@@ -1,0 +1,52 @@
+[
+   {
+      "title": "Broomstick Maintenance Worker",
+      "cost": { "energy": 7, "happiness": -2, "sanity": -1 },
+      "reward": { "gold": 20 }
+   },
+   {
+      "title": "Magical Plant Seedling Tender",
+      "cost": { "energy": 5, "happiness": -1, "sanity": -1, "health": -1 },
+      "reward": { "gold": 25 }
+   },
+   {
+      "title": "Clean-up Crew at Magical Events",
+      "cost": { "energy": 8, "happiness": -3, "sanity": -2 },
+      "reward": { "gold": 30 }
+   },
+   {
+      "title": "Potion Ingredient Sorter",
+      "cost": { "energy": 6, "happiness": -1, "sanity": -2 },
+      "reward": { "gold": 18 }
+   },
+   {
+      "title": "Assistant in a Magical Artifact Shop",
+      "cost": { "energy": 4, "happiness": -1, "sanity": -1 },
+      "reward": { "gold": 22 }
+   },
+   {
+      "title": "Doxy Exterminator",
+      "cost": { "energy": 8, "happiness": -4, "sanity": -3, "health": -2 },
+      "reward": { "gold": 35 }
+   },
+   {
+      "title": "Quill Sharpener",
+      "cost": { "energy": 4, "happiness": -1, "sanity": -1 },
+      "reward": { "gold": 15 }
+   },
+   {
+      "title": "Owl Post Handler",
+      "cost": { "energy": 7, "happiness": -2, "sanity": -2, "health": -1 },
+      "reward": { "gold": 25 }
+   },
+   {
+      "title": "Caretaker at the House-Elf Relocation Office",
+      "cost": { "energy": 5, "happiness": -1, "sanity": -2 },
+      "reward": { "gold": 20 }
+   },
+   {
+      "title": "Apprentice Wandmaker",
+      "cost": { "energy": 6, "happiness": -1, "sanity": -2 },
+      "reward": { "gold": 28 }
+   }
+]

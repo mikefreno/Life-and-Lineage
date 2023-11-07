@@ -1,10 +1,23 @@
-// Learn more https://docs.expo.io/guides/customizing-metro
-const { getDefaultConfig } = require('expo/metro-config');
+const { getDefaultConfig } = require("expo/metro-config");
+const { withNativeWind } = require("nativewind/metro");
 
-/** @type {import('expo/metro-config').MetroConfig} */
-const config = getDefaultConfig(__dirname, {
-  // [Web-only]: Enables CSS support in Metro.
-  isCSSEnabled: true,
-});
+module.exports = (() => {
+  const defaultConfig = getDefaultConfig(__dirname, { isCSSEnabled: true });
 
-module.exports = config;
+  const { transformer, resolver } = defaultConfig;
+
+  defaultConfig.transformer = {
+    ...transformer,
+    babelTransformerPath: require.resolve("react-native-svg-transformer"),
+  };
+
+  defaultConfig.resolver = {
+    ...resolver,
+    assetExts: resolver.assetExts.filter((ext) => ext !== "svg"),
+    sourceExts: [...resolver.sourceExts, "svg"],
+  };
+
+  return withNativeWind(defaultConfig, {
+    input: "./assets/styles/globals.css",
+  });
+})();
