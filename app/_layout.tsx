@@ -5,9 +5,12 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack } from "expo-router";
-import { useEffect } from "react";
+import { SplashScreen, Stack, router } from "expo-router";
+import { createContext, useEffect, useState } from "react";
 import { useColorScheme } from "react-native";
+import { getData } from "../store";
+import { Game } from "../classes/game";
+import { PlayerCharacter } from "../classes/character";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -22,11 +25,46 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+export const GameContext = createContext<
+  | {
+      gameData: Game | undefined;
+      setGameData: React.Dispatch<React.SetStateAction<Game | undefined>>;
+    }
+  | undefined
+>(undefined);
+
+export const PlayerCharacterContext = createContext<
+  | {
+      playerCharacter: PlayerCharacter | undefined;
+      setPlayerCharacter: React.Dispatch<
+        React.SetStateAction<PlayerCharacter | undefined>
+      >;
+    }
+  | undefined
+>(undefined);
+
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
   });
+
+  const [gameData, setGameData] = useState<Game>();
+  const [playerCharacter, setPlayerCharacter] = useState<PlayerCharacter>();
+
+  useEffect(() => {
+    const fetchGameData = async () => {
+      const storedGame = await getData("game");
+      if (storedGame) {
+        const game = Game.fromJSON(storedGame);
+        setGameData(game);
+        const player = game.getPlayer();
+        setPlayerCharacter(player);
+      }
+    };
+
+    fetchGameData();
+  }, []);
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
@@ -36,6 +74,9 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
+      if (!gameData) {
+        router.push("/NewGame");
+      }
     }
   }, [loaded]);
 
@@ -43,7 +84,15 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <GameContext.Provider value={{ gameData, setGameData }}>
+      <PlayerCharacterContext.Provider
+        value={{ playerCharacter, setPlayerCharacter }}
+      >
+        <RootLayoutNav />
+      </PlayerCharacterContext.Provider>
+    </GameContext.Provider>
+  );
 }
 
 function RootLayoutNav() {
@@ -54,7 +103,12 @@ function RootLayoutNav() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="Settings" options={{ presentation: "modal" }} />
-        <Stack.Screen name="Craft" options={{ presentation: "modal" }} />
+        <Stack.Screen name="Study" options={{ presentation: "modal" }} />
+        <Stack.Screen name="Brew" options={{ presentation: "modal" }} />
+        <Stack.Screen
+          name="NewGame"
+          options={{ presentation: "fullScreenModal" }}
+        />
       </Stack>
     </ThemeProvider>
   );

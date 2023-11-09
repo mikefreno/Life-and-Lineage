@@ -3,16 +3,16 @@ import { StyleSheet } from "react-native";
 import EditScreenInfo from "../../components/EditScreenInfo";
 import { Text, View } from "../../components/Themed";
 
-export default function ItemsScreen() {
+export default function PotionsScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Items Tab</Text>
+      <Text style={styles.title}>Potions Tab</Text>
       <View
         style={styles.separator}
         lightColor="#eee"
         darkColor="rgba(255,255,255,0.1)"
       />
-      <EditScreenInfo path="app/(tabs)/items.tsx" />
+      <EditScreenInfo path="app/(tabs)/potions.tsx" />
     </View>
   );
 }
