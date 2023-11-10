@@ -3,7 +3,7 @@ import { View, Text, Pressable } from "react-native";
 import Coins from "../assets/icons/CoinsIcon";
 import Energy from "../assets/icons/EnergyIcon";
 import Sanity from "../assets/icons/SanityIcon";
-import Heart from "../assets/icons/HeartIcon";
+import HealthIcon from "../assets/icons/HealthIcon";
 
 interface LaborTaskProps {
   title: string;
@@ -35,7 +35,7 @@ export default function LaborTask({ title, reward, cost }: LaborTaskProps) {
           {cost.health && (
             <View className="flex w-full flex-row items-center justify-evenly">
               <Text className="dark:text-zinc-50">{cost.health}</Text>
-              <Heart width={14} height={14} style={{ marginLeft: 6 }} />
+              <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
             </View>
           )}
           {cost.sanity && (

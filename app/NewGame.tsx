@@ -10,7 +10,7 @@ import {
 import { Text, View } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { useContext, useState } from "react";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import WitchHat from "../assets/icons/WitchHatIcon";
 import WizardHat from "../assets/icons/WizardHatIcon";
 import { Character, PlayerCharacter } from "../classes/character";
@@ -18,7 +18,7 @@ import jobs from "../assets/jobs.json";
 import names from "../assets/names.json";
 import { Game } from "../classes/game";
 import { GameContext, PlayerCharacterContext } from "./_layout";
-import { router } from "expo-router";
+import { Link, Stack, router } from "expo-router";
 import { storeData } from "../store";
 
 export default function NewGameScreen() {
@@ -119,8 +119,6 @@ export default function NewGameScreen() {
     const filteredNames = names.filter((name) => {
       return name.sex == sex;
     });
-    console.log("fitered: ", filteredNames);
-    console.log("unfiltered: ", names);
     const randomIndex = Math.floor(Math.random() * filteredNames.length);
     return filteredNames[randomIndex].firstName;
   }
@@ -137,6 +135,7 @@ export default function NewGameScreen() {
       sex: sex,
       birthdate: birthday,
       job: job,
+      affection: 75,
     });
     return parent;
   }
@@ -170,7 +169,7 @@ export default function NewGameScreen() {
     const newCharacter = new PlayerCharacter({
       firstName: firstName,
       lastName: lastName,
-      sex: witchOrWizard == "witch" ? "female" : "male",
+      sex: witchOrWizard == "Witch" ? "female" : "male",
       birthdate: birthdate,
       element: element,
       parents: [mom, dad],
@@ -186,7 +185,7 @@ export default function NewGameScreen() {
     setGameData(newGame);
 
     storeData("game", newGame);
-    router.push("/home");
+    router.push("/");
   }
 
   function stepCycler() {
@@ -308,7 +307,7 @@ export default function NewGameScreen() {
                 Minimum Length: 3, Maximum Length: 16
               </Text>
               <TextInput
-                className="rounded border border-zinc-800 pl-2 text-xl dark:border-zinc-100 dark:text-zinc-50"
+                className="mt-8 rounded border border-zinc-800 pl-2 text-xl dark:border-zinc-100 dark:text-zinc-50"
                 onChangeText={setLastName}
                 placeholder={"Surname (Last Name)"}
                 value={lastName}
@@ -730,34 +729,37 @@ export default function NewGameScreen() {
   }
 
   return (
-    <ScrollView>
-      <Text className="bold pt-16 text-center text-3xl">
-        Create a Character
-      </Text>
-      {characterCreationStep > 0 ? (
-        <Pressable
-          className="absolute"
-          style={{ alignItems: "flex-start" }}
-          onPress={() => setCharacterCreationStep((prev) => prev - 1)}
-        >
-          {({ pressed }) => (
-            <View
-              className={`rounded-lg bg-blue-400 px-4 py-1 mt-2 ml-2 dark:bg-blue-800 ${
-                pressed ? "scale-95 opacity-30" : null
-              }`}
-            >
-              <Text style={{ color: "white" }} className="text-2xl">
-                {`<< Back`}
-              </Text>
-            </View>
-          )}
-        </Pressable>
-      ) : null}
-      <View className="">
-        <View className="mx-auto my-8 w-4/5">{stepCycler()}</View>
-        {/* Use a light status bar on iOS to account for the black space above the modal */}
+    <>
+      <Stack.Screen options={{ title: "New Game" }} />
+      <ScrollView>
+        <Text className="bold pt-16 text-center text-3xl">
+          Create a Character
+        </Text>
+        {characterCreationStep > 0 ? (
+          <Pressable
+            className="absolute"
+            style={{ alignItems: "flex-start" }}
+            onPress={() => setCharacterCreationStep((prev) => prev - 1)}
+          >
+            {({ pressed }) => (
+              <View
+                className={`rounded-lg bg-blue-400 px-4 py-1 mt-2 ml-2 dark:bg-blue-800 ${
+                  pressed ? "scale-95 opacity-30" : null
+                }`}
+              >
+                <Text style={{ color: "white" }} className="text-2xl">
+                  {`<< Back`}
+                </Text>
+              </View>
+            )}
+          </Pressable>
+        ) : null}
+        <View className="">
+          <View className="mx-auto my-8 w-4/5">{stepCycler()}</View>
+          {/* Use a light status bar on iOS to account for the black space above the modal */}
+        </View>
         <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 }

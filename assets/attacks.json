@@ -1,0 +1,65 @@
+[
+      {
+         "name": "stab",
+         "targets": "single",
+         "hitChance": 1.0,
+         "damageMult": 1.0,
+         "energyCost": 5,
+         "secondaryEffects": "bleed",
+         "secondaryEffectChance": 0.35
+      },
+      { 
+         "name": "torch stab",
+         "targets": "single",
+         "hitChance": 0.95,
+         "damageMult": 0.85,
+         "energyCost": 5,
+         "secondaryEffects": "burn",
+         "secondaryEffectChance": 0.75
+      },
+      {
+         "name": "cleave",
+         "targets": "cleave",
+         "hitChance": 0.95,
+         "damageMult": 0.75,
+         "energyCost": 10,
+         "secondaryEffects": "bleed",
+         "secondaryEffectChance": 0.35
+      },
+      {
+         "name": "rock throw",
+         "targets": "single",
+         "hitChance": 0.95,
+         "damageMult": 1.25,
+         "energyCost": 5,
+         "secondaryEffects": "stun",
+         "secondaryEffectChance": 0.15
+      },
+      {
+         "name": "bolder throw",
+         "targets": "aoe",
+         "hitChance": 0.85,
+         "damageMult": 1.5,
+         "energyCost": 25,
+         "secondaryEffects": "stun",
+         "secondaryEffectChance": 0.25
+      },
+      {
+         "name": "pocket sand",
+         "targets": "single",
+         "hitChance": 0.95,
+         "damageMult": 0.0,
+         "energyCost": 5,
+         "secondaryEffects": "blind",
+         "secondaryEffectChance": 0.5
+      },
+      {
+         "name": "poison spray",
+         "targets": "single",
+         "hitChance": 1.0,
+         "damageMult": 0.0,
+         "energyCost": 10,
+         "secondaryEffects": "poison",
+         "secondaryEffectChance": 0.35
+      }
+]

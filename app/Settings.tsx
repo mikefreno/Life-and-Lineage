@@ -1,8 +1,8 @@
 import { StatusBar } from "expo-status-bar";
 import { Platform, StyleSheet } from "react-native";
 
-import EditScreenInfo from "../components/EditScreenInfo";
 import { Text, View } from "../components/Themed";
+import { Link } from "expo-router";
 
 export default function SettingsScreen() {
   return (
@@ -13,8 +13,11 @@ export default function SettingsScreen() {
         lightColor="#eee"
         darkColor="rgba(255,255,255,0.1)"
       />
-      <EditScreenInfo path="app/settings.tsx" />
-
+      <View>
+        <Link href="/NewGame" className="dark:text-white">
+          <Text>Start New Game</Text>
+        </Link>
+      </View>
       {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
     </View>

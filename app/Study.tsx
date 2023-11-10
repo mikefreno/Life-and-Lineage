@@ -1,19 +1,129 @@
 import { StatusBar } from "expo-status-bar";
-import { Platform } from "react-native";
+import { Platform, Pressable, ScrollView } from "react-native";
 
-import EditScreenInfo from "../components/EditScreenInfo";
 import { Text, View } from "../components/Themed";
 import "../assets/styles/globals.css";
+import { useState } from "react";
+import spells from "../assets/spells.json";
+import LearnSpellComponent from "../components/LearnSpellComponent";
 
 export default function CraftingScreen() {
-  return (
-    <View className="flex-1 items-center justify-center">
-      <Text className="bold text-xl">Study</Text>
-      <View className="my-8 h-0.5 w-4/5 text-zinc-100 dark:text-zinc-700" />
-      <EditScreenInfo path="app/craft.tsx" />
+  const [selectedElement, setSelectedElement] = useState<string>("");
+  const fireSpells = spells.find((spells) => spells.element == "Fire");
+  const earthSpells = spells.find((spells) => spells.element == "Earth");
+  const airSpells = spells.find((spells) => spells.element == "Air");
+  const waterSpells = spells.find((spells) => spells.element == "Water");
 
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
-    </View>
-  );
+  function elementRenderer() {
+    if (selectedElement == "fire") {
+      return fireSpells?.spells.map((spell, idx) => (
+        <LearnSpellComponent
+          key={idx}
+          title={spell.spellName}
+          desciption={spell.description}
+          proficiencyRequirement={spell.proficiencyRequirement}
+          element={selectedElement}
+        />
+      ));
+    }
+    if (selectedElement == "earth") {
+      return earthSpells?.spells.map((spell, idx) => (
+        <LearnSpellComponent
+          key={idx}
+          title={spell.spellName}
+          desciption={spell.description}
+          proficiencyRequirement={spell.proficiencyRequirement}
+          element={selectedElement}
+        />
+      ));
+    }
+    if (selectedElement == "air") {
+      return airSpells?.spells.map((spell, idx) => (
+        <LearnSpellComponent
+          key={idx}
+          title={spell.spellName}
+          desciption={spell.description}
+          proficiencyRequirement={spell.proficiencyRequirement}
+          element={selectedElement}
+        />
+      ));
+    }
+    if (selectedElement == "water") {
+      return waterSpells?.spells.map((spell, idx) => (
+        <LearnSpellComponent
+          key={idx}
+          title={spell.spellName}
+          desciption={spell.description}
+          proficiencyRequirement={spell.proficiencyRequirement}
+          element={selectedElement}
+        />
+      ));
+    }
+  }
+
+  if (selectedElement == "") {
+    return (
+      <View className="flex-1 items-center justify-center pb-24">
+        <Pressable
+          onPress={() => setSelectedElement("fire")}
+          className="my-4 w-64 rounded-xl bg-orange-600 py-6 active:scale-95 active:opacity-50"
+        >
+          <Text
+            className="text-center text-3xl font-light"
+            style={{ color: "white" }}
+          >
+            Fire
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={() => setSelectedElement("earth")}
+          className="my-4 w-64 rounded-xl bg-[#937D62] py-6 active:scale-95 active:opacity-50"
+        >
+          <Text
+            className="text-center text-3xl font-light"
+            style={{ color: "white" }}
+          >
+            Earth
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={() => setSelectedElement("air")}
+          className="my-4 w-64 rounded-xl bg-slate-100 py-6 active:scale-95 active:opacity-50"
+        >
+          <Text className="text-center text-3xl font-light">Air</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => setSelectedElement("water")}
+          className="my-4 w-64 rounded-xl bg-cyan-400 py-6 active:scale-95 active:opacity-50"
+        >
+          <Text
+            className="text-center text-3xl font-light"
+            style={{ color: "white" }}
+          >
+            Water
+          </Text>
+        </Pressable>
+
+        {/* Use a light status bar on iOS to account for the black space above the modal */}
+        <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
+      </View>
+    );
+  } else {
+    return (
+      <View>
+        <Pressable
+          onPress={() => setSelectedElement("")}
+          style={{ backgroundColor: "#60a5fa" }}
+        >
+          <Text
+            className="py-6 text-center text-2xl"
+            style={{ color: "white" }}
+          >
+            Back to Element Selection
+          </Text>
+        </Pressable>
+        <ScrollView>{elementRenderer()}</ScrollView>
+      </View>
+    );
+  }
 }

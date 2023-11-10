@@ -13,6 +13,7 @@ import Medical from "../../assets/icons/MedicalIcon";
 import { useContext } from "react";
 import { PlayerCharacterContext } from "../_layout";
 import WizardHat from "../../assets/icons/WizardHatIcon";
+import HouseHeart from "../../assets/icons/RelationshipsIcon";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -34,7 +35,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="home"
+        name="index"
         options={{
           title: "Home",
           tabBarIcon: ({ color }) =>
@@ -53,7 +54,7 @@ export default function TabLayout() {
                 style={{ marginBottom: -3 }}
               />
             ),
-          headerRight: () => (
+          headerLeft: () => (
             <Link href="/Settings" asChild>
               <Pressable>
                 {({ pressed }) => (
@@ -61,6 +62,20 @@ export default function TabLayout() {
                     width={30}
                     height={26}
                     color={Colors[colorScheme ?? "light"].text}
+                    style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+            </Link>
+          ),
+          headerRight: () => (
+            <Link href="/Relationships" asChild>
+              <Pressable>
+                {({ pressed }) => (
+                  <HouseHeart
+                    width={30}
+                    height={26}
+                    color={"#f87171"}
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
                 )}
@@ -130,9 +145,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="potions"
+        name="shops"
         options={{
-          title: "Potions",
+          title: "Shops",
           tabBarIcon: ({ color }) => (
             <Potion
               width={26}
@@ -142,7 +157,7 @@ export default function TabLayout() {
             />
           ),
           headerRight: () => (
-            <Link href="/Brew" asChild>
+            <Link href="/Crafting" asChild>
               <Pressable>
                 {({ pressed }) => (
                   <Cauldron

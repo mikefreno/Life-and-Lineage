@@ -1,0 +1,8 @@
+[
+   {
+      "name": "Goblin",
+      "health": 50,
+      "attackPower": 10,
+      "attacks": ["stab", "cleave", "rock throw"]
+   }
+]

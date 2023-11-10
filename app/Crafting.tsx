@@ -5,10 +5,10 @@ import EditScreenInfo from "../components/EditScreenInfo";
 import { Text, View } from "../components/Themed";
 import "../assets/styles/globals.css";
 
-export default function BrewingScreen() {
+export default function CraftingScreen() {
   return (
     <View className="flex-1 items-center justify-center">
-      <Text className="bold text-xl">Brewing</Text>
+      <Text className="bold text-xl">Crafting</Text>
       <View className="my-8 h-0.5 w-4/5 text-zinc-100 dark:text-zinc-700" />
       <EditScreenInfo path="app/craft.tsx" />
 

@@ -5,12 +5,14 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, router } from "expo-router";
-import { createContext, useEffect, useState } from "react";
-import { useColorScheme } from "react-native";
+import { Link, SplashScreen, Stack, router } from "expo-router";
+import { createContext, useContext, useEffect, useState } from "react";
+import { Pressable, useColorScheme } from "react-native";
 import { getData } from "../store";
 import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
+import { MaterialIcons } from "@expo/vector-icons";
+import { Colors } from "react-native/Libraries/NewAppScreen";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -97,6 +99,7 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const gameContext = useContext(GameContext);
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
@@ -104,10 +107,33 @@ function RootLayoutNav() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="Settings" options={{ presentation: "modal" }} />
         <Stack.Screen name="Study" options={{ presentation: "modal" }} />
-        <Stack.Screen name="Brew" options={{ presentation: "modal" }} />
+        <Stack.Screen name="Crafting" options={{ presentation: "modal" }} />
+        <Stack.Screen
+          name="Relationships"
+          options={{ presentation: "modal" }}
+        />
         <Stack.Screen
           name="NewGame"
-          options={{ presentation: "fullScreenModal" }}
+          options={{
+            presentation: "fullScreenModal",
+            headerLeft: () =>
+              gameContext?.gameData ? (
+                <Pressable onPress={() => router.push("/")}>
+                  {({ pressed }) => (
+                    <MaterialIcons
+                      name="cancel"
+                      size={36}
+                      color={Colors[colorScheme ?? "light"].text}
+                      style={{
+                        marginLeft: 15,
+                        marginBottom: 5,
+                        opacity: pressed ? 0.5 : 1,
+                      }}
+                    />
+                  )}
+                </Pressable>
+              ) : null,
+          }}
         />
       </Stack>
     </ThemeProvider>

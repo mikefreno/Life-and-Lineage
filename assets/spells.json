@@ -1,0 +1,62 @@
+[
+  {
+    "element": "Fire",
+    "spells": [
+      {"spellName": "Pyroblast", "description": "Hypergrade fireball causing fiery explosions.", "energyCost": 50, "proficiencyRequirement": "Intermediate"},
+      {"spellName": "Cinderfall", "description": "Rain of burning cinders engulfing the chosen area.", "energyCost": 40, "proficiencyRequirement": "Beginner"},
+      {"spellName": "Phoenix Wings", "description": "Manifest flaming wings for swift flight.", "energyCost": 70, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Ember Cloak", "description": "Envelope oneself in a cloak of protective fire.", "energyCost": 35, "proficiencyRequirement": "Intermediate"},
+      {"spellName": "Flamebind", "description": "Conjure ropes of fire to bind an enemy.", "energyCost": 55, "proficiencyRequirement": "Intermediate"},
+      {"spellName": "Solar Beam", "description": "Harness the power of the sun into a focused beam of energy.", "energyCost": 80, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Inferno Breath", "description": "Unleash a breath of fire, incinerating anything in its path.", "energyCost": 90, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Ember Dance", "description": "Create a swirling vortex of fire, distracting or confusing enemies.", "energyCost": 45, "proficiencyRequirement": "Beginner"},
+      {"spellName": "Volcanic Rune", "description": "Engrave a fiery rune on the ground that explodes when trespassed.", "energyCost": 60, "proficiencyRequirement": "Intermediate"},
+      {"spellName": "Ashen Restoration", "description": "Use the rebirth property of fire, healing severe wounds.", "energyCost": 70, "proficiencyRequirement": "Advanced"}
+    ]
+  },
+  {
+    "element": "Earth",
+    "spells": [
+      {"spellName": "Boulder Roll", "description": "Cause a huge boulder to roll towards enemies.", "energyCost": 70, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Terraform", "description": "Manipulate landscapes at will.", "energyCost": 90, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Sand Vortex", "description": "Create a whirlwind of sand and rocks for confusion and attack.", "energyCost": 50, "proficiencyRequirement": "Intermediate"},
+      {"spellName": "Stone Ward", "description": "Harden the skin to a stone-like quality for defense.", "energyCost": 30, "proficiencyRequirement": "Beginner"},
+      {"spellName": "Crystal Prison", "description": "Conjure a prism of crystal around your foes.", "energyCost": 60, "proficiencyRequirement": "Intermediate"},
+      {"spellName": "Earthquake", "description": "Make the ground tremble and crack beneath your enemies.", "energyCost": 80, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Ironwood Growth", "description": "Grow a strong, sturdy barrier of iron-like wood.", "energyCost": 70, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Pebble Storm", "description": "Raise a high-speed storm of sharp rocks.", "energyCost": 65, "proficiencyRequirement": "Intermediate"},
+      {"spellName": "Granite Grasp", "description": "Hands of solid rock emerge from the ground to hold enemies.", "energyCost": 55, "proficiencyRequirement": "Intermediate"},
+      {"spellName": "Druid’s Call", "description": "Speak to the Earth and its creatures.", "energyCost": 25, "proficiencyRequirement": "Beginner"}
+    ]
+  },
+  {
+    "element": "Water",
+    "spells": [
+      {"spellName": "Tsunami Wave", "description": "Create a massive wave that sweeps everything in its path.", "energyCost": 90, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Healing Aquifer", "description": "Draw health-restoring water from the ground.", "energyCost": 80, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Cryogenic Sphere", "description": "Generate a sphere of intensely cold water, freezing foes.", "energyCost": 60, "proficiencyRequirement": "Intermediate"},
+      {"spellName": "Misty Veil", "description": "Conjure a screen of mist for stealth and escape.", "energyCost": 20, "proficiencyRequirement": "Beginner"},
+      {"spellName": "Vortex Portal", "description": "Open a short-range portal through bodies of water.", "energyCost": 70, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Hydrowhip", "description": "Shape water into a crackling whip.", "energyCost": 50, "proficiencyRequirement": "Intermediate"},
+      {"spellName": "Ebb and Flow", "description": "Control the tides, making water bodies recede or surge.", "energyCost": 65, "proficiencyRequirement": "Intermediate"},
+      {"spellName": "Frost Armor", "description": "Create an armor of ice that also chills attackers.", "energyCost": 55, "proficiencyRequirement": "Beginner"},
+      {"spellName": "Whirlpool", "description": "Summon a whirlpool to disrupt and swallow enemies.", "energyCost": 75, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Raindance", "description": "Cause a calming, steady rainfall.", "energyCost": 30, "proficiencyRequirement": "Beginner"}
+    ]
+  },
+  {
+    "element": "Air",
+    "spells": [
+      {"spellName": "Whirlwind", "description": "Create a small tornado that pulls in or deflects projectiles.", "energyCost": 70, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Gust", "description": "Summon a strong wind to knock back opponents or clear smoke.", "energyCost": 40, "proficiencyRequirement": "Beginner"},
+      {"spellName": "Cyclone Shield", "description": "Create an air barrier around you that deflects attacks.", "energyCost": 60, "proficiencyRequirement": "Intermediate"},
+      {"spellName": "Zephyr Wings", "description": "Form wings of air currents for flight.", "energyCost": 80, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Gale Force", "description": "Release a concentrated, forceful blast of wind.", "energyCost": 75, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Cloud Walk", "description": "Vaporize partially allowing temporary movement through air.", "energyCost": 90, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Air Pocket", "description": "Create a pocket of breathable air around you underwater or in toxic environments.", "energyCost": 45, "proficiencyRequirement": "Intermediate"},
+      {"spellName": "Hurricane Fury", "description": "Summon a fierce windstorm that sweeps across the battlefield.", "energyCost": 85, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Soundwave", "description": "Manipulate air to propagate powerful sound waves that stun enemies.", "energyCost": 70, "proficiencyRequirement": "Advanced"},
+      {"spellName": "Thunderclap", "description": "Cause a sonic shockwave with a clap, disorienting foes.", "energyCost": 55, "proficiencyRequirement": "Intermediate"}
+    ]
+  }
+]
