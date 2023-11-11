@@ -40,7 +40,7 @@ export default function HomeScreen() {
     return (
       <ScrollView className="px-4 py-6">
         <View className="flex flex-row">
-          {playerCharacter?.getSex() == "male" ? (
+          {playerCharacter?.sex == "male" ? (
             <WizardHat height={114} width={120} color={"#1e40af"} />
           ) : (
             <WitchHat height={120} width={120} color={"#4c1d95"} />
@@ -49,7 +49,7 @@ export default function HomeScreen() {
             <Text className="text-xl dark:text-white">{`${name}`}</Text>
             <Text className="text-xl dark:text-white">{`${title}`}</Text>
             <Text className="text-xl dark:text-white">{`${calculateAge(
-              playerCharacter.getBirthdate(),
+              playerCharacter.birthdate,
               new Date(),
             )} years old`}</Text>
           </View>

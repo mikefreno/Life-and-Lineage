@@ -1,10 +1,6 @@
 import { getData } from "../store";
+import { Condition } from "./conditions";
 import { Game } from "./game";
-
-export interface familiar {
-  name: string;
-  age: number;
-}
 
 interface CharacterOptions {
   firstName: string;
@@ -18,10 +14,10 @@ interface CharacterOptions {
 }
 
 export class Character {
-  protected firstName: string;
-  protected lastName: string;
-  protected sex: "male" | "female";
-  protected birthdate: Date;
+  readonly firstName: string;
+  readonly lastName: string;
+  readonly sex: "male" | "female";
+  readonly birthdate: Date;
   protected alive: boolean;
   protected deathdate: Date | null;
   protected job: string;
@@ -48,17 +44,13 @@ export class Character {
   }
 
   public getName(): string {
-    return this.firstName + " " + this.lastName;
+    return `${this.firstName} ${this.lastName}`;
   }
-  public getSex(): "male" | "female" {
-    return this.sex;
-  }
-  public getBirthdate(): Date {
-    return this.birthdate;
-  }
+
   public getJobTitle(): string {
     return this.job;
   }
+
   public getStatus() {
     return {
       name: this.firstName + " " + this.lastName,
@@ -116,6 +108,7 @@ export class PlayerCharacter extends Character {
   private children: Character[] | null = null;
   private element: string;
   private knownSpells: string[];
+  private conditions: Condition[];
 
   constructor({
     firstName,
@@ -158,9 +151,10 @@ export class PlayerCharacter extends Character {
     this.children = children ?? null;
     this.element = element;
     this.knownSpells = knownSpells ?? [];
+    this.conditions = [];
   }
 
-  public getHealth(): number {
+  public getHealth() {
     return this.health;
   }
 
@@ -172,6 +166,7 @@ export class PlayerCharacter extends Character {
     const job = this.jobExperience.find((job) => job.job == this.job);
     return { title: this.job, experience: job?.experience ?? 0 };
   }
+
   public getElementalProficiencies() {
     return this.elementalProficiencies;
   }
@@ -180,20 +175,50 @@ export class PlayerCharacter extends Character {
     const job = this.jobExperience.find((job) => job.job === title);
     return job ? job.experience : 0;
   }
+
   public getParents(): Character[] {
     return this.parents;
   }
 
-  public removeHealth(damage: number): number | "Player Death" {
-    if (damage > this.health) {
-      return "Player Death";
-    } else {
-      this.health -= damage;
-      return this.health;
+  public damageHealth(damage: number | null) {
+    this.health -= damage ?? 0;
+  }
+
+  public damageSanity(damage: number | null) {
+    if (this.sanity) {
+      this.sanity -= damage ?? 0;
+    }
+  }
+  public addCondition(condition: Condition) {
+    this.conditions.push(condition);
+  }
+
+  public conditionTicker() {
+    for (let i = this.conditions.length - 1; i >= 0; i--) {
+      const { effect, damage, turns } = this.conditions[i].tick();
+
+      effect.forEach((eff) => {
+        if (eff == "sanity") {
+          this.damageSanity(damage);
+        } else if (eff == "damage") {
+          this.damageHealth(damage);
+        }
+      });
+
+      if (turns == 0) {
+        this.conditions.splice(i, 1);
+      }
     }
   }
 
   static fromJSON(json: any): PlayerCharacter {
+    let conditions: Condition[] = [];
+    if (json.conditions) {
+      json.conditions.forEach((condition: any) => {
+        const cond = new Condition(condition);
+        conditions.push(cond);
+      });
+    }
     const player = new PlayerCharacter({
       firstName: json.firstName,
       lastName: json.lastName,

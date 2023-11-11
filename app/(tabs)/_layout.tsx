@@ -39,7 +39,7 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color }) =>
-            playerCharacter?.getSex() == "male" ? (
+            playerCharacter?.sex == "male" ? (
               <WizardHat
                 width={28}
                 height={26}

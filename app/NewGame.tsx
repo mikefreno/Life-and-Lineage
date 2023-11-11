@@ -18,7 +18,7 @@ import jobs from "../assets/jobs.json";
 import names from "../assets/names.json";
 import { Game } from "../classes/game";
 import { GameContext, PlayerCharacterContext } from "./_layout";
-import { Link, Stack, router } from "expo-router";
+import { Stack, router } from "expo-router";
 import { storeData } from "../store";
 
 export default function NewGameScreen() {

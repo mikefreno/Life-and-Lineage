@@ -53,3 +53,16 @@ export function getCharacterImage(age: number, sex: "M" | "F") {
     return heads[`Baby_${sex}`];
   }
 }
+
+const monsters = {};
+export function getMonsterImage(monsterName: string) {
+  return require("../assets/images/monsters/goblin.png");
+}
+
+export function flipCoin() {
+  return Math.random() < 0.5 ? "Heads" : "Tails";
+}
+
+export function rollD20() {
+  return Math.floor(Math.random() * 20) + 1;
+}

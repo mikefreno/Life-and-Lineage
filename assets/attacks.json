@@ -5,8 +5,49 @@
          "hitChance": 1.0,
          "damageMult": 1.0,
          "energyCost": 5,
-         "secondaryEffects": "bleed",
-         "secondaryEffectChance": 0.35
+         "sanityDamage": 0,
+         "secondaryEffect": "bleed",
+         "secondaryEffectChance": 0.10
+      },
+      {
+         "name": "serrate",
+         "targets": "single",
+         "hitChance": 0.90,
+         "damageMult": 1.0,
+         "energyCost": 15,
+         "sanityDamage": 0,
+         "secondaryEffect": "hemmorage",
+         "secondaryEffectChance": 0.25
+      },
+      {
+         "name": "bite",
+         "targets": "single",
+         "hitChance": 0.95,
+         "damageMult": 1.25,
+         "energyCost": 10,
+         "sanityDamage": 0,
+         "secondaryEffect": null,
+         "secondaryEffectChance": null 
+      },
+      {
+         "name": "zombie bite",
+         "targets": "single",
+         "hitChance": 0.95,
+         "damageMult": 1.25,
+         "energyCost": 10,
+         "sanityDamage": 0,
+         "secondaryEffect": "diseased",
+         "secondaryEffectChance": 0.05
+      },
+      {
+         "name": "vampiric bite",
+         "targets": "single",
+         "hitChance": 1.0,
+         "damageMult": 1.0,
+         "energyCost": 10,
+         "sanityDamage": 0,
+         "secondaryEffect": "lifesteal",
+         "secondaryEffectChance": 0.85
       },
       { 
          "name": "torch stab",
@@ -14,7 +55,8 @@
          "hitChance": 0.95,
          "damageMult": 0.85,
          "energyCost": 5,
-         "secondaryEffects": "burn",
+         "sanityDamage": 0,
+         "secondaryEffect": "burn",
          "secondaryEffectChance": 0.75
       },
       {
@@ -23,7 +65,8 @@
          "hitChance": 0.95,
          "damageMult": 0.75,
          "energyCost": 10,
-         "secondaryEffects": "bleed",
+         "sanityDamage": 0,
+         "secondaryEffect": "bleed",
          "secondaryEffectChance": 0.35
       },
       {
@@ -32,8 +75,19 @@
          "hitChance": 0.95,
          "damageMult": 1.25,
          "energyCost": 5,
-         "secondaryEffects": "stun",
+         "sanityDamage": 0,
+         "secondaryEffect": "stun",
          "secondaryEffectChance": 0.15
+      },
+      {
+         "name": "grab",
+         "targets": "single",
+         "hitChance": 0.75,
+         "damageMult": 1.0,
+         "energyCost": 15,
+         "sanityDamage": 0,
+         "secondaryEffect": "stun",
+         "secondaryEffectChance": 0.75
       },
       {
          "name": "bolder throw",
@@ -41,7 +95,8 @@
          "hitChance": 0.85,
          "damageMult": 1.5,
          "energyCost": 25,
-         "secondaryEffects": "stun",
+         "sanityDamage": 0,
+         "secondaryEffect": "stun",
          "secondaryEffectChance": 0.25
       },
       {
@@ -50,7 +105,8 @@
          "hitChance": 0.95,
          "damageMult": 0.0,
          "energyCost": 5,
-         "secondaryEffects": "blind",
+         "sanityDamage": 0,
+         "secondaryEffect": "blind",
          "secondaryEffectChance": 0.5
       },
       {
@@ -59,7 +115,28 @@
          "hitChance": 1.0,
          "damageMult": 0.0,
          "energyCost": 10,
-         "secondaryEffects": "poison",
+         "sanityDamage": 0,
+         "secondaryEffect": "poison",
          "secondaryEffectChance": 0.35
+      },
+      {
+         "name": "wail",
+         "targets": "aoe",
+         "hitChance": 0.5,
+         "damageMult": 0.0,
+         "energyCost": 20,
+         "sanityDamage": 5,
+         "secondaryEffect": "fear",
+         "secondaryEffectChance": 0.5
+      },
+      {
+         "name": "shoot",
+         "targets": "single",
+         "hitChance": 0.75,
+         "damageMult": 1.75,
+         "energyCost": 15,
+         "sanityDamage": 0,
+         "secondaryEffect": null,
+         "secondaryEffectChance": null
       }
 ]

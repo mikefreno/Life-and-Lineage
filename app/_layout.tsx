@@ -123,7 +123,7 @@ function RootLayoutNav() {
                     <MaterialIcons
                       name="cancel"
                       size={36}
-                      color={Colors[colorScheme ?? "light"].text}
+                      color={colorScheme == "dark" ? "#fafafa" : "#27272a"}
                       style={{
                         marginLeft: 15,
                         marginBottom: 5,

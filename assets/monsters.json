@@ -1,8 +1,74 @@
 [
    {
+      "name": "Giant Rat",
+      "sanity": null,
+      "healthRange": {"minimum": 20, "maximum": 50},
+      "attackPowerRange": {"minimum": 2, "maximum": 5},
+      "energy": {"maximum": 30, "regen": 5},
+      "attacks": ["bite"],
+      "appearsOn": [1,2]
+   },
+   {
+      "name": "Bat",
+      "sanity": null,
+      "healthRange": {"minimum": 10, "maximum": 20},
+      "attackPowerRange": {"minimum": 3, "maximum": 8},
+      "energy": {"maximum": 30, "regen": 5},
+      "attacks": ["vampiric bite"],
+      "appearsOn": [1,2]
+   },
+   {
+      "name": "Skeleton",
+      "sanity": null,
+      "healthRange": {"minimum": 40, "maximum": 60},
+      "attackPowerRange": {"minimum": 4, "maximum": 8},
+      "energy": {"maximum": 50, "regen": 5},
+      "attacks": ["stab", "cleave"],
+      "appearsOn": [2,3,4]
+   },
+   {
+      "name": "Skeleton Archer",
+      "sanity": null,
+      "healthRange": {"minimum": 30, "maximum": 50},
+      "attackPowerRange": {"minimum": 4, "maximum": 8},
+      "energy": {"maximum": 50, "regen": 5},
+      "attacks": ["shoot"],
+      "appearsOn": [2,3,4]
+   },
+   {
       "name": "Goblin",
-      "health": 50,
-      "attackPower": 10,
-      "attacks": ["stab", "cleave", "rock throw"]
+      "sanity": null,
+      "healthRange": {"minimum": 40, "maximum": 60},
+      "attackPowerRange": {"minimum": 3, "maximum": 7},
+      "energy": {"maximum": 50, "regen": 5},
+      "attacks": ["stab", "pocket sand", "rock throw", "torch stab"],
+      "appearsOn": [2,3,4]
+   },
+   {
+      "name": "Zombie",
+      "sanity": null,
+      "healthRange": {"minimum": 40, "maximum": 60},
+      "attackPowerRange": {"minimum": 5, "maximum": 10},
+      "energy": {"maximum": 50, "regen": 5},
+      "attacks": ["grab", "zombie bite"],
+      "appearsOn": [3,4,5]
+   },
+   {
+      "name": "Ghost",
+      "sanity": null,
+      "healthRange": {"minimum": 30, "maximum": 75},
+      "attackPowerRange": {"minimum": 0, "maximum": 0},
+      "energy": {"maximum": 50, "regen": 5},
+      "attacks": ["wail"],
+      "appearsOn": [3,4,5]
+   },
+      {
+      "name": "Bandit",
+      "sanity": 50,
+      "healthRange": {"minimum": 50, "maximum": 75},
+      "attackPowerRange": {"minimum": 8, "maximum": 10},
+      "energy": {"maximum": 50, "regen": 3},
+      "attacks": ["stab", "pocket sand","serrate"],
+      "appearsOn": [3,4,5]
    }
 ]
