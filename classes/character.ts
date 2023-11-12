@@ -1,6 +1,5 @@
 import { getData } from "../store";
 import { Condition } from "./conditions";
-import { Game } from "./game";
 
 interface CharacterOptions {
   firstName: string;
@@ -88,6 +87,7 @@ interface PlayerCharacterOptions {
   affection?: number;
   health?: number;
   sanity?: number;
+  mana?: number;
   elementalProficiencies?: { element: string; proficiency: number }[];
   jobExperience?: {
     job: string;
@@ -96,18 +96,21 @@ interface PlayerCharacterOptions {
   parents: Character[];
   children?: Character[];
   element: string;
+  physicalAttacks?: string[];
   knownSpells?: string[];
 }
 
 export class PlayerCharacter extends Character {
   private health: number;
   private sanity: number;
+  private mana: number;
   private jobExperience: { job: string; experience: number }[];
   private elementalProficiencies: { element: string; proficiency: number }[];
   private parents: Character[];
   private children: Character[] | null = null;
   private element: string;
   private knownSpells: string[];
+  private physicalAttacks: string[];
   private conditions: Condition[];
 
   constructor({
@@ -121,12 +124,14 @@ export class PlayerCharacter extends Character {
     affection,
     health,
     sanity,
+    mana,
     jobExperience,
     elementalProficiencies,
     parents,
     children,
     element,
     knownSpells,
+    physicalAttacks,
   }: PlayerCharacterOptions) {
     super({
       firstName,
@@ -140,6 +145,7 @@ export class PlayerCharacter extends Character {
     });
     this.health = health ?? 100;
     this.sanity = sanity ?? 50;
+    this.mana = mana ?? 100;
     this.jobExperience = jobExperience ?? [];
     this.elementalProficiencies = elementalProficiencies ?? [
       { element: "fire", proficiency: element == "fire" ? 25 : 0 },
@@ -152,6 +158,7 @@ export class PlayerCharacter extends Character {
     this.element = element;
     this.knownSpells = knownSpells ?? [];
     this.conditions = [];
+    this.physicalAttacks = physicalAttacks ?? ["punch"];
   }
 
   public getHealth() {
@@ -160,6 +167,10 @@ export class PlayerCharacter extends Character {
 
   public getSanity(): number {
     return this.sanity;
+  }
+
+  public getMana(): number {
+    return this.mana;
   }
 
   public getCurrentJobAndExperience() {
@@ -230,6 +241,7 @@ export class PlayerCharacter extends Character {
       affection: json.affection,
       health: json.health,
       sanity: json.sanity,
+      mana: json.mana,
       jobExperience: json.jobExperience,
       parents: json.parents.map((parent: any) => Character.fromJSON(parent)),
       children: json.children
@@ -237,6 +249,7 @@ export class PlayerCharacter extends Character {
         : null,
       element: json.element,
       knownSpells: json.knownSpells,
+      physicalAttacks: json.physicalAttacks,
     });
     return player;
   }

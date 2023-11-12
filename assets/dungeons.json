@@ -1,0 +1,26 @@
+[
+   { 
+      "nearby cave": 
+      [
+         {
+           "level": 1,
+           "step": 0,
+           "stepsBeforeBoss": 25,
+           "boss": "bandit"
+         },
+         {
+           "level": 2,
+           "step": 0,
+           "stepsBeforeBoss": 25,
+           "boss": "bandit"
+         },
+         {
+           "level": 3,
+           "step": 0,
+           "stepsBeforeBoss": 25,
+           "boss": "mage"
+         }
+      ]
+   }
+   
+]

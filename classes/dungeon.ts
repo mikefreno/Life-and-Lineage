@@ -1,4 +1,5 @@
 interface DungeonLevelOptions {
+  instance: string;
   level: number;
   step: number;
   stepsBeforeBoss: number;
@@ -6,16 +7,19 @@ interface DungeonLevelOptions {
 }
 
 export class DungeonLevel {
+  readonly instance: string;
   readonly level: number;
   private step: number;
   readonly stepsBeforeBoss: number;
   private bossDefeated: boolean;
   constructor({
+    instance,
     level,
     step,
     stepsBeforeBoss,
     bossDefeated,
   }: DungeonLevelOptions) {
+    this.instance = instance;
     this.level = level;
     this.step = step;
     this.stepsBeforeBoss = stepsBeforeBoss;
@@ -37,6 +41,7 @@ export class DungeonLevel {
 
   static fromJSON(json: any): DungeonLevel {
     const level = new DungeonLevel({
+      instance: json.instance,
       level: json.level,
       step: json.step,
       stepsBeforeBoss: json.stepsBeforeBoss,

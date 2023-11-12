@@ -66,3 +66,10 @@ export function flipCoin() {
 export function rollD20() {
   return Math.floor(Math.random() * 20) + 1;
 }
+
+export function toTitleCase(title: string) {
+  return title
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}

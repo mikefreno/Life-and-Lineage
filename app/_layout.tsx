@@ -13,6 +13,7 @@ import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colors } from "react-native/Libraries/NewAppScreen";
+import { Monster } from "../classes/creatures";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -45,6 +46,14 @@ export const PlayerCharacterContext = createContext<
   | undefined
 >(undefined);
 
+export const DungeonMonsterContext = createContext<
+  | {
+      monster: Monster | undefined;
+      setMonster: React.Dispatch<React.SetStateAction<Monster | undefined>>;
+    }
+  | undefined
+>(undefined);
+
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
@@ -52,6 +61,7 @@ export default function RootLayout() {
   });
 
   const [gameData, setGameData] = useState<Game>();
+  const [monster, setMonster] = useState<Monster>();
   const [playerCharacter, setPlayerCharacter] = useState<PlayerCharacter>();
 
   useEffect(() => {
@@ -91,7 +101,9 @@ export default function RootLayout() {
       <PlayerCharacterContext.Provider
         value={{ playerCharacter, setPlayerCharacter }}
       >
-        <RootLayoutNav />
+        <DungeonMonsterContext.Provider value={{ monster, setMonster }}>
+          <RootLayoutNav />
+        </DungeonMonsterContext.Provider>
       </PlayerCharacterContext.Provider>
     </GameContext.Provider>
   );

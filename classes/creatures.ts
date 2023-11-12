@@ -1,4 +1,4 @@
-import attacks from "../assets/attacks.json";
+import attacks from "../assets/monsterAttacks.json";
 import { flipCoin, rollD20 } from "../utility/functions";
 import conditions from "../assets/conditions.json";
 import { Condition } from "./conditions";
@@ -23,16 +23,16 @@ interface monsterInterface {
 }
 
 export class Monster {
-  readonly creatureSpecies: string;
-  private health: number;
-  private sanity: number | null;
-  readonly healthMax: number;
-  private attackPower: number;
-  private energy: number;
-  readonly energyMax: number;
-  private energyRegen: number;
-  private attacks: string[];
-  private conditions: Condition[];
+  public creatureSpecies: string;
+  public health: number;
+  public sanity: number | null;
+  public healthMax: number;
+  public attackPower: number;
+  public energy: number;
+  public energyMax: number;
+  public energyRegen: number;
+  public attacks: string[];
+  public conditions: Condition[];
   constructor({
     creatureSpecies,
     health,
@@ -54,11 +54,9 @@ export class Monster {
     this.attacks = attacks;
     this.conditions = conditions ?? [];
   }
-  public getHealth() {
-    return this.health;
-  }
   public damageHealth(damage: number | null) {
     this.health -= damage ?? 0;
+    return this.health;
   }
   public damageSanity(damage: number | null) {
     if (this.sanity) {

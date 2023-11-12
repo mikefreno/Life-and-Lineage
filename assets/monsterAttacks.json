@@ -7,7 +7,7 @@
          "energyCost": 5,
          "sanityDamage": 0,
          "secondaryEffect": "bleed",
-         "secondaryEffectChance": 0.10
+         "secondaryEffectChance": 0.20
       },
       {
          "name": "serrate",

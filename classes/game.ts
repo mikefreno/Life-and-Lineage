@@ -17,6 +17,7 @@ export class Game {
     this.player = player;
     this.dungeon = dungeon ?? [
       new DungeonLevel({
+        instance: "nearby cave",
         level: 1,
         step: 0,
         stepsBeforeBoss: 25,

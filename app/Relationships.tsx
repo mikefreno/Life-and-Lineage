@@ -26,11 +26,11 @@ export default function RelationshipsScreen() {
 
   if (playerCharacter) {
     const parents = playerCharacter.getParents();
-    const dad = parents.find((parent) => parent.getSex() == "male");
-    const mom = parents.find((parent) => parent.getSex() == "female");
+    const dad = parents.find((parent) => parent.sex == "male");
+    const mom = parents.find((parent) => parent.sex == "female");
     if (mom && dad && gameData) {
-      const dadBDay = dad.getBirthdate();
-      const momBDay = mom.getBirthdate();
+      const dadBDay = dad.birthdate;
+      const momBDay = mom.birthdate;
       const currentDate = gameData.getGameDate();
       const dadsAge = calculateAge(dadBDay, currentDate);
       const momsAge = calculateAge(momBDay, currentDate);

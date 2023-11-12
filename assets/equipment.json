@@ -1,0 +1,78 @@
+[
+   {
+      "weapons":
+      [
+         {
+            "name": "stick",
+            "cost": 50,
+            "damage": 1.5
+         },
+         {
+            "name": "dagger",
+            "cost": 150,
+            "damage": 2.0
+         },
+         {
+            "name": "short sword",
+            "cost": 500,
+            "damage": 3.5
+         },
+         {
+            "name": "apprentice wand",
+            "cost": 1000,
+            "damage": 5.0
+         }
+      ]
+   },
+   {
+      "head":
+      [
+         {
+            "name": "feather",
+            "cost": 100,
+            "armor": 5,
+            "heathBonus": null,
+            "staminaBonus": null,
+            "manaBonus": null
+         },
+         {
+            "name": "leather headgear",
+            "cost": 500,
+            "armor": 8,
+            "heathBonus": null,
+            "staminaBonus": null,
+            "manaBonus": null
+         }
+      ]
+   },
+   {
+      "body":
+      [
+         {
+            "name": "cloth robes",
+            "cost": 200,
+            "armor": 8,
+            "heathBonus": null,
+            "staminaBonus": null,
+            "manaBonus": null
+         },
+         {
+            "name": "leather chestpiece",
+            "cost": 500,
+            "armor": 12,
+            "heathBonus": null,
+            "staminaBonus": null,
+            "manaBonus": null
+         },
+         {
+            "name": "apprentice robes",
+            "cost": 1500,
+            "armor": 8,
+            "heathBonus": null,
+            "staminaBonus": null,
+            "manaBonus": 50 
+         }
+      ]
+   }
+
+]
