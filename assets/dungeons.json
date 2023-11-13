@@ -1,7 +1,7 @@
 [
    { 
-      "nearby cave": 
-      [
+      "instance": "nearby cave",
+      "levels": [
          {
            "level": 1,
            "step": 0,

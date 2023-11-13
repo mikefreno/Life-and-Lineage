@@ -1,5 +1,8 @@
 import { getData } from "../store";
+import { rollD20 } from "../utility/functions";
+import { AttackObject } from "../utility/types";
 import { Condition } from "./conditions";
+import conditions from "../assets/conditions.json";
 
 interface CharacterOptions {
   firstName: string;
@@ -98,12 +101,29 @@ interface PlayerCharacterOptions {
   element: string;
   physicalAttacks?: string[];
   knownSpells?: string[];
+  equipment?: {
+    weapon: { name: string; baseDamage: number };
+    head: {
+      name: string;
+      heathBonus: number;
+      staminaBonus: number;
+      manaBonus: number;
+    };
+    body: {
+      name: string;
+      heathBonus: number;
+      staminaBonus: number;
+      manaBonus: number;
+    };
+  };
 }
 
 export class PlayerCharacter extends Character {
   private health: number;
+  private healthMax: number;
   private sanity: number;
   private mana: number;
+  private manaMax: number;
   private jobExperience: { job: string; experience: number }[];
   private elementalProficiencies: { element: string; proficiency: number }[];
   private parents: Character[];
@@ -112,6 +132,21 @@ export class PlayerCharacter extends Character {
   private knownSpells: string[];
   private physicalAttacks: string[];
   private conditions: Condition[];
+  private equipment: {
+    weapon: { name: string; baseDamage: number };
+    head?: {
+      name: string;
+      heathBonus: number;
+      staminaBonus: number;
+      manaBonus: number;
+    };
+    body?: {
+      name: string;
+      heathBonus: number;
+      staminaBonus: number;
+      manaBonus: number;
+    };
+  };
 
   constructor({
     firstName,
@@ -132,6 +167,7 @@ export class PlayerCharacter extends Character {
     element,
     knownSpells,
     physicalAttacks,
+    equipment,
   }: PlayerCharacterOptions) {
     super({
       firstName,
@@ -144,8 +180,10 @@ export class PlayerCharacter extends Character {
       affection,
     });
     this.health = health ?? 100;
+    this.healthMax = health ?? 100;
     this.sanity = sanity ?? 50;
     this.mana = mana ?? 100;
+    this.manaMax = mana ?? 100;
     this.jobExperience = jobExperience ?? [];
     this.elementalProficiencies = elementalProficiencies ?? [
       { element: "fire", proficiency: element == "fire" ? 25 : 0 },
@@ -159,10 +197,17 @@ export class PlayerCharacter extends Character {
     this.knownSpells = knownSpells ?? [];
     this.conditions = [];
     this.physicalAttacks = physicalAttacks ?? ["punch"];
+    this.equipment = equipment ?? {
+      weapon: { name: "unarmored", baseDamage: 1 },
+    };
   }
 
   public getHealth() {
     return this.health;
+  }
+
+  public getMaxHealth() {
+    return this.healthMax;
   }
 
   public getSanity(): number {
@@ -171,6 +216,14 @@ export class PlayerCharacter extends Character {
 
   public getMana(): number {
     return this.mana;
+  }
+
+  public getMaxMana(): number {
+    return this.mana;
+  }
+
+  public getPhysicalAttacks(): string[] {
+    return this.physicalAttacks;
   }
 
   public getCurrentJobAndExperience() {
@@ -193,15 +246,67 @@ export class PlayerCharacter extends Character {
 
   public damageHealth(damage: number | null) {
     this.health -= damage ?? 0;
+    return this.health;
   }
 
   public damageSanity(damage: number | null) {
-    if (this.sanity) {
-      this.sanity -= damage ?? 0;
+    this.sanity -= damage ?? 0;
+    return this.sanity;
+  }
+
+  public addCondition(condition: Condition | null) {
+    if (condition) {
+      this.conditions.push(condition);
     }
   }
-  public addCondition(condition: Condition) {
-    this.conditions.push(condition);
+
+  public doPhysicalAttack(attack: AttackObject, monsterMaxHP: number) {
+    const rollToHit = 20 - (attack.hitChance * 100) / 5;
+    const roll = rollD20();
+    if (roll >= rollToHit) {
+      const hpDamage = attack.damageMult * this.equipment.weapon.baseDamage;
+      const sanityDamage = attack.sanityDamage;
+      const effectChance = attack.secondaryEffectChance;
+      if (effectChance) {
+        let effect: Condition | null = null;
+        const rollToEffect = 20 - (effectChance * 100) / 5;
+        const roll = rollD20();
+        if (roll > rollToEffect) {
+          const conditionJSON = conditions.find(
+            (condition) => condition.name == attack.secondaryEffect,
+          );
+          if (conditionJSON?.damageAmount) {
+            let damage = conditionJSON.damageAmount;
+            if (conditionJSON.damageStyle == "multiplier") {
+              damage *= hpDamage;
+            } else if (conditionJSON.damageStyle == "percentage") {
+              damage *= monsterHP;
+            }
+            effect = new Condition({
+              name: conditionJSON.name,
+              turns: conditionJSON.turns,
+              effect: conditionJSON.effect as (
+                | "skip"
+                | "accuracy halved"
+                | "damage"
+                | "sanity"
+              )[],
+              damage: damage,
+            });
+            return {
+              damage: hpDamage,
+              sanityDamage: sanityDamage,
+              secondaryEffects: effect,
+            };
+          }
+        }
+      }
+      return {
+        damage: hpDamage,
+        sanityDamage: sanityDamage,
+        secondaryEffects: null,
+      };
+    } else return "miss";
   }
 
   public conditionTicker() {

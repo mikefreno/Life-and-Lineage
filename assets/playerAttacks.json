@@ -5,7 +5,6 @@
       "hitChance": 1.0,
       "damageMult": 1.0,
       "sanityDamage": 0,
-      "staminaCost": 10,
       "secondaryEffect": null,
       "secondaryEffectChance": null
    },
@@ -15,7 +14,6 @@
       "hitChance": 0.95,
       "damageMult": 1.0,
       "sanityDamage": 0,
-      "staminaCost": 10,
       "secondaryEffect": null,
       "secondaryEffectChance": null
    },
@@ -25,7 +23,6 @@
       "hitChance": 0.95,
       "damageMult": 1.0,
       "sanityDamage": 0,
-      "staminaCost": 5,
       "secondaryEffect": "bleed",
       "secondaryEffectChance": 0.20
    }

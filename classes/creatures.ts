@@ -61,11 +61,14 @@ export class Monster {
   public damageSanity(damage: number | null) {
     if (this.sanity) {
       this.sanity -= damage ?? 0;
+      return this.sanity;
     }
   }
 
-  public addCondition(condition: Condition) {
-    this.conditions.push(condition);
+  public addCondition(condition: Condition | null) {
+    if (condition) {
+      this.conditions.push(condition);
+    }
   }
 
   public takeTurn(playerMaxHealth: number): {
@@ -78,7 +81,7 @@ export class Monster {
           sanityDamage: number;
           secondaryEffects: Condition | null;
         };
-    health: number;
+    monsterHealth: number;
   } {
     const stun = this.conditions.find((condition) => {
       condition.name == "stun";
@@ -91,14 +94,20 @@ export class Monster {
         const res = flipCoin();
         this.conditionTicker();
         if (res == "Heads") {
-          return { attack: this.attack(playerMaxHealth), health: this.health };
-        } else return { attack: "miss", health: this.health };
+          return {
+            attack: this.attack(playerMaxHealth),
+            monsterHealth: this.health,
+          };
+        } else return { attack: "miss", monsterHealth: this.health };
       }
       this.conditionTicker();
-      return { attack: this.attack(playerMaxHealth), health: this.health };
+      return {
+        attack: this.attack(playerMaxHealth),
+        monsterHealth: this.health,
+      };
     } else {
       this.conditionTicker();
-      return { attack: "stunned", health: this.health };
+      return { attack: "stunned", monsterHealth: this.health };
     }
   }
 

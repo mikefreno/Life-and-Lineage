@@ -70,7 +70,7 @@ export default function CraftingScreen() {
         >
           <Text
             className="text-center text-3xl font-light"
-            style={{ color: "white" }}
+            style={{ color: "#fafafa" }}
           >
             Fire
           </Text>
@@ -81,7 +81,7 @@ export default function CraftingScreen() {
         >
           <Text
             className="text-center text-3xl font-light"
-            style={{ color: "white" }}
+            style={{ color: "#fafafa" }}
           >
             Earth
           </Text>
@@ -90,7 +90,12 @@ export default function CraftingScreen() {
           onPress={() => setSelectedElement("air")}
           className="my-4 w-64 rounded-xl bg-slate-100 py-6 active:scale-95 active:opacity-50"
         >
-          <Text className="text-center text-3xl font-light">Air</Text>
+          <Text
+            className="text-center text-3xl font-light"
+            style={{ color: "#27272a" }}
+          >
+            Air
+          </Text>
         </Pressable>
         <Pressable
           onPress={() => setSelectedElement("water")}
@@ -98,7 +103,7 @@ export default function CraftingScreen() {
         >
           <Text
             className="text-center text-3xl font-light"
-            style={{ color: "white" }}
+            style={{ color: "#fafafa" }}
           >
             Water
           </Text>
@@ -117,7 +122,7 @@ export default function CraftingScreen() {
         >
           <Text
             className="py-6 text-center text-2xl"
-            style={{ color: "white" }}
+            style={{ color: "#fafafa" }}
           >
             Back to Element Selection
           </Text>
