@@ -148,42 +148,55 @@ export class Monster {
           let effect: Condition | null = null;
           const rollToEffect = 20 - (effectChance * 100) / 5;
           const roll = rollD20();
-          if (roll > rollToEffect) {
-            const conditionJSON = conditions.find(
-              (condition) => condition.name == chosenAttack.secondaryEffect,
-            );
-            if (conditionJSON?.damageAmount) {
-              let damage = conditionJSON.damageAmount;
-              if (conditionJSON.damageStyle == "multiplier") {
-                damage *= this.attackPower;
-              } else if (conditionJSON.damageStyle == "percentage") {
-                damage *= playerMaxHealth;
+          if (roll >= rollToEffect) {
+            if (chosenAttack.secondaryEffect == "lifesteal") {
+              const heal = 0.25 * damage;
+              if (heal + this.health > this.healthMax) {
+                this.health = this.healthMax;
+              } else {
+                this.health += heal;
               }
-              effect = new Condition({
-                name: conditionJSON.name,
-                turns: conditionJSON.turns,
-                effect: conditionJSON.effect as (
-                  | "skip"
-                  | "accuracy halved"
-                  | "damage"
-                  | "sanity"
-                )[],
+              return {
                 damage: damage,
-              });
+                sanityDamage: sanityDamage,
+                secondaryEffect: null,
+              };
+            } else {
+              const conditionJSON = conditions.find(
+                (condition) => condition.name == chosenAttack.secondaryEffect,
+              );
+              if (conditionJSON?.damageAmount) {
+                let damage = conditionJSON.damageAmount;
+                if (conditionJSON.damageStyle == "multiplier") {
+                  damage *= this.attackPower;
+                } else if (conditionJSON.damageStyle == "percentage") {
+                  damage *= playerMaxHealth;
+                }
+                effect = new Condition({
+                  name: conditionJSON.name,
+                  turns: conditionJSON.turns,
+                  effect: conditionJSON.effect as (
+                    | "skip"
+                    | "accuracy halved"
+                    | "damage"
+                    | "sanity"
+                  )[],
+                  damage: damage,
+                });
+              }
+              return {
+                damage: damage,
+                sanityDamage: sanityDamage,
+                secondaryEffects: effect,
+              };
             }
           }
-          return {
-            damage: damage,
-            sanityDamage: sanityDamage,
-            secondaryEffects: effect,
-          };
-        } else {
-          return {
-            damage: damage,
-            sanityDamage: sanityDamage,
-            secondaryEffects: null,
-          };
         }
+        return {
+          damage: damage,
+          sanityDamage: sanityDamage,
+          secondaryEffects: null,
+        };
       } else {
         return "miss";
       }

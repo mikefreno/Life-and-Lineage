@@ -5,14 +5,12 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Link, SplashScreen, Stack, router } from "expo-router";
-import { createContext, useContext, useEffect, useState } from "react";
-import { Pressable, useColorScheme } from "react-native";
+import { SplashScreen, Stack, router } from "expo-router";
+import { createContext, useEffect, useState } from "react";
+import { useColorScheme } from "react-native";
 import { getData } from "../store";
 import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
-import { MaterialIcons } from "@expo/vector-icons";
-import { Colors } from "react-native/Libraries/NewAppScreen";
 import { Monster } from "../classes/creatures";
 
 export {
@@ -111,7 +109,6 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const gameContext = useContext(GameContext);
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
@@ -123,29 +120,6 @@ function RootLayoutNav() {
         <Stack.Screen
           name="Relationships"
           options={{ presentation: "modal" }}
-        />
-        <Stack.Screen
-          name="NewGame"
-          options={{
-            presentation: "fullScreenModal",
-            headerLeft: () =>
-              gameContext?.gameData ? (
-                <Pressable onPress={() => router.push("/")}>
-                  {({ pressed }) => (
-                    <MaterialIcons
-                      name="cancel"
-                      size={36}
-                      color={colorScheme == "dark" ? "#fafafa" : "#27272a"}
-                      style={{
-                        marginLeft: 15,
-                        marginBottom: 5,
-                        opacity: pressed ? 0.5 : 1,
-                      }}
-                    />
-                  )}
-                </Pressable>
-              ) : null,
-          }}
         />
       </Stack>
     </ThemeProvider>

@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
-import { Platform, ScrollView, Image } from "react-native";
-import { Text, View } from "../components/Themed";
+import { Platform, Image } from "react-native";
+import { Text, View, ScrollView } from "../components/Themed";
 import { useContext } from "react";
 import { GameContext, PlayerCharacterContext } from "./_layout";
 import { calculateAge, getCharacterImage } from "../utility/functions";

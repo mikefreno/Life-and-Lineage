@@ -8,16 +8,21 @@ import { Pressable } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 import BattleTab from "../../components/BattleTab";
 import { AttackObject } from "../../utility/types";
+import { router } from "expo-router";
+import { DungeonLevel } from "../../classes/dungeon";
 
-export default function DungeonLevel() {
+export default function DungeonLevelScreen() {
   const playerContext = useContext(PlayerCharacterContext);
   const gameContext = useContext(GameContext);
-  const { id } = useLocalSearchParams();
+  const { slug } = useLocalSearchParams();
+  const id = slug[0];
+  const instance = slug[1];
   let level: number;
   level = Number(id);
   const [battleTab, setBattleTab] = useState<
-    "attacks" | "spells" | "equipment" | "misc"
-  >("attacks");
+    "attacks" | "spells" | "equipment" | "log"
+  >("log");
+  const [battleLog, setBattleLog] = useState<{ logLine: string }[]>([]);
 
   const [currentEnemy, setCurrentEnemy] = useState<Monster | null>(null);
 
@@ -28,10 +33,23 @@ export default function DungeonLevel() {
   }
 
   const { playerCharacter } = playerContext;
-  const { gameData, setGameData } = gameContext;
+  const { gameData } = gameContext;
 
-  const dungeons = gameData?.getDungeon();
-  const thisDungeon = dungeons?.find((dungeon) => dungeon.level == level);
+  const thisDungeon = gameData?.getDungeon(instance, level);
+
+  useEffect(() => {
+    if (!currentEnemy) {
+      enemyGenerator();
+    }
+  }, [currentEnemy]);
+
+  function battleLogger(whatHappened: string) {
+    const timeOfLog = new Date().toLocaleString();
+    const log = { logLine: `${timeOfLog}: ${whatHappened}` };
+    setBattleLog((prevLogs) => {
+      return [...prevLogs, log];
+    });
+  }
 
   function pickRandomEnemyJSON() {
     const enemiesOnThisLevel = enemies.filter((enemy) =>
@@ -44,12 +62,6 @@ export default function DungeonLevel() {
   function getNumberInRange(minimum: number, maximum: number) {
     return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
   }
-
-  useEffect(() => {
-    if (!currentEnemy) {
-      enemyGenerator();
-    }
-  }, [currentEnemy]);
 
   function enemyGenerator() {
     const enemyJSON = pickRandomEnemyJSON();
@@ -71,11 +83,11 @@ export default function DungeonLevel() {
       energyRegen: enemyJSON.energy?.regen,
       attacks: enemyJSON.attacks,
     });
-
+    battleLogger(`You Found a ${enemy.creatureSpecies}!`);
     setCurrentEnemy(enemy);
   }
 
-  const useAttack = (attack: AttackObject) => {
+  function useAttack(attack: AttackObject) {
     if (currentEnemy && playerCharacter) {
       const attackRes = playerCharacter.doPhysicalAttack(
         attack,
@@ -95,7 +107,6 @@ export default function DungeonLevel() {
       const enemyAttackRes = currentEnemy.takeTurn(
         playerCharacter.getMaxHealth(),
       );
-      console.log(enemyAttackRes);
       if (
         enemyAttackRes.attack !== "miss" &&
         enemyAttackRes.attack !== "stunned" &&
@@ -107,11 +118,11 @@ export default function DungeonLevel() {
         );
         playerCharacter.addCondition(enemyAttackRes.attack.secondaryEffects);
         if (hp <= 0 || sanity <= 0) {
-          //kill player
+          router.replace("/DeathScreen");
         }
       }
     }
-  };
+  }
 
   while (!currentEnemy) {
     return (
@@ -125,8 +136,8 @@ export default function DungeonLevel() {
     return (
       <>
         <Stack.Screen options={{ title: `Dungeon Level ${level}` }} />
-        <View className="flex-1 justify-evenly px-4 py-6">
-          <View className="flex flex-row justify-evenly">
+        <View className="flex-1 px-4 py-6">
+          <View className="flex h-1/3 flex-row justify-evenly">
             <View className="flex flex-col items-center justify-center">
               <Text className="text-3xl">{currentEnemy.creatureSpecies}</Text>
               <Text className="text-xl">
@@ -138,8 +149,10 @@ export default function DungeonLevel() {
             </View>
           </View>
           <View>
-            <Text className="text-center text-2xl">
-              {`Current Level: ${thisDungeon.level} / ${thisDungeon.stepsBeforeBoss}`}
+            <Text className="text-center text-xl">
+              {`Steps Completed: ${thisDungeon.getStep()} / ${
+                thisDungeon.stepsBeforeBoss
+              }`}
             </Text>
             <View className="flex w-full flex-row justify-evenly border-y border-zinc-200">
               <Pressable
@@ -174,18 +187,22 @@ export default function DungeonLevel() {
               </Pressable>
               <Pressable
                 className={`px-6 py-4 rounded ${
-                  battleTab == "misc"
+                  battleTab == "log"
                     ? "bg-zinc-100 dark:bg-zinc-800"
                     : "active:bg-zinc-200 dark:active:bg-zinc-700"
                 }`}
-                onPress={() => setBattleTab("misc")}
+                onPress={() => setBattleTab("log")}
               >
-                <Text className="text-xl">Misc.</Text>
+                <Text className="text-xl">Log</Text>
               </Pressable>
             </View>
-            <View className="h-1/3">
-              <BattleTab battleTab={battleTab} useAttack={useAttack} />
-            </View>
+          </View>
+          <View className="h-1/2">
+            <BattleTab
+              battleTab={battleTab}
+              useAttack={useAttack}
+              battleLog={battleLog}
+            />
           </View>
           <View className="flex flex-row justify-evenly">
             <Text

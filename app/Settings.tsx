@@ -1,10 +1,14 @@
 import { StatusBar } from "expo-status-bar";
-import { Platform, StyleSheet } from "react-native";
-
+import { Platform, Pressable, StyleSheet } from "react-native";
 import { Text, View } from "../components/Themed";
-import { Link } from "expo-router";
+import { router } from "expo-router";
 
 export default function SettingsScreen() {
+  const startNewGame = () => {
+    router.back();
+    router.push("/NewGame");
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Settings</Text>
@@ -14,9 +18,12 @@ export default function SettingsScreen() {
         darkColor="rgba(255,255,255,0.1)"
       />
       <View>
-        <Link href="/NewGame" className="dark:text-white">
+        <Pressable
+          onPress={startNewGame}
+          className="px-4 py-6 active:bg-zinc-700"
+        >
           <Text>Start New Game</Text>
-        </Link>
+        </Pressable>
       </View>
       {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />

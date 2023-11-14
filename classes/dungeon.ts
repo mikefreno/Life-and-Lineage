@@ -19,6 +19,10 @@ export class DungeonInstance {
     this.levels = levels ?? [];
   }
 
+  public getLevels() {
+    return this.levels;
+  }
+
   static fromJSON(json: any): DungeonInstance {
     const level = new DungeonInstance({
       name: json.name,

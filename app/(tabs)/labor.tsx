@@ -1,6 +1,6 @@
 import jobs from "../../assets/jobs.json";
 import LaborTask from "../../components/LaborTask";
-import { ScrollView, View } from "react-native";
+import { ScrollView, View } from "../../components/Themed";
 
 export default function LaborScreen() {
   return (
