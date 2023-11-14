@@ -73,11 +73,13 @@ export class Monster {
 
   public takeTurn(playerMaxHealth: number): {
     attack:
-      | "stunned"
+      | "stun"
       | "miss"
       | "pass"
       | {
+          name: string;
           damage: number;
+          heal?: number;
           sanityDamage: number;
           secondaryEffects: Condition | null;
         };
@@ -107,7 +109,7 @@ export class Monster {
       };
     } else {
       this.conditionTicker();
-      return { attack: "stunned", monsterHealth: this.health };
+      return { attack: "stun", monsterHealth: this.health };
     }
   }
 
@@ -157,9 +159,11 @@ export class Monster {
                 this.health += heal;
               }
               return {
+                name: chosenAttack.name,
                 damage: damage,
                 sanityDamage: sanityDamage,
-                secondaryEffect: null,
+                heal: heal,
+                secondaryEffects: null,
               };
             } else {
               const conditionJSON = conditions.find(
@@ -185,6 +189,7 @@ export class Monster {
                 });
               }
               return {
+                name: chosenAttack.name,
                 damage: damage,
                 sanityDamage: sanityDamage,
                 secondaryEffects: effect,
@@ -193,6 +198,7 @@ export class Monster {
           }
         }
         return {
+          name: chosenAttack.name,
           damage: damage,
           sanityDamage: sanityDamage,
           secondaryEffects: null,

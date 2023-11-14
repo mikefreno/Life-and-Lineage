@@ -2,18 +2,24 @@ import { View, Text } from "../../components/Themed";
 import enemies from "../../assets/monsters.json";
 import { Monster } from "../../classes/creatures";
 import { useContext, useEffect, useState } from "react";
-import { GameContext, PlayerCharacterContext } from "../_layout";
+import {
+  BattleLogContext,
+  DungeonMonsterContext,
+  GameContext,
+  PlayerCharacterContext,
+} from "../_layout";
 import { MonsterImage } from "../../components/MonsterImage";
 import { Pressable } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 import BattleTab from "../../components/BattleTab";
 import { AttackObject } from "../../utility/types";
 import { router } from "expo-router";
-import { DungeonLevel } from "../../classes/dungeon";
 
 export default function DungeonLevelScreen() {
   const playerContext = useContext(PlayerCharacterContext);
   const gameContext = useContext(GameContext);
+  const monsterContext = useContext(DungeonMonsterContext);
+  const battleLogContext = useContext(BattleLogContext);
   const { slug } = useLocalSearchParams();
   const id = slug[0];
   const instance = slug[1];
@@ -22,31 +28,30 @@ export default function DungeonLevelScreen() {
   const [battleTab, setBattleTab] = useState<
     "attacks" | "spells" | "equipment" | "log"
   >("log");
-  const [battleLog, setBattleLog] = useState<{ logLine: string }[]>([]);
 
-  const [currentEnemy, setCurrentEnemy] = useState<Monster | null>(null);
-
-  if (!playerContext || !gameContext) {
+  if (!playerContext || !gameContext || !monsterContext || !battleLogContext) {
     throw new Error(
-      "DungeonLevel must be used within a PlayerCharacterContext, DungeonMonsterContext & GameContext provider",
+      "DungeonLevel must be used within a PlayerCharacterContext, DungeonMonsterContext, BattleLogContext & GameContext provider",
     );
   }
 
+  const { setLogs } = battleLogContext;
   const { playerCharacter } = playerContext;
   const { gameData } = gameContext;
+  const { monster, setMonster } = monsterContext;
 
   const thisDungeon = gameData?.getDungeon(instance, level);
 
   useEffect(() => {
-    if (!currentEnemy) {
+    if (!monster) {
       enemyGenerator();
     }
-  }, [currentEnemy]);
+  }, [monster]);
 
   function battleLogger(whatHappened: string) {
-    const timeOfLog = new Date().toLocaleString();
+    const timeOfLog = new Date().toLocaleTimeString();
     const log = { logLine: `${timeOfLog}: ${whatHappened}` };
-    setBattleLog((prevLogs) => {
+    setLogs((prevLogs) => {
       return [...prevLogs, log];
     });
   }
@@ -84,47 +89,73 @@ export default function DungeonLevelScreen() {
       attacks: enemyJSON.attacks,
     });
     battleLogger(`You Found a ${enemy.creatureSpecies}!`);
-    setCurrentEnemy(enemy);
+    setMonster(enemy);
   }
 
   function useAttack(attack: AttackObject) {
-    if (currentEnemy && playerCharacter) {
+    if (monster && playerCharacter) {
+      let monsterDefeated = false;
       const attackRes = playerCharacter.doPhysicalAttack(
         attack,
-        currentEnemy.healthMax,
+        monster.healthMax,
       );
       if (attackRes !== "miss") {
-        const hp = currentEnemy.damageHealth(attackRes.damage);
-        const sanity = currentEnemy.damageSanity(attackRes.sanityDamage);
-        currentEnemy.addCondition(attackRes.secondaryEffects);
-        if (hp <= 0 || (sanity && sanity <= 0)) {
-          setCurrentEnemy(null);
-        } else {
-          //@ts-ignore
-          setCurrentEnemy({ ...currentEnemy });
+        const hp = monster.damageHealth(attackRes.damage);
+        const sanity = monster.damageSanity(attackRes.sanityDamage);
+        monster.addCondition(attackRes.secondaryEffects);
+
+        let line = `You ${attack.name}ed the ${monster.creatureSpecies} for ${attackRes.damage} heath damage`;
+        if (attackRes.sanityDamage) {
+          line += ` and ${attackRes.sanityDamage} sanity damage`;
         }
+        if (attackRes.secondaryEffects) {
+          line += ` and applied a ${attackRes.secondaryEffects.name} stack`;
+        }
+        battleLogger(line);
+        if (hp <= 0 || (sanity && sanity <= 0)) {
+          battleLogger(`You defeated the ${monster.creatureSpecies}`);
+          monsterDefeated = true;
+          setMonster(null);
+        }
+      } else {
+        battleLogger(`You ${attackRes}ed the ${monster.creatureSpecies}`);
       }
-      const enemyAttackRes = currentEnemy.takeTurn(
-        playerCharacter.getMaxHealth(),
-      );
-      if (
-        enemyAttackRes.attack !== "miss" &&
-        enemyAttackRes.attack !== "stunned" &&
-        enemyAttackRes.attack !== "pass"
-      ) {
-        const hp = playerCharacter.damageHealth(enemyAttackRes.attack.damage);
-        const sanity = playerCharacter.damageSanity(
-          enemyAttackRes.attack.sanityDamage,
-        );
-        playerCharacter.addCondition(enemyAttackRes.attack.secondaryEffects);
-        if (hp <= 0 || sanity <= 0) {
-          router.replace("/DeathScreen");
+      if (!monsterDefeated) {
+        const enemyAttackRes = monster.takeTurn(playerCharacter.getMaxHealth());
+        if (
+          enemyAttackRes.attack !== "miss" &&
+          enemyAttackRes.attack !== "stun" &&
+          enemyAttackRes.attack !== "pass"
+        ) {
+          const hp = playerCharacter.damageHealth(enemyAttackRes.attack.damage);
+          const sanity = playerCharacter.damageSanity(
+            enemyAttackRes.attack.sanityDamage,
+          );
+          playerCharacter.addCondition(enemyAttackRes.attack.secondaryEffects);
+          if (hp <= 0 || sanity <= 0) {
+            router.replace("/DeathScreen");
+          }
+          let line = `The ${monster.creatureSpecies} used ${enemyAttackRes.attack.name} dealing ${enemyAttackRes.attack.damage} health damage`;
+          if (enemyAttackRes.attack.sanityDamage > 0) {
+            line += ` and ${enemyAttackRes.attack.sanityDamage} sanity damage`;
+          }
+          if (enemyAttackRes.attack.secondaryEffects) {
+            line += ` and applied a ${enemyAttackRes.attack.secondaryEffects.name} stack`;
+          }
+          if (enemyAttackRes.attack.heal) {
+            line += ` and healed for ${enemyAttackRes.attack.heal} health`;
+          }
+          battleLogger(line);
+        } else {
+          battleLogger(
+            `The ${monster?.creatureSpecies} was ${enemyAttackRes.attack}ed`,
+          );
         }
       }
     }
   }
 
-  while (!currentEnemy) {
+  while (!monster) {
     return (
       <View>
         <Text>Loading enemy...</Text>
@@ -139,13 +170,13 @@ export default function DungeonLevelScreen() {
         <View className="flex-1 px-4 py-6">
           <View className="flex h-1/3 flex-row justify-evenly">
             <View className="flex flex-col items-center justify-center">
-              <Text className="text-3xl">{currentEnemy.creatureSpecies}</Text>
-              <Text className="text-xl">
-                {currentEnemy.health} / {currentEnemy.healthMax} health
+              <Text className="text-3xl">{monster.creatureSpecies}</Text>
+              <Text className="text-xl" style={{ color: "#ef4444" }}>
+                {monster.health} / {monster.healthMax} health
               </Text>
             </View>
             <View>
-              <MonsterImage monsterSpecies={currentEnemy.creatureSpecies} />
+              <MonsterImage monsterSpecies={monster.creatureSpecies} />
             </View>
           </View>
           <View>
@@ -198,11 +229,7 @@ export default function DungeonLevelScreen() {
             </View>
           </View>
           <View className="h-1/2">
-            <BattleTab
-              battleTab={battleTab}
-              useAttack={useAttack}
-              battleLog={battleLog}
-            />
+            <BattleTab useAttack={useAttack} battleTab={battleTab} />
           </View>
           <View className="flex flex-row justify-evenly">
             <Text

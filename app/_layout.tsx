@@ -46,8 +46,16 @@ export const PlayerCharacterContext = createContext<
 
 export const DungeonMonsterContext = createContext<
   | {
-      monster: Monster | undefined;
-      setMonster: React.Dispatch<React.SetStateAction<Monster | undefined>>;
+      monster: Monster | null;
+      setMonster: React.Dispatch<React.SetStateAction<Monster | null>>;
+    }
+  | undefined
+>(undefined);
+
+export const BattleLogContext = createContext<
+  | {
+      logs: { logLine: string }[];
+      setLogs: React.Dispatch<React.SetStateAction<{ logLine: string }[]>>;
     }
   | undefined
 >(undefined);
@@ -59,8 +67,9 @@ export default function RootLayout() {
   });
 
   const [gameData, setGameData] = useState<Game>();
-  const [monster, setMonster] = useState<Monster>();
+  const [monster, setMonster] = useState<Monster | null>(null);
   const [playerCharacter, setPlayerCharacter] = useState<PlayerCharacter>();
+  const [logs, setLogs] = useState<{ logLine: string }[]>([]);
 
   useEffect(() => {
     const fetchGameData = async () => {
@@ -100,7 +109,9 @@ export default function RootLayout() {
         value={{ playerCharacter, setPlayerCharacter }}
       >
         <DungeonMonsterContext.Provider value={{ monster, setMonster }}>
-          <RootLayoutNav />
+          <BattleLogContext.Provider value={{ logs, setLogs }}>
+            <RootLayoutNav />
+          </BattleLogContext.Provider>
         </DungeonMonsterContext.Provider>
       </PlayerCharacterContext.Provider>
     </GameContext.Provider>

@@ -243,6 +243,9 @@ export class PlayerCharacter extends Character {
   public getParents(): Character[] {
     return this.parents;
   }
+  public getChildren(): Character[] | null {
+    return this.children;
+  }
 
   public damageHealth(damage: number | null) {
     this.health -= damage ?? 0;
@@ -280,7 +283,7 @@ export class PlayerCharacter extends Character {
             if (conditionJSON.damageStyle == "multiplier") {
               damage *= hpDamage;
             } else if (conditionJSON.damageStyle == "percentage") {
-              damage *= monsterHP;
+              damage *= monsterMaxHP;
             }
             effect = new Condition({
               name: conditionJSON.name,

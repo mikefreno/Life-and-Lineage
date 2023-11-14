@@ -1,17 +1,15 @@
 [
    {"message": "You Died"},
    {"message": "Death Comes For Us All"},
-   {"message": "You Are Ash, Fade Away"},
+   {"message": "Ash, Fade Away"},
    {"message": "Engulfed by Darkness"},
    {"message": "Return to Dust"},
    {"message": "Eternal Rest Awaits"},
-   {"message": "Meet your Demise"},
-   {"message": "Vanquished in Battle"},
+   {"message": "Met your Demise"},
+   {"message": "Vanquished"},
    {"message": "Consumed by the Void"},
    {"message": "Lost in the Abyss"},
    {"message": "Embrace Inevitability"},
    {"message": "Fallen One, Rest Now"},
-   {"message": "Your Flame Flickers Out"},
-   {"message": "Become a Ghost of your Former Self"},
-   {"message": "Meet the Reaper"}
+   {"message": "Your Flame Flickers Out"}
 ]

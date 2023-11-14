@@ -1,23 +1,18 @@
 import { StatusBar } from "expo-status-bar";
-import { Platform, Image } from "react-native";
+import { Platform } from "react-native";
 import { Text, View, ScrollView } from "../components/Themed";
 import { useContext } from "react";
 import { GameContext, PlayerCharacterContext } from "./_layout";
-import { calculateAge, getCharacterImage } from "../utility/functions";
+import { calculateAge } from "../utility/functions";
 import { CharacterImage } from "../components/CharacterImage";
 
 export default function RelationshipsScreen() {
   const playerContext = useContext(PlayerCharacterContext);
   const gameContext = useContext(GameContext);
 
-  if (!playerContext) {
+  if (!playerContext || !gameContext) {
     throw new Error(
-      "RelationshipsScreen must be used within a PlayerCharacterContext provider",
-    );
-  }
-  if (!gameContext) {
-    throw new Error(
-      "RelationshipsScreen must be used within a PlayerCharacterContext provider",
+      "RelationshipsScreen must be used within a PlayerCharacterContext, GameContext provider",
     );
   }
 

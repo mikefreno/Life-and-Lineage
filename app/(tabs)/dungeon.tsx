@@ -65,7 +65,7 @@ export default function DungeonScreen() {
                 key={dungeonInstanceIdx}
                 className="rounded-lg border border-zinc-900 bg-zinc-700 px-4 py-2 dark:border-zinc-100"
               >
-                <Text className="text-center text-2xl underline underline-offset-4">
+                <Text className="text-center text-2xl underline">
                   {toTitleCase(dungeonInstance.instance)}
                 </Text>
                 <View className="mx-auto">
