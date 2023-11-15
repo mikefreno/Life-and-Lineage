@@ -33,6 +33,29 @@ export default function SetStars() {
             Earth Signs are more adept at Earth Based Magics
           </Text>
           <Text className="py-1 text-center">Etc...</Text>
+          {star !== "" ? (
+            <View className="mx-auto mt-8">
+              <Pressable
+                onPress={() =>
+                  router.push(
+                    `/NewGame/Review/${witchOrWizard}/${firstName}/${lastName}/${star}/${element}`,
+                  )
+                }
+              >
+                {({ pressed }) => (
+                  <View
+                    className={`rounded-lg bg-blue-400 px-8 py-4 dark:bg-blue-800 ${
+                      pressed ? "scale-95 opacity-30" : null
+                    }`}
+                  >
+                    <Text style={{ color: "white" }} className="text-2xl">
+                      Review
+                    </Text>
+                  </View>
+                )}
+              </Pressable>
+            </View>
+          ) : null}
           <View className="mt-4 flex max-w-full justify-center">
             <View
               className="flex rounded"
@@ -363,29 +386,6 @@ export default function SetStars() {
               </View>
             </View>
           </View>
-          {star !== "" ? (
-            <View className="mx-auto mt-8">
-              <Pressable
-                onPress={() =>
-                  router.push(
-                    `/NewGame/Review/${witchOrWizard}/${firstName}/${lastName}/${star}/${element}`,
-                  )
-                }
-              >
-                {({ pressed }) => (
-                  <View
-                    className={`rounded-lg bg-blue-400 px-8 py-4 dark:bg-blue-800 ${
-                      pressed ? "scale-95 opacity-30" : null
-                    }`}
-                  >
-                    <Text style={{ color: "white" }} className="text-2xl">
-                      Review
-                    </Text>
-                  </View>
-                )}
-              </Pressable>
-            </View>
-          ) : null}
         </View>
       </ScrollView>
     </>

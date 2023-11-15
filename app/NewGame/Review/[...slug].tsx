@@ -1,42 +1,44 @@
 import { useContext } from "react";
 import { View as ThemedView, Text } from "../../../components/Themed";
 import { Pressable, View } from "react-native";
-import { GameContext, PlayerCharacterContext } from "../../_layout";
-import { Character, PlayerCharacter } from "../../../classes/character";
 import {
-  Stack,
-  router,
-  useLocalSearchParams,
-  useNavigation,
-} from "expo-router";
+  BattleLogContext,
+  DungeonMonsterContext,
+  GameContext,
+  PlayerCharacterContext,
+} from "../../_layout";
+import { Character, PlayerCharacter } from "../../../classes/character";
+import { Stack, router, useLocalSearchParams } from "expo-router";
 import names from "../../../assets/names.json";
 import jobs from "../../../assets/jobs.json";
 import { storeData } from "../../../store";
 import { Game } from "../../../classes/game";
-import { clearHistory } from "../../../utility/functions";
 
 export default function NewGameReview() {
   const gameContext = useContext(GameContext);
   const playerContext = useContext(PlayerCharacterContext);
+  const dungeonMonsterContext = useContext(DungeonMonsterContext);
+  const battleLogContext = useContext(BattleLogContext);
   const { slug } = useLocalSearchParams();
   const witchOrWizard = slug[0];
   const firstName = slug[1];
   const lastName = slug[2];
   const star = slug[3];
   const element = slug[4];
-  const navigation = useNavigation();
 
-  if (!gameContext) {
+  if (
+    !gameContext ||
+    !playerContext ||
+    !battleLogContext ||
+    !dungeonMonsterContext
+  ) {
     throw new Error("NewGameScreen must be used within a GameContext provider");
-  }
-  if (!playerContext) {
-    throw new Error(
-      "NewGameScreen must be used within a PlayerCharacterContext provider",
-    );
   }
 
   const { setGameData } = gameContext;
   const { setPlayerCharacter } = playerContext;
+  const { setLogs } = battleLogContext;
+  const { setMonster } = dungeonMonsterContext;
 
   function generateBirthdate(zodiac: string, birthYear: number): Date {
     let month: number;
@@ -175,10 +177,15 @@ export default function NewGameReview() {
     const startDate = new Date();
     const newGame = new Game({ date: startDate, player: player });
     setGameData(newGame);
-
     storeData("game", newGame);
-    clearHistory(navigation);
-    router.push("/");
+    setLogs([]);
+    setMonster(null);
+
+    router.back();
+    router.back();
+    router.back();
+    router.back();
+    router.replace("/");
   }
 
   return (

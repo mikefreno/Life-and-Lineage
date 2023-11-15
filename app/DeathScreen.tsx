@@ -25,7 +25,7 @@ export default function DeathScreen() {
     return deathMessages[randomIndex].message;
   }
 
-  const { playerCharacter, setPlayerCharacter } = playerContext;
+  const { playerCharacter } = playerContext;
   const { gameData } = gameContext;
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function DeathScreen() {
   }, []);
 
   function startNewGame() {
-    router.replace("/NewGame");
+    router.push("/NewGame");
   }
 
   const currentDate = gameData?.getGameDate();
@@ -48,7 +48,12 @@ export default function DeathScreen() {
         }}
       />
       <View className="flex h-full items-center justify-center">
-        <Text className="text-3xl font-bold">{getDeathMessage()}</Text>
+        <Text
+          className="py-8 text-center text-3xl font-bold"
+          style={{ letterSpacing: 3, color: "#ef4444" }}
+        >
+          {getDeathMessage()}
+        </Text>
         {playerCharacter?.getChildren() ? (
           <>
             <Text className="text-xl">Continue as one of your children</Text>

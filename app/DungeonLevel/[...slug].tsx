@@ -15,7 +15,6 @@ import BattleTab from "../../components/BattleTab";
 import { AttackObject } from "../../utility/types";
 import { router } from "expo-router";
 import { storeData } from "../../store";
-import { Game } from "../../classes/game";
 
 export default function DungeonLevelScreen() {
   const playerContext = useContext(PlayerCharacterContext);
@@ -58,8 +57,6 @@ export default function DungeonLevelScreen() {
       return [...prevLogs, log];
     });
   }
-
-  function updateContainingDungeonInstance() {}
 
   function pickRandomEnemyJSON() {
     const enemiesOnThisLevel = enemies.filter((enemy) =>
@@ -139,17 +136,34 @@ export default function DungeonLevelScreen() {
           );
           playerCharacter.addCondition(enemyAttackRes.attack.secondaryEffects);
           if (hp <= 0 || sanity <= 0) {
+            router.back();
             router.replace("/DeathScreen");
           }
+          let array = [];
           let line = `The ${monster.creatureSpecies} used ${enemyAttackRes.attack.name} dealing ${enemyAttackRes.attack.damage} health damage`;
-          if (enemyAttackRes.attack.sanityDamage > 0) {
-            line += ` and ${enemyAttackRes.attack.sanityDamage} sanity damage`;
-          }
-          if (enemyAttackRes.attack.secondaryEffects) {
-            line += ` and applied a ${enemyAttackRes.attack.secondaryEffects.name} stack`;
-          }
+
           if (enemyAttackRes.attack.heal) {
-            line += ` and healed for ${enemyAttackRes.attack.heal} health`;
+            array.push(`healing for ${enemyAttackRes.attack.heal} health`);
+          }
+
+          if (enemyAttackRes.attack.sanityDamage > 0) {
+            array.push(
+              `dealing ${enemyAttackRes.attack.sanityDamage} sanity damage`,
+            );
+          }
+
+          if (enemyAttackRes.attack.secondaryEffects) {
+            array.push(
+              `it applied a ${enemyAttackRes.attack.secondaryEffects.name} stack`,
+            );
+          }
+
+          if (array.length) {
+            line +=
+              ", " +
+              array.slice(0, -1).join(", ") +
+              (array.length > 1 ? ", and " : " and ") +
+              array.slice(-1);
           }
           battleLogger(line);
         } else {

@@ -73,7 +73,7 @@ export default function DungeonScreen() {
                     <View key={levelIdx}>
                       <Pressable
                         onPress={() =>
-                          router.replace(
+                          router.push(
                             `/DungeonLevel/${level.level}/${dungeonInstance.instance}`,
                           )
                         }

@@ -2,11 +2,12 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
   DarkTheme,
   DefaultTheme,
+  NavigationProp,
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, router } from "expo-router";
-import { createContext, useContext, useEffect, useState } from "react";
+import { SplashScreen, Stack, router, useNavigation } from "expo-router";
+import { createContext, useEffect, useState } from "react";
 import { useColorScheme } from "react-native";
 import { getData } from "../store";
 import { Game } from "../classes/game";

@@ -1,21 +1,18 @@
 import { useColorScheme } from "react-native";
-import { View, ScrollView, Text } from "../../components/Themed";
-import { useContext, useEffect, useLayoutEffect } from "react";
-import { GameContext, PlayerCharacterContext } from "../_layout";
+import { View, Text } from "../../components/Themed";
+import { useContext } from "react";
+import { PlayerCharacterContext } from "../_layout";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import WitchHat from "../../assets/icons/WitchHatIcon";
 import { calculateAge } from "../../utility/functions";
-import { router } from "expo-router";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const playerContext = useContext(PlayerCharacterContext);
-  const gameContext = useContext(GameContext);
 
-  if (!playerContext || !gameContext) {
+  if (!playerContext) {
     throw new Error("NewGameScreen missing context providers");
   }
-  const { gameData } = gameContext;
   const { playerCharacter } = playerContext;
 
   function elementalProficiencySection(
