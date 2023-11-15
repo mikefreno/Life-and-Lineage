@@ -11,7 +11,7 @@ import { Character, PlayerCharacter } from "../../../classes/character";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import names from "../../../assets/names.json";
 import jobs from "../../../assets/jobs.json";
-import { storeData } from "../../../store";
+import { saveGame } from "../../../utility/functions";
 import { Game } from "../../../classes/game";
 
 export default function NewGameReview() {
@@ -177,7 +177,7 @@ export default function NewGameReview() {
     const startDate = new Date();
     const newGame = new Game({ date: startDate, player: player });
     setGameData(newGame);
-    storeData("game", newGame);
+    saveGame(newGame);
     setLogs([]);
     setMonster(null);
 

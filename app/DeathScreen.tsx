@@ -8,7 +8,7 @@ import { router } from "expo-router";
 import { CharacterImage } from "../components/CharacterImage";
 import { calculateAge } from "../utility/functions";
 import { Character } from "../classes/character";
-import { storeData } from "../store";
+import { saveGame } from "../utility/functions";
 
 export default function DeathScreen() {
   const playerContext = useContext(PlayerCharacterContext);
@@ -30,7 +30,7 @@ export default function DeathScreen() {
 
   useEffect(() => {
     gameData?.hitDeathScreen();
-    storeData("game", gameData);
+    saveGame(gameData);
   }, []);
 
   function startNewGame() {

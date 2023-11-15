@@ -1,52 +1,62 @@
 [
    {
       "title": "Broomstick Maintenance Worker",
-      "cost": { "energy": 7, "sanity": -1 },
+      "cost": { "mana": 7, "sanity": -1 },
+      "qualifications": null,
       "reward": { "gold": 20 }
    },
    {
       "title": "Magical Plant Seedling Tender",
-      "cost": { "energy": 5, "sanity": -1, "health": -1 },
+      "cost": { "mana": 5, "sanity": -1, "health": -1 },
+      "qualifications": null,
       "reward": { "gold": 25 }
    },
    {
       "title": "Clean-up Crew at Magical Events",
-      "cost": { "energy": 8, "sanity": -2 },
+      "cost": { "mana": 8, "sanity": -2 },
+      "qualifications": null,
       "reward": { "gold": 30 }
    },
    {
       "title": "Potion Ingredient Sorter",
-      "cost": { "energy": 6, "sanity": -2 },
+      "cost": { "mana": 6, "sanity": -2 },
+      "qualifications": null,
       "reward": { "gold": 18 }
    },
    {
       "title": "Assistant in a Magical Artifact Shop",
-      "cost": { "energy": 4, "sanity": -1 },
+      "cost": { "mana": 4, "sanity": -1 },
+      "qualifications": null,
       "reward": { "gold": 22 }
    },
    {
       "title": "Doxy Exterminator",
-      "cost": { "energy": 8, "sanity": -3, "health": -2 },
+      "cost": { "mana": 8, "sanity": -3, "health": -2 },
+      "qualifications": null,
       "reward": { "gold": 35 }
    },
    {
       "title": "Quill Sharpener",
-      "cost": { "energy": 4, "sanity": -1 },
+      "cost": { "mana": 4, "sanity": -1 },
+      "qualifications": null,
       "reward": { "gold": 15 }
    },
    {
       "title": "Owl Post Handler",
-      "cost": { "energy": 7, "sanity": -2, "health": -1 },
+      "cost": { "mana": 7, "sanity": -2, "health": -1 },
+      "qualifications": null,
       "reward": { "gold": 25 }
    },
    {
       "title": "Caretaker at the House-Elf Relocation Office",
-      "cost": { "energy": 5, "sanity": -2 },
+      "cost": { "mana": 5, "sanity": -2 },
+      "qualifications": null,
       "reward": { "gold": 20 }
    },
    {
       "title": "Apprentice Wandmaker",
-      "cost": { "energy": 6, "sanity": -2 },
+      "cost": { "mana": 5 },
+      "qualifications": ["highschool"],
       "reward": { "gold": 28 }
    }
 ]

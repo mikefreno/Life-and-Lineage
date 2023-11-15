@@ -5,6 +5,7 @@ import { PlayerCharacterContext } from "../_layout";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import WitchHat from "../../assets/icons/WitchHatIcon";
 import { calculateAge } from "../../utility/functions";
+import Coins from "../../assets/icons/CoinsIcon";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -62,22 +63,29 @@ export default function HomeScreen() {
             )} years old`}</Text>
           </View>
         </View>
-        <View className="mx-auto">
+
+        <View className="flex items-center">
           {elementalProficiencySection(elementalProficiencies)}
         </View>
-        <View className="flex flex-row justify-evenly pt-12">
-          <Text
-            className="text-xl"
-            style={{ color: "#ef4444" }}
-          >{`${playerCharacter.getHealth()} / ${playerCharacter.getMaxHealth()} Health`}</Text>
-          <Text
-            className="text-xl"
-            style={{ color: "#60a5fa" }}
-          >{`${playerCharacter.getMana()} / ${playerCharacter.getMaxMana()} Mana`}</Text>
-          <Text
-            className="text-xl"
-            style={{ color: "#c084fc" }}
-          >{`${playerCharacter.getSanity()} Sanity`}</Text>
+        <View className="flex flex-col">
+          <View className="flex flex-row justify-center">
+            <Text>{playerCharacter.getReadableGold()}</Text>
+            <Coins width={20} height={20} style={{ marginLeft: 6 }} />
+          </View>
+          <View className="flex flex-row justify-evenly pt-12">
+            <Text
+              className="text-xl"
+              style={{ color: "#ef4444" }}
+            >{`${playerCharacter.getHealth()} / ${playerCharacter.getMaxHealth()} Health`}</Text>
+            <Text
+              className="text-xl"
+              style={{ color: "#60a5fa" }}
+            >{`${playerCharacter.getMana()} / ${playerCharacter.getMaxMana()} Mana`}</Text>
+            <Text
+              className="text-xl"
+              style={{ color: "#c084fc" }}
+            >{`${playerCharacter.getSanity()} Sanity`}</Text>
+          </View>
         </View>
       </View>
     );

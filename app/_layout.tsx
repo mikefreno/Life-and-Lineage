@@ -2,14 +2,13 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
   DarkTheme,
   DefaultTheme,
-  NavigationProp,
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, router, useNavigation } from "expo-router";
+import { SplashScreen, Stack, router } from "expo-router";
 import { createContext, useEffect, useState } from "react";
 import { useColorScheme } from "react-native";
-import { getData } from "../store";
+import { getData, loadGame } from "../utility/functions";
 import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Monster } from "../classes/creatures";
@@ -74,7 +73,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     const fetchGameData = async () => {
-      const storedGame = await getData("game");
+      const storedGame = await loadGame();
       if (storedGame) {
         const game = Game.fromJSON(storedGame);
         setGameData(game);
@@ -85,6 +84,8 @@ export default function RootLayout() {
 
     fetchGameData();
   }, []);
+
+  useEffect(() => console.log("player updated"), [playerCharacter]);
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {

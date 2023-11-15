@@ -1,3 +1,44 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Game } from "../classes/game";
+
+export const storeData = async (key: string, value: any) => {
+  try {
+    const jsonValue = JSON.stringify(value);
+    await AsyncStorage.setItem(key, jsonValue);
+  } catch (e) {
+    // saving error
+    console.log(e);
+  }
+};
+
+//just saves game, simpler interface
+export const saveGame = async (game: Game | undefined) => {
+  try {
+    const jsonGame = JSON.stringify(game);
+    await AsyncStorage.setItem("game", jsonGame);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export const getData = async (key: string) => {
+  try {
+    const jsonValue = await AsyncStorage.getItem(key);
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export const loadGame = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem("game");
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
 export function calculateAge(birthdate: Date, currentDate: Date) {
   let age = currentDate.getFullYear() - birthdate.getFullYear();
   const m = currentDate.getMonth() - birthdate.getMonth();

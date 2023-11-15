@@ -14,7 +14,7 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import BattleTab from "../../components/BattleTab";
 import { AttackObject } from "../../utility/types";
 import { router } from "expo-router";
-import { storeData } from "../../store";
+import { saveGame } from "../../utility/functions";
 
 export default function DungeonLevelScreen() {
   const playerContext = useContext(PlayerCharacterContext);
@@ -173,8 +173,7 @@ export default function DungeonLevelScreen() {
         }
       }
     }
-
-    storeData("game", gameData);
+    saveGame(gameData);
   }
 
   while (!monster) {

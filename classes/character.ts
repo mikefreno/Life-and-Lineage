@@ -1,5 +1,5 @@
-import { getData } from "../store";
 import { rollD20 } from "../utility/functions";
+import { getData } from "../utility/functions";
 import { AttackObject } from "../utility/types";
 import { Condition } from "./conditions";
 import conditions from "../assets/conditions.json";
@@ -13,6 +13,7 @@ interface CharacterOptions {
   deathdate?: Date | null;
   job?: string;
   affection?: number;
+  qualifications?: string[];
 }
 
 export class Character {
@@ -24,6 +25,7 @@ export class Character {
   protected deathdate: Date | null;
   protected job: string;
   protected affection: number;
+  protected qualifications: string[];
 
   constructor({
     firstName,
@@ -34,6 +36,7 @@ export class Character {
     deathdate,
     job,
     affection,
+    qualifications,
   }: CharacterOptions) {
     this.firstName = firstName;
     this.lastName = lastName;
@@ -43,6 +46,7 @@ export class Character {
     this.deathdate = deathdate ?? null;
     this.job = job ?? "unemployed";
     this.affection = affection ?? 0;
+    this.qualifications = qualifications ?? [];
   }
 
   public getName(): string {
@@ -51,6 +55,14 @@ export class Character {
 
   public getJobTitle(): string {
     return this.job;
+  }
+
+  public getQualifications() {
+    return this.qualifications;
+  }
+
+  public setJobTitle(newJobTitle: string) {
+    this.job = newJobTitle;
   }
 
   public getStatus() {
@@ -74,6 +86,7 @@ export class Character {
       deathdate: new Date(json.deathdate),
       job: json.job,
       affection: json.affection,
+      qualifications: json.qualifications,
     });
     return character;
   }
@@ -103,6 +116,7 @@ interface PlayerCharacterOptions {
   element: string;
   physicalAttacks?: string[];
   knownSpells?: string[];
+  gold?: number;
   equipment?: {
     weapon: { name: string; baseDamage: number };
     head: {
@@ -134,6 +148,7 @@ export class PlayerCharacter extends Character {
   private knownSpells: string[];
   private physicalAttacks: string[];
   private conditions: Condition[];
+  private gold: number;
   private equipment: {
     weapon: { name: string; baseDamage: number };
     head?: {
@@ -171,6 +186,7 @@ export class PlayerCharacter extends Character {
     element,
     knownSpells,
     physicalAttacks,
+    gold,
     equipment,
   }: PlayerCharacterOptions) {
     super({
@@ -201,6 +217,7 @@ export class PlayerCharacter extends Character {
     this.knownSpells = knownSpells ?? [];
     this.conditions = [];
     this.physicalAttacks = physicalAttacks ?? ["punch"];
+    this.gold = gold ?? 25;
     this.equipment = equipment ?? {
       weapon: { name: "unarmored", baseDamage: 1 },
     };
@@ -239,6 +256,25 @@ export class PlayerCharacter extends Character {
     return this.elementalProficiencies;
   }
 
+  public getGold() {
+    return this.gold;
+  }
+
+  public getReadableGold() {
+    if (this.gold > 10_000_000_000) {
+      const cleanedUp = (this.gold / 1_000_000_000).toFixed(2);
+      return `${parseFloat(cleanedUp).toLocaleString()}B`;
+    }
+    if (this.gold > 10_000_000) {
+      const cleanedUp = (this.gold / 1_000_000).toFixed(2);
+      return `${parseFloat(cleanedUp).toLocaleString()}M`;
+    }
+    if (this.gold > 10_000) {
+      const cleanedUp = (this.gold / 1000).toFixed(2);
+      return `${parseFloat(cleanedUp).toLocaleString()}K`;
+    } else return this.gold.toLocaleString();
+  }
+
   public getJobExperience(title: string): number {
     const job = this.jobExperience.find((job) => job.job === title);
     return job ? job.experience : 0;
@@ -247,6 +283,7 @@ export class PlayerCharacter extends Character {
   public getParents(): Character[] {
     return this.parents;
   }
+
   public getChildren(): Character[] | null {
     return this.children;
   }
@@ -364,6 +401,8 @@ export class PlayerCharacter extends Character {
       element: json.element,
       knownSpells: json.knownSpells,
       physicalAttacks: json.physicalAttacks,
+      gold: json.gold,
+      equipment: json.equipment,
     });
     return player;
   }
