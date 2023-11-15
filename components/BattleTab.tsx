@@ -70,7 +70,7 @@ export default function BattleTab({ battleTab, useAttack }: BattleTabProps) {
     case "log":
       return (
         <View
-          className="flex-1 border border-zinc-900 px-4 dark:border-zinc-100"
+          className="flex-1 rounded border border-zinc-900 px-4 dark:border-zinc-100"
           style={{
             backgroundColor: colorScheme == "dark" ? "#09090b" : "#fff",
           }}

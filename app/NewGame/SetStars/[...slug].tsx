@@ -1,6 +1,6 @@
-import { Pressable, ScrollView } from "react-native";
-import { View, Text } from "../../../components/Themed";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { Pressable, View } from "react-native";
+import { Text, ScrollView } from "../../../components/Themed";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { toTitleCase } from "../../../utility/functions";

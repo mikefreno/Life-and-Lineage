@@ -89,8 +89,10 @@ interface PlayerCharacterOptions {
   job?: string;
   affection?: number;
   health?: number;
+  healthMax?: number;
   sanity?: number;
   mana?: number;
+  manaMax?: number;
   elementalProficiencies?: { element: string; proficiency: number }[];
   jobExperience?: {
     job: string;
@@ -158,8 +160,10 @@ export class PlayerCharacter extends Character {
     job,
     affection,
     health,
+    healthMax,
     sanity,
     mana,
+    manaMax,
     jobExperience,
     elementalProficiencies,
     parents,
@@ -180,10 +184,10 @@ export class PlayerCharacter extends Character {
       affection,
     });
     this.health = health ?? 100;
-    this.healthMax = health ?? 100;
+    this.healthMax = healthMax ?? 100;
     this.sanity = sanity ?? 50;
     this.mana = mana ?? 100;
-    this.manaMax = mana ?? 100;
+    this.manaMax = manaMax ?? 100;
     this.jobExperience = jobExperience ?? [];
     this.elementalProficiencies = elementalProficiencies ?? [
       { element: "fire", proficiency: element == "fire" ? 25 : 0 },
@@ -219,7 +223,7 @@ export class PlayerCharacter extends Character {
   }
 
   public getMaxMana(): number {
-    return this.mana;
+    return this.manaMax;
   }
 
   public getPhysicalAttacks(): string[] {
@@ -348,8 +352,10 @@ export class PlayerCharacter extends Character {
       job: json.job,
       affection: json.affection,
       health: json.health,
+      healthMax: json.healthMax,
       sanity: json.sanity,
       mana: json.mana,
+      manaMax: json.manaMax,
       jobExperience: json.jobExperience,
       parents: json.parents.map((parent: any) => Character.fromJSON(parent)),
       children: json.children

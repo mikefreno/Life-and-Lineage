@@ -1,20 +1,22 @@
 import { useColorScheme } from "react-native";
 import { View, ScrollView, Text } from "../../components/Themed";
-import { useContext } from "react";
-import { PlayerCharacterContext } from "../_layout";
+import { useContext, useEffect, useLayoutEffect } from "react";
+import { GameContext, PlayerCharacterContext } from "../_layout";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import WitchHat from "../../assets/icons/WitchHatIcon";
 import { calculateAge } from "../../utility/functions";
+import { router } from "expo-router";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const playerContext = useContext(PlayerCharacterContext);
+  const gameContext = useContext(GameContext);
 
-  if (!playerContext) {
-    throw new Error(
-      "NewGameScreen must be used within a PlayerCharacterContext provider",
-    );
+  if (!playerContext || !gameContext) {
+    throw new Error("NewGameScreen missing context providers");
   }
+  const { gameData } = gameContext;
+  const { playerCharacter } = playerContext;
 
   function elementalProficiencySection(
     proficiencies: {
@@ -32,13 +34,12 @@ export default function HomeScreen() {
     });
   }
 
-  const { playerCharacter } = playerContext;
   if (playerCharacter) {
     const name = playerCharacter.getName();
     const { title, experience } = playerCharacter.getCurrentJobAndExperience();
     const elementalProficiencies = playerCharacter.getElementalProficiencies();
     return (
-      <ScrollView className="px-4 py-6">
+      <View className="flex-1 justify-between px-4 py-6">
         <View className="flex flex-row pb-8">
           <View className="scale-x-[-1] transform">
             {playerCharacter?.sex == "male" ? (
@@ -81,7 +82,7 @@ export default function HomeScreen() {
             style={{ color: "#c084fc" }}
           >{`${playerCharacter.getSanity()} Sanity`}</Text>
         </View>
-      </ScrollView>
+      </View>
     );
   }
 }

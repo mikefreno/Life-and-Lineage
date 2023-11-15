@@ -6,6 +6,7 @@ interface GameOptions {
   player: PlayerCharacter;
   dungeonInstances?: DungeonInstance[];
   furthestDepth?: { instance: string; level: number };
+  atDeathScreen?: boolean;
 }
 
 export class Game {
@@ -13,8 +14,15 @@ export class Game {
   private player: PlayerCharacter;
   private dungeonInstances: DungeonInstance[];
   private furthestDepth: { instance: string; level: number };
+  private atDeathScreen: boolean;
 
-  constructor({ date, player, dungeonInstances, furthestDepth }: GameOptions) {
+  constructor({
+    date,
+    player,
+    dungeonInstances,
+    furthestDepth,
+    atDeathScreen,
+  }: GameOptions) {
     this.date = date ?? new Date();
     this.player = player;
     this.dungeonInstances = dungeonInstances ?? [
@@ -31,10 +39,18 @@ export class Game {
       }),
     ];
     this.furthestDepth = furthestDepth ?? { instance: "nearby cave", level: 1 };
+    this.atDeathScreen = atDeathScreen ?? false;
   }
 
   public getGameDate(): Date {
     return this.date;
+  }
+
+  public hitDeathScreen() {
+    this.atDeathScreen = true;
+  }
+  public getAtDeathScreen() {
+    return this.atDeathScreen;
   }
 
   public getDungeon(instance: string, level: number): DungeonLevel | undefined {
@@ -46,6 +62,27 @@ export class Game {
         .getLevels()
         .find((dungeonLevel) => dungeonLevel.level == level);
       return found;
+    }
+  }
+  public getInstance(instanceName: string) {
+    return this.dungeonInstances.find(
+      (instance) => instance.name == instanceName,
+    );
+  }
+
+  public getAllInstances() {
+    return this.dungeonInstances;
+  }
+
+  public updateNamedInstance(instanceName: string, instance: DungeonInstance) {}
+
+  public updateDungeonLevel(instanceName: string, dungeonLevel: DungeonLevel) {
+    let containingInstance = this.dungeonInstances.find(
+      (instance) => instance.name === instanceName,
+    );
+
+    if (containingInstance) {
+      containingInstance.updateLevel(dungeonLevel);
     }
   }
 

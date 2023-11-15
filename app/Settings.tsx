@@ -20,7 +20,7 @@ export default function SettingsScreen() {
       <View>
         <Pressable
           onPress={startNewGame}
-          className="px-4 py-6 active:bg-zinc-700"
+          className="px-4 py-6 active:bg-zinc-200 active:dark:bg-zinc-700"
         >
           <Text>Start New Game</Text>
         </Pressable>

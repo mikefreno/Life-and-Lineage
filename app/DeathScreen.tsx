@@ -2,12 +2,13 @@ import { Pressable, StyleSheet } from "react-native";
 import { View, Text, SafeAreaView } from "../components/Themed";
 import { Stack } from "expo-router";
 import deathMessages from "../assets/deathMessages.json";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { GameContext, PlayerCharacterContext } from "./_layout";
 import { router } from "expo-router";
 import { CharacterImage } from "../components/CharacterImage";
 import { calculateAge } from "../utility/functions";
 import { Character } from "../classes/character";
+import { storeData } from "../store";
 
 export default function DeathScreen() {
   const playerContext = useContext(PlayerCharacterContext);
@@ -27,9 +28,13 @@ export default function DeathScreen() {
   const { playerCharacter, setPlayerCharacter } = playerContext;
   const { gameData } = gameContext;
 
+  useEffect(() => {
+    gameData?.hitDeathScreen();
+    storeData("game", gameData);
+  }, []);
+
   function startNewGame() {
-    setPlayerCharacter(undefined);
-    router.push("/NewGame");
+    router.replace("/NewGame");
   }
 
   const currentDate = gameData?.getGameDate();
@@ -74,7 +79,7 @@ export default function DeathScreen() {
         ) : null}
         <Pressable
           onPress={startNewGame}
-          className="mt-2 border px-4 py-2 active:scale-95 active:bg-zinc-100 active:dark:bg-zinc-600"
+          className="mt-2 border px-4 py-2 active:scale-95 active:bg-zinc-100 dark:border-zinc-50 active:dark:bg-zinc-600"
         >
           <Text className="text-lg">Live a New Life</Text>
         </Pressable>

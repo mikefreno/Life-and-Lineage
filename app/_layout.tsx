@@ -6,7 +6,7 @@ import {
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack, router } from "expo-router";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useColorScheme } from "react-native";
 import { getData } from "../store";
 import { Game } from "../classes/game";
@@ -95,9 +95,14 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
       if (!gameData) {
         router.push("/NewGame");
+      } else if (
+        gameData.getAtDeathScreen() ||
+        (playerCharacter && playerCharacter.getHealth() <= 0)
+      ) {
+        router.replace("/DeathScreen");
       }
     }
-  }, [loaded]);
+  }, [loaded, gameData, playerCharacter]);
 
   if (!loaded) {
     return null;

@@ -1,3 +1,6 @@
+import { NavigationProp } from "@react-navigation/native";
+import { useNavigation } from "expo-router";
+
 export function calculateAge(birthdate: Date, currentDate: Date) {
   let age = currentDate.getFullYear() - birthdate.getFullYear();
   const m = currentDate.getMonth() - birthdate.getMonth();
@@ -72,4 +75,13 @@ export function toTitleCase(title: string) {
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+}
+export function clearHistory(
+  navigation: NavigationProp<ReactNavigation.RootParamList>,
+) {
+  const state = navigation.getState();
+  navigation.reset({
+    ...state,
+    routes: state.routes.map((route) => ({ ...route, state: undefined })),
+  });
 }

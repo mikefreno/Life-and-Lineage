@@ -14,6 +14,8 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import BattleTab from "../../components/BattleTab";
 import { AttackObject } from "../../utility/types";
 import { router } from "expo-router";
+import { storeData } from "../../store";
+import { Game } from "../../classes/game";
 
 export default function DungeonLevelScreen() {
   const playerContext = useContext(PlayerCharacterContext);
@@ -40,6 +42,7 @@ export default function DungeonLevelScreen() {
   const { gameData } = gameContext;
   const { monster, setMonster } = monsterContext;
 
+  const thisInstance = gameData?.getInstance(instance);
   const thisDungeon = gameData?.getDungeon(instance, level);
 
   useEffect(() => {
@@ -55,6 +58,8 @@ export default function DungeonLevelScreen() {
       return [...prevLogs, log];
     });
   }
+
+  function updateContainingDungeonInstance() {}
 
   function pickRandomEnemyJSON() {
     const enemiesOnThisLevel = enemies.filter((enemy) =>
@@ -115,6 +120,7 @@ export default function DungeonLevelScreen() {
         if (hp <= 0 || (sanity && sanity <= 0)) {
           battleLogger(`You defeated the ${monster.creatureSpecies}`);
           monsterDefeated = true;
+          thisDungeon?.incrementStep();
           setMonster(null);
         }
       } else {
@@ -153,6 +159,8 @@ export default function DungeonLevelScreen() {
         }
       }
     }
+
+    storeData("game", gameData);
   }
 
   while (!monster) {
@@ -209,7 +217,7 @@ export default function DungeonLevelScreen() {
               <Pressable
                 className={`px-6 py-4 rounded ${
                   battleTab == "equipment"
-                    ? "bg-zinc-100 dark:bg-zinc-800"
+                    ? "border-zinc-200 bg-zinc-100 dark:border-zinc-900 dark:bg-zinc-800"
                     : "active:bg-zinc-200 dark:active:bg-zinc-700"
                 }`}
                 onPress={() => setBattleTab("equipment")}

@@ -1,13 +1,19 @@
 import { useContext } from "react";
-import { View, Text } from "../../../components/Themed";
-import { Pressable } from "react-native";
+import { View as ThemedView, Text } from "../../../components/Themed";
+import { Pressable, View } from "react-native";
 import { GameContext, PlayerCharacterContext } from "../../_layout";
 import { Character, PlayerCharacter } from "../../../classes/character";
-import { Stack, router, useLocalSearchParams } from "expo-router";
+import {
+  Stack,
+  router,
+  useLocalSearchParams,
+  useNavigation,
+} from "expo-router";
 import names from "../../../assets/names.json";
 import jobs from "../../../assets/jobs.json";
 import { storeData } from "../../../store";
 import { Game } from "../../../classes/game";
+import { clearHistory } from "../../../utility/functions";
 
 export default function NewGameReview() {
   const gameContext = useContext(GameContext);
@@ -18,8 +24,7 @@ export default function NewGameReview() {
   const lastName = slug[2];
   const star = slug[3];
   const element = slug[4];
-
-  console.log(slug);
+  const navigation = useNavigation();
 
   if (!gameContext) {
     throw new Error("NewGameScreen must be used within a GameContext provider");
@@ -172,11 +177,12 @@ export default function NewGameReview() {
     setGameData(newGame);
 
     storeData("game", newGame);
+    clearHistory(navigation);
     router.push("/");
   }
 
   return (
-    <View className="px-6">
+    <ThemedView className="flex-1 px-6">
       <Stack.Screen
         options={{
           title: "Review",
@@ -197,6 +203,6 @@ export default function NewGameReview() {
           </View>
         )}
       </Pressable>
-    </View>
+    </ThemedView>
   );
 }

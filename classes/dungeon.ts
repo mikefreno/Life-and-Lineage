@@ -19,6 +19,15 @@ export class DungeonInstance {
     this.levels = levels ?? [];
   }
 
+  public updateLevel(newDungeonLevel: DungeonLevel) {
+    for (let i = 0; i < this.levels.length; i++) {
+      if (this.levels[i].level === newDungeonLevel.level) {
+        this.levels[i] = newDungeonLevel;
+        break;
+      }
+    }
+  }
+
   public getLevels() {
     return this.levels;
   }
