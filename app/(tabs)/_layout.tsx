@@ -14,6 +14,7 @@ import WizardHat from "../../assets/icons/WizardHatIcon";
 import HouseHeart from "../../assets/icons/RelationshipsIcon";
 import { useSelector } from "react-redux";
 import { selectPlayerCharacter } from "../../redux/selectors";
+import Sword from "../../assets/icons/SwordIcon";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -133,6 +134,20 @@ export default function TabLayout() {
               color={color}
               style={{ marginBottom: -3 }}
             />
+          ),
+          headerRight: () => (
+            <Link href="/DungeonLevel/0/training grounds" asChild>
+              <Pressable>
+                {({ pressed }) => (
+                  <Sword
+                    width={30}
+                    height={30}
+                    color={"#BF9069"}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+            </Link>
           ),
         }}
       />

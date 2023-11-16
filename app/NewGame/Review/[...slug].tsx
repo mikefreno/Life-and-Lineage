@@ -5,7 +5,7 @@ import { Character, PlayerCharacter } from "../../../classes/character";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import names from "../../../assets/names.json";
 import jobs from "../../../assets/jobs.json";
-import { saveGame, savePlayer } from "../../../utility/functions";
+import { saveGame, savePlayer, toTitleCase } from "../../../utility/functions";
 import { Game } from "../../../classes/game";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../redux/store";
@@ -187,7 +187,9 @@ export default function NewGameReview() {
         }}
       />
       <Text className="pt-12 text-center text-2xl">Review</Text>
-      <Text className="pt-24 text-center text-3xl">{`${firstName} ${lastName} the ${element} (${star}) ${witchOrWizard}`}</Text>
+      <Text className="pt-24 text-center text-3xl">{`${firstName} ${lastName} the ${element}-born (${toTitleCase(
+        star,
+      )}) ${witchOrWizard}`}</Text>
       <Pressable className="mx-auto pt-8" onPress={() => startGame()}>
         {({ pressed }) => (
           <View

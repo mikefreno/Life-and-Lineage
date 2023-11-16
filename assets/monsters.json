@@ -1,5 +1,14 @@
 [
    {
+      "name": "Training Dummy",
+      "sanity": null,
+      "healthRange": {"minimum": 9999, "maximum": 9999},
+      "attackPowerRange": {"minimum": 0, "maximum": 0},
+      "energy": {"maximum": 0, "regen": 0},
+      "attacks": [],
+      "appearsOn": [0]
+   },
+   {
       "name": "Giant Rat",
       "sanity": null,
       "healthRange": {"minimum": 20, "maximum": 50},

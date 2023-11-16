@@ -23,6 +23,17 @@ export class Game {
     this.date = date ?? new Date();
     this.dungeonInstances = dungeonInstances ?? [
       new DungeonInstance({
+        name: "training grounds",
+        levels: [
+          new DungeonLevel({
+            level: 0,
+            step: 0,
+            stepsBeforeBoss: 0,
+            bossDefeated: true,
+          }),
+        ],
+      }),
+      new DungeonInstance({
         name: "nearby cave",
         levels: [
           new DungeonLevel({

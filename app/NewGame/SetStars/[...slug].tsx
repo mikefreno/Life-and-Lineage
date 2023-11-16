@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { toTitleCase } from "../../../utility/functions";
 import { router } from "expo-router";
+import { elementalColorMap } from "../../../utility/elementColors";
 
 export default function SetStars() {
   const { slug } = useLocalSearchParams();
@@ -59,7 +60,7 @@ export default function SetStars() {
           <View className="mt-4 flex max-w-full justify-center">
             <View
               className="flex rounded"
-              style={{ backgroundColor: "#f87171" }}
+              style={{ backgroundColor: elementalColorMap.fire.dark }}
             >
               <Text className="py-2 text-center">Fire Signs</Text>
               <View className="mx-auto flex flex-row pb-4">

@@ -8,17 +8,11 @@ import { useSelector } from "react-redux";
 import { selectPlayerCharacter } from "../../redux/selectors";
 import ProgressBar from "../../components/ProgressBar";
 import PlayerStatus from "../../components/PlayerStatus";
+import { elementalColorMap } from "../../utility/elementColors";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const playerCharacter = useSelector(selectPlayerCharacter);
-
-  const elementalColorMap = {
-    fire: { filledColor: "#f87171", unfilledColor: "#fef2f2" },
-    earth: { filledColor: "#937D62", unfilledColor: "#DFDCC7" },
-    air: { filledColor: "#d4d4d8", unfilledColor: "#f8fafc" },
-    water: { filledColor: "#60a5fa", unfilledColor: "#eff6ff" },
-  };
 
   function elementalProficiencySection(
     proficiencies: {
@@ -39,7 +33,7 @@ export default function HomeScreen() {
               color:
                 elementalProficiency.element == "air" && colorScheme == "light"
                   ? "#71717a"
-                  : color.filledColor,
+                  : color.dark,
             }}
           >
             {elementalProficiency.element}
@@ -47,9 +41,9 @@ export default function HomeScreen() {
           <ProgressBar
             value={elementalProficiency.proficiency}
             maxValue={500}
-            unfilledColor={color.unfilledColor}
-            filledColor={color.filledColor}
-            borderColor={color.filledColor}
+            unfilledColor={color.light}
+            filledColor={color.dark}
+            borderColor={color.dark}
           />
         </View>
       );
@@ -77,7 +71,7 @@ export default function HomeScreen() {
             />
           )}
         </View>
-        <View className="my-auto flex flex-col pl-16">
+        <View className="my-auto flex w-2/3 flex-col pl-16">
           <Text className="text-xl dark:text-white">{`${name}`}</Text>
           <Text className="text-xl dark:text-white">{`${jobRes?.title}`}</Text>
           <Text className="text-xl dark:text-white">{`${

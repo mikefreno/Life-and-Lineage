@@ -4,6 +4,11 @@ import { Text, View } from "../components/Themed";
 import { router } from "expo-router";
 
 export default function SettingsScreen() {
+  const fastStart = () => {
+    router.back();
+    router.push("/NewGame/Review/Wizard/Vim/God/scorpio/Water");
+  };
+
   const startNewGame = () => {
     router.back();
     router.push("/NewGame");
@@ -22,7 +27,13 @@ export default function SettingsScreen() {
           onPress={startNewGame}
           className="px-4 py-6 active:bg-zinc-200 active:dark:bg-zinc-700"
         >
-          <Text>Start New Game</Text>
+          <Text className="text-center">Start New Game</Text>
+        </Pressable>
+        <Pressable
+          onPress={fastStart}
+          className="px-4 py-6 active:bg-zinc-200 active:dark:bg-zinc-700"
+        >
+          <Text className="text-center">Fast Start</Text>
         </Pressable>
       </View>
       {/* Use a light status bar on iOS to account for the black space above the modal */}

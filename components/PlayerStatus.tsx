@@ -7,8 +7,8 @@ export default function PlayerStatus() {
   const playerCharacter = useSelector(selectPlayerCharacter);
   if (playerCharacter) {
     return (
-      <View className="flex flex-row justify-evenly">
-        <View className="flex w-[30%]">
+      <View className="-mx-3 flex flex-row justify-evenly pt-2">
+        <View className="flex w-[31%]">
           <Text className="mx-auto" style={{ color: "#ef4444" }}>
             Health
           </Text>
@@ -19,7 +19,7 @@ export default function PlayerStatus() {
             unfilledColor="#fee2e2"
           />
         </View>
-        <View className="flex w-[30%]">
+        <View className="flex w-[31%]">
           <Text className="mx-auto" style={{ color: "#60a5fa" }}>
             Mana
           </Text>
@@ -30,7 +30,7 @@ export default function PlayerStatus() {
             unfilledColor="#dbeafe"
           />
         </View>
-        <View className="flex w-[30%]">
+        <View className="flex w-[31%]">
           <Text className="mx-auto" style={{ color: "#c084fc" }}>
             Sanity
           </Text>

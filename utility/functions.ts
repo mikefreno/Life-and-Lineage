@@ -30,14 +30,19 @@ export const savePlayer = async (player: PlayerCharacter) => {
   }
 };
 
-export const fullSave = async (game: Game, player: PlayerCharacter) => {
-  try {
-    const jsonGame = JSON.stringify(game);
-    await AsyncStorage.setItem("game", jsonGame);
-    const jsonPlayer = JSON.stringify(player);
-    await AsyncStorage.setItem("player", jsonPlayer);
-  } catch (e) {
-    console.log(e);
+export const fullSave = async (
+  game: Game | null,
+  player: PlayerCharacter | null,
+) => {
+  if (game && player) {
+    try {
+      const jsonGame = JSON.stringify(game);
+      await AsyncStorage.setItem("game", jsonGame);
+      const jsonPlayer = JSON.stringify(player);
+      await AsyncStorage.setItem("player", jsonPlayer);
+    } catch (e) {
+      console.log(e);
+    }
   }
 };
 

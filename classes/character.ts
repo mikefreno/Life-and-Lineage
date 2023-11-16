@@ -43,7 +43,7 @@ export class Character {
     this.birthdate = birthdate;
     this.alive = alive ?? true;
     this.deathdate = deathdate ?? null;
-    this.job = job ?? "unemployed";
+    this.job = job ?? "Unemployed";
     this.affection = affection ?? 0;
     this.qualifications = qualifications ?? [];
   }
@@ -209,10 +209,10 @@ export class PlayerCharacter extends Character {
     this.manaMax = manaMax ?? 100;
     this.jobExperience = jobExperience ?? [];
     this.elementalProficiencies = elementalProficiencies ?? [
-      { element: "fire", proficiency: element == "fire" ? 25 : 0 },
-      { element: "water", proficiency: element == "water" ? 25 : 0 },
-      { element: "air", proficiency: element == "air" ? 25 : 0 },
-      { element: "earth", proficiency: element == "earth" ? 25 : 0 },
+      { element: "fire", proficiency: element == "Fire" ? 50 : 0 },
+      { element: "water", proficiency: element == "Water" ? 50 : 0 },
+      { element: "air", proficiency: element == "Air" ? 50 : 0 },
+      { element: "earth", proficiency: element == "Earth" ? 50 : 0 },
     ];
     this.parents = parents;
     this.children = children ?? null;
@@ -292,19 +292,21 @@ export class PlayerCharacter extends Character {
   }
 
   public performLabor({ title, cost, goldReward }: performLaborProps) {
-    //make sure state is aligned
-    if (this.job !== title) {
-      throw new Error("Requested Labor on unassigned profession");
-    } else {
-      if (cost.health) {
-        this.damageHealth(cost.health);
+    if (this.mana >= cost.mana) {
+      //make sure state is aligned
+      if (this.job !== title) {
+        throw new Error("Requested Labor on unassigned profession");
+      } else {
+        if (cost.health) {
+          this.damageHealth(cost.health);
+        }
+        if (cost.sanity) {
+          this.effectSanity(cost.sanity);
+        }
+        this.useMana(cost.mana);
+        this.addGold(goldReward);
+        this.gainExperience();
       }
-      if (cost.sanity) {
-        this.effectSanity(cost.sanity);
-      }
-      this.useMana(cost.mana);
-      this.addGold(goldReward);
-      this.gainExperience();
     }
   }
 

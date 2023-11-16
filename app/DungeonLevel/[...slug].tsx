@@ -6,7 +6,7 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import BattleTab from "../../components/BattleTab";
 import { AttackObject } from "../../utility/types";
 import { router } from "expo-router";
-import { saveGame } from "../../utility/functions";
+import { fullSave, toTitleCase } from "../../utility/functions";
 import { enemyGenerator } from "../../utility/monster";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -33,6 +33,7 @@ export default function DungeonLevelScreen() {
   const instance = slug[1];
   let level: number;
   level = Number(id);
+  console.log(level);
   const [battleTab, setBattleTab] = useState<
     "attacks" | "spells" | "equipment" | "log"
   >("log");
@@ -86,7 +87,9 @@ export default function DungeonLevelScreen() {
         if (hp <= 0 || (sanity && sanity <= 0)) {
           battleLogger(`You defeated the ${monster.creatureSpecies}`);
           monsterDefeated = true;
-          thisDungeon?.incrementStep();
+          if (thisDungeon?.level != 0) {
+            thisDungeon?.incrementStep();
+          }
           dispatch(setMonster(null));
         } else {
           dispatch(setMonster(monster));
@@ -137,6 +140,8 @@ export default function DungeonLevelScreen() {
               array.slice(-1);
           }
           battleLogger(line);
+        } else if (enemyAttackRes.attack == "pass") {
+          battleLogger(`The ${monster.creatureSpecies} did nothing`);
         } else {
           battleLogger(
             `The ${monster?.creatureSpecies} was ${enemyAttackRes.attack}ed`,
@@ -144,7 +149,7 @@ export default function DungeonLevelScreen() {
         }
       }
     }
-    saveGame(gameData);
+    fullSave(gameData, playerCharacter);
   }
 
   while (!monster) {
@@ -158,7 +163,14 @@ export default function DungeonLevelScreen() {
   if (thisDungeon && playerCharacter) {
     return (
       <>
-        <Stack.Screen options={{ title: `Dungeon Level ${level}` }} />
+        <Stack.Screen
+          options={{
+            title:
+              level == 0
+                ? "Training Grounds"
+                : `${toTitleCase(thisInstance?.name as string)} Level ${level}`,
+          }}
+        />
         <View className="flex-1 px-4 py-6">
           <View className="flex h-1/3 flex-row justify-evenly">
             <View className="flex w-2/5 flex-col items-center justify-center">
@@ -175,11 +187,13 @@ export default function DungeonLevelScreen() {
             </View>
           </View>
           <View>
-            <Text className="text-center text-xl">
-              {`Steps Completed: ${thisDungeon.getStep()} / ${
-                thisDungeon.stepsBeforeBoss
-              }`}
-            </Text>
+            {thisDungeon.stepsBeforeBoss !== 0 ? (
+              <Text className="-mt-7 text-center text-xl">
+                {`Steps Completed: ${thisDungeon.getStep()} / ${
+                  thisDungeon.stepsBeforeBoss
+                }`}
+              </Text>
+            ) : null}
             <View className="flex w-full flex-row justify-evenly border-y border-zinc-200">
               <Pressable
                 className={`px-6 py-4 rounded ${

@@ -76,8 +76,9 @@ export class DungeonLevel {
   }
 
   public incrementStep() {
-    this.step += 1;
-    return this.step;
+    if (this.level < this.stepsBeforeBoss) {
+      this.step += 1;
+    }
   }
 
   public getCompleted() {
