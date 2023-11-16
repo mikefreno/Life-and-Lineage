@@ -32,12 +32,24 @@ export class DungeonInstance {
     return this.levels;
   }
 
+  public toJSON(): object {
+    return {
+      name: this.name,
+      levels: this.levels.map((level) => level.toJSON()),
+    };
+  }
+
   static fromJSON(json: any): DungeonInstance {
-    const level = new DungeonInstance({
+    const levels = json.levels.map((level: any) =>
+      DungeonLevel.fromJSON(level),
+    );
+
+    const instance = new DungeonInstance({
       name: json.name,
-      levels: json.levels,
+      levels: levels,
     });
-    return level;
+
+    return instance;
   }
 }
 
@@ -70,6 +82,15 @@ export class DungeonLevel {
 
   public getCompleted() {
     return this.bossDefeated;
+  }
+
+  public toJSON(): object {
+    return {
+      level: this.level,
+      step: this.step,
+      stepsBeforeBoss: this.stepsBeforeBoss,
+      bossDefeated: this.bossDefeated,
+    };
   }
 
   static fromJSON(json: any): DungeonLevel {

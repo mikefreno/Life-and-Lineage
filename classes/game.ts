@@ -3,7 +3,6 @@ import { DungeonInstance, DungeonLevel } from "./dungeon";
 
 interface GameOptions {
   date?: Date;
-  player: PlayerCharacter;
   dungeonInstances?: DungeonInstance[];
   furthestDepth?: { instance: string; level: number };
   atDeathScreen?: boolean;
@@ -11,20 +10,17 @@ interface GameOptions {
 
 export class Game {
   private date: Date;
-  private player: PlayerCharacter;
   private dungeonInstances: DungeonInstance[];
   private furthestDepth: { instance: string; level: number };
   private atDeathScreen: boolean;
 
   constructor({
     date,
-    player,
     dungeonInstances,
     furthestDepth,
     atDeathScreen,
   }: GameOptions) {
     this.date = date ?? new Date();
-    this.player = player;
     this.dungeonInstances = dungeonInstances ?? [
       new DungeonInstance({
         name: "nearby cave",
@@ -86,20 +82,31 @@ export class Game {
     }
   }
 
-  public getPlayer(): PlayerCharacter {
-    return this.player;
-  }
-
   public getFuthestDepth() {
     return this.furthestDepth;
+  }
+
+  public toJSON(): object {
+    return {
+      date: this.date.toISOString(),
+      dungeonInstances: this.dungeonInstances.map((instance) =>
+        instance.toJSON(),
+      ),
+      furthestDepth: this.furthestDepth,
+      atDeathScreen: this.atDeathScreen,
+    };
   }
 
   static fromJSON(json: any): Game {
     const game = new Game({
       date: new Date(json.date),
-      player: PlayerCharacter.fromJSON(json.player),
       furthestDepth: json.furthestDepth,
+      atDeathScreen: json.atDeathScreen,
+      dungeonInstances: json.dungeonInstances.map((instance: any) =>
+        DungeonInstance.fromJSON(instance),
+      ),
     });
+
     return game;
   }
 }

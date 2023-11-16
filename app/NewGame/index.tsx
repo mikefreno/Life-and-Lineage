@@ -1,31 +1,26 @@
-import { StatusBar } from "expo-status-bar";
-import { Platform, Pressable, useColorScheme } from "react-native";
-import { Text, View, SafeAreaView, ScrollView } from "../../components/Themed";
+import { Pressable, useColorScheme } from "react-native";
+import { Text, View, SafeAreaView } from "../../components/Themed";
 import { View as NonThemedView } from "react-native";
 import "../../assets/styles/globals.css";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import WitchHat from "../../assets/icons/WitchHatIcon";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import { Stack, router } from "expo-router";
-import { GameContext, PlayerCharacterContext } from "../_layout";
+import { useSelector } from "react-redux";
+import { selectPlayerCharacter } from "../../redux/selectors";
 
 export default function NewGameScreen() {
   const [witchOrWizard, setWitchOrWizard] = useState<string>("");
   const colorScheme = useColorScheme();
 
-  const playerContext = useContext(PlayerCharacterContext);
-  const gameContext = useContext(GameContext);
-
-  if (!gameContext || !playerContext) {
-    throw new Error("NewGameScreen must be used within a GameContext provider");
-  }
+  const playerCharacter = useSelector(selectPlayerCharacter);
 
   return (
     <>
       <Stack.Screen
         options={{
           title: "Witch Or Wizard?",
-          headerShown: playerContext.playerCharacter ? true : false,
+          headerShown: playerCharacter ? true : false,
         }}
       />
       <SafeAreaView>

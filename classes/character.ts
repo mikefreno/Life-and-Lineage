@@ -1,5 +1,4 @@
 import { rollD20 } from "../utility/functions";
-import { getData } from "../utility/functions";
 import { AttackObject } from "../utility/types";
 import { Condition } from "./conditions";
 import conditions from "../assets/conditions.json";
@@ -65,14 +64,17 @@ export class Character {
     this.job = newJobTitle;
   }
 
-  public getStatus() {
+  public toJSON(): object {
     return {
-      name: this.firstName + " " + this.lastName,
+      firstName: this.firstName,
+      lastName: this.lastName,
       sex: this.sex,
-      birthdate: this.birthdate,
-      deathdate: this.deathdate,
+      birthdate: this.birthdate.toISOString(),
       alive: this.alive,
+      deathdate: this.deathdate ? this.deathdate.toISOString() : null,
       job: this.job,
+      affection: this.affection,
+      qualifications: this.qualifications,
     };
   }
 
@@ -83,7 +85,7 @@ export class Character {
       sex: json.sex,
       birthdate: new Date(json.birthdate),
       alive: json.alive,
-      deathdate: new Date(json.deathdate),
+      deathdate: json.deathdate ? new Date(json.deathdate) : null,
       job: json.job,
       affection: json.affection,
       qualifications: json.qualifications,
@@ -117,6 +119,7 @@ interface PlayerCharacterOptions {
   physicalAttacks?: string[];
   knownSpells?: string[];
   gold?: number;
+  conditions?: Condition[];
   equipment?: {
     weapon: { name: string; baseDamage: number };
     head: {
@@ -199,7 +202,7 @@ export class PlayerCharacter extends Character {
       job,
       affection,
     });
-    this.health = health ?? 100;
+    this.health = health ?? 1000;
     this.healthMax = healthMax ?? 100;
     this.sanity = sanity ?? 50;
     this.mana = mana ?? 100;
@@ -371,21 +374,35 @@ export class PlayerCharacter extends Character {
     }
   }
 
+  public toJSON(): object {
+    return {
+      ...super.toJSON(),
+      health: this.health,
+      healthMax: this.healthMax,
+      sanity: this.sanity,
+      mana: this.mana,
+      manaMax: this.manaMax,
+      jobExperience: this.jobExperience,
+      elementalProficiencies: this.elementalProficiencies,
+      parents: this.parents.map((parent) => parent.toJSON()),
+      children: this.children?.map((child) => child.toJSON()),
+      conditions: this.conditions.map((condition) => condition.toJSON()),
+      element: this.element,
+      knownSpells: this.knownSpells,
+      physicalAttacks: this.physicalAttacks,
+      gold: this.gold,
+      equipment: this.equipment,
+    };
+  }
+
   static fromJSON(json: any): PlayerCharacter {
-    let conditions: Condition[] = [];
-    if (json.conditions) {
-      json.conditions.forEach((condition: any) => {
-        const cond = new Condition(condition);
-        conditions.push(cond);
-      });
-    }
     const player = new PlayerCharacter({
       firstName: json.firstName,
       lastName: json.lastName,
       sex: json.sex,
       birthdate: new Date(json.birthdate),
       alive: json.alive,
-      deathdate: new Date(json.deathdate),
+      deathdate: json.deathdate ? new Date(json.deathdate) : null,
       job: json.job,
       affection: json.affection,
       health: json.health,
@@ -394,6 +411,7 @@ export class PlayerCharacter extends Character {
       mana: json.mana,
       manaMax: json.manaMax,
       jobExperience: json.jobExperience,
+      elementalProficiencies: json.elementalProficiencies,
       parents: json.parents.map((parent: any) => Character.fromJSON(parent)),
       children: json.children
         ? json.children.map((child: any) => Character.fromJSON(child))
@@ -403,12 +421,10 @@ export class PlayerCharacter extends Character {
       physicalAttacks: json.physicalAttacks,
       gold: json.gold,
       equipment: json.equipment,
+      conditions: json.conditions
+        ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
+        : [],
     });
     return player;
   }
 }
-
-const fetchGameData = async () => {
-  let gameData = await getData("game");
-  return gameData;
-};

@@ -6,97 +6,79 @@ import {
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack, router } from "expo-router";
-import { createContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useColorScheme } from "react-native";
-import { getData, loadGame } from "../utility/functions";
+import { loadGame, loadPlayer } from "../utility/functions";
 import { Game } from "../classes/game";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import store, { AppDispatch } from "../redux/store";
+import { setGameData, setPlayerCharacter } from "../redux/slice/game";
+import { selectGame, selectPlayerCharacter } from "../redux/selectors";
 import { PlayerCharacter } from "../classes/character";
-import { Monster } from "../classes/creatures";
 
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from "expo-router";
-
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
+  // Ensure that reloading on ﻿/modal keeps a back button present.
   initialRouteName: "(tabs)",
 };
-
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-export const GameContext = createContext<
-  | {
-      gameData: Game | undefined;
-      setGameData: React.Dispatch<React.SetStateAction<Game | undefined>>;
-    }
-  | undefined
->(undefined);
+export default function Root() {
+  return (
+    <Provider store={store}>
+      <RootLayout />
+    </Provider>
+  );
+}
 
-export const PlayerCharacterContext = createContext<
-  | {
-      playerCharacter: PlayerCharacter | undefined;
-      setPlayerCharacter: React.Dispatch<
-        React.SetStateAction<PlayerCharacter | undefined>
-      >;
-    }
-  | undefined
->(undefined);
+function RootLayout() {
+  const dispatch: AppDispatch = useDispatch();
+  const gameData = useSelector(selectGame);
+  const playerCharacter = useSelector(selectPlayerCharacter);
 
-export const DungeonMonsterContext = createContext<
-  | {
-      monster: Monster | null;
-      setMonster: React.Dispatch<React.SetStateAction<Monster | null>>;
-    }
-  | undefined
->(undefined);
-
-export const BattleLogContext = createContext<
-  | {
-      logs: { logLine: string }[];
-      setLogs: React.Dispatch<React.SetStateAction<{ logLine: string }[]>>;
-    }
-  | undefined
->(undefined);
-
-export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
   });
 
-  const [gameData, setGameData] = useState<Game>();
-  const [monster, setMonster] = useState<Monster | null>(null);
-  const [playerCharacter, setPlayerCharacter] = useState<PlayerCharacter>();
-  const [logs, setLogs] = useState<{ logLine: string }[]>([]);
+  const [gameAndPlayerLoaded, setGameAndPlayerLoaded] = useState(false);
+
+  const colorScheme = useColorScheme();
 
   useEffect(() => {
     const fetchGameData = async () => {
       const storedGame = await loadGame();
+      const storedPlayer = await loadPlayer();
+
       if (storedGame) {
         const game = Game.fromJSON(storedGame);
-        setGameData(game);
-        const player = game.getPlayer();
-        setPlayerCharacter(player);
+        dispatch(setGameData(game));
       }
+
+      if (storedPlayer) {
+        const player = PlayerCharacter.fromJSON(storedPlayer);
+        dispatch(setPlayerCharacter(player));
+      }
+
+      setGameAndPlayerLoaded(true);
     };
 
     fetchGameData();
   }, []);
 
-  useEffect(() => console.log("player updated"), [playerCharacter]);
-
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
 
   useEffect(() => {
-    if (loaded) {
+    if (loaded && gameAndPlayerLoaded) {
       SplashScreen.hideAsync();
-      if (!gameData) {
-        router.push("/NewGame");
+      if (!playerCharacter || !gameData) {
+        router.replace("/NewGame/");
       } else if (
         gameData.getAtDeathScreen() ||
         (playerCharacter && playerCharacter.getHealth() <= 0)
@@ -104,29 +86,7 @@ export default function RootLayout() {
         router.replace("/DeathScreen");
       }
     }
-  }, [loaded, gameData, playerCharacter]);
-
-  if (!loaded) {
-    return null;
-  }
-
-  return (
-    <GameContext.Provider value={{ gameData, setGameData }}>
-      <PlayerCharacterContext.Provider
-        value={{ playerCharacter, setPlayerCharacter }}
-      >
-        <DungeonMonsterContext.Provider value={{ monster, setMonster }}>
-          <BattleLogContext.Provider value={{ logs, setLogs }}>
-            <RootLayoutNav />
-          </BattleLogContext.Provider>
-        </DungeonMonsterContext.Provider>
-      </PlayerCharacterContext.Provider>
-    </GameContext.Provider>
-  );
-}
-
-function RootLayoutNav() {
-  const colorScheme = useColorScheme();
+  }, [loaded, gameAndPlayerLoaded, gameData, playerCharacter]);
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>

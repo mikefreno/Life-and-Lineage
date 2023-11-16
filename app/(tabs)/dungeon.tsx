@@ -1,10 +1,10 @@
-import { useContext } from "react";
 import { Text, View, ScrollView } from "../../components/Themed";
-import { GameContext } from "../_layout";
 import { Pressable } from "react-native";
 import { router } from "expo-router";
 import dungeons from "../../assets/dungeons.json";
 import { toTitleCase } from "../../utility/functions";
+import { useSelector } from "react-redux";
+import { selectGame } from "../../redux/selectors";
 
 const dangerColorStep = [
   "#fee2e2",
@@ -16,12 +16,7 @@ const dangerColorStep = [
 ];
 
 export default function DungeonScreen() {
-  const gameContext = useContext(GameContext);
-  if (!gameContext) {
-    throw new Error("DungeonTab must be used within a GameContext provider");
-  }
-
-  const { gameData } = gameContext;
+  const gameData = useSelector(selectGame);
 
   let height = 0;
 

@@ -3,30 +3,23 @@ import { View, Text, SafeAreaView } from "../components/Themed";
 import { Stack } from "expo-router";
 import deathMessages from "../assets/deathMessages.json";
 import { useContext, useEffect, useState } from "react";
-import { GameContext, PlayerCharacterContext } from "./_layout";
 import { router } from "expo-router";
 import { CharacterImage } from "../components/CharacterImage";
 import { calculateAge } from "../utility/functions";
 import { Character } from "../classes/character";
 import { saveGame } from "../utility/functions";
+import { useSelector } from "react-redux";
+import { selectGame, selectPlayerCharacter } from "../redux/selectors";
 
 export default function DeathScreen() {
-  const playerContext = useContext(PlayerCharacterContext);
-  const gameContext = useContext(GameContext);
   const [nextLife, setNextLife] = useState<Character | null>(null);
+  const gameData = useSelector(selectGame);
+  const playerCharacter = useSelector(selectPlayerCharacter);
 
-  if (!playerContext || !gameContext) {
-    throw new Error(
-      "DeathScreen must be used within a PlayerCharacterContext, GameContext provider",
-    );
-  }
   function getDeathMessage() {
     const randomIndex = Math.floor(Math.random() * deathMessages.length);
     return deathMessages[randomIndex].message;
   }
-
-  const { playerCharacter } = playerContext;
-  const { gameData } = gameContext;
 
   useEffect(() => {
     gameData?.hitDeathScreen();

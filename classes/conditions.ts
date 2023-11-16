@@ -28,6 +28,15 @@ export class Condition {
     };
   }
 
+  public toJSON(): object {
+    return {
+      name: this.name,
+      turns: this.turns,
+      effect: this.effect,
+      damage: this.damage,
+    };
+  }
+
   static fromJSON(json: any): Condition {
     const condition = new Condition({
       name: json.name,

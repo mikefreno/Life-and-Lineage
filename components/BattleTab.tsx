@@ -1,10 +1,12 @@
 import { useContext } from "react";
 import { View, Text, ScrollView } from "./Themed";
-import { BattleLogContext, PlayerCharacterContext } from "../app/_layout";
 import { Pressable, useColorScheme, FlatList } from "react-native";
 import attacks from "../assets/playerAttacks.json";
 import { AttackObject } from "../utility/types";
 import { toTitleCase } from "../utility/functions";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import { selectPlayerCharacter } from "../redux/selectors";
 
 interface BattleTabProps {
   battleTab: "attacks" | "spells" | "equipment" | "log";
@@ -12,19 +14,15 @@ interface BattleTabProps {
 }
 
 export default function BattleTab({ battleTab, useAttack }: BattleTabProps) {
-  const playerContext = useContext(PlayerCharacterContext);
-  const battleContext = useContext(BattleLogContext);
   const colorScheme = useColorScheme();
+  const logs = useSelector((state: RootState) => state.logs);
 
-  if (!playerContext || !playerContext.playerCharacter || !battleContext) {
-    throw new Error(
-      "DungeonLevel must be used within a PlayerCharacterContext provider",
-    );
+  const playerCharacter = useSelector(selectPlayerCharacter);
+
+  if (!playerCharacter) {
+    throw new Error("no playerCharacter on battleTab");
   }
 
-  const { logs } = battleContext;
-
-  const { playerCharacter } = playerContext;
   const playerAttacks = playerCharacter.getPhysicalAttacks();
 
   let attackObjects: AttackObject[] = [];

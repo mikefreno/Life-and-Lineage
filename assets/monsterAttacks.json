@@ -42,12 +42,12 @@
       {
          "name": "vampiric bite",
          "targets": "single",
-         "hitChance": 1.0,
-         "damageMult": 1.0,
+         "hitChance": 0.90,
+         "damageMult": 0.85,
          "energyCost": 10,
          "sanityDamage": 0,
          "secondaryEffect": "lifesteal",
-         "secondaryEffectChance": 0.85
+         "secondaryEffectChance": 0.5
       },
       { 
          "name": "torch stab",

@@ -10,22 +10,14 @@ import Broom from "../../assets/icons/BroomIcon";
 import Dungeon from "../../assets/icons/DungeonIcon";
 import Potion from "../../assets/icons/PotionIcon";
 import Medical from "../../assets/icons/MedicalIcon";
-import { useContext } from "react";
-import { PlayerCharacterContext } from "../_layout";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import HouseHeart from "../../assets/icons/RelationshipsIcon";
+import { useSelector } from "react-redux";
+import { selectPlayerCharacter } from "../../redux/selectors";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const playerContext = useContext(PlayerCharacterContext);
-
-  if (!playerContext) {
-    throw new Error(
-      "NewGameScreen must be used within a PlayerCharacterContext provider",
-    );
-  }
-
-  const { playerCharacter } = playerContext;
+  const playerCharacter = useSelector(selectPlayerCharacter);
 
   return (
     <Tabs

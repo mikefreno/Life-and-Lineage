@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Game } from "../classes/game";
+import { PlayerCharacter } from "../classes/character";
 
 export const storeData = async (key: string, value: any) => {
   try {
@@ -12,10 +13,18 @@ export const storeData = async (key: string, value: any) => {
 };
 
 //just saves game, simpler interface
-export const saveGame = async (game: Game | undefined) => {
+export const saveGame = async (game: Game | null) => {
   try {
     const jsonGame = JSON.stringify(game);
     await AsyncStorage.setItem("game", jsonGame);
+  } catch (e) {
+    console.log(e);
+  }
+};
+export const savePlayer = async (player: PlayerCharacter) => {
+  try {
+    const jsonPlayer = JSON.stringify(player);
+    await AsyncStorage.setItem("player", jsonPlayer);
   } catch (e) {
     console.log(e);
   }
@@ -33,6 +42,15 @@ export const getData = async (key: string) => {
 export const loadGame = async () => {
   try {
     const jsonValue = await AsyncStorage.getItem("game");
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+export const loadPlayer = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem("player");
     return jsonValue != null ? JSON.parse(jsonValue) : null;
   } catch (e) {
     console.log(e);

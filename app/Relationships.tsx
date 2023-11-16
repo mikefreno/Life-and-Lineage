@@ -1,23 +1,14 @@
 import { StatusBar } from "expo-status-bar";
 import { Platform } from "react-native";
 import { Text, View, ScrollView } from "../components/Themed";
-import { useContext } from "react";
-import { GameContext, PlayerCharacterContext } from "./_layout";
 import { calculateAge } from "../utility/functions";
 import { CharacterImage } from "../components/CharacterImage";
+import { useSelector } from "react-redux";
+import { selectGame, selectPlayerCharacter } from "../redux/selectors";
 
 export default function RelationshipsScreen() {
-  const playerContext = useContext(PlayerCharacterContext);
-  const gameContext = useContext(GameContext);
-
-  if (!playerContext || !gameContext) {
-    throw new Error(
-      "RelationshipsScreen must be used within a PlayerCharacterContext, GameContext provider",
-    );
-  }
-
-  const { gameData } = gameContext;
-  const { playerCharacter } = playerContext;
+  const playerCharacter = useSelector(selectPlayerCharacter);
+  const gameData = useSelector(selectGame);
 
   if (playerCharacter) {
     const parents = playerCharacter.getParents();
@@ -31,9 +22,9 @@ export default function RelationshipsScreen() {
       const momsAge = calculateAge(momBDay, currentDate);
 
       return (
-        <ScrollView className="pt-6">
+        <ScrollView className="flex-1 pt-6">
           <Text className="py-12 text-center text-2xl">Parents</Text>
-          <View className="flex flex-row justify-evenly">
+          <View className="flex flex-row justify-center">
             <View className="flex flex-col items-center">
               <Text className="text-2xl">Dad</Text>
               <View className="mx-auto">

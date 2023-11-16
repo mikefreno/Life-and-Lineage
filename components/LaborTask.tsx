@@ -1,12 +1,13 @@
-import React, { useContext } from "react";
 import { View, Text, Pressable } from "react-native";
 import Coins from "../assets/icons/CoinsIcon";
 import Energy from "../assets/icons/EnergyIcon";
 import Sanity from "../assets/icons/SanityIcon";
 import HealthIcon from "../assets/icons/HealthIcon";
-import { GameContext, PlayerCharacterContext } from "../app/_layout";
-import { loadGame, saveGame } from "../utility/functions";
-import { Game } from "../classes/game";
+import { saveGame } from "../utility/functions";
+import { useDispatch, useSelector } from "react-redux";
+import { selectGame, selectPlayerCharacter } from "../redux/selectors";
+import { AppDispatch } from "../redux/store";
+import { setPlayerCharacter } from "../redux/slice/game";
 
 interface LaborTaskProps {
   title: string;
@@ -20,21 +21,20 @@ interface LaborTaskProps {
 }
 
 export default function LaborTask({ title, reward, cost }: LaborTaskProps) {
-  const playerContext = useContext(PlayerCharacterContext);
-  const gameContext = useContext(GameContext);
+  const playerCharacter = useSelector(selectPlayerCharacter);
+  const gameData = useSelector(selectGame);
+  const dispatch: AppDispatch = useDispatch();
 
-  if (!playerContext || !gameContext || !playerContext.playerCharacter) {
-    throw Error("LaborTask missing Context(s)");
+  if (!playerCharacter) {
+    throw Error("No Player Character on Labor Task");
   }
 
-  const { playerCharacter, setPlayerCharacter } = playerContext;
-  const { gameData, setGameData } = gameContext;
-
-  async function setJob() {
-    playerCharacter.setJobTitle(title);
-    saveGame(gameData);
-    const game = Game.fromJSON(await loadGame());
-    setGameData(game);
+  function setJob() {
+    if (playerCharacter) {
+      playerCharacter.setJobTitle(title);
+      dispatch(setPlayerCharacter(playerCharacter));
+      saveGame(gameData);
+    }
   }
 
   return (

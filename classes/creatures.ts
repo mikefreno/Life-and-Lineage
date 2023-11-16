@@ -14,9 +14,12 @@ interface familiarOptions {
 interface monsterInterface {
   creatureSpecies: string;
   health: number;
+  healthMax: number;
   sanity: number | null;
+  sanityMax: number | null;
   attackPower: number;
   energy: number;
+  energyMax: number;
   energyRegen: number;
   attacks: string[];
   conditions?: Condition[];
@@ -26,6 +29,7 @@ export class Monster {
   public creatureSpecies: string;
   public health: number;
   public sanity: number | null;
+  public sanityMax: number | null;
   public healthMax: number;
   public attackPower: number;
   public energy: number;
@@ -36,9 +40,12 @@ export class Monster {
   constructor({
     creatureSpecies,
     health,
+    healthMax,
     sanity,
+    sanityMax,
     attackPower,
     energy,
+    energyMax,
     energyRegen,
     attacks,
     conditions,
@@ -46,10 +53,11 @@ export class Monster {
     this.creatureSpecies = creatureSpecies;
     this.health = health;
     this.sanity = sanity ?? null;
-    this.healthMax = health;
+    this.sanityMax = sanityMax ?? null;
+    this.healthMax = healthMax;
     this.attackPower = attackPower;
     this.energy = energy;
-    this.energyMax = energy;
+    this.energyMax = energyMax;
     this.energyRegen = energyRegen;
     this.attacks = attacks;
     this.conditions = conditions ?? [];
@@ -142,7 +150,8 @@ export class Monster {
       const chosenAttack = availableAttacks[randomIndex];
       const rollToHit = 20 - (chosenAttack.hitChance * 100) / 5;
       const roll = rollD20();
-      const damage = chosenAttack.damageMult * this.attackPower;
+      const damage =
+        Math.round(chosenAttack.damageMult * this.attackPower * 4) / 4;
       const sanityDamage = chosenAttack.sanityDamage;
       if (roll >= rollToHit) {
         const effectChance = chosenAttack.secondaryEffectChance;
@@ -152,7 +161,7 @@ export class Monster {
           const roll = rollD20();
           if (roll >= rollToEffect) {
             if (chosenAttack.secondaryEffect == "lifesteal") {
-              const heal = 0.25 * damage;
+              const heal = Math.round(0.25 * damage * 4) / 4;
               if (heal + this.health > this.healthMax) {
                 this.health = this.healthMax;
               } else {
@@ -210,5 +219,39 @@ export class Monster {
       this.energy += this.energyRegen;
       return "pass";
     }
+  }
+
+  public toJSON(): object {
+    return {
+      creatureSpecies: this.creatureSpecies,
+      health: this.health,
+      healthMax: this.healthMax,
+      sanity: this.sanity,
+      sanityMax: this.sanityMax,
+      attackPower: this.attackPower,
+      energy: this.energy,
+      energyMax: this.energyMax,
+      energyRegen: this.energyRegen,
+      attacks: this.attacks,
+      conditions: this.conditions.map((condition) => condition.toJSON()),
+    };
+  }
+
+  public static fromJSON(json: any): Monster {
+    return new Monster({
+      creatureSpecies: json.creatureSpecies,
+      health: json.health,
+      healthMax: json.healthMax,
+      sanity: json.sanity,
+      sanityMax: json.sanityMax,
+      attackPower: json.attackPower,
+      energy: json.energy,
+      energyMax: json.energyMax,
+      energyRegen: json.energyRegen,
+      attacks: json.attacks,
+      conditions: json.conditions
+        ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
+        : [],
+    });
   }
 }

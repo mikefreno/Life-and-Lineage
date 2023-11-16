@@ -1,44 +1,30 @@
 import { useContext } from "react";
 import { View as ThemedView, Text } from "../../../components/Themed";
 import { Pressable, View } from "react-native";
-import {
-  BattleLogContext,
-  DungeonMonsterContext,
-  GameContext,
-  PlayerCharacterContext,
-} from "../../_layout";
 import { Character, PlayerCharacter } from "../../../classes/character";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import names from "../../../assets/names.json";
 import jobs from "../../../assets/jobs.json";
-import { saveGame } from "../../../utility/functions";
+import { saveGame, savePlayer } from "../../../utility/functions";
 import { Game } from "../../../classes/game";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../redux/store";
+import {
+  setGameData,
+  setLogs,
+  setMonster,
+  setPlayerCharacter,
+} from "../../../redux/slice/game";
 
 export default function NewGameReview() {
-  const gameContext = useContext(GameContext);
-  const playerContext = useContext(PlayerCharacterContext);
-  const dungeonMonsterContext = useContext(DungeonMonsterContext);
-  const battleLogContext = useContext(BattleLogContext);
+  const dispatch: AppDispatch = useDispatch();
+
   const { slug } = useLocalSearchParams();
   const witchOrWizard = slug[0];
   const firstName = slug[1];
   const lastName = slug[2];
   const star = slug[3];
   const element = slug[4];
-
-  if (
-    !gameContext ||
-    !playerContext ||
-    !battleLogContext ||
-    !dungeonMonsterContext
-  ) {
-    throw new Error("NewGameScreen must be used within a GameContext provider");
-  }
-
-  const { setGameData } = gameContext;
-  const { setPlayerCharacter } = playerContext;
-  const { setLogs } = battleLogContext;
-  const { setMonster } = dungeonMonsterContext;
 
   function generateBirthdate(zodiac: string, birthYear: number): Date {
     let month: number;
@@ -173,18 +159,23 @@ export default function NewGameReview() {
 
   function startGame() {
     const player = createPlayerCharacter();
-    setPlayerCharacter(player);
+    dispatch(setPlayerCharacter(player));
     const startDate = new Date();
-    const newGame = new Game({ date: startDate, player: player });
-    setGameData(newGame);
+    const newGame = new Game({ date: startDate });
+    dispatch(setGameData(newGame));
     saveGame(newGame);
-    setLogs([]);
-    setMonster(null);
+    savePlayer(player);
+    dispatch(setLogs([]));
+    dispatch(setMonster(null));
 
-    router.back();
-    router.back();
-    router.back();
-    router.back();
+    try {
+      router.back();
+      router.back();
+      router.back();
+      router.back();
+    } catch (e) {
+      console.log(e);
+    }
     router.replace("/");
   }
 

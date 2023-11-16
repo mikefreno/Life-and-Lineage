@@ -1,13 +1,5 @@
 import { View, Text } from "../../components/Themed";
-import enemies from "../../assets/monsters.json";
-import { Monster } from "../../classes/creatures";
-import { useContext, useEffect, useState } from "react";
-import {
-  BattleLogContext,
-  DungeonMonsterContext,
-  GameContext,
-  PlayerCharacterContext,
-} from "../_layout";
+import { useEffect, useState } from "react";
 import { MonsterImage } from "../../components/MonsterImage";
 import { Pressable } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
@@ -15,12 +7,25 @@ import BattleTab from "../../components/BattleTab";
 import { AttackObject } from "../../utility/types";
 import { router } from "expo-router";
 import { saveGame } from "../../utility/functions";
+import { enemyGenerator } from "../../utility/monster";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectGame,
+  selectMonster,
+  selectPlayerCharacter,
+} from "../../redux/selectors";
+import { refreshMonster, setMonster } from "../../redux/slice/game";
+import { AppDispatch } from "../../redux/store";
+import { appendLogs } from "../../redux/slice/game";
 
 export default function DungeonLevelScreen() {
-  const playerContext = useContext(PlayerCharacterContext);
-  const gameContext = useContext(GameContext);
-  const monsterContext = useContext(DungeonMonsterContext);
-  const battleLogContext = useContext(BattleLogContext);
+  const playerCharacter = useSelector(selectPlayerCharacter);
+  const gameData = useSelector(selectGame);
+
+  const monster = useSelector(selectMonster);
+
+  const dispatch: AppDispatch = useDispatch();
+
   const { slug } = useLocalSearchParams();
   const id = slug[0];
   const instance = slug[1];
@@ -30,68 +35,30 @@ export default function DungeonLevelScreen() {
     "attacks" | "spells" | "equipment" | "log"
   >("log");
 
-  if (!playerContext || !gameContext || !monsterContext || !battleLogContext) {
-    throw new Error(
-      "DungeonLevel must be used within a PlayerCharacterContext, DungeonMonsterContext, BattleLogContext & GameContext provider",
-    );
+  if (!playerCharacter || !gameData) {
+    throw new Error("No player character or game data on dungeon level");
   }
 
-  const { setLogs } = battleLogContext;
-  const { playerCharacter } = playerContext;
-  const { gameData } = gameContext;
-  const { monster, setMonster } = monsterContext;
-
-  const thisInstance = gameData?.getInstance(instance);
-  const thisDungeon = gameData?.getDungeon(instance, level);
+  const thisInstance = gameData.getInstance(instance);
+  const thisDungeon = gameData.getDungeon(instance, level);
 
   useEffect(() => {
     if (!monster) {
-      enemyGenerator();
+      getEnemy();
     }
   }, [monster]);
 
   function battleLogger(whatHappened: string) {
     const timeOfLog = new Date().toLocaleTimeString();
     const log = { logLine: `${timeOfLog}: ${whatHappened}` };
-    setLogs((prevLogs) => {
-      return [...prevLogs, log];
-    });
+    dispatch(appendLogs(log));
   }
 
-  function pickRandomEnemyJSON() {
-    const enemiesOnThisLevel = enemies.filter((enemy) =>
-      enemy.appearsOn.includes(level),
-    );
-    const randomIndex = Math.floor(Math.random() * enemiesOnThisLevel.length);
-    return enemiesOnThisLevel[randomIndex];
-  }
+  function getEnemy() {
+    const enemy = enemyGenerator(level);
 
-  function getNumberInRange(minimum: number, maximum: number) {
-    return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
-  }
-
-  function enemyGenerator() {
-    const enemyJSON = pickRandomEnemyJSON();
-    const enemyHealth = getNumberInRange(
-      enemyJSON.healthRange.minimum,
-      enemyJSON.healthRange.maximum,
-    );
-    const enemyAttackPower = getNumberInRange(
-      enemyJSON.attackPowerRange.minimum,
-      enemyJSON.attackPowerRange.maximum,
-    );
-
-    const enemy = new Monster({
-      creatureSpecies: enemyJSON.name,
-      health: enemyHealth,
-      sanity: enemyJSON.sanity ?? null,
-      attackPower: enemyAttackPower,
-      energy: enemyJSON.energy?.maximum,
-      energyRegen: enemyJSON.energy?.regen,
-      attacks: enemyJSON.attacks,
-    });
     battleLogger(`You Found a ${enemy.creatureSpecies}!`);
-    setMonster(enemy);
+    dispatch(setMonster(enemy));
   }
 
   function useAttack(attack: AttackObject) {
@@ -118,7 +85,9 @@ export default function DungeonLevelScreen() {
           battleLogger(`You defeated the ${monster.creatureSpecies}`);
           monsterDefeated = true;
           thisDungeon?.incrementStep();
-          setMonster(null);
+          dispatch(setMonster(null));
+        } else {
+          dispatch(setMonster(monster));
         }
       } else {
         battleLogger(`You ${attackRes}ed the ${monster.creatureSpecies}`);
