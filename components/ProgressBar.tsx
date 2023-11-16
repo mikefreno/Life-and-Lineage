@@ -34,10 +34,15 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
       <View
         style={[
           styles.inner,
-          { width: `${width}%`, backgroundColor: filledColor },
+          {
+            width: width < 5 ? "5%" : `${width}%`,
+            backgroundColor: filledColor,
+          },
         ]}
       >
-        <Text style={styles.label}>{value}</Text>
+        <Text style={[styles.label, { marginTop: borderColor ? -1 : 0 }]}>
+          {value}
+        </Text>
       </View>
     </View>
   );
