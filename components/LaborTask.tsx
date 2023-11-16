@@ -3,24 +3,30 @@ import Coins from "../assets/icons/CoinsIcon";
 import Energy from "../assets/icons/EnergyIcon";
 import Sanity from "../assets/icons/SanityIcon";
 import HealthIcon from "../assets/icons/HealthIcon";
-import { saveGame } from "../utility/functions";
+import { fullSave } from "../utility/functions";
 import { useDispatch, useSelector } from "react-redux";
 import { selectGame, selectPlayerCharacter } from "../redux/selectors";
 import { AppDispatch } from "../redux/store";
 import { setPlayerCharacter } from "../redux/slice/game";
+import ProgressBar from "./ProgressBar";
 
 interface LaborTaskProps {
   title: string;
   reward: number;
   cost: {
     mana: number;
-    happiness?: number;
     sanity?: number;
     health?: number;
   };
+  experienceToPromote: number;
 }
 
-export default function LaborTask({ title, reward, cost }: LaborTaskProps) {
+export default function LaborTask({
+  title,
+  reward,
+  cost,
+  experienceToPromote,
+}: LaborTaskProps) {
   const playerCharacter = useSelector(selectPlayerCharacter);
   const gameData = useSelector(selectGame);
   const dispatch: AppDispatch = useDispatch();
@@ -30,10 +36,22 @@ export default function LaborTask({ title, reward, cost }: LaborTaskProps) {
   }
 
   function setJob() {
-    if (playerCharacter) {
+    if (playerCharacter && gameData) {
       playerCharacter.setJobTitle(title);
       dispatch(setPlayerCharacter(playerCharacter));
-      saveGame(gameData);
+      fullSave(gameData, playerCharacter);
+    }
+  }
+
+  function work() {
+    if (playerCharacter && gameData) {
+      playerCharacter.performLabor({
+        title: title,
+        cost: cost,
+        goldReward: reward,
+      });
+      dispatch(setPlayerCharacter(playerCharacter));
+      fullSave(gameData, playerCharacter);
     }
   }
 
@@ -67,17 +85,23 @@ export default function LaborTask({ title, reward, cost }: LaborTaskProps) {
         </View>
       </View>
       {playerCharacter.getJobTitle() == title ? (
-        <Pressable className="mx-auto mb-2 mt-4" onPress={setJob}>
-          {({ pressed }) => (
-            <View
-              className={`my-auto rounded-xl bg-sky-50 px-8 py-4 ${
-                pressed ? "scale-95 opacity-30" : null
-              }`}
-            >
-              <Text className="text-center">Work</Text>
-            </View>
-          )}
-        </Pressable>
+        <>
+          <Pressable className="mx-auto mb-2 mt-4" onPress={work}>
+            {({ pressed }) => (
+              <View
+                className={`my-auto rounded-xl bg-sky-50 px-8 py-4 ${
+                  pressed ? "scale-95 opacity-30" : null
+                }`}
+              >
+                <Text className="text-center">Work</Text>
+              </View>
+            )}
+          </Pressable>
+          <ProgressBar
+            value={playerCharacter.getJobExperience(title)}
+            maxValue={experienceToPromote}
+          />
+        </>
       ) : (
         <Pressable className="mx-auto mb-2 mt-4" onPress={setJob}>
           {({ pressed }) => (

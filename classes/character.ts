@@ -143,7 +143,7 @@ export class PlayerCharacter extends Character {
   private sanity: number;
   private mana: number;
   private manaMax: number;
-  private jobExperience: { job: string; experience: number }[];
+  public jobExperience: { job: string; experience: number }[];
   private elementalProficiencies: { element: string; proficiency: number }[];
   private parents: Character[];
   private children: Character[] | null = null;
@@ -202,7 +202,7 @@ export class PlayerCharacter extends Character {
       job,
       affection,
     });
-    this.health = health ?? 1000;
+    this.health = health ?? 100;
     this.healthMax = healthMax ?? 100;
     this.sanity = sanity ?? 50;
     this.mana = mana ?? 100;
@@ -226,6 +226,7 @@ export class PlayerCharacter extends Character {
     };
   }
 
+  //----------------------------------Health----------------------------------//
   public getHealth() {
     return this.health;
   }
@@ -234,10 +235,12 @@ export class PlayerCharacter extends Character {
     return this.healthMax;
   }
 
-  public getSanity(): number {
-    return this.sanity;
+  public damageHealth(damage: number | null) {
+    this.health -= damage ?? 0;
+    return this.health;
   }
 
+  //----------------------------------Mana----------------------------------//
   public getMana(): number {
     return this.mana;
   }
@@ -245,20 +248,20 @@ export class PlayerCharacter extends Character {
   public getMaxMana(): number {
     return this.manaMax;
   }
-
-  public getPhysicalAttacks(): string[] {
-    return this.physicalAttacks;
+  private useMana(mana: number) {
+    this.mana -= mana;
+  }
+  //----------------------------------Sanity----------------------------------//
+  public getSanity(): number {
+    return this.sanity;
   }
 
-  public getCurrentJobAndExperience() {
-    const job = this.jobExperience.find((job) => job.job == this.job);
-    return { title: this.job, experience: job?.experience ?? 0 };
+  public effectSanity(damage: number | null) {
+    this.sanity += damage ?? 0;
+    return this.sanity;
   }
 
-  public getElementalProficiencies() {
-    return this.elementalProficiencies;
-  }
-
+  //----------------------------------Gold----------------------------------//
   public getGold() {
     return this.gold;
   }
@@ -278,11 +281,55 @@ export class PlayerCharacter extends Character {
     } else return this.gold.toLocaleString();
   }
 
+  //----------------------------------Work----------------------------------//
+  public getCurrentJobAndExperience() {
+    const job = this.jobExperience.find((job) => job.job == this.job);
+    return { title: this.job, experience: job?.experience ?? 0 };
+  }
   public getJobExperience(title: string): number {
     const job = this.jobExperience.find((job) => job.job === title);
     return job ? job.experience : 0;
   }
 
+  public performLabor({ title, cost, goldReward }: performLaborProps) {
+    //make sure state is aligned
+    if (this.job !== title) {
+      throw new Error("Requested Labor on unassigned profession");
+    } else {
+      if (cost.health) {
+        this.damageHealth(cost.health);
+      }
+      if (cost.sanity) {
+        this.effectSanity(cost.sanity);
+      }
+      this.useMana(cost.mana);
+      this.addGold(goldReward);
+      this.gainExperience();
+    }
+  }
+
+  private gainExperience() {
+    let jobWasFoundAndIncremented = false;
+
+    //console.log(Object.isFrozen(this.jobExperience))
+    //to understand why this is necessary, uncomment the above line before calling
+    let newJobExperience = this.jobExperience.map((job) => {
+      if (job.job === this.job) {
+        const newExp = job.experience + 1;
+        jobWasFoundAndIncremented = true;
+        return { job: job.job, experience: newExp };
+      }
+      return job;
+    });
+
+    if (!jobWasFoundAndIncremented) {
+      newJobExperience.push({ job: this.job, experience: 1 });
+    }
+
+    this.jobExperience = newJobExperience;
+  }
+
+  //----------------------------------Relationships----------------------------------//
   public getParents(): Character[] {
     return this.parents;
   }
@@ -290,15 +337,14 @@ export class PlayerCharacter extends Character {
   public getChildren(): Character[] | null {
     return this.children;
   }
-
-  public damageHealth(damage: number | null) {
-    this.health -= damage ?? 0;
-    return this.health;
+  private addGold(gold: number) {
+    this.gold += gold;
   }
 
-  public damageSanity(damage: number | null) {
-    this.sanity -= damage ?? 0;
-    return this.sanity;
+  //----------------------------------Combat----------------------------------//
+
+  public getPhysicalAttacks(): string[] {
+    return this.physicalAttacks;
   }
 
   public addCondition(condition: Condition | null) {
@@ -331,6 +377,7 @@ export class PlayerCharacter extends Character {
             }
             effect = new Condition({
               name: conditionJSON.name,
+              style: conditionJSON.style as "debuff" | "buff",
               turns: conditionJSON.turns,
               effect: conditionJSON.effect as (
                 | "skip"
@@ -362,7 +409,7 @@ export class PlayerCharacter extends Character {
 
       effect.forEach((eff) => {
         if (eff == "sanity") {
-          this.damageSanity(damage);
+          this.effectSanity(damage);
         } else if (eff == "damage") {
           this.damageHealth(damage);
         }
@@ -372,6 +419,12 @@ export class PlayerCharacter extends Character {
         this.conditions.splice(i, 1);
       }
     }
+  }
+
+  //-----------------Misc-----------------//
+
+  public getElementalProficiencies() {
+    return this.elementalProficiencies;
   }
 
   public toJSON(): object {
@@ -427,4 +480,14 @@ export class PlayerCharacter extends Character {
     });
     return player;
   }
+}
+
+interface performLaborProps {
+  goldReward: number;
+  cost: {
+    mana: number;
+    sanity?: number;
+    health?: number;
+  };
+  title: string;
 }

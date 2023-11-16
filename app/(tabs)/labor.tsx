@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import jobs from "../../assets/jobs.json";
 import LaborTask from "../../components/LaborTask";
 import { ScrollView, View } from "../../components/Themed";
@@ -32,6 +31,7 @@ export default function LaborScreen() {
                 title={Job.title}
                 reward={Job.reward.gold}
                 cost={Job.cost}
+                experienceToPromote={Job.experienceToPromote}
               />
             );
           })}

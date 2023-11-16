@@ -3,60 +3,70 @@
       "title": "Broomstick Maintenance Worker",
       "cost": { "mana": 7, "sanity": -1 },
       "qualifications": null,
+      "experienceToPromote": 50,
       "reward": { "gold": 20 }
    },
    {
       "title": "Magical Plant Seedling Tender",
       "cost": { "mana": 5, "sanity": -1, "health": -1 },
       "qualifications": null,
+      "experienceToPromote": 50,
       "reward": { "gold": 25 }
    },
    {
       "title": "Clean-up Crew at Magical Events",
       "cost": { "mana": 8, "sanity": -2 },
       "qualifications": null,
+      "experienceToPromote": 50,
       "reward": { "gold": 30 }
    },
    {
       "title": "Potion Ingredient Sorter",
       "cost": { "mana": 6, "sanity": -2 },
       "qualifications": null,
+      "experienceToPromote": 50,
       "reward": { "gold": 18 }
    },
    {
       "title": "Assistant in a Magical Artifact Shop",
       "cost": { "mana": 4, "sanity": -1 },
       "qualifications": null,
+      "experienceToPromote": 50,
       "reward": { "gold": 22 }
    },
    {
       "title": "Doxy Exterminator",
       "cost": { "mana": 8, "sanity": -3, "health": -2 },
       "qualifications": null,
+      "experienceToPromote": 50,
       "reward": { "gold": 35 }
    },
    {
       "title": "Quill Sharpener",
       "cost": { "mana": 4, "sanity": -1 },
       "qualifications": null,
+      "experienceToPromote": 50,
       "reward": { "gold": 15 }
    },
    {
       "title": "Owl Post Handler",
       "cost": { "mana": 7, "sanity": -2, "health": -1 },
       "qualifications": null,
+      "experienceToPromote": 50,
       "reward": { "gold": 25 }
    },
    {
       "title": "Caretaker at the House-Elf Relocation Office",
       "cost": { "mana": 5, "sanity": -2 },
       "qualifications": null,
+      "experienceToPromote": 50,
       "reward": { "gold": 20 }
    },
    {
       "title": "Apprentice Wandmaker",
       "cost": { "mana": 5 },
       "qualifications": ["highschool"],
+      "experienceToPromote": 50,
       "reward": { "gold": 28 }
    }
 ]

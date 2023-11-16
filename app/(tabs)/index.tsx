@@ -6,10 +6,19 @@ import { calculateAge } from "../../utility/functions";
 import Coins from "../../assets/icons/CoinsIcon";
 import { useSelector } from "react-redux";
 import { selectPlayerCharacter } from "../../redux/selectors";
+import ProgressBar from "../../components/ProgressBar";
+import PlayerStatus from "../../components/PlayerStatus";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const playerCharacter = useSelector(selectPlayerCharacter);
+
+  const elementalColorMap = {
+    fire: { filledColor: "#f87171", unfilledColor: "#fef2f2" },
+    earth: { filledColor: "#937D62", unfilledColor: "#DFDCC7" },
+    air: { filledColor: "#d4d4d8", unfilledColor: "#f8fafc" },
+    water: { filledColor: "#60a5fa", unfilledColor: "#eff6ff" },
+  };
 
   function elementalProficiencySection(
     proficiencies: {
@@ -18,11 +27,31 @@ export default function HomeScreen() {
     }[],
   ) {
     return proficiencies.map((elementalProficiency, idx) => {
+      const color =
+        elementalColorMap[
+          elementalProficiency.element as "fire" | "earth" | "air" | "water"
+        ];
       return (
-        <Text className="text-lg dark:text-white" key={idx}>
-          {elementalProficiency.element}: {elementalProficiency.proficiency} /
-          500
-        </Text>
+        <View className="my-4 flex w-full flex-col" key={idx}>
+          <Text
+            className="mx-auto"
+            style={{
+              color:
+                elementalProficiency.element == "air" && colorScheme == "light"
+                  ? "#71717a"
+                  : color.filledColor,
+            }}
+          >
+            {elementalProficiency.element}
+          </Text>
+          <ProgressBar
+            value={elementalProficiency.proficiency}
+            maxValue={500}
+            unfilledColor={color.unfilledColor}
+            filledColor={color.filledColor}
+            borderColor={color.filledColor}
+          />
+        </View>
       );
     });
   }
@@ -64,26 +93,15 @@ export default function HomeScreen() {
           ? elementalProficiencySection(elementalProficiencies)
           : null}
       </View>
-      <View className="flex flex-col">
-        <View className="flex flex-row justify-center">
-          <Text>{playerCharacter?.getReadableGold()}</Text>
-          <Coins width={20} height={20} style={{ marginLeft: 6 }} />
+      {playerCharacter ? (
+        <View className="flex flex-col">
+          <View className="flex flex-row justify-center">
+            <Text>{playerCharacter.getReadableGold()}</Text>
+            <Coins width={20} height={20} style={{ marginLeft: 6 }} />
+          </View>
+          <PlayerStatus />
         </View>
-        <View className="flex flex-row justify-evenly pt-12">
-          <Text
-            className="text-xl"
-            style={{ color: "#ef4444" }}
-          >{`${playerCharacter?.getHealth()} / ${playerCharacter?.getMaxHealth()} Health`}</Text>
-          <Text
-            className="text-xl"
-            style={{ color: "#60a5fa" }}
-          >{`${playerCharacter?.getMana()} / ${playerCharacter?.getMaxMana()} Mana`}</Text>
-          <Text
-            className="text-xl"
-            style={{ color: "#c084fc" }}
-          >{`${playerCharacter?.getSanity()} Sanity`}</Text>
-        </View>
-      </View>
+      ) : null}
     </View>
   );
 }

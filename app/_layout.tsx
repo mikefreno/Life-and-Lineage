@@ -78,7 +78,7 @@ function RootLayout() {
     if (loaded && gameAndPlayerLoaded) {
       SplashScreen.hideAsync();
       if (!playerCharacter || !gameData) {
-        router.replace("/NewGame/");
+        router.replace("/NewGame");
       } else if (
         gameData.getAtDeathScreen() ||
         (playerCharacter && playerCharacter.getHealth() <= 0)

@@ -14,9 +14,11 @@ import {
   selectMonster,
   selectPlayerCharacter,
 } from "../../redux/selectors";
-import { refreshMonster, setMonster } from "../../redux/slice/game";
+import { setMonster } from "../../redux/slice/game";
 import { AppDispatch } from "../../redux/store";
 import { appendLogs } from "../../redux/slice/game";
+import PlayerStatus from "../../components/PlayerStatus";
+import ProgressBar from "../../components/ProgressBar";
 
 export default function DungeonLevelScreen() {
   const playerCharacter = useSelector(selectPlayerCharacter);
@@ -100,7 +102,7 @@ export default function DungeonLevelScreen() {
           enemyAttackRes.attack !== "pass"
         ) {
           const hp = playerCharacter.damageHealth(enemyAttackRes.attack.damage);
-          const sanity = playerCharacter.damageSanity(
+          const sanity = playerCharacter.effectSanity(
             enemyAttackRes.attack.sanityDamage,
           );
           playerCharacter.addCondition(enemyAttackRes.attack.secondaryEffects);
@@ -159,11 +161,14 @@ export default function DungeonLevelScreen() {
         <Stack.Screen options={{ title: `Dungeon Level ${level}` }} />
         <View className="flex-1 px-4 py-6">
           <View className="flex h-1/3 flex-row justify-evenly">
-            <View className="flex flex-col items-center justify-center">
+            <View className="flex w-2/5 flex-col items-center justify-center">
               <Text className="text-3xl">{monster.creatureSpecies}</Text>
-              <Text className="text-xl" style={{ color: "#ef4444" }}>
-                {monster.health} / {monster.healthMax} health
-              </Text>
+              <ProgressBar
+                value={monster.health}
+                maxValue={monster.healthMax}
+                filledColor="#ef4444"
+                unfilledColor="#fee2e2"
+              />
             </View>
             <View>
               <MonsterImage monsterSpecies={monster.creatureSpecies} />
@@ -221,20 +226,7 @@ export default function DungeonLevelScreen() {
           <View className="h-1/2">
             <BattleTab useAttack={useAttack} battleTab={battleTab} />
           </View>
-          <View className="flex flex-row justify-evenly">
-            <Text
-              className="text-xl"
-              style={{ color: "#ef4444" }}
-            >{`${playerCharacter.getHealth()} / ${playerCharacter.getMaxHealth()} Health`}</Text>
-            <Text
-              className="text-xl"
-              style={{ color: "#60a5fa" }}
-            >{`${playerCharacter.getMana()} / ${playerCharacter.getMaxMana()} Mana`}</Text>
-            <Text
-              className="text-xl"
-              style={{ color: "#c084fc" }}
-            >{`${playerCharacter.getSanity()} Sanity`}</Text>
-          </View>
+          <PlayerStatus />
         </View>
       </>
     );
