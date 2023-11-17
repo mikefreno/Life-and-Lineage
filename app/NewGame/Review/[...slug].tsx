@@ -1,11 +1,15 @@
-import { useContext } from "react";
 import { View as ThemedView, Text } from "../../../components/Themed";
 import { Pressable, View } from "react-native";
 import { Character, PlayerCharacter } from "../../../classes/character";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import names from "../../../assets/names.json";
-import jobs from "../../../assets/jobs.json";
-import { saveGame, savePlayer, toTitleCase } from "../../../utility/functions";
+import names from "../../../assets/json/names.json";
+import jobs from "../../../assets/json/jobs.json";
+import {
+  createShops,
+  saveGame,
+  savePlayer,
+  toTitleCase,
+} from "../../../utility/functions";
 import { Game } from "../../../classes/game";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../redux/store";
@@ -161,7 +165,8 @@ export default function NewGameReview() {
     const player = createPlayerCharacter();
     dispatch(setPlayerCharacter(player));
     const startDate = new Date();
-    const newGame = new Game({ date: startDate });
+    const shops = createShops();
+    const newGame = new Game({ date: startDate, shops: shops });
     dispatch(setGameData(newGame));
     saveGame(newGame);
     savePlayer(player);

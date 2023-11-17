@@ -1,0 +1,10 @@
+[
+   {
+      "name": "leather chestpiece",
+      "cost": 500,
+      "armor": 12,
+      "heathBonus": null,
+      "staminaBonus": null,
+      "manaBonus": null
+   }
+]

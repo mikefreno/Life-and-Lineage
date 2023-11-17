@@ -4,7 +4,7 @@ import { Platform, Pressable, ScrollView } from "react-native";
 import { Text, View } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { useState } from "react";
-import spells from "../assets/spells.json";
+import spells from "../assets/json/spells.json";
 import LearnSpellComponent from "../components/LearnSpellComponent";
 
 export default function CraftingScreen() {

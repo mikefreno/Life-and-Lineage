@@ -1,6 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
+import shops from "../assets/json/shops.json";
+import names from "../assets/json/names.json";
+import { Shop } from "../classes/shop";
+import { Item } from "../classes/item";
 
 export const storeData = async (key: string, value: any) => {
   try {
@@ -129,7 +133,6 @@ export function getCharacterImage(age: number, sex: "M" | "F") {
   }
 }
 
-const monsters = {};
 export function getMonsterImage(monsterName: string) {
   return require("../assets/images/monsters/goblin.png");
 }
@@ -147,4 +150,61 @@ export function toTitleCase(title: string) {
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+function getRandomName(sex: string): string {
+  const filteredNames = names.filter((name) => {
+    return name.sex == sex;
+  });
+  const randomIndex = Math.floor(Math.random() * filteredNames.length);
+  return `${filteredNames[randomIndex].firstName} ${filteredNames[randomIndex].lastName}`;
+}
+
+function generateBirthday(minAge: number, maxAge: number): Date {
+  const today = new Date();
+  const minDate = new Date();
+  const maxDate = new Date();
+
+  minDate.setFullYear(today.getFullYear() - maxAge - 1);
+  minDate.setDate(minDate.getDate() + 1);
+  maxDate.setFullYear(today.getFullYear() - minAge);
+
+  const diff = maxDate.getTime() - minDate.getTime();
+  const randomTimestamp = Math.random() * diff + minDate.getTime();
+
+  return new Date(randomTimestamp);
+}
+
+function getRandomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export function createShops() {
+  let createdShops: Shop[] = [];
+  shops.forEach((shop) => {
+    //want to favor likelihood of male shopkeepers slightly
+    const sex = rollD20() <= 12 ? "male" : "female";
+    const name = getRandomName(sex);
+    const birthday = generateBirthday(28, 60);
+    const randIdx = Math.floor(
+      Math.random() * shop.possiblePersonalities.length,
+    );
+    const invCount = getRandomInt(
+      shop.itemQuantityRange.minimum,
+      shop.itemQuantityRange.maximum,
+    );
+    let inventory: Item[] = [];
+    for (let i = 0; i < invCount; i++) {}
+    const newShop = new Shop({
+      shopKeeperName: name,
+      shopKeeperSex: sex,
+      shopKeeperBirthDate: birthday,
+      personality: shop.possiblePersonalities[randIdx],
+      baseGold: shop.baseGold,
+      lastStockRefresh: new Date(),
+      archetype: shop.type,
+    });
+    createdShops.push(newShop);
+  });
+  return createdShops;
 }

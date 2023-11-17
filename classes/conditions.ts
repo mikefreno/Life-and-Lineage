@@ -12,6 +12,7 @@ export class Condition {
   private turns: number;
   readonly effect: ("skip" | "accuracy halved" | "damage" | "sanity")[];
   readonly damage: number | null;
+
   constructor({ name, style, turns, effect, damage }: ConditionOptions) {
     this.name = name;
     this.style = style;

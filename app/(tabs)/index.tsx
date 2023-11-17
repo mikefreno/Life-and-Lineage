@@ -1,5 +1,5 @@
 import { useColorScheme } from "react-native";
-import { View, Text } from "../../components/Themed";
+import { View, Text, ScrollView } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import WitchHat from "../../assets/icons/WitchHatIcon";
 import { calculateAge } from "../../utility/functions";
@@ -82,11 +82,14 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <View className="flex items-center">
-        {elementalProficiencies
-          ? elementalProficiencySection(elementalProficiencies)
-          : null}
-      </View>
+      <ScrollView>
+        <View className="flex items-center">
+          {elementalProficiencies
+            ? elementalProficiencySection(elementalProficiencies)
+            : null}
+        </View>
+        <View></View>
+      </ScrollView>
       {playerCharacter ? (
         <View className="flex flex-col">
           <View className="flex flex-row justify-center">

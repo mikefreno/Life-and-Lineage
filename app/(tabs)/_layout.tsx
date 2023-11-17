@@ -15,6 +15,7 @@ import HouseHeart from "../../assets/icons/RelationshipsIcon";
 import { useSelector } from "react-redux";
 import { selectPlayerCharacter } from "../../redux/selectors";
 import Sword from "../../assets/icons/SwordIcon";
+import { elementalColorMap } from "../../utility/elementColors";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -96,7 +97,15 @@ export default function TabLayout() {
                   <BookSparkles
                     width={26}
                     height={28}
-                    color={Colors[colorScheme ?? "light"].text}
+                    color={
+                      elementalColorMap[
+                        playerCharacter!.element.toLowerCase() as
+                          | "fire"
+                          | "water"
+                          | "air"
+                          | "earth"
+                      ].dark
+                    }
                     style={{
                       marginRight: 15,
                       marginBottom: 3,

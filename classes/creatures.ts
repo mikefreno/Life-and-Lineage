@@ -1,6 +1,6 @@
-import attacks from "../assets/monsterAttacks.json";
+import attacks from "../assets/json/monsterAttacks.json";
 import { flipCoin, rollD20 } from "../utility/functions";
-import conditions from "../assets/conditions.json";
+import conditions from "../assets/json/conditions.json";
 import { Condition } from "./conditions";
 
 interface familiarOptions {
@@ -26,17 +26,18 @@ interface monsterInterface {
 }
 
 export class Monster {
-  public creatureSpecies: string;
-  public health: number;
-  public sanity: number | null;
-  public sanityMax: number | null;
-  public healthMax: number;
-  public attackPower: number;
-  public energy: number;
-  public energyMax: number;
-  public energyRegen: number;
-  public attacks: string[];
-  public conditions: Condition[];
+  readonly creatureSpecies: string;
+  private health: number;
+  private sanity: number | null;
+  private sanityMax: number | null;
+  private healthMax: number;
+  private attackPower: number;
+  private energy: number;
+  private energyMax: number;
+  private energyRegen: number;
+  private attacks: string[];
+  private conditions: Condition[];
+
   constructor({
     creatureSpecies,
     health,
@@ -62,16 +63,26 @@ export class Monster {
     this.attacks = attacks;
     this.conditions = conditions ?? [];
   }
+
+  //---------------------------Health---------------------------//
   public damageHealth(damage: number | null) {
     this.health -= damage ?? 0;
     return this.health;
   }
+  public getHealth() {
+    return this.health;
+  }
+  public getMaxHealth() {
+    return this.healthMax;
+  }
+  //---------------------------Sanity---------------------------//
   public damageSanity(damage: number | null) {
     if (this.sanity) {
       this.sanity -= damage ?? 0;
       return this.sanity;
     }
   }
+  //---------------------------Battle---------------------------//
 
   public addCondition(condition: Condition | null) {
     if (condition) {
@@ -187,6 +198,7 @@ export class Monster {
                 }
                 effect = new Condition({
                   name: conditionJSON.name,
+                  style: "debuff",
                   turns: conditionJSON.turns,
                   effect: conditionJSON.effect as (
                     | "skip"
@@ -221,6 +233,7 @@ export class Monster {
     }
   }
 
+  //---------------------------Misc---------------------------//
   public toJSON(): object {
     return {
       creatureSpecies: this.creatureSpecies,

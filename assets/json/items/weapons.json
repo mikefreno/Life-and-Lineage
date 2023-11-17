@@ -1,0 +1,17 @@
+[
+   {
+      "name": "stick",
+      "cost": 50,
+      "damage": 1.5
+   },
+   {
+      "name": "dagger",
+      "cost": 150,
+      "damage": 2.0
+   },
+   {
+      "name": "short sword",
+      "cost": 500,
+      "damage": 3.5
+   }
+]

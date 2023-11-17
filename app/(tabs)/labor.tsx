@@ -1,4 +1,4 @@
-import jobs from "../../assets/jobs.json";
+import jobs from "../../assets/json/jobs.json";
 import LaborTask from "../../components/LaborTask";
 import { ScrollView, View } from "../../components/Themed";
 import { useSelector } from "react-redux";

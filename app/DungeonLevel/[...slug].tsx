@@ -19,6 +19,7 @@ import { AppDispatch } from "../../redux/store";
 import { appendLogs } from "../../redux/slice/game";
 import PlayerStatus from "../../components/PlayerStatus";
 import ProgressBar from "../../components/ProgressBar";
+import monsterObjects from "../../assets/json/monsters.json";
 
 export default function DungeonLevelScreen() {
   const playerCharacter = useSelector(selectPlayerCharacter);
@@ -33,7 +34,6 @@ export default function DungeonLevelScreen() {
   const instance = slug[1];
   let level: number;
   level = Number(id);
-  console.log(level);
   const [battleTab, setBattleTab] = useState<
     "attacks" | "spells" | "equipment" | "log"
   >("log");
@@ -48,6 +48,8 @@ export default function DungeonLevelScreen() {
   useEffect(() => {
     if (!monster) {
       getEnemy();
+    } else {
+      appropriateEnemyCheck();
     }
   }, [monster]);
 
@@ -64,12 +66,25 @@ export default function DungeonLevelScreen() {
     dispatch(setMonster(enemy));
   }
 
+  function appropriateEnemyCheck() {
+    if (monster)
+      monsterObjects.forEach((monsterObject) => {
+        if (
+          monsterObject.name == monster.creatureSpecies &&
+          !monsterObject.appearsOn.includes(level)
+        ) {
+          getEnemy();
+          return;
+        }
+      });
+  }
+
   function useAttack(attack: AttackObject) {
     if (monster && playerCharacter) {
       let monsterDefeated = false;
       const attackRes = playerCharacter.doPhysicalAttack(
         attack,
-        monster.healthMax,
+        monster.getMaxHealth(),
       );
       if (attackRes !== "miss") {
         const hp = monster.damageHealth(attackRes.damage);
@@ -105,7 +120,7 @@ export default function DungeonLevelScreen() {
           enemyAttackRes.attack !== "pass"
         ) {
           const hp = playerCharacter.damageHealth(enemyAttackRes.attack.damage);
-          const sanity = playerCharacter.effectSanity(
+          const sanity = playerCharacter.damageSanity(
             enemyAttackRes.attack.sanityDamage,
           );
           playerCharacter.addCondition(enemyAttackRes.attack.secondaryEffects);
@@ -176,8 +191,8 @@ export default function DungeonLevelScreen() {
             <View className="flex w-2/5 flex-col items-center justify-center">
               <Text className="text-3xl">{monster.creatureSpecies}</Text>
               <ProgressBar
-                value={monster.health}
-                maxValue={monster.healthMax}
+                value={monster.getHealth()}
+                maxValue={monster.getMaxHealth()}
                 filledColor="#ef4444"
                 unfilledColor="#fee2e2"
               />
@@ -188,11 +203,18 @@ export default function DungeonLevelScreen() {
           </View>
           <View>
             {thisDungeon.stepsBeforeBoss !== 0 ? (
-              <Text className="-mt-7 text-center text-xl">
-                {`Steps Completed: ${thisDungeon.getStep()} / ${
-                  thisDungeon.stepsBeforeBoss
-                }`}
-              </Text>
+              <View className="-mt-7 mb-1 flex flex-row justify-evenly">
+                <Text className="my-auto text-xl">
+                  {`Steps Completed: ${thisDungeon.getStep()} / ${
+                    thisDungeon.stepsBeforeBoss
+                  }`}
+                </Text>
+                {thisDungeon.getStep() == thisDungeon.stepsBeforeBoss ? (
+                  <Pressable className="rounded bg-red-400 px-4 py-2 active:scale-95 active:opacity-50">
+                    <Text>Fight Boss</Text>
+                  </Pressable>
+                ) : null}
+              </View>
             ) : null}
             <View className="flex w-full flex-row justify-evenly border-y border-zinc-200">
               <Pressable

@@ -1,7 +1,8 @@
 import { rollD20 } from "../utility/functions";
 import { AttackObject } from "../utility/types";
 import { Condition } from "./conditions";
-import conditions from "../assets/conditions.json";
+import conditions from "../assets/json/conditions.json";
+import { Item } from "./item";
 
 interface CharacterOptions {
   firstName: string;
@@ -120,20 +121,13 @@ interface PlayerCharacterOptions {
   knownSpells?: string[];
   gold?: number;
   conditions?: Condition[];
+  inventorySize?: number;
+  inventory?: Item[];
   equipment?: {
-    weapon: { name: string; baseDamage: number };
-    head: {
-      name: string;
-      heathBonus: number;
-      staminaBonus: number;
-      manaBonus: number;
-    };
-    body: {
-      name: string;
-      heathBonus: number;
-      staminaBonus: number;
-      manaBonus: number;
-    };
+    mainHand: Item | undefined;
+    offHand: Item | undefined;
+    head: Item | undefined;
+    body: Item | undefined;
   };
 }
 
@@ -147,25 +141,18 @@ export class PlayerCharacter extends Character {
   private elementalProficiencies: { element: string; proficiency: number }[];
   private parents: Character[];
   private children: Character[] | null = null;
-  private element: string;
+  readonly element: string;
   private knownSpells: string[];
   private physicalAttacks: string[];
   private conditions: Condition[];
   private gold: number;
+  private inventorySize: number;
+  private inventory: Item[];
   private equipment: {
-    weapon: { name: string; baseDamage: number };
-    head?: {
-      name: string;
-      heathBonus: number;
-      staminaBonus: number;
-      manaBonus: number;
-    };
-    body?: {
-      name: string;
-      heathBonus: number;
-      staminaBonus: number;
-      manaBonus: number;
-    };
+    mainHand?: Item;
+    offHand?: Item;
+    head?: Item;
+    body?: Item;
   };
 
   constructor({
@@ -190,6 +177,8 @@ export class PlayerCharacter extends Character {
     knownSpells,
     physicalAttacks,
     gold,
+    inventorySize,
+    inventory,
     equipment,
   }: PlayerCharacterOptions) {
     super({
@@ -221,8 +210,16 @@ export class PlayerCharacter extends Character {
     this.conditions = [];
     this.physicalAttacks = physicalAttacks ?? ["punch"];
     this.gold = gold ?? 25;
+    this.inventorySize = inventorySize ?? 20;
+    this.inventory = inventory ?? [];
     this.equipment = equipment ?? {
-      weapon: { name: "unarmored", baseDamage: 1 },
+      mainHand: new Item({
+        name: "unarmored",
+        slot: "one-hand",
+        stats: [{ baseDamage: 1 }],
+        baseValue: 0,
+        itemClass: "weapon",
+      }),
     };
   }
 
@@ -256,8 +253,8 @@ export class PlayerCharacter extends Character {
     return this.sanity;
   }
 
-  public effectSanity(damage: number | null) {
-    this.sanity += damage ?? 0;
+  public damageSanity(damage: number | null) {
+    this.sanity -= damage ?? 0;
     return this.sanity;
   }
 
@@ -301,7 +298,7 @@ export class PlayerCharacter extends Character {
           this.damageHealth(cost.health);
         }
         if (cost.sanity) {
-          this.effectSanity(cost.sanity);
+          this.damageSanity(cost.sanity);
         }
         this.useMana(cost.mana);
         this.addGold(goldReward);
@@ -359,7 +356,11 @@ export class PlayerCharacter extends Character {
     const rollToHit = 20 - (attack.hitChance * 100) / 5;
     const roll = rollD20();
     if (roll >= rollToHit) {
-      const hpDamage = attack.damageMult * this.equipment.weapon.baseDamage;
+      const hpDamage =
+        attack.damageMult *
+        (this.equipment.mainHand?.stats.find(
+          (stat: Record<string, number>) => "baseDamage" in stat,
+        )?.["baseDamage"] ?? 1);
       const sanityDamage = attack.sanityDamage;
       const effectChance = attack.secondaryEffectChance;
       if (effectChance) {
@@ -411,7 +412,7 @@ export class PlayerCharacter extends Character {
 
       effect.forEach((eff) => {
         if (eff == "sanity") {
-          this.effectSanity(damage);
+          this.damageSanity(damage);
         } else if (eff == "damage") {
           this.damageHealth(damage);
         }
@@ -446,7 +447,14 @@ export class PlayerCharacter extends Character {
       knownSpells: this.knownSpells,
       physicalAttacks: this.physicalAttacks,
       gold: this.gold,
-      equipment: this.equipment,
+      inventorySize: this.inventorySize,
+      inventory: this.inventory.map((item) => item.toJSON()),
+      equipment: {
+        mainHand: this.equipment.mainHand?.toJSON(),
+        offHand: this.equipment.offHand?.toJSON(),
+        head: this.equipment.head?.toJSON(),
+        body: this.equipment.body?.toJSON(),
+      },
     };
   }
 
@@ -475,7 +483,22 @@ export class PlayerCharacter extends Character {
       knownSpells: json.knownSpells,
       physicalAttacks: json.physicalAttacks,
       gold: json.gold,
-      equipment: json.equipment,
+      inventorySize: json.inventorySize,
+      inventory: json.inventory.map((item: any) => Item.fromJSON(item)),
+      equipment: {
+        mainHand: json.equipment.mainHand
+          ? Item.fromJSON(json.equipment.mainHand)
+          : undefined,
+        offHand: json.equipment.offHand
+          ? Item.fromJSON(json.equipment.mainHand)
+          : undefined,
+        body: json.equipment.body
+          ? Item.fromJSON(json.equipment.body)
+          : undefined,
+        head: json.equipment.head
+          ? Item.fromJSON(json.equipment.head)
+          : undefined,
+      },
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],

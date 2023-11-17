@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { View, Text, ScrollView } from "./Themed";
 import { Pressable, useColorScheme, FlatList } from "react-native";
-import attacks from "../assets/playerAttacks.json";
+import attacks from "../assets/json/playerAttacks.json";
 import { AttackObject } from "../utility/types";
 import { toTitleCase } from "../utility/functions";
 import { useSelector } from "react-redux";

@@ -1,0 +1,18 @@
+[
+   {
+      "name": "cloth robes",
+      "cost": 200,
+      "armor": 6,
+      "heathBonus": null,
+      "staminaBonus": null,
+      "manaBonus": 20 
+   },
+   {
+      "name": "apprentice robes",
+      "cost": 1500,
+      "armor": 8,
+      "heathBonus": null,
+      "staminaBonus": null,
+      "manaBonus": 50 
+   }
+]

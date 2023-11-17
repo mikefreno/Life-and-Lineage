@@ -1,7 +1,7 @@
 import { Text, View, ScrollView } from "../../components/Themed";
 import { Pressable } from "react-native";
 import { router } from "expo-router";
-import dungeons from "../../assets/dungeons.json";
+import dungeons from "../../assets/json/dungeons.json";
 import { toTitleCase } from "../../utility/functions";
 import { useSelector } from "react-redux";
 import { selectGame } from "../../redux/selectors";
@@ -49,11 +49,11 @@ export default function DungeonScreen() {
     }
 
     return (
-      <ScrollView className="h-full px-4 py-8">
+      <View className="h-full px-4 py-8">
         <Text className="pb-4 text-center text-2xl">
           The dungeon is a dangerous place. Be careful.
         </Text>
-        <View>
+        <ScrollView>
           {filteredDungeonInstances.map(
             (dungeonInstance, dungeonInstanceIdx) => (
               <View
@@ -89,8 +89,8 @@ export default function DungeonScreen() {
               </View>
             ),
           )}
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     );
   }
 }

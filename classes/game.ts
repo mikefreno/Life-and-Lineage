@@ -1,8 +1,9 @@
-import { PlayerCharacter } from "./character";
 import { DungeonInstance, DungeonLevel } from "./dungeon";
+import { Shop } from "./shop";
 
 interface GameOptions {
   date?: Date;
+  shops: Shop[];
   dungeonInstances?: DungeonInstance[];
   furthestDepth?: { instance: string; level: number };
   atDeathScreen?: boolean;
@@ -13,12 +14,14 @@ export class Game {
   private dungeonInstances: DungeonInstance[];
   private furthestDepth: { instance: string; level: number };
   private atDeathScreen: boolean;
+  private shops: Shop[];
 
   constructor({
     date,
     dungeonInstances,
     furthestDepth,
     atDeathScreen,
+    shops,
   }: GameOptions) {
     this.date = date ?? new Date();
     this.dungeonInstances = dungeonInstances ?? [
@@ -47,17 +50,32 @@ export class Game {
     ];
     this.furthestDepth = furthestDepth ?? { instance: "nearby cave", level: 1 };
     this.atDeathScreen = atDeathScreen ?? false;
+    this.shops = shops;
   }
 
+  //----------------------------------Date----------------------------------//
   public getGameDate(): Date {
     return this.date;
   }
 
+  //----------------------------------Death----------------------------------//
   public hitDeathScreen() {
     this.atDeathScreen = true;
   }
   public getAtDeathScreen() {
     return this.atDeathScreen;
+  }
+  //----------------------------------Shops----------------------------------//
+  public getShops() {
+    return this.shops;
+  }
+  //----------------------------------Dungeon----------------------------------//
+  public getFuthestDepth() {
+    return this.furthestDepth;
+  }
+
+  public getAllInstances() {
+    return this.dungeonInstances;
   }
 
   public getDungeon(instance: string, level: number): DungeonLevel | undefined {
@@ -71,14 +89,11 @@ export class Game {
       return found;
     }
   }
+
   public getInstance(instanceName: string) {
     return this.dungeonInstances.find(
       (instance) => instance.name == instanceName,
     );
-  }
-
-  public getAllInstances() {
-    return this.dungeonInstances;
   }
 
   public updateNamedInstance(instanceName: string, instance: DungeonInstance) {}
@@ -93,10 +108,7 @@ export class Game {
     }
   }
 
-  public getFuthestDepth() {
-    return this.furthestDepth;
-  }
-
+  //----------------------------------Misc----------------------------------//
   public toJSON(): object {
     return {
       date: this.date.toISOString(),
@@ -105,6 +117,7 @@ export class Game {
       ),
       furthestDepth: this.furthestDepth,
       atDeathScreen: this.atDeathScreen,
+      shops: this.shops.map((shop) => shop.toJSON()),
     };
   }
 
@@ -116,6 +129,7 @@ export class Game {
       dungeonInstances: json.dungeonInstances.map((instance: any) =>
         DungeonInstance.fromJSON(instance),
       ),
+      shops: json.shops.map((shop: any) => Shop.fromJSON(shop)),
     });
 
     return game;

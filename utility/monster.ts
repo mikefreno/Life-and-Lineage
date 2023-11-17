@@ -1,4 +1,4 @@
-import enemies from "../assets/monsters.json";
+import enemies from "../assets/json/monsters.json";
 import { Monster } from "../classes/creatures";
 
 function pickRandomEnemyJSON(level: number) {
