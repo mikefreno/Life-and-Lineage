@@ -1,8 +1,7 @@
 [
    {
       "type": "armorer",
-      "sells":{},
-      "buys":["body armor", "helmet"],
+      "trades":["body armor", "helmet"],
       "baseGold": 1000,
       "itemQuantityRange": {"minimum":3, "maximum":10},
       "possiblePersonalities": ["reserved", "open", "jovial"],
@@ -10,8 +9,7 @@
    },
    {
       "type": "weaponsmith",
-      "sells":{},
-      "buys":["weapon", "shield"],
+      "trades":["weapon", "shield"],
       "baseGold": 750,
       "itemQuantityRange": {"minimum":5, "maximum":15},
       "possiblePersonalities": ["reserved", "aggressive", "jovial"],
@@ -19,8 +17,7 @@
    },
    {
       "type": "weaver",
-      "sells":{},
-      "buys":["robe", "hat"],
+      "trades":["robe", "hat"],
       "baseGold": 1500,
       "itemQuantityRange": {"minimum":2, "maximum":5},
       "possiblePersonalities": ["reserved", "silent", "calm"],
@@ -28,8 +25,7 @@
    },
    {
       "type": "archanist",
-      "sells":{},
-      "buys":["wand", "orb"],
+      "trades":["wand", "orb"],
       "baseGold": 2000,
       "itemQuantityRange": {"minimum":3, "maximum":6},
       "possiblePersonalities": ["wise", "silent", "insane"],
@@ -37,8 +33,7 @@
    },
    {
       "type":"junk dealer",
-      "sells":{},
-      "buys": ["body armor", "robe", "helmet", "hat", "weapon", "shield", "orb", "junk"],
+      "trades": ["body armor", "robe", "helmet", "hat", "weapon", "shield", "orb", "junk"],
       "baseGold": 500,
       "itemQuantityRange": {"minimum":10, "maximum":20},
       "possiblePersonalities": ["creepy", "insane", "silent"],
@@ -46,8 +41,7 @@
    },
    {
       "type":"collector",
-      "sells":{},
-      "buys": ["artifact"],
+      "trades": ["artifact"],
       "baseGold": 3000,
       "itemQuantityRange": {"minimum":1, "maximum":2},
       "possiblePersonalities": ["posh", "incredulous", "arrogant"],
@@ -55,8 +49,7 @@
    },
    {
       "type": "apothecary",
-      "sells":{},
-      "buys": ["potion", "poison", "ingredient"],
+      "trades": ["potion", "poison", "ingredient"],
       "baseGold": 400,
       "itemQuantityRange": {"minimum":10, "maximum":20},
       "possiblePersonalities": ["wise", "insane", "creepy"],
@@ -64,8 +57,7 @@
    },
    {
       "type":"librarian",
-      "sells":{},
-      "buys": ["book"],
+      "trades": ["book"],
       "baseGold": 500,
       "itemQuantityRange": {"minimum":2, "maximum":4},
       "possiblePersonalities": ["wise", "reserved", "arrogant"],

@@ -1,17 +1,74 @@
 [
    {
       "name": "stick",
-      "cost": 50,
-      "damage": 1.5
+      "baseValue": 50,
+      "slot": "one-hand",
+      "attacks": ["hit"],
+      "stats":{
+         "damage": 2.5
+      }
    },
    {
       "name": "dagger",
-      "cost": 150,
-      "damage": 2.0
+      "baseValue": 400,
+      "slot": "one-hand",
+      "attacks": ["stab"],
+      "stats":{
+         "damage": 4.5
+      }
    },
    {
       "name": "short sword",
-      "cost": 500,
-      "damage": 3.5
+      "baseValue": 1000,
+      "slot": "one-hand",
+      "attacks": ["slash"],
+      "stats":{
+         "damage": 6.5
+      }
+   },
+   {
+      "name": "mace",
+      "baseValue": 1000,
+      "slot": "one-hand",
+      "attacks": ["crushing blow"],
+      "stats":{
+         "damage": 5.5
+      }
+   },
+   {
+      "name": "long sword",
+      "baseValue": 10000,
+      "slot": "one-hand",
+      "attacks": ["slash"],
+      "stats":{
+         "damage": 10.0
+      }
+   },
+   {
+      "name": "bastard sword",
+      "baseValue": 15000,
+      "slot": "two-hand",
+      "attacks": ["slash", "cleave"],
+      "stats":{
+         "damage": 20.0
+      }
+   },
+   {
+      "name": "claymore",
+      "baseValue": 25000,
+      "slot": "two-hand",
+      "attacks": ["slash", "cleave"],
+      "stats":{
+         "damage": 25.0
+      }
+   },
+   {
+      "name": "zweihänder",
+      "baseValue": 35000,
+      "slot": "two-hand",
+      "attacks": ["slash", "cleave"],
+      "stats":{
+         "damage": 29.0
+      }
    }
 ]

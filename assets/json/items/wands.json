@@ -1,7 +1,143 @@
 [
-   {
-      "name": "apprentice wand",
-      "cost": 1000,
+  {
+    "name": "Apprentice Wand",
+    "baseValue": 1000,
+    "stats":{
       "damage": 5.0
-   }
+    }
+  },
+  {
+    "name": "Scorching Wand",
+    "baseValue": 5000,
+    "stats":{
+      "damage": 8.0
+    }
+  },
+  {
+    "name": "Frozen Wand",
+    "baseValue": 12000,
+    "stats":{
+      "damage": 12.0
+    }
+  },
+  {
+    "name": "Wand of the Prodigy",
+    "baseValue": 18000,
+    "stats":{
+      "damage": 18.0
+    }
+  },
+  {
+    "name": "Adept Wand",
+    "baseValue": 22000,
+    "stats":{
+      "damage": 20.0
+    }
+  },
+  {
+    "name": "Wand of the Inferno",
+    "baseValue": 26000,
+    "stats":{
+      "damage": 23.0
+    }
+  },
+  {
+    "name": "Enchanted Wand",
+    "baseValue": 31000,
+    "stats":{
+      "damage": 27.0
+    }
+  },
+  {
+    "name": "Wand of Blizzards",
+    "baseValue": 40000,
+    "stats":{
+      "damage": 31.0
+    }
+  },
+  {
+    "name": "Expert Wand",
+    "baseValue": 48000,
+    "stats":{
+      "damage": 34.0
+    }
+  },
+  {
+    "name": "Wand of Decay",
+    "baseValue": 65000,
+    "stats":{
+      "damage": 38.0
+    }
+  },
+  {
+    "name": "Master's Wand",
+    "baseValue": 84000,
+    "stats":{
+      "damage": 42.0
+    }
+  },
+  {
+    "name": "Ethereal Wand",
+    "baseValue": 121000,
+    "stats":{
+      "damage": 45.0
+    }
+  },
+  {
+    "name": "Celestial Wand",
+    "baseValue": 145000,
+    "stats":{
+      "damage": 48.0
+    }
+  },
+  {
+    "name": "Wand of Destiny",
+    "baseValue": 185000,
+    "stats":{
+      "damage": 52.0
+    }
+  },
+  {
+    "name": "Wand of Misfortune",
+    "baseValue": 245000,
+    "stats":{
+      "damage": 55.0
+    }
+  },
+  {
+    "name": "Light's End",
+    "baseValue": 285000,
+    "stats":{
+      "damage": 58.0
+    }
+  },
+  {
+    "name": "Wand of the Forgotten",
+    "baseValue": 335000,
+    "stats":{
+      "damage": 60.0
+    }
+  },
+  {
+    "name": "Divine Wand",
+    "baseValue": 410000,
+    "stats":{
+      "damage": 62.0
+    }
+  },
+  {
+    "name": "Death Ray",
+    "baseValue": 520000,
+    "stats":{
+      "damage": 65.0
+    }
+  },
+  {
+    "name": "Finger of God",
+    "baseValue": 750000,
+    "stats":{
+      "damage": 70.0
+    }
+  }
 ]
+

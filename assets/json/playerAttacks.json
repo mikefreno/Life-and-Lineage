@@ -9,9 +9,9 @@
       "secondaryEffectChance": null
    },
    {
-      "name": "staff bonk",
+      "name": "cast",
       "targets": "single",
-      "hitChance": 0.95,
+      "hitChance": 1.0,
       "damageMult": 1.0,
       "sanityDamage": 0,
       "secondaryEffect": null,
@@ -23,7 +23,34 @@
       "hitChance": 0.95,
       "damageMult": 1.0,
       "sanityDamage": 0,
-      "secondaryEffect": "bleed",
-      "secondaryEffectChance": 0.20
+      "secondaryEffect": ["bleed"],
+      "secondaryEffectChance": [0.20]
+   },
+   {
+      "name": "slash",
+      "targets": "single",
+      "hitChance": 1.0,
+      "damageMult": 1.0,
+      "sanityDamage": 0,
+      "secondaryEffect": null,
+      "secondaryEffectChance": null
+   },
+   {
+      "name": "crushing blow",
+      "targets": "single",
+      "hitChance": 0.95,
+      "damageMult": 1.0,
+      "sanityDamage": 0,
+      "secondaryEffect": ["stun"],
+      "secondaryEffectChance": [0.25] 
+   },
+   {
+      "name": "crushing blow",
+      "targets": "single",
+      "hitChance": 0.95,
+      "damageMult": 1.0,
+      "sanityDamage": 0,
+      "secondaryEffect": ["stun"],
+      "secondaryEffectChance": [0.25] 
    }
 ]

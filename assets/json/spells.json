@@ -1,62 +1,418 @@
 [
   {
-    "element": "Fire",
-    "spells": [
-      {"spellName": "Pyroblast", "description": "Hypergrade fireball causing fiery explosions.", "energyCost": 50, "proficiencyRequirement": "Intermediate"},
-      {"spellName": "Cinderfall", "description": "Rain of burning cinders engulfing the chosen area.", "energyCost": 40, "proficiencyRequirement": "Beginner"},
-      {"spellName": "Phoenix Wings", "description": "Manifest flaming wings for swift flight.", "energyCost": 70, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Ember Cloak", "description": "Envelope oneself in a cloak of protective fire.", "energyCost": 35, "proficiencyRequirement": "Intermediate"},
-      {"spellName": "Flamebind", "description": "Conjure ropes of fire to bind an enemy.", "energyCost": 55, "proficiencyRequirement": "Intermediate"},
-      {"spellName": "Solar Beam", "description": "Harness the power of the sun into a focused beam of energy.", "energyCost": 80, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Inferno Breath", "description": "Unleash a breath of fire, incinerating anything in its path.", "energyCost": 90, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Ember Dance", "description": "Create a swirling vortex of fire, distracting or confusing enemies.", "energyCost": 45, "proficiencyRequirement": "Beginner"},
-      {"spellName": "Volcanic Rune", "description": "Engrave a fiery rune on the ground that explodes when trespassed.", "energyCost": 60, "proficiencyRequirement": "Intermediate"},
-      {"spellName": "Ashen Restoration", "description": "Use the rebirth property of fire, healing severe wounds.", "energyCost": 70, "proficiencyRequirement": "Advanced"}
-    ]
+    "name": "fire bolt", 
+    "element": "fire", 
+    "proficiencyNeeded": 0, 
+    "manaCost": 10,
+    "effects": {
+      "damage": 15, 
+      "buffs": null, 
+      "debuffs": ["burn"], 
+      "debuffChance": [0.25]
+    }
   },
   {
-    "element": "Earth",
-    "spells": [
-      {"spellName": "Boulder Roll", "description": "Cause a huge boulder to roll towards enemies.", "energyCost": 70, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Terraform", "description": "Manipulate landscapes at will.", "energyCost": 90, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Sand Vortex", "description": "Create a whirlwind of sand and rocks for confusion and attack.", "energyCost": 50, "proficiencyRequirement": "Intermediate"},
-      {"spellName": "Stone Ward", "description": "Harden the skin to a stone-like quality for defense.", "energyCost": 30, "proficiencyRequirement": "Beginner"},
-      {"spellName": "Crystal Prison", "description": "Conjure a prism of crystal around your foes.", "energyCost": 60, "proficiencyRequirement": "Intermediate"},
-      {"spellName": "Earthquake", "description": "Make the ground tremble and crack beneath your enemies.", "energyCost": 80, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Ironwood Growth", "description": "Grow a strong, sturdy barrier of iron-like wood.", "energyCost": 70, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Pebble Storm", "description": "Raise a high-speed storm of sharp rocks.", "energyCost": 65, "proficiencyRequirement": "Intermediate"},
-      {"spellName": "Granite Grasp", "description": "Hands of solid rock emerge from the ground to hold enemies.", "energyCost": 55, "proficiencyRequirement": "Intermediate"},
-      {"spellName": "Druid’s Call", "description": "Speak to the Earth and its creatures.", "energyCost": 25, "proficiencyRequirement": "Beginner"}
-    ]
+    "name": "catch flame",
+    "element": "fire",
+    "proficiencyNeeded": 50,
+    "manaCost": 20,
+    "effects": {
+      "damage": 25,
+      "buffs": null,
+      "debuffs": ["burn"],
+      "debuffChance": [0.25]
+    }
   },
   {
-    "element": "Water",
-    "spells": [
-      {"spellName": "Tsunami Wave", "description": "Create a massive wave that sweeps everything in its path.", "energyCost": 90, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Healing Aquifer", "description": "Draw health-restoring water from the ground.", "energyCost": 80, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Cryogenic Sphere", "description": "Generate a sphere of intensely cold water, freezing foes.", "energyCost": 60, "proficiencyRequirement": "Intermediate"},
-      {"spellName": "Misty Veil", "description": "Conjure a screen of mist for stealth and escape.", "energyCost": 20, "proficiencyRequirement": "Beginner"},
-      {"spellName": "Vortex Portal", "description": "Open a short-range portal through bodies of water.", "energyCost": 70, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Hydrowhip", "description": "Shape water into a crackling whip.", "energyCost": 50, "proficiencyRequirement": "Intermediate"},
-      {"spellName": "Ebb and Flow", "description": "Control the tides, making water bodies recede or surge.", "energyCost": 65, "proficiencyRequirement": "Intermediate"},
-      {"spellName": "Frost Armor", "description": "Create an armor of ice that also chills attackers.", "energyCost": 55, "proficiencyRequirement": "Beginner"},
-      {"spellName": "Whirlpool", "description": "Summon a whirlpool to disrupt and swallow enemies.", "energyCost": 75, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Raindance", "description": "Cause a calming, steady rainfall.", "energyCost": 30, "proficiencyRequirement": "Beginner"}
-    ]
+    "name": "scorch",
+    "element": "fire",
+    "proficiencyNeeded": 100,
+    "manaCost": 50,
+    "effects": {
+      "damage": 25,
+      "buffs": null,
+      "debuffs": ["burn"],
+      "debuffChance": [0.75]
+    }
   },
   {
-    "element": "Air",
-    "spells": [
-      {"spellName": "Whirlwind", "description": "Create a small tornado that pulls in or deflects projectiles.", "energyCost": 70, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Gust", "description": "Summon a strong wind to knock back opponents or clear smoke.", "energyCost": 40, "proficiencyRequirement": "Beginner"},
-      {"spellName": "Cyclone Shield", "description": "Create an air barrier around you that deflects attacks.", "energyCost": 60, "proficiencyRequirement": "Intermediate"},
-      {"spellName": "Zephyr Wings", "description": "Form wings of air currents for flight.", "energyCost": 80, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Gale Force", "description": "Release a concentrated, forceful blast of wind.", "energyCost": 75, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Cloud Walk", "description": "Vaporize partially allowing temporary movement through air.", "energyCost": 90, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Air Pocket", "description": "Create a pocket of breathable air around you underwater or in toxic environments.", "energyCost": 45, "proficiencyRequirement": "Intermediate"},
-      {"spellName": "Hurricane Fury", "description": "Summon a fierce windstorm that sweeps across the battlefield.", "energyCost": 85, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Soundwave", "description": "Manipulate air to propagate powerful sound waves that stun enemies.", "energyCost": 70, "proficiencyRequirement": "Advanced"},
-      {"spellName": "Thunderclap", "description": "Cause a sonic shockwave with a clap, disorienting foes.", "energyCost": 55, "proficiencyRequirement": "Intermediate"}
-    ]
+    "name": "fireball",
+    "element": "fire",
+    "proficiencyNeeded": 150,
+    "manaCost": 75,
+    "effects": {
+      "damage": 60,
+      "buffs": null,
+      "debuffs": ["burn"],
+      "debuffChance": [0.25]
+    }
+  },
+  {
+    "name": "fire wall",
+    "element": "fire",
+    "proficiencyNeeded": 250,
+    "manaCost": 100,
+    "duration": 3,
+    "effects": {
+      "damage": null,
+      "buffs": ["projectile suppression"],
+      "debuffs": ["burn"],
+      "debuffChance": [0.5]
+    }
+  },
+  {
+    "name": "rain fire",
+    "element": "fire",
+    "proficiencyNeeded": 350,
+    "manaCost": 250,
+    "duration": 5,
+    "effects": {
+      "damage": 50,
+      "buffs": null,
+      "debuffs": ["burn"],
+      "debuffChance": [0.25]
+    }
+  },
+  {
+    "name": "dragons breath",
+    "element": "fire",
+    "proficiencyNeeded": 500,
+    "manaCost": 600,
+    "effects": {
+      "damage": 275,
+      "buffs": null,
+      "debuffs": ["severe burn"],
+      "debuffChance": [0.75]
+    }
+  },
+  {
+    "name": "sunbeam",
+    "element": "fire",
+    "proficiencyNeeded": 550,
+    "manaCost": 1000,
+    "effects": {
+      "damage": 400,
+      "buffs": null,
+      "debuffs": ["severe burn"],
+      "debuffChance": [1.0]
+    }
+  },
+  {
+    "name": "frost",
+    "element": "water",
+    "proficiencyNeeded": 0,
+    "manaCost": 10,
+    "effects": {
+      "damage": 10,
+      "buffs": null,
+      "debuffs": ["chill"],
+      "debuffChance": [0.5]
+    }
+  },
+  {
+    "name": "water whip",
+    "element": "water",
+    "proficiencyNeeded": 50,
+    "manaCost": 20,
+    "effects": {
+      "damage": 30,
+      "buffs": null,
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "soothing waters",
+    "element": "water",
+    "proficiencyNeeded": 100,
+    "manaCost": 50,
+    "effects": {
+      "damage": null,
+      "buffs": ["healing"],
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "cone of cold",
+    "element": "water",
+    "proficiencyNeeded": 150,
+    "manaCost": 100,
+    "effects": {
+      "damage": 40,
+      "buffs": null,
+      "debuffs": ["chill", "chill"],
+      "debuffChance": [1.0, 1.0] 
+    }
+  },
+  {
+    "name": "steam blast",
+    "element": "water",
+    "proficiencyNeeded": 200,
+    "manaCost": 125,
+    "effects": {
+      "damage": 60,
+      "buffs": null,
+      "debuffs": ["burn"],
+      "debuffChance": [0.5] 
+    }
+  },
+  {
+    "name": "freezing ray",
+    "element": "water",
+    "proficiencyNeeded": 250,
+    "manaCost": 200,
+    "effects": {
+      "damage": 100,
+      "buffs": null,
+      "debuffs": ["chill", "chill", "chill"],
+      "debuffChance": [0.75, 0.75, 0.75] 
+    }
+  },
+  {
+    "name": "healing rain",
+    "element": "water",
+    "proficiencyNeeded": 350,
+    "manaCost": 200,
+    "effects": {
+      "damage": null,
+      "buffs": ["strong healing"],
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "orb of cold",
+    "element": "water",
+    "proficiencyNeeded": 400,
+    "manaCost": 300,
+    "duration": 5,
+    "effects": {
+      "damage": 50,
+      "buffs": null,
+      "debuffs": ["chill"],
+      "debuffChance": [0.75]
+    }
+  },
+  {
+    "name": "boil blood",
+    "element": "water",
+    "proficiencyNeeded": 500,
+    "manaCost": 600,
+    "effects": {
+      "damage": 175,
+      "buffs": null,
+      "debuffs": ["severe burn"],
+      "debuffChance": [1.0]
+    }
+  },
+  {
+    "name": "blood control",
+    "element": "water",
+    "proficiencyNeeded": 550,
+    "duration": 2,
+    "manaCost": 1100,
+    "effects": {
+      "damage": 150,
+      "buffs": null,
+      "debuffs": ["stun"],
+      "debuffChance": [1.0]
+    }
+  },
+  {
+    "name": "gust",
+    "element": "air",
+    "proficiencyNeeded": 0,
+    "manaCost": 10,
+    "effects": {
+      "damage": 18,
+      "buffs": null,
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "sparks",
+    "element": "air",
+    "proficiencyNeeded": 50,
+    "manaCost": 25,
+    "effects": {
+      "damage": 25,
+      "buffs": null,
+      "debuffs": ["shocked"],
+      "debuffChance": [0.5] 
+    }
+  },
+  {
+    "name": "lightning",
+    "element": "air",
+    "proficiencyNeeded": 150,
+    "manaCost": 75,
+    "effects": {
+      "damage": 50,
+      "buffs": null,
+      "debuffs": ["shocked", "shocked"],
+      "debuffChance": [0.5, 0.5] 
+    }
+  },
+  {
+    "name": "thunder clap",
+    "element": "air",
+    "proficiencyNeeded": 300,
+    "manaCost": 75,
+    "effects": {
+      "damage": 50,
+      "buffs": null,
+      "debuffs": ["shocked", "stun"],
+      "debuffChance": [0.75, 0.5] 
+    }
+  },
+  {
+    "name": "air blades",
+    "element": "air",
+    "proficiencyNeeded": 300,
+    "manaCost": 100,
+    "effects": {
+      "damage": 75,
+      "buffs": null,
+      "debuffs": ["bleed", "bleed"],
+      "debuffChance": [0.75, 0.75] 
+    }
+  },
+  {
+    "name": "surrounding gale",
+    "element": "air",
+    "proficiencyNeeded": 400,
+    "manaCost": 125,
+    "effects": {
+      "damage": null,
+      "buffs": ["hard to see", "damaging to hit"],
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "tornado",
+    "element": "air",
+    "proficiencyNeeded": 500,
+    "duration": 3,
+    "manaCost": 500,
+    "effects": {
+      "damage": 125,
+      "buffs": null,
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "suffocate",
+    "element": "air",
+    "proficiencyNeeded": 550,
+    "duration": 5,
+    "manaCost": 1250,
+    "effects": {
+      "damage": 125,
+      "buffs": null,
+      "debuffs": ["stun"],
+      "debuffChance": [0.75]
+    }
+  },
+  {
+    "name": "rock toss",
+    "element": "earth",
+    "proficiencyNeeded": 0, 
+    "manaCost": 10,
+    "effects": {
+      "damage": 10, 
+      "buffs": null, 
+      "debuffs": ["stun"], 
+      "debuffChance": [0.10]
+    }
+  },
+  {
+    "name": "stone hands",
+    "element": "earth",
+    "proficiencyNeeded": 50, 
+    "manaCost": 20,
+    "effects": {
+      "damage": null, 
+      "buffs": ["stone hands"], 
+      "debuffs": null, 
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "quick sand",
+    "element": "earth",
+    "proficiencyNeeded": 100, 
+    "duration": 3,
+    "manaCost": 40,
+    "effects": {
+      "damage": 10, 
+      "buffs": null, 
+      "debuffs": ["stun"], 
+      "debuffChance": [0.25] 
+    }
+  },
+  {
+    "name": "rock armor",
+    "element": "earth",
+    "proficiencyNeeded": 150, 
+    "manaCost": 60,
+    "effects": {
+      "damage": null, 
+      "buffs": ["rock armor"], 
+      "debuffs": null, 
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "bolder throw",
+    "element": "earth",
+    "proficiencyNeeded": 200, 
+    "manaCost": 85,
+    "effects": {
+      "damage": 65, 
+      "buffs": null, 
+      "debuffs": ["stun"], 
+      "debuffChance": [0.75] 
+    }
+  },
+  {
+    "name": "rock wall",
+    "element": "earth",
+    "proficiencyNeeded": 300, 
+    "duration": 5,
+    "manaCost": 120,
+    "effects": {
+      "damage": null, 
+      "buffs": ["projectile negation"],
+      "debuffs": null, 
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "earthquake",
+    "element": "earth",
+    "proficiencyNeeded": 500, 
+    "manaCost": 650,
+    "effects": {
+      "damage": 175, 
+      "buffs": null,
+      "debuffs": ["heavy stun"], 
+      "debuffChance": [1.0] 
+    }
+  },
+  {
+    "name": "sand burial",
+    "element": "earth",
+    "proficiencyNeeded": 550, 
+    "manaCost": 1200,
+    "effects": {
+      "damage": 400, 
+      "buffs": null,
+      "debuffs": ["heavy stun"], 
+      "debuffChance": [1.0] 
+    }
   }
 ]

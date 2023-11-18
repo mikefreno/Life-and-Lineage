@@ -9,57 +9,6 @@ import LearnSpellComponent from "../components/LearnSpellComponent";
 
 export default function CraftingScreen() {
   const [selectedElement, setSelectedElement] = useState<string>("");
-  const fireSpells = spells.find((spells) => spells.element == "Fire");
-  const earthSpells = spells.find((spells) => spells.element == "Earth");
-  const airSpells = spells.find((spells) => spells.element == "Air");
-  const waterSpells = spells.find((spells) => spells.element == "Water");
-
-  function elementRenderer() {
-    if (selectedElement == "fire") {
-      return fireSpells?.spells.map((spell, idx) => (
-        <LearnSpellComponent
-          key={idx}
-          title={spell.spellName}
-          desciption={spell.description}
-          proficiencyRequirement={spell.proficiencyRequirement}
-          element={selectedElement}
-        />
-      ));
-    }
-    if (selectedElement == "earth") {
-      return earthSpells?.spells.map((spell, idx) => (
-        <LearnSpellComponent
-          key={idx}
-          title={spell.spellName}
-          desciption={spell.description}
-          proficiencyRequirement={spell.proficiencyRequirement}
-          element={selectedElement}
-        />
-      ));
-    }
-    if (selectedElement == "air") {
-      return airSpells?.spells.map((spell, idx) => (
-        <LearnSpellComponent
-          key={idx}
-          title={spell.spellName}
-          desciption={spell.description}
-          proficiencyRequirement={spell.proficiencyRequirement}
-          element={selectedElement}
-        />
-      ));
-    }
-    if (selectedElement == "water") {
-      return waterSpells?.spells.map((spell, idx) => (
-        <LearnSpellComponent
-          key={idx}
-          title={spell.spellName}
-          desciption={spell.description}
-          proficiencyRequirement={spell.proficiencyRequirement}
-          element={selectedElement}
-        />
-      ));
-    }
-  }
 
   if (selectedElement == "") {
     return (
@@ -127,7 +76,19 @@ export default function CraftingScreen() {
             Back to Element Selection
           </Text>
         </Pressable>
-        <ScrollView>{elementRenderer()}</ScrollView>
+        <ScrollView>
+          {spells
+            .filter((spell) => spell.name == selectedElement)
+            .map((spell, idx) => (
+              <LearnSpellComponent
+                key={idx}
+                title={spell.name}
+                desciption={spell.description}
+                proficiencyRequirement={spell?.proficiencyNeeded}
+                element={selectedElement}
+              />
+            ))}
+        </ScrollView>
       </View>
     );
   }
