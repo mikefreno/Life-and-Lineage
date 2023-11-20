@@ -30,8 +30,8 @@ export default function DungeonLevelScreen() {
   const dispatch: AppDispatch = useDispatch();
 
   const { slug } = useLocalSearchParams();
-  const id = slug[0];
-  const instance = slug[1];
+  const instance = slug[0];
+  const id = slug[1];
   let level: number;
   level = Number(id);
   const [battleTab, setBattleTab] = useState<
@@ -60,7 +60,7 @@ export default function DungeonLevelScreen() {
   }
 
   function getEnemy() {
-    const enemy = enemyGenerator(level);
+    const enemy = enemyGenerator(instance, level);
 
     battleLogger(`You Found a ${enemy.creatureSpecies}!`);
     dispatch(setMonster(enemy));
@@ -71,7 +71,10 @@ export default function DungeonLevelScreen() {
       monsterObjects.forEach((monsterObject) => {
         if (
           monsterObject.name == monster.creatureSpecies &&
-          !monsterObject.appearsOn.includes(level)
+          !(
+            monsterObject.appearsOn.includes(level) &&
+            monsterObject.appearsIn.includes(instance)
+          )
         ) {
           getEnemy();
           return;
@@ -89,14 +92,17 @@ export default function DungeonLevelScreen() {
       if (attackRes !== "miss") {
         const hp = monster.damageHealth(attackRes.damage);
         const sanity = monster.damageSanity(attackRes.sanityDamage);
-        monster.addCondition(attackRes.secondaryEffects);
-
+        attackRes.secondaryEffects?.forEach((effect) =>
+          monster.addCondition(effect),
+        );
         let line = `You ${attack.name}ed the ${monster.creatureSpecies} for ${attackRes.damage} heath damage`;
         if (attackRes.sanityDamage) {
           line += ` and ${attackRes.sanityDamage} sanity damage`;
         }
         if (attackRes.secondaryEffects) {
-          line += ` and applied a ${attackRes.secondaryEffects.name} stack`;
+          attackRes.secondaryEffects.forEach(
+            (effect) => (line += ` and applied a ${effect.name} stack`),
+          );
         }
         battleLogger(line);
         if (hp <= 0 || (sanity && sanity <= 0)) {
@@ -189,7 +195,9 @@ export default function DungeonLevelScreen() {
         <View className="flex-1 px-4 py-6">
           <View className="flex h-1/3 flex-row justify-evenly">
             <View className="flex w-2/5 flex-col items-center justify-center">
-              <Text className="text-3xl">{monster.creatureSpecies}</Text>
+              <Text className="text-3xl">
+                {toTitleCase(monster.creatureSpecies)}
+              </Text>
               <ProgressBar
                 value={monster.getHealth()}
                 maxValue={monster.getMaxHealth()}

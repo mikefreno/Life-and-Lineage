@@ -1,18 +1,52 @@
 [
    {
       "name": "cloth robes",
-      "cost": 200,
-      "armor": 6,
-      "heathBonus": null,
-      "staminaBonus": null,
-      "manaBonus": 20 
+      "baseValue": 200,
+      "stats":{
+         "armor": 4.0
+      }
    },
    {
       "name": "apprentice robes",
-      "cost": 1500,
-      "armor": 8,
-      "heathBonus": null,
-      "staminaBonus": null,
-      "manaBonus": 50 
+      "baseValue": 1500,
+      "stats":{
+         "armor": 6.0,
+         "mana": 50.0
+      }
+   },
+   {
+      "name": "adept robes",
+      "baseValue": 2500,
+      "stats":{
+         "armor": 8.0,
+         "mana": 50.0,
+         "regen": 10
+      }
+   },
+   {
+      "name": "mage robes",
+      "baseValue": 2500,
+      "stats":{
+         "armor": 8.0,
+         "mana": 100.0
+      }
+   },
+   {
+      "name": "gorgeous robes",
+      "baseValue": 6500,
+      "stats":{
+         "armor": 10.0,
+         "mana": 100.0,
+         "regen": 10.0
+      }
+   },
+   {
+      "name": "threads of god",
+      "baseValue": 650000,
+      "stats":{
+         "armor": 40.0,
+         "mana": 1500.0,
+         "regen": 100.0
+      }
    }
 ]

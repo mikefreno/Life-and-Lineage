@@ -1,7 +1,7 @@
 [
    {
       "type": "armorer",
-      "trades":["body armor", "helmet"],
+      "trades":["bodyArmor", "helmet"],
       "baseGold": 1000,
       "itemQuantityRange": {"minimum":3, "maximum":10},
       "possiblePersonalities": ["reserved", "open", "jovial"],
@@ -25,7 +25,7 @@
    },
    {
       "type": "archanist",
-      "trades":["wand", "orb"],
+      "trades":["wand", "focus"],
       "baseGold": 2000,
       "itemQuantityRange": {"minimum":3, "maximum":6},
       "possiblePersonalities": ["wise", "silent", "insane"],
@@ -33,7 +33,7 @@
    },
    {
       "type":"junk dealer",
-      "trades": ["body armor", "robe", "helmet", "hat", "weapon", "shield", "orb", "junk"],
+      "trades": ["bodyArmor", "robe", "helmet", "hat", "weapon", "shield", "focus", "junk"],
       "baseGold": 500,
       "itemQuantityRange": {"minimum":10, "maximum":20},
       "possiblePersonalities": ["creepy", "insane", "silent"],

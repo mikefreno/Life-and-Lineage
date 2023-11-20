@@ -1,8 +1,11 @@
 import enemies from "../assets/json/monsters.json";
 import { Monster } from "../classes/creatures";
 
-function pickRandomEnemyJSON(level: number) {
-  const enemiesOnThisLevel = enemies.filter((enemy) =>
+function pickRandomEnemyJSON(instance: string, level: number) {
+  const enemiesInThisInstance = enemies.filter((enemy) =>
+    enemy.appearsIn.includes(instance),
+  );
+  const enemiesOnThisLevel = enemiesInThisInstance.filter((enemy) =>
     enemy.appearsOn.includes(level),
   );
   const randomIndex = Math.floor(Math.random() * enemiesOnThisLevel.length);
@@ -13,8 +16,8 @@ function getNumberInRange(minimum: number, maximum: number) {
   return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
 }
 
-export function enemyGenerator(level: number) {
-  const enemyJSON = pickRandomEnemyJSON(level);
+export function enemyGenerator(instance: string, level: number) {
+  const enemyJSON = pickRandomEnemyJSON(instance, level);
   const enemyHealth = getNumberInRange(
     enemyJSON.healthRange.minimum,
     enemyJSON.healthRange.maximum,

@@ -4,6 +4,27 @@
       "baseValue": 50,
       "slot": "one-hand",
       "attacks": ["hit"],
+      "icon": "Wood_Log",
+      "stats":{
+         "damage": 2.5
+      }
+   },
+   {
+      "name": "big stick",
+      "baseValue": 75,
+      "slot": "two-hand",
+      "attacks": ["hit"],
+      "icon": "Wood_Log",
+      "stats":{
+         "damage": 5.5
+      }
+   },
+   {
+      "name": "torch",
+      "baseValue": 300,
+      "slot": "one-hand",
+      "attacks": ["torch stab"],
+      "icon":"Torch",
       "stats":{
          "damage": 2.5
       }
@@ -13,26 +34,39 @@
       "baseValue": 400,
       "slot": "one-hand",
       "attacks": ["stab"],
+      "icon":"Knife",
       "stats":{
          "damage": 4.5
       }
    },
    {
       "name": "short sword",
-      "baseValue": 1000,
+      "baseValue": 1200,
       "slot": "one-hand",
       "attacks": ["slash"],
+      "icon":"Iron_Sword",
       "stats":{
          "damage": 6.5
       }
    },
    {
       "name": "mace",
-      "baseValue": 1000,
+      "baseValue": 1100,
       "slot": "one-hand",
       "attacks": ["crushing blow"],
+      "icon":"Hammer",
       "stats":{
          "damage": 5.5
+      }
+   },
+   {
+      "name": "rat-smasher",
+      "baseValue": 2000,
+      "slot": "two-hand",
+      "attacks": ["crushing blow"],
+      "icon":"Hammer",
+      "stats":{
+         "damage": 10.5
       }
    },
    {
@@ -40,6 +74,7 @@
       "baseValue": 10000,
       "slot": "one-hand",
       "attacks": ["slash"],
+      "icon":"Iron_Sword",
       "stats":{
          "damage": 10.0
       }
@@ -49,8 +84,19 @@
       "baseValue": 15000,
       "slot": "two-hand",
       "attacks": ["slash", "cleave"],
+      "icon":"Iron_Sword",
       "stats":{
          "damage": 20.0
+      }
+   },
+   {
+      "name": "elegant blade",
+      "baseValue": 20000,
+      "slot": "one-hand",
+      "attacks": ["slash", "cleave"],
+      "icon":"Silver_Sword",
+      "stats":{
+         "damage": 16.0
       }
    },
    {
@@ -58,17 +104,39 @@
       "baseValue": 25000,
       "slot": "two-hand",
       "attacks": ["slash", "cleave"],
+      "icon":"Iron_Sword",
       "stats":{
-         "damage": 25.0
+         "damage": 27.0
       }
    },
    {
       "name": "zweihänder",
-      "baseValue": 35000,
+      "baseValue": 34000,
       "slot": "two-hand",
       "attacks": ["slash", "cleave"],
+      "icon":"Iron_Sword",
       "stats":{
-         "damage": 29.0
+         "damage": 31.5
+      }
+   },
+   {
+      "name": "grotesque dagger",
+      "baseValue": 38000,
+      "slot": "one-hand",
+      "attacks": ["slash", "serrate"],
+      "icon":"Knife",
+      "stats":{
+         "damage": 23.0
+      }
+   },
+   {
+      "name": "royal greatsword",
+      "baseValue": 42000,
+      "slot": "two-hand",
+      "attacks": ["slash", "cleave"],
+      "icon":"Golden_Sword",
+      "stats":{
+         "damage": 40.5
       }
    }
 ]

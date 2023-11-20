@@ -9,6 +9,15 @@
       "secondaryEffectChance": null
    },
    {
+      "name": "hit",
+      "targets": "single",
+      "hitChance": 1.0,
+      "damageMult": 1.0,
+      "sanityDamage": 0,
+      "secondaryEffect": null,
+      "secondaryEffectChance": null
+   },
+   {
       "name": "cast",
       "targets": "single",
       "hitChance": 1.0,
@@ -27,6 +36,15 @@
       "secondaryEffectChance": [0.20]
    },
    {
+      "name": "torch stab",
+      "targets": "single",
+      "hitChance": 1.0,
+      "damageMult": 1.0,
+      "sanityDamage": 0,
+      "secondaryEffect": ["burn"],
+      "secondaryEffectChance": [0.85]
+   },
+   {
       "name": "slash",
       "targets": "single",
       "hitChance": 1.0,
@@ -36,13 +54,13 @@
       "secondaryEffectChance": null
    },
    {
-      "name": "crushing blow",
-      "targets": "single",
-      "hitChance": 0.95,
+      "name": "cleave",
+      "targets": "dual",
+      "hitChance": 0.85,
       "damageMult": 1.0,
       "sanityDamage": 0,
-      "secondaryEffect": ["stun"],
-      "secondaryEffectChance": [0.25] 
+      "secondaryEffect": null,
+      "secondaryEffectChance": null
    },
    {
       "name": "crushing blow",

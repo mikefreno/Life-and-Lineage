@@ -1,0 +1,12 @@
+[
+   {
+      "name": "bat wing",
+      "icon":"Monster_Meat",
+      "baseValue": 10
+   },
+   {
+      "name": "rat tail",
+      "icon":"Monster_Meat",
+      "baseValue": 15
+   }
+]

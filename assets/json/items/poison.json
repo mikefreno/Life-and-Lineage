@@ -1,0 +1,12 @@
+[
+   {
+      "name":"test poison 1",
+      "icon":"Green_Potion",
+      "baseValue": 500
+   },
+   {
+      "name":"test poison 2",
+      "icon":"Green_Potion",
+      "baseValue": 2500
+   }
+]

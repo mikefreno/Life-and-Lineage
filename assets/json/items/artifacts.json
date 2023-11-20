@@ -1,0 +1,10 @@
+[
+   {
+      "name":"test artifact 1",
+      "baseValue": 500
+   },
+   {
+      "name":"test artifact 2",
+      "baseValue": 2500
+   }
+]

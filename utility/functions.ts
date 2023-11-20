@@ -4,7 +4,6 @@ import { PlayerCharacter } from "../classes/character";
 import shops from "../assets/json/shops.json";
 import names from "../assets/json/names.json";
 import { Shop } from "../classes/shop";
-import { Item } from "../classes/item";
 
 export const storeData = async (key: string, value: any) => {
   try {
@@ -175,7 +174,7 @@ function generateBirthday(minAge: number, maxAge: number): Date {
   return new Date(randomTimestamp);
 }
 
-function getRandomInt(min: number, max: number): number {
+export function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
@@ -189,12 +188,10 @@ export function createShops() {
     const randIdx = Math.floor(
       Math.random() * shop.possiblePersonalities.length,
     );
-    const invCount = getRandomInt(
+    const itemCount = getRandomInt(
       shop.itemQuantityRange.minimum,
       shop.itemQuantityRange.maximum,
     );
-    let inventory: Item[] = [];
-    for (let i = 0; i < invCount; i++) {}
     const newShop = new Shop({
       shopKeeperName: name,
       shopKeeperSex: sex,
@@ -203,6 +200,7 @@ export function createShops() {
       baseGold: shop.baseGold,
       lastStockRefresh: new Date(),
       archetype: shop.type,
+      inventory: generateInventory(itemCount, shop.trades),
     });
     createdShops.push(newShop);
   });

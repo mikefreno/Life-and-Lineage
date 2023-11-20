@@ -8,17 +8,30 @@ with open('../assets/json/items/weapons.json') as f:
 
 df = pd.json_normalize(data)
 
-plt.scatter(df['baseValue'], df['stats.damage'])
-for i, wand_name in enumerate(df['name']):
-    plt.annotate(wand_name, (df['baseValue'].iloc[i], df['stats.damage'].iloc[i]))
+df['baseValue'] = df['baseValue'] / 1000
 
-polynomial_coeffs = np.polyfit(df['baseValue'], df['stats.damage'], 2)
-x_line_range = np.linspace(df['baseValue'].min(), df['baseValue'].max(), 100)
-y_line_range = polynomial_coeffs[0]*x_line_range**2 + polynomial_coeffs[1]*x_line_range + polynomial_coeffs[2]
+df_one_hand = df[df['slot'] == 'one-hand']
+df_two_hand = df[df['slot'] == 'two-hand']
 
-plt.plot(x_line_range, y_line_range, color='red', label=f'y = {polynomial_coeffs[0]:.10f}x² + {polynomial_coeffs[1]:.6f}x + {polynomial_coeffs[2]:.2f}')
+plt.scatter(df_one_hand['baseValue'], df_one_hand['stats.damage'], color='blue')
+for i, weapon_name in enumerate(df_one_hand['name'].tolist()):
+    plt.annotate(weapon_name, (df_one_hand['baseValue'].tolist()[i], df_one_hand['stats.damage'].tolist()[i]))
 
-plt.xlabel('baseValue')
+slope, intercept = np.polyfit(df_one_hand['baseValue'], df_one_hand['stats.damage'], 1)
+x_line_range = np.linspace(df_one_hand['baseValue'].min(), df_one_hand['baseValue'].max(), 100)
+y_line_range = slope * x_line_range + intercept
+plt.plot(x_line_range, y_line_range, color='blue', label=f'One-hand: y = {slope:.2f}x + {intercept:.2f}')
+
+plt.scatter(df_two_hand['baseValue'], df_two_hand['stats.damage'], color='red')
+for i, weapon_name in enumerate(df_two_hand['name'].tolist()):
+    plt.annotate(weapon_name, (df_two_hand['baseValue'].tolist()[i], df_two_hand['stats.damage'].tolist()[i]))
+
+slope, intercept = np.polyfit(df_two_hand['baseValue'], df_two_hand['stats.damage'], 1)
+x_line_range = np.linspace(df_two_hand['baseValue'].min(), df_two_hand['baseValue'].max(), 100)
+y_line_range = slope * x_line_range + intercept
+plt.plot(x_line_range , y_line_range, color='red', label=f'Two-hand: y = {slope:.4f}x + {intercept:.2f}')
+
+plt.xlabel('baseValue in (1000s)')
 plt.ylabel('damage')
 plt.title('BaseValue vs Damage for Weapons')
 

@@ -26,6 +26,7 @@ export default function BattleTab({ battleTab, useAttack }: BattleTabProps) {
   const playerAttacks = playerCharacter.getPhysicalAttacks();
 
   let attackObjects: AttackObject[] = [];
+
   playerAttacks.forEach((plAttack) =>
     attacks.filter((attack) => {
       if (attack.name == plAttack) {

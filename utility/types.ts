@@ -12,8 +12,8 @@ type AttackObjectWithoutEffect = AttackEffect & {
 };
 
 type AttackObjectWithEffect = AttackEffect & {
-  secondaryEffect: string;
-  secondaryEffectChance: number;
+  secondaryEffect: string[];
+  secondaryEffectChance: number[];
 };
 
 export type AttackObject = AttackObjectWithoutEffect | AttackObjectWithEffect;

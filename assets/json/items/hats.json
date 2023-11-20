@@ -1,0 +1,10 @@
+[
+   {
+      "name": "apprentice hood",
+      "baseValue": 1000,
+      "icon":"Wizard_Hat",
+      "stats":{
+         "armor": 3.0
+      }
+   }
+]

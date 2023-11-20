@@ -1,83 +1,92 @@
 [
    {
-      "name": "Training Dummy",
+      "name": "training dummy",
       "sanity": null,
       "healthRange": {"minimum": 9999, "maximum": 9999},
       "attackPowerRange": {"minimum": 0, "maximum": 0},
       "energy": {"maximum": 0, "regen": 0},
       "attacks": [],
+      "appearsIn": ["training grounds"],
       "appearsOn": [0]
    },
    {
-      "name": "Giant Rat",
+      "name": "giant rat",
       "sanity": null,
       "healthRange": {"minimum": 20, "maximum": 50},
       "attackPowerRange": {"minimum": 2, "maximum": 5},
       "energy": {"maximum": 30, "regen": 5},
       "attacks": ["bite"],
+      "appearsIn": ["nearby cave"],
       "appearsOn": [1,2]
    },
    {
-      "name": "Bat",
+      "name": "bat",
       "sanity": null,
       "healthRange": {"minimum": 10, "maximum": 20},
       "attackPowerRange": {"minimum": 3, "maximum": 8},
       "energy": {"maximum": 30, "regen": 5},
       "attacks": ["vampiric bite"],
+      "appearsIn": ["nearby cave"],
       "appearsOn": [1,2]
    },
    {
-      "name": "Skeleton",
+      "name": "skeleton",
       "sanity": null,
       "healthRange": {"minimum": 40, "maximum": 60},
       "attackPowerRange": {"minimum": 4, "maximum": 8},
       "energy": {"maximum": 50, "regen": 5},
       "attacks": ["stab", "cleave"],
+      "appearsIn": ["nearby cave"],
       "appearsOn": [2,3,4]
    },
    {
-      "name": "Skeleton Archer",
+      "name": "skeleton archer",
       "sanity": null,
       "healthRange": {"minimum": 30, "maximum": 50},
       "attackPowerRange": {"minimum": 4, "maximum": 8},
       "energy": {"maximum": 50, "regen": 5},
       "attacks": ["shoot"],
+      "appearsIn": ["nearby cave"],
       "appearsOn": [2,3,4]
    },
    {
-      "name": "Goblin",
+      "name": "goblin",
       "sanity": null,
       "healthRange": {"minimum": 40, "maximum": 60},
       "attackPowerRange": {"minimum": 3, "maximum": 7},
       "energy": {"maximum": 50, "regen": 5},
       "attacks": ["stab", "pocket sand", "rock throw", "torch stab"],
+      "appearsIn": ["nearby cave"],
       "appearsOn": [2,3,4]
    },
    {
-      "name": "Zombie",
+      "name": "zombie",
       "sanity": null,
       "healthRange": {"minimum": 40, "maximum": 60},
       "attackPowerRange": {"minimum": 5, "maximum": 10},
       "energy": {"maximum": 50, "regen": 5},
       "attacks": ["grab", "zombie bite"],
+      "appearsIn": ["nearby cave"],
       "appearsOn": [3,4,5]
    },
    {
-      "name": "Ghost",
+      "name": "ghost",
       "sanity": null,
       "healthRange": {"minimum": 30, "maximum": 75},
       "attackPowerRange": {"minimum": 0, "maximum": 0},
       "energy": {"maximum": 50, "regen": 5},
       "attacks": ["wail"],
+      "appearsIn": ["nearby cave"],
       "appearsOn": [3,4,5]
    },
       {
-      "name": "Bandit",
+      "name": "bandit",
       "sanity": 50,
       "healthRange": {"minimum": 50, "maximum": 75},
       "attackPowerRange": {"minimum": 8, "maximum": 10},
       "energy": {"maximum": 50, "regen": 3},
       "attacks": ["stab", "pocket sand","serrate"],
-      "appearsOn": [3,4,5]
+      "appearsIn": ["bandit hideout"],
+      "appearsOn": [1,2,3]
    }
 ]

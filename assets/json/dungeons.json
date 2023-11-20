@@ -1,23 +1,52 @@
 [
    { 
-      "instance": "nearby cave",
-      "levels": [
-         {
-           "level": 1,
-           "stepsBeforeBoss": 25,
-           "boss": "bandit"
-         },
-         {
-           "level": 2,
-           "stepsBeforeBoss": 25,
-           "boss": "bandit"
-         },
-         {
-           "level": 3,
-           "stepsBeforeBoss": 25,
-           "boss": "mage"
-         }
-      ]
+     "instance": "nearby cave",
+     "levels": [
+       {
+         "level": 1,
+         "stepsBeforeBoss": 25,
+         "boss": ["zombie"]
+       },
+       {
+         "level": 2,
+         "stepsBeforeBoss": 25,
+         "boss": ["zombie"]
+       },
+       {
+         "level": 3,
+         "stepsBeforeBoss": 25,
+         "boss": ["necromancer"]
+       }
+     ]
+   },
+   { 
+     "instance": "goblin cave",
+     "levels": [
+       {
+         "level": 1,
+         "stepsBeforeBoss": 20,
+         "boss": ["hobgoblin"]
+       },
+       {
+         "level": 2,
+         "stepsBeforeBoss": 30,
+         "boss": ["goblin shaman"]
+       }
+     ]
+   },
+   { 
+     "instance": "bandit hideout",
+     "levels": [
+       {
+         "level": 1,
+         "stepsBeforeBoss": 20,
+         "boss": ["bandit", "bandit"]
+       },
+       {
+         "level": 2,
+         "stepsBeforeBoss": 30,
+         "boss": ["bandit boss", "bandit"]
+       }
+     ]
    }
-   
 ]

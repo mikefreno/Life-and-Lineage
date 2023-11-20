@@ -216,7 +216,7 @@ export class PlayerCharacter extends Character {
       mainHand: new Item({
         name: "unarmored",
         slot: "one-hand",
-        stats: [{ baseDamage: 1 }],
+        stats: { baseDamage: 1 },
         baseValue: 0,
         itemClass: "weapon",
       }),
@@ -258,6 +258,32 @@ export class PlayerCharacter extends Character {
     return this.sanity;
   }
 
+  //----------------------------------Inventory----------------------------------//
+  public getInventory() {
+    return this.inventory;
+  }
+  public addToInventory(item: Item) {
+    this.inventory.push(item);
+  }
+  public buyItem(item: Item, buyPrice: number) {
+    if (buyPrice <= this.gold) {
+      this.inventory.push(item);
+      this.gold -= buyPrice;
+    }
+  }
+  public removeFromInventory(item: Item) {
+    const idx = this.inventory.findIndex((invItem) => invItem == item);
+    if (idx !== -1) {
+      this.inventory.splice(idx, 1);
+    }
+  }
+  public sellItem(item: Item, sellPrice: number) {
+    const idx = this.inventory.findIndex((invItem) => invItem == item);
+    if (idx !== -1) {
+      this.inventory.splice(idx, 1);
+      this.gold += sellPrice;
+    }
+  }
   //----------------------------------Gold----------------------------------//
   public getGold() {
     return this.gold;
@@ -358,45 +384,47 @@ export class PlayerCharacter extends Character {
     if (roll >= rollToHit) {
       const hpDamage =
         attack.damageMult *
-        (this.equipment.mainHand?.stats.find(
-          (stat: Record<string, number>) => "baseDamage" in stat,
-        )?.["baseDamage"] ?? 1);
+        (this.equipment.mainHand?.stats?.["baseDamage"] ?? 1);
       const sanityDamage = attack.sanityDamage;
       const effectChance = attack.secondaryEffectChance;
       if (effectChance) {
-        let effect: Condition | null = null;
-        const rollToEffect = 20 - (effectChance * 100) / 5;
-        const roll = rollD20();
-        if (roll > rollToEffect) {
-          const conditionJSON = conditions.find(
-            (condition) => condition.name == attack.secondaryEffect,
-          );
-          if (conditionJSON?.damageAmount) {
-            let damage = conditionJSON.damageAmount;
-            if (conditionJSON.damageStyle == "multiplier") {
-              damage *= hpDamage;
-            } else if (conditionJSON.damageStyle == "percentage") {
-              damage *= monsterMaxHP;
+        let effects: Condition[] = [];
+        for (let j = 0; j < attack.secondaryEffectChance.length; j++) {
+          let effect: Condition | null = null;
+          const rollToEffect = 20 - (effectChance[j] * 100) / 5;
+          const roll = rollD20();
+          if (roll > rollToEffect) {
+            const conditionJSON = conditions.find(
+              (condition) => condition.name == attack.secondaryEffect[j],
+            );
+            if (conditionJSON?.damageAmount) {
+              let damage = conditionJSON.damageAmount;
+              if (conditionJSON.damageStyle == "multiplier") {
+                damage *= hpDamage;
+              } else if (conditionJSON.damageStyle == "percentage") {
+                damage *= monsterMaxHP;
+              }
+              effect = new Condition({
+                name: conditionJSON.name,
+                style: conditionJSON.style as "debuff" | "buff",
+                turns: conditionJSON.turns,
+                effect: conditionJSON.effect as (
+                  | "skip"
+                  | "accuracy halved"
+                  | "damage"
+                  | "sanity"
+                )[],
+                damage: damage,
+              });
+              effects.push(effect);
             }
-            effect = new Condition({
-              name: conditionJSON.name,
-              style: conditionJSON.style as "debuff" | "buff",
-              turns: conditionJSON.turns,
-              effect: conditionJSON.effect as (
-                | "skip"
-                | "accuracy halved"
-                | "damage"
-                | "sanity"
-              )[],
-              damage: damage,
-            });
-            return {
-              damage: hpDamage,
-              sanityDamage: sanityDamage,
-              secondaryEffects: effect,
-            };
           }
         }
+        return {
+          damage: hpDamage,
+          sanityDamage: sanityDamage,
+          secondaryEffects: effects,
+        };
       }
       return {
         damage: hpDamage,

@@ -69,7 +69,7 @@ export default function DungeonScreen() {
                       <Pressable
                         onPress={() =>
                           router.push(
-                            `/DungeonLevel/${level.level}/${dungeonInstance.instance}`,
+                            `/DungeonLevel/${dungeonInstance.instance}/${level.level}`,
                           )
                         }
                         className="my-2 rounded-xl px-6 py-4 active:scale-95 active:opacity-50"

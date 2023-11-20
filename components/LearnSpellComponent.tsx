@@ -4,7 +4,7 @@ import { View, Text, Pressable } from "react-native";
 interface LearnSpellProps {
   title: string;
   desciption: string;
-  proficiencyRequirement: string;
+  proficiencyRequirement: number;
   element: "fire" | "earth" | "air" | "water";
 }
 const bgColorMap = {

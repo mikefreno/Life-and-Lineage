@@ -8,7 +8,9 @@ import spells from "../assets/json/spells.json";
 import LearnSpellComponent from "../components/LearnSpellComponent";
 
 export default function CraftingScreen() {
-  const [selectedElement, setSelectedElement] = useState<string>("");
+  const [selectedElement, setSelectedElement] = useState<
+    "fire" | "earth" | "air" | "water" | ""
+  >("");
 
   if (selectedElement == "") {
     return (
@@ -83,8 +85,8 @@ export default function CraftingScreen() {
               <LearnSpellComponent
                 key={idx}
                 title={spell.name}
-                desciption={spell.description}
-                proficiencyRequirement={spell?.proficiencyNeeded}
+                desciption={""}
+                proficiencyRequirement={spell.proficiencyNeeded}
                 element={selectedElement}
               />
             ))}

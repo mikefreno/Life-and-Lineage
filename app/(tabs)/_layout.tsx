@@ -145,7 +145,7 @@ export default function TabLayout() {
             />
           ),
           headerRight: () => (
-            <Link href="/DungeonLevel/0/training grounds" asChild>
+            <Link href="/DungeonLevel/training grounds/0" asChild>
               <Pressable>
                 {({ pressed }) => (
                   <Sword

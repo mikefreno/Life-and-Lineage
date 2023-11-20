@@ -1,9 +1,42 @@
 [
    {
+      "name": "cheap leather chestpiece",
+      "baseValue": 400,
+      "icon":"Leather_Armor",
+      "stats":{
+         "armor": 7.0
+      }
+   },
+   {
       "name": "leather chestpiece",
-      "cost": 500,
+      "baseValue": 800,
+      "icon":"Leather_Armor",
       "stats":{
          "armor": 10.0
+      }
+   },
+   {
+      "name": "cheap iron chestpiece",
+      "baseValue": 1500,
+      "icon": "Iron_Armor",
+      "stats":{
+         "armor": 15.0
+      }
+   },
+   {
+      "name": "iron chestpiece",
+      "baseValue": 2000,
+      "icon": "Iron_Armor",
+      "stats":{
+         "armor": 20.0
+      }
+   },
+   {
+      "name": "kingsman chestpiece",
+      "baseValue": 550000,
+      "icon": "Iron_Armor",
+      "stats":{
+         "armor": 75.0
       }
    }
 ]

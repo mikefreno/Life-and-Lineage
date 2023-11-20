@@ -1,18 +1,18 @@
 [
    {
       "name": "feather",
-      "cost": 100,
-      "armor": 5,
-      "heathBonus": null,
-      "staminaBonus": null,
-      "manaBonus": null
+      "baseValue": 100,
+      "icon": "Feather",
+      "stats":{
+         "armor": 1.0
+      }
    },
    {
       "name": "leather headgear",
-      "cost": 500,
-      "armor": 8,
-      "heathBonus": null,
-      "staminaBonus": null,
-      "manaBonus": null
+      "baseValue": 500,
+      "icon":"Leather_Helmet",
+      "stats":{
+         "armor": 3.0
+      }
    }
 ]
