@@ -5,14 +5,14 @@ interface GameOptions {
   date?: Date;
   shops: Shop[];
   dungeonInstances?: DungeonInstance[];
-  furthestDepth?: { instance: string; level: number };
+  furthestDepth?: { instance: string; level: number }[];
   atDeathScreen?: boolean;
 }
 
 export class Game {
   private date: Date;
   private dungeonInstances: DungeonInstance[];
-  private furthestDepth: { instance: string; level: number };
+  private furthestDepth: { instance: string; level: number }[];
   private atDeathScreen: boolean;
   private shops: Shop[];
 
@@ -48,7 +48,9 @@ export class Game {
         ],
       }),
     ];
-    this.furthestDepth = furthestDepth ?? { instance: "nearby cave", level: 1 };
+    this.furthestDepth = furthestDepth ?? [
+      { instance: "nearby cave", level: 1 },
+    ];
     this.atDeathScreen = atDeathScreen ?? false;
     this.shops = shops;
   }

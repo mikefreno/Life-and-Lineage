@@ -22,31 +22,36 @@ export default function DungeonScreen() {
 
   if (gameData) {
     const dungeonDepth = gameData.getFuthestDepth();
-    let filteredDungeonInstances: {
+
+    let instances: {
       instance: string;
       levels: {
         level: number;
         stepsBeforeBoss: number;
-        boss: string;
+        boss: string[];
       }[];
     }[] = [];
-    for (let i = 0; i < dungeons.length; i++) {
-      if (dungeons[i].instance == dungeonDepth.instance) {
-        const filteredLevels = dungeons[i].levels.filter(
-          (level) => level.level <= dungeonDepth.level,
-        );
-        const instanceFiltered = {
-          instance: dungeons[i].instance,
-          levels: filteredLevels,
-        };
-        filteredDungeonInstances.push(instanceFiltered);
-        height++;
-      } else {
-        filteredDungeonInstances.push(dungeons[i]);
-        const levelCount = dungeons[i].levels.length;
-        height += levelCount;
+
+    dungeonDepth.forEach((dungeonInstanceDepth) => {
+      const instance = dungeons.find(
+        (dungeon) => dungeon.instance == dungeonInstanceDepth.instance,
+      );
+      if (instance) {
+        const filteredInstance: {
+          instance: string;
+          levels: {
+            level: number;
+            stepsBeforeBoss: number;
+            boss: string[];
+          }[];
+        } = { instance: instance.instance, levels: [] };
+        for (let i = 0; i < dungeonInstanceDepth.level; i++) {
+          filteredInstance.levels.push(instance.levels[i]);
+          height++;
+        }
+        instances.push(filteredInstance);
       }
-    }
+    });
 
     return (
       <View className="h-full px-4 py-8">
@@ -54,41 +59,39 @@ export default function DungeonScreen() {
           The dungeon is a dangerous place. Be careful.
         </Text>
         <ScrollView>
-          {filteredDungeonInstances.map(
-            (dungeonInstance, dungeonInstanceIdx) => (
-              <View
-                key={dungeonInstanceIdx}
-                className="rounded-lg border border-zinc-900 bg-zinc-700 px-4 py-2 dark:border-zinc-100"
-              >
-                <Text className="text-center text-2xl underline">
-                  {toTitleCase(dungeonInstance.instance)}
-                </Text>
-                <View className="mx-auto">
-                  {dungeonInstance.levels.map((level, levelIdx) => (
-                    <View key={levelIdx}>
-                      <Pressable
-                        onPress={() =>
-                          router.push(
-                            `/DungeonLevel/${dungeonInstance.instance}/${level.level}`,
-                          )
-                        }
-                        className="my-2 rounded-xl px-6 py-4 active:scale-95 active:opacity-50"
-                        style={{
-                          backgroundColor:
-                            dangerColorStep[level.level - height + 5] ??
-                            "#fee2e2",
-                        }}
-                      >
-                        <Text
-                          style={{ color: "white" }}
-                        >{`Enter Level ${level.level}`}</Text>
-                      </Pressable>
-                    </View>
-                  ))}
-                </View>
+          {instances.map((dungeonInstance, dungeonInstanceIdx) => (
+            <View
+              key={dungeonInstanceIdx}
+              className="my-2 rounded-lg border border-zinc-900 bg-zinc-700 px-4 py-2 dark:border-zinc-100"
+            >
+              <Text className="text-center text-2xl underline">
+                {toTitleCase(dungeonInstance.instance)}
+              </Text>
+              <View className="mx-auto">
+                {dungeonInstance.levels.map((level, levelIdx) => (
+                  <View key={levelIdx}>
+                    <Pressable
+                      onPress={() =>
+                        router.push(
+                          `/DungeonLevel/${dungeonInstance.instance}/${level.level}`,
+                        )
+                      }
+                      className="my-2 rounded-xl px-6 py-4 active:scale-95 active:opacity-50"
+                      style={{
+                        backgroundColor:
+                          dangerColorStep[level.level - height + 5] ??
+                          "#fee2e2",
+                      }}
+                    >
+                      <Text
+                        style={{ color: "white" }}
+                      >{`Enter Level ${level.level}`}</Text>
+                    </Pressable>
+                  </View>
+                ))}
               </View>
-            ),
-          )}
+            </View>
+          ))}
         </ScrollView>
       </View>
     );

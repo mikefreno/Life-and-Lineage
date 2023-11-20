@@ -1,35 +1,21 @@
-import { StyleSheet } from "react-native";
-
-import EditScreenInfo from "../../components/EditScreenInfo";
+import { Pressable, useColorScheme } from "react-native";
 import { Text, View } from "../../components/Themed";
 
 export default function MedicalScreen() {
+  const colorScheme = useColorScheme();
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Medical Tab</Text>
+    <View className="flex-1">
       <View
-        style={styles.separator}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
-      />
-      <EditScreenInfo path="app/(tabs)/medical.tsx" />
+        className="flex flex-row justify-between"
+        style={{
+          backgroundColor: colorScheme == "light" ? "#fafafa" : "#18181b",
+        }}
+      >
+        <View></View>
+        <Pressable>
+          <Text>Visit</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: "80%",
-  },
-});

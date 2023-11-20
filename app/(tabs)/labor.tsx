@@ -3,6 +3,7 @@ import LaborTask from "../../components/LaborTask";
 import { ScrollView, View } from "../../components/Themed";
 import { useSelector } from "react-redux";
 import { selectPlayerCharacter } from "../../redux/selectors";
+import PlayerStatus from "../../components/PlayerStatus";
 
 export default function LaborScreen() {
   const playerCharacter = useSelector(selectPlayerCharacter);
@@ -20,22 +21,27 @@ export default function LaborScreen() {
   });
 
   return (
-    <ScrollView>
-      <View className="px-2 py-4">
-        {filteredJobs
-          .sort((aJob, bJob) => aJob.reward.gold - bJob.reward.gold)
-          .map((Job, index) => {
-            return (
-              <LaborTask
-                key={index}
-                title={Job.title}
-                reward={Job.reward.gold}
-                cost={Job.cost}
-                experienceToPromote={Job.experienceToPromote}
-              />
-            );
-          })}
+    <View>
+      <View className="mx-4 pb-4">
+        <PlayerStatus />
       </View>
-    </ScrollView>
+      <ScrollView>
+        <View className="px-2 py-4">
+          {filteredJobs
+            .sort((aJob, bJob) => aJob.reward.gold - bJob.reward.gold)
+            .map((Job, index) => {
+              return (
+                <LaborTask
+                  key={index}
+                  title={Job.title}
+                  reward={Job.reward.gold}
+                  cost={Job.cost}
+                  experienceToPromote={Job.experienceToPromote}
+                />
+              );
+            })}
+        </View>
+      </ScrollView>
+    </View>
   );
 }

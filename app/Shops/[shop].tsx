@@ -55,60 +55,60 @@ export default function ShopScreen() {
   }
 
   function selectedItemDisplay() {
-    return (
-      <View className="flex h-1/3 items-center justify-center">
-        {selectedItem ? (
-          <>
-            <Text>{toTitleCase(selectedItem.item.name)}</Text>
-            <Image source={selectedItem.item.getItemIcon()} />
-            <Text>
-              {selectedItem.item.itemClass == "bodyArmor"
-                ? "Body Armor"
-                : toTitleCase(selectedItem.item.itemClass)}
+    if (selectedItem) {
+      const transactionCompleteable = selectedItem.buying
+        ? playerCharacter!.getGold() >=
+          selectedItem.item.getBuyPrice(thisShop!.getAffection())
+        : thisShop!.getCurrentGold() >=
+          selectedItem.item.getSellPrice(thisShop!.getAffection());
+
+      return (
+        <View className="flex h-1/3 items-center justify-center">
+          <Text>{toTitleCase(selectedItem.item.name)}</Text>
+          <Image source={selectedItem.item.getItemIcon()} />
+          <Text>
+            {selectedItem.item.itemClass == "bodyArmor"
+              ? "Body Armor"
+              : toTitleCase(selectedItem.item.itemClass)}
+          </Text>
+          {selectedItem.item.slot ? (
+            <Text className="">
+              Fills {toTitleCase(selectedItem.item.slot)} Slot
             </Text>
-            {selectedItem.item.slot ? (
-              <Text className="">
-                Fills {toTitleCase(selectedItem.item.slot)} Slot
+          ) : null}
+          <View className="flex flex-row">
+            <Text>
+              Price:{" "}
+              {selectedItem.buying
+                ? selectedItem.item.getBuyPrice(thisShop!.getAffection())
+                : selectedItem.item.getSellPrice(thisShop!.getAffection())}
+            </Text>
+            <Coins width={20} height={20} style={{ marginLeft: 6 }} />
+          </View>
+          <View>
+            <Pressable
+              disabled={
+                selectedItem.buying
+                  ? playerCharacter!.getGold() <
+                    selectedItem.item.getBuyPrice(thisShop!.getAffection())
+                  : thisShop!.getCurrentGold() <
+                    selectedItem.item.getSellPrice(thisShop!.getAffection())
+              }
+              onPress={moveBetweenInventories}
+              className={`${
+                !transactionCompleteable ? "bg-zinc-300" : "bg-blue-400"
+              } my-4 rounded-lg  active:scale-95 active:opacity-50`}
+            >
+              <Text className="px-6 py-4" style={{ color: "white" }}>
+                {selectedItem.buying ? "Purchase" : "Sell"}
               </Text>
-            ) : null}
-            <View className="flex flex-row">
-              <Text>
-                Price:{" "}
-                {selectedItem.buying
-                  ? selectedItem.item.getBuyPrice(thisShop!.getAffection())
-                  : selectedItem.item.getSellPrice(thisShop!.getAffection())}
-              </Text>
-              <Coins width={20} height={20} style={{ marginLeft: 6 }} />
-            </View>
-            <View>
-              <Pressable
-                disabled={
-                  selectedItem.buying
-                    ? playerCharacter!.getGold() <
-                      selectedItem.item.getBuyPrice(thisShop!.getAffection())
-                    : thisShop!.getCurrentGold() <
-                      selectedItem.item.getSellPrice(thisShop!.getAffection())
-                }
-                onPress={moveBetweenInventories}
-                className={`${
-                  selectedItem.buying
-                    ? playerCharacter!.getGold() <
-                      selectedItem.item.getBuyPrice(thisShop!.getAffection())
-                    : thisShop!.getCurrentGold() <
-                      selectedItem.item.getSellPrice(thisShop!.getAffection())
-                    ? "bg-zinc-300"
-                    : "bg-blue-400"
-                } my-4 rounded-lg  active:scale-95 active:opacity-50`}
-              >
-                <Text className="px-6 py-4" style={{ color: "white" }}>
-                  {selectedItem.buying ? "Purchase" : "Sell"}
-                </Text>
-              </Pressable>
-            </View>
-          </>
-        ) : null}
-      </View>
-    );
+            </Pressable>
+          </View>
+        </View>
+      );
+    } else {
+      return <View className="flex h-1/3 items-center justify-center"></View>;
+    }
   }
 
   function displaySetter(item: Item, buying: boolean) {

@@ -3,7 +3,7 @@ import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import shops from "../assets/json/shops.json";
 import names from "../assets/json/names.json";
-import { Shop } from "../classes/shop";
+import { Shop, generateInventory } from "../classes/shop";
 
 export const storeData = async (key: string, value: any) => {
   try {
