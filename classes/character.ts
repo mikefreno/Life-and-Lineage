@@ -237,6 +237,14 @@ export class PlayerCharacter extends Character {
     return this.health;
   }
 
+  private restoreHealth(amount: number) {
+    if (this.health + amount < this.healthMax) {
+      this.health += amount;
+    } else {
+      this.health = this.healthMax;
+    }
+  }
+
   //----------------------------------Mana----------------------------------//
   public getMana(): number {
     return this.mana;
@@ -245,8 +253,17 @@ export class PlayerCharacter extends Character {
   public getMaxMana(): number {
     return this.manaMax;
   }
+
   private useMana(mana: number) {
     this.mana -= mana;
+  }
+
+  private restoreMana(amount: number) {
+    if (this.mana + amount < this.manaMax) {
+      this.mana += amount;
+    } else {
+      this.mana = this.manaMax;
+    }
   }
   //----------------------------------Sanity----------------------------------//
   public getSanity(): number {
@@ -258,6 +275,13 @@ export class PlayerCharacter extends Character {
     return this.sanity;
   }
 
+  private restoreSanity(amount: number) {
+    if (this.sanity + amount < 50) {
+      this.sanity += amount;
+    } else {
+      this.sanity = 50;
+    }
+  }
   //----------------------------------Inventory----------------------------------//
   public getInventory() {
     return this.inventory;
@@ -271,17 +295,89 @@ export class PlayerCharacter extends Character {
       this.gold -= buyPrice;
     }
   }
+
   public removeFromInventory(item: Item) {
     const idx = this.inventory.findIndex((invItem) => invItem == item);
     if (idx !== -1) {
       this.inventory.splice(idx, 1);
     }
   }
+
   public sellItem(item: Item, sellPrice: number) {
     const idx = this.inventory.findIndex((invItem) => invItem == item);
     if (idx !== -1) {
       this.inventory.splice(idx, 1);
       this.gold += sellPrice;
+    }
+  }
+
+  public getHeadItem() {
+    return this.equipment.head;
+  }
+
+  public getBodyItem() {
+    return this.equipment.body;
+  }
+
+  public getOffHandItem() {
+    return this.equipment.offHand;
+  }
+
+  public getMainHandItem() {
+    return this.equipment.mainHand;
+  }
+
+  public removeEquipment(slot: "mainHand" | "head" | "body" | "off-hand") {
+    if (slot == "mainHand") {
+      const currentEquipped = this.equipment.mainHand;
+      if (currentEquipped) {
+        this.addToInventory(currentEquipped);
+        this.equipment.offHand = undefined;
+      }
+    }
+    if (slot == "off-hand") {
+      const currentEquipped = this.equipment.offHand;
+      if (currentEquipped) {
+        this.addToInventory(currentEquipped);
+        this.equipment.offHand = undefined;
+      }
+    }
+    if (slot == "head") {
+      const currentEquipped = this.equipment.head;
+      if (currentEquipped) {
+        this.addToInventory(currentEquipped);
+        this.equipment.head = undefined;
+      }
+    }
+    if (slot == "body") {
+      const currentEquipped = this.equipment.body;
+      if (currentEquipped) {
+        this.addToInventory(currentEquipped);
+        this.equipment.body = undefined;
+      }
+    }
+  }
+
+  public equipItem(
+    item: Item,
+    targetSlot: "mainHand" | "head" | "body" | "off-hand",
+  ) {
+    this.removeEquipment(targetSlot);
+    if (targetSlot == "mainHand") {
+      this.equipment.mainHand = item;
+      this.removeFromInventory(item);
+    }
+    if (targetSlot == "off-hand") {
+      this.equipment.offHand = item;
+      this.removeFromInventory(item);
+    }
+    if (targetSlot == "head") {
+      this.equipment.head = item;
+      this.removeFromInventory(item);
+    }
+    if (targetSlot == "body") {
+      this.equipment.body = item;
+      this.removeFromInventory(item);
     }
   }
   //----------------------------------Gold----------------------------------//
@@ -303,7 +399,9 @@ export class PlayerCharacter extends Character {
       return `${parseFloat(cleanedUp).toLocaleString()}K`;
     } else return this.gold.toLocaleString();
   }
-
+  public spendGold(amount: number) {
+    this.gold -= amount;
+  }
   //----------------------------------Work----------------------------------//
   public getCurrentJobAndExperience() {
     const job = this.jobExperience.find((job) => job.job == this.job);
@@ -340,9 +438,11 @@ export class PlayerCharacter extends Character {
     //to understand why this is necessary, uncomment the above line before calling
     let newJobExperience = this.jobExperience.map((job) => {
       if (job.job === this.job) {
-        const newExp = job.experience + 1;
-        jobWasFoundAndIncremented = true;
-        return { job: job.job, experience: newExp };
+        if (job.experience < 50) {
+          const newExp = job.experience + 1;
+          jobWasFoundAndIncremented = true;
+          return { job: job.job, experience: newExp };
+        }
       }
       return job;
     });
@@ -366,16 +466,21 @@ export class PlayerCharacter extends Character {
     this.gold += gold;
   }
 
-  //----------------------------------Combat----------------------------------//
-
-  public getPhysicalAttacks(): string[] {
-    return this.physicalAttacks;
-  }
-
+  //----------------------------------Conditions----------------------------------//
   public addCondition(condition: Condition | null) {
     if (condition) {
       this.conditions.push(condition);
     }
+  }
+  private removeDebuffs(amount: number) {
+    for (let i = 0; i < amount; i++) {
+      this.conditions.shift();
+    }
+  }
+  //----------------------------------Combat----------------------------------//
+
+  public getPhysicalAttacks(): string[] {
+    return this.physicalAttacks;
   }
 
   public doPhysicalAttack(attack: AttackObject, monsterMaxHP: number) {
@@ -453,6 +558,29 @@ export class PlayerCharacter extends Character {
   }
 
   //-----------------Misc-----------------//
+  public getMedicalService(
+    cost: number,
+    healthRestore?: number,
+    sanityRestore?: number,
+    manaRestore?: number,
+    removeDebuffs?: number,
+  ) {
+    if (cost <= this.gold) {
+      this.gold -= cost;
+      if (healthRestore) {
+        this.restoreHealth(healthRestore);
+      }
+      if (sanityRestore) {
+        this.restoreSanity(sanityRestore);
+      }
+      if (manaRestore) {
+        this.restoreMana(manaRestore);
+      }
+      if (removeDebuffs) {
+        this.removeDebuffs(removeDebuffs);
+      }
+    }
+  }
 
   public getElementalProficiencies() {
     return this.elementalProficiencies;

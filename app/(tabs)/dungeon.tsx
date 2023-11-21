@@ -5,6 +5,7 @@ import dungeons from "../../assets/json/dungeons.json";
 import { toTitleCase } from "../../utility/functions";
 import { useSelector } from "react-redux";
 import { selectGame } from "../../redux/selectors";
+import PlayerStatus from "../../components/PlayerStatus";
 
 const dangerColorStep = [
   "#fee2e2",
@@ -54,8 +55,9 @@ export default function DungeonScreen() {
     });
 
     return (
-      <View className="h-full px-4 py-8">
-        <Text className="pb-4 text-center text-2xl">
+      <View className="h-full px-4">
+        <PlayerStatus />
+        <Text className="py-4 text-center text-2xl">
           The dungeon is a dangerous place. Be careful.
         </Text>
         <ScrollView>
