@@ -28,14 +28,15 @@ export default function HomeScreen() {
   }
 
   function moveBetweenEquippedStates(
-    targetSlot: "mainHand" | "head" | "body" | "off-hand",
+    targetSlot: "head" | "body" | "off-hand" | "one-hand" | "two-hand" | null,
   ) {
-    if (playerCharacter) {
-      if (selectedItem && selectedItem?.equipped) {
+    if (playerCharacter && targetSlot) {
+      if (selectedItem && selectedItem.equipped) {
         playerCharacter?.removeEquipment(targetSlot);
       } else if (selectedItem) {
         playerCharacter?.equipItem(selectedItem.item, targetSlot);
       }
+      setSelectedItem(null);
       dispatch(setPlayerCharacter(playerCharacter));
       savePlayer(playerCharacter);
     }
@@ -62,7 +63,7 @@ export default function HomeScreen() {
               {selectedItem.item.slot == "one-hand" ? (
                 <View className="flex flex-row">
                   <Pressable
-                    onPress={() => moveBetweenEquippedStates("mainHand")}
+                    onPress={() => moveBetweenEquippedStates("one-hand")}
                     className={`bg-blue-400 my-4 mr-2 rounded-lg  active:scale-95 active:opacity-50`}
                   >
                     <Text className="px-4 py-4" style={{ color: "white" }}>
@@ -80,6 +81,9 @@ export default function HomeScreen() {
                 </View>
               ) : (
                 <Pressable
+                  onPress={() =>
+                    moveBetweenEquippedStates(selectedItem.item.slot)
+                  }
                   className={`bg-blue-400 my-4 rounded-lg  active:scale-95 active:opacity-50`}
                 >
                   <Text className="px-6 py-4" style={{ color: "white" }}>
@@ -129,7 +133,9 @@ export default function HomeScreen() {
         <View className="mt-2 flex flex-row">
           <View className="mr-4 items-center">
             <Text>Main Hand</Text>
-            {playerCharacter && playerCharacter.getMainHandItem() ? (
+            {playerCharacter &&
+            playerCharacter.getMainHandItem() &&
+            playerCharacter.getMainHandItem()?.name !== "unarmored" ? (
               <Pressable
                 className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
                 onPress={() =>
@@ -283,9 +289,9 @@ export default function HomeScreen() {
         {selectedItem ? selectedItemDisplay() : null}
         <View className="flex flex-row">
           {currentEquipmentDisplay()}
-          <ScrollView>
+          <ScrollView horizontal>
             <View
-              className="flex flex-row flex-wrap justify-around"
+              className="my-auto max-h-64 flex-wrap justify-around"
               style={{
                 backgroundColor: colorScheme == "light" ? "#f4f4f5" : "#020617",
               }}
@@ -293,7 +299,7 @@ export default function HomeScreen() {
               {playerCharacter?.getInventory().map((item, idx) => (
                 <Pressable
                   key={idx}
-                  className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
+                  className="m-2 items-center active:scale-90 active:opacity-50"
                   onPress={() => displaySetter(item, false)}
                 >
                   <View

@@ -3,6 +3,7 @@ import { AttackObject } from "../utility/types";
 import { Condition } from "./conditions";
 import conditions from "../assets/json/conditions.json";
 import { Item } from "./item";
+import weapons from "../assets/json/items/weapons.json";
 
 interface CharacterOptions {
   firstName: string;
@@ -327,13 +328,23 @@ export class PlayerCharacter extends Character {
     return this.equipment.mainHand;
   }
 
-  public removeEquipment(slot: "mainHand" | "head" | "body" | "off-hand") {
-    if (slot == "mainHand") {
+  public removeEquipment(
+    slot: "head" | "body" | "off-hand" | "one-hand" | "two-hand" | null,
+  ) {
+    if (slot == "one-hand" || "two-hand") {
       const currentEquipped = this.equipment.mainHand;
-      if (currentEquipped) {
+      if (currentEquipped && currentEquipped.name !== "unarmored") {
         this.addToInventory(currentEquipped);
-        this.equipment.offHand = undefined;
+        this.equipment.mainHand = new Item({
+          name: "unarmored",
+          slot: "one-hand",
+          stats: { baseDamage: 1 },
+          baseValue: 0,
+          itemClass: "weapon",
+        });
       }
+
+      this.setPhysicalAttacks();
     }
     if (slot == "off-hand") {
       const currentEquipped = this.equipment.offHand;
@@ -341,6 +352,8 @@ export class PlayerCharacter extends Character {
         this.addToInventory(currentEquipped);
         this.equipment.offHand = undefined;
       }
+
+      this.setPhysicalAttacks();
     }
     if (slot == "head") {
       const currentEquipped = this.equipment.head;
@@ -360,16 +373,23 @@ export class PlayerCharacter extends Character {
 
   public equipItem(
     item: Item,
-    targetSlot: "mainHand" | "head" | "body" | "off-hand",
+    targetSlot: "head" | "body" | "off-hand" | "one-hand" | "two-hand",
   ) {
     this.removeEquipment(targetSlot);
-    if (targetSlot == "mainHand") {
+    if (targetSlot == "one-hand" || "two-hand") {
+      if (targetSlot == "two-hand") {
+        this.removeEquipment("two-hand");
+      }
       this.equipment.mainHand = item;
       this.removeFromInventory(item);
+
+      this.setPhysicalAttacks();
     }
     if (targetSlot == "off-hand") {
       this.equipment.offHand = item;
       this.removeFromInventory(item);
+
+      this.setPhysicalAttacks();
     }
     if (targetSlot == "head") {
       this.equipment.head = item;
@@ -380,6 +400,7 @@ export class PlayerCharacter extends Character {
       this.removeFromInventory(item);
     }
   }
+
   //----------------------------------Gold----------------------------------//
   public getGold() {
     return this.gold;
@@ -479,19 +500,36 @@ export class PlayerCharacter extends Character {
   }
   //----------------------------------Combat----------------------------------//
 
+  private setPhysicalAttacks() {
+    if (this.equipment.mainHand) {
+      const itemObj = weapons.find(
+        (weapon) => weapon.name == this.equipment.mainHand!.name,
+      );
+      if (itemObj) {
+        this.physicalAttacks = itemObj.attacks;
+      }
+    }
+  }
+
   public getPhysicalAttacks(): string[] {
     return this.physicalAttacks;
   }
 
   public doPhysicalAttack(attack: AttackObject, monsterMaxHP: number) {
+    console.log(attack);
     const rollToHit = 20 - (attack.hitChance * 100) / 5;
     const roll = rollD20();
     if (roll >= rollToHit) {
-      const hpDamage =
-        attack.damageMult *
-        (this.equipment.mainHand?.stats?.["baseDamage"] ?? 1);
+      let hpDamage =
+        attack.damageMult * (this.equipment.mainHand?.stats?.["damage"] ?? 1);
+
+      const offHandDamage = this.equipment.offHand?.stats?.["damage"];
+      if (offHandDamage) {
+        hpDamage += offHandDamage * 0.5;
+      }
       const sanityDamage = attack.sanityDamage;
       const effectChance = attack.secondaryEffectChance;
+
       if (effectChance) {
         let effects: Condition[] = [];
         for (let j = 0; j < attack.secondaryEffectChance.length; j++) {

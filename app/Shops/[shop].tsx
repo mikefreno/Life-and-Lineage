@@ -2,7 +2,12 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import { View, Text } from "../../components/Themed";
 import { useDispatch, useSelector } from "react-redux";
 import { selectGame, selectPlayerCharacter } from "../../redux/selectors";
-import { calculateAge, fullSave, toTitleCase } from "../../utility/functions";
+import {
+  calculateAge,
+  fullSave,
+  savePlayer,
+  toTitleCase,
+} from "../../utility/functions";
 import { CharacterImage } from "../../components/CharacterImage";
 import { Pressable, Image, ScrollView, useColorScheme } from "react-native";
 import { useEffect, useState } from "react";
@@ -42,14 +47,14 @@ export default function ShopScreen() {
         thisShop.sellItem(selectedItem.item, price);
         setSelectedItem(null);
         dispatch(setPlayerCharacter(playerCharacter));
-        fullSave(game, playerCharacter);
+        savePlayer(playerCharacter);
       } else {
         const price = selectedItem.item.getSellPrice(thisShop!.getAffection());
         thisShop.buyItem(selectedItem.item, price);
         playerCharacter.sellItem(selectedItem.item, price);
         setSelectedItem(null);
         dispatch(setPlayerCharacter(playerCharacter));
-        fullSave(game, playerCharacter);
+        savePlayer(playerCharacter);
       }
     }
   }

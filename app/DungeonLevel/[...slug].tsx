@@ -95,7 +95,9 @@ export default function DungeonLevelScreen() {
         attackRes.secondaryEffects?.forEach((effect) =>
           monster.addCondition(effect),
         );
-        let line = `You ${attack.name}ed the ${monster.creatureSpecies} for ${attackRes.damage} heath damage`;
+        let line = `You ${toTitleCase(attack.name)}ed the ${
+          monster.creatureSpecies
+        } for ${attackRes.damage} heath damage`;
         if (attackRes.sanityDamage) {
           line += ` and ${attackRes.sanityDamage} sanity damage`;
         }
