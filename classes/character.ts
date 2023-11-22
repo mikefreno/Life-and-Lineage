@@ -125,10 +125,10 @@ interface PlayerCharacterOptions {
   inventorySize?: number;
   inventory?: Item[];
   equipment?: {
-    mainHand: Item | undefined;
-    offHand: Item | undefined;
-    head: Item | undefined;
-    body: Item | undefined;
+    mainHand: Item;
+    offHand: Item | null;
+    head: Item | null;
+    body: Item | null;
   };
 }
 
@@ -150,10 +150,10 @@ export class PlayerCharacter extends Character {
   private inventorySize: number;
   private inventory: Item[];
   private equipment: {
-    mainHand?: Item;
-    offHand?: Item;
-    head?: Item;
-    body?: Item;
+    mainHand: Item;
+    offHand: Item | null;
+    head: Item | null;
+    body: Item | null;
   };
 
   constructor({
@@ -210,7 +210,7 @@ export class PlayerCharacter extends Character {
     this.knownSpells = knownSpells ?? [];
     this.conditions = [];
     this.physicalAttacks = physicalAttacks ?? ["punch"];
-    this.gold = gold ?? 25;
+    this.gold = gold ?? 100000;
     this.inventorySize = inventorySize ?? 20;
     this.inventory = inventory ?? [];
     this.equipment = equipment ?? {
@@ -221,6 +221,9 @@ export class PlayerCharacter extends Character {
         baseValue: 0,
         itemClass: "weapon",
       }),
+      offHand: null,
+      head: null,
+      body: null,
     };
   }
 
@@ -287,9 +290,13 @@ export class PlayerCharacter extends Character {
   public getInventory() {
     return this.inventory;
   }
-  public addToInventory(item: Item) {
-    this.inventory.push(item);
+
+  public addToInventory(item: Item | null) {
+    if (item && item.name !== "unarmored") {
+      this.inventory.push(item);
+    }
   }
+
   public buyItem(item: Item, buyPrice: number) {
     if (buyPrice <= this.gold) {
       this.inventory.push(item);
@@ -298,18 +305,23 @@ export class PlayerCharacter extends Character {
   }
 
   public removeFromInventory(item: Item) {
-    const idx = this.inventory.findIndex((invItem) => invItem == item);
+    const idx = this.inventory.findIndex((invItem) => invItem.equals(item));
+
     if (idx !== -1) {
       this.inventory.splice(idx, 1);
     }
   }
 
   public sellItem(item: Item, sellPrice: number) {
-    const idx = this.inventory.findIndex((invItem) => invItem == item);
+    const idx = this.inventory.findIndex((invItem) => invItem.equals(item));
     if (idx !== -1) {
       this.inventory.splice(idx, 1);
       this.gold += sellPrice;
     }
+  }
+
+  public getEquipment() {
+    return this.equipment;
   }
 
   public getHeadItem() {
@@ -328,76 +340,72 @@ export class PlayerCharacter extends Character {
     return this.equipment.mainHand;
   }
 
-  public removeEquipment(
-    slot: "head" | "body" | "off-hand" | "one-hand" | "two-hand" | null,
-  ) {
-    if (slot == "one-hand" || "two-hand") {
-      const currentEquipped = this.equipment.mainHand;
-      if (currentEquipped && currentEquipped.name !== "unarmored") {
-        this.addToInventory(currentEquipped);
-        this.equipment.mainHand = new Item({
-          name: "unarmored",
-          slot: "one-hand",
-          stats: { baseDamage: 1 },
-          baseValue: 0,
-          itemClass: "weapon",
-        });
-      }
-
-      this.setPhysicalAttacks();
+  public equipItem(item: Item) {
+    switch (item.slot) {
+      case "head":
+        this.removeEquipment("head");
+        this.equipment.head = item;
+        this.removeFromInventory(item);
+        break;
+      case "body":
+        this.removeEquipment("body");
+        this.equipment.body = item;
+        this.removeFromInventory(item);
+        break;
+      case "off-hand":
+        this.removeEquipment("offHand");
+        if (this.equipment.mainHand.slot == "two-hand") {
+          this.removeEquipment("mainHand");
+          this.setUnarmored();
+        }
+        this.equipment.offHand = item;
+        this.removeFromInventory(item);
+        break;
+      case "two-hand":
+        this.removeEquipment("mainHand");
+        this.removeEquipment("offHand");
+        this.equipment.mainHand = item;
+        this.removeFromInventory(item);
+        break;
+      case "one-hand":
+        if (this.equipment.mainHand.name == "unarmored") {
+          this.equipment.mainHand = item;
+        } else if (this.equipment.mainHand.slot == "two-hand") {
+          this.removeEquipment("mainHand");
+          this.equipment.mainHand = item;
+        } else {
+          this.removeEquipment("offHand");
+          this.equipment.offHand = item;
+        }
+        this.removeFromInventory(item);
+        break;
     }
-    if (slot == "off-hand") {
-      const currentEquipped = this.equipment.offHand;
-      if (currentEquipped) {
-        this.addToInventory(currentEquipped);
-        this.equipment.offHand = undefined;
-      }
-
-      this.setPhysicalAttacks();
-    }
-    if (slot == "head") {
-      const currentEquipped = this.equipment.head;
-      if (currentEquipped) {
-        this.addToInventory(currentEquipped);
-        this.equipment.head = undefined;
-      }
-    }
-    if (slot == "body") {
-      const currentEquipped = this.equipment.body;
-      if (currentEquipped) {
-        this.addToInventory(currentEquipped);
-        this.equipment.body = undefined;
-      }
-    }
+    this.setPhysicalAttacks();
   }
 
-  public equipItem(
-    item: Item,
-    targetSlot: "head" | "body" | "off-hand" | "one-hand" | "two-hand",
-  ) {
-    this.removeEquipment(targetSlot);
-    if (targetSlot == "one-hand" || "two-hand") {
-      if (targetSlot == "two-hand") {
-        this.removeEquipment("two-hand");
-      }
-      this.equipment.mainHand = item;
-      this.removeFromInventory(item);
+  private setUnarmored() {
+    this.equipment.mainHand = new Item({
+      name: "unarmored",
+      slot: "one-hand",
+      stats: { baseDamage: 1 },
+      baseValue: 0,
+      itemClass: "weapon",
+    });
+  }
 
-      this.setPhysicalAttacks();
-    }
-    if (targetSlot == "off-hand") {
-      this.equipment.offHand = item;
-      this.removeFromInventory(item);
-
-      this.setPhysicalAttacks();
-    }
-    if (targetSlot == "head") {
-      this.equipment.head = item;
-      this.removeFromInventory(item);
-    }
-    if (targetSlot == "body") {
-      this.equipment.body = item;
-      this.removeFromInventory(item);
+  public removeEquipment(slot: "mainHand" | "offHand" | "body" | "head") {
+    if (slot === "mainHand") {
+      this.addToInventory(this.equipment.mainHand);
+      this.setUnarmored();
+    } else if (slot === "offHand") {
+      this.addToInventory(this.equipment.offHand);
+      this.equipment.offHand = null;
+    } else if (slot == "body") {
+      this.addToInventory(this.equipment.body);
+      this.equipment.body = null;
+    } else if (slot == "head") {
+      this.addToInventory(this.equipment.head);
+      this.equipment.head = null;
     }
   }
 
@@ -516,7 +524,6 @@ export class PlayerCharacter extends Character {
   }
 
   public doPhysicalAttack(attack: AttackObject, monsterMaxHP: number) {
-    console.log(attack);
     const rollToHit = 20 - (attack.hitChance * 100) / 5;
     const roll = rollD20();
     if (roll >= rollToHit) {
@@ -684,7 +691,7 @@ export class PlayerCharacter extends Character {
           ? Item.fromJSON(json.equipment.mainHand)
           : undefined,
         offHand: json.equipment.offHand
-          ? Item.fromJSON(json.equipment.mainHand)
+          ? Item.fromJSON(json.equipment.offHand)
           : undefined,
         body: json.equipment.body
           ? Item.fromJSON(json.equipment.body)

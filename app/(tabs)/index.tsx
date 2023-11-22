@@ -10,7 +10,7 @@ import ProgressBar from "../../components/ProgressBar";
 import PlayerStatus from "../../components/PlayerStatus";
 import { elementalColorMap } from "../../utility/elementColors";
 import { Item } from "../../classes/item";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppDispatch } from "../../redux/store";
 import { setPlayerCharacter } from "../../redux/slice/game";
 
@@ -18,23 +18,38 @@ export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const playerCharacter = useSelector(selectPlayerCharacter);
   const dispatch: AppDispatch = useDispatch();
+  const [playerInventory, setPlayerInventory] = useState<Item[] | undefined>(
+    playerCharacter?.getInventory(),
+  );
+  const [playerEquipment, setPlayerEquipment] = useState(
+    playerCharacter?.getEquipment,
+  );
   const [selectedItem, setSelectedItem] = useState<{
     item: Item;
-    equipped: boolean;
+    equipped: "mainHand" | "offHand" | "body" | "head" | null;
   } | null>(null);
 
-  function displaySetter(item: Item, equipped: boolean) {
-    setSelectedItem({ item: item, equipped: equipped });
+  function displaySetter(
+    item: Item | null,
+    equipped: "mainHand" | "offHand" | "body" | "head" | null,
+  ) {
+    if (item) setSelectedItem({ item: item, equipped: equipped });
   }
 
-  function moveBetweenEquippedStates(
-    targetSlot: "head" | "body" | "off-hand" | "one-hand" | "two-hand" | null,
-  ) {
-    if (playerCharacter && targetSlot) {
+  useEffect(() => {
+    setPlayerInventory(playerCharacter?.getInventory());
+  }, [playerCharacter]);
+
+  useEffect(() => {
+    setPlayerEquipment(playerCharacter?.getEquipment());
+  }, [playerCharacter]);
+
+  function moveBetweenEquippedStates() {
+    if (playerCharacter) {
       if (selectedItem && selectedItem.equipped) {
-        playerCharacter?.removeEquipment(targetSlot);
+        playerCharacter?.removeEquipment(selectedItem.equipped);
       } else if (selectedItem) {
-        playerCharacter?.equipItem(selectedItem.item, targetSlot);
+        playerCharacter?.equipItem(selectedItem.item);
       }
       setSelectedItem(null);
       dispatch(setPlayerCharacter(playerCharacter));
@@ -60,39 +75,14 @@ export default function HomeScreen() {
           ) : null}
           {selectedItem.item.slot ? (
             <View>
-              {selectedItem.item.slot == "one-hand" ? (
-                <View className="flex flex-row">
-                  <Pressable
-                    onPress={() => moveBetweenEquippedStates("one-hand")}
-                    className={`bg-blue-400 my-4 mr-2 rounded-lg  active:scale-95 active:opacity-50`}
-                  >
-                    <Text className="px-4 py-4" style={{ color: "white" }}>
-                      {selectedItem.equipped ? "Unequip" : `Equip to Main Hand`}
-                    </Text>
-                  </Pressable>
-                  <Pressable
-                    onPress={() => moveBetweenEquippedStates("off-hand")}
-                    className={`bg-blue-400 my-4 rounded-lg  active:scale-95 active:opacity-50`}
-                  >
-                    <Text className="px-4 py-4" style={{ color: "white" }}>
-                      {selectedItem.equipped ? "Unequip" : `Equip to Off-hand`}
-                    </Text>
-                  </Pressable>
-                </View>
-              ) : (
-                <Pressable
-                  onPress={() =>
-                    moveBetweenEquippedStates(selectedItem.item.slot)
-                  }
-                  className={`bg-blue-400 my-4 rounded-lg  active:scale-95 active:opacity-50`}
-                >
-                  <Text className="px-6 py-4" style={{ color: "white" }}>
-                    {selectedItem.equipped
-                      ? "Unequip"
-                      : `Equip to ${selectedItem.item.slot}`}
-                  </Text>
-                </Pressable>
-              )}
+              <Pressable
+                onPress={() => moveBetweenEquippedStates()}
+                className={`bg-blue-400 my-4 rounded-lg  active:scale-95 active:opacity-50`}
+              >
+                <Text className="px-6 py-4" style={{ color: "white" }}>
+                  {selectedItem.equipped ? "Unequip" : `Equip`}
+                </Text>
+              </Pressable>
             </View>
           ) : null}
         </View>
@@ -107,18 +97,16 @@ export default function HomeScreen() {
       <View className="flex">
         <View className="items-center">
           <Text>Head</Text>
-          {playerCharacter && playerCharacter.getHeadItem() ? (
+          {playerEquipment?.head ? (
             <Pressable
               className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
-              onPress={() =>
-                displaySetter(playerCharacter.getHeadItem()!, true)
-              }
+              onPress={() => displaySetter(playerEquipment.head, "head")}
             >
               <View
                 className="rounded-lg p-1.5"
                 style={{ backgroundColor: "#a1a1aa" }}
               >
-                <Image source={playerCharacter.getHeadItem()!.getItemIcon()} />
+                <Image source={playerEquipment.head.getItemIcon()} />
               </View>
             </Pressable>
           ) : (
@@ -133,22 +121,19 @@ export default function HomeScreen() {
         <View className="mt-2 flex flex-row">
           <View className="mr-4 items-center">
             <Text>Main Hand</Text>
-            {playerCharacter &&
-            playerCharacter.getMainHandItem() &&
-            playerCharacter.getMainHandItem()?.name !== "unarmored" ? (
+            {playerEquipment?.mainHand &&
+            playerEquipment.mainHand.name !== "unarmored" ? (
               <Pressable
                 className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
                 onPress={() =>
-                  displaySetter(playerCharacter.getMainHandItem()!, true)
+                  displaySetter(playerEquipment.mainHand, "mainHand")
                 }
               >
                 <View
                   className="rounded-lg p-1.5"
                   style={{ backgroundColor: "#a1a1aa" }}
                 >
-                  <Image
-                    source={playerCharacter.getMainHandItem()!.getItemIcon()}
-                  />
+                  <Image source={playerEquipment.mainHand.getItemIcon()} />
                 </View>
               </Pressable>
             ) : (
@@ -162,20 +147,19 @@ export default function HomeScreen() {
           </View>
           <View className="mr-2 items-center">
             <Text>Off-Hand</Text>
-            {playerCharacter && playerCharacter.getOffHandItem() ? (
+            {playerEquipment?.offHand &&
+            playerEquipment.offHand.name !== "unarmored" ? (
               <Pressable
                 className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
                 onPress={() =>
-                  displaySetter(playerCharacter.getOffHandItem()!, true)
+                  displaySetter(playerEquipment.offHand, "offHand")
                 }
               >
                 <View
                   className="rounded-lg p-1.5"
                   style={{ backgroundColor: "#a1a1aa" }}
                 >
-                  <Image
-                    source={playerCharacter.getOffHandItem()!.getItemIcon()}
-                  />
+                  <Image source={playerEquipment.offHand.getItemIcon()} />
                 </View>
               </Pressable>
             ) : (
@@ -190,18 +174,16 @@ export default function HomeScreen() {
         </View>
         <View className="mx-auto items-center">
           <Text>Body</Text>
-          {playerCharacter && playerCharacter.getBodyItem() ? (
+          {playerEquipment?.body ? (
             <Pressable
               className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
-              onPress={() =>
-                displaySetter(playerCharacter.getBodyItem()!, true)
-              }
+              onPress={() => displaySetter(playerEquipment.body, "body")}
             >
               <View
                 className="rounded-lg p-1.5"
                 style={{ backgroundColor: "#a1a1aa" }}
               >
-                <Image source={playerCharacter.getBodyItem()!.getItemIcon()} />
+                <Image source={playerEquipment.body.getItemIcon()} />
               </View>
             </Pressable>
           ) : (
@@ -286,6 +268,9 @@ export default function HomeScreen() {
         </View>
       </View>
       <ScrollView>
+        <Text className="pb-2 text-center text-lg">
+          {playerCharacter?.getName()}'s Current Inventory
+        </Text>
         {selectedItem ? selectedItemDisplay() : null}
         <View className="flex flex-row">
           {currentEquipmentDisplay()}
@@ -296,11 +281,11 @@ export default function HomeScreen() {
                 backgroundColor: colorScheme == "light" ? "#f4f4f5" : "#020617",
               }}
             >
-              {playerCharacter?.getInventory().map((item, idx) => (
+              {playerInventory?.map((item) => (
                 <Pressable
-                  key={idx}
+                  key={item.id}
                   className="m-2 items-center active:scale-90 active:opacity-50"
-                  onPress={() => displaySetter(item, false)}
+                  onPress={() => displaySetter(item, null)}
                 >
                   <View
                     className="rounded-lg p-2"
@@ -314,6 +299,7 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
         <View className="flex items-center pb-4">
+          <Text>{playerCharacter?.getName()}'s Proficiencies</Text>
           {elementalProficiencies
             ? elementalProficiencySection(elementalProficiencies)
             : null}

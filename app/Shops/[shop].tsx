@@ -159,9 +159,9 @@ export default function ShopScreen() {
                     colorScheme == "light" ? "#f4f4f5" : "#020617",
                 }}
               >
-                {thisShop.getInventory().map((item, idx) => (
+                {thisShop.getInventory().map((item) => (
                   <Pressable
-                    key={idx}
+                    key={item.id}
                     className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
                     onPress={() => displaySetter(item, true)}
                   >
@@ -200,9 +200,9 @@ export default function ShopScreen() {
                     colorScheme == "light" ? "#f4f4f5" : "#020617",
                 }}
               >
-                {playerCharacter.getInventory().map((item, idx) => (
+                {playerCharacter.getInventory().map((item) => (
                   <Pressable
-                    key={idx}
+                    key={item.id}
                     className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
                     onPress={() => displaySetter(item, false)}
                   >

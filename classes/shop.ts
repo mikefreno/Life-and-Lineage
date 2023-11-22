@@ -96,7 +96,7 @@ export class Shop {
   }
 
   public sellItem(item: Item, sellPrice: number) {
-    const idx = this.inventory.findIndex((invItem) => invItem == item);
+    const idx = this.inventory.findIndex((invItem) => invItem.equals(item));
     if (idx !== -1) {
       this.inventory.splice(idx, 1);
       this.currentGold += sellPrice;

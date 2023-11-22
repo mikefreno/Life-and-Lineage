@@ -1,4 +1,6 @@
+import { v4 as uuidv4 } from "uuid";
 interface ItemOptions {
+  id?: string;
   name: string;
   slot: "head" | "body" | "one-hand" | "two-hand" | "off-hand" | null;
   stats: Record<string, number | undefined> | null;
@@ -22,6 +24,7 @@ interface ItemOptions {
 }
 
 export class Item {
+  readonly id: string;
   readonly name: string;
   readonly slot: "head" | "body" | "one-hand" | "two-hand" | "off-hand" | null;
   readonly itemClass:
@@ -43,13 +46,26 @@ export class Item {
   readonly baseValue: number;
   readonly icon: string | undefined;
 
-  constructor({ name, slot, stats, baseValue, itemClass, icon }: ItemOptions) {
+  constructor({
+    id,
+    name,
+    slot,
+    stats,
+    baseValue,
+    itemClass,
+    icon,
+  }: ItemOptions) {
+    this.id = id ?? uuidv4();
     this.name = name;
     this.slot = slot;
     this.stats = stats;
     this.baseValue = baseValue;
     this.itemClass = itemClass;
     this.icon = icon;
+  }
+
+  public equals(otherItem: Item) {
+    return this.id == otherItem.id;
   }
 
   public getItemIcon() {
@@ -70,6 +86,7 @@ export class Item {
 
   public toJSON(): object {
     return {
+      id: this.id,
       name: this.name,
       slot: this.slot,
       stats: this.stats,
@@ -81,6 +98,7 @@ export class Item {
 
   static fromJSON(json: any): Item {
     const item = new Item({
+      id: json.id,
       name: json.name,
       slot: json.slot,
       stats: json.stats,
