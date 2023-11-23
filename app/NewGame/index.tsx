@@ -1,16 +1,19 @@
 import { Pressable, useColorScheme } from "react-native";
-import { Text, View, SafeAreaView } from "../../components/Themed";
+import { Text, View, SafeAreaView, ScrollView } from "../../components/Themed";
 import { View as NonThemedView } from "react-native";
 import "../../assets/styles/globals.css";
 import { useState } from "react";
-import WitchHat from "../../assets/icons/WitchHatIcon";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import { Stack, router } from "expo-router";
 import { useSelector } from "react-redux";
 import { selectPlayerCharacter } from "../../redux/selectors";
+import Necromancer from "../../assets/icons/NecromancerSkull";
+import PaladinHammer from "../../assets/icons/PaladinHammer";
 
 export default function NewGameScreen() {
-  const [witchOrWizard, setWitchOrWizard] = useState<string>("");
+  const [selectedClass, setSelectedClass] = useState<
+    "mage" | "necromancer" | "paladin"
+  >();
   const colorScheme = useColorScheme();
 
   const playerCharacter = useSelector(selectPlayerCharacter);
@@ -19,100 +22,151 @@ export default function NewGameScreen() {
     <>
       <Stack.Screen
         options={{
-          title: "Witch Or Wizard?",
-          headerShown: playerCharacter ? true : false,
+          title: "Class Select",
         }}
       />
-      <SafeAreaView>
-        <View className="h-full">
-          <Text className="bold pt-16 text-center text-3xl">
-            Create a Character
-          </Text>
-          <View className="">
-            <View className="mx-auto my-8 w-4/5">
-              <Text className="pt-12 text-center text-2xl">
-                Witch Or Wizard?
-              </Text>
-              <View className="flex flex-row justify-between pt-12">
-                <Pressable
-                  onPress={() => {
-                    setWitchOrWizard("Witch");
-                  }}
+      <ScrollView className="h-full">
+        <Text className="bold pt-4 text-center text-3xl">
+          Create a Character
+        </Text>
+        <View className="">
+          <View className="mx-auto my-4 w-4/5">
+            <Text className="pt-4 text-center text-2xl">Select Class</Text>
+            <Pressable
+              className="mx-auto my-8"
+              onPress={() => {
+                setSelectedClass("mage");
+              }}
+            >
+              {({ pressed }) => (
+                <NonThemedView
+                  className={`${
+                    pressed || selectedClass == "mage"
+                      ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                      : null
+                  } px-6 py-4`}
                 >
-                  {({ pressed }) => (
-                    <NonThemedView
-                      className={`${
-                        pressed || witchOrWizard == "Witch"
-                          ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                          : null
-                      } px-2 py-4`}
+                  <WizardHat
+                    height={120}
+                    width={120}
+                    style={{ marginBottom: 5 }}
+                    color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
+                  />
+                  <Text
+                    className="mx-auto text-xl"
+                    style={{ color: "#2563eb" }}
+                  >
+                    Mage
+                  </Text>
+                </NonThemedView>
+              )}
+            </Pressable>
+            {selectedClass == "mage" ? (
+              <Text className="text-center">
+                The Mage is the default class, it is well balanced, with a focus
+                on casting elemental magic
+              </Text>
+            ) : null}
+            <NonThemedView className="flex flex-row justify-between">
+              <Pressable
+                className="-ml-2"
+                onPress={() => {
+                  setSelectedClass("necromancer");
+                }}
+              >
+                {({ pressed }) => (
+                  <NonThemedView
+                    className={`${
+                      pressed || selectedClass == "necromancer"
+                        ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                        : null
+                    } px-6 py-4`}
+                  >
+                    <NonThemedView className="-rotate-12">
+                      <Necromancer
+                        height={120}
+                        width={110}
+                        style={{ marginBottom: 5 }}
+                        color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
+                      />
+                    </NonThemedView>
+                    <Text
+                      className="mx-auto text-xl"
+                      style={{ color: "#9333ea" }}
                     >
-                      <NonThemedView className="mr-6 -rotate-12">
-                        <WitchHat
+                      Necromancer
+                    </Text>
+                  </NonThemedView>
+                )}
+              </Pressable>
+              <Pressable
+                className="-mr-2"
+                onPress={() => {
+                  setSelectedClass("paladin");
+                }}
+              >
+                {({ pressed }) => (
+                  <NonThemedView
+                    className={`${
+                      pressed || selectedClass == "paladin"
+                        ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                        : null
+                    } px-8 py-4`}
+                  >
+                    <NonThemedView className="rotate-12">
+                      <NonThemedView className="scale-x-[-1] transform">
+                        <PaladinHammer
                           height={120}
-                          width={120}
-                          color={colorScheme == "dark" ? "#7c3aed" : "#4c1d95"}
+                          width={90}
+                          style={{ marginBottom: 5 }}
                         />
                       </NonThemedView>
-                      <Text className="mx-auto text-xl">Witch</Text>
                     </NonThemedView>
-                  )}
-                </Pressable>
+                    <Text
+                      className="mx-auto text-xl"
+                      style={{ color: "#fcd34d" }}
+                    >
+                      Paladin
+                    </Text>
+                  </NonThemedView>
+                )}
+              </Pressable>
+            </NonThemedView>
+            {selectedClass == "paladin" ? (
+              <Text className="mt-6 text-center">
+                The Paladin is skilled with arms and uses holy magic, which is
+                especially powerful against the undead.
+              </Text>
+            ) : selectedClass == "necromancer" ? (
+              <Text className="mt-6 text-center">
+                The Necromancer can summon minions, use blood, bone and
+                poisonous magics.
+              </Text>
+            ) : null}
+            {selectedClass ? (
+              <NonThemedView className="mx-auto mt-4">
                 <Pressable
-                  onPress={() => {
-                    setWitchOrWizard("Wizard");
-                  }}
+                  onPress={() =>
+                    router.push(`/NewGame/SetSex/${selectedClass}`)
+                  }
                 >
                   {({ pressed }) => (
                     <NonThemedView
-                      className={`${
-                        pressed || witchOrWizard == "Wizard"
-                          ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                          : null
-                      } px-2 py-4`}
+                      className={`rounded-lg bg-blue-400 px-8 py-4 dark:bg-blue-800 ${
+                        pressed ? "scale-95 opacity-30" : null
+                      }`}
                     >
-                      <NonThemedView className="ml-6 rotate-12">
-                        <NonThemedView className="scale-x-[-1] transform">
-                          <WizardHat
-                            height={114}
-                            width={120}
-                            style={{ marginBottom: 5 }}
-                            color={
-                              colorScheme == "dark" ? "#2563eb" : "#1e40af"
-                            }
-                          />
-                        </NonThemedView>
-                      </NonThemedView>
-                      <Text className="mx-auto text-xl">Wizard</Text>
+                      <Text style={{ color: "white" }} className="text-2xl">
+                        Next
+                      </Text>
                     </NonThemedView>
                   )}
                 </Pressable>
-              </View>
-              {witchOrWizard !== "" ? (
-                <NonThemedView className="mx-auto mt-24">
-                  <Pressable
-                    onPress={() =>
-                      router.push(`/NewGame/SetName/${witchOrWizard}`)
-                    }
-                  >
-                    {({ pressed }) => (
-                      <NonThemedView
-                        className={`rounded-lg bg-blue-400 px-8 py-4 dark:bg-blue-800 ${
-                          pressed ? "scale-95 opacity-30" : null
-                        }`}
-                      >
-                        <Text style={{ color: "white" }} className="text-2xl">
-                          Next
-                        </Text>
-                      </NonThemedView>
-                    )}
-                  </Pressable>
-                </NonThemedView>
-              ) : null}
-            </View>
+              </NonThemedView>
+            ) : null}
           </View>
         </View>
-      </SafeAreaView>
+      </ScrollView>
     </>
   );
 }

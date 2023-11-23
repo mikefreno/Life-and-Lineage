@@ -159,7 +159,7 @@ function getRandomName(sex: string): string {
   return `${filteredNames[randomIndex].firstName} ${filteredNames[randomIndex].lastName}`;
 }
 
-function generateBirthday(minAge: number, maxAge: number): Date {
+export function generateBirthday(minAge: number, maxAge: number): Date {
   const today = new Date();
   const minDate = new Date();
   const maxDate = new Date();

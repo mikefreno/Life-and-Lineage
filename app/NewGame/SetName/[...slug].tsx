@@ -8,9 +8,12 @@ import {
 import { View as ThemedView, Text } from "../../../components/Themed";
 import { useState } from "react";
 import { Stack, router, useLocalSearchParams } from "expo-router";
+import { toTitleCase } from "../../../utility/functions";
 
 export default function SetName() {
   const { slug } = useLocalSearchParams();
+  const playerClass = slug[0];
+  const sex = slug[1];
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
 
@@ -18,12 +21,12 @@ export default function SetName() {
     <>
       <Stack.Screen
         options={{
-          title: "Name",
+          title: "Name Set",
         }}
       />
       <ThemedView className="flex-1 px-6">
         <Text className="py-12 text-center text-2xl text-zinc-900 dark:text-zinc-50">
-          {`Choose Your ${slug}'s Name`}
+          {`Choose Your ${toTitleCase(playerClass)}'s Name`}
         </Text>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -60,7 +63,7 @@ export default function SetName() {
             <Pressable
               onPress={() =>
                 router.push(
-                  `/NewGame/SetStars/${slug}/${firstName.trimEnd()}/${lastName.trimEnd()}`,
+                  `/NewGame/SetBlessing/${playerClass}/${sex}/${firstName.trimEnd()}/${lastName.trimEnd()}`,
                 )
               }
             >

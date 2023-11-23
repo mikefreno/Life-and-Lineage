@@ -21,8 +21,8 @@ export class Character {
   readonly firstName: string;
   readonly lastName: string;
   readonly sex: "male" | "female";
-  readonly birthdate: Date;
   protected alive: boolean;
+  readonly birthdate: Date;
   protected deathdate: Date | null;
   protected job: string;
   protected affection: number;
@@ -32,8 +32,8 @@ export class Character {
     firstName,
     lastName,
     sex,
-    birthdate,
     alive,
+    birthdate,
     deathdate,
     job,
     affection,
@@ -42,8 +42,8 @@ export class Character {
     this.firstName = firstName;
     this.lastName = lastName;
     this.sex = sex;
-    this.birthdate = birthdate;
     this.alive = alive ?? true;
+    this.birthdate = birthdate;
     this.deathdate = deathdate ?? null;
     this.job = job ?? "Unemployed";
     this.affection = affection ?? 0;
@@ -96,13 +96,13 @@ export class Character {
   }
 }
 
-interface PlayerCharacterOptions {
+type PlayerCharacterBase = {
   firstName: string;
   lastName: string;
   sex: "male" | "female";
-  birthdate: Date;
   alive?: boolean;
-  deathdate?: Date | null;
+  birthdate: Date;
+  deathdate: Date | null;
   job?: string;
   affection?: number;
   health?: number;
@@ -110,14 +110,13 @@ interface PlayerCharacterOptions {
   sanity?: number;
   mana?: number;
   manaMax?: number;
-  elementalProficiencies?: { element: string; proficiency: number }[];
+  magicProficiencies?: { school: string; proficiency: number }[];
   jobExperience?: {
     job: string;
     experience: number;
   }[];
   parents: Character[];
   children?: Character[];
-  element: string;
   physicalAttacks?: string[];
   knownSpells?: string[];
   gold?: number;
@@ -130,19 +129,48 @@ interface PlayerCharacterOptions {
     head: Item | null;
     body: Item | null;
   };
-}
+};
+type MageCharacter = PlayerCharacterBase & {
+  playerClass: "mage";
+  blessing: "fire" | "water" | "air" | "earth";
+};
+type NecromancerCharacter = PlayerCharacterBase & {
+  playerClass: "necromancer";
+  blessing: "blood" | "summons" | "pestilence" | "bone";
+};
+type PaladinCharacter = PlayerCharacterBase & {
+  playerClass: "paladin";
+  blessing: "holy" | "vengeance" | "protection";
+};
+
+type PlayerCharacterOptions =
+  | MageCharacter
+  | NecromancerCharacter
+  | PaladinCharacter;
 
 export class PlayerCharacter extends Character {
+  readonly playerClass: "mage" | "necromancer" | "paladin";
+  readonly blessing:
+    | "fire"
+    | "water"
+    | "air"
+    | "earth"
+    | "blood"
+    | "summons"
+    | "pestilence"
+    | "bone"
+    | "holy"
+    | "vengeance"
+    | "protection";
   private health: number;
   private healthMax: number;
   private sanity: number;
   private mana: number;
   private manaMax: number;
   public jobExperience: { job: string; experience: number }[];
-  private elementalProficiencies: { element: string; proficiency: number }[];
+  private magicProficiencies: { school: string; proficiency: number }[];
   private parents: Character[];
   private children: Character[] | null = null;
-  readonly element: string;
   private knownSpells: string[];
   private physicalAttacks: string[];
   private conditions: Condition[];
@@ -159,9 +187,11 @@ export class PlayerCharacter extends Character {
   constructor({
     firstName,
     lastName,
+    playerClass,
+    blessing,
     sex,
-    birthdate,
     alive,
+    birthdate,
     deathdate,
     job,
     affection,
@@ -171,10 +201,9 @@ export class PlayerCharacter extends Character {
     mana,
     manaMax,
     jobExperience,
-    elementalProficiencies,
+    magicProficiencies,
     parents,
     children,
-    element,
     knownSpells,
     physicalAttacks,
     gold,
@@ -192,21 +221,18 @@ export class PlayerCharacter extends Character {
       job,
       affection,
     });
+    this.playerClass = playerClass;
+    this.blessing = blessing;
     this.health = health ?? 100;
     this.healthMax = healthMax ?? 100;
     this.sanity = sanity ?? 50;
     this.mana = mana ?? 100;
     this.manaMax = manaMax ?? 100;
     this.jobExperience = jobExperience ?? [];
-    this.elementalProficiencies = elementalProficiencies ?? [
-      { element: "fire", proficiency: element == "Fire" ? 50 : 0 },
-      { element: "water", proficiency: element == "Water" ? 50 : 0 },
-      { element: "air", proficiency: element == "Air" ? 50 : 0 },
-      { element: "earth", proficiency: element == "Earth" ? 50 : 0 },
-    ];
+    this.magicProficiencies =
+      magicProficiencies ?? getStartingProficiencies(playerClass, blessing);
     this.parents = parents;
     this.children = children ?? null;
-    this.element = element;
     this.knownSpells = knownSpells ?? [];
     this.conditions = [];
     this.physicalAttacks = physicalAttacks ?? ["punch"];
@@ -627,24 +653,25 @@ export class PlayerCharacter extends Character {
     }
   }
 
-  public getElementalProficiencies() {
-    return this.elementalProficiencies;
+  public getMagicalProficiencies() {
+    return this.magicProficiencies;
   }
 
   public toJSON(): object {
     return {
       ...super.toJSON(),
+      playerClass: this.playerClass,
+      blessing: this.blessing,
       health: this.health,
       healthMax: this.healthMax,
       sanity: this.sanity,
       mana: this.mana,
       manaMax: this.manaMax,
       jobExperience: this.jobExperience,
-      elementalProficiencies: this.elementalProficiencies,
+      magicProficiencies: this.magicProficiencies,
       parents: this.parents.map((parent) => parent.toJSON()),
       children: this.children?.map((child) => child.toJSON()),
       conditions: this.conditions.map((condition) => condition.toJSON()),
-      element: this.element,
       knownSpells: this.knownSpells,
       physicalAttacks: this.physicalAttacks,
       gold: this.gold,
@@ -664,41 +691,36 @@ export class PlayerCharacter extends Character {
       firstName: json.firstName,
       lastName: json.lastName,
       sex: json.sex,
-      birthdate: new Date(json.birthdate),
       alive: json.alive,
+      birthdate: new Date(json.birthdate),
       deathdate: json.deathdate ? new Date(json.deathdate) : null,
       job: json.job,
       affection: json.affection,
+      playerClass: json.playerClass,
+      blessing: json.blessing,
       health: json.health,
       healthMax: json.healthMax,
       sanity: json.sanity,
       mana: json.mana,
       manaMax: json.manaMax,
       jobExperience: json.jobExperience,
-      elementalProficiencies: json.elementalProficiencies,
+      magicProficiencies: json.magicProficiencies,
       parents: json.parents.map((parent: any) => Character.fromJSON(parent)),
       children: json.children
         ? json.children.map((child: any) => Character.fromJSON(child))
         : null,
-      element: json.element,
       knownSpells: json.knownSpells,
       physicalAttacks: json.physicalAttacks,
       gold: json.gold,
       inventorySize: json.inventorySize,
       inventory: json.inventory.map((item: any) => Item.fromJSON(item)),
       equipment: {
-        mainHand: json.equipment.mainHand
-          ? Item.fromJSON(json.equipment.mainHand)
-          : undefined,
+        mainHand: Item.fromJSON(json.equipment.mainHand),
         offHand: json.equipment.offHand
           ? Item.fromJSON(json.equipment.offHand)
-          : undefined,
-        body: json.equipment.body
-          ? Item.fromJSON(json.equipment.body)
-          : undefined,
-        head: json.equipment.head
-          ? Item.fromJSON(json.equipment.head)
-          : undefined,
+          : null,
+        body: json.equipment.body ? Item.fromJSON(json.equipment.body) : null,
+        head: json.equipment.head ? Item.fromJSON(json.equipment.head) : null,
       },
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
@@ -716,4 +738,34 @@ interface performLaborProps {
     health?: number;
   };
   title: string;
+}
+
+function getStartingProficiencies(
+  playerClass: "mage" | "necromancer" | "paladin",
+  blessing: string,
+) {
+  if (playerClass == "mage") {
+    const starter = [
+      { school: "fire", proficiency: blessing == "fire" ? 50 : 0 },
+      { school: "water", proficiency: blessing == "water" ? 50 : 0 },
+      { school: "air", proficiency: blessing == "air" ? 50 : 0 },
+      { school: "earth", proficiency: blessing == "earth" ? 50 : 0 },
+    ];
+    return starter;
+  } else if (playerClass == "necromancer") {
+    const starter = [
+      { school: "blood", proficiency: blessing == "blood" ? 50 : 0 },
+      { school: "summons", proficiency: blessing == "summons" ? 50 : 0 },
+      { school: "pestilence", proficiency: blessing == "pestilence" ? 50 : 0 },
+      { school: "bone", proficiency: blessing == "bone" ? 50 : 0 },
+    ];
+    return starter;
+  } else {
+    const starter = [
+      { school: "holy", proficiency: blessing == "holy" ? 50 : 0 },
+      { school: "protection", proficiency: blessing == "protection" ? 50 : 0 },
+      { school: "vengeance", proficiency: blessing == "vengeance" ? 50 : 0 },
+    ];
+    return starter;
+  }
 }

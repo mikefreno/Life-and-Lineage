@@ -6,7 +6,7 @@ import { router } from "expo-router";
 export default function SettingsScreen() {
   const fastStart = () => {
     router.back();
-    router.push("/NewGame/Review/Wizard/Vim/God/scorpio/Water");
+    router.push("/NewGame/Review/necromancer/male/Vim/God/blood");
   };
 
   const startNewGame = () => {

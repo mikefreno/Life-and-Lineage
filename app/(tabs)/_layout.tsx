@@ -5,7 +5,6 @@ import Cauldron from "../../assets/icons/CauldronIcon";
 import Wand from "../../assets/icons/WandIcon";
 import BookSparkles from "../../assets/icons/BookSparklesIcon";
 import Gear from "../../assets/icons/GearIcon";
-import WitchHat from "../../assets/icons/WitchHatIcon";
 import Broom from "../../assets/icons/BroomIcon";
 import Dungeon from "../../assets/icons/DungeonIcon";
 import Potion from "../../assets/icons/PotionIcon";
@@ -16,6 +15,8 @@ import { useSelector } from "react-redux";
 import { selectPlayerCharacter } from "../../redux/selectors";
 import Sword from "../../assets/icons/SwordIcon";
 import { elementalColorMap } from "../../utility/elementColors";
+import PaladinHammer from "../../assets/icons/PaladinHammer";
+import Necromancer from "../../assets/icons/NecromancerSkull";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -35,15 +36,23 @@ export default function TabLayout() {
           options={{
             title: "Home",
             tabBarIcon: ({ color }) =>
-              playerCharacter?.sex == "male" ? (
-                <WizardHat
+              playerCharacter?.playerClass == "necromancer" ? (
+                <Necromancer
                   width={28}
                   height={26}
                   color={color}
                   style={{ marginBottom: -3 }}
                 />
+              ) : playerCharacter?.playerClass == "paladin" ? (
+                <PaladinHammer
+                  width={28}
+                  height={26}
+                  color={color}
+                  useOpacity={true}
+                  style={{ marginBottom: -3 }}
+                />
               ) : (
-                <WitchHat
+                <WizardHat
                   width={28}
                   height={26}
                   color={color}
@@ -99,15 +108,7 @@ export default function TabLayout() {
                     <BookSparkles
                       width={26}
                       height={28}
-                      color={
-                        elementalColorMap[
-                          playerCharacter!.element.toLowerCase() as
-                            | "fire"
-                            | "water"
-                            | "air"
-                            | "earth"
-                        ].dark
-                      }
+                      color={elementalColorMap[playerCharacter!.blessing].dark}
                       style={{
                         marginRight: 15,
                         marginBottom: 3,
