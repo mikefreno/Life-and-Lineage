@@ -14,7 +14,11 @@ import {
   selectMonster,
   selectPlayerCharacter,
 } from "../../redux/selectors";
-import { setMonster } from "../../redux/slice/game";
+import {
+  setGameData,
+  setMonster,
+  setPlayerCharacter,
+} from "../../redux/slice/game";
 import { AppDispatch } from "../../redux/store";
 import { appendLogs } from "../../redux/slice/game";
 import PlayerStatus from "../../components/PlayerStatus";
@@ -136,9 +140,11 @@ export default function DungeonLevelScreen() {
             `You defeated the ${toTitleCase(monster.creatureSpecies)}`,
           );
           monsterDefeated = true;
-          if (fightingBoss && thisDungeon && thisInstance) {
+          if (fightingBoss && thisDungeon && gameData && thisInstance) {
+            setFightingBoss(false);
             thisDungeon.setBossDefeated();
-            gameData?.openNextDungeonLevel(thisInstance.name);
+            gameData.openNextDungeonLevel(thisInstance.name);
+            dispatch(setGameData(gameData));
             dispatch(setMonster(null));
           } else {
             if (thisDungeon?.level != 0) {
@@ -214,6 +220,9 @@ export default function DungeonLevelScreen() {
           );
         }
       }
+    }
+    if (playerCharacter) {
+      dispatch(setPlayerCharacter(playerCharacter));
     }
     fullSave(gameData, playerCharacter);
   }

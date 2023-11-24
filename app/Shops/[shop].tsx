@@ -15,6 +15,7 @@ import { Item } from "../../classes/item";
 import Coins from "../../assets/icons/CoinsIcon";
 import { setPlayerCharacter } from "../../redux/slice/game";
 import { AppDispatch } from "../../redux/store";
+import SelectItemDisplay from "../../components/SelectItemDisplay";
 
 export default function ShopScreen() {
   const { shop } = useLocalSearchParams();
@@ -56,63 +57,6 @@ export default function ShopScreen() {
         dispatch(setPlayerCharacter(playerCharacter));
         savePlayer(playerCharacter);
       }
-    }
-  }
-
-  function selectedItemDisplay() {
-    if (selectedItem) {
-      const transactionCompleteable = selectedItem.buying
-        ? playerCharacter!.getGold() >=
-          selectedItem.item.getBuyPrice(thisShop!.getAffection())
-        : thisShop!.getCurrentGold() >=
-          selectedItem.item.getSellPrice(thisShop!.getAffection());
-
-      return (
-        <View className="flex h-1/3 items-center justify-center">
-          <Text>{toTitleCase(selectedItem.item.name)}</Text>
-          <Image source={selectedItem.item.getItemIcon()} />
-          <Text>
-            {selectedItem.item.itemClass == "bodyArmor"
-              ? "Body Armor"
-              : toTitleCase(selectedItem.item.itemClass)}
-          </Text>
-          {selectedItem.item.slot ? (
-            <Text className="">
-              Fills {toTitleCase(selectedItem.item.slot)} Slot
-            </Text>
-          ) : null}
-          <View className="flex flex-row">
-            <Text>
-              Price:{" "}
-              {selectedItem.buying
-                ? selectedItem.item.getBuyPrice(thisShop!.getAffection())
-                : selectedItem.item.getSellPrice(thisShop!.getAffection())}
-            </Text>
-            <Coins width={20} height={20} style={{ marginLeft: 6 }} />
-          </View>
-          <View>
-            <Pressable
-              disabled={
-                selectedItem.buying
-                  ? playerCharacter!.getGold() <
-                    selectedItem.item.getBuyPrice(thisShop!.getAffection())
-                  : thisShop!.getCurrentGold() <
-                    selectedItem.item.getSellPrice(thisShop!.getAffection())
-              }
-              onPress={moveBetweenInventories}
-              className={`${
-                !transactionCompleteable ? "bg-zinc-300" : "bg-blue-400"
-              } my-4 rounded-lg  active:scale-95 active:opacity-50`}
-            >
-              <Text className="px-6 py-4" style={{ color: "white" }}>
-                {selectedItem.buying ? "Purchase" : "Sell"}
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-      );
-    } else {
-      return <View className="flex h-1/3 items-center justify-center"></View>;
     }
   }
 
@@ -176,7 +120,19 @@ export default function ShopScreen() {
               </View>
             </ScrollView>
           </View>
-          {selectedItemDisplay()}
+          {selectedItem ? (
+            <View className="flex h-1/3">
+              <SelectItemDisplay
+                playerCharacter={playerCharacter}
+                manipulatingFunction={moveBetweenInventories}
+                shop={thisShop}
+                item={selectedItem.item}
+                buyingItem={selectedItem.buying}
+              />
+            </View>
+          ) : (
+            <View className="flex h-1/3 items-center justify-center" />
+          )}
           <View className="h-1/3">
             <View className="mx-auto flex flex-row">
               <Text className="text-center">

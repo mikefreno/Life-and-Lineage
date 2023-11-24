@@ -8,7 +8,7 @@ interface GameOptions {
   dungeonInstances?: DungeonInstance[];
   furthestDepth?: { instance: string; level: number }[];
   atDeathScreen?: boolean;
-  colorScheme: "system" | "dark" | "light";
+  colorScheme?: "system" | "dark" | "light";
 }
 
 export class Game {
@@ -89,13 +89,10 @@ export class Game {
     const foundInstance = this.dungeonInstances.find(
       (dungeonInstance) => dungeonInstance.name == instance,
     );
-    console.log(foundInstance);
-    console.log(foundInstance?.getLevels());
     if (foundInstance) {
       const found = foundInstance
         .getLevels()
         .find((dungeonLevel) => dungeonLevel.level == level);
-      console.log(found);
       return found;
     }
   }

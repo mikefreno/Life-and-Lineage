@@ -1,12 +1,7 @@
 import { Pressable, useColorScheme, Image } from "react-native";
 import { View, Text, ScrollView } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
-import {
-  calculateAge,
-  damageReduction,
-  savePlayer,
-  toTitleCase,
-} from "../../utility/functions";
+import { calculateAge, savePlayer } from "../../utility/functions";
 import Coins from "../../assets/icons/CoinsIcon";
 import { useDispatch, useSelector } from "react-redux";
 import { selectPlayerCharacter } from "../../redux/selectors";
@@ -30,6 +25,7 @@ import HoldingSkull from "../../assets/icons/HoldingSkull";
 import Virus from "../../assets/icons/VirusIcon";
 import Bones from "../../assets/icons/BonesIcon";
 import Drop from "../../assets/icons/DropIcon";
+import SelectItemDisplay from "../../components/SelectItemDisplay";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -74,41 +70,6 @@ export default function HomeScreen() {
       setSelectedItem(null);
       dispatch(setPlayerCharacter(playerCharacter));
       savePlayer(playerCharacter);
-    }
-  }
-
-  function selectedItemDisplay() {
-    if (selectedItem) {
-      return (
-        <View className="flex items-center justify-center py-4">
-          <Text>{toTitleCase(selectedItem.item.name)}</Text>
-          <Image source={selectedItem.item.getItemIcon()} />
-          <Text>
-            {selectedItem.item.itemClass == "bodyArmor"
-              ? "Body Armor"
-              : toTitleCase(selectedItem.item.itemClass)}
-          </Text>
-          {selectedItem.item.slot ? (
-            <Text className="">
-              Fills {toTitleCase(selectedItem.item.slot)} Slot
-            </Text>
-          ) : null}
-          {selectedItem.item.slot ? (
-            <View>
-              <Pressable
-                onPress={() => moveBetweenEquippedStates()}
-                className={`bg-blue-400 my-4 rounded-lg  active:scale-95 active:opacity-50`}
-              >
-                <Text className="px-6 py-4" style={{ color: "white" }}>
-                  {selectedItem.equipped ? "Unequip" : `Equip`}
-                </Text>
-              </Pressable>
-            </View>
-          ) : null}
-        </View>
-      );
-    } else {
-      return <View className="flex h-1/3 items-center justify-center"></View>;
     }
   }
 
@@ -427,7 +388,13 @@ export default function HomeScreen() {
           <Text className="pb-2 text-center text-lg">
             {playerCharacter?.getName()}'s Current Inventory
           </Text>
-          {selectedItem ? selectedItemDisplay() : null}
+          {selectedItem ? (
+            <SelectItemDisplay
+              item={selectedItem.item}
+              isEquipped={selectedItem?.equipped ? true : false}
+              manipulatingFunction={moveBetweenEquippedStates}
+            />
+          ) : null}
           <View className="flex flex-row">
             {currentEquipmentDisplay()}
             <ScrollView horizontal>

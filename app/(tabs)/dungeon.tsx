@@ -43,6 +43,7 @@ export default function DungeonScreen() {
         boss: string[];
       }[];
     }[] = [];
+    let localHeight = 0;
     dungeonDepth?.forEach((dungeonInstanceDepth) => {
       const instance = dungeons.find(
         (dungeon) => dungeon.instance == dungeonInstanceDepth.instance,
@@ -58,10 +59,11 @@ export default function DungeonScreen() {
         } = { instance: instance.instance, levels: [] };
         for (let i = 0; i < dungeonInstanceDepth.level; i++) {
           filteredInstance.levels.push(instance.levels[i]);
-          setHeight(height + 1);
+          localHeight += 1;
         }
         newInstances.push(filteredInstance);
       }
+      setHeight(localHeight);
     });
     setInstances(newInstances);
   }, [dungeonDepth]);
