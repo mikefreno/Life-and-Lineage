@@ -132,6 +132,15 @@ export function getCharacterImage(age: number, sex: "M" | "F") {
   }
 }
 
+export function damageReduction(armorValue: number) {
+  if (armorValue >= 600) {
+    return 0.925;
+  } else {
+    const reduction = 92.5 * (1 - Math.exp(-0.01 * armorValue));
+    return Math.min(reduction, 92.5) / 100;
+  }
+}
+
 export function getMonsterImage(monsterName: string) {
   return require("../assets/images/monsters/goblin.png");
 }

@@ -79,7 +79,7 @@
       "appearsIn": ["nearby cave"],
       "appearsOn": [3,4,5]
    },
-      {
+   {
       "name": "bandit",
       "sanity": 50,
       "healthRange": {"minimum": 50, "maximum": 75},

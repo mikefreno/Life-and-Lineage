@@ -1,4 +1,4 @@
-import { rollD20 } from "../utility/functions";
+import { damageReduction, rollD20 } from "../utility/functions";
 import { AttackObject } from "../utility/types";
 import { Condition } from "./conditions";
 import conditions from "../assets/json/conditions.json";
@@ -259,7 +259,12 @@ export class PlayerCharacter extends Character {
   }
 
   public getMaxHealth() {
-    return this.healthMax;
+    let gearBuffs = 0;
+    gearBuffs += this.equipment.mainHand.stats?.health ?? 0;
+    gearBuffs += this.equipment.offHand?.stats?.health ?? 0;
+    gearBuffs += this.equipment.body?.stats?.health ?? 0;
+    gearBuffs += this.equipment.head?.stats?.health ?? 0;
+    return this.healthMax + gearBuffs;
   }
 
   public damageHealth(damage: number | null) {
@@ -281,6 +286,11 @@ export class PlayerCharacter extends Character {
   }
 
   public getMaxMana(): number {
+    let gearBuffs = 0;
+    gearBuffs += this.equipment.mainHand.stats?.mana ?? 0;
+    gearBuffs += this.equipment.offHand?.stats?.mana ?? 0;
+    gearBuffs += this.equipment.body?.stats?.mana ?? 0;
+    gearBuffs += this.equipment.head?.stats?.mana ?? 0;
     return this.manaMax;
   }
 
@@ -435,6 +445,18 @@ export class PlayerCharacter extends Character {
     }
   }
 
+  public getArmorValue() {
+    let armorValue = 0;
+    armorValue += this.equipment.mainHand.stats?.armor ?? 0;
+    armorValue += this.equipment.offHand?.stats?.armor ?? 0;
+    armorValue += this.equipment.body?.stats?.armor ?? 0;
+    armorValue += this.equipment.head?.stats?.armor ?? 0;
+    return armorValue;
+  }
+  public getDamageReduction() {
+    return damageReduction(this.getArmorValue());
+  }
+
   //----------------------------------Gold----------------------------------//
   public getGold() {
     return this.gold;
@@ -454,6 +476,7 @@ export class PlayerCharacter extends Character {
       return `${parseFloat(cleanedUp).toLocaleString()}K`;
     } else return this.gold.toLocaleString();
   }
+
   public spendGold(amount: number) {
     this.gold -= amount;
   }

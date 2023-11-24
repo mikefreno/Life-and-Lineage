@@ -1,7 +1,12 @@
 import { Pressable, useColorScheme, Image } from "react-native";
 import { View, Text, ScrollView } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
-import { calculateAge, savePlayer, toTitleCase } from "../../utility/functions";
+import {
+  calculateAge,
+  damageReduction,
+  savePlayer,
+  toTitleCase,
+} from "../../utility/functions";
 import Coins from "../../assets/icons/CoinsIcon";
 import { useDispatch, useSelector } from "react-redux";
 import { selectPlayerCharacter } from "../../redux/selectors";
@@ -33,9 +38,6 @@ export default function HomeScreen() {
   const [playerInventory, setPlayerInventory] = useState<Item[] | undefined>(
     playerCharacter?.getInventory(),
   );
-  const [playerEquipment, setPlayerEquipment] = useState(
-    playerCharacter?.getEquipment,
-  );
   const [selectedItem, setSelectedItem] = useState<{
     item: Item;
     equipped: "mainHand" | "offHand" | "body" | "head" | null;
@@ -48,12 +50,18 @@ export default function HomeScreen() {
     if (item) setSelectedItem({ item: item, equipped: equipped });
   }
 
-  useEffect(() => {
-    setPlayerInventory(playerCharacter?.getInventory());
-  }, [playerCharacter]);
+  //useEffect(() => {
+  //const testArmors = [
+  //0, 10, 25, 35, 50, 100, 200, 300, 400, 500, 550, 600, 700,
+  //];
+  //for (let armor of testArmors) {
+  //const reduction = damageReduction(armor);
+  //console.log(`${armor} armor => ${reduction} damage reduction`);
+  //}
+  //}, []);
 
   useEffect(() => {
-    setPlayerEquipment(playerCharacter?.getEquipment());
+    setPlayerInventory(playerCharacter?.getInventory());
   }, [playerCharacter]);
 
   function moveBetweenEquippedStates() {
@@ -109,16 +117,18 @@ export default function HomeScreen() {
       <View className="flex border-r border-zinc-900 pr-2 dark:border-zinc-50">
         <View className="items-center">
           <Text>Head</Text>
-          {playerEquipment?.head ? (
+          {playerCharacter?.getHeadItem() ? (
             <Pressable
               className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
-              onPress={() => displaySetter(playerEquipment.head, "head")}
+              onPress={() =>
+                displaySetter(playerCharacter.getHeadItem(), "head")
+              }
             >
               <View
                 className="rounded-lg p-1.5"
                 style={{ backgroundColor: "#a1a1aa" }}
               >
-                <Image source={playerEquipment.head.getItemIcon()} />
+                <Image source={playerCharacter.getHeadItem()?.getItemIcon()} />
               </View>
             </Pressable>
           ) : (
@@ -133,19 +143,21 @@ export default function HomeScreen() {
         <View className="mt-2 flex flex-row">
           <View className="mr-4 items-center">
             <Text>Main Hand</Text>
-            {playerEquipment?.mainHand &&
-            playerEquipment.mainHand.name !== "unarmored" ? (
+            {playerCharacter?.getMainHandItem() &&
+            playerCharacter?.getMainHandItem().name !== "unarmored" ? (
               <Pressable
                 className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
                 onPress={() =>
-                  displaySetter(playerEquipment.mainHand, "mainHand")
+                  displaySetter(playerCharacter?.getMainHandItem(), "mainHand")
                 }
               >
                 <View
                   className="rounded-lg p-1.5"
                   style={{ backgroundColor: "#a1a1aa" }}
                 >
-                  <Image source={playerEquipment.mainHand.getItemIcon()} />
+                  <Image
+                    source={playerCharacter?.getMainHandItem().getItemIcon()}
+                  />
                 </View>
               </Pressable>
             ) : (
@@ -159,19 +171,37 @@ export default function HomeScreen() {
           </View>
           <View className="mr-2 items-center">
             <Text>Off-Hand</Text>
-            {playerEquipment?.offHand &&
-            playerEquipment.offHand.name !== "unarmored" ? (
+            {playerCharacter?.getOffHandItem() ? (
               <Pressable
                 className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
                 onPress={() =>
-                  displaySetter(playerEquipment.offHand, "offHand")
+                  displaySetter(playerCharacter?.getOffHandItem(), "offHand")
                 }
               >
                 <View
                   className="rounded-lg p-1.5"
                   style={{ backgroundColor: "#a1a1aa" }}
                 >
-                  <Image source={playerEquipment.offHand.getItemIcon()} />
+                  <Image
+                    source={playerCharacter?.getOffHandItem()?.getItemIcon()}
+                  />
+                </View>
+              </Pressable>
+            ) : playerCharacter?.getMainHandItem().slot == "two-hand" ? (
+              <Pressable
+                className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
+                onPress={() =>
+                  displaySetter(playerCharacter?.getMainHandItem(), "offHand")
+                }
+              >
+                <View
+                  className="rounded-lg p-1.5"
+                  style={{ backgroundColor: "#a1a1aa" }}
+                >
+                  <Image
+                    style={{ opacity: 0.5 }}
+                    source={playerCharacter?.getMainHandItem()?.getItemIcon()}
+                  />
                 </View>
               </Pressable>
             ) : (
@@ -186,16 +216,18 @@ export default function HomeScreen() {
         </View>
         <View className="mx-auto items-center">
           <Text>Body</Text>
-          {playerEquipment?.body ? (
+          {playerCharacter?.getBodyItem() ? (
             <Pressable
               className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
-              onPress={() => displaySetter(playerEquipment.body, "body")}
+              onPress={() =>
+                displaySetter(playerCharacter?.getBodyItem(), "body")
+              }
             >
               <View
                 className="rounded-lg p-1.5"
                 style={{ backgroundColor: "#a1a1aa" }}
               >
-                <Image source={playerEquipment.body.getItemIcon()} />
+                <Image source={playerCharacter?.getBodyItem()?.getItemIcon()} />
               </View>
             </Pressable>
           ) : (

@@ -1,0 +1,18 @@
+[
+   {
+      "name": "zombie",
+      "sanity": null,
+      "health": 100,
+      "attackPower": 15,
+      "energy": {"maximum": 50, "regen": 10},
+      "attacks": ["grab", "zombie bite"]
+   },
+   {
+      "name": "necromancer",
+      "sanity": 50,
+      "health": 100,
+      "attackPower": 15,
+      "energy": {"maximum": 50, "regen": 10},
+      "attacks": ["grab", "zombie bite"]
+   }
+]

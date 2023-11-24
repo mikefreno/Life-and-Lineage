@@ -20,36 +20,48 @@ import { appendLogs } from "../../redux/slice/game";
 import PlayerStatus from "../../components/PlayerStatus";
 import ProgressBar from "../../components/ProgressBar";
 import monsterObjects from "../../assets/json/monsters.json";
+import { DungeonInstance, DungeonLevel } from "../../classes/dungeon";
 
 export default function DungeonLevelScreen() {
+  const { slug } = useLocalSearchParams();
   const playerCharacter = useSelector(selectPlayerCharacter);
   const gameData = useSelector(selectGame);
+  const [fightingBoss, setFightingBoss] = useState<boolean>(false);
+  const [instanceName, setInstanceName] = useState<string>(slug[0]);
+  const [level, setLevel] = useState<number>(Number(slug[1]));
+  const [battleTab, setBattleTab] = useState<
+    "attacks" | "spells" | "equipment" | "log"
+  >("log");
+  const [thisInstance, setThisInstance] = useState<DungeonInstance>();
+  const [thisDungeon, setThisDungeon] = useState<DungeonLevel>();
 
   const monster = useSelector(selectMonster);
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { slug } = useLocalSearchParams();
-  const instance = slug[0];
   const id = slug[1];
-  let level: number;
-  level = Number(id);
-  const [battleTab, setBattleTab] = useState<
-    "attacks" | "spells" | "equipment" | "log"
-  >("log");
+
+  useEffect(() => {
+    setInstanceName(slug[0]);
+    setLevel(Number(slug[1]));
+  }, [slug]);
 
   if (!playerCharacter || !gameData) {
     throw new Error("No player character or game data on dungeon level");
   }
 
-  const thisInstance = gameData.getInstance(instance);
-  const thisDungeon = gameData.getDungeon(instance, level);
+  useEffect(() => {
+    setThisDungeon(gameData.getDungeon(instanceName, level));
+    setThisInstance(gameData.getInstance(instanceName));
+  }, [level, instanceName]);
 
   useEffect(() => {
-    if (!monster) {
-      getEnemy();
-    } else {
-      appropriateEnemyCheck();
+    if (!fightingBoss) {
+      if (!monster) {
+        getEnemy();
+      } else {
+        appropriateEnemyCheck();
+      }
     }
   }, [monster]);
 
@@ -59,10 +71,20 @@ export default function DungeonLevelScreen() {
     dispatch(appendLogs(log));
   }
 
-  function getEnemy() {
-    const enemy = enemyGenerator(instance, level);
+  function loadBoss() {
+    if (thisDungeon && thisInstance) {
+      setFightingBoss(true);
+      dispatch(setMonster(null));
+      const boss = thisDungeon.getBoss(thisInstance.name)[0];
+      battleLogger(`You found the boss!`);
+      dispatch(setMonster(boss));
+    }
+  }
 
-    battleLogger(`You Found a ${enemy.creatureSpecies}!`);
+  function getEnemy() {
+    const enemy = enemyGenerator(instanceName, level);
+
+    battleLogger(`You found a ${toTitleCase(enemy.creatureSpecies)}!`);
     dispatch(setMonster(enemy));
   }
 
@@ -73,7 +95,7 @@ export default function DungeonLevelScreen() {
           monsterObject.name == monster.creatureSpecies &&
           !(
             monsterObject.appearsOn.includes(level) &&
-            monsterObject.appearsIn.includes(instance)
+            monsterObject.appearsIn.includes(instanceName)
           )
         ) {
           getEnemy();
@@ -95,9 +117,11 @@ export default function DungeonLevelScreen() {
         attackRes.secondaryEffects?.forEach((effect) =>
           monster.addCondition(effect),
         );
-        let line = `You ${toTitleCase(attack.name)}ed the ${
-          monster.creatureSpecies
-        } for ${attackRes.damage} heath damage`;
+        let line = `You ${toTitleCase(attack.name)}${
+          attack.name.charAt(attack.name.length - 1) == "e" ? "d" : "ed"
+        } the ${toTitleCase(monster.creatureSpecies)} for ${
+          attackRes.damage
+        } heath damage`;
         if (attackRes.sanityDamage) {
           line += ` and ${attackRes.sanityDamage} sanity damage`;
         }
@@ -108,20 +132,33 @@ export default function DungeonLevelScreen() {
         }
         battleLogger(line);
         if (hp <= 0 || (sanity && sanity <= 0)) {
-          battleLogger(`You defeated the ${monster.creatureSpecies}`);
+          battleLogger(
+            `You defeated the ${toTitleCase(monster.creatureSpecies)}`,
+          );
           monsterDefeated = true;
-          if (thisDungeon?.level != 0) {
-            thisDungeon?.incrementStep();
+          if (fightingBoss && thisDungeon && thisInstance) {
+            thisDungeon.setBossDefeated();
+            gameData?.openNextDungeonLevel(thisInstance.name);
+            dispatch(setMonster(null));
+          } else {
+            if (thisDungeon?.level != 0) {
+              thisDungeon?.incrementStep();
+            }
+            dispatch(setMonster(null));
           }
-          dispatch(setMonster(null));
         } else {
           dispatch(setMonster(monster));
         }
       } else {
-        battleLogger(`You ${attackRes}ed the ${monster.creatureSpecies}`);
+        battleLogger(
+          `You ${attackRes}ed the ${toTitleCase(monster.creatureSpecies)}`,
+        );
       }
       if (!monsterDefeated) {
-        const enemyAttackRes = monster.takeTurn(playerCharacter.getMaxHealth());
+        const enemyAttackRes = monster.takeTurn(
+          playerCharacter.getMaxHealth(),
+          playerCharacter.getDamageReduction(),
+        );
         if (
           enemyAttackRes.attack !== "miss" &&
           enemyAttackRes.attack !== "stun" &&
@@ -137,7 +174,9 @@ export default function DungeonLevelScreen() {
             router.replace("/DeathScreen");
           }
           let array = [];
-          let line = `The ${monster.creatureSpecies} used ${enemyAttackRes.attack.name} dealing ${enemyAttackRes.attack.damage} health damage`;
+          let line = `The ${toTitleCase(monster.creatureSpecies)} used ${
+            enemyAttackRes.attack.name
+          } dealing ${enemyAttackRes.attack.damage} health damage`;
 
           if (enemyAttackRes.attack.heal) {
             array.push(`healing for ${enemyAttackRes.attack.heal} health`);
@@ -164,10 +203,14 @@ export default function DungeonLevelScreen() {
           }
           battleLogger(line);
         } else if (enemyAttackRes.attack == "pass") {
-          battleLogger(`The ${monster.creatureSpecies} did nothing`);
+          battleLogger(
+            `The ${toTitleCase(monster.creatureSpecies)} did nothing`,
+          );
         } else {
           battleLogger(
-            `The ${monster?.creatureSpecies} was ${enemyAttackRes.attack}ed`,
+            `The ${toTitleCase(monster?.creatureSpecies)} ${
+              enemyAttackRes.attack == "stun" ? "was " : ""
+            }${enemyAttackRes.attack}ed`,
           );
         }
       }
@@ -219,8 +262,12 @@ export default function DungeonLevelScreen() {
                     thisDungeon.stepsBeforeBoss
                   }`}
                 </Text>
-                {thisDungeon.getStep() == thisDungeon.stepsBeforeBoss ? (
-                  <Pressable className="rounded bg-red-400 px-4 py-2 active:scale-95 active:opacity-50">
+                {thisDungeon.getStep() >= thisDungeon.stepsBeforeBoss &&
+                !thisDungeon.bossDefeatedCheck() ? (
+                  <Pressable
+                    onPress={loadBoss}
+                    className="rounded bg-red-500 px-4 py-2 active:scale-95 active:opacity-50"
+                  >
                     <Text>Fight Boss</Text>
                   </Pressable>
                 ) : null}

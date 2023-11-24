@@ -90,7 +90,10 @@ export class Monster {
     }
   }
 
-  public takeTurn(playerMaxHealth: number): {
+  public takeTurn(
+    playerMaxHealth: number,
+    playerDR: number,
+  ): {
     attack:
       | "stun"
       | "miss"
@@ -116,14 +119,14 @@ export class Monster {
         this.conditionTicker();
         if (res == "Heads") {
           return {
-            attack: this.attack(playerMaxHealth),
+            attack: this.attack(playerMaxHealth, playerDR),
             monsterHealth: this.health,
           };
         } else return { attack: "miss", monsterHealth: this.health };
       }
       this.conditionTicker();
       return {
-        attack: this.attack(playerMaxHealth),
+        attack: this.attack(playerMaxHealth, playerDR),
         monsterHealth: this.health,
       };
     } else {
@@ -150,7 +153,7 @@ export class Monster {
     }
   }
 
-  private attack(playerMaxHealth: number) {
+  private attack(playerMaxHealth: number, playerDR: number) {
     const availableAttacks = attacks.filter(
       (attack) =>
         this.attacks.includes(attack.name) && this.energy >= attack.energyCost,
@@ -162,7 +165,9 @@ export class Monster {
       const rollToHit = 20 - (chosenAttack.hitChance * 100) / 5;
       const roll = rollD20();
       const damage =
-        Math.round(chosenAttack.damageMult * this.attackPower * 4) / 4;
+        Math.round(
+          chosenAttack.damageMult * this.attackPower * (1 - playerDR) * 4,
+        ) / 4;
       const sanityDamage = chosenAttack.sanityDamage;
       if (roll >= rollToHit) {
         const effectChance = chosenAttack.secondaryEffectChance;

@@ -6,6 +6,7 @@ import { toTitleCase } from "../../utility/functions";
 import { useSelector } from "react-redux";
 import { selectGame } from "../../redux/selectors";
 import PlayerStatus from "../../components/PlayerStatus";
+import { useEffect, useState } from "react";
 
 const dangerColorStep = [
   "#fee2e2",
@@ -18,13 +19,23 @@ const dangerColorStep = [
 
 export default function DungeonScreen() {
   const gameData = useSelector(selectGame);
+  const [dungeonDepth, setDungeonDepth] = useState(gameData?.getFuthestDepth());
+  const [instances, setInstances] = useState<
+    {
+      instance: string;
+      levels: {
+        level: number;
+        stepsBeforeBoss: number;
+        boss: string[];
+      }[];
+    }[]
+  >([]);
+  const [height, setHeight] = useState<number>(0);
 
-  let height = 0;
+  useEffect(() => setDungeonDepth(gameData?.getFuthestDepth()), [gameData]);
 
-  if (gameData) {
-    const dungeonDepth = gameData.getFuthestDepth();
-
-    let instances: {
+  useEffect(() => {
+    let newInstances: {
       instance: string;
       levels: {
         level: number;
@@ -32,8 +43,7 @@ export default function DungeonScreen() {
         boss: string[];
       }[];
     }[] = [];
-
-    dungeonDepth.forEach((dungeonInstanceDepth) => {
+    dungeonDepth?.forEach((dungeonInstanceDepth) => {
       const instance = dungeons.find(
         (dungeon) => dungeon.instance == dungeonInstanceDepth.instance,
       );
@@ -48,12 +58,15 @@ export default function DungeonScreen() {
         } = { instance: instance.instance, levels: [] };
         for (let i = 0; i < dungeonInstanceDepth.level; i++) {
           filteredInstance.levels.push(instance.levels[i]);
-          height++;
+          setHeight(height + 1);
         }
-        instances.push(filteredInstance);
+        newInstances.push(filteredInstance);
       }
     });
+    setInstances(newInstances);
+  }, [dungeonDepth]);
 
+  if (gameData) {
     return (
       <View className="h-full px-4">
         <PlayerStatus />
