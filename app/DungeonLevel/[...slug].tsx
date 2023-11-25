@@ -25,12 +25,14 @@ import PlayerStatus from "../../components/PlayerStatus";
 import ProgressBar from "../../components/ProgressBar";
 import monsterObjects from "../../assets/json/monsters.json";
 import { DungeonInstance, DungeonLevel } from "../../classes/dungeon";
+import { debounce } from "lodash";
 
 export default function DungeonLevelScreen() {
   const { slug } = useLocalSearchParams();
   const playerCharacter = useSelector(selectPlayerCharacter);
   const gameData = useSelector(selectGame);
   const [fightingBoss, setFightingBoss] = useState<boolean>(false);
+  const [firstLoad, setFirstLoad] = useState<boolean>(true);
   const [instanceName, setInstanceName] = useState<string>(slug[0]);
   const [level, setLevel] = useState<number>(Number(slug[1]));
   const [battleTab, setBattleTab] = useState<
@@ -42,8 +44,6 @@ export default function DungeonLevelScreen() {
   const monster = useSelector(selectMonster);
 
   const dispatch: AppDispatch = useDispatch();
-
-  const id = slug[1];
 
   useEffect(() => {
     setInstanceName(slug[0]);
@@ -59,12 +59,25 @@ export default function DungeonLevelScreen() {
     setThisInstance(gameData.getInstance(instanceName));
   }, [level, instanceName]);
 
+  const loadBoss = async () => {
+    setFightingBoss(true);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    if (thisDungeon && thisInstance && playerCharacter) {
+      dispatch(setMonster(null));
+      const boss = thisDungeon.getBoss(thisInstance.name)[0];
+      dispatch(setMonster(boss));
+      battleLogger(`You found the boss!`);
+    }
+  };
+
   useEffect(() => {
     if (!fightingBoss) {
       if (!monster) {
         getEnemy();
-      } else {
+      } else if (firstLoad) {
         appropriateEnemyCheck();
+        setFirstLoad(false);
       }
     }
   }, [monster]);
@@ -75,16 +88,6 @@ export default function DungeonLevelScreen() {
     dispatch(appendLogs(log));
   }
 
-  function loadBoss() {
-    if (thisDungeon && thisInstance) {
-      setFightingBoss(true);
-      dispatch(setMonster(null));
-      const boss = thisDungeon.getBoss(thisInstance.name)[0];
-      battleLogger(`You found the boss!`);
-      dispatch(setMonster(boss));
-    }
-  }
-
   function getEnemy() {
     const enemy = enemyGenerator(instanceName, level);
 
@@ -93,7 +96,7 @@ export default function DungeonLevelScreen() {
   }
 
   function appropriateEnemyCheck() {
-    if (monster)
+    if (monster && !fightingBoss)
       monsterObjects.forEach((monsterObject) => {
         if (
           monsterObject.name == monster.creatureSpecies &&
@@ -108,7 +111,7 @@ export default function DungeonLevelScreen() {
       });
   }
 
-  function useAttack(attack: AttackObject) {
+  const useAttack = debounce((attack: AttackObject) => {
     if (monster && playerCharacter) {
       let monsterDefeated = false;
       const attackRes = playerCharacter.doPhysicalAttack(
@@ -136,22 +139,20 @@ export default function DungeonLevelScreen() {
         }
         battleLogger(line);
         if (hp <= 0 || (sanity && sanity <= 0)) {
+          if (thisDungeon?.level != 0) {
+            thisDungeon?.incrementStep();
+          }
           battleLogger(
             `You defeated the ${toTitleCase(monster.creatureSpecies)}`,
           );
           monsterDefeated = true;
-          if (fightingBoss && thisDungeon && gameData && thisInstance) {
+          if (fightingBoss && gameData) {
             setFightingBoss(false);
-            thisDungeon.setBossDefeated();
-            gameData.openNextDungeonLevel(thisInstance.name);
+            thisDungeon?.setBossDefeated();
+            gameData.openNextDungeonLevel(thisInstance!.name);
             dispatch(setGameData(gameData));
-            dispatch(setMonster(null));
-          } else {
-            if (thisDungeon?.level != 0) {
-              thisDungeon?.incrementStep();
-            }
-            dispatch(setMonster(null));
           }
+          dispatch(setMonster(null));
         } else {
           dispatch(setMonster(monster));
         }
@@ -159,6 +160,7 @@ export default function DungeonLevelScreen() {
         battleLogger(
           `You ${attackRes}ed the ${toTitleCase(monster.creatureSpecies)}`,
         );
+        dispatch(setMonster(monster));
       }
       if (!monsterDefeated) {
         const enemyAttackRes = monster.takeTurn(
@@ -225,7 +227,7 @@ export default function DungeonLevelScreen() {
       dispatch(setPlayerCharacter(playerCharacter));
     }
     fullSave(gameData, playerCharacter);
-  }
+  }, 100);
 
   while (!monster) {
     return (
@@ -259,29 +261,38 @@ export default function DungeonLevelScreen() {
                 unfilledColor="#fee2e2"
               />
             </View>
-            <View>
+            <View className="my-auto">
               <MonsterImage monsterSpecies={monster.creatureSpecies} />
             </View>
           </View>
+          {thisDungeon.stepsBeforeBoss !== 0 && !fightingBoss ? (
+            <View className="-mt-7 mb-1 flex flex-row justify-evenly border-b border-zinc-900 dark:border-zinc-50">
+              <Text className="my-auto text-xl">
+                {`Steps Completed: ${thisDungeon.getStep()} / ${
+                  thisDungeon.stepsBeforeBoss
+                }`}
+              </Text>
+              {thisDungeon.getStep() >= thisDungeon.stepsBeforeBoss &&
+              !thisDungeon.bossDefeatedCheck() ? (
+                <Pressable
+                  onPress={loadBoss}
+                  className="rounded bg-red-500 px-4 py-2 active:scale-95 active:opacity-50"
+                >
+                  <Text style={{ color: "white" }}>Fight Boss</Text>
+                </Pressable>
+              ) : null}
+            </View>
+          ) : fightingBoss ? (
+            <View className="-mt-7">
+              <Text className="my-auto text-center text-xl">
+                Fighting Boss!
+              </Text>
+            </View>
+          ) : null}
+          <View className="h-1/2">
+            <BattleTab useAttack={useAttack} battleTab={battleTab} />
+          </View>
           <View>
-            {thisDungeon.stepsBeforeBoss !== 0 ? (
-              <View className="-mt-7 mb-1 flex flex-row justify-evenly">
-                <Text className="my-auto text-xl">
-                  {`Steps Completed: ${thisDungeon.getStep()} / ${
-                    thisDungeon.stepsBeforeBoss
-                  }`}
-                </Text>
-                {thisDungeon.getStep() >= thisDungeon.stepsBeforeBoss &&
-                !thisDungeon.bossDefeatedCheck() ? (
-                  <Pressable
-                    onPress={loadBoss}
-                    className="rounded bg-red-500 px-4 py-2 active:scale-95 active:opacity-50"
-                  >
-                    <Text>Fight Boss</Text>
-                  </Pressable>
-                ) : null}
-              </View>
-            ) : null}
             <View className="flex w-full flex-row justify-evenly border-y border-zinc-200">
               <Pressable
                 className={`px-6 py-4 rounded ${
@@ -324,9 +335,6 @@ export default function DungeonLevelScreen() {
                 <Text className="text-xl">Log</Text>
               </Pressable>
             </View>
-          </View>
-          <View className="h-1/2">
-            <BattleTab useAttack={useAttack} battleTab={battleTab} />
           </View>
           <PlayerStatus />
         </View>

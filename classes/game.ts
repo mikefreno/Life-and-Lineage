@@ -65,6 +65,9 @@ export class Game {
     return this.date;
   }
 
+  public gameTick() {
+    this.date.setDate(this.date.getDate() + 7);
+  }
   //----------------------------------Death----------------------------------//
   public hitDeathScreen() {
     this.atDeathScreen = true;

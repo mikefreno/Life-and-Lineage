@@ -13,9 +13,12 @@ import { Pressable, Image, ScrollView, useColorScheme } from "react-native";
 import { useEffect, useState } from "react";
 import { Item } from "../../classes/item";
 import Coins from "../../assets/icons/CoinsIcon";
-import { setPlayerCharacter } from "../../redux/slice/game";
+import {
+  setGameData,
+  setMonster,
+  setPlayerCharacter,
+} from "../../redux/slice/game";
 import { AppDispatch } from "../../redux/store";
-import SelectItemDisplay from "../../components/SelectItemDisplay";
 
 export default function ShopScreen() {
   const { shop } = useLocalSearchParams();
@@ -40,23 +43,74 @@ export default function ShopScreen() {
     setRefreshCheck(true);
   }, []);
 
+  function selectedItemDisplay() {
+    if (selectedItem) {
+      const transactionCompleteable = selectedItem.buying
+        ? playerCharacter!.getGold() >=
+          selectedItem.item.getBuyPrice(thisShop!.getAffection())
+        : thisShop!.getCurrentGold() >=
+          selectedItem.item.getSellPrice(thisShop!.getAffection());
+
+      return (
+        <View className="flex h-1/3 items-center justify-center">
+          <Text>{toTitleCase(selectedItem.item.name)}</Text>
+          <Image source={selectedItem.item.getItemIcon()} />
+          <Text>
+            {selectedItem.item.itemClass == "bodyArmor"
+              ? "Body Armor"
+              : toTitleCase(selectedItem.item.itemClass)}
+          </Text>
+          {selectedItem.item.slot ? (
+            <Text className="">
+              Fills {toTitleCase(selectedItem.item.slot)} Slot
+            </Text>
+          ) : null}
+          <View className="flex flex-row">
+            <Text>
+              Price:{" "}
+              {selectedItem.buying
+                ? selectedItem.item.getBuyPrice(thisShop!.getAffection())
+                : selectedItem.item.getSellPrice(thisShop!.getAffection())}
+            </Text>
+            <Coins width={20} height={20} style={{ marginLeft: 6 }} />
+          </View>
+          <View>
+            <Pressable
+              disabled={!transactionCompleteable}
+              onPress={moveBetweenInventories}
+              className={`${
+                !transactionCompleteable ? "bg-zinc-300" : "bg-blue-400"
+              } my-4 rounded-lg  active:scale-95 active:opacity-50`}
+            >
+              <Text className="px-6 py-4" style={{ color: "white" }}>
+                {selectedItem.buying ? "Purchase" : "Sell"}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      );
+    } else {
+      return <View className="flex h-1/3 items-center justify-center"></View>;
+    }
+  }
+
   function moveBetweenInventories() {
-    if (selectedItem && playerCharacter && thisShop) {
+    if (selectedItem && playerCharacter && thisShop && game) {
       if (selectedItem.buying) {
         const price = selectedItem.item.getBuyPrice(thisShop!.getAffection());
         playerCharacter.buyItem(selectedItem.item, price);
         thisShop.sellItem(selectedItem.item, price);
-        setSelectedItem(null);
-        dispatch(setPlayerCharacter(playerCharacter));
-        savePlayer(playerCharacter);
       } else {
         const price = selectedItem.item.getSellPrice(thisShop!.getAffection());
         thisShop.buyItem(selectedItem.item, price);
         playerCharacter.sellItem(selectedItem.item, price);
-        setSelectedItem(null);
-        dispatch(setPlayerCharacter(playerCharacter));
-        savePlayer(playerCharacter);
       }
+      setSelectedItem(null);
+      game.gameTick();
+      dispatch(setMonster(null));
+      dispatch(setGameData(game));
+      dispatch(setPlayerCharacter(playerCharacter));
+      fullSave(game, playerCharacter);
     }
   }
 
@@ -121,15 +175,7 @@ export default function ShopScreen() {
             </ScrollView>
           </View>
           {selectedItem ? (
-            <View className="flex h-1/3">
-              <SelectItemDisplay
-                playerCharacter={playerCharacter}
-                manipulatingFunction={moveBetweenInventories}
-                shop={thisShop}
-                item={selectedItem.item}
-                buyingItem={selectedItem.buying}
-              />
-            </View>
+            selectedItemDisplay()
           ) : (
             <View className="flex h-1/3 items-center justify-center" />
           )}
@@ -139,7 +185,10 @@ export default function ShopScreen() {
                 {playerCharacter.getName()}'s Inventory
               </Text>
               <View className="flex flex-row">
-                <Text className="my-auto"> ( {playerCharacter!.getGold()}</Text>
+                <Text className="my-auto">
+                  {" "}
+                  ( {playerCharacter!.getReadableGold()}
+                </Text>
                 <Coins width={16} height={16} style={{ marginLeft: 6 }} />
                 <Text> )</Text>
               </View>

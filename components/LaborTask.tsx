@@ -7,8 +7,10 @@ import { fullSave } from "../utility/functions";
 import { useDispatch, useSelector } from "react-redux";
 import { selectGame, selectPlayerCharacter } from "../redux/selectors";
 import { AppDispatch } from "../redux/store";
-import { setPlayerCharacter } from "../redux/slice/game";
+import { setGameData, setPlayerCharacter } from "../redux/slice/game";
 import ProgressBar from "./ProgressBar";
+import { debounce } from "lodash";
+import { useState } from "react";
 
 interface LaborTaskProps {
   title: string;
@@ -30,6 +32,7 @@ export default function LaborTask({
   const playerCharacter = useSelector(selectPlayerCharacter);
   const gameData = useSelector(selectGame);
   const dispatch: AppDispatch = useDispatch();
+  const [loading, setLoading] = useState<boolean>(false);
 
   if (!playerCharacter) {
     throw Error("No Player Character on Labor Task");
@@ -43,17 +46,21 @@ export default function LaborTask({
     }
   }
 
-  function work() {
+  const work = debounce(() => {
     if (playerCharacter && gameData) {
+      setLoading(true);
       playerCharacter.performLabor({
         title: title,
         cost: cost,
         goldReward: reward,
       });
+      gameData.gameTick();
       dispatch(setPlayerCharacter(playerCharacter));
+      dispatch(setGameData(gameData));
       fullSave(gameData, playerCharacter);
     }
-  }
+    setLoading(false);
+  }, 100);
 
   return (
     <View className="mx-2 my-2 flex justify-between rounded-xl bg-zinc-200 px-4 py-2 text-zinc-950 dark:bg-zinc-800">
@@ -86,7 +93,11 @@ export default function LaborTask({
       </View>
       {playerCharacter.getJobTitle() == title ? (
         <>
-          <Pressable className="mx-auto mb-2 mt-4" onPress={work}>
+          <Pressable
+            disabled={loading}
+            className="mx-auto mb-2 mt-4"
+            onPress={work}
+          >
             {({ pressed }) => (
               <View
                 className={`my-auto rounded-xl bg-sky-50 px-8 py-4 ${

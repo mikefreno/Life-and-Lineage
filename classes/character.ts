@@ -410,8 +410,13 @@ export class PlayerCharacter extends Character {
           this.removeEquipment("mainHand");
           this.equipment.mainHand = item;
         } else {
-          this.removeEquipment("offHand");
-          this.equipment.offHand = item;
+          if (this.equipment.offHand?.slot == "off-hand") {
+            this.removeEquipment("mainHand");
+            this.equipment.mainHand = item;
+          } else {
+            this.removeEquipment("offHand");
+            this.equipment.offHand = item;
+          }
         }
         this.removeFromInventory(item);
         break;

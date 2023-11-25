@@ -38,12 +38,11 @@ export default function BattleTab({ battleTab, useAttack }: BattleTabProps) {
   switch (battleTab) {
     case "attacks":
       return (
-        <ScrollView>
-          {attackObjects.map((attack, idx) => (
-            <View
-              key={idx}
-              className="border-b border-zinc-800 py-2 dark:border-zinc-100"
-            >
+        <FlatList
+          data={attackObjects}
+          inverted
+          renderItem={({ item: attack }) => (
+            <View className="border-t border-zinc-800 py-2 dark:border-zinc-100">
               <View className="flex flex-row justify-between">
                 <View className="flex flex-col justify-center">
                   <Text className="text-xl">{toTitleCase(attack.name)}</Text>
@@ -59,8 +58,8 @@ export default function BattleTab({ battleTab, useAttack }: BattleTabProps) {
                 </Pressable>
               </View>
             </View>
-          ))}
-        </ScrollView>
+          )}
+        />
       );
     case "spells":
       return <ScrollView></ScrollView>;
@@ -69,7 +68,7 @@ export default function BattleTab({ battleTab, useAttack }: BattleTabProps) {
     case "log":
       return (
         <View
-          className="flex-1 rounded border border-zinc-900 px-4 dark:border-zinc-100"
+          className="flex-1 rounded-t border-x border-t border-zinc-900 px-4 dark:border-zinc-100"
           style={{
             backgroundColor: colorScheme == "dark" ? "#09090b" : "#fff",
           }}

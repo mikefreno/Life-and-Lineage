@@ -7,8 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectGame, selectPlayerCharacter } from "../redux/selectors";
 import { AppDispatch } from "../redux/store";
 import ProgressBar from "./ProgressBar";
-import { setPlayerCharacter } from "../redux/slice/game";
-import { savePlayer } from "../utility/functions";
+import { setMonster, setPlayerCharacter } from "../redux/slice/game";
+import { fullSave, savePlayer } from "../utility/functions";
 
 interface MedicalOptionProps {
   title: string;
@@ -44,8 +44,10 @@ export default function MedicalOption({
         manaRestore,
         removeDebuffs,
       );
+      gameData?.gameTick();
       dispatch(setPlayerCharacter(playerCharacter));
-      savePlayer(playerCharacter);
+      dispatch(setMonster(null));
+      fullSave(gameData, playerCharacter);
     }
   }
 

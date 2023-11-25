@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Platform } from "react-native";
 
 interface ProgressBarProps {
   value: number;
@@ -40,9 +40,11 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
           },
         ]}
       >
-        <Text style={[styles.label, { marginTop: borderColor ? -1 : 0 }]}>
-          {value}
-        </Text>
+        <View className={`${Platform.OS === "android" ? "-mt-0.5" : ""}`}>
+          <Text style={[styles.label, { marginTop: borderColor ? -1 : 0 }]}>
+            {value}
+          </Text>
+        </View>
       </View>
     </View>
   );

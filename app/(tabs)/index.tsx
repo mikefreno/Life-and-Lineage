@@ -1,10 +1,10 @@
 import { Pressable, useColorScheme, Image } from "react-native";
 import { View, Text, ScrollView } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
-import { calculateAge, savePlayer } from "../../utility/functions";
+import { calculateAge, savePlayer, toTitleCase } from "../../utility/functions";
 import Coins from "../../assets/icons/CoinsIcon";
 import { useDispatch, useSelector } from "react-redux";
-import { selectPlayerCharacter } from "../../redux/selectors";
+import { selectGame, selectPlayerCharacter } from "../../redux/selectors";
 import ProgressBar from "../../components/ProgressBar";
 import PlayerStatus from "../../components/PlayerStatus";
 import { elementalColorMap } from "../../utility/elementColors";
@@ -25,15 +25,16 @@ import HoldingSkull from "../../assets/icons/HoldingSkull";
 import Virus from "../../assets/icons/VirusIcon";
 import Bones from "../../assets/icons/BonesIcon";
 import Drop from "../../assets/icons/DropIcon";
-import SelectItemDisplay from "../../components/SelectItemDisplay";
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const playerCharacter = useSelector(selectPlayerCharacter);
+  const gameData = useSelector(selectGame);
   const dispatch: AppDispatch = useDispatch();
   const [playerInventory, setPlayerInventory] = useState<Item[] | undefined>(
     playerCharacter?.getInventory(),
   );
+  const [showingInventory, setShowingInventory] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<{
     item: Item;
     equipped: "mainHand" | "offHand" | "body" | "head" | null;
@@ -46,19 +47,44 @@ export default function HomeScreen() {
     if (item) setSelectedItem({ item: item, equipped: equipped });
   }
 
-  //useEffect(() => {
-  //const testArmors = [
-  //0, 10, 25, 35, 50, 100, 200, 300, 400, 500, 550, 600, 700,
-  //];
-  //for (let armor of testArmors) {
-  //const reduction = damageReduction(armor);
-  //console.log(`${armor} armor => ${reduction} damage reduction`);
-  //}
-  //}, []);
-
   useEffect(() => {
     setPlayerInventory(playerCharacter?.getInventory());
   }, [playerCharacter]);
+
+  function selectedItemDisplay() {
+    if (selectedItem) {
+      return (
+        <View className="flex items-center justify-center py-4">
+          <Text>{toTitleCase(selectedItem.item.name)}</Text>
+          <Image source={selectedItem.item.getItemIcon()} />
+          <Text>
+            {selectedItem.item.itemClass == "bodyArmor"
+              ? "Body Armor"
+              : toTitleCase(selectedItem.item.itemClass)}
+          </Text>
+          {selectedItem.item.slot ? (
+            <Text className="">
+              Fills {toTitleCase(selectedItem.item.slot)} Slot
+            </Text>
+          ) : null}
+          {selectedItem.item.slot ? (
+            <View>
+              <Pressable
+                onPress={() => moveBetweenEquippedStates()}
+                className={`bg-blue-400 my-4 rounded-lg  active:scale-95 active:opacity-50`}
+              >
+                <Text className="px-6 py-4" style={{ color: "white" }}>
+                  {selectedItem.equipped ? "Unequip" : `Equip`}
+                </Text>
+              </Pressable>
+            </View>
+          ) : null}
+        </View>
+      );
+    } else {
+      return <View className="flex h-1/3 items-center justify-center"></View>;
+    }
+  }
 
   function moveBetweenEquippedStates() {
     if (playerCharacter) {
@@ -75,12 +101,12 @@ export default function HomeScreen() {
 
   function currentEquipmentDisplay() {
     return (
-      <View className="flex border-r border-zinc-900 pr-2 dark:border-zinc-50">
+      <View className="mr-2 flex border-r border-zinc-900 pr-2 dark:border-zinc-50">
         <View className="items-center">
-          <Text>Head</Text>
+          <Text className="mb-2">Head</Text>
           {playerCharacter?.getHeadItem() ? (
             <Pressable
-              className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
+              className="w-1/4 items-center active:scale-90 active:opacity-50"
               onPress={() =>
                 displaySetter(playerCharacter.getHeadItem(), "head")
               }
@@ -102,12 +128,12 @@ export default function HomeScreen() {
           )}
         </View>
         <View className="mt-2 flex flex-row">
-          <View className="mr-4 items-center">
-            <Text>Main Hand</Text>
+          <View className="">
+            <Text className="mb-2">Main Hand</Text>
             {playerCharacter?.getMainHandItem() &&
             playerCharacter?.getMainHandItem().name !== "unarmored" ? (
               <Pressable
-                className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
+                className="mx-auto w-1/4 items-center active:scale-90 active:opacity-50"
                 onPress={() =>
                   displaySetter(playerCharacter?.getMainHandItem(), "mainHand")
                 }
@@ -122,19 +148,17 @@ export default function HomeScreen() {
                 </View>
               </Pressable>
             ) : (
-              <View className="mt-2">
-                <View
-                  className="mx-auto h-12 w-12 rounded-lg"
-                  style={{ backgroundColor: "#a1a1aa" }}
-                />
-              </View>
+              <View
+                className="mx-auto h-12 w-12 rounded-lg"
+                style={{ backgroundColor: "#a1a1aa" }}
+              />
             )}
           </View>
-          <View className="mr-2 items-center">
-            <Text>Off-Hand</Text>
+          <View className="ml-6 mr-2">
+            <Text className="mb-2">Off-Hand</Text>
             {playerCharacter?.getOffHandItem() ? (
               <Pressable
-                className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
+                className="mx-auto w-1/4 items-center active:scale-90 active:opacity-50"
                 onPress={() =>
                   displaySetter(playerCharacter?.getOffHandItem(), "offHand")
                 }
@@ -150,7 +174,7 @@ export default function HomeScreen() {
               </Pressable>
             ) : playerCharacter?.getMainHandItem().slot == "two-hand" ? (
               <Pressable
-                className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
+                className="mx-auto w-1/4 items-center active:scale-90 active:opacity-50"
                 onPress={() =>
                   displaySetter(playerCharacter?.getMainHandItem(), "offHand")
                 }
@@ -166,20 +190,18 @@ export default function HomeScreen() {
                 </View>
               </Pressable>
             ) : (
-              <View className="mt-2">
-                <View
-                  className="mx-auto h-12 w-12 rounded-lg"
-                  style={{ backgroundColor: "#a1a1aa" }}
-                />
-              </View>
+              <View
+                className="mx-auto h-12 w-12 rounded-lg"
+                style={{ backgroundColor: "#a1a1aa" }}
+              />
             )}
           </View>
         </View>
         <View className="mx-auto items-center">
-          <Text>Body</Text>
+          <Text className="mb-2">Body</Text>
           {playerCharacter?.getBodyItem() ? (
             <Pressable
-              className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
+              className="w-1/4 items-center active:scale-90 active:opacity-50"
               onPress={() =>
                 displaySetter(playerCharacter?.getBodyItem(), "body")
               }
@@ -344,7 +366,7 @@ export default function HomeScreen() {
     }
   }
 
-  if (playerCharacter) {
+  if (playerCharacter && gameData) {
     const name = playerCharacter.getName();
     const jobRes = playerCharacter.getCurrentJobAndExperience();
     const magicProficiencies = playerCharacter.getMagicalProficiencies();
@@ -378,46 +400,58 @@ export default function HomeScreen() {
             <Text className="text-center text-xl dark:text-white">{`${jobRes?.title}`}</Text>
             <Text className="text-center text-xl dark:text-white">{`${
               playerCharacter
-                ? calculateAge(playerCharacter.birthdate, new Date())
+                ? calculateAge(
+                    playerCharacter.birthdate,
+                    gameData.getGameDate(),
+                  )
                 : "x"
             } years old`}</Text>
           </View>
           <View className="m-auto">{blessingDisplay()}</View>
         </View>
         <ScrollView>
-          <Text className="pb-2 text-center text-lg">
-            {playerCharacter?.getName()}'s Current Inventory
-          </Text>
-          {selectedItem ? (
-            <SelectItemDisplay
-              item={selectedItem.item}
-              isEquipped={selectedItem?.equipped ? true : false}
-              manipulatingFunction={moveBetweenEquippedStates}
-            />
-          ) : null}
           <View className="flex flex-row">
             {currentEquipmentDisplay()}
-            <ScrollView horizontal>
-              <View className="my-auto h-64 flex-wrap justify-around">
-                {playerInventory?.map((item) => (
-                  <Pressable
-                    key={item.id}
-                    className="m-2 items-center active:scale-90 active:opacity-50"
-                    onPress={() => displaySetter(item, null)}
-                  >
-                    <View
-                      className="rounded-lg p-2"
-                      style={{ backgroundColor: "#a1a1aa" }}
-                    >
-                      <Image source={item.getItemIcon()} />
-                    </View>
-                  </Pressable>
-                ))}
-              </View>
-            </ScrollView>
+            <View className="mx-auto">
+              {selectedItem ? (
+                <View className="my-auto">{selectedItemDisplay()}</View>
+              ) : null}
+            </View>
           </View>
+          <View className="py-4">
+            <Pressable onPress={() => setShowingInventory(!showingInventory)}>
+              <Image source={require("../../assets/images/items/Bag.png")} />
+            </Pressable>
+          </View>
+          {showingInventory ? (
+            <>
+              {playerCharacter.getInventory().length > 0 ? (
+                <ScrollView horizontal>
+                  <View className="my-auto max-h-64 flex-wrap justify-around">
+                    {playerInventory?.map((item) => (
+                      <Pressable
+                        key={item.id}
+                        className="m-2 items-center active:scale-90 active:opacity-50"
+                        onPress={() => displaySetter(item, null)}
+                      >
+                        <View
+                          className="rounded-lg p-2"
+                          style={{ backgroundColor: "#a1a1aa" }}
+                        >
+                          <Image source={item.getItemIcon()} />
+                        </View>
+                      </Pressable>
+                    ))}
+                  </View>
+                </ScrollView>
+              ) : (
+                <Text className="py-8 text-center italic">
+                  Inventory is currently empty
+                </Text>
+              )}
+            </>
+          ) : null}
           <View className="flex items-center pb-4">
-            <Text>{playerCharacter?.getName()}'s Proficiencies</Text>
             {magicProficiencySection(magicProficiencies)}
           </View>
         </ScrollView>

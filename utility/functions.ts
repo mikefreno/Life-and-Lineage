@@ -76,11 +76,11 @@ export const loadPlayer = async () => {
   }
 };
 
-export function calculateAge(birthdate: Date, currentDate: Date) {
-  let age = currentDate.getFullYear() - birthdate.getFullYear();
-  const m = currentDate.getMonth() - birthdate.getMonth();
+export function calculateAge(birthdate: Date, gameDate: Date) {
+  let age = gameDate.getFullYear() - birthdate.getFullYear();
+  const m = gameDate.getMonth() - birthdate.getMonth();
 
-  if (m < 0 || (m === 0 && currentDate.getDate() < birthdate.getDate())) {
+  if (m < 0 || (m === 0 && gameDate.getDate() < birthdate.getDate())) {
     age--;
   }
 
