@@ -128,7 +128,8 @@
     "manaCost": 50,
     "effects": {
       "damage": null,
-      "buffs": ["healing"],
+      "selfDamage": -35,
+      "buffs": null,
       "debuffs": null,
       "debuffChance": null
     }
@@ -176,7 +177,7 @@
     "manaCost": 200,
     "effects": {
       "damage": null,
-      "buffs": ["strong healing"],
+      "buffs": ["lasting heal"],
       "debuffs": null,
       "debuffChance": null
     }

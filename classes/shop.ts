@@ -3,7 +3,9 @@ import shops from "../assets/json/shops.json";
 
 import artifacts from "../assets/json/items/artifacts.json";
 import bodyArmor from "../assets/json/items/bodyArmor.json";
-import books from "../assets/json/items/books.json";
+import mageBooks from "../assets/json/items/mageBooks.json";
+import necroBooks from "../assets/json/items/necroBooks.json";
+import paladinBooks from "../assets/json/items/paladinBooks.json";
 import foci from "../assets/json/items/foci.json";
 import hats from "../assets/json/items/hats.json";
 import helmets from "../assets/json/items/helmets.json";
@@ -143,7 +145,10 @@ export class Shop {
 }
 
 //----------------------associated functions----------------------//
-function getAnItemByType(type: string): Item {
+function getAnItemByType(
+  type: string,
+  playerClass: "mage" | "paladin" | "necromancer",
+): Item {
   if (type == "artifact") {
     const idx = getRandomInt(0, artifacts.length - 1);
     const itemObj = artifacts[idx];
@@ -168,6 +173,14 @@ function getAnItemByType(type: string): Item {
     });
   }
   if (type == "book") {
+    let books;
+    if (playerClass == "paladin") {
+      books = paladinBooks;
+    } else if (playerClass == "necromancer") {
+      books = necroBooks;
+    } else {
+      books = mageBooks;
+    }
     const idx = getRandomInt(0, books.length - 1);
     const itemObj = books[idx];
     return new Item({

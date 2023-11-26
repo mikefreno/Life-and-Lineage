@@ -1,7 +1,26 @@
 import attacks from "../assets/json/monsterAttacks.json";
-import { flipCoin, rollD20 } from "../utility/functions";
+import monsters from "../assets/json/monsters.json";
+import { flipCoin, getRandomInt, rollD20 } from "../utility/functions";
 import conditions from "../assets/json/conditions.json";
 import { Condition } from "./conditions";
+
+import arrows from "../assets/json/items/arrows.json";
+import artifacts from "../assets/json/items/artifacts.json";
+import bodyArmors from "../assets/json/items/bodyArmor.json";
+import books from "../assets/json/items/books.json";
+import bows from "../assets/json/items/bows.json";
+import foci from "../assets/json/items/foci.json";
+import hats from "../assets/json/items/hats.json";
+import helmets from "../assets/json/items/helmets.json";
+import ingredients from "../assets/json/items/ingredients.json";
+import junk from "../assets/json/items/junk.json";
+import poisons from "../assets/json/items/poison.json";
+import potions from "../assets/json/items/potions.json";
+import robes from "../assets/json/items/robes.json";
+import shields from "../assets/json/items/shields.json";
+import wands from "../assets/json/items/wands.json";
+import weapons from "../assets/json/items/weapons.json";
+import { Item } from "./item";
 
 interface familiarOptions {
   name: string;
@@ -239,6 +258,61 @@ export class Monster {
   }
 
   //---------------------------Misc---------------------------//
+  public getDrops() {
+    const monsterObj = monsters.find(
+      (monster) => monster.name == this.creatureSpecies,
+    );
+    if (monsterObj) {
+      const dropList = monsterObj.drops;
+      const gold = getRandomInt(
+        monsterObj.goldDropRange.minimum,
+        monsterObj.goldDropRange.maximum,
+      );
+      let drops: Item[] = [];
+      dropList.forEach((drop) => {
+        const roll = rollD20();
+        if (roll * 5 > drop.chance) {
+          const items = itemList(drop.itemType);
+          const itemObj = items.find((item) => item.name == drop.item);
+          if (itemObj) {
+            drops.push(
+              new Item({
+                name: itemObj.name,
+                slot: itemObj.slot as
+                  | "head"
+                  | "body"
+                  | "one-hand"
+                  | "two-hand"
+                  | "off-hand"
+                  | undefined
+                  | null,
+                stats: itemObj.stats,
+                baseValue: itemObj.baseValue,
+                itemClass: drop.itemType as
+                  | "poison"
+                  | "weapon"
+                  | "junk"
+                  | "ingredient"
+                  | "bodyArmor"
+                  | "helmet"
+                  | "artifact"
+                  | "potion"
+                  | "wand"
+                  | "focus"
+                  | "shield"
+                  | "robe"
+                  | "hat"
+                  | "book",
+              }),
+            );
+          }
+        }
+      });
+      return { itemDrops: drops, gold: gold };
+    }
+    throw new Error("No found monster on Monster.getDrops()");
+  }
+
   public toJSON(): object {
     return {
       creatureSpecies: this.creatureSpecies,
@@ -271,5 +345,51 @@ export class Monster {
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
     });
+  }
+}
+
+function itemList(itemType: string): {
+  name: string;
+  baseValue: number;
+  slot?: string;
+  attacks?: string[];
+  icon?: string;
+  stats?: Record<string, number | undefined> | null;
+}[] {
+  switch (itemType) {
+    case "arrow":
+      return arrows;
+    case "artifact":
+      return artifacts;
+    case "bodyArmor":
+      return bodyArmors;
+    case "book":
+      return books;
+    case "bow":
+      return bows;
+    case "focus":
+      return foci;
+    case "hat":
+      return hats;
+    case "helmet":
+      return helmets;
+    case "ingredient":
+      return ingredients;
+    case "junk":
+      return junk;
+    case "poison":
+      return poisons;
+    case "potion":
+      return potions;
+    case "robe":
+      return robes;
+    case "shield":
+      return shields;
+    case "wand":
+      return wands;
+    case "weapon":
+      return weapons;
+    default:
+      throw new Error("invalid itemType");
   }
 }

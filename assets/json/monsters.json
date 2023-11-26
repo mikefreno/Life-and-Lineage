@@ -6,6 +6,11 @@
       "attackPowerRange": {"minimum": 0, "maximum": 0},
       "energy": {"maximum": 0, "regen": 0},
       "attacks": [],
+      "drops": [
+         {"item": "stick", "itemType":"weapon", "chance": 1.0},
+         {"item": "big stick", "itemType":"weapon","chance":0.85}
+      ],
+      "goldDropRange": {"minimum": 0, "maximum":0},
       "appearsIn": ["training grounds"],
       "appearsOn": [0]
    },
@@ -16,6 +21,11 @@
       "attackPowerRange": {"minimum": 2, "maximum": 5},
       "energy": {"maximum": 30, "regen": 5},
       "attacks": ["bite"],
+      "drops": [
+         {"item": "patch of hair", "itemType":"junk", "chance": 0.85},
+         {"item": "rat tail", "itemType":"ingredient","chance":0.5}
+      ],
+      "goldDropRange": {"minimum": 5, "maximum":15},
       "appearsIn": ["nearby cave"],
       "appearsOn": [1,2]
    },
@@ -26,6 +36,11 @@
       "attackPowerRange": {"minimum": 3, "maximum": 8},
       "energy": {"maximum": 30, "regen": 5},
       "attacks": ["vampiric bite"],
+      "drops": [
+         {"item": "bat wing", "itemType":"ingredient","chance":0.75},
+         {"item": "vampiric tooth", "itemType":"junk", "chance": 0.5}
+      ],
+      "goldDropRange": {"minimum": 5, "maximum":20},
       "appearsIn": ["nearby cave"],
       "appearsOn": [1,2]
    },
@@ -36,6 +51,12 @@
       "attackPowerRange": {"minimum": 4, "maximum": 8},
       "energy": {"maximum": 50, "regen": 5},
       "attacks": ["stab", "cleave"],
+      "drops": [
+         {"item": "bone", "itemType":"ingredient","chance":0.75},
+         {"item": "bone", "itemType":"ingredient","chance":0.75},
+         {"item": "dagger", "itemType":"weapon","chance":0.10}
+      ],
+      "goldDropRange": {"minimum": 10, "maximum":20},
       "appearsIn": ["nearby cave"],
       "appearsOn": [2,3,4]
    },
@@ -46,6 +67,16 @@
       "attackPowerRange": {"minimum": 4, "maximum": 8},
       "energy": {"maximum": 50, "regen": 5},
       "attacks": ["shoot"],
+      "drops": [
+         {"item": "bone", "itemType":"ingredient","chance":0.75},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
+         {"item": "short bow", "itemType":"bow", "chance": 0.10}
+      ],
+      "goldDropRange": {"minimum": 15, "maximum":25},
       "appearsIn": ["nearby cave"],
       "appearsOn": [2,3,4]
    },
@@ -56,6 +87,11 @@
       "attackPowerRange": {"minimum": 3, "maximum": 7},
       "energy": {"maximum": 50, "regen": 5},
       "attacks": ["stab", "pocket sand", "rock throw", "torch stab"],
+      "drops": [
+         {"item": "dagger", "itemType":"weapon","chance":0.10},
+         {"item": "torch", "itemType":"weapon", "chance": 0.10}
+      ],
+      "goldDropRange": {"minimum": 35, "maximum":65},
       "appearsIn": ["nearby cave"],
       "appearsOn": [2,3,4]
    },
@@ -66,6 +102,11 @@
       "attackPowerRange": {"minimum": 5, "maximum": 10},
       "energy": {"maximum": 50, "regen": 5},
       "attacks": ["grab", "zombie bite"],
+      "drops": [
+         {"item": "chunk of flesh", "itemType":"junk","chance":0.75},
+         {"item": "chunk of flesh", "itemType":"junk","chance":0.75}
+      ],
+      "goldDropRange": {"minimum": 20, "maximum":25},
       "appearsIn": ["nearby cave"],
       "appearsOn": [3,4,5]
    },
@@ -76,6 +117,10 @@
       "attackPowerRange": {"minimum": 0, "maximum": 0},
       "energy": {"maximum": 50, "regen": 5},
       "attacks": ["wail"],
+      "drops": [
+         {"item": "ghostly residue", "itemType":"ingredient","chance":0.5}
+      ],
+      "goldDropRange": {"minimum": 0, "maximum":0},
       "appearsIn": ["nearby cave"],
       "appearsOn": [3,4,5]
    },
@@ -86,6 +131,13 @@
       "attackPowerRange": {"minimum": 8, "maximum": 10},
       "energy": {"maximum": 50, "regen": 3},
       "attacks": ["stab", "pocket sand","serrate"],
+      "drops": [
+         {"item": "dagger", "itemType":"weapon","chance":0.15},
+         {"item": "dagger", "itemType":"weapon","chance":0.15},
+         {"item": "cheap leather chestpiece", "itemType":"bodyArmor","chance":0.15},
+         {"item": "leather headgear", "itemType":"helmet","chance":0.15}
+      ],
+      "goldDropRange": {"minimum": 30, "maximum":50},
       "appearsIn": ["bandit hideout"],
       "appearsOn": [1,2,3]
    }

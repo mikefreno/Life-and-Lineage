@@ -1,0 +1,39 @@
+[
+   {
+    "name": "flash heal",
+    "element": "holy",
+    "proficiencyNeeded": 0,
+    "manaCost": 25,
+    "effects": {
+      "damage": null,
+      "selfDamage": -35,
+      "buffs": null,
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "judgment",
+    "element": "vengeance",
+    "proficiencyNeeded": 0,
+    "manaCost": 25,
+    "effects": {
+      "damage": 25,
+      "buffs": null,
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "blessed guard",
+    "element": "protection",
+    "proficiencyNeeded": 0,
+    "manaCost": 25,
+    "effects": {
+      "damage": null,
+      "buffs": ["guard"],
+      "debuffs": null,
+      "debuffChance": null
+    }
+  }
+]

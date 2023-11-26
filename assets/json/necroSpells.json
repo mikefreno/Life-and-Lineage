@@ -1,0 +1,90 @@
+[
+  {
+    "name": "pull blood",
+    "element": "blood",
+    "proficiencyNeeded": 0,
+    "manaCost": 30,
+    "effects": {
+      "damage": 18,
+      "buffs": null,
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "life tap",
+    "element": "blood",
+    "proficiencyNeeded": 50,
+    "manaCost": -35,
+    "effects": {
+      "damage": null,
+      "selfDamage": 20,
+      "buffs": null,
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "vampiric touch",
+    "element": "blood",
+    "proficiencyNeeded": 100,
+    "manaCost": 50,
+    "effects": {
+      "damage": 30,
+      "selfDamage": -30,
+      "buffs": null,
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "summon flying skull",
+    "element": "summoning",
+    "proficiencyNeeded": 0,
+    "manaCost": 50,
+    "effects": {
+      "damage": null,
+      "buffs": null,
+      "debuffs": null,
+      "debuffChance": null,
+      "summon": ["flying skull"]
+    }
+  },
+  {
+    "name": "raise skeleton",
+    "element": "summoning",
+    "proficiencyNeeded": 50,
+    "manaCost": 50,
+    "effects": {
+      "damage": null,
+      "buffs": null,
+      "debuffs": null,
+      "debuffChance": null,
+      "summon": ["skeleton"]
+    }
+  },
+  {
+    "name": "teeth",
+    "element": "bone",
+    "proficiencyNeeded": 0,
+    "manaCost": 15,
+    "effects": {
+      "damage": 10,
+      "buffs": null,
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "poison dart",
+    "element": "pestilence",
+    "proficiencyNeeded": 0,
+    "manaCost": 25,
+    "effects": {
+      "damage": 5,
+      "buffs": null,
+      "debuffs": ["poison"],
+      "debuffChance": [0.75] 
+    }
+  }
+]

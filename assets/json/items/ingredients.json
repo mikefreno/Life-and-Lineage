@@ -8,5 +8,10 @@
       "name": "rat tail",
       "icon":"Monster_Meat",
       "baseValue": 15
+   },
+   {
+      "name": "ghostly residue",
+      "icon":"Monster_Meat",
+      "baseValue": 100
    }
 ]

@@ -2,8 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 interface ItemOptions {
   id?: string;
   name: string;
-  slot: "head" | "body" | "one-hand" | "two-hand" | "off-hand" | null;
-  stats: Record<string, number | undefined> | null;
+  slot?: "head" | "body" | "one-hand" | "two-hand" | "off-hand" | null;
+  stats?: Record<string, number | undefined> | null;
   baseValue: number;
   itemClass:
     | "artifact"
@@ -57,8 +57,8 @@ export class Item {
   }: ItemOptions) {
     this.id = id ?? uuidv4();
     this.name = name;
-    this.slot = slot;
-    this.stats = stats;
+    this.slot = slot ?? null;
+    this.stats = stats ?? null;
     this.baseValue = baseValue;
     this.itemClass = itemClass;
     this.icon = icon;

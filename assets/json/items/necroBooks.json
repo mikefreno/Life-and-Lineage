@@ -1,0 +1,30 @@
+[
+   {
+      "name": "book of pull blood",
+      "type": "spell",
+      "teaches": "pull blood",
+      "icon": "Book",
+      "baseValue": 2500
+   },
+   {
+      "name": "book of the flying skull",
+      "type": "spell",
+      "teaches": "summon flying skull",
+      "icon": "Book",
+      "baseValue": 2500
+   },
+   {
+      "name": "book of teeth",
+      "type": "spell",
+      "teaches": "teeth",
+      "icon": "Book",
+      "baseValue": 2500
+   },
+   {
+      "name": "book of poison dart",
+      "type": "spell",
+      "teaches": "teeth",
+      "icon": "Book",
+      "baseValue": 2500
+   }
+]

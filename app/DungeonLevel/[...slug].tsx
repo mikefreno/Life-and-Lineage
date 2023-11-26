@@ -139,6 +139,7 @@ export default function DungeonLevelScreen() {
         }
         battleLogger(line);
         if (hp <= 0 || (sanity && sanity <= 0)) {
+          gameData.gameTick();
           if (thisDungeon?.level != 0) {
             thisDungeon?.incrementStep();
           }
@@ -266,7 +267,7 @@ export default function DungeonLevelScreen() {
             </View>
           </View>
           {thisDungeon.stepsBeforeBoss !== 0 && !fightingBoss ? (
-            <View className="-mt-7 mb-1 flex flex-row justify-evenly border-b border-zinc-900 dark:border-zinc-50">
+            <View className="-mt-7 flex flex-row justify-evenly border-b border-zinc-900 dark:border-zinc-50">
               <Text className="my-auto text-xl">
                 {`Steps Completed: ${thisDungeon.getStep()} / ${
                   thisDungeon.stepsBeforeBoss

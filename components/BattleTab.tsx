@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import { View, Text, ScrollView } from "./Themed";
 import { Pressable, useColorScheme, FlatList } from "react-native";
 import attacks from "../assets/json/playerAttacks.json";
@@ -68,7 +67,7 @@ export default function BattleTab({ battleTab, useAttack }: BattleTabProps) {
     case "log":
       return (
         <View
-          className="flex-1 rounded-t border-x border-t border-zinc-900 px-4 dark:border-zinc-100"
+          className="my-2 flex-1 rounded border border-zinc-900 px-4 dark:border-zinc-100"
           style={{
             backgroundColor: colorScheme == "dark" ? "#09090b" : "#fff",
           }}

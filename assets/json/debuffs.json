@@ -1,0 +1,66 @@
+[
+   {
+      "name": "stun",
+      "turns": 1,
+      "effect": ["skip"],
+      "effectStyle": null,
+      "effectAmount": null
+   },
+   {
+      "name": "heavy stun",
+      "turns": 2,
+      "effect": ["skip"],
+      "effectStyle": null,
+      "effectAmount": null
+   },
+   {
+      "name": "blind",
+      "turns": 2,
+      "effect": ["accuracy halved"],
+      "effectStyle": null,
+      "effectAmount": null
+   },
+   {
+      "name": "bleed",
+      "turns": 4,
+      "effect": ["damage"],
+      "effectStyle": "percentage",
+      "effectAmount": 0.020
+   },
+   {
+      "name": "hemmorage",
+      "turns": 2,
+      "effect": ["damage"],
+      "effectStyle": "percentage",
+      "effectAmount": 0.050
+   },
+   {
+      "name": "poison",
+      "turns": 10,
+      "effect": ["damage"],
+      "effectStyle": "percentage",
+      "effectAmount": 0.010
+   },
+   {
+      "name": "diseased",
+      "turns": 10,
+      "effect": ["damage", "accuracy halved"],
+      "effectStyle": "multiplier",
+      "effectAmount": 0.10
+   },
+   {
+      "name": "burn",
+      "turns": 4,
+      "effect": ["damage"],
+      "effectStyle": "multiplier",
+      "effectAmount": 0.25
+   },
+   {
+      "name": "fear",
+      "turns": 5,
+      "effect": ["sanity"],
+      "effectStyle": "flat",
+      "effectAmount": -1
+   },
+
+]

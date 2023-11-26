@@ -36,6 +36,24 @@
       "secondaryEffectChance": [0.20]
    },
    {
+      "name": "shoot",
+      "targets": "single",
+      "hitChance": 0.95,
+      "damageMult": 1.0,
+      "sanityDamage": 0,
+      "secondaryEffect": null,
+      "secondaryEffectChance": null
+   },
+   {
+      "name": "rooting shot",
+      "targets": "single",
+      "hitChance": 0.95,
+      "damageMult": 0.75,
+      "sanityDamage": 0,
+      "secondaryEffect": ["stun"],
+      "secondaryEffectChance": [0.5] 
+   },
+   {
       "name": "torch stab",
       "targets": "single",
       "hitChance": 1.0,

@@ -1,0 +1,9 @@
+[
+   {
+      "name": "lasting heal",
+      "turns": 5,
+      "effect": ["health"],
+      "effectStyle": "flat",
+      "effectAmount": 25 
+   }
+]

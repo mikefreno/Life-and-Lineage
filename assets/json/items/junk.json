@@ -6,5 +6,9 @@
    {
       "name":"vampiric tooth",
       "baseValue": 25
+   },
+   {
+      "name":"chunk of flesh",
+      "baseValue": 40
    }
 ]

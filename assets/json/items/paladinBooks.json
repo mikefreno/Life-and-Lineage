@@ -1,0 +1,23 @@
+[
+   {
+      "name": "book of flash heal",
+      "type": "spell",
+      "teaches": "flash heal",
+      "icon": "Book",
+      "baseValue": 2500
+   },
+   {
+      "name": "book of judgment",
+      "type": "spell",
+      "teaches": "judgment",
+      "icon": "Book",
+      "baseValue": 2500
+   },
+   {
+      "name": "book of blessed guard",
+      "type": "spell",
+      "teaches": "blessed guard",
+      "icon": "Book",
+      "baseValue": 2500
+   }
+]

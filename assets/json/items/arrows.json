@@ -1,0 +1,34 @@
+[
+   {
+      "name": "iron arrow",
+      "baseValue": 2,
+      "icon": "Arrow",
+      "stats":{
+         "damage": 1.0
+      }
+   },
+   {
+      "name": "steel arrow",
+      "baseValue": 4,
+      "icon": "Arrow",
+      "stats":{
+         "damage": 1.5
+      }
+   },
+   {
+      "name": "refined arrow",
+      "baseValue": 8,
+      "icon": "Arrow",
+      "stats":{
+         "damage": 2.5
+      }
+   },
+   {
+      "name": "refined arrow",
+      "baseValue": 8,
+      "icon": "Arrow",
+      "stats":{
+         "damage": 2.5
+      }
+   }
+]

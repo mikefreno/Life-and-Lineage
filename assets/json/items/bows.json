@@ -1,0 +1,12 @@
+[
+   {
+      "name": "short bow",
+      "baseValue": 300,
+      "slot": "two-hand",
+      "attacks": ["shoot", "rooting shot"],
+      "icon":"Bow",
+      "stats":{
+         "damage": 5.5
+      }
+   }
+]
