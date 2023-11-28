@@ -343,7 +343,7 @@ export default function DungeonLevelScreen() {
                 : `${toTitleCase(thisInstance?.name as string)} Level ${level}`,
           }}
         />
-        {LootDrop()}
+        {lootDrop()}
         <View className="flex-1 px-4 py-6">
           <View className="flex h-1/3 flex-row justify-evenly">
             <View className="flex w-2/5 flex-col items-center justify-center">

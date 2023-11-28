@@ -217,6 +217,7 @@ export function createShops(playerClass: "mage" | "paladin" | "necromancer") {
   });
   return createdShops;
 }
+
 export function createDebuff(
   debuffName: string,
   debuffChance: number,

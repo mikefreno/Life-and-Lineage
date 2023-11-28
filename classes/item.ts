@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import mageBooks from "../assets/json/items/mageBooks.json";
 import necroBooks from "../assets/json/items/necroBooks.json";
-import paladingBooks from "../assets/json/items/paladinBooks.json";
+import paladinBooks from "../assets/json/items/paladinBooks.json";
 import mageSpells from "../assets/json/mageSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
@@ -94,7 +94,7 @@ export class Item {
   public getAttachedSpell(playerClass: "mage" | "paladin" | "necromancer") {
     if (this.itemClass == "book") {
       if (playerClass == "mage") {
-        const bookObj = mageBooks.find((book) => (book.name = this.name));
+        const bookObj = mageBooks.find((book) => book.name == this.name);
         const spell = mageSpells.find(
           (mageSpell) => bookObj?.teaches == mageSpell.name,
         );
@@ -104,9 +104,9 @@ export class Item {
         return spell;
       }
       if (playerClass == "necromancer") {
-        const bookObj = necroBooks.find((book) => (book.name = this.name));
+        const bookObj = necroBooks.find((book) => book.name == this.name);
         const spell = necroSpells.find(
-          (mageSpell) => bookObj?.teaches == mageSpell.name,
+          (necroSpell) => bookObj?.teaches == necroSpell.name,
         );
         if (!spell) {
           throw new Error(`missing spell from Book Item ${this.name}`);
@@ -114,9 +114,9 @@ export class Item {
         return spell;
       }
       if (playerClass == "paladin") {
-        const bookObj = paladingBooks.find((book) => (book.name = this.name));
+        const bookObj = paladinBooks.find((book) => book.name == this.name);
         const spell = paladinSpells.find(
-          (mageSpell) => bookObj?.teaches == mageSpell.name,
+          (paladinSpell) => bookObj?.teaches == paladinSpell.name,
         );
         if (!spell) {
           throw new Error(`missing spell from Book Item ${this.name}`);

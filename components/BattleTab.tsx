@@ -1,9 +1,6 @@
 import { View, Text, ScrollView } from "./Themed";
 import { Pressable, useColorScheme, FlatList } from "react-native";
 import attacks from "../assets/json/playerAttacks.json";
-import mageSpells from "../assets/json/mageSpells.json";
-import necroSpells from "../assets/json/necroSpells.json";
-import paladinSpells from "../assets/json/paladinSpells.json";
 import { toTitleCase } from "../utility/functions";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
@@ -60,20 +57,6 @@ export default function BattleTab({
     debuffs: { name: string; chance: number }[] | null;
   }[] = [];
 
-  let spellObjects: {
-    name: string;
-    element: string;
-    proficiencyNeeded: number;
-    manaCost: number;
-    effects: {
-      damage: number | null;
-      buffs: string[] | null;
-      debuffs: { name: string; chance: number }[] | null;
-      summon?: string[];
-      selfDamage?: number;
-    };
-  }[] = [];
-
   playerAttacks.forEach((plAttack) =>
     attacks.filter((attack) => {
       if (attack.name == plAttack) {
@@ -81,18 +64,6 @@ export default function BattleTab({
       }
     }),
   );
-
-  let spells;
-  if (playerCharacter.playerClass == "paladin") {
-    spells = paladinSpells;
-  } else if (playerCharacter.playerClass == "necromancer") {
-    spells = necroSpells;
-  } else spells = mageSpells;
-  spells.forEach((spell) => {
-    if (playerSpells.includes(spell.name)) {
-      spellObjects.push(spell);
-    }
-  });
 
   switch (battleTab) {
     case "attacks":
@@ -123,7 +94,7 @@ export default function BattleTab({
     case "spells":
       return (
         <FlatList
-          data={spellObjects}
+          data={playerSpells}
           inverted
           renderItem={({ item: spell }) => (
             <View className="border-t border-zinc-800 py-2 dark:border-zinc-100">
@@ -132,10 +103,19 @@ export default function BattleTab({
                   <Text className="text-xl">{toTitleCase(spell.name)}</Text>
                 </View>
                 <Pressable
+                  disabled={playerCharacter.getMana() <= spell.manaCost}
                   onPress={() => useSpell(spell)}
-                  className="my-auto rounded bg-zinc-300 px-4 py-2 active:scale-95 active:opacity-50 dark:bg-zinc-700"
+                  className={`my-auto rounded  px-4 py-2 active:scale-95 active:opacity-50 ${
+                    playerCharacter.getMana() <= spell.manaCost
+                      ? ""
+                      : "bg-zinc-300 dark:bg-zinc-700"
+                  }`}
                 >
-                  <Text className="text-xl">Use</Text>
+                  <Text className="text-xl">
+                    {playerCharacter.getMana() <= spell.manaCost
+                      ? "Not Enough Mana"
+                      : "Use"}
+                  </Text>
                 </Pressable>
               </View>
             </View>

@@ -9,11 +9,10 @@ import HoldingSkull from "../assets/icons/HoldingSkull";
 import Virus from "../assets/icons/VirusIcon";
 import Bones from "../assets/icons/BonesIcon";
 import Drop from "../assets/icons/DropIcon";
-import { ColorSchemeName } from "react-native";
 
 export default function blessingDisplay(
   blessing: string,
-  colorScheme: ColorSchemeName,
+  colorScheme: string,
   size: number = 100,
 ) {
   switch (blessing) {

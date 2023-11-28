@@ -3,13 +3,14 @@ import "../assets/styles/globals.css";
 import { useDispatch, useSelector } from "react-redux";
 import { selectGame, selectPlayerCharacter } from "../redux/selectors";
 import ProgressBar from "../components/ProgressBar";
-import { Pressable, Image, useColorScheme } from "react-native";
+import { Pressable, Image } from "react-native";
 import { useEffect, useState } from "react";
 import { Item } from "../classes/item";
 import blessingDisplay from "../components/BlessingsDisplay";
 import { fullSave, toTitleCase } from "../utility/functions";
 import { setGameData, setPlayerCharacter } from "../redux/slice/game";
 import { elementalColorMap } from "../utility/elementColors";
+import { useColorScheme } from "nativewind";
 
 export default function LearningSpellsScreen() {
   const playerCharacter = useSelector(selectPlayerCharacter);
@@ -19,7 +20,8 @@ export default function LearningSpellsScreen() {
   const inventory = playerCharacter.getInventory();
   const books = inventory.filter((item) => item.itemClass == "book");
   const dispatch = useDispatch();
-  const colorScheme = useColorScheme();
+
+  const { colorScheme } = useColorScheme();
 
   const studyingState = playerCharacter.learningSpells;
   const [selectedBook, setSelectedBook] = useState<Item | null>(null);
@@ -140,9 +142,9 @@ export default function LearningSpellsScreen() {
           <Text className="text-lg">{toTitleCase(selectedBook.name)}</Text>
           <View className="flex flex-row">
             <Text className="my-auto text-xl">School: </Text>
-            <View className="py-2">
+            <View className="items-center py-2">
               {blessingDisplay(selectedBookSpell.element, colorScheme, 50)}
-              <Text>{}</Text>
+              <Text>{toTitleCase(selectedBookSpell.element)}</Text>
             </View>
           </View>
           <Text className="text-2xl tracking-wide">
@@ -184,6 +186,11 @@ export default function LearningSpellsScreen() {
               ))}
             </View>
           </ScrollView>
+        </View>
+      ) : null}
+      {filteredBooks.length == 0 && studyingState.length == 0 ? (
+        <View className="-mt-24 flex-1 items-center justify-center">
+          <Text className="text-xl italic">No Books to Learn From</Text>
         </View>
       ) : null}
     </View>

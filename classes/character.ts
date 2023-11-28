@@ -4,6 +4,9 @@ import conditions from "../assets/json/conditions.json";
 import { Item } from "./item";
 import weapons from "../assets/json/items/weapons.json";
 import wands from "../assets/json/items/wands.json";
+import mageSpells from "../assets/json/mageSpells.json";
+import paladinSpells from "../assets/json/paladinSpells.json";
+import necroSpells from "../assets/json/necroSpells.json";
 
 interface CharacterOptions {
   firstName: string;
@@ -596,13 +599,66 @@ export class PlayerCharacter extends Character {
     this.learningSpells = newSpellExperience;
   }
 
-  public getSpells() {
+  public getSpellNames() {
     return this.knownSpells;
+  }
+
+  public getSpells() {
+    let spellList: {
+      name: string;
+      element: string;
+      proficiencyNeeded: number;
+      manaCost: number;
+      effects: {
+        damage: number | null;
+        buffs: string[] | null;
+        debuffs:
+          | {
+              name: string;
+              chance: number;
+            }[]
+          | null;
+        summon?: string[];
+        selfDamage?: number;
+      };
+    }[];
+    if (this.playerClass == "paladin") {
+      spellList = paladinSpells;
+    } else if (this.playerClass == "necromancer") {
+      spellList = necroSpells;
+    } else spellList = mageSpells;
+
+    let spells: {
+      name: string;
+      element: string;
+      proficiencyNeeded: number;
+      manaCost: number;
+      effects: {
+        damage: number | null;
+        buffs: string[] | null;
+        debuffs:
+          | {
+              name: string;
+              chance: number;
+            }[]
+          | null;
+        summon?: string[];
+        selfDamage?: number;
+      };
+    }[] = [];
+    this.knownSpells.forEach((spell) => {
+      const found = spellList.find((spellObj) => spell == spellObj.name);
+      if (found) {
+        spells.push(found);
+      }
+    });
+    return spells;
   }
 
   public learnSpellCompletion(spell: string, bookName: string) {
     let newState = this.knownSpells.map((spell) => spell);
     newState.push(spell);
+    this.knownSpells = newState;
     let newLearningState = this.learningSpells.filter((spellWithExp) => {
       console.log(spellWithExp);
       console.log(spell);
@@ -614,6 +670,7 @@ export class PlayerCharacter extends Character {
     if (book) {
       this.removeFromInventory(book);
     }
+    console.log(newLearningState);
     this.learningSpells = newLearningState;
   }
   //----------------------------------Relationships----------------------------------//
@@ -733,6 +790,7 @@ export class PlayerCharacter extends Character {
     monsterMaxHP: number,
   ) {
     if (chosenSpell.manaCost <= this.mana) {
+      this.mana -= chosenSpell.manaCost;
       const enemyDamage = chosenSpell.effects.damage;
       const selfDamage = chosenSpell.effects.selfDamage;
       if (selfDamage) {

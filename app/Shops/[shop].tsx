@@ -2,12 +2,7 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import { View, Text } from "../../components/Themed";
 import { useDispatch, useSelector } from "react-redux";
 import { selectGame, selectPlayerCharacter } from "../../redux/selectors";
-import {
-  calculateAge,
-  fullSave,
-  savePlayer,
-  toTitleCase,
-} from "../../utility/functions";
+import { calculateAge, fullSave, toTitleCase } from "../../utility/functions";
 import { CharacterImage } from "../../components/CharacterImage";
 import { Pressable, Image, ScrollView, useColorScheme } from "react-native";
 import { useEffect, useState } from "react";
@@ -19,6 +14,7 @@ import {
   setPlayerCharacter,
 } from "../../redux/slice/game";
 import { AppDispatch } from "../../redux/store";
+import SpellDetails from "../../components/SpellDetails";
 
 export default function ShopScreen() {
   const { shop } = useLocalSearchParams();
@@ -32,6 +28,24 @@ export default function ShopScreen() {
     buying: boolean;
   } | null>(null);
   const [refreshCheck, setRefreshCheck] = useState<boolean>(false);
+  const [selectedSpell, setSelectedSpell] = useState<{
+    name: string;
+    element: string;
+    proficiencyNeeded: number;
+    manaCost: number;
+    effects: {
+      damage: number | null;
+      buffs: string[] | null;
+      debuffs:
+        | {
+            name: string;
+            chance: number;
+          }[]
+        | null;
+      summon?: string[] | undefined;
+      selfDamage?: number | undefined;
+    };
+  } | null>(null);
 
   useEffect(() => {
     if (
@@ -88,6 +102,7 @@ export default function ShopScreen() {
               </Text>
             </Pressable>
           </View>
+          {selectedSpell ? <SpellDetails spell={selectedSpell} /> : null}
         </View>
       );
     } else {
@@ -117,6 +132,12 @@ export default function ShopScreen() {
 
   function displaySetter(item: Item, buying: boolean) {
     setSelectedItem({ item: item, buying: buying });
+    if (item.itemClass == "book" && playerCharacter) {
+      const spell = item.getAttachedSpell(playerCharacter.playerClass);
+      setSelectedSpell(spell);
+    } else {
+      setSelectedSpell(null);
+    }
   }
 
   if (refreshCheck && thisShop && game && playerCharacter) {

@@ -23,7 +23,7 @@
    {
       "name": "book of poison dart",
       "type": "spell",
-      "teaches": "teeth",
+      "teaches": "poison dart",
       "icon": "Book",
       "baseValue": 2500
    }
