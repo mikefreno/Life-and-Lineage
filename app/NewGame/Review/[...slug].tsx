@@ -1,6 +1,10 @@
 import { View as ThemedView, Text } from "../../../components/Themed";
 import { Pressable, View } from "react-native";
-import { Character, PlayerCharacter } from "../../../classes/character";
+import {
+  Character,
+  PlayerCharacter,
+  getStartingBook,
+} from "../../../classes/character";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import names from "../../../assets/json/names.json";
 import jobs from "../../../assets/json/jobs.json";
@@ -103,26 +107,49 @@ export default function NewGameReview() {
   }
 
   function startGame() {
-    const player = createPlayerCharacter();
-    dispatch(setPlayerCharacter(player));
-    const startDate = new Date();
-    const shops = createShops();
-    const newGame = new Game({ date: startDate, shops: shops });
-    dispatch(setGameData(newGame));
-    saveGame(newGame);
-    savePlayer(player);
-    dispatch(setLogs([]));
-    dispatch(setMonster(null));
+    if (
+      playerClass == "mage" ||
+      playerClass == "paladin" ||
+      playerClass == "necromancer"
+    ) {
+      const player = createPlayerCharacter();
+      const starterBook = getStartingBook(
+        blessing as
+          | "fire"
+          | "water"
+          | "air"
+          | "earth"
+          | "blood"
+          | "summons"
+          | "pestilence"
+          | "bone"
+          | "holy"
+          | "vengeance"
+          | "protection",
+      );
+      player.addToInventory(starterBook);
+      dispatch(setPlayerCharacter(player));
+      const startDate = new Date();
+      const shops = createShops(
+        playerClass as "mage" | "paladin" | "necromancer",
+      );
+      const newGame = new Game({ date: startDate, shops: shops });
+      dispatch(setGameData(newGame));
+      saveGame(newGame);
+      savePlayer(player);
+      dispatch(setLogs([]));
+      dispatch(setMonster(null));
 
-    try {
-      router.back();
-      router.back();
-      router.back();
-      router.back();
-    } catch (e) {
-      console.log(e);
+      try {
+        router.back();
+        router.back();
+        router.back();
+        router.back();
+      } catch (e) {
+        console.log(e);
+      }
+      router.replace("/");
     }
-    router.replace("/");
   }
 
   return (

@@ -1,6 +1,7 @@
 [
    {
       "name": "stun",
+      "style": "debuff",
       "turns": 1,
       "effect": ["skip"],
       "effectStyle": null,
@@ -8,6 +9,7 @@
    },
    {
       "name": "heavy stun",
+      "style": "debuff",
       "turns": 2,
       "effect": ["skip"],
       "effectStyle": null,
@@ -15,6 +17,7 @@
    },
    {
       "name": "blind",
+      "style": "debuff",
       "turns": 2,
       "effect": ["accuracy halved"],
       "effectStyle": null,
@@ -22,6 +25,7 @@
    },
    {
       "name": "bleed",
+      "style": "debuff",
       "turns": 4,
       "effect": ["damage"],
       "effectStyle": "percentage",
@@ -29,6 +33,7 @@
    },
    {
       "name": "hemmorage",
+      "style": "debuff",
       "turns": 2,
       "effect": ["damage"],
       "effectStyle": "percentage",
@@ -36,6 +41,7 @@
    },
    {
       "name": "poison",
+      "style": "debuff",
       "turns": 10,
       "effect": ["damage"],
       "effectStyle": "percentage",
@@ -43,6 +49,7 @@
    },
    {
       "name": "diseased",
+      "style": "debuff",
       "turns": 10,
       "effect": ["damage", "accuracy halved"],
       "effectStyle": "multiplier",
@@ -50,6 +57,7 @@
    },
    {
       "name": "burn",
+      "style": "debuff",
       "turns": 4,
       "effect": ["damage"],
       "effectStyle": "multiplier",
@@ -57,10 +65,26 @@
    },
    {
       "name": "fear",
+      "style": "debuff",
       "turns": 5,
       "effect": ["sanity"],
       "effectStyle": "flat",
       "effectAmount": -1
    },
-
+   {
+      "name": "lasting heal",
+      "style": "buff",
+      "turns": 5,
+      "effect": ["health"],
+      "effectStyle": "flat",
+      "effectAmount": 25 
+   },
+   {
+      "name": "guard",
+      "style": "buff",
+      "turns": 5,
+      "effect": ["armor"],
+      "effectStyle": "flat",
+      "effectAmount": 25 
+   }
 ]

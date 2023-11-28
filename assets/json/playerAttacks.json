@@ -5,8 +5,7 @@
       "hitChance": 1.0,
       "damageMult": 1.0,
       "sanityDamage": 0,
-      "secondaryEffect": null,
-      "secondaryEffectChance": null
+      "debuffs": null
    },
    {
       "name": "hit",
@@ -14,8 +13,7 @@
       "hitChance": 1.0,
       "damageMult": 1.0,
       "sanityDamage": 0,
-      "secondaryEffect": null,
-      "secondaryEffectChance": null
+      "debuffs": null
    },
    {
       "name": "cast",
@@ -23,8 +21,7 @@
       "hitChance": 1.0,
       "damageMult": 1.0,
       "sanityDamage": 0,
-      "secondaryEffect": null,
-      "secondaryEffectChance": null
+      "debuffs": null
    },
    {
       "name": "stab",
@@ -32,8 +29,7 @@
       "hitChance": 0.95,
       "damageMult": 1.0,
       "sanityDamage": 0,
-      "secondaryEffect": ["bleed"],
-      "secondaryEffectChance": [0.20]
+      "debuffs": [{"name":"bleed", "chance":0.2}]
    },
    {
       "name": "shoot",
@@ -41,8 +37,7 @@
       "hitChance": 0.95,
       "damageMult": 1.0,
       "sanityDamage": 0,
-      "secondaryEffect": null,
-      "secondaryEffectChance": null
+      "debuffs": null
    },
    {
       "name": "rooting shot",
@@ -50,8 +45,7 @@
       "hitChance": 0.95,
       "damageMult": 0.75,
       "sanityDamage": 0,
-      "secondaryEffect": ["stun"],
-      "secondaryEffectChance": [0.5] 
+      "debuffs": [{"name":"stun", "chance":0.5}]
    },
    {
       "name": "torch stab",
@@ -59,8 +53,7 @@
       "hitChance": 1.0,
       "damageMult": 1.0,
       "sanityDamage": 0,
-      "secondaryEffect": ["burn"],
-      "secondaryEffectChance": [0.85]
+      "debuffs": [{"name":"burn", "chance":0.85}]
    },
    {
       "name": "slash",
@@ -68,8 +61,7 @@
       "hitChance": 1.0,
       "damageMult": 1.0,
       "sanityDamage": 0,
-      "secondaryEffect": null,
-      "secondaryEffectChance": null
+      "debuffs": null
    },
    {
       "name": "cleave",
@@ -77,8 +69,7 @@
       "hitChance": 0.85,
       "damageMult": 1.0,
       "sanityDamage": 0,
-      "secondaryEffect": null,
-      "secondaryEffectChance": null
+      "debuffs": null
    },
    {
       "name": "crushing blow",
@@ -86,7 +77,6 @@
       "hitChance": 0.95,
       "damageMult": 1.0,
       "sanityDamage": 0,
-      "secondaryEffect": ["stun"],
-      "secondaryEffectChance": [0.25] 
+      "debuffs": [{"name":"stun", "chance":0.25}]
    }
 ]

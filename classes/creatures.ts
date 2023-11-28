@@ -1,13 +1,15 @@
 import attacks from "../assets/json/monsterAttacks.json";
 import monsters from "../assets/json/monsters.json";
-import { flipCoin, getRandomInt, rollD20 } from "../utility/functions";
-import conditions from "../assets/json/conditions.json";
+import {
+  createDebuff,
+  flipCoin,
+  getRandomInt,
+  rollD20,
+} from "../utility/functions";
 import { Condition } from "./conditions";
-
 import arrows from "../assets/json/items/arrows.json";
 import artifacts from "../assets/json/items/artifacts.json";
 import bodyArmors from "../assets/json/items/bodyArmor.json";
-import books from "../assets/json/items/books.json";
 import bows from "../assets/json/items/bows.json";
 import foci from "../assets/json/items/foci.json";
 import hats from "../assets/json/items/hats.json";
@@ -20,6 +22,9 @@ import robes from "../assets/json/items/robes.json";
 import shields from "../assets/json/items/shields.json";
 import wands from "../assets/json/items/wands.json";
 import weapons from "../assets/json/items/weapons.json";
+import necroBooks from "../assets/json/items/necroBooks.json";
+import paladinBooks from "../assets/json/items/paladinBooks.json";
+import mageBooks from "../assets/json/items/mageBooks.json";
 import { Item } from "./item";
 
 interface familiarOptions {
@@ -122,7 +127,7 @@ export class Monster {
           damage: number;
           heal?: number;
           sanityDamage: number;
-          secondaryEffects: Condition | null;
+          debuffs: Condition[] | null;
         };
     monsterHealth: number;
   } {
@@ -189,64 +194,40 @@ export class Monster {
         ) / 4;
       const sanityDamage = chosenAttack.sanityDamage;
       if (roll >= rollToHit) {
-        const effectChance = chosenAttack.secondaryEffectChance;
-        if (effectChance) {
-          let effect: Condition | null = null;
-          const rollToEffect = 20 - (effectChance * 100) / 5;
-          const roll = rollD20();
-          if (roll >= rollToEffect) {
-            if (chosenAttack.secondaryEffect == "lifesteal") {
-              const heal = Math.round(0.25 * damage * 4) / 4;
-              if (heal + this.health > this.healthMax) {
+        if (chosenAttack.debuffs) {
+          let debuffs: Condition[] = [];
+          let healedFor = 0;
+          chosenAttack.debuffs.forEach((debuff) => {
+            if (debuff.name == "lifesteal") {
+              const heal = Math.round(damage * 0.5 * 4) / 4;
+              if (this.health + heal >= this.healthMax) {
                 this.health = this.healthMax;
               } else {
                 this.health += heal;
               }
-              return {
-                name: chosenAttack.name,
-                damage: damage,
-                sanityDamage: sanityDamage,
-                heal: heal,
-                secondaryEffects: null,
-              };
             } else {
-              const conditionJSON = conditions.find(
-                (condition) => condition.name == chosenAttack.secondaryEffect,
+              const res = createDebuff(
+                debuff.name,
+                debuff.chance,
+                playerMaxHealth,
+                damage,
               );
-              if (conditionJSON?.damageAmount) {
-                let damage = conditionJSON.damageAmount;
-                if (conditionJSON.damageStyle == "multiplier") {
-                  damage *= this.attackPower;
-                } else if (conditionJSON.damageStyle == "percentage") {
-                  damage *= playerMaxHealth;
-                }
-                effect = new Condition({
-                  name: conditionJSON.name,
-                  style: "debuff",
-                  turns: conditionJSON.turns,
-                  effect: conditionJSON.effect as (
-                    | "skip"
-                    | "accuracy halved"
-                    | "damage"
-                    | "sanity"
-                  )[],
-                  damage: damage,
-                });
-              }
-              return {
-                name: chosenAttack.name,
-                damage: damage,
-                sanityDamage: sanityDamage,
-                secondaryEffects: effect,
-              };
+              if (res) debuffs.push(res);
             }
-          }
+          });
+          return {
+            name: chosenAttack.name,
+            damage: damage,
+            heal: healedFor > 0 ? healedFor : undefined,
+            sanityDamage: sanityDamage,
+            debuffs: debuffs,
+          };
         }
         return {
           name: chosenAttack.name,
           damage: damage,
           sanityDamage: sanityDamage,
-          secondaryEffects: null,
+          debuffs: null,
         };
       } else {
         return "miss";
@@ -258,7 +239,7 @@ export class Monster {
   }
 
   //---------------------------Misc---------------------------//
-  public getDrops() {
+  public getDrops(playerClass: "necromancer" | "paladin" | "mage") {
     const monsterObj = monsters.find(
       (monster) => monster.name == this.creatureSpecies,
     );
@@ -272,7 +253,7 @@ export class Monster {
       dropList.forEach((drop) => {
         const roll = rollD20();
         if (roll * 5 > drop.chance) {
-          const items = itemList(drop.itemType);
+          const items = itemList(drop.itemType, playerClass);
           const itemObj = items.find((item) => item.name == drop.item);
           if (itemObj) {
             drops.push(
@@ -348,7 +329,10 @@ export class Monster {
   }
 }
 
-function itemList(itemType: string): {
+function itemList(
+  itemType: string,
+  playerClass: "mage" | "paladin" | "necromancer",
+): {
   name: string;
   baseValue: number;
   slot?: string;
@@ -364,7 +348,11 @@ function itemList(itemType: string): {
     case "bodyArmor":
       return bodyArmors;
     case "book":
-      return books;
+      if (playerClass == "necromancer") {
+        return necroBooks;
+      } else if (playerClass == "paladin") {
+        return paladinBooks;
+      } else return mageBooks;
     case "bow":
       return bows;
     case "focus":

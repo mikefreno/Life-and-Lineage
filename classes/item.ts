@@ -1,4 +1,11 @@
 import { v4 as uuidv4 } from "uuid";
+import mageBooks from "../assets/json/items/mageBooks.json";
+import necroBooks from "../assets/json/items/necroBooks.json";
+import paladingBooks from "../assets/json/items/paladinBooks.json";
+import mageSpells from "../assets/json/mageSpells.json";
+import necroSpells from "../assets/json/necroSpells.json";
+import paladinSpells from "../assets/json/paladinSpells.json";
+
 interface ItemOptions {
   id?: string;
   name: string;
@@ -82,6 +89,42 @@ export class Item {
 
   public getBuyPrice(affection: number) {
     return Math.round(this.baseValue * (1.4 - affection / 2500));
+  }
+
+  public getAttachedSpell(playerClass: "mage" | "paladin" | "necromancer") {
+    if (this.itemClass == "book") {
+      if (playerClass == "mage") {
+        const bookObj = mageBooks.find((book) => (book.name = this.name));
+        const spell = mageSpells.find(
+          (mageSpell) => bookObj?.teaches == mageSpell.name,
+        );
+        if (!spell) {
+          throw new Error(`missing spell from Book Item ${this.name}`);
+        }
+        return spell;
+      }
+      if (playerClass == "necromancer") {
+        const bookObj = necroBooks.find((book) => (book.name = this.name));
+        const spell = necroSpells.find(
+          (mageSpell) => bookObj?.teaches == mageSpell.name,
+        );
+        if (!spell) {
+          throw new Error(`missing spell from Book Item ${this.name}`);
+        }
+        return spell;
+      }
+      if (playerClass == "paladin") {
+        const bookObj = paladingBooks.find((book) => (book.name = this.name));
+        const spell = paladinSpells.find(
+          (mageSpell) => bookObj?.teaches == mageSpell.name,
+        );
+        if (!spell) {
+          throw new Error(`missing spell from Book Item ${this.name}`);
+        }
+        return spell;
+      }
+    }
+    throw new Error("Requested a spell from a non-book item");
   }
 
   public toJSON(): object {

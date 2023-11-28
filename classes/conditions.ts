@@ -2,7 +2,14 @@ interface ConditionOptions {
   name: string;
   style: "debuff" | "buff";
   turns: number;
-  effect: ("skip" | "accuracy halved" | "damage" | "sanity")[];
+  effect: (
+    | "skip"
+    | "accuracy halved"
+    | "damage"
+    | "sanity"
+    | "armor"
+    | "health"
+  )[];
   damage: number;
 }
 
@@ -10,7 +17,14 @@ export class Condition {
   readonly name: string;
   readonly style: "debuff" | "buff";
   private turns: number;
-  readonly effect: ("skip" | "accuracy halved" | "damage" | "sanity")[];
+  readonly effect: (
+    | "skip"
+    | "accuracy halved"
+    | "damage"
+    | "sanity"
+    | "armor"
+    | "health"
+  )[];
   readonly damage: number | null;
 
   constructor({ name, style, turns, effect, damage }: ConditionOptions) {

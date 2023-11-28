@@ -4,7 +4,6 @@ import { MonsterImage } from "../../components/MonsterImage";
 import { Pressable } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 import BattleTab from "../../components/BattleTab";
-import { AttackObject } from "../../utility/types";
 import { router } from "expo-router";
 import { fullSave, toTitleCase } from "../../utility/functions";
 import { enemyGenerator } from "../../utility/monster";
@@ -40,6 +39,7 @@ export default function DungeonLevelScreen() {
   >("log");
   const [thisInstance, setThisInstance] = useState<DungeonInstance>();
   const [thisDungeon, setThisDungeon] = useState<DungeonLevel>();
+  const [showingLoot, setShowingLoot] = useState<boolean>(false);
 
   const monster = useSelector(selectMonster);
 
@@ -111,29 +111,180 @@ export default function DungeonLevelScreen() {
       });
   }
 
-  const useAttack = debounce((attack: AttackObject) => {
-    if (monster && playerCharacter) {
-      let monsterDefeated = false;
-      const attackRes = playerCharacter.doPhysicalAttack(
-        attack,
-        monster.getMaxHealth(),
+  const enemyTurn = () => {
+    if (monster) {
+      const enemyAttackRes = monster.takeTurn(
+        playerCharacter.getMaxHealth(),
+        playerCharacter.getDamageReduction(),
       );
-      if (attackRes !== "miss") {
-        const hp = monster.damageHealth(attackRes.damage);
-        const sanity = monster.damageSanity(attackRes.sanityDamage);
-        attackRes.secondaryEffects?.forEach((effect) =>
-          monster.addCondition(effect),
+      if (
+        enemyAttackRes.attack !== "miss" &&
+        enemyAttackRes.attack !== "stun" &&
+        enemyAttackRes.attack !== "pass"
+      ) {
+        const hp = playerCharacter.damageHealth(enemyAttackRes.attack.damage);
+        const sanity = playerCharacter.damageSanity(
+          enemyAttackRes.attack.sanityDamage,
         );
-        let line = `You ${toTitleCase(attack.name)}${
-          attack.name.charAt(attack.name.length - 1) == "e" ? "d" : "ed"
-        } the ${toTitleCase(monster.creatureSpecies)} for ${
-          attackRes.damage
-        } heath damage`;
-        if (attackRes.sanityDamage) {
-          line += ` and ${attackRes.sanityDamage} sanity damage`;
+        enemyAttackRes.attack.debuffs?.forEach((debuff) =>
+          playerCharacter.addCondition(debuff),
+        );
+        if (hp <= 0 || sanity <= 0) {
+          router.back();
+          router.replace("/DeathScreen");
         }
-        if (attackRes.secondaryEffects) {
-          attackRes.secondaryEffects.forEach(
+        let array = [];
+        let line = `The ${toTitleCase(monster.creatureSpecies)} used ${
+          enemyAttackRes.attack.name
+        } dealing ${enemyAttackRes.attack.damage} health damage`;
+
+        if (enemyAttackRes.attack.heal) {
+          array.push(`healing for ${enemyAttackRes.attack.heal} health`);
+        }
+
+        if (enemyAttackRes.attack.sanityDamage > 0) {
+          array.push(
+            `dealing ${enemyAttackRes.attack.sanityDamage} sanity damage`,
+          );
+        }
+
+        if (enemyAttackRes.attack.debuffs) {
+          enemyAttackRes.attack.debuffs.forEach((debuff) =>
+            array.push(`it applied a ${debuff.name} stack`),
+          );
+        }
+
+        if (array.length) {
+          line +=
+            ", " +
+            array.slice(0, -1).join(", ") +
+            (array.length > 1 ? ", and " : " and ") +
+            array.slice(-1);
+        }
+        battleLogger(line);
+      } else if (enemyAttackRes.attack == "pass") {
+        battleLogger(`The ${toTitleCase(monster.creatureSpecies)} did nothing`);
+      } else {
+        battleLogger(
+          `The ${toTitleCase(monster?.creatureSpecies)} ${
+            enemyAttackRes.attack == "stun" ? "was " : ""
+          }${enemyAttackRes.attack}ed`,
+        );
+      }
+    }
+  };
+
+  const useAttack = debounce(
+    (attack: {
+      name: string;
+      targets: string;
+      hitChance: number;
+      damageMult: number;
+      sanityDamage: number;
+      debuffs: { name: string; chance: number }[] | null;
+    }) => {
+      if (monster && playerCharacter) {
+        let monsterDefeated = false;
+        const attackRes = playerCharacter.doPhysicalAttack(
+          attack,
+          monster.getMaxHealth(),
+        );
+        if (attackRes !== "miss") {
+          const hp = monster.damageHealth(attackRes.damage);
+          const sanity = monster.damageSanity(attackRes.sanityDamage);
+          attackRes.debuffs?.forEach((effect) => monster.addCondition(effect));
+          let line = `You ${attack.name == "cast" ? "used " : ""}${toTitleCase(
+            attack.name,
+          )}${
+            attack.name !== "cast"
+              ? attack.name.charAt(attack.name.length - 1) == "e"
+                ? "d"
+                : "ed"
+              : " on"
+          } the ${toTitleCase(monster.creatureSpecies)} for ${
+            attackRes.damage
+          } heath damage`;
+          if (attackRes.sanityDamage) {
+            line += ` and ${attackRes.sanityDamage} sanity damage`;
+          }
+          if (attackRes.debuffs) {
+            attackRes.debuffs.forEach(
+              (effect) => (line += ` and applied a ${effect.name} stack`),
+            );
+          }
+          battleLogger(line);
+          if (hp <= 0 || (sanity && sanity <= 0)) {
+            gameData.gameTick();
+            if (thisDungeon?.level != 0) {
+              thisDungeon?.incrementStep();
+            }
+            battleLogger(
+              `You defeated the ${toTitleCase(monster.creatureSpecies)}`,
+            );
+            monsterDefeated = true;
+            const drops = monster.getDrops(playerCharacter.playerClass);
+            setShowingLoot(true);
+            if (fightingBoss && gameData) {
+              setFightingBoss(false);
+              thisDungeon?.setBossDefeated();
+              gameData.openNextDungeonLevel(thisInstance!.name);
+              dispatch(setGameData(gameData));
+            }
+            dispatch(setMonster(null));
+          } else {
+            dispatch(setMonster(monster));
+          }
+        } else {
+          battleLogger(
+            `You ${attackRes}ed the ${toTitleCase(monster.creatureSpecies)}`,
+          );
+          dispatch(setMonster(monster));
+        }
+        if (!monsterDefeated) {
+          enemyTurn();
+        }
+      }
+      if (playerCharacter) {
+        dispatch(setPlayerCharacter(playerCharacter));
+      }
+      fullSave(gameData, playerCharacter);
+    },
+    100,
+  );
+
+  const useSpell = debounce(
+    (spell: {
+      name: string;
+      element: string;
+      proficiencyNeeded: number;
+      manaCost: number;
+      effects: {
+        damage: number | null;
+        buffs: string[] | null;
+        debuffs: { name: string; chance: number }[] | null;
+        summon?: string[];
+        selfDamage?: number;
+      };
+    }) => {
+      if (monster && playerCharacter) {
+        let monsterDefeated = false;
+        const spellRes = playerCharacter.useSpell(
+          spell,
+          monster.getMaxHealth(),
+        );
+        const hp = monster.damageHealth(spellRes.damage);
+        const sanity = monster.damageSanity(spellRes.sanityDamage);
+        spellRes.debuffs?.forEach((debuff) => monster.addCondition(debuff));
+        let line = `You ${toTitleCase(spell.name)}${
+          spell.name.charAt(spell.name.length - 1) == "e" ? "d" : "ed"
+        } the ${toTitleCase(monster.creatureSpecies)} for ${
+          spellRes.damage
+        } heath damage`;
+        if (spellRes.sanityDamage) {
+          line += ` and ${spellRes.sanityDamage} sanity damage`;
+        }
+        if (spellRes.debuffs) {
+          spellRes.debuffs.forEach(
             (effect) => (line += ` and applied a ${effect.name} stack`),
           );
         }
@@ -147,88 +298,31 @@ export default function DungeonLevelScreen() {
             `You defeated the ${toTitleCase(monster.creatureSpecies)}`,
           );
           monsterDefeated = true;
+          const drops = monster.getDrops(playerCharacter.playerClass);
           if (fightingBoss && gameData) {
             setFightingBoss(false);
             thisDungeon?.setBossDefeated();
             gameData.openNextDungeonLevel(thisInstance!.name);
             dispatch(setGameData(gameData));
           }
+          setShowingLoot(true);
           dispatch(setMonster(null));
         } else {
           dispatch(setMonster(monster));
         }
-      } else {
-        battleLogger(
-          `You ${attackRes}ed the ${toTitleCase(monster.creatureSpecies)}`,
-        );
-        dispatch(setMonster(monster));
-      }
-      if (!monsterDefeated) {
-        const enemyAttackRes = monster.takeTurn(
-          playerCharacter.getMaxHealth(),
-          playerCharacter.getDamageReduction(),
-        );
-        if (
-          enemyAttackRes.attack !== "miss" &&
-          enemyAttackRes.attack !== "stun" &&
-          enemyAttackRes.attack !== "pass"
-        ) {
-          const hp = playerCharacter.damageHealth(enemyAttackRes.attack.damage);
-          const sanity = playerCharacter.damageSanity(
-            enemyAttackRes.attack.sanityDamage,
-          );
-          playerCharacter.addCondition(enemyAttackRes.attack.secondaryEffects);
-          if (hp <= 0 || sanity <= 0) {
-            router.back();
-            router.replace("/DeathScreen");
-          }
-          let array = [];
-          let line = `The ${toTitleCase(monster.creatureSpecies)} used ${
-            enemyAttackRes.attack.name
-          } dealing ${enemyAttackRes.attack.damage} health damage`;
-
-          if (enemyAttackRes.attack.heal) {
-            array.push(`healing for ${enemyAttackRes.attack.heal} health`);
-          }
-
-          if (enemyAttackRes.attack.sanityDamage > 0) {
-            array.push(
-              `dealing ${enemyAttackRes.attack.sanityDamage} sanity damage`,
-            );
-          }
-
-          if (enemyAttackRes.attack.secondaryEffects) {
-            array.push(
-              `it applied a ${enemyAttackRes.attack.secondaryEffects.name} stack`,
-            );
-          }
-
-          if (array.length) {
-            line +=
-              ", " +
-              array.slice(0, -1).join(", ") +
-              (array.length > 1 ? ", and " : " and ") +
-              array.slice(-1);
-          }
-          battleLogger(line);
-        } else if (enemyAttackRes.attack == "pass") {
-          battleLogger(
-            `The ${toTitleCase(monster.creatureSpecies)} did nothing`,
-          );
-        } else {
-          battleLogger(
-            `The ${toTitleCase(monster?.creatureSpecies)} ${
-              enemyAttackRes.attack == "stun" ? "was " : ""
-            }${enemyAttackRes.attack}ed`,
-          );
+        if (!monsterDefeated) {
+          enemyTurn();
         }
+        if (playerCharacter) {
+          dispatch(setPlayerCharacter(playerCharacter));
+        }
+        fullSave(gameData, playerCharacter);
       }
-    }
-    if (playerCharacter) {
-      dispatch(setPlayerCharacter(playerCharacter));
-    }
-    fullSave(gameData, playerCharacter);
-  }, 100);
+    },
+    100,
+  );
+
+  function lootDrop() {}
 
   while (!monster) {
     return (
@@ -249,6 +343,7 @@ export default function DungeonLevelScreen() {
                 : `${toTitleCase(thisInstance?.name as string)} Level ${level}`,
           }}
         />
+        {LootDrop()}
         <View className="flex-1 px-4 py-6">
           <View className="flex h-1/3 flex-row justify-evenly">
             <View className="flex w-2/5 flex-col items-center justify-center">
@@ -291,7 +386,11 @@ export default function DungeonLevelScreen() {
             </View>
           ) : null}
           <View className="h-1/2">
-            <BattleTab useAttack={useAttack} battleTab={battleTab} />
+            <BattleTab
+              useAttack={useAttack}
+              battleTab={battleTab}
+              useSpell={useSpell}
+            />
           </View>
           <View>
             <View className="flex w-full flex-row justify-evenly border-y border-zinc-200">

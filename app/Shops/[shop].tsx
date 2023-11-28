@@ -35,13 +35,14 @@ export default function ShopScreen() {
 
   useEffect(() => {
     if (
+      playerCharacter &&
       thisShop &&
       thisShop.getLastRefresh() < new Date(Date.now() - 60 * 60 * 1000)
     ) {
-      thisShop.refreshInventory();
+      thisShop.refreshInventory(playerCharacter.playerClass);
     }
     setRefreshCheck(true);
-  }, []);
+  }, [playerCharacter]);
 
   function selectedItemDisplay() {
     if (selectedItem) {

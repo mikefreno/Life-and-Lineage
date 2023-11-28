@@ -7,8 +7,7 @@
     "effects": {
       "damage": 15, 
       "buffs": null, 
-      "debuffs": ["burn"], 
-      "debuffChance": [0.25]
+      "debuffs": [{"name":"burn", "chance": 0.25}]
     }
   },
   {
@@ -19,8 +18,7 @@
     "effects": {
       "damage": 25,
       "buffs": null,
-      "debuffs": ["burn"],
-      "debuffChance": [0.25]
+      "debuffs": [{"name":"burn", "chance": 0.25}]
     }
   },
   {
@@ -31,8 +29,7 @@
     "effects": {
       "damage": 25,
       "buffs": null,
-      "debuffs": ["burn"],
-      "debuffChance": [0.75]
+      "debuffs": [{"name":"burn", "chance": 0.75}]
     }
   },
   {
@@ -43,8 +40,7 @@
     "effects": {
       "damage": 60,
       "buffs": null,
-      "debuffs": ["burn"],
-      "debuffChance": [0.25]
+      "debuffs": [{"name":"burn", "chance": 0.25}]
     }
   },
   {
@@ -56,8 +52,7 @@
     "effects": {
       "damage": null,
       "buffs": ["projectile suppression"],
-      "debuffs": ["burn"],
-      "debuffChance": [0.5]
+      "debuffs": [{"name":"burn", "chance": 0.5}]
     }
   },
   {
@@ -69,8 +64,7 @@
     "effects": {
       "damage": 50,
       "buffs": null,
-      "debuffs": ["burn"],
-      "debuffChance": [0.25]
+      "debuffs": [{"name":"burn", "chance": 0.25}]
     }
   },
   {
@@ -81,8 +75,7 @@
     "effects": {
       "damage": 275,
       "buffs": null,
-      "debuffs": ["severe burn"],
-      "debuffChance": [0.75]
+      "debuffs": [{"name":"severe burn", "chance": 0.75}]
     }
   },
   {
@@ -93,8 +86,7 @@
     "effects": {
       "damage": 400,
       "buffs": null,
-      "debuffs": ["severe burn"],
-      "debuffChance": [1.0]
+      "debuffs": [{"name":"severe burn", "chance": 1.0}]
     }
   },
   {
@@ -105,8 +97,7 @@
     "effects": {
       "damage": 10,
       "buffs": null,
-      "debuffs": ["chill"],
-      "debuffChance": [0.5]
+      "debuffs": [{"name":"chill", "chance": 0.5}]
     }
   },
   {
@@ -142,8 +133,7 @@
     "effects": {
       "damage": 40,
       "buffs": null,
-      "debuffs": ["chill", "chill"],
-      "debuffChance": [1.0, 1.0] 
+      "debuffs": [{"name":"chill", "chance": 1.0},{"name":"chill", "chance": 1.0}]
     }
   },
   {
@@ -154,8 +144,7 @@
     "effects": {
       "damage": 60,
       "buffs": null,
-      "debuffs": ["burn"],
-      "debuffChance": [0.5] 
+      "debuffs": [{"name":"burn", "chance": 0.5}]
     }
   },
   {
@@ -166,8 +155,7 @@
     "effects": {
       "damage": 100,
       "buffs": null,
-      "debuffs": ["chill", "chill", "chill"],
-      "debuffChance": [0.75, 0.75, 0.75] 
+      "debuffs": [{"name":"chill", "chance": 0.75},{"name":"chill", "chance": 0.75},{"name":"chill", "chance": 0.75}]
     }
   },
   {
@@ -191,8 +179,7 @@
     "effects": {
       "damage": 50,
       "buffs": null,
-      "debuffs": ["chill"],
-      "debuffChance": [0.75]
+      "debuffs": [{"name":"chill", "chance": 0.75}]
     }
   },
   {
@@ -203,8 +190,7 @@
     "effects": {
       "damage": 175,
       "buffs": null,
-      "debuffs": ["severe burn"],
-      "debuffChance": [1.0]
+      "debuffs": [{"name":"severe burn", "chance": 1.0}]
     }
   },
   {
@@ -216,8 +202,7 @@
     "effects": {
       "damage": 150,
       "buffs": null,
-      "debuffs": ["stun"],
-      "debuffChance": [1.0]
+      "debuffs": [{"name":"stun", "chance": 1.0}]
     }
   },
   {
@@ -240,8 +225,7 @@
     "effects": {
       "damage": 25,
       "buffs": null,
-      "debuffs": ["shocked"],
-      "debuffChance": [0.5] 
+      "debuffs": [{"name":"shocked", "chance": 0.5}]
     }
   },
   {
@@ -252,8 +236,7 @@
     "effects": {
       "damage": 50,
       "buffs": null,
-      "debuffs": ["shocked", "shocked"],
-      "debuffChance": [0.5, 0.5] 
+      "debuffs": [{"name":"shocked", "chance": 0.5},{"name":"shocked", "chance": 0.5}]
     }
   },
   {
@@ -264,8 +247,7 @@
     "effects": {
       "damage": 50,
       "buffs": null,
-      "debuffs": ["shocked", "stun"],
-      "debuffChance": [0.75, 0.5] 
+      "debuffs": [{"name":"shocked", "chance": 0.75},{"name":"stun", "chance": 0.5}]
     }
   },
   {
@@ -276,8 +258,7 @@
     "effects": {
       "damage": 75,
       "buffs": null,
-      "debuffs": ["bleed", "bleed"],
-      "debuffChance": [0.75, 0.75] 
+      "debuffs": [{"name":"bleed", "chance": 0.75},{"name":"bleed", "chance": 0.75}]
     }
   },
   {
@@ -314,8 +295,7 @@
     "effects": {
       "damage": 125,
       "buffs": null,
-      "debuffs": ["stun"],
-      "debuffChance": [0.75]
+      "debuffs": [{"name":"stun", "chance": 0.75}]
     }
   },
   {
@@ -326,8 +306,7 @@
     "effects": {
       "damage": 10, 
       "buffs": null, 
-      "debuffs": ["stun"], 
-      "debuffChance": [0.10]
+      "debuffs": [{"name":"stun", "chance": 0.10}]
     }
   },
   {
@@ -351,8 +330,7 @@
     "effects": {
       "damage": 10, 
       "buffs": null, 
-      "debuffs": ["stun"], 
-      "debuffChance": [0.25] 
+      "debuffs": [{"name":"stun", "chance": 0.25}]
     }
   },
   {
@@ -375,8 +353,7 @@
     "effects": {
       "damage": 65, 
       "buffs": null, 
-      "debuffs": ["stun"], 
-      "debuffChance": [0.75] 
+      "debuffs": [{"name":"stun", "chance": 0.75}]
     }
   },
   {
@@ -400,8 +377,7 @@
     "effects": {
       "damage": 175, 
       "buffs": null,
-      "debuffs": ["heavy stun"], 
-      "debuffChance": [1.0] 
+      "debuffs": [{"name":"heavy stun", "chance": 1.0}]
     }
   },
   {
@@ -412,8 +388,7 @@
     "effects": {
       "damage": 400, 
       "buffs": null,
-      "debuffs": ["heavy stun"], 
-      "debuffChance": [1.0] 
+      "debuffs": [{"name":"heavy stun", "chance": 1.0}]
     }
   }
 ]

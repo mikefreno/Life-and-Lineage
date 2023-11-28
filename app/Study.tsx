@@ -1,97 +1,191 @@
-import { StatusBar } from "expo-status-bar";
-import { Platform, Pressable, ScrollView } from "react-native";
-
-import { Text, View } from "../components/Themed";
+import { View, Text, ScrollView } from "../components/Themed";
 import "../assets/styles/globals.css";
-import { useState } from "react";
-import spells from "../assets/json/spells.json";
-import LearnSpellComponent from "../components/LearnSpellComponent";
+import { useDispatch, useSelector } from "react-redux";
+import { selectGame, selectPlayerCharacter } from "../redux/selectors";
+import ProgressBar from "../components/ProgressBar";
+import { Pressable, Image, useColorScheme } from "react-native";
+import { useEffect, useState } from "react";
+import { Item } from "../classes/item";
+import blessingDisplay from "../components/BlessingsDisplay";
+import { fullSave, toTitleCase } from "../utility/functions";
+import { setGameData, setPlayerCharacter } from "../redux/slice/game";
+import { elementalColorMap } from "../utility/elementColors";
 
-export default function CraftingScreen() {
-  const [selectedElement, setSelectedElement] = useState<
-    "fire" | "earth" | "air" | "water" | ""
-  >("");
+export default function LearningSpellsScreen() {
+  const playerCharacter = useSelector(selectPlayerCharacter);
+  const game = useSelector(selectGame);
+  if (!playerCharacter || !game)
+    throw new Error("No playerCharacter or game in LearningSpellsScreen");
+  const inventory = playerCharacter.getInventory();
+  const books = inventory.filter((item) => item.itemClass == "book");
+  const dispatch = useDispatch();
+  const colorScheme = useColorScheme();
 
-  if (selectedElement == "") {
-    return (
-      <View className="flex-1 items-center justify-center pb-24">
-        <Pressable
-          onPress={() => setSelectedElement("fire")}
-          className="my-4 w-64 rounded-xl bg-orange-600 py-6 active:scale-95 active:opacity-50"
-        >
-          <Text
-            className="text-center text-3xl font-light"
-            style={{ color: "#fafafa" }}
-          >
-            Fire
-          </Text>
-        </Pressable>
-        <Pressable
-          onPress={() => setSelectedElement("earth")}
-          className="my-4 w-64 rounded-xl bg-[#937D62] py-6 active:scale-95 active:opacity-50"
-        >
-          <Text
-            className="text-center text-3xl font-light"
-            style={{ color: "#fafafa" }}
-          >
-            Earth
-          </Text>
-        </Pressable>
-        <Pressable
-          onPress={() => setSelectedElement("air")}
-          className="my-4 w-64 rounded-xl bg-slate-100 py-6 active:scale-95 active:opacity-50"
-        >
-          <Text
-            className="text-center text-3xl font-light"
-            style={{ color: "#27272a" }}
-          >
-            Air
-          </Text>
-        </Pressable>
-        <Pressable
-          onPress={() => setSelectedElement("water")}
-          className="my-4 w-64 rounded-xl bg-cyan-400 py-6 active:scale-95 active:opacity-50"
-        >
-          <Text
-            className="text-center text-3xl font-light"
-            style={{ color: "#fafafa" }}
-          >
-            Water
-          </Text>
-        </Pressable>
+  const studyingState = playerCharacter.learningSpells;
+  const [selectedBook, setSelectedBook] = useState<Item | null>(null);
+  const [selectedBookSpell, setSelectedBookSpell] = useState<{
+    name: string;
+    element: string;
+    proficiencyNeeded: number;
+    manaCost: number;
+    effects: {
+      damage: number | null;
+      buffs: string[] | null;
+      debuffs:
+        | {
+            name: string;
+            chance: number;
+          }[]
+        | null;
+      summon?: string[];
+      selfDamage?: number;
+    };
+  } | null>(null);
 
-        {/* Use a light status bar on iOS to account for the black space above the modal */}
-        <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
-      </View>
-    );
-  } else {
-    return (
-      <View>
-        <Pressable
-          onPress={() => setSelectedElement("")}
-          style={{ backgroundColor: "#60a5fa" }}
-        >
-          <Text
-            className="py-6 text-center text-2xl"
-            style={{ color: "#fafafa" }}
-          >
-            Back to Element Selection
-          </Text>
-        </Pressable>
-        <ScrollView>
-          {spells
-            .filter((spell) => spell.name == selectedElement)
-            .map((spell, idx) => (
-              <LearnSpellComponent
-                key={idx}
-                title={spell.name}
-                desciption={""}
-                proficiencyRequirement={spell.proficiencyNeeded}
-                element={selectedElement}
-              />
-            ))}
-        </ScrollView>
-      </View>
-    );
+  useEffect(() => {
+    if (selectedBook) {
+      setSelectedBookSpell(
+        selectedBook.getAttachedSpell(playerCharacter.playerClass),
+      );
+    } else setSelectedBookSpell(null);
+  }, [selectedBook]);
+
+  function studySpell(
+    bookName: string,
+    spellName: string,
+    spellElement: string,
+  ) {
+    if (playerCharacter && game) {
+      playerCharacter.learnSpellStep(bookName, spellName, spellElement);
+      game.gameTick();
+      dispatch(setPlayerCharacter(playerCharacter));
+      dispatch(setGameData(game));
+      fullSave(game, playerCharacter);
+    }
   }
+
+  const studyingSpells = studyingState.map(
+    (studyState) => studyState.spellName,
+  );
+
+  const filteredBooks = books.filter(
+    (book) =>
+      !studyingSpells.includes(
+        book.getAttachedSpell(playerCharacter.playerClass).name,
+      ),
+  );
+
+  return (
+    <View className="flex-1 px-4 py-6">
+      {studyingState.length > 0 ? (
+        <View className="pb-12 pt-4">
+          <Text className="text-center text-xl">Currently Studying</Text>
+          {studyingState.map((studyState) => (
+            <View key={studyState.spellName}>
+              <Text>{toTitleCase(studyState.spellName)}</Text>
+              <ProgressBar
+                filledColor={
+                  elementalColorMap[
+                    studyState.element as
+                      | "fire"
+                      | "water"
+                      | "air"
+                      | "earth"
+                      | "blood"
+                      | "summons"
+                      | "pestilence"
+                      | "bone"
+                      | "holy"
+                      | "vengeance"
+                      | "protection"
+                  ].dark
+                }
+                unfilledColor={
+                  elementalColorMap[
+                    studyState.element as
+                      | "fire"
+                      | "water"
+                      | "air"
+                      | "earth"
+                      | "blood"
+                      | "summons"
+                      | "pestilence"
+                      | "bone"
+                      | "holy"
+                      | "vengeance"
+                      | "protection"
+                  ].light
+                }
+                value={studyState.experience}
+                maxValue={20}
+              />
+              <Pressable
+                onPress={() =>
+                  studySpell(
+                    studyState.bookName,
+                    studyState.spellName,
+                    studyState.element,
+                  )
+                }
+                className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+              >
+                <Text>Continue Studying</Text>
+              </Pressable>
+            </View>
+          ))}
+        </View>
+      ) : null}
+      {selectedBook && selectedBookSpell ? (
+        <View className="flex items-center pb-4">
+          <Text className="text-lg">{toTitleCase(selectedBook.name)}</Text>
+          <View className="flex flex-row">
+            <Text className="my-auto text-xl">School: </Text>
+            <View className="py-2">
+              {blessingDisplay(selectedBookSpell.element, colorScheme, 50)}
+              <Text>{}</Text>
+            </View>
+          </View>
+          <Text className="text-2xl tracking-wide">
+            Teaches {toTitleCase(selectedBookSpell.name)}
+          </Text>
+          <Pressable
+            onPress={() => {
+              studySpell(
+                selectedBook.name,
+                selectedBookSpell.name,
+                selectedBookSpell.element,
+              );
+              setSelectedBook(null);
+            }}
+            className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+          >
+            <Text>Start Studying</Text>
+          </Pressable>
+        </View>
+      ) : null}
+      {filteredBooks.length > 0 ? (
+        <View>
+          <Text className="text-center text-xl">Available to Learn</Text>
+          <ScrollView className="mx-auto">
+            <View className="my-auto max-h-64 flex-wrap justify-around">
+              {filteredBooks.map((item) => (
+                <Pressable
+                  key={item.id}
+                  className="m-2 items-center active:scale-90 active:opacity-50"
+                  onPress={() => setSelectedBook(item)}
+                >
+                  <View
+                    className="rounded-lg p-2"
+                    style={{ backgroundColor: "#a1a1aa" }}
+                  >
+                    <Image source={item.getItemIcon()} />
+                  </View>
+                </Pressable>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+      ) : null}
+    </View>
+  );
 }

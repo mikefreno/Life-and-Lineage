@@ -1,9 +1,9 @@
-import { damageReduction, rollD20 } from "../utility/functions";
-import { AttackObject } from "../utility/types";
+import { createDebuff, damageReduction, rollD20 } from "../utility/functions";
 import { Condition } from "./conditions";
 import conditions from "../assets/json/conditions.json";
 import { Item } from "./item";
 import weapons from "../assets/json/items/weapons.json";
+import wands from "../assets/json/items/wands.json";
 
 interface CharacterOptions {
   firstName: string;
@@ -115,6 +115,12 @@ type PlayerCharacterBase = {
     job: string;
     experience: number;
   }[];
+  learningSpells?: {
+    bookName: string;
+    spellName: string;
+    experience: number;
+    element: string;
+  }[];
   parents: Character[];
   children?: Character[];
   physicalAttacks?: string[];
@@ -168,6 +174,12 @@ export class PlayerCharacter extends Character {
   private mana: number;
   private manaMax: number;
   public jobExperience: { job: string; experience: number }[];
+  public learningSpells: {
+    bookName: string;
+    spellName: string;
+    experience: number;
+    element: string;
+  }[];
   private magicProficiencies: { school: string; proficiency: number }[];
   private parents: Character[];
   private children: Character[] | null = null;
@@ -201,6 +213,7 @@ export class PlayerCharacter extends Character {
     mana,
     manaMax,
     jobExperience,
+    learningSpells,
     magicProficiencies,
     parents,
     children,
@@ -229,6 +242,7 @@ export class PlayerCharacter extends Character {
     this.mana = mana ?? 100;
     this.manaMax = manaMax ?? 100;
     this.jobExperience = jobExperience ?? [];
+    this.learningSpells = learningSpells ?? [];
     this.magicProficiencies =
       magicProficiencies ?? getStartingProficiencies(playerClass, blessing);
     this.parents = parents;
@@ -236,7 +250,7 @@ export class PlayerCharacter extends Character {
     this.knownSpells = knownSpells ?? [];
     this.conditions = [];
     this.physicalAttacks = physicalAttacks ?? ["punch"];
-    this.gold = gold ?? 100000;
+    this.gold = gold ?? 100;
     this.inventorySize = inventorySize ?? 20;
     this.inventory = inventory ?? [];
     this.equipment = equipment ?? {
@@ -516,7 +530,6 @@ export class PlayerCharacter extends Character {
 
   private gainExperience() {
     let jobWasFoundAndIncremented = false;
-
     //console.log(Object.isFrozen(this.jobExperience))
     //to understand why this is necessary, uncomment the above line before calling
     let newJobExperience = this.jobExperience.map((job) => {
@@ -536,7 +549,73 @@ export class PlayerCharacter extends Character {
 
     this.jobExperience = newJobExperience;
   }
+  //----------------------------------Spells----------------------------------//
+  public learnSpellStep(bookName: string, spell: string, element: string) {
+    let spellWasFoundAndIncremted = false;
+    //console.log(Object.isFrozen(this.learningSpells))
+    //to understand why this is necessary, uncomment the above line before calling
+    let newSpellExperience = this.learningSpells
+      .map((spellExp) => {
+        if (spellExp.spellName === spell) {
+          if (spellExp.experience < 19) {
+            const newExp = spellExp.experience + 1;
+            spellWasFoundAndIncremted = true;
+            return {
+              bookName: spellExp.bookName,
+              spellName: spellExp.spellName,
+              experience: newExp,
+              element: spellExp.element,
+            };
+          }
+          spellWasFoundAndIncremted = true;
+          this.learnSpellCompletion(spell, bookName);
+          return;
+        }
+        return spellExp;
+      })
+      .filter(
+        (
+          spellExp,
+        ): spellExp is {
+          bookName: string;
+          spellName: string;
+          experience: number;
+          element: string;
+        } => spellExp !== undefined,
+      );
 
+    if (!spellWasFoundAndIncremted) {
+      newSpellExperience.push({
+        bookName: bookName,
+        spellName: spell,
+        experience: 1,
+        element: element,
+      });
+    }
+
+    this.learningSpells = newSpellExperience;
+  }
+
+  public getSpells() {
+    return this.knownSpells;
+  }
+
+  public learnSpellCompletion(spell: string, bookName: string) {
+    let newState = this.knownSpells.map((spell) => spell);
+    newState.push(spell);
+    let newLearningState = this.learningSpells.filter((spellWithExp) => {
+      console.log(spellWithExp);
+      console.log(spell);
+      if (spellWithExp.spellName !== spell) {
+        return spellWithExp;
+      }
+    });
+    const book = this.inventory.find((item) => item.name == bookName);
+    if (book) {
+      this.removeFromInventory(book);
+    }
+    this.learningSpells = newLearningState;
+  }
   //----------------------------------Relationships----------------------------------//
   public getParents(): Character[] {
     return this.parents;
@@ -560,13 +639,18 @@ export class PlayerCharacter extends Character {
       this.conditions.shift();
     }
   }
-  //----------------------------------Combat----------------------------------//
-
+  //----------------------------------Physical Combat----------------------------------//
   private setPhysicalAttacks() {
     if (this.equipment.mainHand) {
-      const itemObj = weapons.find(
+      let itemObj;
+      itemObj = weapons.find(
         (weapon) => weapon.name == this.equipment.mainHand!.name,
       );
+      if (!itemObj) {
+        itemObj = wands.find(
+          (weapon) => weapon.name == this.equipment.mainHand!.name,
+        );
+      }
       if (itemObj) {
         this.physicalAttacks = itemObj.attacks;
       }
@@ -577,7 +661,17 @@ export class PlayerCharacter extends Character {
     return this.physicalAttacks;
   }
 
-  public doPhysicalAttack(attack: AttackObject, monsterMaxHP: number) {
+  public doPhysicalAttack(
+    attack: {
+      name: string;
+      targets: string;
+      hitChance: number;
+      damageMult: number;
+      sanityDamage: number;
+      debuffs: { name: string; chance: number }[] | null;
+    },
+    monsterMaxHP: number,
+  ) {
     const rollToHit = 20 - (attack.hitChance * 100) / 5;
     const roll = rollD20();
     if (roll >= rollToHit) {
@@ -589,55 +683,126 @@ export class PlayerCharacter extends Character {
         hpDamage += offHandDamage * 0.5;
       }
       const sanityDamage = attack.sanityDamage;
-      const effectChance = attack.secondaryEffectChance;
-
-      if (effectChance) {
-        let effects: Condition[] = [];
-        for (let j = 0; j < attack.secondaryEffectChance.length; j++) {
-          let effect: Condition | null = null;
-          const rollToEffect = 20 - (effectChance[j] * 100) / 5;
-          const roll = rollD20();
-          if (roll > rollToEffect) {
-            const conditionJSON = conditions.find(
-              (condition) => condition.name == attack.secondaryEffect[j],
+      if (attack.debuffs) {
+        let debuffs: Condition[] = [];
+        attack.debuffs.forEach((debuff) => {
+          const debuffObj = conditions.find(
+            (condition) => condition.name == debuff.name,
+          );
+          if (!debuffObj)
+            throw new Error(
+              "no debuff found in debuff lookup loop in PlayerCharacter.doPhysicalAttack()",
             );
-            if (conditionJSON?.damageAmount) {
-              let damage = conditionJSON.damageAmount;
-              if (conditionJSON.damageStyle == "multiplier") {
-                damage *= hpDamage;
-              } else if (conditionJSON.damageStyle == "percentage") {
-                damage *= monsterMaxHP;
-              }
-              effect = new Condition({
-                name: conditionJSON.name,
-                style: conditionJSON.style as "debuff" | "buff",
-                turns: conditionJSON.turns,
-                effect: conditionJSON.effect as (
-                  | "skip"
-                  | "accuracy halved"
-                  | "damage"
-                  | "sanity"
-                )[],
-                damage: damage,
-              });
-              effects.push(effect);
-            }
-          }
-        }
+          const debuffRes = createDebuff(
+            debuff.name,
+            debuff.chance,
+            monsterMaxHP,
+            hpDamage ?? 0,
+          );
+          if (debuffRes) debuffs.push(debuffRes);
+        });
         return {
           damage: hpDamage,
           sanityDamage: sanityDamage,
-          secondaryEffects: effects,
+          debuffs: debuffs,
         };
       }
       return {
         damage: hpDamage,
         sanityDamage: sanityDamage,
-        secondaryEffects: null,
+        debuffs: null,
       };
     } else return "miss";
   }
+  //----------------------------------Magical Combat----------------------------------//
+  public useSpell(
+    chosenSpell: {
+      name: string;
+      element: string;
+      proficiencyNeeded: number;
+      manaCost: number;
+      effects: {
+        damage: number | null;
+        sanityDamage?: number;
+        buffs: string[] | null;
+        debuffs: { name: string; chance: number }[] | null;
+        summon?: string[];
+        selfDamage?: number;
+      };
+    },
+    monsterMaxHP: number,
+  ) {
+    if (chosenSpell.manaCost <= this.mana) {
+      const enemyDamage = chosenSpell.effects.damage;
+      const selfDamage = chosenSpell.effects.selfDamage;
+      if (selfDamage) {
+        this.damageHealth(selfDamage);
+      }
+      const buffs = chosenSpell.effects.buffs;
+      if (buffs) {
+        buffs.forEach((buff) => this.addBuff(buff));
+      }
+      if (chosenSpell.effects.debuffs) {
+        let debuffs: Condition[] = [];
+        chosenSpell.effects.debuffs.forEach((debuff) => {
+          const debuffObj = conditions.find(
+            (condition) => condition.name == debuff.name,
+          );
+          if (!debuffObj)
+            throw new Error(
+              "no debuff found in debuff lookup loop in PlayerCharacter.useSpell()",
+            );
+          const debuffRes = createDebuff(
+            debuff.name,
+            debuff.chance,
+            monsterMaxHP,
+            chosenSpell.effects.damage ?? 0,
+          );
+          if (debuffRes) debuffs.push(debuffRes);
+        });
+        return {
+          damage: enemyDamage,
+          sanityDamage: chosenSpell.effects.sanityDamage ?? 0,
+          debuffs: debuffs,
+        };
+      } else
+        return {
+          damage: enemyDamage,
+          sanityDamage: chosenSpell.effects.sanityDamage ?? 0,
+          debuffs: null,
+        };
+    }
+    throw new Error(
+      "not enough mana to useSpell(), this should be prevented on frontend",
+    );
+  }
 
+  public addBuff(buffName: string) {
+    const buffObj = conditions.find((condition) => (condition.name = buffName));
+    if (buffObj) {
+      let damage = buffObj.effectAmount;
+      if (damage && buffObj.effectStyle == "percentage") {
+        damage *= this.healthMax;
+      }
+      this.conditions.push(
+        new Condition({
+          name: buffObj.name,
+          style: buffObj.style as "buff" | "debuff",
+          turns: buffObj.turns,
+          effect: buffObj.effect as (
+            | "skip"
+            | "accuracy halved"
+            | "damage"
+            | "sanity"
+            | "health"
+            | "armor"
+          )[],
+          damage: damage ?? 0,
+        }),
+      );
+    }
+  }
+  //----------------------------------Conditions----------------------------------//
   public conditionTicker() {
     for (let i = this.conditions.length - 1; i >= 0; i--) {
       const { effect, damage, turns } = this.conditions[i].tick();
@@ -655,8 +820,7 @@ export class PlayerCharacter extends Character {
       }
     }
   }
-
-  //-----------------Misc-----------------//
+  //----------------------------------Misc----------------------------------//
   public getMedicalService(
     cost: number,
     healthRestore?: number,
@@ -696,6 +860,7 @@ export class PlayerCharacter extends Character {
       mana: this.mana,
       manaMax: this.manaMax,
       jobExperience: this.jobExperience,
+      learningSpells: this.learningSpells,
       magicProficiencies: this.magicProficiencies,
       parents: this.parents.map((parent) => parent.toJSON()),
       children: this.children?.map((child) => child.toJSON()),
@@ -732,6 +897,7 @@ export class PlayerCharacter extends Character {
       mana: json.mana,
       manaMax: json.manaMax,
       jobExperience: json.jobExperience,
+      learningSpells: json.learningSpells,
       magicProficiencies: json.magicProficiencies,
       parents: json.parents.map((parent: any) => Character.fromJSON(parent)),
       children: json.children
@@ -796,4 +962,108 @@ function getStartingProficiencies(
     ];
     return starter;
   }
+}
+
+export function getStartingBook(
+  playerBlessing:
+    | "fire"
+    | "water"
+    | "air"
+    | "earth"
+    | "blood"
+    | "summons"
+    | "pestilence"
+    | "bone"
+    | "holy"
+    | "vengeance"
+    | "protection",
+) {
+  if (playerBlessing == "fire") {
+    return new Item({
+      name: "book of fire bolt",
+      baseValue: 2500,
+      itemClass: "book",
+      icon: "Book",
+    });
+  }
+  if (playerBlessing == "water") {
+    return new Item({
+      name: "book of frost",
+      baseValue: 2500,
+      itemClass: "book",
+      icon: "Book",
+    });
+  }
+  if (playerBlessing == "air") {
+    return new Item({
+      name: "book of gust",
+      baseValue: 2500,
+      itemClass: "book",
+      icon: "Book",
+    });
+  }
+  if (playerBlessing == "earth") {
+    return new Item({
+      name: "book of rock toss",
+      baseValue: 2500,
+      itemClass: "book",
+      icon: "Book",
+    });
+  }
+  if (playerBlessing == "blood") {
+    return new Item({
+      name: "book of pull blood",
+      baseValue: 2500,
+      itemClass: "book",
+      icon: "Book",
+    });
+  }
+  if (playerBlessing == "summons") {
+    return new Item({
+      name: "book of the flying skull",
+      baseValue: 2500,
+      itemClass: "book",
+      icon: "Book",
+    });
+  }
+  if (playerBlessing == "pestilence") {
+    return new Item({
+      name: "book of poison dart",
+      baseValue: 2500,
+      itemClass: "book",
+      icon: "Book",
+    });
+  }
+  if (playerBlessing == "bone") {
+    return new Item({
+      name: "book of teeth",
+      baseValue: 2500,
+      itemClass: "book",
+      icon: "Book",
+    });
+  }
+  if (playerBlessing == "holy") {
+    return new Item({
+      name: "book of flash heal",
+      baseValue: 2500,
+      itemClass: "book",
+      icon: "Book",
+    });
+  }
+  if (playerBlessing == "protection") {
+    return new Item({
+      name: "book of blessed guard",
+      baseValue: 2500,
+      itemClass: "book",
+      icon: "Book",
+    });
+  }
+  if (playerBlessing == "vengeance") {
+    return new Item({
+      name: "book of judgment",
+      baseValue: 2500,
+      itemClass: "book",
+      icon: "Book",
+    });
+  } else throw new Error("Invalid player blessing in getStartingBook()");
 }

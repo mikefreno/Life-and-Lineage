@@ -6,8 +6,7 @@
          "damageMult": 1.0,
          "energyCost": 5,
          "sanityDamage": 0,
-         "secondaryEffect": "bleed",
-         "secondaryEffectChance": 0.20
+         "debuffs": [{"name":"bleed", "chance":0.20}]
       },
       {
          "name": "serrate",
@@ -16,8 +15,7 @@
          "damageMult": 1.0,
          "energyCost": 15,
          "sanityDamage": 0,
-         "secondaryEffect": "hemmorage",
-         "secondaryEffectChance": 0.25
+         "debuffs": [{"name":"hemmorage", "chance":0.25}]
       },
       {
          "name": "bite",
@@ -26,8 +24,7 @@
          "damageMult": 1.25,
          "energyCost": 10,
          "sanityDamage": 0,
-         "secondaryEffect": null,
-         "secondaryEffectChance": null 
+         "debuffs": null
       },
       {
          "name": "zombie bite",
@@ -36,8 +33,7 @@
          "damageMult": 1.25,
          "energyCost": 10,
          "sanityDamage": 0,
-         "secondaryEffect": "diseased",
-         "secondaryEffectChance": 0.05
+         "debuffs": [{"name":"diseased", "chance":0.05}]
       },
       {
          "name": "vampiric bite",
@@ -46,8 +42,7 @@
          "damageMult": 0.85,
          "energyCost": 10,
          "sanityDamage": 0,
-         "secondaryEffect": "lifesteal",
-         "secondaryEffectChance": 0.5
+         "debuffs": [{"name":"lifesteal", "chance":0.50}]
       },
       { 
          "name": "torch stab",
@@ -56,8 +51,7 @@
          "damageMult": 0.85,
          "energyCost": 5,
          "sanityDamage": 0,
-         "secondaryEffect": "burn",
-         "secondaryEffectChance": 0.75
+         "debuffs": [{"name":"burn", "chance":0.75}]
       },
       {
          "name": "cleave",
@@ -66,8 +60,7 @@
          "damageMult": 0.75,
          "energyCost": 10,
          "sanityDamage": 0,
-         "secondaryEffect": "bleed",
-         "secondaryEffectChance": 0.35
+         "debuffs": [{"name":"bleed", "chance":0.35}]
       },
       {
          "name": "rock throw",
@@ -76,8 +69,7 @@
          "damageMult": 1.25,
          "energyCost": 5,
          "sanityDamage": 0,
-         "secondaryEffect": "stun",
-         "secondaryEffectChance": 0.15
+         "debuffs": [{"name":"stun", "chance":0.15}]
       },
       {
          "name": "grab",
@@ -86,8 +78,7 @@
          "damageMult": 1.0,
          "energyCost": 15,
          "sanityDamage": 0,
-         "secondaryEffect": "stun",
-         "secondaryEffectChance": 0.75
+         "debuffs": [{"name":"stun", "chance":0.75}]
       },
       {
          "name": "bolder throw",
@@ -96,8 +87,7 @@
          "damageMult": 1.5,
          "energyCost": 25,
          "sanityDamage": 0,
-         "secondaryEffect": "stun",
-         "secondaryEffectChance": 0.25
+         "debuffs": [{"name":"stun", "chance":0.25}]
       },
       {
          "name": "pocket sand",
@@ -106,8 +96,7 @@
          "damageMult": 0.0,
          "energyCost": 5,
          "sanityDamage": 0,
-         "secondaryEffect": "blind",
-         "secondaryEffectChance": 0.5
+         "debuffs": [{"name":"blind", "chance":0.50}]
       },
       {
          "name": "poison spray",
@@ -116,8 +105,7 @@
          "damageMult": 0.0,
          "energyCost": 10,
          "sanityDamage": 0,
-         "secondaryEffect": "poison",
-         "secondaryEffectChance": 0.35
+         "debuffs": [{"name":"poison", "chance":0.35}]
       },
       {
          "name": "wail",
@@ -126,8 +114,7 @@
          "damageMult": 0.0,
          "energyCost": 20,
          "sanityDamage": -5,
-         "secondaryEffect": "fear",
-         "secondaryEffectChance": 0.5
+         "debuffs": [{"name":"fear", "chance":0.50}]
       },
       {
          "name": "shoot",
@@ -136,7 +123,6 @@
          "damageMult": 1.75,
          "energyCost": 15,
          "sanityDamage": 0,
-         "secondaryEffect": null,
-         "secondaryEffectChance": null
+         "debuffs": null
       }
 ]

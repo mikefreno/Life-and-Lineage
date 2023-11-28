@@ -1,7 +1,9 @@
 import { View, Text, ScrollView } from "./Themed";
 import { Pressable, useColorScheme, FlatList } from "react-native";
 import attacks from "../assets/json/playerAttacks.json";
-import { AttackObject } from "../utility/types";
+import mageSpells from "../assets/json/mageSpells.json";
+import necroSpells from "../assets/json/necroSpells.json";
+import paladinSpells from "../assets/json/paladinSpells.json";
 import { toTitleCase } from "../utility/functions";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
@@ -9,10 +11,34 @@ import { selectPlayerCharacter } from "../redux/selectors";
 
 interface BattleTabProps {
   battleTab: "attacks" | "spells" | "equipment" | "log";
-  useAttack: (attack: AttackObject) => void;
+  useAttack: (attack: {
+    name: string;
+    targets: string;
+    hitChance: number;
+    damageMult: number;
+    sanityDamage: number;
+    debuffs: { name: string; chance: number }[] | null;
+  }) => void;
+  useSpell: (spell: {
+    name: string;
+    element: string;
+    proficiencyNeeded: number;
+    manaCost: number;
+    effects: {
+      damage: number | null;
+      buffs: string[] | null;
+      debuffs: { name: string; chance: number }[] | null;
+      summon?: string[];
+      selfDamage?: number;
+    };
+  }) => void;
 }
 
-export default function BattleTab({ battleTab, useAttack }: BattleTabProps) {
+export default function BattleTab({
+  battleTab,
+  useAttack,
+  useSpell,
+}: BattleTabProps) {
   const colorScheme = useColorScheme();
   const logs = useSelector((state: RootState) => state.logs);
 
@@ -23,8 +49,30 @@ export default function BattleTab({ battleTab, useAttack }: BattleTabProps) {
   }
 
   const playerAttacks = playerCharacter.getPhysicalAttacks();
+  const playerSpells = playerCharacter.getSpells();
 
-  let attackObjects: AttackObject[] = [];
+  let attackObjects: {
+    name: string;
+    targets: string;
+    hitChance: number;
+    damageMult: number;
+    sanityDamage: number;
+    debuffs: { name: string; chance: number }[] | null;
+  }[] = [];
+
+  let spellObjects: {
+    name: string;
+    element: string;
+    proficiencyNeeded: number;
+    manaCost: number;
+    effects: {
+      damage: number | null;
+      buffs: string[] | null;
+      debuffs: { name: string; chance: number }[] | null;
+      summon?: string[];
+      selfDamage?: number;
+    };
+  }[] = [];
 
   playerAttacks.forEach((plAttack) =>
     attacks.filter((attack) => {
@@ -33,6 +81,18 @@ export default function BattleTab({ battleTab, useAttack }: BattleTabProps) {
       }
     }),
   );
+
+  let spells;
+  if (playerCharacter.playerClass == "paladin") {
+    spells = paladinSpells;
+  } else if (playerCharacter.playerClass == "necromancer") {
+    spells = necroSpells;
+  } else spells = mageSpells;
+  spells.forEach((spell) => {
+    if (playerSpells.includes(spell.name)) {
+      spellObjects.push(spell);
+    }
+  });
 
   switch (battleTab) {
     case "attacks":
@@ -61,7 +121,27 @@ export default function BattleTab({ battleTab, useAttack }: BattleTabProps) {
         />
       );
     case "spells":
-      return <ScrollView></ScrollView>;
+      return (
+        <FlatList
+          data={spellObjects}
+          inverted
+          renderItem={({ item: spell }) => (
+            <View className="border-t border-zinc-800 py-2 dark:border-zinc-100">
+              <View className="flex flex-row justify-between">
+                <View className="flex flex-col justify-center">
+                  <Text className="text-xl">{toTitleCase(spell.name)}</Text>
+                </View>
+                <Pressable
+                  onPress={() => useSpell(spell)}
+                  className="my-auto rounded bg-zinc-300 px-4 py-2 active:scale-95 active:opacity-50 dark:bg-zinc-700"
+                >
+                  <Text className="text-xl">Use</Text>
+                </Pressable>
+              </View>
+            </View>
+          )}
+        />
+      );
     case "equipment":
       return <ScrollView></ScrollView>;
     case "log":

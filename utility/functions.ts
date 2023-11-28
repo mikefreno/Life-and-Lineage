@@ -3,7 +3,9 @@ import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import shops from "../assets/json/shops.json";
 import names from "../assets/json/names.json";
+import conditions from "../assets/json/conditions.json";
 import { Shop, generateInventory } from "../classes/shop";
+import { Condition } from "../classes/conditions";
 
 export const storeData = async (key: string, value: any) => {
   try {
@@ -187,7 +189,7 @@ export function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function createShops() {
+export function createShops(playerClass: "mage" | "paladin" | "necromancer") {
   let createdShops: Shop[] = [];
   shops.forEach((shop) => {
     //want to favor likelihood of male shopkeepers slightly
@@ -209,9 +211,47 @@ export function createShops() {
       baseGold: shop.baseGold,
       lastStockRefresh: new Date(),
       archetype: shop.type,
-      inventory: generateInventory(itemCount, shop.trades),
+      inventory: generateInventory(itemCount, shop.trades, playerClass),
     });
     createdShops.push(newShop);
   });
   return createdShops;
+}
+export function createDebuff(
+  debuffName: string,
+  debuffChance: number,
+  enemyMaxHP: number,
+  primaryAttackDamage: number,
+) {
+  const roll = rollD20();
+  if (roll * 5 >= debuffChance) {
+    const debuffObj = conditions.find(
+      (condition) => (condition.name = debuffName),
+    );
+    if (debuffObj) {
+      let damage = debuffObj.effectAmount;
+      if (damage && debuffObj.effectStyle == "multiplier") {
+        damage *= primaryAttackDamage;
+      } else if (damage && debuffObj.effectStyle == "percentage") {
+        damage *= enemyMaxHP;
+      }
+      const debuff = new Condition({
+        name: debuffObj.name,
+        style: "debuff",
+        turns: debuffObj.turns,
+        effect: debuffObj.effect as (
+          | "skip"
+          | "accuracy halved"
+          | "damage"
+          | "sanity"
+          | "health"
+          | "armor"
+        )[],
+        damage: damage ?? 0,
+      });
+      return debuff;
+    } else {
+      throw new Error("Failed to find debuff in createDebuff()");
+    }
+  }
 }

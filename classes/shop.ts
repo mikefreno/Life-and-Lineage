@@ -75,14 +75,14 @@ export class Shop {
     return this.lastStockRefresh;
   }
 
-  public refreshInventory() {
+  public refreshInventory(playerClass: "mage" | "necromancer" | "paladin") {
     const shopObj = shops.find((shop) => shop.type == this.archetype);
     if (shopObj) {
       const newCount = getRandomInt(
         shopObj.itemQuantityRange.minimum,
         shopObj.itemQuantityRange.maximum,
       );
-      this.inventory = generateInventory(newCount, shopObj.trades);
+      this.inventory = generateInventory(newCount, shopObj.trades, playerClass);
       this.lastStockRefresh = new Date();
       this.currentGold = this.baseGold;
     } else {
@@ -325,11 +325,15 @@ function getAnItemByType(
   }
 }
 
-export function generateInventory(inventoryCount: number, trades: string[]) {
+export function generateInventory(
+  inventoryCount: number,
+  trades: string[],
+  playerClass: "mage" | "necromancer" | "paladin",
+) {
   let items: Item[] = [];
   for (let i = 0; i < inventoryCount; i++) {
     const type = trades[Math.floor(Math.random() * trades.length)];
-    items.push(getAnItemByType(type));
+    items.push(getAnItemByType(type, playerClass));
   }
   return items;
 }
