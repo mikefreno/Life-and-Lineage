@@ -1,5 +1,5 @@
 import { Link, Tabs } from "expo-router";
-import { Platform, Pressable, View, useColorScheme } from "react-native";
+import { Platform, Pressable } from "react-native";
 import Colors from "../../constants/Colors";
 import Cauldron from "../../assets/icons/CauldronIcon";
 import Wand from "../../assets/icons/WandIcon";
@@ -17,16 +17,17 @@ import Sword from "../../assets/icons/SwordIcon";
 import { elementalColorMap } from "../../utility/elementColors";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
 import Necromancer from "../../assets/icons/NecromancerSkull";
+import { useColorScheme } from "nativewind";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const playerCharacter = useSelector(selectPlayerCharacter);
 
   return (
     <>
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+          tabBarActiveTintColor: Colors[colorScheme as "light" | "dark"].tint,
           tabBarStyle:
             Platform.OS === "android" ? { paddingHorizontal: 16 } : {},
         }}

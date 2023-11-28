@@ -191,6 +191,9 @@ export default function LearningSpellsScreen() {
       {filteredBooks.length == 0 && studyingState.length == 0 ? (
         <View className="-mt-24 flex-1 items-center justify-center">
           <Text className="text-xl italic">No Books to Learn From</Text>
+          <Text className="italic">
+            (Books can be bought from the Librarian)
+          </Text>
         </View>
       ) : null}
     </View>

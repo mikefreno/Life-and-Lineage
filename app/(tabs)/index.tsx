@@ -1,8 +1,7 @@
-import { Pressable, useColorScheme, Image } from "react-native";
+import { Pressable, Image } from "react-native";
 import { View, Text, ScrollView } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import { calculateAge, savePlayer, toTitleCase } from "../../utility/functions";
-import Coins from "../../assets/icons/CoinsIcon";
 import { useDispatch, useSelector } from "react-redux";
 import { selectGame, selectPlayerCharacter } from "../../redux/selectors";
 import ProgressBar from "../../components/ProgressBar";
@@ -15,9 +14,10 @@ import { setPlayerCharacter } from "../../redux/slice/game";
 import Necromancer from "../../assets/icons/NecromancerSkull";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
 import blessingDisplay from "../../components/BlessingsDisplay";
+import { useColorScheme } from "nativewind";
 
 export default function HomeScreen() {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const playerCharacter = useSelector(selectPlayerCharacter);
   const gameData = useSelector(selectGame);
   const dispatch: AppDispatch = useDispatch();
@@ -269,101 +269,95 @@ export default function HomeScreen() {
     const magicProficiencies = playerCharacter.getMagicalProficiencies();
 
     return (
-      <View className="flex-1 justify-between px-4 pt-2">
-        <View className="flex flex-row justify-evenly pb-4">
-          {playerCharacter?.playerClass == "necromancer" ? (
-            <View className="m-auto w-1/3">
-              <Necromancer
-                width={100}
-                height={100}
-                color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
-              />
+      <>
+        <View className="flex-1 justify-between px-4 pt-2">
+          <View className="flex flex-row justify-evenly pb-4">
+            {playerCharacter?.playerClass == "necromancer" ? (
+              <View className="m-auto w-1/3">
+                <Necromancer
+                  width={100}
+                  height={100}
+                  color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
+                />
+              </View>
+            ) : playerCharacter?.playerClass == "paladin" ? (
+              <View className="m-auto w-1/3">
+                <PaladinHammer width={100} height={100} />
+              </View>
+            ) : (
+              <View className="m-auto w-1/3 scale-x-[-1] transform">
+                <WizardHat
+                  height={100}
+                  width={100}
+                  color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
+                />
+              </View>
+            )}
+            <View className="mx-auto flex w-1/3 flex-col pt-2">
+              <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
+              <Text className="text-center text-xl dark:text-white">{`${jobRes?.title}`}</Text>
+              <Text className="text-center text-xl dark:text-white">{`${
+                playerCharacter
+                  ? calculateAge(
+                      playerCharacter.birthdate,
+                      gameData.getGameDate(),
+                    )
+                  : "x"
+              } years old`}</Text>
             </View>
-          ) : playerCharacter?.playerClass == "paladin" ? (
-            <View className="m-auto w-1/3">
-              <PaladinHammer width={100} height={100} />
-            </View>
-          ) : (
-            <View className="m-auto w-1/3 scale-x-[-1] transform">
-              <WizardHat
-                height={100}
-                width={100}
-                color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
-              />
-            </View>
-          )}
-          <View className="mx-auto flex w-1/3 flex-col pt-2">
-            <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
-            <Text className="text-center text-xl dark:text-white">{`${jobRes?.title}`}</Text>
-            <Text className="text-center text-xl dark:text-white">{`${
-              playerCharacter
-                ? calculateAge(
-                    playerCharacter.birthdate,
-                    gameData.getGameDate(),
-                  )
-                : "x"
-            } years old`}</Text>
-          </View>
-          <View className="m-auto">
-            {blessingDisplay(playerCharacter.blessing, colorScheme)}
-          </View>
-        </View>
-        <ScrollView>
-          <View className="flex flex-row">
-            {currentEquipmentDisplay()}
-            <View className="mx-auto">
-              {selectedItem ? (
-                <View className="my-auto">{selectedItemDisplay()}</View>
-              ) : null}
+            <View className="m-auto">
+              {blessingDisplay(playerCharacter.blessing, colorScheme)}
             </View>
           </View>
-          <View className="py-4">
-            <Pressable onPress={() => setShowingInventory(!showingInventory)}>
-              <Image source={require("../../assets/images/items/Bag.png")} />
-            </Pressable>
-          </View>
-          {showingInventory ? (
-            <>
-              {playerCharacter.getInventory().length > 0 ? (
-                <ScrollView horizontal>
-                  <View className="my-auto max-h-64 flex-wrap justify-around">
-                    {playerInventory?.map((item) => (
-                      <Pressable
-                        key={item.id}
-                        className="m-2 items-center active:scale-90 active:opacity-50"
-                        onPress={() => displaySetter(item, null)}
-                      >
-                        <View
-                          className="rounded-lg p-2"
-                          style={{ backgroundColor: "#a1a1aa" }}
+          <ScrollView>
+            <View className="flex flex-row">
+              {currentEquipmentDisplay()}
+              <View className="mx-auto">
+                {selectedItem ? (
+                  <View className="my-auto">{selectedItemDisplay()}</View>
+                ) : null}
+              </View>
+            </View>
+            <View className="py-4">
+              <Pressable onPress={() => setShowingInventory(!showingInventory)}>
+                <Image source={require("../../assets/images/items/Bag.png")} />
+              </Pressable>
+            </View>
+            {showingInventory ? (
+              <>
+                {playerCharacter.getInventory().length > 0 ? (
+                  <ScrollView horizontal>
+                    <View className="my-auto max-h-64 flex-wrap justify-around">
+                      {playerInventory?.map((item) => (
+                        <Pressable
+                          key={item.id}
+                          className="m-2 items-center active:scale-90 active:opacity-50"
+                          onPress={() => displaySetter(item, null)}
                         >
-                          <Image source={item.getItemIcon()} />
-                        </View>
-                      </Pressable>
-                    ))}
-                  </View>
-                </ScrollView>
-              ) : (
-                <Text className="py-8 text-center italic">
-                  Inventory is currently empty
-                </Text>
-              )}
-            </>
-          ) : null}
-          <View className="flex items-center pb-4">
-            {magicProficiencySection(magicProficiencies)}
-          </View>
-        </ScrollView>
-        {playerCharacter ? (
-          <View className="mb-1 flex flex-col">
-            <View className="flex flex-row justify-center pt-2">
-              <Text>{playerCharacter.getReadableGold()}</Text>
-              <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+                          <View
+                            className="rounded-lg p-2"
+                            style={{ backgroundColor: "#a1a1aa" }}
+                          >
+                            <Image source={item.getItemIcon()} />
+                          </View>
+                        </Pressable>
+                      ))}
+                    </View>
+                  </ScrollView>
+                ) : (
+                  <Text className="py-8 text-center italic">
+                    Inventory is currently empty
+                  </Text>
+                )}
+              </>
+            ) : null}
+            <View className="flex items-center pb-4">
+              {magicProficiencySection(magicProficiencies)}
             </View>
-            <PlayerStatus />
-          </View>
-        ) : null}
-      </View>
+          </ScrollView>
+        </View>
+        {playerCharacter ? <PlayerStatus displayGoldTop={true} /> : null}
+      </>
     );
   }
 }

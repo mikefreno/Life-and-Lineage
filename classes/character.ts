@@ -113,6 +113,7 @@ type PlayerCharacterBase = {
   sanity?: number;
   mana?: number;
   manaMax?: number;
+  manaRegen?: number;
   magicProficiencies?: { school: string; proficiency: number }[];
   jobExperience?: {
     job: string;
@@ -176,6 +177,7 @@ export class PlayerCharacter extends Character {
   private sanity: number;
   private mana: number;
   private manaMax: number;
+  private manaRegen: number;
   public jobExperience: { job: string; experience: number }[];
   public learningSpells: {
     bookName: string;
@@ -215,6 +217,7 @@ export class PlayerCharacter extends Character {
     sanity,
     mana,
     manaMax,
+    manaRegen,
     jobExperience,
     learningSpells,
     magicProficiencies,
@@ -244,6 +247,7 @@ export class PlayerCharacter extends Character {
     this.sanity = sanity ?? 50;
     this.mana = mana ?? 100;
     this.manaMax = manaMax ?? 100;
+    this.manaRegen = manaRegen ?? 3;
     this.jobExperience = jobExperience ?? [];
     this.learningSpells = learningSpells ?? [];
     this.magicProficiencies =
@@ -269,7 +273,6 @@ export class PlayerCharacter extends Character {
       body: null,
     };
   }
-
   //----------------------------------Health----------------------------------//
   public getHealth() {
     return this.health;
@@ -320,6 +323,13 @@ export class PlayerCharacter extends Character {
       this.mana += amount;
     } else {
       this.mana = this.manaMax;
+    }
+  }
+  private regenMana() {
+    if (this.mana + this.manaRegen > this.manaMax) {
+      this.mana = this.manaMax;
+    } else {
+      this.mana += this.manaRegen;
     }
   }
   //----------------------------------Sanity----------------------------------//
@@ -502,6 +512,9 @@ export class PlayerCharacter extends Character {
   public spendGold(amount: number) {
     this.gold -= amount;
   }
+  public addGold(gold: number) {
+    this.gold += gold;
+  }
   //----------------------------------Work----------------------------------//
   public getCurrentJobAndExperience() {
     const job = this.jobExperience.find((job) => job.job == this.job);
@@ -681,10 +694,6 @@ export class PlayerCharacter extends Character {
   public getChildren(): Character[] | null {
     return this.children;
   }
-  private addGold(gold: number) {
-    this.gold += gold;
-  }
-
   //----------------------------------Conditions----------------------------------//
   public addCondition(condition: Condition | null) {
     if (condition) {
@@ -729,6 +738,7 @@ export class PlayerCharacter extends Character {
     },
     monsterMaxHP: number,
   ) {
+    this.regenMana();
     const rollToHit = 20 - (attack.hitChance * 100) / 5;
     const roll = rollD20();
     if (roll >= rollToHit) {
@@ -791,6 +801,7 @@ export class PlayerCharacter extends Character {
   ) {
     if (chosenSpell.manaCost <= this.mana) {
       this.mana -= chosenSpell.manaCost;
+      this.regenMana();
       const enemyDamage = chosenSpell.effects.damage;
       const selfDamage = chosenSpell.effects.selfDamage;
       if (selfDamage) {
@@ -917,6 +928,7 @@ export class PlayerCharacter extends Character {
       sanity: this.sanity,
       mana: this.mana,
       manaMax: this.manaMax,
+      manaRegen: this.manaRegen,
       jobExperience: this.jobExperience,
       learningSpells: this.learningSpells,
       magicProficiencies: this.magicProficiencies,
@@ -954,6 +966,7 @@ export class PlayerCharacter extends Character {
       sanity: json.sanity,
       mana: json.mana,
       manaMax: json.manaMax,
+      manaRegen: json.manaRegen,
       jobExperience: json.jobExperience,
       learningSpells: json.learningSpells,
       magicProficiencies: json.magicProficiencies,

@@ -1,10 +1,13 @@
 import { View, Text, ScrollView } from "./Themed";
-import { Pressable, useColorScheme, FlatList } from "react-native";
+import { Pressable, useColorScheme, FlatList, Image } from "react-native";
 import attacks from "../assets/json/playerAttacks.json";
 import { toTitleCase } from "../utility/functions";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { selectPlayerCharacter } from "../redux/selectors";
+import Coins from "../assets/icons/CoinsIcon";
+import { Item } from "../classes/item";
+import { useState } from "react";
 
 interface BattleTabProps {
   battleTab: "attacks" | "spells" | "equipment" | "log";
@@ -38,6 +41,7 @@ export default function BattleTab({
 }: BattleTabProps) {
   const colorScheme = useColorScheme();
   const logs = useSelector((state: RootState) => state.logs);
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
   const playerCharacter = useSelector(selectPlayerCharacter);
 
@@ -64,6 +68,29 @@ export default function BattleTab({
       }
     }),
   );
+
+  function selectedItemDisplay() {
+    if (selectedItem) {
+      return (
+        <View className="flex items-center justify-center py-4">
+          <Text>{toTitleCase(selectedItem.name)}</Text>
+          <Image source={selectedItem.getItemIcon()} />
+          <Text>
+            {selectedItem.itemClass == "bodyArmor"
+              ? "Body Armor"
+              : toTitleCase(selectedItem.itemClass)}
+          </Text>
+          {selectedItem.slot ? (
+            <Text className="">
+              Fills {toTitleCase(selectedItem.slot)} Slot
+            </Text>
+          ) : null}
+        </View>
+      );
+    } else {
+      return <View className="flex h-1/3 items-center justify-center"></View>;
+    }
+  }
 
   switch (battleTab) {
     case "attacks":
@@ -123,7 +150,45 @@ export default function BattleTab({
         />
       );
     case "equipment":
-      return <ScrollView></ScrollView>;
+      return (
+        <>
+          {playerCharacter.getInventory().length > 0 ? (
+            <View className="flex h-5/6 flex-row">
+              <ScrollView className="w-1/2">
+                <View className="my-auto flex-wrap justify-around">
+                  {playerCharacter.getInventory()?.map((item) => (
+                    <Pressable
+                      key={item.id}
+                      className="m-2 items-center active:scale-90 active:opacity-50"
+                      onPress={() => setSelectedItem(item)}
+                    >
+                      <View
+                        className="rounded-lg p-2"
+                        style={{ backgroundColor: "#a1a1aa" }}
+                      >
+                        <Image source={item.getItemIcon()} />
+                      </View>
+                    </Pressable>
+                  ))}
+                </View>
+              </ScrollView>
+              <View className="w-1/2">
+                {selectedItem ? (
+                  <View className="my-auto">{selectedItemDisplay()}</View>
+                ) : null}
+              </View>
+            </View>
+          ) : (
+            <Text className="h-5/6 py-8 text-center italic">
+              Inventory is currently empty
+            </Text>
+          )}
+          <View className="flex flex-row justify-center">
+            <Text>{playerCharacter.getReadableGold()}</Text>
+            <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+          </View>
+        </>
+      );
     case "log":
       return (
         <View

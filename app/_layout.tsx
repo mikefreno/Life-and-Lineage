@@ -15,7 +15,6 @@ import { setGameData, setPlayerCharacter } from "../redux/slice/game";
 import { selectGame, selectPlayerCharacter } from "../redux/selectors";
 import { PlayerCharacter } from "../classes/character";
 import { useColorScheme as nativeColorScheme } from "nativewind";
-import { useColorScheme } from "react-native";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -48,8 +47,7 @@ function RootLayout() {
 
   const [gameAndPlayerLoaded, setGameAndPlayerLoaded] = useState(false);
 
-  const { setColorScheme } = nativeColorScheme();
-  const colorScheme = useColorScheme();
+  const { setColorScheme, colorScheme } = nativeColorScheme();
 
   useEffect(() => {
     const fetchGameData = async () => {

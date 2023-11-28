@@ -252,7 +252,7 @@ export class Monster {
       let drops: Item[] = [];
       dropList.forEach((drop) => {
         const roll = rollD20();
-        if (roll * 5 > drop.chance) {
+        if (roll * 5 > drop.chance * 100) {
           const items = itemList(drop.itemType, playerClass);
           const itemObj = items.find((item) => item.name == drop.item);
           if (itemObj) {

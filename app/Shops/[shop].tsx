@@ -4,7 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectGame, selectPlayerCharacter } from "../../redux/selectors";
 import { calculateAge, fullSave, toTitleCase } from "../../utility/functions";
 import { CharacterImage } from "../../components/CharacterImage";
-import { Pressable, Image, ScrollView, useColorScheme } from "react-native";
+import {
+  Pressable,
+  Image,
+  ScrollView,
+  View as NonThemedView,
+  useColorScheme,
+} from "react-native";
 import { useEffect, useState } from "react";
 import { Item } from "../../classes/item";
 import Coins from "../../assets/icons/CoinsIcon";
@@ -166,35 +172,23 @@ export default function ShopScreen() {
                 <Coins width={16} height={16} style={{ marginLeft: 6 }} />
               </View>
             </View>
-            <ScrollView
-              className="my-auto max-h-60 w-2/3"
-              style={{
-                backgroundColor: colorScheme == "light" ? "#f4f4f5" : "#020617",
-              }}
-            >
-              <View
-                className="flex flex-row flex-wrap justify-around"
-                style={{
-                  backgroundColor:
-                    colorScheme == "light" ? "#f4f4f5" : "#020617",
-                }}
-              >
-                {thisShop.getInventory().map((item) => (
-                  <Pressable
-                    key={item.id}
-                    className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
-                    onPress={() => displaySetter(item, true)}
-                  >
-                    <View
-                      className="rounded-lg p-2"
-                      style={{ backgroundColor: "#a1a1aa" }}
+            <View className="mx-2 -mt-1 max-h-60 w-2/3 rounded border border-zinc-300 dark:border-zinc-700">
+              <ScrollView className="my-auto">
+                <View className="flex flex-row flex-wrap justify-around">
+                  {thisShop.getInventory().map((item) => (
+                    <Pressable
+                      key={item.id}
+                      className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
+                      onPress={() => displaySetter(item, true)}
                     >
-                      <Image source={item.getItemIcon()} />
-                    </View>
-                  </Pressable>
-                ))}
-              </View>
-            </ScrollView>
+                      <NonThemedView className="rounded-lg bg-zinc-300 p-2">
+                        <Image source={item.getItemIcon()} />
+                      </NonThemedView>
+                    </Pressable>
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
           </View>
           {selectedItem ? (
             selectedItemDisplay()
@@ -202,7 +196,7 @@ export default function ShopScreen() {
             <View className="flex h-1/3 items-center justify-center" />
           )}
           <View className="h-1/3">
-            <View className="mx-auto flex flex-row">
+            <View className="flex flex-row justify-center border-b border-zinc-300 dark:border-zinc-700">
               <Text className="text-center">
                 {playerCharacter.getName()}'s Inventory
               </Text>
@@ -215,30 +209,17 @@ export default function ShopScreen() {
                 <Text> )</Text>
               </View>
             </View>
-            <ScrollView
-              style={{
-                backgroundColor: colorScheme == "light" ? "#f4f4f5" : "#020617",
-              }}
-            >
-              <View
-                className="flex flex-row flex-wrap justify-around"
-                style={{
-                  backgroundColor:
-                    colorScheme == "light" ? "#f4f4f5" : "#020617",
-                }}
-              >
+            <ScrollView>
+              <View className="flex flex-row flex-wrap justify-around">
                 {playerCharacter.getInventory().map((item) => (
                   <Pressable
                     key={item.id}
                     className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
                     onPress={() => displaySetter(item, false)}
                   >
-                    <View
-                      className="rounded-lg p-2"
-                      style={{ backgroundColor: "#a1a1aa" }}
-                    >
+                    <NonThemedView className="rounded-lg bg-zinc-300 p-2">
                       <Image source={item.getItemIcon()} />
-                    </View>
+                    </NonThemedView>
                   </Pressable>
                 ))}
               </View>

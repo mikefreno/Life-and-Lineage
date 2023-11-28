@@ -1,11 +1,12 @@
 import { View, Text } from "../../components/Themed";
+import { Image, View as NonThemedView } from "react-native";
 import { useEffect, useState } from "react";
 import { MonsterImage } from "../../components/MonsterImage";
-import { Pressable } from "react-native";
+import { Pressable, Modal } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 import BattleTab from "../../components/BattleTab";
 import { router } from "expo-router";
-import { fullSave, toTitleCase } from "../../utility/functions";
+import { fullSave, savePlayer, toTitleCase } from "../../utility/functions";
 import { enemyGenerator } from "../../utility/monster";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -25,6 +26,8 @@ import ProgressBar from "../../components/ProgressBar";
 import monsterObjects from "../../assets/json/monsters.json";
 import { DungeonInstance, DungeonLevel } from "../../classes/dungeon";
 import { debounce } from "lodash";
+import { Item } from "../../classes/item";
+import Coins from "../../assets/icons/CoinsIcon";
 
 export default function DungeonLevelScreen() {
   const { slug } = useLocalSearchParams();
@@ -39,7 +42,10 @@ export default function DungeonLevelScreen() {
   >("log");
   const [thisInstance, setThisInstance] = useState<DungeonInstance>();
   const [thisDungeon, setThisDungeon] = useState<DungeonLevel>();
-  const [showingLoot, setShowingLoot] = useState<boolean>(false);
+  const [droppedItems, setDroppedItems] = useState<{
+    itemDrops: Item[];
+    gold: number;
+  } | null>(null);
 
   const monster = useSelector(selectMonster);
 
@@ -109,6 +115,39 @@ export default function DungeonLevelScreen() {
           return;
         }
       });
+  }
+
+  //adding in removed items
+  function takeItem(item: Item) {
+    if (playerCharacter && droppedItems) {
+      playerCharacter.addToInventory(Item.fromJSON(item.toJSON()));
+      dispatch(setPlayerCharacter(playerCharacter));
+      savePlayer(playerCharacter);
+
+      const updatedItemDrops = droppedItems.itemDrops.filter(
+        (itemDrop) => !itemDrop.equals(item),
+      );
+
+      setDroppedItems((prevState) => ({
+        ...prevState,
+        gold: prevState!.gold,
+        itemDrops: updatedItemDrops,
+      }));
+    }
+    if (droppedItems?.itemDrops.length == 0) {
+      setDroppedItems(null);
+    }
+  }
+
+  function takeAllItems() {
+    if (playerCharacter && droppedItems) {
+      droppedItems.itemDrops.forEach((item) =>
+        playerCharacter.addToInventory(item),
+      );
+      setDroppedItems(null);
+      dispatch(setPlayerCharacter(playerCharacter));
+      savePlayer(playerCharacter);
+    }
   }
 
   const enemyTurn = () => {
@@ -223,7 +262,8 @@ export default function DungeonLevelScreen() {
             );
             monsterDefeated = true;
             const drops = monster.getDrops(playerCharacter.playerClass);
-            setShowingLoot(true);
+            playerCharacter.addGold(drops.gold);
+            setDroppedItems(drops);
             if (fightingBoss && gameData) {
               setFightingBoss(false);
               thisDungeon?.setBossDefeated();
@@ -299,13 +339,14 @@ export default function DungeonLevelScreen() {
           );
           monsterDefeated = true;
           const drops = monster.getDrops(playerCharacter.playerClass);
+          playerCharacter.addGold(drops.gold);
+          setDroppedItems(drops);
           if (fightingBoss && gameData) {
             setFightingBoss(false);
             thisDungeon?.setBossDefeated();
             gameData.openNextDungeonLevel(thisInstance!.name);
             dispatch(setGameData(gameData));
           }
-          setShowingLoot(true);
           dispatch(setMonster(null));
         } else {
           dispatch(setMonster(monster));
@@ -321,8 +362,6 @@ export default function DungeonLevelScreen() {
     },
     100,
   );
-
-  function lootDrop() {}
 
   while (!monster) {
     return (
@@ -343,7 +382,73 @@ export default function DungeonLevelScreen() {
                 : `${toTitleCase(thisInstance?.name as string)} Level ${level}`,
           }}
         />
-        {lootDrop()}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={droppedItems ? true : false}
+          onRequestClose={() => setDroppedItems(null)}
+        >
+          <NonThemedView className="flex-1 items-center justify-center">
+            <View
+              className="w-2/3 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
+              style={{
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+
+                shadowOpacity: 0.25,
+                shadowRadius: 5,
+              }}
+            >
+              <NonThemedView>
+                <NonThemedView className="mb-2 flex flex-row justify-center">
+                  <Text className="italic">
+                    You picked up {droppedItems?.gold}
+                  </Text>
+                  <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+                </NonThemedView>
+                {droppedItems?.itemDrops.map((item) => (
+                  <NonThemedView
+                    key={item.id}
+                    className="my-2 flex flex-row justify-between"
+                  >
+                    <NonThemedView className="flex flex-row">
+                      <Image source={item.getItemIcon()} />
+                      <Text className="my-auto">{item.name}</Text>
+                    </NonThemedView>
+                    <Pressable
+                      onPress={() => {
+                        takeItem(item);
+                      }}
+                      className="rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+                    >
+                      <Text>Take</Text>
+                    </Pressable>
+                  </NonThemedView>
+                ))}
+                {droppedItems && droppedItems.itemDrops.length > 0 ? (
+                  <Pressable
+                    className="mx-auto mt-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+                    onPress={() => {
+                      takeAllItems();
+                    }}
+                  >
+                    <Text>Take All</Text>
+                  </Pressable>
+                ) : null}
+
+                <Pressable
+                  className="mx-auto mt-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+                  onPress={() => setDroppedItems(null)}
+                >
+                  <Text>Done Looting</Text>
+                </Pressable>
+              </NonThemedView>
+            </View>
+          </NonThemedView>
+        </Modal>
         <View className="flex-1 px-4 py-6">
           <View className="flex h-1/3 flex-row justify-evenly">
             <View className="flex w-2/5 flex-col items-center justify-center">
@@ -362,7 +467,7 @@ export default function DungeonLevelScreen() {
             </View>
           </View>
           {thisDungeon.stepsBeforeBoss !== 0 && !fightingBoss ? (
-            <View className="-mt-7 flex flex-row justify-evenly border-b border-zinc-900 dark:border-zinc-50">
+            <View className="-mt-7 flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
               <Text className="my-auto text-xl">
                 {`Steps Completed: ${thisDungeon.getStep()} / ${
                   thisDungeon.stepsBeforeBoss
@@ -372,7 +477,7 @@ export default function DungeonLevelScreen() {
               !thisDungeon.bossDefeatedCheck() ? (
                 <Pressable
                   onPress={loadBoss}
-                  className="rounded bg-red-500 px-4 py-2 active:scale-95 active:opacity-50"
+                  className="my-auto rounded bg-red-500 px-4 py-2 active:scale-95 active:opacity-50"
                 >
                   <Text style={{ color: "white" }}>Fight Boss</Text>
                 </Pressable>
@@ -392,8 +497,8 @@ export default function DungeonLevelScreen() {
               useSpell={useSpell}
             />
           </View>
-          <View>
-            <View className="flex w-full flex-row justify-evenly border-y border-zinc-200">
+          <View className="-m-2">
+            <View className="flex w-full flex-row justify-evenly border-t border-zinc-200">
               <Pressable
                 className={`px-6 py-4 rounded ${
                   battleTab == "attacks"
@@ -436,7 +541,9 @@ export default function DungeonLevelScreen() {
               </Pressable>
             </View>
           </View>
-          <PlayerStatus />
+          <View className="-mx-4">
+            <PlayerStatus />
+          </View>
         </View>
       </>
     );

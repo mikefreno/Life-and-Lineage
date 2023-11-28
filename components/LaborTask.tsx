@@ -9,12 +9,11 @@ import { selectGame, selectPlayerCharacter } from "../redux/selectors";
 import { AppDispatch } from "../redux/store";
 import { setGameData, setPlayerCharacter } from "../redux/slice/game";
 import ProgressBar from "./ProgressBar";
-import { debounce } from "lodash";
-import { useState } from "react";
+import { useColorScheme } from "nativewind";
 
 interface LaborTaskProps {
-  title: string;
   reward: number;
+  title: string;
   cost: {
     mana: number;
     sanity?: number;
@@ -32,7 +31,8 @@ export default function LaborTask({
   const playerCharacter = useSelector(selectPlayerCharacter);
   const gameData = useSelector(selectGame);
   const dispatch: AppDispatch = useDispatch();
-  const [loading, setLoading] = useState<boolean>(false);
+
+  const { colorScheme } = useColorScheme();
 
   if (!playerCharacter) {
     throw Error("No Player Character on Labor Task");
@@ -46,9 +46,8 @@ export default function LaborTask({
     }
   }
 
-  const work = debounce(() => {
+  const work = () => {
     if (playerCharacter && gameData) {
-      setLoading(true);
       playerCharacter.performLabor({
         title: title,
         cost: cost,
@@ -59,73 +58,115 @@ export default function LaborTask({
       dispatch(setGameData(gameData));
       fullSave(gameData, playerCharacter);
     }
-    setLoading(false);
-  }, 100);
+  };
 
   return (
-    <View className="mx-2 my-2 flex justify-between rounded-xl bg-zinc-200 px-4 py-2 text-zinc-950 dark:bg-zinc-800">
-      <View className="flex flex-row justify-between">
-        <Text className="bold my-auto w-2/3 text-xl dark:text-zinc-50">
-          {title}
-        </Text>
-        <View className="my-auto -mb-8 mt-8 w-1/3">
-          <View className="flex w-full flex-row items-center justify-evenly">
-            <Text className="dark:text-zinc-50">{reward}</Text>
-            <Coins width={14} height={14} style={{ marginLeft: 6 }} />
-          </View>
-          <View className="flex w-full flex-row items-center justify-evenly">
-            <Text className="dark:text-zinc-50">-{cost.mana}</Text>
-            <Energy width={14} height={14} style={{ marginLeft: 6 }} />
-          </View>
-          {cost.health && (
+    <View
+      className="m-2 rounded-xl"
+      style={{
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 3,
+          height: 1,
+        },
+        backgroundColor: colorScheme == "light" ? "#fafafa" : "#27272a",
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+      }}
+    >
+      <View className="flex justify-between rounded-xl px-4 py-2 text-zinc-950  dark:border dark:border-zinc-500">
+        <View className="flex flex-row justify-between">
+          <Text className="bold my-auto w-2/3 text-xl dark:text-zinc-50">
+            {title}
+          </Text>
+          <View className="my-auto -mb-8 mt-8 w-1/3">
             <View className="flex w-full flex-row items-center justify-evenly">
-              <Text className="dark:text-zinc-50">-{cost.health}</Text>
-              <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
+              <Text className="dark:text-zinc-50">{reward}</Text>
+              <Coins width={14} height={14} style={{ marginLeft: 6 }} />
             </View>
-          )}
-          {cost.sanity && (
             <View className="flex w-full flex-row items-center justify-evenly">
-              <Text className="dark:text-zinc-50">-{cost.sanity}</Text>
-              <Sanity width={14} height={14} style={{ marginLeft: 6 }} />
+              <Text className="dark:text-zinc-50">-{cost.mana}</Text>
+              <Energy width={14} height={14} style={{ marginLeft: 6 }} />
             </View>
-          )}
+            {cost.health && (
+              <View className="flex w-full flex-row items-center justify-evenly">
+                <Text className="dark:text-zinc-50">-{cost.health}</Text>
+                <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
+              </View>
+            )}
+            {cost.sanity && (
+              <View className="flex w-full flex-row items-center justify-evenly">
+                <Text className="dark:text-zinc-50">-{cost.sanity}</Text>
+                <Sanity width={14} height={14} style={{ marginLeft: 6 }} />
+              </View>
+            )}
+          </View>
         </View>
-      </View>
-      {playerCharacter.getJobTitle() == title ? (
-        <>
-          <Pressable
-            disabled={loading}
-            className="mx-auto mb-2 mt-4"
-            onPress={work}
-          >
+        {playerCharacter.getJobTitle() == title ? (
+          <>
+            <Pressable className="mb-2 mt-4" onPress={work}>
+              {({ pressed }) => (
+                <View
+                  className="mx-auto rounded-xl"
+                  style={{
+                    shadowColor: "#000",
+                    shadowOffset: {
+                      width: 0,
+                      height: 1,
+                    },
+                    backgroundColor:
+                      colorScheme == "light" ? "white" : "#71717a",
+                    shadowOpacity: 0.1,
+                    shadowRadius: 5,
+                  }}
+                >
+                  <View
+                    className={`px-8 py-4 ${
+                      pressed ? "scale-95 opacity-50" : null
+                    }`}
+                  >
+                    <Text className="text-center text-zinc-900 dark:text-zinc-50">
+                      Work
+                    </Text>
+                  </View>
+                </View>
+              )}
+            </Pressable>
+            <ProgressBar
+              value={playerCharacter.getJobExperience(title)}
+              maxValue={experienceToPromote}
+            />
+          </>
+        ) : (
+          <Pressable className="mb-2 mt-4" onPress={setJob}>
             {({ pressed }) => (
               <View
-                className={`my-auto rounded-xl bg-sky-50 px-8 py-4 ${
-                  pressed ? "scale-95 opacity-30" : null
-                }`}
+                className="mx-auto rounded-xl"
+                style={{
+                  shadowColor: "#000",
+                  shadowOffset: {
+                    width: 0,
+                    height: 1,
+                  },
+                  backgroundColor: colorScheme == "light" ? "white" : "#71717a",
+                  shadowOpacity: 0.1,
+                  shadowRadius: 5,
+                }}
               >
-                <Text className="text-center">Work</Text>
+                <View
+                  className={`px-8 py-4 ${
+                    pressed ? "scale-95 opacity-50" : null
+                  }`}
+                >
+                  <Text className="text-center text-zinc-900 dark:text-zinc-50">
+                    Apply
+                  </Text>
+                </View>
               </View>
             )}
           </Pressable>
-          <ProgressBar
-            value={playerCharacter.getJobExperience(title)}
-            maxValue={experienceToPromote}
-          />
-        </>
-      ) : (
-        <Pressable className="mx-auto mb-2 mt-4" onPress={setJob}>
-          {({ pressed }) => (
-            <View
-              className={`my-auto rounded-xl bg-sky-50 px-8 py-4 ${
-                pressed ? "scale-95 opacity-30" : null
-              }`}
-            >
-              <Text className="text-center">Apply</Text>
-            </View>
-          )}
-        </Pressable>
-      )}
+        )}
+      </View>
     </View>
   );
 }
