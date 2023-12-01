@@ -2,7 +2,7 @@ import { Pressable, StyleSheet } from "react-native";
 import { View, Text, SafeAreaView } from "../components/Themed";
 import { Stack } from "expo-router";
 import deathMessages from "../assets/json/deathMessages.json";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { router } from "expo-router";
 import { CharacterImage } from "../components/CharacterImage";
 import { calculateAge } from "../utility/functions";

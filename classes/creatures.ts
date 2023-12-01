@@ -25,15 +25,8 @@ import weapons from "../assets/json/items/weapons.json";
 import necroBooks from "../assets/json/items/necroBooks.json";
 import paladinBooks from "../assets/json/items/paladinBooks.json";
 import mageBooks from "../assets/json/items/mageBooks.json";
+import { v4 as uuidv4 } from "uuid";
 import { Item } from "./item";
-
-interface familiarOptions {
-  name: string;
-  species: string;
-  level: number;
-  sex: "male" | "female";
-  health: number;
-}
 
 interface monsterInterface {
   creatureSpecies: string;
@@ -42,6 +35,7 @@ interface monsterInterface {
   sanity: number | null;
   sanityMax: number | null;
   attackPower: number;
+  minions?: Minion[];
   energy: number;
   energyMax: number;
   energyRegen: number;
@@ -60,6 +54,7 @@ export class Monster {
   private energyMax: number;
   private energyRegen: number;
   private attacks: string[];
+  private minions: Minion[];
   private conditions: Condition[];
 
   constructor({
@@ -67,6 +62,7 @@ export class Monster {
     health,
     healthMax,
     sanity,
+    minions,
     sanityMax,
     attackPower,
     energy,
@@ -79,6 +75,7 @@ export class Monster {
     this.health = health;
     this.sanity = sanity ?? null;
     this.sanityMax = sanityMax ?? null;
+    this.minions = minions ?? [];
     this.healthMax = healthMax;
     this.attackPower = attackPower;
     this.energy = energy;
@@ -87,7 +84,6 @@ export class Monster {
     this.attacks = attacks;
     this.conditions = conditions ?? [];
   }
-
   //---------------------------Health---------------------------//
   public damageHealth(damage: number | null) {
     this.health -= damage ?? 0;
@@ -107,7 +103,6 @@ export class Monster {
     }
   }
   //---------------------------Battle---------------------------//
-
   public addCondition(condition: Condition | null) {
     if (condition) {
       this.conditions.push(condition);
@@ -237,6 +232,10 @@ export class Monster {
       return "pass";
     }
   }
+  //---------------------------Misc---------------------------//
+  public addMinion(minion: Minion) {
+    this.minions.push(minion);
+  }
 
   //---------------------------Misc---------------------------//
   public getDrops(playerClass: "necromancer" | "paladin" | "mage") {
@@ -318,6 +317,7 @@ export class Monster {
       sanity: json.sanity,
       sanityMax: json.sanityMax,
       attackPower: json.attackPower,
+      minions: json.minions,
       energy: json.energy,
       energyMax: json.energyMax,
       energyRegen: json.energyRegen,
@@ -325,6 +325,131 @@ export class Monster {
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
+    });
+  }
+}
+
+interface minionOptions {
+  creatureSpecies: string;
+  creatureID?: string;
+  health: number;
+  healthMax: number;
+  attackPower: number;
+  attacks: string[];
+  turnsLeftAlive: number;
+}
+
+export class Minion {
+  readonly creatureSpecies: string;
+  readonly creatureID: string;
+  private health: number;
+  readonly healthMax: number;
+  readonly attackPower: number;
+  readonly attacks: string[];
+  public turnsLeftAlive: number;
+
+  constructor({
+    creatureSpecies,
+    creatureID,
+    health,
+    healthMax,
+    attackPower,
+    attacks,
+    turnsLeftAlive,
+  }: minionOptions) {
+    this.creatureSpecies = creatureSpecies;
+    this.creatureID = creatureID ?? uuidv4();
+    this.health = health;
+    this.healthMax = healthMax;
+    this.attackPower = attackPower;
+    this.attacks = attacks;
+    this.turnsLeftAlive = turnsLeftAlive;
+  }
+
+  public equals(minion: Minion) {
+    return this.creatureID == minion.creatureID;
+  }
+
+  public getHealth() {
+    return this.health;
+  }
+
+  public attack(enemyMaxHP: number, playerDR?: number) {
+    if (this.turnsLeftAlive > 0) {
+      this.turnsLeftAlive -= 1;
+      const attackString =
+        this.attacks[Math.floor(Math.random() * this.attacks.length)];
+      const attackObj = attacks.find((attack) => attack.name == attackString);
+      if (!attackObj) throw new Error("attack missing!");
+      const rollToHit = 20 - (attackObj.hitChance * 100) / 5;
+      const roll = rollD20();
+      const damage =
+        Math.round(
+          attackObj.damageMult * this.attackPower * (1 - (playerDR ?? 0)) * 4,
+        ) / 4;
+      const sanityDamage = attackObj.sanityDamage;
+      if (roll >= rollToHit) {
+        if (attackObj.debuffs) {
+          let debuffs: Condition[] = [];
+          let healedFor = 0;
+          attackObj.debuffs.forEach((debuff) => {
+            if (debuff.name == "lifesteal") {
+              const heal = Math.round(damage * 0.5 * 4) / 4;
+              if (this.health + heal >= this.healthMax) {
+                this.health = this.healthMax;
+              } else {
+                this.health += heal;
+              }
+            } else {
+              const res = createDebuff(
+                debuff.name,
+                debuff.chance,
+                enemyMaxHP,
+                damage,
+              );
+              if (res) debuffs.push(res);
+            }
+          });
+          return {
+            name: attackObj.name,
+            damage: damage,
+            heal: healedFor > 0 ? healedFor : undefined,
+            sanityDamage: sanityDamage,
+            debuffs: debuffs,
+          };
+        }
+        return {
+          name: attackObj.name,
+          damage: damage,
+          sanityDamage: sanityDamage,
+          debuffs: null,
+        };
+      } else {
+        return "miss";
+      }
+    }
+    throw new Error("minion not properly removed!");
+  }
+
+  public toJSON(): object {
+    return {
+      creatureSpecies: this.creatureSpecies,
+      health: this.health,
+      healthMax: this.healthMax,
+      attackPower: this.attackPower,
+      attacks: this.attacks,
+      turnsLeftAlive: this.turnsLeftAlive,
+    };
+  }
+
+  public static fromJSON(json: any): Minion {
+    return new Minion({
+      creatureSpecies: json.creatureSpecies,
+      health: json.health,
+      healthMax: json.healthMax,
+      attackPower: json.attackPower,
+      attacks: json.attacks,
+      turnsLeftAlive: json.turnsLeftAlive,
     });
   }
 }

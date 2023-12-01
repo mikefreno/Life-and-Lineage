@@ -153,40 +153,48 @@ export default function BattleTab({
       return (
         <>
           {playerCharacter.getInventory().length > 0 ? (
-            <View className="flex h-5/6 flex-row">
-              <ScrollView className="w-1/2">
-                <View className="my-auto flex-wrap justify-around">
-                  {playerCharacter.getInventory()?.map((item) => (
-                    <Pressable
-                      key={item.id}
-                      className="m-2 items-center active:scale-90 active:opacity-50"
-                      onPress={() => setSelectedItem(item)}
-                    >
-                      <View
-                        className="rounded-lg p-2"
-                        style={{ backgroundColor: "#a1a1aa" }}
+            <View className="flex-1 justify-between">
+              <View className="flex flex-row">
+                <ScrollView className="w-1/2">
+                  <View className="my-auto flex-row flex-wrap justify-around">
+                    {playerCharacter.getInventory()?.map((item) => (
+                      <Pressable
+                        key={item.id}
+                        className="m-2 items-center active:scale-90 active:opacity-50"
+                        onPress={() => setSelectedItem(item)}
                       >
-                        <Image source={item.getItemIcon()} />
-                      </View>
-                    </Pressable>
-                  ))}
+                        <View
+                          className="rounded-lg p-2"
+                          style={{ backgroundColor: "#a1a1aa" }}
+                        >
+                          <Image source={item.getItemIcon()} />
+                        </View>
+                      </Pressable>
+                    ))}
+                  </View>
+                </ScrollView>
+                <View className="w-1/2">
+                  {selectedItem ? (
+                    <View className="my-auto">{selectedItemDisplay()}</View>
+                  ) : null}
                 </View>
-              </ScrollView>
-              <View className="w-1/2">
-                {selectedItem ? (
-                  <View className="my-auto">{selectedItemDisplay()}</View>
-                ) : null}
+              </View>
+              <View className="flex flex-row justify-center">
+                <Text>{playerCharacter.getReadableGold()}</Text>
+                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
               </View>
             </View>
           ) : (
-            <Text className="h-5/6 py-8 text-center italic">
-              Inventory is currently empty
-            </Text>
+            <View className="flex-1 justify-between">
+              <Text className="py-8 text-center italic">
+                Inventory is currently empty
+              </Text>
+              <View className="flex flex-row justify-center">
+                <Text>{playerCharacter.getReadableGold()}</Text>
+                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+              </View>
+            </View>
           )}
-          <View className="flex flex-row justify-center">
-            <Text>{playerCharacter.getReadableGold()}</Text>
-            <Coins width={16} height={16} style={{ marginLeft: 6 }} />
-          </View>
         </>
       );
     case "log":

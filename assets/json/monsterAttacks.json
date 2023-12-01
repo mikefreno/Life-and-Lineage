@@ -124,5 +124,14 @@
          "energyCost": 15,
          "sanityDamage": 0,
          "debuffs": null
+      },
+      {
+         "name": "head slam",
+         "targets": "single",
+         "hitChance": 0.95,
+         "damageMult": 1.0,
+         "energyCost": 10,
+         "sanityDamage": 0,
+         "debuffs": [{"name":"stun", "chance": 0.10}]
       }
 ]

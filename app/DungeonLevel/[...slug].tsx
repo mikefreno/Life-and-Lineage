@@ -6,7 +6,7 @@ import { Pressable, Modal } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 import BattleTab from "../../components/BattleTab";
 import { router } from "expo-router";
-import { fullSave, savePlayer, toTitleCase } from "../../utility/functions";
+import { toTitleCase } from "../../utility/functions";
 import { enemyGenerator } from "../../utility/monster";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -25,9 +25,10 @@ import PlayerStatus from "../../components/PlayerStatus";
 import ProgressBar from "../../components/ProgressBar";
 import monsterObjects from "../../assets/json/monsters.json";
 import { DungeonInstance, DungeonLevel } from "../../classes/dungeon";
-import { debounce } from "lodash";
 import { Item } from "../../classes/item";
 import Coins from "../../assets/icons/CoinsIcon";
+import { Condition } from "../../classes/conditions";
+import { Minion } from "../../classes/creatures";
 
 export default function DungeonLevelScreen() {
   const { slug } = useLocalSearchParams();
@@ -46,10 +47,15 @@ export default function DungeonLevelScreen() {
     itemDrops: Item[];
     gold: number;
   } | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const monster = useSelector(selectMonster);
 
   const dispatch: AppDispatch = useDispatch();
+
+  useEffect(() => {
+    console.log(playerCharacter?.getMinions());
+  }, [playerCharacter]);
 
   useEffect(() => {
     setInstanceName(slug[0]);
@@ -117,25 +123,24 @@ export default function DungeonLevelScreen() {
       });
   }
 
-  //adding in removed items
+  //TODO: (fix needed) adding in removed items
   function takeItem(item: Item) {
     if (playerCharacter && droppedItems) {
-      playerCharacter.addToInventory(Item.fromJSON(item.toJSON()));
+      playerCharacter.addToInventory(item);
       dispatch(setPlayerCharacter(playerCharacter));
-      savePlayer(playerCharacter);
-
-      const updatedItemDrops = droppedItems.itemDrops.filter(
-        (itemDrop) => !itemDrop.equals(item),
-      );
-
-      setDroppedItems((prevState) => ({
-        ...prevState,
-        gold: prevState!.gold,
-        itemDrops: updatedItemDrops,
-      }));
-    }
-    if (droppedItems?.itemDrops.length == 0) {
-      setDroppedItems(null);
+      setDroppedItems((prevState) => {
+        const updatedDrops = prevState!.itemDrops.filter(
+          (itemDrop) => !itemDrop.equals(item),
+        );
+        if (updatedDrops.length == 0) {
+          return null;
+        }
+        return {
+          ...prevState,
+          gold: prevState!.gold,
+          itemDrops: updatedDrops,
+        };
+      });
     }
   }
 
@@ -146,7 +151,6 @@ export default function DungeonLevelScreen() {
       );
       setDroppedItems(null);
       dispatch(setPlayerCharacter(playerCharacter));
-      savePlayer(playerCharacter);
     }
   }
 
@@ -213,122 +217,55 @@ export default function DungeonLevelScreen() {
     }
   };
 
-  const useAttack = debounce(
-    (attack: {
-      name: string;
-      targets: string;
-      hitChance: number;
-      damageMult: number;
-      sanityDamage: number;
-      debuffs: { name: string; chance: number }[] | null;
-    }) => {
-      if (monster && playerCharacter) {
-        let monsterDefeated = false;
-        const attackRes = playerCharacter.doPhysicalAttack(
-          attack,
-          monster.getMaxHealth(),
-        );
-        if (attackRes !== "miss") {
-          const hp = monster.damageHealth(attackRes.damage);
-          const sanity = monster.damageSanity(attackRes.sanityDamage);
-          attackRes.debuffs?.forEach((effect) => monster.addCondition(effect));
-          let line = `You ${attack.name == "cast" ? "used " : ""}${toTitleCase(
-            attack.name,
-          )}${
-            attack.name !== "cast"
-              ? attack.name.charAt(attack.name.length - 1) == "e"
-                ? "d"
-                : "ed"
-              : " on"
-          } the ${toTitleCase(monster.creatureSpecies)} for ${
-            attackRes.damage
-          } heath damage`;
-          if (attackRes.sanityDamage) {
-            line += ` and ${attackRes.sanityDamage} sanity damage`;
-          }
-          if (attackRes.debuffs) {
-            attackRes.debuffs.forEach(
-              (effect) => (line += ` and applied a ${effect.name} stack`),
-            );
-          }
-          battleLogger(line);
-          if (hp <= 0 || (sanity && sanity <= 0)) {
-            gameData.gameTick();
-            if (thisDungeon?.level != 0) {
-              thisDungeon?.incrementStep();
-            }
-            battleLogger(
-              `You defeated the ${toTitleCase(monster.creatureSpecies)}`,
-            );
-            monsterDefeated = true;
-            const drops = monster.getDrops(playerCharacter.playerClass);
-            playerCharacter.addGold(drops.gold);
-            setDroppedItems(drops);
-            if (fightingBoss && gameData) {
-              setFightingBoss(false);
-              thisDungeon?.setBossDefeated();
-              gameData.openNextDungeonLevel(thisInstance!.name);
-              dispatch(setGameData(gameData));
-            }
-            dispatch(setMonster(null));
-          } else {
-            dispatch(setMonster(monster));
-          }
-        } else {
-          battleLogger(
-            `You ${attackRes}ed the ${toTitleCase(monster.creatureSpecies)}`,
-          );
-          dispatch(setMonster(monster));
-        }
-        if (!monsterDefeated) {
-          enemyTurn();
-        }
-      }
-      if (playerCharacter) {
-        dispatch(setPlayerCharacter(playerCharacter));
-      }
-      fullSave(gameData, playerCharacter);
-    },
-    100,
-  );
-
-  const useSpell = debounce(
-    (spell: {
-      name: string;
-      element: string;
-      proficiencyNeeded: number;
-      manaCost: number;
-      effects: {
-        damage: number | null;
-        buffs: string[] | null;
-        debuffs: { name: string; chance: number }[] | null;
-        summon?: string[];
-        selfDamage?: number;
-      };
-    }) => {
-      if (monster && playerCharacter) {
-        let monsterDefeated = false;
-        const spellRes = playerCharacter.useSpell(
-          spell,
-          monster.getMaxHealth(),
-        );
-        const hp = monster.damageHealth(spellRes.damage);
-        const sanity = monster.damageSanity(spellRes.sanityDamage);
-        spellRes.debuffs?.forEach((debuff) => monster.addCondition(debuff));
-        let line = `You ${toTitleCase(spell.name)}${
-          spell.name.charAt(spell.name.length - 1) == "e" ? "d" : "ed"
+  const useAttack = (attack: {
+    name: string;
+    targets: string;
+    hitChance: number;
+    damageMult: number;
+    sanityDamage: number;
+    debuffs: { name: string; chance: number }[] | null;
+  }) => {
+    if (monster && playerCharacter && !loading) {
+      setLoading(true);
+      const startOfTurnMinions = [...playerCharacter.getMinions()];
+      let monsterDefeated = false;
+      const attackRes = playerCharacter.doPhysicalAttack(
+        attack,
+        monster.getMaxHealth(),
+      );
+      if (attackRes !== "miss") {
+        let hp = monster.damageHealth(attackRes.damage);
+        let sanity = monster.damageSanity(attackRes.sanityDamage);
+        attackRes.debuffs?.forEach((effect) => monster.addCondition(effect));
+        let line = `You ${attack.name == "cast" ? "used " : ""}${toTitleCase(
+          attack.name,
+        )}${
+          attack.name !== "cast"
+            ? attack.name.charAt(attack.name.length - 1) == "e"
+              ? "d"
+              : "ed"
+            : " on"
         } the ${toTitleCase(monster.creatureSpecies)} for ${
-          spellRes.damage
+          attackRes.damage
         } heath damage`;
-        if (spellRes.sanityDamage) {
-          line += ` and ${spellRes.sanityDamage} sanity damage`;
+        if (attackRes.sanityDamage) {
+          line += ` and ${attackRes.sanityDamage} sanity damage`;
         }
-        if (spellRes.debuffs) {
-          spellRes.debuffs.forEach(
+        if (attackRes.debuffs) {
+          attackRes.debuffs.forEach(
             (effect) => (line += ` and applied a ${effect.name} stack`),
           );
         }
         battleLogger(line);
+        if (startOfTurnMinions.length > 0) {
+          const res = playerMinionAttacks(
+            monster.getMaxHealth(),
+            startOfTurnMinions,
+          );
+          hp = monster.damageHealth(res.totalHPDamage);
+          sanity = monster.damageSanity(res.totalSanityDamage);
+          res.debuffs.forEach((debuff) => monster.addCondition(debuff));
+        }
         if (hp <= 0 || (sanity && sanity <= 0)) {
           gameData.gameTick();
           if (thisDungeon?.level != 0) {
@@ -351,17 +288,143 @@ export default function DungeonLevelScreen() {
         } else {
           dispatch(setMonster(monster));
         }
-        if (!monsterDefeated) {
-          enemyTurn();
-        }
-        if (playerCharacter) {
-          dispatch(setPlayerCharacter(playerCharacter));
-        }
-        fullSave(gameData, playerCharacter);
+      } else {
+        battleLogger(
+          `You ${attackRes}ed the ${toTitleCase(monster.creatureSpecies)}`,
+        );
+        dispatch(setMonster(monster));
       }
-    },
-    100,
-  );
+      if (!monsterDefeated) {
+        enemyTurn();
+      }
+      if (playerCharacter) {
+        dispatch(setPlayerCharacter(playerCharacter));
+      }
+      setLoading(false);
+    }
+  };
+
+  function playerMinionAttacks(enemyMaxHP: number, providedMinions: Minion[]) {
+    let totalHPDamage = 0;
+    let totalSanityDamage = 0;
+    let debuffs: Condition[] = [];
+    if (playerCharacter && providedMinions.length > 0) {
+      providedMinions.forEach((minion) => {
+        if (minion.turnsLeftAlive <= 0) {
+          playerCharacter.removeMinion(minion);
+        } else {
+          const res = minion.attack(enemyMaxHP);
+          if (res == "miss") {
+            battleLogger(
+              `${playerCharacter.getName()}'s ${toTitleCase(
+                minion.creatureSpecies,
+              )} missed!`,
+            );
+          } else {
+            let str = `${playerCharacter.getName()}'s ${toTitleCase(
+              minion.creatureSpecies,
+            )} used ${toTitleCase(res.name)} dealing ${res.damage} damage`;
+            totalHPDamage += res.damage;
+            if (res.heal && res.heal > 0) {
+              str += ` and healed for ${res.heal} damage`;
+            }
+            if (res.sanityDamage > 0) {
+              str += ` and ${res.sanityDamage} sanity damage`;
+              totalSanityDamage += res.sanityDamage;
+            }
+            if (res.debuffs) {
+              res.debuffs.forEach((effect) => {
+                str += ` and applied a ${effect.name} stack`;
+                debuffs.push(effect);
+              });
+            }
+            battleLogger(str);
+          }
+        }
+      });
+    }
+    return {
+      totalHPDamage: totalHPDamage,
+      totalSanityDamage: totalSanityDamage,
+      debuffs: debuffs,
+    };
+  }
+
+  const useSpell = (spell: {
+    name: string;
+    element: string;
+    proficiencyNeeded: number;
+    manaCost: number;
+    effects: {
+      damage: number | null;
+      buffs: string[] | null;
+      debuffs: { name: string; chance: number }[] | null;
+      summon?: string[];
+      selfDamage?: number;
+    };
+  }) => {
+    if (monster && playerCharacter && !loading) {
+      setLoading(true);
+      const startOfTurnMinions = [...playerCharacter.getMinions()];
+      let monsterDefeated = false;
+      const spellRes = playerCharacter.useSpell(spell, monster.getMaxHealth());
+      let hp = monster.damageHealth(spellRes.damage);
+      let sanity = monster.damageSanity(spellRes.sanityDamage);
+      spellRes.debuffs?.forEach((debuff) => monster.addCondition(debuff));
+      let line = `You ${toTitleCase(spell.name)}${
+        spell.name.charAt(spell.name.length - 1) == "e" ? "d" : "ed"
+      } the ${toTitleCase(monster.creatureSpecies)} for ${
+        spellRes.damage
+      } heath damage`;
+      if (spellRes.sanityDamage) {
+        line += ` and ${spellRes.sanityDamage} sanity damage`;
+      }
+      if (spellRes.debuffs) {
+        spellRes.debuffs.forEach(
+          (effect) => (line += ` and applied a ${effect.name} stack`),
+        );
+      }
+      battleLogger(line);
+      if (startOfTurnMinions.length > 0) {
+        const res = playerMinionAttacks(
+          monster.getMaxHealth(),
+          startOfTurnMinions,
+        );
+        hp = monster.damageHealth(res.totalHPDamage);
+        sanity = monster.damageSanity(res.totalSanityDamage);
+        res.debuffs.forEach((debuff) => monster.addCondition(debuff));
+      }
+      if (hp <= 0 || (sanity && sanity <= 0)) {
+        gameData.gameTick();
+        if (thisDungeon?.level != 0) {
+          thisDungeon?.incrementStep();
+        }
+        battleLogger(
+          `You defeated the ${toTitleCase(monster.creatureSpecies)}`,
+        );
+        monsterDefeated = true;
+        const drops = monster.getDrops(playerCharacter.playerClass);
+        playerCharacter.addGold(drops.gold);
+        setDroppedItems(drops);
+        if (fightingBoss && gameData) {
+          setFightingBoss(false);
+          thisDungeon?.setBossDefeated();
+          gameData.openNextDungeonLevel(thisInstance!.name);
+          dispatch(setGameData(gameData));
+        }
+        dispatch(setMonster(null));
+      } else {
+        dispatch(setMonster(monster));
+      }
+      if (!monsterDefeated) {
+        enemyTurn();
+      }
+      if (playerCharacter) {
+        dispatch(setPlayerCharacter(playerCharacter));
+      }
+      setLoading(false);
+    }
+  };
 
   while (!monster) {
     return (
@@ -449,7 +512,7 @@ export default function DungeonLevelScreen() {
             </View>
           </NonThemedView>
         </Modal>
-        <View className="flex-1 px-4 py-6">
+        <View className="flex-1 px-4 pt-4">
           <View className="flex h-1/3 flex-row justify-evenly">
             <View className="flex w-2/5 flex-col items-center justify-center">
               <Text className="text-3xl">
@@ -462,7 +525,7 @@ export default function DungeonLevelScreen() {
                 unfilledColor="#fee2e2"
               />
             </View>
-            <View className="my-auto">
+            <View className="">
               <MonsterImage monsterSpecies={monster.creatureSpecies} />
             </View>
           </View>
@@ -490,59 +553,76 @@ export default function DungeonLevelScreen() {
               </Text>
             </View>
           ) : null}
-          <View className="h-1/2">
-            <BattleTab
-              useAttack={useAttack}
-              battleTab={battleTab}
-              useSpell={useSpell}
-            />
-          </View>
-          <View className="-m-2">
-            <View className="flex w-full flex-row justify-evenly border-t border-zinc-200">
-              <Pressable
-                className={`px-6 py-4 rounded ${
-                  battleTab == "attacks"
-                    ? "bg-zinc-100 dark:bg-zinc-800"
-                    : "active:bg-zinc-200 dark:active:bg-zinc-700"
-                }`}
-                onPress={() => setBattleTab("attacks")}
-              >
-                <Text className="text-xl">Attacks</Text>
-              </Pressable>
-              <Pressable
-                className={`px-6 py-4 rounded ${
-                  battleTab == "spells"
-                    ? "bg-zinc-100 dark:bg-zinc-800"
-                    : "active:bg-zinc-200 dark:active:bg-zinc-700"
-                }`}
-                onPress={() => setBattleTab("spells")}
-              >
-                <Text className="text-xl">Spells</Text>
-              </Pressable>
-              <Pressable
-                className={`px-6 py-4 rounded ${
-                  battleTab == "equipment"
-                    ? "border-zinc-200 bg-zinc-100 dark:border-zinc-900 dark:bg-zinc-800"
-                    : "active:bg-zinc-200 dark:active:bg-zinc-700"
-                }`}
-                onPress={() => setBattleTab("equipment")}
-              >
-                <Text className="text-xl">Equipment</Text>
-              </Pressable>
-              <Pressable
-                className={`px-6 py-4 rounded ${
-                  battleTab == "log"
-                    ? "bg-zinc-100 dark:bg-zinc-800"
-                    : "active:bg-zinc-200 dark:active:bg-zinc-700"
-                }`}
-                onPress={() => setBattleTab("log")}
-              >
-                <Text className="text-xl">Log</Text>
-              </Pressable>
+          <View className="flex-1 justify-between">
+            <View className="flex-1">
+              <BattleTab
+                useAttack={useAttack}
+                battleTab={battleTab}
+                useSpell={useSpell}
+              />
             </View>
-          </View>
-          <View className="-mx-4">
-            <PlayerStatus />
+            <View className="">
+              <View className="-mx-4">
+                <View className="flex w-full flex-row justify-evenly border-t border-zinc-200 dark:border-zinc-700">
+                  <Pressable
+                    className={`px-6 py-4 rounded ${
+                      battleTab == "attacks"
+                        ? "bg-zinc-100 dark:bg-zinc-800"
+                        : "active:bg-zinc-200 dark:active:bg-zinc-700"
+                    }`}
+                    onPress={() => setBattleTab("attacks")}
+                  >
+                    <Text className="text-xl">Attacks</Text>
+                  </Pressable>
+                  <Pressable
+                    className={`px-6 py-4 rounded ${
+                      battleTab == "spells"
+                        ? "bg-zinc-100 dark:bg-zinc-800"
+                        : "active:bg-zinc-200 dark:active:bg-zinc-700"
+                    }`}
+                    onPress={() => setBattleTab("spells")}
+                  >
+                    <Text className="text-xl">Spells</Text>
+                  </Pressable>
+                  <Pressable
+                    className={`px-6 py-4 rounded ${
+                      battleTab == "equipment"
+                        ? "border-zinc-200 bg-zinc-100 dark:border-zinc-900 dark:bg-zinc-800"
+                        : "active:bg-zinc-200 dark:active:bg-zinc-700"
+                    }`}
+                    onPress={() => setBattleTab("equipment")}
+                  >
+                    <Text className="text-xl">Equipment</Text>
+                  </Pressable>
+                  <Pressable
+                    className={`px-6 py-4 rounded ${
+                      battleTab == "log"
+                        ? "bg-zinc-100 dark:bg-zinc-800"
+                        : "active:bg-zinc-200 dark:active:bg-zinc-700"
+                    }`}
+                    onPress={() => setBattleTab("log")}
+                  >
+                    <Text className="text-xl">Log</Text>
+                  </Pressable>
+                </View>
+              </View>
+              {playerCharacter.getMinions().length > 0
+                ? playerCharacter.getMinions().map((minion) => (
+                    <View key={minion.creatureID} className="py-1">
+                      <Text>{toTitleCase(minion.creatureSpecies)}</Text>
+                      <ProgressBar
+                        filledColor="#ef4444"
+                        unfilledColor="#fee2e2"
+                        value={minion.getHealth()}
+                        maxValue={minion.healthMax}
+                      />
+                    </View>
+                  ))
+                : null}
+              <View className="-mx-4 pb-4">
+                <PlayerStatus />
+              </View>
+            </View>
           </View>
         </View>
       </>

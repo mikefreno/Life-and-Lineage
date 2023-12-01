@@ -7,6 +7,8 @@ import wands from "../assets/json/items/wands.json";
 import mageSpells from "../assets/json/mageSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
+import { Minion } from "./creatures";
+import summons from "../assets/json/summons.json";
 
 interface CharacterOptions {
   firstName: string;
@@ -133,6 +135,7 @@ type PlayerCharacterBase = {
   conditions?: Condition[];
   inventorySize?: number;
   inventory?: Item[];
+  minions?: Minion[];
   equipment?: {
     mainHand: Item;
     offHand: Item | null;
@@ -146,7 +149,7 @@ type MageCharacter = PlayerCharacterBase & {
 };
 type NecromancerCharacter = PlayerCharacterBase & {
   playerClass: "necromancer";
-  blessing: "blood" | "summons" | "pestilence" | "bone";
+  blessing: "blood" | "summoning" | "pestilence" | "bone";
 };
 type PaladinCharacter = PlayerCharacterBase & {
   playerClass: "paladin";
@@ -166,7 +169,7 @@ export class PlayerCharacter extends Character {
     | "air"
     | "earth"
     | "blood"
-    | "summons"
+    | "summoning"
     | "pestilence"
     | "bone"
     | "holy"
@@ -186,8 +189,9 @@ export class PlayerCharacter extends Character {
     element: string;
   }[];
   private magicProficiencies: { school: string; proficiency: number }[];
+  private minions: Minion[];
   private parents: Character[];
-  private children: Character[] | null = null;
+  private children: Character[];
   private knownSpells: string[];
   private physicalAttacks: string[];
   private conditions: Condition[];
@@ -218,6 +222,7 @@ export class PlayerCharacter extends Character {
     mana,
     manaMax,
     manaRegen,
+    minions,
     jobExperience,
     learningSpells,
     magicProficiencies,
@@ -248,12 +253,13 @@ export class PlayerCharacter extends Character {
     this.mana = mana ?? 100;
     this.manaMax = manaMax ?? 100;
     this.manaRegen = manaRegen ?? 3;
+    this.minions = minions ?? [];
     this.jobExperience = jobExperience ?? [];
     this.learningSpells = learningSpells ?? [];
     this.magicProficiencies =
       magicProficiencies ?? getStartingProficiencies(playerClass, blessing);
     this.parents = parents;
-    this.children = children ?? null;
+    this.children = children ?? [];
     this.knownSpells = knownSpells ?? [];
     this.conditions = [];
     this.physicalAttacks = physicalAttacks ?? ["punch"];
@@ -288,6 +294,10 @@ export class PlayerCharacter extends Character {
   }
 
   public damageHealth(damage: number | null) {
+    if (damage && this.health - damage > this.healthMax) {
+      this.health = this.healthMax;
+      return this.health;
+    }
     this.health -= damage ?? 0;
     return this.health;
   }
@@ -527,6 +537,7 @@ export class PlayerCharacter extends Character {
 
   public performLabor({ title, cost, goldReward }: performLaborProps) {
     if (this.mana >= cost.mana) {
+      //this.clearMinions();
       //make sure state is aligned
       if (this.job !== title) {
         throw new Error("Requested Labor on unassigned profession");
@@ -673,8 +684,6 @@ export class PlayerCharacter extends Character {
     newState.push(spell);
     this.knownSpells = newState;
     let newLearningState = this.learningSpells.filter((spellWithExp) => {
-      console.log(spellWithExp);
-      console.log(spell);
       if (spellWithExp.spellName !== spell) {
         return spellWithExp;
       }
@@ -683,7 +692,6 @@ export class PlayerCharacter extends Character {
     if (book) {
       this.removeFromInventory(book);
     }
-    console.log(newLearningState);
     this.learningSpells = newLearningState;
   }
   //----------------------------------Relationships----------------------------------//
@@ -753,13 +761,6 @@ export class PlayerCharacter extends Character {
       if (attack.debuffs) {
         let debuffs: Condition[] = [];
         attack.debuffs.forEach((debuff) => {
-          const debuffObj = conditions.find(
-            (condition) => condition.name == debuff.name,
-          );
-          if (!debuffObj)
-            throw new Error(
-              "no debuff found in debuff lookup loop in PlayerCharacter.doPhysicalAttack()",
-            );
           const debuffRes = createDebuff(
             debuff.name,
             debuff.chance,
@@ -802,6 +803,9 @@ export class PlayerCharacter extends Character {
     if (chosenSpell.manaCost <= this.mana) {
       this.mana -= chosenSpell.manaCost;
       this.regenMana();
+      if (chosenSpell.effects.summon) {
+        chosenSpell.effects.summon.map((summon) => this.createMinion(summon));
+      }
       const enemyDamage = chosenSpell.effects.damage;
       const selfDamage = chosenSpell.effects.selfDamage;
       if (selfDamage) {
@@ -871,6 +875,43 @@ export class PlayerCharacter extends Character {
       );
     }
   }
+  //----------------------------------Minions----------------------------------//
+  public getMinions() {
+    return this.minions;
+  }
+
+  private addMinion(minion: Minion) {
+    this.minions.push(minion);
+  }
+
+  public createMinion(minionName: string) {
+    const minionObj = summons.find((summon) => summon.name == minionName);
+    if (!minionObj) {
+      throw new Error(`Minion (${minionName}) not found!`);
+    }
+    const minion = new Minion({
+      creatureSpecies: minionObj.name,
+      health: minionObj.health,
+      healthMax: minionObj.health,
+      attackPower: minionObj.attackPower,
+      attacks: minionObj.attacks,
+      turnsLeftAlive: minionObj.turns,
+    });
+    this.addMinion(minion);
+  }
+
+  public clearMinions() {
+    this.minions = [];
+  }
+  public removeMinion(minionToRemove: Minion) {
+    let newList: Minion[] = [];
+    this.minions.forEach((minion) => {
+      if (!minion.equals(minionToRemove)) {
+        newList.push(minion);
+      }
+    });
+    this.minions = newList;
+  }
   //----------------------------------Conditions----------------------------------//
   public conditionTicker() {
     for (let i = this.conditions.length - 1; i >= 0; i--) {
@@ -897,6 +938,7 @@ export class PlayerCharacter extends Character {
     manaRestore?: number,
     removeDebuffs?: number,
   ) {
+    this.clearMinions();
     if (cost <= this.gold) {
       this.gold -= cost;
       if (healthRestore) {
@@ -933,7 +975,8 @@ export class PlayerCharacter extends Character {
       learningSpells: this.learningSpells,
       magicProficiencies: this.magicProficiencies,
       parents: this.parents.map((parent) => parent.toJSON()),
-      children: this.children?.map((child) => child.toJSON()),
+      children: this.children.map((child) => child.toJSON()),
+      minions: this.minions.map((minion) => minion.toJSON()),
       conditions: this.conditions.map((condition) => condition.toJSON()),
       knownSpells: this.knownSpells,
       physicalAttacks: this.physicalAttacks,
@@ -973,7 +1016,10 @@ export class PlayerCharacter extends Character {
       parents: json.parents.map((parent: any) => Character.fromJSON(parent)),
       children: json.children
         ? json.children.map((child: any) => Character.fromJSON(child))
-        : null,
+        : [],
+      minions: json.minions
+        ? json.minions.map((minion: any) => Minion.fromJSON(minion))
+        : [],
       knownSpells: json.knownSpells,
       physicalAttacks: json.physicalAttacks,
       gold: json.gold,
@@ -1020,7 +1066,7 @@ function getStartingProficiencies(
   } else if (playerClass == "necromancer") {
     const starter = [
       { school: "blood", proficiency: blessing == "blood" ? 50 : 0 },
-      { school: "summons", proficiency: blessing == "summons" ? 50 : 0 },
+      { school: "summoning", proficiency: blessing == "summoning" ? 50 : 0 },
       { school: "pestilence", proficiency: blessing == "pestilence" ? 50 : 0 },
       { school: "bone", proficiency: blessing == "bone" ? 50 : 0 },
     ];
@@ -1042,7 +1088,7 @@ export function getStartingBook(
     | "air"
     | "earth"
     | "blood"
-    | "summons"
+    | "summoning"
     | "pestilence"
     | "bone"
     | "holy"
@@ -1089,7 +1135,7 @@ export function getStartingBook(
       icon: "Book",
     });
   }
-  if (playerBlessing == "summons") {
+  if (playerBlessing == "summoning") {
     return new Item({
       name: "book of the flying skull",
       baseValue: 2500,

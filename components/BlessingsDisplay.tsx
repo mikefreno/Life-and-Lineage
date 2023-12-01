@@ -34,7 +34,7 @@ export default function blessingDisplay(
       return <Drop height={size} width={size} color={"#991b1b"} />;
     case "bone":
       return <Bones height={size} width={size} color={"#9ca3af"} />;
-    case "summons":
+    case "summoning":
       return <HoldingSkull height={size} width={size} color={"#4b5563"} />;
     case "pestilence":
       return (

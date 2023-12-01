@@ -162,13 +162,13 @@ export default function SetBlessing() {
             <Pressable
               className="w-1/2"
               onPress={() => {
-                setBlessing("summons");
+                setBlessing("summoning");
               }}
             >
               {({ pressed }) => (
                 <NonThemedView
                   className={`${
-                    pressed || blessing == "summons"
+                    pressed || blessing == "summoning"
                       ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
                       : null
                   } px-2 py-4`}

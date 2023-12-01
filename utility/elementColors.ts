@@ -3,7 +3,7 @@ export const elementalColorMap = {
   earth: { dark: "#937D62", light: "#DFDCC7" },
   air: { dark: "#d4d4d8", light: "#f8fafc" },
   water: { dark: "#60a5fa", light: "#eff6ff" },
-  summons: { dark: "#4b5563", light: "#9ca3af" },
+  summoning: { dark: "#4b5563", light: "#9ca3af" },
   pestilence: { dark: "#65a30d", light: "#a3e635" },
   blood: { dark: "#991b1b", light: "#f87171" },
   bone: { dark: "#9ca3af", light: "#e5e7eb" },

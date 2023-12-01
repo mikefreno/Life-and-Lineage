@@ -1,11 +1,11 @@
 import { StatusBar } from "expo-status-bar";
 import { Platform, Pressable } from "react-native";
 import { Text, View } from "../../components/Themed";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 
 export default function SettingsScreen() {
   const fastStart = () => {
-    router.push("/NewGame/Review/necromancer/male/Vim/God/blood");
+    router.push("/NewGame/Review/necromancer/male/Vim/God/summoning");
   };
 
   const startNewGame = () => {

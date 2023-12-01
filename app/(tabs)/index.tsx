@@ -15,6 +15,7 @@ import Necromancer from "../../assets/icons/NecromancerSkull";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
 import blessingDisplay from "../../components/BlessingsDisplay";
 import { useColorScheme } from "nativewind";
+import SpellDetails from "../../components/SpellDetails";
 
 export default function HomeScreen() {
   const { colorScheme } = useColorScheme();
@@ -29,12 +30,38 @@ export default function HomeScreen() {
     item: Item;
     equipped: "mainHand" | "offHand" | "body" | "head" | null;
   } | null>(null);
+  const [selectedSpell, setSelectedSpell] = useState<{
+    name: string;
+    element: string;
+    proficiencyNeeded: number;
+    manaCost: number;
+    effects: {
+      damage: number | null;
+      buffs: string[] | null;
+      debuffs:
+        | {
+            name: string;
+            chance: number;
+          }[]
+        | null;
+      summon?: string[] | undefined;
+      selfDamage?: number | undefined;
+    };
+  } | null>(null);
 
   function displaySetter(
     item: Item | null,
     equipped: "mainHand" | "offHand" | "body" | "head" | null,
   ) {
-    if (item) setSelectedItem({ item: item, equipped: equipped });
+    if (item) {
+      setSelectedItem({ item: item, equipped: equipped });
+      if (item.itemClass == "book" && playerCharacter) {
+        const spell = item.getAttachedSpell(playerCharacter.playerClass);
+        setSelectedSpell(spell);
+      } else {
+        setSelectedSpell(null);
+      }
+    }
   }
 
   useEffect(() => {
@@ -231,7 +258,7 @@ export default function HomeScreen() {
             | "air"
             | "earth"
             | "blood"
-            | "summons"
+            | "summoning"
             | "pestilence"
             | "bone"
             | "holy"
@@ -318,7 +345,12 @@ export default function HomeScreen() {
                 ) : null}
               </View>
             </View>
-            <View className="py-4">
+            {selectedSpell ? (
+              <View className="my-4">
+                <SpellDetails spell={selectedSpell} />
+              </View>
+            ) : null}
+            <View className="pb-4">
               <Pressable onPress={() => setShowingInventory(!showingInventory)}>
                 <Image source={require("../../assets/images/items/Bag.png")} />
               </Pressable>

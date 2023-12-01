@@ -66,9 +66,6 @@ export default function NewGameReview() {
     const dad = createParent("male");
     let newCharacter: PlayerCharacter;
     const bday = generateBirthday(15, 18);
-    console.log(bday);
-
-    console.log(typeof bday);
     if (playerClass === "paladin") {
       newCharacter = new PlayerCharacter({
         firstName: firstName,
@@ -86,7 +83,7 @@ export default function NewGameReview() {
         lastName: lastName,
         sex: sex as "male" | "female",
         playerClass: playerClass as "necromancer",
-        blessing: blessing as "blood" | "summons" | "pestilence" | "bone",
+        blessing: blessing as "blood" | "summoning" | "pestilence" | "bone",
         parents: [mom, dad],
         birthdate: bday,
         deathdate: null,
@@ -120,7 +117,7 @@ export default function NewGameReview() {
           | "air"
           | "earth"
           | "blood"
-          | "summons"
+          | "summoning"
           | "pestilence"
           | "bone"
           | "holy"

@@ -33,22 +33,22 @@ export default function SpellDetails({ spell }: SpellDetailInterface) {
   const { colorScheme } = useColorScheme();
   return (
     <View
-      className="w-3/4 rounded-lg"
+      className="mx-auto w-3/4 rounded-lg"
       style={{
         shadowColor:
           elementalColorMap[
-            spell.element as
+            (spell.element as
               | "fire"
               | "water"
               | "air"
               | "earth"
               | "blood"
-              | "summons"
+              | "summoning"
               | "pestilence"
               | "bone"
               | "holy"
               | "vengeance"
-              | "protection"
+              | "protection") ?? "fire"
           ].dark,
         shadowOffset: {
           width: 2,
@@ -60,7 +60,7 @@ export default function SpellDetails({ spell }: SpellDetailInterface) {
       }}
     >
       <View
-        className="flex flex-row justify-between rounded-lg px-4 py-2 dark:border"
+        className="flex flex-row justify-between rounded-lg p-2 dark:border"
         style={{
           borderColor:
             colorScheme == "dark"
@@ -71,7 +71,7 @@ export default function SpellDetails({ spell }: SpellDetailInterface) {
                     | "air"
                     | "earth"
                     | "blood"
-                    | "summons"
+                    | "summoning"
                     | "pestilence"
                     | "bone"
                     | "holy"
@@ -81,40 +81,66 @@ export default function SpellDetails({ spell }: SpellDetailInterface) {
               : "",
         }}
       >
-        <View className="my-auto pl-2">
-          <Text>{toTitleCase(spell.name)}</Text>
+        <View className="my-auto w-2/5">
+          <Text className="text-center">{toTitleCase(spell.name)}</Text>
           <View className="flex flex-row items-center justify-center">
             <Text>{spell.manaCost}</Text>
             <Energy width={14} height={14} style={{ marginLeft: 6 }} />
           </View>
         </View>
         <View className="my-auto items-center">
-          <View className="flex flex-row items-center">
-            <Text>{spell.effects.damage}</Text>
-            <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
-          </View>
+          {spell.effects.damage && spell.effects.damage > 0 ? (
+            <View className="flex flex-row items-center">
+              <Text>{spell.effects.damage}</Text>
+              <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
+            </View>
+          ) : null}
           {spell.effects.buffs?.map((buff) => <Text key={buff}>{buff}</Text>)}
           {spell.effects.debuffs?.map((debuff, idx) => (
             <Text key={idx}>
-              {debuff.name} - {debuff.chance * 100}%
+              {toTitleCase(debuff.name)} - {debuff.chance * 100}%
             </Text>
           ))}
           {spell.effects.selfDamage ? (
             <View className="flex flex-row items-center">
-              <Text>{spell.effects.selfDamage} Self</Text>
-              <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
+              {spell.effects.selfDamage > 0 ? (
+                <>
+                  <Text>{spell.effects.selfDamage} Self</Text>
+                  <HealthIcon
+                    width={14}
+                    height={14}
+                    style={{ marginLeft: 6 }}
+                  />
+                </>
+              ) : spell.effects.selfDamage < 0 ? (
+                <>
+                  <Text>Heal {spell.effects.selfDamage * -1}</Text>
+                  <HealthIcon
+                    width={14}
+                    height={14}
+                    style={{ marginLeft: 6 }}
+                  />
+                </>
+              ) : null}
             </View>
           ) : null}
           {spell.effects.summon
             ? spell.effects.summon.map((summon, idx) => (
                 <View key={idx} className="flex flex-row items-center">
-                  <Text>{summon}</Text>
-                  <NecromancerSkull />
+                  <Text>{toTitleCase(summon)}</Text>
+                  <NecromancerSkull
+                    width={14}
+                    height={14}
+                    style={{ marginLeft: 6 }}
+                    color={colorScheme == "light" ? "#27272a" : "#f4f4f5"}
+                  />
                 </View>
               ))
             : null}
         </View>
-        {blessingDisplay(spell.element, colorScheme, 40)}
+        <View className="my-auto">
+          {blessingDisplay(spell.element, colorScheme, 40)}
+        </View>
       </View>
     </View>
   );
