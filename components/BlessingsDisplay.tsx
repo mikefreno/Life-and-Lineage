@@ -45,6 +45,6 @@ export default function blessingDisplay(
         />
       );
     default:
-      throw new Error(`invalid blessing ${blessing}`);
+      return <Fire height={size} width={size} color={"#ea580c"} />;
   }
 }

@@ -2,9 +2,9 @@ import { Pressable, View as NonThemedView } from "react-native";
 import { View, Text } from "../../components/Themed";
 import { useState } from "react";
 import { useColorScheme } from "nativewind";
-import { saveGame, toTitleCase } from "../../utility/functions";
 import { useSelector } from "react-redux";
 import { selectGame } from "../../redux/selectors";
+import { toTitleCase } from "../../utility/functions";
 
 export default function AppSettings() {
   const options = ["system", "light", "dark"];
@@ -21,7 +21,6 @@ export default function AppSettings() {
       gameData?.saveColorScheme(option);
       setSelectedOption(index);
       setColorScheme(option);
-      saveGame(gameData);
     }
 
     return (

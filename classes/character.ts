@@ -14,9 +14,9 @@ interface CharacterOptions {
   firstName: string;
   lastName: string;
   sex: "male" | "female";
-  birthdate: Date;
+  birthdate?: Date;
   alive?: boolean;
-  deathdate?: Date | null;
+  deathdate: Date | null;
   job?: string;
   affection?: number;
   qualifications?: string[];
@@ -27,8 +27,8 @@ export class Character {
   readonly lastName: string;
   readonly sex: "male" | "female";
   protected alive: boolean;
-  readonly birthdate: Date;
-  protected deathdate: Date | null;
+  readonly birthdate: string;
+  protected deathdate: string | null;
   protected job: string;
   protected affection: number;
   protected qualifications: string[];
@@ -48,8 +48,8 @@ export class Character {
     this.lastName = lastName;
     this.sex = sex;
     this.alive = alive ?? true;
-    this.birthdate = birthdate;
-    this.deathdate = deathdate ?? null;
+    this.birthdate = birthdate?.toISOString() ?? new Date().toISOString();
+    this.deathdate = deathdate?.toISOString() ?? null;
     this.job = job ?? "Unemployed";
     this.affection = affection ?? 0;
     this.qualifications = qualifications ?? [];
@@ -76,9 +76,9 @@ export class Character {
       firstName: this.firstName,
       lastName: this.lastName,
       sex: this.sex,
-      birthdate: this.birthdate.toISOString(),
+      birthdate: this.birthdate,
       alive: this.alive,
-      deathdate: this.deathdate ? this.deathdate.toISOString() : null,
+      deathdate: this.deathdate ? this.deathdate : null,
       job: this.job,
       affection: this.affection,
       qualifications: this.qualifications,
@@ -90,7 +90,7 @@ export class Character {
       firstName: json.firstName,
       lastName: json.lastName,
       sex: json.sex,
-      birthdate: new Date(json.birthdate),
+      birthdate: json.birthdate ? new Date(json.birthdate) : undefined,
       alive: json.alive,
       deathdate: json.deathdate ? new Date(json.deathdate) : null,
       job: json.job,
@@ -106,7 +106,7 @@ type PlayerCharacterBase = {
   lastName: string;
   sex: "male" | "female";
   alive?: boolean;
-  birthdate: Date;
+  birthdate?: Date;
   deathdate: Date | null;
   job?: string;
   affection?: number;
@@ -537,7 +537,7 @@ export class PlayerCharacter extends Character {
 
   public performLabor({ title, cost, goldReward }: performLaborProps) {
     if (this.mana >= cost.mana) {
-      //this.clearMinions();
+      this.clearMinions();
       //make sure state is aligned
       if (this.job !== title) {
         throw new Error("Requested Labor on unassigned profession");
@@ -998,7 +998,7 @@ export class PlayerCharacter extends Character {
       lastName: json.lastName,
       sex: json.sex,
       alive: json.alive,
-      birthdate: new Date(json.birthdate),
+      birthdate: json.birthdate ? new Date(json.birthdate) : undefined,
       deathdate: json.deathdate ? new Date(json.deathdate) : null,
       job: json.job,
       affection: json.affection,
@@ -1013,7 +1013,9 @@ export class PlayerCharacter extends Character {
       jobExperience: json.jobExperience,
       learningSpells: json.learningSpells,
       magicProficiencies: json.magicProficiencies,
-      parents: json.parents.map((parent: any) => Character.fromJSON(parent)),
+      parents: json.parents
+        ? json.parents.map((parent: any) => Character.fromJSON(parent))
+        : [],
       children: json.children
         ? json.children.map((child: any) => Character.fromJSON(child))
         : [],
@@ -1024,15 +1026,23 @@ export class PlayerCharacter extends Character {
       physicalAttacks: json.physicalAttacks,
       gold: json.gold,
       inventorySize: json.inventorySize,
-      inventory: json.inventory.map((item: any) => Item.fromJSON(item)),
-      equipment: {
-        mainHand: Item.fromJSON(json.equipment.mainHand),
-        offHand: json.equipment.offHand
-          ? Item.fromJSON(json.equipment.offHand)
-          : null,
-        body: json.equipment.body ? Item.fromJSON(json.equipment.body) : null,
-        head: json.equipment.head ? Item.fromJSON(json.equipment.head) : null,
-      },
+      inventory: json.inventory
+        ? json.inventory.map((item: any) => Item.fromJSON(item))
+        : [],
+      equipment: json.equipment
+        ? {
+            mainHand: Item.fromJSON(json.equipment.mainHand),
+            offHand: json.equipment.offHand
+              ? Item.fromJSON(json.equipment.offHand)
+              : null,
+            body: json.equipment.body
+              ? Item.fromJSON(json.equipment.body)
+              : null,
+            head: json.equipment.head
+              ? Item.fromJSON(json.equipment.head)
+              : null,
+          }
+        : undefined,
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
@@ -1055,12 +1065,11 @@ function getStartingProficiencies(
   playerClass: "mage" | "necromancer" | "paladin",
   blessing: string,
 ) {
-  if (playerClass == "mage") {
+  if (playerClass == "paladin") {
     const starter = [
-      { school: "fire", proficiency: blessing == "fire" ? 50 : 0 },
-      { school: "water", proficiency: blessing == "water" ? 50 : 0 },
-      { school: "air", proficiency: blessing == "air" ? 50 : 0 },
-      { school: "earth", proficiency: blessing == "earth" ? 50 : 0 },
+      { school: "holy", proficiency: blessing == "holy" ? 50 : 0 },
+      { school: "protection", proficiency: blessing == "protection" ? 50 : 0 },
+      { school: "vengeance", proficiency: blessing == "vengeance" ? 50 : 0 },
     ];
     return starter;
   } else if (playerClass == "necromancer") {
@@ -1073,9 +1082,10 @@ function getStartingProficiencies(
     return starter;
   } else {
     const starter = [
-      { school: "holy", proficiency: blessing == "holy" ? 50 : 0 },
-      { school: "protection", proficiency: blessing == "protection" ? 50 : 0 },
-      { school: "vengeance", proficiency: blessing == "vengeance" ? 50 : 0 },
+      { school: "fire", proficiency: blessing == "fire" ? 50 : 0 },
+      { school: "water", proficiency: blessing == "water" ? 50 : 0 },
+      { school: "air", proficiency: blessing == "air" ? 50 : 0 },
+      { school: "earth", proficiency: blessing == "earth" ? 50 : 0 },
     ];
     return starter;
   }

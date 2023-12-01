@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import shops from "../assets/json/shops.json";
@@ -7,76 +6,76 @@ import conditions from "../assets/json/conditions.json";
 import { Shop, generateInventory } from "../classes/shop";
 import { Condition } from "../classes/conditions";
 
-export const storeData = async (key: string, value: any) => {
-  try {
-    const jsonValue = JSON.stringify(value);
-    await AsyncStorage.setItem(key, jsonValue);
-  } catch (e) {
-    // saving error
-    console.log(e);
-  }
-};
+//export const storeData = async (key: string, value: any) => {
+//try {
+//const jsonValue = JSON.stringify(value);
+//await AsyncStorage.setItem(key, jsonValue);
+//} catch (e) {
+//// saving error
+//console.log(e);
+//}
+//};
 
-//just saves game, simpler interface
-export const saveGame = async (game: Game | null) => {
-  try {
-    const jsonGame = JSON.stringify(game);
-    await AsyncStorage.setItem("game", jsonGame);
-  } catch (e) {
-    console.log(e);
-  }
-};
-export const savePlayer = async (player: PlayerCharacter) => {
-  try {
-    const jsonPlayer = JSON.stringify(player);
-    await AsyncStorage.setItem("player", jsonPlayer);
-  } catch (e) {
-    console.log(e);
-  }
-};
+////just saves game, simpler interface
+//export const saveGame = async (game: Game | null) => {
+//try {
+//const jsonGame = JSON.stringify(game);
+//await AsyncStorage.setItem("game", jsonGame);
+//} catch (e) {
+//console.log(e);
+//}
+//};
+//export const savePlayer = async (player: PlayerCharacter) => {
+//try {
+//const jsonPlayer = JSON.stringify(player);
+//await AsyncStorage.setItem("player", jsonPlayer);
+//} catch (e) {
+//console.log(e);
+//}
+//};
 
-export const fullSave = async (
-  game: Game | null,
-  player: PlayerCharacter | null,
-) => {
-  if (game && player) {
-    try {
-      const jsonGame = JSON.stringify(game);
-      await AsyncStorage.setItem("game", jsonGame);
-      const jsonPlayer = JSON.stringify(player);
-      await AsyncStorage.setItem("player", jsonPlayer);
-    } catch (e) {
-      console.log(e);
-    }
-  }
-};
+//export const fullSave = async (
+//game: Game | null,
+//player: PlayerCharacter | null,
+//) => {
+//if (game && player) {
+//try {
+//const jsonGame = JSON.stringify(game);
+//await AsyncStorage.setItem("game", jsonGame);
+//const jsonPlayer = JSON.stringify(player);
+//await AsyncStorage.setItem("player", jsonPlayer);
+//} catch (e) {
+//console.log(e);
+//}
+//}
+//};
 
-export const getData = async (key: string) => {
-  try {
-    const jsonValue = await AsyncStorage.getItem(key);
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
-  } catch (e) {
-    console.log(e);
-  }
-};
+//export const getData = async (key: string) => {
+//try {
+//const jsonValue = await AsyncStorage.getItem(key);
+//return jsonValue != null ? JSON.parse(jsonValue) : null;
+//} catch (e) {
+//console.log(e);
+//}
+//};
 
-export const loadGame = async () => {
-  try {
-    const jsonValue = await AsyncStorage.getItem("game");
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
-  } catch (e) {
-    console.log(e);
-  }
-};
+//export const loadGame = async () => {
+//try {
+//const jsonValue = await AsyncStorage.getItem("game");
+//return jsonValue != null ? JSON.parse(jsonValue) : null;
+//} catch (e) {
+//console.log(e);
+//}
+//};
 
-export const loadPlayer = async () => {
-  try {
-    const jsonValue = await AsyncStorage.getItem("player");
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
-  } catch (e) {
-    console.log(e);
-  }
-};
+//export const loadPlayer = async () => {
+//try {
+//const jsonValue = await AsyncStorage.getItem("player");
+//return jsonValue != null ? JSON.parse(jsonValue) : null;
+//} catch (e) {
+//console.log(e);
+//}
+//};
 
 export function calculateAge(birthdate: Date, gameDate: Date) {
   let age = gameDate.getFullYear() - birthdate.getFullYear();

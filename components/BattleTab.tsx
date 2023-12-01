@@ -40,7 +40,7 @@ export default function BattleTab({
   useSpell,
 }: BattleTabProps) {
   const colorScheme = useColorScheme();
-  const logs = useSelector((state: RootState) => state.logs);
+  const logs = useSelector((state: RootState) => state.logs.logs);
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
   const playerCharacter = useSelector(selectPlayerCharacter);

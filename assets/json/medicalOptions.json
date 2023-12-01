@@ -15,33 +15,13 @@
       "removeDebuffs": 1
    },
    {
-      "serviceName": "Seek Paladin",
-      "cost": 125,
-      "removeDebuffs": 10
-   },
-   {
-      "serviceName": "Visit Academy Healer",
-      "cost": 150,
-      "heathRestore": 200
-   },
-   {
-      "serviceName": "Pray Alone",
+      "serviceName": "Pray",
       "cost": 0,
       "sanityRestore": 5
-   },
-   {
-      "serviceName": "Pray At Altar",
-      "cost": 10,
-      "sanityRestore": 20
    },
    {
       "serviceName": "Meditate On The Elements",
       "cost": 0,
       "manaRestore": 25
-   },
-   {
-      "serviceName": "Visit Halls of the Elements",
-      "cost": 15,
-      "manaRestore": 100
    }
 ]

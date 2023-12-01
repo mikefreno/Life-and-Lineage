@@ -3,13 +3,14 @@ import Coins from "../assets/icons/CoinsIcon";
 import Energy from "../assets/icons/EnergyIcon";
 import Sanity from "../assets/icons/SanityIcon";
 import HealthIcon from "../assets/icons/HealthIcon";
-import { fullSave } from "../utility/functions";
 import { useDispatch, useSelector } from "react-redux";
 import { selectGame, selectPlayerCharacter } from "../redux/selectors";
 import { AppDispatch } from "../redux/store";
-import { setGameData, setPlayerCharacter } from "../redux/slice/game";
+import { setGameData } from "../redux/slice/game";
 import ProgressBar from "./ProgressBar";
 import { useColorScheme } from "nativewind";
+import { setPlayerCharacter } from "../redux/slice/player";
+import { useIsFocused } from "@react-navigation/native";
 
 interface LaborTaskProps {
   reward: number;
@@ -31,6 +32,7 @@ export default function LaborTask({
   const playerCharacter = useSelector(selectPlayerCharacter);
   const gameData = useSelector(selectGame);
   const dispatch: AppDispatch = useDispatch();
+  const isFocused = useIsFocused();
 
   const { colorScheme } = useColorScheme();
 
@@ -41,24 +43,22 @@ export default function LaborTask({
   function setJob() {
     if (playerCharacter && gameData) {
       playerCharacter.setJobTitle(title);
-      dispatch(setPlayerCharacter(playerCharacter));
-      fullSave(gameData, playerCharacter);
+      gameData.gameTick();
+      dispatch(setGameData(gameData));
+      dispatch(setPlayerCharacter(playerCharacter.toJSON()));
     }
   }
 
-  const work = () => {
-    if (playerCharacter && gameData) {
+  function work() {
+    if (playerCharacter && gameData && isFocused) {
       playerCharacter.performLabor({
         title: title,
         cost: cost,
         goldReward: reward,
       });
-      gameData.gameTick();
-      dispatch(setPlayerCharacter(playerCharacter));
-      dispatch(setGameData(gameData));
-      fullSave(gameData, playerCharacter);
+      dispatch(setPlayerCharacter(playerCharacter.toJSON()));
     }
-  };
+  }
 
   return (
     <View
@@ -104,42 +104,10 @@ export default function LaborTask({
         </View>
         {playerCharacter.getJobTitle() == title ? (
           <>
-            <Pressable className="mb-2 mt-4" onPress={work}>
-              {({ pressed }) => (
-                <View
-                  className="mx-auto rounded-xl"
-                  style={{
-                    shadowColor: "#000",
-                    shadowOffset: {
-                      width: 0,
-                      height: 1,
-                    },
-                    backgroundColor:
-                      colorScheme == "light" ? "white" : "#71717a",
-                    shadowOpacity: 0.1,
-                    shadowRadius: 5,
-                  }}
-                >
-                  <View
-                    className={`px-8 py-4 ${
-                      pressed ? "scale-95 opacity-50" : null
-                    }`}
-                  >
-                    <Text className="text-center text-zinc-900 dark:text-zinc-50">
-                      Work
-                    </Text>
-                  </View>
-                </View>
-              )}
-            </Pressable>
-            <ProgressBar
-              value={playerCharacter.getJobExperience(title)}
-              maxValue={experienceToPromote}
-            />
-          </>
-        ) : (
-          <Pressable className="mb-2 mt-4" onPress={setJob}>
-            {({ pressed }) => (
+            <Pressable
+              className="mb-2 mt-4 active:scale-95 active:opacity-50"
+              onPress={work}
+            >
               <View
                 className="mx-auto rounded-xl"
                 style={{
@@ -153,17 +121,42 @@ export default function LaborTask({
                   shadowRadius: 5,
                 }}
               >
-                <View
-                  className={`px-8 py-4 ${
-                    pressed ? "scale-95 opacity-50" : null
-                  }`}
-                >
+                <View className="px-8 py-4">
                   <Text className="text-center text-zinc-900 dark:text-zinc-50">
-                    Apply
+                    Work
                   </Text>
                 </View>
               </View>
-            )}
+            </Pressable>
+            <ProgressBar
+              value={playerCharacter.getJobExperience(title)}
+              maxValue={experienceToPromote}
+            />
+          </>
+        ) : (
+          <Pressable
+            className="mb-2 mt-4 active:scale-95 active:opacity-50"
+            onPress={setJob}
+          >
+            <View
+              className="mx-auto rounded-xl"
+              style={{
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 1,
+                },
+                backgroundColor: colorScheme == "light" ? "white" : "#71717a",
+                shadowOpacity: 0.1,
+                shadowRadius: 5,
+              }}
+            >
+              <View className="px-8 py-4">
+                <Text className="text-center text-zinc-900 dark:text-zinc-50">
+                  Apply
+                </Text>
+              </View>
+            </View>
           </Pressable>
         )}
       </View>

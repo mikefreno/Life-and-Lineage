@@ -7,10 +7,11 @@ import { Pressable, Image } from "react-native";
 import { useEffect, useState } from "react";
 import { Item } from "../classes/item";
 import blessingDisplay from "../components/BlessingsDisplay";
-import { fullSave, toTitleCase } from "../utility/functions";
-import { setGameData, setPlayerCharacter } from "../redux/slice/game";
+import { toTitleCase } from "../utility/functions";
 import { elementalColorMap } from "../utility/elementColors";
 import { useColorScheme } from "nativewind";
+import { setPlayerCharacter } from "../redux/slice/player";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function LearningSpellsScreen() {
   const playerCharacter = useSelector(selectPlayerCharacter);
@@ -20,6 +21,7 @@ export default function LearningSpellsScreen() {
   const inventory = playerCharacter.getInventory();
   const books = inventory.filter((item) => item.itemClass == "book");
   const dispatch = useDispatch();
+  const isFocused = useIsFocused();
 
   const { colorScheme } = useColorScheme();
 
@@ -57,12 +59,9 @@ export default function LearningSpellsScreen() {
     spellName: string,
     spellElement: string,
   ) {
-    if (playerCharacter && game) {
+    if (playerCharacter && game && isFocused) {
       playerCharacter.learnSpellStep(bookName, spellName, spellElement);
-      game.gameTick();
-      dispatch(setPlayerCharacter(playerCharacter));
-      dispatch(setGameData(game));
-      fullSave(game, playerCharacter);
+      dispatch(setPlayerCharacter(playerCharacter.toJSON()));
     }
   }
 
@@ -94,7 +93,7 @@ export default function LearningSpellsScreen() {
                       | "air"
                       | "earth"
                       | "blood"
-                      | "summons"
+                      | "summoning"
                       | "pestilence"
                       | "bone"
                       | "holy"
@@ -110,7 +109,7 @@ export default function LearningSpellsScreen() {
                       | "air"
                       | "earth"
                       | "blood"
-                      | "summons"
+                      | "summoning"
                       | "pestilence"
                       | "bone"
                       | "holy"

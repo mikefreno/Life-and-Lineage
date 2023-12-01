@@ -12,7 +12,7 @@ interface GameOptions {
 }
 
 export class Game {
-  private date: Date;
+  private date: string;
   private dungeonInstances: DungeonInstance[];
   private furthestDepth: { instance: string; level: number }[];
   private atDeathScreen: boolean;
@@ -27,7 +27,7 @@ export class Game {
     shops,
     colorScheme,
   }: GameOptions) {
-    this.date = date ?? new Date();
+    this.date = date?.toISOString() ?? new Date().toISOString();
     this.dungeonInstances = dungeonInstances ?? [
       new DungeonInstance({
         name: "training grounds",
@@ -62,12 +62,15 @@ export class Game {
 
   //----------------------------------Date----------------------------------//
   public getGameDate(): Date {
-    return this.date;
+    return new Date(this.date);
   }
 
   public gameTick() {
-    this.date.setDate(this.date.getDate() + 7);
+    const dateObject = new Date(this.date);
+    dateObject.setDate(dateObject.getDate() + 7);
+    this.date = dateObject.toISOString();
   }
+
   //----------------------------------Death----------------------------------//
   public hitDeathScreen() {
     this.atDeathScreen = true;
@@ -167,7 +170,7 @@ export class Game {
 
   public toJSON(): object {
     return {
-      date: this.date.toISOString(),
+      date: this.date,
       dungeonInstances: this.dungeonInstances.map((instance) =>
         instance.toJSON(),
       ),
@@ -180,13 +183,17 @@ export class Game {
 
   static fromJSON(json: any): Game {
     const game = new Game({
-      date: new Date(json.date),
+      date: json.date ? new Date(json.date) : undefined,
       furthestDepth: json.furthestDepth,
       atDeathScreen: json.atDeathScreen,
-      dungeonInstances: json.dungeonInstances.map((instance: any) =>
-        DungeonInstance.fromJSON(instance),
-      ),
-      shops: json.shops.map((shop: any) => Shop.fromJSON(shop)),
+      dungeonInstances: json.dungeonInstances
+        ? json.dungeonInstances.map((instance: any) =>
+            DungeonInstance.fromJSON(instance),
+          )
+        : undefined,
+      shops: json.shops
+        ? json.shops.map((shop: any) => Shop.fromJSON(shop))
+        : undefined,
       colorScheme: json.colorScheme,
     });
 

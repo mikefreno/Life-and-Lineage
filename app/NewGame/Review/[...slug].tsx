@@ -11,19 +11,15 @@ import jobs from "../../../assets/json/jobs.json";
 import {
   createShops,
   generateBirthday,
-  saveGame,
-  savePlayer,
   toTitleCase,
 } from "../../../utility/functions";
 import { Game } from "../../../classes/game";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../redux/store";
-import {
-  setGameData,
-  setLogs,
-  setMonster,
-  setPlayerCharacter,
-} from "../../../redux/slice/game";
+import { setGameData } from "../../../redux/slice/game";
+import { setPlayerCharacter } from "../../../redux/slice/player";
+import { setLogs } from "../../../redux/slice/logs";
+import { setMonster } from "../../../redux/slice/monster";
 
 export default function NewGameReview() {
   const dispatch: AppDispatch = useDispatch();
@@ -125,17 +121,15 @@ export default function NewGameReview() {
           | "protection",
       );
       player.addToInventory(starterBook);
-      dispatch(setPlayerCharacter(player));
+      dispatch(setPlayerCharacter(player.toJSON()));
       const startDate = new Date();
       const shops = createShops(
         playerClass as "mage" | "paladin" | "necromancer",
       );
       const newGame = new Game({ date: startDate, shops: shops });
-      dispatch(setGameData(newGame));
-      saveGame(newGame);
-      savePlayer(player);
+      dispatch(setGameData(newGame.toJSON()));
       dispatch(setLogs([]));
-      dispatch(setMonster(null));
+      dispatch(setMonster(undefined));
 
       try {
         router.back();

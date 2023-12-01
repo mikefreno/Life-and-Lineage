@@ -1,7 +1,7 @@
 import { Pressable, Image } from "react-native";
 import { View, Text, ScrollView } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
-import { calculateAge, savePlayer, toTitleCase } from "../../utility/functions";
+import { calculateAge, toTitleCase } from "../../utility/functions";
 import { useDispatch, useSelector } from "react-redux";
 import { selectGame, selectPlayerCharacter } from "../../redux/selectors";
 import ProgressBar from "../../components/ProgressBar";
@@ -10,21 +10,18 @@ import { elementalColorMap } from "../../utility/elementColors";
 import { Item } from "../../classes/item";
 import { useEffect, useState } from "react";
 import { AppDispatch } from "../../redux/store";
-import { setPlayerCharacter } from "../../redux/slice/game";
 import Necromancer from "../../assets/icons/NecromancerSkull";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
 import blessingDisplay from "../../components/BlessingsDisplay";
 import { useColorScheme } from "nativewind";
 import SpellDetails from "../../components/SpellDetails";
+import { setPlayerCharacter } from "../../redux/slice/player";
 
 export default function HomeScreen() {
   const { colorScheme } = useColorScheme();
   const playerCharacter = useSelector(selectPlayerCharacter);
   const gameData = useSelector(selectGame);
   const dispatch: AppDispatch = useDispatch();
-  const [playerInventory, setPlayerInventory] = useState<Item[] | undefined>(
-    playerCharacter?.getInventory(),
-  );
   const [showingInventory, setShowingInventory] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<{
     item: Item;
@@ -63,10 +60,6 @@ export default function HomeScreen() {
       }
     }
   }
-
-  useEffect(() => {
-    setPlayerInventory(playerCharacter?.getInventory());
-  }, [playerCharacter]);
 
   function selectedItemDisplay() {
     if (selectedItem) {
@@ -111,8 +104,7 @@ export default function HomeScreen() {
         playerCharacter?.equipItem(selectedItem.item);
       }
       setSelectedItem(null);
-      dispatch(setPlayerCharacter(playerCharacter));
-      savePlayer(playerCharacter);
+      dispatch(setPlayerCharacter(playerCharacter.toJSON()));
     }
   }
 
@@ -326,7 +318,7 @@ export default function HomeScreen() {
               <Text className="text-center text-xl dark:text-white">{`${
                 playerCharacter
                   ? calculateAge(
-                      playerCharacter.birthdate,
+                      new Date(playerCharacter.birthdate),
                       gameData.getGameDate(),
                     )
                   : "x"
@@ -360,7 +352,7 @@ export default function HomeScreen() {
                 {playerCharacter.getInventory().length > 0 ? (
                   <ScrollView horizontal>
                     <View className="my-auto max-h-64 flex-wrap justify-around">
-                      {playerInventory?.map((item) => (
+                      {playerCharacter.getInventory().map((item) => (
                         <Pressable
                           key={item.id}
                           className="m-2 items-center active:scale-90 active:opacity-50"

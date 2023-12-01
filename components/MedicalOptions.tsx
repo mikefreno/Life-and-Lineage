@@ -6,9 +6,10 @@ import HealthIcon from "../assets/icons/HealthIcon";
 import { useDispatch, useSelector } from "react-redux";
 import { selectGame, selectPlayerCharacter } from "../redux/selectors";
 import { AppDispatch } from "../redux/store";
-import { setMonster, setPlayerCharacter } from "../redux/slice/game";
-import { fullSave } from "../utility/functions";
 import { useColorScheme } from "nativewind";
+import { setPlayerCharacter } from "../redux/slice/player";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
+import { setGameData } from "../redux/slice/game";
 
 interface MedicalOptionProps {
   title: string;
@@ -31,13 +32,14 @@ export default function MedicalOption({
   const gameData = useSelector(selectGame);
   const dispatch: AppDispatch = useDispatch();
   const { colorScheme } = useColorScheme();
+  const isFocused = useIsFocused();
 
   if (!playerCharacter) {
-    throw Error("No Player Character on Labor Task");
+    throw Error("No Player Character on Medical Task");
   }
 
   function visit() {
-    if (playerCharacter) {
+    if (playerCharacter && gameData && isFocused) {
       playerCharacter.getMedicalService(
         cost,
         healthRestore,
@@ -45,10 +47,9 @@ export default function MedicalOption({
         manaRestore,
         removeDebuffs,
       );
-      gameData?.gameTick();
-      dispatch(setPlayerCharacter(playerCharacter));
-      dispatch(setMonster(null));
-      fullSave(gameData, playerCharacter);
+      gameData.gameTick();
+      dispatch(setGameData(gameData));
+      dispatch(setPlayerCharacter(playerCharacter.toJSON()));
     }
   }
 
@@ -110,32 +111,29 @@ export default function MedicalOption({
           </View>
         </View>
 
-        <Pressable className="mb-2 mt-4" onPress={visit}>
-          {({ pressed }) => (
-            <View
-              className="mx-auto rounded-xl"
-              style={{
-                shadowColor: "#000",
-                shadowOffset: {
-                  width: 0,
-                  height: 1,
-                },
-                backgroundColor: colorScheme == "light" ? "white" : "#71717a",
-                shadowOpacity: 0.1,
-                shadowRadius: 5,
-              }}
-            >
-              <View
-                className={`px-8 py-4 ${
-                  pressed ? "scale-95 opacity-50" : null
-                }`}
-              >
-                <Text className="text-center text-zinc-900 dark:text-zinc-50">
-                  Visit
-                </Text>
-              </View>
+        <Pressable
+          className="mb-2 mt-4 active:scale-95 active:opacity-50"
+          onPress={visit}
+        >
+          <View
+            className="mx-auto rounded-xl"
+            style={{
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 1,
+              },
+              backgroundColor: colorScheme == "light" ? "white" : "#71717a",
+              shadowOpacity: 0.1,
+              shadowRadius: 5,
+            }}
+          >
+            <View className="px-8 py-4">
+              <Text className="text-center text-zinc-900 dark:text-zinc-50">
+                Visit
+              </Text>
             </View>
-          )}
+          </View>
         </Pressable>
       </View>
     </View>

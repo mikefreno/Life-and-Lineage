@@ -6,15 +6,12 @@ import {
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack, router } from "expo-router";
-import { useEffect, useState } from "react";
-import { loadGame, loadPlayer } from "../utility/functions";
-import { Game } from "../classes/game";
-import { Provider, useDispatch, useSelector } from "react-redux";
-import store, { AppDispatch } from "../redux/store";
-import { setGameData, setPlayerCharacter } from "../redux/slice/game";
+import { useEffect } from "react";
+import { Provider, useSelector } from "react-redux";
 import { selectGame, selectPlayerCharacter } from "../redux/selectors";
-import { PlayerCharacter } from "../classes/character";
 import { useColorScheme as nativeColorScheme } from "nativewind";
+import { PersistGate } from "redux-persist/integration/react";
+import storeCreator from "../redux/persist";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -28,15 +25,17 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function Root() {
+  const { store, persistor } = storeCreator();
   return (
     <Provider store={store}>
-      <RootLayout />
+      <PersistGate loading={null} persistor={persistor}>
+        <RootLayout />
+      </PersistGate>
     </Provider>
   );
 }
 
 function RootLayout() {
-  const dispatch: AppDispatch = useDispatch();
   const gameData = useSelector(selectGame);
   const playerCharacter = useSelector(selectPlayerCharacter);
 
@@ -45,38 +44,14 @@ function RootLayout() {
     ...FontAwesome.font,
   });
 
-  const [gameAndPlayerLoaded, setGameAndPlayerLoaded] = useState(false);
-
   const { setColorScheme, colorScheme } = nativeColorScheme();
-
-  useEffect(() => {
-    const fetchGameData = async () => {
-      const storedGame = await loadGame();
-      const storedPlayer = await loadPlayer();
-
-      if (storedGame) {
-        const game = Game.fromJSON(storedGame);
-        setColorScheme(game.getColorScheme());
-        dispatch(setGameData(game));
-      }
-
-      if (storedPlayer) {
-        const player = PlayerCharacter.fromJSON(storedPlayer);
-        dispatch(setPlayerCharacter(player));
-      }
-
-      setGameAndPlayerLoaded(true);
-    };
-
-    fetchGameData();
-  }, []);
 
   useEffect(() => {
     if (error) throw error;
   }, [error]);
 
   useEffect(() => {
-    if (loaded && gameAndPlayerLoaded) {
+    if (loaded) {
       SplashScreen.hideAsync();
       if (!playerCharacter || !gameData) {
         router.replace("/NewGame");
@@ -87,7 +62,7 @@ function RootLayout() {
         router.replace("/DeathScreen");
       }
     }
-  }, [loaded, gameAndPlayerLoaded, gameData, playerCharacter]);
+  }, [loaded, gameData, playerCharacter]);
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>

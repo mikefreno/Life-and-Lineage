@@ -7,14 +7,16 @@ import { router } from "expo-router";
 import { CharacterImage } from "../components/CharacterImage";
 import { calculateAge } from "../utility/functions";
 import { Character } from "../classes/character";
-import { saveGame } from "../utility/functions";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectGame, selectPlayerCharacter } from "../redux/selectors";
+import { AppDispatch } from "../redux/store";
+import { setGameData } from "../redux/slice/game";
 
 export default function DeathScreen() {
   const [nextLife, setNextLife] = useState<Character | null>(null);
   const gameData = useSelector(selectGame);
   const playerCharacter = useSelector(selectPlayerCharacter);
+  const dispatch: AppDispatch = useDispatch();
 
   function getDeathMessage() {
     const randomIndex = Math.floor(Math.random() * deathMessages.length);
@@ -22,8 +24,10 @@ export default function DeathScreen() {
   }
 
   useEffect(() => {
-    gameData?.hitDeathScreen();
-    saveGame(gameData);
+    if (gameData) {
+      gameData?.hitDeathScreen();
+      dispatch(setGameData(gameData));
+    }
   }, []);
 
   function startNewGame() {
@@ -54,7 +58,7 @@ export default function DeathScreen() {
               <Pressable key={idx} onPress={() => setNextLife(child)}>
                 <CharacterImage
                   characterAge={calculateAge(
-                    child.birthdate,
+                    new Date(child.birthdate),
                     currentDate as Date,
                   )}
                   characterSex={child.sex == "male" ? "M" : "F"}

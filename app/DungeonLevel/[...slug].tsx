@@ -14,13 +14,8 @@ import {
   selectMonster,
   selectPlayerCharacter,
 } from "../../redux/selectors";
-import {
-  setGameData,
-  setMonster,
-  setPlayerCharacter,
-} from "../../redux/slice/game";
+import { setGameData } from "../../redux/slice/game";
 import { AppDispatch } from "../../redux/store";
-import { appendLogs } from "../../redux/slice/game";
 import PlayerStatus from "../../components/PlayerStatus";
 import ProgressBar from "../../components/ProgressBar";
 import monsterObjects from "../../assets/json/monsters.json";
@@ -29,6 +24,10 @@ import { Item } from "../../classes/item";
 import Coins from "../../assets/icons/CoinsIcon";
 import { Condition } from "../../classes/conditions";
 import { Minion } from "../../classes/creatures";
+import { appendLogs } from "../../redux/slice/logs";
+import { setMonster } from "../../redux/slice/monster";
+import { setPlayerCharacter } from "../../redux/slice/player";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function DungeonLevelScreen() {
   const { slug } = useLocalSearchParams();
@@ -47,15 +46,11 @@ export default function DungeonLevelScreen() {
     itemDrops: Item[];
     gold: number;
   } | null>(null);
-  const [loading, setLoading] = useState(false);
-
   const monster = useSelector(selectMonster);
 
-  const dispatch: AppDispatch = useDispatch();
+  const isFocused = useIsFocused();
 
-  useEffect(() => {
-    console.log(playerCharacter?.getMinions());
-  }, [playerCharacter]);
+  const dispatch: AppDispatch = useDispatch();
 
   useEffect(() => {
     setInstanceName(slug[0]);
@@ -76,9 +71,9 @@ export default function DungeonLevelScreen() {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     if (thisDungeon && thisInstance && playerCharacter) {
-      dispatch(setMonster(null));
+      dispatch(setMonster(undefined));
       const boss = thisDungeon.getBoss(thisInstance.name)[0];
-      dispatch(setMonster(boss));
+      dispatch(setMonster(boss.toJSON()));
       battleLogger(`You found the boss!`);
     }
   };
@@ -104,7 +99,7 @@ export default function DungeonLevelScreen() {
     const enemy = enemyGenerator(instanceName, level);
 
     battleLogger(`You found a ${toTitleCase(enemy.creatureSpecies)}!`);
-    dispatch(setMonster(enemy));
+    dispatch(setMonster(enemy.toJSON()));
   }
 
   function appropriateEnemyCheck() {
@@ -123,11 +118,10 @@ export default function DungeonLevelScreen() {
       });
   }
 
-  //TODO: (fix needed) adding in removed items
   function takeItem(item: Item) {
     if (playerCharacter && droppedItems) {
       playerCharacter.addToInventory(item);
-      dispatch(setPlayerCharacter(playerCharacter));
+      dispatch(setPlayerCharacter(playerCharacter.toJSON()));
       setDroppedItems((prevState) => {
         const updatedDrops = prevState!.itemDrops.filter(
           (itemDrop) => !itemDrop.equals(item),
@@ -150,7 +144,7 @@ export default function DungeonLevelScreen() {
         playerCharacter.addToInventory(item),
       );
       setDroppedItems(null);
-      dispatch(setPlayerCharacter(playerCharacter));
+      dispatch(setPlayerCharacter(playerCharacter.toJSON()));
     }
   }
 
@@ -217,16 +211,15 @@ export default function DungeonLevelScreen() {
     }
   };
 
-  const useAttack = (attack: {
+  function useAttack(attack: {
     name: string;
     targets: string;
     hitChance: number;
     damageMult: number;
     sanityDamage: number;
     debuffs: { name: string; chance: number }[] | null;
-  }) => {
-    if (monster && playerCharacter && !loading) {
-      setLoading(true);
+  }) {
+    if (monster && playerCharacter && isFocused) {
       const startOfTurnMinions = [...playerCharacter.getMinions()];
       let monsterDefeated = false;
       const attackRes = playerCharacter.doPhysicalAttack(
@@ -267,7 +260,6 @@ export default function DungeonLevelScreen() {
           res.debuffs.forEach((debuff) => monster.addCondition(debuff));
         }
         if (hp <= 0 || (sanity && sanity <= 0)) {
-          gameData.gameTick();
           if (thisDungeon?.level != 0) {
             thisDungeon?.incrementStep();
           }
@@ -282,27 +274,26 @@ export default function DungeonLevelScreen() {
             setFightingBoss(false);
             thisDungeon?.setBossDefeated();
             gameData.openNextDungeonLevel(thisInstance!.name);
-            dispatch(setGameData(gameData));
+            dispatch(setGameData(gameData.toJSON()));
           }
-          dispatch(setMonster(null));
+          dispatch(setMonster(undefined));
         } else {
-          dispatch(setMonster(monster));
+          dispatch(setMonster(monster.toJSON()));
         }
       } else {
         battleLogger(
           `You ${attackRes}ed the ${toTitleCase(monster.creatureSpecies)}`,
         );
-        dispatch(setMonster(monster));
+        dispatch(setMonster(monster.toJSON()));
       }
       if (!monsterDefeated) {
         enemyTurn();
       }
       if (playerCharacter) {
-        dispatch(setPlayerCharacter(playerCharacter));
+        dispatch(setPlayerCharacter(playerCharacter.toJSON()));
       }
-      setLoading(false);
     }
-  };
+  }
 
   function playerMinionAttacks(enemyMaxHP: number, providedMinions: Minion[]) {
     let totalHPDamage = 0;
@@ -363,8 +354,7 @@ export default function DungeonLevelScreen() {
       selfDamage?: number;
     };
   }) => {
-    if (monster && playerCharacter && !loading) {
-      setLoading(true);
+    if (monster && playerCharacter && isFocused) {
       const startOfTurnMinions = [...playerCharacter.getMinions()];
       let monsterDefeated = false;
       const spellRes = playerCharacter.useSpell(spell, monster.getMaxHealth());
@@ -406,23 +396,22 @@ export default function DungeonLevelScreen() {
         const drops = monster.getDrops(playerCharacter.playerClass);
         playerCharacter.addGold(drops.gold);
         setDroppedItems(drops);
-        if (fightingBoss && gameData) {
+        if (fightingBoss) {
           setFightingBoss(false);
           thisDungeon?.setBossDefeated();
           gameData.openNextDungeonLevel(thisInstance!.name);
-          dispatch(setGameData(gameData));
         }
-        dispatch(setMonster(null));
+        dispatch(setGameData(gameData.toJSON()));
+        dispatch(setMonster(undefined));
       } else {
-        dispatch(setMonster(monster));
+        dispatch(setMonster(monster.toJSON()));
       }
       if (!monsterDefeated) {
         enemyTurn();
       }
       if (playerCharacter) {
-        dispatch(setPlayerCharacter(playerCharacter));
+        dispatch(setPlayerCharacter(playerCharacter.toJSON()));
       }
-      setLoading(false);
     }
   };
 

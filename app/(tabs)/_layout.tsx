@@ -67,7 +67,7 @@ export default function TabLayout() {
                     <Gear
                       width={30}
                       height={26}
-                      color={Colors[colorScheme ?? "light"].text}
+                      color={Colors[colorScheme as "light" | "dark"].text}
                       style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }}
                     />
                   )}
@@ -183,7 +183,7 @@ export default function TabLayout() {
                     <Cauldron
                       width={26}
                       height={30}
-                      color={Colors[colorScheme ?? "light"].text}
+                      color={Colors[colorScheme as "light" | "dark"].text}
                       style={{
                         marginRight: 15,
                         marginBottom: 6,

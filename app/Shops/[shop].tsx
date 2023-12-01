@@ -2,25 +2,21 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import { View, Text } from "../../components/Themed";
 import { useDispatch, useSelector } from "react-redux";
 import { selectGame, selectPlayerCharacter } from "../../redux/selectors";
-import { calculateAge, fullSave, toTitleCase } from "../../utility/functions";
+import { calculateAge, toTitleCase } from "../../utility/functions";
 import { CharacterImage } from "../../components/CharacterImage";
 import {
   Pressable,
   Image,
   ScrollView,
   View as NonThemedView,
-  useColorScheme,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { Item } from "../../classes/item";
 import Coins from "../../assets/icons/CoinsIcon";
-import {
-  setGameData,
-  setMonster,
-  setPlayerCharacter,
-} from "../../redux/slice/game";
 import { AppDispatch } from "../../redux/store";
 import SpellDetails from "../../components/SpellDetails";
+import { setPlayerCharacter } from "../../redux/slice/player";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function ShopScreen() {
   const { shop } = useLocalSearchParams();
@@ -28,7 +24,6 @@ export default function ShopScreen() {
   const dispatch: AppDispatch = useDispatch();
   const playerCharacter = useSelector(selectPlayerCharacter);
   const thisShop = game?.getShops().find((aShop) => aShop.archetype == shop);
-  const colorScheme = useColorScheme();
   const [selectedItem, setSelectedItem] = useState<{
     item: Item;
     buying: boolean;
@@ -52,6 +47,7 @@ export default function ShopScreen() {
       selfDamage?: number | undefined;
     };
   } | null>(null);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     if (
@@ -117,7 +113,7 @@ export default function ShopScreen() {
   }
 
   function moveBetweenInventories() {
-    if (selectedItem && playerCharacter && thisShop && game) {
+    if (selectedItem && playerCharacter && thisShop && game && isFocused) {
       if (selectedItem.buying) {
         const price = selectedItem.item.getBuyPrice(thisShop!.getAffection());
         playerCharacter.buyItem(selectedItem.item, price);
@@ -128,11 +124,7 @@ export default function ShopScreen() {
         playerCharacter.sellItem(selectedItem.item, price);
       }
       setSelectedItem(null);
-      game.gameTick();
-      dispatch(setMonster(null));
-      dispatch(setGameData(game));
-      dispatch(setPlayerCharacter(playerCharacter));
-      fullSave(game, playerCharacter);
+      dispatch(setPlayerCharacter(playerCharacter.toJSON()));
     }
   }
 
