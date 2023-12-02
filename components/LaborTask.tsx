@@ -7,7 +7,11 @@ import ProgressBar from "./ProgressBar";
 import { useColorScheme } from "nativewind";
 import { useIsFocused } from "@react-navigation/native";
 import { useContext, useState } from "react";
-import { GameContext, PlayerCharacterContext } from "../app/_layout";
+import {
+  GameContext,
+  MonsterContext,
+  PlayerCharacterContext,
+} from "../app/_layout";
 import { observer } from "mobx-react-lite";
 
 interface LaborTaskProps {
@@ -25,10 +29,12 @@ const LaborTask = observer(
   ({ title, reward, cost, experienceToPromote }: LaborTaskProps) => {
     const playerCharacterData = useContext(PlayerCharacterContext);
     const gameData = useContext(GameContext);
-
-    if (!playerCharacterData || !gameData) throw new Error("missing context");
+    const monsterData = useContext(MonsterContext);
+    if (!playerCharacterData || !gameData || !monsterData)
+      throw new Error("missing context");
     const { gameState } = gameData;
     const { playerState } = playerCharacterData;
+    const { setMonster } = monsterData;
 
     const [experience, setExperience] = useState(
       playerState?.getJobExperience(title),
@@ -53,6 +59,7 @@ const LaborTask = observer(
         });
         gameState.gameTick();
         setExperience(playerState.getJobExperience(title));
+        setMonster(null);
       }
     }
 
@@ -70,7 +77,7 @@ const LaborTask = observer(
           shadowRadius: 3,
         }}
       >
-        <View className="flex justify-between rounded-xl px-4 py-2 text-zinc-950  dark:border dark:border-zinc-500">
+        <View className="flex justify-between rounded-xl px-4 py-2 text-zinc-950 dark:border dark:border-zinc-500">
           <View className="flex flex-row justify-between">
             <Text className="bold my-auto w-2/3 text-xl dark:text-zinc-50">
               {title}

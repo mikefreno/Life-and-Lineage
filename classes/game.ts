@@ -71,6 +71,7 @@ export class Game {
       getInstance: action,
       openNextDungeonLevel: action,
       setColorScheme: action,
+      hitDeathScreen: action,
     });
   }
 
@@ -147,6 +148,11 @@ export class Game {
       console.log(depth);
       console.log(this.furthestDepth);
     }
+  }
+
+  //----------------------------------Misc----------------------------------//
+  public hitDeathScreen() {
+    this.atDeathScreen = true;
   }
 
   public setColorScheme(color: "light" | "dark" | "system") {

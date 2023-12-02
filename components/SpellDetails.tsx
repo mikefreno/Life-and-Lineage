@@ -7,11 +7,13 @@ import NecromancerSkull from "../assets/icons/NecromancerSkull";
 import blessingDisplay from "./BlessingsDisplay";
 import { useColorScheme } from "nativewind";
 import { elementalColorMap } from "../utility/elementColors";
+import ClockIcon from "../assets/icons/ClockIcon";
 
 interface SpellDetailInterface {
   spell: {
     name: string;
     element: string;
+    duration?: number;
     proficiencyNeeded: number;
     manaCost: number;
     effects: {
@@ -89,6 +91,17 @@ export default function SpellDetails({ spell }: SpellDetailInterface) {
           </View>
         </View>
         <View className="my-auto items-center">
+          {spell.duration ? (
+            <View className="flex flex-row items-center">
+              <Text>{spell.duration}</Text>
+              <ClockIcon
+                color={colorScheme == "dark" ? "#f4f4f5" : "#18181b"}
+                width={14}
+                height={14}
+                style={{ marginLeft: 6 }}
+              />
+            </View>
+          ) : null}
           {spell.effects.damage && spell.effects.damage > 0 ? (
             <View className="flex flex-row items-center">
               <Text>{spell.effects.damage}</Text>

@@ -25,7 +25,7 @@ export default function DeathScreen() {
 
   useEffect(() => {
     if (gameState) {
-      gameState.atDeathScreen = true;
+      gameState.hitDeathScreen();
     }
   }, []);
 
@@ -49,7 +49,7 @@ export default function DeathScreen() {
           >
             {getDeathMessage()}
           </Text>
-          {playerState.children ? (
+          {playerState.children.length > 0 ? (
             <>
               <Text className="text-xl">Continue as one of your children</Text>
               {playerState.children?.map((child, idx) => (

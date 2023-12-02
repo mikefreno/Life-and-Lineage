@@ -4,7 +4,7 @@ import Energy from "../assets/icons/EnergyIcon";
 import Sanity from "../assets/icons/SanityIcon";
 import HealthIcon from "../assets/icons/HealthIcon";
 import { useColorScheme } from "nativewind";
-import { useNavigation, useIsFocused } from "@react-navigation/native";
+import { useIsFocused } from "@react-navigation/native";
 import {
   GameContext,
   MonsterContext,
@@ -49,6 +49,7 @@ export default function MedicalOption({
         manaRestore,
         removeDebuffs,
       );
+      gameState.gameTick();
       setMonster(null);
     }
   }

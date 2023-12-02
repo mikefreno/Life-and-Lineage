@@ -18,6 +18,7 @@ import Necromancer from "../../assets/icons/NecromancerSkull";
 import { useColorScheme } from "nativewind";
 import { useContext } from "react";
 import { PlayerCharacterContext } from "../_layout";
+import GraduationCapIcon from "../../assets/icons/GraduationCap";
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
@@ -133,6 +134,24 @@ export default function TabLayout() {
                 color={color}
                 style={{ marginBottom: -3 }}
               />
+            ),
+            headerRight: () => (
+              <Link href="/Training" asChild>
+                <Pressable>
+                  {({ pressed }) => (
+                    <GraduationCapIcon
+                      width={28}
+                      height={26}
+                      color={colorScheme == "dark" ? "#f4f4f5" : "#27272a"}
+                      style={{
+                        marginRight: 15,
+                        marginBottom: 3,
+                        opacity: pressed ? 0.5 : 1,
+                      }}
+                    />
+                  )}
+                </Pressable>
+              </Link>
             ),
           }}
         />

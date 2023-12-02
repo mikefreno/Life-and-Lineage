@@ -69,43 +69,45 @@ export default function ShopScreen() {
           selectedItem.item.getSellPrice(thisShop!.affection);
 
       return (
-        <View className="flex h-1/3 items-center justify-center">
-          <Text>{toTitleCase(selectedItem.item.name)}</Text>
-          <Image source={selectedItem.item.getItemIcon()} />
-          <Text>
-            {selectedItem.item.itemClass == "bodyArmor"
-              ? "Body Armor"
-              : toTitleCase(selectedItem.item.itemClass)}
-          </Text>
-          {selectedItem.item.slot ? (
-            <Text className="">
-              Fills {toTitleCase(selectedItem.item.slot)} Slot
-            </Text>
-          ) : null}
-          <View className="flex flex-row">
+        <ScrollView className="pt-6">
+          <View className="flex h-1/3 items-center ">
+            <Text>{toTitleCase(selectedItem.item.name)}</Text>
+            <Image source={selectedItem.item.getItemIcon()} />
             <Text>
-              Price:{" "}
-              {selectedItem.buying
-                ? selectedItem.item.getBuyPrice(thisShop!.affection)
-                : selectedItem.item.getSellPrice(thisShop!.affection)}
+              {selectedItem.item.itemClass == "bodyArmor"
+                ? "Body Armor"
+                : toTitleCase(selectedItem.item.itemClass)}
             </Text>
-            <Coins width={20} height={20} style={{ marginLeft: 6 }} />
-          </View>
-          <View>
-            <Pressable
-              disabled={!transactionCompleteable}
-              onPress={moveBetweenInventories}
-              className={`${
-                !transactionCompleteable ? "bg-zinc-300" : "bg-blue-400"
-              } my-4 rounded-lg  active:scale-95 active:opacity-50`}
-            >
-              <Text className="px-6 py-4" style={{ color: "white" }}>
-                {selectedItem.buying ? "Purchase" : "Sell"}
+            {selectedItem.item.slot ? (
+              <Text className="">
+                Fills {toTitleCase(selectedItem.item.slot)} Slot
               </Text>
-            </Pressable>
+            ) : null}
+            <View className="flex flex-row">
+              <Text>
+                Price:{" "}
+                {selectedItem.buying
+                  ? selectedItem.item.getBuyPrice(thisShop!.affection)
+                  : selectedItem.item.getSellPrice(thisShop!.affection)}
+              </Text>
+              <Coins width={20} height={20} style={{ marginLeft: 6 }} />
+            </View>
+            <View>
+              <Pressable
+                disabled={!transactionCompleteable}
+                onPress={moveBetweenInventories}
+                className={`${
+                  !transactionCompleteable ? "bg-zinc-300" : "bg-blue-400"
+                } my-4 rounded-lg  active:scale-95 active:opacity-50 pb-4 px-6`}
+              >
+                <Text className="py-4" style={{ color: "white" }}>
+                  {selectedItem.buying ? "Purchase" : "Sell"}
+                </Text>
+              </Pressable>
+            </View>
+            {selectedSpell ? <SpellDetails spell={selectedSpell} /> : null}
           </View>
-          {selectedSpell ? <SpellDetails spell={selectedSpell} /> : null}
-        </View>
+        </ScrollView>
       );
     } else {
       return <View className="flex h-1/3 items-center justify-center"></View>;

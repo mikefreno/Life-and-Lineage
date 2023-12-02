@@ -7,7 +7,7 @@ import {
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack, router } from "expo-router";
 import { createContext, useEffect, useContext, useState } from "react";
-import { useColorScheme as nativeColorScheme } from "nativewind";
+import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
 import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
@@ -15,6 +15,7 @@ import { Monster } from "../classes/creatures";
 import { fullSave, loadGame, loadPlayer } from "../utility/functions";
 import { View, Text } from "react-native";
 import { autorun } from "mobx";
+import { useColorScheme as reactColorScheme } from "react-native";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -67,7 +68,8 @@ const Root = observer(() => {
   const [monsterState, setMonster] = useState<Monster | null>(null);
   const [logsState, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const { setColorScheme } = nativeColorScheme();
+  const { setColorScheme } = useColorScheme();
+  const reactScheme = reactColorScheme();
 
   const getData = async () => {
     try {
@@ -86,6 +88,12 @@ const Root = observer(() => {
       console.error(e);
     }
   };
+
+  useEffect(() => {
+    if (gameState) {
+      setColorScheme(gameState.colorScheme);
+    }
+  }, [gameState?.colorScheme, reactScheme]);
 
   useEffect(() => {
     getData();
@@ -129,7 +137,7 @@ const RootLayout = () => {
   const gameData = useContext(GameContext);
   const game = gameData?.gameState;
   const playerCharacter = playerCharacterData?.playerState;
-  const { colorScheme } = nativeColorScheme();
+  const { colorScheme } = useColorScheme();
 
   useEffect(() => {
     if (error) throw error;
@@ -153,8 +161,9 @@ const RootLayout = () => {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="Settings" options={{ presentation: "modal" }} />
+        <Stack.Screen name="Settings" />
         <Stack.Screen name="Study" options={{ presentation: "modal" }} />
+        <Stack.Screen name="Training" options={{ presentation: "modal" }} />
         <Stack.Screen name="Crafting" options={{ presentation: "modal" }} />
         <Stack.Screen
           name="Relationships"

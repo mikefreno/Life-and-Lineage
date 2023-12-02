@@ -151,14 +151,12 @@ export default function NewGameReview() {
       monsterSetter(null);
       await fullSave(newGame, player);
 
-      try {
-        router.back();
-        router.back();
-        router.back();
-        router.back();
-      } catch (e) {
-        console.log(e);
-      }
+      router.back();
+      router.back();
+      router.back();
+      router.back();
+      router.back();
+
       router.replace("/");
     }
   }

@@ -1,11 +1,12 @@
 import { View, Text, ScrollView } from "./Themed";
-import { Pressable, useColorScheme, FlatList, Image } from "react-native";
+import { Pressable, FlatList, Image } from "react-native";
 import attacks from "../assets/json/playerAttacks.json";
 import { toTitleCase } from "../utility/functions";
 import Coins from "../assets/icons/CoinsIcon";
 import { Item } from "../classes/item";
 import { useContext, useState } from "react";
 import { LogsContext, PlayerCharacterContext } from "../app/_layout";
+import { useColorScheme } from "nativewind";
 
 interface BattleTabProps {
   battleTab: "attacks" | "spells" | "equipment" | "log";
@@ -37,7 +38,7 @@ export default function BattleTab({
   useAttack,
   useSpell,
 }: BattleTabProps) {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const logs = useContext(LogsContext)?.logsState;
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 

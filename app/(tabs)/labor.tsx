@@ -23,7 +23,7 @@ const LaborScreen = observer(() => {
   });
 
   return (
-    <View>
+    <View className="flex-1">
       <PlayerStatus displayGoldBottom={true} onTop={true} />
       <ScrollView>
         <View className="px-2 pb-24 pt-4">

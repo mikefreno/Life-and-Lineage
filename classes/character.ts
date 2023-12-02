@@ -68,6 +68,9 @@ export class Character {
   public getFullName(): string {
     return `${this.firstName} ${this.lastName}`;
   }
+  public addQualification(qual: string) {
+    this.qualifications.push(qual);
+  }
 
   public setJob(job: string) {
     this.job = job;
@@ -114,6 +117,11 @@ type PlayerCharacterBase = {
     spellName: string;
     experience: number;
     element: string;
+  }[];
+  qualificationProgress?: {
+    name: string;
+    progress: number;
+    completed: boolean;
   }[];
   parents: Character[];
   children?: Character[];
@@ -176,6 +184,11 @@ export class PlayerCharacter extends Character {
     element: string;
   }[];
   magicProficiencies: { school: string; proficiency: number }[];
+  qualificationProgress: {
+    name: string;
+    progress: number;
+    completed: boolean;
+  }[];
   minions: Minion[];
   readonly parents: Character[];
   children: Character[];
@@ -211,6 +224,7 @@ export class PlayerCharacter extends Character {
     minions,
     jobExperience,
     learningSpells,
+    qualificationProgress,
     magicProficiencies,
     parents,
     children,
@@ -241,6 +255,7 @@ export class PlayerCharacter extends Character {
     this.minions = minions ?? [];
     this.jobExperience = jobExperience ?? [];
     this.learningSpells = learningSpells ?? [];
+    this.qualificationProgress = qualificationProgress ?? [];
     this.magicProficiencies =
       magicProficiencies ?? getStartingProficiencies(playerClass, blessing);
     this.parents = parents;
@@ -273,6 +288,7 @@ export class PlayerCharacter extends Character {
       jobExperience: observable,
       learningSpells: observable,
       magicProficiencies: observable,
+      qualificationProgress: observable,
       children: observable,
       knownSpells: observable,
       conditions: observable,
@@ -282,6 +298,7 @@ export class PlayerCharacter extends Character {
       equipment: observable,
       getMaxHealth: action,
       damageHealth: action,
+      getSpecifiedQualificationProgress: action,
       getMaxMana: action,
       damageSanity: action,
       addToInventory: action,
@@ -296,6 +313,7 @@ export class PlayerCharacter extends Character {
       spendGold: action,
       addGold: action,
       getCurrentJobAndExperience: action,
+      incrementQualificationProgress: action,
       getJobExperience: action,
       performLabor: action,
       learnSpellStep: action,
@@ -559,6 +577,43 @@ export class PlayerCharacter extends Character {
     if (!jobFound) {
       this.jobExperience.push({ job: this.job, experience: 1 });
     }
+  }
+  //----------------------------------Qualification----------------------------------//
+  public incrementQualificationProgress(
+    name: string,
+    ticksToProgress: number,
+    sanityCost: number,
+    goldCost: number,
+  ) {
+    let foundQual = false;
+    this.qualificationProgress.forEach((qual) => {
+      if (qual.name == name) {
+        foundQual = true;
+        this.damageSanity(sanityCost);
+        this.spendGold(goldCost);
+        if (ticksToProgress > qual.progress) {
+          qual.progress++;
+        } else {
+          qual.completed = true;
+          this.addQualification(qual.name);
+        }
+      }
+    });
+    if (!foundQual) {
+      this.damageSanity(sanityCost);
+      this.spendGold(goldCost);
+      this.qualificationProgress.push({
+        name: name,
+        progress: 1,
+        completed: false,
+      });
+    }
+  }
+
+  public getSpecifiedQualificationProgress(name: string) {
+    const found = this.qualificationProgress.find((qual) => qual.name == name)
+      ?.progress;
+    return found;
   }
   //----------------------------------Spells----------------------------------//
 
@@ -930,6 +985,7 @@ export class PlayerCharacter extends Character {
       manaRegen: json.manaRegen,
       jobExperience: json.jobExperience,
       learningSpells: json.learningSpells,
+      qualificationProgress: json.qualificationProgress,
       magicProficiencies: json.magicProficiencies,
       parents: json.parents
         ? json.parents.map((parent: any) => Character.fromJSON(parent))
