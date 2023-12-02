@@ -15,7 +15,6 @@ import { Monster } from "../classes/creatures";
 import { fullSave, loadGame, loadPlayer } from "../utility/functions";
 import { View, Text } from "react-native";
 import { autorun } from "mobx";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -56,8 +55,8 @@ export const MonsterContext = createContext<
 
 export const LogsContext = createContext<
   | {
-      logsState: { logLine: string }[];
-      setLogs: React.Dispatch<React.SetStateAction<{ logLine: string }[]>>;
+      logsState: string[];
+      setLogs: React.Dispatch<React.SetStateAction<string[]>>;
     }
   | undefined
 >(undefined);
@@ -66,7 +65,7 @@ const Root = observer(() => {
   const [gameState, setGameData] = useState<Game>();
   const [playerState, setPlayerCharacter] = useState<PlayerCharacter>();
   const [monsterState, setMonster] = useState<Monster | null>(null);
-  const [logsState, setLogs] = useState<{ logLine: string }[]>([]);
+  const [logsState, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const { setColorScheme } = nativeColorScheme();
 

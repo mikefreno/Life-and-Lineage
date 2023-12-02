@@ -5,7 +5,11 @@ import Sanity from "../assets/icons/SanityIcon";
 import HealthIcon from "../assets/icons/HealthIcon";
 import { useColorScheme } from "nativewind";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
-import { GameContext, PlayerCharacterContext } from "../app/_layout";
+import {
+  GameContext,
+  MonsterContext,
+  PlayerCharacterContext,
+} from "../app/_layout";
 import { useContext } from "react";
 
 interface MedicalOptionProps {
@@ -26,26 +30,26 @@ export default function MedicalOption({
   removeDebuffs,
 }: MedicalOptionProps) {
   const playerCharacterData = useContext(PlayerCharacterContext);
-  const playerCharacter = playerCharacterData?.playerState;
   const gameData = useContext(GameContext);
-  const game = gameData?.gameState;
+  const monsterData = useContext(MonsterContext);
+  if (!playerCharacterData || !gameData || !monsterData)
+    throw new Error("missing context");
+  const { playerState } = playerCharacterData;
+  const { gameState } = gameData;
+  const { setMonster } = monsterData;
   const { colorScheme } = useColorScheme();
   const isFocused = useIsFocused();
 
-  if (!playerCharacter) {
-    throw Error("No Player Character on Medical Task");
-  }
-
   function visit() {
-    if (playerCharacter && game && isFocused) {
-      playerCharacter.getMedicalService(
+    if (playerState && gameState && isFocused) {
+      playerState.getMedicalService(
         cost,
         healthRestore,
         sanityRestore,
         manaRestore,
         removeDebuffs,
       );
-      game.gameTick();
+      setMonster(null);
     }
   }
 

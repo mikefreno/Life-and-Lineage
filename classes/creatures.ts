@@ -27,7 +27,7 @@ import paladinBooks from "../assets/json/items/paladinBooks.json";
 import mageBooks from "../assets/json/items/mageBooks.json";
 import { v4 as uuidv4 } from "uuid";
 import { Item } from "./item";
-import { action, computed, makeObservable, observable } from "mobx";
+import { action, makeObservable, observable } from "mobx";
 
 interface monsterInterface {
   creatureSpecies: string;

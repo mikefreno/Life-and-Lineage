@@ -205,9 +205,7 @@ export default function BattleTab({
             <FlatList
               inverted
               data={logs?.slice().reverse()}
-              renderItem={({ item }) => (
-                <Text className="py-1">{item.logLine}</Text>
-              )}
+              renderItem={({ item }) => <Text className="py-1">{item}</Text>}
             />
           </View>
         );

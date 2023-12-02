@@ -2,7 +2,7 @@ import ProgressBar from "./ProgressBar";
 import { View, Text } from "./Themed";
 import { View as NonThemedView } from "react-native";
 import Coins from "../assets/icons/CoinsIcon";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { PlayerCharacterContext } from "../app/_layout";
 import { observer } from "mobx-react-lite";
 
@@ -14,9 +14,17 @@ interface PlayerStatusOptions {
 
 const PlayerStatus = observer(
   ({ displayGoldBottom, displayGoldTop, onTop }: PlayerStatusOptions) => {
-    const playerCharacter = useContext(PlayerCharacterContext)?.playerState;
+    const playerCharacterData = useContext(PlayerCharacterContext);
+    if (!playerCharacterData) throw new Error("missing context");
+    const { playerState } = playerCharacterData;
+    const [readableGold, setReadableGold] = useState(
+      playerState?.getReadableGold(),
+    );
+    useEffect(() => {
+      setReadableGold(playerState?.getReadableGold());
+    }, [playerState?.gold]);
 
-    if (playerCharacter) {
+    if (playerState) {
       return (
         <NonThemedView
           className={`${
@@ -25,7 +33,7 @@ const PlayerStatus = observer(
         >
           {displayGoldTop ? (
             <View className="flex flex-row justify-center">
-              <Text>{playerCharacter.getReadableGold()}</Text>
+              <Text>{readableGold}</Text>
               <Coins width={16} height={16} style={{ marginLeft: 6 }} />
             </View>
           ) : null}
@@ -35,8 +43,8 @@ const PlayerStatus = observer(
                 Health
               </Text>
               <ProgressBar
-                value={playerCharacter.health}
-                maxValue={playerCharacter.getMaxHealth()}
+                value={playerState.health}
+                maxValue={playerState.getMaxHealth()}
                 filledColor="#ef4444"
                 unfilledColor="#fee2e2"
               />
@@ -46,8 +54,8 @@ const PlayerStatus = observer(
                 Mana
               </Text>
               <ProgressBar
-                value={playerCharacter.mana}
-                maxValue={playerCharacter.getMaxMana()}
+                value={playerState.mana}
+                maxValue={playerState.getMaxMana()}
                 filledColor="#60a5fa"
                 unfilledColor="#dbeafe"
               />
@@ -57,7 +65,7 @@ const PlayerStatus = observer(
                 Sanity
               </Text>
               <ProgressBar
-                value={playerCharacter.sanity}
+                value={playerState.sanity}
                 minValue={-50}
                 maxValue={50}
                 filledColor="#c084fc"
@@ -67,7 +75,7 @@ const PlayerStatus = observer(
           </View>
           {displayGoldBottom ? (
             <View className="flex flex-row justify-center pt-2">
-              <Text>{playerCharacter.getReadableGold()}</Text>
+              <Text>{readableGold}</Text>
               <Coins width={16} height={16} style={{ marginLeft: 6 }} />
             </View>
           ) : null}

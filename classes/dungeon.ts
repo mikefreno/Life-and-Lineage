@@ -51,12 +51,6 @@ export class DungeonInstance {
       throw new Error(`failed to add level to ${this.name} instance`);
     }
   }
-  //public toJSON(): object {
-  //return {
-  //name: this.name,
-  //levels: this.levels.map((level) => level.toJSON()),
-  //};
-  //}
 
   static fromJSON(json: any): DungeonInstance {
     const levels = json.levels.map((level: any) =>
@@ -96,6 +90,7 @@ export class DungeonLevel {
       bossDefeated: observable,
       incrementStep: action,
       getBoss: action,
+      setBossDefeated: action,
     });
   }
 
@@ -103,6 +98,9 @@ export class DungeonLevel {
     if (this.step < this.stepsBeforeBoss) {
       this.step += 1;
     }
+  }
+  public setBossDefeated() {
+    this.bossDefeated = true;
   }
 
   public getBoss(instanceName: string) {
@@ -135,15 +133,6 @@ export class DungeonLevel {
       `No boss found in getBoss() on DungeonLevel, looking for ${this.bosses} in ${instanceName}`,
     );
   }
-  //public toJSON(): object {
-  //return {
-  //level: this.level,
-  //bosses: this.bosses,
-  //step: this.step,
-  //stepsBeforeBoss: this.stepsBeforeBoss,
-  //bossDefeated: this.bossDefeated,
-  //};
-  //}
 
   static fromJSON(json: any): DungeonLevel {
     const level = new DungeonLevel({

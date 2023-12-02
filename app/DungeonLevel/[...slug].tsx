@@ -23,8 +23,9 @@ import {
   MonsterContext,
   PlayerCharacterContext,
 } from "../_layout";
+import { observer } from "mobx-react-lite";
 
-export default function DungeonLevelScreen() {
+const DungeonLevelScreen = observer(() => {
   const playerCharacterData = useContext(PlayerCharacterContext);
   if (!playerCharacterData) throw new Error("missing player context");
   const { playerState } = playerCharacterData;
@@ -36,7 +37,7 @@ export default function DungeonLevelScreen() {
   const { monsterState, setMonster } = monsterData;
   const logsData = useContext(LogsContext);
   if (!logsData) throw new Error("missing logs context");
-  const { logsState, setLogs } = logsData;
+  const { logsState } = logsData;
 
   const { slug } = useLocalSearchParams();
   const [fightingBoss, setFightingBoss] = useState<boolean>(false);
@@ -94,8 +95,8 @@ export default function DungeonLevelScreen() {
 
   function battleLogger(whatHappened: string) {
     const timeOfLog = new Date().toLocaleTimeString();
-    const log = { logLine: `${timeOfLog}: ${whatHappened}` };
-    setLogs([...logsState, log]);
+    const log = `${timeOfLog}: ${whatHappened}`;
+    logsState.push(log);
   }
 
   function getEnemy() {
@@ -276,7 +277,7 @@ export default function DungeonLevelScreen() {
           setDroppedItems(drops);
           if (fightingBoss && gameState && thisDungeon) {
             setFightingBoss(false);
-            thisDungeon.bossDefeated = true;
+            thisDungeon.setBossDefeated();
             gameState.openNextDungeonLevel(thisInstance!.name);
           }
           setMonster(null);
@@ -395,7 +396,7 @@ export default function DungeonLevelScreen() {
         setDroppedItems(drops);
         if (fightingBoss && thisDungeon) {
           setFightingBoss(false);
-          thisDungeon.bossDefeated = true;
+          thisDungeon.setBossDefeated();
           gameState.openNextDungeonLevel(thisInstance!.name);
         }
         setMonster(null);
@@ -606,4 +607,5 @@ export default function DungeonLevelScreen() {
       </>
     );
   }
-}
+});
+export default DungeonLevelScreen;
