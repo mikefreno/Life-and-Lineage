@@ -1,18 +1,20 @@
 import { Pressable, FlatList, View as NonThemedView } from "react-native";
 import { Text, View } from "../../components/Themed";
-import { useSelector } from "react-redux";
-import { selectGame } from "../../redux/selectors";
 import { calculateAge, toTitleCase } from "../../utility/functions";
 import { Shop } from "../../classes/shop";
 import { CharacterImage } from "../../components/CharacterImage";
 import shopObjects from "../../assets/json/shops.json";
 import { router } from "expo-router";
+import { useContext } from "react";
+import { GameContext } from "../_layout";
 
 export default function ShopsScreen() {
-  const game = useSelector(selectGame);
+  const gameData = useContext(GameContext);
+  if (!gameData) throw new Error("missing gameData");
+  const { gameState } = gameData;
 
-  if (game) {
-    const shops = game.getShops();
+  if (gameState) {
+    const shops = gameState.shops;
 
     const renderItem = ({ item: shop }: { item: Shop }) => (
       <NonThemedView className="w-1/2">
@@ -49,8 +51,8 @@ export default function ShopsScreen() {
           <NonThemedView className="items-center">
             <CharacterImage
               characterAge={calculateAge(
-                shop.shopKeeperBirthDate,
-                game.getGameDate(),
+                new Date(shop.shopKeeperBirthDate),
+                new Date(gameState.date),
               )}
               characterSex={shop.shopKeeperSex == "male" ? "M" : "F"}
             />

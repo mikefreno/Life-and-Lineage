@@ -9,14 +9,15 @@ import paladinSpells from "../assets/json/paladinSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
 import { Minion } from "./creatures";
 import summons from "../assets/json/summons.json";
+import { action, makeObservable, observable } from "mobx";
 
 interface CharacterOptions {
   firstName: string;
   lastName: string;
   sex: "male" | "female";
-  birthdate?: Date;
+  birthdate?: string;
   alive?: boolean;
-  deathdate: Date | null;
+  deathdate: string | null;
   job?: string;
   affection?: number;
   qualifications?: string[];
@@ -26,12 +27,12 @@ export class Character {
   readonly firstName: string;
   readonly lastName: string;
   readonly sex: "male" | "female";
-  protected alive: boolean;
+  alive: boolean;
   readonly birthdate: string;
-  protected deathdate: string | null;
-  protected job: string;
-  protected affection: number;
-  protected qualifications: string[];
+  deathdate: string | null;
+  job: string;
+  affection: number;
+  qualifications: string[];
 
   constructor({
     firstName,
@@ -48,41 +49,28 @@ export class Character {
     this.lastName = lastName;
     this.sex = sex;
     this.alive = alive ?? true;
-    this.birthdate = birthdate?.toISOString() ?? new Date().toISOString();
-    this.deathdate = deathdate?.toISOString() ?? null;
+    this.birthdate = birthdate ?? new Date().toISOString();
+    this.deathdate = deathdate ?? null;
     this.job = job ?? "Unemployed";
     this.affection = affection ?? 0;
     this.qualifications = qualifications ?? [];
+    makeObservable(this, {
+      alive: observable,
+      deathdate: observable,
+      job: observable,
+      affection: observable,
+      qualifications: observable,
+      getFullName: action,
+      setJob: action,
+    });
   }
 
-  public getName(): string {
+  public getFullName(): string {
     return `${this.firstName} ${this.lastName}`;
   }
 
-  public getJobTitle(): string {
-    return this.job;
-  }
-
-  public getQualifications() {
-    return this.qualifications;
-  }
-
-  public setJobTitle(newJobTitle: string) {
-    this.job = newJobTitle;
-  }
-
-  public toJSON(): object {
-    return {
-      firstName: this.firstName,
-      lastName: this.lastName,
-      sex: this.sex,
-      birthdate: this.birthdate,
-      alive: this.alive,
-      deathdate: this.deathdate ? this.deathdate : null,
-      job: this.job,
-      affection: this.affection,
-      qualifications: this.qualifications,
-    };
+  public setJob(job: string) {
+    this.job = job;
   }
 
   static fromJSON(json: any): Character {
@@ -90,9 +78,9 @@ export class Character {
       firstName: json.firstName,
       lastName: json.lastName,
       sex: json.sex,
-      birthdate: json.birthdate ? new Date(json.birthdate) : undefined,
+      birthdate: json.birthdate ?? undefined,
       alive: json.alive,
-      deathdate: json.deathdate ? new Date(json.deathdate) : null,
+      deathdate: json.deathdate ?? null,
       job: json.job,
       affection: json.affection,
       qualifications: json.qualifications,
@@ -106,8 +94,8 @@ type PlayerCharacterBase = {
   lastName: string;
   sex: "male" | "female";
   alive?: boolean;
-  birthdate?: Date;
-  deathdate: Date | null;
+  birthdate?: string;
+  deathdate: string | null;
   job?: string;
   affection?: number;
   health?: number;
@@ -133,7 +121,6 @@ type PlayerCharacterBase = {
   knownSpells?: string[];
   gold?: number;
   conditions?: Condition[];
-  inventorySize?: number;
   inventory?: Item[];
   minions?: Minion[];
   equipment?: {
@@ -175,30 +162,29 @@ export class PlayerCharacter extends Character {
     | "holy"
     | "vengeance"
     | "protection";
-  private health: number;
-  private healthMax: number;
-  private sanity: number;
-  private mana: number;
-  private manaMax: number;
-  private manaRegen: number;
-  public jobExperience: { job: string; experience: number }[];
-  public learningSpells: {
+  health: number;
+  healthMax: number;
+  sanity: number;
+  mana: number;
+  manaMax: number;
+  manaRegen: number;
+  jobExperience: { job: string; experience: number }[];
+  learningSpells: {
     bookName: string;
     spellName: string;
     experience: number;
     element: string;
   }[];
-  private magicProficiencies: { school: string; proficiency: number }[];
-  private minions: Minion[];
-  private parents: Character[];
-  private children: Character[];
-  private knownSpells: string[];
-  private physicalAttacks: string[];
-  private conditions: Condition[];
-  private gold: number;
-  private inventorySize: number;
-  private inventory: Item[];
-  private equipment: {
+  magicProficiencies: { school: string; proficiency: number }[];
+  minions: Minion[];
+  readonly parents: Character[];
+  children: Character[];
+  knownSpells: string[];
+  physicalAttacks: string[];
+  conditions: Condition[];
+  gold: number;
+  inventory: Item[];
+  equipment: {
     mainHand: Item;
     offHand: Item | null;
     head: Item | null;
@@ -231,7 +217,6 @@ export class PlayerCharacter extends Character {
     knownSpells,
     physicalAttacks,
     gold,
-    inventorySize,
     inventory,
     equipment,
   }: PlayerCharacterOptions) {
@@ -264,7 +249,6 @@ export class PlayerCharacter extends Character {
     this.conditions = [];
     this.physicalAttacks = physicalAttacks ?? ["punch"];
     this.gold = gold ?? 100;
-    this.inventorySize = inventorySize ?? 20;
     this.inventory = inventory ?? [];
     this.equipment = equipment ?? {
       mainHand: new Item({
@@ -278,12 +262,55 @@ export class PlayerCharacter extends Character {
       head: null,
       body: null,
     };
+    makeObservable(this, {
+      health: observable,
+      healthMax: observable,
+      sanity: observable,
+      mana: observable,
+      manaMax: observable,
+      manaRegen: observable,
+      minions: observable,
+      jobExperience: observable,
+      learningSpells: observable,
+      magicProficiencies: observable,
+      children: observable,
+      knownSpells: observable,
+      conditions: observable,
+      physicalAttacks: observable,
+      gold: observable,
+      inventory: observable,
+      equipment: observable,
+      getMaxHealth: action,
+      damageHealth: action,
+      getMaxMana: action,
+      damageSanity: action,
+      addToInventory: action,
+      buyItem: action,
+      removeFromInventory: action,
+      sellItem: action,
+      equipItem: action,
+      removeEquipment: action,
+      getArmorValue: action,
+      getDamageReduction: action,
+      getReadableGold: action,
+      spendGold: action,
+      addGold: action,
+      getCurrentJobAndExperience: action,
+      getJobExperience: action,
+      performLabor: action,
+      learnSpellStep: action,
+      getSpells: action,
+      addCondition: action,
+      doPhysicalAttack: action,
+      useSpell: action,
+      addBuff: action,
+      createMinion: action,
+      clearMinions: action,
+      removeMinion: action,
+      getMedicalService: action,
+    });
   }
   //----------------------------------Health----------------------------------//
-  public getHealth() {
-    return this.health;
-  }
-
   public getMaxHealth() {
     let gearBuffs = 0;
     gearBuffs += this.equipment.mainHand.stats?.health ?? 0;
@@ -311,10 +338,6 @@ export class PlayerCharacter extends Character {
   }
 
   //----------------------------------Mana----------------------------------//
-  public getMana(): number {
-    return this.mana;
-  }
-
   public getMaxMana(): number {
     let gearBuffs = 0;
     gearBuffs += this.equipment.mainHand.stats?.mana ?? 0;
@@ -343,10 +366,6 @@ export class PlayerCharacter extends Character {
     }
   }
   //----------------------------------Sanity----------------------------------//
-  public getSanity(): number {
-    return this.sanity;
-  }
-
   public damageSanity(damage: number | null) {
     this.sanity -= damage ?? 0;
     return this.sanity;
@@ -360,10 +379,6 @@ export class PlayerCharacter extends Character {
     }
   }
   //----------------------------------Inventory----------------------------------//
-  public getInventory() {
-    return this.inventory;
-  }
-
   public addToInventory(item: Item | null) {
     if (item && item.name !== "unarmored") {
       this.inventory.push(item);
@@ -391,26 +406,6 @@ export class PlayerCharacter extends Character {
       this.inventory.splice(idx, 1);
       this.gold += sellPrice;
     }
-  }
-
-  public getEquipment() {
-    return this.equipment;
-  }
-
-  public getHeadItem() {
-    return this.equipment.head;
-  }
-
-  public getBodyItem() {
-    return this.equipment.body;
-  }
-
-  public getOffHandItem() {
-    return this.equipment.offHand;
-  }
-
-  public getMainHandItem() {
-    return this.equipment.mainHand;
   }
 
   public equipItem(item: Item) {
@@ -461,16 +456,6 @@ export class PlayerCharacter extends Character {
     this.setPhysicalAttacks();
   }
 
-  private setUnarmored() {
-    this.equipment.mainHand = new Item({
-      name: "unarmored",
-      slot: "one-hand",
-      stats: { baseDamage: 1 },
-      baseValue: 0,
-      itemClass: "weapon",
-    });
-  }
-
   public removeEquipment(slot: "mainHand" | "offHand" | "body" | "head") {
     if (slot === "mainHand") {
       this.addToInventory(this.equipment.mainHand);
@@ -495,15 +480,21 @@ export class PlayerCharacter extends Character {
     armorValue += this.equipment.head?.stats?.armor ?? 0;
     return armorValue;
   }
+
   public getDamageReduction() {
     return damageReduction(this.getArmorValue());
   }
 
-  //----------------------------------Gold----------------------------------//
-  public getGold() {
-    return this.gold;
+  private setUnarmored() {
+    this.equipment.mainHand = new Item({
+      name: "unarmored",
+      slot: "one-hand",
+      stats: { baseDamage: 1 },
+      baseValue: 0,
+      itemClass: "weapon",
+    });
   }
-
+  //----------------------------------Gold----------------------------------//
   public getReadableGold() {
     if (this.gold > 10_000_000_000) {
       const cleanedUp = (this.gold / 1_000_000_000).toFixed(2);
@@ -556,75 +547,53 @@ export class PlayerCharacter extends Character {
   }
 
   private gainExperience() {
-    let jobWasFoundAndIncremented = false;
-    //console.log(Object.isFrozen(this.jobExperience))
-    //to understand why this is necessary, uncomment the above line before calling
-    let newJobExperience = this.jobExperience.map((job) => {
-      if (job.job === this.job) {
-        if (job.experience < 50) {
-          const newExp = job.experience + 1;
-          jobWasFoundAndIncremented = true;
-          return { job: job.job, experience: newExp };
-        }
+    let jobFound = false;
+
+    this.jobExperience.forEach((job) => {
+      if (job.job === this.job && job.experience < 50) {
+        jobFound = true;
+        job.experience++;
       }
-      return job;
     });
 
-    if (!jobWasFoundAndIncremented) {
-      newJobExperience.push({ job: this.job, experience: 1 });
+    if (!jobFound) {
+      this.jobExperience.push({ job: this.job, experience: 1 });
     }
-
-    this.jobExperience = newJobExperience;
   }
   //----------------------------------Spells----------------------------------//
-  public learnSpellStep(bookName: string, spell: string, element: string) {
-    let spellWasFoundAndIncremted = false;
-    //console.log(Object.isFrozen(this.learningSpells))
-    //to understand why this is necessary, uncomment the above line before calling
-    let newSpellExperience = this.learningSpells
-      .map((spellExp) => {
-        if (spellExp.spellName === spell) {
-          if (spellExp.experience < 19) {
-            const newExp = spellExp.experience + 1;
-            spellWasFoundAndIncremted = true;
-            return {
-              bookName: spellExp.bookName,
-              spellName: spellExp.spellName,
-              experience: newExp,
-              element: spellExp.element,
-            };
-          }
-          spellWasFoundAndIncremted = true;
-          this.learnSpellCompletion(spell, bookName);
-          return;
-        }
-        return spellExp;
-      })
-      .filter(
-        (
-          spellExp,
-        ): spellExp is {
-          bookName: string;
-          spellName: string;
-          experience: number;
-          element: string;
-        } => spellExp !== undefined,
-      );
 
-    if (!spellWasFoundAndIncremted) {
-      newSpellExperience.push({
+  public learnSpellStep(bookName: string, spell: string, element: string) {
+    let spellFound = false;
+
+    this.learningSpells = this.learningSpells.reduce(
+      (result: (typeof spellExp)[], spellExp) => {
+        if (spellExp.spellName === spell) {
+          spellFound = true;
+
+          if (spellExp.experience < 19) {
+            result.push({
+              ...spellExp,
+              experience: spellExp.experience + 1,
+            });
+          } else {
+            this.learnSpellCompletion(spell, bookName);
+          }
+        } else {
+          result.push(spellExp);
+        }
+        return result;
+      },
+      [],
+    );
+
+    if (!spellFound) {
+      this.learningSpells.push({
         bookName: bookName,
         spellName: spell,
         experience: 1,
         element: element,
       });
     }
-
-    this.learningSpells = newSpellExperience;
-  }
-
-  public getSpellNames() {
-    return this.knownSpells;
   }
 
   public getSpells() {
@@ -695,13 +664,6 @@ export class PlayerCharacter extends Character {
     this.learningSpells = newLearningState;
   }
   //----------------------------------Relationships----------------------------------//
-  public getParents(): Character[] {
-    return this.parents;
-  }
-
-  public getChildren(): Character[] | null {
-    return this.children;
-  }
   //----------------------------------Conditions----------------------------------//
   public addCondition(condition: Condition | null) {
     if (condition) {
@@ -731,10 +693,6 @@ export class PlayerCharacter extends Character {
     }
   }
 
-  public getPhysicalAttacks(): string[] {
-    return this.physicalAttacks;
-  }
-
   public doPhysicalAttack(
     attack: {
       name: string;
@@ -758,6 +716,7 @@ export class PlayerCharacter extends Character {
         hpDamage += offHandDamage * 0.5;
       }
       const sanityDamage = attack.sanityDamage;
+      this.conditionTicker();
       if (attack.debuffs) {
         let debuffs: Condition[] = [];
         attack.debuffs.forEach((debuff) => {
@@ -815,6 +774,7 @@ export class PlayerCharacter extends Character {
       if (buffs) {
         buffs.forEach((buff) => this.addBuff(buff));
       }
+      this.conditionTicker();
       if (chosenSpell.effects.debuffs) {
         let debuffs: Condition[] = [];
         chosenSpell.effects.debuffs.forEach((debuff) => {
@@ -876,14 +836,6 @@ export class PlayerCharacter extends Character {
     }
   }
   //----------------------------------Minions----------------------------------//
-  public getMinions() {
-    return this.minions;
-  }
-
-  private addMinion(minion: Minion) {
-    this.minions.push(minion);
-  }
-
   public createMinion(minionName: string) {
     const minionObj = summons.find((summon) => summon.name == minionName);
     if (!minionObj) {
@@ -899,7 +851,6 @@ export class PlayerCharacter extends Character {
     });
     this.addMinion(minion);
   }
-
   public clearMinions() {
     this.minions = [];
   }
@@ -912,8 +863,11 @@ export class PlayerCharacter extends Character {
     });
     this.minions = newList;
   }
+  private addMinion(minion: Minion) {
+    this.minions.push(minion);
+  }
   //----------------------------------Conditions----------------------------------//
-  public conditionTicker() {
+  private conditionTicker() {
     for (let i = this.conditions.length - 1; i >= 0; i--) {
       const { effect, damage, turns } = this.conditions[i].tick();
 
@@ -956,50 +910,14 @@ export class PlayerCharacter extends Character {
     }
   }
 
-  public getMagicalProficiencies() {
-    return this.magicProficiencies;
-  }
-
-  public toJSON(): object {
-    return {
-      ...super.toJSON(),
-      playerClass: this.playerClass,
-      blessing: this.blessing,
-      health: this.health,
-      healthMax: this.healthMax,
-      sanity: this.sanity,
-      mana: this.mana,
-      manaMax: this.manaMax,
-      manaRegen: this.manaRegen,
-      jobExperience: this.jobExperience,
-      learningSpells: this.learningSpells,
-      magicProficiencies: this.magicProficiencies,
-      parents: this.parents.map((parent) => parent.toJSON()),
-      children: this.children.map((child) => child.toJSON()),
-      minions: this.minions.map((minion) => minion.toJSON()),
-      conditions: this.conditions.map((condition) => condition.toJSON()),
-      knownSpells: this.knownSpells,
-      physicalAttacks: this.physicalAttacks,
-      gold: this.gold,
-      inventorySize: this.inventorySize,
-      inventory: this.inventory.map((item) => item.toJSON()),
-      equipment: {
-        mainHand: this.equipment.mainHand?.toJSON(),
-        offHand: this.equipment.offHand?.toJSON(),
-        head: this.equipment.head?.toJSON(),
-        body: this.equipment.body?.toJSON(),
-      },
-    };
-  }
-
   static fromJSON(json: any): PlayerCharacter {
     const player = new PlayerCharacter({
       firstName: json.firstName,
       lastName: json.lastName,
       sex: json.sex,
       alive: json.alive,
-      birthdate: json.birthdate ? new Date(json.birthdate) : undefined,
-      deathdate: json.deathdate ? new Date(json.deathdate) : null,
+      birthdate: json.birthdate ?? undefined,
+      deathdate: json.deathdate ?? null,
       job: json.job,
       affection: json.affection,
       playerClass: json.playerClass,
@@ -1025,7 +943,6 @@ export class PlayerCharacter extends Character {
       knownSpells: json.knownSpells,
       physicalAttacks: json.physicalAttacks,
       gold: json.gold,
-      inventorySize: json.inventorySize,
       inventory: json.inventory
         ? json.inventory.map((item: any) => Item.fromJSON(item))
         : [],

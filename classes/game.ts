@@ -1,9 +1,10 @@
 import { DungeonInstance, DungeonLevel } from "./dungeon";
 import { Shop } from "./shop";
 import dungeons from "../assets/json/dungeons.json";
+import { action, makeObservable, observable } from "mobx";
 
 interface GameOptions {
-  date?: Date;
+  date?: string;
   shops: Shop[];
   dungeonInstances?: DungeonInstance[];
   furthestDepth?: { instance: string; level: number }[];
@@ -12,12 +13,12 @@ interface GameOptions {
 }
 
 export class Game {
-  private date: string;
-  private dungeonInstances: DungeonInstance[];
-  private furthestDepth: { instance: string; level: number }[];
-  private atDeathScreen: boolean;
-  private shops: Shop[];
-  private colorScheme: "system" | "dark" | "light";
+  date: string;
+  dungeonInstances: DungeonInstance[];
+  furthestDepth: { instance: string; level: number }[];
+  atDeathScreen: boolean;
+  shops: Shop[];
+  colorScheme: "system" | "dark" | "light";
 
   constructor({
     date,
@@ -27,7 +28,7 @@ export class Game {
     shops,
     colorScheme,
   }: GameOptions) {
-    this.date = date?.toISOString() ?? new Date().toISOString();
+    this.date = date ?? new Date().toISOString();
     this.dungeonInstances = dungeonInstances ?? [
       new DungeonInstance({
         name: "training grounds",
@@ -58,47 +59,36 @@ export class Game {
     this.atDeathScreen = atDeathScreen ?? false;
     this.shops = shops;
     this.colorScheme = colorScheme ?? "system";
+    makeObservable(this, {
+      date: observable,
+      dungeonInstances: observable,
+      furthestDepth: observable,
+      atDeathScreen: observable,
+      shops: observable,
+      colorScheme: observable,
+      gameTick: action,
+      getDungeon: action,
+      getInstance: action,
+      openNextDungeonLevel: action,
+      setColorScheme: action,
+    });
   }
 
   //----------------------------------Date----------------------------------//
-  public getGameDate(): Date {
-    return new Date(this.date);
-  }
-
   public gameTick() {
     const dateObject = new Date(this.date);
     dateObject.setDate(dateObject.getDate() + 7);
     this.date = dateObject.toISOString();
   }
-
-  //----------------------------------Death----------------------------------//
-  public hitDeathScreen() {
-    this.atDeathScreen = true;
-  }
-  public getAtDeathScreen() {
-    return this.atDeathScreen;
-  }
-  //----------------------------------Shops----------------------------------//
-  public getShops() {
-    return this.shops;
-  }
   //----------------------------------Dungeon----------------------------------//
-  public getFuthestDepth() {
-    return this.furthestDepth;
-  }
-
-  public getAllInstances() {
-    return this.dungeonInstances;
-  }
-
   public getDungeon(instance: string, level: number): DungeonLevel | undefined {
     const foundInstance = this.dungeonInstances.find(
       (dungeonInstance) => dungeonInstance.name == instance,
     );
     if (foundInstance) {
-      const found = foundInstance
-        .getLevels()
-        .find((dungeonLevel) => dungeonLevel.level == level);
+      const found = foundInstance.levels.find(
+        (dungeonLevel) => dungeonLevel.level == level,
+      );
       return found;
     }
   }
@@ -159,31 +149,13 @@ export class Game {
     }
   }
 
-  //----------------------------------Misc----------------------------------//
-  public saveColorScheme(scheme: "dark" | "light" | "system") {
-    this.colorScheme = scheme;
-  }
-
-  public getColorScheme() {
-    return this.colorScheme;
-  }
-
-  public toJSON(): object {
-    return {
-      date: this.date,
-      dungeonInstances: this.dungeonInstances.map((instance) =>
-        instance.toJSON(),
-      ),
-      furthestDepth: this.furthestDepth,
-      atDeathScreen: this.atDeathScreen,
-      shops: this.shops.map((shop) => shop.toJSON()),
-      colorScheme: this.colorScheme,
-    };
+  public setColorScheme(color: "light" | "dark" | "system") {
+    this.colorScheme = color;
   }
 
   static fromJSON(json: any): Game {
     const game = new Game({
-      date: json.date ? new Date(json.date) : undefined,
+      date: json.date ? json.date : new Date().toISOString(),
       furthestDepth: json.furthestDepth,
       atDeathScreen: json.atDeathScreen,
       dungeonInstances: json.dungeonInstances

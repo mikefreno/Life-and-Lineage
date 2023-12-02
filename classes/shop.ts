@@ -1,6 +1,5 @@
 import { Item } from "./item";
 import shops from "../assets/json/shops.json";
-
 import artifacts from "../assets/json/items/artifacts.json";
 import bodyArmor from "../assets/json/items/bodyArmor.json";
 import mageBooks from "../assets/json/items/mageBooks.json";
@@ -17,10 +16,11 @@ import robes from "../assets/json/items/robes.json";
 import shields from "../assets/json/items/shields.json";
 import wands from "../assets/json/items/wands.json";
 import weapons from "../assets/json/items/weapons.json";
+import { action, makeObservable, observable } from "mobx";
 
 interface ShopProps {
   shopKeeperName: string;
-  shopKeeperBirthDate: Date;
+  shopKeeperBirthDate: string;
   shopKeeperSex: "male" | "female";
   affection?: number;
   personality: string;
@@ -33,14 +33,14 @@ interface ShopProps {
 
 export class Shop {
   readonly shopKeeperName: string;
-  readonly shopKeeperBirthDate: Date;
+  readonly shopKeeperBirthDate: string;
   readonly shopKeeperSex: "male" | "female";
-  private affection: number;
-  private personality: string;
-  private baseGold: number;
-  private currentGold: number;
-  private lastStockRefresh: Date;
-  private inventory: Item[];
+  affection: number;
+  personality: string;
+  baseGold: number;
+  currentGold: number;
+  lastStockRefresh: string;
+  inventory: Item[];
   readonly archetype: string;
 
   constructor({
@@ -62,17 +62,20 @@ export class Shop {
     this.personality = personality;
     this.baseGold = baseGold;
     this.currentGold = currentGold ?? baseGold;
-    this.lastStockRefresh = lastStockRefresh ?? new Date();
+    this.lastStockRefresh =
+      lastStockRefresh.toISOString() ?? new Date().toISOString();
     this.inventory = inventory ?? [];
     this.archetype = archetype;
-  }
-
-  public getInventory() {
-    return this.inventory;
-  }
-
-  public getLastRefresh() {
-    return this.lastStockRefresh;
+    makeObservable(this, {
+      affection: observable,
+      personality: observable,
+      baseGold: observable,
+      currentGold: observable,
+      lastStockRefresh: observable,
+      refreshInventory: action,
+      buyItem: action,
+      sellItem: action,
+    });
   }
 
   public refreshInventory(playerClass: "mage" | "necromancer" | "paladin") {
@@ -83,7 +86,7 @@ export class Shop {
         shopObj.itemQuantityRange.maximum,
       );
       this.inventory = generateInventory(newCount, shopObj.trades, playerClass);
-      this.lastStockRefresh = new Date();
+      this.lastStockRefresh = new Date().toISOString();
       this.currentGold = this.baseGold;
     } else {
       throw new Error("Shop not found on refreshInventory()");
@@ -104,34 +107,25 @@ export class Shop {
       this.currentGold += sellPrice;
     }
   }
-
-  public getCurrentGold() {
-    return this.currentGold;
-  }
-
-  public getAffection() {
-    return this.affection;
-  }
-
-  public toJSON(): object {
-    return {
-      shopKeeperName: this.shopKeeperName,
-      shopKeeperBirthDate: this.shopKeeperBirthDate.toISOString(),
-      shopKeeperSex: this.shopKeeperSex,
-      affection: this.affection,
-      personality: this.personality,
-      baseGold: this.baseGold,
-      currentGold: this.currentGold,
-      lastStockRefresh: this.lastStockRefresh.toISOString(),
-      inventory: this.inventory.map((item) => item.toJSON()),
-      archetype: this.archetype,
-    };
-  }
+  //public toJSON(): object {
+  //return {
+  //shopKeeperName: this.shopKeeperName,
+  //shopKeeperBirthDate: this.shopKeeperBirthDate.toISOString(),
+  //shopKeeperSex: this.shopKeeperSex,
+  //affection: this.affection,
+  //personality: this.personality,
+  //baseGold: this.baseGold,
+  //currentGold: this.currentGold,
+  //lastStockRefresh: this.lastStockRefresh,
+  //inventory: this.inventory.map((item) => item.toJSON()),
+  //archetype: this.archetype,
+  //};
+  //}
 
   static fromJSON(json: any): Shop {
     return new Shop({
       shopKeeperName: json.shopKeeperName,
-      shopKeeperBirthDate: new Date(json.shopKeeperBirthDate),
+      shopKeeperBirthDate: json.shopKeeperBirthDate,
       shopKeeperSex: json.shopKeeperSex,
       affection: json.affection,
       personality: json.personality,

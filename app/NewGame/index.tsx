@@ -2,13 +2,13 @@ import { Pressable, useColorScheme } from "react-native";
 import { Text, View, SafeAreaView, ScrollView } from "../../components/Themed";
 import { View as NonThemedView } from "react-native";
 import "../../assets/styles/globals.css";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useContext, useState } from "react";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import { Stack, router } from "expo-router";
-import { useSelector } from "react-redux";
-import { selectPlayerCharacter } from "../../redux/selectors";
 import Necromancer from "../../assets/icons/NecromancerSkull";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
+import { PlayerCharacterContext } from "../_layout";
+import { PlayerCharacter } from "../../classes/character";
 
 export default function NewGameScreen() {
   const [selectedClass, setSelectedClass] = useState<
@@ -16,7 +16,7 @@ export default function NewGameScreen() {
   >();
   const colorScheme = useColorScheme();
 
-  const playerCharacter = useSelector(selectPlayerCharacter);
+  const playerCharacterData = useContext(PlayerCharacterContext);
 
   return (
     <>

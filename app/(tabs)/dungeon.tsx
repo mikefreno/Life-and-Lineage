@@ -3,11 +3,10 @@ import { Pressable, ScrollView, View as NonThemedView } from "react-native";
 import { router } from "expo-router";
 import dungeons from "../../assets/json/dungeons.json";
 import { toTitleCase } from "../../utility/functions";
-import { useSelector } from "react-redux";
-import { selectGame } from "../../redux/selectors";
 import PlayerStatus from "../../components/PlayerStatus";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
+import { GameContext } from "../_layout";
 
 const dangerColorStep = [
   "#fee2e2",
@@ -19,8 +18,9 @@ const dangerColorStep = [
 ];
 
 export default function DungeonScreen() {
-  const gameData = useSelector(selectGame);
-  const [dungeonDepth, setDungeonDepth] = useState(gameData?.getFuthestDepth());
+  const gameData = useContext(GameContext);
+  const game = gameData?.gameState;
+  const [dungeonDepth, setDungeonDepth] = useState(game?.furthestDepth);
   const [instances, setInstances] = useState<
     {
       instance: string;
@@ -34,7 +34,7 @@ export default function DungeonScreen() {
   const [height, setHeight] = useState<number>(0);
 
   const { colorScheme } = useColorScheme();
-  useEffect(() => setDungeonDepth(gameData?.getFuthestDepth()), [gameData]);
+  useEffect(() => setDungeonDepth(game?.furthestDepth), [game]);
 
   useEffect(() => {
     let newInstances: {

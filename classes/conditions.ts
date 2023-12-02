@@ -1,3 +1,5 @@
+import { action, makeObservable, observable } from "mobx";
+
 interface ConditionOptions {
   name: string;
   style: "debuff" | "buff";
@@ -16,7 +18,7 @@ interface ConditionOptions {
 export class Condition {
   readonly name: string;
   readonly style: "debuff" | "buff";
-  private turns: number;
+  turns: number;
   readonly effect: (
     | "skip"
     | "accuracy halved"
@@ -33,10 +35,9 @@ export class Condition {
     this.turns = turns;
     this.effect = effect;
     this.damage = damage;
+    makeObservable(this, { turns: observable, tick: action });
   }
-  public getRemaingTurns() {
-    return this.turns;
-  }
+
   public tick() {
     this.turns -= 1;
     return {
@@ -45,16 +46,6 @@ export class Condition {
       turns: this.turns,
     };
   }
-
-  public toJSON(): object {
-    return {
-      name: this.name,
-      turns: this.turns,
-      effect: this.effect,
-      damage: this.damage,
-    };
-  }
-
   static fromJSON(json: any): Condition {
     const condition = new Condition({
       name: json.name,

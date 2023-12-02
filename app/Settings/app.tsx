@@ -1,26 +1,28 @@
 import { Pressable, View as NonThemedView } from "react-native";
 import { View, Text } from "../../components/Themed";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useColorScheme } from "nativewind";
-import { useSelector } from "react-redux";
-import { selectGame } from "../../redux/selectors";
 import { toTitleCase } from "../../utility/functions";
+import { GameContext } from "../_layout";
 
 export default function AppSettings() {
   const options = ["system", "light", "dark"];
   const { setColorScheme } = useColorScheme();
 
-  const gameData = useSelector(selectGame);
+  const gameData = useContext(GameContext);
+  const game = gameData?.gameState;
 
-  if (gameData) {
+  if (game) {
     const [selectedOption, setSelectedOption] = useState<number>(
-      options.indexOf(gameData.getColorScheme()),
+      options.indexOf(game?.colorScheme),
     );
 
     function setColorTheme(index: number, option: "system" | "light" | "dark") {
-      gameData?.saveColorScheme(option);
-      setSelectedOption(index);
-      setColorScheme(option);
+      if (game) {
+        game.setColorScheme(option);
+        setSelectedOption(index);
+        setColorScheme(option);
+      }
     }
 
     return (

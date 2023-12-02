@@ -10,25 +10,40 @@ import names from "../../../assets/json/names.json";
 import jobs from "../../../assets/json/jobs.json";
 import {
   createShops,
+  fullSave,
   generateBirthday,
   toTitleCase,
 } from "../../../utility/functions";
 import { Game } from "../../../classes/game";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../redux/store";
-import { setGameData } from "../../../redux/slice/game";
-import { setPlayerCharacter } from "../../../redux/slice/player";
-import { setLogs } from "../../../redux/slice/logs";
-import { setMonster } from "../../../redux/slice/monster";
+import { useContext } from "react";
+import {
+  GameContext,
+  LogsContext,
+  MonsterContext,
+  PlayerCharacterContext,
+} from "../../_layout";
 
 export default function NewGameReview() {
-  const dispatch: AppDispatch = useDispatch();
   const { slug } = useLocalSearchParams();
   const playerClass = slug[0];
   const sex = slug[1];
   const firstName = slug[2];
   const lastName = slug[3];
   const blessing = slug[4];
+
+  const playerCharacterSetter = useContext(PlayerCharacterContext)
+    ?.setPlayerCharacter;
+  const gameDataSetter = useContext(GameContext)?.setGameData;
+  const monsterSetter = useContext(MonsterContext)?.setMonster;
+  const logsSetter = useContext(LogsContext)?.setLogs;
+  if (
+    !playerCharacterSetter ||
+    !monsterSetter ||
+    !gameDataSetter ||
+    !logsSetter
+  ) {
+    throw new Error("missing context setters");
+  }
 
   function getRandomJobTitle(): string {
     const randomIndex = Math.floor(Math.random() * jobs.length);
@@ -99,11 +114,15 @@ export default function NewGameReview() {
     return newCharacter;
   }
 
-  function startGame() {
+  async function startGame() {
     if (
-      playerClass == "mage" ||
-      playerClass == "paladin" ||
-      playerClass == "necromancer"
+      playerCharacterSetter &&
+      gameDataSetter &&
+      monsterSetter &&
+      logsSetter &&
+      (playerClass == "mage" ||
+        playerClass == "paladin" ||
+        playerClass == "necromancer")
     ) {
       const player = createPlayerCharacter();
       const starterBook = getStartingBook(
@@ -121,15 +140,16 @@ export default function NewGameReview() {
           | "protection",
       );
       player.addToInventory(starterBook);
-      dispatch(setPlayerCharacter(player.toJSON()));
-      const startDate = new Date();
+      playerCharacterSetter(player);
+      const startDate = new Date().toISOString();
       const shops = createShops(
         playerClass as "mage" | "paladin" | "necromancer",
       );
       const newGame = new Game({ date: startDate, shops: shops });
-      dispatch(setGameData(newGame.toJSON()));
-      dispatch(setLogs([]));
-      dispatch(setMonster(undefined));
+      gameDataSetter(newGame);
+      logsSetter([]);
+      monsterSetter(null);
+      await fullSave(newGame, player);
 
       try {
         router.back();

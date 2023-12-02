@@ -5,77 +5,78 @@ import names from "../assets/json/names.json";
 import conditions from "../assets/json/conditions.json";
 import { Shop, generateInventory } from "../classes/shop";
 import { Condition } from "../classes/conditions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-//export const storeData = async (key: string, value: any) => {
-//try {
-//const jsonValue = JSON.stringify(value);
-//await AsyncStorage.setItem(key, jsonValue);
-//} catch (e) {
-//// saving error
-//console.log(e);
-//}
-//};
+export const storeData = async (key: string, value: any) => {
+  try {
+    const jsonValue = JSON.stringify(value);
+    await AsyncStorage.setItem(key, jsonValue);
+  } catch (e) {
+    // saving error
+    console.log(e);
+  }
+};
 
-////just saves game, simpler interface
-//export const saveGame = async (game: Game | null) => {
-//try {
-//const jsonGame = JSON.stringify(game);
-//await AsyncStorage.setItem("game", jsonGame);
-//} catch (e) {
-//console.log(e);
-//}
-//};
-//export const savePlayer = async (player: PlayerCharacter) => {
-//try {
-//const jsonPlayer = JSON.stringify(player);
-//await AsyncStorage.setItem("player", jsonPlayer);
-//} catch (e) {
-//console.log(e);
-//}
-//};
+//just saves game, simpler interface
+export const saveGame = async (game: Game | null) => {
+  try {
+    const jsonGame = JSON.stringify(game);
+    await AsyncStorage.setItem("game", jsonGame);
+  } catch (e) {
+    console.log(e);
+  }
+};
+export const savePlayer = async (player: PlayerCharacter) => {
+  try {
+    const jsonPlayer = JSON.stringify(player);
+    await AsyncStorage.setItem("player", jsonPlayer);
+  } catch (e) {
+    console.log(e);
+  }
+};
 
-//export const fullSave = async (
-//game: Game | null,
-//player: PlayerCharacter | null,
-//) => {
-//if (game && player) {
-//try {
-//const jsonGame = JSON.stringify(game);
-//await AsyncStorage.setItem("game", jsonGame);
-//const jsonPlayer = JSON.stringify(player);
-//await AsyncStorage.setItem("player", jsonPlayer);
-//} catch (e) {
-//console.log(e);
-//}
-//}
-//};
+export const fullSave = async (
+  game: Game | null,
+  player: PlayerCharacter | null,
+) => {
+  if (game && player) {
+    try {
+      const jsonGame = JSON.stringify(game);
+      await AsyncStorage.setItem("game", jsonGame);
+      const jsonPlayer = JSON.stringify(player);
+      await AsyncStorage.setItem("player", jsonPlayer);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+};
 
-//export const getData = async (key: string) => {
-//try {
-//const jsonValue = await AsyncStorage.getItem(key);
-//return jsonValue != null ? JSON.parse(jsonValue) : null;
-//} catch (e) {
-//console.log(e);
-//}
-//};
+export const getData = async (key: string) => {
+  try {
+    const jsonValue = await AsyncStorage.getItem(key);
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (e) {
+    console.log(e);
+  }
+};
 
-//export const loadGame = async () => {
-//try {
-//const jsonValue = await AsyncStorage.getItem("game");
-//return jsonValue != null ? JSON.parse(jsonValue) : null;
-//} catch (e) {
-//console.log(e);
-//}
-//};
+export const loadGame = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem("game");
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (e) {
+    console.log(e);
+  }
+};
 
-//export const loadPlayer = async () => {
-//try {
-//const jsonValue = await AsyncStorage.getItem("player");
-//return jsonValue != null ? JSON.parse(jsonValue) : null;
-//} catch (e) {
-//console.log(e);
-//}
-//};
+export const loadPlayer = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem("player");
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (e) {
+    console.log(e);
+  }
+};
 
 export function calculateAge(birthdate: Date, gameDate: Date) {
   let age = gameDate.getFullYear() - birthdate.getFullYear();
@@ -169,7 +170,7 @@ function getRandomName(sex: string): string {
   return `${filteredNames[randomIndex].firstName} ${filteredNames[randomIndex].lastName}`;
 }
 
-export function generateBirthday(minAge: number, maxAge: number): Date {
+export function generateBirthday(minAge: number, maxAge: number) {
   const today = new Date();
   const minDate = new Date();
   const maxDate = new Date();
@@ -181,7 +182,7 @@ export function generateBirthday(minAge: number, maxAge: number): Date {
   const diff = maxDate.getTime() - minDate.getTime();
   const randomTimestamp = Math.random() * diff + minDate.getTime();
 
-  return new Date(randomTimestamp);
+  return new Date(randomTimestamp).toISOString();
 }
 
 export function getRandomInt(min: number, max: number): number {

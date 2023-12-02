@@ -1,31 +1,33 @@
 import { View, Text, ScrollView } from "../components/Themed";
 import "../assets/styles/globals.css";
-import { useDispatch, useSelector } from "react-redux";
-import { selectGame, selectPlayerCharacter } from "../redux/selectors";
-import ProgressBar from "../components/ProgressBar";
 import { Pressable, Image } from "react-native";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Item } from "../classes/item";
 import blessingDisplay from "../components/BlessingsDisplay";
-import { toTitleCase } from "../utility/functions";
-import { elementalColorMap } from "../utility/elementColors";
+import { fullSave, toTitleCase } from "../utility/functions";
 import { useColorScheme } from "nativewind";
-import { setPlayerCharacter } from "../redux/slice/player";
 import { useIsFocused } from "@react-navigation/native";
+import { GameContext, PlayerCharacterContext } from "./_layout";
+import ProgressBar from "../components/ProgressBar";
+import { elementalColorMap } from "../utility/elementColors";
 
 export default function LearningSpellsScreen() {
-  const playerCharacter = useSelector(selectPlayerCharacter);
-  const game = useSelector(selectGame);
-  if (!playerCharacter || !game)
-    throw new Error("No playerCharacter or game in LearningSpellsScreen");
-  const inventory = playerCharacter.getInventory();
-  const books = inventory.filter((item) => item.itemClass == "book");
-  const dispatch = useDispatch();
+  const playerCharacterData = useContext(PlayerCharacterContext);
+  const gameData = useContext(GameContext);
+  if (!playerCharacterData || !gameData) {
+    throw new Error("missing context");
+  }
+  const { playerState } = playerCharacterData;
+  if (!playerState) throw new Error("no playerState");
+  const { gameState } = gameData;
+
+  const books = playerState?.inventory.filter(
+    (item) => item.itemClass == "book",
+  );
   const isFocused = useIsFocused();
 
   const { colorScheme } = useColorScheme();
 
-  const studyingState = playerCharacter.learningSpells;
   const [selectedBook, setSelectedBook] = useState<Item | null>(null);
   const [selectedBookSpell, setSelectedBookSpell] = useState<{
     name: string;
@@ -45,11 +47,19 @@ export default function LearningSpellsScreen() {
       selfDamage?: number;
     };
   } | null>(null);
+  const [spellState, setSpellState] = useState<
+    {
+      bookName: string;
+      spellName: string;
+      experience: number;
+      element: string;
+    }[]
+  >(playerState.learningSpells);
 
   useEffect(() => {
-    if (selectedBook) {
+    if (selectedBook && playerState) {
       setSelectedBookSpell(
-        selectedBook.getAttachedSpell(playerCharacter.playerClass),
+        selectedBook.getAttachedSpell(playerState.playerClass),
       );
     } else setSelectedBookSpell(null);
   }, [selectedBook]);
@@ -59,29 +69,31 @@ export default function LearningSpellsScreen() {
     spellName: string,
     spellElement: string,
   ) {
-    if (playerCharacter && game && isFocused) {
-      playerCharacter.learnSpellStep(bookName, spellName, spellElement);
-      dispatch(setPlayerCharacter(playerCharacter.toJSON()));
+    if (playerState && gameState && isFocused) {
+      playerState.learnSpellStep(bookName, spellName, spellElement);
+      setSpellState(playerState.learningSpells);
+      gameState.gameTick();
+      fullSave(gameState, playerState);
     }
   }
 
-  const studyingSpells = studyingState.map(
+  const studyingSpells = playerState.learningSpells.map(
     (studyState) => studyState.spellName,
   );
 
-  const filteredBooks = books.filter(
+  const filteredBooks = books?.filter(
     (book) =>
-      !studyingSpells.includes(
-        book.getAttachedSpell(playerCharacter.playerClass).name,
+      !studyingSpells?.includes(
+        book.getAttachedSpell(playerState.playerClass).name,
       ),
   );
 
   return (
     <View className="flex-1 px-4 py-6">
-      {studyingState.length > 0 ? (
+      {spellState.length > 0 ? (
         <View className="pb-12 pt-4">
           <Text className="text-center text-xl">Currently Studying</Text>
-          {studyingState.map((studyState) => (
+          {spellState.map((studyState) => (
             <View key={studyState.spellName}>
               <Text>{toTitleCase(studyState.spellName)}</Text>
               <ProgressBar
@@ -187,7 +199,7 @@ export default function LearningSpellsScreen() {
           </ScrollView>
         </View>
       ) : null}
-      {filteredBooks.length == 0 && studyingState.length == 0 ? (
+      {filteredBooks.length == 0 && playerState.learningSpells.length == 0 ? (
         <View className="-mt-24 flex-1 items-center justify-center">
           <Text className="text-xl italic">No Books to Learn From</Text>
           <Text className="italic">

@@ -126,18 +126,17 @@ export class Item {
     }
     throw new Error("Requested a spell from a non-book item");
   }
-
-  public toJSON(): object {
-    return {
-      id: this.id,
-      name: this.name,
-      slot: this.slot,
-      stats: this.stats,
-      baseValue: this.baseValue,
-      itemClass: this.itemClass,
-      icon: this.icon,
-    };
-  }
+  //public toJSON(): object {
+  //return {
+  //id: this.id,
+  //name: this.name,
+  //slot: this.slot,
+  //stats: this.stats,
+  //baseValue: this.baseValue,
+  //itemClass: this.itemClass,
+  //icon: this.icon,
+  //};
+  //}
 
   static fromJSON(json: any): Item {
     const item = new Item({

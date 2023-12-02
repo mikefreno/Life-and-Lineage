@@ -6,12 +6,16 @@ import {
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack, router } from "expo-router";
-import { useEffect } from "react";
-import { Provider, useSelector } from "react-redux";
-import { selectGame, selectPlayerCharacter } from "../redux/selectors";
+import { createContext, useEffect, useContext, useState } from "react";
 import { useColorScheme as nativeColorScheme } from "nativewind";
-import { PersistGate } from "redux-persist/integration/react";
-import storeCreator from "../redux/persist";
+import { observer } from "mobx-react-lite";
+import { Game } from "../classes/game";
+import { PlayerCharacter } from "../classes/character";
+import { Monster } from "../classes/creatures";
+import { fullSave, loadGame, loadPlayer } from "../utility/functions";
+import { View, Text } from "react-native";
+import { autorun } from "mobx";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -24,27 +28,109 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-export default function Root() {
-  const { store, persistor } = storeCreator();
+export const GameContext = createContext<
+  | {
+      gameState: Game | undefined;
+      setGameData: React.Dispatch<React.SetStateAction<Game | undefined>>;
+    }
+  | undefined
+>(undefined);
+
+export const PlayerCharacterContext = createContext<
+  | {
+      playerState: PlayerCharacter | undefined;
+      setPlayerCharacter: React.Dispatch<
+        React.SetStateAction<PlayerCharacter | undefined>
+      >;
+    }
+  | undefined
+>(undefined);
+
+export const MonsterContext = createContext<
+  | {
+      monsterState: Monster | null;
+      setMonster: React.Dispatch<React.SetStateAction<Monster | null>>;
+    }
+  | undefined
+>(undefined);
+
+export const LogsContext = createContext<
+  | {
+      logsState: { logLine: string }[];
+      setLogs: React.Dispatch<React.SetStateAction<{ logLine: string }[]>>;
+    }
+  | undefined
+>(undefined);
+
+const Root = observer(() => {
+  const [gameState, setGameData] = useState<Game>();
+  const [playerState, setPlayerCharacter] = useState<PlayerCharacter>();
+  const [monsterState, setMonster] = useState<Monster | null>(null);
+  const [logsState, setLogs] = useState<{ logLine: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { setColorScheme } = nativeColorScheme();
+
+  const getData = async () => {
+    try {
+      const storedPlayerData = await loadPlayer();
+      const storedGameData = await loadGame();
+
+      if (storedGameData) {
+        setGameData(Game.fromJSON(storedGameData));
+        setColorScheme(storedGameData.colorScheme);
+      }
+      if (storedPlayerData) {
+        setPlayerCharacter(PlayerCharacter.fromJSON(storedPlayerData));
+      }
+      setLoading(false);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  autorun(() => {
+    if (gameState && playerState) {
+      fullSave(gameState, playerState);
+    }
+  });
+
+  while (loading) {
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <RootLayout />
-      </PersistGate>
-    </Provider>
+    <GameContext.Provider value={{ gameState, setGameData }}>
+      <PlayerCharacterContext.Provider
+        value={{ playerState, setPlayerCharacter }}
+      >
+        <MonsterContext.Provider value={{ monsterState, setMonster }}>
+          <LogsContext.Provider value={{ logsState, setLogs }}>
+            <RootLayout />
+          </LogsContext.Provider>
+        </MonsterContext.Provider>
+      </PlayerCharacterContext.Provider>
+    </GameContext.Provider>
   );
-}
+});
 
-function RootLayout() {
-  const gameData = useSelector(selectGame);
-  const playerCharacter = useSelector(selectPlayerCharacter);
-
+const RootLayout = () => {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
   });
-
-  const { setColorScheme, colorScheme } = nativeColorScheme();
+  const playerCharacterData = useContext(PlayerCharacterContext);
+  const gameData = useContext(GameContext);
+  const game = gameData?.gameState;
+  const playerCharacter = playerCharacterData?.playerState;
+  const { colorScheme } = nativeColorScheme();
 
   useEffect(() => {
     if (error) throw error;
@@ -53,11 +139,11 @@ function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
-      if (!playerCharacter || !gameData) {
-        router.replace("/NewGame");
+      if (!playerCharacter || !game) {
+        router.push("/NewGame");
       } else if (
-        gameData.getAtDeathScreen() ||
-        (playerCharacter && playerCharacter.getHealth() <= 0)
+        gameData?.gameState?.atDeathScreen ||
+        (playerCharacter && playerCharacter.health <= 0)
       ) {
         router.replace("/DeathScreen");
       }
@@ -78,4 +164,5 @@ function RootLayout() {
       </Stack>
     </ThemeProvider>
   );
-}
+};
+export default Root;

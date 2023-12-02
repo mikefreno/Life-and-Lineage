@@ -10,14 +10,14 @@ interface ProgressBarProps {
   unfilledColor?: string;
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({
+const ProgressBar = ({
   value,
   minValue = 0,
   maxValue,
   borderColor,
   filledColor = "#007BFF",
   unfilledColor = "#f3f3f3",
-}) => {
+}: ProgressBarProps) => {
   const width = ((value - minValue) / (maxValue - minValue)) * 100;
 
   return (

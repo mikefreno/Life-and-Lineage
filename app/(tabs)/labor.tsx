@@ -1,12 +1,14 @@
 import jobs from "../../assets/json/jobs.json";
 import LaborTask from "../../components/LaborTask";
 import { ScrollView, View } from "../../components/Themed";
-import { useSelector } from "react-redux";
-import { selectPlayerCharacter } from "../../redux/selectors";
 import PlayerStatus from "../../components/PlayerStatus";
+import { PlayerCharacterContext } from "../_layout";
+import { useContext } from "react";
+import { observer } from "mobx-react-lite";
 
-export default function LaborScreen() {
-  const playerCharacter = useSelector(selectPlayerCharacter);
+const LaborScreen = observer(() => {
+  const playerCharacterData = useContext(PlayerCharacterContext);
+  const playerCharacter = playerCharacterData?.playerState;
   if (!playerCharacter) {
     throw Error("No player character on labor tab");
   }
@@ -14,7 +16,7 @@ export default function LaborScreen() {
   const filteredJobs = jobs.filter((job) => {
     if (job.qualifications) {
       return job.qualifications.every((qual) =>
-        playerCharacter.getQualifications().includes(qual),
+        playerCharacter.qualifications.includes(qual),
       );
     }
     return true;
@@ -42,4 +44,5 @@ export default function LaborScreen() {
       </ScrollView>
     </View>
   );
-}
+});
+export default LaborScreen;

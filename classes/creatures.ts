@@ -27,6 +27,7 @@ import paladinBooks from "../assets/json/items/paladinBooks.json";
 import mageBooks from "../assets/json/items/mageBooks.json";
 import { v4 as uuidv4 } from "uuid";
 import { Item } from "./item";
+import { action, computed, makeObservable, observable } from "mobx";
 
 interface monsterInterface {
   creatureSpecies: string;
@@ -45,17 +46,17 @@ interface monsterInterface {
 
 export class Monster {
   readonly creatureSpecies: string;
-  private health: number;
-  private sanity: number | null;
-  private sanityMax: number | null;
-  private healthMax: number;
-  private attackPower: number;
-  private energy: number;
-  private energyMax: number;
-  private energyRegen: number;
-  private attacks: string[];
-  private minions: Minion[];
-  private conditions: Condition[];
+  health: number;
+  readonly healthMax: number;
+  sanity: number | null;
+  readonly sanityMax: number | null;
+  readonly attackPower: number;
+  energy: number;
+  readonly energyMax: number;
+  readonly energyRegen: number;
+  readonly attacks: string[];
+  minions: Minion[];
+  conditions: Condition[];
 
   constructor({
     creatureSpecies,
@@ -83,17 +84,24 @@ export class Monster {
     this.energyRegen = energyRegen;
     this.attacks = attacks;
     this.conditions = conditions ?? [];
+    makeObservable(this, {
+      health: observable,
+      sanity: observable,
+      energy: observable,
+      minions: observable,
+      conditions: observable,
+      damageHealth: action,
+      damageSanity: action,
+      addCondition: action,
+      takeTurn: action,
+      addMinion: action,
+      getDrops: action,
+    });
   }
   //---------------------------Health---------------------------//
   public damageHealth(damage: number | null) {
     this.health -= damage ?? 0;
     return this.health;
-  }
-  public getHealth() {
-    return this.health;
-  }
-  public getMaxHealth() {
-    return this.healthMax;
   }
   //---------------------------Sanity---------------------------//
   public damageSanity(damage: number | null) {
@@ -293,22 +301,6 @@ export class Monster {
     throw new Error("No found monster on Monster.getDrops()");
   }
 
-  public toJSON(): object {
-    return {
-      creatureSpecies: this.creatureSpecies,
-      health: this.health,
-      healthMax: this.healthMax,
-      sanity: this.sanity,
-      sanityMax: this.sanityMax,
-      attackPower: this.attackPower,
-      energy: this.energy,
-      energyMax: this.energyMax,
-      energyRegen: this.energyRegen,
-      attacks: this.attacks,
-      conditions: this.conditions.map((condition) => condition.toJSON()),
-    };
-  }
-
   public static fromJSON(json: any): Monster {
     return new Monster({
       creatureSpecies: json.creatureSpecies,
@@ -342,11 +334,11 @@ interface minionOptions {
 export class Minion {
   readonly creatureSpecies: string;
   readonly creatureID: string;
-  private health: number;
+  health: number;
   readonly healthMax: number;
   readonly attackPower: number;
   readonly attacks: string[];
-  public turnsLeftAlive: number;
+  turnsLeftAlive: number;
 
   constructor({
     creatureSpecies,
@@ -364,14 +356,15 @@ export class Minion {
     this.attackPower = attackPower;
     this.attacks = attacks;
     this.turnsLeftAlive = turnsLeftAlive;
+    makeObservable(this, {
+      health: observable,
+      turnsLeftAlive: observable,
+      attack: action,
+    });
   }
 
   public equals(minion: Minion) {
     return this.creatureID == minion.creatureID;
-  }
-
-  public getHealth() {
-    return this.health;
   }
 
   public attack(enemyMaxHP: number, playerDR?: number) {
@@ -429,17 +422,6 @@ export class Minion {
       }
     }
     throw new Error("minion not properly removed!");
-  }
-
-  public toJSON(): object {
-    return {
-      creatureSpecies: this.creatureSpecies,
-      health: this.health,
-      healthMax: this.healthMax,
-      attackPower: this.attackPower,
-      attacks: this.attacks,
-      turnsLeftAlive: this.turnsLeftAlive,
-    };
   }
 
   public static fromJSON(json: any): Minion {

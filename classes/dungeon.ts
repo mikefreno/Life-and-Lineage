@@ -1,6 +1,7 @@
 import dungeons from "../assets/json/dungeons.json";
 import bosses from "../assets/json/bossMonsters.json";
 import { Monster } from "./creatures";
+import { action, makeObservable, observable } from "mobx";
 
 interface DungeonLevelOptions {
   level: number;
@@ -17,11 +18,12 @@ interface DungeonInstanceOptions {
 
 export class DungeonInstance {
   readonly name: string;
-  private levels: DungeonLevel[];
+  levels: DungeonLevel[];
 
   constructor({ name, levels }: DungeonInstanceOptions) {
     this.name = name;
     this.levels = levels ?? [];
+    makeObservable(this, { levels: observable, addLevel: action });
   }
 
   public addLevel() {
@@ -49,17 +51,12 @@ export class DungeonInstance {
       throw new Error(`failed to add level to ${this.name} instance`);
     }
   }
-
-  public getLevels() {
-    return this.levels;
-  }
-
-  public toJSON(): object {
-    return {
-      name: this.name,
-      levels: this.levels.map((level) => level.toJSON()),
-    };
-  }
+  //public toJSON(): object {
+  //return {
+  //name: this.name,
+  //levels: this.levels.map((level) => level.toJSON()),
+  //};
+  //}
 
   static fromJSON(json: any): DungeonInstance {
     const levels = json.levels.map((level: any) =>
@@ -78,9 +75,9 @@ export class DungeonInstance {
 export class DungeonLevel {
   readonly level: number;
   readonly bosses: string[];
-  private step: number;
+  step: number;
   readonly stepsBeforeBoss: number;
-  private bossDefeated: boolean;
+  bossDefeated: boolean;
 
   constructor({
     level,
@@ -94,10 +91,12 @@ export class DungeonLevel {
     this.step = step ?? 0;
     this.stepsBeforeBoss = stepsBeforeBoss;
     this.bossDefeated = bossDefeated ?? false;
-  }
-
-  public getStep() {
-    return this.step;
+    makeObservable(this, {
+      step: observable,
+      bossDefeated: observable,
+      incrementStep: action,
+      getBoss: action,
+    });
   }
 
   public incrementStep() {
@@ -136,27 +135,15 @@ export class DungeonLevel {
       `No boss found in getBoss() on DungeonLevel, looking for ${this.bosses} in ${instanceName}`,
     );
   }
-
-  public setBossDefeated() {
-    this.bossDefeated = true;
-  }
-  public bossDefeatedCheck() {
-    return this.bossDefeated;
-  }
-
-  public getCompleted() {
-    return this.bossDefeated;
-  }
-
-  public toJSON(): object {
-    return {
-      level: this.level,
-      bosses: this.bosses,
-      step: this.step,
-      stepsBeforeBoss: this.stepsBeforeBoss,
-      bossDefeated: this.bossDefeated,
-    };
-  }
+  //public toJSON(): object {
+  //return {
+  //level: this.level,
+  //bosses: this.bosses,
+  //step: this.step,
+  //stepsBeforeBoss: this.stepsBeforeBoss,
+  //bossDefeated: this.bossDefeated,
+  //};
+  //}
 
   static fromJSON(json: any): DungeonLevel {
     const level = new DungeonLevel({

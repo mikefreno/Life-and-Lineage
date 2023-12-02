@@ -3,21 +3,23 @@ import { Platform } from "react-native";
 import { Text, View, ScrollView } from "../components/Themed";
 import { calculateAge } from "../utility/functions";
 import { CharacterImage } from "../components/CharacterImage";
-import { useSelector } from "react-redux";
-import { selectGame, selectPlayerCharacter } from "../redux/selectors";
+import { useContext } from "react";
+import { GameContext, PlayerCharacterContext } from "./_layout";
 
 export default function RelationshipsScreen() {
-  const playerCharacter = useSelector(selectPlayerCharacter);
-  const gameData = useSelector(selectGame);
+  const playerCharacterData = useContext(PlayerCharacterContext);
+  const playerCharacter = playerCharacterData?.playerState;
+  const gameData = useContext(GameContext);
+  const game = gameData?.gameState;
 
   if (playerCharacter) {
-    const parents = playerCharacter.getParents();
+    const parents = playerCharacter.parents;
     const dad = parents.find((parent) => parent.sex == "male");
     const mom = parents.find((parent) => parent.sex == "female");
-    if (mom && dad && gameData) {
+    if (mom && dad && game) {
       const dadBDay = new Date(dad.birthdate);
       const momBDay = new Date(mom.birthdate);
-      const currentDate = gameData.getGameDate();
+      const currentDate = new Date(game.date);
       const dadsAge = calculateAge(dadBDay, currentDate);
       const momsAge = calculateAge(momBDay, currentDate);
 
@@ -32,10 +34,10 @@ export default function RelationshipsScreen() {
                   <CharacterImage characterAge={dadsAge} characterSex={"M"} />
                 </View>
                 <Text className="text-xl">{dadsAge} Years Old</Text>
-                <Text className="text-xl">{dad?.getName()}</Text>
+                <Text className="text-xl">{dad?.getFullName()}</Text>
                 <View className="mx-auto">
                   <Text className="flex flex-wrap text-center text-lg">
-                    {dad?.getJobTitle()}
+                    {dad?.job}
                   </Text>
                 </View>
               </View>
@@ -45,10 +47,10 @@ export default function RelationshipsScreen() {
                   <CharacterImage characterAge={momsAge} characterSex={"F"} />
                 </View>
                 <Text className="text-xl">{momsAge} Years Old</Text>
-                <Text className="text-xl">{mom?.getName()}</Text>
+                <Text className="text-xl">{mom?.getFullName()}</Text>
                 <View className="mx-auto">
                   <Text className="flex flex-wrap text-center text-lg">
-                    {mom?.getJobTitle()}
+                    {mom?.job}
                   </Text>
                 </View>
               </View>

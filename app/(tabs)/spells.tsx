@@ -1,17 +1,24 @@
-import { useSelector } from "react-redux";
 import { Text, View } from "../../components/Themed";
-import { selectGame, selectPlayerCharacter } from "../../redux/selectors";
 import SpellDetails from "../../components/SpellDetails";
+import { GameContext, PlayerCharacterContext } from "../_layout";
+import { useContext, useEffect, useState } from "react";
+import { observer } from "mobx-react-lite";
 
-export default function SpellsScreen() {
-  const playerCharacter = useSelector(selectPlayerCharacter);
-  const game = useSelector(selectGame);
-  if (!playerCharacter || !game) throw new Error("no player in spells screen");
-  const spells = playerCharacter.getSpells();
+const SpellsScreen = observer(() => {
+  const playerCharacterData = useContext(PlayerCharacterContext);
+  const gameData = useContext(GameContext);
+
+  if (!playerCharacterData || !gameData) throw new Error("missing contexts");
+  const { playerState } = playerCharacterData;
+  const [spells, setSpells] = useState(playerState?.getSpells());
+
+  useEffect(() => {
+    setSpells(playerState?.getSpells());
+  }, [playerState?.knownSpells]);
 
   return (
     <View className="flex-1 items-center justify-evenly">
-      {spells.length > 0 ? (
+      {spells && spells.length > 0 ? (
         <>
           <Text className="text-xl tracking-wide">Known Spells</Text>
           <View className="h-5/6 w-full items-center">
@@ -30,4 +37,5 @@ export default function SpellsScreen() {
       )}
     </View>
   );
-}
+});
+export default SpellsScreen;

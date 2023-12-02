@@ -3,13 +3,10 @@ import Coins from "../assets/icons/CoinsIcon";
 import Energy from "../assets/icons/EnergyIcon";
 import Sanity from "../assets/icons/SanityIcon";
 import HealthIcon from "../assets/icons/HealthIcon";
-import { useDispatch, useSelector } from "react-redux";
-import { selectGame, selectPlayerCharacter } from "../redux/selectors";
-import { AppDispatch } from "../redux/store";
 import { useColorScheme } from "nativewind";
-import { setPlayerCharacter } from "../redux/slice/player";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
-import { setGameData } from "../redux/slice/game";
+import { GameContext, PlayerCharacterContext } from "../app/_layout";
+import { useContext } from "react";
 
 interface MedicalOptionProps {
   title: string;
@@ -28,9 +25,10 @@ export default function MedicalOption({
   manaRestore,
   removeDebuffs,
 }: MedicalOptionProps) {
-  const playerCharacter = useSelector(selectPlayerCharacter);
-  const gameData = useSelector(selectGame);
-  const dispatch: AppDispatch = useDispatch();
+  const playerCharacterData = useContext(PlayerCharacterContext);
+  const playerCharacter = playerCharacterData?.playerState;
+  const gameData = useContext(GameContext);
+  const game = gameData?.gameState;
   const { colorScheme } = useColorScheme();
   const isFocused = useIsFocused();
 
@@ -39,7 +37,7 @@ export default function MedicalOption({
   }
 
   function visit() {
-    if (playerCharacter && gameData && isFocused) {
+    if (playerCharacter && game && isFocused) {
       playerCharacter.getMedicalService(
         cost,
         healthRestore,
@@ -47,9 +45,7 @@ export default function MedicalOption({
         manaRestore,
         removeDebuffs,
       );
-      gameData.gameTick();
-      dispatch(setGameData(gameData));
-      dispatch(setPlayerCharacter(playerCharacter.toJSON()));
+      game.gameTick();
     }
   }
 

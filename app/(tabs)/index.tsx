@@ -2,26 +2,21 @@ import { Pressable, Image } from "react-native";
 import { View, Text, ScrollView } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import { calculateAge, toTitleCase } from "../../utility/functions";
-import { useDispatch, useSelector } from "react-redux";
-import { selectGame, selectPlayerCharacter } from "../../redux/selectors";
 import ProgressBar from "../../components/ProgressBar";
 import PlayerStatus from "../../components/PlayerStatus";
 import { elementalColorMap } from "../../utility/elementColors";
 import { Item } from "../../classes/item";
-import { useEffect, useState } from "react";
-import { AppDispatch } from "../../redux/store";
+import { useContext, useEffect, useState } from "react";
 import Necromancer from "../../assets/icons/NecromancerSkull";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
 import blessingDisplay from "../../components/BlessingsDisplay";
 import { useColorScheme } from "nativewind";
 import SpellDetails from "../../components/SpellDetails";
-import { setPlayerCharacter } from "../../redux/slice/player";
+import { GameContext, PlayerCharacterContext } from "../_layout";
+import { observer } from "mobx-react-lite";
 
-export default function HomeScreen() {
+const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
-  const playerCharacter = useSelector(selectPlayerCharacter);
-  const gameData = useSelector(selectGame);
-  const dispatch: AppDispatch = useDispatch();
   const [showingInventory, setShowingInventory] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<{
     item: Item;
@@ -46,14 +41,20 @@ export default function HomeScreen() {
     };
   } | null>(null);
 
+  const playerStateData = useContext(PlayerCharacterContext);
+  const gameData = useContext(GameContext);
+  if (!playerStateData || !gameData) throw new Error("missing contexts");
+  const { playerState } = playerStateData;
+  const { gameState } = gameData;
+
   function displaySetter(
     item: Item | null,
     equipped: "mainHand" | "offHand" | "body" | "head" | null,
   ) {
     if (item) {
       setSelectedItem({ item: item, equipped: equipped });
-      if (item.itemClass == "book" && playerCharacter) {
-        const spell = item.getAttachedSpell(playerCharacter.playerClass);
+      if (item.itemClass == "book" && playerState) {
+        const spell = item.getAttachedSpell(playerState.playerClass);
         setSelectedSpell(spell);
       } else {
         setSelectedSpell(null);
@@ -97,14 +98,13 @@ export default function HomeScreen() {
   }
 
   function moveBetweenEquippedStates() {
-    if (playerCharacter) {
+    if (playerState) {
       if (selectedItem && selectedItem.equipped) {
-        playerCharacter?.removeEquipment(selectedItem.equipped);
+        playerState?.removeEquipment(selectedItem.equipped);
       } else if (selectedItem) {
-        playerCharacter?.equipItem(selectedItem.item);
+        playerState?.equipItem(selectedItem.item);
       }
       setSelectedItem(null);
-      dispatch(setPlayerCharacter(playerCharacter.toJSON()));
     }
   }
 
@@ -113,18 +113,16 @@ export default function HomeScreen() {
       <View className="mr-2 flex border-r border-zinc-900 pr-2 dark:border-zinc-50">
         <View className="items-center">
           <Text className="mb-2">Head</Text>
-          {playerCharacter?.getHeadItem() ? (
+          {playerState?.equipment.head ? (
             <Pressable
               className="w-1/4 items-center active:scale-90 active:opacity-50"
-              onPress={() =>
-                displaySetter(playerCharacter.getHeadItem(), "head")
-              }
+              onPress={() => displaySetter(playerState?.equipment.head, "head")}
             >
               <View
                 className="rounded-lg p-1.5"
                 style={{ backgroundColor: "#a1a1aa" }}
               >
-                <Image source={playerCharacter.getHeadItem()?.getItemIcon()} />
+                <Image source={playerState?.equipment.head?.getItemIcon()} />
               </View>
             </Pressable>
           ) : (
@@ -139,12 +137,12 @@ export default function HomeScreen() {
         <View className="mt-2 flex flex-row">
           <View className="">
             <Text className="mb-2">Main Hand</Text>
-            {playerCharacter?.getMainHandItem() &&
-            playerCharacter?.getMainHandItem().name !== "unarmored" ? (
+            {playerState?.equipment.mainHand &&
+            playerState?.equipment.mainHand.name !== "unarmored" ? (
               <Pressable
                 className="mx-auto w-1/4 items-center active:scale-90 active:opacity-50"
                 onPress={() =>
-                  displaySetter(playerCharacter?.getMainHandItem(), "mainHand")
+                  displaySetter(playerState?.equipment.mainHand, "mainHand")
                 }
               >
                 <View
@@ -152,7 +150,7 @@ export default function HomeScreen() {
                   style={{ backgroundColor: "#a1a1aa" }}
                 >
                   <Image
-                    source={playerCharacter?.getMainHandItem().getItemIcon()}
+                    source={playerState?.equipment.mainHand.getItemIcon()}
                   />
                 </View>
               </Pressable>
@@ -165,11 +163,11 @@ export default function HomeScreen() {
           </View>
           <View className="ml-6 mr-2">
             <Text className="mb-2">Off-Hand</Text>
-            {playerCharacter?.getOffHandItem() ? (
+            {playerState?.equipment.offHand ? (
               <Pressable
                 className="mx-auto w-1/4 items-center active:scale-90 active:opacity-50"
                 onPress={() =>
-                  displaySetter(playerCharacter?.getOffHandItem(), "offHand")
+                  displaySetter(playerState?.equipment.offHand, "offHand")
                 }
               >
                 <View
@@ -177,15 +175,15 @@ export default function HomeScreen() {
                   style={{ backgroundColor: "#a1a1aa" }}
                 >
                   <Image
-                    source={playerCharacter?.getOffHandItem()?.getItemIcon()}
+                    source={playerState?.equipment.offHand?.getItemIcon()}
                   />
                 </View>
               </Pressable>
-            ) : playerCharacter?.getMainHandItem().slot == "two-hand" ? (
+            ) : playerState?.equipment.mainHand.slot == "two-hand" ? (
               <Pressable
                 className="mx-auto w-1/4 items-center active:scale-90 active:opacity-50"
                 onPress={() =>
-                  displaySetter(playerCharacter?.getMainHandItem(), "offHand")
+                  displaySetter(playerState?.equipment.mainHand, "offHand")
                 }
               >
                 <View
@@ -194,7 +192,7 @@ export default function HomeScreen() {
                 >
                   <Image
                     style={{ opacity: 0.5 }}
-                    source={playerCharacter?.getMainHandItem()?.getItemIcon()}
+                    source={playerState?.equipment.mainHand?.getItemIcon()}
                   />
                 </View>
               </Pressable>
@@ -208,18 +206,16 @@ export default function HomeScreen() {
         </View>
         <View className="mx-auto items-center">
           <Text className="mb-2">Body</Text>
-          {playerCharacter?.getBodyItem() ? (
+          {playerState?.equipment.body ? (
             <Pressable
               className="w-1/4 items-center active:scale-90 active:opacity-50"
-              onPress={() =>
-                displaySetter(playerCharacter?.getBodyItem(), "body")
-              }
+              onPress={() => displaySetter(playerState?.equipment.body, "body")}
             >
               <View
                 className="rounded-lg p-1.5"
                 style={{ backgroundColor: "#a1a1aa" }}
               >
-                <Image source={playerCharacter?.getBodyItem()?.getItemIcon()} />
+                <Image source={playerState?.equipment.body?.getItemIcon()} />
               </View>
             </Pressable>
           ) : (
@@ -282,16 +278,15 @@ export default function HomeScreen() {
     });
   }
 
-  if (playerCharacter && gameData) {
-    const name = playerCharacter.getName();
-    const jobRes = playerCharacter.getCurrentJobAndExperience();
-    const magicProficiencies = playerCharacter.getMagicalProficiencies();
+  if (playerState && gameState) {
+    const name = playerState.getFullName();
+    const magicProficiencies = playerState.magicProficiencies;
 
     return (
       <>
         <View className="flex-1 justify-between px-4 pt-2">
           <View className="flex flex-row justify-evenly pb-4">
-            {playerCharacter?.playerClass == "necromancer" ? (
+            {playerState?.playerClass == "necromancer" ? (
               <View className="m-auto w-1/3">
                 <Necromancer
                   width={100}
@@ -299,7 +294,7 @@ export default function HomeScreen() {
                   color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
                 />
               </View>
-            ) : playerCharacter?.playerClass == "paladin" ? (
+            ) : playerState?.playerClass == "paladin" ? (
               <View className="m-auto w-1/3">
                 <PaladinHammer width={100} height={100} />
               </View>
@@ -314,18 +309,18 @@ export default function HomeScreen() {
             )}
             <View className="mx-auto flex w-1/3 flex-col pt-2">
               <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
-              <Text className="text-center text-xl dark:text-white">{`${jobRes?.title}`}</Text>
+              <Text className="text-center text-xl dark:text-white">{`${playerState.job}`}</Text>
               <Text className="text-center text-xl dark:text-white">{`${
-                playerCharacter
+                playerState
                   ? calculateAge(
-                      new Date(playerCharacter.birthdate),
-                      gameData.getGameDate(),
+                      new Date(playerState.birthdate),
+                      new Date(gameState.date),
                     )
                   : "x"
               } years old`}</Text>
             </View>
             <View className="m-auto">
-              {blessingDisplay(playerCharacter.blessing, colorScheme)}
+              {blessingDisplay(playerState.blessing, colorScheme)}
             </View>
           </View>
           <ScrollView>
@@ -349,10 +344,10 @@ export default function HomeScreen() {
             </View>
             {showingInventory ? (
               <>
-                {playerCharacter.getInventory().length > 0 ? (
+                {playerState.inventory.length > 0 ? (
                   <ScrollView horizontal>
                     <View className="my-auto max-h-64 flex-wrap justify-around">
-                      {playerCharacter.getInventory().map((item) => (
+                      {playerState.inventory.map((item) => (
                         <Pressable
                           key={item.id}
                           className="m-2 items-center active:scale-90 active:opacity-50"
@@ -380,8 +375,9 @@ export default function HomeScreen() {
             </View>
           </ScrollView>
         </View>
-        {playerCharacter ? <PlayerStatus displayGoldTop={true} /> : null}
+        {playerState ? <PlayerStatus displayGoldTop={true} /> : null}
       </>
     );
   }
-}
+});
+export default HomeScreen;

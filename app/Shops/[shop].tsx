@@ -1,7 +1,5 @@
 import { Stack, useLocalSearchParams } from "expo-router";
 import { View, Text } from "../../components/Themed";
-import { useDispatch, useSelector } from "react-redux";
-import { selectGame, selectPlayerCharacter } from "../../redux/selectors";
 import { calculateAge, toTitleCase } from "../../utility/functions";
 import { CharacterImage } from "../../components/CharacterImage";
 import {
@@ -10,20 +8,21 @@ import {
   ScrollView,
   View as NonThemedView,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Item } from "../../classes/item";
 import Coins from "../../assets/icons/CoinsIcon";
-import { AppDispatch } from "../../redux/store";
 import SpellDetails from "../../components/SpellDetails";
-import { setPlayerCharacter } from "../../redux/slice/player";
 import { useIsFocused } from "@react-navigation/native";
+import { GameContext, PlayerCharacterContext } from "../_layout";
 
 export default function ShopScreen() {
   const { shop } = useLocalSearchParams();
-  const game = useSelector(selectGame);
-  const dispatch: AppDispatch = useDispatch();
-  const playerCharacter = useSelector(selectPlayerCharacter);
-  const thisShop = game?.getShops().find((aShop) => aShop.archetype == shop);
+  const gameData = useContext(GameContext);
+  if (!gameData) throw new Error("missing game context");
+  const { gameState } = gameData;
+  const playerCharacterData = useContext(PlayerCharacterContext);
+  const playerCharacter = playerCharacterData?.playerState;
+  const thisShop = gameState?.shops.find((aShop) => aShop.archetype == shop);
   const [selectedItem, setSelectedItem] = useState<{
     item: Item;
     buying: boolean;
@@ -53,7 +52,8 @@ export default function ShopScreen() {
     if (
       playerCharacter &&
       thisShop &&
-      thisShop.getLastRefresh() < new Date(Date.now() - 60 * 60 * 1000)
+      new Date(thisShop.lastStockRefresh) <
+        new Date(Date.now() - 60 * 60 * 1000)
     ) {
       thisShop.refreshInventory(playerCharacter.playerClass);
     }
@@ -63,10 +63,10 @@ export default function ShopScreen() {
   function selectedItemDisplay() {
     if (selectedItem) {
       const transactionCompleteable = selectedItem.buying
-        ? playerCharacter!.getGold() >=
-          selectedItem.item.getBuyPrice(thisShop!.getAffection())
-        : thisShop!.getCurrentGold() >=
-          selectedItem.item.getSellPrice(thisShop!.getAffection());
+        ? playerCharacter!.gold >=
+          selectedItem.item.getBuyPrice(thisShop!.affection)
+        : thisShop!.currentGold >=
+          selectedItem.item.getSellPrice(thisShop!.affection);
 
       return (
         <View className="flex h-1/3 items-center justify-center">
@@ -86,8 +86,8 @@ export default function ShopScreen() {
             <Text>
               Price:{" "}
               {selectedItem.buying
-                ? selectedItem.item.getBuyPrice(thisShop!.getAffection())
-                : selectedItem.item.getSellPrice(thisShop!.getAffection())}
+                ? selectedItem.item.getBuyPrice(thisShop!.affection)
+                : selectedItem.item.getSellPrice(thisShop!.affection)}
             </Text>
             <Coins width={20} height={20} style={{ marginLeft: 6 }} />
           </View>
@@ -113,18 +113,17 @@ export default function ShopScreen() {
   }
 
   function moveBetweenInventories() {
-    if (selectedItem && playerCharacter && thisShop && game && isFocused) {
+    if (selectedItem && playerCharacter && thisShop && gameState && isFocused) {
       if (selectedItem.buying) {
-        const price = selectedItem.item.getBuyPrice(thisShop!.getAffection());
+        const price = selectedItem.item.getBuyPrice(thisShop!.affection);
         playerCharacter.buyItem(selectedItem.item, price);
         thisShop.sellItem(selectedItem.item, price);
       } else {
-        const price = selectedItem.item.getSellPrice(thisShop!.getAffection());
+        const price = selectedItem.item.getSellPrice(thisShop!.affection);
         thisShop.buyItem(selectedItem.item, price);
         playerCharacter.sellItem(selectedItem.item, price);
       }
       setSelectedItem(null);
-      dispatch(setPlayerCharacter(playerCharacter.toJSON()));
     }
   }
 
@@ -138,7 +137,7 @@ export default function ShopScreen() {
     }
   }
 
-  if (refreshCheck && thisShop && game && playerCharacter) {
+  if (refreshCheck && thisShop && gameState && playerCharacter) {
     return (
       <>
         <Stack.Screen
@@ -151,8 +150,8 @@ export default function ShopScreen() {
             <View className="w-1/3">
               <CharacterImage
                 characterAge={calculateAge(
-                  thisShop.shopKeeperBirthDate,
-                  game.getGameDate(),
+                  new Date(thisShop.shopKeeperBirthDate),
+                  new Date(gameState.date),
                 )}
                 characterSex={thisShop?.shopKeeperSex == "male" ? "M" : "F"}
               />
@@ -160,14 +159,14 @@ export default function ShopScreen() {
                 {thisShop.shopKeeperName}'s Inventory
               </Text>
               <View className="mx-auto flex flex-row">
-                <Text>{thisShop.getCurrentGold()}</Text>
+                <Text>{thisShop.currentGold}</Text>
                 <Coins width={16} height={16} style={{ marginLeft: 6 }} />
               </View>
             </View>
             <View className="mx-2 -mt-1 max-h-60 w-2/3 rounded border border-zinc-300 dark:border-zinc-700">
               <ScrollView className="my-auto">
                 <View className="flex flex-row flex-wrap justify-around">
-                  {thisShop.getInventory().map((item) => (
+                  {thisShop.inventory.map((item) => (
                     <Pressable
                       key={item.id}
                       className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
@@ -190,7 +189,7 @@ export default function ShopScreen() {
           <View className="h-1/3">
             <View className="flex flex-row justify-center border-b border-zinc-300 dark:border-zinc-700">
               <Text className="text-center">
-                {playerCharacter.getName()}'s Inventory
+                {playerCharacter.getFullName()}'s Inventory
               </Text>
               <View className="flex flex-row">
                 <Text className="my-auto">
@@ -203,7 +202,7 @@ export default function ShopScreen() {
             </View>
             <ScrollView>
               <View className="flex flex-row flex-wrap justify-around">
-                {playerCharacter.getInventory().map((item) => (
+                {playerCharacter.inventory.map((item) => (
                   <Pressable
                     key={item.id}
                     className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
