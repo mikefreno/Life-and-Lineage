@@ -16,7 +16,7 @@
       "attacks": ["hit"],
       "icon": "Wood_Log",
       "stats":{
-         "damage": 5.5
+         "damage": 4.5
       }
    },
    {
@@ -46,7 +46,7 @@
       "attacks": ["slash"],
       "icon":"Iron_Sword",
       "stats":{
-         "damage": 6.5
+         "damage": 7.5
       }
    },
    {
@@ -56,7 +56,7 @@
       "attacks": ["crushing blow"],
       "icon":"Hammer",
       "stats":{
-         "damage": 5.5
+         "damage": 6.5
       }
    },
    {

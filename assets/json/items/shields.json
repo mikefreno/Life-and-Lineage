@@ -5,7 +5,7 @@
       "icon": "Wooden_Shield",
       "stats":{
          "armor": 4.0,
-         "blockChance": 0.05
+         "blockChance": 0.035
       }
    }, 
    {
@@ -22,8 +22,8 @@
       "baseValue": 1000,
       "icon": "Iron_Shield",
       "stats":{
-         "armor": 8.0,
-         "blockChance": 0.025
+         "armor": 9.0,
+         "blockChance": 0.035
       }
    },
    {

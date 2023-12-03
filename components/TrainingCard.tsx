@@ -6,7 +6,7 @@ import Coins from "../assets/icons/CoinsIcon";
 import Sanity from "../assets/icons/SanityIcon";
 import { Pressable, View, Text } from "react-native";
 import ProgressBar from "./ProgressBar";
-import { toTitleCase } from "../utility/functions";
+import { fullSave, toTitleCase } from "../utility/functions";
 
 interface TrainingCardProps {
   name: string;
@@ -27,18 +27,21 @@ const TrainingCard = observer(
       playerState?.getSpecifiedQualificationProgress(name),
     );
 
+    if (!playerState || !gameState) throw new Error("missing data providers");
+
     useEffect(() => {
-      setExperience(playerState?.getSpecifiedQualificationProgress(name));
+      setExperience(playerState.getSpecifiedQualificationProgress(name));
     }, [playerState?.sanity]);
 
     const progressQualification = () => {
-      playerState?.incrementQualificationProgress(
+      playerState.incrementQualificationProgress(
         name,
         ticks,
         sanityCostPerTick,
         goldCostPerTick,
       );
-      gameState?.gameTick();
+      gameState.gameTick();
+      fullSave(gameState, playerState);
     };
 
     return (
@@ -82,6 +85,7 @@ const TrainingCard = observer(
           {!playerState?.qualifications.includes(name) ? (
             <>
               <Pressable
+                disabled={playerState.gold < goldCostPerTick}
                 className="mb-2 mt-4 active:scale-95 active:opacity-50"
                 onPress={progressQualification}
               >

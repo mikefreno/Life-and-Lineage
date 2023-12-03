@@ -100,6 +100,7 @@ type PlayerCharacterBase = {
   birthdate?: string;
   deathdate: string | null;
   job?: string;
+  qualifications?: string[];
   affection?: number;
   health?: number;
   healthMax?: number;
@@ -214,6 +215,7 @@ export class PlayerCharacter extends Character {
     birthdate,
     deathdate,
     job,
+    qualifications,
     affection,
     health,
     healthMax,
@@ -242,6 +244,7 @@ export class PlayerCharacter extends Character {
       alive,
       deathdate,
       job,
+      qualifications,
       affection,
     });
     this.playerClass = playerClass;
@@ -424,6 +427,99 @@ export class PlayerCharacter extends Character {
       this.inventory.splice(idx, 1);
       this.gold += sellPrice;
     }
+  }
+
+  public getCurrentEquipmentStats(): Record<string, number> {
+    let armor = 0;
+    let damage = 0;
+    let mana = 0;
+    let regen = 0;
+    let health = 0;
+    let blockChance = 0;
+
+    if (this.equipment.head) {
+      const stats = this.equipment.head.stats;
+      if (stats) {
+        if (stats.armor) {
+          armor += stats.armor;
+        }
+        if (stats.mana) {
+          mana += stats.mana;
+        }
+        if (stats.regen) {
+          regen += stats.regen;
+        }
+        if (stats.health) {
+          health += stats.health;
+        }
+      }
+    }
+    if (this.equipment.body) {
+      const stats = this.equipment.body.stats;
+      if (stats) {
+        if (stats.armor) {
+          armor += stats.armor;
+        }
+        if (stats.mana) {
+          mana += stats.mana;
+        }
+        if (stats.regen) {
+          regen += stats.regen;
+        }
+        if (stats.health) {
+          health += stats.health;
+        }
+      }
+    }
+    if (this.equipment.mainHand) {
+      const stats = this.equipment.mainHand.stats;
+      if (stats) {
+        if (stats.damage) {
+          damage += stats.damage;
+        }
+        if (stats.mana) {
+          mana += stats.mana;
+        }
+        if (stats.regen) {
+          regen += stats.regen;
+        }
+        if (stats.health) {
+          health += stats.health;
+        }
+      }
+    }
+    if (this.equipment.offHand) {
+      const stats = this.equipment.offHand.stats;
+      if (stats) {
+        if (stats.damage) {
+          damage += stats.damage * 0.5;
+        }
+        if (stats.armor) {
+          armor += stats.armor;
+        }
+        if (stats.mana) {
+          mana += stats.mana;
+        }
+        if (stats.regen) {
+          regen += stats.regen;
+        }
+        if (stats.health) {
+          health += stats.health;
+        }
+        if (stats.blockChance) {
+          blockChance = stats.blockChance;
+        }
+      }
+    }
+
+    return {
+      armor: armor,
+      damage: damage,
+      mana: mana,
+      regen: regen,
+      health: health,
+      blockChance: blockChance,
+    };
   }
 
   public equipItem(item: Item) {
@@ -974,6 +1070,7 @@ export class PlayerCharacter extends Character {
       birthdate: json.birthdate ?? undefined,
       deathdate: json.deathdate ?? null,
       job: json.job,
+      qualifications: json.qualifications,
       affection: json.affection,
       playerClass: json.playerClass,
       blessing: json.blessing,

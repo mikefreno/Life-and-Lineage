@@ -59,10 +59,11 @@ export default function SpellDetails({ spell }: SpellDetailInterface) {
         backgroundColor: colorScheme == "light" ? "#fafafa" : "#27272a",
         shadowOpacity: 0.25,
         shadowRadius: 5,
+        maxWidth: 400,
       }}
     >
       <View
-        className="flex flex-row justify-between rounded-lg p-2 dark:border"
+        className="flex flex-row justify-between rounded-lg px-6 py-2 dark:border"
         style={{
           borderColor:
             colorScheme == "dark"
@@ -83,7 +84,7 @@ export default function SpellDetails({ spell }: SpellDetailInterface) {
               : "",
         }}
       >
-        <View className="my-auto w-2/5">
+        <View className="my-auto w-[40%]">
           <Text className="text-center">{toTitleCase(spell.name)}</Text>
           <View className="flex flex-row items-center justify-center">
             <Text>{spell.manaCost}</Text>

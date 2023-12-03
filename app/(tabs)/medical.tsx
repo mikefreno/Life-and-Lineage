@@ -5,7 +5,7 @@ import PlayerStatus from "../../components/PlayerStatus";
 
 export default function MedicalScreen() {
   return (
-    <View>
+    <View className="flex-1">
       <PlayerStatus onTop={true} displayGoldBottom={true} />
       <ScrollView>
         <View className="px-2 pb-24 pt-4">

@@ -14,6 +14,7 @@ import Coins from "../../assets/icons/CoinsIcon";
 import SpellDetails from "../../components/SpellDetails";
 import { useIsFocused } from "@react-navigation/native";
 import { GameContext, PlayerCharacterContext } from "../_layout";
+import GearStatsDisplay from "../../components/GearStatsDisplay";
 
 export default function ShopScreen() {
   const { shop } = useLocalSearchParams();
@@ -70,43 +71,59 @@ export default function ShopScreen() {
 
       return (
         <ScrollView className="pt-6">
-          <View className="flex h-1/3 items-center ">
-            <Text>{toTitleCase(selectedItem.item.name)}</Text>
-            <Image source={selectedItem.item.getItemIcon()} />
-            <Text>
-              {selectedItem.item.itemClass == "bodyArmor"
-                ? "Body Armor"
-                : toTitleCase(selectedItem.item.itemClass)}
-            </Text>
-            {selectedItem.item.slot ? (
-              <Text className="">
-                Fills {toTitleCase(selectedItem.item.slot)} Slot
+          <View className="mx-auto flex min-h-[1/3] flex-row">
+            <View
+              className="flex items-center"
+              style={{
+                marginLeft:
+                  selectedItem.item.slot && selectedItem.item.stats ? 100 : 0,
+                width: 140,
+              }}
+            >
+              <Text className="text-center">
+                {toTitleCase(selectedItem.item.name)}
               </Text>
-            ) : null}
-            <View className="flex flex-row">
+              <Image source={selectedItem.item.getItemIcon()} />
               <Text>
-                Price:{" "}
-                {selectedItem.buying
-                  ? selectedItem.item.getBuyPrice(thisShop!.affection)
-                  : selectedItem.item.getSellPrice(thisShop!.affection)}
+                {selectedItem.item.itemClass == "bodyArmor"
+                  ? "Body Armor"
+                  : toTitleCase(selectedItem.item.itemClass)}
               </Text>
-              <Coins width={20} height={20} style={{ marginLeft: 6 }} />
-            </View>
-            <View>
-              <Pressable
-                disabled={!transactionCompleteable}
-                onPress={moveBetweenInventories}
-                className={`${
-                  !transactionCompleteable ? "bg-zinc-300" : "bg-blue-400"
-                } my-4 rounded-lg  active:scale-95 active:opacity-50 pb-4 px-6`}
-              >
-                <Text className="py-4" style={{ color: "white" }}>
-                  {selectedItem.buying ? "Purchase" : "Sell"}
+              {selectedItem.item.slot ? (
+                <Text className="">
+                  Fills {toTitleCase(selectedItem.item.slot)} Slot
                 </Text>
-              </Pressable>
+              ) : null}
+              <View className="flex flex-row">
+                <Text>
+                  Price:{" "}
+                  {selectedItem.buying
+                    ? selectedItem.item.getBuyPrice(thisShop!.affection)
+                    : selectedItem.item.getSellPrice(thisShop!.affection)}
+                </Text>
+                <Coins width={20} height={20} style={{ marginLeft: 6 }} />
+              </View>
+              <View>
+                <Pressable
+                  disabled={!transactionCompleteable}
+                  onPress={moveBetweenInventories}
+                  className={`${
+                    !transactionCompleteable ? "bg-zinc-300" : "bg-blue-400"
+                  } my-4 rounded-lg active:scale-95 active:opacity-50`}
+                >
+                  <Text className="px-6 py-4" style={{ color: "white" }}>
+                    {selectedItem.buying ? "Purchase" : "Sell"}
+                  </Text>
+                </Pressable>
+              </View>
             </View>
-            {selectedSpell ? <SpellDetails spell={selectedSpell} /> : null}
+            {selectedItem.item.slot && selectedItem.item.stats ? (
+              <View style={{ marginLeft: 10, marginTop: 20, width: 90 }}>
+                <GearStatsDisplay stats={selectedItem.item.stats} />
+              </View>
+            ) : null}
           </View>
+          {selectedSpell ? <SpellDetails spell={selectedSpell} /> : null}
         </ScrollView>
       );
     } else {

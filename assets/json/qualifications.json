@@ -1,3 +1,4 @@
 [
-   {"name": "high school education", "ticks": 50, "goldCostPerTick": 0, "sanityCostPerTick": 5}
+   {"name": "high school education", "ticks": 50, "goldCostPerTick": 0, "sanityCostPerTick": 5},
+   {"name": "defense course", "ticks": 35, "goldCostPerTick": 30, "sanityCostPerTick": 3}
 ]

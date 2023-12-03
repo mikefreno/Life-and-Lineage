@@ -1,0 +1,18 @@
+import React from "react";
+import Svg, { Path } from "react-native-svg";
+
+const ArmorIcon = ({ color = "#94a3b8", secondaryOpacity = 0.3, ...props }) => (
+  <Svg viewBox="0 0 512 512" {...props}>
+    <Path
+      d="M256 0C261.314 0.012 269.516 1.639 274.406 3.664L466.406 83.673C484.312 91.064 496 108.568 496 127.975C496 385.156 306.838 512 256.047 512C256.031 512 256.016 511.996 256 511.996V0Z"
+      fill={color}
+      opacity={secondaryOpacity}
+    />
+    <Path
+      d="M256 511.996C255.984 511.996 255.969 512 255.953 512C204.922 512 16 385.258 16 127.975C16 108.568 27.688 91.064 45.594 83.673L237.594 3.664C242.484 1.639 250.686 0.012 256 0V511.996Z "
+      fill={color}
+    />
+  </Svg>
+);
+
+export default ArmorIcon;

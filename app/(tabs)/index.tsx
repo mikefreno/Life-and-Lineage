@@ -1,7 +1,11 @@
 import { Pressable, Image } from "react-native";
 import { View, Text, ScrollView } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
-import { calculateAge, toTitleCase } from "../../utility/functions";
+import {
+  calculateAge,
+  damageReduction,
+  toTitleCase,
+} from "../../utility/functions";
 import ProgressBar from "../../components/ProgressBar";
 import PlayerStatus from "../../components/PlayerStatus";
 import { elementalColorMap } from "../../utility/elementColors";
@@ -14,6 +18,7 @@ import { useColorScheme } from "nativewind";
 import SpellDetails from "../../components/SpellDetails";
 import { GameContext, PlayerCharacterContext } from "../_layout";
 import { observer } from "mobx-react-lite";
+import GearStatsDisplay from "../../components/GearStatsDisplay";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -66,6 +71,11 @@ const HomeScreen = observer(() => {
     if (selectedItem) {
       return (
         <View className="flex items-center justify-center py-4">
+          {selectedItem.item.stats && selectedItem.item.slot ? (
+            <View className="pb-4">
+              <GearStatsDisplay stats={selectedItem.item.stats} />
+            </View>
+          ) : null}
           <Text>{toTitleCase(selectedItem.item.name)}</Text>
           <Image source={selectedItem.item.getItemIcon()} />
           <Text>
@@ -227,6 +237,11 @@ const HomeScreen = observer(() => {
             </View>
           )}
         </View>
+        {playerState ? (
+          <View className="my-2">
+            <GearStatsDisplay stats={playerState.getCurrentEquipmentStats()} />
+          </View>
+        ) : null}
       </View>
     );
   }
@@ -287,7 +302,7 @@ const HomeScreen = observer(() => {
         <View className="flex-1 justify-between px-4 pt-2">
           <View className="flex flex-row justify-evenly pb-4">
             {playerState?.playerClass == "necromancer" ? (
-              <View className="m-auto w-1/3">
+              <View className="m-auto w-[30%]">
                 <Necromancer
                   width={100}
                   height={100}
@@ -295,11 +310,11 @@ const HomeScreen = observer(() => {
                 />
               </View>
             ) : playerState?.playerClass == "paladin" ? (
-              <View className="m-auto w-1/3">
+              <View className="m-auto w-[30%]">
                 <PaladinHammer width={100} height={100} />
               </View>
             ) : (
-              <View className="m-auto w-1/3 scale-x-[-1] transform">
+              <View className="m-auto w-[30%] scale-x-[-1] transform">
                 <WizardHat
                   height={100}
                   width={100}
@@ -307,7 +322,7 @@ const HomeScreen = observer(() => {
                 />
               </View>
             )}
-            <View className="mx-auto flex w-1/3 flex-col pt-2">
+            <View className="mx-auto flex w-[40%] flex-col pt-2">
               <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
               <Text className="text-center text-xl dark:text-white">{`${playerState.job}`}</Text>
               <Text className="text-center text-xl dark:text-white">{`${
