@@ -225,7 +225,7 @@ export function createDebuff(
   primaryAttackDamage: number,
 ) {
   const roll = rollD20();
-  if (roll * 5 >= debuffChance) {
+  if (roll * 5 >= 100 - debuffChance * 100) {
     const debuffObj = conditions.find(
       (condition) => (condition.name = debuffName),
     );

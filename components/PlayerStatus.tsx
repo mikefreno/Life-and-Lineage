@@ -5,6 +5,9 @@ import Coins from "../assets/icons/CoinsIcon";
 import { useContext, useEffect, useState } from "react";
 import { PlayerCharacterContext } from "../app/_layout";
 import { observer } from "mobx-react-lite";
+import { useFonts } from "expo-font";
+import { FontAwesome } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 interface PlayerStatusOptions {
   displayGoldBottom?: boolean;
@@ -20,6 +23,25 @@ const PlayerStatus = observer(
     const [readableGold, setReadableGold] = useState(
       playerState?.getReadableGold(),
     );
+    const [loaded, error] = useFonts({
+      SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+      ...FontAwesome.font,
+    });
+
+    useEffect(() => {
+      if (error) throw error;
+    }, [error]);
+
+    useEffect(() => {
+      if (
+        loaded &&
+        playerState &&
+        (playerState.sanity <= -50 || playerState.health <= 0)
+      ) {
+        router.replace("/DeathScreen");
+      }
+    }, [playerState?.sanity, playerState?.health]);
+
     useEffect(() => {
       setReadableGold(playerState?.getReadableGold());
     }, [playerState?.gold]);
@@ -28,7 +50,7 @@ const PlayerStatus = observer(
       return (
         <NonThemedView
           className={`${
-            onTop ? "border-b" : "border-t"
+            onTop ? "border-b" : "border-t pb-3"
           } border-zinc-200 dark:border-zinc-700 flex bg-zinc-50 dark:bg-zinc-900 py-2`}
         >
           {displayGoldTop ? (
@@ -46,7 +68,7 @@ const PlayerStatus = observer(
                 value={playerState.health}
                 maxValue={playerState.getMaxHealth()}
                 filledColor="#ef4444"
-                unfilledColor="#fee2e2"
+                unfilledColor="#fca5a5"
               />
             </View>
             <View className="flex w-[31%]">
@@ -57,7 +79,7 @@ const PlayerStatus = observer(
                 value={playerState.mana}
                 maxValue={playerState.getMaxMana()}
                 filledColor="#60a5fa"
-                unfilledColor="#dbeafe"
+                unfilledColor="#bfdbfe"
               />
             </View>
             <View className="flex w-[31%]">
@@ -69,7 +91,7 @@ const PlayerStatus = observer(
                 minValue={-50}
                 maxValue={50}
                 filledColor="#c084fc"
-                unfilledColor="#f3e8ff"
+                unfilledColor="#e9d5ff"
               />
             </View>
           </View>

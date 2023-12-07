@@ -10,6 +10,16 @@ interface GearStatsDisplayProps {
 }
 
 export default function GearStatsDisplay({ stats }: GearStatsDisplayProps) {
+  if (
+    !stats.armor &&
+    !stats.damage &&
+    !stats.mana &&
+    !stats.regen &&
+    !stats.health &&
+    !stats.blockChance
+  ) {
+    return;
+  }
   return (
     <View className="flex items-center rounded-lg bg-zinc-300 px-8 py-1 dark:bg-zinc-700">
       {stats.armor ? (
@@ -54,7 +64,7 @@ export default function GearStatsDisplay({ stats }: GearStatsDisplayProps) {
       ) : null}
       {stats.blockChance ? (
         <View className="flex flex-row">
-          <Text>{stats.blockChance * 100}% </Text>
+          <Text>{Math.round(stats.blockChance * 100)}% </Text>
           <View className="my-auto">
             <ShieldSlashIcon height={14} width={14} />
           </View>

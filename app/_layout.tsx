@@ -150,7 +150,8 @@ const RootLayout = () => {
         router.push("/NewGame");
       } else if (
         gameData?.gameState?.atDeathScreen ||
-        (playerCharacter && playerCharacter.health <= 0)
+        (playerCharacter &&
+          (playerCharacter.health <= 0 || playerCharacter.sanity <= -50))
       ) {
         router.replace("/DeathScreen");
       }

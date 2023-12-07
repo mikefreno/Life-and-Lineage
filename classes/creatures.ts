@@ -134,9 +134,7 @@ export class Monster {
         };
     monsterHealth: number;
   } {
-    const stun = this.conditions.find((condition) => {
-      condition.name == "stun";
-    });
+    const stun = this.conditions.find((condition) => condition.name == "stun");
     if (!stun) {
       const accuracy_halved = this.conditions.find((condition) => {
         condition.name == "accuracy_halved";
@@ -202,11 +200,14 @@ export class Monster {
           let healedFor = 0;
           chosenAttack.debuffs.forEach((debuff) => {
             if (debuff.name == "lifesteal") {
-              const heal = Math.round(damage * 0.5 * 4) / 4;
-              if (this.health + heal >= this.healthMax) {
-                this.health = this.healthMax;
-              } else {
-                this.health += heal;
+              const roll = rollD20();
+              if (roll * 5 >= 100 - debuff.chance * 100) {
+                const heal = Math.round(damage * 0.5 * 4) / 4;
+                if (this.health + heal >= this.healthMax) {
+                  this.health = this.healthMax;
+                } else {
+                  this.health += heal;
+                }
               }
             } else {
               const res = createDebuff(

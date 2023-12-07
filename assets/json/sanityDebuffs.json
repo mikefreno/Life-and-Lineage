@@ -1,0 +1,26 @@
+[
+   {
+      "name": "heart attack",
+      "style": "debuff",
+      "turns": 5,
+      "effect": ["damage"],
+      "effectStyle": "percentage",
+      "effectAmount": 0.10
+   },
+   {
+      "name": "distraught",
+      "style": "debuff",
+      "turns": 3,
+      "effect": ["sanity"],
+      "effectStyle": "flat",
+      "effectAmount": -5
+   },
+   {
+      "name": "shock",
+      "style": "debuff",
+      "turns": 3,
+      "effect": ["skip"],
+      "effectStyle": null,
+      "effectAmount": null
+   }
+]

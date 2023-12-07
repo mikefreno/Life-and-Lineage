@@ -3,10 +3,9 @@ import { Image, View as NonThemedView } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import { MonsterImage } from "../../components/MonsterImage";
 import { Pressable, Modal } from "react-native";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import BattleTab from "../../components/BattleTab";
-import { router } from "expo-router";
-import { toTitleCase } from "../../utility/functions";
+import { flipCoin, toTitleCase } from "../../utility/functions";
 import { enemyGenerator } from "../../utility/monster";
 import PlayerStatus from "../../components/PlayerStatus";
 import ProgressBar from "../../components/ProgressBar";
@@ -24,6 +23,8 @@ import {
   PlayerCharacterContext,
 } from "../_layout";
 import { observer } from "mobx-react-lite";
+import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useColorScheme } from "nativewind";
 
 const DungeonLevelScreen = observer(() => {
   const playerCharacterData = useContext(PlayerCharacterContext);
@@ -53,8 +54,13 @@ const DungeonLevelScreen = observer(() => {
     itemDrops: Item[];
     gold: number;
   } | null>(null);
+  const [fleeModalShowing, setFleeModalShowing] = useState<boolean>(false);
+  const [fleeRollFailure, setFleeRollFailure] = useState<boolean>(false);
+  const { colorScheme } = useColorScheme();
 
   const isFocused = useIsFocused();
+
+  const router = useRouter();
 
   useEffect(() => {
     setInstanceName(slug[0]);
@@ -149,6 +155,55 @@ const DungeonLevelScreen = observer(() => {
     }
   }
 
+  function flee() {
+    const roll = flipCoin();
+    if (
+      playerState &&
+      (roll == "Heads" || monsterState?.creatureSpecies == "training dummy")
+    ) {
+      setFleeRollFailure(false);
+      playerState.clearMinions();
+      setMonster(null);
+      setFleeModalShowing(false);
+      router.push("/dungeon");
+    } else {
+      setFleeRollFailure(true);
+      battleLogger("You failed to flee!");
+
+      let monsterDefeated = false;
+      if (playerState && monsterState && playerState.minions.length > 0) {
+        const res = playerMinionAttacks(
+          monsterState.healthMax,
+          playerState.minions,
+        );
+        const hp = monsterState.damageHealth(res.totalHPDamage);
+        const sanity = monsterState.damageSanity(res.totalSanityDamage);
+        res.debuffs.forEach((debuff) => monsterState.addCondition(debuff));
+        if (hp <= 0 || (sanity && sanity <= 0)) {
+          if (thisDungeon?.level != 0) {
+            thisDungeon?.incrementStep();
+          }
+          battleLogger(
+            `You defeated the ${toTitleCase(monsterState.creatureSpecies)}`,
+          );
+          monsterDefeated = true;
+          const drops = monsterState.getDrops(playerState.playerClass);
+          playerState.addGold(drops.gold);
+          setDroppedItems(drops);
+          if (fightingBoss && gameState && thisDungeon) {
+            setFightingBoss(false);
+            thisDungeon.setBossDefeated();
+            gameState.openNextDungeonLevel(thisInstance!.name);
+          }
+          setMonster(null);
+        }
+      }
+      if (!monsterDefeated) {
+        enemyTurn();
+      }
+    }
+  }
+
   const enemyTurn = () => {
     if (monsterState) {
       const enemyAttackRes = monsterState.takeTurn(
@@ -223,7 +278,6 @@ const DungeonLevelScreen = observer(() => {
     debuffs: { name: string; chance: number }[] | null;
   }) {
     if (monsterState && playerState && isFocused) {
-      const startOfTurnMinions = [...playerState.minions];
       let monsterDefeated = false;
       const attackRes = playerState.doPhysicalAttack(
         attack,
@@ -255,10 +309,10 @@ const DungeonLevelScreen = observer(() => {
           );
         }
         battleLogger(line);
-        if (startOfTurnMinions.length > 0) {
+        if (playerState.minions.length > 0) {
           const res = playerMinionAttacks(
             monsterState.healthMax,
-            startOfTurnMinions,
+            playerState.minions,
           );
           hp = monsterState.damageHealth(res.totalHPDamage);
           sanity = monsterState.damageSanity(res.totalSanityDamage);
@@ -293,52 +347,6 @@ const DungeonLevelScreen = observer(() => {
     }
   }
 
-  function playerMinionAttacks(enemyMaxHP: number, providedMinions: Minion[]) {
-    let totalHPDamage = 0;
-    let totalSanityDamage = 0;
-    let debuffs: Condition[] = [];
-    if (playerState && providedMinions.length > 0) {
-      providedMinions.forEach((minion) => {
-        if (minion.turnsLeftAlive <= 0) {
-          playerState.removeMinion(minion);
-        } else {
-          const res = minion.attack(enemyMaxHP);
-          if (res == "miss") {
-            battleLogger(
-              `${playerState.getFullName()}'s ${toTitleCase(
-                minion.creatureSpecies,
-              )} missed!`,
-            );
-          } else {
-            let str = `${playerState.getFullName()}'s ${toTitleCase(
-              minion.creatureSpecies,
-            )} used ${toTitleCase(res.name)} dealing ${res.damage} damage`;
-            totalHPDamage += res.damage;
-            if (res.heal && res.heal > 0) {
-              str += ` and healed for ${res.heal} damage`;
-            }
-            if (res.sanityDamage > 0) {
-              str += ` and ${res.sanityDamage} sanity damage`;
-              totalSanityDamage += res.sanityDamage;
-            }
-            if (res.debuffs) {
-              res.debuffs.forEach((effect) => {
-                str += ` and applied a ${effect.name} stack`;
-                debuffs.push(effect);
-              });
-            }
-            battleLogger(str);
-          }
-        }
-      });
-    }
-    return {
-      totalHPDamage: totalHPDamage,
-      totalSanityDamage: totalSanityDamage,
-      debuffs: debuffs,
-    };
-  }
-
   const useSpell = (spell: {
     name: string;
     element: string;
@@ -353,30 +361,41 @@ const DungeonLevelScreen = observer(() => {
     };
   }) => {
     if (monsterState && playerState && isFocused) {
-      const startOfTurnMinions = [...playerState.minions];
       let monsterDefeated = false;
       const spellRes = playerState.useSpell(spell, monsterState.healthMax);
       let hp = monsterState.damageHealth(spellRes.damage);
       let sanity = monsterState.damageSanity(spellRes.sanityDamage);
       spellRes.debuffs?.forEach((debuff) => monsterState.addCondition(debuff));
-      let line = `You ${toTitleCase(spell.name)}${
-        spell.name.charAt(spell.name.length - 1) == "e" ? "d" : "ed"
-      } the ${toTitleCase(monsterState.creatureSpecies)} for ${
-        spellRes.damage
-      } heath damage`;
-      if (spellRes.sanityDamage) {
-        line += ` and ${spellRes.sanityDamage} sanity damage`;
-      }
-      if (spellRes.debuffs) {
-        spellRes.debuffs.forEach(
-          (effect) => (line += ` and applied a ${effect.name} stack`),
-        );
+      let line = "";
+      if (spell.effects.summon) {
+        let summons = spell.effects.summon.map((summon) => toTitleCase(summon));
+        if (summons.length > 1) {
+          let last = summons[summons.length - 1];
+          let others = summons.slice(0, summons.length - 1);
+          line = `You summoned ${others.join(", ")} and ${toTitleCase(last)}`;
+        } else if (summons.length === 1) {
+          line = `You summoned ${summons[0]}`;
+        }
+      } else {
+        line = `You ${toTitleCase(spell.name)}${
+          spell.name.charAt(spell.name.length - 1) == "e" ? "d" : "ed"
+        } the ${toTitleCase(monsterState.creatureSpecies)} for ${
+          spellRes.damage
+        } heath damage`;
+        if (spellRes.sanityDamage) {
+          line += ` and ${spellRes.sanityDamage} sanity damage`;
+        }
+        if (spellRes.debuffs) {
+          spellRes.debuffs.forEach(
+            (effect) => (line += ` and applied a ${effect.name} stack`),
+          );
+        }
       }
       battleLogger(line);
-      if (startOfTurnMinions.length > 0) {
+      if (playerState.minions.length > 0) {
         const res = playerMinionAttacks(
           monsterState.healthMax,
-          startOfTurnMinions,
+          playerState.minions,
         );
         hp = monsterState.damageHealth(res.totalHPDamage);
         sanity = monsterState.damageSanity(res.totalSanityDamage);
@@ -407,6 +426,91 @@ const DungeonLevelScreen = observer(() => {
     }
   };
 
+  function playerMinionAttacks(enemyMaxHP: number, providedMinions: Minion[]) {
+    let totalHPDamage = 0;
+    let totalSanityDamage = 0;
+    let debuffs: Condition[] = [];
+    if (playerState && providedMinions.length > 0) {
+      providedMinions.forEach((minion) => {
+        const res = minion.attack(enemyMaxHP);
+        if (res == "miss") {
+          battleLogger(
+            `${playerState.getFullName()}'s ${toTitleCase(
+              minion.creatureSpecies,
+            )} missed!`,
+          );
+        } else {
+          let str = `${playerState.getFullName()}'s ${toTitleCase(
+            minion.creatureSpecies,
+          )} used ${toTitleCase(res.name)} dealing ${res.damage} damage`;
+          totalHPDamage += res.damage;
+          if (res.heal && res.heal > 0) {
+            str += ` and healed for ${res.heal} damage`;
+          }
+          if (res.sanityDamage > 0) {
+            str += ` and ${res.sanityDamage} sanity damage`;
+            totalSanityDamage += res.sanityDamage;
+          }
+          if (res.debuffs) {
+            res.debuffs.forEach((effect) => {
+              str += ` and applied a ${effect.name} stack`;
+              debuffs.push(effect);
+            });
+          }
+          battleLogger(str);
+        }
+        if (minion.turnsLeftAlive <= 0) {
+          playerState.removeMinion(minion);
+        }
+      });
+    }
+    return {
+      totalHPDamage: totalHPDamage,
+      totalSanityDamage: totalSanityDamage,
+      debuffs: debuffs,
+    };
+  }
+
+  const pass = () => {
+    if (monsterState && playerState && isFocused) {
+      let monsterDefeated = false;
+      playerState.pass();
+      let hp: number | undefined = undefined;
+      let sanity: number | undefined = undefined;
+      battleLogger("You passed!");
+      if (playerState.minions.length > 0) {
+        const res = playerMinionAttacks(
+          monsterState.healthMax,
+          playerState.minions,
+        );
+        hp = monsterState.damageHealth(res.totalHPDamage);
+        sanity = monsterState.damageSanity(res.totalSanityDamage);
+        res.debuffs.forEach((debuff) => monsterState.addCondition(debuff));
+      }
+      if ((hp && hp <= 0) || (sanity && sanity <= 0)) {
+        if (thisDungeon?.level != 0) {
+          thisDungeon?.incrementStep();
+        }
+        battleLogger(
+          `You defeated the ${toTitleCase(monsterState.creatureSpecies)}`,
+        );
+        monsterDefeated = true;
+        const drops = monsterState.getDrops(playerState.playerClass);
+        playerState.addGold(drops.gold);
+        setDroppedItems(drops);
+        if (fightingBoss && gameState && thisDungeon) {
+          setFightingBoss(false);
+          thisDungeon.setBossDefeated();
+          gameState.openNextDungeonLevel(thisInstance!.name);
+        }
+        setMonster(null);
+      }
+      if (!monsterDefeated) {
+        enemyTurn();
+      }
+    }
+  };
+
   while (!monsterState) {
     return (
       <View>
@@ -420,12 +524,78 @@ const DungeonLevelScreen = observer(() => {
       <>
         <Stack.Screen
           options={{
+            headerLeft: () => (
+              <Pressable
+                onPress={() => {
+                  setFleeRollFailure(false);
+                  setFleeModalShowing(true);
+                }}
+              >
+                {({ pressed }) => (
+                  <MaterialCommunityIcons
+                    name="run-fast"
+                    size={28}
+                    color={colorScheme == "light" ? "#18181b" : "#fafafa"}
+                    style={{ opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+            ),
             title:
               level == 0
                 ? "Training Grounds"
                 : `${toTitleCase(thisInstance?.name as string)} Level ${level}`,
           }}
         />
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={fleeModalShowing}
+          onRequestClose={() => setFleeModalShowing(false)}
+        >
+          <NonThemedView className="flex-1 items-center justify-center">
+            <View
+              className=" w-2/3 rounded-xl bg-zinc-50 px-6 py-4 dark:border dark:border-zinc-50 dark:bg-zinc-700"
+              style={{
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 5,
+              }}
+            >
+              <Pressable
+                className="-ml-2 -mt-2"
+                onPress={() => {
+                  setFleeModalShowing(false);
+                  setFleeRollFailure(false);
+                }}
+              >
+                <AntDesign
+                  name="close"
+                  size={28}
+                  color={colorScheme == "dark" ? "#fafafa" : "#18181b"}
+                />
+              </Pressable>
+              <View className="flex items-center justify-evenly">
+                <Text className="text-center text-lg">Attempt to Flee?</Text>
+                <Pressable
+                  onPress={flee}
+                  className="mb-4 mt-8 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+                >
+                  <Text className="text-lg">Run!</Text>
+                </Pressable>
+                {fleeRollFailure ? (
+                  <Text className="text-center" style={{ color: "#ef4444" }}>
+                    Roll Failure!
+                  </Text>
+                ) : null}
+              </View>
+            </View>
+          </NonThemedView>
+        </Modal>
         <Modal
           animationType="slide"
           transparent={true}
@@ -538,6 +708,7 @@ const DungeonLevelScreen = observer(() => {
                 useAttack={useAttack}
                 battleTab={battleTab}
                 useSpell={useSpell}
+                pass={pass}
               />
             </View>
             <View className="">

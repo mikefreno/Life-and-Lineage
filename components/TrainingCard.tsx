@@ -13,10 +13,17 @@ interface TrainingCardProps {
   ticks: number;
   goldCostPerTick: number;
   sanityCostPerTick: number;
+  preRequisites: string[] | null;
 }
 
 const TrainingCard = observer(
-  ({ name, ticks, goldCostPerTick, sanityCostPerTick }: TrainingCardProps) => {
+  ({
+    name,
+    ticks,
+    goldCostPerTick,
+    sanityCostPerTick,
+    preRequisites,
+  }: TrainingCardProps) => {
     const { colorScheme } = useColorScheme();
     const playerCharacterData = useContext(PlayerCharacterContext);
     const gameData = useContext(GameContext);
@@ -85,7 +92,10 @@ const TrainingCard = observer(
           {!playerState?.qualifications.includes(name) ? (
             <>
               <Pressable
-                disabled={playerState.gold < goldCostPerTick}
+                disabled={
+                  playerState.gold < goldCostPerTick ||
+                  !playerState.hasAllPreReqs(preRequisites)
+                }
                 className="mb-2 mt-4 active:scale-95 active:opacity-50"
                 onPress={progressQualification}
               >
@@ -97,20 +107,29 @@ const TrainingCard = observer(
                       width: 0,
                       height: 1,
                     },
-                    backgroundColor:
-                      colorScheme == "light" ? "white" : "#71717a",
+                    backgroundColor: playerState.hasAllPreReqs(preRequisites)
+                      ? colorScheme == "light"
+                        ? "white"
+                        : "#71717a"
+                      : colorScheme == "light"
+                      ? "#fafafa"
+                      : "#3f3f46",
                     shadowOpacity: 0.1,
                     shadowRadius: 5,
                   }}
                 >
                   <View className="px-8 py-4">
                     <Text className="text-center text-zinc-900 dark:text-zinc-50">
-                      Study
+                      {playerState.hasAllPreReqs(preRequisites)
+                        ? "Study"
+                        : "Locked"}
                     </Text>
                   </View>
                 </View>
               </Pressable>
-              <ProgressBar value={experience ?? 0} maxValue={ticks} />
+              {playerState.hasAllPreReqs(preRequisites) ? (
+                <ProgressBar value={experience ?? 0} maxValue={ticks} />
+              ) : null}
             </>
           ) : (
             <Text>Completed!</Text>

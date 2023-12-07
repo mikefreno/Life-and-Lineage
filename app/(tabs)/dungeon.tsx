@@ -106,11 +106,15 @@ export default function DungeonScreen() {
                     {dungeonInstance.levels.map((level, levelIdx) => (
                       <Pressable
                         key={levelIdx}
-                        onPress={() =>
-                          router.push(
+                        onPress={() => {
+                          router.back();
+                          router.back();
+                          router.back();
+                          router.back();
+                          router.replace(
                             `/DungeonLevel/${dungeonInstance.instance}/${level.level}`,
-                          )
-                        }
+                          );
+                        }}
                         className="active:scale-95 active:opacity-50"
                       >
                         <View

@@ -47,7 +47,9 @@ export default function DeathScreen() {
             className="py-8 text-center text-3xl font-bold"
             style={{ letterSpacing: 3, color: "#ef4444" }}
           >
-            {getDeathMessage()}
+            {playerState.sanity > -50
+              ? getDeathMessage()
+              : "You have gone insane"}
           </Text>
           {playerState.children.length > 0 ? (
             <>

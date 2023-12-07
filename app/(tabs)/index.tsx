@@ -1,16 +1,12 @@
-import { Pressable, Image } from "react-native";
+import { Pressable, Image, StyleSheet } from "react-native";
 import { View, Text, ScrollView } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
-import {
-  calculateAge,
-  damageReduction,
-  toTitleCase,
-} from "../../utility/functions";
+import { calculateAge, toTitleCase } from "../../utility/functions";
 import ProgressBar from "../../components/ProgressBar";
 import PlayerStatus from "../../components/PlayerStatus";
 import { elementalColorMap } from "../../utility/elementColors";
 import { Item } from "../../classes/item";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import Necromancer from "../../assets/icons/NecromancerSkull";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
 import blessingDisplay from "../../components/BlessingsDisplay";
@@ -19,6 +15,7 @@ import SpellDetails from "../../components/SpellDetails";
 import { GameContext, PlayerCharacterContext } from "../_layout";
 import { observer } from "mobx-react-lite";
 import GearStatsDisplay from "../../components/GearStatsDisplay";
+import { AntDesign } from "@expo/vector-icons";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -70,37 +67,54 @@ const HomeScreen = observer(() => {
   function selectedItemDisplay() {
     if (selectedItem) {
       return (
-        <View className="flex items-center justify-center py-4">
-          {selectedItem.item.stats && selectedItem.item.slot ? (
-            <View className="pb-4">
-              <GearStatsDisplay stats={selectedItem.item.stats} />
-            </View>
-          ) : null}
-          <Text>{toTitleCase(selectedItem.item.name)}</Text>
-          <Image source={selectedItem.item.getItemIcon()} />
-          <Text>
-            {selectedItem.item.itemClass == "bodyArmor"
-              ? "Body Armor"
-              : toTitleCase(selectedItem.item.itemClass)}
-          </Text>
-          {selectedItem.item.slot ? (
-            <Text className="">
-              Fills {toTitleCase(selectedItem.item.slot)} Slot
+        <>
+          <Pressable
+            className="-ml-2 -mt-2"
+            onPress={() => {
+              setSelectedSpell(null);
+              setSelectedItem(null);
+            }}
+          >
+            <AntDesign
+              name="close"
+              size={28}
+              color={colorScheme == "dark" ? "#fafafa" : "#18181b"}
+            />
+          </Pressable>
+          <View className="flex items-center justify-center py-4">
+            {selectedItem.item.stats && selectedItem.item.slot ? (
+              <View className="pb-4">
+                <GearStatsDisplay stats={selectedItem.item.stats} />
+              </View>
+            ) : null}
+            <Text className="text-center">
+              {toTitleCase(selectedItem.item.name)}
             </Text>
-          ) : null}
-          {selectedItem.item.slot ? (
-            <View>
-              <Pressable
-                onPress={() => moveBetweenEquippedStates()}
-                className={`bg-blue-400 my-4 rounded-lg  active:scale-95 active:opacity-50`}
-              >
-                <Text className="px-6 py-4" style={{ color: "white" }}>
-                  {selectedItem.equipped ? "Unequip" : `Equip`}
-                </Text>
-              </Pressable>
-            </View>
-          ) : null}
-        </View>
+            <Image source={selectedItem.item.getItemIcon()} />
+            <Text>
+              {selectedItem.item.itemClass == "bodyArmor"
+                ? "Body Armor"
+                : toTitleCase(selectedItem.item.itemClass)}
+            </Text>
+            {selectedItem.item.slot ? (
+              <Text className="">
+                Fills {toTitleCase(selectedItem.item.slot)} Slot
+              </Text>
+            ) : null}
+            {selectedItem.item.slot ? (
+              <View>
+                <Pressable
+                  onPress={() => moveBetweenEquippedStates()}
+                  className={`bg-blue-400 my-4 rounded-lg  active:scale-95 active:opacity-50`}
+                >
+                  <Text className="px-6 py-4" style={{ color: "white" }}>
+                    {selectedItem.equipped ? "Unequip" : `Equip`}
+                  </Text>
+                </Pressable>
+              </View>
+            ) : null}
+          </View>
+        </>
       );
     } else {
       return <View className="flex h-1/3 items-center justify-center"></View>;
@@ -120,7 +134,11 @@ const HomeScreen = observer(() => {
 
   function currentEquipmentDisplay() {
     return (
-      <View className="mr-2 flex border-r border-zinc-900 pr-2 dark:border-zinc-50">
+      <View
+        className={`${
+          selectedItem ? "mr-2 w-1/2 border-r pr-2" : "w-full"
+        } flex border-zinc-900 dark:border-zinc-50`}
+      >
         <View className="items-center">
           <Text className="mb-2">Head</Text>
           {playerState?.equipment.head ? (
@@ -144,8 +162,8 @@ const HomeScreen = observer(() => {
             </View>
           )}
         </View>
-        <View className="mt-2 flex flex-row">
-          <View className="">
+        <View className="mt-2 flex flex-row justify-evenly">
+          <View className="-ml-1 mr-2">
             <Text className="mb-2">Main Hand</Text>
             {playerState?.equipment.mainHand &&
             playerState?.equipment.mainHand.name !== "unarmored" ? (
@@ -171,7 +189,7 @@ const HomeScreen = observer(() => {
               />
             )}
           </View>
-          <View className="ml-6 mr-2">
+          <View className="">
             <Text className="mb-2">Off-Hand</Text>
             {playerState?.equipment.offHand ? (
               <Pressable
@@ -302,7 +320,7 @@ const HomeScreen = observer(() => {
         <View className="flex-1 justify-between px-4 pt-2">
           <View className="flex flex-row justify-evenly pb-4">
             {playerState?.playerClass == "necromancer" ? (
-              <View className="m-auto w-[30%]">
+              <View className="mx-auto w-[30%]">
                 <Necromancer
                   width={100}
                   height={100}
@@ -310,11 +328,11 @@ const HomeScreen = observer(() => {
                 />
               </View>
             ) : playerState?.playerClass == "paladin" ? (
-              <View className="m-auto w-[30%]">
+              <View className="mx-auto w-[30%]">
                 <PaladinHammer width={100} height={100} />
               </View>
             ) : (
-              <View className="m-auto w-[30%] scale-x-[-1] transform">
+              <View className="mx-auto w-[30%] scale-x-[-1] transform">
                 <WizardHat
                   height={100}
                   width={100}
@@ -334,25 +352,32 @@ const HomeScreen = observer(() => {
                   : "x"
               } years old`}</Text>
             </View>
-            <View className="m-auto">
+            <View className="mx-auto w-[30%]">
               {blessingDisplay(playerState.blessing, colorScheme)}
             </View>
           </View>
           <ScrollView>
-            <View className="flex flex-row">
-              {currentEquipmentDisplay()}
-              <View className="mx-auto">
-                {selectedItem ? (
-                  <View className="my-auto">{selectedItemDisplay()}</View>
-                ) : null}
+            <View style={styles.container}>
+              <View style={styles.line} />
+              <View style={styles.content}>
+                <Text className="text-lg">Inventory</Text>
               </View>
+              <View style={styles.line} />
+            </View>
+            <View className="flex flex-row pt-2">
+              {currentEquipmentDisplay()}
+              {selectedItem ? (
+                <View className="mx-auto">
+                  <View className="my-auto">{selectedItemDisplay()}</View>
+                </View>
+              ) : null}
             </View>
             {selectedSpell ? (
               <View className="my-4">
                 <SpellDetails spell={selectedSpell} />
               </View>
             ) : null}
-            <View className="pb-4">
+            <View className="mx-auto py-4">
               <Pressable onPress={() => setShowingInventory(!showingInventory)}>
                 <Image source={require("../../assets/images/items/Bag.png")} />
               </Pressable>
@@ -385,6 +410,13 @@ const HomeScreen = observer(() => {
                 )}
               </>
             ) : null}
+            <View style={styles.container}>
+              <View style={styles.line} />
+              <View style={styles.content}>
+                <Text className="text-lg">Proficiencies</Text>
+              </View>
+              <View style={styles.line} />
+            </View>
             <View className="flex items-center pb-4">
               {magicProficiencySection(magicProficiencies)}
             </View>
@@ -396,3 +428,18 @@ const HomeScreen = observer(() => {
   }
 });
 export default HomeScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  content: {
+    marginHorizontal: 10,
+  },
+  line: {
+    flex: 1,
+    borderTopWidth: 1,
+    borderTopColor: "#ccc",
+  },
+});

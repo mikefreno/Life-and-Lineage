@@ -10,6 +10,7 @@ import { useColorScheme } from "nativewind";
 
 interface BattleTabProps {
   battleTab: "attacks" | "spells" | "equipment" | "log";
+  pass: () => void;
   useAttack: (attack: {
     name: string;
     targets: string;
@@ -37,6 +38,7 @@ export default function BattleTab({
   battleTab,
   useAttack,
   useSpell,
+  pass,
 }: BattleTabProps) {
   const { colorScheme } = useColorScheme();
   const logs = useContext(LogsContext)?.logsState;
@@ -93,28 +95,50 @@ export default function BattleTab({
     switch (battleTab) {
       case "attacks":
         return (
-          <FlatList
-            data={attackObjects}
-            inverted
-            renderItem={({ item: attack }) => (
+          <>
+            <FlatList
+              data={attackObjects}
+              inverted
+              renderItem={({ item: attack }) => (
+                <View className="border-t border-zinc-800 py-2 dark:border-zinc-100">
+                  <View className="flex flex-row justify-between">
+                    <View className="flex flex-col justify-center">
+                      <Text className="text-xl">
+                        {toTitleCase(attack.name)}
+                      </Text>
+                      <Text className="text-lg">{`${
+                        attack.hitChance * 100
+                      }% hit chance`}</Text>
+                    </View>
+                    <Pressable
+                      disabled={playerState.isStunned()}
+                      onPress={() => useAttack(attack)}
+                      className="my-auto rounded bg-zinc-300 px-4 py-2 active:scale-95 active:opacity-50 dark:bg-zinc-700"
+                    >
+                      <Text className="text-xl">
+                        {playerState.isStunned() ? "Stunned!" : "Use"}
+                      </Text>
+                    </Pressable>
+                  </View>
+                </View>
+              )}
+            />
+            {playerState.isStunned() ? (
               <View className="border-t border-zinc-800 py-2 dark:border-zinc-100">
                 <View className="flex flex-row justify-between">
                   <View className="flex flex-col justify-center">
-                    <Text className="text-xl">{toTitleCase(attack.name)}</Text>
-                    <Text className="text-lg">{`${
-                      attack.hitChance * 100
-                    }% hit chance`}</Text>
+                    <Text className="text-xl">Pass</Text>
                   </View>
                   <Pressable
-                    onPress={() => useAttack(attack)}
+                    onPress={pass}
                     className="my-auto rounded bg-zinc-300 px-4 py-2 active:scale-95 active:opacity-50 dark:bg-zinc-700"
                   >
                     <Text className="text-xl">Use</Text>
                   </Pressable>
                 </View>
               </View>
-            )}
-          />
+            ) : null}
+          </>
         );
       case "spells":
         return (
@@ -128,7 +152,10 @@ export default function BattleTab({
                     <Text className="text-xl">{toTitleCase(spell.name)}</Text>
                   </View>
                   <Pressable
-                    disabled={playerState.mana <= spell.manaCost}
+                    disabled={
+                      playerState.mana <= spell.manaCost ||
+                      playerState.isStunned()
+                    }
                     onPress={() => useSpell(spell)}
                     className={`my-auto rounded  px-4 py-2 active:scale-95 active:opacity-50 ${
                       playerState.mana <= spell.manaCost
@@ -137,7 +164,9 @@ export default function BattleTab({
                     }`}
                   >
                     <Text className="text-xl">
-                      {playerState.mana <= spell.manaCost
+                      {playerState.isStunned()
+                        ? "Stunned!"
+                        : playerState.mana <= spell.manaCost
                         ? "Not Enough Mana"
                         : "Use"}
                     </Text>
@@ -177,13 +206,13 @@ export default function BattleTab({
                     ) : null}
                   </View>
                 </View>
-                <View className="flex flex-row justify-center">
+                <View className="flex flex-row justify-center pb-2">
                   <Text>{playerState.getReadableGold()}</Text>
                   <Coins width={16} height={16} style={{ marginLeft: 6 }} />
                 </View>
               </View>
             ) : (
-              <View className="flex-1 justify-between">
+              <View className="flex-1 justify-between pb-2">
                 <Text className="py-8 text-center italic">
                   Inventory is currently empty
                 </Text>

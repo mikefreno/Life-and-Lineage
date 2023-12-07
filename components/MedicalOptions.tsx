@@ -11,6 +11,7 @@ import {
   PlayerCharacterContext,
 } from "../app/_layout";
 import { useContext } from "react";
+import { fullSave } from "../utility/functions";
 
 interface MedicalOptionProps {
   title: string;
@@ -31,12 +32,9 @@ export default function MedicalOption({
 }: MedicalOptionProps) {
   const playerCharacterData = useContext(PlayerCharacterContext);
   const gameData = useContext(GameContext);
-  const monsterData = useContext(MonsterContext);
-  if (!playerCharacterData || !gameData || !monsterData)
-    throw new Error("missing context");
+  if (!playerCharacterData || !gameData) throw new Error("missing context");
   const { playerState } = playerCharacterData;
   const { gameState } = gameData;
-  const { setMonster } = monsterData;
   const { colorScheme } = useColorScheme();
   const isFocused = useIsFocused();
 
@@ -50,7 +48,7 @@ export default function MedicalOption({
         removeDebuffs,
       );
       gameState.gameTick();
-      setMonster(null);
+      fullSave(gameState, playerState);
     }
   }
 

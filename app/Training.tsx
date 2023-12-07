@@ -25,6 +25,7 @@ const JobTraining = observer(() => {
                   ticks={qual.ticks}
                   sanityCostPerTick={qual.sanityCostPerTick}
                   goldCostPerTick={qual.goldCostPerTick}
+                  preRequisites={qual.prerequisites}
                 />
               );
             })}

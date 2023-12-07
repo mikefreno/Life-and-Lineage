@@ -329,6 +329,8 @@ export class PlayerCharacter extends Character {
       clearMinions: action,
       removeMinion: action,
       getMedicalService: action,
+      isStunned: action,
+      pass: action,
     });
   }
   //----------------------------------Health----------------------------------//
@@ -711,6 +713,17 @@ export class PlayerCharacter extends Character {
       ?.progress;
     return found;
   }
+  public hasAllPreReqs(preReqs: string[] | null) {
+    let hasAll = true;
+    if (preReqs) {
+      preReqs.forEach((preReq) => {
+        if (!this.qualifications.includes(preReq)) {
+          hasAll = false;
+        }
+      });
+    }
+    return hasAll;
+  }
   //----------------------------------Spells----------------------------------//
 
   public learnSpellStep(bookName: string, spell: string, element: string) {
@@ -821,6 +834,12 @@ export class PlayerCharacter extends Character {
       this.conditions.push(condition);
     }
   }
+  public isStunned() {
+    const exists = this.conditions.find(
+      (condition) => condition.name == "stun",
+    );
+    return exists ? true : false;
+  }
   private removeDebuffs(amount: number) {
     for (let i = 0; i < amount; i++) {
       this.conditions.shift();
@@ -842,6 +861,11 @@ export class PlayerCharacter extends Character {
         this.physicalAttacks = itemObj.attacks;
       }
     }
+  }
+
+  public pass() {
+    this.regenMana();
+    this.conditionTicker();
   }
 
   public doPhysicalAttack(

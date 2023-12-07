@@ -39,8 +39,8 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "fire"
-                      ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : null
+                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                      : "scale-90"
                   } px-6 py-4`}
                 >
                   <NonThemedView className="mx-auto">
@@ -69,8 +69,8 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "water"
-                      ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : null
+                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                      : "scale-90"
                   } px-6 py-4`}
                 >
                   <NonThemedView className="mx-auto">
@@ -101,8 +101,8 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "air"
-                      ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : null
+                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                      : "scale-90"
                   } px-6 py-4`}
                 >
                   <NonThemedView className="mx-auto">
@@ -131,8 +131,8 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "earth"
-                      ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : null
+                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                      : "scale-90"
                   } px-6 py-4`}
                 >
                   <NonThemedView className="mx-auto">
@@ -169,8 +169,8 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "summoning"
-                      ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : null
+                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                      : "scale-90"
                   } px-2 py-4`}
                 >
                   <NonThemedView className="mx-auto">
@@ -200,8 +200,8 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "pestilence"
-                      ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : null
+                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                      : "scale-90"
                   } px-2 py-4`}
                 >
                   <NonThemedView className="mx-auto">
@@ -233,8 +233,8 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "bone"
-                      ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : null
+                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                      : "scale-90"
                   } px-2 py-4`}
                 >
                   <NonThemedView className="mx-auto">
@@ -264,8 +264,8 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "blood"
-                      ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : null
+                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                      : "scale-90"
                   } px-2 py-4`}
                 >
                   <NonThemedView className="mx-auto">
@@ -301,8 +301,8 @@ export default function SetBlessing() {
               <NonThemedView
                 className={`${
                   pressed || blessing == "holy"
-                    ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                    : null
+                    ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                    : "scale-90"
                 } px-6 py-4`}
               >
                 <NonThemedView className="mx-auto">
@@ -332,8 +332,8 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "vengeance"
-                      ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : null
+                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                      : "scale-90"
                   } px-2 py-4`}
                 >
                   <NonThemedView className="mx-auto">
@@ -362,8 +362,8 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "protection"
-                      ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : null
+                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                      : "scale-90"
                   } px-2 py-4`}
                 >
                   <NonThemedView className="mx-auto">
@@ -414,7 +414,7 @@ export default function SetBlessing() {
                 {({ pressed }) => (
                   <NonThemedView
                     className={`rounded-lg bg-blue-400 px-8 py-4 dark:bg-blue-800 ${
-                      pressed ? "scale-95 opacity-30" : null
+                      pressed ? "scale-95 opacity-30" : "scale-95"
                     }`}
                   >
                     <Text style={{ color: "white" }} className="text-2xl">

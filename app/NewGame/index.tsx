@@ -1,22 +1,18 @@
 import { Pressable, useColorScheme } from "react-native";
-import { Text, View, SafeAreaView, ScrollView } from "../../components/Themed";
+import { Text, View, ScrollView } from "../../components/Themed";
 import { View as NonThemedView } from "react-native";
 import "../../assets/styles/globals.css";
-import { Dispatch, SetStateAction, useContext, useState } from "react";
+import { useState } from "react";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import { Stack, router } from "expo-router";
 import Necromancer from "../../assets/icons/NecromancerSkull";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
-import { PlayerCharacterContext } from "../_layout";
-import { PlayerCharacter } from "../../classes/character";
 
 export default function NewGameScreen() {
   const [selectedClass, setSelectedClass] = useState<
     "mage" | "necromancer" | "paladin"
   >();
   const colorScheme = useColorScheme();
-
-  const playerCharacterData = useContext(PlayerCharacterContext);
 
   return (
     <>
@@ -42,8 +38,8 @@ export default function NewGameScreen() {
                 <NonThemedView
                   className={`${
                     pressed || selectedClass == "mage"
-                      ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : null
+                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                      : "scale-90"
                   } px-6 py-4`}
                 >
                   <WizardHat
@@ -78,8 +74,8 @@ export default function NewGameScreen() {
                   <NonThemedView
                     className={`${
                       pressed || selectedClass == "necromancer"
-                        ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                        : null
+                        ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                        : "scale-90"
                     } px-6 py-4`}
                   >
                     <NonThemedView className="-rotate-12">
@@ -109,8 +105,8 @@ export default function NewGameScreen() {
                   <NonThemedView
                     className={`${
                       pressed || selectedClass == "paladin"
-                        ? "scale-110 rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                        : null
+                        ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
+                        : "scale-90"
                     } px-8 py-4`}
                   >
                     <NonThemedView className="rotate-12">

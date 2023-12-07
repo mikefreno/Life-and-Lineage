@@ -8,6 +8,7 @@ interface ProgressBarProps {
   borderColor?: string;
   filledColor?: string;
   unfilledColor?: string;
+  textColor?: string;
 }
 
 const ProgressBar = ({
@@ -17,6 +18,7 @@ const ProgressBar = ({
   borderColor,
   filledColor = "#007BFF",
   unfilledColor = "#f3f3f3",
+  textColor = "#fff",
 }: ProgressBarProps) => {
   const width = ((value - minValue) / (maxValue - minValue)) * 100;
 
@@ -37,11 +39,22 @@ const ProgressBar = ({
           {
             width: width < 5 ? "5%" : `${width}%`,
             backgroundColor: filledColor,
+            position: "absolute",
           },
         ]}
       >
-        <View className={`${Platform.OS === "android" ? "-mt-0.5" : ""}`}>
-          <Text style={[styles.label, { marginTop: borderColor ? -1 : 0 }]}>
+        <View
+          className={`${
+            Platform.OS === "android" ? "-mt-0.5" : ""
+          } mx-auto flex-1 flex-wrap overflow-visible`}
+        >
+          <Text
+            style={{
+              marginTop: borderColor ? -1 : 0,
+              fontSize: 12,
+              color: textColor,
+            }}
+          >
             {value}
           </Text>
         </View>
@@ -63,9 +76,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 50,
-  },
-  label: {
-    color: "#fff",
-    fontSize: 12,
   },
 });
