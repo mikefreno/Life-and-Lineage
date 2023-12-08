@@ -331,6 +331,7 @@ export class PlayerCharacter extends Character {
       getMedicalService: action,
       isStunned: action,
       pass: action,
+      conditionTicker: action,
     });
   }
   //----------------------------------Health----------------------------------//
@@ -852,6 +853,23 @@ export class PlayerCharacter extends Character {
     );
     return exists ? true : false;
   }
+  public conditionTicker() {
+    for (let i = this.conditions.length - 1; i >= 0; i--) {
+      const { effect, damage, turns } = this.conditions[i].tick();
+
+      effect.forEach((eff) => {
+        if (eff == "sanity") {
+          this.damageSanity(damage);
+        } else if (eff == "damage") {
+          this.damageHealth(damage);
+        }
+      });
+
+      if (turns == 0) {
+        this.conditions.splice(i, 1);
+      }
+    }
+  }
   private removeDebuffs(amount: number) {
     for (let i = 0; i < amount; i++) {
       this.conditions.shift();
@@ -1054,23 +1072,7 @@ export class PlayerCharacter extends Character {
     this.minions.push(minion);
   }
   //----------------------------------Conditions----------------------------------//
-  private conditionTicker() {
-    for (let i = this.conditions.length - 1; i >= 0; i--) {
-      const { effect, damage, turns } = this.conditions[i].tick();
 
-      effect.forEach((eff) => {
-        if (eff == "sanity") {
-          this.damageSanity(damage);
-        } else if (eff == "damage") {
-          this.damageHealth(damage);
-        }
-      });
-
-      if (turns == 0) {
-        this.conditions.splice(i, 1);
-      }
-    }
-  }
   //----------------------------------Misc----------------------------------//
   public getMedicalService(
     cost: number,

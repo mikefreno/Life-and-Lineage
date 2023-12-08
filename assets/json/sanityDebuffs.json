@@ -13,7 +13,7 @@
       "turns": 3,
       "effect": ["sanity"],
       "effectStyle": "flat",
-      "effectAmount": -5
+      "effectAmount": 5
    },
    {
       "name": "shock",

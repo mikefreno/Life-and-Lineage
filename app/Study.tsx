@@ -72,7 +72,7 @@ export default function LearningSpellsScreen() {
     if (playerState && gameState && isFocused) {
       playerState.learnSpellStep(bookName, spellName, spellElement);
       setSpellState(playerState.learningSpells);
-      gameState.gameTick();
+      gameState.gameTick(playerState);
       fullSave(gameState, playerState);
     }
   }

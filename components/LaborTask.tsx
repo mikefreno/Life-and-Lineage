@@ -58,7 +58,7 @@ const LaborTask = observer(
           cost: cost,
           goldReward: reward,
         });
-        gameState.gameTick();
+        gameState.gameTick(playerState);
         setExperience(playerState.getJobExperience(title));
         setMonster(null);
       }

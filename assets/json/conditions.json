@@ -69,7 +69,7 @@
       "turns": 5,
       "effect": ["sanity"],
       "effectStyle": "flat",
-      "effectAmount": -1
+      "effectAmount": 2
    },
    {
       "name": "lasting heal",

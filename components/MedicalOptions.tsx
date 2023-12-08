@@ -47,7 +47,7 @@ export default function MedicalOption({
         manaRestore,
         removeDebuffs,
       );
-      gameState.gameTick();
+      gameState.gameTick(playerState);
       fullSave(gameState, playerState);
     }
   }

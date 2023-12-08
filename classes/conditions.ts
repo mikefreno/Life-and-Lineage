@@ -1,6 +1,8 @@
 import { action, makeObservable, observable } from "mobx";
+import { v4 as uuidv4 } from "uuid";
 
 interface ConditionOptions {
+  id?: string;
   name: string;
   style: "debuff" | "buff";
   turns: number;
@@ -16,6 +18,7 @@ interface ConditionOptions {
 }
 
 export class Condition {
+  readonly id: string;
   readonly name: string;
   readonly style: "debuff" | "buff";
   turns: number;
@@ -29,7 +32,8 @@ export class Condition {
   )[];
   readonly damage: number | null;
 
-  constructor({ name, style, turns, effect, damage }: ConditionOptions) {
+  constructor({ name, style, turns, effect, damage, id }: ConditionOptions) {
+    this.id = id ?? uuidv4();
     this.name = name;
     this.style = style;
     this.turns = turns;
@@ -48,6 +52,7 @@ export class Condition {
   }
   static fromJSON(json: any): Condition {
     const condition = new Condition({
+      id: json.id,
       name: json.name,
       style: json.style,
       turns: json.turns,

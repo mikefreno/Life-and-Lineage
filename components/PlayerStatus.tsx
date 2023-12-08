@@ -1,6 +1,6 @@
 import ProgressBar from "./ProgressBar";
 import { View, Text } from "./Themed";
-import { View as NonThemedView } from "react-native";
+import { View as NonThemedView, ScrollView } from "react-native";
 import Coins from "../assets/icons/CoinsIcon";
 import { useContext, useEffect, useState } from "react";
 import { PlayerCharacterContext } from "../app/_layout";
@@ -8,6 +8,8 @@ import { observer } from "mobx-react-lite";
 import { useFonts } from "expo-font";
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { rollD20 } from "../utility/functions";
+import { Condition } from "../classes/conditions";
 
 interface PlayerStatusOptions {
   displayGoldBottom?: boolean;
@@ -45,9 +47,43 @@ const PlayerStatus = observer(
       }
     }, [playerState?.sanity, playerState?.health]);
 
+    useEffect(() => {}, [playerState?.sanity]);
+
     useEffect(() => {
       setReadableGold(playerState?.getReadableGold());
     }, [playerState?.gold]);
+
+    function conditionRenderer() {
+      if (playerState) {
+        const conditionMap = new Map<string, number>();
+        playerState.conditions.forEach((condition) => {
+          if (conditionMap.has(condition.name)) {
+            let value = conditionMap.get(condition.name);
+            if (value) {
+              conditionMap.set(condition.name, value + 1);
+            }
+          } else {
+            conditionMap.set(condition.name, 1);
+          }
+        });
+        const conditionObject = Object.fromEntries(conditionMap);
+
+        return (
+          <ScrollView horizontal>
+            <View className="my-1 flex flex-row justify-around">
+              {Object.entries(conditionObject).map(([key, value]) => (
+                <View key={key} className="mx-2 flex align-middle">
+                  <NonThemedView className="mx-auto w-2 rounded-md bg-zinc-200 p-2" />
+                  <Text>
+                    {key} x {value}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+        );
+      }
+    }
 
     if (playerState) {
       return (
@@ -62,6 +98,7 @@ const PlayerStatus = observer(
               <Coins width={16} height={16} style={{ marginLeft: 6 }} />
             </View>
           ) : null}
+          {!onTop ? conditionRenderer() : null}
           <View className="flex flex-row justify-evenly">
             <View className="flex w-[31%]">
               <Text className="mx-auto" style={{ color: "#ef4444" }}>
@@ -98,6 +135,7 @@ const PlayerStatus = observer(
               />
             </View>
           </View>
+          {onTop ? conditionRenderer() : null}
           {displayGoldBottom ? (
             <View className="flex flex-row justify-center pt-2">
               <Text>{readableGold}</Text>

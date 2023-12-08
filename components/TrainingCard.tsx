@@ -48,7 +48,7 @@ const TrainingCard = observer(
         sanityCostPerTick,
         goldCostPerTick,
       );
-      gameState.gameTick();
+      gameState.gameTick(playerState);
       fullSave(gameState, playerState);
     };
 

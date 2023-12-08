@@ -184,6 +184,7 @@ const DungeonLevelScreen = observer(() => {
         const sanity = monsterState.damageSanity(res.totalSanityDamage);
         res.debuffs.forEach((debuff) => monsterState.addCondition(debuff));
         if (hp <= 0 || (sanity && sanity <= 0)) {
+          gameState?.gameTick(playerState);
           if (thisDungeon?.level != 0) {
             thisDungeon?.incrementStep();
           }
@@ -323,9 +324,11 @@ const DungeonLevelScreen = observer(() => {
           res.debuffs.forEach((debuff) => monsterState.addCondition(debuff));
         }
         if (hp <= 0 || (sanity && sanity <= 0)) {
+          gameState?.gameTick(playerState);
           if (thisDungeon?.level != 0) {
             thisDungeon?.incrementStep();
           }
+
           battleLogger(
             `You defeated the ${toTitleCase(monsterState.creatureSpecies)}`,
           );
@@ -406,7 +409,7 @@ const DungeonLevelScreen = observer(() => {
         res.debuffs.forEach((debuff) => monsterState.addCondition(debuff));
       }
       if (hp <= 0 || (sanity && sanity <= 0)) {
-        gameState.gameTick();
+        gameState.gameTick(playerState);
         if (thisDungeon?.level != 0) {
           thisDungeon?.incrementStep();
         }

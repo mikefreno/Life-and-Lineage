@@ -2,6 +2,8 @@ import { DungeonInstance, DungeonLevel } from "./dungeon";
 import { Shop } from "./shop";
 import dungeons from "../assets/json/dungeons.json";
 import { action, makeObservable, observable } from "mobx";
+import { PlayerCharacter } from "./character";
+import { lowSanityDebuffGenerator } from "../utility/functions";
 
 interface GameOptions {
   date?: string;
@@ -76,10 +78,14 @@ export class Game {
   }
 
   //----------------------------------Date----------------------------------//
-  public gameTick() {
+  public gameTick(playerState: PlayerCharacter) {
     const dateObject = new Date(this.date);
     dateObject.setDate(dateObject.getDate() + 7);
     this.date = dateObject.toISOString();
+    if (playerState.sanity < 0) {
+      lowSanityDebuffGenerator(playerState);
+    }
+    playerState.conditionTicker();
   }
   //----------------------------------Dungeon----------------------------------//
   public getDungeon(instance: string, level: number): DungeonLevel | undefined {

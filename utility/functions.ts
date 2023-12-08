@@ -6,6 +6,7 @@ import conditions from "../assets/json/conditions.json";
 import { Shop, generateInventory } from "../classes/shop";
 import { Condition } from "../classes/conditions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import sanityDebuffs from "../assets/json/sanityDebuffs.json";
 
 export const storeData = async (key: string, value: any) => {
   try {
@@ -140,6 +141,37 @@ export function damageReduction(armorValue: number) {
   } else {
     const reduction = 92.5 * (1 - Math.exp(-0.01 * armorValue));
     return Math.min(reduction, 92.5) / 100;
+  }
+}
+
+export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
+  if (playerState && playerState.sanity < 0) {
+    const roll = rollD20();
+    if (roll >= 16) {
+      const debuffObj =
+        sanityDebuffs[Math.floor(Math.random() * sanityDebuffs.length)];
+
+      let damage = debuffObj.effectAmount;
+      if (damage && debuffObj.effectStyle == "percentage") {
+        damage *= playerState.getMaxHealth();
+      }
+
+      const debuff = new Condition({
+        name: debuffObj.name,
+        style: "debuff",
+        turns: debuffObj.turns,
+        effect: debuffObj.effect as (
+          | "damage"
+          | "sanity"
+          | "skip"
+          | "health"
+          | "accuracy halved"
+          | "armor"
+        )[],
+        damage: damage ?? 0,
+      });
+      playerState.addCondition(debuff);
+    }
   }
 }
 
