@@ -23,7 +23,7 @@ import {
   PlayerCharacterContext,
 } from "../_layout";
 import { observer } from "mobx-react-lite";
-import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
+import { EvilIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 
 const DungeonLevelScreen = observer(() => {
@@ -161,11 +161,15 @@ const DungeonLevelScreen = observer(() => {
       playerState &&
       (roll == "Heads" || monsterState?.creatureSpecies == "training dummy")
     ) {
-      setFleeRollFailure(false);
-      playerState.clearMinions();
-      setMonster(null);
-      setFleeModalShowing(false);
       router.push("/dungeon");
+      setFleeRollFailure(false);
+      setTimeout(() => {
+        setFleeModalShowing(false);
+      }, 300);
+      setTimeout(() => {
+        playerState.clearMinions();
+        setMonster(null);
+      }, 300);
     } else {
       setFleeRollFailure(true);
       battleLogger("You failed to flee!");
@@ -573,7 +577,7 @@ const DungeonLevelScreen = observer(() => {
                   setFleeRollFailure(false);
                 }}
               >
-                <AntDesign
+                <EvilIcons
                   name="close"
                   size={28}
                   color={colorScheme == "dark" ? "#fafafa" : "#18181b"}

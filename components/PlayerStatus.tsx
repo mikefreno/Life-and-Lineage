@@ -38,6 +38,9 @@ const PlayerStatus = observer(
         playerState &&
         (playerState.sanity <= -50 || playerState.health <= 0)
       ) {
+        while (router.canGoBack()) {
+          router.back();
+        }
         router.replace("/DeathScreen");
       }
     }, [playerState?.sanity, playerState?.health]);

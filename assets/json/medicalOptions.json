@@ -17,7 +17,7 @@
    {
       "serviceName": "Pray",
       "cost": 0,
-      "sanityRestore": 5
+      "sanityRestore": 10
    },
    {
       "serviceName": "Meditate On The Elements",

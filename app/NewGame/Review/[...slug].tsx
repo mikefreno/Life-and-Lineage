@@ -44,6 +44,9 @@ export default function NewGameReview() {
   ) {
     throw new Error("missing context setters");
   }
+  const gameData = useContext(GameContext);
+  if (!gameData) throw new Error("missing contexts");
+  const { gameState } = gameData;
 
   function getRandomJobTitle(): string {
     const randomIndex = Math.floor(Math.random() * jobs.length);
@@ -146,16 +149,18 @@ export default function NewGameReview() {
         playerClass as "mage" | "paladin" | "necromancer",
       );
       const newGame = new Game({ date: startDate, shops: shops });
+      const colorScheme = gameState?.colorScheme;
+      if (colorScheme) {
+        newGame.setColorScheme(colorScheme);
+      }
       gameDataSetter(newGame);
       logsSetter([]);
       monsterSetter(null);
       await fullSave(newGame, player);
 
-      router.back();
-      router.back();
-      router.back();
-      router.back();
-      router.back();
+      while (router.canGoBack()) {
+        router.back();
+      }
 
       router.replace("/");
     }

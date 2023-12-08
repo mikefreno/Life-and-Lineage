@@ -5,10 +5,16 @@ import { router } from "expo-router";
 
 export default function SettingsScreen() {
   const fastStart = () => {
+    while (router.canGoBack()) {
+      router.back();
+    }
     router.push("/NewGame/Review/necromancer/male/Vim/God/summoning");
   };
 
   const startNewGame = () => {
+    while (router.canGoBack()) {
+      router.back();
+    }
     router.push("/NewGame");
   };
 

@@ -8,11 +8,7 @@ import { Stack } from "expo-router";
 const JobTraining = observer(() => {
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: "Gain Qualifications",
-        }}
-      />
+      <Stack.Screen options={{ title: "Gain Qualifications" }} />
       <View className="flex-1">
         <PlayerStatus displayGoldBottom={true} onTop={true} />
         <ScrollView>

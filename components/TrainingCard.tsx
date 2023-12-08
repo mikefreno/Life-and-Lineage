@@ -4,7 +4,8 @@ import { useContext, useEffect, useState } from "react";
 import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import Coins from "../assets/icons/CoinsIcon";
 import Sanity from "../assets/icons/SanityIcon";
-import { Pressable, View, Text } from "react-native";
+import { Pressable, View } from "react-native";
+import { Text } from "../components/Themed";
 import ProgressBar from "./ProgressBar";
 import { fullSave, toTitleCase } from "../utility/functions";
 
@@ -91,45 +92,56 @@ const TrainingCard = observer(
           </View>
           {!playerState?.qualifications.includes(name) ? (
             <>
-              <Pressable
-                disabled={
-                  playerState.gold < goldCostPerTick ||
-                  !playerState.hasAllPreReqs(preRequisites)
-                }
-                className="mb-2 mt-4 active:scale-95 active:opacity-50"
-                onPress={progressQualification}
-              >
-                <View
-                  className="mx-auto rounded-xl"
-                  style={{
-                    shadowColor: "#000",
-                    shadowOffset: {
-                      width: 0,
-                      height: 1,
-                    },
-                    backgroundColor: playerState.hasAllPreReqs(preRequisites)
-                      ? colorScheme == "light"
-                        ? "white"
-                        : "#71717a"
-                      : colorScheme == "light"
-                      ? "#fafafa"
-                      : "#3f3f46",
-                    shadowOpacity: 0.1,
-                    shadowRadius: 5,
-                  }}
+              {playerState.hasAllPreReqs(preRequisites) ? (
+                <Pressable
+                  disabled={
+                    playerState.gold < goldCostPerTick ||
+                    !playerState.hasAllPreReqs(preRequisites)
+                  }
+                  className="mb-2 mt-4 active:scale-95 active:opacity-50"
+                  onPress={progressQualification}
                 >
-                  <View className="px-8 py-4">
-                    <Text className="text-center text-zinc-900 dark:text-zinc-50">
-                      {playerState.hasAllPreReqs(preRequisites)
-                        ? "Study"
-                        : "Locked"}
-                    </Text>
+                  <View
+                    className="mx-auto rounded-xl"
+                    style={{
+                      shadowColor: "#000",
+                      shadowOffset: {
+                        width: 0,
+                        height: 1,
+                      },
+                      backgroundColor: playerState.hasAllPreReqs(preRequisites)
+                        ? colorScheme == "light"
+                          ? "white"
+                          : "#71717a"
+                        : colorScheme == "light"
+                        ? "#fafafa"
+                        : "#3f3f46",
+                      shadowOpacity: 0.1,
+                      shadowRadius: 5,
+                    }}
+                  >
+                    <View className="px-8 py-4">
+                      <Text className="text-center text-zinc-900 dark:text-zinc-50">
+                        {playerState.hasAllPreReqs(preRequisites)
+                          ? "Study"
+                          : "Locked"}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </Pressable>
+                </Pressable>
+              ) : null}
               {playerState.hasAllPreReqs(preRequisites) ? (
                 <ProgressBar value={experience ?? 0} maxValue={ticks} />
-              ) : null}
+              ) : (
+                <View className="flex items-center">
+                  <Text className="text-lg">Missing:</Text>
+                  {playerState.missingPreReqs(preRequisites)?.map((missing) => (
+                    <Text key={missing} className="py-1">
+                      {toTitleCase(missing)}
+                    </Text>
+                  ))}
+                </View>
+              )}
             </>
           ) : (
             <Text>Completed!</Text>

@@ -724,6 +724,18 @@ export class PlayerCharacter extends Character {
     }
     return hasAll;
   }
+  public missingPreReqs(preReqs: string[] | null) {
+    if (preReqs) {
+      let missing: string[] = [];
+      preReqs.forEach((preReq) => {
+        if (!this.qualifications.includes(preReq)) {
+          missing.push(preReq);
+        }
+      });
+      return missing.length > 0 ? missing : null;
+    }
+    return null;
+  }
   //----------------------------------Spells----------------------------------//
 
   public learnSpellStep(bookName: string, spell: string, element: string) {

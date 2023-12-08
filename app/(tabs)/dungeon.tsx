@@ -73,7 +73,7 @@ export default function DungeonScreen() {
   if (gameData) {
     return (
       <>
-        <PlayerStatus />
+        <PlayerStatus onTop={true} />
         <View className="h-full px-4">
           <View className="-mx-4 border-b border-zinc-300 py-4 dark:border-zinc-600">
             <Text className=" px-4 text-center text-2xl">
@@ -107,10 +107,9 @@ export default function DungeonScreen() {
                       <Pressable
                         key={levelIdx}
                         onPress={() => {
-                          router.back();
-                          router.back();
-                          router.back();
-                          router.back();
+                          while (router.canGoBack()) {
+                            router.back();
+                          }
                           router.replace(
                             `/DungeonLevel/${dungeonInstance.instance}/${level.level}`,
                           );

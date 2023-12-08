@@ -153,6 +153,9 @@ const RootLayout = () => {
         (playerCharacter &&
           (playerCharacter.health <= 0 || playerCharacter.sanity <= -50))
       ) {
+        while (router.canGoBack()) {
+          router.back();
+        }
         router.replace("/DeathScreen");
       }
     }
@@ -162,9 +165,8 @@ const RootLayout = () => {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="Settings" />
+        <Stack.Screen name="Settings" options={{ presentation: "modal" }} />
         <Stack.Screen name="Study" options={{ presentation: "modal" }} />
-        <Stack.Screen name="Training" options={{ presentation: "modal" }} />
         <Stack.Screen name="Crafting" options={{ presentation: "modal" }} />
         <Stack.Screen
           name="Relationships"

@@ -1,4 +1,9 @@
-import { Pressable, Image, StyleSheet } from "react-native";
+import {
+  Pressable,
+  Image,
+  StyleSheet,
+  View as NonThemedView,
+} from "react-native";
 import { View, Text, ScrollView } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import { calculateAge, toTitleCase } from "../../utility/functions";
@@ -15,7 +20,7 @@ import SpellDetails from "../../components/SpellDetails";
 import { GameContext, PlayerCharacterContext } from "../_layout";
 import { observer } from "mobx-react-lite";
 import GearStatsDisplay from "../../components/GearStatsDisplay";
-import { AntDesign } from "@expo/vector-icons";
+import { EvilIcons } from "@expo/vector-icons";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -68,52 +73,54 @@ const HomeScreen = observer(() => {
     if (selectedItem) {
       return (
         <>
-          <Pressable
-            className="-ml-2 -mt-2"
-            onPress={() => {
-              setSelectedSpell(null);
-              setSelectedItem(null);
-            }}
-          >
-            <AntDesign
-              name="close"
-              size={28}
-              color={colorScheme == "dark" ? "#fafafa" : "#18181b"}
-            />
-          </Pressable>
-          <View className="flex items-center justify-center py-4">
-            {selectedItem.item.stats && selectedItem.item.slot ? (
-              <View className="pb-4">
-                <GearStatsDisplay stats={selectedItem.item.stats} />
-              </View>
-            ) : null}
-            <Text className="text-center">
-              {toTitleCase(selectedItem.item.name)}
-            </Text>
-            <Image source={selectedItem.item.getItemIcon()} />
-            <Text>
-              {selectedItem.item.itemClass == "bodyArmor"
-                ? "Body Armor"
-                : toTitleCase(selectedItem.item.itemClass)}
-            </Text>
-            {selectedItem.item.slot ? (
-              <Text className="">
-                Fills {toTitleCase(selectedItem.item.slot)} Slot
+          <NonThemedView className="mx-auto my-auto max-w-[40%]">
+            <Pressable
+              className="-ml-2 -mt-2"
+              onPress={() => {
+                setSelectedSpell(null);
+                setSelectedItem(null);
+              }}
+            >
+              <EvilIcons
+                name="close"
+                size={28}
+                color={colorScheme == "dark" ? "#fafafa" : "#18181b"}
+              />
+            </Pressable>
+            <View className="flex w-full flex-wrap items-center justify-center py-4">
+              {selectedItem.item.stats && selectedItem.item.slot ? (
+                <View className="pb-4">
+                  <GearStatsDisplay stats={selectedItem.item.stats} />
+                </View>
+              ) : null}
+              <Text className="text-center">
+                {toTitleCase(selectedItem.item.name)}
               </Text>
-            ) : null}
-            {selectedItem.item.slot ? (
-              <View>
-                <Pressable
-                  onPress={() => moveBetweenEquippedStates()}
-                  className={`bg-blue-400 my-4 rounded-lg  active:scale-95 active:opacity-50`}
-                >
-                  <Text className="px-6 py-4" style={{ color: "white" }}>
-                    {selectedItem.equipped ? "Unequip" : `Equip`}
-                  </Text>
-                </Pressable>
-              </View>
-            ) : null}
-          </View>
+              <Image source={selectedItem.item.getItemIcon()} />
+              <Text>
+                {selectedItem.item.itemClass == "bodyArmor"
+                  ? "Body Armor"
+                  : toTitleCase(selectedItem.item.itemClass)}
+              </Text>
+              {selectedItem.item.slot ? (
+                <Text className="">
+                  Fills {toTitleCase(selectedItem.item.slot)} Slot
+                </Text>
+              ) : null}
+              {selectedItem.item.slot ? (
+                <View>
+                  <Pressable
+                    onPress={() => moveBetweenEquippedStates()}
+                    className={`bg-blue-400 my-4 rounded-lg  active:scale-95 active:opacity-50`}
+                  >
+                    <Text className="px-6 py-4" style={{ color: "white" }}>
+                      {selectedItem.equipped ? "Unequip" : `Equip`}
+                    </Text>
+                  </Pressable>
+                </View>
+              ) : null}
+            </View>
+          </NonThemedView>
         </>
       );
     } else {
@@ -137,7 +144,7 @@ const HomeScreen = observer(() => {
       <View
         className={`${
           selectedItem ? "mr-2 w-1/2 border-r pr-2" : "w-full"
-        } flex border-zinc-900 dark:border-zinc-50`}
+        } flex border-[#ccc]`}
       >
         <View className="items-center">
           <Text className="mb-2">Head</Text>
@@ -366,11 +373,7 @@ const HomeScreen = observer(() => {
             </View>
             <View className="flex flex-row pt-2">
               {currentEquipmentDisplay()}
-              {selectedItem ? (
-                <View className="mx-auto">
-                  <View className="my-auto">{selectedItemDisplay()}</View>
-                </View>
-              ) : null}
+              {selectedItem ? selectedItemDisplay() : null}
             </View>
             {selectedSpell ? (
               <View className="my-4">

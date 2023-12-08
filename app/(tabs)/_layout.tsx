@@ -1,4 +1,4 @@
-import { Link, Tabs } from "expo-router";
+import { Link, Stack, Tabs } from "expo-router";
 import { Platform, Pressable } from "react-native";
 import Colors from "../../constants/Colors";
 import Cauldron from "../../assets/icons/CauldronIcon";
@@ -136,12 +136,12 @@ export default function TabLayout() {
               />
             ),
             headerRight: () => (
-              <Link href="/Training" asChild>
+              <Link href="/training" asChild>
                 <Pressable>
                   {({ pressed }) => (
                     <GraduationCapIcon
                       width={28}
-                      height={26}
+                      height={28}
                       color={colorScheme == "dark" ? "#f4f4f5" : "#27272a"}
                       style={{
                         marginRight: 15,

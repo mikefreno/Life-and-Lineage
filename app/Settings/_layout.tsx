@@ -19,7 +19,7 @@ export default function SettingsLayout() {
         }}
       />
       <Tabs.Screen
-        name="index"
+        name="game"
         options={{
           headerShown: false,
           title: "Game Settings",

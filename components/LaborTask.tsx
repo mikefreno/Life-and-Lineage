@@ -23,10 +23,17 @@ interface LaborTaskProps {
     health?: number;
   };
   experienceToPromote: number;
+  applyToJob: (title: string) => void;
 }
 
 const LaborTask = observer(
-  ({ title, reward, cost, experienceToPromote }: LaborTaskProps) => {
+  ({
+    title,
+    reward,
+    cost,
+    experienceToPromote,
+    applyToJob,
+  }: LaborTaskProps) => {
     const playerCharacterData = useContext(PlayerCharacterContext);
     const gameData = useContext(GameContext);
     const monsterData = useContext(MonsterContext);
@@ -43,12 +50,6 @@ const LaborTask = observer(
     const isFocused = useIsFocused();
 
     const { colorScheme } = useColorScheme();
-
-    function setJob() {
-      if (playerState && gameState) {
-        playerState.setJob(title);
-      }
-    }
 
     function work() {
       if (playerState && gameState && isFocused) {
@@ -144,7 +145,7 @@ const LaborTask = observer(
           ) : (
             <Pressable
               className="mb-2 mt-4 active:scale-95 active:opacity-50"
-              onPress={setJob}
+              onPress={() => applyToJob(title)}
             >
               <View
                 className="mx-auto rounded-xl"
