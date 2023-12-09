@@ -690,7 +690,7 @@ export class PlayerCharacter extends Character {
         foundQual = true;
         this.damageSanity(sanityCost);
         this.spendGold(goldCost);
-        if (ticksToProgress > qual.progress) {
+        if (ticksToProgress > qual.progress + 1) {
           qual.progress++;
         } else {
           qual.completed = true;

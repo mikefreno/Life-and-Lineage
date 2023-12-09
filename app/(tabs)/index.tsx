@@ -324,30 +324,30 @@ const HomeScreen = observer(() => {
 
     return (
       <>
-        <View className="flex-1 justify-between px-4 pt-2">
-          <View className="flex flex-row justify-evenly pb-4">
+        <View className="flex-1 px-4 pt-2">
+          <View className="flex flex-row pb-4">
             {playerState?.playerClass == "necromancer" ? (
-              <View className="mx-auto w-[30%]">
+              <NonThemedView className="mx-auto">
                 <Necromancer
                   width={100}
                   height={100}
                   color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
                 />
-              </View>
+              </NonThemedView>
             ) : playerState?.playerClass == "paladin" ? (
-              <View className="mx-auto w-[30%]">
+              <NonThemedView className="mx-auto">
                 <PaladinHammer width={100} height={100} />
-              </View>
+              </NonThemedView>
             ) : (
-              <View className="mx-auto w-[30%] scale-x-[-1] transform">
+              <NonThemedView className="mx-auto scale-x-[-1] transform">
                 <WizardHat
                   height={100}
                   width={100}
                   color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
                 />
-              </View>
+              </NonThemedView>
             )}
-            <View className="mx-auto flex w-[40%] flex-col pt-2">
+            <NonThemedView className="mx-2 flex-1 flex-col justify-center pt-2 align-middle">
               <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
               <Text className="text-center text-xl dark:text-white">{`${playerState.job}`}</Text>
               <Text className="text-center text-xl dark:text-white">{`${
@@ -358,10 +358,10 @@ const HomeScreen = observer(() => {
                     )
                   : "x"
               } years old`}</Text>
-            </View>
-            <View className="mx-auto w-[30%]">
+            </NonThemedView>
+            <NonThemedView className="mx-auto">
               {blessingDisplay(playerState.blessing, colorScheme)}
-            </View>
+            </NonThemedView>
           </View>
           <ScrollView>
             <View style={styles.container}>

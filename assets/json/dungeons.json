@@ -4,17 +4,17 @@
      "levels": [
        {
          "level": 1,
-         "stepsBeforeBoss": 25,
+         "stepsBeforeBoss": 10,
          "boss": ["zombie"]
        },
        {
          "level": 2,
-         "stepsBeforeBoss": 25,
+         "stepsBeforeBoss": 10,
          "boss": ["zombie"]
        },
        {
          "level": 3,
-         "stepsBeforeBoss": 25,
+         "stepsBeforeBoss": 15,
          "boss": ["necromancer"]
        }
      ]
@@ -24,12 +24,12 @@
      "levels": [
        {
          "level": 1,
-         "stepsBeforeBoss": 20,
+         "stepsBeforeBoss": 10,
          "boss": ["hobgoblin"]
        },
        {
          "level": 2,
-         "stepsBeforeBoss": 30,
+         "stepsBeforeBoss": 15,
          "boss": ["goblin shaman"]
        }
      ]
@@ -39,12 +39,12 @@
      "levels": [
        {
          "level": 1,
-         "stepsBeforeBoss": 20,
+         "stepsBeforeBoss": 10,
          "boss": ["bandit", "bandit"]
        },
        {
          "level": 2,
-         "stepsBeforeBoss": 30,
+         "stepsBeforeBoss": 10,
          "boss": ["bandit boss", "bandit"]
        }
      ]

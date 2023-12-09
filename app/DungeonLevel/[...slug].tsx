@@ -165,11 +165,11 @@ const DungeonLevelScreen = observer(() => {
       setFleeRollFailure(false);
       setTimeout(() => {
         setFleeModalShowing(false);
-      }, 300);
+      }, 100);
       setTimeout(() => {
         playerState.clearMinions();
         setMonster(null);
-      }, 300);
+      }, 200);
     } else {
       setFleeRollFailure(true);
       battleLogger("You failed to flee!");
@@ -220,17 +220,11 @@ const DungeonLevelScreen = observer(() => {
         enemyAttackRes.attack !== "stun" &&
         enemyAttackRes.attack !== "pass"
       ) {
-        const hp = playerState.damageHealth(enemyAttackRes.attack.damage);
-        const sanity = playerState.damageSanity(
-          enemyAttackRes.attack.sanityDamage,
-        );
+        playerState.damageHealth(enemyAttackRes.attack.damage);
+        playerState.damageSanity(enemyAttackRes.attack.sanityDamage);
         enemyAttackRes.attack.debuffs?.forEach((debuff) =>
           playerState.addCondition(debuff),
         );
-        if (hp <= 0 || sanity <= 0) {
-          router.back();
-          router.replace("/DeathScreen");
-        }
         let array = [];
         let line = `The ${toTitleCase(monsterState.creatureSpecies)} used ${
           enemyAttackRes.attack.name

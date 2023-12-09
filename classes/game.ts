@@ -49,7 +49,7 @@ export class Game {
           new DungeonLevel({
             level: 1,
             bosses: ["zombie"],
-            stepsBeforeBoss: 25,
+            stepsBeforeBoss: 10,
             bossDefeated: false,
           }),
         ],
