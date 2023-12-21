@@ -1,7 +1,7 @@
 import React from "react";
 import Svg, { Path } from "react-native-svg";
 
-const Sword = ({ color = "#000", secondaryOpacity = 0.4, ...props }) => (
+const Sword = ({ color = "#71717a", secondaryOpacity = 0.4, ...props }) => (
   <Svg viewBox="0 0 512 512" {...props}>
     <Path
       d="M511.598 18.285L495.725 112.029L244.992 362.76L149 266.768L399.73 16.035L493.475 0.162C503.973 -1.338 513.098 7.787 511.598 18.285Z"

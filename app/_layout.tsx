@@ -147,7 +147,7 @@ const RootLayout = () => {
     if (loaded) {
       SplashScreen.hideAsync();
       if (!playerCharacter || !game) {
-        router.push("/NewGame");
+        router.replace("/NewGame");
       } else if (
         gameData?.gameState?.atDeathScreen ||
         (playerCharacter &&
@@ -165,7 +165,7 @@ const RootLayout = () => {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="Settings" options={{ presentation: "modal" }} />
+        <Stack.Screen name="Options" options={{ presentation: "modal" }} />
         <Stack.Screen name="Study" options={{ presentation: "modal" }} />
         <Stack.Screen name="Crafting" options={{ presentation: "modal" }} />
         <Stack.Screen

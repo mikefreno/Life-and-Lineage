@@ -1,158 +1,86 @@
 import {
   Pressable,
   Image,
-  StyleSheet,
   View as NonThemedView,
+  Animated,
 } from "react-native";
-import { View, Text, ScrollView } from "../../components/Themed";
+import { View, Text } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import { calculateAge, toTitleCase } from "../../utility/functions";
-import ProgressBar from "../../components/ProgressBar";
 import PlayerStatus from "../../components/PlayerStatus";
-import { elementalColorMap } from "../../utility/elementColors";
 import { Item } from "../../classes/item";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Necromancer from "../../assets/icons/NecromancerSkull";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
 import blessingDisplay from "../../components/BlessingsDisplay";
 import { useColorScheme } from "nativewind";
-import SpellDetails from "../../components/SpellDetails";
 import { GameContext, PlayerCharacterContext } from "../_layout";
 import { observer } from "mobx-react-lite";
 import GearStatsDisplay from "../../components/GearStatsDisplay";
-import { EvilIcons } from "@expo/vector-icons";
+import Draggable from "react-native-draggable";
+import { router } from "expo-router";
+import { useVibration } from "../../utility/customHooks";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
   const [showingInventory, setShowingInventory] = useState<boolean>(false);
-  const [selectedItem, setSelectedItem] = useState<{
-    item: Item;
-    equipped: "mainHand" | "offHand" | "body" | "head" | null;
-  } | null>(null);
-  const [selectedSpell, setSelectedSpell] = useState<{
-    name: string;
-    element: string;
-    proficiencyNeeded: number;
-    manaCost: number;
-    effects: {
-      damage: number | null;
-      buffs: string[] | null;
-      debuffs:
-        | {
-            name: string;
-            chance: number;
-          }[]
-        | null;
-      summon?: string[] | undefined;
-      selfDamage?: number | undefined;
-    };
-  } | null>(null);
-
+  const topTranslationValue = useRef(
+    new Animated.Value(showingInventory ? -124 : 0),
+  ).current;
+  const bottomTranslationValue = useRef(
+    new Animated.Value(showingInventory ? 72 : 0),
+  ).current;
   const playerStateData = useContext(PlayerCharacterContext);
   const gameData = useContext(GameContext);
+
+  const headTarget = useRef<NonThemedView>(null);
+  const bodyTarget = useRef<NonThemedView>(null);
+  const mainHandTarget = useRef<NonThemedView>(null);
+  const offHandTarget = useRef<NonThemedView>(null);
+
   if (!playerStateData || !gameData) throw new Error("missing contexts");
   const { playerState } = playerStateData;
   const { gameState } = gameData;
+  const vibration = useVibration();
 
-  function displaySetter(
-    item: Item | null,
-    equipped: "mainHand" | "offHand" | "body" | "head" | null,
-  ) {
-    if (item) {
-      setSelectedItem({ item: item, equipped: equipped });
-      if (item.itemClass == "book" && playerState) {
-        const spell = item.getAttachedSpell(playerState.playerClass);
-        setSelectedSpell(spell);
-      } else {
-        setSelectedSpell(null);
-      }
-    }
+  //animation
+  useEffect(() => {
+    Animated.spring(topTranslationValue, {
+      toValue: showingInventory ? -126 : 0,
+      useNativeDriver: true,
+    }).start();
+    Animated.spring(bottomTranslationValue, {
+      toValue: showingInventory ? 72 : 0,
+      useNativeDriver: true,
+    }).start();
+  }, [showingInventory]);
+
+  useEffect(() => {}, [showingInventory]);
+
+  interface checkReleasePositonProps {
+    item: Item;
+    draggable: NonThemedView | null;
+    size: number;
   }
-
-  function selectedItemDisplay() {
-    if (selectedItem) {
-      return (
-        <>
-          <NonThemedView className="mx-auto my-auto max-w-[40%]">
-            <Pressable
-              className="-ml-2 -mt-2"
-              onPress={() => {
-                setSelectedSpell(null);
-                setSelectedItem(null);
-              }}
-            >
-              <EvilIcons
-                name="close"
-                size={28}
-                color={colorScheme == "dark" ? "#fafafa" : "#18181b"}
-              />
-            </Pressable>
-            <View className="flex w-full flex-wrap items-center justify-center py-4">
-              {selectedItem.item.stats && selectedItem.item.slot ? (
-                <View className="pb-4">
-                  <GearStatsDisplay stats={selectedItem.item.stats} />
-                </View>
-              ) : null}
-              <Text className="text-center">
-                {toTitleCase(selectedItem.item.name)}
-              </Text>
-              <Image source={selectedItem.item.getItemIcon()} />
-              <Text>
-                {selectedItem.item.itemClass == "bodyArmor"
-                  ? "Body Armor"
-                  : toTitleCase(selectedItem.item.itemClass)}
-              </Text>
-              {selectedItem.item.slot ? (
-                <Text className="">
-                  Fills {toTitleCase(selectedItem.item.slot)} Slot
-                </Text>
-              ) : null}
-              {selectedItem.item.slot ? (
-                <View>
-                  <Pressable
-                    onPress={() => moveBetweenEquippedStates()}
-                    className={`bg-blue-400 my-4 rounded-lg  active:scale-95 active:opacity-50`}
-                  >
-                    <Text className="px-6 py-4" style={{ color: "white" }}>
-                      {selectedItem.equipped ? "Unequip" : `Equip`}
-                    </Text>
-                  </Pressable>
-                </View>
-              ) : null}
-            </View>
-          </NonThemedView>
-        </>
-      );
-    } else {
-      return <View className="flex h-1/3 items-center justify-center"></View>;
-    }
-  }
-
-  function moveBetweenEquippedStates() {
-    if (playerState) {
-      if (selectedItem && selectedItem.equipped) {
-        playerState?.removeEquipment(selectedItem.equipped);
-      } else if (selectedItem) {
-        playerState?.equipItem(selectedItem.item);
-      }
-      setSelectedItem(null);
+  function checkReleasePositon({
+    item,
+    draggable,
+    size,
+  }: checkReleasePositonProps) {
+    if (draggable) {
+      draggable.measure((x, y, width, height, pageX, pageY) => {
+        console.log(x);
+      });
     }
   }
 
   function currentEquipmentDisplay() {
     return (
-      <View
-        className={`${
-          selectedItem ? "mr-2 w-1/2 border-r pr-2" : "w-full"
-        } flex border-[#ccc]`}
-      >
+      <View className={`flex border-[#ccc] w-full`}>
         <View className="items-center">
           <Text className="mb-2">Head</Text>
           {playerState?.equipment.head ? (
-            <Pressable
-              className="w-1/4 items-center active:scale-90 active:opacity-50"
-              onPress={() => displaySetter(playerState?.equipment.head, "head")}
-            >
+            <Pressable className="w-1/4 items-center active:scale-90 active:opacity-50">
               <View
                 className="rounded-lg p-1.5"
                 style={{ backgroundColor: "#a1a1aa" }}
@@ -169,17 +97,12 @@ const HomeScreen = observer(() => {
             </View>
           )}
         </View>
-        <View className="mt-2 flex flex-row justify-evenly">
+        <View className="flex flex-row justify-evenly">
           <View className="-ml-1 mr-2">
             <Text className="mb-2">Main Hand</Text>
             {playerState?.equipment.mainHand &&
             playerState?.equipment.mainHand.name !== "unarmored" ? (
-              <Pressable
-                className="mx-auto w-1/4 items-center active:scale-90 active:opacity-50"
-                onPress={() =>
-                  displaySetter(playerState?.equipment.mainHand, "mainHand")
-                }
-              >
+              <Pressable className="mx-auto w-1/4 items-center active:scale-90 active:opacity-50">
                 <View
                   className="rounded-lg p-1.5"
                   style={{ backgroundColor: "#a1a1aa" }}
@@ -196,15 +119,10 @@ const HomeScreen = observer(() => {
               />
             )}
           </View>
-          <View className="">
+          <View>
             <Text className="mb-2">Off-Hand</Text>
             {playerState?.equipment.offHand ? (
-              <Pressable
-                className="mx-auto w-1/4 items-center active:scale-90 active:opacity-50"
-                onPress={() =>
-                  displaySetter(playerState?.equipment.offHand, "offHand")
-                }
-              >
+              <Pressable className="mx-auto w-1/4 items-center active:scale-90 active:opacity-50">
                 <View
                   className="rounded-lg p-1.5"
                   style={{ backgroundColor: "#a1a1aa" }}
@@ -215,12 +133,7 @@ const HomeScreen = observer(() => {
                 </View>
               </Pressable>
             ) : playerState?.equipment.mainHand.slot == "two-hand" ? (
-              <Pressable
-                className="mx-auto w-1/4 items-center active:scale-90 active:opacity-50"
-                onPress={() =>
-                  displaySetter(playerState?.equipment.mainHand, "offHand")
-                }
-              >
+              <Pressable className="mx-auto w-1/4 items-center active:scale-90 active:opacity-50">
                 <View
                   className="rounded-lg p-1.5"
                   style={{ backgroundColor: "#a1a1aa" }}
@@ -242,10 +155,7 @@ const HomeScreen = observer(() => {
         <View className="mx-auto items-center">
           <Text className="mb-2">Body</Text>
           {playerState?.equipment.body ? (
-            <Pressable
-              className="w-1/4 items-center active:scale-90 active:opacity-50"
-              onPress={() => displaySetter(playerState?.equipment.body, "body")}
-            >
+            <Pressable className="w-1/4 items-center active:scale-90 active:opacity-50">
               <View
                 className="rounded-lg p-1.5"
                 style={{ backgroundColor: "#a1a1aa" }}
@@ -263,149 +173,174 @@ const HomeScreen = observer(() => {
           )}
         </View>
         {playerState ? (
-          <View className="my-2">
+          <NonThemedView className="my-2">
             <GearStatsDisplay stats={playerState.getCurrentEquipmentStats()} />
-          </View>
+          </NonThemedView>
         ) : null}
       </View>
     );
   }
 
-  function magicProficiencySection(
-    proficiencies: {
-      school: string;
-      proficiency: number;
-    }[],
-  ) {
-    return proficiencies.map((magicProficiency, idx) => {
-      const color =
-        elementalColorMap[
-          magicProficiency.school as
-            | "fire"
-            | "water"
-            | "air"
-            | "earth"
-            | "blood"
-            | "summoning"
-            | "pestilence"
-            | "bone"
-            | "holy"
-            | "vengeance"
-            | "protection"
-        ];
-      return (
-        <View className="my-4 flex w-full flex-col" key={idx}>
-          <Text
-            className="mx-auto"
-            style={{
-              color:
-                magicProficiency.school == "air" && colorScheme == "light"
-                  ? "#71717a"
-                  : color.dark,
-            }}
-          >
-            {magicProficiency.school}
-          </Text>
-          <ProgressBar
-            value={magicProficiency.proficiency}
-            maxValue={500}
-            unfilledColor={color.light}
-            filledColor={color.dark}
-            borderColor={color.dark}
-          />
-        </View>
-      );
-    });
+  interface ItemRenderProps {
+    item: Item;
   }
+  const ItemRender = ({ item }: ItemRenderProps) => {
+    const [showingStats, setShowingStats] = useState(false);
+    const [buzzed, setBuzzed] = useState(false);
+    const localRef = useRef<NonThemedView>(null);
+
+    const handlePress = () => {
+      vibration({ style: "light" });
+      setShowingStats((prevShowingStats) => !prevShowingStats);
+    };
+
+    return (
+      <NonThemedView className="h-20" ref={localRef}>
+        <Draggable
+          onDragRelease={() => {
+            checkReleasePositon({
+              item: item,
+              draggable: localRef.current,
+              size: 48,
+            });
+            setBuzzed(false);
+          }}
+          onDrag={() => {
+            if (!buzzed) {
+              vibration({ style: "heavy", essential: true });
+              setBuzzed(true);
+            }
+          }}
+          shouldReverse
+        >
+          <NonThemedView className="flex flex-row">
+            <Pressable
+              className="m-2 items-center active:scale-90 active:opacity-50"
+              onPress={handlePress}
+            >
+              <View
+                className="rounded-lg p-2"
+                style={{ backgroundColor: "#a1a1aa" }}
+              >
+                <Image source={item.getItemIcon()} />
+              </View>
+            </Pressable>
+            {showingStats ? (
+              <View
+                className="absolute flex items-center rounded-md border border-zinc-600 px-4 py-2 shadow-lg"
+                style={{ marginTop: -10, marginLeft: 56, zIndex: 1 }}
+              >
+                <View style={{ width: 80 }}>
+                  <Text className="text-center">{toTitleCase(item.name)}</Text>
+                </View>
+                {item.stats && item.slot ? (
+                  <View className="py-2">
+                    <GearStatsDisplay stats={item.stats} />
+                  </View>
+                ) : null}
+                <Text className="text-sm italic">
+                  {item.itemClass == "bodyArmor"
+                    ? "Body Armor"
+                    : toTitleCase(item.itemClass)}
+                </Text>
+                {item.itemClass == "book" ? (
+                  <Pressable
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      router.push("/Study");
+                    }}
+                    className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                  >
+                    <Text>Study This Book</Text>
+                  </Pressable>
+                ) : null}
+              </View>
+            ) : null}
+          </NonThemedView>
+        </Draggable>
+      </NonThemedView>
+    );
+  };
 
   if (playerState && gameState) {
     const name = playerState.getFullName();
-    const magicProficiencies = playerState.magicProficiencies;
 
     return (
-      <>
-        <View className="flex-1 px-4 pt-2">
-          <View className="flex flex-row pb-4">
-            {playerState?.playerClass == "necromancer" ? (
+      <View className="flex-1">
+        <Animated.View
+          style={{
+            transform: [{ translateY: topTranslationValue }],
+            flex: 1,
+            paddingHorizontal: 16,
+            paddingTop: 8,
+          }}
+        >
+          <View className="-mx-4 border-b dark:border-zinc-600">
+            <View className="mx-4 flex-row pb-4">
+              {playerState?.playerClass == "necromancer" ? (
+                <NonThemedView className="mx-auto">
+                  <Necromancer
+                    width={100}
+                    height={100}
+                    color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
+                  />
+                </NonThemedView>
+              ) : playerState?.playerClass == "paladin" ? (
+                <NonThemedView className="mx-auto">
+                  <PaladinHammer width={100} height={100} />
+                </NonThemedView>
+              ) : (
+                <NonThemedView className="mx-auto scale-x-[-1] transform">
+                  <WizardHat
+                    height={100}
+                    width={100}
+                    color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
+                  />
+                </NonThemedView>
+              )}
+              <NonThemedView className="mx-2 flex-1 flex-col justify-center pt-2 align-middle">
+                <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
+                <Text className="text-center text-xl dark:text-white">{`${playerState.job}`}</Text>
+                <Text className="text-center text-xl dark:text-white">{`${
+                  playerState
+                    ? calculateAge(
+                        new Date(playerState.birthdate),
+                        new Date(gameState.date),
+                      )
+                    : "x"
+                } years old`}</Text>
+              </NonThemedView>
               <NonThemedView className="mx-auto">
-                <Necromancer
-                  width={100}
-                  height={100}
-                  color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
-                />
+                {blessingDisplay(playerState.blessing, colorScheme)}
               </NonThemedView>
-            ) : playerState?.playerClass == "paladin" ? (
-              <NonThemedView className="mx-auto">
-                <PaladinHammer width={100} height={100} />
-              </NonThemedView>
-            ) : (
-              <NonThemedView className="mx-auto scale-x-[-1] transform">
-                <WizardHat
-                  height={100}
-                  width={100}
-                  color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
-                />
-              </NonThemedView>
-            )}
-            <NonThemedView className="mx-2 flex-1 flex-col justify-center pt-2 align-middle">
-              <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
-              <Text className="text-center text-xl dark:text-white">{`${playerState.job}`}</Text>
-              <Text className="text-center text-xl dark:text-white">{`${
-                playerState
-                  ? calculateAge(
-                      new Date(playerState.birthdate),
-                      new Date(gameState.date),
-                    )
-                  : "x"
-              } years old`}</Text>
-            </NonThemedView>
-            <NonThemedView className="mx-auto">
-              {blessingDisplay(playerState.blessing, colorScheme)}
-            </NonThemedView>
-          </View>
-          <ScrollView>
-            <View style={styles.container}>
-              <View style={styles.line} />
-              <View style={styles.content}>
-                <Text className="text-lg">Inventory</Text>
-              </View>
-              <View style={styles.line} />
             </View>
+          </View>
+          <View>
             <View className="flex flex-row pt-2">
               {currentEquipmentDisplay()}
-              {selectedItem ? selectedItemDisplay() : null}
             </View>
-            {selectedSpell ? (
-              <View className="my-4">
-                <SpellDetails spell={selectedSpell} />
-              </View>
-            ) : null}
-            <View className="mx-auto py-4">
-              <Pressable onPress={() => setShowingInventory(!showingInventory)}>
-                <Image source={require("../../assets/images/items/Bag.png")} />
+            <View className="py-2">
+              <Pressable
+                style={{ width: 55 }}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  setShowingInventory(!showingInventory);
+                }}
+              >
+                <Image
+                  source={require("../../assets/images/items/Bag.png")}
+                  style={{ width: 50, height: 50 }}
+                />
               </Pressable>
             </View>
             {showingInventory ? (
               <>
                 {playerState.inventory.length > 0 ? (
-                  <ScrollView horizontal>
-                    <View className="my-auto max-h-64 flex-wrap justify-around">
-                      {playerState.inventory.map((item) => (
-                        <Pressable
-                          key={item.id}
-                          className="m-2 items-center active:scale-90 active:opacity-50"
-                          onPress={() => displaySetter(item, null)}
-                        >
-                          <View
-                            className="rounded-lg p-2"
-                            style={{ backgroundColor: "#a1a1aa" }}
-                          >
-                            <Image source={item.getItemIcon()} />
-                          </View>
-                        </Pressable>
-                      ))}
-                    </View>
-                  </ScrollView>
+                  <View className="flex h-1/2 w-full flex-wrap border border-zinc-600">
+                    {playerState.inventory.map((item) => (
+                      <ItemRender item={item} key={item.id} />
+                    ))}
+                  </View>
                 ) : (
                   <Text className="py-8 text-center italic">
                     Inventory is currently empty
@@ -413,36 +348,17 @@ const HomeScreen = observer(() => {
                 )}
               </>
             ) : null}
-            <View style={styles.container}>
-              <View style={styles.line} />
-              <View style={styles.content}>
-                <Text className="text-lg">Proficiencies</Text>
-              </View>
-              <View style={styles.line} />
-            </View>
-            <View className="flex items-center pb-4">
-              {magicProficiencySection(magicProficiencies)}
-            </View>
-          </ScrollView>
-        </View>
-        {playerState ? <PlayerStatus displayGoldTop={true} /> : null}
-      </>
+          </View>
+        </Animated.View>
+        {playerState ? (
+          <Animated.View
+            style={{ transform: [{ translateY: bottomTranslationValue }] }}
+          >
+            <PlayerStatus displayGoldTop={true} />
+          </Animated.View>
+        ) : null}
+      </View>
     );
   }
 });
 export default HomeScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  content: {
-    marginHorizontal: 10,
-  },
-  line: {
-    flex: 1,
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
-  },
-});

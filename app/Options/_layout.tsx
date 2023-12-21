@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-export default function SettingsLayout() {
+export default function OptionsLayout() {
   return (
     <Tabs>
       <Tabs.Screen
@@ -33,10 +33,10 @@ export default function SettingsLayout() {
         }}
       />
       <Tabs.Screen
-        name="encyclopedia"
+        name="codex"
         options={{
           headerShown: false,
-          title: "Encyclopedia",
+          title: "Codex",
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="book-open-variant"
@@ -44,6 +44,12 @@ export default function SettingsLayout() {
               color={color}
             />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="[slug]"
+        options={{
+          href: null,
         }}
       />
     </Tabs>

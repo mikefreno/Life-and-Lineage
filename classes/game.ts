@@ -4,6 +4,7 @@ import dungeons from "../assets/json/dungeons.json";
 import { action, makeObservable, observable } from "mobx";
 import { PlayerCharacter } from "./character";
 import { lowSanityDebuffGenerator } from "../utility/functions";
+import { Platform } from "react-native";
 
 interface GameOptions {
   date?: string;
@@ -12,6 +13,7 @@ interface GameOptions {
   furthestDepth?: { instance: string; level: number }[];
   atDeathScreen?: boolean;
   colorScheme?: "system" | "dark" | "light";
+  vibrationEnabled?: "full" | "minimal" | "none";
 }
 
 export class Game {
@@ -21,6 +23,7 @@ export class Game {
   atDeathScreen: boolean;
   shops: Shop[];
   colorScheme: "system" | "dark" | "light";
+  vibrationEnabled: "full" | "minimal" | "none";
 
   constructor({
     date,
@@ -29,6 +32,7 @@ export class Game {
     atDeathScreen,
     shops,
     colorScheme,
+    vibrationEnabled,
   }: GameOptions) {
     this.date = date ?? new Date().toISOString();
     this.dungeonInstances = dungeonInstances ?? [
@@ -61,6 +65,8 @@ export class Game {
     this.atDeathScreen = atDeathScreen ?? false;
     this.shops = shops;
     this.colorScheme = colorScheme ?? "system";
+    this.vibrationEnabled =
+      vibrationEnabled ?? Platform.OS == "ios" ? "full" : "minimal";
     makeObservable(this, {
       date: observable,
       dungeonInstances: observable,
@@ -68,12 +74,14 @@ export class Game {
       atDeathScreen: observable,
       shops: observable,
       colorScheme: observable,
+      vibrationEnabled: observable,
       gameTick: action,
       getDungeon: action,
       getInstance: action,
       openNextDungeonLevel: action,
       setColorScheme: action,
       hitDeathScreen: action,
+      modifyVibrationSettings: action,
     });
   }
 
@@ -165,6 +173,10 @@ export class Game {
     this.colorScheme = color;
   }
 
+  public modifyVibrationSettings(targetState: "full" | "minimal" | "none") {
+    this.vibrationEnabled = targetState;
+  }
+
   static fromJSON(json: any): Game {
     const game = new Game({
       date: json.date ? json.date : new Date().toISOString(),
@@ -179,6 +191,7 @@ export class Game {
         ? json.shops.map((shop: any) => Shop.fromJSON(shop))
         : undefined,
       colorScheme: json.colorScheme,
+      vibrationEnabled: json.vibrationEnabled,
     });
 
     return game;

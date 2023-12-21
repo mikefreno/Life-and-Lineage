@@ -11,7 +11,7 @@ interface FadeOutTextProps {
 export default function FadeOutText({
   className,
   text,
-  duration = 3000,
+  duration = 2500,
   animationCycler,
 }: FadeOutTextProps) {
   const fadeAnim = useRef(new Animated.Value(1)).current;

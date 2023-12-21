@@ -13,6 +13,8 @@ import {
   PlayerCharacterContext,
 } from "../app/_layout";
 import { observer } from "mobx-react-lite";
+import { debounce } from "lodash";
+import { fullSave } from "../utility/functions";
 
 interface LaborTaskProps {
   reward: number;
@@ -42,6 +44,9 @@ const LaborTask = observer(
     const { gameState } = gameData;
     const { playerState } = playerCharacterData;
     const { setMonster } = monsterData;
+    const [fullReward, setFullReward] = useState<number | undefined>(
+      playerState?.getRewardValue(title, reward),
+    );
 
     const [experience, setExperience] = useState(
       playerState?.getJobExperience(title),
@@ -58,9 +63,11 @@ const LaborTask = observer(
           cost: cost,
           goldReward: reward,
         });
-        gameState.gameTick(playerState);
         setExperience(playerState.getJobExperience(title));
         setMonster(null);
+        gameState.gameTick(playerState);
+        setFullReward(playerState.getRewardValue(title, reward));
+        fullSave(gameState, playerState);
       }
     }
 
@@ -85,7 +92,7 @@ const LaborTask = observer(
             </Text>
             <View className="my-auto -mb-8 mt-8 w-1/3">
               <View className="flex w-full flex-row items-center justify-evenly">
-                <Text className="dark:text-zinc-50">{reward}</Text>
+                <Text className="dark:text-zinc-50">{fullReward}</Text>
                 <Coins width={14} height={14} style={{ marginLeft: 6 }} />
               </View>
               <View className="flex w-full flex-row items-center justify-evenly">

@@ -10,6 +10,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { GameContext, PlayerCharacterContext } from "./_layout";
 import ProgressBar from "../components/ProgressBar";
 import { elementalColorMap } from "../utility/elementColors";
+import { useVibration } from "../utility/customHooks";
 
 export default function LearningSpellsScreen() {
   const playerCharacterData = useContext(PlayerCharacterContext);
@@ -25,6 +26,8 @@ export default function LearningSpellsScreen() {
     (item) => item.itemClass == "book",
   );
   const isFocused = useIsFocused();
+
+  const vibration = useVibration();
 
   const { colorScheme } = useColorScheme();
 
@@ -163,6 +166,7 @@ export default function LearningSpellsScreen() {
           </Text>
           <Pressable
             onPress={() => {
+              vibration({ style: "light", essential: true });
               studySpell(
                 selectedBook.name,
                 selectedBookSpell.name,

@@ -25,6 +25,8 @@ import {
 import { observer } from "mobx-react-lite";
 import { EvilIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
+import FadeOutText from "../../components/FadeOutText";
+import { useVibration } from "../../utility/customHooks";
 
 const DungeonLevelScreen = observer(() => {
   const playerCharacterData = useContext(PlayerCharacterContext);
@@ -58,9 +60,18 @@ const DungeonLevelScreen = observer(() => {
   const [fleeRollFailure, setFleeRollFailure] = useState<boolean>(false);
   const { colorScheme } = useColorScheme();
 
+  const [monsterHealthRecord, setMonsterHealthRecord] = useState<
+    number | undefined
+  >(monsterState?.health);
+  const [monsterHealthDiff, setMonsterHealthDiff] = useState<number>(0);
+  const [showingMonsterHealthChange, setShowingMonsterHealthChange] =
+    useState<boolean>(false);
+  const [animationCycler, setAnimationCycler] = useState<number>(0);
+
   const isFocused = useIsFocused();
 
   const router = useRouter();
+  const vibration = useVibration();
 
   useEffect(() => {
     setInstanceName(slug[0]);
@@ -70,6 +81,22 @@ const DungeonLevelScreen = observer(() => {
   if (!playerState || !gameState) {
     throw new Error("No player character or game data on dungeon level");
   }
+
+  useEffect(() => {
+    if (
+      monsterState &&
+      monsterHealthRecord &&
+      monsterState.health != monsterHealthRecord
+    ) {
+      setMonsterHealthDiff(monsterState.health - monsterHealthRecord);
+      setAnimationCycler(animationCycler + 1);
+      setShowingMonsterHealthChange(true);
+    } else {
+      setMonsterHealthDiff(0);
+      setShowingMonsterHealthChange(false);
+    }
+    setMonsterHealthRecord(monsterState?.health);
+  }, [monsterState?.health]);
 
   useEffect(() => {
     setThisDungeon(gameState.getDungeon(instanceName, level));
@@ -162,6 +189,7 @@ const DungeonLevelScreen = observer(() => {
       (roll == "Heads" || monsterState?.creatureSpecies == "training dummy")
     ) {
       router.push("/dungeon");
+      vibration("light");
       setFleeRollFailure(false);
       setTimeout(() => {
         setFleeModalShowing(false);
@@ -169,9 +197,11 @@ const DungeonLevelScreen = observer(() => {
       setTimeout(() => {
         playerState.clearMinions();
         setMonster(null);
+        gameState?.gameTick(playerState);
       }, 200);
     } else {
       setFleeRollFailure(true);
+      vibration("error");
       battleLogger("You failed to flee!");
 
       let monsterDefeated = false;
@@ -512,6 +542,22 @@ const DungeonLevelScreen = observer(() => {
     }
   };
 
+  function monsterHealthChangePopUp() {
+    if (monsterHealthDiff != 0) {
+      return (
+        <NonThemedView className="h-4">
+          <FadeOutText
+            className={"text-red-400"}
+            text={`${
+              monsterHealthDiff > 0 ? "+" : ""
+            }${monsterHealthDiff.toString()}`}
+            animationCycler={animationCycler}
+          />
+        </NonThemedView>
+      );
+    }
+  }
+
   while (!monsterState) {
     return (
       <View>
@@ -676,6 +722,13 @@ const DungeonLevelScreen = observer(() => {
                 filledColor="#ef4444"
                 unfilledColor="#fee2e2"
               />
+              {showingMonsterHealthChange ? (
+                monsterHealthChangePopUp()
+              ) : (
+                <NonThemedView className="h-4">
+                  <Text></Text>
+                </NonThemedView>
+              )}
             </View>
             <View className="">
               <MonsterImage monsterSpecies={monsterState.creatureSpecies} />

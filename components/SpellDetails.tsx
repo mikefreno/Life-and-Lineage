@@ -35,7 +35,7 @@ export default function SpellDetails({ spell }: SpellDetailInterface) {
   const { colorScheme } = useColorScheme();
   return (
     <View
-      className="mx-auto w-3/4 rounded-lg"
+      className="mx-auto w-4/5 rounded-lg"
       style={{
         shadowColor:
           elementalColorMap[

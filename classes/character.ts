@@ -112,6 +112,7 @@ type PlayerCharacterBase = {
   jobExperience?: {
     job: string;
     experience: number;
+    rank: number;
   }[];
   learningSpells?: {
     bookName: string;
@@ -177,7 +178,7 @@ export class PlayerCharacter extends Character {
   mana: number;
   manaMax: number;
   manaRegen: number;
-  jobExperience: { job: string; experience: number }[];
+  jobExperience: { job: string; experience: number; rank: number }[];
   learningSpells: {
     bookName: string;
     spellName: string;
@@ -663,18 +664,32 @@ export class PlayerCharacter extends Character {
     }
   }
 
+  public getRewardValue(jobTitle: string, baseReward: number) {
+    const job = this.jobExperience.find((job) => job.job == jobTitle);
+    if (job) {
+      return Math.floor(baseReward + (baseReward * job.rank) / 5);
+    } else {
+      return baseReward;
+    }
+  }
+
   private gainExperience() {
     let jobFound = false;
 
     this.jobExperience.forEach((job) => {
-      if (job.job === this.job && job.experience < 50) {
+      if (job.job === this.job) {
         jobFound = true;
-        job.experience++;
+        if (job.experience < 49) {
+          job.experience++;
+        } else {
+          job.experience = 0;
+          job.rank++;
+        }
       }
     });
 
     if (!jobFound) {
-      this.jobExperience.push({ job: this.job, experience: 1 });
+      this.jobExperience.push({ job: this.job, experience: 1, rank: 0 });
     }
   }
   //----------------------------------Qualification----------------------------------//

@@ -7,6 +7,7 @@ import PlayerStatus from "../../components/PlayerStatus";
 import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { GameContext } from "../_layout";
+import { useVibration } from "../../utility/customHooks";
 
 const dangerColorStep = [
   "#fee2e2",
@@ -34,6 +35,8 @@ export default function DungeonScreen() {
   const [height, setHeight] = useState<number>(0);
 
   const { colorScheme } = useColorScheme();
+  const vibration = useVibration();
+
   useEffect(() => setDungeonDepth(game?.furthestDepth), [game]);
 
   useEffect(() => {
@@ -110,6 +113,7 @@ export default function DungeonScreen() {
                           while (router.canGoBack()) {
                             router.back();
                           }
+                          vibration("warning");
                           router.replace(
                             `/DungeonLevel/${dungeonInstance.instance}/${level.level}`,
                           );

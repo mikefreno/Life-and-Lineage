@@ -1,4 +1,5 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
+import { Text } from "../components/Themed";
 import ArmorIcon from "../assets/icons/ArmorIcon";
 import Energy from "../assets/icons/EnergyIcon";
 import HealthIcon from "../assets/icons/HealthIcon";
@@ -20,8 +21,9 @@ export default function GearStatsDisplay({ stats }: GearStatsDisplayProps) {
   ) {
     return;
   }
+
   return (
-    <View className="flex items-center rounded-lg bg-zinc-300 px-8 py-1 dark:bg-zinc-700">
+    <View className="mx-auto flex items-center rounded-lg bg-zinc-300 px-8 py-1 dark:bg-zinc-700">
       {stats.armor ? (
         <View className="flex flex-row">
           <Text>{stats.armor} </Text>

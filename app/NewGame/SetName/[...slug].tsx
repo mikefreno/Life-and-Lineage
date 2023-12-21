@@ -37,6 +37,9 @@ export default function SetName() {
             onChangeText={(text) => setFirstName(text.replace(/^\s+/, ""))}
             placeholder={"Given Name (First Name)"}
             value={firstName}
+            autoCorrect={false}
+            autoCapitalize="words"
+            autoComplete="given-name"
             maxLength={16}
             style={{
               paddingVertical: 8,
@@ -50,6 +53,9 @@ export default function SetName() {
             placeholderClassName="text-zinc-400 dark:text-zinc-400"
             onChangeText={(text) => setLastName(text.replace(/^\s+/, ""))}
             placeholder={"Surname (Last Name)"}
+            autoComplete="family-name"
+            autoCorrect={false}
+            autoCapitalize="words"
             value={lastName}
             maxLength={16}
             style={{ paddingVertical: 8 }}
