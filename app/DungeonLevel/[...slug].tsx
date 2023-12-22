@@ -189,7 +189,7 @@ const DungeonLevelScreen = observer(() => {
       (roll == "Heads" || monsterState?.creatureSpecies == "training dummy")
     ) {
       router.push("/dungeon");
-      vibration("light");
+      vibration({ style: "light" });
       setFleeRollFailure(false);
       setTimeout(() => {
         setFleeModalShowing(false);
@@ -201,7 +201,7 @@ const DungeonLevelScreen = observer(() => {
       }, 200);
     } else {
       setFleeRollFailure(true);
-      vibration("error");
+      vibration({ style: "error" });
       battleLogger("You failed to flee!");
 
       let monsterDefeated = false;

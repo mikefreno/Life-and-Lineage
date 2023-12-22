@@ -310,6 +310,7 @@ export class PlayerCharacter extends Character {
       removeFromInventory: action,
       sellItem: action,
       equipItem: action,
+      unEquipItem: action,
       removeEquipment: action,
       getArmorValue: action,
       getDamageReduction: action,
@@ -572,6 +573,31 @@ export class PlayerCharacter extends Character {
         break;
     }
     this.setPhysicalAttacks();
+  }
+
+  public equippedCheck(item: Item) {
+    if (this.equipment.body?.equals(item)) {
+      return true;
+    } else if (this.equipment.head?.equals(item)) {
+      return true;
+    } else if (this.equipment.mainHand.equals(item)) {
+      return true;
+    } else if (this.equipment.offHand?.equals(item)) {
+      return true;
+    }
+    return false;
+  }
+
+  public unEquipItem(item: Item) {
+    if (this.equipment.body?.equals(item)) {
+      this.removeEquipment("body");
+    } else if (this.equipment.head?.equals(item)) {
+      this.removeEquipment("head");
+    } else if (this.equipment.mainHand.equals(item)) {
+      this.removeEquipment("mainHand");
+    } else if (this.equipment.offHand?.equals(item)) {
+      this.removeEquipment("offHand");
+    }
   }
 
   public removeEquipment(slot: "mainHand" | "offHand" | "body" | "head") {

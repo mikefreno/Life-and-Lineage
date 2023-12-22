@@ -20,6 +20,7 @@ import GearStatsDisplay from "../../components/GearStatsDisplay";
 import Draggable from "react-native-draggable";
 import { router } from "expo-router";
 import { useVibration } from "../../utility/customHooks";
+import { Dimensions } from "react-native";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -37,11 +38,13 @@ const HomeScreen = observer(() => {
   const bodyTarget = useRef<NonThemedView>(null);
   const mainHandTarget = useRef<NonThemedView>(null);
   const offHandTarget = useRef<NonThemedView>(null);
+  const inventoryTarget = useRef<NonThemedView>(null);
 
   if (!playerStateData || !gameData) throw new Error("missing contexts");
   const { playerState } = playerStateData;
   const { gameState } = gameData;
   const vibration = useVibration();
+  const [showingStats, setShowingStats] = useState<Item | null>(null);
 
   //animation
   useEffect(() => {
@@ -57,126 +60,307 @@ const HomeScreen = observer(() => {
 
   useEffect(() => {}, [showingInventory]);
 
+  const deviceWidth = Dimensions.get("window").width;
+  const deviceHeight = Dimensions.get("window").height;
+
   interface checkReleasePositonProps {
-    item: Item;
-    draggable: NonThemedView | null;
+    item: Item | null;
+    xPos: number;
+    yPos: number;
     size: number;
+    equipped: boolean;
   }
+
   function checkReleasePositon({
     item,
-    draggable,
+    xPos,
+    yPos,
     size,
+    equipped,
   }: checkReleasePositonProps) {
-    if (draggable) {
-      draggable.measure((x, y, width, height, pageX, pageY) => {
-        console.log(x);
+    if (item && item.slot) {
+      let refs: React.RefObject<NonThemedView>[] = [];
+      if (equipped) {
+        refs.push(inventoryTarget);
+      } else {
+        switch (item.slot) {
+          case "head":
+            refs.push(headTarget);
+            break;
+          case "body":
+            refs.push(bodyTarget);
+            break;
+          case "two-hand":
+            refs.push(mainHandTarget, offHandTarget);
+            break;
+          case "one-hand":
+            refs.push(mainHandTarget, offHandTarget);
+            break;
+          case "off-hand":
+            refs.push(offHandTarget);
+            break;
+        }
+      }
+      refs.forEach((ref) => {
+        ref.current?.measureInWindow(
+          (targetX, targetY, targetWidth, targetHeight) => {
+            const isWidthAligned =
+              xPos + size / 2 >= targetX &&
+              xPos - size / 2 <= targetX + targetWidth;
+            const isHeightAligned =
+              yPos + size / 2 >= targetY &&
+              yPos - size / 2 <= targetY + targetHeight;
+            if (isWidthAligned && isHeightAligned) {
+              if (equipped) {
+                playerState?.unEquipItem(item);
+              } else {
+                playerState?.equipItem(item);
+              }
+            }
+          },
+        );
       });
     }
   }
 
   function currentEquipmentDisplay() {
+    const [buzzed, setBuzzed] = useState<boolean>(false);
+
     return (
       <View className={`flex border-[#ccc] w-full`}>
         <View className="items-center">
           <Text className="mb-2">Head</Text>
           {playerState?.equipment.head ? (
-            <Pressable className="w-1/4 items-center active:scale-90 active:opacity-50">
-              <View
-                className="rounded-lg p-1.5"
-                style={{ backgroundColor: "#a1a1aa" }}
+            <Pressable className="h-12 w-12 active:scale-90 active:opacity-50">
+              <Draggable
+                onDragRelease={(_, g) => {
+                  checkReleasePositon({
+                    item: playerState.equipment.head,
+                    xPos: g.moveX,
+                    yPos: g.moveY,
+                    size: 48,
+                    equipped: true,
+                  });
+                  setBuzzed(false);
+                }}
+                onDrag={() => {
+                  if (!buzzed) {
+                    vibration({ style: "heavy", essential: true });
+                    setBuzzed(true);
+                  }
+                }}
+                onPressIn={() => {
+                  if (
+                    showingStats &&
+                    playerState.equipment.head &&
+                    showingStats.equals(playerState.equipment.head)
+                  ) {
+                    setShowingStats(null);
+                  } else {
+                    setShowingStats(playerState.equipment.head);
+                  }
+                }}
+                shouldReverse
               >
-                <Image source={playerState?.equipment.head?.getItemIcon()} />
-              </View>
-            </Pressable>
-          ) : (
-            <View className="mt-2">
-              <View
-                className="mx-auto h-12 w-12 rounded-lg"
-                style={{ backgroundColor: "#a1a1aa" }}
-              />
-            </View>
-          )}
-        </View>
-        <View className="flex flex-row justify-evenly">
-          <View className="-ml-1 mr-2">
-            <Text className="mb-2">Main Hand</Text>
-            {playerState?.equipment.mainHand &&
-            playerState?.equipment.mainHand.name !== "unarmored" ? (
-              <Pressable className="mx-auto w-1/4 items-center active:scale-90 active:opacity-50">
-                <View
-                  className="rounded-lg p-1.5"
+                <NonThemedView
+                  ref={headTarget}
+                  className="h-12 w-12 items-center rounded-lg"
                   style={{ backgroundColor: "#a1a1aa" }}
                 >
                   <Image
-                    source={playerState?.equipment.mainHand.getItemIcon()}
+                    className="my-auto"
+                    source={playerState?.equipment.head?.getItemIcon()}
                   />
-                </View>
+                </NonThemedView>
+              </Draggable>
+            </Pressable>
+          ) : (
+            <NonThemedView
+              ref={headTarget}
+              className="mx-auto h-12 w-12 rounded-lg"
+              style={{ backgroundColor: "#a1a1aa" }}
+            />
+          )}
+        </View>
+        <NonThemedView className="flex flex-row justify-evenly">
+          <NonThemedView className="-ml-1 mr-2">
+            <Text className="mb-2">Main Hand</Text>
+            {playerState?.equipment.mainHand &&
+            playerState?.equipment.mainHand.name !== "unarmored" ? (
+              <Pressable className="mx-auto h-12 w-12 items-center active:scale-90 active:opacity-50">
+                <Draggable
+                  onDragRelease={(_, g) => {
+                    checkReleasePositon({
+                      item: playerState.equipment.mainHand,
+                      xPos: g.moveX,
+                      yPos: g.moveY,
+                      size: 48,
+                      equipped: true,
+                    });
+                    setBuzzed(false);
+                  }}
+                  onDrag={() => {
+                    if (!buzzed) {
+                      vibration({ style: "heavy", essential: true });
+                      setBuzzed(true);
+                    }
+                  }}
+                  onPressIn={() => {
+                    if (
+                      showingStats &&
+                      playerState.equipment.mainHand &&
+                      showingStats.equals(playerState.equipment.mainHand)
+                    ) {
+                      setShowingStats(null);
+                    } else {
+                      setShowingStats(playerState.equipment.mainHand);
+                    }
+                  }}
+                  shouldReverse
+                >
+                  <NonThemedView
+                    ref={mainHandTarget}
+                    className="h-12 w-12 items-center rounded-lg"
+                    style={{ backgroundColor: "#a1a1aa" }}
+                  >
+                    <Image
+                      className="my-auto"
+                      source={playerState?.equipment.mainHand.getItemIcon()}
+                    />
+                  </NonThemedView>
+                </Draggable>
               </Pressable>
             ) : (
-              <View
+              <NonThemedView
+                ref={mainHandTarget}
                 className="mx-auto h-12 w-12 rounded-lg"
                 style={{ backgroundColor: "#a1a1aa" }}
               />
             )}
-          </View>
-          <View>
+          </NonThemedView>
+          <NonThemedView>
             <Text className="mb-2">Off-Hand</Text>
             {playerState?.equipment.offHand ? (
-              <Pressable className="mx-auto w-1/4 items-center active:scale-90 active:opacity-50">
-                <View
-                  className="rounded-lg p-1.5"
-                  style={{ backgroundColor: "#a1a1aa" }}
+              <Pressable className="mx-auto h-12 w-12 items-center active:scale-90 active:opacity-50">
+                <Draggable
+                  onDragRelease={(_, g) => {
+                    checkReleasePositon({
+                      item: playerState.equipment.offHand,
+                      xPos: g.moveX,
+                      yPos: g.moveY,
+                      size: 48,
+                      equipped: true,
+                    });
+                    setBuzzed(false);
+                  }}
+                  onDrag={() => {
+                    if (!buzzed) {
+                      vibration({ style: "heavy", essential: true });
+                      setBuzzed(true);
+                    }
+                  }}
+                  onPressIn={() => {
+                    if (
+                      showingStats &&
+                      playerState.equipment.offHand &&
+                      showingStats.equals(playerState.equipment.offHand)
+                    ) {
+                      setShowingStats(null);
+                    } else {
+                      setShowingStats(playerState.equipment.offHand);
+                    }
+                  }}
+                  shouldReverse
                 >
-                  <Image
-                    source={playerState?.equipment.offHand?.getItemIcon()}
-                  />
-                </View>
+                  <NonThemedView
+                    ref={offHandTarget}
+                    className="h-12 w-12 items-center rounded-lg"
+                    style={{ backgroundColor: "#a1a1aa" }}
+                  >
+                    <Image
+                      className="my-auto"
+                      source={playerState?.equipment.offHand?.getItemIcon()}
+                    />
+                  </NonThemedView>
+                </Draggable>
               </Pressable>
             ) : playerState?.equipment.mainHand.slot == "two-hand" ? (
-              <Pressable className="mx-auto w-1/4 items-center active:scale-90 active:opacity-50">
-                <View
-                  className="rounded-lg p-1.5"
+              <Pressable className="mx-auto h-12 w-12 items-center active:scale-90 active:opacity-50">
+                <NonThemedView
+                  ref={offHandTarget}
+                  className="h-12 w-12 items-center rounded-lg"
                   style={{ backgroundColor: "#a1a1aa" }}
                 >
                   <Image
                     style={{ opacity: 0.5 }}
                     source={playerState?.equipment.mainHand?.getItemIcon()}
                   />
-                </View>
+                </NonThemedView>
               </Pressable>
             ) : (
-              <View
+              <NonThemedView
+                ref={offHandTarget}
                 className="mx-auto h-12 w-12 rounded-lg"
                 style={{ backgroundColor: "#a1a1aa" }}
               />
             )}
-          </View>
-        </View>
-        <View className="mx-auto items-center">
+          </NonThemedView>
+        </NonThemedView>
+        <NonThemedView className="mx-auto items-center">
           <Text className="mb-2">Body</Text>
           {playerState?.equipment.body ? (
-            <Pressable className="w-1/4 items-center active:scale-90 active:opacity-50">
-              <View
-                className="rounded-lg p-1.5"
-                style={{ backgroundColor: "#a1a1aa" }}
+            <Pressable className="h-12 w-12 active:scale-90 active:opacity-50">
+              <Draggable
+                onDragRelease={(_, g) => {
+                  checkReleasePositon({
+                    item: playerState.equipment.body,
+                    xPos: g.moveX,
+                    yPos: g.moveY,
+                    size: 48,
+                    equipped: true,
+                  });
+                  setBuzzed(false);
+                }}
+                onDrag={() => {
+                  if (!buzzed) {
+                    vibration({ style: "heavy", essential: true });
+                    setBuzzed(true);
+                  }
+                }}
+                onPressIn={() => {
+                  if (
+                    showingStats &&
+                    playerState.equipment.body &&
+                    showingStats.equals(playerState.equipment.body)
+                  ) {
+                    setShowingStats(null);
+                  } else {
+                    setShowingStats(playerState.equipment.body);
+                  }
+                }}
+                shouldReverse
               >
-                <Image source={playerState?.equipment.body?.getItemIcon()} />
-              </View>
+                <NonThemedView
+                  ref={bodyTarget}
+                  className="h-12 w-12 items-center rounded-lg"
+                  style={{ backgroundColor: "#a1a1aa" }}
+                >
+                  <Image
+                    className="my-auto"
+                    source={playerState?.equipment.body?.getItemIcon()}
+                  />
+                </NonThemedView>
+              </Draggable>
             </Pressable>
           ) : (
-            <View className="mt-2">
-              <View
-                className="mx-auto h-12 w-12 rounded-lg"
-                style={{ backgroundColor: "#a1a1aa" }}
-              />
-            </View>
+            <NonThemedView
+              ref={bodyTarget}
+              className="mx-auto h-12 w-12 rounded-lg"
+              style={{ backgroundColor: "#a1a1aa" }}
+            />
           )}
-        </View>
-        {playerState ? (
-          <NonThemedView className="my-2">
-            <GearStatsDisplay stats={playerState.getCurrentEquipmentStats()} />
-          </NonThemedView>
-        ) : null}
+        </NonThemedView>
+        {playerState ? <NonThemedView className="my-2"></NonThemedView> : null}
       </View>
     );
   }
@@ -185,23 +369,27 @@ const HomeScreen = observer(() => {
     item: Item;
   }
   const ItemRender = ({ item }: ItemRenderProps) => {
-    const [showingStats, setShowingStats] = useState(false);
     const [buzzed, setBuzzed] = useState(false);
-    const localRef = useRef<NonThemedView>(null);
 
     const handlePress = () => {
       vibration({ style: "light" });
-      setShowingStats((prevShowingStats) => !prevShowingStats);
+      if (showingStats?.equals(item)) {
+        setShowingStats(null);
+      } else {
+        setShowingStats(item);
+      }
     };
 
     return (
-      <NonThemedView className="h-20" ref={localRef}>
+      <NonThemedView className="h-20 w-20">
         <Draggable
-          onDragRelease={() => {
+          onDragRelease={(_, g) => {
             checkReleasePositon({
               item: item,
-              draggable: localRef.current,
+              xPos: g.moveX,
+              yPos: g.moveY,
               size: 48,
+              equipped: false,
             });
             setBuzzed(false);
           }}
@@ -212,6 +400,7 @@ const HomeScreen = observer(() => {
             }
           }}
           shouldReverse
+          disabled={!item.slot}
         >
           <NonThemedView className="flex flex-row">
             <Pressable
@@ -225,42 +414,37 @@ const HomeScreen = observer(() => {
                 <Image source={item.getItemIcon()} />
               </View>
             </Pressable>
-            {showingStats ? (
-              <View
-                className="absolute flex items-center rounded-md border border-zinc-600 px-4 py-2 shadow-lg"
-                style={{ marginTop: -10, marginLeft: 56, zIndex: 1 }}
-              >
-                <View style={{ width: 80 }}>
-                  <Text className="text-center">{toTitleCase(item.name)}</Text>
-                </View>
-                {item.stats && item.slot ? (
-                  <View className="py-2">
-                    <GearStatsDisplay stats={item.stats} />
-                  </View>
-                ) : null}
-                <Text className="text-sm italic">
-                  {item.itemClass == "bodyArmor"
-                    ? "Body Armor"
-                    : toTitleCase(item.itemClass)}
-                </Text>
-                {item.itemClass == "book" ? (
-                  <Pressable
-                    onPress={() => {
-                      vibration({ style: "light" });
-                      router.push("/Study");
-                    }}
-                    className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-                  >
-                    <Text>Study This Book</Text>
-                  </Pressable>
-                ) : null}
-              </View>
-            ) : null}
           </NonThemedView>
         </Draggable>
       </NonThemedView>
     );
   };
+
+  function inventoryRender() {
+    if (playerState) {
+      const chunkSize = 4;
+      const chunks = [];
+
+      for (let i = 0; i < playerState.inventory.length; i += chunkSize) {
+        chunks.push(playerState.inventory.slice(i, i + chunkSize));
+      }
+
+      return (
+        <NonThemedView
+          ref={inventoryTarget}
+          className="h-1/2 w-full flex-row border border-zinc-600"
+        >
+          {chunks.map((chunk, index) => (
+            <NonThemedView key={index} className="flex w-16">
+              {chunk.map((item) => (
+                <ItemRender item={item} key={item.id} />
+              ))}
+            </NonThemedView>
+          ))}
+        </NonThemedView>
+      );
+    }
+  }
 
   if (playerState && gameState) {
     const name = playerState.getFullName();
@@ -315,40 +499,42 @@ const HomeScreen = observer(() => {
               </NonThemedView>
             </View>
           </View>
-          <View>
+          <NonThemedView>
             <View className="flex flex-row pt-2">
               {currentEquipmentDisplay()}
             </View>
-            <View className="py-2">
-              <Pressable
-                style={{ width: 55 }}
-                onPress={() => {
-                  vibration({ style: "light" });
-                  setShowingInventory(!showingInventory);
-                }}
+            <NonThemedView className="flex flex-row justify-between">
+              <NonThemedView
+                className="py-2"
+                ref={!showingInventory ? inventoryTarget : undefined}
               >
-                <Image
-                  source={require("../../assets/images/items/Bag.png")}
-                  style={{ width: 50, height: 50 }}
+                <Pressable
+                  style={{ width: 55 }}
+                  onPress={() => {
+                    vibration({ style: "light" });
+                    setShowingInventory(!showingInventory);
+                    if (
+                      showingStats &&
+                      !playerState.equippedCheck(showingStats)
+                    ) {
+                      setShowingStats(null);
+                    }
+                  }}
+                >
+                  <Image
+                    source={require("../../assets/images/items/Bag.png")}
+                    style={{ width: 50, height: 50 }}
+                  />
+                </Pressable>
+              </NonThemedView>
+              <NonThemedView className="-mt-16">
+                <GearStatsDisplay
+                  stats={playerState.getCurrentEquipmentStats()}
                 />
-              </Pressable>
-            </View>
-            {showingInventory ? (
-              <>
-                {playerState.inventory.length > 0 ? (
-                  <View className="flex h-1/2 w-full flex-wrap border border-zinc-600">
-                    {playerState.inventory.map((item) => (
-                      <ItemRender item={item} key={item.id} />
-                    ))}
-                  </View>
-                ) : (
-                  <Text className="py-8 text-center italic">
-                    Inventory is currently empty
-                  </Text>
-                )}
-              </>
-            ) : null}
-          </View>
+              </NonThemedView>
+            </NonThemedView>
+            {showingInventory ? inventoryRender() : null}
+          </NonThemedView>
         </Animated.View>
         {playerState ? (
           <Animated.View
@@ -356,6 +542,41 @@ const HomeScreen = observer(() => {
           >
             <PlayerStatus displayGoldTop={true} />
           </Animated.View>
+        ) : null}
+        {showingStats ? (
+          <View
+            className="absolute items-center rounded-md border border-zinc-600 px-8 py-4 shadow-lg"
+            style={{
+              marginTop: showingInventory ? 8 : deviceHeight / 6,
+            }}
+          >
+            <View style={{ width: 80 }}>
+              <Text className="text-center">
+                {toTitleCase(showingStats.name)}
+              </Text>
+            </View>
+            {showingStats.stats && showingStats.slot ? (
+              <View className="py-2">
+                <GearStatsDisplay stats={showingStats.stats} />
+              </View>
+            ) : null}
+            <Text className="text-sm italic">
+              {showingStats.itemClass == "bodyArmor"
+                ? "Body Armor"
+                : toTitleCase(showingStats.itemClass)}
+            </Text>
+            {showingStats.itemClass == "book" ? (
+              <Pressable
+                onPress={() => {
+                  vibration({ style: "light" });
+                  router.push("/Study");
+                }}
+                className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+              >
+                <Text>Study This Book</Text>
+              </Pressable>
+            ) : null}
+          </View>
         ) : null}
       </View>
     );

@@ -23,7 +23,7 @@ export default function GearStatsDisplay({ stats }: GearStatsDisplayProps) {
   }
 
   return (
-    <View className="mx-auto flex items-center rounded-lg bg-zinc-300 px-8 py-1 dark:bg-zinc-700">
+    <View className="flex items-center rounded-lg bg-zinc-300 px-8 py-1 dark:bg-zinc-700">
       {stats.armor ? (
         <View className="flex flex-row">
           <Text>{stats.armor} </Text>
