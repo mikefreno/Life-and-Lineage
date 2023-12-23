@@ -263,7 +263,7 @@ const PlayerStatus = observer(
           </View>
           {onTop ? conditionRenderer() : null}
           {displayGoldBottom ? (
-            <View className="flex flex-row justify-center pt-2">
+            <View className="mt-2 flex flex-row justify-center">
               <Text>{readableGold}</Text>
               <Coins width={16} height={16} style={{ marginLeft: 6 }} />
               {showingGoldChange ? goldChangePopUp() : null}

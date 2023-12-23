@@ -267,7 +267,7 @@ export class PlayerCharacter extends Character {
     this.knownSpells = knownSpells ?? [];
     this.conditions = [];
     this.physicalAttacks = physicalAttacks ?? ["punch"];
-    this.gold = gold ?? 100000;
+    this.gold = gold ?? 500;
     this.inventory = inventory ?? [];
     this.equipment = equipment ?? {
       mainHand: new Item({

@@ -15,7 +15,6 @@ import { Monster } from "../classes/creatures";
 import { fullSave, loadGame, loadPlayer } from "../utility/functions";
 import { View, Text } from "react-native";
 import { autorun } from "mobx";
-import { useColorScheme as reactColorScheme } from "react-native";
 import "../assets/styles/globals.css";
 
 export {
@@ -70,7 +69,6 @@ const Root = observer(() => {
   const [logsState, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const { setColorScheme } = useColorScheme();
-  const reactScheme = reactColorScheme();
 
   const getData = async () => {
     try {
@@ -94,7 +92,7 @@ const Root = observer(() => {
     if (gameState) {
       setColorScheme(gameState.colorScheme);
     }
-  }, [gameState?.colorScheme, reactScheme]);
+  }, [gameState?.colorScheme]);
 
   useEffect(() => {
     getData();
@@ -166,7 +164,7 @@ const RootLayout = () => {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="Settings" options={{ presentation: "modal" }} />
+        <Stack.Screen name="Options" options={{ presentation: "modal" }} />
         <Stack.Screen name="Study" options={{ presentation: "modal" }} />
         <Stack.Screen name="Crafting" options={{ presentation: "modal" }} />
         <Stack.Screen
