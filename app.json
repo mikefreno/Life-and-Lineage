@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "magic delve",
+    "name": "Magic Delve",
     "slug": "magic-delve",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -46,6 +46,9 @@
       "eas": {
         "projectId": "2307d673-d206-4c58-8170-5dc30a9ec500"
       }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
     }
   }
 }

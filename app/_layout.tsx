@@ -16,8 +16,12 @@ import { fullSave, loadGame, loadPlayer } from "../utility/functions";
 import { View, Text } from "react-native";
 import { autorun } from "mobx";
 import { useColorScheme as reactColorScheme } from "react-native";
+import "../assets/styles/globals.css";
 
-export { ErrorBoundary } from "expo-router";
+export {
+  // Catch any errors thrown by the Layout component.
+  ErrorBoundary,
+} from "expo-router";
 export const unstable_settings = {
   // Ensure that reloading on ﻿/modal keeps a back button present.
   initialRouteName: "(tabs)",
@@ -162,7 +166,7 @@ const RootLayout = () => {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="Options" options={{ presentation: "modal" }} />
+        <Stack.Screen name="Settings" options={{ presentation: "modal" }} />
         <Stack.Screen name="Study" options={{ presentation: "modal" }} />
         <Stack.Screen name="Crafting" options={{ presentation: "modal" }} />
         <Stack.Screen
