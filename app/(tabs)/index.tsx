@@ -45,6 +45,8 @@ const HomeScreen = observer(() => {
   const { gameState } = gameData;
   const vibration = useVibration();
   const [showingStats, setShowingStats] = useState<Item | null>(null);
+  const [statsLeftPos, setStatsLeftPos] = useState<number>();
+  const [statsTopPos, setStatsTopPos] = useState<number>();
 
   //animation
   useEffect(() => {
@@ -60,8 +62,8 @@ const HomeScreen = observer(() => {
 
   useEffect(() => {}, [showingInventory]);
 
-  const deviceWidth = Dimensions.get("window").width;
   const deviceHeight = Dimensions.get("window").height;
+  const deviceWidth = Dimensions.get("window").width;
 
   interface checkReleasePositonProps {
     item: Item | null;
@@ -111,6 +113,8 @@ const HomeScreen = observer(() => {
               yPos + size / 2 >= targetY &&
               yPos - size / 2 <= targetY + targetHeight;
             if (isWidthAligned && isHeightAligned) {
+              vibration({ style: "light", essential: true });
+              setShowingStats(null);
               if (equipped) {
                 playerState?.unEquipItem(item);
               } else {
@@ -127,7 +131,7 @@ const HomeScreen = observer(() => {
     const [buzzed, setBuzzed] = useState<boolean>(false);
 
     return (
-      <View className={`flex border-[#ccc] w-full`}>
+      <View className={`flex w-full`}>
         <View className="items-center">
           <Text className="mb-2">Head</Text>
           {playerState?.equipment.head ? (
@@ -241,7 +245,7 @@ const HomeScreen = observer(() => {
           <NonThemedView>
             <Text className="mb-2">Off-Hand</Text>
             {playerState?.equipment.offHand ? (
-              <Pressable className="mx-auto h-12 w-12 items-center active:scale-90 active:opacity-50">
+              <NonThemedView className="mx-auto h-12 w-12 items-center active:scale-90 active:opacity-50">
                 <Draggable
                   onDragRelease={(_, g) => {
                     checkReleasePositon({
@@ -259,20 +263,20 @@ const HomeScreen = observer(() => {
                       setBuzzed(true);
                     }
                   }}
-                  onPressIn={() => {
-                    if (
-                      showingStats &&
-                      playerState.equipment.offHand &&
-                      showingStats.equals(playerState.equipment.offHand)
-                    ) {
-                      setShowingStats(null);
-                    } else {
-                      setShowingStats(playerState.equipment.offHand);
-                    }
-                  }}
                   shouldReverse
                 >
-                  <NonThemedView
+                  <Pressable
+                    onPress={() => {
+                      if (
+                        showingStats &&
+                        playerState.equipment.offHand &&
+                        showingStats.equals(playerState.equipment.offHand)
+                      ) {
+                        setShowingStats(null);
+                      } else {
+                        setShowingStats(playerState.equipment.offHand);
+                      }
+                    }}
                     ref={offHandTarget}
                     className="h-12 w-12 items-center rounded-lg"
                     style={{ backgroundColor: "#a1a1aa" }}
@@ -281,9 +285,9 @@ const HomeScreen = observer(() => {
                       className="my-auto"
                       source={playerState?.equipment.offHand?.getItemIcon()}
                     />
-                  </NonThemedView>
+                  </Pressable>
                 </Draggable>
-              </Pressable>
+              </NonThemedView>
             ) : playerState?.equipment.mainHand.slot == "two-hand" ? (
               <Pressable className="mx-auto h-12 w-12 items-center active:scale-90 active:opacity-50">
                 <NonThemedView
@@ -370,18 +374,23 @@ const HomeScreen = observer(() => {
   }
   const ItemRender = ({ item }: ItemRenderProps) => {
     const [buzzed, setBuzzed] = useState(false);
+    const localRef = useRef<NonThemedView>(null);
 
     const handlePress = () => {
       vibration({ style: "light" });
-      if (showingStats?.equals(item)) {
+      if (showingStats && showingStats.equals(item)) {
         setShowingStats(null);
       } else {
         setShowingStats(item);
+        localRef.current?.measureInWindow((x, y) => {
+          setStatsLeftPos(x);
+          setStatsTopPos(y);
+        });
       }
     };
 
     return (
-      <NonThemedView className="h-20 w-20">
+      <NonThemedView ref={localRef} className="h-20 w-20">
         <Draggable
           onDragRelease={(_, g) => {
             checkReleasePositon({
@@ -459,7 +468,7 @@ const HomeScreen = observer(() => {
             paddingTop: 8,
           }}
         >
-          <View className="-mx-4 border-b dark:border-zinc-600">
+          <View className="-mx-4 border-b border-zinc-200 dark:border-zinc-700">
             <View className="mx-4 flex-row pb-4">
               {playerState?.playerClass == "necromancer" ? (
                 <NonThemedView className="mx-auto">
@@ -543,22 +552,30 @@ const HomeScreen = observer(() => {
             <PlayerStatus displayGoldTop={true} />
           </Animated.View>
         ) : null}
-        {showingStats ? (
+        {showingStats && statsLeftPos && statsTopPos ? (
           <View
-            className="absolute items-center rounded-md border border-zinc-600 px-8 py-4 shadow-lg"
+            className="max-w-1/3 absolute items-center rounded-md border border-zinc-600 px-8 py-4 shadow-lg"
             style={{
-              marginTop: showingInventory ? 8 : deviceHeight / 6,
+              backgroundColor: "rgba(250, 250, 250, 0.93)",
+              left: statsLeftPos
+                ? statsLeftPos < deviceWidth / 2
+                  ? statsLeftPos + deviceWidth / 7
+                  : statsLeftPos - deviceWidth / 3 - 5
+                : undefined,
+              top: statsTopPos
+                ? statsTopPos - (2.8 * deviceHeight) / 10
+                : undefined,
             }}
           >
-            <View style={{ width: 80 }}>
+            <NonThemedView style={{ width: 80 }}>
               <Text className="text-center">
                 {toTitleCase(showingStats.name)}
               </Text>
-            </View>
+            </NonThemedView>
             {showingStats.stats && showingStats.slot ? (
-              <View className="py-2">
+              <NonThemedView className="py-2">
                 <GearStatsDisplay stats={showingStats.stats} />
-              </View>
+              </NonThemedView>
             ) : null}
             <Text className="text-sm italic">
               {showingStats.itemClass == "bodyArmor"

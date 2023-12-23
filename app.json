@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "magic-life",
-    "slug": "magic-life",
+    "name": "magic delve",
+    "slug": "magic-delve",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -17,14 +17,16 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mikefrenodev.magiclife"
+      "bundleIdentifier": "com.mikefrenodev.magicdelve",
+      "buildNumber": "3"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.mikefrenodev.magiclife"
+      "package": "com.mikefrenodev.magicdelve",
+      "versionCode": 2
     },
     "web": {
       "bundler": "metro",
@@ -42,7 +44,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "4be0d310-a7c2-46c5-9911-072c9d65c562"
+        "projectId": "2307d673-d206-4c58-8170-5dc30a9ec500"
       }
     }
   }

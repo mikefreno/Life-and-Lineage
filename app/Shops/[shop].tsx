@@ -15,6 +15,7 @@ import SpellDetails from "../../components/SpellDetails";
 import { useIsFocused } from "@react-navigation/native";
 import { GameContext, PlayerCharacterContext } from "../_layout";
 import GearStatsDisplay from "../../components/GearStatsDisplay";
+import { useVibration } from "../../utility/customHooks";
 
 export default function ShopScreen() {
   const { shop } = useLocalSearchParams();
@@ -47,7 +48,9 @@ export default function ShopScreen() {
       selfDamage?: number | undefined;
     };
   } | null>(null);
+
   const isFocused = useIsFocused();
+  const vibrate = useVibration();
 
   useEffect(() => {
     if (
@@ -142,6 +145,7 @@ export default function ShopScreen() {
         thisShop.buyItem(selectedItem.item, price);
         playerCharacter.sellItem(selectedItem.item, price);
       }
+      vibrate({ style: "light", essential: true });
       setSelectedItem(null);
     }
   }
@@ -189,7 +193,10 @@ export default function ShopScreen() {
                     <Pressable
                       key={item.id}
                       className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
-                      onPress={() => displaySetter(item, true)}
+                      onPress={() => {
+                        vibrate({ style: "light" });
+                        displaySetter(item, true);
+                      }}
                     >
                       <NonThemedView className="rounded-lg bg-zinc-300 p-2">
                         <Image source={item.getItemIcon()} />
@@ -203,10 +210,10 @@ export default function ShopScreen() {
           {selectedItem ? (
             selectedItemDisplay()
           ) : (
-            <View className="flex h-1/3 items-center justify-center" />
+            <NonThemedView className="-my-6 flex h-1/3 items-center justify-center" />
           )}
-          <View className="h-1/3">
-            <View className="flex flex-row justify-center border-b border-zinc-300 dark:border-zinc-700">
+          <NonThemedView className="h-1/3">
+            <NonThemedView className="flex flex-row justify-center border-b border-zinc-300 dark:border-zinc-700">
               <Text className="text-center">
                 {playerCharacter.getFullName()}'s Inventory
               </Text>
@@ -218,7 +225,7 @@ export default function ShopScreen() {
                 <Coins width={16} height={16} style={{ marginLeft: 6 }} />
                 <Text> )</Text>
               </View>
-            </View>
+            </NonThemedView>
             <ScrollView>
               <View className="flex flex-row flex-wrap justify-around">
                 {playerCharacter.inventory.map((item) => (
@@ -234,7 +241,7 @@ export default function ShopScreen() {
                 ))}
               </View>
             </ScrollView>
-          </View>
+          </NonThemedView>
         </View>
       </>
     );

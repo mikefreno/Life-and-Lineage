@@ -113,7 +113,7 @@ export default function DungeonScreen() {
                           while (router.canGoBack()) {
                             router.back();
                           }
-                          vibration("warning");
+                          vibration({ style: "warning" });
                           router.replace(
                             `/DungeonLevel/${dungeonInstance.instance}/${level.level}`,
                           );

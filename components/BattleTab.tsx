@@ -7,6 +7,7 @@ import { Item } from "../classes/item";
 import { useContext, useState } from "react";
 import { LogsContext, PlayerCharacterContext } from "../app/_layout";
 import { useColorScheme } from "nativewind";
+import { useVibration } from "../utility/customHooks";
 
 interface BattleTabProps {
   battleTab: "attacks" | "spells" | "equipment" | "log";
@@ -50,6 +51,7 @@ export default function BattleTab({
 
   const playerAttacks = playerState?.physicalAttacks;
   const playerSpells = playerState?.getSpells();
+  const vibrate = useVibration();
 
   let attackObjects: {
     name: string;
@@ -112,7 +114,10 @@ export default function BattleTab({
                     </View>
                     <Pressable
                       disabled={playerState.isStunned()}
-                      onPress={() => useAttack(attack)}
+                      onPress={() => {
+                        vibrate({ style: "light" });
+                        useAttack(attack);
+                      }}
                       className="my-auto rounded bg-zinc-300 px-4 py-2 active:scale-95 active:opacity-50 dark:bg-zinc-700"
                     >
                       <Text className="text-xl">
@@ -188,7 +193,10 @@ export default function BattleTab({
                         <Pressable
                           key={item.id}
                           className="m-2 items-center active:scale-90 active:opacity-50"
-                          onPress={() => setSelectedItem(item)}
+                          onPress={() => {
+                            vibrate({ style: "light" });
+                            setSelectedItem(item);
+                          }}
                         >
                           <View
                             className="rounded-lg p-2"

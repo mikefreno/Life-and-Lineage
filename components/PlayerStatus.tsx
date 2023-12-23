@@ -209,7 +209,7 @@ const PlayerStatus = observer(
         <NonThemedView
           className={`${
             onTop ? "border-b" : "border-t pb-3"
-          } border-zinc-200 dark:border-zinc-700 flex bg-zinc-50 dark:bg-zinc-900 py-2 z-0`}
+          } border-zinc-200 dark:border-zinc-700 flex bg-zinc-50 dark:bg-zinc-900 py-2`}
         >
           {displayGoldTop ? (
             <View className="flex flex-row justify-center">

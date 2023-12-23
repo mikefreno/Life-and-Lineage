@@ -7,11 +7,13 @@ import shopObjects from "../../assets/json/shops.json";
 import { router } from "expo-router";
 import { useContext } from "react";
 import { GameContext } from "../_layout";
+import { useVibration } from "../../utility/customHooks";
 
 export default function ShopsScreen() {
   const gameData = useContext(GameContext);
   if (!gameData) throw new Error("missing gameData");
   const { gameState } = gameData;
+  const vibrate = useVibration();
 
   if (gameState) {
     const shops = gameState.shops;
@@ -69,7 +71,10 @@ export default function ShopsScreen() {
 
             <Pressable
               className="mt-2 active:scale-95 active:opacity-50"
-              onPress={() => router.push(`/Shops/${shop.archetype}`)}
+              onPress={() => {
+                vibrate({ style: "light" });
+                router.push(`/Shops/${shop.archetype}`);
+              }}
             >
               <View
                 className="rounded-lg px-8 py-3"

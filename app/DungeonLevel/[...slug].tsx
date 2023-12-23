@@ -1,5 +1,5 @@
 import { View, Text } from "../../components/Themed";
-import { Image, View as NonThemedView } from "react-native";
+import { Animated, Image, View as NonThemedView } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import { MonsterImage } from "../../components/MonsterImage";
 import { Pressable, Modal } from "react-native";
@@ -67,6 +67,8 @@ const DungeonLevelScreen = observer(() => {
   const [showingMonsterHealthChange, setShowingMonsterHealthChange] =
     useState<boolean>(false);
   const [animationCycler, setAnimationCycler] = useState<number>(0);
+  const [attackAnimationOnGoing, setAttackAnimationOnGoing] =
+    useState<boolean>(false);
 
   const isFocused = useIsFocused();
 
@@ -136,6 +138,7 @@ const DungeonLevelScreen = observer(() => {
     const enemy = enemyGenerator(instanceName, level);
     setMonster(enemy);
     battleLogger(`You found a ${toTitleCase(enemy.creatureSpecies)}!`);
+    setAttackAnimationOnGoing(false);
   }
 
   function appropriateEnemyCheck() {
@@ -296,6 +299,7 @@ const DungeonLevelScreen = observer(() => {
         );
       }
     }
+    setAttackAnimationOnGoing(false);
   };
 
   function useAttack(attack: {
@@ -306,6 +310,7 @@ const DungeonLevelScreen = observer(() => {
     sanityDamage: number;
     debuffs: { name: string; chance: number }[] | null;
   }) {
+    setAttackAnimationOnGoing(true);
     if (monsterState && playerState && isFocused) {
       let monsterDefeated = false;
       const attackRes = playerState.doPhysicalAttack(
@@ -730,9 +735,9 @@ const DungeonLevelScreen = observer(() => {
                 </NonThemedView>
               )}
             </View>
-            <View className="">
+            <Animated.View>
               <MonsterImage monsterSpecies={monsterState.creatureSpecies} />
-            </View>
+            </Animated.View>
           </View>
           {thisDungeon.stepsBeforeBoss !== 0 && !fightingBoss ? (
             <View className="-mt-7 flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
