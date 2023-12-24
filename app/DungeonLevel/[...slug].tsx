@@ -1,6 +1,6 @@
 import { View, Text } from "../../components/Themed";
 import { Animated, Image, View as NonThemedView } from "react-native";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { MonsterImage } from "../../components/MonsterImage";
 import { Pressable, Modal } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
@@ -69,6 +69,9 @@ const DungeonLevelScreen = observer(() => {
   const [animationCycler, setAnimationCycler] = useState<number>(0);
   const [attackAnimationOnGoing, setAttackAnimationOnGoing] =
     useState<boolean>(false);
+  const monsterAttackAnimationValue = useRef(new Animated.Value(0)).current;
+  const monsterDamagedAnimationValue = useRef(new Animated.Value(1)).current;
+  const [monsterAttackDummy, setMonsterAttackDummy] = useState<number>(0);
 
   const isFocused = useIsFocused();
 
@@ -116,6 +119,41 @@ const DungeonLevelScreen = observer(() => {
       battleLogger(`You found the boss!`);
     }
   };
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.timing(monsterAttackAnimationValue, {
+        toValue: -30,
+        duration: 375,
+        useNativeDriver: true,
+      }),
+      Animated.timing(monsterAttackAnimationValue, {
+        toValue: 30,
+        duration: 375,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [monsterAttackDummy]);
+
+  useEffect(() => {
+    if (monsterHealthDiff < 0) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(monsterDamagedAnimationValue, {
+            toValue: 0.5,
+            duration: 250,
+            useNativeDriver: true,
+          }),
+          Animated.timing(monsterDamagedAnimationValue, {
+            toValue: 1,
+            duration: 250,
+            useNativeDriver: true,
+          }),
+        ]),
+        { iterations: 2 },
+      ).start();
+    }
+  }, [monsterHealthDiff]);
 
   useEffect(() => {
     if (!fightingBoss) {
@@ -287,6 +325,7 @@ const DungeonLevelScreen = observer(() => {
             array.slice(-1);
         }
         battleLogger(line);
+        setMonsterAttackDummy((prev) => prev + 1);
       } else if (enemyAttackRes.attack == "pass") {
         battleLogger(
           `The ${toTitleCase(monsterState.creatureSpecies)} did nothing`,
@@ -300,6 +339,7 @@ const DungeonLevelScreen = observer(() => {
       }
     }
     setAttackAnimationOnGoing(false);
+    setTimeout(() => {}, 500);
   };
 
   function useAttack(attack: {
@@ -378,7 +418,9 @@ const DungeonLevelScreen = observer(() => {
         );
       }
       if (!monsterDefeated) {
-        enemyTurn();
+        setTimeout(() => {
+          enemyTurn();
+        }, 1000);
       }
     }
   }
@@ -735,7 +777,12 @@ const DungeonLevelScreen = observer(() => {
                 </NonThemedView>
               )}
             </View>
-            <Animated.View>
+            <Animated.View
+              style={{
+                transform: [{ translateX: monsterAttackAnimationValue }],
+                opacity: monsterDamagedAnimationValue,
+              }}
+            >
               <MonsterImage monsterSpecies={monsterState.creatureSpecies} />
             </Animated.View>
           </View>
