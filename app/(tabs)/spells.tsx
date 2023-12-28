@@ -7,6 +7,7 @@ import { StyleSheet } from "react-native";
 import { observer } from "mobx-react-lite";
 import ProgressBar from "../../components/ProgressBar";
 import { elementalColorMap } from "../../utility/elementColors";
+import PlayerStatus from "../../components/PlayerStatus";
 
 const SpellsScreen = observer(() => {
   const playerCharacterData = useContext(PlayerCharacterContext);
@@ -74,6 +75,7 @@ const SpellsScreen = observer(() => {
 
   return (
     <View className="flex-1">
+      <PlayerStatus onTop={true} />
       <Text className="py-8 text-center text-xl tracking-wide">
         Known Spells
       </Text>

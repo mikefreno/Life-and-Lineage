@@ -54,7 +54,7 @@ export default function AppSettings() {
             <View style={styles.line} />
           </View>
           <NonThemedView
-            className="rounded px-4 py-2 dark:border-zinc-50"
+            className="rounded px-4 py-2"
             style={{ marginLeft: -48, marginTop: 12 }}
           >
             {themeOptions.map((item, index) => (
@@ -86,7 +86,7 @@ export default function AppSettings() {
             <View style={styles.line} />
           </View>
           <NonThemedView
-            className="rounded px-4 py-2 dark:border-zinc-50"
+            className="rounded px-4 py-2"
             style={{ marginLeft: -48, marginTop: 12 }}
           >
             {vibrationOptions.map((item, index) => (

@@ -119,10 +119,7 @@ export default function MedicalOption({
             className="mx-auto rounded-xl"
             style={{
               shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 1,
-              },
+              elevation: 1,
               backgroundColor: colorScheme == "light" ? "white" : "#71717a",
               shadowOpacity: 0.1,
               shadowRadius: 5,

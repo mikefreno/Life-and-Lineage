@@ -556,7 +556,10 @@ const HomeScreen = observer(() => {
           <View
             className="max-w-1/3 absolute items-center rounded-md border border-zinc-600 px-8 py-4 shadow-lg"
             style={{
-              backgroundColor: "rgba(250, 250, 250, 0.93)",
+              backgroundColor:
+                colorScheme == "light"
+                  ? "rgba(250, 250, 250, 0.93)"
+                  : "rgba(20, 20, 20, 0.80)",
               left: statsLeftPos
                 ? statsLeftPos < deviceWidth / 2
                   ? statsLeftPos + deviceWidth / 7

@@ -27,6 +27,7 @@ import { EvilIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import FadeOutText from "../../components/FadeOutText";
 import { useVibration } from "../../utility/customHooks";
+import { EnemyHealingAnimationBox } from "../../components/EnemyHealingAnimationBox";
 
 const DungeonLevelScreen = observer(() => {
   const playerCharacterData = useContext(PlayerCharacterContext);
@@ -72,6 +73,7 @@ const DungeonLevelScreen = observer(() => {
   const monsterAttackAnimationValue = useRef(new Animated.Value(0)).current;
   const monsterDamagedAnimationValue = useRef(new Animated.Value(1)).current;
   const [monsterAttackDummy, setMonsterAttackDummy] = useState<number>(0);
+  const [monsterHealDummy, setMonsterHealDummy] = useState<number>(0);
 
   const isFocused = useIsFocused();
 
@@ -121,18 +123,22 @@ const DungeonLevelScreen = observer(() => {
   };
 
   useEffect(() => {
-    Animated.sequence([
-      Animated.timing(monsterAttackAnimationValue, {
-        toValue: -30,
-        duration: 375,
-        useNativeDriver: true,
-      }),
-      Animated.timing(monsterAttackAnimationValue, {
-        toValue: 30,
-        duration: 375,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    if (!firstLoad) {
+      Animated.sequence([
+        Animated.timing(monsterAttackAnimationValue, {
+          toValue: -50,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(monsterAttackAnimationValue, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setAttackAnimationOnGoing(false);
+      });
+    }
   }, [monsterAttackDummy]);
 
   useEffect(() => {
@@ -141,17 +147,22 @@ const DungeonLevelScreen = observer(() => {
         Animated.sequence([
           Animated.timing(monsterDamagedAnimationValue, {
             toValue: 0.5,
-            duration: 250,
+            duration: 200,
             useNativeDriver: true,
           }),
           Animated.timing(monsterDamagedAnimationValue, {
             toValue: 1,
-            duration: 250,
+            duration: 200,
             useNativeDriver: true,
           }),
         ]),
         { iterations: 2 },
-      ).start();
+      ).start(() => {
+        setTimeout(() => {
+          setShowingMonsterHealthChange(false);
+          setMonsterHealthDiff(0);
+        }, 500);
+      });
     }
   }, [monsterHealthDiff]);
 
@@ -303,6 +314,9 @@ const DungeonLevelScreen = observer(() => {
 
         if (enemyAttackRes.attack.heal) {
           array.push(`healing for ${enemyAttackRes.attack.heal} health`);
+          setTimeout(() => {
+            setMonsterHealDummy((prev) => prev + 1);
+          }, 250);
         }
 
         if (enemyAttackRes.attack.sanityDamage > 0) {
@@ -330,16 +344,16 @@ const DungeonLevelScreen = observer(() => {
         battleLogger(
           `The ${toTitleCase(monsterState.creatureSpecies)} did nothing`,
         );
+        setAttackAnimationOnGoing(false);
       } else {
         battleLogger(
           `The ${toTitleCase(monsterState.creatureSpecies)} ${
             enemyAttackRes.attack == "stun" ? "was " : ""
           }${enemyAttackRes.attack}ed`,
         );
+        setAttackAnimationOnGoing(false);
       }
     }
-    setAttackAnimationOnGoing(false);
-    setTimeout(() => {}, 500);
   };
 
   function useAttack(attack: {
@@ -590,19 +604,17 @@ const DungeonLevelScreen = observer(() => {
   };
 
   function monsterHealthChangePopUp() {
-    if (monsterHealthDiff != 0) {
-      return (
-        <NonThemedView className="h-4">
-          <FadeOutText
-            className={"text-red-400"}
-            text={`${
-              monsterHealthDiff > 0 ? "+" : ""
-            }${monsterHealthDiff.toString()}`}
-            animationCycler={animationCycler}
-          />
-        </NonThemedView>
-      );
-    }
+    return (
+      <NonThemedView className="h-4">
+        <FadeOutText
+          className={"text-red-400"}
+          text={`${
+            monsterHealthDiff > 0 ? "+" : ""
+          }${monsterHealthDiff.toString()}`}
+          animationCycler={animationCycler}
+        />
+      </NonThemedView>
+    );
   }
 
   while (!monsterState) {
@@ -758,7 +770,7 @@ const DungeonLevelScreen = observer(() => {
           </NonThemedView>
         </Modal>
         <View className="flex-1 px-4 pt-4">
-          <View className="flex h-1/3 flex-row justify-evenly">
+          <NonThemedView className="flex h-1/3 flex-row justify-evenly">
             <View className="flex w-2/5 flex-col items-center justify-center">
               <Text className="text-3xl">
                 {toTitleCase(monsterState.creatureSpecies)}
@@ -772,20 +784,29 @@ const DungeonLevelScreen = observer(() => {
               {showingMonsterHealthChange ? (
                 monsterHealthChangePopUp()
               ) : (
-                <NonThemedView className="h-4">
-                  <Text></Text>
-                </NonThemedView>
+                <NonThemedView className="h-4" />
               )}
             </View>
             <Animated.View
               style={{
-                transform: [{ translateX: monsterAttackAnimationValue }],
+                transform: [
+                  { translateX: monsterAttackAnimationValue },
+                  {
+                    translateY: Animated.multiply(
+                      monsterAttackAnimationValue,
+                      -1.5,
+                    ),
+                  },
+                ],
                 opacity: monsterDamagedAnimationValue,
               }}
             >
               <MonsterImage monsterSpecies={monsterState.creatureSpecies} />
             </Animated.View>
-          </View>
+            <EnemyHealingAnimationBox
+              showHealAnimationDummy={monsterHealDummy}
+            />
+          </NonThemedView>
           {thisDungeon.stepsBeforeBoss !== 0 && !fightingBoss ? (
             <View className="-mt-7 flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
               <Text className="my-auto text-xl">
@@ -815,6 +836,7 @@ const DungeonLevelScreen = observer(() => {
                 battleTab={battleTab}
                 useSpell={useSpell}
                 pass={pass}
+                attackAnimationOnGoing={attackAnimationOnGoing}
               />
             </View>
             <View className="">

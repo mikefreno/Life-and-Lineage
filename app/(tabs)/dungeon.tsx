@@ -75,7 +75,7 @@ export default function DungeonScreen() {
 
   if (gameData) {
     return (
-      <>
+      <View className="flex-1">
         <PlayerStatus onTop={true} />
         <View className="h-full px-4">
           <View className="-mx-4 border-b border-zinc-300 py-4 dark:border-zinc-600">
@@ -121,7 +121,7 @@ export default function DungeonScreen() {
                         className="active:scale-95 active:opacity-50"
                       >
                         <View
-                          className="my-2 rounded-xl px-6 py-4"
+                          className="my-2 rounded-md px-6 py-4"
                           style={{
                             shadowColor:
                               dangerColorStep[level.level - height + 5],
@@ -138,7 +138,7 @@ export default function DungeonScreen() {
                         >
                           <Text
                             style={{ color: "white" }}
-                          >{`Enter Floor ${level.level}`}</Text>
+                          >{`Delve to Floor ${level.level}`}</Text>
                         </View>
                       </Pressable>
                     ))}
@@ -148,7 +148,7 @@ export default function DungeonScreen() {
             ))}
           </ScrollView>
         </View>
-      </>
+      </View>
     );
   }
 }

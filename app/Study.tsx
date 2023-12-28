@@ -136,13 +136,14 @@ export default function LearningSpellsScreen() {
                 maxValue={20}
               />
               <Pressable
-                onPress={() =>
+                onPress={() => {
                   studySpell(
                     studyState.bookName,
                     studyState.spellName,
                     studyState.element,
-                  )
-                }
+                  );
+                  vibration({ style: "light" });
+                }}
                 className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
               >
                 <Text>Continue Studying</Text>

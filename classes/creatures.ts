@@ -204,8 +204,10 @@ export class Monster {
               if (roll * 5 >= 100 - debuff.chance * 100) {
                 const heal = Math.round(damage * 0.5 * 4) / 4;
                 if (this.health + heal >= this.healthMax) {
+                  healedFor = this.healthMax - this.health;
                   this.health = this.healthMax;
                 } else {
+                  healedFor = heal;
                   this.health += heal;
                 }
               }

@@ -33,6 +33,7 @@ interface BattleTabProps {
       selfDamage?: number;
     };
   }) => void;
+  attackAnimationOnGoing: boolean;
 }
 
 export default function BattleTab({
@@ -40,6 +41,7 @@ export default function BattleTab({
   useAttack,
   useSpell,
   pass,
+  attackAnimationOnGoing,
 }: BattleTabProps) {
   const { colorScheme } = useColorScheme();
   const logs = useContext(LogsContext)?.logsState;
@@ -113,7 +115,9 @@ export default function BattleTab({
                       }% hit chance`}</Text>
                     </View>
                     <Pressable
-                      disabled={playerState.isStunned()}
+                      disabled={
+                        playerState.isStunned() || attackAnimationOnGoing
+                      }
                       onPress={() => {
                         vibrate({ style: "light" });
                         useAttack(attack);
@@ -159,7 +163,8 @@ export default function BattleTab({
                   <Pressable
                     disabled={
                       playerState.mana <= spell.manaCost ||
-                      playerState.isStunned()
+                      playerState.isStunned() ||
+                      attackAnimationOnGoing
                     }
                     onPress={() => useSpell(spell)}
                     className={`my-auto rounded  px-4 py-2 active:scale-95 active:opacity-50 ${

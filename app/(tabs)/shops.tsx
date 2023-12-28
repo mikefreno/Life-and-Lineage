@@ -82,10 +82,7 @@ export default function ShopsScreen() {
                   shadowColor: shopObjects.find(
                     (shopObj) => shopObj.type == shop.archetype,
                   )?.colors.background,
-                  shadowOffset: {
-                    width: 0,
-                    height: 4,
-                  },
+                  elevation: 1,
                   backgroundColor: shopObjects.find(
                     (shopObj) => shopObj.type == shop.archetype,
                   )?.colors.background,

@@ -177,18 +177,11 @@ export default function NewGameReview() {
       <Text className="pt-24 text-center text-3xl">{`${firstName} ${lastName} the ${toTitleCase(
         blessing,
       )}-born ${toTitleCase(playerClass)}`}</Text>
-      <Pressable className="mx-auto pt-8" onPress={() => startGame()}>
-        {({ pressed }) => (
-          <View
-            className={`rounded-lg bg-blue-400 px-8 py-4 dark:bg-blue-800 ${
-              pressed ? "scale-95 opacity-30" : null
-            }`}
-          >
-            <Text style={{ color: "white" }} className="text-2xl">
-              Confirm?
-            </Text>
-          </View>
-        )}
+      <Pressable
+        onPress={() => startGame()}
+        className="mx-auto mt-8 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+      >
+        <Text className="text-xl tracking-widest">Confirm?</Text>
       </Pressable>
     </ThemedView>
   );

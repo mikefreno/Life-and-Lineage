@@ -14,6 +14,7 @@ interface GameOptions {
   atDeathScreen?: boolean;
   colorScheme?: "system" | "dark" | "light";
   vibrationEnabled?: "full" | "minimal" | "none";
+  healthWarning: number;
 }
 
 export class Game {
@@ -24,6 +25,7 @@ export class Game {
   shops: Shop[];
   colorScheme: "system" | "dark" | "light";
   vibrationEnabled: "full" | "minimal" | "none";
+  healthWarning: number;
 
   constructor({
     date,
@@ -33,6 +35,7 @@ export class Game {
     shops,
     colorScheme,
     vibrationEnabled,
+    healthWarning,
   }: GameOptions) {
     this.date = date ?? new Date().toISOString();
     this.dungeonInstances = dungeonInstances ?? [
@@ -67,6 +70,7 @@ export class Game {
     this.colorScheme = colorScheme ?? "system";
     this.vibrationEnabled =
       vibrationEnabled ?? Platform.OS == "ios" ? "full" : "minimal";
+    this.healthWarning = healthWarning ?? 0.2;
     makeObservable(this, {
       date: observable,
       dungeonInstances: observable,
@@ -75,6 +79,7 @@ export class Game {
       shops: observable,
       colorScheme: observable,
       vibrationEnabled: observable,
+      healthWarning: observable,
       gameTick: action,
       getDungeon: action,
       getInstance: action,
@@ -82,6 +87,7 @@ export class Game {
       setColorScheme: action,
       hitDeathScreen: action,
       modifyVibrationSettings: action,
+      setHealthWarning: action,
     });
   }
 
@@ -176,7 +182,9 @@ export class Game {
   public modifyVibrationSettings(targetState: "full" | "minimal" | "none") {
     this.vibrationEnabled = targetState;
   }
-
+  public setHealthWarning(desiredValue: number) {
+    this.healthWarning = desiredValue;
+  }
   static fromJSON(json: any): Game {
     const game = new Game({
       date: json.date ? json.date : new Date().toISOString(),
@@ -192,6 +200,7 @@ export class Game {
         : undefined,
       colorScheme: json.colorScheme,
       vibrationEnabled: json.vibrationEnabled,
+      healthWarning: json.healthWarning,
     });
 
     return game;

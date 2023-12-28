@@ -109,7 +109,12 @@ export default function ShopScreen() {
               <View>
                 <Pressable
                   disabled={!transactionCompleteable}
-                  onPress={moveBetweenInventories}
+                  onPress={() =>
+                    moveBetweenInventories(
+                      selectedItem.item,
+                      selectedItem.buying,
+                    )
+                  }
                   className={`${
                     !transactionCompleteable ? "bg-zinc-300" : "bg-blue-400"
                   } my-4 rounded-lg active:scale-95 active:opacity-50`}
@@ -134,16 +139,16 @@ export default function ShopScreen() {
     }
   }
 
-  function moveBetweenInventories() {
-    if (selectedItem && playerCharacter && thisShop && gameState && isFocused) {
-      if (selectedItem.buying) {
-        const price = selectedItem.item.getBuyPrice(thisShop!.affection);
-        playerCharacter.buyItem(selectedItem.item, price);
-        thisShop.sellItem(selectedItem.item, price);
+  function moveBetweenInventories(itemToMove: Item, buying: boolean) {
+    if (playerCharacter && thisShop && gameState && isFocused) {
+      if (buying) {
+        const price = itemToMove.getBuyPrice(thisShop!.affection);
+        playerCharacter.buyItem(itemToMove, price);
+        thisShop.sellItem(itemToMove, price);
       } else {
-        const price = selectedItem.item.getSellPrice(thisShop!.affection);
-        thisShop.buyItem(selectedItem.item, price);
-        playerCharacter.sellItem(selectedItem.item, price);
+        const price = itemToMove.getSellPrice(thisShop!.affection);
+        thisShop.buyItem(itemToMove, price);
+        playerCharacter.sellItem(itemToMove, price);
       }
       vibrate({ style: "light", essential: true });
       setSelectedItem(null);
@@ -192,13 +197,13 @@ export default function ShopScreen() {
                   {thisShop.inventory.map((item) => (
                     <Pressable
                       key={item.id}
-                      className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
+                      className="m-2 w-1/4 items-center"
                       onPress={() => {
                         vibrate({ style: "light" });
                         displaySetter(item, true);
                       }}
                     >
-                      <NonThemedView className="rounded-lg bg-zinc-300 p-2">
+                      <NonThemedView className="rounded-lg bg-zinc-300 p-2 active:scale-90 active:opacity-50">
                         <Image source={item.getItemIcon()} />
                       </NonThemedView>
                     </Pressable>

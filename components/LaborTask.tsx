@@ -6,15 +6,15 @@ import HealthIcon from "../assets/icons/HealthIcon";
 import ProgressBar from "./ProgressBar";
 import { useColorScheme } from "nativewind";
 import { useIsFocused } from "@react-navigation/native";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   GameContext,
   MonsterContext,
   PlayerCharacterContext,
 } from "../app/_layout";
 import { observer } from "mobx-react-lite";
-import { debounce } from "lodash";
-import { fullSave } from "../utility/functions";
+import { fullSave, numberToRoman } from "../utility/functions";
+import { useVibration } from "../utility/customHooks";
 
 interface LaborTaskProps {
   reward: number;
@@ -51,6 +51,7 @@ const LaborTask = observer(
     const [experience, setExperience] = useState(
       playerState?.getJobExperience(title),
     );
+    const vibration = useVibration();
 
     const isFocused = useIsFocused();
 
@@ -61,9 +62,13 @@ const LaborTask = observer(
         playerState.performLabor({
           title: title,
           cost: cost,
-          goldReward: reward,
+          goldReward: playerState?.getRewardValue(title, reward) ?? reward,
         });
-        setExperience(playerState.getJobExperience(title));
+        const newExp = playerState.getJobExperience(title);
+        if (newExp == 0) {
+          vibration({ style: "success", essential: true });
+        }
+        setExperience(newExp);
         setMonster(null);
         gameState.gameTick(playerState);
         setFullReward(playerState.getRewardValue(title, reward));
@@ -89,7 +94,8 @@ const LaborTask = observer(
         <View className="flex justify-between rounded-xl px-4 py-2 text-zinc-950 dark:border dark:border-zinc-500">
           <View className="flex flex-row justify-between">
             <Text className="bold my-auto w-2/3 text-xl dark:text-zinc-50">
-              {title}
+              {title}{" "}
+              {playerState && numberToRoman(playerState.getJobRank(title))}
             </Text>
             <View className="my-auto -mb-8 mt-8 w-1/3">
               <View className="flex w-full flex-row items-center justify-evenly">
@@ -121,28 +127,23 @@ const LaborTask = observer(
           {playerState?.job == title ? (
             <>
               <Pressable
-                className="mb-2 mt-4 active:scale-95 active:opacity-50"
+                className="mx-auto mb-2 mt-4 active:scale-95 active:opacity-50"
                 onPress={work}
               >
                 <View
-                  className="mx-auto rounded-xl"
+                  className="rounded-xl px-8 py-4"
                   style={{
                     shadowColor: "#000",
-                    shadowOffset: {
-                      width: 0,
-                      height: 1,
-                    },
+                    elevation: 1,
                     backgroundColor:
                       colorScheme == "light" ? "white" : "#71717a",
                     shadowOpacity: 0.1,
                     shadowRadius: 5,
                   }}
                 >
-                  <View className="px-8 py-4">
-                    <Text className="text-center text-zinc-900 dark:text-zinc-50">
-                      Work
-                    </Text>
-                  </View>
+                  <Text className="text-center text-zinc-900 dark:text-zinc-50">
+                    Work
+                  </Text>
                 </View>
               </Pressable>
               <ProgressBar
@@ -152,27 +153,22 @@ const LaborTask = observer(
             </>
           ) : (
             <Pressable
-              className="mb-2 mt-4 active:scale-95 active:opacity-50"
+              className="mx-auto mb-2 mt-4 active:scale-95 active:opacity-50"
               onPress={() => applyToJob(title)}
             >
               <View
-                className="mx-auto rounded-xl"
+                className="rounded-xl px-8 py-4"
                 style={{
                   shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
+                  elevation: 1,
                   backgroundColor: colorScheme == "light" ? "white" : "#71717a",
                   shadowOpacity: 0.1,
                   shadowRadius: 5,
                 }}
               >
-                <View className="px-8 py-4">
-                  <Text className="text-center text-zinc-900 dark:text-zinc-50">
-                    Apply
-                  </Text>
-                </View>
+                <Text className="text-center text-zinc-900 dark:text-zinc-50">
+                  Apply
+                </Text>
               </View>
             </Pressable>
           )}

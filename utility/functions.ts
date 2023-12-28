@@ -288,3 +288,42 @@ export function createDebuff(
     }
   }
 }
+
+export function numberToRoman(num: number): string {
+  let roman = "";
+  const romanMap = new Map<number, string>([
+    [1000, "M"],
+    [900, "CM"],
+    [500, "D"],
+    [400, "CD"],
+    [100, "C"],
+    [90, "XC"],
+    [50, "L"],
+    [40, "XL"],
+    [10, "X"],
+    [9, "IX"],
+    [5, "V"],
+    [4, "IV"],
+    [1, "I"],
+  ]);
+
+  if (isNaN(num)) {
+    throw new Error("Input must be a number between 1 and 100.");
+  }
+  if (num == 0) {
+    return "";
+  }
+
+  const sortedRomanMap = Array.from(romanMap.entries()).sort(
+    (a, b) => b[0] - a[0],
+  );
+
+  for (const [value, symbol] of sortedRomanMap) {
+    while (num >= value) {
+      roman += symbol;
+      num -= value;
+    }
+  }
+
+  return roman;
+}

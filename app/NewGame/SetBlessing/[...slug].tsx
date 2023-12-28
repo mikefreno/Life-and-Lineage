@@ -410,18 +410,9 @@ export default function SetBlessing() {
                     `/NewGame/Review/${playerClass}/${sex}/${firstName}/${lastName}/${blessing}`,
                   )
                 }
+                className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
               >
-                {({ pressed }) => (
-                  <NonThemedView
-                    className={`rounded-lg bg-blue-400 px-8 py-4 dark:bg-blue-800 ${
-                      pressed ? "scale-95 opacity-30" : "scale-95"
-                    }`}
-                  >
-                    <Text style={{ color: "white" }} className="text-2xl">
-                      Next
-                    </Text>
-                  </NonThemedView>
-                )}
+                <Text className="text-xl tracking-widest">Next</Text>
               </Pressable>
             </NonThemedView>
           ) : null}

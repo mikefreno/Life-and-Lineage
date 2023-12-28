@@ -699,6 +699,11 @@ export class PlayerCharacter extends Character {
     }
   }
 
+  public getJobRank(jobTitle: string) {
+    const job = this.jobExperience.find((job) => job.job === jobTitle);
+    return job ? job.rank : 0;
+  }
+
   private gainExperience() {
     let jobFound = false;
 
