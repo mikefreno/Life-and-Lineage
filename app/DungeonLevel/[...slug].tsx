@@ -13,8 +13,6 @@ import monsterObjects from "../../assets/json/monsters.json";
 import { DungeonInstance, DungeonLevel } from "../../classes/dungeon";
 import { Item } from "../../classes/item";
 import Coins from "../../assets/icons/CoinsIcon";
-import { Condition } from "../../classes/conditions";
-import { Minion } from "../../classes/creatures";
 import { useIsFocused } from "@react-navigation/native";
 import {
   GameContext,
@@ -235,37 +233,76 @@ const DungeonLevelScreen = observer(() => {
   }
 
   function flee() {
-    const roll = flipCoin();
-    if (
-      playerState &&
-      (roll == "Heads" || monsterState?.creatureSpecies == "training dummy")
-    ) {
-      router.push("/dungeon");
-      vibration({ style: "light" });
-      setFleeRollFailure(false);
-      setTimeout(() => {
-        setFleeModalShowing(false);
-      }, 100);
-      setTimeout(() => {
-        playerState.clearMinions();
-        setMonster(null);
-        gameState?.gameTick(playerState);
-      }, 200);
-    } else {
-      setFleeRollFailure(true);
-      vibration({ style: "error" });
-      battleLogger("You failed to flee!");
+    if (playerState && monsterState) {
+      const roll = flipCoin();
 
       let monsterDefeated = false;
-      if (playerState && monsterState && playerState.minions.length > 0) {
-        const res = playerMinionAttacks(
-          monsterState.healthMax,
-          playerState.minions,
-        );
-        const hp = monsterState.damageHealth(res.totalHPDamage);
-        const sanity = monsterState.damageSanity(res.totalSanityDamage);
-        res.debuffs.forEach((debuff) => monsterState.addCondition(debuff));
-        if (hp <= 0 || (sanity && sanity <= 0)) {
+      if (
+        playerState &&
+        (roll == "Heads" || monsterState?.creatureSpecies == "training dummy")
+      ) {
+        router.push("/dungeon");
+        vibration({ style: "light" });
+        setFleeRollFailure(false);
+        setTimeout(() => {
+          setFleeModalShowing(false);
+        }, 100);
+        setTimeout(() => {
+          playerState.clearMinions();
+          setMonster(null);
+          gameState?.gameTick(playerState);
+        }, 200);
+      } else {
+        setFleeRollFailure(true);
+        vibration({ style: "error" });
+        battleLogger("You failed to flee!");
+
+        if (playerState.minions.length > 0) {
+          const pause = (ms: number) =>
+            new Promise<void>((resolve) => setTimeout(() => resolve(), ms));
+          playerState.minions.forEach(async (minion) => {
+            await pause(500);
+            const res = minion.attack(monsterState.healthMax);
+            if (res == "miss") {
+              battleLogger(
+                `${playerState.getFullName()}'s ${toTitleCase(
+                  minion.creatureSpecies,
+                )} missed!`,
+              );
+            } else {
+              let str = `${playerState.getFullName()}'s ${toTitleCase(
+                minion.creatureSpecies,
+              )} used ${toTitleCase(res.name)} dealing ${res.damage} damage`;
+              monsterState.damageHealth(res.damage);
+              if (res.heal && res.heal > 0) {
+                str += ` and healed for ${res.heal} damage`;
+              }
+              if (res.sanityDamage > 0) {
+                str += ` and ${res.sanityDamage} sanity damage`;
+                monsterState.damageSanity(res.sanityDamage);
+              }
+              if (res.debuffs) {
+                res.debuffs.forEach((effect) => {
+                  str += ` and applied a ${effect.name} stack`;
+                  monsterState.addCondition(effect);
+                });
+              }
+              battleLogger(str);
+            }
+            if (minion.turnsLeftAlive <= 0) {
+              playerState.removeMinion(minion);
+            }
+          });
+        }
+        if (
+          monsterState.health <= 0 ||
+          (monsterState.sanity && monsterState.sanity <= 0)
+        ) {
+          monsterDefeated = true;
+          gameState?.gameTick(playerState);
+          if (thisDungeon?.level != 0) {
+            thisDungeon?.incrementStep();
+          }
           gameState?.gameTick(playerState);
           if (thisDungeon?.level != 0) {
             thisDungeon?.incrementStep();
@@ -284,9 +321,9 @@ const DungeonLevelScreen = observer(() => {
           }
           setMonster(null);
         }
-      }
-      if (!monsterDefeated) {
-        enemyTurn();
+        if (!monsterDefeated) {
+          enemyTurn();
+        }
       }
     }
   }
@@ -372,8 +409,8 @@ const DungeonLevelScreen = observer(() => {
         monsterState.healthMax,
       );
       if (attackRes !== "miss") {
-        let hp = monsterState.damageHealth(attackRes.damage);
-        let sanity = monsterState.damageSanity(attackRes.sanityDamage);
+        monsterState.damageHealth(attackRes.damage);
+        monsterState.damageSanity(attackRes.sanityDamage);
         attackRes.debuffs?.forEach((effect) =>
           monsterState.addCondition(effect),
         );
@@ -398,15 +435,46 @@ const DungeonLevelScreen = observer(() => {
         }
         battleLogger(line);
         if (playerState.minions.length > 0) {
-          const res = playerMinionAttacks(
-            monsterState.healthMax,
-            playerState.minions,
-          );
-          hp = monsterState.damageHealth(res.totalHPDamage);
-          sanity = monsterState.damageSanity(res.totalSanityDamage);
-          res.debuffs.forEach((debuff) => monsterState.addCondition(debuff));
+          const pause = (ms: number) =>
+            new Promise<void>((resolve) => setTimeout(() => resolve(), ms));
+          playerState.minions.forEach(async (minion) => {
+            await pause(500);
+            const res = minion.attack(monsterState.healthMax);
+            if (res == "miss") {
+              battleLogger(
+                `${playerState.getFullName()}'s ${toTitleCase(
+                  minion.creatureSpecies,
+                )} missed!`,
+              );
+            } else {
+              let str = `${playerState.getFullName()}'s ${toTitleCase(
+                minion.creatureSpecies,
+              )} used ${toTitleCase(res.name)} dealing ${res.damage} damage`;
+              monsterState.damageHealth(res.damage);
+              if (res.heal && res.heal > 0) {
+                str += ` and healed for ${res.heal} damage`;
+              }
+              if (res.sanityDamage > 0) {
+                str += ` and ${res.sanityDamage} sanity damage`;
+                monsterState.damageSanity(res.sanityDamage);
+              }
+              if (res.debuffs) {
+                res.debuffs.forEach((effect) => {
+                  str += ` and applied a ${effect.name} stack`;
+                  monsterState.addCondition(effect);
+                });
+              }
+              battleLogger(str);
+            }
+            if (minion.turnsLeftAlive <= 0) {
+              playerState.removeMinion(minion);
+            }
+          });
         }
-        if (hp <= 0 || (sanity && sanity <= 0)) {
+        if (
+          monsterState.health <= 0 ||
+          (monsterState.sanity && monsterState.sanity <= 0)
+        ) {
           gameState?.gameTick(playerState);
           if (thisDungeon?.level != 0) {
             thisDungeon?.incrementStep();
@@ -453,10 +521,11 @@ const DungeonLevelScreen = observer(() => {
     };
   }) => {
     if (monsterState && playerState && isFocused) {
+      const startOfTurnMinions = { ...playerState.minions };
       let monsterDefeated = false;
       const spellRes = playerState.useSpell(spell, monsterState.healthMax);
-      let hp = monsterState.damageHealth(spellRes.damage);
-      let sanity = monsterState.damageSanity(spellRes.sanityDamage);
+      monsterState.damageHealth(spellRes.damage);
+      monsterState.damageSanity(spellRes.sanityDamage);
       spellRes.debuffs?.forEach((debuff) => monsterState.addCondition(debuff));
       let line = "";
       if (spell.effects.summon) {
@@ -484,16 +553,47 @@ const DungeonLevelScreen = observer(() => {
         }
       }
       battleLogger(line);
-      if (playerState.minions.length > 0) {
-        const res = playerMinionAttacks(
-          monsterState.healthMax,
-          playerState.minions,
-        );
-        hp = monsterState.damageHealth(res.totalHPDamage);
-        sanity = monsterState.damageSanity(res.totalSanityDamage);
-        res.debuffs.forEach((debuff) => monsterState.addCondition(debuff));
+      if (startOfTurnMinions.length > 0) {
+        const pause = (ms: number) =>
+          new Promise<void>((resolve) => setTimeout(() => resolve(), ms));
+        startOfTurnMinions.forEach(async (minion) => {
+          await pause(500);
+          const res = minion.attack(monsterState.healthMax);
+          if (res == "miss") {
+            battleLogger(
+              `${playerState.getFullName()}'s ${toTitleCase(
+                minion.creatureSpecies,
+              )} missed!`,
+            );
+          } else {
+            let str = `${playerState.getFullName()}'s ${toTitleCase(
+              minion.creatureSpecies,
+            )} used ${toTitleCase(res.name)} dealing ${res.damage} damage`;
+            monsterState.damageHealth(res.damage);
+            if (res.heal && res.heal > 0) {
+              str += ` and healed for ${res.heal} damage`;
+            }
+            if (res.sanityDamage > 0) {
+              str += ` and ${res.sanityDamage} sanity damage`;
+              monsterState.damageSanity(res.sanityDamage);
+            }
+            if (res.debuffs) {
+              res.debuffs.forEach((effect) => {
+                str += ` and applied a ${effect.name} stack`;
+                monsterState.addCondition(effect);
+              });
+            }
+            battleLogger(str);
+          }
+          if (minion.turnsLeftAlive <= 0) {
+            playerState.removeMinion(minion);
+          }
+        });
       }
-      if (hp <= 0 || (sanity && sanity <= 0)) {
+      if (
+        monsterState.health <= 0 ||
+        (monsterState.sanity && monsterState.sanity <= 0)
+      ) {
         gameState.gameTick(playerState);
         if (thisDungeon?.level != 0) {
           thisDungeon?.incrementStep();
@@ -518,68 +618,52 @@ const DungeonLevelScreen = observer(() => {
     }
   };
 
-  function playerMinionAttacks(enemyMaxHP: number, providedMinions: Minion[]) {
-    let totalHPDamage = 0;
-    let totalSanityDamage = 0;
-    let debuffs: Condition[] = [];
-    if (playerState && providedMinions.length > 0) {
-      providedMinions.forEach((minion) => {
-        const res = minion.attack(enemyMaxHP);
-        if (res == "miss") {
-          battleLogger(
-            `${playerState.getFullName()}'s ${toTitleCase(
-              minion.creatureSpecies,
-            )} missed!`,
-          );
-        } else {
-          let str = `${playerState.getFullName()}'s ${toTitleCase(
-            minion.creatureSpecies,
-          )} used ${toTitleCase(res.name)} dealing ${res.damage} damage`;
-          totalHPDamage += res.damage;
-          if (res.heal && res.heal > 0) {
-            str += ` and healed for ${res.heal} damage`;
-          }
-          if (res.sanityDamage > 0) {
-            str += ` and ${res.sanityDamage} sanity damage`;
-            totalSanityDamage += res.sanityDamage;
-          }
-          if (res.debuffs) {
-            res.debuffs.forEach((effect) => {
-              str += ` and applied a ${effect.name} stack`;
-              debuffs.push(effect);
-            });
-          }
-          battleLogger(str);
-        }
-        if (minion.turnsLeftAlive <= 0) {
-          playerState.removeMinion(minion);
-        }
-      });
-    }
-    return {
-      totalHPDamage: totalHPDamage,
-      totalSanityDamage: totalSanityDamage,
-      debuffs: debuffs,
-    };
-  }
-
   const pass = () => {
     if (monsterState && playerState && isFocused) {
       let monsterDefeated = false;
       playerState.pass();
-      let hp: number | undefined = undefined;
-      let sanity: number | undefined = undefined;
       battleLogger("You passed!");
       if (playerState.minions.length > 0) {
-        const res = playerMinionAttacks(
-          monsterState.healthMax,
-          playerState.minions,
-        );
-        hp = monsterState.damageHealth(res.totalHPDamage);
-        sanity = monsterState.damageSanity(res.totalSanityDamage);
-        res.debuffs.forEach((debuff) => monsterState.addCondition(debuff));
+        const pause = (ms: number) =>
+          new Promise<void>((resolve) => setTimeout(() => resolve(), ms));
+        playerState.minions.forEach(async (minion) => {
+          await pause(500);
+          const res = minion.attack(monsterState.healthMax);
+          if (res == "miss") {
+            battleLogger(
+              `${playerState.getFullName()}'s ${toTitleCase(
+                minion.creatureSpecies,
+              )} missed!`,
+            );
+          } else {
+            let str = `${playerState.getFullName()}'s ${toTitleCase(
+              minion.creatureSpecies,
+            )} used ${toTitleCase(res.name)} dealing ${res.damage} damage`;
+            monsterState.damageHealth(res.damage);
+            if (res.heal && res.heal > 0) {
+              str += ` and healed for ${res.heal} damage`;
+            }
+            if (res.sanityDamage > 0) {
+              str += ` and ${res.sanityDamage} sanity damage`;
+              monsterState.damageSanity(res.sanityDamage);
+            }
+            if (res.debuffs) {
+              res.debuffs.forEach((effect) => {
+                str += ` and applied a ${effect.name} stack`;
+                monsterState.addCondition(effect);
+              });
+            }
+            battleLogger(str);
+          }
+          if (minion.turnsLeftAlive <= 0) {
+            playerState.removeMinion(minion);
+          }
+        });
       }
-      if ((hp && hp <= 0) || (sanity && sanity <= 0)) {
+      if (
+        monsterState.health <= 0 ||
+        (monsterState.sanity && monsterState.sanity <= 0)
+      ) {
         if (thisDungeon?.level != 0) {
           thisDungeon?.incrementStep();
         }

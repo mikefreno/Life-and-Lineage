@@ -41,3 +41,21 @@ export function enemyGenerator(instance: string, level: number) {
   });
   return enemy;
 }
+
+const nameToImageMap: Record<string, any> = {
+  bandit: require("../assets/images/monsters/bandit.png"),
+  bat: require("../assets/images/monsters/bat.png"),
+  "giant rat": require("../assets/images/monsters/giant_rat.png"),
+  goblin: require("../assets/images/monsters/goblin.png"),
+  ghost: require("../assets/images/monsters/ghost.png"),
+  necromancer: require("../assets/images/monsters/necromancer.png"),
+  skeleton: require("../assets/images/monsters/skeleton.png"),
+  "training dummy": require("../assets/images/monsters/training_dummy.png"),
+  witch: require("../assets/images/monsters/witch.png"),
+};
+
+export function getMonsterImage(monsterName: string) {
+  return nameToImageMap[monsterName]
+    ? nameToImageMap[monsterName]
+    : require("../assets/images/monsters/training_dummy.png");
+}

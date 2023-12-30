@@ -175,10 +175,6 @@ export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
   }
 }
 
-export function getMonsterImage(monsterName: string) {
-  return require("../assets/images/monsters/goblin.png");
-}
-
 export function flipCoin() {
   return Math.random() < 0.5 ? "Heads" : "Tails";
 }

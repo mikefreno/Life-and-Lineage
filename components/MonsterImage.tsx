@@ -1,5 +1,5 @@
 import { Image } from "react-native";
-import { getMonsterImage } from "../utility/functions";
+import { getMonsterImage } from "../utility/monster";
 
 interface MonsterImageProps {
   monsterSpecies: string;

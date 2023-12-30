@@ -5,7 +5,6 @@ import { Easing } from "react-native-reanimated";
 
 const HealingIcon = ({ delay = 0 }) => {
   const translateAnim = useRef(new Animated.Value(320)).current;
-  const opacityAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     Animated.loop(
@@ -14,11 +13,6 @@ const HealingIcon = ({ delay = 0 }) => {
         Animated.parallel([
           Animated.timing(translateAnim, {
             toValue: -320,
-            duration: 2000,
-            useNativeDriver: true,
-          }),
-          Animated.timing(opacityAnim, {
-            toValue: 0.3,
             duration: 2000,
             useNativeDriver: true,
           }),
@@ -32,7 +26,6 @@ const HealingIcon = ({ delay = 0 }) => {
       style={{
         height: 48,
         width: 48,
-        opacity: opacityAnim,
         transform: [{ translateY: translateAnim }],
       }}
     >
@@ -57,7 +50,7 @@ export const EnemyHealingAnimationBox = ({
       setOpacityAnim(newAnim);
       Animated.timing(newAnim, {
         toValue: 0,
-        duration: 5000,
+        duration: 2500,
         useNativeDriver: true,
         easing: Easing.out(Easing.poly(5)),
       }).start();
