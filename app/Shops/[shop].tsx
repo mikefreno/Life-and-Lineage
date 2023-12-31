@@ -73,82 +73,75 @@ export default function ShopScreen() {
           selectedItem.item.getSellPrice(thisShop!.affection);
 
       return (
-        <ScrollView className="pt-6">
-          <View className="mx-auto flex min-h-[1/3] flex-row">
-            <View
-              className="flex items-center"
-              style={{
-                marginLeft:
-                  selectedItem.item.slot && selectedItem.item.stats ? 100 : 0,
-                width: 140,
-              }}
-            >
-              <Text className="text-center">
-                {toTitleCase(selectedItem.item.name)}
+        <View className="mx-auto flex flex-row pt-8">
+          <View
+            className="flex items-center"
+            style={{
+              marginLeft:
+                selectedItem.item.slot && selectedItem.item.stats ? 100 : 0,
+              width: 140,
+            }}
+          >
+            <Text className="text-center">
+              {toTitleCase(selectedItem.item.name)}
+            </Text>
+            <Image source={selectedItem.item.getItemIcon()} />
+            <Text>
+              {selectedItem.item.itemClass == "bodyArmor"
+                ? "Body Armor"
+                : toTitleCase(selectedItem.item.itemClass)}
+            </Text>
+            {selectedItem.item.slot ? (
+              <Text className="">
+                Fills {toTitleCase(selectedItem.item.slot)} Slot
               </Text>
-              <Image source={selectedItem.item.getItemIcon()} />
-              <Text>
-                {selectedItem.item.itemClass == "bodyArmor"
-                  ? "Body Armor"
-                  : toTitleCase(selectedItem.item.itemClass)}
-              </Text>
-              {selectedItem.item.slot ? (
-                <Text className="">
-                  Fills {toTitleCase(selectedItem.item.slot)} Slot
-                </Text>
-              ) : null}
-              <View className="flex flex-row">
-                <Text>
-                  Price:{" "}
-                  {selectedItem.buying
-                    ? selectedItem.item.getBuyPrice(thisShop!.affection)
-                    : selectedItem.item.getSellPrice(thisShop!.affection)}
-                </Text>
-                <Coins width={20} height={20} style={{ marginLeft: 6 }} />
-              </View>
-              <View>
-                <Pressable
-                  disabled={!transactionCompleteable}
-                  onPress={() =>
-                    moveBetweenInventories(
-                      selectedItem.item,
-                      selectedItem.buying,
-                    )
-                  }
-                  className={`${
-                    !transactionCompleteable ? "bg-zinc-300" : "bg-blue-400"
-                  } my-4 rounded-lg active:scale-95 active:opacity-50`}
-                >
-                  <Text className="px-6 py-4" style={{ color: "white" }}>
-                    {selectedItem.buying ? "Purchase" : "Sell"}
-                  </Text>
-                </Pressable>
-              </View>
-            </View>
-            {selectedItem.item.slot && selectedItem.item.stats ? (
-              <View style={{ marginLeft: 10, marginTop: 20, width: 90 }}>
-                <GearStatsDisplay stats={selectedItem.item.stats} />
-              </View>
             ) : null}
+            <View className="flex flex-row">
+              <Text>
+                Price:{" "}
+                {selectedItem.buying
+                  ? selectedItem.item.getBuyPrice(thisShop!.affection)
+                  : selectedItem.item.getSellPrice(thisShop!.affection)}
+              </Text>
+              <Coins width={20} height={20} style={{ marginLeft: 6 }} />
+            </View>
+            <View>
+              <Pressable
+                disabled={!transactionCompleteable}
+                onPress={() => moveBetweenInventories(selectedItem)}
+                className={`${
+                  !transactionCompleteable ? "bg-zinc-300" : "bg-blue-400"
+                } my-4 rounded-lg active:scale-95 active:opacity-50`}
+              >
+                <Text className="px-6 py-4" style={{ color: "white" }}>
+                  {selectedItem.buying ? "Purchase" : "Sell"}
+                </Text>
+              </Pressable>
+            </View>
           </View>
+          {selectedItem.item.slot && selectedItem.item.stats ? (
+            <View style={{ marginLeft: 10, marginTop: 20, width: 90 }}>
+              <GearStatsDisplay stats={selectedItem.item.stats} />
+            </View>
+          ) : null}
           {selectedSpell ? <SpellDetails spell={selectedSpell} /> : null}
-        </ScrollView>
+        </View>
       );
-    } else {
-      return <View className="flex h-1/3 items-center justify-center"></View>;
     }
   }
 
-  function moveBetweenInventories(itemToMove: Item, buying: boolean) {
-    if (playerCharacter && thisShop && gameState && isFocused) {
-      if (buying) {
-        const price = itemToMove.getBuyPrice(thisShop!.affection);
-        playerCharacter.buyItem(itemToMove, price);
-        thisShop.sellItem(itemToMove, price);
+  function moveBetweenInventories(
+    selected: { item: Item; buying: boolean } | null,
+  ) {
+    if (playerCharacter && thisShop && gameState && isFocused && selected) {
+      if (selected.buying) {
+        const price = selected.item.getBuyPrice(thisShop!.affection);
+        playerCharacter.buyItem(selected.item, price);
+        thisShop.sellItem(selected.item, price);
       } else {
-        const price = itemToMove.getSellPrice(thisShop!.affection);
-        thisShop.buyItem(itemToMove, price);
-        playerCharacter.sellItem(itemToMove, price);
+        const price = selected.item.getSellPrice(thisShop!.affection);
+        thisShop.buyItem(selected.item, price);
+        playerCharacter.sellItem(selected.item, price);
       }
       vibrate({ style: "light", essential: true });
       setSelectedItem(null);
@@ -156,7 +149,8 @@ export default function ShopScreen() {
   }
 
   function displaySetter(item: Item, buying: boolean) {
-    setSelectedItem({ item: item, buying: buying });
+    const selected = { item: item, buying: buying };
+    setSelectedItem(selected);
     if (item.itemClass == "book" && playerCharacter) {
       const spell = item.getAttachedSpell(playerCharacter.playerClass);
       setSelectedSpell(spell);
@@ -197,13 +191,10 @@ export default function ShopScreen() {
                   {thisShop.inventory.map((item) => (
                     <Pressable
                       key={item.id}
-                      className="m-2 w-1/4 items-center"
-                      onPress={() => {
-                        vibrate({ style: "light" });
-                        displaySetter(item, true);
-                      }}
+                      className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
+                      onPress={() => displaySetter(item, true)}
                     >
-                      <NonThemedView className="rounded-lg bg-zinc-300 p-2 active:scale-90 active:opacity-50">
+                      <NonThemedView className="rounded-lg bg-zinc-300 p-2">
                         <Image source={item.getItemIcon()} />
                       </NonThemedView>
                     </Pressable>
@@ -212,12 +203,8 @@ export default function ShopScreen() {
               </ScrollView>
             </View>
           </View>
-          {selectedItem ? (
-            selectedItemDisplay()
-          ) : (
-            <NonThemedView className="-my-6 flex h-1/3 items-center justify-center" />
-          )}
-          <NonThemedView className="h-1/3">
+          <ScrollView className="">{selectedItemDisplay()}</ScrollView>
+          <NonThemedView className="h-2/5">
             <NonThemedView className="flex flex-row justify-center border-b border-zinc-300 dark:border-zinc-700">
               <Text className="text-center">
                 {playerCharacter.getFullName()}'s Inventory

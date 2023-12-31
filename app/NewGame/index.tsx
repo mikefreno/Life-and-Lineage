@@ -2,7 +2,7 @@ import { Pressable, useColorScheme } from "react-native";
 import { Text, View, ScrollView } from "../../components/Themed";
 import { View as NonThemedView } from "react-native";
 import "../../assets/styles/globals.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import { Stack, router } from "expo-router";
 import Necromancer from "../../assets/icons/NecromancerSkull";
@@ -12,7 +12,11 @@ export default function NewGameScreen() {
   const [selectedClass, setSelectedClass] = useState<
     "mage" | "necromancer" | "paladin"
   >();
+  const [navigationPath, setNavigationPath] = useState<string>("");
   const colorScheme = useColorScheme();
+  useEffect(() => {
+    setNavigationPath(`/NewGame/SetSex/${selectedClass}`);
+  }, [selectedClass]);
 
   return (
     <>
@@ -139,18 +143,21 @@ export default function NewGameScreen() {
                 poisonous magics.
               </Text>
             ) : null}
-            {selectedClass ? (
+            {selectedClass && (
               <NonThemedView className="mx-auto mt-4">
                 <Pressable
-                  onPress={() =>
-                    router.push(`/NewGame/SetSex/${selectedClass}`)
-                  }
+                  onPress={() => {
+                    router.push({
+                      pathname: "/NewGame/SetSex/[slug]",
+                      params: { slug: selectedClass },
+                    });
+                  }}
                   className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
                 >
                   <Text className="text-xl tracking-widest">Next</Text>
                 </Pressable>
               </NonThemedView>
-            ) : null}
+            )}
           </View>
         </View>
       </ScrollView>

@@ -1,5 +1,6 @@
 import enemies from "../assets/json/monsters.json";
 import { Monster } from "../classes/creatures";
+import { Image } from "react-native";
 
 function pickRandomEnemyJSON(instance: string, level: number) {
   const enemiesInThisInstance = enemies.filter((enemy) =>
@@ -42,20 +43,63 @@ export function enemyGenerator(instance: string, level: number) {
   return enemy;
 }
 
-const nameToImageMap: Record<string, any> = {
-  bandit: require("../assets/images/monsters/bandit.png"),
-  bat: require("../assets/images/monsters/bat.png"),
-  "giant rat": require("../assets/images/monsters/giant_rat.png"),
-  goblin: require("../assets/images/monsters/goblin.png"),
-  ghost: require("../assets/images/monsters/ghost.png"),
-  necromancer: require("../assets/images/monsters/necromancer.png"),
-  skeleton: require("../assets/images/monsters/skeleton.png"),
-  "training dummy": require("../assets/images/monsters/training_dummy.png"),
-  witch: require("../assets/images/monsters/witch.png"),
+type ImageInfo = {
+  source: any;
+  width: number;
+  height: number;
+  heightOffset?: number;
 };
 
-export function getMonsterImage(monsterName: string) {
-  return nameToImageMap[monsterName]
-    ? nameToImageMap[monsterName]
-    : require("../assets/images/monsters/training_dummy.png");
-}
+export const MonsterImageMap: Record<string, ImageInfo> = {
+  bandit: {
+    source: require("../assets/images/monsters/bandit.png"),
+    width: 160,
+    height: 160,
+  },
+  bat: {
+    source: require("../assets/images/monsters/bat.png"),
+    width: 120,
+    height: 120,
+    heightOffset: -60,
+  },
+  "giant rat": {
+    source: require("../assets/images/monsters/giant_rat.png"),
+    width: 180,
+    height: 180,
+  },
+  goblin: {
+    source: require("../assets/images/monsters/goblin.png"),
+    width: 140,
+    height: 140,
+  },
+  ghost: {
+    source: require("../assets/images/monsters/ghost.png"),
+    width: 140,
+    height: 140,
+  },
+  necromancer: {
+    source: require("../assets/images/monsters/necromancer.png"),
+    width: 150,
+    height: 150,
+  },
+  skeleton: {
+    source: require("../assets/images/monsters/skeleton.png"),
+    width: 160,
+    height: 160,
+  },
+  "training dummy": {
+    source: require("../assets/images/monsters/training_dummy.png"),
+    width: 150,
+    height: 150,
+  },
+  witch: {
+    source: require("../assets/images/monsters/witch.png"),
+    width: 150,
+    height: 150,
+  },
+  zombie: {
+    source: require("../assets/images/monsters/zombie.png"),
+    width: 170,
+    height: 170,
+  },
+};

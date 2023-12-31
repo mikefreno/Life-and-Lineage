@@ -30,6 +30,7 @@ import { Item } from "./item";
 import { action, makeObservable, observable } from "mobx";
 
 interface monsterInterface {
+  id?: string;
   creatureSpecies: string;
   health: number;
   healthMax: number;
@@ -45,6 +46,7 @@ interface monsterInterface {
 }
 
 export class Monster {
+  readonly id: string;
   readonly creatureSpecies: string;
   health: number;
   readonly healthMax: number;
@@ -59,6 +61,7 @@ export class Monster {
   conditions: Condition[];
 
   constructor({
+    id,
     creatureSpecies,
     health,
     healthMax,
@@ -72,6 +75,7 @@ export class Monster {
     attacks,
     conditions,
   }: monsterInterface) {
+    this.id = id ?? uuidv4();
     this.creatureSpecies = creatureSpecies;
     this.health = health;
     this.sanity = sanity ?? null;
@@ -96,7 +100,13 @@ export class Monster {
       takeTurn: action,
       addMinion: action,
       getDrops: action,
+      equals: action,
     });
+  }
+
+  //---------------------------Equivalency---------------------------//
+  public equals(otherMonsterID: string) {
+    return this.id == otherMonsterID;
   }
   //---------------------------Health---------------------------//
   public damageHealth(damage: number | null) {
