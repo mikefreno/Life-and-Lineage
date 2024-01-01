@@ -2,7 +2,7 @@ import { Pressable, useColorScheme } from "react-native";
 import { Text, View, ScrollView } from "../../components/Themed";
 import { View as NonThemedView } from "react-native";
 import "../../assets/styles/globals.css";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import { Stack, router } from "expo-router";
 import Necromancer from "../../assets/icons/NecromancerSkull";
@@ -12,11 +12,8 @@ export default function NewGameScreen() {
   const [selectedClass, setSelectedClass] = useState<
     "mage" | "necromancer" | "paladin"
   >();
-  const [navigationPath, setNavigationPath] = useState<string>("");
+  let classRef = useRef<"mage" | "necromancer" | "paladin">();
   const colorScheme = useColorScheme();
-  useEffect(() => {
-    setNavigationPath(`/NewGame/SetSex/${selectedClass}`);
-  }, [selectedClass]);
 
   return (
     <>
@@ -30,21 +27,22 @@ export default function NewGameScreen() {
           Create a Character
         </Text>
         <View className="">
-          <View className="mx-auto my-4 w-4/5">
-            <Text className="pt-4 text-center text-2xl">Select Class</Text>
+          <View className="mx-auto my-2 w-4/5">
+            <Text className="pt-2 text-center text-2xl">Select Class</Text>
             <Pressable
               className="mx-auto my-8"
               onPress={() => {
                 setSelectedClass("mage");
+                classRef.current = "mage";
               }}
             >
               {({ pressed }) => (
                 <NonThemedView
                   className={`${
                     pressed || selectedClass == "mage"
-                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : "scale-90"
-                  } px-6 py-4`}
+                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                      : "border-transparent"
+                  } px-6 py-4 border`}
                 >
                   <WizardHat
                     height={120}
@@ -62,25 +60,28 @@ export default function NewGameScreen() {
               )}
             </Pressable>
             {selectedClass == "mage" ? (
-              <Text className="text-center">
+              <Text className="h-16 text-center">
                 The Mage is the default class, it is well balanced, with a focus
                 on casting elemental magic
               </Text>
-            ) : null}
+            ) : (
+              <View className="h-16" />
+            )}
             <NonThemedView className="flex flex-row justify-between">
               <Pressable
                 className="-ml-2"
                 onPress={() => {
                   setSelectedClass("necromancer");
+                  classRef.current = "necromancer";
                 }}
               >
                 {({ pressed }) => (
                   <NonThemedView
                     className={`${
                       pressed || selectedClass == "necromancer"
-                        ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                        : "scale-90"
-                    } px-6 py-4`}
+                        ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                        : "border-transparent"
+                    } px-6 py-4 border`}
                   >
                     <NonThemedView className="-rotate-12">
                       <Necromancer
@@ -103,15 +104,16 @@ export default function NewGameScreen() {
                 className="-mr-2"
                 onPress={() => {
                   setSelectedClass("paladin");
+                  classRef.current = "paladin";
                 }}
               >
                 {({ pressed }) => (
                   <NonThemedView
                     className={`${
                       pressed || selectedClass == "paladin"
-                        ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                        : "scale-90"
-                    } px-8 py-4`}
+                        ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                        : "border-transparent"
+                    } px-8 py-4 border`}
                   >
                     <NonThemedView className="rotate-12">
                       <NonThemedView className="scale-x-[-1] transform">
@@ -133,12 +135,12 @@ export default function NewGameScreen() {
               </Pressable>
             </NonThemedView>
             {selectedClass == "paladin" ? (
-              <Text className="mt-6 text-center">
+              <Text className="mt-6 h-16 text-center">
                 The Paladin is skilled with arms and uses holy magic, which is
                 especially powerful against the undead.
               </Text>
             ) : selectedClass == "necromancer" ? (
-              <Text className="mt-6 text-center">
+              <Text className="mt-6 h-16 text-center">
                 The Necromancer can summon minions, use blood, bone and
                 poisonous magics.
               </Text>
@@ -146,12 +148,9 @@ export default function NewGameScreen() {
             {selectedClass && (
               <NonThemedView className="mx-auto mt-4">
                 <Pressable
-                  onPress={() => {
-                    router.push({
-                      pathname: "/NewGame/SetSex/[slug]",
-                      params: { slug: selectedClass },
-                    });
-                  }}
+                  onPress={() =>
+                    router.push(`/NewGame/SetSex/${classRef.current}`)
+                  }
                   className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
                 >
                   <Text className="text-xl tracking-widest">Next</Text>

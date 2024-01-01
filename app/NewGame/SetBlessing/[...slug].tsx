@@ -1,6 +1,6 @@
 import { Pressable, View as NonThemedView, useColorScheme } from "react-native";
 import { Text, ScrollView, View } from "../../../components/Themed";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { toTitleCase } from "../../../utility/functions";
 import { router } from "expo-router";
@@ -24,6 +24,7 @@ export default function SetBlessing() {
   const firstName = toTitleCase(slug[2]);
   const lastName = toTitleCase(slug[3]);
   const colorScheme = useColorScheme();
+  const blessingRef = useRef<string>();
 
   function classDependantBlessings() {
     if (playerClass == "mage") {
@@ -33,6 +34,7 @@ export default function SetBlessing() {
             <Pressable
               onPress={() => {
                 setBlessing("fire");
+                blessingRef.current = "fire";
               }}
             >
               {({ pressed }) => (
@@ -63,6 +65,7 @@ export default function SetBlessing() {
             <Pressable
               onPress={() => {
                 setBlessing("water");
+                blessingRef.current = "water";
               }}
             >
               {({ pressed }) => (
@@ -95,6 +98,7 @@ export default function SetBlessing() {
             <Pressable
               onPress={() => {
                 setBlessing("air");
+                blessingRef.current = "air";
               }}
             >
               {({ pressed }) => (
@@ -125,6 +129,7 @@ export default function SetBlessing() {
             <Pressable
               onPress={() => {
                 setBlessing("earth");
+                blessingRef.current = "earth";
               }}
             >
               {({ pressed }) => (
@@ -163,6 +168,7 @@ export default function SetBlessing() {
               className="w-1/2"
               onPress={() => {
                 setBlessing("summoning");
+                blessingRef.current = "summoning";
               }}
             >
               {({ pressed }) => (
@@ -194,6 +200,7 @@ export default function SetBlessing() {
               className="w-1/2"
               onPress={() => {
                 setBlessing("pestilence");
+                blessingRef.current = "pestilence";
               }}
             >
               {({ pressed }) => (
@@ -227,6 +234,7 @@ export default function SetBlessing() {
               className="w-1/2"
               onPress={() => {
                 setBlessing("bone");
+                blessingRef.current = "bone";
               }}
             >
               {({ pressed }) => (
@@ -258,6 +266,7 @@ export default function SetBlessing() {
               className="w-1/2"
               onPress={() => {
                 setBlessing("blood");
+                blessingRef.current = "blood";
               }}
             >
               {({ pressed }) => (
@@ -295,6 +304,7 @@ export default function SetBlessing() {
             className="mx-auto"
             onPress={() => {
               setBlessing("holy");
+              blessingRef.current = "holy";
             }}
           >
             {({ pressed }) => (
@@ -326,6 +336,7 @@ export default function SetBlessing() {
             <Pressable
               onPress={() => {
                 setBlessing("vengeance");
+                blessingRef.current = "vengeance";
               }}
             >
               {({ pressed }) => (
@@ -356,6 +367,7 @@ export default function SetBlessing() {
             <Pressable
               onPress={() => {
                 setBlessing("protection");
+                blessingRef.current = "protection";
               }}
             >
               {({ pressed }) => (
@@ -407,7 +419,7 @@ export default function SetBlessing() {
               <Pressable
                 onPress={() =>
                   router.push(
-                    `/NewGame/Review/${playerClass}/${sex}/${firstName}/${lastName}/${blessing}`,
+                    `/NewGame/Review/${playerClass}/${sex}/${firstName}/${lastName}/${blessingRef.current}`,
                   )
                 }
                 className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"

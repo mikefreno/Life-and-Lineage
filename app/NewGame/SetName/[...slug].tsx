@@ -6,7 +6,7 @@ import {
   View,
 } from "react-native";
 import { View as ThemedView, Text } from "../../../components/Themed";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { toTitleCase } from "../../../utility/functions";
 
@@ -16,6 +16,8 @@ export default function SetName() {
   const sex = slug[1];
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
+  const firstNameRef = useRef<string>();
+  const lastNameRef = useRef<string>();
 
   return (
     <>
@@ -34,7 +36,10 @@ export default function SetName() {
           <TextInput
             className="mt-12 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
             placeholderClassName="text-zinc-400 dark:text-zinc-400"
-            onChangeText={(text) => setFirstName(text.replace(/^\s+/, ""))}
+            onChangeText={(text) => {
+              setFirstName(text.replace(/^\s+/, ""));
+              firstNameRef.current = text.replace(/^\s+/, "");
+            }}
             placeholder={"Given Name (First Name)"}
             value={firstName}
             autoCorrect={false}
@@ -51,7 +56,10 @@ export default function SetName() {
           <TextInput
             className="mt-12 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
             placeholderClassName="text-zinc-400 dark:text-zinc-400"
-            onChangeText={(text) => setLastName(text.replace(/^\s+/, ""))}
+            onChangeText={(text) => {
+              setLastName(text.replace(/^\s+/, ""));
+              lastNameRef.current = text.replace(/^\s+/, "");
+            }}
             placeholder={"Surname (Last Name)"}
             autoComplete="family-name"
             autoCorrect={false}
@@ -69,7 +77,7 @@ export default function SetName() {
             <Pressable
               onPress={() =>
                 router.push(
-                  `/NewGame/SetBlessing/${playerClass}/${sex}/${firstName.trimEnd()}/${lastName.trimEnd()}`,
+                  `/NewGame/SetBlessing/${playerClass}/${sex}/${firstNameRef.current?.trimEnd()}/${lastNameRef.current?.trimEnd()}`,
                 )
               }
               className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"

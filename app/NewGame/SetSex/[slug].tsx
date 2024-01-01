@@ -3,11 +3,14 @@ import { View, Text } from "../../../components/Themed";
 import { toTitleCase } from "../../../utility/functions";
 import { Foundation } from "@expo/vector-icons";
 import { Pressable, View as NonThemedView } from "react-native";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export default function SetSex() {
   const { slug } = useLocalSearchParams();
   const [sex, setSex] = useState<"male" | "female">();
+
+  let sexRef = useRef<"male" | "female">();
+
   return (
     <>
       <Stack.Screen
@@ -23,6 +26,7 @@ export default function SetSex() {
           <Pressable
             onPress={() => {
               setSex("male");
+              sexRef.current = "male";
             }}
           >
             {({ pressed }) => (
@@ -41,6 +45,7 @@ export default function SetSex() {
           <Pressable
             onPress={() => {
               setSex("female");
+              sexRef.current = "female";
             }}
           >
             {({ pressed }) => (
@@ -62,7 +67,9 @@ export default function SetSex() {
         {sex ? (
           <NonThemedView className="mx-auto mt-8">
             <Pressable
-              onPress={() => router.push(`/NewGame/SetName/${slug}/${sex}`)}
+              onPress={() =>
+                router.push(`/NewGame/SetName/${slug}/${sexRef.current}`)
+              }
               className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
             >
               <Text className="text-xl tracking-widest">Next</Text>
