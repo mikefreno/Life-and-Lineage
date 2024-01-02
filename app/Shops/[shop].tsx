@@ -64,6 +64,18 @@ export default function ShopScreen() {
     setRefreshCheck(true);
   }, [playerCharacter]);
 
+  function sellAllJunk() {
+    if (thisShop) {
+      playerCharacter?.inventory.forEach((item) => {
+        if (item.itemClass == "junk") {
+          const price = item.getSellPrice(thisShop!.affection);
+          thisShop.buyItem(item, price);
+          playerCharacter.sellItem(item, price);
+        }
+      });
+    }
+  }
+
   function selectedItemDisplay() {
     if (selectedItem) {
       const transactionCompleteable = selectedItem.buying
@@ -210,12 +222,19 @@ export default function ShopScreen() {
                 {playerCharacter.getFullName()}'s Inventory
               </Text>
               <View className="flex flex-row">
-                <Text className="my-auto">
-                  {" "}
-                  ( {playerCharacter!.getReadableGold()}
-                </Text>
+                <Text> ( {playerCharacter!.getReadableGold()}</Text>
                 <Coins width={16} height={16} style={{ marginLeft: 6 }} />
                 <Text> )</Text>
+                {playerCharacter.inventory.some(
+                  (item) => item.itemClass == "junk",
+                ) ? (
+                  <Pressable
+                    onPress={sellAllJunk}
+                    className="ml-2 rounded-xl border border-zinc-900 px-6 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                  >
+                    <Text>Sell Junk</Text>
+                  </Pressable>
+                ) : null}
               </View>
             </NonThemedView>
             <ScrollView>

@@ -53,7 +53,7 @@ export default function BattleTab({
 
   const playerAttacks = playerState?.physicalAttacks;
   const playerSpells = playerState?.getSpells();
-  const vibrate = useVibration();
+  const vibration = useVibration();
 
   let attackObjects: {
     name: string;
@@ -91,7 +91,7 @@ export default function BattleTab({
         </View>
       );
     } else {
-      return <View className="flex h-1/3 items-center justify-center"></View>;
+      return <View className="flex h-1/3 items-center justify-center" />;
     }
   }
 
@@ -119,7 +119,7 @@ export default function BattleTab({
                         playerState.isStunned() || attackAnimationOnGoing
                       }
                       onPress={() => {
-                        vibrate({ style: "light" });
+                        vibration({ style: "light" });
                         useAttack(attack);
                       }}
                       className="my-auto rounded bg-zinc-300 px-4 py-2 active:scale-95 active:opacity-50 dark:bg-zinc-700"
@@ -139,7 +139,10 @@ export default function BattleTab({
                     <Text className="text-xl">Pass</Text>
                   </View>
                   <Pressable
-                    onPress={pass}
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      pass();
+                    }}
                     className="my-auto rounded bg-zinc-300 px-4 py-2 active:scale-95 active:opacity-50 dark:bg-zinc-700"
                   >
                     <Text className="text-xl">Use</Text>
@@ -166,7 +169,10 @@ export default function BattleTab({
                       playerState.isStunned() ||
                       attackAnimationOnGoing
                     }
-                    onPress={() => useSpell(spell)}
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      useSpell(spell);
+                    }}
                     className={`my-auto rounded  px-4 py-2 active:scale-95 active:opacity-50 ${
                       playerState.mana <= spell.manaCost
                         ? ""
@@ -199,7 +205,6 @@ export default function BattleTab({
                           key={item.id}
                           className="m-2 items-center active:scale-90 active:opacity-50"
                           onPress={() => {
-                            vibrate({ style: "light" });
                             setSelectedItem(item);
                           }}
                         >

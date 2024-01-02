@@ -56,7 +56,7 @@ const PlayerStatus = observer(
     const [animationCycler, setAnimationCycler] = useState<number>(0);
     const [showingHealthWarningPulse, setShowingHealthWarningPulse] =
       useState<boolean>(false);
-
+    const healthDamageFlash = useState(new Animated.Value(0))[0];
     const animatedValue = useState(new Animated.Value(0))[0];
 
     useEffect(() => {
@@ -113,6 +113,20 @@ const PlayerStatus = observer(
 
     useEffect(() => {
       if (playerState && healthRecord && playerState.health != healthRecord) {
+        if (playerState?.health - healthRecord < 0) {
+          Animated.sequence([
+            Animated.timing(healthDamageFlash, {
+              toValue: 1,
+              duration: 200,
+              useNativeDriver: false,
+            }),
+            Animated.timing(healthDamageFlash, {
+              toValue: 0,
+              duration: 200,
+              useNativeDriver: false,
+            }),
+          ]).start();
+        }
         setHealthDiff(playerState?.health - healthRecord);
         setShowingHealthChange(true);
         setAnimationCycler(animationCycler + 1);
@@ -252,7 +266,10 @@ const PlayerStatus = observer(
             display: "flex",
             backgroundColor: showingHealthWarningPulse
               ? backgroundColorInterpolation
-              : "transparent",
+              : healthDamageFlash.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ["transparent", "rgba(180,30,30,0.4)"],
+                }),
           }}
         >
           <View

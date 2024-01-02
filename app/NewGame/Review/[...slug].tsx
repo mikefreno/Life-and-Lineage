@@ -1,5 +1,5 @@
 import { View as ThemedView, Text } from "../../../components/Themed";
-import { Pressable, View } from "react-native";
+import { Pressable } from "react-native";
 import {
   Character,
   PlayerCharacter,
@@ -22,6 +22,7 @@ import {
   MonsterContext,
   PlayerCharacterContext,
 } from "../../_layout";
+import { useVibration } from "../../../utility/customHooks";
 
 export default function NewGameReview() {
   const { slug } = useLocalSearchParams();
@@ -30,6 +31,7 @@ export default function NewGameReview() {
   const firstName = slug[2];
   const lastName = slug[3];
   const blessing = slug[4];
+  const vibration = useVibration();
 
   const playerCharacterSetter = useContext(PlayerCharacterContext)
     ?.setPlayerCharacter;
@@ -157,11 +159,10 @@ export default function NewGameReview() {
       logsSetter([]);
       monsterSetter(null);
       await fullSave(newGame, player);
-
+      vibration({ style: "success" });
       while (router.canGoBack()) {
         router.back();
       }
-
       router.replace("/");
     }
   }

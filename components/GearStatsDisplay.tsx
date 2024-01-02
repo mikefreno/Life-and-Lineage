@@ -5,6 +5,7 @@ import Energy from "../assets/icons/EnergyIcon";
 import HealthIcon from "../assets/icons/HealthIcon";
 import Sword from "../assets/icons/SwordIcon";
 import ShieldSlashIcon from "../assets/icons/ShieldSlash";
+import Regen from "../assets/icons/RegenIcon";
 
 interface GearStatsDisplayProps {
   stats: Record<string, number | undefined>;
@@ -52,7 +53,7 @@ export default function GearStatsDisplay({ stats }: GearStatsDisplayProps) {
         <View className="flex flex-row">
           <Text>{stats.regen} </Text>
           <View className="my-auto">
-            <ArmorIcon height={14} width={14} />
+            <Regen height={14} width={14} />
           </View>
         </View>
       ) : null}

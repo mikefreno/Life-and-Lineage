@@ -152,6 +152,7 @@ function getAnItemByType(
       slot: null,
       stats: null,
       itemClass: type,
+      icon: itemObj.icon,
     });
   }
   if (type == "bodyArmor") {
@@ -195,6 +196,7 @@ function getAnItemByType(
       slot: "off-hand",
       stats: null,
       itemClass: type,
+      icon: itemObj.icon,
     });
   }
   if (type == "hat") {
@@ -242,6 +244,7 @@ function getAnItemByType(
       slot: null,
       stats: null,
       itemClass: type,
+      icon: itemObj.icon,
     });
   }
   if (type == "poison") {
@@ -277,6 +280,7 @@ function getAnItemByType(
       slot: "body",
       stats: itemObj.stats,
       itemClass: type,
+      icon: itemObj.icon,
     });
   }
   if (type == "shield") {

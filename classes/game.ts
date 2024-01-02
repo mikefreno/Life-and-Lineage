@@ -14,7 +14,7 @@ interface GameOptions {
   atDeathScreen?: boolean;
   colorScheme?: "system" | "dark" | "light";
   vibrationEnabled?: "full" | "minimal" | "none";
-  healthWarning: number;
+  healthWarning?: number;
 }
 
 export class Game {

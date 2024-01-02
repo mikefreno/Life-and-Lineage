@@ -89,7 +89,9 @@ export class Monster {
     this.attacks = attacks;
     this.conditions = conditions ?? [];
     makeObservable(this, {
+      id: observable,
       health: observable,
+      creatureSpecies: observable,
       sanity: observable,
       energy: observable,
       minions: observable,
@@ -106,7 +108,7 @@ export class Monster {
 
   //---------------------------Equivalency---------------------------//
   public equals(otherMonsterID: string) {
-    return this.id == otherMonsterID;
+    return this.id === otherMonsterID;
   }
   //---------------------------Health---------------------------//
   public damageHealth(damage: number | null) {
@@ -316,6 +318,7 @@ export class Monster {
 
   public static fromJSON(json: any): Monster {
     return new Monster({
+      id: json.id,
       creatureSpecies: json.creatureSpecies,
       health: json.health,
       healthMax: json.healthMax,

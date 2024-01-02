@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Platform,
 } from "react-native";
+import { useVibration } from "../../utility/customHooks";
 
 const healthWarningOptions: Record<number, string> = {
   0.5: "50%",
@@ -32,12 +33,14 @@ const healthWarningKeys = [0.5, 0.25, 0.2, 0.15, 0.1, 0];
 export default function GameSettings() {
   const gameData = useContext(GameContext);
   const game = gameData?.gameState;
+  const vibration = useVibration();
 
   const [selectedHealthWarning, setSelectedHealthWarning] = useState<string>(
     game ? healthWarningOptions[game?.healthWarning] : "25%",
   );
 
   const startNewGame = () => {
+    vibration({ style: "warning" });
     while (router.canGoBack()) {
       router.back();
     }

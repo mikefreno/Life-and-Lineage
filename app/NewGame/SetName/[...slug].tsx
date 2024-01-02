@@ -9,6 +9,7 @@ import { View as ThemedView, Text } from "../../../components/Themed";
 import { useRef, useState } from "react";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { toTitleCase } from "../../../utility/functions";
+import { useVibration } from "../../../utility/customHooks";
 
 export default function SetName() {
   const { slug } = useLocalSearchParams();
@@ -18,6 +19,8 @@ export default function SetName() {
   const [lastName, setLastName] = useState<string>("");
   const firstNameRef = useRef<string>();
   const lastNameRef = useRef<string>();
+
+  const vibration = useVibration();
 
   return (
     <>
@@ -75,11 +78,12 @@ export default function SetName() {
         {firstName.trimEnd().length >= 2 && lastName.trimEnd().length >= 3 ? (
           <View className="mx-auto mt-24">
             <Pressable
-              onPress={() =>
+              onPress={() => {
+                vibration({ style: "light" });
                 router.push(
                   `/NewGame/SetBlessing/${playerClass}/${sex}/${firstNameRef.current?.trimEnd()}/${lastNameRef.current?.trimEnd()}`,
-                )
-              }
+                );
+              }}
               className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
             >
               <Text className="text-xl tracking-widest">Next</Text>

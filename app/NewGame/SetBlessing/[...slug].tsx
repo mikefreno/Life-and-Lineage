@@ -15,6 +15,7 @@ import Drop from "../../../assets/icons/DropIcon";
 import HoldingSkull from "../../../assets/icons/HoldingSkull";
 import Bones from "../../../assets/icons/BonesIcon";
 import Virus from "../../../assets/icons/VirusIcon";
+import { useVibration } from "../../../utility/customHooks";
 
 export default function SetBlessing() {
   const { slug } = useLocalSearchParams();
@@ -25,6 +26,7 @@ export default function SetBlessing() {
   const lastName = toTitleCase(slug[3]);
   const colorScheme = useColorScheme();
   const blessingRef = useRef<string>();
+  const vibration = useVibration();
 
   function classDependantBlessings() {
     if (playerClass == "mage") {
@@ -417,11 +419,12 @@ export default function SetBlessing() {
           {blessing ? (
             <NonThemedView className="mx-auto mt-8">
               <Pressable
-                onPress={() =>
+                onPress={() => {
+                  vibration({ style: "light" });
                   router.push(
                     `/NewGame/Review/${playerClass}/${sex}/${firstName}/${lastName}/${blessingRef.current}`,
-                  )
-                }
+                  );
+                }}
                 className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
               >
                 <Text className="text-xl tracking-widest">Next</Text>

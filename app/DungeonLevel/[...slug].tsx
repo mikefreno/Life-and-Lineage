@@ -1,6 +1,6 @@
 import { View, Text } from "../../components/Themed";
 import { Animated, Image, View as NonThemedView } from "react-native";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { MonsterImage } from "../../components/MonsterImage";
 import { Pressable, Modal } from "react-native";
 import { Stack, useLocalSearchParams, router } from "expo-router";
@@ -29,6 +29,7 @@ import { EnemyHealingAnimationBox } from "../../components/EnemyHealingAnimation
 import { Minion } from "../../classes/creatures";
 
 const DungeonLevelScreen = observer(() => {
+  const { colorScheme } = useColorScheme();
   const playerCharacterData = useContext(PlayerCharacterContext);
   if (!playerCharacterData) throw new Error("missing player context");
   const { playerState } = playerCharacterData;
@@ -41,7 +42,6 @@ const DungeonLevelScreen = observer(() => {
   const logsData = useContext(LogsContext);
   if (!logsData) throw new Error("missing logs context");
   const { logsState } = logsData;
-
   const { slug } = useLocalSearchParams();
   const [fightingBoss, setFightingBoss] = useState<boolean>(false);
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
@@ -58,7 +58,6 @@ const DungeonLevelScreen = observer(() => {
   } | null>(null);
   const [fleeModalShowing, setFleeModalShowing] = useState<boolean>(false);
   const [fleeRollFailure, setFleeRollFailure] = useState<boolean>(false);
-  const { colorScheme } = useColorScheme();
 
   const [monsterHealthRecord, setMonsterHealthRecord] = useState<
     number | undefined
@@ -69,22 +68,36 @@ const DungeonLevelScreen = observer(() => {
   const [animationCycler, setAnimationCycler] = useState<number>(0);
   const [attackAnimationOnGoing, setAttackAnimationOnGoing] =
     useState<boolean>(false);
-  const monsterAttackAnimationValue = useRef(new Animated.Value(0)).current;
-  const monsterDamagedAnimationValue = useRef(new Animated.Value(1)).current;
+  const monsterAttackAnimationValue = useState(new Animated.Value(0))[0];
+  const monsterDamagedAnimationValue = useState(new Animated.Value(1))[0];
+  const monsterStun = useState(new Animated.Value(0))[0];
+
   const [monsterAttackDummy, setMonsterAttackDummy] = useState<number>(0);
   const [monsterHealDummy, setMonsterHealDummy] = useState<number>(0);
 
   const isFocused = useIsFocused();
   const vibration = useVibration();
 
+  if (!playerState || !gameState) {
+    throw new Error("No player character or game data on dungeon level");
+  }
+
+  //------------dungeon/monster state setting---------//
   useEffect(() => {
     setInstanceName(slug[0]);
     setLevel(Number(slug[1]));
   }, [slug]);
 
-  if (!playerState || !gameState) {
-    throw new Error("No player character or game data on dungeon level");
-  }
+  useEffect(() => {
+    if (!fightingBoss) {
+      if (!monsterState) {
+        getEnemy();
+      } else if (firstLoad) {
+        appropriateEnemyCheck();
+        setFirstLoad(false);
+      }
+    }
+  }, [monsterState]);
 
   useEffect(() => {
     if (
@@ -107,18 +120,7 @@ const DungeonLevelScreen = observer(() => {
     setThisInstance(gameState.getInstance(instanceName));
   }, [level, instanceName]);
 
-  const loadBoss = async () => {
-    setFightingBoss(true);
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    if (thisDungeon && thisInstance && playerState) {
-      setMonster(null);
-      const boss = thisDungeon.getBoss(thisInstance.name)[0];
-      setMonster(boss);
-      battleLogger(`You found the boss!`);
-    }
-  };
-
+  //-----------animations---------//
   useEffect(() => {
     if (!firstLoad) {
       Animated.sequence([
@@ -163,18 +165,8 @@ const DungeonLevelScreen = observer(() => {
     }
   }, [monsterHealthDiff]);
 
-  useEffect(() => {
-    if (!fightingBoss) {
-      if (!monsterState) {
-        getEnemy();
-      } else if (firstLoad) {
-        appropriateEnemyCheck();
-        setFirstLoad(false);
-      }
-    }
-  }, [monsterState]);
-
-  useEffect(() => {
+  //------------monster combat functions------------//
+  const enemyTurnCheck = () => {
     if (monsterState) {
       if (
         monsterState.health <= 0 ||
@@ -200,108 +192,11 @@ const DungeonLevelScreen = observer(() => {
           gameState.openNextDungeonLevel(thisInstance!.name);
         }
         setMonster(null);
-      }
-    }
-  }, [monsterState?.health]);
-
-  function battleLogger(whatHappened: string) {
-    const timeOfLog = new Date().toLocaleTimeString();
-    const log = `${timeOfLog}: ${whatHappened}`;
-    logsState.push(log);
-  }
-
-  function getEnemy() {
-    const enemy = enemyGenerator(instanceName, level);
-    setTimeout(
-      () => {
-        setMonster(enemy);
-        battleLogger(`You found a ${toTitleCase(enemy.creatureSpecies)}!`);
-        setAttackAnimationOnGoing(false);
-      },
-      firstLoad ? 0 : 500,
-    );
-  }
-
-  function appropriateEnemyCheck() {
-    if (monsterState && !fightingBoss)
-      monsterObjects.forEach((monsterObject) => {
-        if (
-          monsterObject.name == monsterState.creatureSpecies &&
-          !(
-            monsterObject.appearsOn.includes(level) &&
-            monsterObject.appearsIn.includes(instanceName)
-          )
-        ) {
-          getEnemy();
-          return;
-        }
-      });
-  }
-
-  function takeItem(item: Item) {
-    if (playerState && droppedItems) {
-      playerState.addToInventory(item);
-      setDroppedItems((prevState) => {
-        const updatedDrops = prevState!.itemDrops.filter(
-          (itemDrop) => !itemDrop.equals(item),
-        );
-        if (updatedDrops.length == 0) {
-          return null;
-        }
-        return {
-          ...prevState,
-          gold: prevState!.gold,
-          itemDrops: updatedDrops,
-        };
-      });
-    }
-  }
-
-  function takeAllItems() {
-    if (playerState && droppedItems) {
-      droppedItems.itemDrops.forEach((item) =>
-        playerState.addToInventory(item),
-      );
-      setDroppedItems(null);
-    }
-  }
-
-  function flee() {
-    if (playerState && monsterState) {
-      const roll = flipCoin();
-      const startOfTurnMonsterID = monsterState.id;
-      if (
-        playerState &&
-        (roll == "Heads" || monsterState?.creatureSpecies == "training dummy")
-      ) {
-        vibration({ style: "light" });
-        setFleeRollFailure(false);
-        setTimeout(() => {
-          setFleeModalShowing(false);
-          gameState?.gameTick(playerState);
-        }, 100);
-        setTimeout(() => {
-          playerState.clearMinions();
-          while (router.canGoBack()) {
-            router.back();
-          }
-          router.replace("/dungeon");
-          setMonster(null);
-        }, 200);
       } else {
-        setFleeRollFailure(true);
-        vibration({ style: "error" });
-        battleLogger("You failed to flee!");
-
-        if (playerState.minions.length > 0) {
-          playerMinionsTurn(playerState.minions, startOfTurnMonsterID);
-        }
-        if (monsterState.equals(startOfTurnMonsterID)) {
-          enemyTurn();
-        }
+        enemyTurn();
       }
     }
-  }
+  };
 
   const enemyTurn = () => {
     if (monsterState) {
@@ -368,17 +263,69 @@ const DungeonLevelScreen = observer(() => {
     }
   };
 
-  function useAttack(attack: {
+  function monsterHealthChangePopUp() {
+    return (
+      <NonThemedView className="h-4">
+        <FadeOutText
+          className={"text-red-400"}
+          text={`${
+            monsterHealthDiff > 0 ? "+" : ""
+          }${monsterHealthDiff.toString()}`}
+          animationCycler={animationCycler}
+        />
+      </NonThemedView>
+    );
+  }
+  //-----------minion loading-------//
+  function appropriateEnemyCheck() {
+    if (monsterState && !fightingBoss)
+      monsterObjects.forEach((monsterObject) => {
+        if (
+          monsterObject.name == monsterState.creatureSpecies &&
+          !(
+            monsterObject.appearsOn.includes(level) &&
+            monsterObject.appearsIn.includes(instanceName)
+          )
+        ) {
+          getEnemy();
+          return;
+        }
+      });
+  }
+
+  function getEnemy() {
+    const enemy = enemyGenerator(instanceName, level);
+    setTimeout(
+      () => {
+        setMonster(enemy);
+        battleLogger(`You found a ${toTitleCase(enemy.creatureSpecies)}!`);
+        setAttackAnimationOnGoing(false);
+      },
+      firstLoad ? 0 : 500,
+    );
+  }
+
+  const loadBoss = () => {
+    setFightingBoss(true);
+    if (thisDungeon && thisInstance && playerState) {
+      setMonster(null);
+      const boss = thisDungeon.getBoss(thisInstance.name)[0];
+      setMonster(boss);
+      battleLogger(`You found the boss!`);
+    }
+  };
+
+  //------------player combat functions------------//
+  const useAttack = (attack: {
     name: string;
     targets: string;
     hitChance: number;
     damageMult: number;
     sanityDamage: number;
     debuffs: { name: string; chance: number }[] | null;
-  }) {
+  }) => {
     setAttackAnimationOnGoing(true);
     if (monsterState && playerState && isFocused) {
-      const startOfTurnMonster = { ...monsterState };
       const attackRes = playerState.doPhysicalAttack(
         attack,
         monsterState.healthMax,
@@ -415,17 +362,13 @@ const DungeonLevelScreen = observer(() => {
         );
       }
       setTimeout(() => {
-        if (playerState.minions.length > 0) {
-          playerMinionsTurn(playerState.minions, startOfTurnMonster.id);
-        }
+        playerMinionsTurn(playerState.minions, monsterState.id);
         setTimeout(() => {
-          if (monsterState.equals(startOfTurnMonster.id)) {
-            enemyTurn();
-          }
-        }, 1000);
+          enemyTurnCheck();
+        }, 1000 * playerState.minions.length);
       }, 1000);
     }
-  }
+  };
 
   const useSpell = (spell: {
     name: string;
@@ -442,7 +385,6 @@ const DungeonLevelScreen = observer(() => {
   }) => {
     setAttackAnimationOnGoing(true);
     if (monsterState && playerState && isFocused) {
-      const startOfTurnMonster = { ...monsterState };
       const spellRes = playerState.useSpell(spell, monsterState.healthMax);
       monsterState.damageHealth(spellRes.damage);
       monsterState.damageSanity(spellRes.sanityDamage);
@@ -473,32 +415,61 @@ const DungeonLevelScreen = observer(() => {
         }
       }
       battleLogger(line);
+      playerMinionsTurn(playerState.minions, monsterState.id);
       setTimeout(() => {
-        if (playerState.minions.length > 0) {
-          playerMinionsTurn(playerState.minions, startOfTurnMonster.id);
-        }
+        playerMinionsTurn(playerState.minions, monsterState.id);
         setTimeout(() => {
-          if (monsterState.equals(startOfTurnMonster.id)) {
-            enemyTurn();
-          }
-        }, 1000);
+          enemyTurnCheck();
+        }, 1000 * playerState.minions.length);
       }, 1000);
     }
   };
 
   const pass = () => {
     if (monsterState && playerState && isFocused) {
-      const startOfTurnMonster = { ...monsterState };
       playerState.pass();
       battleLogger("You passed!");
-      if (playerState.minions.length > 0) {
-        playerMinionsTurn(playerState.minions, startOfTurnMonster.id);
-      }
-      if (monsterState.equals(startOfTurnMonster.id)) {
-        enemyTurn();
+      playerMinionsTurn(playerState.minions, monsterState.id);
+      setTimeout(() => {
+        enemyTurnCheck();
+      }, 1000 * playerState.minions.length);
+    }
+  };
+
+  const flee = () => {
+    if (playerState && monsterState) {
+      const roll = flipCoin();
+      if (
+        playerState &&
+        (roll == "Heads" || monsterState?.creatureSpecies == "training dummy")
+      ) {
+        vibration({ style: "light" });
+        setFleeRollFailure(false);
+        setTimeout(() => {
+          setFleeModalShowing(false);
+          gameState?.gameTick(playerState);
+        }, 100);
+        setTimeout(() => {
+          playerState.clearMinions();
+          while (router.canGoBack()) {
+            router.back();
+          }
+          router.replace("/dungeon");
+          setMonster(null);
+        }, 200);
+      } else {
+        setFleeRollFailure(true);
+        vibration({ style: "error" });
+        battleLogger("You failed to flee!");
+        playerMinionsTurn(playerState.minions, monsterState.id);
+        setTimeout(() => {
+          enemyTurnCheck();
+        }, 1000 * playerState.minions.length);
       }
     }
   };
+
+  //------------minion functions------------//
 
   function playerMinionsTurn(
     suppliedMinions: Minion[],
@@ -507,7 +478,9 @@ const DungeonLevelScreen = observer(() => {
     if (monsterState && playerState) {
       for (
         let i = 0;
-        i < suppliedMinions.length && monsterState.equals(startOfTurnMonsterID);
+        i < suppliedMinions.length &&
+        monsterState.equals(startOfTurnMonsterID) &&
+        monsterState.health > 0;
         i++
       ) {
         setTimeout(() => {
@@ -541,22 +514,149 @@ const DungeonLevelScreen = observer(() => {
           if (suppliedMinions[i].turnsLeftAlive <= 0) {
             playerState.removeMinion(suppliedMinions[i]);
           }
-        }, 500 * i);
+        }, 1000 * i);
       }
     }
   }
 
-  function monsterHealthChangePopUp() {
+  //--------misc functions------//
+
+  function takeItem(item: Item) {
+    if (playerState && droppedItems) {
+      playerState.addToInventory(item);
+      setDroppedItems((prevState) => {
+        const updatedDrops = prevState!.itemDrops.filter(
+          (itemDrop) => !itemDrop.equals(item),
+        );
+        if (updatedDrops.length == 0) {
+          return null;
+        }
+        return {
+          ...prevState,
+          gold: prevState!.gold,
+          itemDrops: updatedDrops,
+        };
+      });
+    }
+  }
+
+  function takeAllItems() {
+    if (playerState && droppedItems) {
+      droppedItems.itemDrops.forEach((item) =>
+        playerState.addToInventory(item),
+      );
+      setDroppedItems(null);
+    }
+  }
+
+  function battleLogger(whatHappened: string) {
+    const timeOfLog = new Date().toLocaleTimeString();
+    const log = `${timeOfLog}: ${whatHappened}`;
+    logsState.push(log);
+  }
+
+  //-----------render---------//
+  while (!monsterState) {
     return (
-      <NonThemedView className="h-4">
-        <FadeOutText
-          className={"text-red-400"}
-          text={`${
-            monsterHealthDiff > 0 ? "+" : ""
-          }${monsterHealthDiff.toString()}`}
-          animationCycler={animationCycler}
-        />
-      </NonThemedView>
+      <View className="flex-1 px-4 pt-4">
+        <NonThemedView className="flex h-1/3 flex-row justify-evenly"></NonThemedView>
+        {thisDungeon?.stepsBeforeBoss !== 0 && !fightingBoss ? (
+          <View className="-mt-7 flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
+            <Text className="my-auto text-xl">
+              {`Steps Completed: ${thisDungeon?.step} / ${thisDungeon?.stepsBeforeBoss}`}
+            </Text>
+            {thisDungeon &&
+            thisDungeon?.step >= thisDungeon.stepsBeforeBoss &&
+            !thisDungeon.bossDefeated ? (
+              <Pressable
+                onPress={loadBoss}
+                className="my-auto rounded bg-red-500 px-4 py-2 active:scale-95 active:opacity-50"
+              >
+                <Text style={{ color: "white" }}>Fight Boss</Text>
+              </Pressable>
+            ) : null}
+          </View>
+        ) : fightingBoss ? (
+          <View className="-mt-7">
+            <Text className="my-auto text-center text-xl">Fighting Boss!</Text>
+          </View>
+        ) : (
+          <View className="flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50" />
+        )}
+        <View className="flex-1 justify-between">
+          <View className="flex-1">
+            <BattleTab
+              useAttack={useAttack}
+              battleTab={battleTab}
+              useSpell={useSpell}
+              pass={pass}
+              attackAnimationOnGoing={attackAnimationOnGoing}
+            />
+          </View>
+          <View className="">
+            <View className="-mx-4">
+              <View className="flex w-full flex-row justify-evenly border-t border-zinc-200 dark:border-zinc-700">
+                <Pressable
+                  className={`px-6 py-4 rounded ${
+                    battleTab == "attacks"
+                      ? "bg-zinc-100 dark:bg-zinc-800"
+                      : "active:bg-zinc-200 dark:active:bg-zinc-700"
+                  }`}
+                  onPress={() => setBattleTab("attacks")}
+                >
+                  <Text className="text-xl">Attacks</Text>
+                </Pressable>
+                <Pressable
+                  className={`px-6 py-4 rounded ${
+                    battleTab == "spells"
+                      ? "bg-zinc-100 dark:bg-zinc-800"
+                      : "active:bg-zinc-200 dark:active:bg-zinc-700"
+                  }`}
+                  onPress={() => setBattleTab("spells")}
+                >
+                  <Text className="text-xl">Spells</Text>
+                </Pressable>
+                <Pressable
+                  className={`px-6 py-4 rounded ${
+                    battleTab == "equipment"
+                      ? "border-zinc-200 bg-zinc-100 dark:border-zinc-900 dark:bg-zinc-800"
+                      : "active:bg-zinc-200 dark:active:bg-zinc-700"
+                  }`}
+                  onPress={() => setBattleTab("equipment")}
+                >
+                  <Text className="text-xl">Equipment</Text>
+                </Pressable>
+                <Pressable
+                  className={`px-6 py-4 rounded ${
+                    battleTab == "log"
+                      ? "bg-zinc-100 dark:bg-zinc-800"
+                      : "active:bg-zinc-200 dark:active:bg-zinc-700"
+                  }`}
+                  onPress={() => setBattleTab("log")}
+                >
+                  <Text className="text-xl">Log</Text>
+                </Pressable>
+              </View>
+            </View>
+            {playerState.minions.length > 0
+              ? playerState.minions.map((minion) => (
+                  <View key={minion.creatureID} className="py-1">
+                    <Text>{toTitleCase(minion.creatureSpecies)}</Text>
+                    <ProgressBar
+                      filledColor="#ef4444"
+                      unfilledColor="#fee2e2"
+                      value={minion.health}
+                      maxValue={minion.healthMax}
+                    />
+                  </View>
+                ))
+              : null}
+            <View className="-mx-4 pb-4">
+              <PlayerStatus />
+            </View>
+          </View>
+        </View>
+      </View>
     );
   }
 
@@ -596,7 +696,7 @@ const DungeonLevelScreen = observer(() => {
         >
           <NonThemedView className="flex-1 items-center justify-center">
             <View
-              className=" w-2/3 rounded-xl bg-zinc-50 px-6 py-4 dark:border dark:border-zinc-50 dark:bg-zinc-700"
+              className="w-2/3 rounded-xl bg-zinc-50 px-6 py-4 dark:border dark:border-zinc-50 dark:bg-zinc-700"
               style={{
                 shadowColor: "#000",
                 shadowOffset: {
@@ -705,49 +805,47 @@ const DungeonLevelScreen = observer(() => {
           </NonThemedView>
         </Modal>
         <View className="flex-1 px-4 pt-4">
-          {monsterState ? (
-            <NonThemedView className="flex h-1/3 flex-row justify-evenly">
-              <View className="flex w-2/5 flex-col items-center justify-center">
-                <Text className="text-3xl">
-                  {toTitleCase(monsterState.creatureSpecies)}
-                </Text>
-                <ProgressBar
-                  value={monsterState.health}
-                  maxValue={monsterState.healthMax}
-                  filledColor="#ef4444"
-                  unfilledColor="#fee2e2"
-                />
-                {showingMonsterHealthChange ? (
-                  monsterHealthChangePopUp()
-                ) : (
-                  <NonThemedView className="h-4" />
-                )}
-              </View>
-              <View className="my-auto">
-                <Animated.View
-                  style={{
-                    transform: [
-                      { translateX: monsterAttackAnimationValue },
-                      {
-                        translateY: Animated.multiply(
-                          monsterAttackAnimationValue,
-                          -1.5,
-                        ),
-                      },
-                    ],
-                    opacity: monsterDamagedAnimationValue,
-                  }}
-                >
-                  <MonsterImage monsterSpecies={monsterState.creatureSpecies} />
-                </Animated.View>
+          <NonThemedView className="flex h-1/3 flex-row justify-evenly">
+            <View className="flex w-2/5 flex-col items-center justify-center">
+              <Text className="text-3xl">
+                {toTitleCase(monsterState.creatureSpecies)}
+              </Text>
+              <ProgressBar
+                value={monsterState.health >= 0 ? monsterState.health : 0}
+                maxValue={monsterState.healthMax}
+                filledColor="#ef4444"
+                unfilledColor="#fee2e2"
+              />
+              {showingMonsterHealthChange ? (
+                monsterHealthChangePopUp()
+              ) : (
+                <NonThemedView className="h-4" />
+              )}
+            </View>
+            <View className="my-auto">
+              <Animated.View
+                style={{
+                  transform: [
+                    { translateX: monsterAttackAnimationValue },
+                    {
+                      translateY: Animated.multiply(
+                        monsterAttackAnimationValue,
+                        -1.5,
+                      ),
+                    },
+                  ],
+                  opacity: monsterDamagedAnimationValue,
+                }}
+              >
+                <MonsterImage monsterSpecies={monsterState.creatureSpecies} />
+              </Animated.View>
+              <View className="-mr-8">
                 <EnemyHealingAnimationBox
                   showHealAnimationDummy={monsterHealDummy}
                 />
               </View>
-            </NonThemedView>
-          ) : (
-            <NonThemedView className="flex h-1/3 flex-row justify-evenly"></NonThemedView>
-          )}
+            </View>
+          </NonThemedView>
           {thisDungeon.stepsBeforeBoss !== 0 && !fightingBoss ? (
             <View className="-mt-7 flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
               <Text className="my-auto text-xl">
@@ -769,7 +867,9 @@ const DungeonLevelScreen = observer(() => {
                 Fighting Boss!
               </Text>
             </View>
-          ) : null}
+          ) : (
+            <View className="flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50" />
+          )}
           <View className="flex-1 justify-between">
             <View className="flex-1">
               <BattleTab
@@ -789,7 +889,10 @@ const DungeonLevelScreen = observer(() => {
                         ? "bg-zinc-100 dark:bg-zinc-800"
                         : "active:bg-zinc-200 dark:active:bg-zinc-700"
                     }`}
-                    onPress={() => setBattleTab("attacks")}
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      setBattleTab("attacks");
+                    }}
                   >
                     <Text className="text-xl">Attacks</Text>
                   </Pressable>
@@ -799,7 +902,10 @@ const DungeonLevelScreen = observer(() => {
                         ? "bg-zinc-100 dark:bg-zinc-800"
                         : "active:bg-zinc-200 dark:active:bg-zinc-700"
                     }`}
-                    onPress={() => setBattleTab("spells")}
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      setBattleTab("spells");
+                    }}
                   >
                     <Text className="text-xl">Spells</Text>
                   </Pressable>
@@ -809,7 +915,10 @@ const DungeonLevelScreen = observer(() => {
                         ? "border-zinc-200 bg-zinc-100 dark:border-zinc-900 dark:bg-zinc-800"
                         : "active:bg-zinc-200 dark:active:bg-zinc-700"
                     }`}
-                    onPress={() => setBattleTab("equipment")}
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      setBattleTab("equipment");
+                    }}
                   >
                     <Text className="text-xl">Equipment</Text>
                   </Pressable>
@@ -819,7 +928,10 @@ const DungeonLevelScreen = observer(() => {
                         ? "bg-zinc-100 dark:bg-zinc-800"
                         : "active:bg-zinc-200 dark:active:bg-zinc-700"
                     }`}
-                    onPress={() => setBattleTab("log")}
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      setBattleTab("log");
+                    }}
                   >
                     <Text className="text-xl">Log</Text>
                   </Pressable>

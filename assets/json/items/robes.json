@@ -2,6 +2,7 @@
    {
       "name": "cloth robes",
       "baseValue": 200,
+      "icon": "Base_Robes",
       "stats":{
          "armor": 4.0
       }
@@ -9,6 +10,7 @@
    {
       "name": "apprentice robes",
       "baseValue": 1500,
+      "icon": "Base_Robes",
       "stats":{
          "armor": 6.0,
          "mana": 50.0
@@ -17,6 +19,7 @@
    {
       "name": "adept robes",
       "baseValue": 2500,
+      "icon": "Base_Robes",
       "stats":{
          "armor": 8.0,
          "mana": 50.0,
@@ -26,6 +29,7 @@
    {
       "name": "mage robes",
       "baseValue": 2500,
+      "icon": "Base_Robes",
       "stats":{
          "armor": 8.0,
          "mana": 100.0
@@ -34,6 +38,7 @@
    {
       "name": "gorgeous robes",
       "baseValue": 6500,
+      "icon": "Base_Robes",
       "stats":{
          "armor": 10.0,
          "mana": 100.0,
@@ -43,6 +48,7 @@
    {
       "name": "threads of god",
       "baseValue": 650000,
+      "icon": "Base_Robes",
       "stats":{
          "armor": 40.0,
          "mana": 1500.0,

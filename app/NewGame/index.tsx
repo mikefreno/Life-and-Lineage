@@ -7,6 +7,7 @@ import WizardHat from "../../assets/icons/WizardHatIcon";
 import { Stack, router } from "expo-router";
 import Necromancer from "../../assets/icons/NecromancerSkull";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
+import { useVibration } from "../../utility/customHooks";
 
 export default function NewGameScreen() {
   const [selectedClass, setSelectedClass] = useState<
@@ -14,6 +15,7 @@ export default function NewGameScreen() {
   >();
   let classRef = useRef<"mage" | "necromancer" | "paladin">();
   const colorScheme = useColorScheme();
+  const vibration = useVibration();
 
   return (
     <>
@@ -148,9 +150,10 @@ export default function NewGameScreen() {
             {selectedClass && (
               <NonThemedView className="mx-auto mt-4">
                 <Pressable
-                  onPress={() =>
-                    router.push(`/NewGame/SetSex/${classRef.current}`)
-                  }
+                  onPress={() => {
+                    vibration({ style: "light" });
+                    router.push(`/NewGame/SetSex/${classRef.current}`);
+                  }}
                   className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
                 >
                   <Text className="text-xl tracking-widest">Next</Text>

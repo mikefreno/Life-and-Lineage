@@ -338,12 +338,12 @@ export class PlayerCharacter extends Character {
   }
   //----------------------------------Health----------------------------------//
   public getMaxHealth() {
-    let gearBuffs = 0;
+    let gearBuffs = this.healthMax;
     gearBuffs += this.equipment.mainHand.stats?.health ?? 0;
     gearBuffs += this.equipment.offHand?.stats?.health ?? 0;
     gearBuffs += this.equipment.body?.stats?.health ?? 0;
     gearBuffs += this.equipment.head?.stats?.health ?? 0;
-    return this.healthMax + gearBuffs;
+    return gearBuffs;
   }
 
   public damageHealth(damage: number | null) {
@@ -356,21 +356,21 @@ export class PlayerCharacter extends Character {
   }
 
   private restoreHealth(amount: number) {
-    if (this.health + amount < this.healthMax) {
+    if (this.health + amount < this.getMaxHealth()) {
       this.health += amount;
     } else {
-      this.health = this.healthMax;
+      this.health = this.getMaxHealth();
     }
   }
 
   //----------------------------------Mana----------------------------------//
   public getMaxMana(): number {
-    let gearBuffs = 0;
-    gearBuffs += this.equipment.mainHand.stats?.mana ?? 0;
-    gearBuffs += this.equipment.offHand?.stats?.mana ?? 0;
-    gearBuffs += this.equipment.body?.stats?.mana ?? 0;
-    gearBuffs += this.equipment.head?.stats?.mana ?? 0;
-    return this.manaMax;
+    let withGearBuffs = this.manaMax;
+    withGearBuffs += this.equipment.mainHand.stats?.mana ?? 0;
+    withGearBuffs += this.equipment.offHand?.stats?.mana ?? 0;
+    withGearBuffs += this.equipment.body?.stats?.mana ?? 0;
+    withGearBuffs += this.equipment.head?.stats?.mana ?? 0;
+    return withGearBuffs;
   }
 
   private useMana(mana: number) {
@@ -378,17 +378,27 @@ export class PlayerCharacter extends Character {
   }
 
   private restoreMana(amount: number) {
-    if (this.mana + amount < this.manaMax) {
+    if (this.mana + amount < this.getMaxMana()) {
       this.mana += amount;
     } else {
-      this.mana = this.manaMax;
+      this.mana = this.getMaxMana();
     }
   }
+
+  public getManaRegen() {
+    let withGearBuffs = this.manaRegen;
+    withGearBuffs += this.equipment.mainHand.stats?.regen ?? 0;
+    withGearBuffs += this.equipment.offHand?.stats?.regen ?? 0;
+    withGearBuffs += this.equipment.body?.stats?.regen ?? 0;
+    withGearBuffs += this.equipment.head?.stats?.regen ?? 0;
+    return withGearBuffs;
+  }
+
   private regenMana() {
-    if (this.mana + this.manaRegen > this.manaMax) {
-      this.mana = this.manaMax;
+    if (this.mana + this.getManaRegen() < this.getMaxMana()) {
+      this.mana += this.getManaRegen();
     } else {
-      this.mana += this.manaRegen;
+      this.mana = this.getMaxMana();
     }
   }
   //----------------------------------Sanity----------------------------------//
