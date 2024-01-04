@@ -21,7 +21,7 @@ import {
   PlayerCharacterContext,
 } from "../_layout";
 import { observer } from "mobx-react-lite";
-import { EvilIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Entypo, EvilIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import FadeOutText from "../../components/FadeOutText";
 import { useVibration } from "../../utility/customHooks";
@@ -555,11 +555,24 @@ const DungeonLevelScreen = observer(() => {
     logsState.push(log);
   }
 
+  //-----------tutorial---------//
+  const [showDungeonInteriorTutorial, setShowDungeonInteriorTutorial] =
+    useState<boolean>(
+      (gameState && !gameState.getTutorialState("dungeonInterior")) ?? false,
+    );
+  const [tutorialStep, setTutorialStep] = useState<number>(1);
+
+  useEffect(() => {
+    if (!showDungeonInteriorTutorial && gameState) {
+      gameState.updateTutorialState("dungeonInterior", true);
+    }
+  }, [showDungeonInteriorTutorial]);
+
   //-----------render---------//
   while (!monsterState) {
     return (
       <View className="flex-1 px-4 pt-4">
-        <NonThemedView className="flex h-1/3 flex-row justify-evenly"></NonThemedView>
+        <NonThemedView className="flex h-1/3 flex-row justify-evenly" />
         {thisDungeon?.stepsBeforeBoss !== 0 && !fightingBoss ? (
           <View className="-mt-7 flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
             <Text className="my-auto text-xl">
@@ -688,6 +701,92 @@ const DungeonLevelScreen = observer(() => {
                 : `${toTitleCase(thisInstance?.name as string)} Level ${level}`,
           }}
         />
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showDungeonInteriorTutorial && gameState?.tutorialsEnabled}
+          onRequestClose={() => setShowDungeonInteriorTutorial(false)}
+        >
+          <NonThemedView className="flex-1 items-center justify-center">
+            <View
+              className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
+              style={{
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+
+                shadowOpacity: 0.25,
+                shadowRadius: 5,
+              }}
+            >
+              <View
+                className={`flex flex-row ${
+                  tutorialStep != 1 ? "justify-between" : "justify-end"
+                }`}
+              >
+                {tutorialStep != 1 ? (
+                  <Pressable
+                    onPress={() => setTutorialStep((prev) => prev - 1)}
+                  >
+                    <Entypo
+                      name="chevron-left"
+                      size={24}
+                      color={colorScheme == "dark" ? "#f4f4f5" : "black"}
+                    />
+                  </Pressable>
+                ) : null}
+                <Text>{tutorialStep}/3</Text>
+              </View>
+              {tutorialStep == 1 ? (
+                <>
+                  <Text className="text-center text-2xl">
+                    Watch Your Health
+                  </Text>
+                  <Text className="my-4 text-center text-lg">
+                    Your situation can change rapidly.
+                  </Text>
+                  <Pressable
+                    onPress={() => setTutorialStep((prev) => prev + 1)}
+                    className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                  >
+                    <Text>Next</Text>
+                  </Pressable>
+                </>
+              ) : tutorialStep == 2 ? (
+                <>
+                  <Text className="text-center text-xl">
+                    Advance by killing the boss.
+                  </Text>
+                  <Text className="my-4 text-center text-lg">
+                    The boss becomes availible after 10 monsters defeated for
+                    the first dungeon.
+                  </Text>
+                  <Pressable
+                    onPress={() => setTutorialStep((prev) => prev + 1)}
+                    className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                  >
+                    <Text>Next</Text>
+                  </Pressable>
+                </>
+              ) : (
+                <>
+                  <Text className="text-center text-xl">Good Luck.</Text>
+                  <Text className="my-4 text-center text-lg">
+                    And remember fleeing (top left) can save you.
+                  </Text>
+                  <Pressable
+                    onPress={() => setShowDungeonInteriorTutorial(false)}
+                    className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                  >
+                    <Text>Close</Text>
+                  </Pressable>
+                </>
+              )}
+            </View>
+          </NonThemedView>
+        </Modal>
         <Modal
           animationType="slide"
           transparent={true}

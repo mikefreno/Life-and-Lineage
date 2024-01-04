@@ -84,8 +84,10 @@ export class Game {
       spell: false,
       labor: false,
       dungeon: false,
-      dungeonLevel: false,
+      dungeonInterior: false,
       shops: false,
+      shopInterior: false,
+      medical: false,
     };
     this.tutorialsEnabled = tutorialsEnabled ?? true;
     makeObservable(this, {
@@ -178,7 +180,7 @@ export class Game {
       let depth = this.furthestDepth.find(
         (depth) => depth.instance == currentInstance,
       );
-      console.log(depth);
+      //console.log(depth);
       //console.log(Object.isFrozen(this.furthestDepth));
       if (depth) {
         depth = { instance: depth?.instance, level: depth!.level + 1 };
@@ -189,8 +191,8 @@ export class Game {
           : depth,
       );
 
-      console.log(depth);
-      console.log(this.furthestDepth);
+      //console.log(depth);
+      //console.log(this.furthestDepth);
     }
   }
 
@@ -224,8 +226,10 @@ export class Game {
       spell: false,
       labor: false,
       dungeon: false,
-      dungeonLevel: false,
+      dungeonInterior: false,
       shops: false,
+      shopInterior: false,
+      medical: false,
     };
     this.tutorialsShown = defaultState;
   }

@@ -16,6 +16,9 @@ import { useIsFocused } from "@react-navigation/native";
 import { GameContext, PlayerCharacterContext } from "../_layout";
 import GearStatsDisplay from "../../components/GearStatsDisplay";
 import { useVibration } from "../../utility/customHooks";
+import { Entypo } from "@expo/vector-icons";
+import { useColorScheme } from "nativewind";
+import Modal from "react-native-modal/dist/modal";
 
 export default function ShopScreen() {
   const { shop } = useLocalSearchParams();
@@ -51,6 +54,20 @@ export default function ShopScreen() {
 
   const isFocused = useIsFocused();
   const vibrate = useVibration();
+  const { colorScheme } = useColorScheme();
+
+  const [showShopInteriorTutorial, setShowShopInteriorTutorial] =
+    useState<boolean>(
+      (gameState && !gameState.getTutorialState("shopInterior")) ?? false,
+    );
+
+  const [tutorialStep, setTutorialStep] = useState<number>(1);
+
+  useEffect(() => {
+    if (!showShopInteriorTutorial && gameState) {
+      gameState.updateTutorialState("shops", true);
+    }
+  }, [showShopInteriorTutorial]);
 
   useEffect(() => {
     if (
@@ -179,6 +196,79 @@ export default function ShopScreen() {
             title: toTitleCase(shop as string),
           }}
         />
+        <Modal
+          animationIn="slideInUp"
+          animationOut="fadeOut"
+          isVisible={showShopInteriorTutorial && gameState?.tutorialsEnabled}
+          backdropOpacity={0.2}
+          animationInTiming={500}
+          onBackdropPress={() => setShowShopInteriorTutorial(false)}
+          onBackButtonPress={() => setShowShopInteriorTutorial(false)}
+        >
+          <View
+            className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
+            style={{
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+
+              shadowOpacity: 0.25,
+              shadowRadius: 5,
+            }}
+          >
+            <View
+              className={`flex flex-row ${
+                tutorialStep == 2 ? "justify-between" : "justify-end"
+              }`}
+            >
+              {tutorialStep == 2 ? (
+                <Pressable onPress={() => setTutorialStep((prev) => prev - 1)}>
+                  <Entypo
+                    name="chevron-left"
+                    size={24}
+                    color={colorScheme == "dark" ? "#f4f4f5" : "black"}
+                  />
+                </Pressable>
+              ) : null}
+              <Text>{tutorialStep}/2</Text>
+            </View>
+            {tutorialStep == 1 ? (
+              <>
+                <Text className="text-center text-2xl">
+                  Shopkeepers remember you.
+                </Text>
+                <Text className="my-4 text-center text-lg">
+                  The more you trade with a given shopkeeper the better the
+                  deals they will have for you.
+                </Text>
+                <Pressable
+                  onPress={() => setTutorialStep((prev) => prev + 1)}
+                  className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                >
+                  <Text>Next</Text>
+                </Pressable>
+              </>
+            ) : (
+              <>
+                <Text className="text-center text-xl">
+                  Shopkeepers are people too.
+                </Text>
+                <Text className="my-4 text-center">
+                  They each have different personalities. They will also age and
+                  eventually die.
+                </Text>
+                <Pressable
+                  onPress={() => setShowShopInteriorTutorial(false)}
+                  className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                >
+                  <Text>Close</Text>
+                </Pressable>
+              </>
+            )}
+          </View>
+        </Modal>
         <View className="flex-1">
           <View className="flex flex-row justify-between">
             <View className="w-1/3">

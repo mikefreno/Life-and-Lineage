@@ -5,15 +5,31 @@ import { Shop } from "../../classes/shop";
 import { CharacterImage } from "../../components/CharacterImage";
 import shopObjects from "../../assets/json/shops.json";
 import { router } from "expo-router";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { GameContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
+import Modal from "react-native-modal/dist/modal";
+import { Entypo } from "@expo/vector-icons";
+import { useColorScheme } from "nativewind";
 
 export default function ShopsScreen() {
   const gameData = useContext(GameContext);
   if (!gameData) throw new Error("missing gameData");
   const { gameState } = gameData;
   const vibrate = useVibration();
+  const { colorScheme } = useColorScheme();
+
+  const [showShopTutorial, setShowShopTutorial] = useState<boolean>(
+    (gameState && !gameState.getTutorialState("shops")) ?? false,
+  );
+
+  const [tutorialStep, setTutorialStep] = useState<number>(1);
+
+  useEffect(() => {
+    if (!showShopTutorial && gameState) {
+      gameState.updateTutorialState("shops", true);
+    }
+  }, [showShopTutorial]);
 
   if (gameState) {
     const shops = gameState.shops;
@@ -108,14 +124,86 @@ export default function ShopsScreen() {
     );
 
     return (
-      <View className="flex-1">
-        <FlatList
-          data={shops}
-          renderItem={renderItem}
-          keyExtractor={(shop) => shop.archetype}
-          numColumns={2}
-        />
-      </View>
+      <>
+        <Modal
+          animationIn="slideInUp"
+          animationOut="fadeOut"
+          isVisible={showShopTutorial && gameState?.tutorialsEnabled}
+          backdropOpacity={0.2}
+          animationInTiming={500}
+          onBackdropPress={() => setShowShopTutorial(false)}
+          onBackButtonPress={() => setShowShopTutorial(false)}
+        >
+          <View
+            className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
+            style={{
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+
+              shadowOpacity: 0.25,
+              shadowRadius: 5,
+            }}
+          >
+            <View
+              className={`flex flex-row ${
+                tutorialStep == 2 ? "justify-between" : "justify-end"
+              }`}
+            >
+              {tutorialStep == 2 ? (
+                <Pressable onPress={() => setTutorialStep((prev) => prev - 1)}>
+                  <Entypo
+                    name="chevron-left"
+                    size={24}
+                    color={colorScheme == "dark" ? "#f4f4f5" : "black"}
+                  />
+                </Pressable>
+              ) : null}
+              <Text>{tutorialStep}/2</Text>
+            </View>
+            {tutorialStep == 1 ? (
+              <>
+                <Text className="text-center text-2xl">Shop Tab</Text>
+                <Text className="my-4 text-center text-lg">
+                  Each of these shops buy and sell various types of items.
+                </Text>
+                <Pressable
+                  onPress={() => setTutorialStep((prev) => prev + 1)}
+                  className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                >
+                  <Text>Next</Text>
+                </Pressable>
+              </>
+            ) : (
+              <>
+                <Text className="text-center text-xl">
+                  Stock Refresh Schedule
+                </Text>
+                <Text className="my-4 text-center">
+                  Each shop refreshes its stock and gold supply every real world
+                  hour.
+                </Text>
+                <Pressable
+                  onPress={() => setShowShopTutorial(false)}
+                  className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                >
+                  <Text>Close</Text>
+                </Pressable>
+              </>
+            )}
+          </View>
+        </Modal>
+        <View className="flex-1">
+          <FlatList
+            data={shops}
+            renderItem={renderItem}
+            keyExtractor={(shop) => shop.archetype}
+            numColumns={2}
+          />
+        </View>
+      </>
     );
   }
 }
