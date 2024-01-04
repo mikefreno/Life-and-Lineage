@@ -30,8 +30,6 @@ export default function LearningSpellsScreen() {
 
   const vibration = useVibration();
 
-  const { colorScheme } = useColorScheme();
-
   const [selectedBook, setSelectedBook] = useState<Item | null>(null);
   const [selectedBookSpell, setSelectedBookSpell] = useState<{
     name: string;
@@ -176,7 +174,7 @@ export default function LearningSpellsScreen() {
       ) : null}
       {filteredBooks.length > 0 ? (
         <View>
-          <Text className="text-center text-xl">Available to Learn</Text>
+          <Text className="text-center text-xl">Available for Study</Text>
           <ScrollView className="mx-auto">
             <View className="my-auto max-h-64 flex-wrap justify-around">
               {filteredBooks.map((item) => (

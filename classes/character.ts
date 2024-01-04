@@ -133,6 +133,7 @@ type PlayerCharacterBase = {
   conditions?: Condition[];
   inventory?: Item[];
   minions?: Minion[];
+  currentDungeon?: { instance: string; level: number };
   equipment?: {
     mainHand: Item;
     offHand: Item | null;
@@ -199,6 +200,7 @@ export class PlayerCharacter extends Character {
   conditions: Condition[];
   gold: number;
   inventory: Item[];
+  currentDungeon: { instance: string; level: number } | null;
   equipment: {
     mainHand: Item;
     offHand: Item | null;
@@ -235,6 +237,7 @@ export class PlayerCharacter extends Character {
     physicalAttacks,
     gold,
     inventory,
+    currentDungeon,
     equipment,
   }: PlayerCharacterOptions) {
     super({
@@ -269,6 +272,7 @@ export class PlayerCharacter extends Character {
     this.physicalAttacks = physicalAttacks ?? ["punch"];
     this.gold = gold ?? 500;
     this.inventory = inventory ?? [];
+    this.currentDungeon = currentDungeon ?? null;
     this.equipment = equipment ?? {
       mainHand: new Item({
         name: "unarmored",
@@ -299,6 +303,7 @@ export class PlayerCharacter extends Character {
       physicalAttacks: observable,
       gold: observable,
       inventory: observable,
+      currentDungeon: observable,
       equipment: observable,
       getMaxHealth: action,
       damageHealth: action,
@@ -334,6 +339,7 @@ export class PlayerCharacter extends Character {
       isStunned: action,
       pass: action,
       conditionTicker: action,
+      setInDungeon: action,
     });
   }
   //----------------------------------Health----------------------------------//
@@ -1155,6 +1161,14 @@ export class PlayerCharacter extends Character {
     }
   }
 
+  public setInDungeon(props: inDungeonProps) {
+    if (props.state) {
+      this.currentDungeon = { instance: props.instance, level: props.level };
+    } else {
+      this.currentDungeon = null;
+    }
+  }
+
   static fromJSON(json: any): PlayerCharacter {
     const player = new PlayerCharacter({
       firstName: json.firstName,
@@ -1193,6 +1207,7 @@ export class PlayerCharacter extends Character {
       inventory: json.inventory
         ? json.inventory.map((item: any) => Item.fromJSON(item))
         : [],
+      currentDungeon: json.currentDungeon,
       equipment: json.equipment
         ? {
             mainHand: Item.fromJSON(json.equipment.mainHand),
@@ -1358,3 +1373,13 @@ export function getStartingBook(
     });
   } else throw new Error("Invalid player blessing in getStartingBook()");
 }
+
+type enterDungeonProps = {
+  state: true;
+  instance: string;
+  level: number;
+};
+type leaveDungeonProps = {
+  state: false;
+};
+type inDungeonProps = enterDungeonProps | leaveDungeonProps;

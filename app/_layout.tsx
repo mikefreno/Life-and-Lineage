@@ -156,6 +156,13 @@ const RootLayout = () => {
           router.back();
         }
         router.replace("/DeathScreen");
+      } else if (playerCharacter.currentDungeon) {
+        while (router.canGoBack()) {
+          router.back();
+        }
+        router.replace(
+          `/DungeonLevel/${playerCharacter.currentDungeon.instance}/${playerCharacter.currentDungeon.level}`,
+        );
       }
     }
   }, [loaded, gameData, playerCharacter]);

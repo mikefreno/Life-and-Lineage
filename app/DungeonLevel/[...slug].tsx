@@ -5,7 +5,7 @@ import { MonsterImage } from "../../components/MonsterImage";
 import { Pressable, Modal } from "react-native";
 import { Stack, useLocalSearchParams, router } from "expo-router";
 import BattleTab from "../../components/BattleTab";
-import { flipCoin, toTitleCase } from "../../utility/functions";
+import { flipCoin, fullSave, toTitleCase } from "../../utility/functions";
 import { enemyGenerator } from "../../utility/monster";
 import PlayerStatus from "../../components/PlayerStatus";
 import ProgressBar from "../../components/ProgressBar";
@@ -445,6 +445,7 @@ const DungeonLevelScreen = observer(() => {
       ) {
         vibration({ style: "light" });
         setFleeRollFailure(false);
+        playerState.setInDungeon({ state: false });
         setTimeout(() => {
           setFleeModalShowing(false);
           gameState?.gameTick(playerState);
@@ -456,6 +457,7 @@ const DungeonLevelScreen = observer(() => {
           }
           router.replace("/dungeon");
           setMonster(null);
+          fullSave(gameState, playerState);
         }, 200);
       } else {
         setFleeRollFailure(true);
