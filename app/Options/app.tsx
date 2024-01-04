@@ -1,32 +1,46 @@
-import { Pressable, View as NonThemedView, StyleSheet } from "react-native";
+import {
+  Pressable,
+  View as NonThemedView,
+  StyleSheet,
+  Switch,
+} from "react-native";
 import { View, Text } from "../../components/Themed";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { toTitleCase } from "../../utility/functions";
 import { GameContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
+import Modal from "react-native-modal";
 
 export default function AppSettings() {
   const themeOptions = ["system", "light", "dark"];
   const vibrationOptions = ["full", "minimal", "none"];
   const { setColorScheme } = useColorScheme();
+  const [showTutorialResetConfirm, setShowTutorialResetConfirm] =
+    useState<boolean>(false);
 
-  const gameData = useContext(GameContext);
-  const game = gameData?.gameState;
+  const gameContext = useContext(GameContext);
+  if (!gameContext) {
+    throw new Error("Missing context");
+  }
+  const { gameState } = gameContext;
 
   const vibration = useVibration();
+  const [tutorialState, setTutorialState] = useState<boolean>(
+    gameState?.tutorialsEnabled ?? true,
+  );
 
-  if (game) {
+  if (gameState) {
     const [selectedThemeOption, setSelectedThemeOption] = useState<number>(
-      themeOptions.indexOf(game?.colorScheme),
+      themeOptions.indexOf(gameState.colorScheme),
     );
     const [selectedVibrationOption, setSelectedVibrationOption] =
-      useState<number>(vibrationOptions.indexOf(game?.vibrationEnabled));
+      useState<number>(vibrationOptions.indexOf(gameState.vibrationEnabled));
 
     function setColorTheme(index: number, option: "system" | "light" | "dark") {
-      if (game) {
+      if (gameState) {
         vibration({ style: "light" });
-        game.setColorScheme(option);
+        gameState.setColorScheme(option);
         setSelectedThemeOption(index);
         setColorScheme(option);
       }
@@ -36,15 +50,69 @@ export default function AppSettings() {
       index: number,
       option: "full" | "minimal" | "none",
     ) {
-      if (game) {
-        game.modifyVibrationSettings(option);
+      if (gameState) {
+        gameState.modifyVibrationSettings(option);
         setSelectedVibrationOption(index);
         vibration({ style: "light" });
       }
     }
 
+    useEffect(() => {
+      if (tutorialState == false) {
+        gameState.disableTutorials();
+      } else {
+        gameState.enableTutorials();
+      }
+    }, [tutorialState]);
+
     return (
       <>
+        <Modal
+          animationIn="slideInUp"
+          animationOut="fadeOut"
+          isVisible={showTutorialResetConfirm}
+          backdropOpacity={0.2}
+          animationInTiming={500}
+          onBackdropPress={() => setShowTutorialResetConfirm(false)}
+          onBackButtonPress={() => setShowTutorialResetConfirm(false)}
+        >
+          <View
+            className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
+            style={{
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+
+              shadowOpacity: 0.25,
+              shadowRadius: 5,
+            }}
+          >
+            <Text className="text-center text-lg">
+              This will reset all tutorials, some may not make sense based on
+              your current game/player/inventory state.
+            </Text>
+            <Text className="text-center text-2xl">Are you sure?</Text>
+            <View className="flex flex-row">
+              <Pressable
+                onPress={() => {
+                  gameState.resetTutorialState();
+                  setShowTutorialResetConfirm(false);
+                }}
+                className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+              >
+                <Text>Reset</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setShowTutorialResetConfirm(false)}
+                className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+              >
+                <Text>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
         <View className="flex-1 items-center justify-center px-4">
           <View style={styles.container}>
             <View style={styles.line} />
@@ -109,6 +177,30 @@ export default function AppSettings() {
                 </Text>
               </Pressable>
             ))}
+          </NonThemedView>
+          <View style={styles.container}>
+            <View style={styles.line} />
+            <View style={styles.content}>
+              <Text className="text-xl">Tutorials</Text>
+            </View>
+            <View style={styles.line} />
+          </View>
+          <NonThemedView className="mt-3 rounded px-4 py-2">
+            <View className="mx-auto flex flex-row">
+              <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+              <Switch
+                trackColor={{ false: "#767577", true: "#3b82f6" }}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={(bool) => setTutorialState(bool)}
+                value={tutorialState}
+              />
+            </View>
+            <Pressable
+              onPress={() => setShowTutorialResetConfirm(true)}
+              className="mx-auto mt-4 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+            >
+              <Text>Reset Tutorials</Text>
+            </Pressable>
           </NonThemedView>
         </View>
       </>

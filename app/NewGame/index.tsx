@@ -1,13 +1,14 @@
-import { Pressable, useColorScheme } from "react-native";
+import { Pressable, useColorScheme, View as NonThemedView } from "react-native";
 import { Text, View, ScrollView } from "../../components/Themed";
-import { View as NonThemedView } from "react-native";
 import "../../assets/styles/globals.css";
-import { useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import { Stack, router } from "expo-router";
 import Necromancer from "../../assets/icons/NecromancerSkull";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
 import { useVibration } from "../../utility/customHooks";
+import { GameContext } from "../_layout";
+import Modal from "react-native-modal";
 
 export default function NewGameScreen() {
   const [selectedClass, setSelectedClass] = useState<
@@ -17,6 +18,24 @@ export default function NewGameScreen() {
   const colorScheme = useColorScheme();
   const vibration = useVibration();
 
+  const gameContext = useContext(GameContext);
+  const gameState = gameContext?.gameState;
+
+  const [showIntroTutorial, setShowIntroTutorial] = useState<boolean>(
+    !gameState || (gameState && !gameState.getTutorialState("class"))
+      ? true
+      : false,
+  );
+  const [showTutorialReset, setShowTutorialReset] = useState<boolean>(
+    gameState ? true : false,
+  );
+
+  useEffect(() => {
+    if (!showIntroTutorial && gameState) {
+      gameState.updateTutorialState("class", true);
+    }
+  }, [showIntroTutorial]);
+
   return (
     <>
       <Stack.Screen
@@ -25,6 +44,87 @@ export default function NewGameScreen() {
         }}
       />
       <ScrollView className="h-full">
+        <Modal
+          animationIn="slideInUp"
+          animationOut="fadeOut"
+          isVisible={showTutorialReset && gameState?.tutorialsEnabled}
+          backdropOpacity={0.2}
+          animationInTiming={500}
+          onBackdropPress={() => setShowTutorialReset(false)}
+          onBackButtonPress={() => setShowTutorialReset(false)}
+        >
+          <View
+            className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
+            style={{
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+
+              shadowOpacity: 0.25,
+              shadowRadius: 5,
+            }}
+          >
+            <Text className="text-center text-2xl">Tutorial Reset</Text>
+            <Text className="text-center text-lg">
+              Would you like to reset tutorials?
+            </Text>
+            <View className="flex flex-row">
+              <Pressable
+                onPress={() => {
+                  gameState?.resetTutorialState();
+                  setShowTutorialReset(false);
+                }}
+                className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+              >
+                <Text>Reset</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setShowTutorialReset(false)}
+                className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+              >
+                <Text>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+        <Modal
+          animationIn="slideInUp"
+          animationOut="fadeOut"
+          isVisible={showIntroTutorial}
+          backdropOpacity={0.2}
+          animationInTiming={500}
+          onBackdropPress={() => setShowIntroTutorial(false)}
+          onBackButtonPress={() => setShowIntroTutorial(false)}
+        >
+          <View
+            className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
+            style={{
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+
+              shadowOpacity: 0.25,
+              shadowRadius: 5,
+            }}
+          >
+            <Text className="text-center text-2xl">
+              Welcome To Magic Delve!
+            </Text>
+            <Text className="mt-2 text-center">
+              Let's start with selecting your class...
+            </Text>
+            <Pressable
+              onPress={() => setShowIntroTutorial(false)}
+              className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+            >
+              <Text>Close</Text>
+            </Pressable>
+          </View>
+        </Modal>
         <Text className="bold pt-4 text-center text-3xl">
           Create a Character
         </Text>

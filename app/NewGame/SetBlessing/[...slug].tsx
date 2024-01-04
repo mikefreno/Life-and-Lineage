@@ -1,6 +1,6 @@
-import { Pressable, View as NonThemedView, useColorScheme } from "react-native";
+import { Pressable, View as NonThemedView } from "react-native";
 import { Text, ScrollView, View } from "../../../components/Themed";
-import { useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { toTitleCase } from "../../../utility/functions";
 import { router } from "expo-router";
@@ -16,6 +16,10 @@ import HoldingSkull from "../../../assets/icons/HoldingSkull";
 import Bones from "../../../assets/icons/BonesIcon";
 import Virus from "../../../assets/icons/VirusIcon";
 import { useVibration } from "../../../utility/customHooks";
+import { GameContext } from "../../_layout";
+import Modal from "react-native-modal";
+import { Entypo } from "@expo/vector-icons";
+import { useColorScheme } from "nativewind";
 
 export default function SetBlessing() {
   const { slug } = useLocalSearchParams();
@@ -24,9 +28,26 @@ export default function SetBlessing() {
   const sex = slug[1];
   const firstName = toTitleCase(slug[2]);
   const lastName = toTitleCase(slug[3]);
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const blessingRef = useRef<string>();
   const vibration = useVibration();
+
+  const gameContext = useContext(GameContext);
+  const gameState = gameContext?.gameState;
+
+  const [showBlessingTutorial, setShowBlessingTutorial] = useState<boolean>(
+    !gameState || (gameState && !gameState.getTutorialState("blessing"))
+      ? true
+      : false,
+  );
+
+  const [tutorialStep, setTutorialStep] = useState<number>(1);
+
+  useEffect(() => {
+    if (!showBlessingTutorial && gameState) {
+      gameState.updateTutorialState("blessing", true);
+    }
+  }, [showBlessingTutorial]);
 
   function classDependantBlessings() {
     if (playerClass == "mage") {
@@ -43,9 +64,9 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "fire"
-                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : "scale-90"
-                  } px-6 py-4`}
+                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                      : "border-transparent"
+                  } px-6 py-4 border`}
                 >
                   <NonThemedView className="mx-auto">
                     <Fire
@@ -74,9 +95,9 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "water"
-                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : "scale-90"
-                  } px-6 py-4`}
+                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                      : "border-transparent"
+                  } px-6 py-4 border`}
                 >
                   <NonThemedView className="mx-auto">
                     <Water
@@ -107,9 +128,9 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "air"
-                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : "scale-90"
-                  } px-6 py-4`}
+                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                      : "border-transparent"
+                  } px-6 py-4 border`}
                 >
                   <NonThemedView className="mx-auto">
                     <Air
@@ -138,9 +159,9 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "earth"
-                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : "scale-90"
-                  } px-6 py-4`}
+                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                      : "border-transparent"
+                  } px-6 py-4 border`}
                 >
                   <NonThemedView className="mx-auto">
                     <Earth
@@ -177,9 +198,9 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "summoning"
-                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : "scale-90"
-                  } px-2 py-4`}
+                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                      : "border-transparent"
+                  } px-6 py-4 border`}
                 >
                   <NonThemedView className="mx-auto">
                     <HoldingSkull
@@ -209,9 +230,9 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "pestilence"
-                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : "scale-90"
-                  } px-2 py-4`}
+                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                      : "border-transparent"
+                  } px-6 py-4 border`}
                 >
                   <NonThemedView className="mx-auto">
                     <Virus
@@ -243,9 +264,9 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "bone"
-                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : "scale-90"
-                  } px-2 py-4`}
+                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                      : "border-transparent"
+                  } px-6 py-4 border`}
                 >
                   <NonThemedView className="mx-auto">
                     <Bones
@@ -275,9 +296,9 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "blood"
-                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : "scale-90"
-                  } px-2 py-4`}
+                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                      : "border-transparent"
+                  } px-6 py-4 border`}
                 >
                   <NonThemedView className="mx-auto">
                     <Drop
@@ -313,9 +334,9 @@ export default function SetBlessing() {
               <NonThemedView
                 className={`${
                   pressed || blessing == "holy"
-                    ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                    : "scale-90"
-                } px-6 py-4`}
+                    ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                    : "border-transparent"
+                } px-6 py-4 border`}
               >
                 <NonThemedView className="mx-auto">
                   <Sun
@@ -345,9 +366,9 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "vengeance"
-                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : "scale-90"
-                  } px-2 py-4`}
+                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                      : "border-transparent"
+                  } px-6 py-4 border`}
                 >
                   <NonThemedView className="mx-auto">
                     <Swords
@@ -376,9 +397,9 @@ export default function SetBlessing() {
                 <NonThemedView
                   className={`${
                     pressed || blessing == "protection"
-                      ? "rounded-lg border border-zinc-900 bg-zinc-100 dark:border-zinc-50 dark:bg-zinc-800"
-                      : "scale-90"
-                  } px-2 py-4`}
+                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                      : "border-transparent"
+                  } px-6 py-4 border`}
                 >
                   <NonThemedView className="mx-auto">
                     <Shield
@@ -410,6 +431,78 @@ export default function SetBlessing() {
           title: "Blessing",
         }}
       />
+      <Modal
+        animationIn="slideInUp"
+        animationOut="fadeOut"
+        isVisible={showBlessingTutorial}
+        backdropOpacity={0.2}
+        animationInTiming={500}
+        onBackdropPress={() => setShowBlessingTutorial(false)}
+        onBackButtonPress={() => setShowBlessingTutorial(false)}
+      >
+        <View
+          className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
+          style={{
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 2,
+            },
+
+            shadowOpacity: 0.25,
+            shadowRadius: 5,
+          }}
+        >
+          <View
+            className={`flex flex-row ${
+              tutorialStep == 2 ? "justify-between" : "justify-end"
+            }`}
+          >
+            {tutorialStep == 2 ? (
+              <Pressable onPress={() => setTutorialStep((prev) => prev - 1)}>
+                <Entypo
+                  name="chevron-left"
+                  size={24}
+                  color={colorScheme == "dark" ? "#f4f4f5" : "black"}
+                />
+              </Pressable>
+            ) : null}
+            <Text>{tutorialStep}/2</Text>
+          </View>
+          {tutorialStep == 1 ? (
+            <>
+              <Text className="text-center text-2xl">
+                Magic is a extreamly powerful, but often very expensive to
+                obtain.
+              </Text>
+              <Text className="my-4 text-center text-lg">
+                You will start with a book providing a spell pertaining to the
+                blessing you choose, and a higher starting point in that school.
+              </Text>
+              <Pressable
+                onPress={() => setTutorialStep((prev) => prev + 1)}
+                className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+              >
+                <Text>Next</Text>
+              </Pressable>
+            </>
+          ) : (
+            <>
+              <Text className="mb-4 text-center text-lg">
+                Each of the blessings are for your class, you can learn from any
+                of these schools, but not from a school for a different class.
+              </Text>
+              <Pressable
+                onPress={() => setShowBlessingTutorial(false)}
+                className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+              >
+                <Text>Close</Text>
+              </Pressable>
+            </>
+          )}
+        </View>
+      </Modal>
+
       <ScrollView>
         <View className="px-6 pb-12">
           <Text className="py-8 text-center text-2xl text-zinc-900 dark:text-zinc-50">

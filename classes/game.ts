@@ -15,6 +15,8 @@ interface GameOptions {
   colorScheme?: "system" | "dark" | "light";
   vibrationEnabled?: "full" | "minimal" | "none";
   healthWarning?: number;
+  tutorialsShown?: Record<string, boolean>;
+  tutorialsEnabled?: boolean;
 }
 
 export class Game {
@@ -26,7 +28,8 @@ export class Game {
   colorScheme: "system" | "dark" | "light";
   vibrationEnabled: "full" | "minimal" | "none";
   healthWarning: number;
-
+  tutorialsShown: Record<string, boolean>;
+  tutorialsEnabled: boolean;
   constructor({
     date,
     dungeonInstances,
@@ -36,6 +39,8 @@ export class Game {
     colorScheme,
     vibrationEnabled,
     healthWarning,
+    tutorialsShown,
+    tutorialsEnabled,
   }: GameOptions) {
     this.date = date ?? new Date().toISOString();
     this.dungeonInstances = dungeonInstances ?? [
@@ -71,6 +76,18 @@ export class Game {
     this.vibrationEnabled =
       vibrationEnabled ?? Platform.OS == "ios" ? "full" : "minimal";
     this.healthWarning = healthWarning ?? 0.2;
+    this.tutorialsShown = tutorialsShown ?? {
+      class: true,
+      aging: true,
+      blessing: true,
+      intro: false,
+      spell: false,
+      labor: false,
+      dungeon: false,
+      dungeonLevel: false,
+      shops: false,
+    };
+    this.tutorialsEnabled = tutorialsEnabled ?? true;
     makeObservable(this, {
       date: observable,
       dungeonInstances: observable,
@@ -80,6 +97,8 @@ export class Game {
       colorScheme: observable,
       vibrationEnabled: observable,
       healthWarning: observable,
+      tutorialsShown: observable,
+      tutorialsEnabled: observable,
       gameTick: action,
       getDungeon: action,
       getInstance: action,
@@ -88,6 +107,11 @@ export class Game {
       hitDeathScreen: action,
       modifyVibrationSettings: action,
       setHealthWarning: action,
+      updateTutorialState: action,
+      resetTutorialState: action,
+      getTutorialState: action,
+      disableTutorials: action,
+      enableTutorials: action,
     });
   }
 
@@ -182,9 +206,41 @@ export class Game {
   public modifyVibrationSettings(targetState: "full" | "minimal" | "none") {
     this.vibrationEnabled = targetState;
   }
+
   public setHealthWarning(desiredValue: number) {
     this.healthWarning = desiredValue;
   }
+
+  public updateTutorialState(tutorial: string, state: boolean) {
+    this.tutorialsShown[tutorial] = state;
+  }
+
+  public resetTutorialState() {
+    const defaultState = {
+      class: false,
+      aging: false,
+      blessing: false,
+      intro: false,
+      spell: false,
+      labor: false,
+      dungeon: false,
+      dungeonLevel: false,
+      shops: false,
+    };
+    this.tutorialsShown = defaultState;
+  }
+
+  public disableTutorials() {
+    this.tutorialsEnabled = false;
+  }
+  public enableTutorials() {
+    this.tutorialsEnabled = true;
+  }
+
+  public getTutorialState(tutorial: string) {
+    return this.tutorialsShown[tutorial];
+  }
+
   static fromJSON(json: any): Game {
     const game = new Game({
       date: json.date ? json.date : new Date().toISOString(),
@@ -201,6 +257,8 @@ export class Game {
       colorScheme: json.colorScheme,
       vibrationEnabled: json.vibrationEnabled,
       healthWarning: json.healthWarning,
+      tutorialsShown: json.tutorialsShown,
+      tutorialsEnabled: json.tutorialsEnabled,
     });
 
     return game;

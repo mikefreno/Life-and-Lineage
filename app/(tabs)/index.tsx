@@ -21,6 +21,8 @@ import Draggable from "react-native-draggable";
 import { router } from "expo-router";
 import { useVibration } from "../../utility/customHooks";
 import { Dimensions } from "react-native";
+import Modal from "react-native-modal";
+import { Entypo } from "@expo/vector-icons";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -47,6 +49,10 @@ const HomeScreen = observer(() => {
   const [showingStats, setShowingStats] = useState<Item | null>(null);
   const [statsLeftPos, setStatsLeftPos] = useState<number>();
   const [statsTopPos, setStatsTopPos] = useState<number>();
+  const [showIntroTutorial, setShowIntroTutorial] = useState<boolean>(
+    (gameState && !gameState.getTutorialState("intro")) ?? false,
+  );
+  const [tutorialStep, setTutorialStep] = useState<number>(1);
 
   //animation
   useEffect(() => {
@@ -60,7 +66,17 @@ const HomeScreen = observer(() => {
     }).start();
   }, [showingInventory]);
 
-  useEffect(() => {}, [showingInventory]);
+  useEffect(() => {
+    if (!showIntroTutorial && gameState) {
+      gameState.updateTutorialState("intro", true);
+    }
+  }, [showIntroTutorial]);
+
+  useEffect(() => {
+    setShowIntroTutorial(
+      (gameState && !gameState.getTutorialState("intro")) ?? false,
+    );
+  }, [gameState?.tutorialsShown]);
 
   const deviceHeight = Dimensions.get("window").height;
   const deviceWidth = Dimensions.get("window").width;
@@ -459,146 +475,217 @@ const HomeScreen = observer(() => {
     const name = playerState.getFullName();
 
     return (
-      <View className="flex-1">
-        <Animated.View
-          style={{
-            transform: [{ translateY: topTranslationValue }],
-            flex: 1,
-            paddingHorizontal: 16,
-            paddingTop: 8,
-          }}
+      <>
+        <Modal
+          animationIn="slideInUp"
+          animationOut="fadeOut"
+          isVisible={showIntroTutorial && gameState.tutorialsEnabled}
+          backdropOpacity={0.2}
+          animationInTiming={500}
+          onBackdropPress={() => setShowIntroTutorial(false)}
+          onBackButtonPress={() => setShowIntroTutorial(false)}
         >
-          <View className="-mx-4 border-b border-zinc-200 dark:border-zinc-700">
-            <View className="mx-4 flex-row pb-4">
-              {playerState?.playerClass == "necromancer" ? (
-                <NonThemedView className="mx-auto">
-                  <Necromancer
-                    width={100}
-                    height={100}
-                    color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
-                  />
-                </NonThemedView>
-              ) : playerState?.playerClass == "paladin" ? (
-                <NonThemedView className="mx-auto">
-                  <PaladinHammer width={100} height={100} />
-                </NonThemedView>
-              ) : (
-                <NonThemedView className="mx-auto scale-x-[-1] transform">
-                  <WizardHat
-                    height={100}
-                    width={100}
-                    color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
-                  />
-                </NonThemedView>
-              )}
-              <NonThemedView className="mx-2 flex-1 flex-col justify-center pt-2 align-middle">
-                <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
-                <Text className="text-center text-xl dark:text-white">{`${playerState.job}`}</Text>
-                <Text className="text-center text-xl dark:text-white">{`${
-                  playerState
-                    ? calculateAge(
-                        new Date(playerState.birthdate),
-                        new Date(gameState.date),
-                      )
-                    : "x"
-                } years old`}</Text>
-              </NonThemedView>
-              <NonThemedView className="mx-auto">
-                {blessingDisplay(playerState.blessing, colorScheme)}
-              </NonThemedView>
-            </View>
-          </View>
-          <NonThemedView>
-            <View className="flex flex-row pt-2">
-              {currentEquipmentDisplay()}
-            </View>
-            <NonThemedView className="flex flex-row justify-between">
-              <NonThemedView
-                className="py-2"
-                ref={!showingInventory ? inventoryTarget : undefined}
-              >
-                <Pressable
-                  style={{ width: 55 }}
-                  onPress={() => {
-                    vibration({ style: "light" });
-                    setShowingInventory(!showingInventory);
-                    if (
-                      showingStats &&
-                      !playerState.equippedCheck(showingStats)
-                    ) {
-                      setShowingStats(null);
-                    }
-                  }}
-                >
-                  <Image
-                    source={require("../../assets/images/items/Bag.png")}
-                    style={{ width: 50, height: 50 }}
-                  />
-                </Pressable>
-              </NonThemedView>
-              <NonThemedView className="-mt-16">
-                <GearStatsDisplay
-                  stats={playerState.getCurrentEquipmentStats()}
-                />
-              </NonThemedView>
-            </NonThemedView>
-            {showingInventory ? inventoryRender() : null}
-          </NonThemedView>
-        </Animated.View>
-        {playerState ? (
-          <Animated.View
-            style={{ transform: [{ translateY: bottomTranslationValue }] }}
-          >
-            <PlayerStatus displayGoldTop={true} />
-          </Animated.View>
-        ) : null}
-        {showingStats && statsLeftPos && statsTopPos ? (
           <View
-            className="max-w-1/3 absolute items-center rounded-md border border-zinc-600 px-8 py-4 shadow-lg"
+            className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
             style={{
-              backgroundColor:
-                colorScheme == "light"
-                  ? "rgba(250, 250, 250, 0.93)"
-                  : "rgba(20, 20, 20, 0.80)",
-              left: statsLeftPos
-                ? statsLeftPos < deviceWidth / 2
-                  ? statsLeftPos + deviceWidth / 7
-                  : statsLeftPos - deviceWidth / 3 - 5
-                : undefined,
-              top: statsTopPos
-                ? statsTopPos - (2.8 * deviceHeight) / 10
-                : undefined,
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+
+              shadowOpacity: 0.25,
+              shadowRadius: 5,
             }}
           >
-            <NonThemedView style={{ width: 80 }}>
-              <Text className="text-center">
-                {toTitleCase(showingStats.name)}
-              </Text>
-            </NonThemedView>
-            {showingStats.stats && showingStats.slot ? (
-              <NonThemedView className="py-2">
-                <GearStatsDisplay stats={showingStats.stats} />
-              </NonThemedView>
-            ) : null}
-            <Text className="text-sm italic">
-              {showingStats.itemClass == "bodyArmor"
-                ? "Body Armor"
-                : toTitleCase(showingStats.itemClass)}
-            </Text>
-            {showingStats.itemClass == "book" ? (
-              <Pressable
-                onPress={() => {
-                  vibration({ style: "light" });
-                  router.push("/Study");
-                }}
-                className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-              >
-                <Text>Study This Book</Text>
-              </Pressable>
-            ) : null}
+            <View
+              className={`flex flex-row ${
+                tutorialStep == 2 ? "justify-between" : "justify-end"
+              }`}
+            >
+              {tutorialStep == 2 ? (
+                <Pressable onPress={() => setTutorialStep((prev) => prev - 1)}>
+                  <Entypo
+                    name="chevron-left"
+                    size={24}
+                    color={colorScheme == "dark" ? "#f4f4f5" : "black"}
+                  />
+                </Pressable>
+              ) : null}
+              <Text>{tutorialStep}/2</Text>
+            </View>
+            {tutorialStep == 1 ? (
+              <>
+                <Text className="text-center text-2xl">Welcome!</Text>
+
+                <Text className="my-4 text-center text-lg">
+                  On this page you can view your inventory (tap the bag) and
+                  equip items to you hands, head, or body.
+                </Text>
+                <Pressable
+                  onPress={() => setTutorialStep((prev) => prev + 1)}
+                  className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                >
+                  <Text>Next</Text>
+                </Pressable>
+              </>
+            ) : (
+              <>
+                <Text className="mt-2 text-center">
+                  A great place to start is to open your inventory and study the
+                  book you were given.
+                </Text>
+                <Pressable
+                  onPress={() => setShowIntroTutorial(false)}
+                  className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                >
+                  <Text>Close</Text>
+                </Pressable>
+              </>
+            )}
           </View>
-        ) : null}
-      </View>
+        </Modal>
+        <View className="flex-1">
+          <Animated.View
+            style={{
+              transform: [{ translateY: topTranslationValue }],
+              flex: 1,
+              paddingHorizontal: 16,
+              paddingTop: 8,
+            }}
+          >
+            <View className="-mx-4 border-b border-zinc-200 dark:border-zinc-700">
+              <View className="mx-4 flex-row pb-4">
+                {playerState?.playerClass == "necromancer" ? (
+                  <NonThemedView className="mx-auto">
+                    <Necromancer
+                      width={100}
+                      height={100}
+                      color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
+                    />
+                  </NonThemedView>
+                ) : playerState?.playerClass == "paladin" ? (
+                  <NonThemedView className="mx-auto">
+                    <PaladinHammer width={100} height={100} />
+                  </NonThemedView>
+                ) : (
+                  <NonThemedView className="mx-auto scale-x-[-1] transform">
+                    <WizardHat
+                      height={100}
+                      width={100}
+                      color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
+                    />
+                  </NonThemedView>
+                )}
+                <NonThemedView className="mx-2 flex-1 flex-col justify-center pt-2 align-middle">
+                  <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
+                  <Text className="text-center text-xl dark:text-white">{`${playerState.job}`}</Text>
+                  <Text className="text-center text-xl dark:text-white">{`${
+                    playerState
+                      ? calculateAge(
+                          new Date(playerState.birthdate),
+                          new Date(gameState.date),
+                        )
+                      : "x"
+                  } years old`}</Text>
+                </NonThemedView>
+                <NonThemedView className="mx-auto">
+                  {blessingDisplay(playerState.blessing, colorScheme)}
+                </NonThemedView>
+              </View>
+            </View>
+            <NonThemedView>
+              <View className="flex flex-row pt-2">
+                {currentEquipmentDisplay()}
+              </View>
+              <NonThemedView className="flex flex-row justify-between">
+                <NonThemedView
+                  className="py-2"
+                  ref={!showingInventory ? inventoryTarget : undefined}
+                >
+                  <Pressable
+                    style={{ width: 55 }}
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      setShowingInventory(!showingInventory);
+                      if (
+                        showingStats &&
+                        !playerState.equippedCheck(showingStats)
+                      ) {
+                        setShowingStats(null);
+                      }
+                    }}
+                  >
+                    <Image
+                      source={require("../../assets/images/items/Bag.png")}
+                      style={{ width: 50, height: 50 }}
+                    />
+                  </Pressable>
+                </NonThemedView>
+                <NonThemedView className="-mt-16">
+                  <GearStatsDisplay
+                    stats={playerState.getCurrentEquipmentStats()}
+                  />
+                </NonThemedView>
+              </NonThemedView>
+              {showingInventory ? inventoryRender() : null}
+            </NonThemedView>
+          </Animated.View>
+          {playerState ? (
+            <Animated.View
+              style={{ transform: [{ translateY: bottomTranslationValue }] }}
+            >
+              <PlayerStatus displayGoldTop={true} />
+            </Animated.View>
+          ) : null}
+          {showingStats && statsLeftPos && statsTopPos ? (
+            <View
+              className="max-w-1/3 absolute items-center rounded-md border border-zinc-600 px-8 py-4 shadow-lg"
+              style={{
+                backgroundColor:
+                  colorScheme == "light"
+                    ? "rgba(250, 250, 250, 0.93)"
+                    : "rgba(20, 20, 20, 0.80)",
+                left: statsLeftPos
+                  ? statsLeftPos < deviceWidth / 2
+                    ? statsLeftPos + deviceWidth / 7
+                    : statsLeftPos - deviceWidth / 3 - 5
+                  : undefined,
+                top: statsTopPos
+                  ? statsTopPos - (2.8 * deviceHeight) / 10
+                  : undefined,
+              }}
+            >
+              <NonThemedView style={{ width: 80 }}>
+                <Text className="text-center">
+                  {toTitleCase(showingStats.name)}
+                </Text>
+              </NonThemedView>
+              {showingStats.stats && showingStats.slot ? (
+                <NonThemedView className="py-2">
+                  <GearStatsDisplay stats={showingStats.stats} />
+                </NonThemedView>
+              ) : null}
+              <Text className="text-sm italic">
+                {showingStats.itemClass == "bodyArmor"
+                  ? "Body Armor"
+                  : toTitleCase(showingStats.itemClass)}
+              </Text>
+              {showingStats.itemClass == "book" ? (
+                <Pressable
+                  onPress={() => {
+                    vibration({ style: "light" });
+                    router.push("/Study");
+                  }}
+                  className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                >
+                  <Text>Study This Book</Text>
+                </Pressable>
+              ) : null}
+            </View>
+          ) : null}
+        </View>
+      </>
     );
   }
 });

@@ -11,6 +11,7 @@ import { GameContext, PlayerCharacterContext } from "./_layout";
 import ProgressBar from "../components/ProgressBar";
 import { elementalColorMap } from "../utility/elementColors";
 import { useVibration } from "../utility/customHooks";
+import SpellDetails from "../components/SpellDetails";
 
 export default function LearningSpellsScreen() {
   const playerCharacterData = useContext(PlayerCharacterContext);
@@ -154,17 +155,9 @@ export default function LearningSpellsScreen() {
       ) : null}
       {selectedBook && selectedBookSpell ? (
         <View className="flex items-center pb-4">
-          <Text className="text-lg">{toTitleCase(selectedBook.name)}</Text>
-          <View className="flex flex-row">
-            <Text className="my-auto text-xl">School: </Text>
-            <View className="items-center py-2">
-              {blessingDisplay(selectedBookSpell.element, colorScheme, 50)}
-              <Text>{toTitleCase(selectedBookSpell.element)}</Text>
-            </View>
-          </View>
-          <Text className="text-2xl tracking-wide">
-            Teaches {toTitleCase(selectedBookSpell.name)}
-          </Text>
+          <Text className="text-xl">{toTitleCase(selectedBook.name)}</Text>
+          <Text className="text-lg tracking-wide">Teaches</Text>
+          <SpellDetails spell={selectedBookSpell} />
           <Pressable
             onPress={() => {
               vibration({ style: "light", essential: true });
