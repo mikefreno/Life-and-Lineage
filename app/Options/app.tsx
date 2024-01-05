@@ -11,6 +11,7 @@ import { toTitleCase } from "../../utility/functions";
 import { GameContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
 import Modal from "react-native-modal";
+import * as Updates from "expo-updates";
 
 export default function AppSettings() {
   const themeOptions = ["system", "light", "dark"];
@@ -91,7 +92,7 @@ export default function AppSettings() {
           >
             <Text className="text-center text-lg">
               This will reset all tutorials, some may not make sense based on
-              your current game/player/inventory state.
+              your current game/player/inventory state (And restart the app).
             </Text>
             <Text className="text-center text-2xl">Are you sure?</Text>
             <View className="flex flex-row">
@@ -99,6 +100,7 @@ export default function AppSettings() {
                 onPress={() => {
                   gameState.resetTutorialState();
                   setShowTutorialResetConfirm(false);
+                  Updates.reloadAsync();
                 }}
                 className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
               >

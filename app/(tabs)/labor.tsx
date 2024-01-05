@@ -11,6 +11,7 @@ import { Entypo, EvilIcons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import { toTitleCase } from "../../utility/functions";
 import { router } from "expo-router";
+import { useVibration } from "../../utility/customHooks";
 
 const LaborScreen = observer(() => {
   const playerCharacterData = useContext(PlayerCharacterContext);
@@ -23,6 +24,7 @@ const LaborScreen = observer(() => {
     throw Error("Missing Context");
   }
   const { gameState } = gameContext;
+  const vibration = useVibration();
 
   const { colorScheme } = useColorScheme();
   const [showLaborTutorial, setShowLaborTutorial] = useState<boolean>(
@@ -115,7 +117,10 @@ const LaborScreen = observer(() => {
                 great riches.
               </Text>
               <Pressable
-                onPress={() => setShowLaborTutorial(false)}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  setShowLaborTutorial(false);
+                }}
                 className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
               >
                 <Text>Close</Text>

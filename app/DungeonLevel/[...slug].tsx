@@ -176,10 +176,6 @@ const DungeonLevelScreen = observer(() => {
         if (thisDungeon?.level != 0) {
           thisDungeon?.incrementStep();
         }
-        gameState?.gameTick(playerState);
-        if (thisDungeon?.level != 0) {
-          thisDungeon?.incrementStep();
-        }
         battleLogger(
           `You defeated the ${toTitleCase(monsterState.creatureSpecies)}`,
         );
@@ -251,14 +247,18 @@ const DungeonLevelScreen = observer(() => {
         battleLogger(
           `The ${toTitleCase(monsterState.creatureSpecies)} did nothing`,
         );
-        setAttackAnimationOnGoing(false);
+        setTimeout(() => {
+          setAttackAnimationOnGoing(false);
+        }, 500);
       } else {
         battleLogger(
           `The ${toTitleCase(monsterState.creatureSpecies)} ${
             enemyAttackRes.attack == "stun" ? "was " : ""
           }${enemyAttackRes.attack}ed`,
         );
-        setAttackAnimationOnGoing(false);
+        setTimeout(() => {
+          setAttackAnimationOnGoing(false);
+        }, 500);
       }
     }
   };
@@ -332,7 +332,7 @@ const DungeonLevelScreen = observer(() => {
       );
       if (attackRes !== "miss") {
         monsterState.damageHealth(attackRes.damage);
-        monsterState.damageSanity(attackRes.sanityDamage);
+        monsterState.damageSanity(attackRes.sanityDamage) ?? null;
         attackRes.debuffs?.forEach((effect) =>
           monsterState.addCondition(effect),
         );
@@ -361,12 +361,21 @@ const DungeonLevelScreen = observer(() => {
           `You ${attackRes}ed the ${toTitleCase(monsterState.creatureSpecies)}`,
         );
       }
-      setTimeout(() => {
-        playerMinionsTurn(playerState.minions, monsterState.id);
+      if (
+        monsterState.health <= 0 ||
+        (monsterState.sanity && monsterState.sanity <= 0)
+      ) {
         setTimeout(() => {
           enemyTurnCheck();
-        }, 1000 * playerState.minions.length);
-      }, 1000);
+        }, 1000);
+      } else {
+        setTimeout(() => {
+          playerMinionsTurn(playerState.minions, monsterState.id);
+          setTimeout(() => {
+            enemyTurnCheck();
+          }, 1000 * playerState.minions.length);
+        }, 1000);
+      }
     }
   };
 
@@ -415,13 +424,21 @@ const DungeonLevelScreen = observer(() => {
         }
       }
       battleLogger(line);
-      playerMinionsTurn(playerState.minions, monsterState.id);
-      setTimeout(() => {
-        playerMinionsTurn(playerState.minions, monsterState.id);
+      if (
+        monsterState.health <= 0 ||
+        (monsterState.sanity && monsterState.sanity <= 0)
+      ) {
         setTimeout(() => {
           enemyTurnCheck();
-        }, 1000 * playerState.minions.length);
-      }, 1000);
+        }, 1000);
+      } else {
+        setTimeout(() => {
+          playerMinionsTurn(playerState.minions, monsterState.id);
+          setTimeout(() => {
+            enemyTurnCheck();
+          }, 1000 * playerState.minions.length);
+        }, 1000);
+      }
     }
   };
 
@@ -779,7 +796,10 @@ const DungeonLevelScreen = observer(() => {
                     And remember fleeing (top left) can save you.
                   </Text>
                   <Pressable
-                    onPress={() => setShowDungeonInteriorTutorial(false)}
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      setShowDungeonInteriorTutorial(false);
+                    }}
                     className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
                   >
                     <Text>Close</Text>
@@ -824,6 +844,7 @@ const DungeonLevelScreen = observer(() => {
               <View className="flex items-center justify-evenly">
                 <Text className="text-center text-lg">Attempt to Flee?</Text>
                 <Pressable
+                  disabled={attackAnimationOnGoing}
                   onPress={flee}
                   className="mb-4 mt-8 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
                 >

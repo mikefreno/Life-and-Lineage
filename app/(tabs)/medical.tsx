@@ -8,11 +8,13 @@ import { GameContext } from "../_layout";
 import { Pressable } from "react-native";
 import { useColorScheme } from "nativewind";
 import { Entypo } from "@expo/vector-icons";
+import { useVibration } from "../../utility/customHooks";
 
 export default function MedicalScreen() {
   const gameContext = useContext(GameContext);
   const [tutorialStep, setTutorialStep] = useState<number>(1);
   const { colorScheme } = useColorScheme();
+  const vibration = useVibration();
 
   if (!gameContext) {
     throw new Error("Missing Context");
@@ -91,7 +93,10 @@ export default function MedicalScreen() {
                 clock forward.
               </Text>
               <Pressable
-                onPress={() => setShowMedicalTutorial(false)}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  setShowMedicalTutorial(false);
+                }}
                 className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
               >
                 <Text>Close</Text>

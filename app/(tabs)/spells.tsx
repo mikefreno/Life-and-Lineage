@@ -10,11 +10,13 @@ import { elementalColorMap } from "../../utility/elementColors";
 import PlayerStatus from "../../components/PlayerStatus";
 import Modal from "react-native-modal";
 import { Entypo } from "@expo/vector-icons";
+import { useVibration } from "../../utility/customHooks";
 
 const SpellsScreen = observer(() => {
   const playerCharacterData = useContext(PlayerCharacterContext);
   const gameData = useContext(GameContext);
   const { colorScheme } = useColorScheme();
+  const vibration = useVibration();
 
   if (!playerCharacterData || !gameData) throw new Error("missing contexts");
 
@@ -149,7 +151,10 @@ const SpellsScreen = observer(() => {
                 Using spells will increase your proficiency in their school.
               </Text>
               <Pressable
-                onPress={() => setShowSpellTutorial(false)}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  setShowSpellTutorial(false);
+                }}
                 className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
               >
                 <Text>Close</Text>

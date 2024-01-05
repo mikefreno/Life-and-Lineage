@@ -306,6 +306,7 @@ export class Monster {
                   | "robe"
                   | "hat"
                   | "book",
+                icon: itemObj.icon,
               }),
             );
           }

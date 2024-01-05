@@ -110,7 +110,10 @@ export default function SetSex() {
                 Retaining much of what has been achieved in your previous life.
               </Text>
               <Pressable
-                onPress={() => setShowAgingTutorial(false)}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  setShowAgingTutorial(false);
+                }}
                 className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
               >
                 <Text>Close</Text>

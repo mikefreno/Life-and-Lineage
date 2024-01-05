@@ -536,7 +536,10 @@ const HomeScreen = observer(() => {
                   book you were given.
                 </Text>
                 <Pressable
-                  onPress={() => setShowIntroTutorial(false)}
+                  onPress={() => {
+                    vibration({ style: "light" });
+                    setShowIntroTutorial(false);
+                  }}
                   className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
                 >
                   <Text>Close</Text>
@@ -675,6 +678,7 @@ const HomeScreen = observer(() => {
                 <Pressable
                   onPress={() => {
                     vibration({ style: "light" });
+                    setShowingInventory(false);
                     router.push("/Study");
                   }}
                   className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"

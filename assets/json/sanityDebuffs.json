@@ -5,7 +5,8 @@
       "turns": 5,
       "effect": ["damage"],
       "effectStyle": "percentage",
-      "effectAmount": 0.10
+      "effectAmount": 0.10,
+      "icon": "split_heart"
    },
    {
       "name": "distraught",
@@ -13,7 +14,8 @@
       "turns": 3,
       "effect": ["sanity"],
       "effectStyle": "flat",
-      "effectAmount": 5
+      "effectAmount": 5,
+      "icon": "distraught"
    },
    {
       "name": "shock",
@@ -21,6 +23,7 @@
       "turns": 3,
       "effect": ["skip"],
       "effectStyle": null,
-      "effectAmount": null
+      "effectAmount": null,
+      "icon": "blank"
    }
 ]

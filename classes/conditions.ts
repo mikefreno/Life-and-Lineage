@@ -15,6 +15,7 @@ interface ConditionOptions {
     | "health"
   )[];
   damage: number;
+  icon?: string;
 }
 
 export class Condition {
@@ -31,15 +32,33 @@ export class Condition {
     | "health"
   )[];
   readonly damage: number | null;
+  readonly icon: string | undefined;
 
-  constructor({ name, style, turns, effect, damage, id }: ConditionOptions) {
+  constructor({
+    name,
+    style,
+    turns,
+    effect,
+    damage,
+    id,
+    icon,
+  }: ConditionOptions) {
     this.id = id ?? uuidv4();
     this.name = name;
     this.style = style;
     this.turns = turns;
     this.effect = effect;
     this.damage = damage;
+    this.icon = icon;
     makeObservable(this, { turns: observable, tick: action });
+  }
+
+  public getConditionIcon() {
+    if (this.icon) {
+      return conditionIconMap[this.icon];
+    } else {
+      return ["Egg"];
+    }
   }
 
   public tick() {
@@ -62,3 +81,17 @@ export class Condition {
     return condition;
   }
 }
+const conditionIconMap: { [key: string]: any } = {
+  blind: require("../assets/images/conditions/blind.png"),
+  bleed: require("../assets/images/conditions/bleed.png"),
+  stun: require("../assets/images/conditions/stun.png"),
+  "skull-and-crossbones": require("../assets/images/conditions/skull_crossbones.png"),
+  viruses: require("../assets/images/conditions/viruses.png"),
+  flame: require("../assets/images/conditions/flame.png"),
+  scarecrow: require("../assets/images/conditions/scarecrow.png"),
+  shield: require("../assets/images/conditions/shield.png"),
+  holding_heart: require("../assets/images/conditions/holding_heart.png"),
+  split_heart: require("../assets/images/conditions/split_heart.png"),
+  distraught: require("../assets/images/conditions/distraught.png"),
+  blank: require("../assets/images/conditions/blank.png"),
+};

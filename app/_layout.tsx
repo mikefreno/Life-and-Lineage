@@ -137,6 +137,7 @@ const RootLayout = () => {
   const game = gameData?.gameState;
   const playerCharacter = playerCharacterData?.playerState;
   const { colorScheme } = useColorScheme();
+  const [firstLoad, setFirstLoad] = useState(true);
 
   useEffect(() => {
     if (error) throw error;
@@ -156,7 +157,7 @@ const RootLayout = () => {
           router.back();
         }
         router.replace("/DeathScreen");
-      } else if (playerCharacter.currentDungeon) {
+      } else if (playerCharacter.currentDungeon && firstLoad) {
         while (router.canGoBack()) {
           router.back();
         }
@@ -164,6 +165,7 @@ const RootLayout = () => {
           `/DungeonLevel/${playerCharacter.currentDungeon.instance}/${playerCharacter.currentDungeon.level}`,
         );
       }
+      setFirstLoad(false);
     }
   }, [loaded, gameData, playerCharacter]);
 

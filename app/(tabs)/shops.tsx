@@ -16,7 +16,7 @@ export default function ShopsScreen() {
   const gameData = useContext(GameContext);
   if (!gameData) throw new Error("missing gameData");
   const { gameState } = gameData;
-  const vibrate = useVibration();
+  const vibration = useVibration();
   const { colorScheme } = useColorScheme();
 
   const [showShopTutorial, setShowShopTutorial] = useState<boolean>(
@@ -88,7 +88,7 @@ export default function ShopsScreen() {
             <Pressable
               className="mt-2 active:scale-95 active:opacity-50"
               onPress={() => {
-                vibrate({ style: "light" });
+                vibration({ style: "light" });
                 router.push(`/Shops/${shop.archetype}`);
               }}
             >
@@ -186,7 +186,10 @@ export default function ShopsScreen() {
                   hour.
                 </Text>
                 <Pressable
-                  onPress={() => setShowShopTutorial(false)}
+                  onPress={() => {
+                    vibration({ style: "light" });
+                    setShowShopTutorial(false);
+                  }}
                   className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
                 >
                   <Text>Close</Text>

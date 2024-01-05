@@ -1,6 +1,6 @@
 import ProgressBar from "./ProgressBar";
 import { Text } from "./Themed";
-import { View, ScrollView, Animated } from "react-native";
+import { View, ScrollView, Animated, Image } from "react-native";
 import Coins from "../assets/icons/CoinsIcon";
 import { useContext, useEffect, useState } from "react";
 import { GameContext, PlayerCharacterContext } from "../app/_layout";
@@ -176,27 +176,49 @@ const PlayerStatus = observer(
 
     function conditionRenderer() {
       if (playerState) {
-        const conditionMap = new Map<string, number>();
+        let simplifiedConditionsMap: Map<
+          string,
+          {
+            name: string;
+            icon: any;
+            count: number;
+          }
+        > = new Map();
+
         playerState.conditions.forEach((condition) => {
-          if (conditionMap.has(condition.name)) {
-            let value = conditionMap.get(condition.name);
-            if (value) {
-              conditionMap.set(condition.name, value + 1);
-            }
+          if (simplifiedConditionsMap.has(condition.name)) {
+            let existingCondition = simplifiedConditionsMap.get(
+              condition.name,
+            )!;
+            existingCondition.count += 1;
+            simplifiedConditionsMap.set(condition.name, existingCondition);
           } else {
-            conditionMap.set(condition.name, 1);
+            simplifiedConditionsMap.set(condition.name, {
+              name: condition.name,
+              icon: condition.getConditionIcon(),
+              count: 1,
+            });
           }
         });
-        const conditionObject = Object.fromEntries(conditionMap);
+        let simplifiedConditions: {
+          name: string;
+          icon: any;
+          count: number;
+        }[] = Array.from(simplifiedConditionsMap.values());
 
         return (
           <ScrollView horizontal>
             <View className="my-1 flex flex-row justify-around">
-              {Object.entries(conditionObject).map(([key, value]) => (
-                <View key={key} className="mx-2 flex align-middle">
-                  <View className="mx-auto w-2 rounded-md bg-zinc-200 p-4" />
+              {simplifiedConditions.map((cond) => (
+                <View key={cond.name} className="mx-2 flex align-middle">
+                  <View className="mx-auto rounded-md bg-zinc-200">
+                    <Image
+                      source={cond.icon}
+                      style={{ width: 32, height: 32 }}
+                    />
+                  </View>
                   <Text>
-                    {toTitleCase(key)} x {value}
+                    {toTitleCase(cond.name)} x {cond.count}
                   </Text>
                 </View>
               ))}

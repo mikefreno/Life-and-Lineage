@@ -118,7 +118,10 @@ export default function NewGameScreen() {
               Let's start with selecting your class...
             </Text>
             <Pressable
-              onPress={() => setShowIntroTutorial(false)}
+              onPress={() => {
+                vibration({ style: "light" });
+                setShowIntroTutorial(false);
+              }}
               className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
             >
               <Text>Close</Text>

@@ -1098,6 +1098,7 @@ export class PlayerCharacter extends Character {
             | "armor"
           )[],
           damage: damage ?? 0,
+          icon: buffObj.icon,
         }),
       );
     }

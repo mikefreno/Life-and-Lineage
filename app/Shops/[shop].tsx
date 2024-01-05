@@ -25,6 +25,7 @@ export default function ShopScreen() {
   const gameData = useContext(GameContext);
   if (!gameData) throw new Error("missing game context");
   const { gameState } = gameData;
+  const vibration = useVibration();
   const playerCharacterData = useContext(PlayerCharacterContext);
   const playerCharacter = playerCharacterData?.playerState;
   const thisShop = gameState?.shops.find((aShop) => aShop.archetype == shop);
@@ -53,7 +54,6 @@ export default function ShopScreen() {
   } | null>(null);
 
   const isFocused = useIsFocused();
-  const vibrate = useVibration();
   const { colorScheme } = useColorScheme();
 
   const [showShopInteriorTutorial, setShowShopInteriorTutorial] =
@@ -172,7 +172,7 @@ export default function ShopScreen() {
         thisShop.buyItem(selected.item, price);
         playerCharacter.sellItem(selected.item, price);
       }
-      vibrate({ style: "light", essential: true });
+      vibration({ style: "light", essential: true });
       setSelectedItem(null);
     }
   }
@@ -260,7 +260,10 @@ export default function ShopScreen() {
                   eventually die.
                 </Text>
                 <Pressable
-                  onPress={() => setShowShopInteriorTutorial(false)}
+                  onPress={() => {
+                    vibration({ style: "light" });
+                    setShowShopInteriorTutorial(false);
+                  }}
                   className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
                 >
                   <Text>Close</Text>

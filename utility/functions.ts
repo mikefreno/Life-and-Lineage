@@ -277,6 +277,7 @@ export function createDebuff(
           | "armor"
         )[],
         damage: damage ?? 0,
+        icon: debuffObj.icon,
       });
       return debuff;
     } else {

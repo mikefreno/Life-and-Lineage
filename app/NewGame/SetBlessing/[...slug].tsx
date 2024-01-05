@@ -472,7 +472,7 @@ export default function SetBlessing() {
           {tutorialStep == 1 ? (
             <>
               <Text className="text-center text-2xl">
-                Magic is a extreamly powerful, but often very expensive to
+                Magic is a extremly powerful, but often very expensive to
                 obtain.
               </Text>
               <Text className="my-4 text-center text-lg">
@@ -493,7 +493,10 @@ export default function SetBlessing() {
                 of these schools, but not from a school for a different class.
               </Text>
               <Pressable
-                onPress={() => setShowBlessingTutorial(false)}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  setShowBlessingTutorial(false);
+                }}
                 className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
               >
                 <Text>Close</Text>

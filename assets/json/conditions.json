@@ -5,7 +5,8 @@
       "turns": 1,
       "effect": ["skip"],
       "effectStyle": null,
-      "effectAmount": null
+      "effectAmount": null,
+      "icon": "stun"
    },
    {
       "name": "heavy stun",
@@ -13,7 +14,8 @@
       "turns": 2,
       "effect": ["skip"],
       "effectStyle": null,
-      "effectAmount": null
+      "effectAmount": null,
+      "icon": "stun"
    },
    {
       "name": "blind",
@@ -21,7 +23,8 @@
       "turns": 2,
       "effect": ["accuracy halved"],
       "effectStyle": null,
-      "effectAmount": null
+      "effectAmount": null,
+      "icon": "blind"
    },
    {
       "name": "bleed",
@@ -29,7 +32,8 @@
       "turns": 4,
       "effect": ["damage"],
       "effectStyle": "percentage",
-      "effectAmount": 0.020
+      "effectAmount": 0.020,
+      "icon": "bleed"
    },
    {
       "name": "hemmorage",
@@ -37,7 +41,8 @@
       "turns": 2,
       "effect": ["damage"],
       "effectStyle": "percentage",
-      "effectAmount": 0.050
+      "effectAmount": 0.050,
+      "icon": "bleed"
    },
    {
       "name": "poison",
@@ -45,7 +50,8 @@
       "turns": 10,
       "effect": ["damage"],
       "effectStyle": "percentage",
-      "effectAmount": 0.010
+      "effectAmount": 0.010,
+      "icon":"skull-and-crossbones"
    },
    {
       "name": "diseased",
@@ -53,7 +59,8 @@
       "turns": 10,
       "effect": ["damage", "accuracy halved"],
       "effectStyle": "multiplier",
-      "effectAmount": 0.10
+      "effectAmount": 0.10,
+      "icon": "viruses"
    },
    {
       "name": "burn",
@@ -61,7 +68,8 @@
       "turns": 4,
       "effect": ["damage"],
       "effectStyle": "multiplier",
-      "effectAmount": 0.25
+      "effectAmount": 0.25,
+      "icon": "flame"
    },
    {
       "name": "fear",
@@ -69,7 +77,8 @@
       "turns": 5,
       "effect": ["sanity"],
       "effectStyle": "flat",
-      "effectAmount": 2
+      "effectAmount": 2,
+      "icon": "scarecrow"
    },
    {
       "name": "lasting heal",
@@ -77,7 +86,8 @@
       "turns": 5,
       "effect": ["health"],
       "effectStyle": "flat",
-      "effectAmount": 25 
+      "effectAmount": 25,
+      "icon": "holding_heart"
    },
    {
       "name": "guard",
@@ -85,6 +95,7 @@
       "turns": 5,
       "effect": ["armor"],
       "effectStyle": "flat",
-      "effectAmount": 25 
+      "effectAmount": 25,
+      "icon": "shield"
    }
 ]
