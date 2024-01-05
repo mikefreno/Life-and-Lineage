@@ -70,10 +70,14 @@ const DungeonLevelScreen = observer(() => {
     useState<boolean>(false);
   const monsterAttackAnimationValue = useState(new Animated.Value(0))[0];
   const monsterDamagedAnimationValue = useState(new Animated.Value(1))[0];
-  const monsterStun = useState(new Animated.Value(0))[0];
+
+  const [monsterTextString, setMonsterTextString] = useState<string>();
+  const monsterTextFadeAnimation = useState(new Animated.Value(1))[0];
+  const monsterTextTranslateAnimation = useState(new Animated.Value(0))[0];
 
   const [monsterAttackDummy, setMonsterAttackDummy] = useState<number>(0);
   const [monsterHealDummy, setMonsterHealDummy] = useState<number>(0);
+  const [monsterTextDummy, setMonsterTextDummy] = useState<number>(0);
 
   const isFocused = useIsFocused();
   const vibration = useVibration();
@@ -165,6 +169,25 @@ const DungeonLevelScreen = observer(() => {
     }
   }, [monsterHealthDiff]);
 
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(monsterTextFadeAnimation, {
+        toValue: 0,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(monsterTextTranslateAnimation, {
+        toValue: -200,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      monsterTextFadeAnimation.setValue(1);
+      monsterTextTranslateAnimation.setValue(0);
+      setMonsterTextString(undefined);
+    });
+  }, [monsterTextDummy]);
+
   //------------monster combat functions------------//
   const enemyTurnCheck = () => {
     if (monsterState) {
@@ -247,6 +270,8 @@ const DungeonLevelScreen = observer(() => {
         battleLogger(
           `The ${toTitleCase(monsterState.creatureSpecies)} did nothing`,
         );
+        setMonsterTextString(enemyAttackRes.attack);
+        setMonsterTextDummy((prev) => prev + 1);
         setTimeout(() => {
           setAttackAnimationOnGoing(false);
         }, 500);
@@ -256,6 +281,8 @@ const DungeonLevelScreen = observer(() => {
             enemyAttackRes.attack == "stun" ? "was " : ""
           }${enemyAttackRes.attack}ed`,
         );
+        setMonsterTextString(enemyAttackRes.attack);
+        setMonsterTextDummy((prev) => prev + 1);
         setTimeout(() => {
           setAttackAnimationOnGoing(false);
         }, 500);
@@ -462,7 +489,6 @@ const DungeonLevelScreen = observer(() => {
       ) {
         vibration({ style: "light" });
         setFleeRollFailure(false);
-        playerState.setInDungeon({ state: false });
         setTimeout(() => {
           setFleeModalShowing(false);
           gameState?.gameTick(playerState);
@@ -960,6 +986,21 @@ const DungeonLevelScreen = observer(() => {
                 }}
               >
                 <MonsterImage monsterSpecies={monsterState.creatureSpecies} />
+              </Animated.View>
+              <Animated.View
+                style={{
+                  transform: [{ translateY: monsterTextTranslateAnimation }],
+                  opacity: monsterTextFadeAnimation,
+                  position: "absolute",
+                  marginLeft: 64,
+                  marginTop: 64,
+                }}
+              >
+                {monsterTextString ? (
+                  <Text className="text-xl tracking-wide">
+                    *{monsterTextString.toUpperCase()}*
+                  </Text>
+                ) : null}
               </Animated.View>
               <View className="-mr-8">
                 <EnemyHealingAnimationBox
