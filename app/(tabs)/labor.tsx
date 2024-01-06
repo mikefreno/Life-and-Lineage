@@ -179,7 +179,7 @@ const LaborScreen = observer(() => {
           <View className="mt-4 flex items-center justify-evenly">
             <Pressable
               onPress={() => {
-                router.push("/training");
+                router.push("/Training");
                 setTimeout(() => {
                   setShowingRejection(false);
                 }, 300);

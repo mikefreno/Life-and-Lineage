@@ -10,9 +10,9 @@
       "heathRestore": 50
    },
    {
-      "serviceName": "Visit Witch Doctor",
-      "cost": 25,
-      "removeDebuffs": 1
+      "serviceName": "Meditate On The Elements",
+      "cost": 0,
+      "manaRestore": 25
    },
    {
       "serviceName": "Pray",
@@ -20,8 +20,8 @@
       "sanityRestore": 10
    },
    {
-      "serviceName": "Meditate On The Elements",
-      "cost": 0,
-      "manaRestore": 25
+      "serviceName": "Visit Witch Doctor",
+      "cost": 25,
+      "removeDebuffs": 1
    }
 ]

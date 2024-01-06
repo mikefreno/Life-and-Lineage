@@ -78,7 +78,7 @@
          "damageMult": 1.0,
          "energyCost": 15,
          "sanityDamage": 0,
-         "debuffs": [{"name":"stun", "chance":0.75}]
+         "debuffs": [{"name":"stun", "chance":0.35}]
       },
       {
          "name": "bolder throw",
@@ -113,7 +113,7 @@
          "hitChance": 0.5,
          "damageMult": 0.0,
          "energyCost": 20,
-         "sanityDamage": -5,
+         "sanityDamage": 5,
          "debuffs": [{"name":"fear", "chance":0.50}]
       },
       {

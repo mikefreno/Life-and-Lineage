@@ -8,7 +8,7 @@ import {
   ScrollView,
   View as NonThemedView,
 } from "react-native";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Item } from "../../classes/item";
 import Coins from "../../assets/icons/CoinsIcon";
 import SpellDetails from "../../components/SpellDetails";
@@ -19,8 +19,9 @@ import { useVibration } from "../../utility/customHooks";
 import { Entypo } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import Modal from "react-native-modal/dist/modal";
+import { observer } from "mobx-react-lite";
 
-export default function ShopScreen() {
+const ShopInteriorScreen = observer(() => {
   const { shop } = useLocalSearchParams();
   const gameData = useContext(GameContext);
   if (!gameData) throw new Error("missing game context");
@@ -33,6 +34,7 @@ export default function ShopScreen() {
     item: Item;
     buying: boolean;
   } | null>(null);
+  let selectedItemRef = useRef<Item>();
   const [refreshCheck, setRefreshCheck] = useState<boolean>(false);
   const [selectedSpell, setSelectedSpell] = useState<{
     name: string;
@@ -65,7 +67,7 @@ export default function ShopScreen() {
 
   useEffect(() => {
     if (!showShopInteriorTutorial && gameState) {
-      gameState.updateTutorialState("shops", true);
+      gameState.updateTutorialState("shopInterior", true);
     }
   }, [showShopInteriorTutorial]);
 
@@ -83,12 +85,17 @@ export default function ShopScreen() {
 
   function sellAllJunk() {
     if (thisShop) {
+      const itemsToSell: Item[] = [];
       playerCharacter?.inventory.forEach((item) => {
         if (item.itemClass == "junk") {
-          const price = item.getSellPrice(thisShop!.affection);
-          thisShop.buyItem(item, price);
-          playerCharacter.sellItem(item, price);
+          itemsToSell.push(item);
         }
+      });
+
+      itemsToSell.forEach((item) => {
+        const price = item.getSellPrice(thisShop!.affection);
+        thisShop.buyItem(item, price);
+        playerCharacter?.sellItem(item, price);
       });
     }
   }
@@ -162,24 +169,33 @@ export default function ShopScreen() {
   function moveBetweenInventories(
     selected: { item: Item; buying: boolean } | null,
   ) {
-    if (playerCharacter && thisShop && gameState && isFocused && selected) {
+    if (
+      playerCharacter &&
+      thisShop &&
+      gameState &&
+      isFocused &&
+      selected &&
+      selectedItemRef.current
+    ) {
       if (selected.buying) {
-        const price = selected.item.getBuyPrice(thisShop!.affection);
-        playerCharacter.buyItem(selected.item, price);
-        thisShop.sellItem(selected.item, price);
+        const price = selectedItemRef.current.getBuyPrice(thisShop!.affection);
+        playerCharacter.buyItem(selectedItemRef.current, price);
+        thisShop.sellItem(selectedItemRef.current, price);
       } else {
-        const price = selected.item.getSellPrice(thisShop!.affection);
-        thisShop.buyItem(selected.item, price);
-        playerCharacter.sellItem(selected.item, price);
+        const price = selectedItemRef.current.getSellPrice(thisShop!.affection);
+        thisShop.buyItem(selectedItemRef.current, price);
+        playerCharacter.sellItem(selectedItemRef.current, price);
       }
       vibration({ style: "light", essential: true });
       setSelectedItem(null);
+      selectedItemRef.current = undefined;
     }
   }
 
   function displaySetter(item: Item, buying: boolean) {
     const selected = { item: item, buying: buying };
     setSelectedItem(selected);
+    selectedItemRef.current = item;
     if (item.itemClass == "book" && playerCharacter) {
       const spell = item.getAttachedSpell(playerCharacter.playerClass);
       setSelectedSpell(spell);
@@ -350,4 +366,5 @@ export default function ShopScreen() {
       </>
     );
   }
-}
+});
+export default ShopInteriorScreen;

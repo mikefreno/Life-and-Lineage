@@ -87,6 +87,11 @@ export const MonsterImageMap: Record<string, ImageInfo> = {
     width: 160,
     height: 160,
   },
+  "skeleton archer": {
+    source: require("../assets/images/monsters/skeleton_archer.png"),
+    width: 160,
+    height: 160,
+  },
   "training dummy": {
     source: require("../assets/images/monsters/training_dummy.png"),
     width: 150,

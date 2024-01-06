@@ -2,8 +2,8 @@
    {
       "name": "zombie",
       "sanity": null,
-      "health": 100,
-      "attackPower": 15,
+      "health": 85,
+      "attackPower": 12,
       "energy": {"maximum": 50, "regen": 10},
       "attacks": ["grab", "zombie bite"]
    },

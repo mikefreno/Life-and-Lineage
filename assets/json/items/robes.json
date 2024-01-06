@@ -4,7 +4,8 @@
       "baseValue": 200,
       "icon": "Base_Robes",
       "stats":{
-         "armor": 4.0
+         "armor": 4.0,
+         "mana": 15.0
       }
    },
    {
@@ -13,7 +14,7 @@
       "icon": "Base_Robes",
       "stats":{
          "armor": 6.0,
-         "mana": 50.0
+         "mana": 25.0
       }
    },
    {
@@ -23,7 +24,7 @@
       "stats":{
          "armor": 8.0,
          "mana": 50.0,
-         "regen": 10
+         "regen": 2.0
       }
    },
    {
@@ -42,7 +43,7 @@
       "stats":{
          "armor": 10.0,
          "mana": 100.0,
-         "regen": 10.0
+         "regen": 2.0
       }
    },
    {

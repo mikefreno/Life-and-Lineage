@@ -73,6 +73,14 @@ const HomeScreen = observer(() => {
   }, [showIntroTutorial]);
 
   useEffect(() => {
+    if (showingInventory) {
+      setStatsTopPos((prev) => (prev ? prev - 64 : undefined));
+    } else {
+      setStatsTopPos((prev) => (prev ? prev + 64 : undefined));
+    }
+  }, [showingInventory]);
+
+  useEffect(() => {
     setShowIntroTutorial(
       (gameState && !gameState.getTutorialState("intro")) ?? false,
     );
@@ -178,6 +186,10 @@ const HomeScreen = observer(() => {
                     setShowingStats(null);
                   } else {
                     setShowingStats(playerState.equipment.head);
+                    headTarget.current?.measureInWindow((x, y) => {
+                      setStatsLeftPos(x - 10);
+                      setStatsTopPos(showingInventory ? y : y + 64);
+                    });
                   }
                 }}
                 shouldReverse
@@ -234,6 +246,10 @@ const HomeScreen = observer(() => {
                       setShowingStats(null);
                     } else {
                       setShowingStats(playerState.equipment.mainHand);
+                      mainHandTarget.current?.measureInWindow((x, y) => {
+                        setStatsLeftPos(x - 10);
+                        setStatsTopPos(showingInventory ? y : y + 64);
+                      });
                     }
                   }}
                   shouldReverse
@@ -291,6 +307,10 @@ const HomeScreen = observer(() => {
                         setShowingStats(null);
                       } else {
                         setShowingStats(playerState.equipment.offHand);
+                        offHandTarget.current?.measureInWindow((x, y) => {
+                          setStatsLeftPos(x - 10);
+                          setStatsTopPos(showingInventory ? y : y + 64);
+                        });
                       }
                     }}
                     ref={offHandTarget}
@@ -356,6 +376,10 @@ const HomeScreen = observer(() => {
                     setShowingStats(null);
                   } else {
                     setShowingStats(playerState.equipment.body);
+                    bodyTarget.current?.measureInWindow((x, y) => {
+                      setStatsLeftPos(x - 10);
+                      setStatsTopPos(showingInventory ? y : y + 64);
+                    });
                   }
                 }}
                 shouldReverse
@@ -406,64 +430,69 @@ const HomeScreen = observer(() => {
     };
 
     return (
-      <NonThemedView ref={localRef} className="h-20 w-20">
-        <Draggable
-          onDragRelease={(_, g) => {
-            checkReleasePositon({
-              item: item,
-              xPos: g.moveX,
-              yPos: g.moveY,
-              size: 48,
-              equipped: false,
-            });
-            setBuzzed(false);
+      <Draggable
+        onDragRelease={(_, g) => {
+          checkReleasePositon({
+            item: item,
+            xPos: g.moveX,
+            yPos: g.moveY,
+            size: 48,
+            equipped: false,
+          });
+          setBuzzed(false);
+        }}
+        onDrag={() => {
+          if (!buzzed) {
+            vibration({ style: "heavy", essential: true });
+            setBuzzed(true);
+          }
+        }}
+        shouldReverse
+        //disabled={!item.slot}
+      >
+        <Pressable
+          className="h-14 w-14 items-center justify-center rounded-lg bg-zinc-400 active:scale-90 active:opacity-50"
+          ref={localRef}
+          onPressIn={(e) => {
+            e.stopPropagation();
+            handlePress();
           }}
-          onDrag={() => {
-            if (!buzzed) {
-              vibration({ style: "heavy", essential: true });
-              setBuzzed(true);
-            }
-          }}
-          shouldReverse
-          disabled={!item.slot}
         >
-          <NonThemedView className="flex flex-row">
-            <Pressable
-              className="m-2 items-center active:scale-90 active:opacity-50"
-              onPress={handlePress}
-            >
-              <View
-                className="rounded-lg p-2"
-                style={{ backgroundColor: "#a1a1aa" }}
-              >
-                <Image source={item.getItemIcon()} />
-              </View>
-            </Pressable>
-          </NonThemedView>
-        </Draggable>
-      </NonThemedView>
+          <Image source={item.getItemIcon()} />
+        </Pressable>
+      </Draggable>
     );
   };
 
   function inventoryRender() {
     if (playerState) {
-      const chunkSize = 4;
-      const chunks = [];
-
-      for (let i = 0; i < playerState.inventory.length; i += chunkSize) {
-        chunks.push(playerState.inventory.slice(i, i + chunkSize));
-      }
-
       return (
         <NonThemedView
           ref={inventoryTarget}
-          className="h-1/2 w-full flex-row border border-zinc-600"
+          className="mx-auto flex h-1/2 w-full flex-wrap border border-zinc-600"
         >
-          {chunks.map((chunk, index) => (
-            <NonThemedView key={index} className="flex w-16">
-              {chunk.map((item) => (
-                <ItemRender item={item} key={item.id} />
-              ))}
+          {Array.from({ length: 24 }).map((_, index) => (
+            <NonThemedView
+              className="absolute items-center justify-center"
+              style={{
+                left: `${(index % 6) * 16.67 + 1}%`,
+                top: `${Math.floor(index / 6) * 25 + 3}%`,
+              }}
+              key={"bg-" + index}
+            >
+              <NonThemedView className="h-14 w-14 rounded-lg bg-zinc-200" />
+            </NonThemedView>
+          ))}
+          {playerState.inventory.slice(0, 24).map((item, index) => (
+            <NonThemedView
+              className="absolute h-1/4 w-1/6 items-center justify-center"
+              style={{
+                left: `${(index % 6) * 16.67 + 1}%`,
+                top: `${Math.floor(index / 6) * 25 + 3}%`,
+              }}
+              key={index}
+            >
+              <ItemRender item={item} />
             </NonThemedView>
           ))}
         </NonThemedView>
@@ -493,7 +522,7 @@ const HomeScreen = observer(() => {
                 width: 0,
                 height: 2,
               },
-
+              elevation: 1,
               shadowOpacity: 0.25,
               shadowRadius: 5,
             }}
@@ -643,14 +672,23 @@ const HomeScreen = observer(() => {
           ) : null}
           {showingStats && statsLeftPos && statsTopPos ? (
             <View
-              className="max-w-1/3 absolute items-center rounded-md border border-zinc-600 px-8 py-4 shadow-lg"
+              className="absolute items-center rounded-md border border-zinc-600 px-8 py-4"
               style={{
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                elevation: 1,
+                shadowOpacity: 0.25,
+                shadowRadius: 5,
+                maxWidth: deviceWidth / 3 - 2,
                 backgroundColor:
                   colorScheme == "light"
-                    ? "rgba(250, 250, 250, 0.93)"
-                    : "rgba(20, 20, 20, 0.80)",
+                    ? "rgba(250, 250, 250, 0.98)"
+                    : "rgba(20, 20, 20, 0.95)",
                 left: statsLeftPos
-                  ? statsLeftPos < deviceWidth / 2
+                  ? statsLeftPos < deviceWidth * 0.66
                     ? statsLeftPos + deviceWidth / 7
                     : statsLeftPos - deviceWidth / 3 - 5
                   : undefined,
@@ -678,7 +716,7 @@ const HomeScreen = observer(() => {
                 <Pressable
                   onPress={() => {
                     vibration({ style: "light" });
-                    setShowingInventory(false);
+                    setShowingStats(null);
                     router.push("/Study");
                   }}
                   className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"

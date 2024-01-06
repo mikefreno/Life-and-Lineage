@@ -5,11 +5,7 @@ import Sanity from "../assets/icons/SanityIcon";
 import HealthIcon from "../assets/icons/HealthIcon";
 import { useColorScheme } from "nativewind";
 import { useIsFocused } from "@react-navigation/native";
-import {
-  GameContext,
-  MonsterContext,
-  PlayerCharacterContext,
-} from "../app/_layout";
+import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { useContext } from "react";
 import { fullSave } from "../utility/functions";
 

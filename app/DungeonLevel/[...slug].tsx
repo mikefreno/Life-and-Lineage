@@ -281,6 +281,9 @@ const DungeonLevelScreen = observer(() => {
             enemyAttackRes.attack == "stun" ? "was " : ""
           }${enemyAttackRes.attack}ed`,
         );
+        if (enemyAttackRes.attack == "miss") {
+          setMonsterAttackDummy((prev) => prev + 1);
+        }
         setMonsterTextString(enemyAttackRes.attack);
         setMonsterTextDummy((prev) => prev + 1);
         setTimeout(() => {
@@ -302,6 +305,49 @@ const DungeonLevelScreen = observer(() => {
         />
       </NonThemedView>
     );
+  }
+
+  function monsterConditionRender() {
+    if (monsterState && monsterState.conditions.length > 0) {
+      let simplifiedConditionsMap: Map<
+        string,
+        {
+          name: string;
+          icon: any;
+          count: number;
+        }
+      > = new Map();
+
+      monsterState.conditions.forEach((condition) => {
+        if (simplifiedConditionsMap.has(condition.name)) {
+          let existingCondition = simplifiedConditionsMap.get(condition.name)!;
+          existingCondition.count += 1;
+          simplifiedConditionsMap.set(condition.name, existingCondition);
+        } else {
+          simplifiedConditionsMap.set(condition.name, {
+            name: condition.name,
+            icon: condition.getConditionIcon(),
+            count: 1,
+          });
+        }
+      });
+      let simplifiedConditions: {
+        name: string;
+        icon: any;
+        count: number;
+      }[] = Array.from(simplifiedConditionsMap.values());
+
+      return simplifiedConditions.map((cond) => (
+        <View key={cond.name} className="mx-2 flex align-middle">
+          <View className="mx-auto rounded-md bg-zinc-200">
+            <Image source={cond.icon} style={{ width: 24, height: 24 }} />
+          </View>
+          <Text className="text-sm">
+            {toTitleCase(cond.name)} x {cond.count}
+          </Text>
+        </View>
+      ));
+    }
   }
   //-----------minion loading-------//
   function appropriateEnemyCheck() {
@@ -501,6 +547,7 @@ const DungeonLevelScreen = observer(() => {
           router.replace("/dungeon");
           setMonster(null);
           fullSave(gameState, playerState);
+          playerState.setInDungeon({ state: false });
         }, 200);
       } else {
         setFleeRollFailure(true);
@@ -605,6 +652,7 @@ const DungeonLevelScreen = observer(() => {
     useState<boolean>(
       (gameState && !gameState.getTutorialState("dungeonInterior")) ?? false,
     );
+
   const [tutorialStep, setTutorialStep] = useState<number>(1);
 
   useEffect(() => {
@@ -963,12 +1011,14 @@ const DungeonLevelScreen = observer(() => {
                 maxValue={monsterState.healthMax}
                 filledColor="#ef4444"
                 unfilledColor="#fee2e2"
+                displayNumber={false}
               />
               {showingMonsterHealthChange ? (
                 monsterHealthChangePopUp()
               ) : (
                 <NonThemedView className="h-4" />
               )}
+              <View className="mt-1">{monsterConditionRender()}</View>
             </View>
             <View className="my-auto">
               <Animated.View
@@ -992,13 +1042,13 @@ const DungeonLevelScreen = observer(() => {
                   transform: [{ translateY: monsterTextTranslateAnimation }],
                   opacity: monsterTextFadeAnimation,
                   position: "absolute",
-                  marginLeft: 64,
-                  marginTop: 64,
+                  marginLeft: 48,
+                  marginTop: 48,
                 }}
               >
                 {monsterTextString ? (
                   <Text className="text-xl tracking-wide">
-                    *{monsterTextString.toUpperCase()}*
+                    *{toTitleCase(monsterTextString)}*
                   </Text>
                 ) : null}
               </Animated.View>

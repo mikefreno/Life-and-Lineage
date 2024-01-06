@@ -63,6 +63,7 @@ export class Condition {
 
   public tick() {
     this.turns -= 1;
+    console.log("effect: ", this.effect, " damage: ", this.damage);
     return {
       effect: this.effect,
       damage: this.damage,

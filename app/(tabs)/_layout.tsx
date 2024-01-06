@@ -143,7 +143,7 @@ export default function TabLayout() {
             />
           ),
           headerRight: () => (
-            <Link href="/training" asChild>
+            <Link href="/Training" asChild>
               <Pressable onPress={() => vibration({ style: "light" })}>
                 {({ pressed }) => (
                   <GraduationCapIcon

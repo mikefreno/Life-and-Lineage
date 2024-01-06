@@ -9,6 +9,7 @@ interface ProgressBarProps {
   filledColor?: string;
   unfilledColor?: string;
   textColor?: string;
+  displayNumber?: boolean;
 }
 
 const ProgressBar = ({
@@ -19,6 +20,7 @@ const ProgressBar = ({
   filledColor = "#007BFF",
   unfilledColor = "#f3f3f3",
   textColor = "#fff",
+  displayNumber = true,
 }: ProgressBarProps) => {
   const width = ((value - minValue) / (maxValue - minValue)) * 100;
 
@@ -43,21 +45,23 @@ const ProgressBar = ({
           },
         ]}
       >
-        <View
-          className={`${
-            Platform.OS === "android" ? "-mt-0.5" : ""
-          } mx-auto flex-1 flex-wrap overflow-visible`}
-        >
-          <Text
-            style={{
-              marginTop: borderColor ? -1 : 0,
-              fontSize: 12,
-              color: textColor,
-            }}
+        {displayNumber && (
+          <View
+            className={`${
+              Platform.OS === "android" ? "-mt-0.5" : ""
+            } mx-auto flex-1 flex-wrap overflow-visible`}
           >
-            {value}
-          </Text>
-        </View>
+            <Text
+              style={{
+                marginTop: borderColor ? -1 : 0,
+                fontSize: 12,
+                color: textColor,
+              }}
+            >
+              {value}
+            </Text>
+          </View>
+        )}
       </View>
     </View>
   );
