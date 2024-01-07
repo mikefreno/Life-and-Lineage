@@ -126,17 +126,6 @@ export class Item {
     }
     throw new Error("Requested a spell from a non-book item");
   }
-  //public toJSON(): object {
-  //return {
-  //id: this.id,
-  //name: this.name,
-  //slot: this.slot,
-  //stats: this.stats,
-  //baseValue: this.baseValue,
-  //itemClass: this.itemClass,
-  //icon: this.icon,
-  //};
-  //}
 
   static fromJSON(json: any): Item {
     const item = new Item({
@@ -188,6 +177,7 @@ const itemMap: { [key: string]: any } = {
   Monster_Eye: require("../assets/images/items/Monster_Eye.png"),
   Monster_Meat: require("../assets/images/items/Monster_Meat.png"),
   Patch_of_Fur: require("../assets/images/items/Patch_of_Fur.png"),
+  Rat_Tail: require("../assets/images/items/Rat_Tail.png"),
   Red_Potion: require("../assets/images/items/Red_Potion.png"),
   Ruby_Staff: require("../assets/images/items/Ruby_Staff.png"),
   Sapphire_Staff: require("../assets/images/items/Sapphire_Staff.png"),

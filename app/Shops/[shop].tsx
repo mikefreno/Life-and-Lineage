@@ -24,11 +24,12 @@ import { observer } from "mobx-react-lite";
 const ShopInteriorScreen = observer(() => {
   const { shop } = useLocalSearchParams();
   const gameData = useContext(GameContext);
-  if (!gameData) throw new Error("missing game context");
-  const { gameState } = gameData;
-  const vibration = useVibration();
   const playerCharacterData = useContext(PlayerCharacterContext);
-  const playerCharacter = playerCharacterData?.playerState;
+  if (!gameData || !playerCharacterData)
+    throw new Error("missing game context");
+  const { gameState } = gameData;
+  const { playerState } = playerCharacterData;
+  const vibration = useVibration();
   const thisShop = gameState?.shops.find((aShop) => aShop.archetype == shop);
   const [selectedItem, setSelectedItem] = useState<{
     item: Item;
@@ -73,20 +74,20 @@ const ShopInteriorScreen = observer(() => {
 
   useEffect(() => {
     if (
-      playerCharacter &&
+      playerState &&
       thisShop &&
       new Date(thisShop.lastStockRefresh) <
         new Date(Date.now() - 60 * 60 * 1000)
     ) {
-      thisShop.refreshInventory(playerCharacter.playerClass);
+      thisShop.refreshInventory(playerState.playerClass);
     }
     setRefreshCheck(true);
-  }, [playerCharacter]);
+  }, [playerState]);
 
   function sellAllJunk() {
     if (thisShop) {
       const itemsToSell: Item[] = [];
-      playerCharacter?.inventory.forEach((item) => {
+      playerState?.inventory.forEach((item) => {
         if (item.itemClass == "junk") {
           itemsToSell.push(item);
         }
@@ -95,7 +96,7 @@ const ShopInteriorScreen = observer(() => {
       itemsToSell.forEach((item) => {
         const price = item.getSellPrice(thisShop!.affection);
         thisShop.buyItem(item, price);
-        playerCharacter?.sellItem(item, price);
+        playerState?.sellItem(item, price);
       });
     }
   }
@@ -103,64 +104,65 @@ const ShopInteriorScreen = observer(() => {
   function selectedItemDisplay() {
     if (selectedItem) {
       const transactionCompleteable = selectedItem.buying
-        ? playerCharacter!.gold >=
+        ? playerState!.gold >=
           selectedItem.item.getBuyPrice(thisShop!.affection)
         : thisShop!.currentGold >=
           selectedItem.item.getSellPrice(thisShop!.affection);
 
       return (
-        <View className="mx-auto flex flex-row pt-8">
+        <View className="mx-auto flex flex-row pb-6 pt-2">
           <View
             className="flex items-center"
             style={{
               marginLeft:
                 selectedItem.item.slot && selectedItem.item.stats ? 100 : 0,
-              width: 140,
             }}
           >
-            <Text className="text-center">
-              {toTitleCase(selectedItem.item.name)}
-            </Text>
-            <Image source={selectedItem.item.getItemIcon()} />
-            <Text>
-              {selectedItem.item.itemClass == "bodyArmor"
-                ? "Body Armor"
-                : toTitleCase(selectedItem.item.itemClass)}
-            </Text>
-            {selectedItem.item.slot ? (
-              <Text className="">
-                Fills {toTitleCase(selectedItem.item.slot)} Slot
+            <View className="w-36 items-center">
+              <Text className="text-center">
+                {toTitleCase(selectedItem.item.name)}
               </Text>
-            ) : null}
-            <View className="flex flex-row">
+              <Image source={selectedItem.item.getItemIcon()} />
               <Text>
-                Price:{" "}
-                {selectedItem.buying
-                  ? selectedItem.item.getBuyPrice(thisShop!.affection)
-                  : selectedItem.item.getSellPrice(thisShop!.affection)}
+                {selectedItem.item.itemClass == "bodyArmor"
+                  ? "Body Armor"
+                  : toTitleCase(selectedItem.item.itemClass)}
               </Text>
-              <Coins width={20} height={20} style={{ marginLeft: 6 }} />
-            </View>
-            <View>
-              <Pressable
-                disabled={!transactionCompleteable}
-                onPress={() => moveBetweenInventories(selectedItem)}
-                className={`${
-                  !transactionCompleteable ? "bg-zinc-300" : "bg-blue-400"
-                } my-4 rounded-lg active:scale-95 active:opacity-50`}
-              >
-                <Text className="px-6 py-4" style={{ color: "white" }}>
-                  {selectedItem.buying ? "Purchase" : "Sell"}
+              {selectedItem.item.slot ? (
+                <Text className="">
+                  Fills {toTitleCase(selectedItem.item.slot)} Slot
                 </Text>
-              </Pressable>
+              ) : null}
+              <View className="flex flex-row">
+                <Text>
+                  Price:{" "}
+                  {selectedItem.buying
+                    ? selectedItem.item.getBuyPrice(thisShop!.affection)
+                    : selectedItem.item.getSellPrice(thisShop!.affection)}
+                </Text>
+                <Coins width={20} height={20} style={{ marginLeft: 6 }} />
+              </View>
+              <View>
+                <Pressable
+                  disabled={!transactionCompleteable}
+                  onPress={() => moveBetweenInventories(selectedItem)}
+                  className={`${
+                    !transactionCompleteable ? "bg-zinc-300" : "bg-blue-400"
+                  } my-4 rounded-lg active:scale-95 active:opacity-50`}
+                >
+                  <Text className="px-6 py-4" style={{ color: "white" }}>
+                    {selectedItem.buying ? "Purchase" : "Sell"}
+                  </Text>
+                </Pressable>
+              </View>
             </View>
+            {selectedSpell ? <SpellDetails spell={selectedSpell} /> : null}
           </View>
           {selectedItem.item.slot && selectedItem.item.stats ? (
             <View style={{ marginLeft: 10, marginTop: 20, width: 90 }}>
               <GearStatsDisplay stats={selectedItem.item.stats} />
             </View>
           ) : null}
-          {selectedSpell ? <SpellDetails spell={selectedSpell} /> : null}
         </View>
       );
     }
@@ -170,21 +172,22 @@ const ShopInteriorScreen = observer(() => {
     selected: { item: Item; buying: boolean } | null,
   ) {
     if (
-      playerCharacter &&
+      playerState &&
       thisShop &&
       gameState &&
       isFocused &&
       selected &&
-      selectedItemRef.current
+      selectedItemRef.current &&
+      playerState.inventory.length < 24
     ) {
       if (selected.buying) {
         const price = selectedItemRef.current.getBuyPrice(thisShop!.affection);
-        playerCharacter.buyItem(selectedItemRef.current, price);
+        playerState.buyItem(selectedItemRef.current, price);
         thisShop.sellItem(selectedItemRef.current, price);
       } else {
         const price = selectedItemRef.current.getSellPrice(thisShop!.affection);
         thisShop.buyItem(selectedItemRef.current, price);
-        playerCharacter.sellItem(selectedItemRef.current, price);
+        playerState.sellItem(selectedItemRef.current, price);
       }
       vibration({ style: "light", essential: true });
       setSelectedItem(null);
@@ -196,15 +199,65 @@ const ShopInteriorScreen = observer(() => {
     const selected = { item: item, buying: buying };
     setSelectedItem(selected);
     selectedItemRef.current = item;
-    if (item.itemClass == "book" && playerCharacter) {
-      const spell = item.getAttachedSpell(playerCharacter.playerClass);
+    if (item.itemClass == "book" && playerState) {
+      const spell = item.getAttachedSpell(playerState.playerClass);
       setSelectedSpell(spell);
     } else {
       setSelectedSpell(null);
     }
   }
 
-  if (refreshCheck && thisShop && gameState && playerCharacter) {
+  interface ItemRenderProps {
+    item: Item;
+  }
+  const ItemRender = ({ item }: ItemRenderProps) => {
+    return (
+      <Pressable
+        className="h-14 w-14 items-center justify-center rounded-lg bg-zinc-400 active:scale-90 active:opacity-50"
+        onPress={() => displaySetter(item, false)}
+      >
+        <Image source={item.getItemIcon()} />
+      </Pressable>
+    );
+  };
+
+  function inventoryRender() {
+    if (playerState) {
+      return (
+        <NonThemedView
+          className="mx-auto flex flex-wrap rounded-lg border border-zinc-600"
+          style={{ height: "85%", width: "95%" }}
+        >
+          {Array.from({ length: 24 }).map((_, index) => (
+            <NonThemedView
+              className="absolute items-center justify-center"
+              style={{
+                left: `${(index % 6) * 16.67 + 1}%`,
+                top: `${Math.floor(index / 6) * 25 + 3}%`,
+              }}
+              key={"bg-" + index}
+            >
+              <NonThemedView className="h-14 w-14 rounded-lg bg-zinc-200 dark:bg-zinc-700" />
+            </NonThemedView>
+          ))}
+          {playerState.inventory.slice(0, 24).map((item, index) => (
+            <NonThemedView
+              className="absolute items-center justify-center"
+              style={{
+                left: `${(index % 6) * 16.67 + 1}%`,
+                top: `${Math.floor(index / 6) * 25 + 3}%`,
+              }}
+              key={index}
+            >
+              <ItemRender item={item} />
+            </NonThemedView>
+          ))}
+        </NonThemedView>
+      );
+    }
+  }
+
+  if (refreshCheck && thisShop && gameState && playerState) {
     return (
       <>
         <Stack.Screen
@@ -325,16 +378,16 @@ const ShopInteriorScreen = observer(() => {
             </View>
           </View>
           <ScrollView className="">{selectedItemDisplay()}</ScrollView>
-          <NonThemedView className="h-2/5">
-            <NonThemedView className="flex flex-row justify-center border-b border-zinc-300 dark:border-zinc-700">
+          <NonThemedView style={{ height: "38%" }}>
+            <NonThemedView className="flex flex-row justify-center dark:border-zinc-700">
               <Text className="text-center">
-                {playerCharacter.getFullName()}'s Inventory
+                {playerState.getFullName()}'s Inventory
               </Text>
               <View className="flex flex-row">
-                <Text> ( {playerCharacter!.getReadableGold()}</Text>
+                <Text> ( {playerState!.getReadableGold()}</Text>
                 <Coins width={16} height={16} style={{ marginLeft: 6 }} />
                 <Text> )</Text>
-                {playerCharacter.inventory.some(
+                {playerState.inventory.some(
                   (item) => item.itemClass == "junk",
                 ) ? (
                   <Pressable
@@ -346,21 +399,7 @@ const ShopInteriorScreen = observer(() => {
                 ) : null}
               </View>
             </NonThemedView>
-            <ScrollView>
-              <View className="flex flex-row flex-wrap justify-around">
-                {playerCharacter.inventory.map((item) => (
-                  <Pressable
-                    key={item.id}
-                    className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
-                    onPress={() => displaySetter(item, false)}
-                  >
-                    <NonThemedView className="rounded-lg bg-zinc-300 p-2">
-                      <Image source={item.getItemIcon()} />
-                    </NonThemedView>
-                  </Pressable>
-                ))}
-              </View>
-            </ScrollView>
+            {inventoryRender()}
           </NonThemedView>
         </View>
       </>

@@ -310,6 +310,7 @@ export class PlayerCharacter extends Character {
       getSpecifiedQualificationProgress: action,
       getMaxMana: action,
       damageSanity: action,
+      getMaxSanity: action,
       addToInventory: action,
       buyItem: action,
       removeFromInventory: action,
@@ -419,6 +420,14 @@ export class PlayerCharacter extends Character {
     } else {
       this.sanity = 50;
     }
+  }
+  public getMaxSanity() {
+    let withGearBuffs = this.sanity;
+    withGearBuffs += this.equipment.mainHand.stats?.sanity ?? 0;
+    withGearBuffs += this.equipment.offHand?.stats?.sanity ?? 0;
+    withGearBuffs += this.equipment.body?.stats?.sanity ?? 0;
+    withGearBuffs += this.equipment.head?.stats?.sanity ?? 0;
+    return withGearBuffs;
   }
   //----------------------------------Inventory----------------------------------//
   public addToInventory(item: Item | null) {

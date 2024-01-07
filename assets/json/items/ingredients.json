@@ -1,17 +1,17 @@
 [
    {
       "name": "bat wing",
-      "icon":"Monster_Meat",
+      "icon":"Bat_Wing",
       "baseValue": 10
    },
    {
       "name": "rat tail",
-      "icon":"Monster_Meat",
+      "icon":"Rat_Tail",
       "baseValue": 15
    },
    {
       "name": "ghostly residue",
-      "icon":"Monster_Meat",
+      "icon":"Slime_Gel",
       "baseValue": 100
    }
 ]

@@ -58,6 +58,26 @@ const PlayerStatus = observer(
       useState<boolean>(false);
     const healthDamageFlash = useState(new Animated.Value(0))[0];
     const animatedValue = useState(new Animated.Value(0))[0];
+    const [localHealthMax, setLocalHealthMax] = useState<number | undefined>(
+      playerState?.getMaxHealth(),
+    );
+    const [localManaMax, setLocalManaMax] = useState<number | undefined>(
+      playerState?.getMaxMana(),
+    );
+    const [localSanityMax, setLocalSanityMax] = useState<number | undefined>(
+      playerState?.getMaxSanity(),
+    );
+
+    useEffect(() => {
+      setLocalHealthMax(playerState?.getMaxHealth());
+      setLocalManaMax(playerState?.getMaxMana());
+      setLocalSanityMax(playerState?.getMaxSanity());
+    }, [
+      playerState?.equipment.body,
+      playerState?.equipment.head,
+      playerState?.equipment.mainHand,
+      playerState?.equipment.offHand,
+    ]);
 
     useEffect(() => {
       Animated.loop(
@@ -315,7 +335,7 @@ const PlayerStatus = observer(
                 </Text>
                 <ProgressBar
                   value={playerState.health}
-                  maxValue={playerState.getMaxHealth()}
+                  maxValue={localHealthMax ?? playerState.getMaxHealth()}
                   filledColor="#ef4444"
                   unfilledColor="#fca5a5"
                 />
@@ -328,7 +348,7 @@ const PlayerStatus = observer(
                 </Text>
                 <ProgressBar
                   value={playerState.mana}
-                  maxValue={playerState.getMaxMana()}
+                  maxValue={localManaMax ?? playerState.getMaxMana()}
                   filledColor="#60a5fa"
                   unfilledColor="#bfdbfe"
                 />
@@ -342,7 +362,7 @@ const PlayerStatus = observer(
                 <ProgressBar
                   value={playerState.sanity}
                   minValue={-50}
-                  maxValue={50}
+                  maxValue={localSanityMax ?? playerState.getMaxSanity()}
                   filledColor="#c084fc"
                   unfilledColor="#e9d5ff"
                 />

@@ -188,7 +188,7 @@ const HomeScreen = observer(() => {
                     setShowingStats(playerState.equipment.head);
                     headTarget.current?.measureInWindow((x, y) => {
                       setStatsLeftPos(x - 10);
-                      setStatsTopPos(showingInventory ? y : y + 64);
+                      setStatsTopPos(showingInventory ? y : y + 120);
                     });
                   }
                 }}
@@ -248,7 +248,7 @@ const HomeScreen = observer(() => {
                       setShowingStats(playerState.equipment.mainHand);
                       mainHandTarget.current?.measureInWindow((x, y) => {
                         setStatsLeftPos(x - 10);
-                        setStatsTopPos(showingInventory ? y : y + 64);
+                        setStatsTopPos(showingInventory ? y : y + 120);
                       });
                     }
                   }}
@@ -309,7 +309,7 @@ const HomeScreen = observer(() => {
                         setShowingStats(playerState.equipment.offHand);
                         offHandTarget.current?.measureInWindow((x, y) => {
                           setStatsLeftPos(x - 10);
-                          setStatsTopPos(showingInventory ? y : y + 64);
+                          setStatsTopPos(showingInventory ? y : y + 120);
                         });
                       }
                     }}
@@ -378,7 +378,7 @@ const HomeScreen = observer(() => {
                     setShowingStats(playerState.equipment.body);
                     bodyTarget.current?.measureInWindow((x, y) => {
                       setStatsLeftPos(x - 10);
-                      setStatsTopPos(showingInventory ? y : y + 64);
+                      setStatsTopPos(showingInventory ? y : y + 120);
                     });
                   }
                 }}
@@ -447,16 +447,13 @@ const HomeScreen = observer(() => {
             setBuzzed(true);
           }
         }}
+        disabled={!item.slot}
         shouldReverse
-        //disabled={!item.slot}
       >
         <Pressable
           className="h-14 w-14 items-center justify-center rounded-lg bg-zinc-400 active:scale-90 active:opacity-50"
           ref={localRef}
-          onPressIn={(e) => {
-            e.stopPropagation();
-            handlePress();
-          }}
+          onPress={handlePress}
         >
           <Image source={item.getItemIcon()} />
         </Pressable>
@@ -480,7 +477,7 @@ const HomeScreen = observer(() => {
               }}
               key={"bg-" + index}
             >
-              <NonThemedView className="h-14 w-14 rounded-lg bg-zinc-200" />
+              <NonThemedView className="h-14 w-14 rounded-lg bg-zinc-200 dark:bg-zinc-700" />
             </NonThemedView>
           ))}
           {playerState.inventory.slice(0, 24).map((item, index) => (
@@ -672,7 +669,7 @@ const HomeScreen = observer(() => {
           ) : null}
           {showingStats && statsLeftPos && statsTopPos ? (
             <View
-              className="absolute items-center rounded-md border border-zinc-600 px-8 py-4"
+              className="absolute items-center rounded-md border border-zinc-600 p-4"
               style={{
                 shadowColor: "#000",
                 shadowOffset: {
@@ -682,13 +679,13 @@ const HomeScreen = observer(() => {
                 elevation: 1,
                 shadowOpacity: 0.25,
                 shadowRadius: 5,
-                maxWidth: deviceWidth / 3 - 2,
+                width: deviceWidth / 3 - 2,
                 backgroundColor:
                   colorScheme == "light"
                     ? "rgba(250, 250, 250, 0.98)"
                     : "rgba(20, 20, 20, 0.95)",
                 left: statsLeftPos
-                  ? statsLeftPos < deviceWidth * 0.66
+                  ? statsLeftPos < deviceWidth * 0.6
                     ? statsLeftPos + deviceWidth / 7
                     : statsLeftPos - deviceWidth / 3 - 5
                   : undefined,
@@ -697,7 +694,7 @@ const HomeScreen = observer(() => {
                   : undefined,
               }}
             >
-              <NonThemedView style={{ width: 80 }}>
+              <NonThemedView>
                 <Text className="text-center">
                   {toTitleCase(showingStats.name)}
                 </Text>
@@ -719,9 +716,9 @@ const HomeScreen = observer(() => {
                     setShowingStats(null);
                     router.push("/Study");
                   }}
-                  className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                  className="-mx-4 mt-2 w-full rounded-xl border border-zinc-900 px-2 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
                 >
-                  <Text>Study This Book</Text>
+                  <Text className="text-center">Study This Book</Text>
                 </Pressable>
               ) : null}
             </View>
