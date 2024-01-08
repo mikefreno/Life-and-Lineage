@@ -132,24 +132,22 @@ export default function BattleTab({
                 </View>
               )}
             />
-            {playerState.isStunned() ? (
-              <View className="border-t border-zinc-800 py-2 dark:border-zinc-100">
-                <View className="flex flex-row justify-between">
-                  <View className="flex flex-col justify-center">
-                    <Text className="text-xl">Pass</Text>
-                  </View>
-                  <Pressable
-                    onPress={() => {
-                      vibration({ style: "light" });
-                      pass();
-                    }}
-                    className="my-auto rounded bg-zinc-300 px-4 py-2 active:scale-95 active:opacity-50 dark:bg-zinc-700"
-                  >
-                    <Text className="text-xl">Use</Text>
-                  </Pressable>
+            <View className="border-t border-zinc-800 py-2 dark:border-zinc-100">
+              <View className="flex flex-row justify-between">
+                <View className="flex flex-col justify-center">
+                  <Text className="text-xl">Pass</Text>
                 </View>
+                <Pressable
+                  onPress={() => {
+                    vibration({ style: "light" });
+                    pass();
+                  }}
+                  className="my-auto rounded bg-zinc-300 px-4 py-2 active:scale-95 active:opacity-50 dark:bg-zinc-700"
+                >
+                  <Text className="text-xl">Use</Text>
+                </Pressable>
               </View>
-            ) : null}
+            </View>
           </>
         );
       case "spells":

@@ -1,6 +1,5 @@
 import enemies from "../assets/json/monsters.json";
 import { Monster } from "../classes/creatures";
-import { Image } from "react-native";
 
 function pickRandomEnemyJSON(instance: string, level: number) {
   const enemiesInThisInstance = enemies.filter((enemy) =>

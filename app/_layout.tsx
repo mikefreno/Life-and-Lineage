@@ -127,7 +127,7 @@ const Root = observer(() => {
   );
 });
 
-const RootLayout = () => {
+const RootLayout = observer(() => {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
@@ -142,6 +142,10 @@ const RootLayout = () => {
   useEffect(() => {
     if (error) throw error;
   }, [error]);
+
+  useEffect(() => {
+    console.log(game?.vibrationEnabled);
+  }, [game?.vibrationEnabled]);
 
   useEffect(() => {
     if (loaded) {
@@ -183,5 +187,5 @@ const RootLayout = () => {
       </Stack>
     </ThemeProvider>
   );
-};
+});
 export default Root;

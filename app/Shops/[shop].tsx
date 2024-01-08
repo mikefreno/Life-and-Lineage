@@ -98,6 +98,13 @@ const ShopInteriorScreen = observer(() => {
         thisShop.buyItem(item, price);
         playerState?.sellItem(item, price);
       });
+      if (
+        selectedItem?.item.itemClass == "junk" ||
+        selectedItemRef.current?.itemClass == "junk"
+      ) {
+        setSelectedItem(null);
+        selectedItemRef.current = undefined;
+      }
     }
   }
 

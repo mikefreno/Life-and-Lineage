@@ -10,6 +10,7 @@ interface ProgressBarProps {
   unfilledColor?: string;
   textColor?: string;
   displayNumber?: boolean;
+  removeAtZero?: boolean;
 }
 
 const ProgressBar = ({
@@ -21,6 +22,7 @@ const ProgressBar = ({
   unfilledColor = "#f3f3f3",
   textColor = "#fff",
   displayNumber = true,
+  removeAtZero = false,
 }: ProgressBarProps) => {
   const width = ((value - minValue) / (maxValue - minValue)) * 100;
 
@@ -39,7 +41,11 @@ const ProgressBar = ({
         style={[
           styles.inner,
           {
-            width: width < 5 ? "5%" : `${width}%`,
+            width: !removeAtZero
+              ? width < 5
+                ? "5%"
+                : `${width}%`
+              : `${width}%`,
             backgroundColor: filledColor,
             position: "absolute",
           },

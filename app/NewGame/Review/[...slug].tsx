@@ -1,5 +1,5 @@
 import { View as ThemedView, Text } from "../../../components/Themed";
-import { Pressable } from "react-native";
+import { Platform, Pressable } from "react-native";
 import {
   Character,
   PlayerCharacter,
@@ -150,7 +150,15 @@ export default function NewGameReview() {
       const shops = createShops(
         playerClass as "mage" | "paladin" | "necromancer",
       );
-      const newGame = new Game({ date: startDate, shops: shops });
+      const newGame = new Game({
+        date: startDate,
+        shops: shops,
+        vibrationEnabled: gameState?.vibrationEnabled
+          ? gameState.vibrationEnabled
+          : Platform.OS == "ios"
+          ? "full"
+          : "minimal",
+      });
       const colorScheme = gameState?.colorScheme;
       if (colorScheme) {
         newGame.setColorScheme(colorScheme);

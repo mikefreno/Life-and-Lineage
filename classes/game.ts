@@ -4,7 +4,6 @@ import dungeons from "../assets/json/dungeons.json";
 import { action, makeObservable, observable } from "mobx";
 import { PlayerCharacter } from "./character";
 import { lowSanityDebuffGenerator } from "../utility/functions";
-import { Platform } from "react-native";
 
 interface GameOptions {
   date?: string;
@@ -13,7 +12,7 @@ interface GameOptions {
   furthestDepth?: { instance: string; level: number }[];
   atDeathScreen?: boolean;
   colorScheme?: "system" | "dark" | "light";
-  vibrationEnabled?: "full" | "minimal" | "none";
+  vibrationEnabled: "full" | "minimal" | "none";
   healthWarning?: number;
   tutorialsShown?: Record<string, boolean>;
   tutorialsEnabled?: boolean;
@@ -30,6 +29,7 @@ export class Game {
   healthWarning: number;
   tutorialsShown: Record<string, boolean>;
   tutorialsEnabled: boolean;
+
   constructor({
     date,
     dungeonInstances,
@@ -73,8 +73,7 @@ export class Game {
     this.atDeathScreen = atDeathScreen ?? false;
     this.shops = shops;
     this.colorScheme = colorScheme ?? "system";
-    this.vibrationEnabled =
-      vibrationEnabled ?? Platform.OS == "ios" ? "full" : "minimal";
+    this.vibrationEnabled = vibrationEnabled;
     this.healthWarning = healthWarning ?? 0.2;
     this.tutorialsShown = tutorialsShown ?? {
       class: true,

@@ -6,7 +6,6 @@ import {
 } from "react-native";
 import { View, Text } from "../../components/Themed";
 import { useContext, useEffect, useState } from "react";
-import { useColorScheme } from "nativewind";
 import { toTitleCase } from "../../utility/functions";
 import { GameContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
@@ -16,7 +15,6 @@ import * as Updates from "expo-updates";
 export default function AppSettings() {
   const themeOptions = ["system", "light", "dark"];
   const vibrationOptions = ["full", "minimal", "none"];
-  const { setColorScheme } = useColorScheme();
   const [showTutorialResetConfirm, setShowTutorialResetConfirm] =
     useState<boolean>(false);
 
@@ -43,7 +41,6 @@ export default function AppSettings() {
         vibration({ style: "light" });
         gameState.setColorScheme(option);
         setSelectedThemeOption(index);
-        setColorScheme(option);
       }
     }
 
