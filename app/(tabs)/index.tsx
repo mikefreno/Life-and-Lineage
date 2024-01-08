@@ -139,7 +139,11 @@ const HomeScreen = observer(() => {
             if (isWidthAligned && isHeightAligned) {
               vibration({ style: "light", essential: true });
               setShowingStats(null);
-              if (equipped) {
+              if (
+                equipped &&
+                playerState &&
+                playerState.inventory.length < 24
+              ) {
                 playerState?.unEquipItem(item);
               } else {
                 playerState?.equipItem(item);

@@ -55,6 +55,8 @@ const ShopInteriorScreen = observer(() => {
       selfDamage?: number | undefined;
     };
   } | null>(null);
+  const [inventoryFullNotifier, setInventoryFullNotifier] =
+    useState<boolean>(false);
 
   const isFocused = useIsFocused();
   const { colorScheme } = useColorScheme();
@@ -71,6 +73,12 @@ const ShopInteriorScreen = observer(() => {
       gameState.updateTutorialState("shopInterior", true);
     }
   }, [showShopInteriorTutorial]);
+
+  useEffect(() => {
+    if (inventoryFullNotifier) {
+      setTimeout(() => setInventoryFullNotifier(false), 2000);
+    }
+  }, [inventoryFullNotifier]);
 
   useEffect(() => {
     if (
@@ -126,6 +134,9 @@ const ShopInteriorScreen = observer(() => {
             }}
           >
             <View className="w-36 items-center">
+              <Text className="text-red-500">
+                {inventoryFullNotifier ?? "Inventory is full!"}
+              </Text>
               <Text className="text-center">
                 {toTitleCase(selectedItem.item.name)}
               </Text>
@@ -184,13 +195,18 @@ const ShopInteriorScreen = observer(() => {
       gameState &&
       isFocused &&
       selected &&
-      selectedItemRef.current &&
-      playerState.inventory.length < 24
+      selectedItemRef.current
     ) {
       if (selected.buying) {
-        const price = selectedItemRef.current.getBuyPrice(thisShop!.affection);
-        playerState.buyItem(selectedItemRef.current, price);
-        thisShop.sellItem(selectedItemRef.current, price);
+        if (playerState.inventory.length < 24) {
+          const price = selectedItemRef.current.getBuyPrice(
+            thisShop!.affection,
+          );
+          playerState.buyItem(selectedItemRef.current, price);
+          thisShop.sellItem(selectedItemRef.current, price);
+        } else {
+          setInventoryFullNotifier(true);
+        }
       } else {
         const price = selectedItemRef.current.getSellPrice(thisShop!.affection);
         thisShop.buyItem(selectedItemRef.current, price);
