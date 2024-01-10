@@ -484,14 +484,16 @@ const HomeScreen = observer(() => {
       return (
         <NonThemedView
           ref={inventoryTarget}
-          className="mx-auto flex h-1/2 w-full flex-wrap border border-zinc-600"
+          className="mx-auto flex h-1/2 w-full flex-wrap rounded-lg border border-zinc-600"
         >
           {Array.from({ length: 24 }).map((_, index) => (
             <NonThemedView
               className="absolute items-center justify-center"
               style={{
-                left: `${(index % 6) * 16.67 + 1}%`,
-                top: `${Math.floor(index / 6) * 25 + 3}%`,
+                left: `${
+                  (index % 6) * 16.67 + 1 * (Math.floor(deviceWidth / 400) + 1)
+                }%`,
+                top: `${Math.floor(index / 6) * 25 + 4}%`,
               }}
               key={"bg-" + index}
             >
@@ -502,8 +504,10 @@ const HomeScreen = observer(() => {
             <NonThemedView
               className="absolute h-1/4 w-1/6 items-center justify-center"
               style={{
-                left: `${(index % 6) * 16.67 + 1}%`,
-                top: `${Math.floor(index / 6) * 25 + 3}%`,
+                left: `${
+                  (index % 6) * 16.67 + 1 * (Math.floor(deviceWidth / 400) + 1)
+                }%`,
+                top: `${Math.floor(index / 6) * 25 + 4}%`,
               }}
               key={index}
             >

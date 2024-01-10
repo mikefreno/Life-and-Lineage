@@ -211,10 +211,11 @@ const LaborScreen = observer(() => {
           <View className="mt-4 flex items-center justify-evenly">
             <Pressable
               onPress={() => {
-                router.push("/Training");
+                vibration({ style: "light" });
                 setTimeout(() => {
                   setShowingRejection(false);
                 }, 300);
+                router.push("/Training");
               }}
               className="rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
             >

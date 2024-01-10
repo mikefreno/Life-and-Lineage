@@ -174,7 +174,6 @@ const RootLayout = observer(() => {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="Options" options={{ presentation: "modal" }} />
-        <Stack.Screen name="Study" options={{ presentation: "modal" }} />
         <Stack.Screen name="Crafting" options={{ presentation: "modal" }} />
         <Stack.Screen
           name="Relationships"

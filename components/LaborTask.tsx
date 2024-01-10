@@ -6,7 +6,7 @@ import HealthIcon from "../assets/icons/HealthIcon";
 import ProgressBar from "./ProgressBar";
 import { useColorScheme } from "nativewind";
 import { useIsFocused } from "@react-navigation/native";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import {
   GameContext,
   MonsterContext,
