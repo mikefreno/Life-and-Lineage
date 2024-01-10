@@ -174,12 +174,12 @@ export default function NewGameReview() {
       gameDataSetter(newGame);
       logsSetter([]);
       monsterSetter(null);
-      await fullSave(newGame, player);
       vibration({ style: "success" });
       while (router.canGoBack()) {
         router.back();
       }
       router.replace("/");
+      await fullSave(newGame, player);
     }
   }
 
