@@ -5,7 +5,7 @@ import PlayerStatus from "../../components/PlayerStatus";
 import Modal from "react-native-modal/dist/modal";
 import { useContext, useEffect, useState } from "react";
 import { GameContext } from "../_layout";
-import { Pressable } from "react-native";
+import { Pressable, Switch } from "react-native";
 import { useColorScheme } from "nativewind";
 import { Entypo } from "@expo/vector-icons";
 import { useVibration } from "../../utility/customHooks";
@@ -20,6 +20,9 @@ export default function MedicalScreen() {
     throw new Error("Missing Context");
   }
   const { gameState } = gameContext;
+  const [tutorialState, setTutorialState] = useState<boolean>(
+    gameState?.tutorialsEnabled ?? true,
+  );
   const [showMedicalTutorial, setShowMedicalTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("medical")) ?? false,
   );
@@ -29,6 +32,16 @@ export default function MedicalScreen() {
       gameState.updateTutorialState("medical", true);
     }
   }, [showMedicalTutorial]);
+
+  useEffect(() => {
+    if (gameState) {
+      if (tutorialState == false) {
+        gameState.disableTutorials();
+      } else {
+        gameState.enableTutorials();
+      }
+    }
+  }, [tutorialState]);
 
   return (
     <>
@@ -76,6 +89,16 @@ export default function MedicalScreen() {
               <Text className="my-4 text-center text-lg">
                 Here you can aquire various forms of medical treatment.
               </Text>
+              <View className="mx-auto flex flex-row">
+                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                <Switch
+                  trackColor={{ false: "#767577", true: "#3b82f6" }}
+                  ios_backgroundColor="#3e3e3e"
+                  thumbColor={"white"}
+                  onValueChange={(bool) => setTutorialState(bool)}
+                  value={tutorialState}
+                />
+              </View>
               <Pressable
                 onPress={() => setTutorialStep((prev) => prev + 1)}
                 className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
@@ -92,6 +115,16 @@ export default function MedicalScreen() {
                 Using items such as potions, or using spells will not tick the
                 clock forward.
               </Text>
+              <View className="mx-auto flex flex-row">
+                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                <Switch
+                  trackColor={{ false: "#767577", true: "#3b82f6" }}
+                  ios_backgroundColor="#3e3e3e"
+                  thumbColor={"white"}
+                  onValueChange={(bool) => setTutorialState(bool)}
+                  value={tutorialState}
+                />
+              </View>
               <Pressable
                 onPress={() => {
                   vibration({ style: "light" });

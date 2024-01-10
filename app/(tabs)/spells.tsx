@@ -3,7 +3,7 @@ import SpellDetails from "../../components/SpellDetails";
 import { GameContext, PlayerCharacterContext } from "../_layout";
 import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, Switch } from "react-native";
 import { observer } from "mobx-react-lite";
 import ProgressBar from "../../components/ProgressBar";
 import { elementalColorMap } from "../../utility/elementColors";
@@ -22,6 +22,9 @@ const SpellsScreen = observer(() => {
 
   const { playerState } = playerCharacterData;
   const { gameState } = gameData;
+  const [tutorialState, setTutorialState] = useState<boolean>(
+    gameState?.tutorialsEnabled ?? true,
+  );
   const [spells, setSpells] = useState(playerState?.getSpells());
   const [showSpellTutorial, setShowSpellTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("spell")) ?? false,
@@ -37,6 +40,16 @@ const SpellsScreen = observer(() => {
       gameState.updateTutorialState("spell", true);
     }
   }, [showSpellTutorial]);
+
+  useEffect(() => {
+    if (gameState) {
+      if (tutorialState == false) {
+        gameState.disableTutorials();
+      } else {
+        gameState.enableTutorials();
+      }
+    }
+  }, [tutorialState]);
 
   function magicProficiencySection(
     proficiencies:
@@ -135,6 +148,16 @@ const SpellsScreen = observer(() => {
                 Here you can see your known spells, and proficiencies with each
                 school of magic.
               </Text>
+              <View className="mx-auto flex flex-row">
+                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                <Switch
+                  trackColor={{ false: "#767577", true: "#3b82f6" }}
+                  ios_backgroundColor="#3e3e3e"
+                  thumbColor={"white"}
+                  onValueChange={(bool) => setTutorialState(bool)}
+                  value={tutorialState}
+                />
+              </View>
               <Pressable
                 onPress={() => setTutorialStep((prev) => prev + 1)}
                 className="mx-auto mt-4 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
@@ -150,6 +173,16 @@ const SpellsScreen = observer(() => {
               <Text className="my-4 text-center text-lg">
                 Using spells will increase your proficiency in their school.
               </Text>
+              <View className="mx-auto flex flex-row">
+                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                <Switch
+                  trackColor={{ false: "#767577", true: "#3b82f6" }}
+                  ios_backgroundColor="#3e3e3e"
+                  thumbColor={"white"}
+                  onValueChange={(bool) => setTutorialState(bool)}
+                  value={tutorialState}
+                />
+              </View>
               <Pressable
                 onPress={() => {
                   vibration({ style: "light" });

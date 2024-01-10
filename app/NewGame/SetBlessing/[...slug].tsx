@@ -1,4 +1,4 @@
-import { Pressable, View as NonThemedView } from "react-native";
+import { Pressable, View as NonThemedView, Switch } from "react-native";
 import { Text, ScrollView, View } from "../../../components/Themed";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
@@ -18,8 +18,9 @@ import Virus from "../../../assets/icons/VirusIcon";
 import { useVibration } from "../../../utility/customHooks";
 import { GameContext } from "../../_layout";
 import Modal from "react-native-modal";
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, FontAwesome5 } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SetBlessing() {
   const { slug } = useLocalSearchParams();
@@ -43,11 +44,63 @@ export default function SetBlessing() {
 
   const [tutorialStep, setTutorialStep] = useState<number>(1);
 
+  const [loadedAsync, setLoadedAsync] = useState<boolean>(false);
+  let tutorialStateRef = useRef<boolean>(gameState?.tutorialsEnabled ?? true);
+
+  const [tutorialState, setTutorialState] = useState<boolean>(
+    gameState?.tutorialsEnabled ?? true,
+  );
+
   useEffect(() => {
     if (!showBlessingTutorial && gameState) {
       gameState.updateTutorialState("blessing", true);
     }
   }, [showBlessingTutorial]);
+
+  useEffect(() => {
+    if (!gameState) {
+      loadAsyncTutorialState();
+    }
+  }, []);
+
+  async function loadAsyncTutorialState() {
+    const res = await AsyncStorage.getItem("tutorialsEnabled");
+    if (res) {
+      const parsed: boolean = JSON.parse(res);
+      setShowBlessingTutorial(parsed);
+      setTutorialState(parsed);
+      tutorialStateRef.current = parsed;
+    }
+    setLoadedAsync(true);
+  }
+
+  useEffect(() => {
+    async function updateAsyncTutorialState() {
+      if (tutorialState == false) {
+        await AsyncStorage.setItem("tutorialsEnabled", JSON.stringify(false));
+      } else {
+        await AsyncStorage.setItem("tutorialsEnabled", JSON.stringify(true));
+      }
+    }
+
+    if (gameState) {
+      if (tutorialState == false) {
+        gameState.disableTutorials();
+      } else {
+        gameState.enableTutorials();
+      }
+    } else {
+      updateAsyncTutorialState();
+    }
+  }, [tutorialState]);
+
+  function tutorialStateDependantPress() {
+    if (tutorialStateRef.current) {
+      setTutorialStep((prev) => prev + 1);
+    } else {
+      setShowBlessingTutorial(false);
+    }
+  }
 
   function classDependantBlessings() {
     if (playerClass == "mage") {
@@ -434,7 +487,13 @@ export default function SetBlessing() {
       <Modal
         animationIn="slideInUp"
         animationOut="fadeOut"
-        isVisible={showBlessingTutorial}
+        isVisible={
+          !gameState
+            ? loadedAsync
+              ? showBlessingTutorial
+              : false
+            : showBlessingTutorial
+        }
         backdropOpacity={0.2}
         animationInTiming={500}
         onBackdropPress={() => setShowBlessingTutorial(false)}
@@ -479,8 +538,21 @@ export default function SetBlessing() {
                 You will start with a book providing a spell pertaining to the
                 blessing you choose, and a higher starting point in that school.
               </Text>
+              <View className="mx-auto flex flex-row">
+                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                <Switch
+                  trackColor={{ false: "#767577", true: "#3b82f6" }}
+                  ios_backgroundColor="#3e3e3e"
+                  thumbColor={"white"}
+                  onValueChange={(bool) => {
+                    setTutorialState(bool);
+                    tutorialStateRef.current = bool;
+                  }}
+                  value={tutorialState}
+                />
+              </View>
               <Pressable
-                onPress={() => setTutorialStep((prev) => prev + 1)}
+                onPress={tutorialStateDependantPress}
                 className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
               >
                 <Text>Next</Text>
@@ -492,10 +564,23 @@ export default function SetBlessing() {
                 Each of the blessings are for your class, you can learn from any
                 of these schools, but not from a school for a different class.
               </Text>
+              <View className="mx-auto flex flex-row">
+                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                <Switch
+                  trackColor={{ false: "#767577", true: "#3b82f6" }}
+                  ios_backgroundColor="#3e3e3e"
+                  thumbColor={"white"}
+                  onValueChange={(bool) => setTutorialState(bool)}
+                  value={tutorialState}
+                />
+              </View>
               <Pressable
                 onPress={() => {
                   vibration({ style: "light" });
                   setShowBlessingTutorial(false);
+                  setTimeout(() => {
+                    setTutorialStep(1);
+                  }, 500);
                 }}
                 className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
               >
@@ -505,9 +590,8 @@ export default function SetBlessing() {
           )}
         </View>
       </Modal>
-
       <ScrollView>
-        <View className="px-6 pb-12">
+        <View className="px-6 pb-12 pt-6">
           <Text className="py-8 text-center text-2xl text-zinc-900 dark:text-zinc-50">
             {`With What Blessing Was ${firstName} ${lastName} Born?`}
           </Text>
@@ -529,6 +613,18 @@ export default function SetBlessing() {
           ) : null}
           <View></View>
         </View>
+        <NonThemedView className="absolute ml-4 mt-4">
+          <Pressable
+            className="absolute"
+            onPress={() => setShowBlessingTutorial(true)}
+          >
+            <FontAwesome5
+              name="question-circle"
+              size={32}
+              color={colorScheme == "light" ? "#27272a" : "#fafafa"}
+            />
+          </Pressable>
+        </NonThemedView>
       </ScrollView>
     </>
   );

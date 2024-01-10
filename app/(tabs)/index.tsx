@@ -3,6 +3,7 @@ import {
   Image,
   View as NonThemedView,
   Animated,
+  Switch,
 } from "react-native";
 import { View, Text } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
@@ -53,6 +54,9 @@ const HomeScreen = observer(() => {
     (gameState && !gameState.getTutorialState("intro")) ?? false,
   );
   const [tutorialStep, setTutorialStep] = useState<number>(1);
+  const [tutorialState, setTutorialState] = useState<boolean>(
+    gameState?.tutorialsEnabled ?? true,
+  );
 
   //animation
   useEffect(() => {
@@ -85,6 +89,16 @@ const HomeScreen = observer(() => {
       (gameState && !gameState.getTutorialState("intro")) ?? false,
     );
   }, [gameState?.tutorialsShown]);
+
+  useEffect(() => {
+    if (gameState) {
+      if (tutorialState == false) {
+        gameState.disableTutorials();
+      } else {
+        gameState.enableTutorials();
+      }
+    }
+  }, [tutorialState]);
 
   const deviceHeight = Dimensions.get("window").height;
   const deviceWidth = Dimensions.get("window").width;
@@ -552,6 +566,16 @@ const HomeScreen = observer(() => {
                   On this page you can view your inventory (tap the bag) and
                   equip items to you hands, head, or body.
                 </Text>
+                <View className="mx-auto flex flex-row">
+                  <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                  <Switch
+                    trackColor={{ false: "#767577", true: "#3b82f6" }}
+                    ios_backgroundColor="#3e3e3e"
+                    thumbColor={"white"}
+                    onValueChange={(bool) => setTutorialState(bool)}
+                    value={tutorialState}
+                  />
+                </View>
                 <Pressable
                   onPress={() => setTutorialStep((prev) => prev + 1)}
                   className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
@@ -565,6 +589,16 @@ const HomeScreen = observer(() => {
                   A great place to start is to open your inventory and study the
                   book you were given.
                 </Text>
+                <View className="mx-auto flex flex-row">
+                  <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                  <Switch
+                    trackColor={{ false: "#767577", true: "#3b82f6" }}
+                    ios_backgroundColor="#3e3e3e"
+                    thumbColor={"white"}
+                    onValueChange={(bool) => setTutorialState(bool)}
+                    value={tutorialState}
+                  />
+                </View>
                 <Pressable
                   onPress={() => {
                     vibration({ style: "light" });

@@ -23,6 +23,7 @@ import {
   PlayerCharacterContext,
 } from "../../_layout";
 import { useVibration } from "../../../utility/customHooks";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function NewGameReview() {
   const { slug } = useLocalSearchParams();
@@ -150,6 +151,11 @@ export default function NewGameReview() {
       const shops = createShops(
         playerClass as "mage" | "paladin" | "necromancer",
       );
+      const tutorialState = await AsyncStorage.getItem("tutorialsEnabled");
+      let parsed = true;
+      if (tutorialState) {
+        parsed = JSON.parse(tutorialState);
+      }
       const newGame = new Game({
         date: startDate,
         shops: shops,
@@ -158,6 +164,8 @@ export default function NewGameReview() {
           : Platform.OS == "ios"
           ? "full"
           : "minimal",
+        tutorialsEnabled: gameState ? gameState.tutorialsEnabled : parsed,
+        tutorialsShown: gameState?.tutorialsShown,
       });
       const colorScheme = gameState?.colorScheme;
       if (colorScheme) {

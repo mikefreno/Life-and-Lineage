@@ -1,7 +1,7 @@
 import jobs from "../../assets/json/jobs.json";
 import LaborTask from "../../components/LaborTask";
 import { ScrollView, View, Text } from "../../components/Themed";
-import { View as NonThemedView, Pressable } from "react-native";
+import { View as NonThemedView, Pressable, Switch } from "react-native";
 import PlayerStatus from "../../components/PlayerStatus";
 import { GameContext, PlayerCharacterContext } from "../_layout";
 import { useContext, useEffect, useState } from "react";
@@ -25,7 +25,9 @@ const LaborScreen = observer(() => {
   }
   const { gameState } = gameContext;
   const vibration = useVibration();
-
+  const [tutorialState, setTutorialState] = useState<boolean>(
+    gameState?.tutorialsEnabled ?? true,
+  );
   const { colorScheme } = useColorScheme();
   const [showLaborTutorial, setShowLaborTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("labor")) ?? false,
@@ -37,6 +39,16 @@ const LaborScreen = observer(() => {
       gameState.updateTutorialState("labor", true);
     }
   }, [showLaborTutorial]);
+
+  useEffect(() => {
+    if (gameState) {
+      if (tutorialState == false) {
+        gameState.disableTutorials();
+      } else {
+        gameState.enableTutorials();
+      }
+    }
+  }, [tutorialState]);
 
   function applyToJob(title: string) {
     if (playerCharacter) {
@@ -100,6 +112,16 @@ const LaborScreen = observer(() => {
                 qualifications which you can earn by going to the training
                 school (top right).
               </Text>
+              <View className="mx-auto flex flex-row">
+                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                <Switch
+                  trackColor={{ false: "#767577", true: "#3b82f6" }}
+                  ios_backgroundColor="#3e3e3e"
+                  thumbColor={"white"}
+                  onValueChange={(bool) => setTutorialState(bool)}
+                  value={tutorialState}
+                />
+              </View>
               <Pressable
                 onPress={() => setTutorialStep((prev) => prev + 1)}
                 className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
@@ -116,6 +138,16 @@ const LaborScreen = observer(() => {
                 The dungeon, is far more dangerous than any job, but promises
                 great riches.
               </Text>
+              <View className="mx-auto flex flex-row">
+                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                <Switch
+                  trackColor={{ false: "#767577", true: "#3b82f6" }}
+                  ios_backgroundColor="#3e3e3e"
+                  thumbColor={"white"}
+                  onValueChange={(bool) => setTutorialState(bool)}
+                  value={tutorialState}
+                />
+              </View>
               <Pressable
                 onPress={() => {
                   vibration({ style: "light" });

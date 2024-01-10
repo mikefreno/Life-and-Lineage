@@ -15,6 +15,7 @@ import { useVibration } from "../../utility/customHooks";
 import { GameContext } from "../_layout";
 import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 export default function NewGameScreen() {
   const [selectedClass, setSelectedClass] = useState<
@@ -170,7 +171,7 @@ export default function NewGameScreen() {
         <Text className="bold pt-4 text-center text-3xl">
           Create a Character
         </Text>
-        <View className="">
+        <NonThemedView className="">
           <View className="mx-auto my-2 w-4/5">
             <Text className="pt-2 text-center text-2xl">Select Class</Text>
             <Pressable
@@ -303,7 +304,19 @@ export default function NewGameScreen() {
               </NonThemedView>
             )}
           </View>
-        </View>
+        </NonThemedView>
+        <NonThemedView className="absolute ml-4 mt-4">
+          <Pressable
+            className="absolute"
+            onPress={() => setShowIntroTutorial(true)}
+          >
+            <FontAwesome5
+              name="question-circle"
+              size={32}
+              color={colorScheme == "light" ? "#27272a" : "#fafafa"}
+            />
+          </Pressable>
+        </NonThemedView>
       </ScrollView>
     </>
   );

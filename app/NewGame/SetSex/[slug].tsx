@@ -1,7 +1,7 @@
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { View, Text } from "../../../components/Themed";
 import { toTitleCase } from "../../../utility/functions";
-import { Entypo, Foundation } from "@expo/vector-icons";
+import { Entypo, FontAwesome5, Foundation } from "@expo/vector-icons";
 import { Pressable, View as NonThemedView, Switch } from "react-native";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useVibration } from "../../../utility/customHooks";
@@ -26,6 +26,10 @@ export default function SetSex() {
       ? true
       : false,
   );
+  const [loadedAsync, setLoadedAsync] = useState<boolean>(false);
+
+  let tutorialStateRef = useRef<boolean>(gameState?.tutorialsEnabled ?? true);
+
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,
   );
@@ -37,6 +41,23 @@ export default function SetSex() {
       gameState.updateTutorialState("aging", true);
     }
   }, [showAgingTutorial]);
+
+  useEffect(() => {
+    if (!gameState) {
+      loadAsyncTutorialState();
+    }
+  }, []);
+
+  async function loadAsyncTutorialState() {
+    const res = await AsyncStorage.getItem("tutorialsEnabled");
+    if (res) {
+      const parsed: boolean = JSON.parse(res);
+      setShowAgingTutorial(parsed);
+      setTutorialState(parsed);
+      tutorialStateRef.current = parsed;
+    }
+    setLoadedAsync(true);
+  }
 
   useEffect(() => {
     async function updateAsyncTutorialState() {
@@ -58,6 +79,14 @@ export default function SetSex() {
     }
   }, [tutorialState]);
 
+  function tutorialStateDependantPress() {
+    if (tutorialStateRef.current) {
+      setTutorialStep((prev) => prev + 1);
+    } else {
+      setShowAgingTutorial(false);
+    }
+  }
+
   const accent =
     (slug as string) == "mage"
       ? "#2563eb"
@@ -75,11 +104,27 @@ export default function SetSex() {
       <Modal
         animationIn="slideInUp"
         animationOut="fadeOut"
-        isVisible={showAgingTutorial}
+        isVisible={
+          !gameState
+            ? loadedAsync
+              ? showAgingTutorial
+              : false
+            : showAgingTutorial
+        }
         backdropOpacity={0.2}
         animationInTiming={500}
-        onBackdropPress={() => setShowAgingTutorial(false)}
-        onBackButtonPress={() => setShowAgingTutorial(false)}
+        onBackdropPress={() => {
+          setShowAgingTutorial(false);
+          setTimeout(() => {
+            setTutorialStep(1);
+          }, 500);
+        }}
+        onBackButtonPress={() => {
+          setShowAgingTutorial(false);
+          setTimeout(() => {
+            setTutorialStep(1);
+          }, 500);
+        }}
       >
         <View
           className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
@@ -126,12 +171,15 @@ export default function SetSex() {
                   trackColor={{ false: "#767577", true: "#3b82f6" }}
                   ios_backgroundColor="#3e3e3e"
                   thumbColor={"white"}
-                  onValueChange={(bool) => setTutorialState(bool)}
+                  onValueChange={(bool) => {
+                    setTutorialState(bool);
+                    tutorialStateRef.current = bool;
+                  }}
                   value={tutorialState}
                 />
               </View>
               <Pressable
-                onPress={() => setTutorialStep((prev) => prev + 1)}
+                onPress={tutorialStateDependantPress}
                 className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
               >
                 <Text>Next</Text>
@@ -157,6 +205,9 @@ export default function SetSex() {
                 onPress={() => {
                   vibration({ style: "light" });
                   setShowAgingTutorial(false);
+                  setTimeout(() => {
+                    setTutorialStep(1);
+                  }, 500);
                 }}
                 className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
               >
@@ -231,6 +282,18 @@ export default function SetSex() {
           </NonThemedView>
         ) : null}
       </View>
+      <NonThemedView className="absolute ml-4 mt-4">
+        <Pressable
+          className="absolute"
+          onPress={() => setShowAgingTutorial(true)}
+        >
+          <FontAwesome5
+            name="question-circle"
+            size={32}
+            color={colorScheme == "light" ? "#27272a" : "#fafafa"}
+          />
+        </Pressable>
+      </NonThemedView>
     </>
   );
 }

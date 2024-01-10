@@ -1,4 +1,9 @@
-import { Pressable, FlatList, View as NonThemedView } from "react-native";
+import {
+  Pressable,
+  FlatList,
+  View as NonThemedView,
+  Switch,
+} from "react-native";
 import { Text, View } from "../../components/Themed";
 import { calculateAge, toTitleCase } from "../../utility/functions";
 import { Shop } from "../../classes/shop";
@@ -18,7 +23,9 @@ export default function ShopsScreen() {
   const { gameState } = gameData;
   const vibration = useVibration();
   const { colorScheme } = useColorScheme();
-
+  const [tutorialState, setTutorialState] = useState<boolean>(
+    gameState?.tutorialsEnabled ?? true,
+  );
   const [showShopTutorial, setShowShopTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("shops")) ?? false,
   );
@@ -169,6 +176,16 @@ export default function ShopsScreen() {
                 <Text className="my-4 text-center text-lg">
                   Each of these shops buy and sell various types of items.
                 </Text>
+                <View className="mx-auto flex flex-row">
+                  <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                  <Switch
+                    trackColor={{ false: "#767577", true: "#3b82f6" }}
+                    ios_backgroundColor="#3e3e3e"
+                    thumbColor={"white"}
+                    onValueChange={(bool) => setTutorialState(bool)}
+                    value={tutorialState}
+                  />
+                </View>
                 <Pressable
                   onPress={() => setTutorialStep((prev) => prev + 1)}
                   className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
@@ -185,6 +202,16 @@ export default function ShopsScreen() {
                   Each shop refreshes its stock and gold supply every real world
                   hour.
                 </Text>
+                <View className="mx-auto flex flex-row">
+                  <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                  <Switch
+                    trackColor={{ false: "#767577", true: "#3b82f6" }}
+                    ios_backgroundColor="#3e3e3e"
+                    thumbColor={"white"}
+                    onValueChange={(bool) => setTutorialState(bool)}
+                    value={tutorialState}
+                  />
+                </View>
                 <Pressable
                   onPress={() => {
                     vibration({ style: "light" });
