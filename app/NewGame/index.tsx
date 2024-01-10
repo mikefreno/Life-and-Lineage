@@ -1,4 +1,9 @@
-import { Pressable, useColorScheme, View as NonThemedView } from "react-native";
+import {
+  Pressable,
+  useColorScheme,
+  View as NonThemedView,
+  Switch,
+} from "react-native";
 import { Text, View, ScrollView } from "../../components/Themed";
 import "../../assets/styles/globals.css";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -9,6 +14,7 @@ import PaladinHammer from "../../assets/icons/PaladinHammer";
 import { useVibration } from "../../utility/customHooks";
 import { GameContext } from "../_layout";
 import Modal from "react-native-modal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function NewGameScreen() {
   const [selectedClass, setSelectedClass] = useState<
@@ -20,6 +26,9 @@ export default function NewGameScreen() {
 
   const gameContext = useContext(GameContext);
   const gameState = gameContext?.gameState;
+  const [tutorialState, setTutorialState] = useState<boolean>(
+    gameState?.tutorialsEnabled ?? true,
+  );
 
   const [showIntroTutorial, setShowIntroTutorial] = useState<boolean>(
     !gameState || (gameState && !gameState.getTutorialState("class"))
@@ -35,6 +44,26 @@ export default function NewGameScreen() {
       gameState.updateTutorialState("class", true);
     }
   }, [showIntroTutorial]);
+
+  useEffect(() => {
+    async function updateAsyncTutorialState() {
+      if (tutorialState == false) {
+        await AsyncStorage.setItem("tutorialsEnabled", JSON.stringify(false));
+      } else {
+        await AsyncStorage.setItem("tutorialsEnabled", JSON.stringify(true));
+      }
+    }
+
+    if (gameState) {
+      if (tutorialState == false) {
+        gameState.disableTutorials();
+      } else {
+        gameState.enableTutorials();
+      }
+    } else {
+      updateAsyncTutorialState();
+    }
+  }, [tutorialState]);
 
   return (
     <>
@@ -114,9 +143,19 @@ export default function NewGameScreen() {
             <Text className="text-center text-2xl">
               Welcome To Magic Delve!
             </Text>
-            <Text className="mt-2 text-center">
+            <Text className="my-4 text-center">
               Let's start with selecting your class...
             </Text>
+            <View className="mx-auto flex flex-row">
+              <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+              <Switch
+                trackColor={{ false: "#767577", true: "#3b82f6" }}
+                ios_backgroundColor="#3e3e3e"
+                thumbColor={"white"}
+                onValueChange={(bool) => setTutorialState(bool)}
+                value={tutorialState}
+              />
+            </View>
             <Pressable
               onPress={() => {
                 vibration({ style: "light" });

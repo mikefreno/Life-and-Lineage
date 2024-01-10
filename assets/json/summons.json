@@ -2,8 +2,15 @@
    {
       "name": "flying skull",
       "health": 20,
-      "attackPower": 5,
+      "attackPower": 3,
       "attacks": ["head slam"],
-      "turns": 6
+      "turns": 5
+   },
+   {
+      "name": "skeleton",
+      "health": 40,
+      "attackPower": 5,
+      "attacks": ["stab", "cleave"],
+      "turns": 5
    }
 ]

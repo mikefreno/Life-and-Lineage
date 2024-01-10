@@ -1,137 +1,190 @@
 [
-      {
-         "name": "stab",
-         "targets": "single",
-         "hitChance": 1.0,
-         "damageMult": 1.0,
-         "energyCost": 5,
-         "sanityDamage": 0,
-         "debuffs": [{"name":"bleed", "chance":0.20}]
-      },
-      {
-         "name": "serrate",
-         "targets": "single",
-         "hitChance": 0.90,
-         "damageMult": 1.0,
-         "energyCost": 15,
-         "sanityDamage": 0,
-         "debuffs": [{"name":"hemmorage", "chance":0.25}]
-      },
-      {
-         "name": "bite",
-         "targets": "single",
-         "hitChance": 0.95,
-         "damageMult": 1.25,
-         "energyCost": 10,
-         "sanityDamage": 0,
-         "debuffs": null
-      },
-      {
-         "name": "zombie bite",
-         "targets": "single",
-         "hitChance": 0.95,
-         "damageMult": 1.25,
-         "energyCost": 10,
-         "sanityDamage": 0,
-         "debuffs": [{"name":"diseased", "chance":0.05}]
-      },
-      {
-         "name": "vampiric bite",
-         "targets": "single",
-         "hitChance": 0.90,
-         "damageMult": 0.85,
-         "energyCost": 10,
-         "sanityDamage": 0,
-         "debuffs": [{"name":"lifesteal", "chance":0.50}]
-      },
-      { 
-         "name": "torch stab",
-         "targets": "single",
-         "hitChance": 0.95,
-         "damageMult": 0.85,
-         "energyCost": 5,
-         "sanityDamage": 0,
-         "debuffs": [{"name":"burn", "chance":0.75}]
-      },
-      {
-         "name": "cleave",
-         "targets": "cleave",
-         "hitChance": 0.95,
-         "damageMult": 0.75,
-         "energyCost": 10,
-         "sanityDamage": 0,
-         "debuffs": [{"name":"bleed", "chance":0.35}]
-      },
-      {
-         "name": "rock throw",
-         "targets": "single",
-         "hitChance": 0.95,
-         "damageMult": 1.25,
-         "energyCost": 5,
-         "sanityDamage": 0,
-         "debuffs": [{"name":"stun", "chance":0.15}]
-      },
-      {
-         "name": "grab",
-         "targets": "single",
-         "hitChance": 0.75,
-         "damageMult": 1.0,
-         "energyCost": 15,
-         "sanityDamage": 0,
-         "debuffs": [{"name":"stun", "chance":0.35}]
-      },
-      {
-         "name": "bolder throw",
-         "targets": "aoe",
-         "hitChance": 0.85,
-         "damageMult": 1.5,
-         "energyCost": 25,
-         "sanityDamage": 0,
-         "debuffs": [{"name":"stun", "chance":0.25}]
-      },
-      {
-         "name": "pocket sand",
-         "targets": "single",
-         "hitChance": 0.95,
-         "damageMult": 0.0,
-         "energyCost": 5,
-         "sanityDamage": 0,
-         "debuffs": [{"name":"blind", "chance":0.50}]
-      },
-      {
-         "name": "poison spray",
-         "targets": "single",
-         "hitChance": 1.0,
-         "damageMult": 0.0,
-         "energyCost": 10,
-         "sanityDamage": 0,
-         "debuffs": [{"name":"poison", "chance":0.35}]
-      },
-      {
-         "name": "wail",
-         "targets": "aoe",
-         "hitChance": 0.5,
-         "damageMult": 0.0,
-         "energyCost": 20,
-         "sanityDamage": 5,
-         "debuffs": [{"name":"fear", "chance":0.50}]
-      },
-      {
-         "name": "shoot",
-         "targets": "single",
-         "hitChance": 0.75,
-         "damageMult": 1.75,
-         "energyCost": 15,
-         "sanityDamage": 0,
-         "debuffs": null
-      },
-      {
-         "name": "head slam",
-         "targets": "single",
-         "hitChance": 0.95,
-         "damageMult": 1.0,
-         "energyCost": 10,
-         "sanityDamage": 0,
-         "debuffs": [{"name":"stun", "chance": 0.10}]
-      }
+   {
+      "name": "stab",
+      "energyCost": 5,
+      "targets": "single",
+      "hitChance": 1.0,
+      "damageMult": 1.0,
+      "sanityDamage": 0,
+      "buffs": null,
+      "debuffs": [{"name":"bleed", "chance":0.20}],
+      "summons": null
+   },
+   {
+      "name": "serrate",
+      "energyCost": 15,
+      "targets": "single",
+      "hitChance": 0.90,
+      "damageMult": 1.0,
+      "sanityDamage": 0,
+      "buffs": null,
+      "debuffs": [{"name":"hemmorage", "chance":0.25}],
+      "summons": null
+   },
+   {
+      "name": "bite",
+      "energyCost": 10,
+      "targets": "single",
+      "hitChance": 0.95,
+      "damageMult": 1.25,
+      "sanityDamage": 0,
+      "buffs": null,
+      "debuffs": null,
+      "summons": null
+   },
+   {
+      "name": "zombie bite",
+      "energyCost": 15,
+      "targets": "single",
+      "hitChance": 0.95,
+      "damageMult": 1.25,
+      "sanityDamage": 0,
+      "buffs": null,
+      "debuffs": [{"name":"diseased", "chance":0.05}],
+      "summons": null
+   },
+   {
+      "name": "vampiric bite",
+      "energyCost": 10,
+      "targets": "single",
+      "hitChance": 0.90,
+      "damageMult": 0.85,
+      "sanityDamage": 0,
+      "buffs": null,
+      "debuffs": [{"name":"lifesteal", "chance":0.50}],
+      "summons": null
+   },
+   { 
+      "name": "torch stab",
+      "energyCost": 5,
+      "targets": "single",
+      "hitChance": 0.95,
+      "damageMult": 0.85,
+      "sanityDamage": 0,
+      "buffs": null,
+      "debuffs": [{"name":"burn", "chance":0.75}],
+      "summons": null
+   },
+   {
+      "name": "cleave",
+      "energyCost": 10,
+      "targets": "cleave",
+      "hitChance": 0.95,
+      "damageMult": 0.75,
+      "sanityDamage": 0,
+      "buffs": null,
+      "debuffs": [{"name":"bleed", "chance":0.35}],
+      "summons": null
+   },
+   {
+      "name": "rock throw",
+      "energyCost": 5,
+      "targets": "single",
+      "hitChance": 0.95,
+      "damageMult": 1.25,
+      "sanityDamage": 0,
+      "buffs": null,
+      "debuffs": [{"name":"stun", "chance":0.15}],
+      "summons": null
+   },
+   {
+      "name": "grab",
+      "energyCost": 20,
+      "targets": "single",
+      "hitChance": 0.75,
+      "damageMult": 1.0,
+      "sanityDamage": 0,
+      "buffs": null,
+      "debuffs": [{"name":"stun", "chance":0.35}],
+      "summons": null
+   },
+   {
+      "name": "bolder throw",
+      "energyCost": 25,
+      "targets": "aoe",
+      "hitChance": 0.85,
+      "damageMult": 1.5,
+      "sanityDamage": 0,
+      "buffs": null,
+      "debuffs": [{"name":"stun", "chance":0.25}],
+      "summons": null
+   },
+   {
+      "name": "pocket sand",
+      "energyCost": 5,
+      "targets": "single",
+      "hitChance": 0.95,
+      "damageMult": 0.0,
+      "sanityDamage": 0,
+      "buffs": null,
+      "debuffs": [{"name":"blind", "chance":0.50}],
+      "summons": null
+   },
+   {
+      "name": "poison spray",
+      "energyCost": 10,
+      "targets": "single",
+      "hitChance": 1.0,
+      "damageMult": 0.0,
+      "sanityDamage": 0,
+      "buffs": null,
+      "debuffs": [{"name":"poison", "chance":0.35}],
+      "summons": null
+   },
+   {
+      "name": "wail",
+      "energyCost": 20,
+      "targets": "aoe",
+      "hitChance": 0.5,
+      "damageMult": 0.0,
+      "sanityDamage": 5,
+      "buffs": null,
+      "debuffs": [{"name":"fear", "chance":0.50}],
+      "summons": null
+   },
+   {
+      "name": "shoot",
+      "energyCost": 15,
+      "targets": "single",
+      "hitChance": 0.75,
+      "damageMult": 1.75,
+      "sanityDamage": 0,
+      "buffs": null,
+      "debuffs": null,
+      "summons": null
+   },
+   {
+      "name": "head slam",
+      "energyCost": 10,
+      "targets": "single",
+      "hitChance": 0.95,
+      "damageMult": 1.0,
+      "sanityDamage": 0,
+      "buffs": null,
+      "debuffs": [{"name":"stun", "chance": 0.10}],
+      "summons": null
+   },
+   {
+      "name": "raise skeleton",
+      "energyCost": 30,
+      "targets": null,
+      "hitChance": null,
+      "damageMult": null,
+      "sanityDamage": 0,
+      "buffs": null,
+      "debuffs": null,
+      "summons": ["skeleton"]
+   },
+   {
+      "name": "teeth",
+      "energyCost": 15,
+      "targets": "cleave",
+      "hitChance": 0.95,
+      "damageMult": null,
+      "flatDamage": 10,
+      "sanityDamage": 0,
+      "buffs": null,
+      "debuffs": null,
+      "summons": null
+   }
 ]

@@ -144,10 +144,6 @@ const RootLayout = observer(() => {
   }, [error]);
 
   useEffect(() => {
-    console.log(game?.vibrationEnabled);
-  }, [game?.vibrationEnabled]);
-
-  useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
       if (!playerCharacter || !game) {

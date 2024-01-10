@@ -4,8 +4,8 @@
       "sanity": null,
       "healthRange": {"minimum": 9999, "maximum": 9999},
       "attackPowerRange": {"minimum": 0, "maximum": 0},
-      "energy": {"maximum": 0, "regen": 0},
-      "attacks": [],
+      "energy": {"maximum": 30, "regen": 0},
+      "attacks": ["raise skeleton"],
       "drops": [
          {"item": "stick", "itemType":"weapon", "chance": 1.0},
          {"item": "big stick", "itemType":"weapon","chance":0.85}

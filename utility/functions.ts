@@ -255,7 +255,7 @@ export function createDebuff(
   const roll = rollD20();
   if (roll * 5 >= 100 - debuffChance * 100) {
     const debuffObj = conditions.find(
-      (condition) => (condition.name = debuffName),
+      (condition) => condition.name == debuffName,
     );
     if (debuffObj) {
       let damage = debuffObj.effectAmount;

@@ -5,35 +5,52 @@ import { toTitleCase } from "../utility/functions";
 import Coins from "../assets/icons/CoinsIcon";
 import { Item } from "../classes/item";
 import { useContext, useState } from "react";
-import { LogsContext, PlayerCharacterContext } from "../app/_layout";
+import {
+  LogsContext,
+  MonsterContext,
+  PlayerCharacterContext,
+} from "../app/_layout";
 import { useColorScheme } from "nativewind";
 import { useVibration } from "../utility/customHooks";
+import { Minion, Monster } from "../classes/creatures";
 
 interface BattleTabProps {
   battleTab: "attacks" | "spells" | "equipment" | "log";
   pass: () => void;
-  useAttack: (attack: {
-    name: string;
-    targets: string;
-    hitChance: number;
-    damageMult: number;
-    sanityDamage: number;
-    debuffs: { name: string; chance: number }[] | null;
-  }) => void;
-  useSpell: (spell: {
-    name: string;
-    element: string;
-    proficiencyNeeded: number;
-    manaCost: number;
-    effects: {
-      damage: number | null;
-      buffs: string[] | null;
+  useAttack: (
+    attack: {
+      name: string;
+      targets: string;
+      hitChance: number;
+      damageMult: number;
+      sanityDamage: number;
       debuffs: { name: string; chance: number }[] | null;
-      summon?: string[];
-      selfDamage?: number;
-    };
-  }) => void;
+    },
+    target: Monster | Minion,
+  ) => void;
+  useSpell: (
+    spell: {
+      name: string;
+      element: string;
+      proficiencyNeeded: number;
+      manaCost: number;
+      effects: {
+        damage: number | null;
+        buffs: string[] | null;
+        debuffs: { name: string; chance: number }[] | null;
+        summon?: string[];
+        selfDamage?: number;
+      };
+    },
+    target: Monster | Minion,
+  ) => void;
   attackAnimationOnGoing: boolean;
+  setShowTargetSelection: React.Dispatch<
+    React.SetStateAction<{
+      showing: boolean;
+      chosenAttack: any;
+    }>
+  >;
 }
 
 export default function BattleTab({
@@ -42,14 +59,17 @@ export default function BattleTab({
   useSpell,
   pass,
   attackAnimationOnGoing,
+  setShowTargetSelection,
 }: BattleTabProps) {
   const { colorScheme } = useColorScheme();
   const logs = useContext(LogsContext)?.logsState;
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
 
-  const playerCharacterData = useContext(PlayerCharacterContext);
-  if (!playerCharacterData) throw new Error("missing player");
-  const { playerState } = playerCharacterData;
+  const monsterContext = useContext(MonsterContext);
+  const playerContext = useContext(PlayerCharacterContext);
+  if (!playerContext || !monsterContext) throw new Error("missing context");
+  const { playerState } = playerContext;
+  const { monsterState } = monsterContext;
 
   const playerAttacks = playerState?.physicalAttacks;
   const playerSpells = playerState?.getSpells();
@@ -120,7 +140,14 @@ export default function BattleTab({
                       }
                       onPress={() => {
                         vibration({ style: "light" });
-                        useAttack(attack);
+                        if (monsterState && monsterState.minions.length == 0) {
+                          useAttack(attack, monsterState);
+                        } else {
+                          setShowTargetSelection({
+                            showing: true,
+                            chosenAttack: attack,
+                          });
+                        }
                       }}
                       className="my-auto rounded bg-zinc-300 px-4 py-2 active:scale-95 active:opacity-50 dark:bg-zinc-700"
                     >
@@ -138,6 +165,7 @@ export default function BattleTab({
                   <Text className="text-xl">Pass</Text>
                 </View>
                 <Pressable
+                  disabled={attackAnimationOnGoing}
                   onPress={() => {
                     vibration({ style: "light" });
                     pass();
@@ -169,7 +197,14 @@ export default function BattleTab({
                     }
                     onPress={() => {
                       vibration({ style: "light" });
-                      useSpell(spell);
+                      if (monsterState && monsterState.minions.length == 0) {
+                        useSpell(spell, monsterState);
+                      } else {
+                        setShowTargetSelection({
+                          showing: true,
+                          chosenAttack: spell,
+                        });
+                      }
                     }}
                     className={`my-auto rounded  px-4 py-2 active:scale-95 active:opacity-50 ${
                       playerState.mana <= spell.manaCost

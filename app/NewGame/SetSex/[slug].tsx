@@ -2,12 +2,13 @@ import { Stack, router, useLocalSearchParams } from "expo-router";
 import { View, Text } from "../../../components/Themed";
 import { toTitleCase } from "../../../utility/functions";
 import { Entypo, Foundation } from "@expo/vector-icons";
-import { Pressable, View as NonThemedView } from "react-native";
+import { Pressable, View as NonThemedView, Switch } from "react-native";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useVibration } from "../../../utility/customHooks";
 import Modal from "react-native-modal";
 import { GameContext } from "../../_layout";
 import { useColorScheme } from "nativewind";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SetSex() {
   const { slug } = useLocalSearchParams();
@@ -20,19 +21,42 @@ export default function SetSex() {
   const gameContext = useContext(GameContext);
   const gameState = gameContext?.gameState;
 
-  const [shoxAgingTutorial, setShowAgingTutorial] = useState<boolean>(
+  const [showAgingTutorial, setShowAgingTutorial] = useState<boolean>(
     !gameState || (gameState && !gameState.getTutorialState("aging"))
       ? true
       : false,
+  );
+  const [tutorialState, setTutorialState] = useState<boolean>(
+    gameState?.tutorialsEnabled ?? true,
   );
 
   const [tutorialStep, setTutorialStep] = useState<number>(1);
 
   useEffect(() => {
-    if (!shoxAgingTutorial && gameState) {
+    if (!showAgingTutorial && gameState) {
       gameState.updateTutorialState("aging", true);
     }
-  }, [shoxAgingTutorial]);
+  }, [showAgingTutorial]);
+
+  useEffect(() => {
+    async function updateAsyncTutorialState() {
+      if (tutorialState == false) {
+        await AsyncStorage.setItem("tutorialsEnabled", JSON.stringify(false));
+      } else {
+        await AsyncStorage.setItem("tutorialsEnabled", JSON.stringify(true));
+      }
+    }
+
+    if (gameState) {
+      if (tutorialState == false) {
+        gameState.disableTutorials();
+      } else {
+        gameState.enableTutorials();
+      }
+    } else {
+      updateAsyncTutorialState();
+    }
+  }, [tutorialState]);
 
   const accent =
     (slug as string) == "mage"
@@ -51,7 +75,7 @@ export default function SetSex() {
       <Modal
         animationIn="slideInUp"
         animationOut="fadeOut"
-        isVisible={shoxAgingTutorial}
+        isVisible={showAgingTutorial}
         backdropOpacity={0.2}
         animationInTiming={500}
         onBackdropPress={() => setShowAgingTutorial(false)}
@@ -96,6 +120,16 @@ export default function SetSex() {
                 the characters in the game. At a certain point it will become
                 nearly impossible to stay alive.
               </Text>
+              <View className="mx-auto flex flex-row">
+                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                <Switch
+                  trackColor={{ false: "#767577", true: "#3b82f6" }}
+                  ios_backgroundColor="#3e3e3e"
+                  thumbColor={"white"}
+                  onValueChange={(bool) => setTutorialState(bool)}
+                  value={tutorialState}
+                />
+              </View>
               <Pressable
                 onPress={() => setTutorialStep((prev) => prev + 1)}
                 className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
@@ -109,6 +143,16 @@ export default function SetSex() {
                 However, if you have a child, you can live on through the child.
                 Retaining much of what has been achieved in your previous life.
               </Text>
+              <View className="mx-auto flex flex-row">
+                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                <Switch
+                  trackColor={{ false: "#767577", true: "#3b82f6" }}
+                  ios_backgroundColor="#3e3e3e"
+                  thumbColor={"white"}
+                  onValueChange={(bool) => setTutorialState(bool)}
+                  value={tutorialState}
+                />
+              </View>
               <Pressable
                 onPress={() => {
                   vibration({ style: "light" });

@@ -1,5 +1,10 @@
 import { View, Text } from "../../components/Themed";
-import { Animated, Image, View as NonThemedView } from "react-native";
+import {
+  Animated,
+  Image,
+  View as NonThemedView,
+  StyleSheet,
+} from "react-native";
 import { useContext, useEffect, useState } from "react";
 import { MonsterImage } from "../../components/MonsterImage";
 import { Pressable, Modal as NativeModal } from "react-native";
@@ -26,7 +31,7 @@ import { useColorScheme } from "nativewind";
 import FadeOutText from "../../components/FadeOutText";
 import { useVibration } from "../../utility/customHooks";
 import { EnemyHealingAnimationBox } from "../../components/EnemyHealingAnimationBox";
-import { Minion } from "../../classes/creatures";
+import { Minion, Monster } from "../../classes/creatures";
 import SackIcon from "../../assets/icons/SackIcon";
 import Modal from "react-native-modal";
 
@@ -58,6 +63,7 @@ const DungeonLevelScreen = observer(() => {
     itemDrops: Item[];
     gold: number;
   } | null>(null);
+  const [monsterAttacked, setMonsterAttacked] = useState<boolean>(false);
   const [leftBehindDrops, setLeftBehindDrops] = useState<Item[]>([]);
   const [showLeftBehindItemsScreen, setShowLeftBehindItemsScreen] =
     useState<boolean>(false);
@@ -65,6 +71,10 @@ const DungeonLevelScreen = observer(() => {
     useState<boolean>(false);
   const [fleeModalShowing, setFleeModalShowing] = useState<boolean>(false);
   const [fleeRollFailure, setFleeRollFailure] = useState<boolean>(false);
+  const [showTargetSelection, setShowTargetSelection] = useState<{
+    showing: boolean;
+    chosenAttack: any;
+  }>({ showing: false, chosenAttack: null });
 
   const [monsterHealthRecord, setMonsterHealthRecord] = useState<
     number | undefined
@@ -75,6 +85,7 @@ const DungeonLevelScreen = observer(() => {
   const [animationCycler, setAnimationCycler] = useState<number>(0);
   const [attackAnimationOnGoing, setAttackAnimationOnGoing] =
     useState<boolean>(false);
+
   const monsterAttackAnimationValue = useState(new Animated.Value(0))[0];
   const monsterDamagedAnimationValue = useState(new Animated.Value(1))[0];
 
@@ -226,44 +237,59 @@ const DungeonLevelScreen = observer(() => {
 
   const enemyTurn = () => {
     if (monsterState) {
+      setMonsterAttacked(true);
       const enemyAttackRes = monsterState.takeTurn(
         playerState.getMaxHealth(),
         playerState.getDamageReduction(),
       );
       if (
-        enemyAttackRes.attack !== "miss" &&
-        enemyAttackRes.attack !== "stun" &&
-        enemyAttackRes.attack !== "pass"
+        enemyAttackRes !== "miss" &&
+        enemyAttackRes !== "stun" &&
+        enemyAttackRes !== "pass"
       ) {
-        playerState.damageHealth(enemyAttackRes.attack.damage);
-        playerState.damageSanity(enemyAttackRes.attack.sanityDamage);
-        enemyAttackRes.attack.debuffs?.forEach((debuff) =>
-          playerState.addCondition(debuff),
-        );
+        playerState.damageHealth(enemyAttackRes.damage);
+        playerState.damageSanity(enemyAttackRes.sanityDamage);
+        if (enemyAttackRes.debuffs) {
+          enemyAttackRes.debuffs.forEach((debuff) =>
+            playerState.addCondition(debuff),
+          );
+        }
         let array = [];
-        let line = `The ${toTitleCase(monsterState.creatureSpecies)} used ${
-          enemyAttackRes.attack.name
-        } dealing ${enemyAttackRes.attack.damage} health damage`;
+        let line = `The ${toTitleCase(
+          monsterState.creatureSpecies,
+        )} used ${toTitleCase(enemyAttackRes.name)}${
+          enemyAttackRes.damage
+            ? ` dealing ${enemyAttackRes.damage} health damage`
+            : ""
+        }`;
 
-        if (enemyAttackRes.attack.heal) {
-          array.push(`healing for ${enemyAttackRes.attack.heal} health`);
+        if (enemyAttackRes.heal) {
+          array.push(`healing for ${enemyAttackRes.heal} health`);
           setTimeout(() => {
             setMonsterHealDummy((prev) => prev + 1);
           }, 250);
         }
 
-        if (enemyAttackRes.attack.sanityDamage > 0) {
-          array.push(
-            `dealing ${enemyAttackRes.attack.sanityDamage} sanity damage`,
-          );
+        if (enemyAttackRes.sanityDamage > 0) {
+          array.push(`dealing ${enemyAttackRes.sanityDamage} sanity damage`);
         }
 
-        if (enemyAttackRes.attack.debuffs) {
-          enemyAttackRes.attack.debuffs.forEach((debuff) =>
+        if (enemyAttackRes.debuffs) {
+          enemyAttackRes.debuffs.forEach((debuff) =>
             array.push(`it applied a ${debuff.name} stack`),
           );
         }
-
+        if (enemyAttackRes.summons) {
+          const counts: { summon: string; count: number }[] = [];
+          enemyAttackRes.summons.forEach((summon) => {
+            const preExisting = counts.find((obj) => obj.summon == summon);
+            if (preExisting) {
+              preExisting.count += 1;
+            } else {
+              counts.push({ summon: summon, count: 1 });
+            }
+          });
+        }
         if (array.length) {
           line +=
             ", " +
@@ -272,12 +298,14 @@ const DungeonLevelScreen = observer(() => {
             array.slice(-1);
         }
         battleLogger(line);
-        setMonsterAttackDummy((prev) => prev + 1);
-      } else if (enemyAttackRes.attack == "pass") {
+        if (enemyAttackRes.damage > 0) {
+          setMonsterAttackDummy((prev) => prev + 1);
+        }
+      } else if (enemyAttackRes == "pass") {
         battleLogger(
           `The ${toTitleCase(monsterState.creatureSpecies)} did nothing`,
         );
-        setMonsterTextString(enemyAttackRes.attack);
+        setMonsterTextString(enemyAttackRes);
         setMonsterTextDummy((prev) => prev + 1);
         setTimeout(() => {
           setAttackAnimationOnGoing(false);
@@ -285,22 +313,26 @@ const DungeonLevelScreen = observer(() => {
       } else {
         battleLogger(
           `The ${toTitleCase(monsterState.creatureSpecies)} ${
-            enemyAttackRes.attack == "stun" ? "was " : ""
-          }${enemyAttackRes.attack}ed`,
+            enemyAttackRes == "stun" ? "was " : ""
+          }${enemyAttackRes}ed`,
         );
-        if (enemyAttackRes.attack == "miss") {
+        if (enemyAttackRes == "miss") {
           setMonsterAttackDummy((prev) => prev + 1);
         }
         setTimeout(
           () => {
-            setMonsterTextString(enemyAttackRes.attack as "miss" | "stun");
+            setMonsterTextString(enemyAttackRes as "miss" | "stun");
             setMonsterTextDummy((prev) => prev + 1);
             setTimeout(() => {
               setAttackAnimationOnGoing(false);
             }, 500);
           },
-          enemyAttackRes.attack == "miss" ? 500 : 0,
+          enemyAttackRes == "miss" ? 500 : 0,
         );
+      }
+      monsterState.conditionTicker();
+      if (monsterState.minions.length > 0) {
+        enemyMinionsTurn(monsterState.minions);
       }
     }
   };
@@ -320,7 +352,7 @@ const DungeonLevelScreen = observer(() => {
   }
 
   function monsterConditionRender() {
-    if (monsterState && monsterState.conditions.length > 0) {
+    if (monsterState) {
       let simplifiedConditionsMap: Map<
         string,
         {
@@ -349,16 +381,20 @@ const DungeonLevelScreen = observer(() => {
         count: number;
       }[] = Array.from(simplifiedConditionsMap.values());
 
-      return simplifiedConditions.map((cond) => (
-        <View key={cond.name} className="mx-2 flex align-middle">
-          <View className="mx-auto rounded-md bg-zinc-200">
-            <Image source={cond.icon} style={{ width: 24, height: 24 }} />
-          </View>
-          <Text className="text-sm">
-            {toTitleCase(cond.name)} x {cond.count}
-          </Text>
-        </View>
-      ));
+      return (
+        <NonThemedView className="h-8">
+          {simplifiedConditions.map((cond) => (
+            <View key={cond.name} className="mx-2 flex align-middle">
+              <NonThemedView className="mx-auto rounded-md bg-zinc-200 dark:bg-zinc-600">
+                <Image source={cond.icon} style={{ width: 24, height: 24 }} />
+              </NonThemedView>
+              <Text className="text-sm">
+                {toTitleCase(cond.name)} x {cond.count}
+              </Text>
+            </View>
+          ))}
+        </NonThemedView>
+      );
     }
   }
   //-----------minion loading-------//
@@ -383,6 +419,7 @@ const DungeonLevelScreen = observer(() => {
     setTimeout(
       () => {
         setMonster(enemy);
+        setMonsterAttacked(false);
         battleLogger(`You found a ${toTitleCase(enemy.creatureSpecies)}!`);
         setAttackAnimationOnGoing(false);
       },
@@ -401,26 +438,24 @@ const DungeonLevelScreen = observer(() => {
   };
 
   //------------player combat functions------------//
-  const useAttack = (attack: {
-    name: string;
-    targets: string;
-    hitChance: number;
-    damageMult: number;
-    sanityDamage: number;
-    debuffs: { name: string; chance: number }[] | null;
-  }) => {
+  const useAttack = (
+    attack: {
+      name: string;
+      targets: string;
+      hitChance: number;
+      damageMult: number;
+      sanityDamage: number;
+      debuffs: { name: string; chance: number }[] | null;
+    },
+    target: Monster | Minion,
+  ) => {
     setAttackAnimationOnGoing(true);
-    if (monsterState && playerState && isFocused) {
-      const attackRes = playerState.doPhysicalAttack(
-        attack,
-        monsterState.healthMax,
-      );
+    if (target && playerState && isFocused) {
+      const attackRes = playerState.doPhysicalAttack(attack, target.healthMax);
       if (attackRes !== "miss") {
-        monsterState.damageHealth(attackRes.damage);
-        monsterState.damageSanity(attackRes.sanityDamage) ?? null;
-        attackRes.debuffs?.forEach((effect) =>
-          monsterState.addCondition(effect),
-        );
+        target.damageHealth(attackRes.damage);
+        target.damageSanity(attackRes.sanityDamage) ?? null;
+        attackRes.debuffs?.forEach((effect) => target.addCondition(effect));
         let line = `You ${attack.name == "cast" ? "used " : ""}${toTitleCase(
           attack.name,
         )}${
@@ -429,7 +464,7 @@ const DungeonLevelScreen = observer(() => {
               ? "d"
               : "ed"
             : " on"
-        } the ${toTitleCase(monsterState.creatureSpecies)} for ${
+        } the ${toTitleCase(target.creatureSpecies)} for ${
           attackRes.damage
         } heath damage`;
         if (attackRes.sanityDamage) {
@@ -443,19 +478,25 @@ const DungeonLevelScreen = observer(() => {
         battleLogger(line);
       } else {
         battleLogger(
-          `You ${attackRes}ed the ${toTitleCase(monsterState.creatureSpecies)}`,
+          `You ${attackRes}ed the ${toTitleCase(target.creatureSpecies)}`,
         );
       }
-      if (
-        monsterState.health <= 0 ||
-        (monsterState.sanity && monsterState.sanity <= 0)
-      ) {
-        setTimeout(() => {
-          enemyTurnCheck();
-        }, 1000);
+      if (target instanceof Monster) {
+        if (target.health <= 0 || (target.sanity && target.sanity <= 0)) {
+          setTimeout(() => {
+            enemyTurnCheck();
+          }, 1000);
+        } else {
+          setTimeout(() => {
+            playerMinionsTurn(playerState.minions, target.id);
+            setTimeout(() => {
+              enemyTurnCheck();
+            }, 1000 * playerState.minions.length);
+          }, 1000);
+        }
       } else {
         setTimeout(() => {
-          playerMinionsTurn(playerState.minions, monsterState.id);
+          playerMinionsTurn(playerState.minions, target.id);
           setTimeout(() => {
             enemyTurnCheck();
           }, 1000 * playerState.minions.length);
@@ -464,25 +505,28 @@ const DungeonLevelScreen = observer(() => {
     }
   };
 
-  const useSpell = (spell: {
-    name: string;
-    element: string;
-    proficiencyNeeded: number;
-    manaCost: number;
-    effects: {
-      damage: number | null;
-      buffs: string[] | null;
-      debuffs: { name: string; chance: number }[] | null;
-      summon?: string[];
-      selfDamage?: number;
-    };
-  }) => {
+  const useSpell = (
+    spell: {
+      name: string;
+      element: string;
+      proficiencyNeeded: number;
+      manaCost: number;
+      effects: {
+        damage: number | null;
+        buffs: string[] | null;
+        debuffs: { name: string; chance: number }[] | null;
+        summon?: string[];
+        selfDamage?: number;
+      };
+    },
+    target: Monster | Minion,
+  ) => {
     setAttackAnimationOnGoing(true);
-    if (monsterState && playerState && isFocused) {
-      const spellRes = playerState.useSpell(spell, monsterState.healthMax);
-      monsterState.damageHealth(spellRes.damage);
-      monsterState.damageSanity(spellRes.sanityDamage);
-      spellRes.debuffs?.forEach((debuff) => monsterState.addCondition(debuff));
+    if (playerState && isFocused) {
+      const spellRes = playerState.useSpell(spell, target.healthMax);
+      target.damageHealth(spellRes.damage);
+      target.damageSanity(spellRes.sanityDamage);
+      spellRes.debuffs?.forEach((debuff) => target.addCondition(debuff));
       let line = "";
       if (spell.effects.summon) {
         let summons = spell.effects.summon.map((summon) => toTitleCase(summon));
@@ -496,7 +540,7 @@ const DungeonLevelScreen = observer(() => {
       } else {
         line = `You ${toTitleCase(spell.name)}${
           spell.name.charAt(spell.name.length - 1) == "e" ? "d" : "ed"
-        } the ${toTitleCase(monsterState.creatureSpecies)} for ${
+        } the ${toTitleCase(target.creatureSpecies)} for ${
           spellRes.damage
         } heath damage`;
         if (spellRes.sanityDamage) {
@@ -509,16 +553,23 @@ const DungeonLevelScreen = observer(() => {
         }
       }
       battleLogger(line);
-      if (
-        monsterState.health <= 0 ||
-        (monsterState.sanity && monsterState.sanity <= 0)
-      ) {
-        setTimeout(() => {
-          enemyTurnCheck();
-        }, 1000);
+
+      if (target instanceof Monster) {
+        if (target.health <= 0 || (target.sanity && target.sanity <= 0)) {
+          setTimeout(() => {
+            enemyTurnCheck();
+          }, 1000);
+        } else {
+          setTimeout(() => {
+            playerMinionsTurn(playerState.minions, target.id);
+            setTimeout(() => {
+              enemyTurnCheck();
+            }, 1000 * playerState.minions.length);
+          }, 1000);
+        }
       } else {
         setTimeout(() => {
-          playerMinionsTurn(playerState.minions, monsterState.id);
+          playerMinionsTurn(playerState.minions, target.id);
           setTimeout(() => {
             enemyTurnCheck();
           }, 1000 * playerState.minions.length);
@@ -543,7 +594,9 @@ const DungeonLevelScreen = observer(() => {
       const roll = flipCoin();
       if (
         playerState &&
-        (roll == "Heads" || monsterState?.creatureSpecies == "training dummy")
+        (roll == "Heads" ||
+          monsterState?.creatureSpecies == "training dummy" ||
+          !monsterAttacked)
       ) {
         vibration({ style: "light" });
         setFleeRollFailure(false);
@@ -617,6 +670,45 @@ const DungeonLevelScreen = observer(() => {
           }
           if (suppliedMinions[i].turnsLeftAlive <= 0) {
             playerState.removeMinion(suppliedMinions[i]);
+          }
+        }, 1000 * i);
+      }
+    }
+  }
+
+  function enemyMinionsTurn(suppliedMinions: Minion[]) {
+    if (monsterState && playerState) {
+      for (let i = 0; i < suppliedMinions.length; i++) {
+        setTimeout(() => {
+          const res = suppliedMinions[i].attack(monsterState.healthMax);
+          if (res == "miss") {
+            battleLogger(
+              `${monsterState.creatureSpecies}'s ${toTitleCase(
+                suppliedMinions[i].creatureSpecies,
+              )} missed!`,
+            );
+          } else {
+            let str = `${monsterState.creatureSpecies}'s ${toTitleCase(
+              suppliedMinions[i].creatureSpecies,
+            )} used ${toTitleCase(res.name)} dealing ${res.damage} damage`;
+            monsterState.damageHealth(res.damage);
+            if (res.heal && res.heal > 0) {
+              str += ` and healed for ${res.heal} damage`;
+            }
+            if (res.sanityDamage > 0) {
+              str += ` and ${res.sanityDamage} sanity damage`;
+              monsterState.damageSanity(res.sanityDamage);
+            }
+            if (res.debuffs) {
+              res.debuffs.forEach((effect) => {
+                str += ` and applied a ${effect.name} stack`;
+                monsterState.addCondition(effect);
+              });
+            }
+            battleLogger(str);
+          }
+          if (suppliedMinions[i].turnsLeftAlive <= 0) {
+            monsterState.removeMinion(suppliedMinions[i]);
           }
         }, 1000 * i);
       }
@@ -720,9 +812,11 @@ const DungeonLevelScreen = observer(() => {
       setTimeout(() => setInventoryFullNotifier(false), 2000);
     }
   }, [inventoryFullNotifier]);
+
   useEffect(() => {
     setInventoryFullNotifier(false);
   }, [showLeftBehindItemsScreen]);
+
   //-----------tutorial---------//
   const [showDungeonInteriorTutorial, setShowDungeonInteriorTutorial] =
     useState<boolean>(
@@ -738,6 +832,54 @@ const DungeonLevelScreen = observer(() => {
   }, [showDungeonInteriorTutorial]);
 
   //-----------render---------//
+  function targetSelectionRender() {
+    if (monsterState) {
+      let targets: (Monster | Minion)[] = [];
+      targets.push(monsterState);
+      monsterState.minions.forEach((minion) => {
+        targets.push(minion);
+      });
+
+      return (
+        <View>
+          {targets.map((target) => (
+            <Pressable
+              key={target.id}
+              onPress={() =>
+                useAttack(showTargetSelection.chosenAttack, target)
+              }
+              className="m-4 rounded-lg border border-zinc-400 px-4 py-2 shadow-lg active:scale-95 active:opacity-50 dark:border-zinc-700"
+            >
+              <NonThemedView className="flex flex-row justify-evenly">
+                <NonThemedView className="my-auto">
+                  <MonsterImage
+                    monsterSpecies={target.creatureSpecies}
+                    widthOverride={60}
+                    heightOverride={60}
+                  />
+                </NonThemedView>
+                <NonThemedView className="my-auto flex w-1/2">
+                  <NonThemedView className="">
+                    <Text className="text-center">
+                      {toTitleCase(target.creatureSpecies)}
+                    </Text>
+                    <ProgressBar
+                      filledColor="#ef4444"
+                      unfilledColor="#fee2e2"
+                      value={target.health}
+                      maxValue={target.healthMax}
+                      displayNumber={false}
+                    />
+                  </NonThemedView>
+                </NonThemedView>
+              </NonThemedView>
+            </Pressable>
+          ))}
+        </View>
+      );
+    }
+  }
+
   while (!monsterState) {
     return (
       <View className="flex-1 px-4 pt-4">
@@ -779,6 +921,7 @@ const DungeonLevelScreen = observer(() => {
               useSpell={useSpell}
               pass={pass}
               attackAnimationOnGoing={attackAnimationOnGoing}
+              setShowTargetSelection={setShowTargetSelection}
             />
           </View>
           <View className="">
@@ -828,7 +971,7 @@ const DungeonLevelScreen = observer(() => {
             </View>
             {playerState.minions.length > 0
               ? playerState.minions.map((minion) => (
-                  <View key={minion.creatureID} className="py-1">
+                  <View key={minion.id} className="py-1">
                     <Text>{toTitleCase(minion.creatureSpecies)}</Text>
                     <ProgressBar
                       filledColor="#ef4444"
@@ -1163,65 +1306,124 @@ const DungeonLevelScreen = observer(() => {
             </NonThemedView>
           </View>
         </Modal>
+        <Modal
+          animationIn="slideInUp"
+          animationOut="fadeOut"
+          isVisible={showTargetSelection.showing}
+          onBackButtonPress={() =>
+            setShowTargetSelection({ showing: false, chosenAttack: null })
+          }
+          onBackdropPress={() =>
+            setShowTargetSelection({ showing: false, chosenAttack: null })
+          }
+        >
+          <View
+            className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
+            style={{
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              elevation: 1,
+              shadowOpacity: 0.25,
+              shadowRadius: 5,
+            }}
+          >
+            <Text className="text-center text-2xl">Choose Your Target</Text>
+            {targetSelectionRender()}
+          </View>
+        </Modal>
         <View className="flex-1 px-4 pt-4">
-          <NonThemedView className="flex h-1/3 flex-row justify-evenly">
-            <View className="flex w-2/5 flex-col items-center justify-center">
-              <Text className="text-3xl">
-                {toTitleCase(monsterState.creatureSpecies)}
-              </Text>
-              <ProgressBar
-                value={monsterState.health >= 0 ? monsterState.health : 0}
-                maxValue={monsterState.healthMax}
-                filledColor="#ef4444"
-                unfilledColor="#fee2e2"
-                displayNumber={false}
-                removeAtZero={true}
-              />
-              {showingMonsterHealthChange ? (
-                monsterHealthChangePopUp()
-              ) : (
-                <NonThemedView className="h-4" />
-              )}
-              <View className="mt-1">{monsterConditionRender()}</View>
-            </View>
-            <View className="my-auto">
-              <Animated.View
-                style={{
-                  transform: [
-                    { translateX: monsterAttackAnimationValue },
-                    {
-                      translateY: Animated.multiply(
-                        monsterAttackAnimationValue,
-                        -1.5,
-                      ),
-                    },
-                  ],
-                  opacity: monsterDamagedAnimationValue,
-                }}
-              >
-                <MonsterImage monsterSpecies={monsterState.creatureSpecies} />
-              </Animated.View>
-              <Animated.View
-                style={{
-                  transform: [{ translateY: monsterTextTranslateAnimation }],
-                  opacity: monsterTextFadeAnimation,
-                  position: "absolute",
-                  marginLeft: 48,
-                  marginTop: 48,
-                }}
-              >
-                {monsterTextString ? (
-                  <Text className="text-xl tracking-wide">
-                    *{toTitleCase(monsterTextString)}*
-                  </Text>
-                ) : null}
-              </Animated.View>
-              <View className="-mr-8">
-                <EnemyHealingAnimationBox
-                  showHealAnimationDummy={monsterHealDummy}
+          <NonThemedView className="flex h-[40%]">
+            <NonThemedView className="flex-1 flex-row justify-evenly">
+              <View className="flex w-2/5 flex-col items-center justify-center">
+                <Text className="text-3xl">
+                  {toTitleCase(monsterState.creatureSpecies)}
+                </Text>
+                <ProgressBar
+                  value={monsterState.health >= 0 ? monsterState.health : 0}
+                  maxValue={monsterState.healthMax}
+                  filledColor="#ef4444"
+                  unfilledColor="#fee2e2"
+                  displayNumber={false}
+                  removeAtZero={true}
                 />
+                {showingMonsterHealthChange ? (
+                  monsterHealthChangePopUp()
+                ) : (
+                  <NonThemedView className="h-4" />
+                )}
+                {monsterConditionRender()}
               </View>
-            </View>
+              <View className="my-auto">
+                <Animated.View
+                  style={{
+                    transform: [
+                      { translateX: monsterAttackAnimationValue },
+                      {
+                        translateY: Animated.multiply(
+                          monsterAttackAnimationValue,
+                          -1.5,
+                        ),
+                      },
+                    ],
+                    opacity: monsterDamagedAnimationValue,
+                  }}
+                >
+                  <MonsterImage monsterSpecies={monsterState.creatureSpecies} />
+                </Animated.View>
+                <Animated.View
+                  style={{
+                    transform: [{ translateY: monsterTextTranslateAnimation }],
+                    opacity: monsterTextFadeAnimation,
+                    position: "absolute",
+                    marginLeft: 48,
+                    marginTop: 48,
+                  }}
+                >
+                  {monsterTextString ? (
+                    <Text className="text-xl tracking-wide">
+                      *{toTitleCase(monsterTextString)}*
+                    </Text>
+                  ) : null}
+                </Animated.View>
+                <View className="-mr-8">
+                  <EnemyHealingAnimationBox
+                    showHealAnimationDummy={monsterHealDummy}
+                  />
+                </View>
+              </View>
+            </NonThemedView>
+            {monsterState.minions.length > 0 ? (
+              <NonThemedView className="mx-4">
+                <View style={styles.container}>
+                  <View style={styles.line} />
+                  <View style={styles.content}>
+                    <Text className="text-sm">Enemy Minions</Text>
+                  </View>
+                  <View style={styles.line} />
+                </View>
+                <View className="mx-4 flex flex-row flex-wrap">
+                  {monsterState.minions.map((minion) => (
+                    <View
+                      key={minion.id}
+                      className="flex-grow px-2 py-1"
+                      style={{ flexBasis: "50%" }}
+                    >
+                      <Text>{toTitleCase(minion.creatureSpecies)}</Text>
+                      <ProgressBar
+                        filledColor="#ef4444"
+                        unfilledColor="#fee2e2"
+                        value={minion.health}
+                        maxValue={minion.healthMax}
+                        displayNumber={false}
+                      />
+                    </View>
+                  ))}
+                </View>
+              </NonThemedView>
+            ) : null}
           </NonThemedView>
           {thisDungeon.stepsBeforeBoss !== 0 && !fightingBoss ? (
             <View className="-mt-7 flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
@@ -1261,6 +1463,7 @@ const DungeonLevelScreen = observer(() => {
                 useSpell={useSpell}
                 pass={pass}
                 attackAnimationOnGoing={attackAnimationOnGoing}
+                setShowTargetSelection={setShowTargetSelection}
               />
             </View>
             <View className="">
@@ -1322,7 +1525,7 @@ const DungeonLevelScreen = observer(() => {
               </View>
               {playerState.minions.length > 0
                 ? playerState.minions.map((minion) => (
-                    <View key={minion.creatureID} className="py-1">
+                    <View key={minion.id} className="py-1">
                       <Text>{toTitleCase(minion.creatureSpecies)}</Text>
                       <ProgressBar
                         filledColor="#ef4444"
@@ -1344,3 +1547,17 @@ const DungeonLevelScreen = observer(() => {
   }
 });
 export default DungeonLevelScreen;
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  content: {
+    marginHorizontal: 10,
+  },
+  line: {
+    flex: 1,
+    borderTopWidth: 1,
+    borderTopColor: "#ccc",
+  },
+});

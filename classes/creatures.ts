@@ -28,6 +28,7 @@ import mageBooks from "../assets/json/items/mageBooks.json";
 import { v4 as uuidv4 } from "uuid";
 import { Item } from "./item";
 import { action, makeObservable, observable } from "mobx";
+import summons from "../assets/json/summons.json";
 
 interface monsterInterface {
   id?: string;
@@ -99,6 +100,7 @@ export class Monster {
       damageHealth: action,
       damageSanity: action,
       addCondition: action,
+      conditionTicker: action,
       takeTurn: action,
       addMinion: action,
       getDrops: action,
@@ -132,20 +134,18 @@ export class Monster {
   public takeTurn(
     playerMaxHealth: number,
     playerDR: number,
-  ): {
-    attack:
-      | "stun"
-      | "miss"
-      | "pass"
-      | {
-          name: string;
-          damage: number;
-          heal?: number;
-          sanityDamage: number;
-          debuffs: Condition[] | null;
-        };
-    monsterHealth: number;
-  } {
+  ):
+    | "pass"
+    | "miss"
+    | "stun"
+    | {
+        name: string;
+        damage: number;
+        heal: number | undefined;
+        sanityDamage: number;
+        debuffs: Condition[] | null;
+        summons: string[] | null;
+      } {
     const stun = this.conditions.find((condition) => condition.name == "stun");
     if (!stun) {
       const accuracy_halved = this.conditions.find((condition) => {
@@ -153,26 +153,17 @@ export class Monster {
       });
       if (accuracy_halved) {
         const res = flipCoin();
-        this.conditionTicker();
         if (res == "Heads") {
-          return {
-            attack: this.attack(playerMaxHealth, playerDR),
-            monsterHealth: this.health,
-          };
-        } else return { attack: "miss", monsterHealth: this.health };
+          return this.attack(playerMaxHealth, playerDR);
+        } else return "miss";
       }
-      this.conditionTicker();
-      return {
-        attack: this.attack(playerMaxHealth, playerDR),
-        monsterHealth: this.health,
-      };
+      return this.attack(playerMaxHealth, playerDR);
     } else {
-      this.conditionTicker();
-      return { attack: "stun", monsterHealth: this.health };
+      return "stun";
     }
   }
 
-  private conditionTicker() {
+  public conditionTicker() {
     for (let i = this.conditions.length - 1; i >= 0; i--) {
       const { effect, damage, turns } = this.conditions[i].tick();
 
@@ -190,26 +181,68 @@ export class Monster {
     }
   }
 
-  private attack(playerMaxHealth: number, playerDR: number) {
+  private attack(
+    playerMaxHealth: number,
+    playerDR: number,
+  ):
+    | "pass"
+    | "miss"
+    | {
+        name: string;
+        damage: number;
+        heal: number | undefined;
+        sanityDamage: number;
+        debuffs: Condition[] | null;
+        summons: string[] | null;
+      } {
     const availableAttacks = attacks.filter(
       (attack) =>
         this.attacks.includes(attack.name) && this.energy >= attack.energyCost,
     );
     if (availableAttacks.length > 0) {
       const randomIndex = Math.floor(Math.random() * availableAttacks.length);
-      this.energy += this.energyRegen;
       const chosenAttack = availableAttacks[randomIndex];
-      const rollToHit = 20 - (chosenAttack.hitChance * 100) / 5;
+      if (chosenAttack.summons) {
+        chosenAttack.summons.forEach((summon) => {
+          const summonObj = summons.find(
+            (summonObj) => summonObj.name == summon,
+          );
+          if (summonObj) {
+            const newMinion = new Minion({
+              creatureSpecies: summonObj.name,
+              health: summonObj.health,
+              healthMax: summonObj.health,
+              attackPower: summonObj.attackPower,
+              attacks: summonObj.attacks,
+              turnsLeftAlive: summonObj.turns,
+            });
+            this.addMinion(newMinion);
+          } else {
+            throw new Error(`Failed to find ${summon} minion obj`);
+          }
+        });
+      }
+      let rollToHit: number;
+      if (chosenAttack.hitChance) {
+        rollToHit = 20 - (chosenAttack.hitChance * 100) / 5;
+      } else {
+        rollToHit = 0;
+      }
       const roll = rollD20();
-      const damage =
-        Math.round(
-          chosenAttack.damageMult * this.attackPower * (1 - playerDR) * 4,
-        ) / 4;
+      let damage: number = 0;
+      if (chosenAttack.damageMult) {
+        damage =
+          Math.round(
+            chosenAttack.damageMult * this.attackPower * (1 - playerDR) * 4,
+          ) / 4;
+      } else if (chosenAttack.flatDamage) {
+        damage = chosenAttack.flatDamage;
+      }
       const sanityDamage = chosenAttack.sanityDamage;
       if (roll >= rollToHit) {
+        let debuffs: Condition[] = [];
+        let healedFor: number = 0;
         if (chosenAttack.debuffs) {
-          let debuffs: Condition[] = [];
-          let healedFor = 0;
           chosenAttack.debuffs.forEach((debuff) => {
             if (debuff.name == "lifesteal") {
               const roll = rollD20();
@@ -233,25 +266,22 @@ export class Monster {
               if (res) debuffs.push(res);
             }
           });
-          return {
-            name: chosenAttack.name,
-            damage: damage,
-            heal: healedFor > 0 ? healedFor : undefined,
-            sanityDamage: sanityDamage,
-            debuffs: debuffs,
-          };
         }
+        //let buffs: Condition[] = [];
+        //if (chosenAttack.buffs) {
+        //}
         return {
           name: chosenAttack.name,
           damage: damage,
+          heal: healedFor,
           sanityDamage: sanityDamage,
-          debuffs: null,
+          debuffs: debuffs.length > 0 ? debuffs : null,
+          summons: chosenAttack.summons,
         };
       } else {
         return "miss";
       }
     } else {
-      this.energy += this.energyRegen;
       return "pass";
     }
   }
@@ -260,6 +290,15 @@ export class Monster {
     this.minions.push(minion);
   }
 
+  public removeMinion(minionToRemove: Minion) {
+    let newList: Minion[] = [];
+    this.minions.forEach((minion) => {
+      if (!minion.equals(minionToRemove)) {
+        newList.push(minion);
+      }
+    });
+    this.minions = newList;
+  }
   //---------------------------Misc---------------------------//
   public getDrops(playerClass: "necromancer" | "paladin" | "mage") {
     const monsterObj = monsters.find(
@@ -340,48 +379,98 @@ export class Monster {
 
 interface minionOptions {
   creatureSpecies: string;
-  creatureID?: string;
+  id?: string;
   health: number;
   healthMax: number;
+  sanity?: number;
   attackPower: number;
   attacks: string[];
   turnsLeftAlive: number;
+  conditions?: Condition[];
 }
 
 export class Minion {
   readonly creatureSpecies: string;
-  readonly creatureID: string;
+  readonly id: string;
   health: number;
   readonly healthMax: number;
+  sanity: number | null;
   readonly attackPower: number;
   readonly attacks: string[];
   turnsLeftAlive: number;
+  conditions: Condition[];
 
   constructor({
     creatureSpecies,
-    creatureID,
+    id,
     health,
     healthMax,
+    sanity,
     attackPower,
     attacks,
     turnsLeftAlive,
+    conditions,
   }: minionOptions) {
     this.creatureSpecies = creatureSpecies;
-    this.creatureID = creatureID ?? uuidv4();
+    this.id = id ?? uuidv4();
     this.health = health;
     this.healthMax = healthMax;
+    this.sanity = sanity ?? null;
     this.attackPower = attackPower;
     this.attacks = attacks;
     this.turnsLeftAlive = turnsLeftAlive;
+    this.conditions = conditions ?? [];
     makeObservable(this, {
       health: observable,
       turnsLeftAlive: observable,
+      sanity: observable,
+      conditions: observable,
+      damageHealth: action,
+      damageSanity: action,
+      addCondition: action,
+      conditionTicker: action,
       attack: action,
     });
   }
 
   public equals(minion: Minion) {
-    return this.creatureID == minion.creatureID;
+    return this.id == minion.id;
+  }
+  //---------------------------Health---------------------------//
+  public damageHealth(damage: number | null) {
+    this.health -= damage ?? 0;
+    return this.health;
+  }
+  //---------------------------Sanity---------------------------//
+  public damageSanity(damage: number | null) {
+    if (this.sanity) {
+      this.sanity -= damage ?? 0;
+      return this.sanity;
+    }
+  }
+  //---------------------------Battle---------------------------//
+  public addCondition(condition: Condition | null) {
+    if (condition) {
+      this.conditions.push(condition);
+    }
+  }
+
+  public conditionTicker() {
+    for (let i = this.conditions.length - 1; i >= 0; i--) {
+      const { effect, damage, turns } = this.conditions[i].tick();
+
+      effect.forEach((eff) => {
+        if (eff == "sanity") {
+          this.damageSanity(damage);
+        } else if (eff == "damage") {
+          this.damageHealth(damage);
+        }
+      });
+
+      if (turns == 0) {
+        this.conditions.splice(i, 1);
+      }
+    }
   }
 
   public attack(enemyMaxHP: number, playerDR?: number) {
@@ -391,12 +480,25 @@ export class Minion {
         this.attacks[Math.floor(Math.random() * this.attacks.length)];
       const attackObj = attacks.find((attack) => attack.name == attackString);
       if (!attackObj) throw new Error("attack missing!");
-      const rollToHit = 20 - (attackObj.hitChance * 100) / 5;
+      let rollToHit: number;
+      if (attackObj.hitChance) {
+        rollToHit = 20 - (attackObj.hitChance * 100) / 5;
+      } else {
+        rollToHit = 0;
+      }
       const roll = rollD20();
-      const damage =
-        Math.round(
-          attackObj.damageMult * this.attackPower * (1 - (playerDR ?? 0)) * 4,
-        ) / 4;
+      let damage: number = 0;
+      if (attackObj.damageMult) {
+        damage =
+          Math.round(
+            attackObj.damageMult *
+              this.attackPower *
+              (1 - (playerDR ? playerDR : 0)) *
+              4,
+          ) / 4;
+      } else if (attackObj.flatDamage) {
+        damage = attackObj.flatDamage;
+      }
       const sanityDamage = attackObj.sanityDamage;
       if (roll >= rollToHit) {
         if (attackObj.debuffs) {
@@ -444,11 +546,14 @@ export class Minion {
   public static fromJSON(json: any): Minion {
     return new Minion({
       creatureSpecies: json.creatureSpecies,
+      id: json.id,
       health: json.health,
       healthMax: json.healthMax,
+      sanity: json.sanity,
       attackPower: json.attackPower,
       attacks: json.attacks,
       turnsLeftAlive: json.turnsLeftAlive,
+      conditions: json.conditions,
     });
   }
 }
