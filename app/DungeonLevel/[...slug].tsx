@@ -75,7 +75,8 @@ const DungeonLevelScreen = observer(() => {
   const [showTargetSelection, setShowTargetSelection] = useState<{
     showing: boolean;
     chosenAttack: any;
-  }>({ showing: false, chosenAttack: null });
+    spell: boolean | null;
+  }>({ showing: false, chosenAttack: null, spell: null });
 
   const [monsterHealthRecord, setMonsterHealthRecord] = useState<
     number | undefined
@@ -322,9 +323,6 @@ const DungeonLevelScreen = observer(() => {
         );
         setMonsterTextString(enemyAttackRes);
         setMonsterTextDummy((prev) => prev + 1);
-        setTimeout(() => {
-          setAttackAnimationOnGoing(false);
-        }, 500);
       } else {
         battleLogger(
           `The ${toTitleCase(monsterState.creatureSpecies)} ${
@@ -338,9 +336,6 @@ const DungeonLevelScreen = observer(() => {
           () => {
             setMonsterTextString(enemyAttackRes as "miss" | "stun");
             setMonsterTextDummy((prev) => prev + 1);
-            setTimeout(() => {
-              setAttackAnimationOnGoing(false);
-            }, 500);
           },
           enemyAttackRes == "miss" ? 500 : 0,
         );
@@ -349,6 +344,9 @@ const DungeonLevelScreen = observer(() => {
       if (monsterState.minions.length > 0) {
         enemyMinionsTurn(monsterState.minions);
       }
+      setTimeout(() => {
+        setAttackAnimationOnGoing(false);
+      }, 500);
     }
   };
 
@@ -397,7 +395,7 @@ const DungeonLevelScreen = observer(() => {
       }[] = Array.from(simplifiedConditionsMap.values());
 
       return (
-        <NonThemedView className="h-8">
+        <NonThemedView className="flex h-8 flex-row">
           {simplifiedConditions.map((cond) => (
             <View key={cond.name} className="mx-2 flex align-middle">
               <NonThemedView className="mx-auto rounded-md bg-zinc-200 dark:bg-zinc-600">
@@ -642,7 +640,6 @@ const DungeonLevelScreen = observer(() => {
   };
 
   //------------minion functions------------//
-
   function playerMinionsTurn(
     suppliedMinions: Minion[],
     startOfTurnMonsterID: string,
@@ -695,29 +692,31 @@ const DungeonLevelScreen = observer(() => {
     if (monsterState && playerState) {
       for (let i = 0; i < suppliedMinions.length; i++) {
         setTimeout(() => {
-          const res = suppliedMinions[i].attack(monsterState.healthMax);
+          const res = suppliedMinions[i].attack(playerState.healthMax);
           if (res == "miss") {
             battleLogger(
-              `${monsterState.creatureSpecies}'s ${toTitleCase(
+              `${toTitleCase(monsterState.creatureSpecies)}'s ${toTitleCase(
                 suppliedMinions[i].creatureSpecies,
               )} missed!`,
             );
           } else {
-            let str = `${monsterState.creatureSpecies}'s ${toTitleCase(
+            let str = `${toTitleCase(
+              monsterState.creatureSpecies,
+            )}'s ${toTitleCase(
               suppliedMinions[i].creatureSpecies,
             )} used ${toTitleCase(res.name)} dealing ${res.damage} damage`;
-            monsterState.damageHealth(res.damage);
+            playerState.damageHealth(res.damage);
             if (res.heal && res.heal > 0) {
               str += ` and healed for ${res.heal} damage`;
             }
             if (res.sanityDamage > 0) {
               str += ` and ${res.sanityDamage} sanity damage`;
-              monsterState.damageSanity(res.sanityDamage);
+              playerState.damageSanity(res.sanityDamage);
             }
             if (res.debuffs) {
               res.debuffs.forEach((effect) => {
                 str += ` and applied a ${effect.name} stack`;
-                monsterState.addCondition(effect);
+                playerState.addCondition(effect);
               });
             }
             battleLogger(str);
@@ -860,9 +859,20 @@ const DungeonLevelScreen = observer(() => {
           {targets.map((target) => (
             <Pressable
               key={target.id}
-              onPress={() =>
-                useAttack(showTargetSelection.chosenAttack, target)
-              }
+              onPress={() => {
+                const attack = { ...showTargetSelection.chosenAttack };
+                const spell = showTargetSelection.spell;
+                setShowTargetSelection({
+                  showing: false,
+                  chosenAttack: null,
+                  spell: null,
+                });
+                if (spell) {
+                  useSpell(attack, target);
+                } else {
+                  useAttack(attack, target);
+                }
+              }}
               className="m-4 rounded-lg border border-zinc-400 px-4 py-2 shadow-lg active:scale-95 active:opacity-50 dark:border-zinc-700"
             >
               <NonThemedView className="flex flex-row justify-evenly">
@@ -1356,10 +1366,18 @@ const DungeonLevelScreen = observer(() => {
           animationOut="fadeOut"
           isVisible={showTargetSelection.showing}
           onBackButtonPress={() =>
-            setShowTargetSelection({ showing: false, chosenAttack: null })
+            setShowTargetSelection({
+              showing: false,
+              chosenAttack: null,
+              spell: null,
+            })
           }
           onBackdropPress={() =>
-            setShowTargetSelection({ showing: false, chosenAttack: null })
+            setShowTargetSelection({
+              showing: false,
+              chosenAttack: null,
+              spell: null,
+            })
           }
         >
           <View

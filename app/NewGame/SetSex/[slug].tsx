@@ -218,7 +218,7 @@ export default function SetSex() {
         </View>
       </Modal>
       <View className="flex-1">
-        <Text className="pt-8 text-center text-2xl">
+        <Text className="pt-12 text-center text-2xl">
           Set the sex of your{" "}
           <Text style={{ color: accent }}>{toTitleCase(slug as string)}</Text>
         </Text>

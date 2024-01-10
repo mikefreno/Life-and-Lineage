@@ -41,6 +41,10 @@ const LaborScreen = observer(() => {
   }, [showLaborTutorial]);
 
   useEffect(() => {
+    setTutorialState(gameState?.tutorialsEnabled ?? true);
+  }, [gameState?.tutorialsEnabled]);
+
+  useEffect(() => {
     if (gameState) {
       if (tutorialState == false) {
         gameState.disableTutorials();

@@ -36,6 +36,10 @@ const SpellsScreen = observer(() => {
   }, [playerState?.knownSpells]);
 
   useEffect(() => {
+    setTutorialState(gameState?.tutorialsEnabled ?? true);
+  }, [gameState?.tutorialsEnabled]);
+
+  useEffect(() => {
     if (!showSpellTutorial && gameState) {
       gameState.updateTutorialState("spell", true);
     }

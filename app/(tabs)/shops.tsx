@@ -38,6 +38,10 @@ export default function ShopsScreen() {
     }
   }, [showShopTutorial]);
 
+  useEffect(() => {
+    setTutorialState(gameState?.tutorialsEnabled ?? true);
+  }, [gameState?.tutorialsEnabled]);
+
   if (gameState) {
     const shops = gameState.shops;
 

@@ -62,6 +62,10 @@ export default function DungeonScreen() {
     }
   }, [showDungeonTutorial]);
 
+  useEffect(() => {
+    setTutorialState(gameState?.tutorialsEnabled ?? true);
+  }, [gameState?.tutorialsEnabled]);
+
   useEffect(() => setDungeonDepth(gameState?.furthestDepth), [gameState]);
 
   useEffect(() => {

@@ -77,6 +77,10 @@ const HomeScreen = observer(() => {
   }, [showIntroTutorial]);
 
   useEffect(() => {
+    setTutorialState(gameState?.tutorialsEnabled ?? true);
+  }, [gameState?.tutorialsEnabled]);
+
+  useEffect(() => {
     if (showingInventory) {
       setStatsTopPos((prev) => (prev ? prev - 64 : undefined));
     } else {

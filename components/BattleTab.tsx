@@ -49,6 +49,7 @@ interface BattleTabProps {
     React.SetStateAction<{
       showing: boolean;
       chosenAttack: any;
+      spell: boolean | null;
     }>
   >;
 }
@@ -146,6 +147,7 @@ export default function BattleTab({
                           setShowTargetSelection({
                             showing: true,
                             chosenAttack: attack,
+                            spell: false,
                           });
                         }
                       }}
@@ -203,6 +205,7 @@ export default function BattleTab({
                         setShowTargetSelection({
                           showing: true,
                           chosenAttack: spell,
+                          spell: true,
                         });
                       }
                     }}

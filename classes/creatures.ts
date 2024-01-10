@@ -103,6 +103,7 @@ export class Monster {
       conditionTicker: action,
       takeTurn: action,
       addMinion: action,
+      removeMinion: action,
       getDrops: action,
       equals: action,
     });
