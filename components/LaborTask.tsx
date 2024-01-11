@@ -84,7 +84,7 @@ const LaborTask = observer(
             width: 3,
             height: 1,
           },
-          elevation: 1,
+          elevation: 3,
           backgroundColor: colorScheme == "light" ? "#fafafa" : "#27272a",
           shadowOpacity: 0.2,
           shadowRadius: 3,

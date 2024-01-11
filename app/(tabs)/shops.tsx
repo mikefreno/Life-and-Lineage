@@ -59,6 +59,7 @@ export default function ShopsScreen() {
               width: 2,
               height: 3,
             },
+            elevation: 4,
             backgroundColor: shopObjects.find(
               (shopObj) => shopObj.type == shop.archetype,
             )?.colors.lightbackground,

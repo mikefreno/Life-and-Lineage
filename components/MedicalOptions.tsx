@@ -55,7 +55,7 @@ export default function MedicalOption({
           width: 3,
           height: 1,
         },
-        elevation: 1,
+        elevation: 3,
         shadowOpacity: 0.2,
         backgroundColor: colorScheme == "light" ? "#fafafa" : "#27272a",
         shadowRadius: 3,

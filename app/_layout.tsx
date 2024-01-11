@@ -13,9 +13,12 @@ import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Monster } from "../classes/creatures";
 import { fullSave, loadGame, loadPlayer } from "../utility/functions";
-import { View, Text } from "react-native";
+import { View, Text, Platform } from "react-native";
 import { autorun } from "mobx";
 import "../assets/styles/globals.css";
+import * as NavigationBar from "expo-navigation-bar";
+import { StatusBar } from "expo-status-bar";
+import { usePathname } from "expo-router";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -138,6 +141,7 @@ const RootLayout = observer(() => {
   const playerCharacter = playerCharacterData?.playerState;
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (error) throw error;
@@ -169,8 +173,33 @@ const RootLayout = observer(() => {
     }
   }, [loaded, gameData, playerCharacter]);
 
+  useEffect(() => {
+    getAndSetNavBar();
+  }, [pathname, colorScheme]);
+
+  async function getAndSetNavBar() {
+    if (Platform.OS == "android") {
+      if ((await NavigationBar.getVisibilityAsync()) == "visible") {
+        let dungeonPath = false;
+        if (pathname.split("/").length > 0) {
+          dungeonPath = pathname.split("/")[1] == "DungeonLevel";
+        }
+        NavigationBar.setBackgroundColorAsync(
+          colorScheme == "light"
+            ? dungeonPath
+              ? "#fafafa"
+              : "white"
+            : dungeonPath
+            ? "#18181b"
+            : "#121212",
+        );
+      }
+    }
+  }
+
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <StatusBar style={colorScheme == "light" ? "dark" : "light"} />
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="Options" options={{ presentation: "modal" }} />
