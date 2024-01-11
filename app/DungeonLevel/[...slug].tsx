@@ -1162,56 +1162,72 @@ const DungeonLevelScreen = observer(() => {
           </View>
         </Modal>
         {Platform.OS == "ios" ? (
-          <NativeModal
-            animationType="slide"
-            transparent={true}
-            visible={fleeModalShowing}
-            onRequestClose={() => setFleeModalShowing(false)}
-          >
-            <NonThemedView className="flex-1 items-center justify-center">
-              <View
-                className="w-2/3 rounded-xl bg-zinc-50 px-6 py-4 dark:border dark:border-zinc-50 dark:bg-zinc-700"
-                style={{
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 2,
-                  },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 5,
-                }}
+          <NonThemedView>
+            <NativeModal
+              animationType="slide"
+              transparent={true}
+              visible={fleeModalShowing}
+              onRequestClose={() => setFleeModalShowing(false)}
+            >
+              <Pressable
+                onPress={() => setFleeModalShowing(false)}
+                className="-mt-[100vh] h-[200vh] w-screen items-center justify-center bg-[rgba(0,0,0,.2)]"
               >
                 <Pressable
-                  className="-ml-2 -mt-2"
-                  onPress={() => {
-                    setFleeModalShowing(false);
-                    setFleeRollFailure(false);
-                  }}
+                  onPress={(e) => e.stopPropagation()}
+                  className="mt-[100vh] w-full py-4"
                 >
-                  <EvilIcons
-                    name="close"
-                    size={28}
-                    color={colorScheme == "dark" ? "#fafafa" : "#18181b"}
-                  />
-                </Pressable>
-                <View className="flex items-center justify-evenly">
-                  <Text className="text-center text-lg">Attempt to Flee?</Text>
-                  <Pressable
-                    disabled={attackAnimationOnGoing}
-                    onPress={flee}
-                    className="mb-4 mt-8 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+                  <View
+                    className="mx-auto w-2/3 rounded-xl bg-zinc-50 px-6 py-4 dark:border dark:border-zinc-50 dark:bg-zinc-700"
+                    style={{
+                      shadowColor: "#000",
+                      shadowOffset: {
+                        width: 0,
+                        height: 2,
+                      },
+                      shadowOpacity: 0.25,
+                      shadowRadius: 5,
+                    }}
                   >
-                    <Text className="text-lg">Run!</Text>
-                  </Pressable>
-                  {fleeRollFailure ? (
-                    <Text className="text-center" style={{ color: "#ef4444" }}>
-                      Roll Failure!
-                    </Text>
-                  ) : null}
-                </View>
-              </View>
-            </NonThemedView>
-          </NativeModal>
+                    <Pressable
+                      className="mx-auto -ml-2"
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        setFleeModalShowing(false);
+                        setFleeRollFailure(false);
+                      }}
+                    >
+                      <EvilIcons
+                        name="close"
+                        size={28}
+                        color={colorScheme == "dark" ? "#fafafa" : "#18181b"}
+                      />
+                    </Pressable>
+                    <View className="flex items-center justify-evenly">
+                      <Text className="text-center text-lg">
+                        Attempt to Flee?
+                      </Text>
+                      <Pressable
+                        disabled={attackAnimationOnGoing}
+                        onPress={flee}
+                        className="mb-4 mt-8 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+                      >
+                        <Text className="text-lg">Run!</Text>
+                      </Pressable>
+                      {fleeRollFailure ? (
+                        <Text
+                          className="text-center"
+                          style={{ color: "#ef4444" }}
+                        >
+                          Roll Failure!
+                        </Text>
+                      ) : null}
+                    </View>
+                  </View>
+                </Pressable>
+              </Pressable>
+            </NativeModal>
+          </NonThemedView>
         ) : (
           <Modal
             animationIn="slideInUp"
