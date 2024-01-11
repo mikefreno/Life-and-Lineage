@@ -158,32 +158,32 @@
         "description": "Deep in the earth, the rhythmic beat of picks against stone echoes out as miners unearth veins of precious iron, indispensable for smiths and warriors.",
         "cost": 125000,
         "turnsPerReturn": 10,
-        "goldReturnRange": {"min": 1000, "max": 2500},
+        "goldReturnRange": {"min": 1000, "max": 3000},
         "maxGoldStockPile": 10000,
         "upgrades": [
             {
-                "name": "Steel Tools",
+                "name": "Enchanted Steel Tools",
                 "cost": 25000,
-                "description":"Invest in steel tools to increase workers' efficiency. Increases gold returns.",
+                "description":"Invest in tools to increase workers' efficiency. Increases gold returns.",
                 "effect": {"goldMinimumIncrease": 500, "goldMaximumIncrease": 500} 
             },
             {
                 "name": "Cart System",
                 "cost": 50000,
                 "description":"Install a cart system for more efficient transport of ore. Increases gold returns and max stockpile size.",
-                "effect": {"goldMinimumIncrease": 250, "goldMaximumIncrease": 750, "maxGoldStockPileIncrease": 2000}
+                "effect": {"goldMinimumIncrease": 250, "goldMaximumIncrease": 750, "maxGoldStockPileIncrease": 5000}
             },
             {
                 "name": "Miner's Training",
                 "cost": 75000,
-                "description":"Provide advanced training for miners to improve their work. Increases minimum gold returns.",
-                "effect": {"goldMinimumIncrease": 1000}
+                "description":"Provide advanced training for miners to improve their work. Increases gold returns.",
+                "effect": {"goldMinimumIncrease": 750, "goldMaximumIncrease": 750}
             },
             {
                 "name": "Improved Mining Techniques",
                 "cost": 100000,
                 "description":"Adopt and implement breakthrough mining techniques. Increases gold returns.",
-                "effect": {"goldMinimumIncrease": 500, "goldMaximumIncrease": 1000}
+                "effect": {"goldMinimumIncrease": 500, "goldMaximumIncrease": 1250}
             },
             {
                 "name": "Ward Against Cave-Ins",
@@ -192,16 +192,68 @@
                 "effect": {"turnsPerRollChange": -2, "goldMinimumIncrease": 750, "goldMaximumIncrease": 1250}    
             },
             {
+                "name": "Profit Sharing",
+                "cost": 200000,
+                "excludes": "Indentured Servitude",
+                "description": "Hire a lawyer to draft a plan to share part of the profits with top employees as an incentive. Increases minimum gold returns.",
+                "effect": {"goldMinimumIncrease": 2000}
+            },
+            {
                 "name": "Indentured Servitude",
                 "cost": 200000,
-                "description":"Bribe nearby city officials for access to their criminal population, its a win-win if you don't consider morality, but that's what the gold is for. Increases gold returns",
+                "excludes": "Profit Sharing",
+                "description":"Bribe nearby city officials for access to their criminal population, its a win-win if you don't consider morality, but that's what the gold is for. Dramatically increases gold returns at the cost of sanity",
                 "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 2500, "permanentlyDecreaseMaxSanity": 5}    
             }
         ]
     },
     {
         "name": "Monster Breeding Ranch",
-        "description": "Here, creatures of nightmare and wonder are reared. Some are bred for their power in battle, others for exotic pets. All fetch a fair price on the market."
+        "description": "Here, creatures of nightmare and wonder are reared. Some are bred for their power in battle, others for exotic pets. All fetch a fair price on the market.",
+        "cost": 200000,
+        "turnsPerReturn": 15,
+        "goldReturnRange": {"min": 2000, "max": 6000},
+        "maxGoldStockPile": 15000,
+        "upgrades": [
+            {
+                "name": "Nest Mimicry",
+                "description": "Replicate the natural habitats of different creatures to boost their growth and health. Increases gold returns.",
+                "cost": 30000,
+                "effect": {"goldMinimumIncrease": 200, "goldMaximumIncrease": 600}
+            },
+            {
+                "name": "Black Market Sales",
+                "cost": 75000,
+                "excludes": "Ethical Breeding",
+                "description":"Sell to disreputable buyers. Increases gold returns dramatically but decreases sanity.",
+                "effect": {"goldMinimumIncrease": 2000, "goldMaximumIncrease": 3000, "permanentlyDecreaseMaxSanity": 5}
+            },
+            {
+                "name": "Ethical Breeding",
+                "cost": 75000,
+                "excludes": "Black Market Sales",
+                "description":"Only breed and sell non-dangerous creatures. Less gold but maintains peace of mind.",
+                "effect": {"goldMinimumIncrease": 1000, "goldMaximumIncrease": 2000}
+            },
+            {
+                "name": "Magical Supplements",
+                "description": "Feed beasts nutrient-rich, magic-infused feed to promote growth. Shortens time to market.",
+                "cost": 100000,
+                "effect": {"turnsPerRollChange": -5 }
+            },
+            {
+                "name": "Enchanted Enclosures",
+                "description": "Enhance the creatures' environments with magic to stimulate faster and more significant growth. Shortens time to market, increases gold returns, and max stockpile size.",
+                "cost": 200000,
+                "effect": {"turnsPerRollChange": -2, "goldMinimumIncrease": 1500,"goldMaximumIncrease": 3000, "maxGoldStockPileIncrease": 5000}
+            },
+            {
+                "name": "Extended Territory",
+                "description": "Increase the ranch size, accommodating a larger variety of monsters. Increases gold returns and max stockpile size.",
+                "cost": 225000,
+                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 3500, "maxGoldStockPileIncrease": 10000}
+            }
+        ]
     },
     {
         "name": "Crystal Mine",
