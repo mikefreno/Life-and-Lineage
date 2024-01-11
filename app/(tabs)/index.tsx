@@ -4,6 +4,7 @@ import {
   View as NonThemedView,
   Animated,
   Switch,
+  Platform,
 } from "react-native";
 import { View, Text } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
@@ -42,6 +43,7 @@ const HomeScreen = observer(() => {
   const mainHandTarget = useRef<NonThemedView>(null);
   const offHandTarget = useRef<NonThemedView>(null);
   const inventoryTarget = useRef<NonThemedView>(null);
+  const bagTarget = useRef<NonThemedView>(null);
 
   if (!playerStateData || !gameData) throw new Error("missing contexts");
   const { playerState } = playerStateData;
@@ -125,7 +127,11 @@ const HomeScreen = observer(() => {
     if (item && item.slot) {
       let refs: React.RefObject<NonThemedView>[] = [];
       if (equipped) {
-        refs.push(inventoryTarget);
+        if (showingInventory) {
+          refs.push(inventoryTarget);
+        } else {
+          refs.push(bagTarget);
+        }
       } else {
         switch (item.slot) {
           case "head":
@@ -195,7 +201,7 @@ const HomeScreen = observer(() => {
                 }}
                 onDrag={() => {
                   if (!buzzed) {
-                    vibration({ style: "heavy", essential: true });
+                    vibration({ style: "medium", essential: true });
                     setBuzzed(true);
                   }
                 }}
@@ -255,7 +261,7 @@ const HomeScreen = observer(() => {
                   }}
                   onDrag={() => {
                     if (!buzzed) {
-                      vibration({ style: "heavy", essential: true });
+                      vibration({ style: "medium", essential: true });
                       setBuzzed(true);
                     }
                   }}
@@ -313,7 +319,7 @@ const HomeScreen = observer(() => {
                   }}
                   onDrag={() => {
                     if (!buzzed) {
-                      vibration({ style: "heavy", essential: true });
+                      vibration({ style: "medium", essential: true });
                       setBuzzed(true);
                     }
                   }}
@@ -385,7 +391,7 @@ const HomeScreen = observer(() => {
                 }}
                 onDrag={() => {
                   if (!buzzed) {
-                    vibration({ style: "heavy", essential: true });
+                    vibration({ style: "medium", essential: true });
                     setBuzzed(true);
                   }
                 }}
@@ -465,7 +471,7 @@ const HomeScreen = observer(() => {
         }}
         onDrag={() => {
           if (!buzzed) {
-            vibration({ style: "heavy", essential: true });
+            vibration({ style: "medium", essential: true });
             setBuzzed(true);
           }
         }}
@@ -674,12 +680,10 @@ const HomeScreen = observer(() => {
                 {currentEquipmentDisplay()}
               </View>
               <NonThemedView className="flex flex-row justify-between">
-                <NonThemedView
-                  className="py-2"
-                  ref={!showingInventory ? inventoryTarget : undefined}
-                >
+                <NonThemedView className="py-2">
                   <Pressable
-                    style={{ width: 55 }}
+                    ref={bagTarget}
+                    style={{ width: 60, height: 60 }}
                     onPress={() => {
                       vibration({ style: "light" });
                       setShowingInventory(!showingInventory);
