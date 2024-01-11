@@ -71,7 +71,7 @@ const Root = observer(() => {
   const [monsterState, setMonster] = useState<Monster | null>(null);
   const [logsState, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const { setColorScheme } = useColorScheme();
+  const { setColorScheme, colorScheme } = useColorScheme();
 
   const getData = async () => {
     try {
@@ -95,7 +95,7 @@ const Root = observer(() => {
     if (gameState) {
       setColorScheme(gameState.colorScheme);
     }
-  }, [gameState?.colorScheme]);
+  }, [gameState?.colorScheme, colorScheme]);
 
   useEffect(() => {
     getData();
