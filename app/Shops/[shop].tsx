@@ -303,10 +303,13 @@ const ShopInteriorScreen = observer(() => {
         />
         <Modal
           animationIn="slideInUp"
-          animationOut="fadeOut"
-          isVisible={showShopInteriorTutorial && gameState?.tutorialsEnabled}
+          animationOut="slideOutDown"
           backdropOpacity={0.2}
           animationInTiming={500}
+          animationOutTiming={300}
+          isVisible={
+            showShopInteriorTutorial && gameState?.tutorialsEnabled && isFocused
+          }
           onBackdropPress={() => setShowShopInteriorTutorial(false)}
           onBackButtonPress={() => setShowShopInteriorTutorial(false)}
         >

@@ -16,6 +16,7 @@ import { useVibration } from "../../utility/customHooks";
 import Modal from "react-native-modal/dist/modal";
 import { Entypo } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function ShopsScreen() {
   const gameData = useContext(GameContext);
@@ -31,6 +32,7 @@ export default function ShopsScreen() {
   );
 
   const [tutorialStep, setTutorialStep] = useState<number>(1);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     if (!showShopTutorial && gameState) {
@@ -138,10 +140,13 @@ export default function ShopsScreen() {
       <>
         <Modal
           animationIn="slideInUp"
-          animationOut="fadeOut"
-          isVisible={showShopTutorial && gameState?.tutorialsEnabled}
+          animationOut="slideOutDown"
           backdropOpacity={0.2}
           animationInTiming={500}
+          animationOutTiming={300}
+          isVisible={
+            showShopTutorial && gameState?.tutorialsEnabled && isFocused
+          }
           onBackdropPress={() => setShowShopTutorial(false)}
           onBackButtonPress={() => setShowShopTutorial(false)}
         >

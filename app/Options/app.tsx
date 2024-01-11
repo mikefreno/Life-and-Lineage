@@ -67,15 +67,16 @@ export default function AppSettings() {
       <>
         <Modal
           animationIn="slideInUp"
-          animationOut="fadeOut"
-          isVisible={showTutorialResetConfirm}
+          animationOut="slideOutDown"
           backdropOpacity={0.2}
           animationInTiming={500}
+          animationOutTiming={300}
+          isVisible={showTutorialResetConfirm}
           onBackdropPress={() => setShowTutorialResetConfirm(false)}
           onBackButtonPress={() => setShowTutorialResetConfirm(false)}
         >
           <View
-            className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
+            className="mx-auto w-5/6 rounded-xl px-6 py-4"
             style={{
               shadowColor: "#000",
               shadowOffset: {
@@ -96,6 +97,7 @@ export default function AppSettings() {
               <Pressable
                 onPress={() => {
                   gameState.resetTutorialState();
+                  gameState.enableTutorials();
                   setShowTutorialResetConfirm(false);
                   Updates.reloadAsync();
                 }}

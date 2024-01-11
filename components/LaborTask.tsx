@@ -13,7 +13,7 @@ import {
   PlayerCharacterContext,
 } from "../app/_layout";
 import { observer } from "mobx-react-lite";
-import { fullSave, numberToRoman } from "../utility/functions";
+import { numberToRoman } from "../utility/functions";
 import { useVibration } from "../utility/customHooks";
 
 interface LaborTaskProps {
@@ -72,7 +72,6 @@ const LaborTask = observer(
         setMonster(null);
         gameState.gameTick(playerState);
         setFullReward(playerState.getRewardValue(title, reward));
-        fullSave(gameState, playerState);
       }
     }
 

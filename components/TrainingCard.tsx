@@ -7,7 +7,7 @@ import Sanity from "../assets/icons/SanityIcon";
 import { Pressable, View } from "react-native";
 import { Text } from "../components/Themed";
 import ProgressBar from "./ProgressBar";
-import { fullSave, toTitleCase } from "../utility/functions";
+import { toTitleCase } from "../utility/functions";
 
 interface TrainingCardProps {
   name: string;
@@ -49,7 +49,6 @@ const TrainingCard = observer(
         goldCostPerTick,
       );
       gameState.gameTick(playerState);
-      fullSave(gameState, playerState);
     };
 
     return (

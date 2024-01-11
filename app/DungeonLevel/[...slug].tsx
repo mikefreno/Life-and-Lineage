@@ -3,6 +3,7 @@ import {
   Animated,
   Image,
   View as NonThemedView,
+  Platform,
   StyleSheet,
   Switch,
 } from "react-native";
@@ -11,7 +12,7 @@ import { MonsterImage } from "../../components/MonsterImage";
 import { Pressable, Modal as NativeModal } from "react-native";
 import { Stack, useLocalSearchParams, router } from "expo-router";
 import BattleTab from "../../components/BattleTab";
-import { flipCoin, fullSave, toTitleCase } from "../../utility/functions";
+import { flipCoin, toTitleCase } from "../../utility/functions";
 import { enemyGenerator } from "../../utility/monster";
 import PlayerStatus from "../../components/PlayerStatus";
 import ProgressBar from "../../components/ProgressBar";
@@ -613,10 +614,7 @@ const DungeonLevelScreen = observer(() => {
       ) {
         vibration({ style: "light" });
         setFleeRollFailure(false);
-        setTimeout(() => {
-          setFleeModalShowing(false);
-          gameState?.gameTick(playerState);
-        }, 100);
+        setFleeModalShowing(false);
         setTimeout(() => {
           playerState.clearMinions();
           while (router.canGoBack()) {
@@ -624,7 +622,6 @@ const DungeonLevelScreen = observer(() => {
           }
           router.replace("/dungeon");
           setMonster(null);
-          fullSave(gameState, playerState);
           playerState.setInDungeon({ state: false });
         }, 200);
       } else {
@@ -1033,7 +1030,10 @@ const DungeonLevelScreen = observer(() => {
                     name="run-fast"
                     size={28}
                     color={colorScheme == "light" ? "#18181b" : "#fafafa"}
-                    style={{ opacity: pressed ? 0.5 : 1 }}
+                    style={{
+                      opacity: pressed ? 0.5 : 1,
+                      marginRight: Platform.OS == "android" ? 8 : 0,
+                    }}
                   />
                 )}
               </Pressable>
@@ -1044,140 +1044,194 @@ const DungeonLevelScreen = observer(() => {
                 : `${toTitleCase(thisInstance?.name as string)} Level ${level}`,
           }}
         />
-        <NativeModal
-          animationType="slide"
-          transparent={true}
-          visible={showDungeonInteriorTutorial && gameState?.tutorialsEnabled}
-          onRequestClose={() => setShowDungeonInteriorTutorial(false)}
+        <Modal
+          animationIn="slideInUp"
+          animationOut="slideOutDown"
+          backdropOpacity={0.2}
+          animationInTiming={500}
+          animationOutTiming={300}
+          isVisible={showDungeonInteriorTutorial && gameState?.tutorialsEnabled}
+          onBackButtonPress={() => setShowDungeonInteriorTutorial(false)}
+          onBackdropPress={() => setShowDungeonInteriorTutorial(false)}
         >
-          <NonThemedView className="flex-1 items-center justify-center">
+          <View
+            className="mx-auto w-5/6 rounded-xl px-6 py-4"
+            style={{
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              elevation: 1,
+              shadowOpacity: 0.25,
+              shadowRadius: 5,
+            }}
+          >
             <View
-              className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
-              style={{
-                shadowColor: "#000",
-                shadowOffset: {
-                  width: 0,
-                  height: 2,
-                },
-
-                shadowOpacity: 0.25,
-                shadowRadius: 5,
-              }}
+              className={`flex flex-row ${
+                tutorialStep != 1 ? "justify-between" : "justify-end"
+              }`}
             >
-              <View
-                className={`flex flex-row ${
-                  tutorialStep != 1 ? "justify-between" : "justify-end"
-                }`}
-              >
-                {tutorialStep != 1 ? (
-                  <Pressable
-                    onPress={() => setTutorialStep((prev) => prev - 1)}
-                  >
-                    <Entypo
-                      name="chevron-left"
-                      size={24}
-                      color={colorScheme == "dark" ? "#f4f4f5" : "black"}
-                    />
-                  </Pressable>
-                ) : null}
-                <Text>{tutorialStep}/3</Text>
-              </View>
-              {tutorialStep == 1 ? (
-                <>
-                  <Text className="text-center text-2xl">
-                    Watch Your Health
-                  </Text>
-                  <Text className="my-4 text-center text-lg">
-                    Your situation can change rapidly.
-                  </Text>
-                  <View className="mx-auto flex flex-row">
-                    <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                    <Switch
-                      trackColor={{ false: "#767577", true: "#3b82f6" }}
-                      ios_backgroundColor="#3e3e3e"
-                      thumbColor={"white"}
-                      onValueChange={(bool) => setTutorialState(bool)}
-                      value={tutorialState}
-                    />
-                  </View>
-                  <Pressable
-                    onPress={() => setTutorialStep((prev) => prev + 1)}
-                    className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-                  >
-                    <Text>Next</Text>
-                  </Pressable>
-                </>
-              ) : tutorialStep == 2 ? (
-                <>
-                  <Text className="text-center text-xl">
-                    Advance by killing the boss.
-                  </Text>
-                  <Text className="my-4 text-center text-lg">
-                    The boss becomes availible after 10 monsters defeated for
-                    the first dungeon.
-                  </Text>
-                  <View className="mx-auto flex flex-row">
-                    <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                    <Switch
-                      trackColor={{ false: "#767577", true: "#3b82f6" }}
-                      ios_backgroundColor="#3e3e3e"
-                      thumbColor={"white"}
-                      onValueChange={(bool) => setTutorialState(bool)}
-                      value={tutorialState}
-                    />
-                  </View>
-                  <Pressable
-                    onPress={() => setTutorialStep((prev) => prev + 1)}
-                    className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-                  >
-                    <Text>Next</Text>
-                  </Pressable>
-                </>
-              ) : (
-                <>
-                  <Text className="text-center text-xl">Good Luck.</Text>
-                  <Text className="my-4 text-center text-lg">
-                    And remember fleeing (top left) can save you.
-                  </Text>
-                  <View className="mx-auto flex flex-row">
-                    <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                    <Switch
-                      trackColor={{ false: "#767577", true: "#3b82f6" }}
-                      ios_backgroundColor="#3e3e3e"
-                      thumbColor={"white"}
-                      onValueChange={(bool) => setTutorialState(bool)}
-                      value={tutorialState}
-                    />
-                  </View>
-                  <Pressable
-                    onPress={() => {
-                      vibration({ style: "light" });
-                      setShowDungeonInteriorTutorial(false);
-                    }}
-                    className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-                  >
-                    <Text>Close</Text>
-                  </Pressable>
-                </>
-              )}
+              {tutorialStep != 1 ? (
+                <Pressable onPress={() => setTutorialStep((prev) => prev - 1)}>
+                  <Entypo
+                    name="chevron-left"
+                    size={24}
+                    color={colorScheme == "dark" ? "#f4f4f5" : "black"}
+                  />
+                </Pressable>
+              ) : null}
+              <Text>{tutorialStep}/3</Text>
             </View>
-          </NonThemedView>
-        </NativeModal>
-        <NativeModal
-          animationType="slide"
-          transparent={true}
-          visible={fleeModalShowing}
-          onRequestClose={() => setFleeModalShowing(false)}
-        >
-          <NonThemedView className="flex-1 items-center justify-center">
+            {tutorialStep == 1 ? (
+              <>
+                <Text className="text-center text-2xl">Watch Your Health</Text>
+                <Text className="my-4 text-center text-lg">
+                  Your situation can change rapidly.
+                </Text>
+                <View className="mx-auto flex flex-row">
+                  <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                  <Switch
+                    trackColor={{ false: "#767577", true: "#3b82f6" }}
+                    ios_backgroundColor="#3e3e3e"
+                    thumbColor={"white"}
+                    onValueChange={(bool) => setTutorialState(bool)}
+                    value={tutorialState}
+                  />
+                </View>
+                <Pressable
+                  onPress={() => setTutorialStep((prev) => prev + 1)}
+                  className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                >
+                  <Text>Next</Text>
+                </Pressable>
+              </>
+            ) : tutorialStep == 2 ? (
+              <>
+                <Text className="text-center text-xl">
+                  Advance by killing the boss.
+                </Text>
+                <Text className="my-4 text-center text-lg">
+                  The boss becomes availible after 10 monsters defeated for the
+                  first dungeon.
+                </Text>
+                <View className="mx-auto flex flex-row">
+                  <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                  <Switch
+                    trackColor={{ false: "#767577", true: "#3b82f6" }}
+                    ios_backgroundColor="#3e3e3e"
+                    thumbColor={"white"}
+                    onValueChange={(bool) => setTutorialState(bool)}
+                    value={tutorialState}
+                  />
+                </View>
+                <Pressable
+                  onPress={() => setTutorialStep((prev) => prev + 1)}
+                  className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                >
+                  <Text>Next</Text>
+                </Pressable>
+              </>
+            ) : (
+              <>
+                <Text className="text-center text-xl">Good Luck.</Text>
+                <Text className="my-4 text-center text-lg">
+                  And remember fleeing (top left) can save you.
+                </Text>
+                <View className="mx-auto flex flex-row">
+                  <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+                  <Switch
+                    trackColor={{ false: "#767577", true: "#3b82f6" }}
+                    ios_backgroundColor="#3e3e3e"
+                    thumbColor={"white"}
+                    onValueChange={(bool) => setTutorialState(bool)}
+                    value={tutorialState}
+                  />
+                </View>
+                <Pressable
+                  onPress={() => {
+                    vibration({ style: "light" });
+                    setShowDungeonInteriorTutorial(false);
+                  }}
+                  className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                >
+                  <Text>Close</Text>
+                </Pressable>
+              </>
+            )}
+          </View>
+        </Modal>
+        {Platform.OS == "ios" ? (
+          <NativeModal
+            animationType="slide"
+            transparent={true}
+            visible={fleeModalShowing}
+            onRequestClose={() => setFleeModalShowing(false)}
+          >
+            <NonThemedView className="flex-1 items-center justify-center">
+              <View
+                className="w-2/3 rounded-xl bg-zinc-50 px-6 py-4 dark:border dark:border-zinc-50 dark:bg-zinc-700"
+                style={{
+                  shadowColor: "#000",
+                  shadowOffset: {
+                    width: 0,
+                    height: 2,
+                  },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 5,
+                }}
+              >
+                <Pressable
+                  className="-ml-2 -mt-2"
+                  onPress={() => {
+                    setFleeModalShowing(false);
+                    setFleeRollFailure(false);
+                  }}
+                >
+                  <EvilIcons
+                    name="close"
+                    size={28}
+                    color={colorScheme == "dark" ? "#fafafa" : "#18181b"}
+                  />
+                </Pressable>
+                <View className="flex items-center justify-evenly">
+                  <Text className="text-center text-lg">Attempt to Flee?</Text>
+                  <Pressable
+                    disabled={attackAnimationOnGoing}
+                    onPress={flee}
+                    className="mb-4 mt-8 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+                  >
+                    <Text className="text-lg">Run!</Text>
+                  </Pressable>
+                  {fleeRollFailure ? (
+                    <Text className="text-center" style={{ color: "#ef4444" }}>
+                      Roll Failure!
+                    </Text>
+                  ) : null}
+                </View>
+              </View>
+            </NonThemedView>
+          </NativeModal>
+        ) : (
+          <Modal
+            animationIn="slideInUp"
+            animationOut="slideOutDown"
+            backdropOpacity={0.2}
+            animationInTiming={500}
+            animationOutTiming={300}
+            isVisible={fleeModalShowing}
+            onBackdropPress={() => setFleeModalShowing(false)}
+            onBackButtonPress={() => setFleeModalShowing(false)}
+          >
             <View
-              className="w-2/3 rounded-xl bg-zinc-50 px-6 py-4 dark:border dark:border-zinc-50 dark:bg-zinc-700"
+              className="mx-auto w-5/6 rounded-xl px-6 py-4"
               style={{
                 shadowColor: "#000",
                 shadowOffset: {
                   width: 0,
                   height: 2,
                 },
+                elevation: 1,
                 shadowOpacity: 0.25,
                 shadowRadius: 5,
               }}
@@ -1211,17 +1265,20 @@ const DungeonLevelScreen = observer(() => {
                 ) : null}
               </View>
             </View>
-          </NonThemedView>
-        </NativeModal>
+          </Modal>
+        )}
         <Modal
           animationIn="slideInUp"
-          animationOut="fadeOut"
+          animationOut="slideOutDown"
+          backdropOpacity={0.2}
+          animationInTiming={500}
+          animationOutTiming={300}
           isVisible={droppedItems ? true : false}
           onBackButtonPress={closeImmediateItemDrops}
           onBackdropPress={closeImmediateItemDrops}
         >
           <View
-            className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
+            className="mx-auto w-5/6 rounded-xl px-6 py-4"
             style={{
               shadowColor: "#000",
               shadowOffset: {
@@ -1289,13 +1346,16 @@ const DungeonLevelScreen = observer(() => {
         </Modal>
         <Modal
           animationIn="slideInUp"
-          animationOut="fadeOut"
+          animationOut="slideOutDown"
+          backdropOpacity={0.2}
+          animationInTiming={500}
+          animationOutTiming={300}
           isVisible={showLeftBehindItemsScreen}
           onBackButtonPress={() => setShowLeftBehindItemsScreen(false)}
           onBackdropPress={() => setShowLeftBehindItemsScreen(false)}
         >
           <View
-            className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
+            className="mx-auto w-5/6 rounded-xl px-6 py-4"
             style={{
               shadowColor: "#000",
               shadowOffset: {
@@ -1363,7 +1423,10 @@ const DungeonLevelScreen = observer(() => {
         </Modal>
         <Modal
           animationIn="slideInUp"
-          animationOut="fadeOut"
+          animationOut="slideOutDown"
+          backdropOpacity={0.2}
+          animationInTiming={500}
+          animationOutTiming={300}
           isVisible={showTargetSelection.showing}
           onBackButtonPress={() =>
             setShowTargetSelection({
@@ -1381,7 +1444,7 @@ const DungeonLevelScreen = observer(() => {
           }
         >
           <View
-            className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
+            className="mx-auto w-5/6 rounded-xl px-6 py-4"
             style={{
               shadowColor: "#000",
               shadowOffset: {

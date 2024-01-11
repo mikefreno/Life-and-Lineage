@@ -12,6 +12,7 @@ import { useColorScheme } from "nativewind";
 import { toTitleCase } from "../../utility/functions";
 import { router } from "expo-router";
 import { useVibration } from "../../utility/customHooks";
+import { useIsFocused } from "@react-navigation/native";
 
 const LaborScreen = observer(() => {
   const playerCharacterData = useContext(PlayerCharacterContext);
@@ -23,6 +24,8 @@ const LaborScreen = observer(() => {
   if (!playerCharacter || !gameContext) {
     throw Error("Missing Context");
   }
+
+  const isFocused = useIsFocused();
   const { gameState } = gameContext;
   const vibration = useVibration();
   const [tutorialState, setTutorialState] = useState<boolean>(
@@ -72,10 +75,13 @@ const LaborScreen = observer(() => {
     <>
       <Modal
         animationIn="slideInUp"
-        animationOut="fadeOut"
-        isVisible={showLaborTutorial && gameState?.tutorialsEnabled}
+        animationOut="slideOutDown"
         backdropOpacity={0.2}
         animationInTiming={500}
+        animationOutTiming={300}
+        isVisible={
+          showLaborTutorial && gameState?.tutorialsEnabled && isFocused
+        }
         onBackdropPress={() => setShowLaborTutorial(false)}
         onBackButtonPress={() => setShowLaborTutorial(false)}
       >
@@ -167,10 +173,11 @@ const LaborScreen = observer(() => {
       </Modal>
       <Modal
         animationIn="slideInUp"
-        animationOut="fadeOut"
-        isVisible={showingRejection}
+        animationOut="slideOutDown"
         backdropOpacity={0.2}
         animationInTiming={500}
+        animationOutTiming={300}
+        isVisible={showingRejection}
         onBackdropPress={() => setShowingRejection(false)}
         onBackButtonPress={() => setShowingRejection(false)}
       >

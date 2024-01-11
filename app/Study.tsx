@@ -3,7 +3,7 @@ import "../assets/styles/globals.css";
 import { Pressable, Image } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import { Item } from "../classes/item";
-import { fullSave, toTitleCase } from "../utility/functions";
+import { toTitleCase } from "../utility/functions";
 import { useIsFocused } from "@react-navigation/native";
 import { GameContext, PlayerCharacterContext } from "./_layout";
 import ProgressBar from "../components/ProgressBar";
@@ -74,7 +74,6 @@ export default function LearningSpellsScreen() {
       playerState.learnSpellStep(bookName, spellName, spellElement);
       setSpellState(playerState.learningSpells);
       gameState.gameTick(playerState);
-      fullSave(gameState, playerState);
     }
   }
 

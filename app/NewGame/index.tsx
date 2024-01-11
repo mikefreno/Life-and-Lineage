@@ -76,10 +76,11 @@ export default function NewGameScreen() {
       <ScrollView className="h-full">
         <Modal
           animationIn="slideInUp"
-          animationOut="fadeOut"
-          isVisible={showTutorialReset && gameState?.tutorialsEnabled}
+          animationOut="slideOutDown"
           backdropOpacity={0.2}
           animationInTiming={500}
+          animationOutTiming={300}
+          isVisible={showTutorialReset && gameState?.tutorialsEnabled}
           onBackdropPress={() => setShowTutorialReset(false)}
           onBackButtonPress={() => setShowTutorialReset(false)}
         >
@@ -121,10 +122,11 @@ export default function NewGameScreen() {
         </Modal>
         <Modal
           animationIn="slideInUp"
-          animationOut="fadeOut"
-          isVisible={showIntroTutorial}
+          animationOut="slideOutDown"
           backdropOpacity={0.2}
           animationInTiming={500}
+          animationOutTiming={300}
+          isVisible={showIntroTutorial}
           onBackdropPress={() => setShowIntroTutorial(false)}
           onBackButtonPress={() => setShowIntroTutorial(false)}
         >

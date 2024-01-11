@@ -9,12 +9,14 @@ import { Pressable, Switch } from "react-native";
 import { useColorScheme } from "nativewind";
 import { Entypo } from "@expo/vector-icons";
 import { useVibration } from "../../utility/customHooks";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function MedicalScreen() {
   const gameContext = useContext(GameContext);
   const [tutorialStep, setTutorialStep] = useState<number>(1);
   const { colorScheme } = useColorScheme();
   const vibration = useVibration();
+  const isFocused = useIsFocused();
 
   if (!gameContext) {
     throw new Error("Missing Context");
@@ -51,10 +53,13 @@ export default function MedicalScreen() {
     <>
       <Modal
         animationIn="slideInUp"
-        animationOut="fadeOut"
-        isVisible={showMedicalTutorial && gameState?.tutorialsEnabled}
+        animationOut="slideOutDown"
         backdropOpacity={0.2}
         animationInTiming={500}
+        animationOutTiming={300}
+        isVisible={
+          showMedicalTutorial && gameState?.tutorialsEnabled && isFocused
+        }
         onBackdropPress={() => setShowMedicalTutorial(false)}
         onBackButtonPress={() => setShowMedicalTutorial(false)}
       >

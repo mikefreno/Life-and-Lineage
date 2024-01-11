@@ -103,7 +103,10 @@ export default function SetSex() {
       />
       <Modal
         animationIn="slideInUp"
-        animationOut="fadeOut"
+        animationOut="slideOutDown"
+        backdropOpacity={0.2}
+        animationInTiming={500}
+        animationOutTiming={300}
         isVisible={
           !gameState
             ? loadedAsync
@@ -111,8 +114,6 @@ export default function SetSex() {
               : false
             : showAgingTutorial
         }
-        backdropOpacity={0.2}
-        animationInTiming={500}
         onBackdropPress={() => {
           setShowAgingTutorial(false);
           setTimeout(() => {

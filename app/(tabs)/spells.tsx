@@ -11,12 +11,14 @@ import PlayerStatus from "../../components/PlayerStatus";
 import Modal from "react-native-modal";
 import { Entypo } from "@expo/vector-icons";
 import { useVibration } from "../../utility/customHooks";
+import { useIsFocused } from "@react-navigation/native";
 
 const SpellsScreen = observer(() => {
   const playerCharacterData = useContext(PlayerCharacterContext);
   const gameData = useContext(GameContext);
   const { colorScheme } = useColorScheme();
   const vibration = useVibration();
+  const isFocused = useIsFocused();
 
   if (!playerCharacterData || !gameData) throw new Error("missing contexts");
 
@@ -109,10 +111,13 @@ const SpellsScreen = observer(() => {
     <>
       <Modal
         animationIn="slideInUp"
-        animationOut="fadeOut"
-        isVisible={showSpellTutorial && gameState?.tutorialsEnabled}
+        animationOut="slideOutDown"
         backdropOpacity={0.2}
         animationInTiming={500}
+        animationOutTiming={300}
+        isVisible={
+          showSpellTutorial && gameState?.tutorialsEnabled && isFocused
+        }
         onBackdropPress={() => setShowSpellTutorial(false)}
         onBackButtonPress={() => setShowSpellTutorial(false)}
       >

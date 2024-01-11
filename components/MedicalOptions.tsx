@@ -7,7 +7,6 @@ import { useColorScheme } from "nativewind";
 import { useIsFocused } from "@react-navigation/native";
 import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { useContext } from "react";
-import { fullSave } from "../utility/functions";
 
 interface MedicalOptionProps {
   title: string;
@@ -44,7 +43,6 @@ export default function MedicalOption({
         removeDebuffs,
       );
       gameState.gameTick(playerState);
-      fullSave(gameState, playerState);
     }
   }
 

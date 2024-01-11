@@ -486,7 +486,10 @@ export default function SetBlessing() {
       />
       <Modal
         animationIn="slideInUp"
-        animationOut="fadeOut"
+        animationOut="slideOutDown"
+        backdropOpacity={0.2}
+        animationInTiming={500}
+        animationOutTiming={300}
         isVisible={
           !gameState
             ? loadedAsync
@@ -494,8 +497,6 @@ export default function SetBlessing() {
               : false
             : showBlessingTutorial
         }
-        backdropOpacity={0.2}
-        animationInTiming={500}
         onBackdropPress={() => setShowBlessingTutorial(false)}
         onBackButtonPress={() => setShowBlessingTutorial(false)}
       >

@@ -15,6 +15,7 @@ import { GameContext, PlayerCharacterContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
 import Modal from "react-native-modal";
 import { Entypo } from "@expo/vector-icons";
+import { useIsFocused } from "@react-navigation/native";
 
 const dangerColorStep = [
   "#fee2e2",
@@ -55,6 +56,7 @@ export default function DungeonScreen() {
     gameState?.tutorialsEnabled ?? true,
   );
   const [tutorialStep, setTutorialStep] = useState<number>(1);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     if (!showDungeonTutorial && gameState) {
@@ -116,10 +118,13 @@ export default function DungeonScreen() {
     <>
       <Modal
         animationIn="slideInUp"
-        animationOut="fadeOut"
-        isVisible={showDungeonTutorial && gameState?.tutorialsEnabled}
+        animationOut="slideOutDown"
         backdropOpacity={0.2}
         animationInTiming={500}
+        animationOutTiming={300}
+        isVisible={
+          showDungeonTutorial && gameState?.tutorialsEnabled && isFocused
+        }
         onBackdropPress={() => setShowDungeonTutorial(false)}
         onBackButtonPress={() => setShowDungeonTutorial(false)}
       >

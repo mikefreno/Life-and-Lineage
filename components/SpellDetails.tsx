@@ -56,6 +56,7 @@ export default function SpellDetails({ spell }: SpellDetailInterface) {
           width: 2,
           height: 3,
         },
+        elevation: 6,
         backgroundColor: colorScheme == "light" ? "#fafafa" : "#27272a",
         shadowOpacity: 0.25,
         shadowRadius: 5,

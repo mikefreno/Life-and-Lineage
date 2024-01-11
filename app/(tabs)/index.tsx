@@ -4,7 +4,6 @@ import {
   View as NonThemedView,
   Animated,
   Switch,
-  Platform,
 } from "react-native";
 import { View, Text } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
@@ -25,6 +24,7 @@ import { useVibration } from "../../utility/customHooks";
 import { Dimensions } from "react-native";
 import Modal from "react-native-modal";
 import { Entypo } from "@expo/vector-icons";
+import { useIsFocused } from "@react-navigation/native";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -59,6 +59,8 @@ const HomeScreen = observer(() => {
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,
   );
+
+  const isFocused = useIsFocused();
 
   //animation
   useEffect(() => {
@@ -536,15 +538,18 @@ const HomeScreen = observer(() => {
       <>
         <Modal
           animationIn="slideInUp"
-          animationOut="fadeOut"
-          isVisible={showIntroTutorial && gameState.tutorialsEnabled}
+          animationOut="slideOutDown"
           backdropOpacity={0.2}
           animationInTiming={500}
+          animationOutTiming={300}
+          isVisible={
+            showIntroTutorial && gameState.tutorialsEnabled && isFocused
+          }
           onBackdropPress={() => setShowIntroTutorial(false)}
           onBackButtonPress={() => setShowIntroTutorial(false)}
         >
           <View
-            className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
+            className="mx-auto w-5/6 rounded-xl px-6 py-4"
             style={{
               shadowColor: "#000",
               shadowOffset: {
