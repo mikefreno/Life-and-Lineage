@@ -20,6 +20,7 @@ import { useContext } from "react";
 import { PlayerCharacterContext } from "../_layout";
 import GraduationCapIcon from "../../assets/icons/GraduationCap";
 import { useVibration } from "../../utility/customHooks";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
@@ -203,12 +204,12 @@ export default function TabLayout() {
             />
           ),
           headerRight: () => (
-            <Link href="/Crafting" asChild>
+            <Link href="/Investing" asChild>
               <Pressable onPress={() => vibration({ style: "light" })}>
                 {({ pressed }) => (
-                  <Cauldron
-                    width={26}
-                    height={30}
+                  <MaterialCommunityIcons
+                    name="trending-up"
+                    size={30}
                     color={Colors[colorScheme as "light" | "dark"].text}
                     style={{
                       marginRight: 15,

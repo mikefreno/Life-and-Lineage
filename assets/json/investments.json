@@ -1,0 +1,218 @@
+[
+    {
+        "name": "Trading Route",
+        "description": "Control the arteries of commerce, provide a trader with startup costs.",
+        "cost": 5000,
+        "turnsPerReturn": 10,
+        "goldReturnRange": {"min": 0, "max": 1000},
+        "maxGoldStockPile": 2500,
+        "upgrades": [
+            {
+                "name": "Inexperienced Guard",
+                "cost": 1500,
+                "description":"Hire a nobody to travel with the trader. Increases minimum gold returns.",
+                "effect": {"goldMinimumIncrease": 150} 
+            },
+            {
+                "name": "Faster Horses",
+                "cost": 3500,
+                "description":"Purchase horses to shorten travel time. Shortens travel time.",
+                "effect": {"turnsPerRollChange": -2}
+            },
+            {
+                "name": "Study Carriage",
+                "cost": 5000,
+                "description":"Better put together carriage means lower chance of breakdowns. Increases minimum gold return, max stockpile size, and shortens travel time.",
+                "effect": {"turnsPerRollChange": -1, "goldMinimumIncrease": 100, "maxGoldStockPileIncrease": 1000}
+            },
+            {
+                "name": "Capital Sales License",
+                "cost": 10000,
+                "description":"Acquire the ability to sell goods within the Capital City's borders. Increases gold returns.",
+                "effect": {"goldMinimumIncrease": 100, "goldMaximumIncrease": 400}
+            },
+            {
+                "name": "Experienced Guards",
+                "cost": 15000,
+                "description":"Hire quality guards. Increases minimum gold returns.",
+                "effect": {"goldMinimumIncrease": 500} 
+            },
+            {
+                "name": "Expand Caravan",
+                "cost": 25000,
+                "description":"Expanding size of caravan means more of everything, but slows down the route. Increases gold returns, and max stockpile size",
+                "effect": {"turnsPerRollChange": 1, "goldMinimumIncrease": 350, "goldMaximumIncrease": 350, "maxGoldStockPileIncrease": 3000} 
+            },
+            {
+                "name": "Regulatory Capture",
+                "cost": 30000,
+                "description":"Bribe a judge to enact regulations few will be able to comply with. Increases gold returns.",
+                "effect": {"goldMinimumIncrease": 600, "goldMaximumIncrease": 600}
+            }
+        ]
+    },
+    {
+        "name": "Remote Rest Stop",
+        "description": "It's cheap and in the middle of no-where. Don't expect much foot traffic. But those rare few tired souls will be grateful for a quiet refuge from the beasts of the night.",
+        "cost": 10000,
+        "turnsPerReturn": 1,
+        "goldReturnRange": {"min": 10, "max": 150},
+        "maxGoldStockPile": 3500,
+        "upgrades": [
+            {
+                "name": "Install Signage",
+                "cost": 1000,
+                "description":"Install signage along nearby roads. Increases gold returns.",
+                "effect": {"goldMinimumIncrease": 20, "goldMaximumIncrease": 10} 
+            },
+            {
+                "name": "Alcohol License",
+                "cost": 5000,
+                "description":"Alcohol often leads to heavy spenders. Increases maximum gold return.",
+                "effect": {"goldMaximumIncrease": 50}
+            },
+            {
+                "name": "Luxury Rooms",
+                "cost": 12500,
+                "description":"Nicer rooms means you can charge more. Increases minimum gold return.",
+                "effect": {"goldMinimumIncrease":  75}
+            },
+            {
+                "name": "New Wing",
+                "cost": 20000,
+                "description":"More rooms means more bodies at peak. Increases maximum gold return.",
+                "effect": {"goldMaximumIncrease": 125}
+            }
+        ]
+    },
+    {
+        "name": "Village Inn",
+        "description": "A vital haven for weary travelers and thirsty locals alike. On a good night, the air is filled with laughter, music, and the clinking of golden coins (and the potential broken table).",
+        "cost": 35000,
+        "turnsPerReturn": 1,
+        "goldReturnRange": {"min": -100, "max": 400},
+        "maxGoldStockPile": 10000,
+        "upgrades": [
+            {
+                "name": "Hire Pretty Tavern Girl",
+                "cost": 2500,
+                "description":"Drunk men are simple creatures. Increases maximum gold returns.",
+                "effect": {"goldMaximumIncrease": 75} 
+            },
+            {
+                "name": "Hire Experienced Bartender",
+                "cost": 10000,
+                "description":"Great bartenders keep the drinks flowing. Increases maximum gold return.",
+                "effect": {"goldMaximumIncrease": 150}
+            },
+            {
+                "name": "Biergarten",
+                "cost": 12500,
+                "description":"Expand land plot with outdoor area, some may get too rowdy, leading to minor fines. Decreases minimum gold return, increases maximum gold return.",
+                "effect": {"goldMinimumIncrease":  -50, "goldMaximumIncrease": 350}
+            },
+            {
+                "name": "Hire Intimidating Bouncers",
+                "cost": 20000,
+                "description":"Keeps the rowdy customers under control. Increases minimum gold return.",
+                "effect": {"goldMinimumIncrease": 200}
+            },
+            {
+                "name": "'Entertainment' Wing",
+                "cost": 65000,
+                "description":"Use your imagination. Increases gold returns.",
+                "effect": {"goldMinimumIncrease":  100, "goldMaximumIncrease": 1000}
+            }
+        ]
+    },
+    {
+        "name": "Spellbook Publisher",
+        "description": "Magic drips from the quill in this establishment, as scribes imbued with arcane knowledge ink the pages of tomes that will guide the next generation of magi.",
+        "cost": 75000,
+        "turnsPerReturn": 25,
+        "goldReturnRange": {"min": 300, "max": 5000},
+        "maxGoldStockPile": 10000,
+        "upgrades": [
+            {
+                "name": "Undo-able Ink™",
+                "cost": 15000,
+                "description":"It's trademarked and highway robbery, but it works. Increases minimum gold return.",
+                "effect": {"goldMinimumIncrease": 1500}
+            },
+            {
+                "name": "Enchanted Quills",
+                "cost": 30000,
+                "description":"Quills need not be held, only spoken to. Decreases publishing time.",
+                "effect": {"turnsPerRollChange": -10} 
+            },
+            {
+                "name": "Exclusivity Contracts",
+                "cost": 50000,
+                "description":"Lock down the best talent. Increases gold returns.",
+                "effect": {"goldMinimumIncrease":  1200, "goldMaximumIncrease": 5000}
+            }
+        ]
+    },
+    {
+        "name": "Iron Mine",
+        "description": "Deep in the earth, the rhythmic beat of picks against stone echoes out as miners unearth veins of precious iron, indispensable for smiths and warriors.",
+        "cost": 125000,
+        "turnsPerReturn": 10,
+        "goldReturnRange": {"min": 1000, "max": 2500},
+        "maxGoldStockPile": 10000,
+        "upgrades": [
+            {
+                "name": "Steel Tools",
+                "cost": 25000,
+                "description":"Invest in steel tools to increase workers' efficiency. Increases gold returns.",
+                "effect": {"goldMinimumIncrease": 500, "goldMaximumIncrease": 500} 
+            },
+            {
+                "name": "Cart System",
+                "cost": 50000,
+                "description":"Install a cart system for more efficient transport of ore. Increases gold returns and max stockpile size.",
+                "effect": {"goldMinimumIncrease": 250, "goldMaximumIncrease": 750, "maxGoldStockPileIncrease": 2000}
+            },
+            {
+                "name": "Miner's Training",
+                "cost": 75000,
+                "description":"Provide advanced training for miners to improve their work. Increases minimum gold returns.",
+                "effect": {"goldMinimumIncrease": 1000}
+            },
+            {
+                "name": "Improved Mining Techniques",
+                "cost": 100000,
+                "description":"Adopt and implement breakthrough mining techniques. Increases gold returns.",
+                "effect": {"goldMinimumIncrease": 500, "goldMaximumIncrease": 1000}
+            },
+            {
+                "name": "Ward Against Cave-Ins",
+                "cost": 150000,
+                "description":"Enchant the mine with magic wards to prevent cave-ins. Increases gold returns and shortens ore extraction time.",
+                "effect": {"turnsPerRollChange": -2, "goldMinimumIncrease": 750, "goldMaximumIncrease": 1250}    
+            },
+            {
+                "name": "Indentured Servitude",
+                "cost": 200000,
+                "description":"Bribe nearby city officials for access to their criminal population, its a win-win if you don't consider morality, but that's what the gold is for. Increases gold returns",
+                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 2500, "permanentlyDecreaseMaxSanity": 5}    
+            }
+        ]
+    },
+    {
+        "name": "Monster Breeding Ranch",
+        "description": "Here, creatures of nightmare and wonder are reared. Some are bred for their power in battle, others for exotic pets. All fetch a fair price on the market."
+    },
+    {
+        "name": "Crystal Mine",
+        "description": "Beneath ominous stone outcroppings, miners burrow, discovering veins of shimmering crystal. Their glow is mesmerizing, their magical potential, immense."
+    },
+    {
+        "name": "Artifact Excavation Site",
+        "description": "Hidden beneath the millennia of earth lie ancient artifacts infused with forgotten magics. Each find promises wealth, power, and a chance to rewrite history."
+    },
+    {
+        "name": "Magic Academy",
+        "description": "A hum of power encircles these halls, where young apprentices learn to harness the arcane. Its influence spreads as mastering graduates shape the world."
+    }
+]
