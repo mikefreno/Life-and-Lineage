@@ -44,6 +44,16 @@ export default function ShopsScreen() {
     setTutorialState(gameState?.tutorialsEnabled ?? true);
   }, [gameState?.tutorialsEnabled]);
 
+  useEffect(() => {
+    if (gameState) {
+      if (tutorialState == false) {
+        gameState.disableTutorials();
+      } else {
+        gameState.enableTutorials();
+      }
+    }
+  }, [tutorialState]);
+
   if (gameState) {
     const shops = gameState.shops;
 

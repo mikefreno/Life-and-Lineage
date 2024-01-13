@@ -1,5 +1,10 @@
 import { Link, Tabs } from "expo-router";
-import { GestureResponderEvent, Platform, Pressable } from "react-native";
+import {
+  GestureResponderEvent,
+  Platform,
+  Pressable,
+  Image,
+} from "react-native";
 import Colors from "../../constants/Colors";
 import Wand from "../../assets/icons/WandIcon";
 import BookSparkles from "../../assets/icons/BookSparklesIcon";
@@ -19,7 +24,6 @@ import { useContext } from "react";
 import { PlayerCharacterContext } from "../_layout";
 import GraduationCapIcon from "../../assets/icons/GraduationCap";
 import { useVibration } from "../../utility/customHooks";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
@@ -151,7 +155,7 @@ export default function TabLayout() {
                     <GraduationCapIcon
                       width={28}
                       height={28}
-                      color={colorScheme == "dark" ? "#f4f4f5" : "#27272a"}
+                      color={"#2563eb"}
                       style={{
                         marginRight: 15,
                         marginBottom: 3,
@@ -198,8 +202,8 @@ export default function TabLayout() {
             title: "Shops",
             tabBarIcon: ({ color }) => (
               <Potion
-                width={26}
-                height={28}
+                width={28}
+                height={30}
                 color={color}
                 style={{ marginBottom: -3 }}
               />
@@ -208,11 +212,11 @@ export default function TabLayout() {
               <Link href="/Investing" asChild>
                 <Pressable onPress={() => vibration({ style: "light" })}>
                   {({ pressed }) => (
-                    <MaterialCommunityIcons
-                      name="trending-up"
-                      size={30}
-                      color={Colors[colorScheme as "light" | "dark"].text}
+                    <Image
+                      source={require("../../assets/images/icons/investing.png")}
                       style={{
+                        height: 26,
+                        width: 28,
                         marginRight: 15,
                         marginBottom: 6,
                         opacity: pressed ? 0.5 : 1,

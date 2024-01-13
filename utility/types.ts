@@ -19,6 +19,7 @@ export type Investment = {
       maxGoldStockPileIncrease?: number;
       turnsPerRollChange?: number;
       permanentlyDecreaseMaxSanity?: number;
+      permanentlyIncreaseMaxSanity?: number;
     };
   }[];
 };

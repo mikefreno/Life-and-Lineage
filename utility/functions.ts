@@ -324,3 +324,17 @@ export function numberToRoman(num: number): string {
 
   return roman;
 }
+export function asReadableGold(gold: number) {
+  if (gold >= 1_000_000_000) {
+    const cleanedUp = (gold / 1_000_000_000).toFixed(2);
+    return `${parseFloat(cleanedUp).toLocaleString()}B`;
+  }
+  if (gold >= 1_000_000) {
+    const cleanedUp = (gold / 1_000_000).toFixed(2);
+    return `${parseFloat(cleanedUp).toLocaleString()}M`;
+  }
+  if (gold >= 10_000) {
+    const cleanedUp = (gold / 1000).toFixed(2);
+    return `${parseFloat(cleanedUp).toLocaleString()}K`;
+  } else return gold.toLocaleString();
+}

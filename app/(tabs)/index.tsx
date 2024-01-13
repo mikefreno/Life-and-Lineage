@@ -75,6 +75,14 @@ const HomeScreen = observer(() => {
   }, [showingInventory]);
 
   useEffect(() => {
+    if (showingInventory) {
+      setStatsTopPos((prev) => (prev ? prev - 64 : undefined));
+    } else {
+      setStatsTopPos((prev) => (prev ? prev + 64 : undefined));
+    }
+  }, [showingInventory]);
+
+  useEffect(() => {
     if (!showIntroTutorial && gameState) {
       gameState.updateTutorialState("intro", true);
     }
@@ -83,14 +91,6 @@ const HomeScreen = observer(() => {
   useEffect(() => {
     setTutorialState(gameState?.tutorialsEnabled ?? true);
   }, [gameState?.tutorialsEnabled]);
-
-  useEffect(() => {
-    if (showingInventory) {
-      setStatsTopPos((prev) => (prev ? prev - 64 : undefined));
-    } else {
-      setStatsTopPos((prev) => (prev ? prev + 64 : undefined));
-    }
-  }, [showingInventory]);
 
   useEffect(() => {
     setShowIntroTutorial(

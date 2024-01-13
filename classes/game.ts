@@ -87,6 +87,7 @@ export class Game {
       shops: false,
       shopInterior: false,
       medical: false,
+      investing: false,
     };
     this.tutorialsEnabled = tutorialsEnabled ?? true;
     makeObservable(this, {
@@ -229,6 +230,7 @@ export class Game {
       shops: false,
       shopInterior: false,
       medical: false,
+      investing: false,
     };
     this.tutorialsShown = defaultState;
   }
