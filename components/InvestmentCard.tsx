@@ -1,25 +1,96 @@
 import { useColorScheme } from "nativewind";
 import { View as ThemedView, Text, ScrollView } from "./Themed";
-import { Investment } from "../utility/types";
+import { InvestmentType } from "../utility/types";
 import Coins from "../assets/icons/CoinsIcon";
 import { Pressable, View, StyleSheet, Animated } from "react-native";
 import Modal from "react-native-modal";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { asReadableGold } from "../utility/functions";
 import ClockIcon from "../assets/icons/ClockIcon";
 import Vault from "../assets/icons/VaultIcon";
 import { Entypo } from "@expo/vector-icons";
 import Sanity from "../assets/icons/SanityIcon";
+import { PlayerCharacterContext } from "../app/_layout";
 
 interface InvestmentCardProps {
-  investment: Investment;
+  investment: InvestmentType;
 }
 export default function InvestmentCard({ investment }: InvestmentCardProps) {
   const { colorScheme } = useColorScheme();
   const [showUpgrades, setShowUpgrades] = useState<boolean>(false);
+  const playerCharacterContext = useContext(PlayerCharacterContext);
+  if (!playerCharacterContext) {
+    throw new Error("missing context");
+  }
+  const [showInvestmentConfirmation, setShowInvestmentConfirmation] =
+    useState<boolean>(false);
+
+  const { playerState } = playerCharacterContext;
+
+  function purchaseInvestmentCheck() {
+    if (playerState && playerState.gold >= investment.cost) {
+      if (investment.cost / playerState.gold >= 0.2) {
+        setShowInvestmentConfirmation(true);
+      } else {
+        playerState.purchaseInvestmentBase(investment);
+      }
+    }
+  }
 
   return (
     <>
+      <Modal
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        backdropOpacity={0.2}
+        animationInTiming={500}
+        animationOutTiming={300}
+        isVisible={showInvestmentConfirmation}
+        onBackdropPress={() => setShowInvestmentConfirmation(false)}
+        onBackButtonPress={() => setShowInvestmentConfirmation(false)}
+      >
+        <ThemedView
+          className="mx-auto w-full rounded-xl p-4"
+          style={{
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 2,
+            },
+            elevation: 1,
+            shadowOpacity: 0.25,
+            shadowRadius: 5,
+          }}
+        >
+          {" "}
+          <Text className="text-center text-lg">Purchase:</Text>
+          <View style={styles.container}>
+            <View style={styles.line} />
+            <View style={styles.content}>
+              <Text className="text-xl">{investment.name}</Text>
+            </View>
+            <View style={styles.line} />
+          </View>
+          <Text className="text-center text-2xl">Are you sure?</Text>
+          <View className="flex flex-row">
+            <Pressable
+              onPress={() => {
+                playerState?.purchaseInvestmentBase(investment);
+                setShowInvestmentConfirmation(false);
+              }}
+              className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+            >
+              <Text>Purchase</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setShowInvestmentConfirmation(false)}
+              className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+            >
+              <Text>Cancel</Text>
+            </Pressable>
+          </View>
+        </ThemedView>
+      </Modal>
       <Modal
         animationIn="slideInUp"
         animationOut="slideOutDown"
@@ -155,39 +226,42 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
                                 <Vault height={14} width={14} />
                               </View>
                             )}
-                            {upgrade.effect.permanentlyDecreaseMaxSanity && (
+                            {upgrade.effect.changeMaxSanity && (
                               <View className="flex flex-row items-center">
-                                <Text>
-                                  -{upgrade.effect.permanentlyDecreaseMaxSanity}{" "}
-                                </Text>
-                                <Sanity height={14} width={14} />
-                              </View>
-                            )}
-                            {upgrade.effect.permanentlyIncreaseMaxSanity && (
-                              <View className="flex flex-row items-center">
-                                <Text>
-                                  {upgrade.effect.permanentlyIncreaseMaxSanity}{" "}
-                                </Text>
+                                <Text>{upgrade.effect.changeMaxSanity} </Text>
                                 <Sanity height={14} width={14} />
                               </View>
                             )}
                           </View>
                           <Pressable className="mx-auto my-2 active:scale-95 active:opacity-50">
                             <View
-                              className="rounded-xl px-4 py-2"
-                              style={{
-                                shadowColor: "#000",
-                                elevation: 1,
-                                backgroundColor:
-                                  colorScheme == "light" ? "white" : "#71717a",
-                                shadowOpacity: 0.1,
-                                shadowRadius: 5,
-                              }}
+                              className="rounded-xl px-8 py-4"
+                              style={
+                                playerState &&
+                                playerState.gold >= investment.cost
+                                  ? {
+                                      shadowColor: "#000",
+                                      elevation: 1,
+                                      backgroundColor:
+                                        colorScheme == "light"
+                                          ? "white"
+                                          : "#71717a",
+                                      shadowOpacity: 0.1,
+                                      shadowRadius: 5,
+                                    }
+                                  : {
+                                      backgroundColor:
+                                        colorScheme == "light"
+                                          ? "#ccc"
+                                          : "#4b4b4b",
+                                      opacity: 0.5,
+                                    }
+                              }
                             >
                               <Text className="text-center">Purchase For</Text>
                               <View className="flex flex-row items-center justify-center">
                                 <Text className="dark:text-zinc-50">
-                                  {asReadableGold(investment.cost)}{" "}
+                                  {asReadableGold(upgrade.cost)}{" "}
                                 </Text>
                                 <Coins width={14} height={14} />
                               </View>
@@ -204,7 +278,7 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
         </ThemedView>
       </Modal>
       <ThemedView
-        className="m-2 rounded-xl"
+        className="mx-4 my-2 rounded-xl"
         style={{
           shadowColor: "#000",
           shadowOffset: {
@@ -225,8 +299,8 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
               {investment.description}
             </Text>
           </View>
-          <View className="flex flex-row items-center justify-between py-4">
-            <View className="flex items-center">
+          <View className="flex flex-row items-center justify-evenly py-4">
+            <View className="mx-12 flex items-center">
               <View className="flex flex-row">
                 <Text>
                   {`${investment.goldReturnRange.min} - ${investment.goldReturnRange.max} `}
@@ -246,23 +320,36 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
             </View>
             <Pressable
               onPress={() => setShowUpgrades(true)}
-              className="rounded-xl border border-zinc-900 px-4 py-1 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+              className="mx-12 rounded-xl border border-zinc-900 px-4 py-1 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
             >
               <Text className="text-center">
                 {`View\nUpgrades `}({investment.upgrades.length})
               </Text>
             </Pressable>
           </View>
-          <Pressable className="mx-auto mb-2 active:scale-95 active:opacity-50">
+          <Pressable
+            onPress={purchaseInvestmentCheck}
+            disabled={playerState && playerState.gold < investment.cost}
+            className="mx-auto mb-2 active:scale-95 active:opacity-50"
+          >
             <View
               className="rounded-xl px-8 py-4"
-              style={{
-                shadowColor: "#000",
-                elevation: 1,
-                backgroundColor: colorScheme == "light" ? "white" : "#71717a",
-                shadowOpacity: 0.1,
-                shadowRadius: 5,
-              }}
+              style={
+                playerState && playerState.gold >= investment.cost
+                  ? {
+                      shadowColor: "#000",
+                      elevation: 1,
+                      backgroundColor:
+                        colorScheme == "light" ? "white" : "#71717a",
+                      shadowOpacity: 0.1,
+                      shadowRadius: 5,
+                    }
+                  : {
+                      backgroundColor:
+                        colorScheme == "light" ? "#ccc" : "#4b4b4b",
+                      opacity: 0.5,
+                    }
+              }
             >
               <Text className="text-center">Purchase For</Text>
               <View className="flex flex-row items-center justify-center">
@@ -283,6 +370,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginHorizontal: 24,
+    marginVertical: 12,
   },
   content: {
     marginHorizontal: 10,

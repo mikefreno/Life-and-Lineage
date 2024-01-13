@@ -203,7 +203,7 @@
                 "cost": 200000,
                 "excludes": "Profit Sharing",
                 "description":"Bribe nearby city officials for access to their criminal population, its a win-win if you don't consider morality, but that's what the gold is for. Decreases extraction time and dramatically increases gold returns at the cost of max sanity",
-                "effect": {"turnsPerRollChange": -2, "goldMinimumIncrease": 1500, "goldMaximumIncrease": 4000, "permanentlyDecreaseMaxSanity": 5}    
+                "effect": {"turnsPerRollChange": -2, "goldMinimumIncrease": 1500, "goldMaximumIncrease": 4000, "changeMaxSanity": -5}    
             }
         ]
     },
@@ -226,7 +226,7 @@
                 "cost": 75000,
                 "excludes": "Ethical Breeding",
                 "description":"Sell to disreputable buyers. Increases gold returns and decreases time to market. decreases sanity.",
-                "effect": {"turnsPerRollChange": -3, "goldMinimumIncrease": 2000, "goldMaximumIncrease": 5000, "permanentlyDecreaseMaxSanity": 5}
+                "effect": {"turnsPerRollChange": -3, "goldMinimumIncrease": 2000, "goldMaximumIncrease": 5000, "changeMaxSanity": -5}
             },
             {
                 "name": "Ethical Breeding",
@@ -287,7 +287,7 @@
                 "cost": 450000,
                 "excludes": "Profit Sharing",
                 "description":"Hire earth magi to keep watch and temper seismic activity. Increases gold returns and maximum sanity.",
-                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "permanentlyIncreaseMaxSanity": 5}    
+                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "changeMaxSanity": -5}    
             }
         ]
     },
@@ -323,14 +323,14 @@
                 "cost": 2100000,
                 "excludes": "Profit Sharing",
                 "description":"",
-                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "permanentlyIncreaseMaxSanity": 5}    
+                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "": 5}    
             },
             {
                 "name": "Seismic Monitoring",
                 "cost": 2100000,
                 "excludes": "Profit Sharing",
                 "description":"",
-                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "permanentlyIncreaseMaxSanity": 5}    
+                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "": 5}    
             }
         ]
     },
@@ -366,14 +366,14 @@
                 "cost": 2100000,
                 "excludes": "Profit Sharing",
                 "description":"",
-                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "permanentlyIncreaseMaxSanity": 5}    
+                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "": 5}    
             },
             {
                 "name": "Seismic Monitoring",
                 "cost": 2100000,
                 "excludes": "Profit Sharing",
                 "description":"",
-                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "permanentlyIncreaseMaxSanity": 5}    
+                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "": 5}    
             }
         ]
     }

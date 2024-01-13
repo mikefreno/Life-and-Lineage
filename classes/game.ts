@@ -126,6 +126,7 @@ export class Game {
       lowSanityDebuffGenerator(playerState);
     }
     playerState.conditionTicker();
+    playerState.tickAllInvestments();
   }
   //----------------------------------Dungeon----------------------------------//
   public getDungeon(instance: string, level: number): DungeonLevel | undefined {

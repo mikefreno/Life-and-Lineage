@@ -3,7 +3,7 @@ import investments from "../assets/json/investments.json";
 import { ScrollView, View, Text } from "../components/Themed";
 
 import "../assets/styles/globals.css";
-import { Investment } from "../utility/types";
+import { InvestmentType } from "../utility/types";
 import InvestmentCard from "../components/InvestmentCard";
 import PlayerStatus from "../components/PlayerStatus";
 import Modal from "react-native-modal";
@@ -162,7 +162,7 @@ export default function InvestingScreen() {
         <PlayerStatus onTop displayGoldBottom />
         <View className="flex-1 items-center justify-center">
           <ScrollView>
-            {investments.map((investment: Investment, idx) => (
+            {investments.map((investment: InvestmentType, idx) => (
               <InvestmentCard key={idx} investment={investment} />
             ))}
           </ScrollView>

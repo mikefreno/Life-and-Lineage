@@ -1,4 +1,4 @@
-export type Investment = {
+export type InvestmentType = {
   name: string;
   description: string;
   cost: number;
@@ -8,18 +8,19 @@ export type Investment = {
     max: number;
   };
   maxGoldStockPile: number;
-  upgrades: {
-    name: string;
-    cost: number;
-    description: string;
-    excludes?: string;
-    effect: {
-      goldMinimumIncrease?: number;
-      goldMaximumIncrease?: number;
-      maxGoldStockPileIncrease?: number;
-      turnsPerRollChange?: number;
-      permanentlyDecreaseMaxSanity?: number;
-      permanentlyIncreaseMaxSanity?: number;
-    };
-  }[];
+  upgrades: InvestmentUpgrade[];
+};
+
+export type InvestmentUpgrade = {
+  name: string;
+  cost: number;
+  description: string;
+  excludes?: string | undefined;
+  effect: {
+    goldMinimumIncrease?: number | undefined;
+    goldMaximumIncrease?: number | undefined;
+    maxGoldStockPileIncrease?: number | undefined;
+    turnsPerRollChange?: number | undefined;
+    changeMaxSanity?: number | undefined;
+  };
 };

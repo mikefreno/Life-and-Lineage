@@ -10,6 +10,8 @@ import necroSpells from "../assets/json/necroSpells.json";
 import { Minion } from "./creatures";
 import summons from "../assets/json/summons.json";
 import { action, makeObservable, observable } from "mobx";
+import { Investment } from "./investment";
+import { InvestmentType } from "../utility/types";
 
 interface CharacterOptions {
   firstName: string;
@@ -140,6 +142,7 @@ type PlayerCharacterBase = {
     head: Item | null;
     body: Item | null;
   };
+  investments?: Investment[];
 };
 type MageCharacter = PlayerCharacterBase & {
   playerClass: "mage";
@@ -207,6 +210,7 @@ export class PlayerCharacter extends Character {
     head: Item | null;
     body: Item | null;
   };
+  investments: Investment[];
 
   constructor({
     firstName,
@@ -239,6 +243,7 @@ export class PlayerCharacter extends Character {
     inventory,
     currentDungeon,
     equipment,
+    investments,
   }: PlayerCharacterOptions) {
     super({
       firstName,
@@ -285,6 +290,7 @@ export class PlayerCharacter extends Character {
       head: null,
       body: null,
     };
+    this.investments = investments ?? [];
     makeObservable(this, {
       health: observable,
       healthMax: observable,
@@ -305,6 +311,7 @@ export class PlayerCharacter extends Character {
       inventory: observable,
       currentDungeon: observable,
       equipment: observable,
+      investments: observable,
       getMaxHealth: action,
       damageHealth: action,
       getSpecifiedQualificationProgress: action,
@@ -341,6 +348,7 @@ export class PlayerCharacter extends Character {
       pass: action,
       conditionTicker: action,
       setInDungeon: action,
+      changeMaxSanity: action,
     });
   }
   //----------------------------------Health----------------------------------//
@@ -421,6 +429,11 @@ export class PlayerCharacter extends Character {
       this.sanity = 50;
     }
   }
+
+  public changeMaxSanity(change: number) {
+    this.sanity + change;
+  }
+
   public getMaxSanity() {
     let withGearBuffs = this.sanity;
     withGearBuffs += this.equipment.mainHand.stats?.sanity ?? 0;
@@ -1145,6 +1158,25 @@ export class PlayerCharacter extends Character {
   }
   //----------------------------------Conditions----------------------------------//
 
+  //----------------------------------Investments----------------------------------//
+  public purchaseInvestmentBase(investment: InvestmentType) {
+    this.gold -= investment.cost;
+    const newInvestment = new Investment({
+      name: investment.name,
+      minimumReturn: investment.goldReturnRange.min,
+      maximumReturn: investment.goldReturnRange.max,
+      turnsPerRoll: investment.turnsPerReturn,
+      maxGoldStockPile: investment.maxGoldStockPile,
+      goldInvested: investment.cost,
+    });
+    this.investments.push(newInvestment);
+  }
+
+  public purchaseInvestmentUpgrade() {}
+
+  public tickAllInvestments() {
+    this.investments.forEach((investment) => investment.turn());
+  }
   //----------------------------------Misc----------------------------------//
   public getMedicalService(
     cost: number,
@@ -1235,6 +1267,11 @@ export class PlayerCharacter extends Character {
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
+      investments: json.investments
+        ? json.investments.map((investment: any) =>
+            Investment.fromJSON(investment),
+          )
+        : undefined,
     });
     return player;
   }
