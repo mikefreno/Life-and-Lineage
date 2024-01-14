@@ -169,6 +169,7 @@ export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
           | "armor"
         )[],
         damage: damage ?? 0,
+        icon: debuffObj.icon,
       });
       playerState.addCondition(debuff);
     }

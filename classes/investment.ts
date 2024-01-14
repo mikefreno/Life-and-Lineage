@@ -69,6 +69,12 @@ export class Investment {
     }
   }
 
+  public collectGold() {
+    const currentGold = this.currentGoldStockPile;
+    this.currentGoldStockPile = 0;
+    return currentGold;
+  }
+
   public addUpgrade(upgrade: InvestmentUpgrade, player: PlayerCharacter) {
     this.upgrades.push(upgrade.name);
     this.increaseGoldInvested(upgrade.cost);
@@ -90,9 +96,9 @@ export class Investment {
   }
 
   private getGoldRoll() {
-    return (
+    return Math.floor(
       Math.random() * (this.maximumReturn - this.minimumReturn) +
-      this.minimumReturn
+        this.minimumReturn,
     );
   }
 

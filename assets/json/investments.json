@@ -4,24 +4,24 @@
         "description": "Control the arteries of commerce, provide a trader with startup costs.",
         "cost": 5000,
         "turnsPerReturn": 10,
-        "goldReturnRange": {"min": 0, "max": 1000},
+        "goldReturnRange": {"min": 0, "max": 400},
         "maxGoldStockPile": 2500,
         "upgrades": [
             {
                 "name": "Inexperienced Guard",
-                "cost": 1500,
+                "cost": 2000,
                 "description":"Hire a nobody to travel with the trader. Increases minimum gold returns.",
-                "effect": {"goldMinimumIncrease": 200} 
+                "effect": {"goldMinimumIncrease": 150} 
             },
             {
                 "name": "Faster Horses",
-                "cost": 3500,
+                "cost": 4000,
                 "description":"Purchase horses to shorten travel time. Shortens travel time.",
                 "effect": {"turnsPerRollChange": -2}
             },
             {
                 "name": "Sturdy Carriage",
-                "cost": 5000,
+                "cost": 6500,
                 "description":"Better put together carriage means lower chance of breakdowns and more carry weight. Increases max stockpile size, and shortens travel time.",
                 "effect": {"turnsPerRollChange": -1, "maxGoldStockPileIncrease": 2000}
             },
@@ -29,25 +29,25 @@
                 "name": "Capital Sales License",
                 "cost": 10000,
                 "description":"Acquire the ability to sell goods within the Capital City's borders. Increases gold returns.",
-                "effect": {"goldMinimumIncrease": 100, "goldMaximumIncrease": 500}
+                "effect": {"goldMinimumIncrease": 50, "goldMaximumIncrease": 400}
             },
             {
                 "name": "Experienced Guards",
-                "cost": 12500,
+                "cost": 17500,
                 "description":"Hire quality guards. Increases minimum gold returns.",
-                "effect": {"goldMinimumIncrease": 800} 
+                "effect": {"goldMinimumIncrease": 500} 
             },
             {
                 "name": "Expand Caravan",
                 "cost": 25000,
                 "description":"Expanding size of caravan means more of everything, but slows down the route. Increases gold returns, and max stockpile size",
-                "effect": {"turnsPerRollChange": 1, "goldMinimumIncrease": 450, "goldMaximumIncrease": 450, "maxGoldStockPileIncrease": 3500} 
+                "effect": {"turnsPerRollChange": 1, "goldMinimumIncrease": 400, "goldMaximumIncrease": 450, "maxGoldStockPileIncrease": 3500} 
             },
             {
                 "name": "Regulatory Capture",
                 "cost": 30000,
                 "description":"Bribe a judge to enact regulations few will be able to comply with. Increases gold returns.",
-                "effect": {"goldMinimumIncrease": 1000, "goldMaximumIncrease": 1000}
+                "effect": {"goldMinimumIncrease": 550, "goldMaximumIncrease": 800}
             }
         ]
     },
@@ -56,72 +56,72 @@
         "description": "It's cheap and in the middle of no-where. Don't expect much foot traffic. But those rare few tired souls will be grateful for a quiet refuge from the beasts of the night.",
         "cost": 10000,
         "turnsPerReturn": 1,
-        "goldReturnRange": {"min": 0, "max": 150},
+        "goldReturnRange": {"min": 0, "max": 75},
         "maxGoldStockPile": 3500,
         "upgrades": [
             {
                 "name": "Install Signage",
-                "cost": 1000,
+                "cost": 1500,
                 "description":"Install signage along nearby roads. Increases gold returns.",
-                "effect": {"goldMinimumIncrease": 20, "goldMaximumIncrease": 10} 
+                "effect": {"goldMinimumIncrease": 10, "goldMaximumIncrease": 5} 
             },
             {
                 "name": "Alcohol License",
-                "cost": 5000,
+                "cost": 10000,
                 "description":"Alcohol often leads to heavy spenders. Increases maximum gold return.",
-                "effect": {"goldMaximumIncrease": 50}
+                "effect": {"goldMaximumIncrease": 25}
             },
             {
                 "name": "Luxury Rooms",
-                "cost": 12500,
+                "cost": 17500,
                 "description":"Nicer rooms means you can charge more. Increases minimum gold return.",
-                "effect": {"goldMinimumIncrease":  100}
+                "effect": {"goldMinimumIncrease":  60}
             },
             {
                 "name": "New Wing",
-                "cost": 20000,
+                "cost": 22500,
                 "description":"More rooms means more bodies at peak. Increases maximum gold return.",
-                "effect": {"goldMaximumIncrease": 175}
+                "effect": {"goldMaximumIncrease": 135}
             }
         ]
     },
     {
         "name": "Village Inn",
         "description": "A vital haven for weary travelers and thirsty locals alike. On a good night, the air is filled with laughter, music, and the clinking of golden coins (and the potential broken table).",
-        "cost": 37500,
+        "cost": 39500,
         "turnsPerReturn": 1,
-        "goldReturnRange": {"min": -100, "max": 400},
+        "goldReturnRange": {"min": -100, "max": 300},
         "maxGoldStockPile": 10000,
         "upgrades": [
             {
                 "name": "Hire Pretty Tavern Girl",
-                "cost": 2500,
+                "cost": 4500,
                 "description":"Drunk men are simple creatures. Increases maximum gold returns.",
-                "effect": {"goldMaximumIncrease": 50} 
+                "effect": {"goldMaximumIncrease": 35} 
             },
             {
                 "name": "Hire Experienced Bartender",
-                "cost": 10000,
+                "cost": 14000,
                 "description":"Great bartenders keep the drinks flowing. Increases maximum gold return.",
-                "effect": {"goldMaximumIncrease": 150}
+                "effect": {"goldMaximumIncrease": 75}
             },
             {
                 "name": "Hire Intimidating Bouncers",
-                "cost": 12500,
+                "cost": 22500,
                 "description":"Keeps the rowdy customers under control. Increases minimum gold return.",
-                "effect": {"goldMinimumIncrease": 200}
+                "effect": {"goldMinimumIncrease": 100}
             },
             {
                 "name": "Biergarten",
-                "cost": 20000,
+                "cost": 37500,
                 "description":"Expand land plot with outdoor area, some may get too rowdy, leading to minor fines. Decreases minimum gold return, increases maximum gold return.",
-                "effect": {"goldMinimumIncrease":  -150, "goldMaximumIncrease": 350}
+                "effect": {"goldMinimumIncrease":  -150, "goldMaximumIncrease": 300}
             },
             {
                 "name": "'Entertainment' Wing",
-                "cost": 75000,
+                "cost": 85000,
                 "description":"Use your imagination. Increases gold returns.",
-                "effect": {"goldMinimumIncrease":  100, "goldMaximumIncrease": 700}
+                "effect": {"goldMinimumIncrease":  50, "goldMaximumIncrease": 500}
             }
         ]
     },
@@ -130,14 +130,20 @@
         "description": "Magic drips from the quill in this establishment, as scribes imbued with arcane knowledge ink the pages of tomes that will guide the next generation of magi.",
         "cost": 75000,
         "turnsPerReturn": 25,
-        "goldReturnRange": {"min": 1000, "max": 7500},
+        "goldReturnRange": {"min": 500, "max": 5500},
         "maxGoldStockPile": 25000,
         "upgrades": [
             {
-                "name": "Undo-able Ink™",
-                "cost": 20000,
+                "name": "Stockpile Room",
+                "cost": 15000,
                 "description":"It's trademarked and highway robbery, but it works. Increases minimum gold return.",
-                "effect": {"goldMinimumIncrease": 5000}
+                "effect": {"maxGoldStockPileIncrease": 15000}
+            },
+            {
+                "name": "Undo-able Ink™",
+                "cost": 22000,
+                "description":"It's trademarked and highway robbery, but it works. Increases minimum gold return.",
+                "effect": {"goldMinimumIncrease": 2500}
             },
             {
                 "name": "Exclusivity Contracts",
@@ -147,49 +153,49 @@
             },
             {
                 "name": "Arcane Quill Stockpile",
-                "cost": 100000,
+                "cost": 120000,
                 "description":"Quills need not be held, only spoken to, one scribe can use hundreds. Decreases publishing time.",
-                "effect": {"turnsPerRollChange": -15} 
+                "effect": {"turnsPerRollChange": -14} 
             }
         ]
     },
     {
         "name": "Iron Mine",
         "description": "Deep in the earth, the rhythmic beat of picks against stone echoes out as miners unearth veins of precious iron, indispensable for smiths and warriors.",
-        "cost": 125000,
+        "cost": 145000,
         "turnsPerReturn": 10,
-        "goldReturnRange": {"min": 1500, "max": 3500},
+        "goldReturnRange": {"min": 1200, "max": 3000},
         "maxGoldStockPile": 35000,
         "upgrades": [
             {
                 "name": "Enchanted Steel Tools",
-                "cost": 25000,
+                "cost": 27500,
                 "description":"Invest in tools to increase workers' efficiency. Increases gold returns.",
-                "effect": {"goldMinimumIncrease": 500, "goldMaximumIncrease": 600} 
+                "effect": {"goldMinimumIncrease": 400, "goldMaximumIncrease": 550} 
             },
             {
                 "name": "Cart System",
                 "cost": 50000,
                 "description":"Install a cart system for more efficient transport of ore. Increases gold returns and max stockpile size.",
-                "effect": {"goldMinimumIncrease": 400, "goldMaximumIncrease": 650, "maxGoldStockPileIncrease": 25000}
+                "effect": {"goldMinimumIncrease": 400, "goldMaximumIncrease": 550, "maxGoldStockPileIncrease": 25000}
             },
             {
                 "name": "Miner's Training",
                 "cost": 75000,
                 "description":"Provide advanced training for miners to improve their work. Increases gold returns.",
-                "effect": {"goldMinimumIncrease": 1250, "goldMaximumIncrease": 1000}
+                "effect": {"goldMinimumIncrease": 1100, "goldMaximumIncrease": 1000}
             },
             {
                 "name": "Improved Mining Techniques",
                 "cost": 100000,
                 "description":"Adopt and implement breakthrough mining techniques. Increases gold returns.",
-                "effect": {"goldMinimumIncrease": 900, "goldMaximumIncrease": 1350}
+                "effect": {"goldMinimumIncrease": 900, "goldMaximumIncrease": 1250}
             },
             {
                 "name": "Ward Against Cave-Ins",
                 "cost": 150000,
                 "description":"Enchant the mine with magic wards to prevent cave-ins. Increases gold returns and shortens ore extraction time.",
-                "effect": {"turnsPerRollChange": -2, "goldMinimumIncrease": 650, "goldMaximumIncrease": 1250}    
+                "effect": {"turnsPerRollChange": -2, "goldMinimumIncrease": 650, "goldMaximumIncrease": 1100}    
             },
             {
                 "name": "Profit Sharing",
@@ -203,14 +209,14 @@
                 "cost": 200000,
                 "excludes": "Profit Sharing",
                 "description":"Bribe nearby city officials for access to their criminal population, its a win-win if you don't consider morality, but that's what the gold is for. Decreases extraction time and dramatically increases gold returns at the cost of max sanity",
-                "effect": {"turnsPerRollChange": -2, "goldMinimumIncrease": 1500, "goldMaximumIncrease": 4000, "changeMaxSanity": -5}    
+                "effect": {"turnsPerRollChange": -2, "goldMinimumIncrease": 1000, "goldMaximumIncrease": 4250, "changeMaxSanity": -5}    
             }
         ]
     },
     {
         "name": "Monster Breeding Ranch",
         "description": "Here, creatures of nightmare and wonder are reared. Some are bred for their power in battle, others for exotic pets. All fetch a fair price on the market.",
-        "cost": 200000,
+        "cost": 220000,
         "turnsPerReturn": 15,
         "goldReturnRange": {"min": 2000, "max": 6000},
         "maxGoldStockPile": 15000,
@@ -218,119 +224,125 @@
             {
                 "name": "Nest Mimicry",
                 "description": "Replicate the natural habitats of different creatures to boost their growth and health. Increases gold returns.",
-                "cost": 30000,
+                "cost": 65000,
                 "effect": {"goldMinimumIncrease": 500, "goldMaximumIncrease": 1150}
-            },
-            {
-                "name": "Black Market Sales",
-                "cost": 75000,
-                "excludes": "Ethical Breeding",
-                "description":"Sell to disreputable buyers. Increases gold returns and decreases time to market. decreases sanity.",
-                "effect": {"turnsPerRollChange": -3, "goldMinimumIncrease": 2000, "goldMaximumIncrease": 5000, "changeMaxSanity": -5}
-            },
-            {
-                "name": "Ethical Breeding",
-                "cost": 75000,
-                "excludes": "Black Market Sales",
-                "description":"Only breed and sell creatures ethically, some with pay the premium. Increases maximum gold returns.",
-                "effect": {"goldMaximumIncrease": 7500}
             },
             {
                 "name": "Magical Supplements",
                 "description": "Feed beasts nutrient-rich, magic-infused feed to promote growth. Shortens time to market.",
-                "cost": 100000,
+                "cost": 120000,
                 "effect": {"turnsPerRollChange": -5 }
+            },
+            {
+                "name": "Black Market Sales",
+                "cost": 145000,
+                "excludes": "Ethical Breeding",
+                "description":"Sell to disreputable buyers. Increases gold returns and decreases time to market. decreases sanity.",
+                "effect": {"turnsPerRollChange": -2, "goldMinimumIncrease": 1500, "goldMaximumIncrease": 4000, "changeMaxSanity": -5}
+            },
+            {
+                "name": "Ethical Breeding",
+                "cost": 145000,
+                "excludes": "Black Market Sales",
+                "description":"Only breed and sell creatures ethically, some with pay the premium. Increases maximum gold returns.",
+                "effect": {"goldMaximumIncrease": 5000}
+            },
+            {
+
+                "name": "Extended Territory",
+                "description": "Increase the ranch size, accommodating a larger variety of monsters. Increases gold returns and max stockpile size.",
+                "cost": 210000,
+                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 3500, "maxGoldStockPileIncrease": 15000}
             },
             {
                 "name": "Enchanted Enclosures",
                 "description": "Enhance the creatures' environments with magic to stimulate faster and more significant growth. Shortens time to market, increases gold returns, and max stockpile size.",
-                "cost": 200000,
+                "cost": 255000,
                 "effect": {"turnsPerRollChange": -2, "goldMinimumIncrease": 1500,"goldMaximumIncrease": 3000, "maxGoldStockPileIncrease": 10000}
-            },
-            {
-                "name": "Extended Territory",
-                "description": "Increase the ranch size, accommodating a larger variety of monsters. Increases gold returns and max stockpile size.",
-                "cost": 225000,
-                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 3500, "maxGoldStockPileIncrease": 15000}
             }
         ]
     },
     {
         "name": "Crystal Mine",
         "description": "Beneath ominous stone outcroppings, miners burrow deep below all other mines, discovering veins of shimmering crystal. Their glow is mesmerizing, and their magical potential immense.",
-        "cost": 450000,
+        "cost": 480000,
         "turnsPerReturn": 20,
-        "goldReturnRange": {"min": 8500, "max": 12000},
+        "goldReturnRange": {"min": 7000, "max": 12000},
         "maxGoldStockPile": 200000,
         "upgrades": [
             {
                 "name": "Gem Laden Tools",
-                "cost": 175000,
+                "cost": 195000,
                 "description":"Invest in enchanted tools to increase workers' success rate in mining. Increases gold returns.",
-                "effect": {"turnsPerRollChange": -5,"goldMinimumIncrease": 3000, "goldMaximumIncrease": 6000}
+                "effect": {"turnsPerRollChange": -3,"goldMinimumIncrease": 3000, "goldMaximumIncrease": 6000}
             },
             {
                 "name": "Portal System",
-                "cost": 325000,
+                "cost": 345000,
                 "description":"Hire magi to create a teleportation system. Significantly decreases time of extraction.",
-                "effect": {"turnsPerRollChange": -10}
+                "effect": {"turnsPerRollChange": -5}
             },
             {
                 "name": "Explosive Mining",
-                "cost": 420000,
+                "cost": 460000,
                 "excludes": "Seismic Monitoring",
                 "description": "Utilize explosives for rapid extraction. Wildly increases maximum gold returns, decreases minimum gold return.",
-                "effect": {"turnsPerRollChange": -2,"goldMinimumIncrease": -4000, "goldMaximumIncrease": 20000}
+                "effect": {"turnsPerRollChange": -3,"goldMinimumIncrease": -2000, "goldMaximumIncrease": 16000}
             },
             {
                 "name": "Seismic Monitoring",
-                "cost": 450000,
+                "cost": 490000,
                 "excludes": "Profit Sharing",
                 "description":"Hire earth magi to keep watch and temper seismic activity. Increases gold returns and maximum sanity.",
-                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "changeMaxSanity": -5}    
+                "effect": {"goldMinimumIncrease": 7500, "goldMaximumIncrease": 7500, "changeMaxSanity": 5}    
             }
         ]
     },
     {
         "name": "Artifact Excavation Site",
         "description": "Hidden beneath the millennia of earth lie ancient artifacts infused with forgotten magics. Each find promises wealth, power, and a chance to rewrite history.",
-        "cost": 1150000,
+        "cost": 1450000,
         "turnsPerReturn": 50,
-        "goldReturnRange": {"min": 37500, "max": 120000},
+        "goldReturnRange": {"min": 28500, "max": 100000},
         "maxGoldStockPile": 500000,
         "upgrades": [
             {
                 "name": "Magic Detectors",
                 "cost": 575000,
                 "description":"",
-                "effect": {"turnsPerRollChange": -5,"goldMinimumIncrease": 15000, "goldMaximumIncrease": 25000}
+                "effect": {"turnsPerRollChange": -5, "goldMinimumIncrease": 15000, "goldMaximumIncrease": 25000}
             },
             {
-                "name": "Portal System",
-                "cost": 950000,
-                "description":"",
-                "effect": {"turnsPerRollChange": -10}
+                "name": "Renowned Archeologists",
+                "cost": 1350000,
+                "description":"Hire the most preeminent archeolgy experts from around the world to overlook the excavation and to make sure nothing goes overlooked.",
+                "effect": {"turnsPerRollChange": -5, "goldMinimumIncrease": 18000, "goldMaximumIncrease": 40000}
             },
             {
-                "name": "Explosive Mining",
-                "cost": 1300000,
-                "excludes": "Seismic Monitoring",
+                "name": "Develop Local Infrastructure",
+                "cost": 2100000,
                 "description": "",
                 "effect": {"turnsPerRollChange": -2,"goldMinimumIncrease": -4000, "goldMaximumIncrease": 20000}
             },
             {
-                "name": "Seismic Monitoring",
+                "name": "Exploit Local Labor",
                 "cost": 2100000,
-                "excludes": "Profit Sharing",
-                "description":"",
-                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "": 5}    
+                "description": "",
+                "effect": {"turnsPerRollChange": -2,"goldMinimumIncrease": -4000, "goldMaximumIncrease": 20000}
             },
             {
-                "name": "Seismic Monitoring",
+                "name": "Rapid Excavation",
                 "cost": 2100000,
-                "excludes": "Profit Sharing",
+                "excludes": "",
                 "description":"",
-                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "": 5}    
+                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "changeMaxSanity": -5}    
+            },
+            {
+                "name": "Careful Excavation",
+                "cost": 2100000,
+                "excludes": "",
+                "description":"",
+                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "changeMaxSanity": 5}    
             }
         ]
     },

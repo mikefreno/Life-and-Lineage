@@ -443,12 +443,14 @@ const DungeonLevelScreen = observer(() => {
 
   const loadBoss = () => {
     setFightingBoss(true);
-    if (thisDungeon && thisInstance && playerState) {
-      setMonster(null);
-      const boss = thisDungeon.getBoss(thisInstance.name)[0];
-      setMonster(boss);
-      battleLogger(`You found the boss!`);
-    }
+    setMonster(null);
+    setTimeout(() => {
+      if (thisDungeon && thisInstance && playerState) {
+        const boss = thisDungeon.getBoss(thisInstance.name)[0];
+        setMonster(boss);
+        battleLogger(`You found the boss!`);
+      }
+    }, 250);
   };
 
   //------------player combat functions------------//

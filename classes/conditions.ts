@@ -63,10 +63,9 @@ export class Condition {
 
   public tick() {
     this.turns -= 1;
-    console.log("effect: ", this.effect, " damage: ", this.damage);
     return {
       effect: this.effect,
-      damage: this.damage,
+      damage: this.damage ? Math.round(this.damage * 4) / 4 : null,
       turns: this.turns,
     };
   }

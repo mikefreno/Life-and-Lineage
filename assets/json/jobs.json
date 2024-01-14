@@ -4,7 +4,7 @@
       "cost": { "mana": 5 },
       "qualifications": null,
       "experienceToPromote": 50,
-      "reward": { "gold": 10 }
+      "reward": { "gold": 500000 }
    },
    {
       "title": "Crusty Cauldron Cleaner",
@@ -29,10 +29,17 @@
    },
    {
       "title": "Private Dueling Partner",
-      "cost": { "mana": 15, "health": 10 },
+      "cost": { "mana": 10, "health": 4 },
       "qualifications": ["high school education", "defense course"],
       "experienceToPromote": 50,
       "reward": { "gold": 45 }
+   },
+   {
+      "title": "Wild Monster Hunter",
+      "cost": { "mana": 10, "health": 6 },
+      "qualifications": ["high school education", "defense course"],
+      "experienceToPromote": 50,
+      "reward": { "gold": 55 }
    }
 ]
 

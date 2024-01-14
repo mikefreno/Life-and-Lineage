@@ -10,22 +10,30 @@ import ClockIcon from "../assets/icons/ClockIcon";
 import Vault from "../assets/icons/VaultIcon";
 import { Entypo } from "@expo/vector-icons";
 import Sanity from "../assets/icons/SanityIcon";
-import { PlayerCharacterContext } from "../app/_layout";
+import { GameContext, PlayerCharacterContext } from "../app/_layout";
+import { Investment } from "../classes/investment";
 
 interface InvestmentCardProps {
   investment: InvestmentType;
 }
+
 export default function InvestmentCard({ investment }: InvestmentCardProps) {
   const { colorScheme } = useColorScheme();
   const [showUpgrades, setShowUpgrades] = useState<boolean>(false);
   const playerCharacterContext = useContext(PlayerCharacterContext);
-  if (!playerCharacterContext) {
+  const gameContext = useContext(GameContext);
+  if (!playerCharacterContext || !gameContext) {
     throw new Error("missing context");
   }
   const [showInvestmentConfirmation, setShowInvestmentConfirmation] =
     useState<boolean>(false);
 
   const { playerState } = playerCharacterContext;
+  const { gameState } = gameContext;
+
+  const [madeInvestment, setMadeInvestment] = useState<Investment | undefined>(
+    playerState?.getInvestment(investment.name),
+  );
 
   function purchaseInvestmentCheck() {
     if (playerState && playerState.gold >= investment.cost) {
@@ -36,6 +44,17 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
       }
     }
   }
+
+  function collectOnInvestment() {
+    if (playerState && gameState) {
+      playerState.collectFromInvestment(investment.name);
+      gameState.gameTick(playerState);
+    }
+  }
+
+  useEffect(() => {
+    setMadeInvestment(playerState?.getInvestment(investment.name));
+  }, [playerState?.investments.length]);
 
   return (
     <>
@@ -62,16 +81,15 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
             shadowRadius: 5,
           }}
         >
-          {" "}
           <Text className="text-center text-lg">Purchase:</Text>
           <View style={styles.container}>
             <View style={styles.line} />
             <View style={styles.content}>
-              <Text className="text-xl">{investment.name}</Text>
+              <Text className="text-2xl">{investment.name}</Text>
             </View>
             <View style={styles.line} />
           </View>
-          <Text className="text-center text-2xl">Are you sure?</Text>
+          <Text className="pb-6 text-center text-xl">Are you sure?</Text>
           <View className="flex flex-row">
             <Pressable
               onPress={() => {
@@ -237,8 +255,7 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
                             <View
                               className="rounded-xl px-8 py-4"
                               style={
-                                playerState &&
-                                playerState.gold >= investment.cost
+                                playerState && playerState.gold >= upgrade.cost
                                   ? {
                                       shadowColor: "#000",
                                       elevation: 1,
@@ -327,39 +344,75 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
               </Text>
             </Pressable>
           </View>
-          <Pressable
-            onPress={purchaseInvestmentCheck}
-            disabled={playerState && playerState.gold < investment.cost}
-            className="mx-auto mb-2 active:scale-95 active:opacity-50"
-          >
-            <View
-              className="rounded-xl px-8 py-4"
-              style={
-                playerState && playerState.gold >= investment.cost
-                  ? {
-                      shadowColor: "#000",
-                      elevation: 1,
-                      backgroundColor:
-                        colorScheme == "light" ? "white" : "#71717a",
-                      shadowOpacity: 0.1,
-                      shadowRadius: 5,
-                    }
-                  : {
-                      backgroundColor:
-                        colorScheme == "light" ? "#ccc" : "#4b4b4b",
-                      opacity: 0.5,
-                    }
-              }
+          {!madeInvestment ? (
+            <Pressable
+              onPress={purchaseInvestmentCheck}
+              disabled={playerState && playerState.gold < investment.cost}
+              className="mx-auto mb-2 active:scale-95 active:opacity-50"
             >
-              <Text className="text-center">Purchase For</Text>
-              <View className="flex flex-row items-center justify-center">
-                <Text className="dark:text-zinc-50">
-                  {asReadableGold(investment.cost)}{" "}
-                </Text>
-                <Coins width={14} height={14} />
+              <View
+                className="rounded-xl px-8 py-4"
+                style={
+                  playerState && playerState.gold >= investment.cost
+                    ? {
+                        shadowColor: "#000",
+                        elevation: 1,
+                        backgroundColor:
+                          colorScheme == "light" ? "white" : "#71717a",
+                        shadowOpacity: 0.1,
+                        shadowRadius: 5,
+                      }
+                    : {
+                        backgroundColor:
+                          colorScheme == "light" ? "#ccc" : "#4b4b4b",
+                        opacity: 0.5,
+                      }
+                }
+              >
+                <Text className="text-center">Purchase For</Text>
+                <View className="flex flex-row items-center justify-center">
+                  <Text className="dark:text-zinc-50">
+                    {asReadableGold(investment.cost)}{" "}
+                  </Text>
+                  <Coins width={14} height={14} />
+                </View>
               </View>
-            </View>
-          </Pressable>
+            </Pressable>
+          ) : (
+            <Pressable
+              onPress={collectOnInvestment}
+              disabled={madeInvestment.currentGoldStockPile > 0}
+              className="mx-auto mb-2 active:scale-95 active:opacity-50"
+            >
+              <View
+                className="rounded-xl px-8 py-4"
+                style={
+                  madeInvestment.currentGoldStockPile > 0
+                    ? {
+                        shadowColor: "#000",
+                        elevation: 1,
+                        backgroundColor:
+                          colorScheme == "light" ? "white" : "#71717a",
+                        shadowOpacity: 0.1,
+                        shadowRadius: 5,
+                      }
+                    : {
+                        backgroundColor:
+                          colorScheme == "light" ? "#ccc" : "#4b4b4b",
+                        opacity: 0.5,
+                      }
+                }
+              >
+                <Text className="text-center">Collect</Text>
+                <View className="flex flex-row items-center justify-center">
+                  <Text className="dark:text-zinc-50">
+                    {asReadableGold(madeInvestment.currentGoldStockPile)}{" "}
+                  </Text>
+                  <Coins width={14} height={14} />
+                </View>
+              </View>
+            </Pressable>
+          )}
         </View>
       </ThemedView>
     </>

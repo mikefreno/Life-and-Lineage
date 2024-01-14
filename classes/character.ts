@@ -349,6 +349,8 @@ export class PlayerCharacter extends Character {
       conditionTicker: action,
       setInDungeon: action,
       changeMaxSanity: action,
+      purchaseInvestmentBase: action,
+      purchaseInvestmentUpgrade: action,
     });
   }
   //----------------------------------Health----------------------------------//
@@ -1176,6 +1178,20 @@ export class PlayerCharacter extends Character {
 
   public tickAllInvestments() {
     this.investments.forEach((investment) => investment.turn());
+  }
+  public collectFromInvestment(investmentName: string) {
+    const found = this.investments.find(
+      (investment) => investment.name == investmentName,
+    );
+    if (found) {
+      this.gold += found.collectGold();
+    }
+  }
+  public getInvestment(investmentName: string) {
+    const found = this.investments.find(
+      (investment) => investment.name == investmentName,
+    );
+    return found;
   }
   //----------------------------------Misc----------------------------------//
   public getMedicalService(

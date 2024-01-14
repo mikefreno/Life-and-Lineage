@@ -97,8 +97,7 @@ const ShopInteriorScreen = observer(() => {
     if (
       playerState &&
       thisShop &&
-      new Date(thisShop.lastStockRefresh) <
-        new Date(Date.now() - 60 * 60 * 1000)
+      new Date(thisShop.lastStockRefresh) < new Date(Date.now())
     ) {
       thisShop.refreshInventory(playerState.playerClass);
     }
