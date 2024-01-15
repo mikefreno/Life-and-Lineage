@@ -232,13 +232,17 @@ export class Monster {
       const roll = rollD20();
       let damage: number = 0;
       if (chosenAttack.damageMult) {
-        damage =
-          Math.round(
-            chosenAttack.damageMult * this.attackPower * (1 - playerDR) * 4,
-          ) / 4;
+        damage = chosenAttack.damageMult * this.attackPower * (1 - playerDR);
       } else if (chosenAttack.flatDamage) {
         damage = chosenAttack.flatDamage;
       }
+      const weakens = this.conditions.filter((condition) =>
+        condition.effect.find((effect) => effect == "weaken"),
+      );
+      if (weakens) {
+        damage *= Math.pow(0.75, weakens.length);
+      }
+      damage = Math.round(damage * 4) / 4;
       const sanityDamage = chosenAttack.sanityDamage;
       if (roll >= rollToHit) {
         let debuffs: Condition[] = [];

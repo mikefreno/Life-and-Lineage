@@ -4,7 +4,7 @@ import {
   View as NonThemedView,
   Switch,
 } from "react-native";
-import { Text, View, ScrollView } from "../../components/Themed";
+import { Text, View } from "../../components/Themed";
 import "../../assets/styles/globals.css";
 import { useContext, useEffect, useRef, useState } from "react";
 import WizardHat from "../../assets/icons/WizardHatIcon";
@@ -16,6 +16,7 @@ import { GameContext } from "../_layout";
 import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesome5 } from "@expo/vector-icons";
+import TutorialModal from "../../components/TutorialModal";
 
 export default function NewGameScreen() {
   const [selectedClass, setSelectedClass] = useState<
@@ -32,13 +33,19 @@ export default function NewGameScreen() {
   );
 
   const [showIntroTutorial, setShowIntroTutorial] = useState<boolean>(
-    !gameState || (gameState && !gameState.getTutorialState("class"))
+    !gameState ||
+      (gameState &&
+        !gameState.getTutorialState("class") &&
+        gameState.tutorialsEnabled)
       ? true
       : false,
   );
+
   const [showTutorialReset, setShowTutorialReset] = useState<boolean>(
     gameState ? true : false,
   );
+
+  const [loadedAsync, setLoadedAsync] = useState<boolean>(false);
 
   useEffect(() => {
     if (!showIntroTutorial && gameState) {
@@ -66,6 +73,26 @@ export default function NewGameScreen() {
     }
   }, [tutorialState]);
 
+  useEffect(() => {
+    loadAsyncTutorialState();
+  }, []);
+
+  useEffect(() => {
+    if (gameState) {
+      setTutorialState(gameState?.tutorialsEnabled);
+    }
+  }, [gameState?.tutorialsEnabled]);
+
+  async function loadAsyncTutorialState() {
+    const res = await AsyncStorage.getItem("tutorialsEnabled");
+    if (res) {
+      const parsed: boolean = JSON.parse(res);
+      setShowIntroTutorial(parsed);
+      setTutorialState(parsed);
+    }
+    setLoadedAsync(true);
+  }
+
   return (
     <>
       <Stack.Screen
@@ -73,253 +100,208 @@ export default function NewGameScreen() {
           title: "Class Select",
         }}
       />
-      <ScrollView className="h-full">
-        <Modal
-          animationIn="slideInUp"
-          animationOut="slideOutDown"
-          backdropOpacity={0.2}
-          animationInTiming={500}
-          animationOutTiming={300}
-          isVisible={showTutorialReset && gameState?.tutorialsEnabled}
-          onBackdropPress={() => setShowTutorialReset(false)}
-          onBackButtonPress={() => setShowTutorialReset(false)}
+      <Modal
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        backdropOpacity={0.2}
+        animationInTiming={500}
+        animationOutTiming={300}
+        isVisible={showTutorialReset}
+        onBackdropPress={() => setShowTutorialReset(false)}
+        onBackButtonPress={() => setShowTutorialReset(false)}
+      >
+        <View
+          className="mx-auto w-5/6 rounded-xl px-6 py-4 dark:border dark:border-zinc-500"
+          style={{
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 2,
+            },
+            elevation: 4,
+            shadowOpacity: 0.25,
+            shadowRadius: 5,
+          }}
         >
-          <View
-            className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
-            style={{
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-
-              shadowOpacity: 0.25,
-              shadowRadius: 5,
-            }}
-          >
-            <Text className="text-center text-2xl">Tutorial Reset</Text>
-            <Text className="text-center text-lg">
-              Would you like to reset tutorials?
-            </Text>
-            <View className="flex flex-row">
-              <Pressable
-                onPress={() => {
-                  gameState?.resetTutorialState();
-                  setShowTutorialReset(false);
-                }}
-                className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-              >
-                <Text>Reset</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => setShowTutorialReset(false)}
-                className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-              >
-                <Text>Cancel</Text>
-              </Pressable>
-            </View>
-          </View>
-        </Modal>
-        <Modal
-          animationIn="slideInUp"
-          animationOut="slideOutDown"
-          backdropOpacity={0.2}
-          animationInTiming={500}
-          animationOutTiming={300}
-          isVisible={showIntroTutorial}
-          onBackdropPress={() => setShowIntroTutorial(false)}
-          onBackButtonPress={() => setShowIntroTutorial(false)}
-        >
-          <View
-            className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
-            style={{
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-
-              shadowOpacity: 0.25,
-              shadowRadius: 5,
-            }}
-          >
-            <Text className="text-center text-2xl">
-              Welcome To Magic Delve!
-            </Text>
-            <Text className="my-4 text-center">
-              Let's start with selecting your class...
-            </Text>
-            <View className="mx-auto flex flex-row">
-              <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-              <Switch
-                trackColor={{ false: "#767577", true: "#3b82f6" }}
-                ios_backgroundColor="#3e3e3e"
-                thumbColor={"white"}
-                onValueChange={(bool) => setTutorialState(bool)}
-                value={tutorialState}
-              />
-            </View>
+          <Text className="text-center text-2xl">Tutorial Reset</Text>
+          <Text className="text-center text-lg">
+            Would you like to reset tutorials?
+          </Text>
+          <View className="flex flex-row">
             <Pressable
               onPress={() => {
-                vibration({ style: "light" });
-                setShowIntroTutorial(false);
+                gameState?.resetTutorialState();
+                setShowTutorialReset(false);
+                setShowIntroTutorial(true);
               }}
               className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
             >
-              <Text>Close</Text>
+              <Text>Reset</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setShowTutorialReset(false)}
+              className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+            >
+              <Text>Cancel</Text>
             </Pressable>
           </View>
-        </Modal>
-        <Text className="bold pt-4 text-center text-3xl">
+        </View>
+      </Modal>
+      <TutorialModal
+        isVisibleCondition={
+          !gameState
+            ? loadedAsync
+              ? showIntroTutorial
+              : false
+            : showIntroTutorial
+        }
+        backFunction={() => setShowIntroTutorial(false)}
+        onCloseFunction={() => setShowIntroTutorial(false)}
+        pageOne={{
+          title: "Welcome To Magic Delve!",
+          body: "Let's start with selecting your class...",
+        }}
+      />
+      <View className="flex-1 items-center px-[6vw]">
+        <Text className="bold pt-[4vh] text-center text-3xl">
           Create a Character
         </Text>
-        <NonThemedView className="">
-          <View className="mx-auto my-2 w-4/5">
-            <Text className="pt-2 text-center text-2xl">Select Class</Text>
-            <Pressable
-              className="mx-auto my-8"
-              onPress={() => {
-                setSelectedClass("mage");
-                classRef.current = "mage";
-              }}
+        <Text className="pt-[2vh] text-center text-2xl">Select Class</Text>
+        <Pressable
+          className="mx-auto mt-[2vh]"
+          onPress={() => {
+            setSelectedClass("mage");
+            classRef.current = "mage";
+          }}
+        >
+          {({ pressed }) => (
+            <NonThemedView
+              className={`${
+                pressed || selectedClass == "mage"
+                  ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                  : "border-transparent"
+              } px-6 py-4 border`}
             >
-              {({ pressed }) => (
-                <NonThemedView
-                  className={`${
-                    pressed || selectedClass == "mage"
-                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                      : "border-transparent"
-                  } px-6 py-4 border`}
-                >
-                  <WizardHat
-                    height={120}
-                    width={120}
-                    style={{ marginBottom: 5 }}
-                    color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
-                  />
-                  <Text
-                    className="mx-auto text-xl"
-                    style={{ color: "#2563eb" }}
-                  >
-                    Mage
-                  </Text>
-                </NonThemedView>
-              )}
-            </Pressable>
-            {selectedClass == "mage" ? (
-              <Text className="h-16 text-center">
-                The Mage is the default class, it is well balanced, with a focus
-                on casting elemental magic
+              <WizardHat
+                height={120}
+                width={120}
+                style={{ marginBottom: 5 }}
+                color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
+              />
+              <Text className="mx-auto text-xl" style={{ color: "#2563eb" }}>
+                Mage
               </Text>
-            ) : (
-              <View className="h-16" />
-            )}
-            <NonThemedView className="flex flex-row justify-between">
-              <Pressable
-                className="-ml-2"
-                onPress={() => {
-                  setSelectedClass("necromancer");
-                  classRef.current = "necromancer";
-                }}
-              >
-                {({ pressed }) => (
-                  <NonThemedView
-                    className={`${
-                      pressed || selectedClass == "necromancer"
-                        ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                        : "border-transparent"
-                    } px-6 py-4 border`}
-                  >
-                    <NonThemedView className="-rotate-12">
-                      <Necromancer
-                        height={120}
-                        width={110}
-                        style={{ marginBottom: 5 }}
-                        color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
-                      />
-                    </NonThemedView>
-                    <Text
-                      className="mx-auto text-xl"
-                      style={{ color: "#9333ea" }}
-                    >
-                      Necromancer
-                    </Text>
-                  </NonThemedView>
-                )}
-              </Pressable>
-              <Pressable
-                className="-mr-2"
-                onPress={() => {
-                  setSelectedClass("paladin");
-                  classRef.current = "paladin";
-                }}
-              >
-                {({ pressed }) => (
-                  <NonThemedView
-                    className={`${
-                      pressed || selectedClass == "paladin"
-                        ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                        : "border-transparent"
-                    } px-8 py-4 border`}
-                  >
-                    <NonThemedView className="rotate-12">
-                      <NonThemedView className="scale-x-[-1] transform">
-                        <PaladinHammer
-                          height={120}
-                          width={90}
-                          style={{ marginBottom: 5 }}
-                        />
-                      </NonThemedView>
-                    </NonThemedView>
-                    <Text
-                      className="mx-auto text-xl"
-                      style={{ color: "#fcd34d" }}
-                    >
-                      Paladin
-                    </Text>
-                  </NonThemedView>
-                )}
-              </Pressable>
             </NonThemedView>
-            {selectedClass == "paladin" ? (
-              <Text className="mt-6 h-16 text-center">
-                The Paladin is skilled with arms and uses holy magic, which is
-                especially powerful against the undead.
-              </Text>
-            ) : selectedClass == "necromancer" ? (
-              <Text className="mt-6 h-16 text-center">
-                The Necromancer can summon minions, use blood, bone and
-                poisonous magics.
-              </Text>
-            ) : null}
-            {selectedClass && (
-              <NonThemedView className="mx-auto mt-4">
-                <Pressable
-                  onPress={() => {
-                    vibration({ style: "light" });
-                    router.push(`/NewGame/SetSex/${classRef.current}`);
-                  }}
-                  className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-                >
-                  <Text className="text-xl tracking-widest">Next</Text>
-                </Pressable>
+          )}
+        </Pressable>
+        {selectedClass == "mage" ? (
+          <Text className="mt-[2vh] h-16 text-center md:text-lg">
+            The Mage is the default class, it is well balanced, with a focus on
+            casting elemental magic
+          </Text>
+        ) : (
+          <View className="mt-[2vh] h-16" />
+        )}
+        <NonThemedView className="flex w-full flex-row justify-evenly">
+          <Pressable
+            className="-ml-2"
+            onPress={() => {
+              setSelectedClass("necromancer");
+              classRef.current = "necromancer";
+            }}
+          >
+            {({ pressed }) => (
+              <NonThemedView
+                className={`${
+                  pressed || selectedClass == "necromancer"
+                    ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                    : "border-transparent"
+                } px-6 py-4 border`}
+              >
+                <NonThemedView className="-rotate-12">
+                  <Necromancer
+                    height={120}
+                    width={110}
+                    style={{ marginBottom: 5 }}
+                    color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
+                  />
+                </NonThemedView>
+                <Text className="mx-auto text-xl" style={{ color: "#9333ea" }}>
+                  Necromancer
+                </Text>
               </NonThemedView>
             )}
-          </View>
-        </NonThemedView>
-        <NonThemedView className="absolute ml-4 mt-4">
+          </Pressable>
           <Pressable
-            className="absolute"
-            onPress={() => setShowIntroTutorial(true)}
+            className="-mr-2"
+            onPress={() => {
+              setSelectedClass("paladin");
+              classRef.current = "paladin";
+            }}
           >
-            <FontAwesome5
-              name="question-circle"
-              size={32}
-              color={colorScheme == "light" ? "#27272a" : "#fafafa"}
-            />
+            {({ pressed }) => (
+              <NonThemedView
+                className={`${
+                  pressed || selectedClass == "paladin"
+                    ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                    : "border-transparent"
+                } px-8 py-4 border`}
+              >
+                <NonThemedView className="rotate-12">
+                  <NonThemedView className="scale-x-[-1] transform">
+                    <PaladinHammer
+                      height={120}
+                      width={90}
+                      style={{ marginBottom: 5 }}
+                    />
+                  </NonThemedView>
+                </NonThemedView>
+                <Text className="mx-auto text-xl" style={{ color: "#fcd34d" }}>
+                  Paladin
+                </Text>
+              </NonThemedView>
+            )}
           </Pressable>
         </NonThemedView>
-      </ScrollView>
+        {selectedClass == "paladin" ? (
+          <Text className="mt-[2vh] h-16 text-center md:text-lg">
+            The Paladin is skilled with arms and uses holy magic, which is
+            especially powerful against the undead.
+          </Text>
+        ) : selectedClass == "necromancer" ? (
+          <Text className="mt-[2vh] h-16 text-center md:text-lg">
+            The Necromancer can summon minions, use blood, bone and poisonous
+            magics.
+          </Text>
+        ) : (
+          <Text className="mt-[2vh] h-16 text-center md:text-lg"></Text>
+        )}
+        {selectedClass && (
+          <NonThemedView className="mx-auto py-4">
+            <Pressable
+              onPress={() => {
+                vibration({ style: "light" });
+                router.push(`/NewGame/SetSex/${classRef.current}`);
+              }}
+              className="mb-[10vh] mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+            >
+              <Text className="text-xl tracking-widest">Next</Text>
+            </Pressable>
+          </NonThemedView>
+        )}
+      </View>
+      <NonThemedView className="absolute ml-4 mt-4">
+        <Pressable
+          className="absolute"
+          onPress={() => setShowIntroTutorial(true)}
+        >
+          <FontAwesome5
+            name="question-circle"
+            size={32}
+            color={colorScheme == "light" ? "#27272a" : "#fafafa"}
+          />
+        </Pressable>
+      </NonThemedView>
     </>
   );
 }

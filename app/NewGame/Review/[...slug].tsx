@@ -180,6 +180,7 @@ export default function NewGameReview() {
       }
       router.replace("/");
       await fullSave(newGame, player);
+      AsyncStorage.removeItem("tutorialsEnabled");
     }
   }
 
@@ -190,13 +191,13 @@ export default function NewGameReview() {
           title: "Review",
         }}
       />
-      <Text className="pt-12 text-center text-2xl">Review</Text>
-      <Text className="pt-24 text-center text-3xl">{`${firstName} ${lastName} the ${toTitleCase(
+      <Text className="pt-[8vh] text-center text-2xl">Review</Text>
+      <Text className="pt-[16vh] text-center text-3xl">{`${firstName} ${lastName} the ${toTitleCase(
         blessing,
       )}-born ${toTitleCase(playerClass)}`}</Text>
       <Pressable
         onPress={() => startGame()}
-        className="mx-auto mt-8 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+        className="mx-auto mt-[6vh] rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
       >
         <Text className="text-xl tracking-widest">Confirm?</Text>
       </Pressable>

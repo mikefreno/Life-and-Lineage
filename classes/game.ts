@@ -234,6 +234,7 @@ export class Game {
       investing: false,
     };
     this.tutorialsShown = defaultState;
+    this.enableTutorials();
   }
 
   public disableTutorials() {

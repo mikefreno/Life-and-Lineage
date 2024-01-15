@@ -276,6 +276,7 @@ export function createDebuff(
           | "sanity"
           | "health"
           | "armor"
+          | "weaken"
         )[],
         damage: damage ?? 0,
         icon: debuffObj.icon,

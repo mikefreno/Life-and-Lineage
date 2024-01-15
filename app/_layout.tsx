@@ -180,16 +180,18 @@ const RootLayout = observer(() => {
   async function getAndSetNavBar() {
     if (Platform.OS == "android") {
       if ((await NavigationBar.getVisibilityAsync()) == "visible") {
-        let dungeonPath = false;
+        let unTabbedPath = false;
         if (pathname.split("/").length > 0) {
-          dungeonPath = pathname.split("/")[1] == "DungeonLevel";
+          unTabbedPath = ["DungeonLevel", "NewGame"].includes(
+            pathname.split("/")[1],
+          );
         }
         NavigationBar.setBackgroundColorAsync(
           colorScheme == "light"
-            ? dungeonPath
+            ? unTabbedPath
               ? "#fafafa"
               : "white"
-            : dungeonPath
+            : unTabbedPath
             ? "#18181b"
             : "#121212",
         );

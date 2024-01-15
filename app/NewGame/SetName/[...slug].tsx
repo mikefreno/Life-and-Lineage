@@ -10,6 +10,7 @@ import { useRef, useState } from "react";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { toTitleCase } from "../../../utility/functions";
 import { useVibration } from "../../../utility/customHooks";
+import { useColorScheme } from "nativewind";
 
 export default function SetName() {
   const { slug } = useLocalSearchParams();
@@ -21,6 +22,14 @@ export default function SetName() {
   const lastNameRef = useRef<string>();
 
   const vibration = useVibration();
+  const { colorScheme } = useColorScheme();
+
+  const accent =
+    playerClass == "mage"
+      ? "#2563eb"
+      : playerClass == "necromancer"
+      ? "#9333ea"
+      : "#fcd34d";
 
   return (
     <>
@@ -29,16 +38,26 @@ export default function SetName() {
           title: "Name Set",
         }}
       />
-      <ThemedView className="flex-1 px-6">
-        <Text className="py-12 text-center text-2xl text-zinc-900 dark:text-zinc-50">
-          {`Choose Your ${toTitleCase(playerClass)}'s Name`}
-        </Text>
+      <ThemedView className="flex-1 items-center px-6">
+        <View className="flex flex-row py-12 text-center">
+          <Text className="text-2xl md:text-3xl">
+            Choose Your
+            <Text className="text-2xl md:text-3xl" style={{ color: accent }}>
+              {" "}
+              {toTitleCase(playerClass)}'s{" "}
+            </Text>
+            Name
+          </Text>
+        </View>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
+          className="justify-center"
         >
           <TextInput
-            className="mt-12 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
-            placeholderClassName="text-zinc-400 dark:text-zinc-400"
+            className="mt-[10vh] rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
+            placeholderTextColor={
+              colorScheme == "light" ? "#d4d4d8" : "#71717a"
+            }
             onChangeText={(text) => {
               setFirstName(text.replace(/^\s+/, ""));
               firstNameRef.current = text.replace(/^\s+/, "");
@@ -51,25 +70,31 @@ export default function SetName() {
             maxLength={16}
             style={{
               paddingVertical: 8,
+              minWidth: "50%",
             }}
           />
           <Text className="pl-1 pt-1 italic">
             Minimum Length: 2, Maximum Length: 16
           </Text>
           <TextInput
-            className="mt-12 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
-            placeholderClassName="text-zinc-400 dark:text-zinc-400"
+            className="mt-[3vh] rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
             onChangeText={(text) => {
               setLastName(text.replace(/^\s+/, ""));
               lastNameRef.current = text.replace(/^\s+/, "");
             }}
+            placeholderTextColor={
+              colorScheme == "light" ? "#d4d4d8" : "#71717a"
+            }
             placeholder={"Surname (Last Name)"}
             autoComplete="family-name"
             autoCorrect={false}
             autoCapitalize="words"
             value={lastName}
             maxLength={16}
-            style={{ paddingVertical: 8 }}
+            style={{
+              paddingVertical: 8,
+              minWidth: "50%",
+            }}
           />
           <Text className="pl-1 pt-1 italic">
             Minimum Length: 3, Maximum Length: 16

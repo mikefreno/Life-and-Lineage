@@ -1,10 +1,5 @@
 import { Text, View } from "../../components/Themed";
-import {
-  Pressable,
-  ScrollView,
-  View as NonThemedView,
-  Switch,
-} from "react-native";
+import { Pressable, ScrollView, View as NonThemedView } from "react-native";
 import { router } from "expo-router";
 import dungeons from "../../assets/json/dungeons.json";
 import { savePlayer, toTitleCase } from "../../utility/functions";
@@ -13,9 +8,8 @@ import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { GameContext, PlayerCharacterContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
-import Modal from "react-native-modal";
-import { Entypo } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
+import TutorialModal from "../../components/TutorialModal";
 
 const dangerColorStep = [
   "#fee2e2",
@@ -52,10 +46,6 @@ export default function DungeonScreen() {
   const [showDungeonTutorial, setShowDungeonTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("dungeon")) ?? false,
   );
-  const [tutorialState, setTutorialState] = useState<boolean>(
-    gameState?.tutorialsEnabled ?? true,
-  );
-  const [tutorialStep, setTutorialStep] = useState<number>(1);
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -64,21 +54,7 @@ export default function DungeonScreen() {
     }
   }, [showDungeonTutorial]);
 
-  useEffect(() => {
-    setTutorialState(gameState?.tutorialsEnabled ?? true);
-  }, [gameState?.tutorialsEnabled]);
-
   useEffect(() => setDungeonDepth(gameState?.furthestDepth), [gameState]);
-
-  useEffect(() => {
-    if (gameState) {
-      if (tutorialState == false) {
-        gameState.disableTutorials();
-      } else {
-        gameState.enableTutorials();
-      }
-    }
-  }, [tutorialState]);
 
   useEffect(() => {
     let newInstances: {
@@ -116,130 +92,26 @@ export default function DungeonScreen() {
 
   return (
     <>
-      <Modal
-        animationIn="slideInUp"
-        animationOut="slideOutDown"
-        backdropOpacity={0.2}
-        animationInTiming={500}
-        animationOutTiming={300}
-        isVisible={
-          showDungeonTutorial && gameState?.tutorialsEnabled && isFocused
+      <TutorialModal
+        isVisibleCondition={
+          (showDungeonTutorial && gameState?.tutorialsEnabled && isFocused) ??
+          false
         }
-        onBackdropPress={() => setShowDungeonTutorial(false)}
-        onBackButtonPress={() => setShowDungeonTutorial(false)}
-      >
-        <View
-          className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
-          style={{
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 2,
-            },
-
-            shadowOpacity: 0.25,
-            shadowRadius: 5,
-          }}
-        >
-          <View
-            className={`flex flex-row ${
-              tutorialStep != 1 ? "justify-between" : "justify-end"
-            }`}
-          >
-            {tutorialStep != 1 ? (
-              <Pressable onPress={() => setTutorialStep((prev) => prev - 1)}>
-                <Entypo
-                  name="chevron-left"
-                  size={24}
-                  color={colorScheme == "dark" ? "#f4f4f5" : "black"}
-                />
-              </Pressable>
-            ) : null}
-            <Text>{tutorialStep}/3</Text>
-          </View>
-          {tutorialStep == 1 ? (
-            <>
-              <Text className="text-center text-2xl">Dungeon</Text>
-              <Text className="my-4 text-center text-lg">
-                Here you will put all your gear and spells to work. Be prepared
-                and you will be rewarded.
-              </Text>
-              <View className="mx-auto flex flex-row">
-                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                <Switch
-                  trackColor={{ false: "#767577", true: "#3b82f6" }}
-                  ios_backgroundColor="#3e3e3e"
-                  thumbColor={"white"}
-                  onValueChange={(bool) => setTutorialState(bool)}
-                  value={tutorialState}
-                />
-              </View>
-              <Pressable
-                onPress={() => setTutorialStep(2)}
-                className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-              >
-                <Text>Next</Text>
-              </Pressable>
-            </>
-          ) : tutorialStep == 2 ? (
-            <>
-              <Text className="text-center text-2xl">
-                Dungeons are very dangerous.
-              </Text>
-              <Text className="my-4 text-center text-lg">
-                You may find yourself faced with monsters you simply can not
-                defeat at your current state, attempting to flee is your best
-                bet, but you may not succeed.
-              </Text>
-              <View className="mx-auto flex flex-row">
-                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                <Switch
-                  trackColor={{ false: "#767577", true: "#3b82f6" }}
-                  ios_backgroundColor="#3e3e3e"
-                  thumbColor={"white"}
-                  onValueChange={(bool) => setTutorialState(bool)}
-                  value={tutorialState}
-                />
-              </View>
-              <Pressable
-                onPress={() => setTutorialStep((prev) => prev + 1)}
-                className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-              >
-                <Text>Next</Text>
-              </Pressable>
-            </>
-          ) : (
-            <>
-              <Text className="text-center text-xl">
-                Each level brings greater danger.
-              </Text>
-              <Text className="my-4 text-center text-lg">
-                And greater rewards. Unlock more levels by defeating each levels
-                boss.
-              </Text>
-              <View className="mx-auto flex flex-row">
-                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                <Switch
-                  trackColor={{ false: "#767577", true: "#3b82f6" }}
-                  ios_backgroundColor="#3e3e3e"
-                  thumbColor={"white"}
-                  onValueChange={(bool) => setTutorialState(bool)}
-                  value={tutorialState}
-                />
-              </View>
-              <Pressable
-                onPress={() => {
-                  vibration({ style: "light" });
-                  setShowDungeonTutorial(false);
-                }}
-                className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-              >
-                <Text>Close</Text>
-              </Pressable>
-            </>
-          )}
-        </View>
-      </Modal>
+        backFunction={() => setShowDungeonTutorial(false)}
+        pageOne={{
+          title: "Dungeon",
+          body: "Here you will put all your gear and spells to work. Be prepared and you will be rewarded.",
+        }}
+        pageTwo={{
+          title: "Dungeons are very dangerous.",
+          body: "You may find yourself faced with monsters you simply can not defeat at your current state, attempting to flee is your best bet, but you may not succeed.",
+        }}
+        pageThree={{
+          title: "Each level brings greater danger.",
+          body: "And greater rewards. Unlock more levels by defeating each levels boss.",
+        }}
+        onCloseFunction={() => setShowDungeonTutorial(false)}
+      />
       <View className="flex-1">
         <PlayerStatus onTop={true} />
         <View className="h-full px-4">

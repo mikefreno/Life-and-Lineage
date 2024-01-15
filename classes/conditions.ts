@@ -13,6 +13,7 @@ interface ConditionOptions {
     | "sanity"
     | "armor"
     | "health"
+    | "weaken"
   )[];
   damage: number;
   icon?: string;
@@ -30,6 +31,7 @@ export class Condition {
     | "sanity"
     | "armor"
     | "health"
+    | "weaken"
   )[];
   readonly damage: number | null;
   readonly icon: string | undefined;
@@ -85,6 +87,7 @@ const conditionIconMap: { [key: string]: any } = {
   blind: require("../assets/images/conditions/blind.png"),
   bleed: require("../assets/images/conditions/bleed.png"),
   stun: require("../assets/images/conditions/stun.png"),
+  snowflake: require("../assets/images/conditions/snowflake.png"),
   "skull-and-crossbones": require("../assets/images/conditions/skull_crossbones.png"),
   viruses: require("../assets/images/conditions/viruses.png"),
   flame: require("../assets/images/conditions/flame.png"),

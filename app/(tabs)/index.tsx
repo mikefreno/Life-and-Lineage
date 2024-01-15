@@ -3,7 +3,6 @@ import {
   Image,
   View as NonThemedView,
   Animated,
-  Switch,
 } from "react-native";
 import { View, Text } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
@@ -22,9 +21,8 @@ import Draggable from "react-native-draggable";
 import { router } from "expo-router";
 import { useVibration } from "../../utility/customHooks";
 import { Dimensions } from "react-native";
-import Modal from "react-native-modal";
-import { Entypo } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
+import TutorialModal from "../../components/TutorialModal";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -54,10 +52,6 @@ const HomeScreen = observer(() => {
   const [statsTopPos, setStatsTopPos] = useState<number>();
   const [showIntroTutorial, setShowIntroTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("intro")) ?? false,
-  );
-  const [tutorialStep, setTutorialStep] = useState<number>(1);
-  const [tutorialState, setTutorialState] = useState<boolean>(
-    gameState?.tutorialsEnabled ?? true,
   );
 
   const isFocused = useIsFocused();
@@ -89,24 +83,10 @@ const HomeScreen = observer(() => {
   }, [showIntroTutorial]);
 
   useEffect(() => {
-    setTutorialState(gameState?.tutorialsEnabled ?? true);
-  }, [gameState?.tutorialsEnabled]);
-
-  useEffect(() => {
     setShowIntroTutorial(
       (gameState && !gameState.getTutorialState("intro")) ?? false,
     );
   }, [gameState?.tutorialsShown]);
-
-  useEffect(() => {
-    if (gameState) {
-      if (tutorialState == false) {
-        gameState.disableTutorials();
-      } else {
-        gameState.enableTutorials();
-      }
-    }
-  }, [tutorialState]);
 
   const deviceHeight = Dimensions.get("window").height;
   const deviceWidth = Dimensions.get("window").width;
@@ -355,18 +335,12 @@ const HomeScreen = observer(() => {
                 </Draggable>
               </NonThemedView>
             ) : playerState?.equipment.mainHand.slot == "two-hand" ? (
-              <Pressable className="mx-auto h-12 w-12 items-center active:scale-90 active:opacity-50">
-                <NonThemedView
-                  ref={offHandTarget}
-                  className="h-12 w-12 items-center rounded-lg"
-                  style={{ backgroundColor: "#a1a1aa" }}
-                >
-                  <Image
-                    style={{ opacity: 0.5 }}
-                    source={playerState?.equipment.mainHand?.getItemIcon()}
-                  />
-                </NonThemedView>
-              </Pressable>
+              <NonThemedView className="mx-auto h-12 w-12 items-center rounded-lg bg-zinc-400">
+                <Image
+                  className="my-auto opacity-50"
+                  source={playerState?.equipment.mainHand?.getItemIcon()}
+                />
+              </NonThemedView>
             ) : (
               <NonThemedView
                 ref={offHandTarget}
@@ -536,101 +510,21 @@ const HomeScreen = observer(() => {
 
     return (
       <>
-        <Modal
-          animationIn="slideInUp"
-          animationOut="slideOutDown"
-          backdropOpacity={0.2}
-          animationInTiming={500}
-          animationOutTiming={300}
-          isVisible={
+        <TutorialModal
+          isVisibleCondition={
             showIntroTutorial && gameState.tutorialsEnabled && isFocused
           }
-          onBackdropPress={() => setShowIntroTutorial(false)}
-          onBackButtonPress={() => setShowIntroTutorial(false)}
-        >
-          <View
-            className="mx-auto w-5/6 rounded-xl px-6 py-4"
-            style={{
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              elevation: 1,
-              shadowOpacity: 0.25,
-              shadowRadius: 5,
-            }}
-          >
-            <View
-              className={`flex flex-row ${
-                tutorialStep == 2 ? "justify-between" : "justify-end"
-              }`}
-            >
-              {tutorialStep == 2 ? (
-                <Pressable onPress={() => setTutorialStep((prev) => prev - 1)}>
-                  <Entypo
-                    name="chevron-left"
-                    size={24}
-                    color={colorScheme == "dark" ? "#f4f4f5" : "black"}
-                  />
-                </Pressable>
-              ) : null}
-              <Text>{tutorialStep}/2</Text>
-            </View>
-            {tutorialStep == 1 ? (
-              <>
-                <Text className="text-center text-2xl">Welcome!</Text>
-
-                <Text className="my-4 text-center text-lg">
-                  On this page you can view your inventory (tap the bag) and
-                  equip items to you hands, head, or body.
-                </Text>
-                <View className="mx-auto flex flex-row">
-                  <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                  <Switch
-                    trackColor={{ false: "#767577", true: "#3b82f6" }}
-                    ios_backgroundColor="#3e3e3e"
-                    thumbColor={"white"}
-                    onValueChange={(bool) => setTutorialState(bool)}
-                    value={tutorialState}
-                  />
-                </View>
-                <Pressable
-                  onPress={() => setTutorialStep((prev) => prev + 1)}
-                  className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-                >
-                  <Text>Next</Text>
-                </Pressable>
-              </>
-            ) : (
-              <>
-                <Text className="mt-2 text-center">
-                  A great place to start is to open your inventory and study the
-                  book you were given.
-                </Text>
-                <View className="mx-auto flex flex-row">
-                  <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                  <Switch
-                    trackColor={{ false: "#767577", true: "#3b82f6" }}
-                    ios_backgroundColor="#3e3e3e"
-                    thumbColor={"white"}
-                    onValueChange={(bool) => setTutorialState(bool)}
-                    value={tutorialState}
-                  />
-                </View>
-                <Pressable
-                  onPress={() => {
-                    vibration({ style: "light" });
-                    setShowIntroTutorial(false);
-                  }}
-                  className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-                >
-                  <Text>Close</Text>
-                </Pressable>
-              </>
-            )}
-          </View>
-        </Modal>
+          backFunction={() => setShowIntroTutorial(false)}
+          pageOne={{
+            title: "Welcome!",
+            body: "On this page you can view your inventory (tap the bag) and equip items to you hands, head, or body.",
+          }}
+          pageTwo={{
+            title: "",
+            body: "A great place to start is to open your inventory and study the book you were given.",
+          }}
+          onCloseFunction={() => setShowIntroTutorial(false)}
+        />
         <View className="flex-1">
           <Animated.View
             style={{
@@ -715,13 +609,13 @@ const HomeScreen = observer(() => {
               {showingInventory ? inventoryRender() : null}
             </NonThemedView>
           </Animated.View>
-          {playerState ? (
+          {playerState && (
             <Animated.View
               style={{ transform: [{ translateY: bottomTranslationValue }] }}
             >
               <PlayerStatus displayGoldTop={true} />
             </Animated.View>
-          ) : null}
+          )}
           {showingStats && statsLeftPos && statsTopPos ? (
             <View
               className="absolute items-center rounded-md border border-zinc-600 p-4"
@@ -759,6 +653,13 @@ const HomeScreen = observer(() => {
                   <GearStatsDisplay stats={showingStats.stats} />
                 </NonThemedView>
               ) : null}
+              {(showingStats.slot == "one-hand" ||
+                showingStats.slot == "two-hand" ||
+                showingStats.slot == "off-hand") && (
+                <Text className="text-sm italic">
+                  {toTitleCase(showingStats.slot)}
+                </Text>
+              )}
               <Text className="text-sm italic">
                 {showingStats.itemClass == "bodyArmor"
                   ? "Body Armor"

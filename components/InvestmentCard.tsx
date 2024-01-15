@@ -1,6 +1,6 @@
 import { useColorScheme } from "nativewind";
 import { View as ThemedView, Text, ScrollView } from "./Themed";
-import { InvestmentType } from "../utility/types";
+import { InvestmentType, InvestmentUpgrade } from "../utility/types";
 import Coins from "../assets/icons/CoinsIcon";
 import { Pressable, View, StyleSheet, Animated } from "react-native";
 import Modal from "react-native-modal";
@@ -27,7 +27,8 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
   }
   const [showInvestmentConfirmation, setShowInvestmentConfirmation] =
     useState<boolean>(false);
-
+  const [showUpgradeConfirmation, setShowUpgradeConfirmation] =
+    useState<boolean>(false);
   const { playerState } = playerCharacterContext;
   const { gameState } = gameContext;
 
@@ -41,6 +42,20 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
         setShowInvestmentConfirmation(true);
       } else {
         playerState.purchaseInvestmentBase(investment);
+      }
+    }
+  }
+
+  function purchaseUpgradeCheck(specifiedUpgrade: InvestmentUpgrade) {
+    if (playerState && playerState.gold >= specifiedUpgrade.cost) {
+      if (specifiedUpgrade.cost / playerState.gold >= 0.2) {
+        setShowUpgradeConfirmation(true);
+      } else {
+        playerState.purchaseInvestmentUpgrade(
+          investment,
+          specifiedUpgrade,
+          playerState,
+        );
       }
     }
   }
@@ -251,7 +266,10 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
                               </View>
                             )}
                           </View>
-                          <Pressable className="mx-auto my-2 active:scale-95 active:opacity-50">
+                          <Pressable
+                            onPress={() => purchaseUpgradeCheck(upgrade)}
+                            className="mx-auto my-2 active:scale-95 active:opacity-50"
+                          >
                             <View
                               className="rounded-xl px-8 py-4"
                               style={

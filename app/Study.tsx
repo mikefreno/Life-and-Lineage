@@ -92,6 +92,14 @@ export default function LearningSpellsScreen() {
     <View className="flex-1 pb-4">
       <PlayerStatus onTop={true} />
       <View className="px-4">
+        {filteredBooks.length == 0 && playerState.learningSpells.length == 0 ? (
+          <View className="items-center pt-12">
+            <Text className="text-xl italic">No Books to Learn From</Text>
+            <Text className="italic">
+              (Books can be bought from the Librarian)
+            </Text>
+          </View>
+        ) : null}
         {spellState.length > 0 ? (
           <View className="pb-12 pt-4">
             <Text className="text-center text-xl">Currently Studying</Text>
@@ -193,14 +201,6 @@ export default function LearningSpellsScreen() {
                 ))}
               </View>
             </ScrollView>
-          </View>
-        ) : null}
-        {filteredBooks.length == 0 && playerState.learningSpells.length == 0 ? (
-          <View className="-mt-24 flex-1 items-center justify-center">
-            <Text className="text-xl italic">No Books to Learn From</Text>
-            <Text className="italic">
-              (Books can be bought from the Librarian)
-            </Text>
           </View>
         ) : null}
       </View>

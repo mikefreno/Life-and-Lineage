@@ -72,6 +72,15 @@
       "icon": "flame"
    },
    {
+      "name": "chill",
+      "style": "debuff",
+      "turns": 2,
+      "effect": ["weaken"],
+      "effectStyle": "percentage",
+      "effectAmount": 0.25,
+      "icon": "snowflake"
+   },
+   {
       "name": "fear",
       "style": "debuff",
       "turns": 5,

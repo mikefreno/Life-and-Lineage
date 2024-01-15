@@ -7,7 +7,6 @@ import {
   Image,
   ScrollView,
   View as NonThemedView,
-  Switch,
 } from "react-native";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Item } from "../../classes/item";
@@ -17,10 +16,8 @@ import { useIsFocused } from "@react-navigation/native";
 import { GameContext, PlayerCharacterContext } from "../_layout";
 import GearStatsDisplay from "../../components/GearStatsDisplay";
 import { useVibration } from "../../utility/customHooks";
-import { Entypo } from "@expo/vector-icons";
-import { useColorScheme } from "nativewind";
-import Modal from "react-native-modal/dist/modal";
 import { observer } from "mobx-react-lite";
+import TutorialModal from "../../components/TutorialModal";
 
 const ShopInteriorScreen = observer(() => {
   const { shop } = useLocalSearchParams();
@@ -60,16 +57,11 @@ const ShopInteriorScreen = observer(() => {
     useState<boolean>(false);
 
   const isFocused = useIsFocused();
-  const { colorScheme } = useColorScheme();
 
   const [showShopInteriorTutorial, setShowShopInteriorTutorial] =
     useState<boolean>(
       (gameState && !gameState.getTutorialState("shopInterior")) ?? false,
     );
-  const [tutorialState, setTutorialState] = useState<boolean>(
-    gameState?.tutorialsEnabled ?? true,
-  );
-  const [tutorialStep, setTutorialStep] = useState<number>(1);
 
   useEffect(() => {
     if (!showShopInteriorTutorial && gameState) {
@@ -84,20 +76,10 @@ const ShopInteriorScreen = observer(() => {
   }, [inventoryFullNotifier]);
 
   useEffect(() => {
-    if (gameState) {
-      if (tutorialState == false) {
-        gameState.disableTutorials();
-      } else {
-        gameState.enableTutorials();
-      }
-    }
-  }, [tutorialState]);
-
-  useEffect(() => {
     if (
       playerState &&
       thisShop &&
-      new Date(thisShop.lastStockRefresh) < new Date(Date.now())
+      new Date(thisShop.lastStockRefresh) < new Date(Date.now() - 60 * 60 * 500)
     ) {
       thisShop.refreshInventory(playerState.playerClass);
     }
@@ -300,105 +282,28 @@ const ShopInteriorScreen = observer(() => {
             title: toTitleCase(shop as string),
           }}
         />
-        <Modal
-          animationIn="slideInUp"
-          animationOut="slideOutDown"
-          backdropOpacity={0.2}
-          animationInTiming={500}
-          animationOutTiming={300}
-          isVisible={
-            showShopInteriorTutorial && gameState?.tutorialsEnabled && isFocused
+        <TutorialModal
+          isVisibleCondition={
+            (showShopInteriorTutorial &&
+              gameState?.tutorialsEnabled &&
+              isFocused) ??
+            false
           }
-          onBackdropPress={() => setShowShopInteriorTutorial(false)}
-          onBackButtonPress={() => setShowShopInteriorTutorial(false)}
-        >
-          <View
-            className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
-            style={{
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-
-              shadowOpacity: 0.25,
-              shadowRadius: 5,
-            }}
-          >
-            <View
-              className={`flex flex-row ${
-                tutorialStep == 2 ? "justify-between" : "justify-end"
-              }`}
-            >
-              {tutorialStep == 2 ? (
-                <Pressable onPress={() => setTutorialStep((prev) => prev - 1)}>
-                  <Entypo
-                    name="chevron-left"
-                    size={24}
-                    color={colorScheme == "dark" ? "#f4f4f5" : "black"}
-                  />
-                </Pressable>
-              ) : null}
-              <Text>{tutorialStep}/2</Text>
-            </View>
-            {tutorialStep == 1 ? (
-              <>
-                <Text className="text-center text-2xl">
-                  Shopkeepers remember you.
-                </Text>
-                <Text className="my-4 text-center text-lg">
-                  The more you trade with a given shopkeeper the better the
-                  deals they will have for you.
-                </Text>
-                <View className="mx-auto flex flex-row">
-                  <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                  <Switch
-                    trackColor={{ false: "#767577", true: "#3b82f6" }}
-                    ios_backgroundColor="#3e3e3e"
-                    thumbColor={"white"}
-                    onValueChange={(bool) => setTutorialState(bool)}
-                    value={tutorialState}
-                  />
-                </View>
-                <Pressable
-                  onPress={() => setTutorialStep((prev) => prev + 1)}
-                  className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-                >
-                  <Text>Next</Text>
-                </Pressable>
-              </>
-            ) : (
-              <>
-                <Text className="text-center text-xl">
-                  Shopkeepers are people too.
-                </Text>
-                <Text className="my-4 text-center">
-                  They each have different personalities. They will also age and
-                  eventually die.
-                </Text>
-                <View className="mx-auto flex flex-row">
-                  <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                  <Switch
-                    trackColor={{ false: "#767577", true: "#3b82f6" }}
-                    ios_backgroundColor="#3e3e3e"
-                    thumbColor={"white"}
-                    onValueChange={(bool) => setTutorialState(bool)}
-                    value={tutorialState}
-                  />
-                </View>
-                <Pressable
-                  onPress={() => {
-                    vibration({ style: "light" });
-                    setShowShopInteriorTutorial(false);
-                  }}
-                  className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-                >
-                  <Text>Close</Text>
-                </Pressable>
-              </>
-            )}
-          </View>
-        </Modal>
+          backFunction={() => setShowShopInteriorTutorial(false)}
+          onCloseFunction={() => setShowShopInteriorTutorial(false)}
+          pageOne={{
+            title: "Shopkeepers remember you.",
+            body: "The more you trade with a given shopkeeper the better deals they will have for you.",
+          }}
+          pageTwo={{
+            title: "Shopkeepers are people too.",
+            body: "They each have different personalities. They will also age eventually die.",
+          }}
+          pageThree={{
+            title: "Good Luck.",
+            body: "And remember fleeing (top left) can save you.",
+          }}
+        />
         <View className="flex-1">
           <View className="flex flex-row justify-between">
             <View className="w-1/3">

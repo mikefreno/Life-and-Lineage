@@ -11,7 +11,7 @@ import { Minion } from "./creatures";
 import summons from "../assets/json/summons.json";
 import { action, makeObservable, observable } from "mobx";
 import { Investment } from "./investment";
-import { InvestmentType } from "../utility/types";
+import { InvestmentType, InvestmentUpgrade } from "../utility/types";
 
 interface CharacterOptions {
   firstName: string;
@@ -261,6 +261,7 @@ export class PlayerCharacter extends Character {
     this.health = health ?? 100;
     this.healthMax = healthMax ?? 100;
     this.sanity = sanity ?? 50;
+    //this.sanityMax = sanity ?? 50;
     this.mana = mana ?? 100;
     this.manaMax = manaMax ?? 100;
     this.manaRegen = manaRegen ?? 3;
@@ -437,7 +438,7 @@ export class PlayerCharacter extends Character {
   }
 
   public getMaxSanity() {
-    let withGearBuffs = this.sanity;
+    let withGearBuffs = 50;
     withGearBuffs += this.equipment.mainHand.stats?.sanity ?? 0;
     withGearBuffs += this.equipment.offHand?.stats?.sanity ?? 0;
     withGearBuffs += this.equipment.body?.stats?.sanity ?? 0;
@@ -1006,6 +1007,12 @@ export class PlayerCharacter extends Character {
       if (offHandDamage) {
         hpDamage += offHandDamage * 0.5;
       }
+      const weakens = this.conditions.filter((condition) =>
+        condition.effect.find((effect) => effect == "weaken"),
+      );
+      if (weakens) {
+        hpDamage *= Math.pow(0.75, weakens.length);
+      }
       const sanityDamage = attack.sanityDamage;
       this.conditionTicker();
       if (attack.debuffs) {
@@ -1174,7 +1181,20 @@ export class PlayerCharacter extends Character {
     this.investments.push(newInvestment);
   }
 
-  public purchaseInvestmentUpgrade() {}
+  public purchaseInvestmentUpgrade(
+    suppliedInvestment: InvestmentType,
+    suppliedUpgrade: InvestmentUpgrade,
+    playerCharacter: PlayerCharacter,
+  ) {
+    const base = this.investments.find(
+      (investment) => investment.name == suppliedInvestment.name,
+    );
+    if (base) {
+      base.addUpgrade(suppliedUpgrade, playerCharacter);
+    } else {
+      throw new Error("no base upgrade found!");
+    }
+  }
 
   public tickAllInvestments() {
     this.investments.forEach((investment) => investment.turn());

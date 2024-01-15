@@ -5,7 +5,6 @@ import {
   View as NonThemedView,
   Platform,
   StyleSheet,
-  Switch,
 } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import { MonsterImage } from "../../components/MonsterImage";
@@ -28,7 +27,7 @@ import {
   PlayerCharacterContext,
 } from "../_layout";
 import { observer } from "mobx-react-lite";
-import { Entypo, EvilIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { EvilIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import FadeOutText from "../../components/FadeOutText";
 import { useVibration } from "../../utility/customHooks";
@@ -36,6 +35,7 @@ import { EnemyHealingAnimationBox } from "../../components/EnemyHealingAnimation
 import { Minion, Monster } from "../../classes/creatures";
 import SackIcon from "../../assets/icons/SackIcon";
 import Modal from "react-native-modal";
+import TutorialModal from "../../components/TutorialModal";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -103,23 +103,9 @@ const DungeonLevelScreen = observer(() => {
   const isFocused = useIsFocused();
   const vibration = useVibration();
 
-  const [tutorialState, setTutorialState] = useState<boolean>(
-    gameState?.tutorialsEnabled ?? true,
-  );
-
   if (!playerState || !gameState) {
     throw new Error("No player character or game data on dungeon level");
   }
-
-  useEffect(() => {
-    if (gameState) {
-      if (tutorialState == false) {
-        gameState.disableTutorials();
-      } else {
-        gameState.enableTutorials();
-      }
-    }
-  }, [tutorialState]);
 
   //------------dungeon/monster state setting---------//
   useEffect(() => {
@@ -399,7 +385,7 @@ const DungeonLevelScreen = observer(() => {
         <NonThemedView className="flex h-8 flex-row">
           {simplifiedConditions.map((cond) => (
             <View key={cond.name} className="mx-2 flex align-middle">
-              <NonThemedView className="mx-auto rounded-md bg-zinc-200 dark:bg-zinc-600">
+              <NonThemedView className="mx-auto rounded-md bg-[rgba(255,255,255,0.3)] dark:bg-[rgba(0,0,0,0.3)]">
                 <Image source={cond.icon} style={{ width: 24, height: 24 }} />
               </NonThemedView>
               <Text className="text-sm">
@@ -1046,123 +1032,26 @@ const DungeonLevelScreen = observer(() => {
                 : `${toTitleCase(thisInstance?.name as string)} Level ${level}`,
           }}
         />
-        <Modal
-          animationIn="slideInUp"
-          animationOut="slideOutDown"
-          backdropOpacity={0.2}
-          animationInTiming={500}
-          animationOutTiming={300}
-          isVisible={showDungeonInteriorTutorial && gameState?.tutorialsEnabled}
-          onBackButtonPress={() => setShowDungeonInteriorTutorial(false)}
-          onBackdropPress={() => setShowDungeonInteriorTutorial(false)}
-        >
-          <View
-            className="mx-auto w-5/6 rounded-xl px-6 py-4"
-            style={{
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              elevation: 1,
-              shadowOpacity: 0.25,
-              shadowRadius: 5,
-            }}
-          >
-            <View
-              className={`flex flex-row ${
-                tutorialStep != 1 ? "justify-between" : "justify-end"
-              }`}
-            >
-              {tutorialStep != 1 ? (
-                <Pressable onPress={() => setTutorialStep((prev) => prev - 1)}>
-                  <Entypo
-                    name="chevron-left"
-                    size={24}
-                    color={colorScheme == "dark" ? "#f4f4f5" : "black"}
-                  />
-                </Pressable>
-              ) : null}
-              <Text>{tutorialStep}/3</Text>
-            </View>
-            {tutorialStep == 1 ? (
-              <>
-                <Text className="text-center text-2xl">Watch Your Health</Text>
-                <Text className="my-4 text-center text-lg">
-                  Your situation can change rapidly.
-                </Text>
-                <View className="mx-auto flex flex-row">
-                  <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                  <Switch
-                    trackColor={{ false: "#767577", true: "#3b82f6" }}
-                    ios_backgroundColor="#3e3e3e"
-                    thumbColor={"white"}
-                    onValueChange={(bool) => setTutorialState(bool)}
-                    value={tutorialState}
-                  />
-                </View>
-                <Pressable
-                  onPress={() => setTutorialStep((prev) => prev + 1)}
-                  className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-                >
-                  <Text>Next</Text>
-                </Pressable>
-              </>
-            ) : tutorialStep == 2 ? (
-              <>
-                <Text className="text-center text-xl">
-                  Advance by killing the boss.
-                </Text>
-                <Text className="my-4 text-center text-lg">
-                  The boss becomes availible after 10 monsters defeated for the
-                  first dungeon.
-                </Text>
-                <View className="mx-auto flex flex-row">
-                  <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                  <Switch
-                    trackColor={{ false: "#767577", true: "#3b82f6" }}
-                    ios_backgroundColor="#3e3e3e"
-                    thumbColor={"white"}
-                    onValueChange={(bool) => setTutorialState(bool)}
-                    value={tutorialState}
-                  />
-                </View>
-                <Pressable
-                  onPress={() => setTutorialStep((prev) => prev + 1)}
-                  className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-                >
-                  <Text>Next</Text>
-                </Pressable>
-              </>
-            ) : (
-              <>
-                <Text className="text-center text-xl">Good Luck.</Text>
-                <Text className="my-4 text-center text-lg">
-                  And remember fleeing (top left) can save you.
-                </Text>
-                <View className="mx-auto flex flex-row">
-                  <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                  <Switch
-                    trackColor={{ false: "#767577", true: "#3b82f6" }}
-                    ios_backgroundColor="#3e3e3e"
-                    thumbColor={"white"}
-                    onValueChange={(bool) => setTutorialState(bool)}
-                    value={tutorialState}
-                  />
-                </View>
-                <Pressable
-                  onPress={() => {
-                    vibration({ style: "light" });
-                    setShowDungeonInteriorTutorial(false);
-                  }}
-                  className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-                >
-                  <Text>Close</Text>
-                </Pressable>
-              </>
-            )}
-          </View>
-        </Modal>
+        <TutorialModal
+          isVisibleCondition={
+            (showDungeonInteriorTutorial && gameState?.tutorialsEnabled) ??
+            false
+          }
+          backFunction={() => setShowDungeonInteriorTutorial(false)}
+          onCloseFunction={() => setShowDungeonInteriorTutorial(false)}
+          pageOne={{
+            title: "Watch Your Health",
+            body: "Your situation can change rapidly.",
+          }}
+          pageTwo={{
+            title: "Advance by killing the boss.",
+            body: "The first boss becomes availible after 10 monsters defeated for the first dungeon.",
+          }}
+          pageThree={{
+            title: "Good Luck.",
+            body: "And remember fleeing (top left) can save you.",
+          }}
+        />
         {Platform.OS == "ios" ? (
           <NonThemedView>
             <NativeModal
@@ -1180,7 +1069,7 @@ const DungeonLevelScreen = observer(() => {
                   className="mt-[100vh] w-full py-4"
                 >
                   <View
-                    className="mx-auto w-2/3 rounded-xl bg-zinc-50 px-6 py-4 dark:border dark:border-zinc-50 dark:bg-zinc-700"
+                    className="mx-auto w-2/3 rounded-xl bg-zinc-50 px-6 py-4 dark:border dark:border-zinc-500 dark:bg-zinc-700"
                     style={{
                       shadowColor: "#000",
                       shadowOffset: {
@@ -1242,7 +1131,7 @@ const DungeonLevelScreen = observer(() => {
             onBackButtonPress={() => setFleeModalShowing(false)}
           >
             <View
-              className="mx-auto w-5/6 rounded-xl px-6 py-4"
+              className="mx-auto w-5/6 rounded-xl px-6 py-4 dark:border dark:border-zinc-500"
               style={{
                 shadowColor: "#000",
                 shadowOffset: {
@@ -1296,7 +1185,7 @@ const DungeonLevelScreen = observer(() => {
           onBackdropPress={closeImmediateItemDrops}
         >
           <View
-            className="mx-auto w-5/6 rounded-xl px-6 py-4"
+            className="mx-auto w-5/6 rounded-xl px-6 py-4 dark:border dark:border-zinc-500"
             style={{
               shadowColor: "#000",
               shadowOffset: {
@@ -1331,7 +1220,9 @@ const DungeonLevelScreen = observer(() => {
                 >
                   <NonThemedView className="flex flex-row">
                     <Image source={item.getItemIcon()} />
-                    <Text className="my-auto">{item.name}</Text>
+                    <Text className="my-auto ml-2">
+                      {toTitleCase(item.name)}
+                    </Text>
                   </NonThemedView>
                   <Pressable
                     onPress={() => {
@@ -1373,7 +1264,7 @@ const DungeonLevelScreen = observer(() => {
           onBackdropPress={() => setShowLeftBehindItemsScreen(false)}
         >
           <View
-            className="mx-auto w-5/6 rounded-xl px-6 py-4"
+            className="mx-auto w-5/6 rounded-xl px-6 py-4 dark:border dark:border-zinc-500"
             style={{
               shadowColor: "#000",
               shadowOffset: {
@@ -1462,7 +1353,7 @@ const DungeonLevelScreen = observer(() => {
           }
         >
           <View
-            className="mx-auto w-5/6 rounded-xl px-6 py-4"
+            className="mx-auto w-5/6 rounded-xl px-6 py-4 dark:border dark:border-zinc-500"
             style={{
               shadowColor: "#000",
               shadowOffset: {
@@ -1490,7 +1381,11 @@ const DungeonLevelScreen = observer(() => {
                   maxValue={monsterState.healthMax}
                   filledColor="#ef4444"
                   unfilledColor="#fee2e2"
-                  displayNumber={false}
+                  displayNumber={
+                    monsterState.creatureSpecies.toLowerCase() == "target dummy"
+                      ? true
+                      : false
+                  }
                   removeAtZero={true}
                 />
                 {showingMonsterHealthChange ? (

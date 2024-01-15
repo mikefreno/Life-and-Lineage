@@ -301,7 +301,7 @@
     {
         "name": "Artifact Excavation Site",
         "description": "Hidden beneath the millennia of earth lie ancient artifacts infused with forgotten magics. Each find promises wealth, power, and a chance to rewrite history.",
-        "cost": 1450000,
+        "cost": 1850000,
         "turnsPerReturn": 50,
         "goldReturnRange": {"min": 28500, "max": 100000},
         "maxGoldStockPile": 500000,
@@ -310,7 +310,7 @@
                 "name": "Magic Detectors",
                 "cost": 575000,
                 "description":"",
-                "effect": {"turnsPerRollChange": -5, "goldMinimumIncrease": 15000, "goldMaximumIncrease": 25000}
+                "effect": {"turnsPerRollChange": -5, "goldMinimumIncrease": 12000, "goldMaximumIncrease": 24000}
             },
             {
                 "name": "Renowned Archeologists",
@@ -320,72 +320,31 @@
             },
             {
                 "name": "Develop Local Infrastructure",
-                "cost": 2100000,
-                "description": "",
-                "effect": {"turnsPerRollChange": -2,"goldMinimumIncrease": -4000, "goldMaximumIncrease": 20000}
+                "cost": 6500000,
+                "excludes": "Exploit Local Labor",
+                "description": "You will be here a long time, building up local roads, hospitals and fire departments will aid both you and the locals. Reduces gold return, but speeds time to market and increases max sanity.",
+                "effect": {"turnsPerRollChange": -10,"goldMinimumIncrease": -2500, "goldMaximumIncrease": -2500, "changeMaxSanity": 5}
             },
             {
                 "name": "Exploit Local Labor",
-                "cost": 2100000,
-                "description": "",
-                "effect": {"turnsPerRollChange": -2,"goldMinimumIncrease": -4000, "goldMaximumIncrease": 20000}
+                "cost": 5750000,
+                "excludes": "Develop Local Infrastructure",
+                "description": "Sabotage other local industries leaving the local population with few other options for work. Increases gold returns, and decreases both time to market and player max sanity.",
+                "effect": {"turnsPerRollChange": -5,"goldMinimumIncrease": 10000, "goldMaximumIncrease": 50000, "changeMaxSanity": -5}
             },
             {
                 "name": "Rapid Excavation",
                 "cost": 2100000,
-                "excludes": "",
-                "description":"",
-                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "changeMaxSanity": -5}    
+                "excludes": "Careful Excavation",
+                "description":"Nothing else matters than moving fast, you may miss things. Decreases time to market, but decreases minimum gold returns.",
+                "effect": {"turnsPerRollChange": -5,"goldMinimumIncrease": -15000}    
             },
             {
                 "name": "Careful Excavation",
                 "cost": 2100000,
-                "excludes": "",
-                "description":"",
-                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "changeMaxSanity": 5}    
-            }
-        ]
-    },
-    {
-        "name": "Magic Academy",
-        "description": "A hum of power encircles these halls, where young apprentices learn to harness the arcane. Its influence spreads as mastering graduates shape the world.",
-        "cost": 1150000,
-        "turnsPerReturn": 50,
-        "goldReturnRange": {"min": 37500, "max": 120000},
-        "maxGoldStockPile": 500000,
-        "upgrades": [
-            {
-                "name": "Magic Detectors",
-                "cost": 575000,
-                "description":"",
-                "effect": {"turnsPerRollChange": -5,"goldMinimumIncrease": 15000, "goldMaximumIncrease": 25000}
-            },
-            {
-                "name": "Portal System",
-                "cost": 950000,
-                "description":"",
-                "effect": {"turnsPerRollChange": -10}
-            },
-            {
-                "name": "Explosive Mining",
-                "cost": 1300000,
-                "excludes": "Seismic Monitoring",
-                "description": "",
-                "effect": {"turnsPerRollChange": -2,"goldMinimumIncrease": -4000, "goldMaximumIncrease": 20000}
-            },
-            {
-                "name": "Seismic Monitoring",
-                "cost": 2100000,
-                "excludes": "Profit Sharing",
-                "description":"",
-                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "": 5}    
-            },
-            {
-                "name": "Seismic Monitoring",
-                "cost": 2100000,
-                "excludes": "Profit Sharing",
-                "description":"",
-                "effect": {"goldMinimumIncrease": 1500, "goldMaximumIncrease": 1500, "": 5}    
+                "excludes": "Rapid Excavation",
+                "description":"Make sure to miss nothing. Decreases time to market but increase returns.",
+                "effect": {"turnsPerRollChange": 5, "goldMinimumIncrease": 45000, "goldMaximumIncrease": 65000}    
             }
         ]
     }

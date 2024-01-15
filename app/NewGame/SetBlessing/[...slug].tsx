@@ -1,5 +1,5 @@
 import { Pressable, View as NonThemedView, Switch } from "react-native";
-import { Text, ScrollView, View } from "../../../components/Themed";
+import { Text, View } from "../../../components/Themed";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { toTitleCase } from "../../../utility/functions";
@@ -21,6 +21,28 @@ import Modal from "react-native-modal";
 import { Entypo, FontAwesome5 } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import TutorialModal from "../../../components/TutorialModal";
+
+const descriptionMap: Record<string, string> = {
+  fire: "With Fire, comes aggression. You will deal damage quickly and potentially burn enemies for additional damage over time.",
+  water:
+    "With Water, comes balance. You will deal moderate damage, reduce incoming damage, and even heal yourself",
+  air: "With Air, come control. You will bend the battlefield to your whim, from amplifying damage, to becoming impossible to hit.",
+  earth:
+    "With Earth, comes adamace. You will become unbreakable and stun your enemies in their place",
+  summoning:
+    "With Summoning, you will bend the undead to your will, overwhelm your enemies.",
+  pestilence:
+    "With Pesitilence, you will control an unseen force to cripple your enemies, or destroy them from within.",
+  bone: "With Bone, you will shield yourself or destroy your foes.",
+  blood:
+    "With Blood, you will contol the life force of enemies and yourself, sacrifice for ultimate power.",
+  holy: "With Holy, you will heal yourself, others, and blast away the undead.",
+  vengeance:
+    "With Vengeance, you will smite the unworthly, combining arms with blessed power.",
+  protection:
+    "With Protection, you will shield yourself and others, become invulnerable.",
+};
 
 export default function SetBlessing() {
   const { slug } = useLocalSearchParams();
@@ -37,7 +59,10 @@ export default function SetBlessing() {
   const gameState = gameContext?.gameState;
 
   const [showBlessingTutorial, setShowBlessingTutorial] = useState<boolean>(
-    !gameState || (gameState && !gameState.getTutorialState("blessing"))
+    !gameState ||
+      (gameState &&
+        !gameState.getTutorialState("blessing") &&
+        gameState.tutorialsEnabled)
       ? true
       : false,
   );
@@ -102,12 +127,26 @@ export default function SetBlessing() {
     }
   }
 
+  useEffect(() => {
+    if (gameState) {
+      setTutorialState(gameState?.tutorialsEnabled);
+    }
+  }, [gameState?.tutorialsEnabled]);
+
+  const accent =
+    playerClass == "mage"
+      ? "#2563eb"
+      : playerClass == "necromancer"
+      ? "#9333ea"
+      : "#fcd34d";
+
   function classDependantBlessings() {
     if (playerClass == "mage") {
       return (
-        <View className="flex justify-evenly">
+        <NonThemedView className="mt-[6vh] flex items-center justify-evenly">
           <View className="flex flex-row justify-evenly">
             <Pressable
+              className="h-[20vh] w-[45vw]"
               onPress={() => {
                 setBlessing("fire");
                 blessingRef.current = "fire";
@@ -139,6 +178,7 @@ export default function SetBlessing() {
               )}
             </Pressable>
             <Pressable
+              className="h-[20vh] w-[45vw]"
               onPress={() => {
                 setBlessing("water");
                 blessingRef.current = "water";
@@ -170,8 +210,9 @@ export default function SetBlessing() {
               )}
             </Pressable>
           </View>
-          <View className="mt-6 flex flex-row justify-evenly">
+          <View className="my-[6vh] flex flex-row justify-evenly">
             <Pressable
+              className="h-[20vh] w-[45vw]"
               onPress={() => {
                 setBlessing("air");
                 blessingRef.current = "air";
@@ -203,6 +244,7 @@ export default function SetBlessing() {
               )}
             </Pressable>
             <Pressable
+              className="h-[20vh] w-[45vw]"
               onPress={() => {
                 setBlessing("earth");
                 blessingRef.current = "earth";
@@ -234,14 +276,14 @@ export default function SetBlessing() {
               )}
             </Pressable>
           </View>
-        </View>
+        </NonThemedView>
       );
     } else if (playerClass == "necromancer") {
       return (
-        <View className="flex justify-evenly">
+        <NonThemedView className="mt-[6vh] flex items-center justify-evenly">
           <View className="flex flex-row justify-evenly">
             <Pressable
-              className="w-1/2"
+              className="h-[20vh] w-[45vw]"
               onPress={() => {
                 setBlessing("summoning");
                 blessingRef.current = "summoning";
@@ -273,7 +315,7 @@ export default function SetBlessing() {
               )}
             </Pressable>
             <Pressable
-              className="w-1/2"
+              className="h-[20vh] w-[45vw]"
               onPress={() => {
                 setBlessing("pestilence");
                 blessingRef.current = "pestilence";
@@ -305,9 +347,9 @@ export default function SetBlessing() {
               )}
             </Pressable>
           </View>
-          <View className="mt-6 flex flex-row justify-evenly">
+          <NonThemedView className="my-[6vh] flex flex-row justify-evenly">
             <Pressable
-              className="w-1/2"
+              className="h-[20vh] w-[45vw]"
               onPress={() => {
                 setBlessing("bone");
                 blessingRef.current = "bone";
@@ -339,7 +381,7 @@ export default function SetBlessing() {
               )}
             </Pressable>
             <Pressable
-              className="w-1/2"
+              className="h-[20vh] w-[45vw]"
               onPress={() => {
                 setBlessing("blood");
                 blessingRef.current = "blood";
@@ -370,14 +412,14 @@ export default function SetBlessing() {
                 </NonThemedView>
               )}
             </Pressable>
-          </View>
-        </View>
+          </NonThemedView>
+        </NonThemedView>
       );
     } else if (playerClass == "paladin") {
       return (
-        <View className="flex justify-evenly">
+        <NonThemedView className="flex items-center justify-evenly">
           <Pressable
-            className="mx-auto"
+            className="h-[20vh] w-[45vw]"
             onPress={() => {
               setBlessing("holy");
               blessingRef.current = "holy";
@@ -408,8 +450,9 @@ export default function SetBlessing() {
               </NonThemedView>
             )}
           </Pressable>
-          <View className="-mx-4 mt-6 flex flex-row justify-evenly">
+          <NonThemedView className="mt-[4vh] flex flex-row justify-evenly">
             <Pressable
+              className="h-[20vh] w-[45vw]"
               onPress={() => {
                 setBlessing("vengeance");
                 blessingRef.current = "vengeance";
@@ -441,6 +484,7 @@ export default function SetBlessing() {
               )}
             </Pressable>
             <Pressable
+              className="h-[20vh] w-[45vw]"
               onPress={() => {
                 setBlessing("protection");
                 blessingRef.current = "protection";
@@ -471,8 +515,8 @@ export default function SetBlessing() {
                 </NonThemedView>
               )}
             </Pressable>
-          </View>
-        </View>
+          </NonThemedView>
+        </NonThemedView>
       );
     } else throw new Error("invalid class set");
   }
@@ -484,121 +528,40 @@ export default function SetBlessing() {
           title: "Blessing",
         }}
       />
-      <Modal
-        animationIn="slideInUp"
-        animationOut="slideOutDown"
-        backdropOpacity={0.2}
-        animationInTiming={500}
-        animationOutTiming={300}
-        isVisible={
+      <TutorialModal
+        isVisibleCondition={
           !gameState
             ? loadedAsync
               ? showBlessingTutorial
               : false
             : showBlessingTutorial
         }
-        onBackdropPress={() => setShowBlessingTutorial(false)}
-        onBackButtonPress={() => setShowBlessingTutorial(false)}
-      >
-        <View
-          className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
-          style={{
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 2,
-            },
-
-            shadowOpacity: 0.25,
-            shadowRadius: 5,
-          }}
-        >
-          <View
-            className={`flex flex-row ${
-              tutorialStep == 2 ? "justify-between" : "justify-end"
-            }`}
-          >
-            {tutorialStep == 2 ? (
-              <Pressable onPress={() => setTutorialStep((prev) => prev - 1)}>
-                <Entypo
-                  name="chevron-left"
-                  size={24}
-                  color={colorScheme == "dark" ? "#f4f4f5" : "black"}
-                />
-              </Pressable>
-            ) : null}
-            <Text>{tutorialStep}/2</Text>
-          </View>
-          {tutorialStep == 1 ? (
-            <>
-              <Text className="text-center text-2xl">
-                Magic is a extremly powerful, but often very expensive to
-                obtain.
-              </Text>
-              <Text className="my-4 text-center text-lg">
-                You will start with a book providing a spell pertaining to the
-                blessing you choose, and a higher starting point in that school.
-              </Text>
-              <View className="mx-auto flex flex-row">
-                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                <Switch
-                  trackColor={{ false: "#767577", true: "#3b82f6" }}
-                  ios_backgroundColor="#3e3e3e"
-                  thumbColor={"white"}
-                  onValueChange={(bool) => {
-                    setTutorialState(bool);
-                    tutorialStateRef.current = bool;
-                  }}
-                  value={tutorialState}
-                />
-              </View>
-              <Pressable
-                onPress={tutorialStateDependantPress}
-                className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-              >
-                <Text>Next</Text>
-              </Pressable>
-            </>
-          ) : (
-            <>
-              <Text className="mb-4 text-center text-lg">
-                Each of the blessings are for your class, you can learn from any
-                of these schools, but not from a school for a different class.
-              </Text>
-              <View className="mx-auto flex flex-row">
-                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                <Switch
-                  trackColor={{ false: "#767577", true: "#3b82f6" }}
-                  ios_backgroundColor="#3e3e3e"
-                  thumbColor={"white"}
-                  onValueChange={(bool) => setTutorialState(bool)}
-                  value={tutorialState}
-                />
-              </View>
-              <Pressable
-                onPress={() => {
-                  vibration({ style: "light" });
-                  setShowBlessingTutorial(false);
-                  setTimeout(() => {
-                    setTutorialStep(1);
-                  }, 500);
-                }}
-                className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-              >
-                <Text>Close</Text>
-              </Pressable>
-            </>
-          )}
-        </View>
-      </Modal>
-      <ScrollView>
-        <View className="px-6 pb-12 pt-6">
-          <Text className="py-8 text-center text-2xl text-zinc-900 dark:text-zinc-50">
-            {`With What Blessing Was ${firstName} ${lastName} Born?`}
-          </Text>
+        backFunction={() => setShowBlessingTutorial(false)}
+        onCloseFunction={() => setShowBlessingTutorial(false)}
+        pageOne={{
+          title:
+            "Magic is a extremly powerful, but often very expensive obtain.",
+          body: "You will start with a book providing a spell pertaining to blessing you choose, and a higher starting point in that school.",
+        }}
+        pageTwo={{
+          body: "Each of the blessings are for your class, you can learn from of these schools, but not from a school for a different class.",
+        }}
+      />
+      <View className="flex-1 px-[5vw] pt-[8vh]">
+        <Text className="text-center text-2xl">
+          With What Blessing Was{" "}
+          <Text style={{ color: accent }}>
+            {firstName} {lastName}
+          </Text>{" "}
+          Born?
+        </Text>
+        <View className="flex-1 justify-evenly">
           {classDependantBlessings()}
+          <Text className="h-24 pt-[2vh] text-center md:text-lg">
+            {descriptionMap[blessing]}
+          </Text>
           {blessing ? (
-            <NonThemedView className="mx-auto mt-8">
+            <NonThemedView className="mx-auto h-32 py-2">
               <Pressable
                 onPress={() => {
                   vibration({ style: "light" });
@@ -606,27 +569,28 @@ export default function SetBlessing() {
                     `/NewGame/Review/${playerClass}/${sex}/${firstName}/${lastName}/${blessingRef.current}`,
                   );
                 }}
-                className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                className="rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
               >
                 <Text className="text-xl tracking-widest">Next</Text>
               </Pressable>
             </NonThemedView>
-          ) : null}
-          <View></View>
+          ) : (
+            <NonThemedView className="h-32"></NonThemedView>
+          )}
         </View>
-        <NonThemedView className="absolute ml-4 mt-4">
-          <Pressable
-            className="absolute"
-            onPress={() => setShowBlessingTutorial(true)}
-          >
-            <FontAwesome5
-              name="question-circle"
-              size={32}
-              color={colorScheme == "light" ? "#27272a" : "#fafafa"}
-            />
-          </Pressable>
-        </NonThemedView>
-      </ScrollView>
+      </View>
+      <NonThemedView className="absolute ml-4 mt-4">
+        <Pressable
+          className="absolute"
+          onPress={() => setShowBlessingTutorial(true)}
+        >
+          <FontAwesome5
+            name="question-circle"
+            size={32}
+            color={colorScheme == "light" ? "#27272a" : "#fafafa"}
+          />
+        </Pressable>
+      </NonThemedView>
     </>
   );
 }
