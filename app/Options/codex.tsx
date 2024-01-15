@@ -2,6 +2,7 @@ import { TextInput } from "react-native";
 import { View, Text, ScrollView } from "../../components/Themed";
 import { useState } from "react";
 import CodexCategory from "../../components/CodexCategory";
+import { useColorScheme } from "nativewind";
 
 const categories = [
   "Player",
@@ -17,6 +18,7 @@ const categories = [
 
 export default function Codex() {
   const [searchTerm, setSearchTerm] = useState<string>();
+  const { colorScheme } = useColorScheme();
 
   return (
     <View className="flex-1">
@@ -25,7 +27,7 @@ export default function Codex() {
       </Text>
       <TextInput
         className="mx-16 my-6 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
-        placeholderClassName="text-zinc-400 dark:text-zinc-400"
+        placeholderTextColor={colorScheme == "light" ? "#d4d4d8" : "#71717a"}
         onChangeText={(text) => setSearchTerm(text)}
         placeholder={"Search Codex"}
         autoCorrect={false}

@@ -11,6 +11,7 @@ import { GameContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
 import Modal from "react-native-modal";
 import * as Updates from "expo-updates";
+import GenericModal from "../../components/GenericModal";
 
 export default function AppSettings() {
   const themeOptions = ["system", "light", "dark"];
@@ -65,29 +66,11 @@ export default function AppSettings() {
 
     return (
       <>
-        <Modal
-          animationIn="slideInUp"
-          animationOut="slideOutDown"
-          backdropOpacity={0.2}
-          animationInTiming={500}
-          animationOutTiming={300}
-          isVisible={showTutorialResetConfirm}
-          onBackdropPress={() => setShowTutorialResetConfirm(false)}
-          onBackButtonPress={() => setShowTutorialResetConfirm(false)}
+        <GenericModal
+          isVisibleCondition={showTutorialResetConfirm}
+          backFunction={() => setShowTutorialResetConfirm(false)}
         >
-          <View
-            className="mx-auto w-5/6 rounded-xl px-6 py-4"
-            style={{
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-
-              shadowOpacity: 0.25,
-              shadowRadius: 5,
-            }}
-          >
+          <>
             <Text className="text-center text-lg">
               This will reset all tutorials, some may not make sense based on
               your current game/player/inventory state (And restart the app).
@@ -112,8 +95,8 @@ export default function AppSettings() {
                 <Text>Cancel</Text>
               </Pressable>
             </View>
-          </View>
-        </Modal>
+          </>
+        </GenericModal>
         <View className="flex-1 items-center justify-center px-4">
           <View style={styles.container}>
             <View style={styles.line} />
