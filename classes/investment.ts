@@ -58,6 +58,7 @@ export class Investment {
       upgrades: observable,
       turn: action,
       addUpgrade: action,
+      collectGold: action,
     });
   }
 

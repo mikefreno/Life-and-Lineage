@@ -352,6 +352,9 @@ export class PlayerCharacter extends Character {
       changeMaxSanity: action,
       purchaseInvestmentBase: action,
       purchaseInvestmentUpgrade: action,
+      collectFromInvestment: action,
+      tickAllInvestments: action,
+      getInvestment: action,
     });
   }
   //----------------------------------Health----------------------------------//
@@ -1191,6 +1194,7 @@ export class PlayerCharacter extends Character {
     );
     if (base) {
       base.addUpgrade(suppliedUpgrade, playerCharacter);
+      this.gold -= suppliedUpgrade.cost;
     } else {
       throw new Error("no base upgrade found!");
     }

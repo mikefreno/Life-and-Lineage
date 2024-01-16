@@ -12,12 +12,14 @@ import { Entypo } from "@expo/vector-icons";
 import Sanity from "../assets/icons/SanityIcon";
 import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { Investment } from "../classes/investment";
+import GenericModal from "./GenericModal";
+import { observer } from "mobx-react-lite";
 
 interface InvestmentCardProps {
   investment: InvestmentType;
 }
 
-export default function InvestmentCard({ investment }: InvestmentCardProps) {
+const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
   const { colorScheme } = useColorScheme();
   const [showUpgrades, setShowUpgrades] = useState<boolean>(false);
   const playerCharacterContext = useContext(PlayerCharacterContext);
@@ -26,8 +28,6 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
     throw new Error("missing context");
   }
   const [showInvestmentConfirmation, setShowInvestmentConfirmation] =
-    useState<boolean>(false);
-  const [showUpgradeConfirmation, setShowUpgradeConfirmation] =
     useState<boolean>(false);
   const { playerState } = playerCharacterContext;
   const { gameState } = gameContext;
@@ -48,15 +48,11 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
 
   function purchaseUpgradeCheck(specifiedUpgrade: InvestmentUpgrade) {
     if (playerState && playerState.gold >= specifiedUpgrade.cost) {
-      if (specifiedUpgrade.cost / playerState.gold >= 0.2) {
-        setShowUpgradeConfirmation(true);
-      } else {
-        playerState.purchaseInvestmentUpgrade(
-          investment,
-          specifiedUpgrade,
-          playerState,
-        );
-      }
+      playerState.purchaseInvestmentUpgrade(
+        investment,
+        specifiedUpgrade,
+        playerState,
+      );
     }
   }
 
@@ -73,57 +69,37 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
 
   return (
     <>
-      <Modal
-        animationIn="slideInUp"
-        animationOut="slideOutDown"
-        backdropOpacity={0.2}
-        animationInTiming={500}
-        animationOutTiming={300}
-        isVisible={showInvestmentConfirmation}
-        onBackdropPress={() => setShowInvestmentConfirmation(false)}
-        onBackButtonPress={() => setShowInvestmentConfirmation(false)}
+      <GenericModal
+        isVisibleCondition={showInvestmentConfirmation}
+        backFunction={() => setShowInvestmentConfirmation(false)}
       >
-        <ThemedView
-          className="mx-auto w-full rounded-xl p-4"
-          style={{
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 2,
-            },
-            elevation: 1,
-            shadowOpacity: 0.25,
-            shadowRadius: 5,
-          }}
-        >
-          <Text className="text-center text-lg">Purchase:</Text>
-          <View style={styles.container}>
-            <View style={styles.line} />
-            <View style={styles.content}>
-              <Text className="text-2xl">{investment.name}</Text>
-            </View>
-            <View style={styles.line} />
+        <Text className="text-center text-lg">Purchase:</Text>
+        <View style={styles.container}>
+          <View style={styles.line} />
+          <View style={styles.content}>
+            <Text className="text-2xl">{investment.name}</Text>
           </View>
-          <Text className="pb-6 text-center text-xl">Are you sure?</Text>
-          <View className="flex flex-row">
-            <Pressable
-              onPress={() => {
-                playerState?.purchaseInvestmentBase(investment);
-                setShowInvestmentConfirmation(false);
-              }}
-              className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-            >
-              <Text>Purchase</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => setShowInvestmentConfirmation(false)}
-              className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-            >
-              <Text>Cancel</Text>
-            </Pressable>
-          </View>
-        </ThemedView>
-      </Modal>
+          <View style={styles.line} />
+        </View>
+        <Text className="pb-6 text-center text-xl">Are you sure?</Text>
+        <View className="flex flex-row">
+          <Pressable
+            onPress={() => {
+              playerState?.purchaseInvestmentBase(investment);
+              setShowInvestmentConfirmation(false);
+            }}
+            className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+          >
+            <Text>Purchase</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => setShowInvestmentConfirmation(false)}
+            className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+          >
+            <Text>Cancel</Text>
+          </Pressable>
+        </View>
+      </GenericModal>
       <Modal
         animationIn="slideInUp"
         animationOut="slideOutDown"
@@ -135,7 +111,7 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
         onBackButtonPress={() => setShowUpgrades(false)}
       >
         <ThemedView
-          className="mx-auto w-full rounded-xl p-4"
+          className="mx-auto w-full rounded-xl p-4 dark:border dark:border-zinc-500"
           style={{
             shadowColor: "#000",
             shadowOffset: {
@@ -204,10 +180,17 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
                           <Entypo
                             name="chevron-small-down"
                             size={24}
-                            color="black"
+                            color={
+                              colorScheme == "light" ? "#18181b" : "#fafafa"
+                            }
                           />
                         </Animated.View>
                       </View>
+                      {madeInvestment?.upgrades.includes(upgrade.name) && (
+                        <Text className="my-auto text-lg italic tracking-wider opacity-70 dark:text-zinc-50">
+                          Purchased
+                        </Text>
+                      )}
                       {showingBody && (
                         <View>
                           <Text className="bold my-auto py-2 text-center dark:text-zinc-50">
@@ -266,42 +249,55 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
                               </View>
                             )}
                           </View>
-                          <Pressable
-                            onPress={() => purchaseUpgradeCheck(upgrade)}
-                            className="mx-auto my-2 active:scale-95 active:opacity-50"
-                          >
-                            <View
-                              className="rounded-xl px-8 py-4"
-                              style={
-                                playerState && playerState.gold >= upgrade.cost
-                                  ? {
-                                      shadowColor: "#000",
-                                      elevation: 1,
-                                      backgroundColor:
-                                        colorScheme == "light"
-                                          ? "white"
-                                          : "#71717a",
-                                      shadowOpacity: 0.1,
-                                      shadowRadius: 5,
+                          {!madeInvestment ||
+                            (madeInvestment &&
+                              !madeInvestment.upgrades.includes(
+                                upgrade.name,
+                              ) && (
+                                <Pressable
+                                  onPress={() => purchaseUpgradeCheck(upgrade)}
+                                  disabled={
+                                    playerState &&
+                                    playerState.gold < upgrade.cost
+                                  }
+                                  className="mx-auto my-2 active:scale-95 active:opacity-50"
+                                >
+                                  <View
+                                    className="rounded-xl px-8 py-4"
+                                    style={
+                                      playerState &&
+                                      playerState.gold >= upgrade.cost
+                                        ? {
+                                            shadowColor: "#000",
+                                            elevation: 1,
+                                            backgroundColor:
+                                              colorScheme == "light"
+                                                ? "white"
+                                                : "#71717a",
+                                            shadowOpacity: 0.1,
+                                            shadowRadius: 5,
+                                          }
+                                        : {
+                                            backgroundColor:
+                                              colorScheme == "light"
+                                                ? "#ccc"
+                                                : "#4b4b4b",
+                                            opacity: 0.5,
+                                          }
                                     }
-                                  : {
-                                      backgroundColor:
-                                        colorScheme == "light"
-                                          ? "#ccc"
-                                          : "#4b4b4b",
-                                      opacity: 0.5,
-                                    }
-                              }
-                            >
-                              <Text className="text-center">Purchase For</Text>
-                              <View className="flex flex-row items-center justify-center">
-                                <Text className="dark:text-zinc-50">
-                                  {asReadableGold(upgrade.cost)}{" "}
-                                </Text>
-                                <Coins width={14} height={14} />
-                              </View>
-                            </View>
-                          </Pressable>
+                                  >
+                                    <Text className="text-center">
+                                      Purchase For
+                                    </Text>
+                                    <View className="flex flex-row items-center justify-center">
+                                      <Text className="dark:text-zinc-50">
+                                        {asReadableGold(upgrade.cost)}{" "}
+                                      </Text>
+                                      <Coins width={14} height={14} />
+                                    </View>
+                                  </View>
+                                </Pressable>
+                              ))}
                         </View>
                       )}
                     </View>
@@ -327,9 +323,20 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
       >
         <View className="flex justify-between rounded-xl px-4 py-2 text-zinc-950 dark:border dark:border-zinc-500">
           <View>
-            <Text className="bold my-auto text-xl tracking-wider dark:text-zinc-50">
-              {investment.name}
-            </Text>
+            {madeInvestment ? (
+              <View className="flex flex-row justify-between">
+                <Text className="bold my-auto text-xl tracking-wider dark:text-zinc-50">
+                  {investment.name}
+                </Text>
+                <Text className="my-auto text-lg italic tracking-wider opacity-70 dark:text-zinc-50">
+                  Purchased
+                </Text>
+              </View>
+            ) : (
+              <Text className="bold my-auto text-xl tracking-wider dark:text-zinc-50">
+                {investment.name}
+              </Text>
+            )}
             <Text className="bold my-auto py-2 text-center dark:text-zinc-50">
               {investment.description}
             </Text>
@@ -337,19 +344,37 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
           <View className="flex flex-row items-center justify-evenly py-4">
             <View className="mx-12 flex items-center">
               <View className="flex flex-row">
-                <Text>
-                  {`${investment.goldReturnRange.min} - ${investment.goldReturnRange.max} `}
-                </Text>
+                {madeInvestment ? (
+                  <Text>
+                    {`${madeInvestment.minimumReturn} - ${madeInvestment.maximumReturn} `}
+                  </Text>
+                ) : (
+                  <Text>
+                    {`${investment.goldReturnRange.min} - ${investment.goldReturnRange.max} `}
+                  </Text>
+                )}
                 <Coins height={14} width={14} />
               </View>
               <View className="flex flex-row">
-                <Text>{investment.turnsPerReturn} </Text>
+                <Text>
+                  {madeInvestment
+                    ? madeInvestment.turnsPerRoll
+                    : investment.turnsPerReturn}{" "}
+                </Text>
                 <View className="my-auto">
-                  <ClockIcon height={14} width={14} />
+                  <ClockIcon
+                    height={14}
+                    width={14}
+                    color={colorScheme == "dark" ? "#fafafa" : undefined}
+                  />
                 </View>
               </View>
               <View className="flex flex-row items-center">
-                <Text>{investment.maxGoldStockPile} </Text>
+                <Text>
+                  {madeInvestment
+                    ? madeInvestment.maxGoldStockPile
+                    : investment.maxGoldStockPile}{" "}
+                </Text>
                 <Vault height={14} width={16} />
               </View>
             </View>
@@ -399,7 +424,7 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
           ) : (
             <Pressable
               onPress={collectOnInvestment}
-              disabled={madeInvestment.currentGoldStockPile > 0}
+              disabled={madeInvestment.currentGoldStockPile == 0}
               className="mx-auto mb-2 active:scale-95 active:opacity-50"
             >
               <View
@@ -435,7 +460,8 @@ export default function InvestmentCard({ investment }: InvestmentCardProps) {
       </ThemedView>
     </>
   );
-}
+});
+
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
@@ -452,3 +478,4 @@ const styles = StyleSheet.create({
     borderTopColor: "#ccc",
   },
 });
+export default InvestmentCard;
