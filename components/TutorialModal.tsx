@@ -85,24 +85,26 @@ export default function TutorialModal({
           shadowRadius: 5,
         }}
       >
-        <View
-          className={`flex flex-row ${
-            tutorialStep == 2 ? "justify-between" : "justify-end"
-          }`}
-        >
-          {tutorialStep == 2 ? (
-            <Pressable onPress={() => setTutorialStep((prev) => prev - 1)}>
-              <Entypo
-                name="chevron-left"
-                size={24}
-                color={colorScheme == "dark" ? "#f4f4f5" : "black"}
-              />
-            </Pressable>
-          ) : null}
-          <Text>
-            {tutorialStep}/{pageThree ? 3 : 2}
-          </Text>
-        </View>
+        {pageTwo && (
+          <View
+            className={`flex flex-row ${
+              tutorialStep == 2 ? "justify-between" : "justify-end"
+            }`}
+          >
+            {tutorialStep == 2 ? (
+              <Pressable onPress={() => setTutorialStep((prev) => prev - 1)}>
+                <Entypo
+                  name="chevron-left"
+                  size={24}
+                  color={colorScheme == "dark" ? "#f4f4f5" : "black"}
+                />
+              </Pressable>
+            ) : null}
+            <Text>
+              {tutorialStep}/{pageThree ? 3 : 2}
+            </Text>
+          </View>
+        )}
         {tutorialStep == 1 ? (
           <>
             <Text className="text-center text-2xl md:text-3xl">

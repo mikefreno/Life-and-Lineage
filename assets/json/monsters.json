@@ -98,8 +98,8 @@
    {
       "name": "goblin",
       "sanity": null,
-      "healthRange": {"minimum": 60, "maximum": 80},
-      "attackPowerRange": {"minimum": 15, "maximum": 20},
+      "healthRange": {"minimum": 50, "maximum": 70},
+      "attackPowerRange": {"minimum": 5, "maximum": 10},
       "energy": {"maximum": 50, "regen": 5},
       "attacks": ["stab", "pocket sand", "rock throw", "torch stab"],
       "drops": [
@@ -108,7 +108,36 @@
       ],
       "goldDropRange": {"minimum": 35, "maximum":65},
       "appearsIn": ["goblin cave"],
-      "appearsOn": [1,2,3]
+      "appearsOn": [1,2]
+   },
+   {
+      "name": "hobgoblin",
+      "sanity": null,
+      "healthRange": {"minimum": 80, "maximum": 80},
+      "attackPowerRange": {"minimum": 7, "maximum": 14},
+      "energy": {"maximum": 50, "regen": 5},
+      "attacks": ["stab"],
+      "drops": [
+         {"item": "longsword", "itemType":"weapon","chance":0.10}
+      ],
+      "goldDropRange": {"minimum": 35, "maximum":65},
+      "appearsIn": ["goblin cave"],
+      "appearsOn": [2]
+   },
+   {
+      "name": "goblin shaman",
+      "sanity": null,
+      "healthRange": {"minimum": 60, "maximum": 80},
+      "attackPowerRange": {"minimum": 15, "maximum": 20},
+      "energy": {"maximum": 50, "regen": 5},
+      "attacks": ["stab", "pocket sand", "rock throw", "torch stab"],
+      "drops": [
+         {"item": "adept robes", "itemType":"bodyArmor","chance":1.0},
+         {"item": "dagger", "itemType":"weapon","chance":0.35}
+      ],
+      "goldDropRange": {"minimum": 185, "maximum":250},
+      "appearsIn": [""],
+      "appearsOn": [1,2]
    },
    {
       "name": "zombie",

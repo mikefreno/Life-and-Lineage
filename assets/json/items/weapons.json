@@ -70,7 +70,7 @@
       }
    },
    {
-      "name": "long sword",
+      "name": "longsword",
       "baseValue": 10000,
       "slot": "one-hand",
       "attacks": ["slash"],

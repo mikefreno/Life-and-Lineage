@@ -71,10 +71,20 @@ export const MonsterImageMap: Record<string, ImageInfo> = {
     width: 140,
     height: 140,
   },
+  "goblin shaman": {
+    source: require("../assets/images/monsters/goblin_shaman.png"),
+    width: 140,
+    height: 140,
+  },
   ghost: {
     source: require("../assets/images/monsters/ghost.png"),
     width: 140,
     height: 140,
+  },
+  hobgoblin: {
+    source: require("../assets/images/monsters/hobgoblin.png"),
+    width: 150,
+    height: 150,
   },
   necromancer: {
     source: require("../assets/images/monsters/necromancer.png"),
@@ -88,6 +98,11 @@ export const MonsterImageMap: Record<string, ImageInfo> = {
   },
   "skeleton archer": {
     source: require("../assets/images/monsters/skeleton_archer.png"),
+    width: 160,
+    height: 160,
+  },
+  "giant spider": {
+    source: require("../assets/images/monsters/giant_spider.png"),
     width: 160,
     height: 160,
   },

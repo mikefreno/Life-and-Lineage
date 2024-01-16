@@ -27,15 +27,15 @@ import {
   PlayerCharacterContext,
 } from "../_layout";
 import { observer } from "mobx-react-lite";
-import { EvilIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import FadeOutText from "../../components/FadeOutText";
 import { useVibration } from "../../utility/customHooks";
 import { EnemyHealingAnimationBox } from "../../components/EnemyHealingAnimationBox";
 import { Minion, Monster } from "../../classes/creatures";
 import SackIcon from "../../assets/icons/SackIcon";
-import Modal from "react-native-modal";
 import TutorialModal from "../../components/TutorialModal";
+import GenericModal from "../../components/GenericModal";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -397,6 +397,7 @@ const DungeonLevelScreen = observer(() => {
       );
     }
   }
+  useEffect(() => console.log(monsterState?.creatureSpecies), []);
   //-----------minion loading-------//
   function appropriateEnemyCheck() {
     if (monsterState && !fightingBoss)
@@ -1080,31 +1081,29 @@ const DungeonLevelScreen = observer(() => {
                       shadowRadius: 5,
                     }}
                   >
-                    <Pressable
-                      className="mx-auto -ml-2"
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        setFleeModalShowing(false);
-                        setFleeRollFailure(false);
-                      }}
-                    >
-                      <EvilIcons
-                        name="close"
-                        size={28}
-                        color={colorScheme == "dark" ? "#fafafa" : "#18181b"}
-                      />
-                    </Pressable>
                     <View className="flex items-center justify-evenly">
                       <Text className="text-center text-lg">
                         Attempt to Flee?
                       </Text>
-                      <Pressable
-                        disabled={attackAnimationOnGoing}
-                        onPress={flee}
-                        className="mb-4 mt-8 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
-                      >
-                        <Text className="text-lg">Run!</Text>
-                      </Pressable>
+                      <View className="flex w-full flex-row justify-evenly">
+                        <Pressable
+                          disabled={attackAnimationOnGoing}
+                          onPress={flee}
+                          className="mb-4 mt-8 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+                        >
+                          <Text className="text-lg">Run!</Text>
+                        </Pressable>
+                        <Pressable
+                          className="mb-4 mt-8 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+                          onPress={(e) => {
+                            e.stopPropagation();
+                            setFleeModalShowing(false);
+                            setFleeRollFailure(false);
+                          }}
+                        >
+                          <Text className="text-lg">Cancel</Text>
+                        </Pressable>
+                      </View>
                       {fleeRollFailure ? (
                         <Text
                           className="text-center"
@@ -1120,44 +1119,13 @@ const DungeonLevelScreen = observer(() => {
             </NativeModal>
           </NonThemedView>
         ) : (
-          <Modal
-            animationIn="slideInUp"
-            animationOut="slideOutDown"
-            backdropOpacity={0.2}
-            animationInTiming={500}
-            animationOutTiming={300}
-            isVisible={fleeModalShowing}
-            onBackdropPress={() => setFleeModalShowing(false)}
-            onBackButtonPress={() => setFleeModalShowing(false)}
+          <GenericModal
+            isVisibleCondition={fleeModalShowing}
+            backFunction={() => setFleeModalShowing(false)}
           >
-            <View
-              className="mx-auto w-5/6 rounded-xl px-6 py-4 dark:border dark:border-zinc-500"
-              style={{
-                shadowColor: "#000",
-                shadowOffset: {
-                  width: 0,
-                  height: 2,
-                },
-                elevation: 1,
-                shadowOpacity: 0.25,
-                shadowRadius: 5,
-              }}
-            >
-              <Pressable
-                className="-ml-2 -mt-2"
-                onPress={() => {
-                  setFleeModalShowing(false);
-                  setFleeRollFailure(false);
-                }}
-              >
-                <EvilIcons
-                  name="close"
-                  size={28}
-                  color={colorScheme == "dark" ? "#fafafa" : "#18181b"}
-                />
-              </Pressable>
-              <View className="flex items-center justify-evenly">
-                <Text className="text-center text-lg">Attempt to Flee?</Text>
+            <View className="flex items-center justify-evenly">
+              <Text className="text-center text-lg">Attempt to Flee?</Text>
+              <View className="flex w-full flex-row justify-evenly">
                 <Pressable
                   disabled={attackAnimationOnGoing}
                   onPress={flee}
@@ -1165,186 +1133,140 @@ const DungeonLevelScreen = observer(() => {
                 >
                   <Text className="text-lg">Run!</Text>
                 </Pressable>
-                {fleeRollFailure ? (
-                  <Text className="text-center" style={{ color: "#ef4444" }}>
-                    Roll Failure!
-                  </Text>
-                ) : null}
+                <Pressable
+                  className="mb-4 mt-8 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    setFleeModalShowing(false);
+                    setFleeRollFailure(false);
+                  }}
+                >
+                  <Text className="text-lg">Cancel</Text>
+                </Pressable>
               </View>
-            </View>
-          </Modal>
-        )}
-        <Modal
-          animationIn="slideInUp"
-          animationOut="slideOutDown"
-          backdropOpacity={0.2}
-          animationInTiming={500}
-          animationOutTiming={300}
-          isVisible={droppedItems ? true : false}
-          onBackButtonPress={closeImmediateItemDrops}
-          onBackdropPress={closeImmediateItemDrops}
-        >
-          <View
-            className="mx-auto w-5/6 rounded-xl px-6 py-4 dark:border dark:border-zinc-500"
-            style={{
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              elevation: 1,
-              shadowOpacity: 0.25,
-              shadowRadius: 5,
-            }}
-          >
-            <NonThemedView>
-              <NonThemedView className="mt-4 flex flex-row justify-center">
-                <Text className="italic">
-                  You picked up {droppedItems?.gold}
+              {fleeRollFailure ? (
+                <Text className="text-center" style={{ color: "#ef4444" }}>
+                  Roll Failure!
                 </Text>
-                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+              ) : null}
+            </View>
+          </GenericModal>
+        )}
+        <GenericModal
+          isVisibleCondition={droppedItems ? true : false}
+          backFunction={closeImmediateItemDrops}
+        >
+          <>
+            <NonThemedView className="mt-4 flex flex-row justify-center">
+              <Text className="italic">You picked up {droppedItems?.gold}</Text>
+              <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+            </NonThemedView>
+            <Text
+              className="text-center text-lg"
+              style={{
+                color: "#ef4444",
+                opacity: inventoryFullNotifier ? 1 : 0,
+              }}
+            >
+              Inventory is full!
+            </Text>
+            {droppedItems?.itemDrops.map((item) => (
+              <NonThemedView
+                key={item.id}
+                className="mt-2 flex flex-row justify-between"
+              >
+                <NonThemedView className="flex flex-row">
+                  <Image source={item.getItemIcon()} />
+                  <Text className="my-auto ml-2">{toTitleCase(item.name)}</Text>
+                </NonThemedView>
+                <Pressable
+                  onPress={() => {
+                    takeItem(item);
+                  }}
+                  className="rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+                >
+                  <Text>Take</Text>
+                </Pressable>
               </NonThemedView>
-              <Text
-                className="text-center text-lg"
-                style={{
-                  color: "#ef4444",
-                  opacity: inventoryFullNotifier ? 1 : 0,
+            ))}
+            {droppedItems && droppedItems.itemDrops.length > 0 ? (
+              <Pressable
+                className="mx-auto mt-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+                onPress={() => {
+                  takeAllItems();
                 }}
               >
-                Inventory is full!
-              </Text>
-              {droppedItems?.itemDrops.map((item) => (
-                <NonThemedView
-                  key={item.id}
-                  className="mt-2 flex flex-row justify-between"
-                >
-                  <NonThemedView className="flex flex-row">
-                    <Image source={item.getItemIcon()} />
-                    <Text className="my-auto ml-2">
-                      {toTitleCase(item.name)}
-                    </Text>
-                  </NonThemedView>
-                  <Pressable
-                    onPress={() => {
-                      takeItem(item);
-                    }}
-                    className="rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+                <Text>Take All</Text>
+              </Pressable>
+            ) : null}
+            <Pressable
+              className="mx-auto my-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+              onPress={closeImmediateItemDrops}
+            >
+              <Text>Done Looting</Text>
+            </Pressable>
+          </>
+        </GenericModal>
+        <GenericModal
+          isVisibleCondition={showLeftBehindItemsScreen}
+          backFunction={() => setShowLeftBehindItemsScreen(false)}
+        >
+          <>
+            <Text
+              className="text-center text-lg"
+              style={{
+                color: "#ef4444",
+                opacity: inventoryFullNotifier ? 1 : 0,
+              }}
+            >
+              Inventory is full!
+            </Text>
+            {leftBehindDrops.length > 0 ? (
+              <>
+                {leftBehindDrops.map((item) => (
+                  <NonThemedView
+                    key={item.id}
+                    className="my-2 flex flex-row justify-between"
                   >
-                    <Text>Take</Text>
-                  </Pressable>
-                </NonThemedView>
-              ))}
-              {droppedItems && droppedItems.itemDrops.length > 0 ? (
+                    <NonThemedView className="flex flex-row">
+                      <Image source={item.getItemIcon()} />
+                      <Text className="my-auto">{item.name}</Text>
+                    </NonThemedView>
+                    <Pressable
+                      onPress={() => {
+                        takeItemFromPouch(item);
+                      }}
+                      className="rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+                    >
+                      <Text>Take</Text>
+                    </Pressable>
+                  </NonThemedView>
+                ))}
                 <Pressable
                   className="mx-auto mt-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
-                  onPress={() => {
-                    takeAllItems();
-                  }}
+                  onPress={takeAllItemsFromPouch}
                 >
                   <Text>Take All</Text>
                 </Pressable>
-              ) : null}
-              <Pressable
-                className="mx-auto my-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
-                onPress={closeImmediateItemDrops}
-              >
-                <Text>Done Looting</Text>
-              </Pressable>
-            </NonThemedView>
-          </View>
-        </Modal>
-        <Modal
-          animationIn="slideInUp"
-          animationOut="slideOutDown"
-          backdropOpacity={0.2}
-          animationInTiming={500}
-          animationOutTiming={300}
-          isVisible={showLeftBehindItemsScreen}
-          onBackButtonPress={() => setShowLeftBehindItemsScreen(false)}
-          onBackdropPress={() => setShowLeftBehindItemsScreen(false)}
-        >
-          <View
-            className="mx-auto w-5/6 rounded-xl px-6 py-4 dark:border dark:border-zinc-500"
-            style={{
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              elevation: 1,
-              shadowOpacity: 0.25,
-              shadowRadius: 5,
-            }}
-          >
-            <NonThemedView>
-              <Text
-                className="text-center text-lg"
-                style={{
-                  color: "#ef4444",
-                  opacity: inventoryFullNotifier ? 1 : 0,
-                }}
-              >
-                Inventory is full!
-              </Text>
-              {leftBehindDrops.length > 0 ? (
-                <>
-                  {leftBehindDrops.map((item) => (
-                    <NonThemedView
-                      key={item.id}
-                      className="my-2 flex flex-row justify-between"
-                    >
-                      <NonThemedView className="flex flex-row">
-                        <Image source={item.getItemIcon()} />
-                        <Text className="my-auto">{item.name}</Text>
-                      </NonThemedView>
-                      <Pressable
-                        onPress={() => {
-                          takeItemFromPouch(item);
-                        }}
-                        className="rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
-                      >
-                        <Text>Take</Text>
-                      </Pressable>
-                    </NonThemedView>
-                  ))}
-                  <Pressable
-                    className="mx-auto mt-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
-                    onPress={takeAllItemsFromPouch}
-                  >
-                    <Text>Take All</Text>
-                  </Pressable>
-                </>
-              ) : (
-                <View>
-                  <Text className="text-center italic">
-                    You find no items on the ground
-                  </Text>
-                </View>
-              )}
-              <Pressable
-                className="mx-auto mt-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
-                onPress={() => setShowLeftBehindItemsScreen(false)}
-              >
-                <Text>Close</Text>
-              </Pressable>
-            </NonThemedView>
-          </View>
-        </Modal>
-        <Modal
-          animationIn="slideInUp"
-          animationOut="slideOutDown"
-          backdropOpacity={0.2}
-          animationInTiming={500}
-          animationOutTiming={300}
-          isVisible={showTargetSelection.showing}
-          onBackButtonPress={() =>
-            setShowTargetSelection({
-              showing: false,
-              chosenAttack: null,
-              spell: null,
-            })
-          }
-          onBackdropPress={() =>
+              </>
+            ) : (
+              <View>
+                <Text className="text-center italic">
+                  You find no items on the ground
+                </Text>
+              </View>
+            )}
+            <Pressable
+              className="mx-auto mt-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+              onPress={() => setShowLeftBehindItemsScreen(false)}
+            >
+              <Text>Close</Text>
+            </Pressable>
+          </>
+        </GenericModal>
+        <GenericModal
+          isVisibleCondition={showTargetSelection.showing}
+          backFunction={() =>
             setShowTargetSelection({
               showing: false,
               chosenAttack: null,
@@ -1352,23 +1274,11 @@ const DungeonLevelScreen = observer(() => {
             })
           }
         >
-          <View
-            className="mx-auto w-5/6 rounded-xl px-6 py-4 dark:border dark:border-zinc-500"
-            style={{
-              shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              elevation: 1,
-              shadowOpacity: 0.25,
-              shadowRadius: 5,
-            }}
-          >
+          <>
             <Text className="text-center text-2xl">Choose Your Target</Text>
             {targetSelectionRender()}
-          </View>
-        </Modal>
+          </>
+        </GenericModal>
         <View className="flex-1 px-4 pt-4">
           <NonThemedView className="flex h-[40%]">
             <NonThemedView className="flex-1 flex-row justify-evenly">
@@ -1382,7 +1292,8 @@ const DungeonLevelScreen = observer(() => {
                   filledColor="#ef4444"
                   unfilledColor="#fee2e2"
                   displayNumber={
-                    monsterState.creatureSpecies.toLowerCase() == "target dummy"
+                    monsterState.creatureSpecies.toLowerCase() ==
+                    "training dummy"
                       ? true
                       : false
                   }
