@@ -231,7 +231,7 @@ const PlayerStatus = observer(
             <View className="my-1 flex flex-row justify-around">
               {simplifiedConditions.map((cond) => (
                 <View key={cond.name} className="mx-2 flex align-middle">
-                  <View className="mx-auto rounded-md bg-zinc-200">
+                  <View className="mx-auto rounded-md bg-[rgba(255,255,255,0.4)]">
                     <Image
                       source={cond.icon}
                       style={{ width: 32, height: 32 }}

@@ -251,6 +251,17 @@
     }
   },
   {
+    "name": "chain lightning",
+    "element": "air",
+    "proficiencyNeeded": 350,
+    "manaCost": 105,
+    "effects": {
+      "damage": 50,
+      "buffs": null,
+      "debuffs": [{"name":"shocked", "chance": 0.75},{"name":"stun", "chance": 0.5}]
+    }
+  },
+  {
     "name": "air blades",
     "element": "air",
     "proficiencyNeeded": 300,

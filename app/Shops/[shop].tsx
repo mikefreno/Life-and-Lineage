@@ -1,6 +1,10 @@
 import { Stack, useLocalSearchParams } from "expo-router";
 import { View, Text } from "../../components/Themed";
-import { calculateAge, toTitleCase } from "../../utility/functions";
+import {
+  asReadableGold,
+  calculateAge,
+  toTitleCase,
+} from "../../utility/functions";
 import { CharacterImage } from "../../components/CharacterImage";
 import {
   Pressable,
@@ -79,7 +83,7 @@ const ShopInteriorScreen = observer(() => {
     if (
       playerState &&
       thisShop &&
-      new Date(thisShop.lastStockRefresh) < new Date(Date.now() - 60 * 60 * 500)
+      new Date(thisShop.lastStockRefresh) < new Date(Date.now())
     ) {
       thisShop.refreshInventory(playerState.playerClass);
     }
@@ -148,9 +152,11 @@ const ShopInteriorScreen = observer(() => {
               <View className="flex flex-row">
                 <Text>
                   Price:{" "}
-                  {selectedItem.buying
-                    ? selectedItem.item.getBuyPrice(thisShop!.affection)
-                    : selectedItem.item.getSellPrice(thisShop!.affection)}
+                  {asReadableGold(
+                    selectedItem.buying
+                      ? selectedItem.item.getBuyPrice(thisShop!.affection)
+                      : selectedItem.item.getSellPrice(thisShop!.affection),
+                  )}
                 </Text>
                 <Coins width={20} height={20} style={{ marginLeft: 6 }} />
               </View>

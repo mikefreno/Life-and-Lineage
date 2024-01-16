@@ -397,7 +397,6 @@ const DungeonLevelScreen = observer(() => {
       );
     }
   }
-  useEffect(() => console.log(monsterState?.creatureSpecies), []);
   //-----------minion loading-------//
   function appropriateEnemyCheck() {
     if (monsterState && !fightingBoss)
@@ -745,6 +744,10 @@ const DungeonLevelScreen = observer(() => {
     }
   }
 
+  function addItemToPouch(item: Item) {
+    setLeftBehindDrops((prev) => [...prev, item]);
+  }
+
   function takeItemFromPouch(item: Item) {
     if (playerState && droppedItems) {
       if (playerState.inventory.length < 24) {
@@ -894,7 +897,7 @@ const DungeonLevelScreen = observer(() => {
   while (!monsterState) {
     return (
       <View className="flex-1 px-4 pt-4">
-        <NonThemedView className="flex h-1/3 flex-row justify-evenly" />
+        <NonThemedView className="flex h-[35%] flex-row justify-evenly" />
         {thisDungeon?.stepsBeforeBoss !== 0 && !fightingBoss ? (
           <View className="-mt-7 flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
             <Text className="my-auto text-xl">
@@ -933,6 +936,7 @@ const DungeonLevelScreen = observer(() => {
               pass={pass}
               attackAnimationOnGoing={attackAnimationOnGoing}
               setShowTargetSelection={setShowTargetSelection}
+              addItemToPouch={addItemToPouch}
             />
           </View>
           <View className="">
@@ -1280,9 +1284,12 @@ const DungeonLevelScreen = observer(() => {
           </>
         </GenericModal>
         <View className="flex-1 px-4 pt-4">
-          <NonThemedView className="flex h-[40%]">
+          <NonThemedView className="flex h-[35%]">
             <NonThemedView className="flex-1 flex-row justify-evenly">
-              <View className="flex w-2/5 flex-col items-center justify-center">
+              <View
+                className="flex flex-col items-center justify-center"
+                style={{ minWidth: "40%" }}
+              >
                 <Text className="text-3xl">
                   {toTitleCase(monsterState.creatureSpecies)}
                 </Text>
@@ -1376,7 +1383,7 @@ const DungeonLevelScreen = observer(() => {
             ) : null}
           </NonThemedView>
           {thisDungeon.stepsBeforeBoss !== 0 && !fightingBoss ? (
-            <View className="-mt-7 flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
+            <View className="flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
               <Text className="my-auto text-xl">
                 {`Steps Completed: ${thisDungeon.step} / ${thisDungeon.stepsBeforeBoss}`}
               </Text>
@@ -1391,7 +1398,7 @@ const DungeonLevelScreen = observer(() => {
               ) : null}
             </View>
           ) : fightingBoss ? (
-            <View className="-mt-7">
+            <View className="flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
               <Text className="my-auto text-center text-xl">
                 Fighting Boss!
               </Text>
@@ -1414,6 +1421,7 @@ const DungeonLevelScreen = observer(() => {
                 pass={pass}
                 attackAnimationOnGoing={attackAnimationOnGoing}
                 setShowTargetSelection={setShowTargetSelection}
+                addItemToPouch={addItemToPouch}
               />
             </View>
             <View className="">

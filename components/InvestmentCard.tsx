@@ -111,7 +111,7 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
         onBackButtonPress={() => setShowUpgrades(false)}
       >
         <ThemedView
-          className="mx-auto w-full rounded-xl p-4 dark:border dark:border-zinc-500"
+          className="mx-auto max-h-[90vh] w-full rounded-xl p-4 dark:border dark:border-zinc-500"
           style={{
             shadowColor: "#000",
             shadowOffset: {
@@ -123,14 +123,14 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
             shadowRadius: 5,
           }}
         >
-          <ScrollView>
-            <View style={styles.container}>
-              <View style={styles.line} />
-              <View style={styles.content}>
-                <Text className="text-xl">{investment.name} Upgrades</Text>
-              </View>
-              <View style={styles.line} />
+          <View style={styles.container}>
+            <View style={styles.line} />
+            <View style={styles.content}>
+              <Text className="text-xl">{investment.name} Upgrades</Text>
             </View>
+            <View style={styles.line} />
+          </View>
+          <ScrollView>
             {investment.upgrades.map((upgrade) => {
               const [showingBody, setShowingBody] = useState<boolean>(false);
               const rotation = useRef(new Animated.Value(0)).current;
@@ -231,7 +231,15 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
                                 <Text>
                                   {upgrade.effect.turnsPerRollChange}{" "}
                                 </Text>
-                                <ClockIcon height={14} width={14} />
+                                <ClockIcon
+                                  height={14}
+                                  width={14}
+                                  color={
+                                    colorScheme == "dark"
+                                      ? "#fafafa"
+                                      : undefined
+                                  }
+                                />
                               </View>
                             )}
                             {upgrade.effect.maxGoldStockPileIncrease && (
@@ -306,6 +314,12 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
               );
             })}
           </ScrollView>
+          <Pressable
+            onPress={() => setShowUpgrades(false)}
+            className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+          >
+            <Text>Close</Text>
+          </Pressable>
         </ThemedView>
       </Modal>
       <ThemedView

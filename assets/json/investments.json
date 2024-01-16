@@ -81,7 +81,7 @@
                 "name": "New Wing",
                 "cost": 22500,
                 "description":"More rooms means more bodies at peak. Increases maximum gold return.",
-                "effect": {"goldMaximumIncrease": 135}
+                "effect": {"goldMaximumIncrease": 135, "maxGoldStockPileIncrease": 1500}
             }
         ]
     },

@@ -1,10 +1,15 @@
 import { View, Text, ScrollView } from "./Themed";
-import { Pressable, FlatList, Image } from "react-native";
+import {
+  Pressable,
+  FlatList,
+  Image,
+  View as NonThemedView,
+  Dimensions,
+} from "react-native";
 import attacks from "../assets/json/playerAttacks.json";
 import { toTitleCase } from "../utility/functions";
-import Coins from "../assets/icons/CoinsIcon";
 import { Item } from "../classes/item";
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import {
   LogsContext,
   MonsterContext,
@@ -13,6 +18,7 @@ import {
 import { useColorScheme } from "nativewind";
 import { useVibration } from "../utility/customHooks";
 import { Minion, Monster } from "../classes/creatures";
+import GearStatsDisplay from "./GearStatsDisplay";
 
 interface BattleTabProps {
   battleTab: "attacks" | "spells" | "equipment" | "log";
@@ -52,6 +58,7 @@ interface BattleTabProps {
       spell: boolean | null;
     }>
   >;
+  addItemToPouch: (item: Item) => void;
 }
 
 export default function BattleTab({
@@ -61,10 +68,17 @@ export default function BattleTab({
   pass,
   attackAnimationOnGoing,
   setShowTargetSelection,
+  addItemToPouch,
 }: BattleTabProps) {
   const { colorScheme } = useColorScheme();
   const logs = useContext(LogsContext)?.logsState;
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const selectedItemRef = useRef<Item>();
+  const [statsLeftPos, setStatsLeftPos] = useState<number>();
+  const [statsTopPos, setStatsTopPos] = useState<number>();
+
+  const deviceHeight = Dimensions.get("window").height;
+  const deviceWidth = Dimensions.get("window").width;
 
   const monsterContext = useContext(MonsterContext);
   const playerContext = useContext(PlayerCharacterContext);
@@ -93,28 +107,35 @@ export default function BattleTab({
     }),
   );
 
-  function selectedItemDisplay() {
-    if (selectedItem) {
-      return (
-        <View className="flex items-center justify-center py-4">
-          <Text>{toTitleCase(selectedItem.name)}</Text>
-          <Image source={selectedItem.getItemIcon()} />
-          <Text>
-            {selectedItem.itemClass == "bodyArmor"
-              ? "Body Armor"
-              : toTitleCase(selectedItem.itemClass)}
-          </Text>
-          {selectedItem.slot ? (
-            <Text className="">
-              Fills {toTitleCase(selectedItem.slot)} Slot
-            </Text>
-          ) : null}
-        </View>
-      );
-    } else {
-      return <View className="flex h-1/3 items-center justify-center" />;
-    }
+  interface ItemRenderProps {
+    item: Item;
   }
+  const ItemRender = ({ item }: ItemRenderProps) => {
+    const localRef = useRef<NonThemedView>(null);
+    return (
+      <Pressable
+        ref={localRef}
+        className="h-14 w-14 items-center justify-center rounded-lg bg-zinc-400 active:scale-90 active:opacity-50"
+        onPress={() => {
+          if (selectedItem?.equals(item)) {
+            setSelectedItem(null);
+            selectedItemRef.current = undefined;
+            setStatsLeftPos(undefined);
+            setStatsTopPos(undefined);
+          } else {
+            setSelectedItem(item);
+            selectedItemRef.current = item;
+            localRef.current?.measureInWindow((x, y) => {
+              setStatsLeftPos(x);
+              setStatsTopPos(y);
+            });
+          }
+        }}
+      >
+        <Image source={item.getItemIcon()} />
+      </Pressable>
+    );
+  };
 
   if (playerState) {
     switch (battleTab) {
@@ -231,51 +252,110 @@ export default function BattleTab({
       case "equipment":
         return (
           <>
-            {playerState.inventory.length > 0 ? (
-              <View className="flex-1 justify-between">
-                <View className="flex flex-row">
-                  <ScrollView className="w-1/2">
-                    <View className="my-auto flex-row flex-wrap justify-around">
-                      {playerState.inventory.map((item) => (
-                        <Pressable
-                          key={item.id}
-                          className="m-2 items-center active:scale-90 active:opacity-50"
-                          onPress={() => {
-                            setSelectedItem(item);
-                          }}
-                        >
-                          <View
-                            className="rounded-lg p-2"
-                            style={{ backgroundColor: "#a1a1aa" }}
-                          >
-                            <Image source={item.getItemIcon()} />
-                          </View>
-                        </Pressable>
-                      ))}
-                    </View>
-                  </ScrollView>
-                  <View className="w-1/2">
-                    {selectedItem ? (
-                      <View className="my-auto">{selectedItemDisplay()}</View>
-                    ) : null}
-                  </View>
-                </View>
-                <View className="flex flex-row justify-center pb-2">
-                  <Text>{playerState.getReadableGold()}</Text>
-                  <Coins width={16} height={16} style={{ marginLeft: 6 }} />
-                </View>
-              </View>
-            ) : (
-              <View className="flex-1 justify-between pb-2">
-                <Text className="py-8 text-center italic">
-                  Inventory is currently empty
+            <NonThemedView className="absolute bottom-0 mx-auto flex h-full w-full flex-wrap rounded-lg border border-zinc-600">
+              {Array.from({ length: 24 }).map((_, index) => (
+                <NonThemedView
+                  className="absolute items-center justify-center"
+                  style={{
+                    left: `${
+                      (index % 6) * 16.67 +
+                      1 * (Math.floor(deviceWidth / 400) + 1)
+                    }%`,
+                    top: `${Math.floor(index / 6) * 25 + 4}%`,
+                  }}
+                  key={"bg-" + index}
+                >
+                  <NonThemedView className="h-14 w-14 rounded-lg bg-zinc-200 dark:bg-zinc-700" />
+                </NonThemedView>
+              ))}
+              {playerState.inventory.slice(0, 24).map((item, index) => (
+                <NonThemedView
+                  className="absolute items-center justify-center"
+                  style={{
+                    left: `${
+                      (index % 6) * 16.67 +
+                      1 * (Math.floor(deviceWidth / 400) + 1)
+                    }%`,
+                    top: `${Math.floor(index / 6) * 25 + 4}%`,
+                  }}
+                  key={index}
+                >
+                  <ItemRender item={item} />
+                </NonThemedView>
+              ))}
+            </NonThemedView>
+            {selectedItem && statsLeftPos && statsTopPos ? (
+              <View
+                className="absolute items-center rounded-md border border-zinc-600 p-4"
+                style={{
+                  shadowColor: "#000",
+                  shadowOffset: {
+                    width: 0,
+                    height: 2,
+                  },
+                  elevation: 1,
+                  shadowOpacity: 0.25,
+                  shadowRadius: 5,
+                  width: deviceWidth / 3 - 2,
+                  backgroundColor:
+                    colorScheme == "light"
+                      ? "rgba(250, 250, 250, 0.98)"
+                      : "rgba(20, 20, 20, 0.95)",
+                  left: statsLeftPos
+                    ? statsLeftPos < deviceWidth * 0.6
+                      ? statsLeftPos + deviceWidth / 10
+                      : statsLeftPos - deviceWidth / 3 - 5
+                    : undefined,
+                  top: statsTopPos
+                    ? statsTopPos -
+                      (2.8 * deviceHeight) /
+                        (statsTopPos < deviceHeight * 0.6 ? 6 : 4.5)
+                    : undefined,
+                }}
+              >
+                <NonThemedView>
+                  <Text className="text-center">
+                    {toTitleCase(selectedItem.name)}
+                  </Text>
+                </NonThemedView>
+                {selectedItem.stats && selectedItem.slot ? (
+                  <NonThemedView className="py-2">
+                    <GearStatsDisplay stats={selectedItem.stats} />
+                  </NonThemedView>
+                ) : null}
+                {(selectedItem.slot == "one-hand" ||
+                  selectedItem.slot == "two-hand" ||
+                  selectedItem.slot == "off-hand") && (
+                  <Text className="text-sm italic">
+                    {toTitleCase(selectedItem.slot)}
+                  </Text>
+                )}
+                <Text className="text-sm italic">
+                  {selectedItem.itemClass == "bodyArmor"
+                    ? "Body Armor"
+                    : toTitleCase(selectedItem.itemClass)}
                 </Text>
-                <View className="flex flex-row justify-center">
-                  <Text>{playerState.getReadableGold()}</Text>
-                  <Coins width={16} height={16} style={{ marginLeft: 6 }} />
-                </View>
+                <Pressable
+                  onPress={() => {
+                    addItemToPouch(
+                      selectedItemRef.current
+                        ? selectedItemRef.current
+                        : selectedItem,
+                    );
+                    playerState.removeFromInventory(
+                      selectedItemRef.current
+                        ? selectedItemRef.current
+                        : selectedItem,
+                    );
+                    setSelectedItem(null);
+                    selectedItemRef.current = undefined;
+                  }}
+                  className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                >
+                  <Text className="text-center">Drop Item</Text>
+                </Pressable>
               </View>
-            )}
+            ) : null}
           </>
         );
       case "log":

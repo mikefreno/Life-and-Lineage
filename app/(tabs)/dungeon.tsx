@@ -19,6 +19,11 @@ const dangerColorStep = [
   "#ef4444",
   "#dc2626",
 ];
+const levelOffset: Record<string, number> = {
+  "nearby cave": 0,
+  "goblin cave": 3,
+  "bandit hideout": 5,
+};
 
 export default function DungeonScreen() {
   const gameContext = useContext(GameContext);
@@ -171,10 +176,19 @@ export default function DungeonScreen() {
                           className="my-2 rounded-md px-6 py-4"
                           style={{
                             shadowColor:
-                              dangerColorStep[level.level - height + 5],
+                              dangerColorStep[
+                                level.level -
+                                  height +
+                                  5 +
+                                  levelOffset[dungeonInstance.instance]
+                              ],
                             backgroundColor:
-                              dangerColorStep[level.level - height + 5] ??
-                              "#fee2e2",
+                              dangerColorStep[
+                                level.level -
+                                  height +
+                                  5 +
+                                  levelOffset[dungeonInstance.instance]
+                              ] ?? "#fee2e2",
                             shadowOpacity: 0.25,
                             shadowRadius: 5,
                           }}
