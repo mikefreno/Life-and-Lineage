@@ -173,7 +173,7 @@ export default function DungeonScreen() {
                         className="active:scale-95 active:opacity-50"
                       >
                         <View
-                          className="my-2 rounded-md px-6 py-4"
+                          className="my-2 rounded-lg px-6 py-4"
                           style={{
                             shadowColor:
                               dangerColorStep[

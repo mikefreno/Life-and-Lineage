@@ -24,3 +24,36 @@ export type InvestmentUpgrade = {
     changeMaxSanity?: number | undefined;
   };
 };
+
+export type Spell = {
+  name: string;
+  element: string;
+  proficiencyNeeded: number;
+  manaCost: number;
+  effects: {
+    damage: number | null;
+    buffs: string[] | null;
+    debuffs:
+      | {
+          name: string;
+          chance: number;
+        }[]
+      | null;
+    summon?: string[] | undefined;
+    selfDamage?: number | undefined;
+  };
+};
+
+export type Attack = {
+  name: string;
+  targets: string;
+  hitChance: number;
+  damageMult: number;
+  sanityDamage: number;
+  debuffs:
+    | {
+        name: string;
+        chance: number;
+      }[]
+    | null;
+};

@@ -1,6 +1,13 @@
 import ProgressBar from "./ProgressBar";
 import { Text } from "./Themed";
-import { View, ScrollView, Animated, Image } from "react-native";
+import {
+  View,
+  ScrollView,
+  Animated,
+  Image,
+  Pressable,
+  StyleSheet,
+} from "react-native";
 import Coins from "../assets/icons/CoinsIcon";
 import { useContext, useEffect, useState } from "react";
 import { GameContext, PlayerCharacterContext } from "../app/_layout";
@@ -10,6 +17,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { toTitleCase } from "../utility/functions";
 import FadeOutText from "./FadeOutText";
+import GenericModal from "./GenericModal";
 
 interface PlayerStatusOptions {
   displayGoldBottom?: boolean;
@@ -67,6 +75,7 @@ const PlayerStatus = observer(
     const [localSanityMax, setLocalSanityMax] = useState<number | undefined>(
       playerState?.getMaxSanity(),
     );
+    const [showDetailedView, setShowDetailedView] = useState<boolean>(false);
 
     useEffect(() => {
       setLocalHealthMax(playerState?.getMaxHealth());
@@ -194,7 +203,7 @@ const PlayerStatus = observer(
       setReadableGold(playerState?.getReadableGold());
     }, [playerState?.gold]);
 
-    function conditionRenderer() {
+    function conditionRenderer(inDetailedView: boolean) {
       if (playerState) {
         let simplifiedConditionsMap: Map<
           string,
@@ -303,34 +312,17 @@ const PlayerStatus = observer(
 
     if (playerState) {
       return (
-        <Animated.View
-          style={{
-            display: "flex",
-            backgroundColor: showingHealthWarningPulse
-              ? backgroundColorInterpolation
-              : healthDamageFlash.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: ["transparent", "rgba(180,30,30,0.4)"],
-                }),
-          }}
-        >
-          <View
-            className={`${
-              onTop ? "border-b" : "border-t pb-3"
-            } border-zinc-200 dark:border-zinc-700 flex py-2`}
+        <>
+          <GenericModal
+            isVisibleCondition={showDetailedView}
+            backFunction={() => setShowDetailedView(false)}
           >
-            {displayGoldTop ? (
-              <View className="flex flex-row justify-center">
-                <Text>{readableGold}</Text>
-                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
-                {showingGoldChange ? goldChangePopUp() : null}
-              </View>
-            ) : null}
-            {!onTop ? conditionRenderer() : null}
-            <View className="flex flex-row justify-evenly">
-              <View className="flex w-[31%]">
-                {!onTop && showingHealthChange ? healthChangePopUp() : null}
-                <Text className="mx-auto" style={{ color: "#ef4444" }}>
+            <View>
+              <Text className="text-center text-xl">
+                {playerState.getFullName()}
+              </Text>
+              <View className="items-center">
+                <Text className="pb-1" style={{ color: "#ef4444" }}>
                   Health
                 </Text>
                 <ProgressBar
@@ -338,12 +330,11 @@ const PlayerStatus = observer(
                   maxValue={localHealthMax ?? playerState.getMaxHealth()}
                   filledColor="#ef4444"
                   unfilledColor="#fca5a5"
+                  showMax
                 />
-                {onTop && showingHealthChange ? healthChangePopUp() : null}
               </View>
-              <View className="flex w-[31%]">
-                {!onTop && showingManaChange ? manaChangePopUp() : null}
-                <Text className="mx-auto" style={{ color: "#60a5fa" }}>
+              <View className="items-center">
+                <Text className="py-1" style={{ color: "#60a5fa" }}>
                   Mana
                 </Text>
                 <ProgressBar
@@ -351,12 +342,11 @@ const PlayerStatus = observer(
                   maxValue={localManaMax ?? playerState.getMaxMana()}
                   filledColor="#60a5fa"
                   unfilledColor="#bfdbfe"
+                  showMax
                 />
-                {onTop && showingManaChange ? manaChangePopUp() : null}
               </View>
-              <View className="flex w-[31%]">
-                {!onTop && showingSanityChange ? sanityChangePopUp() : null}
-                <Text className="mx-auto" style={{ color: "#c084fc" }}>
+              <View className="items-center">
+                <Text className="py-1" style={{ color: "#c084fc" }}>
                   Sanity
                 </Text>
                 <ProgressBar
@@ -365,22 +355,119 @@ const PlayerStatus = observer(
                   maxValue={localSanityMax ?? playerState.getMaxSanity()}
                   filledColor="#c084fc"
                   unfilledColor="#e9d5ff"
+                  showMax
                 />
-                {onTop && showingSanityChange ? sanityChangePopUp() : null}
+              </View>
+              <View>
+                <View style={styles.container}>
+                  <View style={styles.line} />
+                  <View style={styles.content}>
+                    <Text className="text-xl">Conditions</Text>
+                  </View>
+                  <View style={styles.line} />
+                </View>
+                {conditionRenderer(true)}
               </View>
             </View>
-            {onTop ? conditionRenderer() : null}
-            {displayGoldBottom ? (
-              <View className="mt-2 flex flex-row justify-center">
-                <Text>{readableGold}</Text>
-                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
-                {showingGoldChange ? goldChangePopUp() : null}
+          </GenericModal>
+          <Pressable onPress={() => setShowDetailedView(true)}>
+            <Animated.View
+              style={{
+                display: "flex",
+                backgroundColor: showingHealthWarningPulse
+                  ? backgroundColorInterpolation
+                  : healthDamageFlash.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ["transparent", "rgba(180,30,30,0.4)"],
+                    }),
+              }}
+            >
+              <View
+                className={`${
+                  onTop ? "border-b" : "border-t pb-3"
+                } border-zinc-200 dark:border-zinc-700 flex py-2`}
+              >
+                {displayGoldTop ? (
+                  <View className="flex flex-row justify-center">
+                    <Text>{readableGold}</Text>
+                    <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+                    {showingGoldChange ? goldChangePopUp() : null}
+                  </View>
+                ) : null}
+                {!onTop ? conditionRenderer(false) : null}
+                <View className="flex flex-row justify-evenly">
+                  <View className="flex w-[31%]">
+                    {!onTop && showingHealthChange ? healthChangePopUp() : null}
+                    <Text className="mx-auto" style={{ color: "#ef4444" }}>
+                      Health
+                    </Text>
+                    <ProgressBar
+                      value={playerState.health}
+                      maxValue={localHealthMax ?? playerState.getMaxHealth()}
+                      filledColor="#ef4444"
+                      unfilledColor="#fca5a5"
+                    />
+                    {onTop && showingHealthChange ? healthChangePopUp() : null}
+                  </View>
+                  <View className="flex w-[31%]">
+                    {!onTop && showingManaChange ? manaChangePopUp() : null}
+                    <Text className="mx-auto" style={{ color: "#60a5fa" }}>
+                      Mana
+                    </Text>
+                    <ProgressBar
+                      value={playerState.mana}
+                      maxValue={localManaMax ?? playerState.getMaxMana()}
+                      filledColor="#60a5fa"
+                      unfilledColor="#bfdbfe"
+                    />
+                    {onTop && showingManaChange ? manaChangePopUp() : null}
+                  </View>
+                  <View className="flex w-[31%]">
+                    {!onTop && showingSanityChange ? sanityChangePopUp() : null}
+                    <Text className="mx-auto" style={{ color: "#c084fc" }}>
+                      Sanity
+                    </Text>
+                    <ProgressBar
+                      value={playerState.sanity}
+                      minValue={-50}
+                      maxValue={localSanityMax ?? playerState.getMaxSanity()}
+                      filledColor="#c084fc"
+                      unfilledColor="#e9d5ff"
+                    />
+                    {onTop && showingSanityChange ? sanityChangePopUp() : null}
+                  </View>
+                </View>
+                {onTop ? conditionRenderer(false) : null}
+                {displayGoldBottom ? (
+                  <View className="mt-2 flex flex-row justify-center">
+                    <Text>{readableGold}</Text>
+                    <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+                    {showingGoldChange ? goldChangePopUp() : null}
+                  </View>
+                ) : null}
               </View>
-            ) : null}
-          </View>
-        </Animated.View>
+            </Animated.View>
+          </Pressable>
+        </>
       );
     }
   },
 );
 export default PlayerStatus;
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 4,
+    marginHorizontal: 12,
+  },
+  content: {
+    marginHorizontal: 10,
+  },
+  line: {
+    flex: 1,
+    borderTopWidth: 1,
+    borderTopColor: "#ccc",
+  },
+});

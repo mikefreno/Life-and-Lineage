@@ -23,6 +23,8 @@ import { useVibration } from "../../utility/customHooks";
 import { observer } from "mobx-react-lite";
 import TutorialModal from "../../components/TutorialModal";
 
+const ONE_HOUR = 60 * 60 * 1000;
+
 const ShopInteriorScreen = observer(() => {
   const { shop } = useLocalSearchParams();
   const gameData = useContext(GameContext);
@@ -83,7 +85,7 @@ const ShopInteriorScreen = observer(() => {
     if (
       playerState &&
       thisShop &&
-      new Date(thisShop.lastStockRefresh) < new Date(Date.now())
+      new Date(thisShop.lastStockRefresh) < new Date(Date.now() - ONE_HOUR)
     ) {
       thisShop.refreshInventory(playerState.playerClass);
     }

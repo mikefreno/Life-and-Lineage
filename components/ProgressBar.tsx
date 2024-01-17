@@ -11,6 +11,7 @@ interface ProgressBarProps {
   textColor?: string;
   displayNumber?: boolean;
   removeAtZero?: boolean;
+  showMax?: boolean;
 }
 
 const ProgressBar = ({
@@ -23,6 +24,7 @@ const ProgressBar = ({
   textColor = "#fff",
   displayNumber = true,
   removeAtZero = false,
+  showMax = false,
 }: ProgressBarProps) => {
   const width = ((value - minValue) / (maxValue - minValue)) * 100;
 
@@ -65,6 +67,7 @@ const ProgressBar = ({
               }}
             >
               {value}
+              {showMax ? ` / ${maxValue}` : ""}
             </Text>
           </View>
         )}

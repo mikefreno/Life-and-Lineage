@@ -3,7 +3,7 @@ import SpellDetails from "../../components/SpellDetails";
 import { GameContext, PlayerCharacterContext } from "../_layout";
 import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View as NonThemedView } from "react-native";
 import { observer } from "mobx-react-lite";
 import ProgressBar from "../../components/ProgressBar";
 import { elementalColorMap } from "../../utility/elementColors";
@@ -130,7 +130,9 @@ const SpellsScreen = observer(() => {
           {spells && spells.length > 0 ? (
             <ScrollView className="h-1/2">
               {spells.map((spell) => (
-                <SpellDetails spell={spell} key={spell.name} />
+                <NonThemedView key={spell.name} className="my-1">
+                  <SpellDetails spell={spell} />
+                </NonThemedView>
               ))}
             </ScrollView>
           ) : (

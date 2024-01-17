@@ -13,7 +13,7 @@ import { useVibration } from "../../utility/customHooks";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 
-const LaborScreen = observer(() => {
+const EarnScreen = observer(() => {
   const playerCharacterData = useContext(PlayerCharacterContext);
   const gameContext = useContext(GameContext);
   const playerCharacter = playerCharacterData?.playerState;
@@ -62,11 +62,11 @@ const LaborScreen = observer(() => {
         onCloseFunction={() => setShowLaborTutorial(false)}
         pageOne={{
           title: "Labor Tab",
-          body: "Come here to earn gold in a (mostly) safe way. Certain jobs have qualifications which you can earn by going to the training school (top right).",
+          body: "Come here to earn gold in a (mostly) safe way. Certain jobs have qualifications which you can earn by going to the training school (top left).",
         }}
         pageTwo={{
-          title: "There is another option to earn gold.",
-          body: "The dungeon, is far more dangerous than any job, but promises great riches.",
+          title: "There are other options to earn gold.",
+          body: "If you have a stockpile, you can invest to earn passively (top right). And the dungeon, which is far more dangerous than any job, but promises great riches.",
         }}
       />
       <Modal
@@ -143,4 +143,4 @@ const LaborScreen = observer(() => {
     </>
   );
 });
-export default LaborScreen;
+export default EarnScreen;

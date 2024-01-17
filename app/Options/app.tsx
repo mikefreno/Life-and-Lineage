@@ -9,7 +9,6 @@ import { useContext, useEffect, useState } from "react";
 import { toTitleCase } from "../../utility/functions";
 import { GameContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
-import Modal from "react-native-modal";
 import * as Updates from "expo-updates";
 import GenericModal from "../../components/GenericModal";
 
@@ -192,7 +191,6 @@ export default function AppSettings() {
     );
   }
 }
-
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",

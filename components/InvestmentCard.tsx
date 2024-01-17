@@ -77,7 +77,7 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
         <View style={styles.container}>
           <View style={styles.line} />
           <View style={styles.content}>
-            <Text className="text-2xl">{investment.name}</Text>
+            <Text className="text-center text-2xl">{investment.name}</Text>
           </View>
           <View style={styles.line} />
         </View>

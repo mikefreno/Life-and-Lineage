@@ -1,7 +1,10 @@
-export const elementalColorMap = {
+export const elementalColorMap: Record<
+  string,
+  { dark: string; light: string }
+> = {
   fire: { dark: "#FF5722", light: "#fff7ed" },
   earth: { dark: "#937D62", light: "#DFDCC7" },
-  air: { dark: "#d4d4d8", light: "#f8fafc" },
+  air: { dark: "#94a3b8", light: "#f8fafc" },
   water: { dark: "#60a5fa", light: "#eff6ff" },
   summoning: { dark: "#4b5563", light: "#9ca3af" },
   pestilence: { dark: "#65a30d", light: "#a3e635" },

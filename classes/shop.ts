@@ -107,20 +107,6 @@ export class Shop {
       this.currentGold += sellPrice;
     }
   }
-  //public toJSON(): object {
-  //return {
-  //shopKeeperName: this.shopKeeperName,
-  //shopKeeperBirthDate: this.shopKeeperBirthDate.toISOString(),
-  //shopKeeperSex: this.shopKeeperSex,
-  //affection: this.affection,
-  //personality: this.personality,
-  //baseGold: this.baseGold,
-  //currentGold: this.currentGold,
-  //lastStockRefresh: this.lastStockRefresh,
-  //inventory: this.inventory.map((item) => item.toJSON()),
-  //archetype: this.archetype,
-  //};
-  //}
 
   static fromJSON(json: any): Shop {
     return new Shop({

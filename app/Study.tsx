@@ -12,7 +12,7 @@ import { useVibration } from "../utility/customHooks";
 import SpellDetails from "../components/SpellDetails";
 import PlayerStatus from "../components/PlayerStatus";
 
-export default function LearningSpellsScreen() {
+export default function LearningKnowledgeScreen() {
   const playerCharacterData = useContext(PlayerCharacterContext);
   const gameData = useContext(GameContext);
   if (!playerCharacterData || !gameData) {

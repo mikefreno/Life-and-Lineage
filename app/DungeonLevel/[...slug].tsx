@@ -56,9 +56,9 @@ const DungeonLevelScreen = observer(() => {
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
   const [instanceName, setInstanceName] = useState<string>(slug[0]);
   const [level, setLevel] = useState<number>(Number(slug[1]));
-  const [battleTab, setBattleTab] = useState<
-    "attacks" | "spells" | "equipment" | "log"
-  >("log");
+  const [battleTab, setBattleTab] = useState<"attacks" | "equipment" | "log">(
+    "log",
+  );
   const [thisInstance, setThisInstance] = useState<DungeonInstance>();
   const [thisDungeon, setThisDungeon] = useState<DungeonLevel>();
   const [droppedItems, setDroppedItems] = useState<{
@@ -114,13 +114,8 @@ const DungeonLevelScreen = observer(() => {
   }, [slug]);
 
   useEffect(() => {
-    if (!fightingBoss) {
-      if (!monsterState) {
-        getEnemy();
-      } else if (firstLoad) {
-        appropriateEnemyCheck();
-        setFirstLoad(false);
-      }
+    if (!fightingBoss && !monsterState) {
+      getEnemy();
     }
   }, [monsterState]);
 
@@ -385,7 +380,7 @@ const DungeonLevelScreen = observer(() => {
         <NonThemedView className="flex h-8 flex-row">
           {simplifiedConditions.map((cond) => (
             <View key={cond.name} className="mx-2 flex align-middle">
-              <NonThemedView className="mx-auto rounded-md bg-[rgba(255,255,255,0.3)] dark:bg-[rgba(0,0,0,0.3)]">
+              <NonThemedView className="mx-auto rounded-md bg-[rgba(255,255,255,0.4)] p-0.5">
                 <Image source={cond.icon} style={{ width: 24, height: 24 }} />
               </NonThemedView>
               <Text className="text-sm">
@@ -398,22 +393,6 @@ const DungeonLevelScreen = observer(() => {
     }
   }
   //-----------minion loading-------//
-  function appropriateEnemyCheck() {
-    if (monsterState && !fightingBoss)
-      monsterObjects.forEach((monsterObject) => {
-        if (
-          monsterObject.name == monsterState.creatureSpecies &&
-          !(
-            monsterObject.appearsOn.includes(level) &&
-            monsterObject.appearsIn.includes(instanceName)
-          )
-        ) {
-          getEnemy();
-          return;
-        }
-      });
-  }
-
   function getEnemy() {
     const enemy = enemyGenerator(instanceName, level);
     setTimeout(
@@ -609,9 +588,11 @@ const DungeonLevelScreen = observer(() => {
             router.back();
           }
           router.replace("/dungeon");
-          setMonster(null);
           playerState.setInDungeon({ state: false });
         }, 200);
+        setTimeout(() => {
+          setMonster(null);
+        }, 500);
       } else {
         setFleeRollFailure(true);
         vibration({ style: "error" });
@@ -749,7 +730,7 @@ const DungeonLevelScreen = observer(() => {
   }
 
   function takeItemFromPouch(item: Item) {
-    if (playerState && droppedItems) {
+    if (playerState) {
       if (playerState.inventory.length < 24) {
         playerState.addToInventory(item);
         setLeftBehindDrops((prev) =>
@@ -786,13 +767,13 @@ const DungeonLevelScreen = observer(() => {
   }
 
   function takeAllItemsFromPouch() {
-    if (playerState && droppedItems) {
+    if (playerState) {
       const availableSpace = 24 - playerState.inventory.length;
       if (availableSpace === 0) {
         setInventoryFullNotifier(true);
         return;
       }
-      droppedItems.itemDrops
+      leftBehindDrops
         .slice(0, availableSpace)
         .forEach((item) => playerState.addToInventory(item));
       setLeftBehindDrops((prev) => {
@@ -825,8 +806,6 @@ const DungeonLevelScreen = observer(() => {
     useState<boolean>(
       (gameState && !gameState.getTutorialState("dungeonInterior")) ?? false,
     );
-
-  const [tutorialStep, setTutorialStep] = useState<number>(1);
 
   useEffect(() => {
     if (!showDungeonInteriorTutorial && gameState) {
@@ -951,16 +930,6 @@ const DungeonLevelScreen = observer(() => {
                   onPress={() => setBattleTab("attacks")}
                 >
                   <Text className="text-xl">Attacks</Text>
-                </Pressable>
-                <Pressable
-                  className={`px-6 py-4 rounded ${
-                    battleTab == "spells"
-                      ? "bg-zinc-100 dark:bg-zinc-800"
-                      : "active:bg-zinc-200 dark:active:bg-zinc-700"
-                  }`}
-                  onPress={() => setBattleTab("spells")}
-                >
-                  <Text className="text-xl">Spells</Text>
                 </Pressable>
                 <Pressable
                   className={`px-6 py-4 rounded ${
@@ -1290,8 +1259,8 @@ const DungeonLevelScreen = observer(() => {
                 className="flex flex-col items-center justify-center"
                 style={{ minWidth: "40%" }}
               >
-                <Text className="text-3xl">
-                  {toTitleCase(monsterState.creatureSpecies)}
+                <Text className="text-center text-3xl">
+                  {toTitleCase(monsterState.creatureSpecies).replace(" ", "\n")}
                 </Text>
                 <ProgressBar
                   value={monsterState.health >= 0 ? monsterState.health : 0}
@@ -1439,19 +1408,6 @@ const DungeonLevelScreen = observer(() => {
                     }}
                   >
                     <Text className="text-xl">Attacks</Text>
-                  </Pressable>
-                  <Pressable
-                    className={`px-6 py-4 rounded ${
-                      battleTab == "spells"
-                        ? "bg-zinc-100 dark:bg-zinc-800"
-                        : "active:bg-zinc-200 dark:active:bg-zinc-700"
-                    }`}
-                    onPress={() => {
-                      vibration({ style: "light" });
-                      setBattleTab("spells");
-                    }}
-                  >
-                    <Text className="text-xl">Spells</Text>
                   </Pressable>
                   <Pressable
                     className={`px-6 py-4 rounded ${

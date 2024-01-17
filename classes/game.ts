@@ -16,6 +16,12 @@ interface GameOptions {
   healthWarning?: number;
   tutorialsShown?: Record<string, boolean>;
   tutorialsEnabled?: boolean;
+  medicalOptions?: {
+    health: boolean;
+    mana: boolean;
+    sanity: boolean;
+    other: boolean;
+  };
 }
 
 export class Game {
@@ -29,6 +35,12 @@ export class Game {
   healthWarning: number;
   tutorialsShown: Record<string, boolean>;
   tutorialsEnabled: boolean;
+  medicalOptions: {
+    health: boolean;
+    mana: boolean;
+    sanity: boolean;
+    other: boolean;
+  };
 
   constructor({
     date,
@@ -41,6 +53,7 @@ export class Game {
     healthWarning,
     tutorialsShown,
     tutorialsEnabled,
+    medicalOptions,
   }: GameOptions) {
     this.date = date ?? new Date().toISOString();
     this.dungeonInstances = dungeonInstances ?? [
@@ -91,6 +104,12 @@ export class Game {
       training: false,
     };
     this.tutorialsEnabled = tutorialsEnabled ?? true;
+    this.medicalOptions = medicalOptions ?? {
+      health: true,
+      mana: true,
+      sanity: true,
+      other: true,
+    };
     makeObservable(this, {
       date: observable,
       dungeonInstances: observable,
@@ -102,6 +121,7 @@ export class Game {
       healthWarning: observable,
       tutorialsShown: observable,
       tutorialsEnabled: observable,
+      medicalOptions: observable,
       gameTick: action,
       getDungeon: action,
       getInstance: action,
@@ -115,6 +135,7 @@ export class Game {
       getTutorialState: action,
       disableTutorials: action,
       enableTutorials: action,
+      setMedicalOptionVisibility: action,
     });
   }
 
@@ -250,6 +271,13 @@ export class Game {
     return this.tutorialsShown[tutorial];
   }
 
+  public setMedicalOptionVisibility(
+    type: "health" | "mana" | "sanity" | "other",
+    state: boolean,
+  ) {
+    this.medicalOptions[type] = state;
+  }
+
   static fromJSON(json: any): Game {
     const game = new Game({
       date: json.date ? json.date : new Date().toISOString(),
@@ -268,6 +296,7 @@ export class Game {
       healthWarning: json.healthWarning,
       tutorialsShown: json.tutorialsShown,
       tutorialsEnabled: json.tutorialsEnabled,
+      medicalOptions: json.medicalOptions,
     });
 
     return game;

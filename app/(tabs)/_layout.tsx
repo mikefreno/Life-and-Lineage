@@ -137,9 +137,9 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="labor"
+          name="earn"
           options={{
-            title: "Labor",
+            title: "Earn",
             tabBarIcon: ({ color }) => (
               <Broom
                 width={30}
@@ -148,17 +148,35 @@ export default function TabLayout() {
                 style={{ marginBottom: -3 }}
               />
             ),
-            headerRight: () => (
+            headerLeft: () => (
               <Link href="/Training" asChild>
                 <Pressable onPress={() => vibration({ style: "light" })}>
                   {({ pressed }) => (
                     <GraduationCapIcon
                       width={28}
                       height={28}
-                      color={"#2563eb"}
+                      color={colorScheme == "light" ? "#3f3f46" : "#e4e4e7"}
                       style={{
-                        marginRight: 15,
+                        marginLeft: 15,
                         marginBottom: 3,
+                        opacity: pressed ? 0.5 : 1,
+                      }}
+                    />
+                  )}
+                </Pressable>
+              </Link>
+            ),
+            headerRight: () => (
+              <Link href="/Investing" asChild>
+                <Pressable onPress={() => vibration({ style: "light" })}>
+                  {({ pressed }) => (
+                    <Image
+                      source={require("../../assets/images/icons/investing.png")}
+                      style={{
+                        height: 28,
+                        width: 28,
+                        marginRight: 15,
+                        marginBottom: 6,
                         opacity: pressed ? 0.5 : 1,
                       }}
                     />
@@ -207,24 +225,6 @@ export default function TabLayout() {
                 color={color}
                 style={{ marginBottom: -3 }}
               />
-            ),
-            headerRight: () => (
-              <Link href="/Investing" asChild>
-                <Pressable onPress={() => vibration({ style: "light" })}>
-                  {({ pressed }) => (
-                    <Image
-                      source={require("../../assets/images/icons/investing.png")}
-                      style={{
-                        height: 26,
-                        width: 28,
-                        marginRight: 15,
-                        marginBottom: 6,
-                        opacity: pressed ? 0.5 : 1,
-                      }}
-                    />
-                  )}
-                </Pressable>
-              </Link>
             ),
           }}
         />
