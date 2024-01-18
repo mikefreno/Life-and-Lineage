@@ -58,7 +58,7 @@
       ],
       "goldDropRange": {"minimum": 10, "maximum":20},
       "appearsIn": ["nearby cave"],
-      "appearsOn": [2,3,4]
+      "appearsOn": [2,3]
    },
    {
       "name": "skeleton archer",
@@ -78,22 +78,36 @@
       ],
       "goldDropRange": {"minimum": 15, "maximum":25},
       "appearsIn": ["nearby cave"],
-      "appearsOn": [2,3,4]
+      "appearsOn": [2,3]
    },
    {
-      "name": "goblin",
+      "name": "zombie",
       "sanity": null,
       "healthRange": {"minimum": 40, "maximum": 60},
-      "attackPowerRange": {"minimum": 3, "maximum": 7},
+      "attackPowerRange": {"minimum": 5, "maximum": 10},
       "energy": {"maximum": 50, "regen": 5},
-      "attacks": ["stab", "pocket sand", "rock throw", "torch stab"],
+      "attacks": ["grab", "zombie bite"],
       "drops": [
-         {"item": "dagger", "itemType":"weapon","chance":0.10},
-         {"item": "torch", "itemType":"weapon", "chance": 0.10}
+         {"item": "chunk of flesh", "itemType":"junk","chance":0.75},
+         {"item": "chunk of flesh", "itemType":"junk","chance":0.75}
       ],
-      "goldDropRange": {"minimum": 35, "maximum":65},
+      "goldDropRange": {"minimum": 20, "maximum":25},
       "appearsIn": ["nearby cave"],
-      "appearsOn": [2,3,4]
+      "appearsOn": [3]
+   },
+   {
+      "name": "ghost",
+      "sanity": null,
+      "healthRange": {"minimum": 30, "maximum": 75},
+      "attackPowerRange": {"minimum": 0, "maximum": 0},
+      "energy": {"maximum": 50, "regen": 5},
+      "attacks": ["wail"],
+      "drops": [
+         {"item": "ghostly residue", "itemType":"ingredient","chance":0.5}
+      ],
+      "goldDropRange": {"minimum": 0, "maximum":0},
+      "appearsIn": ["nearby cave"],
+      "appearsOn": [2,3]
    },
    {
       "name": "goblin",
@@ -107,6 +121,22 @@
          {"item": "torch", "itemType":"weapon", "chance": 0.10}
       ],
       "goldDropRange": {"minimum": 35, "maximum":65},
+      "appearsIn": ["goblin cave"],
+      "appearsOn": [1,2]
+   },
+   {
+      "name": "worg",
+      "sanity": null,
+      "healthRange": {"minimum": 40, "maximum": 70},
+      "attackPowerRange": {"minimum": 10, "maximum": 15},
+      "energy": {"maximum": 50, "regen": 5},
+      "attacks": ["bite", "tackle"],
+      "drops": [
+         {"item": "patch of hair", "itemType":"junk", "chance": 0.85},
+         {"item": "bone", "itemType":"ingredient","chance":0.75},
+         {"item": "bone", "itemType":"ingredient","chance":0.75}
+      ],
+      "goldDropRange": {"minimum": 40, "maximum":55},
       "appearsIn": ["goblin cave"],
       "appearsOn": [1,2]
    },
@@ -137,36 +167,7 @@
       ],
       "goldDropRange": {"minimum": 185, "maximum":250},
       "appearsIn": [""],
-      "appearsOn": [1,2]
-   },
-   {
-      "name": "zombie",
-      "sanity": null,
-      "healthRange": {"minimum": 40, "maximum": 60},
-      "attackPowerRange": {"minimum": 5, "maximum": 10},
-      "energy": {"maximum": 50, "regen": 5},
-      "attacks": ["grab", "zombie bite"],
-      "drops": [
-         {"item": "chunk of flesh", "itemType":"junk","chance":0.75},
-         {"item": "chunk of flesh", "itemType":"junk","chance":0.75}
-      ],
-      "goldDropRange": {"minimum": 20, "maximum":25},
-      "appearsIn": ["nearby cave"],
-      "appearsOn": [3,4,5]
-   },
-   {
-      "name": "ghost",
-      "sanity": null,
-      "healthRange": {"minimum": 30, "maximum": 75},
-      "attackPowerRange": {"minimum": 0, "maximum": 0},
-      "energy": {"maximum": 50, "regen": 5},
-      "attacks": ["wail"],
-      "drops": [
-         {"item": "ghostly residue", "itemType":"ingredient","chance":0.5}
-      ],
-      "goldDropRange": {"minimum": 0, "maximum":0},
-      "appearsIn": ["nearby cave"],
-      "appearsOn": [3,4,5]
+      "appearsOn": []
    },
    {
       "name": "bandit",
@@ -183,23 +184,6 @@
       ],
       "goldDropRange": {"minimum": 30, "maximum":50},
       "appearsIn": ["bandit hideout"],
-      "appearsOn": [1,2,3]
-   },
-   {
-      "name": "necromancer",
-      "sanity": 50,
-      "healthRange": {"minimum": 50, "maximum": 75},
-      "attackPowerRange": {"minimum": 10, "maximum": 12},
-      "energy": {"maximum": 50, "regen": 10},
-      "attacks": ["raise skeleton", "teeth"],
-      "drops": [
-         {"item": "dagger", "itemType":"weapon","chance":0.15},
-         {"item": "dagger", "itemType":"weapon","chance":0.15},
-         {"item": "adept robes", "itemType":"bodyArmor","chance":1.0},
-         {"item": "apprentice hood", "itemType":"helmet","chance":0.45}
-      ],
-      "goldDropRange": {"minimum": 100, "maximum":150},
-      "appearsIn": [""],
-      "appearsOn": [1,2,3]
+      "appearsOn": [1,2]
    }
 ]

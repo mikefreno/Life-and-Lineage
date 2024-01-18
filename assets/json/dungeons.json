@@ -17,7 +17,8 @@
          "stepsBeforeBoss": 15,
          "boss": ["necromancer"]
        }
-     ]
+     ],
+     "unlocks": ["goblin cave", "bandit hideout"]
    },
    { 
      "instance": "goblin cave",
@@ -30,9 +31,10 @@
        {
          "level": 2,
          "stepsBeforeBoss": 15,
-         "boss": ["goblin shaman"]
+         "boss": ["goblin shaman", "hobgoblin"]
        }
-     ]
+     ],
+     "unlocks":["rogue magi fortress"]
    },
    { 
      "instance": "bandit hideout",
@@ -44,9 +46,100 @@
        },
        {
          "level": 2,
-         "stepsBeforeBoss": 10,
+         "stepsBeforeBoss": 20,
          "boss": ["bandit boss", "bandit"]
        }
-     ]
+     ],
+     "unlocks":["infested mine"]
+   },
+   { 
+     "instance": "rogue magi fortress",
+     "levels": [
+       {
+         "level": 1,
+         "stepsBeforeBoss": 5,
+         "boss": ["adept water mage"]
+       },
+       {
+         "level": 2,
+         "stepsBeforeBoss": 5,
+         "boss": ["adept air mage"]
+       },
+       {
+         "level": 3,
+         "stepsBeforeBoss": 10,
+         "boss": ["expert fire mage"]
+       },
+       {
+         "level": 4,
+         "stepsBeforeBoss": 15,
+         "boss": ["master earth mage"]
+       }
+     ],
+     "unlocks":["dark forest"]
+   }, 
+   { 
+     "instance": "infested mine",
+     "levels": [
+       {
+         "level": 1,
+         "stepsBeforeBoss": 20,
+         "boss": ["venomous spider"]
+       },
+       {
+         "level": 2,
+         "stepsBeforeBoss": 20,
+         "boss": ["brood mother"]
+       }
+     ],
+     "unlocks":["crystal mine"]
+   },
+   {
+     "instance": "dark forest",
+     "levels": [
+       {
+         "level": 1,
+         "stepsBeforeBoss": 15,
+         "boss": ["griffon"]
+       },
+       {
+         "level": 2,
+         "stepsBeforeBoss": 30,
+         "boss": ["chimera"]
+       }
+     ],
+     "unlocks":["corrupted temple"]
+   },
+   {
+     "instance": "crystal mine",
+     "levels": [
+       {
+         "level": 1,
+         "stepsBeforeBoss": 20,
+         "boss": ["cave troll"]
+       },
+       {
+         "level": 2,
+         "stepsBeforeBoss": 25,
+         "boss": ["moon bull"]
+       }
+     ],
+     "unlocks":["corrupted temple"]
+   },
+   {
+     "instance": "corrupted temple",
+     "levels": [
+       {
+         "level": 1,
+         "stepsBeforeBoss": 20,
+         "boss": ["blood paladin"]
+       },
+       {
+         "level": 2,
+         "stepsBeforeBoss": 25,
+         "boss": ["blood priest", "blood paladin"]
+       }
+     ],
+     "unlocks":[]
    }
 ]

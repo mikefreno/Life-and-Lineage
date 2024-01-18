@@ -135,7 +135,7 @@
       "name": "wail",
       "energyCost": 20,
       "targets": "aoe",
-      "hitChance": 0.5,
+      "hitChance": 0.85,
       "damageMult": 0.0,
       "sanityDamage": 5,
       "buffs": null,
@@ -184,6 +184,18 @@
       "flatDamage": 10,
       "sanityDamage": 0,
       "buffs": null,
+      "debuffs": null,
+      "summons": null
+   },
+   {
+      "name": "frenzy",
+      "energyCost": 10,
+      "targets": null,
+      "hitChance": null,
+      "damageMult": null,
+      "flatDamage": null,
+      "sanityDamage": 0,
+      "buffs": ["frenzy"],
       "debuffs": null,
       "summons": null
    }

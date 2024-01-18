@@ -2,6 +2,7 @@ export type InvestmentType = {
   name: string;
   description: string;
   cost: number;
+  requires: { requirement: string; message: string } | null;
   turnsPerReturn: number;
   goldReturnRange: {
     min: number;

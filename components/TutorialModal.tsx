@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { View, Text } from "./Themed";
 import { Entypo } from "@expo/vector-icons";
 import Modal from "react-native-modal";
@@ -30,6 +30,7 @@ export default function TutorialModal({
   }
   const { gameState } = gameContext;
   const [tutorialStep, setTutorialStep] = useState<number>(1);
+  const tutorialStepRef = useRef<number>(1);
   const { colorScheme } = useColorScheme();
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,
@@ -51,10 +52,12 @@ export default function TutorialModal({
   }, [tutorialState]);
 
   const press = () => {
-    if (tutorialStep == 1 && pageTwo) {
+    if (tutorialStepRef.current == 1 && pageTwo) {
       setTutorialStep(2);
-    } else if (tutorialStep == 2 && pageThree) {
+      tutorialStepRef.current = 2;
+    } else if (tutorialStepRef.current == 2 && pageThree) {
       setTutorialStep(3);
+      tutorialStepRef.current = 3;
     } else {
       vibration({ style: "light" });
       onCloseFunction();
@@ -88,11 +91,16 @@ export default function TutorialModal({
         {pageTwo && (
           <View
             className={`flex flex-row ${
-              tutorialStep == 2 ? "justify-between" : "justify-end"
+              tutorialStep != 1 ? "justify-between" : "justify-end"
             }`}
           >
-            {tutorialStep == 2 ? (
-              <Pressable onPress={() => setTutorialStep((prev) => prev - 1)}>
+            {tutorialStep != 1 ? (
+              <Pressable
+                onPress={() => {
+                  setTutorialStep((prev) => prev - 1);
+                  tutorialStepRef.current--;
+                }}
+              >
                 <Entypo
                   name="chevron-left"
                   size={24}

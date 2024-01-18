@@ -78,6 +78,7 @@ export default function AppSettings() {
             <View className="flex flex-row">
               <Pressable
                 onPress={() => {
+                  vibration({ style: "warning" });
                   gameState.resetTutorialState();
                   gameState.enableTutorials();
                   setShowTutorialResetConfirm(false);
@@ -180,7 +181,10 @@ export default function AppSettings() {
               />
             </View>
             <Pressable
-              onPress={() => setShowTutorialResetConfirm(true)}
+              onPress={() => {
+                vibration({ style: "light" });
+                setShowTutorialResetConfirm(true);
+              }}
               className="mx-auto mt-4 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
             >
               <Text>Reset Tutorials</Text>

@@ -50,16 +50,41 @@ type ImageInfo = {
 };
 
 export const MonsterImageMap: Record<string, ImageInfo> = {
+  "air mage": {
+    source: require("../assets/images/monsters/air_mage.png"),
+    width: 160,
+    height: 160,
+  },
   bandit: {
     source: require("../assets/images/monsters/bandit.png"),
     width: 160,
     height: 160,
+  },
+  "bandit boss": {
+    source: require("../assets/images/monsters/bandit_boss.png"),
+    width: 180,
+    height: 180,
   },
   bat: {
     source: require("../assets/images/monsters/bat.png"),
     width: 120,
     height: 120,
     heightOffset: -60,
+  },
+  "brood mother": {
+    source: require("../assets/images/monsters/brood_mother.png"),
+    width: 180,
+    height: 180,
+  },
+  "earth mage": {
+    source: require("../assets/images/monsters/earth_mage.png"),
+    width: 160,
+    height: 160,
+  },
+  "fire mage": {
+    source: require("../assets/images/monsters/fire_mage.png"),
+    width: 160,
+    height: 160,
   },
   "giant rat": {
     source: require("../assets/images/monsters/giant_rat.png"),
@@ -80,6 +105,11 @@ export const MonsterImageMap: Record<string, ImageInfo> = {
     source: require("../assets/images/monsters/ghost.png"),
     width: 140,
     height: 140,
+  },
+  griffon: {
+    source: require("../assets/images/monsters/griffon.png"),
+    width: 180,
+    height: 180,
   },
   hobgoblin: {
     source: require("../assets/images/monsters/hobgoblin.png"),
@@ -110,6 +140,21 @@ export const MonsterImageMap: Record<string, ImageInfo> = {
     source: require("../assets/images/monsters/training_dummy.png"),
     width: 150,
     height: 150,
+  },
+  "venomous spider": {
+    source: require("../assets/images/monsters/venomous_spider.png"),
+    width: 140,
+    height: 140,
+  },
+  "water mage": {
+    source: require("../assets/images/monsters/water_mage.png"),
+    width: 160,
+    height: 160,
+  },
+  worg: {
+    source: require("../assets/images/monsters/worg.png"),
+    width: 160,
+    height: 160,
   },
   witch: {
     source: require("../assets/images/monsters/witch.png"),

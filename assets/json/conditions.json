@@ -21,9 +21,9 @@
       "name": "blind",
       "style": "debuff",
       "turns": 2,
-      "effect": ["accuracy halved"],
-      "effectStyle": null,
-      "effectAmount": null,
+      "effect": ["accuracy reduction"],
+      "effectStyle": "multiplier",
+      "effectAmount": 0.25,
       "icon": "blind"
    },
    {
@@ -57,9 +57,9 @@
       "name": "diseased",
       "style": "debuff",
       "turns": 10,
-      "effect": ["damage", "accuracy halved"],
+      "effect": ["damage", "accuracy reduction"],
       "effectStyle": "multiplier",
-      "effectAmount": 0.10,
+      "effectAmount": 0.15,
       "icon": "viruses"
    },
    {
@@ -106,5 +106,14 @@
       "effectStyle": "flat",
       "effectAmount": 25,
       "icon": "shield"
+   },
+   {
+      "name": "frenzy",
+      "style": "buff",
+      "turns": 3,
+      "effect": ["strengthen"],
+      "effectStyle": "multiplier",
+      "effectAmount": 0.25,
+      "icon": "anger"
    }
 ]

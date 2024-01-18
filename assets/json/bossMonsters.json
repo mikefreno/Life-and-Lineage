@@ -2,17 +2,52 @@
    {
       "name": "zombie",
       "sanity": null,
-      "health": 85,
-      "attackPower": 12,
-      "energy": {"maximum": 50, "regen": 10},
-      "attacks": ["grab", "zombie bite"]
+      "health": 80,
+      "attackPower": 10,
+      "energy": {"maximum": 50, "regen": 5},
+      "attacks": ["grab", "zombie bite"],
+      "drops": [
+         {"item": "chunk of flesh", "itemType":"junk","chance":0.75},
+         {"item": "chunk of flesh", "itemType":"junk","chance":0.75}
+      ],
+      "goldDropRange": {"minimum": 100, "maximum":150}
    },
    {
       "name": "necromancer",
       "sanity": 50,
-      "health": 100,
+      "health": 140,
       "attackPower": 15,
       "energy": {"maximum": 50, "regen": 10},
-      "attacks": ["raise skeleton", "teeth"]
+      "attacks": ["raise skeleton", "teeth"],
+      "drops": [
+         {"item": "dagger", "itemType":"weapon","chance":0.15},
+         {"item": "dagger", "itemType":"weapon","chance":0.15},
+         {"item": "adept robes", "itemType":"bodyArmor","chance":1.0},
+         {"item": "apprentice hood", "itemType":"helmet","chance":0.45}
+      ],
+      "goldDropRange": {"minimum": 100, "maximum":150}
+   },
+   {
+      "name": "hobgoblin",
+      "sanity": null,
+      "health": 160,
+      "attackPower": 15,
+      "energy": {"maximum": 50, "regen": 10},
+      "attacks": ["stab", "frenzy"],
+      "drops": [
+         {"item": "longsword", "itemType":"weapon","chance":0.65}
+      ],
+      "goldDropRange": {"minimum": 100, "maximum":150}
+   },
+   {
+      "name": "goblin shaman",
+      "sanity": 50,
+      "health": 160,
+      "attackPower": 20,
+      "energy": {"maximum": 50, "regen": 10},
+      "attacks": [],
+      "drops": [
+      ],
+      "goldDropRange": {"minimum": 100, "maximum":150}
    }
 ]

@@ -66,6 +66,10 @@ export default function InvestingScreen() {
           body: "Put your gold to work and make time work for you.",
         }}
         pageTwo={{
+          title: "Note:",
+          body: "You will need to clear out dungeons to unlock the purchasing of these investments.",
+        }}
+        pageThree={{
           body: "Each investment base has a number of upgrades, some with significant consequences on your character.",
         }}
       />

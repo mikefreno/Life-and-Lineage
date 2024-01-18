@@ -134,7 +134,7 @@ export default function ShopsScreen() {
           }}
           pageTwo={{
             title: "Stock Refresh Schedule",
-            body: "Each shop refreshes its stock and gold supply every real hour.",
+            body: "Each shop refreshes its stock and gold supply every real world hour.",
           }}
           onCloseFunction={() => setShowShopTutorial(false)}
         />

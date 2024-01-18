@@ -3,6 +3,7 @@ import monsters from "../assets/json/monsters.json";
 import {
   createDebuff,
   flipCoin,
+  getConditionEffectsOnAttacks,
   getRandomInt,
   rollD20,
 } from "../utility/functions";
@@ -224,8 +225,11 @@ export class Monster {
         });
       }
       let rollToHit: number;
+      const { hitChanceMultiplier, damageMult, damageFlat } =
+        getConditionEffectsOnAttacks(this.conditions);
       if (chosenAttack.hitChance) {
-        rollToHit = 20 - (chosenAttack.hitChance * 100) / 5;
+        rollToHit =
+          20 - (chosenAttack.hitChance * 100 * hitChanceMultiplier) / 5;
       } else {
         rollToHit = 0;
       }
@@ -236,12 +240,9 @@ export class Monster {
       } else if (chosenAttack.flatDamage) {
         damage = chosenAttack.flatDamage;
       }
-      const weakens = this.conditions.filter((condition) =>
-        condition.effect.find((effect) => effect == "weaken"),
-      );
-      if (weakens) {
-        damage *= Math.pow(0.75, weakens.length);
-      }
+
+      damage *= damageMult;
+      damage += damageFlat;
       damage = Math.round(damage * 4) / 4;
       const sanityDamage = chosenAttack.sanityDamage;
       if (roll >= rollToHit) {
@@ -272,9 +273,9 @@ export class Monster {
             }
           });
         }
-        //let buffs: Condition[] = [];
-        //if (chosenAttack.buffs) {
-        //}
+        let buffs: Condition[] = [];
+        if (chosenAttack.buffs) {
+        }
         return {
           name: chosenAttack.name,
           damage: damage,

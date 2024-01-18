@@ -5,7 +5,7 @@ import Coins from "../assets/icons/CoinsIcon";
 import { Pressable, View, StyleSheet, Animated } from "react-native";
 import Modal from "react-native-modal";
 import { useContext, useEffect, useRef, useState } from "react";
-import { asReadableGold } from "../utility/functions";
+import { asReadableGold, toTitleCase } from "../utility/functions";
 import ClockIcon from "../assets/icons/ClockIcon";
 import Vault from "../assets/icons/VaultIcon";
 import { Entypo } from "@expo/vector-icons";
@@ -14,6 +14,7 @@ import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { Investment } from "../classes/investment";
 import GenericModal from "./GenericModal";
 import { observer } from "mobx-react-lite";
+import { useVibration } from "../utility/customHooks";
 
 interface InvestmentCardProps {
   investment: InvestmentType;
@@ -22,6 +23,7 @@ interface InvestmentCardProps {
 const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
   const { colorScheme } = useColorScheme();
   const [showUpgrades, setShowUpgrades] = useState<boolean>(false);
+  const [showRequirements, setShowRequirements] = useState<boolean>(false);
   const playerCharacterContext = useContext(PlayerCharacterContext);
   const gameContext = useContext(GameContext);
   if (!playerCharacterContext || !gameContext) {
@@ -31,18 +33,24 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
     useState<boolean>(false);
   const { playerState } = playerCharacterContext;
   const { gameState } = gameContext;
+  const vibration = useVibration();
 
   const [madeInvestment, setMadeInvestment] = useState<Investment | undefined>(
     playerState?.getInvestment(investment.name),
   );
 
   function purchaseInvestmentCheck() {
-    if (playerState && playerState.gold >= investment.cost) {
-      if (investment.cost / playerState.gold >= 0.2) {
-        setShowInvestmentConfirmation(true);
-      } else {
-        playerState.purchaseInvestmentBase(investment);
+    const requirement = investment.requires?.requirement;
+    if (requirement && gameState?.completedInstances.includes(requirement)) {
+      if (playerState && playerState.gold >= investment.cost) {
+        if (investment.cost / playerState.gold >= 0.2) {
+          setShowInvestmentConfirmation(true);
+        } else {
+          playerState.purchaseInvestmentBase(investment);
+        }
       }
+    } else {
+      setShowRequirements(true);
     }
   }
 
@@ -69,6 +77,31 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
 
   return (
     <>
+      {investment.requires && (
+        <GenericModal
+          isVisibleCondition={showRequirements}
+          backFunction={() => setShowRequirements(false)}
+        >
+          <View style={styles.container}>
+            <View style={styles.line} />
+            <View style={styles.content}>
+              <Text className="text-center text-xl">Alert!</Text>
+            </View>
+            <View style={styles.line} />
+          </View>
+          <Text className="mx-4 text-lg">{investment.requires.message}</Text>
+          <Text className="mx-8 py-4 text-center italic">
+            Complete the {toTitleCase(investment.requires.requirement)} dungeon
+            to unlock this investment!
+          </Text>
+          <Pressable
+            onPress={() => setShowRequirements(false)}
+            className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+          >
+            <Text>Cancel</Text>
+          </Pressable>
+        </GenericModal>
+      )}
       <GenericModal
         isVisibleCondition={showInvestmentConfirmation}
         backFunction={() => setShowInvestmentConfirmation(false)}
@@ -85,6 +118,7 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
         <View className="flex flex-row">
           <Pressable
             onPress={() => {
+              vibration({ style: "medium", essential: true });
               playerState?.purchaseInvestmentBase(investment);
               setShowInvestmentConfirmation(false);
             }}
@@ -93,7 +127,10 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
             <Text>Purchase</Text>
           </Pressable>
           <Pressable
-            onPress={() => setShowInvestmentConfirmation(false)}
+            onPress={() => {
+              vibration({ style: "light" });
+              setShowInvestmentConfirmation(false);
+            }}
             className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
           >
             <Text>Cancel</Text>
@@ -126,7 +163,9 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
           <View style={styles.container}>
             <View style={styles.line} />
             <View style={styles.content}>
-              <Text className="text-xl">{investment.name} Upgrades</Text>
+              <Text className="text-center text-xl">
+                {investment.name} Upgrades
+              </Text>
             </View>
             <View style={styles.line} />
           </View>
@@ -151,10 +190,13 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
               return (
                 <Pressable
                   className="w-full"
-                  onPress={() => setShowingBody(!showingBody)}
+                  onPress={() => {
+                    vibration({ style: "light" });
+                    setShowingBody(!showingBody);
+                  }}
                   key={upgrade.name}
                 >
-                  <ThemedView
+                  <View
                     className="m-2 rounded-xl"
                     style={{
                       shadowColor: "#000",
@@ -165,6 +207,16 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
                       elevation: 3,
                       shadowOpacity: 0.2,
                       shadowRadius: 3,
+                      backgroundColor:
+                        "style" in upgrade
+                          ? upgrade.style == "evil"
+                            ? "#ef4444"
+                            : upgrade.style == "neutral"
+                            ? "#f59e0b"
+                            : "#10b981"
+                          : colorScheme == "light"
+                          ? "#fafafa"
+                          : "#27272a",
                     }}
                   >
                     <View className="flex justify-between rounded-xl px-4 py-2 text-zinc-950 dark:border dark:border-zinc-500">
@@ -309,13 +361,16 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
                         </View>
                       )}
                     </View>
-                  </ThemedView>
+                  </View>
                 </Pressable>
               );
             })}
           </ScrollView>
           <Pressable
-            onPress={() => setShowUpgrades(false)}
+            onPress={() => {
+              vibration({ style: "light" });
+              setShowUpgrades(false);
+            }}
             className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
           >
             <Text>Close</Text>
@@ -393,7 +448,10 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
               </View>
             </View>
             <Pressable
-              onPress={() => setShowUpgrades(true)}
+              onPress={() => {
+                vibration({ style: "light" });
+                setShowUpgrades(true);
+              }}
               className="mx-12 rounded-xl border border-zinc-900 px-4 py-1 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
             >
               <Text className="text-center">

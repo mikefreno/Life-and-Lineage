@@ -9,6 +9,7 @@ interface GameOptions {
   date?: string;
   shops: Shop[];
   dungeonInstances?: DungeonInstance[];
+  completedInstances?: string[];
   furthestDepth?: { instance: string; level: number }[];
   atDeathScreen?: boolean;
   colorScheme?: "system" | "dark" | "light";
@@ -28,6 +29,7 @@ export class Game {
   date: string;
   dungeonInstances: DungeonInstance[];
   furthestDepth: { instance: string; level: number }[];
+  completedInstances: string[];
   atDeathScreen: boolean;
   shops: Shop[];
   colorScheme: "system" | "dark" | "light";
@@ -46,6 +48,7 @@ export class Game {
     date,
     dungeonInstances,
     furthestDepth,
+    completedInstances,
     atDeathScreen,
     shops,
     colorScheme,
@@ -83,6 +86,7 @@ export class Game {
     this.furthestDepth = furthestDepth ?? [
       { instance: "nearby cave", level: 1 },
     ];
+    this.completedInstances = completedInstances ?? [];
     this.atDeathScreen = atDeathScreen ?? false;
     this.shops = shops;
     this.colorScheme = colorScheme ?? "system";
@@ -115,6 +119,7 @@ export class Game {
       dungeonInstances: observable,
       furthestDepth: observable,
       atDeathScreen: observable,
+      completedInstances: observable,
       shops: observable,
       colorScheme: observable,
       vibrationEnabled: observable,
@@ -169,53 +174,52 @@ export class Game {
     );
   }
 
-  public openNextDungeonLevel(currentInstance: string) {
-    const goodRes = this.dungeonInstances
-      .find((instance) => instance.name == currentInstance)
-      ?.addLevel();
-    if (!goodRes) {
-      const nextInstance =
-        dungeons[
-          dungeons.findIndex((dungeon) => dungeon.instance == currentInstance) +
-            1
-        ];
-      const matchingInstance = this.dungeonInstances.find(
-        (dungeon) => dungeon.name == nextInstance.instance,
-      );
-      if (matchingInstance) {
-        throw new Error("Next instance already exists!");
-      } else {
-        this.dungeonInstances.push(
-          new DungeonInstance({
-            name: nextInstance.instance,
-            levels: [
-              new DungeonLevel({
-                level: nextInstance.levels[0].level,
-                bosses: nextInstance.levels[0].boss,
-                stepsBeforeBoss: nextInstance.levels[0].stepsBeforeBoss,
-              }),
-            ],
-          }),
-        );
-        this.furthestDepth.push({ instance: nextInstance.instance, level: 1 });
-      }
+  public openNextDungeonLevel(currentInstanceName: string) {
+    const foundInstanceObj = dungeons.find(
+      (dungeon) => dungeon.instance == currentInstanceName,
+    );
+    if (!foundInstanceObj) {
+      throw new Error("Missing instance object!");
     } else {
-      let depth = this.furthestDepth.find(
-        (depth) => depth.instance == currentInstance,
-      );
-      //console.log(depth);
-      //console.log(Object.isFrozen(this.furthestDepth));
-      if (depth) {
-        depth = { instance: depth?.instance, level: depth!.level + 1 };
+      const ownedInstance = this.dungeonInstances.find((instance) => {
+        instance.name == currentInstanceName;
+      });
+      if (!ownedInstance) {
+        throw new Error("Missing owned instance");
       }
-      this.furthestDepth = this.furthestDepth.map((depth) =>
-        depth.instance === currentInstance
-          ? { ...depth, level: depth.level + 1 }
-          : depth,
-      );
-
-      //console.log(depth);
-      //console.log(this.furthestDepth);
+      if (ownedInstance.levels.length < foundInstanceObj.levels.length) {
+        ownedInstance.addLevel();
+      } else {
+        const unlockStrings = foundInstanceObj.unlocks;
+        unlockStrings.forEach((unlock) => {
+          const found = dungeons.find((dungeon) => dungeon.instance == unlock);
+          if (!found) {
+            throw new Error("Missing instance object in unlock loop!");
+          } else {
+            let alreadyExists = false;
+            this.dungeonInstances.forEach((instance) => {
+              if (instance.name == found.instance) {
+                alreadyExists = true;
+              }
+            });
+            if (!alreadyExists) {
+              const instance = new DungeonInstance({
+                name: found.instance,
+                levels: [
+                  new DungeonLevel({
+                    level: 1,
+                    step: 0,
+                    stepsBeforeBoss: found.levels[0].stepsBeforeBoss,
+                    bosses: found.levels[0].boss,
+                    bossDefeated: false,
+                  }),
+                ],
+              });
+              this.dungeonInstances.push(instance);
+            }
+          }
+        });
+      }
     }
   }
 
@@ -282,6 +286,7 @@ export class Game {
     const game = new Game({
       date: json.date ? json.date : new Date().toISOString(),
       furthestDepth: json.furthestDepth,
+      completedInstances: json.completedInstances,
       atDeathScreen: json.atDeathScreen,
       dungeonInstances: json.dungeonInstances
         ? json.dungeonInstances.map((instance: any) =>

@@ -279,6 +279,12 @@ export function createDebuff(
           | "weaken"
         )[],
         damage: damage ?? 0,
+        effectStyle: debuffObj.effectStyle as
+          | "flat"
+          | "multiplier"
+          | "percentage"
+          | null,
+        effectMagnitude: debuffObj.effectAmount,
         icon: debuffObj.icon,
       });
       return debuff;
@@ -339,4 +345,41 @@ export function asReadableGold(gold: number) {
     const cleanedUp = (gold / 1000).toFixed(2);
     return `${parseFloat(cleanedUp).toLocaleString()}K`;
   } else return gold.toLocaleString();
+}
+export function getConditionEffectsOnAttacks(suppliedConditions: Condition[]) {
+  let hitChanceMultiplier = 1;
+  let damageMult = 1;
+  let damageFlat = 0;
+  suppliedConditions.forEach((condition) => {
+    if (
+      condition.effect.includes("accuracy reduction") &&
+      condition.effectMagnitude
+    ) {
+      hitChanceMultiplier *= 1 - condition.effectMagnitude;
+    }
+    if (condition.effect.includes("strengthen") && condition.effectMagnitude) {
+      if (condition.effectStyle == "flat") {
+        damageFlat -= condition.effectMagnitude;
+      } else if (
+        condition.effectStyle == "multiplier" ||
+        condition.effectStyle == "percentage"
+      ) {
+        damageMult *= 1 + condition.effectMagnitude;
+      }
+    } else if (
+      condition.effect.includes("weaken") &&
+      condition.effectMagnitude
+    ) {
+      if (condition.effectStyle == "flat") {
+        damageFlat += condition.effectMagnitude;
+      } else if (condition.effectStyle == "multiplier") {
+        damageMult *= 1 - condition.effectMagnitude;
+      }
+    }
+  });
+  return {
+    hitChanceMultiplier: hitChanceMultiplier,
+    damageMult: damageMult,
+    damageFlat: damageFlat,
+  };
 }

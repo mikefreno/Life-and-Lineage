@@ -1,11 +1,46 @@
 [
     {
+        "name": "Remote Rest Stop",
+        "description": "It's cheap and in the middle of no-where. Don't expect much foot traffic. But those rare few tired souls will be grateful for a quiet refuge from the beasts of the night.",
+        "requires": {"requirement": "nearby cave", "message": "A dangerous flood of monsters is spilling out from a nearby cave, preventing anyone from getting close to this rest stop, put an end to the source before further considering purchase." },
+        "cost": 5000,
+        "turnsPerReturn": 1,
+        "goldReturnRange": {"min": 0, "max": 50},
+        "maxGoldStockPile": 3500,
+        "upgrades": [
+            {
+                "name": "Install Signage",
+                "cost": 1500,
+                "description":"Install signage along nearby roads. Increases gold returns.",
+                "effect": {"goldMinimumIncrease": 10, "goldMaximumIncrease": 5} 
+            },
+            {
+                "name": "Alcohol License",
+                "cost": 10000,
+                "description":"Alcohol often leads to heavy spenders. Increases maximum gold return.",
+                "effect": {"goldMaximumIncrease": 25}
+            },
+            {
+                "name": "Luxury Rooms",
+                "cost": 17500,
+                "description":"Nicer rooms means you can charge more. Increases minimum gold return.",
+                "effect": {"goldMinimumIncrease":  60}
+            },
+            {
+                "name": "New Wing",
+                "cost": 22500,
+                "description":"More rooms means more bodies at peak. Increases maximum gold return.",
+                "effect": {"goldMaximumIncrease": 135, "maxGoldStockPileIncrease": 1500}
+            }
+        ]
+    },
+    {
         "name": "Trading Route",
         "description": "Control the arteries of commerce, provide a trader with startup costs.",
-        "requires": null,
-        "cost": 5000,
+        "requires": {"requirement": "goblin cave", "message": "Goblins have been attacking the roads, clear out the goblin cave to ensure that they won't pose a danger."},
+        "cost": 10000,
         "turnsPerReturn": 10,
-        "goldReturnRange": {"min": 0, "max": 400},
+        "goldReturnRange": {"min": 0, "max": 750},
         "maxGoldStockPile": 2500,
         "upgrades": [
             {
@@ -49,41 +84,6 @@
                 "cost": 30000,
                 "description":"Bribe a judge to enact regulations few will be able to comply with. Increases gold returns.",
                 "effect": {"goldMinimumIncrease": 550, "goldMaximumIncrease": 800}
-            }
-        ]
-    },
-    {
-        "name": "Remote Rest Stop",
-        "description": "It's cheap and in the middle of no-where. Don't expect much foot traffic. But those rare few tired souls will be grateful for a quiet refuge from the beasts of the night.",
-        "requires": {"requirement": "nearby cave", "message": "A dangerous flood of monsters is spilling out from a nearby cave, preventing anyone from getting close to this rest stop, put an end to it before further considering purchase." },
-        "cost": 10000,
-        "turnsPerReturn": 1,
-        "goldReturnRange": {"min": 0, "max": 75},
-        "maxGoldStockPile": 3500,
-        "upgrades": [
-            {
-                "name": "Install Signage",
-                "cost": 1500,
-                "description":"Install signage along nearby roads. Increases gold returns.",
-                "effect": {"goldMinimumIncrease": 10, "goldMaximumIncrease": 5} 
-            },
-            {
-                "name": "Alcohol License",
-                "cost": 10000,
-                "description":"Alcohol often leads to heavy spenders. Increases maximum gold return.",
-                "effect": {"goldMaximumIncrease": 25}
-            },
-            {
-                "name": "Luxury Rooms",
-                "cost": 17500,
-                "description":"Nicer rooms means you can charge more. Increases minimum gold return.",
-                "effect": {"goldMinimumIncrease":  60}
-            },
-            {
-                "name": "New Wing",
-                "cost": 22500,
-                "description":"More rooms means more bodies at peak. Increases maximum gold return.",
-                "effect": {"goldMaximumIncrease": 135, "maxGoldStockPileIncrease": 1500}
             }
         ]
     },
@@ -223,7 +223,7 @@
     {
         "name": "Monster Breeding Ranch",
         "description": "Here, creatures of nightmare and wonder are reared. Some are bred for their power in battle, others for exotic pets. All fetch a fair price on the market.",
-        "requires": null,
+        "requires": {"requirement":"dark forest", "message": "This project will require an immense amount of land. Clear out the Dark Forest and you will have all the land you need."},
         "cost": 220000,
         "turnsPerReturn": 15,
         "goldReturnRange": {"min": 2000, "max": 6000},

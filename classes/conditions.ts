@@ -8,13 +8,16 @@ interface ConditionOptions {
   turns: number;
   effect: (
     | "skip"
-    | "accuracy halved"
+    | "accuracy reduction"
     | "damage"
     | "sanity"
     | "armor"
     | "health"
     | "weaken"
+    | "strengthen"
   )[];
+  effectStyle: "flat" | "multiplier" | "percentage" | null;
+  effectMagnitude: number | null;
   damage: number;
   icon?: string;
 }
@@ -26,14 +29,17 @@ export class Condition {
   turns: number;
   readonly effect: (
     | "skip"
-    | "accuracy halved"
+    | "accuracy reduction"
     | "damage"
     | "sanity"
     | "armor"
     | "health"
     | "weaken"
+    | "strengthen"
   )[];
   readonly damage: number | null;
+  readonly effectStyle: "flat" | "multiplier" | "percentage" | null;
+  readonly effectMagnitude: number | null;
   readonly icon: string | undefined;
 
   constructor({
@@ -41,6 +47,8 @@ export class Condition {
     style,
     turns,
     effect,
+    effectStyle,
+    effectMagnitude,
     damage,
     id,
     icon,
@@ -51,6 +59,8 @@ export class Condition {
     this.turns = turns;
     this.effect = effect;
     this.damage = damage;
+    this.effectStyle = effectStyle;
+    this.effectMagnitude = effectMagnitude;
     this.icon = icon;
     makeObservable(this, { turns: observable, tick: action });
   }
@@ -79,11 +89,14 @@ export class Condition {
       turns: json.turns,
       effect: json.effect,
       damage: json.damage,
+      effectMagnitude: json.effectMagnitude,
+      effectStyle: json.effectStyle,
     });
     return condition;
   }
 }
 const conditionIconMap: { [key: string]: any } = {
+  anger: require("../assets/images/conditions/anger.png"),
   blind: require("../assets/images/conditions/blind.png"),
   bleed: require("../assets/images/conditions/bleed.png"),
   stun: require("../assets/images/conditions/stun.png"),
