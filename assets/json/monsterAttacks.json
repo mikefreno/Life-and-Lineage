@@ -195,7 +195,7 @@
       "damageMult": null,
       "flatDamage": null,
       "sanityDamage": 0,
-      "buffs": ["frenzy"],
+      "buffs": [{"name":"frenzy", "chance": 1.0}],
       "debuffs": null,
       "summons": null
    }

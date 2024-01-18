@@ -58,3 +58,33 @@ export type Attack = {
       }[]
     | null;
 };
+
+export type ConditionBase = {
+  name: string;
+  style: "buff" | "debuff";
+  turns: number;
+  effect: (
+    | "turn skip"
+    | "accuracy reduction"
+    | "accuracy increase"
+    | "sanity heal"
+    | "sanity damage"
+    | "sanityMax increase"
+    | "sanityMax decrease"
+    | "heal"
+    | "health damage"
+    | "healthMax increase"
+    | "healthMax decrease"
+    | "mana regen"
+    | "mana drain"
+    | "manaMax increase"
+    | "manaMax decrease"
+    | "armor increase"
+    | "armor decrease"
+    | "weaken"
+    | "strengthen"
+  )[];
+  effectStyle: "multiplier" | "percentage" | "flat" | null;
+  effectAmount: number | null;
+  icon: string;
+};

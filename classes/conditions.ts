@@ -7,18 +7,30 @@ interface ConditionOptions {
   style: "debuff" | "buff";
   turns: number;
   effect: (
-    | "skip"
+    | "turn skip"
     | "accuracy reduction"
-    | "damage"
-    | "sanity"
-    | "armor"
-    | "health"
+    | "accuracy increase"
+    | "sanity heal"
+    | "sanity damage"
+    | "sanityMax increase"
+    | "sanityMax decrease"
+    | "heal"
+    | "health damage"
+    | "healthMax increase"
+    | "healthMax decrease"
+    | "mana regen"
+    | "mana drain"
+    | "manaMax increase"
+    | "manaMax decrease"
+    | "armor increase"
+    | "armor decrease"
     | "weaken"
     | "strengthen"
   )[];
-  effectStyle: "flat" | "multiplier" | "percentage" | null;
+  effectStyle: "flat" | "multiplier" | null;
   effectMagnitude: number | null;
-  damage: number;
+  healthDamage: number | null;
+  sanityDamage: number | null;
   icon?: string;
 }
 
@@ -28,17 +40,29 @@ export class Condition {
   readonly style: "debuff" | "buff";
   turns: number;
   readonly effect: (
-    | "skip"
+    | "turn skip"
     | "accuracy reduction"
-    | "damage"
-    | "sanity"
-    | "armor"
-    | "health"
+    | "accuracy increase"
+    | "sanity heal"
+    | "sanity damage"
+    | "sanityMax increase"
+    | "sanityMax decrease"
+    | "heal"
+    | "health damage"
+    | "healthMax increase"
+    | "healthMax decrease"
+    | "mana regen"
+    | "mana drain"
+    | "manaMax increase"
+    | "manaMax decrease"
+    | "armor increase"
+    | "armor decrease"
     | "weaken"
     | "strengthen"
   )[];
-  readonly damage: number | null;
-  readonly effectStyle: "flat" | "multiplier" | "percentage" | null;
+  readonly healthDamage: number | null;
+  readonly sanityDamage: number | null;
+  readonly effectStyle: "flat" | "multiplier" | null;
   readonly effectMagnitude: number | null;
   readonly icon: string | undefined;
 
@@ -49,7 +73,8 @@ export class Condition {
     effect,
     effectStyle,
     effectMagnitude,
-    damage,
+    healthDamage,
+    sanityDamage,
     id,
     icon,
   }: ConditionOptions) {
@@ -58,7 +83,8 @@ export class Condition {
     this.style = style;
     this.turns = turns;
     this.effect = effect;
-    this.damage = damage;
+    this.healthDamage = healthDamage;
+    this.sanityDamage = sanityDamage;
     this.effectStyle = effectStyle;
     this.effectMagnitude = effectMagnitude;
     this.icon = icon;
@@ -77,7 +103,12 @@ export class Condition {
     this.turns -= 1;
     return {
       effect: this.effect,
-      damage: this.damage ? Math.round(this.damage * 4) / 4 : null,
+      healthDamage: this.healthDamage
+        ? Math.round(this.healthDamage * 4) / 4
+        : null,
+      sanityDamage: this.sanityDamage
+        ? Math.round(this.sanityDamage * 4) / 4
+        : null,
       turns: this.turns,
     };
   }
@@ -88,7 +119,8 @@ export class Condition {
       style: json.style,
       turns: json.turns,
       effect: json.effect,
-      damage: json.damage,
+      healthDamage: json.healthDamage,
+      sanityDamage: json.sanityDamage,
       effectMagnitude: json.effectMagnitude,
       effectStyle: json.effectStyle,
     });
@@ -97,17 +129,20 @@ export class Condition {
 }
 const conditionIconMap: { [key: string]: any } = {
   anger: require("../assets/images/conditions/anger.png"),
-  blind: require("../assets/images/conditions/blind.png"),
+  blank: require("../assets/images/conditions/blank.png"),
   bleed: require("../assets/images/conditions/bleed.png"),
-  stun: require("../assets/images/conditions/stun.png"),
-  snowflake: require("../assets/images/conditions/snowflake.png"),
-  "skull-and-crossbones": require("../assets/images/conditions/skull_crossbones.png"),
-  viruses: require("../assets/images/conditions/viruses.png"),
+  blind: require("../assets/images/conditions/blind.png"),
+  distraught: require("../assets/images/conditions/distraught.png"),
+  eagle: require("../assets/images/conditions/eagle.png"),
   flame: require("../assets/images/conditions/flame.png"),
+  glow_star: require("../assets/images/conditions/glow_star.png"),
+  holding_heart: require("../assets/images/conditions/holding_heart.png"),
+  pray_hands: require("../assets/images/conditions/pray_hands.png"),
   scarecrow: require("../assets/images/conditions/scarecrow.png"),
   shield: require("../assets/images/conditions/shield.png"),
-  holding_heart: require("../assets/images/conditions/holding_heart.png"),
+  skull_and_crossbones: require("../assets/images/conditions/skull_crossbones.png"),
+  snowflake: require("../assets/images/conditions/snowflake.png"),
   split_heart: require("../assets/images/conditions/split_heart.png"),
-  distraught: require("../assets/images/conditions/distraught.png"),
-  blank: require("../assets/images/conditions/blank.png"),
+  stun: require("../assets/images/conditions/stun.png"),
+  viruses: require("../assets/images/conditions/viruses.png"),
 };

@@ -1,9 +1,11 @@
 import attacks from "../assets/json/monsterAttacks.json";
 import monsters from "../assets/json/monsters.json";
 import {
+  createBuff,
   createDebuff,
   flipCoin,
   getConditionEffectsOnAttacks,
+  getConditionEffectsOnDefenses,
   getRandomInt,
   rollD20,
 } from "../utility/functions";
@@ -39,6 +41,7 @@ interface monsterInterface {
   sanity: number | null;
   sanityMax: number | null;
   attackPower: number;
+  baseArmor?: number;
   minions?: Minion[];
   energy: number;
   energyMax: number;
@@ -55,6 +58,7 @@ export class Monster {
   sanity: number | null;
   readonly sanityMax: number | null;
   readonly attackPower: number;
+  readonly baseArmor: number;
   energy: number;
   readonly energyMax: number;
   readonly energyRegen: number;
@@ -71,6 +75,7 @@ export class Monster {
     minions,
     sanityMax,
     attackPower,
+    baseArmor,
     energy,
     energyMax,
     energyRegen,
@@ -85,6 +90,7 @@ export class Monster {
     this.minions = minions ?? [];
     this.healthMax = healthMax;
     this.attackPower = attackPower;
+    this.baseArmor = baseArmor ?? 0;
     this.energy = energy;
     this.energyMax = energyMax;
     this.energyRegen = energyRegen;
@@ -115,6 +121,20 @@ export class Monster {
     return this.id === otherMonsterID;
   }
   //---------------------------Health---------------------------//
+  public getMaxHealth() {
+    const { healthMult, healthFlat } = getConditionEffectsOnDefenses(
+      this.conditions,
+    );
+    return this.healthMax * healthMult + healthFlat;
+  }
+
+  public getFullHealth() {
+    const { healthMult, healthFlat } = getConditionEffectsOnDefenses(
+      this.conditions,
+    );
+    return this.health + healthFlat + this.healthMax * healthMult;
+  }
+
   public damageHealth(damage: number | null) {
     this.health -= damage ?? 0;
     return this.health;
@@ -126,8 +146,15 @@ export class Monster {
       return this.sanity;
     }
   }
+  //---------------------------Armor---------------------------//
+  public getFullArmor() {
+    const { armorMult, armorFlat } = getConditionEffectsOnDefenses(
+      this.conditions,
+    );
+    return this.baseArmor * armorMult + armorFlat;
+  }
   //---------------------------Battle---------------------------//
-  public addCondition(condition: Condition | null) {
+  public addCondition(condition?: Condition | null) {
     if (condition) {
       this.conditions.push(condition);
     }
@@ -240,7 +267,6 @@ export class Monster {
       } else if (chosenAttack.flatDamage) {
         damage = chosenAttack.flatDamage;
       }
-
       damage *= damageMult;
       damage += damageFlat;
       damage = Math.round(damage * 4) / 4;
@@ -263,18 +289,28 @@ export class Monster {
                 }
               }
             } else {
-              const res = createDebuff(
-                debuff.name,
-                debuff.chance,
-                playerMaxHealth,
-                damage,
-              );
+              const res = createDebuff({
+                debuffName: debuff.name,
+                debuffChance: debuff.chance,
+                enemyMaxHP: playerMaxHealth,
+                primaryAttackDamage: damage,
+              });
               if (res) debuffs.push(res);
             }
           });
         }
-        let buffs: Condition[] = [];
         if (chosenAttack.buffs) {
+          chosenAttack.buffs.forEach((buff) =>
+            this.addCondition(
+              createBuff({
+                buffName: buff.name,
+                buffChance: buff.chance,
+                attackPower: this.attackPower,
+                health: this.getFullHealth(),
+                armor: this.getFullArmor(),
+              }),
+            ),
+          );
         }
         return {
           name: chosenAttack.name,

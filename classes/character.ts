@@ -1,4 +1,9 @@
-import { createDebuff, damageReduction, rollD20 } from "../utility/functions";
+import {
+  createDebuff,
+  damageReduction,
+  getConditionEffectsOnDefenses,
+  rollD20,
+} from "../utility/functions";
 import { Condition } from "./conditions";
 import conditions from "../assets/json/conditions.json";
 import { Item } from "./item";
@@ -359,12 +364,23 @@ export class PlayerCharacter extends Character {
   }
   //----------------------------------Health----------------------------------//
   public getMaxHealth() {
-    let gearBuffs = this.healthMax;
+    let gearBuffs = 0;
     gearBuffs += this.equipment.mainHand.stats?.health ?? 0;
     gearBuffs += this.equipment.offHand?.stats?.health ?? 0;
     gearBuffs += this.equipment.body?.stats?.health ?? 0;
     gearBuffs += this.equipment.head?.stats?.health ?? 0;
-    return gearBuffs;
+    const { healthMult, healthFlat } = getConditionEffectsOnDefenses(
+      this.conditions,
+    );
+    return (this.healthMax + gearBuffs) * healthMult + healthFlat;
+  }
+  public getNonBuffedMaxHealth() {
+    let gearBuffs = 0;
+    gearBuffs += this.equipment.mainHand.stats?.health ?? 0;
+    gearBuffs += this.equipment.offHand?.stats?.health ?? 0;
+    gearBuffs += this.equipment.body?.stats?.health ?? 0;
+    gearBuffs += this.equipment.head?.stats?.health ?? 0;
+    return this.healthMax + gearBuffs;
   }
 
   public damageHealth(damage: number | null) {
@@ -943,23 +959,24 @@ export class PlayerCharacter extends Character {
     );
     return exists ? true : false;
   }
+
   public conditionTicker() {
     for (let i = this.conditions.length - 1; i >= 0; i--) {
-      const { effect, damage, turns } = this.conditions[i].tick();
+      const { effect, healthDamage, sanityDamage, turns } =
+        this.conditions[i].tick();
 
-      effect.forEach((eff) => {
-        if (eff == "sanity") {
-          this.damageSanity(damage);
-        } else if (eff == "damage") {
-          this.damageHealth(damage);
-        }
-      });
-
+      if (sanityDamage) {
+        this.damageSanity(sanityDamage);
+      }
+      if (healthDamage) {
+        this.damageHealth(healthDamage);
+      }
       if (turns == 0) {
         this.conditions.splice(i, 1);
       }
     }
   }
+
   private removeDebuffs(amount: number) {
     for (let i = 0; i < amount; i++) {
       this.conditions.shift();

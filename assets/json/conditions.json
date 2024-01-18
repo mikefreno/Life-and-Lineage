@@ -3,7 +3,7 @@
       "name": "stun",
       "style": "debuff",
       "turns": 1,
-      "effect": ["skip"],
+      "effect": ["turn skip"],
       "effectStyle": null,
       "effectAmount": null,
       "icon": "stun"
@@ -12,7 +12,7 @@
       "name": "heavy stun",
       "style": "debuff",
       "turns": 2,
-      "effect": ["skip"],
+      "effect": ["turn skip"],
       "effectStyle": null,
       "effectAmount": null,
       "icon": "stun"
@@ -20,17 +20,26 @@
    {
       "name": "blind",
       "style": "debuff",
-      "turns": 2,
+      "turns": 3,
       "effect": ["accuracy reduction"],
       "effectStyle": "multiplier",
       "effectAmount": 0.25,
       "icon": "blind"
    },
    {
+      "name": "keen eye",
+      "style": "buff",
+      "turns": 5,
+      "effect": ["accuracy increase"],
+      "effectStyle": "multiplier",
+      "effectAmount": 0.35,
+      "icon": "eagle"
+   },
+   {
       "name": "bleed",
       "style": "debuff",
       "turns": 4,
-      "effect": ["damage"],
+      "effect": ["health damage"],
       "effectStyle": "percentage",
       "effectAmount": 0.020,
       "icon": "bleed"
@@ -39,7 +48,7 @@
       "name": "hemmorage",
       "style": "debuff",
       "turns": 2,
-      "effect": ["damage"],
+      "effect": ["health damage"],
       "effectStyle": "percentage",
       "effectAmount": 0.050,
       "icon": "bleed"
@@ -48,25 +57,25 @@
       "name": "poison",
       "style": "debuff",
       "turns": 10,
-      "effect": ["damage"],
+      "effect": ["health damage"],
       "effectStyle": "percentage",
       "effectAmount": 0.010,
-      "icon":"skull-and-crossbones"
+      "icon":"skull_and_crossbones"
    },
    {
       "name": "diseased",
       "style": "debuff",
       "turns": 10,
-      "effect": ["damage", "accuracy reduction"],
+      "effect": ["health damage", "accuracy reduction"],
       "effectStyle": "multiplier",
       "effectAmount": 0.15,
       "icon": "viruses"
    },
-   {
+  {
       "name": "burn",
       "style": "debuff",
       "turns": 4,
-      "effect": ["damage"],
+      "effect": ["health damage"],
       "effectStyle": "multiplier",
       "effectAmount": 0.25,
       "icon": "flame"
@@ -76,7 +85,7 @@
       "style": "debuff",
       "turns": 2,
       "effect": ["weaken"],
-      "effectStyle": "percentage",
+      "effectStyle": "multiplier",
       "effectAmount": 0.25,
       "icon": "snowflake"
    },
@@ -84,7 +93,7 @@
       "name": "fear",
       "style": "debuff",
       "turns": 5,
-      "effect": ["sanity"],
+      "effect": ["sanity damage"],
       "effectStyle": "flat",
       "effectAmount": 2,
       "icon": "scarecrow"
@@ -93,18 +102,45 @@
       "name": "lasting heal",
       "style": "buff",
       "turns": 5,
-      "effect": ["health"],
+      "effect": ["heal"],
       "effectStyle": "flat",
       "effectAmount": 25,
+      "icon": "holding_heart"
+   },
+   {
+      "name": "head trauma",
+      "style": "debuff",
+      "turns": 5,
+      "effect": ["health decrease"],
+      "effectStyle": "multiplier",
+      "effectAmount": 0.1,
       "icon": "holding_heart"
    },
    {
       "name": "guard",
       "style": "buff",
       "turns": 5,
-      "effect": ["armor"],
+      "effect": ["armor increase"],
       "effectStyle": "flat",
       "effectAmount": 25,
+      "icon": "shield"
+   },
+   {
+      "name": "sunder",
+      "style": "debuff",
+      "turns": 4,
+      "effect": ["armor decrease"],
+      "effectStyle": "multiplier",
+      "effectAmount": 0.25,
+      "icon": "shield"
+   },
+   {
+      "name": "blessed defense",
+      "style": "buff",
+      "turns": 3,
+      "effect": ["armor increase"],
+      "effectStyle": "multiplier",
+      "effectAmount": 0.5,
       "icon": "shield"
    },
    {
@@ -115,5 +151,32 @@
       "effectStyle": "multiplier",
       "effectAmount": 0.25,
       "icon": "anger"
+   },
+   {
+      "name": "enlighten",
+      "style": "buff",
+      "turns": 5,
+      "effect": ["mana increase"],
+      "effectStyle": "multiplier",
+      "effectAmount": 0.25,
+      "icon": "glow_star"
+   },
+   {
+      "name": "dulled mind",
+      "style": "debuff",
+      "turns": 5,
+      "effect": ["mana decrease"],
+      "effectStyle": "multiplier",
+      "effectAmount": 0.1,
+      "icon": "hollow_disk"
+   },
+   {
+      "name": "calm",
+      "style": "buff",
+      "turns": 5,
+      "effect": ["sanity heal"],
+      "effectStyle": "flat",
+      "effectAmount": 10,
+      "icon": "pray_hands"
    }
 ]
