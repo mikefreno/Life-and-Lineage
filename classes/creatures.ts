@@ -1,5 +1,6 @@
 import attacks from "../assets/json/enemyAttacks.json";
 import enemies from "../assets/json/enemy.json";
+import bosses from "../assets/json/bosses.json";
 import {
   createBuff,
   createDebuff,
@@ -33,6 +34,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Item } from "./item";
 import { action, makeObservable, observable } from "mobx";
 import summons from "../assets/json/summons.json";
+import { AttackObj } from "../utility/types";
 
 type CreatureType = {
   id?: string;
@@ -113,6 +115,7 @@ export class Creature {
       conditionTicker: action,
       getDrops: action,
       equals: action,
+      attack: action,
     });
   }
 
@@ -139,10 +142,20 @@ export class Creature {
     );
     return this.sanityMax ? this.sanityMax * sanityMult + sanityFlat : null;
   }
-  public damageSanity(damage: number | null) {
+  public damageSanity(damage?: number | null) {
     if (this.sanity) {
       this.sanity -= damage ?? 0;
       return this.sanity;
+    }
+  }
+  //---------------------------Energy---------------------------//
+  public regenerate() {
+    if (this.energy && this.energyRegen && this.energyMax) {
+      if (this.energy + this.energyRegen >= this.energyMax) {
+        this.energy = this.energyMax;
+      } else {
+        this.energy += this.energyRegen;
+      }
     }
   }
   //---------------------------Armor---------------------------//
@@ -156,6 +169,12 @@ export class Creature {
     return damageReduction(this.getFullArmor());
   }
   //---------------------------Battle---------------------------//
+  protected endTurn() {
+    setTimeout(() => {
+      this.conditionTicker();
+      this.regenerate();
+    }, 250);
+  }
   public addCondition(condition?: Condition | null) {
     if (condition) {
       this.conditions.push(condition);
@@ -179,22 +198,12 @@ export class Creature {
     }
   }
 
-  protected attack(
+  public attack(
     playerMaxHealth: number,
     playerMaxSanity: number | null,
     playerDR: number,
-    chosenAttack: EnemyAttackObj,
-  ):
-    | "miss"
-    | {
-        name: string;
-        damage: number;
-        heal?: number;
-        sanityDamage?: number;
-        debuffs?: Condition[];
-        buffs?: Condition[];
-        summons?: string[];
-      } {
+    chosenAttack: AttackObj,
+  ) {
     let rollToHit: number;
     const { hitChanceMultiplier, damageMult, damageFlat } =
       getConditionEffectsOnAttacks(this.conditions);
@@ -205,17 +214,23 @@ export class Creature {
     }
     const roll = rollD20();
     let damagePreDR: number = 0;
-    if (chosenAttack.damageMult) {
-      damagePreDR = chosenAttack.damageMult * this.attackPower;
-    } else if (chosenAttack.flatHealthDamage) {
-      damagePreDR = chosenAttack.flatHealthDamage;
-    }
-    let damage = damagePreDR * (1 - playerDR);
-    damage *= damageMult; // from conditions
-    damage += damageFlat; // from conditions
-    damage = Math.round(damage * 4) / 4;
-    const sanityDamage = chosenAttack.flatSanityDamage;
     if (roll >= rollToHit) {
+      if (chosenAttack.damageMult) {
+        damagePreDR = chosenAttack.damageMult * this.attackPower;
+      } else if (chosenAttack.flatHealthDamage) {
+        damagePreDR = chosenAttack.flatHealthDamage;
+      }
+
+      if (chosenAttack.selfDamage) {
+        this.damageHealth(chosenAttack.selfDamage);
+      }
+
+      let damage = damagePreDR * (1 - playerDR);
+      damage *= damageMult; // from conditions
+      damage += damageFlat; // from conditions
+      const unRoundedDamage = damage;
+      damage = Math.round(damage * 4) / 4;
+      const sanityDamage = chosenAttack.flatSanityDamage;
       let debuffs: Condition[] = [];
       let healedFor: number = 0;
       if (chosenAttack.debuffs) {
@@ -223,7 +238,7 @@ export class Creature {
           if (debuff.name == "lifesteal") {
             const roll = rollD20();
             if (roll * 5 >= 100 - debuff.chance * 100) {
-              const heal = Math.round(damage * 0.5 * 4) / 4;
+              const heal = Math.round(unRoundedDamage * 0.5 * 4) / 4;
               if (this.health + heal >= this.healthMax) {
                 healedFor = this.healthMax - this.health;
                 this.health = this.healthMax;
@@ -238,7 +253,7 @@ export class Creature {
               debuffChance: debuff.chance,
               enemyMaxHP: playerMaxHealth,
               enemyMaxSanity: playerMaxSanity,
-              primaryAttackDamage: damage,
+              primaryAttackDamage: damagePreDR,
             });
             if (res) debuffs.push(res);
           }
@@ -261,26 +276,35 @@ export class Creature {
           }
         });
       }
-      this.conditionTicker();
+      this.endTurn();
       return {
         name: chosenAttack.name,
         damage: damage,
         heal: healedFor,
+        selfDamage: chosenAttack.selfDamage,
         sanityDamage: sanityDamage,
         debuffs: debuffs.length > 0 ? debuffs : undefined,
         buffs: buffsForLogs.length > 0 ? buffsForLogs : undefined,
         summons: chosenAttack.summons,
       };
     } else {
-      this.conditionTicker();
+      this.endTurn();
       return "miss";
     }
   }
   //---------------------------Misc---------------------------//
-  public getDrops(playerClass: "necromancer" | "paladin" | "mage") {
-    const enemyObj = enemies.find(
-      (monster) => monster.name == this.creatureSpecies,
-    );
+  public getDrops(
+    playerClass: "necromancer" | "paladin" | "mage",
+    bossFight: boolean,
+  ) {
+    let enemyObj;
+    if (bossFight) {
+      enemyObj = bosses.find((monster) => monster.name == this.creatureSpecies);
+    } else {
+      enemyObj = enemies.find(
+        (monster) => monster.name == this.creatureSpecies,
+      );
+    }
     if (enemyObj) {
       const dropList = enemyObj.drops;
       const gold = getRandomInt(
@@ -383,6 +407,7 @@ export class Enemy extends Creature {
   }: takeTurnProps) {
     const { isStunned } = getConditionEffectsOnMisc(this.conditions);
     if (isStunned) {
+      this.endTurn();
       return "stun";
     } else {
       const availableAttacks = attacks.filter(
@@ -392,7 +417,10 @@ export class Enemy extends Creature {
       );
       if (availableAttacks.length > 0) {
         const randomIndex = Math.floor(Math.random() * availableAttacks.length);
-        const chosenAttack = availableAttacks[randomIndex] as EnemyAttackObj;
+        const chosenAttack = availableAttacks[randomIndex] as AttackObj;
+        if (this.energy && chosenAttack.energyCost) {
+          this.energy -= chosenAttack.energyCost;
+        }
         if (chosenAttack.summons) {
           chosenAttack.summons.forEach((summon) => {
             const summonObj = summons.find(
@@ -420,6 +448,7 @@ export class Enemy extends Creature {
           chosenAttack,
         );
       } else {
+        this.endTurn();
         return "pass";
       }
     }
@@ -498,6 +527,7 @@ export class Minion extends Creature {
 
     makeObservable(this, {
       turnsLeftAlive: observable,
+      takeTurn: action,
     });
   }
 
@@ -507,8 +537,10 @@ export class Minion extends Creature {
     defenderDR,
   }: takeTurnProps) {
     if (this.turnsLeftAlive > 0) {
+      this.turnsLeftAlive--;
       const { isStunned } = getConditionEffectsOnMisc(this.conditions);
       if (isStunned) {
+        this.endTurn();
         return "stun";
       } else {
         const availableAttacks = attacks.filter(
@@ -520,7 +552,10 @@ export class Minion extends Creature {
           const randomIndex = Math.floor(
             Math.random() * availableAttacks.length,
           );
-          const chosenAttack = availableAttacks[randomIndex] as EnemyAttackObj;
+          const chosenAttack = availableAttacks[randomIndex] as AttackObj;
+          if (this.energy && chosenAttack.energyCost) {
+            this.energy -= chosenAttack.energyCost;
+          }
           return this.attack(
             defenderMaxHealth,
             defenderMaxSanity,
@@ -528,6 +563,7 @@ export class Minion extends Creature {
             chosenAttack,
           );
         } else {
+          this.endTurn();
           return "pass";
         }
       }
@@ -608,18 +644,6 @@ function itemList(
     default:
       throw new Error("invalid itemType");
   }
-}
-interface EnemyAttackObj {
-  name: string;
-  energyCost: number;
-  targets?: "single" | "cleave" | "aoe";
-  hitChance?: number;
-  damageMult?: number;
-  flatHealthDamage?: number;
-  flatSanityDamage?: number;
-  buffs?: { name: string; chance: number }[];
-  debuffs?: { name: string; chance: number }[];
-  summons?: string[];
 }
 
 interface takeTurnProps {

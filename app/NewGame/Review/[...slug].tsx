@@ -19,7 +19,6 @@ import { useContext } from "react";
 import {
   GameContext,
   LogsContext,
-  MonsterContext,
   PlayerCharacterContext,
 } from "../../_layout";
 import { useVibration } from "../../../utility/customHooks";
@@ -37,14 +36,8 @@ export default function NewGameReview() {
   const playerCharacterSetter = useContext(PlayerCharacterContext)
     ?.setPlayerCharacter;
   const gameDataSetter = useContext(GameContext)?.setGameData;
-  const monsterSetter = useContext(MonsterContext)?.setMonster;
   const logsSetter = useContext(LogsContext)?.setLogs;
-  if (
-    !playerCharacterSetter ||
-    !monsterSetter ||
-    !gameDataSetter ||
-    !logsSetter
-  ) {
+  if (!playerCharacterSetter || !gameDataSetter || !logsSetter) {
     throw new Error("missing context setters");
   }
   const gameData = useContext(GameContext);
@@ -124,7 +117,6 @@ export default function NewGameReview() {
     if (
       playerCharacterSetter &&
       gameDataSetter &&
-      monsterSetter &&
       logsSetter &&
       (playerClass == "mage" ||
         playerClass == "paladin" ||
@@ -173,7 +165,6 @@ export default function NewGameReview() {
       }
       gameDataSetter(newGame);
       logsSetter([]);
-      monsterSetter(null);
       vibration({ style: "success" });
       while (router.canGoBack()) {
         router.back();

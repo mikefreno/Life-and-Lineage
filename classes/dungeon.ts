@@ -1,6 +1,6 @@
 import dungeons from "../assets/json/dungeons.json";
-import bosses from "../assets/json/bossMonsters.json";
-import { Monster } from "./creatures";
+import bosses from "../assets/json/bosses.json";
+import { Enemy } from "./creatures";
 import { action, makeObservable, observable } from "mobx";
 
 interface DungeonLevelOptions {
@@ -108,11 +108,11 @@ export class DungeonLevel {
       bosses.find((bossObj) => bossObj.name == boss),
     );
     if (bossObjects) {
-      let bosses: Monster[] = [];
+      let bosses: Enemy[] = [];
       bossObjects.forEach((bossObj) => {
         if (bossObj) {
           bosses.push(
-            new Monster({
+            new Enemy({
               creatureSpecies: bossObj.name,
               health: bossObj.health,
               healthMax: bossObj.health,

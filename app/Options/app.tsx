@@ -11,6 +11,7 @@ import { GameContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
 import * as Updates from "expo-updates";
 import GenericModal from "../../components/GenericModal";
+import { useColorScheme } from "nativewind";
 
 export default function AppSettings() {
   const themeOptions = ["system", "light", "dark"];
@@ -24,6 +25,7 @@ export default function AppSettings() {
   }
   const { gameState } = gameContext;
 
+  const { colorScheme } = useColorScheme();
   const vibration = useVibration();
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,
@@ -181,13 +183,29 @@ export default function AppSettings() {
               />
             </View>
             <Pressable
+              className="mx-auto mb-2 mt-4"
               onPress={() => {
                 vibration({ style: "light" });
                 setShowTutorialResetConfirm(true);
               }}
-              className="mx-auto mt-4 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
             >
-              <Text>Reset Tutorials</Text>
+              {({ pressed }) => (
+                <View
+                  className={`rounded-xl px-8 py-4 ${
+                    pressed ? "scale-95 opacity-50" : ""
+                  }`}
+                  style={{
+                    shadowColor: "#000",
+                    elevation: 2,
+                    backgroundColor:
+                      colorScheme == "light" ? "white" : "#71717a",
+                    shadowOpacity: 0.1,
+                    shadowRadius: 5,
+                  }}
+                >
+                  <Text>Reset Tutorials</Text>
+                </View>
+              )}
             </Pressable>
           </NonThemedView>
         </View>

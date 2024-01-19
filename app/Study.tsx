@@ -11,6 +11,7 @@ import { elementalColorMap } from "../utility/elementColors";
 import { useVibration } from "../utility/customHooks";
 import SpellDetails from "../components/SpellDetails";
 import PlayerStatus from "../components/PlayerStatus";
+import { useColorScheme } from "nativewind";
 
 export default function LearningKnowledgeScreen() {
   const playerCharacterData = useContext(PlayerCharacterContext);
@@ -21,6 +22,7 @@ export default function LearningKnowledgeScreen() {
   const { playerState } = playerCharacterData;
   if (!playerState) throw new Error("no playerState");
   const { gameState } = gameData;
+  const { colorScheme } = useColorScheme();
 
   const books = playerState?.inventory.filter(
     (item) => item.itemClass == "book",
@@ -142,7 +144,9 @@ export default function LearningKnowledgeScreen() {
                   value={studyState.experience}
                   maxValue={20}
                 />
+
                 <Pressable
+                  className="mx-auto mb-2 mt-4"
                   onPress={() => {
                     studySpell(
                       studyState.bookName,
@@ -151,9 +155,26 @@ export default function LearningKnowledgeScreen() {
                     );
                     vibration({ style: "light" });
                   }}
-                  className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
                 >
-                  <Text>Continue Studying</Text>
+                  {({ pressed }) => (
+                    <View
+                      className={`rounded-xl px-8 py-4 ${
+                        pressed ? "scale-95 opacity-50" : ""
+                      }`}
+                      style={{
+                        shadowColor: "#000",
+                        elevation: 2,
+                        backgroundColor:
+                          colorScheme == "light" ? "white" : "#71717a",
+                        shadowOpacity: 0.1,
+                        shadowRadius: 5,
+                      }}
+                    >
+                      <Text className="text-center text-zinc-900 dark:text-zinc-50">
+                        Continue Studying
+                      </Text>
+                    </View>
+                  )}
                 </Pressable>
               </View>
             ))}
@@ -165,6 +186,7 @@ export default function LearningKnowledgeScreen() {
             <Text className="py-2 text-lg tracking-wide">Teaches</Text>
             <SpellDetails spell={selectedBookSpell} />
             <Pressable
+              className="mx-auto mb-2 mt-4"
               onPress={() => {
                 vibration({ style: "light", essential: true });
                 studySpell(
@@ -174,22 +196,41 @@ export default function LearningKnowledgeScreen() {
                 );
                 setSelectedBook(null);
               }}
-              className="mt-4 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
             >
-              <Text>Start Studying</Text>
+              {({ pressed }) => (
+                <View
+                  className={`rounded-xl px-8 py-4 ${
+                    pressed ? "scale-95 opacity-50" : ""
+                  }`}
+                  style={{
+                    shadowColor: "#000",
+                    elevation: 2,
+                    backgroundColor:
+                      colorScheme == "light" ? "white" : "#71717a",
+                    shadowOpacity: 0.1,
+                    shadowRadius: 5,
+                  }}
+                >
+                  <Text className="text-center text-zinc-900 dark:text-zinc-50">
+                    Start Studying
+                  </Text>
+                </View>
+              )}
             </Pressable>
           </View>
         ) : null}
         {filteredBooks.length > 0 ? (
           <View className="py-4">
             <Text className="text-center text-xl">Available for Study</Text>
-            <ScrollView className="mx-auto">
-              <View className="my-auto max-h-64 flex-wrap justify-around">
+            <ScrollView className="mx-auto" horizontal>
+              <View className="my-auto max-h-24 flex-wrap">
                 {filteredBooks.map((item) => (
                   <Pressable
                     key={item.id}
                     className="m-2 items-center active:scale-90 active:opacity-50"
-                    onPress={() => setSelectedBook(item)}
+                    onPress={() => {
+                      setSelectedBook(item);
+                    }}
                   >
                     <View
                       className="rounded-lg p-2"

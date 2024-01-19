@@ -35,6 +35,7 @@ import { Minion, Enemy } from "../../classes/creatures";
 import SackIcon from "../../assets/icons/SackIcon";
 import TutorialModal from "../../components/TutorialModal";
 import GenericModal from "../../components/GenericModal";
+import { AttackObj } from "../../utility/types";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -152,9 +153,7 @@ const DungeonLevelScreen = observer(() => {
           duration: 200,
           useNativeDriver: true,
         }),
-      ]).start(() => {
-        setAttackAnimationOnGoing(false);
-      });
+      ]).start();
     }
   }, [enemyAttackDummy]);
 
@@ -209,14 +208,16 @@ const DungeonLevelScreen = observer(() => {
         enemyState.health <= 0 ||
         (enemyState.sanity && enemyState.sanity <= 0)
       ) {
-        gameState?.gameTick(playerState);
         if (thisDungeon?.level != 0) {
           thisDungeon?.incrementStep();
         }
         battleLogger(
           `You defeated the ${toTitleCase(enemyState.creatureSpecies)}`,
         );
-        const drops = enemyState.getDrops(playerState.playerClass);
+        const drops = enemyState.getDrops(
+          playerState.playerClass,
+          fightingBoss,
+        );
         playerState.addGold(drops.gold);
         setDroppedItems(drops);
         if (fightingBoss && gameState && thisDungeon) {
@@ -225,8 +226,10 @@ const DungeonLevelScreen = observer(() => {
           gameState.openNextDungeonLevel(thisInstance!.name);
         }
         setEnemy(null);
+        gameState.gameTick(playerState);
       } else {
         enemyTurn();
+        setTimeout(() => setAttackAnimationOnGoing(false), 1000);
       }
     }
   };
@@ -321,19 +324,15 @@ const DungeonLevelScreen = observer(() => {
           enemyAttackRes == "miss" ? 500 : 0,
         );
       }
-      enemyState.conditionTicker();
       if (enemyState.minions.length > 0) {
         enemyMinionsTurn(enemyState.minions);
       }
-      setTimeout(() => {
-        setAttackAnimationOnGoing(false);
-      }, 500);
     }
   };
 
   function EnemyHealthChangePopUp() {
     return (
-      <NonThemedView className="h-4">
+      <NonThemedView className="h-6">
         <FadeOutText
           className={"text-red-400"}
           text={`${
@@ -379,8 +378,8 @@ const DungeonLevelScreen = observer(() => {
         <NonThemedView className="flex h-8 flex-row">
           {simplifiedConditions.map((cond) => (
             <View key={cond.name} className="mx-2 flex align-middle">
-              <NonThemedView className="mx-auto rounded-md bg-[rgba(255,255,255,0.4)] p-0.5">
-                <Image source={cond.icon} style={{ width: 24, height: 24 }} />
+              <NonThemedView className="mx-auto rounded-md bg-[rgba(0,0,0,0.4)] p-0.5 dark:bg-[rgba(255,255,255,0.4)]">
+                <Image source={cond.icon} style={{ width: 22, height: 24 }} />
               </NonThemedView>
               <Text className="text-sm">
                 {toTitleCase(cond.name)} x {cond.count}
@@ -421,27 +420,17 @@ const DungeonLevelScreen = observer(() => {
   };
 
   //------------player combat functions------------//
-  const useAttack = (
-    attack: {
-      name: string;
-      targets: string;
-      hitChance: number;
-      damageMult: number;
-      sanityDamage: number;
-      debuffs: { name: string; chance: number }[] | null;
-    },
-    target: Enemy | Minion,
-  ) => {
-    setAttackAnimationOnGoing(true);
+  const useAttack = (attack: AttackObj, target: Enemy | Minion) => {
     if (target && playerState && isFocused) {
-      const attackRes = playerState.doPhysicalAttack(
-        attack,
-        target.getMaxHealth(),
-        target.getMaxSanity(),
-      );
+      const attackRes = playerState.doPhysicalAttack({
+        chosenAttack: attack,
+        enemyMaxHP: target.getMaxHealth(),
+        enemyMaxSanity: target.getMaxSanity(),
+        enemyDR: target.getDamageReduction(),
+      });
       if (attackRes !== "miss") {
         target.damageHealth(attackRes.damage);
-        target.damageSanity(attackRes.sanityDamage) ?? null;
+        target.damageSanity(attackRes.sanityDamage);
         attackRes.debuffs?.forEach((effect) => target.addCondition(effect));
         let line = `You ${attack.name == "cast" ? "used " : ""}${toTitleCase(
           attack.name,
@@ -476,9 +465,12 @@ const DungeonLevelScreen = observer(() => {
         } else {
           setTimeout(() => {
             playerMinionsTurn(playerState.minions, target.id);
-            setTimeout(() => {
-              enemyTurnCheck();
-            }, 1000 * playerState.minions.length);
+            setTimeout(
+              () => {
+                enemyTurnCheck();
+              },
+              1000 * playerState.minions.length + 1,
+            );
           }, 1000);
         }
       } else {
@@ -508,13 +500,12 @@ const DungeonLevelScreen = observer(() => {
     },
     target: Enemy | Minion,
   ) => {
-    setAttackAnimationOnGoing(true);
     if (playerState && isFocused) {
-      const spellRes = playerState.useSpell(
-        spell,
-        target.getMaxHealth(),
-        target.getMaxSanity(),
-      );
+      const spellRes = playerState.useSpell({
+        chosenSpell: spell,
+        enemyMaxHP: target.getMaxHealth(),
+        enemyMaxSanity: target.getMaxSanity(),
+      });
       target.damageHealth(spellRes.damage);
       target.damageSanity(spellRes.sanityDamage);
       spellRes.debuffs?.forEach((debuff) => target.addCondition(debuff));
@@ -918,9 +909,9 @@ const DungeonLevelScreen = observer(() => {
   while (!enemyState) {
     return (
       <View className="flex-1 px-4 pt-4">
-        <NonThemedView className="flex h-[35%] flex-row justify-evenly" />
+        <NonThemedView className="flex h-[35%]" />
         {thisDungeon?.stepsBeforeBoss !== 0 && !fightingBoss ? (
-          <View className="-mt-7 flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
+          <View className="flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
             <Text className="my-auto text-xl">
               {`Steps Completed: ${thisDungeon?.step} / ${thisDungeon?.stepsBeforeBoss}`}
             </Text>
@@ -936,7 +927,7 @@ const DungeonLevelScreen = observer(() => {
             ) : null}
           </View>
         ) : fightingBoss ? (
-          <View className="-mt-7">
+          <View className="">
             <Text className="my-auto text-center text-xl">Fighting Boss!</Text>
           </View>
         ) : (
@@ -955,6 +946,7 @@ const DungeonLevelScreen = observer(() => {
               battleTab={battleTab}
               useSpell={useSpell}
               pass={pass}
+              setAttackAnimationOnGoing={setAttackAnimationOnGoing}
               attackAnimationOnGoing={attackAnimationOnGoing}
               setShowTargetSelection={setShowTargetSelection}
               addItemToPouch={addItemToPouch}
@@ -1297,7 +1289,7 @@ const DungeonLevelScreen = observer(() => {
         <View className="flex-1 px-4 pt-4">
           <NonThemedView className="flex h-[35%]">
             <NonThemedView className="flex-1 flex-row justify-evenly">
-              <View
+              <NonThemedView
                 className="flex flex-col items-center justify-center"
                 style={{ minWidth: "40%" }}
               >
@@ -1317,13 +1309,13 @@ const DungeonLevelScreen = observer(() => {
                   removeAtZero={true}
                 />
                 {showingEnemyHealthChange ? (
-                  EnemyHealthChangePopUp()
+                  <EnemyHealthChangePopUp />
                 ) : (
-                  <NonThemedView className="h-4" />
+                  <NonThemedView className="h-6" />
                 )}
                 {EnemyConditionRender()}
-              </View>
-              <View className="my-auto">
+              </NonThemedView>
+              <NonThemedView className="my-auto">
                 <Animated.View
                   style={{
                     transform: [
@@ -1360,7 +1352,7 @@ const DungeonLevelScreen = observer(() => {
                     showHealAnimationDummy={enemyHealDummy}
                   />
                 </View>
-              </View>
+              </NonThemedView>
             </NonThemedView>
             {enemyState.minions.length > 0 ? (
               <NonThemedView className="mx-4">
@@ -1429,6 +1421,7 @@ const DungeonLevelScreen = observer(() => {
                 battleTab={battleTab}
                 useSpell={useSpell}
                 pass={pass}
+                setAttackAnimationOnGoing={setAttackAnimationOnGoing}
                 attackAnimationOnGoing={attackAnimationOnGoing}
                 setShowTargetSelection={setShowTargetSelection}
                 addItemToPouch={addItemToPouch}

@@ -10,7 +10,6 @@ interface GameOptions {
   shops: Shop[];
   dungeonInstances?: DungeonInstance[];
   completedInstances?: string[];
-  furthestDepth?: { instance: string; level: number }[];
   atDeathScreen?: boolean;
   colorScheme?: "system" | "dark" | "light";
   vibrationEnabled: "full" | "minimal" | "none";
@@ -28,7 +27,6 @@ interface GameOptions {
 export class Game {
   date: string;
   dungeonInstances: DungeonInstance[];
-  furthestDepth: { instance: string; level: number }[];
   completedInstances: string[];
   atDeathScreen: boolean;
   shops: Shop[];
@@ -47,7 +45,6 @@ export class Game {
   constructor({
     date,
     dungeonInstances,
-    furthestDepth,
     completedInstances,
     atDeathScreen,
     shops,
@@ -77,14 +74,11 @@ export class Game {
           new DungeonLevel({
             level: 1,
             bosses: ["zombie"],
-            stepsBeforeBoss: 10,
+            stepsBeforeBoss: 1,
             bossDefeated: false,
           }),
         ],
       }),
-    ];
-    this.furthestDepth = furthestDepth ?? [
-      { instance: "nearby cave", level: 1 },
     ];
     this.completedInstances = completedInstances ?? [];
     this.atDeathScreen = atDeathScreen ?? false;
@@ -117,7 +111,6 @@ export class Game {
     makeObservable(this, {
       date: observable,
       dungeonInstances: observable,
-      furthestDepth: observable,
       atDeathScreen: observable,
       completedInstances: observable,
       shops: observable,
@@ -181,15 +174,17 @@ export class Game {
     if (!foundInstanceObj) {
       throw new Error("Missing instance object!");
     } else {
-      const ownedInstance = this.dungeonInstances.find((instance) => {
-        instance.name == currentInstanceName;
-      });
+      const ownedInstance = this.dungeonInstances.find(
+        (instance) => instance.name == currentInstanceName,
+      );
       if (!ownedInstance) {
         throw new Error("Missing owned instance");
       }
       if (ownedInstance.levels.length < foundInstanceObj.levels.length) {
+        console.log("adding level");
         ownedInstance.addLevel();
       } else {
+        console.log("adding instance");
         const unlockStrings = foundInstanceObj.unlocks;
         unlockStrings.forEach((unlock) => {
           const found = dungeons.find((dungeon) => dungeon.instance == unlock);
@@ -285,7 +280,6 @@ export class Game {
   static fromJSON(json: any): Game {
     const game = new Game({
       date: json.date ? json.date : new Date().toISOString(),
-      furthestDepth: json.furthestDepth,
       completedInstances: json.completedInstances,
       atDeathScreen: json.atDeathScreen,
       dungeonInstances: json.dungeonInstances

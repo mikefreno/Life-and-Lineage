@@ -1,7 +1,6 @@
 import { Text, View } from "../../components/Themed";
 import { Pressable, ScrollView, View as NonThemedView } from "react-native";
 import { router } from "expo-router";
-import dungeons from "../../assets/json/dungeons.json";
 import { savePlayer, toTitleCase } from "../../utility/functions";
 import PlayerStatus from "../../components/PlayerStatus";
 import { useContext, useEffect, useState } from "react";
@@ -10,6 +9,7 @@ import { GameContext, PlayerCharacterContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
+import { DungeonInstance } from "../../classes/dungeon";
 
 const dangerColorStep = [
   "#fee2e2",
@@ -23,6 +23,11 @@ const levelOffset: Record<string, number> = {
   "nearby cave": 0,
   "goblin cave": 3,
   "bandit hideout": 5,
+  "rogue magi fortress": 7,
+  "infested mine": 11,
+  "forest dark": 13,
+  "crystal mine": 15,
+  "corrupted temple": 17,
 };
 
 export default function DungeonScreen() {
@@ -33,17 +38,11 @@ export default function DungeonScreen() {
   }
   const { gameState } = gameContext;
   const { playerState } = playerContext;
-  const [dungeonDepth, setDungeonDepth] = useState(gameState?.furthestDepth);
-  const [instances, setInstances] = useState<
-    {
-      instance: string;
-      levels: {
-        level: number;
-        stepsBeforeBoss: number;
-        boss: string[];
-      }[];
-    }[]
-  >([]);
+  const [instances, setInstances] = useState<DungeonInstance[]>(
+    gameState?.dungeonInstances.filter(
+      (instance) => instance.name !== "training grounds",
+    ) ?? [],
+  );
   const [height, setHeight] = useState<number>(0);
 
   const { colorScheme } = useColorScheme();
@@ -59,41 +58,16 @@ export default function DungeonScreen() {
     }
   }, [showDungeonTutorial]);
 
-  useEffect(() => setDungeonDepth(gameState?.furthestDepth), [gameState]);
-
   useEffect(() => {
-    let newInstances: {
-      instance: string;
-      levels: {
-        level: number;
-        stepsBeforeBoss: number;
-        boss: string[];
-      }[];
-    }[] = [];
-    let localHeight = 0;
-    dungeonDepth?.forEach((dungeonInstanceDepth) => {
-      const instance = dungeons.find(
-        (dungeon) => dungeon.instance == dungeonInstanceDepth.instance,
-      );
-      if (instance) {
-        const filteredInstance: {
-          instance: string;
-          levels: {
-            level: number;
-            stepsBeforeBoss: number;
-            boss: string[];
-          }[];
-        } = { instance: instance.instance, levels: [] };
-        for (let i = 0; i < dungeonInstanceDepth.level; i++) {
-          filteredInstance.levels.push(instance.levels[i]);
-          localHeight += 1;
-        }
-        newInstances.push(filteredInstance);
+    let deepestDungeonDepth = 0;
+    gameState?.dungeonInstances.forEach((dungeonInstance) => {
+      let dungeonDepth = levelOffset[dungeonInstance.name];
+      if (dungeonDepth + dungeonInstance.levels.length > deepestDungeonDepth) {
+        deepestDungeonDepth = dungeonDepth + dungeonInstance.levels.length;
       }
-      setHeight(localHeight);
     });
-    setInstances(newInstances);
-  }, [dungeonDepth]);
+    setHeight(deepestDungeonDepth);
+  }, [gameState?.dungeonInstances]);
 
   return (
     <>
@@ -140,12 +114,12 @@ export default function DungeonScreen() {
                     colorScheme == "light" ? "#fafafa" : "#27272a",
                   shadowOpacity: 0.2,
                   shadowRadius: 3,
-                  elevation: 3,
+                  elevation: 2,
                 }}
               >
                 <NonThemedView className="flex justify-between rounded-xl px-4 py-2 text-zinc-950 dark:border dark:border-zinc-500 dark:bg-zinc-800">
                   <Text className="text-center text-2xl tracking-widest underline">
-                    {toTitleCase(dungeonInstance.instance)}
+                    {toTitleCase(dungeonInstance.name)}
                   </Text>
                   <NonThemedView className="mx-auto">
                     {dungeonInstance.levels.map((level, levelIdx) => (
@@ -157,46 +131,50 @@ export default function DungeonScreen() {
                           }
                           vibration({ style: "warning" });
                           router.replace(
-                            `/DungeonLevel/${dungeonInstance.instance}/${level.level}`,
+                            `/DungeonLevel/${dungeonInstance.name}/${level.level}`,
                           );
                           setTimeout(() => {
                             if (playerState) {
                               playerState.setInDungeon({
                                 state: true,
-                                instance: dungeonInstance.instance,
+                                instance: dungeonInstance.name,
                                 level: level.level,
                               });
                               savePlayer(playerState);
                             }
                           }, 500);
                         }}
-                        className="active:scale-95 active:opacity-50"
                       >
-                        <View
-                          className="my-2 rounded-lg px-6 py-4"
-                          style={{
-                            shadowColor:
-                              dangerColorStep[
-                                level.level -
-                                  height +
-                                  5 +
-                                  levelOffset[dungeonInstance.instance]
-                              ],
-                            backgroundColor:
-                              dangerColorStep[
-                                level.level -
-                                  height +
-                                  5 +
-                                  levelOffset[dungeonInstance.instance]
-                              ] ?? "#fee2e2",
-                            shadowOpacity: 0.25,
-                            shadowRadius: 5,
-                          }}
-                        >
-                          <Text
-                            style={{ color: "white" }}
-                          >{`Delve to Floor ${level.level}`}</Text>
-                        </View>
+                        {({ pressed }) => (
+                          <View
+                            className={`my-2 rounded-lg px-6 py-4 ${
+                              pressed ? "scale-95 opacity-50" : ""
+                            }`}
+                            style={{
+                              shadowColor:
+                                dangerColorStep[
+                                  level.level -
+                                    height +
+                                    5 +
+                                    levelOffset[dungeonInstance.name]
+                                ],
+                              backgroundColor:
+                                dangerColorStep[
+                                  level.level -
+                                    height +
+                                    5 +
+                                    levelOffset[dungeonInstance.name]
+                                ] ?? "#fee2e2",
+                              shadowOpacity: 0.25,
+                              shadowRadius: 5,
+                              elevation: 2,
+                            }}
+                          >
+                            <Text
+                              style={{ color: "white" }}
+                            >{`Delve to Floor ${level.level}`}</Text>
+                          </View>
+                        )}
                       </Pressable>
                     ))}
                   </NonThemedView>

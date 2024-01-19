@@ -53,32 +53,13 @@ export default function SetSex() {
     const res = await AsyncStorage.getItem("tutorialsEnabled");
     if (res) {
       const parsed: boolean = JSON.parse(res);
+      console.log("loading: ", parsed);
       setShowAgingTutorial(parsed);
       setTutorialState(parsed);
       tutorialStateRef.current = parsed;
     }
     setLoadedAsync(true);
   }
-
-  useEffect(() => {
-    async function updateAsyncTutorialState() {
-      if (tutorialState == false) {
-        await AsyncStorage.setItem("tutorialsEnabled", JSON.stringify(false));
-      } else {
-        await AsyncStorage.setItem("tutorialsEnabled", JSON.stringify(true));
-      }
-    }
-
-    if (gameState) {
-      if (tutorialState == false) {
-        gameState.disableTutorials();
-      } else {
-        gameState.enableTutorials();
-      }
-    } else {
-      updateAsyncTutorialState();
-    }
-  }, [tutorialState]);
 
   useEffect(() => {
     if (gameState) {

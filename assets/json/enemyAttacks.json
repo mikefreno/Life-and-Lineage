@@ -20,7 +20,7 @@
       "energyCost": 10,
       "targets": "single",
       "hitChance": 0.95,
-      "damageMult": 1.25,
+      "damageMult": 1.25
    },
    {
       "name": "zombie bite",

@@ -88,3 +88,16 @@ export type ConditionBase = {
   effectAmount: number | null;
   icon: string;
 };
+export type AttackObj = {
+  name: string;
+  energyCost?: number;
+  targets?: "single" | "cleave" | "aoe";
+  hitChance?: number;
+  damageMult?: number;
+  flatHealthDamage?: number;
+  selfDamage?: number;
+  flatSanityDamage?: number;
+  buffs?: { name: string; chance: number }[];
+  debuffs?: { name: string; chance: number }[];
+  summons?: string[];
+};

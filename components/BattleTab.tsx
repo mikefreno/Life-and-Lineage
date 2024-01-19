@@ -19,24 +19,14 @@ import { useColorScheme } from "nativewind";
 import { useVibration } from "../utility/customHooks";
 import { Minion, Enemy } from "../classes/creatures";
 import GearStatsDisplay from "./GearStatsDisplay";
-import { Attack, Spell } from "../utility/types";
+import { Attack, AttackObj, Spell } from "../utility/types";
 import { elementalColorMap } from "../utility/elementColors";
 import Energy from "../assets/icons/EnergyIcon";
 
 interface BattleTabProps {
   battleTab: "attacks" | "equipment" | "log";
   pass: () => void;
-  useAttack: (
-    attack: {
-      name: string;
-      targets: string;
-      hitChance: number;
-      damageMult: number;
-      sanityDamage: number;
-      debuffs: { name: string; chance: number }[] | null;
-    },
-    target: Enemy | Minion,
-  ) => void;
+  useAttack: (attack: AttackObj, target: Enemy | Minion) => void;
   useSpell: (
     spell: {
       name: string;
@@ -53,6 +43,7 @@ interface BattleTabProps {
     },
     target: Enemy | Minion,
   ) => void;
+  setAttackAnimationOnGoing: React.Dispatch<React.SetStateAction<boolean>>;
   attackAnimationOnGoing: boolean;
   setShowTargetSelection: React.Dispatch<
     React.SetStateAction<{
@@ -69,6 +60,7 @@ export default function BattleTab({
   useAttack,
   useSpell,
   pass,
+  setAttackAnimationOnGoing,
   attackAnimationOnGoing,
   setShowTargetSelection,
   addItemToPouch,
@@ -93,19 +85,12 @@ export default function BattleTab({
   const playerSpells = playerState?.getSpells();
   const vibration = useVibration();
 
-  let attackObjects: {
-    name: string;
-    targets: string;
-    hitChance: number;
-    damageMult: number;
-    sanityDamage: number;
-    debuffs: { name: string; chance: number }[] | null;
-  }[] = [];
+  let attackObjects: AttackObj[] = [];
 
   playerAttacks?.forEach((plAttack) =>
     attacks.filter((attack) => {
       if (attack.name == plAttack) {
-        attackObjects.push(attack);
+        attackObjects.push(attack as AttackObj);
       }
     }),
   );
@@ -140,7 +125,7 @@ export default function BattleTab({
     );
   };
 
-  let combinedData: (Attack | Spell)[] = attackObjects.map((attack) => ({
+  let combinedData: (AttackObj | Spell)[] = attackObjects.map((attack) => ({
     ...attack,
   }));
   if (playerSpells) {
@@ -189,30 +174,36 @@ export default function BattleTab({
                         >
                           {toTitleCase(attackOrSpell.name)}
                         </Text>
-                        {"hitChance" in attackOrSpell ? (
+                        {"hitChance" in attackOrSpell &&
+                        attackOrSpell.hitChance ? (
                           <Text className="text-lg">{`${
                             attackOrSpell.hitChance * 100
                           }% hit chance`}</Text>
                         ) : (
-                          <NonThemedView className="flex flex-row">
-                            <Text
-                              style={{
-                                color:
-                                  elementalColorMap[attackOrSpell.element].dark,
-                              }}
-                            >
-                              {attackOrSpell.manaCost}
-                            </Text>
-                            <NonThemedView className="my-auto pl-1">
-                              <Energy
-                                height={14}
-                                width={14}
-                                color={
-                                  colorScheme == "dark" ? "#2563eb" : undefined
-                                }
-                              />
+                          "element" in attackOrSpell && (
+                            <NonThemedView className="flex flex-row">
+                              <Text
+                                style={{
+                                  color:
+                                    elementalColorMap[attackOrSpell.element]
+                                      .dark,
+                                }}
+                              >
+                                {attackOrSpell.manaCost}
+                              </Text>
+                              <NonThemedView className="my-auto pl-1">
+                                <Energy
+                                  height={14}
+                                  width={14}
+                                  color={
+                                    colorScheme == "dark"
+                                      ? "#2563eb"
+                                      : undefined
+                                  }
+                                />
+                              </NonThemedView>
                             </NonThemedView>
-                          </NonThemedView>
+                          )
                         )}
                       </NonThemedView>
                       <Pressable
@@ -222,6 +213,7 @@ export default function BattleTab({
                         onPress={() => {
                           vibration({ style: "light" });
                           if (enemyState && enemyState.minions.length == 0) {
+                            setAttackAnimationOnGoing(true);
                             if ("element" in attackOrSpell) {
                               useSpell(attackOrSpell, enemyState);
                             } else {
@@ -260,17 +252,23 @@ export default function BattleTab({
                 )}
               />
             ) : (
-              <View className="my-auto px-4 py-2">
+              <NonThemedView className="my-auto px-4 py-2 shadow">
                 <Text className="text-center text-2xl tracking-wide">
                   Stunned!
                 </Text>
-                <View className="flex flex-row justify-between">
-                  <View className="flex flex-col justify-center">
+                <NonThemedView
+                  className="flex flex-row justify-between rounded border px-4 py-2"
+                  style={{
+                    borderColor: colorScheme == "light" ? "#71717a" : "#a1a1aa",
+                  }}
+                >
+                  <NonThemedView className="flex flex-col justify-center">
                     <Text className="text-xl">Pass</Text>
-                  </View>
+                  </NonThemedView>
                   <Pressable
                     disabled={attackAnimationOnGoing}
                     onPress={() => {
+                      setAttackAnimationOnGoing(true);
                       vibration({ style: "light" });
                       pass();
                     }}
@@ -278,8 +276,8 @@ export default function BattleTab({
                   >
                     <Text className="text-xl">Use</Text>
                   </Pressable>
-                </View>
-              </View>
+                </NonThemedView>
+              </NonThemedView>
             )}
           </>
         );

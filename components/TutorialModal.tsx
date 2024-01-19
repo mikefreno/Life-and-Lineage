@@ -6,6 +6,7 @@ import { useColorScheme } from "nativewind";
 import { GameContext } from "../app/_layout";
 import { useVibration } from "../utility/customHooks";
 import { Pressable, Switch } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface TutorialModalProps {
   isVisibleCondition: boolean;
@@ -35,6 +36,7 @@ export default function TutorialModal({
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,
   );
+  const [firstLoad, setFirstLoad] = useState<boolean>(true);
   const vibration = useVibration();
 
   useEffect(() => {
@@ -42,14 +44,39 @@ export default function TutorialModal({
   }, [gameState?.tutorialsEnabled]);
 
   useEffect(() => {
-    if (gameState) {
+    async function updateAsyncTutorialState() {
       if (tutorialState == false) {
-        gameState.disableTutorials();
+        await AsyncStorage.setItem("tutorialsEnabled", JSON.stringify(false));
       } else {
-        gameState.enableTutorials();
+        await AsyncStorage.setItem("tutorialsEnabled", JSON.stringify(true));
       }
     }
+
+    if (!firstLoad) {
+      if (gameState) {
+        if (tutorialState == false) {
+          gameState.disableTutorials();
+        } else {
+          gameState.enableTutorials();
+        }
+      } else {
+        updateAsyncTutorialState();
+      }
+    } else {
+      if (!gameState) {
+        loadAsyncTutorialState();
+      }
+      setFirstLoad(false);
+    }
   }, [tutorialState]);
+
+  async function loadAsyncTutorialState() {
+    const res = await AsyncStorage.getItem("tutorialsEnabled");
+    if (res) {
+      const parsed: boolean = JSON.parse(res);
+      setTutorialState(parsed);
+    }
+  }
 
   const press = () => {
     if (tutorialStepRef.current == 1 && pageTwo) {

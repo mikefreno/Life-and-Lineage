@@ -320,42 +320,46 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
                                     playerState &&
                                     playerState.gold < upgrade.cost
                                   }
-                                  className="mx-auto my-2 active:scale-95 active:opacity-50"
+                                  className="mx-auto my-2"
                                 >
-                                  <View
-                                    className="rounded-xl px-8 py-4"
-                                    style={
-                                      playerState &&
-                                      playerState.gold >= upgrade.cost
-                                        ? {
-                                            shadowColor: "#000",
-                                            elevation: 1,
-                                            backgroundColor:
-                                              colorScheme == "light"
-                                                ? "white"
-                                                : "#71717a",
-                                            shadowOpacity: 0.1,
-                                            shadowRadius: 5,
-                                          }
-                                        : {
-                                            backgroundColor:
-                                              colorScheme == "light"
-                                                ? "#ccc"
-                                                : "#4b4b4b",
-                                            opacity: 0.5,
-                                          }
-                                    }
-                                  >
-                                    <Text className="text-center">
-                                      Purchase For
-                                    </Text>
-                                    <View className="flex flex-row items-center justify-center">
-                                      <Text className="dark:text-zinc-50">
-                                        {asReadableGold(upgrade.cost)}{" "}
+                                  {({ pressed }) => (
+                                    <View
+                                      className={`rounded-xl px-8 py-4 ${
+                                        pressed ? "scale-95 opacity-50" : ""
+                                      }`}
+                                      style={
+                                        playerState &&
+                                        playerState.gold >= upgrade.cost
+                                          ? {
+                                              shadowColor: "#000",
+                                              elevation: 1,
+                                              backgroundColor:
+                                                colorScheme == "light"
+                                                  ? "white"
+                                                  : "#71717a",
+                                              shadowOpacity: 0.1,
+                                              shadowRadius: 5,
+                                            }
+                                          : {
+                                              backgroundColor:
+                                                colorScheme == "light"
+                                                  ? "#ccc"
+                                                  : "#4b4b4b",
+                                              opacity: 0.5,
+                                            }
+                                      }
+                                    >
+                                      <Text className="text-center">
+                                        Purchase For
                                       </Text>
-                                      <Coins width={14} height={14} />
+                                      <View className="flex flex-row items-center justify-center">
+                                        <Text className="dark:text-zinc-50">
+                                          {asReadableGold(upgrade.cost)}{" "}
+                                        </Text>
+                                        <Coins width={14} height={14} />
+                                      </View>
                                     </View>
-                                  </View>
+                                  )}
                                 </Pressable>
                               ))}
                         </View>
@@ -463,69 +467,77 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
             <Pressable
               onPress={purchaseInvestmentCheck}
               disabled={playerState && playerState.gold < investment.cost}
-              className="mx-auto mb-2 active:scale-95 active:opacity-50"
+              className="mx-auto mb-2"
             >
-              <View
-                className="rounded-xl px-8 py-4"
-                style={
-                  playerState && playerState.gold >= investment.cost
-                    ? {
-                        shadowColor: "#000",
-                        elevation: 1,
-                        backgroundColor:
-                          colorScheme == "light" ? "white" : "#71717a",
-                        shadowOpacity: 0.1,
-                        shadowRadius: 5,
-                      }
-                    : {
-                        backgroundColor:
-                          colorScheme == "light" ? "#ccc" : "#4b4b4b",
-                        opacity: 0.5,
-                      }
-                }
-              >
-                <Text className="text-center">Purchase For</Text>
-                <View className="flex flex-row items-center justify-center">
-                  <Text className="dark:text-zinc-50">
-                    {asReadableGold(investment.cost)}{" "}
-                  </Text>
-                  <Coins width={14} height={14} />
+              {({ pressed }) => (
+                <View
+                  className={`rounded-xl px-8 py-4 ${
+                    pressed ? "scale-95 opacity-50" : ""
+                  }`}
+                  style={
+                    playerState && playerState.gold >= investment.cost
+                      ? {
+                          shadowColor: "#000",
+                          elevation: 2,
+                          backgroundColor:
+                            colorScheme == "light" ? "white" : "#71717a",
+                          shadowOpacity: 0.1,
+                          shadowRadius: 5,
+                        }
+                      : {
+                          backgroundColor:
+                            colorScheme == "light" ? "#ccc" : "#4b4b4b",
+                          opacity: 0.5,
+                        }
+                  }
+                >
+                  <Text className="text-center">Purchase For</Text>
+                  <View className="flex flex-row items-center justify-center">
+                    <Text className="dark:text-zinc-50">
+                      {asReadableGold(investment.cost)}{" "}
+                    </Text>
+                    <Coins width={14} height={14} />
+                  </View>
                 </View>
-              </View>
+              )}
             </Pressable>
           ) : (
             <Pressable
               onPress={collectOnInvestment}
               disabled={madeInvestment.currentGoldStockPile == 0}
-              className="mx-auto mb-2 active:scale-95 active:opacity-50"
+              className="mx-auto mb-2"
             >
-              <View
-                className="rounded-xl px-8 py-4"
-                style={
-                  madeInvestment.currentGoldStockPile > 0
-                    ? {
-                        shadowColor: "#000",
-                        elevation: 1,
-                        backgroundColor:
-                          colorScheme == "light" ? "white" : "#71717a",
-                        shadowOpacity: 0.1,
-                        shadowRadius: 5,
-                      }
-                    : {
-                        backgroundColor:
-                          colorScheme == "light" ? "#ccc" : "#4b4b4b",
-                        opacity: 0.5,
-                      }
-                }
-              >
-                <Text className="text-center">Collect</Text>
-                <View className="flex flex-row items-center justify-center">
-                  <Text className="dark:text-zinc-50">
-                    {asReadableGold(madeInvestment.currentGoldStockPile)}{" "}
-                  </Text>
-                  <Coins width={14} height={14} />
+              {({ pressed }) => (
+                <View
+                  className={`rounded-xl px-8 py-4 ${
+                    pressed ? "scale-95 opacity-50" : ""
+                  }`}
+                  style={
+                    madeInvestment.currentGoldStockPile > 0
+                      ? {
+                          shadowColor: "#000",
+                          elevation: 1,
+                          backgroundColor:
+                            colorScheme == "light" ? "white" : "#71717a",
+                          shadowOpacity: 0.1,
+                          shadowRadius: 5,
+                        }
+                      : {
+                          backgroundColor:
+                            colorScheme == "light" ? "#ccc" : "#4b4b4b",
+                          opacity: 0.5,
+                        }
+                  }
+                >
+                  <Text className="text-center">Collect</Text>
+                  <View className="flex flex-row items-center justify-center">
+                    <Text className="dark:text-zinc-50">
+                      {asReadableGold(madeInvestment.currentGoldStockPile)}{" "}
+                    </Text>
+                    <Coins width={14} height={14} />
+                  </View>
                 </View>
-              </View>
+              )}
             </Pressable>
           )}
         </View>

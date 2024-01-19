@@ -19,6 +19,7 @@ import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
 import { usePathname } from "expo-router";
+import { debounce } from "lodash";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -101,9 +102,12 @@ const Root = observer(() => {
     getData();
   }, []);
 
+  const debouncedFullSave = debounce(fullSave, 500);
+
   autorun(() => {
     if (gameState && playerState) {
-      fullSave(gameState, playerState);
+      debouncedFullSave(gameState, playerState);
+      debouncedFullSave.flush();
     }
   });
 

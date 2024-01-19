@@ -105,26 +105,25 @@ export default function MedicalOption({
           </View>
         </View>
 
-        <Pressable
-          className="mb-2 mt-4 active:scale-95 active:opacity-50"
-          onPress={visit}
-        >
-          <View
-            className="mx-auto rounded-xl"
-            style={{
-              shadowColor: "#000",
-              elevation: 1,
-              backgroundColor: colorScheme == "light" ? "white" : "#71717a",
-              shadowOpacity: 0.1,
-              shadowRadius: 5,
-            }}
-          >
-            <View className="px-8 py-4">
+        <Pressable className="mx-auto mb-2 mt-4" onPress={visit}>
+          {({ pressed }) => (
+            <View
+              className={`rounded-xl px-8 py-4 ${
+                pressed ? "scale-95 opacity-50" : ""
+              }`}
+              style={{
+                shadowColor: "#000",
+                elevation: 2,
+                backgroundColor: colorScheme == "light" ? "white" : "#71717a",
+                shadowOpacity: 0.1,
+                shadowRadius: 5,
+              }}
+            >
               <Text className="text-center text-zinc-900 dark:text-zinc-50">
                 Visit
               </Text>
             </View>
-          </View>
+          )}
         </Pressable>
       </View>
     </View>

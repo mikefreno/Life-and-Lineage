@@ -1,9 +1,4 @@
-import {
-  Pressable,
-  useColorScheme,
-  View as NonThemedView,
-  Switch,
-} from "react-native";
+import { Pressable, useColorScheme, View as NonThemedView } from "react-native";
 import { Text, View } from "../../components/Themed";
 import "../../assets/styles/globals.css";
 import { useContext, useEffect, useRef, useState } from "react";

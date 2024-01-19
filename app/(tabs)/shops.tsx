@@ -83,37 +83,41 @@ export default function ShopsScreen() {
             </Text>
 
             <Pressable
-              className="mt-2 active:scale-95 active:opacity-50"
+              className="mt-2"
               onPress={() => {
                 vibration({ style: "light" });
                 router.push(`/Shops/${shop.archetype}`);
               }}
             >
-              <View
-                className="rounded-lg px-8 py-3"
-                style={{
-                  shadowColor: shopObjects.find(
-                    (shopObj) => shopObj.type == shop.archetype,
-                  )?.colors.background,
-                  elevation: 1,
-                  backgroundColor: shopObjects.find(
-                    (shopObj) => shopObj.type == shop.archetype,
-                  )?.colors.background,
-                  shadowOpacity: 0.2,
-                  shadowRadius: 5,
-                }}
-              >
-                <Text
-                  className="text-lg"
+              {({ pressed }) => (
+                <View
+                  className={`rounded-lg px-8 py-3 ${
+                    pressed ? "scale-95 opacity-50" : ""
+                  }`}
                   style={{
-                    color: shopObjects.find(
+                    shadowColor: shopObjects.find(
                       (shopObj) => shopObj.type == shop.archetype,
-                    )?.colors.font,
+                    )?.colors.background,
+                    elevation: 2,
+                    backgroundColor: shopObjects.find(
+                      (shopObj) => shopObj.type == shop.archetype,
+                    )?.colors.background,
+                    shadowOpacity: 0.2,
+                    shadowRadius: 5,
                   }}
                 >
-                  Enter
-                </Text>
-              </View>
+                  <Text
+                    className="text-lg"
+                    style={{
+                      color: shopObjects.find(
+                        (shopObj) => shopObj.type == shop.archetype,
+                      )?.colors.font,
+                    }}
+                  >
+                    Enter
+                  </Text>
+                </View>
+              )}
             </Pressable>
           </NonThemedView>
         </NonThemedView>

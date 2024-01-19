@@ -44,9 +44,11 @@ export const fullSave = async (
   if (game && player) {
     try {
       const jsonGame = JSON.stringify(game);
-      await AsyncStorage.setItem("game", jsonGame);
       const jsonPlayer = JSON.stringify(player);
-      await AsyncStorage.setItem("player", jsonPlayer);
+      await Promise.all([
+        AsyncStorage.setItem("game", jsonGame),
+        AsyncStorage.setItem("player", jsonPlayer),
+      ]);
     } catch (e) {
       console.log(e);
     }

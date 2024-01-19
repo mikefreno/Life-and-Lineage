@@ -31,6 +31,7 @@ interface ConditionOptions {
   effectMagnitude: number | null;
   healthDamage: number | null;
   sanityDamage: number | null;
+  placedby: string;
   icon?: string;
 }
 
@@ -39,6 +40,7 @@ export class Condition {
   readonly name: string;
   readonly style: "debuff" | "buff";
   turns: number;
+  readonly placedby: string;
   readonly effect: (
     | "turn skip"
     | "accuracy reduction"
@@ -75,6 +77,7 @@ export class Condition {
     effectMagnitude,
     healthDamage,
     sanityDamage,
+    placedby,
     id,
     icon,
   }: ConditionOptions) {
@@ -87,6 +90,7 @@ export class Condition {
     this.sanityDamage = sanityDamage;
     this.effectStyle = effectStyle;
     this.effectMagnitude = effectMagnitude;
+    this.placedby = placedby;
     this.icon = icon;
     makeObservable(this, { turns: observable, tick: action });
   }
@@ -123,6 +127,7 @@ export class Condition {
       sanityDamage: json.sanityDamage,
       effectMagnitude: json.effectMagnitude,
       effectStyle: json.effectStyle,
+      placedby: json.placedby,
     });
     return condition;
   }

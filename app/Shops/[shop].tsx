@@ -156,8 +156,12 @@ const ShopInteriorScreen = observer(() => {
                   Price:{" "}
                   {asReadableGold(
                     selectedItem.buying
-                      ? selectedItem.item.getBuyPrice(thisShop!.affection)
-                      : selectedItem.item.getSellPrice(thisShop!.affection),
+                      ? Math.floor(
+                          selectedItem.item.getBuyPrice(thisShop!.affection),
+                        )
+                      : Math.floor(
+                          selectedItem.item.getSellPrice(thisShop!.affection),
+                        ),
                   )}
                 </Text>
                 <Coins width={20} height={20} style={{ marginLeft: 6 }} />
@@ -314,7 +318,7 @@ const ShopInteriorScreen = observer(() => {
         />
         <View className="flex-1">
           <View className="flex flex-row justify-between">
-            <View className="w-1/3">
+            <View className="w-1/3 items-center">
               <CharacterImage
                 characterAge={calculateAge(
                   new Date(thisShop.shopKeeperBirthDate),
@@ -322,10 +326,10 @@ const ShopInteriorScreen = observer(() => {
                 )}
                 characterSex={thisShop?.shopKeeperSex == "male" ? "M" : "F"}
               />
-              <Text className="mx-auto text-center">
+              <Text className="text-center">
                 {thisShop.shopKeeperName}'s Inventory
               </Text>
-              <View className="mx-auto flex flex-row">
+              <View className="flex flex-row">
                 <Text>{thisShop.currentGold}</Text>
                 <Coins width={16} height={16} style={{ marginLeft: 6 }} />
               </View>

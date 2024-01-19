@@ -1,9 +1,4 @@
-import {
-  Pressable,
-  Image,
-  View as NonThemedView,
-  Animated,
-} from "react-native";
+import { Pressable, Image, View as NonThemedView } from "react-native";
 import { View, Text } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import { calculateAge, toTitleCase } from "../../utility/functions";
@@ -26,13 +21,6 @@ import TutorialModal from "../../components/TutorialModal";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
-  const [showingInventory, setShowingInventory] = useState<boolean>(false);
-  const topTranslationValue = useRef(
-    new Animated.Value(showingInventory ? -124 : 0),
-  ).current;
-  const bottomTranslationValue = useRef(
-    new Animated.Value(showingInventory ? 72 : 0),
-  ).current;
   const playerStateData = useContext(PlayerCharacterContext);
   const gameData = useContext(GameContext);
 
@@ -41,7 +29,6 @@ const HomeScreen = observer(() => {
   const mainHandTarget = useRef<NonThemedView>(null);
   const offHandTarget = useRef<NonThemedView>(null);
   const inventoryTarget = useRef<NonThemedView>(null);
-  const bagTarget = useRef<NonThemedView>(null);
 
   if (!playerStateData || !gameData) throw new Error("missing contexts");
   const { playerState } = playerStateData;
@@ -55,26 +42,6 @@ const HomeScreen = observer(() => {
   );
 
   const isFocused = useIsFocused();
-
-  //animation
-  useEffect(() => {
-    Animated.spring(topTranslationValue, {
-      toValue: showingInventory ? -126 : 0,
-      useNativeDriver: true,
-    }).start();
-    Animated.spring(bottomTranslationValue, {
-      toValue: showingInventory ? 72 : 0,
-      useNativeDriver: true,
-    }).start();
-  }, [showingInventory]);
-
-  useEffect(() => {
-    if (showingInventory) {
-      setStatsTopPos((prev) => (prev ? prev - 64 : undefined));
-    } else {
-      setStatsTopPos((prev) => (prev ? prev + 64 : undefined));
-    }
-  }, [showingInventory]);
 
   useEffect(() => {
     if (!showIntroTutorial && gameState) {
@@ -109,11 +76,7 @@ const HomeScreen = observer(() => {
     if (item && item.slot) {
       let refs: React.RefObject<NonThemedView>[] = [];
       if (equipped) {
-        if (showingInventory) {
-          refs.push(inventoryTarget);
-        } else {
-          refs.push(bagTarget);
-        }
+        refs.push(inventoryTarget);
       } else {
         switch (item.slot) {
           case "head":
@@ -163,9 +126,8 @@ const HomeScreen = observer(() => {
 
   function currentEquipmentDisplay() {
     const [buzzed, setBuzzed] = useState<boolean>(false);
-
     return (
-      <View className={`flex w-full`}>
+      <View className={`flex w-full -mt-[1vh]`}>
         <View className="items-center">
           <Text className="mb-2">Head</Text>
           {playerState?.equipment.head ? (
@@ -197,8 +159,8 @@ const HomeScreen = observer(() => {
                   } else {
                     setShowingStats(playerState.equipment.head);
                     headTarget.current?.measureInWindow((x, y) => {
-                      setStatsLeftPos(x - 10);
-                      setStatsTopPos(showingInventory ? y : y + 120);
+                      setStatsLeftPos(x);
+                      setStatsTopPos(y);
                     });
                   }
                 }}
@@ -225,7 +187,7 @@ const HomeScreen = observer(() => {
           )}
         </View>
         <NonThemedView className="flex flex-row justify-evenly">
-          <NonThemedView className="-ml-1 mr-2">
+          <NonThemedView className="-ml-1 -mt-4 mr-2 md:mt-4">
             <Text className="mb-2">Main Hand</Text>
             {playerState?.equipment.mainHand &&
             playerState?.equipment.mainHand.name !== "unarmored" ? (
@@ -257,8 +219,8 @@ const HomeScreen = observer(() => {
                     } else {
                       setShowingStats(playerState.equipment.mainHand);
                       mainHandTarget.current?.measureInWindow((x, y) => {
-                        setStatsLeftPos(x - 10);
-                        setStatsTopPos(showingInventory ? y : y + 120);
+                        setStatsLeftPos(x);
+                        setStatsTopPos(y);
                       });
                     }
                   }}
@@ -284,7 +246,7 @@ const HomeScreen = observer(() => {
               />
             )}
           </NonThemedView>
-          <NonThemedView>
+          <NonThemedView className="-mt-4 md:mt-4">
             <Text className="mb-2">Off-Hand</Text>
             {playerState?.equipment.offHand ? (
               <NonThemedView className="mx-auto h-12 w-12 items-center active:scale-90 active:opacity-50">
@@ -318,8 +280,8 @@ const HomeScreen = observer(() => {
                       } else {
                         setShowingStats(playerState.equipment.offHand);
                         offHandTarget.current?.measureInWindow((x, y) => {
-                          setStatsLeftPos(x - 10);
-                          setStatsTopPos(showingInventory ? y : y + 120);
+                          setStatsLeftPos(x);
+                          setStatsTopPos(y);
                         });
                       }
                     }}
@@ -350,7 +312,7 @@ const HomeScreen = observer(() => {
             )}
           </NonThemedView>
         </NonThemedView>
-        <NonThemedView className="mx-auto items-center">
+        <NonThemedView className="mx-auto -mt-4 items-center md:mt-4">
           <Text className="mb-2">Body</Text>
           {playerState?.equipment.body ? (
             <Pressable className="h-12 w-12 active:scale-90 active:opacity-50">
@@ -381,8 +343,8 @@ const HomeScreen = observer(() => {
                   } else {
                     setShowingStats(playerState.equipment.body);
                     bodyTarget.current?.measureInWindow((x, y) => {
-                      setStatsLeftPos(x - 10);
-                      setStatsTopPos(showingInventory ? y : y + 120);
+                      setStatsLeftPos(x);
+                      setStatsTopPos(y);
                     });
                   }
                 }}
@@ -408,7 +370,6 @@ const HomeScreen = observer(() => {
             />
           )}
         </NonThemedView>
-        {playerState ? <NonThemedView className="my-2"></NonThemedView> : null}
       </View>
     );
   }
@@ -470,7 +431,7 @@ const HomeScreen = observer(() => {
       return (
         <NonThemedView
           ref={inventoryTarget}
-          className="mx-auto flex h-1/2 w-full flex-wrap rounded-lg border border-zinc-600"
+          className="mx-auto flex h-[55%] w-full flex-wrap rounded-lg border border-zinc-600"
         >
           {Array.from({ length: 24 }).map((_, index) => (
             <NonThemedView
@@ -479,7 +440,9 @@ const HomeScreen = observer(() => {
                 left: `${
                   (index % 6) * 16.67 + 1 * (Math.floor(deviceWidth / 400) + 1)
                 }%`,
-                top: `${Math.floor(index / 6) * 25 + 4}%`,
+                top: `${
+                  Math.floor(index / 6) * 25 + Math.floor(deviceHeight / 300)
+                }%`,
               }}
               key={"bg-" + index}
             >
@@ -493,7 +456,9 @@ const HomeScreen = observer(() => {
                 left: `${
                   (index % 6) * 16.67 + 1 * (Math.floor(deviceWidth / 400) + 1)
                 }%`,
-                top: `${Math.floor(index / 6) * 25 + 4}%`,
+                top: `${
+                  Math.floor(index / 6) * 25 + Math.floor(deviceHeight / 300)
+                }%`,
               }}
               key={index}
             >
@@ -526,16 +491,9 @@ const HomeScreen = observer(() => {
           onCloseFunction={() => setShowIntroTutorial(false)}
         />
         <View className="flex-1">
-          <Animated.View
-            style={{
-              transform: [{ translateY: topTranslationValue }],
-              flex: 1,
-              paddingHorizontal: 16,
-              paddingTop: 8,
-            }}
-          >
+          <View className=" flex-1 px-[2vw] pt-[1vh]">
             <View className="-mx-4 border-b border-zinc-200 dark:border-zinc-700">
-              <View className="mx-4 flex-row pb-4">
+              <View className="mx-6 flex-row items-center pb-4 md:py-12">
                 {playerState?.playerClass == "necromancer" ? (
                   <NonThemedView className="mx-auto">
                     <Necromancer
@@ -574,60 +532,16 @@ const HomeScreen = observer(() => {
                 </NonThemedView>
               </View>
             </View>
-            <NonThemedView>
-              <View className="flex flex-row pt-2">
-                {currentEquipmentDisplay()}
-              </View>
-              <NonThemedView className="flex flex-row justify-between">
-                <NonThemedView className="py-2">
-                  <Pressable
-                    ref={bagTarget}
-                    style={{ width: 60, height: 60 }}
-                    onPress={() => {
-                      vibration({ style: "light" });
-                      setShowingInventory(!showingInventory);
-                      if (
-                        showingStats &&
-                        !playerState.equippedCheck(showingStats)
-                      ) {
-                        setShowingStats(null);
-                      }
-                    }}
-                  >
-                    <Image
-                      source={require("../../assets/images/items/Bag.png")}
-                      style={{ width: 50, height: 50 }}
-                    />
-                  </Pressable>
-                </NonThemedView>
-                <NonThemedView className="-mt-16">
-                  <GearStatsDisplay
-                    stats={playerState.getCurrentEquipmentStats()}
-                  />
-                </NonThemedView>
-              </NonThemedView>
-              {showingInventory ? inventoryRender() : null}
+            <NonThemedView className="flex-1 justify-evenly">
+              {currentEquipmentDisplay()}
+              {inventoryRender()}
             </NonThemedView>
-          </Animated.View>
-          {playerState && (
-            <Animated.View
-              style={{ transform: [{ translateY: bottomTranslationValue }] }}
-            >
-              <PlayerStatus displayGoldTop={true} />
-            </Animated.View>
-          )}
+          </View>
+          {playerState && <PlayerStatus displayGoldTop={true} />}
           {showingStats && statsLeftPos && statsTopPos ? (
             <View
               className="absolute items-center rounded-md border border-zinc-600 p-4"
               style={{
-                shadowColor: "#000",
-                shadowOffset: {
-                  width: 0,
-                  height: 2,
-                },
-                elevation: 1,
-                shadowOpacity: 0.25,
-                shadowRadius: 5,
                 width: deviceWidth / 3 - 2,
                 backgroundColor:
                   colorScheme == "light"
@@ -635,12 +549,10 @@ const HomeScreen = observer(() => {
                     : "rgba(20, 20, 20, 0.95)",
                 left: statsLeftPos
                   ? statsLeftPos < deviceWidth * 0.6
-                    ? statsLeftPos + deviceWidth / 7
-                    : statsLeftPos - deviceWidth / 3 - 5
+                    ? statsLeftPos + 50
+                    : statsLeftPos - deviceWidth / 3
                   : undefined,
-                top: statsTopPos
-                  ? statsTopPos - (2.8 * deviceHeight) / 10
-                  : undefined,
+                top: statsTopPos - 120,
               }}
             >
               <NonThemedView>

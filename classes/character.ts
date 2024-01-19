@@ -2,11 +2,11 @@ import {
   createBuff,
   createDebuff,
   damageReduction,
+  getConditionEffectsOnAttacks,
   getConditionEffectsOnDefenses,
   rollD20,
 } from "../utility/functions";
 import { Condition } from "./conditions";
-import conditions from "../assets/json/conditions.json";
 import { Item } from "./item";
 import weapons from "../assets/json/items/weapons.json";
 import wands from "../assets/json/items/wands.json";
@@ -17,7 +17,7 @@ import { Minion } from "./creatures";
 import summons from "../assets/json/summons.json";
 import { action, makeObservable, observable } from "mobx";
 import { Investment } from "./investment";
-import { InvestmentType, InvestmentUpgrade } from "../utility/types";
+import { AttackObj, InvestmentType, InvestmentUpgrade } from "../utility/types";
 
 interface CharacterOptions {
   firstName: string;
@@ -285,7 +285,7 @@ export class PlayerCharacter extends Character {
     this.knownSpells = knownSpells ?? [];
     this.conditions = [];
     this.physicalAttacks = physicalAttacks ?? ["punch"];
-    this.gold = gold ?? 500;
+    this.gold = gold ?? 5000000;
     this.inventory = inventory ?? [];
     this.currentDungeon = currentDungeon ?? null;
     this.equipment = equipment ?? {
@@ -1019,142 +1019,164 @@ export class PlayerCharacter extends Character {
   }
 
   public pass() {
+    this.endTurn();
+  }
+
+  private endTurn() {
     this.regenMana();
     this.conditionTicker();
   }
 
-  public doPhysicalAttack(
-    attack: {
-      name: string;
-      targets: string;
-      hitChance: number;
-      damageMult: number;
-      sanityDamage: number;
-      debuffs: { name: string; chance: number }[] | null;
-    },
-    monsterMaxHP: number,
-    monsterMaxSanity: number | null,
-  ) {
-    this.regenMana();
-    const rollToHit = 20 - (attack.hitChance * 100) / 5;
+  public doPhysicalAttack({
+    chosenAttack,
+    enemyMaxSanity,
+    enemyMaxHP,
+    enemyDR,
+  }: playerAttackDeps) {
+    let rollToHit: number;
+    const { hitChanceMultiplier, damageMult, damageFlat } =
+      getConditionEffectsOnAttacks(this.conditions);
+    if (chosenAttack.hitChance) {
+      rollToHit = 20 - (chosenAttack.hitChance * 100 * hitChanceMultiplier) / 5;
+    } else {
+      rollToHit = 0;
+    }
     const roll = rollD20();
+    let damagePreDR: number = 0;
     if (roll >= rollToHit) {
-      let damage =
-        attack.damageMult * (this.equipment.mainHand?.stats?.["damage"] ?? 1);
-
-      const offHandDamage = this.equipment.offHand?.stats?.["damage"];
-      if (offHandDamage) {
-        damage += offHandDamage * 0.5;
+      if (chosenAttack.damageMult) {
+        damagePreDR =
+          chosenAttack.damageMult *
+          (this.equipment.mainHand?.stats?.["damage"] ?? 1);
+        const offHandDamage = this.equipment.offHand?.stats?.["damage"];
+        if (offHandDamage) {
+          damagePreDR += offHandDamage * 0.5 * chosenAttack.damageMult;
+        }
+      } else if (chosenAttack.flatHealthDamage) {
+        damagePreDR = chosenAttack.flatHealthDamage;
       }
-      const weakens = this.conditions.filter((condition) =>
-        condition.effect.find((effect) => effect == "weaken"),
-      );
-      if (weakens) {
-        damage *= Math.pow(0.75, weakens.length);
-      }
-      const sanityDamage = attack.sanityDamage;
-      this.conditionTicker();
-      if (attack.debuffs) {
-        let debuffs: Condition[] = [];
-        attack.debuffs.forEach((debuff) => {
-          const debuffRes = createDebuff({
-            debuffName: debuff.name,
-            debuffChance: debuff.chance,
-            enemyMaxHP: monsterMaxHP,
-            enemyMaxSanity: monsterMaxSanity,
-            primaryAttackDamage: damage,
-          });
-          if (debuffRes) debuffs.push(debuffRes);
+      let damage = damagePreDR * (1 - enemyDR);
+      damage *= damageMult; // from conditions
+      damage += damageFlat; // from conditions
+      const unRoundedDamage = damage;
+      damage = Math.round(damage * 4) / 4;
+      const sanityDamage = chosenAttack.flatSanityDamage;
+      let debuffs: Condition[] = [];
+      let healedFor: number = 0;
+      if (chosenAttack.debuffs) {
+        chosenAttack.debuffs.forEach((debuff) => {
+          if (debuff.name == "lifesteal") {
+            const roll = rollD20();
+            if (roll * 5 >= 100 - debuff.chance * 100) {
+              const heal = Math.round(unRoundedDamage * 0.5 * 4) / 4;
+              if (this.health + heal >= this.healthMax) {
+                healedFor = this.healthMax - this.health;
+                this.health = this.healthMax;
+              } else {
+                healedFor = heal;
+                this.health += heal;
+              }
+            }
+          } else {
+            const res = createDebuff({
+              debuffName: debuff.name,
+              debuffChance: debuff.chance,
+              enemyMaxHP: enemyMaxHP,
+              enemyMaxSanity: enemyMaxSanity,
+              primaryAttackDamage: damagePreDR,
+            });
+            if (res) debuffs.push(res);
+          }
         });
-        return {
-          damage: damage,
-          sanityDamage: sanityDamage,
-          debuffs: debuffs,
-        };
       }
+      let buffsForLogs: Condition[] = [];
+      if (chosenAttack.buffs) {
+        chosenAttack.buffs.forEach((buff) => {
+          const res = createBuff({
+            buffName: buff.name,
+            buffChance: buff.chance,
+            attackPower: damagePreDR,
+            maxHealth: this.getNonBuffedMaxHealth(),
+            maxSanity: this.getNonBuffedMaxSanity(),
+            armor: this.getArmorValue(),
+          });
+          if (res) {
+            this.addCondition(res);
+            buffsForLogs.push(res);
+          }
+        });
+      }
+      this.endTurn();
       return {
+        name: chosenAttack.name,
         damage: damage,
+        heal: healedFor,
         sanityDamage: sanityDamage,
-        debuffs: null,
+        debuffs: debuffs.length > 0 ? debuffs : undefined,
+        buffs: buffsForLogs.length > 0 ? buffsForLogs : undefined,
       };
-    } else return "miss";
+    } else {
+      this.endTurn();
+      return "miss";
+    }
   }
   //----------------------------------Magical Combat----------------------------------//
-  public useSpell(
-    chosenSpell: {
-      name: string;
-      element: string;
-      proficiencyNeeded: number;
-      manaCost: number;
-      effects: {
-        damage: number | null;
-        sanityDamage?: number;
-        buffs: string[] | null;
-        debuffs: { name: string; chance: number }[] | null;
-        summon?: string[];
-        selfDamage?: number;
-      };
-    },
-    monsterMaxHP: number,
-    monsterMaxSanity: number | null,
-  ) {
+  public useSpell({
+    chosenSpell,
+    enemyMaxHP,
+    enemyMaxSanity,
+  }: playerSpellDeps) {
     if (chosenSpell.manaCost <= this.mana) {
       this.mana -= chosenSpell.manaCost;
-      this.regenMana();
+
       if (chosenSpell.effects.summon) {
         chosenSpell.effects.summon.map((summon) => this.createMinion(summon));
       }
-      const enemyDamage = chosenSpell.effects.damage;
+
       const selfDamage = chosenSpell.effects.selfDamage;
       if (selfDamage) {
         this.damageHealth(selfDamage);
       }
-      const buffs = chosenSpell.effects.buffs;
-      if (buffs) {
-        buffs.forEach((buff) =>
-          this.addCondition(
-            createBuff({
-              buffName: buff,
-              buffChance: 1.0,
-              attackPower: chosenSpell.effects.damage ?? 0,
-              armor: this.getArmorValue(),
-              maxHealth: this.getNonBuffedMaxHealth(),
-              maxSanity: this.getNonBuffedMaxSanity(),
-            }),
-          ),
-        );
+
+      let buffs: Condition[] = [];
+      if (chosenSpell.effects.buffs) {
+        chosenSpell.effects.buffs.forEach((buff) => {
+          const res = createBuff({
+            buffName: buff,
+            buffChance: 1.0,
+            attackPower: chosenSpell.effects.damage ?? 0,
+            armor: this.getArmorValue(),
+            maxHealth: this.getNonBuffedMaxHealth(),
+            maxSanity: this.getNonBuffedMaxSanity(),
+          });
+          if (res) {
+            this.addCondition(res);
+            buffs.push(res);
+          }
+        });
       }
-      this.conditionTicker();
+      let debuffs: Condition[] = [];
       if (chosenSpell.effects.debuffs) {
-        let debuffs: Condition[] = [];
         chosenSpell.effects.debuffs.forEach((debuff) => {
-          const debuffObj = conditions.find(
-            (condition) => condition.name == debuff.name,
-          );
-          if (!debuffObj)
-            throw new Error(
-              "no debuff found in debuff lookup loop in PlayerCharacter.useSpell()",
-            );
           const debuffRes = createDebuff({
             debuffName: debuff.name,
             debuffChance: debuff.chance,
-            enemyMaxHP: monsterMaxHP,
-            enemyMaxSanity: monsterMaxSanity,
+            enemyMaxHP: enemyMaxHP,
+            enemyMaxSanity: enemyMaxSanity,
             primaryAttackDamage: chosenSpell.effects.damage ?? 0,
           });
           if (debuffRes) debuffs.push(debuffRes);
         });
-        return {
-          damage: enemyDamage,
-          sanityDamage: chosenSpell.effects.sanityDamage ?? 0,
-          debuffs: debuffs,
-        };
-      } else
-        return {
-          damage: enemyDamage,
-          sanityDamage: chosenSpell.effects.sanityDamage ?? 0,
-          debuffs: null,
-        };
+      }
+      this.endTurn();
+      return {
+        name: chosenSpell.name,
+        damage: chosenSpell.effects.damage,
+        selfDamage: selfDamage,
+        sanityDamage: chosenSpell.effects.sanityDamage,
+        debuffs: debuffs.length > 0 ? debuffs : undefined,
+        buffs: buffs.length > 0 ? buffs : undefined,
+      };
     }
     throw new Error(
       "not enough mana to useSpell(), this should be prevented on frontend",
@@ -1347,6 +1369,32 @@ interface performLaborProps {
     health?: number;
   };
   title: string;
+}
+
+interface playerAttackDeps {
+  chosenAttack: AttackObj;
+  enemyMaxHP: number;
+  enemyMaxSanity: number | null;
+  enemyDR: number;
+}
+
+interface playerSpellDeps {
+  chosenSpell: {
+    name: string;
+    element: string;
+    proficiencyNeeded: number;
+    manaCost: number;
+    effects: {
+      damage: number | null;
+      sanityDamage?: number;
+      buffs: string[] | null;
+      debuffs: { name: string; chance: number }[] | null;
+      summon?: string[];
+      selfDamage?: number;
+    };
+  };
+  enemyMaxHP: number;
+  enemyMaxSanity: number | null;
 }
 
 function getStartingProficiencies(

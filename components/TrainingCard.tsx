@@ -98,36 +98,43 @@ const TrainingCard = observer(
                     playerState.gold < goldCostPerTick ||
                     !playerState.hasAllPreReqs(preRequisites)
                   }
-                  className="mb-2 mt-4 active:scale-95 active:opacity-50"
+                  className="mb-2 mt-4"
                   onPress={progressQualification}
                 >
-                  <View
-                    className="mx-auto rounded-xl"
-                    style={{
-                      shadowColor: "#000",
-                      shadowOffset: {
-                        width: 0,
-                        height: 1,
-                      },
-                      backgroundColor: playerState.hasAllPreReqs(preRequisites)
-                        ? colorScheme == "light"
-                          ? "white"
-                          : "#71717a"
-                        : colorScheme == "light"
-                        ? "#fafafa"
-                        : "#3f3f46",
-                      shadowOpacity: 0.1,
-                      shadowRadius: 5,
-                    }}
-                  >
-                    <View className="px-8 py-4">
-                      <Text className="text-center text-zinc-900 dark:text-zinc-50">
-                        {playerState.hasAllPreReqs(preRequisites)
-                          ? "Study"
-                          : "Locked"}
-                      </Text>
+                  {({ pressed }) => (
+                    <View
+                      className={`mx-auto rounded-xl ${
+                        pressed ? "scale-95 opacity-50" : ""
+                      }`}
+                      style={{
+                        shadowColor: "#000",
+                        shadowOffset: {
+                          width: 0,
+                          height: 1,
+                        },
+                        backgroundColor: playerState.hasAllPreReqs(
+                          preRequisites,
+                        )
+                          ? colorScheme == "light"
+                            ? "white"
+                            : "#71717a"
+                          : colorScheme == "light"
+                          ? "#fafafa"
+                          : "#3f3f46",
+                        elevation: 2,
+                        shadowOpacity: 0.1,
+                        shadowRadius: 5,
+                      }}
+                    >
+                      <View className="px-8 py-4">
+                        <Text className="text-center text-zinc-900 dark:text-zinc-50">
+                          {playerState.hasAllPreReqs(preRequisites)
+                            ? "Study"
+                            : "Locked"}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
+                  )}
                 </Pressable>
               ) : null}
               {playerState.hasAllPreReqs(preRequisites) ? (
