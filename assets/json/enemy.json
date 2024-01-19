@@ -11,6 +11,7 @@
          {"item": "big stick", "itemType":"weapon","chance":0.85}
       ],
       "goldDropRange": {"minimum": 0, "maximum":0},
+      "armorValue": null,
       "appearsIn": ["training grounds"],
       "appearsOn": [0]
    },
@@ -26,6 +27,7 @@
          {"item": "rat tail", "itemType":"ingredient","chance":0.5}
       ],
       "goldDropRange": {"minimum": 5, "maximum":15},
+      "armorValue": null,
       "appearsIn": ["nearby cave"],
       "appearsOn": [1,2]
    },
@@ -41,6 +43,7 @@
          {"item": "vampiric tooth", "itemType":"junk", "chance": 0.5}
       ],
       "goldDropRange": {"minimum": 5, "maximum":20},
+      "armorValue": null,
       "appearsIn": ["nearby cave"],
       "appearsOn": [1,2]
    },
@@ -56,6 +59,7 @@
          {"item": "bone", "itemType":"ingredient","chance":0.75},
          {"item": "dagger", "itemType":"weapon","chance":0.10}
       ],
+      "armorValue": 10,
       "goldDropRange": {"minimum": 10, "maximum":20},
       "appearsIn": ["nearby cave"],
       "appearsOn": [2,3]
@@ -77,6 +81,7 @@
          {"item": "short bow", "itemType":"bow", "chance": 0.10}
       ],
       "goldDropRange": {"minimum": 15, "maximum":25},
+      "armorValue": 10,
       "appearsIn": ["nearby cave"],
       "appearsOn": [2,3]
    },
@@ -92,6 +97,7 @@
          {"item": "chunk of flesh", "itemType":"junk","chance":0.75}
       ],
       "goldDropRange": {"minimum": 20, "maximum":25},
+      "armorValue": null,
       "appearsIn": ["nearby cave"],
       "appearsOn": [3]
    },
@@ -106,6 +112,7 @@
          {"item": "ghostly residue", "itemType":"ingredient","chance":0.5}
       ],
       "goldDropRange": {"minimum": 0, "maximum":0},
+      "armorValue": null,
       "appearsIn": ["nearby cave"],
       "appearsOn": [2,3]
    },
@@ -121,6 +128,7 @@
          {"item": "torch", "itemType":"weapon", "chance": 0.10}
       ],
       "goldDropRange": {"minimum": 35, "maximum":65},
+      "armorValue": 10,
       "appearsIn": ["goblin cave"],
       "appearsOn": [1,2]
    },
@@ -137,6 +145,7 @@
          {"item": "bone", "itemType":"ingredient","chance":0.75}
       ],
       "goldDropRange": {"minimum": 40, "maximum":55},
+      "armorValue": null,
       "appearsIn": ["goblin cave"],
       "appearsOn": [1,2]
    },
@@ -151,6 +160,7 @@
          {"item": "longsword", "itemType":"weapon","chance":0.10}
       ],
       "goldDropRange": {"minimum": 35, "maximum":65},
+      "armorValue": 10,
       "appearsIn": ["goblin cave"],
       "appearsOn": [2]
    },
@@ -166,6 +176,7 @@
          {"item": "dagger", "itemType":"weapon","chance":0.35}
       ],
       "goldDropRange": {"minimum": 185, "maximum":250},
+      "armorValue": null,
       "appearsIn": [""],
       "appearsOn": []
    },
@@ -183,6 +194,7 @@
          {"item": "leather headgear", "itemType":"helmet","chance":0.15}
       ],
       "goldDropRange": {"minimum": 30, "maximum":50},
+      "armorValue": 15,
       "appearsIn": ["bandit hideout"],
       "appearsOn": [1,2]
    }

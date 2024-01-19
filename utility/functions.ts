@@ -337,7 +337,7 @@ interface createBuffDeps {
   buffChance: number;
   attackPower: number;
   maxHealth: number;
-  maxSanity: number;
+  maxSanity: number | null;
   armor: number;
 }
 
@@ -364,7 +364,11 @@ export function createBuff({
         }
       }
       let sanityHeal = 0;
-      if (buffObj.effect.includes("sanity heal") && buffObj.effectAmount) {
+      if (
+        buffObj.effect.includes("sanity heal") &&
+        buffObj.effectAmount &&
+        maxSanity
+      ) {
         heal = buffObj.effectAmount;
         if (buffObj.effectStyle == "multiplier") {
           sanityHeal *= attackPower;
@@ -470,6 +474,8 @@ export function getConditionEffectsOnDefenses(suppliedConditions: Condition[]) {
   let armorFlat = 0;
   let healthMult = 1;
   let healthFlat = 0;
+  let sanityFlat = 0;
+  let sanityMult = 1;
   suppliedConditions.forEach((condition) => {
     if (
       condition.effect.includes("armor increase") &&
@@ -520,12 +526,34 @@ export function getConditionEffectsOnDefenses(suppliedConditions: Condition[]) {
         healthMult *= 1 - condition.effectMagnitude;
       }
     }
+    if (
+      condition.effect.includes("sanityMax increase") &&
+      condition.effectMagnitude
+    ) {
+      if (condition.effectStyle == "flat") {
+        sanityFlat += condition.effectMagnitude;
+      } else if (condition.effectStyle == "multiplier") {
+        sanityMult *= 1 + condition.effectMagnitude;
+      }
+    }
+    if (
+      condition.effect.includes("sanityMax decrease") &&
+      condition.effectMagnitude
+    ) {
+      if (condition.effectStyle == "flat") {
+        sanityFlat -= condition.effectMagnitude;
+      } else if (condition.effectStyle == "multiplier") {
+        sanityMult *= 1 - condition.effectMagnitude;
+      }
+    }
   });
   return {
     armorMult: armorMult,
     armorFlat: armorFlat,
     healthMult: healthMult,
     healthFlat: healthFlat,
+    sanityMult: sanityMult,
+    sanityFlat: sanityFlat,
   };
 }
 

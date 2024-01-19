@@ -1,5 +1,5 @@
-import enemies from "../assets/json/monsters.json";
-import { Monster } from "../classes/creatures";
+import enemies from "../assets/json/enemy.json";
+import { Enemy } from "../classes/creatures";
 
 function pickRandomEnemyJSON(instance: string, level: number) {
   const enemiesInThisInstance = enemies.filter((enemy) =>
@@ -22,17 +22,19 @@ export function enemyGenerator(instance: string, level: number) {
     enemyJSON.healthRange.minimum,
     enemyJSON.healthRange.maximum,
   );
+
   const enemyAttackPower = getNumberInRange(
     enemyJSON.attackPowerRange.minimum,
     enemyJSON.attackPowerRange.maximum,
   );
 
-  const enemy = new Monster({
+  const enemy = new Enemy({
     creatureSpecies: enemyJSON.name,
     health: enemyHealth,
     healthMax: enemyHealth,
     sanity: enemyJSON.sanity ?? null,
     sanityMax: enemyJSON.sanity ?? null,
+    baseArmor: enemyJSON.armorValue ?? undefined,
     attackPower: enemyAttackPower,
     energy: enemyJSON.energy?.maximum,
     energyMax: enemyJSON.energy?.maximum,
@@ -49,7 +51,7 @@ type ImageInfo = {
   heightOffset?: number;
 };
 
-export const MonsterImageMap: Record<string, ImageInfo> = {
+export const EnemyImageMap: Record<string, ImageInfo> = {
   "air mage": {
     source: require("../assets/images/monsters/air_mage.png"),
     width: 160,
@@ -140,11 +142,6 @@ export const MonsterImageMap: Record<string, ImageInfo> = {
     source: require("../assets/images/monsters/training_dummy.png"),
     width: 150,
     height: 150,
-  },
-  "venomous spider": {
-    source: require("../assets/images/monsters/venomous_spider.png"),
-    width: 140,
-    height: 140,
   },
   "water mage": {
     source: require("../assets/images/monsters/water_mage.png"),

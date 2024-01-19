@@ -7,15 +7,14 @@ import {
   StyleSheet,
 } from "react-native";
 import { useContext, useEffect, useState } from "react";
-import { MonsterImage } from "../../components/MonsterImage";
+import { EnemyImage } from "../../components/EnemyImage";
 import { Pressable, Modal as NativeModal } from "react-native";
 import { Stack, useLocalSearchParams, router } from "expo-router";
 import BattleTab from "../../components/BattleTab";
 import { flipCoin, toTitleCase } from "../../utility/functions";
-import { enemyGenerator } from "../../utility/monster";
+import { enemyGenerator } from "../../utility/enemy";
 import PlayerStatus from "../../components/PlayerStatus";
 import ProgressBar from "../../components/ProgressBar";
-import monsterObjects from "../../assets/json/monsters.json";
 import { DungeonInstance, DungeonLevel } from "../../classes/dungeon";
 import { Item } from "../../classes/item";
 import Coins from "../../assets/icons/CoinsIcon";
@@ -23,7 +22,7 @@ import { useIsFocused } from "@react-navigation/native";
 import {
   GameContext,
   LogsContext,
-  MonsterContext,
+  EnemyContext,
   PlayerCharacterContext,
 } from "../_layout";
 import { observer } from "mobx-react-lite";
@@ -32,25 +31,24 @@ import { useColorScheme } from "nativewind";
 import FadeOutText from "../../components/FadeOutText";
 import { useVibration } from "../../utility/customHooks";
 import { EnemyHealingAnimationBox } from "../../components/EnemyHealingAnimationBox";
-import { Minion, Monster } from "../../classes/creatures";
+import { Minion, Enemy } from "../../classes/creatures";
 import SackIcon from "../../assets/icons/SackIcon";
 import TutorialModal from "../../components/TutorialModal";
 import GenericModal from "../../components/GenericModal";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
-  const playerCharacterData = useContext(PlayerCharacterContext);
-  if (!playerCharacterData) throw new Error("missing player context");
-  const { playerState } = playerCharacterData;
-  const gameData = useContext(GameContext);
-  if (!gameData) throw new Error("missing game context");
-  const { gameState } = gameData;
-  const monsterData = useContext(MonsterContext);
-  if (!monsterData) throw new Error("missing monster context");
-  const { monsterState, setMonster } = monsterData;
-  const logsData = useContext(LogsContext);
-  if (!logsData) throw new Error("missing logs context");
-  const { logsState } = logsData;
+  const playerCharacterContext = useContext(PlayerCharacterContext);
+  const gameContext = useContext(GameContext);
+  const enemyContext = useContext(EnemyContext);
+  const logsContext = useContext(LogsContext);
+  if (!playerCharacterContext || !gameContext || !enemyContext || !logsContext)
+    throw new Error("missing context");
+  const { playerState } = playerCharacterContext;
+  const { gameState } = gameContext;
+  const { enemyState, setEnemy } = enemyContext;
+  const { logsState } = logsContext;
+
   const { slug } = useLocalSearchParams();
   const [fightingBoss, setFightingBoss] = useState<boolean>(false);
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
@@ -65,7 +63,7 @@ const DungeonLevelScreen = observer(() => {
     itemDrops: Item[];
     gold: number;
   } | null>(null);
-  const [monsterAttacked, setMonsterAttacked] = useState<boolean>(false);
+  const [enemyAttacked, setEnemyAttacked] = useState<boolean>(false);
   const [leftBehindDrops, setLeftBehindDrops] = useState<Item[]>([]);
   const [showLeftBehindItemsScreen, setShowLeftBehindItemsScreen] =
     useState<boolean>(false);
@@ -79,26 +77,26 @@ const DungeonLevelScreen = observer(() => {
     spell: boolean | null;
   }>({ showing: false, chosenAttack: null, spell: null });
 
-  const [monsterHealthRecord, setMonsterHealthRecord] = useState<
+  const [enemyHealthRecord, setEnemyHealthRecord] = useState<
     number | undefined
-  >(monsterState?.health);
-  const [monsterHealthDiff, setMonsterHealthDiff] = useState<number>(0);
-  const [showingMonsterHealthChange, setShowingMonsterHealthChange] =
+  >(enemyState?.health);
+  const [enemyHealthDiff, setEnemyHealthDiff] = useState<number>(0);
+  const [showingEnemyHealthChange, setShowingEnemyHealthChange] =
     useState<boolean>(false);
   const [animationCycler, setAnimationCycler] = useState<number>(0);
   const [attackAnimationOnGoing, setAttackAnimationOnGoing] =
     useState<boolean>(false);
 
-  const monsterAttackAnimationValue = useState(new Animated.Value(0))[0];
-  const monsterDamagedAnimationValue = useState(new Animated.Value(1))[0];
+  const enemyAttackAnimationValue = useState(new Animated.Value(0))[0];
+  const enemyDamagedAnimationValue = useState(new Animated.Value(1))[0];
 
-  const [monsterTextString, setMonsterTextString] = useState<string>();
-  const monsterTextFadeAnimation = useState(new Animated.Value(1))[0];
-  const monsterTextTranslateAnimation = useState(new Animated.Value(0))[0];
+  const [enemyTextString, setEnemyTextString] = useState<string>();
+  const enemyTextFadeAnimation = useState(new Animated.Value(1))[0];
+  const enemyTextTranslateAnimation = useState(new Animated.Value(0))[0];
 
-  const [monsterAttackDummy, setMonsterAttackDummy] = useState<number>(0);
-  const [monsterHealDummy, setMonsterHealDummy] = useState<number>(0);
-  const [monsterTextDummy, setMonsterTextDummy] = useState<number>(0);
+  const [enemyAttackDummy, setEnemyAttackDummy] = useState<number>(0);
+  const [enemyHealDummy, setEnemyHealDummy] = useState<number>(0);
+  const [enemyTextDummy, setEnemyTextDummy] = useState<number>(0);
 
   const isFocused = useIsFocused();
   const vibration = useVibration();
@@ -107,33 +105,33 @@ const DungeonLevelScreen = observer(() => {
     throw new Error("No player character or game data on dungeon level");
   }
 
-  //------------dungeon/monster state setting---------//
+  //------------dungeon/Enemy state setting---------//
   useEffect(() => {
     setInstanceName(slug[0]);
     setLevel(Number(slug[1]));
   }, [slug]);
 
   useEffect(() => {
-    if (!fightingBoss && !monsterState) {
+    if (!fightingBoss && !enemyState) {
       getEnemy();
     }
-  }, [monsterState]);
+  }, [enemyState]);
 
   useEffect(() => {
     if (
-      monsterState &&
-      monsterHealthRecord &&
-      monsterState.health != monsterHealthRecord
+      enemyState &&
+      enemyHealthRecord &&
+      enemyState.health != enemyHealthRecord
     ) {
-      setMonsterHealthDiff(monsterState.health - monsterHealthRecord);
+      setEnemyHealthDiff(enemyState.health - enemyHealthRecord);
       setAnimationCycler(animationCycler + 1);
-      setShowingMonsterHealthChange(true);
+      setShowingEnemyHealthChange(true);
     } else {
-      setMonsterHealthDiff(0);
-      setShowingMonsterHealthChange(false);
+      setEnemyHealthDiff(0);
+      setShowingEnemyHealthChange(false);
     }
-    setMonsterHealthRecord(monsterState?.health);
-  }, [monsterState?.health]);
+    setEnemyHealthRecord(enemyState?.health);
+  }, [enemyState?.health]);
 
   useEffect(() => {
     setThisDungeon(gameState.getDungeon(instanceName, level));
@@ -144,12 +142,12 @@ const DungeonLevelScreen = observer(() => {
   useEffect(() => {
     if (!firstLoad) {
       Animated.sequence([
-        Animated.timing(monsterAttackAnimationValue, {
+        Animated.timing(enemyAttackAnimationValue, {
           toValue: -50,
           duration: 200,
           useNativeDriver: true,
         }),
-        Animated.timing(monsterAttackAnimationValue, {
+        Animated.timing(enemyAttackAnimationValue, {
           toValue: 0,
           duration: 200,
           useNativeDriver: true,
@@ -158,18 +156,18 @@ const DungeonLevelScreen = observer(() => {
         setAttackAnimationOnGoing(false);
       });
     }
-  }, [monsterAttackDummy]);
+  }, [enemyAttackDummy]);
 
   useEffect(() => {
-    if (monsterHealthDiff < 0) {
+    if (enemyHealthDiff < 0) {
       Animated.loop(
         Animated.sequence([
-          Animated.timing(monsterDamagedAnimationValue, {
+          Animated.timing(enemyDamagedAnimationValue, {
             toValue: 0.5,
             duration: 200,
             useNativeDriver: true,
           }),
-          Animated.timing(monsterDamagedAnimationValue, {
+          Animated.timing(enemyDamagedAnimationValue, {
             toValue: 1,
             duration: 200,
             useNativeDriver: true,
@@ -178,47 +176,47 @@ const DungeonLevelScreen = observer(() => {
         { iterations: 2 },
       ).start(() => {
         setTimeout(() => {
-          setShowingMonsterHealthChange(false);
-          setMonsterHealthDiff(0);
+          setShowingEnemyHealthChange(false);
+          setEnemyHealthDiff(0);
         }, 500);
       });
     }
-  }, [monsterHealthDiff]);
+  }, [enemyHealthDiff]);
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(monsterTextFadeAnimation, {
+      Animated.timing(enemyTextFadeAnimation, {
         toValue: 0,
         duration: 1000,
         useNativeDriver: true,
       }),
-      Animated.timing(monsterTextTranslateAnimation, {
+      Animated.timing(enemyTextTranslateAnimation, {
         toValue: -100,
         duration: 1000,
         useNativeDriver: true,
       }),
     ]).start(() => {
-      monsterTextFadeAnimation.setValue(1);
-      monsterTextTranslateAnimation.setValue(0);
-      setMonsterTextString(undefined);
+      enemyTextFadeAnimation.setValue(1);
+      enemyTextTranslateAnimation.setValue(0);
+      setEnemyTextString(undefined);
     });
-  }, [monsterTextDummy]);
+  }, [enemyTextDummy]);
 
-  //------------monster combat functions------------//
+  //------------Enemy combat functions------------//
   const enemyTurnCheck = () => {
-    if (monsterState) {
+    if (enemyState) {
       if (
-        monsterState.health <= 0 ||
-        (monsterState.sanity && monsterState.sanity <= 0)
+        enemyState.health <= 0 ||
+        (enemyState.sanity && enemyState.sanity <= 0)
       ) {
         gameState?.gameTick(playerState);
         if (thisDungeon?.level != 0) {
           thisDungeon?.incrementStep();
         }
         battleLogger(
-          `You defeated the ${toTitleCase(monsterState.creatureSpecies)}`,
+          `You defeated the ${toTitleCase(enemyState.creatureSpecies)}`,
         );
-        const drops = monsterState.getDrops(playerState.playerClass);
+        const drops = enemyState.getDrops(playerState.playerClass);
         playerState.addGold(drops.gold);
         setDroppedItems(drops);
         if (fightingBoss && gameState && thisDungeon) {
@@ -226,7 +224,7 @@ const DungeonLevelScreen = observer(() => {
           thisDungeon.setBossDefeated();
           gameState.openNextDungeonLevel(thisInstance!.name);
         }
-        setMonster(null);
+        setEnemy(null);
       } else {
         enemyTurn();
       }
@@ -234,12 +232,13 @@ const DungeonLevelScreen = observer(() => {
   };
 
   const enemyTurn = () => {
-    if (monsterState) {
-      setMonsterAttacked(true);
-      const enemyAttackRes = monsterState.takeTurn(
-        playerState.getMaxHealth(),
-        playerState.getDamageReduction(),
-      );
+    if (enemyState) {
+      setEnemyAttacked(true);
+      const enemyAttackRes = enemyState.takeTurn({
+        defenderMaxHealth: playerState.getNonBuffedMaxHealth(),
+        defenderMaxSanity: playerState.getNonBuffedMaxSanity(),
+        defenderDR: playerState.getDamageReduction(),
+      });
       if (
         enemyAttackRes !== "miss" &&
         enemyAttackRes !== "stun" &&
@@ -254,7 +253,7 @@ const DungeonLevelScreen = observer(() => {
         }
         let array = [];
         let line = `The ${toTitleCase(
-          monsterState.creatureSpecies,
+          enemyState.creatureSpecies,
         )} used ${toTitleCase(enemyAttackRes.name)}${
           enemyAttackRes.damage
             ? ` dealing ${enemyAttackRes.damage} health damage`
@@ -264,11 +263,11 @@ const DungeonLevelScreen = observer(() => {
         if (enemyAttackRes.heal) {
           array.push(`healing for ${enemyAttackRes.heal} health`);
           setTimeout(() => {
-            setMonsterHealDummy((prev) => prev + 1);
+            setEnemyHealDummy((prev) => prev + 1);
           }, 250);
         }
 
-        if (enemyAttackRes.sanityDamage > 0) {
+        if (enemyAttackRes.sanityDamage && enemyAttackRes.sanityDamage > 0) {
           array.push(`dealing ${enemyAttackRes.sanityDamage} sanity damage`);
         }
 
@@ -297,34 +296,34 @@ const DungeonLevelScreen = observer(() => {
         }
         battleLogger(line);
         if (enemyAttackRes.damage > 0) {
-          setMonsterAttackDummy((prev) => prev + 1);
+          setEnemyAttackDummy((prev) => prev + 1);
         }
       } else if (enemyAttackRes == "pass") {
         battleLogger(
-          `The ${toTitleCase(monsterState.creatureSpecies)} did nothing`,
+          `The ${toTitleCase(enemyState.creatureSpecies)} did nothing`,
         );
-        setMonsterTextString(enemyAttackRes);
-        setMonsterTextDummy((prev) => prev + 1);
+        setEnemyTextString(enemyAttackRes);
+        setEnemyTextDummy((prev) => prev + 1);
       } else {
         battleLogger(
-          `The ${toTitleCase(monsterState.creatureSpecies)} ${
+          `The ${toTitleCase(enemyState.creatureSpecies)} ${
             enemyAttackRes == "stun" ? "was " : ""
           }${enemyAttackRes}ed`,
         );
         if (enemyAttackRes == "miss") {
-          setMonsterAttackDummy((prev) => prev + 1);
+          setEnemyAttackDummy((prev) => prev + 1);
         }
         setTimeout(
           () => {
-            setMonsterTextString(enemyAttackRes as "miss" | "stun");
-            setMonsterTextDummy((prev) => prev + 1);
+            setEnemyTextString(enemyAttackRes as "miss" | "stun");
+            setEnemyTextDummy((prev) => prev + 1);
           },
           enemyAttackRes == "miss" ? 500 : 0,
         );
       }
-      monsterState.conditionTicker();
-      if (monsterState.minions.length > 0) {
-        enemyMinionsTurn(monsterState.minions);
+      enemyState.conditionTicker();
+      if (enemyState.minions.length > 0) {
+        enemyMinionsTurn(enemyState.minions);
       }
       setTimeout(() => {
         setAttackAnimationOnGoing(false);
@@ -332,22 +331,22 @@ const DungeonLevelScreen = observer(() => {
     }
   };
 
-  function monsterHealthChangePopUp() {
+  function EnemyHealthChangePopUp() {
     return (
       <NonThemedView className="h-4">
         <FadeOutText
           className={"text-red-400"}
           text={`${
-            monsterHealthDiff > 0 ? "+" : ""
-          }${monsterHealthDiff.toString()}`}
+            enemyHealthDiff > 0 ? "+" : ""
+          }${enemyHealthDiff.toString()}`}
           animationCycler={animationCycler}
         />
       </NonThemedView>
     );
   }
 
-  function monsterConditionRender() {
-    if (monsterState) {
+  function EnemyConditionRender() {
+    if (enemyState) {
       let simplifiedConditionsMap: Map<
         string,
         {
@@ -357,7 +356,7 @@ const DungeonLevelScreen = observer(() => {
         }
       > = new Map();
 
-      monsterState.conditions.forEach((condition) => {
+      enemyState.conditions.forEach((condition) => {
         if (simplifiedConditionsMap.has(condition.name)) {
           let existingCondition = simplifiedConditionsMap.get(condition.name)!;
           existingCondition.count += 1;
@@ -397,10 +396,13 @@ const DungeonLevelScreen = observer(() => {
     const enemy = enemyGenerator(instanceName, level);
     setTimeout(
       () => {
-        setMonster(enemy);
-        setMonsterAttacked(false);
+        setEnemy(enemy);
+        setEnemyAttacked(false);
         battleLogger(`You found a ${toTitleCase(enemy.creatureSpecies)}!`);
         setAttackAnimationOnGoing(false);
+        if (firstLoad) {
+          setFirstLoad(false);
+        }
       },
       firstLoad ? 0 : 500,
     );
@@ -408,11 +410,11 @@ const DungeonLevelScreen = observer(() => {
 
   const loadBoss = () => {
     setFightingBoss(true);
-    setMonster(null);
+    setEnemy(null);
     setTimeout(() => {
       if (thisDungeon && thisInstance && playerState) {
         const boss = thisDungeon.getBoss(thisInstance.name)[0];
-        setMonster(boss);
+        setEnemy(boss);
         battleLogger(`You found the boss!`);
       }
     }, 250);
@@ -428,11 +430,15 @@ const DungeonLevelScreen = observer(() => {
       sanityDamage: number;
       debuffs: { name: string; chance: number }[] | null;
     },
-    target: Monster | Minion,
+    target: Enemy | Minion,
   ) => {
     setAttackAnimationOnGoing(true);
     if (target && playerState && isFocused) {
-      const attackRes = playerState.doPhysicalAttack(attack, target.healthMax);
+      const attackRes = playerState.doPhysicalAttack(
+        attack,
+        target.getMaxHealth(),
+        target.getMaxSanity(),
+      );
       if (attackRes !== "miss") {
         target.damageHealth(attackRes.damage);
         target.damageSanity(attackRes.sanityDamage) ?? null;
@@ -462,7 +468,7 @@ const DungeonLevelScreen = observer(() => {
           `You ${attackRes}ed the ${toTitleCase(target.creatureSpecies)}`,
         );
       }
-      if (target instanceof Monster) {
+      if (target instanceof Enemy) {
         if (target.health <= 0 || (target.sanity && target.sanity <= 0)) {
           setTimeout(() => {
             enemyTurnCheck();
@@ -500,11 +506,15 @@ const DungeonLevelScreen = observer(() => {
         selfDamage?: number;
       };
     },
-    target: Monster | Minion,
+    target: Enemy | Minion,
   ) => {
     setAttackAnimationOnGoing(true);
     if (playerState && isFocused) {
-      const spellRes = playerState.useSpell(spell, target.healthMax);
+      const spellRes = playerState.useSpell(
+        spell,
+        target.getMaxHealth(),
+        target.getMaxSanity(),
+      );
       target.damageHealth(spellRes.damage);
       target.damageSanity(spellRes.sanityDamage);
       spellRes.debuffs?.forEach((debuff) => target.addCondition(debuff));
@@ -535,7 +545,7 @@ const DungeonLevelScreen = observer(() => {
       }
       battleLogger(line);
 
-      if (target instanceof Monster) {
+      if (target instanceof Enemy) {
         if (target.health <= 0 || (target.sanity && target.sanity <= 0)) {
           setTimeout(() => {
             enemyTurnCheck();
@@ -560,10 +570,10 @@ const DungeonLevelScreen = observer(() => {
   };
 
   const pass = () => {
-    if (monsterState && playerState && isFocused) {
+    if (enemyState && playerState && isFocused) {
       playerState.pass();
       battleLogger("You passed!");
-      playerMinionsTurn(playerState.minions, monsterState.id);
+      playerMinionsTurn(playerState.minions, enemyState.id);
       setTimeout(() => {
         enemyTurnCheck();
       }, 1000 * playerState.minions.length);
@@ -571,13 +581,13 @@ const DungeonLevelScreen = observer(() => {
   };
 
   const flee = () => {
-    if (playerState && monsterState) {
+    if (playerState && enemyState) {
       const roll = flipCoin();
       if (
         playerState &&
         (roll == "Heads" ||
-          monsterState?.creatureSpecies == "training dummy" ||
-          !monsterAttacked)
+          enemyState?.creatureSpecies == "training dummy" ||
+          !enemyAttacked)
       ) {
         vibration({ style: "light" });
         setFleeRollFailure(false);
@@ -591,13 +601,13 @@ const DungeonLevelScreen = observer(() => {
           playerState.setInDungeon({ state: false });
         }, 200);
         setTimeout(() => {
-          setMonster(null);
+          setEnemy(null);
         }, 500);
       } else {
         setFleeRollFailure(true);
         vibration({ style: "error" });
         battleLogger("You failed to flee!");
-        playerMinionsTurn(playerState.minions, monsterState.id);
+        playerMinionsTurn(playerState.minions, enemyState.id);
         setTimeout(() => {
           enemyTurnCheck();
         }, 1000 * playerState.minions.length);
@@ -608,40 +618,56 @@ const DungeonLevelScreen = observer(() => {
   //------------minion functions------------//
   function playerMinionsTurn(
     suppliedMinions: Minion[],
-    startOfTurnMonsterID: string,
+    startOfTurnEnemyID: string,
   ) {
-    if (monsterState && playerState) {
+    if (enemyState && playerState) {
       for (
         let i = 0;
         i < suppliedMinions.length &&
-        monsterState.equals(startOfTurnMonsterID) &&
-        monsterState.health > 0;
+        enemyState.equals(startOfTurnEnemyID) &&
+        enemyState.health > 0;
         i++
       ) {
         setTimeout(() => {
-          const res = suppliedMinions[i].attack(monsterState.healthMax);
+          const res = suppliedMinions[i].takeTurn({
+            defenderMaxHealth: enemyState.healthMax,
+            defenderMaxSanity: enemyState.healthMax,
+            defenderDR: enemyState.getDamageReduction(),
+          });
           if (res == "miss") {
             battleLogger(
               `${playerState.getFullName()}'s ${toTitleCase(
                 suppliedMinions[i].creatureSpecies,
               )} missed!`,
             );
+          } else if (res == "stun") {
+            battleLogger(
+              `${playerState.getFullName()}'s ${toTitleCase(
+                suppliedMinions[i].creatureSpecies,
+              )} was stunned!`,
+            );
+          } else if (res == "pass") {
+            battleLogger(
+              `${playerState.getFullName()}'s ${toTitleCase(
+                suppliedMinions[i].creatureSpecies,
+              )} passed!`,
+            );
           } else {
             let str = `${playerState.getFullName()}'s ${toTitleCase(
               suppliedMinions[i].creatureSpecies,
             )} used ${toTitleCase(res.name)} dealing ${res.damage} damage`;
-            monsterState.damageHealth(res.damage);
+            enemyState.damageHealth(res.damage);
             if (res.heal && res.heal > 0) {
               str += ` and healed for ${res.heal} damage`;
             }
-            if (res.sanityDamage > 0) {
+            if (res.sanityDamage && res.sanityDamage > 0) {
               str += ` and ${res.sanityDamage} sanity damage`;
-              monsterState.damageSanity(res.sanityDamage);
+              enemyState.damageSanity(res.sanityDamage);
             }
             if (res.debuffs) {
               res.debuffs.forEach((effect) => {
                 str += ` and applied a ${effect.name} stack`;
-                monsterState.addCondition(effect);
+                enemyState.addCondition(effect);
               });
             }
             battleLogger(str);
@@ -655,19 +681,35 @@ const DungeonLevelScreen = observer(() => {
   }
 
   function enemyMinionsTurn(suppliedMinions: Minion[]) {
-    if (monsterState && playerState) {
+    if (enemyState && playerState) {
       for (let i = 0; i < suppliedMinions.length; i++) {
         setTimeout(() => {
-          const res = suppliedMinions[i].attack(playerState.healthMax);
+          const res = suppliedMinions[i].takeTurn({
+            defenderMaxHealth: playerState.getNonBuffedMaxHealth(),
+            defenderMaxSanity: playerState.getNonBuffedMaxSanity(),
+            defenderDR: playerState.getDamageReduction(),
+          });
           if (res == "miss") {
             battleLogger(
-              `${toTitleCase(monsterState.creatureSpecies)}'s ${toTitleCase(
+              `${toTitleCase(enemyState.creatureSpecies)}'s ${toTitleCase(
                 suppliedMinions[i].creatureSpecies,
               )} missed!`,
             );
+          } else if (res == "stun") {
+            battleLogger(
+              `${toTitleCase(enemyState.creatureSpecies)}'s ${toTitleCase(
+                suppliedMinions[i].creatureSpecies,
+              )} was stunned!`,
+            );
+          } else if (res == "pass") {
+            battleLogger(
+              `${toTitleCase(enemyState.creatureSpecies)}'s ${toTitleCase(
+                suppliedMinions[i].creatureSpecies,
+              )} passed!`,
+            );
           } else {
             let str = `${toTitleCase(
-              monsterState.creatureSpecies,
+              enemyState.creatureSpecies,
             )}'s ${toTitleCase(
               suppliedMinions[i].creatureSpecies,
             )} used ${toTitleCase(res.name)} dealing ${res.damage} damage`;
@@ -675,7 +717,7 @@ const DungeonLevelScreen = observer(() => {
             if (res.heal && res.heal > 0) {
               str += ` and healed for ${res.heal} damage`;
             }
-            if (res.sanityDamage > 0) {
+            if (res.sanityDamage && res.sanityDamage > 0) {
               str += ` and ${res.sanityDamage} sanity damage`;
               playerState.damageSanity(res.sanityDamage);
             }
@@ -688,7 +730,7 @@ const DungeonLevelScreen = observer(() => {
             battleLogger(str);
           }
           if (suppliedMinions[i].turnsLeftAlive <= 0) {
-            monsterState.removeMinion(suppliedMinions[i]);
+            enemyState.removeMinion(suppliedMinions[i]);
           }
         }, 1000 * i);
       }
@@ -815,10 +857,10 @@ const DungeonLevelScreen = observer(() => {
 
   //-----------render---------//
   function targetSelectionRender() {
-    if (monsterState) {
-      let targets: (Monster | Minion)[] = [];
-      targets.push(monsterState);
-      monsterState.minions.forEach((minion) => {
+    if (enemyState) {
+      let targets: (Enemy | Minion)[] = [];
+      targets.push(enemyState);
+      enemyState.minions.forEach((minion) => {
         targets.push(minion);
       });
 
@@ -845,8 +887,8 @@ const DungeonLevelScreen = observer(() => {
             >
               <NonThemedView className="flex flex-row justify-evenly">
                 <NonThemedView className="my-auto">
-                  <MonsterImage
-                    monsterSpecies={target.creatureSpecies}
+                  <EnemyImage
+                    creatureSpecies={target.creatureSpecies}
                     widthOverride={60}
                     heightOverride={60}
                   />
@@ -873,7 +915,7 @@ const DungeonLevelScreen = observer(() => {
     }
   }
 
-  while (!monsterState) {
+  while (!enemyState) {
     return (
       <View className="flex-1 px-4 pt-4">
         <NonThemedView className="flex h-[35%] flex-row justify-evenly" />
@@ -1019,7 +1061,7 @@ const DungeonLevelScreen = observer(() => {
           }}
           pageTwo={{
             title: "Advance by killing the boss.",
-            body: "The first boss becomes availible after 10 monsters defeated for the first dungeon.",
+            body: "The first boss becomes availible after 10 Enemys defeated for the first dungeon.",
           }}
           pageThree={{
             title: "Good Luck.",
@@ -1260,68 +1302,67 @@ const DungeonLevelScreen = observer(() => {
                 style={{ minWidth: "40%" }}
               >
                 <Text className="text-center text-3xl">
-                  {toTitleCase(monsterState.creatureSpecies).replace(" ", "\n")}
+                  {toTitleCase(enemyState.creatureSpecies).replace(" ", "\n")}
                 </Text>
                 <ProgressBar
-                  value={monsterState.health >= 0 ? monsterState.health : 0}
-                  maxValue={monsterState.healthMax}
+                  value={enemyState.health >= 0 ? enemyState.health : 0}
+                  maxValue={enemyState.healthMax}
                   filledColor="#ef4444"
                   unfilledColor="#fee2e2"
                   displayNumber={
-                    monsterState.creatureSpecies.toLowerCase() ==
-                    "training dummy"
+                    enemyState.creatureSpecies.toLowerCase() == "training dummy"
                       ? true
                       : false
                   }
                   removeAtZero={true}
                 />
-                {showingMonsterHealthChange ? (
-                  monsterHealthChangePopUp()
+                {showingEnemyHealthChange ? (
+                  EnemyHealthChangePopUp()
                 ) : (
                   <NonThemedView className="h-4" />
                 )}
-                {monsterConditionRender()}
+                {EnemyConditionRender()}
               </View>
               <View className="my-auto">
                 <Animated.View
                   style={{
                     transform: [
-                      { translateX: monsterAttackAnimationValue },
+                      { translateX: enemyAttackAnimationValue },
                       {
                         translateY: Animated.multiply(
-                          monsterAttackAnimationValue,
+                          enemyAttackAnimationValue,
                           -1.5,
                         ),
                       },
                     ],
-                    opacity: monsterDamagedAnimationValue,
+                    opacity: enemyDamagedAnimationValue,
                   }}
                 >
-                  <MonsterImage monsterSpecies={monsterState.creatureSpecies} />
+                  <EnemyImage creatureSpecies={enemyState.creatureSpecies} />
                 </Animated.View>
                 <Animated.View
                   style={{
-                    transform: [{ translateY: monsterTextTranslateAnimation }],
-                    opacity: monsterTextFadeAnimation,
+                    transform: [{ translateY: enemyTextTranslateAnimation }],
+                    opacity: enemyTextFadeAnimation,
                     position: "absolute",
                     marginLeft: 48,
                     marginTop: 48,
                   }}
                 >
-                  {monsterTextString ? (
+                  {enemyTextString ? (
                     <Text className="text-xl tracking-wide">
-                      *{toTitleCase(monsterTextString)}*
+                      *{toTitleCase(enemyTextString)}*
                     </Text>
                   ) : null}
                 </Animated.View>
                 <View className="-mr-8">
                   <EnemyHealingAnimationBox
-                    showHealAnimationDummy={monsterHealDummy}
+                    showHealAnimationDummy={enemyHealDummy}
                   />
                 </View>
               </View>
             </NonThemedView>
-            {monsterState.minions.length > 0 ? (
+            {enemyState.minions.length > 0 ? (
               <NonThemedView className="mx-4">
                 <View style={styles.container}>
                   <View style={styles.line} />
@@ -1331,7 +1372,7 @@ const DungeonLevelScreen = observer(() => {
                   <View style={styles.line} />
                 </View>
                 <View className="mx-4 flex flex-row flex-wrap">
-                  {monsterState.minions.map((minion) => (
+                  {enemyState.minions.map((minion) => (
                     <View
                       key={minion.id}
                       className="flex-grow px-2 py-1"

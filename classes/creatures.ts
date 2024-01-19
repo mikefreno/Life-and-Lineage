@@ -1,11 +1,12 @@
-import attacks from "../assets/json/monsterAttacks.json";
-import monsters from "../assets/json/monsters.json";
+import attacks from "../assets/json/enemyAttacks.json";
+import enemies from "../assets/json/enemy.json";
 import {
   createBuff,
   createDebuff,
-  flipCoin,
+  damageReduction,
   getConditionEffectsOnAttacks,
   getConditionEffectsOnDefenses,
+  getConditionEffectsOnMisc,
   getRandomInt,
   rollD20,
 } from "../utility/functions";
@@ -33,24 +34,30 @@ import { Item } from "./item";
 import { action, makeObservable, observable } from "mobx";
 import summons from "../assets/json/summons.json";
 
-interface monsterInterface {
+type CreatureType = {
   id?: string;
   creatureSpecies: string;
   health: number;
   healthMax: number;
-  sanity: number | null;
-  sanityMax: number | null;
+  sanity?: number | null;
+  sanityMax?: number | null;
   attackPower: number;
   baseArmor?: number;
-  minions?: Minion[];
-  energy: number;
-  energyMax: number;
-  energyRegen: number;
+  energy?: number;
+  energyMax?: number;
+  energyRegen?: number;
   attacks: string[];
   conditions?: Condition[];
-}
+};
 
-export class Monster {
+type EnemyType = CreatureType & {
+  minions?: Minion[];
+};
+type MinionType = CreatureType & {
+  turnsLeftAlive: number;
+};
+
+export class Creature {
   readonly id: string;
   readonly creatureSpecies: string;
   health: number;
@@ -59,11 +66,10 @@ export class Monster {
   readonly sanityMax: number | null;
   readonly attackPower: number;
   readonly baseArmor: number;
-  energy: number;
-  readonly energyMax: number;
-  readonly energyRegen: number;
+  energy: number | null;
+  readonly energyMax: number | null;
+  readonly energyRegen: number | null;
   readonly attacks: string[];
-  minions: Minion[];
   conditions: Condition[];
 
   constructor({
@@ -72,7 +78,6 @@ export class Monster {
     health,
     healthMax,
     sanity,
-    minions,
     sanityMax,
     attackPower,
     baseArmor,
@@ -81,19 +86,18 @@ export class Monster {
     energyRegen,
     attacks,
     conditions,
-  }: monsterInterface) {
+  }: CreatureType) {
     this.id = id ?? uuidv4();
     this.creatureSpecies = creatureSpecies;
     this.health = health;
     this.sanity = sanity ?? null;
     this.sanityMax = sanityMax ?? null;
-    this.minions = minions ?? [];
     this.healthMax = healthMax;
     this.attackPower = attackPower;
     this.baseArmor = baseArmor ?? 0;
-    this.energy = energy;
-    this.energyMax = energyMax;
-    this.energyRegen = energyRegen;
+    this.energy = energy ?? null;
+    this.energyMax = energyMax ?? null;
+    this.energyRegen = energyRegen ?? null;
     this.attacks = attacks;
     this.conditions = conditions ?? [];
     makeObservable(this, {
@@ -102,15 +106,11 @@ export class Monster {
       creatureSpecies: observable,
       sanity: observable,
       energy: observable,
-      minions: observable,
       conditions: observable,
       damageHealth: action,
       damageSanity: action,
       addCondition: action,
       conditionTicker: action,
-      takeTurn: action,
-      addMinion: action,
-      removeMinion: action,
       getDrops: action,
       equals: action,
     });
@@ -128,18 +128,17 @@ export class Monster {
     return this.healthMax * healthMult + healthFlat;
   }
 
-  public getFullHealth() {
-    const { healthMult, healthFlat } = getConditionEffectsOnDefenses(
-      this.conditions,
-    );
-    return this.health + healthFlat + this.healthMax * healthMult;
-  }
-
   public damageHealth(damage: number | null) {
     this.health -= damage ?? 0;
     return this.health;
   }
   //---------------------------Sanity---------------------------//
+  public getMaxSanity() {
+    const { sanityMult, sanityFlat } = getConditionEffectsOnDefenses(
+      this.conditions,
+    );
+    return this.sanityMax ? this.sanityMax * sanityMult + sanityFlat : null;
+  }
   public damageSanity(damage: number | null) {
     if (this.sanity) {
       this.sanity -= damage ?? 0;
@@ -153,6 +152,9 @@ export class Monster {
     );
     return this.baseArmor * armorMult + armorFlat;
   }
+  public getDamageReduction() {
+    return damageReduction(this.getFullArmor());
+  }
   //---------------------------Battle---------------------------//
   public addCondition(condition?: Condition | null) {
     if (condition) {
@@ -160,197 +162,130 @@ export class Monster {
     }
   }
 
-  public takeTurn(
-    playerMaxHealth: number,
-    playerDR: number,
-  ):
-    | "pass"
-    | "miss"
-    | "stun"
-    | {
-        name: string;
-        damage: number;
-        heal: number | undefined;
-        sanityDamage: number;
-        debuffs: Condition[] | null;
-        summons: string[] | null;
-      } {
-    const stun = this.conditions.find((condition) => condition.name == "stun");
-    if (!stun) {
-      const accuracy_halved = this.conditions.find((condition) => {
-        condition.name == "accuracy_halved";
-      });
-      if (accuracy_halved) {
-        const res = flipCoin();
-        if (res == "Heads") {
-          return this.attack(playerMaxHealth, playerDR);
-        } else return "miss";
-      }
-      return this.attack(playerMaxHealth, playerDR);
-    } else {
-      return "stun";
-    }
-  }
-
   public conditionTicker() {
     for (let i = this.conditions.length - 1; i >= 0; i--) {
-      const { effect, damage, turns } = this.conditions[i].tick();
+      const { effect, healthDamage, sanityDamage, turns } =
+        this.conditions[i].tick();
 
-      effect.forEach((eff) => {
-        if (eff == "sanity") {
-          this.damageSanity(damage);
-        } else if (eff == "damage") {
-          this.damageHealth(damage);
-        }
-      });
-
+      if (sanityDamage) {
+        this.damageSanity(sanityDamage);
+      }
+      if (healthDamage) {
+        this.damageHealth(healthDamage);
+      }
       if (turns == 0) {
         this.conditions.splice(i, 1);
       }
     }
   }
 
-  private attack(
+  protected attack(
     playerMaxHealth: number,
+    playerMaxSanity: number | null,
     playerDR: number,
+    chosenAttack: EnemyAttackObj,
   ):
-    | "pass"
     | "miss"
     | {
         name: string;
         damage: number;
-        heal: number | undefined;
-        sanityDamage: number;
-        debuffs: Condition[] | null;
-        summons: string[] | null;
+        heal?: number;
+        sanityDamage?: number;
+        debuffs?: Condition[];
+        buffs?: Condition[];
+        summons?: string[];
       } {
-    const availableAttacks = attacks.filter(
-      (attack) =>
-        this.attacks.includes(attack.name) && this.energy >= attack.energyCost,
-    );
-    if (availableAttacks.length > 0) {
-      const randomIndex = Math.floor(Math.random() * availableAttacks.length);
-      const chosenAttack = availableAttacks[randomIndex];
-      if (chosenAttack.summons) {
-        chosenAttack.summons.forEach((summon) => {
-          const summonObj = summons.find(
-            (summonObj) => summonObj.name == summon,
-          );
-          if (summonObj) {
-            const newMinion = new Minion({
-              creatureSpecies: summonObj.name,
-              health: summonObj.health,
-              healthMax: summonObj.health,
-              attackPower: summonObj.attackPower,
-              attacks: summonObj.attacks,
-              turnsLeftAlive: summonObj.turns,
-            });
-            this.addMinion(newMinion);
+    let rollToHit: number;
+    const { hitChanceMultiplier, damageMult, damageFlat } =
+      getConditionEffectsOnAttacks(this.conditions);
+    if (chosenAttack.hitChance) {
+      rollToHit = 20 - (chosenAttack.hitChance * 100 * hitChanceMultiplier) / 5;
+    } else {
+      rollToHit = 0;
+    }
+    const roll = rollD20();
+    let damagePreDR: number = 0;
+    if (chosenAttack.damageMult) {
+      damagePreDR = chosenAttack.damageMult * this.attackPower;
+    } else if (chosenAttack.flatHealthDamage) {
+      damagePreDR = chosenAttack.flatHealthDamage;
+    }
+    let damage = damagePreDR * (1 - playerDR);
+    damage *= damageMult; // from conditions
+    damage += damageFlat; // from conditions
+    damage = Math.round(damage * 4) / 4;
+    const sanityDamage = chosenAttack.flatSanityDamage;
+    if (roll >= rollToHit) {
+      let debuffs: Condition[] = [];
+      let healedFor: number = 0;
+      if (chosenAttack.debuffs) {
+        chosenAttack.debuffs.forEach((debuff) => {
+          if (debuff.name == "lifesteal") {
+            const roll = rollD20();
+            if (roll * 5 >= 100 - debuff.chance * 100) {
+              const heal = Math.round(damage * 0.5 * 4) / 4;
+              if (this.health + heal >= this.healthMax) {
+                healedFor = this.healthMax - this.health;
+                this.health = this.healthMax;
+              } else {
+                healedFor = heal;
+                this.health += heal;
+              }
+            }
           } else {
-            throw new Error(`Failed to find ${summon} minion obj`);
+            const res = createDebuff({
+              debuffName: debuff.name,
+              debuffChance: debuff.chance,
+              enemyMaxHP: playerMaxHealth,
+              enemyMaxSanity: playerMaxSanity,
+              primaryAttackDamage: damage,
+            });
+            if (res) debuffs.push(res);
           }
         });
       }
-      let rollToHit: number;
-      const { hitChanceMultiplier, damageMult, damageFlat } =
-        getConditionEffectsOnAttacks(this.conditions);
-      if (chosenAttack.hitChance) {
-        rollToHit =
-          20 - (chosenAttack.hitChance * 100 * hitChanceMultiplier) / 5;
-      } else {
-        rollToHit = 0;
-      }
-      const roll = rollD20();
-      let damage: number = 0;
-      if (chosenAttack.damageMult) {
-        damage = chosenAttack.damageMult * this.attackPower * (1 - playerDR);
-      } else if (chosenAttack.flatDamage) {
-        damage = chosenAttack.flatDamage;
-      }
-      damage *= damageMult;
-      damage += damageFlat;
-      damage = Math.round(damage * 4) / 4;
-      const sanityDamage = chosenAttack.sanityDamage;
-      if (roll >= rollToHit) {
-        let debuffs: Condition[] = [];
-        let healedFor: number = 0;
-        if (chosenAttack.debuffs) {
-          chosenAttack.debuffs.forEach((debuff) => {
-            if (debuff.name == "lifesteal") {
-              const roll = rollD20();
-              if (roll * 5 >= 100 - debuff.chance * 100) {
-                const heal = Math.round(damage * 0.5 * 4) / 4;
-                if (this.health + heal >= this.healthMax) {
-                  healedFor = this.healthMax - this.health;
-                  this.health = this.healthMax;
-                } else {
-                  healedFor = heal;
-                  this.health += heal;
-                }
-              }
-            } else {
-              const res = createDebuff({
-                debuffName: debuff.name,
-                debuffChance: debuff.chance,
-                enemyMaxHP: playerMaxHealth,
-                primaryAttackDamage: damage,
-              });
-              if (res) debuffs.push(res);
-            }
+      let buffsForLogs: Condition[] = [];
+      if (chosenAttack.buffs) {
+        chosenAttack.buffs.forEach((buff) => {
+          const res = createBuff({
+            buffName: buff.name,
+            buffChance: buff.chance,
+            attackPower: this.attackPower,
+            maxHealth: this.healthMax,
+            maxSanity: this.sanityMax,
+            armor: this.getFullArmor(),
           });
-        }
-        if (chosenAttack.buffs) {
-          chosenAttack.buffs.forEach((buff) =>
-            this.addCondition(
-              createBuff({
-                buffName: buff.name,
-                buffChance: buff.chance,
-                attackPower: this.attackPower,
-                health: this.getFullHealth(),
-                armor: this.getFullArmor(),
-              }),
-            ),
-          );
-        }
-        return {
-          name: chosenAttack.name,
-          damage: damage,
-          heal: healedFor,
-          sanityDamage: sanityDamage,
-          debuffs: debuffs.length > 0 ? debuffs : null,
-          summons: chosenAttack.summons,
-        };
-      } else {
-        return "miss";
+          if (res) {
+            this.addCondition(res);
+            buffsForLogs.push(res);
+          }
+        });
       }
+      this.conditionTicker();
+      return {
+        name: chosenAttack.name,
+        damage: damage,
+        heal: healedFor,
+        sanityDamage: sanityDamage,
+        debuffs: debuffs.length > 0 ? debuffs : undefined,
+        buffs: buffsForLogs.length > 0 ? buffsForLogs : undefined,
+        summons: chosenAttack.summons,
+      };
     } else {
-      return "pass";
+      this.conditionTicker();
+      return "miss";
     }
   }
   //---------------------------Misc---------------------------//
-  public addMinion(minion: Minion) {
-    this.minions.push(minion);
-  }
-
-  public removeMinion(minionToRemove: Minion) {
-    let newList: Minion[] = [];
-    this.minions.forEach((minion) => {
-      if (!minion.equals(minionToRemove)) {
-        newList.push(minion);
-      }
-    });
-    this.minions = newList;
-  }
-  //---------------------------Misc---------------------------//
   public getDrops(playerClass: "necromancer" | "paladin" | "mage") {
-    const monsterObj = monsters.find(
+    const enemyObj = enemies.find(
       (monster) => monster.name == this.creatureSpecies,
     );
-    if (monsterObj) {
-      const dropList = monsterObj.drops;
+    if (enemyObj) {
+      const dropList = enemyObj.drops;
       const gold = getRandomInt(
-        monsterObj.goldDropRange.minimum,
-        monsterObj.goldDropRange.maximum,
+        enemyObj.goldDropRange.minimum,
+        enemyObj.goldDropRange.maximum,
       );
       let drops: Item[] = [];
       dropList.forEach((drop) => {
@@ -397,9 +332,115 @@ export class Monster {
     }
     throw new Error("No found monster on Monster.getDrops()");
   }
+}
 
-  public static fromJSON(json: any): Monster {
-    return new Monster({
+export class Enemy extends Creature {
+  minions: Minion[];
+  constructor({
+    id,
+    creatureSpecies,
+    health,
+    healthMax,
+    sanity,
+    sanityMax,
+    minions,
+    attackPower,
+    baseArmor,
+    energy,
+    energyMax,
+    energyRegen,
+    attacks,
+    conditions,
+  }: EnemyType) {
+    super({
+      id,
+      creatureSpecies,
+      health,
+      healthMax,
+      sanity,
+      sanityMax,
+      attackPower,
+      baseArmor,
+      energy,
+      energyMax,
+      energyRegen,
+      attacks,
+      conditions,
+    });
+    this.minions = minions ?? [];
+
+    makeObservable(this, {
+      minions: observable,
+      addMinion: action,
+      removeMinion: action,
+    });
+  }
+
+  public takeTurn({
+    defenderMaxHealth,
+    defenderMaxSanity,
+    defenderDR,
+  }: takeTurnProps) {
+    const { isStunned } = getConditionEffectsOnMisc(this.conditions);
+    if (isStunned) {
+      return "stun";
+    } else {
+      const availableAttacks = attacks.filter(
+        (attack) =>
+          this.attacks.includes(attack.name) &&
+          (!this.energy || this.energy >= attack.energyCost),
+      );
+      if (availableAttacks.length > 0) {
+        const randomIndex = Math.floor(Math.random() * availableAttacks.length);
+        const chosenAttack = availableAttacks[randomIndex] as EnemyAttackObj;
+        if (chosenAttack.summons) {
+          chosenAttack.summons.forEach((summon) => {
+            const summonObj = summons.find(
+              (summonObj) => summonObj.name == summon,
+            );
+            if (summonObj) {
+              const newMinion = new Minion({
+                creatureSpecies: summonObj.name,
+                health: summonObj.health,
+                healthMax: summonObj.health,
+                attackPower: summonObj.attackPower,
+                attacks: summonObj.attacks,
+                turnsLeftAlive: summonObj.turns,
+              });
+              this.addMinion(newMinion);
+            } else {
+              throw new Error(`Failed to find ${summon} minion obj`);
+            }
+          });
+        }
+        return this.attack(
+          defenderMaxHealth,
+          defenderMaxSanity,
+          defenderDR,
+          chosenAttack,
+        );
+      } else {
+        return "pass";
+      }
+    }
+  }
+  //---------------------------Minions---------------------------//
+  public addMinion(minion: Minion) {
+    this.minions.push(minion);
+  }
+
+  public removeMinion(minionToRemove: Minion) {
+    let newList: Minion[] = [];
+    this.minions.forEach((minion) => {
+      if (!minion.equals(minionToRemove.id)) {
+        newList.push(minion);
+      }
+    });
+    this.minions = newList;
+  }
+
+  public static fromJSON(json: any): Enemy {
+    return new Enemy({
       id: json.id,
       creatureSpecies: json.creatureSpecies,
       health: json.health,
@@ -407,10 +448,10 @@ export class Monster {
       sanity: json.sanity,
       sanityMax: json.sanityMax,
       attackPower: json.attackPower,
-      minions: json.minions,
       energy: json.energy,
       energyMax: json.energyMax,
       energyRegen: json.energyRegen,
+      minions: json.minions,
       attacks: json.attacks,
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
@@ -419,183 +460,99 @@ export class Monster {
   }
 }
 
-interface minionOptions {
-  creatureSpecies: string;
-  id?: string;
-  health: number;
-  healthMax: number;
-  sanity?: number;
-  attackPower: number;
-  attacks: string[];
+export class Minion extends Creature {
   turnsLeftAlive: number;
-  conditions?: Condition[];
-}
-
-export class Minion {
-  readonly creatureSpecies: string;
-  readonly id: string;
-  health: number;
-  readonly healthMax: number;
-  sanity: number | null;
-  readonly attackPower: number;
-  readonly attacks: string[];
-  turnsLeftAlive: number;
-  conditions: Condition[];
 
   constructor({
-    creatureSpecies,
     id,
+    creatureSpecies,
     health,
     healthMax,
     sanity,
+    sanityMax,
     attackPower,
+    baseArmor,
+    energy,
+    energyMax,
+    energyRegen,
     attacks,
-    turnsLeftAlive,
     conditions,
-  }: minionOptions) {
-    this.creatureSpecies = creatureSpecies;
-    this.id = id ?? uuidv4();
-    this.health = health;
-    this.healthMax = healthMax;
-    this.sanity = sanity ?? null;
-    this.attackPower = attackPower;
-    this.attacks = attacks;
+    turnsLeftAlive,
+  }: MinionType) {
+    super({
+      id,
+      creatureSpecies,
+      health,
+      healthMax,
+      sanity,
+      sanityMax,
+      attackPower,
+      baseArmor,
+      energy,
+      energyMax,
+      energyRegen,
+      attacks,
+      conditions,
+    });
     this.turnsLeftAlive = turnsLeftAlive;
-    this.conditions = conditions ?? [];
+
     makeObservable(this, {
-      health: observable,
       turnsLeftAlive: observable,
-      sanity: observable,
-      conditions: observable,
-      damageHealth: action,
-      damageSanity: action,
-      addCondition: action,
-      conditionTicker: action,
-      attack: action,
     });
   }
 
-  public equals(minion: Minion) {
-    return this.id == minion.id;
-  }
-  //---------------------------Health---------------------------//
-  public damageHealth(damage: number | null) {
-    this.health -= damage ?? 0;
-    return this.health;
-  }
-  //---------------------------Sanity---------------------------//
-  public damageSanity(damage: number | null) {
-    if (this.sanity) {
-      this.sanity -= damage ?? 0;
-      return this.sanity;
-    }
-  }
-  //---------------------------Battle---------------------------//
-  public addCondition(condition: Condition | null) {
-    if (condition) {
-      this.conditions.push(condition);
-    }
-  }
-
-  public conditionTicker() {
-    for (let i = this.conditions.length - 1; i >= 0; i--) {
-      const { effect, damage, turns } = this.conditions[i].tick();
-
-      effect.forEach((eff) => {
-        if (eff == "sanity") {
-          this.damageSanity(damage);
-        } else if (eff == "damage") {
-          this.damageHealth(damage);
-        }
-      });
-
-      if (turns == 0) {
-        this.conditions.splice(i, 1);
-      }
-    }
-  }
-
-  public attack(enemyMaxHP: number, playerDR?: number) {
+  public takeTurn({
+    defenderMaxHealth,
+    defenderMaxSanity,
+    defenderDR,
+  }: takeTurnProps) {
     if (this.turnsLeftAlive > 0) {
-      this.turnsLeftAlive -= 1;
-      const attackString =
-        this.attacks[Math.floor(Math.random() * this.attacks.length)];
-      const attackObj = attacks.find((attack) => attack.name == attackString);
-      if (!attackObj) throw new Error("attack missing!");
-      let rollToHit: number;
-      if (attackObj.hitChance) {
-        rollToHit = 20 - (attackObj.hitChance * 100) / 5;
+      const { isStunned } = getConditionEffectsOnMisc(this.conditions);
+      if (isStunned) {
+        return "stun";
       } else {
-        rollToHit = 0;
-      }
-      const roll = rollD20();
-      let damage: number = 0;
-      if (attackObj.damageMult) {
-        damage =
-          Math.round(
-            attackObj.damageMult *
-              this.attackPower *
-              (1 - (playerDR ? playerDR : 0)) *
-              4,
-          ) / 4;
-      } else if (attackObj.flatDamage) {
-        damage = attackObj.flatDamage;
-      }
-      const sanityDamage = attackObj.sanityDamage;
-      if (roll >= rollToHit) {
-        if (attackObj.debuffs) {
-          let debuffs: Condition[] = [];
-          let healedFor = 0;
-          attackObj.debuffs.forEach((debuff) => {
-            if (debuff.name == "lifesteal") {
-              const heal = Math.round(damage * 0.5 * 4) / 4;
-              if (this.health + heal >= this.healthMax) {
-                this.health = this.healthMax;
-              } else {
-                this.health += heal;
-              }
-            } else {
-              const res = createDebuff(
-                debuff.name,
-                debuff.chance,
-                enemyMaxHP,
-                damage,
-              );
-              if (res) debuffs.push(res);
-            }
-          });
-          return {
-            name: attackObj.name,
-            damage: damage,
-            heal: healedFor > 0 ? healedFor : undefined,
-            sanityDamage: sanityDamage,
-            debuffs: debuffs,
-          };
+        const availableAttacks = attacks.filter(
+          (attack) =>
+            this.attacks.includes(attack.name) &&
+            (!this.energy || this.energy >= attack.energyCost),
+        );
+        if (availableAttacks.length > 0) {
+          const randomIndex = Math.floor(
+            Math.random() * availableAttacks.length,
+          );
+          const chosenAttack = availableAttacks[randomIndex] as EnemyAttackObj;
+          return this.attack(
+            defenderMaxHealth,
+            defenderMaxSanity,
+            defenderDR,
+            chosenAttack,
+          );
+        } else {
+          return "pass";
         }
-        return {
-          name: attackObj.name,
-          damage: damage,
-          sanityDamage: sanityDamage,
-          debuffs: null,
-        };
-      } else {
-        return "miss";
       }
+    } else {
+      throw new Error("Minion not properly removed!");
     }
-    throw new Error("minion not properly removed!");
   }
 
   public static fromJSON(json: any): Minion {
     return new Minion({
-      creatureSpecies: json.creatureSpecies,
       id: json.id,
+      creatureSpecies: json.creatureSpecies,
       health: json.health,
       healthMax: json.healthMax,
       sanity: json.sanity,
+      sanityMax: json.sanityMax,
       attackPower: json.attackPower,
-      attacks: json.attacks,
+      energy: json.energy,
+      energyMax: json.energyMax,
+      energyRegen: json.energyRegen,
       turnsLeftAlive: json.turnsLeftAlive,
-      conditions: json.conditions,
+      attacks: json.attacks,
+      conditions: json.conditions
+        ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
+        : [],
     });
   }
 }
@@ -651,4 +608,22 @@ function itemList(
     default:
       throw new Error("invalid itemType");
   }
+}
+interface EnemyAttackObj {
+  name: string;
+  energyCost: number;
+  targets?: "single" | "cleave" | "aoe";
+  hitChance?: number;
+  damageMult?: number;
+  flatHealthDamage?: number;
+  flatSanityDamage?: number;
+  buffs?: { name: string; chance: number }[];
+  debuffs?: { name: string; chance: number }[];
+  summons?: string[];
+}
+
+interface takeTurnProps {
+  defenderMaxHealth: number;
+  defenderMaxSanity: number | null;
+  defenderDR: number;
 }

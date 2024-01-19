@@ -11,7 +11,7 @@ import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
 import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
-import { Monster } from "../classes/creatures";
+import { Enemy } from "../classes/creatures";
 import { fullSave, loadGame, loadPlayer } from "../utility/functions";
 import { View, Text, Platform } from "react-native";
 import { autorun } from "mobx";
@@ -49,10 +49,10 @@ export const PlayerCharacterContext = createContext<
   | undefined
 >(undefined);
 
-export const MonsterContext = createContext<
+export const EnemyContext = createContext<
   | {
-      monsterState: Monster | null;
-      setMonster: React.Dispatch<React.SetStateAction<Monster | null>>;
+      enemyState: Enemy | null;
+      setEnemy: React.Dispatch<React.SetStateAction<Enemy | null>>;
     }
   | undefined
 >(undefined);
@@ -68,7 +68,7 @@ export const LogsContext = createContext<
 const Root = observer(() => {
   const [gameState, setGameData] = useState<Game>();
   const [playerState, setPlayerCharacter] = useState<PlayerCharacter>();
-  const [monsterState, setMonster] = useState<Monster | null>(null);
+  const [enemyState, setEnemy] = useState<Enemy | null>(null);
   const [logsState, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const { setColorScheme, colorScheme } = useColorScheme();
@@ -120,11 +120,11 @@ const Root = observer(() => {
       <PlayerCharacterContext.Provider
         value={{ playerState, setPlayerCharacter }}
       >
-        <MonsterContext.Provider value={{ monsterState, setMonster }}>
+        <EnemyContext.Provider value={{ enemyState, setEnemy }}>
           <LogsContext.Provider value={{ logsState, setLogs }}>
             <RootLayout />
           </LogsContext.Provider>
-        </MonsterContext.Provider>
+        </EnemyContext.Provider>
       </PlayerCharacterContext.Provider>
     </GameContext.Provider>
   );

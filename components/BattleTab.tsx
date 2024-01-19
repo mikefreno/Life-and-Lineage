@@ -12,12 +12,12 @@ import { Item } from "../classes/item";
 import { useContext, useRef, useState } from "react";
 import {
   LogsContext,
-  MonsterContext,
+  EnemyContext,
   PlayerCharacterContext,
 } from "../app/_layout";
 import { useColorScheme } from "nativewind";
 import { useVibration } from "../utility/customHooks";
-import { Minion, Monster } from "../classes/creatures";
+import { Minion, Enemy } from "../classes/creatures";
 import GearStatsDisplay from "./GearStatsDisplay";
 import { Attack, Spell } from "../utility/types";
 import { elementalColorMap } from "../utility/elementColors";
@@ -35,7 +35,7 @@ interface BattleTabProps {
       sanityDamage: number;
       debuffs: { name: string; chance: number }[] | null;
     },
-    target: Monster | Minion,
+    target: Enemy | Minion,
   ) => void;
   useSpell: (
     spell: {
@@ -51,7 +51,7 @@ interface BattleTabProps {
         selfDamage?: number;
       };
     },
-    target: Monster | Minion,
+    target: Enemy | Minion,
   ) => void;
   attackAnimationOnGoing: boolean;
   setShowTargetSelection: React.Dispatch<
@@ -83,11 +83,11 @@ export default function BattleTab({
   const deviceHeight = Dimensions.get("window").height;
   const deviceWidth = Dimensions.get("window").width;
 
-  const monsterContext = useContext(MonsterContext);
+  const enemyContext = useContext(EnemyContext);
   const playerContext = useContext(PlayerCharacterContext);
-  if (!playerContext || !monsterContext) throw new Error("missing context");
+  if (!playerContext || !enemyContext) throw new Error("missing context");
   const { playerState } = playerContext;
-  const { monsterState } = monsterContext;
+  const { enemyState } = enemyContext;
 
   const playerAttacks = playerState?.physicalAttacks;
   const playerSpells = playerState?.getSpells();
@@ -221,14 +221,11 @@ export default function BattleTab({
                         }
                         onPress={() => {
                           vibration({ style: "light" });
-                          if (
-                            monsterState &&
-                            monsterState.minions.length == 0
-                          ) {
+                          if (enemyState && enemyState.minions.length == 0) {
                             if ("element" in attackOrSpell) {
-                              useSpell(attackOrSpell, monsterState);
+                              useSpell(attackOrSpell, enemyState);
                             } else {
-                              useAttack(attackOrSpell, monsterState);
+                              useAttack(attackOrSpell, enemyState);
                             }
                           } else {
                             setShowTargetSelection({

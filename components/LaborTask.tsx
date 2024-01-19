@@ -7,11 +7,7 @@ import ProgressBar from "./ProgressBar";
 import { useColorScheme } from "nativewind";
 import { useIsFocused } from "@react-navigation/native";
 import { useContext, useState } from "react";
-import {
-  GameContext,
-  MonsterContext,
-  PlayerCharacterContext,
-} from "../app/_layout";
+import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { observer } from "mobx-react-lite";
 import { numberToRoman } from "../utility/functions";
 import { useVibration } from "../utility/customHooks";
@@ -38,12 +34,9 @@ const LaborTask = observer(
   }: LaborTaskProps) => {
     const playerCharacterData = useContext(PlayerCharacterContext);
     const gameData = useContext(GameContext);
-    const monsterData = useContext(MonsterContext);
-    if (!playerCharacterData || !gameData || !monsterData)
-      throw new Error("missing context");
+    if (!playerCharacterData || !gameData) throw new Error("missing context");
     const { gameState } = gameData;
     const { playerState } = playerCharacterData;
-    const { setMonster } = monsterData;
     const [fullReward, setFullReward] = useState<number | undefined>(
       playerState?.getRewardValue(title, reward),
     );
@@ -69,7 +62,6 @@ const LaborTask = observer(
           vibration({ style: "success", essential: true });
         }
         setExperience(newExp);
-        setMonster(null);
         gameState.gameTick(playerState);
         setFullReward(playerState.getRewardValue(title, reward));
       }

@@ -1,4 +1,5 @@
 import {
+  createBuff,
   createDebuff,
   damageReduction,
   getConditionEffectsOnDefenses,
@@ -112,6 +113,7 @@ type PlayerCharacterBase = {
   health?: number;
   healthMax?: number;
   sanity?: number;
+  sanityMax?: number;
   mana?: number;
   manaMax?: number;
   manaRegen?: number;
@@ -184,6 +186,7 @@ export class PlayerCharacter extends Character {
   health: number;
   healthMax: number;
   sanity: number;
+  sanityMax: number;
   mana: number;
   manaMax: number;
   manaRegen: number;
@@ -232,6 +235,7 @@ export class PlayerCharacter extends Character {
     health,
     healthMax,
     sanity,
+    sanityMax,
     mana,
     manaMax,
     manaRegen,
@@ -266,7 +270,7 @@ export class PlayerCharacter extends Character {
     this.health = health ?? 100;
     this.healthMax = healthMax ?? 100;
     this.sanity = sanity ?? 50;
-    //this.sanityMax = sanity ?? 50;
+    this.sanityMax = sanityMax ?? 50;
     this.mana = mana ?? 100;
     this.manaMax = manaMax ?? 100;
     this.manaRegen = manaRegen ?? 3;
@@ -345,7 +349,6 @@ export class PlayerCharacter extends Character {
       addCondition: action,
       doPhysicalAttack: action,
       useSpell: action,
-      addBuff: action,
       createMinion: action,
       clearMinions: action,
       removeMinion: action,
@@ -374,6 +377,7 @@ export class PlayerCharacter extends Character {
     );
     return (this.healthMax + gearBuffs) * healthMult + healthFlat;
   }
+
   public getNonBuffedMaxHealth() {
     let gearBuffs = 0;
     gearBuffs += this.equipment.mainHand.stats?.health ?? 0;
@@ -383,12 +387,14 @@ export class PlayerCharacter extends Character {
     return this.healthMax + gearBuffs;
   }
 
-  public damageHealth(damage: number | null) {
-    if (damage && this.health - damage > this.healthMax) {
-      this.health = this.healthMax;
-      return this.health;
+  public damageHealth(damage?: number | null) {
+    if (damage) {
+      if (this.health - damage > this.healthMax) {
+        this.health = this.healthMax;
+        return this.health;
+      }
+      this.health -= damage;
     }
-    this.health -= damage ?? 0;
     return this.health;
   }
 
@@ -439,8 +445,10 @@ export class PlayerCharacter extends Character {
     }
   }
   //----------------------------------Sanity----------------------------------//
-  public damageSanity(damage: number | null) {
-    this.sanity -= damage ?? 0;
+  public damageSanity(damage?: number | null) {
+    if (damage) {
+      this.sanity -= damage;
+    }
     return this.sanity;
   }
 
@@ -456,6 +464,15 @@ export class PlayerCharacter extends Character {
     this.sanity + change;
   }
 
+  public getNonBuffedMaxSanity() {
+    let gearBuffs = 0;
+    gearBuffs += this.equipment.mainHand.stats?.sanity ?? 0;
+    gearBuffs += this.equipment.offHand?.stats?.sanity ?? 0;
+    gearBuffs += this.equipment.body?.stats?.sanity ?? 0;
+    gearBuffs += this.equipment.head?.stats?.sanity ?? 0;
+    return 50 + gearBuffs;
+  }
+
   public getMaxSanity() {
     let withGearBuffs = 50;
     withGearBuffs += this.equipment.mainHand.stats?.sanity ?? 0;
@@ -464,6 +481,7 @@ export class PlayerCharacter extends Character {
     withGearBuffs += this.equipment.head?.stats?.sanity ?? 0;
     return withGearBuffs;
   }
+
   //----------------------------------Inventory----------------------------------//
   public addToInventory(item: Item | null) {
     if (item && item.name !== "unarmored") {
@@ -948,7 +966,7 @@ export class PlayerCharacter extends Character {
   }
   //----------------------------------Relationships----------------------------------//
   //----------------------------------Conditions----------------------------------//
-  public addCondition(condition: Condition | null) {
+  public addCondition(condition?: Condition | null) {
     if (condition) {
       this.conditions.push(condition);
     }
@@ -1015,45 +1033,47 @@ export class PlayerCharacter extends Character {
       debuffs: { name: string; chance: number }[] | null;
     },
     monsterMaxHP: number,
+    monsterMaxSanity: number | null,
   ) {
     this.regenMana();
     const rollToHit = 20 - (attack.hitChance * 100) / 5;
     const roll = rollD20();
     if (roll >= rollToHit) {
-      let hpDamage =
+      let damage =
         attack.damageMult * (this.equipment.mainHand?.stats?.["damage"] ?? 1);
 
       const offHandDamage = this.equipment.offHand?.stats?.["damage"];
       if (offHandDamage) {
-        hpDamage += offHandDamage * 0.5;
+        damage += offHandDamage * 0.5;
       }
       const weakens = this.conditions.filter((condition) =>
         condition.effect.find((effect) => effect == "weaken"),
       );
       if (weakens) {
-        hpDamage *= Math.pow(0.75, weakens.length);
+        damage *= Math.pow(0.75, weakens.length);
       }
       const sanityDamage = attack.sanityDamage;
       this.conditionTicker();
       if (attack.debuffs) {
         let debuffs: Condition[] = [];
         attack.debuffs.forEach((debuff) => {
-          const debuffRes = createDebuff(
-            debuff.name,
-            debuff.chance,
-            monsterMaxHP,
-            hpDamage ?? 0,
-          );
+          const debuffRes = createDebuff({
+            debuffName: debuff.name,
+            debuffChance: debuff.chance,
+            enemyMaxHP: monsterMaxHP,
+            enemyMaxSanity: monsterMaxSanity,
+            primaryAttackDamage: damage,
+          });
           if (debuffRes) debuffs.push(debuffRes);
         });
         return {
-          damage: hpDamage,
+          damage: damage,
           sanityDamage: sanityDamage,
           debuffs: debuffs,
         };
       }
       return {
-        damage: hpDamage,
+        damage: damage,
         sanityDamage: sanityDamage,
         debuffs: null,
       };
@@ -1076,6 +1096,7 @@ export class PlayerCharacter extends Character {
       };
     },
     monsterMaxHP: number,
+    monsterMaxSanity: number | null,
   ) {
     if (chosenSpell.manaCost <= this.mana) {
       this.mana -= chosenSpell.manaCost;
@@ -1090,7 +1111,18 @@ export class PlayerCharacter extends Character {
       }
       const buffs = chosenSpell.effects.buffs;
       if (buffs) {
-        buffs.forEach((buff) => this.addBuff(buff));
+        buffs.forEach((buff) =>
+          this.addCondition(
+            createBuff({
+              buffName: buff,
+              buffChance: 1.0,
+              attackPower: chosenSpell.effects.damage ?? 0,
+              armor: this.getArmorValue(),
+              maxHealth: this.getNonBuffedMaxHealth(),
+              maxSanity: this.getNonBuffedMaxSanity(),
+            }),
+          ),
+        );
       }
       this.conditionTicker();
       if (chosenSpell.effects.debuffs) {
@@ -1103,12 +1135,13 @@ export class PlayerCharacter extends Character {
             throw new Error(
               "no debuff found in debuff lookup loop in PlayerCharacter.useSpell()",
             );
-          const debuffRes = createDebuff(
-            debuff.name,
-            debuff.chance,
-            monsterMaxHP,
-            chosenSpell.effects.damage ?? 0,
-          );
+          const debuffRes = createDebuff({
+            debuffName: debuff.name,
+            debuffChance: debuff.chance,
+            enemyMaxHP: monsterMaxHP,
+            enemyMaxSanity: monsterMaxSanity,
+            primaryAttackDamage: chosenSpell.effects.damage ?? 0,
+          });
           if (debuffRes) debuffs.push(debuffRes);
         });
         return {
@@ -1126,33 +1159,6 @@ export class PlayerCharacter extends Character {
     throw new Error(
       "not enough mana to useSpell(), this should be prevented on frontend",
     );
-  }
-
-  public addBuff(buffName: string) {
-    const buffObj = conditions.find((condition) => (condition.name = buffName));
-    if (buffObj) {
-      let damage = buffObj.effectAmount;
-      if (damage && buffObj.effectStyle == "percentage") {
-        damage *= this.healthMax;
-      }
-      this.conditions.push(
-        new Condition({
-          name: buffObj.name,
-          style: buffObj.style as "buff" | "debuff",
-          turns: buffObj.turns,
-          effect: buffObj.effect as (
-            | "skip"
-            | "accuracy halved"
-            | "damage"
-            | "sanity"
-            | "health"
-            | "armor"
-          )[],
-          damage: damage ?? 0,
-          icon: buffObj.icon,
-        }),
-      );
-    }
   }
   //----------------------------------Minions----------------------------------//
   public createMinion(minionName: string) {
@@ -1176,7 +1182,7 @@ export class PlayerCharacter extends Character {
   public removeMinion(minionToRemove: Minion) {
     let newList: Minion[] = [];
     this.minions.forEach((minion) => {
-      if (!minion.equals(minionToRemove)) {
+      if (!minion.equals(minionToRemove.id)) {
         newList.push(minion);
       }
     });
@@ -1185,8 +1191,6 @@ export class PlayerCharacter extends Character {
   private addMinion(minion: Minion) {
     this.minions.push(minion);
   }
-  //----------------------------------Conditions----------------------------------//
-
   //----------------------------------Investments----------------------------------//
   public purchaseInvestmentBase(investment: InvestmentType) {
     this.gold -= investment.cost;
@@ -1284,6 +1288,7 @@ export class PlayerCharacter extends Character {
       health: json.health,
       healthMax: json.healthMax,
       sanity: json.sanity,
+      sanityMax: json.sanityMax,
       mana: json.mana,
       manaMax: json.manaMax,
       manaRegen: json.manaRegen,
