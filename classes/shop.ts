@@ -94,9 +94,9 @@ export class Shop {
   }
 
   public buyItem(item: Item, buyPrice: number) {
-    if (buyPrice <= this.currentGold) {
+    if (Math.floor(buyPrice) <= this.currentGold) {
       this.inventory.push(item);
-      this.currentGold -= buyPrice;
+      this.currentGold -= Math.floor(buyPrice);
     }
   }
 
@@ -104,7 +104,7 @@ export class Shop {
     const idx = this.inventory.findIndex((invItem) => invItem.equals(item));
     if (idx !== -1) {
       this.inventory.splice(idx, 1);
-      this.currentGold += sellPrice;
+      this.currentGold += Math.floor(sellPrice);
     }
   }
 

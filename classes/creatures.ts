@@ -254,6 +254,7 @@ export class Creature {
               enemyMaxHP: playerMaxHealth,
               enemyMaxSanity: playerMaxSanity,
               primaryAttackDamage: damagePreDR,
+              applierNameString: this.creatureSpecies,
             });
             if (res) debuffs.push(res);
           }
@@ -269,6 +270,7 @@ export class Creature {
             maxHealth: this.healthMax,
             maxSanity: this.sanityMax,
             armor: this.getFullArmor(),
+            applierNameString: this.creatureSpecies,
           });
           if (res) {
             this.addCondition(res);

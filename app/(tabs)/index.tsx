@@ -127,7 +127,7 @@ const HomeScreen = observer(() => {
   function currentEquipmentDisplay() {
     const [buzzed, setBuzzed] = useState<boolean>(false);
     return (
-      <View className={`flex w-full -mt-[1vh]`}>
+      <View className={`flex w-full`}>
         <View className="items-center">
           <Text className="mb-2">Head</Text>
           {playerState?.equipment.head ? (

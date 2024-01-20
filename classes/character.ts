@@ -1,10 +1,13 @@
 import {
+  calculateAge,
   createBuff,
   createDebuff,
   damageReduction,
   getConditionEffectsOnAttacks,
   getConditionEffectsOnDefenses,
+  getConditionEffectsOnMisc,
   rollD20,
+  rollToLiveByAge,
 } from "../utility/functions";
 import { Condition } from "./conditions";
 import { Item } from "./item";
@@ -70,6 +73,7 @@ export class Character {
       qualifications: observable,
       getFullName: action,
       setJob: action,
+      deathRoll: action,
     });
   }
 
@@ -82,6 +86,23 @@ export class Character {
 
   public setJob(job: string) {
     this.job = job;
+  }
+
+  public deathRoll(gameDate: Date) {
+    if (!(this instanceof PlayerCharacter)) {
+      const age = calculateAge(new Date(this.birthdate), gameDate);
+      const rollToLive = rollToLiveByAge(age);
+
+      const rollOne = rollD20();
+      if (rollOne >= rollToLive) return;
+      const rollTwo = rollD20();
+      if (rollTwo >= rollToLive) return;
+      const rollThree = rollD20();
+      if (rollThree >= rollToLive) return;
+
+      this.alive = false;
+      this.deathdate = new Date().toISOString();
+    }
   }
 
   static fromJSON(json: any): Character {
@@ -285,7 +306,7 @@ export class PlayerCharacter extends Character {
     this.knownSpells = knownSpells ?? [];
     this.conditions = [];
     this.physicalAttacks = physicalAttacks ?? ["punch"];
-    this.gold = gold ?? 5000000;
+    this.gold = gold ?? 500;
     this.inventory = inventory ?? [];
     this.currentDungeon = currentDungeon ?? null;
     this.equipment = equipment ?? {
@@ -408,12 +429,25 @@ export class PlayerCharacter extends Character {
 
   //----------------------------------Mana----------------------------------//
   public getMaxMana(): number {
-    let withGearBuffs = this.manaMax;
-    withGearBuffs += this.equipment.mainHand.stats?.mana ?? 0;
-    withGearBuffs += this.equipment.offHand?.stats?.mana ?? 0;
-    withGearBuffs += this.equipment.body?.stats?.mana ?? 0;
-    withGearBuffs += this.equipment.head?.stats?.mana ?? 0;
-    return withGearBuffs;
+    let gearBuffs = 0;
+    gearBuffs += this.equipment.mainHand.stats?.mana ?? 0;
+    gearBuffs += this.equipment.offHand?.stats?.mana ?? 0;
+    gearBuffs += this.equipment.body?.stats?.mana ?? 0;
+    gearBuffs += this.equipment.head?.stats?.mana ?? 0;
+    const { manaMaxMult, manaMaxFlat } = getConditionEffectsOnMisc(
+      this.conditions,
+    );
+    return (this.manaMax + gearBuffs) * manaMaxMult + manaMaxFlat;
+  }
+
+  public getNonBuffedMaxMana(): number {
+    let gearBuffs = 0;
+    gearBuffs += this.equipment.mainHand.stats?.mana ?? 0;
+    gearBuffs += this.equipment.offHand?.stats?.mana ?? 0;
+    gearBuffs += this.equipment.body?.stats?.mana ?? 0;
+    gearBuffs += this.equipment.head?.stats?.mana ?? 0;
+
+    return this.manaMax + gearBuffs;
   }
 
   private useMana(mana: number) {
@@ -490,9 +524,9 @@ export class PlayerCharacter extends Character {
   }
 
   public buyItem(item: Item, buyPrice: number) {
-    if (buyPrice <= this.gold) {
+    if (Math.floor(buyPrice) <= this.gold) {
       this.inventory.push(item);
-      this.gold -= buyPrice;
+      this.gold -= Math.floor(buyPrice);
     }
   }
 
@@ -508,7 +542,7 @@ export class PlayerCharacter extends Character {
     const idx = this.inventory.findIndex((invItem) => invItem.equals(item));
     if (idx !== -1) {
       this.inventory.splice(idx, 1);
-      this.gold += sellPrice;
+      this.gold += Math.floor(sellPrice);
     }
   }
 
@@ -996,8 +1030,12 @@ export class PlayerCharacter extends Character {
   }
 
   private removeDebuffs(amount: number) {
-    for (let i = 0; i < amount; i++) {
-      this.conditions.shift();
+    const debuffArray = this.conditions.filter(
+      (condition) =>
+        condition.style == "debuff" && condition.placedby !== "age",
+    );
+    for (let i = 0; i < amount && debuffArray.length > 0; i++) {
+      debuffArray.shift();
     }
   }
   //----------------------------------Physical Combat----------------------------------//
@@ -1084,6 +1122,7 @@ export class PlayerCharacter extends Character {
               enemyMaxHP: enemyMaxHP,
               enemyMaxSanity: enemyMaxSanity,
               primaryAttackDamage: damagePreDR,
+              applierNameString: this.getFullName(),
             });
             if (res) debuffs.push(res);
           }
@@ -1099,6 +1138,7 @@ export class PlayerCharacter extends Character {
             maxHealth: this.getNonBuffedMaxHealth(),
             maxSanity: this.getNonBuffedMaxSanity(),
             armor: this.getArmorValue(),
+            applierNameString: this.getFullName(),
           });
           if (res) {
             this.addCondition(res);

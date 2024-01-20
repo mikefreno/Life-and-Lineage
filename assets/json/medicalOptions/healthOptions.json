@@ -6,7 +6,12 @@
    },
    {
       "serviceName": "Visit Church Healer",
+      "cost": 50,
+      "heathRestore": 50
+   },
+   {
+      "serviceName": "Visit Master Priest",
       "cost": 150,
-      "heathRestore": 100
+      "heathRestore": "fill" 
    }
 ]

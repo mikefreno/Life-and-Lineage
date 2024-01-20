@@ -3,5 +3,15 @@
       "serviceName": "Pray",
       "cost": 0,
       "sanityRestore": 10
+   },
+   {
+      "serviceName": "Seek Guidance",
+      "cost": 65,
+      "sanityRestore": 25
+   },
+   {
+      "serviceName": "Seek Spiritual Leader",
+      "cost": 200,
+      "sanityRestore": "fill"
    }
 ]

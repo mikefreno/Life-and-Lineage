@@ -1,8 +1,9 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Pressable } from "react-native";
 import Coins from "../assets/icons/CoinsIcon";
 import Energy from "../assets/icons/EnergyIcon";
 import Sanity from "../assets/icons/SanityIcon";
 import HealthIcon from "../assets/icons/HealthIcon";
+import { Text } from "./Themed";
 import { useColorScheme } from "nativewind";
 import { useIsFocused } from "@react-navigation/native";
 import { GameContext, PlayerCharacterContext } from "../app/_layout";
@@ -11,10 +12,10 @@ import { useContext } from "react";
 interface MedicalOptionProps {
   title: string;
   cost: number;
-  healthRestore?: number;
-  sanityRestore?: number;
-  manaRestore?: number;
-  removeDebuffs?: number;
+  healthRestore?: number | "fill";
+  sanityRestore?: number | "fill";
+  manaRestore?: number | "fill";
+  removeDebuffs?: number | "all";
 }
 
 export default function MedicalOption({
@@ -37,10 +38,10 @@ export default function MedicalOption({
     if (playerState && gameState && isFocused) {
       playerState.getMedicalService(
         cost,
-        healthRestore,
-        sanityRestore,
-        manaRestore,
-        removeDebuffs,
+        healthRestore == "fill" ? playerState.getMaxHealth() : healthRestore,
+        sanityRestore == "fill" ? playerState.getMaxSanity() : sanityRestore,
+        manaRestore == "fill" ? playerState.getMaxMana() : manaRestore,
+        removeDebuffs == "all" ? playerState.conditions.length : removeDebuffs,
       );
       gameState.gameTick(playerState);
     }
@@ -79,26 +80,40 @@ export default function MedicalOption({
             </View>
             {healthRestore ? (
               <View className="flex w-full flex-row items-center justify-evenly">
-                <Text className="dark:text-zinc-50">{healthRestore}</Text>
+                <Text className="dark:text-zinc-50">
+                  {healthRestore == "fill"
+                    ? playerState?.getMaxHealth()
+                    : healthRestore}
+                </Text>
                 <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
               </View>
             ) : null}
             {manaRestore ? (
               <View className="flex w-full flex-row items-center justify-evenly">
-                <Text className="dark:text-zinc-50">{manaRestore}</Text>
+                <Text className="dark:text-zinc-50">
+                  {manaRestore == "fill"
+                    ? playerState?.getMaxMana()
+                    : manaRestore}
+                </Text>
                 <Energy width={14} height={14} style={{ marginLeft: 6 }} />
               </View>
             ) : null}
             {sanityRestore ? (
               <View className="flex w-full flex-row items-center justify-evenly">
-                <Text className="dark:text-zinc-50">{sanityRestore}</Text>
+                <Text className="dark:text-zinc-50">
+                  {sanityRestore == "fill"
+                    ? playerState?.getMaxSanity()
+                    : sanityRestore}
+                </Text>
                 <Sanity width={14} height={14} style={{ marginLeft: 6 }} />
               </View>
             ) : null}
             {removeDebuffs ? (
               <View className="flex w-full flex-row items-center justify-evenly">
-                <Text className="dark:text-zinc-50">
-                  -{removeDebuffs} Debuffs
+                <Text className="text-center">
+                  {`Remove ${removeDebuffs} ${
+                    removeDebuffs !== 1 ? "debuffs" : "debuff"
+                  }`}
                 </Text>
               </View>
             ) : null}

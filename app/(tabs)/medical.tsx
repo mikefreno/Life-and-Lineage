@@ -167,7 +167,7 @@ export default function MedicalScreen() {
                       key={index}
                       title={medOption.serviceName}
                       cost={medOption.cost}
-                      healthRestore={medOption.heathRestore}
+                      healthRestore={medOption.heathRestore as number | "fill"}
                     />
                   );
                 })}
@@ -188,7 +188,7 @@ export default function MedicalScreen() {
                       key={index}
                       title={medOption.serviceName}
                       cost={medOption.cost}
-                      manaRestore={medOption.manaRestore}
+                      manaRestore={medOption.manaRestore as number | "fill"}
                     />
                   );
                 })}
@@ -209,7 +209,7 @@ export default function MedicalScreen() {
                       key={index}
                       title={medOption.serviceName}
                       cost={medOption.cost}
-                      sanityRestore={medOption.sanityRestore}
+                      sanityRestore={medOption.sanityRestore as number | "fill"}
                     />
                   );
                 })}
@@ -230,7 +230,7 @@ export default function MedicalScreen() {
                       key={index}
                       title={medOption.serviceName}
                       cost={medOption.cost}
-                      removeDebuffs={medOption.removeDebuffs}
+                      removeDebuffs={medOption.removeDebuffs as number | "all"}
                     />
                   );
                 })}

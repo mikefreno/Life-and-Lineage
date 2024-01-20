@@ -93,6 +93,19 @@ export function calculateAge(birthdate: Date, gameDate: Date) {
   return age;
 }
 
+export function deathProbabilityByAge(age: number) {
+  const a = 0.075;
+  const b = 80;
+  const probability = 1.0 / (1.0 + Math.exp(-a * (age - b)));
+  return probability;
+}
+
+export function rollToLiveByAge(age: number) {
+  const deathProbability = deathProbabilityByAge(age);
+  const rollToLive = Math.ceil(deathProbability * 10) + 1;
+  return rollToLive;
+}
+
 const heads = {
   Elderly_M: require("../assets/images/heads/Elderly_M.png"),
   Elderly_F: require("../assets/images/heads/Elderly_F.png"),
@@ -277,6 +290,7 @@ interface createDebuffDeps {
   enemyMaxHP: number;
   enemyMaxSanity?: number | null;
   primaryAttackDamage: number;
+  applierNameString: string;
 }
 export function createDebuff({
   debuffName,
@@ -284,6 +298,7 @@ export function createDebuff({
   enemyMaxHP,
   enemyMaxSanity = 50,
   primaryAttackDamage,
+  applierNameString,
 }: createDebuffDeps) {
   const roll = rollD20();
   if (roll * 5 >= 100 - debuffChance * 100) {
@@ -325,6 +340,7 @@ export function createDebuff({
         effectStyle:
           debuffObj.effectStyle != "percentage" ? debuffObj.effectStyle : null,
         effectMagnitude: debuffObj.effectAmount,
+        placedby: applierNameString,
         icon: debuffObj.icon,
       });
       return debuff;
@@ -341,6 +357,7 @@ interface createBuffDeps {
   maxHealth: number;
   maxSanity: number | null;
   armor: number;
+  applierNameString: string;
 }
 
 export function createBuff({
@@ -349,6 +366,7 @@ export function createBuff({
   attackPower,
   maxHealth,
   maxSanity,
+  applierNameString,
 }: createBuffDeps) {
   const roll = rollD20();
   if (roll * 5 >= 100 - buffChance * 100) {
@@ -388,6 +406,7 @@ export function createBuff({
         effectStyle:
           buffObj.effectStyle != "percentage" ? buffObj.effectStyle : null,
         effectMagnitude: buffObj.effectAmount,
+        placedby: applierNameString,
         icon: buffObj.icon,
       });
       return debuff;
@@ -429,6 +448,7 @@ export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
           healthDamage > 0 || sanityDamage > 0 ? null : debuffObj.effectAmount,
         healthDamage: healthDamage > 0 ? healthDamage : null,
         sanityDamage: sanityDamage > 0 ? sanityDamage : null,
+        placedby: "low sanity",
         icon: debuffObj.icon,
       });
       playerState.addCondition(debuff);
@@ -563,6 +583,8 @@ export function getConditionEffectsOnMisc(suppliedConditions: Condition[]) {
   let stunned = false;
   let manaRegenFlat = 0;
   let manaRegenMult = 1;
+  let manaMaxFlat = 0;
+  let manaMaxMult = 1;
   suppliedConditions.forEach((condition) => {
     if (condition.effect.includes("turn skip") && stunned == false) {
       stunned = true;
@@ -581,10 +603,34 @@ export function getConditionEffectsOnMisc(suppliedConditions: Condition[]) {
         manaRegenMult *= 1 - condition.effectMagnitude;
       }
     }
+    if (
+      condition.effect.includes("manaMax increase") &&
+      condition.effectMagnitude
+    ) {
+      if (condition.effectStyle == "flat") {
+        manaMaxFlat += condition.effectMagnitude;
+      } else if (condition.effectStyle == "multiplier") {
+        manaMaxMult *= 1 + condition.effectMagnitude;
+      }
+    }
+    if (
+      condition.effect.includes("manaMax decrease") &&
+      condition.effectMagnitude
+    ) {
+      {
+        if (condition.effectStyle == "flat") {
+          manaMaxFlat -= condition.effectMagnitude;
+        } else if (condition.effectStyle == "multiplier") {
+          manaMaxMult *= 1 - condition.effectMagnitude;
+        }
+      }
+    }
   });
   return {
     isStunned: stunned,
     manaRegenFlat: manaRegenFlat,
     manaRegenMult: manaRegenMult,
+    manaMaxFlat: manaMaxFlat,
+    manaMaxMult: manaMaxMult,
   };
 }
