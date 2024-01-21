@@ -4,13 +4,11 @@ import bosses from "../assets/json/bosses.json";
 import {
   createBuff,
   createDebuff,
-  damageReduction,
   getConditionEffectsOnAttacks,
   getConditionEffectsOnDefenses,
   getConditionEffectsOnMisc,
-  getRandomInt,
-  rollD20,
-} from "../utility/functions";
+} from "../utility/functions/conditions";
+import { getRandomInt, damageReduction } from "../utility/functions/misc";
 import { Condition } from "./conditions";
 import arrows from "../assets/json/items/arrows.json";
 import artifacts from "../assets/json/items/artifacts.json";
@@ -30,11 +28,12 @@ import weapons from "../assets/json/items/weapons.json";
 import necroBooks from "../assets/json/items/necroBooks.json";
 import paladinBooks from "../assets/json/items/paladinBooks.json";
 import mageBooks from "../assets/json/items/mageBooks.json";
-import { v4 as uuidv4 } from "uuid";
+import * as Crypto from "expo-crypto";
 import { Item } from "./item";
 import { action, makeObservable, observable } from "mobx";
 import summons from "../assets/json/summons.json";
 import { AttackObj } from "../utility/types";
+import { rollD20 } from "../utility/functions/roll";
 
 type CreatureType = {
   id?: string;
@@ -89,7 +88,7 @@ export class Creature {
     attacks,
     conditions,
   }: CreatureType) {
-    this.id = id ?? uuidv4();
+    this.id = id ?? Crypto.randomUUID();
     this.creatureSpecies = creatureSpecies;
     this.health = health;
     this.sanity = sanity ?? null;

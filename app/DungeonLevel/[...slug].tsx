@@ -11,7 +11,7 @@ import { EnemyImage } from "../../components/EnemyImage";
 import { Pressable, Modal as NativeModal } from "react-native";
 import { Stack, useLocalSearchParams, router } from "expo-router";
 import BattleTab from "../../components/BattleTab";
-import { flipCoin, toTitleCase } from "../../utility/functions";
+import { toTitleCase } from "../../utility/functions/misc";
 import { enemyGenerator } from "../../utility/enemy";
 import PlayerStatus from "../../components/PlayerStatus";
 import ProgressBar from "../../components/ProgressBar";
@@ -36,6 +36,7 @@ import SackIcon from "../../assets/icons/SackIcon";
 import TutorialModal from "../../components/TutorialModal";
 import GenericModal from "../../components/GenericModal";
 import { AttackObj } from "../../utility/types";
+import { flipCoin } from "../../utility/functions/roll";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -591,9 +592,6 @@ const DungeonLevelScreen = observer(() => {
           router.replace("/dungeon");
           playerState.setInDungeon({ state: false });
         }, 200);
-        setTimeout(() => {
-          setEnemy(null);
-        }, 500);
       } else {
         setFleeRollFailure(true);
         vibration({ style: "error" });
@@ -908,104 +906,111 @@ const DungeonLevelScreen = observer(() => {
 
   while (!enemyState) {
     return (
-      <View className="flex-1 px-4 pt-4">
-        <NonThemedView className="flex h-[35%]" />
-        {thisDungeon?.stepsBeforeBoss !== 0 && !fightingBoss ? (
-          <View className="flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
-            <Text className="my-auto text-xl">
-              {`Steps Completed: ${thisDungeon?.step} / ${thisDungeon?.stepsBeforeBoss}`}
-            </Text>
-            {thisDungeon &&
-            thisDungeon?.step >= thisDungeon.stepsBeforeBoss &&
-            !thisDungeon.bossDefeated ? (
-              <Pressable
-                onPress={loadBoss}
-                className="my-auto rounded bg-red-500 px-4 py-2 active:scale-95 active:opacity-50"
-              >
-                <Text style={{ color: "white" }}>Fight Boss</Text>
-              </Pressable>
-            ) : null}
-          </View>
-        ) : fightingBoss ? (
-          <View className="">
-            <Text className="my-auto text-center text-xl">Fighting Boss!</Text>
-          </View>
-        ) : (
-          <View className="flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50" />
-        )}
-        <Pressable
-          className="absolute ml-4 mt-4"
-          onPress={() => setShowLeftBehindItemsScreen(true)}
-        >
-          <SackIcon height={32} width={32} />
-        </Pressable>
-        <View className="flex-1 justify-between">
-          <View className="flex-1">
-            <BattleTab
-              useAttack={useAttack}
-              battleTab={battleTab}
-              useSpell={useSpell}
-              pass={pass}
-              setAttackAnimationOnGoing={setAttackAnimationOnGoing}
-              attackAnimationOnGoing={attackAnimationOnGoing}
-              setShowTargetSelection={setShowTargetSelection}
-              addItemToPouch={addItemToPouch}
-            />
-          </View>
-          <View className="">
-            <View className="-mx-4">
-              <View className="flex w-full flex-row justify-evenly border-t border-zinc-200 dark:border-zinc-700">
+      <>
+        <View className="flex-1 px-2" style={{ paddingBottom: 92 }}>
+          <NonThemedView className="flex h-[35%]" />
+          {thisDungeon?.stepsBeforeBoss !== 0 && !fightingBoss ? (
+            <View className="flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
+              <Text className="my-auto text-xl">
+                {`Steps Completed: ${thisDungeon?.step} / ${thisDungeon?.stepsBeforeBoss}`}
+              </Text>
+              {thisDungeon &&
+              thisDungeon?.step >= thisDungeon.stepsBeforeBoss &&
+              !thisDungeon.bossDefeated ? (
                 <Pressable
-                  className={`px-6 py-4 rounded ${
-                    battleTab == "attacks"
-                      ? "bg-zinc-100 dark:bg-zinc-800"
-                      : "active:bg-zinc-200 dark:active:bg-zinc-700"
-                  }`}
-                  onPress={() => setBattleTab("attacks")}
+                  onPress={loadBoss}
+                  className="my-auto rounded bg-red-500 px-4 py-2 active:scale-95 active:opacity-50"
                 >
-                  <Text className="text-xl">Attacks</Text>
+                  <Text style={{ color: "white" }}>Fight Boss</Text>
                 </Pressable>
-                <Pressable
-                  className={`px-6 py-4 rounded ${
-                    battleTab == "equipment"
-                      ? "border-zinc-200 bg-zinc-100 dark:border-zinc-900 dark:bg-zinc-800"
-                      : "active:bg-zinc-200 dark:active:bg-zinc-700"
-                  }`}
-                  onPress={() => setBattleTab("equipment")}
-                >
-                  <Text className="text-xl">Equipment</Text>
-                </Pressable>
-                <Pressable
-                  className={`px-6 py-4 rounded ${
-                    battleTab == "log"
-                      ? "bg-zinc-100 dark:bg-zinc-800"
-                      : "active:bg-zinc-200 dark:active:bg-zinc-700"
-                  }`}
-                  onPress={() => setBattleTab("log")}
-                >
-                  <Text className="text-xl">Log</Text>
-                </Pressable>
-              </View>
+              ) : null}
             </View>
-            {playerState.minions.length > 0
-              ? playerState.minions.map((minion) => (
-                  <View key={minion.id} className="py-1">
-                    <Text>{toTitleCase(minion.creatureSpecies)}</Text>
-                    <ProgressBar
-                      filledColor="#ef4444"
-                      unfilledColor="#fee2e2"
-                      value={minion.health}
-                      maxValue={minion.healthMax}
-                    />
-                  </View>
-                ))
-              : null}
-            <View className="-mx-4 pb-4">
-              <PlayerStatus />
+          ) : fightingBoss ? (
+            <View className="">
+              <Text className="my-auto text-center text-xl">
+                Fighting Boss!
+              </Text>
+            </View>
+          ) : (
+            <View className="flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50" />
+          )}
+          <Pressable
+            className="absolute ml-4 mt-4"
+            onPress={() => setShowLeftBehindItemsScreen(true)}
+          >
+            <SackIcon height={32} width={32} />
+          </Pressable>
+          <View className="flex-1 justify-between">
+            <View className="flex-1">
+              <BattleTab
+                useAttack={useAttack}
+                battleTab={battleTab}
+                useSpell={useSpell}
+                pass={pass}
+                setAttackAnimationOnGoing={setAttackAnimationOnGoing}
+                attackAnimationOnGoing={attackAnimationOnGoing}
+                setShowTargetSelection={setShowTargetSelection}
+                addItemToPouch={addItemToPouch}
+              />
+            </View>
+            <View className="flex w-full flex-row justify-around border-t border-zinc-200 dark:border-zinc-700">
+              <Pressable
+                className={`py-4 w-32 mx-2 rounded ${
+                  battleTab == "attacks"
+                    ? "bg-zinc-100 dark:bg-zinc-800"
+                    : "active:bg-zinc-200 dark:active:bg-zinc-700"
+                }`}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  setBattleTab("attacks");
+                }}
+              >
+                <Text className="text-center text-xl">Attacks</Text>
+              </Pressable>
+              <Pressable
+                className={`py-4 w-32 mx-2 rounded ${
+                  battleTab == "equipment"
+                    ? "border-zinc-200 bg-zinc-100 dark:border-zinc-900 dark:bg-zinc-800"
+                    : "active:bg-zinc-200 dark:active:bg-zinc-700"
+                }`}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  setBattleTab("equipment");
+                }}
+              >
+                <Text className="text-center text-xl">Equipment</Text>
+              </Pressable>
+              <Pressable
+                className={`py-4 w-32 mx-2 rounded align ${
+                  battleTab == "log"
+                    ? "bg-zinc-100 dark:bg-zinc-800"
+                    : "active:bg-zinc-200 dark:active:bg-zinc-700"
+                }`}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  setBattleTab("log");
+                }}
+              >
+                <Text className="text-center text-xl">Log</Text>
+              </Pressable>
+              {playerState.minions.length > 0
+                ? playerState.minions.map((minion) => (
+                    <View key={minion.id} className="py-1">
+                      <Text>{toTitleCase(minion.creatureSpecies)}</Text>
+                      <ProgressBar
+                        filledColor="#ef4444"
+                        unfilledColor="#fee2e2"
+                        value={minion.health}
+                        maxValue={minion.healthMax}
+                      />
+                    </View>
+                  ))
+                : null}
             </View>
           </View>
         </View>
-      </View>
+        <PlayerStatus />
+      </>
     );
   }
 
@@ -1286,8 +1291,8 @@ const DungeonLevelScreen = observer(() => {
             {targetSelectionRender()}
           </>
         </GenericModal>
-        <View className="flex-1 px-4 pt-4">
-          <NonThemedView className="flex h-[35%]">
+        <View className="flex-1 px-2" style={{ paddingBottom: 92 }}>
+          <NonThemedView className="flex h-[35%] pt-8">
             <NonThemedView className="flex-1 flex-row justify-evenly">
               <NonThemedView
                 className="flex flex-col items-center justify-center"
@@ -1427,50 +1432,46 @@ const DungeonLevelScreen = observer(() => {
                 addItemToPouch={addItemToPouch}
               />
             </View>
-            <View className="">
-              <View className="-mx-4">
-                <View className="flex w-full flex-row justify-evenly border-t border-zinc-200 dark:border-zinc-700">
-                  <Pressable
-                    className={`px-6 py-4 rounded ${
-                      battleTab == "attacks"
-                        ? "bg-zinc-100 dark:bg-zinc-800"
-                        : "active:bg-zinc-200 dark:active:bg-zinc-700"
-                    }`}
-                    onPress={() => {
-                      vibration({ style: "light" });
-                      setBattleTab("attacks");
-                    }}
-                  >
-                    <Text className="text-xl">Attacks</Text>
-                  </Pressable>
-                  <Pressable
-                    className={`px-6 py-4 rounded ${
-                      battleTab == "equipment"
-                        ? "border-zinc-200 bg-zinc-100 dark:border-zinc-900 dark:bg-zinc-800"
-                        : "active:bg-zinc-200 dark:active:bg-zinc-700"
-                    }`}
-                    onPress={() => {
-                      vibration({ style: "light" });
-                      setBattleTab("equipment");
-                    }}
-                  >
-                    <Text className="text-xl">Equipment</Text>
-                  </Pressable>
-                  <Pressable
-                    className={`px-6 py-4 rounded ${
-                      battleTab == "log"
-                        ? "bg-zinc-100 dark:bg-zinc-800"
-                        : "active:bg-zinc-200 dark:active:bg-zinc-700"
-                    }`}
-                    onPress={() => {
-                      vibration({ style: "light" });
-                      setBattleTab("log");
-                    }}
-                  >
-                    <Text className="text-xl">Log</Text>
-                  </Pressable>
-                </View>
-              </View>
+            <View className="flex w-full flex-row justify-around">
+              <Pressable
+                className={`py-4 w-32 mx-2 rounded ${
+                  battleTab == "attacks"
+                    ? "bg-zinc-100 dark:bg-zinc-800"
+                    : "active:bg-zinc-200 dark:active:bg-zinc-700"
+                }`}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  setBattleTab("attacks");
+                }}
+              >
+                <Text className="text-center text-xl">Attacks</Text>
+              </Pressable>
+              <Pressable
+                className={`py-4 w-32 mx-2 rounded ${
+                  battleTab == "equipment"
+                    ? "border-zinc-200 bg-zinc-100 dark:border-zinc-900 dark:bg-zinc-800"
+                    : "active:bg-zinc-200 dark:active:bg-zinc-700"
+                }`}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  setBattleTab("equipment");
+                }}
+              >
+                <Text className="text-center text-xl">Equipment</Text>
+              </Pressable>
+              <Pressable
+                className={`py-4 w-32 mx-2 rounded align ${
+                  battleTab == "log"
+                    ? "bg-zinc-100 dark:bg-zinc-800"
+                    : "active:bg-zinc-200 dark:active:bg-zinc-700"
+                }`}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  setBattleTab("log");
+                }}
+              >
+                <Text className="text-center text-xl">Log</Text>
+              </Pressable>
               {playerState.minions.length > 0
                 ? playerState.minions.map((minion) => (
                     <View key={minion.id} className="py-1">
@@ -1484,12 +1485,12 @@ const DungeonLevelScreen = observer(() => {
                     </View>
                   ))
                 : null}
-              <View className="-mx-4 pb-4">
-                <PlayerStatus />
-              </View>
             </View>
           </View>
         </View>
+        <NonThemedView className="absolute z-50 w-full" style={{ bottom: 90 }}>
+          <PlayerStatus />
+        </NonThemedView>
       </>
     );
   }

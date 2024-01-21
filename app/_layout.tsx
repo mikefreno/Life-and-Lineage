@@ -12,7 +12,7 @@ import { observer } from "mobx-react-lite";
 import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
-import { fullSave, loadGame, loadPlayer } from "../utility/functions";
+import { fullSave, loadGame, loadPlayer } from "../utility/functions/save_load";
 import { View, Text, Platform } from "react-native";
 import { autorun } from "mobx";
 import "../assets/styles/globals.css";
@@ -73,6 +73,7 @@ const Root = observer(() => {
   const [logsState, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const { setColorScheme, colorScheme } = useColorScheme();
+  const [dummyRerender, setDummyRerender] = useState<number>(0);
 
   const getData = async () => {
     try {
@@ -145,6 +146,7 @@ const RootLayout = observer(() => {
   const playerCharacter = playerCharacterData?.playerState;
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
+  const [navbarLoad, setNavbarLoad] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -152,7 +154,7 @@ const RootLayout = observer(() => {
   }, [error]);
 
   useEffect(() => {
-    if (loaded) {
+    if (loaded && navbarLoad) {
       SplashScreen.hideAsync();
       if (!playerCharacter || !game) {
         router.replace("/NewGame");
@@ -175,31 +177,23 @@ const RootLayout = observer(() => {
       }
       setFirstLoad(false);
     }
-  }, [loaded, gameData, playerCharacter]);
+  }, [loaded, navbarLoad, gameData, playerCharacter]);
 
   useEffect(() => {
     getAndSetNavBar();
-  }, [pathname, colorScheme]);
+  }, []);
 
   async function getAndSetNavBar() {
     if (Platform.OS == "android") {
       if ((await NavigationBar.getVisibilityAsync()) == "visible") {
-        let unTabbedPath = false;
-        if (pathname.split("/").length > 0) {
-          unTabbedPath = ["DungeonLevel", "NewGame"].includes(
-            pathname.split("/")[1],
-          );
+        await NavigationBar.setPositionAsync("absolute");
+        await NavigationBar.setBackgroundColorAsync("transparent");
+        if (!navbarLoad) {
+          setNavbarLoad(true);
         }
-        NavigationBar.setBackgroundColorAsync(
-          colorScheme == "light"
-            ? unTabbedPath
-              ? "#fafafa"
-              : "white"
-            : unTabbedPath
-            ? "#18181b"
-            : "#121212",
-        );
       }
+    } else {
+      setNavbarLoad(true);
     }
   }
 
@@ -207,8 +201,18 @@ const RootLayout = observer(() => {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <StatusBar style={colorScheme == "light" ? "dark" : "light"} />
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="Options" options={{ presentation: "modal" }} />
+        <Stack.Screen
+          name="(tabs)"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="Options"
+          options={{
+            presentation: "modal",
+          }}
+        />
         <Stack.Screen
           name="Relationships"
           options={{ presentation: "modal" }}

@@ -24,6 +24,9 @@ import { useContext } from "react";
 import { PlayerCharacterContext } from "../_layout";
 import GraduationCapIcon from "../../assets/icons/GraduationCap";
 import { useVibration } from "../../utility/customHooks";
+import BowlingBallAndPin from "../../assets/icons/BowlingBallAndPin";
+import { BlurView } from "expo-blur";
+import { StyleSheet } from "react-native";
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
@@ -34,9 +37,26 @@ export default function TabLayout() {
     <>
       <Tabs
         screenOptions={{
+          tabBarBackground: () => (
+            <BlurView
+              blurReductionFactor={8}
+              tint={
+                Platform.OS == "android"
+                  ? colorScheme == "light"
+                    ? "systemMaterialLight"
+                    : "systemMaterialDark"
+                  : "default"
+              }
+              intensity={100}
+              style={StyleSheet.absoluteFill}
+              experimentalBlurMethod={"dimezisBlurView"}
+            />
+          ),
           tabBarActiveTintColor: Colors[colorScheme as "light" | "dark"].tint,
           tabBarStyle:
-            Platform.OS === "android" ? { paddingHorizontal: 16 } : {},
+            Platform.OS === "android"
+              ? { paddingHorizontal: 16, position: "absolute" }
+              : { position: "absolute" },
           tabBarButton: (props) => {
             const onPressWithVibration = (event: GestureResponderEvent) => {
               vibration({ style: "light" });
@@ -49,6 +69,22 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
+            headerTransparent: true,
+            headerBackground: () => (
+              <BlurView
+                blurReductionFactor={8}
+                tint={
+                  Platform.OS == "android"
+                    ? colorScheme == "light"
+                      ? "systemMaterialLight"
+                      : "systemMaterialDark"
+                    : "default"
+                }
+                intensity={100}
+                style={StyleSheet.absoluteFill}
+                experimentalBlurMethod={"dimezisBlurView"}
+              />
+            ),
             title: "Home",
             tabBarIcon: ({ color }) =>
               playerCharacter?.playerClass == "necromancer" ? (
@@ -107,6 +143,22 @@ export default function TabLayout() {
         <Tabs.Screen
           name="spells"
           options={{
+            headerTransparent: true,
+            headerBackground: () => (
+              <BlurView
+                blurReductionFactor={8}
+                tint={
+                  Platform.OS == "android"
+                    ? colorScheme == "light"
+                      ? "systemMaterialLight"
+                      : "systemMaterialDark"
+                    : "default"
+                }
+                intensity={100}
+                style={StyleSheet.absoluteFill}
+                experimentalBlurMethod={"dimezisBlurView"}
+              />
+            ),
             title: "Spells",
             tabBarIcon: ({ color }) => (
               <Wand
@@ -139,6 +191,22 @@ export default function TabLayout() {
         <Tabs.Screen
           name="earn"
           options={{
+            headerTransparent: true,
+            headerBackground: () => (
+              <BlurView
+                blurReductionFactor={8}
+                tint={
+                  Platform.OS == "android"
+                    ? colorScheme == "light"
+                      ? "systemMaterialLight"
+                      : "systemMaterialDark"
+                    : "default"
+                }
+                intensity={100}
+                style={StyleSheet.absoluteFill}
+                experimentalBlurMethod={"dimezisBlurView"}
+              />
+            ),
             title: "Earn",
             tabBarIcon: ({ color }) => (
               <Broom
@@ -189,6 +257,22 @@ export default function TabLayout() {
         <Tabs.Screen
           name="dungeon"
           options={{
+            headerTransparent: true,
+            headerBackground: () => (
+              <BlurView
+                blurReductionFactor={8}
+                tint={
+                  Platform.OS == "android"
+                    ? colorScheme == "light"
+                      ? "systemMaterialLight"
+                      : "systemMaterialDark"
+                    : "default"
+                }
+                intensity={100}
+                style={StyleSheet.absoluteFill}
+                experimentalBlurMethod={"dimezisBlurView"}
+              />
+            ),
             title: "Dungeon",
             tabBarIcon: ({ color }) => (
               <Dungeon
@@ -217,6 +301,22 @@ export default function TabLayout() {
         <Tabs.Screen
           name="shops"
           options={{
+            headerTransparent: true,
+            headerBackground: () => (
+              <BlurView
+                blurReductionFactor={8}
+                tint={
+                  Platform.OS == "android"
+                    ? colorScheme == "light"
+                      ? "systemMaterialLight"
+                      : "systemMaterialDark"
+                    : "default"
+                }
+                intensity={100}
+                style={StyleSheet.absoluteFill}
+                experimentalBlurMethod={"dimezisBlurView"}
+              />
+            ),
             title: "Shops",
             tabBarIcon: ({ color }) => (
               <Potion
@@ -226,11 +326,41 @@ export default function TabLayout() {
                 style={{ marginBottom: -3 }}
               />
             ),
+            headerRight: () => (
+              <Link href="/Activities" asChild>
+                <Pressable onPress={() => vibration({ style: "light" })}>
+                  {({ pressed }) => (
+                    <BowlingBallAndPin
+                      width={30}
+                      height={28}
+                      color={"#27272a"}
+                      style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                    />
+                  )}
+                </Pressable>
+              </Link>
+            ),
           }}
         />
         <Tabs.Screen
           name="medical"
           options={{
+            headerTransparent: true,
+            headerBackground: () => (
+              <BlurView
+                blurReductionFactor={8}
+                tint={
+                  Platform.OS == "android"
+                    ? colorScheme == "light"
+                      ? "systemMaterialLight"
+                      : "systemMaterialDark"
+                    : "default"
+                }
+                intensity={100}
+                style={StyleSheet.absoluteFill}
+                experimentalBlurMethod={"dimezisBlurView"}
+              />
+            ),
             title: "Medical",
             tabBarIcon: ({ color }) => (
               <Medical

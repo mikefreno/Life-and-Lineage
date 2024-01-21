@@ -7,7 +7,7 @@ import {
   Dimensions,
 } from "react-native";
 import attacks from "../assets/json/playerAttacks.json";
-import { toTitleCase } from "../utility/functions";
+import { toTitleCase } from "../utility/functions/misc";
 import { Item } from "../classes/item";
 import { useContext, useRef, useState } from "react";
 import {
@@ -19,7 +19,7 @@ import { useColorScheme } from "nativewind";
 import { useVibration } from "../utility/customHooks";
 import { Minion, Enemy } from "../classes/creatures";
 import GearStatsDisplay from "./GearStatsDisplay";
-import { Attack, AttackObj, Spell } from "../utility/types";
+import { AttackObj, Spell } from "../utility/types";
 import { elementalColorMap } from "../utility/elementColors";
 import Energy from "../assets/icons/EnergyIcon";
 
@@ -284,7 +284,7 @@ export default function BattleTab({
       case "equipment":
         return (
           <>
-            <NonThemedView className="absolute bottom-0 mx-auto flex h-full w-full flex-wrap rounded-lg border border-zinc-600">
+            <NonThemedView className="absolute bottom-0 mx-auto flex h-full w-full flex-wrap rounded-lg">
               {Array.from({ length: 24 }).map((_, index) => (
                 <NonThemedView
                   className="absolute items-center justify-center"
@@ -393,7 +393,7 @@ export default function BattleTab({
       case "log":
         return (
           <View
-            className="my-2 flex-1 rounded border border-zinc-900 px-4 dark:border-zinc-100"
+            className="my-1 flex-1 rounded border border-zinc-900 px-4 dark:border-zinc-100"
             style={{
               backgroundColor: colorScheme == "dark" ? "#09090b" : "#fff",
             }}

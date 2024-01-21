@@ -9,7 +9,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { useContext, useState } from "react";
 import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { observer } from "mobx-react-lite";
-import { numberToRoman } from "../utility/functions";
+import { numberToRoman } from "../utility/functions/misc";
 import { useVibration } from "../utility/customHooks";
 
 interface LaborTaskProps {

@@ -7,7 +7,7 @@ import Sanity from "../assets/icons/SanityIcon";
 import { Pressable, View } from "react-native";
 import { Text } from "../components/Themed";
 import ProgressBar from "./ProgressBar";
-import { toTitleCase } from "../utility/functions";
+import { toTitleCase } from "../utility/functions/misc";
 
 interface TrainingCardProps {
   name: string;

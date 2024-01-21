@@ -6,7 +6,7 @@ import {
 } from "react-native";
 import { View, Text } from "../../components/Themed";
 import { useContext, useEffect, useState } from "react";
-import { toTitleCase } from "../../utility/functions";
+import { toTitleCase } from "../../utility/functions/misc";
 import { GameContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
 import * as Updates from "expo-updates";

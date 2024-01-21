@@ -1,7 +1,7 @@
 import { Pressable, Image, View as NonThemedView } from "react-native";
 import { View, Text } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
-import { calculateAge, toTitleCase } from "../../utility/functions";
+import { calculateAge, toTitleCase } from "../../utility/functions/misc";
 import PlayerStatus from "../../components/PlayerStatus";
 import { Item } from "../../classes/item";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -18,6 +18,8 @@ import { useVibration } from "../../utility/customHooks";
 import { Dimensions } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -40,7 +42,6 @@ const HomeScreen = observer(() => {
   const [showIntroTutorial, setShowIntroTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("intro")) ?? false,
   );
-
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -127,8 +128,8 @@ const HomeScreen = observer(() => {
   function currentEquipmentDisplay() {
     const [buzzed, setBuzzed] = useState<boolean>(false);
     return (
-      <View className={`flex w-full`}>
-        <View className="items-center">
+      <NonThemedView className="flex w-full">
+        <NonThemedView className="-mt-[1vh] items-center">
           <Text className="mb-2">Head</Text>
           {playerState?.equipment.head ? (
             <Pressable className="h-12 w-12 active:scale-90 active:opacity-50">
@@ -185,7 +186,7 @@ const HomeScreen = observer(() => {
               style={{ backgroundColor: "#a1a1aa" }}
             />
           )}
-        </View>
+        </NonThemedView>
         <NonThemedView className="flex flex-row justify-evenly">
           <NonThemedView className="-ml-1 -mt-4 mr-2 md:mt-4">
             <Text className="mb-2">Main Hand</Text>
@@ -370,7 +371,7 @@ const HomeScreen = observer(() => {
             />
           )}
         </NonThemedView>
-      </View>
+      </NonThemedView>
     );
   }
 
@@ -490,54 +491,69 @@ const HomeScreen = observer(() => {
           }}
           onCloseFunction={() => setShowIntroTutorial(false)}
         />
-        <View className="flex-1">
-          <View className=" flex-1 px-[2vw] pt-[1vh]">
-            <View className="-mx-4 border-b border-zinc-200 dark:border-zinc-700">
-              <View className="mx-6 flex-row items-center pb-4 md:py-12">
-                {playerState?.playerClass == "necromancer" ? (
-                  <NonThemedView className="mx-auto">
-                    <Necromancer
-                      width={100}
-                      height={100}
-                      color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
-                    />
-                  </NonThemedView>
-                ) : playerState?.playerClass == "paladin" ? (
-                  <NonThemedView className="mx-auto">
-                    <PaladinHammer width={100} height={100} />
-                  </NonThemedView>
-                ) : (
-                  <NonThemedView className="mx-auto scale-x-[-1] transform">
-                    <WizardHat
-                      height={100}
-                      width={100}
-                      color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
-                    />
-                  </NonThemedView>
-                )}
-                <NonThemedView className="mx-2 flex-1 flex-col justify-center pt-2 align-middle">
-                  <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
-                  <Text className="text-center text-xl dark:text-white">{`${playerState.job}`}</Text>
-                  <Text className="text-center text-xl dark:text-white">{`${
-                    playerState
-                      ? calculateAge(
-                          new Date(playerState.birthdate),
-                          new Date(gameState.date),
-                        )
-                      : "x"
-                  } years old`}</Text>
-                </NonThemedView>
+        <View
+          style={{
+            marginTop: useHeaderHeight() / 2,
+            height: useHeaderHeight() * 0.5,
+            backgroundColor:
+              playerState.playerClass == "mage"
+                ? "#1e40af"
+                : playerState.playerClass == "necromancer"
+                ? "#6b21a8"
+                : "#fcd34d",
+            opacity: 0.5,
+          }}
+        />
+        <View
+          className="flex-1"
+          style={{
+            paddingBottom: useBottomTabBarHeight() + 60,
+          }}
+        >
+          <NonThemedView className="-mx-4">
+            <NonThemedView className="mx-6 flex-row items-center border-b border-zinc-200 py-2 dark:border-zinc-600 md:py-12">
+              {playerState?.playerClass == "necromancer" ? (
                 <NonThemedView className="mx-auto">
-                  {blessingDisplay(playerState.blessing, colorScheme)}
+                  <Necromancer
+                    width={100}
+                    height={100}
+                    color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
+                  />
                 </NonThemedView>
-              </View>
-            </View>
-            <NonThemedView className="flex-1 justify-evenly">
-              {currentEquipmentDisplay()}
-              {inventoryRender()}
+              ) : playerState?.playerClass == "paladin" ? (
+                <NonThemedView className="mx-auto">
+                  <PaladinHammer width={100} height={100} />
+                </NonThemedView>
+              ) : (
+                <NonThemedView className="mx-auto scale-x-[-1] transform">
+                  <WizardHat
+                    height={100}
+                    width={100}
+                    color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
+                  />
+                </NonThemedView>
+              )}
+              <NonThemedView className="mx-2 flex-1 flex-col justify-center pt-2 align-middle">
+                <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
+                <Text className="text-center text-xl dark:text-white">{`${playerState.job}`}</Text>
+                <Text className="text-center text-xl dark:text-white">{`${
+                  playerState
+                    ? calculateAge(
+                        new Date(playerState.birthdate),
+                        new Date(gameState.date),
+                      )
+                    : "x"
+                } years old`}</Text>
+              </NonThemedView>
+              <NonThemedView className="mx-auto">
+                {blessingDisplay(playerState.blessing, colorScheme)}
+              </NonThemedView>
             </NonThemedView>
-          </View>
-          {playerState && <PlayerStatus displayGoldTop={true} />}
+          </NonThemedView>
+          <NonThemedView className="flex-1 justify-evenly px-[2vw]">
+            {currentEquipmentDisplay()}
+            {inventoryRender()}
+          </NonThemedView>
           {showingStats && statsLeftPos && statsTopPos ? (
             <View
               className="absolute items-center rounded-md border border-zinc-600 p-4"
@@ -592,6 +608,12 @@ const HomeScreen = observer(() => {
             </View>
           ) : null}
         </View>
+        <NonThemedView
+          className="absolute z-50 w-full"
+          style={{ bottom: useBottomTabBarHeight() + 70 }}
+        >
+          <PlayerStatus />
+        </NonThemedView>
       </>
     );
   }

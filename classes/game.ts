@@ -3,7 +3,7 @@ import { Shop } from "./shop";
 import dungeons from "../assets/json/dungeons.json";
 import { action, makeObservable, observable } from "mobx";
 import { PlayerCharacter } from "./character";
-import { lowSanityDebuffGenerator } from "../utility/functions";
+import { lowSanityDebuffGenerator } from "../utility/functions/conditions";
 
 interface GameOptions {
   date?: string;

@@ -5,7 +5,7 @@ import deathMessages from "../assets/json/deathMessages.json";
 import { useContext, useEffect, useState } from "react";
 import { router } from "expo-router";
 import { CharacterImage } from "../components/CharacterImage";
-import { calculateAge } from "../utility/functions";
+import { calculateAge } from "../utility/functions/misc";
 import { Character } from "../classes/character";
 import { GameContext, PlayerCharacterContext } from "./_layout";
 

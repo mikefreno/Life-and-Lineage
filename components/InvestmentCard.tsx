@@ -5,7 +5,7 @@ import Coins from "../assets/icons/CoinsIcon";
 import { Pressable, View, StyleSheet, Animated } from "react-native";
 import Modal from "react-native-modal";
 import { useContext, useEffect, useRef, useState } from "react";
-import { asReadableGold, toTitleCase } from "../utility/functions";
+import { asReadableGold, toTitleCase } from "../utility/functions/misc";
 import ClockIcon from "../assets/icons/ClockIcon";
 import Vault from "../assets/icons/VaultIcon";
 import { Entypo } from "@expo/vector-icons";
@@ -148,7 +148,7 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
         onBackButtonPress={() => setShowUpgrades(false)}
       >
         <ThemedView
-          className="mx-auto max-h-[90vh] w-full rounded-xl p-4 dark:border dark:border-zinc-500"
+          className="mx-auto max-h-[90vh] w-full rounded-xl px-4 dark:border dark:border-zinc-500"
           style={{
             shadowColor: "#000",
             shadowOffset: {
@@ -375,7 +375,7 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
               vibration({ style: "light" });
               setShowUpgrades(false);
             }}
-            className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+            className="mx-auto mb-4 mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
           >
             <Text>Close</Text>
           </Pressable>

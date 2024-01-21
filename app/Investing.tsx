@@ -5,17 +5,20 @@ import { InvestmentType } from "../utility/types";
 import InvestmentCard from "../components/InvestmentCard";
 import PlayerStatus from "../components/PlayerStatus";
 import { useContext, useEffect, useState } from "react";
-import { GameContext, PlayerCharacterContext } from "./_layout";
+import { GameContext } from "./_layout";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../components/TutorialModal";
+import { View as NonThemedView, Platform, StyleSheet } from "react-native";
+import { Stack } from "expo-router";
+import { BlurView } from "expo-blur";
+import { useColorScheme } from "nativewind";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 export default function InvestingScreen() {
-  const playerCharacterContext = useContext(PlayerCharacterContext);
   const gameContext = useContext(GameContext);
-  if (!gameContext || !playerCharacterContext) {
+  if (!gameContext) {
     throw new Error("missing context");
   }
-  const { playerState } = playerCharacterContext;
   const { gameState } = gameContext;
   const [showInvestingTutorial, setShowingInvestingTutorial] =
     useState<boolean>(
@@ -25,6 +28,7 @@ export default function InvestingScreen() {
     gameState?.tutorialsEnabled ?? true,
   );
   const isFocused = useIsFocused();
+  const { colorScheme } = useColorScheme();
 
   useEffect(() => {
     if (!showInvestingTutorial && gameState) {
@@ -54,6 +58,27 @@ export default function InvestingScreen() {
 
   return (
     <>
+      <Stack.Screen
+        options={{
+          headerBackTitleVisible: false,
+          headerTransparent: true,
+          headerBackground: () => (
+            <BlurView
+              blurReductionFactor={4}
+              tint={
+                Platform.OS == "android"
+                  ? colorScheme == "light"
+                    ? "systemMaterialLight"
+                    : "systemMaterialDark"
+                  : "default"
+              }
+              intensity={100}
+              style={StyleSheet.absoluteFill}
+              experimentalBlurMethod={"dimezisBlurView"}
+            />
+          ),
+        }}
+      />
       <TutorialModal
         isVisibleCondition={
           (showInvestingTutorial && gameState?.tutorialsEnabled && isFocused) ??
@@ -74,15 +99,17 @@ export default function InvestingScreen() {
         }}
       />
       <View className="flex-1">
-        <PlayerStatus onTop displayGoldBottom />
-        <View className="flex-1 items-center justify-center">
-          <ScrollView>
+        <ScrollView>
+          <View style={{ paddingTop: useHeaderHeight(), paddingBottom: 90 }}>
             {investments.map((investment: InvestmentType, idx) => (
               <InvestmentCard key={idx} investment={investment} />
             ))}
-          </ScrollView>
-        </View>
+          </View>
+        </ScrollView>
       </View>
+      <NonThemedView className="absolute z-50 w-full" style={{ bottom: 90 }}>
+        <PlayerStatus />
+      </NonThemedView>
     </>
   );
 }

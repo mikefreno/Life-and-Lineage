@@ -7,11 +7,13 @@ import { GameContext, PlayerCharacterContext } from "../_layout";
 import { useContext, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import Modal from "react-native-modal";
-import { toTitleCase } from "../../utility/functions";
+import { toTitleCase } from "../../utility/functions/misc";
 import { router } from "expo-router";
 import { useVibration } from "../../utility/customHooks";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 const EarnScreen = observer(() => {
   const playerCharacterData = useContext(PlayerCharacterContext);
@@ -119,10 +121,22 @@ const EarnScreen = observer(() => {
           </View>
         </View>
       </Modal>
+      <View
+        style={{
+          marginTop: useHeaderHeight() / 2,
+          height: useHeaderHeight() * 0.5,
+          backgroundColor: "#fbbf24",
+          opacity: 0.5,
+        }}
+      />
       <View className="flex-1">
-        <PlayerStatus displayGoldBottom={true} onTop={true} />
-        <ScrollView>
-          <View className="px-2 pb-24 pt-4">
+        <ScrollView className="">
+          <View
+            className="px-2"
+            style={{
+              paddingBottom: useBottomTabBarHeight() + 74,
+            }}
+          >
             {jobs
               .sort((aJob, bJob) => aJob.reward.gold - bJob.reward.gold)
               .map((Job, index) => {
@@ -139,6 +153,12 @@ const EarnScreen = observer(() => {
               })}
           </View>
         </ScrollView>
+        <NonThemedView
+          className="absolute z-50 w-full"
+          style={{ bottom: useBottomTabBarHeight() + 70 }}
+        >
+          <PlayerStatus />
+        </NonThemedView>
       </View>
     </>
   );

@@ -10,6 +10,8 @@ import { elementalColorMap } from "../../utility/elementColors";
 import PlayerStatus from "../../components/PlayerStatus";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 const SpellsScreen = observer(() => {
   const playerCharacterData = useContext(PlayerCharacterContext);
@@ -121,9 +123,23 @@ const SpellsScreen = observer(() => {
         }}
         onCloseFunction={() => setShowSpellTutorial(false)}
       />
-      <View className="flex-1">
-        <PlayerStatus onTop={true} />
-        <Text className="py-8 text-center text-xl tracking-wide">
+      <View
+        style={{
+          marginTop: useHeaderHeight() / 2,
+          height: useHeaderHeight() * 0.5,
+          backgroundColor: playerState
+            ? elementalColorMap[playerState.blessing].dark
+            : undefined,
+          opacity: 0.5,
+        }}
+      />
+      <View
+        className="flex-1"
+        style={{
+          paddingBottom: useBottomTabBarHeight() + 74,
+        }}
+      >
+        <Text className="pt-4 text-center text-xl tracking-wide">
           Known Spells
         </Text>
         <View className="flex-1 justify-evenly px-4">
@@ -158,6 +174,12 @@ const SpellsScreen = observer(() => {
             </View>
           </View>
         </View>
+        <NonThemedView
+          className="absolute z-50 w-full"
+          style={{ bottom: useBottomTabBarHeight() + 70 }}
+        >
+          <PlayerStatus />
+        </NonThemedView>
       </View>
     </>
   );

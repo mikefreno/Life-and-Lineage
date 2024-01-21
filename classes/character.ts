@@ -1,14 +1,15 @@
 import {
   calculateAge,
+  rollToLiveByAge,
+  damageReduction,
+} from "../utility/functions/misc";
+import {
   createBuff,
   createDebuff,
-  damageReduction,
   getConditionEffectsOnAttacks,
   getConditionEffectsOnDefenses,
   getConditionEffectsOnMisc,
-  rollD20,
-  rollToLiveByAge,
-} from "../utility/functions";
+} from "../utility/functions/conditions";
 import { Condition } from "./conditions";
 import { Item } from "./item";
 import weapons from "../assets/json/items/weapons.json";
@@ -19,8 +20,10 @@ import necroSpells from "../assets/json/necroSpells.json";
 import { Minion } from "./creatures";
 import summons from "../assets/json/summons.json";
 import { action, makeObservable, observable } from "mobx";
+
 import { Investment } from "./investment";
 import { AttackObj, InvestmentType, InvestmentUpgrade } from "../utility/types";
+import { rollD20 } from "../utility/functions/roll";
 
 interface CharacterOptions {
   firstName: string;
@@ -29,7 +32,10 @@ interface CharacterOptions {
   birthdate?: string;
   alive?: boolean;
   deathdate: string | null;
+  fertility?: number;
   job?: string;
+  isPlayerPartner?: boolean;
+  sexuality: "straight" | "gay" | "bisexual" | null;
   affection?: number;
   qualifications?: string[];
 }
@@ -39,9 +45,12 @@ export class Character {
   readonly lastName: string;
   readonly sex: "male" | "female";
   alive: boolean;
+  fertility: number;
   readonly birthdate: string;
   deathdate: string | null;
   job: string;
+  isPlayerPartner: boolean;
+  sexuality: "straight" | "gay" | "bisexual" | null;
   affection: number;
   qualifications: string[];
 
@@ -53,6 +62,9 @@ export class Character {
     birthdate,
     deathdate,
     job,
+    isPlayerPartner,
+    sexuality,
+    fertility,
     affection,
     qualifications,
   }: CharacterOptions) {
@@ -63,6 +75,9 @@ export class Character {
     this.birthdate = birthdate ?? new Date().toISOString();
     this.deathdate = deathdate ?? null;
     this.job = job ?? "Unemployed";
+    this.isPlayerPartner = isPlayerPartner ?? false;
+    this.sexuality = sexuality;
+    this.fertility = fertility ?? Math.floor(Math.random() * 21);
     this.affection = affection ?? 0;
     this.qualifications = qualifications ?? [];
     makeObservable(this, {
@@ -71,6 +86,7 @@ export class Character {
       job: observable,
       affection: observable,
       qualifications: observable,
+      isPlayerPartner: observable,
       getFullName: action,
       setJob: action,
       deathRoll: action,
@@ -113,6 +129,8 @@ export class Character {
       birthdate: json.birthdate ?? undefined,
       alive: json.alive,
       deathdate: json.deathdate ?? null,
+      sexuality: json.sexuality,
+      isPlayerPartner: json.isPlayerPartner,
       job: json.job,
       affection: json.affection,
       qualifications: json.qualifications,
@@ -157,6 +175,8 @@ type PlayerCharacterBase = {
   }[];
   parents: Character[];
   children?: Character[];
+  relationships?: Character[];
+  sexuality: null;
   physicalAttacks?: string[];
   knownSpells?: string[];
   gold?: number;
@@ -227,6 +247,7 @@ export class PlayerCharacter extends Character {
   minions: Minion[];
   readonly parents: Character[];
   children: Character[];
+  relationships: Character[];
   knownSpells: string[];
   physicalAttacks: string[];
   conditions: Condition[];
@@ -267,6 +288,8 @@ export class PlayerCharacter extends Character {
     magicProficiencies,
     parents,
     children,
+    sexuality,
+    relationships,
     knownSpells,
     physicalAttacks,
     gold,
@@ -282,6 +305,7 @@ export class PlayerCharacter extends Character {
       birthdate,
       alive,
       deathdate,
+      sexuality,
       job,
       qualifications,
       affection,
@@ -303,6 +327,7 @@ export class PlayerCharacter extends Character {
       magicProficiencies ?? getStartingProficiencies(playerClass, blessing);
     this.parents = parents;
     this.children = children ?? [];
+    this.relationships = relationships ?? [];
     this.knownSpells = knownSpells ?? [];
     this.conditions = [];
     this.physicalAttacks = physicalAttacks ?? ["punch"];
@@ -1188,6 +1213,7 @@ export class PlayerCharacter extends Character {
             armor: this.getArmorValue(),
             maxHealth: this.getNonBuffedMaxHealth(),
             maxSanity: this.getNonBuffedMaxSanity(),
+            applierNameString: this.getFullName(),
           });
           if (res) {
             this.addCondition(res);
@@ -1204,6 +1230,7 @@ export class PlayerCharacter extends Character {
             enemyMaxHP: enemyMaxHP,
             enemyMaxSanity: enemyMaxSanity,
             primaryAttackDamage: chosenSpell.effects.damage ?? 0,
+            applierNameString: this.getFullName(),
           });
           if (debuffRes) debuffs.push(debuffRes);
         });
@@ -1370,6 +1397,7 @@ export class PlayerCharacter extends Character {
       knownSpells: json.knownSpells,
       physicalAttacks: json.physicalAttacks,
       gold: json.gold,
+      sexuality: null,
       inventory: json.inventory
         ? json.inventory.map((item: any) => Item.fromJSON(item))
         : [],

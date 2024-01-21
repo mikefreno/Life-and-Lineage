@@ -1,0 +1,81 @@
+[
+   {
+      "name":"walk in the enchanted forest",
+      "cost": 0,
+      "alone":{
+         "meetingSomeone": 0.15,
+         "nothingHappens": 0.30,
+         "randomGood": 0.40,
+         "randomBad": 0.15
+      },
+      "dateCooldown": 5,
+      "date":{
+         "increaseAffection": 0.85,
+         "increaseAffectionRange": {"min": 1, "max": 10 },
+         "decreaseAffection": 0.15,
+         "decreaseAffectionRange": {"min": 1, "max": 5 }
+      }
+   },
+   {
+      "name":"go to a library",
+      "cost": 0,
+      "alone":{
+         "meetingSomeone": 0.40,
+         "nothingHappens": 0.40,
+         "randomGood": 0.10,
+         "randomBad": 0.10
+      },
+      "dateCooldown": 10,
+      "date":{
+         "increaseAffection": 0.85,
+         "increaseAffectionRange": {"min": 3, "max": 7 },
+         "decreaseAffection": 0.15,
+         "decreaseAffectionRange": {"min": 1, "max": 4 }
+      }
+   },
+   {
+      "name":"go to the pub",
+      "cost": 25,
+      "alone": {
+         "meetingSomeone": 0.30,
+         "nothingHappens": 0.20,
+         "randomGood": 0.15,
+         "randomBad": 0.35
+      },
+      "dateCooldown": 10,
+      "date":{
+         "increaseAffection": 0.80,
+         "increaseAffectionRange": {"min": 5, "max": 15 },
+         "decreaseAffection": 0.20,
+         "decreaseAffectionRange": {"min": 3, "max": 10 }
+      }
+   },
+   {
+      "name":"go to a festival",
+      "cost": 50,
+      "alone":{
+         "meetingSomeone": 0.40,
+         "nothingHappens": 0.40,
+         "randomGood": 0.10,
+         "randomBad": 0.10
+      },
+      "dateCooldown": 15,
+      "date":{
+         "increaseAffection": 0.85,
+         "increaseAffectionRange": {"min": 5, "max": 15 },
+         "decreaseAffection": 0.15,
+         "decreaseAffectionRange": {"min": 3, "max": 10 }
+      }
+   },
+   {
+      "name":"visit a soul-thread weaver",
+      "cost": 250,
+      "aloneCooldown": 20,
+      "alone":{
+         "meetingSomeone": 0.60,
+         "nothingHappens": 0.30,
+         "randomGood": 0.05,
+         "randomBad": 0.05
+      }
+   }
+]

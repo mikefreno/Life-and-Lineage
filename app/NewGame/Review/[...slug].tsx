@@ -6,14 +6,14 @@ import {
   getStartingBook,
 } from "../../../classes/character";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import names from "../../../assets/json/names.json";
 import jobs from "../../../assets/json/jobs.json";
 import {
   createShops,
-  fullSave,
   generateBirthday,
+  getRandomName,
   toTitleCase,
-} from "../../../utility/functions";
+} from "../../../utility/functions/misc";
+import { fullSave } from "../../../utility/functions/save_load";
 import { Game } from "../../../classes/game";
 import { useContext } from "react";
 import {
@@ -48,23 +48,17 @@ export default function NewGameReview() {
     const randomIndex = Math.floor(Math.random() * jobs.length);
     return jobs[randomIndex].title;
   }
-  function getRandomFirstName(sex: string): string {
-    const filteredNames = names.filter((name) => {
-      return name.sex == sex;
-    });
-    const randomIndex = Math.floor(Math.random() * filteredNames.length);
-    return filteredNames[randomIndex].firstName;
-  }
 
   function createParent(sex: "female" | "male"): Character {
-    const firstName = getRandomFirstName(sex);
+    const firstName = getRandomName(sex).firstName;
     const job = getRandomJobTitle();
     const parent = new Character({
       firstName: firstName,
       lastName: lastName,
       sex: sex,
       job: job,
-      affection: 75,
+      sexuality: "straight",
+      affection: 85,
       birthdate: generateBirthday(32, 55),
       deathdate: null,
     });

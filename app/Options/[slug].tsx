@@ -1,11 +1,10 @@
 import { Link, Stack, useLocalSearchParams } from "expo-router";
-import { toTitleCase } from "../../utility/functions";
+import { toTitleCase } from "../../utility/functions/misc";
 import { View, Text } from "../../components/Themed";
 import { Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import { useColorScheme } from "nativewind";
-import { router } from "expo-router";
 
 export default function CodexInfo() {
   const { slug } = useLocalSearchParams();

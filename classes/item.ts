@@ -1,11 +1,10 @@
-import { v4 as uuidv4 } from "uuid";
 import mageBooks from "../assets/json/items/mageBooks.json";
 import necroBooks from "../assets/json/items/necroBooks.json";
 import paladinBooks from "../assets/json/items/paladinBooks.json";
 import mageSpells from "../assets/json/mageSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
-
+import * as Crypto from "expo-crypto";
 interface ItemOptions {
   id?: string;
   name: string;
@@ -62,7 +61,7 @@ export class Item {
     itemClass,
     icon,
   }: ItemOptions) {
-    this.id = id ?? uuidv4();
+    this.id = id ?? Crypto.randomUUID();
     this.name = name;
     this.slot = slot ?? null;
     this.stats = stats ?? null;

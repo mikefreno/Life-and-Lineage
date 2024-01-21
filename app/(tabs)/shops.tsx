@@ -1,6 +1,6 @@
-import { Pressable, FlatList, View as NonThemedView } from "react-native";
-import { Text, View } from "../../components/Themed";
-import { calculateAge, toTitleCase } from "../../utility/functions";
+import { Pressable, View as NonThemedView } from "react-native";
+import { ScrollView, Text, View } from "../../components/Themed";
+import { calculateAge, toTitleCase } from "../../utility/functions/misc";
 import { Shop } from "../../classes/shop";
 import { CharacterImage } from "../../components/CharacterImage";
 import shopObjects from "../../assets/json/shops.json";
@@ -10,6 +10,9 @@ import { GameContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import PlayerStatus from "../../components/PlayerStatus";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 export default function ShopsScreen() {
   const gameData = useContext(GameContext);
@@ -28,10 +31,8 @@ export default function ShopsScreen() {
   }, [showShopTutorial]);
 
   if (gameState) {
-    const shops = gameState.shops;
-
-    const renderItem = ({ item: shop }: { item: Shop }) => (
-      <NonThemedView className="w-1/2">
+    const renderItem = (shop: Shop) => (
+      <NonThemedView className="h-96 w-1/2" key={shop.shopKeeperName}>
         <NonThemedView
           className="m-2 flex-1 items-center justify-between rounded-xl border p-4"
           style={{
@@ -142,14 +143,26 @@ export default function ShopsScreen() {
           }}
           onCloseFunction={() => setShowShopTutorial(false)}
         />
-        <View className="flex-1">
-          <FlatList
-            data={shops}
-            renderItem={renderItem}
-            keyExtractor={(shop) => shop.archetype}
-            numColumns={2}
-          />
-        </View>
+        <ScrollView>
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              alignItems: "flex-start",
+              justifyContent: "flex-start",
+              paddingBottom: useBottomTabBarHeight() + 74,
+              paddingTop: useHeaderHeight(),
+            }}
+          >
+            {gameState.shops.map((shop) => renderItem(shop))}
+          </View>
+        </ScrollView>
+        <NonThemedView
+          className="absolute z-50 w-full"
+          style={{ bottom: useBottomTabBarHeight() + 70 }}
+        >
+          <PlayerStatus />
+        </NonThemedView>
       </>
     );
   }

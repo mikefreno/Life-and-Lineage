@@ -8,6 +8,10 @@ import TutorialModal from "../components/TutorialModal";
 import { GameContext } from "./_layout";
 import { useContext, useEffect, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
+import { View as NonThemedView, Platform, StyleSheet } from "react-native";
+import { BlurView } from "expo-blur";
+import { useColorScheme } from "nativewind";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 const JobTraining = observer(() => {
   const gameContext = useContext(GameContext);
@@ -19,6 +23,7 @@ const JobTraining = observer(() => {
     (gameState && !gameState.getTutorialState("training")) ?? false,
   );
   const isFocused = useIsFocused();
+  const { colorScheme } = useColorScheme();
 
   useEffect(() => {
     if (!showTrainingTutorial && gameState) {
@@ -28,7 +33,28 @@ const JobTraining = observer(() => {
 
   return (
     <>
-      <Stack.Screen options={{ title: "Training School" }} />
+      <Stack.Screen
+        options={{
+          title: "Traditional Study",
+          headerBackTitleVisible: false,
+          headerTransparent: true,
+          headerBackground: () => (
+            <BlurView
+              blurReductionFactor={4}
+              tint={
+                Platform.OS == "android"
+                  ? colorScheme == "light"
+                    ? "systemMaterialLight"
+                    : "systemMaterialDark"
+                  : "default"
+              }
+              intensity={100}
+              style={StyleSheet.absoluteFill}
+              experimentalBlurMethod={"dimezisBlurView"}
+            />
+          ),
+        }}
+      />
       <TutorialModal
         isVisibleCondition={
           (showTrainingTutorial && gameState?.tutorialsEnabled && isFocused) ??
@@ -42,9 +68,10 @@ const JobTraining = observer(() => {
         }}
       />
       <View className="flex-1">
-        <PlayerStatus displayGoldBottom={true} onTop={true} />
-        <ScrollView>
-          <View className="px-2 pb-24 pt-4">
+        <ScrollView
+          style={{ paddingBottom: 48, paddingTop: useHeaderHeight() }}
+        >
+          <View className="px-2 pt-4">
             {qualifications.map((qual, index) => {
               return (
                 <TrainingCard
@@ -60,6 +87,9 @@ const JobTraining = observer(() => {
           </View>
         </ScrollView>
       </View>
+      <NonThemedView className="absolute z-50 w-full" style={{ bottom: 90 }}>
+        <PlayerStatus />
+      </NonThemedView>
     </>
   );
 });

@@ -1,6 +1,6 @@
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { View, Text } from "../../../components/Themed";
-import { toTitleCase } from "../../../utility/functions";
+import { toTitleCase } from "../../../utility/functions/misc";
 import { FontAwesome5, Foundation } from "@expo/vector-icons";
 import { Pressable, View as NonThemedView } from "react-native";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -33,10 +33,6 @@ export default function SetSex() {
 
   let tutorialStateRef = useRef<boolean>(gameState?.tutorialsEnabled ?? true);
 
-  const [tutorialState, setTutorialState] = useState<boolean>(
-    gameState?.tutorialsEnabled ?? true,
-  );
-
   useEffect(() => {
     if (!showAgingTutorial && gameState) {
       gameState.updateTutorialState("aging", true);
@@ -55,17 +51,10 @@ export default function SetSex() {
       const parsed: boolean = JSON.parse(res);
       console.log("loading: ", parsed);
       setShowAgingTutorial(parsed);
-      setTutorialState(parsed);
       tutorialStateRef.current = parsed;
     }
     setLoadedAsync(true);
   }
-
-  useEffect(() => {
-    if (gameState) {
-      setTutorialState(gameState?.tutorialsEnabled);
-    }
-  }, [gameState?.tutorialsEnabled]);
 
   const accent =
     (slug as string) == "mage"

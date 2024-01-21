@@ -1,5 +1,5 @@
 import { action, makeObservable, observable } from "mobx";
-import { v4 as uuidv4 } from "uuid";
+import * as Crypto from "expo-crypto";
 
 interface ConditionOptions {
   id?: string;
@@ -81,7 +81,7 @@ export class Condition {
     id,
     icon,
   }: ConditionOptions) {
-    this.id = id ?? uuidv4();
+    this.id = id ?? Crypto.randomUUID();
     this.name = name;
     this.style = style;
     this.turns = turns;

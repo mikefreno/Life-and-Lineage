@@ -4,13 +4,15 @@ import {
   asReadableGold,
   calculateAge,
   toTitleCase,
-} from "../../utility/functions";
+} from "../../utility/functions/misc";
 import { CharacterImage } from "../../components/CharacterImage";
 import {
   Pressable,
   Image,
   ScrollView,
   View as NonThemedView,
+  Platform,
+  StyleSheet,
 } from "react-native";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Item } from "../../classes/item";
@@ -22,6 +24,10 @@ import GearStatsDisplay from "../../components/GearStatsDisplay";
 import { useVibration } from "../../utility/customHooks";
 import { observer } from "mobx-react-lite";
 import TutorialModal from "../../components/TutorialModal";
+import { BlurView } from "expo-blur";
+import { useColorScheme } from "nativewind";
+import { useHeaderHeight } from "@react-navigation/elements";
+import shopObjects from "../../assets/json/shops.json";
 
 const ONE_HOUR = 60 * 60 * 1000;
 
@@ -35,6 +41,7 @@ const ShopInteriorScreen = observer(() => {
   const { playerState } = playerCharacterData;
   const vibration = useVibration();
   const thisShop = gameState?.shops.find((aShop) => aShop.archetype == shop);
+  const colors = shopObjects.find((shopObj) => shopObj.type == shop)?.colors;
   const [selectedItem, setSelectedItem] = useState<{
     item: Item;
     buying: boolean;
@@ -63,6 +70,7 @@ const ShopInteriorScreen = observer(() => {
     useState<boolean>(false);
 
   const isFocused = useIsFocused();
+  const { colorScheme } = useColorScheme();
 
   const [showShopInteriorTutorial, setShowShopInteriorTutorial] =
     useState<boolean>(
@@ -292,6 +300,23 @@ const ShopInteriorScreen = observer(() => {
         <Stack.Screen
           options={{
             title: toTitleCase(shop as string),
+            headerBackTitleVisible: false,
+            headerTransparent: true,
+            headerBackground: () => (
+              <BlurView
+                blurReductionFactor={8}
+                tint={
+                  Platform.OS == "android"
+                    ? colorScheme == "light"
+                      ? "systemMaterialLight"
+                      : "systemMaterialDark"
+                    : "default"
+                }
+                intensity={100}
+                style={StyleSheet.absoluteFill}
+                experimentalBlurMethod={"dimezisBlurView"}
+              />
+            ),
           }}
         />
         <TutorialModal
@@ -314,6 +339,14 @@ const ShopInteriorScreen = observer(() => {
           pageThree={{
             title: "Good Luck.",
             body: "And remember fleeing (top left) can save you.",
+          }}
+        />
+        <View
+          style={{
+            marginTop: useHeaderHeight() / 2,
+            height: useHeaderHeight() * 0.5,
+            backgroundColor: colors?.background,
+            opacity: 0.5,
           }}
         />
         <View className="flex-1">

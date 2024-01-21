@@ -101,3 +101,22 @@ export type AttackObj = {
   debuffs?: { name: string; chance: number }[];
   summons?: string[];
 };
+
+export type Activity = {
+  name: string;
+  cost: number;
+  aloneCooldown?: number;
+  alone?: {
+    meetingSomeone: number;
+    nothingHappens: number;
+    randomGood: number;
+    randomBad: number;
+  };
+  dateCooldown?: number;
+  date?: {
+    increaseAffection: number;
+    increaseAffectionRange: { min: number; max: number };
+    decreaseAffection: number;
+    decreaseAffectionRange: { min: number; max: number };
+  };
+};

@@ -3,7 +3,7 @@ import { Text, View } from "../../components/Themed";
 import { router } from "expo-router";
 import { useContext, useState } from "react";
 import { GameContext } from "../_layout";
-import { toTitleCase } from "../../utility/functions";
+import { toTitleCase } from "../../utility/functions/misc";
 import {
   Pressable,
   View as NonThemedView,
