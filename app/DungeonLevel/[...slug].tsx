@@ -591,6 +591,7 @@ const DungeonLevelScreen = observer(() => {
           }
           router.replace("/dungeon");
           playerState.setInDungeon({ state: false });
+          setEnemy(null);
         }, 200);
       } else {
         setFleeRollFailure(true);
@@ -907,6 +908,32 @@ const DungeonLevelScreen = observer(() => {
   while (!enemyState) {
     return (
       <>
+        <Stack.Screen
+          options={{
+            animationTypeForReplace: "push",
+            headerTitle: `${toTitleCase(thisInstance?.name)} Level ${level}`,
+            headerLeft: () => (
+              <Pressable
+                onPress={() => {
+                  setFleeRollFailure(false);
+                  setFleeModalShowing(true);
+                }}
+              >
+                {({ pressed }) => (
+                  <MaterialCommunityIcons
+                    name="run-fast"
+                    size={28}
+                    color={colorScheme == "light" ? "#18181b" : "#fafafa"}
+                    style={{
+                      opacity: pressed ? 0.5 : 1,
+                      marginRight: Platform.OS == "android" ? 8 : 0,
+                    }}
+                  />
+                )}
+              </Pressable>
+            ),
+          }}
+        />
         <View className="flex-1 px-2" style={{ paddingBottom: 92 }}>
           <NonThemedView className="flex h-[35%]" />
           {thisDungeon?.stepsBeforeBoss !== 0 && !fightingBoss ? (
@@ -953,7 +980,7 @@ const DungeonLevelScreen = observer(() => {
                 addItemToPouch={addItemToPouch}
               />
             </View>
-            <View className="flex w-full flex-row justify-around border-t border-zinc-200 dark:border-zinc-700">
+            <View className="flex w-full flex-row justify-around">
               <Pressable
                 className={`py-4 w-32 mx-2 rounded ${
                   battleTab == "attacks"
@@ -1009,7 +1036,9 @@ const DungeonLevelScreen = observer(() => {
             </View>
           </View>
         </View>
-        <PlayerStatus />
+        <NonThemedView className="absolute z-50 w-full" style={{ bottom: 90 }}>
+          <PlayerStatus />
+        </NonThemedView>
       </>
     );
   }

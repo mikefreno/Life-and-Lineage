@@ -4,8 +4,9 @@ import {
   ScrollView,
   View as NonThemedView,
   Platform,
+  StyleSheet,
 } from "react-native";
-import { Stack, router } from "expo-router";
+import { Stack, router, usePathname } from "expo-router";
 import PlayerStatus from "../../components/PlayerStatus";
 import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
@@ -51,6 +52,7 @@ export default function DungeonScreen() {
       (instance) => instance.name !== "training grounds",
     ) ?? [],
   );
+  const pathname = usePathname();
   const [height, setHeight] = useState<number>(0);
 
   const { colorScheme } = useColorScheme();
@@ -75,10 +77,31 @@ export default function DungeonScreen() {
       }
     });
     setHeight(deepestDungeonDepth);
-  }, [gameState?.dungeonInstances]);
+  }, [gameState?.dungeonInstances, pathname]);
 
   return (
     <>
+      <Stack.Screen
+        options={{
+          headerBackTitleVisible: false,
+          headerTransparent: true,
+          headerBackground: () => (
+            <BlurView
+              blurReductionFactor={4}
+              tint={
+                Platform.OS == "android"
+                  ? colorScheme == "light"
+                    ? "systemMaterialLight"
+                    : "systemMaterialDark"
+                  : "default"
+              }
+              intensity={100}
+              style={StyleSheet.absoluteFill}
+              experimentalBlurMethod={"dimezisBlurView"}
+            />
+          ),
+        }}
+      />
       <TutorialModal
         isVisibleCondition={
           (showDungeonTutorial && gameState?.tutorialsEnabled && isFocused) ??
@@ -108,30 +131,14 @@ export default function DungeonScreen() {
         }}
       />
       <View className="flex-1">
-        <NonThemedView className="absolute z-10 w-full">
-          <BlurView
-            blurReductionFactor={8}
-            tint={
-              Platform.OS == "android"
-                ? colorScheme == "light"
-                  ? "systemMaterialLight"
-                  : "systemMaterialDark"
-                : "default"
-            }
-            intensity={100}
-            experimentalBlurMethod={"dimezisBlurView"}
-          >
-            <NonThemedView style={{ paddingTop: 12, paddingBottom: 4 }}>
-              <Text className="text-center text-2xl">
-                The dungeon is a dangerous place. Be careful.
-              </Text>
-            </NonThemedView>
-          </BlurView>
+        <NonThemedView style={{ paddingTop: 12, paddingBottom: 4 }}>
+          <Text className="text-center text-2xl">
+            The dungeon is a dangerous place. Be careful.
+          </Text>
         </NonThemedView>
         <ScrollView
           style={{
             paddingBottom: useBottomTabBarHeight() + 74,
-            paddingTop: 84,
           }}
         >
           {instances.map((dungeonInstance, dungeonInstanceIdx) => (

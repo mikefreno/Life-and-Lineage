@@ -81,7 +81,10 @@ export function damageReduction(armorValue: number) {
   }
 }
 
-export function toTitleCase(title: string) {
+export function toTitleCase(title: string | undefined) {
+  if (!title) {
+    return "";
+  }
   return title
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))

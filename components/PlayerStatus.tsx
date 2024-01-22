@@ -374,8 +374,8 @@ const PlayerStatus = observer(() => {
             tint={
               Platform.OS == "android"
                 ? colorScheme == "light"
-                  ? "systemMaterialLight"
-                  : "systemMaterialDark"
+                  ? "light"
+                  : "dark"
                 : "default"
             }
             intensity={100}

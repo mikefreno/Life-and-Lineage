@@ -507,7 +507,7 @@ const HomeScreen = observer(() => {
         <View
           className="flex-1"
           style={{
-            paddingBottom: useBottomTabBarHeight() + 60,
+            paddingBottom: 20,
           }}
         >
           <NonThemedView className="-mx-4">
@@ -614,6 +614,19 @@ const HomeScreen = observer(() => {
         >
           <PlayerStatus />
         </NonThemedView>
+        <View
+          style={{
+            marginBottom: useBottomTabBarHeight() / 3,
+            height: useBottomTabBarHeight() + 20,
+            backgroundColor:
+              playerState.playerClass == "mage"
+                ? "#1e40af"
+                : playerState.playerClass == "necromancer"
+                ? "#6b21a8"
+                : "#fcd34d",
+            opacity: 0.5,
+          }}
+        />
       </>
     );
   }

@@ -5,7 +5,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, router } from "expo-router";
+import { SplashScreen, Stack, router, useNavigation } from "expo-router";
 import { createContext, useEffect, useContext, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
@@ -13,7 +13,7 @@ import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
 import { fullSave, loadGame, loadPlayer } from "../utility/functions/save_load";
-import { View, Text, Platform } from "react-native";
+import { View, Text, Platform, Pressable } from "react-native";
 import { autorun } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
@@ -73,7 +73,6 @@ const Root = observer(() => {
   const [logsState, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const { setColorScheme, colorScheme } = useColorScheme();
-  const [dummyRerender, setDummyRerender] = useState<number>(0);
 
   const getData = async () => {
     try {
@@ -147,7 +146,6 @@ const RootLayout = observer(() => {
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
   const [navbarLoad, setNavbarLoad] = useState(false);
-  const pathname = usePathname();
 
   useEffect(() => {
     if (error) throw error;
@@ -205,6 +203,7 @@ const RootLayout = observer(() => {
           name="(tabs)"
           options={{
             headerShown: false,
+            animation: Platform.OS == "android" ? "none" : undefined,
           }}
         />
         <Stack.Screen

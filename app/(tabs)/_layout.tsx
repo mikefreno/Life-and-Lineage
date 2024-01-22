@@ -43,8 +43,8 @@ export default function TabLayout() {
               tint={
                 Platform.OS == "android"
                   ? colorScheme == "light"
-                    ? "systemMaterialLight"
-                    : "systemMaterialDark"
+                    ? "light"
+                    : "dark"
                   : "default"
               }
               intensity={100}
@@ -76,8 +76,8 @@ export default function TabLayout() {
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
-                      ? "systemMaterialLight"
-                      : "systemMaterialDark"
+                      ? "light"
+                      : "dark"
                     : "default"
                 }
                 intensity={100}
@@ -150,8 +150,8 @@ export default function TabLayout() {
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
-                      ? "systemMaterialLight"
-                      : "systemMaterialDark"
+                      ? "light"
+                      : "dark"
                     : "default"
                 }
                 intensity={100}
@@ -198,8 +198,8 @@ export default function TabLayout() {
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
-                      ? "systemMaterialLight"
-                      : "systemMaterialDark"
+                      ? "light"
+                      : "dark"
                     : "default"
                 }
                 intensity={100}
@@ -257,22 +257,6 @@ export default function TabLayout() {
         <Tabs.Screen
           name="dungeon"
           options={{
-            headerTransparent: true,
-            headerBackground: () => (
-              <BlurView
-                blurReductionFactor={8}
-                tint={
-                  Platform.OS == "android"
-                    ? colorScheme == "light"
-                      ? "systemMaterialLight"
-                      : "systemMaterialDark"
-                    : "default"
-                }
-                intensity={100}
-                style={StyleSheet.absoluteFill}
-                experimentalBlurMethod={"dimezisBlurView"}
-              />
-            ),
             title: "Dungeon",
             tabBarIcon: ({ color }) => (
               <Dungeon
@@ -308,8 +292,8 @@ export default function TabLayout() {
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
-                      ? "systemMaterialLight"
-                      : "systemMaterialDark"
+                      ? "light"
+                      : "dark"
                     : "default"
                 }
                 intensity={100}
@@ -352,8 +336,8 @@ export default function TabLayout() {
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
-                      ? "systemMaterialLight"
-                      : "systemMaterialDark"
+                      ? "light"
+                      : "dark"
                     : "default"
                 }
                 intensity={100}

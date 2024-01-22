@@ -136,7 +136,7 @@ const SpellsScreen = observer(() => {
       <View
         className="flex-1"
         style={{
-          paddingBottom: useBottomTabBarHeight() + 74,
+          paddingBottom: 20,
         }}
       >
         <Text className="pt-4 text-center text-xl tracking-wide">
@@ -174,13 +174,23 @@ const SpellsScreen = observer(() => {
             </View>
           </View>
         </View>
-        <NonThemedView
-          className="absolute z-50 w-full"
-          style={{ bottom: useBottomTabBarHeight() + 70 }}
-        >
-          <PlayerStatus />
-        </NonThemedView>
       </View>
+      <NonThemedView
+        className="absolute z-50 w-full"
+        style={{ bottom: useBottomTabBarHeight() + 70 }}
+      >
+        <PlayerStatus />
+      </NonThemedView>
+      <View
+        style={{
+          marginBottom: useBottomTabBarHeight() / 3,
+          height: useBottomTabBarHeight() + 20,
+          backgroundColor: playerState
+            ? elementalColorMap[playerState.blessing].dark
+            : undefined,
+          opacity: 0.5,
+        }}
+      />
     </>
   );
 });

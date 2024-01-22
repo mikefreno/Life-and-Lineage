@@ -16,18 +16,18 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 
 const EarnScreen = observer(() => {
-  const playerCharacterData = useContext(PlayerCharacterContext);
+  const playerCharacterContext = useContext(PlayerCharacterContext);
   const gameContext = useContext(GameContext);
-  const playerCharacter = playerCharacterData?.playerState;
+  if (!playerCharacterContext || !gameContext) {
+    throw new Error("missing context");
+  }
+  const { playerState } = playerCharacterContext;
+  const { gameState } = gameContext;
+
   const [showingRejection, setShowingRejection] = useState<boolean>(false);
   const [missingPreReqs, setMissingPreReqs] = useState<string[]>([]);
 
-  if (!playerCharacter || !gameContext) {
-    throw Error("Missing Context");
-  }
-
   const isFocused = useIsFocused();
-  const { gameState } = gameContext;
   const vibration = useVibration();
   const [showLaborTutorial, setShowLaborTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("labor")) ?? false,
@@ -40,15 +40,15 @@ const EarnScreen = observer(() => {
   }, [showLaborTutorial]);
 
   function applyToJob(title: string) {
-    if (playerCharacter) {
+    if (playerState) {
       const found = jobs.find((job) => job.title == title);
       if (!found) throw new Error("Missing job is JSON!");
-      const res = playerCharacter.missingPreReqs(found.qualifications);
+      const res = playerState.missingPreReqs(found.qualifications);
       if (res) {
         setMissingPreReqs(res);
         setShowingRejection(true);
       } else {
-        playerCharacter.setJob(title);
+        playerState.setJob(title);
       }
     }
   }
