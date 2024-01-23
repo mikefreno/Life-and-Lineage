@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useVibration } from "../../utility/customHooks";
 import { useColorScheme } from "nativewind";
+import GenericRaisedButton from "../../components/GenericRaisedButton";
 
 const healthWarningOptions: Record<number, string> = {
   0.5: "50%",
@@ -48,8 +49,6 @@ export default function GameSettings() {
     router.push("/NewGame");
   };
 
-  const { colorScheme } = useColorScheme();
-
   const healthWarningSetter = (choice: number) => {
     game?.setHealthWarning(choice);
     setSelectedHealthWarning(healthWarningOptions[choice]);
@@ -64,26 +63,10 @@ export default function GameSettings() {
         </View>
         <View style={styles.line} />
       </View>
-      <Pressable className="mx-auto mt-4" onPress={startNewGame}>
-        {({ pressed }) => (
-          <View
-            className={`rounded-xl px-8 py-4 ${
-              pressed ? "scale-95 opacity-50" : ""
-            }`}
-            style={{
-              shadowColor: "#000",
-              elevation: 2,
-              backgroundColor: colorScheme == "light" ? "white" : "#71717a",
-              shadowOpacity: 0.1,
-              shadowRadius: 5,
-            }}
-          >
-            <Text className="text-center text-zinc-900 dark:text-zinc-50">
-              Start New Game
-            </Text>
-          </View>
-        )}
-      </Pressable>
+      <GenericRaisedButton
+        onPressFunction={startNewGame}
+        text={"Start New Game"}
+      />
       <View style={styles.container} className="mt-8">
         <View style={styles.line} />
         <View style={styles.content}>

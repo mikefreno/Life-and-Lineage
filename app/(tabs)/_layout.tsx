@@ -39,7 +39,7 @@ export default function TabLayout() {
         screenOptions={{
           tabBarBackground: () => (
             <BlurView
-              blurReductionFactor={8}
+              blurReductionFactor={12}
               tint={
                 Platform.OS == "android"
                   ? colorScheme == "light"
@@ -70,9 +70,10 @@ export default function TabLayout() {
           name="index"
           options={{
             headerTransparent: true,
+            headerTitleAlign: "center",
             headerBackground: () => (
               <BlurView
-                blurReductionFactor={8}
+                blurReductionFactor={12}
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
@@ -144,9 +145,10 @@ export default function TabLayout() {
           name="spells"
           options={{
             headerTransparent: true,
+            headerTitleAlign: "center",
             headerBackground: () => (
               <BlurView
-                blurReductionFactor={8}
+                blurReductionFactor={12}
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
@@ -192,9 +194,10 @@ export default function TabLayout() {
           name="earn"
           options={{
             headerTransparent: true,
+            headerTitleAlign: "center",
             headerBackground: () => (
               <BlurView
-                blurReductionFactor={8}
+                blurReductionFactor={12}
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
@@ -257,6 +260,23 @@ export default function TabLayout() {
         <Tabs.Screen
           name="dungeon"
           options={{
+            headerTransparent: true,
+            headerTitleAlign: "center",
+            headerBackground: () => (
+              <BlurView
+                blurReductionFactor={12}
+                tint={
+                  Platform.OS == "android"
+                    ? colorScheme == "light"
+                      ? "light"
+                      : "dark"
+                    : "default"
+                }
+                intensity={100}
+                style={StyleSheet.absoluteFill}
+                experimentalBlurMethod={"dimezisBlurView"}
+              />
+            ),
             title: "Dungeon",
             tabBarIcon: ({ color }) => (
               <Dungeon
@@ -286,9 +306,10 @@ export default function TabLayout() {
           name="shops"
           options={{
             headerTransparent: true,
+            headerTitleAlign: "center",
             headerBackground: () => (
               <BlurView
-                blurReductionFactor={8}
+                blurReductionFactor={12}
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
@@ -330,9 +351,10 @@ export default function TabLayout() {
           name="medical"
           options={{
             headerTransparent: true,
+            headerTitleAlign: "center",
             headerBackground: () => (
               <BlurView
-                blurReductionFactor={8}
+                blurReductionFactor={12}
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"

@@ -82,7 +82,7 @@ const EarnScreen = observer(() => {
         onBackButtonPress={() => setShowingRejection(false)}
       >
         <View
-          className="mx-auto w-5/6 rounded-xl bg-zinc-50 px-6 py-4 dark:bg-zinc-700"
+          className="mx-auto w-5/6 rounded-xl px-6 py-4 dark:border dark:border-zinc-500"
           style={{
             shadowColor: "#000",
             shadowOffset: {

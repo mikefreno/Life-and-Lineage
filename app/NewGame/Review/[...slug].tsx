@@ -6,7 +6,6 @@ import {
   getStartingBook,
 } from "../../../classes/character";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import jobs from "../../../assets/json/jobs.json";
 import {
   createShops,
   generateBirthday,
@@ -23,6 +22,7 @@ import {
 } from "../../_layout";
 import { useVibration } from "../../../utility/customHooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getRandomJobTitle } from "../../../utility/functions/characterAid";
 
 export default function NewGameReview() {
   const { slug } = useLocalSearchParams();
@@ -43,11 +43,6 @@ export default function NewGameReview() {
   const gameData = useContext(GameContext);
   if (!gameData) throw new Error("missing contexts");
   const { gameState } = gameData;
-
-  function getRandomJobTitle(): string {
-    const randomIndex = Math.floor(Math.random() * jobs.length);
-    return jobs[randomIndex].title;
-  }
 
   function createParent(sex: "female" | "male"): Character {
     const firstName = getRandomName(sex).firstName;
@@ -75,6 +70,7 @@ export default function NewGameReview() {
         firstName: firstName,
         lastName: lastName,
         sex: sex as "male" | "female",
+        sexuality: null,
         playerClass: playerClass as "paladin",
         blessing: blessing as "holy" | "vengeance" | "protection",
         parents: [mom, dad],
@@ -86,6 +82,7 @@ export default function NewGameReview() {
         firstName: firstName,
         lastName: lastName,
         sex: sex as "male" | "female",
+        sexuality: null,
         playerClass: playerClass as "necromancer",
         blessing: blessing as "blood" | "summoning" | "pestilence" | "bone",
         parents: [mom, dad],
@@ -97,6 +94,7 @@ export default function NewGameReview() {
         firstName: firstName,
         lastName: lastName,
         sex: sex as "male" | "female",
+        sexuality: null,
         playerClass: playerClass as "mage",
         blessing: blessing as "fire" | "water" | "air" | "earth",
         parents: [mom, dad],

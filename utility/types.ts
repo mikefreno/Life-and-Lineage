@@ -119,4 +119,17 @@ export type Activity = {
     decreaseAffection: number;
     decreaseAffectionRange: { min: number; max: number };
   };
+  randomBad?: BadOutcome[];
+  randomGood?: GoodOutcome[];
+};
+export type BadOutcome = {
+  name: string;
+  buyOff?: { price: number };
+  fight?: string;
+  dungeonTitle?: string;
+  effect?: { healthDamage?: number; sanityDamage?: number };
+};
+export type GoodOutcome = {
+  name: string;
+  effect: { gold?: number; healthRestore?: number; sanityRestore?: number };
 };

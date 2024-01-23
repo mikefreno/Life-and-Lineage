@@ -409,6 +409,7 @@ export class PlayerCharacter extends Character {
       collectFromInvestment: action,
       tickAllInvestments: action,
       getInvestment: action,
+      restoreHealth: action,
     });
   }
   //----------------------------------Health----------------------------------//
@@ -444,7 +445,7 @@ export class PlayerCharacter extends Character {
     return this.health;
   }
 
-  private restoreHealth(amount: number) {
+  public restoreHealth(amount: number) {
     if (this.health + amount < this.getMaxHealth()) {
       this.health += amount;
     } else {
@@ -511,7 +512,7 @@ export class PlayerCharacter extends Character {
     return this.sanity;
   }
 
-  private restoreSanity(amount: number) {
+  public restoreSanity(amount: number) {
     if (this.sanity + amount < 50) {
       this.sanity += amount;
     } else {
@@ -792,7 +793,11 @@ export class PlayerCharacter extends Character {
   }
 
   public spendGold(amount: number) {
-    this.gold -= amount;
+    if (amount <= this.gold) {
+      this.gold -= amount;
+    } else {
+      this.gold = 0;
+    }
   }
   public addGold(gold: number) {
     this.gold += gold;

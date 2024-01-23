@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
 import Coins from "../assets/icons/CoinsIcon";
 import Energy from "../assets/icons/EnergyIcon";
 import Sanity from "../assets/icons/SanityIcon";
@@ -11,6 +11,7 @@ import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { observer } from "mobx-react-lite";
 import { numberToRoman } from "../utility/functions/misc";
 import { useVibration } from "../utility/customHooks";
+import GenericRaisedButton from "./GenericRaisedButton";
 
 interface LaborTaskProps {
   reward: number;
@@ -117,57 +118,24 @@ const LaborTask = observer(
           </View>
           {playerState?.job == title ? (
             <>
-              <Pressable className="mx-auto mb-2 mt-4" onPress={work}>
-                {({ pressed }) => (
-                  <View
-                    className={`rounded-xl px-8 py-4 ${
-                      pressed ? "scale-95 opacity-50" : ""
-                    }`}
-                    style={{
-                      shadowColor: "#000",
-                      elevation: 2,
-                      backgroundColor:
-                        colorScheme == "light" ? "white" : "#71717a",
-                      shadowOpacity: 0.1,
-                      shadowRadius: 5,
-                    }}
-                  >
-                    <Text className="text-center text-zinc-900 dark:text-zinc-50">
-                      Work
-                    </Text>
-                  </View>
-                )}
-              </Pressable>
+              <GenericRaisedButton
+                text={"Work"}
+                onPressFunction={work}
+                disabledCondition={
+                  (cost.health && playerState.health <= cost.health) ||
+                  playerState.mana < cost.mana
+                }
+              />
               <ProgressBar
                 value={experience ?? 0}
                 maxValue={experienceToPromote}
               />
             </>
           ) : (
-            <Pressable
-              className="mx-auto mb-2 mt-4"
-              onPress={() => applyToJob(title)}
-            >
-              {({ pressed }) => (
-                <View
-                  className={`rounded-xl px-8 py-4 ${
-                    pressed ? "scale-95 opacity-50" : ""
-                  }`}
-                  style={{
-                    shadowColor: "#000",
-                    elevation: 2,
-                    backgroundColor:
-                      colorScheme == "light" ? "white" : "#71717a",
-                    shadowOpacity: 0.1,
-                    shadowRadius: 5,
-                  }}
-                >
-                  <Text className="text-center text-zinc-900 dark:text-zinc-50">
-                    Apply
-                  </Text>
-                </View>
-              )}
-            </Pressable>
+            <GenericRaisedButton
+              text={"Apply"}
+              onPressFunction={() => applyToJob(title)}
+            />
           )}
         </View>
       </View>

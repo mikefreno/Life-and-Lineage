@@ -133,12 +133,7 @@ const SpellsScreen = observer(() => {
           opacity: 0.5,
         }}
       />
-      <View
-        className="flex-1"
-        style={{
-          paddingBottom: 20,
-        }}
-      >
+      <View className="flex-1">
         <Text className="pt-4 text-center text-xl tracking-wide">
           Known Spells
         </Text>

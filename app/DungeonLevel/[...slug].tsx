@@ -109,12 +109,17 @@ const DungeonLevelScreen = observer(() => {
 
   //------------dungeon/Enemy state setting---------//
   useEffect(() => {
+    console.log(slug);
+    console.log(enemyState);
     setInstanceName(slug[0]);
-    setLevel(Number(slug[1]));
+    if (slug[0] !== "Activities") {
+      setLevel(Number(slug[1]));
+    }
   }, [slug]);
 
   useEffect(() => {
     if (!fightingBoss && !enemyState) {
+      console.log("entering baad place");
       getEnemy();
     }
   }, [enemyState]);
@@ -136,8 +141,23 @@ const DungeonLevelScreen = observer(() => {
   }, [enemyState?.health]);
 
   useEffect(() => {
-    setThisDungeon(gameState.getDungeon(instanceName, level));
-    setThisInstance(gameState.getInstance(instanceName));
+    if (slug[0] == "Activities") {
+      const tempDungeon = new DungeonLevel({
+        level: 0,
+        bosses: [],
+        stepsBeforeBoss: 0,
+        bossDefeated: true,
+      });
+      const tempInstance = new DungeonInstance({
+        name: slug[1],
+        levels: [tempDungeon],
+      });
+      setThisDungeon(tempDungeon);
+      setThisInstance(tempInstance);
+    } else {
+      setThisDungeon(gameState.getDungeon(instanceName, level));
+      setThisInstance(gameState.getInstance(instanceName));
+    }
   }, [level, instanceName]);
 
   //-----------animations---------//
@@ -911,7 +931,13 @@ const DungeonLevelScreen = observer(() => {
         <Stack.Screen
           options={{
             animationTypeForReplace: "push",
-            headerTitle: `${toTitleCase(thisInstance?.name)} Level ${level}`,
+            title:
+              level == 0
+                ? slug[0] == "Activities"
+                  ? slug[1]
+                  : "Training Grounds"
+                : `${toTitleCase(thisInstance?.name as string)} Level ${level}`,
+
             headerLeft: () => (
               <Pressable
                 onPress={() => {
@@ -1070,7 +1096,9 @@ const DungeonLevelScreen = observer(() => {
             ),
             title:
               level == 0
-                ? "Training Grounds"
+                ? slug[0] == "Activities"
+                  ? slug[1]
+                  : "Training Grounds"
                 : `${toTitleCase(thisInstance?.name as string)} Level ${level}`,
           }}
         />

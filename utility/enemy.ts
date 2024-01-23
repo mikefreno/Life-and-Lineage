@@ -12,7 +12,7 @@ function pickRandomEnemyJSON(instance: string, level: number) {
   return enemiesOnThisLevel[randomIndex];
 }
 
-function getNumberInRange(minimum: number, maximum: number) {
+export function getNumberInRange(minimum: number, maximum: number) {
   return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
 }
 
@@ -77,6 +77,11 @@ export const EnemyImageMap: Record<string, ImageInfo> = {
     source: require("../assets/images/monsters/brood_mother.png"),
     width: 180,
     height: 180,
+  },
+  drunkard: {
+    source: require("../assets/images/monsters/drunkard.png"),
+    width: 160,
+    height: 160,
   },
   "earth mage": {
     source: require("../assets/images/monsters/earth_mage.png"),

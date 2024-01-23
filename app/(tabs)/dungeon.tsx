@@ -1,12 +1,6 @@
 import { Text, View } from "../../components/Themed";
-import {
-  Pressable,
-  ScrollView,
-  View as NonThemedView,
-  Platform,
-  StyleSheet,
-} from "react-native";
-import { Stack, router, usePathname } from "expo-router";
+import { Pressable, ScrollView, View as NonThemedView } from "react-native";
+import { router, usePathname } from "expo-router";
 import PlayerStatus from "../../components/PlayerStatus";
 import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
@@ -18,7 +12,6 @@ import { DungeonInstance } from "../../classes/dungeon";
 import { toTitleCase } from "../../utility/functions/misc";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { BlurView } from "expo-blur";
 
 const dangerColorStep = [
   "#fee2e2",
@@ -81,27 +74,6 @@ export default function DungeonScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          headerBackTitleVisible: false,
-          headerTransparent: true,
-          headerBackground: () => (
-            <BlurView
-              blurReductionFactor={4}
-              tint={
-                Platform.OS == "android"
-                  ? colorScheme == "light"
-                    ? "systemMaterialLight"
-                    : "systemMaterialDark"
-                  : "default"
-              }
-              intensity={100}
-              style={StyleSheet.absoluteFill}
-              experimentalBlurMethod={"dimezisBlurView"}
-            />
-          ),
-        }}
-      />
       <TutorialModal
         isVisibleCondition={
           (showDungeonTutorial && gameState?.tutorialsEnabled && isFocused) ??
@@ -130,7 +102,7 @@ export default function DungeonScreen() {
           opacity: 0.5,
         }}
       />
-      <View className="flex-1">
+      <View className="flex-1 px-8">
         <NonThemedView style={{ paddingTop: 12, paddingBottom: 4 }}>
           <Text className="text-center text-2xl">
             The dungeon is a dangerous place. Be careful.

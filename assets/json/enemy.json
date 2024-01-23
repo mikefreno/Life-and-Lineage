@@ -197,5 +197,20 @@
       "armorValue": 15,
       "appearsIn": ["bandit hideout"],
       "appearsOn": [1,2]
+   },
+   {
+      "name": "drunkard",
+      "sanity": 50,
+      "healthRange": {"minimum": 60, "maximum": 85},
+      "attackPowerRange": {"minimum": 10, "maximum": 10},
+      "energy": {"maximum": 30, "regen": 3},
+      "attacks": ["headbutt", "pocket sand", "punch", "chug beer"],
+      "drops": [
+         {"item": "beer stein", "itemType":"weapon","chance": 1.0}
+      ],
+      "goldDropRange": {"minimum": 40, "maximum":100},
+      "armorValue": 5,
+      "appearsIn": [""],
+      "appearsOn": []
    }
 ]

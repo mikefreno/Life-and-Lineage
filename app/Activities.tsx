@@ -34,7 +34,7 @@ export default function Activities() {
           ),
         }}
       />
-      <ThemedView>
+      <ThemedView className="flex-1">
         <ScrollView>
           <View
             className="px-4"

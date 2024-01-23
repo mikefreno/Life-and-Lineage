@@ -104,7 +104,7 @@ export default function MedicalScreen() {
         className="flex flex-row"
         style={{
           marginTop: useHeaderHeight() / 2,
-          height: useHeaderHeight() * 0.5,
+          height: useHeaderHeight() * 0.75,
         }}
       >
         <NonThemedView
@@ -120,95 +120,96 @@ export default function MedicalScreen() {
           style={{ backgroundColor: "#c084fc" }}
         />
       </NonThemedView>
+      <NonThemedView
+        className="absolute z-10 h-12 w-full border-b border-zinc-200 dark:border-zinc-600"
+        style={{ top: useHeaderHeight() }}
+      >
+        <BlurView
+          blurReductionFactor={12}
+          tint={
+            Platform.OS == "android"
+              ? colorScheme == "light"
+                ? "light"
+                : "dark"
+              : "default"
+          }
+          intensity={100}
+          style={StyleSheet.absoluteFill}
+          experimentalBlurMethod={"dimezisBlurView"}
+        >
+          <NonThemedView className="flex w-full flex-row justify-evenly py-1">
+            <Pressable
+              onPress={() => {
+                vibration({ style: "light" });
+                setShowingHealthOptions(!showingHealthRef.current);
+                showingHealthRef.current = !showingHealthRef.current;
+              }}
+              className={`${
+                showingHealthOptions ? "bg-[#ef4444]" : "bg-zinc-100"
+              } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
+            >
+              <Text
+                style={{ color: showingHealthOptions ? "white" : "#a1a1aa" }}
+              >
+                Health
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                vibration({ style: "light" });
+                setShowingManaOptions(!showingManaRef.current);
+                showingManaRef.current = !showingManaRef.current;
+              }}
+              className={`${
+                showingManaOptions ? "bg-[#60a5fa]" : "bg-zinc-100"
+              } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
+            >
+              <Text style={{ color: showingManaOptions ? "white" : "#a1a1aa" }}>
+                Mana
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                vibration({ style: "light" });
+                setShowingSanityOptions(!showingSanityRef.current);
+                showingSanityRef.current = !showingSanityRef.current;
+              }}
+              className={`${
+                showingSanityOptions ? "bg-[#c084fc]" : "bg-zinc-100"
+              } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
+            >
+              <Text
+                style={{ color: showingSanityOptions ? "white" : "#a1a1aa" }}
+              >
+                Sanity
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                vibration({ style: "light" });
+                setShowingOtherOptions(!showingOtherRef.current);
+                showingOtherRef.current = !showingOtherRef.current;
+              }}
+              className={`${
+                showingOtherOptions ? "bg-[#e4e4e7]" : "bg-zinc-100"
+              } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
+            >
+              <Text
+                style={{ color: showingOtherOptions ? "black" : "#a1a1aa" }}
+              >
+                Other
+              </Text>
+            </Pressable>
+          </NonThemedView>
+        </BlurView>
+      </NonThemedView>
       <View className="flex-1">
-        <NonThemedView className="absolute z-10 h-12 w-full border-b border-zinc-200 dark:border-zinc-600">
-          <BlurView
-            blurReductionFactor={4}
-            tint={
-              Platform.OS == "android"
-                ? colorScheme == "light"
-                  ? "systemMaterialLight"
-                  : "systemMaterialDark"
-                : "default"
-            }
-            intensity={100}
-            style={StyleSheet.absoluteFill}
-            experimentalBlurMethod={"dimezisBlurView"}
-          >
-            <NonThemedView className="flex w-full flex-row justify-evenly py-1">
-              <Pressable
-                onPress={() => {
-                  vibration({ style: "light" });
-                  setShowingHealthOptions(!showingHealthRef.current);
-                  showingHealthRef.current = !showingHealthRef.current;
-                }}
-                className={`${
-                  showingHealthOptions ? "bg-[#ef4444]" : "bg-zinc-100"
-                } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
-              >
-                <Text
-                  style={{ color: showingHealthOptions ? "white" : "#a1a1aa" }}
-                >
-                  Health
-                </Text>
-              </Pressable>
-              <Pressable
-                onPress={() => {
-                  vibration({ style: "light" });
-                  setShowingManaOptions(!showingManaRef.current);
-                  showingManaRef.current = !showingManaRef.current;
-                }}
-                className={`${
-                  showingManaOptions ? "bg-[#60a5fa]" : "bg-zinc-100"
-                } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
-              >
-                <Text
-                  style={{ color: showingManaOptions ? "white" : "#a1a1aa" }}
-                >
-                  Mana
-                </Text>
-              </Pressable>
-              <Pressable
-                onPress={() => {
-                  vibration({ style: "light" });
-                  setShowingSanityOptions(!showingSanityRef.current);
-                  showingSanityRef.current = !showingSanityRef.current;
-                }}
-                className={`${
-                  showingSanityOptions ? "bg-[#c084fc]" : "bg-zinc-100"
-                } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
-              >
-                <Text
-                  style={{ color: showingSanityOptions ? "white" : "#a1a1aa" }}
-                >
-                  Sanity
-                </Text>
-              </Pressable>
-              <Pressable
-                onPress={() => {
-                  vibration({ style: "light" });
-                  setShowingOtherOptions(!showingOtherRef.current);
-                  showingOtherRef.current = !showingOtherRef.current;
-                }}
-                className={`${
-                  showingOtherOptions ? "bg-[#e4e4e7]" : "bg-zinc-100"
-                } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
-              >
-                <Text
-                  style={{ color: showingOtherOptions ? "black" : "#a1a1aa" }}
-                >
-                  Other
-                </Text>
-              </Pressable>
-            </NonThemedView>
-          </BlurView>
-        </NonThemedView>
         <ScrollView>
           <View
             className="px-2"
             style={{
               paddingBottom: useBottomTabBarHeight() + 74,
-              paddingTop: 36,
+              paddingTop: 12,
             }}
           >
             {showingHealthOptions && (

@@ -21,6 +21,7 @@ import { useColorScheme } from "nativewind";
 import { Stack } from "expo-router";
 import { BlurView } from "expo-blur";
 import { useHeaderHeight } from "@react-navigation/elements";
+import GenericRaisedButton from "../components/GenericRaisedButton";
 
 export default function LearningKnowledgeScreen() {
   const playerCharacterData = useContext(PlayerCharacterContext);
@@ -182,10 +183,8 @@ export default function LearningKnowledgeScreen() {
                     value={studyState.experience}
                     maxValue={20}
                   />
-
-                  <Pressable
-                    className="mx-auto mb-2 mt-4"
-                    onPress={() => {
+                  <GenericRaisedButton
+                    onPressFunction={() => {
                       studySpell(
                         studyState.bookName,
                         studyState.spellName,
@@ -193,27 +192,8 @@ export default function LearningKnowledgeScreen() {
                       );
                       vibration({ style: "light" });
                     }}
-                  >
-                    {({ pressed }) => (
-                      <View
-                        className={`rounded-xl px-8 py-4 ${
-                          pressed ? "scale-95 opacity-50" : ""
-                        }`}
-                        style={{
-                          shadowColor: "#000",
-                          elevation: 2,
-                          backgroundColor:
-                            colorScheme == "light" ? "white" : "#71717a",
-                          shadowOpacity: 0.1,
-                          shadowRadius: 5,
-                        }}
-                      >
-                        <Text className="text-center text-zinc-900 dark:text-zinc-50">
-                          Continue Studying
-                        </Text>
-                      </View>
-                    )}
-                  </Pressable>
+                    text={"Continue Studying"}
+                  />
                 </View>
               ))}
             </View>
@@ -223,9 +203,8 @@ export default function LearningKnowledgeScreen() {
               <Text className="text-xl">{toTitleCase(selectedBook.name)}</Text>
               <Text className="py-2 text-lg tracking-wide">Teaches</Text>
               <SpellDetails spell={selectedBookSpell} />
-              <Pressable
-                className="mx-auto mb-2 mt-4"
-                onPress={() => {
+              <GenericRaisedButton
+                onPressFunction={() => {
                   vibration({ style: "light", essential: true });
                   studySpell(
                     selectedBook.name,
@@ -234,27 +213,8 @@ export default function LearningKnowledgeScreen() {
                   );
                   setSelectedBook(null);
                 }}
-              >
-                {({ pressed }) => (
-                  <View
-                    className={`rounded-xl px-8 py-4 ${
-                      pressed ? "scale-95 opacity-50" : ""
-                    }`}
-                    style={{
-                      shadowColor: "#000",
-                      elevation: 2,
-                      backgroundColor:
-                        colorScheme == "light" ? "white" : "#71717a",
-                      shadowOpacity: 0.1,
-                      shadowRadius: 5,
-                    }}
-                  >
-                    <Text className="text-center text-zinc-900 dark:text-zinc-50">
-                      Start Studying
-                    </Text>
-                  </View>
-                )}
-              </Pressable>
+                text={"Start Studying"}
+              />
             </View>
           ) : null}
           {filteredBooks.length > 0 ? (

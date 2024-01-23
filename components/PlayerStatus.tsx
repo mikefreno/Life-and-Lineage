@@ -370,7 +370,7 @@ const PlayerStatus = observer(() => {
           className="absolute w-full border-t border-zinc-200 dark:border-zinc-600"
         >
           <BlurView
-            blurReductionFactor={8}
+            blurReductionFactor={12}
             tint={
               Platform.OS == "android"
                 ? colorScheme == "light"

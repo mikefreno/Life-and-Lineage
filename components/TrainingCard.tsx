@@ -8,6 +8,7 @@ import { Pressable, View } from "react-native";
 import { Text } from "../components/Themed";
 import ProgressBar from "./ProgressBar";
 import { toTitleCase } from "../utility/functions/misc";
+import GenericRaisedButton from "./GenericRaisedButton";
 
 interface TrainingCardProps {
   name: string;
@@ -93,49 +94,18 @@ const TrainingCard = observer(
           {!playerState?.qualifications.includes(name) ? (
             <>
               {playerState.hasAllPreReqs(preRequisites) ? (
-                <Pressable
-                  disabled={
+                <GenericRaisedButton
+                  onPressFunction={progressQualification}
+                  disabledCondition={
                     playerState.gold < goldCostPerTick ||
                     !playerState.hasAllPreReqs(preRequisites)
                   }
-                  className="mb-2 mt-4"
-                  onPress={progressQualification}
-                >
-                  {({ pressed }) => (
-                    <View
-                      className={`mx-auto rounded-xl ${
-                        pressed ? "scale-95 opacity-50" : ""
-                      }`}
-                      style={{
-                        shadowColor: "#000",
-                        shadowOffset: {
-                          width: 0,
-                          height: 1,
-                        },
-                        backgroundColor: playerState.hasAllPreReqs(
-                          preRequisites,
-                        )
-                          ? colorScheme == "light"
-                            ? "white"
-                            : "#71717a"
-                          : colorScheme == "light"
-                          ? "#fafafa"
-                          : "#3f3f46",
-                        elevation: 2,
-                        shadowOpacity: 0.1,
-                        shadowRadius: 5,
-                      }}
-                    >
-                      <View className="px-8 py-4">
-                        <Text className="text-center text-zinc-900 dark:text-zinc-50">
-                          {playerState.hasAllPreReqs(preRequisites)
-                            ? "Study"
-                            : "Locked"}
-                        </Text>
-                      </View>
-                    </View>
-                  )}
-                </Pressable>
+                  text={
+                    playerState.hasAllPreReqs(preRequisites)
+                      ? "Study"
+                      : "Locked"
+                  }
+                />
               ) : null}
               {playerState.hasAllPreReqs(preRequisites) ? (
                 <ProgressBar value={experience ?? 0} maxValue={ticks} />

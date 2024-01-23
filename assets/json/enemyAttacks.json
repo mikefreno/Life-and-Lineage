@@ -119,6 +119,21 @@
       "debuffs": [{"name":"stun", "chance": 0.10}]
    },
    {
+      "name": "headbutt",
+      "energyCost": 10,
+      "targets": "single",
+      "hitChance": 0.85,
+      "damageMult": 1.0,
+      "debuffs": [{"name":"stun", "chance": 0.20}]
+   },
+   {
+      "name": "punch",
+      "energyCost": 5,
+      "targets": "single",
+      "hitChance": 0.95,
+      "damageMult": 1.0
+   },
+   {
       "name": "raise skeleton",
       "energyCost": 30,
       "summons": ["skeleton"]
@@ -134,5 +149,11 @@
       "name": "frenzy",
       "energyCost": 10,
       "buffs": [{"name":"frenzy", "chance": 1.0}]
+   },
+   {
+      "name": "chug beer",
+      "energyCost": 10,
+      "buffs": [{"name":"frenzy", "chance": 1.0}]
    }
+
 ]

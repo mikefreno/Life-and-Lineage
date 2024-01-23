@@ -6,12 +6,14 @@ interface GenericModalProps {
   isVisibleCondition: boolean;
   backFunction: () => void;
   children: ReactNode;
+  backdropCloses?: boolean;
 }
 
 export default function GenericModal({
   isVisibleCondition,
   backFunction,
   children,
+  backdropCloses = true,
 }: GenericModalProps) {
   return (
     <Modal
@@ -21,7 +23,7 @@ export default function GenericModal({
       animationInTiming={500}
       animationOutTiming={300}
       isVisible={isVisibleCondition}
-      onBackdropPress={backFunction}
+      onBackdropPress={backdropCloses ? backFunction : undefined}
       onBackButtonPress={backFunction}
     >
       <View

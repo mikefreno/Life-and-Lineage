@@ -1,9 +1,4 @@
-import {
-  Pressable,
-  View as NonThemedView,
-  StyleSheet,
-  Switch,
-} from "react-native";
+import { Pressable, View as NonThemedView, Switch } from "react-native";
 import { View, Text } from "../../components/Themed";
 import { useContext, useEffect, useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc";
@@ -11,7 +6,8 @@ import { GameContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
 import * as Updates from "expo-updates";
 import GenericModal from "../../components/GenericModal";
-import { useColorScheme } from "nativewind";
+import GenericRaisedButton from "../../components/GenericRaisedButton";
+import GenericStrikeAround from "../../components/GenericStrikeAround";
 
 export default function AppSettings() {
   const themeOptions = ["system", "light", "dark"];
@@ -25,7 +21,6 @@ export default function AppSettings() {
   }
   const { gameState } = gameContext;
 
-  const { colorScheme } = useColorScheme();
   const vibration = useVibration();
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,
@@ -100,13 +95,7 @@ export default function AppSettings() {
           </>
         </GenericModal>
         <View className="flex-1 items-center justify-center px-4">
-          <View style={styles.container}>
-            <View style={styles.line} />
-            <View style={styles.content}>
-              <Text className="text-xl">Select Color Theme</Text>
-            </View>
-            <View style={styles.line} />
-          </View>
+          <GenericStrikeAround text={"Select Color Theme"} />
           <NonThemedView
             className="rounded px-4 py-2"
             style={{ marginLeft: -48, marginTop: 12 }}
@@ -132,13 +121,7 @@ export default function AppSettings() {
               </Pressable>
             ))}
           </NonThemedView>
-          <View style={styles.container}>
-            <View style={styles.line} />
-            <View style={styles.content}>
-              <Text className="text-xl">Vibration Settings</Text>
-            </View>
-            <View style={styles.line} />
-          </View>
+          <GenericStrikeAround text={"Vibration Settings"} />
           <NonThemedView
             className="rounded px-4 py-2"
             style={{ marginLeft: -48, marginTop: 12 }}
@@ -164,13 +147,7 @@ export default function AppSettings() {
               </Pressable>
             ))}
           </NonThemedView>
-          <View style={styles.container}>
-            <View style={styles.line} />
-            <View style={styles.content}>
-              <Text className="text-xl">Tutorials</Text>
-            </View>
-            <View style={styles.line} />
-          </View>
+          <GenericStrikeAround text={"Tutorials"} />
           <NonThemedView className="mt-3 rounded px-4 py-2">
             <View className="mx-auto flex flex-row">
               <Text className="my-auto text-lg">Tutorials Enabled: </Text>
@@ -182,48 +159,16 @@ export default function AppSettings() {
                 value={tutorialState}
               />
             </View>
-            <Pressable
-              className="mx-auto mb-2 mt-4"
-              onPress={() => {
+            <GenericRaisedButton
+              text={"Reset Tutorials"}
+              onPressFunction={() => {
                 vibration({ style: "light" });
                 setShowTutorialResetConfirm(true);
               }}
-            >
-              {({ pressed }) => (
-                <View
-                  className={`rounded-xl px-8 py-4 ${
-                    pressed ? "scale-95 opacity-50" : ""
-                  }`}
-                  style={{
-                    shadowColor: "#000",
-                    elevation: 2,
-                    backgroundColor:
-                      colorScheme == "light" ? "white" : "#71717a",
-                    shadowOpacity: 0.1,
-                    shadowRadius: 5,
-                  }}
-                >
-                  <Text>Reset Tutorials</Text>
-                </View>
-              )}
-            </Pressable>
+            />
           </NonThemedView>
         </View>
       </>
     );
   }
 }
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  content: {
-    marginHorizontal: 10,
-  },
-  line: {
-    flex: 1,
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
-  },
-});
