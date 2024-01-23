@@ -109,17 +109,16 @@ const DungeonLevelScreen = observer(() => {
 
   //------------dungeon/Enemy state setting---------//
   useEffect(() => {
-    console.log(slug);
-    console.log(enemyState);
     setInstanceName(slug[0]);
     if (slug[0] !== "Activities") {
       setLevel(Number(slug[1]));
+    } else {
+      setEnemyAttacked(true);
     }
   }, [slug]);
 
   useEffect(() => {
     if (!fightingBoss && !enemyState) {
-      console.log("entering baad place");
       getEnemy();
     }
   }, [enemyState]);
@@ -595,9 +594,11 @@ const DungeonLevelScreen = observer(() => {
   const flee = () => {
     if (playerState && enemyState) {
       const roll = flipCoin();
+      const secondaryRoll = flipCoin();
       if (
         playerState &&
-        (roll == "Heads" ||
+        ((roll == "Heads" &&
+          (slug[0] !== "Activities" || secondaryRoll == "Heads")) ||
           enemyState?.creatureSpecies == "training dummy" ||
           !enemyAttacked)
       ) {
@@ -612,6 +613,7 @@ const DungeonLevelScreen = observer(() => {
           router.replace("/dungeon");
           playerState.setInDungeon({ state: false });
           setEnemy(null);
+          playerState.setSavedEnemy(null);
         }, 200);
       } else {
         setFleeRollFailure(true);
@@ -932,7 +934,7 @@ const DungeonLevelScreen = observer(() => {
           options={{
             animationTypeForReplace: "push",
             title:
-              level == 0
+              level == 0 || slug[0] == "Activities"
                 ? slug[0] == "Activities"
                   ? slug[1]
                   : "Training Grounds"
@@ -1095,7 +1097,7 @@ const DungeonLevelScreen = observer(() => {
               </Pressable>
             ),
             title:
-              level == 0
+              level == 0 || slug[0] == "Activities"
                 ? slug[0] == "Activities"
                   ? slug[1]
                   : "Training Grounds"

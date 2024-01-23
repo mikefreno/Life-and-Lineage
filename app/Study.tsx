@@ -127,7 +127,7 @@ export default function LearningKnowledgeScreen() {
       <View className="flex-1">
         <View
           style={{
-            paddingBottom: 48,
+            paddingBottom: 110,
             paddingTop: useHeaderHeight(),
             paddingHorizontal: 12,
           }}
@@ -244,7 +244,7 @@ export default function LearningKnowledgeScreen() {
           ) : null}
         </View>
       </View>
-      <NonThemedView className="absolute z-50 w-full" style={{ bottom: 90 }}>
+      <NonThemedView className="absolute z-50 w-full" style={{ bottom: 110 }}>
         <PlayerStatus />
       </NonThemedView>
     </>

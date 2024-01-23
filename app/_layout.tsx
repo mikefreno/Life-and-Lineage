@@ -5,7 +5,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, router, useNavigation } from "expo-router";
+import { SplashScreen, Stack, router } from "expo-router";
 import { createContext, useEffect, useContext, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
@@ -13,12 +13,11 @@ import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
 import { fullSave, loadGame, loadPlayer } from "../utility/functions/save_load";
-import { View, Text, Platform, Pressable } from "react-native";
+import { View, Text, Platform } from "react-native";
 import { autorun } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
-import { usePathname } from "expo-router";
 import { debounce } from "lodash";
 
 export {
@@ -141,8 +140,13 @@ const RootLayout = observer(() => {
   });
   const playerCharacterData = useContext(PlayerCharacterContext);
   const gameData = useContext(GameContext);
-  const game = gameData?.gameState;
-  const playerCharacter = playerCharacterData?.playerState;
+  const enemyData = useContext(EnemyContext);
+  if (!gameData || !playerCharacterData || !enemyData) {
+    throw new Error("missing context");
+  }
+  const { gameState } = gameData;
+  const { playerState } = playerCharacterData;
+  const { setEnemy } = enemyData;
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
   const [navbarLoad, setNavbarLoad] = useState(false);
@@ -154,28 +158,30 @@ const RootLayout = observer(() => {
   useEffect(() => {
     if (loaded && navbarLoad) {
       SplashScreen.hideAsync();
-      if (!playerCharacter || !game) {
+      if (!playerState || !gameState) {
         router.replace("/NewGame");
       } else if (
         gameData?.gameState?.atDeathScreen ||
-        (playerCharacter &&
-          (playerCharacter.health <= 0 || playerCharacter.sanity <= -50))
+        (playerState && (playerState.health <= 0 || playerState.sanity <= -50))
       ) {
         while (router.canGoBack()) {
           router.back();
         }
         router.replace("/DeathScreen");
-      } else if (playerCharacter.currentDungeon && firstLoad) {
+      } else if (playerState.currentDungeon && firstLoad) {
+        if (playerState.savedEnemy) {
+          setEnemy(playerState.savedEnemy);
+        }
         while (router.canGoBack()) {
           router.back();
         }
         router.replace(
-          `/DungeonLevel/${playerCharacter.currentDungeon.instance}/${playerCharacter.currentDungeon.level}`,
+          `/DungeonLevel/${playerState.currentDungeon?.instance}/${playerState.currentDungeon?.level}`,
         );
       }
       setFirstLoad(false);
     }
-  }, [loaded, navbarLoad, gameData, playerCharacter]);
+  }, [loaded, navbarLoad, gameData, playerState]);
 
   useEffect(() => {
     getAndSetNavBar();

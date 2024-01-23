@@ -115,6 +115,8 @@ export class Creature {
       getDrops: action,
       equals: action,
       attack: action,
+      regenerate: action,
+      expendEnergy: action,
     });
   }
 
@@ -155,6 +157,13 @@ export class Creature {
       } else {
         this.energy += this.energyRegen;
       }
+    }
+  }
+  public expendEnergy(energyCost: number) {
+    if (this.energy && this.energy < energyCost) {
+      this.energy = 0;
+    } else if (this.energy) {
+      this.energy -= energyCost;
     }
   }
   //---------------------------Armor---------------------------//
@@ -420,7 +429,7 @@ export class Enemy extends Creature {
         const randomIndex = Math.floor(Math.random() * availableAttacks.length);
         const chosenAttack = availableAttacks[randomIndex] as AttackObj;
         if (this.energy && chosenAttack.energyCost) {
-          this.energy -= chosenAttack.energyCost;
+          this.expendEnergy(chosenAttack.energyCost);
         }
         if (chosenAttack.summons) {
           chosenAttack.summons.forEach((summon) => {
@@ -555,7 +564,7 @@ export class Minion extends Creature {
           );
           const chosenAttack = availableAttacks[randomIndex] as AttackObj;
           if (this.energy && chosenAttack.energyCost) {
-            this.energy -= chosenAttack.energyCost;
+            this.expendEnergy(chosenAttack.energyCost);
           }
           return this.attack(
             defenderMaxHealth,

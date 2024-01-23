@@ -21,6 +21,7 @@ import FadeOutText from "./FadeOutText";
 import GenericModal from "./GenericModal";
 import { BlurView } from "expo-blur";
 import { useColorScheme } from "nativewind";
+import GenericStrikeAround from "./GenericStrikeAround";
 
 const bottomBarPaths = ["", "spells", "earn", "dungeon", "shops", "medical"];
 
@@ -235,11 +236,11 @@ const PlayerStatus = observer(() => {
 
       return (
         <ScrollView horizontal>
-          <View className="my-1 flex flex-row justify-around">
+          <View className="my-1 flex h-6 flex-row justify-around">
             {simplifiedConditions.map((cond) => (
               <View key={cond.name} className="mx-2 flex align-middle">
                 <View className="mx-auto rounded-md bg-[rgba(255,255,255,0.4)]">
-                  <Image source={cond.icon} style={{ width: 32, height: 32 }} />
+                  <Image source={cond.icon} style={{ width: 24, height: 24 }} />
                 </View>
                 <Text>
                   {toTitleCase(cond.name)} x {cond.count}
@@ -354,13 +355,7 @@ const PlayerStatus = observer(() => {
               />
             </View>
             <View>
-              <View style={styles.container}>
-                <View style={styles.line} />
-                <View style={styles.content}>
-                  <Text className="text-xl">Conditions</Text>
-                </View>
-                <View style={styles.line} />
-              </View>
+              <GenericStrikeAround text={"Conditions"} />
               {conditionRenderer(true)}
             </View>
           </View>

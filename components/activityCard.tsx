@@ -137,7 +137,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
   }
 
   function goToFight() {
-    if (badOutCome && badOutCome.fight) {
+    if (badOutCome && badOutCome.fight && badOutCome.dungeonTitle) {
       const enemyJSON = enemies.find((enemy) => enemy.name == badOutCome.fight);
       if (enemyJSON) {
         const enemyHealth = getNumberInRange(
@@ -166,6 +166,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
         setBadOutcome(null);
         setNothingHappened(false);
         setEnemy(enemy);
+        playerState?.setSavedEnemy(enemy);
         setTimeout(() => {
           while (router.canGoBack()) {
             router.back();
@@ -174,6 +175,13 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
             `/DungeonLevel/Activities/${badOutCome?.dungeonTitle}`,
           );
         }, 500);
+        setTimeout(() => {
+          playerState?.setInDungeon({
+            state: true,
+            instance: "Activities",
+            level: badOutCome.dungeonTitle!,
+          });
+        }, 200);
       } else {
         throw new Error("missing enemy object!");
       }

@@ -155,7 +155,7 @@ const EarnScreen = observer(() => {
         </ScrollView>
         <NonThemedView
           className="absolute z-50 w-full"
-          style={{ bottom: useBottomTabBarHeight() + 70 }}
+          style={{ bottom: useBottomTabBarHeight() + 90 }}
         >
           <PlayerStatus />
         </NonThemedView>

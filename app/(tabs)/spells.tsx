@@ -3,7 +3,7 @@ import SpellDetails from "../../components/SpellDetails";
 import { GameContext, PlayerCharacterContext } from "../_layout";
 import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
-import { StyleSheet, View as NonThemedView } from "react-native";
+import { View as NonThemedView } from "react-native";
 import { observer } from "mobx-react-lite";
 import ProgressBar from "../../components/ProgressBar";
 import { elementalColorMap } from "../../utility/elementColors";
@@ -12,6 +12,7 @@ import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
+import GenericStrikeAround from "../../components/GenericStrikeAround";
 
 const SpellsScreen = observer(() => {
   const playerCharacterData = useContext(PlayerCharacterContext);
@@ -157,13 +158,7 @@ const SpellsScreen = observer(() => {
             </View>
           )}
           <View className="h-1/2">
-            <View style={styles.container}>
-              <View style={styles.line} />
-              <View style={styles.content}>
-                <Text className="text-lg">Proficiencies</Text>
-              </View>
-              <View style={styles.line} />
-            </View>
+            <GenericStrikeAround text={"Proficiencies"} />
             <View className="flex items-center px-12 pb-4">
               {magicProficiencySection(playerState?.magicProficiencies)}
             </View>
@@ -172,7 +167,7 @@ const SpellsScreen = observer(() => {
       </View>
       <NonThemedView
         className="absolute z-50 w-full"
-        style={{ bottom: useBottomTabBarHeight() + 70 }}
+        style={{ bottom: useBottomTabBarHeight() + 90 }}
       >
         <PlayerStatus />
       </NonThemedView>
@@ -190,18 +185,3 @@ const SpellsScreen = observer(() => {
   );
 });
 export default SpellsScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  content: {
-    marginHorizontal: 10,
-  },
-  line: {
-    flex: 1,
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
-  },
-});

@@ -20,6 +20,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { BlurView } from "expo-blur";
 import { useColorScheme } from "nativewind";
+import GenericStrikeAround from "../../components/GenericStrikeAround";
 
 export default function MedicalScreen() {
   const gameContext = useContext(GameContext);
@@ -214,13 +215,7 @@ export default function MedicalScreen() {
           >
             {showingHealthOptions && (
               <>
-                <View style={styles.container}>
-                  <View style={styles.line} />
-                  <View style={styles.content}>
-                    <Text className="text-xl">Health</Text>
-                  </View>
-                  <View style={styles.line} />
-                </View>
+                <GenericStrikeAround text={"Health"} />
                 {healthOptions.map((medOption, index) => {
                   return (
                     <MedicalOption
@@ -235,13 +230,7 @@ export default function MedicalScreen() {
             )}
             {showingManaOptions && (
               <>
-                <View style={styles.container}>
-                  <View style={styles.line} />
-                  <View style={styles.content}>
-                    <Text className="text-xl">Mana</Text>
-                  </View>
-                  <View style={styles.line} />
-                </View>
+                <GenericStrikeAround text={"Mana"} />
                 {manaOptions.map((medOption, index) => {
                   return (
                     <MedicalOption
@@ -256,13 +245,7 @@ export default function MedicalScreen() {
             )}
             {showingSanityOptions && (
               <>
-                <View style={styles.container}>
-                  <View style={styles.line} />
-                  <View style={styles.content}>
-                    <Text className="text-xl">Sanity</Text>
-                  </View>
-                  <View style={styles.line} />
-                </View>
+                <GenericStrikeAround text={"Sanity"} />
                 {sanityOptions.map((medOption, index) => {
                   return (
                     <MedicalOption
@@ -277,13 +260,7 @@ export default function MedicalScreen() {
             )}
             {showingOtherOptions && (
               <>
-                <View style={styles.container}>
-                  <View style={styles.line} />
-                  <View style={styles.content}>
-                    <Text className="text-xl">Other</Text>
-                  </View>
-                  <View style={styles.line} />
-                </View>
+                <GenericStrikeAround text={"Other"} />
                 {otherOptions.map((medOption, index) => {
                   return (
                     <MedicalOption
@@ -300,7 +277,7 @@ export default function MedicalScreen() {
         </ScrollView>
         <NonThemedView
           className="absolute z-50 w-full"
-          style={{ bottom: useBottomTabBarHeight() + 70 }}
+          style={{ bottom: useBottomTabBarHeight() + 90 }}
         >
           <PlayerStatus />
         </NonThemedView>
@@ -308,19 +285,3 @@ export default function MedicalScreen() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-  },
-  content: {
-    marginHorizontal: 10,
-  },
-  line: {
-    flex: 1,
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
-  },
-});

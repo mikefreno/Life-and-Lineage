@@ -17,7 +17,7 @@ import wands from "../assets/json/items/wands.json";
 import mageSpells from "../assets/json/mageSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
-import { Minion } from "./creatures";
+import { Enemy, Minion } from "./creatures";
 import summons from "../assets/json/summons.json";
 import { action, makeObservable, observable } from "mobx";
 
@@ -191,6 +191,7 @@ type PlayerCharacterBase = {
     body: Item | null;
   };
   investments?: Investment[];
+  savedEnemy?: Enemy | null;
 };
 type MageCharacter = PlayerCharacterBase & {
   playerClass: "mage";
@@ -253,7 +254,7 @@ export class PlayerCharacter extends Character {
   conditions: Condition[];
   gold: number;
   inventory: Item[];
-  currentDungeon: { instance: string; level: number } | null;
+  currentDungeon: { instance: string; level: number | string } | null;
   equipment: {
     mainHand: Item;
     offHand: Item | null;
@@ -261,6 +262,7 @@ export class PlayerCharacter extends Character {
     body: Item | null;
   };
   investments: Investment[];
+  savedEnemy: Enemy | null;
 
   constructor({
     firstName,
@@ -297,6 +299,7 @@ export class PlayerCharacter extends Character {
     currentDungeon,
     equipment,
     investments,
+    savedEnemy,
   }: PlayerCharacterOptions) {
     super({
       firstName,
@@ -347,6 +350,7 @@ export class PlayerCharacter extends Character {
       body: null,
     };
     this.investments = investments ?? [];
+    this.savedEnemy = savedEnemy ?? null;
     makeObservable(this, {
       health: observable,
       healthMax: observable,
@@ -410,6 +414,7 @@ export class PlayerCharacter extends Character {
       tickAllInvestments: action,
       getInvestment: action,
       restoreHealth: action,
+      setSavedEnemy: action,
     });
   }
   //----------------------------------Health----------------------------------//
@@ -1366,6 +1371,10 @@ export class PlayerCharacter extends Character {
     }
   }
 
+  public setSavedEnemy(enemyToSave: Enemy | null) {
+    this.savedEnemy = enemyToSave;
+  }
+
   static fromJSON(json: any): PlayerCharacter {
     const player = new PlayerCharacter({
       firstName: json.firstName,
@@ -1429,6 +1438,7 @@ export class PlayerCharacter extends Character {
             Investment.fromJSON(investment),
           )
         : undefined,
+      savedEnemy: json.savedEnemy ? Enemy.fromJSON(json.savedEnemy) : null,
     });
     return player;
   }
@@ -1607,7 +1617,7 @@ export function getStartingBook(
 type enterDungeonProps = {
   state: true;
   instance: string;
-  level: number;
+  level: number | string;
 };
 type leaveDungeonProps = {
   state: false;
