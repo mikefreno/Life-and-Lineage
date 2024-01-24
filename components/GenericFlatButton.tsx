@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
-import { Pressable, View, Text } from "react-native";
+import { Pressable, View } from "react-native";
+import { Text } from "./Themed";
 
 interface GenericFlatButtonTextProps {
   onPressFunction: () => void;
@@ -23,7 +24,7 @@ const GenericFlatButton = ({
   disabledCondition = false,
 }: Props) => {
   return (
-    <Pressable onPress={onPressFunction}>
+    <Pressable disabled={disabledCondition} onPress={onPressFunction}>
       {({ pressed }) => (
         <View
           className={`${

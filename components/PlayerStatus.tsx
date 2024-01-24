@@ -10,7 +10,7 @@ import {
   Platform,
 } from "react-native";
 import Coins from "../assets/icons/CoinsIcon";
-import { useContext, useEffect, useState } from "react";
+import { ReactNode, useContext, useEffect, useState } from "react";
 import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { observer } from "mobx-react-lite";
 import { useFonts } from "expo-font";
@@ -22,10 +22,18 @@ import GenericModal from "./GenericModal";
 import { BlurView } from "expo-blur";
 import { useColorScheme } from "nativewind";
 import GenericStrikeAround from "./GenericStrikeAround";
+import { Condition } from "../classes/conditions";
+import ClockIcon from "../assets/icons/ClockIcon";
+import HealthIcon from "../assets/icons/HealthIcon";
+import Sanity from "../assets/icons/SanityIcon";
+import Energy from "../assets/icons/EnergyIcon";
 
 const bottomBarPaths = ["", "spells", "earn", "dungeon", "shops", "medical"];
 
-const PlayerStatus = observer(() => {
+interface PlayerStatus {
+  hideGold?: boolean;
+}
+const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
   const playerCharacterData = useContext(PlayerCharacterContext);
   const gameData = useContext(GameContext);
   if (!playerCharacterData || !gameData) throw new Error("missing context");
@@ -204,7 +212,7 @@ const PlayerStatus = observer(() => {
     setReadableGold(playerState?.getReadableGold());
   }, [playerState?.gold]);
 
-  function conditionRenderer(inDetailedView: boolean) {
+  function conditionRenderer() {
     if (playerState) {
       let simplifiedConditionsMap: Map<
         string,
@@ -249,6 +257,133 @@ const PlayerStatus = observer(() => {
             ))}
           </View>
         </ScrollView>
+      );
+    }
+  }
+
+  function detailedViewConditionRender() {
+    const effectListTypes = [
+      "accuracy reduction",
+      "accuracy increase",
+      "sanityMax increase",
+      "sanityMax decrease",
+      "healthMax increase",
+      "healthMax decrease",
+      "manaMax increase",
+      "manaMax decrease",
+      "armor increase",
+      "armor decrease",
+      "weaken",
+      "strengthen",
+    ];
+    if (playerState) {
+      return (
+        <View className="max-h-40">
+          <ScrollView>
+            {playerState.conditions.map((condition) => (
+              <View
+                key={condition.name}
+                className="rounded-lg bg-zinc-200 px-4 py-2 dark:bg-zinc-600"
+              >
+                <View className="mb-1 flex flex-row items-center">
+                  <Image
+                    source={condition.getConditionIcon()}
+                    style={{ width: 24, height: 24 }}
+                  />
+                  <Text> {condition.turns} </Text>
+                  <ClockIcon width={18} height={18} />
+                </View>
+                <View className="flex flex-row">
+                  <Text>{toTitleCase(condition.name)}:</Text>
+                  {condition.healthDamage && (
+                    <View>
+                      <Text> dealing {condition.healthDamage} </Text>
+                      <HealthIcon height={14} width={14} />
+                      <Text> damage</Text>
+                    </View>
+                  )}
+                  {condition.effect.includes("heal") && (
+                    <View>
+                      <Text>
+                        {condition.healthDamage && "and"} healing{" "}
+                        {condition.effectMagnitude}{" "}
+                      </Text>
+                      <HealthIcon height={14} width={14} />
+                      <Text> health</Text>
+                    </View>
+                  )}
+                  {condition.sanityDamage && (
+                    <View>
+                      <Text>
+                        {(condition.healthDamage ||
+                          condition.effect.includes("heal")) &&
+                          "and"}{" "}
+                        dealing {condition.sanityDamage}
+                      </Text>
+                      <Sanity height={14} width={14} />
+                      <Text> damage</Text>
+                    </View>
+                  )}
+                  {condition.effect.includes("mana drain") && (
+                    <View>
+                      <Text>
+                        {(condition.healthDamage ||
+                          condition.sanityDamage ||
+                          condition.effect.includes("heal")) &&
+                          "and "}
+                        draining {condition.effectMagnitude}
+                      </Text>
+                      <Energy width={14} height={14} />
+                    </View>
+                  )}
+                  {condition.effect.includes("mana regen") && (
+                    <View>
+                      <Text>
+                        {(condition.healthDamage ||
+                          condition.sanityDamage ||
+                          condition.effect.includes("heal") ||
+                          condition.effect.includes("mana drain")) &&
+                          "and "}
+                        restoring {condition.effectMagnitude}
+                      </Text>
+                      <Energy width={14} height={14} />
+                    </View>
+                  )}
+                  {condition.effect.includes("turn skip") && (
+                    <View>
+                      <Text>
+                        {(condition.healthDamage ||
+                          condition.sanityDamage ||
+                          condition.effect.includes("heal") ||
+                          condition.effect.includes("mana regen") ||
+                          condition.effect.includes("mana drain")) &&
+                          "and "}
+                        stuns
+                      </Text>
+                    </View>
+                  )}
+                  {condition.effect.map((effect) => {
+                    if (effectListTypes.includes(effect)) {
+                      return (
+                        <View key={condition.id} className="flex flex-row">
+                          <Text> {toTitleCase(effect)}</Text>
+                          <Text>
+                            {` by `}
+                            {condition.effectStyle == "flat"
+                              ? condition.effectMagnitude
+                              : condition.effectMagnitude
+                              ? condition.effectMagnitude * 100 + "%"
+                              : ""}
+                          </Text>
+                        </View>
+                      );
+                    }
+                  })}
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
       );
     }
   }
@@ -356,7 +491,7 @@ const PlayerStatus = observer(() => {
             </View>
             <View>
               <GenericStrikeAround text={"Conditions"} />
-              {conditionRenderer(true)}
+              {detailedViewConditionRender()}
             </View>
           </View>
         </GenericModal>
@@ -391,12 +526,14 @@ const PlayerStatus = observer(() => {
               }}
             >
               <View className="flex py-2">
-                <View className="flex flex-row justify-center">
-                  <Text>{readableGold}</Text>
-                  <Coins width={16} height={16} style={{ marginLeft: 6 }} />
-                  {showingGoldChange ? goldChangePopUp() : null}
-                </View>
-                {conditionRenderer(false)}
+                {!hideGold && (
+                  <View className="flex flex-row justify-center">
+                    <Text>{readableGold}</Text>
+                    <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+                    {showingGoldChange ? goldChangePopUp() : null}
+                  </View>
+                )}
+                {conditionRenderer()}
                 <View className="flex flex-row justify-evenly">
                   <View className="flex w-[31%]">
                     {showingHealthChange && healthChangePopUp()}

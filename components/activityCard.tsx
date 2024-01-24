@@ -72,6 +72,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
             const knownChar = playerState.relationships[idx];
             setMetCharacter(knownChar);
           }
+          return;
         case "randomGood":
           if (!activity.randomGood) {
             throw new Error(
@@ -85,7 +86,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
           if (randomGoodOutcome.effect) {
             handleGoodOutcome(randomGoodOutcome.effect);
           }
-          setGoodOutcome(randomGoodOutcome);
+          return setGoodOutcome(randomGoodOutcome);
         case "randomBad":
           if (!activity.randomBad) {
             throw new Error(
@@ -97,7 +98,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
           if (randomBadOutcome.effect) {
             handleNonFightBadOutcome(randomBadOutcome.effect);
           }
-          setBadOutcome(randomBadOutcome);
+          return setBadOutcome(randomBadOutcome);
         default:
           return setNothingHappened(true);
       }
@@ -165,7 +166,13 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
         });
         setBadOutcome(null);
         setNothingHappened(false);
+        setGoodOutcome(null);
         setEnemy(enemy);
+        playerState?.setInDungeon({
+          state: true,
+          instance: "Activities",
+          level: badOutCome.dungeonTitle!,
+        });
         playerState?.setSavedEnemy(enemy);
         setTimeout(() => {
           while (router.canGoBack()) {
@@ -174,14 +181,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
           router.replace(
             `/DungeonLevel/Activities/${badOutCome?.dungeonTitle}`,
           );
-        }, 500);
-        setTimeout(() => {
-          playerState?.setInDungeon({
-            state: true,
-            instance: "Activities",
-            level: badOutCome.dungeonTitle!,
-          });
-        }, 200);
+        }, 600);
       } else {
         throw new Error("missing enemy object!");
       }

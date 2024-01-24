@@ -37,6 +37,7 @@ import TutorialModal from "../../components/TutorialModal";
 import GenericModal from "../../components/GenericModal";
 import { AttackObj } from "../../utility/types";
 import { flipCoin } from "../../utility/functions/roll";
+import GenericStrikeAround from "../../components/GenericStrikeAround";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -228,25 +229,36 @@ const DungeonLevelScreen = observer(() => {
         enemyState.health <= 0 ||
         (enemyState.sanity && enemyState.sanity <= 0)
       ) {
-        if (thisDungeon?.level != 0) {
-          thisDungeon?.incrementStep();
+        if (slug[0] == "Activities") {
+          const drops = enemyState.getDrops(
+            playerState.playerClass,
+            fightingBoss,
+          );
+          playerState.addGold(drops.gold);
+          setDroppedItems(drops);
+          setEnemy(null);
+          gameState.gameTick(playerState);
+        } else {
+          if (thisDungeon?.level != 0) {
+            thisDungeon?.incrementStep();
+          }
+          battleLogger(
+            `You defeated the ${toTitleCase(enemyState.creatureSpecies)}`,
+          );
+          const drops = enemyState.getDrops(
+            playerState.playerClass,
+            fightingBoss,
+          );
+          playerState.addGold(drops.gold);
+          setDroppedItems(drops);
+          if (fightingBoss && gameState && thisDungeon) {
+            setFightingBoss(false);
+            thisDungeon.setBossDefeated();
+            gameState.openNextDungeonLevel(thisInstance!.name);
+          }
+          setEnemy(null);
+          gameState.gameTick(playerState);
         }
-        battleLogger(
-          `You defeated the ${toTitleCase(enemyState.creatureSpecies)}`,
-        );
-        const drops = enemyState.getDrops(
-          playerState.playerClass,
-          fightingBoss,
-        );
-        playerState.addGold(drops.gold);
-        setDroppedItems(drops);
-        if (fightingBoss && gameState && thisDungeon) {
-          setFightingBoss(false);
-          thisDungeon.setBossDefeated();
-          gameState.openNextDungeonLevel(thisInstance!.name);
-        }
-        setEnemy(null);
-        gameState.gameTick(playerState);
       } else {
         enemyTurn();
         setTimeout(() => setAttackAnimationOnGoing(false), 1000);
@@ -610,10 +622,19 @@ const DungeonLevelScreen = observer(() => {
           while (router.canGoBack()) {
             router.back();
           }
-          router.replace("/dungeon");
+          if (slug[0] == "Activities") {
+            router.replace("/shops");
+          } else {
+            router.replace("/dungeon");
+          }
           playerState.setInDungeon({ state: false });
           setEnemy(null);
           playerState.setSavedEnemy(null);
+          if (slug[0] == "Activities") {
+            setTimeout(() => {
+              router.push("/Activities");
+            }, 300);
+          }
         }, 200);
       } else {
         setFleeRollFailure(true);
@@ -962,7 +983,7 @@ const DungeonLevelScreen = observer(() => {
             ),
           }}
         />
-        <View className="flex-1 px-2" style={{ paddingBottom: 92 }}>
+        <View className="flex-1 px-2" style={{ paddingBottom: 98 }}>
           <NonThemedView className="flex h-[35%]" />
           {thisDungeon?.stepsBeforeBoss !== 0 && !fightingBoss ? (
             <View className="flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
@@ -1064,8 +1085,8 @@ const DungeonLevelScreen = observer(() => {
             </View>
           </View>
         </View>
-        <NonThemedView className="absolute z-50 w-full" style={{ bottom: 90 }}>
-          <PlayerStatus />
+        <NonThemedView className="absolute z-50 w-full" style={{ bottom: 98 }}>
+          <PlayerStatus hideGold />
         </NonThemedView>
       </>
     );
@@ -1225,7 +1246,19 @@ const DungeonLevelScreen = observer(() => {
         )}
         <GenericModal
           isVisibleCondition={droppedItems ? true : false}
-          backFunction={closeImmediateItemDrops}
+          backFunction={() => {
+            if (slug[0] == "Activities") {
+              while (router.canGoBack()) {
+                router.back();
+              }
+              router.replace("/shops");
+              setTimeout(() => {
+                router.push("/Activities");
+              }, 500);
+            } else {
+              closeImmediateItemDrops();
+            }
+          }}
         >
           <>
             <NonThemedView className="mt-4 flex flex-row justify-center">
@@ -1272,7 +1305,19 @@ const DungeonLevelScreen = observer(() => {
             ) : null}
             <Pressable
               className="mx-auto my-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
-              onPress={closeImmediateItemDrops}
+              onPress={() => {
+                if (slug[0] == "Activities") {
+                  while (router.canGoBack()) {
+                    router.back();
+                  }
+                  router.replace("/shops");
+                  setTimeout(() => {
+                    router.push("/Activities");
+                  }, 500);
+                } else {
+                  closeImmediateItemDrops();
+                }
+              }}
             >
               <Text>Done Looting</Text>
             </Pressable>
@@ -1350,7 +1395,7 @@ const DungeonLevelScreen = observer(() => {
             {targetSelectionRender()}
           </>
         </GenericModal>
-        <View className="flex-1 px-2" style={{ paddingBottom: 92 }}>
+        <View className="flex-1 px-2" style={{ paddingBottom: 98 }}>
           <NonThemedView className="flex h-[35%] pt-8">
             <NonThemedView className="flex-1 flex-row justify-evenly">
               <NonThemedView
@@ -1420,13 +1465,9 @@ const DungeonLevelScreen = observer(() => {
             </NonThemedView>
             {enemyState.minions.length > 0 ? (
               <NonThemedView className="mx-4">
-                <View style={styles.container}>
-                  <View style={styles.line} />
-                  <View style={styles.content}>
-                    <Text className="text-sm">Enemy Minions</Text>
-                  </View>
-                  <View style={styles.line} />
-                </View>
+                <GenericStrikeAround
+                  textNode={<Text className="text-sm">Enemy Minions</Text>}
+                />
                 <View className="mx-4 flex flex-row flex-wrap">
                   {enemyState.minions.map((minion) => (
                     <View
@@ -1547,25 +1588,11 @@ const DungeonLevelScreen = observer(() => {
             </View>
           </View>
         </View>
-        <NonThemedView className="absolute z-50 w-full" style={{ bottom: 90 }}>
-          <PlayerStatus />
+        <NonThemedView className="absolute z-50 w-full" style={{ bottom: 98 }}>
+          <PlayerStatus hideGold />
         </NonThemedView>
       </>
     );
   }
 });
 export default DungeonLevelScreen;
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  content: {
-    marginHorizontal: 10,
-  },
-  line: {
-    flex: 1,
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
-  },
-});

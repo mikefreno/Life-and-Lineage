@@ -209,8 +209,8 @@ export default function MedicalScreen() {
           <View
             className="px-2"
             style={{
-              paddingBottom: useBottomTabBarHeight() + 74,
-              paddingTop: 12,
+              paddingBottom: useBottomTabBarHeight() + 94,
+              paddingTop: 24,
             }}
           >
             {showingHealthOptions && (
