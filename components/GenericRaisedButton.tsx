@@ -1,5 +1,6 @@
 import { useColorScheme } from "nativewind";
 import { Pressable, View, Text, ColorValue } from "react-native";
+import { useVibration } from "../utility/customHooks";
 
 interface GenericRaisedButtonProps {
   onPressFunction: () => void;
@@ -7,6 +8,14 @@ interface GenericRaisedButtonProps {
   text: string;
   textColor?: ColorValue;
   disabledCondition?: boolean;
+  vibrationStrength?:
+    | "light"
+    | "medium"
+    | "heavy"
+    | "success"
+    | "warning"
+    | "error";
+  vibrationEssentiality?: boolean;
 }
 
 const GenericRaisedButton = ({
@@ -15,13 +24,23 @@ const GenericRaisedButton = ({
   textColor,
   text,
   disabledCondition = false,
+  vibrationStrength = "light",
+  vibrationEssentiality = false,
 }: GenericRaisedButtonProps) => {
   const { colorScheme } = useColorScheme();
+
+  const vibration = useVibration();
 
   return (
     <Pressable
       className="mx-auto mb-2 mt-4"
-      onPress={onPressFunction}
+      onPress={() => {
+        vibration({
+          style: vibrationStrength,
+          essential: vibrationEssentiality,
+        });
+        onPressFunction();
+      }}
       disabled={disabledCondition}
     >
       {({ pressed }) => (

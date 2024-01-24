@@ -134,7 +134,8 @@ const EarnScreen = observer(() => {
           <View
             className="px-2"
             style={{
-              paddingBottom: useBottomTabBarHeight() + 90,
+              paddingTop: 8,
+              paddingBottom: useBottomTabBarHeight() + 98,
             }}
           >
             {jobs

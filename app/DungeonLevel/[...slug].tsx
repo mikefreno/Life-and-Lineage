@@ -631,9 +631,7 @@ const DungeonLevelScreen = observer(() => {
           setEnemy(null);
           playerState.setSavedEnemy(null);
           if (slug[0] == "Activities") {
-            setTimeout(() => {
-              router.push("/Activities");
-            }, 300);
+            router.push("/Activities");
           }
         }, 200);
       } else {
@@ -1252,9 +1250,7 @@ const DungeonLevelScreen = observer(() => {
                 router.back();
               }
               router.replace("/shops");
-              setTimeout(() => {
-                router.push("/Activities");
-              }, 500);
+              router.push("/Activities");
             } else {
               closeImmediateItemDrops();
             }
@@ -1311,9 +1307,7 @@ const DungeonLevelScreen = observer(() => {
                     router.back();
                   }
                   router.replace("/shops");
-                  setTimeout(() => {
-                    router.push("/Activities");
-                  }, 500);
+                  router.push("/Activities");
                 } else {
                   closeImmediateItemDrops();
                 }

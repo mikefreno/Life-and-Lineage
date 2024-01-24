@@ -134,7 +134,7 @@ const SpellsScreen = observer(() => {
           opacity: 0.5,
         }}
       />
-      <View className="flex-1">
+      <View className="flex-1" style={{ paddingBottom: 90 }}>
         <Text className="pt-4 text-center text-xl tracking-wide">
           Known Spells
         </Text>
@@ -178,7 +178,7 @@ const SpellsScreen = observer(() => {
           backgroundColor: playerState
             ? elementalColorMap[playerState.blessing].dark
             : undefined,
-          opacity: 0.5,
+          opacity: colorScheme == "light" ? 0.35 : 0.5,
         }}
       />
     </>

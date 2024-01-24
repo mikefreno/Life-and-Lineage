@@ -507,7 +507,7 @@ const HomeScreen = observer(() => {
         <View
           className="flex-1"
           style={{
-            paddingBottom: 20,
+            paddingBottom: 40,
           }}
         >
           <NonThemedView className="-mx-4">
@@ -624,7 +624,7 @@ const HomeScreen = observer(() => {
                 : playerState.playerClass == "necromancer"
                 ? "#6b21a8"
                 : "#fcd34d",
-            opacity: 0.5,
+            opacity: colorScheme == "light" ? 0.35 : 0.5,
           }}
         />
       </>

@@ -10,7 +10,7 @@ import {
   Platform,
 } from "react-native";
 import Coins from "../assets/icons/CoinsIcon";
-import { ReactNode, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { observer } from "mobx-react-lite";
 import { useFonts } from "expo-font";
@@ -22,7 +22,6 @@ import GenericModal from "./GenericModal";
 import { BlurView } from "expo-blur";
 import { useColorScheme } from "nativewind";
 import GenericStrikeAround from "./GenericStrikeAround";
-import { Condition } from "../classes/conditions";
 import ClockIcon from "../assets/icons/ClockIcon";
 import HealthIcon from "../assets/icons/HealthIcon";
 import Sanity from "../assets/icons/SanityIcon";
@@ -278,32 +277,34 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
     ];
     if (playerState) {
       return (
-        <View className="max-h-40">
+        <View className="max-h-52">
           <ScrollView>
             {playerState.conditions.map((condition) => (
               <View
-                key={condition.name}
-                className="rounded-lg bg-zinc-200 px-4 py-2 dark:bg-zinc-600"
+                key={condition.id}
+                className="my-1 rounded-lg bg-zinc-200 px-4 py-2 dark:bg-zinc-600"
               >
-                <View className="mb-1 flex flex-row items-center">
+                <View className="mb-1 flex flex-row items-center justify-evenly">
                   <Image
                     source={condition.getConditionIcon()}
                     style={{ width: 24, height: 24 }}
                   />
-                  <Text> {condition.turns} </Text>
-                  <ClockIcon width={18} height={18} />
+                  <View className="flex flex-row items-center">
+                    <Text> {condition.turns} </Text>
+                    <ClockIcon width={18} height={18} />
+                  </View>
                 </View>
-                <View className="flex flex-row">
+                <View className="flex flex-row justify-center">
                   <Text>{toTitleCase(condition.name)}:</Text>
                   {condition.healthDamage && (
-                    <View>
+                    <View className="flex flex-row items-center">
                       <Text> dealing {condition.healthDamage} </Text>
                       <HealthIcon height={14} width={14} />
                       <Text> damage</Text>
                     </View>
                   )}
                   {condition.effect.includes("heal") && (
-                    <View>
+                    <View className="flex flex-row items-center">
                       <Text>
                         {condition.healthDamage && "and"} healing{" "}
                         {condition.effectMagnitude}{" "}
@@ -313,7 +314,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                     </View>
                   )}
                   {condition.sanityDamage && (
-                    <View>
+                    <View className="flex flex-row items-center">
                       <Text>
                         {(condition.healthDamage ||
                           condition.effect.includes("heal")) &&
@@ -325,7 +326,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                     </View>
                   )}
                   {condition.effect.includes("mana drain") && (
-                    <View>
+                    <View className="flex flex-row items-center">
                       <Text>
                         {(condition.healthDamage ||
                           condition.sanityDamage ||
@@ -337,7 +338,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                     </View>
                   )}
                   {condition.effect.includes("mana regen") && (
-                    <View>
+                    <View className="flex flex-row items-center">
                       <Text>
                         {(condition.healthDamage ||
                           condition.sanityDamage ||
@@ -350,7 +351,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                     </View>
                   )}
                   {condition.effect.includes("turn skip") && (
-                    <View>
+                    <View className="flex flex-row items-center">
                       <Text>
                         {(condition.healthDamage ||
                           condition.sanityDamage ||
@@ -365,7 +366,10 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                   {condition.effect.map((effect) => {
                     if (effectListTypes.includes(effect)) {
                       return (
-                        <View key={condition.id} className="flex flex-row">
+                        <View
+                          key={condition.id}
+                          className="flex flex-row items-center"
+                        >
                           <Text> {toTitleCase(effect)}</Text>
                           <Text>
                             {` by `}
@@ -489,10 +493,12 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                 showMax
               />
             </View>
-            <View>
-              <GenericStrikeAround text={"Conditions"} />
-              {detailedViewConditionRender()}
-            </View>
+            {playerState.conditions.length > 0 ? (
+              <View>
+                <GenericStrikeAround text={"Conditions"} />
+                {detailedViewConditionRender()}
+              </View>
+            ) : null}
           </View>
         </GenericModal>
         <Pressable

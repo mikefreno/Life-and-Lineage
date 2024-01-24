@@ -288,6 +288,7 @@ export class PlayerCharacter extends Character {
     learningSpells,
     qualificationProgress,
     magicProficiencies,
+    conditions,
     parents,
     children,
     sexuality,
@@ -332,7 +333,7 @@ export class PlayerCharacter extends Character {
     this.children = children ?? [];
     this.relationships = relationships ?? [];
     this.knownSpells = knownSpells ?? [];
-    this.conditions = [];
+    this.conditions = conditions ?? [];
     this.physicalAttacks = physicalAttacks ?? ["punch"];
     this.gold = gold ?? 500;
     this.inventory = inventory ?? [];
@@ -1072,6 +1073,7 @@ export class PlayerCharacter extends Character {
     for (let i = 0; i < amount && debuffArray.length > 0; i++) {
       debuffArray.shift();
     }
+    this.conditions = debuffArray;
   }
   //----------------------------------Physical Combat----------------------------------//
   private setPhysicalAttacks() {

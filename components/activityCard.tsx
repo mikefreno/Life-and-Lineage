@@ -59,6 +59,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
           chosenOutcome = outcome;
         }
       }
+      console.log(chosenOutcome);
       switch (chosenOutcome) {
         case "meetingSomeone":
           const flipRes = flipCoin();
@@ -72,6 +73,9 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
             const knownChar = playerState.relationships[idx];
             setMetCharacter(knownChar);
           }
+          setGoodOutcome(null);
+          setBadOutcome(null);
+          setNothingHappened(false);
           return;
         case "randomGood":
           if (!activity.randomGood) {
@@ -86,6 +90,9 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
           if (randomGoodOutcome.effect) {
             handleGoodOutcome(randomGoodOutcome.effect);
           }
+          setMetCharacter(null);
+          setBadOutcome(null);
+          setNothingHappened(false);
           return setGoodOutcome(randomGoodOutcome);
         case "randomBad":
           if (!activity.randomBad) {
@@ -98,8 +105,21 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
           if (randomBadOutcome.effect) {
             handleNonFightBadOutcome(randomBadOutcome.effect);
           }
+          if (
+            randomBadOutcome &&
+            randomBadOutcome.fight &&
+            randomBadOutcome.dungeonTitle
+          ) {
+            setFight(randomBadOutcome.fight, randomBadOutcome.dungeonTitle);
+          }
+          setMetCharacter(null);
+          setGoodOutcome(null);
+          setNothingHappened(false);
           return setBadOutcome(randomBadOutcome);
         default:
+          setMetCharacter(null);
+          setBadOutcome(null);
+          setNothingHappened(false);
           return setNothingHappened(true);
       }
     }
@@ -137,59 +157,64 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
     }
   }
 
+  function setFight(fight: string, dungeonTitle: string) {
+    const enemyJSON = enemies.find((enemy) => enemy.name == fight);
+    if (enemyJSON) {
+      const enemyHealth = getNumberInRange(
+        enemyJSON.healthRange.minimum,
+        enemyJSON.healthRange.maximum,
+      );
+
+      const enemyAttackPower = getNumberInRange(
+        enemyJSON.attackPowerRange.minimum,
+        enemyJSON.attackPowerRange.maximum,
+      );
+
+      const enemy = new Enemy({
+        creatureSpecies: enemyJSON.name,
+        health: enemyHealth,
+        healthMax: enemyHealth,
+        sanity: enemyJSON.sanity ?? null,
+        sanityMax: enemyJSON.sanity ?? null,
+        baseArmor: enemyJSON.armorValue ?? undefined,
+        attackPower: enemyAttackPower,
+        energy: enemyJSON.energy?.maximum,
+        energyMax: enemyJSON.energy?.maximum,
+        energyRegen: enemyJSON.energy?.regen,
+        attacks: enemyJSON.attacks,
+      });
+      setNothingHappened(false);
+      setGoodOutcome(null);
+
+      setEnemy(enemy);
+      playerState?.setInDungeon({
+        state: true,
+        instance: "Activities",
+        level: dungeonTitle,
+      });
+      playerState?.setSavedEnemy(enemy);
+    }
+  }
+
   function goToFight() {
-    if (badOutCome && badOutCome.fight && badOutCome.dungeonTitle) {
-      const enemyJSON = enemies.find((enemy) => enemy.name == badOutCome.fight);
-      if (enemyJSON) {
-        const enemyHealth = getNumberInRange(
-          enemyJSON.healthRange.minimum,
-          enemyJSON.healthRange.maximum,
-        );
-
-        const enemyAttackPower = getNumberInRange(
-          enemyJSON.attackPowerRange.minimum,
-          enemyJSON.attackPowerRange.maximum,
-        );
-
-        const enemy = new Enemy({
-          creatureSpecies: enemyJSON.name,
-          health: enemyHealth,
-          healthMax: enemyHealth,
-          sanity: enemyJSON.sanity ?? null,
-          sanityMax: enemyJSON.sanity ?? null,
-          baseArmor: enemyJSON.armorValue ?? undefined,
-          attackPower: enemyAttackPower,
-          energy: enemyJSON.energy?.maximum,
-          energyMax: enemyJSON.energy?.maximum,
-          energyRegen: enemyJSON.energy?.regen,
-          attacks: enemyJSON.attacks,
-        });
-        setBadOutcome(null);
-        setNothingHappened(false);
-        setGoodOutcome(null);
-        setEnemy(enemy);
-        playerState?.setInDungeon({
-          state: true,
-          instance: "Activities",
-          level: badOutCome.dungeonTitle!,
-        });
-        playerState?.setSavedEnemy(enemy);
-        setTimeout(() => {
-          while (router.canGoBack()) {
-            router.back();
-          }
-          router.replace(
-            `/DungeonLevel/Activities/${badOutCome?.dungeonTitle}`,
-          );
-        }, 600);
+    setBadOutcome(null);
+    setTimeout(() => {
+      if (badOutCome && badOutCome.fight && badOutCome.dungeonTitle) {
+        while (router.canGoBack()) {
+          router.back();
+        }
+        router.replace(`/DungeonLevel/Activities/${badOutCome?.dungeonTitle}`);
       } else {
         throw new Error("missing enemy object!");
       }
-    }
+    }, 500);
   }
 
   function payOff(gold: number) {
     playerState?.spendGold(gold);
+    setBadOutcome(null);
+    playerState?.setInDungeon({ state: false });
+    playerState?.setSavedEnemy(null);
     setTimeout(() => setBadOutcome(null), 350);
   }
 

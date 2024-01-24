@@ -119,6 +119,7 @@ export class Condition {
   static fromJSON(json: any): Condition {
     const condition = new Condition({
       id: json.id,
+      icon: json.icon,
       name: json.name,
       style: json.style,
       turns: json.turns,
