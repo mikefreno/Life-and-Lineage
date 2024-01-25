@@ -29,8 +29,12 @@ import { BlurView } from "expo-blur";
 import { StyleSheet } from "react-native";
 
 export default function TabLayout() {
+  const playerCharacterContext = useContext(PlayerCharacterContext);
+  if (!playerCharacterContext) {
+    throw new Error("missing context");
+  }
   const { colorScheme } = useColorScheme();
-  const playerCharacter = useContext(PlayerCharacterContext)?.playerState;
+  const { playerState } = playerCharacterContext;
   const vibration = useVibration();
 
   return (
@@ -88,14 +92,14 @@ export default function TabLayout() {
             ),
             title: "Home",
             tabBarIcon: ({ color }) =>
-              playerCharacter?.playerClass == "necromancer" ? (
+              playerState?.playerClass == "necromancer" ? (
                 <Necromancer
                   width={28}
                   height={26}
                   color={color}
                   style={{ marginBottom: -3 }}
                 />
-              ) : playerCharacter?.playerClass == "paladin" ? (
+              ) : playerState?.playerClass == "paladin" ? (
                 <PaladinHammer
                   width={28}
                   height={26}
@@ -177,7 +181,7 @@ export default function TabLayout() {
                     <BookSparkles
                       width={26}
                       height={28}
-                      color={elementalColorMap[playerCharacter!.blessing].dark}
+                      color={elementalColorMap[playerState!.blessing].dark}
                       style={{
                         marginRight: 15,
                         marginBottom: 3,

@@ -13,12 +13,13 @@ import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
 import { fullSave, loadGame, loadPlayer } from "../utility/functions/save_load";
-import { View, Text, Platform } from "react-native";
+import { View, Text, Platform, StyleSheet } from "react-native";
 import { autorun } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
 import { debounce } from "lodash";
+import { BlurView } from "expo-blur";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -221,6 +222,28 @@ const RootLayout = observer(() => {
         <Stack.Screen
           name="Relationships"
           options={{ presentation: "modal" }}
+        />
+        <Stack.Screen
+          name="Shops/[shop]"
+          options={{
+            headerBackTitleVisible: false,
+            headerTransparent: true,
+            headerBackground: () => (
+              <BlurView
+                blurReductionFactor={4}
+                tint={
+                  Platform.OS == "android"
+                    ? colorScheme == "light"
+                      ? "light"
+                      : "dark"
+                    : "default"
+                }
+                intensity={100}
+                style={StyleSheet.absoluteFill}
+                experimentalBlurMethod={"dimezisBlurView"}
+              />
+            ),
+          }}
         />
       </Stack>
     </ThemeProvider>

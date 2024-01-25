@@ -11,8 +11,6 @@ import {
   Image,
   ScrollView,
   View as NonThemedView,
-  Platform,
-  StyleSheet,
 } from "react-native";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Item } from "../../classes/item";
@@ -24,8 +22,6 @@ import GearStatsDisplay from "../../components/GearStatsDisplay";
 import { useVibration } from "../../utility/customHooks";
 import { observer } from "mobx-react-lite";
 import TutorialModal from "../../components/TutorialModal";
-import { BlurView } from "expo-blur";
-import { useColorScheme } from "nativewind";
 import { useHeaderHeight } from "@react-navigation/elements";
 import shopObjects from "../../assets/json/shops.json";
 
@@ -40,8 +36,8 @@ const ShopInteriorScreen = observer(() => {
   const { gameState } = gameData;
   const { playerState } = playerCharacterData;
   const vibration = useVibration();
-  const thisShop = gameState?.shops.find((aShop) => aShop.archetype == shop);
   const colors = shopObjects.find((shopObj) => shopObj.type == shop)?.colors;
+  const thisShop = gameState?.shops.find((aShop) => aShop.archetype == shop);
   const [selectedItem, setSelectedItem] = useState<{
     item: Item;
     buying: boolean;
@@ -69,8 +65,8 @@ const ShopInteriorScreen = observer(() => {
   const [inventoryFullNotifier, setInventoryFullNotifier] =
     useState<boolean>(false);
 
+  const header = useHeaderHeight();
   const isFocused = useIsFocused();
-  const { colorScheme } = useColorScheme();
 
   const [showShopInteriorTutorial, setShowShopInteriorTutorial] =
     useState<boolean>(
@@ -223,8 +219,8 @@ const ShopInteriorScreen = observer(() => {
         }
       } else {
         const price = selectedItemRef.current.getSellPrice(thisShop!.affection);
-        thisShop.buyItem(selectedItemRef.current, price);
-        playerState.sellItem(selectedItemRef.current, price);
+        thisShop.buyItem(selectedItemRef.current, Math.floor(price));
+        playerState.sellItem(selectedItemRef.current, Math.floor(price));
       }
       vibration({ style: "light", essential: true });
       setSelectedItem(null);
@@ -300,23 +296,6 @@ const ShopInteriorScreen = observer(() => {
         <Stack.Screen
           options={{
             title: toTitleCase(shop as string),
-            headerBackTitleVisible: false,
-            headerTransparent: true,
-            headerBackground: () => (
-              <BlurView
-                blurReductionFactor={8}
-                tint={
-                  Platform.OS == "android"
-                    ? colorScheme == "light"
-                      ? "systemMaterialLight"
-                      : "systemMaterialDark"
-                    : "default"
-                }
-                intensity={100}
-                style={StyleSheet.absoluteFill}
-                experimentalBlurMethod={"dimezisBlurView"}
-              />
-            ),
           }}
         />
         <TutorialModal
@@ -343,8 +322,8 @@ const ShopInteriorScreen = observer(() => {
         />
         <View
           style={{
-            marginTop: useHeaderHeight() / 2,
-            height: useHeaderHeight() * 0.5,
+            marginTop: header / 2,
+            height: header / 2,
             backgroundColor: colors?.background,
             opacity: 0.5,
           }}
