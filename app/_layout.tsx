@@ -20,6 +20,7 @@ import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
 import { debounce } from "lodash";
 import { BlurView } from "expo-blur";
+import * as Sentry from "@sentry/react-native";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -65,6 +66,11 @@ export const LogsContext = createContext<
     }
   | undefined
 >(undefined);
+
+Sentry.init({
+  dsn: "https://2cff54f8aeb50bcb7151c159cc40fe1b@o4506630160187392.ingest.sentry.io/4506630163398656",
+  debug: true, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
+});
 
 const Root = observer(() => {
   const [gameState, setGameData] = useState<Game>();
@@ -249,4 +255,4 @@ const RootLayout = observer(() => {
     </ThemeProvider>
   );
 });
-export default Root;
+export default Sentry.wrap(Root);

@@ -34,7 +34,14 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "mikefreno",
+          "project": "magic-delve"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
