@@ -2,7 +2,7 @@
   "expo": {
     "name": "Magic Delve",
     "slug": "magic-delve",
-    "version": "1.0.0",
+    "version": "0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -18,7 +18,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mikefrenodev.magicdelve",
-      "buildNumber": "6"
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,7 +26,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.mikefrenodev.magicdelve",
-      "versionCode": 3
+      "versionCode": 1
     },
     "web": {
       "bundler": "metro",

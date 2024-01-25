@@ -43,7 +43,7 @@ export default function TabLayout() {
         screenOptions={{
           tabBarBackground: () => (
             <BlurView
-              blurReductionFactor={12}
+              blurReductionFactor={8}
               tint={
                 Platform.OS == "android"
                   ? colorScheme == "light"

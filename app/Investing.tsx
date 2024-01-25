@@ -64,7 +64,7 @@ export default function InvestingScreen() {
           headerTransparent: true,
           headerBackground: () => (
             <BlurView
-              blurReductionFactor={4}
+              blurReductionFactor={12}
               tint={
                 Platform.OS == "android"
                   ? colorScheme == "light"

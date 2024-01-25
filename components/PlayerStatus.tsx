@@ -506,7 +506,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
           className="absolute w-full border-t border-zinc-200 dark:border-zinc-600"
         >
           <BlurView
-            blurReductionFactor={12}
+            blurReductionFactor={8}
             tint={
               Platform.OS == "android"
                 ? colorScheme == "light"
