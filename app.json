@@ -35,13 +35,6 @@
     },
     "plugins": [
       "expo-router",
-      [
-        "@sentry/react-native/expo",
-        {
-          "organization": "mikefreno",
-          "project": "magic-delve"
-        }
-      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -60,5 +53,6 @@
     "updates": {
       "url": "https://u.expo.dev/2307d673-d206-4c58-8170-5dc30a9ec500"
     }
+
   }
 }
