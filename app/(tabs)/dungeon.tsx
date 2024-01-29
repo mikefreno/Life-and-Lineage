@@ -196,7 +196,7 @@ export default function DungeonScreen() {
       </View>
       <NonThemedView
         className="absolute z-50 w-full"
-        style={{ bottom: useBottomTabBarHeight() + 90 }}
+        style={{ bottom: useBottomTabBarHeight() + 75 }}
       >
         <PlayerStatus />
       </NonThemedView>

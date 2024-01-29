@@ -100,14 +100,14 @@ export default function InvestingScreen() {
       />
       <View className="flex-1">
         <ScrollView>
-          <View style={{ paddingTop: useHeaderHeight(), paddingBottom: 110 }}>
+          <View style={{ paddingTop: useHeaderHeight(), paddingBottom: 95 }}>
             {investments.map((investment: InvestmentType, idx) => (
               <InvestmentCard key={idx} investment={investment} />
             ))}
           </View>
         </ScrollView>
       </View>
-      <NonThemedView className="absolute z-50 w-full" style={{ bottom: 110 }}>
+      <NonThemedView className="absolute z-50 w-full" style={{ bottom: 95 }}>
         <PlayerStatus />
       </NonThemedView>
     </>

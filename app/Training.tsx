@@ -69,7 +69,7 @@ const JobTraining = observer(() => {
       />
       <View className="flex-1">
         <ScrollView
-          style={{ paddingBottom: 110, paddingTop: useHeaderHeight() }}
+          style={{ paddingBottom: 95, paddingTop: useHeaderHeight() }}
         >
           <View className="px-2 pt-4">
             {qualifications.map((qual, index) => {
@@ -87,7 +87,7 @@ const JobTraining = observer(() => {
           </View>
         </ScrollView>
       </View>
-      <NonThemedView className="absolute z-50 w-full" style={{ bottom: 110 }}>
+      <NonThemedView className="absolute z-50 w-full" style={{ bottom: 95 }}>
         <PlayerStatus />
       </NonThemedView>
     </>

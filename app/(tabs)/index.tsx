@@ -507,11 +507,11 @@ const HomeScreen = observer(() => {
         <View
           className="flex-1"
           style={{
-            paddingBottom: 40,
+            paddingBottom: 20,
           }}
         >
-          <NonThemedView className="-mx-4">
-            <NonThemedView className="mx-6 flex-row items-center border-b border-zinc-200 py-2 dark:border-zinc-600 md:py-12">
+          <NonThemedView className="-mx-4 border-b border-zinc-200 py-2 dark:border-zinc-600">
+            <NonThemedView className="mx-6 flex-row items-center md:py-12">
               {playerState?.playerClass == "necromancer" ? (
                 <NonThemedView className="mx-auto">
                   <Necromancer
@@ -610,7 +610,7 @@ const HomeScreen = observer(() => {
         </View>
         <NonThemedView
           className="absolute z-50 w-full"
-          style={{ bottom: useBottomTabBarHeight() + 90 }}
+          style={{ bottom: useBottomTabBarHeight() + 75 }}
         >
           <PlayerStatus />
         </NonThemedView>

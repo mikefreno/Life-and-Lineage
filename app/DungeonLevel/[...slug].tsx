@@ -981,8 +981,8 @@ const DungeonLevelScreen = observer(() => {
             ),
           }}
         />
-        <View className="flex-1 px-2" style={{ paddingBottom: 98 }}>
-          <NonThemedView className="flex h-[35%]" />
+        <View className="flex-1 px-2" style={{ paddingBottom: 88 }}>
+          <NonThemedView className="flex h-[40%]" />
           {thisDungeon?.stepsBeforeBoss !== 0 && !fightingBoss ? (
             <View className="flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
               <Text className="my-auto text-xl">
@@ -1083,7 +1083,7 @@ const DungeonLevelScreen = observer(() => {
             </View>
           </View>
         </View>
-        <NonThemedView className="absolute z-50 w-full" style={{ bottom: 98 }}>
+        <NonThemedView className="absolute z-50 w-full" style={{ bottom: 85 }}>
           <PlayerStatus hideGold />
         </NonThemedView>
       </>
@@ -1389,8 +1389,8 @@ const DungeonLevelScreen = observer(() => {
             {targetSelectionRender()}
           </>
         </GenericModal>
-        <View className="flex-1 px-2" style={{ paddingBottom: 98 }}>
-          <NonThemedView className="flex h-[35%] pt-8">
+        <View className="flex-1 px-2" style={{ paddingBottom: 88 }}>
+          <NonThemedView className="flex h-[40%] pt-8">
             <NonThemedView className="flex-1 flex-row justify-evenly">
               <NonThemedView
                 className="flex flex-col items-center justify-center"
@@ -1582,7 +1582,7 @@ const DungeonLevelScreen = observer(() => {
             </View>
           </View>
         </View>
-        <NonThemedView className="absolute z-50 w-full" style={{ bottom: 98 }}>
+        <NonThemedView className="absolute z-50 w-full" style={{ bottom: 85 }}>
           <PlayerStatus hideGold />
         </NonThemedView>
       </>

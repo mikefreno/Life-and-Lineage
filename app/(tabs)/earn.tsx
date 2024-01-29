@@ -135,7 +135,7 @@ const EarnScreen = observer(() => {
             className="px-2"
             style={{
               paddingTop: 8,
-              paddingBottom: useBottomTabBarHeight() + 98,
+              paddingBottom: useBottomTabBarHeight() + 80,
             }}
           >
             {jobs
@@ -156,7 +156,7 @@ const EarnScreen = observer(() => {
         </ScrollView>
         <NonThemedView
           className="absolute z-50 w-full"
-          style={{ bottom: useBottomTabBarHeight() + 90 }}
+          style={{ bottom: useBottomTabBarHeight() + 75 }}
         >
           <PlayerStatus />
         </NonThemedView>

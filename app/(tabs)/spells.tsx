@@ -134,7 +134,7 @@ const SpellsScreen = observer(() => {
           opacity: 0.5,
         }}
       />
-      <View className="flex-1" style={{ paddingBottom: 90 }}>
+      <View className="flex-1" style={{ paddingBottom: 75 }}>
         <Text className="pt-4 text-center text-xl tracking-wide">
           Known Spells
         </Text>
@@ -167,7 +167,7 @@ const SpellsScreen = observer(() => {
       </View>
       <NonThemedView
         className="absolute z-50 w-full"
-        style={{ bottom: useBottomTabBarHeight() + 90 }}
+        style={{ bottom: useBottomTabBarHeight() + 75 }}
       >
         <PlayerStatus />
       </NonThemedView>

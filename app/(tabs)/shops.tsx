@@ -154,7 +154,7 @@ export default function ShopsScreen() {
               flexWrap: "wrap",
               alignItems: "flex-start",
               justifyContent: "flex-start",
-              paddingBottom: useBottomTabBarHeight() + 94,
+              paddingBottom: useBottomTabBarHeight() + 84,
               paddingTop: useHeaderHeight(),
             }}
           >
@@ -163,7 +163,7 @@ export default function ShopsScreen() {
         </ScrollView>
         <NonThemedView
           className="absolute z-50 w-full"
-          style={{ bottom: useBottomTabBarHeight() + 90 }}
+          style={{ bottom: useBottomTabBarHeight() + 75 }}
         >
           <PlayerStatus />
         </NonThemedView>

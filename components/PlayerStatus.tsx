@@ -242,20 +242,18 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
       }[] = Array.from(simplifiedConditionsMap.values());
 
       return (
-        <ScrollView horizontal>
-          <View className="my-1 flex h-6 flex-row justify-around">
-            {simplifiedConditions.map((cond) => (
-              <View key={cond.name} className="mx-2 flex align-middle">
-                <View className="mx-auto rounded-md bg-[rgba(255,255,255,0.4)]">
-                  <Image source={cond.icon} style={{ width: 24, height: 24 }} />
-                </View>
-                <Text>
-                  {toTitleCase(cond.name)} x {cond.count}
-                </Text>
+        <View className="flex h-7 flex-row justify-around">
+          {simplifiedConditions.map((cond) => (
+            <View key={cond.name} className="mx-2 flex align-middle">
+              <View className="mx-auto rounded-md bg-[rgba(255,255,255,0.4)]">
+                <Image source={cond.icon} style={{ width: 24, height: 24 }} />
               </View>
-            ))}
-          </View>
-        </ScrollView>
+              <Text>
+                {toTitleCase(cond.name)} x {cond.count}
+              </Text>
+            </View>
+          ))}
+        </View>
       );
     }
   }
@@ -531,7 +529,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                     }),
               }}
             >
-              <View className="flex py-2">
+              <View className="flex pt-0.5">
                 {!hideGold && (
                   <View className="flex flex-row justify-center">
                     <Text>{readableGold}</Text>
@@ -539,7 +537,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                     {showingGoldChange ? goldChangePopUp() : null}
                   </View>
                 )}
-                {conditionRenderer()}
+                <View className="mx-auto">{conditionRenderer()}</View>
                 <View className="flex flex-row justify-evenly">
                   <View className="flex w-[31%]">
                     {showingHealthChange && healthChangePopUp()}

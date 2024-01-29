@@ -38,7 +38,7 @@ export default function Activities() {
         <ScrollView>
           <View
             className="px-4"
-            style={{ paddingBottom: 110, paddingTop: useHeaderHeight() }}
+            style={{ paddingBottom: 95, paddingTop: useHeaderHeight() }}
           >
             {activities.map((activity) => (
               <ActivityCard activity={activity} key={activity.name} />
@@ -46,7 +46,7 @@ export default function Activities() {
           </View>
         </ScrollView>
       </ThemedView>
-      <View className="absolute z-50 w-full" style={{ bottom: 110 }}>
+      <View className="absolute z-50 w-full" style={{ bottom: 95 }}>
         <PlayerStatus />
       </View>
     </>
