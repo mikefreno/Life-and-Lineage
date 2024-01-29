@@ -7,6 +7,7 @@ interface GenericModalProps {
   backFunction: () => void;
   children: ReactNode;
   backdropCloses?: boolean;
+  size?: number;
 }
 
 export default function GenericModal({
@@ -14,6 +15,7 @@ export default function GenericModal({
   backFunction,
   children,
   backdropCloses = true,
+  size,
 }: GenericModalProps) {
   return (
     <Modal
@@ -27,7 +29,7 @@ export default function GenericModal({
       onBackButtonPress={backFunction}
     >
       <View
-        className="mx-auto w-5/6 rounded-xl px-6 py-4 dark:border dark:border-zinc-500"
+        className="mx-auto rounded-xl px-6 py-4 dark:border dark:border-zinc-500"
         style={{
           shadowColor: "#000",
           shadowOffset: {
@@ -37,6 +39,7 @@ export default function GenericModal({
           elevation: 2,
           shadowOpacity: 0.25,
           shadowRadius: 5,
+          width: size ? `${size}%` : "83.3333%",
         }}
       >
         {children}

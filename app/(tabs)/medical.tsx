@@ -102,26 +102,6 @@ export default function MedicalScreen() {
         }}
       />
       <NonThemedView
-        className="flex flex-row"
-        style={{
-          marginTop: useHeaderHeight() / 2,
-          height: useHeaderHeight() * 0.75,
-        }}
-      >
-        <NonThemedView
-          className="h-full w-1/3"
-          style={{ backgroundColor: "#ef4444" }}
-        />
-        <NonThemedView
-          className="h-full w-1/3"
-          style={{ backgroundColor: "#60a5fa" }}
-        />
-        <NonThemedView
-          className="h-full w-1/3"
-          style={{ backgroundColor: "#c084fc" }}
-        />
-      </NonThemedView>
-      <NonThemedView
         className="absolute z-10 h-12 w-full border-b border-zinc-200 dark:border-zinc-600"
         style={{ top: useHeaderHeight() }}
       >
@@ -210,7 +190,7 @@ export default function MedicalScreen() {
             className="px-2"
             style={{
               paddingBottom: useBottomTabBarHeight() + 80,
-              paddingTop: 24,
+              paddingTop: useHeaderHeight() + 48,
             }}
           >
             {showingHealthOptions && (

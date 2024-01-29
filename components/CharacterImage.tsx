@@ -11,9 +11,11 @@ export function CharacterImage({
   characterSex,
 }: CharacterImageProps) {
   return (
-    <Image
-      source={getCharacterImage(characterAge, characterSex)}
-      style={{ width: 120, height: 160 }}
-    />
+    <>
+      <Image
+        source={getCharacterImage(characterAge, characterSex)}
+        style={{ width: 120, height: 160 }}
+      />
+    </>
   );
 }

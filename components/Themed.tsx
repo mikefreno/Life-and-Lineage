@@ -43,7 +43,8 @@ export function Text(props: TextProps) {
 
   return (
     <DefaultText
-      style={[{ color }, { fontFamily: "PixelSans" }, style]}
+      allowFontScaling={false}
+      style={[{ color }, { fontFamily: "PixelifySans" }, style]}
       {...otherProps}
     />
   );

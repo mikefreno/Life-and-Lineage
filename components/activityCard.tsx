@@ -49,6 +49,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
   const [goodOutcome, setGoodOutcome] = useState<GoodOutcome | null>(null);
   const [showDatePartnerSelection, setShowDatePartnerSelection] =
     useState<boolean>(false);
+  const [askedForNumber, setAskedForNumber] = useState<boolean>(false);
 
   function activityRoller(outcomes: { [key: string]: number }) {
     const keys = Object.keys(outcomes);
@@ -65,7 +66,6 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
   function visit() {
     if (playerState && activity.alone) {
       let chosenOutcome = activityRoller(activity.alone);
-
       switch (chosenOutcome) {
         case "meetingSomeone":
           const flipRes = flipCoin();
@@ -82,6 +82,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
           setGoodOutcome(null);
           setBadOutcome(null);
           setNothingHappened(false);
+          gameState?.gameTick(playerState);
           return;
         case "randomGood":
           if (!activity.randomGood) {
@@ -99,6 +100,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
           setMetCharacter(null);
           setBadOutcome(null);
           setNothingHappened(false);
+          gameState?.gameTick(playerState);
           return setGoodOutcome(randomGoodOutcome);
         case "randomBad":
           if (!activity.randomBad) {
@@ -121,11 +123,13 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
           setMetCharacter(null);
           setGoodOutcome(null);
           setNothingHappened(false);
+          gameState?.gameTick(playerState);
           return setBadOutcome(randomBadOutcome);
         default:
           setMetCharacter(null);
           setBadOutcome(null);
           setNothingHappened(false);
+          gameState?.gameTick(playerState);
           return setNothingHappened(true);
       }
     }
@@ -245,9 +249,10 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
         isVisibleCondition={metCharacter != null}
         backdropCloses={false}
         backFunction={() => setMetCharacter(null)}
+        size={100}
       >
         {gameState && metCharacter && (
-          <>
+          <View className="">
             <Text className="text-center text-xl">
               {metCharacter.getFullName()}
             </Text>
@@ -269,7 +274,9 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
                 )}{" "}
                 years old
               </Text>
-              <Text className="w-1/2">Works as a {metCharacter.job}</Text>
+              <Text className="px-10 text-center">
+                Works as a {metCharacter.job}
+              </Text>
               <View className="flex w-2/3 flex-row justify-center">
                 <View className="w-3/4">
                   <ProgressBar
@@ -285,13 +292,18 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
                 </View>
               </View>
             </View>
-            <View className="mt-4">
+            <GenericStrikeAround text={"Greetings"} />
+            <View className="mt-2 flex flex-row justify-evenly">
+              <GenericFlatButton text="Friendly" onPressFunction={() => {}} />
+              <GenericFlatButton text="Aggressive" onPressFunction={() => {}} />
+            </View>
+            <View className="mt-2">
               <GenericFlatButton
                 text={"Close"}
                 onPressFunction={() => setMetCharacter(null)}
               />
             </View>
-          </>
+          </View>
         )}
       </GenericModal>
       <GenericModal
@@ -300,22 +312,22 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
         backFunction={() => setGoodOutcome(null)}
       >
         <View className="items-center">
-          <Text>{goodOutcome?.name}</Text>
+          <Text className="text-lg">{goodOutcome?.name}</Text>
           {goodOutcome?.effect.gold && (
-            <View className="flex flex-row">
-              <Text>{goodOutcome?.effect.gold}</Text>
+            <View className="flex flex-row items-center">
+              <Text>{goodOutcome?.effect.gold} </Text>
               <Coins width={14} height={14} />
             </View>
           )}
           {goodOutcome?.effect.sanityRestore && (
-            <View className="flex flex-row">
-              <Text>{goodOutcome?.effect.sanityRestore}</Text>
+            <View className="flex flex-row items-center">
+              <Text>{goodOutcome?.effect.sanityRestore} </Text>
               <Sanity width={14} height={14} />
             </View>
           )}
           {goodOutcome?.effect.healthRestore && (
-            <View className="flex flex-row">
-              <Text>{goodOutcome?.effect.healthRestore}</Text>
+            <View className="flex flex-row items-center">
+              <Text>{goodOutcome?.effect.healthRestore} </Text>
               <HealthIcon width={14} height={14} />
             </View>
           )}
@@ -402,7 +414,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
           <View className="mt-4">
             <GenericFlatButton
               text={"Close"}
-              onPressFunction={() => setNothingHappened(true)}
+              onPressFunction={() => setNothingHappened(false)}
             />
           </View>
         </View>
@@ -423,7 +435,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
       >
         <View className="flex justify-between rounded-xl px-4 py-2 text-zinc-950 dark:border dark:border-zinc-500">
           <View className="flex flex-row justify-between">
-            <Text className="bold w-1/2 text-xl dark:text-zinc-50">
+            <Text className="bold w-3/4 text-xl dark:text-zinc-50">
               {toTitleCase(activity.name)}
             </Text>
             <View className="flex flex-row items-center">

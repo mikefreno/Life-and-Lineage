@@ -507,7 +507,7 @@ const HomeScreen = observer(() => {
         <View
           className="flex-1"
           style={{
-            paddingBottom: 20,
+            paddingBottom: useBottomTabBarHeight() + 65,
           }}
         >
           <NonThemedView className="-mx-4 border-b border-zinc-200 py-2 dark:border-zinc-600">
@@ -533,7 +533,7 @@ const HomeScreen = observer(() => {
                   />
                 </NonThemedView>
               )}
-              <NonThemedView className="mx-2 flex-1 flex-col justify-center pt-2 align-middle">
+              <NonThemedView className="flex-1 flex-col justify-center align-middle">
                 <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
                 <Text className="text-center text-xl dark:text-white">{`${playerState.job}`}</Text>
                 <Text className="text-center text-xl dark:text-white">{`${
@@ -614,19 +614,6 @@ const HomeScreen = observer(() => {
         >
           <PlayerStatus />
         </NonThemedView>
-        <View
-          style={{
-            marginBottom: useBottomTabBarHeight() / 3,
-            height: useBottomTabBarHeight() + 20,
-            backgroundColor:
-              playerState.playerClass == "mage"
-                ? "#1e40af"
-                : playerState.playerClass == "necromancer"
-                ? "#6b21a8"
-                : "#fcd34d",
-            opacity: colorScheme == "light" ? 0.35 : 0.5,
-          }}
-        />
       </>
     );
   }

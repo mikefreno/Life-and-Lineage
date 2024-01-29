@@ -93,10 +93,15 @@ export class Shop {
     }
   }
 
+  private changeAffection(change: number) {
+    this.affection += Math.floor(change * 4) / 4;
+  }
+
   public buyItem(item: Item, buyPrice: number) {
     if (Math.floor(buyPrice) <= this.currentGold) {
       this.inventory.push(item);
       this.currentGold -= Math.floor(buyPrice);
+      this.changeAffection(buyPrice / 1000);
     }
   }
 
@@ -105,6 +110,7 @@ export class Shop {
     if (idx !== -1) {
       this.inventory.splice(idx, 1);
       this.currentGold += Math.floor(sellPrice);
+      this.changeAffection(sellPrice / 1000);
     }
   }
 

@@ -38,6 +38,7 @@ import GenericModal from "../../components/GenericModal";
 import { AttackObj } from "../../utility/types";
 import { flipCoin } from "../../utility/functions/roll";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
+import GenericFlatButton from "../../components/GenericFlatButton";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -115,6 +116,7 @@ const DungeonLevelScreen = observer(() => {
       setLevel(Number(slug[1]));
     } else {
       setEnemyAttacked(true);
+      setFirstLoad(false);
     }
   }, [slug]);
 
@@ -358,6 +360,41 @@ const DungeonLevelScreen = observer(() => {
       }
       if (enemyState.minions.length > 0) {
         enemyMinionsTurn(enemyState.minions);
+      }
+      if (
+        enemyState.health <= 0 ||
+        (enemyState.sanity && enemyState.sanity <= 0)
+      ) {
+        if (slug[0] == "Activities") {
+          const drops = enemyState.getDrops(
+            playerState.playerClass,
+            fightingBoss,
+          );
+          playerState.addGold(drops.gold);
+          setDroppedItems(drops);
+          setEnemy(null);
+          gameState.gameTick(playerState);
+        } else {
+          if (thisDungeon?.level != 0) {
+            thisDungeon?.incrementStep();
+          }
+          battleLogger(
+            `You defeated the ${toTitleCase(enemyState.creatureSpecies)}`,
+          );
+          const drops = enemyState.getDrops(
+            playerState.playerClass,
+            fightingBoss,
+          );
+          playerState.addGold(drops.gold);
+          setDroppedItems(drops);
+          if (fightingBoss && gameState && thisDungeon) {
+            setFightingBoss(false);
+            thisDungeon.setBossDefeated();
+            gameState.openNextDungeonLevel(thisInstance!.name);
+          }
+          setEnemy(null);
+          gameState.gameTick(playerState);
+        }
       }
     }
   };
@@ -1175,24 +1212,26 @@ const DungeonLevelScreen = observer(() => {
                       <Text className="text-center text-lg">
                         Attempt to Flee?
                       </Text>
-                      <View className="flex w-full flex-row justify-evenly">
-                        <Pressable
-                          disabled={attackAnimationOnGoing}
-                          onPress={flee}
-                          className="mb-4 mt-8 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
-                        >
-                          <Text className="text-lg">Run!</Text>
-                        </Pressable>
-                        <Pressable
-                          className="mb-4 mt-8 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
-                          onPress={(e) => {
-                            e.stopPropagation();
+                      {playerState.isStunned() ? (
+                        <Text className="italic" style={{ color: "#ef4444" }}>
+                          You are stunned!
+                        </Text>
+                      ) : null}
+                      <View className="flex w-full flex-row justify-evenly pt-8">
+                        <GenericFlatButton
+                          onPressFunction={flee}
+                          text={"Run!"}
+                          disabledCondition={
+                            attackAnimationOnGoing || playerState.isStunned()
+                          }
+                        />
+                        <GenericFlatButton
+                          onPressFunction={() => {
                             setFleeModalShowing(false);
                             setFleeRollFailure(false);
                           }}
-                        >
-                          <Text className="text-lg">Cancel</Text>
-                        </Pressable>
+                          text={"Cancel"}
+                        />
                       </View>
                       {fleeRollFailure ? (
                         <Text

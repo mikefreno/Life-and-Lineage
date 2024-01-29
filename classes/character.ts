@@ -90,6 +90,7 @@ export class Character {
       getFullName: action,
       setJob: action,
       deathRoll: action,
+      increaseAffection: action,
     });
   }
 
@@ -119,6 +120,10 @@ export class Character {
       this.alive = false;
       this.deathdate = new Date().toISOString();
     }
+  }
+
+  public increaseAffection(change: number) {
+    this.affection += change;
   }
 
   static fromJSON(json: any): Character {
@@ -415,6 +420,7 @@ export class PlayerCharacter extends Character {
       tickAllInvestments: action,
       getInvestment: action,
       restoreHealth: action,
+      restoreSanity: action,
       setSavedEnemy: action,
     });
   }

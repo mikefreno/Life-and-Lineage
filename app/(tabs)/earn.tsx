@@ -121,20 +121,12 @@ const EarnScreen = observer(() => {
           </View>
         </View>
       </Modal>
-      <View
-        style={{
-          marginTop: useHeaderHeight() / 2,
-          height: useHeaderHeight() * 0.5,
-          backgroundColor: "#fbbf24",
-          opacity: 0.5,
-        }}
-      />
       <View className="flex-1">
         <ScrollView className="">
           <View
             className="px-2"
             style={{
-              paddingTop: 8,
+              paddingTop: useHeaderHeight(),
               paddingBottom: useBottomTabBarHeight() + 80,
             }}
           >

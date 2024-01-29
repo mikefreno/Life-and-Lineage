@@ -94,16 +94,10 @@ export default function DungeonScreen() {
         }}
         onCloseFunction={() => setShowDungeonTutorial(false)}
       />
-      <View
-        style={{
-          marginTop: useHeaderHeight() / 2,
-          height: useHeaderHeight() * 0.5,
-          backgroundColor: "#dc2626",
-          opacity: 0.5,
-        }}
-      />
       <View className="flex-1 px-8">
-        <NonThemedView style={{ paddingTop: 12, paddingBottom: 4 }}>
+        <NonThemedView
+          style={{ paddingTop: useHeaderHeight(), paddingBottom: 4 }}
+        >
           <Text className="text-center text-2xl">
             The dungeon is a dangerous place. Be careful.
           </Text>

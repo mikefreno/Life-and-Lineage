@@ -141,9 +141,8 @@ const Root = observer(() => {
 });
 
 const RootLayout = observer(() => {
-  const [loaded, error] = useFonts({
+  const [fontLoaded, fontError] = useFonts({
     PixelifySans: require("../assets/fonts/PixelifySans-Regular.ttf"),
-    ...FontAwesome.font,
   });
   const playerCharacterData = useContext(PlayerCharacterContext);
   const gameData = useContext(GameContext);
@@ -159,11 +158,7 @@ const RootLayout = observer(() => {
   const [navbarLoad, setNavbarLoad] = useState(false);
 
   useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded && navbarLoad) {
+    if (fontLoaded && navbarLoad) {
       SplashScreen.hideAsync();
       if (!playerState || !gameState) {
         router.replace("/NewGame");
@@ -188,7 +183,7 @@ const RootLayout = observer(() => {
       }
       setFirstLoad(false);
     }
-  }, [loaded, navbarLoad, gameData, playerState]);
+  }, [fontLoaded, navbarLoad, gameData, playerState]);
 
   useEffect(() => {
     getAndSetNavBar();
@@ -208,6 +203,10 @@ const RootLayout = observer(() => {
     }
   }
 
+  if (!fontLoaded && !fontError) {
+    return null;
+  }
+
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <StatusBar style={colorScheme == "light" ? "dark" : "light"} />
@@ -223,14 +222,14 @@ const RootLayout = observer(() => {
           name="Options"
           options={{
             presentation: "modal",
-            headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
+            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
           }}
         />
         <Stack.Screen
           name="Relationships"
           options={{
             presentation: "modal",
-            headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
+            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
           }}
         />
         <Stack.Screen
@@ -238,7 +237,7 @@ const RootLayout = observer(() => {
           options={{
             headerBackTitleVisible: false,
             headerTransparent: true,
-            headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
+            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
             headerBackground: () => (
               <BlurView
                 blurReductionFactor={12}

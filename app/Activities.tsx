@@ -17,15 +17,15 @@ export default function Activities() {
           title: "Activities",
           headerBackTitleVisible: false,
           headerTransparent: true,
-          headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
+          headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
           headerBackground: () => (
             <BlurView
               blurReductionFactor={8}
               tint={
                 Platform.OS == "android"
                   ? colorScheme == "light"
-                    ? "systemMaterialLight"
-                    : "systemMaterialDark"
+                    ? "light"
+                    : "dark"
                   : "default"
               }
               intensity={100}

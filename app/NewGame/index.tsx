@@ -93,6 +93,8 @@ export default function NewGameScreen() {
       <Stack.Screen
         options={{
           title: "Class Select",
+          headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
+          headerBackTitleStyle: { fontFamily: "PixelifySans" },
         }}
       />
       <Modal

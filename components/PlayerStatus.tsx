@@ -5,7 +5,6 @@ import {
   Animated,
   Image,
   Pressable,
-  StyleSheet,
   View,
   Platform,
 } from "react-native";
@@ -496,7 +495,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
         </GenericModal>
         <Pressable
           onPress={() => setShowDetailedView(true)}
-          className="absolute w-full border-t border-zinc-200 dark:border-zinc-600"
+          className="absolute -mt-1 w-full border-t border-zinc-200 dark:border-zinc-600"
         >
           <BlurView
             blurReductionFactor={8}
@@ -533,7 +532,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                   </View>
                 )}
                 <View className="mx-auto">{conditionRenderer()}</View>
-                <View className="flex flex-row justify-evenly">
+                <View className="flex flex-row justify-evenly pb-1">
                   <View className="flex w-[31%]">
                     {showingHealthChange && healthChangePopUp()}
                     <Text className="mx-auto" style={{ color: "#ef4444" }}>
@@ -581,20 +580,3 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
   }
 });
 export default PlayerStatus;
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 4,
-    marginHorizontal: 12,
-  },
-  content: {
-    marginHorizontal: 10,
-  },
-  line: {
-    flex: 1,
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
-  },
-});

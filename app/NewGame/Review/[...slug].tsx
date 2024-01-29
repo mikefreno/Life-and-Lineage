@@ -172,6 +172,8 @@ export default function NewGameReview() {
       <Stack.Screen
         options={{
           title: "Review",
+          headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
+          headerBackTitleStyle: { fontFamily: "PixelifySans" },
         }}
       />
       <Text className="pt-[8vh] text-center text-2xl">Review</Text>

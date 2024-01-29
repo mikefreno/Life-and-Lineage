@@ -68,6 +68,8 @@ export default function SetSex() {
       <Stack.Screen
         options={{
           title: "Sex Select",
+          headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
+          headerBackTitleStyle: { fontFamily: "PixelifySans" },
         }}
       />
       <TutorialModal

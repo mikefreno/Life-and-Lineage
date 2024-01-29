@@ -36,13 +36,18 @@ export default function SetName() {
       <Stack.Screen
         options={{
           title: "Name Set",
+          headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
+          headerBackTitleStyle: { fontFamily: "PixelifySans" },
         }}
       />
       <ThemedView className="flex-1 items-center px-6">
         <View className="flex flex-row py-12 text-center">
-          <Text className="text-2xl md:text-3xl">
+          <Text className="text-center text-2xl md:text-3xl">
             Choose Your
-            <Text className="text-2xl md:text-3xl" style={{ color: accent }}>
+            <Text
+              className="text-center text-2xl md:text-3xl"
+              style={{ color: accent }}
+            >
               {" "}
               {toTitleCase(playerClass)}'s{" "}
             </Text>
@@ -54,7 +59,7 @@ export default function SetName() {
           className="justify-center"
         >
           <TextInput
-            className="mt-[10vh] rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
+            className="mt-[10vh] rounded border border-zinc-800 pl-2 text-black dark:border-zinc-100 dark:text-zinc-50"
             placeholderTextColor={
               colorScheme == "light" ? "#d4d4d8" : "#71717a"
             }
@@ -69,15 +74,17 @@ export default function SetName() {
             autoComplete="given-name"
             maxLength={16}
             style={{
+              fontFamily: "PixelifySans",
               paddingVertical: 8,
               minWidth: "50%",
+              fontSize: 20,
             }}
           />
           <Text className="pl-1 pt-1 italic">
             Minimum Length: 2, Maximum Length: 16
           </Text>
           <TextInput
-            className="mt-[3vh] rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
+            className="mt-[3vh] rounded border border-zinc-800 pl-2 text-black dark:border-zinc-100 dark:text-zinc-50"
             onChangeText={(text) => {
               setLastName(text.replace(/^\s+/, ""));
               lastNameRef.current = text.replace(/^\s+/, "");
@@ -92,8 +99,10 @@ export default function SetName() {
             value={lastName}
             maxLength={16}
             style={{
+              fontFamily: "PixelifySans",
               paddingVertical: 8,
               minWidth: "50%",
+              fontSize: 20,
             }}
           />
           <Text className="pl-1 pt-1 italic">

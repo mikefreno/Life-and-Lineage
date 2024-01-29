@@ -134,7 +134,10 @@ const SpellsScreen = observer(() => {
           opacity: 0.5,
         }}
       />
-      <View className="flex-1" style={{ paddingBottom: 75 }}>
+      <View
+        className="flex-1"
+        style={{ paddingBottom: useBottomTabBarHeight() + 65 }}
+      >
         <Text className="pt-4 text-center text-xl tracking-wide">
           Known Spells
         </Text>
@@ -171,16 +174,6 @@ const SpellsScreen = observer(() => {
       >
         <PlayerStatus />
       </NonThemedView>
-      <View
-        style={{
-          marginBottom: useBottomTabBarHeight() / 3,
-          height: useBottomTabBarHeight() + 20,
-          backgroundColor: playerState
-            ? elementalColorMap[playerState.blessing].dark
-            : undefined,
-          opacity: colorScheme == "light" ? 0.35 : 0.5,
-        }}
-      />
     </>
   );
 });

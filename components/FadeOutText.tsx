@@ -30,6 +30,7 @@ export default function FadeOutText({
     <Animated.Text
       className={className}
       style={{
+        fontFamily: "PixelifySans",
         opacity: fadeAnim,
       }}
     >

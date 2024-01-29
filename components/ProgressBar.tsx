@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, StyleSheet, Platform } from "react-native";
+import { View, StyleSheet, Platform } from "react-native";
+import { Text } from "./Themed";
 
 interface ProgressBarProps {
   value: number;
@@ -62,9 +63,7 @@ const ProgressBar = ({
             <Text
               style={{
                 marginTop: borderColor ? -1 : 0,
-                fontSize: 12,
                 color: textColor,
-                fontFamily: "PixelSans",
               }}
             >
               {value}

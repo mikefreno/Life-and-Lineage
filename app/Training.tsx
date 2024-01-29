@@ -38,15 +38,15 @@ const JobTraining = observer(() => {
           title: "Traditional Study",
           headerBackTitleVisible: false,
           headerTransparent: true,
-          headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
+          headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
           headerBackground: () => (
             <BlurView
               blurReductionFactor={4}
               tint={
                 Platform.OS == "android"
                   ? colorScheme == "light"
-                    ? "systemMaterialLight"
-                    : "systemMaterialDark"
+                    ? "light"
+                    : "dark"
                   : "default"
               }
               intensity={100}

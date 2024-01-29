@@ -525,6 +525,8 @@ export default function SetBlessing() {
       <Stack.Screen
         options={{
           title: "Blessing",
+          headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
+          headerBackTitleStyle: { fontFamily: "PixelifySans" },
         }}
       />
       <TutorialModal
