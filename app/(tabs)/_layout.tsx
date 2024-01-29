@@ -57,6 +57,7 @@ export default function TabLayout() {
             />
           ),
           tabBarActiveTintColor: Colors[colorScheme as "light" | "dark"].tint,
+          tabBarLabelStyle: { fontFamily: "PixelSans" },
           tabBarStyle:
             Platform.OS === "android"
               ? { paddingHorizontal: 16, position: "absolute" }
@@ -75,6 +76,7 @@ export default function TabLayout() {
           options={{
             headerTransparent: true,
             headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
             headerBackground: () => (
               <BlurView
                 blurReductionFactor={12}
@@ -150,6 +152,7 @@ export default function TabLayout() {
           options={{
             headerTransparent: true,
             headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
             headerBackground: () => (
               <BlurView
                 blurReductionFactor={12}
@@ -199,6 +202,7 @@ export default function TabLayout() {
           options={{
             headerTransparent: true,
             headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
             headerBackground: () => (
               <BlurView
                 blurReductionFactor={12}
@@ -266,6 +270,7 @@ export default function TabLayout() {
           options={{
             headerTransparent: true,
             headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
             headerBackground: () => (
               <BlurView
                 blurReductionFactor={12}
@@ -311,6 +316,7 @@ export default function TabLayout() {
           options={{
             headerTransparent: true,
             headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
             headerBackground: () => (
               <BlurView
                 blurReductionFactor={12}
@@ -356,6 +362,7 @@ export default function TabLayout() {
           options={{
             headerTransparent: true,
             headerTitleAlign: "center",
+            headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
             headerBackground: () => (
               <BlurView
                 blurReductionFactor={12}

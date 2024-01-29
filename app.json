@@ -41,6 +41,14 @@
           "organization": "mikefreno",
           "project": "magic-delve"
         }
+      ],
+      [ 
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/PixelifySans-Regular.ttf"
+          ]
+        }
       ]
     ],
     "experiments": {

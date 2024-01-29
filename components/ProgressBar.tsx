@@ -64,6 +64,7 @@ const ProgressBar = ({
                 marginTop: borderColor ? -1 : 0,
                 fontSize: 12,
                 color: textColor,
+                fontFamily: "PixelSans",
               }}
             >
               {value}

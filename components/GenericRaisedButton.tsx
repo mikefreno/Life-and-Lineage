@@ -1,6 +1,7 @@
 import { useColorScheme } from "nativewind";
-import { Pressable, View, Text, ColorValue } from "react-native";
+import { Pressable, View, ColorValue } from "react-native";
 import { useVibration } from "../utility/customHooks";
+import { Text } from "./Themed";
 
 interface GenericRaisedButtonProps {
   onPressFunction: () => void;

@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import Coins from "../assets/icons/CoinsIcon";
 import Energy from "../assets/icons/EnergyIcon";
 import Sanity from "../assets/icons/SanityIcon";
@@ -12,6 +12,7 @@ import { observer } from "mobx-react-lite";
 import { numberToRoman } from "../utility/functions/misc";
 import { useVibration } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
+import { Text } from "./Themed";
 
 interface LaborTaskProps {
   reward: number;

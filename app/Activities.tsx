@@ -17,6 +17,7 @@ export default function Activities() {
           title: "Activities",
           headerBackTitleVisible: false,
           headerTransparent: true,
+          headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
           headerBackground: () => (
             <BlurView
               blurReductionFactor={8}

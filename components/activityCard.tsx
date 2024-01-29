@@ -5,9 +5,13 @@ import { useColorScheme } from "nativewind";
 import { flipCoin } from "../utility/functions/roll";
 import { generateNewCharacter } from "../utility/functions/characterAid";
 import { useContext, useState } from "react";
-import { EnemyContext, PlayerCharacterContext } from "../app/_layout";
+import {
+  EnemyContext,
+  GameContext,
+  PlayerCharacterContext,
+} from "../app/_layout";
 import Coins from "../assets/icons/CoinsIcon";
-import { toTitleCase } from "../utility/functions/misc";
+import { calculateAge, toTitleCase } from "../utility/functions/misc";
 import GenericModal from "./GenericModal";
 import { Character } from "../classes/character";
 import GenericRaisedButton from "./GenericRaisedButton";
@@ -20,6 +24,9 @@ import { router } from "expo-router";
 import { getNumberInRange } from "../utility/enemy";
 import { Enemy } from "../classes/creatures";
 import enemies from "../assets/json/enemy.json";
+import { CharacterImage } from "./CharacterImage";
+import ProgressBar from "./ProgressBar";
+import AffectionIcon from "../assets/icons/AffectionIcon";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -28,11 +35,13 @@ interface ActivityCardProps {
 export default function ActivityCard({ activity }: ActivityCardProps) {
   const playerContext = useContext(PlayerCharacterContext);
   const enemyContext = useContext(EnemyContext);
-  if (!playerContext || !enemyContext) {
+  const gameContext = useContext(GameContext);
+  if (!playerContext || !enemyContext || !gameContext) {
     throw new Error("missing context");
   }
   const { playerState } = playerContext;
   const { setEnemy } = enemyContext;
+  const { gameState } = gameContext;
   const { colorScheme } = useColorScheme();
   const [metCharacter, setMetCharacter] = useState<Character | null>(null);
   const [nothingHappened, setNothingHappened] = useState<boolean>(false);
@@ -41,25 +50,22 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
   const [showDatePartnerSelection, setShowDatePartnerSelection] =
     useState<boolean>(false);
 
-  function visit() {
-    if (playerState) {
-      const r = Math.random();
-      let cumProb = 0;
-      let chosenOutcome;
-      for (const outcome in activity.alone) {
-        cumProb +=
-          activity.alone[
-            outcome as
-              | "meetingSomeone"
-              | "nothingHappens"
-              | "randomGood"
-              | "randomBad"
-          ];
-        if (r <= cumProb) {
-          chosenOutcome = outcome;
-        }
+  function activityRoller(outcomes: { [key: string]: number }) {
+    const keys = Object.keys(outcomes);
+    let accum = 0;
+    let roll = Math.random();
+    for (let key of keys) {
+      accum += outcomes[key];
+      if (roll <= accum) {
+        return key;
       }
-      console.log(chosenOutcome);
+    }
+  }
+
+  function visit() {
+    if (playerState && activity.alone) {
+      let chosenOutcome = activityRoller(activity.alone);
+
       switch (chosenOutcome) {
         case "meetingSomeone":
           const flipRes = flipCoin();
@@ -240,13 +246,53 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
         backdropCloses={false}
         backFunction={() => setMetCharacter(null)}
       >
-        <Text>{metCharacter?.getFullName()}</Text>
-        <View className="mt-4">
-          <GenericFlatButton
-            text={"Close"}
-            onPressFunction={() => setMetCharacter(null)}
-          />
-        </View>
+        {gameState && metCharacter && (
+          <>
+            <Text className="text-center text-xl">
+              {metCharacter.getFullName()}
+            </Text>
+            <View className="mx-auto">
+              <CharacterImage
+                characterAge={calculateAge(
+                  new Date(metCharacter.birthdate),
+                  new Date(gameState.date),
+                )}
+                characterSex={"M"}
+              />
+            </View>
+
+            <View className="items-center">
+              <Text>
+                {calculateAge(
+                  new Date(metCharacter.birthdate),
+                  new Date(gameState.date),
+                )}{" "}
+                years old
+              </Text>
+              <Text className="w-1/2">Works as a {metCharacter.job}</Text>
+              <View className="flex w-2/3 flex-row justify-center">
+                <View className="w-3/4">
+                  <ProgressBar
+                    value={metCharacter.affection}
+                    minValue={-100}
+                    maxValue={100}
+                    filledColor="#dc2626"
+                    unfilledColor="#fca5a5"
+                  />
+                </View>
+                <View className="my-auto ml-1">
+                  <AffectionIcon height={14} width={14} />
+                </View>
+              </View>
+            </View>
+            <View className="mt-4">
+              <GenericFlatButton
+                text={"Close"}
+                onPressFunction={() => setMetCharacter(null)}
+              />
+            </View>
+          </>
+        )}
       </GenericModal>
       <GenericModal
         isVisibleCondition={goodOutcome != null}
@@ -351,8 +397,8 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
         backFunction={() => setNothingHappened(false)}
       >
         <View className="items-center">
-          <Text>Nothing of note happened</Text>
-          <Text>Could be worse</Text>
+          <Text className="pb-2 text-xl">Nothing of note happened</Text>
+          <Text>Could have been worse</Text>
           <View className="mt-4">
             <GenericFlatButton
               text={"Close"}

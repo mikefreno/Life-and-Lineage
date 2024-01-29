@@ -38,6 +38,7 @@ const JobTraining = observer(() => {
           title: "Traditional Study",
           headerBackTitleVisible: false,
           headerTransparent: true,
+          headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
           headerBackground: () => (
             <BlurView
               blurReductionFactor={4}

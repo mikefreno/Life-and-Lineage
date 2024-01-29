@@ -245,12 +245,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
         <View className="flex h-7 flex-row justify-around">
           {simplifiedConditions.map((cond) => (
             <View key={cond.name} className="mx-2 flex align-middle">
-              <View className="mx-auto rounded-md bg-[rgba(255,255,255,0.4)]">
-                <Image source={cond.icon} style={{ width: 24, height: 24 }} />
-              </View>
-              <Text>
-                {toTitleCase(cond.name)} x {cond.count}
-              </Text>
+              <Image source={cond.icon} style={{ height: 24, maxWidth: 32 }} />
             </View>
           ))}
         </View>
@@ -282,10 +277,10 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                 key={condition.id}
                 className="my-1 rounded-lg bg-zinc-200 px-4 py-2 dark:bg-zinc-600"
               >
-                <View className="mb-1 flex flex-row items-center justify-evenly">
+                <View className="mb-1 flex flex-row items-center justify-center">
                   <Image
                     source={condition.getConditionIcon()}
-                    style={{ width: 24, height: 24 }}
+                    style={{ maxWidth: 32, height: 24 }}
                   />
                   <View className="flex flex-row items-center">
                     <Text> {condition.turns} </Text>

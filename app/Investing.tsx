@@ -62,6 +62,7 @@ export default function InvestingScreen() {
         options={{
           headerBackTitleVisible: false,
           headerTransparent: true,
+          headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
           headerBackground: () => (
             <BlurView
               blurReductionFactor={12}

@@ -142,7 +142,7 @@ const Root = observer(() => {
 
 const RootLayout = observer(() => {
   const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    PixelifySans: require("../assets/fonts/PixelifySans-Regular.ttf"),
     ...FontAwesome.font,
   });
   const playerCharacterData = useContext(PlayerCharacterContext);
@@ -223,17 +223,22 @@ const RootLayout = observer(() => {
           name="Options"
           options={{
             presentation: "modal",
+            headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
           }}
         />
         <Stack.Screen
           name="Relationships"
-          options={{ presentation: "modal" }}
+          options={{
+            presentation: "modal",
+            headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
+          }}
         />
         <Stack.Screen
           name="Shops/[shop]"
           options={{
             headerBackTitleVisible: false,
             headerTransparent: true,
+            headerTitleStyle: { fontFamily: "PixelSans", fontSize: 22 },
             headerBackground: () => (
               <BlurView
                 blurReductionFactor={12}
