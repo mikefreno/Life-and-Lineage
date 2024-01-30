@@ -4,6 +4,7 @@ import {
   Platform,
   Pressable,
   Image,
+  View,
 } from "react-native";
 import Colors from "../../constants/Colors";
 import Wand from "../../assets/icons/WandIcon";
@@ -41,27 +42,34 @@ export default function TabLayout() {
     <>
       <Tabs
         screenOptions={{
-          tabBarBackground: () => (
-            <BlurView
-              blurReductionFactor={8}
-              tint={
-                Platform.OS == "android"
-                  ? colorScheme == "light"
-                    ? "light"
-                    : "dark"
-                  : "default"
-              }
-              intensity={100}
-              style={StyleSheet.absoluteFill}
-              experimentalBlurMethod={"dimezisBlurView"}
-            />
-          ),
+          tabBarBackground: () =>
+            Platform.OS == "android" ? (
+              <BlurView
+                blurReductionFactor={8}
+                tint={
+                  Platform.OS == "android"
+                    ? colorScheme == "light"
+                      ? "light"
+                      : "dark"
+                    : "default"
+                }
+                intensity={100}
+                style={StyleSheet.absoluteFill}
+                experimentalBlurMethod={"dimezisBlurView"}
+              />
+            ) : (
+              <View style={{ backgroundColor: "transparent" }} />
+            ),
           tabBarActiveTintColor: Colors[colorScheme as "light" | "dark"].tint,
           tabBarLabelStyle: { fontFamily: "PixelifySans" },
           tabBarStyle:
             Platform.OS === "android"
-              ? { paddingHorizontal: 16, position: "absolute" }
-              : { position: "absolute" },
+              ? {
+                  paddingHorizontal: 10,
+                  position: "absolute",
+                  borderTopWidth: 0,
+                }
+              : { position: "absolute", borderTopWidth: 0 },
           tabBarButton: (props) => {
             const onPressWithVibration = (event: GestureResponderEvent) => {
               vibration({ style: "light" });
@@ -79,7 +87,7 @@ export default function TabLayout() {
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
             headerBackground: () => (
               <BlurView
-                blurReductionFactor={12}
+                blurReductionFactor={8}
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
@@ -155,7 +163,7 @@ export default function TabLayout() {
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
             headerBackground: () => (
               <BlurView
-                blurReductionFactor={12}
+                blurReductionFactor={8}
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
@@ -205,7 +213,7 @@ export default function TabLayout() {
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
             headerBackground: () => (
               <BlurView
-                blurReductionFactor={12}
+                blurReductionFactor={8}
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
@@ -273,7 +281,7 @@ export default function TabLayout() {
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
             headerBackground: () => (
               <BlurView
-                blurReductionFactor={12}
+                blurReductionFactor={8}
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
@@ -319,7 +327,7 @@ export default function TabLayout() {
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
             headerBackground: () => (
               <BlurView
-                blurReductionFactor={12}
+                blurReductionFactor={8}
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
@@ -365,7 +373,7 @@ export default function TabLayout() {
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
             headerBackground: () => (
               <BlurView
-                blurReductionFactor={12}
+                blurReductionFactor={8}
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"

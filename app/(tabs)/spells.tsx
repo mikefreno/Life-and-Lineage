@@ -3,7 +3,7 @@ import SpellDetails from "../../components/SpellDetails";
 import { GameContext, PlayerCharacterContext } from "../_layout";
 import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
-import { View as NonThemedView } from "react-native";
+import { View as NonThemedView, Platform } from "react-native";
 import { observer } from "mobx-react-lite";
 import ProgressBar from "../../components/ProgressBar";
 import { elementalColorMap } from "../../utility/elementColors";
@@ -131,7 +131,7 @@ const SpellsScreen = observer(() => {
           backgroundColor: playerState
             ? elementalColorMap[playerState.blessing].dark
             : undefined,
-          opacity: 0.5,
+          opacity: Platform.OS == "android" ? 1.0 : 0.5,
         }}
       />
       <View

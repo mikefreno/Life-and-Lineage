@@ -512,9 +512,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
             <Animated.View
               style={{
                 display: "flex",
-                paddingBottom: bottomBarPaths.includes(pathname.split("/")[1])
-                  ? 0
-                  : 20,
+                paddingBottom: 100,
                 backgroundColor: showingHealthWarningPulse
                   ? backgroundColorInterpolation
                   : healthDamageFlash.interpolate({

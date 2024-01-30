@@ -11,7 +11,7 @@ import {
   PlayerCharacterContext,
 } from "../app/_layout";
 import Coins from "../assets/icons/CoinsIcon";
-import { calculateAge, toTitleCase } from "../utility/functions/misc";
+import { toTitleCase } from "../utility/functions/misc";
 import GenericModal from "./GenericModal";
 import { Character } from "../classes/character";
 import GenericRaisedButton from "./GenericRaisedButton";
@@ -24,11 +24,9 @@ import { router } from "expo-router";
 import { getNumberInRange } from "../utility/enemy";
 import { Enemy } from "../classes/creatures";
 import enemies from "../assets/json/enemy.json";
-import { CharacterImage } from "./CharacterImage";
-import ProgressBar from "./ProgressBar";
-import AffectionIcon from "../assets/icons/AffectionIcon";
 import { observer } from "mobx-react-lite";
 import { useVibration } from "../utility/customHooks";
+import { CharacterInteractionModal } from "./CharacterInteractionModal";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -51,7 +49,6 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   const [goodOutcome, setGoodOutcome] = useState<GoodOutcome | null>(null);
   const [showDatePartnerSelection, setShowDatePartnerSelection] =
     useState<boolean>(false);
-  const [greeted, setGreeted] = useState<boolean>(false);
 
   const vibration = useVibration();
 
@@ -68,20 +65,18 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   }
 
   function visit() {
-    if (playerState && activity.alone) {
+    if (playerState && activity.alone && gameState) {
       let chosenOutcome = activityRoller(activity.alone);
       switch (chosenOutcome) {
         case "meetingSomeone":
-          setGreeted(false);
           const flipRes = flipCoin();
           if (flipRes == "Heads" || playerState.knownCharacters.length == 0) {
             const res = generateNewCharacter();
             setMetCharacter(res);
           } else {
-            const idx = Math.floor(
-              Math.random() * playerState.knownCharacters.length,
+            let knownChar = playerState.getAdultCharacter(
+              new Date(gameState.date),
             );
-            const knownChar = playerState.knownCharacters[idx];
             setMetCharacter(knownChar);
           }
           setGoodOutcome(null);
@@ -250,85 +245,10 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           </View>
         </View>
       </GenericModal>
-      <GenericModal
-        isVisibleCondition={metCharacter != null}
-        backdropCloses={false}
-        backFunction={() => setMetCharacter(null)}
-        size={100}
-      >
-        {gameState && metCharacter && (
-          <View className="">
-            <Text className="text-center text-xl">
-              {metCharacter.getFullName()}
-            </Text>
-            <View className="mx-auto">
-              <CharacterImage
-                characterAge={calculateAge(
-                  new Date(metCharacter.birthdate),
-                  new Date(gameState.date),
-                )}
-                characterSex={metCharacter.sex == "male" ? "M" : "F"}
-              />
-            </View>
-
-            <View className="items-center">
-              <Text>
-                {calculateAge(
-                  new Date(metCharacter.birthdate),
-                  new Date(gameState.date),
-                )}{" "}
-                years old
-              </Text>
-              <Text className="px-10 text-center">
-                Works as a {metCharacter.job}
-              </Text>
-              <View className="flex w-2/3 flex-row justify-center">
-                <View className="w-3/4">
-                  <ProgressBar
-                    value={metCharacter.affection}
-                    minValue={-100}
-                    maxValue={100}
-                    filledColor="#dc2626"
-                    unfilledColor="#fca5a5"
-                  />
-                </View>
-                <View className="my-auto ml-1">
-                  <AffectionIcon height={14} width={14} />
-                </View>
-              </View>
-            </View>
-            {!greeted && (
-              <>
-                <GenericStrikeAround text={"Greetings"} />
-                <View className="mt-2 flex flex-row justify-evenly">
-                  <GenericFlatButton
-                    text="Friendly"
-                    onPressFunction={() => {
-                      vibration({ style: "light" });
-                      metCharacter.increaseAffection(5);
-                      setGreeted(true);
-                    }}
-                  />
-                  <GenericFlatButton
-                    text="Aggressive"
-                    onPressFunction={() => {
-                      vibration({ style: "light" });
-                      metCharacter.increaseAffection(-5);
-                      setGreeted(true);
-                    }}
-                  />
-                </View>
-              </>
-            )}
-            <View className="mt-2">
-              <GenericFlatButton
-                text={"Close"}
-                onPressFunction={() => setMetCharacter(null)}
-              />
-            </View>
-          </View>
-        )}
-      </GenericModal>
+      <CharacterInteractionModal
+        character={metCharacter}
+        closeFunction={() => setMetCharacter(null)}
+      />
       <GenericModal
         isVisibleCondition={goodOutcome != null}
         backdropCloses={false}
@@ -480,7 +400,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
             )}
             {activity.date && (
               <GenericRaisedButton
-                disabledCondition={playerState?.relationships.length == 0}
+                disabledCondition={playerState?.knownCharacters.length == 0}
                 onPressFunction={date}
                 text={"Go on Date"}
               />

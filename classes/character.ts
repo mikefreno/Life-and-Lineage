@@ -94,7 +94,7 @@ export class Character {
       getFullName: action,
       setJob: action,
       deathRoll: action,
-      increaseAffection: action,
+      updateAffection: action,
     });
   }
 
@@ -130,7 +130,7 @@ export class Character {
     }
   }
 
-  public increaseAffection(change: number) {
+  public updateAffection(change: number) {
     this.affection += change;
   }
 
@@ -1078,6 +1078,68 @@ export class PlayerCharacter extends Character {
     this.knownCharacters.push(character);
   }
 
+  public isKnownCharacter(characterToCheck: Character) {
+    if (
+      this.knownCharacters.some((character) =>
+        character.equals(characterToCheck),
+      )
+    ) {
+      return true;
+    }
+    if (this.partners.some((partner) => partner.equals(characterToCheck))) {
+      return true;
+    }
+    if (this.children.some((child) => child.equals(characterToCheck))) {
+      return true;
+    }
+    if (this.parents.some((parent) => parent.equals(characterToCheck))) {
+      return true;
+    }
+
+    return false;
+  }
+
+  public getAdultCharacter(gameDate: Date) {
+    const allEligibleCharacters = [
+      ...this.knownCharacters,
+      ...this.partners,
+      ...this.children,
+      ...this.parents,
+    ].filter(
+      (character) =>
+        calculateAge(new Date(character.birthdate), gameDate) < 18 &&
+        !character.deathdate,
+    );
+
+    const randomIndex = Math.floor(
+      Math.random() * allEligibleCharacters.length,
+    );
+
+    return allEligibleCharacters[randomIndex];
+  }
+
+  public tickDownRelationshipAffection() {
+    this.parents.forEach((parent) => {
+      if (parent.affection > 0) {
+        parent.updateAffection(-0.1);
+      }
+    });
+    this.partners.forEach((partner) => {
+      if (partner.affection > 0) {
+        partner.updateAffection(-0.15);
+      }
+    });
+    this.children.forEach((child) => {
+      if (child.affection > 0) {
+        child.updateAffection(-0.15);
+      }
+    });
+    this.knownCharacters.forEach((character) => {
+      if (character.affection > 0) {
+        character.updateAffection(-0.25);
+      }
+    });
+  }
   //----------------------------------Conditions----------------------------------//
   public addCondition(condition?: Condition | null) {
     if (condition) {

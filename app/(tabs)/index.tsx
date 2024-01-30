@@ -1,4 +1,9 @@
-import { Pressable, Image, View as NonThemedView } from "react-native";
+import {
+  Pressable,
+  Image,
+  View as NonThemedView,
+  Platform,
+} from "react-native";
 import { View, Text } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import { calculateAge, toTitleCase } from "../../utility/functions/misc";
@@ -501,7 +506,7 @@ const HomeScreen = observer(() => {
                 : playerState.playerClass == "necromancer"
                 ? "#6b21a8"
                 : "#fcd34d",
-            opacity: 0.5,
+            opacity: Platform.OS == "android" ? 1.0 : 0.5,
           }}
         />
         <View

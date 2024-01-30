@@ -55,11 +55,7 @@ const ProgressBar = ({
         ]}
       >
         {displayNumber && (
-          <View
-            className={`${
-              Platform.OS === "android" ? "-mt-0.5" : ""
-            } mx-auto flex-1 flex-wrap overflow-visible`}
-          >
+          <View className={`mx-auto flex-1 flex-wrap overflow-visible`}>
             <Text
               style={{
                 marginTop: borderColor ? -2 : -1,
@@ -85,6 +81,8 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
   inner: {
+    marginTop: Platform.OS == "android" ? -0.1 : 0,
+    marginLeft: Platform.OS == "android" ? -0.1 : 0,
     height: "100%",
     alignItems: "center",
     justifyContent: "center",
