@@ -1,22 +1,34 @@
-import { View, StyleSheet } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ViewProps,
+  ViewStyle,
+  StyleProp,
+} from "react-native";
 import { Text } from "./Themed";
 import { ReactNode } from "react";
 
 interface GenericStrikeAroundBasicProps {
+  containerStyles?: StyleProp<ViewStyle>;
   text: string;
   textNode?: never;
 }
 
 interface GenericStrikeAroundNodeProps {
+  containerStyles?: StyleProp<ViewStyle>;
   textNode: ReactNode;
   text?: never;
 }
 
 type Props = GenericStrikeAroundBasicProps | GenericStrikeAroundNodeProps;
 
-export default function GenericStrikeAround({ text, textNode }: Props) {
+export default function GenericStrikeAround({
+  text,
+  textNode,
+  containerStyles,
+}: Props) {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyles]}>
       <View style={styles.line} />
       <View style={styles.content}>
         {text ? <Text className="text-xl">{text}</Text> : textNode}

@@ -1,66 +1,126 @@
-import { StatusBar } from "expo-status-bar";
-import { Platform } from "react-native";
 import { Text, View, ScrollView } from "../components/Themed";
 import { calculateAge } from "../utility/functions/misc";
 import { CharacterImage } from "../components/CharacterImage";
 import { useContext } from "react";
 import { GameContext, PlayerCharacterContext } from "./_layout";
+import { useHeaderHeight } from "@react-navigation/elements";
+import GenericStrikeAround from "../components/GenericStrikeAround";
+import { Character } from "../classes/character";
 
 export default function RelationshipsScreen() {
-  const playerCharacterData = useContext(PlayerCharacterContext);
-  const playerCharacter = playerCharacterData?.playerState;
-  const gameData = useContext(GameContext);
-  const game = gameData?.gameState;
+  const playerCharacterContext = useContext(PlayerCharacterContext);
+  const gameContext = useContext(GameContext);
+  if (!playerCharacterContext || !gameContext) {
+    throw new Error("missing context");
+  }
+  const { playerState } = playerCharacterContext;
+  const { gameState } = gameContext;
 
-  if (playerCharacter) {
-    const parents = playerCharacter.parents;
-    const dad = parents.find((parent) => parent.sex == "male");
-    const mom = parents.find((parent) => parent.sex == "female");
-    if (mom && dad && game) {
-      const dadBDay = new Date(dad.birthdate);
-      const momBDay = new Date(mom.birthdate);
-      const currentDate = new Date(game.date);
-      const dadsAge = calculateAge(dadBDay, currentDate);
-      const momsAge = calculateAge(momBDay, currentDate);
+  function renderCharacter(character: Character) {
+    if (gameState) {
+      const characterAge = calculateAge(
+        new Date(character.birthdate),
+        character.deathdate
+          ? new Date(character.deathdate)
+          : new Date(gameState.date),
+      );
 
       return (
-        <ScrollView>
-          <View className="flex-1 items-center pt-6">
-            <Text className="py-12 text-center text-2xl">Parents</Text>
-            <View className="flex flex-row">
-              <View className="flex w-2/5 items-center">
-                <Text className="text-2xl">Dad</Text>
-                <View className="mx-auto">
-                  <CharacterImage characterAge={dadsAge} characterSex={"M"} />
-                </View>
-                <Text className="text-xl">{dadsAge} Years Old</Text>
-                <Text className="text-xl">{dad?.getFullName()}</Text>
-                <View className="mx-auto">
-                  <Text className="flex flex-wrap text-center text-lg">
-                    {dad?.job}
-                  </Text>
-                </View>
-              </View>
-              <View className="flex w-2/5 items-center">
-                <Text className="text-2xl">Mom</Text>
-                <View className="mx-auto">
-                  <CharacterImage characterAge={momsAge} characterSex={"F"} />
-                </View>
-                <Text className="text-xl">{momsAge} Years Old</Text>
-                <Text className="text-xl">{mom?.getFullName()}</Text>
-                <View className="mx-auto">
-                  <Text className="flex flex-wrap text-center text-lg">
-                    {mom?.job}
-                  </Text>
-                </View>
-              </View>
-            </View>
-
-            {/* Use a light status bar on iOS to account for the black space above the modal */}
-            <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
+        <View className="flex w-1/2 items-center" key={character.getFullName()}>
+          <Text className="text-2xl">{character.getFullName()}</Text>
+          <View className="mx-auto">
+            <CharacterImage
+              characterAge={characterAge}
+              characterSex={character.sex == "male" ? "M" : "F"}
+            />
           </View>
-        </ScrollView>
+          <Text className="text-xl">
+            {character.deathdate && "Died at "}
+            {characterAge} Years Old
+          </Text>
+          <Text className="text-xl">{character.getFullName()}</Text>
+          <View className="mx-auto">
+            <Text className="flex flex-wrap text-center text-lg">
+              {character.deathdate && "Was a "}
+              {character.job}
+            </Text>
+          </View>
+        </View>
       );
     }
+  }
+
+  if (playerState) {
+    return (
+      <ScrollView>
+        <View
+          className="flex-1 items-center px-8"
+          style={{ paddingTop: useHeaderHeight() }}
+        >
+          {playerState.children.length > 0 && (
+            <>
+              <Text className="py-12 text-center text-2xl">Children</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-start",
+                }}
+              >
+                {playerState.children.map((child) => renderCharacter(child))}
+              </View>
+            </>
+          )}
+          {playerState.partners.length > 0 && (
+            <>
+              <Text className="py-12 text-center text-2xl">
+                {playerState.partners.length == 1 ? "Partner" : "Partners"}
+              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-start",
+                }}
+              >
+                {playerState.partners.map((child) => renderCharacter(child))}
+              </View>
+            </>
+          )}
+          <>
+            <Text className="py-12 text-center text-2xl">Parents</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                alignItems: "flex-start",
+                justifyContent: "flex-start",
+              }}
+            >
+              {playerState.parents.map((parent) => renderCharacter(parent))}
+            </View>
+          </>
+          {playerState.partners.length == 0 && (
+            <GenericStrikeAround
+              text={"No Partner"}
+              containerStyles={{ paddingTop: 20 }}
+            />
+          )}
+          {playerState.children.length == 0 && (
+            <GenericStrikeAround
+              text={"No Children"}
+              containerStyles={{ paddingTop: 20 }}
+            />
+          )}
+          {playerState.knownCharacters.length > 0 && (
+            <View>
+              <Text></Text>
+            </View>
+          )}
+        </View>
+      </ScrollView>
+    );
   }
 }

@@ -335,6 +335,10 @@ const DungeonLevelScreen = observer(() => {
         if (enemyAttackRes.damage > 0) {
           setEnemyAttackDummy((prev) => prev + 1);
         }
+        if (enemyAttackRes.debuffs || enemyAttackRes.buffs) {
+          setEnemyTextString(enemyAttackRes.name);
+          setEnemyTextDummy((prev) => prev + 1);
+        }
       } else if (enemyAttackRes == "pass") {
         battleLogger(
           `The ${toTitleCase(enemyState.creatureSpecies)} did nothing`,
@@ -1484,7 +1488,7 @@ const DungeonLevelScreen = observer(() => {
                   }}
                 >
                   {enemyTextString ? (
-                    <Text className="text-xl tracking-wide">
+                    <Text className="text-center text-xl tracking-wide">
                       *{toTitleCase(enemyTextString)}*
                     </Text>
                   ) : null}

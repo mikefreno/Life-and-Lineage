@@ -180,7 +180,8 @@ type PlayerCharacterBase = {
   }[];
   parents: Character[];
   children?: Character[];
-  relationships?: Character[];
+  partners?: Character[];
+  knownCharacters?: Character[];
   sexuality: null;
   physicalAttacks?: string[];
   knownSpells?: string[];
@@ -253,7 +254,8 @@ export class PlayerCharacter extends Character {
   minions: Minion[];
   readonly parents: Character[];
   children: Character[];
-  relationships: Character[];
+  partners: Character[];
+  knownCharacters: Character[];
   knownSpells: string[];
   physicalAttacks: string[];
   conditions: Condition[];
@@ -297,7 +299,8 @@ export class PlayerCharacter extends Character {
     parents,
     children,
     sexuality,
-    relationships,
+    partners,
+    knownCharacters,
     knownSpells,
     physicalAttacks,
     gold,
@@ -336,7 +339,8 @@ export class PlayerCharacter extends Character {
       magicProficiencies ?? getStartingProficiencies(playerClass, blessing);
     this.parents = parents;
     this.children = children ?? [];
-    this.relationships = relationships ?? [];
+    this.partners = partners ?? [];
+    this.knownCharacters = knownCharacters ?? [];
     this.knownSpells = knownSpells ?? [];
     this.conditions = conditions ?? [];
     this.physicalAttacks = physicalAttacks ?? ["punch"];
@@ -370,6 +374,7 @@ export class PlayerCharacter extends Character {
       magicProficiencies: observable,
       qualificationProgress: observable,
       children: observable,
+      partners: observable,
       knownSpells: observable,
       conditions: observable,
       physicalAttacks: observable,
@@ -1412,6 +1417,14 @@ export class PlayerCharacter extends Character {
         : [],
       children: json.children
         ? json.children.map((child: any) => Character.fromJSON(child))
+        : [],
+      partners: json.partners
+        ? json.partners.map((partner: any) => Character.fromJSON(partner))
+        : [],
+      knownCharacters: json.knownCharacters
+        ? json.knownCharacters.map((relationships: any) =>
+            Character.fromJSON(relationships),
+          )
         : [],
       minions: json.minions
         ? json.minions.map((minion: any) => Minion.fromJSON(minion))

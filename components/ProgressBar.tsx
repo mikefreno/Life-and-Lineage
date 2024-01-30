@@ -62,7 +62,7 @@ const ProgressBar = ({
           >
             <Text
               style={{
-                marginTop: borderColor ? -1 : 0,
+                marginTop: borderColor ? -2 : -1,
                 color: textColor,
               }}
             >

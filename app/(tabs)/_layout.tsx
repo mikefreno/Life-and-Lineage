@@ -133,7 +133,7 @@ export default function TabLayout() {
             ),
             headerRight: () => (
               <Link href="/Relationships" asChild>
-                <Pressable>
+                <Pressable onPress={() => vibration({ style: "light" })}>
                   {({ pressed }) => (
                     <HouseHeart
                       width={30}

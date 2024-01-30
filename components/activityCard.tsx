@@ -27,12 +27,14 @@ import enemies from "../assets/json/enemy.json";
 import { CharacterImage } from "./CharacterImage";
 import ProgressBar from "./ProgressBar";
 import AffectionIcon from "../assets/icons/AffectionIcon";
+import { observer } from "mobx-react-lite";
+import { useVibration } from "../utility/customHooks";
 
 interface ActivityCardProps {
   activity: Activity;
 }
 
-export default function ActivityCard({ activity }: ActivityCardProps) {
+const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   const playerContext = useContext(PlayerCharacterContext);
   const enemyContext = useContext(EnemyContext);
   const gameContext = useContext(GameContext);
@@ -49,7 +51,9 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
   const [goodOutcome, setGoodOutcome] = useState<GoodOutcome | null>(null);
   const [showDatePartnerSelection, setShowDatePartnerSelection] =
     useState<boolean>(false);
-  const [askedForNumber, setAskedForNumber] = useState<boolean>(false);
+  const [greeted, setGreeted] = useState<boolean>(false);
+
+  const vibration = useVibration();
 
   function activityRoller(outcomes: { [key: string]: number }) {
     const keys = Object.keys(outcomes);
@@ -68,6 +72,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
       let chosenOutcome = activityRoller(activity.alone);
       switch (chosenOutcome) {
         case "meetingSomeone":
+          setGreeted(false);
           const flipRes = flipCoin();
           if (flipRes == "Heads" || playerState.relationships.length == 0) {
             const res = generateNewCharacter();
@@ -262,7 +267,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
                   new Date(metCharacter.birthdate),
                   new Date(gameState.date),
                 )}
-                characterSex={"M"}
+                characterSex={metCharacter.sex == "male" ? "M" : "F"}
               />
             </View>
 
@@ -292,11 +297,29 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
                 </View>
               </View>
             </View>
-            <GenericStrikeAround text={"Greetings"} />
-            <View className="mt-2 flex flex-row justify-evenly">
-              <GenericFlatButton text="Friendly" onPressFunction={() => {}} />
-              <GenericFlatButton text="Aggressive" onPressFunction={() => {}} />
-            </View>
+            {!greeted && (
+              <>
+                <GenericStrikeAround text={"Greetings"} />
+                <View className="mt-2 flex flex-row justify-evenly">
+                  <GenericFlatButton
+                    text="Friendly"
+                    onPressFunction={() => {
+                      vibration({ style: "light" });
+                      metCharacter.increaseAffection(5);
+                      setGreeted(true);
+                    }}
+                  />
+                  <GenericFlatButton
+                    text="Aggressive"
+                    onPressFunction={() => {
+                      vibration({ style: "light" });
+                      metCharacter.increaseAffection(-5);
+                      setGreeted(true);
+                    }}
+                  />
+                </View>
+              </>
+            )}
             <View className="mt-2">
               <GenericFlatButton
                 text={"Close"}
@@ -312,7 +335,7 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
         backFunction={() => setGoodOutcome(null)}
       >
         <View className="items-center">
-          <Text className="text-lg">{goodOutcome?.name}</Text>
+          <Text className="text-center text-lg">{goodOutcome?.name}</Text>
           {goodOutcome?.effect.gold && (
             <View className="flex flex-row items-center">
               <Text>{goodOutcome?.effect.gold} </Text>
@@ -467,4 +490,5 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
       </ThemedView>
     </>
   );
-}
+});
+export default ActivityCard;

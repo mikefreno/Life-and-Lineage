@@ -228,8 +228,24 @@ const RootLayout = observer(() => {
         <Stack.Screen
           name="Relationships"
           options={{
-            presentation: "modal",
+            headerBackTitleVisible: false,
+            headerTransparent: true,
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
+            headerBackground: () => (
+              <BlurView
+                blurReductionFactor={12}
+                tint={
+                  Platform.OS == "android"
+                    ? colorScheme == "light"
+                      ? "light"
+                      : "dark"
+                    : "default"
+                }
+                intensity={100}
+                style={StyleSheet.absoluteFill}
+                experimentalBlurMethod={"dimezisBlurView"}
+              />
+            ),
           }}
         />
         <Stack.Screen
