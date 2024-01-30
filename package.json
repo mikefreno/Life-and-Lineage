@@ -1,7 +1,7 @@
 {
   "name": "magic-life",
   "main": "expo-router/entry",
-  "version": "1.0.0",
+  "version": "0.0.4",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
@@ -47,8 +47,7 @@
     "react-native-safe-area-context": "4.8.2",
     "react-native-screens": "~3.29.0",
     "react-native-svg": "14.1.0",
-    "react-native-web": "~0.19.6",
-    "expo-dev-client": "~3.3.7"
+    "react-native-web": "~0.19.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -26,7 +26,7 @@ export default function RelationshipsScreen() {
       );
 
       return (
-        <View className="flex w-1/2 items-center" key={character.getFullName()}>
+        <View className="flex w-1/2 items-center" key={character.id}>
           <Text className="text-2xl">{character.getFullName()}</Text>
           <View className="mx-auto">
             <CharacterImage

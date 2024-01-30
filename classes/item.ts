@@ -5,6 +5,7 @@ import mageSpells from "../assets/json/mageSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import * as Crypto from "expo-crypto";
+
 interface ItemOptions {
   id?: string;
   name: string;

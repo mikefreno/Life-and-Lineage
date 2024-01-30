@@ -20,12 +20,13 @@ import necroSpells from "../assets/json/necroSpells.json";
 import { Enemy, Minion } from "./creatures";
 import summons from "../assets/json/summons.json";
 import { action, makeObservable, observable } from "mobx";
-
+import * as Crypto from "expo-crypto";
 import { Investment } from "./investment";
 import { AttackObj, InvestmentType, InvestmentUpgrade } from "../utility/types";
 import { rollD20 } from "../utility/functions/roll";
 
 interface CharacterOptions {
+  id?: string;
   firstName: string;
   lastName: string;
   sex: "male" | "female";
@@ -41,6 +42,7 @@ interface CharacterOptions {
 }
 
 export class Character {
+  readonly id: string;
   readonly firstName: string;
   readonly lastName: string;
   readonly sex: "male" | "female";
@@ -55,6 +57,7 @@ export class Character {
   qualifications: string[];
 
   constructor({
+    id,
     firstName,
     lastName,
     sex,
@@ -68,6 +71,7 @@ export class Character {
     affection,
     qualifications,
   }: CharacterOptions) {
+    this.id = id ?? Crypto.randomUUID();
     this.firstName = firstName;
     this.lastName = lastName;
     this.sex = sex;
@@ -92,6 +96,10 @@ export class Character {
       deathRoll: action,
       increaseAffection: action,
     });
+  }
+
+  public equals(otherCharacter: Character) {
+    return this.id == otherCharacter.id;
   }
 
   public getFullName(): string {
@@ -128,6 +136,7 @@ export class Character {
 
   static fromJSON(json: any): Character {
     const character = new Character({
+      id: json.id,
       firstName: json.firstName,
       lastName: json.lastName,
       sex: json.sex,
@@ -145,6 +154,7 @@ export class Character {
 }
 
 type PlayerCharacterBase = {
+  id?: string;
   firstName: string;
   lastName: string;
   sex: "male" | "female";
@@ -272,6 +282,7 @@ export class PlayerCharacter extends Character {
   savedEnemy: Enemy | null;
 
   constructor({
+    id,
     firstName,
     lastName,
     playerClass,
@@ -311,6 +322,7 @@ export class PlayerCharacter extends Character {
     savedEnemy,
   }: PlayerCharacterOptions) {
     super({
+      id,
       firstName,
       lastName,
       sex,
@@ -919,6 +931,7 @@ export class PlayerCharacter extends Character {
       ?.progress;
     return found;
   }
+
   public hasAllPreReqs(preReqs: string[] | null) {
     let hasAll = true;
     if (preReqs) {
@@ -930,6 +943,7 @@ export class PlayerCharacter extends Character {
     }
     return hasAll;
   }
+
   public missingPreReqs(preReqs: string[] | null) {
     if (preReqs) {
       let missing: string[] = [];
@@ -1046,6 +1060,24 @@ export class PlayerCharacter extends Character {
     this.learningSpells = newLearningState;
   }
   //----------------------------------Relationships----------------------------------//
+  public addNewKnownCharacter(character: Character) {
+    this.knownCharacters.push(character);
+  }
+
+  public makePartner(character: Character) {
+    this.knownCharacters = this.knownCharacters.filter(
+      (knownCharacter) => !character.equals(knownCharacter),
+    );
+    this.partners.push(character);
+  }
+
+  public removePartner(character: Character) {
+    this.partners = this.partners.filter(
+      (partner) => !character.equals(partner),
+    );
+    this.knownCharacters.push(character);
+  }
+
   //----------------------------------Conditions----------------------------------//
   public addCondition(condition?: Condition | null) {
     if (condition) {
@@ -1061,8 +1093,7 @@ export class PlayerCharacter extends Character {
 
   public conditionTicker() {
     for (let i = this.conditions.length - 1; i >= 0; i--) {
-      const { effect, healthDamage, sanityDamage, turns } =
-        this.conditions[i].tick();
+      const { healthDamage, sanityDamage, turns } = this.conditions[i].tick();
 
       if (sanityDamage) {
         this.damageSanity(sanityDamage);
@@ -1390,6 +1421,7 @@ export class PlayerCharacter extends Character {
 
   static fromJSON(json: any): PlayerCharacter {
     const player = new PlayerCharacter({
+      id: json.id,
       firstName: json.firstName,
       lastName: json.lastName,
       sex: json.sex,

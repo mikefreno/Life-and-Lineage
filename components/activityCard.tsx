@@ -74,14 +74,14 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
         case "meetingSomeone":
           setGreeted(false);
           const flipRes = flipCoin();
-          if (flipRes == "Heads" || playerState.relationships.length == 0) {
+          if (flipRes == "Heads" || playerState.knownCharacters.length == 0) {
             const res = generateNewCharacter();
             setMetCharacter(res);
           } else {
             const idx = Math.floor(
-              Math.random() * playerState.relationships.length,
+              Math.random() * playerState.knownCharacters.length,
             );
-            const knownChar = playerState.relationships[idx];
+            const knownChar = playerState.knownCharacters[idx];
             setMetCharacter(knownChar);
           }
           setGoodOutcome(null);
