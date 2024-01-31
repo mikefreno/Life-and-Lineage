@@ -1,7 +1,7 @@
 import { Pressable, View as NonThemedView, Switch } from "react-native";
 import { View, Text } from "../../components/Themed";
 import { useContext, useEffect, useState } from "react";
-import { toTitleCase } from "../../utility/functions/misc";
+import { toTitleCase } from "../../utility/functions/misc/words";
 import { GameContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
 import * as Updates from "expo-updates";

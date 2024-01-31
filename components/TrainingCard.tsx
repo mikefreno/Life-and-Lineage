@@ -4,11 +4,11 @@ import { useContext, useEffect, useState } from "react";
 import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import Coins from "../assets/icons/CoinsIcon";
 import Sanity from "../assets/icons/SanityIcon";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { Text } from "../components/Themed";
 import ProgressBar from "./ProgressBar";
-import { toTitleCase } from "../utility/functions/misc";
 import GenericRaisedButton from "./GenericRaisedButton";
+import { toTitleCase } from "../utility/functions/misc/words";
 
 interface TrainingCardProps {
   name: string;

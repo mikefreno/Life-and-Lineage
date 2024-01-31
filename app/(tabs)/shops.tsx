@@ -1,6 +1,5 @@
 import { Pressable, View as NonThemedView } from "react-native";
 import { ScrollView, Text, View } from "../../components/Themed";
-import { calculateAge, toTitleCase } from "../../utility/functions/misc";
 import { Shop } from "../../classes/shop";
 import { CharacterImage } from "../../components/CharacterImage";
 import shopObjects from "../../assets/json/shops.json";
@@ -13,6 +12,8 @@ import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import PlayerStatus from "../../components/PlayerStatus";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { toTitleCase } from "../../utility/functions/misc/words";
+import { calculateAge } from "../../utility/functions/misc/age";
 
 export default function ShopsScreen() {
   const gameData = useContext(GameContext);
@@ -32,7 +33,7 @@ export default function ShopsScreen() {
 
   if (gameState) {
     const renderItem = (shop: Shop) => (
-      <NonThemedView className="h-96 w-1/2" key={shop.shopKeeperName}>
+      <NonThemedView className="h-96 w-1/2" key={shop.shopKeeper.id}>
         <NonThemedView
           className="m-2 flex-1 items-center justify-between rounded-xl border p-4"
           style={{
@@ -67,10 +68,10 @@ export default function ShopsScreen() {
           <NonThemedView className="items-center">
             <CharacterImage
               characterAge={calculateAge(
-                new Date(shop.shopKeeperBirthDate),
+                new Date(shop.shopKeeper.birthdate),
                 new Date(gameState.date),
               )}
-              characterSex={shop.shopKeeperSex == "male" ? "M" : "F"}
+              characterSex={shop.shopKeeper.sex == "male" ? "M" : "F"}
             />
             <Text
               className="text-center"
@@ -80,7 +81,7 @@ export default function ShopsScreen() {
                 )?.colors.font,
               }}
             >
-              {shop.shopKeeperName}
+              {shop.shopKeeper.getFullName()}
             </Text>
 
             <Pressable

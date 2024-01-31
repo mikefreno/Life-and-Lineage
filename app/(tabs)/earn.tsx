@@ -7,7 +7,7 @@ import { GameContext, PlayerCharacterContext } from "../_layout";
 import { useContext, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import Modal from "react-native-modal";
-import { toTitleCase } from "../../utility/functions/misc";
+import { toTitleCase } from "../../utility/functions/misc/words";
 import { router } from "expo-router";
 import { useVibration } from "../../utility/customHooks";
 import { useIsFocused } from "@react-navigation/native";

@@ -9,7 +9,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { useContext, useState } from "react";
 import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { observer } from "mobx-react-lite";
-import { numberToRoman } from "../utility/functions/misc";
+import { numberToRoman } from "../utility/functions/misc/numbers";
 import { useVibration } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
 import { Text } from "./Themed";

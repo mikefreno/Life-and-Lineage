@@ -15,7 +15,7 @@ import { observer } from "mobx-react-lite";
 import { useFonts } from "expo-font";
 import { FontAwesome } from "@expo/vector-icons";
 import { router, usePathname } from "expo-router";
-import { toTitleCase } from "../utility/functions/misc";
+import { toTitleCase } from "../utility/functions/misc/words";
 import FadeOutText from "./FadeOutText";
 import GenericModal from "./GenericModal";
 import { BlurView } from "expo-blur";
@@ -25,8 +25,6 @@ import ClockIcon from "../assets/icons/ClockIcon";
 import HealthIcon from "../assets/icons/HealthIcon";
 import Sanity from "../assets/icons/SanityIcon";
 import Energy from "../assets/icons/EnergyIcon";
-
-const bottomBarPaths = ["", "spells", "earn", "dungeon", "shops", "medical"];
 
 interface PlayerStatus {
   hideGold?: boolean;

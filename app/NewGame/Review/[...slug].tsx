@@ -7,12 +7,9 @@ import {
 } from "../../../classes/character";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import {
-  createShops,
-  generateBirthday,
   getRandomName,
   toTitleCase,
-} from "../../../utility/functions/misc";
-import { fullSave } from "../../../utility/functions/save_load";
+} from "../../../utility/functions/misc/words";
 import { Game } from "../../../classes/game";
 import { useContext } from "react";
 import {
@@ -23,6 +20,8 @@ import {
 import { useVibration } from "../../../utility/customHooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getRandomJobTitle } from "../../../utility/functions/characterAid";
+import { createShops } from "../../../classes/shop";
+import { generateBirthday } from "../../../utility/functions/misc/age";
 
 export default function NewGameReview() {
   const { slug } = useLocalSearchParams();
@@ -33,16 +32,16 @@ export default function NewGameReview() {
   const blessing = slug[4];
   const vibration = useVibration();
 
-  const playerCharacterSetter = useContext(PlayerCharacterContext)
-    ?.setPlayerCharacter;
+  const playerCharacterContext = useContext(PlayerCharacterContext);
   const gameDataSetter = useContext(GameContext)?.setGameData;
   const logsSetter = useContext(LogsContext)?.setLogs;
-  if (!playerCharacterSetter || !gameDataSetter || !logsSetter) {
+  if (!playerCharacterContext || !gameDataSetter || !logsSetter) {
     throw new Error("missing context setters");
   }
   const gameData = useContext(GameContext);
   if (!gameData) throw new Error("missing contexts");
   const { gameState } = gameData;
+  const { setPlayerCharacter } = playerCharacterContext;
 
   function createParent(sex: "female" | "male"): Character {
     const firstName = getRandomName(sex).firstName;
@@ -107,7 +106,6 @@ export default function NewGameReview() {
 
   async function startGame() {
     if (
-      playerCharacterSetter &&
       gameDataSetter &&
       logsSetter &&
       (playerClass == "mage" ||
@@ -130,7 +128,7 @@ export default function NewGameReview() {
           | "protection",
       );
       player.addToInventory(starterBook);
-      playerCharacterSetter(player);
+      setPlayerCharacter(player);
       const startDate = new Date().toISOString();
       const shops = createShops(
         playerClass as "mage" | "paladin" | "necromancer",
@@ -162,7 +160,6 @@ export default function NewGameReview() {
         router.back();
       }
       router.replace("/");
-      await fullSave(newGame, player);
       AsyncStorage.removeItem("tutorialsEnabled");
     }
   }

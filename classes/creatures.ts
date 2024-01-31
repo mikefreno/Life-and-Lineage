@@ -8,7 +8,6 @@ import {
   getConditionEffectsOnDefenses,
   getConditionEffectsOnMisc,
 } from "../utility/functions/conditions";
-import { getRandomInt, damageReduction } from "../utility/functions/misc";
 import { Condition } from "./conditions";
 import arrows from "../assets/json/items/arrows.json";
 import artifacts from "../assets/json/items/artifacts.json";
@@ -34,6 +33,8 @@ import { action, makeObservable, observable } from "mobx";
 import summons from "../assets/json/summons.json";
 import { AttackObj } from "../utility/types";
 import { rollD20 } from "../utility/functions/roll";
+import { damageReduction } from "../utility/functions/misc/numbers";
+import { getRandomInt } from "../utility/functions/misc/words";
 
 type CreatureType = {
   id?: string;

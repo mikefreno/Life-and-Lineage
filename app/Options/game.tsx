@@ -3,7 +3,7 @@ import { Text, View } from "../../components/Themed";
 import { router } from "expo-router";
 import { useContext, useState } from "react";
 import { GameContext } from "../_layout";
-import { toTitleCase } from "../../utility/functions/misc";
+import { toTitleCase } from "../../utility/functions/misc/words";
 import {
   Pressable,
   View as NonThemedView,
@@ -11,7 +11,6 @@ import {
   Platform,
 } from "react-native";
 import { useVibration } from "../../utility/customHooks";
-import { useColorScheme } from "nativewind";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 
 const healthWarningOptions: Record<number, string> = {

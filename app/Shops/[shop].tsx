@@ -1,10 +1,5 @@
 import { Stack, useLocalSearchParams } from "expo-router";
 import { View, Text } from "../../components/Themed";
-import {
-  asReadableGold,
-  calculateAge,
-  toTitleCase,
-} from "../../utility/functions/misc";
 import { CharacterImage } from "../../components/CharacterImage";
 import {
   Pressable,
@@ -24,6 +19,9 @@ import { observer } from "mobx-react-lite";
 import TutorialModal from "../../components/TutorialModal";
 import { useHeaderHeight } from "@react-navigation/elements";
 import shopObjects from "../../assets/json/shops.json";
+import { toTitleCase } from "../../utility/functions/misc/words";
+import { asReadableGold } from "../../utility/functions/misc/numbers";
+import { calculateAge } from "../../utility/functions/misc/age";
 
 const ONE_HOUR = 60 * 60 * 1000;
 
@@ -106,7 +104,7 @@ const ShopInteriorScreen = observer(() => {
       });
 
       itemsToSell.forEach((item) => {
-        const price = item.getSellPrice(thisShop!.affection);
+        const price = item.getSellPrice(thisShop.shopKeeper.affection);
         thisShop.buyItem(item, price);
         playerState?.sellItem(item, price);
       });
@@ -121,12 +119,12 @@ const ShopInteriorScreen = observer(() => {
   }
 
   function selectedItemDisplay() {
-    if (selectedItem) {
+    if (selectedItem && thisShop) {
       const transactionCompleteable = selectedItem.buying
         ? playerState!.gold >=
-          selectedItem.item.getBuyPrice(thisShop!.affection)
+          selectedItem.item.getBuyPrice(thisShop.shopKeeper.affection)
         : thisShop!.currentGold >=
-          selectedItem.item.getSellPrice(thisShop!.affection);
+          selectedItem.item.getSellPrice(thisShop.shopKeeper.affection);
 
       return (
         <View className="mx-auto flex flex-row pb-6 pt-2">
@@ -161,10 +159,14 @@ const ShopInteriorScreen = observer(() => {
                   {asReadableGold(
                     selectedItem.buying
                       ? Math.floor(
-                          selectedItem.item.getBuyPrice(thisShop!.affection),
+                          selectedItem.item.getBuyPrice(
+                            thisShop.shopKeeper.affection,
+                          ),
                         )
                       : Math.floor(
-                          selectedItem.item.getSellPrice(thisShop!.affection),
+                          selectedItem.item.getSellPrice(
+                            thisShop.shopKeeper.affection,
+                          ),
                         ),
                   )}
                 </Text>
@@ -210,7 +212,7 @@ const ShopInteriorScreen = observer(() => {
       if (selected.buying) {
         if (playerState.inventory.length < 24) {
           const price = selectedItemRef.current.getBuyPrice(
-            thisShop!.affection,
+            thisShop.shopKeeper.affection,
           );
           playerState.buyItem(selectedItemRef.current, price);
           thisShop.sellItem(selectedItemRef.current, price);
@@ -218,7 +220,9 @@ const ShopInteriorScreen = observer(() => {
           setInventoryFullNotifier(true);
         }
       } else {
-        const price = selectedItemRef.current.getSellPrice(thisShop!.affection);
+        const price = selectedItemRef.current.getSellPrice(
+          thisShop.shopKeeper.affection,
+        );
         thisShop.buyItem(selectedItemRef.current, Math.floor(price));
         playerState.sellItem(selectedItemRef.current, Math.floor(price));
       }
@@ -333,13 +337,13 @@ const ShopInteriorScreen = observer(() => {
             <View className="w-1/3 items-center">
               <CharacterImage
                 characterAge={calculateAge(
-                  new Date(thisShop.shopKeeperBirthDate),
+                  new Date(thisShop.shopKeeper.birthdate),
                   new Date(gameState.date),
                 )}
-                characterSex={thisShop?.shopKeeperSex == "male" ? "M" : "F"}
+                characterSex={thisShop.shopKeeper.sex == "male" ? "M" : "F"}
               />
               <Text className="text-center">
-                {thisShop.shopKeeperName}'s Inventory
+                {thisShop.shopKeeper.getFullName()}'s Inventory
               </Text>
               <View className="flex flex-row">
                 <Text>{thisShop.currentGold}</Text>

@@ -9,9 +9,10 @@ import { useVibration } from "../../utility/customHooks";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { DungeonInstance } from "../../classes/dungeon";
-import { toTitleCase } from "../../utility/functions/misc";
+import { toTitleCase } from "../../utility/functions/misc/words";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { observer } from "mobx-react-lite";
 
 const dangerColorStep = [
   "#fee2e2",
@@ -32,7 +33,7 @@ const levelOffset: Record<string, number> = {
   "corrupted temple": 17,
 };
 
-export default function DungeonScreen() {
+const DungeonScreen = observer(() => {
   const gameContext = useContext(GameContext);
   const playerContext = useContext(PlayerCharacterContext);
   if (!gameContext || !playerContext) {
@@ -196,4 +197,5 @@ export default function DungeonScreen() {
       </NonThemedView>
     </>
   );
-}
+});
+export default DungeonScreen;

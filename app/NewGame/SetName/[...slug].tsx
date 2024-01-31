@@ -8,7 +8,7 @@ import {
 import { View as ThemedView, Text } from "../../../components/Themed";
 import { useRef, useState } from "react";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { toTitleCase } from "../../../utility/functions/misc";
+import { toTitleCase } from "../../../utility/functions/misc/words";
 import { useVibration } from "../../../utility/customHooks";
 import { useColorScheme } from "nativewind";
 

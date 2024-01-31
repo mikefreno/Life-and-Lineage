@@ -1,5 +1,5 @@
 import { Link, Stack, useLocalSearchParams } from "expo-router";
-import { toTitleCase } from "../../utility/functions/misc";
+import { toTitleCase } from "../../utility/functions/misc/words";
 import { View, Text } from "../../components/Themed";
 import { Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";

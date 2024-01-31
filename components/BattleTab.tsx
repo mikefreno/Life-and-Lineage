@@ -7,7 +7,7 @@ import {
   Dimensions,
 } from "react-native";
 import attacks from "../assets/json/playerAttacks.json";
-import { toTitleCase } from "../utility/functions/misc";
+import { toTitleCase } from "../utility/functions/misc/words";
 import { Item } from "../classes/item";
 import { useContext, useRef, useState } from "react";
 import {

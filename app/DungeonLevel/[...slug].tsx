@@ -1,17 +1,11 @@
 import { View, Text } from "../../components/Themed";
-import {
-  Animated,
-  Image,
-  View as NonThemedView,
-  Platform,
-  StyleSheet,
-} from "react-native";
+import { Animated, Image, View as NonThemedView, Platform } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import { EnemyImage } from "../../components/EnemyImage";
 import { Pressable, Modal as NativeModal } from "react-native";
 import { Stack, useLocalSearchParams, router } from "expo-router";
 import BattleTab from "../../components/BattleTab";
-import { toTitleCase } from "../../utility/functions/misc";
+import { toTitleCase } from "../../utility/functions/misc/words";
 import { enemyGenerator } from "../../utility/enemy";
 import PlayerStatus from "../../components/PlayerStatus";
 import ProgressBar from "../../components/ProgressBar";

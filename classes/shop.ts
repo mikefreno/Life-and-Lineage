@@ -17,58 +17,46 @@ import shields from "../assets/json/items/shields.json";
 import wands from "../assets/json/items/wands.json";
 import weapons from "../assets/json/items/weapons.json";
 import { action, makeObservable, observable } from "mobx";
+import { Character } from "./character";
+import { rollD20 } from "../utility/functions/roll";
+import { getRandomSexuality } from "../utility/functions/characterAid";
+import { getRandomName, toTitleCase } from "../utility/functions/misc/words";
+import { generateBirthday } from "../utility/functions/misc/age";
 
 interface ShopProps {
-  shopKeeperName: string;
-  shopKeeperBirthDate: string;
-  shopKeeperSex: "male" | "female";
-  affection?: number;
-  personality: string;
   baseGold: number;
   currentGold?: number;
   lastStockRefresh: Date;
   inventory?: Item[];
+  shopKeeper: Character;
   archetype: string;
 }
 
 export class Shop {
-  readonly shopKeeperName: string;
-  readonly shopKeeperBirthDate: string;
-  readonly shopKeeperSex: "male" | "female";
-  affection: number;
-  personality: string;
   baseGold: number;
   currentGold: number;
   lastStockRefresh: string;
   inventory: Item[];
+  shopKeeper: Character;
   readonly archetype: string;
 
   constructor({
-    shopKeeperName,
-    shopKeeperBirthDate,
-    shopKeeperSex,
-    affection,
-    personality,
     baseGold,
+    currentGold,
     lastStockRefresh,
     inventory,
+    shopKeeper,
     archetype,
-    currentGold,
   }: ShopProps) {
-    this.shopKeeperName = shopKeeperName;
-    this.shopKeeperBirthDate = shopKeeperBirthDate;
-    this.shopKeeperSex = shopKeeperSex;
-    this.affection = affection ?? 0;
-    this.personality = personality;
     this.baseGold = baseGold;
     this.currentGold = currentGold ?? baseGold;
     this.lastStockRefresh =
       lastStockRefresh.toISOString() ?? new Date().toISOString();
     this.inventory = inventory ?? [];
     this.archetype = archetype;
+    this.shopKeeper = shopKeeper;
     makeObservable(this, {
-      affection: observable,
-      personality: observable,
+      shopKeeper: observable,
       baseGold: observable,
       currentGold: observable,
       lastStockRefresh: observable,
@@ -94,7 +82,7 @@ export class Shop {
   }
 
   private changeAffection(change: number) {
-    this.affection += Math.floor(change * 4) / 4;
+    this.shopKeeper.affection += Math.floor(change * 4) / 4;
   }
 
   public buyItem(item: Item, buyPrice: number) {
@@ -116,11 +104,7 @@ export class Shop {
 
   static fromJSON(json: any): Shop {
     return new Shop({
-      shopKeeperName: json.shopKeeperName,
-      shopKeeperBirthDate: json.shopKeeperBirthDate,
-      shopKeeperSex: json.shopKeeperSex,
-      affection: json.affection,
-      personality: json.personality,
+      shopKeeper: Character.fromJSON(json.shopKeeper),
       baseGold: json.baseGold,
       currentGold: json.currentGold,
       lastStockRefresh: new Date(json.lastStockRefresh),
@@ -330,4 +314,43 @@ export function generateInventory(
 
 function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export function createShops(playerClass: "mage" | "paladin" | "necromancer") {
+  let createdShops: Shop[] = [];
+  shops.forEach((shop) => {
+    //want to favor likelihood of male shopkeepers slightly
+    const itemCount = getRandomInt(
+      shop.itemQuantityRange.minimum,
+      shop.itemQuantityRange.maximum,
+    );
+    const newShop = new Shop({
+      shopKeeper: generateShopKeeper(shop.type),
+      baseGold: shop.baseGold,
+      lastStockRefresh: new Date(),
+      archetype: shop.type,
+      inventory: generateInventory(itemCount, shop.trades, playerClass),
+    });
+    createdShops.push(newShop);
+  });
+  return createdShops;
+}
+
+export function generateShopKeeper(archetype: string) {
+  const sex = rollD20() <= 12 ? "male" : "female";
+  const sexuality = getRandomSexuality() as "straight" | "bisexual" | "gay";
+  const name = getRandomName(sex);
+  const birthdate = generateBirthday(25, 70);
+  const job = toTitleCase(archetype);
+
+  const newChar = new Character({
+    sex: sex,
+    sexuality: sexuality,
+    firstName: name.firstName,
+    lastName: name.lastName,
+    birthdate: birthdate,
+    deathdate: null,
+    job: job,
+  });
+  return newChar;
 }

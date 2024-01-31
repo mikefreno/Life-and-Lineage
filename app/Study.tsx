@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import { Item } from "../classes/item";
-import { toTitleCase } from "../utility/functions/misc";
+import { toTitleCase } from "../utility/functions/misc/words";
 import { useIsFocused } from "@react-navigation/native";
 import { GameContext, PlayerCharacterContext } from "./_layout";
 import ProgressBar from "../components/ProgressBar";

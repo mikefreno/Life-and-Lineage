@@ -1,6 +1,6 @@
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { View, Text } from "../../../components/Themed";
-import { toTitleCase } from "../../../utility/functions/misc";
+import { toTitleCase } from "../../../utility/functions/misc/words";
 import { FontAwesome5, Foundation } from "@expo/vector-icons";
 import { Pressable, View as NonThemedView } from "react-native";
 import { useContext, useEffect, useRef, useState } from "react";

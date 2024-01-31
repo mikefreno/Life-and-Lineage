@@ -1,7 +1,8 @@
 import { Character, PlayerCharacter } from "../../classes/character";
-import { generateBirthday, getRandomName } from "./misc";
 import { flipCoin, rollD20 } from "./roll";
 import jobs from "../../assets/json/jobs.json";
+import { getRandomName } from "./misc/words";
+import { generateBirthday } from "./misc/age";
 
 export function generateNewCharacter() {
   const sex = flipCoin() == "Heads" ? "male" : "female";
@@ -47,7 +48,7 @@ const sexualities: Record<string, number> = {
   gay: 0.05,
 };
 
-function getRandomSexuality() {
+export function getRandomSexuality() {
   const rand = Math.random();
   let sum = 0;
 

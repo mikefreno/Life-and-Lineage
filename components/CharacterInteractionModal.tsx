@@ -6,7 +6,7 @@ import GenericModal from "./GenericModal";
 import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { useContext } from "react";
 import { CharacterImage } from "./CharacterImage";
-import { calculateAge } from "../utility/functions/misc";
+import { calculateAge } from "../utility/functions/misc/age";
 import ProgressBar from "./ProgressBar";
 import AffectionIcon from "../assets/icons/AffectionIcon";
 import GenericFlatButton from "./GenericFlatButton";

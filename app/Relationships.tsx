@@ -1,13 +1,14 @@
 import { Text, View, ScrollView } from "../components/Themed";
-import { calculateAge } from "../utility/functions/misc";
+import { calculateAge } from "../utility/functions/misc/age";
 import { CharacterImage } from "../components/CharacterImage";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { GameContext, PlayerCharacterContext } from "./_layout";
 import { useHeaderHeight } from "@react-navigation/elements";
-import GenericStrikeAround from "../components/GenericStrikeAround";
 import { Character } from "../classes/character";
 import ProgressBar from "../components/ProgressBar";
 import AffectionIcon from "../assets/icons/AffectionIcon";
+import { CharacterInteractionModal } from "../components/CharacterInteractionModal";
+import { Pressable } from "react-native";
 
 export default function RelationshipsScreen() {
   const playerCharacterContext = useContext(PlayerCharacterContext);
@@ -17,6 +18,9 @@ export default function RelationshipsScreen() {
   }
   const { playerState } = playerCharacterContext;
   const { gameState } = gameContext;
+  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
+    null,
+  );
 
   const acquaintances = playerState?.knownCharacters.filter(
     (character) => character.affection < 25 && character.affection > -25,
@@ -44,7 +48,7 @@ export default function RelationshipsScreen() {
       );
 
       return (
-        <View className="flex w-1/2 items-center" key={character.id}>
+        <Pressable className="flex w-1/2 items-center" key={character.id}>
           <Text className="text-center text-2xl">
             {character.getFullName()}
           </Text>
@@ -79,21 +83,57 @@ export default function RelationshipsScreen() {
               <AffectionIcon height={14} width={14} />
             </View>
           </View>
-        </View>
+        </Pressable>
       );
     }
   }
 
   if (playerState) {
     return (
-      <ScrollView>
-        <View
-          className="flex-1 items-center px-8"
-          style={{ paddingTop: useHeaderHeight() }}
-        >
-          {playerState.children.length > 0 && (
+      <>
+        <CharacterInteractionModal
+          character={selectedCharacter}
+          closeFunction={() => setSelectedCharacter(null)}
+        />
+        <ScrollView>
+          <View
+            className="flex-1 items-center px-8"
+            style={{ paddingTop: useHeaderHeight() }}
+          >
+            {playerState.children.length > 0 && (
+              <>
+                <Text className="py-12 text-center text-2xl">Children</Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    alignItems: "flex-start",
+                    justifyContent: "flex-start",
+                  }}
+                >
+                  {playerState.children.map((child) => renderCharacter(child))}
+                </View>
+              </>
+            )}
+            {playerState.partners.length > 0 && (
+              <>
+                <Text className="py-12 text-center text-2xl">
+                  {playerState.partners.length == 1 ? "Partner" : "Partners"}
+                </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    alignItems: "flex-start",
+                    justifyContent: "flex-start",
+                  }}
+                >
+                  {playerState.partners.map((child) => renderCharacter(child))}
+                </View>
+              </>
+            )}
             <>
-              <Text className="py-12 text-center text-2xl">Children</Text>
+              <Text className="py-12 text-center text-2xl"></Text>
               <View
                 style={{
                   flexDirection: "row",
@@ -102,121 +142,93 @@ export default function RelationshipsScreen() {
                   justifyContent: "flex-start",
                 }}
               >
-                {playerState.children.map((child) => renderCharacter(child))}
+                {playerState.parents.map((parent) => renderCharacter(parent))}
               </View>
             </>
-          )}
-          {playerState.partners.length > 0 && (
-            <>
-              <Text className="py-12 text-center text-2xl">
-                {playerState.partners.length == 1 ? "Partner" : "Partners"}
-              </Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                }}
-              >
-                {playerState.partners.map((child) => renderCharacter(child))}
-              </View>
-            </>
-          )}
-          <>
-            <Text className="py-12 text-center text-2xl">Parents</Text>
-            <View
-              style={{
-                flexDirection: "row",
-                flexWrap: "wrap",
-                alignItems: "flex-start",
-                justifyContent: "flex-start",
-              }}
-            >
-              {playerState.parents.map((parent) => renderCharacter(parent))}
-            </View>
-          </>
-          {bestFriend && bestFriend.length > 0 && (
-            <>
-              <Text className="py-4 text-center text-2xl">Best Friends</Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                }}
-              >
-                {bestFriend.map((bestFriend) => renderCharacter(bestFriend))}
-              </View>
-            </>
-          )}
-          {bitterEnemies && bitterEnemies.length > 0 && (
-            <>
-              <Text className="py-4 text-center text-2xl">Bitter Enemies</Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                }}
-              >
-                {bitterEnemies.map((bitterEnemy) =>
-                  renderCharacter(bitterEnemy),
-                )}
-              </View>
-            </>
-          )}
-          {friends && friends.length > 0 && (
-            <>
-              <Text className="py-4 text-center text-2xl">Friends</Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                }}
-              >
-                {friends.map((friend) => renderCharacter(friend))}
-              </View>
-            </>
-          )}
-          {enemies && enemies.length > 0 && (
-            <>
-              <Text className="py-4 text-center text-2xl">Enemies</Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                }}
-              >
-                {enemies.map((enemy) => renderCharacter(enemy))}
-              </View>
-            </>
-          )}
-          {acquaintances && acquaintances.length > 0 && (
-            <>
-              <Text className="py-4 text-center text-2xl">Acquaintances</Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  alignItems: "flex-start",
-                  justifyContent: "flex-start",
-                }}
-              >
-                {acquaintances.map((acquaintance) =>
-                  renderCharacter(acquaintance),
-                )}
-              </View>
-            </>
-          )}
-        </View>
-      </ScrollView>
+            {bestFriend && bestFriend.length > 0 && (
+              <>
+                <Text className="py-4 text-center text-2xl">Best Friends</Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    alignItems: "flex-start",
+                    justifyContent: "flex-start",
+                  }}
+                >
+                  {bestFriend.map((bestFriend) => renderCharacter(bestFriend))}
+                </View>
+              </>
+            )}
+            {bitterEnemies && bitterEnemies.length > 0 && (
+              <>
+                <Text className="py-4 text-center text-2xl">
+                  Bitter Enemies
+                </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    alignItems: "flex-start",
+                    justifyContent: "flex-start",
+                  }}
+                >
+                  {bitterEnemies.map((bitterEnemy) =>
+                    renderCharacter(bitterEnemy),
+                  )}
+                </View>
+              </>
+            )}
+            {friends && friends.length > 0 && (
+              <>
+                <Text className="py-4 text-center text-2xl">Friends</Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    alignItems: "flex-start",
+                    justifyContent: "flex-start",
+                  }}
+                >
+                  {friends.map((friend) => renderCharacter(friend))}
+                </View>
+              </>
+            )}
+            {enemies && enemies.length > 0 && (
+              <>
+                <Text className="py-4 text-center text-2xl">Enemies</Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    alignItems: "flex-start",
+                    justifyContent: "flex-start",
+                  }}
+                >
+                  {enemies.map((enemy) => renderCharacter(enemy))}
+                </View>
+              </>
+            )}
+            {acquaintances && acquaintances.length > 0 && (
+              <>
+                <Text className="py-4 text-center text-2xl">Acquaintances</Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    alignItems: "flex-start",
+                    justifyContent: "flex-start",
+                  }}
+                >
+                  {acquaintances.map((acquaintance) =>
+                    renderCharacter(acquaintance),
+                  )}
+                </View>
+              </>
+            )}
+          </View>
+        </ScrollView>
+      </>
     );
   }
 }

@@ -6,7 +6,6 @@ import {
 } from "react-native";
 import { View, Text } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
-import { calculateAge, toTitleCase } from "../../utility/functions/misc";
 import PlayerStatus from "../../components/PlayerStatus";
 import { Item } from "../../classes/item";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -25,6 +24,8 @@ import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { toTitleCase } from "../../utility/functions/misc/words";
+import { calculateAge } from "../../utility/functions/misc/age";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();

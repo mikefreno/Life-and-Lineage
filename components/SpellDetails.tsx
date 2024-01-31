@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { toTitleCase } from "../utility/functions/misc";
+import { toTitleCase } from "../utility/functions/misc/words";
 import { Text } from "./Themed";
 import Energy from "../assets/icons/EnergyIcon";
 import HealthIcon from "../assets/icons/HealthIcon";

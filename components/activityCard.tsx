@@ -11,7 +11,7 @@ import {
   PlayerCharacterContext,
 } from "../app/_layout";
 import Coins from "../assets/icons/CoinsIcon";
-import { toTitleCase } from "../utility/functions/misc";
+import { toTitleCase } from "../utility/functions/misc/words";
 import GenericModal from "./GenericModal";
 import { Character } from "../classes/character";
 import GenericRaisedButton from "./GenericRaisedButton";
