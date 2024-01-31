@@ -49,7 +49,6 @@ export default function SetSex() {
     const res = await AsyncStorage.getItem("tutorialsEnabled");
     if (res) {
       const parsed: boolean = JSON.parse(res);
-      console.log("loading: ", parsed);
       setShowAgingTutorial(parsed);
       tutorialStateRef.current = parsed;
     }

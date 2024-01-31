@@ -151,16 +151,16 @@ const SpellsScreen = observer(() => {
               ))}
             </ScrollView>
           ) : (
-            <View className="h-1/2 items-center justify-center">
+            <NonThemedView className="h-1/2 items-center justify-center">
               <Text className="text-xl italic tracking-wide">
                 No Known Spells.
               </Text>
               <Text className="text-center italic tracking-wide">
                 (Books can be studied on the top right)
               </Text>
-            </View>
+            </NonThemedView>
           )}
-          <View className="h-1/2">
+          <View className="h-1/2 min-h-[280]">
             <GenericStrikeAround text={"Proficiencies"} />
             <View className="flex items-center px-12 pb-4">
               {magicProficiencySection(playerState?.magicProficiencies)}

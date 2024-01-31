@@ -63,6 +63,7 @@ const HomeScreen = observer(() => {
   }, [gameState?.tutorialsShown]);
 
   const deviceHeight = Dimensions.get("window").height;
+  console.log(deviceHeight);
   const deviceWidth = Dimensions.get("window").width;
 
   interface checkReleasePositonProps {
@@ -135,7 +136,7 @@ const HomeScreen = observer(() => {
     const [buzzed, setBuzzed] = useState<boolean>(false);
     return (
       <NonThemedView className="flex w-full">
-        <NonThemedView className="-mt-[1vh] items-center">
+        <NonThemedView className="-mt-3 items-center">
           <Text className="mb-2">Head</Text>
           {playerState?.equipment.head ? (
             <Pressable className="h-12 w-12 active:scale-90 active:opacity-50">
@@ -319,7 +320,7 @@ const HomeScreen = observer(() => {
             )}
           </NonThemedView>
         </NonThemedView>
-        <NonThemedView className="mx-auto -mt-4 items-center md:mt-4">
+        <NonThemedView className="mx-auto -mt-6 items-center md:mt-4">
           <Text className="mb-2">Body</Text>
           {playerState?.equipment.body ? (
             <Pressable className="h-12 w-12 active:scale-90 active:opacity-50">
@@ -438,7 +439,7 @@ const HomeScreen = observer(() => {
       return (
         <NonThemedView
           ref={inventoryTarget}
-          className="mx-auto flex h-[55%] w-full flex-wrap rounded-lg border border-zinc-600"
+          className="mx-auto -mt-2 flex h-[55%] w-full flex-wrap rounded-lg border border-zinc-600"
         >
           {Array.from({ length: 24 }).map((_, index) => (
             <NonThemedView
@@ -513,7 +514,7 @@ const HomeScreen = observer(() => {
         <View
           className="flex-1"
           style={{
-            paddingBottom: useBottomTabBarHeight() + 65,
+            paddingBottom: useBottomTabBarHeight() + 70,
           }}
         >
           <NonThemedView className="-mx-4 border-b border-zinc-200 py-2 dark:border-zinc-600">
@@ -521,20 +522,23 @@ const HomeScreen = observer(() => {
               {playerState?.playerClass == "necromancer" ? (
                 <NonThemedView className="mx-auto">
                   <Necromancer
-                    width={100}
-                    height={100}
+                    width={deviceHeight / 9 > 100 ? 100 : deviceHeight / 9}
+                    height={deviceHeight / 9 > 100 ? 100 : deviceHeight / 9}
                     color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
                   />
                 </NonThemedView>
               ) : playerState?.playerClass == "paladin" ? (
                 <NonThemedView className="mx-auto">
-                  <PaladinHammer width={100} height={100} />
+                  <PaladinHammer
+                    width={deviceHeight / 9 > 100 ? 100 : deviceHeight / 9}
+                    height={deviceHeight / 9 > 100 ? 100 : deviceHeight / 9}
+                  />
                 </NonThemedView>
               ) : (
                 <NonThemedView className="mx-auto scale-x-[-1] transform">
                   <WizardHat
-                    height={100}
-                    width={100}
+                    width={deviceHeight / 9 > 100 ? 100 : deviceHeight / 9}
+                    height={deviceHeight / 9 > 100 ? 100 : deviceHeight / 9}
                     color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
                   />
                 </NonThemedView>
@@ -552,7 +556,11 @@ const HomeScreen = observer(() => {
                 } years old`}</Text>
               </NonThemedView>
               <NonThemedView className="mx-auto">
-                {blessingDisplay(playerState.blessing, colorScheme)}
+                {blessingDisplay(
+                  playerState.blessing,
+                  colorScheme,
+                  deviceHeight / 9 > 100 ? 100 : deviceHeight / 9,
+                )}
               </NonThemedView>
             </NonThemedView>
           </NonThemedView>
