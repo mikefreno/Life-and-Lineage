@@ -3,7 +3,11 @@ import { View } from "react-native";
 import { Text } from "./Themed";
 import { Character } from "../classes/character";
 import GenericModal from "./GenericModal";
-import { GameContext, PlayerCharacterContext } from "../app/_layout";
+import {
+  EnemyContext,
+  GameContext,
+  PlayerCharacterContext,
+} from "../app/_layout";
 import { useContext, useState } from "react";
 import { CharacterImage } from "./CharacterImage";
 import { calculateAge } from "../utility/functions/misc/age";
@@ -13,6 +17,7 @@ import GenericFlatButton from "./GenericFlatButton";
 import GenericStrikeAround from "./GenericStrikeAround";
 import { useVibration } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
+import { Enemy } from "../classes/creatures";
 
 interface CharacterInteractionModal {
   character: Character | null;
@@ -29,7 +34,8 @@ export const CharacterInteractionModal = observer(
   }: CharacterInteractionModal) => {
     const playerContext = useContext(PlayerCharacterContext);
     const gameContext = useContext(GameContext);
-    if (!playerContext || !gameContext) {
+    const enemyContext = useContext(EnemyContext);
+    if (!playerContext || !gameContext || !enemyContext) {
       throw new Error("missing context");
     }
     const { playerState } = playerContext;
@@ -37,7 +43,38 @@ export const CharacterInteractionModal = observer(
     const [showAssaultWarning, setShowAssaultWarning] =
       useState<boolean>(false);
 
+    const { setEnemy } = enemyContext;
     const vibration = useVibration();
+    const characterAge =
+      character && gameState
+        ? calculateAge(new Date(character.birthdate), new Date(gameState.date))
+        : 0;
+
+    function setFight() {
+      if (character) {
+        const enemy = new Enemy({
+          creatureSpecies: character.getFullName(),
+          health: 75 - characterAge / 5,
+          healthMax: 75 - characterAge / 5,
+          sanity: 50,
+          sanityMax: 50,
+          baseArmor: 75 - characterAge ?? undefined,
+          attackPower: 10,
+          energy: 50,
+          energyMax: 50,
+          energyRegen: 10,
+          attacks: ["stab"],
+        });
+        setEnemy(enemy);
+        console.log(enemy);
+        playerState?.setInDungeon({
+          state: true,
+          instance: "Activities",
+          level: "Personal Assault",
+        });
+        playerState?.setSavedEnemy(enemy);
+      }
+    }
 
     return (
       <GenericModal
@@ -53,23 +90,14 @@ export const CharacterInteractionModal = observer(
             </Text>
             <View className="mx-auto">
               <CharacterImage
-                characterAge={calculateAge(
-                  new Date(character.birthdate),
-                  new Date(gameState.date),
-                )}
+                characterAge={characterAge}
                 characterSex={character.sex == "male" ? "M" : "F"}
               />
             </View>
             {!showAssaultWarning ? (
               <View>
                 <View className="items-center">
-                  <Text>
-                    {calculateAge(
-                      new Date(character.birthdate),
-                      new Date(gameState.date),
-                    )}{" "}
-                    years old
-                  </Text>
+                  <Text>{characterAge} years old</Text>
                   <Text className="px-10 text-center">
                     Works as a {character.job}
                   </Text>
@@ -94,14 +122,12 @@ export const CharacterInteractionModal = observer(
                     <View className="mt-2 flex flex-row justify-evenly">
                       <GenericFlatButton
                         text="Chat"
-                        backgroundColor={"#60a5fa"}
                         onPressFunction={() => {
                           vibration({ style: "light" });
                           character.updateAffection(5);
                         }}
                       />
                       <GenericFlatButton
-                        backgroundColor={"#3b82f6"}
                         text="Give a Gift"
                         onPressFunction={() => {
                           vibration({ style: "light" });
@@ -111,7 +137,6 @@ export const CharacterInteractionModal = observer(
                     <View className="mt-2 flex flex-row justify-evenly">
                       <GenericFlatButton
                         text="Spit in Face"
-                        backgroundColor={"#dc2626"}
                         onPressFunction={() => {
                           vibration({ style: "light" });
                           character.updateAffection(-10);
@@ -122,7 +147,6 @@ export const CharacterInteractionModal = observer(
                       <View className="mt-2 flex flex-row justify-evenly">
                         <GenericFlatButton
                           text="Assault"
-                          backgroundColor={"#450a0a"}
                           onPressFunction={() => {
                             vibration({ style: "warning", essential: true });
                             setShowAssaultWarning(true);
@@ -182,6 +206,7 @@ export const CharacterInteractionModal = observer(
                       backgroundColor={"#450a0a"}
                       onPressFunction={() => {
                         vibration({ style: "warning", essential: true });
+                        setFight();
                       }}
                     />
                   </View>

@@ -15,11 +15,11 @@ export function EnemyImage({
   const enemy = EnemyImageMap[creatureSpecies];
   return (
     <Image
-      source={enemy.source}
+      source={enemy ? enemy.source : require("../assets/images/items/Egg.png")}
       style={{
-        width: widthOverride ? widthOverride : enemy.width,
-        height: heightOverride ? heightOverride : enemy.height,
-        marginTop: enemy.heightOffset ?? 0,
+        width: widthOverride ? widthOverride : enemy ? enemy.width : 40,
+        height: heightOverride ? heightOverride : enemy ? enemy.height : 40,
+        marginTop: enemy ? enemy.heightOffset : 0,
       }}
     />
   );
