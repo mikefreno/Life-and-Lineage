@@ -143,7 +143,13 @@ export class Character {
   }
 
   public updateAffection(change: number) {
-    this.affection += change;
+    if (this.affection + change >= 100) {
+      this.affection = 100;
+    } else if (this.affection + change < -100) {
+      this.affection = -100;
+    } else {
+      this.affection += change;
+    }
   }
 
   static fromJSON(json: any): Character {
@@ -1112,6 +1118,15 @@ export class PlayerCharacter extends Character {
   }
 
   public getAdultCharacter(gameDate: Date) {
+    const allEligibleCharacters = this.getAllAdultCharacters(gameDate);
+    const randomIndex = Math.floor(
+      Math.random() * allEligibleCharacters.length,
+    );
+
+    return allEligibleCharacters[randomIndex];
+  }
+
+  public getAllAdultCharacters(gameDate: Date) {
     const allEligibleCharacters = [
       ...this.knownCharacters,
       ...this.partners,
@@ -1119,15 +1134,11 @@ export class PlayerCharacter extends Character {
       ...this.parents,
     ].filter(
       (character) =>
-        calculateAge(new Date(character.birthdate), gameDate) < 18 &&
+        calculateAge(new Date(character.birthdate), gameDate) >= 18 &&
         !character.deathdate,
     );
 
-    const randomIndex = Math.floor(
-      Math.random() * allEligibleCharacters.length,
-    );
-
-    return allEligibleCharacters[randomIndex];
+    return allEligibleCharacters;
   }
 
   public tickDownRelationshipAffection() {

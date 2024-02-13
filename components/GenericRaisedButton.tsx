@@ -17,6 +17,7 @@ interface GenericRaisedButtonProps {
     | "warning"
     | "error";
   vibrationEssentiality?: boolean;
+  disableTopLevelStyling?: boolean;
 }
 
 const GenericRaisedButton = ({
@@ -27,6 +28,7 @@ const GenericRaisedButton = ({
   disabledCondition = false,
   vibrationStrength = "light",
   vibrationEssentiality = false,
+  disableTopLevelStyling = false,
 }: GenericRaisedButtonProps) => {
   const { colorScheme } = useColorScheme();
 
@@ -34,7 +36,7 @@ const GenericRaisedButton = ({
 
   return (
     <Pressable
-      className="mx-auto mb-2 mt-4"
+      className={!disableTopLevelStyling ? "mx-auto mb-2 mt-4" : undefined}
       onPress={() => {
         vibration({
           style: vibrationStrength,

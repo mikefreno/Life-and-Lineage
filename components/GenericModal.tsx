@@ -29,7 +29,7 @@ export default function GenericModal({
       onBackButtonPress={backFunction}
     >
       <View
-        className="mx-auto rounded-xl px-6 py-4 dark:border dark:border-zinc-500"
+        className="mx-auto rounded-xl px-[2vw] py-4 dark:border dark:border-zinc-500"
         style={{
           shadowColor: "#000",
           shadowOffset: {

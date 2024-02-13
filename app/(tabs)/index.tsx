@@ -63,7 +63,6 @@ const HomeScreen = observer(() => {
   }, [gameState?.tutorialsShown]);
 
   const deviceHeight = Dimensions.get("window").height;
-  console.log(deviceHeight);
   const deviceWidth = Dimensions.get("window").width;
 
   interface checkReleasePositonProps {

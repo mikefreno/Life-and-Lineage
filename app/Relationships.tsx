@@ -21,6 +21,7 @@ export default function RelationshipsScreen() {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null,
   );
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const acquaintances = playerState?.knownCharacters.filter(
     (character) => character.affection < 25 && character.affection > -25,
@@ -48,7 +49,14 @@ export default function RelationshipsScreen() {
       );
 
       return (
-        <Pressable className="flex w-1/2 items-center" key={character.id}>
+        <Pressable
+          className="flex w-1/2 items-center"
+          key={character.id}
+          onPress={() => {
+            setShowModal(true);
+            setSelectedCharacter(character);
+          }}
+        >
           <Text className="text-center text-2xl">
             {character.getFullName()}
           </Text>
@@ -62,7 +70,7 @@ export default function RelationshipsScreen() {
             {character.deathdate && "Died at "}
             {characterAge} Years Old
           </Text>
-          <Text className="text-xl">{character.getFullName()}</Text>
+          <Text className="text-center text-xl">{character.getFullName()}</Text>
           <View className="mx-auto">
             <Text className="flex flex-wrap text-center text-lg">
               {character.deathdate && "Was a "}
@@ -93,11 +101,16 @@ export default function RelationshipsScreen() {
       <>
         <CharacterInteractionModal
           character={selectedCharacter}
-          closeFunction={() => setSelectedCharacter(null)}
+          closeFunction={() => {
+            setShowModal(false);
+            setTimeout(() => setSelectedCharacter(null), 500);
+          }}
+          backdropCloses
+          secondaryRequirement={showModal}
         />
         <ScrollView>
           <View
-            className="flex-1 items-center px-8"
+            className="flex-1 items-center px-8 pb-10"
             style={{ paddingTop: useHeaderHeight() }}
           >
             {playerState.children.length > 0 && (
@@ -133,7 +146,7 @@ export default function RelationshipsScreen() {
               </>
             )}
             <>
-              <Text className="py-12 text-center text-2xl"></Text>
+              <Text className="py-8 text-center text-2xl">Parents</Text>
               <View
                 style={{
                   flexDirection: "row",
@@ -147,7 +160,7 @@ export default function RelationshipsScreen() {
             </>
             {bestFriend && bestFriend.length > 0 && (
               <>
-                <Text className="py-4 text-center text-2xl">Best Friends</Text>
+                <Text className="py-8 text-center text-2xl">Best Friends</Text>
                 <View
                   style={{
                     flexDirection: "row",
@@ -162,7 +175,7 @@ export default function RelationshipsScreen() {
             )}
             {bitterEnemies && bitterEnemies.length > 0 && (
               <>
-                <Text className="py-4 text-center text-2xl">
+                <Text className="py-8 text-center text-2xl">
                   Bitter Enemies
                 </Text>
                 <View
@@ -181,7 +194,7 @@ export default function RelationshipsScreen() {
             )}
             {friends && friends.length > 0 && (
               <>
-                <Text className="py-4 text-center text-2xl">Friends</Text>
+                <Text className="py-8 text-center text-2xl">Friends</Text>
                 <View
                   style={{
                     flexDirection: "row",
@@ -196,7 +209,7 @@ export default function RelationshipsScreen() {
             )}
             {enemies && enemies.length > 0 && (
               <>
-                <Text className="py-4 text-center text-2xl">Enemies</Text>
+                <Text className="py-8 text-center text-2xl">Enemies</Text>
                 <View
                   style={{
                     flexDirection: "row",
@@ -211,7 +224,7 @@ export default function RelationshipsScreen() {
             )}
             {acquaintances && acquaintances.length > 0 && (
               <>
-                <Text className="py-4 text-center text-2xl">Acquaintances</Text>
+                <Text className="py-8 text-center text-2xl">Acquaintances</Text>
                 <View
                   style={{
                     flexDirection: "row",

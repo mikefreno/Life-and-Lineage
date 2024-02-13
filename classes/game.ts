@@ -145,6 +145,7 @@ export class Game {
     if (playerState.sanity < 0) {
       lowSanityDebuffGenerator(playerState);
     }
+    playerState.tickDownRelationshipAffection();
     playerState.conditionTicker();
     playerState.tickAllInvestments();
   }

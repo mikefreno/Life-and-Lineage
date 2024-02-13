@@ -1,15 +1,9 @@
-import { StatusBar } from "expo-status-bar";
 import { Text, View } from "../../components/Themed";
 import { router } from "expo-router";
 import { useContext, useState } from "react";
 import { GameContext } from "../_layout";
 import { toTitleCase } from "../../utility/functions/misc/words";
-import {
-  Pressable,
-  View as NonThemedView,
-  StyleSheet,
-  Platform,
-} from "react-native";
+import { Pressable, View as NonThemedView, StyleSheet } from "react-native";
 import { useVibration } from "../../utility/customHooks";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 
@@ -93,8 +87,6 @@ export default function GameSettings() {
           </Pressable>
         ))}
       </NonThemedView>
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
     </View>
   );
 }

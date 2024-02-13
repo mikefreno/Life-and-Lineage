@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Pressable, View } from "react-native";
+import { ColorValue, Pressable, View } from "react-native";
 import { Text } from "./Themed";
 
 interface GenericFlatButtonTextProps {
@@ -7,12 +7,14 @@ interface GenericFlatButtonTextProps {
   text: string;
   disabledCondition?: boolean;
   textNode?: never;
+  backgroundColor?: ColorValue;
 }
 interface GenericFlatButtonNodeProps {
   onPressFunction: () => void;
   text?: never;
   disabledCondition?: boolean;
   textNode: ReactNode;
+  backgroundColor?: ColorValue;
 }
 
 type Props = GenericFlatButtonNodeProps | GenericFlatButtonTextProps;
@@ -22,6 +24,7 @@ const GenericFlatButton = ({
   text,
   textNode,
   disabledCondition = false,
+  backgroundColor,
 }: Props) => {
   return (
     <Pressable disabled={disabledCondition} onPress={onPressFunction}>
@@ -32,6 +35,7 @@ const GenericFlatButton = ({
               ? "mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg dark:border-zinc-50"
               : "mx-auto rounded-xl border border-zinc-400 px-6 py-2 text-lg"
           }`}
+          style={{ backgroundColor: backgroundColor }}
         >
           {text ? (
             <Text

@@ -27,6 +27,10 @@ import enemies from "../assets/json/enemy.json";
 import { observer } from "mobx-react-lite";
 import { useVibration } from "../utility/customHooks";
 import { CharacterInteractionModal } from "./CharacterInteractionModal";
+import { calculateAge } from "../utility/functions/misc/age";
+import { CharacterImage } from "./CharacterImage";
+import ProgressBar from "./ProgressBar";
+import AffectionIcon from "../assets/icons/AffectionIcon";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -206,6 +210,59 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
     }
   }
 
+  function renderCharacter(character: Character) {
+    if (gameState) {
+      const characterAge = calculateAge(
+        new Date(character.birthdate),
+        character.deathdate
+          ? new Date(character.deathdate)
+          : new Date(gameState.date),
+      );
+
+      return (
+        <View
+          className="mx-1 my-2 flex w-[45%] items-center rounded border border-zinc-400"
+          key={character.id}
+        >
+          <Text className="text-center text-2xl">
+            {character.getFullName()}
+          </Text>
+          <View className="mx-auto">
+            <CharacterImage
+              characterAge={characterAge}
+              characterSex={character.sex == "male" ? "M" : "F"}
+            />
+          </View>
+          <Text className="text-xl">
+            {character.deathdate && "Died at "}
+            {characterAge} Years Old
+          </Text>
+          <Text className="text-center text-xl">{character.getFullName()}</Text>
+          <View className="mx-auto">
+            <Text className="flex flex-wrap text-center text-lg">
+              {character.deathdate && "Was a "}
+              {character.job}
+            </Text>
+          </View>
+          <View className="flex w-2/3 flex-row justify-center">
+            <View className="w-3/4">
+              <ProgressBar
+                value={Math.floor(character.affection * 4) / 4}
+                minValue={-100}
+                maxValue={100}
+                filledColor="#dc2626"
+                unfilledColor="#fca5a5"
+              />
+            </View>
+            <View className="my-auto ml-1">
+              <AffectionIcon height={14} width={14} />
+            </View>
+          </View>
+        </View>
+      );
+    }
+  }
+
   function goToFight() {
     setBadOutcome(null);
     setTimeout(() => {
@@ -233,10 +290,30 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
       <GenericModal
         isVisibleCondition={showDatePartnerSelection}
         backFunction={() => setShowDatePartnerSelection(false)}
+        size={100}
       >
         <View className="items-center">
-          <Text>Who would you like to take on the date?</Text>
-          <ScrollView></ScrollView>
+          <Text className="text-center text-2xl">
+            Who would you like to take on the date?
+          </Text>
+          {playerState && gameState && (
+            <ScrollView className=" h-4/5 w-full">
+              <View
+                style={{
+                  paddingVertical: 12,
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                  marginHorizontal: -12,
+                }}
+              >
+                {playerState
+                  .getAllAdultCharacters(new Date(gameState.date))
+                  .map((character) => renderCharacter(character))}
+              </View>
+            </ScrollView>
+          )}
           <View className="mt-4">
             <GenericFlatButton
               text={"Cancel"}
