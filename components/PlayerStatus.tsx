@@ -98,6 +98,12 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
   ]);
 
   useEffect(() => {
+    if (playerState?.getTotalAllocatedPoints() == 0) {
+      setRespeccing(false);
+    }
+  }, [playerState?.unAllocatedSkillPoints]);
+
+  useEffect(() => {
     Animated.loop(
       Animated.sequence([
         Animated.timing(animatedValue, {
@@ -460,9 +466,9 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                 >
                   {({ pressed }) => (
                     <View
-                      className={`${
-                        pressed && "scale-90"
-                      } h-[30] w-[30] items-center rounded-md bg-red-800`}
+                      className={`${pressed && "scale-90"} ${
+                        respeccing ? "scale-x-[-1] bg-green-600" : "bg-red-600"
+                      } h-[30] w-[30] items-center rounded-md`}
                     >
                       <View className="my-auto">
                         <RotateArrow height={18} width={18} color={"white"} />
@@ -486,7 +492,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                     showMax
                   />
                 </View>
-                {playerState.unAllocatedSkillPoints > 0 && (
+                {playerState.unAllocatedSkillPoints > 0 && !respeccing && (
                   <Pressable
                     className="px-0.5"
                     onPress={() => {
@@ -495,7 +501,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                     }}
                   >
                     {({ pressed }) => (
-                      <View className={pressed ? "scale-95" : ""}>
+                      <View className={`${pressed && "scale-95"}`}>
                         <SquarePlus height={28} width={28} />
                       </View>
                     )}
@@ -506,7 +512,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                     className="px-0.5"
                     onPress={() => {
                       vibration({ style: "light" });
-                      playerState.refundAllocatedSkillPoint(SkillPoint.Health);
+                      playerState.refundSkillPointOnHealth();
                     }}
                   >
                     {({ pressed }) => (
@@ -532,7 +538,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                     showMax
                   />
                 </View>
-                {playerState.unAllocatedSkillPoints > 0 && (
+                {playerState.unAllocatedSkillPoints > 0 && !respeccing && (
                   <Pressable
                     className="px-0.5"
                     onPress={() => {
@@ -552,7 +558,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                     className="px-0.5"
                     onPress={() => {
                       vibration({ style: "light" });
-                      playerState.refundAllocatedSkillPoint(SkillPoint.Mana);
+                      playerState.refundSkillPointOnMana();
                     }}
                   >
                     {({ pressed }) => (
@@ -579,7 +585,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                     showMax
                   />
                 </View>
-                {playerState.unAllocatedSkillPoints > 0 && (
+                {playerState.unAllocatedSkillPoints > 0 && !respeccing && (
                   <Pressable
                     className="px-0.5"
                     onPress={() => {
@@ -599,7 +605,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                     className="px-0.5"
                     onPress={() => {
                       vibration({ style: "light" });
-                      playerState.refundAllocatedSkillPoint(SkillPoint.Mana);
+                      playerState.refundSkillPointOnSanity();
                     }}
                   >
                     {({ pressed }) => (

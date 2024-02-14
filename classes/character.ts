@@ -497,7 +497,10 @@ export class PlayerCharacter extends Character {
       spendSkillPointOnMana: action,
       spendSkillPointOnSanity: action,
       spendSkillPointOnAttackPower: action,
-      refundAllocatedSkillPoint: action,
+      refundSkillPointOnHealth: action,
+      refundSkillPointOnMana: action,
+      refundSkillPointOnSanity: action,
+      refundSkillPointOnAttackPower: action,
     });
   }
   //----------------------------------Stats----------------------------------//
@@ -535,36 +538,41 @@ export class PlayerCharacter extends Character {
       this.allocatedSkillPoints.attackPower += 1;
     }
   }
-  private refundSkillPointOnHealth() {
-    if (this.unAllocatedSkillPoints >= 1 && this.gold > 500) {
+  public refundSkillPointOnHealth() {
+    if (this.allocatedSkillPoints.health >= 1) {
       this.healthMax -= 10;
       this.unAllocatedSkillPoints += 1;
       this.allocatedSkillPoints.health -= 1;
-      this.spendGold(500);
+      if (this.health > this.healthMax) {
+        this.health = this.healthMax;
+      }
     }
   }
-  private refundSkillPointOnMana() {
-    if (this.unAllocatedSkillPoints >= 1 && this.gold > 500) {
+  public refundSkillPointOnMana() {
+    if (this.allocatedSkillPoints.mana >= 1) {
       this.manaMax -= 10;
       this.unAllocatedSkillPoints += 1;
       this.allocatedSkillPoints.mana -= 1;
-      this.spendGold(500);
+      if (this.mana > this.manaMax) {
+        this.mana = this.manaMax;
+      }
     }
   }
-  private refundSkillPointOnSanity() {
-    if (this.unAllocatedSkillPoints >= 1 && this.gold > 500) {
+  public refundSkillPointOnSanity() {
+    if (this.allocatedSkillPoints.sanity >= 1) {
       this.sanityMax -= 5;
       this.unAllocatedSkillPoints += 1;
       this.allocatedSkillPoints.sanity -= 1;
-      this.spendGold(500);
+      if (this.sanity > this.sanityMax) {
+        this.sanity = this.sanityMax;
+      }
     }
   }
-  private refundSkillPointOnAttackPower() {
-    if (this.unAllocatedSkillPoints >= 1 && this.gold > 500) {
+  public refundSkillPointOnAttackPower() {
+    if (this.allocatedSkillPoints.attackPower >= 1) {
       this.attackPower -= 5;
       this.unAllocatedSkillPoints += 1;
       this.allocatedSkillPoints.attackPower -= 1;
-      this.spendGold(500);
     }
   }
   public getTotalAllocatedPoints() {
@@ -574,22 +582,6 @@ export class PlayerCharacter extends Character {
       this.allocatedSkillPoints.sanity +
       this.allocatedSkillPoints.attackPower
     );
-  }
-  public refundAllocatedSkillPoint(target: SkillPoint) {
-    switch (target) {
-      case SkillPoint.Health:
-        this.refundSkillPointOnHealth();
-        break;
-      case SkillPoint.Mana:
-        this.refundSkillPointOnMana();
-        break;
-      case SkillPoint.Sanity:
-        this.refundSkillPointOnSanity();
-        break;
-      case SkillPoint.AttackPower:
-        this.refundSkillPointOnAttackPower();
-        break;
-    }
   }
   //----------------------------------Health----------------------------------//
   public getMaxHealth() {

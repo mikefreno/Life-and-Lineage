@@ -2,7 +2,7 @@ import React from "react";
 import Svg, { Path } from "react-native-svg";
 
 const SquareMinus = ({
-  color = "#22c55e",
+  color = "#ef4444",
   secondaryOpacity = 0.3,
   ...props
 }) => (
