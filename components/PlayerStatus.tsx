@@ -12,9 +12,7 @@ import Coins from "../assets/icons/CoinsIcon";
 import { useContext, useEffect, useState } from "react";
 import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { observer } from "mobx-react-lite";
-import { useFonts } from "expo-font";
-import { FontAwesome } from "@expo/vector-icons";
-import { router, usePathname } from "expo-router";
+import { router } from "expo-router";
 import { toTitleCase } from "../utility/functions/misc/words";
 import FadeOutText from "./FadeOutText";
 import GenericModal from "./GenericModal";
@@ -25,6 +23,11 @@ import ClockIcon from "../assets/icons/ClockIcon";
 import HealthIcon from "../assets/icons/HealthIcon";
 import Sanity from "../assets/icons/SanityIcon";
 import Energy from "../assets/icons/EnergyIcon";
+import SquarePlus from "../assets/icons/SquarePlus";
+import { useVibration } from "../utility/customHooks";
+import SquareMinus from "../assets/icons/SquareMinus";
+import RotateArrow from "../assets/icons/RotateArrow";
+import { SkillPoint } from "../utility/types";
 
 interface PlayerStatus {
   hideGold?: boolean;
@@ -38,10 +41,6 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
   const [readableGold, setReadableGold] = useState(
     playerState?.getReadableGold(),
   );
-  const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-    ...FontAwesome.font,
-  });
   const [healthRecord, setHealthRecord] = useState<number | undefined>(
     playerState?.health,
   );
@@ -79,9 +78,10 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
     playerState?.getMaxSanity(),
   );
   const [showDetailedView, setShowDetailedView] = useState<boolean>(false);
+  const [respeccing, setRespeccing] = useState<boolean>(false);
 
-  const pathname = usePathname();
   const { colorScheme } = useColorScheme();
+  const vibration = useVibration();
 
   useEffect(() => {
     setLocalHealthMax(playerState?.getMaxHealth());
@@ -92,6 +92,9 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
     playerState?.equipment.head,
     playerState?.equipment.mainHand,
     playerState?.equipment.offHand,
+    playerState?.healthMax,
+    playerState?.manaMax,
+    playerState?.sanityMax,
   ]);
 
   useEffect(() => {
@@ -129,15 +132,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
   }, [playerState?.health, gameState?.healthWarning]);
 
   useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (
-      loaded &&
-      playerState &&
-      (playerState.sanity <= -50 || playerState.health <= 0)
-    ) {
+    if (playerState && (playerState.sanity <= -50 || playerState.health <= 0)) {
       while (router.canGoBack()) {
         router.back();
       }
@@ -446,42 +441,175 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
             <Text className="text-center text-xl">
               {playerState.getFullName()}
             </Text>
+            {playerState.unAllocatedSkillPoints > 0 && (
+              <Text
+                className="text-center text-xl"
+                style={{ color: "#16a34a" }}
+              >
+                You have {playerState.unAllocatedSkillPoints} unallocated Skill
+                Points!
+              </Text>
+            )}
+            {playerState.getTotalAllocatedPoints() > 0 && (
+              <View className="absolute right-0 -mt-1">
+                <Pressable
+                  onPress={() => {
+                    setRespeccing(!respeccing);
+                    vibration({ style: "light", essential: true });
+                  }}
+                >
+                  {({ pressed }) => (
+                    <View
+                      className={`${
+                        pressed && "scale-90"
+                      } h-[30] w-[30] items-center rounded-md bg-red-800`}
+                    >
+                      <View className="my-auto">
+                        <RotateArrow height={18} width={18} color={"white"} />
+                      </View>
+                    </View>
+                  )}
+                </Pressable>
+              </View>
+            )}
             <View className="items-center">
               <Text className="pb-1" style={{ color: "#ef4444" }}>
                 Health
               </Text>
-              <ProgressBar
-                value={playerState.health}
-                maxValue={localHealthMax ?? playerState.getMaxHealth()}
-                filledColor="#ef4444"
-                unfilledColor="#fca5a5"
-                showMax
-              />
+              <View className="flex w-full flex-row items-center">
+                <View className="flex-1">
+                  <ProgressBar
+                    value={playerState.health}
+                    maxValue={localHealthMax ?? playerState.getMaxHealth()}
+                    filledColor="#ef4444"
+                    unfilledColor="#fca5a5"
+                    showMax
+                  />
+                </View>
+                {playerState.unAllocatedSkillPoints > 0 && (
+                  <Pressable
+                    className="px-0.5"
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      playerState.spendSkillPointOnHealth();
+                    }}
+                  >
+                    {({ pressed }) => (
+                      <View className={pressed ? "scale-95" : ""}>
+                        <SquarePlus height={28} width={28} />
+                      </View>
+                    )}
+                  </Pressable>
+                )}
+                {playerState.allocatedSkillPoints.health > 0 && respeccing && (
+                  <Pressable
+                    className="px-0.5"
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      playerState.refundAllocatedSkillPoint(SkillPoint.Health);
+                    }}
+                  >
+                    {({ pressed }) => (
+                      <View className={pressed ? "scale-95" : ""}>
+                        <SquareMinus height={28} width={28} />
+                      </View>
+                    )}
+                  </Pressable>
+                )}
+              </View>
             </View>
             <View className="items-center">
               <Text className="py-1" style={{ color: "#60a5fa" }}>
                 Mana
               </Text>
-              <ProgressBar
-                value={playerState.mana}
-                maxValue={localManaMax ?? playerState.getMaxMana()}
-                filledColor="#60a5fa"
-                unfilledColor="#bfdbfe"
-                showMax
-              />
+              <View className="flex w-full flex-row items-center">
+                <View className="flex-1">
+                  <ProgressBar
+                    value={playerState.mana}
+                    maxValue={localManaMax ?? playerState.getMaxMana()}
+                    filledColor="#60a5fa"
+                    unfilledColor="#bfdbfe"
+                    showMax
+                  />
+                </View>
+                {playerState.unAllocatedSkillPoints > 0 && (
+                  <Pressable
+                    className="px-0.5"
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      playerState.spendSkillPointOnMana();
+                    }}
+                  >
+                    {({ pressed }) => (
+                      <View className={pressed ? "scale-95" : ""}>
+                        <SquarePlus height={28} width={28} />
+                      </View>
+                    )}
+                  </Pressable>
+                )}
+                {playerState.allocatedSkillPoints.mana > 0 && respeccing && (
+                  <Pressable
+                    className="px-0.5"
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      playerState.refundAllocatedSkillPoint(SkillPoint.Mana);
+                    }}
+                  >
+                    {({ pressed }) => (
+                      <View className={pressed ? "scale-95" : ""}>
+                        <SquareMinus height={28} width={28} />
+                      </View>
+                    )}
+                  </Pressable>
+                )}
+              </View>
             </View>
             <View className="items-center">
               <Text className="py-1" style={{ color: "#c084fc" }}>
                 Sanity
               </Text>
-              <ProgressBar
-                value={playerState.sanity}
-                minValue={-50}
-                maxValue={localSanityMax ?? playerState.getMaxSanity()}
-                filledColor="#c084fc"
-                unfilledColor="#e9d5ff"
-                showMax
-              />
+              <View className="flex w-full flex-row items-center">
+                <View className="flex-1">
+                  <ProgressBar
+                    value={playerState.sanity}
+                    minValue={-50}
+                    maxValue={localSanityMax ?? playerState.getMaxSanity()}
+                    filledColor="#c084fc"
+                    unfilledColor="#e9d5ff"
+                    showMax
+                  />
+                </View>
+                {playerState.unAllocatedSkillPoints > 0 && (
+                  <Pressable
+                    className="px-0.5"
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      playerState.spendSkillPointOnSanity();
+                    }}
+                  >
+                    {({ pressed }) => (
+                      <View className={pressed ? "scale-95" : ""}>
+                        <SquarePlus height={28} width={28} />
+                      </View>
+                    )}
+                  </Pressable>
+                )}
+                {playerState.allocatedSkillPoints.sanity > 0 && respeccing && (
+                  <Pressable
+                    className="px-0.5"
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      playerState.refundAllocatedSkillPoint(SkillPoint.Mana);
+                    }}
+                  >
+                    {({ pressed }) => (
+                      <View className={pressed ? "scale-95" : ""}>
+                        <SquareMinus height={28} width={28} />
+                      </View>
+                    )}
+                  </Pressable>
+                )}
+              </View>
             </View>
             {playerState.conditions.length > 0 ? (
               <View>

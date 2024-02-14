@@ -212,5 +212,20 @@
       "armorValue": 5,
       "appearsIn": [""],
       "appearsOn": []
+   },
+   {
+      "name": "generic npc",
+      "sanity": 50,
+      "healthRange": {"minimum": 60, "maximum": 85},
+      "attackPowerRange": {"minimum": 10, "maximum": 10},
+      "energy": {"maximum": 30, "regen": 3},
+      "attacks": ["stab", "pocket sand"],
+      "drops": [
+         {"item": "dagger", "itemType":"weapon","chance":0.75}
+      ],
+      "goldDropRange": {"minimum": 250, "maximum":1000},
+      "armorValue": 5,
+      "appearsIn": [""],
+      "appearsOn": []
    }
 ]

@@ -17,7 +17,12 @@ import summons from "../assets/json/summons.json";
 import { action, makeObservable, observable } from "mobx";
 import * as Crypto from "expo-crypto";
 import { Investment } from "./investment";
-import { AttackObj, InvestmentType, InvestmentUpgrade } from "../utility/types";
+import {
+  AttackObj,
+  InvestmentType,
+  InvestmentUpgrade,
+  SkillPoint,
+} from "../utility/types";
 import { rollD20 } from "../utility/functions/roll";
 import shops from "../assets/json/shops.json";
 import artifacts from "../assets/json/items/artifacts.json";
@@ -226,6 +231,14 @@ type PlayerCharacterBase = {
   };
   investments?: Investment[];
   savedEnemy?: Enemy | null;
+  unAllocatedSkillPoints?: number;
+  allocatedSkillPoints?: {
+    health: number;
+    mana: number;
+    sanity: number;
+    attackPower: number;
+  };
+  attackPower?: number;
 };
 type MageCharacter = PlayerCharacterBase & {
   playerClass: "mage";
@@ -266,6 +279,7 @@ export class PlayerCharacter extends Character {
   mana: number;
   manaMax: number;
   manaRegen: number;
+  attackPower: number;
   jobExperience: { job: string; experience: number; rank: number }[];
   learningSpells: {
     bookName: string;
@@ -298,6 +312,13 @@ export class PlayerCharacter extends Character {
   };
   investments: Investment[];
   savedEnemy: Enemy | null;
+  unAllocatedSkillPoints: number;
+  allocatedSkillPoints: {
+    health: number;
+    mana: number;
+    sanity: number;
+    attackPower: number;
+  };
 
   constructor({
     id,
@@ -338,6 +359,9 @@ export class PlayerCharacter extends Character {
     equipment,
     investments,
     savedEnemy,
+    unAllocatedSkillPoints,
+    allocatedSkillPoints,
+    attackPower,
   }: PlayerCharacterOptions) {
     super({
       id,
@@ -391,6 +415,14 @@ export class PlayerCharacter extends Character {
     };
     this.investments = investments ?? [];
     this.savedEnemy = savedEnemy ?? null;
+    this.unAllocatedSkillPoints = unAllocatedSkillPoints ?? 0;
+    this.allocatedSkillPoints = allocatedSkillPoints ?? {
+      health: 0,
+      mana: 0,
+      sanity: 0,
+      attackPower: 0,
+    };
+    this.attackPower = attackPower ?? 0;
     makeObservable(this, {
       health: observable,
       healthMax: observable,
@@ -413,6 +445,9 @@ export class PlayerCharacter extends Character {
       currentDungeon: observable,
       equipment: observable,
       investments: observable,
+      allocatedSkillPoints: observable,
+      unAllocatedSkillPoints: observable,
+      attackPower: observable,
       getMaxHealth: action,
       damageHealth: action,
       getSpecifiedQualificationProgress: action,
@@ -457,7 +492,104 @@ export class PlayerCharacter extends Character {
       restoreHealth: action,
       restoreSanity: action,
       setSavedEnemy: action,
+      bossDefeated: action,
+      spendSkillPointOnHealth: action,
+      spendSkillPointOnMana: action,
+      spendSkillPointOnSanity: action,
+      spendSkillPointOnAttackPower: action,
+      refundAllocatedSkillPoint: action,
     });
+  }
+  //----------------------------------Stats----------------------------------//
+  public bossDefeated() {
+    this.addSkillPoints(3);
+  }
+  private addSkillPoints(amount: number) {
+    this.unAllocatedSkillPoints += amount;
+  }
+  public spendSkillPointOnHealth() {
+    if (this.unAllocatedSkillPoints >= 1) {
+      this.healthMax += 10;
+      this.unAllocatedSkillPoints -= 1;
+      this.allocatedSkillPoints.health += 1;
+    }
+  }
+  public spendSkillPointOnMana() {
+    if (this.unAllocatedSkillPoints >= 1) {
+      this.manaMax += 10;
+      this.unAllocatedSkillPoints -= 1;
+      this.allocatedSkillPoints.mana += 1;
+    }
+  }
+  public spendSkillPointOnSanity() {
+    if (this.unAllocatedSkillPoints >= 1) {
+      this.sanityMax += 5;
+      this.unAllocatedSkillPoints -= 1;
+      this.allocatedSkillPoints.sanity += 1;
+    }
+  }
+  public spendSkillPointOnAttackPower() {
+    if (this.unAllocatedSkillPoints >= 1) {
+      this.attackPower += 5;
+      this.unAllocatedSkillPoints -= 1;
+      this.allocatedSkillPoints.attackPower += 1;
+    }
+  }
+  private refundSkillPointOnHealth() {
+    if (this.unAllocatedSkillPoints >= 1 && this.gold > 500) {
+      this.healthMax -= 10;
+      this.unAllocatedSkillPoints += 1;
+      this.allocatedSkillPoints.health -= 1;
+      this.spendGold(500);
+    }
+  }
+  private refundSkillPointOnMana() {
+    if (this.unAllocatedSkillPoints >= 1 && this.gold > 500) {
+      this.manaMax -= 10;
+      this.unAllocatedSkillPoints += 1;
+      this.allocatedSkillPoints.mana -= 1;
+      this.spendGold(500);
+    }
+  }
+  private refundSkillPointOnSanity() {
+    if (this.unAllocatedSkillPoints >= 1 && this.gold > 500) {
+      this.sanityMax -= 5;
+      this.unAllocatedSkillPoints += 1;
+      this.allocatedSkillPoints.sanity -= 1;
+      this.spendGold(500);
+    }
+  }
+  private refundSkillPointOnAttackPower() {
+    if (this.unAllocatedSkillPoints >= 1 && this.gold > 500) {
+      this.attackPower -= 5;
+      this.unAllocatedSkillPoints += 1;
+      this.allocatedSkillPoints.attackPower -= 1;
+      this.spendGold(500);
+    }
+  }
+  public getTotalAllocatedPoints() {
+    return (
+      this.allocatedSkillPoints.health +
+      this.allocatedSkillPoints.mana +
+      this.allocatedSkillPoints.sanity +
+      this.allocatedSkillPoints.attackPower
+    );
+  }
+  public refundAllocatedSkillPoint(target: SkillPoint) {
+    switch (target) {
+      case SkillPoint.Health:
+        this.refundSkillPointOnHealth();
+        break;
+      case SkillPoint.Mana:
+        this.refundSkillPointOnMana();
+        break;
+      case SkillPoint.Sanity:
+        this.refundSkillPointOnSanity();
+        break;
+      case SkillPoint.AttackPower:
+        this.refundSkillPointOnAttackPower();
+        break;
+    }
   }
   //----------------------------------Health----------------------------------//
   public getMaxHealth() {
@@ -560,10 +692,10 @@ export class PlayerCharacter extends Character {
   }
 
   public restoreSanity(amount: number) {
-    if (this.sanity + amount < 50) {
+    if (this.sanity + amount < this.sanityMax) {
       this.sanity += amount;
     } else {
-      this.sanity = 50;
+      this.sanity = this.sanityMax;
     }
   }
 
@@ -581,7 +713,7 @@ export class PlayerCharacter extends Character {
   }
 
   public getMaxSanity() {
-    let withGearBuffs = 50;
+    let withGearBuffs = this.sanityMax;
     withGearBuffs += this.equipment.mainHand.stats?.sanity ?? 0;
     withGearBuffs += this.equipment.offHand?.stats?.sanity ?? 0;
     withGearBuffs += this.equipment.body?.stats?.sanity ?? 0;
@@ -1257,6 +1389,7 @@ export class PlayerCharacter extends Character {
       } else if (chosenAttack.flatHealthDamage) {
         damagePreDR = chosenAttack.flatHealthDamage;
       }
+      damagePreDR += this.attackPower / 10;
       let damage = damagePreDR * (1 - enemyDR);
       damage *= damageMult; // from conditions
       damage += damageFlat; // from conditions
@@ -1577,6 +1710,9 @@ export class PlayerCharacter extends Character {
           )
         : undefined,
       savedEnemy: json.savedEnemy ? Enemy.fromJSON(json.savedEnemy) : null,
+      unAllocatedSkillPoints: json.unAllocatedSkillPoints,
+      allocatedSkillPoints: json.allocatedSkillPoints,
+      attackPower: json.attackPower,
     });
     return player;
   }

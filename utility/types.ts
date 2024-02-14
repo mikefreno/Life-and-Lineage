@@ -133,3 +133,9 @@ export type GoodOutcome = {
   name: string;
   effect: { gold?: number; healthRestore?: number; sanityRestore?: number };
 };
+export enum SkillPoint {
+  Health,
+  Mana,
+  Sanity,
+  AttackPower,
+}

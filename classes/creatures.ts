@@ -316,6 +316,9 @@ export class Creature {
         (monster) => monster.name == this.creatureSpecies,
       );
     }
+    if (!enemyObj) {
+      enemyObj = enemies.find((monster) => monster.name == "generic npc");
+    }
     if (enemyObj) {
       const dropList = enemyObj.drops;
       const gold = getRandomInt(

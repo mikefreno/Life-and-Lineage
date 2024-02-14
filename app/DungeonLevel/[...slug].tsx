@@ -106,7 +106,7 @@ const DungeonLevelScreen = observer(() => {
   //------------dungeon/Enemy state setting---------//
   useEffect(() => {
     setInstanceName(slug[0]);
-    if (slug[0] !== "Activities") {
+    if (slug[0] !== "Activities" && slug[0] !== "Personal") {
       setLevel(Number(slug[1]));
     } else {
       setEnemyAttacked(true);
@@ -137,7 +137,7 @@ const DungeonLevelScreen = observer(() => {
   }, [enemyState?.health]);
 
   useEffect(() => {
-    if (slug[0] == "Activities") {
+    if (slug[0] == "Activities" || slug[0] == "Personal") {
       const tempDungeon = new DungeonLevel({
         level: 0,
         bosses: [],
@@ -234,6 +234,15 @@ const DungeonLevelScreen = observer(() => {
           setDroppedItems(drops);
           setEnemy(null);
           gameState.gameTick(playerState);
+        } else if (slug[0] == "Personal") {
+          const drops = enemyState.getDrops(
+            playerState.playerClass,
+            fightingBoss,
+          );
+          playerState.addGold(drops.gold);
+          setDroppedItems(drops);
+          setEnemy(null);
+          gameState.gameTick(playerState);
         } else {
           if (thisDungeon?.level != 0) {
             thisDungeon?.incrementStep();
@@ -251,6 +260,7 @@ const DungeonLevelScreen = observer(() => {
             setFightingBoss(false);
             thisDungeon.setBossDefeated();
             gameState.openNextDungeonLevel(thisInstance!.name);
+            playerState.bossDefeated();
           }
           setEnemy(null);
           gameState.gameTick(playerState);
@@ -359,41 +369,44 @@ const DungeonLevelScreen = observer(() => {
       if (enemyState.minions.length > 0) {
         enemyMinionsTurn(enemyState.minions);
       }
-      if (
-        enemyState.health <= 0 ||
-        (enemyState.sanity && enemyState.sanity <= 0)
-      ) {
-        if (slug[0] == "Activities") {
-          const drops = enemyState.getDrops(
-            playerState.playerClass,
-            fightingBoss,
-          );
-          playerState.addGold(drops.gold);
-          setDroppedItems(drops);
-          setEnemy(null);
-          gameState.gameTick(playerState);
-        } else {
-          if (thisDungeon?.level != 0) {
-            thisDungeon?.incrementStep();
+      setTimeout(() => {
+        if (
+          enemyState.health <= 0 ||
+          (enemyState.sanity && enemyState.sanity <= 0)
+        ) {
+          if (slug[0] == "Activities") {
+            const drops = enemyState.getDrops(
+              playerState.playerClass,
+              fightingBoss,
+            );
+            playerState.addGold(drops.gold);
+            setDroppedItems(drops);
+            setEnemy(null);
+            gameState.gameTick(playerState);
+          } else {
+            if (thisDungeon?.level != 0) {
+              thisDungeon?.incrementStep();
+            }
+            battleLogger(
+              `You defeated the ${toTitleCase(enemyState.creatureSpecies)}`,
+            );
+            const drops = enemyState.getDrops(
+              playerState.playerClass,
+              fightingBoss,
+            );
+            playerState.addGold(drops.gold);
+            setDroppedItems(drops);
+            if (fightingBoss && gameState && thisDungeon) {
+              setFightingBoss(false);
+              playerState.bossDefeated();
+              thisDungeon.setBossDefeated();
+              gameState.openNextDungeonLevel(thisInstance!.name);
+            }
+            setEnemy(null);
+            gameState.gameTick(playerState);
           }
-          battleLogger(
-            `You defeated the ${toTitleCase(enemyState.creatureSpecies)}`,
-          );
-          const drops = enemyState.getDrops(
-            playerState.playerClass,
-            fightingBoss,
-          );
-          playerState.addGold(drops.gold);
-          setDroppedItems(drops);
-          if (fightingBoss && gameState && thisDungeon) {
-            setFightingBoss(false);
-            thisDungeon.setBossDefeated();
-            gameState.openNextDungeonLevel(thisInstance!.name);
-          }
-          setEnemy(null);
-          gameState.gameTick(playerState);
         }
-      }
+      }, 1000);
     }
   };
 
@@ -1102,19 +1115,6 @@ const DungeonLevelScreen = observer(() => {
               >
                 <Text className="text-center text-xl">Log</Text>
               </Pressable>
-              {playerState.minions.length > 0
-                ? playerState.minions.map((minion) => (
-                    <View key={minion.id} className="py-1">
-                      <Text>{toTitleCase(minion.creatureSpecies)}</Text>
-                      <ProgressBar
-                        filledColor="#ef4444"
-                        unfilledColor="#fee2e2"
-                        value={minion.health}
-                        maxValue={minion.healthMax}
-                      />
-                    </View>
-                  ))
-                : null}
             </View>
           </View>
         </View>
@@ -1563,6 +1563,29 @@ const DungeonLevelScreen = observer(() => {
                 addItemToPouch={addItemToPouch}
               />
             </View>
+            {playerState.minions.length > 0 ? (
+              <View className="flex flex-row flex-wrap justify-evenly">
+                {playerState.minions.map((minion, index) => (
+                  <View
+                    key={minion.id}
+                    className={`${
+                      index == playerState.minions.length - 1 &&
+                      playerState.minions.length % 2 !== 0
+                        ? "w-full"
+                        : "w-2/5"
+                    } py-1`}
+                  >
+                    <Text>{toTitleCase(minion.creatureSpecies)}</Text>
+                    <ProgressBar
+                      filledColor="#ef4444"
+                      unfilledColor="#fee2e2"
+                      value={minion.health}
+                      maxValue={minion.healthMax}
+                    />
+                  </View>
+                ))}
+              </View>
+            ) : null}
             <View className="flex w-full flex-row justify-around">
               <Pressable
                 className={`py-4 w-32 mx-2 rounded ${
@@ -1603,19 +1626,6 @@ const DungeonLevelScreen = observer(() => {
               >
                 <Text className="text-center text-xl">Log</Text>
               </Pressable>
-              {playerState.minions.length > 0
-                ? playerState.minions.map((minion) => (
-                    <View key={minion.id} className="py-1">
-                      <Text>{toTitleCase(minion.creatureSpecies)}</Text>
-                      <ProgressBar
-                        filledColor="#ef4444"
-                        unfilledColor="#fee2e2"
-                        value={minion.health}
-                        maxValue={minion.healthMax}
-                      />
-                    </View>
-                  ))
-                : null}
             </View>
           </View>
         </View>

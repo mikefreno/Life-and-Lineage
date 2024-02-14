@@ -18,6 +18,7 @@ import GenericStrikeAround from "./GenericStrikeAround";
 import { useVibration } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
 import { Enemy } from "../classes/creatures";
+import { useRouter } from "expo-router";
 
 interface CharacterInteractionModal {
   character: Character | null;
@@ -42,6 +43,7 @@ export const CharacterInteractionModal = observer(
     const { gameState } = gameContext;
     const [showAssaultWarning, setShowAssaultWarning] =
       useState<boolean>(false);
+    const router = useRouter();
 
     const { setEnemy } = enemyContext;
     const vibration = useVibration();
@@ -51,7 +53,7 @@ export const CharacterInteractionModal = observer(
         : 0;
 
     function setFight() {
-      if (character) {
+      if (character && playerState && gameState) {
         const enemy = new Enemy({
           creatureSpecies: character.getFullName(),
           health: 75 - characterAge / 5,
@@ -65,14 +67,15 @@ export const CharacterInteractionModal = observer(
           energyRegen: 10,
           attacks: ["stab"],
         });
-        setEnemy(enemy);
-        console.log(enemy);
-        playerState?.setInDungeon({
+        playerState.setInDungeon({
           state: true,
-          instance: "Activities",
+          instance: "Personal",
           level: "Personal Assault",
         });
-        playerState?.setSavedEnemy(enemy);
+        setEnemy(enemy);
+        playerState.setSavedEnemy(enemy);
+        gameState.gameTick(playerState);
+        router.push(`/DungeonLevel/Personal/Personal\ Assault`);
       }
     }
 
@@ -125,6 +128,7 @@ export const CharacterInteractionModal = observer(
                         onPressFunction={() => {
                           vibration({ style: "light" });
                           character.updateAffection(5);
+                          gameState.gameTick(playerState);
                         }}
                       />
                       <GenericFlatButton
@@ -140,6 +144,7 @@ export const CharacterInteractionModal = observer(
                         onPressFunction={() => {
                           vibration({ style: "light" });
                           character.updateAffection(-10);
+                          gameState.gameTick(playerState);
                         }}
                       />
                     </View>
@@ -164,7 +169,10 @@ export const CharacterInteractionModal = observer(
                         onPressFunction={() => {
                           vibration({ style: "light" });
                           character.updateAffection(5);
-                          playerState?.addNewKnownCharacter(character);
+                          if (playerState && gameState) {
+                            playerState.addNewKnownCharacter(character);
+                            gameState.gameTick(playerState);
+                          }
                         }}
                       />
                       <GenericFlatButton
@@ -172,7 +180,10 @@ export const CharacterInteractionModal = observer(
                         onPressFunction={() => {
                           vibration({ style: "light" });
                           character.updateAffection(-5);
-                          playerState?.addNewKnownCharacter(character);
+                          if (playerState && gameState) {
+                            playerState.addNewKnownCharacter(character);
+                            gameState.gameTick(playerState);
+                          }
                         }}
                       />
                     </View>
