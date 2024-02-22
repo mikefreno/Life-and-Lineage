@@ -284,7 +284,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                     <ClockIcon width={18} height={18} />
                   </View>
                 </View>
-                <View className="flex flex-row justify-center">
+                <View className="flex flex-row flex-wrap justify-center">
                   <Text>{toTitleCase(condition.name)}:</Text>
                   {condition.healthDamage && (
                     <View className="flex flex-row items-center">
@@ -658,6 +658,11 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                     <Text>{readableGold}</Text>
                     <Coins width={16} height={16} style={{ marginLeft: 6 }} />
                     {showingGoldChange ? goldChangePopUp() : null}
+                    {playerState.unAllocatedSkillPoints > 0 && (
+                      <View className="px-1">
+                        <SquarePlus height={16} width={16} />
+                      </View>
+                    )}
                   </View>
                 )}
                 <View className="mx-auto">{conditionRenderer()}</View>
