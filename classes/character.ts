@@ -450,6 +450,7 @@ export class PlayerCharacter extends Character {
       attackPower: observable,
       getMaxHealth: action,
       damageHealth: action,
+      calculateBaseAttackDamage: action,
       getSpecifiedQualificationProgress: action,
       getMaxMana: action,
       damageSanity: action,
@@ -1353,6 +1354,22 @@ export class PlayerCharacter extends Character {
     this.conditionTicker();
   }
 
+  public calculateBaseAttackDamage(attack: AttackObj) {
+    let damagePreDR: number = 0;
+    if (attack.damageMult) {
+      damagePreDR =
+        attack.damageMult * (this.equipment.mainHand?.stats?.["damage"] ?? 1);
+      const offHandDamage = this.equipment.offHand?.stats?.["damage"];
+      if (offHandDamage) {
+        damagePreDR += offHandDamage * 0.5 * attack.damageMult;
+      }
+    } else if (attack.flatHealthDamage) {
+      damagePreDR = attack.flatHealthDamage;
+    }
+    damagePreDR += this.attackPower / 10;
+    return damagePreDR;
+  }
+
   public doPhysicalAttack({
     chosenAttack,
     enemyMaxSanity,
@@ -1368,20 +1385,8 @@ export class PlayerCharacter extends Character {
       rollToHit = 0;
     }
     const roll = rollD20();
-    let damagePreDR: number = 0;
     if (roll >= rollToHit) {
-      if (chosenAttack.damageMult) {
-        damagePreDR =
-          chosenAttack.damageMult *
-          (this.equipment.mainHand?.stats?.["damage"] ?? 1);
-        const offHandDamage = this.equipment.offHand?.stats?.["damage"];
-        if (offHandDamage) {
-          damagePreDR += offHandDamage * 0.5 * chosenAttack.damageMult;
-        }
-      } else if (chosenAttack.flatHealthDamage) {
-        damagePreDR = chosenAttack.flatHealthDamage;
-      }
-      damagePreDR += this.attackPower / 10;
+      let damagePreDR = this.calculateBaseAttackDamage(chosenAttack);
       let damage = damagePreDR * (1 - enemyDR);
       damage *= damageMult; // from conditions
       damage += damageFlat; // from conditions

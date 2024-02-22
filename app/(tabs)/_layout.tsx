@@ -49,8 +49,8 @@ export default function TabLayout() {
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
-                      ? "light"
-                      : "dark"
+                      ? "systemMaterial"
+                      : "systemMaterialDark"
                     : "default"
                 }
                 intensity={100}
@@ -91,8 +91,8 @@ export default function TabLayout() {
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
-                      ? "light"
-                      : "dark"
+                      ? "systemMaterial"
+                      : "systemMaterialDark"
                     : "default"
                 }
                 intensity={100}
@@ -167,8 +167,8 @@ export default function TabLayout() {
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
-                      ? "light"
-                      : "dark"
+                      ? "systemMaterial"
+                      : "systemMaterialDark"
                     : "default"
                 }
                 intensity={100}
@@ -217,8 +217,8 @@ export default function TabLayout() {
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
-                      ? "light"
-                      : "dark"
+                      ? "systemMaterial"
+                      : "systemMaterialDark"
                     : "default"
                 }
                 intensity={100}
@@ -285,8 +285,8 @@ export default function TabLayout() {
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
-                      ? "light"
-                      : "dark"
+                      ? "systemMaterial"
+                      : "systemMaterialDark"
                     : "default"
                 }
                 intensity={100}
@@ -331,8 +331,8 @@ export default function TabLayout() {
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
-                      ? "light"
-                      : "dark"
+                      ? "systemMaterial"
+                      : "systemMaterialDark"
                     : "default"
                 }
                 intensity={100}
@@ -377,8 +377,8 @@ export default function TabLayout() {
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
-                      ? "light"
-                      : "dark"
+                      ? "systemMaterial"
+                      : "systemMaterialDark"
                     : "default"
                 }
                 intensity={100}

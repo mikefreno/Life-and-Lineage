@@ -27,7 +27,6 @@ import SquarePlus from "../assets/icons/SquarePlus";
 import { useVibration } from "../utility/customHooks";
 import SquareMinus from "../assets/icons/SquareMinus";
 import RotateArrow from "../assets/icons/RotateArrow";
-import { SkillPoint } from "../utility/types";
 
 interface PlayerStatus {
   hideGold?: boolean;
@@ -634,8 +633,8 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
             tint={
               Platform.OS == "android"
                 ? colorScheme == "light"
-                  ? "light"
-                  : "dark"
+                  ? "systemMaterial"
+                  : "systemMaterialDark"
                 : "default"
             }
             intensity={100}
