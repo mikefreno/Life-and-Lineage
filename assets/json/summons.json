@@ -1,6 +1,7 @@
 [ 
    {
       "name": "flying skull",
+      "beingType": "undead",
       "health": 20,
       "attackPower": 3,
       "attacks": ["head slam"],
@@ -8,6 +9,7 @@
    },
    {
       "name": "skeleton",
+      "beingType": "undead",
       "health": 40,
       "attackPower": 5,
       "attacks": ["stab", "cleave"],

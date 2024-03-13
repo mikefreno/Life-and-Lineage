@@ -17,7 +17,7 @@ import { autorun } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
-import { debounce } from "lodash";
+import { throttle } from "lodash";
 import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
 
@@ -68,7 +68,7 @@ export const LogsContext = createContext<
 
 Sentry.init({
   dsn: "https://2cff54f8aeb50bcb7151c159cc40fe1b@o4506630160187392.ingest.sentry.io/4506630163398656",
-  debug: false, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
+  debug: process.env.NODE_ENV === "development", // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
 });
 
 const Root = observer(() => {
@@ -107,12 +107,14 @@ const Root = observer(() => {
     getData();
   }, []);
 
-  const debouncedFullSave = debounce(fullSave, 500);
+  const throttledFullSave = throttle(fullSave, 1500, {
+    leading: true,
+    trailing: false,
+  });
 
   autorun(() => {
     if (gameState && playerState) {
-      debouncedFullSave(gameState, playerState);
-      debouncedFullSave.flush();
+      throttledFullSave(gameState, playerState);
     }
   });
 

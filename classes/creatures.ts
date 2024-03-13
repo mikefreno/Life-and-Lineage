@@ -38,6 +38,7 @@ import { getRandomInt } from "../utility/functions/misc/words";
 
 type CreatureType = {
   id?: string;
+  beingType: string;
   creatureSpecies: string;
   health: number;
   healthMax: number;
@@ -59,8 +60,24 @@ type MinionType = CreatureType & {
   turnsLeftAlive: number;
 };
 
+interface attackProps {
+  playerMaxHealth: number;
+  playerMaxSanity: number | null;
+  playerDR: number;
+  playerConditions: Condition[];
+  chosenAttack: AttackObj;
+}
+
+interface takeTurnProps {
+  defenderMaxHealth: number;
+  defenderMaxSanity: number | null;
+  defenderDR: number;
+  defenderConditions: Condition[];
+}
+
 export class Creature {
   readonly id: string;
+  readonly beingType: string;
   readonly creatureSpecies: string;
   health: number;
   readonly healthMax: number;
@@ -76,6 +93,7 @@ export class Creature {
 
   constructor({
     id,
+    beingType,
     creatureSpecies,
     health,
     healthMax,
@@ -90,6 +108,7 @@ export class Creature {
     conditions,
   }: CreatureType) {
     this.id = id ?? Crypto.randomUUID();
+    this.beingType = beingType;
     this.creatureSpecies = creatureSpecies;
     this.health = health;
     this.sanity = sanity ?? null;
@@ -191,10 +210,14 @@ export class Creature {
   }
 
   public conditionTicker() {
+    let undeadDeathCheck = -1;
     for (let i = this.conditions.length - 1; i >= 0; i--) {
       const { effect, healthDamage, sanityDamage, turns } =
         this.conditions[i].tick();
 
+      if (effect.includes("destroy undead")) {
+        undeadDeathCheck = this.conditions[i].effectMagnitude ?? 0;
+      }
       if (sanityDamage) {
         this.damageSanity(sanityDamage);
       }
@@ -205,17 +228,25 @@ export class Creature {
         this.conditions.splice(i, 1);
       }
     }
+    if (this.health <= undeadDeathCheck) {
+      this.health = 0;
+    }
   }
 
-  public attack(
-    playerMaxHealth: number,
-    playerMaxSanity: number | null,
-    playerDR: number,
-    chosenAttack: AttackObj,
-  ) {
+  public attack({
+    playerDR,
+    playerMaxHealth,
+    playerMaxSanity,
+    playerConditions,
+    chosenAttack,
+  }: attackProps) {
     let rollToHit: number;
     const { hitChanceMultiplier, damageMult, damageFlat } =
-      getConditionEffectsOnAttacks(this.conditions);
+      getConditionEffectsOnAttacks({
+        selfConditions: this.conditions,
+        enemyConditions: playerConditions,
+        beingType: this.beingType,
+      });
     if (chosenAttack.hitChance) {
       rollToHit = 20 - (chosenAttack.hitChance * 100 * hitChanceMultiplier) / 5;
     } else {
@@ -229,11 +260,9 @@ export class Creature {
       } else if (chosenAttack.flatHealthDamage) {
         damagePreDR = chosenAttack.flatHealthDamage;
       }
-
       if (chosenAttack.selfDamage) {
         this.damageHealth(chosenAttack.selfDamage);
       }
-
       let damage = damagePreDR * (1 - playerDR);
       damage *= damageMult; // from conditions
       damage += damageFlat; // from conditions
@@ -376,6 +405,7 @@ export class Enemy extends Creature {
   minions: Minion[];
   constructor({
     id,
+    beingType,
     creatureSpecies,
     health,
     healthMax,
@@ -392,6 +422,7 @@ export class Enemy extends Creature {
   }: EnemyType) {
     super({
       id,
+      beingType,
       creatureSpecies,
       health,
       healthMax,
@@ -418,6 +449,7 @@ export class Enemy extends Creature {
     defenderMaxHealth,
     defenderMaxSanity,
     defenderDR,
+    defenderConditions,
   }: takeTurnProps) {
     const { isStunned } = getConditionEffectsOnMisc(this.conditions);
     if (isStunned) {
@@ -442,6 +474,7 @@ export class Enemy extends Creature {
             );
             if (summonObj) {
               const newMinion = new Minion({
+                beingType: summonObj.beingType,
                 creatureSpecies: summonObj.name,
                 health: summonObj.health,
                 healthMax: summonObj.health,
@@ -485,6 +518,7 @@ export class Enemy extends Creature {
   public static fromJSON(json: any): Enemy {
     return new Enemy({
       id: json.id,
+      beingType: json.beingType,
       creatureSpecies: json.creatureSpecies,
       health: json.health,
       healthMax: json.healthMax,
@@ -508,6 +542,7 @@ export class Minion extends Creature {
 
   constructor({
     id,
+    beingType,
     creatureSpecies,
     health,
     healthMax,
@@ -524,6 +559,7 @@ export class Minion extends Creature {
   }: MinionType) {
     super({
       id,
+      beingType,
       creatureSpecies,
       health,
       healthMax,
@@ -589,6 +625,7 @@ export class Minion extends Creature {
   public static fromJSON(json: any): Minion {
     return new Minion({
       id: json.id,
+      beingType: json.beingType,
       creatureSpecies: json.creatureSpecies,
       health: json.health,
       healthMax: json.healthMax,
@@ -658,10 +695,4 @@ function itemList(
     default:
       throw new Error("invalid itemType");
   }
-}
-
-interface takeTurnProps {
-  defenderMaxHealth: number;
-  defenderMaxSanity: number | null;
-  defenderDR: number;
 }

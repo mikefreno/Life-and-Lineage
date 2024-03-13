@@ -26,6 +26,10 @@ interface ConditionOptions {
     | "armor decrease"
     | "weaken"
     | "strengthen"
+    | "destroy undead"
+    | "undead cower"
+    | "blur"
+    | "thorns"
   )[];
   effectStyle: "flat" | "multiplier" | null;
   effectMagnitude: number | null;
@@ -61,6 +65,10 @@ export class Condition {
     | "armor decrease"
     | "weaken"
     | "strengthen"
+    | "destroy undead"
+    | "undead cower"
+    | "blur"
+    | "thorns"
   )[];
   readonly healthDamage: number | null;
   readonly sanityDamage: number | null;

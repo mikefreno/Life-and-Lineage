@@ -99,12 +99,39 @@
       "icon": "scarecrow"
    },
    {
+      "name": "undead cower",
+      "style": "debuff",
+      "turns": 5,
+      "effect": ["undead cower"],
+      "effectStyle": "multiplier",
+      "effectAmount": 0.5,
+      "icon": "scarecrow"
+   },
+   {
+      "name": "revoke undead",
+      "style": "debuff",
+      "turns": 1,
+      "effect": ["destroy undead"],
+      "effectStyle": "flat",
+      "effectAmount": 100,
+      "icon": "scarecrow"
+   },
+   {
       "name": "lasting heal",
       "style": "buff",
       "turns": 5,
       "effect": ["heal"],
       "effectStyle": "flat",
       "effectAmount": 25,
+      "icon": "holding_heart"
+   },
+   {
+      "name": "delayed heal",
+      "style": "buff",
+      "turns": 2,
+      "effect": ["heal"],
+      "effectStyle": "flat",
+      "effectAmount": 100,
       "icon": "holding_heart"
    },
    {
@@ -162,6 +189,24 @@
       "icon": "glow_star"
    },
    {
+      "name": "quickened mind",
+      "style": "buff",
+      "turns": 10,
+      "effect": ["mana regen"],
+      "effectStyle": "flat",
+      "effectAmount": 5,
+      "icon": "glow_star"
+   },
+   {
+      "name": "greater quickened mind",
+      "style": "buff",
+      "turns": 10,
+      "effect": ["mana regen"],
+      "effectStyle": "flat",
+      "effectAmount": 50,
+      "icon": "glow_star"
+   },
+   {
       "name": "dulled mind",
       "style": "debuff",
       "turns": 5,
@@ -177,6 +222,33 @@
       "effect": ["sanity heal"],
       "effectStyle": "flat",
       "effectAmount": 10,
+      "icon": "pray_hands"
+   },
+   {
+      "name": "overwhelming glow",
+      "style": "buff",
+      "turns": 5,
+      "effect": ["blur"],
+      "effectStyle": "multiplier",
+      "effectAmount": 0.75,
+      "icon": "pray_hands"
+   },
+   {
+      "name": "unending cure",
+      "style": "buff",
+      "turns": 15,
+      "effect": ["blur"],
+      "effectStyle": "flat",
+      "effectAmount": 50,
+      "icon": "pray_hands"
+   },
+   {
+      "name": "bulwark",
+      "style": "buff",
+      "turns": 10,
+      "effect": ["thorns"],
+      "effectStyle": "flat",
+      "effectAmount": 5,
       "icon": "pray_hands"
    }
 ]

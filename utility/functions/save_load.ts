@@ -36,6 +36,7 @@ export const fullSave = async (
 ) => {
   if (game && player) {
     try {
+      console.log("saving");
       const jsonGame = JSON.stringify(game);
       const jsonPlayer = JSON.stringify(player);
       await Promise.all([

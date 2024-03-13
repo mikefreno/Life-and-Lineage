@@ -24,9 +24,6 @@ export default function InvestingScreen() {
     useState<boolean>(
       (gameState && !gameState.getTutorialState("investing")) ?? false,
     );
-  const [tutorialState, setTutorialState] = useState<boolean>(
-    gameState?.tutorialsEnabled ?? true,
-  );
   const isFocused = useIsFocused();
   const { colorScheme } = useColorScheme();
 
@@ -37,24 +34,10 @@ export default function InvestingScreen() {
   }, [showInvestingTutorial]);
 
   useEffect(() => {
-    setTutorialState(gameState?.tutorialsEnabled ?? true);
-  }, [gameState?.tutorialsEnabled]);
-
-  useEffect(() => {
     setShowingInvestingTutorial(
       (gameState && !gameState.getTutorialState("investing")) ?? false,
     );
   }, [gameState?.tutorialsShown]);
-
-  useEffect(() => {
-    if (gameState) {
-      if (tutorialState == false) {
-        gameState.disableTutorials();
-      } else {
-        gameState.enableTutorials();
-      }
-    }
-  }, [tutorialState]);
 
   return (
     <>

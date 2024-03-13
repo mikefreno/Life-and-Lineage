@@ -176,12 +176,20 @@ export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
     }
   }
 }
-
-export function getConditionEffectsOnAttacks(suppliedConditions: Condition[]) {
+interface getConditionEffectsOnAttacksProps {
+  selfConditions: Condition[];
+  enemyConditions: Condition[];
+  beingType?: string;
+}
+export function getConditionEffectsOnAttacks({
+  selfConditions,
+  enemyConditions,
+  beingType,
+}: getConditionEffectsOnAttacksProps) {
   let hitChanceMultiplier = 1;
   let damageMult = 1;
   let damageFlat = 0;
-  suppliedConditions.forEach((condition) => {
+  selfConditions.forEach((condition) => {
     if (
       condition.effect.includes("accuracy reduction") &&
       condition.effectMagnitude
@@ -203,6 +211,15 @@ export function getConditionEffectsOnAttacks(suppliedConditions: Condition[]) {
       } else if (condition.effectStyle == "multiplier") {
         damageMult *= 1 - condition.effectMagnitude;
       }
+    }
+    if (condition.name === "undead cower" && beingType === "undead") {
+      hitChanceMultiplier *= 0.5;
+      damageMult *= 0.5;
+    }
+  });
+  enemyConditions.forEach((condition) => {
+    if (condition.effect.includes("blur")) {
+      hitChanceMultiplier *= condition.effectMagnitude ?? 1;
     }
   });
   return {

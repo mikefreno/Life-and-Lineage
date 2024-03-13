@@ -7,6 +7,62 @@
       "baseValue": 2500
    },
    {
+      "name": "book of rejuvenating light",
+      "type": "spell",
+      "teaches": "rejuvenating light",
+      "icon": "Book",
+      "baseValue": 5000
+   },
+   {
+      "name": "book of turn undead",
+      "type": "spell",
+      "teaches": "turn undead",
+      "icon": "Book",
+      "baseValue": 20000
+   },
+   {
+      "name": "book of delayed heal",
+      "type": "spell",
+      "teaches": "delayed heal",
+      "icon": "Book",
+      "baseValue": 50000
+   },
+   {
+      "name": "book of moderate heal",
+      "type": "spell",
+      "teaches": "delayed heal",
+      "icon": "Book_2",
+      "baseValue": 75000
+   },
+   {
+      "name": "book of revoke undead",
+      "type": "spell",
+      "teaches": "delayed heal",
+      "icon": "Book_2",
+      "baseValue": 100000
+   },
+   {
+      "name": "book of great rejuvenating light",
+      "type": "spell",
+      "teaches": "delayed heal",
+      "icon": "Book_2",
+      "baseValue": 200000
+   },
+   {
+      "name": "book of overwhelming glow",
+      "type": "spell",
+      "teaches": "delayed heal",
+      "icon": "Book_3",
+      "baseValue": 500000
+   },
+   {
+      "name": "book of unending cure",
+      "type": "spell",
+      "teaches": "delayed heal",
+      "icon": "Book_3",
+      "baseValue": 1000000
+   },
+   {
       "name": "book of judgment",
       "type": "spell",
       "teaches": "judgment",

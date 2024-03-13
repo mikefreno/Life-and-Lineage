@@ -193,7 +193,7 @@ export default function LearningKnowledgeScreen() {
                       );
                       vibration({ style: "light" });
                     }}
-                    text={"Continue Studying"}
+                    text={"Continue\nStudying"}
                   />
                 </View>
               ))}

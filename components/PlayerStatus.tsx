@@ -633,8 +633,8 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
             tint={
               Platform.OS == "android"
                 ? colorScheme == "light"
-                  ? "systemMaterial"
-                  : "systemMaterialDark"
+                  ? "light"
+                  : "dark"
                 : "default"
             }
             intensity={100}

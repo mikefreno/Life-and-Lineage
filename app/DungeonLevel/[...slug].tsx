@@ -279,6 +279,7 @@ const DungeonLevelScreen = observer(() => {
         defenderMaxHealth: playerState.getNonBuffedMaxHealth(),
         defenderMaxSanity: playerState.getNonBuffedMaxSanity(),
         defenderDR: playerState.getDamageReduction(),
+        defenderConditions: playerState.conditions,
       });
       if (
         enemyAttackRes !== "miss" &&
@@ -1077,7 +1078,7 @@ const DungeonLevelScreen = observer(() => {
             </View>
             <View className="flex w-full flex-row justify-around">
               <Pressable
-                className={`py-4 w-32 mx-2 rounded ${
+                className={`mx-2 w-32 rounded py-4 ${
                   battleTab == "attacks"
                     ? "bg-zinc-100 dark:bg-zinc-800"
                     : "active:bg-zinc-200 dark:active:bg-zinc-700"
@@ -1090,7 +1091,7 @@ const DungeonLevelScreen = observer(() => {
                 <Text className="text-center text-xl">Attacks</Text>
               </Pressable>
               <Pressable
-                className={`py-4 w-32 mx-2 rounded ${
+                className={`mx-2 w-32 rounded py-4 ${
                   battleTab == "equipment"
                     ? "border-zinc-200 bg-zinc-100 dark:border-zinc-900 dark:bg-zinc-800"
                     : "active:bg-zinc-200 dark:active:bg-zinc-700"
@@ -1103,7 +1104,7 @@ const DungeonLevelScreen = observer(() => {
                 <Text className="text-center text-xl">Equipment</Text>
               </Pressable>
               <Pressable
-                className={`py-4 w-32 mx-2 rounded align ${
+                className={`align mx-2 w-32 rounded py-4 ${
                   battleTab == "log"
                     ? "bg-zinc-100 dark:bg-zinc-800"
                     : "active:bg-zinc-200 dark:active:bg-zinc-700"
@@ -1588,7 +1589,7 @@ const DungeonLevelScreen = observer(() => {
             ) : null}
             <View className="flex w-full flex-row justify-around">
               <Pressable
-                className={`py-4 w-32 mx-2 rounded ${
+                className={`mx-2 w-32 rounded py-4 ${
                   battleTab == "attacks"
                     ? "bg-zinc-100 dark:bg-zinc-800"
                     : "active:bg-zinc-200 dark:active:bg-zinc-700"
@@ -1601,7 +1602,7 @@ const DungeonLevelScreen = observer(() => {
                 <Text className="text-center text-xl">Attacks</Text>
               </Pressable>
               <Pressable
-                className={`py-4 w-32 mx-2 rounded ${
+                className={`mx-2 w-32 rounded py-4 ${
                   battleTab == "equipment"
                     ? "border-zinc-200 bg-zinc-100 dark:border-zinc-900 dark:bg-zinc-800"
                     : "active:bg-zinc-200 dark:active:bg-zinc-700"
@@ -1614,7 +1615,7 @@ const DungeonLevelScreen = observer(() => {
                 <Text className="text-center text-xl">Equipment</Text>
               </Pressable>
               <Pressable
-                className={`py-4 w-32 mx-2 rounded align ${
+                className={`align mx-2 w-32 rounded py-4 ${
                   battleTab == "log"
                     ? "bg-zinc-100 dark:bg-zinc-800"
                     : "active:bg-zinc-200 dark:active:bg-zinc-700"

@@ -12,6 +12,95 @@
     }
   },
   {
+    "name": "rejuvenating light",
+    "element": "holy",
+    "proficiencyNeeded": 50,
+    "manaCost": 20,
+    "effects": {
+      "damage": null,
+      "buffs": ["quickened mind"],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "turn undead",
+    "element": "holy",
+    "proficiencyNeeded": 100,
+    "manaCost": 50,
+    "effects": {
+      "damage": null,
+      "buffs": null,
+      "debuffs": [{"name": "undead cower", "chance": 1.0}] 
+    }
+  },
+  {
+    "name": "delayed heal",
+    "element": "holy",
+    "proficiencyNeeded": 125,
+    "manaCost": 75,
+    "effects": {
+      "damage": null,
+      "buffs": ["delayed heal"],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "moderate heal",
+    "element": "holy",
+    "proficiencyNeeded": 150,
+    "manaCost": 75,
+    "effects": {
+      "damage": null,
+      "selfDamage": -85,
+      "buffs": null,
+      "debuffs": null
+    }
+  },
+  {
+    "name": "revoke undead",
+    "element": "holy",
+    "proficiencyNeeded": 200,
+    "manaCost": 100,
+    "effects": {
+      "damage": null,
+      "buffs": null,
+      "debuffs": [{"name": "revoke undead", "chance": 1.0}] 
+    }
+  },
+  {
+    "name": "great rejuvenating light",
+    "element": "holy",
+    "proficiencyNeeded": 275,
+    "manaCost": 200,
+    "effects": {
+      "damage": null,
+      "buffs": ["greater quickened mind"],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "overwhelming glow",
+    "element": "holy",
+    "proficiencyNeeded": 350,
+    "manaCost": 200,
+    "effects": {
+      "damage": null,
+      "buffs": ["overwhelming glow"],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "unending cure",
+    "element": "holy",
+    "proficiencyNeeded": 400,
+    "manaCost": 250,
+    "effects": {
+      "damage": null,
+      "buffs": ["overwhelming glow"],
+      "debuffs": null
+    }
+  },
+  {
     "name": "judgment",
     "element": "vengeance",
     "proficiencyNeeded": 0,
@@ -30,6 +119,17 @@
     "effects": {
       "damage": null,
       "buffs": ["guard"],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "reflective bulwark",
+    "element": "protection",
+    "proficiencyNeeded": 0,
+    "manaCost": 50,
+    "effects": {
+      "damage": null,
+      "buffs": ["bulwark"],
       "debuffs": null
     }
   }

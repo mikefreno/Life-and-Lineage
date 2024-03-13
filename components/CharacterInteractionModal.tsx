@@ -8,7 +8,7 @@ import {
   GameContext,
   PlayerCharacterContext,
 } from "../app/_layout";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CharacterImage } from "./CharacterImage";
 import { calculateAge } from "../utility/functions/misc/age";
 import ProgressBar from "./ProgressBar";
@@ -19,12 +19,14 @@ import { useVibration } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
 import { Enemy } from "../classes/creatures";
 import { useRouter } from "expo-router";
+import { getDaysBetweenDates } from "../utility/functions/misc/date";
 
 interface CharacterInteractionModal {
   character: Character | null;
   closeFunction: () => void;
   secondaryRequirement?: boolean;
   backdropCloses?: boolean;
+  showGiftModal: () => void;
 }
 export const CharacterInteractionModal = observer(
   ({
@@ -32,6 +34,7 @@ export const CharacterInteractionModal = observer(
     closeFunction,
     secondaryRequirement = true,
     backdropCloses = false,
+    showGiftModal,
   }: CharacterInteractionModal) => {
     const playerContext = useContext(PlayerCharacterContext);
     const gameContext = useContext(GameContext);
@@ -43,6 +46,15 @@ export const CharacterInteractionModal = observer(
     const { gameState } = gameContext;
     const [showAssaultWarning, setShowAssaultWarning] =
       useState<boolean>(false);
+    const [dateAvailable, setDateAvailable] = useState<boolean>(
+      character?.dateCooldownStart && gameState?.date
+        ? getDaysBetweenDates(
+            new Date(character.dateCooldownStart),
+            new Date(gameState.date),
+          ) > 7
+        : true,
+    );
+
     const router = useRouter();
 
     const { setEnemy } = enemyContext;
@@ -78,6 +90,17 @@ export const CharacterInteractionModal = observer(
         router.push(`/DungeonLevel/Personal/Personal\ Assault`);
       }
     }
+
+    useEffect(() => {
+      if (character?.dateCooldownStart && gameState?.date) {
+        setDateAvailable(
+          getDaysBetweenDates(
+            new Date(character.dateCooldownStart),
+            new Date(gameState.date),
+          ) > 7,
+        );
+      }
+    }, [gameState?.date, character?.dateCooldownStart]);
 
     return (
       <GenericModal
@@ -125,24 +148,30 @@ export const CharacterInteractionModal = observer(
                     <View className="mt-2 flex flex-row justify-evenly">
                       <GenericFlatButton
                         text="Chat"
+                        disabledCondition={!dateAvailable}
                         onPressFunction={() => {
                           vibration({ style: "light" });
+                          character.setDateCooldownStart(gameState.date);
                           character.updateAffection(5);
                           gameState.gameTick(playerState);
                         }}
                       />
                       <GenericFlatButton
                         text="Give a Gift"
+                        disabledCondition={!dateAvailable}
                         onPressFunction={() => {
                           vibration({ style: "light" });
+                          showGiftModal();
                         }}
                       />
                     </View>
                     <View className="mt-2 flex flex-row justify-evenly">
                       <GenericFlatButton
                         text="Spit in Face"
+                        disabledCondition={!dateAvailable}
                         onPressFunction={() => {
                           vibration({ style: "light" });
+                          character.setDateCooldownStart(gameState.date);
                           character.updateAffection(-10);
                           gameState.gameTick(playerState);
                         }}

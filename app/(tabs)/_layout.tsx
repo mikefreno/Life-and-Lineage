@@ -49,8 +49,8 @@ export default function TabLayout() {
                 tint={
                   Platform.OS == "android"
                     ? colorScheme == "light"
-                      ? "systemMaterial"
-                      : "systemMaterialDark"
+                      ? "light"
+                      : "dark"
                     : "default"
                 }
                 intensity={100}

@@ -17,12 +17,7 @@ import summons from "../assets/json/summons.json";
 import { action, makeObservable, observable } from "mobx";
 import * as Crypto from "expo-crypto";
 import { Investment } from "./investment";
-import {
-  AttackObj,
-  InvestmentType,
-  InvestmentUpgrade,
-  SkillPoint,
-} from "../utility/types";
+import { AttackObj, InvestmentType, InvestmentUpgrade } from "../utility/types";
 import { rollD20 } from "../utility/functions/roll";
 import shops from "../assets/json/shops.json";
 import artifacts from "../assets/json/items/artifacts.json";
@@ -56,10 +51,12 @@ interface CharacterOptions {
   sexuality: "straight" | "gay" | "bisexual" | null;
   affection?: number;
   qualifications?: string[];
+  dateCooldownStart?: string;
 }
 
 export class Character {
   readonly id: string;
+  readonly beingType = "human";
   readonly firstName: string;
   readonly lastName: string;
   readonly sex: "male" | "female";
@@ -72,6 +69,7 @@ export class Character {
   sexuality: "straight" | "gay" | "bisexual" | null;
   affection: number;
   qualifications: string[];
+  dateCooldownStart?: string;
 
   constructor({
     id,
@@ -87,6 +85,7 @@ export class Character {
     fertility,
     affection,
     qualifications,
+    dateCooldownStart,
   }: CharacterOptions) {
     this.id = id ?? Crypto.randomUUID();
     this.firstName = firstName;
@@ -101,6 +100,7 @@ export class Character {
     this.fertility = fertility ?? Math.floor(Math.random() * 21);
     this.affection = affection ?? 0;
     this.qualifications = qualifications ?? [];
+    this.dateCooldownStart = dateCooldownStart;
     makeObservable(this, {
       alive: observable,
       deathdate: observable,
@@ -108,9 +108,11 @@ export class Character {
       affection: observable,
       qualifications: observable,
       isPlayerPartner: observable,
+      dateCooldownStart: observable,
       getFullName: action,
       setJob: action,
       deathRoll: action,
+      setDateCooldownStart: action,
       updateAffection: action,
     });
   }
@@ -128,6 +130,10 @@ export class Character {
 
   public setJob(job: string) {
     this.job = job;
+  }
+
+  public setDateCooldownStart(date: string) {
+    this.dateCooldownStart = date;
   }
 
   public deathRoll(gameDate: Date) {
@@ -171,6 +177,7 @@ export class Character {
       job: json.job,
       affection: json.affection,
       qualifications: json.qualifications,
+      dateCooldownStart: json.dateCooldownStart,
     });
     return character;
   }
@@ -1375,10 +1382,15 @@ export class PlayerCharacter extends Character {
     enemyMaxSanity,
     enemyMaxHP,
     enemyDR,
+    enemyConditions,
   }: playerAttackDeps) {
     let rollToHit: number;
     const { hitChanceMultiplier, damageMult, damageFlat } =
-      getConditionEffectsOnAttacks(this.conditions);
+      getConditionEffectsOnAttacks({
+        selfConditions: this.conditions,
+        enemyConditions: enemyConditions,
+        beingType: this.beingType,
+      });
     if (chosenAttack.hitChance) {
       rollToHit = 20 - (chosenAttack.hitChance * 100 * hitChanceMultiplier) / 5;
     } else {
@@ -1531,6 +1543,7 @@ export class PlayerCharacter extends Character {
       attackPower: minionObj.attackPower,
       attacks: minionObj.attacks,
       turnsLeftAlive: minionObj.turns,
+      beingType: minionObj.beingType,
     });
     this.addMinion(minion);
   }
@@ -1730,6 +1743,7 @@ interface playerAttackDeps {
   enemyMaxHP: number;
   enemyMaxSanity: number | null;
   enemyDR: number;
+  enemyConditions: Condition[];
 }
 
 interface playerSpellDeps {

@@ -1,8 +1,8 @@
-import { ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { View as ThemedView, Text } from "../components/Themed";
 import { Activity, BadOutcome, GoodOutcome } from "../utility/types";
 import { useColorScheme } from "nativewind";
-import { flipCoin } from "../utility/functions/roll";
+import { flipCoin, rollD20 } from "../utility/functions/roll";
 import { generateNewCharacter } from "../utility/functions/characterAid";
 import { useContext, useState } from "react";
 import {
@@ -53,6 +53,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   const [goodOutcome, setGoodOutcome] = useState<GoodOutcome | null>(null);
   const [showDatePartnerSelection, setShowDatePartnerSelection] =
     useState<boolean>(false);
+  const [dateDestination, setDateDestination] = useState<string>("");
 
   const vibration = useVibration();
 
@@ -139,7 +140,28 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
     }
   }
 
-  function date() {
+  function date(character: Character) {
+    if (playerState && activity.date && gameState && character) {
+      let chosenOutcome = activityRoller({
+        decreaseAffection: activity.date.decreaseAffection,
+        increaseAffection: activity.date.increaseAffection,
+      });
+      if (chosenOutcome == "increaseAffection") {
+        const range = activity.date.increaseAffectionRange;
+        const res =
+          Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
+        console.log(res);
+      } else {
+        const range = activity.date.decreaseAffectionRange;
+        const res =
+          Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
+        console.log(res);
+      }
+    }
+  }
+
+  function dateSelect(selection: string) {
+    setDateDestination(selection);
     setShowDatePartnerSelection(true);
   }
 
@@ -220,45 +242,56 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
       );
 
       return (
-        <View
-          className="mx-1 my-2 flex w-[45%] items-center rounded border border-zinc-400"
+        <Pressable
           key={character.id}
+          onPress={() => date(character)}
+          className="w-[48%]"
         >
-          <Text className="text-center text-2xl">
-            {character.getFullName()}
-          </Text>
-          <View className="mx-auto">
-            <CharacterImage
-              characterAge={characterAge}
-              characterSex={character.sex == "male" ? "M" : "F"}
-            />
-          </View>
-          <Text className="text-xl">
-            {character.deathdate && "Died at "}
-            {characterAge} Years Old
-          </Text>
-          <Text className="text-center text-xl">{character.getFullName()}</Text>
-          <View className="mx-auto">
-            <Text className="flex flex-wrap text-center text-lg">
-              {character.deathdate && "Was a "}
-              {character.job}
-            </Text>
-          </View>
-          <View className="flex w-2/3 flex-row justify-center">
-            <View className="w-3/4">
-              <ProgressBar
-                value={Math.floor(character.affection * 4) / 4}
-                minValue={-100}
-                maxValue={100}
-                filledColor="#dc2626"
-                unfilledColor="#fca5a5"
-              />
+          {({ pressed }) => (
+            <View
+              className={`${
+                pressed && "scale-95"
+              } my-2 flex w-full items-center rounded border border-zinc-400`}
+            >
+              <Text className="text-center text-2xl">
+                {character.getFullName()}
+              </Text>
+              <View className="mx-auto">
+                <CharacterImage
+                  characterAge={characterAge}
+                  characterSex={character.sex == "male" ? "M" : "F"}
+                />
+              </View>
+              <Text className="text-xl">
+                {character.deathdate && "Died at "}
+                {characterAge} Years Old
+              </Text>
+              <Text className="text-center text-xl">
+                {character.getFullName()}
+              </Text>
+              <View className="mx-auto">
+                <Text className="flex flex-wrap text-center text-lg">
+                  {character.deathdate && "Was a "}
+                  {character.job}
+                </Text>
+              </View>
+              <View className="flex w-2/3 flex-row justify-center">
+                <View className="w-3/4">
+                  <ProgressBar
+                    value={Math.floor(character.affection * 4) / 4}
+                    minValue={-100}
+                    maxValue={100}
+                    filledColor="#dc2626"
+                    unfilledColor="#fca5a5"
+                  />
+                </View>
+                <View className="my-auto ml-1">
+                  <AffectionIcon height={14} width={14} />
+                </View>
+              </View>
             </View>
-            <View className="my-auto ml-1">
-              <AffectionIcon height={14} width={14} />
-            </View>
-          </View>
-        </View>
+          )}
+        </Pressable>
       );
     }
   }
@@ -293,11 +326,11 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
         size={100}
       >
         <View className="items-center">
-          <Text className="text-center text-2xl">
-            Who would you like to take on the date?
+          <Text className="px-4 text-center text-2xl">
+            Who would you like to {dateDestination} with?
           </Text>
           {playerState && gameState && (
-            <ScrollView className=" h-4/5 w-full">
+            <ScrollView className="w-full">
               <View
                 style={{
                   paddingVertical: 12,
@@ -305,7 +338,6 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                   flexWrap: "wrap",
                   alignItems: "flex-start",
                   justifyContent: "space-between",
-                  marginHorizontal: -12,
                 }}
               >
                 {playerState
@@ -475,10 +507,13 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                 text={"Visit Alone"}
               />
             )}
-            {activity.date && (
+            {activity.date && gameState && (
               <GenericRaisedButton
-                disabledCondition={playerState?.knownCharacters.length == 0}
-                onPressFunction={date}
+                disabledCondition={
+                  playerState?.getAllAdultCharacters(new Date(gameState.date))
+                    .length == 0
+                }
+                onPressFunction={() => dateSelect(activity.name)}
                 text={"Go on Date"}
               />
             )}

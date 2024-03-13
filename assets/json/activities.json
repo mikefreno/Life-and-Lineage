@@ -1,6 +1,6 @@
 [
    {
-      "name":"walk in the enchanted forest",
+      "name":"walk in the Enchanted Forest",
       "cost": 0,
       "alone":{
          "meetingSomeone": 0.15,
@@ -35,7 +35,7 @@
       ]
    },
    {
-      "name":"go to a library",
+      "name":"go to a Library",
       "cost": 0,
       "alone":{
          "meetingSomeone": 0.40,
@@ -68,7 +68,7 @@
       ]
    },
    {
-      "name":"go to the pub",
+      "name":"go to the Pub",
       "cost": 25,
       "alone": {
          "meetingSomeone": 0.30,
@@ -102,7 +102,7 @@
       ]
    },
    {
-      "name":"go to a festival",
+      "name":"go to a Festival",
       "cost": 50,
       "alone":{
          "meetingSomeone": 0.40,
@@ -136,7 +136,7 @@
 
    },
    {
-      "name":"visit a soul-thread weaver",
+      "name":"visit a Soul-Thread Weaver",
       "cost": 250,
       "aloneCooldown": 20,
       "alone":{

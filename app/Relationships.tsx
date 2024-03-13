@@ -9,6 +9,7 @@ import ProgressBar from "../components/ProgressBar";
 import AffectionIcon from "../assets/icons/AffectionIcon";
 import { CharacterInteractionModal } from "../components/CharacterInteractionModal";
 import { Pressable } from "react-native";
+import GiftModal from "../components/GiftModal";
 
 export default function RelationshipsScreen() {
   const playerCharacterContext = useContext(PlayerCharacterContext);
@@ -21,7 +22,9 @@ export default function RelationshipsScreen() {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null,
   );
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showInteractionModal, setShowInteractionModal] =
+    useState<boolean>(false);
+  const [showingGiftModal, setShowingGiftModal] = useState<boolean>(false);
 
   const acquaintances = playerState?.knownCharacters.filter(
     (character) => character.affection < 25 && character.affection > -25,
@@ -53,7 +56,7 @@ export default function RelationshipsScreen() {
           className="flex w-1/2 items-center"
           key={character.id}
           onPress={() => {
-            setShowModal(true);
+            setShowInteractionModal(true);
             setSelectedCharacter(character);
           }}
         >
@@ -102,11 +105,20 @@ export default function RelationshipsScreen() {
         <CharacterInteractionModal
           character={selectedCharacter}
           closeFunction={() => {
-            setShowModal(false);
+            setShowInteractionModal(false);
             setTimeout(() => setSelectedCharacter(null), 500);
           }}
           backdropCloses
-          secondaryRequirement={showModal}
+          secondaryRequirement={showInteractionModal}
+          showGiftModal={() => setShowingGiftModal(true)}
+        />
+        <GiftModal
+          showing={showingGiftModal}
+          onCloseFunction={() => {
+            setShowInteractionModal(false);
+            setShowingGiftModal(false);
+          }}
+          backdropCloses
         />
         <ScrollView>
           <View

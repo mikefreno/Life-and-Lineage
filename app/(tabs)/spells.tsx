@@ -24,9 +24,6 @@ const SpellsScreen = observer(() => {
 
   const { playerState } = playerCharacterData;
   const { gameState } = gameData;
-  const [tutorialState, setTutorialState] = useState<boolean>(
-    gameState?.tutorialsEnabled ?? true,
-  );
   const [spells, setSpells] = useState(playerState?.getSpells());
   const [showSpellTutorial, setShowSpellTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("spell")) ?? false,
@@ -37,24 +34,10 @@ const SpellsScreen = observer(() => {
   }, [playerState?.knownSpells]);
 
   useEffect(() => {
-    setTutorialState(gameState?.tutorialsEnabled ?? true);
-  }, [gameState?.tutorialsEnabled]);
-
-  useEffect(() => {
     if (!showSpellTutorial && gameState) {
       gameState.updateTutorialState("spell", true);
     }
   }, [showSpellTutorial]);
-
-  useEffect(() => {
-    if (gameState) {
-      if (tutorialState == false) {
-        gameState.disableTutorials();
-      } else {
-        gameState.enableTutorials();
-      }
-    }
-  }, [tutorialState]);
 
   function magicProficiencySection(
     proficiencies:
