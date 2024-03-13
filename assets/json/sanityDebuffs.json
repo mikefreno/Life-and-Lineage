@@ -4,8 +4,8 @@
       "style": "debuff",
       "turns": 5,
       "effect": ["damage"],
-      "effectStyle": "percentage",
-      "effectAmount": 0.10,
+      "effectStyle": ["percentage"],
+      "effectAmount": [0.10],
       "icon": "split_heart"
    },
    {
@@ -13,8 +13,8 @@
       "style": "debuff",
       "turns": 3,
       "effect": ["sanity"],
-      "effectStyle": "flat",
-      "effectAmount": 5,
+      "effectStyle": ["flat"],
+      "effectAmount": [5],
       "icon": "distraught"
    },
    {

@@ -84,8 +84,9 @@ export type ConditionBase = {
     | "weaken"
     | "strengthen"
   )[];
-  effectStyle: "multiplier" | "percentage" | "flat" | null;
-  effectAmount: number | null;
+  aura?: boolean;
+  effectStyle: ("multiplier" | "percentage" | "flat" | null)[] | null;
+  effectAmount: number[] | null;
   icon: string;
 };
 export type AttackObj = {

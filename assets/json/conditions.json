@@ -22,8 +22,8 @@
       "style": "debuff",
       "turns": 3,
       "effect": ["accuracy reduction"],
-      "effectStyle": "multiplier",
-      "effectAmount": 0.25,
+      "effectStyle": ["multiplier"],
+      "effectAmount": [0.25],
       "icon": "blind"
    },
    {
@@ -31,8 +31,8 @@
       "style": "buff",
       "turns": 5,
       "effect": ["accuracy increase"],
-      "effectStyle": "multiplier",
-      "effectAmount": 0.35,
+      "effectStyle": ["multiplier"],
+      "effectAmount": [0.35],
       "icon": "eagle"
    },
    {
@@ -40,8 +40,8 @@
       "style": "debuff",
       "turns": 4,
       "effect": ["health damage"],
-      "effectStyle": "percentage",
-      "effectAmount": 0.020,
+      "effectStyle": ["percentage"],
+      "effectAmount": [0.020],
       "icon": "bleed"
    },
    {
@@ -49,8 +49,8 @@
       "style": "debuff",
       "turns": 2,
       "effect": ["health damage"],
-      "effectStyle": "percentage",
-      "effectAmount": 0.050,
+      "effectStyle": ["percentage"],
+      "effectAmount": [0.050],
       "icon": "bleed"
    },
    {
@@ -58,8 +58,8 @@
       "style": "debuff",
       "turns": 10,
       "effect": ["health damage"],
-      "effectStyle": "percentage",
-      "effectAmount": 0.010,
+      "effectStyle": ["percentage"],
+      "effectAmount": [0.025],
       "icon":"skull_and_crossbones"
    },
    {
@@ -67,8 +67,8 @@
       "style": "debuff",
       "turns": 10,
       "effect": ["health damage", "accuracy reduction"],
-      "effectStyle": "multiplier",
-      "effectAmount": 0.15,
+      "effectStyle": ["percentage", "multiplier"],
+      "effectAmount": [0.015, 0.25],
       "icon": "viruses"
    },
   {
@@ -76,8 +76,8 @@
       "style": "debuff",
       "turns": 4,
       "effect": ["health damage"],
-      "effectStyle": "multiplier",
-      "effectAmount": 0.25,
+      "effectStyle": ["multiplier"],
+      "effectAmount": [0.25],
       "icon": "flame"
    },
    {
@@ -85,8 +85,8 @@
       "style": "debuff",
       "turns": 2,
       "effect": ["weaken"],
-      "effectStyle": "multiplier",
-      "effectAmount": 0.25,
+      "effectStyle": ["multiplier"],
+      "effectAmount": [0.25],
       "icon": "snowflake"
    },
    {
@@ -94,8 +94,8 @@
       "style": "debuff",
       "turns": 5,
       "effect": ["sanity damage"],
-      "effectStyle": "flat",
-      "effectAmount": 2,
+      "effectStyle": ["flat"],
+      "effectAmount": [2],
       "icon": "scarecrow"
    },
    {
@@ -103,8 +103,8 @@
       "style": "debuff",
       "turns": 5,
       "effect": ["undead cower"],
-      "effectStyle": "multiplier",
-      "effectAmount": 0.5,
+      "effectStyle": ["multiplier"],
+      "effectAmount": [0.5],
       "icon": "scarecrow"
    },
    {
@@ -112,8 +112,8 @@
       "style": "debuff",
       "turns": 1,
       "effect": ["destroy undead"],
-      "effectStyle": "flat",
-      "effectAmount": 100,
+      "effectStyle": ["flat"],
+      "effectAmount": [100],
       "icon": "scarecrow"
    },
    {
@@ -121,8 +121,8 @@
       "style": "buff",
       "turns": 5,
       "effect": ["heal"],
-      "effectStyle": "flat",
-      "effectAmount": 25,
+      "effectStyle": ["flat"],
+      "effectAmount": [25],
       "icon": "holding_heart"
    },
    {
@@ -130,8 +130,8 @@
       "style": "buff",
       "turns": 2,
       "effect": ["heal"],
-      "effectStyle": "flat",
-      "effectAmount": 100,
+      "effectStyle": ["flat"],
+      "effectAmount": [100],
       "icon": "holding_heart"
    },
    {
@@ -139,8 +139,8 @@
       "style": "debuff",
       "turns": 5,
       "effect": ["health decrease"],
-      "effectStyle": "multiplier",
-      "effectAmount": 0.1,
+      "effectStyle": ["multiplier"],
+      "effectAmount": [0.1],
       "icon": "holding_heart"
    },
    {
@@ -157,8 +157,8 @@
       "style": "debuff",
       "turns": 4,
       "effect": ["armor decrease"],
-      "effectStyle": "multiplier",
-      "effectAmount": 0.25,
+      "effectStyle": ["multiplier"],
+      "effectAmount": [0.25],
       "icon": "shield"
    },
    {
@@ -166,8 +166,8 @@
       "style": "buff",
       "turns": 3,
       "effect": ["armor increase"],
-      "effectStyle": "multiplier",
-      "effectAmount": 0.5,
+      "effectStyle": ["multiplier"],
+      "effectAmount": [0.5],
       "icon": "shield"
    },
    {
@@ -175,8 +175,8 @@
       "style": "buff",
       "turns": 3,
       "effect": ["strengthen"],
-      "effectStyle": "multiplier",
-      "effectAmount": 0.25,
+      "effectStyle": ["multiplier"],
+      "effectAmount": [0.25],
       "icon": "anger"
    },
    {
@@ -184,8 +184,8 @@
       "style": "buff",
       "turns": 5,
       "effect": ["mana increase"],
-      "effectStyle": "multiplier",
-      "effectAmount": 0.25,
+      "effectStyle": ["multiplier"],
+      "effectAmount": [0.25],
       "icon": "glow_star"
    },
    {
@@ -193,8 +193,8 @@
       "style": "buff",
       "turns": 10,
       "effect": ["mana regen"],
-      "effectStyle": "flat",
-      "effectAmount": 5,
+      "effectStyle": ["flat"],
+      "effectAmount": [5],
       "icon": "glow_star"
    },
    {
@@ -202,8 +202,8 @@
       "style": "buff",
       "turns": 10,
       "effect": ["mana regen"],
-      "effectStyle": "flat",
-      "effectAmount": 50,
+      "effectStyle": ["flat"],
+      "effectAmount": [50],
       "icon": "glow_star"
    },
    {
@@ -211,8 +211,8 @@
       "style": "debuff",
       "turns": 5,
       "effect": ["mana decrease"],
-      "effectStyle": "multiplier",
-      "effectAmount": 0.1,
+      "effectStyle": ["multiplier"],
+      "effectAmount": [0.1],
       "icon": "hollow_disk"
    },
    {
@@ -220,8 +220,8 @@
       "style": "buff",
       "turns": 5,
       "effect": ["sanity heal"],
-      "effectStyle": "flat",
-      "effectAmount": 10,
+      "effectStyle": ["flat"],
+      "effectAmount": [10],
       "icon": "pray_hands"
    },
    {
@@ -229,8 +229,8 @@
       "style": "buff",
       "turns": 5,
       "effect": ["blur"],
-      "effectStyle": "multiplier",
-      "effectAmount": 0.75,
+      "effectStyle": ["multiplier"],
+      "effectAmount": [0.75],
       "icon": "pray_hands"
    },
    {
@@ -238,8 +238,8 @@
       "style": "buff",
       "turns": 15,
       "effect": ["blur"],
-      "effectStyle": "flat",
-      "effectAmount": 50,
+      "effectStyle": ["flat"],
+      "effectAmount": [50],
       "icon": "pray_hands"
    },
    {
@@ -247,8 +247,28 @@
       "style": "buff",
       "turns": 10,
       "effect": ["thorns"],
-      "effectStyle": "flat",
-      "effectAmount": 5,
+      "effectStyle": ["flat"],
+      "effectAmount": [5],
+      "icon": "pray_hands"
+   },
+   {
+      "name": "empowered guarding",
+      "style": "buff",
+      "turns": -1,
+      "aura": true,
+      "effect": ["revenge", "mana drain"],
+      "effectStyle": ["multiplier","flat"],
+      "effectAmount": [500, 5],
+      "icon": "pray_hands"
+   },
+   {
+      "name": "protection aura",
+      "style": "buff",
+      "turns": -1,
+      "aura": true,
+      "effect": ["protection"],
+      "effectStyle": ["flat"],
+      "effectAmount": [75],
       "icon": "pray_hands"
    }
 ]

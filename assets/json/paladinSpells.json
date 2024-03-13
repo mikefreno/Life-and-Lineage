@@ -125,11 +125,33 @@
   {
     "name": "reflective bulwark",
     "element": "protection",
-    "proficiencyNeeded": 0,
+    "proficiencyNeeded": 50,
     "manaCost": 50,
     "effects": {
       "damage": null,
       "buffs": ["bulwark"],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "readied guard",
+    "element": "protection",
+    "proficiencyNeeded": 75,
+    "manaCost": 10,
+    "effects": {
+      "damage": null,
+      "buffs": ["empowered guarding"],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "protection aura",
+    "element": "protection",
+    "proficiencyNeeded": 0,
+    "manaCost": 25,
+    "effects": {
+      "damage": null,
+      "buffs": ["protection aura"],
       "debuffs": null
     }
   }

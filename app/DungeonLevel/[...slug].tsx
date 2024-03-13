@@ -338,6 +338,20 @@ const DungeonLevelScreen = observer(() => {
         }
         battleLogger(line);
         if (enemyAttackRes.damage > 0) {
+          const revengeCondition = playerState.conditions.find((condition) =>
+            condition.effect.includes("revenge"),
+          );
+          if (revengeCondition) {
+            const revengeDamage =
+              enemyAttackRes.damage * 5 >
+              (revengeCondition.effectMagnitude ?? 1) * 10
+                ? (revengeCondition.effectMagnitude ?? 1) * 10
+                : enemyAttackRes.damage * 5;
+            enemyState.damageHealth(revengeDamage);
+            battleLogger(`You dealt ${revengeDamage} revenge damage!`);
+          }
+        }
+        if (enemyAttackRes.damage > 0) {
           setEnemyAttackDummy((prev) => prev + 1);
         }
         if (enemyAttackRes.debuffs || enemyAttackRes.buffs) {

@@ -1,79 +1,79 @@
 import { action, makeObservable, observable } from "mobx";
 import * as Crypto from "expo-crypto";
 
-interface ConditionOptions {
+export type effectOptions =
+  | "turn skip"
+  | "accuracy reduction"
+  | "accuracy increase"
+  | "sanity heal"
+  | "sanity damage"
+  | "sanityMax increase"
+  | "sanityMax decrease"
+  | "heal"
+  | "health damage"
+  | "healthMax increase"
+  | "healthMax decrease"
+  | "mana regen"
+  | "mana drain"
+  | "manaMax increase"
+  | "manaMax decrease"
+  | "armor increase"
+  | "armor decrease"
+  | "weaken"
+  | "strengthen"
+  | "destroy undead"
+  | "undead cower"
+  | "blur"
+  | "thorns"
+  | "revenge";
+
+type ConditionBase = {
   id?: string;
   name: string;
   style: "debuff" | "buff";
   turns: number;
-  effect: (
-    | "turn skip"
-    | "accuracy reduction"
-    | "accuracy increase"
-    | "sanity heal"
-    | "sanity damage"
-    | "sanityMax increase"
-    | "sanityMax decrease"
-    | "heal"
-    | "health damage"
-    | "healthMax increase"
-    | "healthMax decrease"
-    | "mana regen"
-    | "mana drain"
-    | "manaMax increase"
-    | "manaMax decrease"
-    | "armor increase"
-    | "armor decrease"
-    | "weaken"
-    | "strengthen"
-    | "destroy undead"
-    | "undead cower"
-    | "blur"
-    | "thorns"
-  )[];
+  placedby: string;
+  aura?: boolean;
+  icon?: string;
+  simple: boolean;
+};
+
+type SimpleCondition = ConditionBase & {
+  effect: effectOptions;
   effectStyle: "flat" | "multiplier" | null;
   effectMagnitude: number | null;
   healthDamage: number | null;
   sanityDamage: number | null;
-  placedby: string;
-  icon?: string;
-}
+  simple: true;
+};
+
+type ComplexCondition = ConditionBase & {
+  effect: effectOptions[];
+  effectStyle: ("flat" | "multiplier" | null)[] | null;
+  effectMagnitude: (number | null)[];
+  healthDamage: (number | null)[];
+  sanityDamage: (number | null)[];
+  simple: false;
+};
+
+type ConditionType = SimpleCondition | ComplexCondition;
 
 export class Condition {
   readonly id: string;
   readonly name: string;
   readonly style: "debuff" | "buff";
   turns: number;
+  readonly aura: boolean;
   readonly placedby: string;
-  readonly effect: (
-    | "turn skip"
-    | "accuracy reduction"
-    | "accuracy increase"
-    | "sanity heal"
-    | "sanity damage"
-    | "sanityMax increase"
-    | "sanityMax decrease"
-    | "heal"
-    | "health damage"
-    | "healthMax increase"
-    | "healthMax decrease"
-    | "mana regen"
-    | "mana drain"
-    | "manaMax increase"
-    | "manaMax decrease"
-    | "armor increase"
-    | "armor decrease"
-    | "weaken"
-    | "strengthen"
-    | "destroy undead"
-    | "undead cower"
-    | "blur"
-    | "thorns"
-  )[];
-  readonly healthDamage: number | null;
-  readonly sanityDamage: number | null;
-  readonly effectStyle: "flat" | "multiplier" | null;
-  readonly effectMagnitude: number | null;
+  readonly effect: effectOptions[] | effectOptions;
+  readonly healthDamage: (number | null)[] | number | null;
+  readonly sanityDamage: (number | null)[] | number | null;
+  readonly effectStyle:
+    | ("flat" | "multiplier" | null)[]
+    | "flat"
+    | "multiplier"
+    | null;
+  readonly effectMagnitude: (number | null)[] | number | null;
   readonly icon: string | undefined;
 
   constructor({
@@ -87,8 +87,9 @@ export class Condition {
     sanityDamage,
     placedby,
     id,
+    aura,
     icon,
-  }: ConditionOptions) {
+  }: ConditionType) {
     this.id = id ?? Crypto.randomUUID();
     this.name = name;
     this.style = style;
@@ -99,6 +100,7 @@ export class Condition {
     this.effectStyle = effectStyle;
     this.effectMagnitude = effectMagnitude;
     this.placedby = placedby;
+    this.aura = aura ?? false;
     this.icon = icon;
     makeObservable(this, { turns: observable, tick: action });
   }
@@ -112,18 +114,35 @@ export class Condition {
   }
 
   public tick() {
-    this.turns -= 1;
+    if (!this.aura) {
+      this.turns -= 1;
+    }
+    let totalHealthDmg: number | null = null;
+    if (typeof this.healthDamage == "number") {
+      totalHealthDmg = this.healthDamage;
+    } else if (this.healthDamage) {
+      totalHealthDmg = this.healthDamage.reduce(
+        (acc, val) => (acc ?? 0) + (val ?? 0),
+        0,
+      );
+    }
+    let totalSanityDmg: number | null = null;
+    if (typeof this.sanityDamage == "number") {
+      totalSanityDmg = this.sanityDamage;
+    } else if (this.sanityDamage) {
+      totalSanityDmg = this.sanityDamage.reduce(
+        (acc, val) => (acc ?? 0) + (val ?? 0),
+        0,
+      );
+    }
     return {
       effect: this.effect,
-      healthDamage: this.healthDamage
-        ? Math.round(this.healthDamage * 4) / 4
-        : null,
-      sanityDamage: this.sanityDamage
-        ? Math.round(this.sanityDamage * 4) / 4
-        : null,
+      healthDamage: totalHealthDmg ? Math.round(totalHealthDmg * 4) / 4 : null,
+      sanityDamage: totalSanityDmg ? Math.round(totalSanityDmg * 4) / 4 : null,
       turns: this.turns,
     };
   }
+
   static fromJSON(json: any): Condition {
     const condition = new Condition({
       id: json.id,
@@ -137,6 +156,8 @@ export class Condition {
       effectMagnitude: json.effectMagnitude,
       effectStyle: json.effectStyle,
       placedby: json.placedby,
+      aura: json.aura,
+      simple: json.simple,
     });
     return condition;
   }
