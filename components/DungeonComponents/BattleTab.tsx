@@ -1,4 +1,4 @@
-import { View, Text } from "./Themed";
+import { View, Text } from "../Themed";
 import {
   Pressable,
   FlatList,
@@ -6,25 +6,25 @@ import {
   View as NonThemedView,
   Dimensions,
 } from "react-native";
-import attacks from "../assets/json/playerAttacks.json";
-import { toTitleCase } from "../utility/functions/misc/words";
-import { Item } from "../classes/item";
+import attacks from "../../assets/json/playerAttacks.json";
+import { toTitleCase } from "../../utility/functions/misc/words";
+import { Item } from "../../classes/item";
 import { useContext, useEffect, useRef, useState } from "react";
 import {
   LogsContext,
   EnemyContext,
   PlayerCharacterContext,
-} from "../app/_layout";
+} from "../../app/_layout";
 import { useColorScheme } from "nativewind";
-import { useVibration } from "../utility/customHooks";
-import { Minion, Enemy } from "../classes/creatures";
-import GearStatsDisplay from "./GearStatsDisplay";
-import { AttackObj, Spell } from "../utility/types";
-import { elementalColorMap } from "../utility/elementColors";
-import Energy from "../assets/icons/EnergyIcon";
-import GenericModal from "./GenericModal";
-import SpellDetails from "./SpellDetails";
-import GenericStrikeAround from "./GenericStrikeAround";
+import { useVibration } from "../../utility/customHooks";
+import { Minion, Enemy } from "../../classes/creatures";
+import GearStatsDisplay from "../GearStatsDisplay";
+import { AttackObj, Spell } from "../../utility/types";
+import { elementalColorMap } from "../../utility/elementColors";
+import Energy from "../../assets/icons/EnergyIcon";
+import GenericModal from "../GenericModal";
+import SpellDetails from "../SpellDetails";
+import GenericStrikeAround from "../GenericStrikeAround";
 
 interface BattleTabProps {
   battleTab: "attacks" | "equipment" | "log";
