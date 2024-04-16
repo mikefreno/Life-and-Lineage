@@ -3,6 +3,7 @@ import { Enemy, Minion } from "../../classes/creatures";
 import { DungeonInstance, DungeonLevel } from "../../classes/dungeon";
 import { Game } from "../../classes/game";
 import { Item } from "../../classes/item";
+import { getMagnitude } from "./conditions";
 import { toTitleCase } from "./misc/words";
 
 export interface enemyTurnCheckProps {
@@ -359,21 +360,4 @@ function enemyMinionsTurn(
       }, 1000 * i);
     }
   }
-}
-
-function getMagnitude(magnitude: number | (number | null)[] | null): number {
-  if (Array.isArray(magnitude)) {
-    let sum = 0;
-    let count = 0;
-
-    magnitude.forEach((value) => {
-      if (typeof value === "number") {
-        sum += value;
-        count++;
-      }
-    });
-
-    return count === 0 ? 1 : sum / count;
-  }
-  return magnitude ?? 1;
 }

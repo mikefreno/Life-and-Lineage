@@ -7,6 +7,7 @@ import {
   getConditionEffectsOnAttacks,
   getConditionEffectsOnDefenses,
   getConditionEffectsOnMisc,
+  getMagnitude,
 } from "../utility/functions/conditions";
 import { Condition } from "./conditions";
 import arrows from "../assets/json/items/arrows.json";
@@ -216,7 +217,7 @@ export class Creature {
         this.conditions[i].tick();
 
       if (effect.includes("destroy undead")) {
-        undeadDeathCheck = this.conditions[i].effectMagnitude ?? 0;
+        undeadDeathCheck = getMagnitude(this.conditions[i].effectMagnitude);
       }
       if (sanityDamage) {
         this.damageSanity(sanityDamage);
@@ -307,7 +308,6 @@ export class Creature {
             attackPower: this.attackPower,
             maxHealth: this.healthMax,
             maxSanity: this.sanityMax,
-            armor: this.getFullArmor(),
             applierNameString: this.creatureSpecies,
           });
           if (res) {
@@ -488,12 +488,13 @@ export class Enemy extends Creature {
             }
           });
         }
-        return this.attack(
-          defenderMaxHealth,
-          defenderMaxSanity,
-          defenderDR,
-          chosenAttack,
-        );
+        return this.attack({
+          playerMaxHealth: defenderMaxHealth,
+          playerMaxSanity: defenderMaxSanity,
+          playerDR: defenderDR,
+          chosenAttack: chosenAttack,
+          playerConditions: defenderConditions,
+        });
       } else {
         this.endTurn();
         return "pass";

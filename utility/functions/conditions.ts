@@ -400,6 +400,7 @@ interface getConditionEffectsOnAttacksProps {
   enemyConditions: Condition[];
   beingType?: string;
 }
+
 export function getConditionEffectsOnAttacks({
   selfConditions,
   enemyConditions,
@@ -408,39 +409,64 @@ export function getConditionEffectsOnAttacks({
   let hitChanceMultiplier = 1;
   let damageMult = 1;
   let damageFlat = 0;
+
   selfConditions.forEach((condition) => {
-    if (
-      condition.effect.includes("accuracy reduction") &&
-      condition.effectMagnitude
-    ) {
-      hitChanceMultiplier *= 1 - condition.effectMagnitude;
-    }
-    if (condition.effect.includes("strengthen") && condition.effectMagnitude) {
-      if (condition.effectStyle == "flat") {
-        damageFlat -= condition.effectMagnitude;
-      } else if (condition.effectStyle == "multiplier") {
-        damageMult *= 1 + condition.effectMagnitude;
+    const effects = Array.isArray(condition.effect)
+      ? condition.effect
+      : [condition.effect];
+    const effectMagnitudes = Array.isArray(condition.effectMagnitude)
+      ? condition.effectMagnitude
+      : [condition.effectMagnitude];
+    const effectStyles = Array.isArray(condition.effectStyle)
+      ? condition.effectStyle
+      : [condition.effectStyle];
+
+    effects.forEach((effect, index) => {
+      const effectMagnitude = effectMagnitudes[index];
+      const effectStyle = effectStyles[index];
+
+      if (effect === "accuracy reduction" && effectMagnitude) {
+        hitChanceMultiplier *= 1 - effectMagnitude;
       }
-    } else if (
-      condition.effect.includes("weaken") &&
-      condition.effectMagnitude
-    ) {
-      if (condition.effectStyle == "flat") {
-        damageFlat += condition.effectMagnitude;
-      } else if (condition.effectStyle == "multiplier") {
-        damageMult *= 1 - condition.effectMagnitude;
+
+      if (effect === "strengthen" && effectMagnitude) {
+        if (effectStyle === "flat") {
+          damageFlat -= effectMagnitude;
+        } else if (effectStyle === "multiplier") {
+          damageMult *= 1 + effectMagnitude;
+        }
+      } else if (effect === "weaken" && effectMagnitude) {
+        if (effectStyle === "flat") {
+          damageFlat += effectMagnitude;
+        } else if (effectStyle === "multiplier") {
+          damageMult *= 1 - effectMagnitude;
+        }
       }
-    }
+    });
+
     if (condition.name === "undead cower" && beingType === "undead") {
       hitChanceMultiplier *= 0.5;
       damageMult *= 0.5;
     }
   });
+
   enemyConditions.forEach((condition) => {
-    if (condition.effect.includes("blur")) {
-      hitChanceMultiplier *= condition.effectMagnitude ?? 1;
-    }
+    const effects = Array.isArray(condition.effect)
+      ? condition.effect
+      : [condition.effect];
+    const effectMagnitudes = Array.isArray(condition.effectMagnitude)
+      ? condition.effectMagnitude
+      : [condition.effectMagnitude];
+
+    effects.forEach((effect, index) => {
+      const effectMagnitude = effectMagnitudes[index];
+
+      if (effect === "blur") {
+        hitChanceMultiplier *= effectMagnitude ?? 1;
+      }
+    });
   });
+
   return {
     hitChanceMultiplier: hitChanceMultiplier,
     damageMult: damageMult,
@@ -455,77 +481,81 @@ export function getConditionEffectsOnDefenses(suppliedConditions: Condition[]) {
   let healthFlat = 0;
   let sanityFlat = 0;
   let sanityMult = 1;
+
   suppliedConditions.forEach((condition) => {
-    if (
-      condition.effect.includes("armor increase") &&
-      condition.effectMagnitude
-    ) {
-      if (condition.effectStyle == "flat") {
-        armorFlat += condition.effectMagnitude;
-      } else if (
-        condition.effectStyle == "multiplier" ||
-        condition.effectStyle == "percentage"
-      ) {
-        armorMult *= 1 + condition.effectMagnitude;
+    const effects = Array.isArray(condition.effect)
+      ? condition.effect
+      : [condition.effect];
+    const effectMagnitudes = Array.isArray(condition.effectMagnitude)
+      ? condition.effectMagnitude
+      : [condition.effectMagnitude];
+    const effectStyles = Array.isArray(condition.effectStyle)
+      ? condition.effectStyle
+      : [condition.effectStyle];
+
+    effects.forEach((effect, index) => {
+      const effectMagnitude = effectMagnitudes[index];
+      const effectStyle = effectStyles[index];
+
+      if (effect === "armor increase" && effectMagnitude) {
+        if (effectStyle === "flat") {
+          armorFlat += effectMagnitude;
+        } else if (
+          effectStyle === "multiplier" ||
+          effectStyle === "percentage"
+        ) {
+          armorMult *= 1 + effectMagnitude;
+        }
       }
-    }
-    if (
-      condition.effect.includes("armor decrease") &&
-      condition.effectMagnitude
-    ) {
-      if (condition.effectStyle == "flat") {
-        armorFlat -= condition.effectMagnitude;
-      } else if (
-        condition.effectStyle == "multiplier" ||
-        condition.effectStyle == "percentage"
-      ) {
-        armorMult *= 1 - condition.effectMagnitude;
+
+      if (effect === "armor decrease" && effectMagnitude) {
+        if (effectStyle === "flat") {
+          armorFlat -= effectMagnitude;
+        } else if (
+          effectStyle === "multiplier" ||
+          effectStyle === "percentage"
+        ) {
+          armorMult *= 1 - effectMagnitude;
+        }
       }
-    }
-    if (
-      condition.effect.includes("healthMax increase") &&
-      condition.effectMagnitude
-    ) {
-      if (condition.effectStyle == "flat") {
-        healthFlat += condition.effectMagnitude;
-      } else if (
-        condition.effectStyle == "multiplier" ||
-        condition.effectStyle == "percentage"
-      ) {
-        healthMult *= 1 + condition.effectMagnitude;
+
+      if (effect === "healthMax increase" && effectMagnitude) {
+        if (effectStyle === "flat") {
+          healthFlat += effectMagnitude;
+        } else if (
+          effectStyle === "multiplier" ||
+          effectStyle === "percentage"
+        ) {
+          healthMult *= 1 + effectMagnitude;
+        }
       }
-    }
-    if (
-      condition.effect.includes("healthMax decrease") &&
-      condition.effectMagnitude
-    ) {
-      if (condition.effectStyle == "flat") {
-        healthFlat -= condition.effectMagnitude;
-      } else if (condition.effectStyle == "multiplier") {
-        healthMult *= 1 - condition.effectMagnitude;
+
+      if (effect === "healthMax decrease" && effectMagnitude) {
+        if (effectStyle === "flat") {
+          healthFlat -= effectMagnitude;
+        } else if (effectStyle === "multiplier") {
+          healthMult *= 1 - effectMagnitude;
+        }
       }
-    }
-    if (
-      condition.effect.includes("sanityMax increase") &&
-      condition.effectMagnitude
-    ) {
-      if (condition.effectStyle == "flat") {
-        sanityFlat += condition.effectMagnitude;
-      } else if (condition.effectStyle == "multiplier") {
-        sanityMult *= 1 + condition.effectMagnitude;
+
+      if (effect === "sanityMax increase" && effectMagnitude) {
+        if (effectStyle === "flat") {
+          sanityFlat += effectMagnitude;
+        } else if (effectStyle === "multiplier") {
+          sanityMult *= 1 + effectMagnitude;
+        }
       }
-    }
-    if (
-      condition.effect.includes("sanityMax decrease") &&
-      condition.effectMagnitude
-    ) {
-      if (condition.effectStyle == "flat") {
-        sanityFlat -= condition.effectMagnitude;
-      } else if (condition.effectStyle == "multiplier") {
-        sanityMult *= 1 - condition.effectMagnitude;
+
+      if (effect === "sanityMax decrease" && effectMagnitude) {
+        if (effectStyle === "flat") {
+          sanityFlat -= effectMagnitude;
+        } else if (effectStyle === "multiplier") {
+          sanityMult *= 1 - effectMagnitude;
+        }
       }
-    }
+    });
   });
+
   return {
     armorMult: armorMult,
     armorFlat: armorFlat,
@@ -542,47 +572,60 @@ export function getConditionEffectsOnMisc(suppliedConditions: Condition[]) {
   let manaRegenMult = 1;
   let manaMaxFlat = 0;
   let manaMaxMult = 1;
+
   suppliedConditions.forEach((condition) => {
-    if (condition.effect.includes("turn skip") && stunned == false) {
-      stunned = true;
-    }
-    if (condition.effect.includes("mana regen") && condition.effectMagnitude) {
-      if (condition.effectStyle == "flat") {
-        manaRegenFlat += condition.effectMagnitude;
-      } else if (condition.effectStyle == "multiplier") {
-        manaRegenMult *= 1 + condition.effectMagnitude;
+    const effects = Array.isArray(condition.effect)
+      ? condition.effect
+      : [condition.effect];
+    const effectMagnitudes = Array.isArray(condition.effectMagnitude)
+      ? condition.effectMagnitude
+      : [condition.effectMagnitude];
+    const effectStyles = Array.isArray(condition.effectStyle)
+      ? condition.effectStyle
+      : [condition.effectStyle];
+
+    effects.forEach((effect, index) => {
+      const effectMagnitude = effectMagnitudes[index];
+      const effectStyle = effectStyles[index];
+
+      if (effect === "turn skip" && !stunned) {
+        stunned = true;
       }
-    }
-    if (condition.effect.includes("mana drain") && condition.effectMagnitude) {
-      if (condition.effectStyle == "flat") {
-        manaRegenFlat -= condition.effectMagnitude;
-      } else if (condition.effectStyle == "multiplier") {
-        manaRegenMult *= 1 - condition.effectMagnitude;
-      }
-    }
-    if (
-      condition.effect.includes("manaMax increase") &&
-      condition.effectMagnitude
-    ) {
-      if (condition.effectStyle == "flat") {
-        manaMaxFlat += condition.effectMagnitude;
-      } else if (condition.effectStyle == "multiplier") {
-        manaMaxMult *= 1 + condition.effectMagnitude;
-      }
-    }
-    if (
-      condition.effect.includes("manaMax decrease") &&
-      condition.effectMagnitude
-    ) {
-      {
-        if (condition.effectStyle == "flat") {
-          manaMaxFlat -= condition.effectMagnitude;
-        } else if (condition.effectStyle == "multiplier") {
-          manaMaxMult *= 1 - condition.effectMagnitude;
+
+      if (effect === "mana regen" && effectMagnitude) {
+        if (effectStyle === "flat") {
+          manaRegenFlat += effectMagnitude;
+        } else if (effectStyle === "multiplier") {
+          manaRegenMult *= 1 + effectMagnitude;
         }
       }
-    }
+
+      if (effect === "mana drain" && effectMagnitude) {
+        if (effectStyle === "flat") {
+          manaRegenFlat -= effectMagnitude;
+        } else if (effectStyle === "multiplier") {
+          manaRegenMult *= 1 - effectMagnitude;
+        }
+      }
+
+      if (effect === "manaMax increase" && effectMagnitude) {
+        if (effectStyle === "flat") {
+          manaMaxFlat += effectMagnitude;
+        } else if (effectStyle === "multiplier") {
+          manaMaxMult *= 1 + effectMagnitude;
+        }
+      }
+
+      if (effect === "manaMax decrease" && effectMagnitude) {
+        if (effectStyle === "flat") {
+          manaMaxFlat -= effectMagnitude;
+        } else if (effectStyle === "multiplier") {
+          manaMaxMult *= 1 - effectMagnitude;
+        }
+      }
+    });
   });
+
   return {
     isStunned: stunned,
     manaRegenFlat: manaRegenFlat,
@@ -590,4 +633,23 @@ export function getConditionEffectsOnMisc(suppliedConditions: Condition[]) {
     manaMaxFlat: manaMaxFlat,
     manaMaxMult: manaMaxMult,
   };
+}
+
+export function getMagnitude(
+  magnitude: number | (number | null)[] | null,
+): number {
+  if (Array.isArray(magnitude)) {
+    let sum = 0;
+    let count = 0;
+
+    magnitude.forEach((value) => {
+      if (typeof value === "number") {
+        sum += value;
+        count++;
+      }
+    });
+
+    return count === 0 ? 1 : sum / count;
+  }
+  return magnitude ?? 1;
 }
