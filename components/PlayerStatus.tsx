@@ -286,23 +286,25 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                 </View>
                 <View className="flex flex-row flex-wrap justify-center">
                   <Text>{toTitleCase(condition.name)}:</Text>
-                  {condition.healthDamage && (
+                  {condition.getHealthDamage() && (
                     <View className="flex flex-row items-center">
                       <Text> dealing {condition.healthDamage} </Text>
                       <HealthIcon height={14} width={14} />
                       <Text> damage</Text>
                     </View>
                   )}
-                  {condition.effect.includes("heal") && (
-                    <View className="flex flex-row items-center">
-                      <Text>
-                        {condition.healthDamage && "and"} healing{" "}
-                        {condition.effectMagnitude}{" "}
-                      </Text>
-                      <HealthIcon height={14} width={14} />
-                      <Text> health</Text>
-                    </View>
-                  )}
+                  {condition.getHealthDamage() &&
+                    condition.getHealthDamage()! < 0 &&
+                    condition.effect.includes("heal") && (
+                      <View className="flex flex-row items-center">
+                        <Text>
+                          {condition.healthDamage && "and"} healing{" "}
+                          {condition.effectMagnitude}{" "}
+                        </Text>
+                        <HealthIcon height={14} width={14} />
+                        <Text> health</Text>
+                      </View>
+                    )}
                   {condition.sanityDamage && (
                     <View className="flex flex-row items-center">
                       <Text>
@@ -353,26 +355,43 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                       </Text>
                     </View>
                   )}
-                  {condition.effect.map((effect) => {
-                    if (effectListTypes.includes(effect)) {
-                      return (
-                        <View
-                          key={condition.id}
-                          className="flex flex-row items-center"
-                        >
-                          <Text> {toTitleCase(effect)}</Text>
-                          <Text>
-                            {` by `}
-                            {condition.effectStyle == "flat"
-                              ? condition.effectMagnitude
-                              : condition.effectMagnitude
-                              ? condition.effectMagnitude * 100 + "%"
-                              : ""}
-                          </Text>
-                        </View>
-                      );
-                    }
-                  })}
+                  {Array.isArray(condition.effect) ? (
+                    condition.effect.map((effect) => {
+                      if (effectListTypes.includes(effect)) {
+                        return (
+                          <View
+                            key={condition.id}
+                            className="flex flex-row items-center"
+                          >
+                            <Text> {toTitleCase(effect)}</Text>
+                            <Text>
+                              {` of `}
+                              {condition.effectStyle == "flat"
+                                ? condition.effectMagnitude
+                                : condition.effectStyle == "multiplier"
+                                ? condition.effectMagnitude * 100 + "%"
+                                : ""}
+                            </Text>
+                          </View>
+                        );
+                      }
+                    })
+                  ) : (
+                    <View
+                      key={condition.id}
+                      className="flex flex-row items-center"
+                    >
+                      <Text> {toTitleCase(condition.effect)}</Text>
+                      <Text>
+                        {` of `}
+                        {condition.effectStyle == "flat"
+                          ? condition.effectMagnitude
+                          : condition.effectMagnitude
+                          ? condition.effectMagnitude * 100 + "%"
+                          : ""}
+                      </Text>
+                    </View>
+                  )}
                 </View>
               </View>
             ))}

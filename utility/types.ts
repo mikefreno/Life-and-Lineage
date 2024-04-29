@@ -59,36 +59,6 @@ export type Attack = {
     | null;
 };
 
-export type ConditionBase = {
-  name: string;
-  style: "buff" | "debuff";
-  turns: number;
-  effect: (
-    | "turn skip"
-    | "accuracy reduction"
-    | "accuracy increase"
-    | "sanity heal"
-    | "sanity damage"
-    | "sanityMax increase"
-    | "sanityMax decrease"
-    | "heal"
-    | "health damage"
-    | "healthMax increase"
-    | "healthMax decrease"
-    | "mana regen"
-    | "mana drain"
-    | "manaMax increase"
-    | "manaMax decrease"
-    | "armor increase"
-    | "armor decrease"
-    | "weaken"
-    | "strengthen"
-  )[];
-  aura?: boolean;
-  effectStyle: ("multiplier" | "percentage" | "flat" | null)[] | null;
-  effectAmount: number[] | null;
-  icon: string;
-};
 export type AttackObj = {
   name: string;
   energyCost?: number;
@@ -140,3 +110,59 @@ export enum SkillPoint {
   Sanity,
   AttackPower,
 }
+export type effectOptions =
+  | "turn skip"
+  | "accuracy reduction"
+  | "accuracy increase"
+  | "sanity heal"
+  | "sanity damage"
+  | "sanityMax increase"
+  | "sanityMax decrease"
+  | "heal"
+  | "health damage"
+  | "healthMax increase"
+  | "healthMax decrease"
+  | "mana regen"
+  | "mana drain"
+  | "manaMax increase"
+  | "manaMax decrease"
+  | "armor increase"
+  | "armor decrease"
+  | "weaken"
+  | "strengthen"
+  | "destroy undead"
+  | "undead cower"
+  | "blur"
+  | "thorns"
+  | "revenge";
+
+type ConditionBase = {
+  id?: string;
+  name: string;
+  style: "debuff" | "buff";
+  turns: number;
+  placedby: string;
+  aura?: boolean;
+  icon?: string;
+  simple: boolean;
+};
+
+type SimpleCondition = ConditionBase & {
+  effect: effectOptions;
+  effectStyle: "flat" | "multiplier" | null;
+  effectMagnitude: number | null;
+  healthDamage: number | null;
+  sanityDamage: number | null;
+  simple: true;
+};
+
+type ComplexCondition = ConditionBase & {
+  effect: effectOptions[];
+  effectStyle: ("flat" | "multiplier" | null)[] | null;
+  effectMagnitude: (number | null)[];
+  healthDamage: (number | null)[];
+  sanityDamage: (number | null)[];
+  simple: false;
+};
+
+export type ConditionType = SimpleCondition | ComplexCondition;

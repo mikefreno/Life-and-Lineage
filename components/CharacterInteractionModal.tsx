@@ -67,6 +67,7 @@ export const CharacterInteractionModal = observer(
     function setFight() {
       if (character && playerState && gameState) {
         const enemy = new Enemy({
+          beingType: character.beingType,
           creatureSpecies: character.getFullName(),
           health: 75 - characterAge / 5,
           healthMax: 75 - characterAge / 5,

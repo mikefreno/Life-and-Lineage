@@ -27,7 +27,6 @@ import GenericModal from "../../components/GenericModal";
 import { AttackObj } from "../../utility/types";
 import BattleTabControls from "../../components/DungeonComponents/BattleTabControls";
 import DungeonEnemyDisplay from "../../components/DungeonComponents/DungeonEnemyDisplay";
-import NoEnemyComponent from "../../components/DungeonComponents/NoEnemyComponent";
 import FleeModal from "../../components/DungeonComponents/FleeModal";
 import TargetSelection from "../../components/DungeonComponents/TargetSelection";
 import DroppedItemsModal from "../../components/DungeonComponents/DroppedItemsModal";
@@ -114,8 +113,10 @@ const DungeonLevelScreen = observer(() => {
   }, [slug]);
 
   useEffect(() => {
-    if (!fightingBoss && !enemyState) {
-      getEnemy();
+    if (slug[0] !== "Activities" && slug[0] !== "Personal") {
+      if (!fightingBoss && !enemyState) {
+        getEnemy();
+      }
     }
   }, [enemyState]);
 
@@ -197,6 +198,10 @@ const DungeonLevelScreen = observer(() => {
       });
     }
   }, [enemyHealthDiff]);
+
+  //useEffect(() => {
+  //console.log(droppedItems);
+  //}, [droppedItems]);
 
   useEffect(() => {
     Animated.parallel([
@@ -554,33 +559,6 @@ const DungeonLevelScreen = observer(() => {
     }
   }, [showDungeonInteriorTutorial]);
 
-  while (!enemyState) {
-    return (
-      <NoEnemyComponent
-        level={level}
-        slug={slug}
-        setFleeRollFailure={setFleeRollFailure}
-        setFleeModalShowing={setFleeModalShowing}
-        thisInstance={thisInstance}
-        thisDungeon={thisDungeon}
-        colorScheme={colorScheme}
-        fightingBoss={fightingBoss}
-        loadBoss={loadBoss}
-        battleTab={battleTab}
-        setBattleTab={setBattleTab}
-        useAttack={useAttack}
-        setShowLeftBehindItemsScreen={setShowLeftBehindItemsScreen}
-        useSpell={useSpell}
-        pass={pass}
-        setAttackAnimationOnGoing={setAttackAnimationOnGoing}
-        attackAnimationOnGoing={attackAnimationOnGoing}
-        setShowTargetSelection={setShowTargetSelection}
-        addItemToPouch={addItemToPouch}
-        playerState={playerState}
-      />
-    );
-  }
-
   if (thisDungeon && playerState) {
     return (
       <>
@@ -700,18 +678,22 @@ const DungeonLevelScreen = observer(() => {
           </>
         </GenericModal>
         <View className="flex-1 px-2" style={{ paddingBottom: 88 }}>
-          <DungeonEnemyDisplay
-            enemyState={enemyState}
-            showingEnemyHealthChange={showingEnemyHealthChange}
-            enemyHealthDiff={enemyHealthDiff}
-            animationCycler={animationCycler}
-            enemyAttackAnimationValue={enemyAttackAnimationValue}
-            enemyHealDummy={enemyHealDummy}
-            enemyDamagedAnimationValue={enemyDamagedAnimationValue}
-            enemyTextTranslateAnimation={enemyTextTranslateAnimation}
-            enemyTextString={enemyTextString}
-            enemyTextFadeAnimation={enemyTextFadeAnimation}
-          />
+          {enemyState ? (
+            <DungeonEnemyDisplay
+              enemyState={enemyState}
+              showingEnemyHealthChange={showingEnemyHealthChange}
+              enemyHealthDiff={enemyHealthDiff}
+              animationCycler={animationCycler}
+              enemyAttackAnimationValue={enemyAttackAnimationValue}
+              enemyHealDummy={enemyHealDummy}
+              enemyDamagedAnimationValue={enemyDamagedAnimationValue}
+              enemyTextTranslateAnimation={enemyTextTranslateAnimation}
+              enemyTextString={enemyTextString}
+              enemyTextFadeAnimation={enemyTextFadeAnimation}
+            />
+          ) : (
+            <View className="flex h-[40%] pt-8" />
+          )}
           {thisDungeon.stepsBeforeBoss !== 0 && !fightingBoss ? (
             <View className="flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
               <Text className="my-auto text-xl">

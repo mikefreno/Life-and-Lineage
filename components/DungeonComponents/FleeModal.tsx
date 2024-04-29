@@ -18,7 +18,7 @@ interface FleeModalProps {
   fleeRollFailure: boolean;
   setFleeModalShowing: React.Dispatch<React.SetStateAction<boolean>>;
   setFleeRollFailure: React.Dispatch<React.SetStateAction<boolean>>;
-  enemyState: Enemy;
+  enemyState: Enemy | null;
   setEnemy: React.Dispatch<React.SetStateAction<Enemy | null>>;
   slug: string | string[];
   enemyAttacked: boolean;
@@ -75,15 +75,16 @@ export default function FleeModal({
   const vibration = useVibration();
 
   const flee = () => {
-    if (playerState && enemyState) {
+    if (playerState) {
       const roll = flipCoin();
       const secondaryRoll = flipCoin();
       if (
-        playerState &&
-        ((roll == "Heads" &&
-          (slug[0] !== "Activities" || secondaryRoll == "Heads")) ||
-          enemyState?.creatureSpecies == "training dummy" ||
-          !enemyAttacked)
+        (playerState &&
+          ((roll == "Heads" &&
+            (slug[0] !== "Activities" || secondaryRoll == "Heads")) ||
+            enemyState?.creatureSpecies == "training dummy" ||
+            !enemyAttacked)) ||
+        !enemyState
       ) {
         vibration({ style: "light" });
         setFleeRollFailure(false);
@@ -164,7 +165,9 @@ export default function FleeModal({
               }}
             >
               <ThemedView className="flex items-center justify-evenly">
-                <Text className="text-center text-lg">Attempt to Flee?</Text>
+                <Text className="text-center text-lg">
+                  {!enemyState ? "Ready to Leave?" : "Attempt to Flee?"}
+                </Text>
                 {playerState.isStunned() ? (
                   <Text className="italic" style={{ color: "#ef4444" }}>
                     You are stunned!
@@ -173,9 +176,11 @@ export default function FleeModal({
                 <ThemedView className="flex w-full flex-row justify-evenly pt-8">
                   <GenericFlatButton
                     onPressFunction={flee}
-                    text={"Run!"}
+                    text={enemyState ? "Run!" : "Leave"}
                     disabledCondition={
-                      attackAnimationOnGoing || playerState.isStunned()
+                      enemyState
+                        ? attackAnimationOnGoing || playerState.isStunned()
+                        : false
                     }
                   />
                   <GenericFlatButton
@@ -203,14 +208,16 @@ export default function FleeModal({
       backFunction={() => setFleeModalShowing(false)}
     >
       <ThemedView className="flex items-center justify-evenly">
-        <Text className="text-center text-lg">Attempt to Flee?</Text>
+        <Text className="text-center text-lg">
+          {enemyState ? "Attempt to Flee?" : "Ready to Leave?"}
+        </Text>
         <ThemedView className="flex w-full flex-row justify-evenly">
           <Pressable
             disabled={attackAnimationOnGoing}
             onPress={flee}
             className="mb-4 mt-8 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
           >
-            <Text className="text-lg">Run!</Text>
+            <Text className="text-lg">{enemyState ? "Run!" : "Leave"}</Text>
           </Pressable>
           <Pressable
             className="mb-4 mt-8 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"

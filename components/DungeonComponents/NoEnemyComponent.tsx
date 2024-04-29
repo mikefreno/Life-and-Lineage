@@ -151,6 +151,7 @@ export default function NoEnemyComponent({
         >
           <SackIcon height={32} width={32} />
         </Pressable>
+
         <View className="-mb-1 flex-1 justify-between">
           <View className="flex-1">
             <BattleTab

@@ -1,9 +1,37 @@
-import { ConditionBase } from "../types";
 import conditions from "../../assets/json/conditions.json";
 import { Condition } from "../../classes/conditions";
 import { PlayerCharacter } from "../../classes/character";
 import sanityDebuffs from "../../assets/json/sanityDebuffs.json";
 import { rollD20 } from "./roll";
+import { effectOptions } from "../types";
+
+type ConditionObjectBase = {
+  name: string;
+  style: "debuff" | "buff";
+  turns: number;
+  aura?: boolean;
+  icon: string;
+};
+
+type SimpleConditionObject = ConditionObjectBase & {
+  effect: effectOptions;
+  effectStyle: "flat" | "multiplier" | "percentage" | null;
+  effectAmount: number | null;
+  healthDamage: number | null;
+  sanityDamage: number | null;
+};
+
+type ComplexConditionObject = ConditionObjectBase & {
+  effect: effectOptions[];
+  effectStyle: ("flat" | "multiplier" | "percentage" | null)[] | null;
+  effectAmount: (number | null)[];
+  healthDamage: (number | null)[];
+  sanityDamage: (number | null)[];
+};
+
+export type ConditionObjectType =
+  | SimpleConditionObject
+  | ComplexConditionObject;
 
 interface createDebuffDeps {
   debuffName: string;
@@ -25,9 +53,9 @@ export function createDebuff({
   if (roll * 5 >= 100 - debuffChance * 100) {
     const debuffObj = conditions.find(
       (condition) => condition.name == debuffName,
-    ) as ConditionBase;
+    ) as ConditionObjectType;
     if (debuffObj) {
-      if (debuffObj.effect.length > 1) {
+      if (Array.isArray(debuffObj.effect)) {
         // complex condition
         let healthDamage: (number | null)[] = [];
         let sanityDamage: (number | null)[] = [];
@@ -38,7 +66,8 @@ export function createDebuff({
             debuffObj.effectAmount &&
             debuffObj.effectStyle
           ) {
-            let localHealthDmg = debuffObj.effectAmount[index];
+            let localHealthDmg =
+              (debuffObj.effectAmount as (number | null)[])[index] ?? 1;
             if (debuffObj.effectStyle[index] == "multiplier") {
               localHealthDmg *= primaryAttackDamage;
             } else if (debuffObj.effectStyle[index] == "percentage") {
@@ -53,7 +82,8 @@ export function createDebuff({
             debuffObj.effectAmount &&
             debuffObj.effectStyle
           ) {
-            let localSanityDmg = debuffObj.effectAmount[index];
+            let localSanityDmg =
+              (debuffObj.effectAmount as (number | null)[])[index] ?? 1;
             if (debuffObj.effectStyle[index] == "multiplier") {
               localSanityDmg *= primaryAttackDamage;
             } else if (debuffObj.effectStyle[index] == "percentage") {
@@ -79,7 +109,7 @@ export function createDebuff({
           healthDamage: healthDamage,
           sanityDamage: sanityDamage,
           effectStyle: styles,
-          effectMagnitude: debuffObj.effectAmount ?? [0],
+          effectMagnitude: (debuffObj.effectAmount as (number | null)[]) ?? [0],
           placedby: applierNameString,
           icon: debuffObj.icon,
           simple: false,
@@ -89,14 +119,14 @@ export function createDebuff({
         // simple condition
         let healthDamage = 0;
         if (
-          debuffObj.effect[0] == "health damage" &&
+          debuffObj.effect == "health damage" &&
           debuffObj.effectAmount &&
           debuffObj.effectStyle
         ) {
-          healthDamage = debuffObj.effectAmount[0];
-          if (debuffObj.effectStyle[0] == "multiplier") {
+          healthDamage = (debuffObj.effectAmount as number | null) ?? 1;
+          if (debuffObj.effectStyle == "multiplier") {
             healthDamage *= primaryAttackDamage;
-          } else if (debuffObj.effectStyle[0] == "percentage") {
+          } else if (debuffObj.effectStyle == "percentage") {
             healthDamage *= enemyMaxHP;
           }
         }
@@ -106,10 +136,10 @@ export function createDebuff({
           debuffObj.effectAmount &&
           debuffObj.effectStyle
         ) {
-          sanityDamage = debuffObj.effectAmount[0];
-          if (debuffObj.effectStyle[0] == "multiplier") {
+          sanityDamage = (debuffObj.effectAmount as number | null) ?? 1;
+          if (debuffObj.effectStyle == "multiplier") {
             sanityDamage *= primaryAttackDamage;
-          } else if (debuffObj.effectStyle[0] == "percentage") {
+          } else if (debuffObj.effectStyle == "percentage") {
             sanityDamage *= enemyMaxSanity ?? 50;
           }
         }
@@ -117,15 +147,16 @@ export function createDebuff({
           name: debuffObj.name,
           style: "debuff",
           turns: debuffObj.turns,
-          effect: debuffObj.effect[0],
+          effect: debuffObj.effect,
           healthDamage: healthDamage > 0 ? healthDamage : null,
           sanityDamage: sanityDamage > 0 ? sanityDamage : null,
           effectStyle:
-            debuffObj.effectStyle && debuffObj.effectStyle[0] != "percentage"
-              ? debuffObj.effectStyle[0]
-              : null,
-          effectMagnitude: debuffObj.effectAmount
-            ? debuffObj.effectAmount[0]
+            (debuffObj.effectStyle as "flat" | "multiplier" | "percentage") ==
+            "percentage"
+              ? null
+              : (debuffObj.effectStyle as "flat" | "multiplier"),
+          effectMagnitude: (debuffObj.effectAmount as number)
+            ? (debuffObj.effectAmount as number)
             : null,
           placedby: applierNameString,
           icon: debuffObj.icon,

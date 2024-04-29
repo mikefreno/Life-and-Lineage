@@ -29,6 +29,7 @@ export function enemyGenerator(instance: string, level: number) {
   );
 
   const enemy = new Enemy({
+    beingType: enemyJSON.beingType,
     creatureSpecies: enemyJSON.name,
     health: enemyHealth,
     healthMax: enemyHealth,

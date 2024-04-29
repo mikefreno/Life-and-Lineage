@@ -1,62 +1,6 @@
 import { action, makeObservable, observable } from "mobx";
 import * as Crypto from "expo-crypto";
-
-export type effectOptions =
-  | "turn skip"
-  | "accuracy reduction"
-  | "accuracy increase"
-  | "sanity heal"
-  | "sanity damage"
-  | "sanityMax increase"
-  | "sanityMax decrease"
-  | "heal"
-  | "health damage"
-  | "healthMax increase"
-  | "healthMax decrease"
-  | "mana regen"
-  | "mana drain"
-  | "manaMax increase"
-  | "manaMax decrease"
-  | "armor increase"
-  | "armor decrease"
-  | "weaken"
-  | "strengthen"
-  | "destroy undead"
-  | "undead cower"
-  | "blur"
-  | "thorns"
-  | "revenge";
-
-type ConditionBase = {
-  id?: string;
-  name: string;
-  style: "debuff" | "buff";
-  turns: number;
-  placedby: string;
-  aura?: boolean;
-  icon?: string;
-  simple: boolean;
-};
-
-type SimpleCondition = ConditionBase & {
-  effect: effectOptions;
-  effectStyle: "flat" | "multiplier" | null;
-  effectMagnitude: number | null;
-  healthDamage: number | null;
-  sanityDamage: number | null;
-  simple: true;
-};
-
-type ComplexCondition = ConditionBase & {
-  effect: effectOptions[];
-  effectStyle: ("flat" | "multiplier" | null)[] | null;
-  effectMagnitude: (number | null)[];
-  healthDamage: (number | null)[];
-  sanityDamage: (number | null)[];
-  simple: false;
-};
-
-type ConditionType = SimpleCondition | ComplexCondition;
+import { ConditionType, effectOptions } from "../utility/types";
 
 export class Condition {
   readonly id: string;
@@ -113,10 +57,7 @@ export class Condition {
     }
   }
 
-  public tick() {
-    if (!this.aura) {
-      this.turns -= 1;
-    }
+  public getHealthDamage() {
     let totalHealthDmg: number | null = null;
     if (typeof this.healthDamage == "number") {
       totalHealthDmg = this.healthDamage;
@@ -126,6 +67,10 @@ export class Condition {
         0,
       );
     }
+    return totalHealthDmg ? Math.round(totalHealthDmg * 4) / 4 : null;
+  }
+
+  public getSanityDamage() {
     let totalSanityDmg: number | null = null;
     if (typeof this.sanityDamage == "number") {
       totalSanityDmg = this.sanityDamage;
@@ -135,10 +80,18 @@ export class Condition {
         0,
       );
     }
+    return totalSanityDmg ? Math.round(totalSanityDmg * 4) / 4 : null;
+  }
+
+  public tick() {
+    if (!this.aura) {
+      this.turns -= 1;
+    }
+
     return {
       effect: this.effect,
-      healthDamage: totalHealthDmg ? Math.round(totalHealthDmg * 4) / 4 : null,
-      sanityDamage: totalSanityDmg ? Math.round(totalSanityDmg * 4) / 4 : null,
+      healthDamage: this.getHealthDamage(),
+      sanityDamage: this.getSanityDamage(),
       turns: this.turns,
     };
   }

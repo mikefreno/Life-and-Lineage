@@ -3,6 +3,7 @@
       "name": "block of wood",
       "baseValue": 100,
       "icon": "Wooden_Shield",
+      "slot": "one-hand",
       "stats":{
          "armor": 4.0,
          "blockChance": 0.035
@@ -12,6 +13,7 @@
       "name": "cheap buckler",
       "baseValue": 500,
       "icon": "Wooden_Shield",
+      "slot": "one-hand",
       "stats":{
          "armor": 6.0,
          "blockChance": 0.05
@@ -21,6 +23,7 @@
       "name": "block of iron",
       "baseValue": 1000,
       "icon": "Iron_Shield",
+      "slot": "one-hand",
       "stats":{
          "armor": 9.0,
          "blockChance": 0.035
@@ -30,6 +33,7 @@
       "name": "iron shield",
       "baseValue": 7000,
       "icon": "Iron_Shield",
+      "slot": "one-hand",
       "stats":{
          "armor": 11.0,
          "blockChance": 0.05
@@ -39,6 +43,7 @@
       "name": "shield of glory",
       "baseValue": 350000,
       "icon": "Iron_Shield",
+      "slot": "one-hand",
       "stats":{
          "armor": 40.0,
          "blockChance": 0.07

@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import GenericModal from "../GenericModal";
 import { Item } from "../../classes/item";
-import { SetStateAction } from "react";
+import { SetStateAction, useEffect } from "react";
 import { PlayerCharacter } from "../../classes/character";
 import { Pressable, View, Image } from "react-native";
 import Coins from "../../assets/icons/CoinsIcon";

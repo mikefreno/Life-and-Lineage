@@ -1443,7 +1443,6 @@ export class PlayerCharacter extends Character {
             attackPower: damagePreDR,
             maxHealth: this.getNonBuffedMaxHealth(),
             maxSanity: this.getNonBuffedMaxSanity(),
-            armor: this.getArmorValue(),
             applierNameString: this.getFullName(),
           });
           if (res) {
@@ -1491,7 +1490,6 @@ export class PlayerCharacter extends Character {
             buffName: buff,
             buffChance: 1.0,
             attackPower: chosenSpell.effects.damage ?? 0,
-            armor: this.getArmorValue(),
             maxHealth: this.getNonBuffedMaxHealth(),
             maxSanity: this.getNonBuffedMaxSanity(),
             applierNameString: this.getFullName(),

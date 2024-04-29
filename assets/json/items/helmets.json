@@ -2,7 +2,8 @@
    {
       "name": "feather",
       "baseValue": 100,
-      "icon": "Feather",
+      "icon": "Feather", 
+      "slot": "head",
       "stats":{
          "armor": 1.0
       }
@@ -10,7 +11,8 @@
    {
       "name": "leather headgear",
       "baseValue": 500,
-      "icon":"Leather_Helmet",
+      "icon": "Leather_Helmet",
+      "slot": "head",
       "stats":{
          "armor": 3.0
       }
