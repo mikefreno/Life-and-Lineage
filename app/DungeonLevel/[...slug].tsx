@@ -576,6 +576,7 @@ const DungeonLevelScreen = observer(() => {
         attackAnimationOnGoing={attackAnimationOnGoing}
         setShowTargetSelection={setShowTargetSelection}
         addItemToPouch={addItemToPouch}
+        playerState={playerState}
       />
     );
   }
@@ -646,6 +647,18 @@ const DungeonLevelScreen = observer(() => {
           fleeRollFailure={fleeRollFailure}
           setFleeModalShowing={setFleeModalShowing}
           setFleeRollFailure={setFleeRollFailure}
+          fightingBoss={fightingBoss}
+          setDroppedItems={setDroppedItems}
+          gameState={gameState}
+          setFightingBoss={setFightingBoss}
+          setAttackAnimationOnGoing={setAttackAnimationOnGoing}
+          thisDungeon={thisDungeon}
+          thisInstance={thisInstance}
+          setEnemyAttacked={setEnemyAttacked}
+          setEnemyHealDummy={setEnemyHealDummy}
+          setEnemyAttackDummy={setEnemyAttackDummy}
+          setEnemyTextDummy={setEnemyTextDummy}
+          setEnemyTextString={setEnemyTextString}
         />
         <DroppedItemsModal
           setLeftBehindDrops={setLeftBehindDrops}
@@ -729,7 +742,7 @@ const DungeonLevelScreen = observer(() => {
           >
             <SackIcon height={32} width={32} />
           </Pressable>
-          <View className="flex-1 justify-between">
+          <View className="-mb-1 flex-1 justify-between">
             <View className="flex-1">
               <BattleTab
                 useAttack={useAttack}

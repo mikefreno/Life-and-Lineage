@@ -3,7 +3,7 @@
       "name": "flying skull",
       "beingType": "undead",
       "health": 20,
-      "attackPower": 3,
+      "attackPower": 5,
       "attacks": ["head slam"],
       "turns": 5
    },

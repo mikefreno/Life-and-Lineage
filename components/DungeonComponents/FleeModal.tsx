@@ -8,6 +8,9 @@ import { Enemy, Minion } from "../../classes/creatures";
 import { useVibration } from "../../utility/customHooks";
 import { router } from "expo-router";
 import { enemyTurnCheck } from "../../utility/functions/dungeonInteriorFunctions";
+import { Game } from "../../classes/game";
+import { Item } from "../../classes/item";
+import { DungeonInstance, DungeonLevel } from "../../classes/dungeon";
 
 interface FleeModalProps {
   playerState: PlayerCharacter;
@@ -25,6 +28,23 @@ interface FleeModalProps {
     startOfTurnEnemyID: string,
   ) => void;
   attackAnimationOnGoing: boolean;
+  fightingBoss: boolean;
+  setDroppedItems: (
+    value: React.SetStateAction<{
+      itemDrops: Item[];
+      gold: number;
+    } | null>,
+  ) => void;
+  gameState: Game;
+  setFightingBoss: (value: React.SetStateAction<boolean>) => void;
+  setAttackAnimationOnGoing: (value: React.SetStateAction<boolean>) => void;
+  thisDungeon: DungeonLevel | undefined;
+  thisInstance: DungeonInstance | undefined;
+  setEnemyAttacked: (value: React.SetStateAction<boolean>) => void;
+  setEnemyHealDummy: React.Dispatch<React.SetStateAction<number>>;
+  setEnemyAttackDummy: React.Dispatch<React.SetStateAction<number>>;
+  setEnemyTextDummy: React.Dispatch<React.SetStateAction<number>>;
+  setEnemyTextString: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 export default function FleeModal({
   playerState,
@@ -39,6 +59,18 @@ export default function FleeModal({
   setFleeModalShowing,
   fleeRollFailure,
   fleeModalShowing,
+  setDroppedItems,
+  setFightingBoss,
+  setEnemyAttacked,
+  setEnemyHealDummy,
+  setEnemyTextDummy,
+  setEnemyTextString,
+  setEnemyAttackDummy,
+  setAttackAnimationOnGoing,
+  fightingBoss,
+  thisDungeon,
+  thisInstance,
+  gameState,
 }: FleeModalProps) {
   const vibration = useVibration();
 
@@ -79,7 +111,25 @@ export default function FleeModal({
         battleLogger("You failed to flee!");
         playerMinionsTurn(playerState.minions, enemyState.id);
         setTimeout(() => {
-          enemyTurnCheck();
+          enemyTurnCheck({
+            enemyState: enemyState,
+            slug: slug,
+            playerState: playerState,
+            setEnemy: setEnemy,
+            battleLogger: battleLogger,
+            fightingBoss: fightingBoss,
+            setDroppedItems: setDroppedItems,
+            gameState: gameState,
+            setFightingBoss: setFightingBoss,
+            setAttackAnimationOnGoing: setAttackAnimationOnGoing,
+            thisDungeon: thisDungeon,
+            thisInstance: thisInstance,
+            setEnemyAttacked: setEnemyAttacked,
+            setEnemyHealDummy: setEnemyHealDummy,
+            setEnemyAttackDummy: setEnemyAttackDummy,
+            setEnemyTextDummy: setEnemyTextDummy,
+            setEnemyTextString: setEnemyTextString,
+          });
         }, 1000 * playerState.minions.length);
       }
     }

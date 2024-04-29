@@ -62,10 +62,10 @@ type MinionType = CreatureType & {
 };
 
 interface attackProps {
-  playerMaxHealth: number;
-  playerMaxSanity: number | null;
-  playerDR: number;
-  playerConditions: Condition[];
+  targetMaxHealth: number;
+  targetMaxSanity: number | null;
+  targetDR: number;
+  targetConditions: Condition[];
   chosenAttack: AttackObj;
 }
 
@@ -235,17 +235,17 @@ export class Creature {
   }
 
   public attack({
-    playerDR,
-    playerMaxHealth,
-    playerMaxSanity,
-    playerConditions,
+    targetDR,
+    targetMaxHealth,
+    targetMaxSanity,
+    targetConditions,
     chosenAttack,
   }: attackProps) {
     let rollToHit: number;
     const { hitChanceMultiplier, damageMult, damageFlat } =
       getConditionEffectsOnAttacks({
         selfConditions: this.conditions,
-        enemyConditions: playerConditions,
+        enemyConditions: targetConditions,
         beingType: this.beingType,
       });
     if (chosenAttack.hitChance) {
@@ -264,7 +264,7 @@ export class Creature {
       if (chosenAttack.selfDamage) {
         this.damageHealth(chosenAttack.selfDamage);
       }
-      let damage = damagePreDR * (1 - playerDR);
+      let damage = damagePreDR * (1 - targetDR);
       damage *= damageMult; // from conditions
       damage += damageFlat; // from conditions
       const unRoundedDamage = damage;
@@ -290,8 +290,8 @@ export class Creature {
             const res = createDebuff({
               debuffName: debuff.name,
               debuffChance: debuff.chance,
-              enemyMaxHP: playerMaxHealth,
-              enemyMaxSanity: playerMaxSanity,
+              enemyMaxHP: targetMaxHealth,
+              enemyMaxSanity: targetMaxSanity,
               primaryAttackDamage: damagePreDR,
               applierNameString: this.creatureSpecies,
             });
@@ -489,11 +489,11 @@ export class Enemy extends Creature {
           });
         }
         return this.attack({
-          playerMaxHealth: defenderMaxHealth,
-          playerMaxSanity: defenderMaxSanity,
-          playerDR: defenderDR,
+          targetMaxHealth: defenderMaxHealth,
+          targetMaxSanity: defenderMaxSanity,
+          targetDR: defenderDR,
           chosenAttack: chosenAttack,
-          playerConditions: defenderConditions,
+          targetConditions: defenderConditions,
         });
       } else {
         this.endTurn();
@@ -586,6 +586,7 @@ export class Minion extends Creature {
     defenderMaxHealth,
     defenderMaxSanity,
     defenderDR,
+    defenderConditions,
   }: takeTurnProps) {
     if (this.turnsLeftAlive > 0) {
       this.turnsLeftAlive--;
@@ -607,12 +608,13 @@ export class Minion extends Creature {
           if (this.energy && chosenAttack.energyCost) {
             this.expendEnergy(chosenAttack.energyCost);
           }
-          return this.attack(
-            defenderMaxHealth,
-            defenderMaxSanity,
-            defenderDR,
-            chosenAttack,
-          );
+          return this.attack({
+            targetConditions: defenderConditions,
+            targetMaxSanity: defenderMaxSanity,
+            targetMaxHealth: defenderMaxHealth,
+            targetDR: defenderDR,
+            chosenAttack: chosenAttack,
+          });
         } else {
           this.endTurn();
           return "pass";

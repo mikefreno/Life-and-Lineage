@@ -256,14 +256,19 @@ export default function BattleTab({
                             }
                           }}
                           className="mx-2 my-auto rounded px-4 py-2 shadow-sm active:scale-95 active:opacity-50"
-                          style={{
-                            backgroundColor:
-                              "element" in attackOrSpell
-                                ? elementalColorMap[attackOrSpell.element].dark
-                                : colorScheme == "light"
-                                ? "#d4d4d8"
-                                : "#27272a",
-                          }}
+                          style={[
+                            (playerState.isStunned() ||
+                              attackAnimationOnGoing) && { opacity: 0.5 },
+                            {
+                              backgroundColor:
+                                "element" in attackOrSpell
+                                  ? elementalColorMap[attackOrSpell.element]
+                                      .dark
+                                  : colorScheme == "light"
+                                  ? "#d4d4d8"
+                                  : "#27272a",
+                            },
+                          ]}
                         >
                           <Text className="text-xl">
                             {playerState.isStunned()
@@ -301,7 +306,11 @@ export default function BattleTab({
                         vibration({ style: "light" });
                         pass();
                       }}
-                      className="mx-2 my-auto rounded bg-zinc-300 px-4 py-2 active:scale-95 active:opacity-50 dark:bg-zinc-700"
+                      className={`${
+                        attackAnimationOnGoing
+                          ? ""
+                          : "bg-zinc-300 dark:bg-zinc-700"
+                      } mx-2 my-auto rounded px-4 py-2 active:scale-95 active:opacity-50`}
                     >
                       <Text className="text-xl">Use</Text>
                     </Pressable>
