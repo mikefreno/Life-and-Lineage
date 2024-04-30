@@ -26,7 +26,12 @@
       "attacks": ["bite"],
       "drops": [
          {"item": "patch of hair", "itemType":"junk", "chance": 0.85},
-         {"item": "rat tail", "itemType":"ingredient","chance":0.5}
+         {"item": "rat tail", "itemType":"ingredient","chance":0.5},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75}
       ],
       "goldDropRange": {"minimum": 5, "maximum":15},
       "armorValue": null,
@@ -43,7 +48,12 @@
       "attacks": ["vampiric bite"],
       "drops": [
          {"item": "bat wing", "itemType":"ingredient","chance":0.75},
-         {"item": "vampiric tooth", "itemType":"junk", "chance": 0.5}
+         {"item": "vampiric tooth", "itemType":"junk", "chance": 0.5},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75}
       ],
       "goldDropRange": {"minimum": 5, "maximum":20},
       "armorValue": null,

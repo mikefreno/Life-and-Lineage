@@ -810,6 +810,7 @@ export class PlayerCharacter extends Character {
         }
       }
     }
+
     if (this.equipment.offHand) {
       const stats = this.equipment.offHand.stats;
       if (stats) {
@@ -931,6 +932,28 @@ export class PlayerCharacter extends Character {
       this.addToInventory(this.equipment.head);
       this.equipment.head = null;
     }
+  }
+
+  public getInventory() {
+    const condensedInventory: { item: Item; count: number }[] = [];
+    this.inventory.forEach((item) => {
+      if (item.stackable) {
+        let found = false;
+        console.log(item);
+        condensedInventory.forEach((entry) => {
+          if (entry.item.name == item.name) {
+            found = true;
+            entry.count += 1;
+          }
+        });
+        if (!found) {
+          condensedInventory.push({ item: item, count: 1 });
+        }
+      } else {
+        condensedInventory.push({ item: item, count: 1 });
+      }
+    });
+    return condensedInventory;
   }
 
   public getArmorValue() {

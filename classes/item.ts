@@ -28,6 +28,7 @@ interface ItemOptions {
     | "hat"
     | "book";
   icon?: string;
+  stackable?: number | null;
 }
 
 export class Item {
@@ -52,6 +53,7 @@ export class Item {
   readonly stats: Record<string, number | undefined> | null;
   readonly baseValue: number;
   readonly icon: string | undefined;
+  readonly stackable: number | null;
 
   constructor({
     id,
@@ -61,6 +63,7 @@ export class Item {
     baseValue,
     itemClass,
     icon,
+    stackable,
   }: ItemOptions) {
     this.id = id ?? Crypto.randomUUID();
     this.name = name;
@@ -69,6 +72,7 @@ export class Item {
     this.baseValue = baseValue;
     this.itemClass = itemClass;
     this.icon = icon;
+    this.stackable = stackable ?? null;
   }
 
   public equals(otherItem: Item) {

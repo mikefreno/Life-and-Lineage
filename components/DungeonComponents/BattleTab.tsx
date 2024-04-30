@@ -235,7 +235,10 @@ export default function BattleTab({
                         </NonThemedView>
                         <Pressable
                           disabled={
-                            playerState.isStunned() || attackAnimationOnGoing
+                            ("element" in attackOrSpell &&
+                              attackOrSpell.manaCost >= playerState.mana) ||
+                            playerState.isStunned() ||
+                            attackAnimationOnGoing
                           }
                           onPress={() => {
                             vibration({ style: "light" });
@@ -257,7 +260,9 @@ export default function BattleTab({
                           }}
                           className="mx-2 my-auto rounded px-4 py-2 shadow-sm active:scale-95 active:opacity-50"
                           style={[
-                            (playerState.isStunned() ||
+                            (("element" in attackOrSpell &&
+                              attackOrSpell.manaCost >= playerState.mana) ||
+                              playerState.isStunned() ||
                               attackAnimationOnGoing) && { opacity: 0.5 },
                             {
                               backgroundColor:

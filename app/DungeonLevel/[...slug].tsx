@@ -677,6 +677,10 @@ const DungeonLevelScreen = observer(() => {
             />
           </>
         </GenericModal>
+        {/*<GenericModal
+          isVisibleCondition={}
+          backFunction={}
+        ><View></View></GenericModal> */}
         <View className="flex-1 px-2" style={{ paddingBottom: 88 }}>
           {enemyState ? (
             <DungeonEnemyDisplay
@@ -737,34 +741,34 @@ const DungeonLevelScreen = observer(() => {
                 addItemToPouch={addItemToPouch}
               />
             </View>
-            {playerState.minions.length > 0 ? (
-              <View className="flex flex-row flex-wrap justify-evenly">
-                {playerState.minions.map((minion, index) => (
-                  <View
-                    key={minion.id}
-                    className={`${
-                      index == playerState.minions.length - 1 &&
-                      playerState.minions.length % 2 !== 0
-                        ? "w-full"
-                        : "w-2/5"
-                    } py-1`}
-                  >
-                    <Text>{toTitleCase(minion.creatureSpecies)}</Text>
-                    <ProgressBar
-                      filledColor="#ef4444"
-                      unfilledColor="#fee2e2"
-                      value={minion.health}
-                      maxValue={minion.healthMax}
-                    />
-                  </View>
-                ))}
-              </View>
-            ) : null}
           </View>
           <BattleTabControls
             battleTab={battleTab}
             setBattleTab={setBattleTab}
           />
+          {playerState.minions.length > 0 ? (
+            <View className="flex flex-row flex-wrap justify-evenly">
+              {playerState.minions.map((minion, index) => (
+                <View
+                  key={minion.id}
+                  className={`${
+                    index == playerState.minions.length - 1 &&
+                    playerState.minions.length % 2 !== 0
+                      ? "w-full"
+                      : "w-2/5"
+                  } py-1`}
+                >
+                  <Text>{toTitleCase(minion.creatureSpecies)}</Text>
+                  <ProgressBar
+                    filledColor="#ef4444"
+                    unfilledColor="#fee2e2"
+                    value={minion.health}
+                    maxValue={minion.healthMax}
+                  />
+                </View>
+              ))}
+            </View>
+          ) : null}
         </View>
         <NonThemedView className="absolute z-50 w-full" style={{ bottom: 85 }}>
           <PlayerStatus hideGold />

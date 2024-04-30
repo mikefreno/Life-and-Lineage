@@ -383,8 +383,9 @@ const HomeScreen = observer(() => {
 
   interface ItemRenderProps {
     item: Item;
+    count: number;
   }
-  const ItemRender = ({ item }: ItemRenderProps) => {
+  const ItemRender = ({ item, count }: ItemRenderProps) => {
     const [buzzed, setBuzzed] = useState(false);
     const localRef = useRef<NonThemedView>(null);
 
@@ -428,6 +429,7 @@ const HomeScreen = observer(() => {
           onPress={handlePress}
         >
           <Image source={item.getItemIcon()} />
+          {item.stackable && <Text>x{count}</Text>}
         </Pressable>
       </Draggable>
     );
@@ -456,22 +458,26 @@ const HomeScreen = observer(() => {
               <NonThemedView className="h-14 w-14 rounded-lg bg-zinc-200 dark:bg-zinc-700" />
             </NonThemedView>
           ))}
-          {playerState.inventory.slice(0, 24).map((item, index) => (
-            <NonThemedView
-              className="absolute h-1/4 w-1/6 items-center justify-center"
-              style={{
-                left: `${
-                  (index % 6) * 16.67 + 1 * (Math.floor(deviceWidth / 400) + 1)
-                }%`,
-                top: `${
-                  Math.floor(index / 6) * 25 + Math.floor(deviceHeight / 300)
-                }%`,
-              }}
-              key={index}
-            >
-              <ItemRender item={item} />
-            </NonThemedView>
-          ))}
+          {playerState
+            .getInventory()
+            .slice(0, 24)
+            .map((item, index) => (
+              <NonThemedView
+                className="absolute h-1/4 w-1/6 items-center justify-center"
+                style={{
+                  left: `${
+                    (index % 6) * 16.67 +
+                    1 * (Math.floor(deviceWidth / 400) + 1)
+                  }%`,
+                  top: `${
+                    Math.floor(index / 6) * 25 + Math.floor(deviceHeight / 300)
+                  }%`,
+                }}
+                key={index}
+              >
+                <ItemRender item={item.item} count={item.count} />
+              </NonThemedView>
+            ))}
         </NonThemedView>
       );
     }

@@ -57,6 +57,7 @@ type CreatureType = {
 type EnemyType = CreatureType & {
   minions?: Minion[];
 };
+
 type MinionType = CreatureType & {
   turnsLeftAlive: number;
 };
@@ -390,6 +391,7 @@ export class Creature {
                   | "hat"
                   | "book",
                 icon: itemObj.icon,
+                stackable: itemObj.stackable,
               }),
             );
           }

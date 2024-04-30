@@ -178,7 +178,7 @@ export default function NewGameScreen() {
                   pressed || selectedClass == "mage"
                     ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                     : "border-transparent"
-                } px-6 py-4 border`}
+                } border px-6 py-4`}
               >
                 <WizardHat
                   height={120}
@@ -214,7 +214,7 @@ export default function NewGameScreen() {
                     pressed || selectedClass == "necromancer"
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
-                  } px-6 py-4 border`}
+                  } border px-6 py-4`}
                 >
                   <NonThemedView className="-rotate-12">
                     <Necromancer
@@ -246,7 +246,7 @@ export default function NewGameScreen() {
                     pressed || selectedClass == "paladin"
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
-                  } px-8 py-4 border`}
+                  } border px-8 py-4`}
                 >
                   <NonThemedView className="rotate-12">
                     <NonThemedView className="scale-x-[-1] transform">
