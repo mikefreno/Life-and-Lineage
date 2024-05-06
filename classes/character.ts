@@ -14,7 +14,7 @@ import paladinSpells from "../assets/json/paladinSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
 import { Enemy, Minion } from "./creatures";
 import summons from "../assets/json/summons.json";
-import { action, makeObservable, observable } from "mobx";
+import { action, makeObservable, observable, computed } from "mobx";
 import * as Crypto from "expo-crypto";
 import { Investment } from "./investment";
 import { AttackObj, InvestmentType, InvestmentUpgrade } from "../utility/types";
@@ -469,6 +469,7 @@ export class PlayerCharacter extends Character {
       equipItem: action,
       unEquipItem: action,
       removeEquipment: action,
+      getInventory: observable,
       getArmorValue: action,
       getDamageReduction: action,
       getReadableGold: action,

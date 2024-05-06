@@ -1,3 +1,7 @@
+import { RefObject } from "react";
+import type { Item } from "../classes/item";
+import { View } from "react-native";
+
 export type InvestmentType = {
   name: string;
   description: string;
@@ -136,7 +140,7 @@ export type effectOptions =
   | "thorns"
   | "revenge";
 
-type ConditionBase = {
+export type ConditionBase = {
   id?: string;
   name: string;
   style: "debuff" | "buff";
@@ -147,7 +151,7 @@ type ConditionBase = {
   simple: boolean;
 };
 
-type SimpleCondition = ConditionBase & {
+export type SimpleCondition = ConditionBase & {
   effect: effectOptions;
   effectStyle: "flat" | "multiplier" | null;
   effectMagnitude: number | null;
@@ -156,7 +160,7 @@ type SimpleCondition = ConditionBase & {
   simple: true;
 };
 
-type ComplexCondition = ConditionBase & {
+export type ComplexCondition = ConditionBase & {
   effect: effectOptions[];
   effectStyle: ("flat" | "multiplier" | null)[] | null;
   effectMagnitude: (number | null)[];
@@ -166,3 +170,11 @@ type ComplexCondition = ConditionBase & {
 };
 
 export type ConditionType = SimpleCondition | ComplexCondition;
+
+export interface checkReleasePositonProps {
+  item: Item | null;
+  xPos: number;
+  yPos: number;
+  size: number;
+  equipped?: boolean;
+}

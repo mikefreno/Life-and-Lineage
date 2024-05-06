@@ -1,12 +1,7 @@
 import { Stack, useLocalSearchParams } from "expo-router";
-import { View, Text } from "../../components/Themed";
+import { View as ThemedView, Text } from "../../components/Themed";
 import { CharacterImage } from "../../components/CharacterImage";
-import {
-  Pressable,
-  Image,
-  ScrollView,
-  View as NonThemedView,
-} from "react-native";
+import { Pressable, Image, ScrollView, View } from "react-native";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Item } from "../../classes/item";
 import Coins from "../../assets/icons/CoinsIcon";
@@ -22,6 +17,7 @@ import shopObjects from "../../assets/json/shops.json";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { asReadableGold } from "../../utility/functions/misc/numbers";
 import { calculateAge } from "../../utility/functions/misc/age";
+import InventoryRender from "../../components/InventoryRender";
 
 const ONE_HOUR = 60 * 60 * 1000;
 
@@ -62,6 +58,9 @@ const ShopInteriorScreen = observer(() => {
   } | null>(null);
   const [inventoryFullNotifier, setInventoryFullNotifier] =
     useState<boolean>(false);
+
+  const inventoryTarget = useRef<NonThemedView>(null);
+  const [showingStats, setShowingStats] = useState<Item | null>(null);
 
   const header = useHeaderHeight();
   const isFocused = useIsFocused();
@@ -244,59 +243,9 @@ const ShopInteriorScreen = observer(() => {
     }
   }
 
-  interface ItemRenderProps {
-    item: Item;
-  }
-  const ItemRender = ({ item }: ItemRenderProps) => {
-    return (
-      <Pressable
-        className="h-14 w-14 items-center justify-center rounded-lg bg-zinc-400 active:scale-90 active:opacity-50"
-        onPress={() => displaySetter(item, false)}
-      >
-        <Image source={item.getItemIcon()} />
-      </Pressable>
-    );
-  };
-
-  function inventoryRender() {
-    if (playerState) {
-      return (
-        <NonThemedView
-          className="mx-auto flex flex-wrap rounded-lg border border-zinc-600"
-          style={{ height: "85%", width: "95%" }}
-        >
-          {Array.from({ length: 24 }).map((_, index) => (
-            <NonThemedView
-              className="absolute items-center justify-center"
-              style={{
-                left: `${(index % 6) * 16.67 + 1}%`,
-                top: `${Math.floor(index / 6) * 25 + 3}%`,
-              }}
-              key={"bg-" + index}
-            >
-              <NonThemedView className="h-14 w-14 rounded-lg bg-zinc-200 dark:bg-zinc-700" />
-            </NonThemedView>
-          ))}
-          {playerState.inventory.slice(0, 24).map((item, index) => (
-            <NonThemedView
-              className="absolute items-center justify-center"
-              style={{
-                left: `${(index % 6) * 16.67 + 1}%`,
-                top: `${Math.floor(index / 6) * 25 + 3}%`,
-              }}
-              key={index}
-            >
-              <ItemRender item={item} />
-            </NonThemedView>
-          ))}
-        </NonThemedView>
-      );
-    }
-  }
-
   if (refreshCheck && thisShop && gameState && playerState) {
     return (
-      <>
+      <ThemedView className="h-full">
         <Stack.Screen
           options={{
             title: toTitleCase(shop as string),
@@ -332,68 +281,61 @@ const ShopInteriorScreen = observer(() => {
             opacity: 0.5,
           }}
         />
-        <View className="flex-1">
-          <View className="flex flex-row justify-between">
-            <View className="w-1/3 items-center">
-              <CharacterImage
-                characterAge={calculateAge(
-                  new Date(thisShop.shopKeeper.birthdate),
-                  new Date(gameState.date),
-                )}
-                characterSex={thisShop.shopKeeper.sex == "male" ? "M" : "F"}
-              />
-              <Text className="text-center">
-                {thisShop.shopKeeper.getFullName()}'s Inventory
-              </Text>
-              <View className="flex flex-row">
-                <Text>{thisShop.currentGold}</Text>
-                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
-              </View>
-            </View>
-            <View className="mx-2 -mt-1 max-h-60 w-2/3 rounded border border-zinc-300 dark:border-zinc-700">
-              <ScrollView className="my-auto">
-                <View className="flex flex-row flex-wrap justify-around">
-                  {thisShop.inventory.map((item) => (
-                    <Pressable
-                      key={item.id}
-                      className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
-                      onPress={() => displaySetter(item, true)}
-                    >
-                      <NonThemedView className="rounded-lg bg-zinc-300 p-2">
-                        <Image source={item.getItemIcon()} />
-                      </NonThemedView>
-                    </Pressable>
-                  ))}
-                </View>
-              </ScrollView>
+        <ThemedView className="flex flex-row justify-between">
+          <View className="w-1/3 items-center">
+            <CharacterImage
+              characterAge={calculateAge(
+                new Date(thisShop.shopKeeper.birthdate),
+                new Date(gameState.date),
+              )}
+              characterSex={thisShop.shopKeeper.sex == "male" ? "M" : "F"}
+            />
+            <Text className="text-center">
+              {thisShop.shopKeeper.getFullName()}'s Inventory
+            </Text>
+            <View className="flex flex-row">
+              <Text>{thisShop.currentGold}</Text>
+              <Coins width={16} height={16} style={{ marginLeft: 6 }} />
             </View>
           </View>
-          <ScrollView className="">{selectedItemDisplay()}</ScrollView>
-          <NonThemedView style={{ height: "38%" }}>
-            <NonThemedView className="flex flex-row justify-center dark:border-zinc-700">
-              <Text className="text-center">
-                {playerState.getFullName()}'s Inventory
-              </Text>
-              <View className="flex flex-row">
-                <Text> ( {playerState!.getReadableGold()}</Text>
-                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
-                <Text> )</Text>
-                {playerState.inventory.some(
-                  (item) => item.itemClass == "junk",
-                ) ? (
+          <View className="mx-2 -mt-1 h-96 w-2/3 rounded border border-zinc-300 dark:border-zinc-700">
+            <ScrollView className="my-auto">
+              <View className="flex flex-row flex-wrap justify-around">
+                {thisShop.inventory.map((item) => (
                   <Pressable
-                    onPress={sellAllJunk}
-                    className="ml-2 rounded-xl border border-zinc-900 px-6 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                    key={item.id}
+                    className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
+                    onPress={() => displaySetter(item, true)}
                   >
-                    <Text>Sell Junk</Text>
+                    <View className="rounded-lg bg-zinc-300 p-2">
+                      <Image source={item.getItemIcon()} />
+                    </View>
                   </Pressable>
-                ) : null}
+                ))}
               </View>
-            </NonThemedView>
-            {inventoryRender()}
-          </NonThemedView>
-        </View>
-      </>
+            </ScrollView>
+          </View>
+        </ThemedView>
+        <ThemedView className="flex flex-row justify-center py-4 dark:border-zinc-700">
+          <Text className=" text-center">
+            {playerState.getFullName()}'s Inventory
+          </Text>
+          <View className="flex flex-row">
+            <Text> ( {playerState!.getReadableGold()}</Text>
+            <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+            <Text> )</Text>
+            {playerState.inventory.some((item) => item.itemClass == "junk") ? (
+              <Pressable
+                onPress={sellAllJunk}
+                className="ml-2 rounded-xl border border-zinc-900 px-6 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+              >
+                <Text>Sell Junk</Text>
+              </Pressable>
+            ) : null}
+          </View>
+        </ThemedView>
+        <InventoryRender location={"shop"} selfRef={inventoryTarget} />
+      </ThemedView>
     );
   }
 });

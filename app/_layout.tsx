@@ -107,7 +107,7 @@ const Root = observer(() => {
     getData();
   }, []);
 
-  const throttledFullSave = throttle(fullSave, 1500, {
+  const throttledFullSave = throttle(fullSave, 10000, {
     leading: true,
     trailing: false,
   });
