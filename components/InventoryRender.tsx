@@ -156,7 +156,7 @@ export default function InventoryRender({
         shouldReverse
       >
         <Pressable
-          className="h-14 w-14 items-center justify-center rounded-lg bg-zinc-400 active:scale-90 active:opacity-50"
+          className="z-10 h-14 w-14 items-center justify-center rounded-lg bg-zinc-400 active:scale-90 active:opacity-50"
           ref={localRef}
           onPress={handlePress}
         >
@@ -172,11 +172,11 @@ export default function InventoryRender({
         ref={selfRef}
         className={`${
           location == "home"
-            ? "h-[55%]"
+            ? "h-[60%]"
             : location == "shop"
-            ? "h-[45%]"
-            : "h-full"
-        } mx-auto -mt-2 flex  w-full flex-wrap rounded-lg border border-zinc-600`}
+            ? "-mt-2 h-[40%]"
+            : "mt-1 h-[99%]"
+        } mx-auto flex w-full flex-wrap rounded-lg border border-zinc-600`}
       >
         {Array.from({ length: 24 }).map((_, index) => (
           <View
@@ -217,7 +217,9 @@ export default function InventoryRender({
           statsTopPos={statsTopPos}
           showingStats={showingStats}
           setShowingStats={setShowingStats}
-          topOffset={location == "home" ? -240 : 0}
+          topOffset={
+            location == "home" ? -240 : location == "dungeon" ? -360 : 0
+          }
         />
       )}
     </>

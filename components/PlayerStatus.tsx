@@ -12,7 +12,7 @@ import Coins from "../assets/icons/CoinsIcon";
 import { useContext, useEffect, useState } from "react";
 import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { observer } from "mobx-react-lite";
-import { router } from "expo-router";
+import { router, usePathname } from "expo-router";
 import { toTitleCase } from "../utility/functions/misc/words";
 import FadeOutText from "./FadeOutText";
 import GenericModal from "./GenericModal";
@@ -79,6 +79,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
   const [showDetailedView, setShowDetailedView] = useState<boolean>(false);
   const [respeccing, setRespeccing] = useState<boolean>(false);
 
+  const pathname = usePathname();
   const { colorScheme } = useColorScheme();
   const vibration = useVibration();
 
@@ -239,7 +240,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
       }[] = Array.from(simplifiedConditionsMap.values());
 
       return (
-        <View className="flex h-7 flex-row justify-around">
+        <View className="flex flex-row justify-around">
           {simplifiedConditions.map((cond) => (
             <View key={cond.name} className="mx-2 flex align-middle">
               <Image source={cond.icon} style={{ height: 24, maxWidth: 32 }} />
@@ -645,7 +646,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
         </GenericModal>
         <Pressable
           onPress={() => setShowDetailedView(true)}
-          className="absolute -mt-1 w-full border-t border-zinc-200 dark:border-zinc-600"
+          className="absolute mt-4 w-full border-t border-zinc-200 dark:border-zinc-600"
         >
           <BlurView
             blurReductionFactor={8}
@@ -656,7 +657,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                   : "dark"
                 : "default"
             }
-            intensity={100}
+            intensity={pathname.split("/")[1] == "DungeonLevel" ? 0 : 100}
             experimentalBlurMethod={"dimezisBlurView"}
           >
             <Animated.View
@@ -672,19 +673,21 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
               }}
             >
               <View className="flex pt-0.5">
-                {!hideGold && (
-                  <View className="flex flex-row justify-center">
-                    <Text>{readableGold}</Text>
-                    <Coins width={16} height={16} style={{ marginLeft: 6 }} />
-                    {showingGoldChange ? goldChangePopUp() : null}
-                    {playerState.unAllocatedSkillPoints > 0 && (
-                      <View className="px-1">
-                        <SquarePlus height={16} width={16} />
-                      </View>
-                    )}
-                  </View>
-                )}
-                <View className="mx-auto">{conditionRenderer()}</View>
+                <View className="flex h-7 flex-row justify-center">
+                  {!hideGold && (
+                    <>
+                      <Text>{readableGold}</Text>
+                      <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+                      {showingGoldChange ? goldChangePopUp() : null}
+                    </>
+                  )}
+                  {playerState.unAllocatedSkillPoints > 0 && (
+                    <View className="px-1">
+                      <SquarePlus height={16} width={16} />
+                    </View>
+                  )}
+                  <View>{conditionRenderer()}</View>
+                </View>
                 <View className="flex flex-row justify-evenly pb-1">
                   <View className="flex w-[31%]">
                     {showingHealthChange && healthChangePopUp()}

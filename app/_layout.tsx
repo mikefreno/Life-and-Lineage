@@ -4,7 +4,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, router } from "expo-router";
+import { SplashScreen, Stack, router, usePathname } from "expo-router";
 import { createContext, useEffect, useContext, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
@@ -157,6 +157,7 @@ const RootLayout = observer(() => {
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
   const [navbarLoad, setNavbarLoad] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (fontLoaded && navbarLoad) {
@@ -189,6 +190,20 @@ const RootLayout = observer(() => {
   useEffect(() => {
     getAndSetNavBar();
   }, []);
+
+  useEffect(() => {
+    if (Platform.OS == "android") {
+      if (pathname.split("/")[1] == "DungeonLevel") {
+        NavigationBar.setPositionAsync("relative");
+        NavigationBar.setBackgroundColorAsync(
+          colorScheme == "dark" ? "#18181b" : "#fafafa",
+        );
+      } else {
+        NavigationBar.setPositionAsync("absolute");
+        NavigationBar.setBackgroundColorAsync("transparent");
+      }
+    }
+  }, [pathname]);
 
   async function getAndSetNavBar() {
     if (Platform.OS == "android") {

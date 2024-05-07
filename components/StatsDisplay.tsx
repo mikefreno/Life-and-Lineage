@@ -1,5 +1,5 @@
-import { Dimensions, Pressable, Text, View } from "react-native";
-import { View as ThemedView } from "./Themed";
+import { Dimensions, Pressable, View } from "react-native";
+import { View as ThemedView, Text } from "./Themed";
 import GearStatsDisplay from "./GearStatsDisplay";
 import { useColorScheme } from "nativewind";
 import { useVibration } from "../utility/customHooks";

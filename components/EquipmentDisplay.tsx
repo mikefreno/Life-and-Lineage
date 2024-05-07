@@ -1,5 +1,6 @@
 import { RefObject, useContext, useState } from "react";
-import { Pressable, View, Text, Image } from "react-native";
+import { Pressable, View, Image } from "react-native";
+import { Text } from "./Themed";
 import Draggable from "react-native-draggable";
 import type { Item } from "../classes/item";
 import { useVibration } from "../utility/customHooks";
@@ -99,7 +100,7 @@ export default function EquipmentDisplay({
         <View className="-mt-3 items-center">
           <Text className="mb-2">Head</Text>
           {playerState?.equipment.head ? (
-            <Pressable className="h-12 w-12 active:scale-90 active:opacity-50">
+            <View className="z-50 h-12 w-12 active:scale-90 active:opacity-50">
               <Draggable
                 onDragRelease={(_, g) => {
                   checkReleasePositon({
@@ -136,7 +137,7 @@ export default function EquipmentDisplay({
               >
                 <View
                   ref={headTarget}
-                  className="h-12 w-12 items-center rounded-lg"
+                  className="absolute h-12 w-12 items-center rounded-lg"
                   style={{ backgroundColor: "#a1a1aa" }}
                 >
                   <Image
@@ -145,7 +146,7 @@ export default function EquipmentDisplay({
                   />
                 </View>
               </Draggable>
-            </Pressable>
+            </View>
           ) : (
             <View
               ref={headTarget}
@@ -153,13 +154,17 @@ export default function EquipmentDisplay({
               style={{ backgroundColor: "#a1a1aa" }}
             />
           )}
+          <View
+            className="absolute mx-auto ml-4 mt-7 h-12 w-12 rounded-lg"
+            style={{ backgroundColor: "#a1a1aa" }}
+          />
         </View>
         <View className="flex flex-row justify-evenly">
           <View className="-ml-1 -mt-4 mr-2 md:mt-4">
             <Text className="mb-2">Main Hand</Text>
             {playerState?.equipment.mainHand &&
             playerState?.equipment.mainHand.name !== "unarmored" ? (
-              <Pressable className="mx-auto h-12 w-12 items-center active:scale-90 active:opacity-50">
+              <View className="z-50 mx-auto h-12 w-12 items-center active:scale-90 active:opacity-50">
                 <Draggable
                   onDragRelease={(_, g) => {
                     checkReleasePositon({
@@ -205,7 +210,7 @@ export default function EquipmentDisplay({
                     />
                   </View>
                 </Draggable>
-              </Pressable>
+              </View>
             ) : (
               <View
                 ref={mainHandTarget}
@@ -213,11 +218,15 @@ export default function EquipmentDisplay({
                 style={{ backgroundColor: "#a1a1aa" }}
               />
             )}
+            <View
+              className="absolute mx-auto ml-4 mt-7 h-12 w-12 rounded-lg"
+              style={{ backgroundColor: "#a1a1aa" }}
+            />
           </View>
           <View className="-mt-4 md:mt-4">
             <Text className="mb-2">Off-Hand</Text>
             {playerState?.equipment.offHand ? (
-              <View className="mx-auto h-12 w-12 items-center active:scale-90 active:opacity-50">
+              <View className="z-50 mx-auto h-12 w-12 items-center active:scale-90 active:opacity-50">
                 <Draggable
                   onDragRelease={(_, g) => {
                     checkReleasePositon({
@@ -278,12 +287,16 @@ export default function EquipmentDisplay({
                 style={{ backgroundColor: "#a1a1aa" }}
               />
             )}
+            <View
+              className="absolute mx-auto ml-3 mt-7 h-12 w-12 rounded-lg"
+              style={{ backgroundColor: "#a1a1aa" }}
+            />
           </View>
         </View>
         <View className="mx-auto -mt-6 items-center md:mt-4">
           <Text className="mb-2">Body</Text>
           {playerState?.equipment.body ? (
-            <Pressable className="h-12 w-12 active:scale-90 active:opacity-50">
+            <View className="z-50 h-12 w-12 active:scale-90 active:opacity-50">
               <Draggable
                 onDragRelease={(_, g) => {
                   checkReleasePositon({
@@ -329,7 +342,7 @@ export default function EquipmentDisplay({
                   />
                 </View>
               </Draggable>
-            </Pressable>
+            </View>
           ) : (
             <View
               ref={bodyTarget}
@@ -337,6 +350,10 @@ export default function EquipmentDisplay({
               style={{ backgroundColor: "#a1a1aa" }}
             />
           )}
+          <View
+            className="absolute mx-auto ml-4 mt-7 h-12 w-12 rounded-lg"
+            style={{ backgroundColor: "#a1a1aa" }}
+          />
         </View>
       </View>
       {showingStats && statsLeftPos && statsTopPos && (

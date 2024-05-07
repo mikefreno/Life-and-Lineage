@@ -14,7 +14,7 @@ export default function BattleTabControls({
 }: BattleTabControlsProps) {
   const vibration = useVibration();
   return (
-    <View className="flex w-full flex-row justify-around">
+    <View className="-mb-1 flex w-full flex-row justify-around">
       <Pressable
         className={`mx-2 w-32 rounded py-4 ${
           battleTab == "attacks"

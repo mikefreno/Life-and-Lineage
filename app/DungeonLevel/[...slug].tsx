@@ -1,5 +1,5 @@
-import { View, Text } from "../../components/Themed";
-import { Animated, View as NonThemedView, Platform } from "react-native";
+import { View as ThemedView, Text } from "../../components/Themed";
+import { Animated, View, Platform } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import { Pressable } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
@@ -32,6 +32,7 @@ import TargetSelection from "../../components/DungeonComponents/TargetSelection"
 import DroppedItemsModal from "../../components/DungeonComponents/DroppedItemsModal";
 import { enemyTurnCheck } from "../../utility/functions/dungeonInteriorFunctions";
 import LeftBehindItemsModal from "../../components/DungeonComponents/LeftBehindItemsModal";
+import { useVibration } from "../../utility/customHooks";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -94,6 +95,7 @@ const DungeonLevelScreen = observer(() => {
   const [enemyAttackDummy, setEnemyAttackDummy] = useState<number>(0);
   const [enemyHealDummy, setEnemyHealDummy] = useState<number>(0);
   const [enemyTextDummy, setEnemyTextDummy] = useState<number>(0);
+  const vibration = useVibration();
 
   const isFocused = useIsFocused();
 
@@ -198,10 +200,6 @@ const DungeonLevelScreen = observer(() => {
       });
     }
   }, [enemyHealthDiff]);
-
-  //useEffect(() => {
-  //console.log(droppedItems);
-  //}, [droppedItems]);
 
   useEffect(() => {
     Animated.parallel([
@@ -681,7 +679,7 @@ const DungeonLevelScreen = observer(() => {
           isVisibleCondition={}
           backFunction={}
         ><View></View></GenericModal> */}
-        <View className="flex-1 px-2" style={{ paddingBottom: 88 }}>
+        <ThemedView className="flex-1 px-2" style={{ paddingBottom: 88 }}>
           {enemyState ? (
             <DungeonEnemyDisplay
               enemyState={enemyState}
@@ -706,7 +704,10 @@ const DungeonLevelScreen = observer(() => {
               {thisDungeon.step >= thisDungeon.stepsBeforeBoss &&
               !thisDungeon.bossDefeated ? (
                 <Pressable
-                  onPress={loadBoss}
+                  onPress={() => {
+                    vibration({ style: "warning", essential: true });
+                    loadBoss();
+                  }}
                   className="my-auto rounded bg-red-500 px-4 py-2 active:scale-95 active:opacity-50"
                 >
                   <Text style={{ color: "white" }}>Fight Boss</Text>
@@ -728,7 +729,7 @@ const DungeonLevelScreen = observer(() => {
           >
             <SackIcon height={32} width={32} />
           </Pressable>
-          <View className="-mb-1 flex-1 justify-between">
+          <View className="flex-1 justify-between">
             <View className="flex-1">
               <BattleTab
                 useAttack={useAttack}
@@ -747,9 +748,9 @@ const DungeonLevelScreen = observer(() => {
             setBattleTab={setBattleTab}
           />
           {playerState.minions.length > 0 ? (
-            <View className="flex flex-row flex-wrap justify-evenly">
+            <ThemedView className="flex flex-row flex-wrap justify-evenly">
               {playerState.minions.map((minion, index) => (
-                <View
+                <ThemedView
                   key={minion.id}
                   className={`${
                     index == playerState.minions.length - 1 &&
@@ -765,14 +766,14 @@ const DungeonLevelScreen = observer(() => {
                     value={minion.health}
                     maxValue={minion.healthMax}
                   />
-                </View>
+                </ThemedView>
               ))}
-            </View>
+            </ThemedView>
           ) : null}
-        </View>
-        <NonThemedView className="absolute z-50 w-full" style={{ bottom: 85 }}>
+        </ThemedView>
+        <View className="absolute z-50 w-full" style={{ bottom: 95 }}>
           <PlayerStatus hideGold />
-        </NonThemedView>
+        </View>
       </>
     );
   }

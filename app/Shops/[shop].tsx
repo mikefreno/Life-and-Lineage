@@ -5,19 +5,17 @@ import { Pressable, Image, ScrollView, View } from "react-native";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Item } from "../../classes/item";
 import Coins from "../../assets/icons/CoinsIcon";
-import SpellDetails from "../../components/SpellDetails";
 import { useIsFocused } from "@react-navigation/native";
 import { GameContext, PlayerCharacterContext } from "../_layout";
-import GearStatsDisplay from "../../components/GearStatsDisplay";
 import { useVibration } from "../../utility/customHooks";
 import { observer } from "mobx-react-lite";
 import TutorialModal from "../../components/TutorialModal";
 import { useHeaderHeight } from "@react-navigation/elements";
 import shopObjects from "../../assets/json/shops.json";
 import { toTitleCase } from "../../utility/functions/misc/words";
-import { asReadableGold } from "../../utility/functions/misc/numbers";
 import { calculateAge } from "../../utility/functions/misc/age";
 import InventoryRender from "../../components/InventoryRender";
+import { StatsDisplay } from "../../components/StatsDisplay";
 
 const ONE_HOUR = 60 * 60 * 1000;
 
@@ -37,6 +35,8 @@ const ShopInteriorScreen = observer(() => {
     buying: boolean;
   } | null>(null);
   let selectedItemRef = useRef<Item>();
+  const [statsLeftPos, setStatsLeftPos] = useState<number>();
+  const [statsTopPos, setStatsTopPos] = useState<number>();
   const [refreshCheck, setRefreshCheck] = useState<boolean>(false);
   const [selectedSpell, setSelectedSpell] = useState<{
     name: string;
@@ -59,7 +59,7 @@ const ShopInteriorScreen = observer(() => {
   const [inventoryFullNotifier, setInventoryFullNotifier] =
     useState<boolean>(false);
 
-  const inventoryTarget = useRef<NonThemedView>(null);
+  const inventoryTarget = useRef<View>(null);
   const [showingStats, setShowingStats] = useState<Item | null>(null);
 
   const header = useHeaderHeight();
@@ -114,120 +114,6 @@ const ShopInteriorScreen = observer(() => {
         setSelectedItem(null);
         selectedItemRef.current = undefined;
       }
-    }
-  }
-
-  function selectedItemDisplay() {
-    if (selectedItem && thisShop) {
-      const transactionCompleteable = selectedItem.buying
-        ? playerState!.gold >=
-          selectedItem.item.getBuyPrice(thisShop.shopKeeper.affection)
-        : thisShop!.currentGold >=
-          selectedItem.item.getSellPrice(thisShop.shopKeeper.affection);
-
-      return (
-        <View className="mx-auto flex flex-row pb-6 pt-2">
-          <View
-            className="flex items-center"
-            style={{
-              marginLeft:
-                selectedItem.item.slot && selectedItem.item.stats ? 100 : 0,
-            }}
-          >
-            <View className="w-36 items-center">
-              <Text className="text-red-500">
-                {inventoryFullNotifier ?? "Inventory is full!"}
-              </Text>
-              <Text className="text-center">
-                {toTitleCase(selectedItem.item.name)}
-              </Text>
-              <Image source={selectedItem.item.getItemIcon()} />
-              <Text>
-                {selectedItem.item.itemClass == "bodyArmor"
-                  ? "Body Armor"
-                  : toTitleCase(selectedItem.item.itemClass)}
-              </Text>
-              {selectedItem.item.slot ? (
-                <Text className="">
-                  Fills {toTitleCase(selectedItem.item.slot)} Slot
-                </Text>
-              ) : null}
-              <View className="flex flex-row">
-                <Text>
-                  Price:{" "}
-                  {asReadableGold(
-                    selectedItem.buying
-                      ? Math.floor(
-                          selectedItem.item.getBuyPrice(
-                            thisShop.shopKeeper.affection,
-                          ),
-                        )
-                      : Math.floor(
-                          selectedItem.item.getSellPrice(
-                            thisShop.shopKeeper.affection,
-                          ),
-                        ),
-                  )}
-                </Text>
-                <Coins width={20} height={20} style={{ marginLeft: 6 }} />
-              </View>
-              <View>
-                <Pressable
-                  disabled={!transactionCompleteable}
-                  onPress={() => moveBetweenInventories(selectedItem)}
-                  className={`${
-                    !transactionCompleteable ? "bg-zinc-300" : "bg-blue-400"
-                  } my-4 rounded-lg active:scale-95 active:opacity-50`}
-                >
-                  <Text className="px-6 py-4" style={{ color: "white" }}>
-                    {selectedItem.buying ? "Purchase" : "Sell"}
-                  </Text>
-                </Pressable>
-              </View>
-            </View>
-            {selectedSpell ? <SpellDetails spell={selectedSpell} /> : null}
-          </View>
-          {selectedItem.item.slot && selectedItem.item.stats ? (
-            <View style={{ marginLeft: 10, marginTop: 20, width: 90 }}>
-              <GearStatsDisplay stats={selectedItem.item.stats} />
-            </View>
-          ) : null}
-        </View>
-      );
-    }
-  }
-
-  function moveBetweenInventories(
-    selected: { item: Item; buying: boolean } | null,
-  ) {
-    if (
-      playerState &&
-      thisShop &&
-      gameState &&
-      isFocused &&
-      selected &&
-      selectedItemRef.current
-    ) {
-      if (selected.buying) {
-        if (playerState.inventory.length < 24) {
-          const price = selectedItemRef.current.getBuyPrice(
-            thisShop.shopKeeper.affection,
-          );
-          playerState.buyItem(selectedItemRef.current, price);
-          thisShop.sellItem(selectedItemRef.current, price);
-        } else {
-          setInventoryFullNotifier(true);
-        }
-      } else {
-        const price = selectedItemRef.current.getSellPrice(
-          thisShop.shopKeeper.affection,
-        );
-        thisShop.buyItem(selectedItemRef.current, Math.floor(price));
-        playerState.sellItem(selectedItemRef.current, Math.floor(price));
-      }
-      vibration({ style: "light", essential: true });
-      setSelectedItem(null);
-      selectedItemRef.current = undefined;
     }
   }
 
@@ -315,6 +201,17 @@ const ShopInteriorScreen = observer(() => {
               </View>
             </ScrollView>
           </View>
+          {showingStats && statsLeftPos && statsTopPos && (
+            <View className="absolute z-10">
+              <StatsDisplay
+                statsLeftPos={statsLeftPos}
+                statsTopPos={statsTopPos}
+                showingStats={showingStats}
+                setShowingStats={setShowingStats}
+                topOffset={-240}
+              />
+            </View>
+          )}
         </ThemedView>
         <ThemedView className="flex flex-row justify-center py-4 dark:border-zinc-700">
           <Text className=" text-center">
@@ -334,7 +231,11 @@ const ShopInteriorScreen = observer(() => {
             ) : null}
           </View>
         </ThemedView>
-        <InventoryRender location={"shop"} selfRef={inventoryTarget} />
+        <InventoryRender
+          location={"shop"}
+          selfRef={inventoryTarget}
+          inventory={playerState.getInventory()}
+        />
       </ThemedView>
     );
   }

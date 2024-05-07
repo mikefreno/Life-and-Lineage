@@ -1,14 +1,9 @@
 import { View, Text } from "../Themed";
-import {
-  Pressable,
-  FlatList,
-  Image,
-  View as NonThemedView,
-} from "react-native";
+import { Pressable, FlatList, View as NonThemedView } from "react-native";
 import attacks from "../../assets/json/playerAttacks.json";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { Item } from "../../classes/item";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   LogsContext,
   EnemyContext,
@@ -65,12 +60,9 @@ export default function BattleTab({
   setAttackAnimationOnGoing,
   attackAnimationOnGoing,
   setShowTargetSelection,
-  addItemToPouch,
 }: BattleTabProps) {
   const { colorScheme } = useColorScheme();
   const logs = useContext(LogsContext)?.logsState;
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
-  const selectedItemRef = useRef<Item>();
   const [attackDetails, setAttackDetails] = useState<AttackObj | Spell | null>(
     null,
   );
@@ -289,11 +281,19 @@ export default function BattleTab({
             </>
           );
         case "equipment":
-          return <InventoryRender location={"dungeon"} selfRef={null} />;
+          return (
+            <View className="my-1 flex-1">
+              <InventoryRender
+                location={"dungeon"}
+                selfRef={null}
+                inventory={playerState.getInventory()}
+              />
+            </View>
+          );
         case "log":
           return (
             <View
-              className="my-1 flex-1 rounded border border-zinc-900 px-4 dark:border-zinc-100"
+              className="my-1 flex-1 rounded-lg border border-zinc-600 px-4"
               style={{
                 backgroundColor: colorScheme == "dark" ? "#09090b" : "#fff",
               }}
