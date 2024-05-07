@@ -58,6 +58,7 @@ const ShopInteriorScreen = observer(() => {
       selfDamage?: number | undefined;
     };
   } | null>(null);
+
   const [inventoryFullNotifier, setInventoryFullNotifier] =
     useState<boolean>(false);
 
@@ -116,18 +117,6 @@ const ShopInteriorScreen = observer(() => {
         setSelectedItem(null);
         selectedItemRef.current = undefined;
       }
-    }
-  }
-
-  function displaySetter(item: Item, buying: boolean) {
-    const selected = { item: item, buying: buying };
-    setSelectedItem(selected);
-    selectedItemRef.current = item;
-    if (item.itemClass == "book" && playerState) {
-      const spell = item.getAttachedSpell(playerState.playerClass);
-      setSelectedSpell(spell);
-    } else {
-      setSelectedSpell(null);
     }
   }
 
@@ -229,7 +218,22 @@ const ShopInteriorScreen = observer(() => {
               </ScrollView>
             </View>
           </ThemedView>
-          <View className="flex-1">
+          {showingStats && statsLeftPos && statsTopPos && (
+            <View className="absolute z-50">
+              <StatsDisplay
+                statsLeftPos={statsLeftPos}
+                statsTopPos={statsTopPos}
+                item={showingStats}
+                setShowingStats={setShowingStats}
+                topOffset={-60}
+                topGuard={header / 3}
+                location={"shopkeeper"}
+                playerInventory={false}
+                shop={thisShop}
+              />
+            </View>
+          )}
+          <View className="flex-1 mx-2 mt-4">
             <ThemedView className="flex flex-row justify-center py-4 dark:border-zinc-700">
               <Text className=" text-center">
                 {playerState.getFullName()}'s Inventory
@@ -254,19 +258,9 @@ const ShopInteriorScreen = observer(() => {
               location={"shop"}
               selfRef={inventoryTarget}
               inventory={playerState.getInventory()}
+              shop={thisShop}
             />
           </View>
-          {showingStats && statsLeftPos && statsTopPos && (
-            <View className="absolute z-50">
-              <StatsDisplay
-                statsLeftPos={statsLeftPos}
-                statsTopPos={statsTopPos}
-                showingStats={showingStats}
-                setShowingStats={setShowingStats}
-                topOffset={-80}
-              />
-            </View>
-          )}
         </ThemedView>
       </ThemedView>
     );

@@ -7,6 +7,7 @@ import { useVibration } from "../utility/customHooks";
 import { StatsDisplay } from "./StatsDisplay";
 import { PlayerCharacterContext } from "../app/_layout";
 import { checkReleasePositonProps } from "../utility/types";
+import { Shop } from "../classes/shop";
 
 export interface ItemRenderProps {
   item: Item;
@@ -35,6 +36,7 @@ export type InventoryRenderDungeon = InventoryRenderBase & {
 };
 export type InventoryRenderShop = InventoryRenderBase & {
   location: "shop";
+  shop: Shop;
 };
 
 export type InventoryRenderProps =
@@ -115,10 +117,10 @@ export default function InventoryRender({
               );
             });
           }
+          break;
         case "dungeon":
           const { pouchTarget, addItemToPouch } =
             props as InventoryRenderDungeon;
-
           pouchTarget.current?.measureInWindow(
             (targetX, targetY, targetWidth, targetHeight) => {
               const isWidthAligned =
@@ -135,7 +137,9 @@ export default function InventoryRender({
               }
             },
           );
+          break;
         case "shop":
+          break;
       }
     }
   }
@@ -197,7 +201,7 @@ export default function InventoryRender({
           location == "home"
             ? "h-[60%]"
             : location == "shop"
-            ? "-mt-2 h-[75%]"
+            ? "mt-4 h-[75%]"
             : "mt-1 h-[99%]"
         } mx-auto flex w-full flex-wrap rounded-lg border border-zinc-600`}
       >
@@ -234,17 +238,33 @@ export default function InventoryRender({
           </View>
         ))}
       </View>
-      {showingStats && statsLeftPos && statsTopPos && (
-        <StatsDisplay
-          statsLeftPos={statsLeftPos}
-          statsTopPos={statsTopPos}
-          showingStats={showingStats}
-          setShowingStats={setShowingStats}
-          topOffset={
-            location == "home" ? -240 : location == "dungeon" ? -360 : -360
-          }
-        />
-      )}
+      {showingStats &&
+        statsLeftPos &&
+        statsTopPos &&
+        playerState &&
+        (location !== "shop" ? (
+          <StatsDisplay
+            statsLeftPos={statsLeftPos}
+            statsTopPos={statsTopPos}
+            item={showingStats}
+            setShowingStats={setShowingStats}
+            location={location}
+            topOffset={location == "home" ? -240 : -360}
+          />
+        ) : (
+          location == "shop" && (
+            <StatsDisplay
+              statsLeftPos={statsLeftPos}
+              statsTopPos={statsTopPos}
+              item={showingStats}
+              setShowingStats={setShowingStats}
+              location={location}
+              shop={props.shop}
+              playerInventory={true}
+              topOffset={-360}
+            />
+          )
+        ))}
     </>
   );
 }

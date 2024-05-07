@@ -191,25 +191,14 @@ const RootLayout = observer(() => {
     getAndSetNavBar();
   }, []);
 
-  useEffect(() => {
-    if (Platform.OS == "android") {
-      if (pathname.split("/")[1] == "DungeonLevel") {
-        NavigationBar.setPositionAsync("relative");
-        NavigationBar.setBackgroundColorAsync(
-          colorScheme == "dark" ? "#18181b" : "#fafafa",
-        );
-      } else {
-        NavigationBar.setPositionAsync("absolute");
-        NavigationBar.setBackgroundColorAsync("transparent");
-      }
-    }
-  }, [pathname]);
-
   async function getAndSetNavBar() {
     if (Platform.OS == "android") {
       if ((await NavigationBar.getVisibilityAsync()) == "visible") {
-        await NavigationBar.setPositionAsync("absolute");
+        await NavigationBar.setPositionAsync("relative");
         await NavigationBar.setBackgroundColorAsync("transparent");
+        await NavigationBar.setBackgroundColorAsync(
+          colorScheme == "dark" ? "#18181b" : "#fafafa",
+        );
         if (!navbarLoad) {
           setNavbarLoad(true);
         }

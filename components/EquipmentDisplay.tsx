@@ -361,7 +361,7 @@ export default function EquipmentDisplay({
           <StatsDisplay
             statsLeftPos={statsLeftPos}
             statsTopPos={statsTopPos}
-            showingStats={showingStats}
+            item={showingStats}
             setShowingStats={setShowingStats}
             topOffset={-240}
           />
