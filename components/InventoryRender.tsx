@@ -1,14 +1,14 @@
 import { useContext, useRef, useState } from "react";
 import type { RefObject } from "react";
 import { Item } from "../classes/item";
-import { Dimensions, Pressable, View, Image, Text } from "react-native";
+import { Dimensions, Pressable, View, Image } from "react-native";
 import Draggable from "react-native-draggable";
 import { useVibration } from "../utility/customHooks";
 import { StatsDisplay } from "./StatsDisplay";
 import { PlayerCharacterContext } from "../app/_layout";
 import { checkReleasePositonProps } from "../utility/types";
 
-interface ItemRenderProps {
+export interface ItemRenderProps {
   item: Item;
   count: number;
 }
@@ -30,6 +30,8 @@ export type InventoryRenderHome = InventoryRenderBase & {
 };
 export type InventoryRenderDungeon = InventoryRenderBase & {
   location: "dungeon";
+  pouchTarget: RefObject<View>;
+  addItemToPouch: (item: Item) => void;
 };
 export type InventoryRenderShop = InventoryRenderBase & {
   location: "shop";
@@ -63,57 +65,78 @@ export default function InventoryRender({
     size,
     equipped,
   }: checkReleasePositonProps) {
-    switch (location) {
-      case "home":
-        const { headTarget, bodyTarget, mainHandTarget, offHandTarget } =
-          props as InventoryRenderHome;
-        if (item && item.slot) {
-          let refs: React.RefObject<View>[] = [];
-          switch (item.slot) {
-            case "head":
-              refs.push(headTarget);
-              break;
-            case "body":
-              refs.push(bodyTarget);
-              break;
-            case "two-hand":
-              refs.push(mainHandTarget, offHandTarget);
-              break;
-            case "one-hand":
-              refs.push(mainHandTarget, offHandTarget);
-              break;
-            case "off-hand":
-              refs.push(offHandTarget);
-              break;
-          }
-          refs.forEach((ref) => {
-            ref.current?.measureInWindow(
-              (targetX, targetY, targetWidth, targetHeight) => {
-                const isWidthAligned =
-                  xPos + size / 2 >= targetX &&
-                  xPos - size / 2 <= targetX + targetWidth;
-                const isHeightAligned =
-                  yPos + size / 2 >= targetY &&
-                  yPos - size / 2 <= targetY + targetHeight;
-                if (isWidthAligned && isHeightAligned) {
-                  setShowingStats(null);
-                  vibration({ style: "light", essential: true });
-                  if (
-                    equipped &&
-                    playerState &&
-                    playerState.inventory.length < 24
-                  ) {
-                    playerState?.unEquipItem(item);
-                  } else {
-                    playerState?.equipItem(item);
+    if (item) {
+      switch (location) {
+        case "home":
+          const { headTarget, bodyTarget, mainHandTarget, offHandTarget } =
+            props as InventoryRenderHome;
+          if (item.slot) {
+            let refs: React.RefObject<View>[] = [];
+            switch (item.slot) {
+              case "head":
+                refs.push(headTarget);
+                break;
+              case "body":
+                refs.push(bodyTarget);
+                break;
+              case "two-hand":
+                refs.push(mainHandTarget, offHandTarget);
+                break;
+              case "one-hand":
+                refs.push(mainHandTarget, offHandTarget);
+                break;
+              case "off-hand":
+                refs.push(offHandTarget);
+                break;
+            }
+            refs.forEach((ref) => {
+              ref.current?.measureInWindow(
+                (targetX, targetY, targetWidth, targetHeight) => {
+                  const isWidthAligned =
+                    xPos + size / 2 >= targetX &&
+                    xPos - size / 2 <= targetX + targetWidth;
+                  const isHeightAligned =
+                    yPos + size / 2 >= targetY &&
+                    yPos - size / 2 <= targetY + targetHeight;
+                  if (isWidthAligned && isHeightAligned) {
+                    setShowingStats(null);
+                    vibration({ style: "light", essential: true });
+                    if (
+                      equipped &&
+                      playerState &&
+                      playerState.inventory.length < 24
+                    ) {
+                      playerState?.unEquipItem(item);
+                    } else {
+                      playerState?.equipItem(item);
+                    }
                   }
-                }
-              },
-            );
-          });
-        }
-      case "dungeon":
-      case "shop":
+                },
+              );
+            });
+          }
+        case "dungeon":
+          const { pouchTarget, addItemToPouch } =
+            props as InventoryRenderDungeon;
+
+          pouchTarget.current?.measureInWindow(
+            (targetX, targetY, targetWidth, targetHeight) => {
+              const isWidthAligned =
+                xPos + size / 2 >= targetX &&
+                xPos - size / 2 <= targetX + targetWidth;
+              const isHeightAligned =
+                yPos + size / 2 >= targetY &&
+                yPos - size / 2 <= targetY + targetHeight;
+              if (isWidthAligned && isHeightAligned) {
+                setShowingStats(null);
+                vibration({ style: "light", essential: true });
+                playerState?.removeFromInventory(item);
+                addItemToPouch(item);
+              }
+            },
+          );
+        case "shop":
+      }
     }
   }
 
@@ -174,7 +197,7 @@ export default function InventoryRender({
           location == "home"
             ? "h-[60%]"
             : location == "shop"
-            ? "-mt-2 h-[40%]"
+            ? "-mt-2 h-[75%]"
             : "mt-1 h-[99%]"
         } mx-auto flex w-full flex-wrap rounded-lg border border-zinc-600`}
       >
@@ -183,10 +206,10 @@ export default function InventoryRender({
             className="absolute items-center justify-center"
             style={{
               left: `${
-                (index % 6) * 16.67 + 1 * (Math.floor(deviceWidth / 400) + 1)
+                (index % 6) * 16.67 + 1.2 * Math.floor(deviceWidth / 200)
               }%`,
               top: `${
-                Math.floor(index / 6) * 25 + Math.floor(deviceHeight / 300)
+                Math.floor(index / 6) * 25 + Math.floor(deviceHeight / 200)
               }%`,
             }}
             key={"bg-" + index}
@@ -199,10 +222,10 @@ export default function InventoryRender({
             className="absolute h-1/4 w-1/6 items-center justify-center"
             style={{
               left: `${
-                (index % 6) * 16.67 + 1 * (Math.floor(deviceWidth / 400) + 1)
+                (index % 6) * 16.67 + 1.2 * Math.floor(deviceWidth / 200)
               }%`,
               top: `${
-                Math.floor(index / 6) * 25 + Math.floor(deviceHeight / 300)
+                Math.floor(index / 6) * 25 + Math.floor(deviceHeight / 200)
               }%`,
             }}
             key={index}
@@ -218,7 +241,7 @@ export default function InventoryRender({
           showingStats={showingStats}
           setShowingStats={setShowingStats}
           topOffset={
-            location == "home" ? -240 : location == "dungeon" ? -360 : 0
+            location == "home" ? -240 : location == "dungeon" ? -360 : -360
           }
         />
       )}

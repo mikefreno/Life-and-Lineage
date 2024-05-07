@@ -1,5 +1,5 @@
-import { View, Text } from "../Themed";
-import { Pressable, FlatList, View as NonThemedView } from "react-native";
+import { View as ThemedView, Text } from "../Themed";
+import { Pressable, FlatList, View } from "react-native";
 import attacks from "../../assets/json/playerAttacks.json";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { Item } from "../../classes/item";
@@ -40,6 +40,7 @@ interface BattleTabProps {
     },
     target: Enemy | Minion,
   ) => void;
+  pouchRef: React.RefObject<View>;
   setAttackAnimationOnGoing: React.Dispatch<React.SetStateAction<boolean>>;
   attackAnimationOnGoing: boolean;
   setShowTargetSelection: React.Dispatch<
@@ -60,6 +61,8 @@ export default function BattleTab({
   setAttackAnimationOnGoing,
   attackAnimationOnGoing,
   setShowTargetSelection,
+  pouchRef,
+  addItemToPouch,
 }: BattleTabProps) {
   const { colorScheme } = useColorScheme();
   const logs = useContext(LogsContext)?.logsState;
@@ -120,7 +123,7 @@ export default function BattleTab({
                   data={combinedData}
                   inverted
                   renderItem={({ item: attackOrSpell }) => (
-                    <NonThemedView
+                    <View
                       className="my-1 rounded border px-4 py-2"
                       style={{
                         backgroundColor:
@@ -135,8 +138,8 @@ export default function BattleTab({
                             : "#a1a1aa",
                       }}
                     >
-                      <NonThemedView className="flex flex-row justify-between">
-                        <NonThemedView className="flex flex-col justify-center">
+                      <View className="flex flex-row justify-between">
+                        <View className="flex flex-col justify-center">
                           <Pressable
                             onPress={() => {
                               setAttackDetails(attackOrSpell);
@@ -163,7 +166,7 @@ export default function BattleTab({
                               }% hit chance`}</Text>
                             ) : (
                               "element" in attackOrSpell && (
-                                <NonThemedView className="flex flex-row">
+                                <View className="flex flex-row">
                                   <Text
                                     style={{
                                       color:
@@ -173,7 +176,7 @@ export default function BattleTab({
                                   >
                                     {attackOrSpell.manaCost}
                                   </Text>
-                                  <NonThemedView className="my-auto pl-1">
+                                  <View className="my-auto pl-1">
                                     <Energy
                                       height={14}
                                       width={14}
@@ -183,12 +186,12 @@ export default function BattleTab({
                                           : undefined
                                       }
                                     />
-                                  </NonThemedView>
-                                </NonThemedView>
+                                  </View>
+                                </View>
                               )
                             )}
                           </Pressable>
-                        </NonThemedView>
+                        </View>
                         <Pressable
                           disabled={
                             ("element" in attackOrSpell &&
@@ -241,25 +244,25 @@ export default function BattleTab({
                               : "Attack"}
                           </Text>
                         </Pressable>
-                      </NonThemedView>
-                    </NonThemedView>
+                      </View>
+                    </View>
                   )}
                 />
               ) : (
-                <NonThemedView className="my-auto px-4 py-2 shadow">
+                <View className="my-auto px-4 py-2 shadow">
                   <Text className="text-center text-2xl tracking-wide">
                     Stunned!
                   </Text>
-                  <NonThemedView
+                  <View
                     className="flex flex-row justify-between rounded border px-4 py-2"
                     style={{
                       borderColor:
                         colorScheme == "light" ? "#71717a" : "#a1a1aa",
                     }}
                   >
-                    <NonThemedView className="flex flex-col justify-center">
+                    <View className="flex flex-col justify-center">
                       <Text className="text-xl">Pass</Text>
-                    </NonThemedView>
+                    </View>
                     <Pressable
                       disabled={attackAnimationOnGoing}
                       onPress={() => {
@@ -275,8 +278,8 @@ export default function BattleTab({
                     >
                       <Text className="text-xl">Use</Text>
                     </Pressable>
-                  </NonThemedView>
-                </NonThemedView>
+                  </View>
+                </View>
               )}
             </>
           );
@@ -287,12 +290,14 @@ export default function BattleTab({
                 location={"dungeon"}
                 selfRef={null}
                 inventory={playerState.getInventory()}
+                pouchTarget={pouchRef}
+                addItemToPouch={addItemToPouch}
               />
             </View>
           );
         case "log":
           return (
-            <View
+            <ThemedView
               className="my-1 flex-1 rounded-lg border border-zinc-600 px-4"
               style={{
                 backgroundColor: colorScheme == "dark" ? "#09090b" : "#fff",
@@ -303,7 +308,7 @@ export default function BattleTab({
                 data={logs?.slice().reverse()}
                 renderItem={({ item }) => <Text className="py-1">{item}</Text>}
               />
-            </View>
+            </ThemedView>
           );
       }
     }
@@ -316,7 +321,7 @@ export default function BattleTab({
         backFunction={() => setAttackDetailsShowing(false)}
       >
         {attackDetails && (
-          <NonThemedView className="flex items-center">
+          <View className="flex items-center">
             {"element" in attackDetails ? (
               <SpellDetails spell={attackDetails} />
             ) : (
@@ -335,10 +340,10 @@ export default function BattleTab({
                   <>
                     <GenericStrikeAround text="Buffs" />
                     {attackDetails.buffs.map((buff) => (
-                      <NonThemedView>
+                      <View>
                         <Text>{buff.name}</Text>
                         <Text>{buff.chance * 100}% effect chance</Text>
-                      </NonThemedView>
+                      </View>
                     ))}
                   </>
                 )}
@@ -346,14 +351,14 @@ export default function BattleTab({
                   <>
                     <GenericStrikeAround text="Debuffs" />
                     {attackDetails.debuffs.map((debuff) => (
-                      <NonThemedView>
+                      <View>
                         <Text>{debuff.name}</Text>
                         <Text>{debuff.chance * 100}% effect chance</Text>
-                      </NonThemedView>
+                      </View>
                     ))}
                   </>
                 )}
-                <NonThemedView className="my-1 w-2/3 items-center rounded-md border border-zinc-800 px-2 py-1 dark:border-zinc-100">
+                <View className="my-1 w-2/3 items-center rounded-md border border-zinc-800 px-2 py-1 dark:border-zinc-100">
                   <Text className="text-center">
                     {playerState?.calculateBaseAttackDamage(attackDetails)} base
                     attack damage
@@ -361,10 +366,10 @@ export default function BattleTab({
                   <Text className="text-center">
                     (before enemy damage reduction)
                   </Text>
-                </NonThemedView>
+                </View>
               </>
             )}
-          </NonThemedView>
+          </View>
         )}
       </GenericModal>
       <TabRender />

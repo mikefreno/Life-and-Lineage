@@ -1,6 +1,6 @@
 import { View as ThemedView, Text } from "../../components/Themed";
 import { Animated, View, Platform } from "react-native";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useRef, useEffect, useState } from "react";
 import { Pressable } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 import BattleTab from "../../components/DungeonComponents/BattleTab";
@@ -95,8 +95,9 @@ const DungeonLevelScreen = observer(() => {
   const [enemyAttackDummy, setEnemyAttackDummy] = useState<number>(0);
   const [enemyHealDummy, setEnemyHealDummy] = useState<number>(0);
   const [enemyTextDummy, setEnemyTextDummy] = useState<number>(0);
-  const vibration = useVibration();
+  const pouchRef = useRef<View>(null);
 
+  const vibration = useVibration();
   const isFocused = useIsFocused();
 
   if (!playerState || !gameState) {
@@ -724,6 +725,7 @@ const DungeonLevelScreen = observer(() => {
             <View className="flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50" />
           )}
           <Pressable
+            ref={pouchRef}
             className="absolute ml-4 mt-4"
             onPress={() => setShowLeftBehindItemsScreen(true)}
           >
@@ -740,6 +742,7 @@ const DungeonLevelScreen = observer(() => {
                 attackAnimationOnGoing={attackAnimationOnGoing}
                 setShowTargetSelection={setShowTargetSelection}
                 addItemToPouch={addItemToPouch}
+                pouchRef={pouchRef}
               />
             </View>
           </View>
