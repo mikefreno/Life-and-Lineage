@@ -38,17 +38,20 @@ export function numberToRoman(num: number): string {
 }
 export function asReadableGold(gold: number) {
   if (gold >= 1_000_000_000) {
-    const cleanedUp = (gold / 1_000_000_000).toFixed(2);
+    const cleanedUp = (gold / 1_000_000_000).toFixed(0);
     return `${parseFloat(cleanedUp).toLocaleString()}B`;
   }
   if (gold >= 1_000_000) {
-    const cleanedUp = (gold / 1_000_000).toFixed(2);
+    const cleanedUp = (gold / 1_000_000).toFixed(0);
     return `${parseFloat(cleanedUp).toLocaleString()}M`;
   }
   if (gold >= 10_000) {
-    const cleanedUp = (gold / 1000).toFixed(2);
+    const cleanedUp = (gold / 1000).toFixed(0);
     return `${parseFloat(cleanedUp).toLocaleString()}K`;
-  } else return gold.toLocaleString();
+  }
+  if (gold > 20) {
+    return gold.toFixed(0).toLocaleString();
+  } else return gold.toFixed(1).toLocaleString();
 }
 
 export function damageReduction(armorValue: number) {
