@@ -19,7 +19,8 @@ import InventoryRender, {
 } from "../../components/InventoryRender";
 import { StatsDisplay } from "../../components/StatsDisplay";
 
-const ONE_HOUR = 60 * 60 * 1000;
+//const ONE_HOUR = 60 * 60 * 1000;
+const ONE_MINUTE = 1000 * 60; // for testing_one_min
 
 const ShopInteriorScreen = observer(() => {
   const { shop } = useLocalSearchParams();
@@ -40,24 +41,6 @@ const ShopInteriorScreen = observer(() => {
   const [statsLeftPos, setStatsLeftPos] = useState<number>();
   const [statsTopPos, setStatsTopPos] = useState<number>();
   const [refreshCheck, setRefreshCheck] = useState<boolean>(false);
-  const [selectedSpell, setSelectedSpell] = useState<{
-    name: string;
-    element: string;
-    proficiencyNeeded: number;
-    manaCost: number;
-    effects: {
-      damage: number | null;
-      buffs: string[] | null;
-      debuffs:
-        | {
-            name: string;
-            chance: number;
-          }[]
-        | null;
-      summon?: string[] | undefined;
-      selfDamage?: number | undefined;
-    };
-  } | null>(null);
 
   const [inventoryFullNotifier, setInventoryFullNotifier] =
     useState<boolean>(false);
@@ -89,7 +72,7 @@ const ShopInteriorScreen = observer(() => {
     if (
       playerState &&
       thisShop &&
-      new Date(thisShop.lastStockRefresh) < new Date(Date.now() - ONE_HOUR)
+      new Date(thisShop.lastStockRefresh) < new Date(Date.now() - ONE_MINUTE)
     ) {
       thisShop.refreshInventory(playerState.playerClass);
     }
@@ -186,8 +169,8 @@ const ShopInteriorScreen = observer(() => {
           }}
         />
         <ThemedView className="flex-1 justify-between">
-          <ThemedView className="flex flex-row justify-between">
-            <View className="w-1/3 items-center pt-4">
+          <ThemedView className="flex h-[40%] flex-row justify-between">
+            <View className="w-1/3 items-center my-auto">
               <CharacterImage
                 characterAge={calculateAge(
                   new Date(thisShop.shopKeeper.birthdate),
@@ -203,7 +186,7 @@ const ShopInteriorScreen = observer(() => {
                 <Coins width={16} height={16} style={{ marginLeft: 6 }} />
               </View>
             </View>
-            <View className="mx-2 -mt-1 h-80 w-2/3 rounded border border-zinc-300 dark:border-zinc-700">
+            <View className="mx-2 -mt-1 w-2/3 rounded border border-zinc-300 dark:border-zinc-700">
               <ScrollView className="my-auto">
                 <View className="flex flex-row flex-wrap justify-around">
                   {thisShop.inventory.map((item) => (

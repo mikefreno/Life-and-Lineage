@@ -243,7 +243,10 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
         <View className="flex flex-row justify-around">
           {simplifiedConditions.map((cond) => (
             <View key={cond.name} className="mx-2 flex align-middle">
-              <Image source={cond.icon} style={{ height: 24, maxWidth: 32 }} />
+              <Image
+                source={cond.icon}
+                style={{ maxHeight: 26, maxWidth: 32 }}
+              />
             </View>
           ))}
         </View>
@@ -356,43 +359,48 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                       </Text>
                     </View>
                   )}
-                  {Array.isArray(condition.effect) ? (
-                    condition.effect.map((effect) => {
-                      if (effectListTypes.includes(effect)) {
-                        return (
-                          <View
-                            key={condition.id}
-                            className="flex flex-row items-center"
-                          >
-                            <Text> {toTitleCase(effect)}</Text>
-                            <Text>
-                              {` of `}
-                              {condition.effectStyle == "flat"
-                                ? condition.effectMagnitude
-                                : condition.effectStyle == "multiplier"
-                                ? condition.effectMagnitude * 100 + "%"
-                                : ""}
-                            </Text>
-                          </View>
-                        );
-                      }
-                    })
-                  ) : (
-                    <View
-                      key={condition.id}
-                      className="flex flex-row items-center"
-                    >
-                      <Text> {toTitleCase(condition.effect)}</Text>
-                      <Text>
-                        {` of `}
-                        {condition.effectStyle == "flat"
-                          ? condition.effectMagnitude
-                          : condition.effectMagnitude
-                          ? condition.effectMagnitude * 100 + "%"
-                          : ""}
-                      </Text>
+                  {condition.effect.includes("blood magic consumable") && (
+                    <View className="flex flex-row items-center">
+                      <Text>Expended by powerful blood magic</Text>
                     </View>
                   )}
+                  {Array.isArray(condition.effect)
+                    ? condition.effect.map((effect) => {
+                        if (effectListTypes.includes(effect)) {
+                          return (
+                            <View
+                              key={condition.id}
+                              className="flex flex-row items-center"
+                            >
+                              <Text> {toTitleCase(effect)}</Text>
+                              <Text>
+                                {` of `}
+                                {condition.effectStyle == "flat"
+                                  ? condition.effectMagnitude
+                                  : condition.effectStyle == "multiplier"
+                                  ? condition.effectMagnitude * 100 + "%"
+                                  : ""}
+                              </Text>
+                            </View>
+                          );
+                        }
+                      })
+                    : condition.effectMagnitude && (
+                        <View
+                          key={condition.id}
+                          className="flex flex-row items-center"
+                        >
+                          <Text> {toTitleCase(condition.effect)}</Text>
+                          <Text>
+                            {` of `}
+                            {condition.effectStyle == "flat"
+                              ? condition.effectMagnitude
+                              : condition.effectMagnitude
+                              ? condition.effectMagnitude * 100 + "%"
+                              : ""}
+                          </Text>
+                        </View>
+                      )}
                 </View>
               </View>
             ))}
@@ -675,14 +683,14 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
               <View className="flex pt-0.5">
                 <View className="flex h-7 flex-row justify-center">
                   {!hideGold && (
-                    <>
+                    <View className="flex flex-row my-auto">
                       <Text>{readableGold}</Text>
                       <Coins width={16} height={16} style={{ marginLeft: 6 }} />
                       {showingGoldChange ? goldChangePopUp() : null}
-                    </>
+                    </View>
                   )}
                   {playerState.unAllocatedSkillPoints > 0 && (
-                    <View className="px-1">
+                    <View className="px-1 my-auto">
                       <SquarePlus height={16} width={16} />
                     </View>
                   )}

@@ -166,9 +166,9 @@ export function StatsDisplay({
                   ? "rgba(250, 250, 250, 0.98)"
                   : "rgba(20, 20, 20, 0.95)",
               left: statsLeftPos
-                ? statsLeftPos < deviceWidth * 0.6
-                  ? statsLeftPos + 50
-                  : statsLeftPos - deviceWidth / 3
+                ? statsLeftPos < deviceWidth * 0.6 + (leftOffset ?? 0)
+                  ? statsLeftPos + 50 + (leftOffset ?? 0)
+                  : statsLeftPos - deviceWidth / 3 + (leftOffset ?? 0)
                 : undefined,
               top:
                 topGuard && statsTopPos + (topOffset ?? 0) < topGuard

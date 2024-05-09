@@ -123,8 +123,9 @@ export default function DungeonEnemyDisplay({
           )}
           {EnemyConditionRender()}
         </View>
-        <View className="my-auto">
+        <View>
           <Animated.View
+            className="mx-auto mt-12"
             style={{
               transform: [
                 { translateX: enemyAttackAnimationValue },
@@ -140,6 +141,9 @@ export default function DungeonEnemyDisplay({
           >
             <EnemyImage creatureSpecies={enemyState.creatureSpecies} />
           </Animated.View>
+          <View className="absolute -mt-[40vh]">
+            <EnemyHealingAnimationBox showHealAnimationDummy={enemyHealDummy} />
+          </View>
           <Animated.View
             style={{
               transform: [{ translateY: enemyTextTranslateAnimation }],
@@ -155,9 +159,6 @@ export default function DungeonEnemyDisplay({
               </Text>
             ) : null}
           </Animated.View>
-          <View className="-mr-8">
-            <EnemyHealingAnimationBox showHealAnimationDummy={enemyHealDummy} />
-          </View>
         </View>
       </View>
       {enemyState.minions.length > 0 ? (

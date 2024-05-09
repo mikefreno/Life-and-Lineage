@@ -138,7 +138,8 @@ export type effectOptions =
   | "undead cower"
   | "blur"
   | "thorns"
-  | "revenge";
+  | "revenge"
+  | "blood magic consumable"
 
 export type ConditionBase = {
   id?: string;

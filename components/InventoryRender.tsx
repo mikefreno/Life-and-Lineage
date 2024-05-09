@@ -1,7 +1,7 @@
 import { useContext, useRef, useState } from "react";
 import type { RefObject } from "react";
 import { Item } from "../classes/item";
-import { Dimensions, Pressable, View, Image } from "react-native";
+import { Dimensions, Pressable, View, Image, Platform } from "react-native";
 import Draggable from "react-native-draggable";
 import { useVibration } from "../utility/customHooks";
 import { StatsDisplay } from "./StatsDisplay";
@@ -249,7 +249,15 @@ export default function InventoryRender({
             item={showingStats}
             setShowingStats={setShowingStats}
             location={location}
-            topOffset={location == "home" ? -240 : -360}
+            topOffset={
+              Platform.OS == "ios"
+                ? location == "home"
+                  ? -(120 + deviceHeight / 10)
+                  : -(deviceHeight / 2.15)
+                : location == "home"
+                ? -(80 + deviceHeight / 10)
+                : -(14 + deviceHeight / 2.4)
+            }
           />
         ) : (
           location == "shop" && (
@@ -261,7 +269,12 @@ export default function InventoryRender({
               location={location}
               shop={props.shop}
               playerInventory={true}
-              topOffset={-360}
+              topOffset={
+                Platform.OS == "ios"
+                  ? -(40 + deviceHeight / 2.2)
+                  : -(40 + deviceHeight / 2.4)
+              }
+              leftOffset={-4}
             />
           )
         ))}

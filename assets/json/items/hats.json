@@ -4,7 +4,47 @@
       "baseValue": 1000,
       "icon":"Wizard_Hat",
       "stats":{
-         "armor": 3.0
+         "armor": 3.0,
+         "regen": 1.0
+      }
+   },
+   {
+      "name": "adept hood",
+      "baseValue": 2500,
+      "icon": "Wizard_Hat",
+      "stats":{
+         "armor": 3.0,
+         "mana": 20.0,
+         "regen": 1.0
+      }
+   },
+   {
+      "name": "mage hood",
+      "baseValue": 2500,
+      "icon": "Wizard_Hat",
+      "stats":{
+         "armor": 5.0,
+         "mana": 100.0
+      }
+   },
+   {
+      "name": "gorgeous hood",
+      "baseValue": 4500,
+      "icon": "Wizard_Hat",
+      "stats":{
+         "armor": 5.0,
+         "mana": 15.0,
+         "regen": 2.0
+      }
+   },
+   {
+      "name": "veil of god",
+      "baseValue": 550000,
+      "icon": "Wizard_Hat",
+      "stats":{
+         "armor": 12.0,
+         "mana": 200.0,
+         "regen": 25.0
       }
    }
 ]

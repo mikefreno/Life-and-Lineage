@@ -270,5 +270,15 @@
       "effectStyle": "flat",
       "effectAmount": 75,
       "icon": "pray_hands"
+   },
+   {
+      "name": "blood orb",
+      "style": "buff",
+      "turns": 25,
+      "aura": false,
+      "effect": "blood magic consumable",
+      "effectStyle": null,
+      "effectAmount": null,
+      "icon": "blood_orb"
    }
 ]

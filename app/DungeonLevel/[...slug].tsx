@@ -676,10 +676,6 @@ const DungeonLevelScreen = observer(() => {
             />
           </>
         </GenericModal>
-        {/*<GenericModal
-          isVisibleCondition={}
-          backFunction={}
-        ><View></View></GenericModal> */}
         <ThemedView className="flex-1 px-2" style={{ paddingBottom: 88 }}>
           {enemyState ? (
             <DungeonEnemyDisplay

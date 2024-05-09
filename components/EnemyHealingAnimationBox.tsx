@@ -4,7 +4,7 @@ import { View, Animated } from "react-native";
 import { Easing } from "react-native-reanimated";
 
 const HealingIcon = ({ delay = 0 }) => {
-  const translateAnim = useRef(new Animated.Value(320)).current;
+  const translateAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.loop(
@@ -12,8 +12,8 @@ const HealingIcon = ({ delay = 0 }) => {
         Animated.delay(delay),
         Animated.parallel([
           Animated.timing(translateAnim, {
-            toValue: -320,
-            duration: 2000,
+            toValue: -700,
+            duration: 3000,
             useNativeDriver: true,
           }),
         ]),
@@ -50,7 +50,7 @@ export const EnemyHealingAnimationBox = ({
       setOpacityAnim(newAnim);
       Animated.timing(newAnim, {
         toValue: 0,
-        duration: 2500,
+        duration: 3000,
         useNativeDriver: true,
         easing: Easing.out(Easing.poly(5)),
       }).start();
@@ -60,16 +60,12 @@ export const EnemyHealingAnimationBox = ({
   }, [showHealAnimationDummy]);
 
   return (
-    <Animated.View
-      style={{ opacity: opacityAnim }}
-      className="absolute right-52 mt-32"
-    >
+    <Animated.View style={{ opacity: opacityAnim }}>
       <View
         style={{
           flexDirection: "row",
           flexWrap: "wrap",
           width: 192,
-          position: "absolute",
         }}
       >
         {Array.from({ length: 6 * 4 }).map((_, i) => (

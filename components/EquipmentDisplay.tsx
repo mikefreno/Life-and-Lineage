@@ -274,7 +274,7 @@ export default function EquipmentDisplay({
                 </Draggable>
               </View>
             ) : playerState?.equipment.mainHand.slot == "two-hand" ? (
-              <View className="mx-auto h-12 w-12 items-center rounded-lg bg-zinc-400">
+              <View className="z-50 mx-auto h-12 w-12 items-center rounded-lg bg-zinc-400">
                 <Image
                   className="my-auto opacity-50"
                   source={playerState?.equipment.mainHand?.getItemIcon()}

@@ -133,4 +133,5 @@ const conditionIconMap: { [key: string]: any } = {
   split_heart: require("../assets/images/conditions/split_heart.png"),
   stun: require("../assets/images/conditions/stun.png"),
   viruses: require("../assets/images/conditions/viruses.png"),
+  blood_orb: require("../assets/images/conditions/blood_orb.png"),
 };

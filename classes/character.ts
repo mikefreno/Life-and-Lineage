@@ -933,6 +933,7 @@ export class PlayerCharacter extends Character {
       this.addToInventory(this.equipment.head);
       this.equipment.head = null;
     }
+    this.setPhysicalAttacks();
   }
 
   public getInventory() {
@@ -977,6 +978,8 @@ export class PlayerCharacter extends Character {
       baseValue: 0,
       itemClass: "weapon",
     });
+    this.setPhysicalAttacks();
+    console.log(this.equipment.mainHand);
   }
   //----------------------------------Gold----------------------------------//
   public getReadableGold() {
@@ -1371,6 +1374,8 @@ export class PlayerCharacter extends Character {
       }
       if (itemObj) {
         this.physicalAttacks = itemObj.attacks;
+      } else {
+        this.physicalAttacks = ["punch"];
       }
     }
   }
