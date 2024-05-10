@@ -42,7 +42,6 @@ export class DungeonInstance {
             stepsBeforeBoss: nextLevelObj.stepsBeforeBoss,
           }),
         );
-        console.log("added");
         return true;
       } else {
         return false;

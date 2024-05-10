@@ -182,10 +182,8 @@ export class Game {
         throw new Error("Missing owned instance");
       }
       if (ownedInstance.levels.length < foundInstanceObj.levels.length) {
-        console.log("adding level");
         ownedInstance.addLevel();
       } else {
-        console.log("adding instance");
         const unlockStrings = foundInstanceObj.unlocks;
         unlockStrings.forEach((unlock) => {
           const found = dungeons.find((dungeon) => dungeon.instance == unlock);

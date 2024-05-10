@@ -8,7 +8,7 @@ export const storeData = async (key: string, value: any) => {
     await AsyncStorage.setItem(key, jsonValue);
   } catch (e) {
     // saving error
-    console.log(e);
+    console.error(e);
   }
 };
 
@@ -18,7 +18,7 @@ export const saveGame = async (game: Game | null) => {
     const jsonGame = JSON.stringify(game);
     await AsyncStorage.setItem("game", jsonGame);
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 };
 export const savePlayer = async (player: PlayerCharacter) => {
@@ -26,7 +26,7 @@ export const savePlayer = async (player: PlayerCharacter) => {
     const jsonPlayer = JSON.stringify(player);
     await AsyncStorage.setItem("player", jsonPlayer);
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 };
 
@@ -43,7 +43,7 @@ export const fullSave = async (
         AsyncStorage.setItem("player", jsonPlayer),
       ]);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 };
@@ -53,7 +53,7 @@ export const getData = async (key: string) => {
     const jsonValue = await AsyncStorage.getItem(key);
     return jsonValue != null ? JSON.parse(jsonValue) : null;
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 };
 
@@ -62,7 +62,7 @@ export const loadGame = async () => {
     const jsonValue = await AsyncStorage.getItem("game");
     return jsonValue != null ? JSON.parse(jsonValue) : null;
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 };
 
@@ -71,6 +71,6 @@ export const loadPlayer = async () => {
     const jsonValue = await AsyncStorage.getItem("player");
     return jsonValue != null ? JSON.parse(jsonValue) : null;
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 };

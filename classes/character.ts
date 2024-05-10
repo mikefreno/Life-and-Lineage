@@ -979,7 +979,6 @@ export class PlayerCharacter extends Character {
       itemClass: "weapon",
     });
     this.setPhysicalAttacks();
-    console.log(this.equipment.mainHand);
   }
   //----------------------------------Gold----------------------------------//
   public getReadableGold() {
