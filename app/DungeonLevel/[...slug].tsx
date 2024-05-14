@@ -48,6 +48,9 @@ const DungeonLevelScreen = observer(() => {
   const { logsState } = logsContext;
 
   const { slug } = useLocalSearchParams();
+  if (!slug) {
+    return <View>Missing params...</View>;
+  }
   const [fightingBoss, setFightingBoss] = useState<boolean>(false);
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
   const [instanceName, setInstanceName] = useState<string>(slug[0]);
@@ -771,7 +774,7 @@ const DungeonLevelScreen = observer(() => {
           ) : null}
         </ThemedView>
         <View className="absolute z-50 w-full" style={{ bottom: 95 }}>
-          <PlayerStatus hideGold />
+          <PlayerStatus />
         </View>
       </>
     );

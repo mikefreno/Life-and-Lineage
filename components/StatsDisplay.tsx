@@ -203,9 +203,11 @@ export function StatsDisplay({
       </Text>
       {item.itemClass == "book" && playerState ? (
         <>
-          <SpellDetails
-            spell={item.getAttachedSpell(playerState.playerClass)}
-          />
+          <View className="-mx-2">
+            <SpellDetails
+              spell={item.getAttachedSpell(playerState.playerClass)}
+            />
+          </View>
           {location != "shopkeeper" && (
             <Pressable
               onPress={() => {

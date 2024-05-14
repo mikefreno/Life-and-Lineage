@@ -5,7 +5,12 @@ import {
   PlayerCharacter,
   getStartingBook,
 } from "../../../classes/character";
-import { Stack, router, useLocalSearchParams } from "expo-router";
+import {
+  Stack,
+  router,
+  useLocalSearchParams,
+  useNavigation,
+} from "expo-router";
 import {
   getRandomName,
   toTitleCase,
@@ -22,9 +27,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getRandomJobTitle } from "../../../utility/functions/characterAid";
 import { createShops } from "../../../classes/shop";
 import { generateBirthday } from "../../../utility/functions/misc/age";
+import clearHistory from "../../../utility/functions/misc/nav";
 
 export default function NewGameReview() {
   const { slug } = useLocalSearchParams();
+  if (!slug) {
+    return router.replace("/NewGame");
+  }
   const playerClass = slug[0];
   const sex = slug[1];
   const firstName = slug[2];
@@ -42,6 +51,7 @@ export default function NewGameReview() {
   if (!gameData) throw new Error("missing contexts");
   const { gameState } = gameData;
   const { setPlayerCharacter } = playerCharacterContext;
+  const navigation = useNavigation();
 
   function createParent(sex: "female" | "male"): Character {
     const firstName = getRandomName(sex).firstName;
@@ -128,7 +138,6 @@ export default function NewGameReview() {
           | "protection",
       );
       player.addToInventory(starterBook);
-      setPlayerCharacter(player);
       const startDate = new Date().toISOString();
       const shops = createShops(
         playerClass as "mage" | "paladin" | "necromancer",
@@ -154,12 +163,10 @@ export default function NewGameReview() {
         newGame.setColorScheme(colorScheme);
       }
       gameDataSetter(newGame);
+      setPlayerCharacter(player);
       logsSetter([]);
       vibration({ style: "success" });
-      while (router.canGoBack()) {
-        router.back();
-      }
-      router.replace("/");
+      setTimeout(() => clearHistory(navigation), 500);
       AsyncStorage.removeItem("tutorialsEnabled");
     }
   }

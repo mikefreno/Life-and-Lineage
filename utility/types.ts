@@ -1,6 +1,29 @@
-import { RefObject } from "react";
 import type { Item } from "../classes/item";
-import { View } from "react-native";
+
+export interface ItemOptions {
+  id?: string;
+  name: string;
+  slot?: "head" | "body" | "one-hand" | "two-hand" | "off-hand" | null;
+  stats?: Record<string, number | undefined> | null;
+  baseValue: number;
+  itemClass:
+    | "artifact"
+    | "potion"
+    | "poison"
+    | "junk"
+    | "ingredient"
+    | "wand"
+    | "focus"
+    | "weapon"
+    | "shield"
+    | "bodyArmor"
+    | "helmet"
+    | "robe"
+    | "hat"
+    | "book";
+  icon?: string;
+  stackable?: number | null;
+}
 
 export type InvestmentType = {
   name: string;
@@ -139,7 +162,7 @@ export type effectOptions =
   | "blur"
   | "thorns"
   | "revenge"
-  | "blood magic consumable"
+  | "blood magic consumable";
 
 export type ConditionBase = {
   id?: string;
@@ -171,6 +194,34 @@ export type ComplexCondition = ConditionBase & {
 };
 
 export type ConditionType = SimpleCondition | ComplexCondition;
+
+export type ConditionObjectBase = {
+  name: string;
+  style: "debuff" | "buff";
+  turns: number;
+  aura?: boolean;
+  icon: string;
+};
+
+export type SimpleConditionObject = ConditionObjectBase & {
+  effect: effectOptions;
+  effectStyle: "flat" | "multiplier" | "percentage" | null;
+  effectAmount: number | null;
+  healthDamage: number | null;
+  sanityDamage: number | null;
+};
+
+export type ComplexConditionObject = ConditionObjectBase & {
+  effect: effectOptions[];
+  effectStyle: ("flat" | "multiplier" | "percentage" | null)[] | null;
+  effectAmount: (number | null)[];
+  healthDamage: (number | null)[];
+  sanityDamage: (number | null)[];
+};
+
+export type ConditionObjectType =
+  | SimpleConditionObject
+  | ComplexConditionObject;
 
 export interface checkReleasePositonProps {
   item: Item | null;

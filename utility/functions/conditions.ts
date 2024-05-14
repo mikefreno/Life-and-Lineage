@@ -3,35 +3,7 @@ import { Condition } from "../../classes/conditions";
 import { PlayerCharacter } from "../../classes/character";
 import sanityDebuffs from "../../assets/json/sanityDebuffs.json";
 import { rollD20 } from "./roll";
-import { effectOptions } from "../types";
-
-type ConditionObjectBase = {
-  name: string;
-  style: "debuff" | "buff";
-  turns: number;
-  aura?: boolean;
-  icon: string;
-};
-
-type SimpleConditionObject = ConditionObjectBase & {
-  effect: effectOptions;
-  effectStyle: "flat" | "multiplier" | "percentage" | null;
-  effectAmount: number | null;
-  healthDamage: number | null;
-  sanityDamage: number | null;
-};
-
-type ComplexConditionObject = ConditionObjectBase & {
-  effect: effectOptions[];
-  effectStyle: ("flat" | "multiplier" | "percentage" | null)[] | null;
-  effectAmount: (number | null)[];
-  healthDamage: (number | null)[];
-  sanityDamage: (number | null)[];
-};
-
-export type ConditionObjectType =
-  | SimpleConditionObject
-  | ComplexConditionObject;
+import { ConditionObjectType } from "../types";
 
 interface createDebuffDeps {
   debuffName: string;

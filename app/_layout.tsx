@@ -68,7 +68,7 @@ export const LogsContext = createContext<
 
 Sentry.init({
   dsn: "https://2cff54f8aeb50bcb7151c159cc40fe1b@o4506630160187392.ingest.sentry.io/4506630163398656",
-  debug: process.env.NODE_ENV === "development", // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
+  debug: false, // process.env.NODE_ENV === "development"  If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
 });
 
 const Root = observer(() => {
@@ -151,18 +151,16 @@ const RootLayout = observer(() => {
   if (!gameData || !playerCharacterData || !enemyData) {
     throw new Error("missing context");
   }
-  const { gameState } = gameData;
   const { playerState } = playerCharacterData;
   const { setEnemy } = enemyData;
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
   const [navbarLoad, setNavbarLoad] = useState(false);
-  const pathname = usePathname();
 
   useEffect(() => {
     if (fontLoaded && navbarLoad) {
       SplashScreen.hideAsync();
-      if (!playerState || !gameState) {
+      if (!playerState) {
         router.replace("/NewGame");
       } else if (
         gameData?.gameState?.atDeathScreen ||
@@ -185,7 +183,7 @@ const RootLayout = observer(() => {
       }
       setFirstLoad(false);
     }
-  }, [fontLoaded, navbarLoad, gameData, playerState]);
+  }, [fontLoaded, navbarLoad, playerState]);
 
   useEffect(() => {
     getAndSetNavBar();

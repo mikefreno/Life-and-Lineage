@@ -5,31 +5,7 @@ import mageSpells from "../assets/json/mageSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import * as Crypto from "expo-crypto";
-
-interface ItemOptions {
-  id?: string;
-  name: string;
-  slot?: "head" | "body" | "one-hand" | "two-hand" | "off-hand" | null;
-  stats?: Record<string, number | undefined> | null;
-  baseValue: number;
-  itemClass:
-    | "artifact"
-    | "potion"
-    | "poison"
-    | "junk"
-    | "ingredient"
-    | "wand"
-    | "focus"
-    | "weapon"
-    | "shield"
-    | "bodyArmor"
-    | "helmet"
-    | "robe"
-    | "hat"
-    | "book";
-  icon?: string;
-  stackable?: number | null;
-}
+import type { ItemOptions } from "../utility/types";
 
 export class Item {
   readonly id: string;

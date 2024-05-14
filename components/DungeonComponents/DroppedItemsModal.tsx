@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import GenericModal from "../GenericModal";
 import { Item } from "../../classes/item";
-import { SetStateAction, useEffect } from "react";
+import { SetStateAction } from "react";
 import { PlayerCharacter } from "../../classes/character";
 import { Pressable, View, Image } from "react-native";
 import Coins from "../../assets/icons/CoinsIcon";
@@ -37,6 +37,7 @@ export default function DroppedItemsModal({
 }: DroppedItemsModalProps) {
   function closeImmediateItemDrops() {
     if (droppedItems && droppedItems.itemDrops.length > 0) {
+      console.log(droppedItems);
       setLeftBehindDrops((prev) => [...prev, ...droppedItems.itemDrops]);
     }
     setDroppedItems(null);
