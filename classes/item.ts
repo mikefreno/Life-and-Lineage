@@ -5,7 +5,8 @@ import mageSpells from "../assets/json/mageSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import * as Crypto from "expo-crypto";
-import type { ItemOptions } from "../utility/types";
+import type { ItemOptions, Spell } from "../utility/types";
+import { parseSpell } from "../utility/functions/jsonParsing";
 
 export class Item {
   readonly id: string;
@@ -71,38 +72,41 @@ export class Item {
     return Math.round(this.baseValue * (1.4 - affection / 2500));
   }
 
-  public getAttachedSpell(playerClass: "mage" | "paladin" | "necromancer") {
+  public getAttachedSpell(
+    playerClass: "mage" | "paladin" | "necromancer",
+  ): Spell {
+    let spell = undefined;
     if (this.itemClass == "book") {
       if (playerClass == "mage") {
         const bookObj = mageBooks.find((book) => book.name == this.name);
-        const spell = mageSpells.find(
+        spell = mageSpells.find(
           (mageSpell) => bookObj?.teaches == mageSpell.name,
         );
         if (!spell) {
           throw new Error(`missing spell from Book Item ${this.name}`);
         }
-        return spell;
       }
       if (playerClass == "necromancer") {
         const bookObj = necroBooks.find((book) => book.name == this.name);
-        const spell = necroSpells.find(
+        spell = necroSpells.find(
           (necroSpell) => bookObj?.teaches == necroSpell.name,
         );
         if (!spell) {
           throw new Error(`missing spell from Book Item ${this.name}`);
         }
-        return spell;
       }
       if (playerClass == "paladin") {
         const bookObj = paladinBooks.find((book) => book.name == this.name);
-        const spell = paladinSpells.find(
+        spell = paladinSpells.find(
           (paladinSpell) => bookObj?.teaches == paladinSpell.name,
         );
         if (!spell) {
           throw new Error(`missing spell from Book Item ${this.name}`);
         }
-        return spell;
       }
+    }
+    if (spell) {
+      return parseSpell(spell);
     }
     throw new Error("Requested a spell from a non-book item");
   }

@@ -4,7 +4,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, router, usePathname } from "expo-router";
+import { SplashScreen, Stack, router } from "expo-router";
 import { createContext, useEffect, useContext, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
@@ -67,8 +67,14 @@ export const LogsContext = createContext<
 >(undefined);
 
 Sentry.init({
-  dsn: "https://2cff54f8aeb50bcb7151c159cc40fe1b@o4506630160187392.ingest.sentry.io/4506630163398656",
-  debug: false, // process.env.NODE_ENV === "development"  If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
+  dsn: "https://2cff54f8aeb50bcb7151c159cc40fe1b@o4506630160187392.ingest.us.sentry.io/4506630163398656",
+  tracesSampleRate: 1.0,
+  _experiments: {
+    // The sampling rate for profiling is relative to TracesSampleRate.
+    // In this case, we'll capture profiles for 100% of transactions.
+    profilesSampleRate: 1.0,
+  },
+  //debug: process.env.NODE_ENV === "development",
 });
 
 const Root = observer(() => {

@@ -6,7 +6,7 @@ import Draggable from "react-native-draggable";
 import { useVibration } from "../utility/customHooks";
 import { StatsDisplay } from "./StatsDisplay";
 import { PlayerCharacterContext } from "../app/_layout";
-import { checkReleasePositonProps } from "../utility/types";
+import { checkReleasePositionProps } from "../utility/types";
 import { Shop } from "../classes/shop";
 
 export interface ItemRenderProps {
@@ -36,6 +36,7 @@ export type InventoryRenderDungeon = InventoryRenderBase & {
 };
 export type InventoryRenderShop = InventoryRenderBase & {
   location: "shop";
+  shopInventoryTarget: RefObject<View>;
   shop: Shop;
 };
 
@@ -60,13 +61,13 @@ export default function InventoryRender({
   if (!playerStateData) throw new Error("missing contexts");
   const { playerState } = playerStateData;
 
-  function checkReleasePositon({
+  function checkReleasePosition({
     item,
     xPos,
     yPos,
     size,
     equipped,
-  }: checkReleasePositonProps) {
+  }: checkReleasePositionProps) {
     if (item) {
       switch (location) {
         case "home":
@@ -139,7 +140,24 @@ export default function InventoryRender({
           );
           break;
         case "shop":
-          break;
+          const { shopInventoryTarget, shop } = props as InventoryRenderShop;
+          shopInventoryTarget.current?.measureInWindow(
+            (targetX, targetY, targetWidth, targetHeight) => {
+              const isWidthAligned =
+                xPos + size / 2 >= targetX &&
+                xPos - size / 2 <= targetX + targetWidth;
+              const isHeightAligned =
+                yPos + size / 2 >= targetY &&
+                yPos - size / 2 <= targetY + targetHeight;
+              if (isWidthAligned && isHeightAligned) {
+                setShowingStats(null);
+                vibration({ style: "light", essential: true });
+                const price = item.getSellPrice(shop.shopKeeper.affection);
+                playerState?.sellItem(item, price);
+                shop.buyItem(item, price);
+              }
+            },
+          );
       }
     }
   }
@@ -164,7 +182,7 @@ export default function InventoryRender({
     return (
       <Draggable
         onDragRelease={(_, g) => {
-          checkReleasePositon({
+          checkReleasePosition({
             item: item,
             xPos: g.moveX,
             yPos: g.moveY,

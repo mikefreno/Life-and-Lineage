@@ -8,30 +8,13 @@ import blessingDisplay from "./BlessingsDisplay";
 import { useColorScheme } from "nativewind";
 import { elementalColorMap } from "../utility/elementColors";
 import ClockIcon from "../assets/icons/ClockIcon";
+import { Spell } from "../utility/types";
 
-interface SpellDetailInterface {
-  spell: {
-    name: string;
-    element: string;
-    duration?: number;
-    proficiencyNeeded: number;
-    manaCost: number;
-    effects: {
-      damage: number | null;
-      buffs: string[] | null;
-      debuffs:
-        | {
-            name: string;
-            chance: number;
-          }[]
-        | null;
-      summon?: string[] | undefined;
-      selfDamage?: number | undefined;
-    };
-  };
+interface SpellDetailsProps {
+  spell: Spell;
 }
 
-export default function SpellDetails({ spell }: SpellDetailInterface) {
+export default function SpellDetails({ spell }: SpellDetailsProps) {
   const { colorScheme } = useColorScheme();
   return (
     <View
@@ -141,7 +124,7 @@ export default function SpellDetails({ spell }: SpellDetailInterface) {
           ) : null}
           {spell.effects.summon
             ? spell.effects.summon.map((summon, idx) => (
-                <View key={idx} className="flex flex-row items-center">
+                <View key={idx} className="flex flex-col items-center">
                   <Text>{toTitleCase(summon)}</Text>
                   <NecromancerSkull
                     width={14}

@@ -3,7 +3,7 @@
       "name": "stun",
       "style": "debuff",
       "turns": 1,
-      "effect": "turn skip",
+      "effect": "stun",
       "effectStyle": null,
       "effectAmount": null,
       "icon": "stun"
@@ -12,7 +12,7 @@
       "name": "heavy stun",
       "style": "debuff",
       "turns": 2,
-      "effect": "turn skip",
+      "effect": "stun",
       "effectStyle": null,
       "effectAmount": null,
       "icon": "stun"
@@ -59,7 +59,7 @@
       "turns": 10,
       "effect": "health damage",
       "effectStyle": "percentage",
-      "effectAmount": 0.025,
+      "effectAmount": 0.05,
       "icon":"skull_and_crossbones"
    },
    {

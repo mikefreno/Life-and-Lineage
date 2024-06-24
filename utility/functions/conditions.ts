@@ -589,7 +589,7 @@ export function getConditionEffectsOnMisc(suppliedConditions: Condition[]) {
       const effectMagnitude = effectMagnitudes[index];
       const effectStyle = effectStyles[index];
 
-      if (effect === "turn skip" && !stunned) {
+      if (effect === "stun" && !stunned) {
         stunned = true;
       }
 

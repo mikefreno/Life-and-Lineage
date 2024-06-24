@@ -43,10 +43,11 @@
       "name": "goblin shaman",
       "sanity": 50,
       "health": 160,
-      "attackPower": 20,
+      "attackPower": 35,
       "energy": {"maximum": 50, "regen": 10},
-      "attacks": [],
+      "attacks": ["spark", "bonk"],
       "drops": [
+         {"item": "goblin totem", "itemType":"staff", "chance": 1.0}
       ],
       "goldDropRange": {"minimum": 100, "maximum":150}
    }

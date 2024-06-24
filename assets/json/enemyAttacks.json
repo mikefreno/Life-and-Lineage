@@ -154,6 +154,21 @@
       "name": "chug beer",
       "energyCost": 10,
       "buffs": [{"name":"frenzy", "chance": 1.0}]
+   },
+   {
+      "name": "spark",
+      "energyCost": 25,
+      "targets": "single",
+      "hitChance":0.85,
+      "damageMult": 1.0,
+      "debuffs": [{"name": "stun", "chance": 0.5}]
+   },
+   {
+      "name": "bonk",
+      "energyCost": 5,
+      "targets": "single",
+      "hitChance": 1.0,
+      "damageMult": 0.25,
+      "debuffs": [{"name": "stun", "chance": 0.1}]
    }
-
 ]

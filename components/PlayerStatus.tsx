@@ -346,7 +346,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
                       <Energy width={14} height={14} />
                     </View>
                   )}
-                  {condition.effect.includes("turn skip") && (
+                  {condition.effect.includes("stun") && (
                     <View className="flex flex-row items-center">
                       <Text>
                         {(condition.healthDamage ||

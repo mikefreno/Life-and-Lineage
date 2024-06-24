@@ -2,7 +2,7 @@
    {
     "name": "flash heal",
     "element": "holy",
-    "proficiencyNeeded": 0,
+    "proficiencyNeeded": "novice",
     "manaCost": 25,
     "effects": {
       "damage": null,
@@ -14,7 +14,7 @@
   {
     "name": "rejuvenating light",
     "element": "holy",
-    "proficiencyNeeded": 50,
+    "proficiencyNeeded": "apprentice",
     "manaCost": 20,
     "effects": {
       "damage": null,
@@ -25,7 +25,7 @@
   {
     "name": "turn undead",
     "element": "holy",
-    "proficiencyNeeded": 100,
+    "proficiencyNeeded": "apprentice",
     "manaCost": 50,
     "effects": {
       "damage": null,
@@ -36,7 +36,7 @@
   {
     "name": "delayed heal",
     "element": "holy",
-    "proficiencyNeeded": 125,
+    "proficiencyNeeded": "adept",
     "manaCost": 75,
     "effects": {
       "damage": null,
@@ -47,7 +47,7 @@
   {
     "name": "moderate heal",
     "element": "holy",
-    "proficiencyNeeded": 150,
+    "proficiencyNeeded": "adept",
     "manaCost": 75,
     "effects": {
       "damage": null,
@@ -59,7 +59,7 @@
   {
     "name": "revoke undead",
     "element": "holy",
-    "proficiencyNeeded": 200,
+    "proficiencyNeeded": "expert",
     "manaCost": 100,
     "effects": {
       "damage": null,
@@ -70,7 +70,7 @@
   {
     "name": "great rejuvenating light",
     "element": "holy",
-    "proficiencyNeeded": 275,
+    "proficiencyNeeded": "expert",
     "manaCost": 200,
     "effects": {
       "damage": null,
@@ -81,7 +81,7 @@
   {
     "name": "overwhelming glow",
     "element": "holy",
-    "proficiencyNeeded": 350,
+    "proficiencyNeeded": "master",
     "manaCost": 200,
     "effects": {
       "damage": null,
@@ -92,7 +92,7 @@
   {
     "name": "unending cure",
     "element": "holy",
-    "proficiencyNeeded": 400,
+    "proficiencyNeeded": "legend",
     "manaCost": 250,
     "effects": {
       "damage": null,
@@ -103,7 +103,7 @@
   {
     "name": "judgment",
     "element": "vengeance",
-    "proficiencyNeeded": 0,
+    "proficiencyNeeded": "novice",
     "manaCost": 25,
     "effects": {
       "damage": 25,
@@ -114,7 +114,7 @@
   {
     "name": "blessed guard",
     "element": "protection",
-    "proficiencyNeeded": 0,
+    "proficiencyNeeded": "novice",
     "manaCost": 25,
     "effects": {
       "damage": null,
@@ -125,7 +125,7 @@
   {
     "name": "reflective bulwark",
     "element": "protection",
-    "proficiencyNeeded": 50,
+    "proficiencyNeeded": "apprentice",
     "manaCost": 50,
     "effects": {
       "damage": null,
@@ -136,7 +136,7 @@
   {
     "name": "readied guard",
     "element": "protection",
-    "proficiencyNeeded": 75,
+    "proficiencyNeeded": "apprentice",
     "manaCost": 10,
     "effects": {
       "damage": null,
@@ -147,7 +147,7 @@
   {
     "name": "protection aura",
     "element": "protection",
-    "proficiencyNeeded": 0,
+    "proficiencyNeeded": "novice",
     "manaCost": 25,
     "effects": {
       "damage": null,

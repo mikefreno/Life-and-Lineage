@@ -41,11 +41,13 @@ const ShopInteriorScreen = observer(() => {
   const [statsLeftPos, setStatsLeftPos] = useState<number>();
   const [statsTopPos, setStatsTopPos] = useState<number>();
   const [refreshCheck, setRefreshCheck] = useState<boolean>(false);
+  const [scrollEnabled, setScrollEnabled] = useState<boolean>(true);
 
   const [inventoryFullNotifier, setInventoryFullNotifier] =
     useState<boolean>(false);
 
   const inventoryTarget = useRef<View>(null);
+  const shopInventoryTarget = useRef<View>(null);
   const [showingStats, setShowingStats] = useState<Item | null>(null);
 
   const header = useHeaderHeight();
@@ -186,8 +188,11 @@ const ShopInteriorScreen = observer(() => {
                 <Coins width={16} height={16} style={{ marginLeft: 6 }} />
               </View>
             </View>
-            <View className="mx-2 -mt-1 w-2/3 rounded border border-zinc-300 dark:border-zinc-700">
-              <ScrollView className="my-auto">
+            <View
+              className="mx-2 -mt-1 w-2/3 rounded border border-zinc-300 dark:border-zinc-700"
+              ref={shopInventoryTarget}
+            >
+              <ScrollView className="my-auto" scrollEnabled={scrollEnabled}>
                 <View className="flex flex-row flex-wrap justify-around">
                   {thisShop.inventory.map((item) => (
                     <View
@@ -240,6 +245,7 @@ const ShopInteriorScreen = observer(() => {
             <InventoryRender
               location={"shop"}
               selfRef={inventoryTarget}
+              shopInventoryTarget={shopInventoryTarget}
               inventory={playerState.getInventory()}
               shop={thisShop}
             />

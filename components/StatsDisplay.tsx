@@ -13,6 +13,8 @@ import { asReadableGold } from "../utility/functions/misc/numbers";
 import SpellDetails from "./SpellDetails";
 import GenericFlatButton from "./GenericFlatButton";
 import { PlayerCharacterContext } from "../app/_layout";
+import { getMasteryLevel } from "../utility/spellHelper";
+import { SpellError } from "../utility/errorTypes";
 
 type StatsDisplayBaseProps = {
   statsLeftPos: number;
@@ -135,6 +137,13 @@ export function StatsDisplay({
     }
   };
 
+  function bookItemLabel() {
+    if (playerState) {
+      const spellRes = item.getAttachedSpell(playerState.playerClass);
+      return `${getMasteryLevel(spellRes.proficiencyNeeded, true)} level book`;
+    }
+  }
+
   return (
     <ThemedView
       className="absolute items-center rounded-md border border-zinc-600 p-4"
@@ -199,6 +208,8 @@ export function StatsDisplay({
       <Text className="text-sm italic">
         {item.itemClass == "bodyArmor"
           ? "Body Armor"
+          : item.itemClass == "book" && playerState
+          ? bookItemLabel()
           : toTitleCase(item.itemClass)}
       </Text>
       {item.itemClass == "book" && playerState ? (

@@ -53,11 +53,21 @@ export type InvestmentUpgrade = {
   };
 };
 
+export enum MasteryLevel {
+  Novice,
+  Apprentice,
+  Adept,
+  Expert,
+  Master,
+  Legend,
+}
+
 export type Spell = {
   name: string;
   element: string;
-  proficiencyNeeded: number;
+  proficiencyNeeded: MasteryLevel;
   manaCost: number;
+  duration?: number;
   effects: {
     damage: number | null;
     buffs: string[] | null;
@@ -138,7 +148,8 @@ export enum SkillPoint {
   AttackPower,
 }
 export type effectOptions =
-  | "turn skip"
+  | "stun"
+  | "silenced"
   | "accuracy reduction"
   | "accuracy increase"
   | "sanity heal"
@@ -223,7 +234,7 @@ export type ConditionObjectType =
   | SimpleConditionObject
   | ComplexConditionObject;
 
-export interface checkReleasePositonProps {
+export interface checkReleasePositionProps {
   item: Item | null;
   xPos: number;
   yPos: number;

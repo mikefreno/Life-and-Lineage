@@ -17,7 +17,13 @@ import summons from "../assets/json/summons.json";
 import { action, makeObservable, observable } from "mobx";
 import * as Crypto from "expo-crypto";
 import { Investment } from "./investment";
-import { AttackObj, InvestmentType, InvestmentUpgrade } from "../utility/types";
+import {
+  AttackObj,
+  InvestmentType,
+  InvestmentUpgrade,
+  MasteryLevel,
+  type Spell,
+} from "../utility/types";
 import { rollD20 } from "../utility/functions/roll";
 import shops from "../assets/json/shops.json";
 import artifacts from "../assets/json/items/artifacts.json";
@@ -36,6 +42,12 @@ import robes from "../assets/json/items/robes.json";
 import shields from "../assets/json/items/shields.json";
 import { calculateAge, rollToLiveByAge } from "../utility/functions/misc/age";
 import { damageReduction } from "../utility/functions/misc/numbers";
+import { SpellError } from "../utility/errorTypes";
+import { parseSpell } from "../utility/functions/jsonParsing";
+import {
+  convertMasteryToNumber,
+  getMasteryLevel,
+} from "../utility/spellHelper";
 
 interface CharacterOptions {
   id?: string;
@@ -483,7 +495,7 @@ export class PlayerCharacter extends Character {
       getSpells: action,
       addCondition: action,
       doPhysicalAttack: action,
-      useSpell: action,
+      attemptSpellUse: action,
       createMinion: action,
       clearMinions: action,
       removeMinion: action,
@@ -1171,7 +1183,7 @@ export class PlayerCharacter extends Character {
     let spellList: {
       name: string;
       element: string;
-      proficiencyNeeded: number;
+      proficiencyNeeded: string;
       manaCost: number;
       effects: {
         damage: number | null;
@@ -1192,28 +1204,13 @@ export class PlayerCharacter extends Character {
       spellList = necroSpells;
     } else spellList = mageSpells;
 
-    let spells: {
-      name: string;
-      element: string;
-      proficiencyNeeded: number;
-      manaCost: number;
-      effects: {
-        damage: number | null;
-        buffs: string[] | null;
-        debuffs:
-          | {
-              name: string;
-              chance: number;
-            }[]
-          | null;
-        summon?: string[];
-        selfDamage?: number;
-      };
-    }[] = [];
+    let spells: Spell[] = [];
     this.knownSpells.forEach((spell) => {
       const found = spellList.find((spellObj) => spell == spellObj.name);
       if (found) {
-        spells.push(found);
+        let parsed = parseSpell(found);
+        if (parsed == SpellError.InvalidMastery) return;
+        spells.push(parsed);
       }
     });
     return spells;
@@ -1327,10 +1324,15 @@ export class PlayerCharacter extends Character {
     }
   }
   public isStunned() {
-    const exists = this.conditions.find(
-      (condition) => condition.name == "stun",
+    return this.conditions.some((condition) =>
+      condition.effect.includes("stun"),
     );
-    return exists ? true : false;
+  }
+
+  public isSilenced() {
+    return this.conditions.some((condition) =>
+      condition.effect.includes("silenced"),
+    );
   }
 
   public conditionTicker() {
@@ -1493,67 +1495,135 @@ export class PlayerCharacter extends Character {
     }
   }
   //----------------------------------Magical Combat----------------------------------//
-  public useSpell({
+  private playerHasAdequateProficiency(chosenSpell: Spell) {
+    const currentSchoolProficiency = this.magicProficiencies.find(
+      (prof) => prof.school == chosenSpell.element,
+    )?.proficiency;
+    console.log(currentSchoolProficiency);
+    console.log(chosenSpell.proficiencyNeeded);
+    if (
+      currentSchoolProficiency &&
+      currentSchoolProficiency >=
+        convertMasteryToNumber[chosenSpell.proficiencyNeeded]
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  public attemptSpellUse({
     chosenSpell,
     enemyMaxHP,
     enemyMaxSanity,
   }: playerSpellDeps) {
-    if (chosenSpell.manaCost <= this.mana) {
-      this.mana -= chosenSpell.manaCost;
-
-      if (chosenSpell.effects.summon) {
-        chosenSpell.effects.summon.map((summon) => this.createMinion(summon));
+    if (this.playerHasAdequateProficiency(chosenSpell)) {
+      if (chosenSpell.manaCost <= this.mana) {
+        this.mana -= chosenSpell.manaCost;
+        this.gainProficiency(chosenSpell);
+        return this.useSpell({ chosenSpell, enemyMaxHP, enemyMaxSanity });
       }
-
-      const selfDamage = chosenSpell.effects.selfDamage;
-      if (selfDamage) {
-        this.damageHealth(selfDamage);
-      }
-
-      let buffs: Condition[] = [];
-      if (chosenSpell.effects.buffs) {
-        chosenSpell.effects.buffs.forEach((buff) => {
-          const res = createBuff({
-            buffName: buff,
-            buffChance: 1.0,
-            attackPower: chosenSpell.effects.damage ?? 0,
-            maxHealth: this.getNonBuffedMaxHealth(),
-            maxSanity: this.getNonBuffedMaxSanity(),
-            applierNameString: this.getFullName(),
-          });
-          if (res) {
-            this.addCondition(res);
-            buffs.push(res);
-          }
-        });
-      }
-      let debuffs: Condition[] = [];
-      if (chosenSpell.effects.debuffs) {
-        chosenSpell.effects.debuffs.forEach((debuff) => {
-          const debuffRes = createDebuff({
-            debuffName: debuff.name,
-            debuffChance: debuff.chance,
-            enemyMaxHP: enemyMaxHP,
-            enemyMaxSanity: enemyMaxSanity,
-            primaryAttackDamage: chosenSpell.effects.damage ?? 0,
-            applierNameString: this.getFullName(),
-          });
-          if (debuffRes) debuffs.push(debuffRes);
-        });
-      }
-      this.endTurn();
-      return {
-        name: chosenSpell.name,
-        damage: chosenSpell.effects.damage,
-        selfDamage: selfDamage,
-        sanityDamage: chosenSpell.effects.sanityDamage,
-        debuffs: debuffs.length > 0 ? debuffs : undefined,
-        buffs: buffs.length > 0 ? buffs : undefined,
-      };
+      return SpellError.NotEnoughMana;
     }
-    throw new Error(
-      "not enough mana to useSpell(), this should be prevented on frontend",
-    );
+    return SpellError.ProficencyDeficit;
+  }
+
+  private gainProficiency(chosenSpell: Spell) {
+    let currentProficiencies = this.magicProficiencies;
+    const newProficiencies = currentProficiencies.map((prof) => {
+      if (prof.school === chosenSpell.element) {
+        prof.proficiency += this.experienceGainSteps(chosenSpell);
+        return prof;
+      }
+      return prof;
+    });
+    this.magicProficiencies = newProficiencies;
+  }
+
+  public currentMasteryLevel(
+    school: string,
+    asString: boolean = false,
+  ): MasteryLevel | string {
+    const schoolProficiency = this.magicProficiencies.find(
+      (prof) => prof.school == school,
+    )?.proficiency;
+    return getMasteryLevel(schoolProficiency ?? 0, asString);
+  }
+
+  private experienceGainSteps(chosenSpell: Spell) {
+    if (
+      (this.currentMasteryLevel(chosenSpell.element) as MasteryLevel) <
+      MasteryLevel.Legend
+    ) {
+      const levelDif =
+        (this.currentMasteryLevel(chosenSpell.element) as MasteryLevel) -
+        chosenSpell.proficiencyNeeded;
+      switch (levelDif) {
+        case 0:
+          return 2;
+        case 1:
+          return 1;
+        case 2:
+          return 0.5;
+        default:
+          return 0;
+      }
+    }
+  }
+
+  private useSpell({
+    chosenSpell,
+    enemyMaxHP,
+    enemyMaxSanity,
+  }: playerSpellDeps) {
+    if (chosenSpell.effects.summon) {
+      chosenSpell.effects.summon.map((summon) => this.createMinion(summon));
+    }
+
+    const selfDamage = chosenSpell.effects.selfDamage;
+    if (selfDamage) {
+      this.damageHealth(selfDamage);
+    }
+
+    let buffs: Condition[] = [];
+    if (chosenSpell.effects.buffs) {
+      chosenSpell.effects.buffs.forEach((buff) => {
+        const res = createBuff({
+          buffName: buff,
+          buffChance: 1.0,
+          attackPower: chosenSpell.effects.damage ?? 0,
+          maxHealth: this.getNonBuffedMaxHealth(),
+          maxSanity: this.getNonBuffedMaxSanity(),
+          applierNameString: this.getFullName(),
+        });
+        if (res) {
+          this.addCondition(res);
+          buffs.push(res);
+        }
+      });
+    }
+    let debuffs: Condition[] = [];
+    if (chosenSpell.effects.debuffs) {
+      chosenSpell.effects.debuffs.forEach((debuff) => {
+        const debuffRes = createDebuff({
+          debuffName: debuff.name,
+          debuffChance: debuff.chance,
+          enemyMaxHP: enemyMaxHP,
+          enemyMaxSanity: enemyMaxSanity,
+          primaryAttackDamage: chosenSpell.effects.damage ?? 0,
+          applierNameString: this.getFullName(),
+        });
+        if (debuffRes) debuffs.push(debuffRes);
+      });
+    }
+    this.endTurn();
+    return {
+      name: chosenSpell.name,
+      damage: chosenSpell.effects.damage,
+      selfDamage: selfDamage,
+      sanityDamage: chosenSpell.effects.sanityDamage,
+      debuffs: debuffs.length > 0 ? debuffs : undefined,
+      buffs: buffs.length > 0 ? buffs : undefined,
+    };
   }
   //----------------------------------Minions----------------------------------//
   public createMinion(minionName: string) {
@@ -1772,20 +1842,7 @@ interface playerAttackDeps {
 }
 
 interface playerSpellDeps {
-  chosenSpell: {
-    name: string;
-    element: string;
-    proficiencyNeeded: number;
-    manaCost: number;
-    effects: {
-      damage: number | null;
-      sanityDamage?: number;
-      buffs: string[] | null;
-      debuffs: { name: string; chance: number }[] | null;
-      summon?: string[];
-      selfDamage?: number;
-    };
-  };
+  chosenSpell: Spell;
   enemyMaxHP: number;
   enemyMaxSanity: number | null;
 }

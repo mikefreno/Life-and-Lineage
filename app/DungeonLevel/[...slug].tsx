@@ -33,6 +33,7 @@ import DroppedItemsModal from "../../components/DungeonComponents/DroppedItemsMo
 import { enemyTurnCheck } from "../../utility/functions/dungeonInteriorFunctions";
 import LeftBehindItemsModal from "../../components/DungeonComponents/LeftBehindItemsModal";
 import { useVibration } from "../../utility/customHooks";
+import { SpellError } from "../../utility/errorTypes";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -355,11 +356,21 @@ const DungeonLevelScreen = observer(() => {
     target: Enemy | Minion,
   ) => {
     if (playerState && isFocused) {
-      const spellRes = playerState.useSpell({
+      const spellRes = playerState.attemptSpellUse({
         chosenSpell: spell,
         enemyMaxHP: target.getMaxHealth(),
         enemyMaxSanity: target.getMaxSanity(),
       });
+      if (spellRes == SpellError.NotEnoughMana) {
+        // update to indicate error to user
+        console.log("Not enough mana!");
+        return;
+      }
+      if (spellRes == SpellError.ProficencyDeficit) {
+        // update to indicate error to user
+        console.log("Proficiency is too low!");
+        return;
+      }
       target.damageHealth(spellRes.damage);
       target.damageSanity(spellRes.sanityDamage);
       spellRes.debuffs?.forEach((debuff) => target.addCondition(debuff));

@@ -2,7 +2,7 @@
   {
     "name": "pull blood",
     "element": "blood",
-    "proficiencyNeeded": 0,
+    "proficiencyNeeded": "novice",
     "manaCost": 20,
     "effects": {
       "damage": 5,
@@ -13,7 +13,7 @@
   {
     "name": "life tap",
     "element": "blood",
-    "proficiencyNeeded": 50,
+    "proficiencyNeeded": "apprentice",
     "manaCost": -35,
     "effects": {
       "damage": null,
@@ -25,7 +25,7 @@
   {
     "name": "vampiric touch",
     "element": "blood",
-    "proficiencyNeeded": 100,
+    "proficiencyNeeded": "adept",
     "manaCost": 50,
     "effects": {
       "damage": 30,
@@ -37,7 +37,7 @@
   {
     "name": "summon flying skull",
     "element": "summoning",
-    "proficiencyNeeded": 0,
+    "proficiencyNeeded": "novice",
     "manaCost": 50,
     "effects": {
       "damage": null,
@@ -49,7 +49,7 @@
   {
     "name": "raise skeleton",
     "element": "summoning",
-    "proficiencyNeeded": 50,
+    "proficiencyNeeded": "apprentice",
     "manaCost": 50,
     "effects": {
       "damage": null,
@@ -61,7 +61,7 @@
   {
     "name": "teeth",
     "element": "bone",
-    "proficiencyNeeded": 0,
+    "proficiencyNeeded": "novice",
     "manaCost": 15,
     "effects": {
       "damage": 10,
@@ -72,8 +72,8 @@
   {
     "name": "poison dart",
     "element": "pestilence",
-    "proficiencyNeeded": 0,
-    "manaCost": 25,
+    "proficiencyNeeded": "novice",
+    "manaCost": 20,
     "effects": {
       "damage": 5,
       "buffs": null,

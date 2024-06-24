@@ -22,6 +22,8 @@ import { Stack } from "expo-router";
 import { BlurView } from "expo-blur";
 import { useHeaderHeight } from "@react-navigation/elements";
 import GenericRaisedButton from "../components/GenericRaisedButton";
+import { MasteryLevel, Spell } from "../utility/types";
+import GenericModal from "../components/GenericModal";
 
 export default function LearningKnowledgeScreen() {
   const playerCharacterData = useContext(PlayerCharacterContext);
@@ -42,24 +44,9 @@ export default function LearningKnowledgeScreen() {
   const vibration = useVibration();
 
   const [selectedBook, setSelectedBook] = useState<Item | null>(null);
-  const [selectedBookSpell, setSelectedBookSpell] = useState<{
-    name: string;
-    element: string;
-    proficiencyNeeded: number;
-    manaCost: number;
-    effects: {
-      damage: number | null;
-      buffs: string[] | null;
-      debuffs:
-        | {
-            name: string;
-            chance: number;
-          }[]
-        | null;
-      summon?: string[];
-      selfDamage?: number;
-    };
-  } | null>(null);
+  const [selectedBookSpell, setSelectedBookSpell] = useState<Spell | null>(
+    null,
+  );
   const [spellState, setSpellState] = useState<
     {
       bookName: string;
@@ -68,6 +55,9 @@ export default function LearningKnowledgeScreen() {
       element: string;
     }[]
   >(playerState.learningSpells);
+  const [showMasteryLevelTooLow, setShowMasteryLevelTooLow] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     if (selectedBook && playerState) {
@@ -125,6 +115,58 @@ export default function LearningKnowledgeScreen() {
           ),
         }}
       />
+      <GenericModal
+        isVisibleCondition={showMasteryLevelTooLow != null}
+        backFunction={() => setShowMasteryLevelTooLow(null)}
+      >
+        {showMasteryLevelTooLow != null ? (
+          <>
+            <Text
+              className="text-center"
+              style={{
+                color:
+                  elementalColorMap[
+                    showMasteryLevelTooLow as
+                      | "fire"
+                      | "water"
+                      | "air"
+                      | "earth"
+                      | "blood"
+                      | "summoning"
+                      | "pestilence"
+                      | "bone"
+                      | "holy"
+                      | "vengeance"
+                      | "protection"
+                  ].dark,
+              }}
+            >
+              This book is beyond your knowledge in the school of{" "}
+              {showMasteryLevelTooLow}
+            </Text>
+            <GenericRaisedButton
+              onPressFunction={() => setShowMasteryLevelTooLow(null)}
+              textColor={
+                elementalColorMap[
+                  showMasteryLevelTooLow as
+                    | "fire"
+                    | "water"
+                    | "air"
+                    | "earth"
+                    | "blood"
+                    | "summoning"
+                    | "pestilence"
+                    | "bone"
+                    | "holy"
+                    | "vengeance"
+                    | "protection"
+                ].dark
+              }
+              text={"Acknowledge Knowledge"}
+            />
+          </>
+        ) : null}
+      </GenericModal>
       <View className="flex-1">
         <View
           style={{
@@ -206,13 +248,21 @@ export default function LearningKnowledgeScreen() {
               <SpellDetails spell={selectedBookSpell} />
               <GenericRaisedButton
                 onPressFunction={() => {
-                  vibration({ style: "light", essential: true });
-                  studySpell(
-                    selectedBook.name,
-                    selectedBookSpell.name,
-                    selectedBookSpell.element,
-                  );
-                  setSelectedBook(null);
+                  if (
+                    (playerState.currentMasteryLevel(
+                      selectedBookSpell.element,
+                    ) as MasteryLevel) >= selectedBookSpell.proficiencyNeeded
+                  ) {
+                    vibration({ style: "light", essential: true });
+                    studySpell(
+                      selectedBook.name,
+                      selectedBookSpell.name,
+                      selectedBookSpell.element,
+                    );
+                    setSelectedBook(null);
+                  } else {
+                    setShowMasteryLevelTooLow(selectedBookSpell.element);
+                  }
                 }}
                 text={"Start Studying"}
               />

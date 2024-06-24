@@ -45,8 +45,8 @@ const ProgressBar = ({
           styles.inner,
           {
             width: !removeAtZero
-              ? width < 5
-                ? "5%"
+              ? width < 8
+                ? "8%"
                 : `${width}%`
               : `${width}%`,
             backgroundColor: filledColor,
