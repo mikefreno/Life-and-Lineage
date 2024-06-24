@@ -6,7 +6,7 @@ const masteryConversion = (asString: string) => {
     case "novice":
       return MasteryLevel.Novice;
     case "apprentice":
-      return MasteryLevel.Adept;
+      return MasteryLevel.Apprentice;
     case "adept":
       return MasteryLevel.Adept;
     case "expert":
@@ -22,7 +22,7 @@ const masteryConversion = (asString: string) => {
 export function parseSpell(json: any): Spell {
   const mastery = masteryConversion(json.proficiencyNeeded);
   if (mastery == SpellError.InvalidMastery) {
-    throw Error(
+    throw new Error(
       `Attempt to make incorrect from: ${json.proficiencyNeeded},\nSpell Name:${json.name}`,
     );
   }

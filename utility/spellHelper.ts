@@ -4,10 +4,8 @@ export function getMasteryLevel(
   proficiency: number,
   asString: boolean = false,
 ): MasteryLevel | string {
+  console.log(proficiency);
   if (asString) {
-    if (!proficiency) {
-      return "Novice";
-    }
     if (proficiency >= 500) {
       return "Legend";
     }
@@ -24,9 +22,6 @@ export function getMasteryLevel(
       return "Apprentice";
     }
     return "Novice";
-  }
-  if (!proficiency) {
-    return MasteryLevel.Novice;
   }
   if (proficiency >= 500) {
     return MasteryLevel.Legend;

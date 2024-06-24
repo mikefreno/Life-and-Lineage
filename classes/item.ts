@@ -175,4 +175,5 @@ const itemMap: { [key: string]: any } = {
   Wooden_Armor: require("../assets/images/items/Wooden_Armor.png"),
   Wooden_Shield: require("../assets/images/items/Wooden_Shield.png"),
   Wooden_Sword: require("../assets/images/items/Wooden_Sword.png"),
+  Goblin_Staff: require("../assets/images/items/Goblin_Staff.png"),
 };

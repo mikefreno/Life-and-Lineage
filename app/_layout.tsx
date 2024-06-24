@@ -13,7 +13,7 @@ import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
 import { fullSave, loadGame, loadPlayer } from "../utility/functions/save_load";
 import { View, Text, Platform, StyleSheet } from "react-native";
-import { autorun } from "mobx";
+import { autorun, reaction } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
@@ -67,14 +67,8 @@ export const LogsContext = createContext<
 >(undefined);
 
 Sentry.init({
-  dsn: "https://2cff54f8aeb50bcb7151c159cc40fe1b@o4506630160187392.ingest.us.sentry.io/4506630163398656",
-  tracesSampleRate: 1.0,
-  _experiments: {
-    // The sampling rate for profiling is relative to TracesSampleRate.
-    // In this case, we'll capture profiles for 100% of transactions.
-    profilesSampleRate: 1.0,
-  },
-  //debug: process.env.NODE_ENV === "development",
+  dsn: "https://2cff54f8aeb50bcb7151c159cc40fe1b@o4506630160187392.ingest.sentry.io/4506630163398656",
+  debug: false, //process.env.NODE_ENV === "development", // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
 });
 
 const Root = observer(() => {
@@ -83,6 +77,7 @@ const Root = observer(() => {
   const [enemyState, setEnemy] = useState<Enemy | null>(null);
   const [logsState, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [gameDate, setGameDate] = useState<string>("");
   const { setColorScheme, colorScheme } = useColorScheme();
 
   const getData = async () => {
@@ -93,6 +88,7 @@ const Root = observer(() => {
       if (storedGameData) {
         setGameData(Game.fromJSON(storedGameData));
         setColorScheme(storedGameData.colorScheme);
+        setGameDate(storedGameData.date);
       }
       if (storedPlayerData) {
         setPlayerCharacter(PlayerCharacter.fromJSON(storedPlayerData));
@@ -113,16 +109,20 @@ const Root = observer(() => {
     getData();
   }, []);
 
-  const throttledFullSave = throttle(fullSave, 10000, {
-    leading: true,
-    trailing: false,
-  });
+  const throttledFullSave = throttle(fullSave, 2000);
 
-  autorun(() => {
-    if (gameState && playerState) {
-      throttledFullSave(gameState, playerState);
-    }
-  });
+  reaction(
+    () => ({
+      gameTime: gameState?.date,
+    }),
+    (state) => {
+      if (gameState && playerState && state.gameTime != gameDate) {
+        setGameDate(gameState.date);
+        throttledFullSave(gameState, playerState);
+      }
+    },
+    { delay: 2000 }, // delay to reduce frequency
+  );
 
   while (loading) {
     return (

@@ -47,7 +47,7 @@ export default function SpellDetails({ spell }: SpellDetailsProps) {
       }}
     >
       <View
-        className="flex flex-row justify-between rounded-lg px-6 py-2 dark:border"
+        className="flex flex-row justify-between rounded-lg p-2 dark:border"
         style={{
           borderColor:
             colorScheme == "dark"
@@ -68,14 +68,14 @@ export default function SpellDetails({ spell }: SpellDetailsProps) {
               : "",
         }}
       >
-        <View className="my-auto w-[40%]">
+        <View className="my-auto">
           <Text className="text-center">{toTitleCase(spell.name)}</Text>
           <View className="flex flex-row items-center justify-center">
             <Text>{spell.manaCost}</Text>
             <Energy width={14} height={14} style={{ marginLeft: 6 }} />
           </View>
         </View>
-        <View className="my-auto items-center">
+        <View className="my-auto items-center w-1/2">
           {spell.duration ? (
             <View className="flex flex-row items-center">
               <Text>{spell.duration}</Text>
@@ -93,9 +93,13 @@ export default function SpellDetails({ spell }: SpellDetailsProps) {
               <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
             </View>
           ) : null}
-          {spell.effects.buffs?.map((buff) => <Text key={buff}>{buff}</Text>)}
+          {spell.effects.buffs?.map((buff) => (
+            <Text className="text-center" key={buff}>
+              {toTitleCase(buff)}
+            </Text>
+          ))}
           {spell.effects.debuffs?.map((debuff, idx) => (
-            <Text key={idx}>
+            <Text className="text-center" key={idx}>
               {toTitleCase(debuff.name)} - {debuff.chance * 100}%
             </Text>
           ))}

@@ -34,6 +34,7 @@ export const fullSave = async (
   game: Game | null,
   player: PlayerCharacter | null,
 ) => {
+  console.log("saving")
   if (game && player) {
     try {
       const jsonGame = JSON.stringify(game);

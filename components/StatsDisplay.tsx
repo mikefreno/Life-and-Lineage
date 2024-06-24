@@ -1,4 +1,4 @@
-import { Dimensions, Pressable, View } from "react-native";
+import { Dimensions, Pressable, ScrollView, View } from "react-native";
 import { View as ThemedView, Text } from "./Themed";
 import GearStatsDisplay from "./GearStatsDisplay";
 import { useColorScheme } from "nativewind";
@@ -13,8 +13,10 @@ import { asReadableGold } from "../utility/functions/misc/numbers";
 import SpellDetails from "./SpellDetails";
 import GenericFlatButton from "./GenericFlatButton";
 import { PlayerCharacterContext } from "../app/_layout";
-import { getMasteryLevel } from "../utility/spellHelper";
-import { SpellError } from "../utility/errorTypes";
+import {
+  convertMasteryToString,
+  getMasteryLevel,
+} from "../utility/spellHelper";
 
 type StatsDisplayBaseProps = {
   statsLeftPos: number;
@@ -140,13 +142,13 @@ export function StatsDisplay({
   function bookItemLabel() {
     if (playerState) {
       const spellRes = item.getAttachedSpell(playerState.playerClass);
-      return `${getMasteryLevel(spellRes.proficiencyNeeded, true)} level book`;
+      return `${convertMasteryToString[spellRes.proficiencyNeeded]} level book`;
     }
   }
 
   return (
     <ThemedView
-      className="absolute items-center rounded-md border border-zinc-600 p-4"
+      className="absolute items-center rounded-md border border-zinc-600 py-4"
       style={
         item.itemClass == "book"
           ? {
@@ -214,7 +216,7 @@ export function StatsDisplay({
       </Text>
       {item.itemClass == "book" && playerState ? (
         <>
-          <View className="-mx-2">
+          <View className="px-2">
             <SpellDetails
               spell={item.getAttachedSpell(playerState.playerClass)}
             />
