@@ -21,7 +21,7 @@ import GenericStrikeAround from "../GenericStrikeAround";
 import InventoryRender from "../InventoryRender";
 
 interface BattleTabProps {
-  battleTab: "attacks" | "equipment" | "log";
+  battleTab: "attacksOrNavigation" | "equipment" | "log";
   pass: () => void;
   useAttack: (attack: AttackObj, target: Enemy | Minion) => void;
   useSpell: (
@@ -51,6 +51,8 @@ interface BattleTabProps {
     }>
   >;
   addItemToPouch: (item: Item) => void;
+  inCombat: boolean;
+  DungeonMapControls: JSX.Element;
 }
 
 export default function BattleTab({
@@ -63,6 +65,8 @@ export default function BattleTab({
   setShowTargetSelection,
   pouchRef,
   addItemToPouch,
+  inCombat,
+  DungeonMapControls,
 }: BattleTabProps) {
   const { colorScheme } = useColorScheme();
   const logs = useContext(LogsContext)?.logsState;
@@ -97,6 +101,7 @@ export default function BattleTab({
       setAttackDetailsShowing(true);
     }
   }, [attackDetails]);
+
   useEffect(() => {
     if (!attackDetailsShowing) {
       setTimeout(() => setAttackDetails(null), 250);
@@ -112,177 +117,187 @@ export default function BattleTab({
     );
   }
 
+  useEffect(() => {}, [inCombat]);
+
   const TabRender = () => {
     if (playerState) {
       switch (battleTab) {
-        case "attacks":
-          return (
-            <>
-              {!playerState.isStunned() ? (
-                <FlatList
-                  data={combinedData}
-                  inverted
-                  renderItem={({ item: attackOrSpell }) => (
-                    <View
-                      className="my-1 rounded border px-4 py-2"
-                      style={{
-                        backgroundColor:
-                          "element" in attackOrSpell
-                            ? elementalColorMap[attackOrSpell.element].light
-                            : undefined,
-                        borderColor:
-                          "element" in attackOrSpell
-                            ? elementalColorMap[attackOrSpell.element].dark
-                            : colorScheme == "light"
-                            ? "#71717a"
-                            : "#a1a1aa",
-                      }}
-                    >
-                      <View className="flex flex-row justify-between">
-                        <View className="flex flex-col justify-center">
+        case "attacksOrNavigation":
+          if (!inCombat) {
+            return DungeonMapControls;
+          } else {
+            return (
+              <>
+                {!playerState.isStunned() ? (
+                  <FlatList
+                    data={combinedData}
+                    inverted
+                    renderItem={({ item: attackOrSpell }) => (
+                      <View
+                        className="my-1 rounded border px-4 py-2"
+                        style={{
+                          backgroundColor:
+                            "element" in attackOrSpell
+                              ? elementalColorMap[attackOrSpell.element].light
+                              : undefined,
+                          borderColor:
+                            "element" in attackOrSpell
+                              ? elementalColorMap[attackOrSpell.element].dark
+                              : colorScheme == "light"
+                              ? "#71717a"
+                              : "#a1a1aa",
+                        }}
+                      >
+                        <View className="flex flex-row justify-between">
+                          <View className="flex flex-col justify-center">
+                            <Pressable
+                              onPress={() => {
+                                setAttackDetails(attackOrSpell);
+                              }}
+                            >
+                              <Text
+                                className="text-xl"
+                                style={{
+                                  color:
+                                    "element" in attackOrSpell
+                                      ? elementalColorMap[attackOrSpell.element]
+                                          .dark
+                                      : colorScheme == "dark"
+                                      ? "#fafafa"
+                                      : "#09090b",
+                                }}
+                              >
+                                {toTitleCase(attackOrSpell.name)}
+                              </Text>
+                              {"hitChance" in attackOrSpell &&
+                              attackOrSpell.hitChance ? (
+                                <Text className="text-lg">{`${
+                                  attackOrSpell.hitChance * 100
+                                }% hit chance`}</Text>
+                              ) : (
+                                "element" in attackOrSpell && (
+                                  <View className="flex flex-row">
+                                    <Text
+                                      style={{
+                                        color:
+                                          elementalColorMap[
+                                            attackOrSpell.element
+                                          ].dark,
+                                      }}
+                                    >
+                                      {attackOrSpell.manaCost}
+                                    </Text>
+                                    <View className="my-auto pl-1">
+                                      <Energy
+                                        height={14}
+                                        width={14}
+                                        color={
+                                          colorScheme == "dark"
+                                            ? "#2563eb"
+                                            : undefined
+                                        }
+                                      />
+                                    </View>
+                                  </View>
+                                )
+                              )}
+                            </Pressable>
+                          </View>
                           <Pressable
+                            disabled={
+                              ("element" in attackOrSpell &&
+                                attackOrSpell.manaCost >= playerState.mana) ||
+                              playerState.isStunned() ||
+                              attackAnimationOnGoing
+                            }
                             onPress={() => {
-                              setAttackDetails(attackOrSpell);
+                              vibration({ style: "light" });
+                              if (
+                                enemyState &&
+                                enemyState.minions.length == 0
+                              ) {
+                                setAttackAnimationOnGoing(true);
+                                if ("element" in attackOrSpell) {
+                                  useSpell(attackOrSpell, enemyState);
+                                } else {
+                                  useAttack(attackOrSpell, enemyState);
+                                }
+                              } else {
+                                setShowTargetSelection({
+                                  showing: true,
+                                  chosenAttack: attackOrSpell,
+                                  spell:
+                                    "element" in attackOrSpell ? true : false,
+                                });
+                              }
                             }}
-                          >
-                            <Text
-                              className="text-xl"
-                              style={{
-                                color:
+                            className="mx-2 my-auto rounded px-4 py-2 shadow-sm active:scale-95 active:opacity-50"
+                            style={[
+                              (("element" in attackOrSpell &&
+                                attackOrSpell.manaCost >= playerState.mana) ||
+                                playerState.isStunned() ||
+                                attackAnimationOnGoing) && { opacity: 0.5 },
+                              {
+                                backgroundColor:
                                   "element" in attackOrSpell
                                     ? elementalColorMap[attackOrSpell.element]
                                         .dark
-                                    : colorScheme == "dark"
-                                    ? "#fafafa"
-                                    : "#09090b",
-                              }}
-                            >
-                              {toTitleCase(attackOrSpell.name)}
+                                    : colorScheme == "light"
+                                    ? "#d4d4d8"
+                                    : "#27272a",
+                              },
+                            ]}
+                          >
+                            <Text className="text-xl">
+                              {playerState.isStunned()
+                                ? "Stunned!"
+                                : "element" in attackOrSpell
+                                ? playerState.mana >= attackOrSpell.manaCost
+                                  ? "Cast"
+                                  : "Not Enough Mana"
+                                : "Attack"}
                             </Text>
-                            {"hitChance" in attackOrSpell &&
-                            attackOrSpell.hitChance ? (
-                              <Text className="text-lg">{`${
-                                attackOrSpell.hitChance * 100
-                              }% hit chance`}</Text>
-                            ) : (
-                              "element" in attackOrSpell && (
-                                <View className="flex flex-row">
-                                  <Text
-                                    style={{
-                                      color:
-                                        elementalColorMap[attackOrSpell.element]
-                                          .dark,
-                                    }}
-                                  >
-                                    {attackOrSpell.manaCost}
-                                  </Text>
-                                  <View className="my-auto pl-1">
-                                    <Energy
-                                      height={14}
-                                      width={14}
-                                      color={
-                                        colorScheme == "dark"
-                                          ? "#2563eb"
-                                          : undefined
-                                      }
-                                    />
-                                  </View>
-                                </View>
-                              )
-                            )}
                           </Pressable>
                         </View>
-                        <Pressable
-                          disabled={
-                            ("element" in attackOrSpell &&
-                              attackOrSpell.manaCost >= playerState.mana) ||
-                            playerState.isStunned() ||
-                            attackAnimationOnGoing
-                          }
-                          onPress={() => {
-                            vibration({ style: "light" });
-                            if (enemyState && enemyState.minions.length == 0) {
-                              setAttackAnimationOnGoing(true);
-                              if ("element" in attackOrSpell) {
-                                useSpell(attackOrSpell, enemyState);
-                              } else {
-                                useAttack(attackOrSpell, enemyState);
-                              }
-                            } else {
-                              setShowTargetSelection({
-                                showing: true,
-                                chosenAttack: attackOrSpell,
-                                spell:
-                                  "element" in attackOrSpell ? true : false,
-                              });
-                            }
-                          }}
-                          className="mx-2 my-auto rounded px-4 py-2 shadow-sm active:scale-95 active:opacity-50"
-                          style={[
-                            (("element" in attackOrSpell &&
-                              attackOrSpell.manaCost >= playerState.mana) ||
-                              playerState.isStunned() ||
-                              attackAnimationOnGoing) && { opacity: 0.5 },
-                            {
-                              backgroundColor:
-                                "element" in attackOrSpell
-                                  ? elementalColorMap[attackOrSpell.element]
-                                      .dark
-                                  : colorScheme == "light"
-                                  ? "#d4d4d8"
-                                  : "#27272a",
-                            },
-                          ]}
-                        >
-                          <Text className="text-xl">
-                            {playerState.isStunned()
-                              ? "Stunned!"
-                              : "element" in attackOrSpell
-                              ? playerState.mana >= attackOrSpell.manaCost
-                                ? "Cast"
-                                : "Not Enough Mana"
-                              : "Attack"}
-                          </Text>
-                        </Pressable>
                       </View>
-                    </View>
-                  )}
-                />
-              ) : (
-                <View className="my-auto px-4 py-2 shadow">
-                  <Text className="text-center text-2xl tracking-wide">
-                    Stunned!
-                  </Text>
-                  <View
-                    className="flex flex-row justify-between rounded border px-4 py-2"
-                    style={{
-                      borderColor:
-                        colorScheme == "light" ? "#71717a" : "#a1a1aa",
-                    }}
-                  >
-                    <View className="flex flex-col justify-center">
-                      <Text className="text-xl">Pass</Text>
-                    </View>
-                    <Pressable
-                      disabled={attackAnimationOnGoing}
-                      onPress={() => {
-                        setAttackAnimationOnGoing(true);
-                        vibration({ style: "light" });
-                        pass();
+                    )}
+                  />
+                ) : (
+                  <View className="my-auto px-4 py-2 shadow">
+                    <Text className="text-center text-2xl tracking-wide">
+                      Stunned!
+                    </Text>
+                    <View
+                      className="flex flex-row justify-between rounded border px-4 py-2"
+                      style={{
+                        borderColor:
+                          colorScheme == "light" ? "#71717a" : "#a1a1aa",
                       }}
-                      className={`${
-                        attackAnimationOnGoing
-                          ? ""
-                          : "bg-zinc-300 dark:bg-zinc-700"
-                      } mx-2 my-auto rounded px-4 py-2 active:scale-95 active:opacity-50`}
                     >
-                      <Text className="text-xl">Use</Text>
-                    </Pressable>
+                      <View className="flex flex-col justify-center">
+                        <Text className="text-xl">Pass</Text>
+                      </View>
+                      <Pressable
+                        disabled={attackAnimationOnGoing}
+                        onPress={() => {
+                          setAttackAnimationOnGoing(true);
+                          vibration({ style: "light" });
+                          pass();
+                        }}
+                        className={`${
+                          attackAnimationOnGoing
+                            ? ""
+                            : "bg-zinc-300 dark:bg-zinc-700"
+                        } mx-2 my-auto rounded px-4 py-2 active:scale-95 active:opacity-50`}
+                      >
+                        <Text className="text-xl">Use</Text>
+                      </Pressable>
+                    </View>
                   </View>
-                </View>
-              )}
-            </>
-          );
+                )}
+              </>
+            );
+          }
         case "equipment":
           return (
             <View className="my-1 flex-1">

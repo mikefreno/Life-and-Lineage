@@ -13,7 +13,7 @@ import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
 import { fullSave, loadGame, loadPlayer } from "../utility/functions/save_load";
 import { View, Text, Platform, StyleSheet } from "react-native";
-import { autorun, reaction } from "mobx";
+import { reaction } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
@@ -121,7 +121,7 @@ const Root = observer(() => {
         throttledFullSave(gameState, playerState);
       }
     },
-    { delay: 2000 }, // delay to reduce frequency
+    { delay: 2000 },
   );
 
   while (loading) {

@@ -33,12 +33,14 @@ import DroppedItemsModal from "../../components/DungeonComponents/DroppedItemsMo
 import { enemyTurnCheck } from "../../utility/functions/dungeonInteriorFunctions";
 import LeftBehindItemsModal from "../../components/DungeonComponents/LeftBehindItemsModal";
 import { SpellError } from "../../utility/errorTypes";
-import DungeonMapRender, {
+import {
   BoundingBox,
+  DungeonMapControls,
+  DungeonMapRender,
   Tile,
   generateTiles,
   getBoundingBox,
-} from "../../components/DungeonMapRender";
+} from "../../components/DungeonMap";
 
 const TILE_SIZE = 40;
 
@@ -63,9 +65,9 @@ const DungeonLevelScreen = observer(() => {
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
   const [instanceName, setInstanceName] = useState<string>(slug[0]);
   const [level, setLevel] = useState<number>(Number(slug[1]));
-  const [battleTab, setBattleTab] = useState<"attacks" | "equipment" | "log">(
-    "log",
-  );
+  const [battleTab, setBattleTab] = useState<
+    "attacksOrNavigation" | "equipment" | "log"
+  >("attacksOrNavigation");
   const [thisInstance, setThisInstance] = useState<DungeonInstance>();
   const [thisDungeon, setThisDungeon] = useState<DungeonLevel>();
   const [enemyAttacked, setEnemyAttacked] = useState<boolean>(false);
@@ -155,11 +157,12 @@ const DungeonLevelScreen = observer(() => {
     const generatedTiles = generateTiles({
       numTiles: thisDungeon?.tiles ?? 10,
       tileSize: TILE_SIZE,
+      bossDefeated: thisDungeon?.bossDefeated ?? false,
     });
     setTiles(generatedTiles);
     const dimensions = getBoundingBox(generatedTiles, TILE_SIZE);
     setMapDimensions(dimensions);
-    setCurrentPosition(tiles[0]);
+    setCurrentPosition(generatedTiles[0]);
   }, []);
 
   useEffect(() => {
@@ -727,19 +730,16 @@ const DungeonLevelScreen = observer(() => {
             />
           </>
         </GenericModal>
-        {!inCombat ? (
-          <DungeonMapRender
-            tiles={tiles}
-            mapDimensions={mapDimensions}
-            currentPosition={currentPosition}
-            setCurrentPosition={setCurrentPosition}
-            tileSize={TILE_SIZE}
-            setInCombat={setInCombat}
-            loadBoss={loadBoss}
-          />
-        ) : (
+        {
           <ThemedView className="flex-1 px-2" style={{ paddingBottom: 88 }}>
-            {enemyState ? (
+            {!inCombat ? (
+              <DungeonMapRender
+                tiles={tiles}
+                mapDimensions={mapDimensions}
+                currentPosition={currentPosition}
+                tileSize={TILE_SIZE}
+              />
+            ) : enemyState ? (
               <DungeonEnemyDisplay
                 enemyState={enemyState}
                 showingEnemyHealthChange={showingEnemyHealthChange}
@@ -774,12 +774,22 @@ const DungeonLevelScreen = observer(() => {
                   setShowTargetSelection={setShowTargetSelection}
                   addItemToPouch={addItemToPouch}
                   pouchRef={pouchRef}
+                  DungeonMapControls={DungeonMapControls({
+                    tiles,
+                    currentPosition,
+                    tileSize: TILE_SIZE,
+                    setCurrentPosition,
+                    setInCombat,
+                    loadBoss,
+                  })}
+                  inCombat={inCombat}
                 />
               </View>
             </View>
             <BattleTabControls
               battleTab={battleTab}
               setBattleTab={setBattleTab}
+              inCombat={inCombat}
             />
             {playerState.minions.length > 0 ? (
               <ThemedView className="flex flex-row flex-wrap justify-evenly">
@@ -805,7 +815,7 @@ const DungeonLevelScreen = observer(() => {
               </ThemedView>
             ) : null}
           </ThemedView>
-        )}
+        }
         <View className="absolute z-50 w-full" style={{ bottom: 95 }}>
           <PlayerStatus />
         </View>

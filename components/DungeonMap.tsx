@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Svg, { Rect } from "react-native-svg";
 import { View } from "react-native";
-import { View as ThemedView } from "./Themed";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
 } from "react-native-reanimated";
 import GenericRaisedButton from "./GenericRaisedButton";
+import { useColorScheme } from "nativewind";
 
 export interface Tile {
   x: number;
@@ -22,16 +22,6 @@ export interface BoundingBox {
   offsetY: number;
 }
 
-interface MapGeneratorProps {
-  tiles: Tile[];
-  mapDimensions: BoundingBox;
-  tileSize: number;
-  currentPosition: Tile | null;
-  setCurrentPosition: React.Dispatch<React.SetStateAction<Tile | null>>;
-  setInCombat: React.Dispatch<React.SetStateAction<boolean>>;
-  loadBoss: () => void;
-}
-
 const directionsMapping: Record<string, { x: number; y: number }> = {
   up: { x: 0, y: -1 },
   down: { x: 0, y: 1 },
@@ -42,11 +32,13 @@ const directionsMapping: Record<string, { x: number; y: number }> = {
 export interface generateTilesProps {
   numTiles: number;
   tileSize: number;
+  bossDefeated: boolean;
 }
 
 export const generateTiles = ({
   numTiles,
   tileSize,
+  bossDefeated,
 }: generateTilesProps): Tile[] => {
   const tiles: Tile[] = [];
   const activeTiles: Tile[] = [];
@@ -85,7 +77,7 @@ export const generateTiles = ({
           x: newX,
           y: newY,
           clearedRoom: false,
-          isBossRoom: i == numTiles - 2,
+          isBossRoom: false, // set in distance check
         };
         tiles.push(newTile);
         activeTiles.push(newTile);
@@ -98,9 +90,27 @@ export const generateTiles = ({
     }
   }
 
+  if (!bossDefeated) {
+    let maxDistance = 0;
+    let furthestTile = tiles[1]; // will be updated
+
+    tiles.forEach((tile) => {
+      const distance = Math.sqrt(
+        Math.pow(tile.x - startTile.x, 2) + Math.pow(tile.y - startTile.y, 2),
+      );
+      if (distance > maxDistance) {
+        maxDistance = distance;
+        furthestTile = tile;
+      }
+    });
+
+    if (furthestTile) {
+      furthestTile.isBossRoom = true;
+    }
+  }
+
   return tiles;
 };
-
 export const getBoundingBox = (
   tiles: Tile[],
   tileSize: number,
@@ -118,17 +128,22 @@ export const getBoundingBox = (
   };
 };
 
-export default function DungeonMapRender({
+interface MapGeneratorProps {
+  tiles: Tile[];
+  mapDimensions: BoundingBox;
+  tileSize: number;
+  currentPosition: Tile | null;
+}
+
+export const DungeonMapRender = ({
   tiles,
   mapDimensions,
   tileSize,
   currentPosition,
-  setCurrentPosition,
-  setInCombat,
-  loadBoss,
-}: MapGeneratorProps) {
+}: MapGeneratorProps) => {
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
+  const { colorScheme } = useColorScheme();
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
@@ -136,6 +151,89 @@ export default function DungeonMapRender({
       { translateY: translateY.value },
     ],
   }));
+
+  const getFillColor = (tile: Tile) => {
+    const isCurrent =
+      tile.x === currentPosition?.x && tile.y === currentPosition?.y;
+    if (colorScheme == "dark") {
+      if (tile.clearedRoom) {
+        return isCurrent ? "#93c5fd" : "#2563eb";
+      }
+
+      if (tile.isBossRoom) {
+        return "#dc2626";
+      }
+
+      return isCurrent ? "#a1a1aa" : "#18181b";
+    } else {
+      if (tile.clearedRoom) {
+        return isCurrent ? "#93c5fd" : "#2563eb";
+      }
+
+      if (tile.isBossRoom) {
+        return "#dc2626";
+      }
+
+      return isCurrent ? "#a1a1aa" : "#e4e4e7";
+    }
+  };
+
+  const renderTile = (tile: Tile) => {
+    return (
+      <Rect
+        key={`${tile.x}-${tile.y}`}
+        x={tile.x - mapDimensions.offsetX}
+        y={tile.y - mapDimensions.offsetY}
+        width={tileSize}
+        height={tileSize}
+        fill={getFillColor(tile)}
+        stroke="gray"
+      />
+    );
+  };
+
+  return (
+    <View className="flex h-1/2 mx-auto justify-center">
+      <Animated.View
+        style={[
+          animatedStyle,
+          { width: mapDimensions.width, height: mapDimensions.height },
+        ]}
+      >
+        <Svg width={mapDimensions.width} height={mapDimensions.height}>
+          {tiles.map((tile) => renderTile(tile))}
+        </Svg>
+      </Animated.View>
+    </View>
+  );
+};
+
+interface DungeonMapControlsProps {
+  tiles: Tile[];
+  currentPosition: Tile | null;
+  tileSize: number;
+  setCurrentPosition: React.Dispatch<React.SetStateAction<Tile | null>>;
+  setInCombat: React.Dispatch<React.SetStateAction<boolean>>;
+  loadBoss: () => void;
+}
+
+export const DungeonMapControls = ({
+  tiles,
+  currentPosition,
+  tileSize,
+  setCurrentPosition,
+  setInCombat,
+  loadBoss,
+}: DungeonMapControlsProps) => {
+  const isMoveValid = (direction: keyof typeof directionsMapping) => {
+    if (!currentPosition) return false;
+    if (!currentPosition.clearedRoom) return false;
+    const { x, y } = directionsMapping[direction];
+    const newX = currentPosition.x + x * tileSize;
+    const newY = currentPosition.y + y * tileSize;
+
+    return tiles.some((tile) => tile.x === newX && tile.y === newY);
+  };
 
   const move = (direction: keyof typeof directionsMapping) => {
     if (!currentPosition) return;
@@ -149,48 +247,14 @@ export default function DungeonMapRender({
 
     if (newPosition) {
       setCurrentPosition(newPosition);
-      if (newPosition.isBossRoom) {
-        loadBoss();
-      } else {
-        setInCombat(true);
+      if (!newPosition.clearedRoom) {
+        if (newPosition.isBossRoom) {
+          loadBoss();
+        } else {
+          setInCombat(true);
+        }
       }
     }
-  };
-
-  const renderTile = (tile: Tile) => {
-    const isCurrent =
-      tile.x === currentPosition?.x && tile.y === currentPosition?.y;
-    return (
-      <Rect
-        key={`${tile.x}-${tile.y}`}
-        x={tile.x - mapDimensions.offsetX}
-        y={tile.y - mapDimensions.offsetY}
-        width={tileSize}
-        height={tileSize}
-        fill={
-          tile.clearedRoom
-            ? isCurrent
-              ? "#93c5fd"
-              : "#2563eb"
-            : tile.isBossRoom
-            ? "#dc2626"
-            : isCurrent
-            ? "gray"
-            : "black"
-        }
-        stroke="gray"
-      />
-    );
-  };
-
-  const isMoveValid = (direction: keyof typeof directionsMapping) => {
-    if (!currentPosition) return false;
-    if (!currentPosition.clearedRoom) return false;
-    const { x, y } = directionsMapping[direction];
-    const newX = currentPosition.x + x * tileSize;
-    const newY = currentPosition.y + y * tileSize;
-
-    return tiles.some((tile) => tile.x === newX && tile.y === newY);
   };
 
   const ArrowButton: React.FC<{
@@ -205,29 +269,14 @@ export default function DungeonMapRender({
       />
     );
   };
-
   return (
-    <ThemedView className="h-full">
-      <View className="flex h-1/2 mx-auto justify-center">
-        <Animated.View
-          style={[
-            animatedStyle,
-            { width: mapDimensions.width, height: mapDimensions.height },
-          ]}
-        >
-          <Svg width={mapDimensions.width} height={mapDimensions.height}>
-            {tiles.map((tile) => renderTile(tile))}
-          </Svg>
-        </Animated.View>
+    <View className="flex-1 flex items-center w-2/3 mx-auto">
+      <ArrowButton direction="up" />
+      <View className="flex-row justify-between w-full">
+        <ArrowButton direction="left" />
+        <ArrowButton direction="right" />
       </View>
-      <View className="flex-1 flex items-center w-2/3 mx-auto">
-        <ArrowButton direction="up" />
-        <View className="flex-row justify-between w-full">
-          <ArrowButton direction="left" />
-          <ArrowButton direction="right" />
-        </View>
-        <ArrowButton direction="down" />
-      </View>
-    </ThemedView>
+      <ArrowButton direction="down" />
+    </View>
   );
-}
+};

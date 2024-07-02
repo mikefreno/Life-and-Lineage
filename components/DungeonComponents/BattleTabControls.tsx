@@ -5,28 +5,32 @@ import { useVibration } from "../../utility/customHooks";
 interface BattleTabControlsProps {
   battleTab: string;
   setBattleTab: (
-    value: React.SetStateAction<"attacks" | "equipment" | "log">,
+    value: React.SetStateAction<"attacksOrNavigation" | "equipment" | "log">,
   ) => void;
+  inCombat: boolean;
 }
 export default function BattleTabControls({
   battleTab,
   setBattleTab,
+  inCombat,
 }: BattleTabControlsProps) {
   const vibration = useVibration();
   return (
     <View className="-mb-1 flex w-full flex-row justify-around">
       <Pressable
         className={`mx-2 w-32 rounded py-4 ${
-          battleTab == "attacks"
+          battleTab == "attacksOrNavigation"
             ? "bg-zinc-100 dark:bg-zinc-800"
             : "active:bg-zinc-200 dark:active:bg-zinc-700"
         }`}
         onPress={() => {
           vibration({ style: "light" });
-          setBattleTab("attacks");
+          setBattleTab("attacksOrNavigation");
         }}
       >
-        <Text className="text-center text-xl">Attacks</Text>
+        <Text className="text-center text-xl">
+          {inCombat ? "Attacks" : "Navigation"}
+        </Text>
       </Pressable>
       <Pressable
         className={`mx-2 w-32 rounded py-4 ${

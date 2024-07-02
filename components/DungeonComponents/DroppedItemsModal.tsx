@@ -37,7 +37,6 @@ export default function DroppedItemsModal({
 }: DroppedItemsModalProps) {
   function closeImmediateItemDrops() {
     if (droppedItems && droppedItems.itemDrops.length > 0) {
-      console.log(droppedItems);
       setLeftBehindDrops((prev) => [...prev, ...droppedItems.itemDrops]);
     }
     setDroppedItems(null);
