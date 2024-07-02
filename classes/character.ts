@@ -1499,8 +1499,6 @@ export class PlayerCharacter extends Character {
     const currentSchoolProficiency = this.magicProficiencies.find(
       (prof) => prof.school == chosenSpell.element,
     )?.proficiency;
-    console.log(currentSchoolProficiency);
-    console.log(chosenSpell.proficiencyNeeded);
     if (
       currentSchoolProficiency &&
       currentSchoolProficiency >=

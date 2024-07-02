@@ -4,7 +4,6 @@ export function getMasteryLevel(
   proficiency: number,
   asString: boolean = false,
 ): MasteryLevel | string {
-  console.log(proficiency);
   if (asString) {
     if (proficiency >= 500) {
       return "Legend";

@@ -8,14 +8,14 @@ import Animated, {
 } from "react-native-reanimated";
 import GenericRaisedButton from "./GenericRaisedButton";
 
-interface Tile {
+export interface Tile {
   x: number;
   y: number;
   clearedRoom: boolean;
   isBossRoom: boolean;
 }
 
-interface BoundingBox {
+export interface BoundingBox {
   width: number;
   height: number;
   offsetX: number;
@@ -23,8 +23,11 @@ interface BoundingBox {
 }
 
 interface MapGeneratorProps {
-  numTiles: number;
+  tiles: Tile[];
+  mapDimensions: BoundingBox;
   tileSize: number;
+  currentPosition: Tile | null;
+  setCurrentPosition: React.Dispatch<React.SetStateAction<Tile | null>>;
   setInCombat: React.Dispatch<React.SetStateAction<boolean>>;
   loadBoss: () => void;
 }
@@ -36,11 +39,15 @@ const directionsMapping: Record<string, { x: number; y: number }> = {
   right: { x: 1, y: 0 },
 };
 
-interface generateTilesProps {
+export interface generateTilesProps {
   numTiles: number;
   tileSize: number;
 }
-const generateTiles = ({ numTiles, tileSize }: generateTilesProps): Tile[] => {
+
+export const generateTiles = ({
+  numTiles,
+  tileSize,
+}: generateTilesProps): Tile[] => {
   const tiles: Tile[] = [];
   const activeTiles: Tile[] = [];
   const directions = Object.values(directionsMapping);
@@ -94,7 +101,10 @@ const generateTiles = ({ numTiles, tileSize }: generateTilesProps): Tile[] => {
   return tiles;
 };
 
-const getBoundingBox = (tiles: Tile[], tileSize: number): BoundingBox => {
+export const getBoundingBox = (
+  tiles: Tile[],
+  tileSize: number,
+): BoundingBox => {
   let minX = Math.min(...tiles.map((tile) => tile.x));
   let maxX = Math.max(...tiles.map((tile) => tile.x));
   let minY = Math.min(...tiles.map((tile) => tile.y));
@@ -109,29 +119,16 @@ const getBoundingBox = (tiles: Tile[], tileSize: number): BoundingBox => {
 };
 
 export default function DungeonMapRender({
-  numTiles,
+  tiles,
+  mapDimensions,
   tileSize,
+  currentPosition,
+  setCurrentPosition,
   setInCombat,
   loadBoss,
 }: MapGeneratorProps) {
-  const [tiles, setTiles] = useState<Tile[]>([]);
-  const [mapDimensions, setMapDimensions] = useState<BoundingBox>({
-    width: tileSize,
-    height: tileSize,
-    offsetX: 0,
-    offsetY: 0,
-  });
-  const [currentPosition, setCurrentPosition] = useState<Tile | null>(null);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
-
-  useEffect(() => {
-    const generatedTiles = generateTiles({ numTiles, tileSize });
-    setTiles(generatedTiles);
-    const dimensions = getBoundingBox(generatedTiles, tileSize);
-    setMapDimensions(dimensions);
-    setCurrentPosition(generatedTiles[0]);
-  }, [numTiles, tileSize]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [

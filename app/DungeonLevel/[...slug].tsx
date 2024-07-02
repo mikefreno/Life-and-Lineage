@@ -33,7 +33,14 @@ import DroppedItemsModal from "../../components/DungeonComponents/DroppedItemsMo
 import { enemyTurnCheck } from "../../utility/functions/dungeonInteriorFunctions";
 import LeftBehindItemsModal from "../../components/DungeonComponents/LeftBehindItemsModal";
 import { SpellError } from "../../utility/errorTypes";
-import DungeonMapRender from "../../components/DungeonMapRender";
+import DungeonMapRender, {
+  BoundingBox,
+  Tile,
+  generateTiles,
+  getBoundingBox,
+} from "../../components/DungeonMapRender";
+
+const TILE_SIZE = 40;
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -100,6 +107,15 @@ const DungeonLevelScreen = observer(() => {
   const [enemyHealDummy, setEnemyHealDummy] = useState<number>(0);
   const [enemyTextDummy, setEnemyTextDummy] = useState<number>(0);
   const [inCombat, setInCombat] = useState<boolean>(false);
+  const [tiles, setTiles] = useState<Tile[]>([]);
+  const [mapDimensions, setMapDimensions] = useState<BoundingBox>({
+    width: TILE_SIZE,
+    height: TILE_SIZE,
+    offsetX: 0,
+    offsetY: 0,
+  });
+
+  const [currentPosition, setCurrentPosition] = useState<Tile | null>(null);
   const pouchRef = useRef<View>(null);
 
   const isFocused = useIsFocused();
@@ -122,10 +138,29 @@ const DungeonLevelScreen = observer(() => {
   useEffect(() => {
     if (slug[0] !== "Activities" && slug[0] !== "Personal") {
       if (!fightingBoss && !enemyState) {
+        setInCombat(false);
+        tiles.map((tile) => {
+          if (tile.x == currentPosition?.x && tile.y == currentPosition.y) {
+            tile.clearedRoom = true;
+            return tile;
+          }
+          return tile;
+        });
         getEnemy();
       }
     }
   }, [enemyState]);
+
+  useEffect(() => {
+    const generatedTiles = generateTiles({
+      numTiles: thisDungeon?.tiles ?? 10,
+      tileSize: TILE_SIZE,
+    });
+    setTiles(generatedTiles);
+    const dimensions = getBoundingBox(generatedTiles, TILE_SIZE);
+    setMapDimensions(dimensions);
+    setCurrentPosition(tiles[0]);
+  }, []);
 
   useEffect(() => {
     if (
@@ -694,8 +729,11 @@ const DungeonLevelScreen = observer(() => {
         </GenericModal>
         {!inCombat ? (
           <DungeonMapRender
-            numTiles={thisDungeon.tiles ?? 10}
-            tileSize={40}
+            tiles={tiles}
+            mapDimensions={mapDimensions}
+            currentPosition={currentPosition}
+            setCurrentPosition={setCurrentPosition}
+            tileSize={TILE_SIZE}
             setInCombat={setInCombat}
             loadBoss={loadBoss}
           />
