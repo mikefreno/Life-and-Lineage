@@ -63,7 +63,7 @@ export class Game {
           new DungeonLevel({
             level: 0,
             bosses: [],
-            stepsBeforeBoss: 0,
+            tiles: 0,
             bossDefeated: true,
           }),
         ],
@@ -74,7 +74,7 @@ export class Game {
           new DungeonLevel({
             level: 1,
             bosses: ["zombie"],
-            stepsBeforeBoss: 10,
+            tiles: 10,
             bossDefeated: false,
           }),
         ],
@@ -203,7 +203,7 @@ export class Game {
                   new DungeonLevel({
                     level: 1,
                     step: 0,
-                    stepsBeforeBoss: found.levels[0].stepsBeforeBoss,
+                    tiles: found.levels[0].tiles,
                     bosses: found.levels[0].boss,
                     bossDefeated: false,
                   }),

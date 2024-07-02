@@ -22,7 +22,7 @@ export interface ItemOptions {
     | "hat"
     | "book";
   icon?: string;
-  stackable?: number | null;
+  stackable?: boolean;
 }
 
 export type InvestmentType = {
@@ -241,3 +241,10 @@ export interface checkReleasePositionProps {
   size: number;
   equipped?: boolean;
 }
+
+export type beingType =
+  | "block o wood"
+  | "beast"
+  | "undead"
+  | "demi-human"
+  | "human";

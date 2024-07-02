@@ -32,14 +32,14 @@ import * as Crypto from "expo-crypto";
 import { Item } from "./item";
 import { action, makeObservable, observable } from "mobx";
 import summons from "../assets/json/summons.json";
-import { AttackObj } from "../utility/types";
+import { AttackObj, beingType } from "../utility/types";
 import { rollD20 } from "../utility/functions/roll";
 import { damageReduction } from "../utility/functions/misc/numbers";
 import { getRandomInt } from "../utility/functions/misc/words";
 
 type CreatureType = {
   id?: string;
-  beingType: string;
+  beingType: beingType;
   creatureSpecies: string;
   health: number;
   healthMax: number;
@@ -79,7 +79,7 @@ interface takeTurnProps {
 
 export class Creature {
   readonly id: string;
-  readonly beingType: string;
+  readonly beingType: beingType;
   readonly creatureSpecies: string;
   health: number;
   readonly healthMax: number;

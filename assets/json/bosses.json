@@ -1,6 +1,7 @@
 [
    {
       "name": "zombie",
+      "beingType": "undead",
       "sanity": null,
       "health": 80,
       "attackPower": 10,
@@ -14,6 +15,7 @@
    },
    {
       "name": "necromancer",
+      "beingType": "human",
       "sanity": 50,
       "health": 140,
       "attackPower": 15,
@@ -29,6 +31,7 @@
    },
    {
       "name": "hobgoblin",
+      "beingType": "demi-human",
       "sanity": null,
       "health": 160,
       "attackPower": 15,
@@ -41,6 +44,7 @@
    },
    {
       "name": "goblin shaman",
+      "beingType": "demi-human",
       "sanity": 50,
       "health": 160,
       "attackPower": 35,

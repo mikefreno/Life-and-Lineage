@@ -30,7 +30,7 @@ export class Item {
   readonly stats: Record<string, number | undefined> | null;
   readonly baseValue: number;
   readonly icon: string | undefined;
-  readonly stackable: number | null;
+  readonly stackable: boolean;
 
   constructor({
     id,
@@ -40,7 +40,7 @@ export class Item {
     baseValue,
     itemClass,
     icon,
-    stackable,
+    stackable = false,
   }: ItemOptions) {
     this.id = id ?? Crypto.randomUUID();
     this.name = name;
@@ -49,7 +49,7 @@ export class Item {
     this.baseValue = baseValue;
     this.itemClass = itemClass;
     this.icon = icon;
-    this.stackable = stackable ?? null;
+    this.stackable = stackable;
   }
 
   public equals(otherItem: Item) {

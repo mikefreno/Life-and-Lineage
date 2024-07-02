@@ -4,17 +4,17 @@
      "levels": [
        {
          "level": 1,
-         "stepsBeforeBoss": 10,
+         "tiles": 10,
          "boss": ["zombie"]
        },
        {
          "level": 2,
-         "stepsBeforeBoss": 10,
+         "tiles": 10,
          "boss": ["zombie"]
        },
        {
          "level": 3,
-         "stepsBeforeBoss": 15,
+         "tiles": 15,
          "boss": ["necromancer"]
        }
      ],
@@ -25,12 +25,12 @@
      "levels": [
        {
          "level": 1,
-         "stepsBeforeBoss": 10,
+         "tiles": 10,
          "boss": ["hobgoblin"]
        },
        {
          "level": 2,
-         "stepsBeforeBoss": 15,
+         "tiles": 15,
          "boss": ["goblin shaman", "hobgoblin"]
        }
      ],
@@ -41,12 +41,12 @@
      "levels": [
        {
          "level": 1,
-         "stepsBeforeBoss": 10,
+         "tiles": 10,
          "boss": ["bandit", "bandit"]
        },
        {
          "level": 2,
-         "stepsBeforeBoss": 20,
+         "tiles": 20,
          "boss": ["bandit boss", "bandit"]
        }
      ],
@@ -57,22 +57,22 @@
      "levels": [
        {
          "level": 1,
-         "stepsBeforeBoss": 5,
+         "tiles": 5,
          "boss": ["adept water mage"]
        },
        {
          "level": 2,
-         "stepsBeforeBoss": 5,
+         "tiles": 5,
          "boss": ["adept air mage"]
        },
        {
          "level": 3,
-         "stepsBeforeBoss": 10,
+         "tiles": 10,
          "boss": ["expert fire mage"]
        },
        {
          "level": 4,
-         "stepsBeforeBoss": 15,
+         "tiles": 15,
          "boss": ["master earth mage"]
        }
      ],
@@ -83,12 +83,12 @@
      "levels": [
        {
          "level": 1,
-         "stepsBeforeBoss": 20,
+         "tiles": 20,
          "boss": ["venomous spider"]
        },
        {
          "level": 2,
-         "stepsBeforeBoss": 20,
+         "tiles": 20,
          "boss": ["brood mother"]
        }
      ],
@@ -99,12 +99,12 @@
      "levels": [
        {
          "level": 1,
-         "stepsBeforeBoss": 15,
+         "tiles": 15,
          "boss": ["griffon"]
        },
        {
          "level": 2,
-         "stepsBeforeBoss": 30,
+         "tiles": 30,
          "boss": ["chimera"]
        }
      ],
@@ -115,12 +115,12 @@
      "levels": [
        {
          "level": 1,
-         "stepsBeforeBoss": 20,
+         "tiles": 20,
          "boss": ["cave troll"]
        },
        {
          "level": 2,
-         "stepsBeforeBoss": 25,
+         "tiles": 25,
          "boss": ["moon bull"]
        }
      ],
@@ -131,12 +131,12 @@
      "levels": [
        {
          "level": 1,
-         "stepsBeforeBoss": 20,
+         "tiles": 20,
          "boss": ["blood paladin"]
        },
        {
          "level": 2,
-         "stepsBeforeBoss": 25,
+         "tiles": 25,
          "boss": ["blood priest", "blood paladin"]
        }
      ],

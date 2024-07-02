@@ -32,8 +32,8 @@ import TargetSelection from "../../components/DungeonComponents/TargetSelection"
 import DroppedItemsModal from "../../components/DungeonComponents/DroppedItemsModal";
 import { enemyTurnCheck } from "../../utility/functions/dungeonInteriorFunctions";
 import LeftBehindItemsModal from "../../components/DungeonComponents/LeftBehindItemsModal";
-import { useVibration } from "../../utility/customHooks";
 import { SpellError } from "../../utility/errorTypes";
+import DungeonMapRender from "../../components/DungeonMapRender";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -99,9 +99,9 @@ const DungeonLevelScreen = observer(() => {
   const [enemyAttackDummy, setEnemyAttackDummy] = useState<number>(0);
   const [enemyHealDummy, setEnemyHealDummy] = useState<number>(0);
   const [enemyTextDummy, setEnemyTextDummy] = useState<number>(0);
+  const [inCombat, setInCombat] = useState<boolean>(false);
   const pouchRef = useRef<View>(null);
 
-  const vibration = useVibration();
   const isFocused = useIsFocused();
 
   if (!playerState || !gameState) {
@@ -145,10 +145,11 @@ const DungeonLevelScreen = observer(() => {
 
   useEffect(() => {
     if (slug[0] == "Activities" || slug[0] == "Personal") {
+      setInCombat(true);
       const tempDungeon = new DungeonLevel({
         level: 0,
         bosses: [],
-        stepsBeforeBoss: 0,
+        tiles: 0,
         bossDefeated: true,
       });
       const tempInstance = new DungeonInstance({
@@ -244,6 +245,7 @@ const DungeonLevelScreen = observer(() => {
 
   const loadBoss = () => {
     setFightingBoss(true);
+    setInCombat(true);
     setEnemy(null);
     setTimeout(() => {
       if (thisDungeon && thisInstance && playerState) {
@@ -618,7 +620,7 @@ const DungeonLevelScreen = observer(() => {
           }}
           pageTwo={{
             title: "Advance by killing the boss.",
-            body: "The first boss becomes availible after 10 Enemys defeated for the first dungeon.",
+            body: "The first boss becomes available after 10 Enemys defeated for the first dungeon.",
           }}
           pageThree={{
             title: "Good Luck.",
@@ -690,100 +692,82 @@ const DungeonLevelScreen = observer(() => {
             />
           </>
         </GenericModal>
-        <ThemedView className="flex-1 px-2" style={{ paddingBottom: 88 }}>
-          {enemyState ? (
-            <DungeonEnemyDisplay
-              enemyState={enemyState}
-              showingEnemyHealthChange={showingEnemyHealthChange}
-              enemyHealthDiff={enemyHealthDiff}
-              animationCycler={animationCycler}
-              enemyAttackAnimationValue={enemyAttackAnimationValue}
-              enemyHealDummy={enemyHealDummy}
-              enemyDamagedAnimationValue={enemyDamagedAnimationValue}
-              enemyTextTranslateAnimation={enemyTextTranslateAnimation}
-              enemyTextString={enemyTextString}
-              enemyTextFadeAnimation={enemyTextFadeAnimation}
-            />
-          ) : (
-            <View className="flex h-[40%] pt-8" />
-          )}
-          {thisDungeon.stepsBeforeBoss !== 0 && !fightingBoss ? (
-            <View className="flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
-              <Text className="my-auto text-xl">
-                {`Steps Completed: ${thisDungeon.step} / ${thisDungeon.stepsBeforeBoss}`}
-              </Text>
-              {thisDungeon.step >= thisDungeon.stepsBeforeBoss &&
-              !thisDungeon.bossDefeated ? (
-                <Pressable
-                  onPress={() => {
-                    vibration({ style: "warning", essential: true });
-                    loadBoss();
-                  }}
-                  className="my-auto rounded bg-red-500 px-4 py-2 active:scale-95 active:opacity-50"
-                >
-                  <Text style={{ color: "white" }}>Fight Boss</Text>
-                </Pressable>
-              ) : null}
-            </View>
-          ) : fightingBoss ? (
-            <View className="flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50">
-              <Text className="my-auto text-center text-xl">
-                Fighting Boss!
-              </Text>
-            </View>
-          ) : (
-            <View className="flex flex-row justify-evenly border-b border-zinc-900 pb-1 dark:border-zinc-50" />
-          )}
-          <Pressable
-            ref={pouchRef}
-            className="absolute ml-4 mt-4"
-            onPress={() => setShowLeftBehindItemsScreen(true)}
-          >
-            <SackIcon height={32} width={32} />
-          </Pressable>
-          <View className="flex-1 justify-between">
-            <View className="flex-1">
-              <BattleTab
-                useAttack={useAttack}
-                battleTab={battleTab}
-                useSpell={useSpell}
-                pass={pass}
-                setAttackAnimationOnGoing={setAttackAnimationOnGoing}
-                attackAnimationOnGoing={attackAnimationOnGoing}
-                setShowTargetSelection={setShowTargetSelection}
-                addItemToPouch={addItemToPouch}
-                pouchRef={pouchRef}
-              />
-            </View>
-          </View>
-          <BattleTabControls
-            battleTab={battleTab}
-            setBattleTab={setBattleTab}
+        {!inCombat ? (
+          <DungeonMapRender
+            numTiles={thisDungeon.tiles ?? 10}
+            tileSize={40}
+            setInCombat={setInCombat}
+            loadBoss={loadBoss}
           />
-          {playerState.minions.length > 0 ? (
-            <ThemedView className="flex flex-row flex-wrap justify-evenly">
-              {playerState.minions.map((minion, index) => (
-                <ThemedView
-                  key={minion.id}
-                  className={`${
-                    index == playerState.minions.length - 1 &&
-                    playerState.minions.length % 2 !== 0
-                      ? "w-full"
-                      : "w-2/5"
-                  } py-1`}
-                >
-                  <Text>{toTitleCase(minion.creatureSpecies)}</Text>
-                  <ProgressBar
-                    filledColor="#ef4444"
-                    unfilledColor="#fee2e2"
-                    value={minion.health}
-                    maxValue={minion.healthMax}
-                  />
-                </ThemedView>
-              ))}
-            </ThemedView>
-          ) : null}
-        </ThemedView>
+        ) : (
+          <ThemedView className="flex-1 px-2" style={{ paddingBottom: 88 }}>
+            {enemyState ? (
+              <DungeonEnemyDisplay
+                enemyState={enemyState}
+                showingEnemyHealthChange={showingEnemyHealthChange}
+                enemyHealthDiff={enemyHealthDiff}
+                animationCycler={animationCycler}
+                enemyAttackAnimationValue={enemyAttackAnimationValue}
+                enemyHealDummy={enemyHealDummy}
+                enemyDamagedAnimationValue={enemyDamagedAnimationValue}
+                enemyTextTranslateAnimation={enemyTextTranslateAnimation}
+                enemyTextString={enemyTextString}
+                enemyTextFadeAnimation={enemyTextFadeAnimation}
+              />
+            ) : (
+              <View className="flex h-[40%] pt-8" />
+            )}
+            <Pressable
+              ref={pouchRef}
+              className="absolute ml-4 mt-4"
+              onPress={() => setShowLeftBehindItemsScreen(true)}
+            >
+              <SackIcon height={32} width={32} />
+            </Pressable>
+            <View className="flex-1 justify-between">
+              <View className="flex-1">
+                <BattleTab
+                  useAttack={useAttack}
+                  battleTab={battleTab}
+                  useSpell={useSpell}
+                  pass={pass}
+                  setAttackAnimationOnGoing={setAttackAnimationOnGoing}
+                  attackAnimationOnGoing={attackAnimationOnGoing}
+                  setShowTargetSelection={setShowTargetSelection}
+                  addItemToPouch={addItemToPouch}
+                  pouchRef={pouchRef}
+                />
+              </View>
+            </View>
+            <BattleTabControls
+              battleTab={battleTab}
+              setBattleTab={setBattleTab}
+            />
+            {playerState.minions.length > 0 ? (
+              <ThemedView className="flex flex-row flex-wrap justify-evenly">
+                {playerState.minions.map((minion, index) => (
+                  <ThemedView
+                    key={minion.id}
+                    className={`${
+                      index == playerState.minions.length - 1 &&
+                      playerState.minions.length % 2 !== 0
+                        ? "w-full"
+                        : "w-2/5"
+                    } py-1`}
+                  >
+                    <Text>{toTitleCase(minion.creatureSpecies)}</Text>
+                    <ProgressBar
+                      filledColor="#ef4444"
+                      unfilledColor="#fee2e2"
+                      value={minion.health}
+                      maxValue={minion.healthMax}
+                    />
+                  </ThemedView>
+                ))}
+              </ThemedView>
+            ) : null}
+          </ThemedView>
+        )}
         <View className="absolute z-50 w-full" style={{ bottom: 95 }}>
           <PlayerStatus />
         </View>
@@ -791,4 +775,5 @@ const DungeonLevelScreen = observer(() => {
     );
   }
 });
+
 export default DungeonLevelScreen;

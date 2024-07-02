@@ -2,12 +2,13 @@ import dungeons from "../assets/json/dungeons.json";
 import bosses from "../assets/json/bosses.json";
 import { Enemy } from "./creatures";
 import { action, makeObservable, observable } from "mobx";
+import { beingType } from "../utility/types";
 
 interface DungeonLevelOptions {
   level: number;
   bosses: string[];
   step?: number;
-  stepsBeforeBoss: number;
+  tiles: number;
   bossDefeated?: boolean;
 }
 
@@ -39,7 +40,7 @@ export class DungeonInstance {
           new DungeonLevel({
             level: nextLevelObj.level,
             bosses: nextLevelObj.boss,
-            stepsBeforeBoss: nextLevelObj.stepsBeforeBoss,
+            tiles: nextLevelObj.tiles,
           }),
         );
         return true;
@@ -69,20 +70,20 @@ export class DungeonLevel {
   readonly level: number;
   readonly bosses: string[];
   step: number;
-  readonly stepsBeforeBoss: number;
+  readonly tiles: number;
   bossDefeated: boolean;
 
   constructor({
     level,
     bosses,
     step,
-    stepsBeforeBoss,
+    tiles,
     bossDefeated,
   }: DungeonLevelOptions) {
     this.level = level;
     this.bosses = bosses;
     this.step = step ?? 0;
-    this.stepsBeforeBoss = stepsBeforeBoss;
+    this.tiles = tiles;
     this.bossDefeated = bossDefeated ?? false;
     makeObservable(this, {
       step: observable,
@@ -94,13 +95,15 @@ export class DungeonLevel {
   }
 
   public incrementStep() {
-    if (this.step < this.stepsBeforeBoss) {
+    if (this.step < this.tiles) {
       this.step += 1;
     }
   }
   public setBossDefeated() {
     this.bossDefeated = true;
   }
+
+  public generateMap() {}
 
   public getBoss(instanceName: string) {
     let bossObjects = this.bosses.map((boss) =>
@@ -112,6 +115,7 @@ export class DungeonLevel {
         if (bossObj) {
           bosses.push(
             new Enemy({
+              beingType: bossObj.beingType as beingType,
               creatureSpecies: bossObj.name,
               health: bossObj.health,
               healthMax: bossObj.health,
@@ -138,7 +142,7 @@ export class DungeonLevel {
       level: json.level,
       bosses: json.bosses,
       step: json.step,
-      stepsBeforeBoss: json.stepsBeforeBoss,
+      tiles: json.tiles,
       bossDefeated: json.bossDefeated,
     });
     return level;
