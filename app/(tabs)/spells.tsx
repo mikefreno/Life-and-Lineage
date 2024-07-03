@@ -1,9 +1,9 @@
-import { ScrollView, Text, View } from "../../components/Themed";
+import { Text, View as ThemedView } from "../../components/Themed";
 import SpellDetails from "../../components/SpellDetails";
 import { GameContext, PlayerCharacterContext } from "../_layout";
 import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
-import { View as NonThemedView, Platform } from "react-native";
+import { View, Platform, ScrollView } from "react-native";
 import { observer } from "mobx-react-lite";
 import ProgressBar from "../../components/ProgressBar";
 import { elementalColorMap } from "../../utility/elementColors";
@@ -76,7 +76,6 @@ const SpellsScreen = observer(() => {
             return (
               <View className="my-4 px-8 flex w-full flex-col" key={idx}>
                 <Text
-                  className="mx-auto"
                   style={{
                     color:
                       magicProficiency.school == "air" && colorScheme == "light"
@@ -91,7 +90,6 @@ const SpellsScreen = observer(() => {
                     ) as string,
                   )})`}
                 </Text>
-
                 <ProgressBar
                   value={magicProficiency.proficiency}
                   minValue={
@@ -166,7 +164,7 @@ const SpellsScreen = observer(() => {
           opacity: Platform.OS == "android" ? 1.0 : 0.5,
         }}
       />
-      <View
+      <ThemedView
         className="flex-1"
         style={{ paddingBottom: useBottomTabBarHeight() + 65 }}
       >
@@ -177,20 +175,20 @@ const SpellsScreen = observer(() => {
           {spells && spells.length > 0 ? (
             <ScrollView className="h-1/2">
               {spells.map((spell) => (
-                <NonThemedView key={spell.name} className="my-1">
+                <View key={spell.name} className="my-1">
                   <SpellDetails spell={spell} />
-                </NonThemedView>
+                </View>
               ))}
             </ScrollView>
           ) : (
-            <NonThemedView className="h-1/2 items-center justify-center">
+            <View className="h-1/2 items-center justify-center">
               <Text className="text-xl italic tracking-wide">
                 No Known Spells.
               </Text>
               <Text className="text-center italic tracking-wide">
                 (Books can be studied on the top right)
               </Text>
-            </NonThemedView>
+            </View>
           )}
           <View className="h-1/2 min-h-[280]">
             <GenericStrikeAround text={"Proficiencies"} />
@@ -199,13 +197,13 @@ const SpellsScreen = observer(() => {
             </View>
           </View>
         </View>
-      </View>
-      <NonThemedView
+      </ThemedView>
+      <View
         className="absolute z-50 w-full"
         style={{ bottom: useBottomTabBarHeight() + 75 }}
       >
         <PlayerStatus />
-      </NonThemedView>
+      </View>
     </>
   );
 });

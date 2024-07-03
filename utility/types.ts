@@ -6,23 +6,26 @@ export interface ItemOptions {
   slot?: "head" | "body" | "one-hand" | "two-hand" | "off-hand" | null;
   stats?: Record<string, number | undefined> | null;
   baseValue: number;
-  itemClass:
-    | "artifact"
-    | "potion"
-    | "poison"
-    | "junk"
-    | "ingredient"
-    | "wand"
-    | "focus"
-    | "weapon"
-    | "shield"
-    | "bodyArmor"
-    | "helmet"
-    | "robe"
-    | "hat"
-    | "book";
+  itemClass: ItemClassType;
   icon?: string;
   stackable?: boolean;
+}
+export enum ItemClassType {
+  Artifact = "artifact",
+  Potion = "potion",
+  Poison = "poison",
+  Junk = "junk",
+  Ingredient = "ingredient",
+  Wand = "wand",
+  Focus = "focus",
+  Weapon = "weapon",
+  Shield = "shield",
+  BodyArmor = "bodyArmor",
+  Helmet = "helmet",
+  Robe = "robe",
+  Hat = "hat",
+  Book = "book",
+  Arrow = "arrow",
 }
 
 export type InvestmentType = {

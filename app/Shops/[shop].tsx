@@ -14,10 +14,9 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import shopObjects from "../../assets/json/shops.json";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { calculateAge } from "../../utility/functions/misc/age";
-import InventoryRender, {
-  ItemRenderProps,
-} from "../../components/InventoryRender";
+import InventoryRender from "../../components/InventoryRender";
 import { StatsDisplay } from "../../components/StatsDisplay";
+import { Shop } from "../../classes/shop";
 
 //const ONE_HOUR = 60 * 60 * 1000;
 const ONE_MINUTE = 1000 * 60; // for testing_one_min
@@ -41,14 +40,16 @@ const ShopInteriorScreen = observer(() => {
   const [statsLeftPos, setStatsLeftPos] = useState<number>();
   const [statsTopPos, setStatsTopPos] = useState<number>();
   const [refreshCheck, setRefreshCheck] = useState<boolean>(false);
-  const [scrollEnabled, setScrollEnabled] = useState<boolean>(true);
 
   const [inventoryFullNotifier, setInventoryFullNotifier] =
     useState<boolean>(false);
 
   const inventoryTarget = useRef<View>(null);
   const shopInventoryTarget = useRef<View>(null);
-  const [showingStats, setShowingStats] = useState<Item | null>(null);
+  const [showingStats, setShowingStats] = useState<{
+    item: Item;
+    count: number;
+  } | null>(null);
 
   const header = useHeaderHeight();
   const isFocused = useIsFocused();
@@ -105,15 +106,42 @@ const ShopInteriorScreen = observer(() => {
     }
   }
 
-  const ItemRender = ({ item }: ItemRenderProps) => {
+  function sellStack() {}
+
+  const purchaseItem = (itemPrice: number, shop: Shop) => {
+    if (playerState && showingStats) {
+      vibration({ style: "light" });
+      playerState.buyItem(showingStats.item, itemPrice);
+      shop.sellItem(showingStats.item, itemPrice);
+      setShowingStats(null);
+    }
+  };
+
+  const sellItem = (itemPrice: number, shop: Shop) => {
+    if (playerState && showingStats) {
+      vibration({ style: "light" });
+      shop.buyItem(showingStats.item, itemPrice);
+      playerState.sellItem(showingStats.item, itemPrice);
+      if (!showingStats.count || showingStats.count == 1) {
+        setShowingStats(null);
+      }
+    }
+  };
+
+  interface ItemRenderProps {
+    item: Item;
+    count: number;
+  }
+
+  const ItemRender = ({ item, count }: ItemRenderProps) => {
     const localRef = useRef<View>(null);
 
     const handlePress = () => {
       vibration({ style: "light" });
-      if (showingStats && showingStats.equals(item)) {
+      if (showingStats && showingStats.item.equals(item)) {
         setShowingStats(null);
       } else {
-        setShowingStats(item);
+        setShowingStats({ item, count });
         localRef.current?.measureInWindow((x, y) => {
           setStatsLeftPos(x);
           setStatsTopPos(y);
@@ -192,7 +220,7 @@ const ShopInteriorScreen = observer(() => {
               className="mx-2 -mt-1 w-2/3 rounded border border-zinc-300 dark:border-zinc-700"
               ref={shopInventoryTarget}
             >
-              <ScrollView className="my-auto" scrollEnabled={scrollEnabled}>
+              <ScrollView className="my-auto">
                 <View className="flex flex-row flex-wrap justify-around">
                   {thisShop.inventory.map((item) => (
                     <View
@@ -211,13 +239,12 @@ const ShopInteriorScreen = observer(() => {
               <StatsDisplay
                 statsLeftPos={statsLeftPos}
                 statsTopPos={statsTopPos}
-                item={showingStats}
+                item={showingStats.item}
                 setShowingStats={setShowingStats}
                 topOffset={-60}
                 topGuard={header / 3}
-                location={"shopkeeper"}
-                playerInventory={false}
                 shop={thisShop}
+                purchaseItem={purchaseItem}
               />
             </View>
           )}
@@ -243,11 +270,11 @@ const ShopInteriorScreen = observer(() => {
               </View>
             </ThemedView>
             <InventoryRender
-              location={"shop"}
               selfRef={inventoryTarget}
               shopInventoryTarget={shopInventoryTarget}
               inventory={playerState.getInventory()}
               shop={thisShop}
+              sellItem={sellItem}
             />
           </View>
         </ThemedView>

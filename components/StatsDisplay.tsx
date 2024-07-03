@@ -1,4 +1,4 @@
-import { Dimensions, Pressable, ScrollView, View } from "react-native";
+import { Dimensions, Pressable, View } from "react-native";
 import { View as ThemedView, Text } from "./Themed";
 import GearStatsDisplay from "./GearStatsDisplay";
 import { useColorScheme } from "nativewind";
@@ -6,54 +6,55 @@ import { useVibration } from "../utility/customHooks";
 import { router } from "expo-router";
 import { toTitleCase } from "../utility/functions/misc/words";
 import { Item } from "../classes/item";
-import { Dispatch, useContext } from "react";
+import { useContext } from "react";
 import { Shop } from "../classes/shop";
 import Coins from "../assets/icons/CoinsIcon";
 import { asReadableGold } from "../utility/functions/misc/numbers";
 import SpellDetails from "./SpellDetails";
 import GenericFlatButton from "./GenericFlatButton";
 import { PlayerCharacterContext } from "../app/_layout";
-import {
-  convertMasteryToString,
-  getMasteryLevel,
-} from "../utility/spellHelper";
+import { convertMasteryToString } from "../utility/spellHelper";
 
-type StatsDisplayBaseProps = {
+type BaseProps = {
   statsLeftPos: number;
   statsTopPos: number;
   item: Item;
-  setShowingStats: Dispatch<React.SetStateAction<Item | null>>;
-  location?: string;
+  setShowingStats: React.Dispatch<
+    React.SetStateAction<{
+      item: Item;
+      count: number;
+    } | null>
+  >;
+  count?: number;
   topGuard?: number;
   topOffset?: number;
   leftOffset?: number;
 };
 
-type StatsDisplayShopProps = StatsDisplayBaseProps & {
-  location: "shop";
-  playerInventory: true;
-  shop: Shop;
+type DungeonProps = BaseProps & {
+  addItemToPouch: (item: Item) => void;
 };
 
-type StatsDisplayShopKeeperProps = StatsDisplayBaseProps & {
-  location: "shopkeeper";
-  playerInventory: false;
+type ShopProps = BaseProps & {
   shop: Shop;
+  sellItem: (itemPrice: number, shop: Shop) => void;
 };
 
-type StatsDisplayProps =
-  | StatsDisplayBaseProps
-  | StatsDisplayShopProps
-  | StatsDisplayShopKeeperProps;
+type ShopKeeperProps = BaseProps & {
+  shop: Shop;
+  purchaseItem: (itemPrice: number, shop: Shop) => void;
+};
+
+type StatsDisplayProps = BaseProps | DungeonProps | ShopProps | ShopKeeperProps;
 
 export function StatsDisplay({
   statsLeftPos,
   statsTopPos,
   item,
+  count,
   setShowingStats,
   topOffset,
   topGuard,
-  location,
   leftOffset,
   ...props
 }: StatsDisplayProps) {
@@ -67,56 +68,78 @@ export function StatsDisplay({
 
   const SaleSection = () => {
     if (playerState) {
-      const purchaseItem = (itemPrice: number, shop: Shop) => {
-        vibration({ style: "light" });
-        playerState.buyItem(item, itemPrice);
-        shop.sellItem(item, itemPrice);
-        setShowingStats(null);
-      };
-
-      const sellItem = (itemPrice: number, shop: Shop) => {
-        vibration({ style: "light" });
-        shop.buyItem(item, itemPrice);
-        playerState.sellItem(item, itemPrice);
-        setShowingStats(null);
-      };
-
-      if (location == "shop") {
-        const { shop } = props as StatsDisplayShopProps;
+      if ("sellItem" in props) {
+        const { shop, sellItem } = props;
         const itemPrice = item.getSellPrice(shop.shopKeeper.affection);
         const isDisabled = shop.currentGold < itemPrice;
         return (
           <>
             <View className="flex flex-row py-1">
               <Text>
-                {asReadableGold(item.getSellPrice(shop.shopKeeper.affection))}
+                {asReadableGold(
+                  item.getSellPrice(shop.shopKeeper.affection) * (count ?? 1),
+                )}
               </Text>
               <Coins width={16} height={16} style={{ marginLeft: 6 }} />
             </View>
-            <GenericFlatButton
-              onPressFunction={() => sellItem(itemPrice, shop)}
-              textNode={
-                <Text
-                  className={
-                    isDisabled ? "opacity-50 text-center" : "text-center"
+            {count && count > 1 ? (
+              <>
+                <GenericFlatButton
+                  onPressFunction={() => sellItem(itemPrice, shop)}
+                  textNode={
+                    <Text
+                      className={
+                        isDisabled ? "opacity-50 text-center" : "text-center"
+                      }
+                    >
+                      Sell One
+                    </Text>
                   }
-                >
-                  Sell Item
-                </Text>
-              }
-              disabledCondition={isDisabled}
-            />
+                  disabledCondition={isDisabled}
+                />
+                <GenericFlatButton
+                  onPressFunction={() => sellItem(itemPrice, shop)}
+                  textNode={
+                    <Text
+                      className={
+                        isDisabled ? "opacity-50 text-center" : "text-center"
+                      }
+                    >
+                      Sell All
+                    </Text>
+                  }
+                  disabledCondition={isDisabled}
+                  className="mt-1"
+                />
+              </>
+            ) : (
+              <GenericFlatButton
+                onPressFunction={() => props.sellItem(itemPrice, shop)}
+                textNode={
+                  <Text
+                    className={
+                      isDisabled ? "opacity-50 text-center" : "text-center"
+                    }
+                  >
+                    Sell
+                  </Text>
+                }
+                disabledCondition={isDisabled}
+              />
+            )}
           </>
         );
-      } else if (location == "shopkeeper") {
-        const { shop } = props as StatsDisplayShopKeeperProps;
+      } else if ("purchaseItem" in props) {
+        const { shop, purchaseItem } = props;
         const itemPrice = item.getBuyPrice(shop.shopKeeper.affection);
         const isDisabled = playerState.gold < itemPrice;
         return (
           <>
             <View className="flex flex-row py-1">
               <Text>
-                {asReadableGold(item.getBuyPrice(shop.shopKeeper.affection))}
+                {asReadableGold(
+                  item.getBuyPrice(shop.shopKeeper.affection) * (count ?? 1),
+                )}
               </Text>
               <Coins width={16} height={16} style={{ marginLeft: 6 }} />
             </View>
@@ -134,6 +157,13 @@ export function StatsDisplay({
               disabledCondition={isDisabled}
             />
           </>
+        );
+      } else if ("addItemToPouch" in props) {
+        return (
+          <GenericFlatButton
+            onPressFunction={() => props.addItemToPouch(item)}
+            text={"Drop"}
+          />
         );
       }
     }
@@ -159,16 +189,12 @@ export function StatsDisplay({
               left: 20,
               top:
                 topGuard &&
-                statsTopPos +
-                  (topOffset ?? 0) -
-                  (location == "shop" || location == "shopkeeper" ? 200 : 100) <
+                statsTopPos + (topOffset ?? 0) - ("shop" in props ? 200 : 100) <
                   topGuard
                   ? topGuard
                   : statsTopPos +
                     (topOffset ?? 0) -
-                    (location == "shop" || location == "shopkeeper"
-                      ? 200
-                      : 100),
+                    ("shop" in props ? 200 : 100),
             }
           : {
               width: deviceWidth / 3 - 2,
@@ -190,9 +216,9 @@ export function StatsDisplay({
     >
       <Pressable
         onPress={() => setShowingStats(null)}
-        className="absolute right-1 -mt-2"
+        className="absolute right-0 -mt-3 p-1"
       >
-        <Text className="text-3xl">x</Text>
+        <Text className="text-2xl">x</Text>
       </Pressable>
       <View>
         <Text className="text-center">{toTitleCase(item.name)}</Text>
@@ -221,14 +247,14 @@ export function StatsDisplay({
               spell={item.getAttachedSpell(playerState.playerClass)}
             />
           </View>
-          {location != "shopkeeper" && (
+          {!("purchaseItem" in props) && (
             <Pressable
               onPress={() => {
                 vibration({ style: "light" });
                 setShowingStats(null);
                 router.push("/Study");
               }}
-              className="-mx-4 mt-2 w-full rounded-xl border border-zinc-900 px-2 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+              className="-mx-4 mt-2 w-1/2 rounded-xl border border-zinc-900 px-2 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
             >
               <Text className="text-center">Study This Book</Text>
             </Pressable>

@@ -111,6 +111,7 @@ export default function BattleTab({
   let combinedData: (AttackObj | Spell)[] = attackObjects.map((attack) => ({
     ...attack,
   }));
+
   if (playerSpells) {
     combinedData = combinedData.concat(
       playerSpells.map((spell) => ({ ...spell })),
@@ -302,7 +303,6 @@ export default function BattleTab({
           return (
             <View className="my-1 flex-1">
               <InventoryRender
-                location={"dungeon"}
                 selfRef={null}
                 inventory={playerState.getInventory()}
                 pouchTarget={pouchRef}

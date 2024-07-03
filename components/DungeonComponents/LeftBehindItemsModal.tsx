@@ -38,7 +38,7 @@ export default function LeftBehindItemsModal({
 
   function takeAllItemsFromPouch() {
     if (playerState) {
-      const availableSpace = 24 - playerState.inventory.length;
+      const availableSpace = 24 - playerState.getInventory().length;
       if (availableSpace === 0) {
         setInventoryFullNotifier(true);
         return;

@@ -1,4 +1,4 @@
-import { Item } from "./item";
+import { Item, isStackable } from "./item";
 import shops from "../assets/json/shops.json";
 import artifacts from "../assets/json/items/artifacts.json";
 import bodyArmor from "../assets/json/items/bodyArmor.json";
@@ -22,6 +22,7 @@ import { rollD20 } from "../utility/functions/roll";
 import { getRandomSexuality } from "../utility/functions/characterAid";
 import { getRandomName, toTitleCase } from "../utility/functions/misc/words";
 import { generateBirthday } from "../utility/functions/misc/age";
+import { ItemClassType } from "../utility/types";
 
 interface ShopProps {
   baseGold: number;
@@ -116,7 +117,7 @@ export class Shop {
 
 //----------------------associated functions----------------------//
 function getAnItemByType(
-  type: string,
+  type: ItemClassType,
   playerClass: "mage" | "paladin" | "necromancer",
 ): Item {
   if (type == "artifact") {
@@ -128,6 +129,7 @@ function getAnItemByType(
       slot: null,
       stats: null,
       itemClass: type,
+      stackable: isStackable(type),
       icon: itemObj.icon,
     });
   }
@@ -140,6 +142,7 @@ function getAnItemByType(
       slot: "body",
       stats: itemObj.stats,
       itemClass: type,
+      stackable: isStackable(type),
       icon: itemObj.icon,
     });
   }
@@ -160,6 +163,7 @@ function getAnItemByType(
       slot: null,
       stats: null,
       itemClass: type,
+      stackable: isStackable(type),
       icon: itemObj.icon,
     });
   }
@@ -172,6 +176,7 @@ function getAnItemByType(
       slot: "off-hand",
       stats: null,
       itemClass: type,
+      stackable: isStackable(type),
       icon: itemObj.icon,
     });
   }
@@ -184,6 +189,7 @@ function getAnItemByType(
       slot: "head",
       stats: itemObj.stats,
       itemClass: type,
+      stackable: isStackable(type),
       icon: itemObj.icon,
     });
   }
@@ -196,6 +202,7 @@ function getAnItemByType(
       slot: "head",
       stats: itemObj.stats,
       itemClass: type,
+      stackable: isStackable(type),
       icon: itemObj.icon,
     });
   }
@@ -208,6 +215,7 @@ function getAnItemByType(
       slot: null,
       stats: null,
       itemClass: type,
+      stackable: isStackable(type),
       icon: itemObj.icon,
     });
   }
@@ -220,6 +228,7 @@ function getAnItemByType(
       slot: null,
       stats: null,
       itemClass: type,
+      stackable: isStackable(type),
       icon: itemObj.icon,
     });
   }
@@ -232,6 +241,7 @@ function getAnItemByType(
       slot: null,
       stats: null,
       itemClass: type,
+      stackable: isStackable(type),
       icon: itemObj.icon,
     });
   }
@@ -244,6 +254,7 @@ function getAnItemByType(
       slot: null,
       stats: null,
       itemClass: type,
+      stackable: isStackable(type),
       icon: itemObj.icon,
     });
   }
@@ -256,6 +267,7 @@ function getAnItemByType(
       slot: "body",
       stats: itemObj.stats,
       itemClass: type,
+      stackable: isStackable(type),
       icon: itemObj.icon,
     });
   }
@@ -268,6 +280,7 @@ function getAnItemByType(
       slot: "off-hand",
       stats: itemObj.stats,
       itemClass: type,
+      stackable: isStackable(type),
       icon: itemObj.icon,
     });
   }
@@ -280,6 +293,7 @@ function getAnItemByType(
       slot: "one-hand",
       stats: itemObj.stats,
       itemClass: type,
+      stackable: isStackable(type),
       icon: itemObj.icon,
     });
   }
@@ -292,6 +306,7 @@ function getAnItemByType(
       slot: itemObj.slot as "one-hand" | "two-hand",
       stats: itemObj.stats,
       itemClass: type,
+      stackable: isStackable(type),
       icon: itemObj.icon,
     });
   } else {
@@ -306,7 +321,9 @@ export function generateInventory(
 ) {
   let items: Item[] = [];
   for (let i = 0; i < inventoryCount; i++) {
-    const type = trades[Math.floor(Math.random() * trades.length)];
+    const type = trades[
+      Math.floor(Math.random() * trades.length)
+    ] as ItemClassType;
     items.push(getAnItemByType(type, playerClass));
   }
   return items;

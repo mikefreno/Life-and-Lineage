@@ -654,7 +654,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
         </GenericModal>
         <Pressable
           onPress={() => setShowDetailedView(true)}
-          className="absolute mt-4 w-full border-t border-zinc-200 dark:border-zinc-600"
+          className="absolute mt-3 z-50 w-full border-t border-zinc-200 dark:border-zinc-600"
         >
           <BlurView
             blurReductionFactor={8}

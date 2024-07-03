@@ -29,10 +29,10 @@ import necroBooks from "../assets/json/items/necroBooks.json";
 import paladinBooks from "../assets/json/items/paladinBooks.json";
 import mageBooks from "../assets/json/items/mageBooks.json";
 import * as Crypto from "expo-crypto";
-import { Item } from "./item";
+import { Item, isStackable } from "./item";
 import { action, makeObservable, observable } from "mobx";
 import summons from "../assets/json/summons.json";
-import { AttackObj, beingType } from "../utility/types";
+import { AttackObj, ItemClassType, beingType } from "../utility/types";
 import { rollD20 } from "../utility/functions/roll";
 import { damageReduction } from "../utility/functions/misc/numbers";
 import { getRandomInt } from "../utility/functions/misc/words";
@@ -375,23 +375,9 @@ export class Creature {
                   | null,
                 stats: itemObj.stats,
                 baseValue: itemObj.baseValue,
-                itemClass: drop.itemType as
-                  | "poison"
-                  | "weapon"
-                  | "junk"
-                  | "ingredient"
-                  | "bodyArmor"
-                  | "helmet"
-                  | "artifact"
-                  | "potion"
-                  | "wand"
-                  | "focus"
-                  | "shield"
-                  | "robe"
-                  | "hat"
-                  | "book",
+                itemClass: drop.itemType as ItemClassType,
                 icon: itemObj.icon,
-                stackable: itemObj.stackable,
+                stackable: isStackable(drop.itemType as ItemClassType),
               }),
             );
           }

@@ -1,5 +1,5 @@
 import { View, Platform } from "react-native";
-import { Text } from "../../components/Themed";
+import { Text, View as ThemedView } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import PlayerStatus from "../../components/PlayerStatus";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -82,13 +82,13 @@ const HomeScreen = observer(() => {
             opacity: Platform.OS == "android" ? 1.0 : 0.5,
           }}
         />
-        <View
+        <ThemedView
           className="flex-1"
           style={{
             paddingBottom: useBottomTabBarHeight() + 70,
           }}
         >
-          <View className="-mx-4 border-b border-zinc-200 sm:py-2 dark:border-zinc-600">
+          <View className="-mx-4 py-1 border-b border-zinc-200 sm:py-2 dark:border-zinc-600">
             <View className="mx-6 flex-row items-center md:py-12">
               {playerState?.playerClass == "necromancer" ? (
                 <View className="mx-auto">
@@ -145,7 +145,6 @@ const HomeScreen = observer(() => {
               inventory={playerState.getInventory()}
             />
             <InventoryRender
-              location={"home"}
               selfRef={inventoryTarget}
               headTarget={headTarget}
               bodyTarget={bodyTarget}
@@ -154,7 +153,7 @@ const HomeScreen = observer(() => {
               inventory={playerState.getInventory()}
             />
           </View>
-        </View>
+        </ThemedView>
         <View
           className="absolute z-50 w-full"
           style={{ bottom: useBottomTabBarHeight() + 75 }}

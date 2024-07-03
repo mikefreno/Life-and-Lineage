@@ -8,13 +8,9 @@ import { StatsDisplay } from "./StatsDisplay";
 import { PlayerCharacterContext } from "../app/_layout";
 import { checkReleasePositionProps } from "../utility/types";
 import { Shop } from "../classes/shop";
+import { Text, View as ThemedView } from "./Themed";
 
-export interface ItemRenderProps {
-  item: Item;
-  count: number;
-}
-
-export type InventoryRenderBase = {
+type InventoryRenderBase = {
   selfRef: RefObject<View> | null;
   inventory: {
     item: Item;
@@ -22,31 +18,30 @@ export type InventoryRenderBase = {
   }[];
 };
 
-export type InventoryRenderHome = InventoryRenderBase & {
-  location: "home";
+type InventoryRenderHome = InventoryRenderBase & {
   headTarget: RefObject<View>;
   bodyTarget: RefObject<View>;
   mainHandTarget: RefObject<View>;
   offHandTarget: RefObject<View>;
 };
-export type InventoryRenderDungeon = InventoryRenderBase & {
-  location: "dungeon";
+
+type InventoryRenderDungeon = InventoryRenderBase & {
   pouchTarget: RefObject<View>;
   addItemToPouch: (item: Item) => void;
 };
-export type InventoryRenderShop = InventoryRenderBase & {
-  location: "shop";
+
+type InventoryRenderShop = InventoryRenderBase & {
   shopInventoryTarget: RefObject<View>;
   shop: Shop;
+  sellItem: (itemPrice: number, shop: Shop) => void;
 };
 
-export type InventoryRenderProps =
+type InventoryRenderProps =
   | InventoryRenderHome
   | InventoryRenderDungeon
   | InventoryRenderShop;
 
 export default function InventoryRender({
-  location,
   selfRef,
   inventory,
   ...props
@@ -56,7 +51,10 @@ export default function InventoryRender({
   const vibration = useVibration();
   const [statsLeftPos, setStatsLeftPos] = useState<number | undefined>();
   const [statsTopPos, setStatsTopPos] = useState<number | undefined>();
-  const [showingStats, setShowingStats] = useState<Item | null>(null);
+  const [showingStats, setShowingStats] = useState<{
+    item: Item;
+    count: number;
+  } | null>(null);
   const playerStateData = useContext(PlayerCharacterContext);
   if (!playerStateData) throw new Error("missing contexts");
   const { playerState } = playerStateData;
@@ -69,109 +67,110 @@ export default function InventoryRender({
     equipped,
   }: checkReleasePositionProps) {
     if (item) {
-      switch (location) {
-        case "home":
-          const { headTarget, bodyTarget, mainHandTarget, offHandTarget } =
-            props as InventoryRenderHome;
-          if (item.slot) {
-            let refs: React.RefObject<View>[] = [];
-            switch (item.slot) {
-              case "head":
-                refs.push(headTarget);
-                break;
-              case "body":
-                refs.push(bodyTarget);
-                break;
-              case "two-hand":
-                refs.push(mainHandTarget, offHandTarget);
-                break;
-              case "one-hand":
-                refs.push(mainHandTarget, offHandTarget);
-                break;
-              case "off-hand":
-                refs.push(offHandTarget);
-                break;
-            }
-            refs.forEach((ref) => {
-              ref.current?.measureInWindow(
-                (targetX, targetY, targetWidth, targetHeight) => {
-                  const isWidthAligned =
-                    xPos + size / 2 >= targetX &&
-                    xPos - size / 2 <= targetX + targetWidth;
-                  const isHeightAligned =
-                    yPos + size / 2 >= targetY &&
-                    yPos - size / 2 <= targetY + targetHeight;
-                  if (isWidthAligned && isHeightAligned) {
-                    setShowingStats(null);
-                    vibration({ style: "light", essential: true });
-                    if (
-                      equipped &&
-                      playerState &&
-                      playerState.inventory.length < 24
-                    ) {
-                      playerState?.unEquipItem(item);
-                    } else {
-                      playerState?.equipItem(item);
-                    }
-                  }
-                },
-              );
-            });
+      if ("headTarget" in props) {
+        const { headTarget, bodyTarget, mainHandTarget, offHandTarget } = props;
+        if (item.slot) {
+          let refs: React.RefObject<View>[] = [];
+          switch (item.slot) {
+            case "head":
+              refs.push(headTarget);
+              break;
+            case "body":
+              refs.push(bodyTarget);
+              break;
+            case "two-hand":
+              refs.push(mainHandTarget, offHandTarget);
+              break;
+            case "one-hand":
+              refs.push(mainHandTarget, offHandTarget);
+              break;
+            case "off-hand":
+              refs.push(offHandTarget);
+              break;
           }
-          break;
-        case "dungeon":
-          const { pouchTarget, addItemToPouch } =
-            props as InventoryRenderDungeon;
-          pouchTarget.current?.measureInWindow(
-            (targetX, targetY, targetWidth, targetHeight) => {
-              const isWidthAligned =
-                xPos + size / 2 >= targetX &&
-                xPos - size / 2 <= targetX + targetWidth;
-              const isHeightAligned =
-                yPos + size / 2 >= targetY &&
-                yPos - size / 2 <= targetY + targetHeight;
-              if (isWidthAligned && isHeightAligned) {
-                setShowingStats(null);
-                vibration({ style: "light", essential: true });
-                playerState?.removeFromInventory(item);
-                addItemToPouch(item);
-              }
-            },
-          );
-          break;
-        case "shop":
-          const { shopInventoryTarget, shop } = props as InventoryRenderShop;
-          shopInventoryTarget.current?.measureInWindow(
-            (targetX, targetY, targetWidth, targetHeight) => {
-              const isWidthAligned =
-                xPos + size / 2 >= targetX &&
-                xPos - size / 2 <= targetX + targetWidth;
-              const isHeightAligned =
-                yPos + size / 2 >= targetY &&
-                yPos - size / 2 <= targetY + targetHeight;
-              if (isWidthAligned && isHeightAligned) {
-                setShowingStats(null);
-                vibration({ style: "light", essential: true });
-                const price = item.getSellPrice(shop.shopKeeper.affection);
-                playerState?.sellItem(item, price);
-                shop.buyItem(item, price);
-              }
-            },
-          );
+          refs.forEach((ref) => {
+            ref.current?.measureInWindow(
+              (targetX, targetY, targetWidth, targetHeight) => {
+                const isWidthAligned =
+                  xPos + size / 2 >= targetX &&
+                  xPos - size / 2 <= targetX + targetWidth;
+                const isHeightAligned =
+                  yPos + size / 2 >= targetY &&
+                  yPos - size / 2 <= targetY + targetHeight;
+                if (isWidthAligned && isHeightAligned) {
+                  setShowingStats(null);
+                  vibration({ style: "light", essential: true });
+                  if (
+                    equipped &&
+                    playerState &&
+                    playerState.inventory.length < 24
+                  ) {
+                    playerState?.unEquipItem(item);
+                  } else {
+                    playerState?.equipItem(item);
+                  }
+                }
+              },
+            );
+          });
+        }
+      } else if ("pouchTarget" in props) {
+        const { pouchTarget, addItemToPouch } = props;
+        pouchTarget.current?.measureInWindow(
+          (targetX, targetY, targetWidth, targetHeight) => {
+            const isWidthAligned =
+              xPos + size / 2 >= targetX &&
+              xPos - size / 2 <= targetX + targetWidth;
+            const isHeightAligned =
+              yPos + size / 2 >= targetY &&
+              yPos - size / 2 <= targetY + targetHeight;
+            if (isWidthAligned && isHeightAligned) {
+              setShowingStats(null);
+              vibration({ style: "light", essential: true });
+              playerState?.removeFromInventory(item);
+              addItemToPouch(item);
+            }
+          },
+        );
+      } else {
+        const { shopInventoryTarget, shop } = props;
+        shopInventoryTarget.current?.measureInWindow(
+          (targetX, targetY, targetWidth, targetHeight) => {
+            const isWidthAligned =
+              xPos + size / 2 >= targetX &&
+              xPos - size / 2 <= targetX + targetWidth;
+            const isHeightAligned =
+              yPos + size / 2 >= targetY &&
+              yPos - size / 2 <= targetY + targetHeight;
+            if (isWidthAligned && isHeightAligned) {
+              setShowingStats(null);
+              vibration({ style: "light", essential: true });
+              const price = item.getSellPrice(shop.shopKeeper.affection);
+              playerState?.sellItem(item, price);
+              shop.buyItem(item, price);
+            }
+          },
+        );
       }
     }
   }
 
-  const ItemRender = ({ item }: ItemRenderProps) => {
+  interface ItemRenderProps {
+    item: Item;
+    count: number;
+  }
+
+  const ItemRender = ({ item, count }: ItemRenderProps) => {
     const [buzzed, setBuzzed] = useState(false);
     const localRef = useRef<View>(null);
+    const [z, setZ] = useState<number>(10);
 
     const handlePress = () => {
       vibration({ style: "light" });
-      if (showingStats && showingStats.equals(item)) {
+      if (showingStats && showingStats.item.equals(item)) {
         setShowingStats(null);
       } else {
-        setShowingStats(item);
+        setShowingStats({ item, count });
         localRef.current?.measureInWindow((x, y) => {
           setStatsLeftPos(x);
           setStatsTopPos(y);
@@ -190,22 +189,30 @@ export default function InventoryRender({
             equipped: false,
           });
           setBuzzed(false);
+          setZ(10);
         }}
         onDrag={() => {
           if (!buzzed) {
             vibration({ style: "medium", essential: true });
             setBuzzed(true);
+            setZ(50);
           }
         }}
-        disabled={location == "home" ? !item.slot : false}
+        disabled={"headTarget" in props ? !item.slot : false}
         shouldReverse
       >
         <Pressable
-          className="z-10 h-14 w-14 items-center justify-center rounded-lg bg-zinc-400 active:scale-90 active:opacity-50"
+          className={`h-14 w-14 absolute items-center justify-center rounded-lg bg-zinc-400 active:scale-90 active:opacity-50`}
           ref={localRef}
           onPress={handlePress}
+          style={{ zIndex: z }}
         >
           <Image source={item.getItemIcon()} />
+          {item.stackable && count > 1 && (
+            <ThemedView className="absolute bottom-0 right-0 bg-opacity-50 rounded px-1">
+              <Text>{count}</Text>
+            </ThemedView>
+          )}
         </Pressable>
       </Draggable>
     );
@@ -216,9 +223,9 @@ export default function InventoryRender({
       <View
         ref={selfRef}
         className={`${
-          location == "home"
+          "headTarget" in props
             ? "h-[60%]"
-            : location == "shop"
+            : "shop" in props
             ? "mt-4 h-[75%]"
             : "mt-1 h-[99%]"
         } mx-auto flex w-full flex-wrap rounded-lg border border-zinc-600`}
@@ -260,41 +267,49 @@ export default function InventoryRender({
         statsLeftPos &&
         statsTopPos &&
         playerState &&
-        (location !== "shop" ? (
+        ("addItemToPouch" in props ? (
           <StatsDisplay
             statsLeftPos={statsLeftPos}
             statsTopPos={statsTopPos}
-            item={showingStats}
+            item={showingStats.item}
+            count={showingStats.count}
             setShowingStats={setShowingStats}
-            location={location}
+            addItemToPouch={props.addItemToPouch}
             topOffset={
               Platform.OS == "ios"
-                ? location == "home"
-                  ? -(120 + deviceHeight / 10)
-                  : -(deviceHeight / 2.15)
-                : location == "home"
-                ? -(80 + deviceHeight / 10)
+                ? -(50 + deviceHeight / 2.2)
+                : -(80 + deviceHeight / 10)
+            }
+          />
+        ) : "shopInventoryTarget" in props ? (
+          <StatsDisplay
+            statsLeftPos={statsLeftPos}
+            statsTopPos={statsTopPos}
+            item={showingStats.item}
+            count={showingStats.count}
+            setShowingStats={setShowingStats}
+            shop={props.shop}
+            topOffset={
+              Platform.OS == "ios"
+                ? -(40 + deviceHeight / 2.2)
+                : -(40 + deviceHeight / 2.4)
+            }
+            leftOffset={-4}
+            sellItem={props.sellItem}
+          />
+        ) : (
+          <StatsDisplay
+            statsLeftPos={statsLeftPos}
+            statsTopPos={statsTopPos}
+            item={showingStats.item}
+            count={showingStats.count}
+            setShowingStats={setShowingStats}
+            topOffset={
+              Platform.OS == "ios"
+                ? -(120 + deviceHeight / 10)
                 : -(14 + deviceHeight / 2.4)
             }
           />
-        ) : (
-          location == "shop" && (
-            <StatsDisplay
-              statsLeftPos={statsLeftPos}
-              statsTopPos={statsTopPos}
-              item={showingStats}
-              setShowingStats={setShowingStats}
-              location={location}
-              shop={props.shop}
-              playerInventory={true}
-              topOffset={
-                Platform.OS == "ios"
-                  ? -(40 + deviceHeight / 2.2)
-                  : -(40 + deviceHeight / 2.4)
-              }
-              leftOffset={-4}
-            />
-          )
         ))}
     </>
   );

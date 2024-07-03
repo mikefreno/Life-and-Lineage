@@ -11,10 +11,10 @@ export function getMasteryLevel(
     if (proficiency >= 350) {
       return "Master";
     }
-    if (proficiency >= 250) {
+    if (proficiency >= 225) {
       return "Expert";
     }
-    if (proficiency >= 150) {
+    if (proficiency >= 125) {
       return "Adept";
     }
     if (proficiency >= 50) {
@@ -28,10 +28,10 @@ export function getMasteryLevel(
   if (proficiency >= 350) {
     return MasteryLevel.Master;
   }
-  if (proficiency >= 250) {
+  if (proficiency >= 225) {
     return MasteryLevel.Expert;
   }
-  if (proficiency >= 150) {
+  if (proficiency >= 125) {
     return MasteryLevel.Adept;
   }
   if (proficiency >= 50) {
@@ -47,8 +47,8 @@ type MasteryNumberConversion = {
 export const convertMasteryToNumber: MasteryNumberConversion = {
   [MasteryLevel.Novice]: 0,
   [MasteryLevel.Apprentice]: 50,
-  [MasteryLevel.Adept]: 100,
-  [MasteryLevel.Expert]: 250,
+  [MasteryLevel.Adept]: 125,
+  [MasteryLevel.Expert]: 225,
   [MasteryLevel.Master]: 350,
   [MasteryLevel.Legend]: 500,
 };

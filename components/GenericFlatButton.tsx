@@ -7,12 +7,14 @@ type GenericFlatButtonTextProps = {
   text: string;
   disabledCondition?: boolean;
   backgroundColor?: ColorValue;
+  className?: string;
 };
 type GenericFlatButtonNodeProps = {
   onPressFunction: () => void;
   textNode: ReactNode;
   disabledCondition?: boolean;
   backgroundColor?: ColorValue;
+  className?: string;
 };
 
 type Props = GenericFlatButtonNodeProps | GenericFlatButtonTextProps;
@@ -24,7 +26,11 @@ const GenericFlatButton = ({
   ...props
 }: Props) => {
   return (
-    <Pressable disabled={disabledCondition} onPress={onPressFunction}>
+    <Pressable
+      disabled={disabledCondition}
+      onPress={onPressFunction}
+      className={props.className}
+    >
       {({ pressed }) => (
         <View
           className={`${pressed ? "scale-95 opacity-50" : ""} ${

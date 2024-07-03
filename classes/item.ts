@@ -5,28 +5,14 @@ import mageSpells from "../assets/json/mageSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import * as Crypto from "expo-crypto";
-import type { ItemOptions, Spell } from "../utility/types";
+import { ItemClassType, type ItemOptions, type Spell } from "../utility/types";
 import { parseSpell } from "../utility/functions/jsonParsing";
 
 export class Item {
   readonly id: string;
   readonly name: string;
   readonly slot: "head" | "body" | "one-hand" | "two-hand" | "off-hand" | null;
-  readonly itemClass:
-    | "artifact"
-    | "potion"
-    | "poison"
-    | "junk"
-    | "ingredient"
-    | "wand"
-    | "focus"
-    | "weapon"
-    | "shield"
-    | "bodyArmor"
-    | "helmet"
-    | "robe"
-    | "hat"
-    | "book";
+  readonly itemClass: ItemClassType;
   readonly stats: Record<string, number | undefined> | null;
   readonly baseValue: number;
   readonly icon: string | undefined;
@@ -119,6 +105,7 @@ export class Item {
       stats: json.stats,
       baseValue: json.baseValue,
       itemClass: json.itemClass,
+      stackable: isStackable(json.itemClass),
       icon: json.icon,
     });
 
@@ -176,4 +163,17 @@ const itemMap: { [key: string]: any } = {
   Wooden_Shield: require("../assets/images/items/Wooden_Shield.png"),
   Wooden_Sword: require("../assets/images/items/Wooden_Sword.png"),
   Goblin_Staff: require("../assets/images/items/Goblin_Staff.png"),
+};
+
+export const isStackable = (itemClass: ItemClassType) => {
+  switch (itemClass) {
+    case ItemClassType.Potion:
+    case ItemClassType.Poison:
+    case ItemClassType.Junk:
+    case ItemClassType.Ingredient:
+    case ItemClassType.Arrow:
+      return true;
+    default:
+      return false;
+  }
 };

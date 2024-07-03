@@ -56,61 +56,87 @@ export const generateTiles = ({
   tiles.push(startTile);
   activeTiles.push(startTile);
 
-  for (let i = 0; i < numTiles - 1; i++) {
-    const { x: currentX, y: currentY } = activeTiles[i];
+  let maxDistance = 0;
+  while (maxDistance < numTiles * 0.4) {
+    for (let i = 0; i < numTiles - 1; i++) {
+      const { x: currentX, y: currentY } = activeTiles[i];
 
-    let validTileFound = false;
-    let attempt = 0;
+      let validTileFound = false;
+      let attempt = 0;
 
-    while (!validTileFound && attempt < 10) {
-      const direction =
-        directions[Math.floor(Math.random() * directions.length)];
-      const newX = currentX + direction.x * tileSize;
-      const newY = currentY + direction.y * tileSize;
+      while (!validTileFound && attempt < 10) {
+        const direction =
+          directions[Math.floor(Math.random() * directions.length)];
+        const newX = currentX + direction.x * tileSize;
+        const newY = currentY + direction.y * tileSize;
 
-      if (
-        newX >= 0 &&
-        newY >= 0 &&
-        !tiles.find((t) => t.x === newX && t.y === newY)
-      ) {
-        const newTile: Tile = {
-          x: newX,
-          y: newY,
-          clearedRoom: false,
-          isBossRoom: false, // set in distance check
-        };
-        tiles.push(newTile);
-        activeTiles.push(newTile);
-        validTileFound = true;
+        if (
+          newX >= 0 &&
+          newY >= 0 &&
+          !tiles.find((t) => t.x === newX && t.y === newY)
+        ) {
+          const newTile: Tile = {
+            x: newX,
+            y: newY,
+            clearedRoom: false,
+            isBossRoom: false, // We'll set this later
+          };
+          tiles.push(newTile);
+          activeTiles.push(newTile);
+          validTileFound = true;
+        }
+        attempt++;
       }
-      attempt++;
-    }
-    if (!validTileFound) {
-      activeTiles.splice(i, 1);
-    }
-  }
-
-  if (!bossDefeated) {
-    let maxDistance = 0;
-    let furthestTile = tiles[1]; // will be updated
-
-    tiles.forEach((tile) => {
-      const distance = Math.sqrt(
-        Math.pow(tile.x - startTile.x, 2) + Math.pow(tile.y - startTile.y, 2),
-      );
-      if (distance > maxDistance) {
-        maxDistance = distance;
-        furthestTile = tile;
+      if (!validTileFound) {
+        activeTiles.splice(i, 1);
       }
-    });
+    }
 
-    if (furthestTile) {
+    if (!bossDefeated) {
+      const distanceMap = new Map<Tile, number>();
+      const queue: Tile[] = [];
+      queue.push(startTile);
+      distanceMap.set(startTile, 0);
+
+      while (queue.length > 0) {
+        const currentTile = queue.shift()!;
+        const currentDistance = distanceMap.get(currentTile)!;
+
+        directions.forEach((direction) => {
+          const newX = currentTile.x + direction.x * tileSize;
+          const newY = currentTile.y + direction.y * tileSize;
+          const nextTile = tiles.find((t) => t.x === newX && t.y === newY);
+
+          if (nextTile && !distanceMap.has(nextTile)) {
+            distanceMap.set(nextTile, currentDistance + 1);
+            queue.push(nextTile);
+          }
+        });
+      }
+
+      let furthestTile = tiles[0];
+      let maxEuclideanDistance = 0;
+
+      distanceMap.forEach((distance, tile) => {
+        const euclideanDistance = Math.sqrt(
+          Math.pow(tile.x - startTile.x, 2) + Math.pow(tile.y - startTile.y, 2),
+        );
+        if (
+          distance > maxDistance ||
+          (distance == maxDistance && euclideanDistance > maxEuclideanDistance)
+        ) {
+          maxDistance = distance;
+          maxEuclideanDistance = euclideanDistance;
+          furthestTile = tile;
+        }
+      });
+
       furthestTile.isBossRoom = true;
     }
   }
-
   return tiles;
 };
+
 export const getBoundingBox = (
   tiles: Tile[],
   tileSize: number,

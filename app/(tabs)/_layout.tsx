@@ -226,7 +226,7 @@ export default function TabLayout() {
                 experimentalBlurMethod={"dimezisBlurView"}
               />
             ),
-            title: "Earn",
+            title: "Labor",
             tabBarIcon: ({ color }) => (
               <Broom
                 width={30}

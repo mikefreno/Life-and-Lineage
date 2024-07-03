@@ -44,7 +44,7 @@ export default function DroppedItemsModal({
 
   function takeItem(item: Item) {
     if (playerState && droppedItems) {
-      if (playerState.inventory.length < 24) {
+      if (playerState.getInventory().length < 24) {
         playerState.addToInventory(item);
         setDroppedItems((prevState) => {
           const updatedDrops = prevState!.itemDrops.filter(
@@ -67,7 +67,7 @@ export default function DroppedItemsModal({
 
   function takeAllItems() {
     if (playerState && droppedItems) {
-      const availableSpace = 24 - playerState.inventory.length;
+      const availableSpace = 24 - playerState.getInventory().length;
       if (availableSpace === 0) {
         setInventoryFullNotifier(true);
         return;

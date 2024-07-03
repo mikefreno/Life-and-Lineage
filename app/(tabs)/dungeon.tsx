@@ -41,7 +41,7 @@ const DungeonScreen = observer(() => {
   }
   const { gameState } = gameContext;
   const { playerState } = playerContext;
-  const [instances, setInstances] = useState<DungeonInstance[]>(
+  const [instances, _] = useState<DungeonInstance[]>(
     gameState?.dungeonInstances.filter(
       (instance) => instance.name !== "training grounds",
     ) ?? [],
@@ -95,16 +95,18 @@ const DungeonScreen = observer(() => {
         }}
         onCloseFunction={() => setShowDungeonTutorial(false)}
       />
+      <View
+        className="shadow-diffuse w-full absolute z-50 px-8"
+        style={{ paddingTop: useHeaderHeight(), paddingBottom: 4 }}
+      >
+        <Text className="text-center text-2xl">
+          The dungeon is a dangerous place. Be careful.
+        </Text>
+      </View>
       <View className="flex-1 px-8">
-        <NonThemedView
-          style={{ paddingTop: useHeaderHeight(), paddingBottom: 4 }}
-        >
-          <Text className="text-center text-2xl">
-            The dungeon is a dangerous place. Be careful.
-          </Text>
-        </NonThemedView>
         <ScrollView
           style={{
+            paddingTop: useHeaderHeight() + 74,
             paddingBottom: useBottomTabBarHeight() + 74,
           }}
         >

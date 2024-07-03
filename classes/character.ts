@@ -21,6 +21,7 @@ import {
   AttackObj,
   InvestmentType,
   InvestmentUpgrade,
+  ItemClassType,
   MasteryLevel,
   type Spell,
 } from "../utility/types";
@@ -988,7 +989,7 @@ export class PlayerCharacter extends Character {
       slot: "one-hand",
       stats: { baseDamage: 1 },
       baseValue: 0,
-      itemClass: "weapon",
+      itemClass: "weapon" as ItemClassType,
     });
     this.setPhysicalAttacks();
   }

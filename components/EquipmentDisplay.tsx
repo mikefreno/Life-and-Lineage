@@ -5,7 +5,7 @@ import Draggable from "react-native-draggable";
 import type { Item } from "../classes/item";
 import { useVibration } from "../utility/customHooks";
 import { StatsDisplay } from "./StatsDisplay";
-import { checkReleasePositonProps } from "../utility/types";
+import { checkReleasePositionProps } from "../utility/types";
 import { PlayerCharacterContext } from "../app/_layout";
 
 interface EquipmentDisplayProps {
@@ -36,13 +36,13 @@ export default function EquipmentDisplay({
   if (!playerStateData) throw new Error("missing contexts");
   const { playerState } = playerStateData;
 
-  function checkReleasePositon({
+  function checkReleasePosition({
     item,
     xPos,
     yPos,
     size,
     equipped,
-  }: checkReleasePositonProps) {
+  }: checkReleasePositionProps) {
     if (item && item.slot) {
       let refs: React.RefObject<View>[] = [];
       if (equipped) {
@@ -81,7 +81,7 @@ export default function EquipmentDisplay({
               if (
                 equipped &&
                 playerState &&
-                playerState.inventory.length < 24
+                playerState.getInventory().length < 24
               ) {
                 playerState?.unEquipItem(item);
               } else {
@@ -103,7 +103,7 @@ export default function EquipmentDisplay({
             <View className="z-50 h-12 w-12 active:scale-90 active:opacity-50">
               <Draggable
                 onDragRelease={(_, g) => {
-                  checkReleasePositon({
+                  checkReleasePosition({
                     item: playerState.equipment.head,
                     xPos: g.moveX,
                     yPos: g.moveY,
@@ -167,7 +167,7 @@ export default function EquipmentDisplay({
               <View className="z-50 mx-auto h-12 w-12 items-center active:scale-90 active:opacity-50">
                 <Draggable
                   onDragRelease={(_, g) => {
-                    checkReleasePositon({
+                    checkReleasePosition({
                       item: playerState.equipment.mainHand,
                       xPos: g.moveX,
                       yPos: g.moveY,
@@ -229,7 +229,7 @@ export default function EquipmentDisplay({
               <View className="z-50 mx-auto h-12 w-12 items-center active:scale-90 active:opacity-50">
                 <Draggable
                   onDragRelease={(_, g) => {
-                    checkReleasePositon({
+                    checkReleasePosition({
                       item: playerState.equipment.offHand,
                       xPos: g.moveX,
                       yPos: g.moveY,
@@ -299,7 +299,7 @@ export default function EquipmentDisplay({
             <View className="z-50 h-12 w-12 active:scale-90 active:opacity-50">
               <Draggable
                 onDragRelease={(_, g) => {
-                  checkReleasePositon({
+                  checkReleasePosition({
                     item: playerState.equipment.body,
                     xPos: g.moveX,
                     yPos: g.moveY,
