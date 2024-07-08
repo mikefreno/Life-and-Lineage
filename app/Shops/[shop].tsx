@@ -18,8 +18,9 @@ import InventoryRender from "../../components/InventoryRender";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import { Shop } from "../../classes/shop";
 
-//const ONE_HOUR = 60 * 60 * 1000;
+const ONE_HOUR = 60 * 60 * 1000;
 const ONE_MINUTE = 1000 * 60; // for testing_one_min
+const REFRESH_TIME = ONE_HOUR;
 
 const ShopInteriorScreen = observer(() => {
   const { shop } = useLocalSearchParams();
@@ -75,7 +76,7 @@ const ShopInteriorScreen = observer(() => {
     if (
       playerState &&
       thisShop &&
-      new Date(thisShop.lastStockRefresh) < new Date(Date.now() - ONE_MINUTE)
+      new Date(thisShop.lastStockRefresh) < new Date(Date.now() - REFRESH_TIME)
     ) {
       thisShop.refreshInventory(playerState.playerClass);
     }
@@ -106,25 +107,34 @@ const ShopInteriorScreen = observer(() => {
     }
   }
 
-  function sellStack() {}
+  const sellStack = (item: Item) => {
+    if (playerState && thisShop) {
+      playerState.getInventory().forEach((obj) => {
+        if (obj.item.name === item.name) {
+          sellItem(item);
+        }
+      });
+    }
+  };
 
-  const purchaseItem = (itemPrice: number, shop: Shop) => {
-    if (playerState && showingStats) {
+  const purchaseItem = () => {
+    if (playerState && showingStats && thisShop) {
       vibration({ style: "light" });
+      const itemPrice = showingStats.item.getSellPrice(
+        thisShop.shopKeeper.affection,
+      );
       playerState.buyItem(showingStats.item, itemPrice);
-      shop.sellItem(showingStats.item, itemPrice);
+      thisShop.sellItem(showingStats.item, itemPrice);
       setShowingStats(null);
     }
   };
 
-  const sellItem = (itemPrice: number, shop: Shop) => {
-    if (playerState && showingStats) {
+  const sellItem = (item: Item) => {
+    if (playerState && thisShop) {
       vibration({ style: "light" });
-      shop.buyItem(showingStats.item, itemPrice);
-      playerState.sellItem(showingStats.item, itemPrice);
-      if (!showingStats.count || showingStats.count == 1) {
-        setShowingStats(null);
-      }
+      const itemPrice = item.getSellPrice(thisShop.shopKeeper.affection);
+      thisShop.buyItem(item, itemPrice);
+      playerState.sellItem(item, itemPrice);
     }
   };
 
@@ -275,6 +285,7 @@ const ShopInteriorScreen = observer(() => {
               inventory={playerState.getInventory()}
               shop={thisShop}
               sellItem={sellItem}
+              sellStack={sellStack}
             />
           </View>
         </ThemedView>

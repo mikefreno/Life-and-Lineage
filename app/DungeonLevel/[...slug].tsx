@@ -148,22 +148,30 @@ const DungeonLevelScreen = observer(() => {
           }
           return tile;
         });
-        getEnemy();
       }
     }
   }, [enemyState]);
 
   useEffect(() => {
-    const generatedTiles = generateTiles({
-      numTiles: thisDungeon?.tiles ?? 10,
-      tileSize: TILE_SIZE,
-      bossDefeated: thisDungeon?.bossDefeated ?? false,
-    });
-    setTiles(generatedTiles);
-    const dimensions = getBoundingBox(generatedTiles, TILE_SIZE);
-    setMapDimensions(dimensions);
-    setCurrentPosition(generatedTiles[0]);
-  }, []);
+    if (inCombat && !fightingBoss) {
+      getEnemy();
+    }
+    setAttackAnimationOnGoing(false);
+  }, [inCombat]);
+
+  useEffect(() => {
+    if (thisDungeon) {
+      const generatedTiles = generateTiles({
+        numTiles: thisDungeon.tiles,
+        tileSize: TILE_SIZE,
+        bossDefeated: thisDungeon.bossDefeated ?? false,
+      });
+      setTiles(generatedTiles);
+      const dimensions = getBoundingBox(generatedTiles, TILE_SIZE);
+      setMapDimensions(dimensions);
+      setCurrentPosition(generatedTiles[0]);
+    }
+  }, [thisDungeon]);
 
   useEffect(() => {
     if (
@@ -284,7 +292,6 @@ const DungeonLevelScreen = observer(() => {
   const loadBoss = () => {
     setFightingBoss(true);
     setInCombat(true);
-    setEnemy(null);
     setTimeout(() => {
       if (thisDungeon && thisInstance && playerState) {
         const boss = thisDungeon.getBoss(thisInstance.name)[0];

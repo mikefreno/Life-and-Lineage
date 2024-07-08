@@ -7,6 +7,7 @@ import Animated, {
 } from "react-native-reanimated";
 import GenericRaisedButton from "./GenericRaisedButton";
 import { useColorScheme } from "nativewind";
+import Draggable from "react-native-draggable";
 
 export interface Tile {
   x: number;
@@ -56,83 +57,67 @@ export const generateTiles = ({
   tiles.push(startTile);
   activeTiles.push(startTile);
 
-  let maxDistance = 0;
-  while (maxDistance < numTiles * 0.4) {
-    for (let i = 0; i < numTiles - 1; i++) {
-      const { x: currentX, y: currentY } = activeTiles[i];
+  for (let i = 0; i < numTiles - 1; i++) {
+    const { x: currentX, y: currentY } = activeTiles[i];
 
-      let validTileFound = false;
-      let attempt = 0;
+    let validTileFound = false;
+    let attempt = 0;
 
-      while (!validTileFound && attempt < 10) {
-        const direction =
-          directions[Math.floor(Math.random() * directions.length)];
-        const newX = currentX + direction.x * tileSize;
-        const newY = currentY + direction.y * tileSize;
+    while (!validTileFound && attempt < 10) {
+      const direction =
+        directions[Math.floor(Math.random() * directions.length)];
+      const newX = currentX + direction.x * tileSize;
+      const newY = currentY + direction.y * tileSize;
 
-        if (
-          newX >= 0 &&
-          newY >= 0 &&
-          !tiles.find((t) => t.x === newX && t.y === newY)
-        ) {
-          const newTile: Tile = {
-            x: newX,
-            y: newY,
-            clearedRoom: false,
-            isBossRoom: false, // We'll set this later
-          };
-          tiles.push(newTile);
-          activeTiles.push(newTile);
-          validTileFound = true;
-        }
-        attempt++;
+      if (
+        newX >= 0 &&
+        newY >= 0 &&
+        !tiles.find((t) => t.x === newX && t.y === newY)
+      ) {
+        const newTile: Tile = {
+          x: newX,
+          y: newY,
+          clearedRoom: false,
+          isBossRoom: false,
+        };
+        tiles.push(newTile);
+        activeTiles.push(newTile);
+        validTileFound = true;
       }
-      if (!validTileFound) {
-        activeTiles.splice(i, 1);
-      }
+      attempt++;
     }
+    if (!validTileFound) {
+      activeTiles.splice(i, 1);
+    }
+  }
 
-    if (!bossDefeated) {
-      const distanceMap = new Map<Tile, number>();
-      const queue: Tile[] = [];
-      queue.push(startTile);
-      distanceMap.set(startTile, 0);
+  if (!bossDefeated) {
+    const distanceMap = new Map<Tile, number>();
+    const queue: Tile[] = [];
+    queue.push(startTile);
+    distanceMap.set(startTile, 0);
 
-      while (queue.length > 0) {
-        const currentTile = queue.shift()!;
-        const currentDistance = distanceMap.get(currentTile)!;
+    while (queue.length > 0) {
+      const currentTile = queue.shift()!;
+      const currentDistance = distanceMap.get(currentTile)!;
 
-        directions.forEach((direction) => {
-          const newX = currentTile.x + direction.x * tileSize;
-          const newY = currentTile.y + direction.y * tileSize;
-          const nextTile = tiles.find((t) => t.x === newX && t.y === newY);
+      directions.forEach((direction) => {
+        const newX = currentTile.x + direction.x * tileSize;
+        const newY = currentTile.y + direction.y * tileSize;
+        const nextTile = tiles.find((t) => t.x === newX && t.y === newY);
 
-          if (nextTile && !distanceMap.has(nextTile)) {
-            distanceMap.set(nextTile, currentDistance + 1);
-            queue.push(nextTile);
-          }
-        });
-      }
-
-      let furthestTile = tiles[0];
-      let maxEuclideanDistance = 0;
-
-      distanceMap.forEach((distance, tile) => {
-        const euclideanDistance = Math.sqrt(
-          Math.pow(tile.x - startTile.x, 2) + Math.pow(tile.y - startTile.y, 2),
-        );
-        if (
-          distance > maxDistance ||
-          (distance == maxDistance && euclideanDistance > maxEuclideanDistance)
-        ) {
-          maxDistance = distance;
-          maxEuclideanDistance = euclideanDistance;
-          furthestTile = tile;
+        if (nextTile && !distanceMap.has(nextTile)) {
+          distanceMap.set(nextTile, currentDistance + 1);
+          queue.push(nextTile);
         }
       });
-
-      furthestTile.isBossRoom = true;
     }
+    const options = Array.from(distanceMap.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map((entry) => entry[0]);
+    const idx = Math.floor(Math.random() * 3);
+    options[idx].isBossRoom = true;
   }
   return tiles;
 };
@@ -186,9 +171,9 @@ export const DungeonMapRender = ({
         return isCurrent ? "#93c5fd" : "#2563eb";
       }
 
-      if (tile.isBossRoom) {
-        return "#dc2626";
-      }
+      //if (tile.isBossRoom) {
+      //return "#dc2626";
+      //}
 
       return isCurrent ? "#a1a1aa" : "#18181b";
     } else {
@@ -196,9 +181,9 @@ export const DungeonMapRender = ({
         return isCurrent ? "#93c5fd" : "#2563eb";
       }
 
-      if (tile.isBossRoom) {
-        return "#dc2626";
-      }
+      //if (tile.isBossRoom) {
+      //return "#dc2626";
+      //}
 
       return isCurrent ? "#a1a1aa" : "#e4e4e7";
     }

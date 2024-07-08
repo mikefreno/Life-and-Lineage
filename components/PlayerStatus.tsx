@@ -138,15 +138,6 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
   }, [playerState?.health, gameState?.healthWarning]);
 
   useEffect(() => {
-    if (playerState && (playerState.sanity <= -50 || playerState.health <= 0)) {
-      while (router.canGoBack()) {
-        router.back();
-      }
-      router.replace("/DeathScreen");
-    }
-  }, [playerState?.sanity, playerState?.health]);
-
-  useEffect(() => {
     if (playerState && healthRecord && playerState.health != healthRecord) {
       if (playerState?.health - healthRecord < 0) {
         Animated.sequence([

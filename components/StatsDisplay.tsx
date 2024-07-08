@@ -37,12 +37,13 @@ type DungeonProps = BaseProps & {
 
 type ShopProps = BaseProps & {
   shop: Shop;
-  sellItem: (itemPrice: number, shop: Shop) => void;
+  sellItem: (item: Item) => void;
+  sellStack: (item: Item) => void;
 };
 
 type ShopKeeperProps = BaseProps & {
   shop: Shop;
-  purchaseItem: (itemPrice: number, shop: Shop) => void;
+  purchaseItem: () => void;
 };
 
 type StatsDisplayProps = BaseProps | DungeonProps | ShopProps | ShopKeeperProps;
@@ -69,7 +70,7 @@ export function StatsDisplay({
   const SaleSection = () => {
     if (playerState) {
       if ("sellItem" in props) {
-        const { shop, sellItem } = props;
+        const { shop, sellItem, sellStack } = props;
         const itemPrice = item.getSellPrice(shop.shopKeeper.affection);
         const isDisabled = shop.currentGold < itemPrice;
         return (
@@ -85,7 +86,9 @@ export function StatsDisplay({
             {count && count > 1 ? (
               <>
                 <GenericFlatButton
-                  onPressFunction={() => sellItem(itemPrice, shop)}
+                  onPressFunction={() => {
+                    sellItem(item), setShowingStats(null);
+                  }}
                   textNode={
                     <Text
                       className={
@@ -98,7 +101,10 @@ export function StatsDisplay({
                   disabledCondition={isDisabled}
                 />
                 <GenericFlatButton
-                  onPressFunction={() => sellItem(itemPrice, shop)}
+                  onPressFunction={() => {
+                    sellStack(item);
+                    setShowingStats(null);
+                  }}
                   textNode={
                     <Text
                       className={
@@ -114,7 +120,10 @@ export function StatsDisplay({
               </>
             ) : (
               <GenericFlatButton
-                onPressFunction={() => props.sellItem(itemPrice, shop)}
+                onPressFunction={() => {
+                  props.sellItem(item);
+                  setShowingStats(null);
+                }}
                 textNode={
                   <Text
                     className={
@@ -144,7 +153,7 @@ export function StatsDisplay({
               <Coins width={16} height={16} style={{ marginLeft: 6 }} />
             </View>
             <GenericFlatButton
-              onPressFunction={() => purchaseItem(itemPrice, shop)}
+              onPressFunction={() => purchaseItem()}
               textNode={
                 <Text
                   className={
@@ -216,9 +225,9 @@ export function StatsDisplay({
     >
       <Pressable
         onPress={() => setShowingStats(null)}
-        className="absolute right-0 -mt-3 p-1"
+        className="absolute right-0 border-zinc-600 rounded-tr rounded-bl dark:border-zinc-400 px-2 py-1"
       >
-        <Text className="text-2xl">x</Text>
+        <Text className="-mt-3 -ml-1 text-2xl">x</Text>
       </Pressable>
       <View>
         <Text className="text-center">{toTitleCase(item.name)}</Text>

@@ -164,7 +164,7 @@
    {
       "name": "book of gale",
       "type": "spell",
-      "teaches": "gale",
+      "teaches": "surrounding gale",
       "icon": "Book_2",
       "baseValue": 200000
    },

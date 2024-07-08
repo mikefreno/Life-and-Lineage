@@ -33,7 +33,8 @@ type InventoryRenderDungeon = InventoryRenderBase & {
 type InventoryRenderShop = InventoryRenderBase & {
   shopInventoryTarget: RefObject<View>;
   shop: Shop;
-  sellItem: (itemPrice: number, shop: Shop) => void;
+  sellItem: (item: Item) => void;
+  sellStack: (item: Item) => void;
 };
 
 type InventoryRenderProps =
@@ -296,6 +297,7 @@ export default function InventoryRender({
             }
             leftOffset={-4}
             sellItem={props.sellItem}
+            sellStack={props.sellStack}
           />
         ) : (
           <StatsDisplay
