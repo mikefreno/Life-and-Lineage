@@ -222,7 +222,7 @@ export const enemyTurn = (
           battleLogger(`You dealt ${revengeDamage} revenge damage!`);
         }
       }
-      if (enemyAttackRes.damage > 0) {
+      if (enemyAttackRes.damage > 0 || (enemyAttackRes.sanityDamage && enemyAttackRes.sanityDamage > 0)) {
         setEnemyAttackDummy((prev) => prev + 1);
       }
       if (enemyAttackRes.debuffs || enemyAttackRes.buffs) {

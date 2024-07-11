@@ -1,7 +1,7 @@
 export enum SpellError {
-  NotEnoughMana,
-  ProficencyDeficit,
-  Silenced,
-  IncorrectSchool,
-  InvalidMastery,
+  NotEnoughMana = "NotEnoughMana",
+  ProficencyDeficit = "ProficencyDeficit",
+  Silenced = "Silenced",
+  IncorrectSchool = "IncorrectSchool",
+  InvalidMastery = "InvalidMastery",
 }

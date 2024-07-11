@@ -111,9 +111,9 @@
       "name": "ghost",
       "beingType": "undead",
       "sanity": null,
-      "healthRange": {"minimum": 30, "maximum": 75},
+      "healthRange": {"minimum": 30, "maximum": 55},
       "attackPowerRange": {"minimum": 0, "maximum": 0},
-      "energy": {"maximum": 50, "regen": 5},
+      "energy": {"maximum": 25, "regen": 5},
       "attacks": ["wail"],
       "drops": [
          {"item": "ghostly residue", "itemType":"ingredient","chance":0.5}

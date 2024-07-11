@@ -101,7 +101,7 @@ const MedicalOption = observer(
             <Text className="bold my-auto w-2/3 text-xl dark:text-zinc-50">
               {title}
             </Text>
-            <View className="my-auto -mb-8 mt-8 w-1/3">
+            <View className="-mb-4 mt-4 w-[40%]">
               <View className="flex w-full flex-row items-center justify-evenly">
                 {cost > 0 ? (
                   <>
@@ -140,7 +140,7 @@ const MedicalOption = observer(
                 <View className="flex w-full flex-row items-center justify-evenly">
                   <Text className="dark:text-zinc-50">
                     {sanityRestore == "fill"
-                      ? playerState?.getMaxSanity()
+                      ? (playerState?.getMaxSanity() ?? 50) * 2
                       : sanityRestore}
                   </Text>
                   <Sanity width={14} height={14} style={{ marginLeft: 6 }} />

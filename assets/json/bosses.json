@@ -19,7 +19,7 @@
       "sanity": 50,
       "health": 140,
       "attackPower": 15,
-      "energy": {"maximum": 50, "regen": 10},
+      "energy": {"maximum": 40, "regen": 10},
       "attacks": ["raise skeleton", "teeth"],
       "drops": [
          {"item": "dagger", "itemType":"weapon","chance":0.15},

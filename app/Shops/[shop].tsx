@@ -16,11 +16,11 @@ import { toTitleCase } from "../../utility/functions/misc/words";
 import { calculateAge } from "../../utility/functions/misc/age";
 import InventoryRender from "../../components/InventoryRender";
 import { StatsDisplay } from "../../components/StatsDisplay";
-import { Shop } from "../../classes/shop";
 
 const ONE_HOUR = 60 * 60 * 1000;
-const ONE_MINUTE = 1000 * 60; // for testing_one_min
-const REFRESH_TIME = ONE_HOUR;
+const ONE_SECOND = 1000; // for testing_one_min
+const REFRESH_TIME =
+  process.env.NODE_ENV === "development" ? ONE_SECOND : ONE_HOUR;
 
 const ShopInteriorScreen = observer(() => {
   const { shop } = useLocalSearchParams();

@@ -3,6 +3,8 @@
     "name": "fire bolt", 
     "element": "fire", 
     "proficiencyNeeded": "novice", 
+    "target": "single",
+    "type": "offense",
     "manaCost": 10,
     "effects": {
       "damage": 15, 
@@ -13,6 +15,8 @@
   {
     "name": "catch flame",
     "element": "fire",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
     "effects": {
@@ -24,6 +28,8 @@
   {
     "name": "scorch",
     "element": "fire",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 50,
     "effects": {
@@ -35,6 +41,8 @@
   {
     "name": "fireball",
     "element": "fire",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 75,
     "effects": {
@@ -46,6 +54,8 @@
   {
     "name": "fire wall",
     "element": "fire",
+    "target": "area",
+    "type": "defense",
     "proficiencyNeeded": "expert",
     "manaCost": 100,
     "duration": 3,
@@ -58,6 +68,8 @@
   {
     "name": "rain fire",
     "element": "fire",
+    "target": "area",
+    "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 250,
     "duration": 5,
@@ -70,6 +82,8 @@
   {
     "name": "dragons breath",
     "element": "fire",
+    "target": "area",
+    "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 600,
     "effects": {
@@ -81,8 +95,10 @@
   {
     "name": "sunbeam",
     "element": "fire",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "legend",
-    "manaCost": 1000,
+    "manaCost": 800,
     "effects": {
       "damage": 400,
       "buffs": null,
@@ -92,6 +108,8 @@
   {
     "name": "frost",
     "element": "water",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 10,
     "effects": {
@@ -103,6 +121,8 @@
   {
     "name": "water whip",
     "element": "water",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
     "effects": {
@@ -115,6 +135,8 @@
   {
     "name": "soothing waters",
     "element": "water",
+    "target": "single",
+    "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 50,
     "effects": {
@@ -128,6 +150,8 @@
   {
     "name": "cone of cold",
     "element": "water",
+    "target": "area",
+    "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 100,
     "effects": {
@@ -139,6 +163,8 @@
   {
     "name": "steam blast",
     "element": "water",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 125,
     "effects": {
@@ -150,6 +176,8 @@
   {
     "name": "freezing ray",
     "element": "water",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 200,
     "effects": {
@@ -162,6 +190,8 @@
     "name": "healing rain",
     "element": "water",
     "proficiencyNeeded": "master",
+    "target": "area",
+    "type": "defense",
     "manaCost": 200,
     "effects": {
       "damage": null,
@@ -173,6 +203,8 @@
   {
     "name": "orb of cold",
     "element": "water",
+    "target": "area",
+    "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 300,
     "duration": 5,
@@ -185,6 +217,8 @@
   {
     "name": "boil blood",
     "element": "water",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 600,
     "effects": {
@@ -196,6 +230,8 @@
   {
     "name": "blood control",
     "element": "water",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "legend",
     "duration": 2,
     "manaCost": 1100,
@@ -208,6 +244,8 @@
   {
     "name": "gust",
     "element": "air",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 15,
     "effects": {
@@ -220,6 +258,8 @@
   {
     "name": "sparks",
     "element": "air",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 25,
     "effects": {
@@ -231,6 +271,8 @@
   {
     "name": "lightning",
     "element": "air",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 75,
     "effects": {
@@ -242,6 +284,8 @@
   {
     "name": "thunder clap",
     "element": "air",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 75,
     "effects": {
@@ -253,6 +297,8 @@
   {
     "name": "chain lightning",
     "element": "air",
+    "target": "area",
+    "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 105,
     "effects": {
@@ -264,6 +310,8 @@
   {
     "name": "air blades",
     "element": "air",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 100,
     "effects": {
@@ -275,6 +323,8 @@
   {
     "name": "surrounding gale",
     "element": "air",
+    "target": "single",
+    "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 125,
     "effects": {
@@ -287,6 +337,8 @@
   {
     "name": "tornado",
     "element": "air",
+    "target": "area",
+    "type": "offense",
     "proficiencyNeeded": "legend",
     "duration": 3,
     "manaCost": 500,
@@ -300,6 +352,8 @@
   {
     "name": "suffocate",
     "element": "air",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "legend",
     "duration": 5,
     "manaCost": 1250,

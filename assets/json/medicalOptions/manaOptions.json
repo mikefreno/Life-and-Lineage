@@ -5,13 +5,8 @@
       "manaRestore": 25
    },
    {
-      "serviceName": "Visit Site of Elemental Power",
-      "cost": 65,
-      "manaRestore": 75
-   },
-   {
       "serviceName": "Hire Shamanic Guide",
-      "cost": 175,
+      "cost": 150,
       "manaRestore": "fill"
    }
 ]

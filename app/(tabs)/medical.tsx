@@ -1,4 +1,4 @@
-import { ScrollView, View, Text } from "../../components/Themed";
+import { ScrollView, View as ThemedView, Text } from "../../components/Themed";
 import healthOptions from "../../assets/json/medicalOptions/healthOptions.json";
 import manaOptions from "../../assets/json/medicalOptions/manaOptions.json";
 import sanityOptions from "../../assets/json/medicalOptions/sanityOptions.json";
@@ -9,12 +9,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { GameContext } from "../_layout";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
-import {
-  Pressable,
-  StyleSheet,
-  View as NonThemedView,
-  Platform,
-} from "react-native";
+import { Pressable, StyleSheet, View, Platform } from "react-native";
 import { useVibration } from "../../utility/customHooks";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -68,20 +63,19 @@ export default function MedicalScreen() {
   }, [showMedicalTutorial]);
 
   useEffect(() => {
-    gameState?.setMedicalOptionVisibility("health", showingHealthOptions);
-  }, [showingHealthOptions]);
-
-  useEffect(() => {
-    gameState?.setMedicalOptionVisibility("mana", showingManaOptions);
-  }, [showingManaOptions]);
-
-  useEffect(() => {
-    gameState?.setMedicalOptionVisibility("sanity", showingSanityOptions);
-  }, [showingSanityOptions]);
-
-  useEffect(() => {
-    gameState?.setMedicalOptionVisibility("other", showingOtherOptions);
-  }, [showingOtherOptions]);
+    if (gameState) {
+      gameState.setMedicalOptionVisibility("health", showingHealthOptions);
+      gameState.setMedicalOptionVisibility("mana", showingManaOptions);
+      gameState.setMedicalOptionVisibility("sanity", showingSanityOptions);
+      gameState.setMedicalOptionVisibility("other", showingOtherOptions);
+    }
+  }, [
+    gameState,
+    showingHealthOptions,
+    showingManaOptions,
+    showingSanityOptions,
+    showingOtherOptions,
+  ]);
 
   return (
     <>
@@ -94,174 +88,159 @@ export default function MedicalScreen() {
         onCloseFunction={() => setShowMedicalTutorial(false)}
         pageOne={{
           title: "Medical Tab",
-          body: "Here you can aquire various forms of medical treatment.",
+          body: "Here you can acquire various forms of medical treatment.",
         }}
         pageTwo={{
           title: "Note: These tick the game clock forward",
           body: "Using items such as potions, or using spells will not tick the clock forward.",
         }}
       />
-      <NonThemedView
-        className="absolute z-10 h-12 w-full border-b border-zinc-200 dark:border-zinc-600"
+      <View
+        className="absolute z-10 h-12 w-full shadow-diffuse"
         style={{ top: useHeaderHeight() }}
       >
-        <BlurView
-          blurReductionFactor={12}
-          tint={
-            Platform.OS == "android"
-              ? colorScheme == "light"
-                ? "light"
-                : "dark"
-              : "default"
-          }
-          intensity={100}
-          style={StyleSheet.absoluteFill}
-          experimentalBlurMethod={"dimezisBlurView"}
-        >
-          <NonThemedView className="flex w-full flex-row justify-evenly py-1">
-            <Pressable
-              onPress={() => {
-                vibration({ style: "light" });
-                setShowingHealthOptions(!showingHealthRef.current);
-                showingHealthRef.current = !showingHealthRef.current;
-              }}
-              className={`${
-                showingHealthOptions ? "bg-[#ef4444]" : "bg-zinc-100"
-              } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
-            >
-              <Text
-                style={{ color: showingHealthOptions ? "white" : "#a1a1aa" }}
-              >
-                Health
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                vibration({ style: "light" });
-                setShowingManaOptions(!showingManaRef.current);
-                showingManaRef.current = !showingManaRef.current;
-              }}
-              className={`${
-                showingManaOptions ? "bg-[#60a5fa]" : "bg-zinc-100"
-              } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
-            >
-              <Text style={{ color: showingManaOptions ? "white" : "#a1a1aa" }}>
-                Mana
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                vibration({ style: "light" });
-                setShowingSanityOptions(!showingSanityRef.current);
-                showingSanityRef.current = !showingSanityRef.current;
-              }}
-              className={`${
-                showingSanityOptions ? "bg-[#c084fc]" : "bg-zinc-100"
-              } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
-            >
-              <Text
-                style={{ color: showingSanityOptions ? "white" : "#a1a1aa" }}
-              >
-                Sanity
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                vibration({ style: "light" });
-                setShowingOtherOptions(!showingOtherRef.current);
-                showingOtherRef.current = !showingOtherRef.current;
-              }}
-              className={`${
-                showingOtherOptions ? "bg-[#e4e4e7]" : "bg-zinc-100"
-              } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
-            >
-              <Text
-                style={{ color: showingOtherOptions ? "black" : "#a1a1aa" }}
-              >
-                Other
-              </Text>
-            </Pressable>
-          </NonThemedView>
-        </BlurView>
-      </NonThemedView>
-      <View className="flex-1">
+        <ThemedView className="flex flex-row justify-evenly mx-4 pb-1 pt-4 -mt-2 rounded-xl">
+          <Pressable
+            onPress={() => {
+              vibration({ style: "light" });
+              setShowingHealthOptions(!showingHealthRef.current);
+              showingHealthRef.current = !showingHealthRef.current;
+            }}
+            className={`${
+              showingHealthOptions ? "bg-[#ef4444]" : "bg-zinc-100"
+            } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
+          >
+            <Text style={{ color: showingHealthOptions ? "white" : "#a1a1aa" }}>
+              Health
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              vibration({ style: "light" });
+              setShowingManaOptions(!showingManaRef.current);
+              showingManaRef.current = !showingManaRef.current;
+            }}
+            className={`${
+              showingManaOptions ? "bg-[#60a5fa]" : "bg-zinc-100"
+            } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
+          >
+            <Text style={{ color: showingManaOptions ? "white" : "#a1a1aa" }}>
+              Mana
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              vibration({ style: "light" });
+              setShowingSanityOptions(!showingSanityRef.current);
+              showingSanityRef.current = !showingSanityRef.current;
+            }}
+            className={`${
+              showingSanityOptions ? "bg-[#c084fc]" : "bg-zinc-100"
+            } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
+          >
+            <Text style={{ color: showingSanityOptions ? "white" : "#a1a1aa" }}>
+              Sanity
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              vibration({ style: "light" });
+              setShowingOtherOptions(!showingOtherRef.current);
+              showingOtherRef.current = !showingOtherRef.current;
+            }}
+            className={`${
+              showingOtherOptions ? "bg-[#e4e4e7]" : "bg-zinc-100"
+            } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
+          >
+            <Text style={{ color: showingOtherOptions ? "black" : "#a1a1aa" }}>
+              Other
+            </Text>
+          </Pressable>
+        </ThemedView>
+      </View>
+      <ThemedView className="flex-1">
         <ScrollView>
-          <View
+          <ThemedView
             className="px-2"
             style={{
               paddingBottom: useBottomTabBarHeight() + 80,
               paddingTop: useHeaderHeight() + 48,
             }}
           >
-            {showingHealthOptions && (
-              <>
-                <GenericStrikeAround text={"Health"} />
-                {healthOptions.map((medOption, index) => {
-                  return (
-                    <MedicalOption
-                      key={index}
-                      title={medOption.serviceName}
-                      cost={medOption.cost}
-                      healthRestore={medOption.heathRestore as number | "fill"}
-                    />
-                  );
-                })}
-              </>
-            )}
-            {showingManaOptions && (
-              <>
-                <GenericStrikeAround text={"Mana"} />
-                {manaOptions.map((medOption, index) => {
-                  return (
-                    <MedicalOption
-                      key={index}
-                      title={medOption.serviceName}
-                      cost={medOption.cost}
-                      manaRestore={medOption.manaRestore as number | "fill"}
-                    />
-                  );
-                })}
-              </>
-            )}
-            {showingSanityOptions && (
-              <>
-                <GenericStrikeAround text={"Sanity"} />
-                {sanityOptions.map((medOption, index) => {
-                  return (
-                    <MedicalOption
-                      key={index}
-                      title={medOption.serviceName}
-                      cost={medOption.cost}
-                      sanityRestore={medOption.sanityRestore as number | "fill"}
-                    />
-                  );
-                })}
-              </>
-            )}
-            {showingOtherOptions && (
-              <>
-                <GenericStrikeAround text={"Other"} />
-                {otherOptions.map((medOption, index) => {
-                  return (
-                    <MedicalOption
-                      key={index}
-                      title={medOption.serviceName}
-                      cost={medOption.cost}
-                      removeDebuffs={medOption.removeDebuffs as number | "all"}
-                    />
-                  );
-                })}
-              </>
-            )}
-          </View>
+            <View className="flex flex-row">
+              <View className="w-1/2">
+                {showingHealthOptions && (
+                  <>
+                    <GenericStrikeAround text={"Health"} />
+                    {healthOptions.map((medOption, index) => (
+                      <MedicalOption
+                        key={index}
+                        title={medOption.serviceName}
+                        cost={medOption.cost}
+                        healthRestore={
+                          medOption.heathRestore as number | "fill"
+                        }
+                      />
+                    ))}
+                  </>
+                )}
+                {showingOtherOptions && (
+                  <>
+                    <GenericStrikeAround text={"Other"} />
+                    {otherOptions.map((medOption, index) => (
+                      <MedicalOption
+                        key={index}
+                        title={medOption.serviceName}
+                        cost={medOption.cost}
+                        removeDebuffs={
+                          medOption.removeDebuffs as number | "all"
+                        }
+                      />
+                    ))}
+                  </>
+                )}
+              </View>
+              <View className="w-1/2">
+                {showingManaOptions && (
+                  <>
+                    <GenericStrikeAround text={"Mana"} />
+                    {manaOptions.map((medOption, index) => (
+                      <MedicalOption
+                        key={index}
+                        title={medOption.serviceName}
+                        cost={medOption.cost}
+                        manaRestore={medOption.manaRestore as number | "fill"}
+                      />
+                    ))}
+                  </>
+                )}
+
+                {showingSanityOptions && (
+                  <>
+                    <GenericStrikeAround text={"Sanity"} />
+                    {sanityOptions.map((medOption, index) => (
+                      <MedicalOption
+                        key={index}
+                        title={medOption.serviceName}
+                        cost={medOption.cost}
+                        sanityRestore={
+                          medOption.sanityRestore as number | "fill"
+                        }
+                      />
+                    ))}
+                  </>
+                )}
+              </View>
+            </View>
+          </ThemedView>
         </ScrollView>
-        <NonThemedView
+        <View
           className="absolute z-50 w-full"
           style={{ bottom: useBottomTabBarHeight() + 75 }}
         >
           <PlayerStatus />
-        </NonThemedView>
-      </View>
+        </View>
+      </ThemedView>
     </>
   );
 }

@@ -1,5 +1,5 @@
 import ProgressBar from "./ProgressBar";
-import { Text } from "./Themed";
+import { Text, View as ThemedView } from "./Themed";
 import {
   ScrollView,
   Animated,
@@ -12,7 +12,7 @@ import Coins from "../assets/icons/CoinsIcon";
 import { useContext, useEffect, useState } from "react";
 import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { observer } from "mobx-react-lite";
-import { router, usePathname } from "expo-router";
+import { usePathname } from "expo-router";
 import { toTitleCase } from "../utility/functions/misc/words";
 import FadeOutText from "./FadeOutText";
 import GenericModal from "./GenericModal";

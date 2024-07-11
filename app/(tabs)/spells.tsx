@@ -168,10 +168,7 @@ const SpellsScreen = observer(() => {
         className="flex-1"
         style={{ paddingBottom: useBottomTabBarHeight() + 65 }}
       >
-        <Text className="pt-4 text-center text-xl tracking-wide">
-          Known Spells
-        </Text>
-        <View className="flex-1 justify-evenly px-4">
+        <View className="flex-1 pt-4 justify-evenly px-4">
           {spells && spells.length > 0 ? (
             <ScrollView className="h-1/2">
               {spells.map((spell) => (

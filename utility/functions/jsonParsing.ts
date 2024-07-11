@@ -2,7 +2,9 @@ import { SpellError } from "../errorTypes";
 import { MasteryLevel, Spell } from "../types";
 
 const masteryConversion = (asString: string) => {
-  switch (asString) {
+  const normalizedString = asString.toLowerCase().trim();
+
+  switch (normalizedString) {
     case "novice":
       return MasteryLevel.Novice;
     case "apprentice":
@@ -19,11 +21,12 @@ const masteryConversion = (asString: string) => {
       return SpellError.InvalidMastery;
   }
 };
+
 export function parseSpell(json: any): Spell {
   const mastery = masteryConversion(json.proficiencyNeeded);
-  if (mastery == SpellError.InvalidMastery) {
+  if (mastery === SpellError.InvalidMastery) {
     throw new Error(
-      `Attempt to make incorrect from: ${json.proficiencyNeeded},\nSpell Name:${json.name}`,
+      `Attempt to make spell from: ${json.proficiencyNeeded},\nSpell Name: ${json.name}`,
     );
   }
   return {

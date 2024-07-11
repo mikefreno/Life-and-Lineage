@@ -135,7 +135,7 @@
    },
    {
       "name": "raise skeleton",
-      "energyCost": 30,
+      "energyCost": 35,
       "summons": ["skeleton"]
    },
    {

@@ -9,12 +9,14 @@ import { useColorScheme } from "nativewind";
 import { elementalColorMap } from "../utility/elementColors";
 import ClockIcon from "../assets/icons/ClockIcon";
 import { Spell } from "../utility/types";
+import { Dimensions } from "react-native";
 
 interface SpellDetailsProps {
   spell: Spell;
 }
 
 export default function SpellDetails({ spell }: SpellDetailsProps) {
+  const windowWidth = Dimensions.get("window").width;
   const { colorScheme } = useColorScheme();
   return (
     <View
@@ -43,7 +45,7 @@ export default function SpellDetails({ spell }: SpellDetailsProps) {
         backgroundColor: colorScheme == "light" ? "#fafafa" : "#27272a",
         shadowOpacity: 0.25,
         shadowRadius: 5,
-        maxWidth: 400,
+        maxWidth: windowWidth * 0.9,
       }}
     >
       <View

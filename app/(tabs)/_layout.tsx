@@ -174,6 +174,7 @@ export default function TabLayout() {
                 intensity={100}
                 style={StyleSheet.absoluteFill}
                 experimentalBlurMethod={"dimezisBlurView"}
+                className="shadow-diffuse"
               />
             ),
             title: "Spells",
@@ -224,6 +225,7 @@ export default function TabLayout() {
                 intensity={100}
                 style={StyleSheet.absoluteFill}
                 experimentalBlurMethod={"dimezisBlurView"}
+                className="shadow-diffuse"
               />
             ),
             title: "Labor",
@@ -338,6 +340,7 @@ export default function TabLayout() {
                 intensity={100}
                 style={StyleSheet.absoluteFill}
                 experimentalBlurMethod={"dimezisBlurView"}
+                className="shadow-diffuse"
               />
             ),
             title: "Shops",

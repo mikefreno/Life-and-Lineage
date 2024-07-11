@@ -293,7 +293,7 @@ export default function InventoryRender({
             topOffset={
               Platform.OS == "ios"
                 ? -(40 + deviceHeight / 2.2)
-                : -(40 + deviceHeight / 2.4)
+                : -(40 + deviceHeight / 2.3)
             }
             leftOffset={-4}
             sellItem={props.sellItem}
@@ -309,7 +309,7 @@ export default function InventoryRender({
             topOffset={
               Platform.OS == "ios"
                 ? -(120 + deviceHeight / 10)
-                : -(14 + deviceHeight / 2.4)
+                : -(10 + deviceHeight / 4)
             }
           />
         ))}

@@ -28,6 +28,7 @@ import { getRandomJobTitle } from "../../../utility/functions/characterAid";
 import { createShops } from "../../../classes/shop";
 import { generateBirthday } from "../../../utility/functions/misc/age";
 import clearHistory from "../../../utility/functions/misc/nav";
+import { fullSave } from "../../../utility/functions/save_load";
 
 export default function NewGameReview() {
   const { slug } = useLocalSearchParams();
@@ -167,6 +168,7 @@ export default function NewGameReview() {
       logsSetter([]);
       vibration({ style: "success" });
       setTimeout(() => clearHistory(navigation), 500);
+      fullSave(newGame, player);
       AsyncStorage.removeItem("tutorialsEnabled");
     }
   }
