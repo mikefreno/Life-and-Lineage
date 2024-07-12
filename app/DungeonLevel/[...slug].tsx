@@ -116,6 +116,8 @@ const DungeonLevelScreen = observer(() => {
     offsetX: 0,
     offsetY: 0,
   });
+  const [showFirstBossKillTutorial, setShowFirstBossKillTutorial] =
+    useState<boolean>(false);
 
   const [currentPosition, setCurrentPosition] = useState<Tile | null>(null);
   const pouchRef = useRef<View>(null);
@@ -358,6 +360,7 @@ const DungeonLevelScreen = observer(() => {
         setEnemyAttackDummy: setEnemyAttackDummy,
         setEnemyTextDummy: setEnemyTextDummy,
         setEnemyTextString: setEnemyTextString,
+        toggleFirstBossKillTutorial: () => setShowFirstBossKillTutorial(true),
       };
       if (target instanceof Enemy) {
         if (target.health <= 0 || (target.sanity && target.sanity <= 0)) {
@@ -670,6 +673,19 @@ const DungeonLevelScreen = observer(() => {
           pageThree={{
             title: "Good Luck.",
             body: "And remember fleeing (top left) can save you.",
+          }}
+        />
+        <TutorialModal
+          isVisibleCondition={false}
+          backFunction={function (): void {
+            throw new Error("Function not implemented.");
+          }}
+          onCloseFunction={function (): void {
+            throw new Error("Function not implemented.");
+          }}
+          pageOne={{
+            title: "",
+            body: "",
           }}
         />
         <FleeModal

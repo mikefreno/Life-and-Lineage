@@ -202,7 +202,6 @@ export class Game {
                 levels: [
                   new DungeonLevel({
                     level: 1,
-                    step: 0,
                     tiles: found.levels[0].tiles,
                     bosses: found.levels[0].boss,
                     bossDefeated: false,

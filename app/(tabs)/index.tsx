@@ -88,7 +88,7 @@ const HomeScreen = observer(() => {
             paddingBottom: useBottomTabBarHeight() + 70,
           }}
         >
-          <View className="-mx-4 py-1 border-b border-zinc-200 sm:py-2 dark:border-zinc-600">
+          <View className="-mx-2 py-1">
             <View className="mx-6 flex-row items-center md:py-12">
               {playerState?.playerClass == "necromancer" ? (
                 <View className="mx-auto">

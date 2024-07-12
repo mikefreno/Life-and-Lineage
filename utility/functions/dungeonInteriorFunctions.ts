@@ -29,6 +29,7 @@ export interface enemyTurnCheckProps {
   setEnemyAttackDummy: React.Dispatch<React.SetStateAction<number>>;
   setEnemyTextDummy: React.Dispatch<React.SetStateAction<number>>;
   setEnemyTextString: React.Dispatch<React.SetStateAction<string | undefined>>;
+  toggleFirstBossKillTutorial: () => void;
 }
 
 export function enemyTurnCheck({
@@ -49,6 +50,7 @@ export function enemyTurnCheck({
   setEnemyTextDummy,
   setEnemyTextString,
   setEnemyAttackDummy,
+  toggleFirstBossKillTutorial,
 }: enemyTurnCheckProps) {
   if (enemyState) {
     if (
@@ -74,9 +76,6 @@ export function enemyTurnCheck({
         setEnemy(null);
         gameState.gameTick(playerState);
       } else {
-        if (thisDungeon?.level != 0) {
-          thisDungeon?.incrementStep();
-        }
         battleLogger(
           `You defeated the ${toTitleCase(enemyState.creatureSpecies)}`,
         );
@@ -91,6 +90,9 @@ export function enemyTurnCheck({
           thisDungeon.setBossDefeated();
           gameState.openNextDungeonLevel(thisInstance!.name);
           playerState.bossDefeated();
+          if (!gameState.tutorialsShown["First Boss Kill"]) {
+            toggleFirstBossKillTutorial();
+          }
         }
         setEnemy(null);
         gameState.gameTick(playerState);
@@ -222,7 +224,10 @@ export const enemyTurn = (
           battleLogger(`You dealt ${revengeDamage} revenge damage!`);
         }
       }
-      if (enemyAttackRes.damage > 0 || (enemyAttackRes.sanityDamage && enemyAttackRes.sanityDamage > 0)) {
+      if (
+        enemyAttackRes.damage > 0 ||
+        (enemyAttackRes.sanityDamage && enemyAttackRes.sanityDamage > 0)
+      ) {
         setEnemyAttackDummy((prev) => prev + 1);
       }
       if (enemyAttackRes.debuffs || enemyAttackRes.buffs) {

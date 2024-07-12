@@ -36,10 +36,10 @@ export default function NewGameReview() {
     return router.replace("/NewGame");
   }
   const playerClass = slug[0];
-  const sex = slug[1];
-  const firstName = slug[2];
-  const lastName = slug[3];
-  const blessing = slug[4];
+  const blessing = slug[1];
+  const sex = slug[2];
+  const firstName = slug[3];
+  const lastName = slug[4];
   const vibration = useVibration();
 
   const playerCharacterContext = useContext(PlayerCharacterContext);

@@ -202,18 +202,18 @@
       "teaches": "quick sand",
       "icon": "Book",
       "baseValue": 20000
+   }, 
+   {
+      "name": "book of rock armor",
+      "type": "spell",
+      "teaches": "rock armor",
+      "icon": "Book_2",
+      "baseValue": 50000
    },
    {
       "name": "book of bolder throw",
       "type": "spell",
       "teaches": "bolder throw",
-      "icon": "Book_2",
-      "baseValue": 50000
-   },
-   {
-      "name": "book of rock armor",
-      "type": "spell",
-      "teaches": "rock armor",
       "icon": "Book_2",
       "baseValue": 100000
    },

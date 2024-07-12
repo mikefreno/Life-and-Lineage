@@ -2,7 +2,6 @@ import { Pressable, View as NonThemedView } from "react-native";
 import { ScrollView, Text, View } from "../../../components/Themed";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { toTitleCase } from "../../../utility/functions/misc/words";
 import { router } from "expo-router";
 import Fire from "../../../assets/icons/FireIcon";
 import Water from "../../../assets/icons/WaterIcon";
@@ -21,6 +20,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TutorialModal from "../../../components/TutorialModal";
+import { toTitleCase } from "../../../utility/functions/misc/words";
 
 const descriptionMap: Record<string, string> = {
   fire: "With Fire, comes aggression. You will deal damage quickly and potentially burn enemies for additional damage over time.",
@@ -35,21 +35,22 @@ const descriptionMap: Record<string, string> = {
     "With Pesitilence, you will control an unseen force to cripple your enemies, or destroy them from within.",
   bone: "With Bone, you will shield yourself or destroy your foes.",
   blood:
-    "With Blood, you will contol the life force of enemies and yourself, sacrifice for ultimate power.",
+    "With Blood, you will control the life force of enemies and yourself, sacrifice for ultimate power.",
   holy: "With Holy, you will heal yourself, others, and blast away the undead.",
   vengeance:
-    "With Vengeance, you will smite the unworthly, combining arms with blessed power.",
+    "With Vengeance, you will smite the unworthy, combining arms with blessed power.",
   protection:
     "With Protection, you will shield yourself and others, become invulnerable.",
 };
 
 export default function SetBlessing() {
   const { slug } = useLocalSearchParams();
+  if (!slug) {
+    return router.replace("/NewGame");
+  }
+  const playerClass = slug as string;
+
   const [blessing, setBlessing] = useState<string>("");
-  const playerClass = slug[0];
-  const sex = slug[1];
-  const firstName = toTitleCase(slug[2]);
-  const lastName = toTitleCase(slug[3]);
   const { colorScheme } = useColorScheme();
   const blessingRef = useRef<string>();
   const vibration = useVibration();
@@ -520,7 +521,7 @@ export default function SetBlessing() {
         onCloseFunction={() => setShowBlessingTutorial(false)}
         pageOne={{
           title:
-            "Magic is a extremly powerful, but often very expensive obtain.",
+            "Magic is a extremely powerful, but often very expensive obtain.",
           body: "You will start with a book providing a spell pertaining to blessing you choose, and a higher starting point in that school.",
         }}
         pageTwo={{
@@ -530,10 +531,10 @@ export default function SetBlessing() {
       <ScrollView>
         <View className="flex-1 px-[5vw] pt-[8vh]">
           <Text className="text-center text-2xl">
-            With What Blessing Was{" "}
-            <Text style={{ color: accent }}>
-              {firstName} {lastName}
-            </Text>{" "}
+            With What Blessing Was Your
+            <Text style={{ color: accent }}>{` ${toTitleCase(
+              playerClass,
+            )} `}</Text>
             Born?
           </Text>
           <View className="flex-1 justify-evenly">
@@ -547,7 +548,7 @@ export default function SetBlessing() {
                   onPress={() => {
                     vibration({ style: "light" });
                     router.push(
-                      `/NewGame/Review/${playerClass}/${sex}/${firstName}/${lastName}/${blessingRef.current}`,
+                      `/NewGame/SetSex/${playerClass}/${blessingRef.current}`,
                     );
                   }}
                   className="rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"

@@ -14,8 +14,12 @@ import { useColorScheme } from "nativewind";
 
 export default function SetName() {
   const { slug } = useLocalSearchParams();
+  if (!slug) {
+    return router.replace("/NewGame");
+  }
   const playerClass = slug[0];
-  const sex = slug[1];
+  const blessing = slug[1];
+  const sex = slug[2];
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
   const firstNameRef = useRef<string>();
@@ -115,7 +119,7 @@ export default function SetName() {
               onPress={() => {
                 vibration({ style: "light" });
                 router.push(
-                  `/NewGame/SetBlessing/${playerClass}/${sex}/${firstNameRef.current?.trimEnd()}/${lastNameRef.current?.trimEnd()}`,
+                  `/NewGame/Review/${playerClass}/${blessing}/${sex}/${firstNameRef.current?.trimEnd()}/${lastNameRef.current?.trimEnd()}`,
                 );
               }}
               className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"

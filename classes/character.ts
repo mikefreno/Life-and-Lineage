@@ -418,7 +418,8 @@ export class PlayerCharacter extends Character {
     this.knownSpells = knownSpells ?? [];
     this.conditions = conditions ?? [];
     this.physicalAttacks = physicalAttacks ?? ["punch"];
-    this.gold = gold ?? 500;
+    this.gold =
+      gold ?? process.env.NODE_ENV === "development" ? 1_000_000 : 500;
     this.inventory = inventory ?? [];
     this.currentDungeon = currentDungeon ?? null;
     this.equipment = equipment ?? {
@@ -427,7 +428,7 @@ export class PlayerCharacter extends Character {
         slot: "one-hand",
         stats: { baseDamage: 1 },
         baseValue: 0,
-        itemClass: "weapon",
+        itemClass: ItemClassType.Weapon,
       }),
       offHand: null,
       head: null,

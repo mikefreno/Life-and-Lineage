@@ -7,7 +7,6 @@ import { beingType } from "../utility/types";
 interface DungeonLevelOptions {
   level: number;
   bosses: string[];
-  step?: number;
   tiles: number;
   bossDefeated?: boolean;
 }
@@ -69,36 +68,21 @@ export class DungeonInstance {
 export class DungeonLevel {
   readonly level: number;
   readonly bosses: string[];
-  step: number;
   readonly tiles: number;
   bossDefeated: boolean;
 
-  constructor({
-    level,
-    bosses,
-    step,
-    tiles,
-    bossDefeated,
-  }: DungeonLevelOptions) {
+  constructor({ level, bosses, tiles, bossDefeated }: DungeonLevelOptions) {
     this.level = level;
     this.bosses = bosses;
-    this.step = step ?? 0;
     this.tiles = tiles;
     this.bossDefeated = bossDefeated ?? false;
     makeObservable(this, {
-      step: observable,
       bossDefeated: observable,
-      incrementStep: action,
       getBoss: action,
       setBossDefeated: action,
     });
   }
 
-  public incrementStep() {
-    if (this.step < this.tiles) {
-      this.step += 1;
-    }
-  }
   public setBossDefeated() {
     this.bossDefeated = true;
   }
@@ -141,7 +125,6 @@ export class DungeonLevel {
     const level = new DungeonLevel({
       level: json.level,
       bosses: json.bosses,
-      step: json.step,
       tiles: json.tiles,
       bossDefeated: json.bossDefeated,
     });

@@ -12,6 +12,11 @@ import TutorialModal from "../../../components/TutorialModal";
 
 export default function SetSex() {
   const { slug } = useLocalSearchParams();
+  if (!slug) {
+    return router.replace("/NewGame");
+  }
+  const playerClass = slug[0];
+  const blessing = slug[1];
   const [sex, setSex] = useState<"male" | "female">();
   const { colorScheme } = useColorScheme();
 
@@ -56,9 +61,9 @@ export default function SetSex() {
   }
 
   const accent =
-    (slug as string) == "mage"
+    playerClass == "mage"
       ? "#2563eb"
-      : (slug as string) == "necromancer"
+      : playerClass == "necromancer"
       ? "#9333ea"
       : "#fcd34d";
 
@@ -96,7 +101,7 @@ export default function SetSex() {
       <View className="flex-1 items-center">
         <Text className="mt-[6vh] text-center text-2xl md:text-3xl">
           Set the sex of your{" "}
-          <Text style={{ color: accent }}>{toTitleCase(slug as string)}</Text>
+          <Text style={{ color: accent }}>{toTitleCase(playerClass)}</Text>
         </Text>
         <View className="mt-[12vh] flex w-full flex-row justify-evenly">
           <Pressable
@@ -149,7 +154,9 @@ export default function SetSex() {
             <Pressable
               onPress={() => {
                 vibration({ style: "light" });
-                router.push(`/NewGame/SetName/${slug}/${sexRef.current}`);
+                router.push(
+                  `/NewGame/SetName/${playerClass}/${blessing}/${sexRef.current}`,
+                );
               }}
               className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
             >

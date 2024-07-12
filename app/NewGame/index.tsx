@@ -285,7 +285,7 @@ export default function NewGameScreen() {
               <Pressable
                 onPress={() => {
                   vibration({ style: "light" });
-                  router.push(`/NewGame/SetSex/${classRef.current}`);
+                  router.push(`/NewGame/SetBlessing/${classRef.current}`);
                 }}
                 className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
               >

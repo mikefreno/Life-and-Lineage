@@ -98,6 +98,7 @@ export default function TabLayout() {
                 intensity={100}
                 style={StyleSheet.absoluteFill}
                 experimentalBlurMethod={"dimezisBlurView"}
+                className="shadow-diffuse"
               />
             ),
             title: "Home",

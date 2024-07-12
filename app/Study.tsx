@@ -24,6 +24,11 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import GenericRaisedButton from "../components/GenericRaisedButton";
 import { MasteryLevel, Spell } from "../utility/types";
 import GenericModal from "../components/GenericModal";
+import {
+  convertMasteryToNumber,
+  convertMasteryToString,
+  getMasteryLevel,
+} from "../utility/spellHelper";
 
 export default function LearningKnowledgeScreen() {
   const playerCharacterData = useContext(PlayerCharacterContext);
@@ -66,6 +71,10 @@ export default function LearningKnowledgeScreen() {
       );
     } else setSelectedBookSpell(null);
   }, [selectedBook]);
+
+  useEffect(() => {
+    console.log(selectedBookSpell);
+  }, [selectedBookSpell]);
 
   function studySpell(
     bookName: string,
@@ -245,13 +254,17 @@ export default function LearningKnowledgeScreen() {
             <View className="flex items-center py-4">
               <Text className="text-xl">{toTitleCase(selectedBook.name)}</Text>
               <Text className="py-2 text-lg tracking-wide">Teaches</Text>
+              <Text className="py-2 text-lg tracking-wide">
+                ({convertMasteryToString[selectedBookSpell.proficiencyNeeded]})
+              </Text>
               <SpellDetails spell={selectedBookSpell} />
               <GenericRaisedButton
                 onPressFunction={() => {
                   if (
                     (playerState.currentMasteryLevel(
                       selectedBookSpell.element,
-                    ) as MasteryLevel) >= selectedBookSpell.proficiencyNeeded
+                    ) as MasteryLevel) >=
+                    convertMasteryToNumber[selectedBookSpell.proficiencyNeeded]
                   ) {
                     vibration({ style: "light", essential: true });
                     studySpell(
@@ -277,9 +290,7 @@ export default function LearningKnowledgeScreen() {
                     <Pressable
                       key={item.id}
                       className="m-2 items-center active:scale-90 active:opacity-50"
-                      onPress={() => {
-                        setSelectedBook(item);
-                      }}
+                      onPress={() => setSelectedBook(item)}
                     >
                       <View
                         className="rounded-lg p-2"
