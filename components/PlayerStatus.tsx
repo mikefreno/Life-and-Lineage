@@ -1,5 +1,5 @@
 import ProgressBar from "./ProgressBar";
-import { Text, View as ThemedView } from "./Themed";
+import { Text } from "./Themed";
 import {
   ScrollView,
   Animated,
@@ -7,10 +7,15 @@ import {
   Pressable,
   View,
   Platform,
+  PressableProps,
 } from "react-native";
 import Coins from "../assets/icons/CoinsIcon";
-import { useContext, useEffect, useState } from "react";
-import { GameContext, PlayerCharacterContext } from "../app/_layout";
+import { useContext, useEffect, useRef, useState } from "react";
+import {
+  GameContext,
+  PlayerCharacterContext,
+  PlayerStatusContext,
+} from "../app/_layout";
 import { observer } from "mobx-react-lite";
 import { usePathname } from "expo-router";
 import { toTitleCase } from "../utility/functions/misc/words";
@@ -34,9 +39,12 @@ interface PlayerStatus {
 const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
   const playerCharacterData = useContext(PlayerCharacterContext);
   const gameData = useContext(GameContext);
-  if (!playerCharacterData || !gameData) throw new Error("missing context");
+  const playerStatusRefContext = useContext(PlayerStatusContext);
+  if (!playerCharacterData || !gameData || !playerStatusRefContext)
+    throw new Error("missing context");
   const { playerState } = playerCharacterData;
   const { gameState } = gameData;
+  const { setPlayerStatusRef } = playerStatusRefContext;
   const [readableGold, setReadableGold] = useState(
     playerState?.getReadableGold(),
   );
@@ -82,6 +90,13 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
   const pathname = usePathname();
   const { colorScheme } = useColorScheme();
   const vibration = useVibration();
+
+  const pressableRef =
+    useRef<
+      React.ForwardRefExoticComponent<
+        PressableProps & React.RefAttributes<View>
+      >
+    >(null);
 
   useEffect(() => {
     setLocalHealthMax(playerState?.getMaxHealth());
@@ -199,6 +214,12 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
   useEffect(() => {
     setReadableGold(playerState?.getReadableGold());
   }, [playerState?.gold]);
+
+  useEffect(() => {
+    if (pressableRef) {
+      setPlayerStatusRef(pressableRef);
+    }
+  }, [pressableRef]);
 
   function conditionRenderer() {
     if (playerState) {
@@ -644,6 +665,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
           </View>
         </GenericModal>
         <Pressable
+          ref={pressableRef}
           onPress={() => setShowDetailedView(true)}
           className="absolute mt-3 z-50 w-full border-t border-zinc-200 dark:border-zinc-600"
         >

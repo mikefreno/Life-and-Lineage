@@ -12,7 +12,7 @@ import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
 import { fullSave, loadGame, loadPlayer } from "../utility/functions/save_load";
-import { View, Text, Platform, StyleSheet } from "react-native";
+import { View, Text, Platform, StyleSheet, PressableProps } from "react-native";
 import { reaction } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
@@ -66,6 +66,29 @@ export const LogsContext = createContext<
   | undefined
 >(undefined);
 
+export const PlayerStatusContext = createContext<
+  | {
+      playerStatusRef:
+        | React.RefObject<
+            React.ForwardRefExoticComponent<
+              PressableProps & React.RefAttributes<View>
+            >
+          >
+        | undefined;
+      setPlayerStatusRef: React.Dispatch<
+        React.SetStateAction<
+          | React.RefObject<
+              React.ForwardRefExoticComponent<
+                PressableProps & React.RefAttributes<View>
+              >
+            >
+          | undefined
+        >
+      >;
+    }
+  | undefined
+>(undefined); // literally only used for a single tutorial... no idea if there is a better way to do this
+
 Sentry.init({
   dsn: "https://2cff54f8aeb50bcb7151c159cc40fe1b@o4506630160187392.ingest.sentry.io/4506630163398656",
   debug: process.env.NODE_ENV === "development", // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
@@ -78,6 +101,14 @@ const Root = observer(() => {
   const [logsState, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [gameDate, setGameDate] = useState<string>("");
+  const [playerStatusRef, setPlayerStatusRef] =
+    useState<
+      React.RefObject<
+        React.ForwardRefExoticComponent<
+          PressableProps & React.RefAttributes<View>
+        >
+      >
+    >();
   const { setColorScheme, colorScheme } = useColorScheme();
 
   const getData = async () => {
@@ -139,7 +170,11 @@ const Root = observer(() => {
       >
         <EnemyContext.Provider value={{ enemyState, setEnemy }}>
           <LogsContext.Provider value={{ logsState, setLogs }}>
-            <RootLayout />
+            <PlayerStatusContext.Provider
+              value={{ playerStatusRef, setPlayerStatusRef }}
+            >
+              <RootLayout />
+            </PlayerStatusContext.Provider>
           </LogsContext.Provider>
         </EnemyContext.Provider>
       </PlayerCharacterContext.Provider>

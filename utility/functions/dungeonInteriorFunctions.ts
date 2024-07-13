@@ -29,7 +29,7 @@ export interface enemyTurnCheckProps {
   setEnemyAttackDummy: React.Dispatch<React.SetStateAction<number>>;
   setEnemyTextDummy: React.Dispatch<React.SetStateAction<number>>;
   setEnemyTextString: React.Dispatch<React.SetStateAction<string | undefined>>;
-  toggleFirstBossKillTutorial: () => void;
+  triggerFirstBossKillTutorial: () => void;
 }
 
 export function enemyTurnCheck({
@@ -50,7 +50,7 @@ export function enemyTurnCheck({
   setEnemyTextDummy,
   setEnemyTextString,
   setEnemyAttackDummy,
-  toggleFirstBossKillTutorial,
+  triggerFirstBossKillTutorial,
 }: enemyTurnCheckProps) {
   if (enemyState) {
     if (
@@ -91,7 +91,7 @@ export function enemyTurnCheck({
           gameState.openNextDungeonLevel(thisInstance!.name);
           playerState.bossDefeated();
           if (!gameState.tutorialsShown["First Boss Kill"]) {
-            toggleFirstBossKillTutorial();
+            triggerFirstBossKillTutorial();
           }
         }
         setEnemy(null);

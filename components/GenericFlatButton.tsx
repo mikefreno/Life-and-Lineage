@@ -4,17 +4,19 @@ import { Text } from "./Themed";
 
 type GenericFlatButtonTextProps = {
   onPressFunction: () => void;
-  text: string;
+  text?: string;
   disabledCondition?: boolean;
   backgroundColor?: ColorValue;
   className?: string;
+  children?: ReactNode;
 };
 type GenericFlatButtonNodeProps = {
   onPressFunction: () => void;
-  textNode: ReactNode;
+  textNode?: ReactNode;
   disabledCondition?: boolean;
   backgroundColor?: ColorValue;
   className?: string;
+  children?: ReactNode;
 };
 
 type Props = GenericFlatButtonNodeProps | GenericFlatButtonTextProps;
@@ -40,9 +42,10 @@ const GenericFlatButton = ({
           }`}
           style={{ backgroundColor: backgroundColor }}
         >
+          {props.children ? props.children : null}
           {"text" in props && props.text ? (
             <Text
-              className="text-center text-xl tracking-widest"
+              className="text-center text-lg tracking-widest"
               style={disabledCondition ? { color: "#d4d4d8" } : {}}
             >
               {props.text}

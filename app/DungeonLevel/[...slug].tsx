@@ -16,6 +16,7 @@ import {
   LogsContext,
   EnemyContext,
   PlayerCharacterContext,
+  PlayerStatusContext,
 } from "../_layout";
 import { observer } from "mobx-react-lite";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -41,6 +42,8 @@ import {
   generateTiles,
   getBoundingBox,
 } from "../../components/DungeonMap";
+import GenericFlatButton from "../../components/GenericFlatButton";
+import { tapRef } from "../../utility/functions/misc/tap";
 
 const TILE_SIZE = 40;
 
@@ -50,12 +53,20 @@ const DungeonLevelScreen = observer(() => {
   const gameContext = useContext(GameContext);
   const enemyContext = useContext(EnemyContext);
   const logsContext = useContext(LogsContext);
-  if (!playerCharacterContext || !gameContext || !enemyContext || !logsContext)
+  const playerStatusContext = useContext(PlayerStatusContext);
+  if (
+    !playerCharacterContext ||
+    !gameContext ||
+    !enemyContext ||
+    !logsContext ||
+    !playerStatusContext
+  )
     throw new Error("missing context");
   const { playerState } = playerCharacterContext;
   const { gameState } = gameContext;
   const { enemyState, setEnemy } = enemyContext;
   const { logsState } = logsContext;
+  const { playerStatusRef } = playerStatusContext;
 
   const { slug } = useLocalSearchParams();
   if (!slug) {
@@ -116,8 +127,6 @@ const DungeonLevelScreen = observer(() => {
     offsetX: 0,
     offsetY: 0,
   });
-  const [showFirstBossKillTutorial, setShowFirstBossKillTutorial] =
-    useState<boolean>(false);
 
   const [currentPosition, setCurrentPosition] = useState<Tile | null>(null);
   const pouchRef = useRef<View>(null);
@@ -360,7 +369,7 @@ const DungeonLevelScreen = observer(() => {
         setEnemyAttackDummy: setEnemyAttackDummy,
         setEnemyTextDummy: setEnemyTextDummy,
         setEnemyTextString: setEnemyTextString,
-        toggleFirstBossKillTutorial: () => setShowFirstBossKillTutorial(true),
+        triggerFirstBossKillTutorial: () => setShowFirstBossKillTutorial(true),
       };
       if (target instanceof Enemy) {
         if (target.health <= 0 || (target.sanity && target.sanity <= 0)) {
@@ -469,6 +478,7 @@ const DungeonLevelScreen = observer(() => {
         setEnemyAttackDummy: setEnemyAttackDummy,
         setEnemyTextDummy: setEnemyTextDummy,
         setEnemyTextString: setEnemyTextString,
+        triggerFirstBossKillTutorial: () => setShowFirstBossKillTutorial(true),
       };
 
       if (target instanceof Enemy) {
@@ -519,6 +529,8 @@ const DungeonLevelScreen = observer(() => {
           setEnemyAttackDummy: setEnemyAttackDummy,
           setEnemyTextDummy: setEnemyTextDummy,
           setEnemyTextString: setEnemyTextString,
+          triggerFirstBossKillTutorial: () =>
+            setShowFirstBossKillTutorial(true),
         });
       }, 1000 * playerState.minions.length);
     }
@@ -616,6 +628,9 @@ const DungeonLevelScreen = observer(() => {
       (gameState && !gameState.getTutorialState("dungeonInterior")) ?? false,
     );
 
+  const [showFirstBossKillTutorial, setShowFirstBossKillTutorial] =
+    useState<boolean>(false);
+
   useEffect(() => {
     if (!showDungeonInteriorTutorial && gameState) {
       gameState.updateTutorialState("dungeonInterior", true);
@@ -675,19 +690,22 @@ const DungeonLevelScreen = observer(() => {
             body: "And remember fleeing (top left) can save you.",
           }}
         />
-        <TutorialModal
-          isVisibleCondition={false}
-          backFunction={function (): void {
-            throw new Error("Function not implemented.");
-          }}
-          onCloseFunction={function (): void {
-            throw new Error("Function not implemented.");
-          }}
-          pageOne={{
-            title: "",
-            body: "",
-          }}
-        />
+        <GenericModal
+          isVisibleCondition={showFirstBossKillTutorial}
+          backFunction={() => setShowFirstBossKillTutorial(false)}
+        >
+          <View>
+            <Text></Text>
+            <GenericFlatButton
+              onPressFunction={() => {
+                setShowFirstBossKillTutorial(false);
+                setTimeout(() => tapRef(playerStatusRef), 500);
+              }}
+            >
+              <Text>Show Me</Text>
+            </GenericFlatButton>
+          </View>
+        </GenericModal>
         <FleeModal
           playerState={playerState}
           enemyState={enemyState}
