@@ -68,23 +68,8 @@ export const LogsContext = createContext<
 
 export const PlayerStatusContext = createContext<
   | {
-      playerStatusRef:
-        | React.RefObject<
-            React.ForwardRefExoticComponent<
-              PressableProps & React.RefAttributes<View>
-            >
-          >
-        | undefined;
-      setPlayerStatusRef: React.Dispatch<
-        React.SetStateAction<
-          | React.RefObject<
-              React.ForwardRefExoticComponent<
-                PressableProps & React.RefAttributes<View>
-              >
-            >
-          | undefined
-        >
-      >;
+      playerStatusRef: React.RefObject<View> | undefined;
+      setPlayerStatusRef: React.Dispatch<React.RefObject<View>>;
     }
   | undefined
 >(undefined); // literally only used for a single tutorial... no idea if there is a better way to do this
@@ -102,13 +87,7 @@ const Root = observer(() => {
   const [loading, setLoading] = useState(true);
   const [gameDate, setGameDate] = useState<string>("");
   const [playerStatusRef, setPlayerStatusRef] =
-    useState<
-      React.RefObject<
-        React.ForwardRefExoticComponent<
-          PressableProps & React.RefAttributes<View>
-        >
-      >
-    >();
+    useState<React.RefObject<View>>();
   const { setColorScheme, colorScheme } = useColorScheme();
 
   const getData = async () => {

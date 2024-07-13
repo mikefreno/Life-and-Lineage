@@ -6,7 +6,13 @@ module.exports = {
   theme: {
     extend: {
       boxShadow: {
-        diffuse: "0px 5px 20px rgba(0, 0, 0, 0.15)",
+        diffuse: "0px 5px 10px rgba(0, 0, 0, 0.05)",
+        "diffuse-top": "0px -5px 10px rgba(0, 0, 0, 0.05)",
+      },
+      colors: {
+        zinc: {
+          150: "rgb(236 236 238)",
+        },
       },
     },
   },

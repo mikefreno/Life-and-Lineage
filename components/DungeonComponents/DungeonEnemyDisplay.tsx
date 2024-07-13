@@ -141,7 +141,7 @@ export default function DungeonEnemyDisplay({
           >
             <EnemyImage creatureSpecies={enemyState.creatureSpecies} />
           </Animated.View>
-          <View className="absolute -mt-[40vh]">
+          <View className="absolute -ml-[10vw]">
             <EnemyHealingAnimationBox showHealAnimationDummy={enemyHealDummy} />
           </View>
           <Animated.View

@@ -9,18 +9,15 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { GameContext } from "../_layout";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
-import { Pressable, StyleSheet, View, Platform } from "react-native";
+import { Pressable, View } from "react-native";
 import { useVibration } from "../../utility/customHooks";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { BlurView } from "expo-blur";
-import { useColorScheme } from "nativewind";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 
 export default function MedicalScreen() {
   const gameContext = useContext(GameContext);
   const isFocused = useIsFocused();
-  const { colorScheme } = useColorScheme();
 
   if (!gameContext) {
     throw new Error("Missing Context");

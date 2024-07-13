@@ -91,12 +91,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
   const { colorScheme } = useColorScheme();
   const vibration = useVibration();
 
-  const pressableRef =
-    useRef<
-      React.ForwardRefExoticComponent<
-        PressableProps & React.RefAttributes<View>
-      >
-    >(null);
+  const pressableRef = useRef<View>(null);
 
   useEffect(() => {
     setLocalHealthMax(playerState?.getMaxHealth());
@@ -667,7 +662,7 @@ const PlayerStatus = observer(({ hideGold = false }: PlayerStatus) => {
         <Pressable
           ref={pressableRef}
           onPress={() => setShowDetailedView(true)}
-          className="absolute mt-3 z-50 w-full border-t border-zinc-200 dark:border-zinc-600"
+          className="absolute mt-3 shadow-diffuse-top z-50 w-full border-t border-zinc-200 dark:border-zinc-600"
         >
           <BlurView
             blurReductionFactor={8}

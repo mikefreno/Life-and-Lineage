@@ -20,7 +20,7 @@ export default function BattleTabControls({
       <Pressable
         className={`mx-2 w-32 rounded py-4 ${
           battleTab == "attacksOrNavigation"
-            ? "bg-zinc-100 dark:bg-zinc-800"
+            ? "bg-zinc-150 dark:bg-zinc-800"
             : "active:bg-zinc-200 dark:active:bg-zinc-700"
         }`}
         onPress={() => {
@@ -35,7 +35,7 @@ export default function BattleTabControls({
       <Pressable
         className={`mx-2 w-32 rounded py-4 ${
           battleTab == "equipment"
-            ? "border-zinc-200 bg-zinc-100 dark:border-zinc-900 dark:bg-zinc-800"
+            ? " bg-zinc-150 dark:bg-zinc-800"
             : "active:bg-zinc-200 dark:active:bg-zinc-700"
         }`}
         onPress={() => {
@@ -48,7 +48,7 @@ export default function BattleTabControls({
       <Pressable
         className={`align mx-2 w-32 rounded py-4 ${
           battleTab == "log"
-            ? "bg-zinc-100 dark:bg-zinc-800"
+            ? "bg-zinc-150 dark:bg-zinc-800"
             : "active:bg-zinc-200 dark:active:bg-zinc-700"
         }`}
         onPress={() => {

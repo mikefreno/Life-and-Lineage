@@ -794,7 +794,7 @@ const DungeonLevelScreen = observer(() => {
                 enemyTextFadeAnimation={enemyTextFadeAnimation}
               />
             ) : (
-              <View className="flex h-[40%] pt-8" />
+              <View className="flex h-[40%] pt-8" /> // TODO: Add loading animation
             )}
             <Pressable
               ref={pouchRef}
