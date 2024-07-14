@@ -5,7 +5,7 @@ import { CharacterImage } from "../../components/CharacterImage";
 import shopObjects from "../../assets/json/shops.json";
 import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
-import { GameContext } from "../_layout";
+import { GameContext, PlayerStatusCompactContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
@@ -17,13 +17,17 @@ import { calculateAge } from "../../utility/functions/misc/age";
 
 export default function ShopsScreen() {
   const gameData = useContext(GameContext);
-  if (!gameData) throw new Error("missing gameData");
-  const { gameState } = gameData;
+  const playerStatusCompact = useContext(PlayerStatusCompactContext);
+  if (!gameData || !playerStatusCompact) throw new Error("missing gameData");
+
   const vibration = useVibration();
+  const isFocused = useIsFocused();
+
+  const { gameState } = gameData;
+  const { isCompact } = playerStatusCompact;
   const [showShopTutorial, setShowShopTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("shops")) ?? false,
   );
-  const isFocused = useIsFocused();
 
   useEffect(() => {
     if (!showShopTutorial && gameState) {
@@ -155,7 +159,7 @@ export default function ShopsScreen() {
               flexWrap: "wrap",
               alignItems: "flex-start",
               justifyContent: "flex-start",
-              paddingBottom: useBottomTabBarHeight() + 84,
+              paddingBottom: useBottomTabBarHeight() + (isCompact ? 40 : 84),
               paddingTop: useHeaderHeight(),
             }}
           >
@@ -166,7 +170,7 @@ export default function ShopsScreen() {
           className="absolute z-50 w-full"
           style={{ bottom: useBottomTabBarHeight() + 75 }}
         >
-          <PlayerStatus />
+          <PlayerStatus hidden hideGold />
         </NonThemedView>
       </>
     );

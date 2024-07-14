@@ -45,6 +45,7 @@ interface FleeModalProps {
   setEnemyAttackDummy: React.Dispatch<React.SetStateAction<number>>;
   setEnemyTextDummy: React.Dispatch<React.SetStateAction<number>>;
   setEnemyTextString: React.Dispatch<React.SetStateAction<string | undefined>>;
+  triggerFirstBossKillTutorial: () => void;
 }
 export default function FleeModal({
   playerState,
@@ -71,6 +72,7 @@ export default function FleeModal({
   thisDungeon,
   thisInstance,
   gameState,
+  triggerFirstBossKillTutorial,
 }: FleeModalProps) {
   const vibration = useVibration();
 
@@ -130,6 +132,7 @@ export default function FleeModal({
             setEnemyAttackDummy: setEnemyAttackDummy,
             setEnemyTextDummy: setEnemyTextDummy,
             setEnemyTextString: setEnemyTextString,
+            triggerFirstBossKillTutorial: triggerFirstBossKillTutorial,
           });
         }, 1000 * playerState.minions.length);
       }

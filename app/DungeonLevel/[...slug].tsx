@@ -731,6 +731,9 @@ const DungeonLevelScreen = observer(() => {
           setEnemyAttackDummy={setEnemyAttackDummy}
           setEnemyTextDummy={setEnemyTextDummy}
           setEnemyTextString={setEnemyTextString}
+          triggerFirstBossKillTutorial={() =>
+            setShowFirstBossKillTutorial(true)
+          }
         />
         <DroppedItemsModal
           setLeftBehindDrops={setLeftBehindDrops}

@@ -4,7 +4,11 @@ import { router, usePathname } from "expo-router";
 import PlayerStatus from "../../components/PlayerStatus";
 import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
-import { GameContext, PlayerCharacterContext } from "../_layout";
+import {
+  GameContext,
+  PlayerCharacterContext,
+  PlayerStatusCompactContext,
+} from "../_layout";
 import { useVibration } from "../../utility/customHooks";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
@@ -36,11 +40,13 @@ const levelOffset: Record<string, number> = {
 const DungeonScreen = observer(() => {
   const gameContext = useContext(GameContext);
   const playerContext = useContext(PlayerCharacterContext);
-  if (!gameContext || !playerContext) {
+  const playerStatusCompact = useContext(PlayerStatusCompactContext);
+  if (!gameContext || !playerContext || !playerStatusCompact) {
     throw new Error("Missing Context");
   }
   const { gameState } = gameContext;
   const { playerState } = playerContext;
+  const { isCompact } = playerStatusCompact;
   const [instances, _] = useState<DungeonInstance[]>(
     gameState?.dungeonInstances.filter(
       (instance) => instance.name !== "training grounds",
@@ -103,13 +109,13 @@ const DungeonScreen = observer(() => {
           The dungeon is a dangerous place. Be careful.
         </Text>
       </View>
-      <View className="flex-1 px-8">
-        <ScrollView
-          style={{
-            paddingTop: useHeaderHeight() + 74,
-            paddingBottom: useBottomTabBarHeight() + 74,
-          }}
-        >
+      <View
+        className="flex-1 px-8"
+        style={{
+          paddingTop: useHeaderHeight() + 64,
+        }}
+      >
+        <ScrollView>
           {instances.map((dungeonInstance, dungeonInstanceIdx) => (
             <View
               key={dungeonInstanceIdx}
@@ -189,13 +195,17 @@ const DungeonScreen = observer(() => {
               </NonThemedView>
             </View>
           ))}
+          <View
+            style={{ height: useBottomTabBarHeight() + (isCompact ? 48 : 78) }}
+          />
+          {/* ^ Bottom Pad ^ */}
         </ScrollView>
       </View>
       <NonThemedView
         className="absolute z-50 w-full"
         style={{ bottom: useBottomTabBarHeight() + 75 }}
       >
-        <PlayerStatus />
+        <PlayerStatus hidden hideGold />
       </NonThemedView>
     </>
   );

@@ -74,6 +74,14 @@ export const PlayerStatusContext = createContext<
   | undefined
 >(undefined); // literally only used for a single tutorial... no idea if there is a better way to do this
 
+export const PlayerStatusCompactContext = createContext<
+  | {
+      isCompact: boolean;
+      setIsCompact: React.Dispatch<React.SetStateAction<boolean>>;
+    }
+  | undefined
+>(undefined);
+
 Sentry.init({
   dsn: "https://2cff54f8aeb50bcb7151c159cc40fe1b@o4506630160187392.ingest.sentry.io/4506630163398656",
   debug: process.env.NODE_ENV === "development", // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
@@ -88,6 +96,7 @@ const Root = observer(() => {
   const [gameDate, setGameDate] = useState<string>("");
   const [playerStatusRef, setPlayerStatusRef] =
     useState<React.RefObject<View>>();
+  const [playerStatusCompact, setPlayerStatusCompact] = useState<boolean>(true);
   const { setColorScheme, colorScheme } = useColorScheme();
 
   const getData = async () => {
@@ -152,7 +161,14 @@ const Root = observer(() => {
             <PlayerStatusContext.Provider
               value={{ playerStatusRef, setPlayerStatusRef }}
             >
-              <RootLayout />
+              <PlayerStatusCompactContext.Provider
+                value={{
+                  isCompact: playerStatusCompact,
+                  setIsCompact: setPlayerStatusCompact,
+                }}
+              >
+                <RootLayout />
+              </PlayerStatusCompactContext.Provider>
             </PlayerStatusContext.Provider>
           </LogsContext.Provider>
         </EnemyContext.Provider>

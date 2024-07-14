@@ -3,7 +3,11 @@ import LaborTask from "../../components/LaborTask";
 import { ScrollView, View, Text } from "../../components/Themed";
 import { View as NonThemedView, Pressable } from "react-native";
 import PlayerStatus from "../../components/PlayerStatus";
-import { GameContext, PlayerCharacterContext } from "../_layout";
+import {
+  GameContext,
+  PlayerCharacterContext,
+  PlayerStatusCompactContext,
+} from "../_layout";
 import { useContext, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import Modal from "react-native-modal";
@@ -18,10 +22,12 @@ import { useHeaderHeight } from "@react-navigation/elements";
 const EarnScreen = observer(() => {
   const playerCharacterContext = useContext(PlayerCharacterContext);
   const gameContext = useContext(GameContext);
-  if (!playerCharacterContext || !gameContext) {
+  const playerStatusCompact = useContext(PlayerStatusCompactContext);
+  if (!playerCharacterContext || !gameContext || !playerStatusCompact) {
     throw new Error("missing context");
   }
   const { playerState } = playerCharacterContext;
+  const { isCompact } = playerStatusCompact;
   const { gameState } = gameContext;
 
   const [showingRejection, setShowingRejection] = useState<boolean>(false);
@@ -127,7 +133,7 @@ const EarnScreen = observer(() => {
             className="px-2"
             style={{
               paddingTop: useHeaderHeight(),
-              paddingBottom: useBottomTabBarHeight() + 80,
+              paddingBottom: useBottomTabBarHeight() + (isCompact ? 50 : 80),
             }}
           >
             {jobs
@@ -150,7 +156,7 @@ const EarnScreen = observer(() => {
           className="absolute z-50 w-full"
           style={{ bottom: useBottomTabBarHeight() + 75 }}
         >
-          <PlayerStatus />
+          <PlayerStatus hidden hideGold />
         </NonThemedView>
       </View>
     </>

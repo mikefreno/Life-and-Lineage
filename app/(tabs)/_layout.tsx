@@ -4,7 +4,6 @@ import {
   Platform,
   Pressable,
   Image,
-  View,
 } from "react-native";
 import Colors from "../../constants/Colors";
 import Wand from "../../assets/icons/WandIcon";
@@ -28,6 +27,7 @@ import { useVibration } from "../../utility/customHooks";
 import BowlingBallAndPin from "../../assets/icons/BowlingBallAndPin";
 import { BlurView } from "expo-blur";
 import { StyleSheet } from "react-native";
+import PlayerStatus from "../../components/PlayerStatus";
 
 export default function TabLayout() {
   const playerCharacterContext = useContext(PlayerCharacterContext);
@@ -42,8 +42,8 @@ export default function TabLayout() {
     <>
       <Tabs
         screenOptions={{
-          tabBarBackground: () =>
-            Platform.OS == "android" ? (
+          tabBarBackground: () => (
+            <>
               <BlurView
                 blurReductionFactor={8}
                 tint={
@@ -57,9 +57,9 @@ export default function TabLayout() {
                 style={StyleSheet.absoluteFill}
                 experimentalBlurMethod={"dimezisBlurView"}
               />
-            ) : (
-              <View style={{ backgroundColor: "transparent" }} />
-            ),
+              <PlayerStatus home hideGold />
+            </>
+          ),
           tabBarActiveTintColor: Colors[colorScheme as "light" | "dark"].tint,
           tabBarLabelStyle: { fontFamily: "PixelifySans" },
           tabBarStyle:
@@ -68,8 +68,15 @@ export default function TabLayout() {
                   paddingHorizontal: 10,
                   position: "absolute",
                   borderTopWidth: 0,
+                  paddingTop: 8,
+                  height: 84,
                 }
-              : { position: "absolute", borderTopWidth: 0 },
+              : {
+                  position: "absolute",
+                  borderTopWidth: 0,
+                  paddingTop: 8,
+                  height: 84,
+                },
           tabBarButton: (props) => {
             const onPressWithVibration = (event: GestureResponderEvent) => {
               vibration({ style: "light" });

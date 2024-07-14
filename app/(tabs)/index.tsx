@@ -7,7 +7,11 @@ import Necromancer from "../../assets/icons/NecromancerSkull";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
 import blessingDisplay from "../../components/BlessingsDisplay";
 import { useColorScheme } from "nativewind";
-import { GameContext, PlayerCharacterContext } from "../_layout";
+import {
+  GameContext,
+  PlayerCharacterContext,
+  PlayerStatusCompactContext,
+} from "../_layout";
 import { observer } from "mobx-react-lite";
 import { Dimensions } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
@@ -22,6 +26,8 @@ const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
   const playerStateData = useContext(PlayerCharacterContext);
   const gameData = useContext(GameContext);
+  const playerStatusCompact = useContext(PlayerStatusCompactContext);
+
   const headTarget = useRef<View>(null);
   const bodyTarget = useRef<View>(null);
   const mainHandTarget = useRef<View>(null);
@@ -30,9 +36,11 @@ const HomeScreen = observer(() => {
 
   const deviceHeight = Dimensions.get("window").height;
 
-  if (!playerStateData || !gameData) throw new Error("missing contexts");
+  if (!playerStateData || !gameData || !playerStatusCompact)
+    throw new Error("missing contexts");
   const { playerState } = playerStateData;
   const { gameState } = gameData;
+  const { isCompact } = playerStatusCompact;
   const [showIntroTutorial, setShowIntroTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("intro")) ?? false,
   );
@@ -85,7 +93,7 @@ const HomeScreen = observer(() => {
         <ThemedView
           className="flex-1"
           style={{
-            paddingBottom: useBottomTabBarHeight() + 70,
+            paddingBottom: useBottomTabBarHeight() + (isCompact ? 30 : 70),
           }}
         >
           <View className="-mx-2 py-1">
@@ -158,7 +166,7 @@ const HomeScreen = observer(() => {
           className="absolute z-50 w-full"
           style={{ bottom: useBottomTabBarHeight() + 75 }}
         >
-          <PlayerStatus />
+          <PlayerStatus hidden hideGold />
         </View>
       </>
     );

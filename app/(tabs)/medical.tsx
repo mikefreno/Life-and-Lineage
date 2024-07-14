@@ -6,7 +6,7 @@ import otherOptions from "../../assets/json/medicalOptions/otherOptions.json";
 import MedicalOption from "../../components/MedicalOptions";
 import PlayerStatus from "../../components/PlayerStatus";
 import { useContext, useEffect, useRef, useState } from "react";
-import { GameContext } from "../_layout";
+import { GameContext, PlayerStatusCompactContext } from "../_layout";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { Pressable, View } from "react-native";
@@ -17,11 +17,14 @@ import GenericStrikeAround from "../../components/GenericStrikeAround";
 
 export default function MedicalScreen() {
   const gameContext = useContext(GameContext);
-  const isFocused = useIsFocused();
-
-  if (!gameContext) {
+  const playerStatusCompact = useContext(PlayerStatusCompactContext);
+  if (!gameContext || !playerStatusCompact) {
     throw new Error("Missing Context");
   }
+
+  const isFocused = useIsFocused();
+
+  const { isCompact } = playerStatusCompact;
   const { gameState } = gameContext;
   const [showMedicalTutorial, setShowMedicalTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("medical")) ?? false,
@@ -93,10 +96,10 @@ export default function MedicalScreen() {
         }}
       />
       <View
-        className="absolute z-10 h-12 w-full shadow-diffuse"
+        className="absolute z-10 h-12 w-full shadow-soft"
         style={{ top: useHeaderHeight() }}
       >
-        <ThemedView className="flex flex-row justify-evenly mx-4 pb-1 pt-4 -mt-2 rounded-xl">
+        <ThemedView className="flex flex-row justify-evenly mx-3 pb-1 pt-4 -mt-2 rounded-xl">
           <Pressable
             onPress={() => {
               vibration({ style: "light" });
@@ -160,7 +163,7 @@ export default function MedicalScreen() {
           <ThemedView
             className="px-2"
             style={{
-              paddingBottom: useBottomTabBarHeight() + 80,
+              paddingBottom: useBottomTabBarHeight() + (isCompact ? 50 : 80),
               paddingTop: useHeaderHeight() + 48,
             }}
           >
@@ -235,7 +238,7 @@ export default function MedicalScreen() {
           className="absolute z-50 w-full"
           style={{ bottom: useBottomTabBarHeight() + 75 }}
         >
-          <PlayerStatus />
+          <PlayerStatus hidden hideGold />
         </View>
       </ThemedView>
     </>

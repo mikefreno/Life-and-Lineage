@@ -1,6 +1,10 @@
 import { Text, View as ThemedView } from "../../components/Themed";
 import SpellDetails from "../../components/SpellDetails";
-import { GameContext, PlayerCharacterContext } from "../_layout";
+import {
+  GameContext,
+  PlayerCharacterContext,
+  PlayerStatusCompactContext,
+} from "../_layout";
 import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { View, Platform, ScrollView } from "react-native";
@@ -23,11 +27,15 @@ import {
 const SpellsScreen = observer(() => {
   const playerCharacterData = useContext(PlayerCharacterContext);
   const gameData = useContext(GameContext);
+  const playerStatusCompact = useContext(PlayerStatusCompactContext);
+
   const { colorScheme } = useColorScheme();
   const isFocused = useIsFocused();
 
-  if (!playerCharacterData || !gameData) throw new Error("missing contexts");
+  if (!playerCharacterData || !gameData || !playerStatusCompact)
+    throw new Error("missing contexts");
 
+  const { isCompact } = playerStatusCompact;
   const { playerState } = playerCharacterData;
   const { gameState } = gameData;
   const [spells, setSpells] = useState(playerState?.getSpells());
@@ -166,7 +174,9 @@ const SpellsScreen = observer(() => {
       />
       <ThemedView
         className="flex-1"
-        style={{ paddingBottom: useBottomTabBarHeight() + 65 }}
+        style={{
+          paddingBottom: useBottomTabBarHeight() + (isCompact ? 34 : 65),
+        }}
       >
         <View className="flex-1 pt-4 justify-evenly px-4">
           {spells && spells.length > 0 ? (
@@ -199,7 +209,7 @@ const SpellsScreen = observer(() => {
         className="absolute z-50 w-full"
         style={{ bottom: useBottomTabBarHeight() + 75 }}
       >
-        <PlayerStatus />
+        <PlayerStatus hidden hideGold />
       </View>
     </>
   );
