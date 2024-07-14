@@ -16,6 +16,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
     "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-masked-view/masked-view": "0.3.1",
     "@react-navigation/native": "^6.0.2",
     "@sentry/react-native": "~5.22.0",
     "expo": "~51.0.17",
@@ -44,6 +45,7 @@
     "react-dom": "18.2.0",
     "react-native": "0.74.3",
     "react-native-draggable": "git@github.com:mikefreno/react-native-draggable.git",
+    "react-native-easing-gradient": "^1.1.1",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-modal": "^13.0.1",
     "react-native-reanimated": "~3.10.1",

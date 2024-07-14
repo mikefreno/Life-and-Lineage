@@ -175,7 +175,7 @@ const SpellsScreen = observer(() => {
       <ThemedView
         className="flex-1"
         style={{
-          paddingBottom: useBottomTabBarHeight() + (isCompact ? 34 : 65),
+          paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
         }}
       >
         <View className="flex-1 pt-4 justify-evenly px-4">
@@ -197,20 +197,14 @@ const SpellsScreen = observer(() => {
               </Text>
             </View>
           )}
-          <View className="h-1/2 min-h-[280]">
+          <View className="min-h-[280]">
             <GenericStrikeAround text={"Proficiencies"} />
-            <View className="flex items-center pb-4">
+            <View className="flex items-center">
               {magicProficiencySection(playerState?.magicProficiencies)}
             </View>
           </View>
         </View>
       </ThemedView>
-      <View
-        className="absolute z-50 w-full"
-        style={{ bottom: useBottomTabBarHeight() + 75 }}
-      >
-        <PlayerStatus hidden hideGold />
-      </View>
     </>
   );
 });

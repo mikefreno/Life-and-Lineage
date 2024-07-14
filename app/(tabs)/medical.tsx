@@ -163,7 +163,7 @@ export default function MedicalScreen() {
           <ThemedView
             className="px-2"
             style={{
-              paddingBottom: useBottomTabBarHeight() + (isCompact ? 50 : 80),
+              paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
               paddingTop: useHeaderHeight() + 48,
             }}
           >
@@ -234,12 +234,6 @@ export default function MedicalScreen() {
             </View>
           </ThemedView>
         </ScrollView>
-        <View
-          className="absolute z-50 w-full"
-          style={{ bottom: useBottomTabBarHeight() + 75 }}
-        >
-          <PlayerStatus hidden hideGold />
-        </View>
       </ThemedView>
     </>
   );

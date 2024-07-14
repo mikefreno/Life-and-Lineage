@@ -12,7 +12,7 @@ import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
 import { fullSave, loadGame, loadPlayer } from "../utility/functions/save_load";
-import { View, Text, Platform, StyleSheet, PressableProps } from "react-native";
+import { View, Text, Platform, StyleSheet } from "react-native";
 import { reaction } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";

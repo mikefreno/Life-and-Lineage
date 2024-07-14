@@ -159,19 +159,13 @@ export default function ShopsScreen() {
               flexWrap: "wrap",
               alignItems: "flex-start",
               justifyContent: "flex-start",
-              paddingBottom: useBottomTabBarHeight() + (isCompact ? 40 : 84),
+              paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
               paddingTop: useHeaderHeight(),
             }}
           >
             {gameState.shops.map((shop) => renderItem(shop))}
           </View>
         </ScrollView>
-        <NonThemedView
-          className="absolute z-50 w-full"
-          style={{ bottom: useBottomTabBarHeight() + 75 }}
-        >
-          <PlayerStatus hidden hideGold />
-        </NonThemedView>
       </>
     );
   }

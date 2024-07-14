@@ -93,7 +93,7 @@ const HomeScreen = observer(() => {
         <ThemedView
           className="flex-1"
           style={{
-            paddingBottom: useBottomTabBarHeight() + (isCompact ? 30 : 70),
+            paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
           }}
         >
           <View className="-mx-2 py-1">
@@ -162,12 +162,6 @@ const HomeScreen = observer(() => {
             />
           </View>
         </ThemedView>
-        <View
-          className="absolute z-50 w-full"
-          style={{ bottom: useBottomTabBarHeight() + 75 }}
-        >
-          <PlayerStatus hidden hideGold />
-        </View>
       </>
     );
   }

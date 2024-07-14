@@ -1,7 +1,6 @@
 import { Text, View } from "../../components/Themed";
 import { Pressable, ScrollView, View as NonThemedView } from "react-native";
 import { router, usePathname } from "expo-router";
-import PlayerStatus from "../../components/PlayerStatus";
 import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import {
@@ -196,17 +195,11 @@ const DungeonScreen = observer(() => {
             </View>
           ))}
           <View
-            style={{ height: useBottomTabBarHeight() + (isCompact ? 48 : 78) }}
+            style={{ height: useBottomTabBarHeight() + (isCompact ? 0 : 28) }}
           />
           {/* ^ Bottom Pad ^ */}
         </ScrollView>
       </View>
-      <NonThemedView
-        className="absolute z-50 w-full"
-        style={{ bottom: useBottomTabBarHeight() + 75 }}
-      >
-        <PlayerStatus hidden hideGold />
-      </NonThemedView>
     </>
   );
 });

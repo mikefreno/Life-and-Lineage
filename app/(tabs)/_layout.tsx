@@ -4,6 +4,7 @@ import {
   Platform,
   Pressable,
   Image,
+  View,
 } from "react-native";
 import Colors from "../../constants/Colors";
 import Wand from "../../assets/icons/WandIcon";
@@ -21,21 +22,31 @@ import PaladinHammer from "../../assets/icons/PaladinHammer";
 import Necromancer from "../../assets/icons/NecromancerSkull";
 import { useColorScheme } from "nativewind";
 import { useContext } from "react";
-import { PlayerCharacterContext } from "../_layout";
+import {
+  PlayerCharacterContext,
+  PlayerStatusCompactContext,
+  PlayerStatusContext,
+} from "../_layout";
 import GraduationCapIcon from "../../assets/icons/GraduationCap";
 import { useVibration } from "../../utility/customHooks";
 import BowlingBallAndPin from "../../assets/icons/BowlingBallAndPin";
 import { BlurView } from "expo-blur";
 import { StyleSheet } from "react-native";
 import PlayerStatus from "../../components/PlayerStatus";
+import { LinearGradientBlur } from "../../components/LinearGradientBlur";
+import { tapRef } from "../../utility/functions/misc/tap";
 
 export default function TabLayout() {
   const playerCharacterContext = useContext(PlayerCharacterContext);
-  if (!playerCharacterContext) {
+  const playerStatusContext = useContext(PlayerStatusContext);
+  const playerStatusCompact = useContext(PlayerStatusCompactContext);
+  if (!playerCharacterContext || !playerStatusContext || !playerStatusCompact) {
     throw new Error("missing context");
   }
   const { colorScheme } = useColorScheme();
   const { playerState } = playerCharacterContext;
+  const { playerStatusRef } = playerStatusContext;
+  const { isCompact } = playerStatusCompact;
   const vibration = useVibration();
 
   return (
@@ -44,45 +55,60 @@ export default function TabLayout() {
         screenOptions={{
           tabBarBackground: () => (
             <>
-              <BlurView
-                blurReductionFactor={8}
-                tint={
-                  Platform.OS == "android"
-                    ? colorScheme == "light"
-                      ? "light"
-                      : "dark"
-                    : "default"
-                }
-                intensity={100}
-                style={StyleSheet.absoluteFill}
-                experimentalBlurMethod={"dimezisBlurView"}
-              />
               <PlayerStatus home hideGold />
+              <LinearGradientBlur />
             </>
           ),
           tabBarActiveTintColor: Colors[colorScheme as "light" | "dark"].tint,
           tabBarLabelStyle: { fontFamily: "PixelifySans" },
-          tabBarStyle:
-            Platform.OS === "android"
-              ? {
-                  paddingHorizontal: 10,
-                  position: "absolute",
-                  borderTopWidth: 0,
-                  paddingTop: 8,
-                  height: 84,
-                }
-              : {
-                  position: "absolute",
-                  borderTopWidth: 0,
-                  paddingTop: 8,
-                  height: 84,
-                },
+          tabBarStyle: {
+            position: "absolute",
+            borderTopWidth: 0,
+            height: 120,
+            ...(Platform.OS === "android" && { paddingHorizontal: 10 }),
+          },
           tabBarButton: (props) => {
             const onPressWithVibration = (event: GestureResponderEvent) => {
               vibration({ style: "light" });
               if (props.onPress) props.onPress(event);
             };
-            return <Pressable {...props} onPress={onPressWithVibration} />;
+            const isHome = props.accessibilityLabel?.includes("Home");
+            const isMedical = props.accessibilityLabel?.includes("Medical");
+            return (
+              <View className="flex flex-col w-1/6">
+                <Pressable
+                  onPress={() => tapRef(playerStatusRef)}
+                  style={[
+                    {
+                      height: isCompact ? 44 : 72,
+                      zIndex: 1000,
+                      marginLeft: isHome ? 12 : 0,
+                      borderTopLeftRadius: isHome ? 12 : 0,
+                      borderBottomLeftRadius: isHome ? 12 : 0,
+                      marginRight: isMedical ? 12 : 0,
+                      borderBottomRightRadius: isMedical ? 12 : 0,
+                      borderTopRightRadius: isMedical ? 12 : 0,
+                      marginTop: isCompact ? 0 : -28,
+                    },
+                  ]}
+                />
+                {/* ^ The above is to trigger the player status ^ */}
+                <Pressable
+                  onPress={onPressWithVibration}
+                  accessibilityLabel={props.accessibilityLabel}
+                  accessibilityRole={props.accessibilityRole}
+                  accessibilityState={props.accessibilityState}
+                  style={[
+                    {
+                      height: 44,
+                      zIndex: 1000,
+                    },
+                  ]}
+                >
+                  {props.children}
+                </Pressable>
+              </View>
+            );
           },
         }}
       >
