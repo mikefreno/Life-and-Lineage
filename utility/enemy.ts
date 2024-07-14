@@ -1,7 +1,8 @@
 import enemies from "../assets/json/enemy.json";
 import { Enemy } from "../classes/creatures";
+import { type beingType } from "./types";
 
-function pickRandomEnemyJSON(instance: string, level: number) {
+function pickRandomEnemyJSON(instance: string, level: number | string) {
   const enemiesInThisInstance = enemies.filter((enemy) =>
     enemy.appearsIn.includes(instance),
   );
@@ -18,6 +19,7 @@ export function getNumberInRange(minimum: number, maximum: number) {
 
 export function enemyGenerator(instance: string, level: number) {
   const enemyJSON = pickRandomEnemyJSON(instance, level);
+  if(enemyJSON){
   const enemyHealth = getNumberInRange(
     enemyJSON.healthRange.minimum,
     enemyJSON.healthRange.maximum,
@@ -29,7 +31,7 @@ export function enemyGenerator(instance: string, level: number) {
   );
 
   const enemy = new Enemy({
-    beingType: enemyJSON.beingType,
+    beingType: enemyJSON.beingType as beingType,
     creatureSpecies: enemyJSON.name,
     health: enemyHealth,
     healthMax: enemyHealth,
@@ -43,6 +45,7 @@ export function enemyGenerator(instance: string, level: number) {
     attacks: enemyJSON.attacks,
   });
   return enemy;
+  }
 }
 
 type ImageInfo = {

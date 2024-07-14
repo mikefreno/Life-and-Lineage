@@ -183,12 +183,10 @@ const RootLayout = observer(() => {
   });
   const playerCharacterData = useContext(PlayerCharacterContext);
   const gameData = useContext(GameContext);
-  const enemyData = useContext(EnemyContext);
-  if (!gameData || !playerCharacterData || !enemyData) {
+  if (!gameData || !playerCharacterData) {
     throw new Error("missing context");
   }
   const { playerState } = playerCharacterData;
-  const { setEnemy } = enemyData;
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
   const [navbarLoad, setNavbarLoad] = useState(false);
@@ -207,9 +205,6 @@ const RootLayout = observer(() => {
         }
         router.replace("/DeathScreen");
       } else if (playerState.currentDungeon && firstLoad) {
-        if (playerState.savedEnemy) {
-          setEnemy(playerState.savedEnemy);
-        }
         while (router.canGoBack()) {
           router.back();
         }
@@ -217,6 +212,7 @@ const RootLayout = observer(() => {
           `/DungeonLevel/${playerState.currentDungeon?.instance}/${playerState.currentDungeon?.level}`,
         );
       }
+      console.log("current:", playerState?.currentDungeon);
       setFirstLoad(false);
     }
   }, [fontLoaded, navbarLoad, playerState]);
@@ -237,13 +233,12 @@ const RootLayout = observer(() => {
 
   useEffect(() => {
     getAndSetNavBar();
-  }, []);
+  }, [colorScheme]);
 
   async function getAndSetNavBar() {
     if (Platform.OS == "android") {
       if ((await NavigationBar.getVisibilityAsync()) == "visible") {
         await NavigationBar.setPositionAsync("relative");
-        await NavigationBar.setBackgroundColorAsync("transparent");
         await NavigationBar.setBackgroundColorAsync(
           colorScheme == "dark" ? "#18181b" : "#fafafa",
         );

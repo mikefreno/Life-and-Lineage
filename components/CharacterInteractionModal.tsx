@@ -3,11 +3,7 @@ import { View } from "react-native";
 import { Text } from "./Themed";
 import { Character } from "../classes/character";
 import GenericModal from "./GenericModal";
-import {
-  EnemyContext,
-  GameContext,
-  PlayerCharacterContext,
-} from "../app/_layout";
+import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { useContext, useEffect, useState } from "react";
 import { CharacterImage } from "./CharacterImage";
 import { calculateAge } from "../utility/functions/misc/age";
@@ -17,7 +13,6 @@ import GenericFlatButton from "./GenericFlatButton";
 import GenericStrikeAround from "./GenericStrikeAround";
 import { useVibration } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
-import { Enemy } from "../classes/creatures";
 import { useRouter } from "expo-router";
 import { getDaysBetweenDates } from "../utility/functions/misc/date";
 
@@ -38,8 +33,7 @@ export const CharacterInteractionModal = observer(
   }: CharacterInteractionModal) => {
     const playerContext = useContext(PlayerCharacterContext);
     const gameContext = useContext(GameContext);
-    const enemyContext = useContext(EnemyContext);
-    if (!playerContext || !gameContext || !enemyContext) {
+    if (!playerContext || !gameContext) {
       throw new Error("missing context");
     }
     const { playerState } = playerContext;
@@ -57,7 +51,6 @@ export const CharacterInteractionModal = observer(
 
     const router = useRouter();
 
-    const { setEnemy } = enemyContext;
     const vibration = useVibration();
     const characterAge =
       character && gameState
@@ -66,29 +59,10 @@ export const CharacterInteractionModal = observer(
 
     function setFight() {
       if (character && playerState && gameState) {
-        const enemy = new Enemy({
-          beingType: character.beingType,
-          creatureSpecies: character.getFullName(),
-          health: 75 - characterAge / 5,
-          healthMax: 75 - characterAge / 5,
-          sanity: 50,
-          sanityMax: 50,
-          baseArmor: 75 - characterAge ?? undefined,
-          attackPower: 10,
-          energy: 50,
-          energyMax: 50,
-          energyRegen: 10,
-          attacks: ["stab"],
-        });
-        playerState.setInDungeon({
-          state: true,
-          instance: "Personal",
-          level: "Personal Assault",
-        });
-        setEnemy(enemy);
-        playerState.setSavedEnemy(enemy);
         gameState.gameTick(playerState);
-        router.push(`/DungeonLevel/Personal/Personal\ Assault`);
+        router.push(
+          `/DungeonLevel/Personal/Personal\ Assault/${character.getFullName()}`,
+        );
       }
     }
 

@@ -2,7 +2,7 @@ import { Pressable, ScrollView, View } from "react-native";
 import { View as ThemedView, Text } from "../components/Themed";
 import { Activity, BadOutcome, GoodOutcome } from "../utility/types";
 import { useColorScheme } from "nativewind";
-import { flipCoin, rollD20 } from "../utility/functions/roll";
+import { flipCoin } from "../utility/functions/roll";
 import { generateNewCharacter } from "../utility/functions/characterAid";
 import { useContext, useState } from "react";
 import {
@@ -123,7 +123,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
             randomBadOutcome.fight &&
             randomBadOutcome.dungeonTitle
           ) {
-            setFight(randomBadOutcome.fight, randomBadOutcome.dungeonTitle);
+            setFight(randomBadOutcome.dungeonTitle);
           }
           setMetCharacter(null);
           setGoodOutcome(null);
@@ -193,43 +193,15 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
     }
   }
 
-  function setFight(fight: string, dungeonTitle: string) {
-    const enemyJSON = enemies.find((enemy) => enemy.name == fight);
-    if (enemyJSON) {
-      const enemyHealth = getNumberInRange(
-        enemyJSON.healthRange.minimum,
-        enemyJSON.healthRange.maximum,
-      );
+  function setFight(dungeonTitle: string) {
+    setNothingHappened(false);
+    setGoodOutcome(null);
 
-      const enemyAttackPower = getNumberInRange(
-        enemyJSON.attackPowerRange.minimum,
-        enemyJSON.attackPowerRange.maximum,
-      );
-
-      const enemy = new Enemy({
-        creatureSpecies: enemyJSON.name,
-        health: enemyHealth,
-        healthMax: enemyHealth,
-        sanity: enemyJSON.sanity ?? null,
-        sanityMax: enemyJSON.sanity ?? null,
-        baseArmor: enemyJSON.armorValue ?? undefined,
-        attackPower: enemyAttackPower,
-        energy: enemyJSON.energy?.maximum,
-        energyMax: enemyJSON.energy?.maximum,
-        energyRegen: enemyJSON.energy?.regen,
-        attacks: enemyJSON.attacks,
-      });
-      setNothingHappened(false);
-      setGoodOutcome(null);
-
-      setEnemy(enemy);
-      playerState?.setInDungeon({
-        state: true,
-        instance: "Activities",
-        level: dungeonTitle,
-      });
-      playerState?.setSavedEnemy(enemy);
-    }
+    playerState?.setInDungeon({
+      state: true,
+      instance: "Activities",
+      level: dungeonTitle,
+    });
   }
 
   function renderCharacter(character: Character) {

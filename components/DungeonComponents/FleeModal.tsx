@@ -11,6 +11,7 @@ import { enemyTurnCheck } from "../../utility/functions/dungeonInteriorFunctions
 import { Game } from "../../classes/game";
 import { Item } from "../../classes/item";
 import { DungeonInstance, DungeonLevel } from "../../classes/dungeon";
+import { fullSave } from "../../utility/functions/save_load";
 
 interface FleeModalProps {
   playerState: PlayerCharacter;
@@ -103,10 +104,10 @@ export default function FleeModal({
           }
           playerState.setInDungeon({ state: false });
           setEnemy(null);
-          playerState.setSavedEnemy(null);
           if (slug[0] == "Activities") {
             router.push("/Activities");
           }
+          fullSave(gameState, playerState);
         }, 200);
       } else {
         setFleeRollFailure(true);

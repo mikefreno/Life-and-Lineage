@@ -11,7 +11,6 @@ import { View, Platform, ScrollView } from "react-native";
 import { observer } from "mobx-react-lite";
 import ProgressBar from "../../components/ProgressBar";
 import { elementalColorMap } from "../../utility/elementColors";
-import PlayerStatus from "../../components/PlayerStatus";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -162,7 +161,7 @@ const SpellsScreen = observer(() => {
         }}
         onCloseFunction={() => setShowSpellTutorial(false)}
       />
-      <View
+      {/*<View
         style={{
           marginTop: useHeaderHeight() / 2,
           height: useHeaderHeight() * 0.5,
@@ -171,10 +170,11 @@ const SpellsScreen = observer(() => {
             : undefined,
           opacity: Platform.OS == "android" ? 1.0 : 0.5,
         }}
-      />
+      />*/}
       <ThemedView
         className="flex-1"
         style={{
+          paddingTop: useHeaderHeight(),
           paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
         }}
       >

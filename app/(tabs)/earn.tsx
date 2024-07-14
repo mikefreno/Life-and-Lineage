@@ -2,7 +2,6 @@ import jobs from "../../assets/json/jobs.json";
 import LaborTask from "../../components/LaborTask";
 import { ScrollView, View, Text } from "../../components/Themed";
 import { View as NonThemedView, Pressable } from "react-native";
-import PlayerStatus from "../../components/PlayerStatus";
 import {
   GameContext,
   PlayerCharacterContext,

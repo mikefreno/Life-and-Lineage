@@ -24,7 +24,7 @@ export default function FadeOutText({
       duration: duration,
       useNativeDriver: true,
     }).start();
-  }, [text, fadeAnim, duration, animationCycler]);
+  }, [fadeAnim, duration, animationCycler]);
 
   return (
     <Animated.Text

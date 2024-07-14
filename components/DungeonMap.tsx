@@ -7,7 +7,6 @@ import Animated, {
 } from "react-native-reanimated";
 import GenericRaisedButton from "./GenericRaisedButton";
 import { useColorScheme } from "nativewind";
-import Draggable from "react-native-draggable";
 
 export interface Tile {
   x: number;
@@ -260,6 +259,7 @@ export const DungeonMapControls = ({
       setCurrentPosition(newPosition);
       if (!newPosition.clearedRoom) {
         if (newPosition.isBossRoom) {
+          setInCombat(true);
           loadBoss();
         } else {
           setInCombat(true);

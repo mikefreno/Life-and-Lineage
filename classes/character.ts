@@ -23,6 +23,7 @@ import {
   InvestmentUpgrade,
   ItemClassType,
   MasteryLevel,
+  beingType,
   type Spell,
 } from "../utility/types";
 import { rollD20 } from "../utility/functions/roll";
@@ -49,6 +50,7 @@ import {
   convertMasteryToNumber,
   getMasteryLevel,
 } from "../utility/spellHelper";
+import type { BoundingBox, Tile } from "../components/DungeonMap";
 
 interface CharacterOptions {
   id?: string;
@@ -242,7 +244,19 @@ type PlayerCharacterBase = {
   conditions?: Condition[];
   inventory?: Item[];
   minions?: Minion[];
-  currentDungeon?: { instance: string; level: number };
+  currentDungeon?: {
+    instance: string;
+    level: number | string;
+    dungeonMap: Tile[];
+    currentPosition: Tile;
+    enemy: Enemy;
+    mapDimensions: {
+      width: number;
+      height: number;
+      offsetX: number;
+      offsetY: number;
+    };
+  } | null;
   equipment?: {
     mainHand: Item;
     offHand: Item | null;
@@ -323,7 +337,19 @@ export class PlayerCharacter extends Character {
   conditions: Condition[];
   gold: number;
   inventory: Item[];
-  currentDungeon: { instance: string; level: number | string } | null;
+  currentDungeon: {
+    instance: string;
+    level: number | string;
+    dungeonMap: Tile[];
+    currentPosition: Tile;
+    enemy: Enemy;
+    mapDimensions: {
+      width: number;
+      height: number;
+      offsetX: number;
+      offsetY: number;
+    };
+  } | null;
   equipment: {
     mainHand: Item;
     offHand: Item | null;
@@ -514,7 +540,6 @@ export class PlayerCharacter extends Character {
       getInvestment: action,
       restoreHealth: action,
       restoreSanity: action,
-      setSavedEnemy: action,
       bossDefeated: action,
       spendSkillPointOnHealth: action,
       spendSkillPointOnMana: action,
@@ -1638,7 +1663,7 @@ export class PlayerCharacter extends Character {
       attackPower: minionObj.attackPower,
       attacks: minionObj.attacks,
       turnsLeftAlive: minionObj.turns,
-      beingType: minionObj.beingType,
+      beingType: minionObj.beingType as beingType,
     });
     this.addMinion(minion);
   }
@@ -1732,7 +1757,14 @@ export class PlayerCharacter extends Character {
 
   public setInDungeon(props: inDungeonProps) {
     if (props.state) {
-      this.currentDungeon = { instance: props.instance, level: props.level };
+      this.currentDungeon = {
+        instance: props.instance,
+        level: props.level,
+        dungeonMap: props.tiles,
+        currentPosition: props.currentPosition,
+        mapDimensions: props.mapDimensions,
+        enemy: props.enemy,
+      };
     } else {
       this.currentDungeon = null;
     }
@@ -1791,7 +1823,16 @@ export class PlayerCharacter extends Character {
       inventory: json.inventory
         ? json.inventory.map((item: any) => Item.fromJSON(item))
         : [],
-      currentDungeon: json.currentDungeon,
+      currentDungeon: json.currentDungeon
+        ? {
+            instance: json.currentDungeon.instance,
+            level: json.currentDungeon.level,
+            dungeonMap: json.currentDungeon.dungeonMap,
+            currentPosition: json.currentDungeon.currentPosition,
+            enemy: Enemy.fromJSON(json.currentDungeon.enemy),
+            mapDimensions: json.currentDungeon.mapDimensions,
+          }
+        : null,
       equipment: json.equipment
         ? {
             mainHand: Item.fromJSON(json.equipment.mainHand),
@@ -1985,6 +2026,10 @@ type enterDungeonProps = {
   state: true;
   instance: string;
   level: number | string;
+  tiles: Tile[];
+  currentPosition: Tile;
+  mapDimensions: BoundingBox;
+  enemy: Enemy;
 };
 type leaveDungeonProps = {
   state: false;

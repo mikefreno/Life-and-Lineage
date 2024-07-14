@@ -56,16 +56,33 @@ export default function TabLayout() {
           tabBarBackground: () => (
             <>
               <PlayerStatus home hideGold />
-              <LinearGradientBlur />
+              {Platform.OS == "ios" ? (
+                <LinearGradientBlur />
+              ) : (
+                <BlurView
+                  tint={
+                    Platform.OS == "android"
+                      ? colorScheme == "light"
+                        ? "systemMaterial"
+                        : "systemMaterialDark"
+                      : "default"
+                  }
+                  intensity={100}
+                  style={StyleSheet.absoluteFill}
+                  experimentalBlurMethod={"dimezisBlurView"}
+                />
+              )}
             </>
           ),
           tabBarActiveTintColor: Colors[colorScheme as "light" | "dark"].tint,
-          tabBarLabelStyle: { fontFamily: "PixelifySans" },
+          tabBarLabelStyle: {
+            fontFamily: "PixelifySans",
+            marginLeft: 0,
+          },
           tabBarStyle: {
             position: "absolute",
             borderTopWidth: 0,
             height: 120,
-            ...(Platform.OS === "android" && { paddingHorizontal: 10 }),
           },
           tabBarButton: (props) => {
             const onPressWithVibration = (event: GestureResponderEvent) => {
@@ -81,7 +98,6 @@ export default function TabLayout() {
                   style={[
                     {
                       height: isCompact ? 44 : 72,
-                      zIndex: 1000,
                       marginLeft: isHome ? 12 : 0,
                       borderTopLeftRadius: isHome ? 12 : 0,
                       borderBottomLeftRadius: isHome ? 12 : 0,
@@ -98,12 +114,9 @@ export default function TabLayout() {
                   accessibilityLabel={props.accessibilityLabel}
                   accessibilityRole={props.accessibilityRole}
                   accessibilityState={props.accessibilityState}
-                  style={[
-                    {
-                      height: 44,
-                      zIndex: 1000,
-                    },
-                  ]}
+                  style={{
+                    height: 44,
+                  }}
                 >
                   {props.children}
                 </Pressable>

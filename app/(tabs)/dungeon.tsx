@@ -147,15 +147,6 @@ const DungeonScreen = observer(() => {
                         router.replace(
                           `/DungeonLevel/${dungeonInstance.name}/${level.level}`,
                         );
-                        setTimeout(() => {
-                          if (playerState) {
-                            playerState.setInDungeon({
-                              state: true,
-                              instance: dungeonInstance.name,
-                              level: level.level,
-                            });
-                          }
-                        }, 500);
                       }}
                     >
                       {({ pressed }) => (

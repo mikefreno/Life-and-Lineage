@@ -24,7 +24,7 @@ export default function FadeOutNode({
       duration: duration,
       useNativeDriver: true,
     }).start();
-  }, [children, fadeAnim, duration, animationCycler]);
+  }, [fadeAnim, duration, animationCycler]);
 
   return (
     <Animated.View

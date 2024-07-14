@@ -1,7 +1,6 @@
 import { View, Platform } from "react-native";
 import { Text, View as ThemedView } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
-import PlayerStatus from "../../components/PlayerStatus";
 import { useContext, useEffect, useRef, useState } from "react";
 import Necromancer from "../../assets/icons/NecromancerSkull";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
@@ -77,27 +76,15 @@ const HomeScreen = observer(() => {
           }}
           onCloseFunction={() => setShowIntroTutorial(false)}
         />
-        <View
-          style={{
-            marginTop: useHeaderHeight() / 2,
-            height: useHeaderHeight() * 0.5,
-            backgroundColor:
-              playerState.playerClass == "mage"
-                ? "#1e40af"
-                : playerState.playerClass == "necromancer"
-                ? "#6b21a8"
-                : "#fcd34d",
-            opacity: Platform.OS == "android" ? 1.0 : 0.5,
-          }}
-        />
         <ThemedView
           className="flex-1"
           style={{
+            paddingTop: useHeaderHeight(),
             paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
           }}
         >
-          <View className="-mx-2 py-1">
-            <View className="mx-6 flex-row items-center md:py-12">
+          <View className="-mx-2 py-2 md:py-4">
+            <View className="mx-6 flex-row items-center">
               {playerState?.playerClass == "necromancer" ? (
                 <View className="mx-auto">
                   <Necromancer

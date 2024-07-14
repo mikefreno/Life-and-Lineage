@@ -4,7 +4,6 @@ import manaOptions from "../../assets/json/medicalOptions/manaOptions.json";
 import sanityOptions from "../../assets/json/medicalOptions/sanityOptions.json";
 import otherOptions from "../../assets/json/medicalOptions/otherOptions.json";
 import MedicalOption from "../../components/MedicalOptions";
-import PlayerStatus from "../../components/PlayerStatus";
 import { useContext, useEffect, useRef, useState } from "react";
 import { GameContext, PlayerStatusCompactContext } from "../_layout";
 import { useIsFocused } from "@react-navigation/native";

@@ -723,7 +723,7 @@ const PlayerStatus = observer(
                 }}
               >
                 <View className={home ? "flex px-2" : "flex"}>
-                  {!isCompact && (
+                  {!isCompact ? (
                     <View className="flex h-7 flex-row justify-center">
                       {!hideGold && (
                         <View className="flex flex-row my-auto">
@@ -742,6 +742,10 @@ const PlayerStatus = observer(
                         </View>
                       )}
                       <View>{conditionRenderer()}</View>
+                    </View>
+                  ) : (
+                    <View className="flex flex-row mt-1">
+                      {goldChangePopUp()}
                     </View>
                   )}
                   <View className="flex flex-row justify-evenly py-1">

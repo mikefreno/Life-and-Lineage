@@ -293,7 +293,7 @@ export default function EquipmentDisplay({
             />
           </View>
         </View>
-        <View className="mx-auto -mt-6 items-center md:mt-4">
+        <View className="mx-auto -mt-6 items-center">
           <Text className="mb-2">Body</Text>
           {playerState?.equipment.body ? (
             <View className="z-50 h-12 w-12 active:scale-90 active:opacity-50">

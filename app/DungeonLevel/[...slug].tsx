@@ -44,6 +44,7 @@ import {
 } from "../../components/DungeonMap";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { tapRef } from "../../utility/functions/misc/tap";
+import { fullSave } from "../../utility/functions/save_load";
 
 const TILE_SIZE = 40;
 
@@ -149,9 +150,29 @@ const DungeonLevelScreen = observer(() => {
   }, [slug]);
 
   useEffect(() => {
+    if (playerState.currentDungeon) {
+      console.log("loading dungeon save");
+      setTiles(playerState.currentDungeon.dungeonMap);
+      setCurrentPosition(playerState.currentDungeon.currentPosition);
+      setMapDimensions(playerState.currentDungeon.mapDimensions);
+      setEnemy(playerState.currentDungeon.enemy);
+      setInCombat(true);
+    } else if (thisDungeon) {
+      const generatedTiles = generateTiles({
+        numTiles: thisDungeon.tiles,
+        tileSize: TILE_SIZE,
+        bossDefeated: thisDungeon.bossDefeated ?? false,
+      });
+      setTiles(generatedTiles);
+      const dimensions = getBoundingBox(generatedTiles, TILE_SIZE);
+      setMapDimensions(dimensions);
+      setCurrentPosition(generatedTiles[0]);
+    }
+  }, [thisDungeon]);
+
+  useEffect(() => {
     if (slug[0] !== "Activities" && slug[0] !== "Personal") {
       if (!fightingBoss && !enemyState) {
-        setInCombat(false);
         tiles.map((tile) => {
           if (tile.x == currentPosition?.x && tile.y == currentPosition.y) {
             tile.clearedRoom = true;
@@ -164,25 +185,14 @@ const DungeonLevelScreen = observer(() => {
   }, [enemyState]);
 
   useEffect(() => {
-    if (inCombat && !fightingBoss) {
-      getEnemy();
+    if (!firstLoad) {
+      if (inCombat && !fightingBoss) {
+        getEnemy();
+      }
+      dungeonSave();
     }
     setAttackAnimationOnGoing(false);
   }, [inCombat]);
-
-  useEffect(() => {
-    if (thisDungeon) {
-      const generatedTiles = generateTiles({
-        numTiles: thisDungeon.tiles,
-        tileSize: TILE_SIZE,
-        bossDefeated: thisDungeon.bossDefeated ?? false,
-      });
-      setTiles(generatedTiles);
-      const dimensions = getBoundingBox(generatedTiles, TILE_SIZE);
-      setMapDimensions(dimensions);
-      setCurrentPosition(generatedTiles[0]);
-    }
-  }, [thisDungeon]);
 
   useEffect(() => {
     if (
@@ -202,7 +212,6 @@ const DungeonLevelScreen = observer(() => {
 
   useEffect(() => {
     if (slug[0] == "Activities" || slug[0] == "Personal") {
-      setInCombat(true);
       const tempDungeon = new DungeonLevel({
         level: 0,
         bosses: [],
@@ -283,26 +292,27 @@ const DungeonLevelScreen = observer(() => {
     });
   }, [enemyTextDummy]);
 
-  //-----------minion loading-------//
+  //-----------minion loading-------/
   function getEnemy() {
     const enemy = enemyGenerator(instanceName, level);
-    setTimeout(
-      () => {
-        setEnemy(enemy);
-        setEnemyAttacked(false);
-        battleLogger(`You found a ${toTitleCase(enemy.creatureSpecies)}!`);
-        setAttackAnimationOnGoing(false);
-        if (firstLoad) {
-          setFirstLoad(false);
-        }
-      },
-      firstLoad ? 0 : 500,
-    );
+    if (enemy) {
+      setTimeout(
+        () => {
+          setEnemy(enemy);
+          setEnemyAttacked(false);
+          battleLogger(`You found a ${toTitleCase(enemy.creatureSpecies)}!`);
+          setAttackAnimationOnGoing(false);
+          if (firstLoad) {
+            setFirstLoad(false);
+          }
+        },
+        firstLoad ? 0 : 500,
+      );
+    }
   }
 
   const loadBoss = () => {
     setFightingBoss(true);
-    setInCombat(true);
     setTimeout(() => {
       if (thisDungeon && thisInstance && playerState) {
         const boss = thisDungeon.getBoss(thisInstance.name)[0];
@@ -610,6 +620,22 @@ const DungeonLevelScreen = observer(() => {
 
   function addItemToPouch(item: Item) {
     setLeftBehindDrops((prev) => [...prev, item]);
+  }
+
+  function dungeonSave() {
+    if (playerState && gameState && enemyState) {
+      console.log("saving in dungeon");
+      playerState.setInDungeon({
+        state: true,
+        instance: instanceName,
+        level: level,
+        tiles: tiles,
+        currentPosition: currentPosition ?? tiles[0],
+        mapDimensions: mapDimensions,
+        enemy: enemyState,
+      });
+      fullSave(gameState, playerState);
+    }
   }
 
   useEffect(() => {

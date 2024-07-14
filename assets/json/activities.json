@@ -5,8 +5,8 @@
       "alone":{
          "meetingSomeone": 0.15,
          "nothingHappens": 0.25,
-         "randomGood": 0.50,
-         "randomBad": 0.10
+         "randomGood": 0.40,
+         "randomBad": 0.20
       },
       "dateCooldown": 5,
       "date":{
@@ -19,7 +19,6 @@
          {
             "name": "Mugged!",
             "buyOff": {"price": 300},
-            "fight": "bandit",
             "dungeonTitle": "Enchanted Forest"
          }
       ],
@@ -86,7 +85,6 @@
       "randomBad":[
          {
             "name": "Bar Fight",
-            "fight": "drunkard",
             "dungeonTitle": "Local Pub"
          }
       ],
@@ -120,7 +118,7 @@
       "randomBad":[
          {
             "name": "Raucous Local",
-            "fight": "drunkard"
+            "dungeonTitle": "Festival"
          },
          {
             "name": "Ride broke down!",

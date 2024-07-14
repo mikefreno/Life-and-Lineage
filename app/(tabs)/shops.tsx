@@ -1,5 +1,5 @@
-import { Pressable, View as NonThemedView } from "react-native";
-import { ScrollView, Text, View } from "../../components/Themed";
+import { Pressable, ScrollView, View } from "react-native";
+import { Text } from "../../components/Themed";
 import { Shop } from "../../classes/shop";
 import { CharacterImage } from "../../components/CharacterImage";
 import shopObjects from "../../assets/json/shops.json";
@@ -10,7 +10,6 @@ import { useVibration } from "../../utility/customHooks";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import PlayerStatus from "../../components/PlayerStatus";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { calculateAge } from "../../utility/functions/misc/age";
@@ -37,8 +36,8 @@ export default function ShopsScreen() {
 
   if (gameState) {
     const renderItem = (shop: Shop) => (
-      <NonThemedView className="h-96 w-1/2" key={shop.shopKeeper.id}>
-        <NonThemedView
+      <View className="h-96 w-1/2" key={shop.shopKeeper.id}>
+        <View
           className="m-2 flex-1 items-center justify-between rounded-xl border p-4"
           style={{
             shadowColor: shopObjects.find(
@@ -69,7 +68,7 @@ export default function ShopsScreen() {
           >
             The {toTitleCase(shop.archetype)}
           </Text>
-          <NonThemedView className="items-center">
+          <View className="items-center">
             <CharacterImage
               characterAge={calculateAge(
                 new Date(shop.shopKeeper.birthdate),
@@ -129,9 +128,9 @@ export default function ShopsScreen() {
                 </View>
               )}
             </Pressable>
-          </NonThemedView>
-        </NonThemedView>
-      </NonThemedView>
+          </View>
+        </View>
+      </View>
     );
 
     return (
@@ -152,6 +151,7 @@ export default function ShopsScreen() {
           }}
           onCloseFunction={() => setShowShopTutorial(false)}
         />
+
         <ScrollView>
           <View
             style={{
