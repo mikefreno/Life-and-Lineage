@@ -16,6 +16,7 @@ import { toTitleCase } from "../../utility/functions/misc/words";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
+import ThemedCard from "../../components/ThemedCard";
 
 const dangerColorStep = [
   "#fee2e2",
@@ -116,74 +117,58 @@ const DungeonScreen = observer(() => {
       >
         <ScrollView>
           {instances.map((dungeonInstance, dungeonInstanceIdx) => (
-            <View
-              key={dungeonInstanceIdx}
-              className="m-2 rounded-xl"
-              style={{
-                shadowColor: "#000",
-                shadowOffset: {
-                  width: 3,
-                  height: 1,
-                },
-                backgroundColor: colorScheme == "light" ? "#fafafa" : "#27272a",
-                shadowOpacity: 0.2,
-                shadowRadius: 3,
-                elevation: 2,
-              }}
-            >
-              <NonThemedView className="flex justify-between rounded-xl px-4 py-2 text-zinc-950 dark:border dark:border-zinc-500 dark:bg-zinc-800">
-                <Text className="text-center text-2xl tracking-widest underline">
-                  {toTitleCase(dungeonInstance.name)}
-                </Text>
-                <NonThemedView className="mx-auto">
-                  {dungeonInstance.levels.map((level, levelIdx) => (
-                    <Pressable
-                      key={levelIdx}
-                      onPress={() => {
-                        while (router.canGoBack()) {
-                          router.back();
-                        }
-                        vibration({ style: "warning" });
-                        router.replace(
-                          `/DungeonLevel/${dungeonInstance.name}/${level.level}`,
-                        );
-                      }}
-                    >
-                      {({ pressed }) => (
-                        <View
-                          className={`my-2 rounded-lg px-6 py-4 ${
-                            pressed ? "scale-95 opacity-50" : ""
-                          }`}
-                          style={{
-                            shadowColor:
-                              dangerColorStep[
-                                level.level -
-                                  height +
-                                  5 +
-                                  levelOffset[dungeonInstance.name]
-                              ],
-                            backgroundColor:
-                              dangerColorStep[
-                                level.level -
-                                  height +
-                                  5 +
-                                  levelOffset[dungeonInstance.name]
-                              ] ?? "#fee2e2",
-                            shadowOpacity: 0.25,
-                            shadowRadius: 5,
-                            elevation: 2,
-                          }}
-                        >
-                          <Text
-                            style={{ color: "white" }}
-                          >{`Delve to Floor ${level.level}`}</Text>
-                        </View>
-                      )}
-                    </Pressable>
-                  ))}
-                </NonThemedView>
+            <ThemedCard key={dungeonInstanceIdx}>
+              <Text className="text-center text-2xl tracking-widest underline">
+                {toTitleCase(dungeonInstance.name)}
+              </Text>
+              <NonThemedView className="mx-auto">
+                {dungeonInstance.levels.map((level, levelIdx) => (
+                  <Pressable
+                    key={levelIdx}
+                    onPress={() => {
+                      while (router.canGoBack()) {
+                        router.back();
+                      }
+                      vibration({ style: "warning" });
+                      router.replace(
+                        `/DungeonLevel/${dungeonInstance.name}/${level.level}`,
+                      );
+                    }}
+                  >
+                    {({ pressed }) => (
+                      <View
+                        className={`my-2 rounded-lg px-6 py-4 ${
+                          pressed ? "scale-95 opacity-50" : ""
+                        }`}
+                        style={{
+                          shadowColor:
+                            dangerColorStep[
+                              level.level -
+                                height +
+                                5 +
+                                levelOffset[dungeonInstance.name]
+                            ],
+                          backgroundColor:
+                            dangerColorStep[
+                              level.level -
+                                height +
+                                5 +
+                                levelOffset[dungeonInstance.name]
+                            ] ?? "#fee2e2",
+                          shadowOpacity: 0.25,
+                          shadowRadius: 5,
+                          elevation: 2,
+                        }}
+                      >
+                        <Text
+                          style={{ color: "white" }}
+                        >{`Delve to Floor ${level.level}`}</Text>
+                      </View>
+                    )}
+                  </Pressable>
+                ))}
               </NonThemedView>
-            </View>
+            </ThemedCard>
           ))}
           <View
             style={{ height: useBottomTabBarHeight() + (isCompact ? 0 : 28) }}

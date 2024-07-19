@@ -225,6 +225,7 @@ interface DungeonMapControlsProps {
   setCurrentPosition: React.Dispatch<React.SetStateAction<Tile | null>>;
   setInCombat: React.Dispatch<React.SetStateAction<boolean>>;
   loadBoss: () => void;
+  getEnemy: () => void;
 }
 
 export const DungeonMapControls = ({
@@ -234,6 +235,7 @@ export const DungeonMapControls = ({
   setCurrentPosition,
   setInCombat,
   loadBoss,
+  getEnemy,
 }: DungeonMapControlsProps) => {
   const isMoveValid = (direction: keyof typeof directionsMapping) => {
     if (!currentPosition) return false;
@@ -259,9 +261,10 @@ export const DungeonMapControls = ({
       setCurrentPosition(newPosition);
       if (!newPosition.clearedRoom) {
         if (newPosition.isBossRoom) {
-          setInCombat(true);
           loadBoss();
+          setInCombat(true);
         } else {
+          getEnemy();
           setInCombat(true);
         }
       }

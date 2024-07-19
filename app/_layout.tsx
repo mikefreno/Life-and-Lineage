@@ -212,7 +212,6 @@ const RootLayout = observer(() => {
           `/DungeonLevel/${playerState.currentDungeon?.instance}/${playerState.currentDungeon?.level}`,
         );
       }
-      console.log("current:", playerState?.currentDungeon);
       setFirstLoad(false);
     }
   }, [fontLoaded, navbarLoad, playerState]);

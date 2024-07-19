@@ -13,7 +13,7 @@ const HealingIcon = ({ delay = 0 }) => {
         Animated.parallel([
           Animated.timing(translateAnim, {
             toValue: -700,
-            duration: 3000,
+            duration: 4000,
             useNativeDriver: true,
           }),
         ]),
@@ -50,7 +50,7 @@ export const EnemyHealingAnimationBox = ({
       setOpacityAnim(newAnim);
       Animated.timing(newAnim, {
         toValue: 0,
-        duration: 3000,
+        duration: 4000,
         useNativeDriver: true,
         easing: Easing.out(Easing.poly(5)),
       }).start();
@@ -61,16 +61,21 @@ export const EnemyHealingAnimationBox = ({
 
   return (
     <Animated.View style={{ opacity: opacityAnim }}>
-      <View
-        style={{
-          flexDirection: "row",
-          flexWrap: "wrap",
-          width: 192,
-        }}
-      >
-        {Array.from({ length: 6 * 4 }).map((_, i) => (
-          <HealingIcon key={i} delay={i * 75} />
-        ))}
+      <View style={{ height: 120, overflow: "hidden" }} className="-mt-[10vh]">
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            width: 192,
+            height: 192,
+            position: "absolute",
+            top: 0,
+          }}
+        >
+          {Array.from({ length: 6 * 4 }).map((_, i) => (
+            <HealingIcon key={i} delay={i * 75} />
+          ))}
+        </View>
       </View>
     </Animated.View>
   );

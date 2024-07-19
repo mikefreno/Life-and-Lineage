@@ -25,11 +25,7 @@ export function LinearGradientBlur() {
         }
         style={[StyleSheet.absoluteFill]}
       >
-        <BlurView
-          intensity={100}
-          style={StyleSheet.absoluteFill}
-          experimentalBlurMethod={"dimezisBlurView"}
-        />
+        <BlurView intensity={100} style={StyleSheet.absoluteFill} />
       </MaskedView>
     </View>
   );

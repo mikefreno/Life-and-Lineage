@@ -280,9 +280,6 @@ export const enemyTurn = (
           setEnemy(null);
           gameState.gameTick(playerState);
         } else {
-          if (thisDungeon?.level != 0) {
-            thisDungeon?.incrementStep();
-          }
           battleLogger(
             `You defeated the ${toTitleCase(enemyState.creatureSpecies)}`,
           );

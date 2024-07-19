@@ -45,6 +45,7 @@ import {
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { tapRef } from "../../utility/functions/misc/tap";
 import { fullSave } from "../../utility/functions/save_load";
+import { debounce, throttle } from "lodash";
 
 const TILE_SIZE = 40;
 
@@ -151,12 +152,12 @@ const DungeonLevelScreen = observer(() => {
 
   useEffect(() => {
     if (playerState.currentDungeon) {
-      console.log("loading dungeon save");
       setTiles(playerState.currentDungeon.dungeonMap);
       setCurrentPosition(playerState.currentDungeon.currentPosition);
       setMapDimensions(playerState.currentDungeon.mapDimensions);
       setEnemy(playerState.currentDungeon.enemy);
       setInCombat(true);
+      setEnemyAttacked(true);
     } else if (thisDungeon) {
       const generatedTiles = generateTiles({
         numTiles: thisDungeon.tiles,
@@ -183,16 +184,6 @@ const DungeonLevelScreen = observer(() => {
       }
     }
   }, [enemyState]);
-
-  useEffect(() => {
-    if (!firstLoad) {
-      if (inCombat && !fightingBoss) {
-        getEnemy();
-      }
-      dungeonSave();
-    }
-    setAttackAnimationOnGoing(false);
-  }, [inCombat]);
 
   useEffect(() => {
     if (
@@ -296,30 +287,24 @@ const DungeonLevelScreen = observer(() => {
   function getEnemy() {
     const enemy = enemyGenerator(instanceName, level);
     if (enemy) {
-      setTimeout(
-        () => {
-          setEnemy(enemy);
-          setEnemyAttacked(false);
-          battleLogger(`You found a ${toTitleCase(enemy.creatureSpecies)}!`);
-          setAttackAnimationOnGoing(false);
-          if (firstLoad) {
-            setFirstLoad(false);
-          }
-        },
-        firstLoad ? 0 : 500,
-      );
+      setEnemy(enemy);
+      setEnemyAttacked(false);
+      battleLogger(`You found a ${toTitleCase(enemy.creatureSpecies)}!`);
+      setAttackAnimationOnGoing(false);
+      dungeonSave(enemy);
+      if (firstLoad || !playerState?.currentDungeon) {
+        setFirstLoad(false);
+      }
     }
   }
 
   const loadBoss = () => {
     setFightingBoss(true);
-    setTimeout(() => {
-      if (thisDungeon && thisInstance && playerState) {
-        const boss = thisDungeon.getBoss(thisInstance.name)[0];
-        setEnemy(boss);
-        battleLogger(`You found the boss!`);
-      }
-    }, 250);
+    if (thisDungeon && thisInstance && playerState) {
+      const boss = thisDungeon.getBoss(thisInstance.name)[0];
+      setEnemy(boss);
+      battleLogger(`You found the boss!`);
+    }
   };
 
   //------------player combat functions------------//
@@ -622,9 +607,8 @@ const DungeonLevelScreen = observer(() => {
     setLeftBehindDrops((prev) => [...prev, item]);
   }
 
-  function dungeonSave() {
-    if (playerState && gameState && enemyState) {
-      console.log("saving in dungeon");
+  function dungeonSave(enemy: Enemy | null) {
+    if (playerState && gameState) {
       playerState.setInDungeon({
         state: true,
         instance: instanceName,
@@ -632,7 +616,7 @@ const DungeonLevelScreen = observer(() => {
         tiles: tiles,
         currentPosition: currentPosition ?? tiles[0],
         mapDimensions: mapDimensions,
-        enemy: enemyState,
+        enemy: enemy,
       });
       fullSave(gameState, playerState);
     }
@@ -647,6 +631,24 @@ const DungeonLevelScreen = observer(() => {
   useEffect(() => {
     setInventoryFullNotifier(false);
   }, [showLeftBehindItemsScreen]);
+
+  const throttledDungeonSave = throttle(
+    (state) => {
+      dungeonSave(state);
+    },
+    3000,
+    { leading: false, trailing: true },
+  );
+
+  useEffect(() => {
+    throttledDungeonSave(enemyState);
+  }, [enemyState?.health, playerState.health]);
+
+  useEffect(() => {
+    if (!firstLoad && !enemyState) {
+      setInCombat(false);
+    }
+  }, [enemyState]);
 
   //-----------tutorial---------//
   const [showDungeonInteriorTutorial, setShowDungeonInteriorTutorial] =
@@ -851,6 +853,7 @@ const DungeonLevelScreen = observer(() => {
                     setCurrentPosition,
                     setInCombat,
                     loadBoss,
+                    getEnemy,
                   })}
                   inCombat={inCombat}
                 />

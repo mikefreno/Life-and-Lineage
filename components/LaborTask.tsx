@@ -13,6 +13,8 @@ import { numberToRoman } from "../utility/functions/misc/numbers";
 import { useVibration } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
 import { Text } from "./Themed";
+import Colors from "../constants/Colors";
+import ThemedCard from "./ThemedCard";
 
 interface LaborTaskProps {
   reward: number;
@@ -70,76 +72,57 @@ const LaborTask = observer(
     }
 
     return (
-      <View
-        className="m-2 rounded-xl"
-        style={{
-          shadowColor: "#000",
-          shadowOffset: {
-            width: 3,
-            height: 1,
-          },
-          elevation: 3,
-          backgroundColor: colorScheme == "light" ? "#fafafa" : "#27272a",
-          shadowOpacity: 0.2,
-          shadowRadius: 3,
-        }}
-      >
-        <View className="flex justify-between rounded-xl px-4 py-2 text-zinc-950 dark:border dark:border-zinc-500">
-          <View className="flex flex-row justify-between">
-            <Text className="bold my-auto w-2/3 text-xl dark:text-zinc-50">
-              {title}{" "}
-              {playerState && numberToRoman(playerState.getJobRank(title))}
-            </Text>
-            <View className="my-auto -mb-8 mt-8 w-1/3">
-              <View className="flex w-full flex-row items-center justify-evenly">
-                <Text className="dark:text-zinc-50">{fullReward}</Text>
-                <Coins width={14} height={14} style={{ marginLeft: 6 }} />
-              </View>
-              <View className="flex w-full flex-row items-center justify-evenly">
-                <Text className="dark:text-zinc-50">-{cost.mana}</Text>
-                <Energy width={14} height={14} style={{ marginLeft: 6 }} />
-              </View>
-              {cost.health && (
-                <View className="flex w-full flex-row items-center justify-evenly">
-                  <Text className="dark:text-zinc-50">-{cost.health}</Text>
-                  <HealthIcon
-                    width={14}
-                    height={14}
-                    style={{ marginLeft: 6 }}
-                  />
-                </View>
-              )}
-              {cost.sanity && (
-                <View className="flex w-full flex-row items-center justify-evenly">
-                  <Text className="dark:text-zinc-50">-{cost.sanity}</Text>
-                  <Sanity width={14} height={14} style={{ marginLeft: 6 }} />
-                </View>
-              )}
+      <ThemedCard>
+        <View className="flex flex-row justify-between">
+          <Text className="bold my-auto w-2/3 text-xl dark:text-zinc-50">
+            {title}{" "}
+            {playerState && numberToRoman(playerState.getJobRank(title))}
+          </Text>
+          <View className="my-auto -mb-8 mt-8 w-1/3">
+            <View className="flex w-full flex-row items-center justify-evenly">
+              <Text className="dark:text-zinc-50">{fullReward}</Text>
+              <Coins width={14} height={14} style={{ marginLeft: 6 }} />
             </View>
+            <View className="flex w-full flex-row items-center justify-evenly">
+              <Text className="dark:text-zinc-50">-{cost.mana}</Text>
+              <Energy width={14} height={14} style={{ marginLeft: 6 }} />
+            </View>
+            {cost.health && (
+              <View className="flex w-full flex-row items-center justify-evenly">
+                <Text className="dark:text-zinc-50">-{cost.health}</Text>
+                <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
+              </View>
+            )}
+            {cost.sanity && (
+              <View className="flex w-full flex-row items-center justify-evenly">
+                <Text className="dark:text-zinc-50">-{cost.sanity}</Text>
+                <Sanity width={14} height={14} style={{ marginLeft: 6 }} />
+              </View>
+            )}
           </View>
-          {playerState?.job == title ? (
-            <>
-              <GenericRaisedButton
-                text={"Work"}
-                onPressFunction={work}
-                disabledCondition={
-                  (cost.health && playerState.health <= cost.health) ||
-                  playerState.mana < cost.mana
-                }
-              />
-              <ProgressBar
-                value={experience ?? 0}
-                maxValue={experienceToPromote}
-              />
-            </>
-          ) : (
-            <GenericRaisedButton
-              text={"Apply"}
-              onPressFunction={() => applyToJob(title)}
-            />
-          )}
         </View>
-      </View>
+        {playerState?.job == title ? (
+          <>
+            <GenericRaisedButton
+              text={"Work"}
+              onPressFunction={work}
+              disabledCondition={
+                (cost.health && playerState.health <= cost.health) ||
+                playerState.mana < cost.mana
+              }
+            />
+            <ProgressBar
+              value={experience ?? 0}
+              maxValue={experienceToPromote}
+            />
+          </>
+        ) : (
+          <GenericRaisedButton
+            text={"Apply"}
+            onPressFunction={() => applyToJob(title)}
+          />
+        )}
+      </ThemedCard>
     );
   },
 );

@@ -8,12 +8,14 @@ export default {
     tint: tintColorLight,
     tabIconDefault: "#ccc",
     tabIconSelected: tintColorLight,
+    accent: "#fafafa",
   },
   dark: {
     text: "#fff",
-    background: "#18181b",
+    background: "#000000",
     tint: tintColorDark,
     tabIconDefault: "#ccc",
     tabIconSelected: tintColorDark,
+    accent: "#18181b",
   },
 };

@@ -249,7 +249,7 @@ type PlayerCharacterBase = {
     level: number | string;
     dungeonMap: Tile[];
     currentPosition: Tile;
-    enemy: Enemy;
+    enemy: Enemy | null;
     mapDimensions: {
       width: number;
       height: number;
@@ -342,7 +342,7 @@ export class PlayerCharacter extends Character {
     level: number | string;
     dungeonMap: Tile[];
     currentPosition: Tile;
-    enemy: Enemy;
+    enemy: Enemy | null;
     mapDimensions: {
       width: number;
       height: number;
@@ -1770,10 +1770,6 @@ export class PlayerCharacter extends Character {
     }
   }
 
-  public setSavedEnemy(enemyToSave: Enemy | null) {
-    this.savedEnemy = enemyToSave;
-  }
-
   static fromJSON(json: any): PlayerCharacter {
     const player = new PlayerCharacter({
       id: json.id,
@@ -1829,7 +1825,9 @@ export class PlayerCharacter extends Character {
             level: json.currentDungeon.level,
             dungeonMap: json.currentDungeon.dungeonMap,
             currentPosition: json.currentDungeon.currentPosition,
-            enemy: Enemy.fromJSON(json.currentDungeon.enemy),
+            enemy: json.currentDungeon.enemy
+              ? Enemy.fromJSON(json.currentDungeon.enemy)
+              : null,
             mapDimensions: json.currentDungeon.mapDimensions,
           }
         : null,
@@ -2029,7 +2027,7 @@ type enterDungeonProps = {
   tiles: Tile[];
   currentPosition: Tile;
   mapDimensions: BoundingBox;
-  enemy: Enemy;
+  enemy: Enemy | null;
 };
 type leaveDungeonProps = {
   state: false;

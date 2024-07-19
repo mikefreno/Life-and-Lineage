@@ -96,7 +96,7 @@ export default function DungeonEnemyDisplay({
 
   return (
     <View className="flex h-[40%] pt-8">
-      <View className="flex-1 flex-row justify-evenly">
+      <View className="flex-1 flex-row justify-evenly pl-8">
         <View
           className="flex flex-col items-center justify-center"
           style={{ minWidth: "40%" }}
@@ -141,9 +141,8 @@ export default function DungeonEnemyDisplay({
           >
             <EnemyImage creatureSpecies={enemyState.creatureSpecies} />
           </Animated.View>
-          <View className="absolute -ml-[10vw]">
-            <EnemyHealingAnimationBox showHealAnimationDummy={enemyHealDummy} />
-          </View>
+
+          <EnemyHealingAnimationBox showHealAnimationDummy={enemyHealDummy} />
           <Animated.View
             style={{
               transform: [{ translateY: enemyTextTranslateAnimation }],

@@ -1,6 +1,13 @@
 import ProgressBar from "./ProgressBar";
 import { Text } from "./Themed";
-import { ScrollView, Animated, Image, Pressable, View } from "react-native";
+import {
+  ScrollView,
+  Animated,
+  Image,
+  Pressable,
+  View,
+  Platform,
+} from "react-native";
 import Coins from "../assets/icons/CoinsIcon";
 import { useContext, useEffect, useRef, useState } from "react";
 import {
@@ -23,6 +30,8 @@ import { useVibration } from "../utility/customHooks";
 import SquareMinus from "../assets/icons/SquareMinus";
 import RotateArrow from "../assets/icons/RotateArrow";
 import FadeOutNode from "./FadeOutNode";
+import { BlurView } from "expo-blur";
+import { useColorScheme } from "nativewind";
 
 interface PlayerStatus {
   hideGold?: boolean;
@@ -88,6 +97,7 @@ const PlayerStatus = observer(
     const [respeccing, setRespeccing] = useState<boolean>(false);
 
     const vibration = useVibration();
+    const { colorScheme } = useColorScheme();
 
     const pressableRef = useRef<View>(null);
 
@@ -493,6 +503,67 @@ const PlayerStatus = observer(
       }
     }
 
+    function ColorAndPlatformDependantBlur({ children }) {
+      if (home) {
+        if (colorScheme == "dark" && Platform.OS == "ios") {
+          return (
+            <BlurView
+              intensity={100}
+              className="shadow-soft dark:shadow-soft-white mx-4 rounded-xl z-top pb-1 overflow-hidden"
+            >
+              <Animated.View
+                style={{
+                  display: "flex",
+                  backgroundColor: showingHealthWarningPulse
+                    ? backgroundColorInterpolation
+                    : healthDamageFlash.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ["transparent", "rgba(180,30,30,0.4)"],
+                      }),
+                }}
+              >
+                {children}
+              </Animated.View>
+            </BlurView>
+          );
+        } else {
+          return (
+            <Animated.View
+              style={{
+                display: "flex",
+                backgroundColor: showingHealthWarningPulse
+                  ? backgroundColorInterpolation
+                  : healthDamageFlash.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ["transparent", "rgba(180,30,30,0.4)"],
+                    }),
+              }}
+            >
+              <View className="shadow-soft dark:shadow-soft-white mx-4 rounded-xl z-top pb-1  bg-zinc-50 dark:bg-zinc-800">
+                {children}
+              </View>
+            </Animated.View>
+          );
+        }
+      } else {
+        return (
+          <Animated.View
+            style={{
+              display: "flex",
+              backgroundColor: showingHealthWarningPulse
+                ? backgroundColorInterpolation
+                : healthDamageFlash.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ["transparent", "rgba(180,30,30,0.4)"],
+                  }),
+            }}
+          >
+            <View className="mx-4 z-top">{children}</View>
+          </Animated.View>
+        );
+      }
+    }
+
     if (playerState) {
       return (
         <>
@@ -509,7 +580,9 @@ const PlayerStatus = observer(
                   </View>
                 </View>
                 <View className="flex-1 flex items-center">
-                  <Text className="text-xl">{playerState.getFullName()}</Text>
+                  <Text className="text-xl text-center">
+                    {playerState.getFullName()}
+                  </Text>
                 </View>
                 <View className="flex-1">
                   {/* This empty View takes up space on the right*/}
@@ -703,93 +776,81 @@ const PlayerStatus = observer(
             className={
               !isCompact
                 ? home
-                  ? "absolute -mt-7 shadow-soft z-top dark:shadow-soft-white w-full"
+                  ? "absolute -mt-7 z-top w-full"
                   : "absolute mt-3 z-top w-full"
                 : home
-                ? "absolute shadow-soft z-top dark:shadow-soft-white w-full"
+                ? "absolute z-top w-full"
                 : "absolute mt-20 z-top w-full"
             }
           >
-            <View className="mx-4 rounded-xl z-top pb-1 bg-opacity-90 bg-zinc-50 dark:bg-zinc-800">
-              <Animated.View
-                style={{
-                  display: "flex",
-                  backgroundColor: showingHealthWarningPulse
-                    ? backgroundColorInterpolation
-                    : healthDamageFlash.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: ["transparent", "rgba(180,30,30,0.4)"],
-                      }),
-                }}
-              >
-                <View className={home ? "flex px-2" : "flex"}>
-                  {!isCompact ? (
-                    <View className="flex h-7 flex-row justify-center">
-                      {!hideGold && (
-                        <View className="flex flex-row my-auto">
-                          <Text>{readableGold}</Text>
-                          <Coins
-                            width={16}
-                            height={16}
-                            style={{ marginLeft: 6 }}
-                          />
-                          {showingGoldChange ? goldChangePopUp() : null}
-                        </View>
-                      )}
-                      {playerState.unAllocatedSkillPoints > 0 && (
-                        <View className="px-1 my-auto">
-                          <SquarePlus height={16} width={16} />
-                        </View>
-                      )}
-                      <View>{conditionRenderer()}</View>
-                    </View>
-                  ) : (
-                    <View className="flex flex-row mt-1">
-                      {goldChangePopUp()}
-                    </View>
-                  )}
-                  <View className="flex flex-row justify-evenly py-1">
-                    <View className="flex w-[31%]">
-                      {showingHealthChange && healthChangePopUp()}
-                      <Text className="mx-auto" style={{ color: "#ef4444" }}>
-                        Health
-                      </Text>
-                      <ProgressBar
-                        value={playerState.health}
-                        maxValue={localHealthMax ?? playerState.getMaxHealth()}
-                        filledColor="#ef4444"
-                        unfilledColor="#fca5a5"
-                      />
-                    </View>
-                    <View className="flex w-[31%]">
-                      {showingManaChange && manaChangePopUp()}
-                      <Text className="mx-auto" style={{ color: "#60a5fa" }}>
-                        Mana
-                      </Text>
-                      <ProgressBar
-                        value={playerState.mana}
-                        maxValue={localManaMax ?? playerState.getMaxMana()}
-                        filledColor="#60a5fa"
-                        unfilledColor="#bfdbfe"
-                      />
-                    </View>
-                    <View className="flex w-[31%]">
-                      {showingSanityChange && sanityChangePopUp()}
-                      <Text className="mx-auto" style={{ color: "#c084fc" }}>
-                        Sanity
-                      </Text>
-                      <ProgressBar
-                        value={playerState.sanity}
-                        minValue={-50}
-                        maxValue={localSanityMax ?? playerState.getMaxSanity()}
-                        filledColor="#c084fc"
-                        unfilledColor="#e9d5ff"
-                      />
-                    </View>
+            <ColorAndPlatformDependantBlur>
+              <View className={home ? "flex px-2" : "flex"}>
+                {!isCompact ? (
+                  <View className="flex h-7 flex-row justify-center">
+                    {!hideGold && (
+                      <View className="flex flex-row my-auto">
+                        <Text>{readableGold}</Text>
+                        <Coins
+                          width={16}
+                          height={16}
+                          style={{ marginLeft: 6 }}
+                        />
+                        {showingGoldChange ? goldChangePopUp() : null}
+                      </View>
+                    )}
+                    {playerState.unAllocatedSkillPoints > 0 && (
+                      <View className="px-1 my-auto">
+                        <SquarePlus height={16} width={16} />
+                      </View>
+                    )}
+                    <View>{conditionRenderer()}</View>
+                  </View>
+                ) : (
+                  <View className="flex flex-row mt-1">
+                    {goldChangePopUp()}
+                  </View>
+                )}
+                <View className="flex flex-row justify-evenly py-1">
+                  <View className="flex w-[31%]">
+                    {showingHealthChange && healthChangePopUp()}
+                    <Text className="mx-auto" style={{ color: "#ef4444" }}>
+                      Health
+                    </Text>
+                    <ProgressBar
+                      value={playerState.health}
+                      maxValue={localHealthMax ?? playerState.getMaxHealth()}
+                      filledColor="#ef4444"
+                      unfilledColor="#fca5a5"
+                    />
+                  </View>
+                  <View className="flex w-[31%]">
+                    {showingManaChange && manaChangePopUp()}
+                    <Text className="mx-auto" style={{ color: "#60a5fa" }}>
+                      Mana
+                    </Text>
+                    <ProgressBar
+                      value={playerState.mana}
+                      maxValue={localManaMax ?? playerState.getMaxMana()}
+                      filledColor="#60a5fa"
+                      unfilledColor="#bfdbfe"
+                    />
+                  </View>
+                  <View className="flex w-[31%]">
+                    {showingSanityChange && sanityChangePopUp()}
+                    <Text className="mx-auto" style={{ color: "#c084fc" }}>
+                      Sanity
+                    </Text>
+                    <ProgressBar
+                      value={playerState.sanity}
+                      minValue={-50}
+                      maxValue={localSanityMax ?? playerState.getMaxSanity()}
+                      filledColor="#c084fc"
+                      unfilledColor="#e9d5ff"
+                    />
                   </View>
                 </View>
-              </Animated.View>
-            </View>
+              </View>
+            </ColorAndPlatformDependantBlur>
           </Pressable>
         </>
       );

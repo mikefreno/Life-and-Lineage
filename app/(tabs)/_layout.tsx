@@ -61,11 +61,9 @@ export default function TabLayout() {
               ) : (
                 <BlurView
                   tint={
-                    Platform.OS == "android"
-                      ? colorScheme == "light"
-                        ? "systemMaterial"
-                        : "systemMaterialDark"
-                      : "default"
+                    colorScheme == "light"
+                      ? "systemMaterial"
+                      : "systemMaterialDark"
                   }
                   intensity={100}
                   style={StyleSheet.absoluteFill}

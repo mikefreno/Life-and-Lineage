@@ -76,7 +76,6 @@ export default function FleeModal({
   triggerFirstBossKillTutorial,
 }: FleeModalProps) {
   const vibration = useVibration();
-
   const flee = () => {
     if (playerState) {
       const roll = flipCoin();

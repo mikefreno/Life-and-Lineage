@@ -8,11 +8,15 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { GameContext, PlayerStatusCompactContext } from "../_layout";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
-import { Pressable, View } from "react-native";
+import { Platform, Pressable, View, StyleSheet } from "react-native";
 import { useVibration } from "../../utility/customHooks";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
+import { Tabs } from "expo-router";
+import { BlurView } from "expo-blur";
+import Medical from "../../assets/icons/MedicalIcon";
+import { useColorScheme } from "nativewind";
 
 export default function MedicalScreen() {
   const gameContext = useContext(GameContext);
@@ -28,32 +32,32 @@ export default function MedicalScreen() {
   const [showMedicalTutorial, setShowMedicalTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("medical")) ?? false,
   );
-  const [showingHealthOptions, setShowingHealthOptions] = useState<boolean>(
-    gameState?.medicalOptions.health ?? true,
-  );
-  const showingHealthRef = useRef<boolean>(
-    gameState?.medicalOptions.health ?? true,
-  );
-  const [showingManaOptions, setShowingManaOptions] = useState<boolean>(
-    gameState?.medicalOptions.mana ?? true,
-  );
-  const showingManaRef = useRef<boolean>(
-    gameState?.medicalOptions.mana ?? true,
-  );
-  const [showingSanityOptions, setShowingSanityOptions] = useState<boolean>(
-    gameState?.medicalOptions.sanity ?? true,
-  );
-  const showingSanityRef = useRef<boolean>(
-    gameState?.medicalOptions.sanity ?? true,
-  );
-  const [showingOtherOptions, setShowingOtherOptions] = useState<boolean>(
-    gameState?.medicalOptions.other ?? true,
-  );
-  const showingOtherRef = useRef<boolean>(
-    gameState?.medicalOptions.other ?? true,
-  );
+  //const [showingHealthOptions, setShowingHealthOptions] = useState<boolean>(
+  //gameState?.medicalOptions.health ?? true,
+  //);
+  //const showingHealthRef = useRef<boolean>(
+  //gameState?.medicalOptions.health ?? true,
+  //);
+  //const [showingManaOptions, setShowingManaOptions] = useState<boolean>(
+  //gameState?.medicalOptions.mana ?? true,
+  //);
+  //const showingManaRef = useRef<boolean>(
+  //gameState?.medicalOptions.mana ?? true,
+  //);
+  //const [showingSanityOptions, setShowingSanityOptions] = useState<boolean>(
+  //gameState?.medicalOptions.sanity ?? true,
+  //);
+  //const showingSanityRef = useRef<boolean>(
+  //gameState?.medicalOptions.sanity ?? true,
+  //);
+  //const [showingOtherOptions, setShowingOtherOptions] = useState<boolean>(
+  //gameState?.medicalOptions.other ?? true,
+  //);
+  //const showingOtherRef = useRef<boolean>(
+  //gameState?.medicalOptions.other ?? true,
+  //);
 
-  const vibration = useVibration();
+  //const vibration = useVibration();
 
   useEffect(() => {
     if (!showMedicalTutorial && gameState) {
@@ -61,20 +65,20 @@ export default function MedicalScreen() {
     }
   }, [showMedicalTutorial]);
 
-  useEffect(() => {
-    if (gameState) {
-      gameState.setMedicalOptionVisibility("health", showingHealthOptions);
-      gameState.setMedicalOptionVisibility("mana", showingManaOptions);
-      gameState.setMedicalOptionVisibility("sanity", showingSanityOptions);
-      gameState.setMedicalOptionVisibility("other", showingOtherOptions);
-    }
-  }, [
-    gameState,
-    showingHealthOptions,
-    showingManaOptions,
-    showingSanityOptions,
-    showingOtherOptions,
-  ]);
+  //useEffect(() => {
+  //if (gameState) {
+  //gameState.setMedicalOptionVisibility("health", showingHealthOptions);
+  //gameState.setMedicalOptionVisibility("mana", showingManaOptions);
+  //gameState.setMedicalOptionVisibility("sanity", showingSanityOptions);
+  //gameState.setMedicalOptionVisibility("other", showingOtherOptions);
+  //}
+  //}, [
+  //gameState,
+  //showingHealthOptions,
+  //showingManaOptions,
+  //showingSanityOptions,
+  //showingOtherOptions,
+  //]);
 
   return (
     <>
@@ -94,11 +98,11 @@ export default function MedicalScreen() {
           body: "Using items such as potions, or using spells will not tick the clock forward.",
         }}
       />
-      <View
-        className="absolute z-10 h-12 w-full shadow-soft"
+      {/*<View
+        className="absolute z-top w-full "
         style={{ top: useHeaderHeight() }}
       >
-        <ThemedView className="flex flex-row justify-evenly mx-3 pb-1 pt-4 -mt-2 rounded-xl">
+        <ThemedView className="flex z-top shadow-diffuse-top flex-row justify-evenly mx-3 border py-2 rounded-xl">
           <Pressable
             onPress={() => {
               vibration({ style: "light" });
@@ -156,79 +160,56 @@ export default function MedicalScreen() {
             </Text>
           </Pressable>
         </ThemedView>
-      </View>
+      </View> */}
       <ThemedView className="flex-1">
         <ScrollView>
           <ThemedView
             className="px-2"
             style={{
               paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
-              paddingTop: useHeaderHeight() + 48,
+              paddingTop: useHeaderHeight(),
             }}
           >
             <View className="flex flex-row">
               <View className="w-1/2">
-                {showingHealthOptions && (
-                  <>
-                    <GenericStrikeAround text={"Health"} />
-                    {healthOptions.map((medOption, index) => (
-                      <MedicalOption
-                        key={index}
-                        title={medOption.serviceName}
-                        cost={medOption.cost}
-                        healthRestore={
-                          medOption.heathRestore as number | "fill"
-                        }
-                      />
-                    ))}
-                  </>
-                )}
-                {showingOtherOptions && (
-                  <>
-                    <GenericStrikeAround text={"Other"} />
-                    {otherOptions.map((medOption, index) => (
-                      <MedicalOption
-                        key={index}
-                        title={medOption.serviceName}
-                        cost={medOption.cost}
-                        removeDebuffs={
-                          medOption.removeDebuffs as number | "all"
-                        }
-                      />
-                    ))}
-                  </>
-                )}
+                <GenericStrikeAround text={"Health"} />
+                {healthOptions.map((medOption, index) => (
+                  <MedicalOption
+                    key={index}
+                    title={medOption.serviceName}
+                    cost={medOption.cost}
+                    healthRestore={medOption.heathRestore as number | "fill"}
+                  />
+                ))}
+                <GenericStrikeAround text={"Other"} />
+                {otherOptions.map((medOption, index) => (
+                  <MedicalOption
+                    key={index}
+                    title={medOption.serviceName}
+                    cost={medOption.cost}
+                    removeDebuffs={medOption.removeDebuffs as number | "all"}
+                  />
+                ))}
               </View>
               <View className="w-1/2">
-                {showingManaOptions && (
-                  <>
-                    <GenericStrikeAround text={"Mana"} />
-                    {manaOptions.map((medOption, index) => (
-                      <MedicalOption
-                        key={index}
-                        title={medOption.serviceName}
-                        cost={medOption.cost}
-                        manaRestore={medOption.manaRestore as number | "fill"}
-                      />
-                    ))}
-                  </>
-                )}
-
-                {showingSanityOptions && (
-                  <>
-                    <GenericStrikeAround text={"Sanity"} />
-                    {sanityOptions.map((medOption, index) => (
-                      <MedicalOption
-                        key={index}
-                        title={medOption.serviceName}
-                        cost={medOption.cost}
-                        sanityRestore={
-                          medOption.sanityRestore as number | "fill"
-                        }
-                      />
-                    ))}
-                  </>
-                )}
+                <GenericStrikeAround text={"Mana"} />
+                {manaOptions.map((medOption, index) => (
+                  <MedicalOption
+                    key={index}
+                    title={medOption.serviceName}
+                    cost={medOption.cost}
+                    manaRestore={medOption.manaRestore as number | "fill"}
+                  />
+                ))}
+                <GenericStrikeAround text={"Sanity"} />
+                {sanityOptions.map((medOption, index) => (
+                  <MedicalOption
+                    key={index}
+                    title={medOption.serviceName}
+                    cost={medOption.cost}
+                    sanityRestore={medOption.sanityRestore as number | "fill"}
+                  />
+                ))}
               </View>
             </View>
           </ThemedView>
