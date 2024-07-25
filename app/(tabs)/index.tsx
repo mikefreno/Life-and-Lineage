@@ -1,4 +1,4 @@
-import { View, Platform } from "react-native";
+import { View } from "react-native";
 import { Text, View as ThemedView } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -20,6 +20,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { calculateAge } from "../../utility/functions/misc/age";
 import InventoryRender from "../../components/InventoryRender";
 import EquipmentDisplay from "../../components/EquipmentDisplay";
+import DiceRoll from "../../components/DieRollAnim";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();

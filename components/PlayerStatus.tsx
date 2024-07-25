@@ -18,7 +18,6 @@ import {
 } from "../app/_layout";
 import { observer } from "mobx-react-lite";
 import { toTitleCase } from "../utility/functions/misc/words";
-import FadeOutText from "./FadeOutText";
 import GenericModal from "./GenericModal";
 import GenericStrikeAround from "./GenericStrikeAround";
 import ClockIcon from "../assets/icons/ClockIcon";
@@ -32,13 +31,19 @@ import RotateArrow from "../assets/icons/RotateArrow";
 import FadeOutNode from "./FadeOutNode";
 import { BlurView } from "expo-blur";
 import { useColorScheme } from "nativewind";
+import { usePathname } from "expo-router";
 
 interface PlayerStatus {
   hideGold?: boolean;
   home?: boolean;
+  positioning?: string;
 }
 const PlayerStatus = observer(
-  ({ hideGold = false, home = false }: PlayerStatus) => {
+  ({
+    hideGold = false,
+    home = false,
+    positioning = "absolute",
+  }: PlayerStatus) => {
     const playerCharacterData = useContext(PlayerCharacterContext);
     const gameData = useContext(GameContext);
     const playerStatusRefContext = useContext(PlayerStatusContext);
@@ -83,7 +88,7 @@ const PlayerStatus = observer(
     const [showingHealthWarningPulse, setShowingHealthWarningPulse] =
       useState<boolean>(false);
     const healthDamageFlash = useState(new Animated.Value(0))[0];
-    const animatedValue = useState(new Animated.Value(0))[0];
+    const healthWarningAnimatedValue = useState(new Animated.Value(0))[0];
     const [localHealthMax, setLocalHealthMax] = useState<number | undefined>(
       playerState?.getMaxHealth(),
     );
@@ -100,6 +105,17 @@ const PlayerStatus = observer(
     const { colorScheme } = useColorScheme();
 
     const pressableRef = useRef<View>(null);
+    const pathname = usePathname();
+
+    const healthWarningInterpolation = healthWarningAnimatedValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: ["rgba(205,20,20,0.6)", "rgba(127,29,29,0.2)"],
+    });
+
+    const healthDamageInterpolation = healthDamageFlash.interpolate({
+      inputRange: [0, 1],
+      outputRange: ["transparent", "rgba(180,30,30,0.4)"],
+    });
 
     useEffect(() => {
       setLocalHealthMax(playerState?.getMaxHealth());
@@ -115,31 +131,39 @@ const PlayerStatus = observer(
       playerState?.sanityMax,
     ]);
 
+    console.log("playerstatus rendered");
+
     useEffect(() => {
       if (playerState?.getTotalAllocatedPoints() == 0) {
         setRespeccing(false);
       }
     }, [playerState?.unAllocatedSkillPoints]);
 
-    useEffect(() => {
+    const startHealthWarningAnimation = () => {
       Animated.loop(
         Animated.sequence([
-          Animated.timing(animatedValue, {
+          Animated.timing(healthWarningAnimatedValue, {
             toValue: 1,
             duration: 1000,
-            useNativeDriver: false,
+            useNativeDriver: true,
           }),
-          Animated.timing(animatedValue, {
+          Animated.timing(healthWarningAnimatedValue, {
             toValue: 0,
             duration: 1000,
-            useNativeDriver: false,
+            useNativeDriver: true,
           }),
         ]),
         {
           iterations: -1,
         },
       ).start();
-    }, []);
+    };
+
+    useEffect(() => {
+      if (showingHealthWarningPulse) {
+        startHealthWarningAnimation();
+      }
+    }, [pathname, showingHealthWarningPulse]);
 
     useEffect(() => {
       if (playerState) {
@@ -159,22 +183,8 @@ const PlayerStatus = observer(
       hideGold,
       playerState?.conditions,
       playerState?.unAllocatedSkillPoints,
+      pathname,
     ]);
-
-    const backgroundColorInterpolation = animatedValue.interpolate({
-      inputRange: [0, 1],
-      outputRange: ["rgba(205,20,20,0.6)", "rgba(127,29,29,0.2)"],
-    });
-
-    useEffect(() => {
-      (playerState &&
-        gameState &&
-        playerState.health / playerState.healthMax <=
-          gameState.healthWarning) ??
-      0.2
-        ? setShowingHealthWarningPulse(true)
-        : setShowingHealthWarningPulse(false);
-    }, [playerState?.health, gameState?.healthWarning]);
 
     useEffect(() => {
       if (playerState && healthRecord && playerState.health != healthRecord) {
@@ -234,6 +244,22 @@ const PlayerStatus = observer(
       playerState?.mana,
       playerState?.gold,
     ]);
+
+    useEffect(() => {
+      if (
+        playerState &&
+        gameState &&
+        playerState.health / playerState.healthMax <= gameState.healthWarning
+      ) {
+        if (!showingHealthWarningPulse) {
+          setShowingHealthWarningPulse(true);
+        }
+      } else {
+        if (showingHealthWarningPulse) {
+          setShowingHealthWarningPulse(false);
+        }
+      }
+    }, [playerState?.health, gameState?.healthWarning]);
 
     useEffect(() => {
       setReadableGold(playerState?.getReadableGold());
@@ -452,11 +478,12 @@ const PlayerStatus = observer(
       if (healthDiff != 0) {
         return (
           <View className="absolute ml-2">
-            <FadeOutText
-              className={"text-red-400"}
-              text={`${healthDiff > 0 ? "+" : ""}${healthDiff.toString()}`}
-              animationCycler={animationCycler}
-            />
+            <FadeOutNode animationCycler={animationCycler}>
+              <Text style={{ color: "#f87171" }}>
+                {healthDiff > 0 ? "+" : ""}
+                {healthDiff.toString()}
+              </Text>
+            </FadeOutNode>
           </View>
         );
       }
@@ -465,11 +492,12 @@ const PlayerStatus = observer(
       if (sanityDiff != 0) {
         return (
           <View className="absolute ml-2">
-            <FadeOutText
-              className={"text-purple-400"}
-              text={`${sanityDiff > 0 ? "+" : ""}${sanityDiff.toString()}`}
-              animationCycler={animationCycler}
-            />
+            <FadeOutNode animationCycler={animationCycler}>
+              <Text style={{ color: "#c084fc" }}>
+                {sanityDiff > 0 ? "+" : ""}
+                {sanityDiff.toString()}
+              </Text>
+            </FadeOutNode>
           </View>
         );
       }
@@ -478,11 +506,12 @@ const PlayerStatus = observer(
       if (manaDiff != 0) {
         return (
           <View className="absolute ml-2">
-            <FadeOutText
-              className={"text-blue-400"}
-              text={`${manaDiff > 0 ? "+" : ""}${manaDiff.toString()}`}
-              animationCycler={animationCycler}
-            />
+            <FadeOutNode animationCycler={animationCycler}>
+              <Text style={{ color: "#60a5fa" }}>
+                {manaDiff > 0 ? "+" : ""}
+                {manaDiff.toString()}
+              </Text>
+            </FadeOutNode>
           </View>
         );
       }
@@ -492,10 +521,13 @@ const PlayerStatus = observer(
         return (
           <View className="absolute -mt-3">
             <FadeOutNode
-              className={"text-zinc-900 dark:text-zinc-50 flex flex-row"}
               animationCycler={animationCycler}
+              className="flex flex-row"
             >
-              <Text>{`${goldDiff > 0 ? "+" : ""}${goldDiff.toString()}`}</Text>
+              <Text>
+                {goldDiff > 0 ? "+" : ""}
+                {goldDiff.toString()}
+              </Text>
               <Coins />
             </FadeOutNode>
           </View>
@@ -503,7 +535,7 @@ const PlayerStatus = observer(
       }
     }
 
-    function ColorAndPlatformDependantBlur({ children }) {
+    function colorAndPlatformDependantBlur(children: JSX.Element) {
       if (home) {
         if (colorScheme == "dark" && Platform.OS == "ios") {
           return (
@@ -515,11 +547,8 @@ const PlayerStatus = observer(
                 style={{
                   display: "flex",
                   backgroundColor: showingHealthWarningPulse
-                    ? backgroundColorInterpolation
-                    : healthDamageFlash.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: ["transparent", "rgba(180,30,30,0.4)"],
-                      }),
+                    ? healthWarningInterpolation
+                    : healthDamageInterpolation,
                 }}
               >
                 {children}
@@ -528,38 +557,35 @@ const PlayerStatus = observer(
           );
         } else {
           return (
-            <Animated.View
-              style={{
-                display: "flex",
-                backgroundColor: showingHealthWarningPulse
-                  ? backgroundColorInterpolation
-                  : healthDamageFlash.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ["transparent", "rgba(180,30,30,0.4)"],
-                    }),
-              }}
-            >
-              <View className="shadow-soft dark:shadow-soft-white mx-4 rounded-xl z-top pb-1  bg-zinc-50 dark:bg-zinc-800">
+            <View className="shadow-soft dark:shadow-soft-white mx-4 rounded-xl z-top  bg-zinc-50 dark:bg-zinc-800">
+              <Animated.View
+                style={{
+                  display: "flex",
+                  backgroundColor: showingHealthWarningPulse
+                    ? healthWarningInterpolation
+                    : healthDamageInterpolation,
+                }}
+                className="rounded-xl"
+              >
                 {children}
-              </View>
-            </Animated.View>
+              </Animated.View>
+            </View>
           );
         }
       } else {
         return (
-          <Animated.View
-            style={{
-              display: "flex",
-              backgroundColor: showingHealthWarningPulse
-                ? backgroundColorInterpolation
-                : healthDamageFlash.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ["transparent", "rgba(180,30,30,0.4)"],
-                  }),
-            }}
-          >
-            <View className="mx-4 z-top">{children}</View>
-          </Animated.View>
+          <View>
+            <Animated.View
+              style={{
+                display: "flex",
+                backgroundColor: showingHealthWarningPulse
+                  ? healthWarningInterpolation
+                  : healthDamageInterpolation,
+              }}
+            >
+              {children}
+            </Animated.View>
+          </View>
         );
       }
     }
@@ -776,16 +802,16 @@ const PlayerStatus = observer(
             className={
               !isCompact
                 ? home
-                  ? "absolute -mt-7 z-top w-full"
-                  : "absolute mt-3 z-top w-full"
+                  ? `${positioning} -mt-7 z-top w-full`
+                  : `${positioning} mt-3 z-top w-full`
                 : home
-                ? "absolute z-top w-full"
-                : "absolute mt-20 z-top w-full"
+                ? `${positioning} z-top w-full`
+                : `${positioning} mt-20 z-top w-full`
             }
           >
-            <ColorAndPlatformDependantBlur>
+            {colorAndPlatformDependantBlur(
               <View className={home ? "flex px-2" : "flex"}>
-                {!isCompact ? (
+                {!isCompact && (
                   <View className="flex h-7 flex-row justify-center">
                     {!hideGold && (
                       <View className="flex flex-row my-auto">
@@ -795,7 +821,7 @@ const PlayerStatus = observer(
                           height={16}
                           style={{ marginLeft: 6 }}
                         />
-                        {showingGoldChange ? goldChangePopUp() : null}
+                        {showingGoldChange && goldChangePopUp()}
                       </View>
                     )}
                     {playerState.unAllocatedSkillPoints > 0 && (
@@ -804,10 +830,6 @@ const PlayerStatus = observer(
                       </View>
                     )}
                     <View>{conditionRenderer()}</View>
-                  </View>
-                ) : (
-                  <View className="flex flex-row mt-1">
-                    {goldChangePopUp()}
                   </View>
                 )}
                 <View className="flex flex-row justify-evenly py-1">
@@ -849,8 +871,11 @@ const PlayerStatus = observer(
                     />
                   </View>
                 </View>
-              </View>
-            </ColorAndPlatformDependantBlur>
+              </View>,
+            )}
+            <View className="flex flex-row ml-4 absolute z-top">
+              {showingGoldChange && goldChangePopUp()}
+            </View>
           </Pressable>
         </>
       );

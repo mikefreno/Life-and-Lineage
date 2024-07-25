@@ -24,32 +24,30 @@ export default function Activities() {
               tint={
                 Platform.OS == "android"
                   ? colorScheme == "light"
-                    ? "light"
-                    : "dark"
+                    ? "systemMaterialLight"
+                    : "systemMaterialDark"
                   : "default"
               }
               intensity={100}
               style={StyleSheet.absoluteFill}
               experimentalBlurMethod={"dimezisBlurView"}
+              className="shadow-diffuse"
             />
           ),
         }}
       />
-      <ThemedView className="flex-1">
+      <ThemedView className="flex justify-between h-full">
         <ScrollView>
-          <View
-            className="px-4"
-            style={{ paddingBottom: 95, paddingTop: useHeaderHeight() }}
-          >
+          <View className="px-4" style={{ paddingTop: useHeaderHeight() }}>
             {activities.map((activity) => (
               <ActivityCard activity={activity} key={activity.name} />
             ))}
           </View>
         </ScrollView>
+        <View className="pb-6">
+          <PlayerStatus positioning={"relative"} hideGold={false} />
+        </View>
       </ThemedView>
-      <View className="absolute z-50 w-full" style={{ bottom: 95 }}>
-        <PlayerStatus />
-      </View>
     </>
   );
 }

@@ -45,7 +45,7 @@ import {
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { tapRef } from "../../utility/functions/misc/tap";
 import { fullSave } from "../../utility/functions/save_load";
-import { debounce, throttle } from "lodash";
+import { throttle } from "lodash";
 
 const TILE_SIZE = 40;
 
@@ -292,14 +292,12 @@ const DungeonLevelScreen = observer(() => {
       battleLogger(`You found a ${toTitleCase(enemy.creatureSpecies)}!`);
       setAttackAnimationOnGoing(false);
       dungeonSave(enemy);
-      if (firstLoad || !playerState?.currentDungeon) {
-        setFirstLoad(false);
-      }
     }
   }
 
   const loadBoss = () => {
     setFightingBoss(true);
+    setAttackAnimationOnGoing(false);
     if (thisDungeon && thisInstance && playerState) {
       const boss = thisDungeon.getBoss(thisInstance.name)[0];
       setEnemy(boss);
@@ -647,6 +645,8 @@ const DungeonLevelScreen = observer(() => {
   useEffect(() => {
     if (!firstLoad && !enemyState) {
       setInCombat(false);
+    } else {
+      setFirstLoad(false);
     }
   }, [enemyState]);
 

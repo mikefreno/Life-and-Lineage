@@ -5,9 +5,9 @@ import { Enemy } from "../../classes/creatures";
 import { Text } from "../Themed";
 import ProgressBar from "../ProgressBar";
 import GenericStrikeAround from "../GenericStrikeAround";
-import FadeOutText from "../FadeOutText";
 import { View as ThemedView } from "../Themed";
 import { EnemyImage } from "../EnemyImage";
+import FadeOutNode from "../FadeOutNode";
 
 interface DungeonEnemyDisplayInterface {
   enemyState: Enemy;
@@ -25,7 +25,6 @@ export default function DungeonEnemyDisplay({
   enemyState,
   showingEnemyHealthChange,
   enemyHealthDiff,
-  animationCycler,
   enemyAttackAnimationValue,
   enemyHealDummy,
   enemyDamagedAnimationValue,
@@ -36,13 +35,12 @@ export default function DungeonEnemyDisplay({
   function EnemyHealthChangePopUp() {
     return (
       <View className="h-6">
-        <FadeOutText
-          className={"text-red-400"}
-          text={`${
-            enemyHealthDiff > 0 ? "+" : ""
-          }${enemyHealthDiff.toString()}`}
-          animationCycler={animationCycler}
-        />
+        <FadeOutNode>
+          <Text className={"text-red-400"}>
+            {enemyHealthDiff > 0 ? "+" : ""}
+            {enemyHealthDiff.toString()}
+          </Text>
+        </FadeOutNode>
       </View>
     );
   }

@@ -16,6 +16,7 @@ import GenericModal from "./GenericModal";
 import { observer } from "mobx-react-lite";
 import { useVibration } from "../utility/customHooks";
 import { asReadableGold } from "../utility/functions/misc/numbers";
+import ThemedCard from "./ThemedCard";
 
 interface InvestmentCardProps {
   investment: InvestmentType;
@@ -382,167 +383,153 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
           </Pressable>
         </ThemedView>
       </Modal>
-      <ThemedView
-        className="mx-4 my-2 rounded-xl"
-        style={{
-          shadowColor: "#000",
-          shadowOffset: {
-            width: 3,
-            height: 1,
-          },
-          elevation: 3,
-          shadowOpacity: 0.2,
-          shadowRadius: 3,
-        }}
-      >
-        <View className="flex justify-between rounded-xl px-4 py-2 text-zinc-950 dark:border dark:border-zinc-500">
-          <View>
-            {madeInvestment ? (
-              <View className="flex flex-row justify-between">
-                <Text className="bold my-auto text-xl tracking-wider dark:text-zinc-50">
-                  {investment.name}
-                </Text>
-                <Text className="my-auto text-lg italic tracking-wider opacity-70 dark:text-zinc-50">
-                  Purchased
-                </Text>
-              </View>
-            ) : (
+      <ThemedCard>
+        <View>
+          {madeInvestment ? (
+            <View className="flex flex-row justify-between">
               <Text className="bold my-auto text-xl tracking-wider dark:text-zinc-50">
                 {investment.name}
               </Text>
-            )}
-            <Text className="bold my-auto py-2 text-center dark:text-zinc-50">
-              {investment.description}
+              <Text className="my-auto text-lg italic tracking-wider opacity-70 dark:text-zinc-50">
+                Purchased
+              </Text>
+            </View>
+          ) : (
+            <Text className="bold my-auto text-xl tracking-wider dark:text-zinc-50">
+              {investment.name}
             </Text>
-          </View>
-          <View className="flex flex-row items-center justify-evenly py-4">
-            <View className="mx-12 flex items-center">
-              <View className="flex flex-row">
-                {madeInvestment ? (
-                  <Text>
-                    {`${madeInvestment.minimumReturn} - ${madeInvestment.maximumReturn} `}
-                  </Text>
-                ) : (
-                  <Text>
-                    {`${investment.goldReturnRange.min} - ${investment.goldReturnRange.max} `}
-                  </Text>
-                )}
-                <Coins height={14} width={14} />
-              </View>
-              <View className="flex flex-row">
+          )}
+          <Text className="bold my-auto py-2 text-center dark:text-zinc-50">
+            {investment.description}
+          </Text>
+        </View>
+        <View className="flex flex-row items-center justify-evenly py-4">
+          <View className="mx-12 flex items-center">
+            <View className="flex flex-row">
+              {madeInvestment ? (
                 <Text>
-                  {madeInvestment
-                    ? madeInvestment.turnsPerRoll
-                    : investment.turnsPerReturn}{" "}
+                  {`${madeInvestment.minimumReturn} - ${madeInvestment.maximumReturn} `}
                 </Text>
-                <View className="my-auto">
-                  <ClockIcon
-                    height={14}
-                    width={14}
-                    color={colorScheme == "dark" ? "#fafafa" : undefined}
-                  />
-                </View>
-              </View>
-              <View className="flex flex-row items-center">
+              ) : (
                 <Text>
-                  {madeInvestment
-                    ? madeInvestment.maxGoldStockPile
-                    : investment.maxGoldStockPile}{" "}
+                  {`${investment.goldReturnRange.min} - ${investment.goldReturnRange.max} `}
                 </Text>
-                <Vault height={14} width={16} />
+              )}
+              <Coins height={14} width={14} />
+            </View>
+            <View className="flex flex-row">
+              <Text>
+                {madeInvestment
+                  ? madeInvestment.turnsPerRoll
+                  : investment.turnsPerReturn}{" "}
+              </Text>
+              <View className="my-auto">
+                <ClockIcon
+                  height={14}
+                  width={14}
+                  color={colorScheme == "dark" ? "#fafafa" : undefined}
+                />
               </View>
             </View>
-            <Pressable
-              onPress={() => {
-                vibration({ style: "light" });
-                setShowUpgrades(true);
-              }}
-              className="mx-12 rounded-xl border border-zinc-900 px-4 py-1 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-            >
-              <Text className="text-center">
-                {`View\nUpgrades `}({investment.upgrades.length})
+            <View className="flex flex-row items-center">
+              <Text>
+                {madeInvestment
+                  ? madeInvestment.maxGoldStockPile
+                  : investment.maxGoldStockPile}{" "}
               </Text>
-            </Pressable>
+              <Vault height={14} width={16} />
+            </View>
           </View>
-          {!madeInvestment ? (
-            <Pressable
-              onPress={purchaseInvestmentCheck}
-              disabled={playerState && playerState.gold < investment.cost}
-              className="mx-auto mb-2"
-            >
-              {({ pressed }) => (
-                <View
-                  className={`rounded-xl px-8 py-4 ${
-                    pressed ? "scale-95 opacity-50" : ""
-                  }`}
-                  style={
-                    playerState && playerState.gold >= investment.cost
-                      ? {
-                          shadowColor: "#000",
-                          elevation: 2,
-                          backgroundColor:
-                            colorScheme == "light" ? "white" : "#71717a",
-                          shadowOpacity: 0.1,
-                          shadowRadius: 5,
-                        }
-                      : {
-                          backgroundColor:
-                            colorScheme == "light" ? "#ccc" : "#4b4b4b",
-                          opacity: 0.5,
-                        }
-                  }
-                >
-                  <Text className="text-center">Purchase For</Text>
-                  <View className="flex flex-row items-center justify-center">
-                    <Text className="dark:text-zinc-50">
-                      {asReadableGold(investment.cost)}{" "}
-                    </Text>
-                    <Coins width={14} height={14} />
-                  </View>
-                </View>
-              )}
-            </Pressable>
-          ) : (
-            <Pressable
-              onPress={collectOnInvestment}
-              disabled={madeInvestment.currentGoldStockPile == 0}
-              className="mx-auto mb-2"
-            >
-              {({ pressed }) => (
-                <View
-                  className={`rounded-xl px-8 py-4 ${
-                    pressed ? "scale-95 opacity-50" : ""
-                  }`}
-                  style={
-                    madeInvestment.currentGoldStockPile > 0
-                      ? {
-                          shadowColor: "#000",
-                          elevation: 1,
-                          backgroundColor:
-                            colorScheme == "light" ? "white" : "#71717a",
-                          shadowOpacity: 0.1,
-                          shadowRadius: 5,
-                        }
-                      : {
-                          backgroundColor:
-                            colorScheme == "light" ? "#ccc" : "#4b4b4b",
-                          opacity: 0.5,
-                        }
-                  }
-                >
-                  <Text className="text-center">Collect</Text>
-                  <View className="flex flex-row items-center justify-center">
-                    <Text className="dark:text-zinc-50">
-                      {asReadableGold(madeInvestment.currentGoldStockPile)}{" "}
-                    </Text>
-                    <Coins width={14} height={14} />
-                  </View>
-                </View>
-              )}
-            </Pressable>
-          )}
+          <Pressable
+            onPress={() => {
+              vibration({ style: "light" });
+              setShowUpgrades(true);
+            }}
+            className="mx-12 rounded-xl border border-zinc-900 px-4 py-1 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+          >
+            <Text className="text-center">
+              {`View\nUpgrades `}({investment.upgrades.length})
+            </Text>
+          </Pressable>
         </View>
-      </ThemedView>
+        {!madeInvestment ? (
+          <Pressable
+            onPress={purchaseInvestmentCheck}
+            disabled={playerState && playerState.gold < investment.cost}
+            className="mx-auto mb-2"
+          >
+            {({ pressed }) => (
+              <View
+                className={`rounded-xl px-8 py-4 ${
+                  pressed ? "scale-95 opacity-50" : ""
+                }`}
+                style={
+                  playerState && playerState.gold >= investment.cost
+                    ? {
+                        shadowColor: "#000",
+                        elevation: 2,
+                        backgroundColor:
+                          colorScheme == "light" ? "white" : "#71717a",
+                        shadowOpacity: 0.1,
+                        shadowRadius: 5,
+                      }
+                    : {
+                        backgroundColor:
+                          colorScheme == "light" ? "#ccc" : "#4b4b4b",
+                        opacity: 0.5,
+                      }
+                }
+              >
+                <Text className="text-center">Purchase For</Text>
+                <View className="flex flex-row items-center justify-center">
+                  <Text className="dark:text-zinc-50">
+                    {asReadableGold(investment.cost)}{" "}
+                  </Text>
+                  <Coins width={14} height={14} />
+                </View>
+              </View>
+            )}
+          </Pressable>
+        ) : (
+          <Pressable
+            onPress={collectOnInvestment}
+            disabled={madeInvestment.currentGoldStockPile == 0}
+            className="mx-auto mb-2"
+          >
+            {({ pressed }) => (
+              <View
+                className={`rounded-xl px-8 py-4 ${
+                  pressed ? "scale-95 opacity-50" : ""
+                }`}
+                style={
+                  madeInvestment.currentGoldStockPile > 0
+                    ? {
+                        shadowColor: "#000",
+                        elevation: 1,
+                        backgroundColor:
+                          colorScheme == "light" ? "white" : "#71717a",
+                        shadowOpacity: 0.1,
+                        shadowRadius: 5,
+                      }
+                    : {
+                        backgroundColor:
+                          colorScheme == "light" ? "#ccc" : "#4b4b4b",
+                        opacity: 0.5,
+                      }
+                }
+              >
+                <Text className="text-center">Collect</Text>
+                <View className="flex flex-row items-center justify-center">
+                  <Text className="dark:text-zinc-50">
+                    {asReadableGold(madeInvestment.currentGoldStockPile)}{" "}
+                  </Text>
+                  <Coins width={14} height={14} />
+                </View>
+              </View>
+            )}
+          </Pressable>
+        )}
+      </ThemedCard>
     </>
   );
 });

@@ -53,25 +53,27 @@ export default function TabLayout() {
     <>
       <Tabs
         screenOptions={{
-          tabBarBackground: () => (
-            <>
-              <PlayerStatus home hideGold />
-              {Platform.OS == "ios" ? (
-                <LinearGradientBlur />
-              ) : (
-                <BlurView
-                  tint={
-                    colorScheme == "light"
-                      ? "systemMaterial"
-                      : "systemMaterialDark"
-                  }
-                  intensity={100}
-                  style={StyleSheet.absoluteFill}
-                  experimentalBlurMethod={"dimezisBlurView"}
-                />
-              )}
-            </>
-          ),
+          tabBarBackground: () => {
+            return (
+              <>
+                <PlayerStatus home hideGold />
+                {Platform.OS == "ios" ? (
+                  <LinearGradientBlur />
+                ) : (
+                  <BlurView
+                    tint={
+                      colorScheme == "light"
+                        ? "systemMaterial"
+                        : "systemMaterialDark"
+                    }
+                    intensity={100}
+                    style={StyleSheet.absoluteFill}
+                    experimentalBlurMethod={"dimezisBlurView"}
+                  />
+                )}
+              </>
+            );
+          },
           tabBarActiveTintColor: Colors[colorScheme as "light" | "dark"].tint,
           tabBarLabelStyle: {
             fontFamily: "PixelifySans",
@@ -432,6 +434,7 @@ export default function TabLayout() {
                 intensity={100}
                 style={StyleSheet.absoluteFill}
                 experimentalBlurMethod={"dimezisBlurView"}
+                className="shadow-diffuse"
               />
             ),
             title: "Medical",

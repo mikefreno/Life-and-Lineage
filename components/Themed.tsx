@@ -23,6 +23,8 @@ export type ViewProps = ThemeProps & DefaultView["props"];
 export type SafeAreaViewProps = ThemeProps & DefaultSafeAreaView["props"];
 export type ScrollViewProps = ThemeProps & DefaultScrollView["props"];
 
+export const DEFAULT_FADEOUT_TIME = 2500; //ms
+
 export function useThemeColor(
   props: { light?: string; dark?: string },
   colorName: keyof typeof Colors.light & keyof typeof Colors.dark,
