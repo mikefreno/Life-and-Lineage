@@ -131,8 +131,6 @@ const PlayerStatus = observer(
       playerState?.sanityMax,
     ]);
 
-    console.log("playerstatus rendered");
-
     useEffect(() => {
       if (playerState?.getTotalAllocatedPoints() == 0) {
         setRespeccing(false);
@@ -541,7 +539,7 @@ const PlayerStatus = observer(
           return (
             <BlurView
               intensity={100}
-              className="shadow-soft dark:shadow-soft-white mx-4 rounded-xl z-top pb-1 overflow-hidden"
+              className="shadow-soft dark:shadow-soft-white mx-4 rounded-xl z-top overflow-hidden"
             >
               <Animated.View
                 style={{
@@ -549,6 +547,7 @@ const PlayerStatus = observer(
                   backgroundColor: showingHealthWarningPulse
                     ? healthWarningInterpolation
                     : healthDamageInterpolation,
+                  paddingBottom: 4,
                 }}
               >
                 {children}
@@ -564,8 +563,9 @@ const PlayerStatus = observer(
                   backgroundColor: showingHealthWarningPulse
                     ? healthWarningInterpolation
                     : healthDamageInterpolation,
+                  paddingBottom: 4,
+                  borderRadius: 12,
                 }}
-                className="rounded-xl"
               >
                 {children}
               </Animated.View>

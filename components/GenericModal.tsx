@@ -1,6 +1,8 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
+import { Dimensions } from "react-native";
 import Modal from "react-native-modal";
 import { View } from "./Themed";
+import * as NavigationBar from "expo-navigation-bar";
 
 interface GenericModalProps {
   isVisibleCondition: boolean;
@@ -17,6 +19,8 @@ export default function GenericModal({
   backdropCloses = true,
   size,
 }: GenericModalProps) {
+  const deviceHeight = Dimensions.get("screen").height;
+
   return (
     <Modal
       animationIn="slideInUp"
@@ -27,6 +31,9 @@ export default function GenericModal({
       isVisible={isVisibleCondition}
       onBackdropPress={backdropCloses ? backFunction : undefined}
       onBackButtonPress={backFunction}
+      deviceHeight={deviceHeight}
+      useNativeDriver
+      statusBarTranslucent
     >
       <View
         className="mx-auto rounded-xl px-[2vw] py-4 dark:border dark:border-zinc-500"

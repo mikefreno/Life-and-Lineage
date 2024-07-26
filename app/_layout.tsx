@@ -237,10 +237,7 @@ const RootLayout = observer(() => {
   async function getAndSetNavBar() {
     if (Platform.OS == "android") {
       if ((await NavigationBar.getVisibilityAsync()) == "visible") {
-        await NavigationBar.setPositionAsync("relative");
-        await NavigationBar.setBackgroundColorAsync(
-          colorScheme == "dark" ? "#18181b" : "#fafafa",
-        );
+        await NavigationBar.setVisibilityAsync("hidden");
         if (!navbarLoad) {
           setNavbarLoad(true);
         }

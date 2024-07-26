@@ -1,5 +1,5 @@
 import investments from "../assets/json/investments.json";
-import { ScrollView, View } from "../components/Themed";
+import { ScrollView, View, Text } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { InvestmentType } from "../utility/types";
 import InvestmentCard from "../components/InvestmentCard";
@@ -8,7 +8,7 @@ import { useContext, useEffect, useState } from "react";
 import { GameContext } from "./_layout";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../components/TutorialModal";
-import { View as NonThemedView, Platform, StyleSheet } from "react-native";
+import { Modal, Platform, StyleSheet } from "react-native";
 import { Stack } from "expo-router";
 import { BlurView } from "expo-blur";
 import { useColorScheme } from "nativewind";
@@ -82,6 +82,11 @@ export default function InvestingScreen() {
           body: "Each investment base has a number of upgrades, some with significant consequences on your character.",
         }}
       />
+      <Modal>
+        <View>
+          <Text>Hi</Text>
+        </View>
+      </Modal>
       <View className="flex-1">
         <View className="flex-1">
           <ScrollView>
