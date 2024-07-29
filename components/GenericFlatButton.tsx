@@ -35,7 +35,7 @@ const GenericFlatButton = ({
           {typeof children === "string" ? (
             <Text
               className="text-center text-lg tracking-widest"
-              style={disabledCondition && { color: "#d4d4d8" }}
+              style={disabledCondition ? { color: "#d4d4d8" } : {}}
             >
               {children}
             </Text>

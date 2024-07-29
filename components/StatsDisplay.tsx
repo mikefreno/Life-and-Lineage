@@ -89,34 +89,32 @@ export function StatsDisplay({
                   onPressFunction={() => {
                     sellItem(item), setShowingStats(null);
                   }}
-                  textNode={
-                    <Text
-                      className={
-                        isDisabled ? "opacity-50 text-center" : "text-center"
-                      }
-                    >
-                      Sell One
-                    </Text>
-                  }
                   disabledCondition={isDisabled}
-                />
+                >
+                  <Text
+                    className={
+                      isDisabled ? "opacity-50 text-center" : "text-center"
+                    }
+                  >
+                    Sell One
+                  </Text>
+                </GenericFlatButton>
                 <GenericFlatButton
                   onPressFunction={() => {
                     sellStack(item);
                     setShowingStats(null);
                   }}
-                  textNode={
-                    <Text
-                      className={
-                        isDisabled ? "opacity-50 text-center" : "text-center"
-                      }
-                    >
-                      Sell All
-                    </Text>
-                  }
                   disabledCondition={isDisabled}
                   className="mt-1"
-                />
+                >
+                  <Text
+                    className={
+                      isDisabled ? "opacity-50 text-center" : "text-center"
+                    }
+                  >
+                    Sell All
+                  </Text>
+                </GenericFlatButton>
               </>
             ) : (
               <GenericFlatButton
@@ -124,17 +122,17 @@ export function StatsDisplay({
                   props.sellItem(item);
                   setShowingStats(null);
                 }}
-                textNode={
-                  <Text
-                    className={
-                      isDisabled ? "opacity-50 text-center" : "text-center"
-                    }
-                  >
-                    Sell
-                  </Text>
-                }
                 disabledCondition={isDisabled}
-              />
+              >
+                {" "}
+                <Text
+                  className={
+                    isDisabled ? "opacity-50 text-center" : "text-center"
+                  }
+                >
+                  Sell
+                </Text>
+              </GenericFlatButton>
             )}
           </>
         );
@@ -154,25 +152,23 @@ export function StatsDisplay({
             </View>
             <GenericFlatButton
               onPressFunction={() => purchaseItem()}
-              textNode={
-                <Text
-                  className={
-                    isDisabled ? "opacity-50 text-center" : "text-center"
-                  }
-                >
-                  Buy Item
-                </Text>
-              }
               disabledCondition={isDisabled}
-            />
+            >
+              <Text
+                className={
+                  isDisabled ? "opacity-50 text-center" : "text-center"
+                }
+              >
+                Buy Item
+              </Text>
+            </GenericFlatButton>
           </>
         );
       } else if ("addItemToPouch" in props) {
         return (
-          <GenericFlatButton
-            onPressFunction={() => props.addItemToPouch(item)}
-            text={"Drop"}
-          />
+          <GenericFlatButton onPressFunction={() => props.addItemToPouch(item)}>
+            Drop
+          </GenericFlatButton>
         );
       }
     }

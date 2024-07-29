@@ -1,12 +1,5 @@
-import React, { useState, useRef } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  Animated,
-  Easing,
-  Pressable,
-} from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import { View, StyleSheet, Text, Animated, Easing } from "react-native";
 import { rollD20 } from "../utility/functions/roll";
 import D20SVG from "../assets/icons/D20SVG";
 
@@ -36,6 +29,10 @@ const D20Die = () => {
     outputRange: [1, 0.5, 1],
   });
 
+  useEffect(() => {
+    roll();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Animated.View
@@ -49,9 +46,6 @@ const D20Die = () => {
         <D20SVG />
         <Text style={styles.diceText}>{diceValue}</Text>
       </Animated.View>
-      <Pressable style={styles.button} onPress={roll}>
-        <Text style={styles.buttonText}>Roll D20</Text>
-      </Pressable>
     </View>
   );
 };
