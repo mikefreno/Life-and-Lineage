@@ -22,11 +22,6 @@ import PaladinHammer from "../../assets/icons/PaladinHammer";
 import Necromancer from "../../assets/icons/NecromancerSkull";
 import { useColorScheme } from "nativewind";
 import { useContext } from "react";
-import {
-  PlayerCharacterContext,
-  PlayerStatusCompactContext,
-  PlayerStatusContext,
-} from "../_layout";
 import GraduationCapIcon from "../../assets/icons/GraduationCap";
 import { useVibration } from "../../utility/customHooks";
 import BowlingBallAndPin from "../../assets/icons/BowlingBallAndPin";
@@ -35,18 +30,14 @@ import { StyleSheet } from "react-native";
 import PlayerStatus from "../../components/PlayerStatus";
 import { LinearGradientBlur } from "../../components/LinearGradientBlur";
 import { tapRef } from "../../utility/functions/misc/tap";
+import { AppContext } from "../_layout";
 
 export default function TabLayout() {
-  const playerCharacterContext = useContext(PlayerCharacterContext);
-  const playerStatusContext = useContext(PlayerStatusContext);
-  const playerStatusCompact = useContext(PlayerStatusCompactContext);
-  if (!playerCharacterContext || !playerStatusContext || !playerStatusCompact) {
-    throw new Error("missing context");
-  }
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing context");
+
   const { colorScheme } = useColorScheme();
-  const { playerState } = playerCharacterContext;
-  const { playerStatusRef } = playerStatusContext;
-  const { isCompact } = playerStatusCompact;
+  const { playerState, playerStatusRef, isCompact } = appData;
   const vibration = useVibration();
 
   return (

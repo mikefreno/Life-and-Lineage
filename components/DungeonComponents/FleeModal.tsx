@@ -179,20 +179,22 @@ export default function FleeModal({
                 <ThemedView className="flex w-full flex-row justify-evenly pt-8">
                   <GenericFlatButton
                     onPressFunction={flee}
-                    text={enemyState ? "Run!" : "Leave"}
                     disabledCondition={
                       enemyState
                         ? attackAnimationOnGoing || playerState.isStunned()
                         : false
                     }
-                  />
+                  >
+                    {enemyState ? "Run!" : "Leave"}
+                  </GenericFlatButton>
                   <GenericFlatButton
                     onPressFunction={() => {
                       setFleeModalShowing(false);
                       setFleeRollFailure(false);
                     }}
-                    text={"Cancel"}
-                  />
+                  >
+                    Cancel
+                  </GenericFlatButton>
                 </ThemedView>
                 {fleeRollFailure ? (
                   <Text className="text-center" style={{ color: "#ef4444" }}>

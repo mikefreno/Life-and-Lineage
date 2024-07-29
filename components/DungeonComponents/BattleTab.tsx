@@ -4,11 +4,6 @@ import attacks from "../../assets/json/playerAttacks.json";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { Item } from "../../classes/item";
 import { useContext, useEffect, useState } from "react";
-import {
-  LogsContext,
-  EnemyContext,
-  PlayerCharacterContext,
-} from "../../app/_layout";
 import { useColorScheme } from "nativewind";
 import { useVibration } from "../../utility/customHooks";
 import { Minion, Enemy } from "../../classes/creatures";
@@ -19,6 +14,7 @@ import GenericModal from "../GenericModal";
 import SpellDetails from "../SpellDetails";
 import GenericStrikeAround from "../GenericStrikeAround";
 import InventoryRender from "../InventoryRender";
+import { AppContext } from "../../app/_layout";
 
 interface BattleTabProps {
   battleTab: "attacksOrNavigation" | "equipment" | "log";
@@ -69,18 +65,15 @@ export default function BattleTab({
   DungeonMapControls,
 }: BattleTabProps) {
   const { colorScheme } = useColorScheme();
-  const logs = useContext(LogsContext)?.logsState;
   const [attackDetails, setAttackDetails] = useState<AttackObj | Spell | null>(
     null,
   );
   const [attackDetailsShowing, setAttackDetailsShowing] =
     useState<boolean>(false);
 
-  const enemyContext = useContext(EnemyContext);
-  const playerContext = useContext(PlayerCharacterContext);
-  if (!playerContext || !enemyContext) throw new Error("missing context");
-  const { playerState } = playerContext;
-  const { enemyState } = enemyContext;
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing context");
+  const { playerState, logsState, enemyState } = appData;
 
   const playerAttacks = playerState?.physicalAttacks;
   const playerSpells = playerState?.getSpells();
@@ -323,15 +316,17 @@ export default function BattleTab({
             >
               {Platform.OS == "web" ? (
                 <ScrollView>
-                  {logs
-                    ?.slice()
+                  {logsState
+                    .slice()
                     .reverse()
-                    .map((text) => <Text>{text}</Text>)}
+                    .map((text) => (
+                      <Text>{text}</Text>
+                    ))}
                 </ScrollView>
               ) : (
                 <FlatList
                   inverted
-                  data={logs?.slice().reverse()}
+                  data={logsState.slice().reverse()}
                   renderItem={({ item }) => (
                     <Text className="py-1">{item}</Text>
                   )}
@@ -367,7 +362,7 @@ export default function BattleTab({
                 )}
                 {attackDetails.buffs && (
                   <>
-                    <GenericStrikeAround text="Buffs" />
+                    <GenericStrikeAround>Buffs</GenericStrikeAround>
                     {attackDetails.buffs.map((buff) => (
                       <View>
                         <Text>{buff.name}</Text>
@@ -378,7 +373,7 @@ export default function BattleTab({
                 )}
                 {attackDetails.debuffs && (
                   <>
-                    <GenericStrikeAround text="Debuffs" />
+                    <GenericStrikeAround>Debuffs</GenericStrikeAround>
                     {attackDetails.debuffs.map((debuff) => (
                       <View>
                         <Text>{debuff.name}</Text>

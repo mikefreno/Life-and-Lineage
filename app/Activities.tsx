@@ -44,10 +44,8 @@ export default function Activities() {
             ))}
           </View>
         </ScrollView>
-        <View className="pb-6">
-          <PlayerStatus positioning={"relative"} hideGold={false} />
-        </View>
       </ThemedView>
+      <PlayerStatus tabScreen />
     </>
   );
 }

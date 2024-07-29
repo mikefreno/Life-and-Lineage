@@ -2,7 +2,6 @@ import { Text, View, ScrollView } from "../components/Themed";
 import { calculateAge } from "../utility/functions/misc/age";
 import { CharacterImage } from "../components/CharacterImage";
 import { useContext, useState } from "react";
-import { GameContext, PlayerCharacterContext } from "./_layout";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Character } from "../classes/character";
 import ProgressBar from "../components/ProgressBar";
@@ -10,15 +9,14 @@ import AffectionIcon from "../assets/icons/AffectionIcon";
 import { CharacterInteractionModal } from "../components/CharacterInteractionModal";
 import { Pressable } from "react-native";
 import GiftModal from "../components/GiftModal";
+import { AppContext } from "./_layout";
 
 export default function RelationshipsScreen() {
-  const playerCharacterContext = useContext(PlayerCharacterContext);
-  const gameContext = useContext(GameContext);
-  if (!playerCharacterContext || !gameContext) {
+  const appData = useContext(AppContext);
+  if (!appData) {
     throw new Error("missing context");
   }
-  const { playerState } = playerCharacterContext;
-  const { gameState } = gameContext;
+  const { playerState, gameState } = appData;
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null,
   );

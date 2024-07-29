@@ -7,7 +7,7 @@ import { Stack, router } from "expo-router";
 import Necromancer from "../../assets/icons/NecromancerSkull";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
 import { useVibration } from "../../utility/customHooks";
-import { GameContext } from "../_layout";
+import { AppContext } from "../_layout";
 import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -21,8 +21,9 @@ export default function NewGameScreen() {
   const colorScheme = useColorScheme();
   const vibration = useVibration();
 
-  const gameContext = useContext(GameContext);
-  const gameState = gameContext?.gameState;
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing context!");
+  const { gameState } = appData;
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,
   );

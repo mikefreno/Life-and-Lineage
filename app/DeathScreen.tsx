@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable } from "react-native";
 import { View, Text, SafeAreaView } from "../components/Themed";
 import { Stack } from "expo-router";
 import deathMessages from "../assets/json/deathMessages.json";
@@ -7,16 +7,15 @@ import { router } from "expo-router";
 import { CharacterImage } from "../components/CharacterImage";
 import { calculateAge } from "../utility/functions/misc/age";
 import { Character } from "../classes/character";
-import { GameContext, PlayerCharacterContext } from "./_layout";
+import { AppContext } from "./_layout";
+import GenericStrikeAround from "../components/GenericStrikeAround";
 
 export default function DeathScreen() {
   const [nextLife, setNextLife] = useState<Character | null>(null);
 
-  const gameData = useContext(GameContext);
-  const playerCharacterData = useContext(PlayerCharacterContext);
-  if (!gameData || !playerCharacterData) throw new Error("missing contexts");
-  const { gameState } = gameData;
-  const { playerState } = playerCharacterData;
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing contexts");
+  const { playerState, gameState } = appData;
 
   function getDeathMessage() {
     const randomIndex = Math.floor(Math.random() * deathMessages.length);
@@ -70,13 +69,9 @@ export default function DeathScreen() {
                   <Text>{`Live on as ${nextLife.getFullName()}`}</Text>
                 </Pressable>
               ) : null}
-              <View style={styles.container}>
-                <View style={styles.line} />
-                <View style={styles.content}>
-                  <Text>Or</Text>
-                </View>
-                <View style={styles.line} />
-              </View>
+              <GenericStrikeAround>
+                <Text>Or</Text>
+              </GenericStrikeAround>
             </>
           ) : null}
           <Pressable
@@ -90,18 +85,3 @@ export default function DeathScreen() {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  content: {
-    marginHorizontal: 10,
-  },
-  line: {
-    flex: 1,
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
-  },
-});

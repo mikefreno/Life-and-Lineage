@@ -5,7 +5,15 @@ import {
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack, router } from "expo-router";
-import { createContext, useEffect, useContext, useState } from "react";
+import React, {
+  createContext,
+  useEffect,
+  useContext,
+  useState,
+  Dispatch,
+  SetStateAction,
+  RefObject,
+} from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
 import { Game } from "../classes/game";
@@ -32,55 +40,22 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-export const GameContext = createContext<
-  | {
-      gameState: Game | undefined;
-      setGameData: React.Dispatch<React.SetStateAction<Game | undefined>>;
-    }
-  | undefined
->(undefined);
+interface AppContextType {
+  gameState: Game | undefined;
+  setGameData: Dispatch<SetStateAction<Game | undefined>>;
+  playerState: PlayerCharacter | undefined;
+  setPlayerCharacter: Dispatch<SetStateAction<PlayerCharacter | undefined>>;
+  enemyState: Enemy | null;
+  setEnemy: Dispatch<SetStateAction<Enemy | null>>;
+  logsState: string[];
+  setLogs: Dispatch<SetStateAction<string[]>>;
+  playerStatusRef: RefObject<View> | undefined;
+  setPlayerStatusRef: Dispatch<RefObject<View>>;
+  isCompact: boolean;
+  setIsCompact: Dispatch<SetStateAction<boolean>>;
+}
 
-export const PlayerCharacterContext = createContext<
-  | {
-      playerState: PlayerCharacter | undefined;
-      setPlayerCharacter: React.Dispatch<
-        React.SetStateAction<PlayerCharacter | undefined>
-      >;
-    }
-  | undefined
->(undefined);
-
-export const EnemyContext = createContext<
-  | {
-      enemyState: Enemy | null;
-      setEnemy: React.Dispatch<React.SetStateAction<Enemy | null>>;
-    }
-  | undefined
->(undefined);
-
-export const LogsContext = createContext<
-  | {
-      logsState: string[];
-      setLogs: React.Dispatch<React.SetStateAction<string[]>>;
-    }
-  | undefined
->(undefined);
-
-export const PlayerStatusContext = createContext<
-  | {
-      playerStatusRef: React.RefObject<View> | undefined;
-      setPlayerStatusRef: React.Dispatch<React.RefObject<View>>;
-    }
-  | undefined
->(undefined); // literally only used for a single tutorial... no idea if there is a better way to do this
-
-export const PlayerStatusCompactContext = createContext<
-  | {
-      isCompact: boolean;
-      setIsCompact: React.Dispatch<React.SetStateAction<boolean>>;
-    }
-  | undefined
->(undefined);
+export const AppContext = createContext<AppContextType | undefined>(undefined);
 
 Sentry.init({
   dsn: "https://2cff54f8aeb50bcb7151c159cc40fe1b@o4506630160187392.ingest.sentry.io/4506630163398656",
@@ -152,28 +127,24 @@ const Root = observer(() => {
   }
 
   return (
-    <GameContext.Provider value={{ gameState, setGameData }}>
-      <PlayerCharacterContext.Provider
-        value={{ playerState, setPlayerCharacter }}
-      >
-        <EnemyContext.Provider value={{ enemyState, setEnemy }}>
-          <LogsContext.Provider value={{ logsState, setLogs }}>
-            <PlayerStatusContext.Provider
-              value={{ playerStatusRef, setPlayerStatusRef }}
-            >
-              <PlayerStatusCompactContext.Provider
-                value={{
-                  isCompact: playerStatusCompact,
-                  setIsCompact: setPlayerStatusCompact,
-                }}
-              >
-                <RootLayout />
-              </PlayerStatusCompactContext.Provider>
-            </PlayerStatusContext.Provider>
-          </LogsContext.Provider>
-        </EnemyContext.Provider>
-      </PlayerCharacterContext.Provider>
-    </GameContext.Provider>
+    <AppContext.Provider
+      value={{
+        gameState,
+        setGameData,
+        playerState,
+        setPlayerCharacter,
+        enemyState,
+        setEnemy,
+        logsState,
+        setLogs,
+        playerStatusRef,
+        setPlayerStatusRef,
+        isCompact: playerStatusCompact,
+        setIsCompact: setPlayerStatusCompact,
+      }}
+    >
+      <RootLayout />
+    </AppContext.Provider>
   );
 });
 
@@ -181,12 +152,11 @@ const RootLayout = observer(() => {
   const [fontLoaded, fontError] = useFonts({
     PixelifySans: require("../assets/fonts/PixelifySans-Regular.ttf"),
   });
-  const playerCharacterData = useContext(PlayerCharacterContext);
-  const gameData = useContext(GameContext);
-  if (!gameData || !playerCharacterData) {
+  const appData = useContext(AppContext);
+  if (!appData) {
     throw new Error("missing context");
   }
-  const { playerState } = playerCharacterData;
+  const { playerState, gameState } = appData;
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
   const [navbarLoad, setNavbarLoad] = useState(false);
@@ -197,7 +167,7 @@ const RootLayout = observer(() => {
       if (!playerState) {
         router.replace("/NewGame");
       } else if (
-        gameData?.gameState?.atDeathScreen ||
+        gameState?.atDeathScreen ||
         (playerState && (playerState.health <= 0 || playerState.sanity <= -50))
       ) {
         while (router.canGoBack()) {

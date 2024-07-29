@@ -4,13 +4,12 @@ import Energy from "../assets/icons/EnergyIcon";
 import Sanity from "../assets/icons/SanityIcon";
 import HealthIcon from "../assets/icons/HealthIcon";
 import { Text } from "./Themed";
-import { useColorScheme } from "nativewind";
 import { useIsFocused } from "@react-navigation/native";
-import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { useContext } from "react";
 import GenericRaisedButton from "./GenericRaisedButton";
 import { observer } from "mobx-react-lite";
 import ThemedCard from "./ThemedCard";
+import { AppContext } from "../app/_layout";
 
 interface MedicalOptionProps {
   title: string;
@@ -30,12 +29,9 @@ const MedicalOption = observer(
     manaRestore,
     removeDebuffs,
   }: MedicalOptionProps) => {
-    const playerCharacterData = useContext(PlayerCharacterContext);
-    const gameData = useContext(GameContext);
-    if (!playerCharacterData || !gameData) throw new Error("missing context");
-    const { playerState } = playerCharacterData;
-    const { gameState } = gameData;
-    const { colorScheme } = useColorScheme();
+    const appData = useContext(AppContext);
+    if (!appData) throw new Error("missing context");
+    const { playerState, gameState } = appData;
     const isFocused = useIsFocused();
 
     function visit() {
@@ -141,10 +137,11 @@ const MedicalOption = observer(
           </View>
         </View>
         <GenericRaisedButton
-          text={"Visit"}
           onPressFunction={visit}
           disabledCondition={getDisabled()}
-        />
+        >
+          Visit
+        </GenericRaisedButton>
       </ThemedCard>
     );
   },

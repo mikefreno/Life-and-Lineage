@@ -6,11 +6,6 @@ import Necromancer from "../../assets/icons/NecromancerSkull";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
 import blessingDisplay from "../../components/BlessingsDisplay";
 import { useColorScheme } from "nativewind";
-import {
-  GameContext,
-  PlayerCharacterContext,
-  PlayerStatusCompactContext,
-} from "../_layout";
 import { observer } from "mobx-react-lite";
 import { Dimensions } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
@@ -20,13 +15,12 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { calculateAge } from "../../utility/functions/misc/age";
 import InventoryRender from "../../components/InventoryRender";
 import EquipmentDisplay from "../../components/EquipmentDisplay";
-import DiceRoll from "../../components/DieRollAnim";
+import { AppContext } from "../_layout";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
-  const playerStateData = useContext(PlayerCharacterContext);
-  const gameData = useContext(GameContext);
-  const playerStatusCompact = useContext(PlayerStatusCompactContext);
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing contexts");
 
   const headTarget = useRef<View>(null);
   const bodyTarget = useRef<View>(null);
@@ -36,11 +30,7 @@ const HomeScreen = observer(() => {
 
   const deviceHeight = Dimensions.get("window").height;
 
-  if (!playerStateData || !gameData || !playerStatusCompact)
-    throw new Error("missing contexts");
-  const { playerState } = playerStateData;
-  const { gameState } = gameData;
-  const { isCompact } = playerStatusCompact;
+  const { playerState, gameState, isCompact } = appData;
   const [showIntroTutorial, setShowIntroTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("intro")) ?? false,
   );

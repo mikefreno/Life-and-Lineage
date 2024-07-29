@@ -6,7 +6,7 @@ import type { Item } from "../classes/item";
 import { useVibration } from "../utility/customHooks";
 import { StatsDisplay } from "./StatsDisplay";
 import { checkReleasePositionProps } from "../utility/types";
-import { PlayerCharacterContext } from "../app/_layout";
+import { AppContext } from "../app/_layout";
 
 interface EquipmentDisplayProps {
   headTarget: RefObject<View>;
@@ -32,9 +32,9 @@ export default function EquipmentDisplay({
   const [statsLeftPos, setStatsLeftPos] = useState<number>();
   const [statsTopPos, setStatsTopPos] = useState<number>();
   const vibration = useVibration();
-  const playerStateData = useContext(PlayerCharacterContext);
-  if (!playerStateData) throw new Error("missing contexts");
-  const { playerState } = playerStateData;
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing contexts");
+  const { playerState } = appData;
 
   function checkReleasePosition({
     item,

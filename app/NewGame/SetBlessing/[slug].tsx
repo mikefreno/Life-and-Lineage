@@ -15,7 +15,7 @@ import HoldingSkull from "../../../assets/icons/HoldingSkull";
 import Bones from "../../../assets/icons/BonesIcon";
 import Virus from "../../../assets/icons/VirusIcon";
 import { useVibration } from "../../../utility/customHooks";
-import { GameContext } from "../../_layout";
+import { AppContext } from "../../_layout";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -55,8 +55,9 @@ export default function SetBlessing() {
   const blessingRef = useRef<string>();
   const vibration = useVibration();
 
-  const gameContext = useContext(GameContext);
-  const gameState = gameContext?.gameState;
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing context");
+  const { gameState } = appData;
 
   const [showBlessingTutorial, setShowBlessingTutorial] = useState<boolean>(
     !gameState ||

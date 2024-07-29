@@ -1,17 +1,10 @@
-import { View, Text, ScrollView } from "../components/Themed";
+import { View as ThemedView, Text, ScrollView } from "../components/Themed";
 import "../assets/styles/globals.css";
-import {
-  Pressable,
-  Image,
-  View as NonThemedView,
-  Platform,
-  StyleSheet,
-} from "react-native";
+import { Pressable, Image, Platform, StyleSheet, View } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import { Item } from "../classes/item";
 import { toTitleCase } from "../utility/functions/misc/words";
 import { useIsFocused } from "@react-navigation/native";
-import { GameContext, PlayerCharacterContext } from "./_layout";
 import ProgressBar from "../components/ProgressBar";
 import { elementalColorMap } from "../utility/elementColors";
 import { useVibration } from "../utility/customHooks";
@@ -27,18 +20,16 @@ import GenericModal from "../components/GenericModal";
 import {
   convertMasteryToNumber,
   convertMasteryToString,
-  getMasteryLevel,
 } from "../utility/spellHelper";
+import { AppContext } from "./_layout";
 
 export default function LearningKnowledgeScreen() {
-  const playerCharacterData = useContext(PlayerCharacterContext);
-  const gameData = useContext(GameContext);
-  if (!playerCharacterData || !gameData) {
+  const appData = useContext(AppContext);
+  if (!appData) {
     throw new Error("missing context");
   }
-  const { playerState } = playerCharacterData;
+  const { playerState, gameState } = appData;
   if (!playerState) throw new Error("no playerState");
-  const { gameState } = gameData;
   const { colorScheme } = useColorScheme();
 
   const books = playerState?.inventory.filter(
@@ -176,7 +167,7 @@ export default function LearningKnowledgeScreen() {
           </>
         ) : null}
       </GenericModal>
-      <View className="flex-1">
+      <ThemedView className="flex-1">
         <View
           style={{
             paddingTop: useHeaderHeight(),
@@ -304,10 +295,8 @@ export default function LearningKnowledgeScreen() {
             </View>
           ) : null}
         </View>
-      </View>
-      <View className="pb-6">
-        <PlayerStatus positioning={"relative"} />
-      </View>
+      </ThemedView>
+      <PlayerStatus tabScreen />
     </>
   );
 }

@@ -2,36 +2,26 @@ import { ReactNode } from "react";
 import { ColorValue, Pressable, View } from "react-native";
 import { Text } from "./Themed";
 
-type GenericFlatButtonTextProps = {
+type GenericFlatButton = {
   onPressFunction: () => void;
-  text?: string;
   disabledCondition?: boolean;
   backgroundColor?: ColorValue;
   className?: string;
-  children?: ReactNode;
+  children: string | ReactNode;
 };
-type GenericFlatButtonNodeProps = {
-  onPressFunction: () => void;
-  textNode?: ReactNode;
-  disabledCondition?: boolean;
-  backgroundColor?: ColorValue;
-  className?: string;
-  children?: ReactNode;
-};
-
-type Props = GenericFlatButtonNodeProps | GenericFlatButtonTextProps;
 
 const GenericFlatButton = ({
   onPressFunction,
   disabledCondition = false,
   backgroundColor,
-  ...props
-}: Props) => {
+  children,
+  className,
+}: GenericFlatButton) => {
   return (
     <Pressable
       disabled={disabledCondition}
       onPress={onPressFunction}
-      className={props.className}
+      className={className}
     >
       {({ pressed }) => (
         <View
@@ -42,16 +32,15 @@ const GenericFlatButton = ({
           }`}
           style={{ backgroundColor: backgroundColor }}
         >
-          {props.children ? props.children : null}
-          {"text" in props && props.text ? (
+          {typeof children === "string" ? (
             <Text
               className="text-center text-lg tracking-widest"
-              style={disabledCondition ? { color: "#d4d4d8" } : {}}
+              style={disabledCondition && { color: "#d4d4d8" }}
             >
-              {props.text}
+              {children}
             </Text>
           ) : (
-            "textNode" in props && props.textNode
+            children
           )}
         </View>
       )}

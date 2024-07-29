@@ -5,11 +5,6 @@ import { useColorScheme } from "nativewind";
 import { flipCoin } from "../utility/functions/roll";
 import { generateNewCharacter } from "../utility/functions/characterAid";
 import { useContext, useState } from "react";
-import {
-  EnemyContext,
-  GameContext,
-  PlayerCharacterContext,
-} from "../app/_layout";
 import Coins from "../assets/icons/CoinsIcon";
 import { toTitleCase } from "../utility/functions/misc/words";
 import GenericModal from "./GenericModal";
@@ -21,31 +16,24 @@ import HealthIcon from "../assets/icons/HealthIcon";
 import { EnemyImage } from "./EnemyImage";
 import GenericStrikeAround from "./GenericStrikeAround";
 import { router } from "expo-router";
-import { getNumberInRange } from "../utility/enemy";
-import { Enemy } from "../classes/creatures";
-import enemies from "../assets/json/enemy.json";
 import { observer } from "mobx-react-lite";
-import { useVibration } from "../utility/customHooks";
 import { CharacterInteractionModal } from "./CharacterInteractionModal";
 import { calculateAge } from "../utility/functions/misc/age";
 import { CharacterImage } from "./CharacterImage";
 import ProgressBar from "./ProgressBar";
 import AffectionIcon from "../assets/icons/AffectionIcon";
+import { AppContext } from "../app/_layout";
 
 interface ActivityCardProps {
   activity: Activity;
 }
 
 const ActivityCard = observer(({ activity }: ActivityCardProps) => {
-  const playerContext = useContext(PlayerCharacterContext);
-  const enemyContext = useContext(EnemyContext);
-  const gameContext = useContext(GameContext);
-  if (!playerContext || !enemyContext || !gameContext) {
+  const appData = useContext(AppContext);
+  if (!appData) {
     throw new Error("missing context");
   }
-  const { playerState } = playerContext;
-  const { setEnemy } = enemyContext;
-  const { gameState } = gameContext;
+  const { playerState, gameState } = appData;
   const { colorScheme } = useColorScheme();
   const [metCharacter, setMetCharacter] = useState<Character | null>(null);
   const [nothingHappened, setNothingHappened] = useState<boolean>(false);
@@ -54,8 +42,6 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   const [showDatePartnerSelection, setShowDatePartnerSelection] =
     useState<boolean>(false);
   const [dateDestination, setDateDestination] = useState<string>("");
-
-  const vibration = useVibration();
 
   function activityRoller(outcomes: { [key: string]: number }) {
     const keys = Object.keys(outcomes);
@@ -320,15 +306,17 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           )}
           <View className="mt-4">
             <GenericFlatButton
-              text={"Cancel"}
               onPressFunction={() => setShowDatePartnerSelection(false)}
-            />
+            >
+              Cancel
+            </GenericFlatButton>
           </View>
         </View>
       </GenericModal>
       <CharacterInteractionModal
         character={metCharacter}
         closeFunction={() => setMetCharacter(null)}
+        showGiftModal={() => null}
       />
       <GenericModal
         isVisibleCondition={goodOutcome != null}
@@ -356,10 +344,9 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
             </View>
           )}
           <View className="mt-4">
-            <GenericFlatButton
-              text={"Close"}
-              onPressFunction={() => setGoodOutcome(null)}
-            />
+            <GenericFlatButton onPressFunction={() => setGoodOutcome(null)}>
+              Close
+            </GenericFlatButton>
           </View>
         </View>
       </GenericModal>
@@ -380,27 +367,25 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                     <>
                       <GenericFlatButton
                         onPressFunction={() => payOff(badOutCome.buyOff!.price)}
-                        textNode={
-                          <View className="flex flex-row">
-                            <Text>
-                              Save yourself for{" "}
-                              {badOutCome.buyOff.price <= playerState?.gold
-                                ? badOutCome.buyOff.price
-                                : playerState.gold}{" "}
-                            </Text>
-                            <Coins height={14} width={14} />
-                          </View>
-                        }
-                      />
-                      <GenericStrikeAround
-                        textNode={<Text className="my-2 text-lg">Or</Text>}
-                      />
+                      >
+                        <View className="flex flex-row">
+                          <Text>
+                            Save yourself for{" "}
+                            {badOutCome.buyOff.price <= playerState?.gold
+                              ? badOutCome.buyOff.price
+                              : playerState.gold}{" "}
+                          </Text>
+                          <Coins height={14} width={14} />
+                        </View>
+                      </GenericFlatButton>
+                      <GenericStrikeAround>
+                        <Text className="my-2 text-lg">Or</Text>
+                      </GenericStrikeAround>
                     </>
                   )}
-                <GenericFlatButton
-                  onPressFunction={goToFight}
-                  text={"Fight!"}
-                />
+                <GenericFlatButton onPressFunction={goToFight}>
+                  Fight
+                </GenericFlatButton>
               </View>
             </>
           ) : (
@@ -419,10 +404,9 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                   </View>
                 )}
               </View>
-              <GenericFlatButton
-                onPressFunction={() => setBadOutcome(null)}
-                text={"Close"}
-              />
+              <GenericFlatButton onPressFunction={() => setBadOutcome(null)}>
+                Close
+              </GenericFlatButton>
             </>
           )}
         </View>
@@ -437,9 +421,10 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           <Text>Could have been worse</Text>
           <View className="mt-4">
             <GenericFlatButton
-              text={"Close"}
               onPressFunction={() => setNothingHappened(false)}
-            />
+            >
+              Close
+            </GenericFlatButton>
           </View>
         </View>
       </GenericModal>
@@ -476,8 +461,9 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                   playerState && playerState.gold < activity.cost
                 }
                 onPressFunction={visit}
-                text={"Visit Alone"}
-              />
+              >
+                Visit Alone
+              </GenericRaisedButton>
             )}
             {activity.date && gameState && (
               <GenericRaisedButton
@@ -486,8 +472,9 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                     .length == 0
                 }
                 onPressFunction={() => dateSelect(activity.name)}
-                text={"Go on Date"}
-              />
+              >
+                Go on Date
+              </GenericRaisedButton>
             )}
           </View>
         </View>

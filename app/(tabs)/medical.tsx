@@ -1,84 +1,36 @@
-import { ScrollView, View as ThemedView, Text } from "../../components/Themed";
+import { ScrollView, View as ThemedView } from "../../components/Themed";
 import healthOptions from "../../assets/json/medicalOptions/healthOptions.json";
 import manaOptions from "../../assets/json/medicalOptions/manaOptions.json";
 import sanityOptions from "../../assets/json/medicalOptions/sanityOptions.json";
 import otherOptions from "../../assets/json/medicalOptions/otherOptions.json";
 import MedicalOption from "../../components/MedicalOptions";
-import { useContext, useEffect, useRef, useState } from "react";
-import { GameContext, PlayerStatusCompactContext } from "../_layout";
+import { useContext, useEffect, useState } from "react";
+import { AppContext } from "../_layout";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
-import { Platform, Pressable, View, StyleSheet } from "react-native";
-import { useVibration } from "../../utility/customHooks";
+import { View } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
-import { Tabs } from "expo-router";
-import { BlurView } from "expo-blur";
-import Medical from "../../assets/icons/MedicalIcon";
-import { useColorScheme } from "nativewind";
 
 export default function MedicalScreen() {
-  const gameContext = useContext(GameContext);
-  const playerStatusCompact = useContext(PlayerStatusCompactContext);
-  if (!gameContext || !playerStatusCompact) {
+  const appData = useContext(AppContext);
+  if (!appData) {
     throw new Error("Missing Context");
   }
 
   const isFocused = useIsFocused();
 
-  const { isCompact } = playerStatusCompact;
-  const { gameState } = gameContext;
+  const { isCompact, gameState } = appData;
   const [showMedicalTutorial, setShowMedicalTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("medical")) ?? false,
   );
-  //const [showingHealthOptions, setShowingHealthOptions] = useState<boolean>(
-  //gameState?.medicalOptions.health ?? true,
-  //);
-  //const showingHealthRef = useRef<boolean>(
-  //gameState?.medicalOptions.health ?? true,
-  //);
-  //const [showingManaOptions, setShowingManaOptions] = useState<boolean>(
-  //gameState?.medicalOptions.mana ?? true,
-  //);
-  //const showingManaRef = useRef<boolean>(
-  //gameState?.medicalOptions.mana ?? true,
-  //);
-  //const [showingSanityOptions, setShowingSanityOptions] = useState<boolean>(
-  //gameState?.medicalOptions.sanity ?? true,
-  //);
-  //const showingSanityRef = useRef<boolean>(
-  //gameState?.medicalOptions.sanity ?? true,
-  //);
-  //const [showingOtherOptions, setShowingOtherOptions] = useState<boolean>(
-  //gameState?.medicalOptions.other ?? true,
-  //);
-  //const showingOtherRef = useRef<boolean>(
-  //gameState?.medicalOptions.other ?? true,
-  //);
-
-  //const vibration = useVibration();
 
   useEffect(() => {
     if (!showMedicalTutorial && gameState) {
       gameState.updateTutorialState("medical", true);
     }
   }, [showMedicalTutorial]);
-
-  //useEffect(() => {
-  //if (gameState) {
-  //gameState.setMedicalOptionVisibility("health", showingHealthOptions);
-  //gameState.setMedicalOptionVisibility("mana", showingManaOptions);
-  //gameState.setMedicalOptionVisibility("sanity", showingSanityOptions);
-  //gameState.setMedicalOptionVisibility("other", showingOtherOptions);
-  //}
-  //}, [
-  //gameState,
-  //showingHealthOptions,
-  //showingManaOptions,
-  //showingSanityOptions,
-  //showingOtherOptions,
-  //]);
 
   return (
     <>
@@ -98,69 +50,6 @@ export default function MedicalScreen() {
           body: "Using items such as potions, or using spells will not tick the clock forward.",
         }}
       />
-      {/*<View
-        className="absolute z-top w-full "
-        style={{ top: useHeaderHeight() }}
-      >
-        <ThemedView className="flex z-top shadow-diffuse-top flex-row justify-evenly mx-3 border py-2 rounded-xl">
-          <Pressable
-            onPress={() => {
-              vibration({ style: "light" });
-              setShowingHealthOptions(!showingHealthRef.current);
-              showingHealthRef.current = !showingHealthRef.current;
-            }}
-            className={`${
-              showingHealthOptions ? "bg-[#ef4444]" : "bg-zinc-100"
-            } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
-          >
-            <Text style={{ color: showingHealthOptions ? "white" : "#a1a1aa" }}>
-              Health
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              vibration({ style: "light" });
-              setShowingManaOptions(!showingManaRef.current);
-              showingManaRef.current = !showingManaRef.current;
-            }}
-            className={`${
-              showingManaOptions ? "bg-[#60a5fa]" : "bg-zinc-100"
-            } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
-          >
-            <Text style={{ color: showingManaOptions ? "white" : "#a1a1aa" }}>
-              Mana
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              vibration({ style: "light" });
-              setShowingSanityOptions(!showingSanityRef.current);
-              showingSanityRef.current = !showingSanityRef.current;
-            }}
-            className={`${
-              showingSanityOptions ? "bg-[#c084fc]" : "bg-zinc-100"
-            } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
-          >
-            <Text style={{ color: showingSanityOptions ? "white" : "#a1a1aa" }}>
-              Sanity
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              vibration({ style: "light" });
-              setShowingOtherOptions(!showingOtherRef.current);
-              showingOtherRef.current = !showingOtherRef.current;
-            }}
-            className={`${
-              showingOtherOptions ? "bg-[#e4e4e7]" : "bg-zinc-100"
-            } rounded-lg px-4 py-2 active:scale-95 active:opacity-50`}
-          >
-            <Text style={{ color: showingOtherOptions ? "black" : "#a1a1aa" }}>
-              Other
-            </Text>
-          </Pressable>
-        </ThemedView>
-      </View> */}
       <ThemedView className="flex-1">
         <ScrollView>
           <ThemedView
@@ -172,7 +61,7 @@ export default function MedicalScreen() {
           >
             <View className="flex flex-row">
               <View className="w-1/2">
-                <GenericStrikeAround text={"Health"} />
+                <GenericStrikeAround>Health</GenericStrikeAround>
                 {healthOptions.map((medOption, index) => (
                   <MedicalOption
                     key={index}
@@ -181,7 +70,7 @@ export default function MedicalScreen() {
                     healthRestore={medOption.heathRestore as number | "fill"}
                   />
                 ))}
-                <GenericStrikeAround text={"Other"} />
+                <GenericStrikeAround>Other</GenericStrikeAround>
                 {otherOptions.map((medOption, index) => (
                   <MedicalOption
                     key={index}
@@ -192,7 +81,7 @@ export default function MedicalScreen() {
                 ))}
               </View>
               <View className="w-1/2">
-                <GenericStrikeAround text={"Mana"} />
+                <GenericStrikeAround>Mana</GenericStrikeAround>
                 {manaOptions.map((medOption, index) => (
                   <MedicalOption
                     key={index}
@@ -201,7 +90,7 @@ export default function MedicalScreen() {
                     manaRestore={medOption.manaRestore as number | "fill"}
                   />
                 ))}
-                <GenericStrikeAround text={"Sanity"} />
+                <GenericStrikeAround>Sanity</GenericStrikeAround>
                 {sanityOptions.map((medOption, index) => (
                   <MedicalOption
                     key={index}

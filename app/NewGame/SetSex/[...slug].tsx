@@ -5,7 +5,7 @@ import { FontAwesome5, Foundation } from "@expo/vector-icons";
 import { Pressable, View as NonThemedView } from "react-native";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useVibration } from "../../../utility/customHooks";
-import { GameContext } from "../../_layout";
+import { AppContext } from "../../_layout";
 import { useColorScheme } from "nativewind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TutorialModal from "../../../components/TutorialModal";
@@ -23,8 +23,9 @@ export default function SetSex() {
   let sexRef = useRef<"male" | "female">();
   const vibration = useVibration();
 
-  const gameContext = useContext(GameContext);
-  const gameState = gameContext?.gameState;
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing context");
+  const gameState = appData?.gameState;
 
   const [showAgingTutorial, setShowAgingTutorial] = useState<boolean>(
     !gameState ||

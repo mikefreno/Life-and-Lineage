@@ -5,7 +5,6 @@ import { CharacterImage } from "../../components/CharacterImage";
 import shopObjects from "../../assets/json/shops.json";
 import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
-import { GameContext, PlayerStatusCompactContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
@@ -13,17 +12,16 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { calculateAge } from "../../utility/functions/misc/age";
+import { AppContext } from "../_layout";
 
 export default function ShopsScreen() {
-  const gameData = useContext(GameContext);
-  const playerStatusCompact = useContext(PlayerStatusCompactContext);
-  if (!gameData || !playerStatusCompact) throw new Error("missing gameData");
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing gameData");
 
   const vibration = useVibration();
   const isFocused = useIsFocused();
 
-  const { gameState } = gameData;
-  const { isCompact } = playerStatusCompact;
+  const { gameState, isCompact } = appData;
   const [showShopTutorial, setShowShopTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("shops")) ?? false,
   );

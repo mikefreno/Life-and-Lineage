@@ -1,24 +1,24 @@
 import { observer } from "mobx-react-lite";
-import { ScrollView, View } from "../components/Themed";
+import { ScrollView, View as ThemedView } from "../components/Themed";
 import qualifications from "../assets/json/qualifications.json";
 import PlayerStatus from "../components/PlayerStatus";
 import TrainingCard from "../components/TrainingCard";
 import { Stack } from "expo-router";
 import TutorialModal from "../components/TutorialModal";
-import { GameContext } from "./_layout";
 import { useContext, useEffect, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
-import { View as NonThemedView, Platform, StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { BlurView } from "expo-blur";
 import { useColorScheme } from "nativewind";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { AppContext } from "./_layout";
 
 const JobTraining = observer(() => {
-  const gameContext = useContext(GameContext);
-  if (!gameContext) {
+  const appData = useContext(AppContext);
+  if (!appData) {
     throw new Error("missing context");
   }
-  const { gameState } = gameContext;
+  const { gameState } = appData;
   const [showTrainingTutorial, setShowTrainingTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("training")) ?? false,
   );
@@ -68,11 +68,9 @@ const JobTraining = observer(() => {
           body: "Here you can gain access to better jobs, just keep a careful eye on your sanity.",
         }}
       />
-      <View className="flex-1">
-        <ScrollView
-          style={{ paddingBottom: 95, paddingTop: useHeaderHeight() }}
-        >
-          <View className="px-2 pt-4">
+      <ThemedView className="flex-1">
+        <ScrollView style={{ paddingTop: useHeaderHeight() }}>
+          <ThemedView className="px-2 pt-4">
             {qualifications.map((qual, index) => {
               return (
                 <TrainingCard
@@ -85,12 +83,10 @@ const JobTraining = observer(() => {
                 />
               );
             })}
-          </View>
+          </ThemedView>
         </ScrollView>
-      </View>
-      <NonThemedView className="absolute z-50 w-full" style={{ bottom: 95 }}>
-        <PlayerStatus />
-      </NonThemedView>
+      </ThemedView>
+      <PlayerStatus tabScreen />
     </>
   );
 });

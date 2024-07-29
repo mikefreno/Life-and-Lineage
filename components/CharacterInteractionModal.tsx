@@ -3,7 +3,6 @@ import { View } from "react-native";
 import { Text } from "./Themed";
 import { Character } from "../classes/character";
 import GenericModal from "./GenericModal";
-import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { useContext, useEffect, useState } from "react";
 import { CharacterImage } from "./CharacterImage";
 import { calculateAge } from "../utility/functions/misc/age";
@@ -15,6 +14,7 @@ import { useVibration } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
 import { useRouter } from "expo-router";
 import { getDaysBetweenDates } from "../utility/functions/misc/date";
+import { AppContext } from "../app/_layout";
 
 interface CharacterInteractionModal {
   character: Character | null;
@@ -31,13 +31,11 @@ export const CharacterInteractionModal = observer(
     backdropCloses = false,
     showGiftModal,
   }: CharacterInteractionModal) => {
-    const playerContext = useContext(PlayerCharacterContext);
-    const gameContext = useContext(GameContext);
-    if (!playerContext || !gameContext) {
+    const appData = useContext(AppContext);
+    if (!appData) {
       throw new Error("missing context");
     }
-    const { playerState } = playerContext;
-    const { gameState } = gameContext;
+    const { playerState, gameState } = appData;
     const [showAssaultWarning, setShowAssaultWarning] =
       useState<boolean>(false);
     const [dateAvailable, setDateAvailable] = useState<boolean>(
@@ -119,10 +117,9 @@ export const CharacterInteractionModal = observer(
                 </View>
                 {playerState?.isKnownCharacter(character) ? (
                   <>
-                    <GenericStrikeAround text={"Interactions"} />
+                    <GenericStrikeAround>Interactions</GenericStrikeAround>
                     <View className="mt-2 flex flex-row justify-evenly">
                       <GenericFlatButton
-                        text="Chat"
                         disabledCondition={!dateAvailable}
                         onPressFunction={() => {
                           vibration({ style: "light" });
@@ -130,19 +127,21 @@ export const CharacterInteractionModal = observer(
                           character.updateAffection(5);
                           gameState.gameTick(playerState);
                         }}
-                      />
+                      >
+                        Chat
+                      </GenericFlatButton>
                       <GenericFlatButton
-                        text="Give a Gift"
                         disabledCondition={!dateAvailable}
                         onPressFunction={() => {
                           vibration({ style: "light" });
                           showGiftModal();
                         }}
-                      />
+                      >
+                        Give a Gift
+                      </GenericFlatButton>
                     </View>
                     <View className="mt-2 flex flex-row justify-evenly">
                       <GenericFlatButton
-                        text="Spit in Face"
                         disabledCondition={!dateAvailable}
                         onPressFunction={() => {
                           vibration({ style: "light" });
@@ -150,26 +149,28 @@ export const CharacterInteractionModal = observer(
                           character.updateAffection(-10);
                           gameState.gameTick(playerState);
                         }}
-                      />
+                      >
+                        Spit in Face
+                      </GenericFlatButton>
                     </View>
                     {character.affection > -25 && (
                       <View className="mt-2 flex flex-row justify-evenly">
                         <GenericFlatButton
-                          text="Assault"
                           onPressFunction={() => {
                             vibration({ style: "warning", essential: true });
                             setShowAssaultWarning(true);
                           }}
-                        />
+                        >
+                          Assault
+                        </GenericFlatButton>
                       </View>
                     )}
                   </>
                 ) : (
                   <>
-                    <GenericStrikeAround text={"Greetings"} />
+                    <GenericStrikeAround>Greetings</GenericStrikeAround>
                     <View className="mt-2 flex flex-row justify-evenly">
                       <GenericFlatButton
-                        text="Friendly"
                         onPressFunction={() => {
                           vibration({ style: "light" });
                           character.updateAffection(5);
@@ -178,9 +179,10 @@ export const CharacterInteractionModal = observer(
                             gameState.gameTick(playerState);
                           }
                         }}
-                      />
+                      >
+                        Friendly
+                      </GenericFlatButton>
                       <GenericFlatButton
-                        text="Aggressive"
                         onPressFunction={() => {
                           vibration({ style: "light" });
                           character.updateAffection(-5);
@@ -189,15 +191,16 @@ export const CharacterInteractionModal = observer(
                             gameState.gameTick(playerState);
                           }
                         }}
-                      />
+                      >
+                        Aggressive
+                      </GenericFlatButton>
                     </View>
                   </>
                 )}
                 <View className="mt-2">
-                  <GenericFlatButton
-                    text={"Close"}
-                    onPressFunction={closeFunction}
-                  />
+                  <GenericFlatButton onPressFunction={closeFunction}>
+                    Close
+                  </GenericFlatButton>
                 </View>
               </View>
             ) : (
@@ -217,23 +220,25 @@ export const CharacterInteractionModal = observer(
                 <View className="mt-2 flex flex-row justify-evenly">
                   <View className="my-auto">
                     <GenericFlatButton
-                      text="I'm sure."
                       backgroundColor={"#450a0a"}
                       onPressFunction={() => {
                         vibration({ style: "warning", essential: true });
                         setFight();
                       }}
-                    />
+                    >
+                      I'm sure.
+                    </GenericFlatButton>
                   </View>
                   <GenericRaisedButton
-                    text="Take me back!"
                     backgroundColor={"#3b82f6"}
                     disableTopLevelStyling
                     onPressFunction={() => {
                       vibration({ style: "light" });
                       setShowAssaultWarning(false);
                     }}
-                  />
+                  >
+                    Take me back!
+                  </GenericRaisedButton>
                 </View>
               </View>
             )}

@@ -5,10 +5,10 @@ import { Dimensions, Pressable, View, Image, Platform } from "react-native";
 import Draggable from "react-native-draggable";
 import { useVibration } from "../utility/customHooks";
 import { StatsDisplay } from "./StatsDisplay";
-import { PlayerCharacterContext } from "../app/_layout";
 import { checkReleasePositionProps } from "../utility/types";
 import { Shop } from "../classes/shop";
 import { Text, View as ThemedView } from "./Themed";
+import { AppContext } from "../app/_layout";
 
 type InventoryRenderBase = {
   selfRef: RefObject<View> | null;
@@ -56,9 +56,9 @@ export default function InventoryRender({
     item: Item;
     count: number;
   } | null>(null);
-  const playerStateData = useContext(PlayerCharacterContext);
-  if (!playerStateData) throw new Error("missing contexts");
-  const { playerState } = playerStateData;
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing contexts");
+  const { playerState } = appData;
 
   function checkReleasePosition({
     item,

@@ -17,11 +17,7 @@ import {
 } from "../../../utility/functions/misc/words";
 import { Game } from "../../../classes/game";
 import { useContext } from "react";
-import {
-  GameContext,
-  LogsContext,
-  PlayerCharacterContext,
-} from "../../_layout";
+
 import { useVibration } from "../../../utility/customHooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getRandomJobTitle } from "../../../utility/functions/characterAid";
@@ -29,6 +25,7 @@ import { createShops } from "../../../classes/shop";
 import { generateBirthday } from "../../../utility/functions/misc/age";
 import clearHistory from "../../../utility/functions/misc/nav";
 import { fullSave } from "../../../utility/functions/save_load";
+import { AppContext } from "../../_layout";
 
 export default function NewGameReview() {
   const { slug } = useLocalSearchParams();
@@ -42,16 +39,11 @@ export default function NewGameReview() {
   const lastName = slug[4];
   const vibration = useVibration();
 
-  const playerCharacterContext = useContext(PlayerCharacterContext);
-  const gameDataSetter = useContext(GameContext)?.setGameData;
-  const logsSetter = useContext(LogsContext)?.setLogs;
-  if (!playerCharacterContext || !gameDataSetter || !logsSetter) {
-    throw new Error("missing context setters");
+  const appData = useContext(AppContext);
+  if (!appData) {
+    throw new Error("missing context");
   }
-  const gameData = useContext(GameContext);
-  if (!gameData) throw new Error("missing contexts");
-  const { gameState } = gameData;
-  const { setPlayerCharacter } = playerCharacterContext;
+  const { gameState, setGameData, setPlayerCharacter, setLogs } = appData;
   const navigation = useNavigation();
 
   function createParent(sex: "female" | "male"): Character {
@@ -117,11 +109,9 @@ export default function NewGameReview() {
 
   async function startGame() {
     if (
-      gameDataSetter &&
-      logsSetter &&
-      (playerClass == "mage" ||
-        playerClass == "paladin" ||
-        playerClass == "necromancer")
+      playerClass == "mage" ||
+      playerClass == "paladin" ||
+      playerClass == "necromancer"
     ) {
       const player = createPlayerCharacter();
       const starterBook = getStartingBook(
@@ -163,9 +153,9 @@ export default function NewGameReview() {
       if (colorScheme) {
         newGame.setColorScheme(colorScheme);
       }
-      gameDataSetter(newGame);
+      setGameData(newGame);
       setPlayerCharacter(player);
-      logsSetter([]);
+      setLogs([]);
       vibration({ style: "success" });
       setTimeout(() => clearHistory(navigation), 500);
       fullSave(newGame, player);

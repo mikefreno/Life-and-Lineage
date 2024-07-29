@@ -1,37 +1,29 @@
-import {
-  View,
-  StyleSheet,
-  ViewProps,
-  ViewStyle,
-  StyleProp,
-} from "react-native";
+import { View, StyleSheet, ViewStyle, StyleProp } from "react-native";
 import { Text } from "./Themed";
 import { ReactNode } from "react";
 
-interface GenericStrikeAroundBasicProps {
+interface GenericStrikeAround {
   containerStyles?: StyleProp<ViewStyle>;
-  text: string;
-  textNode?: never;
+  children: string | ReactNode;
 }
 
-interface GenericStrikeAroundNodeProps {
-  containerStyles?: StyleProp<ViewStyle>;
-  textNode: ReactNode;
-  text?: never;
-}
-
-type Props = GenericStrikeAroundBasicProps | GenericStrikeAroundNodeProps;
-
+/**
+ * Pass in a string to render as <Text className="text-xl">{children}</Text>
+ * Or pass in a node
+ */
 export default function GenericStrikeAround({
-  text,
-  textNode,
   containerStyles,
-}: Props) {
+  children,
+}: GenericStrikeAround) {
   return (
     <View style={[styles.container, containerStyles]}>
       <View style={styles.line} />
       <View style={styles.content}>
-        {text ? <Text className="text-xl">{text}</Text> : textNode}
+        {typeof children === "string" ? (
+          <Text className="text-xl">{children}</Text>
+        ) : (
+          children
+        )}
       </View>
       <View style={styles.line} />
     </View>

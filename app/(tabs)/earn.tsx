@@ -2,11 +2,6 @@ import jobs from "../../assets/json/jobs.json";
 import LaborTask from "../../components/LaborTask";
 import { ScrollView, View, Text } from "../../components/Themed";
 import { View as NonThemedView, Pressable } from "react-native";
-import {
-  GameContext,
-  PlayerCharacterContext,
-  PlayerStatusCompactContext,
-} from "../_layout";
 import { useContext, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import Modal from "react-native-modal";
@@ -17,18 +12,14 @@ import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { AppContext } from "../_layout";
 
 const EarnScreen = observer(() => {
-  const playerCharacterContext = useContext(PlayerCharacterContext);
-  const gameContext = useContext(GameContext);
-  const playerStatusCompact = useContext(PlayerStatusCompactContext);
-  if (!playerCharacterContext || !gameContext || !playerStatusCompact) {
+  const appData = useContext(AppContext);
+  if (!appData) {
     throw new Error("missing context");
   }
-  const { playerState } = playerCharacterContext;
-  const { isCompact } = playerStatusCompact;
-  const { gameState } = gameContext;
-
+  const { playerState, isCompact, gameState } = appData;
   const [showingRejection, setShowingRejection] = useState<boolean>(false);
   const [missingPreReqs, setMissingPreReqs] = useState<string[]>([]);
 

@@ -10,31 +10,31 @@ import ClockIcon from "../assets/icons/ClockIcon";
 import Vault from "../assets/icons/VaultIcon";
 import { Entypo } from "@expo/vector-icons";
 import Sanity from "../assets/icons/SanityIcon";
-import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { Investment } from "../classes/investment";
 import GenericModal from "./GenericModal";
 import { observer } from "mobx-react-lite";
 import { useVibration } from "../utility/customHooks";
 import { asReadableGold } from "../utility/functions/misc/numbers";
 import ThemedCard from "./ThemedCard";
+import { AppContext } from "../app/_layout";
+import GenericStrikeAround from "./GenericStrikeAround";
 
 interface InvestmentCardProps {
   investment: InvestmentType;
 }
 
 const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing context");
+  const { playerState, gameState } = appData;
+
   const { colorScheme } = useColorScheme();
+
   const [showUpgrades, setShowUpgrades] = useState<boolean>(false);
   const [showRequirements, setShowRequirements] = useState<boolean>(false);
-  const playerCharacterContext = useContext(PlayerCharacterContext);
-  const gameContext = useContext(GameContext);
-  if (!playerCharacterContext || !gameContext) {
-    throw new Error("missing context");
-  }
+
   const [showInvestmentConfirmation, setShowInvestmentConfirmation] =
     useState<boolean>(false);
-  const { playerState } = playerCharacterContext;
-  const { gameState } = gameContext;
   const vibration = useVibration();
 
   const [madeInvestment, setMadeInvestment] = useState<Investment | undefined>(
@@ -84,13 +84,9 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
           isVisibleCondition={showRequirements}
           backFunction={() => setShowRequirements(false)}
         >
-          <View style={styles.container}>
-            <View style={styles.line} />
-            <View style={styles.content}>
-              <Text className="text-center text-xl">Alert!</Text>
-            </View>
-            <View style={styles.line} />
-          </View>
+          <GenericStrikeAround>
+            <Text className="text-center text-xl">Alert!</Text>
+          </GenericStrikeAround>
           <Text className="mx-4 text-lg">{investment.requires.message}</Text>
           <Text className="mx-8 py-4 text-center italic">
             Complete the {toTitleCase(investment.requires.requirement)} dungeon
@@ -109,13 +105,9 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
         backFunction={() => setShowInvestmentConfirmation(false)}
       >
         <Text className="text-center text-lg">Purchase:</Text>
-        <View style={styles.container}>
-          <View style={styles.line} />
-          <View style={styles.content}>
-            <Text className="text-center text-2xl">{investment.name}</Text>
-          </View>
-          <View style={styles.line} />
-        </View>
+        <GenericStrikeAround>
+          <Text className="text-center text-2xl">{investment.name}</Text>
+        </GenericStrikeAround>
         <Text className="pb-6 text-center text-xl">Are you sure?</Text>
         <View className="flex flex-row">
           <Pressable
@@ -162,15 +154,11 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
             shadowRadius: 5,
           }}
         >
-          <View style={styles.container}>
-            <View style={styles.line} />
-            <View style={styles.content}>
-              <Text className="text-center text-xl">
-                {investment.name} Upgrades
-              </Text>
-            </View>
-            <View style={styles.line} />
-          </View>
+          <GenericStrikeAround>
+            <Text className="text-center text-xl">
+              {investment.name} Upgrades
+            </Text>
+          </GenericStrikeAround>
           <ScrollView>
             {investment.upgrades.map((upgrade) => {
               const [showingBody, setShowingBody] = useState<boolean>(false);
@@ -250,13 +238,9 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
                           <Text className="bold my-auto py-2 text-center dark:text-zinc-50">
                             {upgrade.description}
                           </Text>
-                          <View style={styles.container}>
-                            <View style={styles.line} />
-                            <View style={styles.content}>
-                              <Text>Effects</Text>
-                            </View>
-                            <View style={styles.line} />
-                          </View>
+                          <GenericStrikeAround>
+                            <Text>Effects</Text>
+                          </GenericStrikeAround>
                           <View className="items-center py-2">
                             {upgrade.effect.goldMinimumIncrease && (
                               <View className="flex flex-row items-center">
@@ -534,20 +518,4 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
   );
 });
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 24,
-    marginVertical: 12,
-  },
-  content: {
-    marginHorizontal: 10,
-  },
-  line: {
-    flex: 1,
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
-  },
-});
 export default InvestmentCard;

@@ -6,7 +6,7 @@ import { Text } from "./Themed";
 interface GenericRaisedButtonProps {
   onPressFunction: () => void;
   backgroundColor?: ColorValue;
-  text: string;
+  children: string;
   textColor?: ColorValue;
   disabledCondition?: boolean;
   vibrationStrength?:
@@ -24,7 +24,7 @@ const GenericRaisedButton = ({
   onPressFunction,
   backgroundColor,
   textColor,
-  text,
+  children,
   disabledCondition = false,
   vibrationStrength = "light",
   vibrationEssentiality = false,
@@ -84,7 +84,7 @@ const GenericRaisedButton = ({
                 : "#fafafa",
             }}
           >
-            {text}
+            {children}
           </Text>
         </View>
       )}

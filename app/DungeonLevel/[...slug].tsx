@@ -2,7 +2,7 @@ import { View as ThemedView, Text } from "../../components/Themed";
 import { Animated, View, Platform } from "react-native";
 import { useContext, useRef, useEffect, useState } from "react";
 import { Pressable } from "react-native";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, router, useLocalSearchParams } from "expo-router";
 import BattleTab from "../../components/DungeonComponents/BattleTab";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { enemyGenerator } from "../../utility/enemy";
@@ -11,13 +11,6 @@ import ProgressBar from "../../components/ProgressBar";
 import { DungeonInstance, DungeonLevel } from "../../classes/dungeon";
 import { Item } from "../../classes/item";
 import { useIsFocused } from "@react-navigation/native";
-import {
-  GameContext,
-  LogsContext,
-  EnemyContext,
-  PlayerCharacterContext,
-  PlayerStatusContext,
-} from "../_layout";
 import { observer } from "mobx-react-lite";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
@@ -46,29 +39,22 @@ import GenericFlatButton from "../../components/GenericFlatButton";
 import { tapRef } from "../../utility/functions/misc/tap";
 import { fullSave } from "../../utility/functions/save_load";
 import { throttle } from "lodash";
+import { AppContext } from "../_layout";
 
 const TILE_SIZE = 40;
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
-  const playerCharacterContext = useContext(PlayerCharacterContext);
-  const gameContext = useContext(GameContext);
-  const enemyContext = useContext(EnemyContext);
-  const logsContext = useContext(LogsContext);
-  const playerStatusContext = useContext(PlayerStatusContext);
-  if (
-    !playerCharacterContext ||
-    !gameContext ||
-    !enemyContext ||
-    !logsContext ||
-    !playerStatusContext
-  )
-    throw new Error("missing context");
-  const { playerState } = playerCharacterContext;
-  const { gameState } = gameContext;
-  const { enemyState, setEnemy } = enemyContext;
-  const { logsState } = logsContext;
-  const { playerStatusRef } = playerStatusContext;
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing context");
+  const {
+    playerState,
+    gameState,
+    enemyState,
+    setEnemy,
+    logsState,
+    playerStatusRef,
+  } = appData;
 
   const { slug } = useLocalSearchParams();
   if (!slug) {

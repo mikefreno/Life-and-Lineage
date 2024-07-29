@@ -2,12 +2,12 @@ import { Pressable, View as NonThemedView, Switch } from "react-native";
 import { View, Text } from "../../components/Themed";
 import { useContext, useEffect, useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc/words";
-import { GameContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
 import * as Updates from "expo-updates";
 import GenericModal from "../../components/GenericModal";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
+import { AppContext } from "../_layout";
 
 export default function AppSettings() {
   const themeOptions = ["system", "light", "dark"];
@@ -15,11 +15,11 @@ export default function AppSettings() {
   const [showTutorialResetConfirm, setShowTutorialResetConfirm] =
     useState<boolean>(false);
 
-  const gameContext = useContext(GameContext);
-  if (!gameContext) {
+  const appData = useContext(AppContext);
+  if (!appData) {
     throw new Error("Missing context");
   }
-  const { gameState } = gameContext;
+  const { gameState } = appData;
 
   const vibration = useVibration();
   const [tutorialState, setTutorialState] = useState<boolean>(
@@ -95,7 +95,7 @@ export default function AppSettings() {
           </>
         </GenericModal>
         <View className="flex-1 items-center justify-center px-4">
-          <GenericStrikeAround text={"Select Color Theme"} />
+          <GenericStrikeAround>Select Color Theme</GenericStrikeAround>
           <NonThemedView
             className="rounded px-4 py-2"
             style={{ marginLeft: -48, marginTop: 12 }}
@@ -121,7 +121,7 @@ export default function AppSettings() {
               </Pressable>
             ))}
           </NonThemedView>
-          <GenericStrikeAround text={"Vibration Settings"} />
+          <GenericStrikeAround>Vibration Settings</GenericStrikeAround>
           <NonThemedView
             className="rounded px-4 py-2"
             style={{ marginLeft: -48, marginTop: 12 }}
@@ -147,7 +147,7 @@ export default function AppSettings() {
               </Pressable>
             ))}
           </NonThemedView>
-          <GenericStrikeAround text={"Tutorials"} />
+          <GenericStrikeAround>Tutorials</GenericStrikeAround>
           <NonThemedView className="mt-3 rounded px-4 py-2">
             <View className="mx-auto flex flex-row">
               <Text className="my-auto text-lg">Tutorials Enabled: </Text>
@@ -160,12 +160,13 @@ export default function AppSettings() {
               />
             </View>
             <GenericRaisedButton
-              text={"Reset Tutorials"}
               onPressFunction={() => {
                 vibration({ style: "light" });
                 setShowTutorialResetConfirm(true);
               }}
-            />
+            >
+              Reset Tutorials
+            </GenericRaisedButton>
           </NonThemedView>
         </View>
       </>

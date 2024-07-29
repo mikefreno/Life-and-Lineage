@@ -10,12 +10,7 @@ import {
 } from "react-native";
 import Coins from "../assets/icons/CoinsIcon";
 import { useContext, useEffect, useRef, useState } from "react";
-import {
-  GameContext,
-  PlayerCharacterContext,
-  PlayerStatusCompactContext,
-  PlayerStatusContext,
-} from "../app/_layout";
+
 import { observer } from "mobx-react-lite";
 import { toTitleCase } from "../utility/functions/misc/words";
 import GenericModal from "./GenericModal";
@@ -32,33 +27,33 @@ import FadeOutNode from "./FadeOutNode";
 import { BlurView } from "expo-blur";
 import { useColorScheme } from "nativewind";
 import { usePathname } from "expo-router";
+import { AppContext } from "../app/_layout";
+import { useIsFocused } from "@react-navigation/native";
 
 interface PlayerStatus {
   hideGold?: boolean;
   home?: boolean;
+  tabScreen?: boolean;
   positioning?: string;
+  classname?: string;
 }
 const PlayerStatus = observer(
   ({
     hideGold = false,
     home = false,
+    tabScreen = false,
     positioning = "absolute",
+    classname,
   }: PlayerStatus) => {
-    const playerCharacterData = useContext(PlayerCharacterContext);
-    const gameData = useContext(GameContext);
-    const playerStatusRefContext = useContext(PlayerStatusContext);
-    const playerStatusCompact = useContext(PlayerStatusCompactContext);
-    if (
-      !playerCharacterData ||
-      !gameData ||
-      !playerStatusRefContext ||
-      !playerStatusCompact
-    )
-      throw new Error("missing context");
-    const { playerState } = playerCharacterData;
-    const { gameState } = gameData;
-    const { setPlayerStatusRef } = playerStatusRefContext;
-    const { isCompact, setIsCompact } = playerStatusCompact;
+    const appData = useContext(AppContext);
+    if (!appData) throw new Error("missing context");
+    const {
+      playerState,
+      gameState,
+      setPlayerStatusRef,
+      isCompact,
+      setIsCompact,
+    } = appData;
     const [readableGold, setReadableGold] = useState(
       playerState?.getReadableGold(),
     );
@@ -131,6 +126,8 @@ const PlayerStatus = observer(
       playerState?.sanityMax,
     ]);
 
+    const isFocused = useIsFocused();
+
     useEffect(() => {
       if (playerState?.getTotalAllocatedPoints() == 0) {
         setRespeccing(false);
@@ -164,7 +161,7 @@ const PlayerStatus = observer(
     }, [pathname, showingHealthWarningPulse]);
 
     useEffect(() => {
-      if (playerState) {
+      if (playerState && isFocused) {
         if (
           playerState.conditions.length > 0 ||
           !hideGold ||
@@ -178,7 +175,6 @@ const PlayerStatus = observer(
         }
       }
     }, [
-      hideGold,
       playerState?.conditions,
       playerState?.unAllocatedSkillPoints,
       pathname,
@@ -574,7 +570,10 @@ const PlayerStatus = observer(
         }
       } else {
         return (
-          <View>
+          <BlurView
+            intensity={100}
+            className="shadow-soft dark:shadow-soft-white z-top overflow-hidden pb-10"
+          >
             <Animated.View
               style={{
                 display: "flex",
@@ -585,12 +584,25 @@ const PlayerStatus = observer(
             >
               {children}
             </Animated.View>
-          </View>
+          </BlurView>
         );
       }
     }
 
     if (playerState) {
+      const preprop = !isCompact
+        ? home
+          ? `${positioning} -mt-7 z-top w-full`
+          : `${positioning} mt-3 z-top w-full`
+        : home
+        ? `${positioning} z-top w-full`
+        : `${positioning} mt-20 z-top w-full`;
+
+      const filled = tabScreen
+        ? preprop + " bottom-0 -mb-4"
+        : classname
+        ? preprop + " " + classname
+        : preprop;
       return (
         <>
           <GenericModal
@@ -799,15 +811,7 @@ const PlayerStatus = observer(
           <Pressable
             ref={pressableRef}
             onPress={() => setShowDetailedView(true)}
-            className={
-              !isCompact
-                ? home
-                  ? `${positioning} -mt-7 z-top w-full`
-                  : `${positioning} mt-3 z-top w-full`
-                : home
-                ? `${positioning} z-top w-full`
-                : `${positioning} mt-20 z-top w-full`
-            }
+            className={filled}
           >
             {colorAndPlatformDependantBlur(
               <View className={home ? "flex px-2" : "flex"}>

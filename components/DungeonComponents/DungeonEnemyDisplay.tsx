@@ -160,9 +160,9 @@ export default function DungeonEnemyDisplay({
       </View>
       {enemyState.minions.length > 0 ? (
         <View className="mx-4">
-          <GenericStrikeAround
-            textNode={<Text className="text-sm">Enemy Minions</Text>}
-          />
+          <GenericStrikeAround>
+            <Text className="text-sm">Enemy Minions</Text>
+          </GenericStrikeAround>
           <View className="mx-4 flex flex-row flex-wrap">
             {enemyState.minions.map((minion) => (
               <View

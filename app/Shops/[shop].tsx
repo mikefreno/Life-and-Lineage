@@ -6,7 +6,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Item } from "../../classes/item";
 import Coins from "../../assets/icons/CoinsIcon";
 import { useIsFocused } from "@react-navigation/native";
-import { GameContext, PlayerCharacterContext } from "../_layout";
+import { AppContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
 import { observer } from "mobx-react-lite";
 import TutorialModal from "../../components/TutorialModal";
@@ -24,12 +24,9 @@ const REFRESH_TIME =
 
 const ShopInteriorScreen = observer(() => {
   const { shop } = useLocalSearchParams();
-  const gameData = useContext(GameContext);
-  const playerCharacterData = useContext(PlayerCharacterContext);
-  if (!gameData || !playerCharacterData)
-    throw new Error("missing game context");
-  const { gameState } = gameData;
-  const { playerState } = playerCharacterData;
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing game context");
+  const { gameState, playerState } = appData;
   const vibration = useVibration();
   const colors = shopObjects.find((shopObj) => shopObj.type == shop)?.colors;
   const thisShop = gameState?.shops.find((aShop) => aShop.archetype == shop);

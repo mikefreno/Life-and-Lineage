@@ -1,10 +1,5 @@
 import { Text, View as ThemedView } from "../../components/Themed";
 import SpellDetails from "../../components/SpellDetails";
-import {
-  GameContext,
-  PlayerCharacterContext,
-  PlayerStatusCompactContext,
-} from "../_layout";
 import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { View, ScrollView } from "react-native";
@@ -22,21 +17,16 @@ import {
   convertMasteryToNumber,
   convertMasteryToString,
 } from "../../utility/spellHelper";
+import { AppContext } from "../_layout";
 
 const SpellsScreen = observer(() => {
-  const playerCharacterData = useContext(PlayerCharacterContext);
-  const gameData = useContext(GameContext);
-  const playerStatusCompact = useContext(PlayerStatusCompactContext);
-
+  const appData = useContext(AppContext);
   const { colorScheme } = useColorScheme();
   const isFocused = useIsFocused();
 
-  if (!playerCharacterData || !gameData || !playerStatusCompact)
-    throw new Error("missing contexts");
+  if (!appData) throw new Error("missing contexts");
 
-  const { isCompact } = playerStatusCompact;
-  const { playerState } = playerCharacterData;
-  const { gameState } = gameData;
+  const { isCompact, playerState, gameState } = appData;
   const [spells, setSpells] = useState(playerState?.getSpells());
   const [showSpellTutorial, setShowSpellTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("spell")) ?? false,
@@ -161,16 +151,6 @@ const SpellsScreen = observer(() => {
         }}
         onCloseFunction={() => setShowSpellTutorial(false)}
       />
-      {/*<View
-        style={{
-          marginTop: useHeaderHeight() / 2,
-          height: useHeaderHeight() * 0.5,
-          backgroundColor: playerState
-            ? elementalColorMap[playerState.blessing].dark
-            : undefined,
-          opacity: Platform.OS == "android" ? 1.0 : 0.5,
-        }}
-      />*/}
       <ThemedView
         className="flex-1"
         style={{
@@ -198,7 +178,7 @@ const SpellsScreen = observer(() => {
             </View>
           )}
           <View className="min-h-[280]">
-            <GenericStrikeAround text={"Proficiencies"} />
+            <GenericStrikeAround>Proficiencies</GenericStrikeAround>
             <View className="flex items-center">
               {magicProficiencySection(playerState?.magicProficiencies)}
             </View>

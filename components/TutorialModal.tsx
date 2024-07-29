@@ -3,7 +3,7 @@ import { View, Text } from "./Themed";
 import { Entypo } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import { useColorScheme } from "nativewind";
-import { GameContext } from "../app/_layout";
+import { AppContext } from "../app/_layout";
 import { useVibration } from "../utility/customHooks";
 import { Pressable, Switch } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -25,11 +25,11 @@ export default function TutorialModal({
   pageTwo,
   pageThree,
 }: TutorialModalProps) {
-  const gameContext = useContext(GameContext);
-  if (!gameContext) {
+  const appData = useContext(AppContext);
+  if (!appData) {
     throw new Error("missing context");
   }
-  const { gameState } = gameContext;
+  const { gameState } = appData;
   const [tutorialStep, setTutorialStep] = useState<number>(1);
   const tutorialStepRef = useRef<number>(1);
   const { colorScheme } = useColorScheme();

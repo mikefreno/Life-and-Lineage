@@ -1,11 +1,12 @@
 import { Text, View } from "../../components/Themed";
 import { router } from "expo-router";
 import { useContext, useState } from "react";
-import { GameContext } from "../_layout";
+import { AppContext } from "../_layout";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { Pressable, View as NonThemedView, StyleSheet } from "react-native";
 import { useVibration } from "../../utility/customHooks";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
+import GenericStrikeAround from "../../components/GenericStrikeAround";
 
 const healthWarningOptions: Record<number, string> = {
   0.5: "50%",
@@ -26,12 +27,13 @@ const healthWarningVals = [
 const healthWarningKeys = [0.5, 0.25, 0.2, 0.15, 0.1, 0];
 
 export default function GameSettings() {
-  const gameData = useContext(GameContext);
-  const game = gameData?.gameState;
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing context!");
+  const { gameState } = appData;
   const vibration = useVibration();
 
   const [selectedHealthWarning, setSelectedHealthWarning] = useState<string>(
-    game ? healthWarningOptions[game?.healthWarning] : "25%",
+    gameState ? healthWarningOptions[gameState?.healthWarning] : "25%",
   );
 
   const startNewGame = () => {
@@ -43,30 +45,17 @@ export default function GameSettings() {
   };
 
   const healthWarningSetter = (choice: number) => {
-    game?.setHealthWarning(choice);
+    gameState?.setHealthWarning(choice);
     setSelectedHealthWarning(healthWarningOptions[choice]);
   };
 
   return (
     <View className="flex-1 items-center justify-center px-4">
-      <View style={styles.container}>
-        <View style={styles.line} />
-        <View style={styles.content}>
-          <Text className="text-xl">Game Restart</Text>
-        </View>
-        <View style={styles.line} />
-      </View>
-      <GenericRaisedButton
-        onPressFunction={startNewGame}
-        text={"Start New Game"}
-      />
-      <View style={styles.container} className="mt-8">
-        <View style={styles.line} />
-        <View style={styles.content}>
-          <Text className="text-xl">Health Warning</Text>
-        </View>
-        <View style={styles.line} />
-      </View>
+      <GenericStrikeAround>Game Restart</GenericStrikeAround>
+      <GenericRaisedButton onPressFunction={startNewGame}>
+        Start New Game
+      </GenericRaisedButton>
+      <GenericStrikeAround>Health Warning</GenericStrikeAround>
       <NonThemedView className="mt-3 rounded px-4 py-2">
         {healthWarningVals.map((item, idx) => (
           <Pressable
@@ -90,18 +79,3 @@ export default function GameSettings() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  content: {
-    marginHorizontal: 10,
-  },
-  line: {
-    flex: 1,
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
-  },
-});

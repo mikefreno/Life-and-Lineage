@@ -278,9 +278,10 @@ export const DungeonMapControls = ({
     return (
       <GenericRaisedButton
         onPressFunction={() => move(direction)}
-        text={direction.charAt(0).toUpperCase() + direction.slice(1)}
         disabledCondition={!valid}
-      />
+      >
+        {direction.charAt(0).toUpperCase() + direction.slice(1)}
+      </GenericRaisedButton>
     );
   };
   return (

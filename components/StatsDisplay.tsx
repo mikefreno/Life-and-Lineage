@@ -12,8 +12,8 @@ import Coins from "../assets/icons/CoinsIcon";
 import { asReadableGold } from "../utility/functions/misc/numbers";
 import SpellDetails from "./SpellDetails";
 import GenericFlatButton from "./GenericFlatButton";
-import { PlayerCharacterContext } from "../app/_layout";
 import { convertMasteryToString } from "../utility/spellHelper";
+import { AppContext } from "../app/_layout";
 
 type BaseProps = {
   statsLeftPos: number;
@@ -63,9 +63,9 @@ export function StatsDisplay({
   const { colorScheme } = useColorScheme();
   const vibration = useVibration();
 
-  const playerStateData = useContext(PlayerCharacterContext);
-  if (!playerStateData) throw new Error("missing contexts");
-  const { playerState } = playerStateData;
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing contexts");
+  const { playerState } = appData;
 
   const SaleSection = () => {
     if (playerState) {

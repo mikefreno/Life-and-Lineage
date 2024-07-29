@@ -80,11 +80,7 @@ export default function TargetSelectionRender({
           >
             <View className="flex flex-row justify-evenly">
               <View className="my-auto">
-                <EnemyImage
-                  creatureSpecies={target.creatureSpecies}
-                  widthOverride={60}
-                  heightOverride={60}
-                />
+                <EnemyImage creatureSpecies={target.creatureSpecies} />
               </View>
               <View className="my-auto flex w-1/2">
                 <View className="">

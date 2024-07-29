@@ -2,12 +2,6 @@ import { Text, View } from "../../components/Themed";
 import { Pressable, ScrollView, View as NonThemedView } from "react-native";
 import { router, usePathname } from "expo-router";
 import { useContext, useEffect, useState } from "react";
-import { useColorScheme } from "nativewind";
-import {
-  GameContext,
-  PlayerCharacterContext,
-  PlayerStatusCompactContext,
-} from "../_layout";
 import { useVibration } from "../../utility/customHooks";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
@@ -17,6 +11,7 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
 import ThemedCard from "../../components/ThemedCard";
+import { AppContext } from "../_layout";
 
 const dangerColorStep = [
   "#fee2e2",
@@ -38,15 +33,11 @@ const levelOffset: Record<string, number> = {
 };
 
 const DungeonScreen = observer(() => {
-  const gameContext = useContext(GameContext);
-  const playerContext = useContext(PlayerCharacterContext);
-  const playerStatusCompact = useContext(PlayerStatusCompactContext);
-  if (!gameContext || !playerContext || !playerStatusCompact) {
+  const appData = useContext(AppContext);
+  if (!appData) {
     throw new Error("Missing Context");
   }
-  const { gameState } = gameContext;
-  const { playerState } = playerContext;
-  const { isCompact } = playerStatusCompact;
+  const { gameState, isCompact } = appData;
   const [instances, _] = useState<DungeonInstance[]>(
     gameState?.dungeonInstances.filter(
       (instance) => instance.name !== "training grounds",
@@ -55,7 +46,6 @@ const DungeonScreen = observer(() => {
   const pathname = usePathname();
   const [height, setHeight] = useState<number>(0);
 
-  const { colorScheme } = useColorScheme();
   const vibration = useVibration();
   const [showDungeonTutorial, setShowDungeonTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("dungeon")) ?? false,

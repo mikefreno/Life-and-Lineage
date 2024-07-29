@@ -4,17 +4,15 @@ import Energy from "../assets/icons/EnergyIcon";
 import Sanity from "../assets/icons/SanityIcon";
 import HealthIcon from "../assets/icons/HealthIcon";
 import ProgressBar from "./ProgressBar";
-import { useColorScheme } from "nativewind";
 import { useIsFocused } from "@react-navigation/native";
 import { useContext, useState } from "react";
-import { GameContext, PlayerCharacterContext } from "../app/_layout";
 import { observer } from "mobx-react-lite";
 import { numberToRoman } from "../utility/functions/misc/numbers";
 import { useVibration } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
 import { Text } from "./Themed";
-import Colors from "../constants/Colors";
 import ThemedCard from "./ThemedCard";
+import { AppContext } from "../app/_layout";
 
 interface LaborTaskProps {
   reward: number;
@@ -36,11 +34,9 @@ const LaborTask = observer(
     experienceToPromote,
     applyToJob,
   }: LaborTaskProps) => {
-    const playerCharacterData = useContext(PlayerCharacterContext);
-    const gameData = useContext(GameContext);
-    if (!playerCharacterData || !gameData) throw new Error("missing context");
-    const { gameState } = gameData;
-    const { playerState } = playerCharacterData;
+    const appData = useContext(AppContext);
+    if (!appData) throw new Error("missing context");
+    const { gameState, playerState } = appData;
     const [fullReward, setFullReward] = useState<number | undefined>(
       playerState?.getRewardValue(title, reward),
     );
@@ -51,8 +47,6 @@ const LaborTask = observer(
     const vibration = useVibration();
 
     const isFocused = useIsFocused();
-
-    const { colorScheme } = useColorScheme();
 
     function work() {
       if (playerState && gameState && isFocused) {
@@ -104,23 +98,23 @@ const LaborTask = observer(
         {playerState?.job == title ? (
           <>
             <GenericRaisedButton
-              text={"Work"}
               onPressFunction={work}
               disabledCondition={
                 (cost.health && playerState.health <= cost.health) ||
                 playerState.mana < cost.mana
               }
-            />
+            >
+              Work
+            </GenericRaisedButton>
             <ProgressBar
               value={experience ?? 0}
               maxValue={experienceToPromote}
             />
           </>
         ) : (
-          <GenericRaisedButton
-            text={"Apply"}
-            onPressFunction={() => applyToJob(title)}
-          />
+          <GenericRaisedButton onPressFunction={() => applyToJob(title)}>
+            Apply
+          </GenericRaisedButton>
         )}
       </ThemedCard>
     );
