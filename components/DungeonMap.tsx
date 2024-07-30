@@ -239,12 +239,14 @@ export const DungeonMapControls = ({
 }: DungeonMapControlsProps) => {
   const isMoveValid = (direction: keyof typeof directionsMapping) => {
     if (!currentPosition) return false;
-    if (!currentPosition.clearedRoom) return false;
+
     const { x, y } = directionsMapping[direction];
     const newX = currentPosition.x + x * tileSize;
     const newY = currentPosition.y + y * tileSize;
 
-    return tiles.some((tile) => tile.x === newX && tile.y === newY);
+    const newTile = tiles.find((tile) => tile.x === newX && tile.y === newY);
+
+    return !!newTile;
   };
 
   const move = (direction: keyof typeof directionsMapping) => {

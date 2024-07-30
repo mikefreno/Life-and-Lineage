@@ -138,13 +138,17 @@ const DungeonLevelScreen = observer(() => {
   }, [slug]);
 
   useEffect(() => {
-    if (playerState.currentDungeon) {
+    if (playerState.currentDungeon && playerState.currentDungeon.dungeonMap) {
       setTiles(playerState.currentDungeon.dungeonMap);
       setCurrentPosition(playerState.currentDungeon.currentPosition);
       setMapDimensions(playerState.currentDungeon.mapDimensions);
       setEnemy(playerState.currentDungeon.enemy);
-      setInCombat(true);
-      setEnemyAttacked(true);
+      if (playerState.currentDungeon.enemy) {
+        setFightingBoss(playerState.currentDungeon.fightingBoss);
+        setInCombat(true);
+        setEnemyAttacked(true);
+        setAttackAnimationOnGoing(false);
+      }
     } else if (thisDungeon) {
       const generatedTiles = generateTiles({
         numTiles: thisDungeon.tiles,
@@ -171,10 +175,6 @@ const DungeonLevelScreen = observer(() => {
       }
     }
   }, [enemyState]);
-
-  useEffect(() => {
-    console.log(inCombat);
-  }, []);
 
   useEffect(() => {
     if (
@@ -598,16 +598,19 @@ const DungeonLevelScreen = observer(() => {
 
   function dungeonSave(enemy: Enemy | null) {
     if (playerState && gameState) {
-      playerState.setInDungeon({
-        state: true,
-        instance: instanceName,
-        level: level,
-        tiles: tiles,
-        currentPosition: currentPosition ?? tiles[0],
-        mapDimensions: mapDimensions,
-        enemy: enemy,
-      });
-      fullSave(gameState, playerState);
+      if (tiles.length > 0) {
+        playerState.setInDungeon({
+          state: true,
+          instance: instanceName,
+          level: level,
+          dungeonMap: tiles,
+          currentPosition: currentPosition ?? tiles[0],
+          mapDimensions: mapDimensions,
+          enemy: enemy,
+          fightingBoss: fightingBoss,
+        });
+        fullSave(gameState, playerState);
+      }
     }
   }
 
@@ -621,13 +624,9 @@ const DungeonLevelScreen = observer(() => {
     setInventoryFullNotifier(false);
   }, [showLeftBehindItemsScreen]);
 
-  const throttledDungeonSave = throttle(
-    (state) => {
-      dungeonSave(state);
-    },
-    3000,
-    { leading: false, trailing: true },
-  );
+  const throttledDungeonSave = throttle((state) => {
+    dungeonSave(state);
+  }, 250);
 
   useEffect(() => {
     throttledDungeonSave(enemyState);
@@ -639,7 +638,7 @@ const DungeonLevelScreen = observer(() => {
     } else {
       setFirstLoad(false);
     }
-  }, [enemyState, firstLoad]);
+  }, [enemyState]);
 
   //-----------tutorial---------//
   const [showDungeonInteriorTutorial, setShowDungeonInteriorTutorial] =

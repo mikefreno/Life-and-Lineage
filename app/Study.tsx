@@ -141,8 +141,8 @@ export default function LearningKnowledgeScreen() {
                   ].dark,
               }}
             >
-              This book is beyond your knowledge in the school of{" "}
-              {showMasteryLevelTooLow}
+              {`This book is beyond your knowledge in the school of{" "}
+              ${showMasteryLevelTooLow}`}
             </Text>
             <GenericRaisedButton
               onPressFunction={() => setShowMasteryLevelTooLow(null)}
@@ -162,8 +162,9 @@ export default function LearningKnowledgeScreen() {
                     | "protection"
                 ].dark
               }
-              text={"Acknowledge Knowledge"}
-            />
+            >
+              Acknowledge Knowledge
+            </GenericRaisedButton>
           </>
         ) : null}
       </GenericModal>
@@ -234,8 +235,9 @@ export default function LearningKnowledgeScreen() {
                       );
                       vibration({ style: "light" });
                     }}
-                    text={"Continue\nStudying"}
-                  />
+                  >
+                    Continue\nStudying
+                  </GenericRaisedButton>
                 </View>
               ))}
             </View>
@@ -267,8 +269,9 @@ export default function LearningKnowledgeScreen() {
                     setShowMasteryLevelTooLow(selectedBookSpell.element);
                   }
                 }}
-                text={"Start Studying"}
-              />
+              >
+                Start Studying
+              </GenericRaisedButton>
             </View>
           ) : null}
           {filteredBooks.length > 0 ? (

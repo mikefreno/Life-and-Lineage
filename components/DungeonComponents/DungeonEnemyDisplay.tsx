@@ -36,7 +36,7 @@ export default function DungeonEnemyDisplay({
     return (
       <View className="h-6">
         <FadeOutNode>
-          <Text className={"text-red-400"}>
+          <Text style={{ color: "#f87171" }}>
             {enemyHealthDiff > 0 ? "+" : ""}
             {enemyHealthDiff.toString()}
           </Text>

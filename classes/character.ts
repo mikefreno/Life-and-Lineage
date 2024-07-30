@@ -250,6 +250,7 @@ type PlayerCharacterBase = {
     dungeonMap: Tile[];
     currentPosition: Tile;
     enemy: Enemy | null;
+    fightingBoss: boolean;
     mapDimensions: {
       width: number;
       height: number;
@@ -343,6 +344,7 @@ export class PlayerCharacter extends Character {
     dungeonMap: Tile[];
     currentPosition: Tile;
     enemy: Enemy | null;
+    fightingBoss: boolean;
     mapDimensions: {
       width: number;
       height: number;
@@ -1760,10 +1762,11 @@ export class PlayerCharacter extends Character {
       this.currentDungeon = {
         instance: props.instance,
         level: props.level,
-        dungeonMap: props.tiles,
+        dungeonMap: props.dungeonMap,
         currentPosition: props.currentPosition,
         mapDimensions: props.mapDimensions,
         enemy: props.enemy,
+        fightingBoss: props.fightingBoss,
       };
     } else {
       this.currentDungeon = null;
@@ -1828,6 +1831,7 @@ export class PlayerCharacter extends Character {
             enemy: json.currentDungeon.enemy
               ? Enemy.fromJSON(json.currentDungeon.enemy)
               : null,
+            fightingBoss: json.currentDungeon.fightingBoss,
             mapDimensions: json.currentDungeon.mapDimensions,
           }
         : null,
@@ -2024,11 +2028,13 @@ type enterDungeonProps = {
   state: true;
   instance: string;
   level: number | string;
-  tiles: Tile[];
+  dungeonMap: Tile[];
   currentPosition: Tile;
-  mapDimensions: BoundingBox;
   enemy: Enemy | null;
+  mapDimensions: BoundingBox;
+  fightingBoss: boolean;
 };
+
 type leaveDungeonProps = {
   state: false;
 };
