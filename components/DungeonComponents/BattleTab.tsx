@@ -15,6 +15,7 @@ import SpellDetails from "../SpellDetails";
 import GenericStrikeAround from "../GenericStrikeAround";
 import InventoryRender from "../InventoryRender";
 import { AppContext } from "../../app/_layout";
+import { DungeonContext } from "./DungeonContext";
 
 interface BattleTabProps {
   battleTab: "attacksOrNavigation" | "equipment" | "log";
@@ -37,8 +38,6 @@ interface BattleTabProps {
     target: Enemy | Minion,
   ) => void;
   pouchRef: React.RefObject<View>;
-  setAttackAnimationOnGoing: React.Dispatch<React.SetStateAction<boolean>>;
-  attackAnimationOnGoing: boolean;
   setShowTargetSelection: React.Dispatch<
     React.SetStateAction<{
       showing: boolean;
@@ -47,7 +46,6 @@ interface BattleTabProps {
     }>
   >;
   addItemToPouch: (item: Item) => void;
-  inCombat: boolean;
   DungeonMapControls: JSX.Element;
 }
 
@@ -56,12 +54,9 @@ export default function BattleTab({
   useAttack,
   useSpell,
   pass,
-  setAttackAnimationOnGoing,
-  attackAnimationOnGoing,
   setShowTargetSelection,
   pouchRef,
   addItemToPouch,
-  inCombat,
   DungeonMapControls,
 }: BattleTabProps) {
   const { colorScheme } = useColorScheme();
@@ -72,8 +67,11 @@ export default function BattleTab({
     useState<boolean>(false);
 
   const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing context");
+  const dungeonData = useContext(DungeonContext);
+  if (!appData || !dungeonData) throw new Error("missing context");
   const { playerState, logsState, enemyState } = appData;
+  const { inCombat, attackAnimationOnGoing, setAttackAnimationOnGoing } =
+    dungeonData;
 
   const playerAttacks = playerState?.physicalAttacks;
   const playerSpells = playerState?.getSpells();

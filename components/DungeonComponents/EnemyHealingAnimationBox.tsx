@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
-import PlusIcon from "../assets/icons/PlusIcon";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { View, Animated } from "react-native";
 import { Easing } from "react-native-reanimated";
+import PlusIcon from "../../assets/icons/PlusIcon";
+import { DungeonContext } from "./DungeonContext";
 
 const HealingIcon = ({ delay = 0 }) => {
   const translateAnim = useRef(new Animated.Value(0)).current;
@@ -41,8 +42,10 @@ interface EnemyHealingAnimationBoxProps {
 export const EnemyHealingAnimationBox = ({
   showHealAnimationDummy,
 }: EnemyHealingAnimationBoxProps) => {
+  const dungeonData = useContext(DungeonContext);
+  if (!dungeonData) throw new Error("missing context");
+  const { firstLoad } = dungeonData;
   const [opacityAnim, setOpacityAnim] = useState(new Animated.Value(0));
-  const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
   useEffect(() => {
     if (!firstLoad) {
@@ -54,8 +57,6 @@ export const EnemyHealingAnimationBox = ({
         useNativeDriver: true,
         easing: Easing.out(Easing.poly(5)),
       }).start();
-    } else {
-      setFirstLoad(false);
     }
   }, [showHealAnimationDummy]);
 

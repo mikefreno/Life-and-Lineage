@@ -2,30 +2,32 @@ import { Pressable, View, Image } from "react-native";
 import GenericModal from "../GenericModal";
 import { View as ThemedView, Text } from "../Themed";
 import { Item } from "../../classes/item";
-import { PlayerCharacter } from "../../classes/character";
+import { useContext } from "react";
+import { AppContext } from "../../app/_layout";
+import { DungeonContext } from "./DungeonContext";
 
 interface LeftBehindItemsModalProps {
   showLeftBehindItemsScreen: boolean;
   setShowLeftBehindItemsScreen: React.Dispatch<React.SetStateAction<boolean>>;
-  inventoryFullNotifier: boolean;
-  leftBehindDrops: Item[];
-  playerState: PlayerCharacter;
-  setInventoryFullNotifier: (value: React.SetStateAction<boolean>) => void;
-  setLeftBehindDrops: (value: React.SetStateAction<Item[]>) => void;
 }
 
 export default function LeftBehindItemsModal({
   showLeftBehindItemsScreen,
   setShowLeftBehindItemsScreen,
-  inventoryFullNotifier,
-  leftBehindDrops,
-  playerState,
-  setInventoryFullNotifier,
-  setLeftBehindDrops,
 }: LeftBehindItemsModalProps) {
+  const appData = useContext(AppContext);
+  const dungeonData = useContext(DungeonContext);
+  if (!dungeonData || !appData) throw new Error("missing context");
+  const { playerState } = appData;
+  const {
+    leftBehindDrops,
+    setLeftBehindDrops,
+    inventoryFullNotifier,
+    setInventoryFullNotifier,
+  } = dungeonData;
   function takeItemFromPouch(item: Item) {
     if (playerState) {
-      if (playerState.inventory.length < 24) {
+      if (playerState.getInventory().length < 24) {
         playerState.addToInventory(item);
         setLeftBehindDrops((prev) =>
           prev.filter((dropItem) => !dropItem.equals(item)),

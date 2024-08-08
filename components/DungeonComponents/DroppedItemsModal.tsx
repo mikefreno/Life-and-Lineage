@@ -1,40 +1,27 @@
 import { router } from "expo-router";
 import GenericModal from "../GenericModal";
 import { Item } from "../../classes/item";
-import { SetStateAction } from "react";
-import { PlayerCharacter } from "../../classes/character";
 import { Pressable, View, Image } from "react-native";
 import Coins from "../../assets/icons/CoinsIcon";
 import { Text } from "../Themed";
 import { toTitleCase } from "../../utility/functions/misc/words";
+import { useContext } from "react";
+import { AppContext } from "../../app/_layout";
+import { DungeonContext } from "./DungeonContext";
 
-interface DroppedItemsModalProps {
-  setLeftBehindDrops: React.Dispatch<SetStateAction<Item[]>>;
-  playerState: PlayerCharacter;
-  slug: string | string[];
-  inventoryFullNotifier: boolean;
-  setInventoryFullNotifier: React.Dispatch<SetStateAction<boolean>>;
-  droppedItems: {
-    itemDrops: Item[];
-    gold: number;
-  } | null;
-  setDroppedItems: React.Dispatch<
-    SetStateAction<{
-      itemDrops: Item[];
-      gold: number;
-    } | null>
-  >;
-}
-
-export default function DroppedItemsModal({
-  setLeftBehindDrops,
-  playerState,
-  slug,
-  setInventoryFullNotifier,
-  inventoryFullNotifier,
-  droppedItems,
-  setDroppedItems,
-}: DroppedItemsModalProps) {
+export default function DroppedItemsModal() {
+  const appData = useContext(AppContext);
+  const dungeonData = useContext(DungeonContext);
+  if (!dungeonData || !appData) throw new Error("missing context");
+  const { playerState } = appData;
+  const {
+    slug,
+    inventoryFullNotifier,
+    droppedItems,
+    setLeftBehindDrops,
+    setDroppedItems,
+    setInventoryFullNotifier,
+  } = dungeonData;
   function closeImmediateItemDrops() {
     if (droppedItems && droppedItems.itemDrops.length > 0) {
       setLeftBehindDrops((prev) => [...prev, ...droppedItems.itemDrops]);

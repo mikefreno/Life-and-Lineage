@@ -5,15 +5,7 @@ import {
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack, router } from "expo-router";
-import React, {
-  createContext,
-  useEffect,
-  useContext,
-  useState,
-  Dispatch,
-  SetStateAction,
-  RefObject,
-} from "react";
+import React, { createContext, useEffect, useContext, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
 import { Game } from "../classes/game";
@@ -28,6 +20,7 @@ import { StatusBar } from "expo-status-bar";
 import { throttle } from "lodash";
 import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
+import { AppContextType } from "../utility/types";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -39,21 +32,6 @@ export const unstable_settings = {
 };
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
-
-interface AppContextType {
-  gameState: Game | undefined;
-  setGameData: Dispatch<SetStateAction<Game | undefined>>;
-  playerState: PlayerCharacter | undefined;
-  setPlayerCharacter: Dispatch<SetStateAction<PlayerCharacter | undefined>>;
-  enemyState: Enemy | null;
-  setEnemy: Dispatch<SetStateAction<Enemy | null>>;
-  logsState: string[];
-  setLogs: Dispatch<SetStateAction<string[]>>;
-  playerStatusRef: RefObject<View> | undefined;
-  setPlayerStatusRef: Dispatch<RefObject<View>>;
-  isCompact: boolean;
-  setIsCompact: Dispatch<SetStateAction<boolean>>;
-}
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -207,7 +185,9 @@ const RootLayout = observer(() => {
   async function getAndSetNavBar() {
     if (Platform.OS == "android") {
       if ((await NavigationBar.getVisibilityAsync()) == "visible") {
+        await NavigationBar.setBackgroundColorAsync("transparent");
         await NavigationBar.setVisibilityAsync("hidden");
+        await NavigationBar.setPositionAsync("absolute");
         if (!navbarLoad) {
           setNavbarLoad(true);
         }

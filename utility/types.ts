@@ -1,4 +1,10 @@
+import type { DungeonInstance, DungeonLevel } from "../classes/dungeon";
 import type { Item } from "../classes/item";
+import type { BoundingBox, Tile } from "../components/DungeonMap";
+import type { Game } from "../classes/game";
+import type { PlayerCharacter } from "../classes/character";
+import type { Enemy } from "../classes/creatures";
+import type { View } from "react-native";
 
 export interface ItemOptions {
   id?: string;
@@ -251,3 +257,68 @@ export type beingType =
   | "undead"
   | "demi-human"
   | "human";
+
+export interface DungeonContextType {
+  slug: string | string[];
+  fightingBoss: boolean;
+  setFightingBoss: React.Dispatch<React.SetStateAction<boolean>>;
+  thisDungeon: DungeonLevel;
+  thisInstance: DungeonInstance;
+  attackAnimationOnGoing: boolean;
+  setAttackAnimationOnGoing: React.Dispatch<React.SetStateAction<boolean>>;
+  enemyAttacked: boolean;
+  setEnemyAttacked: React.Dispatch<React.SetStateAction<boolean>>;
+  enemyHealDummy: number;
+  setEnemyHealDummy: React.Dispatch<React.SetStateAction<number>>;
+  enemyAttackDummy: number;
+  setEnemyAttackDummy: React.Dispatch<React.SetStateAction<number>>;
+  enemyTextString: string | undefined;
+  setEnemyTextString: React.Dispatch<React.SetStateAction<string | undefined>>;
+  inventoryFullNotifier: boolean;
+  setInventoryFullNotifier: React.Dispatch<React.SetStateAction<boolean>>;
+  droppedItems: {
+    itemDrops: Item[];
+    gold: number;
+  } | null;
+  leftBehindDrops: Item[];
+  setDroppedItems: React.Dispatch<
+    React.SetStateAction<{
+      itemDrops: Item[];
+      gold: number;
+    } | null>
+  >;
+  setLeftBehindDrops: React.Dispatch<React.SetStateAction<Item[]>>;
+  firstLoad: boolean;
+  setFirstLoad: React.Dispatch<React.SetStateAction<boolean>>;
+  enemyTextDummy: number;
+  setEnemyTextDummy: React.Dispatch<React.SetStateAction<number>>;
+  tiles: Tile[];
+  setTiles: React.Dispatch<React.SetStateAction<Tile[]>>;
+  inCombat: boolean;
+  setInCombat: React.Dispatch<React.SetStateAction<boolean>>;
+  currentPosition: Tile | null;
+  setCurrentPosition: React.Dispatch<React.SetStateAction<Tile | null>>;
+  mapDimensions: BoundingBox;
+  setMapDimensions: React.Dispatch<React.SetStateAction<BoundingBox>>;
+  level: number;
+  instanceName: string;
+  battleLogger: (whatHappened: string) => void;
+  showFirstBossKillTutorial: boolean;
+  setShowFirstBossKillTutorial: React.Dispatch<React.SetStateAction<boolean>>;
+}
+export interface AppContextType {
+  gameState: Game | undefined;
+  setGameData: React.Dispatch<React.SetStateAction<Game | undefined>>;
+  playerState: PlayerCharacter | undefined;
+  setPlayerCharacter: React.Dispatch<
+    React.SetStateAction<PlayerCharacter | undefined>
+  >;
+  enemyState: Enemy | null;
+  setEnemy: React.Dispatch<React.SetStateAction<Enemy | null>>;
+  logsState: string[];
+  setLogs: React.Dispatch<React.SetStateAction<string[]>>;
+  playerStatusRef: React.RefObject<View> | undefined;
+  setPlayerStatusRef: React.Dispatch<React.RefObject<View>>;
+  isCompact: boolean;
+  setIsCompact: React.Dispatch<React.SetStateAction<boolean>>;
+}

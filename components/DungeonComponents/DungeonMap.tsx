@@ -1,12 +1,18 @@
-import React from "react";
+import { useContext } from "react";
 import Svg, { Rect } from "react-native-svg";
-import { View } from "react-native";
+import { Dimensions, View } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
 } from "react-native-reanimated";
-import GenericRaisedButton from "./GenericRaisedButton";
+import GenericRaisedButton from "../GenericRaisedButton";
 import { useColorScheme } from "nativewind";
+import { DungeonContext, TILE_SIZE } from "./DungeonContext";
+import Draggable from "react-native-draggable";
+import { View as ThemedView } from "../Themed";
+import { BlurView } from "expo-blur";
+import PlatformDependantBlurView from "../PlatformDependantBlurView";
+import { useVibration } from "../../utility/customHooks";
 
 export interface Tile {
   x: number;
@@ -154,6 +160,7 @@ export const DungeonMapRender = ({
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const { colorScheme } = useColorScheme();
+  const strokeWidth = 1;
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
@@ -161,6 +168,8 @@ export const DungeonMapRender = ({
       { translateY: translateY.value },
     ],
   }));
+
+  const vibrate = useVibration();
 
   const getFillColor = (tile: Tile) => {
     const isCurrent =
@@ -198,45 +207,58 @@ export const DungeonMapRender = ({
         height={tileSize}
         fill={getFillColor(tile)}
         stroke="gray"
+        strokeWidth={strokeWidth}
       />
     );
   };
 
   return (
-    <View className="flex h-1/2 mx-auto justify-center">
-      <Animated.View
-        style={[
-          animatedStyle,
-          { width: mapDimensions.width, height: mapDimensions.height },
-        ]}
+    <View className="flex h-1/2">
+      <Draggable
+        x={Dimensions.get("screen").width / 4}
+        y={20}
+        minX={TILE_SIZE - mapDimensions.width}
+        maxX={Dimensions.get("screen").width + mapDimensions.width - TILE_SIZE}
+        minY={TILE_SIZE - mapDimensions.height}
+        maxY={Dimensions.get("screen").height / 2 + mapDimensions.height / 2}
+        onPressIn={() => vibrate({ style: "medium" })}
       >
-        <Svg width={mapDimensions.width} height={mapDimensions.height}>
-          {tiles.map((tile) => renderTile(tile))}
-        </Svg>
-      </Animated.View>
+        <Animated.View
+          style={[
+            animatedStyle,
+            { width: mapDimensions.width, height: mapDimensions.height },
+          ]}
+        >
+          <Svg
+            width={mapDimensions.width}
+            height={mapDimensions.height}
+            viewBox={`${-strokeWidth / 2} ${-strokeWidth / 2} ${
+              mapDimensions.width + strokeWidth
+            } ${mapDimensions.height + strokeWidth}`} // corrective to include map edge borders
+          >
+            {tiles.map((tile) => renderTile(tile))}
+          </Svg>
+        </Animated.View>
+      </Draggable>
     </View>
   );
 };
 
 interface DungeonMapControlsProps {
-  tiles: Tile[];
-  currentPosition: Tile | null;
   tileSize: number;
-  setCurrentPosition: React.Dispatch<React.SetStateAction<Tile | null>>;
-  setInCombat: React.Dispatch<React.SetStateAction<boolean>>;
   loadBoss: () => void;
   getEnemy: () => void;
 }
 
 export const DungeonMapControls = ({
-  tiles,
-  currentPosition,
   tileSize,
-  setCurrentPosition,
-  setInCombat,
   loadBoss,
   getEnemy,
 }: DungeonMapControlsProps) => {
+  const dungeonData = useContext(DungeonContext);
+  if (!dungeonData) throw new Error("missing context");
+  const { currentPosition, setCurrentPosition, setInCombat, tiles } =
+    dungeonData;
   const isMoveValid = (direction: keyof typeof directionsMapping) => {
     if (!currentPosition) return false;
 
@@ -287,13 +309,15 @@ export const DungeonMapControls = ({
     );
   };
   return (
-    <View className="flex-1 flex items-center w-2/3 mx-auto">
-      <ArrowButton direction="up" />
-      <View className="flex-row justify-between w-full">
-        <ArrowButton direction="left" />
-        <ArrowButton direction="right" />
+    <PlatformDependantBlurView className="flex-1 flex items-center w-full">
+      <View className="w-2/3 mx-auto">
+        <ArrowButton direction="up" />
+        <View className="flex-row justify-between w-full">
+          <ArrowButton direction="left" />
+          <ArrowButton direction="right" />
+        </View>
+        <ArrowButton direction="down" />
       </View>
-      <ArrowButton direction="down" />
-    </View>
+    </PlatformDependantBlurView>
   );
 };

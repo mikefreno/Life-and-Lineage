@@ -300,10 +300,11 @@ const PlayerStatus = observer(
         return (
           <View className="flex flex-row justify-around">
             {simplifiedConditions.map((cond) => (
-              <View key={cond.name} className="mx-2 flex align-middle">
+              <View key={cond.name} className="mx-0.5 flex align-middle">
                 <Image
                   source={cond.icon}
-                  style={{ maxHeight: 26, maxWidth: 32 }}
+                  style={{ width: 24, height: 24 }}
+                  resizeMode="contain"
                 />
               </View>
             ))}
@@ -339,7 +340,8 @@ const PlayerStatus = observer(
                   <View className="mb-1 flex flex-row items-center justify-center">
                     <Image
                       source={condition.getConditionIcon()}
-                      style={{ maxWidth: 32, height: 24 }}
+                      style={{ width: 24, height: 24 }}
+                      resizeMode="contain"
                     />
                     <View className="flex flex-row items-center">
                       <Text> {condition.turns} </Text>
@@ -350,7 +352,7 @@ const PlayerStatus = observer(
                     <Text>{toTitleCase(condition.name)}:</Text>
                     {condition.getHealthDamage() && (
                       <View className="flex flex-row items-center">
-                        <Text> dealing {condition.healthDamage} </Text>
+                        <Text> dealing {condition.getHealthDamage()} </Text>
                         <HealthIcon height={14} width={14} />
                         <Text> damage</Text>
                       </View>
@@ -360,7 +362,7 @@ const PlayerStatus = observer(
                       condition.effect.includes("heal") && (
                         <View className="flex flex-row items-center">
                           <Text>
-                            {condition.healthDamage && "and"} healing{" "}
+                            {condition.getHealthDamage() && "and"} healing{" "}
                             {condition.effectMagnitude}{" "}
                           </Text>
                           <HealthIcon height={14} width={14} />
@@ -370,10 +372,10 @@ const PlayerStatus = observer(
                     {condition.sanityDamage && (
                       <View className="flex flex-row items-center">
                         <Text>
-                          {(condition.healthDamage ||
+                          {(condition.getHealthDamage() ||
                             condition.effect.includes("heal")) &&
                             "and"}{" "}
-                          dealing {condition.sanityDamage}
+                          dealing {condition.getSanityDamage()}
                         </Text>
                         <Sanity height={14} width={14} />
                         <Text> damage</Text>
@@ -382,8 +384,8 @@ const PlayerStatus = observer(
                     {condition.effect.includes("mana drain") && (
                       <View className="flex flex-row items-center">
                         <Text>
-                          {(condition.healthDamage ||
-                            condition.sanityDamage ||
+                          {(condition.getHealthDamage() ||
+                            condition.getSanityDamage() ||
                             condition.effect.includes("heal")) &&
                             "and "}
                           draining {condition.effectMagnitude}
@@ -394,8 +396,8 @@ const PlayerStatus = observer(
                     {condition.effect.includes("mana regen") && (
                       <View className="flex flex-row items-center">
                         <Text>
-                          {(condition.healthDamage ||
-                            condition.sanityDamage ||
+                          {(condition.getHealthDamage() ||
+                            condition.getSanityDamage() ||
                             condition.effect.includes("heal") ||
                             condition.effect.includes("mana drain")) &&
                             "and "}
@@ -407,8 +409,8 @@ const PlayerStatus = observer(
                     {condition.effect.includes("stun") && (
                       <View className="flex flex-row items-center">
                         <Text>
-                          {(condition.healthDamage ||
-                            condition.sanityDamage ||
+                          {(condition.getHealthDamage() ||
+                            condition.getSanityDamage() ||
                             condition.effect.includes("heal") ||
                             condition.effect.includes("mana regen") ||
                             condition.effect.includes("mana drain")) &&
@@ -471,7 +473,7 @@ const PlayerStatus = observer(
     function healthChangePopUp() {
       if (healthDiff != 0) {
         return (
-          <View className="absolute ml-2">
+          <View className="absolute ml-1">
             <FadeOutNode animationCycler={animationCycler}>
               <Text style={{ color: "#f87171" }}>
                 {healthDiff > 0 ? "+" : ""}
@@ -485,7 +487,7 @@ const PlayerStatus = observer(
     function sanityChangePopUp() {
       if (sanityDiff != 0) {
         return (
-          <View className="absolute ml-2">
+          <View className="absolute ml-1">
             <FadeOutNode animationCycler={animationCycler}>
               <Text style={{ color: "#c084fc" }}>
                 {sanityDiff > 0 ? "+" : ""}
@@ -499,7 +501,7 @@ const PlayerStatus = observer(
     function manaChangePopUp() {
       if (manaDiff != 0) {
         return (
-          <View className="absolute ml-2">
+          <View className="absolute ml-1">
             <FadeOutNode animationCycler={animationCycler}>
               <Text style={{ color: "#60a5fa" }}>
                 {manaDiff > 0 ? "+" : ""}
@@ -518,7 +520,7 @@ const PlayerStatus = observer(
               animationCycler={animationCycler}
               className="flex flex-row"
             >
-              <Text>
+              <Text className="pr-0.5">
                 {goldDiff > 0 ? "+" : ""}
                 {goldDiff.toString()}
               </Text>
@@ -802,7 +804,7 @@ const PlayerStatus = observer(
               </View>
               {playerState.conditions.length > 0 ? (
                 <View>
-                  <GenericStrikeAround text={"Conditions"} />
+                  <GenericStrikeAround>Conditions</GenericStrikeAround>
                   {detailedViewConditionRender()}
                 </View>
               ) : null}
@@ -825,7 +827,6 @@ const PlayerStatus = observer(
                           height={16}
                           style={{ marginLeft: 6 }}
                         />
-                        {showingGoldChange && goldChangePopUp()}
                       </View>
                     )}
                     {playerState.unAllocatedSkillPoints > 0 && (
@@ -877,7 +878,11 @@ const PlayerStatus = observer(
                 </View>
               </View>,
             )}
-            <View className="flex flex-row ml-4 absolute z-top">
+            <View
+              className={`${
+                isCompact ? "ml-4" : "justify-center w-full mr-8"
+              } flex flex-row absolute z-top`}
+            >
               {showingGoldChange && goldChangePopUp()}
             </View>
           </Pressable>

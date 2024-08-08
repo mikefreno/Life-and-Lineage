@@ -5,9 +5,10 @@ import { EnemyImage } from "../EnemyImage";
 import ProgressBar from "../ProgressBar";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { AttackObj } from "../../utility/types";
+import { useContext } from "react";
+import { AppContext } from "../../app/_layout";
 
 interface TargetSelectionRenderProps {
-  enemyState: Enemy | null;
   useAttack: (attack: AttackObj, target: Enemy | Minion) => void;
   useSpell: (
     spell: {
@@ -44,12 +45,14 @@ interface TargetSelectionRenderProps {
   };
 }
 export default function TargetSelectionRender({
-  enemyState,
   useSpell,
   useAttack,
   setShowTargetSelection,
   showTargetSelection,
 }: TargetSelectionRenderProps) {
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing context");
+  const { enemyState } = appData;
   if (enemyState) {
     let targets: (Enemy | Minion)[] = [];
     targets.push(enemyState);

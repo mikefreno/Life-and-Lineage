@@ -1,58 +1,30 @@
 import { PlayerCharacter } from "../../classes/character";
 import { Enemy, Minion } from "../../classes/creatures";
-import { DungeonInstance, DungeonLevel } from "../../classes/dungeon";
-import { Game } from "../../classes/game";
-import { Item } from "../../classes/item";
-import { getMagnitude } from "./conditions";
-import { toTitleCase } from "./misc/words";
+import { getMagnitude } from "../../utility/functions/conditions";
+import { toTitleCase } from "../../utility/functions/misc/words";
+import type { AppContextType, DungeonContextType } from "../../utility/types";
 
-export interface enemyTurnCheckProps {
-  enemyState: Enemy | null;
-  slug: string | string[];
-  playerState: PlayerCharacter;
-  fightingBoss: boolean;
-  setDroppedItems: (
-    value: React.SetStateAction<{
-      itemDrops: Item[];
-      gold: number;
-    } | null>,
-  ) => void;
-  setEnemy: (value: React.SetStateAction<Enemy | null>) => void;
-  gameState: Game;
-  battleLogger: (whatHappened: string) => void;
-  setFightingBoss: (value: React.SetStateAction<boolean>) => void;
-  setAttackAnimationOnGoing: (value: React.SetStateAction<boolean>) => void;
-  thisDungeon: DungeonLevel | undefined;
-  thisInstance: DungeonInstance | undefined;
-  setEnemyAttacked: (value: React.SetStateAction<boolean>) => void;
-  setEnemyHealDummy: React.Dispatch<React.SetStateAction<number>>;
-  setEnemyAttackDummy: React.Dispatch<React.SetStateAction<number>>;
-  setEnemyTextDummy: React.Dispatch<React.SetStateAction<number>>;
-  setEnemyTextString: React.Dispatch<React.SetStateAction<string | undefined>>;
-  triggerFirstBossKillTutorial: () => void;
+interface enemyTurnCheck {
+  dungeonData: DungeonContextType | undefined;
+  appData: AppContextType | undefined;
 }
 
-export function enemyTurnCheck({
-  enemyState,
-  slug,
-  playerState,
-  fightingBoss,
-  setDroppedItems,
-  setEnemy,
-  gameState,
-  battleLogger,
-  setFightingBoss,
-  setAttackAnimationOnGoing,
-  thisDungeon,
-  thisInstance,
-  setEnemyAttacked,
-  setEnemyHealDummy,
-  setEnemyTextDummy,
-  setEnemyTextString,
-  setEnemyAttackDummy,
-  triggerFirstBossKillTutorial,
-}: enemyTurnCheckProps) {
-  if (enemyState) {
+export function enemyTurnCheck({ dungeonData, appData }: enemyTurnCheck) {
+  if (!appData || !dungeonData)
+    throw new Error("missing context in enemyTurnCheck()");
+  const { enemyState, playerState, setEnemy, gameState } = appData;
+  const {
+    slug,
+    fightingBoss,
+    setDroppedItems,
+    thisDungeon,
+    thisInstance,
+    setFightingBoss,
+    setAttackAnimationOnGoing,
+    battleLogger,
+    setShowFirstBossKillTutorial,
+  } = dungeonData;
+  if (enemyState && playerState && gameState) {
     if (
       enemyState.health <= 0 ||
       (enemyState.sanity && enemyState.sanity <= 0)
@@ -91,60 +63,43 @@ export function enemyTurnCheck({
           gameState.openNextDungeonLevel(thisInstance!.name);
           playerState.bossDefeated();
           if (!gameState.tutorialsShown["First Boss Kill"]) {
-            triggerFirstBossKillTutorial();
+            setShowFirstBossKillTutorial(true);
           }
         }
         setEnemy(null);
         gameState.gameTick(playerState);
       }
     } else {
-      enemyTurn(
-        enemyState,
-        slug,
-        playerState,
-        fightingBoss,
-        setDroppedItems,
-        setEnemy,
-        gameState,
-        battleLogger,
-        setFightingBoss,
-        thisDungeon,
-        thisInstance,
-        setEnemyAttacked,
-        setEnemyHealDummy,
-        setEnemyAttackDummy,
-        setEnemyTextDummy,
-        setEnemyTextString,
-      );
+      enemyTurn({ appData, dungeonData });
       setTimeout(() => setAttackAnimationOnGoing(false), 1000);
     }
   }
 }
 
-export const enemyTurn = (
-  enemyState: Enemy | null,
-  slug: string | string[],
-  playerState: PlayerCharacter,
-  fightingBoss: boolean,
-  setDroppedItems: (
-    value: React.SetStateAction<{
-      itemDrops: Item[];
-      gold: number;
-    } | null>,
-  ) => void,
-  setEnemy: (value: React.SetStateAction<Enemy | null>) => void,
-  gameState: Game,
-  battleLogger: (whatHappened: string) => void,
-  setFightingBoss: (value: React.SetStateAction<boolean>) => void,
-  thisDungeon: DungeonLevel | undefined,
-  thisInstance: DungeonInstance | undefined,
-  setEnemyAttacked: (value: React.SetStateAction<boolean>) => void,
-  setEnemyHealDummy: React.Dispatch<React.SetStateAction<number>>,
-  setEnemyAttackDummy: React.Dispatch<React.SetStateAction<number>>,
-  setEnemyTextDummy: React.Dispatch<React.SetStateAction<number>>,
-  setEnemyTextString: React.Dispatch<React.SetStateAction<string | undefined>>,
-) => {
-  if (enemyState) {
+interface enemyTurn {
+  appData: AppContextType | undefined;
+  dungeonData: DungeonContextType | undefined;
+}
+
+export const enemyTurn = ({ appData, dungeonData }: enemyTurn) => {
+  if (!appData || !dungeonData)
+    throw new Error("missing context in enemyTurnCheck()");
+  const { enemyState, playerState, setEnemy, gameState } = appData;
+  const {
+    slug,
+    fightingBoss,
+    setDroppedItems,
+    thisDungeon,
+    thisInstance,
+    setFightingBoss,
+    setEnemyAttacked,
+    setEnemyHealDummy,
+    setEnemyAttackDummy,
+    setEnemyTextString,
+    setEnemyTextDummy,
+    battleLogger,
+  } = dungeonData;
+  if (enemyState && playerState && gameState) {
     setEnemyAttacked(true);
     const enemyAttackRes = enemyState.takeTurn({
       defenderMaxHealth: playerState.getNonBuffedMaxHealth(),
