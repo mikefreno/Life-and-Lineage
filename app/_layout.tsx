@@ -47,9 +47,9 @@ const Root = observer(() => {
   const [logsState, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [gameDate, setGameDate] = useState<string>("");
-  const [playerStatusRef, setPlayerStatusRef] =
-    useState<React.RefObject<View>>();
   const [playerStatusCompact, setPlayerStatusCompact] = useState<boolean>(true);
+  const [showDetailedStatusView, setShowDetailedStatusView] =
+    useState<boolean>(false);
   const { setColorScheme, colorScheme } = useColorScheme();
 
   const getData = async () => {
@@ -115,10 +115,10 @@ const Root = observer(() => {
         setEnemy,
         logsState,
         setLogs,
-        playerStatusRef,
-        setPlayerStatusRef,
         isCompact: playerStatusCompact,
         setIsCompact: setPlayerStatusCompact,
+        showDetailedStatusView,
+        setShowDetailedStatusView,
       }}
     >
       <RootLayout />
@@ -185,7 +185,6 @@ const RootLayout = observer(() => {
   async function getAndSetNavBar() {
     if (Platform.OS == "android") {
       if ((await NavigationBar.getVisibilityAsync()) == "visible") {
-        await NavigationBar.setBackgroundColorAsync("transparent");
         await NavigationBar.setVisibilityAsync("hidden");
         await NavigationBar.setPositionAsync("absolute");
         if (!navbarLoad) {

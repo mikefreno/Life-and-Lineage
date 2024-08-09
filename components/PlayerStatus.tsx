@@ -53,6 +53,8 @@ const PlayerStatus = observer(
       setPlayerStatusRef,
       isCompact,
       setIsCompact,
+      showDetailedStatusView,
+      setShowDetailedStatusView,
     } = appData;
     const [readableGold, setReadableGold] = useState(
       playerState?.getReadableGold(),
@@ -93,13 +95,11 @@ const PlayerStatus = observer(
     const [localSanityMax, setLocalSanityMax] = useState<number | undefined>(
       playerState?.getMaxSanity(),
     );
-    const [showDetailedView, setShowDetailedView] = useState<boolean>(false);
     const [respeccing, setRespeccing] = useState<boolean>(false);
 
     const vibration = useVibration();
     const { colorScheme } = useColorScheme();
 
-    const pressableRef = useRef<View>(null);
     const pathname = usePathname();
 
     const healthWarningInterpolation = healthWarningAnimatedValue.interpolate({
@@ -258,12 +258,6 @@ const PlayerStatus = observer(
     useEffect(() => {
       setReadableGold(playerState?.getReadableGold());
     }, [playerState?.gold]);
-
-    useEffect(() => {
-      if (pressableRef) {
-        setPlayerStatusRef(pressableRef);
-      }
-    }, [pressableRef]);
 
     function conditionRenderer() {
       if (playerState) {
@@ -608,8 +602,8 @@ const PlayerStatus = observer(
       return (
         <>
           <GenericModal
-            isVisibleCondition={showDetailedView}
-            backFunction={() => setShowDetailedView(false)}
+            isVisibleCondition={showDetailedStatusView}
+            backFunction={() => setShowDetailedStatusView(false)}
           >
             <View>
               <View className="flex flex-row justify-between items-center py-1 w-full">
@@ -811,8 +805,7 @@ const PlayerStatus = observer(
             </View>
           </GenericModal>
           <Pressable
-            ref={pressableRef}
-            onPress={() => setShowDetailedView(true)}
+            onPress={() => setShowDetailedStatusView(true)}
             className={filled}
           >
             {colorAndPlatformDependantBlur(

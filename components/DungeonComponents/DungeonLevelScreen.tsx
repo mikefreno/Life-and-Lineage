@@ -27,7 +27,6 @@ import { enemyTurnCheck } from "./DungeonInteriorFunctions";
 import LeftBehindItemsModal from "../../components/DungeonComponents/LeftBehindItemsModal";
 import { SpellError } from "../../utility/errorTypes";
 import GenericFlatButton from "../../components/GenericFlatButton";
-import { tapRef } from "../../utility/functions/misc/tap";
 import { fullSave } from "../../utility/functions/save_load";
 import { throttle } from "lodash";
 import D20Die from "../../components/DieRollAnim";
@@ -40,8 +39,13 @@ const DungeonLevelScreen = observer(() => {
   const appData = useContext(AppContext);
   const dungeonData = useContext(DungeonContext);
   if (!appData || !dungeonData) throw new Error("missing context");
-  const { playerState, gameState, enemyState, setEnemy, playerStatusRef } =
-    appData;
+  const {
+    playerState,
+    gameState,
+    enemyState,
+    setEnemy,
+    setShowDetailedStatusView,
+  } = appData;
 
   const {
     slug,
@@ -471,7 +475,7 @@ const DungeonLevelScreen = observer(() => {
             <GenericFlatButton
               onPressFunction={() => {
                 setShowFirstBossKillTutorial(false);
-                setTimeout(() => tapRef(playerStatusRef), 500);
+                setTimeout(() => setShowDetailedStatusView(true), 500);
               }}
               className="py-2"
             >

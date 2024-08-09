@@ -5,6 +5,7 @@ import type { Game } from "../classes/game";
 import type { PlayerCharacter } from "../classes/character";
 import type { Enemy } from "../classes/creatures";
 import type { View } from "react-native";
+import React from "react";
 
 export interface ItemOptions {
   id?: string;
@@ -317,8 +318,8 @@ export interface AppContextType {
   setEnemy: React.Dispatch<React.SetStateAction<Enemy | null>>;
   logsState: string[];
   setLogs: React.Dispatch<React.SetStateAction<string[]>>;
-  playerStatusRef: React.RefObject<View> | undefined;
-  setPlayerStatusRef: React.Dispatch<React.RefObject<View>>;
   isCompact: boolean;
   setIsCompact: React.Dispatch<React.SetStateAction<boolean>>;
+  showDetailedStatusView: boolean;
+  setShowDetailedStatusView: React.Dispatch<React.SetStateAction<boolean>>;
 }

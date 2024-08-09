@@ -29,7 +29,6 @@ import { BlurView } from "expo-blur";
 import { StyleSheet } from "react-native";
 import PlayerStatus from "../../components/PlayerStatus";
 import { LinearGradientBlur } from "../../components/LinearGradientBlur";
-import { tapRef } from "../../utility/functions/misc/tap";
 import { AppContext } from "../_layout";
 
 export default function TabLayout() {
@@ -37,7 +36,7 @@ export default function TabLayout() {
   if (!appData) throw new Error("missing context");
 
   const { colorScheme } = useColorScheme();
-  const { playerState, playerStatusRef, isCompact } = appData;
+  const { playerState, setShowDetailedStatusView, isCompact } = appData;
   const vibration = useVibration();
 
   return (
@@ -85,7 +84,7 @@ export default function TabLayout() {
             return (
               <View className="flex flex-col w-1/6">
                 <Pressable
-                  onPress={() => tapRef(playerStatusRef)}
+                  onPress={() => setShowDetailedStatusView(true)}
                   style={[
                     {
                       height: isCompact ? 44 : 72,
