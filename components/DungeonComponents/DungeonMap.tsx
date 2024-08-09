@@ -9,8 +9,6 @@ import GenericRaisedButton from "../GenericRaisedButton";
 import { useColorScheme } from "nativewind";
 import { DungeonContext, TILE_SIZE } from "./DungeonContext";
 import Draggable from "react-native-draggable";
-import { View as ThemedView } from "../Themed";
-import { BlurView } from "expo-blur";
 import PlatformDependantBlurView from "../PlatformDependantBlurView";
 import { useVibration } from "../../utility/customHooks";
 
@@ -216,11 +214,11 @@ export const DungeonMapRender = ({
     <View className="flex h-1/2">
       <Draggable
         x={Dimensions.get("screen").width / 4}
-        y={20}
+        y={TILE_SIZE}
         minX={TILE_SIZE - mapDimensions.width}
         maxX={Dimensions.get("screen").width + mapDimensions.width - TILE_SIZE}
         minY={TILE_SIZE - mapDimensions.height}
-        maxY={Dimensions.get("screen").height / 2 + mapDimensions.height / 2}
+        maxY={Dimensions.get("window").height / 2 + mapDimensions.height / 2}
         onPressIn={() => vibrate({ style: "medium" })}
       >
         <Animated.View
