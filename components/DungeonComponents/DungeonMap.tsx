@@ -216,11 +216,17 @@ export const DungeonMapRender = ({
     <View className="flex h-1/2">
       <Draggable
         x={Dimensions.get("screen").width / 4}
-        y={TILE_SIZE}
-        minX={TILE_SIZE - mapDimensions.width}
-        maxX={Dimensions.get("screen").width + mapDimensions.width - TILE_SIZE}
-        minY={TILE_SIZE - mapDimensions.height}
-        maxY={Dimensions.get("window").height / 2 + mapDimensions.height / 2}
+        y={TILE_SIZE * 2}
+        minX={TILE_SIZE * 2 - mapDimensions.width}
+        maxX={
+          Dimensions.get("screen").width + mapDimensions.width - TILE_SIZE * 2
+        }
+        minY={TILE_SIZE * 2 - mapDimensions.height}
+        maxY={
+          Dimensions.get("window").height / 2 +
+          mapDimensions.height / 2 -
+          TILE_SIZE * 2
+        }
         onPressIn={() => vibrate({ style: "medium" })}
       >
         <Animated.View

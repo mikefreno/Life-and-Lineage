@@ -214,9 +214,7 @@ const DungeonLevelScreen = observer(() => {
             <SackIcon height={32} width={32} />
           </Pressable>
           <View className="flex-1 justify-between">
-            <View className="flex-1 px-2">
-              <BattleTab battleTab={battleTab} pouchRef={pouchRef} />
-            </View>
+            <BattleTab battleTab={battleTab} pouchRef={pouchRef} />
           </View>
           <BattleTabControls
             battleTab={battleTab}

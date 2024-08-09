@@ -21,6 +21,7 @@ import {
   useSpell,
 } from "./DungeonInteriorFunctions";
 import { DungeonMapControls } from "./DungeonMap";
+import PlatformDependantBlurView from "../PlatformDependantBlurView";
 
 interface BattleTabProps {
   battleTab: "attacksOrNavigation" | "equipment" | "log";
@@ -276,19 +277,19 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
           }
         case "equipment":
           return (
-            <View className="my-1 flex-1">
+            <PlatformDependantBlurView className="my-1 flex-1 px-2">
               <InventoryRender
                 selfRef={null}
                 inventory={playerState.getInventory()}
                 pouchTarget={pouchRef}
                 addItemToPouch={(item) => addItemToPouch({ item, dungeonData })}
               />
-            </View>
+            </PlatformDependantBlurView>
           );
         case "log":
           return (
             <ThemedView
-              className="my-1 flex-1 rounded-lg border border-zinc-600 px-4"
+              className="my-1 flex-1 rounded-lg border border-zinc-600 mx-2"
               style={{
                 backgroundColor: colorScheme == "dark" ? "#09090b" : "#fff",
               }}
