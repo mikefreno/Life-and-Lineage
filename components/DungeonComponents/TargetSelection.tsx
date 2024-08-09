@@ -4,55 +4,17 @@ import { Enemy, Minion } from "../../classes/creatures";
 import { EnemyImage } from "../EnemyImage";
 import ProgressBar from "../ProgressBar";
 import { toTitleCase } from "../../utility/functions/misc/words";
-import { AttackObj } from "../../utility/types";
 import { useContext } from "react";
 import { AppContext } from "../../app/_layout";
+import { useAttack, useSpell } from "./DungeonInteriorFunctions";
+import { DungeonContext } from "./DungeonContext";
 
-interface TargetSelectionRenderProps {
-  useAttack: (attack: AttackObj, target: Enemy | Minion) => void;
-  useSpell: (
-    spell: {
-      name: string;
-      element: string;
-      proficiencyNeeded: number;
-      manaCost: number;
-      effects: {
-        damage: number | null;
-        buffs: string[] | null;
-        debuffs:
-          | {
-              name: string;
-              chance: number;
-            }[]
-          | null;
-        summon?: string[] | undefined;
-        selfDamage?: number | undefined;
-      };
-    },
-    target: Enemy | Minion,
-  ) => void;
-  setShowTargetSelection: React.Dispatch<
-    React.SetStateAction<{
-      showing: boolean;
-      chosenAttack: any;
-      spell: boolean | null;
-    }>
-  >;
-  showTargetSelection: {
-    showing: boolean;
-    chosenAttack: any;
-    spell: boolean | null;
-  };
-}
-export default function TargetSelectionRender({
-  useSpell,
-  useAttack,
-  setShowTargetSelection,
-  showTargetSelection,
-}: TargetSelectionRenderProps) {
+export default function TargetSelectionRender() {
   const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing context");
+  const dungeonData = useContext(DungeonContext);
+  if (!appData || !dungeonData) throw new Error("missing context");
   const { enemyState } = appData;
+  const { showTargetSelection, setShowTargetSelection } = dungeonData;
   if (enemyState) {
     let targets: (Enemy | Minion)[] = [];
     targets.push(enemyState);
@@ -66,17 +28,17 @@ export default function TargetSelectionRender({
           <Pressable
             key={target.id}
             onPress={() => {
-              const attack = { ...showTargetSelection.chosenAttack };
-              const spell = showTargetSelection.spell;
+              const attack = showTargetSelection.chosenAttack;
               setShowTargetSelection({
                 showing: false,
                 chosenAttack: null,
-                spell: null,
               });
-              if (spell) {
-                useSpell(attack, target);
-              } else {
-                useAttack(attack, target);
+              if (attack) {
+                if ("element" in attack) {
+                  useSpell({ spell: attack, target, appData, dungeonData });
+                } else {
+                  useAttack({ attack, target, appData, dungeonData });
+                }
               }
             }}
             className="m-4 rounded-lg border border-zinc-400 px-4 py-2 shadow-lg active:scale-95 active:opacity-50 dark:border-zinc-700"

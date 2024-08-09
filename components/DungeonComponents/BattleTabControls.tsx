@@ -1,20 +1,23 @@
 import { Pressable } from "react-native";
 import { View, Text } from "../Themed";
 import { useVibration } from "../../utility/customHooks";
+import { useContext } from "react";
+import { DungeonContext } from "./DungeonContext";
 
 interface BattleTabControlsProps {
   battleTab: string;
   setBattleTab: (
     value: React.SetStateAction<"attacksOrNavigation" | "equipment" | "log">,
   ) => void;
-  inCombat: boolean;
 }
 export default function BattleTabControls({
   battleTab,
   setBattleTab,
-  inCombat,
 }: BattleTabControlsProps) {
   const vibration = useVibration();
+  const dungeonData = useContext(DungeonContext);
+  if (!dungeonData) throw new Error("missing context in BattleTabControls");
+  const { inCombat } = dungeonData;
   return (
     <View className="-mb-1 flex w-full flex-row justify-around">
       <Pressable

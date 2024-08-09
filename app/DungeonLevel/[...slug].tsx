@@ -17,6 +17,7 @@ import {
   TILE_SIZE,
 } from "../../components/DungeonComponents/DungeonContext";
 import DungeonLevelScreen from "../../components/DungeonComponents/DungeonLevelScreen";
+import type { AttackObj, SpellObj } from "../../utility/types";
 
 const DungeonProvider = observer(() => {
   const { slug } = useLocalSearchParams();
@@ -59,6 +60,10 @@ const DungeonProvider = observer(() => {
   const [currentPosition, setCurrentPosition] = useState<Tile | null>(null);
   const [showFirstBossKillTutorial, setShowFirstBossKillTutorial] =
     useState<boolean>(false);
+  const [showTargetSelection, setShowTargetSelection] = useState<{
+    showing: boolean;
+    chosenAttack: AttackObj | SpellObj | null;
+  }>({ showing: false, chosenAttack: null });
 
   useEffect(() => {
     setInstanceName(slug[0]);
@@ -195,6 +200,8 @@ const DungeonProvider = observer(() => {
           battleLogger,
           showFirstBossKillTutorial,
           setShowFirstBossKillTutorial,
+          showTargetSelection,
+          setShowTargetSelection,
         }}
       >
         <DungeonLevelScreen />

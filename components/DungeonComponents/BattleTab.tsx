@@ -2,11 +2,9 @@ import { View as ThemedView, Text, ScrollView } from "../Themed";
 import { Pressable, FlatList, View, Platform } from "react-native";
 import attacks from "../../assets/json/playerAttacks.json";
 import { toTitleCase } from "../../utility/functions/misc/words";
-import { Item } from "../../classes/item";
 import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { useVibration } from "../../utility/customHooks";
-import { Minion, Enemy } from "../../classes/creatures";
 import { AttackObj, Spell } from "../../utility/types";
 import { elementalColorMap } from "../../utility/elementColors";
 import Energy from "../../assets/icons/EnergyIcon";
@@ -16,49 +14,20 @@ import GenericStrikeAround from "../GenericStrikeAround";
 import InventoryRender from "../InventoryRender";
 import { AppContext } from "../../app/_layout";
 import { DungeonContext } from "./DungeonContext";
+import {
+  addItemToPouch,
+  pass,
+  useAttack,
+  useSpell,
+} from "./DungeonInteriorFunctions";
+import { DungeonMapControls } from "./DungeonMap";
 
 interface BattleTabProps {
   battleTab: "attacksOrNavigation" | "equipment" | "log";
-  pass: () => void;
-  useAttack: (attack: AttackObj, target: Enemy | Minion) => void;
-  useSpell: (
-    spell: {
-      name: string;
-      element: string;
-      proficiencyNeeded: number;
-      manaCost: number;
-      effects: {
-        damage: number | null;
-        buffs: string[] | null;
-        debuffs: { name: string; chance: number }[] | null;
-        summon?: string[];
-        selfDamage?: number;
-      };
-    },
-    target: Enemy | Minion,
-  ) => void;
   pouchRef: React.RefObject<View>;
-  setShowTargetSelection: React.Dispatch<
-    React.SetStateAction<{
-      showing: boolean;
-      chosenAttack: any;
-      spell: boolean | null;
-    }>
-  >;
-  addItemToPouch: (item: Item) => void;
-  DungeonMapControls: JSX.Element;
 }
 
-export default function BattleTab({
-  battleTab,
-  useAttack,
-  useSpell,
-  pass,
-  setShowTargetSelection,
-  pouchRef,
-  addItemToPouch,
-  DungeonMapControls,
-}: BattleTabProps) {
+export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
   const { colorScheme } = useColorScheme();
   const [attackDetails, setAttackDetails] = useState<AttackObj | Spell | null>(
     null,
@@ -70,8 +39,12 @@ export default function BattleTab({
   const dungeonData = useContext(DungeonContext);
   if (!appData || !dungeonData) throw new Error("missing context");
   const { playerState, logsState, enemyState } = appData;
-  const { inCombat, attackAnimationOnGoing, setAttackAnimationOnGoing } =
-    dungeonData;
+  const {
+    inCombat,
+    attackAnimationOnGoing,
+    setAttackAnimationOnGoing,
+    setShowTargetSelection,
+  } = dungeonData;
 
   const playerAttacks = playerState?.physicalAttacks;
   const playerSpells = playerState?.getSpells();
@@ -116,7 +89,7 @@ export default function BattleTab({
       switch (battleTab) {
         case "attacksOrNavigation":
           if (!inCombat) {
-            return DungeonMapControls;
+            return <DungeonMapControls />;
           } else {
             return (
               <>
@@ -212,16 +185,24 @@ export default function BattleTab({
                                 ) {
                                   setAttackAnimationOnGoing(true);
                                   if ("element" in attackOrSpell) {
-                                    useSpell(attackOrSpell, enemyState);
+                                    useSpell({
+                                      spell: attackOrSpell,
+                                      appData,
+                                      dungeonData,
+                                      target: enemyState,
+                                    });
                                   } else {
-                                    useAttack(attackOrSpell, enemyState);
+                                    useAttack({
+                                      attack: attackOrSpell,
+                                      appData,
+                                      dungeonData,
+                                      target: enemyState,
+                                    });
                                   }
                                 } else {
                                   setShowTargetSelection({
                                     showing: true,
                                     chosenAttack: attackOrSpell,
-                                    spell:
-                                      "element" in attackOrSpell ? true : false,
                                   });
                                 }
                               }}
@@ -277,7 +258,7 @@ export default function BattleTab({
                         onPress={() => {
                           setAttackAnimationOnGoing(true);
                           vibration({ style: "light" });
-                          pass();
+                          pass({ appData, dungeonData });
                         }}
                         className={`${
                           attackAnimationOnGoing
@@ -300,7 +281,7 @@ export default function BattleTab({
                 selfRef={null}
                 inventory={playerState.getInventory()}
                 pouchTarget={pouchRef}
-                addItemToPouch={addItemToPouch}
+                addItemToPouch={(item) => addItemToPouch({ item, dungeonData })}
               />
             </View>
           );

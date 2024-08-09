@@ -1,6 +1,8 @@
 import { PlayerCharacter } from "../../classes/character";
+import type { Enemy } from "../../classes/creatures";
 import { Game } from "../../classes/game";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import type { AppContextType, DungeonContextType } from "../types";
 
 export const storeData = async (key: string, value: any) => {
   try {
@@ -74,3 +76,38 @@ export const loadPlayer = async () => {
     console.error(e);
   }
 };
+
+interface dungeonSave {
+  enemy: Enemy | null;
+  dungeonData: DungeonContextType | undefined;
+  appData: AppContextType | undefined;
+}
+
+export function dungeonSave({ enemy, dungeonData, appData }: dungeonSave) {
+  if (!appData || !dungeonData)
+    throw new Error("missing context in dungeonSave()");
+  const { playerState, gameState } = appData;
+  const {
+    tiles,
+    instanceName,
+    level,
+    currentPosition,
+    fightingBoss,
+    mapDimensions,
+  } = dungeonData;
+  if (playerState && gameState) {
+    if (tiles.length > 0) {
+      playerState.setInDungeon({
+        state: true,
+        instance: instanceName,
+        level: level,
+        dungeonMap: tiles,
+        currentPosition: currentPosition ?? tiles[0],
+        mapDimensions: mapDimensions,
+        enemy: enemy,
+        fightingBoss: fightingBoss,
+      });
+      fullSave(gameState, playerState);
+    }
+  }
+}

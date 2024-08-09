@@ -1,11 +1,10 @@
 import type { DungeonInstance, DungeonLevel } from "../classes/dungeon";
 import type { Item } from "../classes/item";
-import type { BoundingBox, Tile } from "../components/DungeonMap";
 import type { Game } from "../classes/game";
 import type { PlayerCharacter } from "../classes/character";
 import type { Enemy } from "../classes/creatures";
-import type { View } from "react-native";
 import React from "react";
+import { BoundingBox, Tile } from "../components/DungeonComponents/DungeonMap";
 
 export interface ItemOptions {
   id?: string;
@@ -89,6 +88,19 @@ export type Spell = {
       | null;
     summon?: string[] | undefined;
     selfDamage?: number | undefined;
+  };
+};
+export type SpellObj = {
+  name: string;
+  element: string;
+  proficiencyNeeded: number;
+  manaCost: number;
+  effects: {
+    damage: number | null;
+    buffs: string[] | null;
+    debuffs: { name: string; chance: number }[] | null;
+    summon?: string[];
+    selfDamage?: number;
   };
 };
 
@@ -306,6 +318,16 @@ export interface DungeonContextType {
   battleLogger: (whatHappened: string) => void;
   showFirstBossKillTutorial: boolean;
   setShowFirstBossKillTutorial: React.Dispatch<React.SetStateAction<boolean>>;
+  showTargetSelection: {
+    showing: boolean;
+    chosenAttack: AttackObj | SpellObj | null;
+  };
+  setShowTargetSelection: React.Dispatch<
+    React.SetStateAction<{
+      showing: boolean;
+      chosenAttack: AttackObj | SpellObj | null;
+    }>
+  >;
 }
 export interface AppContextType {
   gameState: Game | undefined;

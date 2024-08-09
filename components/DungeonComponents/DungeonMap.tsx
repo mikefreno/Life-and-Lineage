@@ -9,10 +9,10 @@ import GenericRaisedButton from "../GenericRaisedButton";
 import { useColorScheme } from "nativewind";
 import { DungeonContext, TILE_SIZE } from "./DungeonContext";
 import Draggable from "react-native-draggable";
-import { View as ThemedView } from "../Themed";
-import { BlurView } from "expo-blur";
 import PlatformDependantBlurView from "../PlatformDependantBlurView";
 import { useVibration } from "../../utility/customHooks";
+import { getEnemy, loadBoss } from "./DungeonInteriorFunctions";
+import { AppContext } from "../../app/_layout";
 
 export interface Tile {
   x: number;
@@ -244,27 +244,18 @@ export const DungeonMapRender = ({
   );
 };
 
-interface DungeonMapControlsProps {
-  tileSize: number;
-  loadBoss: () => void;
-  getEnemy: () => void;
-}
-
-export const DungeonMapControls = ({
-  tileSize,
-  loadBoss,
-  getEnemy,
-}: DungeonMapControlsProps) => {
+export const DungeonMapControls = () => {
   const dungeonData = useContext(DungeonContext);
-  if (!dungeonData) throw new Error("missing context");
+  const appData = useContext(AppContext);
+  if (!dungeonData || !appData) throw new Error("missing context");
   const { currentPosition, setCurrentPosition, setInCombat, tiles } =
     dungeonData;
   const isMoveValid = (direction: keyof typeof directionsMapping) => {
     if (!currentPosition) return false;
 
     const { x, y } = directionsMapping[direction];
-    const newX = currentPosition.x + x * tileSize;
-    const newY = currentPosition.y + y * tileSize;
+    const newX = currentPosition.x + x * TILE_SIZE;
+    const newY = currentPosition.y + y * TILE_SIZE;
 
     const newTile = tiles.find((tile) => tile.x === newX && tile.y === newY);
 
@@ -274,8 +265,8 @@ export const DungeonMapControls = ({
   const move = (direction: keyof typeof directionsMapping) => {
     if (!currentPosition) return;
     const { x, y } = directionsMapping[direction];
-    const newX = currentPosition.x + x * tileSize;
-    const newY = currentPosition.y + y * tileSize;
+    const newX = currentPosition.x + x * TILE_SIZE;
+    const newY = currentPosition.y + y * TILE_SIZE;
 
     const newPosition = tiles.find(
       (tile) => tile.x === newX && tile.y === newY,
@@ -285,10 +276,10 @@ export const DungeonMapControls = ({
       setCurrentPosition(newPosition);
       if (!newPosition.clearedRoom) {
         if (newPosition.isBossRoom) {
-          loadBoss();
+          loadBoss({ appData, dungeonData });
           setInCombat(true);
         } else {
-          getEnemy();
+          getEnemy({ appData, dungeonData });
           setInCombat(true);
         }
       }

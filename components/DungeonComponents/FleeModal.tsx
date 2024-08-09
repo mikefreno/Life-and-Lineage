@@ -8,17 +8,13 @@ import { router } from "expo-router";
 import { fullSave } from "../../utility/functions/save_load";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../app/_layout";
-import type { Minion } from "../../classes/creatures";
 import { DungeonContext } from "./DungeonContext";
-import { enemyTurnCheck } from "./DungeonInteriorFunctions";
+import { type contextData, enemyTurnCheck } from "./DungeonInteriorFunctions";
 
 interface FleeModalProps {
   fleeModalShowing: boolean;
   setFleeModalShowing: React.Dispatch<React.SetStateAction<boolean>>;
-  playerMinionsTurn: (
-    suppliedMinions: Minion[],
-    startOfTurnEnemyID: string,
-  ) => void;
+  playerMinionsTurn: ({ dungeonData, appData }: contextData) => void;
 }
 export default function FleeModal({
   fleeModalShowing,
@@ -75,7 +71,7 @@ export default function FleeModal({
         setFleeRollFailure(true);
         vibration({ style: "error" });
         battleLogger("You failed to flee!");
-        playerMinionsTurn(playerState.minions, enemyState.id);
+        playerMinionsTurn({ appData, dungeonData });
         setTimeout(() => {
           enemyTurnCheck({ appData, dungeonData });
         }, 1000 * playerState.minions.length);
