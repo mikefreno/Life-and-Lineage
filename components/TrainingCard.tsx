@@ -98,12 +98,11 @@ const TrainingCard = observer(
                     playerState.gold < goldCostPerTick ||
                     !playerState.hasAllPreReqs(preRequisites)
                   }
-                  text={
-                    playerState.hasAllPreReqs(preRequisites)
-                      ? "Study"
-                      : "Locked"
-                  }
-                />
+                >
+                  {playerState.hasAllPreReqs(preRequisites)
+                    ? "Study"
+                    : "Locked"}
+                </GenericRaisedButton>
               ) : null}
               {playerState.hasAllPreReqs(preRequisites) ? (
                 <ProgressBar value={experience ?? 0} maxValue={ticks} />
