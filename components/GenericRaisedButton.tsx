@@ -2,11 +2,12 @@ import { useColorScheme } from "nativewind";
 import { Pressable, View, ColorValue } from "react-native";
 import { useVibration } from "../utility/customHooks";
 import { Text } from "./Themed";
+import type { ReactNode } from "react";
 
 interface GenericRaisedButtonProps {
   onPressFunction: () => void;
   backgroundColor?: ColorValue;
-  children: string;
+  children: string | ReactNode;
   textColor?: ColorValue;
   disabledCondition?: boolean;
   vibrationStrength?:
@@ -74,18 +75,22 @@ const GenericRaisedButton = ({
                 }
           }
         >
-          <Text
-            className="text-center"
-            style={{
-              color: textColor
-                ? textColor
-                : colorScheme == "light"
-                ? "#27272a"
-                : "#fafafa",
-            }}
-          >
-            {children}
-          </Text>
+          {typeof children === "string" ? (
+            <Text
+              className="text-center"
+              style={{
+                color: textColor
+                  ? textColor
+                  : colorScheme == "light"
+                  ? "#27272a"
+                  : "#fafafa",
+              }}
+            >
+              {children}
+            </Text>
+          ) : (
+            children
+          )}
         </View>
       )}
     </Pressable>

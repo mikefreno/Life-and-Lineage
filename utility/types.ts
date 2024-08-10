@@ -316,8 +316,14 @@ export interface DungeonContextType {
   level: number;
   instanceName: string;
   battleLogger: (whatHappened: string) => void;
-  showFirstBossKillTutorial: boolean;
-  setShowFirstBossKillTutorial: React.Dispatch<React.SetStateAction<boolean>>;
+  showingFirstBossKillTutorial: boolean;
+  setShowingFirstBossKillTutorial: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;
+  shouldShowFirstBossKillTutorial: boolean;
+  setShouldShowFirstBossKillTutorial: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;
   showTargetSelection: {
     showing: boolean;
     chosenAttack: AttackObj | SpellObj | null;

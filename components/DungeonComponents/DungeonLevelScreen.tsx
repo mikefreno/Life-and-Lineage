@@ -19,7 +19,6 @@ import FleeModal from "../../components/DungeonComponents/FleeModal";
 import TargetSelection from "../../components/DungeonComponents/TargetSelection";
 import DroppedItemsModal from "../../components/DungeonComponents/DroppedItemsModal";
 import LeftBehindItemsModal from "../../components/DungeonComponents/LeftBehindItemsModal";
-import GenericFlatButton from "../../components/GenericFlatButton";
 import { dungeonSave } from "../../utility/functions/save_load";
 import { throttle } from "lodash";
 import D20Die from "../../components/DieRollAnim";
@@ -46,11 +45,13 @@ const DungeonLevelScreen = observer(() => {
     level,
     inCombat,
     mapDimensions,
-    setShowFirstBossKillTutorial,
-    showFirstBossKillTutorial,
-    droppedItems,
+    setShowingFirstBossKillTutorial,
+    showingFirstBossKillTutorial,
     showTargetSelection,
     setShowTargetSelection,
+    droppedItems,
+    shouldShowFirstBossKillTutorial,
+    setShouldShowFirstBossKillTutorial,
   } = dungeonData;
 
   const [battleTab, setBattleTab] = useState<
@@ -136,37 +137,25 @@ const DungeonLevelScreen = observer(() => {
           }}
           pageTwo={{
             title: "Advance by killing the boss.",
-            body: "The first boss becomes available after 10 Enemys defeated for the first dungeon.",
+            body: "Navigate the dungeon until you find them.",
           }}
           pageThree={{
             title: "Good Luck.",
             body: "And remember fleeing (top left) can save you.",
           }}
         />
-        <GenericModal
-          isVisibleCondition={showFirstBossKillTutorial && !droppedItems}
-          backFunction={() => setShowFirstBossKillTutorial(false)}
-        >
-          <View>
-            <Text className="text-3xl text-center">Well Fought!</Text>
-            <Text className="text-center">
-              You have defeated the first boss! Every boss will reward you with
-              stats points to distribute as you wish.
-            </Text>
-            <GenericFlatButton
-              onPressFunction={() => {
-                setShowFirstBossKillTutorial(false);
-                setTimeout(() => setShowDetailedStatusView(true), 500);
-              }}
-              className="py-2"
-            >
-              <Text>Show Me</Text>
-            </GenericFlatButton>
-            <Text className="text-center">
-              <Text className="text-xl">Note:</Text> Bosses do not respawn.
-            </Text>
-          </View>
-        </GenericModal>
+        <TutorialModal
+          isVisibleCondition={showingFirstBossKillTutorial}
+          backFunction={() => setShowingFirstBossKillTutorial(false)}
+          onCloseFunction={() => {
+            setShowingFirstBossKillTutorial(false);
+            setTimeout(() => setShowDetailedStatusView(true), 500);
+          }}
+          pageOne={{
+            title: "Well Fought!",
+            body: "You have defeated the first boss! Every boss will reward you with stats points to distribute as you wish.",
+          }}
+        />
         <FleeModal
           fleeModalShowing={fleeModalShowing}
           setFleeModalShowing={setFleeModalShowing}

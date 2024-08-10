@@ -63,10 +63,6 @@ export default function LearningKnowledgeScreen() {
     } else setSelectedBookSpell(null);
   }, [selectedBook]);
 
-  useEffect(() => {
-    console.log(selectedBookSpell);
-  }, [selectedBookSpell]);
-
   function studySpell(
     bookName: string,
     spellName: string,
@@ -236,7 +232,7 @@ export default function LearningKnowledgeScreen() {
                       vibration({ style: "light" });
                     }}
                   >
-                    Continue\nStudying
+                    Continue Studying
                   </GenericRaisedButton>
                 </View>
               ))}

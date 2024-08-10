@@ -8,6 +8,7 @@ import { useContext } from "react";
 import { AppContext } from "../../app/_layout";
 import { useAttack, useSpell } from "./DungeonInteriorFunctions";
 import { DungeonContext } from "./DungeonContext";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function TargetSelectionRender() {
   const appData = useContext(AppContext);
@@ -15,6 +16,7 @@ export default function TargetSelectionRender() {
   if (!appData || !dungeonData) throw new Error("missing context");
   const { enemyState } = appData;
   const { showTargetSelection, setShowTargetSelection } = dungeonData;
+  const isFocused = useIsFocused();
   if (enemyState) {
     let targets: (Enemy | Minion)[] = [];
     targets.push(enemyState);
@@ -35,9 +37,21 @@ export default function TargetSelectionRender() {
               });
               if (attack) {
                 if ("element" in attack) {
-                  useSpell({ spell: attack, target, appData, dungeonData });
+                  useSpell({
+                    spell: attack,
+                    target,
+                    appData,
+                    dungeonData,
+                    isFocused,
+                  });
                 } else {
-                  useAttack({ attack, target, appData, dungeonData });
+                  useAttack({
+                    attack,
+                    target,
+                    appData,
+                    dungeonData,
+                    isFocused,
+                  });
                 }
               }
             }}

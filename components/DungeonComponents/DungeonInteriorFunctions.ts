@@ -42,7 +42,7 @@ export function enemyTurnCheck({ dungeonData, appData }: contextData) {
     setFightingBoss,
     setAttackAnimationOnGoing,
     battleLogger,
-    setShowFirstBossKillTutorial,
+    setShouldShowFirstBossKillTutorial,
   } = dungeonData;
   if (enemyState && playerState && gameState) {
     if (
@@ -83,7 +83,7 @@ export function enemyTurnCheck({ dungeonData, appData }: contextData) {
           gameState.openNextDungeonLevel(thisInstance!.name);
           playerState.bossDefeated();
           if (!gameState.tutorialsShown["First Boss Kill"]) {
-            setShowFirstBossKillTutorial(true);
+            setShouldShowFirstBossKillTutorial(true);
           }
         }
         setEnemy(null);
@@ -380,18 +380,19 @@ export interface useAttack {
   appData: AppContextType | undefined;
   attack: AttackObj;
   target: Enemy | Minion;
+  isFocused: boolean;
 }
 export const useAttack = ({
   dungeonData,
   appData,
   attack,
   target,
+  isFocused,
 }: useAttack) => {
   if (!appData || !dungeonData)
     throw new Error("missing context in useAttack()");
   const { battleLogger } = dungeonData;
   const { playerState } = appData;
-  const isFocused = useIsFocused();
   if (target && playerState && isFocused) {
     const attackRes = playerState.doPhysicalAttack({
       chosenAttack: attack,
@@ -471,13 +472,19 @@ export interface useSpell {
   appData: AppContextType | undefined;
   spell: SpellObj;
   target: Enemy | Minion;
+  isFocused: boolean;
 }
-export const useSpell = ({ dungeonData, appData, spell, target }: useSpell) => {
+export const useSpell = ({
+  dungeonData,
+  appData,
+  spell,
+  target,
+  isFocused,
+}: useSpell) => {
   if (!appData || !dungeonData)
     throw new Error("missing context in useSpell()");
   const { battleLogger } = dungeonData;
   const { playerState } = appData;
-  const isFocused = useIsFocused();
   if (playerState && isFocused) {
     const spellRes = playerState.attemptSpellUse({
       chosenSpell: spell,
@@ -557,11 +564,15 @@ export const useSpell = ({ dungeonData, appData, spell, target }: useSpell) => {
   }
 };
 
-export const pass = ({ appData, dungeonData }: contextData) => {
+export interface pass {
+  dungeonData: DungeonContextType | undefined;
+  appData: AppContextType | undefined;
+  isFocused: boolean;
+}
+export const pass = ({ appData, dungeonData, isFocused }: pass) => {
   if (!appData || !dungeonData) throw new Error("missing context in pass()");
   const { battleLogger } = dungeonData;
   const { playerState, enemyState } = appData;
-  const isFocused = useIsFocused();
   if (enemyState && playerState && isFocused) {
     playerState.pass();
     battleLogger("You passed!");

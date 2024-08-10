@@ -136,12 +136,10 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
         const range = activity.date.increaseAffectionRange;
         const res =
           Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
-        console.log(res);
       } else {
         const range = activity.date.decreaseAffectionRange;
         const res =
           Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
-        console.log(res);
       }
     }
   }

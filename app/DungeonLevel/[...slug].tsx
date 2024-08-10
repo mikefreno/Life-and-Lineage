@@ -58,7 +58,9 @@ const DungeonProvider = observer(() => {
   });
   const [inCombat, setInCombat] = useState<boolean>(false);
   const [currentPosition, setCurrentPosition] = useState<Tile | null>(null);
-  const [showFirstBossKillTutorial, setShowFirstBossKillTutorial] =
+  const [showingFirstBossKillTutorial, setShowingFirstBossKillTutorial] =
+    useState<boolean>(false);
+  const [shouldShowFirstBossKillTutorial, setShouldShowFirstBossKillTutorial] =
     useState<boolean>(false);
   const [showTargetSelection, setShowTargetSelection] = useState<{
     showing: boolean;
@@ -198,8 +200,10 @@ const DungeonProvider = observer(() => {
           level,
           instanceName,
           battleLogger,
-          showFirstBossKillTutorial,
-          setShowFirstBossKillTutorial,
+          showingFirstBossKillTutorial,
+          setShowingFirstBossKillTutorial,
+          shouldShowFirstBossKillTutorial,
+          setShouldShowFirstBossKillTutorial,
           showTargetSelection,
           setShowTargetSelection,
         }}

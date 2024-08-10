@@ -21,7 +21,11 @@ export default function DroppedItemsModal() {
     setLeftBehindDrops,
     setDroppedItems,
     setInventoryFullNotifier,
+    shouldShowFirstBossKillTutorial,
+    setShouldShowFirstBossKillTutorial,
+    setShowingFirstBossKillTutorial,
   } = dungeonData;
+
   function closeImmediateItemDrops() {
     if (droppedItems && droppedItems.itemDrops.length > 0) {
       setLeftBehindDrops((prev) => [...prev, ...droppedItems.itemDrops]);
@@ -46,6 +50,14 @@ export default function DroppedItemsModal() {
             itemDrops: updatedDrops,
           };
         });
+        if (!droppedItems) {
+          if (shouldShowFirstBossKillTutorial) {
+            setTimeout(() => {
+              setShowingFirstBossKillTutorial(true);
+              setShouldShowFirstBossKillTutorial(false);
+            }, 250);
+          }
+        }
       } else {
         setInventoryFullNotifier(true);
       }
@@ -88,6 +100,12 @@ export default function DroppedItemsModal() {
           router.push("/Activities");
         } else {
           closeImmediateItemDrops();
+          if (shouldShowFirstBossKillTutorial) {
+            setTimeout(() => {
+              setShowingFirstBossKillTutorial(true);
+              setShouldShowFirstBossKillTutorial(false);
+            }, 250);
+          }
         }
       }}
     >
@@ -126,6 +144,12 @@ export default function DroppedItemsModal() {
             className="mx-auto mt-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
             onPress={() => {
               takeAllItems();
+              if (shouldShowFirstBossKillTutorial) {
+                setTimeout(() => {
+                  setShowingFirstBossKillTutorial(true);
+                  setShouldShowFirstBossKillTutorial(false);
+                }, 250);
+              }
             }}
           >
             <Text>Take All</Text>
@@ -142,6 +166,12 @@ export default function DroppedItemsModal() {
               router.push("/Activities");
             } else {
               closeImmediateItemDrops();
+              if (shouldShowFirstBossKillTutorial) {
+                setTimeout(() => {
+                  setShowingFirstBossKillTutorial(true);
+                  setShouldShowFirstBossKillTutorial(false);
+                }, 250);
+              }
             }
           }}
         >

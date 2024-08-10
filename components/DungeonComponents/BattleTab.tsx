@@ -22,6 +22,7 @@ import {
 } from "./DungeonInteriorFunctions";
 import { DungeonMapControls } from "./DungeonMap";
 import PlatformDependantBlurView from "../PlatformDependantBlurView";
+import { useIsFocused } from "@react-navigation/native";
 
 interface BattleTabProps {
   battleTab: "attacksOrNavigation" | "equipment" | "log";
@@ -50,6 +51,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
   const playerAttacks = playerState?.physicalAttacks;
   const playerSpells = playerState?.getSpells();
   const vibration = useVibration();
+  const isFocused = useIsFocused();
 
   let attackObjects: AttackObj[] = [];
 
@@ -93,7 +95,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
             return <DungeonMapControls />;
           } else {
             return (
-              <>
+              <View className="w-full h-full px-2">
                 {!playerState.isStunned() ? (
                   Platform.OS != "web" && (
                     <FlatList
@@ -191,6 +193,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                                       appData,
                                       dungeonData,
                                       target: enemyState,
+                                      isFocused,
                                     });
                                   } else {
                                     useAttack({
@@ -198,6 +201,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                                       appData,
                                       dungeonData,
                                       target: enemyState,
+                                      isFocused,
                                     });
                                   }
                                 } else {
@@ -259,7 +263,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                         onPress={() => {
                           setAttackAnimationOnGoing(true);
                           vibration({ style: "light" });
-                          pass({ appData, dungeonData });
+                          pass({ appData, dungeonData, isFocused });
                         }}
                         className={`${
                           attackAnimationOnGoing
@@ -272,7 +276,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                     </View>
                   </View>
                 )}
-              </>
+              </View>
             );
           }
         case "equipment":
