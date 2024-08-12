@@ -335,6 +335,7 @@ export interface DungeonContextType {
     }>
   >;
 }
+
 export interface AppContextType {
   gameState: Game | undefined;
   setGameData: React.Dispatch<React.SetStateAction<Game | undefined>>;

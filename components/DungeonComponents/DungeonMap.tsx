@@ -1,16 +1,10 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import Svg, { Rect } from "react-native-svg";
 import { Dimensions, View } from "react-native";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-} from "react-native-reanimated";
 import GenericRaisedButton from "../GenericRaisedButton";
 import { useColorScheme } from "nativewind";
 import { DungeonContext, TILE_SIZE } from "./DungeonContext";
-import Draggable from "react-native-draggable";
 import PlatformDependantBlurView from "../PlatformDependantBlurView";
-import { useVibration } from "../../utility/customHooks";
 import { getEnemy, loadBoss } from "./DungeonInteriorFunctions";
 import { AppContext } from "../../app/_layout";
 
@@ -144,32 +138,12 @@ export const getBoundingBox = (
   };
 };
 
-interface MapGeneratorProps {
-  tiles: Tile[];
-  mapDimensions: BoundingBox;
-  tileSize: number;
-  currentPosition: Tile | null;
-}
-
-export const DungeonMapRender = ({
-  tiles,
-  mapDimensions,
-  tileSize,
-  currentPosition,
-}: MapGeneratorProps) => {
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
+export const DungeonMapRender = () => {
+  const dungeonData = useContext(DungeonContext);
+  if (!dungeonData) throw new Error("missing context");
+  const { mapDimensions, currentPosition, tiles } = dungeonData;
   const { colorScheme } = useColorScheme();
   const strokeWidth = 1;
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: translateX.value },
-      { translateY: translateY.value },
-    ],
-  }));
-
-  const vibrate = useVibration();
 
   const getFillColor = (tile: Tile) => {
     const isCurrent =
@@ -203,8 +177,8 @@ export const DungeonMapRender = ({
         key={`${tile.x}-${tile.y}`}
         x={tile.x - mapDimensions.offsetX}
         y={tile.y - mapDimensions.offsetY}
-        width={tileSize}
-        height={tileSize}
+        width={TILE_SIZE}
+        height={TILE_SIZE}
         fill={getFillColor(tile)}
         stroke="gray"
         strokeWidth={strokeWidth}
@@ -212,40 +186,43 @@ export const DungeonMapRender = ({
     );
   };
 
+  useEffect(() => {
+    console.log(mapDimensions);
+    console.log(currentPosition);
+  }, [mapDimensions]);
+  const windowWidth = Dimensions.get("window").width;
+  const windowHeight = Dimensions.get("window").height;
+
+  // Position of the map's top left piece
+  const xOrigin = windowWidth / 2 - TILE_SIZE / 2;
+  const yOrigin = windowHeight * 0.2 - TILE_SIZE / 2;
+  // Distance from map's top left piece
+  const offsetX = currentPosition
+    ? currentPosition.x - mapDimensions.offsetX
+    : 0;
+  const offsetY = currentPosition
+    ? currentPosition.y - mapDimensions.offsetY
+    : 0;
+
   return (
-    <View className="flex h-1/2">
-      <Draggable
-        x={Dimensions.get("screen").width / 4}
-        y={TILE_SIZE * 2}
-        minX={TILE_SIZE * 2 - mapDimensions.width}
-        maxX={
-          Dimensions.get("screen").width + mapDimensions.width - TILE_SIZE * 2
-        }
-        minY={TILE_SIZE * 2 - mapDimensions.height}
-        maxY={
-          Dimensions.get("window").height / 2 +
-          mapDimensions.height / 2 -
-          TILE_SIZE * 2
-        }
-        onPressIn={() => vibrate({ style: "medium" })}
+    <View className="h-[40vh]">
+      <View
+        className="absolute"
+        style={{
+          left: xOrigin - offsetX,
+          top: yOrigin - offsetY,
+        }}
       >
-        <Animated.View
-          style={[
-            animatedStyle,
-            { width: mapDimensions.width, height: mapDimensions.height },
-          ]}
+        <Svg
+          width={mapDimensions.width}
+          height={mapDimensions.height}
+          viewBox={`${-strokeWidth / 2} ${-strokeWidth / 2} ${
+            mapDimensions.width + strokeWidth
+          } ${mapDimensions.height + strokeWidth}`}
         >
-          <Svg
-            width={mapDimensions.width}
-            height={mapDimensions.height}
-            viewBox={`${-strokeWidth / 2} ${-strokeWidth / 2} ${
-              mapDimensions.width + strokeWidth
-            } ${mapDimensions.height + strokeWidth}`} // corrective to include map edge borders
-          >
-            {tiles.map((tile) => renderTile(tile))}
-          </Svg>
-        </Animated.View>
-      </Draggable>
+          {tiles.map((tile) => renderTile(tile))}
+        </Svg>
+      </View>
     </View>
   );
 };

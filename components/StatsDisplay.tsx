@@ -124,7 +124,6 @@ export function StatsDisplay({
                 }}
                 disabledCondition={isDisabled}
               >
-                {" "}
                 <Text
                   className={
                     isDisabled ? "opacity-50 text-center" : "text-center"

@@ -49,9 +49,7 @@ const DungeonLevelScreen = observer(() => {
     showingFirstBossKillTutorial,
     showTargetSelection,
     setShowTargetSelection,
-    droppedItems,
-    shouldShowFirstBossKillTutorial,
-    setShouldShowFirstBossKillTutorial,
+    mapPos,
   } = dungeonData;
 
   const [battleTab, setBattleTab] = useState<
@@ -187,6 +185,7 @@ const DungeonLevelScreen = observer(() => {
               mapDimensions={mapDimensions}
               currentPosition={currentPosition}
               tileSize={TILE_SIZE}
+              mapPos={mapPos}
             />
           ) : enemyState ? (
             <DungeonEnemyDisplay />
