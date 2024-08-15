@@ -19,6 +19,7 @@ const categories = [
 export default function Codex() {
   const [searchTerm, setSearchTerm] = useState<string>();
   const { colorScheme } = useColorScheme();
+  const [scrolling, setScrolling] = useState(false);
 
   return (
     <View className="flex-1">
@@ -33,13 +34,27 @@ export default function Codex() {
         autoCorrect={false}
         value={searchTerm}
         maxLength={16}
-        style={{ paddingVertical: 8 }}
+        style={{
+          fontFamily: "PixelifySans",
+          paddingVertical: 8,
+          minWidth: "50%",
+          fontSize: 20,
+        }}
       />
 
-      <ScrollView className="mx-4">
+      <ScrollView
+        className="mx-4"
+        scrollEventThrottle={16}
+        onScrollBeginDrag={() => setScrolling(true)}
+        onScrollEndDrag={() => setScrolling(false)}
+      >
         <View className="flex items-center">
           {categories.map((category) => (
-            <CodexCategory key={category} category={category} />
+            <CodexCategory
+              key={category}
+              category={category}
+              scrolling={scrolling}
+            />
           ))}
         </View>
       </ScrollView>

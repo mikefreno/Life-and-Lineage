@@ -7,11 +7,14 @@ import { useColorScheme } from "nativewind";
 
 interface CodexCategoryProps {
   category: string;
+  scrolling: boolean;
 }
 
-export default function CodexCategory({ category }: CodexCategoryProps) {
+export default function CodexCategory({
+  category,
+  scrolling,
+}: CodexCategoryProps) {
   const [animationTriggered, setAnimationtriggered] = useState(false);
-  const [isPressing, setIsPressing] = useState(false);
   const animatedValue = useState(new Animated.Value(0))[0];
   const [pressed, setPressed] = useState<boolean>(false);
 
@@ -23,20 +26,19 @@ export default function CodexCategory({ category }: CodexCategoryProps) {
       duration: 400,
       useNativeDriver: true,
     }).start(() => {
-      if (animationTriggered && !isPressing) {
+      if (animationTriggered) {
         setAnimationtriggered(false);
       }
     });
-  }, [animationTriggered, isPressing]);
+  }, [animationTriggered]);
 
-  const onPressIn = () => {
-    setIsPressing(true);
+  const handlePressOut = () => {
     setAnimationtriggered(true);
-  };
-
-  const onPressOut = () => {
-    router.push(`/Options/${category}`);
-    setIsPressing(false);
+    setPressed(true);
+    setTimeout(() => {
+      router.push(`/Options/${category}`);
+      setPressed(false);
+    }, 150);
   };
 
   const chevronAnimatedStyle = {
@@ -55,10 +57,15 @@ export default function CodexCategory({ category }: CodexCategoryProps) {
   };
 
   return (
-    <View
+    <Pressable
       key={category}
       className="mx-2 my-4 w-full border-y-[0.5px] border-zinc-700 py-4 dark:border-zinc-100"
       style={{ maxWidth: 512 }}
+      onPressOut={() => {
+        if (!scrolling) {
+          handlePressOut();
+        }
+      }}
     >
       <View className="flex flex-row justify-between px-2">
         <Text
@@ -67,27 +74,15 @@ export default function CodexCategory({ category }: CodexCategoryProps) {
         >
           {category}
         </Text>
-        <Pressable
-          className="flex w-1/4 items-end justify-end"
-          onPressIn={() => {
-            setPressed(true);
-            onPressIn();
-          }}
-          onPressOut={() => {
-            setPressed(false);
-            onPressOut();
-          }}
-        >
-          <Animated.View style={chevronAnimatedStyle}>
-            <Entypo
-              name="chevron-thin-right"
-              size={24}
-              color={colorScheme == "dark" ? "white" : "black"}
-              style={{ opacity: pressed ? 0.5 : 1 }}
-            />
-          </Animated.View>
-        </Pressable>
+        <Animated.View style={chevronAnimatedStyle}>
+          <Entypo
+            name="chevron-thin-right"
+            size={24}
+            color={colorScheme == "dark" ? "white" : "black"}
+            style={{ opacity: pressed ? 0.5 : 1 }}
+          />
+        </Animated.View>
       </View>
-    </View>
+    </Pressable>
   );
 }
