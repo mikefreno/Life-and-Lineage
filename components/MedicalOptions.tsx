@@ -1,8 +1,4 @@
 import { View } from "react-native";
-import Coins from "../assets/icons/CoinsIcon";
-import Energy from "../assets/icons/EnergyIcon";
-import Sanity from "../assets/icons/SanityIcon";
-import HealthIcon from "../assets/icons/HealthIcon";
 import { Text } from "./Themed";
 import { useIsFocused } from "@react-navigation/native";
 import { useContext } from "react";
@@ -10,6 +6,7 @@ import GenericRaisedButton from "./GenericRaisedButton";
 import { observer } from "mobx-react-lite";
 import ThemedCard from "./ThemedCard";
 import { AppContext } from "../app/_layout";
+import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
 
 interface MedicalOptionProps {
   title: string;

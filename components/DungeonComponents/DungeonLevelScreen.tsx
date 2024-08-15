@@ -10,7 +10,6 @@ import ProgressBar from "../../components/ProgressBar";
 import { observer } from "mobx-react-lite";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
-import SackIcon from "../../assets/icons/SackIcon";
 import TutorialModal from "../../components/TutorialModal";
 import GenericModal from "../../components/GenericModal";
 import BattleTabControls from "../../components/DungeonComponents/BattleTabControls";
@@ -23,9 +22,10 @@ import { dungeonSave } from "../../utility/functions/save_load";
 import { throttle } from "lodash";
 import D20Die from "../../components/DieRollAnim";
 import { AppContext } from "../../app/_layout";
-import { DungeonContext, TILE_SIZE } from "./DungeonContext";
+import { DungeonContext } from "./DungeonContext";
 import { DungeonMapRender } from "./DungeonMap";
 import { playerMinionsTurn } from "./DungeonInteriorFunctions";
+import { SackIcon } from "../../assets/icons/SVGIcons";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -37,19 +37,15 @@ const DungeonLevelScreen = observer(() => {
 
   const {
     slug,
-    tiles,
-    currentPosition,
     setInventoryFullNotifier,
     thisInstance,
     thisDungeon,
     level,
     inCombat,
-    mapDimensions,
     setShowingFirstBossKillTutorial,
     showingFirstBossKillTutorial,
     showTargetSelection,
     setShowTargetSelection,
-    mapPos,
   } = dungeonData;
 
   const [battleTab, setBattleTab] = useState<
@@ -180,13 +176,7 @@ const DungeonLevelScreen = observer(() => {
         </GenericModal>
         <ThemedView className="flex-1" style={{ paddingBottom: 100 }}>
           {!inCombat ? (
-            <DungeonMapRender
-              tiles={tiles}
-              mapDimensions={mapDimensions}
-              currentPosition={currentPosition}
-              tileSize={TILE_SIZE}
-              mapPos={mapPos}
-            />
+            <DungeonMapRender />
           ) : enemyState ? (
             <DungeonEnemyDisplay />
           ) : (

@@ -8,12 +8,12 @@ import { toTitleCase } from "../utility/functions/misc/words";
 import { Item } from "../classes/item";
 import { useContext } from "react";
 import { Shop } from "../classes/shop";
-import Coins from "../assets/icons/CoinsIcon";
 import { asReadableGold } from "../utility/functions/misc/numbers";
 import SpellDetails from "./SpellDetails";
 import GenericFlatButton from "./GenericFlatButton";
 import { convertMasteryToString } from "../utility/spellHelper";
 import { AppContext } from "../app/_layout";
+import { Coins } from "../assets/icons/SVGIcons";
 
 type BaseProps = {
   statsLeftPos: number;

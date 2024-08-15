@@ -19,7 +19,6 @@ import HouseHeart from "../../assets/icons/RelationshipsIcon";
 import Sword from "../../assets/icons/SwordIcon";
 import { elementalColorMap } from "../../utility/elementColors";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
-import Necromancer from "../../assets/icons/NecromancerSkull";
 import { useColorScheme } from "nativewind";
 import { useContext } from "react";
 import GraduationCapIcon from "../../assets/icons/GraduationCap";
@@ -30,6 +29,7 @@ import { StyleSheet } from "react-native";
 import PlayerStatus from "../../components/PlayerStatus";
 import { LinearGradientBlur } from "../../components/LinearGradientBlur";
 import { AppContext } from "../_layout";
+import NecromancerSkull from "../../assets/icons/NecromancerSkull";
 
 export default function TabLayout() {
   const appData = useContext(AppContext);
@@ -140,7 +140,7 @@ export default function TabLayout() {
             title: "Home",
             tabBarIcon: ({ color }) =>
               playerState?.playerClass == "necromancer" ? (
-                <Necromancer
+                <NecromancerSkull
                   width={28}
                   height={26}
                   color={color}

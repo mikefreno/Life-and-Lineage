@@ -5,14 +5,11 @@ import { useColorScheme } from "nativewind";
 import { flipCoin } from "../utility/functions/roll";
 import { generateNewCharacter } from "../utility/functions/characterAid";
 import { useContext, useState } from "react";
-import Coins from "../assets/icons/CoinsIcon";
 import { toTitleCase } from "../utility/functions/misc/words";
 import GenericModal from "./GenericModal";
 import { Character } from "../classes/character";
 import GenericRaisedButton from "./GenericRaisedButton";
 import GenericFlatButton from "./GenericFlatButton";
-import Sanity from "../assets/icons/SanityIcon";
-import HealthIcon from "../assets/icons/HealthIcon";
 import { EnemyImage } from "./EnemyImage";
 import GenericStrikeAround from "./GenericStrikeAround";
 import { router } from "expo-router";
@@ -21,8 +18,13 @@ import { CharacterInteractionModal } from "./CharacterInteractionModal";
 import { calculateAge } from "../utility/functions/misc/age";
 import { CharacterImage } from "./CharacterImage";
 import ProgressBar from "./ProgressBar";
-import AffectionIcon from "../assets/icons/AffectionIcon";
 import { AppContext } from "../app/_layout";
+import {
+  AffectionIcon,
+  Coins,
+  HealthIcon,
+  Sanity,
+} from "../assets/icons/SVGIcons";
 
 interface ActivityCardProps {
   activity: Activity;

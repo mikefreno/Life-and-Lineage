@@ -2,7 +2,6 @@ import { View } from "react-native";
 import { Text, View as ThemedView } from "../../components/Themed";
 import WizardHat from "../../assets/icons/WizardHatIcon";
 import { useContext, useEffect, useRef, useState } from "react";
-import Necromancer from "../../assets/icons/NecromancerSkull";
 import PaladinHammer from "../../assets/icons/PaladinHammer";
 import blessingDisplay from "../../components/BlessingsDisplay";
 import { useColorScheme } from "nativewind";
@@ -16,6 +15,7 @@ import { calculateAge } from "../../utility/functions/misc/age";
 import InventoryRender from "../../components/InventoryRender";
 import EquipmentDisplay from "../../components/EquipmentDisplay";
 import { AppContext } from "../_layout";
+import NecromancerSkull from "../../assets/icons/NecromancerSkull";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -78,7 +78,7 @@ const HomeScreen = observer(() => {
             <View className="mx-6 flex-row items-center">
               {playerState?.playerClass == "necromancer" ? (
                 <View className="mx-auto">
-                  <Necromancer
+                  <NecromancerSkull
                     width={deviceHeight / 9 > 100 ? 100 : deviceHeight / 9}
                     height={deviceHeight / 9 > 100 ? 100 : deviceHeight / 9}
                     color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}

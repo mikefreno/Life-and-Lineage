@@ -1,17 +1,19 @@
-import { Pressable, useColorScheme, View as NonThemedView } from "react-native";
-import { ScrollView, Text, View } from "../../components/Themed";
+import { Pressable, useColorScheme, View } from "react-native";
+import { ScrollView, Text, View as ThemedView } from "../../components/Themed";
 import "../../assets/styles/globals.css";
 import { useContext, useEffect, useRef, useState } from "react";
-import WizardHat from "../../assets/icons/WizardHatIcon";
 import { Stack, router } from "expo-router";
-import Necromancer from "../../assets/icons/NecromancerSkull";
-import PaladinHammer from "../../assets/icons/PaladinHammer";
 import { useVibration } from "../../utility/customHooks";
 import { AppContext } from "../_layout";
 import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesome5 } from "@expo/vector-icons";
 import TutorialModal from "../../components/TutorialModal";
+import {
+  NecromancerSkull,
+  PaladinHammer,
+  WizardHat,
+} from "../../assets/icons/SVGIcons";
 
 export default function NewGameScreen() {
   const [selectedClass, setSelectedClass] = useState<
@@ -108,7 +110,7 @@ export default function NewGameScreen() {
         onBackdropPress={() => setShowTutorialReset(false)}
         onBackButtonPress={() => setShowTutorialReset(false)}
       >
-        <View
+        <ThemedView
           className="mx-auto w-5/6 rounded-xl px-6 py-4 dark:border dark:border-zinc-500"
           style={{
             shadowColor: "#000",
@@ -125,7 +127,7 @@ export default function NewGameScreen() {
           <Text className="text-center text-lg">
             Would you like to reset tutorials?
           </Text>
-          <View className="flex flex-row">
+          <ThemedView className="flex flex-row">
             <Pressable
               onPress={() => {
                 gameState?.resetTutorialState();
@@ -142,8 +144,8 @@ export default function NewGameScreen() {
             >
               <Text>Cancel</Text>
             </Pressable>
-          </View>
-        </View>
+          </ThemedView>
+        </ThemedView>
       </Modal>
       <TutorialModal
         isVisibleCondition={
@@ -161,7 +163,7 @@ export default function NewGameScreen() {
         }}
       />
       <ScrollView>
-        <View className="flex-1 items-center px-[6vw]">
+        <ThemedView className="flex-1 items-center px-[6vw]">
           <Text className="bold pt-[4vh] text-center text-3xl">
             Create a Character
           </Text>
@@ -174,7 +176,7 @@ export default function NewGameScreen() {
             }}
           >
             {({ pressed }) => (
-              <NonThemedView
+              <View
                 className={`${
                   pressed || selectedClass == "mage"
                     ? "rounded-lg border-zinc-900 dark:border-zinc-50"
@@ -190,7 +192,7 @@ export default function NewGameScreen() {
                 <Text className="mx-auto text-xl" style={{ color: "#2563eb" }}>
                   Mage
                 </Text>
-              </NonThemedView>
+              </View>
             )}
           </Pressable>
           {selectedClass == "mage" ? (
@@ -199,9 +201,9 @@ export default function NewGameScreen() {
               on casting elemental magic
             </Text>
           ) : (
-            <View className="mt-[2vh] h-16" />
+            <ThemedView className="mt-[2vh] h-16" />
           )}
-          <NonThemedView className="flex w-full flex-row justify-evenly">
+          <View className="flex w-full flex-row justify-evenly">
             <Pressable
               className="-ml-2"
               onPress={() => {
@@ -210,28 +212,28 @@ export default function NewGameScreen() {
               }}
             >
               {({ pressed }) => (
-                <NonThemedView
+                <View
                   className={`${
                     pressed || selectedClass == "necromancer"
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
                   } border px-6 py-4`}
                 >
-                  <NonThemedView className="-rotate-12">
-                    <Necromancer
+                  <View className="-rotate-12">
+                    <NecromancerSkull
                       height={120}
                       width={110}
                       style={{ marginBottom: 5 }}
                       color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
                     />
-                  </NonThemedView>
+                  </View>
                   <Text
                     className="mx-auto text-xl"
                     style={{ color: "#9333ea" }}
                   >
                     Necromancer
                   </Text>
-                </NonThemedView>
+                </View>
               )}
             </Pressable>
             <Pressable
@@ -242,32 +244,32 @@ export default function NewGameScreen() {
               }}
             >
               {({ pressed }) => (
-                <NonThemedView
+                <View
                   className={`${
                     pressed || selectedClass == "paladin"
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
                   } border px-8 py-4`}
                 >
-                  <NonThemedView className="rotate-12">
-                    <NonThemedView className="scale-x-[-1] transform">
+                  <View className="rotate-12">
+                    <View className="scale-x-[-1] transform">
                       <PaladinHammer
                         height={120}
                         width={90}
                         style={{ marginBottom: 5 }}
                       />
-                    </NonThemedView>
-                  </NonThemedView>
+                    </View>
+                  </View>
                   <Text
                     className="mx-auto text-xl"
                     style={{ color: "#fcd34d" }}
                   >
                     Paladin
                   </Text>
-                </NonThemedView>
+                </View>
               )}
             </Pressable>
-          </NonThemedView>
+          </View>
           {selectedClass == "paladin" ? (
             <Text className="mt-[2vh] h-16 text-center md:text-lg">
               The Paladin is skilled with arms and uses holy magic, which is
@@ -282,7 +284,7 @@ export default function NewGameScreen() {
             <Text className="mt-[2vh] h-16 text-center md:text-lg"></Text>
           )}
           {selectedClass && (
-            <NonThemedView className="mx-auto py-4 pb-[10vh]">
+            <View className="mx-auto py-4 pb-[10vh]">
               <Pressable
                 onPress={() => {
                   vibration({ style: "light" });
@@ -292,11 +294,11 @@ export default function NewGameScreen() {
               >
                 <Text className="text-xl tracking-widest">Next</Text>
               </Pressable>
-            </NonThemedView>
+            </View>
           )}
-        </View>
+        </ThemedView>
       </ScrollView>
-      <NonThemedView className="absolute ml-4 mt-4">
+      <View className="absolute ml-4 mt-4">
         <Pressable
           className="absolute"
           onPress={() => setShowIntroTutorial(true)}
@@ -307,7 +309,7 @@ export default function NewGameScreen() {
             color={colorScheme == "light" ? "#27272a" : "#fafafa"}
           />
         </Pressable>
-      </NonThemedView>
+      </View>
     </>
   );
 }

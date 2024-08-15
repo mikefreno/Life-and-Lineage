@@ -1,15 +1,17 @@
 import { View } from "react-native";
 import { toTitleCase } from "../utility/functions/misc/words";
 import { Text } from "./Themed";
-import Energy from "../assets/icons/EnergyIcon";
-import HealthIcon from "../assets/icons/HealthIcon";
-import NecromancerSkull from "../assets/icons/NecromancerSkull";
 import blessingDisplay from "./BlessingsDisplay";
 import { useColorScheme } from "nativewind";
 import { elementalColorMap } from "../utility/elementColors";
-import ClockIcon from "../assets/icons/ClockIcon";
 import { Spell } from "../utility/types";
 import { Dimensions } from "react-native";
+import {
+  ClockIcon,
+  Energy,
+  HealthIcon,
+  NecromancerSkull,
+} from "../assets/icons/SVGIcons";
 
 interface SpellDetailsProps {
   spell: Spell;

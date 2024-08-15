@@ -8,27 +8,28 @@ import {
   View,
   Platform,
 } from "react-native";
-import Coins from "../assets/icons/CoinsIcon";
-import { useContext, useEffect, useRef, useState } from "react";
-
+import { useContext, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { toTitleCase } from "../utility/functions/misc/words";
 import GenericModal from "./GenericModal";
 import GenericStrikeAround from "./GenericStrikeAround";
-import ClockIcon from "../assets/icons/ClockIcon";
-import HealthIcon from "../assets/icons/HealthIcon";
-import Sanity from "../assets/icons/SanityIcon";
-import Energy from "../assets/icons/EnergyIcon";
-import SquarePlus from "../assets/icons/SquarePlus";
 import { useVibration } from "../utility/customHooks";
-import SquareMinus from "../assets/icons/SquareMinus";
-import RotateArrow from "../assets/icons/RotateArrow";
 import FadeOutNode from "./FadeOutNode";
 import { BlurView } from "expo-blur";
 import { useColorScheme } from "nativewind";
 import { usePathname } from "expo-router";
 import { AppContext } from "../app/_layout";
 import { useIsFocused } from "@react-navigation/native";
+import {
+  ClockIcon,
+  Coins,
+  Energy,
+  HealthIcon,
+  RotateArrow,
+  Sanity,
+  SquareMinus,
+  SquarePlus,
+} from "../assets/icons/SVGIcons";
 
 interface PlayerStatus {
   hideGold?: boolean;
@@ -50,7 +51,6 @@ const PlayerStatus = observer(
     const {
       playerState,
       gameState,
-      setPlayerStatusRef,
       isCompact,
       setIsCompact,
       showDetailedStatusView,

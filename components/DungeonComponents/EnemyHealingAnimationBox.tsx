@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { View, Animated } from "react-native";
 import { Easing } from "react-native-reanimated";
-import PlusIcon from "../../assets/icons/PlusIcon";
 import { DungeonContext } from "./DungeonContext";
+import { PlusIcon } from "../../assets/icons/SVGIcons";
 
 const HealingIcon = ({ delay = 0 }) => {
   const translateAnim = useRef(new Animated.Value(0)).current;

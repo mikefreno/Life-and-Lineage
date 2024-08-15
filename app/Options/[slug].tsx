@@ -1,14 +1,41 @@
 import { Link, Stack, useLocalSearchParams } from "expo-router";
-import { toTitleCase } from "../../utility/functions/misc/words";
-import { View, Text } from "../../components/Themed";
+import { View } from "../../components/Themed";
 import { Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../constants/Colors";
 import { useColorScheme } from "nativewind";
+import {
+  CombatCodex,
+  DungeonCodex,
+  GearCodex,
+  LaborCodex,
+  MagicCodex,
+  MonstersCodex,
+  PlayerCodex,
+  RelationshipsCodex,
+  ShopsCodex,
+} from "../../components/CodexPages";
+
+const ContextMap: { [key: string]: React.JSX.Element } = {
+  Combat: <CombatCodex />,
+  Dungeon: <DungeonCodex />,
+  Gear: <GearCodex />,
+  Labor: <LaborCodex />,
+  Magic: <MagicCodex />,
+  Monsters: <MonstersCodex />,
+  Player: <PlayerCodex />,
+  Relationships: <RelationshipsCodex />,
+  Shops: <ShopsCodex />,
+};
 
 export default function CodexInfo() {
-  const { slug } = useLocalSearchParams();
+  let { slug } = useLocalSearchParams();
   const { colorScheme } = useColorScheme();
+
+  if (Array.isArray(slug)) {
+    slug = slug[0];
+  }
+
   return (
     <>
       <Stack.Screen
@@ -30,9 +57,7 @@ export default function CodexInfo() {
           title: `${slug} Codex`,
         }}
       />
-      <View className="flex-1">
-        <Text>{toTitleCase(slug as string)}</Text>
-      </View>
+      <View className="flex-1">{ContextMap[slug]}</View>
     </>
   );
 }

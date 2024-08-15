@@ -1,15 +1,11 @@
 import { useColorScheme } from "nativewind";
 import { View as ThemedView, Text, ScrollView } from "./Themed";
 import { InvestmentType, InvestmentUpgrade } from "../utility/types";
-import Coins from "../assets/icons/CoinsIcon";
 import { Pressable, View, StyleSheet, Animated } from "react-native";
 import Modal from "react-native-modal";
 import { useContext, useEffect, useRef, useState } from "react";
 import { toTitleCase } from "../utility/functions/misc/words";
-import ClockIcon from "../assets/icons/ClockIcon";
-import Vault from "../assets/icons/VaultIcon";
 import { Entypo } from "@expo/vector-icons";
-import Sanity from "../assets/icons/SanityIcon";
 import { Investment } from "../classes/investment";
 import GenericModal from "./GenericModal";
 import { observer } from "mobx-react-lite";
@@ -18,6 +14,7 @@ import { asReadableGold } from "../utility/functions/misc/numbers";
 import ThemedCard from "./ThemedCard";
 import { AppContext } from "../app/_layout";
 import GenericStrikeAround from "./GenericStrikeAround";
+import { ClockIcon, Coins, Sanity, Vault } from "../assets/icons/SVGIcons";
 
 interface InvestmentCardProps {
   investment: InvestmentType;

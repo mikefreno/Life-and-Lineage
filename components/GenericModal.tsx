@@ -1,8 +1,7 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import { Dimensions } from "react-native";
 import Modal from "react-native-modal";
 import { View } from "./Themed";
-import * as NavigationBar from "expo-navigation-bar";
 
 interface GenericModalProps {
   isVisibleCondition: boolean;

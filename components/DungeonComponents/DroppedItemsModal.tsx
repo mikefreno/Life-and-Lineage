@@ -2,12 +2,12 @@ import { router } from "expo-router";
 import GenericModal from "../GenericModal";
 import { Item } from "../../classes/item";
 import { Pressable, View, Image } from "react-native";
-import Coins from "../../assets/icons/CoinsIcon";
 import { Text } from "../Themed";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { useContext } from "react";
 import { AppContext } from "../../app/_layout";
 import { DungeonContext } from "./DungeonContext";
+import { Coins } from "../../assets/icons/SVGIcons";
 
 export default function DroppedItemsModal() {
   const appData = useContext(AppContext);

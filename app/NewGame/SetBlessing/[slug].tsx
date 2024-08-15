@@ -1,19 +1,12 @@
-import { Pressable, View as NonThemedView } from "react-native";
-import { ScrollView, Text, View } from "../../../components/Themed";
+import { Pressable, View } from "react-native";
+import {
+  ScrollView,
+  Text,
+  View as ThemedView,
+} from "../../../components/Themed";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
-import Fire from "../../../assets/icons/FireIcon";
-import Water from "../../../assets/icons/WaterIcon";
-import Air from "../../../assets/icons/AirIcon";
-import Earth from "../../../assets/icons/EarthIcon";
-import Sun from "../../../assets/icons/SunIcon";
-import Swords from "../../../assets/icons/SwordsIcon";
-import Shield from "../../../assets/icons/ShieldIcon";
-import Drop from "../../../assets/icons/DropIcon";
-import HoldingSkull from "../../../assets/icons/HoldingSkull";
-import Bones from "../../../assets/icons/BonesIcon";
-import Virus from "../../../assets/icons/VirusIcon";
 import { useVibration } from "../../../utility/customHooks";
 import { AppContext } from "../../_layout";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -21,6 +14,19 @@ import { useColorScheme } from "nativewind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TutorialModal from "../../../components/TutorialModal";
 import { toTitleCase } from "../../../utility/functions/misc/words";
+import {
+  Air,
+  Bones,
+  Drop,
+  Earth,
+  Fire,
+  HoldingSkull,
+  Shield,
+  Sun,
+  Swords,
+  Virus,
+  Water,
+} from "../../../assets/icons/SVGIcons";
 
 const descriptionMap: Record<string, string> = {
   fire: "With Fire, comes aggression. You will deal damage quickly and potentially burn enemies for additional damage over time.",
@@ -134,8 +140,8 @@ export default function SetBlessing() {
   function classDependantBlessings() {
     if (playerClass == "mage") {
       return (
-        <NonThemedView className="flex items-center justify-evenly py-6">
-          <View className="mb-8 flex flex-row justify-evenly">
+        <View className="flex items-center justify-evenly py-6">
+          <ThemedView className="mb-8 flex flex-row justify-evenly">
             <Pressable
               onPress={() => {
                 setBlessing("fire");
@@ -143,28 +149,28 @@ export default function SetBlessing() {
               }}
             >
               {({ pressed }) => (
-                <NonThemedView
+                <View
                   className={`${
                     pressed || blessing == "fire"
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
-                  <NonThemedView className="mx-auto">
+                  <View className="mx-auto">
                     <Fire
                       height={120}
                       width={90}
                       style={{ marginBottom: 5 }}
                       color={"#ea580c"}
                     />
-                  </NonThemedView>
+                  </View>
                   <Text
                     className="text-center text-lg"
                     style={{ color: "#ea580c" }}
                   >
                     Blessing of Fire
                   </Text>
-                </NonThemedView>
+                </View>
               )}
             </Pressable>
             <Pressable
@@ -174,32 +180,32 @@ export default function SetBlessing() {
               }}
             >
               {({ pressed }) => (
-                <NonThemedView
+                <View
                   className={`${
                     pressed || blessing == "water"
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
-                  <NonThemedView className="mx-auto">
+                  <View className="mx-auto">
                     <Water
                       height={120}
                       width={120}
                       style={{ marginBottom: 5 }}
                       color={"#3b82f6"}
                     />
-                  </NonThemedView>
+                  </View>
                   <Text
                     className="text-center text-lg"
                     style={{ color: "#3b82f6" }}
                   >
                     Blessing of Water
                   </Text>
-                </NonThemedView>
+                </View>
               )}
             </Pressable>
-          </View>
-          <View className="my-[6vh] flex flex-row justify-evenly">
+          </ThemedView>
+          <ThemedView className="my-[6vh] flex flex-row justify-evenly">
             <Pressable
               onPress={() => {
                 setBlessing("air");
@@ -207,28 +213,28 @@ export default function SetBlessing() {
               }}
             >
               {({ pressed }) => (
-                <NonThemedView
+                <View
                   className={`${
                     pressed || blessing == "air"
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
-                  <NonThemedView className="mx-auto">
+                  <View className="mx-auto">
                     <Air
                       height={120}
                       width={120}
                       style={{ marginBottom: 5 }}
                       color={"#cbd5e1"}
                     />
-                  </NonThemedView>
+                  </View>
                   <Text
                     className="text-center text-lg"
                     style={{ color: "#cbd5e1" }}
                   >
                     Blessing of Air
                   </Text>
-                </NonThemedView>
+                </View>
               )}
             </Pressable>
             <Pressable
@@ -238,37 +244,37 @@ export default function SetBlessing() {
               }}
             >
               {({ pressed }) => (
-                <NonThemedView
+                <View
                   className={`${
                     pressed || blessing == "earth"
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
-                  <NonThemedView className="mx-auto">
+                  <View className="mx-auto">
                     <Earth
                       height={120}
                       width={120}
                       style={{ marginBottom: 5 }}
                       color={"#937D62"}
                     />
-                  </NonThemedView>
+                  </View>
                   <Text
                     className="text-center text-lg"
                     style={{ color: "#937D62" }}
                   >
                     Blessing of Earth
                   </Text>
-                </NonThemedView>
+                </View>
               )}
             </Pressable>
-          </View>
-        </NonThemedView>
+          </ThemedView>
+        </View>
       );
     } else if (playerClass == "necromancer") {
       return (
-        <NonThemedView className="flex items-center justify-evenly py-6">
-          <View className="mb-8 flex flex-row justify-evenly">
+        <View className="flex items-center justify-evenly py-6">
+          <ThemedView className="mb-8 flex flex-row justify-evenly">
             <Pressable
               onPress={() => {
                 setBlessing("summoning");
@@ -276,28 +282,28 @@ export default function SetBlessing() {
               }}
             >
               {({ pressed }) => (
-                <NonThemedView
+                <View
                   className={`${
                     pressed || blessing == "summoning"
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
-                  <NonThemedView className="mx-auto">
+                  <View className="mx-auto">
                     <HoldingSkull
                       height={120}
                       width={120}
                       style={{ marginBottom: 5 }}
                       color={"#4b5563"}
                     />
-                  </NonThemedView>
+                  </View>
                   <Text
                     className="text-center text-lg"
                     style={{ color: "#4b5563" }}
                   >
                     Blessing of Summons
                   </Text>
-                </NonThemedView>
+                </View>
               )}
             </Pressable>
             <Pressable
@@ -307,32 +313,32 @@ export default function SetBlessing() {
               }}
             >
               {({ pressed }) => (
-                <NonThemedView
+                <View
                   className={`${
                     pressed || blessing == "pestilence"
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
-                  <NonThemedView className="mx-auto">
+                  <View className="mx-auto">
                     <Virus
                       height={120}
                       width={120}
                       style={{ marginBottom: 5 }}
                       color={colorScheme == "dark" ? "#84cc16" : "#65a30d"}
                     />
-                  </NonThemedView>
+                  </View>
                   <Text
                     className="text-center text-lg"
                     style={{ color: "#84cc16" }}
                   >
                     Blessing of Pestilence
                   </Text>
-                </NonThemedView>
+                </View>
               )}
             </Pressable>
-          </View>
-          <NonThemedView className="my-[6vh] flex flex-row justify-evenly">
+          </ThemedView>
+          <View className="my-[6vh] flex flex-row justify-evenly">
             <Pressable
               onPress={() => {
                 setBlessing("bone");
@@ -340,28 +346,28 @@ export default function SetBlessing() {
               }}
             >
               {({ pressed }) => (
-                <NonThemedView
+                <View
                   className={`${
                     pressed || blessing == "bone"
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
-                  <NonThemedView className="mx-auto">
+                  <View className="mx-auto">
                     <Bones
                       height={120}
                       width={100}
                       style={{ marginBottom: 5 }}
                       color={"#9ca3af"}
                     />
-                  </NonThemedView>
+                  </View>
                   <Text
                     className="text-center text-lg"
                     style={{ color: "#9ca3af" }}
                   >
                     Blessing of Bones
                   </Text>
-                </NonThemedView>
+                </View>
               )}
             </Pressable>
             <Pressable
@@ -371,36 +377,36 @@ export default function SetBlessing() {
               }}
             >
               {({ pressed }) => (
-                <NonThemedView
+                <View
                   className={`${
                     pressed || blessing == "blood"
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
-                  <NonThemedView className="mx-auto">
+                  <View className="mx-auto">
                     <Drop
                       height={120}
                       width={120}
                       style={{ marginBottom: 5 }}
                       color={"#991b1b"}
                     />
-                  </NonThemedView>
+                  </View>
                   <Text
                     className="text-center text-lg"
                     style={{ color: "#991b1b" }}
                   >
                     Blessing of Blood
                   </Text>
-                </NonThemedView>
+                </View>
               )}
             </Pressable>
-          </NonThemedView>
-        </NonThemedView>
+          </View>
+        </View>
       );
     } else if (playerClass == "paladin") {
       return (
-        <NonThemedView className="flex items-center justify-evenly py-6">
+        <View className="flex items-center justify-evenly py-6">
           <Pressable
             onPress={() => {
               setBlessing("holy");
@@ -408,31 +414,31 @@ export default function SetBlessing() {
             }}
           >
             {({ pressed }) => (
-              <NonThemedView
+              <View
                 className={`${
                   pressed || blessing == "holy"
                     ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                     : "border-transparent"
                 } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
               >
-                <NonThemedView className="mx-auto">
+                <View className="mx-auto">
                   <Sun
                     height={120}
                     width={120}
                     style={{ marginBottom: 5 }}
                     color={"#facc15"}
                   />
-                </NonThemedView>
+                </View>
                 <Text
                   className="text-center text-lg"
                   style={{ color: "#facc15" }}
                 >
                   Holy Blessing
                 </Text>
-              </NonThemedView>
+              </View>
             )}
           </Pressable>
-          <NonThemedView className="my-[6vh] flex flex-row justify-evenly">
+          <View className="my-[6vh] flex flex-row justify-evenly">
             <Pressable
               onPress={() => {
                 setBlessing("vengeance");
@@ -440,28 +446,28 @@ export default function SetBlessing() {
               }}
             >
               {({ pressed }) => (
-                <NonThemedView
+                <View
                   className={`${
                     pressed || blessing == "vengeance"
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
-                  <NonThemedView className="mx-auto">
+                  <View className="mx-auto">
                     <Swords
                       height={100}
                       width={100}
                       style={{ marginBottom: 5 }}
                       color={"#cbd5e1"}
                     />
-                  </NonThemedView>
+                  </View>
                   <Text
                     className="text-center text-lg"
                     style={{ color: "#cbd5e1" }}
                   >
                     Blessing of Vengeance
                   </Text>
-                </NonThemedView>
+                </View>
               )}
             </Pressable>
             <Pressable
@@ -471,32 +477,32 @@ export default function SetBlessing() {
               }}
             >
               {({ pressed }) => (
-                <NonThemedView
+                <View
                   className={`${
                     pressed || blessing == "protection"
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
-                  <NonThemedView className="mx-auto">
+                  <View className="mx-auto">
                     <Shield
                       height={100}
                       width={100}
                       style={{ marginBottom: 5 }}
                       color={"#3b82f6"}
                     />
-                  </NonThemedView>
+                  </View>
                   <Text
                     className="text-center text-lg"
                     style={{ color: "#3b82f6" }}
                   >
                     Blessing of Protection
                   </Text>
-                </NonThemedView>
+                </View>
               )}
             </Pressable>
-          </NonThemedView>
-        </NonThemedView>
+          </View>
+        </View>
       );
     } else throw new Error("invalid class set");
   }
@@ -530,7 +536,7 @@ export default function SetBlessing() {
         }}
       />
       <ScrollView>
-        <View className="flex-1 px-[5vw] pt-[8vh]">
+        <ThemedView className="flex-1 px-[5vw] pt-[8vh]">
           <Text className="text-center text-2xl">
             With What Blessing Was Your
             <Text style={{ color: accent }}>{` ${toTitleCase(
@@ -538,13 +544,13 @@ export default function SetBlessing() {
             )} `}</Text>
             Born?
           </Text>
-          <View className="flex-1 justify-evenly">
+          <ThemedView className="flex-1 justify-evenly">
             {classDependantBlessings()}
             <Text className="text-center md:text-lg">
               {descriptionMap[blessing]}
             </Text>
             {blessing ? (
-              <NonThemedView className="mx-auto h-32 py-2">
+              <View className="mx-auto h-32 py-2">
                 <Pressable
                   onPress={() => {
                     vibration({ style: "light" });
@@ -556,14 +562,14 @@ export default function SetBlessing() {
                 >
                   <Text className="text-xl tracking-widest">Next</Text>
                 </Pressable>
-              </NonThemedView>
+              </View>
             ) : (
-              <NonThemedView className="h-32"></NonThemedView>
+              <View className="h-32"></View>
             )}
-          </View>
-        </View>
+          </ThemedView>
+        </ThemedView>
       </ScrollView>
-      <NonThemedView className="absolute ml-4 mt-4">
+      <View className="absolute ml-4 mt-4">
         <Pressable
           className="absolute"
           onPress={() => setShowBlessingTutorial(true)}
@@ -574,7 +580,7 @@ export default function SetBlessing() {
             color={colorScheme == "light" ? "#27272a" : "#fafafa"}
           />
         </Pressable>
-      </NonThemedView>
+      </View>
     </>
   );
 }

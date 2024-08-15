@@ -7,7 +7,6 @@ import { useContext, useEffect, useState } from "react";
 import { CharacterImage } from "./CharacterImage";
 import { calculateAge } from "../utility/functions/misc/age";
 import ProgressBar from "./ProgressBar";
-import AffectionIcon from "../assets/icons/AffectionIcon";
 import GenericFlatButton from "./GenericFlatButton";
 import GenericStrikeAround from "./GenericStrikeAround";
 import { useVibration } from "../utility/customHooks";
@@ -15,6 +14,7 @@ import GenericRaisedButton from "./GenericRaisedButton";
 import { useRouter } from "expo-router";
 import { getDaysBetweenDates } from "../utility/functions/misc/date";
 import { AppContext } from "../app/_layout";
+import { AffectionIcon } from "../assets/icons/SVGIcons";
 
 interface CharacterInteractionModal {
   character: Character | null;

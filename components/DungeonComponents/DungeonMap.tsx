@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import Svg, { Rect } from "react-native-svg";
 import { Dimensions, View } from "react-native";
 import GenericRaisedButton from "../GenericRaisedButton";

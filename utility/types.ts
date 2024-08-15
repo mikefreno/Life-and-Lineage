@@ -347,6 +347,7 @@ export interface AppContextType {
   setEnemy: React.Dispatch<React.SetStateAction<Enemy | null>>;
   logsState: string[];
   setLogs: React.Dispatch<React.SetStateAction<string[]>>;
+  // the following are for controlling the player status stats display
   isCompact: boolean;
   setIsCompact: React.Dispatch<React.SetStateAction<boolean>>;
   showDetailedStatusView: boolean;

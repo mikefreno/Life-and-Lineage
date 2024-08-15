@@ -1,8 +1,4 @@
 import { View } from "react-native";
-import Coins from "../assets/icons/CoinsIcon";
-import Energy from "../assets/icons/EnergyIcon";
-import Sanity from "../assets/icons/SanityIcon";
-import HealthIcon from "../assets/icons/HealthIcon";
 import ProgressBar from "./ProgressBar";
 import { useIsFocused } from "@react-navigation/native";
 import { useContext, useState } from "react";
@@ -13,6 +9,7 @@ import GenericRaisedButton from "./GenericRaisedButton";
 import { Text } from "./Themed";
 import ThemedCard from "./ThemedCard";
 import { AppContext } from "../app/_layout";
+import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
 
 interface LaborTaskProps {
   reward: number;

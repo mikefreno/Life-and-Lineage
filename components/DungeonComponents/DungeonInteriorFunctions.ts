@@ -1,4 +1,3 @@
-import { useIsFocused } from "@react-navigation/native";
 import type { PlayerCharacter } from "../../classes/character";
 import { Enemy, type Minion } from "../../classes/creatures";
 import { enemyGenerator } from "../../utility/enemy";

@@ -1,11 +1,13 @@
 import { View } from "react-native";
 import { Text } from "../components/Themed";
-import ArmorIcon from "../assets/icons/ArmorIcon";
-import Energy from "../assets/icons/EnergyIcon";
-import HealthIcon from "../assets/icons/HealthIcon";
-import Sword from "../assets/icons/SwordIcon";
-import ShieldSlashIcon from "../assets/icons/ShieldSlash";
-import Regen from "../assets/icons/RegenIcon";
+import {
+  ArmorIcon,
+  Energy,
+  HealthIcon,
+  Regen,
+  ShieldSlashIcon,
+  Sword,
+} from "../assets/icons/SVGIcons";
 
 interface GearStatsDisplayProps {
   stats: Record<string, number | undefined>;

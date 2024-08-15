@@ -4,7 +4,6 @@ import { CharacterImage } from "../../components/CharacterImage";
 import { Pressable, Image, ScrollView, View } from "react-native";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Item } from "../../classes/item";
-import Coins from "../../assets/icons/CoinsIcon";
 import { useIsFocused } from "@react-navigation/native";
 import { AppContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
@@ -16,6 +15,7 @@ import { toTitleCase } from "../../utility/functions/misc/words";
 import { calculateAge } from "../../utility/functions/misc/age";
 import InventoryRender from "../../components/InventoryRender";
 import { StatsDisplay } from "../../components/StatsDisplay";
+import { Coins } from "../../assets/icons/SVGIcons";
 
 const ONE_HOUR = 60 * 60 * 1000;
 const ONE_SECOND = 1000; // for testing_one_min

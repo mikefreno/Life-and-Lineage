@@ -5,11 +5,11 @@ import { useContext, useState } from "react";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Character } from "../classes/character";
 import ProgressBar from "../components/ProgressBar";
-import AffectionIcon from "../assets/icons/AffectionIcon";
 import { CharacterInteractionModal } from "../components/CharacterInteractionModal";
 import { Pressable } from "react-native";
 import GiftModal from "../components/GiftModal";
 import { AppContext } from "./_layout";
+import { AffectionIcon } from "../assets/icons/SVGIcons";
 
 export default function RelationshipsScreen() {
   const appData = useContext(AppContext);

@@ -1,14 +1,16 @@
-import Fire from "../assets/icons/FireIcon";
-import Water from "../assets/icons/WaterIcon";
-import Air from "../assets/icons/AirIcon";
-import Earth from "../assets/icons/EarthIcon";
-import Sun from "../assets/icons/SunIcon";
-import Swords from "../assets/icons/SwordsIcon";
-import Shield from "../assets/icons/ShieldIcon";
-import HoldingSkull from "../assets/icons/HoldingSkull";
-import Virus from "../assets/icons/VirusIcon";
-import Bones from "../assets/icons/BonesIcon";
-import Drop from "../assets/icons/DropIcon";
+import {
+  Air,
+  Bones,
+  Drop,
+  Earth,
+  Fire,
+  HoldingSkull,
+  Shield,
+  Sun,
+  Swords,
+  Virus,
+  Water,
+} from "../assets/icons/SVGIcons";
 
 export default function blessingDisplay(
   blessing: string,

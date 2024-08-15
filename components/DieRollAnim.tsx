@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, StyleSheet, Text, Animated, Easing } from "react-native";
 import { rollD20 } from "../utility/functions/roll";
-import D20SVG from "../assets/icons/D20SVG";
+import { D20SVG } from "../assets/icons/SVGIcons";
 
 const D20Die = () => {
   const [diceValue, setDiceValue] = useState(1);

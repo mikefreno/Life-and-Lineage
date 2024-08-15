@@ -3,7 +3,7 @@ import { router } from "expo-router";
 import { useContext, useState } from "react";
 import { AppContext } from "../_layout";
 import { toTitleCase } from "../../utility/functions/misc/words";
-import { Pressable, View as NonThemedView, StyleSheet } from "react-native";
+import { Pressable, View as NonThemedView } from "react-native";
 import { useVibration } from "../../utility/customHooks";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 import GenericStrikeAround from "../../components/GenericStrikeAround";

@@ -7,7 +7,6 @@ import { useColorScheme } from "nativewind";
 import { useVibration } from "../../utility/customHooks";
 import { AttackObj, Spell } from "../../utility/types";
 import { elementalColorMap } from "../../utility/elementColors";
-import Energy from "../../assets/icons/EnergyIcon";
 import GenericModal from "../GenericModal";
 import SpellDetails from "../SpellDetails";
 import GenericStrikeAround from "../GenericStrikeAround";
@@ -23,6 +22,7 @@ import {
 import { DungeonMapControls } from "./DungeonMap";
 import PlatformDependantBlurView from "../PlatformDependantBlurView";
 import { useIsFocused } from "@react-navigation/native";
+import { Energy } from "../../assets/icons/SVGIcons";
 
 interface BattleTabProps {
   battleTab: "attacksOrNavigation" | "equipment" | "log";
