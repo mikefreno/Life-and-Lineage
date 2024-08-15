@@ -186,10 +186,6 @@ export const DungeonMapRender = () => {
     );
   };
 
-  useEffect(() => {
-    console.log(mapDimensions);
-    console.log(currentPosition);
-  }, [mapDimensions]);
   const windowWidth = Dimensions.get("window").width;
   const windowHeight = Dimensions.get("window").height;
 
