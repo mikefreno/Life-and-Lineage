@@ -36,7 +36,7 @@ export default function CodexCategory({
     setAnimationtriggered(true);
     setPressed(true);
     setTimeout(() => {
-      router.push(`/Options/${category}`);
+      router.push(`/Options/Codex/${category}`);
       setPressed(false);
     }, 150);
   };

@@ -7,29 +7,31 @@ import {
   View,
 } from "react-native";
 import Colors from "../../constants/Colors";
-import Wand from "../../assets/icons/WandIcon";
-import BookSparkles from "../../assets/icons/BookSparklesIcon";
-import Gear from "../../assets/icons/GearIcon";
-import Broom from "../../assets/icons/BroomIcon";
-import Dungeon from "../../assets/icons/DungeonIcon";
-import Potion from "../../assets/icons/PotionIcon";
-import Medical from "../../assets/icons/MedicalIcon";
-import WizardHat from "../../assets/icons/WizardHatIcon";
-import HouseHeart from "../../assets/icons/RelationshipsIcon";
-import Sword from "../../assets/icons/SwordIcon";
 import { elementalColorMap } from "../../utility/elementColors";
-import PaladinHammer from "../../assets/icons/PaladinHammer";
 import { useColorScheme } from "nativewind";
 import { useContext } from "react";
-import GraduationCapIcon from "../../assets/icons/GraduationCap";
 import { useVibration } from "../../utility/customHooks";
-import BowlingBallAndPin from "../../assets/icons/BowlingBallAndPin";
 import { BlurView } from "expo-blur";
 import { StyleSheet } from "react-native";
 import PlayerStatus from "../../components/PlayerStatus";
 import { LinearGradientBlur } from "../../components/LinearGradientBlur";
 import { AppContext } from "../_layout";
-import NecromancerSkull from "../../assets/icons/NecromancerSkull";
+import {
+  BookSparkles,
+  BowlingBallAndPin,
+  Broom,
+  Dungeon,
+  Gear,
+  GraduationCapIcon,
+  HouseHeart,
+  Medical,
+  NecromancerSkull,
+  PaladinHammer,
+  Potion,
+  Sword,
+  Wand,
+  WizardHat,
+} from "../../assets/icons/SVGIcons";
 
 export default function TabLayout() {
   const appData = useContext(AppContext);

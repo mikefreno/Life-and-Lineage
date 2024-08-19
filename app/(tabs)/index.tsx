@@ -1,8 +1,6 @@
 import { View } from "react-native";
 import { Text, View as ThemedView } from "../../components/Themed";
-import WizardHat from "../../assets/icons/WizardHatIcon";
 import { useContext, useEffect, useRef, useState } from "react";
-import PaladinHammer from "../../assets/icons/PaladinHammer";
 import blessingDisplay from "../../components/BlessingsDisplay";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
@@ -15,7 +13,11 @@ import { calculateAge } from "../../utility/functions/misc/age";
 import InventoryRender from "../../components/InventoryRender";
 import EquipmentDisplay from "../../components/EquipmentDisplay";
 import { AppContext } from "../_layout";
-import NecromancerSkull from "../../assets/icons/NecromancerSkull";
+import {
+  NecromancerSkull,
+  PaladinHammer,
+  WizardHat,
+} from "../../assets/icons/SVGIcons";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();

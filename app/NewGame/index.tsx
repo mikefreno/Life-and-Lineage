@@ -98,6 +98,7 @@ export default function NewGameScreen() {
           title: "Class Select",
           headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
           headerBackTitleStyle: { fontFamily: "PixelifySans" },
+          headerBackTitle: "Home",
         }}
       />
       <Modal
@@ -184,8 +185,6 @@ export default function NewGameScreen() {
                 } border px-6 py-4`}
               >
                 <WizardHat
-                  height={120}
-                  width={120}
                   style={{ marginBottom: 5 }}
                   color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
                 />
@@ -221,8 +220,6 @@ export default function NewGameScreen() {
                 >
                   <View className="-rotate-12">
                     <NecromancerSkull
-                      height={120}
-                      width={110}
                       style={{ marginBottom: 5 }}
                       color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
                     />
@@ -253,11 +250,7 @@ export default function NewGameScreen() {
                 >
                   <View className="rotate-12">
                     <View className="scale-x-[-1] transform">
-                      <PaladinHammer
-                        height={120}
-                        width={90}
-                        style={{ marginBottom: 5 }}
-                      />
+                      <PaladinHammer style={{ marginBottom: 5 }} />
                     </View>
                   </View>
                   <Text

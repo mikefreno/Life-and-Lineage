@@ -1,7 +1,7 @@
 import { TextInput } from "react-native";
-import { View, Text, ScrollView } from "../../components/Themed";
+import { View, Text, ScrollView } from "../../../components/Themed";
 import { useState } from "react";
-import CodexCategory from "../../components/CodexCategory";
+import CodexCategory from "../../../components/CodexCategory";
 import { useColorScheme } from "nativewind";
 
 const categories = [

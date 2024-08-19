@@ -50,7 +50,10 @@ import {
   convertMasteryToNumber,
   getMasteryLevel,
 } from "../utility/spellHelper";
-import type { BoundingBox, Tile } from "../components/DungeonMap";
+import type {
+  BoundingBox,
+  Tile,
+} from "../components/DungeonComponents/DungeonMap";
 
 interface CharacterOptions {
   id?: string;

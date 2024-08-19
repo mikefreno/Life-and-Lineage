@@ -16,15 +16,15 @@ import TutorialModal from "../../../components/TutorialModal";
 import { toTitleCase } from "../../../utility/functions/misc/words";
 import {
   Air,
+  BloodDrop,
   Bones,
-  Drop,
   Earth,
   Fire,
-  HoldingSkull,
-  Shield,
-  Sun,
-  Swords,
-  Virus,
+  Holy,
+  Pestilence,
+  Protection,
+  SummonerSkull,
+  Vengeance,
   Water,
 } from "../../../assets/icons/SVGIcons";
 
@@ -221,12 +221,7 @@ export default function SetBlessing() {
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
                   <View className="mx-auto">
-                    <Air
-                      height={120}
-                      width={120}
-                      style={{ marginBottom: 5 }}
-                      color={"#cbd5e1"}
-                    />
+                    <Air style={{ marginBottom: 5 }} />
                   </View>
                   <Text
                     className="text-center text-lg"
@@ -252,12 +247,7 @@ export default function SetBlessing() {
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
                   <View className="mx-auto">
-                    <Earth
-                      height={120}
-                      width={120}
-                      style={{ marginBottom: 5 }}
-                      color={"#937D62"}
-                    />
+                    <Earth style={{ marginBottom: 5 }} />
                   </View>
                   <Text
                     className="text-center text-lg"
@@ -290,12 +280,7 @@ export default function SetBlessing() {
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
                   <View className="mx-auto">
-                    <HoldingSkull
-                      height={120}
-                      width={120}
-                      style={{ marginBottom: 5 }}
-                      color={"#4b5563"}
-                    />
+                    <SummonerSkull style={{ marginBottom: 5 }} />
                   </View>
                   <Text
                     className="text-center text-lg"
@@ -321,9 +306,7 @@ export default function SetBlessing() {
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
                   <View className="mx-auto">
-                    <Virus
-                      height={120}
-                      width={120}
+                    <Pestilence
                       style={{ marginBottom: 5 }}
                       color={colorScheme == "dark" ? "#84cc16" : "#65a30d"}
                     />
@@ -354,12 +337,7 @@ export default function SetBlessing() {
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
                   <View className="mx-auto">
-                    <Bones
-                      height={120}
-                      width={100}
-                      style={{ marginBottom: 5 }}
-                      color={"#9ca3af"}
-                    />
+                    <Bones style={{ marginBottom: 5 }} />
                   </View>
                   <Text
                     className="text-center text-lg"
@@ -385,12 +363,7 @@ export default function SetBlessing() {
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
                   <View className="mx-auto">
-                    <Drop
-                      height={120}
-                      width={120}
-                      style={{ marginBottom: 5 }}
-                      color={"#991b1b"}
-                    />
+                    <BloodDrop style={{ marginBottom: 5 }} color={"#991b1b"} />
                   </View>
                   <Text
                     className="text-center text-lg"
@@ -422,12 +395,7 @@ export default function SetBlessing() {
                 } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
               >
                 <View className="mx-auto">
-                  <Sun
-                    height={120}
-                    width={120}
-                    style={{ marginBottom: 5 }}
-                    color={"#facc15"}
-                  />
+                  <Holy style={{ marginBottom: 5 }} />
                 </View>
                 <Text
                   className="text-center text-lg"
@@ -454,12 +422,7 @@ export default function SetBlessing() {
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
                   <View className="mx-auto">
-                    <Swords
-                      height={100}
-                      width={100}
-                      style={{ marginBottom: 5 }}
-                      color={"#cbd5e1"}
-                    />
+                    <Vengeance style={{ marginBottom: 5 }} />
                   </View>
                   <Text
                     className="text-center text-lg"
@@ -485,12 +448,7 @@ export default function SetBlessing() {
                   } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
                 >
                   <View className="mx-auto">
-                    <Shield
-                      height={100}
-                      width={100}
-                      style={{ marginBottom: 5 }}
-                      color={"#3b82f6"}
-                    />
+                    <Protection style={{ marginBottom: 5 }} />
                   </View>
                   <Text
                     className="text-center text-lg"

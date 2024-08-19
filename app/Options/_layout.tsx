@@ -33,7 +33,7 @@ export default function OptionsLayout() {
         }}
       />
       <Tabs.Screen
-        name="codex"
+        name="Codex/index"
         options={{
           headerShown: false,
           title: "Codex",
@@ -47,7 +47,7 @@ export default function OptionsLayout() {
         }}
       />
       <Tabs.Screen
-        name="[slug]"
+        name="Codex/[...slug]"
         options={{
           href: null,
         }}
