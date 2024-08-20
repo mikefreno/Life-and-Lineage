@@ -1,5 +1,5 @@
-import { Link, Stack, useLocalSearchParams } from "expo-router";
-import { View } from "../../../components/Themed";
+import { Href, Link, Stack, router, useLocalSearchParams } from "expo-router";
+import { View as ThemedView } from "../../../components/Themed";
 import { Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../../constants/Colors";
@@ -16,19 +16,23 @@ import {
   ShopsCodex,
 } from "../../../components/CodexPages";
 import {
-  Air,
-  Blood,
-  Bones,
-  Earth,
-  Fire,
-  Mage,
-  Necromancer,
-  Pestilence,
-  Summoner,
-  Water,
+  AirCodex,
+  BloodCodex,
+  BonesCodex,
+  EarthCodex,
+  FireCodex,
+  HolyCodex,
+  MageCodex,
+  NecromancerCodex,
+  PaladinCodex,
+  PestilenceCodex,
+  ProtectionCodex,
+  SummonerCodex,
+  VengeanceCodex,
+  WaterCodex,
 } from "../../../components/CodexSecondaries";
-import { useEffect } from "react";
 import { toTitleCase } from "../../../utility/functions/misc/words";
+import { useEffect, useState } from "react";
 
 const CategoryMap: { [key: string]: React.JSX.Element } = {
   Combat: <CombatCodex />,
@@ -43,21 +47,27 @@ const CategoryMap: { [key: string]: React.JSX.Element } = {
 };
 
 const SecondaryMap: { [key: string]: React.JSX.Element } = {
-  Mage: <Mage />,
-  Water: <Water />,
-  Fire: <Fire />,
-  Earth: <Earth />,
-  Air: <Air />,
-  Necromancer: <Necromancer />,
-  Blood: <Blood />,
-  Pestilence: <Pestilence />,
-  Bones: <Bones />,
-  Summoner: <Summoner />,
+  Mage: <MageCodex />,
+  Water: <WaterCodex />,
+  Fire: <FireCodex />,
+  Earth: <EarthCodex />,
+  Air: <AirCodex />,
+  Necromancer: <NecromancerCodex />,
+  Blood: <BloodCodex />,
+  Pestilence: <PestilenceCodex />,
+  Bones: <BonesCodex />,
+  Summoner: <SummonerCodex />,
+  Paladin: <PaladinCodex />,
+  Vengeance: <VengeanceCodex />,
+  Protection: <ProtectionCodex />,
+  Holy: <HolyCodex />,
 };
 
 export default function CodexInfo() {
   let { slug } = useLocalSearchParams();
   const { colorScheme } = useColorScheme();
+
+  const [history, setHistory] = useState<Href<string>[]>([]);
   let category: string;
   let secondary: string | undefined = undefined;
 
@@ -68,40 +78,59 @@ export default function CodexInfo() {
     category = slug;
   }
 
-  useEffect(() => console.log(secondary), [secondary]);
+  useEffect(() => {
+    const currentPath = secondary
+      ? `/Options/Codex/${category}/${secondary}`
+      : `/Options/Codex/${category}`;
+
+    setHistory((prev) => {
+      if (prev[prev.length - 1] !== currentPath) {
+        return [...prev, currentPath as Href<string>];
+      }
+      return prev;
+    });
+  }, [category, secondary]);
+
+  const handleBack = () => {
+    if (history.length > 1) {
+      const newHistory = [...history];
+      newHistory.pop(); // Remove current page
+      const previousPage = newHistory[newHistory.length - 1];
+      setHistory(newHistory);
+      router.push(previousPage);
+    } else {
+      setHistory([]);
+      router.push("/Options/Codex");
+    }
+  };
 
   return (
     <>
       <Stack.Screen
         options={{
           headerLeft: () => (
-            <Link
-              href={
-                secondary
-                  ? `/Options/Codex/${toTitleCase(category)}`
-                  : "/Options/Codex"
-              }
-              asChild
-            >
-              <Pressable>
-                {({ pressed }) => (
-                  <Ionicons
-                    name={"chevron-back"}
-                    size={36}
-                    color={Colors[colorScheme as "light" | "dark"].tint}
-                    style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
+            <Pressable onPress={handleBack}>
+              {({ pressed }) => (
+                <Ionicons
+                  name={"chevron-back"}
+                  size={36}
+                  color={Colors[colorScheme as "light" | "dark"].tint}
+                  style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }}
+                />
+              )}
+            </Pressable>
           ),
           title: `${secondary ? secondary : category} Codex`,
         }}
       />
       {secondary ? (
-        <View className="flex-1">{SecondaryMap[toTitleCase(category)]}</View>
+        <ThemedView className="flex-1">
+          {SecondaryMap[toTitleCase(secondary)]}
+        </ThemedView>
       ) : (
-        <View className="flex-1">{CategoryMap[toTitleCase(category)]}</View>
+        <ThemedView className="flex-1">
+          {CategoryMap[toTitleCase(category)]}
+        </ThemedView>
       )}
     </>
   );

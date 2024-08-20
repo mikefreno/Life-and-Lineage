@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { Text } from "./Themed";
 import {
   Air,
@@ -17,7 +17,7 @@ import {
   WizardHat,
 } from "../assets/icons/SVGIcons";
 import { useColorScheme } from "nativewind";
-import { Link, router } from "expo-router";
+import { Link } from "expo-router";
 
 export function CombatCodex() {
   return (
@@ -76,7 +76,12 @@ export function PlayerCodex() {
           </Text>
           <View className="mx-auto">
             <Link href="/Options/Codex/Player/Mage" suppressHighlighting>
-              <Text className="text-xl underline">
+              <Text
+                style={{
+                  color: colorScheme == "dark" ? "#2563eb" : "#1e40af",
+                }}
+                className="text-xl underline"
+              >
                 The Mage{" "}
                 <WizardHat
                   height={24}
@@ -88,7 +93,10 @@ export function PlayerCodex() {
           </View>
           <View className="mx-auto">
             <Link href="/Options/Codex/Player/Necromancer" suppressHighlighting>
-              <Text className="text-xl underline">
+              <Text
+                style={{ color: colorScheme == "dark" ? "#9333ea" : "#6b21a8" }}
+                className="text-xl underline"
+              >
                 The Necromancer{" "}
                 <NecromancerSkull
                   height={24}
@@ -100,7 +108,7 @@ export function PlayerCodex() {
           </View>
           <View className="mx-auto">
             <Link href="/Options/Codex/Player/Paladin" suppressHighlighting>
-              <Text className="text-xl underline">
+              <Text style={{ color: "#fcd34d" }} className="text-xl underline">
                 The Paladin <PaladinHammer height={24} width={24} />
               </Text>
             </Link>
@@ -117,16 +125,27 @@ export function PlayerCodex() {
               class.
             </Text>
           </View>
-          <View className="mx-auto">
-            <Link href="/Options/Codex/Player/Mage" suppressHighlighting>
-              <WizardHat
-                height={64}
-                width={64}
-                color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
-              />
+          <View className="py-2 my-2 border border-blue-500 bg-blue-100 dark:bg-blue-950">
+            <Link
+              href="/Options/Codex/Player/Mage"
+              className="mx-auto"
+              suppressHighlighting
+            >
+              <View className="flex items-center">
+                <WizardHat
+                  height={64}
+                  width={64}
+                  color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
+                />
+                <Text
+                  style={{
+                    color: colorScheme == "dark" ? "#2563eb" : "#1e40af",
+                  }}
+                >
+                  Mage
+                </Text>
+              </View>
             </Link>
-          </View>
-          <View>
             <View className="flex flex-row justify-evenly py-2">
               <Link href="/Options/Codex/Player/Water" suppressHighlighting>
                 <Water height={48} width={48} />
@@ -145,16 +164,25 @@ export function PlayerCodex() {
             </View>
           </View>
         </View>
-        <View className="mx-auto">
-          <Link href="/Options/Codex/Player/Necromancer" suppressHighlighting>
-            <NecromancerSkull
-              width={64}
-              height={64}
-              color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
-            />
+        <View className="py-2 my-2 border border-purple-500 bg-purple-100 dark:bg-purple-950">
+          <Link
+            href="/Options/Codex/Player/Necromancer"
+            className="mx-auto"
+            suppressHighlighting
+          >
+            <View className="flex items-center">
+              <NecromancerSkull
+                width={64}
+                height={64}
+                color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
+              />
+              <Text
+                style={{ color: colorScheme == "dark" ? "#9333ea" : "#6b21a8" }}
+              >
+                Necromancer
+              </Text>
+            </View>
           </Link>
-        </View>
-        <View>
           <View className="flex flex-row justify-evenly py-2">
             <Link href="/Options/Codex/Player/Blood" suppressHighlighting>
               <BloodDrop height={48} width={48} />
@@ -176,12 +204,17 @@ export function PlayerCodex() {
             </Link>
           </View>
         </View>
-        <View className="mx-auto">
-          <Link href="/Options/Codex/Player/Paladin" suppressHighlighting>
-            <PaladinHammer width={64} height={64} />
+        <View className="py-2 my-2 border border-yellow-500 bg-yellow-100 dark:bg-yellow-950">
+          <Link
+            className="mx-auto"
+            href="/Options/Codex/Player/Paladin"
+            suppressHighlighting
+          >
+            <View className="flex items-center">
+              <PaladinHammer width={64} height={64} />
+              <Text style={{ color: "#fcd34d" }}>Paladin</Text>
+            </View>
           </Link>
-        </View>
-        <View>
           <View className="flex flex-row justify-evenly py-2">
             <Link href="/Options/Codex/Player/Protection" suppressHighlighting>
               <Protection height={48} width={48} />
@@ -196,7 +229,6 @@ export function PlayerCodex() {
             </Link>
           </View>
         </View>
-        <View></View>
       </View>
     </ScrollView>
   );
