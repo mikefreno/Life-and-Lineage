@@ -1,5 +1,7 @@
+import { Element } from "./types";
+
 export const elementalColorMap: Record<
-  string,
+  Element,
   { dark: string; light: string }
 > = {
   fire: { dark: "#FF5722", light: "#fff7ed" },

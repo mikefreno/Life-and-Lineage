@@ -196,7 +196,7 @@ export function PlayerCodex() {
             </Link>
           </View>
           <View className="flex flex-row justify-evenly py-2">
-            <Link href="/Options/Codex/Player/Bones" suppressHighlighting>
+            <Link href="/Options/Codex/Player/Bone" suppressHighlighting>
               <Bones height={48} width={48} />
             </Link>
             <Link href="/Options/Codex/Player/Summoner" suppressHighlighting>

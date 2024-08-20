@@ -1,4 +1,4 @@
-import { Href, Link, Stack, router, useLocalSearchParams } from "expo-router";
+import { Href, Stack, router, useLocalSearchParams } from "expo-router";
 import { View as ThemedView } from "../../../components/Themed";
 import { Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,7 +18,7 @@ import {
 import {
   AirCodex,
   BloodCodex,
-  BonesCodex,
+  BoneCodex,
   EarthCodex,
   FireCodex,
   HolyCodex,
@@ -55,7 +55,7 @@ const SecondaryMap: { [key: string]: React.JSX.Element } = {
   Necromancer: <NecromancerCodex />,
   Blood: <BloodCodex />,
   Pestilence: <PestilenceCodex />,
-  Bones: <BonesCodex />,
+  Bone: <BoneCodex />,
   Summoner: <SummonerCodex />,
   Paladin: <PaladinCodex />,
   Vengeance: <VengeanceCodex />,

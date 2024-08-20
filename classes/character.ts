@@ -1369,15 +1369,9 @@ export class PlayerCharacter extends Character {
 
   public conditionTicker() {
     for (let i = this.conditions.length - 1; i >= 0; i--) {
-      const { healthDamage, sanityDamage, turns } = this.conditions[i].tick();
+      const turnsRemaining = this.conditions[i].tick(this);
 
-      if (sanityDamage) {
-        this.damageSanity(sanityDamage);
-      }
-      if (healthDamage) {
-        this.damageHealth(healthDamage);
-      }
-      if (turns == 0) {
+      if (turnsRemaining == 0) {
         this.conditions.splice(i, 1);
       }
     }

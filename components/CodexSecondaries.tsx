@@ -10,13 +10,20 @@ import {
   BloodDrop,
   Pestilence,
   Bones,
+  SummonerSkull,
+  PaladinHammer,
+  Holy,
+  Vengeance,
+  Protection,
 } from "../assets/icons/SVGIcons";
 import { Link } from "expo-router";
 import mageSpells from "../assets/json/mageSpells.json";
 import necromancerSpells from "../assets/json/necroSpells.json";
+import paladinSpells from "../assets/json/paladinSpells.json";
 import SpellDetails from "./SpellDetails";
 import type { MasteryLevel } from "../utility/types";
 import { toTitleCase } from "../utility/functions/misc/words";
+import { elementalColorMap } from "../utility/elementColors";
 
 export function MageCodex() {
   const headerComponent = () => (
@@ -31,25 +38,37 @@ export function MageCodex() {
         </Text>
         <Text>The mage has four schools:</Text>
         <Link href="/Options/Codex/Player/Fire" suppressHighlighting>
-          <Text className="text-2xl" style={{ color: "#ea580c" }}>
+          <Text
+            className="text-2xl"
+            style={{ color: elementalColorMap["fire"].dark }}
+          >
             Fire
           </Text>
           <Fire height={24} width={24} />
         </Link>
         <Link href="/Options/Codex/Player/Water" suppressHighlighting>
-          <Text className="text-2xl" style={{ color: "#3b82f6" }}>
+          <Text
+            className="text-2xl"
+            style={{ color: elementalColorMap["water"].dark }}
+          >
             Water
           </Text>
           <Water height={24} width={24} />
         </Link>
         <Link href="/Options/Codex/Air" suppressHighlighting>
-          <Text className="text-2xl" style={{ color: "#cbd5e1" }}>
+          <Text
+            className="text-2xl"
+            style={{ color: elementalColorMap["air"].dark }}
+          >
             Air
           </Text>
           <Air height={24} width={24} />
         </Link>
         <Link href="/Options/Codex/Earth" suppressHighlighting>
-          <Text className="text-2xl" style={{ color: "#937D62" }}>
+          <Text
+            className="text-2xl"
+            style={{ color: elementalColorMap["earth"].dark }}
+          >
             Earth
           </Text>
           <Earth height={24} width={24} />
@@ -101,7 +120,10 @@ export function WaterCodex() {
           opponents, at the highest levels it can even give the caster control
           over their enemies.
         </Text>
-        <Text className="text-2xl py-4" style={{ color: "#3b82f6" }}>
+        <Text
+          className="text-2xl py-4"
+          style={{ color: elementalColorMap["water"].dark }}
+        >
           Available Spells:
         </Text>
       </View>
@@ -147,7 +169,10 @@ export function FireCodex() {
           The School of Fire has its focus in all out damage, fire spells hit
           hard, and can leave enemies burnt.
         </Text>
-        <Text className="text-2xl py-4" style={{ color: "#ea580c" }}>
+        <Text
+          className="text-2xl py-4"
+          style={{ color: elementalColorMap["fire"].dark }}
+        >
           Available Spells:
         </Text>
       </View>
@@ -193,7 +218,10 @@ export function EarthCodex() {
           The School of Earth believes in defense. Prevent your enemies from
           moving and coat yourself in armor of stones.
         </Text>
-        <Text className="text-2xl py-4" style={{ color: "#937D62" }}>
+        <Text
+          className="text-2xl py-4"
+          style={{ color: elementalColorMap["earth"].dark }}
+        >
           Available Spells:
         </Text>
       </View>
@@ -239,7 +267,10 @@ export function AirCodex() {
           The School of Air channels lightning and terrifying winds, these
           spells can debilitate and defend.
         </Text>
-        <Text className="text-2xl py-4" style={{ color: "#cbd5e1" }}>
+        <Text
+          className="text-2xl py-4"
+          style={{ color: elementalColorMap["air"].dark }}
+        >
           Available Spells:
         </Text>
       </View>
@@ -284,30 +315,42 @@ export function NecromancerCodex() {
         <Text className="text-center pt-8">The Necromancer</Text>
         <Text>The Necromancer has four schools:</Text>
         <Link href="/Options/Codex/Player/Blood" suppressHighlighting>
-          <Text className="text-2xl" style={{ color: "#ea580c" }}>
+          <Text
+            className="text-2xl"
+            style={{ color: elementalColorMap["blood"].dark }}
+          >
             Blood
           </Text>
           <BloodDrop height={24} width={24} />
         </Link>
         <Link href="/Options/Codex/Player/Pestilence" suppressHighlighting>
-          <Text className="text-2xl" style={{ color: "#3b82f6" }}>
+          <Text
+            className="text-2xl"
+            style={{ color: elementalColorMap["pestilence"].dark }}
+          >
             Pestilence
           </Text>
           <Pestilence height={24} width={24} />
         </Link>
-        <Link href="/Options/Codex/Player/Bones" suppressHighlighting>
-          <Text className="text-2xl" style={{ color: "#cbd5e1" }}>
-            Bones
+        <Link href="/Options/Codex/Player/Bone" suppressHighlighting>
+          <Text
+            className="text-2xl"
+            style={{ color: elementalColorMap["bone"].dark }}
+          >
+            Bone
           </Text>
           <Bones height={24} width={24} />
         </Link>
         <Link href="/Options/Codex/Player/Summoner" suppressHighlighting>
-          <Text className="text-2xl" style={{ color: "#937D62" }}>
+          <Text
+            className="text-2xl"
+            style={{ color: elementalColorMap["summoning"].dark }}
+          >
             Summoning
           </Text>
-          <Earth height={24} width={24} />
+          <SummonerSkull height={24} width={24} />
         </Link>
-        <Text className="text-2xl py-4" style={{ color: "#9333ea" }}>
+        <Text className="text-2xl py-4" style={{ color: "#4b5563" }}>
           Available Spells:
         </Text>
       </View>
@@ -342,26 +385,410 @@ export function NecromancerCodex() {
   );
 }
 export function BloodCodex() {
-  return <View></View>;
+  const headerComponent = () => (
+    <View className="px-4 pt-4">
+      <View className="items-center">
+        <BloodDrop width={64} height={64} />
+      </View>
+      <View className="items-center">
+        <Text className="text-center pt-8">
+          The School of Fire has its focus in all out damage, fire spells hit
+          hard, and can leave enemies burnt.
+        </Text>
+        <Text
+          className="text-2xl py-4"
+          style={{ color: elementalColorMap["blood"].dark }}
+        >
+          Available Spells:
+        </Text>
+      </View>
+    </View>
+  );
+
+  const renderItem = ({ item }) => (
+    <View className="py-2 mx-auto">
+      <SpellDetails
+        spell={{
+          name: item.name,
+          element: item.element,
+          proficiencyNeeded: toTitleCase(
+            item.proficiencyNeeded,
+          ) as unknown as MasteryLevel,
+          manaCost: item.manaCost,
+          duration: item.duration,
+          effects: item.effects,
+        }}
+      />
+    </View>
+  );
+
+  return (
+    <FlatList
+      data={necromancerSpells.filter((spell) => spell.element == "blood")}
+      renderItem={renderItem}
+      keyExtractor={(item, index) => item.name || index.toString()}
+      ListHeaderComponent={headerComponent}
+      contentContainerStyle={{ paddingBottom: 20 }}
+    />
+  );
 }
+
 export function PestilenceCodex() {
-  return <View></View>;
+  const headerComponent = () => (
+    <View className="px-4 pt-4">
+      <View className="items-center">
+        <Pestilence width={64} height={64} />
+      </View>
+      <View className="items-center">
+        <Text className="text-center pt-8">
+          The School of Fire has its focus in all out damage, fire spells hit
+          hard, and can leave enemies burnt.
+        </Text>
+        <Text
+          className="text-2xl py-4"
+          style={{ color: elementalColorMap["pestilence"].dark }}
+        >
+          Available Spells:
+        </Text>
+      </View>
+    </View>
+  );
+
+  const renderItem = ({ item }) => (
+    <View className="py-2 mx-auto">
+      <SpellDetails
+        spell={{
+          name: item.name,
+          element: item.element,
+          proficiencyNeeded: toTitleCase(
+            item.proficiencyNeeded,
+          ) as unknown as MasteryLevel,
+          manaCost: item.manaCost,
+          duration: item.duration,
+          effects: item.effects,
+        }}
+      />
+    </View>
+  );
+
+  return (
+    <FlatList
+      data={necromancerSpells.filter((spell) => spell.element == "pestilence")}
+      renderItem={renderItem}
+      keyExtractor={(item, index) => item.name || index.toString()}
+      ListHeaderComponent={headerComponent}
+      contentContainerStyle={{ paddingBottom: 20 }}
+    />
+  );
 }
-export function BonesCodex() {
-  return <View></View>;
+export function BoneCodex() {
+  const headerComponent = () => (
+    <View className="px-4 pt-4">
+      <View className="items-center">
+        <Bones width={64} height={64} />
+      </View>
+      <View className="items-center">
+        <Text className="text-center pt-8">
+          The School of Fire has its focus in all out damage, fire spells hit
+          hard, and can leave enemies burnt.
+        </Text>
+        <Text
+          className="text-2xl py-4"
+          style={{ color: elementalColorMap["bone"].dark }}
+        >
+          Available Spells:
+        </Text>
+      </View>
+    </View>
+  );
+
+  const renderItem = ({ item }) => (
+    <View className="py-2 mx-auto">
+      <SpellDetails
+        spell={{
+          name: item.name,
+          element: item.element,
+          proficiencyNeeded: toTitleCase(
+            item.proficiencyNeeded,
+          ) as unknown as MasteryLevel,
+          manaCost: item.manaCost,
+          duration: item.duration,
+          effects: item.effects,
+        }}
+      />
+    </View>
+  );
+
+  return (
+    <FlatList
+      data={necromancerSpells.filter((spell) => spell.element == "bone")}
+      renderItem={renderItem}
+      keyExtractor={(item, index) => item.name || index.toString()}
+      ListHeaderComponent={headerComponent}
+      contentContainerStyle={{ paddingBottom: 20 }}
+    />
+  );
 }
 export function SummonerCodex() {
-  return <View></View>;
+  const headerComponent = () => (
+    <View className="px-4 pt-4">
+      <View className="items-center">
+        <SummonerSkull width={64} height={64} />
+      </View>
+      <View className="items-center">
+        <Text className="text-center pt-8">
+          The School of Fire has its focus in all out damage, fire spells hit
+          hard, and can leave enemies burnt.
+        </Text>
+        <Text
+          className="text-2xl py-4"
+          style={{ color: elementalColorMap["summoning"].dark }}
+        >
+          Available Spells:
+        </Text>
+      </View>
+    </View>
+  );
+
+  const renderItem = ({ item }) => (
+    <View className="py-2 mx-auto">
+      <SpellDetails
+        spell={{
+          name: item.name,
+          element: item.element,
+          proficiencyNeeded: toTitleCase(
+            item.proficiencyNeeded,
+          ) as unknown as MasteryLevel,
+          manaCost: item.manaCost,
+          duration: item.duration,
+          effects: item.effects,
+        }}
+      />
+    </View>
+  );
+
+  return (
+    <FlatList
+      data={necromancerSpells.filter((spell) => spell.element == "summoning")}
+      renderItem={renderItem}
+      keyExtractor={(item, index) => item.name || index.toString()}
+      ListHeaderComponent={headerComponent}
+      contentContainerStyle={{ paddingBottom: 20 }}
+    />
+  );
 }
+
 export function PaladinCodex() {
-  return <View></View>;
+  const headerComponent = () => (
+    <View className="px-4 pt-4">
+      <View className="items-center">
+        <PaladinHammer width={64} height={64} />
+      </View>
+      <View className="items-center">
+        <Text className="text-center pt-8">The Paladin...</Text>
+        <Text>The Paladin has three schools:</Text>
+        <Link href="/Options/Codex/Player/Protection" suppressHighlighting>
+          <Text
+            className="text-2xl"
+            style={{ color: elementalColorMap["protection"].dark }}
+          >
+            Protection
+          </Text>
+          <Protection height={24} width={24} />
+        </Link>
+        <Link href="/Options/Codex/Player/Vengeance" suppressHighlighting>
+          <Text
+            className="text-2xl"
+            style={{ color: elementalColorMap["vengeance"].dark }}
+          >
+            Vengeance
+          </Text>
+          <Vengeance height={24} width={24} />
+        </Link>
+        <Link href="/Options/Codex/Player/Holy" suppressHighlighting>
+          <Text
+            className="text-2xl"
+            style={{ color: elementalColorMap["holy"].dark }}
+          >
+            Holy
+          </Text>
+          <Holy height={24} width={24} />
+        </Link>
+        <Text className="text-2xl py-4" style={{ color: "#fcd34d" }}>
+          Available Spells:
+        </Text>
+      </View>
+    </View>
+  );
+
+  const renderItem = ({ item }) => (
+    <View className="py-2 mx-auto">
+      <SpellDetails
+        spell={{
+          name: item.name,
+          element: item.element,
+          proficiencyNeeded: toTitleCase(
+            item.proficiencyNeeded,
+          ) as unknown as MasteryLevel,
+          manaCost: item.manaCost,
+          duration: item.duration,
+          effects: item.effects,
+        }}
+      />
+    </View>
+  );
+
+  return (
+    <FlatList
+      data={paladinSpells}
+      renderItem={renderItem}
+      keyExtractor={(item, index) => item.name || index.toString()}
+      ListHeaderComponent={headerComponent}
+      contentContainerStyle={{ paddingBottom: 20 }}
+    />
+  );
 }
 export function ProtectionCodex() {
-  return <View></View>;
+  const headerComponent = () => (
+    <View className="px-4 pt-4">
+      <View className="items-center">
+        <Protection width={64} height={64} />
+      </View>
+      <View className="items-center">
+        <Text className="text-center pt-8">
+          The School of Fire has its focus in all out damage, fire spells hit
+          hard, and can leave enemies burnt.
+        </Text>
+        <Text
+          className="text-2xl py-4"
+          style={{ color: elementalColorMap["protection"].dark }}
+        >
+          Available Spells:
+        </Text>
+      </View>
+    </View>
+  );
+
+  const renderItem = ({ item }) => (
+    <View className="py-2 mx-auto">
+      <SpellDetails
+        spell={{
+          name: item.name,
+          element: item.element,
+          proficiencyNeeded: toTitleCase(
+            item.proficiencyNeeded,
+          ) as unknown as MasteryLevel,
+          manaCost: item.manaCost,
+          duration: item.duration,
+          effects: item.effects,
+        }}
+      />
+    </View>
+  );
+
+  return (
+    <FlatList
+      data={paladinSpells.filter((spell) => spell.element == "protection")}
+      renderItem={renderItem}
+      keyExtractor={(item, index) => item.name || index.toString()}
+      ListHeaderComponent={headerComponent}
+      contentContainerStyle={{ paddingBottom: 20 }}
+    />
+  );
 }
 export function VengeanceCodex() {
-  return <View></View>;
+  const headerComponent = () => (
+    <View className="px-4 pt-4">
+      <View className="items-center">
+        <Vengeance width={64} height={64} />
+      </View>
+      <View className="items-center">
+        <Text className="text-center pt-8">
+          The School of Fire has its focus in all out damage, fire spells hit
+          hard, and can leave enemies burnt.
+        </Text>
+        <Text
+          className="text-2xl py-4"
+          style={{ color: elementalColorMap["vengeance"].dark }}
+        >
+          Available Spells:
+        </Text>
+      </View>
+    </View>
+  );
+
+  const renderItem = ({ item }) => (
+    <View className="py-2 mx-auto">
+      <SpellDetails
+        spell={{
+          name: item.name,
+          element: item.element,
+          proficiencyNeeded: toTitleCase(
+            item.proficiencyNeeded,
+          ) as unknown as MasteryLevel,
+          manaCost: item.manaCost,
+          duration: item.duration,
+          effects: item.effects,
+        }}
+      />
+    </View>
+  );
+
+  return (
+    <FlatList
+      data={paladinSpells.filter((spell) => spell.element == "vengeance")}
+      renderItem={renderItem}
+      keyExtractor={(item, index) => item.name || index.toString()}
+      ListHeaderComponent={headerComponent}
+      contentContainerStyle={{ paddingBottom: 20 }}
+    />
+  );
 }
 export function HolyCodex() {
-  return <View></View>;
+  const headerComponent = () => (
+    <View className="px-4 pt-4">
+      <View className="items-center">
+        <Holy width={64} height={64} />
+      </View>
+      <View className="items-center">
+        <Text className="text-center pt-8">
+          The School of Fire has its focus in all out damage, fire spells hit
+          hard, and can leave enemies burnt.
+        </Text>
+        <Text
+          className="text-2xl py-4"
+          style={{ color: elementalColorMap["holy"].dark }}
+        >
+          Available Spells:
+        </Text>
+      </View>
+    </View>
+  );
+
+  const renderItem = ({ item }) => (
+    <View className="py-2 mx-auto">
+      <SpellDetails
+        spell={{
+          name: item.name,
+          element: item.element,
+          proficiencyNeeded: toTitleCase(
+            item.proficiencyNeeded,
+          ) as unknown as MasteryLevel,
+          manaCost: item.manaCost,
+          duration: item.duration,
+          effects: item.effects,
+        }}
+      />
+    </View>
+  );
+
+  return (
+    <FlatList
+      data={paladinSpells.filter((spell) => spell.element == "holy")}
+      renderItem={renderItem}
+      keyExtractor={(item, index) => item.name || index.toString()}
+      ListHeaderComponent={headerComponent}
+      contentContainerStyle={{ paddingBottom: 20 }}
+    />
+  );
 }

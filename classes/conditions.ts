@@ -1,6 +1,7 @@
 import { action, makeObservable, observable } from "mobx";
 import * as Crypto from "expo-crypto";
 import { ConditionType, effectOptions } from "../utility/types";
+import { PlayerCharacter } from "./character";
 
 export class Condition {
   readonly id: string;
@@ -83,17 +84,13 @@ export class Condition {
     return totalSanityDmg ? Math.round(totalSanityDmg * 4) / 4 : null;
   }
 
-  public tick() {
+  public tick(playerCharacter: PlayerCharacter) {
     if (!this.aura) {
       this.turns -= 1;
     }
-
-    return {
-      effect: this.effect,
-      healthDamage: this.getHealthDamage(),
-      sanityDamage: this.getSanityDamage(),
-      turns: this.turns,
-    };
+    playerCharacter.damageHealth(this.getHealthDamage());
+    playerCharacter.damageSanity(this.getSanityDamage());
+    return this.turns;
   }
 
   static fromJSON(json: any): Condition {

@@ -90,9 +90,24 @@ export type Spell = {
     selfDamage?: number | undefined;
   };
 };
+
+export enum Element {
+  fire = "fire",
+  earth = "earth",
+  air = "air",
+  water = "water",
+  summoning = "summoning",
+  pestilence = "pestilence",
+  blood = "blood",
+  bone = "bone",
+  holy = "holy",
+  vengeance = "vengeance",
+  protection = "protection",
+}
+
 export type SpellObj = {
   name: string;
-  element: string;
+  element: Element;
   proficiencyNeeded: number;
   manaCost: number;
   effects: {
