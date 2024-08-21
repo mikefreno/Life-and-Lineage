@@ -25,7 +25,8 @@ import {
   HealthIcon,
   Sanity,
 } from "../assets/icons/SVGIcons";
-import { specifiedEnemyGenerator } from "../utility/enemy";
+import { enemyGenerator } from "../utility/enemy";
+import { Enemy } from "../classes/creatures";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -179,14 +180,11 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   function setFight(outcome: BadOutcome) {
     setNothingHappened(false);
     setGoodOutcome(null);
-    const enemy = specifiedEnemyGenerator(outcome.fight ?? "");
-    if (!enemy) throw new Error("Activity fight enemy missing!");
-    setEnemy(enemy);
+
     playerState?.setInDungeon({
       state: true,
       instance: "Activities",
       level: outcome.dungeonTitle ?? "",
-      enemy: enemy,
     });
   }
 

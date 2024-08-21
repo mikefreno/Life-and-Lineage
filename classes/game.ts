@@ -130,13 +130,13 @@ export class Game {
     playerState.tickAllInvestments();
   }
   //----------------------------------Dungeon----------------------------------//
-  public getDungeon(instance: string, level: number): DungeonLevel | undefined {
+  public getDungeon(instance: string, level: string): DungeonLevel | undefined {
     const foundInstance = this.dungeonInstances.find(
       (dungeonInstance) => dungeonInstance.name == instance,
     );
     if (foundInstance) {
       const found = foundInstance.levels.find(
-        (dungeonLevel) => dungeonLevel.level == level,
+        (dungeonLevel) => dungeonLevel.level == Number(level),
       );
       return found;
     }

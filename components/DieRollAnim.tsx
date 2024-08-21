@@ -4,7 +4,7 @@ import { rollD20 } from "../utility/functions/roll";
 import { D20SVG } from "../assets/icons/SVGIcons";
 
 const D20Die = () => {
-  const [diceValue, setDiceValue] = useState(1);
+  const [diceValue, setDiceValue] = useState<number | undefined>();
   const spinValue = useRef(new Animated.Value(0)).current;
 
   const roll = () => {
@@ -44,7 +44,7 @@ const D20Die = () => {
         ]}
       >
         <D20SVG />
-        <Text style={styles.diceText}>{diceValue}</Text>
+        <Text style={styles.diceText}>{diceValue ?? ""}</Text>
       </Animated.View>
     </View>
   );

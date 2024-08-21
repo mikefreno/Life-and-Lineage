@@ -80,7 +80,7 @@ interface takeTurnProps {
 export class Creature {
   readonly id: string;
   readonly beingType: beingType;
-  creatureSpecies: string;
+  readonly creatureSpecies: string;
   health: number;
   readonly healthMax: number;
   sanity: number | null;

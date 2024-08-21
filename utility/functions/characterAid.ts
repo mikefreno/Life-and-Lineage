@@ -3,6 +3,7 @@ import { flipCoin, rollD20 } from "./roll";
 import jobs from "../../assets/json/jobs.json";
 import { getRandomName } from "./misc/words";
 import { generateBirthday } from "./misc/age";
+import names from "../../assets/json/names.json";
 
 export function generateNewCharacter() {
   const sex = flipCoin() == "Heads" ? "male" : "female";
@@ -57,4 +58,9 @@ export function getRandomSexuality() {
     if (rand < sum) return sexuality;
   }
   return "straight";
+}
+
+export function getSexFromName(firstName: string) {
+  const res = names.find((name) => name.firstName == firstName);
+  return res?.sex ?? "male";
 }

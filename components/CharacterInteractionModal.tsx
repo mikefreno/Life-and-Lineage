@@ -15,8 +15,6 @@ import { useRouter } from "expo-router";
 import { getDaysBetweenDates } from "../utility/functions/misc/date";
 import { AppContext } from "../app/_layout";
 import { AffectionIcon } from "../assets/icons/SVGIcons";
-import { specifiedEnemyGenerator } from "../utility/enemy";
-import { flipCoin } from "../utility/functions/roll";
 
 interface CharacterInteractionModal {
   character: Character | null;
@@ -38,7 +36,7 @@ export const CharacterInteractionModal = observer(
     if (!appData) {
       throw new Error("missing context");
     }
-    const { playerState, gameState, setEnemy } = appData;
+    const { playerState, gameState } = appData;
     const [showAssaultWarning, setShowAssaultWarning] =
       useState<boolean>(false);
     const [dateAvailable, setDateAvailable] = useState<boolean>(
@@ -61,20 +59,10 @@ export const CharacterInteractionModal = observer(
     function setFight() {
       if (character && playerState && gameState) {
         gameState.gameTick(playerState);
-        const name_for_image =
-          character.sex == "male"
-            ? "generic npc male"
-            : flipCoin() == "Heads"
-            ? "generic npc femaleA"
-            : "generic npc femaleB";
-        let enemy = specifiedEnemyGenerator("generic npc", name_for_image);
-        if (!enemy) throw new Error("enemy generation failed in assault");
-        setEnemy(enemy);
         playerState.setInDungeon({
           state: true,
           instance: "Personal",
           level: `Personal Assault,${character.getFullName()}`,
-          enemy: enemy,
         });
         closeFunction();
         router.push(

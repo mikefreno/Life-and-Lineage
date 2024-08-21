@@ -18,6 +18,9 @@ import {
 } from "../../components/DungeonComponents/DungeonContext";
 import DungeonLevelScreen from "../../components/DungeonComponents/DungeonLevelScreen";
 import type { AttackObj, SpellObj } from "../../utility/types";
+import { enemyGenerator } from "../../utility/enemy";
+import { getSexFromName } from "../../utility/functions/characterAid";
+import { flipCoin } from "../../utility/functions/roll";
 
 const DungeonProvider = observer(() => {
   const { slug } = useLocalSearchParams();
@@ -30,8 +33,6 @@ const DungeonProvider = observer(() => {
   const { playerState, gameState, setEnemy, enemyState, logsState } = appData;
 
   const [fightingBoss, setFightingBoss] = useState<boolean>(false);
-  const [instanceName, setInstanceName] = useState<string>(slug[0]);
-  const [level, setLevel] = useState<number>(Number(slug[1]));
   const [thisInstance, setThisInstance] = useState<DungeonInstance>();
   const [thisDungeon, setThisDungeon] = useState<DungeonLevel>();
   const [leftBehindDrops, setLeftBehindDrops] = useState<Item[]>([]);
@@ -67,25 +68,38 @@ const DungeonProvider = observer(() => {
     chosenAttack: AttackObj | SpellObj | null;
   }>({ showing: false, chosenAttack: null });
 
+  const instanceName = slug[0];
+  const level = slug[1];
+
   useEffect(() => {
-    setInstanceName(slug[0]);
     if (
-      slug[0] !== "Activities" &&
-      slug[0] !== "Personal" &&
-      slug[0] !== "training grounds"
+      (instanceName === "Activities" ||
+        instanceName === "Personal" ||
+        instanceName === "training grounds") &&
+      !enemyState
     ) {
-      setLevel(Number(slug[1]));
-    } else {
-      if (!enemyState) {
-        //setEnemy(playerState?.currentDungeon?.enemy);
+      let name: string | undefined = undefined;
+      if (slug.length > 2) {
+        let sex = getSexFromName(slug[2].split(" ")[0]);
+        name =
+          sex === "male"
+            ? "generic npc male"
+            : flipCoin() == "Heads"
+            ? "generic npc femaleA"
+            : "generic npc femaleB";
       }
+      console.log(name);
+      const enemy = enemyGenerator(instanceName, level, name);
+      if (!enemy) throw new Error(`missing enemy, slug: ${slug}`);
+      setEnemy(enemy);
       setEnemyAttacked(true);
+      setFirstLoad(true);
       setInCombat(true);
     }
   }, [slug]);
 
   useEffect(() => {
-    if (slug[0] !== "Activities" && slug[0] !== "Personal") {
+    if (instanceName !== "Activities" && instanceName !== "Personal") {
       if (!fightingBoss && !enemyState) {
         tiles.map((tile) => {
           if (tile.x == currentPosition?.x && tile.y == currentPosition.y) {
@@ -99,8 +113,11 @@ const DungeonProvider = observer(() => {
   }, [enemyState]);
 
   useEffect(() => {
+    console.log(enemyState);
     if (!firstLoad && !enemyState) {
-      setInCombat(false);
+      if (instanceName !== "Activities" && instanceName === "Personal") {
+        setInCombat(false);
+      }
       setFirstLoad(true);
     } else if (enemyState) {
       setFirstLoad(false);
@@ -136,7 +153,7 @@ const DungeonProvider = observer(() => {
 
   useEffect(() => {
     if (gameState) {
-      if (slug[0] == "Activities" || slug[0] == "Personal") {
+      if (instanceName == "Activities" || instanceName == "Personal") {
         const tempDungeon = new DungeonLevel({
           level: 0,
           bosses: [],
@@ -144,7 +161,7 @@ const DungeonProvider = observer(() => {
           bossDefeated: true,
         });
         const tempInstance = new DungeonInstance({
-          name: slug[1],
+          name: level,
           levels: [tempDungeon],
         });
         setThisDungeon(tempDungeon);

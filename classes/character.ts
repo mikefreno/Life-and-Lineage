@@ -2058,7 +2058,6 @@ type enterActivityProps = {
   state: true;
   instance: "Activities" | "Personal";
   level: string;
-  enemy: Enemy | null;
 };
 type leaveDungeonProps = {
   state: false;

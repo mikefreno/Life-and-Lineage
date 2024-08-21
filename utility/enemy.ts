@@ -2,12 +2,19 @@ import enemies from "../assets/json/enemy.json";
 import { Enemy } from "../classes/creatures";
 import { type beingType } from "./types";
 
-function pickRandomEnemyJSON(instance: string, level: number | string) {
+function isConvertibleToNumber(str: string) {
+  return /^-?\d*\.?\d+$/.test(str);
+}
+
+function pickRandomEnemyJSON(instance: string, level: string) {
   const enemiesInThisInstance = enemies.filter((enemy) =>
     enemy.appearsIn.includes(instance),
   );
+
   const enemiesOnThisLevel = enemiesInThisInstance.filter((enemy) =>
-    enemy.appearsOn.includes(level),
+    enemy.appearsOn.includes(
+      isConvertibleToNumber(level) ? Number(level) : level,
+    ),
   );
   const randomIndex = Math.floor(Math.random() * enemiesOnThisLevel.length);
   return enemiesOnThisLevel[randomIndex];
@@ -17,7 +24,11 @@ export function getNumberInRange(minimum: number, maximum: number) {
   return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
 }
 
-export function enemyGenerator(instance: string, level: string | number) {
+export function enemyGenerator(
+  instance: string,
+  level: string,
+  nameOverride?: string,
+) {
   const enemyJSON = pickRandomEnemyJSON(instance, level);
   if (enemyJSON) {
     const enemyHealth = getNumberInRange(
@@ -32,37 +43,7 @@ export function enemyGenerator(instance: string, level: string | number) {
 
     const enemy = new Enemy({
       beingType: enemyJSON.beingType as beingType,
-      creatureSpecies: enemyJSON.name,
-      health: enemyHealth,
-      healthMax: enemyHealth,
-      sanity: enemyJSON.sanity ?? null,
-      sanityMax: enemyJSON.sanity ?? null,
-      baseArmor: enemyJSON.armorValue ?? undefined,
-      attackPower: enemyAttackPower,
-      energy: enemyJSON.energy?.maximum,
-      energyMax: enemyJSON.energy?.maximum,
-      energyRegen: enemyJSON.energy?.regen,
-      attacks: enemyJSON.attacks,
-    });
-    return enemy;
-  }
-}
-export function specifiedEnemyGenerator(name: string, setNPCName?: string) {
-  const enemyJSON = enemies.find((enemy) => enemy.name == name);
-  if (enemyJSON) {
-    const enemyHealth = getNumberInRange(
-      enemyJSON.healthRange.minimum,
-      enemyJSON.healthRange.maximum,
-    );
-
-    const enemyAttackPower = getNumberInRange(
-      enemyJSON.attackPowerRange.minimum,
-      enemyJSON.attackPowerRange.maximum,
-    );
-
-    const enemy = new Enemy({
-      beingType: enemyJSON.beingType as beingType,
-      creatureSpecies: setNPCName ?? enemyJSON.name,
+      creatureSpecies: nameOverride ?? enemyJSON.name,
       health: enemyHealth,
       healthMax: enemyHealth,
       sanity: enemyJSON.sanity ?? null,

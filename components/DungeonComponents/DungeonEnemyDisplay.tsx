@@ -41,31 +41,6 @@ export default function DungeonEnemyDisplay() {
   const enemyTextTranslateAnimation = useState(new Animated.Value(0))[0];
 
   useEffect(() => {
-    if (enemyHealthDiff < 0) {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(enemyDamagedAnimationValue, {
-            toValue: 0.5,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-          Animated.timing(enemyDamagedAnimationValue, {
-            toValue: 1,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-        ]),
-        { iterations: 2 },
-      ).start(() => {
-        setTimeout(() => {
-          setShowingEnemyHealthChange(false);
-          setEnemyHealthDiff(0);
-        }, 500);
-      });
-    }
-  }, [enemyHealthDiff]);
-
-  useEffect(() => {
     if (
       enemyState &&
       enemyHealthRecord &&
@@ -116,6 +91,31 @@ export default function DungeonEnemyDisplay() {
       ]).start();
     }
   }, [enemyAttackDummy]);
+
+  useEffect(() => {
+    if (enemyHealthDiff < 0) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(enemyDamagedAnimationValue, {
+            toValue: 0.5,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(enemyDamagedAnimationValue, {
+            toValue: 1,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+        ]),
+        { iterations: 2 },
+      ).start(() => {
+        setTimeout(() => {
+          setShowingEnemyHealthChange(false);
+          setEnemyHealthDiff(0);
+        }, 500);
+      });
+    }
+  }, [enemyHealthDiff]);
 
   function EnemyHealthChangePopUp() {
     return (
@@ -183,7 +183,7 @@ export default function DungeonEnemyDisplay() {
           <View className="flex-1 flex-row justify-evenly pl-8">
             <View
               className="flex flex-col items-center justify-center"
-              style={{ minWidth: "40%" }}
+              style={{ minWidth: "40%", maxWidth: "60%" }}
             >
               <Text className="text-center text-3xl">
                 {enemyState.creatureSpecies

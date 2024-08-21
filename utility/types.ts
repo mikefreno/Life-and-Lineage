@@ -328,7 +328,7 @@ export interface DungeonContextType {
   setCurrentPosition: React.Dispatch<React.SetStateAction<Tile | null>>;
   mapDimensions: BoundingBox;
   setMapDimensions: React.Dispatch<React.SetStateAction<BoundingBox>>;
-  level: number;
+  level: string;
   instanceName: string;
   battleLogger: (whatHappened: string) => void;
   showingFirstBossKillTutorial: boolean;

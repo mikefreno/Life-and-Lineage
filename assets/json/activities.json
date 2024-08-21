@@ -120,7 +120,8 @@
       "randomBad":[
          {
             "name": "Raucous Local",
-            "dungeonTitle": "Festival"
+            "dungeonTitle": "Festival",
+            "fight": "drunkard"
          },
          {
             "name": "Ride broke down!",

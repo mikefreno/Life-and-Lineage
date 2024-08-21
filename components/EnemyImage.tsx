@@ -6,7 +6,8 @@ interface EnemyImageProps {
 }
 
 export function EnemyImage({ creatureSpecies }: EnemyImageProps) {
-  const enemy = EnemyImageMap[creatureSpecies];
+  let enemy = EnemyImageMap[creatureSpecies];
+
   return (
     <Image
       source={enemy ? enemy.source : require("../assets/images/items/Egg.png")}
