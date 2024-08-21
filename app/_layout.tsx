@@ -156,7 +156,6 @@ const RootLayout = observer(() => {
         while (router.canGoBack()) {
           router.back();
         }
-        console.log(playerState.currentDungeon);
         router.replace(
           `/DungeonLevel/${playerState.currentDungeon
             ?.instance}/${playerState.currentDungeon?.level
