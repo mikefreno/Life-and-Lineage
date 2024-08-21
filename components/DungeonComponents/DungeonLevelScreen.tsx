@@ -111,10 +111,10 @@ const DungeonLevelScreen = observer(() => {
               </Pressable>
             ),
             title:
-              level == 0 || slug[0] == "Activities"
-                ? slug[0] == "Activities"
-                  ? slug[1]
-                  : "Training Grounds"
+              slug[0] == "Activities" || slug[0] == "Personal"
+                ? slug[1]
+                : slug[0] === "training grounds"
+                ? "Training Grounds"
                 : `${toTitleCase(thisInstance?.name as string)} Level ${level}`,
           }}
         />

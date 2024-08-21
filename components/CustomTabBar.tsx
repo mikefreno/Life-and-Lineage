@@ -9,8 +9,6 @@ import { LinearGradientBlur } from "./LinearGradientBlur";
 const CustomTabBar = React.memo(() => {
   const { colorScheme } = useColorScheme();
 
-  console.log("rendering tab bar");
-
   return (
     <>
       <PlayerStatus home hideGold />

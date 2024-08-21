@@ -214,19 +214,12 @@ export class Creature {
   public conditionTicker() {
     let undeadDeathCheck = -1;
     for (let i = this.conditions.length - 1; i >= 0; i--) {
-      const { effect, healthDamage, sanityDamage, turns } =
-        this.conditions[i].tick();
+      const { effect, turns } = this.conditions[i].tick(this);
 
       if (effect.includes("destroy undead")) {
         undeadDeathCheck = getMagnitude(this.conditions[i].effectMagnitude);
       }
-      if (sanityDamage) {
-        this.damageSanity(sanityDamage);
-      }
-      if (healthDamage) {
-        this.damageHealth(healthDamage);
-      }
-      if (turns == 0) {
+      if (turns <= 0) {
         this.conditions.splice(i, 1);
       }
     }

@@ -18,6 +18,7 @@ import {
 } from "../../components/DungeonComponents/DungeonContext";
 import DungeonLevelScreen from "../../components/DungeonComponents/DungeonLevelScreen";
 import type { AttackObj, SpellObj } from "../../utility/types";
+import { enemyGenerator } from "../../utility/enemy";
 
 const DungeonProvider = observer(() => {
   const { slug } = useLocalSearchParams();
@@ -69,10 +70,23 @@ const DungeonProvider = observer(() => {
 
   useEffect(() => {
     setInstanceName(slug[0]);
-    if (slug[0] !== "Activities" && slug[0] !== "Personal") {
+    if (
+      slug[0] !== "Activities" &&
+      slug[0] !== "Personal" &&
+      slug[0] !== "training grounds"
+    ) {
       setLevel(Number(slug[1]));
     } else {
+      if (!enemyState) {
+        const enemy = enemyGenerator(slug[0], Number(slug[1]));
+        if (enemy) {
+          setEnemy(enemy);
+        } else {
+          throw new Error(`enemy gen failed, slug: ${slug}`);
+        }
+      }
       setEnemyAttacked(true);
+      setInCombat(true);
     }
   }, [slug]);
 

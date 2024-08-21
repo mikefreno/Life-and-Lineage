@@ -17,34 +17,64 @@ export function getNumberInRange(minimum: number, maximum: number) {
   return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
 }
 
-export function enemyGenerator(instance: string, level: number) {
+export function enemyGenerator(instance: string, level: string | number) {
   const enemyJSON = pickRandomEnemyJSON(instance, level);
-  if(enemyJSON){
-  const enemyHealth = getNumberInRange(
-    enemyJSON.healthRange.minimum,
-    enemyJSON.healthRange.maximum,
-  );
+  if (enemyJSON) {
+    const enemyHealth = getNumberInRange(
+      enemyJSON.healthRange.minimum,
+      enemyJSON.healthRange.maximum,
+    );
 
-  const enemyAttackPower = getNumberInRange(
-    enemyJSON.attackPowerRange.minimum,
-    enemyJSON.attackPowerRange.maximum,
-  );
+    const enemyAttackPower = getNumberInRange(
+      enemyJSON.attackPowerRange.minimum,
+      enemyJSON.attackPowerRange.maximum,
+    );
 
-  const enemy = new Enemy({
-    beingType: enemyJSON.beingType as beingType,
-    creatureSpecies: enemyJSON.name,
-    health: enemyHealth,
-    healthMax: enemyHealth,
-    sanity: enemyJSON.sanity ?? null,
-    sanityMax: enemyJSON.sanity ?? null,
-    baseArmor: enemyJSON.armorValue ?? undefined,
-    attackPower: enemyAttackPower,
-    energy: enemyJSON.energy?.maximum,
-    energyMax: enemyJSON.energy?.maximum,
-    energyRegen: enemyJSON.energy?.regen,
-    attacks: enemyJSON.attacks,
-  });
-  return enemy;
+    const enemy = new Enemy({
+      beingType: enemyJSON.beingType as beingType,
+      creatureSpecies: enemyJSON.name,
+      health: enemyHealth,
+      healthMax: enemyHealth,
+      sanity: enemyJSON.sanity ?? null,
+      sanityMax: enemyJSON.sanity ?? null,
+      baseArmor: enemyJSON.armorValue ?? undefined,
+      attackPower: enemyAttackPower,
+      energy: enemyJSON.energy?.maximum,
+      energyMax: enemyJSON.energy?.maximum,
+      energyRegen: enemyJSON.energy?.regen,
+      attacks: enemyJSON.attacks,
+    });
+    return enemy;
+  }
+}
+export function specifiedEnemyGenerator(name: string) {
+  const enemyJSON = enemies.find((enemy) => enemy.name == name);
+  if (enemyJSON) {
+    const enemyHealth = getNumberInRange(
+      enemyJSON.healthRange.minimum,
+      enemyJSON.healthRange.maximum,
+    );
+
+    const enemyAttackPower = getNumberInRange(
+      enemyJSON.attackPowerRange.minimum,
+      enemyJSON.attackPowerRange.maximum,
+    );
+
+    const enemy = new Enemy({
+      beingType: enemyJSON.beingType as beingType,
+      creatureSpecies: enemyJSON.name,
+      health: enemyHealth,
+      healthMax: enemyHealth,
+      sanity: enemyJSON.sanity ?? null,
+      sanityMax: enemyJSON.sanity ?? null,
+      baseArmor: enemyJSON.armorValue ?? undefined,
+      attackPower: enemyAttackPower,
+      energy: enemyJSON.energy?.maximum,
+      energyMax: enemyJSON.energy?.maximum,
+      energyRegen: enemyJSON.energy?.regen,
+      attacks: enemyJSON.attacks,
+    });
+    return enemy;
   }
 }
 
@@ -166,6 +196,21 @@ export const EnemyImageMap: Record<string, ImageInfo> = {
     source: require("../assets/images/monsters/witch.png"),
     width: 150,
     height: 150,
+  },
+  "generic npc male": {
+    source: require("../assets/images/monsters/generic_npc_male.png"),
+    width: 60,
+    height: 160,
+  },
+  "generic npc femaleA": {
+    source: require("../assets/images/monsters/generic_npc_femaleA.png"),
+    width: 100,
+    height: 160,
+  },
+  "generic npc femaleB": {
+    source: require("../assets/images/monsters/generic_npc_femaleB.png"),
+    width: 100,
+    height: 160,
   },
   zombie: {
     source: require("../assets/images/monsters/zombie.png"),

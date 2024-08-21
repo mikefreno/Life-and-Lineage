@@ -25,6 +25,8 @@ import {
   HealthIcon,
   Sanity,
 } from "../assets/icons/SVGIcons";
+import enemies from "../assets/json/enemy.json";
+import { enemyGenerator, specifiedEnemyGenerator } from "../utility/enemy";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -35,7 +37,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   if (!appData) {
     throw new Error("missing context");
   }
-  const { playerState, gameState } = appData;
+  const { playerState, gameState, setEnemy } = appData;
   const { colorScheme } = useColorScheme();
   const [metCharacter, setMetCharacter] = useState<Character | null>(null);
   const [nothingHappened, setNothingHappened] = useState<boolean>(false);
@@ -106,12 +108,8 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           if (randomBadOutcome.effect) {
             handleNonFightBadOutcome(randomBadOutcome.effect);
           }
-          if (
-            randomBadOutcome &&
-            randomBadOutcome.fight &&
-            randomBadOutcome.dungeonTitle
-          ) {
-            setFight(randomBadOutcome.dungeonTitle);
+          if (randomBadOutcome.fight) {
+            setFight(randomBadOutcome);
           }
           setMetCharacter(null);
           setGoodOutcome(null);
@@ -179,14 +177,17 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
     }
   }
 
-  function setFight(dungeonTitle: string) {
+  function setFight(outcome: BadOutcome) {
     setNothingHappened(false);
     setGoodOutcome(null);
-
+    const enemy = specifiedEnemyGenerator(outcome.fight ?? "");
+    if (!enemy) throw new Error("Activity fight enemy missing!");
+    setEnemy(enemy);
     playerState?.setInDungeon({
       state: true,
       instance: "Activities",
-      level: dungeonTitle,
+      level: outcome.dungeonTitle ?? "",
+      enemy: enemy,
     });
   }
 
@@ -271,8 +272,8 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   function payOff(gold: number) {
     playerState?.spendGold(gold);
     setBadOutcome(null);
+    setEnemy(null);
     playerState?.setInDungeon({ state: false });
-    playerState?.setSavedEnemy(null);
     setTimeout(() => setBadOutcome(null), 350);
   }
 

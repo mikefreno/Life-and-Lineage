@@ -1,4 +1,4 @@
-import { ScrollView, View } from "react-native";
+import { FlatList, ScrollView, View } from "react-native";
 import { Text } from "./Themed";
 import {
   Air,
@@ -18,11 +18,18 @@ import {
 } from "../assets/icons/SVGIcons";
 import { useColorScheme } from "nativewind";
 import { Link } from "expo-router";
+import { GenericCarousel } from "./GenericCarousel";
 
 export function CombatCodex() {
+  const images = [
+    require("../assets/images/codex/DungeonAttacks.png"),
+    require("../assets/images/codex/DungeonEquipment.png"),
+    require("../assets/images/codex/DungeonLog.png"),
+  ];
+
   return (
     <View>
-      <View></View>
+      <GenericCarousel images={images} />
     </View>
   );
 }
@@ -44,10 +51,27 @@ export function GearCodex() {
 }
 
 export function LaborCodex() {
+  const images = [
+    require("../assets/images/codex/Labors.jpeg"),
+    require("../assets/images/codex/LaborsRejection.jpeg"),
+    require("../assets/images/codex/QualificationsButton.jpeg"),
+    require("../assets/images/codex/Qualifications.jpeg"),
+  ];
   return (
-    <View>
-      <View></View>
-    </View>
+    <ScrollView>
+      <Text className="text-xl text-center px-2">
+        Labors are a way to earn gold in a (mostly) safe way.
+      </Text>
+      <GenericCarousel images={images} />
+      <Text className="text-xl text-center px-2">
+        There are a number of jobs you can take, some require no qualifications,
+        but most have some.
+      </Text>
+      <Text className="text-xl text-center p-2">
+        To gain new qualifications, go to the qualifications page, just keep an
+        eye on your sanity.
+      </Text>
+    </ScrollView>
   );
 }
 export function MagicCodex() {
@@ -57,13 +81,7 @@ export function MagicCodex() {
     </View>
   );
 }
-export function MonstersCodex() {
-  return (
-    <View>
-      <View></View>
-    </View>
-  );
-}
+
 export function PlayerCodex() {
   const { colorScheme } = useColorScheme();
 
@@ -229,14 +247,27 @@ export function PlayerCodex() {
             </Link>
           </View>
         </View>
+        <View></View>
       </View>
     </ScrollView>
   );
 }
 export function RelationshipsCodex() {
+  const images = [
+    require("../assets/images/codex/RelationshipsButton.jpeg"),
+    require("../assets/images/codex/Relationships.png"),
+    require("../assets/images/codex/RelationshipActions.png"),
+  ];
+  const images2 = [
+    require("../assets/images/codex/ActivitiesButton.jpeg"),
+    require("../assets/images/codex/Activities.jpeg"),
+  ];
+
   return (
     <View>
-      <View></View>
+      <GenericCarousel images={images} />
+      <Text>You can meet new people through various activities</Text>
+      <GenericCarousel images={images2} />
     </View>
   );
 }

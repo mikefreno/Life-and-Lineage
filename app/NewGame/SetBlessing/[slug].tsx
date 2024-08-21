@@ -27,27 +27,8 @@ import {
   Vengeance,
   Water,
 } from "../../../assets/icons/SVGIcons";
-
-const descriptionMap: Record<string, string> = {
-  fire: "With Fire, comes aggression. You will deal damage quickly and potentially burn enemies for additional damage over time.",
-  water:
-    "With Water, comes balance. You will deal moderate damage, reduce incoming damage, and even heal yourself",
-  air: "With Air, come control. You will bend the battlefield to your whim, from amplifying damage, to becoming impossible to hit.",
-  earth:
-    "With Earth, comes adamace. You will become unbreakable and stun your enemies in their place",
-  summoning:
-    "With Summoning, you will bend the undead to your will, overwhelm your enemies.",
-  pestilence:
-    "With Pesitilence, you will control an unseen force to cripple your enemies, or destroy them from within.",
-  bone: "With Bone, you will shield yourself or destroy your foes.",
-  blood:
-    "With Blood, you will control the life force of enemies and yourself, sacrifice for ultimate power.",
-  holy: "With Holy, you will heal yourself, others, and blast away the undead.",
-  vengeance:
-    "With Vengeance, you will smite the unworthy, combining arms with blessed power.",
-  protection:
-    "With Protection, you will shield yourself and others, become invulnerable.",
-};
+import { descriptionMap } from "../../../utility/descriptions";
+import { Element } from "../../../utility/types";
 
 export default function SetBlessing() {
   const { slug } = useLocalSearchParams();
@@ -505,7 +486,7 @@ export default function SetBlessing() {
           <ThemedView className="flex-1 justify-evenly">
             {classDependantBlessings()}
             <Text className="text-center md:text-lg">
-              {descriptionMap[blessing]}
+              {descriptionMap[blessing as Element]}
             </Text>
             {blessing ? (
               <View className="mx-auto h-32 py-2">

@@ -24,6 +24,7 @@ import SpellDetails from "./SpellDetails";
 import type { MasteryLevel } from "../utility/types";
 import { toTitleCase } from "../utility/functions/misc/words";
 import { elementalColorMap } from "../utility/elementColors";
+import { descriptionMap } from "../utility/descriptions";
 
 export function MageCodex() {
   const headerComponent = () => (
@@ -55,7 +56,7 @@ export function MageCodex() {
           </Text>
           <Water height={24} width={24} />
         </Link>
-        <Link href="/Options/Codex/Air" suppressHighlighting>
+        <Link href="/Options/Codex/Player/Air" suppressHighlighting>
           <Text
             className="text-2xl"
             style={{ color: elementalColorMap["air"].dark }}
@@ -64,7 +65,7 @@ export function MageCodex() {
           </Text>
           <Air height={24} width={24} />
         </Link>
-        <Link href="/Options/Codex/Earth" suppressHighlighting>
+        <Link href="/Options/Codex/Player/Earth" suppressHighlighting>
           <Text
             className="text-2xl"
             style={{ color: elementalColorMap["earth"].dark }}
@@ -115,11 +116,7 @@ export function WaterCodex() {
         <Water width={64} height={64} />
       </View>
       <View className="items-center">
-        <Text className="text-center pt-8">
-          The School of Water focuses on healing the caster and freezing
-          opponents, at the highest levels it can even give the caster control
-          over their enemies.
-        </Text>
+        <Text className="text-center pt-8">{descriptionMap["water"]}</Text>
         <Text
           className="text-2xl py-4"
           style={{ color: elementalColorMap["water"].dark }}
@@ -165,10 +162,7 @@ export function FireCodex() {
         <Fire width={64} height={64} />
       </View>
       <View className="items-center">
-        <Text className="text-center pt-8">
-          The School of Fire has its focus in all out damage, fire spells hit
-          hard, and can leave enemies burnt.
-        </Text>
+        <Text className="text-center pt-8">{descriptionMap["fire"]}</Text>
         <Text
           className="text-2xl py-4"
           style={{ color: elementalColorMap["fire"].dark }}
@@ -214,10 +208,7 @@ export function EarthCodex() {
         <Earth width={64} height={64} />
       </View>
       <View className="items-center">
-        <Text className="text-center pt-8">
-          The School of Earth believes in defense. Prevent your enemies from
-          moving and coat yourself in armor of stones.
-        </Text>
+        <Text className="text-center pt-8">{descriptionMap["earth"]}</Text>
         <Text
           className="text-2xl py-4"
           style={{ color: elementalColorMap["earth"].dark }}
@@ -263,10 +254,7 @@ export function AirCodex() {
         <Air width={64} height={64} />
       </View>
       <View className="items-center">
-        <Text className="text-center pt-8">
-          The School of Air channels lightning and terrifying winds, these
-          spells can debilitate and defend.
-        </Text>
+        <Text className="text-center pt-8">{descriptionMap["air"]}</Text>
         <Text
           className="text-2xl py-4"
           style={{ color: elementalColorMap["air"].dark }}
@@ -312,7 +300,10 @@ export function NecromancerCodex() {
         <NecromancerSkull width={64} height={64} />
       </View>
       <View className="items-center">
-        <Text className="text-center pt-8">The Necromancer</Text>
+        <Text className="text-center pt-8">
+          The Necromancer controls the forces of death, they can summon minions,
+          use blood, bone and poisonous magics.
+        </Text>
         <Text>The Necromancer has four schools:</Text>
         <Link href="/Options/Codex/Player/Blood" suppressHighlighting>
           <Text
@@ -391,10 +382,7 @@ export function BloodCodex() {
         <BloodDrop width={64} height={64} />
       </View>
       <View className="items-center">
-        <Text className="text-center pt-8">
-          The School of Fire has its focus in all out damage, fire spells hit
-          hard, and can leave enemies burnt.
-        </Text>
+        <Text className="text-center pt-8">{descriptionMap["blood"]}</Text>
         <Text
           className="text-2xl py-4"
           style={{ color: elementalColorMap["blood"].dark }}
@@ -440,10 +428,7 @@ export function PestilenceCodex() {
         <Pestilence width={64} height={64} />
       </View>
       <View className="items-center">
-        <Text className="text-center pt-8">
-          The School of Fire has its focus in all out damage, fire spells hit
-          hard, and can leave enemies burnt.
-        </Text>
+        <Text className="text-center pt-8">{descriptionMap["pestilence"]}</Text>
         <Text
           className="text-2xl py-4"
           style={{ color: elementalColorMap["pestilence"].dark }}
@@ -488,10 +473,7 @@ export function BoneCodex() {
         <Bones width={64} height={64} />
       </View>
       <View className="items-center">
-        <Text className="text-center pt-8">
-          The School of Fire has its focus in all out damage, fire spells hit
-          hard, and can leave enemies burnt.
-        </Text>
+        <Text className="text-center pt-8">{descriptionMap["bone"]}</Text>
         <Text
           className="text-2xl py-4"
           style={{ color: elementalColorMap["bone"].dark }}
@@ -536,10 +518,7 @@ export function SummonerCodex() {
         <SummonerSkull width={64} height={64} />
       </View>
       <View className="items-center">
-        <Text className="text-center pt-8">
-          The School of Fire has its focus in all out damage, fire spells hit
-          hard, and can leave enemies burnt.
-        </Text>
+        <Text className="text-center pt-8">{descriptionMap["summoning"]}</Text>
         <Text
           className="text-2xl py-4"
           style={{ color: elementalColorMap["summoning"].dark }}
@@ -585,7 +564,10 @@ export function PaladinCodex() {
         <PaladinHammer width={64} height={64} />
       </View>
       <View className="items-center">
-        <Text className="text-center pt-8">The Paladin...</Text>
+        <Text className="text-center pt-8">
+          The Paladin is skilled with arms and uses holy magic, which is
+          especially powerful against the undead and protecting life.
+        </Text>
         <Text>The Paladin has three schools:</Text>
         <Link href="/Options/Codex/Player/Protection" suppressHighlighting>
           <Text
@@ -655,10 +637,7 @@ export function ProtectionCodex() {
         <Protection width={64} height={64} />
       </View>
       <View className="items-center">
-        <Text className="text-center pt-8">
-          The School of Fire has its focus in all out damage, fire spells hit
-          hard, and can leave enemies burnt.
-        </Text>
+        <Text className="text-center pt-8">{descriptionMap["protection"]}</Text>
         <Text
           className="text-2xl py-4"
           style={{ color: elementalColorMap["protection"].dark }}
@@ -703,10 +682,7 @@ export function VengeanceCodex() {
         <Vengeance width={64} height={64} />
       </View>
       <View className="items-center">
-        <Text className="text-center pt-8">
-          The School of Fire has its focus in all out damage, fire spells hit
-          hard, and can leave enemies burnt.
-        </Text>
+        <Text className="text-center pt-8">{descriptionMap["vengeance"]}</Text>
         <Text
           className="text-2xl py-4"
           style={{ color: elementalColorMap["vengeance"].dark }}
@@ -751,10 +727,7 @@ export function HolyCodex() {
         <Holy width={64} height={64} />
       </View>
       <View className="items-center">
-        <Text className="text-center pt-8">
-          The School of Fire has its focus in all out damage, fire spells hit
-          hard, and can leave enemies burnt.
-        </Text>
+        <Text className="text-center pt-8">{descriptionMap["holy"]}</Text>
         <Text
           className="text-2xl py-4"
           style={{ color: elementalColorMap["holy"].dark }}

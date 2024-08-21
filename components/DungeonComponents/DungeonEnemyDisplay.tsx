@@ -18,6 +18,7 @@ export default function DungeonEnemyDisplay() {
   if (!dungeonData || !appData) throw new Error("missing context");
   const { enemyState } = appData;
   const {
+    slug,
     enemyTextString,
     enemyHealDummy,
     enemyAttackDummy,
@@ -185,7 +186,11 @@ export default function DungeonEnemyDisplay() {
               style={{ minWidth: "40%" }}
             >
               <Text className="text-center text-3xl">
-                {toTitleCase(enemyState.creatureSpecies).replace(" ", "\n")}
+                {enemyState.creatureSpecies
+                  .toLowerCase()
+                  .includes("generic npc")
+                  ? slug[2]
+                  : toTitleCase(enemyState.creatureSpecies).replace(" ", "\n")}
               </Text>
               <ProgressBar
                 value={enemyState.health >= 0 ? enemyState.health : 0}

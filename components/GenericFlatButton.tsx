@@ -8,12 +8,14 @@ type GenericFlatButton = {
   backgroundColor?: ColorValue;
   className?: string;
   children: string | ReactNode;
+  textColor?: string;
 };
 
 const GenericFlatButton = ({
   onPressFunction,
   disabledCondition = false,
   backgroundColor,
+  textColor,
   children,
   className,
 }: GenericFlatButton) => {
@@ -35,7 +37,11 @@ const GenericFlatButton = ({
           {typeof children === "string" ? (
             <Text
               className="text-center text-lg tracking-widest"
-              style={disabledCondition ? { color: "#d4d4d8" } : {}}
+              style={
+                disabledCondition
+                  ? { color: "#d4d4d8" }
+                  : { color: textColor ?? undefined }
+              }
             >
               {children}
             </Text>

@@ -19,7 +19,8 @@
          {
             "name": "Mugged!",
             "buyOff": {"price": 300},
-            "dungeonTitle": "Enchanted Forest"
+            "dungeonTitle": "Enchanted Forest",
+            "fight": "bandit"
          }
       ],
       "randomGood": [
@@ -85,7 +86,8 @@
       "randomBad":[
          {
             "name": "Bar Fight",
-            "dungeonTitle": "Local Pub"
+            "dungeonTitle": "Local Pub",
+            "fight": "drunkard"
          }
       ],
       "randomGood":[

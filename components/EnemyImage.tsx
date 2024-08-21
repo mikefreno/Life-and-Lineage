@@ -11,8 +11,8 @@ export function EnemyImage({ creatureSpecies }: EnemyImageProps) {
     <Image
       source={enemy ? enemy.source : require("../assets/images/items/Egg.png")}
       style={{
-        width: enemy.width,
-        height: enemy.height,
+        width: enemy?.width ?? 150,
+        height: enemy?.height ?? 150,
       }}
     />
   );

@@ -10,10 +10,8 @@ import {
   GearCodex,
   LaborCodex,
   MagicCodex,
-  MonstersCodex,
   PlayerCodex,
   RelationshipsCodex,
-  ShopsCodex,
 } from "../../../components/CodexPages";
 import {
   AirCodex,
@@ -40,10 +38,8 @@ const CategoryMap: { [key: string]: React.JSX.Element } = {
   Gear: <GearCodex />,
   Labor: <LaborCodex />,
   Magic: <MagicCodex />,
-  Monsters: <MonstersCodex />,
   Player: <PlayerCodex />,
   Relationships: <RelationshipsCodex />,
-  Shops: <ShopsCodex />,
 };
 
 const SecondaryMap: { [key: string]: React.JSX.Element } = {

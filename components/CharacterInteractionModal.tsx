@@ -15,6 +15,9 @@ import { useRouter } from "expo-router";
 import { getDaysBetweenDates } from "../utility/functions/misc/date";
 import { AppContext } from "../app/_layout";
 import { AffectionIcon } from "../assets/icons/SVGIcons";
+import { specifiedEnemyGenerator } from "../utility/enemy";
+import { flipCoin } from "../utility/functions/roll";
+import { Enemy } from "../classes/creatures";
 
 interface CharacterInteractionModal {
   character: Character | null;
@@ -23,6 +26,7 @@ interface CharacterInteractionModal {
   backdropCloses?: boolean;
   showGiftModal: () => void;
 }
+
 export const CharacterInteractionModal = observer(
   ({
     character,
@@ -35,7 +39,7 @@ export const CharacterInteractionModal = observer(
     if (!appData) {
       throw new Error("missing context");
     }
-    const { playerState, gameState } = appData;
+    const { playerState, gameState, setEnemy } = appData;
     const [showAssaultWarning, setShowAssaultWarning] =
       useState<boolean>(false);
     const [dateAvailable, setDateAvailable] = useState<boolean>(
@@ -58,6 +62,18 @@ export const CharacterInteractionModal = observer(
     function setFight() {
       if (character && playerState && gameState) {
         gameState.gameTick(playerState);
+        let enemy = specifiedEnemyGenerator("generic npc");
+        if (!enemy) throw new Error("generic npc not found");
+        let img_mod = { ...enemy };
+        if (character.sex == "male") {
+          img_mod.creatureSpecies = "generic npc male";
+        } else {
+          if (flipCoin() == "Heads") {
+            img_mod.creatureSpecies = "generic npc femaleA";
+          }
+          img_mod.creatureSpecies = "generic npc femaleB";
+        }
+        setEnemy(img_mod as Enemy);
         router.push(
           `/DungeonLevel/Personal/Personal\ Assault/${character.getFullName()}`,
         );
@@ -221,6 +237,7 @@ export const CharacterInteractionModal = observer(
                   <View className="my-auto">
                     <GenericFlatButton
                       backgroundColor={"#450a0a"}
+                      textColor={"#a1a1aa"}
                       onPressFunction={() => {
                         vibration({ style: "warning", essential: true });
                         setFight();

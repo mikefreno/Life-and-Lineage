@@ -223,8 +223,8 @@
       ],
       "goldDropRange": {"minimum": 40, "maximum":100},
       "armorValue": 5,
-      "appearsIn": ["Activities"],
-      "appearsOn": ["Festival"]
+      "appearsIn": [],
+      "appearsOn": []
    },
    {
       "name": "generic npc",
@@ -239,7 +239,7 @@
       ],
       "goldDropRange": {"minimum": 250, "maximum":1000},
       "armorValue": 5,
-      "appearsIn": [""],
-      "appearsOn": []
+      "appearsIn": ["Personal"],
+      "appearsOn": ["Personal Assault"]
    }
 ]

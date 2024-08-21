@@ -1369,9 +1369,9 @@ export class PlayerCharacter extends Character {
 
   public conditionTicker() {
     for (let i = this.conditions.length - 1; i >= 0; i--) {
-      const turnsRemaining = this.conditions[i].tick(this);
+      const { turns } = this.conditions[i].tick(this);
 
-      if (turnsRemaining == 0) {
+      if (turns <= 0) {
         this.conditions.splice(i, 1);
       }
     }
@@ -2032,10 +2032,20 @@ type enterDungeonProps = {
   fightingBoss: boolean;
 };
 
+type enterActivityProps = {
+  state: true;
+  instance: "Activities";
+  level: string;
+  enemy: Enemy | null;
+};
+
 type leaveDungeonProps = {
   state: false;
 };
-type inDungeonProps = enterDungeonProps | leaveDungeonProps;
+type inDungeonProps =
+  | enterDungeonProps
+  | leaveDungeonProps
+  | enterActivityProps;
 
 interface ShopProps {
   baseGold: number;

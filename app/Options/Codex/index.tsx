@@ -7,13 +7,10 @@ import { useColorScheme } from "nativewind";
 const categories = [
   "Player",
   "Relationships",
-  "Magic",
   "Labor",
-  "Dungeon",
   "Combat",
-  "Monsters",
+  "Magic",
   "Gear",
-  "Shops",
 ];
 
 export default function Codex() {

@@ -266,12 +266,12 @@ export default function NewGameScreen() {
           {selectedClass == "paladin" ? (
             <Text className="mt-[2vh] h-16 text-center md:text-lg">
               The Paladin is skilled with arms and uses holy magic, which is
-              especially powerful against the undead.
+              especially powerful against the undead and protecting life.
             </Text>
           ) : selectedClass == "necromancer" ? (
             <Text className="mt-[2vh] h-16 text-center md:text-lg">
-              The Necromancer can summon minions, use blood, bone and poisonous
-              magics.
+              The Necromancer controls the forces of death, they can summon
+              minions, use blood, bone and poisonous magics.
             </Text>
           ) : (
             <Text className="mt-[2vh] h-16 text-center md:text-lg"></Text>
