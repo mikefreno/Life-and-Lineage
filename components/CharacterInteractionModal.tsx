@@ -17,7 +17,6 @@ import { AppContext } from "../app/_layout";
 import { AffectionIcon } from "../assets/icons/SVGIcons";
 import { specifiedEnemyGenerator } from "../utility/enemy";
 import { flipCoin } from "../utility/functions/roll";
-import { Enemy } from "../classes/creatures";
 
 interface CharacterInteractionModal {
   character: Character | null;
@@ -62,18 +61,22 @@ export const CharacterInteractionModal = observer(
     function setFight() {
       if (character && playerState && gameState) {
         gameState.gameTick(playerState);
-        let enemy = specifiedEnemyGenerator("generic npc");
-        if (!enemy) throw new Error("generic npc not found");
-        let img_mod = { ...enemy };
-        if (character.sex == "male") {
-          img_mod.creatureSpecies = "generic npc male";
-        } else {
-          if (flipCoin() == "Heads") {
-            img_mod.creatureSpecies = "generic npc femaleA";
-          }
-          img_mod.creatureSpecies = "generic npc femaleB";
-        }
-        setEnemy(img_mod as Enemy);
+        const name_for_image =
+          character.sex == "male"
+            ? "generic npc male"
+            : flipCoin() == "Heads"
+            ? "generic npc femaleA"
+            : "generic npc femaleB";
+        let enemy = specifiedEnemyGenerator("generic npc", name_for_image);
+        if (!enemy) throw new Error("enemy generation failed in assault");
+        setEnemy(enemy);
+        playerState.setInDungeon({
+          state: true,
+          instance: "Personal",
+          level: `Personal Assault,${character.getFullName()}`,
+          enemy: enemy,
+        });
+        closeFunction();
         router.push(
           `/DungeonLevel/Personal/Personal\ Assault/${character.getFullName()}`,
         );

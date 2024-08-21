@@ -47,7 +47,7 @@ export function enemyGenerator(instance: string, level: string | number) {
     return enemy;
   }
 }
-export function specifiedEnemyGenerator(name: string) {
+export function specifiedEnemyGenerator(name: string, setNPCName?: string) {
   const enemyJSON = enemies.find((enemy) => enemy.name == name);
   if (enemyJSON) {
     const enemyHealth = getNumberInRange(
@@ -62,7 +62,7 @@ export function specifiedEnemyGenerator(name: string) {
 
     const enemy = new Enemy({
       beingType: enemyJSON.beingType as beingType,
-      creatureSpecies: enemyJSON.name,
+      creatureSpecies: setNPCName ?? enemyJSON.name,
       health: enemyHealth,
       healthMax: enemyHealth,
       sanity: enemyJSON.sanity ?? null,
@@ -204,12 +204,12 @@ export const EnemyImageMap: Record<string, ImageInfo> = {
   },
   "generic npc femaleA": {
     source: require("../assets/images/monsters/generic_npc_femaleA.png"),
-    width: 100,
+    width: 80,
     height: 160,
   },
   "generic npc femaleB": {
     source: require("../assets/images/monsters/generic_npc_femaleB.png"),
-    width: 100,
+    width: 80,
     height: 160,
   },
   zombie: {

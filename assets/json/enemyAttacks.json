@@ -82,9 +82,9 @@
       "name": "pocket sand",
       "energyCost": 5,
       "targets": "single",
-      "hitChance": 0.95,
+      "hitChance": 0.90,
       "damageMult": 0.0,
-      "debuffs": [{"name":"blind", "chance":0.50}]
+      "debuffs": [{"name":"blind", "chance":1.0}]
    },
    {
       "name": "poison spray",

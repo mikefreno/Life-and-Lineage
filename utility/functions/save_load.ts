@@ -165,14 +165,15 @@ export function dungeonSave({ enemy, dungeonData, appData }: dungeonSave) {
     throw new Error("missing context in dungeonSave()");
   const { playerState, gameState } = appData;
   const {
+    slug,
     tiles,
     instanceName,
-    level,
     currentPosition,
     fightingBoss,
     mapDimensions,
   } = dungeonData;
   if (playerState && gameState) {
+    const level = slug.length > 2 ? slug[1] + "," + slug[2] : slug[1];
     if (tiles.length > 0) {
       playerState.setInDungeon({
         state: true,

@@ -238,12 +238,12 @@ export default function DungeonEnemyDisplay() {
                   transform: [{ translateY: enemyTextTranslateAnimation }],
                   opacity: enemyTextFadeAnimation,
                   position: "absolute",
-                  marginLeft: 48,
+                  marginLeft: 0,
                   marginTop: 48,
                 }}
               >
                 {enemyTextString ? (
-                  <Text className="text-center text-xl tracking-wide">
+                  <Text className="text-center text-xl tracking-wide min-w-[6rem]">
                     *{toTitleCase(enemyTextString)}*
                   </Text>
                 ) : null}

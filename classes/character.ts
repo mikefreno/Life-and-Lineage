@@ -54,6 +54,7 @@ import type {
   BoundingBox,
   Tile,
 } from "../components/DungeonComponents/DungeonMap";
+import { toTitleCase } from "../utility/functions/misc/words";
 
 interface CharacterOptions {
   id?: string;
@@ -249,7 +250,7 @@ type PlayerCharacterBase = {
   minions?: Minion[];
   currentDungeon?: {
     instance: string;
-    level: number | string;
+    level: string;
     dungeonMap: Tile[];
     currentPosition: Tile;
     enemy: Enemy | null;
@@ -343,17 +344,12 @@ export class PlayerCharacter extends Character {
   inventory: Item[];
   currentDungeon: {
     instance: string;
-    level: number | string;
+    level: string;
     dungeonMap: Tile[];
     currentPosition: Tile;
     enemy: Enemy | null;
     fightingBoss: boolean;
-    mapDimensions: {
-      width: number;
-      height: number;
-      offsetX: number;
-      offsetY: number;
-    };
+    mapDimensions: BoundingBox;
   } | null;
   equipment: {
     mainHand: Item;
@@ -1756,15 +1752,40 @@ export class PlayerCharacter extends Character {
 
   public setInDungeon(props: inDungeonProps) {
     if (props.state) {
-      this.currentDungeon = {
-        instance: props.instance,
-        level: props.level,
-        dungeonMap: props.dungeonMap,
-        currentPosition: props.currentPosition,
-        mapDimensions: props.mapDimensions,
-        enemy: props.enemy,
-        fightingBoss: props.fightingBoss,
-      };
+      if ("dungeonMap" in props) {
+        this.currentDungeon = {
+          instance: props.instance,
+          level: props.level,
+          dungeonMap: props.dungeonMap,
+          currentPosition: props.currentPosition,
+          mapDimensions: props.mapDimensions,
+          enemy: props.enemy,
+          fightingBoss: props.fightingBoss,
+        };
+      } else {
+        const syntheticTile: Tile = {
+          x: 0,
+          y: 0,
+          clearedRoom: false,
+          isBossRoom: false,
+        };
+        const syntheticDungeon = [syntheticTile];
+        const mapDimensions = {
+          width: 0,
+          height: 0,
+          offsetX: 0,
+          offsetY: 0,
+        };
+        this.currentDungeon = {
+          instance: props.instance,
+          level: props.level,
+          dungeonMap: syntheticDungeon,
+          currentPosition: syntheticTile,
+          mapDimensions: mapDimensions,
+          enemy: props.enemy,
+          fightingBoss: false,
+        };
+      }
     } else {
       this.currentDungeon = null;
     }
@@ -1931,11 +1952,12 @@ export function getStartingBook(
     | "vengeance"
     | "protection",
 ) {
+  const itemType = ItemClassType["Book"];
   if (playerBlessing == "fire") {
     return new Item({
       name: "book of fire bolt",
       baseValue: 2500,
-      itemClass: "book",
+      itemClass: itemType,
       icon: "Book",
     });
   }
@@ -1943,7 +1965,7 @@ export function getStartingBook(
     return new Item({
       name: "book of frost",
       baseValue: 2500,
-      itemClass: "book",
+      itemClass: itemType,
       icon: "Book",
     });
   }
@@ -1951,7 +1973,7 @@ export function getStartingBook(
     return new Item({
       name: "book of gust",
       baseValue: 2500,
-      itemClass: "book",
+      itemClass: itemType,
       icon: "Book",
     });
   }
@@ -1959,7 +1981,7 @@ export function getStartingBook(
     return new Item({
       name: "book of rock toss",
       baseValue: 2500,
-      itemClass: "book",
+      itemClass: itemType,
       icon: "Book",
     });
   }
@@ -1967,7 +1989,7 @@ export function getStartingBook(
     return new Item({
       name: "book of pull blood",
       baseValue: 2500,
-      itemClass: "book",
+      itemClass: itemType,
       icon: "Book",
     });
   }
@@ -1975,7 +1997,7 @@ export function getStartingBook(
     return new Item({
       name: "book of the flying skull",
       baseValue: 2500,
-      itemClass: "book",
+      itemClass: itemType,
       icon: "Book",
     });
   }
@@ -1983,7 +2005,7 @@ export function getStartingBook(
     return new Item({
       name: "book of poison dart",
       baseValue: 2500,
-      itemClass: "book",
+      itemClass: itemType,
       icon: "Book",
     });
   }
@@ -1991,7 +2013,7 @@ export function getStartingBook(
     return new Item({
       name: "book of teeth",
       baseValue: 2500,
-      itemClass: "book",
+      itemClass: itemType,
       icon: "Book",
     });
   }
@@ -1999,7 +2021,7 @@ export function getStartingBook(
     return new Item({
       name: "book of flash heal",
       baseValue: 2500,
-      itemClass: "book",
+      itemClass: itemType,
       icon: "Book",
     });
   }
@@ -2007,7 +2029,7 @@ export function getStartingBook(
     return new Item({
       name: "book of blessed guard",
       baseValue: 2500,
-      itemClass: "book",
+      itemClass: itemType,
       icon: "Book",
     });
   }
@@ -2015,7 +2037,7 @@ export function getStartingBook(
     return new Item({
       name: "book of judgment",
       baseValue: 2500,
-      itemClass: "book",
+      itemClass: itemType,
       icon: "Book",
     });
   } else throw new Error("Invalid player blessing in getStartingBook()");
@@ -2024,7 +2046,7 @@ export function getStartingBook(
 type enterDungeonProps = {
   state: true;
   instance: string;
-  level: number | string;
+  level: string;
   dungeonMap: Tile[];
   currentPosition: Tile;
   enemy: Enemy | null;
@@ -2034,11 +2056,10 @@ type enterDungeonProps = {
 
 type enterActivityProps = {
   state: true;
-  instance: "Activities";
+  instance: "Activities" | "Personal";
   level: string;
   enemy: Enemy | null;
 };
-
 type leaveDungeonProps = {
   state: false;
 };
@@ -2143,7 +2164,8 @@ function getAnItemByType(
   type: string,
   playerClass: "mage" | "paladin" | "necromancer",
 ): Item {
-  if (type == "artifact") {
+  type = toTitleCase(type);
+  if (type == "Artifact") {
     const idx = getRandomInt(0, artifacts.length - 1);
     const itemObj = artifacts[idx];
     return new Item({
@@ -2151,11 +2173,11 @@ function getAnItemByType(
       baseValue: itemObj.baseValue,
       slot: null,
       stats: null,
-      itemClass: type,
+      itemClass: ItemClassType[type],
       icon: itemObj.icon,
     });
   }
-  if (type == "bodyArmor") {
+  if (type == "BodyArmor") {
     const idx = getRandomInt(0, bodyArmor.length - 1);
     const itemObj = bodyArmor[idx];
     return new Item({
@@ -2163,11 +2185,11 @@ function getAnItemByType(
       baseValue: itemObj.baseValue,
       slot: "body",
       stats: itemObj.stats,
-      itemClass: type,
+      itemClass: ItemClassType[type],
       icon: itemObj.icon,
     });
   }
-  if (type == "book") {
+  if (type == "Book") {
     let books;
     if (playerClass == "paladin") {
       books = paladinBooks;
@@ -2183,11 +2205,11 @@ function getAnItemByType(
       baseValue: itemObj.baseValue,
       slot: null,
       stats: null,
-      itemClass: type,
+      itemClass: ItemClassType[type],
       icon: itemObj.icon,
     });
   }
-  if (type == "focus") {
+  if (type == "Focus") {
     const idx = getRandomInt(0, foci.length - 1);
     const itemObj = foci[idx];
     return new Item({
@@ -2195,11 +2217,11 @@ function getAnItemByType(
       baseValue: itemObj.baseValue,
       slot: "off-hand",
       stats: null,
-      itemClass: type,
+      itemClass: ItemClassType[type],
       icon: itemObj.icon,
     });
   }
-  if (type == "hat") {
+  if (type == "Hat") {
     const idx = getRandomInt(0, hats.length - 1);
     const itemObj = hats[idx];
     return new Item({
@@ -2207,11 +2229,11 @@ function getAnItemByType(
       baseValue: itemObj.baseValue,
       slot: "head",
       stats: itemObj.stats,
-      itemClass: type,
+      itemClass: ItemClassType[type],
       icon: itemObj.icon,
     });
   }
-  if (type == "helmet") {
+  if (type == "Helmet") {
     const idx = getRandomInt(0, helmets.length - 1);
     const itemObj = helmets[idx];
     return new Item({
@@ -2219,11 +2241,11 @@ function getAnItemByType(
       baseValue: itemObj.baseValue,
       slot: "head",
       stats: itemObj.stats,
-      itemClass: type,
+      itemClass: ItemClassType[type],
       icon: itemObj.icon,
     });
   }
-  if (type == "ingredient") {
+  if (type == "Ingredient") {
     const idx = getRandomInt(0, ingredients.length - 1);
     const itemObj = ingredients[idx];
     return new Item({
@@ -2231,11 +2253,11 @@ function getAnItemByType(
       baseValue: itemObj.baseValue,
       slot: null,
       stats: null,
-      itemClass: type,
+      itemClass: ItemClassType[type],
       icon: itemObj.icon,
     });
   }
-  if (type == "junk") {
+  if (type == "Junk") {
     const idx = getRandomInt(0, junk.length - 1);
     const itemObj = junk[idx];
     return new Item({
@@ -2243,11 +2265,11 @@ function getAnItemByType(
       baseValue: itemObj.baseValue,
       slot: null,
       stats: null,
-      itemClass: type,
+      itemClass: ItemClassType[type],
       icon: itemObj.icon,
     });
   }
-  if (type == "poison") {
+  if (type == "Poison") {
     const idx = getRandomInt(0, poison.length - 1);
     const itemObj = poison[idx];
     return new Item({
@@ -2255,11 +2277,11 @@ function getAnItemByType(
       baseValue: itemObj.baseValue,
       slot: null,
       stats: null,
-      itemClass: type,
+      itemClass: ItemClassType[type],
       icon: itemObj.icon,
     });
   }
-  if (type == "potion") {
+  if (type == "Potion") {
     const idx = getRandomInt(0, potions.length - 1);
     const itemObj = potions[idx];
     return new Item({
@@ -2267,11 +2289,11 @@ function getAnItemByType(
       baseValue: itemObj.baseValue,
       slot: null,
       stats: null,
-      itemClass: type,
+      itemClass: ItemClassType[type],
       icon: itemObj.icon,
     });
   }
-  if (type == "robe") {
+  if (type == "Robe") {
     const idx = getRandomInt(0, robes.length - 1);
     const itemObj = robes[idx];
     return new Item({
@@ -2279,11 +2301,11 @@ function getAnItemByType(
       baseValue: itemObj.baseValue,
       slot: "body",
       stats: itemObj.stats,
-      itemClass: type,
+      itemClass: ItemClassType[type],
       icon: itemObj.icon,
     });
   }
-  if (type == "shield") {
+  if (type == "Shield") {
     const idx = getRandomInt(0, shields.length - 1);
     const itemObj = shields[idx];
     return new Item({
@@ -2291,11 +2313,11 @@ function getAnItemByType(
       baseValue: itemObj.baseValue,
       slot: "off-hand",
       stats: itemObj.stats,
-      itemClass: type,
+      itemClass: ItemClassType[type],
       icon: itemObj.icon,
     });
   }
-  if (type == "wand") {
+  if (type == "Wand") {
     const idx = getRandomInt(0, wands.length - 1);
     const itemObj = wands[idx];
     return new Item({
@@ -2303,11 +2325,11 @@ function getAnItemByType(
       baseValue: itemObj.baseValue,
       slot: "one-hand",
       stats: itemObj.stats,
-      itemClass: type,
+      itemClass: ItemClassType[type],
       icon: itemObj.icon,
     });
   }
-  if (type == "weapon") {
+  if (type == "Weapon") {
     const idx = getRandomInt(0, weapons.length - 1);
     const itemObj = weapons[idx];
     return new Item({
@@ -2315,7 +2337,7 @@ function getAnItemByType(
       baseValue: itemObj.baseValue,
       slot: itemObj.slot as "one-hand" | "two-hand",
       stats: itemObj.stats,
-      itemClass: type,
+      itemClass: ItemClassType[type],
       icon: itemObj.icon,
     });
   } else {

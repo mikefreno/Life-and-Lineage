@@ -25,8 +25,7 @@ import {
   HealthIcon,
   Sanity,
 } from "../assets/icons/SVGIcons";
-import enemies from "../assets/json/enemy.json";
-import { enemyGenerator, specifiedEnemyGenerator } from "../utility/enemy";
+import { specifiedEnemyGenerator } from "../utility/enemy";
 
 interface ActivityCardProps {
   activity: Activity;
