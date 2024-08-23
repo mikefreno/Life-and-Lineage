@@ -87,7 +87,6 @@ export default function SignUpScreen() {
         } else {
           setError(result.message || "An unexpected error occurred.");
         }
-        console.error("API Error:", res.status, result);
       } else {
         if (result.success) {
           setEmailSent(true);
@@ -96,7 +95,6 @@ export default function SignUpScreen() {
         }
       }
     } catch (e) {
-      console.error("Network Error:", e);
       setError("Network error. Please check your connection and try again.");
     } finally {
       setIsAutofilled(false);
