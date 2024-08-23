@@ -135,6 +135,7 @@ export default function Page() {
           <GenericRaisedButton
             onPressFunction={attemptLogin}
             backgroundColor={"#2563eb"}
+            textColor={"#fafafa"}
           >
             Sign In
           </GenericRaisedButton>

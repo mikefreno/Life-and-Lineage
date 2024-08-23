@@ -18,16 +18,18 @@ export function RemoteConnectionFactory() {
 }
 
 const conductor = `
-  CREATE TABLE User
+  CREATE TABLE User_new
   (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE,
-    email_verified INTEGER DEFAULT 0,
+    email_verified INTEGER DEFAULT 0, 
     password_hash TEXT,
     provider TEXT,
+    google_id_token TEXT,
     image TEXT,
-    database_url TEXT,
+    database_url TEXT, 
     database_token TEXT,
-    registered_at TEXT NOT NULL DEFAULT (datetime('now'))
+    registered_at TEXT NOT NULL DEFAULT (datetime('now')),
+    db_destroy_date TEXT DEFAULT (datetime('now', '+1 year'))
   );
 `;

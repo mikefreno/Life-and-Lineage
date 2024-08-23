@@ -29,6 +29,7 @@
         <data android:scheme="myapp"/>
         <data android:scheme="com.mikefrenodev.magicdelve"/>
         <data android:scheme="exp+magic-delve"/>
+        <data android:scheme="magicdelveapp"/>
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false"/>

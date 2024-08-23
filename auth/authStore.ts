@@ -5,10 +5,27 @@ import { jwtDecode } from "jwt-decode";
 class AuthStore {
   token: string | null = null;
   email: string | null = null;
+  db_url: string | null = null;
+  db_token: string | null = null;
 
   constructor() {
     makeAutoObservable(this);
     this.initializeAuth();
+  }
+
+  setToken(token: string | null) {
+    this.token = token;
+  }
+
+  setEmail(email: string | null) {
+    this.email = email;
+  }
+  setDBUrl(url: string | null) {
+    this.db_url = url;
+  }
+
+  setDBToken(token: string | null) {
+    this.db_token = token;
   }
 
   async initializeAuth() {
@@ -28,7 +45,6 @@ class AuthStore {
 
   async validateToken(token: string): Promise<boolean> {
     try {
-      // Decode the token to get its expiration time
       const decodedToken: any = jwtDecode(token);
       const currentTime = Date.now() / 1000;
 
@@ -36,7 +52,6 @@ class AuthStore {
         return false;
       }
 
-      // Optional: Verify the token with your backend
       const response = await fetch(
         "https://www.freno.me/api/magic-delve/verify-token",
         {
@@ -51,7 +66,6 @@ class AuthStore {
       if (response.ok) {
         const data = await response.json();
         if (data.token) {
-          // Store the new token
           await AsyncStorage.setItem("userToken", data.token);
           return true;
         }
@@ -62,14 +76,6 @@ class AuthStore {
       console.error("Token validation error:", error);
       return false;
     }
-  }
-
-  setToken(token: string | null) {
-    this.token = token;
-  }
-
-  setEmail(email: string | null) {
-    this.email = email;
   }
 
   get isAuthenticated() {
@@ -88,6 +94,27 @@ class AuthStore {
     await AsyncStorage.removeItem("userEmail");
     this.setToken(null);
     this.setEmail(null);
+  }
+
+  async refreshDatabaseCreds() {
+    const response = await fetch(
+      "https://www.freno.me/api/magic-delve/verify-token",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.token}`,
+        },
+      },
+    );
+    const parsed = await response.json();
+    if (response.ok) {
+      this.setDBUrl(parsed.db_url);
+      this.setDBToken(parsed.db_token);
+    }
+    if (parsed.message === "destroy token") {
+      this.logout();
+    }
   }
 }
 

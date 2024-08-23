@@ -16,6 +16,7 @@
       "**/*"
     ],
     "ios": {
+      "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.mikefrenodev.magicdelve",
       "buildNumber": "1"
@@ -35,6 +36,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-apple-authentication",
       [
         "@sentry/react-native/expo",
         {
@@ -42,7 +44,13 @@
           "project": "magic-delve"
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.976302581992-tbi6afmid4eq5dsn63t30kpfpdhjju8m"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
