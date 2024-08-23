@@ -65,7 +65,10 @@ export const CharacterInteractionModal = observer(
           level: `Personal Assault,${character.getFullName()}`,
         });
         closeFunction();
-        router.push(
+        while (router.canGoBack()) {
+          router.back();
+        }
+        router.replace(
           `/DungeonLevel/Personal/Personal\ Assault/${character.getFullName()}`,
         );
       }

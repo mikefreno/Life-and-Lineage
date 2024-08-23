@@ -21,11 +21,13 @@ import { throttle } from "lodash";
 import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
 import { AppContextType } from "../utility/types";
+import { AuthProvider } from "../auth/AuthContext";
 
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from "expo-router";
+
 export const unstable_settings = {
   // Ensure that reloading on ﻿/modal keeps a back button present.
   initialRouteName: "(tabs)",
@@ -105,24 +107,26 @@ const Root = observer(() => {
   }
 
   return (
-    <AppContext.Provider
-      value={{
-        gameState,
-        setGameData,
-        playerState,
-        setPlayerCharacter,
-        enemyState,
-        setEnemy,
-        logsState,
-        setLogs,
-        isCompact: playerStatusCompact,
-        setIsCompact: setPlayerStatusCompact,
-        showDetailedStatusView,
-        setShowDetailedStatusView,
-      }}
-    >
-      <RootLayout />
-    </AppContext.Provider>
+    <AuthProvider>
+      <AppContext.Provider
+        value={{
+          gameState,
+          setGameData,
+          playerState,
+          setPlayerCharacter,
+          enemyState,
+          setEnemy,
+          logsState,
+          setLogs,
+          isCompact: playerStatusCompact,
+          setIsCompact: setPlayerStatusCompact,
+          showDetailedStatusView,
+          setShowDetailedStatusView,
+        }}
+      >
+        <RootLayout />
+      </AppContext.Provider>
+    </AuthProvider>
   );
 });
 
@@ -212,6 +216,13 @@ const RootLayout = observer(() => {
           options={{
             headerShown: false,
             animation: Platform.OS == "android" ? "none" : undefined,
+          }}
+        />
+        <Stack.Screen
+          name="Auth"
+          options={{
+            presentation: "modal",
+            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
           }}
         />
         <Stack.Screen

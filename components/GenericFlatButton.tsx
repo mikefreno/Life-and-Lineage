@@ -40,7 +40,9 @@ const GenericFlatButton = ({
               style={
                 disabledCondition
                   ? { color: "#d4d4d8" }
-                  : { color: textColor ?? undefined }
+                  : textColor
+                  ? { color: textColor }
+                  : {}
               }
             >
               {children}

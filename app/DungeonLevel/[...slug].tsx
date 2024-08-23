@@ -88,7 +88,6 @@ const DungeonProvider = observer(() => {
             ? "generic npc femaleA"
             : "generic npc femaleB";
       }
-      console.log(name);
       const enemy = enemyGenerator(instanceName, level, name);
       if (!enemy) throw new Error(`missing enemy, slug: ${slug}`);
       setEnemy(enemy);
@@ -113,9 +112,8 @@ const DungeonProvider = observer(() => {
   }, [enemyState]);
 
   useEffect(() => {
-    console.log(enemyState);
     if (!firstLoad && !enemyState) {
-      if (instanceName !== "Activities" && instanceName === "Personal") {
+      if (instanceName !== "Activities" && instanceName !== "Personal") {
         setInCombat(false);
       }
       setFirstLoad(true);

@@ -9,6 +9,7 @@ export default function OptionsLayout() {
         options={{
           headerShown: false,
           title: "App Settings",
+          tabBarLabelStyle: { fontFamily: "PixelifySans" },
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="application-brackets"
@@ -23,6 +24,7 @@ export default function OptionsLayout() {
         options={{
           headerShown: false,
           title: "Game Settings",
+          tabBarLabelStyle: { fontFamily: "PixelifySans" },
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="gamepad-circle-right"
@@ -37,6 +39,7 @@ export default function OptionsLayout() {
         options={{
           headerShown: false,
           title: "Codex",
+          tabBarLabelStyle: { fontFamily: "PixelifySans" },
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="book-open-variant"

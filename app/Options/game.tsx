@@ -1,12 +1,14 @@
-import { Text, View } from "../../components/Themed";
+import { Text, View as ThemedView } from "../../components/Themed";
 import { router } from "expo-router";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../_layout";
 import { toTitleCase } from "../../utility/functions/misc/words";
-import { Pressable, View as NonThemedView } from "react-native";
+import { Pressable, Switch, View } from "react-native";
 import { useVibration } from "../../utility/customHooks";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
+import GenericModal from "../../components/GenericModal";
+import * as Updates from "expo-updates";
 
 const healthWarningOptions: Record<number, string> = {
   0.5: "50%",
@@ -31,10 +33,14 @@ export default function GameSettings() {
   if (!appData) throw new Error("missing context!");
   const { gameState } = appData;
   const vibration = useVibration();
-
+  const [tutorialState, setTutorialState] = useState<boolean>(
+    gameState?.tutorialsEnabled ?? true,
+  );
   const [selectedHealthWarning, setSelectedHealthWarning] = useState<string>(
     gameState ? healthWarningOptions[gameState?.healthWarning] : "25%",
   );
+  const [showTutorialResetConfirm, setShowTutorialResetConfirm] =
+    useState<boolean>(false);
 
   const startNewGame = () => {
     vibration({ style: "warning" });
@@ -44,38 +50,103 @@ export default function GameSettings() {
     router.push("/NewGame");
   };
 
+  useEffect(() => {
+    if (gameState) {
+      if (tutorialState == false) {
+        gameState.disableTutorials();
+      } else {
+        gameState.enableTutorials();
+      }
+    }
+  }, [tutorialState]);
+
   const healthWarningSetter = (choice: number) => {
     gameState?.setHealthWarning(choice);
     setSelectedHealthWarning(healthWarningOptions[choice]);
   };
 
   return (
-    <View className="flex-1 items-center justify-center px-4">
-      <GenericStrikeAround>Game Restart</GenericStrikeAround>
-      <GenericRaisedButton onPressFunction={startNewGame}>
-        Start New Game
-      </GenericRaisedButton>
-      <GenericStrikeAround>Health Warning</GenericStrikeAround>
-      <NonThemedView className="mt-3 rounded px-4 py-2">
-        {healthWarningVals.map((item, idx) => (
-          <Pressable
-            key={idx}
-            className="mb-2 ml-10 flex flex-row"
-            onPress={() => healthWarningSetter(healthWarningKeys[idx])}
-          >
-            <NonThemedView
-              className={
-                selectedHealthWarning == healthWarningVals[idx]
-                  ? "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 bg-blue-500 dark:border-zinc-50 dark:bg-blue-600"
-                  : "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 dark:border-zinc-50"
-              }
+    <>
+      <GenericModal
+        isVisibleCondition={showTutorialResetConfirm}
+        backFunction={() => setShowTutorialResetConfirm(false)}
+      >
+        <>
+          <Text className="text-center text-lg">
+            This will reset all tutorials, some may not make sense based on your
+            current game/player/inventory state (And restart the app).
+          </Text>
+          <Text className="text-center text-2xl">Are you sure?</Text>
+          <ThemedView className="flex flex-row">
+            <Pressable
+              onPress={() => {
+                vibration({ style: "warning" });
+                gameState?.resetTutorialState();
+                gameState?.enableTutorials();
+                setShowTutorialResetConfirm(false);
+                Updates.reloadAsync();
+              }}
+              className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+            >
+              <Text>Reset</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setShowTutorialResetConfirm(false)}
+              className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+            >
+              <Text>Cancel</Text>
+            </Pressable>
+          </ThemedView>
+        </>
+      </GenericModal>
+      <ThemedView className="flex-1 items-center justify-center px-4">
+        <GenericStrikeAround>Game Restart</GenericStrikeAround>
+        <GenericRaisedButton onPressFunction={startNewGame}>
+          Start New Game
+        </GenericRaisedButton>
+        <GenericStrikeAround>Health Warning</GenericStrikeAround>
+        <View className="mt-3 rounded px-4 py-2">
+          {healthWarningVals.map((item, idx) => (
+            <Pressable
+              key={idx}
+              className="mb-2 ml-10 flex flex-row"
+              onPress={() => healthWarningSetter(healthWarningKeys[idx])}
+            >
+              <View
+                className={
+                  selectedHealthWarning == healthWarningVals[idx]
+                    ? "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 bg-blue-500 dark:border-zinc-50 dark:bg-blue-600"
+                    : "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 dark:border-zinc-50"
+                }
+              />
+              <Text className="text-2xl tracking-widest">
+                {toTitleCase(item)}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+        <GenericStrikeAround>Tutorials</GenericStrikeAround>
+        <View className="mt-3 rounded px-4 py-2">
+          <ThemedView className="mx-auto flex flex-row">
+            <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+            <Switch
+              trackColor={{ false: "#767577", true: "#3b82f6" }}
+              ios_backgroundColor="#3e3e3e"
+              thumbColor={"white"}
+              onValueChange={(bool) => setTutorialState(bool)}
+              value={tutorialState}
             />
-            <Text className="text-2xl tracking-widest">
-              {toTitleCase(item)}
-            </Text>
-          </Pressable>
-        ))}
-      </NonThemedView>
-    </View>
+          </ThemedView>
+          <GenericRaisedButton
+            onPressFunction={() => {
+              vibration({ style: "light" });
+              setShowTutorialResetConfirm(true);
+            }}
+          >
+            Reset Tutorials
+          </GenericRaisedButton>
+        </View>
+      </ThemedView>
+    </>
   );
 }

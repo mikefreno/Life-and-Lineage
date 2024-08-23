@@ -16,7 +16,6 @@ export default function CodexCategory({
 }: CodexCategoryProps) {
   const [animationTriggered, setAnimationtriggered] = useState(false);
   const animatedValue = useState(new Animated.Value(0))[0];
-  const [pressed, setPressed] = useState<boolean>(false);
 
   const { colorScheme } = useColorScheme();
 
@@ -34,10 +33,8 @@ export default function CodexCategory({
 
   const handlePressOut = () => {
     setAnimationtriggered(true);
-    setPressed(true);
     setTimeout(() => {
       router.push(`/Options/Codex/${category}`);
-      setPressed(false);
     }, 150);
   };
 
@@ -59,30 +56,31 @@ export default function CodexCategory({
   return (
     <Pressable
       key={category}
-      className="mx-2 my-4 w-full border-y-[0.5px] border-zinc-700 py-4 dark:border-zinc-100"
-      style={{ maxWidth: 512 }}
+      className="w-full"
       onPressOut={() => {
         if (!scrolling) {
           handlePressOut();
         }
       }}
     >
-      <View className="flex flex-row justify-between px-2">
-        <Text
-          className="my-auto text-xl"
-          style={{ opacity: pressed ? 0.5 : 1 }}
+      {({ pressed }) => (
+        <View
+          className="mx-2 my-6 w-full border-b-[0.5px] border-zinc-700 py-2 dark:border-zinc-100"
+          style={{ maxWidth: 512, opacity: pressed ? 0.5 : 1 }}
         >
-          {category}
-        </Text>
-        <Animated.View style={chevronAnimatedStyle}>
-          <Entypo
-            name="chevron-thin-right"
-            size={24}
-            color={colorScheme == "dark" ? "white" : "black"}
-            style={{ opacity: pressed ? 0.5 : 1 }}
-          />
-        </Animated.View>
-      </View>
+          <View className="flex flex-row justify-between px-2">
+            <Text className="my-auto text-xl">{category}</Text>
+            <Animated.View style={chevronAnimatedStyle}>
+              <Entypo
+                name="chevron-thin-right"
+                size={24}
+                color={colorScheme == "dark" ? "white" : "black"}
+                style={{ opacity: pressed ? 0.5 : 1 }}
+              />
+            </Animated.View>
+          </View>
+        </View>
+      )}
     </Pressable>
   );
 }
