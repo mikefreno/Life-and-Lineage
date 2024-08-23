@@ -25,7 +25,6 @@ const conductor = `
     email_verified INTEGER DEFAULT 0, 
     password_hash TEXT,
     provider TEXT,
-    google_id_token TEXT,
     image TEXT,
     database_url TEXT, 
     database_token TEXT,

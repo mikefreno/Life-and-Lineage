@@ -3,11 +3,12 @@ import { Text } from "../../components/Themed";
 import { useState } from "react";
 import { useColorScheme } from "nativewind";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
-import { router } from "expo-router";
 import D20Die from "../../components/DieRollAnim";
 import { useAuth } from "../../auth/AuthContext";
+import { router } from "expo-router";
+import { observer } from "mobx-react-lite";
 
-export default function Page() {
+const SignInScreen = observer(() => {
   const auth = useAuth();
 
   const { colorScheme } = useColorScheme();
@@ -16,6 +17,13 @@ export default function Page() {
   const [password, setPassword] = useState("");
   const [awaitingResponse, setAwaitingResponse] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>();
+
+  if (auth.isAuthenticated) {
+    while (router.canGoBack()) {
+      router.back();
+    }
+    router.push("/Options");
+  }
 
   const attemptLogin = async () => {
     setAwaitingResponse(true);
@@ -65,8 +73,7 @@ export default function Page() {
         if (result.success) {
           // Store the token
           await auth.login(result.token, result.email);
-          // close out this window
-          router.back();
+          // window should close automatically
         } else {
           setError("Login failed for an unknown reason.");
         }
@@ -143,4 +150,5 @@ export default function Page() {
       )}
     </View>
   );
-}
+});
+export default SignInScreen;

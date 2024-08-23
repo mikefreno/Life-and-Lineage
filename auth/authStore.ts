@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 class AuthStore {
   token: string | null = null;
   email: string | null = null;
+  provider: "email" | "apple" | "google" | null = null;
   db_url: string | null = null;
   db_token: string | null = null;
 
@@ -25,6 +26,9 @@ class AuthStore {
   }
 
   setDBToken(token: string | null) {
+    this.db_token = token;
+  }
+  setProvider(token: string | null) {
     this.db_token = token;
   }
 
@@ -82,11 +86,12 @@ class AuthStore {
     return !!this.token;
   }
 
-  async login(token: string, email: string) {
+  async login(token: string, email: string, provider: string) {
     await AsyncStorage.setItem("userToken", token);
     await AsyncStorage.setItem("userEmail", email);
     this.setToken(token);
     this.setEmail(email);
+    this.setProvider(provider);
   }
 
   async logout() {
@@ -114,6 +119,30 @@ class AuthStore {
     }
     if (parsed.message === "destroy token") {
       this.logout();
+    }
+  }
+
+  async _debugLog() {
+    try {
+      const [storedToken, storedEmail] = await Promise.all([
+        AsyncStorage.getItem("userToken"),
+        AsyncStorage.getItem("userEmail"),
+      ]);
+
+      const debugInfo = [
+        { key: "Stored Token", value: storedToken },
+        { key: "Stored Email", value: storedEmail },
+        { key: "State Token", value: this.token },
+        { key: "State Email", value: this.email },
+        { key: "State Provider", value: this.provider },
+        { key: "State db_url", value: this.db_url },
+        { key: "State db_token", value: this.db_token },
+      ];
+
+      console.log("*******USER AUTH STATE*******");
+      debugInfo.forEach((item) => console.log(`${item.key}: ${item.value}`));
+    } catch (error) {
+      console.error("Error in _debugLog:", error);
     }
   }
 }

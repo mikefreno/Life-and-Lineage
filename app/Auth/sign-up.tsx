@@ -1,4 +1,4 @@
-import { Alert, Platform, Pressable, TextInput, View } from "react-native";
+import { Platform, Pressable, TextInput, View } from "react-native";
 import { Text } from "../../components/Themed";
 import { useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
@@ -13,10 +13,15 @@ import {
   statusCodes,
 } from "@react-native-google-signin/google-signin";
 import * as AppleAuthentication from "expo-apple-authentication";
+import { configureGoogleSignIn } from "../../components/GoogleComponents";
+import { useAuth } from "../../auth/AuthContext";
+import { router } from "expo-router";
+import { observer } from "mobx-react-lite";
 
-export default function SignUpScreen() {
+const SignUpScreen = observer(() => {
   const { colorScheme } = useColorScheme();
   const vibration = useVibration();
+  const auth = useAuth();
 
   const [emailAddress, setEmailAddress] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -30,6 +35,13 @@ export default function SignUpScreen() {
   const [isAutofilled, setIsAutofilled] = useState<boolean>(false);
   const [emailSent, setEmailSent] = useState<boolean>(false);
   const [usingEmail, setUsingEmail] = useState<boolean>(false);
+
+  if (auth.isAuthenticated) {
+    while (router.canGoBack()) {
+      router.back();
+    }
+    router.push("/Options");
+  }
 
   useEffect(() => {
     if (password.length !== trackedLength + 1) {
@@ -112,37 +124,68 @@ export default function SignUpScreen() {
     }
   };
 
+  useEffect(() => {
+    configureGoogleSignIn();
+    //getCurrentUser();
+  }, []);
+
   const googleSignUp = async () => {
+    setAwaitingResponse(true);
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      console.log(userInfo);
+      //console.log(userInfo);
+      const { idToken } = userInfo;
+
+      const response = await fetch(
+        "https://www.freno.me/api/magic-delve/callback/google",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ idToken }),
+        },
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(data);
+
+      if (data.success) {
+        await auth.login(data.token, data.user.email, "google");
+        setAwaitingResponse(false);
+      } else {
+        setError("Server authentication failed");
+      }
     } catch (error) {
       if (isErrorWithCode(error)) {
-        console.log("error", error.message);
         switch (error.code) {
           case statusCodes.SIGN_IN_CANCELLED:
             // sign in was cancelled by user
             setTimeout(() => {
-              Alert.alert("cancelled");
+              setError("cancelled");
             }, 500);
             break;
           case statusCodes.IN_PROGRESS:
             // operation (eg. sign in) already in progress
-            Alert.alert(
-              "in progress",
-              "operation (eg. sign in) already in progress",
+            setError(
+              "in progress\n operation (eg. sign in) already in progress",
             );
             break;
           case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
             // android only
-            Alert.alert("play services not available or outdated");
+            setError("play services not available or outdated");
             break;
           default:
-            Alert.alert("Something went wrong: ", error.toString());
+            setError("Something went wrong: \n" + error.toString());
         }
       } else {
-        alert(`an error that's not related to google sign in occurred`);
+        setError(
+          `an unknown error that's not related to google sign in occurred`,
+        );
       }
     }
   };
@@ -164,6 +207,7 @@ export default function SignUpScreen() {
                   AppleAuthentication.AppleAuthenticationScope.EMAIL,
                 ],
               });
+              console.log(credential);
               // signed in
             } catch (e) {
               if (e.code === "ERR_REQUEST_CANCELED") {
@@ -305,4 +349,5 @@ export default function SignUpScreen() {
       </Text>
     </View>
   );
-}
+});
+export default SignUpScreen;

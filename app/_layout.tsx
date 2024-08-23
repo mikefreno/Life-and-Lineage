@@ -21,7 +21,7 @@ import { throttle } from "lodash";
 import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
 import { AppContextType } from "../utility/types";
-import { AuthProvider } from "../auth/AuthContext";
+import { AuthProvider, useAuth } from "../auth/AuthContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -142,6 +142,10 @@ const RootLayout = observer(() => {
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
   const [navbarLoad, setNavbarLoad] = useState(false);
+  const auth = useAuth();
+  useEffect(() => {
+    auth._debugLog();
+  }, []);
 
   useEffect(() => {
     if (fontLoaded && navbarLoad) {

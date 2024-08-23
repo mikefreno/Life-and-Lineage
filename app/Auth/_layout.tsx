@@ -1,12 +1,7 @@
-import { Tabs, router } from "expo-router";
+import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useAuth } from "../../auth/AuthContext";
 
 export default function AuthRoutesLayout() {
-  const auth = useAuth();
-  if (auth.isAuthenticated) {
-    router.back();
-  }
   return (
     <Tabs>
       <Tabs.Screen

@@ -32,6 +32,7 @@ import {
   Wand,
   WizardHat,
 } from "../../assets/icons/SVGIcons";
+import PlatformDependantBlurView from "../../components/PlatformDependantBlurView";
 
 export default function TabLayout() {
   const appData = useContext(AppContext);
@@ -123,22 +124,7 @@ export default function TabLayout() {
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackground: () => (
-              <BlurView
-                blurReductionFactor={8}
-                tint={
-                  Platform.OS == "android"
-                    ? colorScheme == "light"
-                      ? "systemMaterial"
-                      : "systemMaterialDark"
-                    : "default"
-                }
-                intensity={100}
-                style={StyleSheet.absoluteFill}
-                experimentalBlurMethod={"dimezisBlurView"}
-                className="shadow-diffuse"
-              />
-            ),
+            headerBackground: () => <PlatformDependantBlurView />,
             title: "Home",
             tabBarIcon: ({ color }) =>
               playerState?.playerClass == "necromancer" ? (
@@ -200,22 +186,9 @@ export default function TabLayout() {
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackground: () => (
-              <BlurView
-                blurReductionFactor={8}
-                tint={
-                  Platform.OS == "android"
-                    ? colorScheme == "light"
-                      ? "systemMaterial"
-                      : "systemMaterialDark"
-                    : "default"
-                }
-                intensity={100}
-                style={StyleSheet.absoluteFill}
-                experimentalBlurMethod={"dimezisBlurView"}
-                className="shadow-diffuse"
-              />
-            ),
+
+            headerBackground: () => <PlatformDependantBlurView />,
+
             title: "Spells",
             tabBarIcon: ({ color }) => (
               <Wand
@@ -251,22 +224,7 @@ export default function TabLayout() {
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackground: () => (
-              <BlurView
-                blurReductionFactor={8}
-                tint={
-                  Platform.OS == "android"
-                    ? colorScheme == "light"
-                      ? "systemMaterial"
-                      : "systemMaterialDark"
-                    : "default"
-                }
-                intensity={100}
-                style={StyleSheet.absoluteFill}
-                experimentalBlurMethod={"dimezisBlurView"}
-                className="shadow-diffuse"
-              />
-            ),
+            headerBackground: () => <PlatformDependantBlurView />,
             title: "Labor",
             tabBarIcon: ({ color }) => (
               <Broom
@@ -320,21 +278,7 @@ export default function TabLayout() {
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackground: () => (
-              <BlurView
-                blurReductionFactor={8}
-                tint={
-                  Platform.OS == "android"
-                    ? colorScheme == "light"
-                      ? "systemMaterial"
-                      : "systemMaterialDark"
-                    : "default"
-                }
-                intensity={100}
-                style={StyleSheet.absoluteFill}
-                experimentalBlurMethod={"dimezisBlurView"}
-              />
-            ),
+            headerBackground: () => <PlatformDependantBlurView />,
             title: "Dungeon",
             tabBarIcon: ({ color }) => (
               <Dungeon
@@ -366,22 +310,7 @@ export default function TabLayout() {
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackground: () => (
-              <BlurView
-                blurReductionFactor={8}
-                tint={
-                  Platform.OS == "android"
-                    ? colorScheme == "light"
-                      ? "systemMaterial"
-                      : "systemMaterialDark"
-                    : "default"
-                }
-                intensity={100}
-                style={StyleSheet.absoluteFill}
-                experimentalBlurMethod={"dimezisBlurView"}
-                className="shadow-diffuse"
-              />
-            ),
+            headerBackground: () => <PlatformDependantBlurView />,
             title: "Shops",
             tabBarIcon: ({ color }) => (
               <Potion
@@ -413,22 +342,7 @@ export default function TabLayout() {
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackground: () => (
-              <BlurView
-                blurReductionFactor={8}
-                tint={
-                  Platform.OS == "android"
-                    ? colorScheme == "light"
-                      ? "systemMaterial"
-                      : "systemMaterialDark"
-                    : "default"
-                }
-                intensity={100}
-                style={StyleSheet.absoluteFill}
-                experimentalBlurMethod={"dimezisBlurView"}
-                className="shadow-diffuse"
-              />
-            ),
+            headerBackground: () => <PlatformDependantBlurView />,
             title: "Medical",
             tabBarIcon: ({ color }) => (
               <Medical

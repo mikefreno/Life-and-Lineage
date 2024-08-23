@@ -2,7 +2,7 @@
   "expo": {
     "name": "Magic Delve",
     "slug": "magic-delve",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "orientation": "portrait",
     "icon": "assets/images/icon.png",
     "scheme": "magicdelveapp",
@@ -19,7 +19,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.mikefrenodev.magicdelve",
-      "buildNumber": "1"
+      "buildNumber": "1",
     },
     "android": {
       "adaptiveIcon": {
@@ -48,7 +48,8 @@
       [
         "@react-native-google-signin/google-signin",
         {
-          "iosUrlScheme": "com.googleusercontent.apps.976302581992-tbi6afmid4eq5dsn63t30kpfpdhjju8m"
+          "iosUrlScheme": "com.googleusercontent.apps.976302581992-tbi6afmid4eq5dsn63t30kpfpdhjju8m",
+          "serverClientId": "976302581992-ug8v8panoqpetrkfv06noq6v30obl988.apps.googleusercontent.com"
         }
       ]
     ],
@@ -63,7 +64,7 @@
         "projectId": "2307d673-d206-4c58-8170-5dc30a9ec500"
       }
     },
-    "runtimeVersion": "0.2.0",
+    "runtimeVersion": "0.2.2",
     "updates": {
       "url": "https://u.expo.dev/2307d673-d206-4c58-8170-5dc30a9ec500"
     }

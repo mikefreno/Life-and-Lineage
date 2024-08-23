@@ -92,8 +92,8 @@ const DungeonScreen = observer(() => {
         onCloseFunction={() => setShowDungeonTutorial(false)}
       />
       <View
-        className="shadow-diffuse w-full absolute z-50 px-8"
-        style={{ paddingTop: useHeaderHeight(), paddingBottom: 4 }}
+        className="shadow-diffuse w-full absolute z-10 px-8"
+        style={{ marginTop: useHeaderHeight(), paddingBottom: 4 }}
       >
         <Text className="text-center text-2xl">
           The dungeon is a dangerous place. Be careful.
