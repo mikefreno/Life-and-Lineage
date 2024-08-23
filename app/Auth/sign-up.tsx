@@ -1,4 +1,4 @@
-import { Alert, Pressable, TextInput, View } from "react-native";
+import { Alert, Platform, Pressable, TextInput, View } from "react-native";
 import { Text } from "../../components/Themed";
 import { useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
@@ -150,29 +150,31 @@ export default function SignUpScreen() {
   return !usingEmail ? (
     <View>
       <GoogleSigninButton onPress={googleSignUp} />
-      <AppleAuthentication.AppleAuthenticationButton
-        buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP}
-        buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-        cornerRadius={5}
-        style={{ height: 200, width: 44 }}
-        onPress={async () => {
-          try {
-            const credential = await AppleAuthentication.signInAsync({
-              requestedScopes: [
-                AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-                AppleAuthentication.AppleAuthenticationScope.EMAIL,
-              ],
-            });
-            // signed in
-          } catch (e) {
-            if (e.code === "ERR_REQUEST_CANCELED") {
-              // handle that the user canceled the sign-in flow
-            } else {
-              // handle other errors
+      {Platform.OS == "ios" && (
+        <AppleAuthentication.AppleAuthenticationButton
+          buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP}
+          buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+          cornerRadius={5}
+          style={{ height: 200, width: 44 }}
+          onPress={async () => {
+            try {
+              const credential = await AppleAuthentication.signInAsync({
+                requestedScopes: [
+                  AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                  AppleAuthentication.AppleAuthenticationScope.EMAIL,
+                ],
+              });
+              // signed in
+            } catch (e) {
+              if (e.code === "ERR_REQUEST_CANCELED") {
+                // handle that the user canceled the sign-in flow
+              } else {
+                // handle other errors
+              }
             }
-          }
-        }}
-      />
+          }}
+        />
+      )}
       <GenericRaisedButton onPressFunction={() => setUsingEmail(true)}>
         Email
       </GenericRaisedButton>
