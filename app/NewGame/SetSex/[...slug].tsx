@@ -96,7 +96,7 @@ export default function SetSex() {
           body: "Almost everything will move the game clock forward, aging the characters in the game. At a certain point it will nearly impossible to stay alive.",
         }}
         pageTwo={{
-          body: "However, if you have a child, you can live on through the childRetaining much of what has been achieved in your previous life",
+          body: "However, if you have a child, you can live on through the child retaining much of what has been achieved in your previous life",
         }}
       />
       <ThemedView className="flex-1 items-center">

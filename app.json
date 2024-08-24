@@ -19,7 +19,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.mikefrenodev.magicdelve",
-      "buildNumber": "1",
+      "buildNumber": "1"
     },
     "android": {
       "adaptiveIcon": {
@@ -37,6 +37,7 @@
     "plugins": [
       "expo-router",
       "expo-apple-authentication",
+      "expo-font",
       [
         "@sentry/react-native/expo",
         {
@@ -44,12 +45,10 @@
           "project": "magic-delve"
         }
       ],
-      "expo-font",
       [
         "@react-native-google-signin/google-signin",
         {
-          "iosUrlScheme": "com.googleusercontent.apps.976302581992-tbi6afmid4eq5dsn63t30kpfpdhjju8m",
-          "serverClientId": "976302581992-ug8v8panoqpetrkfv06noq6v30obl988.apps.googleusercontent.com"
+          "iosUrlScheme": "com.googleusercontent.apps.976302581992-tbi6afmid4eq5dsn63t30kpfpdhjju8m"
         }
       ]
     ],

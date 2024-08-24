@@ -6,17 +6,12 @@ import GenericRaisedButton from "../../components/GenericRaisedButton";
 import D20Die from "../../components/DieRollAnim";
 import { isValidPassword } from "../../auth/password";
 import { useVibration } from "../../utility/customHooks";
-import {
-  GoogleSignin,
-  GoogleSigninButton,
-  isErrorWithCode,
-  statusCodes,
-} from "@react-native-google-signin/google-signin";
+import { GoogleIcon } from "../../assets/icons/SVGIcons";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { configureGoogleSignIn } from "../../components/GoogleComponents";
 import { useAuth } from "../../auth/AuthContext";
 import { router } from "expo-router";
 import { observer } from "mobx-react-lite";
+import { API_BASE_URL } from "../../config/config";
 
 const SignUpScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -36,12 +31,18 @@ const SignUpScreen = observer(() => {
   const [emailSent, setEmailSent] = useState<boolean>(false);
   const [usingEmail, setUsingEmail] = useState<boolean>(false);
 
-  if (auth.isAuthenticated) {
-    while (router.canGoBack()) {
-      router.back();
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      const navigateToOptions = async () => {
+        while (router.canGoBack()) {
+          router.back();
+        }
+        router.push("/Options");
+      };
+
+      navigateToOptions();
     }
-    router.push("/Options");
-  }
+  }, [auth.isAuthenticated, router]);
 
   useEffect(() => {
     if (password.length !== trackedLength + 1) {
@@ -51,7 +52,7 @@ const SignUpScreen = observer(() => {
     }
   }, [password]);
 
-  const attemptRegistration = async () => {
+  const handleEmailSignUp = async () => {
     setError(undefined);
     setAwaitingResponse(true);
     setShortPassword(false);
@@ -86,16 +87,13 @@ const SignUpScreen = observer(() => {
     };
 
     try {
-      const res = await fetch(
-        "https://www.freno.me/api/magic-delve/email-registration",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
+      const res = await fetch(`${API_BASE_URL}/email/registration`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(data),
+      });
 
       const result = await res.json();
 
@@ -124,107 +122,113 @@ const SignUpScreen = observer(() => {
     }
   };
 
-  useEffect(() => {
-    configureGoogleSignIn();
-    //getCurrentUser();
-  }, []);
-
-  const googleSignUp = async () => {
+  const handleGoogleSignUp = async () => {
     setAwaitingResponse(true);
     try {
-      await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      //console.log(userInfo);
-      const { idToken } = userInfo;
-
-      const response = await fetch(
-        "https://www.freno.me/api/magic-delve/callback/google",
-        {
+      const { givenName, familyName, email } = await auth.googleSignIn();
+      try {
+        await fetch(`${API_BASE_URL}/google/registration`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ idToken }),
-        },
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+          body: JSON.stringify({ givenName, familyName, email }),
+        });
+      } catch (error) {
+        setError(error as string);
       }
-
-      const data = await response.json();
-      console.log(data);
-
-      if (data.success) {
-        await auth.login(data.token, data.user.email, "google");
-        setAwaitingResponse(false);
-      } else {
-        setError("Server authentication failed");
-      }
+      setAwaitingResponse(false);
     } catch (error) {
-      if (isErrorWithCode(error)) {
-        switch (error.code) {
-          case statusCodes.SIGN_IN_CANCELLED:
-            // sign in was cancelled by user
-            setTimeout(() => {
-              setError("cancelled");
-            }, 500);
-            break;
-          case statusCodes.IN_PROGRESS:
-            // operation (eg. sign in) already in progress
-            setError(
-              "in progress\n operation (eg. sign in) already in progress",
-            );
-            break;
-          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-            // android only
-            setError("play services not available or outdated");
-            break;
-          default:
-            setError("Something went wrong: \n" + error.toString());
-        }
-      } else {
-        setError(
-          `an unknown error that's not related to google sign in occurred`,
-        );
-      }
+      setError("Failed to sign up with Google. Please try again.");
+      setAwaitingResponse(false);
     }
   };
 
+  const handleAppleSignUp = async () => {
+    setAwaitingResponse(true);
+    try {
+      const { givenName, lastName, email, userString } =
+        await auth.appleSignIn();
+      try {
+        await fetch(`${API_BASE_URL}/apple/registration`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ givenName, lastName, email, userString }),
+        });
+      } catch (error) {
+        console.error(error);
+      }
+
+      setAwaitingResponse(false);
+    } catch (error) {
+      // ignoring for now
+    }
+    setAwaitingResponse(false);
+  };
+
   return !usingEmail ? (
-    <View>
-      <GoogleSigninButton onPress={googleSignUp} />
-      {Platform.OS == "ios" && (
-        <AppleAuthentication.AppleAuthenticationButton
-          buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP}
-          buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-          cornerRadius={5}
-          style={{ height: 200, width: 44 }}
-          onPress={async () => {
-            try {
-              const credential = await AppleAuthentication.signInAsync({
-                requestedScopes: [
-                  AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-                  AppleAuthentication.AppleAuthenticationScope.EMAIL,
-                ],
-              });
-              console.log(credential);
-              // signed in
-            } catch (e) {
-              if (e.code === "ERR_REQUEST_CANCELED") {
-                // handle that the user canceled the sign-in flow
-              } else {
-                // handle other errors
-              }
-            }
-          }}
-        />
-      )}
-      <GenericRaisedButton onPressFunction={() => setUsingEmail(true)}>
-        Email
-      </GenericRaisedButton>
-    </View>
-  ) : !emailSent ? (
     <>
+      {error && (
+        <Text className="text-center" style={{ color: "#ef4444" }}>
+          {error}
+        </Text>
+      )}
+      <View className="flex flex-row mt-[20vh] px-4">
+        <View className="mx-auto justify-between">
+          <Pressable
+            onPress={handleGoogleSignUp}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              borderWidth: 1,
+              borderColor: colorScheme == "dark" ? "#fafafa" : "#27272a",
+              backgroundColor: colorScheme == "dark" ? "#27272a" : "#ffffff",
+              paddingHorizontal: 12,
+              marginTop: -8,
+              marginBottom: 8,
+              paddingVertical: 8,
+              borderRadius: 5,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.2,
+              shadowRadius: 1.41,
+              elevation: 2,
+            }}
+          >
+            <Text className="text-xl">Register with Google</Text>
+            <GoogleIcon height={20} width={20} />
+          </Pressable>
+          {Platform.OS == "ios" && (
+            <AppleAuthentication.AppleAuthenticationButton
+              buttonType={
+                AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
+              }
+              buttonStyle={
+                colorScheme == "dark"
+                  ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE
+                  : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+              }
+              cornerRadius={5}
+              style={{ width: 230, height: 48 }}
+              onPress={handleAppleSignUp}
+            />
+          )}
+        </View>
+        <GenericRaisedButton
+          onPressFunction={() => setUsingEmail(true)}
+          backgroundColor={"#2563eb"}
+        >
+          <Text className="text-xl" style={{ color: "white" }}>
+            Email
+          </Text>
+        </GenericRaisedButton>
+      </View>
+    </>
+  ) : !emailSent ? (
+    <View className="flex my-auto">
       <Text className="text-center text-3xl pt-4">Email Registration</Text>
       {awaitingResponse ? (
         <View className="pt-[25vh]">
@@ -306,8 +310,8 @@ const SignUpScreen = observer(() => {
           )}
           {simplePassword && (
             <Text className="text-center" style={{ color: "#ef4444" }}>
-              Password must contain a lower-case, upper-case, and special
-              character()
+              Password must contain a lower-case, upper-case, and either a
+              number or special character(!@$% etc.)
             </Text>
           )}
           {passwordMismatch && (
@@ -321,7 +325,12 @@ const SignUpScreen = observer(() => {
             </Text>
           )}
           <GenericRaisedButton
-            onPressFunction={attemptRegistration}
+            disabledCondition={
+              password.length == 0 ||
+              passwordConf.length == 0 ||
+              emailAddress.length == 0
+            }
+            onPressFunction={handleEmailSignUp}
             backgroundColor={"#2563eb"}
             textColor={"#fafafa"}
           >
@@ -340,7 +349,7 @@ const SignUpScreen = observer(() => {
           </Pressable>
         </>
       )}
-    </>
+    </View>
   ) : (
     <View className="pt-[25vh]">
       <Text className="text-center text-2xl">
@@ -350,4 +359,5 @@ const SignUpScreen = observer(() => {
     </View>
   );
 });
+
 export default SignUpScreen;

@@ -18,15 +18,17 @@ export function RemoteConnectionFactory() {
 }
 
 const conductor = `
-  CREATE TABLE User_new
+  CREATE TABLE User
   (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE,
     email_verified INTEGER DEFAULT 0, 
+    given_name TEXT,
+    family_name TEXT,
     password_hash TEXT,
+    apple_user_string TEXT,
     provider TEXT,
-    image TEXT,
-    database_url TEXT, 
+    database_name TEXT, 
     database_token TEXT,
     registered_at TEXT NOT NULL DEFAULT (datetime('now')),
     db_destroy_date TEXT DEFAULT (datetime('now', '+1 year'))
