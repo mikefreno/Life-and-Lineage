@@ -4,7 +4,7 @@ import { useLocalSearchParams } from "expo-router";
 import { DungeonInstance, DungeonLevel } from "../../classes/dungeon";
 import { Item } from "../../classes/item";
 import { AppContext } from "../../app/_layout";
-import D20Die from "../../components/DieRollAnim";
+import { TimedD20Die } from "../../components/DieRollAnim";
 import { observer } from "mobx-react-lite";
 import {
   type BoundingBox,
@@ -235,7 +235,7 @@ const DungeonProvider = observer(() => {
       </DungeonContext.Provider>
     );
   } else {
-    return <D20Die />;
+    return <TimedD20Die />;
   }
 });
 export default DungeonProvider;

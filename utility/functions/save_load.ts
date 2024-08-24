@@ -3,6 +3,7 @@ import type { Enemy } from "../../classes/creatures";
 import { Game } from "../../classes/game";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { AppContextType, DungeonContextType } from "../types";
+import * as SQLite from "expo-sqlite";
 
 export const storeData = async (key: string, value: any) => {
   try {
@@ -23,6 +24,7 @@ export const saveGame = async (game: Game | null) => {
     console.error(e);
   }
 };
+
 export const savePlayer = async (player: PlayerCharacter) => {
   try {
     const jsonPlayer = JSON.stringify(player);
@@ -32,7 +34,7 @@ export const savePlayer = async (player: PlayerCharacter) => {
   }
 };
 
-export const fullSave = async (
+export const fullSaveAsyncStore = async (
   game: Game | null,
   player: PlayerCharacter | null,
 ) => {
@@ -49,83 +51,6 @@ export const fullSave = async (
     }
   }
 };
-//export const fullSaveDB = async (
-//game: Game | null,
-//player: PlayerCharacter | null,
-//) => {
-//if (game && player) {
-//SQLite.openDatabaseAsync("gameDatabase.db").then((database) => {
-//database.runAsync(
-//"INSERT OR REPLACE INTO Game (id, date, dungeonInstances, completedInstances, atDeathScreen, shops, colorScheme, vibrationEnabled, healthWarning, tutorialsShown, tutorialsEnabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-//[
-//1, // Assuming there's only one game record
-//game.date,
-//JSON.stringify(game.dungeonInstances),
-//JSON.stringify(game.completedInstances),
-//game.atDeathScreen ? 1 : 0,
-//JSON.stringify(game.shops),
-//game.colorScheme,
-//game.vibrationEnabled,
-//game.healthWarning,
-//JSON.stringify(game.tutorialsShown),
-//game.tutorialsEnabled ? 1 : 0,
-//],
-//),
-//database.runAsync(
-//"INSERT OR REPLACE INTO Character (id, beingType, firstName, lastName, sex, alive, fertility, birthdate, deathdate, job, isPlayerPartner, sexuality, affection, qualifications, dateCooldownStart) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-//[
-//player.id,
-//player.beingType,
-//player.firstName,
-//player.lastName,
-//player.sex,
-//player.alive ? 1 : 0,
-//player.fertility,
-//player.birthdate,
-//player.deathdate,
-//player.job,
-//player.isPlayerPartner ? 1 : 0,
-//player.sexuality,
-//player.affection,
-//JSON.stringify(player.qualifications),
-//player.dateCooldownStart ?? null,
-//],
-//),
-//database.runAsync(
-//"INSERT OR REPLACE INTO PlayerCharacter (id, playerClass, blessing, health, healthMax, sanity, sanityMax, mana, manaMax, manaRegen, attackPower, jobExperience, learningSpells, magicProficiencies, qualificationProgress, minions, knownSpells, physicalAttacks, conditions, gold, inventory, currentDungeon, equipment, investments, savedEnemy, unAllocatedSkillPoints, allocatedSkillPoints) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-//[
-//player.id,
-//player.playerClass,
-//player.blessing,
-//player.health,
-//player.healthMax,
-//player.sanity,
-//player.sanityMax,
-//player.mana,
-//player.manaMax,
-//player.manaRegen,
-//player.attackPower,
-//JSON.stringify(player.jobExperience),
-//JSON.stringify(player.learningSpells),
-//JSON.stringify(player.magicProficiencies),
-//JSON.stringify(player.qualificationProgress),
-//JSON.stringify(player.minions),
-//JSON.stringify(player.knownSpells),
-//JSON.stringify(player.physicalAttacks),
-//JSON.stringify(player.conditions),
-//player.gold,
-//JSON.stringify(player.inventory),
-//JSON.stringify(player.currentDungeon),
-//JSON.stringify(player.equipment),
-//JSON.stringify(player.investments),
-//JSON.stringify(player.savedEnemy),
-//player.unAllocatedSkillPoints,
-//JSON.stringify(player.allocatedSkillPoints),
-//],
-//);
-//});
-//}
-//};
 
 export const getData = async (key: string) => {
   try {

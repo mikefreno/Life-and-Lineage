@@ -13,13 +13,13 @@ type EmailLogin = {
 };
 
 type GoogleLogin = {
-  idToken: string;
+  token: string;
   email: string;
   provider: "google";
 };
 
 type AppleLogin = {
-  identityToken?: string;
+  token?: string;
   email: string;
   provider: "apple";
   appleUser: string;
@@ -59,7 +59,7 @@ class AuthStore {
   };
 
   get isAuthenticated() {
-    return !!(this.token || this.apple_user_string);
+    return !!this.token || !!this.apple_user_string;
   }
 
   initializeAuth = async () => {
@@ -72,7 +72,7 @@ class AuthStore {
           AsyncStorage.getItem("appleUser"),
         ]);
 
-      if (storedToken) {
+      if (storedToken || (appleUser && storedProvider === "apple")) {
         switch (storedProvider) {
           case "apple":
             await this.checkAppleAuth(appleUser, storedEmail);
@@ -96,14 +96,14 @@ class AuthStore {
               // No previous sign in, clear stored data
               await this.logout();
             }
+            break;
           default:
-            const isValid = await this.validateToken(storedToken);
+            const isValid = await this.validateToken(storedToken!);
             if (isValid) {
               this.setAuthState(
                 storedToken,
                 storedEmail,
-                storedProvider as "email" | "apple" | "google" | null,
-                appleUser,
+                storedProvider as "email",
               );
             } else {
               await this.logout();
@@ -122,7 +122,7 @@ class AuthStore {
       iosClientId: config.iosClientId,
       webClientId: config.webClientId,
       offlineAccess: true,
-      forceCodeForRefreshToken: true, // ensures you always get a refresh token
+      forceCodeForRefreshToken: true,
     });
   };
 
@@ -155,27 +155,23 @@ class AuthStore {
   };
 
   googleSignIn = async () => {
-    try {
-      await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      userInfo.serverAuthCode;
+    await GoogleSignin.hasPlayServices();
+    const userInfo = await GoogleSignin.signIn();
+    userInfo.serverAuthCode;
 
-      if (!userInfo.idToken) {
-        throw new Error("missing idToken in response");
-      }
-      await this.login({
-        idToken: userInfo.idToken,
-        email: userInfo.user.email,
-        provider: "google",
-      });
-      return {
-        givenName: userInfo.user.givenName,
-        familyName: userInfo.user.familyName,
-        email: userInfo.user.email,
-      };
-    } catch (error) {
-      console.log(error);
+    if (!userInfo.idToken) {
+      throw new Error("missing idToken in response");
     }
+    await this.login({
+      token: userInfo.idToken,
+      email: userInfo.user.email,
+      provider: "google",
+    });
+    return {
+      givenName: userInfo.user.givenName,
+      familyName: userInfo.user.familyName,
+      email: userInfo.user.email,
+    };
   };
 
   private appleEmailRetrieval = async (user: string) => {
@@ -194,71 +190,52 @@ class AuthStore {
   };
 
   appleSignIn = async () => {
-    try {
-      const credential = await AppleAuthentication.signInAsync({
-        requestedScopes: [
-          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-          AppleAuthentication.AppleAuthenticationScope.EMAIL,
-        ],
-      });
-      const user = credential.user;
-      let email = credential.email;
-      if (!email) {
-        const email_opt = await this.appleEmailRetrieval(user);
-        if (!email_opt) throw new Error("email retrieval failed");
-        email = email_opt;
-      }
-      await this.login({
-        email,
-        provider: "apple",
-        appleUser: credential.user,
-      });
-      return {
-        givenName: credential.fullName?.givenName,
-        lastName: credential.fullName?.familyName,
-        email: credential.email,
-        userString: credential.user,
-      };
-    } catch (error) {
-      console.log(error);
+    const credential = await AppleAuthentication.signInAsync({
+      requestedScopes: [
+        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+        AppleAuthentication.AppleAuthenticationScope.EMAIL,
+      ],
+    });
+    const user = credential.user;
+    let email = credential.email;
+    if (!email) {
+      const email_opt = await this.appleEmailRetrieval(user);
+      if (!email_opt) throw new Error("email retrieval failed");
+      email = email_opt;
     }
+    await this.login({
+      email,
+      provider: "apple",
+      appleUser: credential.user,
+    });
+    return {
+      givenName: credential.fullName?.givenName,
+      lastName: credential.fullName?.familyName,
+      email: credential.email,
+      userString: credential.user,
+    };
   };
 
   login = async (creds: LoginCreds) => {
     try {
-      const { email, provider } = creds;
-      let token: string | undefined;
-
-      switch (provider) {
-        case "email":
-          token = creds.token;
-          break;
-        case "google":
-          token = creds.idToken;
-          break;
-        case "apple":
-          token = creds.identityToken;
-          break;
+      const { email, provider, token } = creds;
+      let appleUser: string | null = null;
+      if (provider == "apple") {
+        appleUser = creds.appleUser;
       }
 
       await Promise.all([
         token ? AsyncStorage.setItem("userToken", token) : Promise.resolve(),
         AsyncStorage.setItem("userEmail", email),
         AsyncStorage.setItem("authProvider", provider),
-        provider === "apple"
-          ? AsyncStorage.setItem("appleUser", creds.appleUser)
+        appleUser
+          ? AsyncStorage.setItem("appleUser", appleUser)
           : Promise.resolve(),
       ]);
 
-      this.setAuthState(
-        token ?? null,
-        email,
-        provider,
-        provider === "apple" ? creds.appleUser : undefined,
-      );
+      this.setAuthState(token ?? null, email, provider, appleUser);
     } catch (error) {
       console.error("Login error:", error);
-      throw error;
     }
   };
 
@@ -277,9 +254,10 @@ class AuthStore {
       this.setDBCredentials(null, null);
     } catch (error) {
       console.error("Logout error:", error);
-      throw error;
     }
   };
+
+  _destroy_tokens = async () => {};
 
   refreshDatabaseCreds = async () => {
     try {
@@ -341,8 +319,11 @@ class AuthStore {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signInSilently();
       if (userInfo) {
+        if (!userInfo.idToken) {
+          throw new Error("missing token");
+        }
         await this.login({
-          idToken: userInfo.idToken ?? "",
+          token: userInfo.idToken,
           email: userInfo.user.email,
           provider: "google",
         });

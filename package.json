@@ -61,7 +61,8 @@
     "react-native-screens": "3.31.1",
     "react-native-svg": "15.2.0",
     "react-native-web": "~0.19.6",
-    "expo-apple-authentication": "~6.4.2"
+    "expo-apple-authentication": "~6.4.2",
+    "@react-native-community/netinfo": "11.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",

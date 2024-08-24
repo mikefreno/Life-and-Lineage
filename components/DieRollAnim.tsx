@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, Animated, Easing } from "react-native";
 import { rollD20 } from "../utility/functions/roll";
 import { D20SVG } from "../assets/icons/SVGIcons";
 
-const D20Die = () => {
+export const TimedD20Die = () => {
   const [diceValue, setDiceValue] = useState<number | undefined>();
   const spinValue = useRef(new Animated.Value(0)).current;
 
@@ -32,6 +32,63 @@ const D20Die = () => {
   useEffect(() => {
     roll();
   }, []);
+
+  return (
+    <View style={styles.container}>
+      <Animated.View
+        style={[
+          styles.diceContainer,
+          {
+            transform: [{ rotateZ: spin }, { rotateY: spin }, { scale: scale }],
+          },
+        ]}
+      >
+        <D20SVG />
+        <Text style={styles.diceText}>{diceValue ?? ""}</Text>
+      </Animated.View>
+    </View>
+  );
+};
+
+interface IndefiniteD20Die {
+  isSpinning: boolean;
+}
+
+export const IndefiniteD20Die = ({ isSpinning }: IndefiniteD20Die) => {
+  const [diceValue, setDiceValue] = useState<number | undefined>();
+  const spinValue = useRef(new Animated.Value(0)).current;
+
+  const roll = () => {
+    spinValue.setValue(0);
+    setDiceValue(undefined);
+    setTimeout(() => setDiceValue(rollD20()), 750);
+    Animated.timing(spinValue, {
+      toValue: 1,
+      duration: 1000,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start(() => {
+      if (isSpinning) {
+        setTimeout(() => roll(), 500);
+      }
+    });
+  };
+
+  const spin = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "720deg"],
+  });
+
+  const scale = spinValue.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [1, 0.5, 1],
+  });
+
+  useEffect(() => {
+    if (isSpinning) {
+      roll();
+    }
+  }, [isSpinning]);
 
   return (
     <View style={styles.container}>
@@ -82,5 +139,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-
-export default D20Die;

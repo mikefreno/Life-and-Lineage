@@ -17,6 +17,9 @@ export function RemoteConnectionFactory() {
   }
 }
 
+interface UpdateUserState {}
+export function UpdateUserState() {}
+
 const conductor = `
   CREATE TABLE User
   (

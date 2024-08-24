@@ -3,7 +3,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function OptionsLayout() {
   return (
-    <Tabs>
+    <Tabs screenOptions={{ tabBarStyle: { height: 64, paddingBottom: 16 } }}>
       <Tabs.Screen
         name="app"
         options={{

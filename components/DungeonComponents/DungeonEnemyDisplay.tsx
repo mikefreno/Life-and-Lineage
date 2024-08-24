@@ -10,7 +10,7 @@ import FadeOutNode from "../FadeOutNode";
 import { Suspense, useContext, useEffect, useState } from "react";
 import { AppContext } from "../../app/_layout";
 import { DungeonContext } from "./DungeonContext";
-import D20Die from "../DieRollAnim";
+import { TimedD20Die } from "../DieRollAnim";
 
 export default function DungeonEnemyDisplay() {
   const appData = useContext(AppContext);
@@ -178,7 +178,7 @@ export default function DungeonEnemyDisplay() {
   }
   if (enemyState) {
     return (
-      <Suspense fallback={<D20Die />}>
+      <Suspense fallback={<TimedD20Die />}>
         <View className="flex h-[40%] pt-8">
           <View className="flex-1 flex-row justify-evenly pl-8">
             <View

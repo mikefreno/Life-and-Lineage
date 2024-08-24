@@ -1,9 +1,18 @@
-import { Platform, Pressable, TextInput, View } from "react-native";
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  TextInput,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import { Text } from "../../components/Themed";
 import { useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
-import D20Die from "../../components/DieRollAnim";
+import { IndefiniteD20Die } from "../../components/DieRollAnim";
 import { useAuth } from "../../auth/AuthContext";
 import { router } from "expo-router";
 import { observer } from "mobx-react-lite";
@@ -32,7 +41,7 @@ const SignInScreen = observer(() => {
 
       navigateToOptions();
     }
-  }, [auth.isAuthenticated, router]);
+  }, [auth.isAuthenticated]);
 
   const attemptLogin = async () => {
     setAwaitingResponse(true);
@@ -57,16 +66,13 @@ const SignInScreen = observer(() => {
           );
         } else {
           if (result.message === "Email not yet verified!") {
-            await fetch(
-              "https://www.freno.me/api/magic-delve/resend-verification",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email: emailAddress }),
+            fetch(`${API_BASE_URL}/email/refresh/verification`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
               },
-            );
+              body: JSON.stringify({ email: emailAddress }),
+            });
             setError(
               result.message + " A new verification email has been sent",
             );
@@ -95,11 +101,23 @@ const SignInScreen = observer(() => {
     }
   };
 
-  return (
-    <View className="mt-[5vh]">
-      <View className="flex items-center">
+  return awaitingResponse ? (
+    <View className="pt-[25vh]">
+      <IndefiniteD20Die isSpinning={awaitingResponse} />
+    </View>
+  ) : (
+    <>
+      <View className="flex items-center py-[5vh]">
         <Pressable
-          onPress={auth.googleSignIn}
+          onPress={async () => {
+            setAwaitingResponse(true);
+            try {
+              await auth.googleSignIn();
+            } catch (e) {
+              setError("Failed to sign in with Google. Please try again.");
+            }
+            setAwaitingResponse(false);
+          }}
           style={{
             flexDirection: "row",
             alignItems: "center",
@@ -134,72 +152,85 @@ const SignInScreen = observer(() => {
             }
             cornerRadius={5}
             style={{ width: 230, height: 48 }}
-            onPress={auth.appleSignIn}
+            onPress={async () => {
+              setAwaitingResponse(true);
+              try {
+                await auth.appleSignIn();
+              } catch (e) {
+                setError("Failed to sign in with Apple. Please try again.");
+              }
+              setAwaitingResponse(false);
+            }}
           />
         )}
       </View>
-      <Text className="text-center text-3xl pt-4">Email Login</Text>
-      {awaitingResponse ? (
-        <View className="pt-[25vh]">
-          <D20Die />
-        </View>
-      ) : (
-        <>
-          <TextInput
-            className="mx-16 my-6 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
-            placeholderTextColor={
-              colorScheme == "light" ? "#d4d4d8" : "#71717a"
-            }
-            autoComplete={"email"}
-            inputMode={"email"}
-            onChangeText={(text) => setEmailAddress(text)}
-            placeholder={"Enter Email Address..."}
-            autoCorrect={false}
-            autoCapitalize={"none"}
-            value={emailAddress}
-            style={{
-              fontFamily: "PixelifySans",
-              paddingVertical: 8,
-              minWidth: "50%",
-              fontSize: 20,
-            }}
-          />
-          <TextInput
-            className="mx-16 my-6 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
-            placeholderTextColor={
-              colorScheme == "light" ? "#d4d4d8" : "#71717a"
-            }
-            onChangeText={(text) => setPassword(text)}
-            placeholder={"Enter Password..."}
-            autoComplete={"current-password"}
-            autoCorrect={false}
-            autoCapitalize={"none"}
-            secureTextEntry
-            value={password}
-            style={{
-              fontFamily: "PixelifySans",
-              paddingVertical: 8,
-              minWidth: "50%",
-              fontSize: 20,
-            }}
-          />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ScrollView>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View>
+              {error && (
+                <Text className="text-center px-6" style={{ color: "#ef4444" }}>
+                  {error}
+                </Text>
+              )}
 
-          {error && (
-            <Text className="text-center px-6" style={{ color: "#ef4444" }}>
-              {error}
-            </Text>
-          )}
-          <GenericRaisedButton
-            disabledCondition={password.length == 0 || emailAddress.length == 0}
-            onPressFunction={attemptLogin}
-            backgroundColor={"#2563eb"}
-            textColor={"#fafafa"}
-          >
-            Sign In
-          </GenericRaisedButton>
-        </>
-      )}
-    </View>
+              <Text className="text-center text-3xl pt-4">Email Login</Text>
+              <TextInput
+                className="mx-16 my-6 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
+                placeholderTextColor={
+                  colorScheme == "light" ? "#d4d4d8" : "#71717a"
+                }
+                autoComplete={"email"}
+                inputMode={"email"}
+                onChangeText={(text) => setEmailAddress(text)}
+                placeholder={"Enter Email Address..."}
+                autoCorrect={false}
+                autoCapitalize={"none"}
+                value={emailAddress}
+                style={{
+                  fontFamily: "PixelifySans",
+                  paddingVertical: 8,
+                  minWidth: "50%",
+                  fontSize: 20,
+                }}
+              />
+              <TextInput
+                className="mx-16 my-6 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
+                placeholderTextColor={
+                  colorScheme == "light" ? "#d4d4d8" : "#71717a"
+                }
+                onChangeText={(text) => setPassword(text)}
+                placeholder={"Enter Password..."}
+                autoComplete={"current-password"}
+                autoCorrect={false}
+                autoCapitalize={"none"}
+                secureTextEntry
+                value={password}
+                style={{
+                  fontFamily: "PixelifySans",
+                  paddingVertical: 8,
+                  minWidth: "50%",
+                  fontSize: 20,
+                }}
+              />
+              <GenericRaisedButton
+                disabledCondition={
+                  password.length == 0 || emailAddress.length == 0
+                }
+                onPressFunction={attemptLogin}
+                backgroundColor={"#2563eb"}
+                textColor={"#fafafa"}
+              >
+                Sign In
+              </GenericRaisedButton>
+            </View>
+          </TouchableWithoutFeedback>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </>
   );
 });
 export default SignInScreen;

@@ -20,7 +20,7 @@ import DroppedItemsModal from "../../components/DungeonComponents/DroppedItemsMo
 import LeftBehindItemsModal from "../../components/DungeonComponents/LeftBehindItemsModal";
 import { dungeonSave } from "../../utility/functions/save_load";
 import { throttle } from "lodash";
-import D20Die from "../../components/DieRollAnim";
+import { TimedD20Die } from "../../components/DieRollAnim";
 import { AppContext } from "../../app/_layout";
 import { DungeonContext } from "./DungeonContext";
 import { DungeonMapRender } from "./DungeonMap";
@@ -181,7 +181,7 @@ const DungeonLevelScreen = observer(() => {
             <DungeonEnemyDisplay />
           ) : (
             <View className="flex h-[40%] pt-8">
-              <D20Die />
+              <TimedD20Die />
             </View>
           )}
           <Pressable
