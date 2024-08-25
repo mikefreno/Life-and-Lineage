@@ -5,11 +5,6 @@ import { fullLoad, storage } from "../utility/functions/save_load";
 import { PlayerCharacter } from "../classes/character";
 import { Game } from "../classes/game";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  Game as GameMessage,
-  PlayerCharacter as PlayerCharacterMessage,
-} from "../proto/generated/game_data";
-import { fromByteArray, toByteArray } from "react-native-quick-base64";
 
 export default function SaveLoadPerformance() {
   const [newTime, setNewTime] = useState<number>();
@@ -153,36 +148,30 @@ const test_fullSave_new = async (
 ) => {
   if (game && player) {
     try {
-      const packedGame = GameMessage.encode(game).finish();
-      const packedPlayer = PlayerCharacterMessage.encode(player).finish();
-
-      storage.set("test_game", fromByteArray(packedGame));
-      storage.set("test_player", fromByteArray(packedPlayer));
+      const jsonGame = JSON.stringify(game);
+      const jsonPlayer = JSON.stringify(player);
+      storage.set("game_test", jsonGame);
+      storage.set("player_test", jsonPlayer);
     } catch (e) {
-      console.error("Error in test_fullSave_new:", e);
+      console.error(e);
     }
-  } else {
-    console.error("Game or player is null in test_fullSave_new");
   }
 };
 
-const test_fullLoad_new = async () => {
+export const test_fullLoad_new = async () => {
   try {
-    const retrieved_game = storage.getString("test_game");
-    const retrieved_player = storage.getString("test_player");
+    const jsonGame = storage.getString("game_test");
     let game;
+    if (jsonGame) {
+      game = Game.fromJSON(JSON.parse(jsonGame));
+    }
+    const jsonPlayer = storage.getString("player_test");
     let player;
-    if (retrieved_game) {
-      game = Game.fromJSON(GameMessage.decode(toByteArray(retrieved_game)));
+    if (jsonPlayer) {
+      player = PlayerCharacter.fromJSON(JSON.parse(jsonPlayer));
     }
-    if (retrieved_player) {
-      player = PlayerCharacter.fromJSON(
-        PlayerCharacterMessage.decode(toByteArray(retrieved_player)),
-      );
-    }
-    return { player, game };
+    return { game, player };
   } catch (e) {
-    console.error("Error in test_fullLoad_new:", e);
-    return { game: undefined, player: undefined };
+    console.error(e);
   }
 };

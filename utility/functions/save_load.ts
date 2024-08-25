@@ -1,45 +1,10 @@
 import { PlayerCharacter } from "../../classes/character";
 import type { Enemy } from "../../classes/creatures";
 import { Game } from "../../classes/game";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { AppContextType, DungeonContextType } from "../types";
-import {
-  Game as GameMessage,
-  PlayerCharacter as PlayerCharacterMessage,
-} from "../../proto/generated/game_data";
-import { fromByteArray, toByteArray } from "react-native-quick-base64";
 import { MMKV } from "react-native-mmkv";
 
 export const storage = new MMKV();
-
-export const storeData = async (key: string, value: any) => {
-  try {
-    const jsonValue = JSON.stringify(value);
-    await AsyncStorage.setItem(key, jsonValue);
-  } catch (e) {
-    // saving error
-    console.error(e);
-  }
-};
-
-//just saves game, simpler interface
-export const saveGame = async (game: Game | null) => {
-  try {
-    const jsonGame = JSON.stringify(game);
-    await AsyncStorage.setItem("game", jsonGame);
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-export const savePlayer = async (player: PlayerCharacter) => {
-  try {
-    const jsonPlayer = JSON.stringify(player);
-    await AsyncStorage.setItem("player", jsonPlayer);
-  } catch (e) {
-    console.error(e);
-  }
-};
 
 export const fullSave = async (
   game: Game | null,
@@ -47,55 +12,32 @@ export const fullSave = async (
 ) => {
   if (game && player) {
     try {
-      const packedGame = GameMessage.encode(game).finish();
-      const packedPlayer = PlayerCharacterMessage.encode(player).finish();
-
-      storage.set("test_game", fromByteArray(packedGame));
-      storage.set("test_player", fromByteArray(packedPlayer));
+      storage.set("game", JSON.stringify(game));
+      storage.set("player", JSON.stringify(player));
     } catch (e) {
-      console.error("Error in test_fullSave_new:", e);
+      console.log("Error in fullSave:", e);
     }
   } else {
-    console.error("Game or player is null in test_fullSave_new");
+    console.log("Game or player is null in fullSave");
   }
 };
 
 export const fullLoad = async () => {
   try {
-    const retrieved_game = storage.getString("test_game");
-    const retrieved_player = storage.getString("test_player");
+    const retrieved_game = storage.getString("game");
+    const retrieved_player = storage.getString("player");
     let game;
     let player;
     if (retrieved_game) {
-      game = Game.fromJSON(GameMessage.decode(toByteArray(retrieved_game)));
+      game = Game.fromJSON(JSON.parse(retrieved_game));
     }
     if (retrieved_player) {
-      player = PlayerCharacter.fromJSON(
-        PlayerCharacterMessage.decode(toByteArray(retrieved_player)),
-      );
+      player = PlayerCharacter.fromJSON(JSON.parse(retrieved_player));
     }
     return { player, game };
   } catch (e) {
-    console.error("Error in test_fullLoad_new:", e);
+    console.log("Error in fullLoad:", e);
     return { game: undefined, player: undefined };
-  }
-};
-
-export const loadGame = async () => {
-  try {
-    const jsonValue = await AsyncStorage.getItem("game");
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-export const loadPlayer = async () => {
-  try {
-    const jsonValue = await AsyncStorage.getItem("player");
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
-  } catch (e) {
-    console.error(e);
   }
 };
 

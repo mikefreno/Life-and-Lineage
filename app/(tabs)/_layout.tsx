@@ -32,7 +32,7 @@ import {
   Wand,
   WizardHat,
 } from "../../assets/icons/SVGIcons";
-import PlatformDependantBlurView from "../../components/PlatformDependantBlurView";
+import { View as ThemedView } from "../../components/Themed";
 
 export default function TabLayout() {
   const appData = useContext(AppContext);
@@ -53,16 +53,7 @@ export default function TabLayout() {
                 {Platform.OS == "ios" ? (
                   <LinearGradientBlur />
                 ) : (
-                  <BlurView
-                    tint={
-                      colorScheme == "light"
-                        ? "systemMaterial"
-                        : "systemMaterialDark"
-                    }
-                    intensity={100}
-                    style={StyleSheet.absoluteFill}
-                    experimentalBlurMethod={"dimezisBlurView"}
-                  />
+                  <ThemedView style={StyleSheet.absoluteFill} />
                 )}
               </>
             );
@@ -124,7 +115,29 @@ export default function TabLayout() {
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackground: () => <PlatformDependantBlurView />,
+            headerBackground:
+              Platform.OS == "ios"
+                ? () => (
+                    <BlurView
+                      blurReductionFactor={8}
+                      tint={
+                        Platform.OS == "android"
+                          ? colorScheme == "light"
+                            ? "systemMaterial"
+                            : "systemMaterialDark"
+                          : "default"
+                      }
+                      intensity={100}
+                      style={StyleSheet.absoluteFill}
+                      experimentalBlurMethod={"dimezisBlurView"}
+                    />
+                  )
+                : () => (
+                    <ThemedView
+                      style={StyleSheet.absoluteFill}
+                      className="shadow-soft"
+                    />
+                  ),
             title: "Home",
             tabBarIcon: ({ color }) =>
               playerState?.playerClass == "necromancer" ? (
@@ -186,9 +199,29 @@ export default function TabLayout() {
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-
-            headerBackground: () => <PlatformDependantBlurView />,
-
+            headerBackground:
+              Platform.OS == "ios"
+                ? () => (
+                    <BlurView
+                      blurReductionFactor={8}
+                      tint={
+                        Platform.OS == "android"
+                          ? colorScheme == "light"
+                            ? "systemMaterial"
+                            : "systemMaterialDark"
+                          : "default"
+                      }
+                      intensity={100}
+                      style={StyleSheet.absoluteFill}
+                      experimentalBlurMethod={"dimezisBlurView"}
+                    />
+                  )
+                : () => (
+                    <ThemedView
+                      style={StyleSheet.absoluteFill}
+                      className="shadow-soft"
+                    />
+                  ),
             title: "Spells",
             tabBarIcon: ({ color }) => (
               <Wand
@@ -224,7 +257,29 @@ export default function TabLayout() {
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackground: () => <PlatformDependantBlurView />,
+            headerBackground:
+              Platform.OS == "ios"
+                ? () => (
+                    <BlurView
+                      blurReductionFactor={8}
+                      tint={
+                        Platform.OS == "android"
+                          ? colorScheme == "light"
+                            ? "systemMaterial"
+                            : "systemMaterialDark"
+                          : "default"
+                      }
+                      intensity={100}
+                      style={StyleSheet.absoluteFill}
+                      experimentalBlurMethod={"dimezisBlurView"}
+                    />
+                  )
+                : () => (
+                    <ThemedView
+                      style={StyleSheet.absoluteFill}
+                      className="shadow-soft"
+                    />
+                  ),
             title: "Labor",
             tabBarIcon: ({ color }) => (
               <Broom
@@ -278,7 +333,29 @@ export default function TabLayout() {
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackground: () => <PlatformDependantBlurView />,
+            headerBackground:
+              Platform.OS == "ios"
+                ? () => (
+                    <BlurView
+                      blurReductionFactor={8}
+                      tint={
+                        Platform.OS == "android"
+                          ? colorScheme == "light"
+                            ? "systemMaterial"
+                            : "systemMaterialDark"
+                          : "default"
+                      }
+                      intensity={100}
+                      style={StyleSheet.absoluteFill}
+                      experimentalBlurMethod={"dimezisBlurView"}
+                    />
+                  )
+                : () => (
+                    <ThemedView
+                      style={StyleSheet.absoluteFill}
+                      className="shadow-soft"
+                    />
+                  ),
             title: "Dungeon",
             tabBarIcon: ({ color }) => (
               <Dungeon
@@ -310,7 +387,29 @@ export default function TabLayout() {
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackground: () => <PlatformDependantBlurView />,
+            headerBackground:
+              Platform.OS == "ios"
+                ? () => (
+                    <BlurView
+                      blurReductionFactor={8}
+                      tint={
+                        Platform.OS == "android"
+                          ? colorScheme == "light"
+                            ? "systemMaterial"
+                            : "systemMaterialDark"
+                          : "default"
+                      }
+                      intensity={100}
+                      style={StyleSheet.absoluteFill}
+                      experimentalBlurMethod={"dimezisBlurView"}
+                    />
+                  )
+                : () => (
+                    <ThemedView
+                      style={StyleSheet.absoluteFill}
+                      className="shadow-soft"
+                    />
+                  ),
             title: "Shops",
             tabBarIcon: ({ color }) => (
               <Potion
@@ -342,7 +441,29 @@ export default function TabLayout() {
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackground: () => <PlatformDependantBlurView />,
+            headerBackground:
+              Platform.OS == "ios"
+                ? () => (
+                    <BlurView
+                      blurReductionFactor={8}
+                      tint={
+                        Platform.OS == "android"
+                          ? colorScheme == "light"
+                            ? "systemMaterial"
+                            : "systemMaterialDark"
+                          : "default"
+                      }
+                      intensity={100}
+                      style={StyleSheet.absoluteFill}
+                      experimentalBlurMethod={"dimezisBlurView"}
+                    />
+                  )
+                : () => (
+                    <ThemedView
+                      style={StyleSheet.absoluteFill}
+                      className="shadow-soft"
+                    />
+                  ),
             title: "Medical",
             tabBarIcon: ({ color }) => (
               <Medical

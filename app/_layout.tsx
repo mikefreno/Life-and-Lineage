@@ -22,6 +22,7 @@ import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
 import { AppContextType } from "../utility/types";
 import { AuthProvider, useAuth } from "../auth/AuthContext";
+import { IndefiniteD20Die } from "../components/DieRollAnim";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -56,15 +57,15 @@ const Root = observer(() => {
 
   const getData = async () => {
     try {
-      const res = await fullLoad();
+      const { game, player } = await fullLoad();
 
-      if (res?.game) {
-        setGameData(res.game);
-        setColorScheme(res.game.colorScheme);
-        setGameDate(res.game.date);
+      if (game) {
+        setGameData(game);
+        setColorScheme(game.colorScheme);
+        setGameDate(game.date);
       }
-      if (res?.player) {
-        setPlayerCharacter(PlayerCharacter.fromJSON(res.player));
+      if (player) {
+        setPlayerCharacter(player);
       }
       setLoading(false);
     } catch (e) {
@@ -98,11 +99,7 @@ const Root = observer(() => {
   );
 
   while (loading) {
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
+    return <IndefiniteD20Die isSpinning={loading} />;
   }
 
   return (
@@ -130,7 +127,7 @@ const Root = observer(() => {
 });
 
 const RootLayout = observer(() => {
-  const [fontLoaded, fontError] = useFonts({
+  const [fontLoaded] = useFonts({
     PixelifySans: require("../assets/fonts/PixelifySans-Regular.ttf"),
   });
   const appData = useContext(AppContext);
@@ -208,9 +205,8 @@ const RootLayout = observer(() => {
       setNavbarLoad(true);
     }
   }
-
-  if (!fontLoaded && !fontError) {
-    return null;
+  while (!fontLoaded) {
+    return <IndefiniteD20Die isSpinning={fontLoaded} />;
   }
 
   return (
