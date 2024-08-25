@@ -17,7 +17,6 @@ import {
 } from "../../../utility/functions/misc/words";
 import { Game } from "../../../classes/game";
 import { useContext } from "react";
-
 import { useVibration } from "../../../utility/customHooks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getRandomJobTitle } from "../../../utility/functions/characterAid";
@@ -54,7 +53,6 @@ export default function NewGameReview() {
       lastName: lastName,
       sex: sex,
       job: job,
-      sexuality: "straight",
       affection: 85,
       birthdate: generateBirthday(32, 55),
       deathdate: null,
@@ -72,7 +70,6 @@ export default function NewGameReview() {
         firstName: firstName,
         lastName: lastName,
         sex: sex as "male" | "female",
-        sexuality: null,
         playerClass: playerClass as "paladin",
         blessing: blessing as "holy" | "vengeance" | "protection",
         parents: [mom, dad],
@@ -84,7 +81,6 @@ export default function NewGameReview() {
         firstName: firstName,
         lastName: lastName,
         sex: sex as "male" | "female",
-        sexuality: null,
         playerClass: playerClass as "necromancer",
         blessing: blessing as "blood" | "summoning" | "pestilence" | "bone",
         parents: [mom, dad],
@@ -96,7 +92,6 @@ export default function NewGameReview() {
         firstName: firstName,
         lastName: lastName,
         sex: sex as "male" | "female",
-        sexuality: null,
         playerClass: playerClass as "mage",
         blessing: blessing as "fire" | "water" | "air" | "earth",
         parents: [mom, dad],

@@ -1,8 +1,8 @@
 import { action, makeObservable, observable } from "mobx";
 import * as Crypto from "expo-crypto";
 import { ConditionType, effectOptions } from "../utility/types";
-import { Character, PlayerCharacter } from "./character";
-import { Creature, Enemy } from "./creatures";
+import { PlayerCharacter } from "./character";
+import { Creature } from "./creatures";
 
 export class Condition {
   readonly id: string;

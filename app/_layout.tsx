@@ -11,7 +11,7 @@ import { observer } from "mobx-react-lite";
 import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
-import { fullSave, loadGame, loadPlayer } from "../utility/functions/save_load";
+import { fullSave, fullLoad } from "../utility/functions/save_load";
 import { View, Text, Platform, StyleSheet } from "react-native";
 import { reaction } from "mobx";
 import "../assets/styles/globals.css";
@@ -56,16 +56,15 @@ const Root = observer(() => {
 
   const getData = async () => {
     try {
-      const storedPlayerData = await loadPlayer();
-      const storedGameData = await loadGame();
+      const { game, player } = await fullLoad();
 
-      if (storedGameData) {
-        setGameData(Game.fromJSON(storedGameData));
-        setColorScheme(storedGameData.colorScheme);
-        setGameDate(storedGameData.date);
+      if (game) {
+        setGameData(Game.fromJSON(game));
+        setColorScheme(game.colorScheme);
+        setGameDate(game.date);
       }
-      if (storedPlayerData) {
-        setPlayerCharacter(PlayerCharacter.fromJSON(storedPlayerData));
+      if (player) {
+        setPlayerCharacter(PlayerCharacter.fromJSON(player));
       }
       setLoading(false);
     } catch (e) {

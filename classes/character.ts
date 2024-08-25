@@ -64,10 +64,8 @@ interface CharacterOptions {
   birthdate?: string;
   alive?: boolean;
   deathdate: string | null;
-  fertility?: number;
   job?: string;
   isPlayerPartner?: boolean;
-  sexuality: "straight" | "gay" | "bisexual" | null;
   affection?: number;
   qualifications?: string[];
   dateCooldownStart?: string;
@@ -80,12 +78,10 @@ export class Character {
   readonly lastName: string;
   readonly sex: "male" | "female";
   alive: boolean;
-  fertility: number;
   readonly birthdate: string;
   deathdate: string | null;
   job: string;
   isPlayerPartner: boolean;
-  sexuality: "straight" | "gay" | "bisexual" | null;
   affection: number;
   qualifications: string[];
   dateCooldownStart?: string;
@@ -100,8 +96,6 @@ export class Character {
     deathdate,
     job,
     isPlayerPartner,
-    sexuality,
-    fertility,
     affection,
     qualifications,
     dateCooldownStart,
@@ -115,8 +109,6 @@ export class Character {
     this.deathdate = deathdate ?? null;
     this.job = job ?? "Unemployed";
     this.isPlayerPartner = isPlayerPartner ?? false;
-    this.sexuality = sexuality;
-    this.fertility = fertility ?? Math.floor(Math.random() * 21);
     this.affection = affection ?? 0;
     this.qualifications = qualifications ?? [];
     this.dateCooldownStart = dateCooldownStart;
@@ -191,7 +183,6 @@ export class Character {
       birthdate: json.birthdate ?? undefined,
       alive: json.alive,
       deathdate: json.deathdate ?? null,
-      sexuality: json.sexuality,
       isPlayerPartner: json.isPlayerPartner,
       job: json.job,
       affection: json.affection,
@@ -241,7 +232,6 @@ type PlayerCharacterBase = {
   children?: Character[];
   partners?: Character[];
   knownCharacters?: Character[];
-  sexuality: null;
   physicalAttacks?: string[];
   knownSpells?: string[];
   gold?: number;
@@ -395,7 +385,6 @@ export class PlayerCharacter extends Character {
     conditions,
     parents,
     children,
-    sexuality,
     partners,
     knownCharacters,
     knownSpells,
@@ -418,7 +407,6 @@ export class PlayerCharacter extends Character {
       birthdate,
       alive,
       deathdate,
-      sexuality,
       job,
       qualifications,
       affection,
@@ -1836,7 +1824,6 @@ export class PlayerCharacter extends Character {
       knownSpells: json.knownSpells,
       physicalAttacks: json.physicalAttacks,
       gold: json.gold,
-      sexuality: null,
       inventory: json.inventory
         ? json.inventory.map((item: any) => Item.fromJSON(item))
         : [],

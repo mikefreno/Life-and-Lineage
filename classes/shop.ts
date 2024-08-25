@@ -19,7 +19,6 @@ import weapons from "../assets/json/items/weapons.json";
 import { action, makeObservable, observable } from "mobx";
 import { Character } from "./character";
 import { rollD20 } from "../utility/functions/roll";
-import { getRandomSexuality } from "../utility/functions/characterAid";
 import { getRandomName, toTitleCase } from "../utility/functions/misc/words";
 import { generateBirthday } from "../utility/functions/misc/age";
 import { ItemClassType } from "../utility/types";
@@ -355,14 +354,12 @@ export function createShops(playerClass: "mage" | "paladin" | "necromancer") {
 
 export function generateShopKeeper(archetype: string) {
   const sex = rollD20() <= 12 ? "male" : "female";
-  const sexuality = getRandomSexuality() as "straight" | "bisexual" | "gay";
   const name = getRandomName(sex);
   const birthdate = generateBirthday(25, 70);
   const job = toTitleCase(archetype);
 
   const newChar = new Character({
     sex: sex,
-    sexuality: sexuality,
     firstName: name.firstName,
     lastName: name.lastName,
     birthdate: birthdate,
