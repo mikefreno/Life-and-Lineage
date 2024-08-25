@@ -56,15 +56,15 @@ const Root = observer(() => {
 
   const getData = async () => {
     try {
-      const { game, player } = await fullLoad();
+      const res = await fullLoad();
 
-      if (game) {
-        setGameData(Game.fromJSON(game));
-        setColorScheme(game.colorScheme);
-        setGameDate(game.date);
+      if (res?.game) {
+        setGameData(res.game);
+        setColorScheme(res.game.colorScheme);
+        setGameDate(res.game.date);
       }
-      if (player) {
-        setPlayerCharacter(PlayerCharacter.fromJSON(player));
+      if (res?.player) {
+        setPlayerCharacter(PlayerCharacter.fromJSON(res.player));
       }
       setLoading(false);
     } catch (e) {
@@ -82,7 +82,7 @@ const Root = observer(() => {
     getData();
   }, []);
 
-  //const throttledFullSave = throttle(fullSave, 2000);
+  const throttledFullSave = throttle(fullSave, 2000);
 
   reaction(
     () => ({
@@ -91,7 +91,7 @@ const Root = observer(() => {
     (state) => {
       if (gameState && playerState && state.gameTime != gameDate) {
         setGameDate(gameState.date);
-        //throttledFullSave(gameState, playerState);
+        throttledFullSave(gameState, playerState);
       }
     },
     { delay: 2000 },

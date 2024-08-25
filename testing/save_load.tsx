@@ -1,18 +1,15 @@
 import { useEffect, useState } from "react";
 import { TextInput, View, Text, StyleSheet } from "react-native";
 import GenericRaisedButton from "../components/GenericRaisedButton";
-import { fullLoad } from "../utility/functions/save_load";
+import { fullLoad, storage } from "../utility/functions/save_load";
 import { PlayerCharacter } from "../classes/character";
 import { Game } from "../classes/game";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { encode, decode } from "react-native-msgpack";
-import * as FileSystem from "expo-file-system";
-import { fromByteArray, toByteArray } from "react-native-quick-base64";
 import {
   Game as GameMessage,
   PlayerCharacter as PlayerCharacterMessage,
 } from "../proto/generated/game_data";
-import { MMKV } from "react-native-mmkv";
+import { fromByteArray, toByteArray } from "react-native-quick-base64";
 
 export default function SaveLoadPerformance() {
   const [newTime, setNewTime] = useState<number>();
@@ -30,10 +27,10 @@ export default function SaveLoadPerformance() {
 
   const setup = async () => {
     setSettingUp(true);
-    const { game, player } = await fullLoad();
-    if (!game || !player) throw new Error("load failure");
-    setTestPlayer(player);
-    setTestGame(game);
+    const res = await fullLoad();
+    if (!res?.game || !res?.player) throw new Error("load failure");
+    setTestPlayer(res?.player);
+    setTestGame(res?.game);
     setSettingUp(false);
   };
 
@@ -132,28 +129,21 @@ const test_fullSave = async (
   }
 };
 
-const test_fullLoad = async (): Promise<{
-  game: Game | null;
-  player: PlayerCharacter | null;
-}> => {
+export const test_fullLoad = async () => {
   try {
-    const [gameData, playerData] = await Promise.all([
-      AsyncStorage.getItem("game_test"),
-      AsyncStorage.getItem("player_test"),
-    ]);
-
-    const parseData = (data: string | null) => {
-      console.log(JSON.parse(data));
-      return data ? JSON.parse(data) : null;
-    };
-
-    return {
-      game: parseData(gameData) as Game | null,
-      player: parseData(playerData) as PlayerCharacter | null,
-    };
+    const jsonGame = await AsyncStorage.getItem("game");
+    let game;
+    if (jsonGame) {
+      game = Game.fromJSON(JSON.parse(jsonGame));
+    }
+    const jsonPlayer = await AsyncStorage.getItem("game");
+    let player;
+    if (jsonPlayer) {
+      player = PlayerCharacter.fromJSON(JSON.parse(jsonPlayer));
+    }
+    return { game, player };
   } catch (e) {
     console.error(e);
-    return { game: null, player: null };
   }
 };
 
@@ -166,41 +156,33 @@ const test_fullSave_new = async (
       const packedGame = GameMessage.encode(game).finish();
       const packedPlayer = PlayerCharacterMessage.encode(player).finish();
 
-      const storage = new MMKV();
-      storage.set("mmkv_game_test", packedGame);
-      storage.set("mmkv_player_test", packedPlayer);
+      storage.set("test_game", fromByteArray(packedGame));
+      storage.set("test_player", fromByteArray(packedPlayer));
     } catch (e) {
-      console.error(e);
+      console.error("Error in test_fullSave_new:", e);
     }
+  } else {
+    console.error("Game or player is null in test_fullSave_new");
   }
 };
 
-const test_fullLoad_new = async (): Promise<{
-  game: Game | null;
-  player: PlayerCharacter | null;
-}> => {
+const test_fullLoad_new = async () => {
   try {
-    const storage = new MMKV();
-
-    const packedGame = storage.getBuffer("mmkv_game_test");
-    const packedPlayer = storage.getBuffer("mmkv_player_test");
-
-    let game: Game | null = null;
-    let player: PlayerCharacter | null = null;
-
-    if (packedGame) {
-      game = GameMessage.decode(packedGame) as unknown as Game;
+    const retrieved_game = storage.getString("test_game");
+    const retrieved_player = storage.getString("test_player");
+    let game;
+    let player;
+    if (retrieved_game) {
+      game = Game.fromJSON(GameMessage.decode(toByteArray(retrieved_game)));
     }
-
-    if (packedPlayer) {
-      player = PlayerCharacterMessage.decode(
-        packedPlayer,
-      ) as unknown as PlayerCharacter;
+    if (retrieved_player) {
+      player = PlayerCharacter.fromJSON(
+        PlayerCharacterMessage.decode(toByteArray(retrieved_player)),
+      );
     }
-
-    return { game, player };
+    return { player, game };
   } catch (e) {
     console.error("Error in test_fullLoad_new:", e);
-    return { game: null, player: null };
+    return { game: undefined, player: undefined };
   }
 };

@@ -3,6 +3,14 @@ import type { Enemy } from "../../classes/creatures";
 import { Game } from "../../classes/game";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { AppContextType, DungeonContextType } from "../types";
+import {
+  Game as GameMessage,
+  PlayerCharacter as PlayerCharacterMessage,
+} from "../../proto/generated/game_data";
+import { fromByteArray, toByteArray } from "react-native-quick-base64";
+import { MMKV } from "react-native-mmkv";
+
+export const storage = new MMKV();
 
 export const storeData = async (key: string, value: any) => {
   try {
@@ -39,15 +47,37 @@ export const fullSave = async (
 ) => {
   if (game && player) {
     try {
-      const jsonGame = JSON.stringify(game);
-      const jsonPlayer = JSON.stringify(player);
-      await Promise.all([
-        AsyncStorage.setItem("game", jsonGame),
-        AsyncStorage.setItem("player", jsonPlayer),
-      ]);
+      const packedGame = GameMessage.encode(game).finish();
+      const packedPlayer = PlayerCharacterMessage.encode(player).finish();
+
+      storage.set("test_game", fromByteArray(packedGame));
+      storage.set("test_player", fromByteArray(packedPlayer));
     } catch (e) {
-      console.error(e);
+      console.error("Error in test_fullSave_new:", e);
     }
+  } else {
+    console.error("Game or player is null in test_fullSave_new");
+  }
+};
+
+export const fullLoad = async () => {
+  try {
+    const retrieved_game = storage.getString("test_game");
+    const retrieved_player = storage.getString("test_player");
+    let game;
+    let player;
+    if (retrieved_game) {
+      game = Game.fromJSON(GameMessage.decode(toByteArray(retrieved_game)));
+    }
+    if (retrieved_player) {
+      player = PlayerCharacter.fromJSON(
+        PlayerCharacterMessage.decode(toByteArray(retrieved_player)),
+      );
+    }
+    return { player, game };
+  } catch (e) {
+    console.error("Error in test_fullLoad_new:", e);
+    return { game: undefined, player: undefined };
   }
 };
 

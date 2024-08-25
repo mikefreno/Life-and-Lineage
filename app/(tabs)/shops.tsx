@@ -1,170 +1,175 @@
-import { Pressable, ScrollView, View } from "react-native";
-import { Text } from "../../components/Themed";
-import { Shop } from "../../classes/shop";
-import { CharacterImage } from "../../components/CharacterImage";
-import shopObjects from "../../assets/json/shops.json";
-import { router } from "expo-router";
-import { useContext, useEffect, useState } from "react";
-import { useVibration } from "../../utility/customHooks";
-import { useIsFocused } from "@react-navigation/native";
-import TutorialModal from "../../components/TutorialModal";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { useHeaderHeight } from "@react-navigation/elements";
-import { toTitleCase } from "../../utility/functions/misc/words";
-import { calculateAge } from "../../utility/functions/misc/age";
-import { AppContext } from "../_layout";
+//import { Pressable, ScrollView, View } from "react-native";
+//import { Text } from "../../components/Themed";
+//import { Shop } from "../../classes/shop";
+//import { CharacterImage } from "../../components/CharacterImage";
+//import shopObjects from "../../assets/json/shops.json";
+//import { router } from "expo-router";
+//import { useContext, useEffect, useState } from "react";
+//import { useVibration } from "../../utility/customHooks";
+//import { useIsFocused } from "@react-navigation/native";
+//import TutorialModal from "../../components/TutorialModal";
+//import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+//import { useHeaderHeight } from "@react-navigation/elements";
+//import { toTitleCase } from "../../utility/functions/misc/words";
+//import { calculateAge } from "../../utility/functions/misc/age";
+//import { AppContext } from "../_layout";
 
-export default function ShopsScreen() {
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing gameData");
+import SaveLoadPerformance from "../../testing/save_load";
 
-  const vibration = useVibration();
-  const isFocused = useIsFocused();
+//export default function ShopsScreen() {
+//const appData = useContext(AppContext);
+//if (!appData) throw new Error("missing gameData");
 
-  const { gameState, isCompact } = appData;
-  const [showShopTutorial, setShowShopTutorial] = useState<boolean>(
-    (gameState && !gameState.getTutorialState("shops")) ?? false,
-  );
+//const vibration = useVibration();
+//const isFocused = useIsFocused();
 
-  useEffect(() => {
-    if (!showShopTutorial && gameState) {
-      gameState.updateTutorialState("shops", true);
-    }
-  }, [showShopTutorial]);
+//const { gameState, isCompact } = appData;
+//const [showShopTutorial, setShowShopTutorial] = useState<boolean>(
+//(gameState && !gameState.getTutorialState("shops")) ?? false,
+//);
 
-  if (gameState) {
-    const renderItem = (shop: Shop) => (
-      <View className="h-96 w-1/2" key={shop.shopKeeper.id}>
-        <View
-          className="m-2 flex-1 items-center justify-between rounded-xl border p-4"
-          style={{
-            shadowColor: shopObjects.find(
-              (shopObj) => shopObj.type == shop.archetype,
-            )?.colors.background,
-            shadowOffset: {
-              width: 2,
-              height: 3,
-            },
-            elevation: 4,
-            backgroundColor: shopObjects.find(
-              (shopObj) => shopObj.type == shop.archetype,
-            )?.colors.lightbackground,
-            shadowOpacity: 0.2,
-            shadowRadius: 4,
-            borderColor: shopObjects.find(
-              (shopObj) => shopObj.type == shop.archetype,
-            )?.colors.background,
-          }}
-        >
-          <Text
-            className="text-center text-2xl"
-            style={{
-              color: shopObjects.find(
-                (shopObj) => shopObj.type == shop.archetype,
-              )?.colors.font,
-            }}
-          >
-            The {toTitleCase(shop.archetype)}
-          </Text>
-          <View className="items-center">
-            <CharacterImage
-              characterAge={calculateAge(
-                new Date(shop.shopKeeper.birthdate),
-                new Date(gameState.date),
-              )}
-              characterSex={shop.shopKeeper.sex == "male" ? "M" : "F"}
-            />
-            <Text
-              className="text-center"
-              style={{
-                color: shopObjects.find(
-                  (shopObj) => shopObj.type == shop.archetype,
-                )?.colors.font,
-              }}
-            >
-              {shop.shopKeeper.getFullName()}
-            </Text>
+//useEffect(() => {
+//if (!showShopTutorial && gameState) {
+//gameState.updateTutorialState("shops", true);
+//}
+//}, [showShopTutorial]);
 
-            <Pressable
-              className="mt-2"
-              onPress={() => {
-                vibration({ style: "light" });
-                router.push(`/Shops/${shop.archetype}`);
-              }}
-            >
-              {({ pressed }) => (
-                <View
-                  className={`rounded-lg px-8 py-3 ${
-                    pressed ? "scale-95 opacity-50" : ""
-                  }`}
-                  style={{
-                    shadowColor: shopObjects.find(
-                      (shopObj) => shopObj.type == shop.archetype,
-                    )?.colors.background,
-                    shadowOffset: {
-                      width: 2,
-                      height: 3,
-                    },
-                    elevation: 2,
-                    backgroundColor: shopObjects.find(
-                      (shopObj) => shopObj.type == shop.archetype,
-                    )?.colors.background,
-                    shadowOpacity: 0.2,
-                    shadowRadius: 5,
-                  }}
-                >
-                  <Text
-                    className="text-lg"
-                    style={{
-                      color: shopObjects.find(
-                        (shopObj) => shopObj.type == shop.archetype,
-                      )?.colors.font,
-                    }}
-                  >
-                    Enter
-                  </Text>
-                </View>
-              )}
-            </Pressable>
-          </View>
-        </View>
-      </View>
-    );
+//if (gameState) {
+//const renderItem = (shop: Shop) => (
+//<View className="h-96 w-1/2" key={shop.shopKeeper.id}>
+//<View
+//className="m-2 flex-1 items-center justify-between rounded-xl border p-4"
+//style={{
+//shadowColor: shopObjects.find(
+//(shopObj) => shopObj.type == shop.archetype,
+//)?.colors.background,
+//shadowOffset: {
+//width: 2,
+//height: 3,
+//},
+//elevation: 4,
+//backgroundColor: shopObjects.find(
+//(shopObj) => shopObj.type == shop.archetype,
+//)?.colors.lightbackground,
+//shadowOpacity: 0.2,
+//shadowRadius: 4,
+//borderColor: shopObjects.find(
+//(shopObj) => shopObj.type == shop.archetype,
+//)?.colors.background,
+//}}
+//>
+//<Text
+//className="text-center text-2xl"
+//style={{
+//color: shopObjects.find(
+//(shopObj) => shopObj.type == shop.archetype,
+//)?.colors.font,
+//}}
+//>
+//The {toTitleCase(shop.archetype)}
+//</Text>
+//<View className="items-center">
+//<CharacterImage
+//characterAge={calculateAge(
+//new Date(shop.shopKeeper.birthdate),
+//new Date(gameState.date),
+//)}
+//characterSex={shop.shopKeeper.sex == "male" ? "M" : "F"}
+///>
+//<Text
+//className="text-center"
+//style={{
+//color: shopObjects.find(
+//(shopObj) => shopObj.type == shop.archetype,
+//)?.colors.font,
+//}}
+//>
+//{shop.shopKeeper.getFullName()}
+//</Text>
 
-    return (
-      <>
-        <TutorialModal
-          isVisibleCondition={
-            (showShopTutorial && gameState?.tutorialsEnabled && isFocused) ??
-            false
-          }
-          backFunction={() => setShowShopTutorial(false)}
-          pageOne={{
-            title: "Shop Tab",
-            body: "Each of these shops buy and sell various types of items.",
-          }}
-          pageTwo={{
-            title: "Stock Refresh Schedule",
-            body: "Each shop refreshes its stock and gold supply every real world hour.",
-          }}
-          onCloseFunction={() => setShowShopTutorial(false)}
-        />
+//<Pressable
+//className="mt-2"
+//onPress={() => {
+//vibration({ style: "light" });
+//router.push(`/Shops/${shop.archetype}`);
+//}}
+//>
+//{({ pressed }) => (
+//<View
+//className={`rounded-lg px-8 py-3 ${
+//pressed ? "scale-95 opacity-50" : ""
+//}`}
+//style={{
+//shadowColor: shopObjects.find(
+//(shopObj) => shopObj.type == shop.archetype,
+//)?.colors.background,
+//shadowOffset: {
+//width: 2,
+//height: 3,
+//},
+//elevation: 2,
+//backgroundColor: shopObjects.find(
+//(shopObj) => shopObj.type == shop.archetype,
+//)?.colors.background,
+//shadowOpacity: 0.2,
+//shadowRadius: 5,
+//}}
+//>
+//<Text
+//className="text-lg"
+//style={{
+//color: shopObjects.find(
+//(shopObj) => shopObj.type == shop.archetype,
+//)?.colors.font,
+//}}
+//>
+//Enter
+//</Text>
+//</View>
+//)}
+//</Pressable>
+//</View>
+//</View>
+//</View>
+//);
 
-        <ScrollView>
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              alignItems: "flex-start",
-              justifyContent: "flex-start",
-              paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
-              paddingTop: useHeaderHeight(),
-            }}
-          >
-            {gameState.shops.map((shop) => renderItem(shop))}
-          </View>
-        </ScrollView>
-      </>
-    );
-  }
+//return (
+//<>
+//<TutorialModal
+//isVisibleCondition={
+//(showShopTutorial && gameState?.tutorialsEnabled && isFocused) ??
+//false
+//}
+//backFunction={() => setShowShopTutorial(false)}
+//pageOne={{
+//title: "Shop Tab",
+//body: "Each of these shops buy and sell various types of items.",
+//}}
+//pageTwo={{
+//title: "Stock Refresh Schedule",
+//body: "Each shop refreshes its stock and gold supply every real world hour.",
+//}}
+//onCloseFunction={() => setShowShopTutorial(false)}
+///>
+
+//<ScrollView>
+//<View
+//style={{
+//flexDirection: "row",
+//flexWrap: "wrap",
+//alignItems: "flex-start",
+//justifyContent: "flex-start",
+//paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
+//paddingTop: useHeaderHeight(),
+//}}
+//>
+//{gameState.shops.map((shop) => renderItem(shop))}
+//</View>
+//</ScrollView>
+//</>
+//);
+//}
+//}
+export default function Shops() {
+  return <SaveLoadPerformance />;
 }
