@@ -13,7 +13,7 @@ export class Item {
   readonly name: string;
   readonly slot: "head" | "body" | "one-hand" | "two-hand" | "off-hand" | null;
   readonly itemClass: ItemClassType;
-  readonly stats: Record<string, number | undefined> | null;
+  readonly stats: Record<string, number> | null;
   readonly baseValue: number;
   readonly icon: string | undefined;
   readonly stackable: boolean;

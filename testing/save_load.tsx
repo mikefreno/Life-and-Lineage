@@ -8,6 +8,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { encode, decode } from "react-native-msgpack";
 import * as FileSystem from "expo-file-system";
 import { fromByteArray, toByteArray } from "react-native-quick-base64";
+import {
+  Game as GameMessage,
+  PlayerCharacter as PlayerCharacterMessage,
+} from "../proto/generated/game_data";
+import { MMKV } from "react-native-mmkv";
 
 export default function SaveLoadPerformance() {
   const [newTime, setNewTime] = useState<number>();
@@ -158,18 +163,12 @@ const test_fullSave_new = async (
 ) => {
   if (game && player) {
     try {
-      const packedGame = encode(game);
-      const packedPlayer = encode(player);
-      await Promise.all([
-        FileSystem.writeAsStringAsync(
-          FileSystem.documentDirectory + "game_test.bin",
-          fromByteArray(packedGame),
-        ),
-        FileSystem.writeAsStringAsync(
-          FileSystem.documentDirectory + "player_test.bin",
-          fromByteArray(packedPlayer),
-        ),
-      ]);
+      const packedGame = GameMessage.encode(game).finish();
+      const packedPlayer = PlayerCharacterMessage.encode(player).finish();
+
+      const storage = new MMKV();
+      storage.set("mmkv_game_test", packedGame);
+      storage.set("mmkv_player_test", packedPlayer);
     } catch (e) {
       console.error(e);
     }
@@ -181,33 +180,27 @@ const test_fullLoad_new = async (): Promise<{
   player: PlayerCharacter | null;
 }> => {
   try {
-    const [gameData, playerData] = await Promise.all([
-      FileSystem.readAsStringAsync(
-        FileSystem.documentDirectory + "game_test.bin",
-      ),
-      FileSystem.readAsStringAsync(
-        FileSystem.documentDirectory + "player_test.bin",
-      ),
-    ]);
+    const storage = new MMKV();
 
-    let game;
-    let player;
+    const packedGame = storage.getBuffer("mmkv_game_test");
+    const packedPlayer = storage.getBuffer("mmkv_player_test");
 
-    if (gameData) {
-      const gameBuffer = toByteArray(gameData);
-      game = decode(gameBuffer);
+    let game: Game | null = null;
+    let player: PlayerCharacter | null = null;
+
+    if (packedGame) {
+      game = GameMessage.decode(packedGame) as unknown as Game;
     }
 
-    if (playerData) {
-      const playerBuffer = toByteArray(playerData);
-      player = decode(playerBuffer);
+    if (packedPlayer) {
+      player = PlayerCharacterMessage.decode(
+        packedPlayer,
+      ) as unknown as PlayerCharacter;
     }
-    console.log(typeof new PlayerCharacter(player));
-    console.log(typeof game);
 
     return { game, player };
   } catch (e) {
-    console.error(e);
+    console.error("Error in test_fullLoad_new:", e);
     return { game: null, player: null };
   }
 };

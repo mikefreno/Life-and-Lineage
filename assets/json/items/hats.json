@@ -4,8 +4,9 @@
       "baseValue": 1000,
       "icon":"Wizard_Hat",
       "stats":{
-         "armor": 3.0,
-         "regen": 1.0
+         "armor": 3,
+         "regen": 1,
+         "mana": 0
       }
    },
    {
@@ -13,9 +14,9 @@
       "baseValue": 2500,
       "icon": "Wizard_Hat",
       "stats":{
-         "armor": 3.0,
-         "mana": 20.0,
-         "regen": 1.0
+         "armor": 3,
+         "mana": 20,
+         "regen": 1
       }
    },
    {
@@ -23,8 +24,9 @@
       "baseValue": 2500,
       "icon": "Wizard_Hat",
       "stats":{
-         "armor": 5.0,
-         "mana": 100.0
+         "armor": 5,
+         "mana": 100,
+         "regen": 0
       }
    },
    {
@@ -32,9 +34,9 @@
       "baseValue": 4500,
       "icon": "Wizard_Hat",
       "stats":{
-         "armor": 5.0,
-         "mana": 15.0,
-         "regen": 2.0
+         "armor": 5,
+         "mana": 15,
+         "regen": 2
       }
    },
    {
@@ -42,9 +44,10 @@
       "baseValue": 550000,
       "icon": "Wizard_Hat",
       "stats":{
-         "armor": 12.0,
-         "mana": 200.0,
-         "regen": 25.0
+         "armor": 12,
+         "mana": 200,
+         "regen": 25
       }
    }
 ]
+

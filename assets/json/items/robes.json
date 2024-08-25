@@ -4,8 +4,9 @@
       "baseValue": 200,
       "icon": "Base_Robes",
       "stats":{
-         "armor": 4.0,
-         "mana": 15.0
+         "armor": 4,
+         "mana": 15,
+         "regen": 0
       }
    },
    {
@@ -13,8 +14,9 @@
       "baseValue": 1500,
       "icon": "Base_Robes",
       "stats":{
-         "armor": 6.0,
-         "mana": 25.0
+         "armor": 6,
+         "mana": 25,
+         "regen": 0
       }
    },
    {
@@ -22,9 +24,9 @@
       "baseValue": 2500,
       "icon": "Base_Robes",
       "stats":{
-         "armor": 8.0,
-         "mana": 50.0,
-         "regen": 2.0
+         "armor": 8,
+         "mana": 50,
+         "regen": 2
       }
    },
    {
@@ -32,8 +34,9 @@
       "baseValue": 2500,
       "icon": "Base_Robes",
       "stats":{
-         "armor": 8.0,
-         "mana": 100.0
+         "armor": 8,
+         "mana": 100,
+         "regen": 0
       }
    },
    {
@@ -41,9 +44,9 @@
       "baseValue": 6500,
       "icon": "Base_Robes",
       "stats":{
-         "armor": 10.0,
-         "mana": 100.0,
-         "regen": 2.0
+         "armor": 10,
+         "mana": 100,
+         "regen": 2
       }
    },
    {
@@ -51,9 +54,10 @@
       "baseValue": 650000,
       "icon": "Base_Robes",
       "stats":{
-         "armor": 40.0,
-         "mana": 1500.0,
-         "regen": 100.0
+         "armor": 40,
+         "mana": 1500,
+         "regen": 100
       }
    }
 ]
+

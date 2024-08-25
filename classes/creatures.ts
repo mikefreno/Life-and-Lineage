@@ -637,7 +637,7 @@ function itemList(
   slot?: string;
   attacks?: string[];
   icon?: string;
-  stats?: Record<string, number | undefined> | null;
+  stats?: Record<string, number> | null;
 }[] {
   switch (itemType) {
     case "arrow":

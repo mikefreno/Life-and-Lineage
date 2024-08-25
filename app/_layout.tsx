@@ -82,7 +82,7 @@ const Root = observer(() => {
     getData();
   }, []);
 
-  const throttledFullSave = throttle(fullSave, 2000);
+  //const throttledFullSave = throttle(fullSave, 2000);
 
   reaction(
     () => ({
@@ -91,7 +91,7 @@ const Root = observer(() => {
     (state) => {
       if (gameState && playerState && state.gameTime != gameDate) {
         setGameDate(gameState.date);
-        throttledFullSave(gameState, playerState);
+        //throttledFullSave(gameState, playerState);
       }
     },
     { delay: 2000 },

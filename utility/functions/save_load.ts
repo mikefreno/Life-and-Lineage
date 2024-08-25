@@ -1,25 +1,49 @@
 import { PlayerCharacter } from "../../classes/character";
 import type { Enemy } from "../../classes/creatures";
 import { Game } from "../../classes/game";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { AppContextType, DungeonContextType } from "../types";
-import { encode, decode } from "react-native-msgpack";
-import * as FileSystem from "expo-file-system";
-import { fromByteArray, toByteArray } from "react-native-quick-base64";
 
-const fullSave = async (game: Game | null, player: PlayerCharacter | null) => {
+export const storeData = async (key: string, value: any) => {
+  try {
+    const jsonValue = JSON.stringify(value);
+    await AsyncStorage.setItem(key, jsonValue);
+  } catch (e) {
+    // saving error
+    console.error(e);
+  }
+};
+
+//just saves game, simpler interface
+export const saveGame = async (game: Game | null) => {
+  try {
+    const jsonGame = JSON.stringify(game);
+    await AsyncStorage.setItem("game", jsonGame);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+export const savePlayer = async (player: PlayerCharacter) => {
+  try {
+    const jsonPlayer = JSON.stringify(player);
+    await AsyncStorage.setItem("player", jsonPlayer);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+export const fullSave = async (
+  game: Game | null,
+  player: PlayerCharacter | null,
+) => {
   if (game && player) {
     try {
-      const packedGame = encode(game);
-      const packedPlayer = encode(player);
+      const jsonGame = JSON.stringify(game);
+      const jsonPlayer = JSON.stringify(player);
       await Promise.all([
-        FileSystem.writeAsStringAsync(
-          FileSystem.documentDirectory + "game.bin",
-          fromByteArray(packedGame),
-        ),
-        FileSystem.writeAsStringAsync(
-          FileSystem.documentDirectory + "player.bin",
-          fromByteArray(packedPlayer),
-        ),
+        AsyncStorage.setItem("game", jsonGame),
+        AsyncStorage.setItem("player", jsonPlayer),
       ]);
     } catch (e) {
       console.error(e);
@@ -27,32 +51,21 @@ const fullSave = async (game: Game | null, player: PlayerCharacter | null) => {
   }
 };
 
-const fullLoad = async (): Promise<{
-  game: Game | null;
-  player: PlayerCharacter | null;
-}> => {
+export const loadGame = async () => {
   try {
-    const [gameData, playerData] = await Promise.all([
-      FileSystem.readAsStringAsync(FileSystem.documentDirectory + "game.bin"),
-      FileSystem.readAsStringAsync(FileSystem.documentDirectory + "player.bin"),
-    ]);
-
-    let game: Game | null = null;
-    let player: PlayerCharacter | null = null;
-
-    if (gameData) {
-      const gameBuffer = toByteArray(gameData);
-      game = Game.fromJSON(decode(gameBuffer));
-    }
-
-    if (playerData) {
-      const playerBuffer = toByteArray(playerData);
-      player = PlayerCharacter.fromJSON(decode(playerBuffer));
-    }
-    return { game, player };
+    const jsonValue = await AsyncStorage.getItem("game");
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
   } catch (e) {
     console.error(e);
-    return { game: null, player: null };
+  }
+};
+
+export const loadPlayer = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem("player");
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (e) {
+    console.error(e);
   }
 };
 

@@ -1,6 +1,6 @@
 import { action, makeObservable, observable } from "mobx";
 import * as Crypto from "expo-crypto";
-import { ConditionType, effectOptions } from "../utility/types";
+import { ConditionType, EffectOptions, EffectStyle } from "../utility/types";
 import { PlayerCharacter } from "./character";
 import { Creature } from "./creatures";
 
@@ -11,16 +11,12 @@ export class Condition {
   turns: number;
   readonly aura: boolean;
   readonly placedby: string;
-  readonly effect: effectOptions[] | effectOptions;
-  readonly healthDamage: (number | null)[] | number | null;
-  readonly sanityDamage: (number | null)[] | number | null;
-  readonly effectStyle:
-    | ("flat" | "multiplier" | null)[]
-    | "flat"
-    | "multiplier"
-    | null;
-  readonly effectMagnitude: (number | null)[] | number | null;
-  readonly icon: string | undefined;
+  readonly effect: EffectOptions[];
+  readonly healthDamage: number[];
+  readonly sanityDamage: number[];
+  readonly effectStyle: EffectStyle[];
+  readonly effectMagnitude: number[];
+  readonly icon: string;
 
   constructor({
     name,
@@ -108,7 +104,6 @@ export class Condition {
       effectStyle: json.effectStyle,
       placedby: json.placedby,
       aura: json.aura,
-      simple: json.simple,
     });
     return condition;
   }

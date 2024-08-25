@@ -22,8 +22,8 @@
       "style": "debuff",
       "turns": 3,
       "effect": ["skip"],
-      "effectStyle": null,
-      "effectAmount": null,
+      "effectStyle": [null],
+      "effectAmount": [null],
       "icon": "blank"
    }
 ]

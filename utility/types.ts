@@ -10,7 +10,7 @@ export interface ItemOptions {
   id?: string;
   name: string;
   slot?: "head" | "body" | "one-hand" | "two-hand" | "off-hand" | null;
-  stats?: Record<string, number | undefined> | null;
+  stats?: Record<string, number> | null;
   baseValue: number;
   itemClass: ItemClassType;
   icon?: string;
@@ -184,7 +184,7 @@ export enum SkillPoint {
   Sanity,
   AttackPower,
 }
-export type effectOptions =
+export type EffectOptions =
   | "stun"
   | "silenced"
   | "accuracy reduction"
@@ -212,64 +212,33 @@ export type effectOptions =
   | "revenge"
   | "blood magic consumable";
 
-export type ConditionBase = {
+export type EffectStyle = "multiplier" | "percentage" | "flat";
+
+export type ConditionType = {
   id?: string;
   name: string;
   style: "debuff" | "buff";
   turns: number;
+  effect: EffectOptions[];
+  effectStyle: EffectStyle[];
+  effectMagnitude: number[];
+  healthDamage: number[];
+  sanityDamage: number[];
   placedby: string;
-  aura?: boolean;
-  icon?: string;
-  simple: boolean;
-};
-
-export type SimpleCondition = ConditionBase & {
-  effect: effectOptions;
-  effectStyle: "flat" | "multiplier" | null;
-  effectMagnitude: number | null;
-  healthDamage: number | null;
-  sanityDamage: number | null;
-  simple: true;
-};
-
-export type ComplexCondition = ConditionBase & {
-  effect: effectOptions[];
-  effectStyle: ("flat" | "multiplier" | null)[] | null;
-  effectMagnitude: (number | null)[];
-  healthDamage: (number | null)[];
-  sanityDamage: (number | null)[];
-  simple: false;
-};
-
-export type ConditionType = SimpleCondition | ComplexCondition;
-
-export type ConditionObjectBase = {
-  name: string;
-  style: "debuff" | "buff";
-  turns: number;
   aura?: boolean;
   icon: string;
 };
 
-export type SimpleConditionObject = ConditionObjectBase & {
-  effect: effectOptions;
-  effectStyle: "flat" | "multiplier" | "percentage" | null;
-  effectAmount: number | null;
-  healthDamage: number | null;
-  sanityDamage: number | null;
+export type ConditionObjectType = {
+  name: string;
+  style: "debuff" | "buff";
+  turns: number;
+  effect: EffectOptions[];
+  effectStyle: EffectStyle[];
+  effectAmount: number[];
+  icon: string;
+  aura?: boolean;
 };
-
-export type ComplexConditionObject = ConditionObjectBase & {
-  effect: effectOptions[];
-  effectStyle: ("flat" | "multiplier" | "percentage" | null)[] | null;
-  effectAmount: (number | null)[];
-  healthDamage: (number | null)[];
-  sanityDamage: (number | null)[];
-};
-
-export type ConditionObjectType =
-  | SimpleConditionObject
-  | ComplexConditionObject;
 
 export interface checkReleasePositionProps {
   item: Item | null;
