@@ -1,25 +1,3 @@
-import { createClient } from "@libsql/client/.";
-
-// Turso
-export function RemoteConnectionFactory() {
-  const db_url = process.env.TURSO_DB_URL;
-  const db_token = process.env.TURSO_DB_URL;
-  if (db_url && db_token) {
-    const config = {
-      url: db_url,
-      authToken: db_token,
-    };
-
-    const conn = createClient(config);
-    return conn;
-  } else {
-    throw new Error("missing env for turso");
-  }
-}
-
-interface UpdateUserState {}
-export function UpdateUserState() {}
-
 const conductor = `
   CREATE TABLE User
   (
@@ -37,3 +15,23 @@ const conductor = `
     db_destroy_date TEXT DEFAULT (datetime('now', '+1 year'))
   );
 `;
+const user_db = `
+  CREATE TABLE Save
+  (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE,
+    player_state TEXT NOT NULL,
+    game_state TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    last_updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+`;
+
+export type SaveRow = {
+  id: number;
+  name: string;
+  player_state: string | null;
+  game_state: string | null;
+  created_at: string;
+  last_updated_at: string;
+};

@@ -199,7 +199,7 @@ const DungeonLevelScreen = observer(() => {
             setBattleTab={setBattleTab}
           />
           {playerState.minions.length > 0 ? (
-            <ThemedView className="flex flex-row flex-wrap justify-evenly">
+            <ThemedView className="flex flex-row flex-wrap justify-evenly px-4">
               {playerState.minions.map((minion, index) => (
                 <ThemedView
                   key={minion.id}

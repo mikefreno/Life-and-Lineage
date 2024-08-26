@@ -7,8 +7,8 @@ import { MMKV } from "react-native-mmkv";
 export const storage = new MMKV();
 
 export const fullSave = async (
-  game: Game | null,
-  player: PlayerCharacter | null,
+  game: Game | undefined,
+  player: PlayerCharacter | undefined,
 ) => {
   if (game && player) {
     try {

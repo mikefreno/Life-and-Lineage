@@ -5,6 +5,9 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import { API_BASE_URL } from "../config/config";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import config from "../config/google_config";
+import { SaveRow } from "../utility/database";
+import { PlayerCharacter } from "../classes/character";
+import { Game } from "../classes/game";
 
 type EmailLogin = {
   token: string;
@@ -27,12 +30,20 @@ type AppleLogin = {
 
 type LoginCreds = EmailLogin | GoogleLogin | AppleLogin;
 
+interface databaseExecuteProps {
+  sql: string;
+  args?: {
+    type: "null" | "integer" | "float" | "text" | "blob";
+    value: string;
+  }[];
+}
+
 class AuthStore {
   private token: string | null = null;
   private email: string | null = null;
   private provider: "email" | "apple" | "google" | null = null;
   private apple_user_string: string | null = null;
-  private db_url: string | null = null;
+  private db_name: string | null = null;
   private db_token: string | null = null;
 
   constructor() {
@@ -53,10 +64,20 @@ class AuthStore {
     this.apple_user_string = appleUser ?? null;
   };
 
-  setDBCredentials = (url: string | null, token: string | null) => {
-    this.db_url = url;
+  setDBCredentials = (name: string | null, token: string | null) => {
+    this.db_name = name;
     this.db_token = token;
   };
+
+  getDbURL() {
+    return this.db_name
+      ? `https://${this.db_name}-mikefreno.turso.io/v2/pipeline`
+      : undefined;
+  }
+
+  getEmail() {
+    return this.email;
+  }
 
   get isAuthenticated() {
     return !!this.token || !!this.apple_user_string;
@@ -154,6 +175,35 @@ class AuthStore {
     }
   };
 
+  getRemoteSaves = async () => {
+    try {
+      const res = await this.databaseExecute({ sql: `SELECT * FROM Save` });
+      const data = await res.json();
+      return data.results[0].response.result.rows;
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  };
+
+  makeRemoteSave = async (
+    name: string,
+    playerCharacterState: PlayerCharacter,
+    gameState: Game,
+  ) => {
+    try {
+      const res = await this.databaseExecute({
+        sql: `INSERT INTO Save (name, player_state, game_state)`,
+        args: {},
+      });
+      const data = await res.json();
+      return data.results[0].response.result.rows;
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  };
+
   googleSignIn = async () => {
     await GoogleSignin.hasPlayServices();
     const userInfo = await GoogleSignin.signIn();
@@ -167,53 +217,17 @@ class AuthStore {
       email: userInfo.user.email,
       provider: "google",
     });
-    return {
-      givenName: userInfo.user.givenName,
-      familyName: userInfo.user.familyName,
-      email: userInfo.user.email,
-    };
-  };
-
-  private appleEmailRetrieval = async (user: string) => {
-    const response = await fetch(`${API_BASE_URL}/apple/email`, {
+    await fetch(`${API_BASE_URL}/google/registration`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ userString: user }),
+      body: JSON.stringify({
+        givenName: userInfo.user.givenName,
+        familyName: userInfo.user.familyName,
+        email: userInfo.user.email,
+      }),
     });
-    if (response.ok) {
-      const { email } = await response.json();
-      return email as string;
-    }
-    return undefined;
-  };
-
-  appleSignIn = async () => {
-    const credential = await AppleAuthentication.signInAsync({
-      requestedScopes: [
-        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-        AppleAuthentication.AppleAuthenticationScope.EMAIL,
-      ],
-    });
-    const user = credential.user;
-    let email = credential.email;
-    if (!email) {
-      const email_opt = await this.appleEmailRetrieval(user);
-      if (!email_opt) throw new Error("email retrieval failed");
-      email = email_opt;
-    }
-    await this.login({
-      email,
-      provider: "apple",
-      appleUser: credential.user,
-    });
-    return {
-      givenName: credential.fullName?.givenName,
-      lastName: credential.fullName?.familyName,
-      email: credential.email,
-      userString: credential.user,
-    };
   };
 
   login = async (creds: LoginCreds) => {
@@ -257,31 +271,52 @@ class AuthStore {
     }
   };
 
-  _destroy_tokens = async () => {};
-
-  refreshDatabaseCreds = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/verify-token`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.token}`,
-        },
-        body: JSON.stringify({}),
-      });
-      const parsed = await response.json();
-      if (response.ok) {
-        this.setDBCredentials(parsed.db_url, parsed.db_token);
-      }
-      if (parsed.message === "destroy token") {
-        await this.logout();
-      }
-    } catch (error) {
-      console.error("Error refreshing database credentials:", error);
+  appleSignIn = async () => {
+    const credential = await AppleAuthentication.signInAsync({
+      requestedScopes: [
+        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+        AppleAuthentication.AppleAuthenticationScope.EMAIL,
+      ],
+    });
+    const user = credential.user;
+    let email = credential.email;
+    if (!email) {
+      const email_opt = await this.appleEmailRetrieval(user);
+      if (!email_opt) throw new Error("email retrieval failed");
+      email = email_opt;
     }
+    await this.login({
+      email,
+      provider: "apple",
+      appleUser: credential.user,
+    });
+    return {
+      givenName: credential.fullName?.givenName,
+      lastName: credential.fullName?.familyName,
+      email: credential.email,
+      userString: credential.user,
+    };
   };
 
-  checkAppleAuth = async (appleUser: string | null, email: string | null) => {
+  private appleEmailRetrieval = async (user: string) => {
+    const response = await fetch(`${API_BASE_URL}/apple/email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userString: user }),
+    });
+    if (response.ok) {
+      const { email } = await response.json();
+      return email as string;
+    }
+    return undefined;
+  };
+
+  private checkAppleAuth = async (
+    appleUser: string | null,
+    email: string | null,
+  ) => {
     if (!appleUser) {
       await this.logout();
       return;
@@ -314,7 +349,7 @@ class AuthStore {
     }
   };
 
-  refreshGoogleAuth = async () => {
+  private refreshGoogleAuth = async () => {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signInSilently();
@@ -336,6 +371,57 @@ class AuthStore {
     }
   };
 
+  private async databaseExecute({ sql, args }: databaseExecuteProps) {
+    if (!this.db_name || !this.db_token) {
+      const credsRes = await fetch(`${API_BASE_URL}/database/creds`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${
+            this.provider == "apple" ? this.apple_user_string : this.token
+          }`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: this.email, provider: this.provider }),
+      });
+      const parse = await credsRes.json();
+      this.setDBCredentials(parse.db_name, parse.db_token);
+    }
+    const url = this.getDbURL();
+    if (!url) throw new Error("url build failed!");
+    let res;
+    if (args) {
+      res = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.db_token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          requests: [
+            { type: "execute", stmt: { sql: sql, args: args } },
+            { type: "close" },
+          ],
+        }),
+      });
+    } else {
+      res = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.db_token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          requests: [
+            { type: "execute", stmt: { sql: sql } },
+            { type: "close" },
+          ],
+        }),
+      });
+    }
+
+    return res;
+  }
+
   _debugLog = async () => {
     try {
       const [storedToken, storedEmail, storedProvider, appleUser] =
@@ -355,7 +441,7 @@ class AuthStore {
       console.log("State Email:", this.email);
       console.log("State Provider:", this.provider);
       console.log("State Apple User:", this.apple_user_string);
-      console.log("State DB URL:", this.db_url);
+      console.log("State DB Name:", this.db_name);
       console.log("State DB Token:", this.db_token);
     } catch (error) {
       console.error("Error in _debugLog:", error);

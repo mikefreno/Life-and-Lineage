@@ -73,7 +73,7 @@ export enum MasteryLevel {
 
 export type Spell = {
   name: string;
-  element: string;
+  element: Element;
   proficiencyNeeded: MasteryLevel;
   manaCost: number;
   duration?: number;

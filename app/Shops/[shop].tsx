@@ -18,9 +18,8 @@ import { StatsDisplay } from "../../components/StatsDisplay";
 import { Coins } from "../../assets/icons/SVGIcons";
 
 const ONE_HOUR = 60 * 60 * 1000;
-const ONE_SECOND = 1000; // for testing_one_min
-const REFRESH_TIME =
-  process.env.NODE_ENV === "development" ? ONE_SECOND : ONE_HOUR;
+const ONE_SECOND = 1000;
+const REFRESH_TIME = __DEV__ ? ONE_SECOND : ONE_HOUR;
 
 const ShopInteriorScreen = observer(() => {
   const { shop } = useLocalSearchParams();
@@ -117,9 +116,11 @@ const ShopInteriorScreen = observer(() => {
   const purchaseItem = () => {
     if (playerState && showingStats && thisShop) {
       vibration({ style: "light" });
-      const itemPrice = showingStats.item.getSellPrice(
+      const itemPrice = showingStats.item.getBuyPrice(
         thisShop.shopKeeper.affection,
       );
+      console.log(showingStats.item);
+      console.log(itemPrice);
       playerState.buyItem(showingStats.item, itemPrice);
       thisShop.sellItem(showingStats.item, itemPrice);
       setShowingStats(null);

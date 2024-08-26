@@ -136,18 +136,7 @@ const SignUpScreen = observer(() => {
   const handleGoogleSignUp = async () => {
     setAwaitingResponse(true);
     try {
-      const { givenName, familyName, email } = await auth.googleSignIn();
-      try {
-        await fetch(`${API_BASE_URL}/google/registration`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ givenName, familyName, email }),
-        });
-      } catch (error) {
-        setError(error as string);
-      }
+      await auth.googleSignIn();
       setAwaitingResponse(false);
     } catch (error) {
       setError("Failed to sign up with Google. Please try again.");

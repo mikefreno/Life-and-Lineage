@@ -1,6 +1,6 @@
-import { Pressable, View } from "react-native";
+import { Pressable, TextInput, View } from "react-native";
 import { View as ThemedView, Text } from "../../components/Themed";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { useVibration } from "../../utility/customHooks";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
@@ -9,11 +9,25 @@ import { router } from "expo-router";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 import { useAuth } from "../../auth/AuthContext";
 import { observer } from "mobx-react-lite";
+import GenericModal from "../../components/GenericModal";
+import { useColorScheme } from "nativewind";
+import { SaveRow } from "../../utility/database";
+
+const themeOptions = ["system", "light", "dark"];
+const vibrationOptions = ["full", "minimal", "none"];
 
 export const AppSettings = observer(() => {
-  const auth = useAuth();
-  const themeOptions = ["system", "light", "dark"];
-  const vibrationOptions = ["full", "minimal", "none"];
+  const user = useAuth();
+
+  const { colorScheme } = useColorScheme();
+  const [showRemoteSaveWindow, setShowRemoteSaveWindow] =
+    useState<boolean>(false);
+  const [showRemoteLoadWidow, setShowRemoteLoadWindow] =
+    useState<boolean>(false);
+  const [remoteSaves, setRemoteSaves] = useState<SaveRow[]>([]);
+  const [saveName, setSaveName] = useState<string>("");
+  const [showingOverwriteWarning, setShowingOverwriteWarning] =
+    useState<string>("");
 
   const appData = useContext(AppContext);
   if (!appData) {
@@ -48,21 +62,81 @@ export const AppSettings = observer(() => {
         vibration({ style: "light" });
       }
     }
+
+    useEffect(() => {
+      if (user.isAuthenticated) {
+        user.getRemoteSaves().then((rows) => {
+          setRemoteSaves(rows);
+        });
+      }
+    }, [user.isAuthenticated]);
+
     const logout = async () => {
-      await auth.logout();
+      await user.logout();
     };
+
+    const toggleRemoteSaveWindow = () => {
+      setShowRemoteSaveWindow(!showRemoteSaveWindow);
+    };
+
+    const toggleRemoteLoadWindow = () => {
+      setShowRemoteLoadWindow(!showRemoteLoadWidow);
+    };
+
+    const remoteSave = () => {};
 
     return (
       <>
+        <GenericModal
+          isVisibleCondition={showRemoteSaveWindow}
+          backFunction={() => setShowRemoteSaveWindow(false)}
+          backdropCloses
+        >
+          <View>
+            <Text className="text-xl">Remote Saving</Text>
+            <TextInput
+              className="mx-16 my-6 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
+              placeholderTextColor={
+                colorScheme == "light" ? "#d4d4d8" : "#71717a"
+              }
+              onChangeText={(text) => setSaveName(text)}
+              placeholder={"Search Codex"}
+              autoCorrect={false}
+              value={saveName}
+              maxLength={16}
+              style={{
+                fontFamily: "PixelifySans",
+                paddingVertical: 8,
+                minWidth: "50%",
+                fontSize: 20,
+              }}
+            />
+          </View>
+        </GenericModal>
+        <GenericModal
+          isVisibleCondition={showRemoteSaveWindow}
+          backFunction={() => setShowRemoteSaveWindow(false)}
+          backdropCloses
+        >
+          <View>{}</View>
+        </GenericModal>
         <ThemedView className="flex-1 items-center justify-center px-4">
           <GenericStrikeAround>
             <Text className="text-xl">
-              Remote Backups{!auth.isAuthenticated && ` (requires login)`}
+              Remote Backups{!user.isAuthenticated && ` (requires login)`}
             </Text>
           </GenericStrikeAround>
-          {auth.isAuthenticated ? (
+          {user.isAuthenticated ? (
             <View>
-              <Text>Logged in as: {auth.email}</Text>
+              <Text>Logged in as: {user.getEmail()}</Text>
+              <View className="flex flex-row justify-evenly">
+                <GenericRaisedButton onPressFunction={toggleRemoteSaveWindow}>
+                  Save Game Remotely
+                </GenericRaisedButton>
+                <GenericRaisedButton onPressFunction={toggleRemoteLoadWindow}>
+                  Load Remote Save
+                </GenericRaisedButton>
+              </View>
               <GenericRaisedButton onPressFunction={logout}>
                 Sign Out
               </GenericRaisedButton>

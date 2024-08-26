@@ -282,23 +282,19 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
         case "equipment":
           return (
             <PlatformDependantBlurView className="flex-1 px-2">
-              <View className="py-1">
-                <InventoryRender
-                  selfRef={null}
-                  inventory={playerState.getInventory()}
-                  pouchTarget={pouchRef}
-                  addItemToPouch={(item) =>
-                    addItemToPouch({ item, dungeonData })
-                  }
-                />
-              </View>
+              <InventoryRender
+                selfRef={null}
+                inventory={playerState.getInventory()}
+                pouchTarget={pouchRef}
+                addItemToPouch={(item) => addItemToPouch({ item, dungeonData })}
+              />
             </PlatformDependantBlurView>
           );
         case "log":
           return (
             <PlatformDependantBlurView className="flex-1 px-2">
               <ThemedView
-                className="mt-2 mb-1 flex-1 rounded-lg border border-zinc-600"
+                className="flex-1 pl-1 rounded-lg border border-zinc-600"
                 style={{
                   backgroundColor: colorScheme == "dark" ? "#09090b" : "#fff",
                 }}

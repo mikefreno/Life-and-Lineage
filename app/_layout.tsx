@@ -12,8 +12,8 @@ import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
 import { fullSave, fullLoad } from "../utility/functions/save_load";
-import { View, Text, Platform, StyleSheet } from "react-native";
-import { reaction } from "mobx";
+import { Platform, StyleSheet } from "react-native";
+import { autorun, reaction } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
@@ -85,18 +85,21 @@ const Root = observer(() => {
 
   const throttledFullSave = throttle(fullSave, 2000);
 
-  reaction(
-    () => ({
-      gameTime: gameState?.date,
-    }),
-    (state) => {
-      if (gameState && playerState && state.gameTime != gameDate) {
-        setGameDate(gameState.date);
-        throttledFullSave(gameState, playerState);
-      }
-    },
-    { delay: 2000 },
-  );
+  autorun(() => throttledFullSave(gameState, playerState));
+
+  // this was used before switching to MMKV
+  //reaction(
+  //() => ({
+  //gameTime: gameState?.date,
+  //}),
+  //(state) => {
+  //if (gameState && playerState && state.gameTime != gameDate) {
+  //setGameDate(gameState.date);
+  //throttledFullSave(gameState, playerState);
+  //}
+  //},
+  //{ delay: 2000 },
+  //);
 
   while (loading) {
     return <IndefiniteD20Die isSpinning={loading} />;

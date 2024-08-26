@@ -228,7 +228,7 @@ export default function InventoryRender({
             ? "h-[60%]"
             : "shop" in props
             ? "mt-4 h-[75%]"
-            : "mt-1 h-[99%]"
+            : "h-full"
         } mx-auto flex w-full flex-wrap rounded-lg border border-zinc-600`}
       >
         {Array.from({ length: 24 }).map((_, index) => (
