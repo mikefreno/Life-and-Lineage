@@ -30,8 +30,8 @@ const user_db = `
 export type SaveRow = {
   id: number;
   name: string;
-  player_state: string | null;
-  game_state: string | null;
+  player_state: string;
+  game_state: string;
   created_at: string;
   last_updated_at: string;
 };

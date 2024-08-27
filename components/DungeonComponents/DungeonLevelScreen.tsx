@@ -1,5 +1,5 @@
 import { View as ThemedView, Text } from "../../components/Themed";
-import { View, Platform } from "react-native";
+import { View, Platform, Dimensions } from "react-native";
 import { useContext, useRef, useEffect, useState } from "react";
 import { Pressable } from "react-native";
 import { Stack } from "expo-router";
@@ -20,12 +20,12 @@ import DroppedItemsModal from "../../components/DungeonComponents/DroppedItemsMo
 import LeftBehindItemsModal from "../../components/DungeonComponents/LeftBehindItemsModal";
 import { dungeonSave } from "../../utility/functions/save_load";
 import { throttle } from "lodash";
-import { TimedD20Die } from "../../components/DieRollAnim";
 import { AppContext } from "../../app/_layout";
 import { DungeonContext } from "./DungeonContext";
 import { DungeonMapRender } from "./DungeonMap";
 import { playerMinionsTurn } from "./DungeonInteriorFunctions";
 import { SackIcon } from "../../assets/icons/SVGIcons";
+import D20DieAnimation from "../DieRollAnim";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -177,11 +177,14 @@ const DungeonLevelScreen = observer(() => {
         <ThemedView className="flex-1" style={{ paddingBottom: 100 }}>
           {!inCombat ? (
             <DungeonMapRender />
-          ) : enemyState ? (
+          ) : !enemyState ? (
             <DungeonEnemyDisplay />
           ) : (
             <View className="flex h-[40%] pt-8">
-              <TimedD20Die />
+              <D20DieAnimation
+                keepRolling={true}
+                size={Dimensions.get("window").height * 0.25}
+              />
             </View>
           )}
           <Pressable

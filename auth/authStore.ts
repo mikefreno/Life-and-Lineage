@@ -8,6 +8,7 @@ import config from "../config/google_config";
 import { SaveRow } from "../utility/database";
 import { PlayerCharacter } from "../classes/character";
 import { Game } from "../classes/game";
+import { parseInt } from "lodash";
 
 type EmailLogin = {
   token: string;
@@ -32,10 +33,22 @@ type LoginCreds = EmailLogin | GoogleLogin | AppleLogin;
 
 interface databaseExecuteProps {
   sql: string;
-  args?: {
-    type: "null" | "integer" | "float" | "text" | "blob";
-    value: string;
-  }[];
+  args?: string[];
+}
+interface makeRemoteSaveProps {
+  name: string;
+  playerState: PlayerCharacter;
+  gameState: Game;
+}
+
+interface overwriteRemoteSaveProps {
+  name: string;
+  id: number;
+  playerState: PlayerCharacter;
+  gameState: Game;
+}
+interface deleteRemoteSaveProps {
+  id: number;
 }
 
 class AuthStore {
@@ -179,55 +192,27 @@ class AuthStore {
     try {
       const res = await this.databaseExecute({ sql: `SELECT * FROM Save` });
       const data = await res.json();
-      return data.results[0].response.result.rows;
+      const rows = data.results[0].response.result.rows;
+      return this.convertHTTPResponseSaveRow(rows);
     } catch (e) {
-      console.error(e);
+      console.log(e);
       return [];
     }
   };
 
-  makeRemoteSave = async (
-    name: string,
-    playerCharacterState: PlayerCharacter,
-    gameState: Game,
-  ) => {
-    try {
-      const res = await this.databaseExecute({
-        sql: `INSERT INTO Save (name, player_state, game_state)`,
-        args: {},
-      });
-      const data = await res.json();
-      return data.results[0].response.result.rows;
-    } catch (e) {
-      console.error(e);
-      return [];
-    }
-  };
-
-  googleSignIn = async () => {
-    await GoogleSignin.hasPlayServices();
-    const userInfo = await GoogleSignin.signIn();
-    userInfo.serverAuthCode;
-
-    if (!userInfo.idToken) {
-      throw new Error("missing idToken in response");
-    }
-    await this.login({
-      token: userInfo.idToken,
-      email: userInfo.user.email,
-      provider: "google",
-    });
-    await fetch(`${API_BASE_URL}/google/registration`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        givenName: userInfo.user.givenName,
-        familyName: userInfo.user.familyName,
-        email: userInfo.user.email,
+  private convertHTTPResponseSaveRow = (rows: any[][]) => {
+    let cleaned: SaveRow[] = [];
+    rows.forEach((row) =>
+      cleaned.push({
+        id: parseInt(row[0].value),
+        name: row[1].value,
+        player_state: row[2].value,
+        game_state: row[3].value,
+        created_at: row[4].value,
+        last_updated_at: row[5].value,
       }),
-    });
+    );
+    return cleaned;
   };
 
   login = async (creds: LoginCreds) => {
@@ -297,6 +282,108 @@ class AuthStore {
       userString: credential.user,
     };
   };
+  googleSignIn = async () => {
+    await GoogleSignin.hasPlayServices();
+    const userInfo = await GoogleSignin.signIn();
+    userInfo.serverAuthCode;
+
+    if (!userInfo.idToken) {
+      throw new Error("missing idToken in response");
+    }
+    await this.login({
+      token: userInfo.idToken,
+      email: userInfo.user.email,
+      provider: "google",
+    });
+    await fetch(`${API_BASE_URL}/google/registration`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        familyName: userInfo.user.familyName,
+        email: userInfo.user.email,
+      }),
+    });
+  };
+
+  makeRemoteSave = async ({
+    name,
+    playerState,
+    gameState,
+  }: makeRemoteSaveProps) => {
+    try {
+      const time = this.formatDate(new Date());
+      const res = await this.databaseExecute({
+        sql: `INSERT INTO Save (name, player_state, game_state, created_at, last_updated_at) VALUES (?, ?, ?, ?, ?)`,
+        args: [
+          name,
+          JSON.stringify(playerState),
+          JSON.stringify(gameState),
+          time,
+          time,
+        ],
+      });
+      await res.json();
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  };
+
+  overwriteRemoteSave = async ({
+    name,
+    id,
+    playerState,
+    gameState,
+  }: overwriteRemoteSaveProps) => {
+    try {
+      const updateTime = this.formatDate(new Date());
+      console.log(updateTime);
+      const res = await this.databaseExecute({
+        sql: `UPDATE Save SET player_state = ?, game_state = ?, last_updated_at = ? WHERE name = ? AND id = ?`,
+        args: [
+          JSON.stringify(playerState),
+          JSON.stringify(gameState),
+          updateTime,
+          name,
+          id.toString(),
+        ],
+      });
+      const parsed = await res.json();
+      console.log(parsed.results[0]);
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  };
+
+  deleteRemoteSave = async ({ id }: deleteRemoteSaveProps) => {
+    try {
+      const updateTime = this.formatDate(new Date());
+      console.log(updateTime);
+      const res = await this.databaseExecute({
+        sql: `DELETE FROM Save WHERE id = ?`,
+        args: [id.toString()],
+      });
+      const parsed = await res.json();
+      console.log(parsed.results[0]);
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  };
+
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
 
   private appleEmailRetrieval = async (user: string) => {
     const response = await fetch(`${API_BASE_URL}/apple/email`, {
@@ -388,38 +475,52 @@ class AuthStore {
     }
     const url = this.getDbURL();
     if (!url) throw new Error("url build failed!");
-    let res;
-    if (args) {
-      res = await fetch(url, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${this.db_token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          requests: [
-            { type: "execute", stmt: { sql: sql, args: args } },
-            { type: "close" },
-          ],
-        }),
-      });
-    } else {
-      res = await fetch(url, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${this.db_token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          requests: [
-            { type: "execute", stmt: { sql: sql } },
-            { type: "close" },
-          ],
-        }),
-      });
-    }
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${this.db_token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        requests: [
+          {
+            type: "execute",
+            stmt: args
+              ? { sql: sql, args: this.argBuilder(args) }
+              : { sql: sql },
+          },
+          { type: "close" },
+        ],
+      }),
+    });
 
     return res;
+  }
+
+  private argBuilder(args: string[]) {
+    const types = args.map((arg) => this.argCheck(arg));
+    const built: { type: string; value: string }[] = [];
+    args.forEach((arg, idx) => built.push({ type: types[idx], value: arg }));
+    return built;
+  }
+
+  private argCheck(arg: string) {
+    if (/^-?\d+$/.test(arg)) {
+      return "integer";
+    }
+
+    if (/^-?\d*\.\d+$/.test(arg)) {
+      return "float";
+    }
+
+    if (/^data:.*;base64,/.test(arg)) {
+      return "blob";
+    }
+    if (arg == "null") {
+      return "null";
+    }
+
+    return "text";
   }
 
   _debugLog = async () => {

@@ -4,7 +4,6 @@ import { useLocalSearchParams } from "expo-router";
 import { DungeonInstance, DungeonLevel } from "../../classes/dungeon";
 import { Item } from "../../classes/item";
 import { AppContext } from "../../app/_layout";
-import { TimedD20Die } from "../../components/DieRollAnim";
 import { observer } from "mobx-react-lite";
 import {
   type BoundingBox,
@@ -21,6 +20,7 @@ import type { AttackObj, SpellObj } from "../../utility/types";
 import { enemyGenerator } from "../../utility/enemy";
 import { getSexFromName } from "../../utility/functions/characterAid";
 import { flipCoin } from "../../utility/functions/roll";
+import D20DieAnimation from "../../components/DieRollAnim";
 
 const DungeonProvider = observer(() => {
   const { slug } = useLocalSearchParams();
@@ -235,7 +235,7 @@ const DungeonProvider = observer(() => {
       </DungeonContext.Provider>
     );
   } else {
-    return <TimedD20Die />;
+    return <D20DieAnimation />;
   }
 });
 export default DungeonProvider;

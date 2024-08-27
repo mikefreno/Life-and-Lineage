@@ -3,7 +3,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  ScrollView,
   TextInput,
   TouchableWithoutFeedback,
   View,
@@ -12,7 +11,6 @@ import { Text } from "../../components/Themed";
 import { useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
-import { IndefiniteD20Die } from "../../components/DieRollAnim";
 import { isValidPassword } from "../../auth/password";
 import { useVibration } from "../../utility/customHooks";
 import { GoogleIcon } from "../../assets/icons/SVGIcons";
@@ -21,6 +19,7 @@ import { useAuth } from "../../auth/AuthContext";
 import { router } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { API_BASE_URL } from "../../config/config";
+import D20DieAnimation from "../../components/DieRollAnim";
 
 const SignUpScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -172,7 +171,7 @@ const SignUpScreen = observer(() => {
     <>
       {awaitingResponse ? (
         <View className="pt-[25vh]">
-          <IndefiniteD20Die isSpinning={awaitingResponse} />
+          <D20DieAnimation keepRolling={awaitingResponse} />
         </View>
       ) : !usingEmail ? (
         <>

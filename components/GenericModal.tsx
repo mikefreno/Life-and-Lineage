@@ -9,6 +9,7 @@ interface GenericModalProps {
   children: ReactNode;
   backdropCloses?: boolean;
   size?: number;
+  style?: {};
 }
 
 export default function GenericModal({
@@ -17,6 +18,7 @@ export default function GenericModal({
   children,
   backdropCloses = true,
   size,
+  style,
 }: GenericModalProps) {
   const deviceHeight = Dimensions.get("screen").height;
 
@@ -33,6 +35,7 @@ export default function GenericModal({
       deviceHeight={deviceHeight}
       useNativeDriver
       statusBarTranslucent
+      style={style}
     >
       <View
         className="mx-auto rounded-xl px-[2vw] py-4 dark:border dark:border-zinc-500"

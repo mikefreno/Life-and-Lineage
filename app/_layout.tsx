@@ -22,7 +22,7 @@ import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
 import { AppContextType } from "../utility/types";
 import { AuthProvider, useAuth } from "../auth/AuthContext";
-import { IndefiniteD20Die } from "../components/DieRollAnim";
+import D20DieAnimation from "../components/DieRollAnim";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -102,7 +102,7 @@ const Root = observer(() => {
   //);
 
   while (loading) {
-    return <IndefiniteD20Die isSpinning={loading} />;
+    return <D20DieAnimation keepRolling={loading} />;
   }
 
   return (
@@ -141,13 +141,13 @@ const RootLayout = observer(() => {
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
   const [navbarLoad, setNavbarLoad] = useState(false);
-  const auth = useAuth();
+  //const auth = useAuth();
 
-  useEffect(() => {
-    if (__DEV__) {
-      auth._debugLog();
-    }
-  }, []);
+  //useEffect(() => {
+  //if (__DEV__) {
+  //auth._debugLog();
+  //}
+  //}, []);
 
   useEffect(() => {
     if (fontLoaded && navbarLoad) {
@@ -209,7 +209,7 @@ const RootLayout = observer(() => {
     }
   }
   while (!fontLoaded) {
-    return <IndefiniteD20Die isSpinning={fontLoaded} />;
+    return <D20DieAnimation keepRolling={!fontLoaded} />;
   }
 
   return (

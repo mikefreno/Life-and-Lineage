@@ -1,4 +1,11 @@
-import { Pressable, TextInput, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  TextInput,
+  View,
+} from "react-native";
 import { View as ThemedView, Text } from "../../components/Themed";
 import { useContext, useEffect, useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc/words";
@@ -12,6 +19,11 @@ import { observer } from "mobx-react-lite";
 import GenericModal from "../../components/GenericModal";
 import { useColorScheme } from "nativewind";
 import { SaveRow } from "../../utility/database";
+import D20DieAnimation from "../../components/DieRollAnim";
+import GenericFlatButton from "../../components/GenericFlatButton";
+import { fullSave } from "../../utility/functions/save_load";
+import { Game } from "../../classes/game";
+import { PlayerCharacter } from "../../classes/character";
 
 const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
@@ -28,12 +40,13 @@ export const AppSettings = observer(() => {
   const [saveName, setSaveName] = useState<string>("");
   const [showingOverwriteWarning, setShowingOverwriteWarning] =
     useState<string>("");
+  const [loadingDBInfo, setLoadingDBInfo] = useState<boolean>(false);
 
   const appData = useContext(AppContext);
   if (!appData) {
     throw new Error("Missing context");
   }
-  const { gameState } = appData;
+  const { playerState, gameState, setPlayerCharacter, setGameData } = appData;
 
   const vibration = useVibration();
 
@@ -65,9 +78,13 @@ export const AppSettings = observer(() => {
 
     useEffect(() => {
       if (user.isAuthenticated) {
+        setLoadingDBInfo(true);
         user.getRemoteSaves().then((rows) => {
           setRemoteSaves(rows);
+          setLoadingDBInfo(false);
         });
+      } else {
+        setRemoteSaves([]);
       }
     }, [user.isAuthenticated]);
 
@@ -83,7 +100,46 @@ export const AppSettings = observer(() => {
       setShowRemoteLoadWindow(!showRemoteLoadWidow);
     };
 
-    const remoteSave = () => {};
+    const newRemoteSave = async () => {
+      if (playerState && gameState && saveName.length >= 3) {
+        setLoadingDBInfo(true);
+        await user.makeRemoteSave({ name: saveName, playerState, gameState });
+        const res = await user.getRemoteSaves();
+        setRemoteSaves(res);
+
+        setLoadingDBInfo(false);
+      }
+    };
+
+    const overwriteSave = async (chosenSave: SaveRow) => {
+      if (playerState && gameState) {
+        setLoadingDBInfo(true);
+        user.overwriteRemoteSave({
+          name: chosenSave.name,
+          id: chosenSave.id,
+          playerState,
+          gameState,
+        });
+        const res = await user.getRemoteSaves();
+        setRemoteSaves(res);
+        setLoadingDBInfo(false);
+      }
+    };
+
+    const loadRemoteSave = async (chosenSave: SaveRow) => {
+      setGameData(Game.fromJSON(JSON.parse(chosenSave.game_state)));
+      setPlayerCharacter(
+        PlayerCharacter.fromJSON(JSON.parse(chosenSave.player_state)),
+      );
+    };
+
+    const deleteRemoteSave = async (chosenSave: SaveRow) => {
+      setLoadingDBInfo(true);
+      await user.deleteRemoteSave({ id: chosenSave.id });
+      const res = await user.getRemoteSaves();
+      setRemoteSaves(res);
+      setLoadingDBInfo(false);
+    };
 
     return (
       <>
@@ -91,34 +147,100 @@ export const AppSettings = observer(() => {
           isVisibleCondition={showRemoteSaveWindow}
           backFunction={() => setShowRemoteSaveWindow(false)}
           backdropCloses
+          size={95}
         >
-          <View>
-            <Text className="text-xl">Remote Saving</Text>
-            <TextInput
-              className="mx-16 my-6 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
-              placeholderTextColor={
-                colorScheme == "light" ? "#d4d4d8" : "#71717a"
-              }
-              onChangeText={(text) => setSaveName(text)}
-              placeholder={"Search Codex"}
-              autoCorrect={false}
-              value={saveName}
-              maxLength={16}
-              style={{
-                fontFamily: "PixelifySans",
-                paddingVertical: 8,
-                minWidth: "50%",
-                fontSize: 20,
-              }}
-            />
-          </View>
+          {loadingDBInfo ? (
+            <D20DieAnimation keepRolling />
+          ) : (
+            <View className="p-2">
+              <Text className="text-xl">Remote Saving</Text>
+              <GenericStrikeAround>Make New Save</GenericStrikeAround>
+              <TextInput
+                className="mx-4 mt-6 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
+                placeholderTextColor={
+                  colorScheme == "light" ? "#d4d4d8" : "#71717a"
+                }
+                onChangeText={(text) => setSaveName(text)}
+                placeholder={"New Save Name"}
+                autoCorrect={false}
+                value={saveName}
+                style={{
+                  fontFamily: "PixelifySans",
+                  paddingVertical: 8,
+                  minWidth: "50%",
+                  fontSize: 20,
+                }}
+              />
+              <Text className="text-center text-sm">Min Length: 3</Text>
+              <GenericFlatButton
+                onPressFunction={newRemoteSave}
+                disabledCondition={saveName.length < 3}
+              >
+                Save
+              </GenericFlatButton>
+              <GenericStrikeAround>Current Saves</GenericStrikeAround>
+              {remoteSaves.map((save) => (
+                <View
+                  key={save.id}
+                  className="w-full bg-zinc-300 border rounded border-zinc-900 dark:border-zinc-50 pb-2"
+                >
+                  <Pressable
+                    className="border py-1 px-2 bg-zinc-50 rounded-full"
+                    onPress={() => {
+                      vibration({ essential: true, style: "warning" });
+                      deleteRemoteSave(save);
+                    }}
+                  >
+                    <Text>X</Text>
+                  </Pressable>
+                  <Text className="text-xl text-center">{save.name}</Text>
+                  <View className="flex flex-col w-full items-end py-2">
+                    <Text className="">
+                      Last updated: {save.last_updated_at}
+                    </Text>
+                    <Text className="">Created at: {save.created_at}</Text>
+                  </View>
+                  <GenericFlatButton
+                    backgroundColor={"white"}
+                    onPressFunction={() => overwriteSave(save)}
+                  >
+                    Overwrite save
+                  </GenericFlatButton>
+                </View>
+              ))}
+            </View>
+          )}
         </GenericModal>
         <GenericModal
-          isVisibleCondition={showRemoteSaveWindow}
-          backFunction={() => setShowRemoteSaveWindow(false)}
+          isVisibleCondition={showRemoteLoadWidow}
+          backFunction={() => setShowRemoteLoadWindow(false)}
           backdropCloses
+          size={95}
         >
-          <View>{}</View>
+          <View className="p-2">
+            <Text className="text-xl">Load Saves</Text>
+            <Text className="text-xl text-center" style={{ color: "#ef4444" }}>
+              Make sure to backup first!
+            </Text>
+            {remoteSaves.map((save) => (
+              <View
+                key={save.id}
+                className="w-full bg-zinc-300 border rounded border-zinc-900 dark:border-zinc-50 pb-2"
+              >
+                <Text className="text-xl text-center">{save.name}</Text>
+                <View className="flex flex-col w-full items-end py-2">
+                  <Text className="">Last updated: {save.last_updated_at}</Text>
+                  <Text className="">Created at: {save.created_at}</Text>
+                </View>
+                <GenericFlatButton
+                  backgroundColor={"white"}
+                  onPressFunction={() => loadRemoteSave(save)}
+                >
+                  Load Save
+                </GenericFlatButton>
+              </View>
+            ))}
+          </View>
         </GenericModal>
         <ThemedView className="flex-1 items-center justify-center px-4">
           <GenericStrikeAround>
@@ -127,20 +249,36 @@ export const AppSettings = observer(() => {
             </Text>
           </GenericStrikeAround>
           {user.isAuthenticated ? (
-            <View>
-              <Text>Logged in as: {user.getEmail()}</Text>
-              <View className="flex flex-row justify-evenly">
-                <GenericRaisedButton onPressFunction={toggleRemoteSaveWindow}>
-                  Save Game Remotely
-                </GenericRaisedButton>
-                <GenericRaisedButton onPressFunction={toggleRemoteLoadWindow}>
-                  Load Remote Save
-                </GenericRaisedButton>
+            <>
+              <Text className="text-center">
+                Logged in as: {user.getEmail()}
+              </Text>
+              <View className="flex flex-row justify-evenly w-full border border-white">
+                <GenericFlatButton
+                  onPressFunction={toggleRemoteSaveWindow}
+                  disabledCondition={loadingDBInfo}
+                >
+                  {loadingDBInfo ? (
+                    <D20DieAnimation size={20} keepRolling />
+                  ) : (
+                    "Make\n Cloud Save"
+                  )}
+                </GenericFlatButton>
+                <GenericFlatButton
+                  onPressFunction={toggleRemoteLoadWindow}
+                  disabledCondition={loadingDBInfo}
+                >
+                  {loadingDBInfo ? (
+                    <D20DieAnimation size={20} keepRolling />
+                  ) : (
+                    "Load\n Cloud Save"
+                  )}
+                </GenericFlatButton>
               </View>
               <GenericRaisedButton onPressFunction={logout}>
                 Sign Out
               </GenericRaisedButton>
-            </View>
+            </>
           ) : (
             <View className="flex flex-row justify-evenly w-full">
               <GenericRaisedButton

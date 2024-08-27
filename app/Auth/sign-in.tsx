@@ -12,13 +12,13 @@ import { Text } from "../../components/Themed";
 import { useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
-import { IndefiniteD20Die } from "../../components/DieRollAnim";
 import { useAuth } from "../../auth/AuthContext";
 import { router } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { API_BASE_URL } from "../../config/config";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { GoogleIcon } from "../../assets/icons/SVGIcons";
+import D20DieAnimation from "../../components/DieRollAnim";
 
 const SignInScreen = observer(() => {
   const auth = useAuth();
@@ -103,7 +103,7 @@ const SignInScreen = observer(() => {
 
   return awaitingResponse ? (
     <View className="pt-[25vh]">
-      <IndefiniteD20Die isSpinning={awaitingResponse} />
+      <D20DieAnimation keepRolling={awaitingResponse} />
     </View>
   ) : (
     <>
