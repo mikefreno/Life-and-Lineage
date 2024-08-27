@@ -1,4 +1,4 @@
-import { Pressable, useColorScheme, View } from "react-native";
+import { Dimensions, Pressable, useColorScheme, View } from "react-native";
 import { ScrollView, Text, View as ThemedView } from "../../components/Themed";
 import "../../assets/styles/globals.css";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -29,6 +29,8 @@ export default function NewGameScreen() {
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,
   );
+  const deviceHeight = Dimensions.get("screen").height;
+  const deviceWidth = Dimensions.get("screen").width;
 
   const [showIntroTutorial, setShowIntroTutorial] = useState<boolean>(
     !gameState ||
@@ -175,6 +177,7 @@ export default function NewGameScreen() {
               setSelectedClass("mage");
               classRef.current = "mage";
             }}
+            style={{ height: deviceHeight * 0.25, width: deviceWidth * 0.45 }}
           >
             {({ pressed }) => (
               <View
@@ -182,11 +185,13 @@ export default function NewGameScreen() {
                   pressed || selectedClass == "mage"
                     ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                     : "border-transparent"
-                } border px-6 py-4`}
+                } w-full h-full border flex items-center justify-center`}
               >
                 <WizardHat
                   style={{ marginBottom: 5 }}
                   color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
+                  height={deviceHeight * 0.15}
+                  width={deviceHeight * 0.15}
                 />
                 <Text className="mx-auto text-xl" style={{ color: "#2563eb" }}>
                   Mage
@@ -194,14 +199,6 @@ export default function NewGameScreen() {
               </View>
             )}
           </Pressable>
-          {selectedClass == "mage" ? (
-            <Text className="mt-[2vh] h-16 text-center md:text-lg">
-              The Mage is the default class, it is well balanced, with a focus
-              on casting elemental magic
-            </Text>
-          ) : (
-            <ThemedView className="mt-[2vh] h-16" />
-          )}
           <View className="flex w-full flex-row justify-evenly">
             <Pressable
               className="-ml-2"
@@ -209,6 +206,7 @@ export default function NewGameScreen() {
                 setSelectedClass("necromancer");
                 classRef.current = "necromancer";
               }}
+              style={{ height: deviceHeight * 0.25, width: deviceWidth * 0.45 }}
             >
               {({ pressed }) => (
                 <View
@@ -216,12 +214,14 @@ export default function NewGameScreen() {
                     pressed || selectedClass == "necromancer"
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
-                  } border px-6 py-4`}
+                  } w-full h-full border flex items-center justify-center`}
                 >
                   <View className="-rotate-12">
                     <NecromancerSkull
                       style={{ marginBottom: 5 }}
                       color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
+                      height={deviceHeight * 0.15}
+                      width={deviceHeight * 0.15}
                     />
                   </View>
                   <Text
@@ -239,6 +239,7 @@ export default function NewGameScreen() {
                 setSelectedClass("paladin");
                 classRef.current = "paladin";
               }}
+              style={{ height: deviceHeight * 0.25, width: deviceWidth * 0.45 }}
             >
               {({ pressed }) => (
                 <View
@@ -246,11 +247,14 @@ export default function NewGameScreen() {
                     pressed || selectedClass == "paladin"
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
-                  } border px-8 py-4`}
+                  } w-full h-full border flex items-center justify-center`}
                 >
                   <View className="rotate-12">
                     <View className="scale-x-[-1] transform">
-                      <PaladinHammer style={{ marginBottom: 5 }} />
+                      <PaladinHammer
+                        height={deviceHeight * 0.15}
+                        width={deviceHeight * 0.15}
+                      />
                     </View>
                   </View>
                   <Text
@@ -263,7 +267,12 @@ export default function NewGameScreen() {
               )}
             </Pressable>
           </View>
-          {selectedClass == "paladin" ? (
+          {selectedClass == "mage" ? (
+            <Text className="mt-[2vh] h-16 text-center md:text-lg">
+              The Mage is the default class, it is well balanced, with a focus
+              on casting elemental magic
+            </Text>
+          ) : selectedClass == "paladin" ? (
             <Text className="mt-[2vh] h-16 text-center md:text-lg">
               The Paladin is skilled with arms and uses holy magic, which is
               especially powerful against the undead and protecting life.
@@ -273,9 +282,7 @@ export default function NewGameScreen() {
               The Necromancer controls the forces of death, they can summon
               minions, use blood, bone and poisonous magics.
             </Text>
-          ) : (
-            <Text className="mt-[2vh] h-16 text-center md:text-lg"></Text>
-          )}
+          ) : null}
           {selectedClass && (
             <View className="mx-auto py-4 pb-[10vh]">
               <Pressable

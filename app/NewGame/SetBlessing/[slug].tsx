@@ -1,4 +1,4 @@
-import { Pressable, View } from "react-native";
+import { Dimensions, Pressable, View } from "react-native";
 import {
   ScrollView,
   Text,
@@ -29,6 +29,8 @@ import {
 } from "../../../assets/icons/SVGIcons";
 import { descriptionMap } from "../../../utility/descriptions";
 import { Element } from "../../../utility/types";
+import { elementalColorMap } from "../../../utility/elementColors";
+import BlessingDisplay from "../../../components/BlessingsDisplay";
 
 export default function SetBlessing() {
   const { slug } = useLocalSearchParams();
@@ -37,9 +39,9 @@ export default function SetBlessing() {
   }
   const playerClass = slug as string;
 
-  const [blessing, setBlessing] = useState<string>("");
+  const [blessing, setBlessing] = useState<Element>();
   const { colorScheme } = useColorScheme();
-  const blessingRef = useRef<string>();
+  const blessingRef = useRef<Element>();
   const vibration = useVibration();
 
   const appData = useContext(AppContext);
@@ -61,6 +63,9 @@ export default function SetBlessing() {
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,
   );
+
+  const deviceHeight = Dimensions.get("screen").height;
+  const deviceWidth = Dimensions.get("screen").width;
 
   useEffect(() => {
     if (!showBlessingTutorial && gameState) {
@@ -118,127 +123,54 @@ export default function SetBlessing() {
       ? "#9333ea"
       : "#fcd34d";
 
+  interface BlessingPressableProps {
+    element: Element;
+  }
+  const BlessingPressable = ({ element }: BlessingPressableProps) => {
+    return (
+      <Pressable
+        onPress={() => {
+          setBlessing(element);
+          blessingRef.current = element;
+        }}
+        style={{ height: deviceHeight * 0.25, width: deviceWidth * 0.45 }}
+      >
+        {({ pressed }) => (
+          <View
+            className={`${
+              pressed || blessing == element
+                ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                : "border-transparent"
+            } w-full h-full border flex items-center justify-center`}
+          >
+            <BlessingDisplay
+              blessing={element}
+              colorScheme={colorScheme}
+              size={deviceHeight * 0.15}
+            />
+            <Text
+              className="text-center text-lg px-2"
+              style={{ color: elementalColorMap[element].dark }}
+            >
+              Blessing of {toTitleCase(element)}
+            </Text>
+          </View>
+        )}
+      </Pressable>
+    );
+  };
+
   function classDependantBlessings() {
     if (playerClass == "mage") {
       return (
         <View className="flex items-center justify-evenly py-6">
           <ThemedView className="mb-8 flex flex-row justify-evenly">
-            <Pressable
-              onPress={() => {
-                setBlessing("fire");
-                blessingRef.current = "fire";
-              }}
-            >
-              {({ pressed }) => (
-                <View
-                  className={`${
-                    pressed || blessing == "fire"
-                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                      : "border-transparent"
-                  } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
-                >
-                  <View className="mx-auto">
-                    <Fire
-                      height={120}
-                      width={90}
-                      style={{ marginBottom: 5 }}
-                      color={"#ea580c"}
-                    />
-                  </View>
-                  <Text
-                    className="text-center text-lg"
-                    style={{ color: "#ea580c" }}
-                  >
-                    Blessing of Fire
-                  </Text>
-                </View>
-              )}
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                setBlessing("water");
-                blessingRef.current = "water";
-              }}
-            >
-              {({ pressed }) => (
-                <View
-                  className={`${
-                    pressed || blessing == "water"
-                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                      : "border-transparent"
-                  } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
-                >
-                  <View className="mx-auto">
-                    <Water
-                      height={120}
-                      width={120}
-                      style={{ marginBottom: 5 }}
-                      color={"#3b82f6"}
-                    />
-                  </View>
-                  <Text
-                    className="text-center text-lg"
-                    style={{ color: "#3b82f6" }}
-                  >
-                    Blessing of Water
-                  </Text>
-                </View>
-              )}
-            </Pressable>
+            <BlessingPressable element={Element.fire} />
+            <BlessingPressable element={Element.water} />
           </ThemedView>
-          <ThemedView className="my-[6vh] flex flex-row justify-evenly">
-            <Pressable
-              onPress={() => {
-                setBlessing("air");
-                blessingRef.current = "air";
-              }}
-            >
-              {({ pressed }) => (
-                <View
-                  className={`${
-                    pressed || blessing == "air"
-                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                      : "border-transparent"
-                  } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
-                >
-                  <View className="mx-auto">
-                    <Air style={{ marginBottom: 5 }} />
-                  </View>
-                  <Text
-                    className="text-center text-lg"
-                    style={{ color: "#cbd5e1" }}
-                  >
-                    Blessing of Air
-                  </Text>
-                </View>
-              )}
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                setBlessing("earth");
-                blessingRef.current = "earth";
-              }}
-            >
-              {({ pressed }) => (
-                <View
-                  className={`${
-                    pressed || blessing == "earth"
-                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                      : "border-transparent"
-                  } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
-                >
-                  <View className="mx-auto">
-                    <Earth style={{ marginBottom: 5 }} />
-                  </View>
-                  <Text
-                    className="text-center text-lg"
-                    style={{ color: "#937D62" }}
-                  >
-                    Blessing of Earth
-                  </Text>
-                </View>
-              )}
-            </Pressable>
+          <ThemedView className="flex flex-row justify-evenly">
+            <BlessingPressable element={Element.air} />
+            <BlessingPressable element={Element.earth} />
           </ThemedView>
         </View>
       );
@@ -246,201 +178,23 @@ export default function SetBlessing() {
       return (
         <View className="flex items-center justify-evenly py-6">
           <ThemedView className="mb-8 flex flex-row justify-evenly">
-            <Pressable
-              onPress={() => {
-                setBlessing("summoning");
-                blessingRef.current = "summoning";
-              }}
-            >
-              {({ pressed }) => (
-                <View
-                  className={`${
-                    pressed || blessing == "summoning"
-                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                      : "border-transparent"
-                  } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
-                >
-                  <View className="mx-auto">
-                    <SummonerSkull style={{ marginBottom: 5 }} />
-                  </View>
-                  <Text
-                    className="text-center text-lg"
-                    style={{ color: "#4b5563" }}
-                  >
-                    Blessing of Summons
-                  </Text>
-                </View>
-              )}
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                setBlessing("pestilence");
-                blessingRef.current = "pestilence";
-              }}
-            >
-              {({ pressed }) => (
-                <View
-                  className={`${
-                    pressed || blessing == "pestilence"
-                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                      : "border-transparent"
-                  } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
-                >
-                  <View className="mx-auto">
-                    <Pestilence
-                      style={{ marginBottom: 5 }}
-                      color={colorScheme == "dark" ? "#84cc16" : "#65a30d"}
-                    />
-                  </View>
-                  <Text
-                    className="text-center text-lg"
-                    style={{ color: "#84cc16" }}
-                  >
-                    Blessing of Pestilence
-                  </Text>
-                </View>
-              )}
-            </Pressable>
+            <BlessingPressable element={Element.summoning} />
+            <BlessingPressable element={Element.pestilence} />
           </ThemedView>
-          <View className="my-[6vh] flex flex-row justify-evenly">
-            <Pressable
-              onPress={() => {
-                setBlessing("bone");
-                blessingRef.current = "bone";
-              }}
-            >
-              {({ pressed }) => (
-                <View
-                  className={`${
-                    pressed || blessing == "bone"
-                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                      : "border-transparent"
-                  } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
-                >
-                  <View className="mx-auto">
-                    <Bones style={{ marginBottom: 5 }} />
-                  </View>
-                  <Text
-                    className="text-center text-lg"
-                    style={{ color: "#9ca3af" }}
-                  >
-                    Blessing of Bones
-                  </Text>
-                </View>
-              )}
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                setBlessing("blood");
-                blessingRef.current = "blood";
-              }}
-            >
-              {({ pressed }) => (
-                <View
-                  className={`${
-                    pressed || blessing == "blood"
-                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                      : "border-transparent"
-                  } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
-                >
-                  <View className="mx-auto">
-                    <BloodDrop style={{ marginBottom: 5 }} color={"#991b1b"} />
-                  </View>
-                  <Text
-                    className="text-center text-lg"
-                    style={{ color: "#991b1b" }}
-                  >
-                    Blessing of Blood
-                  </Text>
-                </View>
-              )}
-            </Pressable>
-          </View>
+          <ThemedView className="flex flex-row justify-evenly">
+            <BlessingPressable element={Element.bone} />
+            <BlessingPressable element={Element.blood} />
+          </ThemedView>
         </View>
       );
     } else if (playerClass == "paladin") {
       return (
         <View className="flex items-center justify-evenly py-6">
-          <Pressable
-            onPress={() => {
-              setBlessing("holy");
-              blessingRef.current = "holy";
-            }}
-          >
-            {({ pressed }) => (
-              <View
-                className={`${
-                  pressed || blessing == "holy"
-                    ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                    : "border-transparent"
-                } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
-              >
-                <View className="mx-auto">
-                  <Holy style={{ marginBottom: 5 }} />
-                </View>
-                <Text
-                  className="text-center text-lg"
-                  style={{ color: "#facc15" }}
-                >
-                  Holy Blessing
-                </Text>
-              </View>
-            )}
-          </Pressable>
-          <View className="my-[6vh] flex flex-row justify-evenly">
-            <Pressable
-              onPress={() => {
-                setBlessing("vengeance");
-                blessingRef.current = "vengeance";
-              }}
-            >
-              {({ pressed }) => (
-                <View
-                  className={`${
-                    pressed || blessing == "vengeance"
-                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                      : "border-transparent"
-                  } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
-                >
-                  <View className="mx-auto">
-                    <Vengeance style={{ marginBottom: 5 }} />
-                  </View>
-                  <Text
-                    className="text-center text-lg"
-                    style={{ color: "#cbd5e1" }}
-                  >
-                    Blessing of Vengeance
-                  </Text>
-                </View>
-              )}
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                setBlessing("protection");
-                blessingRef.current = "protection";
-              }}
-            >
-              {({ pressed }) => (
-                <View
-                  className={`${
-                    pressed || blessing == "protection"
-                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                      : "border-transparent"
-                  } px-6 py-4 border h-[20vh] min-h-[196] w-[45vw]`}
-                >
-                  <View className="mx-auto">
-                    <Protection style={{ marginBottom: 5 }} />
-                  </View>
-                  <Text
-                    className="text-center text-lg"
-                    style={{ color: "#3b82f6" }}
-                  >
-                    Blessing of Protection
-                  </Text>
-                </View>
-              )}
-            </Pressable>
-          </View>
+          <BlessingPressable element={Element.holy} />
+          <ThemedView className="mt-8 flex flex-row justify-evenly">
+            <BlessingPressable element={Element.vengeance} />
+            <BlessingPressable element={Element.protection} />
+          </ThemedView>
         </View>
       );
     } else throw new Error("invalid class set");
@@ -475,7 +229,7 @@ export default function SetBlessing() {
         }}
       />
       <ScrollView>
-        <ThemedView className="flex-1 px-[5vw] pt-[8vh]">
+        <ThemedView className="flex-1 pt-[8vh]">
           <Text className="text-center text-2xl">
             With What Blessing Was Your
             <Text style={{ color: accent }}>{` ${toTitleCase(
@@ -483,9 +237,9 @@ export default function SetBlessing() {
             )} `}</Text>
             Born?
           </Text>
-          <ThemedView className="flex-1 justify-evenly">
+          <>
             {classDependantBlessings()}
-            <Text className="text-center md:text-lg">
+            <Text className="text-center md:text-lg px-4">
               {descriptionMap[blessing as Element]}
             </Text>
             {blessing ? (
@@ -505,7 +259,7 @@ export default function SetBlessing() {
             ) : (
               <View className="h-32"></View>
             )}
-          </ThemedView>
+          </>
         </ThemedView>
       </ScrollView>
       <View className="absolute ml-4 mt-4">

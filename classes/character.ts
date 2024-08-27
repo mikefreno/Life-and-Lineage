@@ -25,6 +25,7 @@ import {
   MasteryLevel,
   beingType,
   type Spell,
+  Element,
 } from "../utility/types";
 import { rollD20 } from "../utility/functions/roll";
 import shops from "../assets/json/shops.json";
@@ -289,18 +290,7 @@ type PlayerCharacterOptions =
 
 export class PlayerCharacter extends Character {
   readonly playerClass: "mage" | "necromancer" | "paladin";
-  readonly blessing:
-    | "fire"
-    | "water"
-    | "air"
-    | "earth"
-    | "blood"
-    | "summoning"
-    | "pestilence"
-    | "bone"
-    | "holy"
-    | "vengeance"
-    | "protection";
+  readonly blessing: Element;
   health: number;
   healthMax: number;
   sanity: number;
@@ -412,7 +402,7 @@ export class PlayerCharacter extends Character {
       affection,
     });
     this.playerClass = playerClass;
-    this.blessing = blessing;
+    this.blessing = Element[blessing];
     this.health = health ?? 100;
     this.healthMax = healthMax ?? 100;
     this.sanity = sanity ?? 50;

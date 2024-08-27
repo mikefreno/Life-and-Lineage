@@ -18,6 +18,7 @@ import {
   PaladinHammer,
   WizardHat,
 } from "../../assets/icons/SVGIcons";
+import BlessingDisplay from "../../components/BlessingsDisplay";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -81,23 +82,23 @@ const HomeScreen = observer(() => {
               {playerState?.playerClass == "necromancer" ? (
                 <View className="mx-auto">
                   <NecromancerSkull
-                    width={deviceHeight / 9 > 100 ? 100 : deviceHeight / 9}
-                    height={deviceHeight / 9 > 100 ? 100 : deviceHeight / 9}
+                    width={deviceHeight / 9 > 100 ? 100 : deviceHeight / 10}
+                    height={deviceHeight / 9 > 100 ? 100 : deviceHeight / 10}
                     color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
                   />
                 </View>
               ) : playerState?.playerClass == "paladin" ? (
                 <View className="mx-auto">
                   <PaladinHammer
-                    width={deviceHeight / 9 > 100 ? 100 : deviceHeight / 9}
-                    height={deviceHeight / 9 > 100 ? 100 : deviceHeight / 9}
+                    width={deviceHeight / 9 > 100 ? 100 : deviceHeight / 10}
+                    height={deviceHeight / 9 > 100 ? 100 : deviceHeight / 10}
                   />
                 </View>
               ) : (
                 <View className="mx-auto scale-x-[-1] transform">
                   <WizardHat
-                    width={deviceHeight / 9 > 100 ? 100 : deviceHeight / 9}
-                    height={deviceHeight / 9 > 100 ? 100 : deviceHeight / 9}
+                    width={deviceHeight / 9 > 100 ? 100 : deviceHeight / 10}
+                    height={deviceHeight / 9 > 100 ? 100 : deviceHeight / 10}
                     color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
                   />
                 </View>
@@ -115,11 +116,11 @@ const HomeScreen = observer(() => {
                 } years old`}</Text>
               </View>
               <View className="mx-auto">
-                {blessingDisplay(
-                  playerState.blessing,
-                  colorScheme,
-                  deviceHeight / 9 > 100 ? 100 : deviceHeight / 9,
-                )}
+                <BlessingDisplay
+                  blessing={playerState.blessing}
+                  colorScheme={colorScheme}
+                  size={deviceHeight / 9 > 100 ? 100 : deviceHeight / 10}
+                />
               </View>
             </View>
           </View>

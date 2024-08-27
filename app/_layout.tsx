@@ -198,8 +198,6 @@ const RootLayout = observer(() => {
   async function getAndSetNavBar() {
     if (Platform.OS == "android") {
       if ((await NavigationBar.getVisibilityAsync()) == "visible") {
-        await NavigationBar.setVisibilityAsync("hidden");
-        await NavigationBar.setPositionAsync("absolute");
         if (!navbarLoad) {
           setNavbarLoad(true);
         }

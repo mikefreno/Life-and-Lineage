@@ -238,7 +238,7 @@ const SignUpScreen = observer(() => {
           <Text className="text-center text-3xl pt-4">Email Registration</Text>
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0} // Adjust this value as needed
+            keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
           >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
               <View>
