@@ -19,6 +19,7 @@ interface GenericRaisedButtonProps {
     | "error";
   vibrationEssentiality?: boolean;
   disableTopLevelStyling?: boolean;
+  style?: {};
 }
 
 const GenericRaisedButton = ({
@@ -30,6 +31,7 @@ const GenericRaisedButton = ({
   vibrationStrength = "light",
   vibrationEssentiality = false,
   disableTopLevelStyling = false,
+  style,
 }: GenericRaisedButtonProps) => {
   const { colorScheme } = useColorScheme();
 
@@ -46,6 +48,7 @@ const GenericRaisedButton = ({
         onPressFunction();
       }}
       disabled={disabledCondition}
+      style={style}
     >
       {({ pressed }) => (
         <View

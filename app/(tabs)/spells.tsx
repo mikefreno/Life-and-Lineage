@@ -12,7 +12,7 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import { toTitleCase } from "../../utility/functions/misc/words";
-import { MasteryLevel } from "../../utility/types";
+import { Element, MasteryLevel } from "../../utility/types";
 import {
   convertMasteryToNumber,
   convertMasteryToString,
@@ -45,91 +45,78 @@ const SpellsScreen = observer(() => {
   function magicProficiencySection(
     proficiencies:
       | {
-          school: string;
+          school: Element;
           proficiency: number;
         }[]
       | undefined,
   ) {
     if (!proficiencies) return;
     return (
-      <View className="w-full">
-        <ScrollView>
-          {proficiencies.map((magicProficiency, idx) => {
-            const color =
-              elementalColorMap[
-                magicProficiency.school as
-                  | "fire"
-                  | "water"
-                  | "air"
-                  | "earth"
-                  | "blood"
-                  | "summoning"
-                  | "pestilence"
-                  | "bone"
-                  | "holy"
-                  | "vengeance"
-                  | "protection"
-              ];
-            return (
-              <View className="my-4 px-8 flex w-full flex-col" key={idx}>
-                <Text
-                  style={{
-                    color:
-                      magicProficiency.school == "air" && colorScheme == "light"
-                        ? "#71717a"
-                        : color.dark,
-                  }}
-                >
-                  {`${toTitleCase(magicProficiency.school)} (${toTitleCase(
+      <ScrollView
+        className="w-full"
+        contentContainerStyle={{ paddingBottom: 10 }}
+      >
+        {proficiencies.map((magicProficiency, idx) => {
+          const color = elementalColorMap[magicProficiency.school];
+          return (
+            <View className="my-4 px-8 flex w-full flex-col" key={idx}>
+              <Text
+                style={{
+                  color:
+                    magicProficiency.school == "air" && colorScheme == "light"
+                      ? "#71717a"
+                      : color.dark,
+                }}
+              >
+                {`${toTitleCase(magicProficiency.school)} (${toTitleCase(
+                  playerState?.currentMasteryLevel(
+                    magicProficiency.school,
+                    true,
+                  ) as string,
+                )})`}
+              </Text>
+              <ProgressBar
+                value={magicProficiency.proficiency}
+                minValue={
+                  convertMasteryToNumber[
                     playerState?.currentMasteryLevel(
                       magicProficiency.school,
-                      true,
-                    ) as string,
-                  )})`}
-                </Text>
-                <ProgressBar
-                  value={magicProficiency.proficiency}
-                  minValue={
-                    convertMasteryToNumber[
-                      playerState?.currentMasteryLevel(
-                        magicProficiency.school,
-                      ) as MasteryLevel
-                    ]
-                  }
-                  maxValue={
-                    convertMasteryToNumber[
-                      ((playerState?.currentMasteryLevel(
-                        magicProficiency.school,
-                      ) as MasteryLevel) + 1) as MasteryLevel
-                    ]
-                  }
-                  unfilledColor={color.light}
-                  filledColor={color.dark}
-                  borderColor={color.dark}
-                />
-                <Text
-                  className="mx-auto text-sm"
-                  style={{
-                    color:
-                      magicProficiency.school == "air" && colorScheme == "light"
-                        ? "#71717a"
-                        : color.dark,
-                  }}
-                >
-                  Progression to{" "}
-                  {
-                    convertMasteryToString[
-                      ((playerState?.currentMasteryLevel(
-                        magicProficiency.school,
-                      ) as MasteryLevel) + 1) as MasteryLevel
-                    ]
-                  }
-                </Text>
-              </View>
-            );
-          })}
-        </ScrollView>
-      </View>
+                    ) as MasteryLevel
+                  ]
+                }
+                maxValue={
+                  convertMasteryToNumber[
+                    ((playerState?.currentMasteryLevel(
+                      magicProficiency.school,
+                    ) as MasteryLevel) + 1) as MasteryLevel
+                  ]
+                }
+                unfilledColor={color.light}
+                filledColor={color.dark}
+                borderColor={color.dark}
+              />
+              <Text
+                className="mx-auto text-sm"
+                style={{
+                  color:
+                    magicProficiency.school == "air" && colorScheme == "light"
+                      ? "#71717a"
+                      : color.dark,
+                }}
+              >
+                Progression to{" "}
+                {
+                  convertMasteryToString[
+                    ((playerState?.currentMasteryLevel(
+                      magicProficiency.school,
+                    ) as MasteryLevel) + 1) as MasteryLevel
+                  ]
+                }
+              </Text>
+            </View>
+          );
+        })}
+      </ScrollView>
     );
   }
 
@@ -177,9 +164,9 @@ const SpellsScreen = observer(() => {
               </Text>
             </View>
           )}
-          <View className="min-h-[280]">
+          <View className="h-[60%]">
             <GenericStrikeAround>Proficiencies</GenericStrikeAround>
-            <View className="flex items-center">
+            <View className="flex-1 items-center">
               {magicProficiencySection(playerState?.magicProficiencies)}
             </View>
           </View>

@@ -1,7 +1,6 @@
 import { View } from "react-native";
 import { Text, View as ThemedView } from "../../components/Themed";
 import { useContext, useEffect, useRef, useState } from "react";
-import blessingDisplay from "../../components/BlessingsDisplay";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
 import { Dimensions } from "react-native";

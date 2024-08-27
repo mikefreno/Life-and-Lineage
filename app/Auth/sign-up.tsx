@@ -20,6 +20,7 @@ import { router } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { API_BASE_URL } from "../../config/config";
 import D20DieAnimation from "../../components/DieRollAnim";
+import { View as ThemedView } from "../../components/Themed";
 
 const SignUpScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -168,7 +169,7 @@ const SignUpScreen = observer(() => {
   };
 
   return (
-    <>
+    <ThemedView className="flex-1">
       {awaitingResponse ? (
         <View className="pt-[25vh]">
           <D20DieAnimation keepRolling={awaitingResponse} />
@@ -180,54 +181,53 @@ const SignUpScreen = observer(() => {
               {error}
             </Text>
           )}
-          <View className="flex flex-row mt-[20vh] px-4">
-            <View className="mx-auto justify-between">
-              <Pressable
-                onPress={handleGoogleSignUp}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  borderWidth: 1,
-                  borderColor: colorScheme == "dark" ? "#fafafa" : "#27272a",
-                  backgroundColor:
-                    colorScheme == "dark" ? "#27272a" : "#ffffff",
-                  paddingHorizontal: 12,
-                  marginTop: -8,
-                  marginBottom: 8,
-                  paddingVertical: 8,
-                  borderRadius: 5,
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 1 },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 1.41,
-                  elevation: 2,
-                }}
-              >
-                <Text className="text-xl">Register with Google</Text>
-                <GoogleIcon height={20} width={20} />
-              </Pressable>
-              {Platform.OS == "ios" && (
-                <AppleAuthentication.AppleAuthenticationButton
-                  buttonType={
-                    AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
-                  }
-                  buttonStyle={
-                    colorScheme == "dark"
-                      ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE
-                      : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
-                  }
-                  cornerRadius={5}
-                  style={{ width: 230, height: 48 }}
-                  onPress={handleAppleSignUp}
-                />
-              )}
-            </View>
+          <View className="flex items-center mt-[20vh] px-4">
+            <Pressable
+              onPress={handleGoogleSignUp}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                borderWidth: 1,
+                borderColor: colorScheme == "dark" ? "#fafafa" : "#27272a",
+                backgroundColor: colorScheme == "dark" ? "#27272a" : "#ffffff",
+                paddingHorizontal: 12,
+                marginTop: -8,
+                marginBottom: 8,
+                paddingVertical: 8,
+                borderRadius: 5,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.2,
+                shadowRadius: 1.41,
+                elevation: 2,
+                width: 230,
+              }}
+            >
+              <Text className="text-xl">Register with Google</Text>
+              <GoogleIcon height={20} width={20} />
+            </Pressable>
+            {Platform.OS == "ios" && (
+              <AppleAuthentication.AppleAuthenticationButton
+                buttonType={
+                  AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
+                }
+                buttonStyle={
+                  colorScheme == "dark"
+                    ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE
+                    : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+                }
+                cornerRadius={5}
+                style={{ width: 230, height: 48 }}
+                onPress={handleAppleSignUp}
+              />
+            )}
             <GenericRaisedButton
               onPressFunction={() => setUsingEmail(true)}
               backgroundColor={"#2563eb"}
+              style={{ width: 230 }}
             >
-              <Text className="text-xl" style={{ color: "white" }}>
+              <Text className="text-xl text-center" style={{ color: "white" }}>
                 Email
               </Text>
             </GenericRaisedButton>
@@ -365,7 +365,7 @@ const SignUpScreen = observer(() => {
           </Text>
         </View>
       )}
-    </>
+    </ThemedView>
   );
 });
 

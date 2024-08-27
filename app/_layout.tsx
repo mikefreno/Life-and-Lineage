@@ -12,7 +12,7 @@ import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
 import { fullSave, fullLoad } from "../utility/functions/save_load";
-import { Platform, StyleSheet } from "react-native";
+import { Keyboard, Platform, StyleSheet } from "react-native";
 import { autorun, reaction } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
@@ -141,6 +141,8 @@ const RootLayout = observer(() => {
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
   const [navbarLoad, setNavbarLoad] = useState(false);
+
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   //const auth = useAuth();
 
   //useEffect(() => {
@@ -193,14 +195,43 @@ const RootLayout = observer(() => {
 
   useEffect(() => {
     getAndSetNavBar();
-  }, [colorScheme]);
+  }, [colorScheme, isKeyboardVisible]);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setKeyboardVisible(true);
+      },
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardVisible(false);
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   async function getAndSetNavBar() {
-    if (Platform.OS == "android") {
-      if ((await NavigationBar.getVisibilityAsync()) == "visible") {
-        if (!navbarLoad) {
-          setNavbarLoad(true);
-        }
+    if (Platform.OS === "android") {
+      const isVisible =
+        (await NavigationBar.getVisibilityAsync()) === "visible";
+      if (isKeyboardVisible && !isVisible) {
+        await NavigationBar.setVisibilityAsync("visible");
+        await NavigationBar.setPositionAsync("relative");
+        await NavigationBar.setBehaviorAsync("inset-touch");
+      } else if (!isKeyboardVisible && isVisible) {
+        await NavigationBar.setVisibilityAsync("hidden");
+        await NavigationBar.setPositionAsync("absolute");
+        await NavigationBar.setBehaviorAsync("overlay-swipe");
+      }
+      if (!navbarLoad) {
+        setNavbarLoad(true);
       }
     } else {
       setNavbarLoad(true);

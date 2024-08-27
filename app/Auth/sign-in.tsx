@@ -3,12 +3,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  ScrollView,
   TextInput,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { Text } from "../../components/Themed";
+import { Text, ScrollView } from "../../components/Themed";
 import { useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
@@ -19,6 +18,8 @@ import { API_BASE_URL } from "../../config/config";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { GoogleIcon } from "../../assets/icons/SVGIcons";
 import D20DieAnimation from "../../components/DieRollAnim";
+import { View as ThemedView } from "../../components/Themed";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 const SignInScreen = observer(() => {
   const auth = useAuth();
@@ -29,6 +30,8 @@ const SignInScreen = observer(() => {
   const [password, setPassword] = useState("");
   const [awaitingResponse, setAwaitingResponse] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>();
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const header = useHeaderHeight();
 
   useEffect(() => {
     if (auth.isAuthenticated) {
@@ -102,84 +105,84 @@ const SignInScreen = observer(() => {
   };
 
   return awaitingResponse ? (
-    <View className="pt-[25vh]">
+    <ThemedView className="pt-[25vh] flex-1">
       <D20DieAnimation keepRolling={awaitingResponse} />
-    </View>
+    </ThemedView>
   ) : (
-    <>
-      <View className="flex items-center py-[5vh]">
-        <Pressable
-          onPress={async () => {
-            setAwaitingResponse(true);
-            try {
-              await auth.googleSignIn();
-            } catch (e) {
-              setError("Failed to sign in with Google. Please try again.");
-            }
-            setAwaitingResponse(false);
-          }}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            borderWidth: 1,
-            borderColor: colorScheme == "dark" ? "#fafafa" : "#27272a",
-            backgroundColor: colorScheme == "dark" ? "#27272a" : "#ffffff",
-            paddingHorizontal: 12,
-            marginTop: -8,
-            marginBottom: 8,
-            paddingVertical: 8,
-            borderRadius: 5,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.2,
-            shadowRadius: 1.41,
-            elevation: 2,
-          }}
-        >
-          <Text className="text-xl">Sign in with Google</Text>
-          <GoogleIcon height={20} width={20} />
-        </Pressable>
-        {Platform.OS == "ios" && (
-          <AppleAuthentication.AppleAuthenticationButton
-            buttonType={
-              AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
-            }
-            buttonStyle={
-              colorScheme == "dark"
-                ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE
-                : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
-            }
-            cornerRadius={5}
-            style={{ width: 230, height: 48 }}
-            onPress={async () => {
-              setAwaitingResponse(true);
-              try {
-                await auth.appleSignIn();
-              } catch (e) {
-                setError("Failed to sign in with Apple. Please try again.");
-              }
-              setAwaitingResponse(false);
-            }}
-          />
-        )}
-      </View>
+    <ThemedView className="flex-1">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
+        keyboardVerticalOffset={header}
       >
-        <ScrollView>
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ThemedView className="flex-1 justify-center items-center">
+            <Pressable
+              onPress={async () => {
+                setAwaitingResponse(true);
+                try {
+                  await auth.googleSignIn();
+                } catch (e) {
+                  setError("Failed to sign in with Google. Please try again.");
+                }
+                setAwaitingResponse(false);
+              }}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                borderWidth: 1,
+                borderColor: colorScheme == "dark" ? "#fafafa" : "#27272a",
+                backgroundColor: colorScheme == "dark" ? "#27272a" : "#ffffff",
+                paddingHorizontal: 12,
+                marginTop: -8,
+                marginBottom: 8,
+                paddingVertical: 8,
+                borderRadius: 5,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.2,
+                shadowRadius: 1.41,
+                elevation: 2,
+                width: 230,
+              }}
+            >
+              <Text className="text-xl">Sign in with Google</Text>
+              <GoogleIcon height={20} width={20} />
+            </Pressable>
+            {Platform.OS == "ios" && (
+              <AppleAuthentication.AppleAuthenticationButton
+                buttonType={
+                  AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
+                }
+                buttonStyle={
+                  colorScheme == "dark"
+                    ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE
+                    : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+                }
+                cornerRadius={5}
+                style={{ width: 230, height: 48 }}
+                onPress={async () => {
+                  setAwaitingResponse(true);
+                  try {
+                    await auth.appleSignIn();
+                  } catch (e) {
+                    setError("Failed to sign in with Apple. Please try again.");
+                  }
+                  setAwaitingResponse(false);
+                }}
+              />
+            )}
+
+            <View className="w-3/4 pt-6 pb-16">
               {error && (
                 <Text className="text-center px-6" style={{ color: "#ef4444" }}>
                   {error}
                 </Text>
               )}
-
               <Text className="text-center text-3xl pt-4">Email Login</Text>
               <TextInput
-                className="mx-16 my-6 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
+                className="my-6 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
                 placeholderTextColor={
                   colorScheme == "light" ? "#d4d4d8" : "#71717a"
                 }
@@ -198,7 +201,7 @@ const SignInScreen = observer(() => {
                 }}
               />
               <TextInput
-                className="mx-16 my-6 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
+                className="mt-6 mb-2 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
                 placeholderTextColor={
                   colorScheme == "light" ? "#d4d4d8" : "#71717a"
                 }
@@ -223,14 +226,15 @@ const SignInScreen = observer(() => {
                 onPressFunction={attemptLogin}
                 backgroundColor={"#2563eb"}
                 textColor={"#fafafa"}
+                style={{ height: 48 }}
               >
                 Sign In
               </GenericRaisedButton>
             </View>
-          </TouchableWithoutFeedback>
-        </ScrollView>
+          </ThemedView>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
-    </>
+    </ThemedView>
   );
 });
 export default SignInScreen;

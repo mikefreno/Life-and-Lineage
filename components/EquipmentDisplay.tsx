@@ -1,5 +1,5 @@
 import { RefObject, useContext, useState } from "react";
-import { Pressable, View, Image } from "react-native";
+import { View, Image, Dimensions, Pressable } from "react-native";
 import { Text } from "./Themed";
 import Draggable from "react-native-draggable";
 import type { Item } from "../classes/item";
@@ -27,10 +27,11 @@ export default function EquipmentDisplay({
   offHandTarget,
   inventoryTarget,
 }: EquipmentDisplayProps) {
-  const [buzzed, setBuzzed] = useState<boolean>(false);
-  const [showingStats, setShowingStats] = useState<Item | null>(null);
-  const [statsLeftPos, setStatsLeftPos] = useState<number>();
-  const [statsTopPos, setStatsTopPos] = useState<number>();
+  const [showingStats, setShowingStats] = useState<{
+    item: Item;
+    count: number;
+  } | null>(null);
+  const [statsPos, setStatsPos] = useState<{ left: number; top: number }>();
   const vibration = useVibration();
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing contexts");
@@ -94,274 +95,149 @@ export default function EquipmentDisplay({
     }
   }
 
+  const blockSize = Dimensions.get("screen").width / 8.5;
+
+  interface EquipmentSlotProps {
+    slot: "Head" | "Main-Hand" | "Off-Hand" | "Body";
+  }
+
+  const EquipmentSlot = ({ slot }: EquipmentSlotProps) => {
+    const [buzzed, setBuzzed] = useState<boolean>(false);
+    let ref: RefObject<View>;
+    let item: Item | null = null;
+    let backdropString = "";
+    if (playerState) {
+      switch (slot) {
+        case "Head":
+          ref = headTarget;
+          item = playerState.equipment.head;
+          backdropString = "ml-0 mt-7";
+          break;
+        case "Main-Hand":
+          ref = mainHandTarget;
+          item =
+            playerState.equipment.mainHand.name !== "unarmored"
+              ? playerState.equipment.mainHand
+              : null;
+          backdropString = "ml-0 mt-7";
+          break;
+        case "Off-Hand":
+          ref = offHandTarget;
+          item = playerState.equipment.offHand;
+          backdropString = "ml-0 mt-7";
+          break;
+        case "Body":
+          ref = bodyTarget;
+          item = playerState.equipment.body;
+          backdropString = "ml-0 mt-7";
+          break;
+      }
+
+      const isTwoHanded = playerState.equipment.mainHand?.slot === "two-hand";
+
+      return (
+        <View>
+          <Text className="mb-2 text-center">{slot}</Text>
+          {item ? (
+            <View
+              className="z-50 mx-auto bg-zinc-400 rounded-lg"
+              style={{ height: blockSize, width: blockSize }}
+            >
+              <Draggable
+                onDragRelease={(_, g) => {
+                  checkReleasePosition({
+                    item: item!,
+                    xPos: g.moveX,
+                    yPos: g.moveY,
+                    size: blockSize,
+                    equipped: true,
+                  });
+                  setBuzzed(false);
+                }}
+                onDrag={() => {
+                  if (!buzzed) {
+                    vibration({ style: "medium", essential: true });
+                    setBuzzed(true);
+                  }
+                }}
+                shouldReverse
+              >
+                <Pressable
+                  onPress={() => {
+                    if (showingStats && showingStats.item.equals(item!)) {
+                      setShowingStats(null);
+                    } else {
+                      setShowingStats({ item: item!, count: 1 });
+                      ref.current?.measureInWindow((x, y) => {
+                        setStatsPos({ left: x, top: y });
+                      });
+                    }
+                  }}
+                  className="active:scale-90 active:opacity-50"
+                >
+                  <View
+                    className="items-center rounded-lg bg-zinc-400"
+                    ref={ref}
+                    style={{
+                      height: blockSize,
+                      width: blockSize,
+                    }}
+                  >
+                    <Image className="my-auto" source={item.getItemIcon()} />
+                  </View>
+                </Pressable>
+              </Draggable>
+            </View>
+          ) : slot === "Off-Hand" && isTwoHanded ? (
+            <View
+              className="mx-auto z-50 items-center rounded-lg bg-zinc-400"
+              style={{ height: blockSize, width: blockSize }}
+            >
+              <Image
+                className="my-auto opacity-50"
+                source={playerState.equipment.mainHand?.getItemIcon()}
+              />
+            </View>
+          ) : (
+            <View
+              ref={ref}
+              className="mx-auto rounded-lg bg-zinc-400"
+              style={{
+                height: blockSize,
+                width: blockSize,
+              }}
+            />
+          )}
+        </View>
+      );
+    }
+    return null;
+  };
+
   return (
     <>
       <View className="flex w-full">
         <View className="-mt-3 items-center">
-          <Text className="mb-2">Head</Text>
-          {playerState?.equipment.head ? (
-            <View className="z-50 h-12 w-12 active:scale-90 active:opacity-50">
-              <Draggable
-                onDragRelease={(_, g) => {
-                  checkReleasePosition({
-                    item: playerState.equipment.head,
-                    xPos: g.moveX,
-                    yPos: g.moveY,
-                    size: 48,
-                    equipped: true,
-                  });
-                  setBuzzed(false);
-                }}
-                onDrag={() => {
-                  if (!buzzed) {
-                    vibration({ style: "medium", essential: true });
-                    setBuzzed(true);
-                  }
-                }}
-                onPressIn={() => {
-                  if (
-                    showingStats &&
-                    playerState.equipment.head &&
-                    showingStats.equals(playerState.equipment.head)
-                  ) {
-                    setShowingStats(null);
-                  } else {
-                    setShowingStats(playerState.equipment.head);
-                    headTarget.current?.measureInWindow((x, y) => {
-                      setStatsLeftPos(x);
-                      setStatsTopPos(y);
-                    });
-                  }
-                }}
-                shouldReverse
-              >
-                <View
-                  ref={headTarget}
-                  className="absolute h-12 w-12 items-center rounded-lg"
-                  style={{ backgroundColor: "#a1a1aa" }}
-                >
-                  <Image
-                    className="my-auto"
-                    source={playerState?.equipment.head?.getItemIcon()}
-                  />
-                </View>
-              </Draggable>
-            </View>
-          ) : (
-            <View
-              ref={headTarget}
-              className="mx-auto h-12 w-12 rounded-lg"
-              style={{ backgroundColor: "#a1a1aa" }}
-            />
-          )}
-          <View
-            className="absolute mx-auto ml-4 mt-7 h-12 w-12 rounded-lg"
-            style={{ backgroundColor: "#a1a1aa" }}
-          />
+          <EquipmentSlot slot={"Head"} />
         </View>
         <View className="flex flex-row justify-evenly">
           <View className="-ml-1 -mt-4 mr-2 md:mt-4">
-            <Text className="mb-2">Main Hand</Text>
-            {playerState?.equipment.mainHand &&
-            playerState?.equipment.mainHand.name !== "unarmored" ? (
-              <View className="z-50 mx-auto h-12 w-12 items-center active:scale-90 active:opacity-50">
-                <Draggable
-                  onDragRelease={(_, g) => {
-                    checkReleasePosition({
-                      item: playerState.equipment.mainHand,
-                      xPos: g.moveX,
-                      yPos: g.moveY,
-                      size: 48,
-                      equipped: true,
-                    });
-                    setBuzzed(false);
-                  }}
-                  onDrag={() => {
-                    if (!buzzed) {
-                      vibration({ style: "medium", essential: true });
-                      setBuzzed(true);
-                    }
-                  }}
-                  onPressIn={() => {
-                    if (
-                      showingStats &&
-                      playerState.equipment.mainHand &&
-                      showingStats.equals(playerState.equipment.mainHand)
-                    ) {
-                      setShowingStats(null);
-                    } else {
-                      setShowingStats(playerState.equipment.mainHand);
-                      mainHandTarget.current?.measureInWindow((x, y) => {
-                        setStatsLeftPos(x);
-                        setStatsTopPos(y);
-                      });
-                    }
-                  }}
-                  shouldReverse
-                >
-                  <View
-                    ref={mainHandTarget}
-                    className="h-12 w-12 items-center rounded-lg"
-                    style={{ backgroundColor: "#a1a1aa" }}
-                  >
-                    <Image
-                      className="my-auto"
-                      source={playerState?.equipment.mainHand.getItemIcon()}
-                    />
-                  </View>
-                </Draggable>
-              </View>
-            ) : (
-              <View
-                ref={mainHandTarget}
-                className="mx-auto h-12 w-12 rounded-lg"
-                style={{ backgroundColor: "#a1a1aa" }}
-              />
-            )}
-            <View
-              className="absolute mx-auto ml-4 mt-7 h-12 w-12 rounded-lg"
-              style={{ backgroundColor: "#a1a1aa" }}
-            />
+            <EquipmentSlot slot={"Main-Hand"} />
           </View>
           <View className="-mt-4 md:mt-4">
-            <Text className="mb-2">Off-Hand</Text>
-            {playerState?.equipment.offHand ? (
-              <View className="z-50 mx-auto h-12 w-12 items-center active:scale-90 active:opacity-50">
-                <Draggable
-                  onDragRelease={(_, g) => {
-                    checkReleasePosition({
-                      item: playerState.equipment.offHand,
-                      xPos: g.moveX,
-                      yPos: g.moveY,
-                      size: 48,
-                      equipped: true,
-                    });
-                    setBuzzed(false);
-                  }}
-                  onDrag={() => {
-                    if (!buzzed) {
-                      vibration({ style: "medium", essential: true });
-                      setBuzzed(true);
-                    }
-                  }}
-                  shouldReverse
-                >
-                  <Pressable
-                    onPress={() => {
-                      if (
-                        showingStats &&
-                        playerState.equipment.offHand &&
-                        showingStats.equals(playerState.equipment.offHand)
-                      ) {
-                        setShowingStats(null);
-                      } else {
-                        setShowingStats(playerState.equipment.offHand);
-                        offHandTarget.current?.measureInWindow((x, y) => {
-                          setStatsLeftPos(x);
-                          setStatsTopPos(y);
-                        });
-                      }
-                    }}
-                    ref={offHandTarget}
-                    className="h-12 w-12 items-center rounded-lg"
-                    style={{ backgroundColor: "#a1a1aa" }}
-                  >
-                    <Image
-                      className="my-auto"
-                      source={playerState?.equipment.offHand?.getItemIcon()}
-                    />
-                  </Pressable>
-                </Draggable>
-              </View>
-            ) : playerState?.equipment.mainHand.slot == "two-hand" ? (
-              <View className="z-50 mx-auto h-12 w-12 items-center rounded-lg bg-zinc-400">
-                <Image
-                  className="my-auto opacity-50"
-                  source={playerState?.equipment.mainHand?.getItemIcon()}
-                />
-              </View>
-            ) : (
-              <View
-                ref={offHandTarget}
-                className="mx-auto h-12 w-12 rounded-lg"
-                style={{ backgroundColor: "#a1a1aa" }}
-              />
-            )}
-            <View
-              className="absolute mx-auto ml-3 mt-7 h-12 w-12 rounded-lg"
-              style={{ backgroundColor: "#a1a1aa" }}
-            />
+            <EquipmentSlot slot={"Off-Hand"} />
           </View>
         </View>
-        <View className="mx-auto -mt-6 items-center">
-          <Text className="mb-2">Body</Text>
-          {playerState?.equipment.body ? (
-            <View className="z-50 h-12 w-12 active:scale-90 active:opacity-50">
-              <Draggable
-                onDragRelease={(_, g) => {
-                  checkReleasePosition({
-                    item: playerState.equipment.body,
-                    xPos: g.moveX,
-                    yPos: g.moveY,
-                    size: 48,
-                    equipped: true,
-                  });
-                  setBuzzed(false);
-                }}
-                onDrag={() => {
-                  if (!buzzed) {
-                    vibration({ style: "medium", essential: true });
-                    setBuzzed(true);
-                  }
-                }}
-                onPressIn={() => {
-                  if (
-                    showingStats &&
-                    playerState.equipment.body &&
-                    showingStats.equals(playerState.equipment.body)
-                  ) {
-                    setShowingStats(null);
-                  } else {
-                    setShowingStats(playerState.equipment.body);
-                    bodyTarget.current?.measureInWindow((x, y) => {
-                      setStatsLeftPos(x);
-                      setStatsTopPos(y);
-                    });
-                  }
-                }}
-                shouldReverse
-              >
-                <View
-                  ref={bodyTarget}
-                  className="h-12 w-12 items-center rounded-lg"
-                  style={{ backgroundColor: "#a1a1aa" }}
-                >
-                  <Image
-                    className="my-auto"
-                    source={playerState?.equipment.body?.getItemIcon()}
-                  />
-                </View>
-              </Draggable>
-            </View>
-          ) : (
-            <View
-              ref={bodyTarget}
-              className="mx-auto h-12 w-12 rounded-lg"
-              style={{ backgroundColor: "#a1a1aa" }}
-            />
-          )}
-          <View
-            className="absolute mx-auto ml-4 mt-7 h-12 w-12 rounded-lg"
-            style={{ backgroundColor: "#a1a1aa" }}
-          />
+        <View className="mx-auto -mt-8 items-center">
+          <EquipmentSlot slot={"Body"} />
         </View>
       </View>
-      {showingStats && statsLeftPos && statsTopPos && (
+      {showingStats && statsPos && (
         <View className="absolute z-10">
           <StatsDisplay
-            statsLeftPos={statsLeftPos}
-            statsTopPos={statsTopPos}
-            item={showingStats}
+            statsLeftPos={statsPos.left}
+            statsTopPos={statsPos.top}
+            item={showingStats.item}
             setShowingStats={setShowingStats}
             topOffset={-240}
           />

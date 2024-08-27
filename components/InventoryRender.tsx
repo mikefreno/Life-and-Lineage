@@ -50,8 +50,7 @@ export default function InventoryRender({
   const deviceHeight = Dimensions.get("window").height;
   const deviceWidth = Dimensions.get("window").width;
   const vibration = useVibration();
-  const [statsLeftPos, setStatsLeftPos] = useState<number | undefined>();
-  const [statsTopPos, setStatsTopPos] = useState<number | undefined>();
+  const [statsPos, setStatsPos] = useState<{ left: number; top: number }>();
   const [showingStats, setShowingStats] = useState<{
     item: Item;
     count: number;
@@ -161,10 +160,11 @@ export default function InventoryRender({
     count: number;
   }
 
+  const blockSize = Dimensions.get("screen").width / 7.5;
+
   const ItemRender = ({ item, count }: ItemRenderProps) => {
     const [buzzed, setBuzzed] = useState(false);
-    const localRef = useRef<View>(null);
-    const [z, setZ] = useState<number>(10);
+    const ref = useRef<View>(null);
 
     const handlePress = () => {
       vibration({ style: "light" });
@@ -172,9 +172,8 @@ export default function InventoryRender({
         setShowingStats(null);
       } else {
         setShowingStats({ item, count });
-        localRef.current?.measureInWindow((x, y) => {
-          setStatsLeftPos(x);
-          setStatsTopPos(y);
+        ref.current?.measureInWindow((x, y) => {
+          setStatsPos({ left: x, top: y });
         });
       }
     };
@@ -186,34 +185,38 @@ export default function InventoryRender({
             item: item,
             xPos: g.moveX,
             yPos: g.moveY,
-            size: 48,
+            size: blockSize,
             equipped: false,
           });
           setBuzzed(false);
-          setZ(10);
         }}
         onDrag={() => {
           if (!buzzed) {
             vibration({ style: "medium", essential: true });
             setBuzzed(true);
-            setZ(50);
           }
         }}
-        disabled={"headTarget" in props ? !item.slot : false}
         shouldReverse
       >
         <Pressable
-          className={`h-14 w-14 absolute items-center justify-center rounded-lg bg-zinc-400 active:scale-90 active:opacity-50`}
-          ref={localRef}
+          ref={ref}
           onPress={handlePress}
-          style={{ zIndex: z }}
+          className="active:scale-90 active:opacity-50"
         >
-          <Image source={item.getItemIcon()} />
-          {item.stackable && count > 1 && (
-            <ThemedView className="absolute bottom-0 right-0 bg-opacity-50 rounded px-1">
-              <Text>{count}</Text>
-            </ThemedView>
-          )}
+          <View
+            className="items-center rounded-lg bg-zinc-400"
+            style={{
+              height: blockSize,
+              width: blockSize,
+            }}
+          >
+            <Image className="my-auto" source={item.getItemIcon()} />
+            {item.stackable && count > 1 && (
+              <ThemedView className="absolute bottom-0 right-0 bg-opacity-50 rounded px-1">
+                <Text>{count}</Text>
+              </ThemedView>
+            )}
+          </View>
         </Pressable>
       </Draggable>
     );
@@ -239,7 +242,7 @@ export default function InventoryRender({
                 (index % 6) * 16.67 + 1.2 * Math.floor(deviceWidth / 200)
               }%`,
               top: `${
-                Math.floor(index / 6) * 25 + Math.floor(deviceHeight / 200)
+                Math.floor(index / 6) * 24 + Math.floor(deviceHeight / 200)
               }%`,
             }}
             key={"bg-" + index}
@@ -255,7 +258,7 @@ export default function InventoryRender({
                 (index % 6) * 16.67 + 1.2 * Math.floor(deviceWidth / 200)
               }%`,
               top: `${
-                Math.floor(index / 6) * 25 + Math.floor(deviceHeight / 200)
+                Math.floor(index / 6) * 24 + Math.floor(deviceHeight / 200)
               }%`,
             }}
             key={index}
@@ -265,13 +268,12 @@ export default function InventoryRender({
         ))}
       </View>
       {showingStats &&
-        statsLeftPos &&
-        statsTopPos &&
+        statsPos &&
         playerState &&
         ("addItemToPouch" in props ? (
           <StatsDisplay
-            statsLeftPos={statsLeftPos}
-            statsTopPos={statsTopPos}
+            statsLeftPos={statsPos.left}
+            statsTopPos={statsPos.top}
             item={showingStats.item}
             count={showingStats.count}
             setShowingStats={setShowingStats}
@@ -284,8 +286,8 @@ export default function InventoryRender({
           />
         ) : "shopInventoryTarget" in props ? (
           <StatsDisplay
-            statsLeftPos={statsLeftPos}
-            statsTopPos={statsTopPos}
+            statsLeftPos={statsPos.left}
+            statsTopPos={statsPos.top}
             item={showingStats.item}
             count={showingStats.count}
             setShowingStats={setShowingStats}
@@ -301,8 +303,8 @@ export default function InventoryRender({
           />
         ) : (
           <StatsDisplay
-            statsLeftPos={statsLeftPos}
-            statsTopPos={statsTopPos}
+            statsLeftPos={statsPos.left}
+            statsTopPos={statsPos.top}
             item={showingStats.item}
             count={showingStats.count}
             setShowingStats={setShowingStats}

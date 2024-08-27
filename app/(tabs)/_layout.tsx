@@ -58,7 +58,7 @@ export default function TabLayout() {
               </>
             );
           },
-          tabBarActiveTintColor: Colors[colorScheme as "light" | "dark"].tint,
+          tabBarActiveTintColor: Colors[colorScheme].tint,
           tabBarLabelStyle: {
             fontFamily: "PixelifySans",
             marginLeft: 0,
@@ -66,7 +66,7 @@ export default function TabLayout() {
           tabBarStyle: {
             position: "absolute",
             borderTopWidth: 0,
-            height: 120,
+            height: Platform.OS == "ios" ? 120 : 100,
           },
           tabBarButton: (props) => {
             const onPressWithVibration = (event: GestureResponderEvent) => {
