@@ -336,4 +336,10 @@ export interface AppContextType {
   setIsCompact: React.Dispatch<React.SetStateAction<boolean>>;
   showDetailedStatusView: boolean;
   setShowDetailedStatusView: React.Dispatch<React.SetStateAction<boolean>>;
+  dimensions: {
+    height: number;
+    width: number;
+    greater: number;
+    lesser: number;
+  };
 }

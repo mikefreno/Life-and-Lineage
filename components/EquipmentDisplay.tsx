@@ -35,7 +35,7 @@ export default function EquipmentDisplay({
   const vibration = useVibration();
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing contexts");
-  const { playerState } = appData;
+  const { playerState, dimensions } = appData;
 
   function checkReleasePosition({
     item,
@@ -95,7 +95,7 @@ export default function EquipmentDisplay({
     }
   }
 
-  const blockSize = Dimensions.get("screen").width / 8.5;
+  const blockSize = Math.min(dimensions.lesser / 7.5, 84);
 
   interface EquipmentSlotProps {
     slot: "Head" | "Main-Hand" | "Off-Hand" | "Body";
@@ -137,7 +137,7 @@ export default function EquipmentDisplay({
 
       return (
         <View>
-          <Text className="mb-2 text-center">{slot}</Text>
+          <Text className="mb-1 text-center">{slot}</Text>
           {item ? (
             <View
               className="z-50 mx-auto bg-zinc-400 rounded-lg"
@@ -190,7 +190,7 @@ export default function EquipmentDisplay({
             </View>
           ) : slot === "Off-Hand" && isTwoHanded ? (
             <View
-              className="mx-auto z-50 items-center rounded-lg bg-zinc-400"
+              className="mx-auto z-10 items-center rounded-lg bg-zinc-400"
               style={{ height: blockSize, width: blockSize }}
             >
               <Image
@@ -216,19 +216,23 @@ export default function EquipmentDisplay({
 
   return (
     <>
-      <View className="flex w-full">
-        <View className="-mt-3 items-center">
+      <View className="flex w-full" style={{ height: dimensions.height * 0.3 }}>
+        <View className="items-center">
           <EquipmentSlot slot={"Head"} />
         </View>
         <View className="flex flex-row justify-evenly">
-          <View className="-ml-1 -mt-4 mr-2 md:mt-4">
+          <View className="-ml-1 -mt-4 mr-2">
             <EquipmentSlot slot={"Main-Hand"} />
           </View>
-          <View className="-mt-4 md:mt-4">
+          <View className="-mt-4">
             <EquipmentSlot slot={"Off-Hand"} />
           </View>
         </View>
-        <View className="mx-auto -mt-8 items-center">
+        <View
+          className={`mx-auto items-center ${
+            dimensions.width == dimensions.greater ? "-mt-20" : "-mt-8"
+          }`}
+        >
           <EquipmentSlot slot={"Body"} />
         </View>
       </View>

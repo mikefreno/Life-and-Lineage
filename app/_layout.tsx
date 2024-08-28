@@ -5,15 +5,21 @@ import {
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack, router } from "expo-router";
-import React, { createContext, useEffect, useContext, useState } from "react";
+import React, {
+  createContext,
+  useEffect,
+  useContext,
+  useState,
+  useCallback,
+} from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
 import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
 import { fullSave, fullLoad } from "../utility/functions/save_load";
-import { Keyboard, Platform, StyleSheet } from "react-native";
-import { autorun, reaction } from "mobx";
+import { Dimensions, Keyboard, Platform, StyleSheet } from "react-native";
+import { autorun } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
@@ -87,19 +93,47 @@ const Root = observer(() => {
 
   autorun(() => throttledFullSave(gameState, playerState));
 
-  // this was used before switching to MMKV
-  //reaction(
-  //() => ({
-  //gameTime: gameState?.date,
-  //}),
-  //(state) => {
-  //if (gameState && playerState && state.gameTime != gameDate) {
-  //setGameDate(gameState.date);
-  //throttledFullSave(gameState, playerState);
-  //}
-  //},
-  //{ delay: 2000 },
-  //);
+  const [dimensions, setDimensions] = useState(() => ({
+    height: Dimensions.get("screen").height,
+    width: Dimensions.get("screen").width,
+    greater: Math.max(
+      Dimensions.get("screen").height,
+      Dimensions.get("screen").width,
+    ),
+    lesser: Math.min(
+      Dimensions.get("screen").height,
+      Dimensions.get("screen").width,
+    ),
+  }));
+
+  const onChange = useCallback(
+    ({
+      screen,
+    }: {
+      screen: {
+        width: number;
+        height: number;
+        scale: number;
+        fontScale: number;
+      };
+    }) => {
+      setDimensions({
+        height: screen.height,
+        width: screen.width,
+        greater: Math.max(screen.height, screen.width),
+        lesser: Math.min(screen.width, screen.height),
+      });
+    },
+    [],
+  );
+
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener("change", onChange);
+
+    return () => {
+      subscription.remove();
+    };
+  }, [onChange]);
 
   while (loading) {
     return <D20DieAnimation keepRolling={loading} />;
@@ -121,6 +155,7 @@ const Root = observer(() => {
           setIsCompact: setPlayerStatusCompact,
           showDetailedStatusView,
           setShowDetailedStatusView,
+          dimensions,
         }}
       >
         <RootLayout />
@@ -143,13 +178,13 @@ const RootLayout = observer(() => {
   const [navbarLoad, setNavbarLoad] = useState(false);
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  //const auth = useAuth();
+  const auth = useAuth();
 
-  //useEffect(() => {
-  //if (__DEV__) {
-  //auth._debugLog();
-  //}
-  //}, []);
+  useEffect(() => {
+    if (__DEV__) {
+      auth._debugLog();
+    }
+  }, []);
 
   useEffect(() => {
     if (fontLoaded && navbarLoad) {

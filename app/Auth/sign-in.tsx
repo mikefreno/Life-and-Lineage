@@ -30,7 +30,6 @@ const SignInScreen = observer(() => {
   const [password, setPassword] = useState("");
   const [awaitingResponse, setAwaitingResponse] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>();
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const header = useHeaderHeight();
 
   useEffect(() => {
@@ -91,7 +90,6 @@ const SignInScreen = observer(() => {
             email: result.email,
             provider: "email",
           });
-          // window should close automatically
         } else {
           setError("Login failed for an unknown reason.");
         }
@@ -106,7 +104,7 @@ const SignInScreen = observer(() => {
 
   return awaitingResponse ? (
     <ThemedView className="pt-[25vh] flex-1">
-      <D20DieAnimation keepRolling={awaitingResponse} />
+      <D20DieAnimation keepRolling={true} />
     </ThemedView>
   ) : (
     <ThemedView className="flex-1">

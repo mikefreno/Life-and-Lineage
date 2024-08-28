@@ -1,7 +1,7 @@
 import { Dimensions, Pressable, useColorScheme, View } from "react-native";
 import { ScrollView, Text, View as ThemedView } from "../../components/Themed";
 import "../../assets/styles/globals.css";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Stack, router } from "expo-router";
 import { useVibration } from "../../utility/customHooks";
 import { AppContext } from "../_layout";
@@ -25,12 +25,10 @@ export default function NewGameScreen() {
 
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing context!");
-  const { gameState } = appData;
+  const { gameState, dimensions } = appData;
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,
   );
-  const deviceHeight = Dimensions.get("screen").height;
-  const deviceWidth = Dimensions.get("screen").width;
 
   const [showIntroTutorial, setShowIntroTutorial] = useState<boolean>(
     !gameState ||
@@ -177,7 +175,10 @@ export default function NewGameScreen() {
               setSelectedClass("mage");
               classRef.current = "mage";
             }}
-            style={{ height: deviceHeight * 0.25, width: deviceWidth * 0.45 }}
+            style={{
+              height: dimensions.height * 0.25,
+              width: dimensions.width * 0.45,
+            }}
           >
             {({ pressed }) => (
               <View
@@ -190,8 +191,8 @@ export default function NewGameScreen() {
                 <WizardHat
                   style={{ marginBottom: 5 }}
                   color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
-                  height={deviceHeight * 0.15}
-                  width={deviceHeight * 0.15}
+                  height={dimensions.height * 0.15}
+                  width={dimensions.width * 0.15}
                 />
                 <Text className="mx-auto text-xl" style={{ color: "#2563eb" }}>
                   Mage
@@ -206,7 +207,10 @@ export default function NewGameScreen() {
                 setSelectedClass("necromancer");
                 classRef.current = "necromancer";
               }}
-              style={{ height: deviceHeight * 0.25, width: deviceWidth * 0.45 }}
+              style={{
+                height: dimensions.height * 0.25,
+                width: dimensions.width * 0.45,
+              }}
             >
               {({ pressed }) => (
                 <View
@@ -220,8 +224,8 @@ export default function NewGameScreen() {
                     <NecromancerSkull
                       style={{ marginBottom: 5 }}
                       color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
-                      height={deviceHeight * 0.15}
-                      width={deviceHeight * 0.15}
+                      height={dimensions.height * 0.15}
+                      width={dimensions.width * 0.15}
                     />
                   </View>
                   <Text
@@ -239,7 +243,10 @@ export default function NewGameScreen() {
                 setSelectedClass("paladin");
                 classRef.current = "paladin";
               }}
-              style={{ height: deviceHeight * 0.25, width: deviceWidth * 0.45 }}
+              style={{
+                height: dimensions.height * 0.25,
+                width: dimensions.width * 0.45,
+              }}
             >
               {({ pressed }) => (
                 <View
@@ -252,8 +259,8 @@ export default function NewGameScreen() {
                   <View className="rotate-12">
                     <View className="scale-x-[-1] transform">
                       <PaladinHammer
-                        height={deviceHeight * 0.15}
-                        width={deviceHeight * 0.15}
+                        height={dimensions.height * 0.15}
+                        width={dimensions.height * 0.15}
                       />
                     </View>
                   </View>

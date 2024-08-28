@@ -17,8 +17,6 @@ export const fullSave = async (
     } catch (e) {
       console.log("Error in fullSave:", e);
     }
-  } else {
-    console.log("Game or player is null in fullSave");
   }
 };
 

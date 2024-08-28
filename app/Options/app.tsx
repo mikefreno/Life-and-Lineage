@@ -250,10 +250,10 @@ export const AppSettings = observer(() => {
           </GenericStrikeAround>
           {user.isAuthenticated ? (
             <>
-              <Text className="text-center">
+              <Text className="text-center py-2">
                 Logged in as: {user.getEmail()}
               </Text>
-              <View className="flex flex-row justify-evenly w-full border border-white">
+              <View className="flex flex-row justify-evenly w-full">
                 <GenericFlatButton
                   onPressFunction={toggleRemoteSaveWindow}
                   disabledCondition={loadingDBInfo}

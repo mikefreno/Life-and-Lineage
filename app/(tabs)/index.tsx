@@ -3,7 +3,6 @@ import { Text, View as ThemedView } from "../../components/Themed";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
-import { Dimensions } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -30,9 +29,7 @@ const HomeScreen = observer(() => {
   const offHandTarget = useRef<View>(null);
   const inventoryTarget = useRef<View>(null);
 
-  const deviceHeight = Dimensions.get("window").height;
-
-  const { playerState, gameState, isCompact } = appData;
+  const { playerState, gameState, isCompact, dimensions } = appData;
   const [showIntroTutorial, setShowIntroTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("intro")) ?? false,
   );
@@ -76,33 +73,45 @@ const HomeScreen = observer(() => {
             paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
           }}
         >
-          <View className="-mx-2 py-2 md:py-4">
-            <View className="mx-6 flex-row items-center">
+          <View className="-mx-2 py-1 md:py-4">
+            <View className="flex-row">
               {playerState?.playerClass == "necromancer" ? (
                 <View className="mx-auto">
                   <NecromancerSkull
-                    width={deviceHeight / 9 > 100 ? 100 : deviceHeight / 10}
-                    height={deviceHeight / 9 > 100 ? 100 : deviceHeight / 10}
+                    width={
+                      dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
+                    }
+                    height={
+                      dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
+                    }
                     color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
                   />
                 </View>
               ) : playerState?.playerClass == "paladin" ? (
                 <View className="mx-auto">
                   <PaladinHammer
-                    width={deviceHeight / 9 > 100 ? 100 : deviceHeight / 10}
-                    height={deviceHeight / 9 > 100 ? 100 : deviceHeight / 10}
+                    width={
+                      dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
+                    }
+                    height={
+                      dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
+                    }
                   />
                 </View>
               ) : (
                 <View className="mx-auto scale-x-[-1] transform">
                   <WizardHat
-                    width={deviceHeight / 9 > 100 ? 100 : deviceHeight / 10}
-                    height={deviceHeight / 9 > 100 ? 100 : deviceHeight / 10}
+                    width={
+                      dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
+                    }
+                    height={
+                      dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
+                    }
                     color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
                   />
                 </View>
               )}
-              <View className="flex-1 flex-col justify-center align-middle">
+              <View className="">
                 <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
                 <Text className="text-center text-xl dark:text-white">{`${playerState.job}`}</Text>
                 <Text className="text-center text-xl dark:text-white">{`${
@@ -118,12 +127,14 @@ const HomeScreen = observer(() => {
                 <BlessingDisplay
                   blessing={playerState.blessing}
                   colorScheme={colorScheme}
-                  size={deviceHeight / 9 > 100 ? 100 : deviceHeight / 10}
+                  size={
+                    dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
+                  }
                 />
               </View>
             </View>
           </View>
-          <View className="flex-1 justify-evenly px-[2vw]">
+          <View className="flex-1 justify-evenly py-4 px-[2vw]">
             <EquipmentDisplay
               headTarget={headTarget}
               bodyTarget={bodyTarget}

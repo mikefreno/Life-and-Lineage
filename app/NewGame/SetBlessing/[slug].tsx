@@ -14,19 +14,6 @@ import { useColorScheme } from "nativewind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TutorialModal from "../../../components/TutorialModal";
 import { toTitleCase } from "../../../utility/functions/misc/words";
-import {
-  Air,
-  BloodDrop,
-  Bones,
-  Earth,
-  Fire,
-  Holy,
-  Pestilence,
-  Protection,
-  SummonerSkull,
-  Vengeance,
-  Water,
-} from "../../../assets/icons/SVGIcons";
 import { descriptionMap } from "../../../utility/descriptions";
 import { Element } from "../../../utility/types";
 import { elementalColorMap } from "../../../utility/elementColors";
@@ -46,7 +33,7 @@ export default function SetBlessing() {
 
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing context");
-  const { gameState } = appData;
+  const { gameState, dimensions } = appData;
 
   const [showBlessingTutorial, setShowBlessingTutorial] = useState<boolean>(
     !gameState ||
@@ -63,9 +50,6 @@ export default function SetBlessing() {
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,
   );
-
-  const deviceHeight = Dimensions.get("screen").height;
-  const deviceWidth = Dimensions.get("screen").width;
 
   useEffect(() => {
     if (!showBlessingTutorial && gameState) {
@@ -133,7 +117,10 @@ export default function SetBlessing() {
           setBlessing(element);
           blessingRef.current = element;
         }}
-        style={{ height: deviceHeight * 0.25, width: deviceWidth * 0.45 }}
+        style={{
+          height: dimensions.height * 0.25,
+          width: dimensions.width * 0.45,
+        }}
       >
         {({ pressed }) => (
           <View
@@ -146,7 +133,7 @@ export default function SetBlessing() {
             <BlessingDisplay
               blessing={element}
               colorScheme={colorScheme}
-              size={deviceHeight * 0.15}
+              size={dimensions.height * 0.15}
             />
             <Text
               className="text-center text-lg px-2"

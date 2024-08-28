@@ -180,7 +180,7 @@ export default function DungeonEnemyDisplay() {
     return (
       <Suspense fallback={<D20DieAnimation keepRolling={true} />}>
         <View className="flex h-[40%] pt-8">
-          <View className="flex-1 flex-row justify-evenly pl-8">
+          <View className="flex-1 flex-row items-center justify-evenly pl-8">
             <View
               className="flex flex-col items-center justify-center"
               style={{ minWidth: "40%", maxWidth: "60%" }}

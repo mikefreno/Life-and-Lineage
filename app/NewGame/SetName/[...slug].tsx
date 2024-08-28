@@ -3,7 +3,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  ScrollView,
   TextInput,
   TouchableWithoutFeedback,
   View,
@@ -14,6 +13,7 @@ import { Stack, router, useLocalSearchParams } from "expo-router";
 import { toTitleCase } from "../../../utility/functions/misc/words";
 import { useVibration } from "../../../utility/customHooks";
 import { useColorScheme } from "nativewind";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 export default function SetName() {
   const { slug } = useLocalSearchParams();
@@ -27,6 +27,7 @@ export default function SetName() {
   const [lastName, setLastName] = useState<string>("");
   const firstNameRef = useRef<string>();
   const lastNameRef = useRef<string>();
+  const header = useHeaderHeight();
 
   const vibration = useVibration();
   const { colorScheme } = useColorScheme();
@@ -47,28 +48,29 @@ export default function SetName() {
           headerBackTitleStyle: { fontFamily: "PixelifySans" },
         }}
       />
-      <ThemedView className="flex-1 items-center px-6">
-        <View className="flex flex-row py-12 text-center">
-          <Text className="text-center text-2xl md:text-3xl">
-            Choose Your
-            <Text
-              className="text-center text-2xl md:text-3xl"
-              style={{ color: accent }}
-            >
-              {" "}
-              {toTitleCase(playerClass)}'s{" "}
-            </Text>
-            Name
-          </Text>
-        </View>
+      <ThemedView className="flex-1">
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={header}
         >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <>
+            <ThemedView className="flex-1 items-center px-6 justify-center">
+              <View className="flex flex-row text-center">
+                <Text className="text-center text-2xl md:text-3xl">
+                  Choose Your
+                  <Text
+                    className="text-center text-2xl md:text-3xl"
+                    style={{ color: accent }}
+                  >
+                    {" "}
+                    {toTitleCase(playerClass)}'s{" "}
+                  </Text>
+                  Name
+                </Text>
+              </View>
               <TextInput
-                className="mt-[10vh] rounded border border-zinc-800 pl-2 text-black dark:border-zinc-100 dark:text-zinc-50"
+                className="rounded border border-zinc-800 pl-2 text-black dark:border-zinc-100 dark:text-zinc-50"
                 placeholderTextColor={
                   colorScheme == "light" ? "#d4d4d8" : "#71717a"
                 }
@@ -89,11 +91,11 @@ export default function SetName() {
                   fontSize: 20,
                 }}
               />
-              <Text className="pl-1 pt-1 italic">
+              <Text className="pl-1 pt-1 italic pb-2">
                 Minimum Length: 2, Maximum Length: 16
               </Text>
               <TextInput
-                className="mt-[3vh] rounded border border-zinc-800 pl-2 text-black dark:border-zinc-100 dark:text-zinc-50"
+                className="rounded border border-zinc-800 pl-2 text-black dark:border-zinc-100 dark:text-zinc-50"
                 onChangeText={(text) => {
                   setLastName(text.replace(/^\s+/, ""));
                   lastNameRef.current = text.replace(/^\s+/, "");
@@ -114,26 +116,28 @@ export default function SetName() {
                   fontSize: 20,
                 }}
               />
-              <Text className="pl-1 pt-1 italic">
+              <Text className="pl-1 pt-1 italic pb-2">
                 Minimum Length: 3, Maximum Length: 16
               </Text>
-              {firstName.trimEnd().length >= 2 &&
-              lastName.trimEnd().length >= 3 ? (
-                <View className="mx-auto mt-24">
-                  <Pressable
-                    onPress={() => {
-                      vibration({ style: "light" });
-                      router.push(
-                        `/NewGame/Review/${playerClass}/${blessing}/${sex}/${firstNameRef.current?.trimEnd()}/${lastNameRef.current?.trimEnd()}`,
-                      );
-                    }}
-                    className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-                  >
-                    <Text className="text-xl tracking-widest">Next</Text>
-                  </Pressable>
-                </View>
-              ) : null}
-            </>
+              <View className="pb-16">
+                {firstName.trimEnd().length >= 2 &&
+                lastName.trimEnd().length >= 3 ? (
+                  <View className="mx-auto">
+                    <Pressable
+                      onPress={() => {
+                        vibration({ style: "light" });
+                        router.push(
+                          `/NewGame/Review/${playerClass}/${blessing}/${sex}/${firstNameRef.current?.trimEnd()}/${lastNameRef.current?.trimEnd()}`,
+                        );
+                      }}
+                      className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                    >
+                      <Text className="text-xl tracking-widest">Next</Text>
+                    </Pressable>
+                  </View>
+                ) : null}
+              </View>
+            </ThemedView>
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
       </ThemedView>

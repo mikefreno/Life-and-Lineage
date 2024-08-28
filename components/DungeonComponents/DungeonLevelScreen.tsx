@@ -174,10 +174,10 @@ const DungeonLevelScreen = observer(() => {
             <TargetSelection />
           </>
         </GenericModal>
-        <ThemedView className="flex-1" style={{ paddingBottom: 100 }}>
+        <ThemedView className="flex-1" style={{ paddingBottom: 84 }}>
           {!inCombat ? (
             <DungeonMapRender />
-          ) : !enemyState ? (
+          ) : enemyState ? (
             <DungeonEnemyDisplay />
           ) : (
             <View className="flex h-[40%] pt-8">

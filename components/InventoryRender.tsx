@@ -48,7 +48,6 @@ export default function InventoryRender({
   ...props
 }: InventoryRenderProps) {
   const deviceHeight = Dimensions.get("window").height;
-  const deviceWidth = Dimensions.get("window").width;
   const vibration = useVibration();
   const [statsPos, setStatsPos] = useState<{ left: number; top: number }>();
   const [showingStats, setShowingStats] = useState<{
@@ -57,7 +56,7 @@ export default function InventoryRender({
   } | null>(null);
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing contexts");
-  const { playerState } = appData;
+  const { playerState, dimensions } = appData;
 
   function checkReleasePosition({
     item,
@@ -160,7 +159,7 @@ export default function InventoryRender({
     count: number;
   }
 
-  const blockSize = Dimensions.get("screen").width / 7.5;
+  const blockSize = Math.min(dimensions.lesser / 7.5, 84);
 
   const ItemRender = ({ item, count }: ItemRenderProps) => {
     const [buzzed, setBuzzed] = useState(false);
@@ -228,7 +227,9 @@ export default function InventoryRender({
         ref={selfRef}
         className={`${
           "headTarget" in props
-            ? "h-[60%]"
+            ? dimensions.greater == dimensions.height
+              ? "-mt-4 h-[60%]"
+              : "-mt-2 h-[50%]"
             : "shop" in props
             ? "mt-4 h-[75%]"
             : "h-full"
@@ -237,30 +238,39 @@ export default function InventoryRender({
         {Array.from({ length: 24 }).map((_, index) => (
           <View
             className="absolute items-center justify-center"
-            style={{
-              left: `${
-                (index % 6) * 16.67 + 1.2 * Math.floor(deviceWidth / 200)
-              }%`,
-              top: `${
-                Math.floor(index / 6) * 24 + Math.floor(deviceHeight / 200)
-              }%`,
-            }}
+            style={
+              dimensions.width === dimensions.greater
+                ? {
+                    left: `${(index % 12) * 8.33 + 0.5}%`,
+                    top: `${Math.floor(index / 12) * 48 + blockSize / 10}%`,
+                  }
+                : {
+                    left: `${(index % 6) * 16.67 + 1.2}%`,
+                    top: `${Math.floor(index / 6) * 24 + blockSize / 12}%`,
+                  }
+            }
             key={"bg-" + index}
           >
-            <View className="h-14 w-14 rounded-lg bg-zinc-200 dark:bg-zinc-700" />
+            <View
+              className="rounded-lg bg-zinc-200 dark:bg-zinc-700"
+              style={{ height: blockSize, width: blockSize }}
+            />
           </View>
         ))}
         {inventory.slice(0, 24).map((item, index) => (
           <View
-            className="absolute h-1/4 w-1/6 items-center justify-center"
-            style={{
-              left: `${
-                (index % 6) * 16.67 + 1.2 * Math.floor(deviceWidth / 200)
-              }%`,
-              top: `${
-                Math.floor(index / 6) * 24 + Math.floor(deviceHeight / 200)
-              }%`,
-            }}
+            className="absolute items-center justify-center"
+            style={
+              dimensions.width === dimensions.greater
+                ? {
+                    left: `${(index % 12) * 8.33 + 0.5}%`,
+                    top: `${Math.floor(index / 12) * 48 + blockSize / 10}%`,
+                  }
+                : {
+                    left: `${(index % 6) * 16.67 + 1.2}%`,
+                    top: `${Math.floor(index / 6) * 24 + blockSize / 12}%`,
+                  }
+            }
             key={index}
           >
             <ItemRender item={item.item} count={item.count} />
