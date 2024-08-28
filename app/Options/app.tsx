@@ -1,11 +1,4 @@
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, TextInput, View } from "react-native";
 import { View as ThemedView, Text } from "../../components/Themed";
 import { useContext, useEffect, useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc/words";
@@ -21,7 +14,6 @@ import { useColorScheme } from "nativewind";
 import { SaveRow } from "../../utility/database";
 import D20DieAnimation from "../../components/DieRollAnim";
 import GenericFlatButton from "../../components/GenericFlatButton";
-import { fullSave } from "../../utility/functions/save_load";
 import { Game } from "../../classes/game";
 import { PlayerCharacter } from "../../classes/character";
 
@@ -38,8 +30,6 @@ export const AppSettings = observer(() => {
     useState<boolean>(false);
   const [remoteSaves, setRemoteSaves] = useState<SaveRow[]>([]);
   const [saveName, setSaveName] = useState<string>("");
-  const [showingOverwriteWarning, setShowingOverwriteWarning] =
-    useState<string>("");
   const [loadingDBInfo, setLoadingDBInfo] = useState<boolean>(false);
 
   const appData = useContext(AppContext);

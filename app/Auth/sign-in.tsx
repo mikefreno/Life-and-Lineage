@@ -165,6 +165,7 @@ const SignInScreen = observer(() => {
                   try {
                     await auth.appleSignIn();
                   } catch (e) {
+                    console.error(e);
                     setError("Failed to sign in with Apple. Please try again.");
                   }
                   setAwaitingResponse(false);

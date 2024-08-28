@@ -8,14 +8,18 @@ import {
   View,
 } from "react-native";
 import { View as ThemedView, Text } from "../../../components/Themed";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { toTitleCase } from "../../../utility/functions/misc/words";
 import { useVibration } from "../../../utility/customHooks";
 import { useColorScheme } from "nativewind";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { AppContext } from "../../_layout";
 
 export default function SetName() {
+  const appData = useContext(AppContext);
+  if (!appData) return;
+  const { dimensions } = appData;
   const { slug } = useLocalSearchParams();
   if (!slug) {
     return router.replace("/NewGame");
@@ -87,7 +91,7 @@ export default function SetName() {
                 style={{
                   fontFamily: "PixelifySans",
                   paddingVertical: 8,
-                  minWidth: "50%",
+                  width: Math.min(dimensions.width * 0.65, 300),
                   fontSize: 20,
                 }}
               />
@@ -112,7 +116,7 @@ export default function SetName() {
                 style={{
                   fontFamily: "PixelifySans",
                   paddingVertical: 8,
-                  minWidth: "50%",
+                  width: Math.min(dimensions.width * 0.65, 300),
                   fontSize: 20,
                 }}
               />

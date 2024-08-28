@@ -1,7 +1,7 @@
-import { Dimensions, Pressable, useColorScheme, View } from "react-native";
+import { Pressable, useColorScheme, View } from "react-native";
 import { ScrollView, Text, View as ThemedView } from "../../components/Themed";
 import "../../assets/styles/globals.css";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Stack, router } from "expo-router";
 import { useVibration } from "../../utility/customHooks";
 import { AppContext } from "../_layout";
@@ -192,7 +192,7 @@ export default function NewGameScreen() {
                   style={{ marginBottom: 5 }}
                   color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
                   height={dimensions.height * 0.15}
-                  width={dimensions.width * 0.15}
+                  width={dimensions.height * 0.15}
                 />
                 <Text className="mx-auto text-xl" style={{ color: "#2563eb" }}>
                   Mage
@@ -225,7 +225,7 @@ export default function NewGameScreen() {
                       style={{ marginBottom: 5 }}
                       color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
                       height={dimensions.height * 0.15}
-                      width={dimensions.width * 0.15}
+                      width={dimensions.height * 0.15}
                     />
                   </View>
                   <Text

@@ -3,7 +3,7 @@
     "name": "Magic Delve",
     "slug": "magic-delve",
     "version": "0.2.2",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "assets/images/icon.png",
     "scheme": "magicdelveapp",
     "userInterfaceStyle": "automatic",
@@ -32,6 +32,9 @@
       "package": "com.mikefrenodev.magicdelve",
       "versionCode": 1
     },
+    "androidStatusBar": {
+      "hidden":true
+    },
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -52,6 +55,15 @@
         "@react-native-google-signin/google-signin",
         {
           "iosUrlScheme": "com.googleusercontent.apps.976302581992-tbi6afmid4eq5dsn63t30kpfpdhjju8m"
+        }
+      ],
+      [
+        "expo-navigation-bar",
+        {
+          "position": "absolute",
+          "visibility": "hidden",
+          "behavior": "overlay-swipe",
+          "backgroundColor": "#00000080"
         }
       ]
     ],

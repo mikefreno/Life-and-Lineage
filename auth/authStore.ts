@@ -270,22 +270,30 @@ class AuthStore {
       if (!email_opt) throw new Error("email retrieval failed");
       email = email_opt;
     }
+
+    const res = await fetch(`${API_BASE_URL}/apple/registration`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        givenName: credential.fullName?.givenName,
+        lastName: credential.fullName?.familyName,
+        email,
+        userString: user,
+      }),
+    });
+    const parse = await res.json();
+    console.log(parse);
     await this.login({
       email,
       provider: "apple",
       appleUser: credential.user,
     });
-    return {
-      givenName: credential.fullName?.givenName,
-      lastName: credential.fullName?.familyName,
-      email: credential.email,
-      userString: credential.user,
-    };
   };
   googleSignIn = async () => {
     await GoogleSignin.hasPlayServices();
     const userInfo = await GoogleSignin.signIn();
-    userInfo.serverAuthCode;
 
     if (!userInfo.idToken) {
       throw new Error("missing idToken in response");
@@ -302,6 +310,7 @@ class AuthStore {
       },
       body: JSON.stringify({
         familyName: userInfo.user.familyName,
+        givenName: userInfo.user.givenName,
         email: userInfo.user.email,
       }),
     });
@@ -470,11 +479,27 @@ class AuthStore {
         },
         body: JSON.stringify({ email: this.email, provider: this.provider }),
       });
+
       const parse = await credsRes.json();
-      this.setDBCredentials(parse.db_name, parse.db_token);
+      console.log(parse);
+      if (credsRes.ok) {
+        this.setDBCredentials(parse.db_name, parse.db_token);
+      } else if (parse.message == "destroy token") {
+        this.logout();
+        return;
+      }
     }
-    const url = this.getDbURL();
-    if (!url) throw new Error("url build failed!");
+    let url = this.getDbURL();
+    if (!url) {
+      for (let i = 1; i++; i <= 3) {
+        setTimeout(() => {
+          url = this.getDbURL();
+        }, 250);
+      }
+      if (!url) {
+        throw new Error("url build failed!");
+      }
+    }
     const res = await fetch(url, {
       method: "POST",
       headers: {

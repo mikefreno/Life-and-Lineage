@@ -21,6 +21,7 @@ import { observer } from "mobx-react-lite";
 import { API_BASE_URL } from "../../config/config";
 import D20DieAnimation from "../../components/DieRollAnim";
 import { View as ThemedView } from "../../components/Themed";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 const SignUpScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -39,6 +40,7 @@ const SignUpScreen = observer(() => {
   const [isAutofilled, setIsAutofilled] = useState<boolean>(false);
   const [emailSent, setEmailSent] = useState<boolean>(false);
   const [usingEmail, setUsingEmail] = useState<boolean>(false);
+  const header = useHeaderHeight();
 
   useEffect(() => {
     if (auth.isAuthenticated) {
@@ -147,20 +149,7 @@ const SignUpScreen = observer(() => {
   const handleAppleSignUp = async () => {
     setAwaitingResponse(true);
     try {
-      const { givenName, lastName, email, userString } =
-        await auth.appleSignIn();
-      try {
-        await fetch(`${API_BASE_URL}/apple/registration`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ givenName, lastName, email, userString }),
-        });
-      } catch (error) {
-        setError(error as string);
-      }
-
+      await auth.appleSignIn();
       setAwaitingResponse(false);
     } catch (error) {
       setError("Failed to sign up with Apple. Please try again.");
@@ -234,35 +223,38 @@ const SignUpScreen = observer(() => {
           </View>
         </>
       ) : !emailSent ? (
-        <View className="flex my-auto">
-          <Text className="text-center text-3xl pt-4">Email Registration</Text>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
-          >
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={header + (Platform.OS == "ios" ? 20 : 0)}
+          className="flex-1"
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View className="flex-1 justify-evenly">
+              <Text className="text-center text-3xl pt-4">
+                Email Registration
+              </Text>
+              <TextInput
+                className="mx-16 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
+                placeholderTextColor={
+                  colorScheme == "light" ? "#d4d4d8" : "#71717a"
+                }
+                autoComplete={"email"}
+                inputMode={"email"}
+                onChangeText={(text) => setEmailAddress(text)}
+                placeholder={"Enter Email Address..."}
+                autoCorrect={false}
+                autoCapitalize={"none"}
+                value={emailAddress}
+                style={{
+                  fontFamily: "PixelifySans",
+                  paddingVertical: 8,
+                  minWidth: "50%",
+                  fontSize: 20,
+                }}
+              />
               <View>
                 <TextInput
-                  className="mx-16 my-6 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
-                  placeholderTextColor={
-                    colorScheme == "light" ? "#d4d4d8" : "#71717a"
-                  }
-                  autoComplete={"email"}
-                  inputMode={"email"}
-                  onChangeText={(text) => setEmailAddress(text)}
-                  placeholder={"Enter Email Address..."}
-                  autoCorrect={false}
-                  autoCapitalize={"none"}
-                  value={emailAddress}
-                  style={{
-                    fontFamily: "PixelifySans",
-                    paddingVertical: 8,
-                    minWidth: "50%",
-                    fontSize: 20,
-                  }}
-                />
-                <TextInput
-                  className={`mx-16 my-6 rounded border border-zinc-800 pl-2 text-xl  dark:border-zinc-100  ${
+                  className={`mx-16 rounded border border-zinc-800 pl-2 text-xl  dark:border-zinc-100  ${
                     isAutofilled ? "text-black" : "text-black dark:text-zinc-50"
                   }`}
                   placeholderTextColor={
@@ -285,78 +277,83 @@ const SignUpScreen = observer(() => {
                     fontSize: 20,
                   }}
                 />
-                <TextInput
-                  className={`mx-16 my-6 rounded border border-zinc-800 pl-2 text-xl  dark:border-zinc-100  ${
-                    isAutofilled ? "text-black" : "text-black dark:text-zinc-50"
-                  }`}
-                  placeholderTextColor={
-                    colorScheme == "light" ? "#d4d4d8" : "#71717a"
-                  }
-                  onChangeText={(text) => setPasswordConf(text)}
-                  placeholder={"Confirm Password..."}
-                  autoComplete={"password-new"}
-                  autoCorrect={false}
-                  secureTextEntry
-                  autoCapitalize={"none"}
-                  value={passwordConf}
-                  passwordRules={
-                    "minlength: 8; required: lower; required: upper; required: digit,[oqtu-#&'()+,./;?@]; required: [-];"
-                  }
-                  style={{
-                    fontFamily: "PixelifySans",
-                    paddingVertical: 8,
-                    minWidth: "50%",
-                    fontSize: 20,
-                  }}
-                />
-                {shortPassword && (
-                  <Text className="text-center" style={{ color: "#ef4444" }}>
-                    Password too short, must be at least 8 chars
-                  </Text>
-                )}
-                {simplePassword && (
-                  <Text className="text-center" style={{ color: "#ef4444" }}>
-                    Password must contain a lower-case, upper-case, and either a
-                    number or special character(!@$% etc.)
-                  </Text>
-                )}
-                {passwordMismatch && (
-                  <Text className="text-center" style={{ color: "#ef4444" }}>
-                    Passwords must match!
-                  </Text>
-                )}
-                {error && (
-                  <Text className="text-center" style={{ color: "#ef4444" }}>
-                    {error}
-                  </Text>
-                )}
-                <GenericRaisedButton
-                  disabledCondition={
-                    password.length == 0 ||
-                    passwordConf.length == 0 ||
-                    emailAddress.length == 0
-                  }
-                  onPressFunction={handleEmailSignUp}
-                  backgroundColor={"#2563eb"}
-                  textColor={"#fafafa"}
-                >
-                  Sign Up
-                </GenericRaisedButton>
+                <Text className="text-center">
+                  Password must contain at least 8 characters, a lower-case,
+                  upper-case, and either a number or special character(!@$%
+                  etc.)
+                </Text>
               </View>
-            </TouchableWithoutFeedback>
-          </KeyboardAvoidingView>
-          <Pressable
-            onPress={() => {
-              setUsingEmail(false);
-              vibration({ essential: true, style: "medium" });
-            }}
-            className="m-8"
-          >
-            <Text className="underline" style={{ color: "#3b82f6" }}>
-              Use a provider instead
-            </Text>
-          </Pressable>
-        </View>
+              <TextInput
+                className={`mx-16 rounded border border-zinc-800 pl-2 text-xl  dark:border-zinc-100  ${
+                  isAutofilled ? "text-black" : "text-black dark:text-zinc-50"
+                }`}
+                placeholderTextColor={
+                  colorScheme == "light" ? "#d4d4d8" : "#71717a"
+                }
+                onChangeText={(text) => setPasswordConf(text)}
+                placeholder={"Confirm Password..."}
+                autoComplete={"password-new"}
+                autoCorrect={false}
+                secureTextEntry
+                autoCapitalize={"none"}
+                value={passwordConf}
+                passwordRules={
+                  "minlength: 8; required: lower; required: upper; required: digit,[oqtu-#&'()+,./;?@]; required: [-];"
+                }
+                style={{
+                  fontFamily: "PixelifySans",
+                  paddingVertical: 8,
+                  minWidth: "50%",
+                  fontSize: 20,
+                }}
+              />
+              {shortPassword && (
+                <Text className="text-center" style={{ color: "#ef4444" }}>
+                  Password too short, must be at least 8 chars
+                </Text>
+              )}
+              {simplePassword && (
+                <Text className="text-center" style={{ color: "#ef4444" }}>
+                  Password must contain a lower-case, upper-case, and either a
+                  number or special character(!@$% etc.)
+                </Text>
+              )}
+              {passwordMismatch && (
+                <Text className="text-center" style={{ color: "#ef4444" }}>
+                  Passwords must match!
+                </Text>
+              )}
+              {error && (
+                <Text className="text-center" style={{ color: "#ef4444" }}>
+                  {error}
+                </Text>
+              )}
+              <GenericRaisedButton
+                disabledCondition={
+                  password.length == 0 ||
+                  passwordConf.length == 0 ||
+                  emailAddress.length == 0
+                }
+                onPressFunction={handleEmailSignUp}
+                backgroundColor={"#2563eb"}
+                textColor={"#fafafa"}
+              >
+                Sign Up
+              </GenericRaisedButton>
+              <Pressable
+                onPress={() => {
+                  setUsingEmail(false);
+                  vibration({ essential: true, style: "medium" });
+                }}
+                className="m-8"
+              >
+                <Text className="underline" style={{ color: "#3b82f6" }}>
+                  Use a provider instead
+                </Text>
+              </Pressable>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       ) : (
         <View className="pt-[25vh]">
           <Text className="text-center text-2xl">
