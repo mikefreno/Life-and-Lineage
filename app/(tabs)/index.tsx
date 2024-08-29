@@ -17,6 +17,8 @@ import {
   WizardHat,
 } from "../../assets/icons/SVGIcons";
 import BlessingDisplay from "../../components/BlessingsDisplay";
+import { Item } from "../../classes/item";
+import { StatsDisplay } from "../../components/StatsDisplay";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -28,6 +30,11 @@ const HomeScreen = observer(() => {
   const mainHandTarget = useRef<View>(null);
   const offHandTarget = useRef<View>(null);
   const inventoryTarget = useRef<View>(null);
+
+  const [displayItem, setDisplayItem] = useState<{
+    item: Item;
+    positon: { left: number; top: number };
+  } | null>(null);
 
   const { playerState, gameState, isCompact, dimensions } = appData;
   const [showIntroTutorial, setShowIntroTutorial] = useState<boolean>(
@@ -134,15 +141,10 @@ const HomeScreen = observer(() => {
               </View>
             </View>
           </View>
-          <View className="flex-1 justify-evenly py-4 px-[2vw]">
-            <EquipmentDisplay
-              headTarget={headTarget}
-              bodyTarget={bodyTarget}
-              mainHandTarget={mainHandTarget}
-              offHandTarget={offHandTarget}
-              inventoryTarget={inventoryTarget}
-              inventory={playerState.getInventory()}
-            />
+          <View
+            className="flex-1 justify-evenly py-4"
+            style={{ marginTop: -dimensions.height * 0.3 }}
+          >
             <InventoryRender
               selfRef={inventoryTarget}
               headTarget={headTarget}
@@ -150,7 +152,29 @@ const HomeScreen = observer(() => {
               mainHandTarget={mainHandTarget}
               offHandTarget={offHandTarget}
               inventory={playerState.getInventory()}
+              displayItem={displayItem}
+              setDisplayItem={setDisplayItem}
             />
+            <EquipmentDisplay
+              headTarget={headTarget}
+              bodyTarget={bodyTarget}
+              mainHandTarget={mainHandTarget}
+              offHandTarget={offHandTarget}
+              inventoryTarget={inventoryTarget}
+              inventory={playerState.getInventory()}
+              displayItem={displayItem}
+              setDisplayItem={setDisplayItem}
+            />
+            {displayItem && (
+              <View className="absolute z-10">
+                <StatsDisplay
+                  statsLeftPos={displayItem.positon.left}
+                  statsTopPos={displayItem.positon.top}
+                  item={displayItem.item}
+                  clearItem={() => setDisplayItem(null)}
+                />
+              </View>
+            )}
           </View>
         </ThemedView>
       </>

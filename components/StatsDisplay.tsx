@@ -19,12 +19,7 @@ type BaseProps = {
   statsLeftPos: number;
   statsTopPos: number;
   item: Item;
-  setShowingStats: React.Dispatch<
-    React.SetStateAction<{
-      item: Item;
-      count: number;
-    } | null>
-  >;
+  clearItem: () => void;
   count?: number;
   topGuard?: number;
   topOffset?: number;
@@ -53,7 +48,7 @@ export function StatsDisplay({
   statsTopPos,
   item,
   count,
-  setShowingStats,
+  clearItem,
   topOffset,
   topGuard,
   leftOffset,
@@ -87,7 +82,7 @@ export function StatsDisplay({
               <>
                 <GenericFlatButton
                   onPressFunction={() => {
-                    sellItem(item), setShowingStats(null);
+                    sellItem(item), clearItem();
                   }}
                   disabledCondition={isDisabled}
                 >
@@ -102,7 +97,7 @@ export function StatsDisplay({
                 <GenericFlatButton
                   onPressFunction={() => {
                     sellStack(item);
-                    setShowingStats(null);
+                    clearItem();
                   }}
                   disabledCondition={isDisabled}
                   className="mt-1"
@@ -120,7 +115,7 @@ export function StatsDisplay({
               <GenericFlatButton
                 onPressFunction={() => {
                   props.sellItem(item);
-                  setShowingStats(null);
+                  clearItem();
                 }}
                 disabledCondition={isDisabled}
               >
@@ -219,7 +214,7 @@ export function StatsDisplay({
       }
     >
       <Pressable
-        onPress={() => setShowingStats(null)}
+        onPress={() => clearItem()}
         className="absolute right-0 border-zinc-600 rounded-tr rounded-bl dark:border-zinc-400 px-2 py-1"
       >
         <Text className="-mt-3 -ml-1 text-2xl">x</Text>
@@ -255,7 +250,7 @@ export function StatsDisplay({
             <Pressable
               onPress={() => {
                 vibration({ style: "light" });
-                setShowingStats(null);
+                clearItem();
                 router.push("/Study");
               }}
               className="-mx-4 mt-2 w-1/2 rounded-xl border border-zinc-900 px-2 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"

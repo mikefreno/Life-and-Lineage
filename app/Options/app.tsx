@@ -146,7 +146,7 @@ export const AppSettings = observer(() => {
               <Text className="text-xl">Remote Saving</Text>
               <GenericStrikeAround>Make New Save</GenericStrikeAround>
               <TextInput
-                className="mx-4 mt-6 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
+                className="mx-4 mt-6 rounded border  border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
                 placeholderTextColor={
                   colorScheme == "light" ? "#d4d4d8" : "#71717a"
                 }
@@ -172,16 +172,16 @@ export const AppSettings = observer(() => {
               {remoteSaves.map((save) => (
                 <View
                   key={save.id}
-                  className="w-full bg-zinc-300 border rounded border-zinc-900 dark:border-zinc-50 pb-2"
+                  className="w-full bg-zinc-300 dark:bg-zinc-700 border rounded border-zinc-900 dark:border-zinc-50 pb-2"
                 >
                   <Pressable
-                    className="border py-1 px-2 bg-zinc-50 rounded-full"
+                    className="w-8 h-8 items-center justify-center m-1 border bg-zinc-50 dark:bg-zinc-900 rounded-full border-zinc-900 dark:border-zinc-50"
                     onPress={() => {
                       vibration({ essential: true, style: "warning" });
                       deleteRemoteSave(save);
                     }}
                   >
-                    <Text>X</Text>
+                    <Text className="text-center">X</Text>
                   </Pressable>
                   <Text className="text-xl text-center">{save.name}</Text>
                   <View className="flex flex-col w-full items-end py-2">
@@ -191,7 +191,7 @@ export const AppSettings = observer(() => {
                     <Text className="">Created at: {save.created_at}</Text>
                   </View>
                   <GenericFlatButton
-                    backgroundColor={"white"}
+                    backgroundColor={colorScheme == "dark" ? "black" : "white"}
                     onPressFunction={() => overwriteSave(save)}
                   >
                     Overwrite save

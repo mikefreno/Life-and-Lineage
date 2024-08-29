@@ -23,6 +23,22 @@ type InventoryRenderHome = InventoryRenderBase & {
   bodyTarget: RefObject<View>;
   mainHandTarget: RefObject<View>;
   offHandTarget: RefObject<View>;
+  displayItem: {
+    item: Item;
+    positon: {
+      left: number;
+      top: number;
+    };
+  } | null;
+  setDisplayItem: React.Dispatch<
+    React.SetStateAction<{
+      item: Item;
+      positon: {
+        left: number;
+        top: number;
+      };
+    } | null>
+  >;
 };
 
 type InventoryRenderDungeon = InventoryRenderBase & {
@@ -167,13 +183,24 @@ export default function InventoryRender({
 
     const handlePress = () => {
       vibration({ style: "light" });
-      if (showingStats && showingStats.item.equals(item)) {
-        setShowingStats(null);
+      if ("displayItem" in props) {
+        const { displayItem, setDisplayItem } = props;
+        if (displayItem && displayItem.item.equals(item)) {
+          setDisplayItem(null);
+        } else {
+          ref.current?.measureInWindow((x, y) => {
+            setDisplayItem({ item, positon: { left: x, top: y } });
+          });
+        }
       } else {
-        setShowingStats({ item, count });
-        ref.current?.measureInWindow((x, y) => {
-          setStatsPos({ left: x, top: y });
-        });
+        if (showingStats && showingStats.item.equals(item)) {
+          setShowingStats(null);
+        } else {
+          setShowingStats({ item, count });
+          ref.current?.measureInWindow((x, y) => {
+            setStatsPos({ left: x, top: y });
+          });
+        }
       }
     };
 
@@ -228,12 +255,20 @@ export default function InventoryRender({
         className={`${
           "headTarget" in props
             ? dimensions.greater == dimensions.height
-              ? "-mt-4 h-[60%]"
-              : "-mt-2 h-[50%]"
+              ? "h-[40%]"
+              : "h-[35%]"
             : "shop" in props
             ? "mt-4 h-[75%]"
             : "h-full"
         } mx-auto flex w-full flex-wrap rounded-lg border border-zinc-600`}
+        style={
+          "headTarget" in props && {
+            marginTop:
+              dimensions.greater == dimensions.height
+                ? dimensions.height * 0.55
+                : dimensions.height * 0.6,
+          }
+        }
       >
         {Array.from({ length: 24 }).map((_, index) => (
           <View
@@ -286,7 +321,7 @@ export default function InventoryRender({
             statsTopPos={statsPos.top}
             item={showingStats.item}
             count={showingStats.count}
-            setShowingStats={setShowingStats}
+            clearItem={() => setShowingStats(null)}
             addItemToPouch={props.addItemToPouch}
             topOffset={
               Platform.OS == "ios"
@@ -300,7 +335,7 @@ export default function InventoryRender({
             statsTopPos={statsPos.top}
             item={showingStats.item}
             count={showingStats.count}
-            setShowingStats={setShowingStats}
+            clearItem={() => setShowingStats(null)}
             shop={props.shop}
             topOffset={
               Platform.OS == "ios"
@@ -311,20 +346,7 @@ export default function InventoryRender({
             sellItem={props.sellItem}
             sellStack={props.sellStack}
           />
-        ) : (
-          <StatsDisplay
-            statsLeftPos={statsPos.left}
-            statsTopPos={statsPos.top}
-            item={showingStats.item}
-            count={showingStats.count}
-            setShowingStats={setShowingStats}
-            topOffset={
-              Platform.OS == "ios"
-                ? -(120 + deviceHeight / 10)
-                : -(10 + deviceHeight / 4)
-            }
-          />
-        ))}
+        ) : null)}
     </>
   );
 }

@@ -266,9 +266,7 @@ class AuthStore {
     const user = credential.user;
     let email = credential.email;
     if (!email) {
-      const email_opt = await this.appleEmailRetrieval(user);
-      if (!email_opt) throw new Error("email retrieval failed");
-      email = email_opt;
+      email = await this.appleEmailRetrieval(user);
     }
 
     const res = await fetch(`${API_BASE_URL}/apple/registration`, {
@@ -283,14 +281,23 @@ class AuthStore {
         userString: user,
       }),
     });
-    const parse = await res.json();
-    console.log(parse);
-    await this.login({
-      email,
-      provider: "apple",
-      appleUser: credential.user,
-    });
+    if (res.status == 200 || res.status == 201) {
+      const parse = await res.json();
+      console.log(parse);
+      await this.login({
+        email: parse.email,
+        provider: "apple",
+        appleUser: credential.user,
+      });
+    } else if (res.status == 400) {
+      throw new Error("Missing user string");
+    } else if (res.status == 418) {
+      throw new Error("Somehow the user was found but did not update");
+    } else if (res.status == 500) {
+      throw new Error("There was an unknown server error");
+    }
   };
+
   googleSignIn = async () => {
     await GoogleSignin.hasPlayServices();
     const userInfo = await GoogleSignin.signIn();
@@ -303,7 +310,7 @@ class AuthStore {
       email: userInfo.user.email,
       provider: "google",
     });
-    await fetch(`${API_BASE_URL}/google/registration`, {
+    const res = await fetch(`${API_BASE_URL}/google/registration`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -314,6 +321,7 @@ class AuthStore {
         email: userInfo.user.email,
       }),
     });
+    console.log(res);
   };
 
   makeRemoteSave = async ({
@@ -333,7 +341,7 @@ class AuthStore {
           time,
         ],
       });
-      await res.json();
+      await res?.json();
     } catch (e) {
       console.error(e);
       return [];
@@ -359,7 +367,7 @@ class AuthStore {
           id.toString(),
         ],
       });
-      const parsed = await res.json();
+      const parsed = await res?.json();
       console.log(parsed.results[0]);
     } catch (e) {
       console.error(e);
@@ -375,7 +383,7 @@ class AuthStore {
         sql: `DELETE FROM Save WHERE id = ?`,
         args: [id.toString()],
       });
-      const parsed = await res.json();
+      const parsed = await res?.json();
       console.log(parsed.results[0]);
     } catch (e) {
       console.error(e);
@@ -406,7 +414,7 @@ class AuthStore {
       const { email } = await response.json();
       return email as string;
     }
-    return undefined;
+    return null;
   };
 
   private checkAppleAuth = async (
@@ -481,12 +489,11 @@ class AuthStore {
       });
 
       const parse = await credsRes.json();
-      console.log(parse);
+      console.log("parse:", parse);
       if (credsRes.ok) {
         this.setDBCredentials(parse.db_name, parse.db_token);
-      } else if (parse.message == "destroy token") {
+      } else {
         this.logout();
-        return;
       }
     }
     let url = this.getDbURL();
@@ -518,7 +525,6 @@ class AuthStore {
         ],
       }),
     });
-
     return res;
   }
 

@@ -1,10 +1,9 @@
 import { RefObject, useContext, useState } from "react";
-import { View, Image, Dimensions, Pressable } from "react-native";
+import { View, Image, Pressable } from "react-native";
 import { Text } from "./Themed";
 import Draggable from "react-native-draggable";
 import type { Item } from "../classes/item";
 import { useVibration } from "../utility/customHooks";
-import { StatsDisplay } from "./StatsDisplay";
 import { checkReleasePositionProps } from "../utility/types";
 import { AppContext } from "../app/_layout";
 
@@ -18,6 +17,22 @@ interface EquipmentDisplayProps {
     item: Item;
     count: number;
   }[];
+  displayItem: {
+    item: Item;
+    positon: {
+      left: number;
+      top: number;
+    };
+  } | null;
+  setDisplayItem: React.Dispatch<
+    React.SetStateAction<{
+      item: Item;
+      positon: {
+        left: number;
+        top: number;
+      };
+    } | null>
+  >;
 }
 
 export default function EquipmentDisplay({
@@ -26,12 +41,9 @@ export default function EquipmentDisplay({
   mainHandTarget,
   offHandTarget,
   inventoryTarget,
+  displayItem,
+  setDisplayItem,
 }: EquipmentDisplayProps) {
-  const [showingStats, setShowingStats] = useState<{
-    item: Item;
-    count: number;
-  } | null>(null);
-  const [statsPos, setStatsPos] = useState<{ left: number; top: number }>();
   const vibration = useVibration();
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing contexts");
@@ -78,7 +90,7 @@ export default function EquipmentDisplay({
               yPos - size / 2 <= targetY + targetHeight;
             if (isWidthAligned && isHeightAligned) {
               vibration({ style: "light", essential: true });
-              setShowingStats(null);
+              setDisplayItem(null);
               if (
                 equipped &&
                 playerState &&
@@ -164,12 +176,15 @@ export default function EquipmentDisplay({
               >
                 <Pressable
                   onPress={() => {
-                    if (showingStats && showingStats.item.equals(item!)) {
-                      setShowingStats(null);
+                    vibration({ style: "light" });
+                    if (displayItem && displayItem.item.equals(item!)) {
+                      setDisplayItem(null);
                     } else {
-                      setShowingStats({ item: item!, count: 1 });
                       ref.current?.measureInWindow((x, y) => {
-                        setStatsPos({ left: x, top: y });
+                        setDisplayItem({
+                          item: item!,
+                          positon: { left: x, top: y },
+                        });
                       });
                     }
                   }}
@@ -215,8 +230,11 @@ export default function EquipmentDisplay({
   };
 
   return (
-    <>
-      <View className="flex w-full" style={{ height: dimensions.height * 0.3 }}>
+    <View
+      className="w-full absolute"
+      style={{ marginTop: dimensions.height * 0.31 }}
+    >
+      <View>
         <View className="items-center">
           <EquipmentSlot slot={"Head"} />
         </View>
@@ -236,17 +254,6 @@ export default function EquipmentDisplay({
           <EquipmentSlot slot={"Body"} />
         </View>
       </View>
-      {showingStats && statsPos && (
-        <View className="absolute z-10">
-          <StatsDisplay
-            statsLeftPos={statsPos.left}
-            statsTopPos={statsPos.top}
-            item={showingStats.item}
-            setShowingStats={setShowingStats}
-            topOffset={-240}
-          />
-        </View>
-      )}
-    </>
+    </View>
   );
 }
