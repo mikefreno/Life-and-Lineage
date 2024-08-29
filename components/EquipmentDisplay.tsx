@@ -216,7 +216,7 @@ export default function EquipmentDisplay({
           ) : (
             <View
               ref={ref}
-              className="mx-auto rounded-lg bg-zinc-400"
+              className="mx-auto z-0 rounded-lg bg-zinc-400"
               style={{
                 height: blockSize,
                 width: blockSize,
@@ -230,29 +230,24 @@ export default function EquipmentDisplay({
   };
 
   return (
-    <View
-      className="w-full absolute"
-      style={{ marginTop: dimensions.height * 0.31 }}
-    >
-      <View>
-        <View className="items-center">
-          <EquipmentSlot slot={"Head"} />
+    <View className="pb-2 -mt-2">
+      <View className="items-center ">
+        <EquipmentSlot slot={"Head"} />
+      </View>
+      <View className="flex flex-row justify-evenly">
+        <View className="-ml-1 -mt-4 mr-2">
+          <EquipmentSlot slot={"Main-Hand"} />
         </View>
-        <View className="flex flex-row justify-evenly">
-          <View className="-ml-1 -mt-4 mr-2">
-            <EquipmentSlot slot={"Main-Hand"} />
-          </View>
-          <View className="-mt-4">
-            <EquipmentSlot slot={"Off-Hand"} />
-          </View>
+        <View className="-mt-4">
+          <EquipmentSlot slot={"Off-Hand"} />
         </View>
-        <View
-          className={`mx-auto items-center ${
-            dimensions.width == dimensions.greater ? "-mt-20" : "-mt-8"
-          }`}
-        >
-          <EquipmentSlot slot={"Body"} />
-        </View>
+      </View>
+      <View
+        className={`mx-auto items-center ${
+          dimensions.width == dimensions.greater ? "-mt-20" : "-mt-8"
+        }`}
+      >
+        <EquipmentSlot slot={"Body"} />
       </View>
     </View>
   );

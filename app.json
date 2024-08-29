@@ -2,8 +2,8 @@
   "expo": {
     "name": "Magic Delve",
     "slug": "magic-delve",
-    "version": "0.2.2",
-    "orientation": "default",
+    "version": "0.2.3",
+    "orientation": "portrait",
     "icon": "assets/images/icon.png",
     "scheme": "magicdelveapp",
     "userInterfaceStyle": "automatic",

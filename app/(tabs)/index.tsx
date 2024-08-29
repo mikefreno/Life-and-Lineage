@@ -42,6 +42,8 @@ const HomeScreen = observer(() => {
   );
   const isFocused = useIsFocused();
 
+  const tabBarHeight = useBottomTabBarHeight();
+
   useEffect(() => {
     if (!showIntroTutorial && gameState) {
       gameState.updateTutorialState("intro", true);
@@ -77,10 +79,10 @@ const HomeScreen = observer(() => {
           className="flex-1"
           style={{
             paddingTop: useHeaderHeight(),
-            paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
+            paddingBottom: tabBarHeight + (isCompact ? 0 : 28),
           }}
         >
-          <View className="-mx-2 py-1 md:py-4">
+          <View className="p-1 md:py-4">
             <View className="flex-row">
               {playerState?.playerClass == "necromancer" ? (
                 <View className="mx-auto">
@@ -118,7 +120,7 @@ const HomeScreen = observer(() => {
                   />
                 </View>
               )}
-              <View className="">
+              <View>
                 <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
                 <Text className="text-center text-xl dark:text-white">{`${playerState.job}`}</Text>
                 <Text className="text-center text-xl dark:text-white">{`${
@@ -141,20 +143,7 @@ const HomeScreen = observer(() => {
               </View>
             </View>
           </View>
-          <View
-            className="flex-1 justify-evenly py-4"
-            style={{ marginTop: -dimensions.height * 0.3 }}
-          >
-            <InventoryRender
-              selfRef={inventoryTarget}
-              headTarget={headTarget}
-              bodyTarget={bodyTarget}
-              mainHandTarget={mainHandTarget}
-              offHandTarget={offHandTarget}
-              inventory={playerState.getInventory()}
-              displayItem={displayItem}
-              setDisplayItem={setDisplayItem}
-            />
+          <View className="flex-1 justify-evenly">
             <EquipmentDisplay
               headTarget={headTarget}
               bodyTarget={bodyTarget}
@@ -165,17 +154,27 @@ const HomeScreen = observer(() => {
               displayItem={displayItem}
               setDisplayItem={setDisplayItem}
             />
-            {displayItem && (
-              <View className="absolute z-10">
-                <StatsDisplay
-                  statsLeftPos={displayItem.positon.left}
-                  statsTopPos={displayItem.positon.top}
-                  item={displayItem.item}
-                  clearItem={() => setDisplayItem(null)}
-                />
-              </View>
-            )}
+            <InventoryRender
+              selfRef={inventoryTarget}
+              headTarget={headTarget}
+              bodyTarget={bodyTarget}
+              mainHandTarget={mainHandTarget}
+              offHandTarget={offHandTarget}
+              inventory={playerState.getInventory()}
+              displayItem={displayItem}
+              setDisplayItem={setDisplayItem}
+            />
           </View>
+          {displayItem && (
+            <View className="absolute z-10">
+              <StatsDisplay
+                statsLeftPos={displayItem.positon.left}
+                statsTopPos={displayItem.positon.top}
+                item={displayItem.item}
+                clearItem={() => setDisplayItem(null)}
+              />
+            </View>
+          )}
         </ThemedView>
       </>
     );

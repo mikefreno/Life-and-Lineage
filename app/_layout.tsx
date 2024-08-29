@@ -19,6 +19,7 @@ import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
 import { fullSave, fullLoad } from "../utility/functions/save_load";
 import { Dimensions, Keyboard, Platform, StyleSheet } from "react-native";
+import { View as ThemedView } from "../components/Themed";
 import { autorun } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
@@ -136,7 +137,11 @@ const Root = observer(() => {
   }, [onChange]);
 
   while (loading) {
-    return <D20DieAnimation keepRolling={loading} />;
+    return (
+      <ThemedView>
+        <D20DieAnimation keepRolling={loading} />
+      </ThemedView>
+    );
   }
 
   return (
@@ -285,6 +290,7 @@ const RootLayout = observer(() => {
           options={{
             headerShown: false,
             animation: Platform.OS == "android" ? "none" : undefined,
+            autoHideHomeIndicator: true,
           }}
         />
         <Stack.Screen

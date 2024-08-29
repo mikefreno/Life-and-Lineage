@@ -121,6 +121,9 @@ export const AppSettings = observer(() => {
       setPlayerCharacter(
         PlayerCharacter.fromJSON(JSON.parse(chosenSave.player_state)),
       );
+      while (router.canGoBack()) {
+        router.back();
+      }
     };
 
     const deleteRemoteSave = async (chosenSave: SaveRow) => {
@@ -175,7 +178,7 @@ export const AppSettings = observer(() => {
                   className="w-full bg-zinc-300 dark:bg-zinc-700 border rounded border-zinc-900 dark:border-zinc-50 pb-2"
                 >
                   <Pressable
-                    className="w-8 h-8 items-center justify-center m-1 border bg-zinc-50 dark:bg-zinc-900 rounded-full border-zinc-900 dark:border-zinc-50"
+                    className="w-8 h-8 absolute items-center justify-center m-1 border bg-zinc-50 dark:bg-zinc-900 rounded-full border-zinc-900 dark:border-zinc-50"
                     onPress={() => {
                       vibration({ essential: true, style: "warning" });
                       deleteRemoteSave(save);
@@ -183,7 +186,7 @@ export const AppSettings = observer(() => {
                   >
                     <Text className="text-center">X</Text>
                   </Pressable>
-                  <Text className="text-xl text-center">{save.name}</Text>
+                  <Text className="text-xl pt-2 text-center">{save.name}</Text>
                   <View className="flex flex-col w-full items-end py-2">
                     <Text className="">
                       Last updated: {save.last_updated_at}
@@ -215,15 +218,24 @@ export const AppSettings = observer(() => {
             {remoteSaves.map((save) => (
               <View
                 key={save.id}
-                className="w-full bg-zinc-300 border rounded border-zinc-900 dark:border-zinc-50 pb-2"
+                className="w-full bg-zinc-300 dark:bg-zinc-700 border rounded border-zinc-900 dark:border-zinc-50 pb-2"
               >
-                <Text className="text-xl text-center">{save.name}</Text>
+                <Pressable
+                  className="w-8 h-8 absolute items-center justify-center m-1 border bg-zinc-50 dark:bg-zinc-900 rounded-full border-zinc-900 dark:border-zinc-50"
+                  onPress={() => {
+                    vibration({ essential: true, style: "warning" });
+                    deleteRemoteSave(save);
+                  }}
+                >
+                  <Text className="text-center">X</Text>
+                </Pressable>
+                <Text className="text-xl pt-2 text-center">{save.name}</Text>
                 <View className="flex flex-col w-full items-end py-2">
                   <Text className="">Last updated: {save.last_updated_at}</Text>
                   <Text className="">Created at: {save.created_at}</Text>
                 </View>
                 <GenericFlatButton
-                  backgroundColor={"white"}
+                  backgroundColor={colorScheme == "dark" ? "black" : "white"}
                   onPressFunction={() => loadRemoteSave(save)}
                 >
                   Load Save

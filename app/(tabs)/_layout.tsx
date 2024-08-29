@@ -39,7 +39,8 @@ export default function TabLayout() {
   if (!appData) throw new Error("missing context");
 
   const { colorScheme } = useColorScheme();
-  const { playerState, setShowDetailedStatusView, isCompact } = appData;
+  const { playerState, setShowDetailedStatusView, isCompact, dimensions } =
+    appData;
   const vibration = useVibration();
 
   return (
@@ -66,7 +67,10 @@ export default function TabLayout() {
           tabBarStyle: {
             position: "absolute",
             borderTopWidth: 0,
-            height: Platform.OS == "ios" ? 120 : 100,
+            height:
+              Platform.OS == "ios"
+                ? Math.min(dimensions.greater / 8, 140)
+                : 100,
           },
           tabBarButton: (props) => {
             const onPressWithVibration = (event: GestureResponderEvent) => {

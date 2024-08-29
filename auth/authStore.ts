@@ -268,6 +268,8 @@ class AuthStore {
     if (!email) {
       email = await this.appleEmailRetrieval(user);
     }
+    const givenName = credential.fullName?.givenName;
+    const lastName = credential.fullName?.familyName;
 
     const res = await fetch(`${API_BASE_URL}/apple/registration`, {
       method: "POST",
@@ -275,15 +277,14 @@ class AuthStore {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        givenName: credential.fullName?.givenName,
-        lastName: credential.fullName?.familyName,
+        givenName,
+        lastName,
         email,
         userString: user,
       }),
     });
     if (res.status == 200 || res.status == 201) {
       const parse = await res.json();
-      console.log(parse);
       await this.login({
         email: parse.email,
         provider: "apple",
@@ -310,7 +311,7 @@ class AuthStore {
       email: userInfo.user.email,
       provider: "google",
     });
-    const res = await fetch(`${API_BASE_URL}/google/registration`, {
+    await fetch(`${API_BASE_URL}/google/registration`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -321,7 +322,6 @@ class AuthStore {
         email: userInfo.user.email,
       }),
     });
-    console.log(res);
   };
 
   makeRemoteSave = async ({
@@ -489,7 +489,6 @@ class AuthStore {
       });
 
       const parse = await credsRes.json();
-      console.log("parse:", parse);
       if (credsRes.ok) {
         this.setDBCredentials(parse.db_name, parse.db_token);
       } else {

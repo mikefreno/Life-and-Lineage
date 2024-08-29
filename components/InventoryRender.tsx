@@ -255,20 +255,12 @@ export default function InventoryRender({
         className={`${
           "headTarget" in props
             ? dimensions.greater == dimensions.height
-              ? "h-[40%]"
-              : "h-[35%]"
+              ? "h-[55%] mx-2"
+              : "mx-2 h-[50%]"
             : "shop" in props
             ? "mt-4 h-[75%]"
             : "h-full"
-        } mx-auto flex w-full flex-wrap rounded-lg border border-zinc-600`}
-        style={
-          "headTarget" in props && {
-            marginTop:
-              dimensions.greater == dimensions.height
-                ? dimensions.height * 0.55
-                : dimensions.height * 0.6,
-          }
-        }
+        } rounded-lg border border-zinc-600`}
       >
         {Array.from({ length: 24 }).map((_, index) => (
           <View
