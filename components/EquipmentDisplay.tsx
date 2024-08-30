@@ -33,6 +33,7 @@ interface EquipmentDisplayProps {
       };
     } | null>
   >;
+  draggingFromInventory: React.MutableRefObject<boolean>;
 }
 
 export default function EquipmentDisplay({
@@ -43,6 +44,7 @@ export default function EquipmentDisplay({
   inventoryTarget,
   displayItem,
   setDisplayItem,
+  draggingFromInventory,
 }: EquipmentDisplayProps) {
   const vibration = useVibration();
   const appData = useContext(AppContext);
@@ -188,17 +190,20 @@ export default function EquipmentDisplay({
                       });
                     }
                   }}
-                  className="active:scale-90 active:opacity-50"
+                  className="active:scale-90 active:opacity-50 z-top"
                 >
                   <View
-                    className="items-center rounded-lg bg-zinc-400"
+                    className="items-center rounded-lg bg-zinc-400 z-top"
                     ref={ref}
                     style={{
                       height: blockSize,
                       width: blockSize,
                     }}
                   >
-                    <Image className="my-auto" source={item.getItemIcon()} />
+                    <Image
+                      className="my-auto z-top"
+                      source={item.getItemIcon()}
+                    />
                   </View>
                 </Pressable>
               </Draggable>
@@ -230,7 +235,10 @@ export default function EquipmentDisplay({
   };
 
   return (
-    <View className="pb-2 -mt-2">
+    <View
+      className="pb-2 -mt-2"
+      style={{ zIndex: draggingFromInventory ? 0 : 10 }}
+    >
       <View className="items-center ">
         <EquipmentSlot slot={"Head"} />
       </View>

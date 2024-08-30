@@ -38,6 +38,10 @@ export class Item {
     this.stackable = stackable;
   }
 
+  get isEquippable() {
+    return !!this.slot;
+  }
+
   public equals(otherItem: Item) {
     return this.id == otherItem.id;
   }

@@ -30,6 +30,11 @@ const HomeScreen = observer(() => {
   const mainHandTarget = useRef<View>(null);
   const offHandTarget = useRef<View>(null);
   const inventoryTarget = useRef<View>(null);
+  const draggingFromInventory = useRef(false);
+
+  const setDraggingFromInventory = (value: boolean) => {
+    draggingFromInventory.current = value;
+  };
 
   const [displayItem, setDisplayItem] = useState<{
     item: Item;
@@ -143,7 +148,7 @@ const HomeScreen = observer(() => {
               </View>
             </View>
           </View>
-          <View className="flex-1 justify-evenly">
+          <View className="flex-1 justify-evenly relative z-10">
             <EquipmentDisplay
               headTarget={headTarget}
               bodyTarget={bodyTarget}
@@ -153,6 +158,7 @@ const HomeScreen = observer(() => {
               inventory={playerState.getInventory()}
               displayItem={displayItem}
               setDisplayItem={setDisplayItem}
+              draggingFromInventory={draggingFromInventory}
             />
             <InventoryRender
               selfRef={inventoryTarget}
@@ -163,6 +169,8 @@ const HomeScreen = observer(() => {
               inventory={playerState.getInventory()}
               displayItem={displayItem}
               setDisplayItem={setDisplayItem}
+              draggingFromInventory={draggingFromInventory}
+              setDraggingFromInventory={setDraggingFromInventory}
             />
           </View>
           {displayItem && (

@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import type { RefObject } from "react";
 import { Item } from "../classes/item";
 import { Dimensions, Pressable, View, Image, Platform } from "react-native";
@@ -39,6 +39,8 @@ type InventoryRenderHome = InventoryRenderBase & {
       };
     } | null>
   >;
+  draggingFromInventory: React.MutableRefObject<boolean>;
+  setDraggingFromInventory: (value: boolean) => void;
 };
 
 type InventoryRenderDungeon = InventoryRenderBase & {
@@ -215,28 +217,38 @@ export default function InventoryRender({
             equipped: false,
           });
           setBuzzed(false);
+          if ("setDraggingFromInventory" in props) {
+            props.setDraggingFromInventory(false);
+          }
         }}
         onDrag={() => {
           if (!buzzed) {
+            if (
+              "draggingFromInventory" in props &&
+              !props.draggingFromInventory
+            ) {
+              props.setDraggingFromInventory(true);
+            }
             vibration({ style: "medium", essential: true });
             setBuzzed(true);
           }
         }}
+        disabled={!item.isEquippable}
         shouldReverse
       >
         <Pressable
           ref={ref}
           onPress={handlePress}
-          className="active:scale-90 active:opacity-50"
+          className="active:scale-90 active:opacity-50 z-top"
         >
           <View
-            className="items-center rounded-lg bg-zinc-400"
+            className="items-center rounded-lg bg-zinc-400 z-top"
             style={{
               height: blockSize,
               width: blockSize,
             }}
           >
-            <Image className="my-auto" source={item.getItemIcon()} />
+            <Image className="my-auto z-top" source={item.getItemIcon()} />
             {item.stackable && count > 1 && (
               <ThemedView className="absolute bottom-0 right-0 bg-opacity-50 rounded px-1">
                 <Text>{count}</Text>
@@ -260,7 +272,7 @@ export default function InventoryRender({
             : "shop" in props
             ? "mt-4 h-[75%]"
             : "h-full"
-        } rounded-lg border border-zinc-600`}
+        } rounded-lg border border-zinc-600 relative`}
       >
         {Array.from({ length: 24 }).map((_, index) => (
           <View
@@ -279,7 +291,7 @@ export default function InventoryRender({
             key={"bg-" + index}
           >
             <View
-              className="rounded-lg bg-zinc-200 dark:bg-zinc-700"
+              className="rounded-lg bg-zinc-200 dark:bg-zinc-700 z-0"
               style={{ height: blockSize, width: blockSize }}
             />
           </View>
@@ -292,10 +304,12 @@ export default function InventoryRender({
                 ? {
                     left: `${(index % 12) * 8.33 + 0.5}%`,
                     top: `${Math.floor(index / 12) * 48 + blockSize / 10}%`,
+                    zIndex: 100,
                   }
                 : {
                     left: `${(index % 6) * 16.67 + 1.2}%`,
                     top: `${Math.floor(index / 6) * 24 + blockSize / 12}%`,
+                    zIndex: 100,
                   }
             }
             key={index}
