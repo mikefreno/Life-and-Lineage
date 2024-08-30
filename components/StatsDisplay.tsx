@@ -19,6 +19,7 @@ type BaseProps = {
   displayItem: {
     item: Item;
     count: number;
+    side?: "shop" | "inventory";
     positon: {
       left: number;
       top: number;
@@ -35,17 +36,13 @@ type DungeonProps = BaseProps & {
 };
 
 type ShopProps = BaseProps & {
+  purchaseItem: () => void;
   shop: Shop;
   sellItem: (item: Item) => void;
   sellStack: (item: Item) => void;
 };
 
-type ShopKeeperProps = BaseProps & {
-  shop: Shop;
-  purchaseItem: () => void;
-};
-
-type StatsDisplayProps = BaseProps | DungeonProps | ShopProps | ShopKeeperProps;
+type StatsDisplayProps = BaseProps | DungeonProps | ShopProps;
 
 export function StatsDisplay({
   displayItem,
@@ -64,62 +61,95 @@ export function StatsDisplay({
 
   const SaleSection = () => {
     if (playerState) {
-      if ("sellItem" in props) {
+      if ("shop" in props) {
         const { shop, sellItem, sellStack } = props;
-        const itemPrice = displayItem.item.getSellPrice(
-          shop.shopKeeper.affection,
-        );
-        const isDisabled = shop.currentGold < itemPrice;
-        return (
-          <>
-            <View className="flex flex-row py-1">
-              <Text>
-                {asReadableGold(
-                  displayItem.item.getSellPrice(shop.shopKeeper.affection) *
-                    (displayItem.count ?? 1),
-                )}
-              </Text>
-              <Coins width={16} height={16} style={{ marginLeft: 6 }} />
-            </View>
-            {displayItem.count && displayItem.count > 1 ? (
-              <>
-                <GenericFlatButton
-                  onPressFunction={() => {
-                    sellItem(displayItem.item), clearItem();
-                  }}
-                  disabledCondition={isDisabled}
-                >
-                  <Text
-                    className={
-                      isDisabled ? "opacity-50 text-center" : "text-center"
-                    }
+        if (displayItem.side == "inventory") {
+          const itemPrice = displayItem.item.getSellPrice(
+            shop.shopKeeper.affection,
+          );
+          const isDisabled = shop.currentGold < itemPrice;
+          return (
+            <>
+              <View className="flex flex-row py-1">
+                <Text>
+                  {asReadableGold(
+                    displayItem.item.getSellPrice(shop.shopKeeper.affection) *
+                      (displayItem.count ?? 1),
+                  )}
+                </Text>
+                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+              </View>
+              {displayItem.count && displayItem.count > 1 ? (
+                <>
+                  <GenericFlatButton
+                    onPressFunction={() => {
+                      sellItem(displayItem.item), clearItem();
+                    }}
+                    disabledCondition={isDisabled}
                   >
-                    Sell One
-                  </Text>
-                </GenericFlatButton>
+                    <Text
+                      className={
+                        isDisabled ? "opacity-50 text-center" : "text-center"
+                      }
+                    >
+                      Sell One
+                    </Text>
+                  </GenericFlatButton>
+                  <GenericFlatButton
+                    onPressFunction={() => {
+                      sellStack(displayItem.item);
+                      clearItem();
+                    }}
+                    disabledCondition={isDisabled}
+                    className="mt-1"
+                  >
+                    <Text
+                      className={
+                        isDisabled ? "opacity-50 text-center" : "text-center"
+                      }
+                    >
+                      Sell All
+                    </Text>
+                  </GenericFlatButton>
+                </>
+              ) : (
                 <GenericFlatButton
                   onPressFunction={() => {
-                    sellStack(displayItem.item);
+                    props.sellItem(displayItem.item);
                     clearItem();
                   }}
                   disabledCondition={isDisabled}
-                  className="mt-1"
                 >
                   <Text
                     className={
                       isDisabled ? "opacity-50 text-center" : "text-center"
                     }
                   >
-                    Sell All
+                    Sell
                   </Text>
                 </GenericFlatButton>
-              </>
-            ) : (
+              )}
+            </>
+          );
+        } else if (displayItem.side == "shop") {
+          const { shop, purchaseItem } = props;
+          const itemPrice = displayItem.item.getBuyPrice(
+            shop.shopKeeper.affection,
+          );
+          const isDisabled = playerState.gold < itemPrice;
+          return (
+            <>
+              <View className="flex flex-row py-1">
+                <Text>
+                  {asReadableGold(
+                    displayItem.item.getBuyPrice(shop.shopKeeper.affection) *
+                      (displayItem.count ?? 1),
+                  )}
+                </Text>
+                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+              </View>
               <GenericFlatButton
-                onPressFunction={() => {
-                  props.sellItem(displayItem.item);
-                  clearItem();
-                }}
+                onPressFunction={() => purchaseItem()}
                 disabledCondition={isDisabled}
               >
                 <Text
@@ -127,43 +157,12 @@ export function StatsDisplay({
                     isDisabled ? "opacity-50 text-center" : "text-center"
                   }
                 >
-                  Sell
+                  Buy Item
                 </Text>
               </GenericFlatButton>
-            )}
-          </>
-        );
-      } else if ("purchaseItem" in props) {
-        const { shop, purchaseItem } = props;
-        const itemPrice = displayItem.item.getBuyPrice(
-          shop.shopKeeper.affection,
-        );
-        const isDisabled = playerState.gold < itemPrice;
-        return (
-          <>
-            <View className="flex flex-row py-1">
-              <Text>
-                {asReadableGold(
-                  displayItem.item.getBuyPrice(shop.shopKeeper.affection) *
-                    (displayItem.count ?? 1),
-                )}
-              </Text>
-              <Coins width={16} height={16} style={{ marginLeft: 6 }} />
-            </View>
-            <GenericFlatButton
-              onPressFunction={() => purchaseItem()}
-              disabledCondition={isDisabled}
-            >
-              <Text
-                className={
-                  isDisabled ? "opacity-50 text-center" : "text-center"
-                }
-              >
-                Buy Item
-              </Text>
-            </GenericFlatButton>
-          </>
-        );
+            </>
+          );
+        }
       } else if ("addItemToPouch" in props) {
         return (
           <GenericFlatButton

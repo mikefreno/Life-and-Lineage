@@ -30,6 +30,7 @@ import {
   SquareMinus,
   SquarePlus,
 } from "../assets/icons/SVGIcons";
+import { damageReduction } from "../utility/functions/misc/numbers";
 
 interface PlayerStatus {
   hideGold?: boolean;
@@ -796,6 +797,62 @@ const PlayerStatus = observer(
                     )}
                 </View>
               </View>
+              {(playerState.equipmentStats.armor > 0 ||
+                playerState.equipmentStats.damage > 0 ||
+                playerState.equipmentStats.health > 0 ||
+                playerState.equipmentStats.regen > 0 ||
+                playerState.equipmentStats.mana > 0 ||
+                playerState.equipmentStats.blockChance > 0) && (
+                <View className="py-1">
+                  <GenericStrikeAround>Gear Stats</GenericStrikeAround>
+                  {playerState.equipmentStats.damage > 0 && (
+                    <Text className="text-center">
+                      Attack Damage: {playerState.equipmentStats.damage}
+                    </Text>
+                  )}
+                  {playerState.equipmentStats.armor > 0 && (
+                    <>
+                      <Text className="text-center">
+                        Total Armor: {playerState.equipmentStats.armor}
+                      </Text>
+                      <Text className="text-center">
+                        Physical Damage Reduction:{" "}
+                        {(
+                          damageReduction(playerState.equipmentStats.armor) *
+                          100
+                        ).toFixed(1)}
+                        %
+                      </Text>
+                    </>
+                  )}
+                  {playerState.equipmentStats.blockChance > 0 && (
+                    <Text className="text-center">
+                      Chance to block:{" "}
+                      {(playerState.equipmentStats.blockChance * 100).toFixed(
+                        1,
+                      )}
+                      %
+                    </Text>
+                  )}
+                  {playerState.equipmentStats.mana > 0 && (
+                    <>
+                      <Text className="text-center">
+                        Mana: +{playerState.equipmentStats.mana}
+                      </Text>
+                    </>
+                  )}
+                  {playerState.equipmentStats.regen > 0 && (
+                    <Text className="text-center">
+                      Mana Regen: +{playerState.equipmentStats.regen}
+                    </Text>
+                  )}
+                  {playerState.equipmentStats.health > 0 && (
+                    <Text className="text-center">
+                      Health: +{playerState.equipmentStats.health}
+                    </Text>
+                  )}
+                </View>
+              )}
               {playerState.conditions.length > 0 ? (
                 <View>
                   <GenericStrikeAround>Conditions</GenericStrikeAround>

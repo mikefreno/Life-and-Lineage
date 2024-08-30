@@ -176,6 +176,7 @@ export default function EquipmentDisplay({
                       ref.current?.measureInWindow((x, y) => {
                         setDisplayItem({
                           item: item!,
+                          count: 1,
                           positon: { left: x, top: y },
                         });
                       });

@@ -18,6 +18,7 @@ type InventoryRenderBase = {
   displayItem: {
     item: Item;
     count: number;
+    side?: "shop" | "inventory";
     positon: {
       left: number;
       top: number;
@@ -27,6 +28,7 @@ type InventoryRenderBase = {
     React.SetStateAction<{
       item: Item;
       count: number;
+      side?: "shop" | "inventory";
       positon: {
         left: number;
         top: number;
@@ -183,9 +185,20 @@ export default function InventoryRender({
       if (displayItem && displayItem.item.equals(item)) {
         setDisplayItem(null);
       } else {
-        ref.current?.measureInWindow((x, y) => {
-          setDisplayItem({ item, count, positon: { left: x, top: y } });
-        });
+        if ("shop" in props) {
+          ref.current?.measureInWindow((x, y) => {
+            setDisplayItem({
+              item,
+              count,
+              side: "inventory",
+              positon: { left: x, top: y },
+            });
+          });
+        } else {
+          ref.current?.measureInWindow((x, y) => {
+            setDisplayItem({ item, count, positon: { left: x, top: y } });
+          });
+        }
       }
     };
 

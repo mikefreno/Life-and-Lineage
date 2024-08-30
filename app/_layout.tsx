@@ -183,13 +183,13 @@ const RootLayout = observer(() => {
   const [navbarLoad, setNavbarLoad] = useState(false);
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  const auth = useAuth();
+  //const auth = useAuth();
 
-  useEffect(() => {
-    if (__DEV__) {
-      auth._debugLog();
-    }
-  }, []);
+  //useEffect(() => {
+  //if (__DEV__) {
+  //auth._debugLog();
+  //}
+  //}, []);
 
   useEffect(() => {
     if (fontLoaded && navbarLoad) {

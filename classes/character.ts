@@ -770,7 +770,7 @@ export class PlayerCharacter extends Character {
     }
   }
 
-  public getCurrentEquipmentStats(): Record<string, number> {
+  get equipmentStats() {
     let armor = 0;
     let damage = 0;
     let mana = 0;

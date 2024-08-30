@@ -11,14 +11,21 @@ import { calculateAge } from "../../utility/functions/misc/age";
 import InventoryRender from "../../components/InventoryRender";
 import { AppContext } from "../_layout";
 import {
+  ArmorIcon,
+  Energy,
+  HealthIcon,
   NecromancerSkull,
   PaladinHammer,
+  Regen,
+  ShieldSlashIcon,
+  Sword,
   WizardHat,
 } from "../../assets/icons/SVGIcons";
 import BlessingDisplay from "../../components/BlessingsDisplay";
 import { Item } from "../../classes/item";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import EquipmentDisplay from "../../components/EquipmentDisplay";
+import { damageReduction } from "../../utility/functions/misc/numbers";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -160,6 +167,50 @@ const HomeScreen = observer(() => {
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
             <View className="flex-1 justify-evenly relative z-10">
+              <View className="absolute pl-2">
+                {playerState.equipmentStats.damage > 0 && (
+                  <>
+                    <Text className="text-center">
+                      <Sword height={12} width={12} />{" "}
+                      {playerState.equipmentStats.damage}
+                    </Text>
+                  </>
+                )}
+                {playerState.equipmentStats.armor > 0 && (
+                  <>
+                    <Text className="text-center">
+                      <ArmorIcon height={12} width={12} />{" "}
+                      {playerState.equipmentStats.armor}
+                    </Text>
+                  </>
+                )}
+                {playerState.equipmentStats.blockChance > 0 && (
+                  <Text className="text-center">
+                    <ShieldSlashIcon height={12} width={12} />{" "}
+                    {(playerState.equipmentStats.blockChance * 100).toFixed(1)}%
+                  </Text>
+                )}
+                {playerState.equipmentStats.mana > 0 && (
+                  <>
+                    <Text className="text-center">
+                      <Energy height={12} width={12} />{" "}
+                      {playerState.equipmentStats.mana}
+                    </Text>
+                  </>
+                )}
+                {playerState.equipmentStats.regen > 0 && (
+                  <Text className="text-center">
+                    <Regen height={12} width={12} />{" "}
+                    {playerState.equipmentStats.regen}
+                  </Text>
+                )}
+                {playerState.equipmentStats.health > 0 && (
+                  <Text className="text-center">
+                    <HealthIcon height={12} width={12} />{" "}
+                    {playerState.equipmentStats.health}
+                  </Text>
+                )}
+              </View>
               <EquipmentDisplay
                 headTarget={headTarget}
                 bodyTarget={bodyTarget}
