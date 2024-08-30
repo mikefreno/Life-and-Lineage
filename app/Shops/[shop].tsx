@@ -36,8 +36,7 @@ const ShopInteriorScreen = observer(() => {
   const colors = shopObjects.find((shopObj) => shopObj.type == shop)?.colors;
   const thisShop = gameState?.shops.find((aShop) => aShop.archetype == shop);
   const [displayItem, setDisplayItem] = useState<{
-    item: Item;
-    count: number;
+    item: Item[];
     side?: "shop" | "inventory";
     positon: { left: number; top: number };
   } | null>(null);
@@ -94,68 +93,74 @@ const ShopInteriorScreen = observer(() => {
         thisShop.buyItem(item, price);
         playerState?.sellItem(item, price);
       });
-      if (displayItem?.item.itemClass == "junk") {
+      if (displayItem?.item[0].itemClass == "junk") {
         setDisplayItem(null);
       }
     }
   }
 
-  const sellStack = () => {
+  const sellStack = (items: Item[]) => {
     if (playerState && displayItem && thisShop) {
-      let count = displayItem.count;
-      while (count > 0)
-        playerState.getInventory().forEach((obj) => {
-          const itemPrice = displayItem.item.getSellPrice(
-            thisShop.shopKeeper.affection,
-          );
-          if (obj.item.name === displayItem.item.name) {
-            playerState.sellItem(displayItem.item, itemPrice);
-            count--;
-          }
-        });
+      items.forEach((item) => {
+        const itemPrice = item.getSellPrice(thisShop.shopKeeper.affection);
+        thisShop.buyItem(item, itemPrice);
+        playerState.sellItem(item, itemPrice);
+        setDisplayItem(null);
+      });
     }
   };
 
-  const purchaseItem = () => {
-    if (playerState && displayItem && thisShop) {
+  const purchaseItem = (item: Item) => {
+    if (playerState && item && thisShop) {
       vibration({ style: "light" });
-      const itemPrice = displayItem.item.getBuyPrice(
-        thisShop.shopKeeper.affection,
-      );
-      playerState.buyItem(displayItem.item, itemPrice);
-      thisShop.sellItem(displayItem.item, itemPrice);
-      setDisplayItem(null);
+      const itemPrice = item.getBuyPrice(thisShop.shopKeeper.affection);
+      if (displayItem?.item.length && displayItem.item.length == 1) {
+        setDisplayItem(null);
+      }
+      playerState.buyItem(item, itemPrice);
+      thisShop.sellItem(item, itemPrice);
     }
   };
 
-  const sellItem = () => {
-    if (playerState && displayItem && thisShop) {
+  const sellItem = (item: Item) => {
+    if (playerState && item && thisShop) {
       vibration({ style: "light" });
-      const itemPrice = displayItem.item.getSellPrice(
-        thisShop.shopKeeper.affection,
-      );
-      thisShop.buyItem(displayItem.item, itemPrice);
-      playerState.sellItem(displayItem.item, itemPrice);
+      const itemPrice = item.getSellPrice(thisShop.shopKeeper.affection);
+      if (displayItem?.item.length && displayItem.item.length == 1) {
+        setDisplayItem(null);
+      }
+      thisShop.buyItem(item, itemPrice);
+      playerState.sellItem(item, itemPrice);
+    }
+  };
+
+  const purchaseStack = (items: Item[]) => {
+    if (playerState && thisShop) {
+      vibration({ style: "light" });
+      items.forEach((item) => {
+        const itemPrice = item.getBuyPrice(thisShop.shopKeeper.affection);
+        playerState.buyItem(item, itemPrice);
+        thisShop.sellItem(item, itemPrice);
+        setDisplayItem(null);
+      });
     }
   };
 
   interface ItemRenderProps {
-    item: Item;
-    count: number;
+    item: Item[];
   }
 
-  const ItemRender = ({ item, count }: ItemRenderProps) => {
+  const ItemRender = ({ item }: ItemRenderProps) => {
     const localRef = useRef<View>(null);
 
     const handlePress = () => {
       vibration({ style: "light" });
-      if (displayItem && displayItem.item.equals(item)) {
+      if (displayItem && displayItem.item[0].equals(item[0])) {
         setDisplayItem(null);
       } else {
         localRef.current?.measureInWindow((x, y) => {
           setDisplayItem({
             item,
-            count,
             side: "shop",
             positon: { left: x, top: y },
           });
@@ -169,7 +174,7 @@ const ShopInteriorScreen = observer(() => {
         ref={localRef}
         onPress={handlePress}
       >
-        <Image source={item.getItemIcon()} />
+        <Image source={item[0].getItemIcon()} />
       </Pressable>
     );
   };
@@ -238,12 +243,17 @@ const ShopInteriorScreen = observer(() => {
               >
                 <ScrollView className="my-auto">
                   <View className="flex flex-row flex-wrap justify-around">
-                    {thisShop.inventory.map((item) => (
+                    {thisShop.getInventory().map((item) => (
                       <View
-                        key={item.id}
+                        key={item.item[0].id}
                         className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
                       >
-                        <ItemRender item={item} count={1} />
+                        <ItemRender item={item.item} />
+                        {item.item[0].stackable && item.item.length > 1 && (
+                          <ThemedView className="absolute z-50 bottom-0 right-1 bg-opacity-50 rounded px-1">
+                            <Text>{item.item.length}</Text>
+                          </ThemedView>
+                        )}
                       </View>
                     ))}
                   </View>
@@ -290,7 +300,9 @@ const ShopInteriorScreen = observer(() => {
               displayItem={displayItem}
               shop={thisShop}
               purchaseItem={purchaseItem}
+              purchaseStack={purchaseStack}
               sellItem={sellItem}
+              sellStack={sellStack}
               clearItem={() => setDisplayItem(null)}
             />
           </View>

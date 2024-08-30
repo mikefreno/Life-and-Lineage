@@ -25,7 +25,6 @@ import BlessingDisplay from "../../components/BlessingsDisplay";
 import { Item } from "../../classes/item";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import EquipmentDisplay from "../../components/EquipmentDisplay";
-import { damageReduction } from "../../utility/functions/misc/numbers";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -39,8 +38,7 @@ const HomeScreen = observer(() => {
   const inventoryTarget = useRef<View>(null);
 
   const [displayItem, setDisplayItem] = useState<{
-    item: Item;
-    count: number;
+    item: Item[];
     positon: { left: number; top: number };
   } | null>(null);
 

@@ -17,8 +17,7 @@ import { Coins } from "../assets/icons/SVGIcons";
 
 type BaseProps = {
   displayItem: {
-    item: Item;
-    count: number;
+    item: Item[];
     side?: "shop" | "inventory";
     positon: {
       left: number;
@@ -36,10 +35,11 @@ type DungeonProps = BaseProps & {
 };
 
 type ShopProps = BaseProps & {
-  purchaseItem: () => void;
+  purchaseItem: (item: Item) => void;
+  purchaseStack: (items: Item[]) => void;
   shop: Shop;
   sellItem: (item: Item) => void;
-  sellStack: (item: Item) => void;
+  sellStack: (items: Item[]) => void;
 };
 
 type StatsDisplayProps = BaseProps | DungeonProps | ShopProps;
@@ -64,32 +64,37 @@ export function StatsDisplay({
       if ("shop" in props) {
         const { shop, sellItem, sellStack } = props;
         if (displayItem.side == "inventory") {
-          const itemPrice = displayItem.item.getSellPrice(
+          const itemPrice = displayItem.item[0].getSellPrice(
             shop.shopKeeper.affection,
           );
-          const isDisabled = shop.currentGold < itemPrice;
+          const stackPrice = itemPrice * displayItem.item.length;
+          const singleIsDisabled = shop.currentGold < itemPrice;
+          const stackIsDisabled = shop.currentGold < stackPrice;
           return (
             <>
               <View className="flex flex-row py-1">
                 <Text>
                   {asReadableGold(
-                    displayItem.item.getSellPrice(shop.shopKeeper.affection) *
-                      (displayItem.count ?? 1),
+                    displayItem.item[0].getSellPrice(
+                      shop.shopKeeper.affection,
+                    ) * (displayItem.item.length ?? 1),
                   )}
                 </Text>
                 <Coins width={16} height={16} style={{ marginLeft: 6 }} />
               </View>
-              {displayItem.count && displayItem.count > 1 ? (
+              {displayItem.item.length && displayItem.item.length > 1 ? (
                 <>
                   <GenericFlatButton
                     onPressFunction={() => {
-                      sellItem(displayItem.item), clearItem();
+                      sellItem(displayItem.item[0]), clearItem();
                     }}
-                    disabledCondition={isDisabled}
+                    disabledCondition={singleIsDisabled}
                   >
                     <Text
                       className={
-                        isDisabled ? "opacity-50 text-center" : "text-center"
+                        singleIsDisabled
+                          ? "opacity-50 text-center"
+                          : "text-center"
                       }
                     >
                       Sell One
@@ -100,12 +105,14 @@ export function StatsDisplay({
                       sellStack(displayItem.item);
                       clearItem();
                     }}
-                    disabledCondition={isDisabled}
+                    disabledCondition={stackIsDisabled}
                     className="mt-1"
                   >
                     <Text
                       className={
-                        isDisabled ? "opacity-50 text-center" : "text-center"
+                        stackIsDisabled
+                          ? "opacity-50 text-center"
+                          : "text-center"
                       }
                     >
                       Sell All
@@ -115,14 +122,16 @@ export function StatsDisplay({
               ) : (
                 <GenericFlatButton
                   onPressFunction={() => {
-                    props.sellItem(displayItem.item);
+                    props.sellItem(displayItem.item[0]);
                     clearItem();
                   }}
-                  disabledCondition={isDisabled}
+                  disabledCondition={singleIsDisabled}
                 >
                   <Text
                     className={
-                      isDisabled ? "opacity-50 text-center" : "text-center"
+                      singleIsDisabled
+                        ? "opacity-50 text-center"
+                        : "text-center"
                     }
                   >
                     Sell
@@ -132,48 +141,77 @@ export function StatsDisplay({
             </>
           );
         } else if (displayItem.side == "shop") {
-          const { shop, purchaseItem } = props;
-          const itemPrice = displayItem.item.getBuyPrice(
+          const { shop, purchaseItem, purchaseStack } = props;
+          const itemPrice = displayItem.item[0].getBuyPrice(
             shop.shopKeeper.affection,
           );
-          const isDisabled = playerState.gold < itemPrice;
+          const stackPrice = itemPrice * displayItem.item.length;
+          const singleIsDisabled = playerState.gold < itemPrice;
+          const stackIsDisabled = playerState.gold < stackPrice;
           return (
             <>
               <View className="flex flex-row py-1">
                 <Text>
                   {asReadableGold(
-                    displayItem.item.getBuyPrice(shop.shopKeeper.affection) *
-                      (displayItem.count ?? 1),
+                    displayItem.item[0].getBuyPrice(shop.shopKeeper.affection) *
+                      displayItem.item.length,
                   )}
                 </Text>
                 <Coins width={16} height={16} style={{ marginLeft: 6 }} />
               </View>
               <GenericFlatButton
-                onPressFunction={() => purchaseItem()}
-                disabledCondition={isDisabled}
+                onPressFunction={() => purchaseItem(displayItem.item[0])}
+                disabledCondition={singleIsDisabled}
               >
                 <Text
                   className={
-                    isDisabled ? "opacity-50 text-center" : "text-center"
+                    singleIsDisabled ? "opacity-50 text-center" : "text-center"
                   }
                 >
-                  Buy Item
+                  Buy {displayItem.item.length == 1 ? "Item" : "One"}
                 </Text>
               </GenericFlatButton>
+              {displayItem.item.length > 1 && (
+                <GenericFlatButton
+                  onPressFunction={() => purchaseStack(displayItem.item)}
+                  disabledCondition={stackIsDisabled}
+                >
+                  <Text
+                    className={
+                      stackIsDisabled ? "opacity-50 text-center" : "text-center"
+                    }
+                  >
+                    Buy All
+                  </Text>
+                </GenericFlatButton>
+              )}
             </>
           );
         }
       } else if ("addItemToPouch" in props) {
         return (
-          <GenericFlatButton
-            onPressFunction={() => {
-              props.addItemToPouch(displayItem.item);
-              clearItem();
-              playerState?.removeFromInventory(displayItem.item);
-            }}
-          >
-            Drop
-          </GenericFlatButton>
+          <View>
+            <GenericFlatButton
+              onPressFunction={() => {
+                props.addItemToPouch(displayItem.item[0]);
+                clearItem();
+                playerState?.removeFromInventory(displayItem.item[0]);
+              }}
+            >
+              Drop
+            </GenericFlatButton>
+            <GenericFlatButton
+              onPressFunction={() => {
+                displayItem.item.forEach((item) => {
+                  props.addItemToPouch(item);
+                  playerState?.removeFromInventory(item);
+                });
+                clearItem();
+              }}
+            >
+              Drop All
+            </GenericFlatButton>
+          </View>
         );
       }
     }
@@ -181,7 +219,7 @@ export function StatsDisplay({
 
   function bookItemLabel() {
     if (playerState) {
-      const spellRes = displayItem.item.getAttachedSpell(
+      const spellRes = displayItem.item[0].getAttachedSpell(
         playerState.playerClass,
       );
       return `${convertMasteryToString[spellRes.proficiencyNeeded]} level book`;
@@ -192,7 +230,7 @@ export function StatsDisplay({
     <ThemedView
       className="items-center rounded-md border border-zinc-600 p-4"
       style={
-        displayItem.item.itemClass == "book"
+        displayItem.item[0].itemClass == "book"
           ? {
               backgroundColor:
                 colorScheme == "light"
@@ -201,14 +239,9 @@ export function StatsDisplay({
               left: 20,
               top:
                 topGuard &&
-                displayItem.positon.top +
-                  (topOffset ?? 0) -
-                  ("shop" in props ? 200 : 100) <
-                  topGuard
+                displayItem.positon.top + (topOffset ?? 0) < topGuard
                   ? topGuard
-                  : displayItem.positon.top +
-                    (topOffset ?? 0) -
-                    ("shop" in props ? 200 : 100),
+                  : displayItem.positon.top + (topOffset ?? 0),
             }
           : {
               backgroundColor:
@@ -239,33 +272,35 @@ export function StatsDisplay({
       </Pressable>
       <View>
         <Text className="text-center">
-          {toTitleCase(displayItem.item.name)}
+          {toTitleCase(displayItem.item[0].name)}
         </Text>
       </View>
-      {displayItem.item.stats && displayItem.item.slot ? (
+      {displayItem.item[0].stats && displayItem.item[0].slot ? (
         <View className="py-2">
-          <GearStatsDisplay stats={displayItem.item.stats} />
+          <GearStatsDisplay stats={displayItem.item[0].stats} />
         </View>
       ) : null}
-      {(displayItem.item.slot == "one-hand" ||
-        displayItem.item.slot == "two-hand" ||
-        displayItem.item.slot == "off-hand") && (
+      {(displayItem.item[0].slot == "one-hand" ||
+        displayItem.item[0].slot == "two-hand" ||
+        displayItem.item[0].slot == "off-hand") && (
         <Text className="text-sm italic">
-          {toTitleCase(displayItem.item.slot)}
+          {toTitleCase(displayItem.item[0].slot)}
         </Text>
       )}
       <Text className="text-sm italic">
-        {displayItem.item.itemClass == "bodyArmor"
+        {displayItem.item[0].itemClass == "bodyArmor"
           ? "Body Armor"
-          : displayItem.item.itemClass == "book" && playerState
+          : displayItem.item[0].itemClass == "book" && playerState
           ? bookItemLabel()
-          : toTitleCase(displayItem.item.itemClass)}
+          : toTitleCase(displayItem.item[0].itemClass)}
       </Text>
-      {displayItem.item.itemClass == "book" && playerState ? (
+      {displayItem.item[0].itemClass == "book" && playerState ? (
         <>
           <View className="px-2 mx-auto">
             <SpellDetails
-              spell={displayItem.item.getAttachedSpell(playerState.playerClass)}
+              spell={displayItem.item[0].getAttachedSpell(
+                playerState.playerClass,
+              )}
             />
           </View>
           {!("purchaseItem" in props) && (

@@ -12,12 +12,10 @@ import { AppContext } from "../app/_layout";
 type InventoryRenderBase = {
   selfRef: RefObject<View> | null;
   inventory: {
-    item: Item;
-    count: number;
+    item: Item[];
   }[];
   displayItem: {
-    item: Item;
-    count: number;
+    item: Item[];
     side?: "shop" | "inventory";
     positon: {
       left: number;
@@ -26,8 +24,7 @@ type InventoryRenderBase = {
   } | null;
   setDisplayItem: React.Dispatch<
     React.SetStateAction<{
-      item: Item;
-      count: number;
+      item: Item[];
       side?: "shop" | "inventory";
       positon: {
         left: number;
@@ -53,7 +50,7 @@ type InventoryRenderShop = InventoryRenderBase & {
   shopInventoryTarget: RefObject<View>;
   shop: Shop;
   sellItem: (item: Item) => void;
-  sellStack: (item: Item) => void;
+  sellStack: (items: Item[]) => void;
 };
 
 type InventoryRenderProps =
@@ -170,33 +167,31 @@ export default function InventoryRender({
   }
 
   interface ItemRenderProps {
-    item: Item;
-    count: number;
+    item: Item[];
   }
 
   const blockSize = Math.min(dimensions.lesser / 7.5, 84);
 
-  const ItemRender = ({ item, count }: ItemRenderProps) => {
+  const ItemRender = ({ item }: ItemRenderProps) => {
     const [buzzed, setBuzzed] = useState(false);
     const ref = useRef<View>(null);
 
     const handlePress = () => {
       vibration({ style: "light" });
-      if (displayItem && displayItem.item.equals(item)) {
+      if (displayItem && displayItem.item[0].equals(item[0])) {
         setDisplayItem(null);
       } else {
         if ("shop" in props) {
           ref.current?.measureInWindow((x, y) => {
             setDisplayItem({
               item,
-              count,
               side: "inventory",
               positon: { left: x, top: y },
             });
           });
         } else {
           ref.current?.measureInWindow((x, y) => {
-            setDisplayItem({ item, count, positon: { left: x, top: y } });
+            setDisplayItem({ item, positon: { left: x, top: y } });
           });
         }
       }
@@ -206,7 +201,7 @@ export default function InventoryRender({
       <Draggable
         onDragRelease={(_, g) => {
           checkReleasePosition({
-            item: item,
+            item: item[0],
             xPos: g.moveX,
             yPos: g.moveY,
             size: blockSize,
@@ -220,7 +215,7 @@ export default function InventoryRender({
             setBuzzed(true);
           }
         }}
-        disabled={!item.isEquippable}
+        disabled={!item[0].isEquippable}
         shouldReverse
       >
         <Pressable
@@ -235,10 +230,10 @@ export default function InventoryRender({
               width: blockSize,
             }}
           >
-            <Image source={item.getItemIcon()} />
-            {item.stackable && count > 1 && (
+            <Image source={item[0].getItemIcon()} />
+            {item[0].stackable && item.length > 1 && (
               <ThemedView className="absolute bottom-0 right-0 bg-opacity-50 rounded px-1">
-                <Text>{count}</Text>
+                <Text>{item.length}</Text>
               </ThemedView>
             )}
           </View>
@@ -299,7 +294,7 @@ export default function InventoryRender({
             }
             key={index}
           >
-            <ItemRender item={item.item} count={item.count} />
+            <ItemRender item={item.item} />
           </View>
         ))}
       </View>

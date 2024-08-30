@@ -14,8 +14,7 @@ interface EquipmentDisplayProps {
   offHandTarget: RefObject<View>;
   inventoryTarget: RefObject<View>;
   displayItem: {
-    item: Item;
-    count: number;
+    item: Item[];
     positon: {
       left: number;
       top: number;
@@ -23,8 +22,7 @@ interface EquipmentDisplayProps {
   } | null;
   setDisplayItem: React.Dispatch<
     React.SetStateAction<{
-      item: Item;
-      count: number;
+      item: Item[];
       positon: {
         left: number;
         top: number;
@@ -170,13 +168,12 @@ export default function EquipmentDisplay({
                 <Pressable
                   onPress={() => {
                     vibration({ style: "light" });
-                    if (displayItem && displayItem.item.equals(item!)) {
+                    if (displayItem && displayItem.item[0].equals(item!)) {
                       setDisplayItem(null);
                     } else {
                       ref.current?.measureInWindow((x, y) => {
                         setDisplayItem({
-                          item: item!,
-                          count: 1,
+                          item: [item!],
                           positon: { left: x, top: y },
                         });
                       });

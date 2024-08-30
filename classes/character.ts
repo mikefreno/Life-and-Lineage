@@ -955,21 +955,21 @@ export class PlayerCharacter extends Character {
   }
 
   public getInventory() {
-    const condensedInventory: { item: Item; count: number }[] = [];
+    const condensedInventory: { item: Item[] }[] = [];
     this.inventory.forEach((item) => {
       if (item.stackable) {
         let found = false;
         condensedInventory.forEach((entry) => {
-          if (entry.item.name == item.name) {
+          if (entry.item[0].name == item.name) {
             found = true;
-            entry.count += 1;
+            entry.item.push(item);
           }
         });
         if (!found) {
-          condensedInventory.push({ item: item, count: 1 });
+          condensedInventory.push({ item: [item] });
         }
       } else {
-        condensedInventory.push({ item: item, count: 1 });
+        condensedInventory.push({ item: [item] });
       }
     });
     return condensedInventory;

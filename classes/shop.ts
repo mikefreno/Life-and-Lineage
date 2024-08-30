@@ -102,6 +102,27 @@ export class Shop {
     }
   }
 
+  public getInventory() {
+    const condensedInventory: { item: Item[] }[] = [];
+    this.inventory.forEach((item) => {
+      if (item.stackable) {
+        let found = false;
+        condensedInventory.forEach((entry) => {
+          if (entry.item[0].name == item.name) {
+            found = true;
+            entry.item.push(item);
+          }
+        });
+        if (!found) {
+          condensedInventory.push({ item: [item] });
+        }
+      } else {
+        condensedInventory.push({ item: [item] });
+      }
+    });
+    return condensedInventory;
+  }
+
   static fromJSON(json: any): Shop {
     return new Shop({
       shopKeeper: Character.fromJSON(json.shopKeeper),
