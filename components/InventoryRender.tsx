@@ -39,8 +39,6 @@ type InventoryRenderHome = InventoryRenderBase & {
       };
     } | null>
   >;
-  draggingFromInventory: React.MutableRefObject<boolean>;
-  setDraggingFromInventory: (value: boolean) => void;
 };
 
 type InventoryRenderDungeon = InventoryRenderBase & {
@@ -217,18 +215,9 @@ export default function InventoryRender({
             equipped: false,
           });
           setBuzzed(false);
-          if ("setDraggingFromInventory" in props) {
-            props.setDraggingFromInventory(false);
-          }
         }}
         onDrag={() => {
           if (!buzzed) {
-            if (
-              "draggingFromInventory" in props &&
-              !props.draggingFromInventory
-            ) {
-              props.setDraggingFromInventory(true);
-            }
             vibration({ style: "medium", essential: true });
             setBuzzed(true);
           }
@@ -242,13 +231,13 @@ export default function InventoryRender({
           className="active:scale-90 active:opacity-50 z-top"
         >
           <View
-            className="items-center rounded-lg bg-zinc-400 z-top"
+            className="items-center justify-center rounded-lg bg-zinc-400 z-top"
             style={{
               height: blockSize,
               width: blockSize,
             }}
           >
-            <Image className="my-auto z-top" source={item.getItemIcon()} />
+            <Image source={item.getItemIcon()} />
             {item.stackable && count > 1 && (
               <ThemedView className="absolute bottom-0 right-0 bg-opacity-50 rounded px-1">
                 <Text>{count}</Text>
@@ -291,7 +280,7 @@ export default function InventoryRender({
             key={"bg-" + index}
           >
             <View
-              className="rounded-lg bg-zinc-200 dark:bg-zinc-700 z-0"
+              className="rounded-lg border-zinc-200 dark:border-zinc-700 border z-0"
               style={{ height: blockSize, width: blockSize }}
             />
           </View>

@@ -138,7 +138,7 @@ const Root = observer(() => {
 
   while (loading) {
     return (
-      <ThemedView>
+      <ThemedView className="flex-1 items-center justify-center">
         <D20DieAnimation keepRolling={loading} />
       </ThemedView>
     );
@@ -278,7 +278,11 @@ const RootLayout = observer(() => {
     }
   }
   while (!fontLoaded) {
-    return <D20DieAnimation keepRolling={!fontLoaded} />;
+    return (
+      <ThemedView className="flex-1 items-center justify-center">
+        <D20DieAnimation keepRolling={!fontLoaded} />
+      </ThemedView>
+    );
   }
 
   return (

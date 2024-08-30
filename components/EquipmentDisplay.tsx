@@ -13,10 +13,7 @@ interface EquipmentDisplayProps {
   mainHandTarget: RefObject<View>;
   offHandTarget: RefObject<View>;
   inventoryTarget: RefObject<View>;
-  inventory: {
-    item: Item;
-    count: number;
-  }[];
+
   displayItem: {
     item: Item;
     positon: {
@@ -33,7 +30,6 @@ interface EquipmentDisplayProps {
       };
     } | null>
   >;
-  draggingFromInventory: React.MutableRefObject<boolean>;
 }
 
 export default function EquipmentDisplay({
@@ -44,7 +40,6 @@ export default function EquipmentDisplay({
   inventoryTarget,
   displayItem,
   setDisplayItem,
-  draggingFromInventory,
 }: EquipmentDisplayProps) {
   const vibration = useVibration();
   const appData = useContext(AppContext);
@@ -119,13 +114,11 @@ export default function EquipmentDisplay({
     const [buzzed, setBuzzed] = useState<boolean>(false);
     let ref: RefObject<View>;
     let item: Item | null = null;
-    let backdropString = "";
     if (playerState) {
       switch (slot) {
         case "Head":
           ref = headTarget;
           item = playerState.equipment.head;
-          backdropString = "ml-0 mt-7";
           break;
         case "Main-Hand":
           ref = mainHandTarget;
@@ -133,28 +126,25 @@ export default function EquipmentDisplay({
             playerState.equipment.mainHand.name !== "unarmored"
               ? playerState.equipment.mainHand
               : null;
-          backdropString = "ml-0 mt-7";
           break;
         case "Off-Hand":
           ref = offHandTarget;
           item = playerState.equipment.offHand;
-          backdropString = "ml-0 mt-7";
           break;
         case "Body":
           ref = bodyTarget;
           item = playerState.equipment.body;
-          backdropString = "ml-0 mt-7";
           break;
       }
 
       const isTwoHanded = playerState.equipment.mainHand?.slot === "two-hand";
 
       return (
-        <View>
+        <>
           <Text className="mb-1 text-center">{slot}</Text>
           {item ? (
             <View
-              className="z-50 mx-auto bg-zinc-400 rounded-lg"
+              className="z-50 mx-auto border border-zinc-400 rounded-lg"
               style={{ height: blockSize, width: blockSize }}
             >
               <Draggable
@@ -190,10 +180,10 @@ export default function EquipmentDisplay({
                       });
                     }
                   }}
-                  className="active:scale-90 active:opacity-50 z-top"
+                  className="active:scale-90 active:opacity-50"
                 >
                   <View
-                    className="items-center rounded-lg bg-zinc-400 z-top"
+                    className="items-center rounded-lg bg-zinc-400"
                     ref={ref}
                     style={{
                       height: blockSize,
@@ -210,7 +200,7 @@ export default function EquipmentDisplay({
             </View>
           ) : slot === "Off-Hand" && isTwoHanded ? (
             <View
-              className="mx-auto z-10 items-center rounded-lg bg-zinc-400"
+              className="mx-auto z-10 items-center rounded-lg border border-zinc-400 bg-zinc-400"
               style={{ height: blockSize, width: blockSize }}
             >
               <Image
@@ -221,29 +211,25 @@ export default function EquipmentDisplay({
           ) : (
             <View
               ref={ref}
-              className="mx-auto z-0 rounded-lg bg-zinc-400"
+              className="mx-auto rounded-lg border border-zinc-400"
               style={{
                 height: blockSize,
                 width: blockSize,
               }}
             />
           )}
-        </View>
+        </>
       );
     }
-    return null;
   };
 
   return (
-    <View
-      className="pb-2 -mt-2"
-      style={{ zIndex: draggingFromInventory ? 0 : 10 }}
-    >
+    <View className="pb-2 -mt-2 z-10">
       <View className="items-center ">
         <EquipmentSlot slot={"Head"} />
       </View>
       <View className="flex flex-row justify-evenly">
-        <View className="-ml-1 -mt-4 mr-2">
+        <View className="-ml-2 -mt-4 mr-2">
           <EquipmentSlot slot={"Main-Hand"} />
         </View>
         <View className="-mt-4">

@@ -9,7 +9,6 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { calculateAge } from "../../utility/functions/misc/age";
 import InventoryRender from "../../components/InventoryRender";
-import EquipmentDisplay from "../../components/EquipmentDisplay";
 import { AppContext } from "../_layout";
 import {
   NecromancerSkull,
@@ -19,6 +18,7 @@ import {
 import BlessingDisplay from "../../components/BlessingsDisplay";
 import { Item } from "../../classes/item";
 import { StatsDisplay } from "../../components/StatsDisplay";
+import EquipmentDisplay from "../../components/EquipmentDisplay";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -30,11 +30,6 @@ const HomeScreen = observer(() => {
   const mainHandTarget = useRef<View>(null);
   const offHandTarget = useRef<View>(null);
   const inventoryTarget = useRef<View>(null);
-  const draggingFromInventory = useRef(false);
-
-  const setDraggingFromInventory = (value: boolean) => {
-    draggingFromInventory.current = value;
-  };
 
   const [displayItem, setDisplayItem] = useState<{
     item: Item;
@@ -155,10 +150,8 @@ const HomeScreen = observer(() => {
               mainHandTarget={mainHandTarget}
               offHandTarget={offHandTarget}
               inventoryTarget={inventoryTarget}
-              inventory={playerState.getInventory()}
               displayItem={displayItem}
               setDisplayItem={setDisplayItem}
-              draggingFromInventory={draggingFromInventory}
             />
             <InventoryRender
               selfRef={inventoryTarget}
@@ -169,8 +162,6 @@ const HomeScreen = observer(() => {
               inventory={playerState.getInventory()}
               displayItem={displayItem}
               setDisplayItem={setDisplayItem}
-              draggingFromInventory={draggingFromInventory}
-              setDraggingFromInventory={setDraggingFromInventory}
             />
           </View>
           {displayItem && (
