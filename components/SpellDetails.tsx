@@ -1,28 +1,31 @@
 import { View } from "react-native";
 import { toTitleCase } from "../utility/functions/misc/words";
 import { Text } from "./Themed";
-import blessingDisplay from "./BlessingsDisplay";
 import { useColorScheme } from "nativewind";
 import { elementalColorMap } from "../utility/elementColors";
 import { Spell } from "../utility/types";
-import { Dimensions } from "react-native";
 import {
   ClockIcon,
   Energy,
   HealthIcon,
   NecromancerSkull,
 } from "../assets/icons/SVGIcons";
+import BlessingDisplay from "./BlessingsDisplay";
+import { useContext } from "react";
+import { AppContext } from "../app/_layout";
 
 interface SpellDetailsProps {
   spell: Spell;
 }
 
 export default function SpellDetails({ spell }: SpellDetailsProps) {
-  const windowWidth = Dimensions.get("window").width;
   const { colorScheme } = useColorScheme();
+  const appData = useContext(AppContext);
+  if (!appData) throw new Error("missing context");
+  const { dimensions } = appData;
   return (
     <View
-      className="mx-auto w-4/5 rounded-lg"
+      className="rounded-lg"
       style={{
         shadowColor:
           elementalColorMap[
@@ -47,7 +50,7 @@ export default function SpellDetails({ spell }: SpellDetailsProps) {
         backgroundColor: colorScheme == "light" ? "#fafafa" : "#27272a",
         shadowOpacity: 0.25,
         shadowRadius: 5,
-        maxWidth: windowWidth * 0.9,
+        width: dimensions.width * 0.75,
       }}
     >
       <View
@@ -72,14 +75,14 @@ export default function SpellDetails({ spell }: SpellDetailsProps) {
               : "",
         }}
       >
-        <View className="my-auto">
+        <View className="my-auto w-1/4">
           <Text className="text-center">{toTitleCase(spell.name)}</Text>
           <View className="flex flex-row items-center justify-center">
             <Text>{spell.manaCost}</Text>
             <Energy width={14} height={14} style={{ marginLeft: 6 }} />
           </View>
         </View>
-        <View className="my-auto items-center w-1/2">
+        <View className="my-auto items-center w-2/5">
           {spell.duration ? (
             <View className="flex flex-row items-center">
               <Text>{spell.duration}</Text>
@@ -145,7 +148,11 @@ export default function SpellDetails({ spell }: SpellDetailsProps) {
             : null}
         </View>
         <View className="my-auto">
-          {blessingDisplay(spell.element, colorScheme, 40)}
+          <BlessingDisplay
+            blessing={spell.element}
+            colorScheme={colorScheme}
+            size={dimensions.width * 0.15}
+          />
         </View>
       </View>
     </View>

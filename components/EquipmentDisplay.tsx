@@ -140,7 +140,7 @@ export default function EquipmentDisplay({
       const isTwoHanded = playerState.equipment.mainHand?.slot === "two-hand";
 
       return (
-        <>
+        <View>
           <Text className="mb-1 text-center">{slot}</Text>
           {item ? (
             <View
@@ -218,7 +218,7 @@ export default function EquipmentDisplay({
               }}
             />
           )}
-        </>
+        </View>
       );
     }
   };

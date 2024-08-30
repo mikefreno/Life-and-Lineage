@@ -7,7 +7,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { Text, ScrollView } from "../../components/Themed";
+import { Text } from "../../components/Themed";
 import { useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import GenericRaisedButton from "../../components/GenericRaisedButton";

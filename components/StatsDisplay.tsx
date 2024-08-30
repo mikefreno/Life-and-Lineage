@@ -54,13 +54,12 @@ export function StatsDisplay({
   leftOffset,
   ...props
 }: StatsDisplayProps) {
-  const deviceWidth = Dimensions.get("window").width;
   const { colorScheme } = useColorScheme();
   const vibration = useVibration();
 
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing contexts");
-  const { playerState } = appData;
+  const { playerState, dimensions } = appData;
 
   const SaleSection = () => {
     if (playerState) {
@@ -177,7 +176,7 @@ export function StatsDisplay({
 
   return (
     <ThemedView
-      className="absolute items-center rounded-md border border-zinc-600 py-4"
+      className="items-center rounded-md border border-zinc-600 p-4"
       style={
         item.itemClass == "book"
           ? {
@@ -196,15 +195,14 @@ export function StatsDisplay({
                     ("shop" in props ? 200 : 100),
             }
           : {
-              width: deviceWidth / 3 - 2,
               backgroundColor:
                 colorScheme == "light"
                   ? "rgba(250, 250, 250, 0.98)"
                   : "rgba(20, 20, 20, 0.95)",
               left: statsLeftPos
-                ? statsLeftPos < deviceWidth * 0.6 + (leftOffset ?? 0)
+                ? statsLeftPos < dimensions.width * 0.6 + (leftOffset ?? 0)
                   ? statsLeftPos + 50 + (leftOffset ?? 0)
-                  : statsLeftPos - deviceWidth / 3 + (leftOffset ?? 0)
+                  : statsLeftPos - dimensions.width / 3 + (leftOffset ?? 0)
                 : undefined,
               top:
                 topGuard && statsTopPos + (topOffset ?? 0) < topGuard
@@ -241,7 +239,7 @@ export function StatsDisplay({
       </Text>
       {item.itemClass == "book" && playerState ? (
         <>
-          <View className="px-2">
+          <View className="px-2 mx-auto">
             <SpellDetails
               spell={item.getAttachedSpell(playerState.playerClass)}
             />

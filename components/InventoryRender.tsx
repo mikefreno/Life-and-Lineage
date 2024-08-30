@@ -280,7 +280,7 @@ export default function InventoryRender({
             key={"bg-" + index}
           >
             <View
-              className="rounded-lg border-zinc-200 dark:border-zinc-700 border z-0"
+              className="rounded-lg border-zinc-300 dark:border-zinc-700 border z-0"
               style={{ height: blockSize, width: blockSize }}
             />
           </View>
@@ -293,12 +293,10 @@ export default function InventoryRender({
                 ? {
                     left: `${(index % 12) * 8.33 + 0.5}%`,
                     top: `${Math.floor(index / 12) * 48 + blockSize / 10}%`,
-                    zIndex: 100,
                   }
                 : {
                     left: `${(index % 6) * 16.67 + 1.2}%`,
                     top: `${Math.floor(index / 6) * 24 + blockSize / 12}%`,
-                    zIndex: 100,
                   }
             }
             key={index}

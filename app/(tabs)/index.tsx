@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { TouchableWithoutFeedback, View } from "react-native";
 import { Text, View as ThemedView } from "../../components/Themed";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useColorScheme } from "nativewind";
@@ -82,88 +82,104 @@ const HomeScreen = observer(() => {
             paddingBottom: tabBarHeight + (isCompact ? 0 : 28),
           }}
         >
-          <View className="p-1 md:py-4">
-            <View className="flex-row">
-              {playerState?.playerClass == "necromancer" ? (
+          <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
+            <View className="p-1 md:py-4">
+              <View className="flex-row">
+                {playerState?.playerClass == "necromancer" ? (
+                  <View className="mx-auto">
+                    <NecromancerSkull
+                      width={
+                        dimensions.height / 9 > 100
+                          ? 100
+                          : dimensions.height / 10
+                      }
+                      height={
+                        dimensions.height / 9 > 100
+                          ? 100
+                          : dimensions.height / 10
+                      }
+                      color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
+                    />
+                  </View>
+                ) : playerState?.playerClass == "paladin" ? (
+                  <View className="mx-auto">
+                    <PaladinHammer
+                      width={
+                        dimensions.height / 9 > 100
+                          ? 100
+                          : dimensions.height / 10
+                      }
+                      height={
+                        dimensions.height / 9 > 100
+                          ? 100
+                          : dimensions.height / 10
+                      }
+                    />
+                  </View>
+                ) : (
+                  <View className="mx-auto scale-x-[-1] transform">
+                    <WizardHat
+                      width={
+                        dimensions.height / 9 > 100
+                          ? 100
+                          : dimensions.height / 10
+                      }
+                      height={
+                        dimensions.height / 9 > 100
+                          ? 100
+                          : dimensions.height / 10
+                      }
+                      color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
+                    />
+                  </View>
+                )}
+                <View>
+                  <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
+                  <Text className="text-center text-xl dark:text-white">{`${playerState.job}`}</Text>
+                  <Text className="text-center text-xl dark:text-white">{`${
+                    playerState
+                      ? calculateAge(
+                          new Date(playerState.birthdate),
+                          new Date(gameState.date),
+                        )
+                      : "x"
+                  } years old`}</Text>
+                </View>
                 <View className="mx-auto">
-                  <NecromancerSkull
-                    width={
-                      dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
-                    }
-                    height={
-                      dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
-                    }
-                    color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
-                  />
-                </View>
-              ) : playerState?.playerClass == "paladin" ? (
-                <View className="mx-auto">
-                  <PaladinHammer
-                    width={
-                      dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
-                    }
-                    height={
+                  <BlessingDisplay
+                    blessing={playerState.blessing}
+                    colorScheme={colorScheme}
+                    size={
                       dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
                     }
                   />
                 </View>
-              ) : (
-                <View className="mx-auto scale-x-[-1] transform">
-                  <WizardHat
-                    width={
-                      dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
-                    }
-                    height={
-                      dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
-                    }
-                    color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
-                  />
-                </View>
-              )}
-              <View>
-                <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
-                <Text className="text-center text-xl dark:text-white">{`${playerState.job}`}</Text>
-                <Text className="text-center text-xl dark:text-white">{`${
-                  playerState
-                    ? calculateAge(
-                        new Date(playerState.birthdate),
-                        new Date(gameState.date),
-                      )
-                    : "x"
-                } years old`}</Text>
-              </View>
-              <View className="mx-auto">
-                <BlessingDisplay
-                  blessing={playerState.blessing}
-                  colorScheme={colorScheme}
-                  size={
-                    dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
-                  }
-                />
               </View>
             </View>
-          </View>
-          <View className="flex-1 justify-evenly relative z-10">
-            <EquipmentDisplay
-              headTarget={headTarget}
-              bodyTarget={bodyTarget}
-              mainHandTarget={mainHandTarget}
-              offHandTarget={offHandTarget}
-              inventoryTarget={inventoryTarget}
-              displayItem={displayItem}
-              setDisplayItem={setDisplayItem}
-            />
-            <InventoryRender
-              selfRef={inventoryTarget}
-              headTarget={headTarget}
-              bodyTarget={bodyTarget}
-              mainHandTarget={mainHandTarget}
-              offHandTarget={offHandTarget}
-              inventory={playerState.getInventory()}
-              displayItem={displayItem}
-              setDisplayItem={setDisplayItem}
-            />
-          </View>
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
+            <View className="flex-1 justify-evenly relative z-10">
+              <EquipmentDisplay
+                headTarget={headTarget}
+                bodyTarget={bodyTarget}
+                mainHandTarget={mainHandTarget}
+                offHandTarget={offHandTarget}
+                inventoryTarget={inventoryTarget}
+                displayItem={displayItem}
+                setDisplayItem={setDisplayItem}
+              />
+              <InventoryRender
+                selfRef={inventoryTarget}
+                headTarget={headTarget}
+                bodyTarget={bodyTarget}
+                mainHandTarget={mainHandTarget}
+                offHandTarget={offHandTarget}
+                inventory={playerState.getInventory()}
+                displayItem={displayItem}
+                setDisplayItem={setDisplayItem}
+              />
+            </View>
+          </TouchableWithoutFeedback>
           {displayItem && (
             <View className="absolute z-10">
               <StatsDisplay
