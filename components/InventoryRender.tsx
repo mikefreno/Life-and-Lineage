@@ -1,10 +1,9 @@
 import React, { useContext, useRef, useState } from "react";
 import type { RefObject } from "react";
 import { Item } from "../classes/item";
-import { Dimensions, Pressable, View, Image, Platform } from "react-native";
+import { Pressable, View, Image } from "react-native";
 import Draggable from "react-native-draggable";
 import { useVibration } from "../utility/customHooks";
-import { StatsDisplay } from "./StatsDisplay";
 import { checkReleasePositionProps } from "../utility/types";
 import { Shop } from "../classes/shop";
 import { Text, View as ThemedView } from "./Themed";
@@ -16,15 +15,9 @@ type InventoryRenderBase = {
     item: Item;
     count: number;
   }[];
-};
-
-type InventoryRenderHome = InventoryRenderBase & {
-  headTarget: RefObject<View>;
-  bodyTarget: RefObject<View>;
-  mainHandTarget: RefObject<View>;
-  offHandTarget: RefObject<View>;
   displayItem: {
     item: Item;
+    count: number;
     positon: {
       left: number;
       top: number;
@@ -33,12 +26,20 @@ type InventoryRenderHome = InventoryRenderBase & {
   setDisplayItem: React.Dispatch<
     React.SetStateAction<{
       item: Item;
+      count: number;
       positon: {
         left: number;
         top: number;
       };
     } | null>
   >;
+};
+
+type InventoryRenderHome = InventoryRenderBase & {
+  headTarget: RefObject<View>;
+  bodyTarget: RefObject<View>;
+  mainHandTarget: RefObject<View>;
+  offHandTarget: RefObject<View>;
 };
 
 type InventoryRenderDungeon = InventoryRenderBase & {
@@ -61,15 +62,11 @@ type InventoryRenderProps =
 export default function InventoryRender({
   selfRef,
   inventory,
+  displayItem,
+  setDisplayItem,
   ...props
 }: InventoryRenderProps) {
-  const deviceHeight = Dimensions.get("window").height;
   const vibration = useVibration();
-  const [statsPos, setStatsPos] = useState<{ left: number; top: number }>();
-  const [showingStats, setShowingStats] = useState<{
-    item: Item;
-    count: number;
-  } | null>(null);
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing contexts");
   const { playerState, dimensions } = appData;
@@ -113,7 +110,7 @@ export default function InventoryRender({
                   yPos + size / 2 >= targetY &&
                   yPos - size / 2 <= targetY + targetHeight;
                 if (isWidthAligned && isHeightAligned) {
-                  setShowingStats(null);
+                  setDisplayItem(null);
                   vibration({ style: "light", essential: true });
                   if (
                     equipped &&
@@ -140,7 +137,7 @@ export default function InventoryRender({
               yPos + size / 2 >= targetY &&
               yPos - size / 2 <= targetY + targetHeight;
             if (isWidthAligned && isHeightAligned) {
-              setShowingStats(null);
+              setDisplayItem(null);
               vibration({ style: "light", essential: true });
               playerState?.removeFromInventory(item);
               addItemToPouch(item);
@@ -158,7 +155,7 @@ export default function InventoryRender({
               yPos + size / 2 >= targetY &&
               yPos - size / 2 <= targetY + targetHeight;
             if (isWidthAligned && isHeightAligned) {
-              setShowingStats(null);
+              setDisplayItem(null);
               vibration({ style: "light", essential: true });
               const price = item.getSellPrice(shop.shopKeeper.affection);
               playerState?.sellItem(item, price);
@@ -183,24 +180,12 @@ export default function InventoryRender({
 
     const handlePress = () => {
       vibration({ style: "light" });
-      if ("displayItem" in props) {
-        const { displayItem, setDisplayItem } = props;
-        if (displayItem && displayItem.item.equals(item)) {
-          setDisplayItem(null);
-        } else {
-          ref.current?.measureInWindow((x, y) => {
-            setDisplayItem({ item, positon: { left: x, top: y } });
-          });
-        }
+      if (displayItem && displayItem.item.equals(item)) {
+        setDisplayItem(null);
       } else {
-        if (showingStats && showingStats.item.equals(item)) {
-          setShowingStats(null);
-        } else {
-          setShowingStats({ item, count });
-          ref.current?.measureInWindow((x, y) => {
-            setStatsPos({ left: x, top: y });
-          });
-        }
+        ref.current?.measureInWindow((x, y) => {
+          setDisplayItem({ item, count, positon: { left: x, top: y } });
+        });
       }
     };
 
@@ -305,41 +290,6 @@ export default function InventoryRender({
           </View>
         ))}
       </View>
-      {showingStats &&
-        statsPos &&
-        playerState &&
-        ("addItemToPouch" in props ? (
-          <StatsDisplay
-            statsLeftPos={statsPos.left}
-            statsTopPos={statsPos.top}
-            item={showingStats.item}
-            count={showingStats.count}
-            clearItem={() => setShowingStats(null)}
-            addItemToPouch={props.addItemToPouch}
-            topOffset={
-              Platform.OS == "ios"
-                ? -(50 + deviceHeight / 2.2)
-                : -(80 + deviceHeight / 10)
-            }
-          />
-        ) : "shopInventoryTarget" in props ? (
-          <StatsDisplay
-            statsLeftPos={statsPos.left}
-            statsTopPos={statsPos.top}
-            item={showingStats.item}
-            count={showingStats.count}
-            clearItem={() => setShowingStats(null)}
-            shop={props.shop}
-            topOffset={
-              Platform.OS == "ios"
-                ? -(40 + deviceHeight / 2.2)
-                : -(40 + deviceHeight / 2.3)
-            }
-            leftOffset={-4}
-            sellItem={props.sellItem}
-            sellStack={props.sellStack}
-          />
-        ) : null)}
     </>
   );
 }

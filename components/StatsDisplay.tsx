@@ -1,4 +1,4 @@
-import { Dimensions, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { View as ThemedView, Text } from "./Themed";
 import GearStatsDisplay from "./GearStatsDisplay";
 import { useColorScheme } from "nativewind";
@@ -16,11 +16,15 @@ import { AppContext } from "../app/_layout";
 import { Coins } from "../assets/icons/SVGIcons";
 
 type BaseProps = {
-  statsLeftPos: number;
-  statsTopPos: number;
-  item: Item;
+  displayItem: {
+    item: Item;
+    count: number;
+    positon: {
+      left: number;
+      top: number;
+    };
+  };
   clearItem: () => void;
-  count?: number;
   topGuard?: number;
   topOffset?: number;
   leftOffset?: number;
@@ -44,10 +48,7 @@ type ShopKeeperProps = BaseProps & {
 type StatsDisplayProps = BaseProps | DungeonProps | ShopProps | ShopKeeperProps;
 
 export function StatsDisplay({
-  statsLeftPos,
-  statsTopPos,
-  item,
-  count,
+  displayItem,
   clearItem,
   topOffset,
   topGuard,
@@ -65,23 +66,26 @@ export function StatsDisplay({
     if (playerState) {
       if ("sellItem" in props) {
         const { shop, sellItem, sellStack } = props;
-        const itemPrice = item.getSellPrice(shop.shopKeeper.affection);
+        const itemPrice = displayItem.item.getSellPrice(
+          shop.shopKeeper.affection,
+        );
         const isDisabled = shop.currentGold < itemPrice;
         return (
           <>
             <View className="flex flex-row py-1">
               <Text>
                 {asReadableGold(
-                  item.getSellPrice(shop.shopKeeper.affection) * (count ?? 1),
+                  displayItem.item.getSellPrice(shop.shopKeeper.affection) *
+                    (displayItem.count ?? 1),
                 )}
               </Text>
               <Coins width={16} height={16} style={{ marginLeft: 6 }} />
             </View>
-            {count && count > 1 ? (
+            {displayItem.count && displayItem.count > 1 ? (
               <>
                 <GenericFlatButton
                   onPressFunction={() => {
-                    sellItem(item), clearItem();
+                    sellItem(displayItem.item), clearItem();
                   }}
                   disabledCondition={isDisabled}
                 >
@@ -95,7 +99,7 @@ export function StatsDisplay({
                 </GenericFlatButton>
                 <GenericFlatButton
                   onPressFunction={() => {
-                    sellStack(item);
+                    sellStack(displayItem.item);
                     clearItem();
                   }}
                   disabledCondition={isDisabled}
@@ -113,7 +117,7 @@ export function StatsDisplay({
             ) : (
               <GenericFlatButton
                 onPressFunction={() => {
-                  props.sellItem(item);
+                  props.sellItem(displayItem.item);
                   clearItem();
                 }}
                 disabledCondition={isDisabled}
@@ -131,14 +135,17 @@ export function StatsDisplay({
         );
       } else if ("purchaseItem" in props) {
         const { shop, purchaseItem } = props;
-        const itemPrice = item.getBuyPrice(shop.shopKeeper.affection);
+        const itemPrice = displayItem.item.getBuyPrice(
+          shop.shopKeeper.affection,
+        );
         const isDisabled = playerState.gold < itemPrice;
         return (
           <>
             <View className="flex flex-row py-1">
               <Text>
                 {asReadableGold(
-                  item.getBuyPrice(shop.shopKeeper.affection) * (count ?? 1),
+                  displayItem.item.getBuyPrice(shop.shopKeeper.affection) *
+                    (displayItem.count ?? 1),
                 )}
               </Text>
               <Coins width={16} height={16} style={{ marginLeft: 6 }} />
@@ -159,7 +166,13 @@ export function StatsDisplay({
         );
       } else if ("addItemToPouch" in props) {
         return (
-          <GenericFlatButton onPressFunction={() => props.addItemToPouch(item)}>
+          <GenericFlatButton
+            onPressFunction={() => {
+              props.addItemToPouch(displayItem.item);
+              clearItem();
+              playerState?.removeFromInventory(displayItem.item);
+            }}
+          >
             Drop
           </GenericFlatButton>
         );
@@ -169,7 +182,9 @@ export function StatsDisplay({
 
   function bookItemLabel() {
     if (playerState) {
-      const spellRes = item.getAttachedSpell(playerState.playerClass);
+      const spellRes = displayItem.item.getAttachedSpell(
+        playerState.playerClass,
+      );
       return `${convertMasteryToString[spellRes.proficiencyNeeded]} level book`;
     }
   }
@@ -178,7 +193,7 @@ export function StatsDisplay({
     <ThemedView
       className="items-center rounded-md border border-zinc-600 p-4"
       style={
-        item.itemClass == "book"
+        displayItem.item.itemClass == "book"
           ? {
               backgroundColor:
                 colorScheme == "light"
@@ -187,10 +202,12 @@ export function StatsDisplay({
               left: 20,
               top:
                 topGuard &&
-                statsTopPos + (topOffset ?? 0) - ("shop" in props ? 200 : 100) <
+                displayItem.positon.top +
+                  (topOffset ?? 0) -
+                  ("shop" in props ? 200 : 100) <
                   topGuard
                   ? topGuard
-                  : statsTopPos +
+                  : displayItem.positon.top +
                     (topOffset ?? 0) -
                     ("shop" in props ? 200 : 100),
             }
@@ -199,15 +216,19 @@ export function StatsDisplay({
                 colorScheme == "light"
                   ? "rgba(250, 250, 250, 0.98)"
                   : "rgba(20, 20, 20, 0.95)",
-              left: statsLeftPos
-                ? statsLeftPos < dimensions.width * 0.6 + (leftOffset ?? 0)
-                  ? statsLeftPos + 50 + (leftOffset ?? 0)
-                  : statsLeftPos - dimensions.width / 3 + (leftOffset ?? 0)
+              left: displayItem.positon.left
+                ? displayItem.positon.left <
+                  dimensions.width * 0.6 + (leftOffset ?? 0)
+                  ? displayItem.positon.left + 50 + (leftOffset ?? 0)
+                  : displayItem.positon.left -
+                    dimensions.width / 3 +
+                    (leftOffset ?? 0)
                 : undefined,
               top:
-                topGuard && statsTopPos + (topOffset ?? 0) < topGuard
+                topGuard &&
+                displayItem.positon.top + (topOffset ?? 0) < topGuard
                   ? topGuard
-                  : statsTopPos + (topOffset ?? 0),
+                  : displayItem.positon.top + (topOffset ?? 0),
             }
       }
     >
@@ -218,30 +239,34 @@ export function StatsDisplay({
         <Text className="-mt-3 -ml-1 text-2xl">x</Text>
       </Pressable>
       <View>
-        <Text className="text-center">{toTitleCase(item.name)}</Text>
+        <Text className="text-center">
+          {toTitleCase(displayItem.item.name)}
+        </Text>
       </View>
-      {item.stats && item.slot ? (
+      {displayItem.item.stats && displayItem.item.slot ? (
         <View className="py-2">
-          <GearStatsDisplay stats={item.stats} />
+          <GearStatsDisplay stats={displayItem.item.stats} />
         </View>
       ) : null}
-      {(item.slot == "one-hand" ||
-        item.slot == "two-hand" ||
-        item.slot == "off-hand") && (
-        <Text className="text-sm italic">{toTitleCase(item.slot)}</Text>
+      {(displayItem.item.slot == "one-hand" ||
+        displayItem.item.slot == "two-hand" ||
+        displayItem.item.slot == "off-hand") && (
+        <Text className="text-sm italic">
+          {toTitleCase(displayItem.item.slot)}
+        </Text>
       )}
       <Text className="text-sm italic">
-        {item.itemClass == "bodyArmor"
+        {displayItem.item.itemClass == "bodyArmor"
           ? "Body Armor"
-          : item.itemClass == "book" && playerState
+          : displayItem.item.itemClass == "book" && playerState
           ? bookItemLabel()
-          : toTitleCase(item.itemClass)}
+          : toTitleCase(displayItem.item.itemClass)}
       </Text>
-      {item.itemClass == "book" && playerState ? (
+      {displayItem.item.itemClass == "book" && playerState ? (
         <>
           <View className="px-2 mx-auto">
             <SpellDetails
-              spell={item.getAttachedSpell(playerState.playerClass)}
+              spell={displayItem.item.getAttachedSpell(playerState.playerClass)}
             />
           </View>
           {!("purchaseItem" in props) && (

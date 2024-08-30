@@ -13,9 +13,9 @@ interface EquipmentDisplayProps {
   mainHandTarget: RefObject<View>;
   offHandTarget: RefObject<View>;
   inventoryTarget: RefObject<View>;
-
   displayItem: {
     item: Item;
+    count: number;
     positon: {
       left: number;
       top: number;
@@ -24,6 +24,7 @@ interface EquipmentDisplayProps {
   setDisplayItem: React.Dispatch<
     React.SetStateAction<{
       item: Item;
+      count: number;
       positon: {
         left: number;
         top: number;

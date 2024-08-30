@@ -1,5 +1,11 @@
 import { View as ThemedView, Text, ScrollView } from "../Themed";
-import { Pressable, FlatList, View, Platform } from "react-native";
+import {
+  Pressable,
+  FlatList,
+  View,
+  Platform,
+  TouchableWithoutFeedback,
+} from "react-native";
 import attacks from "../../assets/json/playerAttacks.json";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { useContext, useEffect, useState } from "react";
@@ -46,6 +52,8 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
     attackAnimationOnGoing,
     setAttackAnimationOnGoing,
     setShowTargetSelection,
+    displayItem,
+    setDisplayItem,
   } = dungeonData;
 
   const playerAttacks = playerState?.physicalAttacks;
@@ -281,14 +289,20 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
           }
         case "equipment":
           return (
-            <PlatformDependantBlurView className="flex-1 px-2">
-              <InventoryRender
-                selfRef={null}
-                inventory={playerState.getInventory()}
-                pouchTarget={pouchRef}
-                addItemToPouch={(item) => addItemToPouch({ item, dungeonData })}
-              />
-            </PlatformDependantBlurView>
+            <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
+              <PlatformDependantBlurView className="flex-1 px-2">
+                <InventoryRender
+                  selfRef={null}
+                  displayItem={displayItem}
+                  setDisplayItem={setDisplayItem}
+                  inventory={playerState.getInventory()}
+                  pouchTarget={pouchRef}
+                  addItemToPouch={(item) =>
+                    addItemToPouch({ item, dungeonData })
+                  }
+                />
+              </PlatformDependantBlurView>
+            </TouchableWithoutFeedback>
           );
         case "log":
           return (
@@ -382,6 +396,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
           </View>
         )}
       </GenericModal>
+
       <TabRender />
     </>
   );

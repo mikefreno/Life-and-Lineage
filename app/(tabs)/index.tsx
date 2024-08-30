@@ -33,6 +33,7 @@ const HomeScreen = observer(() => {
 
   const [displayItem, setDisplayItem] = useState<{
     item: Item;
+    count: number;
     positon: { left: number; top: number };
   } | null>(null);
 

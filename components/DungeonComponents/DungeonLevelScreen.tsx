@@ -23,9 +23,10 @@ import { throttle } from "lodash";
 import { AppContext } from "../../app/_layout";
 import { DungeonContext } from "./DungeonContext";
 import { DungeonMapRender } from "./DungeonMap";
-import { playerMinionsTurn } from "./DungeonInteriorFunctions";
+import { addItemToPouch, playerMinionsTurn } from "./DungeonInteriorFunctions";
 import { SackIcon } from "../../assets/icons/SVGIcons";
 import D20DieAnimation from "../DieRollAnim";
+import { StatsDisplay } from "../StatsDisplay";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -46,6 +47,8 @@ const DungeonLevelScreen = observer(() => {
     showingFirstBossKillTutorial,
     showTargetSelection,
     setShowTargetSelection,
+    displayItem,
+    setDisplayItem,
   } = dungeonData;
 
   const [battleTab, setBattleTab] = useState<
@@ -224,6 +227,16 @@ const DungeonLevelScreen = observer(() => {
               ))}
             </ThemedView>
           ) : null}
+          {displayItem && (
+            <View className="absolute z-10">
+              <StatsDisplay
+                displayItem={displayItem}
+                clearItem={() => setDisplayItem(null)}
+                addItemToPouch={(item) => addItemToPouch({ item, dungeonData })}
+                topOffset={-96}
+              />
+            </View>
+          )}
         </ThemedView>
         <PlayerStatus positioning={"absolute"} classname="bottom-0" />
       </>

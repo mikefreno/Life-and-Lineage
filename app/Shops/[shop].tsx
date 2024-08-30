@@ -29,13 +29,11 @@ const ShopInteriorScreen = observer(() => {
   const vibration = useVibration();
   const colors = shopObjects.find((shopObj) => shopObj.type == shop)?.colors;
   const thisShop = gameState?.shops.find((aShop) => aShop.archetype == shop);
-  const [selectedItem, setSelectedItem] = useState<{
+  const [displayItem, setDisplayItem] = useState<{
     item: Item;
-    buying: boolean;
+    count: number;
+    positon: { left: number; top: number };
   } | null>(null);
-  let selectedItemRef = useRef<Item>();
-  const [statsLeftPos, setStatsLeftPos] = useState<number>();
-  const [statsTopPos, setStatsTopPos] = useState<number>();
   const [refreshCheck, setRefreshCheck] = useState<boolean>(false);
 
   const [inventoryFullNotifier, setInventoryFullNotifier] =
@@ -43,10 +41,6 @@ const ShopInteriorScreen = observer(() => {
 
   const inventoryTarget = useRef<View>(null);
   const shopInventoryTarget = useRef<View>(null);
-  const [showingStats, setShowingStats] = useState<{
-    item: Item;
-    count: number;
-  } | null>(null);
 
   const header = useHeaderHeight();
   const isFocused = useIsFocused();
@@ -93,12 +87,8 @@ const ShopInteriorScreen = observer(() => {
         thisShop.buyItem(item, price);
         playerState?.sellItem(item, price);
       });
-      if (
-        selectedItem?.item.itemClass == "junk" ||
-        selectedItemRef.current?.itemClass == "junk"
-      ) {
-        setSelectedItem(null);
-        selectedItemRef.current = undefined;
+      if (displayItem?.item.itemClass == "junk") {
+        setDisplayItem(null);
       }
     }
   }
@@ -114,16 +104,14 @@ const ShopInteriorScreen = observer(() => {
   };
 
   const purchaseItem = () => {
-    if (playerState && showingStats && thisShop) {
+    if (playerState && displayItem && thisShop) {
       vibration({ style: "light" });
-      const itemPrice = showingStats.item.getBuyPrice(
+      const itemPrice = displayItem.item.getBuyPrice(
         thisShop.shopKeeper.affection,
       );
-      console.log(showingStats.item);
-      console.log(itemPrice);
-      playerState.buyItem(showingStats.item, itemPrice);
-      thisShop.sellItem(showingStats.item, itemPrice);
-      setShowingStats(null);
+      playerState.buyItem(displayItem.item, itemPrice);
+      thisShop.sellItem(displayItem.item, itemPrice);
+      setDisplayItem(null);
     }
   };
 
@@ -146,13 +134,11 @@ const ShopInteriorScreen = observer(() => {
 
     const handlePress = () => {
       vibration({ style: "light" });
-      if (showingStats && showingStats.item.equals(item)) {
-        setShowingStats(null);
+      if (displayItem && displayItem.item.equals(item)) {
+        setDisplayItem(null);
       } else {
-        setShowingStats({ item, count });
         localRef.current?.measureInWindow((x, y) => {
-          setStatsLeftPos(x);
-          setStatsTopPos(y);
+          setDisplayItem({ item, count, positon: { left: x, top: y } });
         });
       }
     };
@@ -242,20 +228,6 @@ const ShopInteriorScreen = observer(() => {
               </ScrollView>
             </View>
           </ThemedView>
-          {showingStats && statsLeftPos && statsTopPos && (
-            <View className="absolute z-50">
-              <StatsDisplay
-                statsLeftPos={statsLeftPos}
-                statsTopPos={statsTopPos}
-                item={showingStats.item}
-                setShowingStats={setShowingStats}
-                topOffset={-60}
-                topGuard={header / 3}
-                shop={thisShop}
-                purchaseItem={purchaseItem}
-              />
-            </View>
-          )}
           <View className="flex-1 mx-2 mt-4">
             <ThemedView className="flex flex-row justify-center py-4 dark:border-zinc-700">
               <Text className=" text-center">
@@ -284,9 +256,24 @@ const ShopInteriorScreen = observer(() => {
               shop={thisShop}
               sellItem={sellItem}
               sellStack={sellStack}
+              displayItem={displayItem}
+              setDisplayItem={setDisplayItem}
             />
           </View>
         </ThemedView>
+        {displayItem && (
+          <View className="absolute z-10">
+            <StatsDisplay
+              statsLeftPos={displayItem.positon.left}
+              statsTopPos={displayItem.positon.top}
+              item={displayItem.item}
+              shop={thisShop}
+              purchaseItem={purchaseItem}
+              sellItem={sellItem}
+              clearItem={() => setDisplayItem(null)}
+            />
+          </View>
+        )}
       </ThemedView>
     );
   }

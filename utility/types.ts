@@ -318,6 +318,24 @@ export interface DungeonContextType {
       chosenAttack: AttackObj | SpellObj | null;
     }>
   >;
+  displayItem: {
+    item: Item;
+    count: number;
+    positon: {
+      left: number;
+      top: number;
+    };
+  } | null;
+  setDisplayItem: React.Dispatch<
+    React.SetStateAction<{
+      item: Item;
+      count: number;
+      positon: {
+        left: number;
+        top: number;
+      };
+    } | null>
+  >;
 }
 
 export interface AppContextType {

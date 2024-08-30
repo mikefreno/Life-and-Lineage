@@ -71,6 +71,12 @@ const DungeonProvider = observer(() => {
   const instanceName = slug[0];
   const level = slug[1];
 
+  const [displayItem, setDisplayItem] = useState<{
+    item: Item;
+    count: number;
+    positon: { left: number; top: number };
+  } | null>(null);
+
   useEffect(() => {
     if (
       (instanceName === "Activities" ||
@@ -229,6 +235,8 @@ const DungeonProvider = observer(() => {
           setShouldShowFirstBossKillTutorial,
           showTargetSelection,
           setShowTargetSelection,
+          displayItem,
+          setDisplayItem,
         }}
       >
         <DungeonLevelScreen />
