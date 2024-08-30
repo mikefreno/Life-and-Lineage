@@ -264,9 +264,7 @@ const ShopInteriorScreen = observer(() => {
         {displayItem && (
           <View className="absolute z-10">
             <StatsDisplay
-              statsLeftPos={displayItem.positon.left}
-              statsTopPos={displayItem.positon.top}
-              item={displayItem.item}
+              displayItem={displayItem}
               shop={thisShop}
               purchaseItem={purchaseItem}
               sellItem={sellItem}

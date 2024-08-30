@@ -2,7 +2,7 @@
   "expo": {
     "name": "Magic Delve",
     "slug": "magic-delve",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "orientation": "portrait",
     "icon": "assets/images/icon.png",
     "scheme": "magicdelveapp",
@@ -21,7 +21,8 @@
       "bundleIdentifier": "com.mikefrenodev.magicdelve",
       "buildNumber": "1",
       "entitlements": {
-        "com.apple.developer.networking.wifi-info": true
+        "com.apple.developer.networking.wifi-info": true,
+        "aps-environment": "development"
       }
     },
     "android": {
