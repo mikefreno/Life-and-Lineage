@@ -35,18 +35,58 @@
       "icon": "Wizard_Hat",
       "stats":{
          "armor": 5,
-         "mana": 15,
+         "mana": 30,
          "regen": 2
       }
    },
    {
-      "name": "veil of god",
-      "baseValue": 550000,
+      "name": "expert hood",
+      "baseValue": 10000,
       "icon": "Wizard_Hat",
       "stats":{
-         "armor": 12,
+         "armor": 5,
+         "mana": 50,
+         "regen": 4
+      }
+   },
+   {
+      "name": "rouge magi's hood",
+      "baseValue": 17500,
+      "icon": "Wizard_Hat",
+      "stats":{
+         "armor": 8,
+         "regen": 8
+      }
+   },
+   {
+      "name": "war mage's cap",
+      "baseValue": 65000,
+      "icon": "Wizard_Hat",
+      "stats":{
+         "armor": 15,
+         "mana": 40,
+         "regen": 5,
+         "health": 40
+      }
+   },
+   {
+      "name": "ancient veil",
+      "baseValue": 100000,
+      "icon": "Wizard_Hat",
+      "stats":{
          "mana": 200,
-         "regen": 25
+         "regen": 10
+      }
+   },
+   {
+      "name": "arch-mage's veil",
+      "baseValue": 350000,
+      "icon": "Wizard_Hat",
+      "stats":{
+         "armor": 8,
+         "mana": 150,
+         "health": 50,
+         "regen": 10
       }
    }
 ]

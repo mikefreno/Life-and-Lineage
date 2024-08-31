@@ -40,6 +40,36 @@
       }
    },
    {
+      "name": "kite shield",
+      "baseValue": 10000,
+      "icon": "Iron_Shield",
+      "slot": "one-hand",
+      "stats":{
+         "armor": 10.0,
+         "blockChance": 0.07
+      }
+   },
+   {
+      "name": "kite shield",
+      "baseValue": 15000,
+      "icon": "Iron_Shield",
+      "slot": "one-hand",
+      "stats":{
+         "armor": 14.0,
+         "blockChance": 0.06
+      }
+   },
+   {
+      "name": "pavise",
+      "baseValue": 25000,
+      "icon": "Iron_Shield",
+      "slot": "one-hand",
+      "stats":{
+         "armor": 20.0,
+         "blockChance": 0.10
+      }
+   },
+   {
       "name": "shield of glory",
       "baseValue": 350000,
       "icon": "Iron_Shield",

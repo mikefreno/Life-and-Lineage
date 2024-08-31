@@ -24,11 +24,28 @@
       }
    },
    {
-      "name": "refined arrow",
-      "baseValue": 8,
+
+      "name": "barbed arrow",
+      "baseValue": 15,
       "icon": "Arrow",
       "stats":{
-         "damage": 2.5
+         "damage": 3.5
+      }
+   },
+   {
+      "name": "great arrow",
+      "baseValue": 20,
+      "icon": "Arrow",
+      "stats":{
+         "damage": 4.0
+      }
+   },
+   {
+      "name": "explosive arrow",
+      "baseValue": 40,
+      "icon": "Arrow",
+      "stats":{
+         "damage": 5.0
       }
    }
 ]

@@ -50,13 +50,52 @@
       }
    },
    {
-      "name": "threads of god",
+      "name": "expert robes",
+      "baseValue": 25000,
+      "icon": "Base_Robes",
+      "stats":{
+         "armor": 10,
+         "mana": 150,
+         "regen": 5
+      }
+   },
+   {
+      "name": "rouge magi's vestment",
+      "baseValue": 47500,
+      "icon": "Base_Robes",
+      "stats":{
+         "armor": 16,
+         "regen": 12
+      }
+   },
+   {
+      "name": "war mage's vestment",
+      "baseValue": 95000,
+      "icon": "Base_Robes",
+      "stats":{
+         "armor": 28,
+         "mana": 100,
+         "regen": 8,
+         "health": 100
+      }
+   },
+   {
+      "name": "ancient silks",
+      "baseValue": 200000,
+      "icon": "Base_Robes",
+      "stats":{
+         "mana": 400,
+         "regen": 20
+      }
+   },
+   {
+      "name": "arch-mage's robes",
       "baseValue": 650000,
       "icon": "Base_Robes",
       "stats":{
-         "armor": 40,
-         "mana": 1500,
-         "regen": 100
+         "armor": 25,
+         "mana": 350,
+         "regen": 20
       }
    }
 ]

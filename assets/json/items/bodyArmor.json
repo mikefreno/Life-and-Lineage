@@ -36,12 +36,62 @@
       }
    },
    {
+      "name": "steel chestpiece",
+      "baseValue": 5000,
+      "icon": "Iron_Armor",
+      "slot":"body",
+      "stats":{
+         "armor": 25.0
+      }
+   },
+   {
+      "name": "barbarian king armor",
+      "baseValue": 10000,
+      "icon": "Leather_Armor",
+      "slot":"body",
+      "stats":{
+         "armor": 20.0,
+         "health": 50
+      }
+   },
+   {
+      "name": "knight's breastplate",
+      "baseValue": 15000,
+      "icon": "Iron_Armor",
+      "slot":"body",
+      "stats":{
+         "armor": 30.0
+      }
+   },
+   {
+      "name": "crusader's breastplate",
+      "baseValue": 75000,
+      "icon": "Iron_Armor",
+      "slot":"body",
+      "stats":{
+         "armor": 30.0,
+         "health": 100,
+         "mana": 100
+      }
+   },
+   {
+      "name": "soldier of fortune",
+      "baseValue": 225000,
+      "icon": "Iron_Armor",
+      "slot":"body",
+      "stats":{
+         "armor": 58.0
+      }
+   },
+   {
       "name": "kingsman chestpiece",
       "baseValue": 550000,
       "icon": "Iron_Armor",
       "slot":"body",
       "stats":{
-         "armor": 75.0
+         "armor": 50.0,
+         "health": 250,
+         "mana": 100
       }
    }
 ]

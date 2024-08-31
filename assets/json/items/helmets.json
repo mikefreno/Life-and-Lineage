@@ -16,5 +16,82 @@
       "stats":{
          "armor": 3.0
       }
+   },
+   {
+      "name": "cheap iron helmet",
+      "baseValue": 1500,
+      "icon": "Iron_Helmet",
+      "slot":"head",
+      "stats":{
+         "armor": 15.0
+      }
+   },
+   {
+      "name": "iron helmet",
+      "baseValue": 2000,
+      "icon": "Iron_Helmet",
+      "slot":"head",
+      "stats":{
+         "armor": 20.0
+      }
+   },
+   {
+      "name": "steel helmet",
+      "baseValue": 5000,
+      "icon": "Iron_Helmet",
+      "slot":"head",
+      "stats":{
+         "armor": 25.0
+      }
+   },
+   {
+      "name": "barbarian king headgear",
+      "baseValue": 10000,
+      "icon": "Leather_Helmet",
+      "slot":"head",
+      "stats":{
+         "armor": 20.0,
+         "health": 50
+      }
+   },
+   {
+      "name": "knight's helm",
+      "baseValue": 15000,
+      "icon": "Iron_Helmet",
+      "slot":"head",
+      "stats":{
+         "armor": 30.0
+      }
+   },
+   {
+      "name": "crusader's helm",
+      "baseValue": 75000,
+      "icon": "Iron_Helmet",
+      "slot":"head",
+      "stats":{
+         "armor": 30.0,
+         "health": 100,
+         "mana": 100
+      }
+   },
+   {
+      "name": "helm of fortune",
+      "baseValue": 225000,
+      "icon": "Iron_Helmet",
+      "slot":"head",
+      "stats":{
+         "armor": 58.0
+      }
+   },
+   {
+      "name": "kingsman helm",
+      "baseValue": 550000,
+      "icon": "Iron_Helmet",
+      "slot":"head",
+      "stats":{
+         "armor": 50.0,
+         "health": 250,
+         "mana": 100
+      }
    }
 ]

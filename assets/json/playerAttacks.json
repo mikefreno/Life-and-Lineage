@@ -12,30 +12,11 @@
       "damageMult": 1.0
    },
    {
-      "name": "cast",
-      "targets": "single",
-      "hitChance": 1.0,
-      "damageMult": 1.0
-   },
-   {
       "name": "stab",
       "targets": "single",
       "hitChance": 0.95,
       "damageMult": 1.0,
       "debuffs": [{"name":"bleed", "chance":0.2}]
-   },
-   {
-      "name": "shoot",
-      "targets": "single",
-      "hitChance": 0.95,
-      "damageMult": 1.0
-   },
-   {
-      "name": "rooting shot",
-      "targets": "single",
-      "hitChance": 0.95,
-      "damageMult": 0.75,
-      "debuffs": [{"name":"stun", "chance":0.5}]
    },
    {
       "name": "torch stab",
@@ -62,5 +43,36 @@
       "hitChance": 0.95,
       "damageMult": 1.0,
       "debuffs": [{"name":"stun", "chance":0.25}]
+   },
+   {
+      "name": "cast",
+      "targets": "single",
+      "hitChance": 1.0,
+      "damageMult": 1.0
+   },
+   {
+      "name": "shoot",
+      "targets": "single",
+      "hitChance": 0.95,
+      "damageMult": 1.0
+   },
+   {
+      "name": "rooting shot",
+      "targets": "single",
+      "hitChance": 0.95,
+      "damageMult": 0.75,
+      "debuffs": [{"name":"stun", "chance":0.5}]
+   },
+   {
+      "name": "rapid shot",
+      "targets": "single",
+      "hitChance": 0.9,
+      "damageMult": 2.0
+   },
+   {
+      "name": "aimed shot",
+      "targets": "single",
+      "hitChance": 1.0,
+      "damageMult": 1.25
    }
 ]

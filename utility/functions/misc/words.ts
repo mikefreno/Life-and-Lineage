@@ -15,10 +15,14 @@ export function toTitleCase(title: string | undefined) {
   if (!title) {
     return "";
   }
-  return title
+  let spacePass = title
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+  return spacePass
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join("-");
 }
 
 export function getRandomInt(min: number, max: number): number {
