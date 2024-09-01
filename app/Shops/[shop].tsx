@@ -22,6 +22,7 @@ import { calculateAge } from "../../utility/functions/misc/age";
 import InventoryRender from "../../components/InventoryRender";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import { Coins } from "../../assets/icons/SVGIcons";
+import { fullSave } from "../../utility/functions/save_load";
 
 const ONE_HOUR = 60 * 60 * 1000;
 const ONE_SECOND = 1000;
@@ -96,6 +97,7 @@ const ShopInteriorScreen = observer(() => {
       if (displayItem?.item[0].itemClass == "junk") {
         setDisplayItem(null);
       }
+      fullSave(gameState, playerState);
     }
   }
 
@@ -107,6 +109,7 @@ const ShopInteriorScreen = observer(() => {
         playerState.sellItem(item, itemPrice);
         setDisplayItem(null);
       });
+      fullSave(gameState, playerState);
     }
   };
 
@@ -119,6 +122,7 @@ const ShopInteriorScreen = observer(() => {
       }
       playerState.buyItem(item, itemPrice);
       thisShop.sellItem(item, itemPrice);
+      fullSave(gameState, playerState);
     }
   };
 
@@ -131,6 +135,7 @@ const ShopInteriorScreen = observer(() => {
       }
       thisShop.buyItem(item, itemPrice);
       playerState.sellItem(item, itemPrice);
+      fullSave(gameState, playerState);
     }
   };
 
@@ -143,6 +148,8 @@ const ShopInteriorScreen = observer(() => {
         thisShop.sellItem(item, itemPrice);
         setDisplayItem(null);
       });
+
+      fullSave(gameState, playerState);
     }
   };
 
@@ -304,6 +311,7 @@ const ShopInteriorScreen = observer(() => {
               sellItem={sellItem}
               sellStack={sellStack}
               clearItem={() => setDisplayItem(null)}
+              topGuard={header}
             />
           </View>
         )}

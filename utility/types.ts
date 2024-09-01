@@ -88,6 +88,7 @@ export type Spell = {
       | null;
     summon?: string[] | undefined;
     selfDamage?: number | undefined;
+    sanityDamage?: number | undefined;
   };
 };
 
@@ -319,8 +320,7 @@ export interface DungeonContextType {
     }>
   >;
   displayItem: {
-    item: Item;
-    count: number;
+    item: Item[];
     positon: {
       left: number;
       top: number;
@@ -328,8 +328,7 @@ export interface DungeonContextType {
   } | null;
   setDisplayItem: React.Dispatch<
     React.SetStateAction<{
-      item: Item;
-      count: number;
+      item: Item[];
       positon: {
         left: number;
         top: number;

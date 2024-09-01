@@ -27,7 +27,6 @@ type BaseProps = {
   clearItem: () => void;
   topGuard?: number;
   topOffset?: number;
-  leftOffset?: number;
 };
 
 type DungeonProps = BaseProps & {
@@ -49,7 +48,6 @@ export function StatsDisplay({
   clearItem,
   topOffset,
   topGuard,
-  leftOffset,
   ...props
 }: StatsDisplayProps) {
   const { colorScheme } = useColorScheme();
@@ -190,7 +188,7 @@ export function StatsDisplay({
         }
       } else if ("addItemToPouch" in props) {
         return (
-          <View>
+          <View className="pt-1">
             <GenericFlatButton
               onPressFunction={() => {
                 props.addItemToPouch(displayItem.item[0]);
@@ -200,17 +198,20 @@ export function StatsDisplay({
             >
               Drop
             </GenericFlatButton>
-            <GenericFlatButton
-              onPressFunction={() => {
-                displayItem.item.forEach((item) => {
-                  props.addItemToPouch(item);
-                  playerState?.removeFromInventory(item);
-                });
-                clearItem();
-              }}
-            >
-              Drop All
-            </GenericFlatButton>
+            {displayItem.item.length > 1 && (
+              <GenericFlatButton
+                className="pt-1"
+                onPressFunction={() => {
+                  displayItem.item.forEach((item) => {
+                    props.addItemToPouch(item);
+                    playerState?.removeFromInventory(item);
+                  });
+                  clearItem();
+                }}
+              >
+                Drop All
+              </GenericFlatButton>
+            )}
           </View>
         );
       }
@@ -244,17 +245,15 @@ export function StatsDisplay({
                   : displayItem.positon.top + (topOffset ?? 0),
             }
           : {
+              maxWidth: dimensions.width * 0.4,
               backgroundColor:
                 colorScheme == "light"
                   ? "rgba(250, 250, 250, 0.98)"
                   : "rgba(20, 20, 20, 0.95)",
               left: displayItem.positon.left
-                ? displayItem.positon.left <
-                  dimensions.width * 0.6 + (leftOffset ?? 0)
-                  ? displayItem.positon.left + 50 + (leftOffset ?? 0)
-                  : displayItem.positon.left -
-                    dimensions.width / 3 +
-                    (leftOffset ?? 0)
+                ? displayItem.positon.left < dimensions.width * 0.6
+                  ? displayItem.positon.left + 50
+                  : displayItem.positon.left - dimensions.width / 3
                 : undefined,
               top:
                 topGuard &&
@@ -283,11 +282,9 @@ export function StatsDisplay({
       {(displayItem.item[0].slot == "one-hand" ||
         displayItem.item[0].slot == "two-hand" ||
         displayItem.item[0].slot == "off-hand") && (
-        <Text className="text-sm italic">
-          {toTitleCase(displayItem.item[0].slot)}
-        </Text>
+        <Text className="text-sm">{toTitleCase(displayItem.item[0].slot)}</Text>
       )}
-      <Text className="text-sm italic">
+      <Text className="text-sm">
         {displayItem.item[0].itemClass == "bodyArmor"
           ? "Body Armor"
           : displayItem.item[0].itemClass == "book" && playerState
@@ -304,16 +301,16 @@ export function StatsDisplay({
             />
           </View>
           {!("purchaseItem" in props) && (
-            <Pressable
-              onPress={() => {
+            <GenericFlatButton
+              onPressFunction={() => {
                 vibration({ style: "light" });
                 clearItem();
                 router.push("/Study");
               }}
-              className="-mx-4 mt-2 w-1/2 rounded-xl border border-zinc-900 px-2 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+              className="mt-2"
             >
-              <Text className="text-center">Study This Book</Text>
-            </Pressable>
+              Study This Book
+            </GenericFlatButton>
           )}
         </>
       ) : null}

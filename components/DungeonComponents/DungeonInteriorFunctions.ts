@@ -116,8 +116,8 @@ export const enemyTurn = ({ appData, dungeonData }: contextData) => {
   if (enemyState && playerState && gameState) {
     setEnemyAttacked(true);
     const enemyAttackRes = enemyState.takeTurn({
-      defenderMaxHealth: playerState.nonBuffedMaxHealth,
-      defenderMaxSanity: playerState.nonBuffedMaxSanity,
+      defenderMaxHealth: playerState.nonConditionalMaxHealth,
+      defenderMaxSanity: playerState.nonConditionalMaxSanity,
       defenderDR: playerState.getDamageReduction(),
       defenderConditions: playerState.conditions,
     });
@@ -282,8 +282,8 @@ function enemyMinionsTurn(
     for (let i = 0; i < suppliedMinions.length; i++) {
       setTimeout(() => {
         const res = suppliedMinions[i].takeTurn({
-          defenderMaxHealth: playerState.nonBuffedMaxHealth,
-          defenderMaxSanity: playerState.nonBuffedMaxSanity,
+          defenderMaxHealth: playerState.nonConditionalMaxHealth,
+          defenderMaxSanity: playerState.nonConditionalMaxSanity,
           defenderDR: playerState.getDamageReduction(),
           defenderConditions: playerState.conditions,
         });

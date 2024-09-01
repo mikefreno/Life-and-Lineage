@@ -223,7 +223,7 @@ export const CharacterInteractionModal = observer(
                 </Text>
                 <Text className="text-center text-lg">
                   Are you certain you want to do that? You will start a fight{" "}
-                  <Text className="italic" style={{ color: "#ef4444" }}>
+                  <Text style={{ color: "#ef4444" }}>
                     that could end in {character.getFullName()}'s death.
                   </Text>
                 </Text>

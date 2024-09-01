@@ -95,7 +95,7 @@ export default function SetName() {
                   fontSize: 20,
                 }}
               />
-              <Text className="pl-1 pt-1 italic pb-2">
+              <Text className="pl-1 pt-1 pb-2">
                 Minimum Length: 2, Maximum Length: 16
               </Text>
               <TextInput
@@ -120,7 +120,7 @@ export default function SetName() {
                   fontSize: 20,
                 }}
               />
-              <Text className="pl-1 pt-1 italic pb-2">
+              <Text className="pl-1 pt-1 pb-2">
                 Minimum Length: 3, Maximum Length: 16
               </Text>
               <View className="pb-16">

@@ -174,10 +174,8 @@ export default function LearningKnowledgeScreen() {
           {filteredBooks.length == 0 &&
           playerState.learningSpells.length == 0 ? (
             <View className="items-center pt-12">
-              <Text className="text-xl italic">No Books to Learn From</Text>
-              <Text className="italic">
-                (Books can be bought from the Librarian)
-              </Text>
+              <Text className="text-xl">No Books to Learn From</Text>
+              <Text>(Books can be bought from the Librarian)</Text>
             </View>
           ) : null}
           {spellState.length > 0 ? (

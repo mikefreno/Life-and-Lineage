@@ -1,3 +1,4 @@
+import { throttle } from "lodash";
 import { PlayerCharacter } from "../../classes/character";
 import type { Enemy } from "../../classes/creatures";
 import { Game } from "../../classes/game";
@@ -6,11 +7,12 @@ import { MMKV } from "react-native-mmkv";
 
 export const storage = new MMKV();
 
-export const fullSave = async (
+const _fullSave = async (
   game: Game | undefined,
   player: PlayerCharacter | undefined,
 ) => {
   if (game && player) {
+    console.log("saving");
     try {
       storage.set("game", JSON.stringify(game));
       storage.set("player", JSON.stringify(player));
@@ -19,6 +21,8 @@ export const fullSave = async (
     }
   }
 };
+
+export const fullSave = throttle(_fullSave, 2000);
 
 export const fullLoad = async () => {
   try {

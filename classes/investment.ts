@@ -92,7 +92,7 @@ export class Investment {
       this.increaseMaxGoldStockPile(upgrade.effect.maxGoldStockPileIncrease);
     }
     if (upgrade.effect.changeMaxSanity) {
-      player.changeMaxSanity(upgrade.effect.changeMaxSanity);
+      player.changeBaseSanity(upgrade.effect.changeMaxSanity);
     }
   }
 

@@ -101,9 +101,7 @@ export default function LeftBehindItemsModal({
           </>
         ) : (
           <ThemedView>
-            <Text className="text-center italic">
-              You find no items on the ground
-            </Text>
+            <Text className="text-center">You find no items on the ground</Text>
           </ThemedView>
         )}
         <Pressable

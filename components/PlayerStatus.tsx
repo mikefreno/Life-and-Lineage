@@ -63,13 +63,13 @@ const PlayerStatus = observer(
       playerState?.getReadableGold(),
     );
     const [healthRecord, setHealthRecord] = useState<number | undefined>(
-      playerState?.health,
+      playerState?.currentHealth,
     );
     const [sanityRecord, setSanityRecord] = useState<number | undefined>(
-      playerState?.sanity,
+      playerState?.currentSanity,
     );
     const [manaRecord, setManaRecord] = useState<number | undefined>(
-      playerState?.mana,
+      playerState?.currentMana,
     );
     const [goldRecord, setGoldRecord] = useState<number | undefined>(
       playerState?.gold,
@@ -89,16 +89,7 @@ const PlayerStatus = observer(
       useState<boolean>(false);
     const healthDamageFlash = useState(new Animated.Value(0))[0];
     const healthWarningAnimatedValue = useState(new Animated.Value(0))[0];
-    const [localHealthMax, setLocalHealthMax] = useState<number | undefined>(
-      playerState?.totalMaxHealth,
-    );
-    const [localManaMax, setLocalManaMax] = useState<number | undefined>(
-      playerState?.totalMaxMana,
-    );
-    const [localSanityMax, setLocalSanityMax] = useState<number | undefined>(
-      playerState?.totalMaxSanity,
-    );
-    const [respeccing, setRespeccing] = useState<boolean>(true);
+    const [respeccing, setRespeccing] = useState<boolean>(false);
 
     const vibration = useVibration();
     const { colorScheme } = useColorScheme();
@@ -114,16 +105,6 @@ const PlayerStatus = observer(
       inputRange: [0, 1],
       outputRange: ["transparent", "rgba(180,30,30,0.4)"],
     });
-
-    useEffect(() => {
-      setLocalHealthMax(playerState?.totalMaxHealth);
-      setLocalManaMax(playerState?.totalMaxMana);
-      setLocalSanityMax(playerState?.totalMaxSanity);
-    }, [
-      playerState?.totalMaxSanity,
-      playerState?.totalMaxMana,
-      playerState?.totalMaxHealth,
-    ]);
 
     const isFocused = useIsFocused();
 
@@ -180,8 +161,12 @@ const PlayerStatus = observer(
     ]);
 
     useEffect(() => {
-      if (playerState && healthRecord && playerState.health != healthRecord) {
-        if (playerState?.health - healthRecord < 0) {
+      if (
+        playerState &&
+        healthRecord &&
+        playerState.currentHealth != healthRecord
+      ) {
+        if (playerState?.currentHealth - healthRecord < 0) {
           Animated.sequence([
             Animated.timing(healthDamageFlash, {
               toValue: 1,
@@ -195,23 +180,27 @@ const PlayerStatus = observer(
             }),
           ]).start();
         }
-        setHealthDiff(playerState?.health - healthRecord);
+        setHealthDiff(playerState?.currentHealth - healthRecord);
         setShowingHealthChange(true);
         setAnimationCycler(animationCycler + 1);
       } else {
         setHealthDiff(0);
         setShowingHealthChange(false);
       }
-      if (playerState && sanityRecord && playerState.sanity != sanityRecord) {
-        setSanityDiff(playerState?.sanity - sanityRecord);
+      if (
+        playerState &&
+        sanityRecord &&
+        playerState.currentSanity != sanityRecord
+      ) {
+        setSanityDiff(playerState?.currentSanity - sanityRecord);
         setShowingSanityChange(true);
         setAnimationCycler(animationCycler + 1);
       } else {
         setSanityDiff(0);
         setShowingSanityChange(false);
       }
-      if (playerState && manaRecord && playerState.mana != manaRecord) {
-        setManaDiff(playerState?.mana - manaRecord);
+      if (playerState && manaRecord && playerState.currentMana != manaRecord) {
+        setManaDiff(playerState?.currentMana - manaRecord);
         setShowingManaChange(true);
         setAnimationCycler(animationCycler + 1);
       } else {
@@ -227,14 +216,14 @@ const PlayerStatus = observer(
         setShowingGoldChange(false);
       }
 
-      setHealthRecord(playerState?.health);
-      setSanityRecord(playerState?.sanity);
-      setManaRecord(playerState?.mana);
+      setHealthRecord(playerState?.currentHealth);
+      setSanityRecord(playerState?.currentSanity);
+      setManaRecord(playerState?.currentMana);
       setGoldRecord(playerState?.gold);
     }, [
-      playerState?.health,
-      playerState?.sanity,
-      playerState?.mana,
+      playerState?.currentHealth,
+      playerState?.currentSanity,
+      playerState?.currentMana,
       playerState?.gold,
     ]);
 
@@ -242,7 +231,8 @@ const PlayerStatus = observer(
       if (
         playerState &&
         gameState &&
-        playerState.health / playerState.healthMax <= gameState.healthWarning
+        playerState.currentHealth / playerState.maxHealth <=
+          gameState.healthWarning
       ) {
         if (!showingHealthWarningPulse) {
           setShowingHealthWarningPulse(true);
@@ -252,7 +242,7 @@ const PlayerStatus = observer(
           setShowingHealthWarningPulse(false);
         }
       }
-    }, [playerState?.health, gameState?.healthWarning]);
+    }, [playerState?.currentHealth, gameState?.healthWarning]);
 
     useEffect(() => {
       setReadableGold(playerState?.getReadableGold());
@@ -417,7 +407,11 @@ const PlayerStatus = observer(
                         <Text>Expended by powerful blood magic</Text>
                       </View>
                     )}
-                    {Array.isArray(condition.effect)
+                    {/*
+
+              --------------This entire thing needs to be reworked----------
+
+                      {Array.isArray(condition.effect)
                       ? condition.effect.map((effect) => {
                           if (effectListTypes.includes(effect)) {
                             return (
@@ -453,7 +447,7 @@ const PlayerStatus = observer(
                                 : ""}
                             </Text>
                           </View>
-                        )}
+                        )} */}
                   </View>
                 </View>
               ))}
@@ -661,8 +655,8 @@ const PlayerStatus = observer(
                 <View className="flex w-full flex-row items-center">
                   <View className="flex-1">
                     <ProgressBar
-                      value={playerState.health}
-                      maxValue={localHealthMax ?? playerState.totalMaxHealth}
+                      value={playerState.currentHealth}
+                      maxValue={playerState.maxHealth}
                       filledColor="#ef4444"
                       unfilledColor="#fca5a5"
                       showMax
@@ -673,7 +667,7 @@ const PlayerStatus = observer(
                       className="px-0.5"
                       onPress={() => {
                         vibration({ style: "light" });
-                        playerState.spendSkillPointOnHealth();
+                        playerState.addSkillPoint({ to: "health" });
                       }}
                     >
                       {({ pressed }) => (
@@ -689,7 +683,7 @@ const PlayerStatus = observer(
                         className="px-0.5"
                         onPress={() => {
                           vibration({ style: "light" });
-                          playerState.refundSkillPointOnHealth();
+                          playerState.removeSkillPoint({ from: "health" });
                         }}
                       >
                         {({ pressed }) => (
@@ -708,8 +702,8 @@ const PlayerStatus = observer(
                 <View className="flex w-full flex-row items-center">
                   <View className="flex-1">
                     <ProgressBar
-                      value={playerState.mana}
-                      maxValue={localManaMax ?? playerState.totalMaxMana}
+                      value={playerState.currentMana}
+                      maxValue={playerState.maxMana}
                       filledColor="#60a5fa"
                       unfilledColor="#bfdbfe"
                       showMax
@@ -720,7 +714,7 @@ const PlayerStatus = observer(
                       className="px-0.5"
                       onPress={() => {
                         vibration({ style: "light" });
-                        playerState.spendSkillPointOnMana();
+                        playerState.addSkillPoint({ to: "mana" });
                       }}
                     >
                       {({ pressed }) => (
@@ -735,7 +729,7 @@ const PlayerStatus = observer(
                       className="px-0.5"
                       onPress={() => {
                         vibration({ style: "light" });
-                        playerState.refundSkillPointOnMana();
+                        playerState.removeSkillPoint({ from: "mana" });
                       }}
                     >
                       {({ pressed }) => (
@@ -754,9 +748,9 @@ const PlayerStatus = observer(
                 <View className="flex w-full flex-row items-center">
                   <View className="flex-1">
                     <ProgressBar
-                      value={playerState.sanity}
-                      minValue={-50}
-                      maxValue={localSanityMax ?? playerState.totalMaxSanity}
+                      value={playerState.currentSanity}
+                      minValue={-playerState.maxSanity}
+                      maxValue={playerState.maxSanity}
                       filledColor="#c084fc"
                       unfilledColor="#e9d5ff"
                       showMax
@@ -767,7 +761,7 @@ const PlayerStatus = observer(
                       className="px-0.5"
                       onPress={() => {
                         vibration({ style: "light" });
-                        playerState.spendSkillPointOnSanity();
+                        playerState.addSkillPoint({ to: "sanity" });
                       }}
                     >
                       {({ pressed }) => (
@@ -783,7 +777,7 @@ const PlayerStatus = observer(
                         className="px-0.5"
                         onPress={() => {
                           vibration({ style: "light" });
-                          playerState.refundSkillPointOnSanity();
+                          playerState.removeSkillPoint({ from: "sanity" });
                         }}
                       >
                         {({ pressed }) => (
@@ -799,6 +793,7 @@ const PlayerStatus = observer(
                 <View className="flex items-center">
                   <Text className="py-1">Strength</Text>
                   <View className="flex flex-row">
+                    <Text>{playerState.totalStrength}</Text>
                     <StrengthIcon color={"#ef4444"} height={20} width={23} />
                     <View className="flex flex-row">
                       {playerState.unAllocatedSkillPoints > 0 &&
@@ -807,7 +802,7 @@ const PlayerStatus = observer(
                             className="px-0.5"
                             onPress={() => {
                               vibration({ style: "light" });
-                              playerState.spendSkillPointOnStrength();
+                              playerState.addSkillPoint({ to: "strength" });
                             }}
                           >
                             {({ pressed }) => (
@@ -823,7 +818,9 @@ const PlayerStatus = observer(
                             className="px-0.5"
                             onPress={() => {
                               vibration({ style: "light" });
-                              playerState.refundSkillPointOnStrength();
+                              playerState.removeSkillPoint({
+                                from: "strength",
+                              });
                             }}
                           >
                             {({ pressed }) => (
@@ -839,8 +836,9 @@ const PlayerStatus = observer(
                 <View className="flex items-center">
                   <Text className="py-1">Intelligence</Text>
                   <View className="flex flex-row">
+                    <Text>{playerState.totalIntelligence}</Text>
                     <IntelligenceIcon
-                      color={"#ef4444"}
+                      color={"#60a5fa"}
                       height={20}
                       width={23}
                     />
@@ -851,7 +849,7 @@ const PlayerStatus = observer(
                             className="px-0.5"
                             onPress={() => {
                               vibration({ style: "light" });
-                              playerState.spendSkillPointOnIntelligence();
+                              playerState.addSkillPoint({ to: "intelligence" });
                             }}
                           >
                             {({ pressed }) => (
@@ -867,7 +865,9 @@ const PlayerStatus = observer(
                             className="px-0.5"
                             onPress={() => {
                               vibration({ style: "light" });
-                              playerState.refundSkillPointOnIntelligence();
+                              playerState.removeSkillPoint({
+                                from: "intelligence",
+                              });
                             }}
                           >
                             {({ pressed }) => (
@@ -978,8 +978,8 @@ const PlayerStatus = observer(
                       Health
                     </Text>
                     <ProgressBar
-                      value={playerState.health}
-                      maxValue={localHealthMax ?? playerState.totalMaxHealth}
+                      value={playerState.currentHealth}
+                      maxValue={playerState.maxHealth}
                       filledColor="#ef4444"
                       unfilledColor="#fca5a5"
                     />
@@ -990,8 +990,8 @@ const PlayerStatus = observer(
                       Mana
                     </Text>
                     <ProgressBar
-                      value={playerState.mana}
-                      maxValue={localManaMax ?? playerState.totalMaxMana}
+                      value={playerState.currentMana}
+                      maxValue={playerState.maxMana}
                       filledColor="#60a5fa"
                       unfilledColor="#bfdbfe"
                     />
@@ -1002,9 +1002,9 @@ const PlayerStatus = observer(
                       Sanity
                     </Text>
                     <ProgressBar
-                      value={playerState.sanity}
-                      minValue={-50}
-                      maxValue={localSanityMax ?? playerState.totalMaxSanity}
+                      value={playerState.maxSanity}
+                      minValue={-playerState.maxSanity}
+                      maxValue={playerState.maxSanity}
                       filledColor="#c084fc"
                       unfilledColor="#e9d5ff"
                     />

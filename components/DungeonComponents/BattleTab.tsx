@@ -184,7 +184,8 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                             <Pressable
                               disabled={
                                 ("element" in attackOrSpell &&
-                                  attackOrSpell.manaCost >= playerState.mana) ||
+                                  attackOrSpell.manaCost >=
+                                    playerState.currentMana) ||
                                 playerState.isStunned() ||
                                 attackAnimationOnGoing
                               }
@@ -222,7 +223,8 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                               className="mx-2 my-auto rounded px-4 py-2 shadow-sm active:scale-95 active:opacity-50"
                               style={[
                                 (("element" in attackOrSpell &&
-                                  attackOrSpell.manaCost >= playerState.mana) ||
+                                  attackOrSpell.manaCost >=
+                                    playerState.currentMana) ||
                                   playerState.isStunned() ||
                                   attackAnimationOnGoing) && { opacity: 0.5 },
                                 {
@@ -240,7 +242,8 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                                 {playerState.isStunned()
                                   ? "Stunned!"
                                   : "element" in attackOrSpell
-                                  ? playerState.mana >= attackOrSpell.manaCost
+                                  ? playerState.currentMana >=
+                                    attackOrSpell.manaCost
                                     ? "Cast"
                                     : "Not Enough Mana"
                                   : "Attack"}

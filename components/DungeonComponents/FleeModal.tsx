@@ -113,9 +113,7 @@ export default function FleeModal({
                     {!enemyState ? "Ready to Leave?" : "Attempt to Flee?"}
                   </Text>
                   {playerState.isStunned() ? (
-                    <Text className="italic" style={{ color: "#ef4444" }}>
-                      You are stunned!
-                    </Text>
+                    <Text style={{ color: "#ef4444" }}>You are stunned!</Text>
                   ) : null}
                   <ThemedView className="flex w-full flex-row justify-evenly pt-8">
                     <GenericFlatButton

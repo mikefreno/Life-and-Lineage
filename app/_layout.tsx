@@ -21,7 +21,7 @@ import { Enemy } from "../classes/creatures";
 import { fullSave, fullLoad } from "../utility/functions/save_load";
 import { Dimensions, Keyboard, Platform, StyleSheet } from "react-native";
 import { View as ThemedView } from "../components/Themed";
-import { autorun } from "mobx";
+import { autorun, reaction, runInAction } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
@@ -34,6 +34,7 @@ import D20DieAnimation from "../components/DieRollAnim";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
+import { Item } from "../classes/item";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -103,7 +104,7 @@ async function registerForPushNotificationsAsync() {
           projectId,
         })
       ).data;
-      console.log(pushTokenString);
+      __DEV__ && console.log(pushTokenString);
       return pushTokenString;
     } catch (e: unknown) {
       handleRegistrationError(`${e}`);
@@ -120,6 +121,10 @@ const Root = observer(() => {
   const [logsState, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [gameDate, setGameDate] = useState<string>("");
+  const [playerGold, setPlayerGold] = useState<number>(playerState?.gold ?? 0);
+  const [playerHealth, setPlayerHealth] = useState<number>(
+    playerState?.health ?? 100,
+  );
   const [playerStatusCompact, setPlayerStatusCompact] = useState<boolean>(true);
   const [showDetailedStatusView, setShowDetailedStatusView] =
     useState<boolean>(false);
@@ -157,8 +162,6 @@ const Root = observer(() => {
     };
   }, []);
 
-  useEffect(() => console.log("notification: ", notification), [notification]);
-
   const getData = async () => {
     try {
       const { game, player } = await fullLoad();
@@ -187,9 +190,17 @@ const Root = observer(() => {
     getData();
   }, []);
 
-  const throttledFullSave = throttle(fullSave, 2000);
-
-  autorun(() => throttledFullSave(gameState, playerState));
+  reaction(
+    () => ({
+      gameTime: gameState?.date,
+    }),
+    (state) => {
+      if (gameState && playerState && state.gameTime !== gameDate) {
+        setGameDate(gameState.date);
+        fullSave(gameState, playerState);
+      }
+    },
+  );
 
   const [dimensions, setDimensions] = useState(() => ({
     height: Dimensions.get("screen").height,

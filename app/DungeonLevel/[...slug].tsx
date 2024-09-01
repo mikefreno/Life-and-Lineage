@@ -72,8 +72,7 @@ const DungeonProvider = observer(() => {
   const level = slug[1];
 
   const [displayItem, setDisplayItem] = useState<{
-    item: Item;
-    count: number;
+    item: Item[];
     positon: { left: number; top: number };
   } | null>(null);
 

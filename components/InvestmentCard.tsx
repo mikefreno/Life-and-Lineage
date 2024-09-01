@@ -85,7 +85,7 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
             <Text className="text-center text-xl">Alert!</Text>
           </GenericStrikeAround>
           <Text className="mx-4 text-lg">{investment.requires.message}</Text>
-          <Text className="mx-8 py-4 text-center italic">
+          <Text className="mx-8 py-4 text-center">
             Complete the {toTitleCase(investment.requires.requirement)} dungeon
             to unlock this investment!
           </Text>
@@ -226,7 +226,7 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
                         </Animated.View>
                       </View>
                       {madeInvestment?.upgrades.includes(upgrade.name) && (
-                        <Text className="my-auto text-lg italic tracking-wider opacity-70 dark:text-zinc-50">
+                        <Text className="my-auto text-lg tracking-wider opacity-70 dark:text-zinc-50">
                           Purchased
                         </Text>
                       )}
@@ -371,7 +371,7 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
               <Text className="bold my-auto text-xl tracking-wider dark:text-zinc-50">
                 {investment.name}
               </Text>
-              <Text className="my-auto text-lg italic tracking-wider opacity-70 dark:text-zinc-50">
+              <Text className="my-auto text-lg tracking-wider opacity-70 dark:text-zinc-50">
                 Purchased
               </Text>
             </View>

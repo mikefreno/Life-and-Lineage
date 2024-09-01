@@ -111,7 +111,7 @@ export default function DroppedItemsModal() {
     >
       <>
         <View className="mt-4 flex flex-row justify-center">
-          <Text className="italic">You picked up {droppedItems?.gold}</Text>
+          <Text>You picked up {droppedItems?.gold}</Text>
           <Coins width={16} height={16} style={{ marginLeft: 6 }} />
         </View>
         <Text

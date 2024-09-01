@@ -140,11 +140,9 @@ export default function GiftModal({
             {(selectedItem.slot == "one-hand" ||
               selectedItem.slot == "two-hand" ||
               selectedItem.slot == "off-hand") && (
-              <Text className="text-sm italic">
-                {toTitleCase(selectedItem.slot)}
-              </Text>
+              <Text className="text-sm">{toTitleCase(selectedItem.slot)}</Text>
             )}
-            <Text className="text-sm italic">
+            <Text className="text-sm">
               {selectedItem.itemClass == "bodyArmor"
                 ? "Body Armor"
                 : toTitleCase(selectedItem.itemClass)}

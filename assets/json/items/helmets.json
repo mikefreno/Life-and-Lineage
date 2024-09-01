@@ -23,7 +23,7 @@
       "icon": "Iron_Helmet",
       "slot":"head",
       "stats":{
-         "armor": 15.0
+         "armor": 5.0
       }
    },
    {
@@ -32,7 +32,7 @@
       "icon": "Iron_Helmet",
       "slot":"head",
       "stats":{
-         "armor": 20.0
+         "armor": 8.0
       }
    },
    {
@@ -41,7 +41,7 @@
       "icon": "Iron_Helmet",
       "slot":"head",
       "stats":{
-         "armor": 25.0
+         "armor": 10.0
       }
    },
    {
@@ -50,7 +50,7 @@
       "icon": "Leather_Helmet",
       "slot":"head",
       "stats":{
-         "armor": 20.0,
+         "armor": 8.0,
          "health": 50
       }
    },
@@ -60,7 +60,7 @@
       "icon": "Iron_Helmet",
       "slot":"head",
       "stats":{
-         "armor": 30.0
+         "armor": 12.0
       }
    },
    {
@@ -69,7 +69,7 @@
       "icon": "Iron_Helmet",
       "slot":"head",
       "stats":{
-         "armor": 30.0,
+         "armor": 15.0,
          "health": 100,
          "mana": 100
       }
@@ -80,7 +80,7 @@
       "icon": "Iron_Helmet",
       "slot":"head",
       "stats":{
-         "armor": 58.0
+         "armor": 25.0
       }
    },
    {
@@ -89,7 +89,7 @@
       "icon": "Iron_Helmet",
       "slot":"head",
       "stats":{
-         "armor": 50.0,
+         "armor": 22.0,
          "health": 250,
          "mana": 100
       }

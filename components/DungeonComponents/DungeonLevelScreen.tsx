@@ -75,7 +75,7 @@ const DungeonLevelScreen = observer(() => {
 
   useEffect(() => {
     throttledDungeonSave(enemyState);
-  }, [enemyState?.health, playerState.health]);
+  }, [enemyState?.health, playerState.currentHealth]);
 
   //-----------tutorial---------//
   const [showDungeonInteriorTutorial, setShowDungeonInteriorTutorial] =

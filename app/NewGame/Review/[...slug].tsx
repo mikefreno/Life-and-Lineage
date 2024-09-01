@@ -55,16 +55,51 @@ export default function NewGameReview() {
       job: job,
       affection: 85,
       birthdate: generateBirthday(32, 55),
-      deathdate: null,
     });
     return parent;
+  }
+
+  function getStartingBaseStats({
+    playerClass,
+  }: {
+    playerClass: "necromancer" | "paladin" | "mage";
+  }) {
+    switch (playerClass) {
+      case "necromancer":
+        return {
+          baseHealth: 80,
+          baseMana: 120,
+          baseStrength: 3,
+          baseIntelligence: 6,
+          baseManaRegen: 6,
+          baseSanity: 40,
+        };
+      case "paladin":
+        return {
+          baseHealth: 120,
+          baseMana: 80,
+          baseStrength: 6,
+          baseIntelligence: 3,
+          baseManaRegen: 5,
+          baseSanity: 60,
+        };
+      case "mage":
+        return {
+          baseHealth: 100,
+          baseMana: 80,
+          baseStrength: 5,
+          baseIntelligence: 5,
+          baseManaRegen: 5,
+          baseSanity: 50,
+        };
+    }
   }
 
   function createPlayerCharacter() {
     const mom = createParent("female");
     const dad = createParent("male");
     let newCharacter: PlayerCharacter;
-    const bday = generateBirthday(15, 18);
+    const bday = generateBirthday(15, 15);
     if (playerClass === "paladin") {
       newCharacter = new PlayerCharacter({
         firstName: firstName,
@@ -74,7 +109,7 @@ export default function NewGameReview() {
         blessing: blessing as "holy" | "vengeance" | "protection",
         parents: [mom, dad],
         birthdate: bday,
-        deathdate: null,
+        ...getStartingBaseStats({ playerClass }),
       });
     } else if (playerClass === "necromancer") {
       newCharacter = new PlayerCharacter({
@@ -85,7 +120,7 @@ export default function NewGameReview() {
         blessing: blessing as "blood" | "summoning" | "pestilence" | "bone",
         parents: [mom, dad],
         birthdate: bday,
-        deathdate: null,
+        ...getStartingBaseStats({ playerClass }),
       });
     } else {
       newCharacter = new PlayerCharacter({
@@ -96,7 +131,7 @@ export default function NewGameReview() {
         blessing: blessing as "fire" | "water" | "air" | "earth",
         parents: [mom, dad],
         birthdate: bday,
-        deathdate: null,
+        ...getStartingBaseStats({ playerClass: "mage" }),
       });
     }
     return newCharacter;

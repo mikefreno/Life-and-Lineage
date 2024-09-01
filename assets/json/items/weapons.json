@@ -140,7 +140,7 @@
       }
    },
    {
-      "name": "",
+      "name": "crusader's longsword",
       "baseValue": 50000,
       "slot": "one-hand",
       "attacks": ["slash", "cleave"],

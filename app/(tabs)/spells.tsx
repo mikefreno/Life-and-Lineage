@@ -156,10 +156,8 @@ const SpellsScreen = observer(() => {
             </ScrollView>
           ) : (
             <View className="h-1/2 items-center justify-center">
-              <Text className="text-xl italic tracking-wide">
-                No Known Spells.
-              </Text>
-              <Text className="text-center italic tracking-wide">
+              <Text className="text-xl tracking-wide">No Known Spells.</Text>
+              <Text className="text-center tracking-wide">
                 (Books can be studied on the top right)
               </Text>
             </View>

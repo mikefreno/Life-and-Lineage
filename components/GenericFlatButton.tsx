@@ -29,14 +29,14 @@ const GenericFlatButton = ({
         <View
           className={`${pressed ? "scale-95 opacity-50" : ""} ${
             !disabledCondition
-              ? "mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg dark:border-zinc-50"
-              : "mx-auto rounded-xl border border-zinc-400 px-6 py-2 text-lg"
+              ? "mx-auto rounded-xl border border-zinc-900 px-6 py-2 dark:border-zinc-50"
+              : "mx-auto rounded-xl border border-zinc-400 px-6 py-2"
           }`}
           style={{ backgroundColor: backgroundColor }}
         >
           {typeof children === "string" ? (
             <Text
-              className="text-center text-lg tracking-widest"
+              className="text-center tracking-widest"
               style={
                 disabledCondition
                   ? { color: "#d4d4d8" }

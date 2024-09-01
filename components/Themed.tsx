@@ -19,7 +19,9 @@ type ThemeProps = {
 };
 
 export type TextProps = ThemeProps & DefaultText["props"];
-export type ViewProps = ThemeProps & DefaultView["props"];
+export type ViewProps = ThemeProps &
+  DefaultView["props"] &
+  React.RefAttributes<DefaultView>;
 export type SafeAreaViewProps = ThemeProps & DefaultSafeAreaView["props"];
 export type ScrollViewProps = ThemeProps & DefaultScrollView["props"];
 
