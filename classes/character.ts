@@ -14,7 +14,7 @@ import paladinSpells from "../assets/json/paladinSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
 import { Enemy, Minion } from "./creatures";
 import summons from "../assets/json/summons.json";
-import { action, makeObservable, observable } from "mobx";
+import { action, makeObservable, observable, computed } from "mobx";
 import * as Crypto from "expo-crypto";
 import { Investment } from "./investment";
 import {
@@ -266,9 +266,11 @@ type PlayerCharacterBase = {
     health: number;
     mana: number;
     sanity: number;
-    attackPower: number;
+    strength: number;
+    intelligence: number;
   };
-  attackPower?: number;
+  strength?: number;
+  intelligence: number;
 };
 type MageCharacter = PlayerCharacterBase & {
   playerClass: "mage";
@@ -298,7 +300,8 @@ export class PlayerCharacter extends Character {
   mana: number;
   manaMax: number;
   manaRegen: number;
-  attackPower: number;
+  strength: number;
+  intelligence: number;
   jobExperience: { job: string; experience: number; rank: number }[];
   learningSpells: {
     bookName: string;
@@ -344,7 +347,8 @@ export class PlayerCharacter extends Character {
     health: number;
     mana: number;
     sanity: number;
-    attackPower: number;
+    strength: number;
+    intelligence: number;
   };
 
   constructor({
@@ -367,6 +371,8 @@ export class PlayerCharacter extends Character {
     mana,
     manaMax,
     manaRegen,
+    strength,
+    intelligence,
     minions,
     jobExperience,
     learningSpells,
@@ -387,7 +393,6 @@ export class PlayerCharacter extends Character {
     savedEnemy,
     unAllocatedSkillPoints,
     allocatedSkillPoints,
-    attackPower,
   }: PlayerCharacterOptions) {
     super({
       id,
@@ -410,6 +415,8 @@ export class PlayerCharacter extends Character {
     this.mana = mana ?? 100;
     this.manaMax = manaMax ?? 100;
     this.manaRegen = manaRegen ?? 3;
+    this.strength = strength ?? playerClass == "paladin" ? 5 : 3;
+    this.intelligence = intelligence ?? playerClass == "paladin" ? 3 : 5;
     this.minions = minions ?? [];
     this.jobExperience = jobExperience ?? [];
     this.learningSpells = learningSpells ?? [];
@@ -446,9 +453,9 @@ export class PlayerCharacter extends Character {
       health: 0,
       mana: 0,
       sanity: 0,
-      attackPower: 0,
+      strength: 0,
+      intelligence: 0,
     };
-    this.attackPower = attackPower ?? 0;
     makeObservable(this, {
       health: observable,
       healthMax: observable,
@@ -473,14 +480,12 @@ export class PlayerCharacter extends Character {
       investments: observable,
       allocatedSkillPoints: observable,
       unAllocatedSkillPoints: observable,
-      attackPower: observable,
-      getMaxHealth: action,
+      strength: observable,
+      intelligence: observable,
       damageHealth: action,
       calculateBaseAttackDamage: action,
       getSpecifiedQualificationProgress: action,
-      getMaxMana: action,
       damageSanity: action,
-      getMaxSanity: action,
       addToInventory: action,
       buyItem: action,
       removeFromInventory: action,
@@ -523,11 +528,22 @@ export class PlayerCharacter extends Character {
       spendSkillPointOnHealth: action,
       spendSkillPointOnMana: action,
       spendSkillPointOnSanity: action,
-      spendSkillPointOnAttackPower: action,
+      spendSkillPointOnStrength: action,
+      spendSkillPointOnIntelligence: action,
       refundSkillPointOnHealth: action,
       refundSkillPointOnMana: action,
       refundSkillPointOnSanity: action,
-      refundSkillPointOnAttackPower: action,
+      refundSkillPointOnStrength: action,
+      refundSkillPointOnIntelligence: action,
+      totalMaxMana: computed,
+      totalMaxHealth: computed,
+      totalManaRegen: computed,
+      totalMaxSanity: computed,
+      nonBuffedMaxHealth: computed,
+      nonBuffedMaxSanity: computed,
+      nonBuffedMaxMana: computed,
+      attackPower: computed,
+      magicPower: computed,
     });
   }
   //----------------------------------Stats----------------------------------//
@@ -558,13 +574,23 @@ export class PlayerCharacter extends Character {
       this.allocatedSkillPoints.sanity += 1;
     }
   }
-  public spendSkillPointOnAttackPower() {
+
+  public spendSkillPointOnStrength() {
     if (this.unAllocatedSkillPoints >= 1) {
-      this.attackPower += 5;
+      this.strength += 1;
       this.unAllocatedSkillPoints -= 1;
-      this.allocatedSkillPoints.attackPower += 1;
+      this.allocatedSkillPoints.strength += 1;
     }
   }
+
+  public spendSkillPointOnIntelligence() {
+    if (this.unAllocatedSkillPoints >= 1) {
+      this.intelligence += 1;
+      this.unAllocatedSkillPoints -= 1;
+      this.allocatedSkillPoints.intelligence += 1;
+    }
+  }
+
   public refundSkillPointOnHealth() {
     if (this.allocatedSkillPoints.health >= 1) {
       this.healthMax -= 10;
@@ -595,41 +621,49 @@ export class PlayerCharacter extends Character {
       }
     }
   }
-  public refundSkillPointOnAttackPower() {
-    if (this.allocatedSkillPoints.attackPower >= 1) {
-      this.attackPower -= 5;
+  public refundSkillPointOnStrength() {
+    if (this.allocatedSkillPoints.strength >= 1) {
+      this.strength -= 1;
       this.unAllocatedSkillPoints += 1;
-      this.allocatedSkillPoints.attackPower -= 1;
+      this.allocatedSkillPoints.strength -= 1;
     }
   }
+
+  public refundSkillPointOnIntelligence() {
+    if (this.allocatedSkillPoints.intelligence >= 1) {
+      this.intelligence -= 1;
+      this.unAllocatedSkillPoints += 1;
+      this.allocatedSkillPoints.intelligence -= 1;
+    }
+  }
+
   public getTotalAllocatedPoints() {
     return (
       this.allocatedSkillPoints.health +
       this.allocatedSkillPoints.mana +
       this.allocatedSkillPoints.sanity +
-      this.allocatedSkillPoints.attackPower
+      this.allocatedSkillPoints.strength +
+      this.allocatedSkillPoints.intelligence
     );
+  }
+  get attackPower() {
+    return (this.strength + this.equipmentStats.strength) * 2;
+  }
+  get magicPower() {
+    return (this.intelligence + this.equipmentStats.intelligence) * 2;
   }
   //----------------------------------Health----------------------------------//
-  public getMaxHealth() {
-    let gearBuffs = 0;
-    gearBuffs += this.equipment.mainHand.stats?.health ?? 0;
-    gearBuffs += this.equipment.offHand?.stats?.health ?? 0;
-    gearBuffs += this.equipment.body?.stats?.health ?? 0;
-    gearBuffs += this.equipment.head?.stats?.health ?? 0;
-    const { healthMult, healthFlat } = getConditionEffectsOnDefenses(
+  get totalMaxHealth() {
+    const { healthFlat, healthMult } = getConditionEffectsOnDefenses(
       this.conditions,
     );
-    return (this.healthMax + gearBuffs) * healthMult + healthFlat;
+    return (
+      this.healthMax * healthMult + this.equipmentStats.health + healthFlat
+    );
   }
 
-  public getNonBuffedMaxHealth() {
-    let gearBuffs = 0;
-    gearBuffs += this.equipment.mainHand.stats?.health ?? 0;
-    gearBuffs += this.equipment.offHand?.stats?.health ?? 0;
-    gearBuffs += this.equipment.body?.stats?.health ?? 0;
-    gearBuffs += this.equipment.head?.stats?.health ?? 0;
-    return this.healthMax + gearBuffs;
+  get nonBuffedMaxHealth() {
+    return this.healthMax + this.equipmentStats.health;
   }
 
   public damageHealth(damage?: number | null) {
@@ -644,34 +678,32 @@ export class PlayerCharacter extends Character {
   }
 
   public restoreHealth(amount: number) {
-    if (this.health + amount < this.getMaxHealth()) {
+    if (this.health + amount < this.totalMaxHealth) {
       this.health += amount;
     } else {
-      this.health = this.getMaxHealth();
+      this.health = this.totalMaxHealth;
     }
   }
 
   //----------------------------------Mana----------------------------------//
-  public getMaxMana(): number {
-    let gearBuffs = 0;
-    gearBuffs += this.equipment.mainHand.stats?.mana ?? 0;
-    gearBuffs += this.equipment.offHand?.stats?.mana ?? 0;
-    gearBuffs += this.equipment.body?.stats?.mana ?? 0;
-    gearBuffs += this.equipment.head?.stats?.mana ?? 0;
-    const { manaMaxMult, manaMaxFlat } = getConditionEffectsOnMisc(
+  get totalMaxMana() {
+    const { manaMaxFlat, manaMaxMult } = getConditionEffectsOnMisc(
       this.conditions,
     );
-    return (this.manaMax + gearBuffs) * manaMaxMult + manaMaxFlat;
+    return this.manaMax * manaMaxMult + this.equipmentStats.mana + manaMaxFlat;
   }
 
-  public getNonBuffedMaxMana(): number {
-    let gearBuffs = 0;
-    gearBuffs += this.equipment.mainHand.stats?.mana ?? 0;
-    gearBuffs += this.equipment.offHand?.stats?.mana ?? 0;
-    gearBuffs += this.equipment.body?.stats?.mana ?? 0;
-    gearBuffs += this.equipment.head?.stats?.mana ?? 0;
+  get totalManaRegen() {
+    const { manaRegenFlat, manaRegenMult } = getConditionEffectsOnMisc(
+      this.conditions,
+    );
+    return (
+      this.manaRegen * manaRegenMult + this.equipmentStats.regen + manaRegenFlat
+    );
+  }
 
-    return this.manaMax + gearBuffs;
+  get nonBuffedMaxMana() {
+    return this.manaMax + this.equipmentStats.mana;
   }
 
   private useMana(mana: number) {
@@ -679,30 +711,34 @@ export class PlayerCharacter extends Character {
   }
 
   private restoreMana(amount: number) {
-    if (this.mana + amount < this.getMaxMana()) {
+    if (this.mana + amount < this.totalMaxMana) {
       this.mana += amount;
     } else {
-      this.mana = this.getMaxMana();
+      this.mana = this.totalMaxMana;
     }
-  }
-
-  public getManaRegen() {
-    let withGearBuffs = this.manaRegen;
-    withGearBuffs += this.equipment.mainHand.stats?.regen ?? 0;
-    withGearBuffs += this.equipment.offHand?.stats?.regen ?? 0;
-    withGearBuffs += this.equipment.body?.stats?.regen ?? 0;
-    withGearBuffs += this.equipment.head?.stats?.regen ?? 0;
-    return withGearBuffs;
   }
 
   private regenMana() {
-    if (this.mana + this.getManaRegen() < this.getMaxMana()) {
-      this.mana += this.getManaRegen();
+    if (this.mana + this.totalManaRegen < this.totalMaxMana) {
+      this.mana += this.totalManaRegen;
     } else {
-      this.mana = this.getMaxMana();
+      this.mana = this.totalMaxMana;
     }
   }
   //----------------------------------Sanity----------------------------------//
+  get nonBuffedMaxSanity() {
+    return this.sanityMax + this.equipmentStats.sanity;
+  }
+
+  get totalMaxSanity() {
+    const { sanityFlat, sanityMult } = getConditionEffectsOnDefenses(
+      this.conditions,
+    );
+    return (
+      this.sanityMax * sanityMult + this.equipmentStats.sanity + sanityFlat
+    );
+  }
+
   public damageSanity(damage?: number | null) {
     if (damage) {
       this.sanity -= damage;
@@ -711,33 +747,15 @@ export class PlayerCharacter extends Character {
   }
 
   public restoreSanity(amount: number) {
-    if (this.sanity + amount < this.sanityMax) {
+    if (this.sanity + amount < this.totalMaxSanity) {
       this.sanity += amount;
     } else {
-      this.sanity = this.sanityMax;
+      this.sanity = this.totalMaxSanity;
     }
   }
 
   public changeMaxSanity(change: number) {
-    this.sanity + change;
-  }
-
-  public getNonBuffedMaxSanity() {
-    let gearBuffs = 0;
-    gearBuffs += this.equipment.mainHand.stats?.sanity ?? 0;
-    gearBuffs += this.equipment.offHand?.stats?.sanity ?? 0;
-    gearBuffs += this.equipment.body?.stats?.sanity ?? 0;
-    gearBuffs += this.equipment.head?.stats?.sanity ?? 0;
-    return 50 + gearBuffs;
-  }
-
-  public getMaxSanity() {
-    let withGearBuffs = this.sanityMax;
-    withGearBuffs += this.equipment.mainHand.stats?.sanity ?? 0;
-    withGearBuffs += this.equipment.offHand?.stats?.sanity ?? 0;
-    withGearBuffs += this.equipment.body?.stats?.sanity ?? 0;
-    withGearBuffs += this.equipment.head?.stats?.sanity ?? 0;
-    return withGearBuffs;
+    this.sanityMax + change;
   }
 
   //----------------------------------Inventory----------------------------------//
@@ -776,91 +794,35 @@ export class PlayerCharacter extends Character {
     let mana = 0;
     let regen = 0;
     let health = 0;
+    let sanity = 0;
     let blockChance = 0;
+    let strength = 0;
+    let intelligence = 0;
 
-    if (this.equipment.head) {
-      const stats = this.equipment.head.stats;
-      if (stats) {
-        if (stats.armor) {
-          armor += stats.armor;
-        }
-        if (stats.mana) {
-          mana += stats.mana;
-        }
-        if (stats.regen) {
-          regen += stats.regen;
-        }
-        if (stats.health) {
-          health += stats.health;
-        }
-      }
-    }
-    if (this.equipment.body) {
-      const stats = this.equipment.body.stats;
-      if (stats) {
-        if (stats.armor) {
-          armor += stats.armor;
-        }
-        if (stats.mana) {
-          mana += stats.mana;
-        }
-        if (stats.regen) {
-          regen += stats.regen;
-        }
-        if (stats.health) {
-          health += stats.health;
-        }
-      }
-    }
-    if (this.equipment.mainHand) {
-      const stats = this.equipment.mainHand.stats;
-      if (stats) {
-        if (stats.damage) {
-          damage += stats.damage;
-        }
-        if (stats.mana) {
-          mana += stats.mana;
-        }
-        if (stats.regen) {
-          regen += stats.regen;
-        }
-        if (stats.health) {
-          health += stats.health;
-        }
-      }
-    }
-
-    if (this.equipment.offHand) {
-      const stats = this.equipment.offHand.stats;
-      if (stats) {
-        if (stats.damage) {
-          damage += stats.damage * 0.5;
-        }
-        if (stats.armor) {
-          armor += stats.armor;
-        }
-        if (stats.mana) {
-          mana += stats.mana;
-        }
-        if (stats.regen) {
-          regen += stats.regen;
-        }
-        if (stats.health) {
-          health += stats.health;
-        }
-        if (stats.blockChance) {
-          blockChance = stats.blockChance;
-        }
-      }
+    for (const [_, item] of Object.entries(this.equipment)) {
+      const stats = item?.stats;
+      if (!stats) continue;
+      armor += stats.armor ?? 0;
+      damage += stats.damage ?? 0;
+      mana += stats.mana ?? 0;
+      regen += stats.regen ?? 0;
+      health += stats.health ?? 0;
+      sanity += stats.sanity ?? 0;
+      blockChance += stats.blockChance ?? 0;
+      strength += stats.strength ?? 0;
+      intelligence += stats.strength ?? 0;
     }
 
     return {
-      armor: armor,
-      damage: damage,
-      mana: mana,
-      regen: regen,
-      health: health,
-      blockChance: blockChance,
+      armor,
+      damage,
+      mana,
+      regen,
+      health,
+      sanity,
+      blockChance,
+      strength,
+      intelligence,
     };
   }
 
@@ -1470,8 +1432,8 @@ export class PlayerCharacter extends Character {
             buffName: buff.name,
             buffChance: buff.chance,
             attackPower: damagePreDR,
-            maxHealth: this.getNonBuffedMaxHealth(),
-            maxSanity: this.getNonBuffedMaxSanity(),
+            maxHealth: this.nonBuffedMaxHealth,
+            maxSanity: this.nonBuffedMaxSanity,
             applierNameString: this.getFullName(),
           });
           if (res) {
@@ -1589,8 +1551,8 @@ export class PlayerCharacter extends Character {
           buffName: buff,
           buffChance: 1.0,
           attackPower: chosenSpell.effects.damage ?? 0,
-          maxHealth: this.getNonBuffedMaxHealth(),
-          maxSanity: this.getNonBuffedMaxSanity(),
+          maxHealth: this.nonBuffedMaxHealth,
+          maxSanity: this.nonBuffedMaxSanity,
           applierNameString: this.getFullName(),
         });
         if (res) {
@@ -1760,7 +1722,7 @@ export class PlayerCharacter extends Character {
           dungeonMap: syntheticDungeon,
           currentPosition: syntheticTile,
           mapDimensions: mapDimensions,
-          enemy: props.enemy,
+          enemy: props.enemy ?? null,
           fightingBoss: false,
         };
       }
@@ -1855,7 +1817,8 @@ export class PlayerCharacter extends Character {
       savedEnemy: json.savedEnemy ? Enemy.fromJSON(json.savedEnemy) : null,
       unAllocatedSkillPoints: json.unAllocatedSkillPoints,
       allocatedSkillPoints: json.allocatedSkillPoints,
-      attackPower: json.attackPower,
+      strength: json.strength,
+      intelligence: json.intelligence,
     });
     return player;
   }

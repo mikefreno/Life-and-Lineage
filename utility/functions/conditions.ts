@@ -170,7 +170,7 @@ export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
             debuffObj.effectStyle[index] === "multiplier" ||
             debuffObj.effectStyle[index] === "percentage"
           ) {
-            localHealthDmg *= playerState.getNonBuffedMaxHealth();
+            localHealthDmg *= playerState.nonBuffedMaxHealth;
           }
           healthDamage.push(localHealthDmg);
         } else {
@@ -183,7 +183,7 @@ export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
             debuffObj.effectStyle[index] === "multiplier" ||
             debuffObj.effectStyle[index] === "percentage"
           ) {
-            localSanityDmg *= playerState.getNonBuffedMaxSanity();
+            localSanityDmg *= playerState.nonBuffedMaxSanity;
           }
           sanityDamage.push(localSanityDmg);
         } else {

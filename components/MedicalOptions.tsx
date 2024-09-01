@@ -35,9 +35,9 @@ const MedicalOption = observer(
       if (playerState && gameState && isFocused) {
         playerState.getMedicalService(
           cost,
-          healthRestore == "fill" ? playerState.getMaxHealth() : healthRestore,
-          sanityRestore == "fill" ? playerState.getMaxSanity() : sanityRestore,
-          manaRestore == "fill" ? playerState.getMaxMana() : manaRestore,
+          healthRestore == "fill" ? playerState.totalMaxHealth : healthRestore,
+          sanityRestore == "fill" ? playerState.totalMaxSanity : sanityRestore,
+          manaRestore == "fill" ? playerState.totalMaxMana : manaRestore,
           removeDebuffs == "all"
             ? playerState.conditions.length
             : removeDebuffs,
@@ -52,17 +52,17 @@ const MedicalOption = observer(
           return true;
         }
         if (healthRestore) {
-          if (playerState.getMaxHealth() - playerState.health == 0) {
+          if (playerState.totalMaxHealth - playerState.health == 0) {
             return true;
           }
         }
         if (manaRestore) {
-          if (playerState.getMaxMana() - playerState.mana == 0) {
+          if (playerState.totalMaxMana - playerState.mana == 0) {
             return true;
           }
         }
         if (sanityRestore) {
-          if (playerState.getMaxSanity() - playerState.sanity == 0) {
+          if (playerState.totalMaxSanity - playerState.sanity == 0) {
             return true;
           }
         }
@@ -96,7 +96,7 @@ const MedicalOption = observer(
               <View className="flex w-full flex-row items-center justify-evenly">
                 <Text className="dark:text-zinc-50">
                   {healthRestore == "fill"
-                    ? playerState?.getMaxHealth()
+                    ? playerState?.totalMaxHealth
                     : healthRestore}
                 </Text>
                 <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
@@ -106,7 +106,7 @@ const MedicalOption = observer(
               <View className="flex w-full flex-row items-center justify-evenly">
                 <Text className="dark:text-zinc-50">
                   {manaRestore == "fill"
-                    ? playerState?.getMaxMana()
+                    ? playerState?.totalMaxMana
                     : manaRestore}
                 </Text>
                 <Energy width={14} height={14} style={{ marginLeft: 6 }} />
@@ -116,7 +116,7 @@ const MedicalOption = observer(
               <View className="flex w-full flex-row items-center justify-evenly">
                 <Text className="dark:text-zinc-50">
                   {sanityRestore == "fill"
-                    ? (playerState?.getMaxSanity() ?? 50) * 2
+                    ? (playerState?.totalMaxSanity ?? 50) * 2
                     : sanityRestore}
                 </Text>
                 <Sanity width={14} height={14} style={{ marginLeft: 6 }} />

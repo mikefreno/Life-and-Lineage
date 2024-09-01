@@ -25,10 +25,12 @@ import {
   Coins,
   Energy,
   HealthIcon,
+  IntelligenceIcon,
   RotateArrow,
   Sanity,
   SquareMinus,
   SquarePlus,
+  StrengthIcon,
 } from "../assets/icons/SVGIcons";
 import { damageReduction } from "../utility/functions/misc/numbers";
 
@@ -88,15 +90,15 @@ const PlayerStatus = observer(
     const healthDamageFlash = useState(new Animated.Value(0))[0];
     const healthWarningAnimatedValue = useState(new Animated.Value(0))[0];
     const [localHealthMax, setLocalHealthMax] = useState<number | undefined>(
-      playerState?.getMaxHealth(),
+      playerState?.totalMaxHealth,
     );
     const [localManaMax, setLocalManaMax] = useState<number | undefined>(
-      playerState?.getMaxMana(),
+      playerState?.totalMaxMana,
     );
     const [localSanityMax, setLocalSanityMax] = useState<number | undefined>(
-      playerState?.getMaxSanity(),
+      playerState?.totalMaxSanity,
     );
-    const [respeccing, setRespeccing] = useState<boolean>(false);
+    const [respeccing, setRespeccing] = useState<boolean>(true);
 
     const vibration = useVibration();
     const { colorScheme } = useColorScheme();
@@ -114,17 +116,13 @@ const PlayerStatus = observer(
     });
 
     useEffect(() => {
-      setLocalHealthMax(playerState?.getMaxHealth());
-      setLocalManaMax(playerState?.getMaxMana());
-      setLocalSanityMax(playerState?.getMaxSanity());
+      setLocalHealthMax(playerState?.totalMaxHealth);
+      setLocalManaMax(playerState?.totalMaxMana);
+      setLocalSanityMax(playerState?.totalMaxSanity);
     }, [
-      playerState?.equipment.body,
-      playerState?.equipment.head,
-      playerState?.equipment.mainHand,
-      playerState?.equipment.offHand,
-      playerState?.healthMax,
-      playerState?.manaMax,
-      playerState?.sanityMax,
+      playerState?.totalMaxSanity,
+      playerState?.totalMaxMana,
+      playerState?.totalMaxHealth,
     ]);
 
     const isFocused = useIsFocused();
@@ -664,7 +662,7 @@ const PlayerStatus = observer(
                   <View className="flex-1">
                     <ProgressBar
                       value={playerState.health}
-                      maxValue={localHealthMax ?? playerState.getMaxHealth()}
+                      maxValue={localHealthMax ?? playerState.totalMaxHealth}
                       filledColor="#ef4444"
                       unfilledColor="#fca5a5"
                       showMax
@@ -711,7 +709,7 @@ const PlayerStatus = observer(
                   <View className="flex-1">
                     <ProgressBar
                       value={playerState.mana}
-                      maxValue={localManaMax ?? playerState.getMaxMana()}
+                      maxValue={localManaMax ?? playerState.totalMaxMana}
                       filledColor="#60a5fa"
                       unfilledColor="#bfdbfe"
                       showMax
@@ -758,7 +756,7 @@ const PlayerStatus = observer(
                     <ProgressBar
                       value={playerState.sanity}
                       minValue={-50}
-                      maxValue={localSanityMax ?? playerState.getMaxSanity()}
+                      maxValue={localSanityMax ?? playerState.totalMaxSanity}
                       filledColor="#c084fc"
                       unfilledColor="#e9d5ff"
                       showMax
@@ -795,6 +793,92 @@ const PlayerStatus = observer(
                         )}
                       </Pressable>
                     )}
+                </View>
+              </View>
+              <View className="flex flex-row justify-evenly">
+                <View className="flex items-center">
+                  <Text className="py-1">Strength</Text>
+                  <View className="flex flex-row">
+                    <StrengthIcon color={"#ef4444"} height={20} width={23} />
+                    <View className="flex flex-row">
+                      {playerState.unAllocatedSkillPoints > 0 &&
+                        !respeccing && (
+                          <Pressable
+                            className="px-0.5"
+                            onPress={() => {
+                              vibration({ style: "light" });
+                              playerState.spendSkillPointOnStrength();
+                            }}
+                          >
+                            {({ pressed }) => (
+                              <View className={pressed ? "scale-95" : ""}>
+                                <SquarePlus height={28} width={28} />
+                              </View>
+                            )}
+                          </Pressable>
+                        )}
+                      {playerState.allocatedSkillPoints.strength > 0 &&
+                        respeccing && (
+                          <Pressable
+                            className="px-0.5"
+                            onPress={() => {
+                              vibration({ style: "light" });
+                              playerState.refundSkillPointOnStrength();
+                            }}
+                          >
+                            {({ pressed }) => (
+                              <View className={pressed ? "scale-95" : ""}>
+                                <SquareMinus height={28} width={28} />
+                              </View>
+                            )}
+                          </Pressable>
+                        )}
+                    </View>
+                  </View>
+                </View>
+                <View className="flex items-center">
+                  <Text className="py-1">Intelligence</Text>
+                  <View className="flex flex-row">
+                    <IntelligenceIcon
+                      color={"#ef4444"}
+                      height={20}
+                      width={23}
+                    />
+                    <View className="flex flex-row items-center">
+                      {playerState.unAllocatedSkillPoints > 0 &&
+                        !respeccing && (
+                          <Pressable
+                            className="px-0.5"
+                            onPress={() => {
+                              vibration({ style: "light" });
+                              playerState.spendSkillPointOnIntelligence();
+                            }}
+                          >
+                            {({ pressed }) => (
+                              <View className={pressed ? "scale-95" : ""}>
+                                <SquarePlus height={28} width={28} />
+                              </View>
+                            )}
+                          </Pressable>
+                        )}
+                      {playerState.allocatedSkillPoints.intelligence > 0 &&
+                        respeccing && (
+                          <Pressable
+                            className="px-0.5"
+                            onPress={() => {
+                              vibration({ style: "light" });
+                              playerState.refundSkillPointOnIntelligence();
+                            }}
+                          >
+                            {({ pressed }) => (
+                              <View className={pressed ? "scale-95" : ""}>
+                                <SquareMinus height={28} width={28} />
+                              </View>
+                            )}
+                          </Pressable>
+                        )}
+                    </View>
+                  </View>
                 </View>
               </View>
               {(playerState.equipmentStats.armor > 0 ||
@@ -895,7 +979,7 @@ const PlayerStatus = observer(
                     </Text>
                     <ProgressBar
                       value={playerState.health}
-                      maxValue={localHealthMax ?? playerState.getMaxHealth()}
+                      maxValue={localHealthMax ?? playerState.totalMaxHealth}
                       filledColor="#ef4444"
                       unfilledColor="#fca5a5"
                     />
@@ -907,7 +991,7 @@ const PlayerStatus = observer(
                     </Text>
                     <ProgressBar
                       value={playerState.mana}
-                      maxValue={localManaMax ?? playerState.getMaxMana()}
+                      maxValue={localManaMax ?? playerState.totalMaxMana}
                       filledColor="#60a5fa"
                       unfilledColor="#bfdbfe"
                     />
@@ -920,7 +1004,7 @@ const PlayerStatus = observer(
                     <ProgressBar
                       value={playerState.sanity}
                       minValue={-50}
-                      maxValue={localSanityMax ?? playerState.getMaxSanity()}
+                      maxValue={localSanityMax ?? playerState.totalMaxSanity}
                       filledColor="#c084fc"
                       unfilledColor="#e9d5ff"
                     />
