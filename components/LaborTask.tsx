@@ -97,8 +97,8 @@ const LaborTask = observer(
             <GenericRaisedButton
               onPressFunction={work}
               disabledCondition={
-                (cost.health && playerState.health <= cost.health) ||
-                playerState.mana < cost.mana
+                (cost.health && playerState.currentHealth <= cost.health) ||
+                playerState.currentMana < cost.mana
               }
             >
               Work

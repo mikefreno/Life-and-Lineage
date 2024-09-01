@@ -12,7 +12,6 @@ const _fullSave = async (
   player: PlayerCharacter | undefined,
 ) => {
   if (game && player) {
-    console.log("saving");
     try {
       storage.set("game", JSON.stringify(game));
       storage.set("player", JSON.stringify(player));

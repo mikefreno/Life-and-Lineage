@@ -716,7 +716,7 @@ export class PlayerCharacter extends Character {
   }
 
   private regenMana() {
-    if (this.maxMana + this.totalManaRegen < this.maxMana) {
+    if (this.currentMana + this.totalManaRegen < this.maxMana) {
       this.currentMana += this.totalManaRegen;
     } else {
       this.currentMana = this.maxMana;
@@ -1525,7 +1525,7 @@ export class PlayerCharacter extends Character {
   }: playerSpellDeps) {
     if (this.playerHasAdequateProficiency(chosenSpell)) {
       if (chosenSpell.manaCost <= this.currentMana) {
-        this.currentMana -= chosenSpell.manaCost;
+        this.useMana(chosenSpell.manaCost);
         this.gainProficiency(chosenSpell);
         return this.useSpell({ chosenSpell, enemyMaxHP, enemyMaxSanity });
       }
