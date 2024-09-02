@@ -1,12 +1,12 @@
-import { Pressable, View } from "react-native";
-import { View as ThemedView, Text } from "./Themed";
+import { LayoutChangeEvent, Pressable, View } from "react-native";
+import { Text } from "./Themed";
 import GearStatsDisplay from "./GearStatsDisplay";
 import { useColorScheme } from "nativewind";
 import { useVibration } from "../utility/customHooks";
 import { router } from "expo-router";
 import { toTitleCase } from "../utility/functions/misc/words";
 import { Item } from "../classes/item";
-import { useContext } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Shop } from "../classes/shop";
 import { asReadableGold } from "../utility/functions/misc/numbers";
 import SpellDetails from "./SpellDetails";
@@ -55,7 +55,9 @@ export function StatsDisplay({
 
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing contexts");
-  const { playerState, dimensions } = appData;
+  const { playerState, dimensions, blockSize } = appData;
+  const [viewWidth, setViewWidth] = useState(dimensions.width * 0.4);
+  const topRef = useRef<View>(null);
 
   const SaleSection = () => {
     if (playerState) {
@@ -226,10 +228,15 @@ export function StatsDisplay({
       return `${convertMasteryToString[spellRes.proficiencyNeeded]} level book`;
     }
   }
+  const onLayoutView = (event: LayoutChangeEvent) => {
+    const { width } = event.nativeEvent.layout;
+    setViewWidth(width);
+  };
 
   return (
-    <ThemedView
+    <View
       className="items-center rounded-md border border-zinc-600 p-4"
+      onLayout={onLayoutView}
       style={
         displayItem.item[0].itemClass == "book"
           ? {
@@ -250,11 +257,10 @@ export function StatsDisplay({
                 colorScheme == "light"
                   ? "rgba(250, 250, 250, 0.98)"
                   : "rgba(20, 20, 20, 0.95)",
-              left: displayItem.positon.left
-                ? displayItem.positon.left < dimensions.width * 0.6
-                  ? displayItem.positon.left + 50
-                  : displayItem.positon.left - dimensions.width / 3
-                : undefined,
+              left:
+                displayItem.positon.left + blockSize < dimensions.width * 0.6
+                  ? displayItem.positon.left + blockSize
+                  : displayItem.positon.left - viewWidth - 4,
               top:
                 topGuard &&
                 displayItem.positon.top + (topOffset ?? 0) < topGuard
@@ -315,6 +321,6 @@ export function StatsDisplay({
         </>
       ) : null}
       <SaleSection />
-    </ThemedView>
+    </View>
   );
 }

@@ -1,7 +1,7 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 import { Item } from "../classes/item";
-import { Pressable, View, Image } from "react-native";
+import { Pressable, View, Image, LayoutChangeEvent } from "react-native";
 import Draggable from "react-native-draggable";
 import { useVibration } from "../utility/customHooks";
 import { checkReleasePositionProps } from "../utility/types";
@@ -10,7 +10,7 @@ import { Text, View as ThemedView } from "./Themed";
 import { AppContext } from "../app/_layout";
 
 type InventoryRenderBase = {
-  selfRef: RefObject<View> | null;
+  selfRef?: RefObject<View>;
   inventory: {
     item: Item[];
   }[];
@@ -68,7 +68,7 @@ export default function InventoryRender({
   const vibration = useVibration();
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing contexts");
-  const { playerState, dimensions } = appData;
+  const { playerState, dimensions, blockSize, setBlockSize } = appData;
 
   function checkReleasePosition({
     item,
@@ -170,7 +170,20 @@ export default function InventoryRender({
     item: Item[];
   }
 
-  const blockSize = Math.min(dimensions.lesser / 7.5, 84);
+  const onLayoutView = (event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+    if (width && height) {
+      if (dimensions.width === dimensions.lesser) {
+        const blockSize = Math.min(height / 5, width / 7.5);
+        setBlockSize(blockSize);
+      } else {
+        const blockSize = width / 14;
+        setBlockSize(blockSize);
+      }
+    } else {
+      console.log("uh", width, height);
+    }
+  };
 
   const ItemRender = ({ item }: ItemRenderProps) => {
     const [buzzed, setBuzzed] = useState(false);
@@ -246,6 +259,7 @@ export default function InventoryRender({
     <>
       <View
         ref={selfRef}
+        onLayout={onLayoutView}
         className={`${
           "headTarget" in props
             ? dimensions.greater == dimensions.height
@@ -263,11 +277,11 @@ export default function InventoryRender({
               dimensions.width === dimensions.greater
                 ? {
                     left: `${(index % 12) * 8.33 + 0.5}%`,
-                    top: `${Math.floor(index / 12) * 48 + blockSize / 10}%`,
+                    top: `${Math.floor(index / 12) * 48 + 8}%`,
                   }
                 : {
-                    left: `${(index % 6) * 16.67 + 1.2}%`,
-                    top: `${Math.floor(index / 6) * 24 + blockSize / 12}%`,
+                    left: `${(index % 6) * 16.67 + 2}%`,
+                    top: `${Math.floor(index / 6) * 24 + 4}%`,
                   }
             }
             key={"bg-" + index}
@@ -285,11 +299,11 @@ export default function InventoryRender({
               dimensions.width === dimensions.greater
                 ? {
                     left: `${(index % 12) * 8.33 + 0.5}%`,
-                    top: `${Math.floor(index / 12) * 48 + blockSize / 10}%`,
+                    top: `${Math.floor(index / 12) * 48 + 8}%`,
                   }
                 : {
-                    left: `${(index % 6) * 16.67 + 1.2}%`,
-                    top: `${Math.floor(index / 6) * 24 + blockSize / 12}%`,
+                    left: `${(index % 6) * 16.67 + 2}%`,
+                    top: `${Math.floor(index / 6) * 24 + 4}%`,
                   }
             }
             key={index}

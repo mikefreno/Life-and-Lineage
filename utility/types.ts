@@ -359,4 +359,6 @@ export interface AppContextType {
     greater: number;
     lesser: number;
   };
+  blockSize: number;
+  setBlockSize: React.Dispatch<React.SetStateAction<number>>;
 }

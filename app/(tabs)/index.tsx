@@ -48,7 +48,7 @@ const HomeScreen = observer(() => {
   );
   const isFocused = useIsFocused();
 
-  const tabBarHeight = useBottomTabBarHeight();
+  const tabBarHeight = useBottomTabBarHeight() + 10;
 
   useEffect(() => {
     if (!showIntroTutorial && gameState) {

@@ -21,20 +21,18 @@ import { Enemy } from "../classes/creatures";
 import { fullSave, fullLoad } from "../utility/functions/save_load";
 import { Dimensions, Keyboard, Platform, StyleSheet } from "react-native";
 import { View as ThemedView } from "../components/Themed";
-import { autorun, reaction, runInAction } from "mobx";
+import { reaction } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
-import { throttle } from "lodash";
 import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
 import { AppContextType } from "../utility/types";
-import { AuthProvider, useAuth } from "../auth/AuthContext";
+import { AuthProvider } from "../auth/AuthContext";
 import D20DieAnimation from "../components/DieRollAnim";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
-import { Item } from "../classes/item";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -64,8 +62,7 @@ Notifications.setNotificationHandler({
 });
 
 function handleRegistrationError(errorMessage: string) {
-  alert(errorMessage);
-  throw new Error(errorMessage);
+  console.log(errorMessage);
 }
 
 async function registerForPushNotificationsAsync() {
@@ -121,13 +118,10 @@ const Root = observer(() => {
   const [logsState, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [gameDate, setGameDate] = useState<string>("");
-  const [playerGold, setPlayerGold] = useState<number>(playerState?.gold ?? 0);
-  const [playerHealth, setPlayerHealth] = useState<number>(
-    playerState?.health ?? 100,
-  );
   const [playerStatusCompact, setPlayerStatusCompact] = useState<boolean>(true);
   const [showDetailedStatusView, setShowDetailedStatusView] =
     useState<boolean>(false);
+  const [blockSize, setBlockSize] = useState<number>();
   const { setColorScheme, colorScheme } = useColorScheme();
 
   const [expoPushToken, setExpoPushToken] = useState("");
@@ -203,15 +197,15 @@ const Root = observer(() => {
   );
 
   const [dimensions, setDimensions] = useState(() => ({
-    height: Dimensions.get("screen").height,
-    width: Dimensions.get("screen").width,
+    height: Dimensions.get("window").height,
+    width: Dimensions.get("window").width,
     greater: Math.max(
-      Dimensions.get("screen").height,
-      Dimensions.get("screen").width,
+      Dimensions.get("window").height,
+      Dimensions.get("window").width,
     ),
     lesser: Math.min(
-      Dimensions.get("screen").height,
-      Dimensions.get("screen").width,
+      Dimensions.get("window").height,
+      Dimensions.get("window").width,
     ),
   }));
 
@@ -269,6 +263,8 @@ const Root = observer(() => {
           showDetailedStatusView,
           setShowDetailedStatusView,
           dimensions,
+          blockSize,
+          setBlockSize,
         }}
       >
         <RootLayout />

@@ -86,7 +86,7 @@ export default function NewGameReview() {
       case "mage":
         return {
           baseHealth: 100,
-          baseMana: 80,
+          baseMana: 100,
           baseStrength: 5,
           baseIntelligence: 5,
           baseManaRegen: 5,

@@ -295,7 +295,6 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
             <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
               <PlatformDependantBlurView className="flex-1 px-2">
                 <InventoryRender
-                  selfRef={null}
                   displayItem={displayItem}
                   setDisplayItem={setDisplayItem}
                   inventory={playerState.getInventory()}
