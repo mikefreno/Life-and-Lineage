@@ -12,6 +12,8 @@ import type {
 } from "../../utility/types";
 import { SpellError } from "../../utility/errorTypes";
 import { Item } from "../../classes/item";
+import { Spell } from "../../classes/spell";
+import { Attack } from "../../classes/attack";
 
 interface addItemToPouch {
   item: Item;
@@ -374,192 +376,33 @@ export const loadBoss = ({ appData, dungeonData }: contextData) => {
   }
 };
 
-export interface useAttack {
+export interface use {
+  attackOrSpell: Attack | Spell;
+  target: Enemy | Minion;
   dungeonData: DungeonContextType | undefined;
   appData: AppContextType | undefined;
-  attack: AttackObj;
-  target: Enemy | Minion;
   isFocused: boolean;
 }
-export const useAttack = ({
+export const use = ({
+  attackOrSpell,
+  target,
   dungeonData,
   appData,
-  attack,
-  target,
   isFocused,
-}: useAttack) => {
-  if (!appData || !dungeonData)
-    throw new Error("missing context in useAttack()");
+}: use) => {
+  if (!appData || !dungeonData) throw new Error("missing context in pass()");
   const { battleLogger } = dungeonData;
-  const { playerState } = appData;
-  if (target && playerState && isFocused) {
-    const attackRes = playerState.doPhysicalAttack({
-      chosenAttack: attack,
-      enemyMaxHP: target.getMaxHealth(),
-      enemyMaxSanity: target.getMaxSanity(),
-      enemyDR: target.getDamageReduction(),
-      enemyConditions: target.conditions,
-    });
-    if (attackRes !== "miss") {
-      target.damageHealth(attackRes.damage);
-      target.damageSanity(attackRes.sanityDamage);
-      attackRes.debuffs?.forEach((effect) => target.addCondition(effect));
-      let line = `You ${attack.name == "cast" ? "used " : ""}${toTitleCase(
-        attack.name,
-      )}${
-        attack.name !== "cast"
-          ? attack.name.charAt(attack.name.length - 1) == "e"
-            ? "d"
-            : "ed"
-          : " on"
-      } the ${toTitleCase(target.creatureSpecies)} for ${
-        attackRes.damage
-      } heath damage`;
-      if (attackRes.sanityDamage) {
-        line += ` and ${attackRes.sanityDamage} sanity damage`;
-      }
-      if (attackRes.debuffs) {
-        attackRes.debuffs.forEach(
-          (effect) => (line += ` and applied a ${effect.name} stack`),
-        );
-      }
-      battleLogger(line);
-    } else {
-      battleLogger(
-        `You ${attackRes}ed the ${toTitleCase(target.creatureSpecies)}`,
-      );
-    }
-
-    if (target instanceof Enemy) {
-      if (target.health <= 0 || (target.sanity && target.sanity <= 0)) {
-        setTimeout(() => {
-          enemyTurnCheck({
-            appData,
-            dungeonData,
-          });
-        }, 1000);
-      } else {
-        setTimeout(() => {
-          playerMinionsTurn({ appData, dungeonData });
-          setTimeout(
-            () => {
-              enemyTurnCheck({
-                appData,
-                dungeonData,
-              });
-            },
-            1000 * playerState.minions.length + 1,
-          );
-        }, 1000);
-      }
-    } else {
-      setTimeout(() => {
-        playerMinionsTurn({ appData, dungeonData });
-        setTimeout(() => {
-          enemyTurnCheck({
-            appData,
-            dungeonData,
-          });
-        }, 1000 * playerState.minions.length);
-      }, 1000);
-    }
-  }
-};
-
-export interface useSpell {
-  dungeonData: DungeonContextType | undefined;
-  appData: AppContextType | undefined;
-  spell: SpellObj;
-  target: Enemy | Minion;
-  isFocused: boolean;
-}
-export const useSpell = ({
-  dungeonData,
-  appData,
-  spell,
-  target,
-  isFocused,
-}: useSpell) => {
-  if (!appData || !dungeonData)
-    throw new Error("missing context in useSpell()");
-  const { battleLogger } = dungeonData;
-  const { playerState } = appData;
-  if (playerState && isFocused) {
-    const spellRes = playerState.attemptSpellUse({
-      chosenSpell: spell,
-      enemyMaxHP: target.getMaxHealth(),
-      enemyMaxSanity: target.getMaxSanity(),
-    });
-    if (spellRes == SpellError.NotEnoughMana) {
-      // update to indicate error to user
-      console.log("Not enough mana!");
-      return;
-    }
-    if (spellRes == SpellError.ProficencyDeficit) {
-      // update to indicate error to user
-      console.log("Proficiency is too low!");
-      return;
-    }
-    target.damageHealth(spellRes.damage);
-    target.damageSanity(spellRes.sanityDamage);
-    spellRes.debuffs?.forEach((debuff) => target.addCondition(debuff));
-    let line = "";
-    if (spell.effects.summon) {
-      let summons = spell.effects.summon.map((summon) => toTitleCase(summon));
-      if (summons.length > 1) {
-        let last = summons[summons.length - 1];
-        let others = summons.slice(0, summons.length - 1);
-        line = `You summoned ${others.join(", ")} and ${toTitleCase(last)}`;
-      } else if (summons.length === 1) {
-        line = `You summoned ${summons[0]}`;
-      }
-    } else {
-      line = `You ${toTitleCase(spell.name)}${
-        spell.name.charAt(spell.name.length - 1) == "e" ? "d" : "ed"
-      } the ${toTitleCase(target.creatureSpecies)} for ${
-        spellRes.damage
-      } heath damage`;
-      if (spellRes.sanityDamage) {
-        line += ` and ${spellRes.sanityDamage} sanity damage`;
-      }
-      if (spellRes.debuffs) {
-        spellRes.debuffs.forEach(
-          (effect) => (line += ` and applied a ${effect.name} stack`),
-        );
-      }
-    }
-    battleLogger(line);
-
-    if (target instanceof Enemy) {
-      if (target.health <= 0 || (target.sanity && target.sanity <= 0)) {
-        setTimeout(() => {
-          enemyTurnCheck({
-            appData,
-            dungeonData,
-          });
-        }, 1000);
-      } else {
-        setTimeout(() => {
-          playerMinionsTurn({ appData, dungeonData });
-          setTimeout(() => {
-            enemyTurnCheck({
-              appData,
-              dungeonData,
-            });
-          }, 1000 * playerState.minions.length);
-        }, 1000);
-      }
-    } else {
-      setTimeout(() => {
-        playerMinionsTurn({ appData, dungeonData });
-        setTimeout(() => {
-          enemyTurnCheck({
-            appData,
-            dungeonData,
-          });
-        }, 1000 * playerState.minions.length);
-      }, 1000);
-    }
+  const { playerState, enemyState } = appData;
+  if (enemyState && playerState && isFocused) {
+    const { result, logString } = attackOrSpell.use(target);
+    battleLogger(logString ?? "");
+    playerMinionsTurn({ dungeonData, appData });
+    setTimeout(() => {
+      enemyTurnCheck({
+        appData,
+        dungeonData,
+      });
+    }, 1000 * playerState.minions.length);
   }
 };
 

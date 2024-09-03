@@ -17,12 +17,7 @@ import GenericStrikeAround from "../GenericStrikeAround";
 import InventoryRender from "../InventoryRender";
 import { AppContext } from "../../app/_layout";
 import { DungeonContext } from "./DungeonContext";
-import {
-  addItemToPouch,
-  pass,
-  useAttack,
-  useSpell,
-} from "./DungeonInteriorFunctions";
+import { addItemToPouch, pass, use } from "./DungeonInteriorFunctions";
 import { DungeonMapControls } from "./DungeonMap";
 import PlatformDependantBlurView from "../PlatformDependantBlurView";
 import { useIsFocused } from "@react-navigation/native";
@@ -51,10 +46,10 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
     inCombat,
     attackAnimationOnGoing,
     setAttackAnimationOnGoing,
-    setShowTargetSelection,
     displayItem,
     setDisplayItem,
   } = dungeonData;
+  const [combinedData, setCombinedData] = useState<(Attack | Spell)[]>([]);
 
   const vibration = useVibration();
   const isFocused = useIsFocused();
@@ -73,9 +68,11 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
     }
   }, [attackDetailsShowing]);
 
-  let combinedData: (Attack | Spell)[] = playerState.physicalAttacks;
-
-  combinedData.concat(playerState.spells);
+  useEffect(() => {
+    if (playerState) {
+      setCombinedData([...playerState.physicalAttacks, ...playerState.spells]);
+    }
+  }, [playerState]);
 
   useEffect(() => {}, [inCombat]);
 
@@ -174,19 +171,15 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                                 attackAnimationOnGoing
                               }
                               onPress={() => {
+                                setAttackAnimationOnGoing(true);
                                 vibration({ style: "light" });
-                                if (
-                                  enemyState &&
-                                  enemyState.minions.length == 0
-                                ) {
-                                  setAttackAnimationOnGoing(true);
-                                  attackOrSpell.use(enemyState);
-                                } else {
-                                  setShowTargetSelection({
-                                    showing: true,
-                                    chosenAttack: attackOrSpell,
-                                  });
-                                }
+                                use({
+                                  target: enemyState!,
+                                  attackOrSpell,
+                                  appData,
+                                  dungeonData,
+                                  isFocused,
+                                });
                               }}
                               className="mx-2 my-auto rounded px-4 py-2 shadow-sm active:scale-95 active:opacity-50"
                               style={[
