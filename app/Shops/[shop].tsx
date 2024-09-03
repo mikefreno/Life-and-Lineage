@@ -237,7 +237,7 @@ const ShopInteriorScreen = observer(() => {
                   characterSex={thisShop.shopKeeper.sex == "male" ? "M" : "F"}
                 />
                 <Text className="text-center">
-                  {thisShop.shopKeeper.getFullName()}'s Inventory
+                  {thisShop.shopKeeper.fullName}'s Inventory
                 </Text>
                 <View className="flex flex-row">
                   <Text>{thisShop.currentGold}</Text>
@@ -270,7 +270,7 @@ const ShopInteriorScreen = observer(() => {
             <View className="flex-1 mx-2 mt-4">
               <ThemedView className="flex flex-row justify-center py-4 dark:border-zinc-700">
                 <Text className=" text-center">
-                  {playerState.getFullName()}'s Inventory
+                  {playerState.fullName}'s Inventory
                 </Text>
                 <View className="flex flex-row">
                   <Text> ( {playerState!.getReadableGold()}</Text>

@@ -82,7 +82,7 @@ export default function ShopsScreen() {
                 )?.colors.font,
               }}
             >
-              {shop.shopKeeper.getFullName()}
+              {shop.shopKeeper.fullName}
             </Text>
 
             <Pressable

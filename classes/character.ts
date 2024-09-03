@@ -7,6 +7,7 @@ import {
 } from "../utility/functions/conditions";
 import { Condition } from "./conditions";
 import { Item } from "./item";
+import attacks from "../assets/json/playerAttacks.json";
 import weapons from "../assets/json/items/weapons.json";
 import wands from "../assets/json/items/wands.json";
 import mageSpells from "../assets/json/mageSpells.json";
@@ -23,9 +24,9 @@ import {
   InvestmentUpgrade,
   ItemClassType,
   MasteryLevel,
-  beingType,
-  type Spell,
+  BeingType,
   Element,
+  SpellObj,
 } from "../utility/types";
 import { rollD20 } from "../utility/functions/roll";
 import shops from "../assets/json/shops.json";
@@ -56,6 +57,8 @@ import type {
   Tile,
 } from "../components/DungeonComponents/DungeonMap";
 import { toTitleCase } from "../utility/functions/misc/words";
+import { Attack } from "./attack";
+import { Spell } from "./spell";
 
 interface CharacterOptions {
   id?: string;
@@ -121,7 +124,7 @@ export class Character {
       qualifications: observable,
       isPlayerPartner: observable,
       dateCooldownStart: observable,
-      getFullName: action,
+      fullName: computed,
       setJob: action,
       deathRoll: action,
       setDateCooldownStart: action,
@@ -133,7 +136,7 @@ export class Character {
     return this.id == otherCharacter.id;
   }
 
-  public getFullName(): string {
+  get fullName(): string {
     return `${this.firstName} ${this.lastName}`;
   }
   public addQualification(qual: string) {
@@ -521,11 +524,10 @@ export class PlayerCharacter extends Character {
       purchaseInvestmentUpgrade: action,
 
       learnSpellStep: action,
-      getSpells: action,
+      spells: computed,
       learningSpells: observable,
       magicProficiencies: observable,
       knownSpells: observable,
-      attemptSpellUse: action,
 
       minions: observable,
       createMinion: action,
@@ -533,10 +535,9 @@ export class PlayerCharacter extends Character {
       removeMinion: action,
 
       physicalAttacks: computed,
-      doPhysicalAttack: action,
       pass: action,
 
-      isStunned: action,
+      isStunned: computed,
       addCondition: action,
       conditionTicker: action,
 
@@ -556,8 +557,6 @@ export class PlayerCharacter extends Character {
       currentDungeon: observable,
       investments: observable,
 
-      calculateBaseAttackDamage: action,
-
       addToInventory: action,
       buyItem: action,
       removeFromInventory: action,
@@ -566,7 +565,6 @@ export class PlayerCharacter extends Character {
       equipItem: action,
       unEquipItem: action,
       getInventory: observable,
-      getArmorValue: action,
       getDamageReduction: action,
 
       getMedicalService: action,
@@ -663,8 +661,11 @@ export class PlayerCharacter extends Character {
   public restoreHealth(amount: number) {
     if (this.currentHealth + amount < this.maxHealth) {
       this.currentHealth += amount;
+      return amount;
     } else {
+      const amt = this.maxHealth - this.currentHealth;
       this.currentHealth = this.maxHealth;
+      return amt;
     }
   }
 
@@ -781,7 +782,7 @@ export class PlayerCharacter extends Character {
   }
 
   get attackPower() {
-    return this.totalStrength * 0.5;
+    return this.totalStrength * 0.5 + this.equipmentStats.damage;
   }
   //----------------------------------Intelligence-------------------------------//
   get totalIntelligence() {
@@ -960,6 +961,9 @@ export class PlayerCharacter extends Character {
     }
   }
 
+  /**
+   * This should always be used over the `inventory` field
+   */
   public getInventory() {
     const condensedInventory: { item: Item[] }[] = [];
     this.inventory.forEach((item) => {
@@ -981,17 +985,14 @@ export class PlayerCharacter extends Character {
     return condensedInventory;
   }
 
-  public getArmorValue() {
-    let armorValue = 0;
-    armorValue += this.equipment.mainHand.stats?.armor ?? 0;
-    armorValue += this.equipment.offHand?.stats?.armor ?? 0;
-    armorValue += this.equipment.body?.stats?.armor ?? 0;
-    armorValue += this.equipment.head?.stats?.armor ?? 0;
-    return armorValue;
-  }
-
+  /**
+   * This includes `conditional` effects, it returns a float between 0 and 0.925 (hard cap)
+   */
   public getDamageReduction() {
-    return damageReduction(this.getArmorValue());
+    const { armorMult, armorFlat } = getConditionEffectsOnDefenses(
+      this.conditions,
+    );
+    return damageReduction(this.equipmentStats.armor * armorMult + armorFlat);
   }
 
   private setUnarmored() {
@@ -1003,6 +1004,7 @@ export class PlayerCharacter extends Character {
       itemClass: "weapon" as ItemClassType,
     });
   }
+
   //----------------------------------Gold----------------------------------//
   public getReadableGold() {
     if (this.gold > 10_000_000_000) {
@@ -1156,6 +1158,33 @@ export class PlayerCharacter extends Character {
   }
   //----------------------------------Spells----------------------------------//
 
+  get spells() {
+    let spellList: SpellObj[] = [];
+    if (this.playerClass == "paladin") {
+      spellList = paladinSpells as SpellObj[];
+    } else if (this.playerClass == "necromancer") {
+      spellList = necroSpells as SpellObj[];
+    } else spellList = mageSpells as SpellObj[];
+
+    let spells: Spell[] = [];
+    this.knownSpells.forEach((spell) => {
+      const found = spellList.find((spellObj) => spell == spellObj.name);
+      if (found) {
+        const spell = new Spell({
+          name: found.name,
+          player: this,
+          element: Element[found.element],
+          proficiencyNeeded: found.proficiencyNeeded,
+          manaCost: found.manaCost,
+          duration: found.duration,
+          effects: found.effects,
+        });
+        spells.push(spell);
+      }
+    });
+    return spells;
+  }
+
   public learnSpellStep(bookName: string, spell: string, element: string) {
     let spellFound = false;
 
@@ -1188,47 +1217,6 @@ export class PlayerCharacter extends Character {
         element: element,
       });
     }
-  }
-
-  public getSpells() {
-    let spellList: {
-      name: string;
-      element: string;
-      proficiencyNeeded: string;
-      manaCost: number;
-      effects: {
-        damage: number | null;
-        buffs: string[] | null;
-        debuffs:
-          | {
-              name: string;
-              chance: number;
-            }[]
-          | null;
-        summon?: string[];
-        selfDamage?: number;
-      };
-    }[];
-    if (this.playerClass == "paladin") {
-      spellList = paladinSpells;
-    } else if (this.playerClass == "necromancer") {
-      spellList = necroSpells;
-    } else spellList = mageSpells;
-
-    let spells: Spell[] = [];
-    this.knownSpells.forEach((spell) => {
-      const found = spellList.find((spellObj) => spell == spellObj.name);
-      if (found) {
-        try {
-          let parsed = parseSpell(found);
-          spells.push(parsed);
-        } catch (e) {
-          console.error(e);
-          return;
-        }
-      }
-    });
-    return spells;
   }
 
   public learnSpellCompletion(spell: string, bookName: string) {
@@ -1338,7 +1326,7 @@ export class PlayerCharacter extends Character {
       this.conditions.push(condition);
     }
   }
-  public isStunned() {
+  get isStunned() {
     return this.conditions.some((condition) =>
       condition.effect.includes("stun"),
     );
@@ -1372,6 +1360,7 @@ export class PlayerCharacter extends Character {
   }
   //----------------------------------Physical Combat----------------------------------//
   get physicalAttacks() {
+    let builtAttacks: Attack[] = [];
     if (this.equipment.mainHand) {
       let itemObj;
       itemObj = weapons.find(
@@ -1383,11 +1372,28 @@ export class PlayerCharacter extends Character {
         );
       }
       if (itemObj) {
-        return itemObj.attacks;
+        const attackStrings = itemObj.attacks;
+        attacks.filter((attack) => {
+          if (attackStrings.includes(attack.name)) {
+            const builtAttack = new Attack({
+              name: attack.name,
+              user: this,
+              hitChance: attack.hitChance,
+              targets: attack.targets as "single" | "cleave" | "aoe",
+              damageMult: attack.damageMult,
+            });
+            builtAttacks.push(builtAttack);
+          }
+        });
       } else {
-        return ["punch"];
+        const attack = new Attack({ name: "Punch", user: this });
+        builtAttacks.push(attack);
       }
+    } else {
+      const attack = new Attack({ name: "Punch", user: this });
+      builtAttacks.push(attack);
     }
+    return builtAttacks;
   }
 
   public pass() {
@@ -1399,142 +1405,9 @@ export class PlayerCharacter extends Character {
     this.conditionTicker();
   }
 
-  public calculateBaseAttackDamage(attack: AttackObj) {
-    let damagePreDR: number = 0;
-    if (attack.damageMult) {
-      damagePreDR =
-        attack.damageMult * (this.equipment.mainHand?.stats?.["damage"] ?? 1);
-      const offHandDamage = this.equipment.offHand?.stats?.["damage"];
-      if (offHandDamage) {
-        damagePreDR += offHandDamage * 0.5 * attack.damageMult;
-      }
-    } else if (attack.flatHealthDamage) {
-      damagePreDR = attack.flatHealthDamage;
-    }
-    damagePreDR += this.attackPower / 10;
-    return damagePreDR;
-  }
-
-  public doPhysicalAttack({
-    chosenAttack,
-    enemyMaxSanity,
-    enemyMaxHP,
-    enemyDR,
-    enemyConditions,
-  }: playerAttackDeps) {
-    let rollToHit: number;
-    const { hitChanceMultiplier, damageMult, damageFlat } =
-      getConditionEffectsOnAttacks({
-        selfConditions: this.conditions,
-        enemyConditions: enemyConditions,
-        beingType: this.beingType,
-      });
-    if (chosenAttack.hitChance) {
-      rollToHit = 20 - (chosenAttack.hitChance * 100 * hitChanceMultiplier) / 5;
-    } else {
-      rollToHit = 0;
-    }
-    const roll = rollD20();
-    if (roll >= rollToHit) {
-      let damagePreDR = this.calculateBaseAttackDamage(chosenAttack);
-      let damage = damagePreDR * (1 - enemyDR);
-      damage *= damageMult; // from conditions
-      damage += damageFlat; // from conditions
-      const unRoundedDamage = damage;
-      damage = Math.round(damage * 4) / 4;
-      const sanityDamage = chosenAttack.flatSanityDamage;
-      let debuffs: Condition[] = [];
-      let healedFor: number = 0;
-      if (chosenAttack.debuffs) {
-        chosenAttack.debuffs.forEach((debuff) => {
-          if (debuff.name == "lifesteal") {
-            const roll = rollD20();
-            if (roll * 5 >= 100 - debuff.chance * 100) {
-              const heal = Math.round(unRoundedDamage * 0.5 * 4) / 4;
-              if (this.currentHealth + heal >= this.maxHealth) {
-                healedFor = this.maxHealth - this.currentHealth;
-                this.currentHealth = this.maxHealth;
-              } else {
-                healedFor = heal;
-                this.currentHealth += heal;
-              }
-            }
-          } else {
-            const res = createDebuff({
-              debuffName: debuff.name,
-              debuffChance: debuff.chance,
-              enemyMaxHP: enemyMaxHP,
-              enemyMaxSanity: enemyMaxSanity,
-              primaryAttackDamage: damagePreDR,
-              applierNameString: this.getFullName(),
-            });
-            if (res) debuffs.push(res);
-          }
-        });
-      }
-      let buffsForLogs: Condition[] = [];
-      if (chosenAttack.buffs) {
-        chosenAttack.buffs.forEach((buff) => {
-          const res = createBuff({
-            buffName: buff.name,
-            buffChance: buff.chance,
-            attackPower: damagePreDR,
-            maxHealth: this.nonConditionalMaxHealth,
-            maxSanity: this.nonConditionalMaxSanity,
-            applierNameString: this.getFullName(),
-          });
-          if (res) {
-            this.addCondition(res);
-            buffsForLogs.push(res);
-          }
-        });
-      }
-      this.endTurn();
-      return {
-        name: chosenAttack.name,
-        damage: damage,
-        heal: healedFor,
-        sanityDamage: sanityDamage,
-        debuffs: debuffs.length > 0 ? debuffs : undefined,
-        buffs: buffsForLogs.length > 0 ? buffsForLogs : undefined,
-      };
-    } else {
-      this.endTurn();
-      return "miss";
-    }
-  }
   //----------------------------------Magical Combat----------------------------------//
-  private playerHasAdequateProficiency(chosenSpell: Spell) {
-    const currentSchoolProficiency = this.magicProficiencies.find(
-      (prof) => prof.school == chosenSpell.element,
-    )?.proficiency;
-    if (
-      currentSchoolProficiency &&
-      currentSchoolProficiency >=
-        convertMasteryToNumber[chosenSpell.proficiencyNeeded]
-    ) {
-      return true;
-    }
-    return false;
-  }
 
-  public attemptSpellUse({
-    chosenSpell,
-    enemyMaxHP,
-    enemyMaxSanity,
-  }: playerSpellDeps) {
-    if (this.playerHasAdequateProficiency(chosenSpell)) {
-      if (chosenSpell.manaCost <= this.currentMana) {
-        this.useMana(chosenSpell.manaCost);
-        this.gainProficiency(chosenSpell);
-        return this.useSpell({ chosenSpell, enemyMaxHP, enemyMaxSanity });
-      }
-      return SpellError.NotEnoughMana;
-    }
-    return SpellError.ProficencyDeficit;
-  }
-
-  private gainProficiency(chosenSpell: Spell) {
+  public gainProficiency(chosenSpell: Spell) {
     let currentProficiencies = this.magicProficiencies;
     const newProficiencies = currentProficiencies.map((prof) => {
       if (prof.school === chosenSpell.element) {
@@ -1577,68 +1450,10 @@ export class PlayerCharacter extends Character {
     }
   }
 
-  private useSpell({
-    chosenSpell,
-    enemyMaxHP,
-    enemyMaxSanity,
-  }: playerSpellDeps) {
-    if (chosenSpell.effects.summon) {
-      chosenSpell.effects.summon.map((summon) => this.createMinion(summon));
-    }
-
-    const selfDamage = chosenSpell.effects.selfDamage;
-    if (selfDamage) {
-      this.damageHealth(selfDamage + this.magicPower);
-    }
-
-    let buffs: Condition[] = [];
-    if (chosenSpell.effects.buffs) {
-      chosenSpell.effects.buffs.forEach((buff) => {
-        const res = createBuff({
-          buffName: buff,
-          buffChance: 1.0,
-          attackPower: chosenSpell.effects.damage
-            ? chosenSpell.effects.damage + this.magicPower
-            : 0,
-          maxHealth: this.nonConditionalMaxHealth,
-          maxSanity: this.nonConditionalMaxSanity,
-          applierNameString: this.getFullName(),
-        });
-        if (res) {
-          this.addCondition(res);
-          buffs.push(res);
-        }
-      });
-    }
-    let debuffs: Condition[] = [];
-    if (chosenSpell.effects.debuffs) {
-      chosenSpell.effects.debuffs.forEach((debuff) => {
-        const debuffRes = createDebuff({
-          debuffName: debuff.name,
-          debuffChance: debuff.chance,
-          enemyMaxHP: enemyMaxHP,
-          enemyMaxSanity: enemyMaxSanity,
-          primaryAttackDamage: chosenSpell.effects.damage
-            ? chosenSpell.effects.damage + this.magicPower
-            : 0,
-          applierNameString: this.getFullName(),
-        });
-        if (debuffRes) debuffs.push(debuffRes);
-      });
-    }
-    this.endTurn();
-    return {
-      name: chosenSpell.name,
-      damage: chosenSpell.effects.damage
-        ? chosenSpell.effects.damage + this.magicPower
-        : null,
-      selfDamage: selfDamage,
-      sanityDamage: chosenSpell.effects.sanityDamage,
-      debuffs: debuffs.length > 0 ? debuffs : undefined,
-      buffs: buffs.length > 0 ? buffs : undefined,
-    };
-  }
   //----------------------------------Minions----------------------------------//
+  /**
+   * Returns the beingType of the created minion, adds the minion to the minion list
+   */
   public createMinion(minionName: string) {
     const minionObj = summons.find((summon) => summon.name == minionName);
     if (!minionObj) {
@@ -1651,10 +1466,12 @@ export class PlayerCharacter extends Character {
       attackPower: minionObj.attackPower,
       attacks: minionObj.attacks,
       turnsLeftAlive: minionObj.turns,
-      beingType: minionObj.beingType as beingType,
+      beingType: minionObj.beingType as BeingType,
     });
     this.addMinion(minion);
+    return minion.beingType;
   }
+
   public clearMinions() {
     this.minions = [];
   }

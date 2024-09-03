@@ -27,14 +27,9 @@ const SpellsScreen = observer(() => {
   if (!appData) throw new Error("missing contexts");
 
   const { isCompact, playerState, gameState } = appData;
-  const [spells, setSpells] = useState(playerState?.getSpells());
   const [showSpellTutorial, setShowSpellTutorial] = useState<boolean>(
     (gameState && !gameState.getTutorialState("spell")) ?? false,
   );
-
-  useEffect(() => {
-    setSpells(playerState?.getSpells());
-  }, [playerState?.knownSpells]);
 
   useEffect(() => {
     if (!showSpellTutorial && gameState) {
@@ -146,9 +141,9 @@ const SpellsScreen = observer(() => {
         }}
       >
         <View className="flex-1 pt-4 justify-evenly px-4">
-          {spells && spells.length > 0 ? (
+          {playerState?.spells && playerState.spells.length > 0 ? (
             <ScrollView className="h-1/2">
-              {spells.map((spell) => (
+              {playerState.spells.map((spell) => (
                 <View key={spell.name} className="my-1">
                   <SpellDetails spell={spell} />
                 </View>

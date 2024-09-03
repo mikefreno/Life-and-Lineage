@@ -62,14 +62,14 @@ export const CharacterInteractionModal = observer(
         playerState.setInDungeon({
           state: true,
           instance: "Personal",
-          level: `Personal Assault,${character.getFullName()}`,
+          level: `Personal Assault,${character.fullName}`,
         });
         closeFunction();
         while (router.canGoBack()) {
           router.back();
         }
         router.replace(
-          `/DungeonLevel/Personal/Personal\ Assault/${character.getFullName()}`,
+          `/DungeonLevel/Personal/Personal\ Assault/${character.fullName}`,
         );
       }
     }
@@ -94,9 +94,7 @@ export const CharacterInteractionModal = observer(
       >
         {character && gameState && (
           <View className="">
-            <Text className="text-center text-xl">
-              {character.getFullName()}
-            </Text>
+            <Text className="text-center text-xl">{character.fullName}</Text>
             <View className="mx-auto">
               <CharacterImage
                 characterAge={characterAge}
@@ -224,7 +222,7 @@ export const CharacterInteractionModal = observer(
                 <Text className="text-center text-lg">
                   Are you certain you want to do that? You will start a fight{" "}
                   <Text style={{ color: "#ef4444" }}>
-                    that could end in {character.getFullName()}'s death.
+                    that could end in {character.fullName}'s death.
                   </Text>
                 </Text>
                 <View className="mt-2 flex flex-row justify-evenly">

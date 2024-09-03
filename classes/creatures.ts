@@ -32,14 +32,14 @@ import * as Crypto from "expo-crypto";
 import { Item, isStackable } from "./item";
 import { action, makeObservable, observable } from "mobx";
 import summons from "../assets/json/summons.json";
-import { AttackObj, ItemClassType, beingType } from "../utility/types";
+import { AttackObj, ItemClassType, BeingType } from "../utility/types";
 import { rollD20 } from "../utility/functions/roll";
 import { damageReduction } from "../utility/functions/misc/numbers";
 import { getRandomInt } from "../utility/functions/misc/words";
 
 type CreatureType = {
   id?: string;
-  beingType: beingType;
+  beingType: BeingType;
   creatureSpecies: string;
   health: number;
   healthMax: number;
@@ -79,7 +79,7 @@ interface takeTurnProps {
 
 export class Creature {
   readonly id: string;
-  readonly beingType: beingType;
+  readonly beingType: BeingType;
   readonly creatureSpecies: string;
   health: number;
   readonly healthMax: number;
@@ -158,6 +158,17 @@ export class Creature {
     this.health -= damage ?? 0;
     return this.health;
   }
+
+  public restoreHealth(amount: number) {
+    if (this.health + amount < this.healthMax) {
+      this.health += amount;
+      return amount;
+    } else {
+      const amt = this.healthMax - this.health;
+      this.health = this.healthMax;
+      return amt;
+    }
+  }
   //---------------------------Sanity---------------------------//
   public getMaxSanity() {
     const { sanityMult, sanityFlat } = getConditionEffectsOnDefenses(
@@ -189,16 +200,17 @@ export class Creature {
     }
   }
   //---------------------------Armor---------------------------//
-  public getFullArmor() {
+  public getDamageReduction() {
     const { armorMult, armorFlat } = getConditionEffectsOnDefenses(
       this.conditions,
     );
-    return this.baseArmor * armorMult + armorFlat;
-  }
-  public getDamageReduction() {
-    return damageReduction(this.getFullArmor());
+    return damageReduction(this.baseArmor * armorMult + armorFlat);
   }
   //---------------------------Battle---------------------------//
+  get isStunned() {
+    return getConditionEffectsOnMisc(this.conditions).isStunned;
+  }
+
   protected endTurn() {
     setTimeout(() => {
       this.conditionTicker();
@@ -432,8 +444,7 @@ export class Enemy extends Creature {
     defenderDR,
     defenderConditions,
   }: takeTurnProps) {
-    const { isStunned } = getConditionEffectsOnMisc(this.conditions);
-    if (isStunned) {
+    if (this.isStunned) {
       this.endTurn();
       return "stun";
     } else {
@@ -482,7 +493,29 @@ export class Enemy extends Creature {
       }
     }
   }
+
   //---------------------------Minions---------------------------//
+  /**
+   * Returns the beingType of the created minion, adds the minion to the minion list
+   */
+  public createMinion(minionName: string) {
+    const minionObj = summons.find((summon) => summon.name == minionName);
+    if (!minionObj) {
+      throw new Error(`Minion (${minionName}) not found!`);
+    }
+    const minion = new Minion({
+      creatureSpecies: minionObj.name,
+      health: minionObj.health,
+      healthMax: minionObj.health,
+      attackPower: minionObj.attackPower,
+      attacks: minionObj.attacks,
+      turnsLeftAlive: minionObj.turns,
+      beingType: minionObj.beingType as BeingType,
+    });
+    this.addMinion(minion);
+    return minion.beingType;
+  }
+
   public addMinion(minion: Minion) {
     this.minions.push(minion);
   }

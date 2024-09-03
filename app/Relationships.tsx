@@ -58,9 +58,7 @@ export default function RelationshipsScreen() {
             setSelectedCharacter(character);
           }}
         >
-          <Text className="text-center text-2xl">
-            {character.getFullName()}
-          </Text>
+          <Text className="text-center text-2xl">{character.fullName}</Text>
           <View className="mx-auto">
             <CharacterImage
               characterAge={characterAge}
@@ -71,7 +69,7 @@ export default function RelationshipsScreen() {
             {character.deathdate && "Died at "}
             {characterAge} Years Old
           </Text>
-          <Text className="text-center text-xl">{character.getFullName()}</Text>
+          <Text className="text-center text-xl">{character.fullName}</Text>
           <View className="mx-auto">
             <Text className="flex flex-wrap text-center text-lg">
               {character.deathdate && "Was a "}

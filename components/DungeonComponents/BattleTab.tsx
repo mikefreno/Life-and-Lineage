@@ -6,12 +6,10 @@ import {
   Platform,
   TouchableWithoutFeedback,
 } from "react-native";
-import attacks from "../../assets/json/playerAttacks.json";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { useVibration } from "../../utility/customHooks";
-import { AttackObj, Spell } from "../../utility/types";
 import { elementalColorMap } from "../../utility/elementColors";
 import GenericModal from "../GenericModal";
 import SpellDetails from "../SpellDetails";
@@ -29,6 +27,8 @@ import { DungeonMapControls } from "./DungeonMap";
 import PlatformDependantBlurView from "../PlatformDependantBlurView";
 import { useIsFocused } from "@react-navigation/native";
 import { Energy } from "../../assets/icons/SVGIcons";
+import { Attack } from "../../classes/attack";
+import { Spell } from "../../classes/spell";
 
 interface BattleTabProps {
   battleTab: "attacksOrNavigation" | "equipment" | "log";
@@ -37,7 +37,7 @@ interface BattleTabProps {
 
 export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
   const { colorScheme } = useColorScheme();
-  const [attackDetails, setAttackDetails] = useState<AttackObj | Spell | null>(
+  const [attackDetails, setAttackDetails] = useState<Attack | Spell | null>(
     null,
   );
   const [attackDetailsShowing, setAttackDetailsShowing] =
@@ -56,20 +56,10 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
     setDisplayItem,
   } = dungeonData;
 
-  const playerAttacks = playerState?.physicalAttacks;
-  const playerSpells = playerState?.getSpells();
   const vibration = useVibration();
   const isFocused = useIsFocused();
 
-  let attackObjects: AttackObj[] = [];
-
-  playerAttacks?.forEach((plAttack) =>
-    attacks.filter((attack) => {
-      if (attack.name == plAttack) {
-        attackObjects.push(attack as AttackObj);
-      }
-    }),
-  );
+  if (!playerState) return;
 
   useEffect(() => {
     if (attackDetails) {
@@ -83,15 +73,9 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
     }
   }, [attackDetailsShowing]);
 
-  let combinedData: (AttackObj | Spell)[] = attackObjects.map((attack) => ({
-    ...attack,
-  }));
+  let combinedData: (Attack | Spell)[] = playerState.physicalAttacks;
 
-  if (playerSpells) {
-    combinedData = combinedData.concat(
-      playerSpells.map((spell) => ({ ...spell })),
-    );
-  }
+  combinedData.concat(playerState.spells);
 
   useEffect(() => {}, [inCombat]);
 
@@ -104,7 +88,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
           } else {
             return (
               <View className="w-full h-full px-2">
-                {!playerState.isStunned() ? (
+                {!playerState.isStunned ? (
                   Platform.OS != "web" && (
                     <FlatList
                       data={combinedData}
@@ -114,11 +98,11 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                           className="my-1 rounded border px-4 py-2"
                           style={{
                             backgroundColor:
-                              "element" in attackOrSpell
+                              attackOrSpell instanceof Spell
                                 ? elementalColorMap[attackOrSpell.element].light
                                 : undefined,
                             borderColor:
-                              "element" in attackOrSpell
+                              attackOrSpell instanceof Spell
                                 ? elementalColorMap[attackOrSpell.element].dark
                                 : colorScheme == "light"
                                 ? "#71717a"
@@ -147,13 +131,13 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                                 >
                                   {toTitleCase(attackOrSpell.name)}
                                 </Text>
-                                {"hitChance" in attackOrSpell &&
-                                attackOrSpell.hitChance ? (
+                                {attackOrSpell instanceof Attack &&
+                                attackOrSpell.baseHitChance ? (
                                   <Text className="text-lg">{`${
-                                    attackOrSpell.hitChance * 100
+                                    attackOrSpell.baseHitChance * 100
                                   }% hit chance`}</Text>
                                 ) : (
-                                  "element" in attackOrSpell && (
+                                  attackOrSpell instanceof Spell && (
                                     <View className="flex flex-row">
                                       <Text
                                         style={{
@@ -183,10 +167,10 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                             </View>
                             <Pressable
                               disabled={
-                                ("element" in attackOrSpell &&
+                                (attackOrSpell instanceof Spell &&
                                   attackOrSpell.manaCost >=
                                     playerState.currentMana) ||
-                                playerState.isStunned() ||
+                                playerState.isStunned ||
                                 attackAnimationOnGoing
                               }
                               onPress={() => {
@@ -196,23 +180,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                                   enemyState.minions.length == 0
                                 ) {
                                   setAttackAnimationOnGoing(true);
-                                  if ("element" in attackOrSpell) {
-                                    useSpell({
-                                      spell: attackOrSpell,
-                                      appData,
-                                      dungeonData,
-                                      target: enemyState,
-                                      isFocused,
-                                    });
-                                  } else {
-                                    useAttack({
-                                      attack: attackOrSpell,
-                                      appData,
-                                      dungeonData,
-                                      target: enemyState,
-                                      isFocused,
-                                    });
-                                  }
+                                  attackOrSpell.use(enemyState);
                                 } else {
                                   setShowTargetSelection({
                                     showing: true,
@@ -225,7 +193,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                                 (("element" in attackOrSpell &&
                                   attackOrSpell.manaCost >=
                                     playerState.currentMana) ||
-                                  playerState.isStunned() ||
+                                  playerState.isStunned ||
                                   attackAnimationOnGoing) && { opacity: 0.5 },
                                 {
                                   backgroundColor:
@@ -239,7 +207,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                               ]}
                             >
                               <Text className="text-xl">
-                                {playerState.isStunned()
+                                {playerState.isStunned
                                   ? "Stunned!"
                                   : "element" in attackOrSpell
                                   ? playerState.currentMana >=
@@ -356,11 +324,11 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                   {toTitleCase(attackDetails?.name)}
                 </Text>
                 <Text>
-                  {toTitleCase(attackDetails.targets)}{" "}
-                  {attackDetails.targets == "single" && "Target"}
+                  {toTitleCase(attackDetails.attackStyle)}{" "}
+                  {attackDetails.attackStyle == "single" && "Target"}
                 </Text>
-                {attackDetails.hitChance && (
-                  <Text>{attackDetails.hitChance * 100}% hit chance</Text>
+                {attackDetails.attackStyle && (
+                  <Text>{attackDetails.baseHitChance * 100}% hit chance</Text>
                 )}
                 {attackDetails.buffs && (
                   <>
@@ -386,8 +354,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                 )}
                 <View className="my-1 w-2/3 items-center rounded-md border border-zinc-800 px-2 py-1 dark:border-zinc-100">
                   <Text className="text-center">
-                    {playerState?.calculateBaseAttackDamage(attackDetails)} base
-                    attack damage
+                    {attackDetails.baseDamage} base attack damage
                   </Text>
                   <Text className="text-center">
                     (before enemy damage reduction)

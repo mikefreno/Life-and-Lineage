@@ -3,7 +3,6 @@ import { toTitleCase } from "../utility/functions/misc/words";
 import { Text } from "./Themed";
 import { useColorScheme } from "nativewind";
 import { elementalColorMap } from "../utility/elementColors";
-import { Spell } from "../utility/types";
 import {
   ClockIcon,
   Energy,
@@ -13,12 +12,9 @@ import {
 import BlessingDisplay from "./BlessingsDisplay";
 import { useContext } from "react";
 import { AppContext } from "../app/_layout";
+import { Spell } from "../classes/spell";
 
-interface SpellDetailsProps {
-  spell: Spell;
-}
-
-export default function SpellDetails({ spell }: SpellDetailsProps) {
+export default function SpellDetails({ spell }: { spell: Spell }) {
   const { colorScheme } = useColorScheme();
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing context");
@@ -83,7 +79,7 @@ export default function SpellDetails({ spell }: SpellDetailsProps) {
           </View>
         </View>
         <View className="my-auto items-center w-2/5">
-          {spell.duration ? (
+          {spell.duration > 1 ? (
             <View className="flex flex-row items-center">
               <Text>{spell.duration}</Text>
               <ClockIcon
@@ -94,36 +90,36 @@ export default function SpellDetails({ spell }: SpellDetailsProps) {
               />
             </View>
           ) : null}
-          {spell.effects.damage && spell.effects.damage > 0 ? (
+          {spell.baseDamage && spell.baseDamage > 0 ? (
             <View className="flex flex-row items-center">
-              <Text>{spell.effects.damage}</Text>
+              <Text>{spell.baseDamage}</Text>
               <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
             </View>
           ) : null}
-          {spell.effects.buffs?.map((buff) => (
+          {spell.buffs?.map((buff) => (
             <Text className="text-center" key={buff}>
               {toTitleCase(buff)}
             </Text>
           ))}
-          {spell.effects.debuffs?.map((debuff, idx) => (
+          {spell.debuffs?.map((debuff, idx) => (
             <Text className="text-center" key={idx}>
               {toTitleCase(debuff.name)} - {debuff.chance * 100}%
             </Text>
           ))}
-          {spell.effects.selfDamage ? (
+          {spell.selfDamage ? (
             <View className="flex flex-row items-center">
-              {spell.effects.selfDamage > 0 ? (
+              {spell.selfDamage > 0 ? (
                 <>
-                  <Text>{spell.effects.selfDamage} Self</Text>
+                  <Text>{spell.selfDamage} Self</Text>
                   <HealthIcon
                     width={14}
                     height={14}
                     style={{ marginLeft: 6 }}
                   />
                 </>
-              ) : spell.effects.selfDamage < 0 ? (
+              ) : spell.selfDamage < 0 ? (
                 <>
-                  <Text>Heal {spell.effects.selfDamage * -1}</Text>
+                  <Text>Heal {spell.selfDamage * -1}</Text>
                   <HealthIcon
                     width={14}
                     height={14}
@@ -133,8 +129,8 @@ export default function SpellDetails({ spell }: SpellDetailsProps) {
               ) : null}
             </View>
           ) : null}
-          {spell.effects.summon
-            ? spell.effects.summon.map((summon, idx) => (
+          {spell.summons
+            ? spell.summons.map((summon, idx) => (
                 <View key={idx} className="flex flex-col items-center">
                   <Text>{toTitleCase(summon)}</Text>
                   <NecromancerSkull

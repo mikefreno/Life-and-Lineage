@@ -71,10 +71,11 @@ export enum MasteryLevel {
   Legend,
 }
 
-export type Spell = {
+export type SpellObj = {
   name: string;
   element: Element;
   proficiencyNeeded: MasteryLevel;
+  target?: "single" | "aoe" | "cleave";
   manaCost: number;
   duration?: number;
   effects: {
@@ -105,34 +106,6 @@ export enum Element {
   vengeance = "vengeance",
   protection = "protection",
 }
-
-export type SpellObj = {
-  name: string;
-  element: Element;
-  proficiencyNeeded: number;
-  manaCost: number;
-  effects: {
-    damage: number | null;
-    buffs: string[] | null;
-    debuffs: { name: string; chance: number }[] | null;
-    summon?: string[];
-    selfDamage?: number;
-  };
-};
-
-export type Attack = {
-  name: string;
-  targets: string;
-  hitChance: number;
-  damageMult: number;
-  sanityDamage: number;
-  debuffs:
-    | {
-        name: string;
-        chance: number;
-      }[]
-    | null;
-};
 
 export type AttackObj = {
   name: string;
@@ -249,7 +222,7 @@ export interface checkReleasePositionProps {
   equipped?: boolean;
 }
 
-export type beingType =
+export type BeingType =
   | "block o wood"
   | "beast"
   | "undead"

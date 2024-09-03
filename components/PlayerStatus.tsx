@@ -608,7 +608,7 @@ const PlayerStatus = observer(
                 </View>
                 <View className="flex-1 flex items-center">
                   <Text className="text-xl text-center">
-                    {playerState.getFullName()}
+                    {playerState.fullName}
                   </Text>
                 </View>
                 <View className="flex-1">

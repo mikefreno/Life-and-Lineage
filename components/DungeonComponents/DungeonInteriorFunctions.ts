@@ -608,24 +608,24 @@ export function playerMinionsTurn({ dungeonData, appData }: contextData) {
         });
         if (res == "miss") {
           battleLogger(
-            `${playerState.getFullName()}'s ${toTitleCase(
+            `${playerState.fullName}'s ${toTitleCase(
               suppliedMinions[i].creatureSpecies,
             )} missed!`,
           );
         } else if (res == "stun") {
           battleLogger(
-            `${playerState.getFullName()}'s ${toTitleCase(
+            `${playerState.fullName}'s ${toTitleCase(
               suppliedMinions[i].creatureSpecies,
             )} was stunned!`,
           );
         } else if (res == "pass") {
           battleLogger(
-            `${playerState.getFullName()}'s ${toTitleCase(
+            `${playerState.fullName}'s ${toTitleCase(
               suppliedMinions[i].creatureSpecies,
             )} passed!`,
           );
         } else {
-          let str = `${playerState.getFullName()}'s ${toTitleCase(
+          let str = `${playerState.fullName}'s ${toTitleCase(
             suppliedMinions[i].creatureSpecies,
           )} used ${toTitleCase(res.name)} dealing ${res.damage} damage`;
           enemyState.damageHealth(res.damage);

@@ -78,7 +78,6 @@
       "damage": 5,
       "buffs": null,
       "debuffs": [{"name":"poison", "chance": 0.75}]
-
     }
   }
 ]

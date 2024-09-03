@@ -63,7 +63,7 @@ const HomeScreen = observer(() => {
   }, [gameState?.tutorialsShown]);
 
   if (playerState && gameState) {
-    const name = playerState.getFullName();
+    const name = playerState.fullName;
     return (
       <>
         <TutorialModal

@@ -207,9 +207,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                 pressed && "scale-95"
               } my-2 flex w-full items-center rounded border border-zinc-400`}
             >
-              <Text className="text-center text-2xl">
-                {character.getFullName()}
-              </Text>
+              <Text className="text-center text-2xl">{character.fullName}</Text>
               <View className="mx-auto">
                 <CharacterImage
                   characterAge={characterAge}
@@ -220,9 +218,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                 {character.deathdate && "Died at "}
                 {characterAge} Years Old
               </Text>
-              <Text className="text-center text-xl">
-                {character.getFullName()}
-              </Text>
+              <Text className="text-center text-xl">{character.fullName}</Text>
               <View className="mx-auto">
                 <Text className="flex flex-wrap text-center text-lg">
                   {character.deathdate && "Was a "}
