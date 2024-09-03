@@ -4,13 +4,7 @@ import { enemyGenerator } from "../../utility/enemy";
 import { getMagnitude } from "../../utility/functions/conditions";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { dungeonSave } from "../../utility/functions/save_load";
-import type {
-  AppContextType,
-  AttackObj,
-  DungeonContextType,
-  SpellObj,
-} from "../../utility/types";
-import { SpellError } from "../../utility/errorTypes";
+import type { AppContextType, DungeonContextType } from "../../utility/types";
 import { Item } from "../../classes/item";
 import { Spell } from "../../classes/spell";
 import { Attack } from "../../classes/attack";
@@ -391,18 +385,21 @@ export const use = ({
   isFocused,
 }: use) => {
   if (!appData || !dungeonData) throw new Error("missing context in pass()");
-  const { battleLogger } = dungeonData;
+  const { battleLogger, setAttackAnimationOnGoing } = dungeonData;
   const { playerState, enemyState } = appData;
   if (enemyState && playerState && isFocused) {
     const { result, logString } = attackOrSpell.use(target);
     battleLogger(logString ?? "");
     playerMinionsTurn({ dungeonData, appData });
     setTimeout(() => {
-      enemyTurnCheck({
-        appData,
-        dungeonData,
-      });
-    }, 1000 * playerState.minions.length);
+      setTimeout(() => {
+        enemyTurnCheck({
+          appData,
+          dungeonData,
+        });
+      }, 1000 * playerState.minions.length);
+      setAttackAnimationOnGoing(false);
+    }, 1000);
   }
 };
 
@@ -413,18 +410,21 @@ export interface pass {
 }
 export const pass = ({ appData, dungeonData, isFocused }: pass) => {
   if (!appData || !dungeonData) throw new Error("missing context in pass()");
-  const { battleLogger } = dungeonData;
+  const { battleLogger, setAttackAnimationOnGoing } = dungeonData;
   const { playerState, enemyState } = appData;
   if (enemyState && playerState && isFocused) {
     playerState.pass();
     battleLogger("You passed!");
     playerMinionsTurn({ dungeonData, appData });
     setTimeout(() => {
-      enemyTurnCheck({
-        appData,
-        dungeonData,
-      });
-    }, 1000 * playerState.minions.length);
+      setTimeout(() => {
+        enemyTurnCheck({
+          appData,
+          dungeonData,
+        });
+      }, 1000 * playerState.minions.length);
+      setAttackAnimationOnGoing(false);
+    }, 1000);
   }
 };
 

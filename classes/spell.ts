@@ -135,21 +135,21 @@ export class Spell {
         this.user.addCondition(newBuff);
       }
     });
-    let minionBeingTypes: BeingType[] = [];
+    let minionSpecies: string[] = [];
     this.summons.forEach((summon) => {
       const type = (this.user as PlayerCharacter | Enemy).createMinion(summon);
-      minionBeingTypes.push(type);
+      minionSpecies.push(type);
     });
     this.user.gainProficiency(this);
 
     return {
       logString: this.logBuilder({
-        targetName: target.beingType,
+        targetName: target.creatureSpecies,
         healthDamage: finalDamage,
         sanityDamage: this.flatSanityDamage,
         debuffNames,
         buffNames,
-        minionBeingTypes,
+        minionSpecies,
       }),
     };
   }
@@ -160,7 +160,7 @@ export class Spell {
     sanityDamage,
     debuffNames,
     buffNames,
-    minionBeingTypes,
+    minionSpecies,
   }: LogProps): string {
     const userString = "You";
     const targetString = `the ${targetName}`;
@@ -190,8 +190,8 @@ export class Spell {
     }
 
     // Summons
-    if (minionBeingTypes.length > 0) {
-      returnString += `  • ${userString} summoned: ${minionBeingTypes.join(
+    if (minionSpecies.length > 0) {
+      returnString += `  • ${userString} summoned: ${minionSpecies.join(
         ", ",
       )}.\n`;
     }
@@ -211,5 +211,5 @@ interface LogProps {
   sanityDamage: number;
   debuffNames: string[];
   buffNames: string[];
-  minionBeingTypes: BeingType[];
+  minionSpecies: string[];
 }

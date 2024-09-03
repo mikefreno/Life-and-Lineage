@@ -144,7 +144,7 @@ const SpellsScreen = observer(() => {
           {playerState?.spells && playerState.spells.length > 0 ? (
             <ScrollView className="h-1/2">
               {playerState.spells.map((spell) => (
-                <View key={spell.name} className="my-1">
+                <View key={spell.name} className="my-1 mx-auto">
                   <SpellDetails spell={spell} />
                 </View>
               ))}

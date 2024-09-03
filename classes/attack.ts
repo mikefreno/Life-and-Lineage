@@ -158,13 +158,13 @@ export class Attack {
           this.user.addCondition(newBuff);
         }
       });
-      let minionBeingTypes: BeingType[] = [];
+      let minionSpecies: string[] = [];
       if (this.user instanceof PlayerCharacter || this.user instanceof Enemy) {
         this.summons.forEach((summon) => {
           const type = (this.user as PlayerCharacter | Enemy).createMinion(
             summon,
           );
-          minionBeingTypes.push(type);
+          minionSpecies.push(type);
         });
       }
 
@@ -177,7 +177,7 @@ export class Attack {
           sanityDamage: this.flatSanityDamage,
           debuffNames,
           buffNames,
-          minionBeingTypes,
+          minionSpecies,
         }),
       };
     }
@@ -231,7 +231,7 @@ export class Attack {
           sanityDamage,
           debuffNames,
           buffNames,
-          minionBeingTypes,
+          minionSpecies,
         } = props;
 
         let returnString = `${userString} used ${this.name} on ${targetString}.\n`;
@@ -261,8 +261,8 @@ export class Attack {
         }
 
         // Summons
-        if (minionBeingTypes.length > 0) {
-          returnString += `  • ${userString} summoned: ${minionBeingTypes.join(
+        if (minionSpecies.length > 0) {
+          returnString += `  • ${userString} summoned: ${minionSpecies.join(
             ", ",
           )}.\n`;
         }
@@ -286,7 +286,7 @@ export class Attack {
     if (target instanceof PlayerCharacter) {
       return target.fullName;
     }
-    return target.beingType;
+    return target.creatureSpecies;
   }
 }
 
@@ -308,7 +308,7 @@ type AttackSuccessLogProps = {
   sanityDamage: number;
   debuffNames: string[];
   buffNames: string[];
-  minionBeingTypes: BeingType[];
+  minionSpecies: string[];
 };
 
 type LogProps = AttackSuccessLogProps | AttackFailureLogProps;

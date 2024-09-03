@@ -1,7 +1,4 @@
 import {
-  createBuff,
-  createDebuff,
-  getConditionEffectsOnAttacks,
   getConditionEffectsOnDefenses,
   getConditionEffectsOnMisc,
 } from "../utility/functions/conditions";
@@ -46,12 +43,7 @@ import robes from "../assets/json/items/robes.json";
 import shields from "../assets/json/items/shields.json";
 import { calculateAge, rollToLiveByAge } from "../utility/functions/misc/age";
 import { damageReduction } from "../utility/functions/misc/numbers";
-import { SpellError } from "../utility/errorTypes";
-import { parseSpell } from "../utility/functions/jsonParsing";
-import {
-  convertMasteryToNumber,
-  getMasteryLevel,
-} from "../utility/spellHelper";
+import { getMasteryLevel } from "../utility/spellHelper";
 import type {
   BoundingBox,
   Tile,
@@ -1452,7 +1444,7 @@ export class PlayerCharacter extends Character {
 
   //----------------------------------Minions----------------------------------//
   /**
-   * Returns the beingType of the created minion, adds the minion to the minion list
+   * Returns the species(name) of the created minion, adds the minion to the minion list
    */
   public createMinion(minionName: string) {
     const minionObj = summons.find((summon) => summon.name == minionName);
@@ -1469,7 +1461,7 @@ export class PlayerCharacter extends Character {
       beingType: minionObj.beingType as BeingType,
     });
     this.addMinion(minion);
-    return minion.beingType;
+    return minion.creatureSpecies;
   }
 
   public clearMinions() {

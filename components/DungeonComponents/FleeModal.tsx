@@ -112,7 +112,7 @@ export default function FleeModal({
                   <Text className="text-center text-lg">
                     {!enemyState ? "Ready to Leave?" : "Attempt to Flee?"}
                   </Text>
-                  {playerState.isStunned() ? (
+                  {playerState.isStunned ? (
                     <Text style={{ color: "#ef4444" }}>You are stunned!</Text>
                   ) : null}
                   <ThemedView className="flex w-full flex-row justify-evenly pt-8">
@@ -120,7 +120,7 @@ export default function FleeModal({
                       onPressFunction={flee}
                       disabledCondition={
                         enemyState
-                          ? attackAnimationOnGoing || playerState.isStunned()
+                          ? attackAnimationOnGoing || playerState.isStunned
                           : false
                       }
                     >

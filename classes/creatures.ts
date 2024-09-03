@@ -496,7 +496,7 @@ export class Enemy extends Creature {
 
   //---------------------------Minions---------------------------//
   /**
-   * Returns the beingType of the created minion, adds the minion to the minion list
+   * Returns the species(name) of the created minion, adds the minion to the minion list
    */
   public createMinion(minionName: string) {
     const minionObj = summons.find((summon) => summon.name == minionName);
@@ -513,7 +513,7 @@ export class Enemy extends Creature {
       beingType: minionObj.beingType as BeingType,
     });
     this.addMinion(minion);
-    return minion.beingType;
+    return minion.creatureSpecies;
   }
 
   public addMinion(minion: Minion) {
