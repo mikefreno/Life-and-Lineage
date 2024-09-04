@@ -4,7 +4,6 @@ import type { Enemy } from "../../classes/creatures";
 import { Game } from "../../classes/game";
 import type { AppContextType, DungeonContextType } from "../types";
 import { MMKV } from "react-native-mmkv";
-
 export const storage = new MMKV();
 
 const _fullSave = async (

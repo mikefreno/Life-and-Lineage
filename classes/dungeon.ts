@@ -89,36 +89,46 @@ export class DungeonLevel {
 
   public generateMap() {}
 
-  public getBoss(instanceName: string) {
-    let bossObjects = this.bosses.map((boss) =>
-      bosses.find((bossObj) => bossObj.name == boss),
+  public getBoss(instanceName: string): Enemy {
+    console.log(this.bosses);
+
+    const bossObjects = this.bosses.map((bossName) =>
+      bosses.find((bossObj) => bossObj.name === bossName),
     );
-    if (bossObjects) {
-      let bosses: Enemy[] = [];
-      bossObjects.forEach((bossObj) => {
-        if (bossObj) {
-          bosses.push(
-            new Enemy({
-              beingType: bossObj.beingType as beingType,
-              creatureSpecies: bossObj.name,
-              health: bossObj.health,
-              healthMax: bossObj.health,
-              sanity: bossObj.sanity,
-              sanityMax: bossObj.sanity,
-              attackPower: bossObj.attackPower,
-              energy: bossObj.energy.maximum,
-              energyMax: bossObj.energy.maximum,
-              energyRegen: bossObj.energy.regen,
-              attacks: bossObj.attacks,
-            }),
-          );
-        }
-      });
-      return bosses;
+
+    if (!bossObjects || bossObjects.length === 0) {
+      throw new Error(
+        `No boss found in getBoss() on DungeonLevel, looking for ${this.bosses} in ${instanceName}`,
+      );
     }
-    throw new Error(
-      `No boss found in getBoss() on DungeonLevel, looking for ${this.bosses} in ${instanceName}`,
-    );
+    const [mainBoss, ...minions] = bossObjects;
+    if (!mainBoss) {
+      throw new Error(
+        `Main boss object not found in getBoss() on DungeonLevel, looking for ${this.bosses} in ${instanceName}`,
+      );
+    }
+    const boss = new Enemy({
+      beingType: mainBoss.beingType as beingType,
+      creatureSpecies: mainBoss.name,
+      health: mainBoss.health,
+      healthMax: mainBoss.health,
+      sanity: mainBoss.sanity,
+      sanityMax: mainBoss.sanity,
+      attackPower: mainBoss.attackPower,
+      energy: mainBoss.energy.maximum,
+      energyMax: mainBoss.energy.maximum,
+      energyRegen: mainBoss.energy.regen,
+      attacks: mainBoss.attacks,
+      baseArmor: mainBoss.armorValue,
+    });
+
+    minions.forEach((minion) => {
+      if (minion) {
+        boss.createMinion(minion.name);
+      }
+    });
+
+    return boss;
   }
 
   static fromJSON(json: any): DungeonLevel {

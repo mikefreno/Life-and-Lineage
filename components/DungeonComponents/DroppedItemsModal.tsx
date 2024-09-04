@@ -8,6 +8,8 @@ import { useContext } from "react";
 import { AppContext } from "../../app/_layout";
 import { DungeonContext } from "./DungeonContext";
 import { Coins } from "../../assets/icons/SVGIcons";
+import GenericFlatButton from "../GenericFlatButton";
+import { useVibration } from "../../utility/customHooks";
 
 export default function DroppedItemsModal() {
   const appData = useContext(AppContext);
@@ -21,9 +23,6 @@ export default function DroppedItemsModal() {
     setLeftBehindDrops,
     setDroppedItems,
     setInventoryFullNotifier,
-    shouldShowFirstBossKillTutorial,
-    setShouldShowFirstBossKillTutorial,
-    setShowingFirstBossKillTutorial,
   } = dungeonData;
 
   function closeImmediateItemDrops() {
@@ -50,14 +49,6 @@ export default function DroppedItemsModal() {
             itemDrops: updatedDrops,
           };
         });
-        if (!droppedItems) {
-          if (shouldShowFirstBossKillTutorial) {
-            setTimeout(() => {
-              setShowingFirstBossKillTutorial(true);
-              setShouldShowFirstBossKillTutorial(false);
-            }, 250);
-          }
-        }
       } else {
         setInventoryFullNotifier(true);
       }
@@ -88,9 +79,11 @@ export default function DroppedItemsModal() {
     }
   }
 
+  const vibration = useVibration();
+
   return (
     <GenericModal
-      isVisibleCondition={droppedItems ? true : false}
+      isVisibleCondition={!!droppedItems}
       backFunction={() => {
         if (slug[0] == "Activities") {
           while (router.canGoBack()) {
@@ -100,12 +93,6 @@ export default function DroppedItemsModal() {
           router.push("/Activities");
         } else {
           closeImmediateItemDrops();
-          if (shouldShowFirstBossKillTutorial) {
-            setTimeout(() => {
-              setShowingFirstBossKillTutorial(true);
-              setShouldShowFirstBossKillTutorial(false);
-            }, 250);
-          }
         }
       }}
     >
@@ -124,19 +111,20 @@ export default function DroppedItemsModal() {
           Inventory is full!
         </Text>
         {droppedItems?.itemDrops.map((item) => (
-          <View key={item.id} className="mt-2 flex flex-row justify-between">
-            <View className="flex flex-row">
-              <Image source={item.getItemIcon()} />
-              <Text className="my-auto ml-2">{toTitleCase(item.name)}</Text>
-            </View>
-            <Pressable
-              onPress={() => {
+          <View
+            key={item.id}
+            className="mt-2 flex flex-row justify-between items-center"
+          >
+            <Image source={item.getItemIcon()} />
+            <Text className="my-auto ml-2 w-1/2">{toTitleCase(item.name)}</Text>
+            <GenericFlatButton
+              onPressFunction={() => {
+                vibration({ style: "light" });
                 takeItem(item);
               }}
-              className="rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
             >
               <Text>Take</Text>
-            </Pressable>
+            </GenericFlatButton>
           </View>
         ))}
         {droppedItems && droppedItems.itemDrops.length > 0 ? (
@@ -144,12 +132,6 @@ export default function DroppedItemsModal() {
             className="mx-auto mt-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
             onPress={() => {
               takeAllItems();
-              if (shouldShowFirstBossKillTutorial) {
-                setTimeout(() => {
-                  setShowingFirstBossKillTutorial(true);
-                  setShouldShowFirstBossKillTutorial(false);
-                }, 250);
-              }
             }}
           >
             <Text>Take All</Text>
@@ -166,12 +148,6 @@ export default function DroppedItemsModal() {
               router.push("/Activities");
             } else {
               closeImmediateItemDrops();
-              if (shouldShowFirstBossKillTutorial) {
-                setTimeout(() => {
-                  setShowingFirstBossKillTutorial(true);
-                  setShouldShowFirstBossKillTutorial(false);
-                }, 250);
-              }
             }
           }}
         >

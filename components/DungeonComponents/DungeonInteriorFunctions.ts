@@ -42,7 +42,7 @@ export function enemyTurnCheck({ dungeonData, appData }: contextData) {
     setFightingBoss,
     setAttackAnimationOnGoing,
     battleLogger,
-    setShouldShowFirstBossKillTutorial,
+    setShouldShowFirstBossKillTutorialAfterItemDrops,
   } = dungeonData;
   if (enemyState && playerState && gameState) {
     if (
@@ -83,7 +83,7 @@ export function enemyTurnCheck({ dungeonData, appData }: contextData) {
           gameState.openNextDungeonLevel(thisInstance!.name);
           playerState.bossDefeated();
           if (!gameState.tutorialsShown["First Boss Kill"]) {
-            setShouldShowFirstBossKillTutorial(true);
+            setShouldShowFirstBossKillTutorialAfterItemDrops(true);
           }
         }
         setEnemy(null);
@@ -167,39 +167,32 @@ export const enemyTurn = ({ appData, dungeonData }: contextData) => {
         action = () => {
           setEnemyAttackDummy((prev) => prev + 1);
           wait(500).then(() => {
-            setEnemyTextString("*miss*");
+            setEnemyTextString("miss");
             setEnemyTextDummy((prev) => prev + 1);
           });
         };
         break;
       case AttackUse.block:
         action = () => {
-          setEnemyTextString("*blocked*");
+          setEnemyTextString("blocked");
           setEnemyTextDummy((prev) => prev + 1);
         };
         break;
       case AttackUse.stunned:
         action = () => {
-          setEnemyTextString("*stunned*");
+          setEnemyTextString("stunned");
           setEnemyTextDummy((prev) => prev + 1);
         };
         break;
       case AttackUse.lowEnergy:
         action = () => {
-          setEnemyTextString("*pass*");
+          setEnemyTextString("pass");
           setEnemyTextDummy((prev) => prev + 1);
         };
         break;
     }
     action();
-    if (enemyState?.minions.length > 0) {
-      enemyMinionsTurn(
-        enemyState.minions,
-        enemyState,
-        playerState,
-        battleLogger,
-      );
-    }
+    enemyMinionsTurn(enemyState.minions, enemyState, playerState, battleLogger);
     setTimeout(() => {
       if (
         enemyState.health <= 0 ||
@@ -246,13 +239,13 @@ function enemyMinionsTurn(
 ) {
   if (enemyState && playerState) {
     for (let i = 0; i < suppliedMinions.length; i++) {
-      setTimeout(() => {
+      wait(1000).then(() => {
         const res = suppliedMinions[i].takeTurn({ target: playerState });
-        battleLogger(res.logString);
+        battleLogger("(minion) " + res.logString);
         if (suppliedMinions[i].turnsLeftAlive <= 0) {
           enemyState.removeMinion(suppliedMinions[i]);
         }
-      }, 1000 * i);
+      });
     }
   }
 }
@@ -292,7 +285,8 @@ export const loadBoss = ({ appData, dungeonData }: contextData) => {
   setFightingBoss(true);
   setAttackAnimationOnGoing(false);
   if (thisDungeon && thisInstance && playerState) {
-    const boss = thisDungeon.getBoss(thisInstance.name)[0];
+    const boss = thisDungeon.getBoss(thisInstance.name);
+    console.log(boss);
     setEnemy(boss);
     battleLogger(`You found the boss!`);
   }
@@ -313,11 +307,22 @@ export const use = ({
   isFocused,
 }: use) => {
   if (!appData || !dungeonData) throw new Error("missing context in pass()");
-  const { battleLogger, setAttackAnimationOnGoing } = dungeonData;
+  const { battleLogger, setAttackAnimationOnGoing, setEnemyDodgeDummy } =
+    dungeonData;
   const { playerState, enemyState } = appData;
   if (enemyState && playerState && isFocused) {
-    const { logString } = attackOrSpell.use(target);
-    battleLogger(logString);
+    if (attackOrSpell instanceof Attack) {
+      const { result, logString } = attackOrSpell.use(target);
+      if (result == AttackUse.miss) {
+        setEnemyDodgeDummy((prev) => prev + 1);
+      }
+
+      battleLogger(logString);
+    } else {
+      const { logString } = attackOrSpell.use(target);
+      battleLogger(logString);
+    }
+
     playerMinionsTurn({ dungeonData, appData });
     setTimeout(() => {
       setTimeout(() => {
@@ -335,13 +340,19 @@ export interface pass {
   dungeonData: DungeonContextType | undefined;
   appData: AppContextType | undefined;
   isFocused: boolean;
+  voluntary?: boolean;
 }
-export const pass = ({ appData, dungeonData, isFocused }: pass) => {
+export const pass = ({
+  appData,
+  dungeonData,
+  isFocused,
+  voluntary = false,
+}: pass) => {
   if (!appData || !dungeonData) throw new Error("missing context in pass()");
   const { battleLogger, setAttackAnimationOnGoing } = dungeonData;
   const { playerState, enemyState } = appData;
   if (enemyState && playerState && isFocused) {
-    playerState.pass();
+    playerState.pass({ voluntary });
     battleLogger("You passed!");
     playerMinionsTurn({ dungeonData, appData });
     setTimeout(() => {
@@ -352,7 +363,7 @@ export const pass = ({ appData, dungeonData, isFocused }: pass) => {
         });
       }, 1000 * playerState.minions.length);
       setAttackAnimationOnGoing(false);
-    }, 1000);
+    }, 500);
   }
 };
 

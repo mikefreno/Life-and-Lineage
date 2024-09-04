@@ -6,7 +6,7 @@ import { useVibration } from "../utility/customHooks";
 import { router } from "expo-router";
 import { toTitleCase } from "../utility/functions/misc/words";
 import { Item } from "../classes/item";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import { Shop } from "../classes/shop";
 import { asReadableGold } from "../utility/functions/misc/numbers";
 import SpellDetails from "./SpellDetails";
@@ -27,6 +27,7 @@ type BaseProps = {
   clearItem: () => void;
   topGuard?: number;
   topOffset?: number;
+  tabBarHeight?: number;
 };
 
 type DungeonProps = BaseProps & {
@@ -48,6 +49,7 @@ export function StatsDisplay({
   clearItem,
   topOffset,
   topGuard,
+  tabBarHeight = 20,
   ...props
 }: StatsDisplayProps) {
   const { colorScheme } = useColorScheme();
@@ -57,7 +59,7 @@ export function StatsDisplay({
   if (!appData) throw new Error("missing contexts");
   const { playerState, dimensions, blockSize } = appData;
   const [viewWidth, setViewWidth] = useState(dimensions.width * 0.4);
-  const topRef = useRef<View>(null);
+  const [viewHeight, setViewHeight] = useState(dimensions.height * 0.2);
 
   const SaleSection = () => {
     if (playerState) {
@@ -229,8 +231,9 @@ export function StatsDisplay({
     }
   }
   const onLayoutView = (event: LayoutChangeEvent) => {
-    const { width } = event.nativeEvent.layout;
+    const { width, height } = event.nativeEvent.layout;
     setViewWidth(width);
+    setViewHeight(height);
   };
 
   return (
@@ -249,7 +252,9 @@ export function StatsDisplay({
                 topGuard &&
                 displayItem.positon.top + (topOffset ?? 0) < topGuard
                   ? topGuard
-                  : displayItem.positon.top + (topOffset ?? 0),
+                  : viewHeight + displayItem.positon.top < dimensions.height
+                  ? displayItem.positon.top + (topOffset ?? 0)
+                  : dimensions.height - (viewHeight + 20),
             }
           : {
               maxWidth: dimensions.width * 0.4,
@@ -265,7 +270,10 @@ export function StatsDisplay({
                 topGuard &&
                 displayItem.positon.top + (topOffset ?? 0) < topGuard
                   ? topGuard
-                  : displayItem.positon.top + (topOffset ?? 0),
+                  : viewHeight + displayItem.positon.top <
+                    dimensions.height - tabBarHeight
+                  ? displayItem.positon.top + (topOffset ?? 0)
+                  : dimensions.height - (viewHeight + tabBarHeight),
             }
       }
     >

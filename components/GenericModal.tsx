@@ -12,6 +12,9 @@ interface GenericModalProps {
   style?: {};
 }
 
+/**
+ * `size` is a percentage, default of 83.33...%
+ */
 export default function GenericModal({
   isVisibleCondition,
   backFunction,

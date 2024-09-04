@@ -44,7 +44,7 @@ export class Attack {
     energyCost = 0,
     hitChance = 1.0,
     targets = "single",
-    damageMult = 1.0,
+    damageMult = 0,
     flatHealthDamage = 0,
     selfDamage = 0,
     flatSanityDamage = 0,
@@ -67,9 +67,10 @@ export class Attack {
   }
 
   get baseDamage() {
-    return (
-      this.user.attackPower * (this.damageMult ?? 0) + this.flatHealthDamage
-    );
+    if (this.damageMult == 0) {
+      return 0;
+    }
+    return this.user.attackPower * this.damageMult + this.flatHealthDamage;
   }
 
   get canBeUsed() {
@@ -128,6 +129,7 @@ export class Attack {
       const finalDamage = Math.round(damage * 4) / 4; // physical damage
       target.damageHealth(finalDamage);
       target.damageSanity(this.flatSanityDamage);
+      this.user.damageHealth(this.selfDamage);
       // create debuff loop
       const debuffNames: string[] = []; // only storing names, collecting for logBuilder
       let amountHealed = 0;
@@ -241,7 +243,9 @@ export class Attack {
         ? "You"
         : `The ${toTitleCase(this.user.creatureSpecies)}`;
     const targetString =
-      this.user instanceof PlayerCharacter ? `the ${targetName}` : "you";
+      this.user instanceof PlayerCharacter
+        ? `the ${toTitleCase(targetName)}`
+        : "you";
 
     switch (result) {
       case AttackUse.miss:

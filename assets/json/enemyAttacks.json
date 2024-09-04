@@ -71,6 +71,14 @@
       "debuffs": [{"name":"stun", "chance":0.35}]
    },
    {
+      "name": "tackle",
+      "energyCost": 20,
+      "targets": "single",
+      "hitChance": 0.75,
+      "damageMult": 0.25,
+      "debuffs": [{"name":"stun", "chance":0.4}]
+   },
+   {
       "name": "bolder throw",
       "energyCost": 25,
       "targets": "aoe",
@@ -84,7 +92,7 @@
       "targets": "single",
       "hitChance": 0.90,
       "damageMult": 0.0,
-      "debuffs": [{"name":"blind", "chance":1.0}]
+      "debuffs": [{"name":"blind", "chance":0.75}]
    },
    {
       "name": "poison spray",
@@ -132,6 +140,11 @@
       "targets": "single",
       "hitChance": 0.95,
       "damageMult": 1.0
+   },
+   {
+      "name": "call backup",
+      "energyCost": 30,
+      "summons": ["bandit"]
    },
    {
       "name": "raise skeleton",

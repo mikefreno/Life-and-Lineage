@@ -16,11 +16,14 @@ import {
   TILE_SIZE,
 } from "../../components/DungeonComponents/DungeonContext";
 import DungeonLevelScreen from "../../components/DungeonComponents/DungeonLevelScreen";
-import type { AttackObj, SpellObj } from "../../utility/types";
 import { enemyGenerator } from "../../utility/enemy";
 import { getSexFromName } from "../../utility/functions/characterAid";
 import { flipCoin } from "../../utility/functions/roll";
 import D20DieAnimation from "../../components/DieRollAnim";
+import { wait } from "../../utility/functions/misc/wait";
+import TutorialModal from "../../components/TutorialModal";
+import { Attack } from "../../classes/attack";
+import { Spell } from "../../classes/spell";
 
 const DungeonProvider = observer(() => {
   const { slug } = useLocalSearchParams();
@@ -30,7 +33,14 @@ const DungeonProvider = observer(() => {
 
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing context");
-  const { playerState, gameState, setEnemy, enemyState, logsState } = appData;
+  const {
+    playerState,
+    gameState,
+    setEnemy,
+    enemyState,
+    logsState,
+    setShowDetailedStatusView,
+  } = appData;
 
   const [fightingBoss, setFightingBoss] = useState<boolean>(false);
   const [thisInstance, setThisInstance] = useState<DungeonInstance>();
@@ -40,6 +50,7 @@ const DungeonProvider = observer(() => {
   const [attackAnimationOnGoing, setAttackAnimationOnGoing] =
     useState<boolean>(false);
   const [enemyAttackDummy, setEnemyAttackDummy] = useState<number>(0);
+  const [enemyDodgeDummy, setEnemyDodgeDummy] = useState<number>(0);
   const [enemyHealDummy, setEnemyHealDummy] = useState<number>(0);
   const [enemyTextDummy, setEnemyTextDummy] = useState<number>(0);
   const [enemyTextString, setEnemyTextString] = useState<string>();
@@ -59,13 +70,15 @@ const DungeonProvider = observer(() => {
   });
   const [inCombat, setInCombat] = useState<boolean>(false);
   const [currentPosition, setCurrentPosition] = useState<Tile | null>(null);
-  const [showingFirstBossKillTutorial, setShowingFirstBossKillTutorial] =
+  const [showFirstBossKillTutorial, setShowFirstBossKillTutorial] =
     useState<boolean>(false);
-  const [shouldShowFirstBossKillTutorial, setShouldShowFirstBossKillTutorial] =
-    useState<boolean>(false);
+  const [
+    shouldShowFirstBossKillTutorialAfterItemDrops,
+    setShouldShowFirstBossKillTutorialAfterItemDrops,
+  ] = useState<boolean>(false);
   const [showTargetSelection, setShowTargetSelection] = useState<{
     showing: boolean;
-    chosenAttack: AttackObj | SpellObj | null;
+    chosenAttack: Attack | Spell | null;
   }>({ showing: false, chosenAttack: null });
 
   const instanceName = slug[0];
@@ -188,6 +201,22 @@ const DungeonProvider = observer(() => {
     logsState.push(log);
   };
 
+  useEffect(() => {
+    console.log("should: ", shouldShowFirstBossKillTutorialAfterItemDrops);
+    console.log("showing: ", showFirstBossKillTutorial);
+  }, [
+    showFirstBossKillTutorial,
+    shouldShowFirstBossKillTutorialAfterItemDrops,
+  ]);
+  useEffect(() => {
+    if (!droppedItems && shouldShowFirstBossKillTutorialAfterItemDrops) {
+      wait(250).then(() => {
+        setShowFirstBossKillTutorial(true);
+        setShouldShowFirstBossKillTutorialAfterItemDrops(false);
+      });
+    }
+  }, [shouldShowFirstBossKillTutorialAfterItemDrops, droppedItems]);
+
   if (thisDungeon && thisInstance) {
     return (
       <DungeonContext.Provider
@@ -202,6 +231,8 @@ const DungeonProvider = observer(() => {
           enemyAttacked,
           setEnemyAttacked,
           enemyHealDummy,
+          enemyDodgeDummy,
+          setEnemyDodgeDummy,
           setEnemyHealDummy,
           enemyAttackDummy,
           setEnemyAttackDummy,
@@ -228,16 +259,28 @@ const DungeonProvider = observer(() => {
           level,
           instanceName,
           battleLogger,
-          showingFirstBossKillTutorial,
-          setShowingFirstBossKillTutorial,
-          shouldShowFirstBossKillTutorial,
-          setShouldShowFirstBossKillTutorial,
+          showFirstBossKillTutorial,
+          setShowFirstBossKillTutorial,
+          shouldShowFirstBossKillTutorialAfterItemDrops,
+          setShouldShowFirstBossKillTutorialAfterItemDrops,
           showTargetSelection,
           setShowTargetSelection,
           displayItem,
           setDisplayItem,
         }}
       >
+        <TutorialModal
+          isVisibleCondition={showFirstBossKillTutorial}
+          backFunction={() => setShowFirstBossKillTutorial(false)}
+          onCloseFunction={() => {
+            setShowFirstBossKillTutorial(false);
+            setTimeout(() => setShowDetailedStatusView(true), 500);
+          }}
+          pageOne={{
+            title: "Well Fought!",
+            body: "You have defeated the first boss! Every boss will reward you with stats points to distribute as you wish.",
+          }}
+        />
         <DungeonLevelScreen />
       </DungeonContext.Provider>
     );

@@ -25,6 +25,7 @@ export default function DungeonEnemyDisplay() {
     firstLoad,
     enemyTextDummy,
     setEnemyTextString,
+    enemyDodgeDummy,
   } = dungeonData;
 
   const [enemyHealthRecord, setEnemyHealthRecord] = useState<
@@ -39,6 +40,8 @@ export default function DungeonEnemyDisplay() {
   const enemyDamagedAnimationValue = useState(new Animated.Value(1))[0];
   const enemyTextFadeAnimation = useState(new Animated.Value(1))[0];
   const enemyTextTranslateAnimation = useState(new Animated.Value(0))[0];
+  const enemyDodgeAnimationValue = useState(new Animated.Value(0))[0];
+  const enemyFlashOpacity = useState(new Animated.Value(1))[0];
 
   useEffect(() => {
     if (
@@ -91,6 +94,41 @@ export default function DungeonEnemyDisplay() {
       ]).start();
     }
   }, [enemyAttackDummy]);
+
+  useEffect(() => {
+    if (!firstLoad) {
+      Animated.sequence([
+        // Move to dodge position
+        Animated.timing(enemyDodgeAnimationValue, {
+          toValue: 30,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        // Hold position and flash simultaneously
+        Animated.parallel([
+          Animated.delay(200),
+          Animated.sequence([
+            Animated.timing(enemyFlashOpacity, {
+              toValue: 0.3,
+              duration: 100,
+              useNativeDriver: true,
+            }),
+            Animated.timing(enemyFlashOpacity, {
+              toValue: 1,
+              duration: 100,
+              useNativeDriver: true,
+            }),
+          ]),
+        ]),
+        // Move back to original position
+        Animated.timing(enemyDodgeAnimationValue, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [enemyDodgeDummy]);
 
   useEffect(() => {
     if (enemyHealthDiff < 0) {
@@ -211,25 +249,35 @@ export default function DungeonEnemyDisplay() {
               )}
               {EnemyConditionRender()}
             </View>
-            <View>
+            <View className="relative">
               <Animated.View
                 className="mx-auto mt-12"
                 style={{
                   transform: [
-                    { translateX: enemyAttackAnimationValue },
+                    {
+                      translateX: Animated.add(
+                        enemyAttackAnimationValue,
+                        enemyDodgeAnimationValue,
+                      ),
+                    },
                     {
                       translateY: Animated.multiply(
-                        enemyAttackAnimationValue,
+                        Animated.add(
+                          enemyAttackAnimationValue,
+                          enemyDodgeAnimationValue,
+                        ),
                         -1.5,
                       ),
                     },
                   ],
-                  opacity: enemyDamagedAnimationValue,
+                  opacity: Animated.multiply(
+                    enemyDamagedAnimationValue,
+                    enemyFlashOpacity,
+                  ),
                 }}
               >
                 <EnemyImage creatureSpecies={enemyState.creatureSpecies} />
               </Animated.View>
-
               <EnemyHealingAnimationBox
                 showHealAnimationDummy={enemyHealDummy}
               />
@@ -238,12 +286,19 @@ export default function DungeonEnemyDisplay() {
                   transform: [{ translateY: enemyTextTranslateAnimation }],
                   opacity: enemyTextFadeAnimation,
                   position: "absolute",
-                  marginLeft: 0,
-                  marginTop: 48,
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
                 {enemyTextString ? (
-                  <Text className="text-xl tracking-wide">
+                  <Text
+                    className="text-xl tracking-wide text-center"
+                    numberOfLines={1}
+                  >
                     *{toTitleCase(enemyTextString)}*
                   </Text>
                 ) : null}

@@ -14,5 +14,14 @@
       "attackPower": 5,
       "attacks": ["stab", "cleave"],
       "turns": 5
+   },
+   {
+      "name": "bandit",
+      "beingType": "human",
+      "sanity": 50,
+      "health":50,
+      "attackPower": 8,
+      "attacks": ["stab", "pocket sand","serrate"],
+      "turns": 100
    }
 ]

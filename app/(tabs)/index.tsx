@@ -235,6 +235,7 @@ const HomeScreen = observer(() => {
               <StatsDisplay
                 displayItem={displayItem}
                 clearItem={() => setDisplayItem(null)}
+                tabBarHeight={tabBarHeight}
               />
             </View>
           )}

@@ -33,8 +33,7 @@ const DungeonLevelScreen = observer(() => {
   const appData = useContext(AppContext);
   const dungeonData = useContext(DungeonContext);
   if (!appData || !dungeonData) throw new Error("missing context");
-  const { playerState, gameState, enemyState, setShowDetailedStatusView } =
-    appData;
+  const { playerState, gameState, enemyState, dimensions } = appData;
 
   const {
     slug,
@@ -43,8 +42,6 @@ const DungeonLevelScreen = observer(() => {
     thisDungeon,
     level,
     inCombat,
-    setShowingFirstBossKillTutorial,
-    showingFirstBossKillTutorial,
     showTargetSelection,
     setShowTargetSelection,
     displayItem,
@@ -94,6 +91,7 @@ const DungeonLevelScreen = observer(() => {
       <>
         <Stack.Screen
           options={{
+            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 20 },
             headerLeft: () => (
               <Pressable
                 onPress={() => {
@@ -141,18 +139,6 @@ const DungeonLevelScreen = observer(() => {
             body: "And remember fleeing (top left) can save you.",
           }}
         />
-        <TutorialModal
-          isVisibleCondition={showingFirstBossKillTutorial}
-          backFunction={() => setShowingFirstBossKillTutorial(false)}
-          onCloseFunction={() => {
-            setShowingFirstBossKillTutorial(false);
-            setTimeout(() => setShowDetailedStatusView(true), 500);
-          }}
-          pageOne={{
-            title: "Well Fought!",
-            body: "You have defeated the first boss! Every boss will reward you with stats points to distribute as you wish.",
-          }}
-        />
         <FleeModal
           fleeModalShowing={fleeModalShowing}
           setFleeModalShowing={setFleeModalShowing}
@@ -165,6 +151,7 @@ const DungeonLevelScreen = observer(() => {
         />
         <GenericModal
           isVisibleCondition={showTargetSelection.showing}
+          size={100}
           backFunction={() =>
             setShowTargetSelection({
               showing: false,

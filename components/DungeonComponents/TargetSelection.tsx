@@ -6,8 +6,8 @@ import ProgressBar from "../ProgressBar";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { useContext } from "react";
 import { AppContext } from "../../app/_layout";
-import { useAttack, useSpell } from "./DungeonInteriorFunctions";
 import { DungeonContext } from "./DungeonContext";
+import { use } from "./DungeonInteriorFunctions";
 import { useIsFocused } from "@react-navigation/native";
 
 export default function TargetSelectionRender() {
@@ -25,34 +25,23 @@ export default function TargetSelectionRender() {
     });
 
     return (
-      <ThemedView>
+      <ThemedView className="w-full">
         {targets.map((target) => (
           <Pressable
             key={target.id}
             onPress={() => {
-              const attack = showTargetSelection.chosenAttack;
-              setShowTargetSelection({
-                showing: false,
-                chosenAttack: null,
-              });
-              if (attack) {
-                if ("element" in attack) {
-                  useSpell({
-                    spell: attack,
-                    target,
-                    appData,
-                    dungeonData,
-                    isFocused,
-                  });
-                } else {
-                  useAttack({
-                    attack,
-                    target,
-                    appData,
-                    dungeonData,
-                    isFocused,
-                  });
-                }
+              if (showTargetSelection.chosenAttack) {
+                use({
+                  attackOrSpell: showTargetSelection.chosenAttack,
+                  target,
+                  dungeonData,
+                  appData,
+                  isFocused,
+                });
+                setShowTargetSelection({
+                  showing: false,
+                  chosenAttack: null,
+                });
               }
             }}
             className="m-4 rounded-lg border border-zinc-400 px-4 py-2 shadow-lg active:scale-95 active:opacity-50 dark:border-zinc-700"
@@ -61,7 +50,7 @@ export default function TargetSelectionRender() {
               <View className="my-auto">
                 <EnemyImage creatureSpecies={target.creatureSpecies} />
               </View>
-              <View className="my-auto flex w-1/2">
+              <View className="my-auto flex w-1/3">
                 <View className="">
                   <Text className="text-center">
                     {toTitleCase(target.creatureSpecies)}

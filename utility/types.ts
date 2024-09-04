@@ -5,6 +5,8 @@ import type { PlayerCharacter } from "../classes/character";
 import type { Enemy } from "../classes/creatures";
 import React from "react";
 import { BoundingBox, Tile } from "../components/DungeonComponents/DungeonMap";
+import { Attack } from "../classes/attack";
+import { Spell } from "../classes/spell";
 
 export interface ItemOptions {
   id?: string;
@@ -71,28 +73,6 @@ export enum MasteryLevel {
   Legend,
 }
 
-export type SpellObj = {
-  name: string;
-  element: Element;
-  proficiencyNeeded: MasteryLevel;
-  target?: "single" | "aoe" | "cleave";
-  manaCost: number;
-  duration?: number;
-  effects: {
-    damage: number | null;
-    buffs: string[] | null;
-    debuffs:
-      | {
-          name: string;
-          chance: number;
-        }[]
-      | null;
-    summon?: string[] | undefined;
-    selfDamage?: number | undefined;
-    sanityDamage?: number | undefined;
-  };
-};
-
 export enum Element {
   fire = "fire",
   earth = "earth",
@@ -114,20 +94,6 @@ export enum AttackUse {
   stunned,
   lowEnergy,
 }
-
-export type AttackObj = {
-  name: string;
-  energyCost?: number;
-  targets?: "single" | "cleave" | "aoe";
-  hitChance?: number;
-  damageMult?: number;
-  flatHealthDamage?: number;
-  selfDamage?: number;
-  flatSanityDamage?: number;
-  buffs?: { name: string; chance: number }[];
-  debuffs?: { name: string; chance: number }[];
-  summons?: string[];
-};
 
 export type Activity = {
   name: string;
@@ -247,6 +213,8 @@ export interface DungeonContextType {
   setAttackAnimationOnGoing: React.Dispatch<React.SetStateAction<boolean>>;
   enemyAttacked: boolean;
   setEnemyAttacked: React.Dispatch<React.SetStateAction<boolean>>;
+  enemyDodgeDummy: number;
+  setEnemyDodgeDummy: React.Dispatch<React.SetStateAction<number>>;
   enemyHealDummy: number;
   setEnemyHealDummy: React.Dispatch<React.SetStateAction<number>>;
   enemyAttackDummy: number;
@@ -282,22 +250,20 @@ export interface DungeonContextType {
   level: string;
   instanceName: string;
   battleLogger: (whatHappened: string) => void;
-  showingFirstBossKillTutorial: boolean;
-  setShowingFirstBossKillTutorial: React.Dispatch<
-    React.SetStateAction<boolean>
-  >;
-  shouldShowFirstBossKillTutorial: boolean;
-  setShouldShowFirstBossKillTutorial: React.Dispatch<
+  showFirstBossKillTutorial: boolean;
+  setShowFirstBossKillTutorial: React.Dispatch<React.SetStateAction<boolean>>;
+  shouldShowFirstBossKillTutorialAfterItemDrops: boolean;
+  setShouldShowFirstBossKillTutorialAfterItemDrops: React.Dispatch<
     React.SetStateAction<boolean>
   >;
   showTargetSelection: {
     showing: boolean;
-    chosenAttack: AttackObj | SpellObj | null;
+    chosenAttack: Attack | Spell | null;
   };
   setShowTargetSelection: React.Dispatch<
     React.SetStateAction<{
       showing: boolean;
-      chosenAttack: AttackObj | SpellObj | null;
+      chosenAttack: Attack | Spell | null;
     }>
   >;
   displayItem: {

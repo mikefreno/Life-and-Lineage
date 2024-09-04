@@ -116,6 +116,7 @@ export class Creature {
       energy: observable,
       conditions: observable,
       damageHealth: action,
+      restoreHealth: action,
       damageSanity: action,
       addCondition: action,
       conditionTicker: action,

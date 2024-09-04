@@ -8,12 +8,18 @@ export interface VibrateProps {
   essential?: boolean;
 }
 
+/**
+ * This is a hook(returns a function) to create a `vibration`
+ */
 export const useVibration = () => {
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing context");
   const { gameState } = appData;
 
-  const vibrate = ({ style, essential }: VibrateProps) => {
+  /**
+   * requires a `style` for the vibration, `essential`(optional) is a signal for if the user has set in-app vibrations to 'minimal', defaults to false
+   */
+  const vibrate = ({ style, essential = false }: VibrateProps) => {
     const platform = Platform.OS;
 
     if (

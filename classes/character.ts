@@ -16,14 +16,12 @@ import { action, makeObservable, observable, computed } from "mobx";
 import * as Crypto from "expo-crypto";
 import { Investment } from "./investment";
 import {
-  AttackObj,
   InvestmentType,
   InvestmentUpgrade,
   ItemClassType,
   MasteryLevel,
   BeingType,
   Element,
-  SpellObj,
 } from "../utility/types";
 import { rollD20 } from "../utility/functions/roll";
 import shops from "../assets/json/shops.json";
@@ -487,10 +485,12 @@ export class PlayerCharacter extends Character {
       currentMana: observable,
       maxMana: computed,
       nonConditionalMaxMana: computed,
+      useMana: action,
 
       baseManaRegen: observable,
       totalManaRegen: computed,
       nonConditionalManaRegen: computed,
+      regenMana: action,
 
       baseStrength: observable,
       totalStrength: computed,
@@ -696,7 +696,7 @@ export class PlayerCharacter extends Character {
     return this.baseManaRegen + this.equipmentStats.regen;
   }
 
-  private useMana(mana: number) {
+  public useMana(mana: number) {
     this.currentMana -= mana;
   }
 
@@ -708,7 +708,7 @@ export class PlayerCharacter extends Character {
     }
   }
 
-  private regenMana() {
+  public regenMana() {
     if (this.currentMana + this.totalManaRegen < this.maxMana) {
       this.currentMana += this.totalManaRegen;
     } else {
@@ -866,6 +866,7 @@ export class PlayerCharacter extends Character {
   }
 
   public equipItem(item: Item) {
+    const offsets = this.gatherOffsets();
     switch (item.slot) {
       case "head":
         this.removeEquipment("head");
@@ -910,6 +911,28 @@ export class PlayerCharacter extends Character {
         this.removeFromInventory(item);
         break;
     }
+    this.resolveOffsets(offsets);
+  }
+
+  private gatherOffsets() {
+    return {
+      health: this.maxHealth - this.currentHealth,
+      mana: this.maxMana - this.currentMana,
+      sanity: this.maxSanity - this.currentSanity,
+    };
+  }
+  private resolveOffsets({
+    health,
+    mana,
+    sanity,
+  }: {
+    health: number;
+    mana: number;
+    sanity: number;
+  }) {
+    this.currentHealth = this.maxHealth - health;
+    this.currentMana = this.maxMana - mana;
+    this.currentSanity = this.maxSanity - sanity;
   }
 
   public equippedCheck(item: Item) {
@@ -926,6 +949,7 @@ export class PlayerCharacter extends Character {
   }
 
   public unEquipItem(item: Item) {
+    const offsets = this.gatherOffsets();
     if (this.equipment.body?.equals(item)) {
       this.removeEquipment("body");
     } else if (this.equipment.head?.equals(item)) {
@@ -935,6 +959,7 @@ export class PlayerCharacter extends Character {
     } else if (this.equipment.offHand?.equals(item)) {
       this.removeEquipment("offHand");
     }
+    this.resolveOffsets(offsets);
   }
 
   public removeEquipment(slot: "mainHand" | "offHand" | "body" | "head") {
@@ -1151,12 +1176,12 @@ export class PlayerCharacter extends Character {
   //----------------------------------Spells----------------------------------//
 
   get spells() {
-    let spellList: SpellObj[] = [];
+    let spellList: any[] = [];
     if (this.playerClass == "paladin") {
-      spellList = paladinSpells as SpellObj[];
+      spellList = paladinSpells;
     } else if (this.playerClass == "necromancer") {
-      spellList = necroSpells as SpellObj[];
-    } else spellList = mageSpells as SpellObj[];
+      spellList = necroSpells;
+    } else spellList = mageSpells;
 
     let spells: Spell[] = [];
     this.knownSpells.forEach((spell) => {
@@ -1388,7 +1413,10 @@ export class PlayerCharacter extends Character {
     return builtAttacks;
   }
 
-  public pass() {
+  public pass({ voluntary = false }: { voluntary?: boolean }) {
+    if (voluntary) {
+      this.regenMana(); // if the user voluntarily passes the turn, their mana regen is doubled
+    }
     this.endTurn();
   }
 

@@ -47,12 +47,41 @@
       "beingType": "demi-human",
       "sanity": 50,
       "health": 160,
-      "attackPower": 35,
+      "attackPower": 25,
       "energy": {"maximum": 50, "regen": 10},
       "attacks": ["spark", "bonk"],
       "drops": [
          {"item": "goblin totem", "itemType":"staff", "chance": 1.0}
       ],
       "goldDropRange": {"minimum": 100, "maximum":150}
+   },
+   {
+      "name": "bandit",
+      "beingType": "human",
+      "sanity": 50,
+      "health": 75,
+      "attackPower": 10,
+      "energy": {"maximum": 50, "regen": 3},
+      "attacks": ["stab", "pocket sand","serrate"],
+      "drops": [
+         {"item": "dagger", "itemType":"weapon","chance":0.15},
+         {"item": "dagger", "itemType":"weapon","chance":0.15},
+         {"item": "cheap leather chestpiece", "itemType":"bodyArmor","chance":0.15},
+         {"item": "leather headgear", "itemType":"helmet","chance":0.15}
+      ],
+      "goldDropRange": {"minimum": 70, "maximum":100},
+      "armorValue": 15
+   },
+   {
+      "name": "bandit boss",
+      "beingType": "human",
+      "sanity": 50,
+      "health": 200,
+      "attackPower": 22.5,
+      "energy": {"maximum": 50, "regen": 10},
+      "attacks": ["serrate", "call backup", "stab"],
+      "drops": [],
+      "goldDropRange": {"minimum": 2500, "maximum":3000},
+      "armorValue": 30
    }
 ]

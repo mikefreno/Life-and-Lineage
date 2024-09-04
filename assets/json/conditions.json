@@ -23,7 +23,7 @@
       "turns": 3,
       "effect": ["accuracy reduction"],
       "effectStyle": ["multiplier"],
-      "effectAmount": [0.25],
+      "effectAmount": [0.20],
       "icon": "blind"
    },
    {

@@ -1,4 +1,5 @@
 import { createBuff, createDebuff } from "../utility/functions/conditions";
+import { wait } from "../utility/functions/misc/wait";
 import { toTitleCase } from "../utility/functions/misc/words";
 import { rollD20 } from "../utility/functions/roll";
 import { Element, MasteryLevel } from "../utility/types";
@@ -69,7 +70,9 @@ export class Spell {
   }
 
   get baseDamage() {
-    return this.user.magicPower + this.initDamage;
+    if (this.initDamage > 0) {
+      return this.initDamage + this.user.magicPower;
+    } else return 0;
   }
 
   get canBeUsed() {
@@ -93,10 +96,12 @@ export class Spell {
     if (!this.canBeUsed) {
       return { logString: "failure" };
     }
+    this.user.useMana(this.manaCost);
 
     const finalDamage = Math.round(this.baseDamage * 4) / 4; // physical damage
     target.damageHealth(finalDamage);
     target.damageSanity(this.flatSanityDamage);
+    this.user.damageHealth(this.selfDamage);
     // create debuff loop
     const debuffNames: string[] = []; // only storing names, collecting for logBuilder
     let amountHealed = 0;
@@ -144,6 +149,8 @@ export class Spell {
       minionSpecies.push(type);
     });
     this.user.gainProficiency(this);
+
+    wait(1000).then(() => this.user.regenMana());
 
     return {
       logString: this.logBuilder({
