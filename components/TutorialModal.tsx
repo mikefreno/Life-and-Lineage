@@ -6,7 +6,7 @@ import { useColorScheme } from "nativewind";
 import { AppContext } from "../app/_layout";
 import { useVibration } from "../utility/customHooks";
 import { Pressable, Switch } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { storage } from "../utility/functions/save_load";
 
 interface TutorialModalProps {
   isVisibleCondition: boolean;
@@ -44,11 +44,11 @@ export default function TutorialModal({
   }, [gameState?.tutorialsEnabled]);
 
   useEffect(() => {
-    async function updateAsyncTutorialState() {
+    function updateAsyncTutorialState() {
       if (tutorialState == false) {
-        await AsyncStorage.setItem("tutorialsEnabled", JSON.stringify(false));
+        storage.set("tutorialsEnabled", JSON.stringify(false));
       } else {
-        await AsyncStorage.setItem("tutorialsEnabled", JSON.stringify(true));
+        storage.set("tutorialsEnabled", JSON.stringify(true));
       }
     }
 
@@ -70,8 +70,8 @@ export default function TutorialModal({
     }
   }, [tutorialState]);
 
-  async function loadAsyncTutorialState() {
-    const res = await AsyncStorage.getItem("tutorialsEnabled");
+  function loadAsyncTutorialState() {
+    const res = storage.getString("tutorialsEnabled");
     if (res) {
       const parsed: boolean = JSON.parse(res);
       setTutorialState(parsed);

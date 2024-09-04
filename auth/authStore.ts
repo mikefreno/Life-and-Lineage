@@ -1,5 +1,4 @@
 import { makeAutoObservable } from "mobx";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { API_BASE_URL } from "../config/config";
@@ -9,6 +8,7 @@ import { SaveRow } from "../utility/database";
 import { PlayerCharacter } from "../classes/character";
 import { Game } from "../classes/game";
 import { parseInt } from "lodash";
+import { storage } from "../utility/functions/save_load";
 
 type EmailLogin = {
   token: string;
@@ -100,16 +100,16 @@ class AuthStore {
     try {
       const [storedToken, storedEmail, storedProvider, appleUser] =
         await Promise.all([
-          AsyncStorage.getItem("userToken"),
-          AsyncStorage.getItem("userEmail"),
-          AsyncStorage.getItem("authProvider"),
-          AsyncStorage.getItem("appleUser"),
+          storage.getString("userToken"),
+          storage.getString("userEmail"),
+          storage.getString("authProvider"),
+          storage.getString("appleUser"),
         ]);
 
       if (storedToken || (appleUser && storedProvider === "apple")) {
         switch (storedProvider) {
           case "apple":
-            await this.checkAppleAuth(appleUser, storedEmail);
+            await this.checkAppleAuth(appleUser ?? "", storedEmail ?? "");
             break;
           case "google":
             const hasPrevious = GoogleSignin.hasPreviousSignIn();
@@ -135,8 +135,8 @@ class AuthStore {
             const isValid = await this.validateToken(storedToken!);
             if (isValid) {
               this.setAuthState(
-                storedToken,
-                storedEmail,
+                storedToken ?? "",
+                storedEmail ?? "",
                 storedProvider as "email",
               );
             } else {
@@ -176,7 +176,7 @@ class AuthStore {
       if (response.ok) {
         const data = await response.json();
         if (data.token) {
-          await AsyncStorage.setItem("userToken", data.token);
+          storage.set("userToken", data.token);
           this.token = data.token;
         }
         return true;
@@ -223,14 +223,10 @@ class AuthStore {
         appleUser = creds.appleUser;
       }
 
-      await Promise.all([
-        token ? AsyncStorage.setItem("userToken", token) : Promise.resolve(),
-        AsyncStorage.setItem("userEmail", email),
-        AsyncStorage.setItem("authProvider", provider),
-        appleUser
-          ? AsyncStorage.setItem("appleUser", appleUser)
-          : Promise.resolve(),
-      ]);
+      token && storage.set("userToken", token);
+      storage.set("userEmail", email);
+      storage.set("authProvider", provider);
+      appleUser && storage.set("appleUser", appleUser);
 
       this.setAuthState(token ?? null, email, provider, appleUser);
     } catch (error) {
@@ -243,12 +239,10 @@ class AuthStore {
       if (this.provider === "google") {
         await GoogleSignin.signOut();
       }
-      await Promise.all([
-        AsyncStorage.removeItem("userToken"),
-        AsyncStorage.removeItem("userEmail"),
-        AsyncStorage.removeItem("authProvider"),
-        AsyncStorage.removeItem("appleUser"),
-      ]);
+      storage.delete("userToken");
+      storage.delete("userEmail");
+      storage.delete("authProvider");
+      storage.delete("appleUser");
       this.setAuthState(null, null, null);
       this.setDBCredentials(null, null);
     } catch (error) {
@@ -557,10 +551,10 @@ class AuthStore {
     try {
       const [storedToken, storedEmail, storedProvider, appleUser] =
         await Promise.all([
-          AsyncStorage.getItem("userToken"),
-          AsyncStorage.getItem("userEmail"),
-          AsyncStorage.getItem("authProvider"),
-          AsyncStorage.getItem("appleUser"),
+          storage.getString("userToken"),
+          storage.getString("userEmail"),
+          storage.getString("authProvider"),
+          storage.getString("appleUser"),
         ]);
 
       console.log("*******USER AUTH STATE*******");

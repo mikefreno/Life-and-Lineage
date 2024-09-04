@@ -11,13 +11,16 @@ import { useVibration } from "../../../utility/customHooks";
 import { AppContext } from "../../_layout";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import TutorialModal from "../../../components/TutorialModal";
 import { toTitleCase } from "../../../utility/functions/misc/words";
 import { descriptionMap } from "../../../utility/descriptions";
 import { Element } from "../../../utility/types";
 import { elementalColorMap } from "../../../utility/elementColors";
 import BlessingDisplay from "../../../components/BlessingsDisplay";
+import {
+  loadStoredTutorialState,
+  updateStoredTutorialState,
+} from "../../../utility/functions/misc/tutorial";
 
 export default function SetBlessing() {
   const { slug } = useLocalSearchParams();
@@ -44,9 +47,6 @@ export default function SetBlessing() {
       : false,
   );
 
-  const [loadedAsync, setLoadedAsync] = useState<boolean>(false);
-  let tutorialStateRef = useRef<boolean>(gameState?.tutorialsEnabled ?? true);
-
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,
   );
@@ -59,30 +59,13 @@ export default function SetBlessing() {
 
   useEffect(() => {
     if (!gameState) {
-      loadAsyncTutorialState();
+      const res = loadStoredTutorialState();
+      setShowBlessingTutorial(res);
+      setTutorialState(res);
     }
   }, []);
 
-  async function loadAsyncTutorialState() {
-    const res = await AsyncStorage.getItem("tutorialsEnabled");
-    if (res) {
-      const parsed: boolean = JSON.parse(res);
-      setShowBlessingTutorial(parsed);
-      setTutorialState(parsed);
-      tutorialStateRef.current = parsed;
-    }
-    setLoadedAsync(true);
-  }
-
   useEffect(() => {
-    async function updateAsyncTutorialState() {
-      if (tutorialState == false) {
-        await AsyncStorage.setItem("tutorialsEnabled", JSON.stringify(false));
-      } else {
-        await AsyncStorage.setItem("tutorialsEnabled", JSON.stringify(true));
-      }
-    }
-
     if (gameState) {
       if (tutorialState == false) {
         gameState.disableTutorials();
@@ -90,7 +73,7 @@ export default function SetBlessing() {
         gameState.enableTutorials();
       }
     } else {
-      updateAsyncTutorialState();
+      updateStoredTutorialState(tutorialState);
     }
   }, [tutorialState]);
 
@@ -197,13 +180,7 @@ export default function SetBlessing() {
         }}
       />
       <TutorialModal
-        isVisibleCondition={
-          !gameState
-            ? loadedAsync
-              ? showBlessingTutorial
-              : false
-            : showBlessingTutorial
-        }
+        isVisibleCondition={showBlessingTutorial}
         backFunction={() => setShowBlessingTutorial(false)}
         onCloseFunction={() => setShowBlessingTutorial(false)}
         pageOne={{

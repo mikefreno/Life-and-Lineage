@@ -4,7 +4,6 @@ import GenericRaisedButton from "../components/GenericRaisedButton";
 import { fullLoad, storage } from "../utility/functions/save_load";
 import { PlayerCharacter } from "../classes/character";
 import { Game } from "../classes/game";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SaveLoadPerformance() {
   const [newTime, setNewTime] = useState<number>();
@@ -106,41 +105,41 @@ const styles = StyleSheet.create({
   },
 });
 
-const test_fullSave = async (
-  game: Game | null,
-  player: PlayerCharacter | null,
-) => {
-  if (game && player) {
-    try {
-      const jsonGame = JSON.stringify(game);
-      const jsonPlayer = JSON.stringify(player);
-      await Promise.all([
-        AsyncStorage.setItem("game_test", jsonGame),
-        AsyncStorage.setItem("player_test", jsonPlayer),
-      ]);
-    } catch (e) {
-      console.error(e);
-    }
-  }
-};
+//const test_fullSave = async (
+//game: Game | null,
+//player: PlayerCharacter | null,
+//) => {
+//if (game && player) {
+//try {
+//const jsonGame = JSON.stringify(game);
+//const jsonPlayer = JSON.stringify(player);
+//await Promise.all([
+//AsyncStorage.setItem("game_test", jsonGame),
+//AsyncStorage.setItem("player_test", jsonPlayer),
+//]);
+//} catch (e) {
+//console.error(e);
+//}
+//}
+//};
 
-export const test_fullLoad = async () => {
-  try {
-    const jsonGame = await AsyncStorage.getItem("game");
-    let game;
-    if (jsonGame) {
-      game = Game.fromJSON(JSON.parse(jsonGame));
-    }
-    const jsonPlayer = await AsyncStorage.getItem("game");
-    let player;
-    if (jsonPlayer) {
-      player = PlayerCharacter.fromJSON(JSON.parse(jsonPlayer));
-    }
-    return { game, player };
-  } catch (e) {
-    console.error(e);
-  }
-};
+//export const test_fullLoad = async () => {
+//try {
+//const jsonGame = await AsyncStorage.getItem("game");
+//let game;
+//if (jsonGame) {
+//game = Game.fromJSON(JSON.parse(jsonGame));
+//}
+//const jsonPlayer = await AsyncStorage.getItem("game");
+//let player;
+//if (jsonPlayer) {
+//player = PlayerCharacter.fromJSON(JSON.parse(jsonPlayer));
+//}
+//return { game, player };
+//} catch (e) {
+//console.error(e);
+//}
+//};
 
 const test_fullSave_new = async (
   game: Game | null,

@@ -7,8 +7,8 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { useVibration } from "../../../utility/customHooks";
 import { AppContext } from "../../_layout";
 import { useColorScheme } from "nativewind";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import TutorialModal from "../../../components/TutorialModal";
+import { loadStoredTutorialState } from "../../../utility/functions/misc/tutorial";
 
 export default function SetSex() {
   const { slug } = useLocalSearchParams();
@@ -35,9 +35,6 @@ export default function SetSex() {
       ? true
       : false,
   );
-  const [loadedAsync, setLoadedAsync] = useState<boolean>(false);
-
-  let tutorialStateRef = useRef<boolean>(gameState?.tutorialsEnabled ?? true);
 
   useEffect(() => {
     if (!showAgingTutorial && gameState) {
@@ -47,19 +44,10 @@ export default function SetSex() {
 
   useEffect(() => {
     if (!gameState) {
-      loadAsyncTutorialState();
+      const res = loadStoredTutorialState();
+      setShowAgingTutorial(res);
     }
   }, []);
-
-  async function loadAsyncTutorialState() {
-    const res = await AsyncStorage.getItem("tutorialsEnabled");
-    if (res) {
-      const parsed: boolean = JSON.parse(res);
-      setShowAgingTutorial(parsed);
-      tutorialStateRef.current = parsed;
-    }
-    setLoadedAsync(true);
-  }
 
   const accent =
     playerClass == "mage"
@@ -78,13 +66,7 @@ export default function SetSex() {
         }}
       />
       <TutorialModal
-        isVisibleCondition={
-          !gameState
-            ? loadedAsync
-              ? showAgingTutorial
-              : false
-            : showAgingTutorial
-        }
+        isVisibleCondition={!gameState ? showAgingTutorial : false}
         backFunction={() => {
           setShowAgingTutorial(false);
         }}

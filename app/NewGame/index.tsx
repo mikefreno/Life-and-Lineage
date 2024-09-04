@@ -6,7 +6,6 @@ import { Stack, router } from "expo-router";
 import { useVibration } from "../../utility/customHooks";
 import { AppContext } from "../_layout";
 import Modal from "react-native-modal";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesome5 } from "@expo/vector-icons";
 import TutorialModal from "../../components/TutorialModal";
 import {
@@ -14,6 +13,7 @@ import {
   PaladinHammer,
   WizardHat,
 } from "../../assets/icons/SVGIcons";
+import { loadStoredTutorialState } from "../../utility/functions/misc/tutorial";
 
 export default function NewGameScreen() {
   const [selectedClass, setSelectedClass] = useState<
@@ -43,8 +43,6 @@ export default function NewGameScreen() {
     gameState ? true : false,
   );
 
-  const [loadedAsync, setLoadedAsync] = useState<boolean>(false);
-
   useEffect(() => {
     if (!showIntroTutorial && gameState) {
       gameState.updateTutorialState("class", true);
@@ -52,14 +50,6 @@ export default function NewGameScreen() {
   }, [showIntroTutorial]);
 
   useEffect(() => {
-    async function updateAsyncTutorialState() {
-      if (tutorialState == false) {
-        await AsyncStorage.setItem("tutorialsEnabled", JSON.stringify(false));
-      } else {
-        await AsyncStorage.setItem("tutorialsEnabled", JSON.stringify(true));
-      }
-    }
-
     if (gameState) {
       if (tutorialState == false) {
         gameState.disableTutorials();
@@ -67,12 +57,14 @@ export default function NewGameScreen() {
         gameState.enableTutorials();
       }
     } else {
-      updateAsyncTutorialState();
+      setTutorialState(tutorialState);
     }
   }, [tutorialState]);
 
   useEffect(() => {
-    loadAsyncTutorialState();
+    let res = loadStoredTutorialState();
+    setShowIntroTutorial(res);
+    setTutorialState(res);
   }, []);
 
   useEffect(() => {
@@ -80,16 +72,6 @@ export default function NewGameScreen() {
       setTutorialState(gameState?.tutorialsEnabled);
     }
   }, [gameState?.tutorialsEnabled]);
-
-  async function loadAsyncTutorialState() {
-    const res = await AsyncStorage.getItem("tutorialsEnabled");
-    if (res) {
-      const parsed: boolean = JSON.parse(res);
-      setShowIntroTutorial(parsed);
-      setTutorialState(parsed);
-    }
-    setLoadedAsync(true);
-  }
 
   return (
     <>
@@ -149,13 +131,7 @@ export default function NewGameScreen() {
         </ThemedView>
       </Modal>
       <TutorialModal
-        isVisibleCondition={
-          !gameState
-            ? loadedAsync
-              ? showIntroTutorial
-              : false
-            : showIntroTutorial
-        }
+        isVisibleCondition={showIntroTutorial}
         backFunction={() => setShowIntroTutorial(false)}
         onCloseFunction={() => setShowIntroTutorial(false)}
         pageOne={{

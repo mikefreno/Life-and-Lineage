@@ -18,12 +18,11 @@ import {
 import { Game } from "../../../classes/game";
 import { useContext } from "react";
 import { useVibration } from "../../../utility/customHooks";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getRandomJobTitle } from "../../../utility/functions/characterAid";
 import { createShops } from "../../../classes/shop";
 import { generateBirthday } from "../../../utility/functions/misc/age";
 import clearHistory from "../../../utility/functions/misc/nav";
-import { fullSave } from "../../../utility/functions/save_load";
+import { fullSave, storage } from "../../../utility/functions/save_load";
 import { AppContext } from "../../_layout";
 
 export default function NewGameReview() {
@@ -163,7 +162,7 @@ export default function NewGameReview() {
       const shops = createShops(
         playerClass as "mage" | "paladin" | "necromancer",
       );
-      const tutorialState = await AsyncStorage.getItem("tutorialsEnabled");
+      const tutorialState = storage.getString("tutorialsEnabled");
       let parsed = true;
       if (tutorialState) {
         parsed = JSON.parse(tutorialState);
@@ -189,7 +188,7 @@ export default function NewGameReview() {
       vibration({ style: "success" });
       setTimeout(() => clearHistory(navigation), 500);
       fullSave(newGame, player);
-      AsyncStorage.removeItem("tutorialsEnabled");
+      storage.delete("tutorialsEnabled");
     }
   }
 
