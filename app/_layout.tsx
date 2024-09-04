@@ -101,7 +101,7 @@ async function registerForPushNotificationsAsync() {
           projectId,
         })
       ).data;
-      __DEV__ && console.log(pushTokenString);
+      //__DEV__ && console.log(pushTokenString);
       return pushTokenString;
     } catch (e: unknown) {
       handleRegistrationError(`${e}`);

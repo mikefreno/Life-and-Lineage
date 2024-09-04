@@ -8,7 +8,6 @@ import { Enemy, Minion } from "./creatures";
 
 interface SpellFields {
   name: string;
-  player: PlayerCharacter;
   attackStyle?: "single" | "cleave" | "aoe";
   element: Element;
   proficiencyNeeded: MasteryLevel;
@@ -31,7 +30,6 @@ interface SpellFields {
 
 export class Spell {
   name: string;
-  user: PlayerCharacter;
   attackStyle: "single" | "cleave" | "aoe"; // at time of writing, only implementing single target
   element: Element;
   proficiencyNeeded: MasteryLevel;
@@ -46,7 +44,6 @@ export class Spell {
 
   constructor({
     name,
-    player,
     attackStyle,
     element,
     proficiencyNeeded,
@@ -55,7 +52,6 @@ export class Spell {
     effects,
   }: SpellFields) {
     this.name = name;
-    this.user = player;
     this.element = element;
     (this.attackStyle = attackStyle ?? "single"),
       (this.proficiencyNeeded = proficiencyNeeded);
@@ -69,21 +65,21 @@ export class Spell {
     this.summons = effects.summon ?? [];
   }
 
-  get baseDamage() {
+  private baseDamage(user: PlayerCharacter) {
     if (this.initDamage > 0) {
-      return this.initDamage + this.user.magicPower;
+      return this.initDamage + user.magicPower;
     } else return 0;
   }
 
-  get canBeUsed() {
-    if (this.user.isStunned) {
+  private canBeUsed(user: PlayerCharacter) {
+    if (user.isStunned) {
       return false;
     }
-    if (this.user.currentMana < this.manaCost) {
+    if (user.currentMana < this.manaCost) {
       return false;
     }
     if (
-      (this.user.currentMasteryLevel(this.element) as MasteryLevel) <
+      (user.currentMasteryLevel(this.element) as MasteryLevel) <
       this.proficiencyNeeded
     ) {
       return false;
@@ -92,16 +88,22 @@ export class Spell {
     return true;
   }
 
-  public use(target: Enemy | Minion): { logString: string } {
+  public use({
+    target,
+    user,
+  }: {
+    target: Enemy | Minion;
+    user: PlayerCharacter;
+  }): { logString: string } {
     if (!this.canBeUsed) {
       return { logString: "failure" };
     }
-    this.user.useMana(this.manaCost);
+    user.useMana(this.manaCost);
 
-    const finalDamage = Math.round(this.baseDamage * 4) / 4; // physical damage
+    const finalDamage = Math.round(this.baseDamage(user) * 4) / 4; // physical damage
     target.damageHealth(finalDamage);
     target.damageSanity(this.flatSanityDamage);
-    this.user.damageHealth(this.selfDamage);
+    user.damageHealth(this.selfDamage);
     // create debuff loop
     const debuffNames: string[] = []; // only storing names, collecting for logBuilder
     let amountHealed = 0;
@@ -109,8 +111,8 @@ export class Spell {
       if (debuff.name == "lifesteal") {
         const roll = rollD20();
         if (roll * 5 >= 100 - debuff.chance * 100) {
-          const heal = Math.round(this.baseDamage * 0.5 * 4) / 4;
-          amountHealed += this.user.restoreHealth(heal);
+          const heal = Math.round(this.baseDamage(user) * 0.5 * 4) / 4;
+          amountHealed += user.restoreHealth(heal);
         }
       } else {
         const newDebuff = createDebuff({
@@ -118,8 +120,8 @@ export class Spell {
           debuffChance: debuff.chance,
           enemyMaxHP: target.healthMax,
           enemyMaxSanity: target.sanityMax,
-          primaryAttackDamage: this.baseDamage,
-          applierNameString: this.user.fullName,
+          primaryAttackDamage: this.baseDamage(user),
+          applierNameString: user.fullName,
         });
 
         if (newDebuff) {
@@ -133,24 +135,24 @@ export class Spell {
       const newBuff = createBuff({
         buffName: buff,
         buffChance: 1,
-        attackPower: this.baseDamage,
-        maxHealth: this.user.nonConditionalMaxHealth,
-        maxSanity: this.user.nonConditionalMaxSanity,
-        applierNameString: this.user.fullName,
+        attackPower: this.baseDamage(user),
+        maxHealth: user.nonConditionalMaxHealth,
+        maxSanity: user.nonConditionalMaxSanity,
+        applierNameString: user.fullName,
       });
       if (newBuff) {
         buffNames.push(newBuff.name);
-        this.user.addCondition(newBuff);
+        user.addCondition(newBuff);
       }
     });
     let minionSpecies: string[] = [];
     this.summons.forEach((summon) => {
-      const type = (this.user as PlayerCharacter | Enemy).createMinion(summon);
+      const type = (user as PlayerCharacter | Enemy).createMinion(summon);
       minionSpecies.push(type);
     });
-    this.user.gainProficiency(this);
+    user.gainProficiency(this);
 
-    wait(1000).then(() => this.user.regenMana());
+    wait(1000).then(() => user.regenMana());
 
     return {
       logString: this.logBuilder({

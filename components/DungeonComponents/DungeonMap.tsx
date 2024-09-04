@@ -229,6 +229,7 @@ export const DungeonMapControls = () => {
   if (!dungeonData || !appData) throw new Error("missing context");
   const { currentPosition, setCurrentPosition, setInCombat, tiles } =
     dungeonData;
+  const { dimensions } = appData;
   const isMoveValid = (direction: keyof typeof directionsMapping) => {
     if (!currentPosition) return false;
 
@@ -279,8 +280,11 @@ export const DungeonMapControls = () => {
     );
   };
   return (
-    <PlatformDependantBlurView className="flex-1 flex items-center w-full">
-      <View className="w-2/3 mx-auto">
+    <PlatformDependantBlurView className="flex-1 flex items-center w-full justify-center">
+      <View
+        className="w-2/3 mx-auto"
+        style={{ marginTop: -dimensions.height / 20 }}
+      >
         <ArrowButton direction="up" />
         <View className="flex-row justify-between w-full">
           <ArrowButton direction="left" />

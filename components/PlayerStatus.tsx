@@ -562,6 +562,14 @@ const PlayerStatus = observer(
           <BlurView
             intensity={Platform.OS == "ios" ? 100 : 0}
             className="shadow-soft dark:shadow-soft-white z-top overflow-hidden pb-6"
+            style={{
+              backgroundColor:
+                Platform.OS != "ios"
+                  ? colorScheme == "dark"
+                    ? "#27272a"
+                    : "#fafafa"
+                  : "transparent",
+            }}
           >
             <Animated.View
               style={{

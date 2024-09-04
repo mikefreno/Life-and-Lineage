@@ -312,7 +312,10 @@ export const use = ({
   const { playerState, enemyState } = appData;
   if (enemyState && playerState && isFocused) {
     if (attackOrSpell instanceof Attack) {
-      const { result, logString } = attackOrSpell.use(target);
+      const { result, logString } = attackOrSpell.use({
+        target,
+        user: playerState,
+      });
       if (result == AttackUse.miss) {
         setEnemyDodgeDummy((prev) => prev + 1);
       }

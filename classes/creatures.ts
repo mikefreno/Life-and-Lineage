@@ -249,7 +249,6 @@ export class Creature {
       } = foundAttack;
       const builtAttack = new Attack({
         name,
-        user: this as unknown as Enemy | Minion, // this is dumb, but a 'Creature' never exists, only Enemy and Minion
         energyCost,
         hitChance,
         targets: targets as "single" | "aoe" | "cleave",
@@ -295,7 +294,10 @@ export class Creature {
       if (availableAttacks.length > 0) {
         const randomIndex = Math.floor(Math.random() * availableAttacks.length);
         const chosenAttack = availableAttacks[randomIndex];
-        const res = chosenAttack.use(target);
+        const res = chosenAttack.use({
+          target,
+          user: this as unknown as Enemy | Minion,
+        });
         this.endTurn();
         return { ...res, chosenAttack };
       } else {

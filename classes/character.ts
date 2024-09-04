@@ -1403,11 +1403,25 @@ export class PlayerCharacter extends Character {
           }
         });
       } else {
-        const attack = new Attack({ name: "Punch", user: this });
+        const punchObj = attacks.find(
+          (attackObj) => attackObj.name == "punch",
+        )!;
+        const attack = new Attack({
+          name: punchObj.name,
+          user: this,
+          damageMult: punchObj.damageMult,
+          hitChance: punchObj.damageMult,
+        });
         builtAttacks.push(attack);
       }
     } else {
-      const attack = new Attack({ name: "Punch", user: this });
+      const punchObj = attacks.find((attackObj) => attackObj.name == "punch")!;
+      const attack = new Attack({
+        name: punchObj.name,
+        user: this,
+        damageMult: punchObj.damageMult,
+        hitChance: punchObj.damageMult,
+      });
       builtAttacks.push(attack);
     }
     return builtAttacks;
