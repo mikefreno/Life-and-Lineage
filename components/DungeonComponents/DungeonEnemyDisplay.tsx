@@ -243,7 +243,7 @@ export default function DungeonEnemyDisplay() {
                 }}
               >
                 {enemyTextString ? (
-                  <Text className="text-center text-xl tracking-wide min-w-[6rem]">
+                  <Text className="text-xl tracking-wide">
                     *{toTitleCase(enemyTextString)}*
                   </Text>
                 ) : null}

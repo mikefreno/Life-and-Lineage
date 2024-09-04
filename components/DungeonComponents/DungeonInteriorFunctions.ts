@@ -4,10 +4,15 @@ import { enemyGenerator } from "../../utility/enemy";
 import { getMagnitude } from "../../utility/functions/conditions";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { dungeonSave } from "../../utility/functions/save_load";
-import type { AppContextType, DungeonContextType } from "../../utility/types";
+import {
+  AttackUse,
+  type AppContextType,
+  type DungeonContextType,
+} from "../../utility/types";
 import { Item } from "../../classes/item";
 import { Spell } from "../../classes/spell";
 import { Attack } from "../../classes/attack";
+import { wait } from "../../utility/functions/misc/wait";
 
 interface addItemToPouch {
   item: Item;
@@ -111,118 +116,83 @@ export const enemyTurn = ({ appData, dungeonData }: contextData) => {
   } = dungeonData;
   if (enemyState && playerState && gameState) {
     setEnemyAttacked(true);
-    const enemyAttackRes = enemyState.takeTurn({
-      defenderMaxHealth: playerState.nonConditionalMaxHealth,
-      defenderMaxSanity: playerState.nonConditionalMaxSanity,
-      defenderDR: playerState.getDamageReduction(),
-      defenderConditions: playerState.conditions,
-    });
-    if (
-      enemyAttackRes !== "miss" &&
-      enemyAttackRes !== "stun" &&
-      enemyAttackRes !== "pass"
-    ) {
-      playerState.damageHealth(enemyAttackRes.damage);
-      playerState.damageSanity(enemyAttackRes.sanityDamage);
-      if (enemyAttackRes.debuffs) {
-        enemyAttackRes.debuffs.forEach((debuff) =>
-          playerState.addCondition(debuff),
-        );
-      }
-      let array = [];
-      let line = `The ${toTitleCase(
-        enemyState.creatureSpecies,
-      )} used ${toTitleCase(enemyAttackRes.name)}${
-        enemyAttackRes.damage
-          ? ` dealing ${enemyAttackRes.damage} health damage`
-          : ""
-      }`;
-
-      if (enemyAttackRes.heal) {
-        array.push(`healing for ${enemyAttackRes.heal} health`);
-        setTimeout(() => {
-          setEnemyHealDummy((prev) => prev + 1);
-        }, 250);
-      }
-
-      if (enemyAttackRes.sanityDamage && enemyAttackRes.sanityDamage > 0) {
-        array.push(`dealing ${enemyAttackRes.sanityDamage} sanity damage`);
-      }
-
-      if (enemyAttackRes.debuffs) {
-        enemyAttackRes.debuffs.forEach((debuff) =>
-          array.push(`it applied a ${debuff.name} stack`),
-        );
-      }
-      if (enemyAttackRes.summons) {
-        const counts: { summon: string; count: number }[] = [];
-        enemyAttackRes.summons.forEach((summon) => {
-          const preExisting = counts.find((obj) => obj.summon == summon);
-          if (preExisting) {
-            preExisting.count += 1;
-          } else {
-            counts.push({ summon: summon, count: 1 });
-          }
-        });
-      }
-      if (array.length) {
-        line +=
-          ", " +
-          array.slice(0, -1).join(", ") +
-          (array.length > 1 ? ", and " : " and ") +
-          array.slice(-1);
-      }
-      battleLogger(line);
-      if (enemyAttackRes.damage > 0) {
-        const revengeCondition = playerState.conditions.find((condition) =>
-          condition.effect.includes("revenge"),
-        );
-        if (revengeCondition) {
-          const effectMagnitudeValue = getMagnitude(
-            revengeCondition.effectMagnitude,
+    const startOfTurnPlayerState = { ...playerState };
+    const startOfTurnEnemyState = { ...enemyState };
+    const enemyAttackRes = enemyState.takeTurn({ target: playerState }); // this should be updated to allow the enemy to target player minions
+    battleLogger(enemyAttackRes.logString);
+    let action: () => void;
+    switch (enemyAttackRes.result) {
+      case AttackUse.success:
+        const playerHealthChange =
+          startOfTurnPlayerState.currentHealth - playerState.currentHealth;
+        const enemyHealthChange =
+          startOfTurnEnemyState.health - enemyState.health;
+        const playerSanityChange =
+          startOfTurnPlayerState.currentSanity - playerState.currentSanity;
+        if (playerHealthChange > 0) {
+          const revengeCondition = playerState.conditions.find((condition) =>
+            condition.effect.includes("revenge"),
           );
-          const revengeDamage =
-            enemyAttackRes.damage * 5 > effectMagnitudeValue * 10
-              ? effectMagnitudeValue * 10
-              : enemyAttackRes.damage * 5;
-          enemyState.damageHealth(revengeDamage);
-          battleLogger(`You dealt ${revengeDamage} revenge damage!`);
+          if (revengeCondition) {
+            const effectMagnitudeValue = getMagnitude(
+              revengeCondition.effectMagnitude,
+            );
+            const revengeDamage =
+              playerHealthChange * 5 > effectMagnitudeValue * 10
+                ? effectMagnitudeValue * 10
+                : playerHealthChange * 5;
+            enemyState.damageHealth(revengeDamage);
+            battleLogger(`You dealt ${revengeDamage} revenge damage!`);
+          }
         }
-      }
-      if (
-        enemyAttackRes.damage > 0 ||
-        (enemyAttackRes.sanityDamage && enemyAttackRes.sanityDamage > 0)
-      ) {
-        setEnemyAttackDummy((prev) => prev + 1);
-      }
-      if (enemyAttackRes.debuffs || enemyAttackRes.buffs) {
-        setEnemyTextString(enemyAttackRes.name);
-        setEnemyTextDummy((prev) => prev + 1);
-      }
-    } else if (enemyAttackRes == "pass") {
-      battleLogger(
-        `The ${toTitleCase(enemyState.creatureSpecies)} did nothing`,
-      );
-      setEnemyTextString(enemyAttackRes);
-      setEnemyTextDummy((prev) => prev + 1);
-    } else {
-      battleLogger(
-        `The ${toTitleCase(enemyState.creatureSpecies)} ${
-          enemyAttackRes == "stun" ? "was " : ""
-        }${enemyAttackRes}ed`,
-      );
-      if (enemyAttackRes == "miss") {
-        setEnemyAttackDummy((prev) => prev + 1);
-      }
-      setTimeout(
-        () => {
-          setEnemyTextString(enemyAttackRes as "miss" | "stun");
+        action = () => {
+          if (playerHealthChange > 0 || playerSanityChange > 0) {
+            setEnemyAttackDummy((prev) => prev + 1);
+          }
+          wait(500).then(() => {
+            if (enemyHealthChange < 0) {
+              setEnemyHealDummy((prev) => prev + 1);
+            }
+            if (
+              enemyAttackRes.chosenAttack.debuffs.length > 0 ||
+              enemyAttackRes.chosenAttack.debuffs.length > 0
+            ) {
+              setEnemyTextString(enemyAttackRes.chosenAttack.name);
+              setEnemyTextDummy((prev) => prev + 1);
+            }
+          });
+        };
+        break;
+      case AttackUse.miss:
+        action = () => {
+          setEnemyAttackDummy((prev) => prev + 1);
+          wait(500).then(() => {
+            setEnemyTextString("*miss*");
+            setEnemyTextDummy((prev) => prev + 1);
+          });
+        };
+        break;
+      case AttackUse.block:
+        action = () => {
+          setEnemyTextString("*blocked*");
           setEnemyTextDummy((prev) => prev + 1);
-        },
-        enemyAttackRes == "miss" ? 500 : 0,
-      );
+        };
+        break;
+      case AttackUse.stunned:
+        action = () => {
+          setEnemyTextString("*stunned*");
+          setEnemyTextDummy((prev) => prev + 1);
+        };
+        break;
+      case AttackUse.lowEnergy:
+        action = () => {
+          setEnemyTextString("*pass*");
+          setEnemyTextDummy((prev) => prev + 1);
+        };
+        break;
     }
-    if (enemyState.minions.length > 0) {
+    action();
+    if (enemyState?.minions.length > 0) {
       enemyMinionsTurn(
         enemyState.minions,
         enemyState,
@@ -277,50 +247,8 @@ function enemyMinionsTurn(
   if (enemyState && playerState) {
     for (let i = 0; i < suppliedMinions.length; i++) {
       setTimeout(() => {
-        const res = suppliedMinions[i].takeTurn({
-          defenderMaxHealth: playerState.nonConditionalMaxHealth,
-          defenderMaxSanity: playerState.nonConditionalMaxSanity,
-          defenderDR: playerState.getDamageReduction(),
-          defenderConditions: playerState.conditions,
-        });
-        if (res == "miss") {
-          battleLogger(
-            `${toTitleCase(enemyState.creatureSpecies)}'s ${toTitleCase(
-              suppliedMinions[i].creatureSpecies,
-            )} missed!`,
-          );
-        } else if (res == "stun") {
-          battleLogger(
-            `${toTitleCase(enemyState.creatureSpecies)}'s ${toTitleCase(
-              suppliedMinions[i].creatureSpecies,
-            )} was stunned!`,
-          );
-        } else if (res == "pass") {
-          battleLogger(
-            `${toTitleCase(enemyState.creatureSpecies)}'s ${toTitleCase(
-              suppliedMinions[i].creatureSpecies,
-            )} passed!`,
-          );
-        } else {
-          let str = `${toTitleCase(enemyState.creatureSpecies)}'s ${toTitleCase(
-            suppliedMinions[i].creatureSpecies,
-          )} used ${toTitleCase(res.name)} dealing ${res.damage} damage`;
-          playerState.damageHealth(res.damage);
-          if (res.heal && res.heal > 0) {
-            str += ` and healed for ${res.heal} damage`;
-          }
-          if (res.sanityDamage && res.sanityDamage > 0) {
-            str += ` and ${res.sanityDamage} sanity damage`;
-            playerState.damageSanity(res.sanityDamage);
-          }
-          if (res.debuffs) {
-            res.debuffs.forEach((effect) => {
-              str += ` and applied a ${effect.name} stack`;
-              playerState.addCondition(effect);
-            });
-          }
-          battleLogger(str);
-        }
+        const res = suppliedMinions[i].takeTurn({ target: playerState });
+        battleLogger(res.logString);
         if (suppliedMinions[i].turnsLeftAlive <= 0) {
           enemyState.removeMinion(suppliedMinions[i]);
         }
@@ -388,8 +316,8 @@ export const use = ({
   const { battleLogger, setAttackAnimationOnGoing } = dungeonData;
   const { playerState, enemyState } = appData;
   if (enemyState && playerState && isFocused) {
-    const { result, logString } = attackOrSpell.use(target);
-    battleLogger(logString ?? "");
+    const { logString } = attackOrSpell.use(target);
+    battleLogger(logString);
     playerMinionsTurn({ dungeonData, appData });
     setTimeout(() => {
       setTimeout(() => {
@@ -443,50 +371,8 @@ export function playerMinionsTurn({ dungeonData, appData }: contextData) {
       i++
     ) {
       setTimeout(() => {
-        const res = suppliedMinions[i].takeTurn({
-          defenderMaxHealth: enemyState.healthMax,
-          defenderMaxSanity: enemyState.healthMax,
-          defenderDR: enemyState.getDamageReduction(),
-          defenderConditions: enemyState.conditions,
-        });
-        if (res == "miss") {
-          battleLogger(
-            `${playerState.fullName}'s ${toTitleCase(
-              suppliedMinions[i].creatureSpecies,
-            )} missed!`,
-          );
-        } else if (res == "stun") {
-          battleLogger(
-            `${playerState.fullName}'s ${toTitleCase(
-              suppliedMinions[i].creatureSpecies,
-            )} was stunned!`,
-          );
-        } else if (res == "pass") {
-          battleLogger(
-            `${playerState.fullName}'s ${toTitleCase(
-              suppliedMinions[i].creatureSpecies,
-            )} passed!`,
-          );
-        } else {
-          let str = `${playerState.fullName}'s ${toTitleCase(
-            suppliedMinions[i].creatureSpecies,
-          )} used ${toTitleCase(res.name)} dealing ${res.damage} damage`;
-          enemyState.damageHealth(res.damage);
-          if (res.heal && res.heal > 0) {
-            str += ` and healed for ${res.heal} damage`;
-          }
-          if (res.sanityDamage && res.sanityDamage > 0) {
-            str += ` and ${res.sanityDamage} sanity damage`;
-            enemyState.damageSanity(res.sanityDamage);
-          }
-          if (res.debuffs) {
-            res.debuffs.forEach((effect) => {
-              str += ` and applied a ${effect.name} stack`;
-              enemyState.addCondition(effect);
-            });
-          }
-          battleLogger(str);
-        }
+        const res = suppliedMinions[i].takeTurn({ target: enemyState });
+        battleLogger(res.logString);
         if (suppliedMinions[i].turnsLeftAlive <= 0) {
           playerState.removeMinion(suppliedMinions[i]);
         }
@@ -494,77 +380,3 @@ export function playerMinionsTurn({ dungeonData, appData }: contextData) {
     }
   }
 }
-
-//old function
-//interface playerMinionsTurnBackup {
-//suppliedMinions: Minion[];
-//startOfTurnEnemyID: string;
-//dungeonData: DungeonContextType | undefined;
-//appData: AppContextType | undefined;
-//}
-//function playerMinionsTurnBackup({
-//suppliedMinions,
-//startOfTurnEnemyID,
-//dungeonData,
-//appData,
-//}: playerMinionsTurn) {
-//if (enemyState && playerState) {
-//for (
-//let i = 0;
-//i < suppliedMinions.length &&
-//enemyState.equals(startOfTurnEnemyID) &&
-//enemyState.health > 0;
-//i++
-//) {
-//setTimeout(() => {
-//const res = suppliedMinions[i].takeTurn({
-//defenderMaxHealth: enemyState.healthMax,
-//defenderMaxSanity: enemyState.healthMax,
-//defenderDR: enemyState.getDamageReduction(),
-//defenderConditions: enemyState.conditions,
-//});
-//if (res == "miss") {
-//battleLogger(
-//`${playerState.getFullName()}'s ${toTitleCase(
-//suppliedMinions[i].creatureSpecies,
-//)} missed!`,
-//);
-//} else if (res == "stun") {
-//battleLogger(
-//`${playerState.getFullName()}'s ${toTitleCase(
-//suppliedMinions[i].creatureSpecies,
-//)} was stunned!`,
-//);
-//} else if (res == "pass") {
-//battleLogger(
-//`${playerState.getFullName()}'s ${toTitleCase(
-//suppliedMinions[i].creatureSpecies,
-//)} passed!`,
-//);
-//} else {
-//let str = `${playerState.getFullName()}'s ${toTitleCase(
-//suppliedMinions[i].creatureSpecies,
-//)} used ${toTitleCase(res.name)} dealing ${res.damage} damage`;
-//enemyState.damageHealth(res.damage);
-//if (res.heal && res.heal > 0) {
-//str += ` and healed for ${res.heal} damage`;
-//}
-//if (res.sanityDamage && res.sanityDamage > 0) {
-//str += ` and ${res.sanityDamage} sanity damage`;
-//enemyState.damageSanity(res.sanityDamage);
-//}
-//if (res.debuffs) {
-//res.debuffs.forEach((effect) => {
-//str += ` and applied a ${effect.name} stack`;
-//enemyState.addCondition(effect);
-//});
-//}
-//battleLogger(str);
-//}
-//if (suppliedMinions[i].turnsLeftAlive <= 0) {
-//playerState.removeMinion(suppliedMinions[i]);
-//}
-//}, 1000 * i);
-//}
-//}
-//}

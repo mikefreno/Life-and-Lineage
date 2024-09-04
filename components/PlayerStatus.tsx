@@ -1002,7 +1002,7 @@ const PlayerStatus = observer(
                       Sanity
                     </Text>
                     <ProgressBar
-                      value={playerState.maxSanity}
+                      value={playerState.currentSanity}
                       minValue={-playerState.maxSanity}
                       maxValue={playerState.maxSanity}
                       filledColor="#c084fc"

@@ -92,7 +92,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                       inverted
                       renderItem={({ item: attackOrSpell }) => (
                         <View
-                          className="my-1 rounded border px-4 py-2"
+                          className="mt-2 rounded-lg border px-4 py-2"
                           style={{
                             backgroundColor:
                               attackOrSpell instanceof Spell

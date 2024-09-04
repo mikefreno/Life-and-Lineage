@@ -1,6 +1,7 @@
 import { createBuff, createDebuff } from "../utility/functions/conditions";
+import { toTitleCase } from "../utility/functions/misc/words";
 import { rollD20 } from "../utility/functions/roll";
-import { BeingType, Element, MasteryLevel } from "../utility/types";
+import { Element, MasteryLevel } from "../utility/types";
 import { PlayerCharacter } from "./character";
 import { Enemy, Minion } from "./creatures";
 
@@ -88,8 +89,10 @@ export class Spell {
     return true;
   }
 
-  public use(target: Enemy | Minion) {
-    if (!this.canBeUsed) return { result: "Cannot use" };
+  public use(target: Enemy | Minion): { logString: string } {
+    if (!this.canBeUsed) {
+      return { logString: "failure" };
+    }
 
     const finalDamage = Math.round(this.baseDamage * 4) / 4; // physical damage
     target.damageHealth(finalDamage);
@@ -165,7 +168,9 @@ export class Spell {
     const userString = "You";
     const targetString = `the ${targetName}`;
 
-    let returnString = `${userString} used ${this.name} on ${targetString}.\n`;
+    let returnString = `${userString} used ${toTitleCase(
+      this.name,
+    )} on ${targetString}.\n`;
 
     // Health damage
     if (healthDamage > 0) {

@@ -107,6 +107,14 @@ export enum Element {
   protection = "protection",
 }
 
+export enum AttackUse {
+  success,
+  miss,
+  block,
+  stunned,
+  lowEnergy,
+}
+
 export type AttackObj = {
   name: string;
   energyCost?: number;

@@ -1,6 +1,6 @@
 import enemies from "../assets/json/enemy.json";
 import { Enemy } from "../classes/creatures";
-import { type beingType } from "./types";
+import { type BeingType } from "./types";
 
 function isConvertibleToNumber(str: string) {
   return /^-?\d*\.?\d+$/.test(str);
@@ -42,7 +42,7 @@ export function enemyGenerator(
     );
 
     const enemy = new Enemy({
-      beingType: enemyJSON.beingType as beingType,
+      beingType: enemyJSON.beingType as BeingType,
       creatureSpecies: nameOverride ?? enemyJSON.name,
       health: enemyHealth,
       healthMax: enemyHealth,
