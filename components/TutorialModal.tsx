@@ -6,12 +6,17 @@ import { useColorScheme } from "nativewind";
 import { AppContext } from "../app/_layout";
 import { useVibration } from "../utility/customHooks";
 import { Pressable, Switch } from "react-native";
-import { storage } from "../utility/functions/save_load";
+import {
+  loadStoredTutorialState,
+  updateStoredTutorialState,
+} from "../utility/functions/misc/tutorial";
+import { TutorialOption } from "../utility/types";
 
 interface TutorialModalProps {
   isVisibleCondition: boolean;
-  backFunction: () => void;
-  onCloseFunction: () => void;
+  tutorial: TutorialOption;
+  backFunction?: () => void;
+  onCloseFunction?: () => void;
   pageOne: { title: string; body: string };
   pageTwo?: { title?: string; body: string };
   pageThree?: { title?: string; body: string };
@@ -19,6 +24,7 @@ interface TutorialModalProps {
 
 export default function TutorialModal({
   isVisibleCondition,
+  tutorial,
   backFunction,
   onCloseFunction,
   pageOne,
@@ -44,14 +50,6 @@ export default function TutorialModal({
   }, [gameState?.tutorialsEnabled]);
 
   useEffect(() => {
-    function updateAsyncTutorialState() {
-      if (tutorialState == false) {
-        storage.set("tutorialsEnabled", JSON.stringify(false));
-      } else {
-        storage.set("tutorialsEnabled", JSON.stringify(true));
-      }
-    }
-
     if (!firstLoad) {
       if (gameState) {
         if (tutorialState == false) {
@@ -60,23 +58,15 @@ export default function TutorialModal({
           gameState.enableTutorials();
         }
       } else {
-        updateAsyncTutorialState();
+        updateStoredTutorialState(tutorialState);
       }
     } else {
       if (!gameState) {
-        loadAsyncTutorialState();
+        loadStoredTutorialState();
       }
       setFirstLoad(false);
     }
   }, [tutorialState]);
-
-  function loadAsyncTutorialState() {
-    const res = storage.getString("tutorialsEnabled");
-    if (res) {
-      const parsed: boolean = JSON.parse(res);
-      setTutorialState(parsed);
-    }
-  }
 
   const press = () => {
     if (tutorialStepRef.current == 1 && pageTwo) {
@@ -86,8 +76,12 @@ export default function TutorialModal({
       setTutorialStep(3);
       tutorialStepRef.current = 3;
     } else {
+      console.log("close");
       vibration({ style: "light" });
-      onCloseFunction();
+      if (onCloseFunction) {
+        onCloseFunction();
+      }
+      gameState?.updateTutorialState(tutorial, true);
     }
   };
 
@@ -99,8 +93,18 @@ export default function TutorialModal({
       animationInTiming={500}
       animationOutTiming={300}
       isVisible={isVisibleCondition}
-      onBackdropPress={backFunction}
-      onBackButtonPress={backFunction}
+      onBackdropPress={() => {
+        if (backFunction) {
+          backFunction();
+        }
+        gameState?.updateTutorialState(tutorial, true);
+      }}
+      onBackButtonPress={() => {
+        if (backFunction) {
+          backFunction();
+        }
+        gameState?.updateTutorialState(tutorial, true);
+      }}
     >
       <View
         className="mx-auto w-5/6 rounded-xl px-6 py-4 dark:border dark:border-zinc-500"

@@ -13,6 +13,7 @@ import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { AppContext } from "../_layout";
+import { TutorialOption } from "../../utility/types";
 
 const EarnScreen = observer(() => {
   const appData = useContext(AppContext);
@@ -25,15 +26,6 @@ const EarnScreen = observer(() => {
 
   const isFocused = useIsFocused();
   const vibration = useVibration();
-  const [showLaborTutorial, setShowLaborTutorial] = useState<boolean>(
-    (gameState && !gameState.getTutorialState("labor")) ?? false,
-  );
-
-  useEffect(() => {
-    if (!showLaborTutorial && gameState) {
-      gameState.updateTutorialState("labor", true);
-    }
-  }, [showLaborTutorial]);
 
   function applyToJob(title: string) {
     if (playerState) {
@@ -53,11 +45,12 @@ const EarnScreen = observer(() => {
     <>
       <TutorialModal
         isVisibleCondition={
-          (showLaborTutorial && gameState?.tutorialsEnabled && isFocused) ??
+          (!gameState?.tutorialsShown.labor &&
+            gameState?.tutorialsEnabled &&
+            isFocused) ??
           false
         }
-        backFunction={() => setShowLaborTutorial(false)}
-        onCloseFunction={() => setShowLaborTutorial(false)}
+        tutorial={TutorialOption.labor}
         pageOne={{
           title: "Labor Tab",
           body: "Come here to earn gold in a (mostly) safe way. Certain jobs have qualifications which you can earn by going to the training school (top left).",

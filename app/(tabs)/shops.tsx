@@ -4,7 +4,7 @@ import { Shop } from "../../classes/shop";
 import { CharacterImage } from "../../components/CharacterImage";
 import shopObjects from "../../assets/json/shops.json";
 import { router } from "expo-router";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { useVibration } from "../../utility/customHooks";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
@@ -13,24 +13,15 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { toTitleCase } from "../../utility/functions/misc/words";
 import { calculateAge } from "../../utility/functions/misc/age";
 import { AppContext } from "../_layout";
+import { TutorialOption } from "../../utility/types";
+import { observer } from "mobx-react-lite";
 
-export default function ShopsScreen() {
+const ShopsScreen = observer(() => {
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing gameData");
-
   const vibration = useVibration();
   const isFocused = useIsFocused();
-
   const { gameState, isCompact } = appData;
-  const [showShopTutorial, setShowShopTutorial] = useState<boolean>(
-    (gameState && !gameState.getTutorialState("shops")) ?? false,
-  );
-
-  useEffect(() => {
-    if (!showShopTutorial && gameState) {
-      gameState.updateTutorialState("shops", true);
-    }
-  }, [showShopTutorial]);
 
   if (gameState) {
     const renderItem = (shop: Shop) => (
@@ -135,10 +126,12 @@ export default function ShopsScreen() {
       <>
         <TutorialModal
           isVisibleCondition={
-            (showShopTutorial && gameState?.tutorialsEnabled && isFocused) ??
+            (!gameState.tutorialsShown.shops &&
+              gameState?.tutorialsEnabled &&
+              isFocused) ??
             false
           }
-          backFunction={() => setShowShopTutorial(false)}
+          tutorial={TutorialOption.shops}
           pageOne={{
             title: "Shop Tab",
             body: "Each of these shops buy and sell various types of items.",
@@ -147,7 +140,6 @@ export default function ShopsScreen() {
             title: "Stock Refresh Schedule",
             body: "Each shop refreshes its stock and gold supply every real world hour.",
           }}
-          onCloseFunction={() => setShowShopTutorial(false)}
         />
 
         <ScrollView>
@@ -167,4 +159,5 @@ export default function ShopsScreen() {
       </>
     );
   }
-}
+});
+export default ShopsScreen;

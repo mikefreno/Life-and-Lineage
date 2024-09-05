@@ -25,6 +25,7 @@ import BlessingDisplay from "../../components/BlessingsDisplay";
 import { Item } from "../../classes/item";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import EquipmentDisplay from "../../components/EquipmentDisplay";
+import { TutorialOption } from "../../utility/types";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -43,24 +44,9 @@ const HomeScreen = observer(() => {
   } | null>(null);
 
   const { playerState, gameState, isCompact, dimensions } = appData;
-  const [showIntroTutorial, setShowIntroTutorial] = useState<boolean>(
-    (gameState && !gameState.getTutorialState("intro")) ?? false,
-  );
   const isFocused = useIsFocused();
 
   const tabBarHeight = useBottomTabBarHeight() + 10;
-
-  useEffect(() => {
-    if (!showIntroTutorial && gameState) {
-      gameState.updateTutorialState("intro", true);
-    }
-  }, [showIntroTutorial]);
-
-  useEffect(() => {
-    setShowIntroTutorial(
-      (gameState && !gameState.getTutorialState("intro")) ?? false,
-    );
-  }, [gameState?.tutorialsShown]);
 
   if (playerState && gameState) {
     const name = playerState.fullName;
@@ -68,9 +54,11 @@ const HomeScreen = observer(() => {
       <>
         <TutorialModal
           isVisibleCondition={
-            showIntroTutorial && gameState.tutorialsEnabled && isFocused
+            !gameState.tutorialsShown.intro &&
+            gameState.tutorialsEnabled &&
+            isFocused
           }
-          backFunction={() => setShowIntroTutorial(false)}
+          tutorial={TutorialOption.intro}
           pageOne={{
             title: "Welcome!",
             body: "On this page you can view your inventory (tap the bag) and equip items to you hands, head, or body.",
@@ -79,7 +67,6 @@ const HomeScreen = observer(() => {
             title: "",
             body: "A great place to start is to open your inventory and study the book you were given.",
           }}
-          onCloseFunction={() => setShowIntroTutorial(false)}
         />
         <ThemedView
           className="flex-1"

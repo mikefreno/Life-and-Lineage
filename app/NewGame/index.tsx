@@ -14,6 +14,7 @@ import {
   WizardHat,
 } from "../../assets/icons/SVGIcons";
 import { loadStoredTutorialState } from "../../utility/functions/misc/tutorial";
+import { TutorialOption } from "../../utility/types";
 
 export default function NewGameScreen() {
   const [selectedClass, setSelectedClass] = useState<
@@ -33,7 +34,7 @@ export default function NewGameScreen() {
   const [showIntroTutorial, setShowIntroTutorial] = useState<boolean>(
     !gameState ||
       (gameState &&
-        !gameState.getTutorialState("class") &&
+        !gameState.tutorialsShown.class &&
         gameState.tutorialsEnabled)
       ? true
       : false,
@@ -42,12 +43,6 @@ export default function NewGameScreen() {
   const [showTutorialReset, setShowTutorialReset] = useState<boolean>(
     gameState ? true : false,
   );
-
-  useEffect(() => {
-    if (!showIntroTutorial && gameState) {
-      gameState.updateTutorialState("class", true);
-    }
-  }, [showIntroTutorial]);
 
   useEffect(() => {
     if (gameState) {
@@ -131,7 +126,8 @@ export default function NewGameScreen() {
         </ThemedView>
       </Modal>
       <TutorialModal
-        isVisibleCondition={showIntroTutorial}
+        isVisibleCondition={showIntroTutorial && !showTutorialReset}
+        tutorial={TutorialOption.intro}
         backFunction={() => setShowIntroTutorial(false)}
         onCloseFunction={() => setShowIntroTutorial(false)}
         pageOne={{

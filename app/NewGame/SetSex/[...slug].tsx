@@ -9,6 +9,7 @@ import { AppContext } from "../../_layout";
 import { useColorScheme } from "nativewind";
 import TutorialModal from "../../../components/TutorialModal";
 import { loadStoredTutorialState } from "../../../utility/functions/misc/tutorial";
+import { TutorialOption } from "../../../utility/types";
 
 export default function SetSex() {
   const { slug } = useLocalSearchParams();
@@ -30,17 +31,11 @@ export default function SetSex() {
   const [showAgingTutorial, setShowAgingTutorial] = useState<boolean>(
     !gameState ||
       (gameState &&
-        !gameState.getTutorialState("aging") &&
+        !gameState.tutorialsShown.aging &&
         gameState.tutorialsEnabled)
       ? true
       : false,
   );
-
-  useEffect(() => {
-    if (!showAgingTutorial && gameState) {
-      gameState.updateTutorialState("aging", true);
-    }
-  }, [showAgingTutorial]);
 
   useEffect(() => {
     if (!gameState) {
@@ -66,13 +61,10 @@ export default function SetSex() {
         }}
       />
       <TutorialModal
-        isVisibleCondition={!gameState ? showAgingTutorial : false}
-        backFunction={() => {
-          setShowAgingTutorial(false);
-        }}
-        onCloseFunction={() => {
-          setShowAgingTutorial(false);
-        }}
+        isVisibleCondition={showAgingTutorial}
+        tutorial={TutorialOption.aging}
+        backFunction={() => setShowAgingTutorial(false)}
+        onCloseFunction={() => setShowAgingTutorial(false)}
         pageOne={{
           title: "This game focuses around the passage of time.",
           body: "Almost everything will move the game clock forward, aging the characters in the game. At a certain point it will nearly impossible to stay alive.",

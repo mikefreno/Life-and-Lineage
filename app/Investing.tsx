@@ -1,7 +1,7 @@
 import investments from "../assets/json/investments.json";
 import { ScrollView, View as ThemedView } from "../components/Themed";
 import "../assets/styles/globals.css";
-import { InvestmentType } from "../utility/types";
+import { InvestmentType, TutorialOption } from "../utility/types";
 import InvestmentCard from "../components/InvestmentCard";
 import PlayerStatus from "../components/PlayerStatus";
 import { useContext, useEffect, useState } from "react";
@@ -13,31 +13,16 @@ import { BlurView } from "expo-blur";
 import { useColorScheme } from "nativewind";
 import { AppContext } from "./_layout";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { observer } from "mobx-react-lite";
 
-export default function InvestingScreen() {
+const InvestingScreen = observer(() => {
   const appData = useContext(AppContext);
   if (!appData) {
     throw new Error("missing context");
   }
   const { gameState } = appData;
-  const [showInvestingTutorial, setShowingInvestingTutorial] =
-    useState<boolean>(
-      (gameState && !gameState.getTutorialState("investing")) ?? false,
-    );
   const isFocused = useIsFocused();
   const { colorScheme } = useColorScheme();
-
-  useEffect(() => {
-    if (!showInvestingTutorial && gameState) {
-      gameState.updateTutorialState("investing", true);
-    }
-  }, [showInvestingTutorial]);
-
-  useEffect(() => {
-    setShowingInvestingTutorial(
-      (gameState && !gameState.getTutorialState("investing")) ?? false,
-    );
-  }, [gameState?.tutorialsShown]);
 
   return (
     <>
@@ -65,11 +50,12 @@ export default function InvestingScreen() {
       />
       <TutorialModal
         isVisibleCondition={
-          (showInvestingTutorial && gameState?.tutorialsEnabled && isFocused) ??
+          (!gameState?.tutorialsShown.investing &&
+            gameState?.tutorialsEnabled &&
+            isFocused) ??
           false
         }
-        backFunction={() => setShowingInvestingTutorial(false)}
-        onCloseFunction={() => setShowingInvestingTutorial(false)}
+        tutorial={TutorialOption.investing}
         pageOne={{
           title: "Investing",
           body: "Put your gold to work and make time work for you.",
@@ -94,4 +80,5 @@ export default function InvestingScreen() {
       <PlayerStatus tabScreen />
     </>
   );
-}
+});
+export default InvestingScreen;

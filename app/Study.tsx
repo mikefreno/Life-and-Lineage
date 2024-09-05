@@ -15,13 +15,14 @@ import { Stack } from "expo-router";
 import { BlurView } from "expo-blur";
 import { useHeaderHeight } from "@react-navigation/elements";
 import GenericRaisedButton from "../components/GenericRaisedButton";
-import { MasteryLevel, Spell } from "../utility/types";
+import { MasteryLevel } from "../utility/types";
 import GenericModal from "../components/GenericModal";
 import {
   convertMasteryToNumber,
   convertMasteryToString,
 } from "../utility/spellHelper";
 import { AppContext } from "./_layout";
+import { Spell } from "../classes/spell";
 
 export default function LearningKnowledgeScreen() {
   const appData = useContext(AppContext);

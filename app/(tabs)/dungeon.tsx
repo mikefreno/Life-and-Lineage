@@ -12,6 +12,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
 import ThemedCard from "../../components/ThemedCard";
 import { AppContext } from "../_layout";
+import { TutorialOption } from "../../utility/types";
 
 const dangerColorStep = [
   "#fee2e2",
@@ -47,16 +48,7 @@ const DungeonScreen = observer(() => {
   const [height, setHeight] = useState<number>(0);
 
   const vibration = useVibration();
-  const [showDungeonTutorial, setShowDungeonTutorial] = useState<boolean>(
-    (gameState && !gameState.getTutorialState("dungeon")) ?? false,
-  );
   const isFocused = useIsFocused();
-
-  useEffect(() => {
-    if (!showDungeonTutorial && gameState) {
-      gameState.updateTutorialState("dungeon", true);
-    }
-  }, [showDungeonTutorial]);
 
   useEffect(() => {
     let deepestDungeonDepth = 0;
@@ -73,10 +65,12 @@ const DungeonScreen = observer(() => {
     <>
       <TutorialModal
         isVisibleCondition={
-          (showDungeonTutorial && gameState?.tutorialsEnabled && isFocused) ??
+          (!gameState?.tutorialsShown.dungeon &&
+            gameState?.tutorialsEnabled &&
+            isFocused) ??
           false
         }
-        backFunction={() => setShowDungeonTutorial(false)}
+        tutorial={TutorialOption.dungeon}
         pageOne={{
           title: "Dungeon",
           body: "Here you will put all your gear and spells to work. Be prepared and you will be rewarded.",
@@ -89,7 +83,6 @@ const DungeonScreen = observer(() => {
           title: "Each level brings greater danger.",
           body: "And greater rewards. Unlock more levels by defeating each levels boss.",
         }}
-        onCloseFunction={() => setShowDungeonTutorial(false)}
       />
       <View
         className="shadow-diffuse w-full absolute z-10 px-8"

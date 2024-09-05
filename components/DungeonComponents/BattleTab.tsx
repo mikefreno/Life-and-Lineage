@@ -102,9 +102,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                             borderColor:
                               attackOrSpell instanceof Spell
                                 ? elementalColorMap[attackOrSpell.element].dark
-                                : colorScheme == "light"
-                                ? "#71717a"
-                                : "#a1a1aa",
+                                : "#52525b",
                           }}
                         >
                           <View className="flex flex-row justify-between">

@@ -64,6 +64,23 @@ export type InvestmentUpgrade = {
   };
 };
 
+export enum TutorialOption {
+  class = "class",
+  aging = "aging",
+  blessing = "blessing",
+  intro = "intro",
+  spell = "spell",
+  labor = "labor",
+  dungeon = "dungeon",
+  dungeonInterior = "dungeonInterior",
+  shops = "shops",
+  shopInterior = "shopInterior",
+  medical = "medical",
+  investing = "investing",
+  training = "training",
+  firstBossKill = "firstBossKill",
+}
+
 export enum MasteryLevel {
   Novice,
   Apprentice,

@@ -90,8 +90,6 @@ export class DungeonLevel {
   public generateMap() {}
 
   public getBoss(instanceName: string): Enemy {
-    console.log(this.bosses);
-
     const bossObjects = this.bosses.map((bossName) =>
       bosses.find((bossObj) => bossObj.name === bossName),
     );

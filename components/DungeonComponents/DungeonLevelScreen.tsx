@@ -27,6 +27,7 @@ import { addItemToPouch, playerMinionsTurn } from "./DungeonInteriorFunctions";
 import { SackIcon } from "../../assets/icons/SVGIcons";
 import D20DieAnimation from "../DieRollAnim";
 import { StatsDisplay } from "../StatsDisplay";
+import { TutorialOption } from "../../utility/types";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -77,18 +78,6 @@ const DungeonLevelScreen = observer(() => {
     throttledDungeonSave(enemyState);
   }, [enemyState?.health, playerState.currentHealth]);
 
-  //-----------tutorial---------//
-  const [showDungeonInteriorTutorial, setShowDungeonInteriorTutorial] =
-    useState<boolean>(
-      (gameState && !gameState.getTutorialState("dungeonInterior")) ?? false,
-    );
-
-  useEffect(() => {
-    if (!showDungeonInteriorTutorial && gameState) {
-      gameState.updateTutorialState("dungeonInterior", true);
-    }
-  }, [showDungeonInteriorTutorial]);
-
   if (thisDungeon && playerState) {
     return (
       <>
@@ -124,11 +113,10 @@ const DungeonLevelScreen = observer(() => {
         />
         <TutorialModal
           isVisibleCondition={
-            (showDungeonInteriorTutorial && gameState?.tutorialsEnabled) ??
-            false
+            gameState.tutorialsShown.dungeonInterior &&
+            gameState.tutorialsEnabled
           }
-          backFunction={() => setShowDungeonInteriorTutorial(false)}
-          onCloseFunction={() => setShowDungeonInteriorTutorial(false)}
+          tutorial={TutorialOption.dungeonInterior}
           pageOne={{
             title: "Watch Your Health",
             body: "Your situation can change rapidly.",

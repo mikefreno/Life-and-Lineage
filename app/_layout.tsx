@@ -21,7 +21,7 @@ import { Enemy } from "../classes/creatures";
 import { fullSave, fullLoad } from "../utility/functions/save_load";
 import { Dimensions, Keyboard, Platform, StyleSheet } from "react-native";
 import { View as ThemedView } from "../components/Themed";
-import { reaction } from "mobx";
+import { autorun, reaction } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
@@ -183,17 +183,7 @@ const Root = observer(() => {
     getData();
   }, []);
 
-  reaction(
-    () => ({
-      gameTime: gameState?.date,
-    }),
-    (state) => {
-      if (gameState && playerState && state.gameTime !== gameDate) {
-        setGameDate(gameState.date);
-        fullSave(gameState, playerState);
-      }
-    },
-  );
+  autorun(() => fullSave(gameState, playerState));
 
   const [dimensions, setDimensions] = useState(() => ({
     height: Dimensions.get("window").height,

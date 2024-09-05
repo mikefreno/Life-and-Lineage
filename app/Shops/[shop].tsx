@@ -23,6 +23,7 @@ import InventoryRender from "../../components/InventoryRender";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import { Coins } from "../../assets/icons/SVGIcons";
 import { fullSave } from "../../utility/functions/save_load";
+import { TutorialOption } from "../../utility/types";
 
 const ONE_HOUR = 60 * 60 * 1000;
 const ONE_SECOND = 1000;
@@ -51,17 +52,6 @@ const ShopInteriorScreen = observer(() => {
 
   const header = useHeaderHeight();
   const isFocused = useIsFocused();
-
-  const [showShopInteriorTutorial, setShowShopInteriorTutorial] =
-    useState<boolean>(
-      (gameState && !gameState.getTutorialState("shopInterior")) ?? false,
-    );
-
-  useEffect(() => {
-    if (!showShopInteriorTutorial && gameState) {
-      gameState.updateTutorialState("shopInterior", true);
-    }
-  }, [showShopInteriorTutorial]);
 
   useEffect(() => {
     if (inventoryFullNotifier) {
@@ -210,13 +200,12 @@ const ShopInteriorScreen = observer(() => {
         />
         <TutorialModal
           isVisibleCondition={
-            (showShopInteriorTutorial &&
+            (!gameState.tutorialsShown.shopInterior &&
               gameState?.tutorialsEnabled &&
               isFocused) ??
             false
           }
-          backFunction={() => setShowShopInteriorTutorial(false)}
-          onCloseFunction={() => setShowShopInteriorTutorial(false)}
+          tutorial={TutorialOption.shopInterior}
           pageOne={{
             title: "Shopkeepers remember you.",
             body: "The more you trade with a given shopkeeper the better deals they will have for you.",

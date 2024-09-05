@@ -24,6 +24,7 @@ import { wait } from "../../utility/functions/misc/wait";
 import TutorialModal from "../../components/TutorialModal";
 import { Attack } from "../../classes/attack";
 import { Spell } from "../../classes/spell";
+import { TutorialOption } from "../../utility/types";
 
 const DungeonProvider = observer(() => {
   const { slug } = useLocalSearchParams();
@@ -80,6 +81,7 @@ const DungeonProvider = observer(() => {
     showing: boolean;
     chosenAttack: Attack | Spell | null;
   }>({ showing: false, chosenAttack: null });
+  const [isReady, setIsReady] = useState(false);
 
   const instanceName = slug[0];
   const level = slug[1];
@@ -186,8 +188,9 @@ const DungeonProvider = observer(() => {
         setThisDungeon(gameState.getDungeon(instanceName, level));
         setThisInstance(gameState.getInstance(instanceName));
       }
+      setIsReady(true);
     }
-  }, [level, instanceName]);
+  }, [level, instanceName, gameState]);
 
   useEffect(() => {
     if (inventoryFullNotifier) {
@@ -208,16 +211,26 @@ const DungeonProvider = observer(() => {
     showFirstBossKillTutorial,
     shouldShowFirstBossKillTutorialAfterItemDrops,
   ]);
+
   useEffect(() => {
-    if (!droppedItems && shouldShowFirstBossKillTutorialAfterItemDrops) {
-      wait(250).then(() => {
+    if (
+      isReady &&
+      shouldShowFirstBossKillTutorialAfterItemDrops &&
+      !droppedItems
+    ) {
+      const timer = setTimeout(() => {
         setShowFirstBossKillTutorial(true);
         setShouldShowFirstBossKillTutorialAfterItemDrops(false);
-      });
+      }, 250);
+      return () => clearTimeout(timer);
     }
-  }, [shouldShowFirstBossKillTutorialAfterItemDrops, droppedItems]);
+  }, [isReady, shouldShowFirstBossKillTutorialAfterItemDrops, droppedItems]);
 
-  if (thisDungeon && thisInstance) {
+  if (!isReady) {
+    return <D20DieAnimation />;
+  }
+
+  if (thisDungeon && thisInstance && gameState) {
     return (
       <DungeonContext.Provider
         value={{
@@ -270,11 +283,16 @@ const DungeonProvider = observer(() => {
         }}
       >
         <TutorialModal
-          isVisibleCondition={showFirstBossKillTutorial}
+          isVisibleCondition={
+            showFirstBossKillTutorial && gameState.tutorialsEnabled
+          }
+          tutorial={TutorialOption.firstBossKill}
           backFunction={() => setShowFirstBossKillTutorial(false)}
           onCloseFunction={() => {
             setShowFirstBossKillTutorial(false);
-            setTimeout(() => setShowDetailedStatusView(true), 500);
+            wait(500).then(() => {
+              setShowDetailedStatusView(true);
+            });
           }}
           pageOne={{
             title: "Well Fought!",

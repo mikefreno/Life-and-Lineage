@@ -4,6 +4,7 @@ import dungeons from "../assets/json/dungeons.json";
 import { action, makeObservable, observable } from "mobx";
 import { PlayerCharacter } from "./character";
 import { lowSanityDebuffGenerator } from "../utility/functions/conditions";
+import { TutorialOption } from "../utility/types";
 
 interface GameOptions {
   date?: string;
@@ -14,7 +15,7 @@ interface GameOptions {
   colorScheme?: "system" | "dark" | "light";
   vibrationEnabled: "full" | "minimal" | "none";
   healthWarning?: number;
-  tutorialsShown?: Record<string, boolean>;
+  tutorialsShown?: Record<TutorialOption, boolean>;
   tutorialsEnabled?: boolean;
 }
 
@@ -27,7 +28,7 @@ export class Game {
   colorScheme: "system" | "dark" | "light";
   vibrationEnabled: "full" | "minimal" | "none";
   healthWarning: number;
-  tutorialsShown: Record<string, boolean>;
+  tutorialsShown: Record<TutorialOption, boolean>;
   tutorialsEnabled: boolean;
 
   constructor({
@@ -87,6 +88,7 @@ export class Game {
       medical: false,
       investing: false,
       training: false,
+      firstBossKill: false,
     };
     this.tutorialsEnabled = tutorialsEnabled ?? true;
 
@@ -111,7 +113,6 @@ export class Game {
       setHealthWarning: action,
       updateTutorialState: action,
       resetTutorialState: action,
-      getTutorialState: action,
       disableTutorials: action,
       enableTutorials: action,
     });
@@ -122,7 +123,7 @@ export class Game {
     const dateObject = new Date(this.date);
     dateObject.setDate(dateObject.getDate() + 7);
     this.date = dateObject.toISOString();
-    if (playerState.sanity < 0) {
+    if (playerState.currentSanity < 0) {
       lowSanityDebuffGenerator(playerState);
     }
     playerState.tickDownRelationshipAffection();
@@ -213,7 +214,7 @@ export class Game {
     this.healthWarning = desiredValue;
   }
 
-  public updateTutorialState(tutorial: string, state: boolean) {
+  public updateTutorialState(tutorial: TutorialOption, state: boolean) {
     this.tutorialsShown[tutorial] = state;
   }
 
@@ -232,6 +233,7 @@ export class Game {
       medical: false,
       investing: false,
       training: false,
+      firstBossKill: false,
     };
     this.tutorialsShown = defaultState;
     this.enableTutorials();
@@ -242,10 +244,6 @@ export class Game {
   }
   public enableTutorials() {
     this.tutorialsEnabled = true;
-  }
-
-  public getTutorialState(tutorial: string) {
-    return this.tutorialsShown[tutorial];
   }
 
   static fromJSON(json: any): Game {

@@ -14,7 +14,7 @@ import { useColorScheme } from "nativewind";
 import TutorialModal from "../../../components/TutorialModal";
 import { toTitleCase } from "../../../utility/functions/misc/words";
 import { descriptionMap } from "../../../utility/descriptions";
-import { Element } from "../../../utility/types";
+import { Element, TutorialOption } from "../../../utility/types";
 import { elementalColorMap } from "../../../utility/elementColors";
 import BlessingDisplay from "../../../components/BlessingsDisplay";
 import {
@@ -41,7 +41,7 @@ export default function SetBlessing() {
   const [showBlessingTutorial, setShowBlessingTutorial] = useState<boolean>(
     !gameState ||
       (gameState &&
-        !gameState.getTutorialState("blessing") &&
+        !gameState.tutorialsShown.blessing &&
         gameState.tutorialsEnabled)
       ? true
       : false,
@@ -50,12 +50,6 @@ export default function SetBlessing() {
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,
   );
-
-  useEffect(() => {
-    if (!showBlessingTutorial && gameState) {
-      gameState.updateTutorialState("blessing", true);
-    }
-  }, [showBlessingTutorial]);
 
   useEffect(() => {
     if (!gameState) {
@@ -181,6 +175,7 @@ export default function SetBlessing() {
       />
       <TutorialModal
         isVisibleCondition={showBlessingTutorial}
+        tutorial={TutorialOption.blessing}
         backFunction={() => setShowBlessingTutorial(false)}
         onCloseFunction={() => setShowBlessingTutorial(false)}
         pageOne={{

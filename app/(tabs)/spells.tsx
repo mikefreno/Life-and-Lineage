@@ -1,6 +1,6 @@
 import { Text, View as ThemedView } from "../../components/Themed";
 import SpellDetails from "../../components/SpellDetails";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { useColorScheme } from "nativewind";
 import { View, ScrollView } from "react-native";
 import { observer } from "mobx-react-lite";
@@ -12,7 +12,7 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import { toTitleCase } from "../../utility/functions/misc/words";
-import { Element, MasteryLevel } from "../../utility/types";
+import { Element, MasteryLevel, TutorialOption } from "../../utility/types";
 import {
   convertMasteryToNumber,
   convertMasteryToString,
@@ -27,15 +27,6 @@ const SpellsScreen = observer(() => {
   if (!appData) throw new Error("missing contexts");
 
   const { isCompact, playerState, gameState } = appData;
-  const [showSpellTutorial, setShowSpellTutorial] = useState<boolean>(
-    (gameState && !gameState.getTutorialState("spell")) ?? false,
-  );
-
-  useEffect(() => {
-    if (!showSpellTutorial && gameState) {
-      gameState.updateTutorialState("spell", true);
-    }
-  }, [showSpellTutorial]);
 
   function magicProficiencySection(
     proficiencies:
@@ -119,10 +110,12 @@ const SpellsScreen = observer(() => {
     <>
       <TutorialModal
         isVisibleCondition={
-          (showSpellTutorial && gameState?.tutorialsEnabled && isFocused) ??
+          (!gameState?.tutorialsShown.spell &&
+            gameState?.tutorialsEnabled &&
+            isFocused) ??
           false
         }
-        backFunction={() => setShowSpellTutorial(false)}
+        tutorial={TutorialOption.spell}
         pageOne={{
           title: "Magic Tab",
           body: "Here you can see your known spells, and proficiencies with each school of magic.",
@@ -131,7 +124,6 @@ const SpellsScreen = observer(() => {
           title: "More powerful spells require higher proficiencies",
           body: "Using spells will increase your proficiency in their school.",
         }}
-        onCloseFunction={() => setShowSpellTutorial(false)}
       />
       <ThemedView
         className="flex-1"

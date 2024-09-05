@@ -4,7 +4,7 @@ import manaOptions from "../../assets/json/medicalOptions/manaOptions.json";
 import sanityOptions from "../../assets/json/medicalOptions/sanityOptions.json";
 import otherOptions from "../../assets/json/medicalOptions/otherOptions.json";
 import MedicalOption from "../../components/MedicalOptions";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { AppContext } from "../_layout";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
@@ -12,35 +12,27 @@ import { View } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
+import { TutorialOption } from "../../utility/types";
+import { observer } from "mobx-react-lite";
 
-export default function MedicalScreen() {
+const MedicalScreen = observer(() => {
   const appData = useContext(AppContext);
   if (!appData) {
     throw new Error("Missing Context");
   }
-
   const isFocused = useIsFocused();
-
   const { isCompact, gameState } = appData;
-  const [showMedicalTutorial, setShowMedicalTutorial] = useState<boolean>(
-    (gameState && !gameState.getTutorialState("medical")) ?? false,
-  );
-
-  useEffect(() => {
-    if (!showMedicalTutorial && gameState) {
-      gameState.updateTutorialState("medical", true);
-    }
-  }, [showMedicalTutorial]);
 
   return (
     <>
       <TutorialModal
         isVisibleCondition={
-          (showMedicalTutorial && gameState?.tutorialsEnabled && isFocused) ??
+          (!gameState?.tutorialsShown.medical &&
+            gameState?.tutorialsEnabled &&
+            isFocused) ??
           false
         }
-        backFunction={() => setShowMedicalTutorial(false)}
-        onCloseFunction={() => setShowMedicalTutorial(false)}
+        tutorial={TutorialOption.medical}
         pageOne={{
           title: "Medical Tab",
           body: "Here you can acquire various forms of medical treatment.",
@@ -106,4 +98,5 @@ export default function MedicalScreen() {
       </ThemedView>
     </>
   );
-}
+});
+export default MedicalScreen;
