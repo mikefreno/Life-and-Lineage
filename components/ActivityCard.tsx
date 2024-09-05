@@ -25,6 +25,7 @@ import {
   HealthIcon,
   Sanity,
 } from "../assets/icons/SVGIcons";
+import { wait } from "../utility/functions/misc/wait";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -248,7 +249,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
 
   function goToFight() {
     setBadOutcome(null);
-    setTimeout(() => {
+    wait(500).then(() => {
       if (badOutCome && badOutCome.fight && badOutCome.dungeonTitle) {
         while (router.canGoBack()) {
           router.back();
@@ -257,7 +258,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
       } else {
         throw new Error("missing enemy object!");
       }
-    }, 500);
+    });
   }
 
   function payOff(gold: number) {

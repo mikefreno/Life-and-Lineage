@@ -35,7 +35,7 @@ export default function TutorialModal({
   if (!appData) {
     throw new Error("missing context");
   }
-  const { gameState } = appData;
+  const { gameState, androidNavBarVisibility } = appData;
   const [tutorialStep, setTutorialStep] = useState<number>(1);
   const tutorialStepRef = useRef<number>(1);
   const { colorScheme } = useColorScheme();
@@ -96,6 +96,7 @@ export default function TutorialModal({
       animationOutTiming={300}
       isVisible={isVisibleCondition}
       deviceHeight={deviceHeight}
+      statusBarTranslucent={androidNavBarVisibility ? false : true}
       useNativeDriver
       onBackdropPress={() => {
         if (backFunction) {

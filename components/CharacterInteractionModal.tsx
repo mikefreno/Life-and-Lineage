@@ -15,6 +15,7 @@ import { useRouter } from "expo-router";
 import { getDaysBetweenDates } from "../utility/functions/misc/date";
 import { AppContext } from "../app/_layout";
 import { AffectionIcon } from "../assets/icons/SVGIcons";
+import { wait } from "../utility/functions/misc/wait";
 
 interface CharacterInteractionModal {
   character: Character | null;
@@ -65,12 +66,14 @@ export const CharacterInteractionModal = observer(
           level: `Personal Assault,${character.fullName}`,
         });
         closeFunction();
-        while (router.canGoBack()) {
-          router.back();
-        }
-        router.replace(
-          `/DungeonLevel/Personal/Personal\ Assault/${character.fullName}`,
-        );
+        wait(500).then(() => {
+          while (router.canGoBack()) {
+            router.back();
+          }
+          router.replace(
+            `/DungeonLevel/Personal/Personal\ Assault/${character.fullName}`,
+          );
+        });
       }
     }
 

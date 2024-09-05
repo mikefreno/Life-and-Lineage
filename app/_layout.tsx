@@ -33,6 +33,10 @@ import D20DieAnimation from "../components/DieRollAnim";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -122,6 +126,8 @@ const Root = observer(() => {
     useState<boolean>(false);
   const [blockSize, setBlockSize] = useState<number>();
   const { setColorScheme, colorScheme } = useColorScheme();
+  const [androidNavBarVisibility, setAndroidNavBarVisibility] =
+    useState<boolean>(false);
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState<
     Notifications.Notification | undefined
@@ -262,9 +268,13 @@ const Root = observer(() => {
           dimensions,
           blockSize,
           setBlockSize,
+          androidNavBarVisibility,
+          setAndroidNavBarVisibility,
         }}
       >
-        <RootLayout />
+        <SafeAreaProvider>
+          <RootLayout />
+        </SafeAreaProvider>
       </AppContext.Provider>
     </AuthProvider>
   );
@@ -278,11 +288,17 @@ const RootLayout = observer(() => {
   if (!appData) {
     throw new Error("missing context");
   }
-  const { playerState, gameState } = appData;
+  const {
+    playerState,
+    gameState,
+    setAndroidNavBarVisibility,
+    showDetailedStatusView,
+  } = appData;
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
   const [navbarLoad, setNavbarLoad] = useState(false);
 
+  const insets = useSafeAreaInsets();
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   //const auth = useAuth();
 
@@ -337,7 +353,7 @@ const RootLayout = observer(() => {
 
   useEffect(() => {
     getAndSetNavBar();
-  }, [colorScheme, isKeyboardVisible]);
+  }, [colorScheme, isKeyboardVisible, insets.bottom]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -361,8 +377,9 @@ const RootLayout = observer(() => {
 
   async function getAndSetNavBar() {
     if (Platform.OS === "android") {
-      const isVisible =
-        (await NavigationBar.getVisibilityAsync()) === "visible";
+      let isVisible = (await NavigationBar.getVisibilityAsync()) == "visible";
+
+      setAndroidNavBarVisibility(isVisible);
       if (isKeyboardVisible && !isVisible) {
         await NavigationBar.setVisibilityAsync("visible");
         await NavigationBar.setPositionAsync("relative");
@@ -372,7 +389,7 @@ const RootLayout = observer(() => {
         await NavigationBar.setPositionAsync("absolute");
         await NavigationBar.setBehaviorAsync("overlay-swipe");
       }
-      NavigationBar.getBackgroundColorAsync().then((val) => console.log(val));
+
       if (!navbarLoad) {
         setNavbarLoad(true);
       }

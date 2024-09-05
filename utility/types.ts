@@ -325,4 +325,6 @@ export interface AppContextType {
   };
   blockSize: number | undefined;
   setBlockSize: React.Dispatch<React.SetStateAction<number | undefined>>;
+  androidNavBarVisibility: boolean;
+  setAndroidNavBarVisibility: React.Dispatch<React.SetStateAction<boolean>>;
 }
