@@ -32,13 +32,7 @@
       },
       "package": "com.mikefrenodev.magicdelve",
       "versionCode": 1,
-      "googleServicesFile": "./google-services.json",
-      "config": {
-        "styles": {
-          "android:windowTranslucentNavigation": true,
-          "android:windowTranslucentStatus": true
-        }
-      }
+      "googleServicesFile": "./google-services.json"
     },
     "androidStatusBar": {
       "hidden":true
@@ -49,6 +43,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "./androidStylesPlugin.js",
       "expo-router",
       "expo-apple-authentication",
       "expo-font",
@@ -86,7 +81,7 @@
         "projectId": "2307d673-d206-4c58-8170-5dc30a9ec500"
       }
     },
-    "runtimeVersion": "0.3.0",
+    "runtimeVersion": "0.2.4",
     "updates": {
       "url": "https://u.expo.dev/2307d673-d206-4c58-8170-5dc30a9ec500"
     }
