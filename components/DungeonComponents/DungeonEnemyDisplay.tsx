@@ -79,7 +79,7 @@ export default function DungeonEnemyDisplay() {
   }, [enemyTextDummy]);
 
   useEffect(() => {
-    if (!firstLoad) {
+    if (!firstLoad && enemyAttackDummy !== 0) {
       Animated.sequence([
         Animated.timing(enemyAttackAnimationValue, {
           toValue: -50,
@@ -96,7 +96,7 @@ export default function DungeonEnemyDisplay() {
   }, [enemyAttackDummy]);
 
   useEffect(() => {
-    if (!firstLoad) {
+    if (!firstLoad && enemyDodgeDummy !== 0) {
       Animated.sequence([
         // Move to dodge position
         Animated.timing(enemyDodgeAnimationValue, {
@@ -131,7 +131,7 @@ export default function DungeonEnemyDisplay() {
   }, [enemyDodgeDummy]);
 
   useEffect(() => {
-    if (enemyHealthDiff < 0) {
+    if (enemyHealthDiff < 0 && !firstLoad) {
       Animated.loop(
         Animated.sequence([
           Animated.timing(enemyDamagedAnimationValue, {
@@ -155,15 +155,22 @@ export default function DungeonEnemyDisplay() {
     }
   }, [enemyHealthDiff]);
 
+  useEffect(() => {
+    return () => setEnemyHealthDiff(-0.1);
+  }, []);
+
   function EnemyHealthChangePopUp() {
     return (
       <View className="h-6">
-        <FadeOutNode>
-          <Text style={{ color: "#f87171" }}>
-            {enemyHealthDiff > 0 ? "+" : ""}
-            {enemyHealthDiff.toString()}
-          </Text>
-        </FadeOutNode>
+        {enemyHealthDiff != -0.1 &&
+          enemyState?.health !== enemyState?.healthMax && (
+            <FadeOutNode>
+              <Text style={{ color: "#f87171" }}>
+                {enemyHealthDiff > 0 ? "+" : ""}
+                {enemyHealthDiff.toString()}
+              </Text>
+            </FadeOutNode>
+          )}
       </View>
     );
   }
@@ -214,124 +221,119 @@ export default function DungeonEnemyDisplay() {
       );
     }
   }
+
   if (enemyState) {
     return (
-      <Suspense fallback={<D20DieAnimation keepRolling={true} />}>
-        <View className="flex h-[40%] pt-8">
-          <View className="flex-1 flex-row items-center justify-evenly pl-8">
-            <View
-              className="flex flex-col items-center justify-center"
-              style={{ minWidth: "40%", maxWidth: "60%" }}
-            >
-              <Text className="text-center text-3xl">
-                {enemyState.creatureSpecies
-                  .toLowerCase()
-                  .includes("generic npc")
-                  ? slug[2]
-                  : toTitleCase(enemyState.creatureSpecies).replace(" ", "\n")}
-              </Text>
-              <ProgressBar
-                value={enemyState.health >= 0 ? enemyState.health : 0}
-                maxValue={enemyState.healthMax}
-                filledColor="#ef4444"
-                unfilledColor="#fee2e2"
-                displayNumber={
-                  enemyState.creatureSpecies.toLowerCase() == "training dummy"
-                    ? true
-                    : false
-                }
-                removeAtZero={true}
-              />
-              {showingEnemyHealthChange ? (
-                <EnemyHealthChangePopUp />
-              ) : (
-                <View className="h-6" />
-              )}
-              {EnemyConditionRender()}
-            </View>
-            <View className="relative">
-              <Animated.View
-                className="mx-auto mt-12"
-                style={{
-                  transform: [
-                    {
-                      translateX: Animated.add(
+      <View className="flex h-[40%] pt-8">
+        <View className="flex-1 flex-row items-center justify-evenly pl-8">
+          <View
+            className="flex flex-col items-center justify-center"
+            style={{ minWidth: "40%", maxWidth: "60%" }}
+          >
+            <Text className="text-center text-3xl">
+              {enemyState.creatureSpecies.toLowerCase().includes("generic npc")
+                ? slug[2]
+                : toTitleCase(enemyState.creatureSpecies).replace(" ", "\n")}
+            </Text>
+            <ProgressBar
+              value={enemyState.health >= 0 ? enemyState.health : 0}
+              maxValue={enemyState.healthMax}
+              filledColor="#ef4444"
+              unfilledColor="#fee2e2"
+              displayNumber={
+                enemyState.creatureSpecies.toLowerCase() == "training dummy"
+                  ? true
+                  : false
+              }
+              removeAtZero={true}
+            />
+            {showingEnemyHealthChange ? (
+              <EnemyHealthChangePopUp />
+            ) : (
+              <View className="h-6" />
+            )}
+            {EnemyConditionRender()}
+          </View>
+          <View className="relative">
+            <Animated.View
+              className="mx-auto mt-12"
+              style={{
+                transform: [
+                  {
+                    translateX: Animated.add(
+                      enemyAttackAnimationValue,
+                      enemyDodgeAnimationValue,
+                    ),
+                  },
+                  {
+                    translateY: Animated.multiply(
+                      Animated.add(
                         enemyAttackAnimationValue,
                         enemyDodgeAnimationValue,
                       ),
-                    },
-                    {
-                      translateY: Animated.multiply(
-                        Animated.add(
-                          enemyAttackAnimationValue,
-                          enemyDodgeAnimationValue,
-                        ),
-                        -1.5,
-                      ),
-                    },
-                  ],
-                  opacity: Animated.multiply(
-                    enemyDamagedAnimationValue,
-                    enemyFlashOpacity,
-                  ),
-                }}
-              >
-                <EnemyImage creatureSpecies={enemyState.creatureSpecies} />
-              </Animated.View>
-              <EnemyHealingAnimationBox
-                showHealAnimationDummy={enemyHealDummy}
-              />
-              <Animated.View
-                style={{
-                  transform: [{ translateY: enemyTextTranslateAnimation }],
-                  opacity: enemyTextFadeAnimation,
-                  position: "absolute",
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                  bottom: 0,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                {enemyTextString ? (
-                  <Text
-                    className="text-xl tracking-wide text-center"
-                    numberOfLines={1}
-                  >
-                    *{toTitleCase(enemyTextString)}*
-                  </Text>
-                ) : null}
-              </Animated.View>
+                      -1.5,
+                    ),
+                  },
+                ],
+                opacity: Animated.multiply(
+                  enemyDamagedAnimationValue,
+                  enemyFlashOpacity,
+                ),
+              }}
+            >
+              <EnemyImage creatureSpecies={enemyState.creatureSpecies} />
+            </Animated.View>
+            <EnemyHealingAnimationBox showHealAnimationDummy={enemyHealDummy} />
+            <Animated.View
+              style={{
+                transform: [{ translateY: enemyTextTranslateAnimation }],
+                opacity: enemyTextFadeAnimation,
+                position: "absolute",
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {enemyTextString ? (
+                <Text
+                  className="text-xl tracking-wide text-center"
+                  numberOfLines={1}
+                >
+                  *{toTitleCase(enemyTextString)}*
+                </Text>
+              ) : null}
+            </Animated.View>
+          </View>
+        </View>
+        {enemyState.minions.length > 0 ? (
+          <View className="mx-4">
+            <GenericStrikeAround>
+              <Text className="text-sm">Enemy Minions</Text>
+            </GenericStrikeAround>
+            <View className="mx-4 flex flex-row flex-wrap">
+              {enemyState.minions.map((minion) => (
+                <View
+                  key={minion.id}
+                  className="flex-grow px-2 py-1"
+                  style={{ flexBasis: "50%" }}
+                >
+                  <Text>{toTitleCase(minion.creatureSpecies)}</Text>
+                  <ProgressBar
+                    filledColor="#ef4444"
+                    unfilledColor="#fee2e2"
+                    value={minion.health}
+                    maxValue={minion.healthMax}
+                    displayNumber={false}
+                  />
+                </View>
+              ))}
             </View>
           </View>
-          {enemyState.minions.length > 0 ? (
-            <View className="mx-4">
-              <GenericStrikeAround>
-                <Text className="text-sm">Enemy Minions</Text>
-              </GenericStrikeAround>
-              <View className="mx-4 flex flex-row flex-wrap">
-                {enemyState.minions.map((minion) => (
-                  <View
-                    key={minion.id}
-                    className="flex-grow px-2 py-1"
-                    style={{ flexBasis: "50%" }}
-                  >
-                    <Text>{toTitleCase(minion.creatureSpecies)}</Text>
-                    <ProgressBar
-                      filledColor="#ef4444"
-                      unfilledColor="#fee2e2"
-                      value={minion.health}
-                      maxValue={minion.healthMax}
-                      displayNumber={false}
-                    />
-                  </View>
-                ))}
-              </View>
-            </View>
-          ) : null}
-        </View>
-      </Suspense>
+        ) : null}
+      </View>
     );
   }
 }

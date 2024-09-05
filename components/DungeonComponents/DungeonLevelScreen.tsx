@@ -161,7 +161,7 @@ const DungeonLevelScreen = observer(() => {
           ) : enemyState ? (
             <DungeonEnemyDisplay />
           ) : (
-            <View className="flex h-[40%] pt-8">
+            <View className="flex-1 justify-center">
               <D20DieAnimation
                 keepRolling={true}
                 size={Dimensions.get("window").height * 0.25}

@@ -25,6 +25,7 @@ import TutorialModal from "../../components/TutorialModal";
 import { Attack } from "../../classes/attack";
 import { Spell } from "../../classes/spell";
 import { TutorialOption } from "../../utility/types";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 const DungeonProvider = observer(() => {
   const { slug } = useLocalSearchParams();
@@ -108,12 +109,13 @@ const DungeonProvider = observer(() => {
             ? "generic npc femaleA"
             : "generic npc femaleB";
       }
-      const enemy = enemyGenerator(instanceName, level, name);
-      if (!enemy) throw new Error(`missing enemy, slug: ${slug}`);
-      setEnemy(enemy);
-      setEnemyAttacked(true);
-      setFirstLoad(true);
-      setInCombat(true);
+      wait(100).then(() => {
+        const enemy = enemyGenerator(instanceName, level, name);
+        if (!enemy) throw new Error(`missing enemy, slug: ${slug}`);
+        setEnemy(enemy);
+        setEnemyAttacked(true);
+        setInCombat(true);
+      });
     }
   }, [slug]);
 
@@ -141,6 +143,8 @@ const DungeonProvider = observer(() => {
       setFirstLoad(false);
     }
   }, [enemyState]);
+
+  const header = useHeaderHeight();
 
   useEffect(() => {
     if (playerState) {
@@ -203,14 +207,6 @@ const DungeonProvider = observer(() => {
     const log = `${timeOfLog}: ${whatHappened}`;
     logsState.push(log);
   };
-
-  useEffect(() => {
-    console.log("should: ", shouldShowFirstBossKillTutorialAfterItemDrops);
-    console.log("showing: ", showFirstBossKillTutorial);
-  }, [
-    showFirstBossKillTutorial,
-    shouldShowFirstBossKillTutorialAfterItemDrops,
-  ]);
 
   useEffect(() => {
     if (
@@ -303,7 +299,11 @@ const DungeonProvider = observer(() => {
       </DungeonContext.Provider>
     );
   } else {
-    return <D20DieAnimation />;
+    return (
+      <View className="flex-1 justify-center" style={{ marginTop: -header }}>
+        <D20DieAnimation keepRolling={true} />
+      </View>
+    );
   }
 });
 export default DungeonProvider;

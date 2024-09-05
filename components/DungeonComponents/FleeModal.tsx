@@ -2,7 +2,7 @@ import { Modal, Platform, Pressable, View } from "react-native";
 import GenericModal from "../GenericModal";
 import GenericFlatButton from "../GenericFlatButton";
 import { View as ThemedView, Text } from "../Themed";
-import { flipCoin } from "../../utility/functions/roll";
+import { flipCoin, rollD20 } from "../../utility/functions/roll";
 import { useVibration } from "../../utility/customHooks";
 import { router } from "expo-router";
 import { fullSave } from "../../utility/functions/save_load";
@@ -37,15 +37,11 @@ export default function FleeModal({
 
   const flee = () => {
     if (playerState && gameState) {
-      const roll = flipCoin();
-      const secondaryRoll = flipCoin();
+      const roll = rollD20();
       if (
-        (playerState &&
-          ((roll == "Heads" &&
-            (slug[0] !== "Activities" || secondaryRoll == "Heads")) ||
-            enemyState?.creatureSpecies == "training dummy" ||
-            !enemyAttacked)) ||
-        !enemyState
+        enemyState?.creatureSpecies == "training dummy" ||
+        !enemyAttacked ||
+        roll > 13
       ) {
         vibration({ style: "light" });
         setFleeRollFailure(false);

@@ -48,7 +48,7 @@ export const EnemyHealingAnimationBox = ({
   const [opacityAnim, setOpacityAnim] = useState(new Animated.Value(0));
 
   useEffect(() => {
-    if (!firstLoad) {
+    if (!firstLoad && showHealAnimationDummy != 0) {
       const newAnim = new Animated.Value(1);
       setOpacityAnim(newAnim);
       Animated.timing(newAnim, {
