@@ -5,7 +5,7 @@ import Modal from "react-native-modal";
 import { useColorScheme } from "nativewind";
 import { AppContext } from "../app/_layout";
 import { useVibration } from "../utility/customHooks";
-import { Pressable, Switch } from "react-native";
+import { Dimensions, Pressable, Switch } from "react-native";
 import {
   loadStoredTutorialState,
   updateStoredTutorialState,
@@ -85,14 +85,18 @@ export default function TutorialModal({
     }
   };
 
+  const deviceHeight = Dimensions.get("screen").height;
+
   return (
     <Modal
       animationIn="slideInUp"
       animationOut="slideOutDown"
-      backdropOpacity={0.2}
+      backdropOpacity={0.45}
       animationInTiming={500}
       animationOutTiming={300}
       isVisible={isVisibleCondition}
+      deviceHeight={deviceHeight}
+      useNativeDriver
       onBackdropPress={() => {
         if (backFunction) {
           backFunction();

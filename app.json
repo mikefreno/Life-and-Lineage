@@ -65,7 +65,7 @@
           "position": "absolute",
           "visibility": "hidden",
           "behavior": "overlay-swipe",
-          "backgroundColor": "#00000080"
+          "backgroundColor": "@android:color/transparent"
         }
       ]
     ],

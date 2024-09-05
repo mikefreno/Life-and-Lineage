@@ -29,15 +29,14 @@ export default function GenericModal({
     <Modal
       animationIn="slideInUp"
       animationOut="slideOutDown"
-      backdropOpacity={0.2}
       animationInTiming={500}
       animationOutTiming={300}
+      backdropOpacity={0.45}
       isVisible={isVisibleCondition}
       onBackdropPress={backdropCloses ? backFunction : undefined}
       onBackButtonPress={backFunction}
       deviceHeight={deviceHeight}
       useNativeDriver
-      statusBarTranslucent
       style={style}
     >
       <View

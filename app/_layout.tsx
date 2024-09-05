@@ -21,7 +21,7 @@ import { Enemy } from "../classes/creatures";
 import { fullSave, fullLoad } from "../utility/functions/save_load";
 import { Dimensions, Keyboard, Platform, StyleSheet } from "react-native";
 import { View as ThemedView } from "../components/Themed";
-import { autorun, reaction } from "mobx";
+import { autorun } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
@@ -117,7 +117,6 @@ const Root = observer(() => {
   const [enemyState, setEnemy] = useState<Enemy | null>(null);
   const [logsState, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [gameDate, setGameDate] = useState<string>("");
   const [playerStatusCompact, setPlayerStatusCompact] = useState<boolean>(true);
   const [showDetailedStatusView, setShowDetailedStatusView] =
     useState<boolean>(false);
@@ -162,7 +161,6 @@ const Root = observer(() => {
       if (game) {
         setGameData(game);
         setColorScheme(game.colorScheme);
-        setGameDate(game.date);
       }
       if (player) {
         setPlayerCharacter(player);
@@ -374,6 +372,7 @@ const RootLayout = observer(() => {
         await NavigationBar.setPositionAsync("absolute");
         await NavigationBar.setBehaviorAsync("overlay-swipe");
       }
+      NavigationBar.getBackgroundColorAsync().then((val) => console.log(val));
       if (!navbarLoad) {
         setNavbarLoad(true);
       }
