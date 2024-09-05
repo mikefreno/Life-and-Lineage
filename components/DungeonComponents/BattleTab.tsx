@@ -361,10 +361,11 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
       <GenericModal
         isVisibleCondition={attackDetailsShowing}
         backFunction={() => setAttackDetailsShowing(false)}
+        size={attackDetails instanceof Spell ? 100 : undefined}
       >
         {attackDetails && (
           <View className="flex items-center">
-            {"element" in attackDetails ? (
+            {attackDetails instanceof Spell ? (
               <SpellDetails spell={attackDetails} />
             ) : (
               <>
@@ -402,7 +403,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                 )}
                 <View className="my-1 w-2/3 items-center rounded-md border border-zinc-800 px-2 py-1 dark:border-zinc-100">
                   <Text className="text-center">
-                    {attackDetails.baseDamage} base attack damage
+                    {attackDetails.baseDamage(playerState)} base attack damage
                   </Text>
                   <Text className="text-center">
                     (before enemy damage reduction)

@@ -286,12 +286,20 @@ const PlayerStatus = observer(
               <View key={cond.name} className="mx-0.5 flex align-middle">
                 <Image
                   source={cond.icon}
-                  style={{
-                    width: 24,
-                    height: 24,
-                    borderWidth: 1,
-                    borderColor: "white",
-                  }}
+                  style={[
+                    colorScheme == "dark" &&
+                    ["blind", "stun"].includes(cond.name)
+                      ? {
+                          backgroundColor: "rgba(255, 255, 255, 0.5)",
+                          borderRadius: 20,
+                          width: 24,
+                          height: 24,
+                        }
+                      : {
+                          width: 24,
+                          height: 24,
+                        },
+                  ]}
                   resizeMode="contain"
                 />
               </View>

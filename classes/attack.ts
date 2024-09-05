@@ -62,7 +62,7 @@ export class Attack {
     this.summons = summons;
   }
 
-  private baseDamage(user: PlayerCharacter | Enemy | Minion) {
+  public baseDamage(user: PlayerCharacter | Enemy | Minion) {
     if (this.damageMult == 0) {
       return 0;
     }
