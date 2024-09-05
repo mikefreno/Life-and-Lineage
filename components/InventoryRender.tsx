@@ -8,6 +8,7 @@ import { checkReleasePositionProps } from "../utility/types";
 import { Shop } from "../classes/shop";
 import { Text, View as ThemedView } from "./Themed";
 import { AppContext } from "../app/_layout";
+import D20DieAnimation from "./DieRollAnim";
 
 type InventoryRenderBase = {
   selfRef?: RefObject<View>;
@@ -68,7 +69,8 @@ export default function InventoryRender({
   const vibration = useVibration();
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing contexts");
-  const { playerState, dimensions, blockSize, setBlockSize } = appData;
+  const { playerState, dimensions } = appData;
+  const [blockSize, setBlockSize] = useState<number>();
 
   function checkReleasePosition({
     item,
@@ -210,6 +212,10 @@ export default function InventoryRender({
       }
     };
 
+    while (!blockSize) {
+      return <></>;
+    }
+
     return (
       <Draggable
         onDragRelease={(_, g) => {
@@ -243,7 +249,13 @@ export default function InventoryRender({
               width: blockSize,
             }}
           >
-            <Image source={item[0].getItemIcon()} />
+            <Image
+              source={item[0].getItemIcon()}
+              style={{
+                width: Math.min(blockSize * 0.65, 40),
+                height: Math.min(blockSize * 0.65, 40),
+              }}
+            />
             {item[0].stackable && item.length > 1 && (
               <ThemedView className="absolute bottom-0 right-0 bg-opacity-50 rounded px-1">
                 <Text>{item.length}</Text>

@@ -43,7 +43,7 @@ export default function EquipmentDisplay({
   const vibration = useVibration();
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing contexts");
-  const { playerState, dimensions } = appData;
+  const { playerState, dimensions, blockSize } = appData;
 
   function checkReleasePosition({
     item,
@@ -103,8 +103,6 @@ export default function EquipmentDisplay({
     }
   }
 
-  const blockSize = Math.min(dimensions.lesser / 7.5, 84);
-
   interface EquipmentSlotProps {
     slot: "Head" | "Main-Hand" | "Off-Hand" | "Body";
   }
@@ -137,6 +135,10 @@ export default function EquipmentDisplay({
       }
 
       const isTwoHanded = playerState.equipment.mainHand?.slot === "two-hand";
+
+      while (!blockSize) {
+        return <></>;
+      }
 
       return (
         <View>
@@ -187,11 +189,17 @@ export default function EquipmentDisplay({
                     style={{
                       height: blockSize,
                       width: blockSize,
+                      marginLeft: -1,
+                      marginTop: -1,
                     }}
                   >
                     <Image
                       className="my-auto z-top"
                       source={item.getItemIcon()}
+                      style={{
+                        height: Math.min(blockSize * 0.65, 52),
+                        width: Math.min(blockSize * 0.65, 52),
+                      }}
                     />
                   </View>
                 </Pressable>
@@ -205,6 +213,10 @@ export default function EquipmentDisplay({
               <Image
                 className="my-auto opacity-50"
                 source={playerState.equipment.mainHand?.getItemIcon()}
+                style={{
+                  height: Math.min(blockSize * 0.65, 52),
+                  width: Math.min(blockSize * 0.65, 52),
+                }}
               />
             </View>
           ) : (

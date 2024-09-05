@@ -306,6 +306,6 @@ export interface AppContextType {
     greater: number;
     lesser: number;
   };
-  blockSize: number;
-  setBlockSize: React.Dispatch<React.SetStateAction<number>>;
+  blockSize: number | undefined;
+  setBlockSize: React.Dispatch<React.SetStateAction<number | undefined>>;
 }

@@ -6,7 +6,7 @@ import { useVibration } from "../utility/customHooks";
 import { router } from "expo-router";
 import { toTitleCase } from "../utility/functions/misc/words";
 import { Item } from "../classes/item";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Shop } from "../classes/shop";
 import { asReadableGold } from "../utility/functions/misc/numbers";
 import SpellDetails from "./SpellDetails";
@@ -57,9 +57,20 @@ export function StatsDisplay({
 
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing contexts");
-  const { playerState, dimensions, blockSize } = appData;
+  const { playerState, dimensions } = appData;
   const [viewWidth, setViewWidth] = useState(dimensions.width * 0.4);
   const [viewHeight, setViewHeight] = useState(dimensions.height * 0.2);
+  const [blockSize, setBlockSize] = useState<number>();
+
+  useEffect(() => {
+    if (dimensions.width === dimensions.lesser) {
+      const blockSize = Math.min(dimensions.height / 5, dimensions.width / 7.5);
+      setBlockSize(blockSize);
+    } else {
+      const blockSize = dimensions.width / 14;
+      setBlockSize(blockSize);
+    }
+  }, [dimensions.height]);
 
   const SaleSection = () => {
     if (playerState) {
@@ -235,6 +246,10 @@ export function StatsDisplay({
     setViewWidth(width);
     setViewHeight(height);
   };
+
+  while (!blockSize) {
+    return <></>;
+  }
 
   return (
     <View

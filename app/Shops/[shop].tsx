@@ -32,7 +32,7 @@ const ShopInteriorScreen = observer(() => {
   const { shop } = useLocalSearchParams();
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing game context");
-  const { gameState, playerState } = appData;
+  const { gameState, playerState, blockSize } = appData;
   const vibration = useVibration();
   const colors = shopObjects.find((shopObj) => shopObj.type == shop)?.colors;
   const thisShop = gameState?.shops.find((aShop) => aShop.archetype == shop);
@@ -79,6 +79,10 @@ const ShopInteriorScreen = observer(() => {
     }
     setRefreshCheck(true);
   }, [playerState]);
+
+  while (!blockSize) {
+    return <></>;
+  }
 
   function sellAllJunk() {
     if (thisShop) {
@@ -180,8 +184,18 @@ const ShopInteriorScreen = observer(() => {
         className="z-10 h-14 w-14 items-center justify-center rounded-lg bg-zinc-400 active:scale-90 active:opacity-50"
         ref={localRef}
         onPress={handlePress}
+        style={{
+          width: blockSize,
+          height: blockSize,
+        }}
       >
-        <Image source={item[0].getItemIcon()} />
+        <Image
+          source={item[0].getItemIcon()}
+          style={{
+            width: Math.min(blockSize * 0.65, 40),
+            height: Math.min(blockSize * 0.65, 40),
+          }}
+        />
       </Pressable>
     );
   };

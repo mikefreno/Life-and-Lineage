@@ -123,7 +123,6 @@ const Root = observer(() => {
     useState<boolean>(false);
   const [blockSize, setBlockSize] = useState<number>();
   const { setColorScheme, colorScheme } = useColorScheme();
-
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState<
     Notifications.Notification | undefined
@@ -238,6 +237,16 @@ const Root = observer(() => {
     };
   }, [onChange]);
 
+  useEffect(() => {
+    if (dimensions.width === dimensions.lesser) {
+      const blockSize = Math.min(dimensions.height / 5, dimensions.width / 7.5);
+      setBlockSize(blockSize);
+    } else {
+      const blockSize = dimensions.width / 14;
+      setBlockSize(blockSize);
+    }
+  }, [dimensions.height]);
+
   while (loading) {
     return (
       <ThemedView className="flex-1 items-center justify-center">
@@ -302,7 +311,8 @@ const RootLayout = observer(() => {
         router.replace("/NewGame");
       } else if (
         gameState?.atDeathScreen ||
-        (playerState && (playerState.health <= 0 || playerState.sanity <= -50))
+        (playerState &&
+          (playerState.currentHealth <= 0 || playerState.currentSanity <= -50))
       ) {
         while (router.canGoBack()) {
           router.back();
@@ -327,7 +337,7 @@ const RootLayout = observer(() => {
     if (fontLoaded && navbarLoad) {
       if (
         playerState &&
-        (playerState.sanity <= -50 || playerState.health <= 0)
+        (playerState.currentSanity <= -50 || playerState.currentHealth <= 0)
       ) {
         while (router.canGoBack()) {
           router.back();
@@ -335,7 +345,7 @@ const RootLayout = observer(() => {
         router.replace("/DeathScreen");
       }
     }
-  }, [playerState?.sanity, playerState?.health]);
+  }, [playerState?.currentSanity, playerState?.currentHealth]);
 
   useEffect(() => {
     getAndSetNavBar();

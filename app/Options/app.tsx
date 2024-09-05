@@ -178,7 +178,7 @@ export const AppSettings = observer(() => {
                   className="w-full bg-zinc-300 dark:bg-zinc-700 border rounded border-zinc-900 dark:border-zinc-50 pb-2"
                 >
                   <Pressable
-                    className="w-8 h-8 absolute items-center justify-center m-1 border bg-zinc-50 dark:bg-zinc-900 rounded-full border-zinc-900 dark:border-zinc-50"
+                    className="w-8 h-8 -mb-8 z-top items-center justify-center m-1 border bg-zinc-50 dark:bg-zinc-900 rounded-full border-zinc-900 dark:border-zinc-50"
                     onPress={() => {
                       vibration({ essential: true, style: "warning" });
                       deleteRemoteSave(save);
