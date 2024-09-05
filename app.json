@@ -2,7 +2,7 @@
   "expo": {
     "name": "Magic Delve",
     "slug": "magic-delve",
-    "version": "0.3.1",
+    "version": "0.3.0",
     "orientation": "portrait",
     "icon": "assets/images/icon.png",
     "scheme": "magicdelveapp",
@@ -32,7 +32,13 @@
       },
       "package": "com.mikefrenodev.magicdelve",
       "versionCode": 1,
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "config": {
+        "styles": {
+          "android:windowTranslucentNavigation": true,
+          "android:windowTranslucentStatus": true
+        }
+      }
     },
     "androidStatusBar": {
       "hidden":true
@@ -65,7 +71,7 @@
           "position": "absolute",
           "visibility": "hidden",
           "behavior": "overlay-swipe",
-          "backgroundColor": "@android:color/transparent"
+          "backgroundColor": "#00000080"
         }
       ]
     ],

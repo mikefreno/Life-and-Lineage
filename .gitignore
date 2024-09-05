@@ -36,6 +36,7 @@ yarn-error.*
 data/env/
 
 ios
+android
 magic-delve-messager-firebase-adminsdk-kfxxy-88e8768e79.json
 google-services.json
 
