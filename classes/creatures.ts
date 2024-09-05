@@ -50,7 +50,7 @@ type CreatureType = {
   energy?: number;
   energyMax?: number;
   energyRegen?: number;
-  attacks: string[];
+  attacks: string[] | Attack[];
   conditions?: Condition[];
 };
 
@@ -77,6 +77,7 @@ export class Creature {
   readonly energyRegen: number | null;
   readonly attacks: Attack[];
   conditions: Condition[];
+  gotDrops: boolean;
 
   constructor({
     id,
@@ -108,6 +109,7 @@ export class Creature {
     this.energyRegen = energyRegen ?? null;
     this.attacks = this.initAttacks(attacks);
     this.conditions = conditions ?? [];
+    this.gotDrops = false;
     makeObservable(this, {
       id: observable,
       health: observable,
@@ -225,7 +227,10 @@ export class Creature {
     }
   }
 
-  private initAttacks(attackStrings: string[]): Attack[] {
+  private initAttacks(attackStrings: string[] | Attack[]): Attack[] {
+    if (attackStrings[0] instanceof Attack) {
+      return attackStrings as Attack[];
+    }
     const builtAttacks: Attack[] = [];
     attackStrings.forEach((attackName) => {
       const foundAttack = attacks.find(
@@ -316,6 +321,7 @@ export class Creature {
     playerClass: "necromancer" | "paladin" | "mage",
     bossFight: boolean,
   ) {
+    if (this.gotDrops) return "already retrieved";
     let enemyObj;
     if (bossFight) {
       enemyObj = bosses.find((monster) => monster.name == this.creatureSpecies);
@@ -336,7 +342,7 @@ export class Creature {
       let drops: Item[] = [];
       dropList.forEach((drop) => {
         const roll = rollD20();
-        if (roll * 5 > drop.chance * 100) {
+        if (roll >= 20 - drop.chance * 20) {
           const items = itemList(drop.itemType, playerClass);
           const itemObj = items.find((item) => item.name == drop.item);
           if (itemObj) {
@@ -361,6 +367,7 @@ export class Creature {
           }
         }
       });
+      this.gotDrops = true;
       return { itemDrops: drops, gold: gold };
     }
     throw new Error("No found monster on Monster.getDrops()");
@@ -465,7 +472,9 @@ export class Enemy extends Creature {
       energyMax: json.energyMax,
       energyRegen: json.energyRegen,
       minions: json.minions,
-      attacks: json.attacks,
+      attacks: json.attacks
+        ? json.attacks.map((attack: any) => Attack.fromJSON(attack))
+        : [],
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
@@ -540,7 +549,9 @@ export class Minion extends Creature {
       energyMax: json.energyMax,
       energyRegen: json.energyRegen,
       turnsLeftAlive: json.turnsLeftAlive,
-      attacks: json.attacks,
+      attacks: json.attacks
+        ? json.attacks.map((attack: any) => Attack.fromJSON(attack))
+        : [],
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],

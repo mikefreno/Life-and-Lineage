@@ -54,8 +54,10 @@ export function enemyTurnCheck({ dungeonData, appData }: contextData) {
           playerState.playerClass,
           fightingBoss,
         );
-        playerState.addGold(drops.gold);
-        setDroppedItems(drops);
+        if (drops != "already retrieved") {
+          playerState.addGold(drops.gold);
+          setDroppedItems(drops);
+        }
         setEnemy(null);
         gameState.gameTick(playerState);
       } else if (slug[0] == "Personal") {
@@ -63,31 +65,38 @@ export function enemyTurnCheck({ dungeonData, appData }: contextData) {
           playerState.playerClass,
           fightingBoss,
         );
-        playerState.addGold(drops.gold);
-        setDroppedItems(drops);
+
+        if (drops != "already retrieved") {
+          playerState.addGold(drops.gold);
+          setDroppedItems(drops);
+          gameState.gameTick(playerState);
+        }
         setEnemy(null);
-        gameState.gameTick(playerState);
       } else {
         battleLogger(
           `You defeated the ${toTitleCase(enemyState.creatureSpecies)}`,
         );
+
         const drops = enemyState.getDrops(
           playerState.playerClass,
           fightingBoss,
         );
-        playerState.addGold(drops.gold);
-        setDroppedItems(drops);
-        if (fightingBoss && gameState && thisDungeon) {
-          setFightingBoss(false);
-          thisDungeon.setBossDefeated();
-          gameState.openNextDungeonLevel(thisInstance!.name);
-          playerState.bossDefeated();
-          if (!gameState.tutorialsShown["First Boss Kill"]) {
-            setShouldShowFirstBossKillTutorialAfterItemDrops(true);
+        if (drops != "already retrieved") {
+          playerState.addGold(drops.gold);
+          setDroppedItems(drops);
+          if (fightingBoss && gameState && thisDungeon) {
+            setFightingBoss(false);
+            thisDungeon.setBossDefeated();
+            gameState.openNextDungeonLevel(thisInstance!.name);
+            playerState.bossDefeated();
+            if (!gameState.tutorialsShown["First Boss Kill"]) {
+              setShouldShowFirstBossKillTutorialAfterItemDrops(true);
+            }
           }
+          gameState.gameTick(playerState);
         }
+
         setEnemy(null);
-        gameState.gameTick(playerState);
       }
     } else {
       enemyTurn({ appData, dungeonData });
@@ -203,10 +212,13 @@ export const enemyTurn = ({ appData, dungeonData }: contextData) => {
             playerState.playerClass,
             fightingBoss,
           );
-          playerState.addGold(drops.gold);
-          setDroppedItems(drops);
+          if (drops != "already retrieved") {
+            playerState.addGold(drops.gold);
+            setDroppedItems(drops);
+
+            gameState.gameTick(playerState);
+          }
           setEnemy(null);
-          gameState.gameTick(playerState);
         } else {
           battleLogger(
             `You defeated the ${toTitleCase(enemyState.creatureSpecies)}`,
@@ -215,16 +227,20 @@ export const enemyTurn = ({ appData, dungeonData }: contextData) => {
             playerState.playerClass,
             fightingBoss,
           );
-          playerState.addGold(drops.gold);
-          setDroppedItems(drops);
-          if (fightingBoss && gameState && thisDungeon) {
-            setFightingBoss(false);
-            playerState.bossDefeated();
-            thisDungeon.setBossDefeated();
-            gameState.openNextDungeonLevel(thisInstance!.name);
+
+          if (drops != "already retrieved") {
+            playerState.addGold(drops.gold);
+            setDroppedItems(drops);
+            gameState.gameTick(playerState);
+            if (fightingBoss && gameState && thisDungeon) {
+              setFightingBoss(false);
+              playerState.bossDefeated();
+              thisDungeon.setBossDefeated();
+              gameState.openNextDungeonLevel(thisInstance!.name);
+            }
           }
+
           setEnemy(null);
-          gameState.gameTick(playerState);
         }
       }
     }, 1000);
@@ -322,7 +338,7 @@ export const use = ({
 
       battleLogger(logString);
     } else {
-      const { logString } = attackOrSpell.use(target);
+      const { logString } = attackOrSpell.use({ target, user: playerState });
       battleLogger(logString);
     }
 

@@ -314,6 +314,26 @@ export class Attack {
     }
     return target.creatureSpecies;
   }
+
+  static fromJSON(json: any): Attack {
+    if (!json.name) {
+      throw new Error("Attack name is required");
+    }
+
+    return new Attack({
+      name: json.name,
+      energyCost: json.energyCost,
+      hitChance: json.hitChance,
+      targets: json.targets,
+      damageMult: json.damageMult,
+      flatHealthDamage: json.flatHealthDamage,
+      selfDamage: json.selfDamage,
+      flatSanityDamage: json.flatSanityDamage,
+      buffs: json.buffs,
+      debuffs: json.debuffs,
+      summons: json.summons,
+    });
+  }
 }
 
 type AttackFailureLogProps = {

@@ -33,7 +33,7 @@ const DungeonLevelScreen = observer(() => {
   const appData = useContext(AppContext);
   const dungeonData = useContext(DungeonContext);
   if (!appData || !dungeonData) throw new Error("missing context");
-  const { playerState, gameState, enemyState, dimensions } = appData;
+  const { playerState, gameState, enemyState } = appData;
 
   const {
     slug,
@@ -46,6 +46,7 @@ const DungeonLevelScreen = observer(() => {
     setShowTargetSelection,
     displayItem,
     setDisplayItem,
+    droppedItems,
   } = dungeonData;
 
   const [battleTab, setBattleTab] = useState<
@@ -69,6 +70,8 @@ const DungeonLevelScreen = observer(() => {
   const throttledDungeonSave = throttle((state) => {
     dungeonSave({ enemy: state, dungeonData, appData });
   }, 250);
+
+  useEffect(() => console.log(droppedItems), [droppedItems]);
 
   useEffect(() => {
     throttledDungeonSave(enemyState);
