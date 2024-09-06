@@ -9,6 +9,9 @@ import GenericRaisedButton from "../../components/GenericRaisedButton";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import GenericModal from "../../components/GenericModal";
 import * as Updates from "expo-updates";
+import { fullSave } from "../../utility/functions/save_load";
+import { wait } from "../../utility/functions/misc/wait";
+import D20DieAnimation from "../../components/DieRollAnim";
 
 const healthWarningOptions: Record<number, string> = {
   0.5: "50%",
@@ -31,11 +34,12 @@ const healthWarningKeys = [0.5, 0.25, 0.2, 0.15, 0.1, 0];
 export default function GameSettings() {
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing context!");
-  const { gameState } = appData;
+  const { gameState, playerState } = appData;
   const vibration = useVibration();
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,
   );
+  const [loading, setLoading] = useState<boolean>(false);
   const [selectedHealthWarning, setSelectedHealthWarning] = useState<string>(
     gameState ? healthWarningOptions[gameState?.healthWarning] : "25%",
   );
@@ -71,33 +75,42 @@ export default function GameSettings() {
         isVisibleCondition={showTutorialResetConfirm}
         backFunction={() => setShowTutorialResetConfirm(false)}
       >
-        <>
-          <Text className="text-center text-lg">
-            This will reset all tutorials, some may not make sense based on your
-            current game/player/inventory state (And restart the app).
-          </Text>
-          <Text className="text-center text-2xl">Are you sure?</Text>
-          <ThemedView className="flex flex-row">
-            <Pressable
-              onPress={() => {
-                vibration({ style: "warning" });
-                gameState?.resetTutorialState();
-                gameState?.enableTutorials();
-                setShowTutorialResetConfirm(false);
-                Updates.reloadAsync();
-              }}
-              className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-            >
-              <Text>Reset</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => setShowTutorialResetConfirm(false)}
-              className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-            >
-              <Text>Cancel</Text>
-            </Pressable>
-          </ThemedView>
-        </>
+        {loading ? (
+          <D20DieAnimation keepRolling={true} />
+        ) : (
+          <>
+            <Text className="text-center text-lg">
+              This will reset all tutorials, some may not make sense based on
+              your current game/player/inventory state (And restart the app).
+            </Text>
+            <Text className="text-center text-2xl">Are you sure?</Text>
+            <ThemedView className="flex flex-row">
+              <Pressable
+                onPress={() => {
+                  vibration({ style: "warning" });
+                  gameState?.resetTutorialState();
+                  gameState?.enableTutorials();
+                  setLoading(true);
+                  wait(1000).then(() => {
+                    setShowTutorialResetConfirm(false);
+                    fullSave(gameState, playerState);
+                    setLoading(false);
+                    Updates.reloadAsync();
+                  });
+                }}
+                className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+              >
+                <Text>Reset</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setShowTutorialResetConfirm(false)}
+                className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+              >
+                <Text>Cancel</Text>
+              </Pressable>
+            </ThemedView>
+          </>
+        )}
       </GenericModal>
       <ThemedView className="flex-1 items-center justify-center px-4">
         <GenericStrikeAround>Game Restart</GenericStrikeAround>

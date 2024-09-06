@@ -3,6 +3,7 @@ import { Dimensions, Platform } from "react-native";
 import Modal from "react-native-modal";
 import { View } from "./Themed";
 import { AppContext } from "../app/_layout";
+import { wait } from "../utility/functions/misc/wait";
 
 interface GenericModalProps {
   isVisibleCondition: boolean;
@@ -34,9 +35,16 @@ export default function GenericModal({
   } = appData;
 
   useEffect(() => {
-    if (isVisibleCondition && visibilityWhenOpen != androidNavBarVisibility) {
-      console.log("setting");
-      setVisisbilityWhenOpen(androidNavBarVisibility);
+    console.log(androidNavBarVisibility);
+    if (
+      isVisibleCondition &&
+      visibilityWhenOpen != androidNavBarVisibility &&
+      visibilityWhenOpen == "notset"
+    ) {
+      wait(200).then(() => {
+        console.log("setting");
+        setVisisbilityWhenOpen(androidNavBarVisibility);
+      });
     }
   }, [androidNavBarVisibility]);
 
@@ -46,7 +54,7 @@ export default function GenericModal({
       animationOut="slideOutDown"
       animationInTiming={500}
       animationOutTiming={300}
-      backdropTransitionInTiming={Platform.OS === "android" ? -500 : 300}
+      backdropTransitionInTiming={Platform.OS === "android" ? 100 : 300}
       hasBackdrop
       backdropColor={"#000000a2"}
       isVisible={isVisibleCondition}

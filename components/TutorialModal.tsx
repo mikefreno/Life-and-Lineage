@@ -1,16 +1,16 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { View, Text } from "./Themed";
 import { Entypo } from "@expo/vector-icons";
-import Modal from "react-native-modal";
 import { useColorScheme } from "nativewind";
 import { AppContext } from "../app/_layout";
 import { useVibration } from "../utility/customHooks";
-import { Dimensions, Platform, Pressable, Switch } from "react-native";
+import { Pressable, Switch } from "react-native";
 import {
   loadStoredTutorialState,
   updateStoredTutorialState,
 } from "../utility/functions/misc/tutorial";
 import { TutorialOption } from "../utility/types";
+import GenericModal from "./GenericModal";
 
 interface TutorialModalProps {
   isVisibleCondition: boolean;
@@ -35,12 +35,7 @@ export default function TutorialModal({
   if (!appData) {
     throw new Error("missing context");
   }
-  const {
-    gameState,
-    androidNavBarVisibility,
-    visibilityWhenOpen,
-    setVisisbilityWhenOpen,
-  } = appData;
+  const { gameState } = appData;
   const [tutorialStep, setTutorialStep] = useState<number>(1);
   const tutorialStepRef = useRef<number>(1);
   const { colorScheme } = useColorScheme();
@@ -81,7 +76,6 @@ export default function TutorialModal({
       setTutorialStep(3);
       tutorialStepRef.current = 3;
     } else {
-      console.log("close");
       vibration({ style: "light" });
       if (onCloseFunction) {
         onCloseFunction();
@@ -90,114 +84,104 @@ export default function TutorialModal({
     }
   };
 
-  const deviceHeight = Dimensions.get("screen").height;
-
-  useEffect(() => {
-    if (isVisibleCondition && visibilityWhenOpen != androidNavBarVisibility) {
-      console.log("setting");
-      setVisisbilityWhenOpen(androidNavBarVisibility);
-    }
-  }, [androidNavBarVisibility]);
-
   return (
-    <Modal
-      animationIn="slideInUp"
-      animationOut="slideOutDown"
-      backdropTransitionInTiming={Platform.OS === "android" ? -500 : 300}
-      hasBackdrop
-      backdropColor={"#000000a2"}
-      animationInTiming={500}
-      animationOutTiming={300}
-      isVisible={isVisibleCondition}
-      deviceHeight={deviceHeight}
-      statusBarTranslucent={!visibilityWhenOpen}
-      useNativeDriverForBackdrop
-      useNativeDriver
-      onBackdropPress={() => {
-        if (backFunction) {
-          backFunction();
-        }
-        gameState?.updateTutorialState(tutorial, true);
-      }}
-      onBackButtonPress={() => {
+    <GenericModal
+      isVisibleCondition={isVisibleCondition}
+      backFunction={() => {
         if (backFunction) {
           backFunction();
         }
         gameState?.updateTutorialState(tutorial, true);
       }}
     >
-      <View
-        className="mx-auto w-5/6 rounded-xl px-6 py-4 dark:border dark:border-zinc-500"
-        style={{
-          shadowColor: "#000",
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          elevation: 2,
-          shadowOpacity: 0.25,
-          shadowRadius: 5,
-        }}
-      >
-        {pageTwo && (
-          <View
-            className={`flex flex-row ${
-              tutorialStep != 1 ? "justify-between" : "justify-end"
-            }`}
-          >
-            {tutorialStep != 1 ? (
-              <Pressable
-                onPress={() => {
-                  setTutorialStep((prev) => prev - 1);
-                  tutorialStepRef.current--;
-                }}
-              >
-                <Entypo
-                  name="chevron-left"
-                  size={24}
-                  color={colorScheme == "dark" ? "#f4f4f5" : "black"}
-                />
-              </Pressable>
-            ) : null}
-            <Text>
-              {tutorialStep}/{pageThree ? 3 : 2}
-            </Text>
-          </View>
-        )}
-        {tutorialStep == 1 ? (
-          <>
-            <Text className="text-center text-2xl md:text-3xl">
-              {pageOne.title}
-            </Text>
-            <Text className="my-4 text-center text-lg md:text-xl">
-              {pageOne.body}
-            </Text>
-            <View className="mx-auto my-[2vh] flex flex-row">
-              <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-              <Switch
-                trackColor={{ false: "#767577", true: "#3b82f6" }}
-                ios_backgroundColor="#3e3e3e"
-                thumbColor={"white"}
-                onValueChange={(bool) => setTutorialState(bool)}
-                value={tutorialState}
-              />
-            </View>
+      {pageTwo && (
+        <View
+          className={`flex flex-row ${
+            tutorialStep != 1 ? "justify-between" : "justify-end"
+          }`}
+        >
+          {tutorialStep != 1 ? (
             <Pressable
-              onPress={press}
-              className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+              onPress={() => {
+                setTutorialStep((prev) => prev - 1);
+                tutorialStepRef.current--;
+              }}
             >
-              <Text>{pageTwo ? "Next" : "Close"}</Text>
+              <Entypo
+                name="chevron-left"
+                size={24}
+                color={colorScheme == "dark" ? "#f4f4f5" : "black"}
+              />
             </Pressable>
-          </>
-        ) : tutorialStep == 2 && pageTwo ? (
+          ) : null}
+          <Text>
+            {tutorialStep}/{pageThree ? 3 : 2}
+          </Text>
+        </View>
+      )}
+      {tutorialStep == 1 ? (
+        <>
+          <Text className="text-center text-2xl md:text-3xl">
+            {pageOne.title}
+          </Text>
+          <Text className="my-4 text-center text-lg md:text-xl">
+            {pageOne.body}
+          </Text>
+          <View className="mx-auto my-[2vh] flex flex-row">
+            <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+            <Switch
+              trackColor={{ false: "#767577", true: "#3b82f6" }}
+              ios_backgroundColor="#3e3e3e"
+              thumbColor={"white"}
+              onValueChange={(bool) => setTutorialState(bool)}
+              value={tutorialState}
+            />
+          </View>
+          <Pressable
+            onPress={press}
+            className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+          >
+            <Text>{pageTwo ? "Next" : "Close"}</Text>
+          </Pressable>
+        </>
+      ) : tutorialStep == 2 && pageTwo ? (
+        <>
+          {pageTwo.title && (
+            <Text className="text-center text-2xl md:text-3xl">
+              {pageTwo.title}
+            </Text>
+          )}
+          <Text className="mt-2 text-center text-lg md:text-xl">
+            {pageTwo.body}
+          </Text>
+          <View className="mx-auto my-[2vh] flex flex-row">
+            <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+            <Switch
+              trackColor={{ false: "#767577", true: "#3b82f6" }}
+              ios_backgroundColor="#3e3e3e"
+              thumbColor={"white"}
+              onValueChange={(bool) => setTutorialState(bool)}
+              value={tutorialState}
+            />
+          </View>
+          <Pressable
+            onPress={press}
+            className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+          >
+            <Text>{pageThree ? "Next" : "Close"}</Text>
+          </Pressable>
+        </>
+      ) : (
+        tutorialStep == 3 &&
+        pageThree && (
           <>
-            {pageTwo.title && (
+            {pageThree.title && (
               <Text className="text-center text-2xl md:text-3xl">
-                {pageTwo.title}
+                {pageThree.title}
               </Text>
             )}
             <Text className="mt-2 text-center text-lg md:text-xl">
-              {pageTwo.body}
+              {pageThree.body}
             </Text>
             <View className="mx-auto my-[2vh] flex flex-row">
               <Text className="my-auto text-lg">Tutorials Enabled: </Text>
@@ -213,41 +197,11 @@ export default function TutorialModal({
               onPress={press}
               className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
             >
-              <Text>{pageThree ? "Next" : "Close"}</Text>
+              <Text>Close</Text>
             </Pressable>
           </>
-        ) : (
-          tutorialStep == 3 &&
-          pageThree && (
-            <>
-              {pageThree.title && (
-                <Text className="text-center text-2xl md:text-3xl">
-                  {pageThree.title}
-                </Text>
-              )}
-              <Text className="mt-2 text-center text-lg md:text-xl">
-                {pageThree.body}
-              </Text>
-              <View className="mx-auto my-[2vh] flex flex-row">
-                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                <Switch
-                  trackColor={{ false: "#767577", true: "#3b82f6" }}
-                  ios_backgroundColor="#3e3e3e"
-                  thumbColor={"white"}
-                  onValueChange={(bool) => setTutorialState(bool)}
-                  value={tutorialState}
-                />
-              </View>
-              <Pressable
-                onPress={press}
-                className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-              >
-                <Text>Close</Text>
-              </Pressable>
-            </>
-          )
-        )}
-      </View>
-    </Modal>
+        )
+      )}
+    </GenericModal>
   );
 }

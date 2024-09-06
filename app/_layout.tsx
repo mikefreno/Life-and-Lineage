@@ -37,7 +37,6 @@ import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { useFocusEffect } from "@react-navigation/native";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -129,7 +128,9 @@ const Root = observer(() => {
   const { setColorScheme, colorScheme } = useColorScheme();
   const [androidNavBarVisibility, setAndroidNavBarVisibility] =
     useState<boolean>(false);
-  const [visibilityWhenOpen, setVisisbilityWhenOpen] = useState<boolean>(true);
+  const [visibilityWhenOpen, setVisisbilityWhenOpen] = useState<
+    boolean | "notset"
+  >("notset");
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState<
     Notifications.Notification | undefined
@@ -355,37 +356,30 @@ const RootLayout = observer(() => {
     }
   }, [playerState?.currentSanity, playerState?.currentHealth]);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (Platform.OS === "android") {
-        const updateNavBar = async () => {
-          const isVisible =
-            (await NavigationBar.getVisibilityAsync()) === "visible";
-          if (androidNavBarVisibility !== isVisible) {
-            setAndroidNavBarVisibility(isVisible);
-          }
+  useEffect(() => {
+    updateNavBar();
+  }, [isKeyboardVisible, insets.bottom]);
 
-          if (isKeyboardVisible && !isVisible) {
-            await NavigationBar.setVisibilityAsync("visible");
-            await NavigationBar.setPositionAsync("relative");
-            await NavigationBar.setBehaviorAsync("inset-touch");
-          } else if (!isKeyboardVisible && isVisible) {
-            await NavigationBar.setVisibilityAsync("hidden");
-            await NavigationBar.setPositionAsync("absolute");
-            await NavigationBar.setBehaviorAsync("overlay-swipe");
-          }
+  const updateNavBar = async () => {
+    const isVisible = (await NavigationBar.getVisibilityAsync()) === "visible";
+    if (androidNavBarVisibility !== isVisible) {
+      setAndroidNavBarVisibility(isVisible);
+    }
 
-          if (!navbarLoad) {
-            setNavbarLoad(true);
-          }
-        };
+    if (isKeyboardVisible && !isVisible) {
+      await NavigationBar.setVisibilityAsync("visible");
+      await NavigationBar.setPositionAsync("relative");
+      await NavigationBar.setBehaviorAsync("inset-touch");
+    } else if (!isKeyboardVisible && isVisible) {
+      await NavigationBar.setVisibilityAsync("hidden");
+      await NavigationBar.setPositionAsync("absolute");
+      await NavigationBar.setBehaviorAsync("overlay-swipe");
+    }
 
-        updateNavBar();
-      } else {
-        setNavbarLoad(true);
-      }
-    }, [isKeyboardVisible, insets.bottom]),
-  );
+    if (!navbarLoad) {
+      setNavbarLoad(true);
+    }
+  };
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -423,7 +417,6 @@ const RootLayout = observer(() => {
           name="(tabs)"
           options={{
             headerShown: false,
-            animation: Platform.OS == "android" ? "none" : undefined,
             autoHideHomeIndicator: true,
           }}
         />

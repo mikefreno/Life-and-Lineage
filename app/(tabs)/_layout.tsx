@@ -63,6 +63,7 @@ export default function TabLayout() {
           tabBarStyle: {
             position: "absolute",
             borderTopWidth: 0,
+            shadowColor: "transparent",
             height:
               Platform.OS == "ios"
                 ? Math.min(dimensions.greater / 8, 140)
