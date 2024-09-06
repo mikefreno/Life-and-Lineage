@@ -35,7 +35,6 @@ export default function GenericModal({
   } = appData;
 
   useEffect(() => {
-    console.log(androidNavBarVisibility);
     if (
       isVisibleCondition &&
       visibilityWhenOpen != androidNavBarVisibility &&

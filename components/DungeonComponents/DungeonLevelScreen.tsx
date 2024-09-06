@@ -47,7 +47,6 @@ const DungeonLevelScreen = observer(() => {
     setShowTargetSelection,
     displayItem,
     setDisplayItem,
-    droppedItems,
   } = dungeonData;
 
   const [battleTab, setBattleTab] = useState<
@@ -71,8 +70,6 @@ const DungeonLevelScreen = observer(() => {
   const throttledDungeonSave = throttle((state) => {
     dungeonSave({ enemy: state, dungeonData, appData });
   }, 250);
-
-  useEffect(() => console.log(droppedItems), [droppedItems]);
 
   useEffect(() => {
     throttledDungeonSave(enemyState);

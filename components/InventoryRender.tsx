@@ -182,8 +182,6 @@ export default function InventoryRender({
         const blockSize = width / 14;
         setBlockSize(blockSize);
       }
-    } else {
-      console.log("uh", width, height);
     }
   };
 
