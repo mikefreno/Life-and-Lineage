@@ -1,6 +1,6 @@
 import { TouchableWithoutFeedback, View } from "react-native";
 import { Text, View as ThemedView } from "../../components/Themed";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";

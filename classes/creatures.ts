@@ -347,20 +347,9 @@ export class Creature {
           const itemObj = items.find((item) => item.name == drop.item);
           if (itemObj) {
             drops.push(
-              new Item({
-                name: itemObj.name,
-                slot: itemObj.slot as
-                  | "head"
-                  | "body"
-                  | "one-hand"
-                  | "two-hand"
-                  | "off-hand"
-                  | undefined
-                  | null,
-                stats: itemObj.stats,
-                baseValue: itemObj.baseValue,
-                itemClass: drop.itemType as ItemClassType,
-                icon: itemObj.icon,
+              Item.fromJSON({
+                ...itemObj,
+                itemClass: drop.itemType,
                 stackable: isStackable(drop.itemType as ItemClassType),
               }),
             );

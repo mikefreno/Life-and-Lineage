@@ -5,8 +5,10 @@ import mageSpells from "../assets/json/mageSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import * as Crypto from "expo-crypto";
-import { ItemClassType, type ItemOptions, type Spell } from "../utility/types";
+import { ItemClassType, type ItemOptions } from "../utility/types";
 import { parseSpell } from "../utility/functions/jsonParsing";
+import type { PlayerCharacter } from "./character";
+import { Spell } from "./spell";
 
 export class Item {
   readonly id: string;
@@ -17,6 +19,7 @@ export class Item {
   readonly baseValue: number;
   readonly icon: string | undefined;
   readonly stackable: boolean;
+  readonly requirements: { strength?: number; intelligence?: number };
 
   constructor({
     id,
@@ -26,6 +29,7 @@ export class Item {
     baseValue,
     itemClass,
     icon,
+    requirements,
     stackable = false,
   }: ItemOptions) {
     this.id = id ?? Crypto.randomUUID();
@@ -35,11 +39,35 @@ export class Item {
     this.baseValue = baseValue;
     this.itemClass = itemClass;
     this.icon = icon;
+    this.requirements = requirements ?? {};
     this.stackable = stackable;
   }
 
   get isEquippable() {
     return !!this.slot;
+  }
+
+  public playerHasRequirements(player: PlayerCharacter) {
+    console.log(this.requirements);
+    if (
+      this.requirements.strength &&
+      this.requirements.strength >
+        player.baseStrength + player.allocatedSkillPoints.strength
+    ) {
+      console.log("false");
+      return false;
+    }
+    if (
+      this.requirements.intelligence &&
+      this.requirements.intelligence >
+        player.baseIntelligence + player.allocatedSkillPoints.intelligence
+    ) {
+      console.log("false");
+      return false;
+    }
+
+    console.log("true");
+    return true;
   }
 
   public equals(otherItem: Item) {
@@ -110,6 +138,7 @@ export class Item {
       baseValue: json.baseValue,
       itemClass: json.itemClass,
       stackable: isStackable(json.itemClass),
+      requirements: json.requirements,
       icon: json.icon,
     });
 

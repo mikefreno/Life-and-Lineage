@@ -357,7 +357,9 @@ const RootLayout = observer(() => {
   }, [playerState?.currentSanity, playerState?.currentHealth]);
 
   useEffect(() => {
-    updateNavBar();
+    if (Platform.OS == "android") {
+      updateNavBar();
+    }
   }, [isKeyboardVisible, insets.bottom]);
 
   const updateNavBar = async () => {

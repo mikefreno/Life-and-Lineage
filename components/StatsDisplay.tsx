@@ -13,7 +13,11 @@ import SpellDetails from "./SpellDetails";
 import GenericFlatButton from "./GenericFlatButton";
 import { convertMasteryToString } from "../utility/spellHelper";
 import { AppContext } from "../app/_layout";
-import { Coins } from "../assets/icons/SVGIcons";
+import {
+  Coins,
+  IntelligenceIcon,
+  StrengthIcon,
+} from "../assets/icons/SVGIcons";
 
 type BaseProps = {
   displayItem: {
@@ -71,6 +75,47 @@ export function StatsDisplay({
       setBlockSize(blockSize);
     }
   }, [dimensions.height]);
+
+  const RequirementsBlock = () => {
+    const item = displayItem.item[0];
+    const reqs = item.requirements;
+    if ((reqs.intelligence || reqs.strength) && playerState) {
+      const playerMeetsStrength =
+        reqs.strength &&
+        reqs.strength <
+          playerState.baseStrength + playerState.allocatedSkillPoints.strength;
+      const playerMeetsIntelligence =
+        reqs.intelligence &&
+        reqs.intelligence <
+          playerState.baseIntelligence +
+            playerState.allocatedSkillPoints.intelligence;
+      if (playerMeetsStrength && playerMeetsIntelligence) return null;
+      return (
+        <View className="flex items-center p-1 rounded-lg border border-red-700">
+          <Text>Requires:</Text>
+          <View className="flex flex-row items-center justify-evenly">
+            <Text
+              className="text-sm"
+              style={{ color: playerMeetsStrength ? "#22c55e" : "#b91c1c" }}
+            >
+              {reqs.strength}
+            </Text>
+            <StrengthIcon color={"#ef4444"} height={14} width={16} />
+          </View>
+          <View className="flex flex-row items-center justify-evenly">
+            <Text
+              className="text-sm pr-1"
+              style={{ color: playerMeetsIntelligence ? "#22c55e" : "#b91c1c" }}
+            >
+              {reqs.intelligence}
+            </Text>
+            <IntelligenceIcon color={"#60a5fa"} height={14} width={16} />
+          </View>
+        </View>
+      );
+    }
+    return null;
+  };
 
   const SaleSection = () => {
     if (playerState) {
@@ -308,13 +353,14 @@ export function StatsDisplay({
           <GearStatsDisplay stats={displayItem.item[0].stats} />
         </View>
       ) : null}
+      <RequirementsBlock />
       {(displayItem.item[0].slot == "one-hand" ||
         displayItem.item[0].slot == "two-hand" ||
         displayItem.item[0].slot == "off-hand") && (
         <Text className="text-sm">{toTitleCase(displayItem.item[0].slot)}</Text>
       )}
       <Text className="text-sm">
-        {displayItem.item[0].itemClass == "bodyArmor"
+        {displayItem.item[0].itemClass == "BodyArmor"
           ? "Body Armor"
           : displayItem.item[0].itemClass == "book" && playerState
           ? bookItemLabel()

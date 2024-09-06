@@ -3,7 +3,7 @@ import {
   getConditionEffectsOnMisc,
 } from "../utility/functions/conditions";
 import { Condition } from "./conditions";
-import { Item } from "./item";
+import { Item, isStackable } from "./item";
 import attacks from "../assets/json/playerAttacks.json";
 import weapons from "../assets/json/items/weapons.json";
 import wands from "../assets/json/items/wands.json";
@@ -840,7 +840,7 @@ export class PlayerCharacter extends Character {
 
     for (const [_, item] of Object.entries(this.equipment)) {
       const stats = item?.stats;
-      if (!stats) continue;
+      if (!stats || !item.playerHasRequirements(this)) continue;
       armor += stats.armor ?? 0;
       damage += stats.damage ?? 0;
       mana += stats.mana ?? 0;
@@ -2023,189 +2023,48 @@ export class Shop {
 }
 
 //----------------------associated functions----------------------//
+
 function getAnItemByType(
   type: string,
   playerClass: "mage" | "paladin" | "necromancer",
 ): Item {
   type = toTitleCase(type);
-  if (type == "Artifact") {
-    const idx = getRandomInt(0, artifacts.length - 1);
-    const itemObj = artifacts[idx];
-    return new Item({
-      name: itemObj.name,
-      baseValue: itemObj.baseValue,
-      slot: null,
-      stats: null,
-      itemClass: ItemClassType[type],
-      icon: itemObj.icon,
-    });
+
+  const itemTypes: { [key: string]: any[] } = {
+    Artifact: artifacts,
+    BodyArmor: bodyArmor,
+    Book:
+      {
+        mage: mageBooks,
+        paladin: paladinBooks,
+        necromancer: necroBooks,
+      }[playerClass] || mageBooks,
+    Focus: foci,
+    Hat: hats,
+    Helmet: helmets,
+    Ingredient: ingredients,
+    Junk: junk,
+    Poison: poison,
+    Potion: potions,
+    Robe: robes,
+    Shield: shields,
+    Wand: wands,
+    Weapon: weapons,
+  };
+
+  if (!(type in itemTypes)) {
+    throw new Error(`Invalid type passed to getAnItemByType(): ${type}`);
   }
-  if (type == "BodyArmor") {
-    const idx = getRandomInt(0, bodyArmor.length - 1);
-    const itemObj = bodyArmor[idx];
-    return new Item({
-      name: itemObj.name,
-      baseValue: itemObj.baseValue,
-      slot: "body",
-      stats: itemObj.stats,
-      itemClass: ItemClassType[type],
-      icon: itemObj.icon,
-    });
-  }
-  if (type == "Book") {
-    let books;
-    if (playerClass == "paladin") {
-      books = paladinBooks;
-    } else if (playerClass == "necromancer") {
-      books = necroBooks;
-    } else {
-      books = mageBooks;
-    }
-    const idx = getRandomInt(0, books.length - 1);
-    const itemObj = books[idx];
-    return new Item({
-      name: itemObj.name,
-      baseValue: itemObj.baseValue,
-      slot: null,
-      stats: null,
-      itemClass: ItemClassType[type],
-      icon: itemObj.icon,
-    });
-  }
-  if (type == "Focus") {
-    const idx = getRandomInt(0, foci.length - 1);
-    const itemObj = foci[idx];
-    return new Item({
-      name: itemObj.name,
-      baseValue: itemObj.baseValue,
-      slot: "off-hand",
-      stats: null,
-      itemClass: ItemClassType[type],
-      icon: itemObj.icon,
-    });
-  }
-  if (type == "Hat") {
-    const idx = getRandomInt(0, hats.length - 1);
-    const itemObj = hats[idx];
-    return new Item({
-      name: itemObj.name,
-      baseValue: itemObj.baseValue,
-      slot: "head",
-      stats: itemObj.stats,
-      itemClass: ItemClassType[type],
-      icon: itemObj.icon,
-    });
-  }
-  if (type == "Helmet") {
-    const idx = getRandomInt(0, helmets.length - 1);
-    const itemObj = helmets[idx];
-    return new Item({
-      name: itemObj.name,
-      baseValue: itemObj.baseValue,
-      slot: "head",
-      stats: itemObj.stats,
-      itemClass: ItemClassType[type],
-      icon: itemObj.icon,
-    });
-  }
-  if (type == "Ingredient") {
-    const idx = getRandomInt(0, ingredients.length - 1);
-    const itemObj = ingredients[idx];
-    return new Item({
-      name: itemObj.name,
-      baseValue: itemObj.baseValue,
-      slot: null,
-      stats: null,
-      itemClass: ItemClassType[type],
-      icon: itemObj.icon,
-    });
-  }
-  if (type == "Junk") {
-    const idx = getRandomInt(0, junk.length - 1);
-    const itemObj = junk[idx];
-    return new Item({
-      name: itemObj.name,
-      baseValue: itemObj.baseValue,
-      slot: null,
-      stats: null,
-      itemClass: ItemClassType[type],
-      icon: itemObj.icon,
-    });
-  }
-  if (type == "Poison") {
-    const idx = getRandomInt(0, poison.length - 1);
-    const itemObj = poison[idx];
-    return new Item({
-      name: itemObj.name,
-      baseValue: itemObj.baseValue,
-      slot: null,
-      stats: null,
-      itemClass: ItemClassType[type],
-      icon: itemObj.icon,
-    });
-  }
-  if (type == "Potion") {
-    const idx = getRandomInt(0, potions.length - 1);
-    const itemObj = potions[idx];
-    return new Item({
-      name: itemObj.name,
-      baseValue: itemObj.baseValue,
-      slot: null,
-      stats: null,
-      itemClass: ItemClassType[type],
-      icon: itemObj.icon,
-    });
-  }
-  if (type == "Robe") {
-    const idx = getRandomInt(0, robes.length - 1);
-    const itemObj = robes[idx];
-    return new Item({
-      name: itemObj.name,
-      baseValue: itemObj.baseValue,
-      slot: "body",
-      stats: itemObj.stats,
-      itemClass: ItemClassType[type],
-      icon: itemObj.icon,
-    });
-  }
-  if (type == "Shield") {
-    const idx = getRandomInt(0, shields.length - 1);
-    const itemObj = shields[idx];
-    return new Item({
-      name: itemObj.name,
-      baseValue: itemObj.baseValue,
-      slot: "off-hand",
-      stats: itemObj.stats,
-      itemClass: ItemClassType[type],
-      icon: itemObj.icon,
-    });
-  }
-  if (type == "Wand") {
-    const idx = getRandomInt(0, wands.length - 1);
-    const itemObj = wands[idx];
-    return new Item({
-      name: itemObj.name,
-      baseValue: itemObj.baseValue,
-      slot: "one-hand",
-      stats: itemObj.stats,
-      itemClass: ItemClassType[type],
-      icon: itemObj.icon,
-    });
-  }
-  if (type == "Weapon") {
-    const idx = getRandomInt(0, weapons.length - 1);
-    const itemObj = weapons[idx];
-    return new Item({
-      name: itemObj.name,
-      baseValue: itemObj.baseValue,
-      slot: itemObj.slot as "one-hand" | "two-hand",
-      stats: itemObj.stats,
-      itemClass: ItemClassType[type],
-      icon: itemObj.icon,
-    });
-  } else {
-    throw new Error(`Invalid type passed to getAnItemByType(), ${type}`);
-  }
+
+  const items = itemTypes[type];
+  const idx = getRandomInt(0, items.length - 1);
+  const itemObj = items[idx];
+
+  return Item.fromJSON({
+    ...itemObj,
+    itemClass: type,
+    stackable: isStackable(type as ItemClassType),
+  });
 }
 
 export function generateInventory(

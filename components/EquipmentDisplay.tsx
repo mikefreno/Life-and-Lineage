@@ -184,7 +184,11 @@ export default function EquipmentDisplay({
                   className="active:scale-90 active:opacity-50"
                 >
                   <View
-                    className="items-center rounded-lg bg-zinc-400"
+                    className={`${
+                      item.playerHasRequirements(playerState)
+                        ? "bg-zinc-400"
+                        : "bg-red-800"
+                    } items-center rounded-lg`}
                     ref={ref}
                     style={{
                       height: blockSize,
@@ -207,7 +211,13 @@ export default function EquipmentDisplay({
             </View>
           ) : slot === "Off-Hand" && isTwoHanded ? (
             <View
-              className="mx-auto z-10 items-center rounded-lg border border-zinc-400 bg-zinc-400"
+              className={`${
+                playerState.equipment.mainHand.playerHasRequirements(
+                  playerState,
+                )
+                  ? "bg-zinc-400"
+                  : "bg-red-500"
+              } mx-auto z-10 items-center rounded-lg border border-zinc-400`}
               style={{ height: blockSize, width: blockSize }}
             >
               <Image

@@ -33,6 +33,9 @@
       "slot":"body",
       "stats":{
          "armor": 20.0
+      },
+      "requirements": {
+         "strength": 5
       }
    },
    {
@@ -42,6 +45,9 @@
       "slot":"body",
       "stats":{
          "armor": 25.0
+      },
+      "requirements": {
+         "strength": 10
       }
    },
    {
@@ -52,6 +58,9 @@
       "stats":{
          "armor": 20.0,
          "health": 50
+      },
+      "requirements": {
+         "strength": 15
       }
    },
    {
@@ -61,6 +70,10 @@
       "slot":"body",
       "stats":{
          "armor": 30.0
+      },
+      "requirements": {
+         "strength": 10,
+         "intelligence": 5
       }
    },
    {
@@ -72,6 +85,10 @@
          "armor": 30.0,
          "health": 100,
          "mana": 100
+      },
+      "requirements": {
+         "strength": 25,
+         "intelligence": 10
       }
    },
    {
@@ -81,6 +98,9 @@
       "slot":"body",
       "stats":{
          "armor": 58.0
+      },
+      "requirements": {
+         "strength": 35
       }
    },
    {
@@ -92,6 +112,10 @@
          "armor": 50.0,
          "health": 250,
          "mana": 100
+      },
+      "requirements": {
+         "strength": 30,
+         "intelligence": 10
       }
    }
 ]

@@ -16,6 +16,7 @@ export interface ItemOptions {
   baseValue: number;
   itemClass: ItemClassType;
   icon?: string;
+  requirements?: { strength?: number; intelligence?: number };
   stackable?: boolean;
 }
 export enum ItemClassType {
@@ -28,7 +29,7 @@ export enum ItemClassType {
   Focus = "focus",
   Weapon = "weapon",
   Shield = "shield",
-  BodyArmor = "bodyArmor",
+  BodyArmor = "BodyArmor",
   Helmet = "helmet",
   Robe = "robe",
   Hat = "hat",
