@@ -5,7 +5,7 @@ import Modal from "react-native-modal";
 import { useColorScheme } from "nativewind";
 import { AppContext } from "../app/_layout";
 import { useVibration } from "../utility/customHooks";
-import { Dimensions, Pressable, Switch } from "react-native";
+import { Dimensions, Platform, Pressable, Switch } from "react-native";
 import {
   loadStoredTutorialState,
   updateStoredTutorialState,
@@ -35,7 +35,12 @@ export default function TutorialModal({
   if (!appData) {
     throw new Error("missing context");
   }
-  const { gameState, androidNavBarVisibility } = appData;
+  const {
+    gameState,
+    androidNavBarVisibility,
+    visibilityWhenOpen,
+    setVisisbilityWhenOpen,
+  } = appData;
   const [tutorialStep, setTutorialStep] = useState<number>(1);
   const tutorialStepRef = useRef<number>(1);
   const { colorScheme } = useColorScheme();
@@ -87,16 +92,26 @@ export default function TutorialModal({
 
   const deviceHeight = Dimensions.get("screen").height;
 
+  useEffect(() => {
+    if (isVisibleCondition && visibilityWhenOpen != androidNavBarVisibility) {
+      console.log("setting");
+      setVisisbilityWhenOpen(androidNavBarVisibility);
+    }
+  }, [androidNavBarVisibility]);
+
   return (
     <Modal
       animationIn="slideInUp"
       animationOut="slideOutDown"
-      backdropOpacity={0.45}
+      backdropTransitionInTiming={Platform.OS === "android" ? -500 : 300}
+      hasBackdrop
+      backdropColor={"#000000a2"}
       animationInTiming={500}
       animationOutTiming={300}
       isVisible={isVisibleCondition}
       deviceHeight={deviceHeight}
-      statusBarTranslucent={androidNavBarVisibility ? false : true}
+      statusBarTranslucent={!visibilityWhenOpen}
+      useNativeDriverForBackdrop
       useNativeDriver
       onBackdropPress={() => {
         if (backFunction) {

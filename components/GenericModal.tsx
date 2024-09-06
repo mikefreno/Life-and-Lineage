@@ -1,5 +1,5 @@
-import { ReactNode, useContext } from "react";
-import { Dimensions } from "react-native";
+import { ReactNode, useContext, useEffect } from "react";
+import { Dimensions, Platform } from "react-native";
 import Modal from "react-native-modal";
 import { View } from "./Themed";
 import { AppContext } from "../app/_layout";
@@ -14,7 +14,7 @@ interface GenericModalProps {
 }
 
 /**
- * `size` is a percentage, default of 83.33...%
+ * `size` is a percentage, default of 83.33%(5/6)
  */
 export default function GenericModal({
   isVisibleCondition,
@@ -27,7 +27,18 @@ export default function GenericModal({
   const deviceHeight = Dimensions.get("screen").height;
   const appData = useContext(AppContext);
   if (!appData) return;
-  const { androidNavBarVisibility } = appData;
+  const {
+    androidNavBarVisibility,
+    visibilityWhenOpen,
+    setVisisbilityWhenOpen,
+  } = appData;
+
+  useEffect(() => {
+    if (isVisibleCondition && visibilityWhenOpen != androidNavBarVisibility) {
+      console.log("setting");
+      setVisisbilityWhenOpen(androidNavBarVisibility);
+    }
+  }, [androidNavBarVisibility]);
 
   return (
     <Modal
@@ -35,12 +46,15 @@ export default function GenericModal({
       animationOut="slideOutDown"
       animationInTiming={500}
       animationOutTiming={300}
-      backdropOpacity={0.45}
+      backdropTransitionInTiming={Platform.OS === "android" ? -500 : 300}
+      hasBackdrop
+      backdropColor={"#000000a2"}
       isVisible={isVisibleCondition}
       onBackdropPress={backdropCloses ? backFunction : undefined}
       onBackButtonPress={backFunction}
       deviceHeight={deviceHeight}
-      statusBarTranslucent={androidNavBarVisibility ? false : true}
+      statusBarTranslucent={!visibilityWhenOpen}
+      useNativeDriverForBackdrop
       useNativeDriver
       style={style}
     >

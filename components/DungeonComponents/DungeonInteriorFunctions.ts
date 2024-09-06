@@ -302,7 +302,6 @@ export const loadBoss = ({ appData, dungeonData }: contextData) => {
   setAttackAnimationOnGoing(false);
   if (thisDungeon && thisInstance && playerState) {
     const boss = thisDungeon.getBoss(thisInstance.name);
-    console.log(boss);
     setEnemy(boss);
     battleLogger(`You found the boss!`);
   }

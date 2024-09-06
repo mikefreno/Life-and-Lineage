@@ -33,7 +33,6 @@ import {
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
 import { damageReduction } from "../utility/functions/misc/numbers";
-import * as NavigationBar from "expo-navigation-bar";
 
 interface PlayerStatus {
   hideGold?: boolean;

@@ -327,4 +327,6 @@ export interface AppContextType {
   setBlockSize: React.Dispatch<React.SetStateAction<number | undefined>>;
   androidNavBarVisibility: boolean;
   setAndroidNavBarVisibility: React.Dispatch<React.SetStateAction<boolean>>;
+  visibilityWhenOpen: boolean;
+  setVisisbilityWhenOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }

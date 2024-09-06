@@ -51,11 +51,7 @@ export default function TabLayout() {
             return (
               <>
                 <PlayerStatus home hideGold />
-                {Platform.OS == "ios" ? (
-                  <LinearGradientBlur />
-                ) : (
-                  <ThemedView style={StyleSheet.absoluteFill} />
-                )}
+                <LinearGradientBlur />
               </>
             );
           },

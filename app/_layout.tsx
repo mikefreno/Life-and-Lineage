@@ -37,6 +37,7 @@ import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+import { useFocusEffect } from "@react-navigation/native";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -128,6 +129,7 @@ const Root = observer(() => {
   const { setColorScheme, colorScheme } = useColorScheme();
   const [androidNavBarVisibility, setAndroidNavBarVisibility] =
     useState<boolean>(false);
+  const [visibilityWhenOpen, setVisisbilityWhenOpen] = useState<boolean>(true);
   const [expoPushToken, setExpoPushToken] = useState("");
   const [notification, setNotification] = useState<
     Notifications.Notification | undefined
@@ -270,6 +272,8 @@ const Root = observer(() => {
           setBlockSize,
           androidNavBarVisibility,
           setAndroidNavBarVisibility,
+          visibilityWhenOpen,
+          setVisisbilityWhenOpen,
         }}
       >
         <SafeAreaProvider>
@@ -291,8 +295,8 @@ const RootLayout = observer(() => {
   const {
     playerState,
     gameState,
+    androidNavBarVisibility,
     setAndroidNavBarVisibility,
-    showDetailedStatusView,
   } = appData;
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
@@ -351,9 +355,37 @@ const RootLayout = observer(() => {
     }
   }, [playerState?.currentSanity, playerState?.currentHealth]);
 
-  useEffect(() => {
-    getAndSetNavBar();
-  }, [colorScheme, isKeyboardVisible, insets.bottom]);
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS === "android") {
+        const updateNavBar = async () => {
+          const isVisible =
+            (await NavigationBar.getVisibilityAsync()) === "visible";
+          if (androidNavBarVisibility !== isVisible) {
+            setAndroidNavBarVisibility(isVisible);
+          }
+
+          if (isKeyboardVisible && !isVisible) {
+            await NavigationBar.setVisibilityAsync("visible");
+            await NavigationBar.setPositionAsync("relative");
+            await NavigationBar.setBehaviorAsync("inset-touch");
+          } else if (!isKeyboardVisible && isVisible) {
+            await NavigationBar.setVisibilityAsync("hidden");
+            await NavigationBar.setPositionAsync("absolute");
+            await NavigationBar.setBehaviorAsync("overlay-swipe");
+          }
+
+          if (!navbarLoad) {
+            setNavbarLoad(true);
+          }
+        };
+
+        updateNavBar();
+      } else {
+        setNavbarLoad(true);
+      }
+    }, [isKeyboardVisible, insets.bottom]),
+  );
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -375,28 +407,6 @@ const RootLayout = observer(() => {
     };
   }, []);
 
-  async function getAndSetNavBar() {
-    if (Platform.OS === "android") {
-      let isVisible = (await NavigationBar.getVisibilityAsync()) == "visible";
-
-      setAndroidNavBarVisibility(isVisible);
-      if (isKeyboardVisible && !isVisible) {
-        await NavigationBar.setVisibilityAsync("visible");
-        await NavigationBar.setPositionAsync("relative");
-        await NavigationBar.setBehaviorAsync("inset-touch");
-      } else if (!isKeyboardVisible && isVisible) {
-        await NavigationBar.setVisibilityAsync("hidden");
-        await NavigationBar.setPositionAsync("absolute");
-        await NavigationBar.setBehaviorAsync("overlay-swipe");
-      }
-
-      if (!navbarLoad) {
-        setNavbarLoad(true);
-      }
-    } else {
-      setNavbarLoad(true);
-    }
-  }
   while (!fontLoaded) {
     return (
       <ThemedView className="flex-1 items-center justify-center">
@@ -407,7 +417,7 @@ const RootLayout = observer(() => {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <StatusBar style={colorScheme == "light" ? "dark" : "light"} />
+      <StatusBar />
       <Stack>
         <Stack.Screen
           name="(tabs)"
@@ -433,52 +443,46 @@ const RootLayout = observer(() => {
         />
         <Stack.Screen
           name="Relationships"
-          options={{
-            headerBackTitleVisible: false,
-            headerTransparent: true,
-            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackground: () => (
-              <BlurView
-                blurReductionFactor={12}
-                tint={
-                  Platform.OS == "android"
-                    ? colorScheme == "light"
-                      ? "light"
-                      : "dark"
-                    : "default"
-                }
-                intensity={100}
-                style={StyleSheet.absoluteFill}
-                experimentalBlurMethod={"dimezisBlurView"}
-              />
-            ),
-          }}
+          options={headerOptions(colorScheme)}
         />
         <Stack.Screen
           name="Shops/[shop]"
-          options={{
-            headerBackTitleVisible: false,
-            headerTransparent: true,
-            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackground: () => (
-              <BlurView
-                blurReductionFactor={12}
-                tint={
-                  Platform.OS == "android"
-                    ? colorScheme == "light"
-                      ? "light"
-                      : "dark"
-                    : "default"
-                }
-                intensity={100}
-                style={StyleSheet.absoluteFill}
-                experimentalBlurMethod={"dimezisBlurView"}
-              />
-            ),
-          }}
+          options={headerOptions(colorScheme, true)}
         />
       </Stack>
     </ThemeProvider>
   );
 });
 export default Sentry.wrap(Root);
+
+const headerOptions = (colorScheme: "light" | "dark", shop?: boolean) =>
+  Platform.OS == "ios" || shop
+    ? {
+        headerBackTitleVisible: false,
+        headerTransparent: true,
+        headerTitleStyle: {
+          fontFamily: "PixelifySans",
+          fontSize: 22,
+        },
+        headerBackground: () => (
+          <BlurView
+            blurReductionFactor={12}
+            tint={
+              Platform.OS == "android"
+                ? colorScheme == "light"
+                  ? "light"
+                  : "dark"
+                : "default"
+            }
+            intensity={100}
+            style={StyleSheet.absoluteFill}
+            experimentalBlurMethod={"dimezisBlurView"}
+          />
+        ),
+      }
+    : {
+        headerTitleStyle: {
+          fontFamily: "PixelifySans",
+          fontSize: 22,
+        },
+      };

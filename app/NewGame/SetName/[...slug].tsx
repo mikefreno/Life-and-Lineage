@@ -36,6 +36,11 @@ export default function SetName() {
   const vibration = useVibration();
   const { colorScheme } = useColorScheme();
 
+  function trimWhitespace(str: string) {
+    // Trim leading and trailing spaces, then replace multiple spaces with a single space
+    return str.trim().replace(/\s+/g, " ");
+  }
+
   const accent =
     playerClass == "mage"
       ? "#2563eb"
@@ -95,9 +100,7 @@ export default function SetName() {
                   fontSize: 20,
                 }}
               />
-              <Text className="pl-1 pt-1 pb-2">
-                Minimum Length: 2, Maximum Length: 16
-              </Text>
+              <Text className="pl-1 pt-1 pb-2">Maximum Length: 16</Text>
               <TextInput
                 className="rounded border border-zinc-800 pl-2 text-black dark:border-zinc-100 dark:text-zinc-50"
                 onChangeText={(text) => {
@@ -120,18 +123,17 @@ export default function SetName() {
                   fontSize: 20,
                 }}
               />
-              <Text className="pl-1 pt-1 pb-2">
-                Minimum Length: 3, Maximum Length: 16
-              </Text>
+              <Text className="pl-1 pt-1 pb-2">Maximum Length: 16</Text>
               <View className="pb-16">
-                {firstName.trimEnd().length >= 2 &&
-                lastName.trimEnd().length >= 3 ? (
+                {firstName.trimEnd() && lastName.trimEnd() ? (
                   <View className="mx-auto">
                     <Pressable
                       onPress={() => {
                         vibration({ style: "light" });
                         router.push(
-                          `/NewGame/Review/${playerClass}/${blessing}/${sex}/${firstNameRef.current?.trimEnd()}/${lastNameRef.current?.trimEnd()}`,
+                          `/NewGame/Review/${playerClass}/${blessing}/${sex}/${trimWhitespace(
+                            firstName,
+                          )}/${trimWhitespace(lastName)}`,
                         );
                       }}
                       className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
