@@ -42,7 +42,6 @@ export default function GenericModal({
       visibilityWhenOpen == "notset"
     ) {
       wait(200).then(() => {
-        console.log("setting");
         setVisisbilityWhenOpen(androidNavBarVisibility);
       });
     }
