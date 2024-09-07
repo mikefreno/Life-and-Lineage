@@ -45,6 +45,13 @@
       "debuffs": [{"name":"stun", "chance":0.25}]
    },
    {
+      "name": "crushing blow",
+      "targets": "single",
+      "hitChance": 0.95,
+      "damageMult": 1.0,
+      "debuffs": [{"name":"execute", "chance":0.05}]
+   },
+   {
       "name": "cast",
       "targets": "single",
       "hitChance": 1.0,
@@ -73,6 +80,20 @@
       "name": "aimed shot",
       "targets": "single",
       "hitChance": 1.0,
-      "damageMult": 1.25
+      "damageMult": 1.5,
+      "buff": [{"name":"stun", "chance":0.5}]
+   },
+   {
+      "name": "poison shot",
+      "targets": "single",
+      "hitChance": 1.0,
+      "damageMult": 0.85,
+      "debuffs": [{"name":"poison", "chance": 0.65}]
+   },
+   {
+      "name": "overdraw",
+      "targets": "single",
+      "hitChance": 0.80,
+      "damageMult": 1.75
    }
 ]

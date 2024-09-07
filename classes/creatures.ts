@@ -286,6 +286,14 @@ export class Creature {
           | AttackUse.stunned;
         logString: string;
       } {
+    if (this.conditions.find((cond) => cond.name == "execute")) {
+      this.damageHealth(9999);
+      this.endTurn();
+      return {
+        result: AttackUse.stunned,
+        logString: `${toTitleCase(this.creatureSpecies)} was executed!`,
+      };
+    }
     if (this.isStunned) {
       this.endTurn();
       return {

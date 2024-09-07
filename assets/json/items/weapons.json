@@ -17,6 +17,9 @@
       "icon": "Wood_Log",
       "stats":{
          "damage": 4.5
+      },
+      "requirements":{
+         "strength": 5
       }
    },
    {
@@ -57,7 +60,11 @@
       "icon":"Hammer",
       "stats":{
          "damage": 6.5
+      },
+      "requirements":{
+         "strength": 8
       }
+      
    },
    {
       "name": "rat-smasher",
@@ -67,6 +74,9 @@
       "icon":"Hammer",
       "stats":{
          "damage": 10.5
+      },
+      "requirements":{
+         "strength": 10
       }
    },
    {
@@ -77,6 +87,10 @@
       "icon":"Iron_Sword",
       "stats":{
          "damage": 10.0
+      },
+      "requirements":{
+         "strength": 8,
+         "dexterity": 5
       }
    },
    {
@@ -87,6 +101,9 @@
       "icon":"Iron_Sword",
       "stats":{
          "damage": 20.0
+      },
+      "requirements":{
+         "strength": 12
       }
    },
    {
@@ -97,16 +114,23 @@
       "icon":"Silver_Sword",
       "stats":{
          "damage": 16.0
+      },
+      "requirements":{
+         "strength": 10,
+         "dexterity": 8
       }
    },
    {
-      "name": "claymore",
+      "name": "axe",
       "baseValue": 25000,
-      "slot": "two-hand",
+      "slot": "one-hand",
       "attacks": ["slash", "cleave"],
-      "icon":"Iron_Sword",
+      "icon":"ax",
       "stats":{
-         "damage": 27.0
+         "damage": 20.0
+      },
+      "requirements":{
+         "strength": 15
       }
    },
    {
@@ -116,7 +140,10 @@
       "attacks": ["slash", "cleave"],
       "icon":"Iron_Sword",
       "stats":{
-         "damage": 31.5
+         "damage": 29.5
+      },
+      "requirements":{
+         "strength": 20
       }
    },
    {
@@ -126,27 +153,103 @@
       "attacks": ["slash", "serrate"],
       "icon":"Knife",
       "stats":{
-         "damage": 23.0
+         "damage": 22.0
+      },
+      "requirements":{
+         "strength": 10,
+         "dexterity": 20
       }
    },
    {
-      "name": "royal greatsword",
-      "baseValue": 42000,
+      "name": "greataxe",
+      "baseValue": 65000,
+      "slot": "two-hand",
+      "attacks": ["hack"],
+      "icon":"axe",
+      "stats":{
+         "damage": 33.5
+      },
+      "requirements":{
+         "strength": 28
+      }
+   },   {
+      "name": "greatsword",
+      "baseValue": 65000,
+      "slot": "two-hand",
+      "attacks": ["slash", "cleave"],
+      "icon":"Iron_Sword",
+      "stats":{
+         "damage": 37.5
+      },
+      "requirements":{
+         "strength": 30
+      }
+   },
+   {
+      "name": "royal longsword",
+      "baseValue": 85000,
       "slot": "two-hand",
       "attacks": ["slash", "cleave"],
       "icon":"Golden_Sword",
       "stats":{
          "damage": 35.0
+      },
+      "requirements":{
+         "strength": 25,
+         "dexterity": 15
+      }
+   },
+   {
+      "name": "barbarian war axe",
+      "baseValue": 150000,
+      "slot": "one-hand",
+      "attacks": ["hack"],
+      "icon":"Axe",
+      "stats":{
+         "damage": 30.5
+      },
+      "requirements":{
+         "strength": 33
+      }
+   },
+   {
+      "name": "knight's greatsword",
+      "baseValue": 225000,
+      "slot": "two-hand",
+      "attacks": ["slash", "cleave"],
+      "icon":"Golden_Sword",
+      "stats":{
+         "damage": 35.5
+      },
+      "requirements":{
+         "strength": 32
       }
    },
    {
       "name": "crusader's longsword",
-      "baseValue": 50000,
+      "baseValue": 310000,
       "slot": "one-hand",
       "attacks": ["slash", "cleave"],
       "icon":"Golden_Sword",
       "stats":{
-         "damage": 25.0
+         "damage": 33.0
+      },
+      "requirements":{
+         "strength": 30,
+         "dexterity": 15
+      }
+   },
+   {
+      "name": "crusader's war hammer",
+      "baseValue": 310000,
+      "slot": "two-hand",
+      "attacks": ["slash", "cleave"],
+      "icon":"Golden_Hammer",
+      "stats":{
+         "damage": 45.0
+      },
+      "requirements":{
+         "strength": 45
       }
    }
 ]

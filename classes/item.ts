@@ -206,6 +206,8 @@ const itemMap: { [key: string]: any } = {
   Goblin_Staff: require("../assets/images/items/Goblin_Staff.png"),
   Great_Bow: require("../assets/images/items/Great_Bow.png"),
   Black_Bow: require("../assets/images/items/Black_Bow.png"),
+  Axe: require("../assets/images/items/Axe.png"),
+  Golden_Hammer: require("../assets/images/items/Golden_Hammer.png"),
 };
 
 export const isStackable = (itemClass: ItemClassType) => {

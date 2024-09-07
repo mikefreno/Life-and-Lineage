@@ -280,6 +280,16 @@
       "effectStyle": [null],
       "effectAmount": [null],
       "icon": "blood_orb"
+   },
+   {
+      "name": "execute",
+      "style": "buff",
+      "turns": 1,
+      "aura": false,
+      "effect": ["execution"],
+      "effectStyle": [null],
+      "effectAmount": [null],
+      "icon":"skull_and_crossbones"
    }
 ]
 

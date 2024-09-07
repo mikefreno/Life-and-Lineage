@@ -78,7 +78,7 @@
    {
       "name": "crusader's helm",
       "baseValue": 75000,
-      "icon": "Iron_Helmet",
+      "icon": "Helm",
       "slot":"head",
       "stats":{
          "armor": 15.0,
@@ -93,7 +93,7 @@
    {
       "name": "helm of fortune",
       "baseValue": 225000,
-      "icon": "Iron_Helmet",
+      "icon": "Helm",
       "slot":"head",
       "stats":{
          "armor": 25.0
@@ -105,7 +105,7 @@
    {
       "name": "kingsman helm",
       "baseValue": 550000,
-      "icon": "Iron_Helmet",
+      "icon": "Helm",
       "slot":"head",
       "stats":{
          "armor": 22.0,

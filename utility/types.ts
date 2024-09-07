@@ -176,7 +176,8 @@ export type EffectOptions =
   | "blur"
   | "thorns"
   | "revenge"
-  | "blood magic consumable";
+  | "blood magic consumable"
+  | "execute";
 
 export type EffectStyle = "multiplier" | "percentage" | "flat";
 
