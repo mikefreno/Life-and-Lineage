@@ -198,6 +198,7 @@ type PlayerCharacterBase = {
   baseSanity: number;
   baseStrength: number;
   baseIntelligence: number;
+  baseDexterity: number;
   baseManaRegen: number;
   parents: Character[];
   birthdate: string;
@@ -255,6 +256,7 @@ type PlayerCharacterBase = {
     offHand: Item | null;
     head: Item | null;
     body: Item | null;
+    quiver: Item[] | null;
   };
   investments?: Investment[];
   unAllocatedSkillPoints?: number;
@@ -264,6 +266,7 @@ type PlayerCharacterBase = {
     sanity: number;
     strength: number;
     intelligence: number;
+    dexterity: number;
   };
 
   alive?: boolean;
@@ -302,6 +305,7 @@ export class PlayerCharacter extends Character {
   baseManaRegen: number;
   baseStrength: number;
   baseIntelligence: number;
+  baseDexterity: number;
 
   currentSanity: number;
   currentMana: number;
@@ -318,6 +322,7 @@ export class PlayerCharacter extends Character {
     sanity: number;
     strength: number;
     intelligence: number;
+    dexterity: number;
   };
 
   knownSpells: string[];
@@ -352,6 +357,7 @@ export class PlayerCharacter extends Character {
     offHand: Item | null;
     head: Item | null;
     body: Item | null;
+    quiver: Item[] | null;
   };
   investments: Investment[];
 
@@ -376,6 +382,7 @@ export class PlayerCharacter extends Character {
     baseManaRegen,
     baseStrength,
     baseIntelligence,
+    baseDexterity,
     minions,
     jobExperience,
     learningSpells,
@@ -416,6 +423,7 @@ export class PlayerCharacter extends Character {
     this.baseMana = baseMana;
     this.baseStrength = baseStrength;
     this.baseIntelligence = baseIntelligence;
+    this.baseDexterity = baseDexterity;
     this.baseManaRegen = baseManaRegen;
 
     this.magicProficiencies =
@@ -433,6 +441,7 @@ export class PlayerCharacter extends Character {
       sanity: 0,
       strength: 0,
       intelligence: 0,
+      dexterity: 0,
     };
 
     this.gold =
@@ -462,6 +471,7 @@ export class PlayerCharacter extends Character {
       offHand: null,
       head: null,
       body: null,
+      quiver: null,
     };
     this.investments = investments ?? [];
 
@@ -496,6 +506,8 @@ export class PlayerCharacter extends Character {
       totalStrength: computed,
       baseIntelligence: observable,
       totalIntelligence: computed,
+      baseDexterity: observable,
+      totalDexterity: computed,
       attackPower: computed,
       magicPower: computed,
 
@@ -797,6 +809,27 @@ export class PlayerCharacter extends Character {
   get magicPower() {
     return this.totalIntelligence * 0.5;
   }
+  //----------------------------------Dexterity-------------------------------//
+  get totalDexterity() {
+    // needs conditionals added to it, at time of righting no conditions affect this stat
+
+    return (
+      this.baseDexterity +
+      this.allocatedSkillPoints.dexterity +
+      this.equipmentStats.dexterity
+    );
+  }
+
+  get nonConditionalDexterity() {
+    return (
+      this.baseDexterity +
+      this.allocatedSkillPoints.dexterity +
+      this.equipmentStats.dexterity
+    );
+  }
+  get criticalChance() {
+    return this.totalDexterity * 0.1;
+  }
   //----------------------------------Inventory----------------------------------//
   public addToInventory(item: Item | null) {
     if (item && item.name !== "unarmored") {
@@ -837,19 +870,25 @@ export class PlayerCharacter extends Character {
     let blockChance = 0;
     let strength = 0;
     let intelligence = 0;
+    let dexterity = 0;
 
     for (const [_, item] of Object.entries(this.equipment)) {
-      const stats = item?.stats;
-      if (!stats || !item.playerHasRequirements(this)) continue;
-      armor += stats.armor ?? 0;
-      damage += stats.damage ?? 0;
-      mana += stats.mana ?? 0;
-      regen += stats.regen ?? 0;
-      health += stats.health ?? 0;
-      sanity += stats.sanity ?? 0;
-      blockChance += stats.blockChance ?? 0;
-      strength += stats.strength ?? 0;
-      intelligence += stats.strength ?? 0;
+      if (item && "length" in item) {
+        continue; // arrows do not provide stats, only quiver accepts array
+      } else {
+        const stats = item?.stats;
+        if (!stats || !item.playerHasRequirements(this)) continue;
+        armor += stats.armor ?? 0;
+        damage += stats.damage ?? 0;
+        mana += stats.mana ?? 0;
+        regen += stats.regen ?? 0;
+        health += stats.health ?? 0;
+        sanity += stats.sanity ?? 0;
+        blockChance += stats.blockChance ?? 0;
+        strength += stats.strength ?? 0;
+        intelligence += stats.intelligence ?? 0;
+        dexterity += stats.dexterity ?? 0;
+      }
     }
 
     return {
@@ -862,6 +901,7 @@ export class PlayerCharacter extends Character {
       blockChance,
       strength,
       intelligence,
+      dexterity,
     };
   }
 

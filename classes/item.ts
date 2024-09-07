@@ -19,7 +19,11 @@ export class Item {
   readonly baseValue: number;
   readonly icon: string | undefined;
   readonly stackable: boolean;
-  readonly requirements: { strength?: number; intelligence?: number };
+  readonly requirements: {
+    strength?: number;
+    intelligence?: number;
+    dexterity?: number;
+  };
 
   constructor({
     id,
@@ -60,6 +64,13 @@ export class Item {
       this.requirements.intelligence &&
       this.requirements.intelligence >
         player.baseIntelligence + player.allocatedSkillPoints.intelligence
+    ) {
+      return false;
+    }
+    if (
+      this.requirements.dexterity &&
+      this.requirements.dexterity >
+        player.baseDexterity + player.allocatedSkillPoints.dexterity
     ) {
       return false;
     }
