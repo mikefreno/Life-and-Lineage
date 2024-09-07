@@ -54,7 +54,6 @@ export class Item {
       this.requirements.strength >
         player.baseStrength + player.allocatedSkillPoints.strength
     ) {
-      console.log("false");
       return false;
     }
     if (
@@ -62,11 +61,9 @@ export class Item {
       this.requirements.intelligence >
         player.baseIntelligence + player.allocatedSkillPoints.intelligence
     ) {
-      console.log("false");
       return false;
     }
 
-    console.log("true");
     return true;
   }
 
@@ -196,6 +193,8 @@ const itemMap: { [key: string]: any } = {
   Wooden_Shield: require("../assets/images/items/Wooden_Shield.png"),
   Wooden_Sword: require("../assets/images/items/Wooden_Sword.png"),
   Goblin_Staff: require("../assets/images/items/Goblin_Staff.png"),
+  Great_Bow: require("../assets/images/items/Great_Bow.png"),
+  Black_Bow: require("../assets/images/items/Black_Bow.png"),
 };
 
 export const isStackable = (itemClass: ItemClassType) => {
