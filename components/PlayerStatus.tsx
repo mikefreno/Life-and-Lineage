@@ -23,6 +23,7 @@ import { useIsFocused } from "@react-navigation/native";
 import {
   ClockIcon,
   Coins,
+  DexterityIcon,
   Energy,
   HealthIcon,
   IntelligenceIcon,
@@ -841,6 +842,49 @@ const PlayerStatus = observer(
                               vibration({ style: "light" });
                               playerState.removeSkillPoint({
                                 from: "strength",
+                              });
+                            }}
+                          >
+                            {({ pressed }) => (
+                              <View className={pressed ? "scale-95" : ""}>
+                                <SquareMinus height={28} width={28} />
+                              </View>
+                            )}
+                          </Pressable>
+                        )}
+                    </View>
+                  </View>
+                </View>
+                <View className="flex items-center">
+                  <Text className="py-1">Dexterity</Text>
+                  <View className="flex flex-row">
+                    <Text>{playerState.totalDexterity}</Text>
+                    <DexterityIcon height={20} width={23} />
+                    <View className="flex flex-row items-center">
+                      {playerState.unAllocatedSkillPoints > 0 &&
+                        !respeccing && (
+                          <Pressable
+                            className="px-0.5"
+                            onPress={() => {
+                              vibration({ style: "light" });
+                              playerState.addSkillPoint({ to: "dexterity" });
+                            }}
+                          >
+                            {({ pressed }) => (
+                              <View className={pressed ? "scale-95" : ""}>
+                                <SquarePlus height={28} width={28} />
+                              </View>
+                            )}
+                          </Pressable>
+                        )}
+                      {playerState.allocatedSkillPoints.dexterity > 0 &&
+                        respeccing && (
+                          <Pressable
+                            className="px-0.5"
+                            onPress={() => {
+                              vibration({ style: "light" });
+                              playerState.removeSkillPoint({
+                                from: "dexterity",
                               });
                             }}
                           >

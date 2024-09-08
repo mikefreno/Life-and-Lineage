@@ -94,7 +94,7 @@ export default function EquipmentDisplay({
               ) {
                 playerState?.unEquipItem(item);
               } else {
-                playerState?.equipItem(item);
+                playerState?.equipItem([item]);
               }
             }
           },

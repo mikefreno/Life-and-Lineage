@@ -284,14 +284,19 @@ type PaladinCharacter = PlayerCharacterBase & {
   playerClass: "paladin";
   blessing: "holy" | "vengeance" | "protection";
 };
+type RangerCharacter = PlayerCharacterBase & {
+  playerClass: "ranger";
+  blessing: "assassination" | "beastMastery" | "arcane";
+};
 
 type PlayerCharacterOptions =
   | MageCharacter
   | NecromancerCharacter
-  | PaladinCharacter;
+  | PaladinCharacter
+  | RangerCharacter;
 
 export class PlayerCharacter extends Character {
-  readonly playerClass: "mage" | "necromancer" | "paladin";
+  readonly playerClass: "mage" | "necromancer" | "paladin" | "ranger";
   readonly blessing: Element;
   readonly parents: Character[];
 
@@ -592,6 +597,7 @@ export class PlayerCharacter extends Character {
       | "sanity"
       | "strength"
       | "intelligence"
+      | "dexterity"
       | "unallocated";
   }) {
     switch (to) {
@@ -600,6 +606,7 @@ export class PlayerCharacter extends Character {
       case "sanity":
       case "strength":
       case "intelligence":
+      case "dexterity":
         this.unAllocatedSkillPoints -= amount;
         this.allocatedSkillPoints[to] += amount;
         break;
@@ -614,7 +621,13 @@ export class PlayerCharacter extends Character {
     from,
   }: {
     amount?: number;
-    from: "health" | "mana" | "sanity" | "strength" | "intelligence";
+    from:
+      | "health"
+      | "mana"
+      | "sanity"
+      | "strength"
+      | "intelligence"
+      | "dexterity";
   }) {
     if (this.allocatedSkillPoints[from] >= amount) {
       this.allocatedSkillPoints[from] -= amount;
@@ -628,7 +641,8 @@ export class PlayerCharacter extends Character {
       this.allocatedSkillPoints.mana +
       this.allocatedSkillPoints.sanity +
       this.allocatedSkillPoints.strength +
-      this.allocatedSkillPoints.intelligence
+      this.allocatedSkillPoints.intelligence +
+      this.allocatedSkillPoints.dexterity
     );
   }
   //----------------------------------Health----------------------------------//
@@ -831,8 +845,10 @@ export class PlayerCharacter extends Character {
     return this.totalDexterity * 0.1;
   }
   //----------------------------------Inventory----------------------------------//
-  public addToInventory(item: Item | null) {
-    if (item && item.name !== "unarmored") {
+  public addToInventory(item: Item | Item[] | null) {
+    if (Array.isArray(item)) {
+      this.inventory = this.inventory.concat(item);
+    } else if (item && item.name !== "unarmored") {
       this.inventory.push(item);
     }
   }
@@ -905,18 +921,18 @@ export class PlayerCharacter extends Character {
     };
   }
 
-  public equipItem(item: Item) {
+  public equipItem(item: Item[]) {
     const offsets = this.gatherOffsets();
-    switch (item.slot) {
+    switch (item[0].slot) {
       case "head":
         this.removeEquipment("head");
-        this.equipment.head = item;
-        this.removeFromInventory(item);
+        this.equipment.head = item[0];
+        this.removeFromInventory(item[0]);
         break;
       case "body":
         this.removeEquipment("body");
-        this.equipment.body = item;
-        this.removeFromInventory(item);
+        this.equipment.body = item[0];
+        this.removeFromInventory(item[0]);
         break;
       case "off-hand":
         this.removeEquipment("offHand");
@@ -924,31 +940,35 @@ export class PlayerCharacter extends Character {
           this.removeEquipment("mainHand");
           this.setUnarmored();
         }
-        this.equipment.offHand = item;
-        this.removeFromInventory(item);
+        this.equipment.offHand = item[0];
+        this.removeFromInventory(item[0]);
         break;
       case "two-hand":
         this.removeEquipment("mainHand");
         this.removeEquipment("offHand");
-        this.equipment.mainHand = item;
-        this.removeFromInventory(item);
+        this.equipment.mainHand = item[0];
+        this.removeFromInventory(item[0]);
         break;
       case "one-hand":
         if (this.equipment.mainHand.name == "unarmored") {
-          this.equipment.mainHand = item;
+          this.equipment.mainHand = item[0];
         } else if (this.equipment.mainHand.slot == "two-hand") {
           this.removeEquipment("mainHand");
-          this.equipment.mainHand = item;
+          this.equipment.mainHand = item[0];
         } else {
           if (this.equipment.offHand?.slot == "off-hand") {
             this.removeEquipment("mainHand");
-            this.equipment.mainHand = item;
+            this.equipment.mainHand = item[0];
           } else {
             this.removeEquipment("offHand");
-            this.equipment.offHand = item;
+            this.equipment.offHand = item[0];
           }
         }
-        this.removeFromInventory(item);
+        this.removeFromInventory(item[0]);
+        break;
+      case "quiver":
+        this.removeEquipment("quiver");
+        this.equipment.quiver = item;
         break;
     }
     this.resolveOffsets(offsets);
@@ -998,11 +1018,15 @@ export class PlayerCharacter extends Character {
       this.removeEquipment("mainHand");
     } else if (this.equipment.offHand?.equals(item)) {
       this.removeEquipment("offHand");
+    } else if (this.equipment.quiver?.find((arrow) => arrow.equals(item))) {
+      this.removeEquipment("quiver");
     }
     this.resolveOffsets(offsets);
   }
 
-  public removeEquipment(slot: "mainHand" | "offHand" | "body" | "head") {
+  public removeEquipment(
+    slot: "mainHand" | "offHand" | "body" | "head" | "quiver",
+  ) {
     if (slot === "mainHand") {
       this.addToInventory(this.equipment.mainHand);
       this.setUnarmored();
@@ -1014,6 +1038,9 @@ export class PlayerCharacter extends Character {
       this.equipment.body = null;
     } else if (slot == "head") {
       this.addToInventory(this.equipment.head);
+      this.equipment.head = null;
+    } else if (slot == "quiver") {
+      this.addToInventory(this.equipment.quiver);
       this.equipment.head = null;
     }
   }
@@ -1229,7 +1256,6 @@ export class PlayerCharacter extends Character {
       if (found) {
         const spell = new Spell({
           name: found.name,
-          player: this,
           element: Element[found.element],
           proficiencyNeeded: found.proficiencyNeeded,
           manaCost: found.manaCost,
@@ -1748,6 +1774,9 @@ export class PlayerCharacter extends Character {
             head: json.equipment.head
               ? Item.fromJSON(json.equipment.head)
               : null,
+            quiver: json.equipment.quiver
+              ? json.equipment.quiver.map((arrow: any) => Item.fromJSON(arrow))
+              : null,
           }
         : undefined,
       conditions: json.conditions
@@ -1762,6 +1791,7 @@ export class PlayerCharacter extends Character {
       allocatedSkillPoints: json.allocatedSkillPoints,
       baseStrength: json.baseStrength,
       baseIntelligence: json.baseIntelligence,
+      baseDexterity: json.baseDexterity,
     });
     return player;
   }
@@ -1777,22 +1807,8 @@ interface performLaborProps {
   title: string;
 }
 
-interface playerAttackDeps {
-  chosenAttack: AttackObj;
-  enemyMaxHP: number;
-  enemyMaxSanity: number | null;
-  enemyDR: number;
-  enemyConditions: Condition[];
-}
-
-interface playerSpellDeps {
-  chosenSpell: Spell;
-  enemyMaxHP: number;
-  enemyMaxSanity: number | null;
-}
-
 function getStartingProficiencies(
-  playerClass: "mage" | "necromancer" | "paladin",
+  playerClass: "mage" | "necromancer" | "paladin" | "ranger",
   blessing: Element,
 ) {
   if (playerClass == "paladin") {
@@ -1825,7 +1841,7 @@ function getStartingProficiencies(
       { school: Element.bone, proficiency: blessing == Element.bone ? 50 : 0 },
     ];
     return starter;
-  } else {
+  } else if (playerClass == "mage") {
     const starter = [
       { school: Element.fire, proficiency: blessing == Element.fire ? 50 : 0 },
       {
@@ -1839,112 +1855,112 @@ function getStartingProficiencies(
       },
     ];
     return starter;
+  } else if (playerClass == "ranger") {
+    const starter = [
+      {
+        school: Element.arcane,
+        proficiency: blessing == Element.arcane ? 50 : 0,
+      },
+      {
+        school: Element.beastMastery,
+        proficiency: blessing == Element.beastMastery ? 50 : 0,
+      },
+      {
+        school: Element.assassination,
+        proficiency: blessing == Element.assassination ? 50 : 0,
+      },
+    ];
+    return starter;
   }
 }
 
-export function getStartingBook(
-  playerBlessing:
-    | "fire"
-    | "water"
-    | "air"
-    | "earth"
-    | "blood"
-    | "summoning"
-    | "pestilence"
-    | "bone"
-    | "holy"
-    | "vengeance"
-    | "protection",
-) {
+export function getStartingBook(playerBlessing: Element) {
   const itemType = ItemClassType["Book"];
-  if (playerBlessing == "fire") {
-    return new Item({
-      name: "book of fire bolt",
-      baseValue: 2500,
-      itemClass: itemType,
-      icon: "Book",
-    });
+
+  switch (playerBlessing) {
+    case "fire":
+      return new Item({
+        name: "book of fire bolt",
+        baseValue: 2500,
+        itemClass: itemType,
+        icon: "Book",
+      });
+    case "water":
+      return new Item({
+        name: "book of frost",
+        baseValue: 2500,
+        itemClass: itemType,
+        icon: "Book",
+      });
+    case "air":
+      return new Item({
+        name: "book of gust",
+        baseValue: 2500,
+        itemClass: itemType,
+        icon: "Book",
+      });
+    case "earth":
+      return new Item({
+        name: "book of rock toss",
+        baseValue: 2500,
+        itemClass: itemType,
+        icon: "Book",
+      });
+    case "blood":
+      return new Item({
+        name: "book of pull blood",
+        baseValue: 2500,
+        itemClass: itemType,
+        icon: "Book",
+      });
+    case "summoning":
+      return new Item({
+        name: "book of the flying skull",
+        baseValue: 2500,
+        itemClass: itemType,
+        icon: "Book",
+      });
+    case "pestilence":
+      return new Item({
+        name: "book of poison dart",
+        baseValue: 2500,
+        itemClass: itemType,
+        icon: "Book",
+      });
+    case "bone":
+      return new Item({
+        name: "book of teeth",
+        baseValue: 2500,
+        itemClass: itemType,
+        icon: "Book",
+      });
+    case "holy":
+      return new Item({
+        name: "book of flash heal",
+        baseValue: 2500,
+        itemClass: itemType,
+        icon: "Book",
+      });
+    case "protection":
+      return new Item({
+        name: "book of blessed guard",
+        baseValue: 2500,
+        itemClass: itemType,
+        icon: "Book",
+      });
+    case "vengeance":
+      return new Item({
+        name: "book of judgment",
+        baseValue: 2500,
+        itemClass: itemType,
+        icon: "Book",
+      });
+    case "beastMastery":
+    case "assassination":
+    case "arcane":
+    default:
+      throw new Error("Invalid player blessing in getStartingBook()");
   }
-  if (playerBlessing == "water") {
-    return new Item({
-      name: "book of frost",
-      baseValue: 2500,
-      itemClass: itemType,
-      icon: "Book",
-    });
-  }
-  if (playerBlessing == "air") {
-    return new Item({
-      name: "book of gust",
-      baseValue: 2500,
-      itemClass: itemType,
-      icon: "Book",
-    });
-  }
-  if (playerBlessing == "earth") {
-    return new Item({
-      name: "book of rock toss",
-      baseValue: 2500,
-      itemClass: itemType,
-      icon: "Book",
-    });
-  }
-  if (playerBlessing == "blood") {
-    return new Item({
-      name: "book of pull blood",
-      baseValue: 2500,
-      itemClass: itemType,
-      icon: "Book",
-    });
-  }
-  if (playerBlessing == "summoning") {
-    return new Item({
-      name: "book of the flying skull",
-      baseValue: 2500,
-      itemClass: itemType,
-      icon: "Book",
-    });
-  }
-  if (playerBlessing == "pestilence") {
-    return new Item({
-      name: "book of poison dart",
-      baseValue: 2500,
-      itemClass: itemType,
-      icon: "Book",
-    });
-  }
-  if (playerBlessing == "bone") {
-    return new Item({
-      name: "book of teeth",
-      baseValue: 2500,
-      itemClass: itemType,
-      icon: "Book",
-    });
-  }
-  if (playerBlessing == "holy") {
-    return new Item({
-      name: "book of flash heal",
-      baseValue: 2500,
-      itemClass: itemType,
-      icon: "Book",
-    });
-  }
-  if (playerBlessing == "protection") {
-    return new Item({
-      name: "book of blessed guard",
-      baseValue: 2500,
-      itemClass: itemType,
-      icon: "Book",
-    });
-  }
-  if (playerBlessing == "vengeance") {
-    return new Item({
-      name: "book of judgment",
-      baseValue: 2500,
-      itemClass: itemType,
-      icon: "Book",
-    });
-  } else throw new Error("Invalid player blessing in getStartingBook()");
 }
 
 type enterDungeonProps = {

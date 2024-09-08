@@ -23,6 +23,7 @@
    {
       "name": "refined arrow",
       "baseValue": 8,
+      "slot":"quiver",
       "icon": "Arrow",
       "stats":{
          "damage": 2.5

@@ -120,7 +120,7 @@ export default function InventoryRender({
                   ) {
                     playerState?.unEquipItem(item);
                   } else {
-                    playerState?.equipItem(item);
+                    playerState?.equipItem([item]);
                   }
                 }
               },

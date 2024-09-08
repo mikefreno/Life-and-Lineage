@@ -1,7 +1,9 @@
 import { Item, isStackable } from "./item";
 import shops from "../assets/json/shops.json";
+import arrows from "../assets/json/items/arrows.json";
 import artifacts from "../assets/json/items/artifacts.json";
 import bodyArmor from "../assets/json/items/bodyArmor.json";
+import bows from "../assets/json/items/bows.json";
 import mageBooks from "../assets/json/items/mageBooks.json";
 import necroBooks from "../assets/json/items/necroBooks.json";
 import paladinBooks from "../assets/json/items/paladinBooks.json";
@@ -14,6 +16,7 @@ import poison from "../assets/json/items/poison.json";
 import potions from "../assets/json/items/potions.json";
 import robes from "../assets/json/items/robes.json";
 import shields from "../assets/json/items/shields.json";
+import staves from "../assets/json/items/staves.json";
 import wands from "../assets/json/items/wands.json";
 import weapons from "../assets/json/items/weapons.json";
 import { action, makeObservable, observable } from "mobx";
@@ -142,6 +145,7 @@ function getAnItemByType(
 ): Item {
   type = toTitleCase(type);
   const itemTypes: { [key: string]: any[] } = {
+    Arrow: arrows,
     Artifact: artifacts,
     BodyArmor: bodyArmor,
     Book:
@@ -150,6 +154,7 @@ function getAnItemByType(
         paladin: paladinBooks,
         necromancer: necroBooks,
       }[playerClass] || mageBooks,
+    Bow: bows,
     Focus: foci,
     Hat: hats,
     Helmet: helmets,
@@ -159,6 +164,7 @@ function getAnItemByType(
     Potion: potions,
     Robe: robes,
     Shield: shields,
+    Staff: staves,
     Wand: wands,
     Weapon: weapons,
   };

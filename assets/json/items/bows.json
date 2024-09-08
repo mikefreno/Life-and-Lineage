@@ -83,7 +83,7 @@
       "attacks": ["shoot", "rapid shot"],
       "icon":"Bow",
       "stats":{
-         "damage": 10
+         "damage": 25
       },
       "requirements":{
          "dexterity": 20
@@ -96,7 +96,7 @@
       "attacks": ["shoot", "seeking shot"],
       "icon":"Black_Bow",
       "stats":{
-         "damage": 10
+         "damage": 29
       },
       "requirements":{
          "dexterity": 30
@@ -109,7 +109,7 @@
       "attacks": ["shoot", "overdraw"],
       "icon":"Great_Bow",
       "stats":{
-         "damage": 10
+         "damage": 32
       },
       "requirements":{
          "strength": 20,

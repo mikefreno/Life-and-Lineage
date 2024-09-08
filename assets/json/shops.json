@@ -1,8 +1,8 @@
 [
    {
       "type": "armorer",
-      "trades":["bodyArmor", "helmet"],
-      "baseGold": 12000,
+      "trades":["bodyArmor", "helmet", "shield"],
+      "baseGold": 120000,
       "itemQuantityRange": {"minimum":3, "maximum":10},
       "possiblePersonalities": ["reserved", "open", "jovial"],
       "colors": { "background": "#787878", "font": "#282828", "lightbackground": "#BCBCBC" }
@@ -10,7 +10,7 @@
    {
       "type": "weaponsmith",
       "trades":["weapon", "shield"],
-      "baseGold": 9000,
+      "baseGold": 90000,
       "itemQuantityRange": {"minimum":5, "maximum":15},
       "possiblePersonalities": ["reserved", "aggressive", "jovial"],
       "colors": { "background": "#B22222", "font": "#505050", "lightbackground": "#DD9191" }
@@ -18,39 +18,39 @@
    {
       "type": "weaver",
       "trades":["robe", "hat"],
-      "baseGold": 15000,
+      "baseGold": 150000,
       "itemQuantityRange": {"minimum":2, "maximum":5},
       "possiblePersonalities": ["reserved", "silent", "calm"],
       "colors": { "background": "#9F8170", "font": "#8A2BE2", "lightbackground": "#CDB5A7" }
    },
    {
       "type": "archanist",
-      "trades":["wand", "focus"],
-      "baseGold": 10000,
+      "trades":["wand", "focus", "staff"],
+      "baseGold": 100000,
       "itemQuantityRange": {"minimum":3, "maximum":6},
       "possiblePersonalities": ["wise", "silent", "insane"],
       "colors": { "background": "#4B0082", "font": "#FFD700", "lightbackground": "#9582D9" }
    },
    {
       "type":"junk dealer",
-      "trades": ["bodyArmor", "robe", "helmet", "hat", "weapon", "shield", "focus", "junk"],
-      "baseGold": 5000,
+      "trades": ["bodyArmor", "robe", "helmet", "hat", "weapon", "shield", "focus", "junk", "arrow", "staff"],
+      "baseGold": 50000,
       "itemQuantityRange": {"minimum":10, "maximum":20},
       "possiblePersonalities": ["creepy", "insane", "silent"],
       "colors": { "background": "#CD7F32", "font": "#8B4513", "lightbackground": "#E6BF99" }
    },
    {
-      "type":"collector",
-      "trades": ["artifact"],
+      "type":"fletcher",
+      "trades": ["bow", "arrow"],
       "baseGold": 20000,
-      "itemQuantityRange": {"minimum":1, "maximum":2},
-      "possiblePersonalities": ["posh", "incredulous", "arrogant"],
-      "colors": {"background":"#D4AF37", "font": "#FDF5E6", "lightbackground": "#EAD69B" }
+      "itemQuantityRange": {"minimum":10, "maximum":20},
+      "possiblePersonalities": ["reserved", "incredulous", "arrogant"],
+      "colors": {"background":"#8F8170", "font": "#FDF5E6", "lightbackground": "#9F8170" }
    },
    {
       "type": "apothecary",
       "trades": ["potion", "poison", "ingredient"],
-      "baseGold": 3000,
+      "baseGold": 30000,
       "itemQuantityRange": {"minimum":10, "maximum":20},
       "possiblePersonalities": ["wise", "insane", "creepy"],
       "colors": {"background":"#3D9970", "font": "#800080", "lightbackground": "#9ECCB8" }
@@ -58,7 +58,7 @@
    {
       "type":"librarian",
       "trades": ["book"],
-      "baseGold": 6000,
+      "baseGold": 60000,
       "itemQuantityRange": {"minimum":2, "maximum":4},
       "possiblePersonalities": ["wise", "reserved", "arrogant"],
       "colors": {"background":"#f3eac1", "font": "#8B4513", "lightbackground": "#FFFFF8" }

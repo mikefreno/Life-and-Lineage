@@ -103,6 +103,9 @@ export enum Element {
   holy = "holy",
   vengeance = "vengeance",
   protection = "protection",
+  beastMastery = "beastMastery",
+  assassination = "assassination",
+  arcane = "arcane",
 }
 
 export enum AttackUse {

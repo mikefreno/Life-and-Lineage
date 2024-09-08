@@ -15,6 +15,7 @@ import { convertMasteryToString } from "../utility/spellHelper";
 import { AppContext } from "../app/_layout";
 import {
   Coins,
+  DexterityIcon,
   IntelligenceIcon,
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
@@ -79,7 +80,7 @@ export function StatsDisplay({
   const RequirementsBlock = () => {
     const item = displayItem.item[0];
     const reqs = item.requirements;
-    if ((reqs.intelligence || reqs.strength) && playerState) {
+    if ((reqs.intelligence || reqs.strength || reqs.dexterity) && playerState) {
       const playerMeetsStrength =
         reqs.strength &&
         reqs.strength <
@@ -89,28 +90,50 @@ export function StatsDisplay({
         reqs.intelligence <
           playerState.baseIntelligence +
             playerState.allocatedSkillPoints.intelligence;
+      const playerMeetDexterity =
+        reqs.dexterity &&
+        reqs.dexterity <
+          playerState.baseDexterity +
+            playerState.allocatedSkillPoints.dexterity;
       if (playerMeetsStrength && playerMeetsIntelligence) return null;
       return (
         <View className="flex items-center p-1 rounded-lg border border-red-700">
           <Text>Requires:</Text>
-          <View className="flex flex-row items-center justify-evenly">
-            <Text
-              className="text-sm"
-              style={{ color: playerMeetsStrength ? "#22c55e" : "#b91c1c" }}
-            >
-              {reqs.strength}
-            </Text>
-            <StrengthIcon color={"#ef4444"} height={14} width={16} />
-          </View>
-          <View className="flex flex-row items-center justify-evenly">
-            <Text
-              className="text-sm pr-1"
-              style={{ color: playerMeetsIntelligence ? "#22c55e" : "#b91c1c" }}
-            >
-              {reqs.intelligence}
-            </Text>
-            <IntelligenceIcon color={"#60a5fa"} height={14} width={16} />
-          </View>
+          {reqs.strength && (
+            <View className="flex flex-row items-center justify-evenly">
+              <Text
+                className="text-sm"
+                style={{ color: playerMeetsStrength ? "#22c55e" : "#b91c1c" }}
+              >
+                {reqs.strength}
+              </Text>
+              <StrengthIcon height={14} width={16} />
+            </View>
+          )}
+          {reqs.intelligence && (
+            <View className="flex flex-row items-center justify-evenly">
+              <Text
+                className="text-sm pr-1"
+                style={{
+                  color: playerMeetsIntelligence ? "#22c55e" : "#b91c1c",
+                }}
+              >
+                {reqs.intelligence}
+              </Text>
+              <IntelligenceIcon height={14} width={16} />
+            </View>
+          )}
+          {reqs.dexterity && (
+            <View className="flex flex-row items-center justify-evenly">
+              <Text
+                className="text-sm pr-1"
+                style={{ color: playerMeetDexterity ? "#22c55e" : "#b91c1c" }}
+              >
+                {reqs.dexterity}
+              </Text>
+              <DexterityIcon height={14} width={16} />
+            </View>
+          )}
         </View>
       );
     }

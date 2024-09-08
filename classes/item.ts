@@ -13,7 +13,14 @@ import { Spell } from "./spell";
 export class Item {
   readonly id: string;
   readonly name: string;
-  readonly slot: "head" | "body" | "one-hand" | "two-hand" | "off-hand" | null;
+  readonly slot:
+    | "head"
+    | "body"
+    | "one-hand"
+    | "two-hand"
+    | "off-hand"
+    | "quiver"
+    | null;
   readonly itemClass: ItemClassType;
   readonly stats: Record<string, number> | null;
   readonly baseValue: number;
