@@ -16,6 +16,7 @@ import {
   HealthIcon,
   NecromancerSkull,
   PaladinHammer,
+  RangerIcon,
   Regen,
   ShieldSlashIcon,
   Sword,
@@ -109,7 +110,7 @@ const HomeScreen = observer(() => {
                       }
                     />
                   </View>
-                ) : (
+                ) : playerState.playerClass == "mage" ? (
                   <View className="mx-auto scale-x-[-1] transform">
                     <WizardHat
                       width={
@@ -123,6 +124,21 @@ const HomeScreen = observer(() => {
                           : dimensions.height / 10
                       }
                       color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
+                    />
+                  </View>
+                ) : (
+                  <View className="mx-auto">
+                    <RangerIcon
+                      width={
+                        dimensions.height / 9 > 100
+                          ? 100
+                          : dimensions.height / 10
+                      }
+                      height={
+                        dimensions.height / 9 > 100
+                          ? 100
+                          : dimensions.height / 10
+                      }
                     />
                   </View>
                 )}

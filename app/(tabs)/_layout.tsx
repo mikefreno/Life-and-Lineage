@@ -28,6 +28,7 @@ import {
   NecromancerSkull,
   PaladinHammer,
   Potion,
+  RangerIcon,
   Sword,
   Wand,
   WizardHat,
@@ -150,6 +151,14 @@ export default function TabLayout() {
                 />
               ) : playerState?.playerClass == "paladin" ? (
                 <PaladinHammer
+                  width={28}
+                  height={26}
+                  color={color}
+                  useOpacity={true}
+                  style={{ marginBottom: -3 }}
+                />
+              ) : playerState?.playerClass == "ranger" ? (
+                <RangerIcon
                   width={28}
                   height={26}
                   color={color}

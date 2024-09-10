@@ -1,0 +1,24 @@
+[
+   {
+      "name": "book of the raven",
+      "type": "spell",
+      "teaches": "call raven",
+      "icon": "Book",
+      "baseValue": 2500
+   },
+   {
+      "name": "book of backstab",
+      "type": "spell",
+      "teaches": "backstab",
+      "icon": "Book",
+      "baseValue": 2500
+   },
+   {
+      "name": "book of arcane shot",
+      "type": "spell",
+      "teaches": "arcane shot",
+      "icon": "Book",
+      "baseValue": 2500
+   }
+
+]

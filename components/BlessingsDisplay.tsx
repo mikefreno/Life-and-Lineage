@@ -1,5 +1,8 @@
 import {
   Air,
+  ArcaneIcon,
+  AssassinationIcon,
+  BeastMasteryIcon,
   BloodDrop,
   Bones,
   Earth,
@@ -53,6 +56,12 @@ export default function BlessingDisplay({
           color={colorScheme == "dark" ? "#84cc16" : "#65a30d"}
         />
       );
+    case Element.beastMastery:
+      return <BeastMasteryIcon height={size} width={size} />;
+    case Element.assassination:
+      return <AssassinationIcon height={size} width={size} />;
+    case Element.arcane:
+      return <ArcaneIcon height={size} width={size} />;
     default:
       return <Fire height={size} width={size} />;
   }

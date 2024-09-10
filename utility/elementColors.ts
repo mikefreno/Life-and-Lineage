@@ -15,4 +15,7 @@ export const elementalColorMap: Record<
   holy: { dark: "#facc15", light: "#fef9c3" },
   vengeance: { dark: "#94a3b8", light: "#f1f5f9" },
   protection: { dark: "#3b82f6", light: "#bfdbfe" },
+  arcane: { dark: "#99e7ff", light: "#e0e7ff" },
+  assassination: { dark: "#1e293b", light: "#cbd5e1" },
+  beastMastery: { dark: "#854d0e", light: "#fef3c7" },
 };

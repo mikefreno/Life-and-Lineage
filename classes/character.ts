@@ -1460,7 +1460,6 @@ export class PlayerCharacter extends Character {
           if (attackStrings.includes(attack.name)) {
             const builtAttack = new Attack({
               name: attack.name,
-              user: this,
               hitChance: attack.hitChance,
               targets: attack.targets as "single" | "cleave" | "aoe",
               damageMult: attack.damageMult,
@@ -1474,7 +1473,6 @@ export class PlayerCharacter extends Character {
         )!;
         const attack = new Attack({
           name: punchObj.name,
-          user: this,
           damageMult: punchObj.damageMult,
           hitChance: punchObj.damageMult,
         });
@@ -1484,7 +1482,6 @@ export class PlayerCharacter extends Character {
       const punchObj = attacks.find((attackObj) => attackObj.name == "punch")!;
       const attack = new Attack({
         name: punchObj.name,
-        user: this,
         damageMult: punchObj.damageMult,
         hitChance: punchObj.damageMult,
       });
@@ -1872,6 +1869,7 @@ function getStartingProficiencies(
     ];
     return starter;
   }
+  throw new Error("Incorrect playerClass setting");
 }
 
 export function getStartingBook(playerBlessing: Element) {
@@ -1956,8 +1954,26 @@ export function getStartingBook(playerBlessing: Element) {
         icon: "Book",
       });
     case "beastMastery":
+      return new Item({
+        name: "book of the raven",
+        baseValue: 2500,
+        itemClass: itemType,
+        icon: "Book",
+      });
     case "assassination":
+      return new Item({
+        name: "book of backstab",
+        baseValue: 2500,
+        itemClass: itemType,
+        icon: "Book",
+      });
     case "arcane":
+      return new Item({
+        name: "book of arcane shot",
+        baseValue: 2500,
+        itemClass: itemType,
+        icon: "Book",
+      });
     default:
       throw new Error("Invalid player blessing in getStartingBook()");
   }

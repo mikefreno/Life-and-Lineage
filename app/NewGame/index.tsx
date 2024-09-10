@@ -6,11 +6,12 @@ import { Stack, router } from "expo-router";
 import { useVibration } from "../../utility/customHooks";
 import { AppContext } from "../_layout";
 import Modal from "react-native-modal";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import TutorialModal from "../../components/TutorialModal";
 import {
   NecromancerSkull,
   PaladinHammer,
+  RangerIcon,
   WizardHat,
 } from "../../assets/icons/SVGIcons";
 import { loadStoredTutorialState } from "../../utility/functions/misc/tutorial";
@@ -18,9 +19,9 @@ import { TutorialOption } from "../../utility/types";
 
 export default function NewGameScreen() {
   const [selectedClass, setSelectedClass] = useState<
-    "mage" | "necromancer" | "paladin"
+    "mage" | "necromancer" | "paladin" | "ranger"
   >();
-  let classRef = useRef<"mage" | "necromancer" | "paladin">();
+  let classRef = useRef<"mage" | "necromancer" | "paladin" | "ranger">();
   const colorScheme = useColorScheme();
   const vibration = useVibration();
 
@@ -141,37 +142,74 @@ export default function NewGameScreen() {
             Create a Character
           </Text>
           <Text className="pt-[2vh] text-center text-2xl">Select Class</Text>
-          <Pressable
-            className="mx-auto mt-[2vh]"
-            onPress={() => {
-              setSelectedClass("mage");
-              classRef.current = "mage";
-            }}
-            style={{
-              height: dimensions.height * 0.25,
-              width: dimensions.width * 0.45,
-            }}
-          >
-            {({ pressed }) => (
-              <View
-                className={`${
-                  pressed || selectedClass == "mage"
-                    ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                    : "border-transparent"
-                } w-full h-full border flex items-center justify-center`}
-              >
-                <WizardHat
-                  style={{ marginBottom: 5 }}
-                  color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
-                  height={dimensions.height * 0.15}
-                  width={dimensions.height * 0.15}
-                />
-                <Text className="mx-auto text-xl" style={{ color: "#2563eb" }}>
-                  Mage
-                </Text>
-              </View>
-            )}
-          </Pressable>
+          <View className="flex w-full flex-row justify-evenly">
+            <Pressable
+              className="-ml-2"
+              onPress={() => {
+                setSelectedClass("mage");
+                classRef.current = "mage";
+              }}
+              style={{
+                height: dimensions.height * 0.25,
+                width: dimensions.width * 0.45,
+              }}
+            >
+              {({ pressed }) => (
+                <View
+                  className={`${
+                    pressed || selectedClass == "mage"
+                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                      : "border-transparent"
+                  } w-full h-full border flex items-center justify-center`}
+                >
+                  <WizardHat
+                    style={{ marginBottom: 5 }}
+                    color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
+                    height={dimensions.height * 0.15}
+                    width={dimensions.height * 0.15}
+                  />
+                  <Text
+                    className="mx-auto text-xl"
+                    style={{ color: "#2563eb" }}
+                  >
+                    Mage
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+            <Pressable
+              className="-mr-2"
+              onPress={() => {
+                setSelectedClass("ranger");
+                classRef.current = "ranger";
+              }}
+              style={{
+                height: dimensions.height * 0.25,
+                width: dimensions.width * 0.45,
+              }}
+            >
+              {({ pressed }) => (
+                <View
+                  className={`${
+                    pressed || selectedClass == "ranger"
+                      ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                      : "border-transparent"
+                  } w-full h-full border flex items-center justify-center`}
+                >
+                  <View className="rotate-12">
+                    <RangerIcon
+                      style={{ marginBottom: 5 }}
+                      height={dimensions.height * 0.15}
+                      width={dimensions.height * 0.15}
+                    />
+                  </View>
+                  <Text className="mx-auto text-xl" style={{ color: "green" }}>
+                    Ranger
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+          </View>
           <View className="flex w-full flex-row justify-evenly">
             <Pressable
               className="-ml-2"
@@ -260,6 +298,11 @@ export default function NewGameScreen() {
             <Text className="mt-[2vh] h-16 text-center md:text-lg">
               The Necromancer controls the forces of death, they can summon
               minions, use blood, bone and poisonous magics.
+            </Text>
+          ) : selectedClass == "ranger" ? (
+            <Text>
+              The Ranger has extreme versatility, a master at archery,
+              assassination and commanding beasts
             </Text>
           ) : null}
           {selectedClass && (

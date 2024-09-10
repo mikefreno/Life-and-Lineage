@@ -46,6 +46,8 @@ export default function SetName() {
       ? "#2563eb"
       : playerClass == "necromancer"
       ? "#9333ea"
+      : playerClass == "ranger"
+      ? "#15803d"
       : "#fcd34d";
 
   return (
@@ -57,7 +59,7 @@ export default function SetName() {
           headerBackTitleStyle: { fontFamily: "PixelifySans" },
         }}
       />
-      <ThemedView className="flex-1">
+      <ThemedView className="flex-1" style={{ marginTop: -header }}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}

@@ -1,0 +1,366 @@
+[
+  {
+    "name": "throw dagger", 
+    "element": "assassination", 
+    "proficiencyNeeded": "novice", 
+    "target": "single",
+    "type": "offense",
+    "manaCost": 10,
+    "effects": {
+      "damage": 15, 
+      "buffs": null, 
+      "debuffs": [{"name":"bleed", "chance": 0.25}]
+    }
+  },
+  {
+    "name": "back stab",
+    "element": "assassination",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "apprentice",
+    "manaCost": 20,
+    "effects": {
+      "damage": 25,
+      "buffs": null,
+      "debuffs": [{"name":"burn", "chance": 0.25}]
+    }
+  },
+  {
+    "name": "",
+    "element": "assassination",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "adept",
+    "manaCost": 50,
+    "effects": {
+      "damage": 25,
+      "buffs": null,
+      "debuffs": [{"name":"burn", "chance": 0.75}]
+    }
+  },
+  {
+    "name": "",
+    "element": "assassination",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "adept",
+    "manaCost": 75,
+    "effects": {
+      "damage": 60,
+      "buffs": null,
+      "debuffs": [{"name":"burn", "chance": 0.25}]
+    }
+  },
+  {
+    "name": "",
+    "element": "assassination",
+    "target": "area",
+    "type": "defense",
+    "proficiencyNeeded": "expert",
+    "manaCost": 100,
+    "duration": 3,
+    "effects": {
+      "damage": null,
+      "buffs": ["projectile suppression"],
+      "debuffs": [{"name":"burn", "chance": 0.5}]
+    }
+  },
+  {
+    "name": "",
+    "element": "assassination",
+    "target": "area",
+    "type": "offense",
+    "proficiencyNeeded": "master",
+    "manaCost": 250,
+    "duration": 5,
+    "effects": {
+      "damage": 50,
+      "buffs": null,
+      "debuffs": [{"name":"burn", "chance": 0.25}]
+    }
+  },
+  {
+    "name": "",
+    "element": "assassination",
+    "target": "area",
+    "type": "offense",
+    "proficiencyNeeded": "legend",
+    "manaCost": 600,
+    "effects": {
+      "damage": 275,
+      "buffs": null,
+      "debuffs": [{"name":"severe burn", "chance": 0.75}]
+    }
+  },
+  {
+    "name": "",
+    "element": "assassination",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "legend",
+    "manaCost": 800,
+    "effects": {
+      "damage": 400,
+      "buffs": null,
+      "debuffs": [{"name":"severe burn", "chance": 1.0}]
+    }
+  },
+  {
+    "name": "",
+    "element": "beastMastery",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "novice",
+    "manaCost": 10,
+    "effects": {
+      "damage": 10,
+      "buffs": null,
+      "debuffs": [{"name":"chill", "chance": 0.5}]
+    }
+  },
+  {
+    "name": "",
+    "element": "beastMastery",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "apprentice",
+    "manaCost": 20,
+    "effects": {
+      "damage": 30,
+      "buffs": null,
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "",
+    "element": "beastMastery",
+    "target": "single",
+    "type": "defense",
+    "proficiencyNeeded": "apprentice",
+    "manaCost": 50,
+    "effects": {
+      "damage": null,
+      "selfDamage": -35,
+      "buffs": null,
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "",
+    "element": "beastMastery",
+    "target": "area",
+    "type": "offense",
+    "proficiencyNeeded": "adept",
+    "manaCost": 100,
+    "effects": {
+      "damage": 40,
+      "buffs": null,
+      "debuffs": [{"name":"chill", "chance": 1.0},{"name":"chill", "chance": 1.0}]
+    }
+  },
+  {
+    "name": "",
+    "element": "beastMastery",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "adept",
+    "manaCost": 125,
+    "effects": {
+      "damage": 60,
+      "buffs": null,
+      "debuffs": [{"name":"burn", "chance": 0.5}]
+    }
+  },
+  {
+    "name": "",
+    "element": "beastMastery",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "expert",
+    "manaCost": 200,
+    "effects": {
+      "damage": 100,
+      "buffs": null,
+      "debuffs": [{"name":"chill", "chance": 0.75},{"name":"chill", "chance": 0.75},{"name":"chill", "chance": 0.75}]
+    }
+  },
+  {
+    "name": "",
+    "element": "beastMastery",
+    "proficiencyNeeded": "master",
+    "target": "area",
+    "type": "defense",
+    "manaCost": 200,
+    "effects": {
+      "damage": null,
+      "buffs": ["lasting heal"],
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "",
+    "element": "beastMastery",
+    "target": "area",
+    "type": "offense",
+    "proficiencyNeeded": "master",
+    "manaCost": 300,
+    "duration": 5,
+    "effects": {
+      "damage": 50,
+      "buffs": null,
+      "debuffs": [{"name":"chill", "chance": 0.75}]
+    }
+  },
+  {
+    "name": "",
+    "element": "beastMastery",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "legend",
+    "manaCost": 600,
+    "effects": {
+      "damage": 175,
+      "buffs": null,
+      "debuffs": [{"name":"severe burn", "chance": 1.0}]
+    }
+  },
+  {
+    "name": "",
+    "element": "beastMastery",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "legend",
+    "duration": 2,
+    "manaCost": 1100,
+    "effects": {
+      "damage": 150,
+      "buffs": null,
+      "debuffs": [{"name":"stun", "chance": 1.0}]
+    }
+  },
+  {
+    "name": "",
+    "element": "arcane",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "novice",
+    "manaCost": 15,
+    "effects": {
+      "damage": 18,
+      "buffs": null,
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "",
+    "element": "arcane",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "apprentice",
+    "manaCost": 25,
+    "effects": {
+      "damage": 25,
+      "buffs": null,
+      "debuffs": [{"name":"shocked", "chance": 0.5}]
+    }
+  },
+  {
+    "name": "",
+    "element": "arcane",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "adept",
+    "manaCost": 75,
+    "effects": {
+      "damage": 50,
+      "buffs": null,
+      "debuffs": [{"name":"shocked", "chance": 0.5},{"name":"shocked", "chance": 0.5}]
+    }
+  },
+  {
+    "name": "",
+    "element": "arcane",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "expert",
+    "manaCost": 75,
+    "effects": {
+      "damage": 50,
+      "buffs": null,
+      "debuffs": [{"name":"shocked", "chance": 0.75},{"name":"stun", "chance": 0.5}]
+    }
+  },
+  {
+    "name": "",
+    "element": "arcane",
+    "target": "area",
+    "type": "offense",
+    "proficiencyNeeded": "expert",
+    "manaCost": 105,
+    "effects": {
+      "damage": 50,
+      "buffs": null,
+      "debuffs": [{"name":"shocked", "chance": 0.75},{"name":"stun", "chance": 0.5}]
+    }
+  },
+  {
+    "name": "",
+    "element": "arcane",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "master",
+    "manaCost": 100,
+    "effects": {
+      "damage": 75,
+      "buffs": null,
+      "debuffs": [{"name":"bleed", "chance": 0.75},{"name":"bleed", "chance": 0.75}]
+    }
+  },
+  {
+    "name": "",
+    "element": "arcane",
+    "target": "single",
+    "type": "defense",
+    "proficiencyNeeded": "master",
+    "manaCost": 125,
+    "effects": {
+      "damage": null,
+      "buffs": ["hard to see", "damaging to hit"],
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "",
+    "element": "arcane",
+    "target": "area",
+    "type": "offense",
+    "proficiencyNeeded": "legend",
+    "duration": 3,
+    "manaCost": 500,
+    "effects": {
+      "damage": 125,
+      "buffs": null,
+      "debuffs": null,
+      "debuffChance": null
+    }
+  },
+  {
+    "name": "",
+    "element": "arcane",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "legend",
+    "duration": 5,
+    "manaCost": 1250,
+    "effects": {
+      "damage": 125,
+      "buffs": null,
+      "debuffs": [{"name":"stun", "chance": 0.75}]
+    }
+  }
+]

@@ -82,6 +82,8 @@ export default function SetBlessing() {
       ? "#2563eb"
       : playerClass == "necromancer"
       ? "#9333ea"
+      : playerClass == "ranger"
+      ? "#15803d"
       : "#fcd34d";
 
   interface BlessingPressableProps {
@@ -116,7 +118,10 @@ export default function SetBlessing() {
               className="text-center text-lg px-2"
               style={{ color: elementalColorMap[element].dark }}
             >
-              Blessing of {toTitleCase(element)}
+              Blessing of{" "}
+              {element == "beastMastery"
+                ? "Beast Mastery"
+                : toTitleCase(element)}
             </Text>
           </View>
         )}
@@ -158,6 +163,16 @@ export default function SetBlessing() {
           <ThemedView className="mt-8 flex flex-row justify-evenly">
             <BlessingPressable element={Element.vengeance} />
             <BlessingPressable element={Element.protection} />
+          </ThemedView>
+        </View>
+      );
+    } else if (playerClass == "ranger") {
+      return (
+        <View className="flex items-center justify-evenly py-6">
+          <BlessingPressable element={Element.beastMastery} />
+          <ThemedView className="mt-8 flex flex-row justify-evenly">
+            <BlessingPressable element={Element.arcane} />
+            <BlessingPressable element={Element.assassination} />
           </ThemedView>
         </View>
       );

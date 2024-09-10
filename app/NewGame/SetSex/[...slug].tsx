@@ -49,6 +49,8 @@ export default function SetSex() {
       ? "#2563eb"
       : playerClass == "necromancer"
       ? "#9333ea"
+      : playerClass == "ranger"
+      ? "#15803d"
       : "#fcd34d";
 
   return (

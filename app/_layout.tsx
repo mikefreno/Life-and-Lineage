@@ -359,6 +359,8 @@ const RootLayout = observer(() => {
   useEffect(() => {
     if (Platform.OS == "android") {
       updateNavBar();
+    } else {
+      setNavbarLoad(true);
     }
   }, [isKeyboardVisible, insets.bottom]);
 

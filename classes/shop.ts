@@ -7,6 +7,7 @@ import bows from "../assets/json/items/bows.json";
 import mageBooks from "../assets/json/items/mageBooks.json";
 import necroBooks from "../assets/json/items/necroBooks.json";
 import paladinBooks from "../assets/json/items/paladinBooks.json";
+import rangerBooks from "../assets/json/items/rangerBooks.json";
 import foci from "../assets/json/items/foci.json";
 import hats from "../assets/json/items/hats.json";
 import helmets from "../assets/json/items/helmets.json";
@@ -141,7 +142,7 @@ export class Shop {
 //----------------------associated functions----------------------//
 function getAnItemByType(
   type: string,
-  playerClass: "mage" | "paladin" | "necromancer",
+  playerClass: "mage" | "paladin" | "necromancer" | "ranger",
 ): Item {
   type = toTitleCase(type);
   const itemTypes: { [key: string]: any[] } = {
@@ -153,6 +154,7 @@ function getAnItemByType(
         mage: mageBooks,
         paladin: paladinBooks,
         necromancer: necroBooks,
+        ranger: rangerBooks,
       }[playerClass] || mageBooks,
     Bow: bows,
     Focus: foci,
@@ -187,7 +189,7 @@ function getAnItemByType(
 export function generateInventory(
   inventoryCount: number,
   trades: string[],
-  playerClass: "mage" | "necromancer" | "paladin",
+  playerClass: "mage" | "necromancer" | "paladin" | "ranger",
 ) {
   let items: Item[] = [];
   for (let i = 0; i < inventoryCount; i++) {
@@ -201,7 +203,9 @@ function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function createShops(playerClass: "mage" | "paladin" | "necromancer") {
+export function createShops(
+  playerClass: "mage" | "paladin" | "necromancer" | "ranger",
+) {
   let createdShops: Shop[] = [];
   shops.forEach((shop) => {
     //want to favor likelihood of male shopkeepers slightly

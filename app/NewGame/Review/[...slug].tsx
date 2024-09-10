@@ -61,7 +61,7 @@ export default function NewGameReview() {
   function getStartingBaseStats({
     playerClass,
   }: {
-    playerClass: "necromancer" | "paladin" | "mage";
+    playerClass: "necromancer" | "paladin" | "mage" | "ranger";
   }) {
     switch (playerClass) {
       case "necromancer":
@@ -70,6 +70,7 @@ export default function NewGameReview() {
           baseMana: 120,
           baseStrength: 3,
           baseIntelligence: 6,
+          baseDexterity: 4,
           baseManaRegen: 6,
           baseSanity: 40,
         };
@@ -79,6 +80,7 @@ export default function NewGameReview() {
           baseMana: 80,
           baseStrength: 6,
           baseIntelligence: 3,
+          baseDexterity: 4,
           baseManaRegen: 5,
           baseSanity: 60,
         };
@@ -88,6 +90,17 @@ export default function NewGameReview() {
           baseMana: 100,
           baseStrength: 5,
           baseIntelligence: 5,
+          baseDexterity: 3,
+          baseManaRegen: 5,
+          baseSanity: 50,
+        };
+      case "ranger":
+        return {
+          baseHealth: 90,
+          baseMana: 90,
+          baseStrength: 4,
+          baseIntelligence: 3,
+          baseDexterity: 7,
           baseManaRegen: 5,
           baseSanity: 50,
         };
@@ -121,7 +134,7 @@ export default function NewGameReview() {
         birthdate: bday,
         ...getStartingBaseStats({ playerClass }),
       });
-    } else {
+    } else if (playerClass == "mage") {
       newCharacter = new PlayerCharacter({
         firstName: firstName,
         lastName: lastName,
@@ -132,6 +145,17 @@ export default function NewGameReview() {
         birthdate: bday,
         ...getStartingBaseStats({ playerClass: "mage" }),
       });
+    } else {
+      newCharacter = new PlayerCharacter({
+        firstName: firstName,
+        lastName: lastName,
+        sex: sex as "male" | "female",
+        playerClass: playerClass as "ranger",
+        blessing: blessing as "beastMastery" | "assassination" | "arcane",
+        parents: [mom, dad],
+        birthdate: bday,
+        ...getStartingBaseStats({ playerClass: "ranger" }),
+      });
     }
     return newCharacter;
   }
@@ -140,7 +164,8 @@ export default function NewGameReview() {
     if (
       playerClass == "mage" ||
       playerClass == "paladin" ||
-      playerClass == "necromancer"
+      playerClass == "necromancer" ||
+      playerClass == "ranger"
     ) {
       const player = createPlayerCharacter();
       const starterBook = getStartingBook(
@@ -155,12 +180,15 @@ export default function NewGameReview() {
           | "bone"
           | "holy"
           | "vengeance"
-          | "protection",
+          | "protection"
+          | "arcane"
+          | "beastMastery"
+          | "assassination",
       );
       player.addToInventory(starterBook);
       const startDate = new Date().toISOString();
       const shops = createShops(
-        playerClass as "mage" | "paladin" | "necromancer",
+        playerClass as "mage" | "paladin" | "necromancer" | "ranger",
       );
       const tutorialState = storage.getString("tutorialsEnabled");
       let parsed = true;
