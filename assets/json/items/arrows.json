@@ -4,9 +4,11 @@
       "baseValue": 2,
       "slot": "quiver",
       "icon": "Arrow",
+      "stackable": true,
       "stats":{
          "damage": 1.0
       }
+
    },
    {
       "name": "steel arrow",

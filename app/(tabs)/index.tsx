@@ -37,6 +37,7 @@ const HomeScreen = observer(() => {
   const bodyTarget = useRef<View>(null);
   const mainHandTarget = useRef<View>(null);
   const offHandTarget = useRef<View>(null);
+  const quiverTarget = useRef<View>(null);
   const inventoryTarget = useRef<View>(null);
 
   const [displayItem, setDisplayItem] = useState<{
@@ -167,7 +168,7 @@ const HomeScreen = observer(() => {
             </View>
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
-            <View className="flex-1 justify-evenly relative z-10">
+            <View className="flex-1 justify-between relative z-10 h-full">
               <View className="absolute pl-2">
                 {playerState.equipmentStats.damage > 0 && (
                   <>
@@ -218,6 +219,7 @@ const HomeScreen = observer(() => {
                 mainHandTarget={mainHandTarget}
                 offHandTarget={offHandTarget}
                 inventoryTarget={inventoryTarget}
+                quiverTarget={quiverTarget}
                 displayItem={displayItem}
                 setDisplayItem={setDisplayItem}
               />
@@ -227,6 +229,7 @@ const HomeScreen = observer(() => {
                 bodyTarget={bodyTarget}
                 mainHandTarget={mainHandTarget}
                 offHandTarget={offHandTarget}
+                quiverTarget={quiverTarget}
                 inventory={playerState.getInventory()}
                 displayItem={displayItem}
                 setDisplayItem={setDisplayItem}

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import type { RefObject } from "react";
 import { Item } from "../classes/item";
 import { Pressable, View, Image, LayoutChangeEvent } from "react-native";
@@ -8,7 +8,6 @@ import { checkReleasePositionProps } from "../utility/types";
 import { Shop } from "../classes/shop";
 import { Text, View as ThemedView } from "./Themed";
 import { AppContext } from "../app/_layout";
-import D20DieAnimation from "./DieRollAnim";
 
 type InventoryRenderBase = {
   selfRef?: RefObject<View>;
@@ -40,11 +39,12 @@ type InventoryRenderHome = InventoryRenderBase & {
   bodyTarget: RefObject<View>;
   mainHandTarget: RefObject<View>;
   offHandTarget: RefObject<View>;
+  quiverTarget: RefObject<View>;
 };
 
 type InventoryRenderDungeon = InventoryRenderBase & {
   pouchTarget: RefObject<View>;
-  addItemToPouch: (item: Item) => void;
+  addItemToPouch: (item: Item[]) => void;
 };
 
 type InventoryRenderShop = InventoryRenderBase & {
@@ -73,18 +73,24 @@ export default function InventoryRender({
   const [blockSize, setBlockSize] = useState<number>();
 
   function checkReleasePosition({
-    item,
+    itemStack,
     xPos,
     yPos,
     size,
     equipped,
   }: checkReleasePositionProps) {
-    if (item) {
+    if (itemStack) {
       if ("headTarget" in props) {
-        const { headTarget, bodyTarget, mainHandTarget, offHandTarget } = props;
-        if (item.slot) {
+        const {
+          headTarget,
+          bodyTarget,
+          mainHandTarget,
+          offHandTarget,
+          quiverTarget,
+        } = props;
+        if (itemStack[0].slot) {
           let refs: React.RefObject<View>[] = [];
-          switch (item.slot) {
+          switch (itemStack[0].slot) {
             case "head":
               refs.push(headTarget);
               break;
@@ -99,6 +105,9 @@ export default function InventoryRender({
               break;
             case "off-hand":
               refs.push(offHandTarget);
+              break;
+            case "quiver":
+              refs.push(quiverTarget);
               break;
           }
           refs.forEach((ref) => {
@@ -118,9 +127,9 @@ export default function InventoryRender({
                     playerState &&
                     playerState.inventory.length < 24
                   ) {
-                    playerState?.unEquipItem(item);
+                    playerState?.unEquipItem(itemStack);
                   } else {
-                    playerState?.equipItem([item]);
+                    playerState?.equipItem(itemStack);
                   }
                 }
               },
@@ -140,8 +149,8 @@ export default function InventoryRender({
             if (isWidthAligned && isHeightAligned) {
               setDisplayItem(null);
               vibration({ style: "light", essential: true });
-              playerState?.removeFromInventory(item);
-              addItemToPouch(item);
+              playerState?.removeFromInventory(itemStack);
+              addItemToPouch(itemStack);
             }
           },
         );
@@ -158,9 +167,11 @@ export default function InventoryRender({
             if (isWidthAligned && isHeightAligned) {
               setDisplayItem(null);
               vibration({ style: "light", essential: true });
-              const price = item.getSellPrice(shop.shopKeeper.affection);
-              playerState?.sellItem(item, price);
-              shop.buyItem(item, price);
+              const price = itemStack[0].getSellPrice(
+                shop.shopKeeper.affection,
+              );
+              playerState?.sellItem(itemStack, price);
+              shop.buyItem(itemStack, price);
             }
           },
         );
@@ -218,7 +229,7 @@ export default function InventoryRender({
       <Draggable
         onDragRelease={(_, g) => {
           checkReleasePosition({
-            item: item[0],
+            itemStack: item,
             xPos: g.moveX,
             yPos: g.moveY,
             size: blockSize,

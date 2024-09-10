@@ -211,7 +211,7 @@ export type ConditionObjectType = {
 };
 
 export interface checkReleasePositionProps {
-  item: Item | null;
+  itemStack: Item[] | null;
   xPos: number;
   yPos: number;
   size: number;

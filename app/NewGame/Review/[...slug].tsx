@@ -230,9 +230,9 @@ export default function NewGameReview() {
         }}
       />
       <Text className="pt-[8vh] text-center text-2xl">Review</Text>
-      <Text className="pt-[16vh] text-center text-3xl">{`${firstName} ${lastName} the ${toTitleCase(
-        blessing,
-      )}-born ${toTitleCase(playerClass)}`}</Text>
+      <Text className="pt-[16vh] text-center text-3xl">{`${firstName} ${lastName} the ${
+        blessing == "beastMastery" ? "Beast Mastery" : toTitleCase(blessing)
+      }-born ${toTitleCase(playerClass)}`}</Text>
       <Pressable
         onPress={() => startGame()}
         className="mx-auto mt-[6vh] rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"

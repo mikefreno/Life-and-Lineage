@@ -6,7 +6,7 @@ import { Stack, router } from "expo-router";
 import { useVibration } from "../../utility/customHooks";
 import { AppContext } from "../_layout";
 import Modal from "react-native-modal";
-import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 import TutorialModal from "../../components/TutorialModal";
 import {
   NecromancerSkull,
@@ -300,7 +300,7 @@ export default function NewGameScreen() {
               minions, use blood, bone and poisonous magics.
             </Text>
           ) : selectedClass == "ranger" ? (
-            <Text>
+            <Text className="mt-[2vh] h-16 text-center md:text-lg">
               The Ranger has extreme versatility, a master at archery,
               assassination and commanding beasts
             </Text>

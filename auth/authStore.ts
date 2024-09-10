@@ -350,7 +350,6 @@ class AuthStore {
   }: overwriteRemoteSaveProps) => {
     try {
       const updateTime = this.formatDate(new Date());
-      console.log(updateTime);
       const res = await this.databaseExecute({
         sql: `UPDATE Save SET player_state = ?, game_state = ?, last_updated_at = ? WHERE name = ? AND id = ?`,
         args: [

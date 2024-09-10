@@ -89,20 +89,41 @@ export class Shop {
     this.shopKeeper.affection += Math.floor(change * 4) / 4;
   }
 
-  public buyItem(item: Item, buyPrice: number) {
-    if (Math.floor(buyPrice) <= this.currentGold) {
-      this.inventory.push(item);
-      this.currentGold -= Math.floor(buyPrice);
-      this.changeAffection(buyPrice / 1000);
+  public buyItem(itemOrItems: Item | Item[], buyPrice: number) {
+    const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
+    const totalCost = items.length * Math.floor(buyPrice);
+
+    if (totalCost <= this.currentGold) {
+      items.forEach((item) => {
+        this.inventory.push(item);
+      });
+      this.currentGold -= totalCost;
+      this.changeAffection((totalCost / 1000) * items.length);
+    } else {
+      throw new Error("Not enough gold to complete the purchase");
     }
   }
 
-  public sellItem(item: Item, sellPrice: number) {
-    const idx = this.inventory.findIndex((invItem) => invItem.equals(item));
-    if (idx !== -1) {
-      this.inventory.splice(idx, 1);
-      this.currentGold += Math.floor(sellPrice);
-      this.changeAffection(sellPrice / 1000);
+  public sellItem(itemOrItems: Item | Item[], sellPrice: number) {
+    const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
+    let soldCount = 0;
+
+    items.forEach((item) => {
+      const idx = this.inventory.findIndex((invItem) => invItem.equals(item));
+      if (idx !== -1) {
+        this.inventory.splice(idx, 1);
+        soldCount++;
+      }
+    });
+
+    const totalEarned = Math.floor(sellPrice) * soldCount;
+    this.currentGold += totalEarned;
+    this.changeAffection((sellPrice / 1000) * soldCount);
+
+    if (soldCount < items.length) {
+      console.warn(
+        `Only ${soldCount} out of ${items.length} items were found and sold.`,
+      );
     }
   }
 

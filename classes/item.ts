@@ -59,7 +59,6 @@ export class Item {
   }
 
   public playerHasRequirements(player: PlayerCharacter) {
-    console.log(this.requirements);
     if (
       this.requirements.strength &&
       this.requirements.strength >
@@ -218,7 +217,7 @@ const itemMap: { [key: string]: any } = {
 };
 
 export const isStackable = (itemClass: ItemClassType) => {
-  switch (itemClass) {
+  switch (itemClass.toLowerCase()) {
     case ItemClassType.Potion:
     case ItemClassType.Poison:
     case ItemClassType.Junk:

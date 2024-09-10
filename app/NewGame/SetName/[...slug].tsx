@@ -63,7 +63,6 @@ export default function SetName() {
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
-          keyboardVerticalOffset={header}
         >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <ThemedView className="flex-1 items-center px-6 justify-center">
@@ -126,7 +125,7 @@ export default function SetName() {
                 }}
               />
               <Text className="pl-1 pt-1 pb-2">Maximum Length: 16</Text>
-              <View className="pb-16">
+              <View>
                 {firstName.trimEnd() && lastName.trimEnd() ? (
                   <View className="mx-auto">
                     <Pressable

@@ -1,6 +1,6 @@
 import { RefObject, useContext, useState } from "react";
 import { View, Image, Pressable } from "react-native";
-import { Text } from "./Themed";
+import { Text, View as ThemedView } from "./Themed";
 import Draggable from "react-native-draggable";
 import type { Item } from "../classes/item";
 import { useVibration } from "../utility/customHooks";
@@ -12,6 +12,7 @@ interface EquipmentDisplayProps {
   bodyTarget: RefObject<View>;
   mainHandTarget: RefObject<View>;
   offHandTarget: RefObject<View>;
+  quiverTarget: RefObject<View>;
   inventoryTarget: RefObject<View>;
   displayItem: {
     item: Item[];
@@ -37,6 +38,7 @@ export default function EquipmentDisplay({
   mainHandTarget,
   offHandTarget,
   inventoryTarget,
+  quiverTarget,
   displayItem,
   setDisplayItem,
 }: EquipmentDisplayProps) {
@@ -46,18 +48,19 @@ export default function EquipmentDisplay({
   const { playerState, dimensions, blockSize } = appData;
 
   function checkReleasePosition({
-    item,
+    itemStack,
     xPos,
     yPos,
     size,
     equipped,
   }: checkReleasePositionProps) {
-    if (item && item.slot) {
+    console.log(itemStack);
+    if (itemStack && itemStack[0].slot) {
       let refs: React.RefObject<View>[] = [];
       if (equipped) {
         refs.push(inventoryTarget);
       } else {
-        switch (item.slot) {
+        switch (itemStack[0].slot) {
           case "head":
             refs.push(headTarget);
             break;
@@ -73,6 +76,8 @@ export default function EquipmentDisplay({
           case "off-hand":
             refs.push(offHandTarget);
             break;
+          case "quiver":
+            refs.push(quiverTarget);
         }
       }
       refs.forEach((ref) => {
@@ -92,9 +97,9 @@ export default function EquipmentDisplay({
                 playerState &&
                 playerState.getInventory().length < 24
               ) {
-                playerState?.unEquipItem(item);
+                playerState?.unEquipItem(itemStack);
               } else {
-                playerState?.equipItem([item]);
+                playerState?.equipItem(itemStack);
               }
             }
           },
@@ -104,33 +109,38 @@ export default function EquipmentDisplay({
   }
 
   interface EquipmentSlotProps {
-    slot: "Head" | "Main-Hand" | "Off-Hand" | "Body";
+    slot: "Head" | "Main-Hand" | "Off-Hand" | "Body" | "Quiver";
   }
 
   const EquipmentSlot = ({ slot }: EquipmentSlotProps) => {
     const [buzzed, setBuzzed] = useState<boolean>(false);
     let ref: RefObject<View>;
-    let item: Item | null = null;
+    let itemStack: Item[] = [];
     if (playerState) {
       switch (slot) {
         case "Head":
           ref = headTarget;
-          item = playerState.equipment.head;
+          playerState.equipment.head &&
+            itemStack.push(playerState.equipment.head);
           break;
         case "Main-Hand":
           ref = mainHandTarget;
-          item =
-            playerState.equipment.mainHand.name !== "unarmored"
-              ? playerState.equipment.mainHand
-              : null;
+          playerState.equipment.mainHand.name !== "unarmored" &&
+            itemStack.push(playerState.equipment.mainHand);
           break;
         case "Off-Hand":
           ref = offHandTarget;
-          item = playerState.equipment.offHand;
+          playerState.equipment.offHand &&
+            itemStack.push(playerState.equipment.offHand);
           break;
         case "Body":
           ref = bodyTarget;
-          item = playerState.equipment.body;
+          playerState.equipment.body &&
+            itemStack.push(playerState.equipment.body);
+          break;
+        case "Quiver":
+          ref = quiverTarget;
+          itemStack = playerState.equipment.quiver ?? [];
           break;
       }
 
@@ -140,10 +150,11 @@ export default function EquipmentDisplay({
         return <></>;
       }
 
+      console.log(slot, itemStack);
       return (
         <View>
           <Text className="mb-1 text-center">{slot}</Text>
-          {item ? (
+          {itemStack.length > 0 ? (
             <View
               className="z-50 mx-auto border border-zinc-400 rounded-lg"
               style={{ height: blockSize, width: blockSize }}
@@ -151,7 +162,7 @@ export default function EquipmentDisplay({
               <Draggable
                 onDragRelease={(_, g) => {
                   checkReleasePosition({
-                    item: item!,
+                    itemStack,
                     xPos: g.moveX,
                     yPos: g.moveY,
                     size: blockSize,
@@ -170,12 +181,15 @@ export default function EquipmentDisplay({
                 <Pressable
                   onPress={() => {
                     vibration({ style: "light" });
-                    if (displayItem && displayItem.item[0].equals(item!)) {
+                    if (
+                      displayItem &&
+                      displayItem.item[0].equals(itemStack[0])
+                    ) {
                       setDisplayItem(null);
                     } else {
                       ref.current?.measureInWindow((x, y) => {
                         setDisplayItem({
-                          item: [item!],
+                          item: itemStack,
                           positon: { left: x, top: y },
                         });
                       });
@@ -185,7 +199,7 @@ export default function EquipmentDisplay({
                 >
                   <View
                     className={`${
-                      item.playerHasRequirements(playerState)
+                      itemStack[0].playerHasRequirements(playerState)
                         ? "bg-zinc-400"
                         : "bg-red-800"
                     } items-center rounded-lg`}
@@ -199,12 +213,17 @@ export default function EquipmentDisplay({
                   >
                     <Image
                       className="my-auto z-top"
-                      source={item.getItemIcon()}
+                      source={itemStack[0].getItemIcon()}
                       style={{
                         height: Math.min(blockSize * 0.65, 52),
                         width: Math.min(blockSize * 0.65, 52),
                       }}
                     />
+                    {itemStack[0].stackable && itemStack.length > 1 && (
+                      <ThemedView className="absolute bottom-0 right-0 bg-opacity-50 rounded px-1">
+                        <Text>{itemStack.length}</Text>
+                      </ThemedView>
+                    )}
                   </View>
                 </Pressable>
               </Draggable>
@@ -216,7 +235,7 @@ export default function EquipmentDisplay({
                   playerState,
                 )
                   ? "bg-zinc-400"
-                  : "bg-red-500"
+                  : "bg-red-800"
               } mx-auto z-10 items-center rounded-lg border border-zinc-400`}
               style={{ height: blockSize, width: blockSize }}
             >
@@ -245,15 +264,22 @@ export default function EquipmentDisplay({
   };
 
   return (
-    <View className="pb-2 -mt-2 z-10">
-      <View className="items-center ">
-        <EquipmentSlot slot={"Head"} />
+    <View className="pb-2 my-auto z-10">
+      <View className="flex flex-row items-center justify-between w-full">
+        <View className="flex-1" />
+        <View className="flex-1 flex items-center justify-center -ml-[10vw]">
+          <EquipmentSlot slot="Head" />
+        </View>
+        <View className="flex-1 flex items-center justify-end -mt-[4vh] -ml-[10vw]">
+          <EquipmentSlot slot="Quiver" />
+        </View>
       </View>
-      <View className="flex flex-row justify-evenly">
-        <View className="-ml-2 -mt-4 mr-2">
+
+      <View className="flex flex-row justify-evenly -mt-4">
+        <View className="-ml-2 mr-2">
           <EquipmentSlot slot={"Main-Hand"} />
         </View>
-        <View className="-mt-4">
+        <View className="">
           <EquipmentSlot slot={"Off-Hand"} />
         </View>
       </View>

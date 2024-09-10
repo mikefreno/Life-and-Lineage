@@ -853,26 +853,52 @@ export class PlayerCharacter extends Character {
     }
   }
 
-  public buyItem(item: Item, buyPrice: number) {
-    if (Math.floor(buyPrice) <= this.gold) {
-      this.inventory.push(item);
-      this.gold -= Math.floor(buyPrice);
+  public removeFromInventory(itemOrItems: Item | Item[]) {
+    if (Array.isArray(itemOrItems)) {
+      itemOrItems.forEach((item) => this.removeSingleItem(item));
+    } else {
+      this.removeSingleItem(itemOrItems);
     }
   }
-
-  public removeFromInventory(item: Item) {
-    const idx = this.inventory.findIndex((invItem) => invItem.equals(item));
-
-    if (idx !== -1) {
-      this.inventory.splice(idx, 1);
-    }
-  }
-
-  public sellItem(item: Item, sellPrice: number) {
+  private removeSingleItem(item: Item) {
     const idx = this.inventory.findIndex((invItem) => invItem.equals(item));
     if (idx !== -1) {
       this.inventory.splice(idx, 1);
-      this.gold += Math.floor(sellPrice);
+    }
+  }
+
+  public buyItem(itemOrItems: Item | Item[], buyPrice: number) {
+    const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
+    const totalCost = items.length * Math.floor(buyPrice);
+
+    if (totalCost <= this.gold) {
+      items.forEach((item) => {
+        this.inventory.push(item);
+      });
+      this.gold -= totalCost;
+    } else {
+      throw new Error("Not enough gold to complete the purchase");
+    }
+  }
+
+  public sellItem(itemOrItems: Item | Item[], sellPrice: number) {
+    const items = Array.isArray(itemOrItems) ? itemOrItems : [itemOrItems];
+    let soldCount = 0;
+
+    items.forEach((item) => {
+      const idx = this.inventory.findIndex((invItem) => invItem.equals(item));
+      if (idx !== -1) {
+        this.inventory.splice(idx, 1);
+        soldCount++;
+      }
+    });
+
+    this.gold += Math.floor(sellPrice) * soldCount;
+
+    if (soldCount < items.length) {
+      console.warn(
+        `Only ${soldCount} out of ${items.length} items were found and sold.`,
+      );
     }
   }
 
@@ -969,6 +995,7 @@ export class PlayerCharacter extends Character {
       case "quiver":
         this.removeEquipment("quiver");
         this.equipment.quiver = item;
+        this.removeFromInventory(item);
         break;
     }
     this.resolveOffsets(offsets);
@@ -1008,17 +1035,18 @@ export class PlayerCharacter extends Character {
     return false;
   }
 
-  public unEquipItem(item: Item) {
+  public unEquipItem(item: Item[]) {
+    console.log("removing: ", item);
     const offsets = this.gatherOffsets();
-    if (this.equipment.body?.equals(item)) {
+    if (this.equipment.body?.equals(item[0])) {
       this.removeEquipment("body");
-    } else if (this.equipment.head?.equals(item)) {
+    } else if (this.equipment.head?.equals(item[0])) {
       this.removeEquipment("head");
-    } else if (this.equipment.mainHand.equals(item)) {
+    } else if (this.equipment.mainHand.equals(item[0])) {
       this.removeEquipment("mainHand");
-    } else if (this.equipment.offHand?.equals(item)) {
+    } else if (this.equipment.offHand?.equals(item[0])) {
       this.removeEquipment("offHand");
-    } else if (this.equipment.quiver?.find((arrow) => arrow.equals(item))) {
+    } else if (this.equipment.quiver?.find((arrow) => arrow.equals(item[0]))) {
       this.removeEquipment("quiver");
     }
     this.resolveOffsets(offsets);
@@ -1041,7 +1069,7 @@ export class PlayerCharacter extends Character {
       this.equipment.head = null;
     } else if (slot == "quiver") {
       this.addToInventory(this.equipment.quiver);
-      this.equipment.head = null;
+      this.equipment.quiver = null;
     }
   }
 
