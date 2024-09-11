@@ -1,9 +1,11 @@
 import mageBooks from "../assets/json/items/mageBooks.json";
 import necroBooks from "../assets/json/items/necroBooks.json";
 import paladinBooks from "../assets/json/items/paladinBooks.json";
+import rangerBooks from "../assets/json/items/rangerBooks.json";
 import mageSpells from "../assets/json/mageSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
+import rangerSpells from "../assets/json/rangerSpells.json";
 import * as Crypto from "expo-crypto";
 import { ItemClassType, type ItemOptions } from "../utility/types";
 import { parseSpell } from "../utility/functions/jsonParsing";
@@ -105,7 +107,7 @@ export class Item {
   }
 
   public getAttachedSpell(
-    playerClass: "mage" | "paladin" | "necromancer",
+    playerClass: "mage" | "paladin" | "necromancer" | "ranger",
   ): Spell {
     let spell = undefined;
     if (this.itemClass == "book") {
@@ -130,6 +132,15 @@ export class Item {
       if (playerClass == "paladin") {
         const bookObj = paladinBooks.find((book) => book.name == this.name);
         spell = paladinSpells.find(
+          (paladinSpell) => bookObj?.teaches == paladinSpell.name,
+        );
+        if (!spell) {
+          throw new Error(`missing spell from Book Item ${this.name}`);
+        }
+      }
+      if (playerClass == "ranger") {
+        const bookObj = rangerBooks.find((book) => book.name == this.name);
+        spell = rangerSpells.find(
           (paladinSpell) => bookObj?.teaches == paladinSpell.name,
         );
         if (!spell) {
@@ -214,6 +225,7 @@ const itemMap: { [key: string]: any } = {
   Black_Bow: require("../assets/images/items/Black_Bow.png"),
   Axe: require("../assets/images/items/Axe.png"),
   Golden_Hammer: require("../assets/images/items/Golden_Hammer.png"),
+  Harp_Bow: require("../assets/images/items/Harp_Bow.png"),
 };
 
 export const isStackable = (itemClass: ItemClassType) => {

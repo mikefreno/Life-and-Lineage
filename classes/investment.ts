@@ -14,6 +14,10 @@ interface InvestmentProps {
   goldInvested: number;
 }
 
+/**
+ * The players currently made investments, the options reside within the `investements.json`, once purchased, one of these is instantiated,
+ * then the user interacts with this class
+ */
 export class Investment {
   name: string;
   minimumReturn: number;

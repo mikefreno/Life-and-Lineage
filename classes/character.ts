@@ -65,6 +65,10 @@ interface CharacterOptions {
   dateCooldownStart?: string;
 }
 
+/**
+ * This class fully contain characters like parents, children, met characters and shopkeepers(which are a property of the `Shop` class).
+ * This class serves as a base for the player's character - `PlayerCharacter`
+ */
 export class Character {
   readonly id: string;
   readonly beingType = "human";
@@ -122,6 +126,9 @@ export class Character {
     });
   }
 
+  /**
+   * Used to check if the character object is the same as another
+   */
   public equals(otherCharacter: Character) {
     return this.id == otherCharacter.id;
   }
@@ -129,6 +136,7 @@ export class Character {
   get fullName(): string {
     return `${this.firstName} ${this.lastName}`;
   }
+
   public addQualification(qual: string) {
     this.qualifications.push(qual);
   }
@@ -158,6 +166,10 @@ export class Character {
     }
   }
 
+  /**
+   * This is called on non player characters to manage their `affection` to the player.
+   * Affection is used to calculate prices in shops and allows for certain character interactions
+   */
   public updateAffection(change: number) {
     if (this.affection + change >= 100) {
       this.affection = 100;
@@ -295,6 +307,10 @@ type PlayerCharacterOptions =
   | PaladinCharacter
   | RangerCharacter;
 
+/**
+ * This is the heart of most state and progression changes in the game, with the only notable exceptions being the game time and
+ * the dungeons, which are both in the game class as these persist specific player characters
+ */
 export class PlayerCharacter extends Character {
   readonly playerClass: "mage" | "necromancer" | "paladin" | "ranger";
   readonly blessing: Element;
@@ -358,7 +374,8 @@ export class PlayerCharacter extends Character {
     mapDimensions: BoundingBox;
   } | null;
   equipment: {
-    mainHand: Item;
+    // nulls indicate a lack of equipment in the given slot
+    mainHand: Item; // main hand is never null, weapons are replaced with 'unarmored'
     offHand: Item | null;
     head: Item | null;
     body: Item | null;
@@ -480,6 +497,9 @@ export class PlayerCharacter extends Character {
     };
     this.investments = investments ?? [];
 
+    // this is where we set what is to be watched for mutation by mobX.
+    // observable are state that is for mutated attributes, computed are for `get`s and
+    // actions are methods to be tracked that manipulate any attributes, needed in strict mode
     makeObservable(this, {
       baseHealth: observable,
       currentHealth: observable,
@@ -1990,7 +2010,7 @@ export function getStartingBook(playerBlessing: Element) {
       });
     case "assassination":
       return new Item({
-        name: "book of backstab",
+        name: "book of throw dagger",
         baseValue: 2500,
         itemClass: itemType,
         icon: "Book",

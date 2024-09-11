@@ -7,11 +7,18 @@
       "baseValue": 2500
    },
    {
+      "name": "book of throw dagger",
+      "type": "spell",
+      "teaches": "throw dagger",
+      "icon": "Book",
+      "baseValue": 2500
+   },
+   {
       "name": "book of backstab",
       "type": "spell",
       "teaches": "backstab",
       "icon": "Book",
-      "baseValue": 2500
+      "baseValue": 5000
    },
    {
       "name": "book of arcane shot",

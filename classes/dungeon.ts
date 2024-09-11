@@ -2,7 +2,7 @@ import dungeons from "../assets/json/dungeons.json";
 import bosses from "../assets/json/bosses.json";
 import { Enemy } from "./creatures";
 import { action, makeObservable, observable } from "mobx";
-import { beingType } from "../utility/types";
+import { BeingType } from "../utility/types";
 
 interface DungeonLevelOptions {
   level: number;
@@ -16,6 +16,10 @@ interface DungeonInstanceOptions {
   levels?: DungeonLevel[];
 }
 
+/**
+ * This is the top level and in combination with the DungeonLevel, creates what a player experiences as a Dungeon. It holds levels
+ * Which are the individual levels. These are created when the last in range is cleared as dictated by the dungeons.json
+ */
 export class DungeonInstance {
   readonly name: string;
   levels: DungeonLevel[];
@@ -65,6 +69,10 @@ export class DungeonInstance {
   }
 }
 
+/**
+ * This is at time of writing very simple, I plan on implementing the map logic to this class, maybe with a shaking function, maybe with the
+ * map saved in state.
+ */
 export class DungeonLevel {
   readonly level: number;
   readonly bosses: string[];
@@ -106,7 +114,7 @@ export class DungeonLevel {
       );
     }
     const boss = new Enemy({
-      beingType: mainBoss.beingType as beingType,
+      beingType: mainBoss.beingType as BeingType,
       creatureSpecies: mainBoss.name,
       health: mainBoss.health,
       healthMax: mainBoss.health,

@@ -13,7 +13,7 @@
     }
   },
   {
-    "name": "back stab",
+    "name": "backstab",
     "element": "assassination",
     "target": "single",
     "type": "offense",
@@ -26,16 +26,16 @@
     }
   },
   {
-    "name": "",
+    "name": "shadow cover",
     "element": "assassination",
     "target": "single",
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 50,
     "effects": {
-      "damage": 25,
-      "buffs": null,
-      "debuffs": [{"name":"burn", "chance": 0.75}]
+      "damage": null,
+      "buffs": [{"name": "shadow cover", "chance": 1.0}],
+      "debuffs": null
     }
   },
   {

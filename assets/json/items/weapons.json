@@ -125,7 +125,7 @@
       "baseValue": 25000,
       "slot": "one-hand",
       "attacks": ["slash", "cleave"],
-      "icon":"ax",
+      "icon":"Axe",
       "stats":{
          "damage": 20.0
       },
@@ -165,7 +165,7 @@
       "baseValue": 65000,
       "slot": "two-hand",
       "attacks": ["hack"],
-      "icon":"axe",
+      "icon":"Axe",
       "stats":{
          "damage": 33.5
       },

@@ -28,9 +28,15 @@ interface SpellFields {
   };
 }
 
+/**
+ * This class instantiates learned spells by the `PlayerCharacter` only.
+ * An instance can be made with the constructor `new Spell({})` or with `fromJSON` in most cases `fromJSON` should be used
+ * This used to store a reference to the user `PlayerCharacter`. This was abandoned due to creating cyclical data
+ * The heart of this class is the `use` method, no other method needed for use other than `canBeUsed` as a check in UI
+ */
 export class Spell {
   name: string;
-  attackStyle: "single" | "cleave" | "aoe"; // at time of writing, only implementing single target
+  attackStyle: "single" | "cleave" | "aoe"; //at time of writing, only implementing single target
   element: Element;
   proficiencyNeeded: MasteryLevel;
   duration: number;
@@ -71,7 +77,7 @@ export class Spell {
     } else return 0;
   }
 
-  private canBeUsed(user: PlayerCharacter) {
+  public canBeUsed(user: PlayerCharacter) {
     if (user.isStunned) {
       return false;
     }
@@ -152,6 +158,7 @@ export class Spell {
     });
     user.gainProficiency(this);
 
+    // we wait here for animation timings, the fade out of mana use cost
     wait(1000).then(() => user.regenMana());
 
     return {

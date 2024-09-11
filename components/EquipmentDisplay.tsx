@@ -150,7 +150,6 @@ export default function EquipmentDisplay({
         return <></>;
       }
 
-      console.log(slot, itemStack);
       return (
         <View>
           <Text className="mb-1 text-center">{slot}</Text>

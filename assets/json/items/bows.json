@@ -32,7 +32,7 @@
          "damage": 10.5
       },
       "requirements":{
-         "dexterity": 10
+         "dexterity": 7
       }
    },
    {
@@ -45,7 +45,7 @@
          "damage": 12.5
       },
       "requirements":{
-         "dexterity": 15
+         "dexterity": 12
       }
    },
    {
@@ -81,7 +81,7 @@
       "baseValue": 75000,
       "slot": "two-hand",
       "attacks": ["shoot", "rapid shot"],
-      "icon":"Bow",
+      "icon":"Harp_Bow",
       "stats":{
          "damage": 25
       },

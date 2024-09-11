@@ -237,7 +237,7 @@
       "name": "unending cure",
       "style": "buff",
       "turns": 15,
-      "effect": ["blur"],
+      "effect": ["heal"],
       "effectStyle": ["flat"],
       "effectAmount": [50],
       "icon": "pray_hands"
@@ -290,6 +290,15 @@
       "effectStyle": [null],
       "effectAmount": [null],
       "icon":"skull_and_crossbones"
+   },
+   {
+      "name": "shadow cover",
+      "style": "buff",
+      "turns": 5,
+      "effect": ["blur"],
+      "effectStyle": ["multiplier"],
+      "effectAmount": [0.75],
+      "icon": "hollow_disk"
    }
 ]
 

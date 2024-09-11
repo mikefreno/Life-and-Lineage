@@ -4,6 +4,12 @@ import { ConditionType, EffectOptions, EffectStyle } from "../utility/types";
 import { PlayerCharacter } from "./character";
 import { Creature } from "./creatures";
 
+/**
+ * Almost everything in this class is readonly. Everything is either pre-computed or is computed in totality with all Conditions at once.
+ * The reason for this is there are different times where `Condition` effects need be evaluated, they can be evaluated at various points
+ * in the turn of a `PlayerCharacter`, `Creature` depending on their effect, for instance total health damage is calculated at the end of a turn,
+ * accuracy effects are calculated at the beginning, and attack damage buffs are calculated following a successful attack roll
+ */
 export class Condition {
   readonly id: string;
   readonly name: string;
@@ -81,6 +87,10 @@ export class Condition {
     return totalSanityDmg ? Math.round(totalSanityDmg * 4) / 4 : null;
   }
 
+  /**
+   * This will always return the turn count, which need be checked for removal, an effect is returned if it exists
+   * If the condition only does sanity and/or health damage, no effect is returned
+   */
   public tick(holder: PlayerCharacter | Creature) {
     if (!this.aura) {
       this.turns -= 1;
@@ -127,4 +137,5 @@ const conditionIconMap: { [key: string]: any } = {
   stun: require("../assets/images/conditions/stun.png"),
   viruses: require("../assets/images/conditions/viruses.png"),
   blood_orb: require("../assets/images/conditions/blood_orb.png"),
+  hollow_disk: require("../assets/images/conditions/hollow_disk.png"),
 };

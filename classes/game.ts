@@ -8,6 +8,7 @@ import { TutorialOption } from "../utility/types";
 
 interface GameOptions {
   date?: string;
+  startDate?: string;
   shops: Shop[];
   dungeonInstances?: DungeonInstance[];
   completedInstances?: string[];
@@ -19,8 +20,13 @@ interface GameOptions {
   tutorialsEnabled?: boolean;
 }
 
+/**
+ * This stores anything not directly related to the `PlayerCharacter`, the idea was to store anything that should persist in player character death.
+ * The above would include obvious things like the app settings (vibration, tutorials and health warning level, color scheme) date properties and shops
+ */
 export class Game {
-  date: string;
+  date: string; // compared against the startDate to calculate ages
+  readonly startDate: string; // only ever set at game start, should never again be modified.
   dungeonInstances: DungeonInstance[];
   completedInstances: string[];
   atDeathScreen: boolean;
@@ -33,6 +39,7 @@ export class Game {
 
   constructor({
     date,
+    startDate,
     dungeonInstances,
     completedInstances,
     atDeathScreen,
@@ -44,6 +51,7 @@ export class Game {
     tutorialsEnabled,
   }: GameOptions) {
     this.date = date ?? new Date().toISOString();
+    this.startDate = startDate ?? new Date().toISOString();
     this.dungeonInstances = dungeonInstances ?? [
       new DungeonInstance({
         name: "training grounds",
@@ -119,6 +127,12 @@ export class Game {
   }
 
   //----------------------------------Date----------------------------------//
+
+  /**
+   * Moves the game time forward, effectively aging all characters. Additionally will "tick" all time based events,
+   * this includes affections, conditions and investements. Additionally will roll to apply a debuff if the player character
+   * has negative sanity
+   */
   public gameTick(playerState: PlayerCharacter) {
     const dateObject = new Date(this.date);
     dateObject.setDate(dateObject.getDate() + 7);
@@ -149,6 +163,9 @@ export class Game {
     );
   }
 
+  /**
+   * Unlocks the next dungeon(s) when a boss has been defeated, given the name of the current dungeon the player is in.
+   */
   public openNextDungeonLevel(currentInstanceName: string) {
     const foundInstanceObj = dungeons.find(
       (dungeon) => dungeon.instance == currentInstanceName,
@@ -198,6 +215,9 @@ export class Game {
   }
 
   //----------------------------------Misc----------------------------------//
+  /**
+   * Used on player death to block the user from somehow going back, and healing their character
+   */
   public hitDeathScreen() {
     this.atDeathScreen = true;
   }
@@ -248,7 +268,8 @@ export class Game {
 
   static fromJSON(json: any): Game {
     const game = new Game({
-      date: json.date ? json.date : new Date().toISOString(),
+      date: json.date,
+      startDate: json.startDate,
       completedInstances: json.completedInstances,
       atDeathScreen: json.atDeathScreen,
       dungeonInstances: json.dungeonInstances

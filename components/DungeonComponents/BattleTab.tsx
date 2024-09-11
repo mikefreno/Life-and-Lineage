@@ -163,10 +163,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                             </View>
                             <Pressable
                               disabled={
-                                (attackOrSpell instanceof Spell &&
-                                  attackOrSpell.manaCost >=
-                                    playerState.currentMana) ||
-                                playerState.isStunned ||
+                                !attackOrSpell.canBeUsed(playerState) ||
                                 attackAnimationOnGoing
                               }
                               onPress={() => {
@@ -192,10 +189,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                               }}
                               className="mx-2 my-auto rounded px-4 py-2 shadow-sm active:scale-95 active:opacity-50"
                               style={[
-                                ((attackOrSpell instanceof Spell &&
-                                  attackOrSpell.manaCost >=
-                                    playerState.currentMana) ||
-                                  playerState.isStunned ||
+                                (!attackOrSpell.canBeUsed(playerState) ||
                                   attackAnimationOnGoing) && { opacity: 0.5 },
                                 {
                                   backgroundColor:

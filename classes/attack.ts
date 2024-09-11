@@ -23,6 +23,14 @@ interface AttackFields {
   summons?: string[];
 }
 
+/**
+ * This class is used to store weapon provided player attacks and all enemy attacks. The indexing/finding is based on name, stored in JSON
+ * An instance can be made with the constructor `new Attack({})` or with `fromJSON` in most cases `fromJSON` should be used
+ * This used to store a reference to the user: [`PlayerCharacter`, `Enemy`, `Minion`]. This was abandoned due to creating cyclical data
+ * `PlayerCharacter` attacks are free, while `Enemy`/`Minion` attacks typically have an energy cost
+ * The heart of this class is the `use` method, no other method needed for use other than `canBeUsed` as a check in UI
+ * The only property needed to create is the `name` property, but all properties of the JSON object (source) should be provided
+ */
 export class Attack {
   name: string;
   energyCost: number;
@@ -69,7 +77,7 @@ export class Attack {
     return user.attackPower * this.damageMult + this.flatHealthDamage;
   }
 
-  private canBeUsed(user: PlayerCharacter | Enemy | Minion) {
+  public canBeUsed(user: PlayerCharacter | Enemy | Minion) {
     if (user.isStunned) {
       return false;
     }

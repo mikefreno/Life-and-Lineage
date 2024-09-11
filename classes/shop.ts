@@ -36,8 +36,12 @@ interface ShopProps {
   archetype: string;
 }
 
+/**
+ * At game start, all Shops are created, they will not be created again, in any sense. The `shopKeeper` like all `Character`'s
+ * can die and this will be replaced. Base gold and archetype (e.g. armorer, weaponsmith) are never changed
+ */
 export class Shop {
-  baseGold: number;
+  readonly baseGold: number;
   currentGold: number;
   lastStockRefresh: string;
   inventory: Item[];

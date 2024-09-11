@@ -62,6 +62,11 @@ type MinionType = CreatureType & {
   turnsLeftAlive: number;
 };
 
+/**
+ * Nothing is ever simply a `Creature` this class is simply used for inheritance
+ * While I hate inheritance, this is done due to the massive similarities of the `Enemy` and `Minion` class
+ * Most of the attributes here are readonly
+ */
 export class Creature {
   readonly id: string;
   readonly beingType: BeingType;
@@ -371,6 +376,10 @@ export class Creature {
   }
 }
 
+/**
+ * When entering a dungeon tile (room), one of these is created. At times there will be rooms with multi-enemies,
+ * in this case i == 0 is set as the `Enemy` then i >= 1 is created as a `Minion` attached to the `Enemy`
+ */
 export class Enemy extends Creature {
   minions: Minion[];
   constructor({
@@ -479,6 +488,11 @@ export class Enemy extends Creature {
   }
 }
 
+/**
+ * While this is an extension of the `Creature`, same as the `Enemy`, this can be attached to the `PlayerCharacter` in addition the `Enemy`
+ * The only extension this has over the base class is the `turnsLeftAlive` property. Currently, this needs to be watched outside of the class
+ * to be properly destroyed. I don't like it but the only solution in my head would create a cycle.
+ */
 export class Minion extends Creature {
   turnsLeftAlive: number;
 

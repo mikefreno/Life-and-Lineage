@@ -24,6 +24,7 @@ import { generateBirthday } from "../../../utility/functions/misc/age";
 import clearHistory from "../../../utility/functions/misc/nav";
 import { fullSave, storage } from "../../../utility/functions/save_load";
 import { AppContext } from "../../_layout";
+import { Element } from "../../../utility/types";
 
 export default function NewGameReview() {
   const { slug } = useLocalSearchParams();
@@ -168,23 +169,7 @@ export default function NewGameReview() {
       playerClass == "ranger"
     ) {
       const player = createPlayerCharacter();
-      const starterBook = getStartingBook(
-        blessing as
-          | "fire"
-          | "water"
-          | "air"
-          | "earth"
-          | "blood"
-          | "summoning"
-          | "pestilence"
-          | "bone"
-          | "holy"
-          | "vengeance"
-          | "protection"
-          | "arcane"
-          | "beastMastery"
-          | "assassination",
-      );
+      const starterBook = getStartingBook(Element[blessing]);
       player.addToInventory(starterBook);
       const startDate = new Date().toISOString();
       const shops = createShops(
