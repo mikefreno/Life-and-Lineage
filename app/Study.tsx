@@ -23,6 +23,7 @@ import {
 } from "../utility/spellHelper";
 import { AppContext } from "./_layout";
 import { Spell } from "../classes/spell";
+import { fullSave } from "../utility/functions/save_load";
 
 export default function LearningKnowledgeScreen() {
   const appData = useContext(AppContext);
@@ -72,7 +73,7 @@ export default function LearningKnowledgeScreen() {
     if (playerState && gameState && isFocused) {
       playerState.learnSpellStep(bookName, spellName, spellElement);
       setSpellState(playerState.learningSpells);
-      gameState.gameTick(playerState);
+      gameState.gameTick({ playerState, fullSave });
     }
   }
 

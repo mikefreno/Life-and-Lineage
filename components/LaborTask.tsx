@@ -1,15 +1,15 @@
 import { View } from "react-native";
 import ProgressBar from "./ProgressBar";
-import { useIsFocused } from "@react-navigation/native";
 import { useContext, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { numberToRoman } from "../utility/functions/misc/numbers";
-import { useVibration } from "../utility/customHooks";
+import type { VibrateProps } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
 import { Text } from "./Themed";
 import ThemedCard from "./ThemedCard";
 import { AppContext } from "../app/_layout";
 import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
+import { fullSave } from "../utility/functions/save_load";
 
 interface LaborTaskProps {
   reward: number;
@@ -21,6 +21,8 @@ interface LaborTaskProps {
   };
   experienceToPromote: number;
   applyToJob: (title: string) => void;
+  focused: boolean;
+  vibration: ({ style, essential }: VibrateProps) => void;
 }
 
 const LaborTask = observer(
@@ -30,6 +32,8 @@ const LaborTask = observer(
     cost,
     experienceToPromote,
     applyToJob,
+    focused,
+    vibration,
   }: LaborTaskProps) => {
     const appData = useContext(AppContext);
     if (!appData) throw new Error("missing context");
@@ -41,12 +45,9 @@ const LaborTask = observer(
     const [experience, setExperience] = useState(
       playerState?.getJobExperience(title),
     );
-    const vibration = useVibration();
-
-    const isFocused = useIsFocused();
 
     function work() {
-      if (playerState && gameState && isFocused) {
+      if (playerState && gameState && focused) {
         playerState.performLabor({
           title: title,
           cost: cost,
@@ -57,7 +58,7 @@ const LaborTask = observer(
           vibration({ style: "success", essential: true });
         }
         setExperience(newExp);
-        gameState.gameTick(playerState);
+        gameState.gameTick({ playerState, fullSave });
         setFullReward(playerState.getRewardValue(title, reward));
       }
     }

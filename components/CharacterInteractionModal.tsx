@@ -16,6 +16,7 @@ import { getDaysBetweenDates } from "../utility/functions/misc/date";
 import { AppContext } from "../app/_layout";
 import { AffectionIcon } from "../assets/icons/SVGIcons";
 import { wait } from "../utility/functions/misc/wait";
+import { fullSave } from "../utility/functions/save_load";
 
 interface CharacterInteractionModal {
   character: Character | null;
@@ -59,7 +60,7 @@ export const CharacterInteractionModal = observer(
 
     function setFight() {
       if (character && playerState && gameState) {
-        gameState.gameTick(playerState);
+        gameState.gameTick({ playerState, fullSave });
         playerState.setInDungeon({
           state: true,
           instance: "Personal",
@@ -136,7 +137,7 @@ export const CharacterInteractionModal = observer(
                           vibration({ style: "light" });
                           character.setDateCooldownStart(gameState.date);
                           character.updateAffection(5);
-                          gameState.gameTick(playerState);
+                          gameState.gameTick({ playerState, fullSave });
                         }}
                       >
                         Chat
@@ -158,7 +159,7 @@ export const CharacterInteractionModal = observer(
                           vibration({ style: "light" });
                           character.setDateCooldownStart(gameState.date);
                           character.updateAffection(-10);
-                          gameState.gameTick(playerState);
+                          gameState.gameTick({ playerState, fullSave });
                         }}
                       >
                         Spit in Face
@@ -187,7 +188,7 @@ export const CharacterInteractionModal = observer(
                           character.updateAffection(5);
                           if (playerState && gameState) {
                             playerState.addNewKnownCharacter(character);
-                            gameState.gameTick(playerState);
+                            gameState.gameTick({ playerState, fullSave });
                           }
                         }}
                       >
@@ -199,7 +200,7 @@ export const CharacterInteractionModal = observer(
                           character.updateAffection(-5);
                           if (playerState && gameState) {
                             playerState.addNewKnownCharacter(character);
-                            gameState.gameTick(playerState);
+                            gameState.gameTick({ playerState, fullSave });
                           }
                         }}
                       >

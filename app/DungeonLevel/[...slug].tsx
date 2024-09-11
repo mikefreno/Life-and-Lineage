@@ -26,7 +26,6 @@ import { Attack } from "../../classes/attack";
 import { Spell } from "../../classes/spell";
 import { TutorialOption } from "../../utility/types";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { throttle } from "lodash";
 
 const DungeonProvider = observer(() => {
   const { slug } = useLocalSearchParams();

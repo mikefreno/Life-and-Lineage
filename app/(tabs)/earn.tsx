@@ -2,7 +2,7 @@ import jobs from "../../assets/json/jobs.json";
 import LaborTask from "../../components/LaborTask";
 import { ScrollView, View, Text } from "../../components/Themed";
 import { View as NonThemedView, Pressable } from "react-native";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { observer } from "mobx-react-lite";
 import Modal from "react-native-modal";
 import { toTitleCase } from "../../utility/functions/misc/words";
@@ -14,8 +14,9 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { AppContext } from "../_layout";
 import { TutorialOption } from "../../utility/types";
+import { fullSave } from "../../utility/functions/save_load";
 
-const EarnScreen = observer(() => {
+const EarnScreen = () => {
   const appData = useContext(AppContext);
   if (!appData) {
     throw new Error("missing context");
@@ -37,6 +38,7 @@ const EarnScreen = observer(() => {
         setShowingRejection(true);
       } else {
         playerState.setJob(title);
+        fullSave(gameState, playerState);
       }
     }
   }
@@ -130,6 +132,8 @@ const EarnScreen = observer(() => {
                     cost={Job.cost}
                     experienceToPromote={Job.experienceToPromote}
                     applyToJob={applyToJob}
+                    focused={isFocused}
+                    vibration={vibration}
                   />
                 );
               })}
@@ -138,5 +142,5 @@ const EarnScreen = observer(() => {
       </View>
     </>
   );
-});
+};
 export default EarnScreen;

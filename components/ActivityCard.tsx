@@ -26,6 +26,7 @@ import {
   Sanity,
 } from "../assets/icons/SVGIcons";
 import { wait } from "../utility/functions/misc/wait";
+import { fullSave } from "../utility/functions/save_load";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -76,7 +77,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           setGoodOutcome(null);
           setBadOutcome(null);
           setNothingHappened(false);
-          gameState?.gameTick(playerState);
+          gameState?.gameTick({ playerState, fullSave });
           return;
         case "randomGood":
           if (!activity.randomGood) {
@@ -94,7 +95,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           setMetCharacter(null);
           setBadOutcome(null);
           setNothingHappened(false);
-          gameState?.gameTick(playerState);
+          gameState?.gameTick({ playerState, fullSave });
           return setGoodOutcome(randomGoodOutcome);
         case "randomBad":
           if (!activity.randomBad) {
@@ -113,13 +114,13 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           setMetCharacter(null);
           setGoodOutcome(null);
           setNothingHappened(false);
-          gameState?.gameTick(playerState);
+          gameState?.gameTick({ playerState, fullSave });
           return setBadOutcome(randomBadOutcome);
         default:
           setMetCharacter(null);
           setBadOutcome(null);
           setNothingHappened(false);
-          gameState?.gameTick(playerState);
+          gameState?.gameTick({ playerState, fullSave });
           return setNothingHappened(true);
       }
     }

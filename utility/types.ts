@@ -225,6 +225,10 @@ export type BeingType =
   | "demi-human"
   | "human";
 
+/**
+ * This is used mostly for simplicity. While prop drilling wouldn't be too cumbersome, this makes management a bit easier
+ * and reading the main DungeonLevelScreen's template
+ */
 export interface DungeonContextType {
   slug: string | string[];
   fightingBoss: boolean;
@@ -306,6 +310,9 @@ export interface DungeonContextType {
   >;
 }
 
+/**
+ * This represents all data to be accessed at any level, most of which is set at the highest level (root) `_layout.tsx`
+ */
 export interface AppContextType {
   gameState: Game | undefined;
   setGameData: React.Dispatch<React.SetStateAction<Game | undefined>>;

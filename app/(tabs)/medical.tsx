@@ -13,9 +13,8 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import { TutorialOption } from "../../utility/types";
-import { observer } from "mobx-react-lite";
 
-const MedicalScreen = observer(() => {
+const MedicalScreen = () => {
   const appData = useContext(AppContext);
   if (!appData) {
     throw new Error("Missing Context");
@@ -60,6 +59,7 @@ const MedicalScreen = observer(() => {
                     title={medOption.serviceName}
                     cost={medOption.cost}
                     healthRestore={medOption.heathRestore as number | "fill"}
+                    focused={isFocused}
                   />
                 ))}
                 <GenericStrikeAround>Other</GenericStrikeAround>
@@ -69,6 +69,7 @@ const MedicalScreen = observer(() => {
                     title={medOption.serviceName}
                     cost={medOption.cost}
                     removeDebuffs={medOption.removeDebuffs as number | "all"}
+                    focused={isFocused}
                   />
                 ))}
               </View>
@@ -80,6 +81,7 @@ const MedicalScreen = observer(() => {
                     title={medOption.serviceName}
                     cost={medOption.cost}
                     manaRestore={medOption.manaRestore as number | "fill"}
+                    focused={isFocused}
                   />
                 ))}
                 <GenericStrikeAround>Sanity</GenericStrikeAround>
@@ -89,6 +91,7 @@ const MedicalScreen = observer(() => {
                     title={medOption.serviceName}
                     cost={medOption.cost}
                     sanityRestore={medOption.sanityRestore as number | "fill"}
+                    focused={isFocused}
                   />
                 ))}
               </View>
@@ -98,5 +101,5 @@ const MedicalScreen = observer(() => {
       </ThemedView>
     </>
   );
-});
+};
 export default MedicalScreen;

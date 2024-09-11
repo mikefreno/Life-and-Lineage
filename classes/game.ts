@@ -131,9 +131,18 @@ export class Game {
   /**
    * Moves the game time forward, effectively aging all characters. Additionally will "tick" all time based events,
    * this includes affections, conditions and investements. Additionally will roll to apply a debuff if the player character
-   * has negative sanity
+   * has negative sanity. The full save is passed in instead of importing to prevent an import cycle
    */
-  public gameTick(playerState: PlayerCharacter) {
+  public gameTick({
+    playerState,
+    fullSave,
+  }: {
+    playerState: PlayerCharacter;
+    fullSave: (
+      game: Game,
+      playerState: PlayerCharacter,
+    ) => Promise<void> | undefined;
+  }) {
     const dateObject = new Date(this.date);
     dateObject.setDate(dateObject.getDate() + 7);
     this.date = dateObject.toISOString();
@@ -143,6 +152,7 @@ export class Game {
     playerState.tickDownRelationshipAffection();
     playerState.conditionTicker();
     playerState.tickAllInvestments();
+    fullSave(this, playerState);
   }
   //----------------------------------Dungeon----------------------------------//
   public getDungeon(instance: string, level: string): DungeonLevel | undefined {

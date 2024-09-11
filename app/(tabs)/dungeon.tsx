@@ -51,15 +51,20 @@ const DungeonScreen = observer(() => {
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    let deepestDungeonDepth = 0;
-    gameState?.dungeonInstances.forEach((dungeonInstance) => {
-      let dungeonDepth = levelOffset[dungeonInstance.name];
-      if (dungeonDepth + dungeonInstance.levels.length > deepestDungeonDepth) {
-        deepestDungeonDepth = dungeonDepth + dungeonInstance.levels.length;
-      }
-    });
-    setHeight(deepestDungeonDepth);
-  }, [gameState?.dungeonInstances, pathname]);
+    if (isFocused) {
+      let deepestDungeonDepth = 0;
+      gameState?.dungeonInstances.forEach((dungeonInstance) => {
+        let dungeonDepth = levelOffset[dungeonInstance.name];
+        if (
+          dungeonDepth + dungeonInstance.levels.length >
+          deepestDungeonDepth
+        ) {
+          deepestDungeonDepth = dungeonDepth + dungeonInstance.levels.length;
+        }
+      });
+      setHeight(deepestDungeonDepth);
+    }
+  }, [isFocused, gameState?.dungeonInstances, pathname]);
 
   return (
     <>

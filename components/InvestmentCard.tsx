@@ -15,6 +15,7 @@ import ThemedCard from "./ThemedCard";
 import { AppContext } from "../app/_layout";
 import GenericStrikeAround from "./GenericStrikeAround";
 import { ClockIcon, Coins, Sanity, Vault } from "../assets/icons/SVGIcons";
+import { fullSave } from "../utility/functions/save_load";
 
 interface InvestmentCardProps {
   investment: InvestmentType;
@@ -66,7 +67,7 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
   function collectOnInvestment() {
     if (playerState && gameState) {
       playerState.collectFromInvestment(investment.name);
-      gameState.gameTick(playerState);
+      gameState.gameTick({ playerState, fullSave });
     }
   }
 

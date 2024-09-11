@@ -21,7 +21,7 @@ import { Enemy } from "../classes/creatures";
 import { fullSave, fullLoad } from "../utility/functions/save_load";
 import { Dimensions, Keyboard, Platform, StyleSheet } from "react-native";
 import { View as ThemedView } from "../components/Themed";
-import { autorun } from "mobx";
+import { autorun, reaction } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
@@ -115,6 +115,10 @@ async function registerForPushNotificationsAsync() {
   }
 }
 
+/**
+ * This wraps the entire app, loads the player data, sets up user app settings and holds&sets the `AppContext`.
+ * The responsibility of this is largely around unseen app state, whereas `RootLayout` is largely concerned with UI
+ */
 const Root = observer(() => {
   const [gameState, setGameData] = useState<Game>();
   const [playerState, setPlayerCharacter] = useState<PlayerCharacter>();
@@ -189,8 +193,6 @@ const Root = observer(() => {
   useEffect(() => {
     getData();
   }, []);
-
-  autorun(() => fullSave(gameState, playerState));
 
   const [dimensions, setDimensions] = useState(() => ({
     height: Dimensions.get("window").height,
@@ -285,6 +287,9 @@ const Root = observer(() => {
   );
 });
 
+/**
+ * This focuses on getting the UI set, and relieving the splash screen when ready
+ */
 const RootLayout = observer(() => {
   const [fontLoaded] = useFonts({
     PixelifySans: require("../assets/fonts/PixelifySans-Regular.ttf"),

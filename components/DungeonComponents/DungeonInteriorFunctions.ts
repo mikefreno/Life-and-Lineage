@@ -3,7 +3,7 @@ import { Enemy, type Minion } from "../../classes/creatures";
 import { enemyGenerator } from "../../utility/enemy";
 import { getMagnitude } from "../../utility/functions/conditions";
 import { toTitleCase } from "../../utility/functions/misc/words";
-import { dungeonSave } from "../../utility/functions/save_load";
+import { dungeonSave, fullSave } from "../../utility/functions/save_load";
 import {
   AttackUse,
   type AppContextType,
@@ -59,7 +59,7 @@ export function enemyTurnCheck({ dungeonData, appData }: contextData) {
           setDroppedItems(drops);
         }
         setEnemy(null);
-        gameState.gameTick(playerState);
+        gameState.gameTick({ playerState, fullSave });
       } else if (slug[0] == "Personal") {
         const drops = enemyState.getDrops(
           playerState.playerClass,
@@ -69,7 +69,7 @@ export function enemyTurnCheck({ dungeonData, appData }: contextData) {
         if (drops != "already retrieved") {
           playerState.addGold(drops.gold);
           setDroppedItems(drops);
-          gameState.gameTick(playerState);
+          gameState.gameTick({ playerState, fullSave });
         }
         setEnemy(null);
       } else {
@@ -89,11 +89,11 @@ export function enemyTurnCheck({ dungeonData, appData }: contextData) {
             thisDungeon.setBossDefeated();
             gameState.openNextDungeonLevel(thisInstance!.name);
             playerState.bossDefeated();
-            if (!gameState.tutorialsShown["First Boss Kill"]) {
+            if (!gameState.tutorialsShown["firstBossKill"]) {
               setShouldShowFirstBossKillTutorialAfterItemDrops(true);
             }
           }
-          gameState.gameTick(playerState);
+          gameState.gameTick({ playerState, fullSave });
         }
 
         setEnemy(null);
@@ -216,7 +216,7 @@ export const enemyTurn = ({ appData, dungeonData }: contextData) => {
             playerState.addGold(drops.gold);
             setDroppedItems(drops);
 
-            gameState.gameTick(playerState);
+            gameState.gameTick({ playerState, fullSave });
           }
           setEnemy(null);
         } else {
@@ -231,7 +231,7 @@ export const enemyTurn = ({ appData, dungeonData }: contextData) => {
           if (drops != "already retrieved") {
             playerState.addGold(drops.gold);
             setDroppedItems(drops);
-            gameState.gameTick(playerState);
+            gameState.gameTick({ playerState, fullSave });
             if (fightingBoss && gameState && thisDungeon) {
               setFightingBoss(false);
               playerState.bossDefeated();

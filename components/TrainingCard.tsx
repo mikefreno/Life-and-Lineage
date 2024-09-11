@@ -8,6 +8,7 @@ import GenericRaisedButton from "./GenericRaisedButton";
 import { toTitleCase } from "../utility/functions/misc/words";
 import { AppContext } from "../app/_layout";
 import { Coins, Sanity } from "../assets/icons/SVGIcons";
+import { fullSave } from "../utility/functions/save_load";
 
 interface TrainingCardProps {
   name: string;
@@ -37,7 +38,7 @@ const TrainingCard = observer(
 
     useEffect(() => {
       setExperience(playerState.getSpecifiedQualificationProgress(name));
-    }, [playerState?.sanity]);
+    }, [playerState?.currentSanity]);
 
     const progressQualification = () => {
       playerState.incrementQualificationProgress(
@@ -46,7 +47,7 @@ const TrainingCard = observer(
         sanityCostPerTick,
         goldCostPerTick,
       );
-      gameState.gameTick(playerState);
+      gameState.gameTick({ playerState, fullSave });
     };
 
     return (

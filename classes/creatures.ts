@@ -25,6 +25,7 @@ import weapons from "../assets/json/items/weapons.json";
 import necroBooks from "../assets/json/items/necroBooks.json";
 import paladinBooks from "../assets/json/items/paladinBooks.json";
 import mageBooks from "../assets/json/items/mageBooks.json";
+import rangerBooks from "../assets/json/items/rangerBooks.json";
 import * as Crypto from "expo-crypto";
 import { Item, isStackable } from "./item";
 import { action, makeObservable, observable } from "mobx";
@@ -331,7 +332,7 @@ export class Creature {
   }
   //---------------------------Misc---------------------------//
   public getDrops(
-    playerClass: "necromancer" | "paladin" | "mage",
+    playerClass: "necromancer" | "paladin" | "mage" | "ranger",
     bossFight: boolean,
   ) {
     if (this.gotDrops) return "already retrieved";
@@ -572,7 +573,7 @@ export class Minion extends Creature {
 
 function itemList(
   itemType: string,
-  playerClass: "mage" | "paladin" | "necromancer",
+  playerClass: "mage" | "paladin" | "necromancer" | "ranger",
 ): {
   name: string;
   baseValue: number;
@@ -589,11 +590,16 @@ function itemList(
     case "bodyArmor":
       return bodyArmors;
     case "book":
-      if (playerClass == "necromancer") {
-        return necroBooks;
-      } else if (playerClass == "paladin") {
-        return paladinBooks;
-      } else return mageBooks;
+      switch (playerClass) {
+        case "necromancer":
+          return necroBooks;
+        case "mage":
+          return mageBooks;
+        case "paladin":
+          return paladinBooks;
+        case "ranger":
+          return rangerBooks;
+      }
     case "bow":
       return bows;
     case "focus":

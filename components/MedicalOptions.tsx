@@ -1,12 +1,12 @@
 import { View } from "react-native";
 import { Text } from "./Themed";
-import { useIsFocused } from "@react-navigation/native";
 import { useContext } from "react";
 import GenericRaisedButton from "./GenericRaisedButton";
-import { observer } from "mobx-react-lite";
 import ThemedCard from "./ThemedCard";
 import { AppContext } from "../app/_layout";
 import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
+import { observer } from "mobx-react-lite";
+import { fullSave } from "../utility/functions/save_load";
 
 interface MedicalOptionProps {
   title: string;
@@ -15,6 +15,7 @@ interface MedicalOptionProps {
   sanityRestore?: number | "fill";
   manaRestore?: number | "fill";
   removeDebuffs?: number | "all";
+  focused: boolean;
 }
 
 const MedicalOption = observer(
@@ -25,14 +26,14 @@ const MedicalOption = observer(
     sanityRestore,
     manaRestore,
     removeDebuffs,
+    focused,
   }: MedicalOptionProps) => {
     const appData = useContext(AppContext);
     if (!appData) throw new Error("missing context");
     const { playerState, gameState } = appData;
-    const isFocused = useIsFocused();
 
     function visit() {
-      if (playerState && gameState && isFocused) {
+      if (playerState && gameState && focused) {
         playerState.getMedicalService(
           cost,
           healthRestore == "fill" ? playerState.maxHealth : healthRestore,
@@ -42,7 +43,7 @@ const MedicalOption = observer(
             ? playerState.conditions.length
             : removeDebuffs,
         );
-        gameState.gameTick(playerState);
+        gameState.gameTick({ playerState, fullSave });
       }
     }
 
