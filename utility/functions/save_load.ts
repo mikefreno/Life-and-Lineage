@@ -20,11 +20,11 @@ const _fullSave = async (
   }
 };
 
+/**
+ * This should only rarely be called directly, such as app settings changes and shop transactions
+ */
 export const fullSave = throttle(_fullSave, 2000);
 
-/**
- * This should only rarely be called directly, such as app settings changes and after each turn in the dungeon.
- */
 export const fullLoad = async () => {
   try {
     const retrieved_game = storage.getString("game");

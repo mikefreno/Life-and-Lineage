@@ -129,7 +129,8 @@ export class Game {
   //----------------------------------Date----------------------------------//
 
   /**
-   * Moves the game time forward, effectively aging all characters. Additionally will "tick" all time based events,
+   * Saves the game (after all other effects), and moves the game time forward, effectively aging all characters.
+   * Additionally will "tick" all time based events,
    * this includes affections, conditions and investements. Additionally will roll to apply a debuff if the player character
    * has negative sanity. The full save is passed in instead of importing to prevent an import cycle
    */
