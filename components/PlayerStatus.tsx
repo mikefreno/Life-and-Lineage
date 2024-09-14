@@ -24,11 +24,8 @@ import {
   ClockIcon,
   Coins,
   DexterityIcon,
-  Energy,
-  HealthIcon,
   IntelligenceIcon,
   RotateArrow,
-  Sanity,
   SquareMinus,
   SquarePlus,
   StrengthIcon,
@@ -356,62 +353,177 @@ const PlayerStatus = observer(
       }
     }
 
-    function healthChangePopUp() {
-      if (healthDiff != 0) {
+    function ChangePopUp({
+      popUp,
+      diff,
+    }: {
+      popUp: "health" | "mana" | "sanity" | "gold";
+      diff: number;
+    }) {
+      const marginAdjust = popUp == "gold" ? "-mt-3" : "ml-1";
+      const color =
+        popUp == "mana" ? "#60a5fa" : popUp == "health" ? "#f87171" : "#c084fc";
+      if (diff) {
         return (
-          <View className="absolute ml-1">
-            <FadeOutNode animationCycler={animationCycler}>
-              <Text style={{ color: "#f87171" }}>
-                {healthDiff > 0 ? "+" : ""}
-                {healthDiff.toString()}
-              </Text>
-            </FadeOutNode>
-          </View>
-        );
-      }
-    }
-    function sanityChangePopUp() {
-      if (sanityDiff != 0) {
-        return (
-          <View className="absolute ml-1">
-            <FadeOutNode animationCycler={animationCycler}>
-              <Text style={{ color: "#c084fc" }}>
-                {sanityDiff > 0 ? "+" : ""}
-                {sanityDiff.toString()}
-              </Text>
-            </FadeOutNode>
-          </View>
-        );
-      }
-    }
-    function manaChangePopUp() {
-      if (manaDiff != 0) {
-        return (
-          <View className="absolute ml-1">
-            <FadeOutNode animationCycler={animationCycler}>
-              <Text style={{ color: "#60a5fa" }}>
-                {manaDiff > 0 ? "+" : ""}
-                {manaDiff.toString()}
-              </Text>
-            </FadeOutNode>
-          </View>
-        );
-      }
-    }
-    function goldChangePopUp() {
-      if (goldDiff != 0) {
-        return (
-          <View className="absolute -mt-3">
+          <View className={`absolute ${marginAdjust}`}>
             <FadeOutNode
               animationCycler={animationCycler}
               className="flex flex-row"
             >
-              <Text className="pr-0.5">
-                {goldDiff > 0 ? "+" : ""}
-                {goldDiff.toString()}
+              <Text className="pr-0.5" style={{ color: color }}>
+                {diff > 0 ? "+" : ""}
+                {diff.toString()}
               </Text>
-              <Coins />
+              {popUp == "gold" && <Coins />}
             </FadeOutNode>
+          </View>
+        );
+      }
+    }
+
+    function RenderPrimaryStatsBlock({
+      stat,
+    }: {
+      stat: "health" | "mana" | "sanity";
+    }) {
+      if (playerState) {
+        let current;
+        let max;
+        let min = 0;
+        let filledColor;
+        let unfilledColor;
+        switch (stat) {
+          case "health":
+            current = playerState.currentHealth;
+            max = playerState.maxHealth;
+            filledColor = "#ef4444";
+            unfilledColor = "#fca5a5";
+            break;
+          case "mana":
+            current = playerState.currentHealth;
+            max = playerState.maxMana;
+            filledColor = "#60a5fa";
+            unfilledColor = "#bfdbfe";
+            break;
+          case "sanity":
+            current = playerState.currentSanity;
+            max = playerState.maxSanity;
+            min = -playerState.maxSanity;
+            filledColor = "#c084fc";
+            unfilledColor = "#e9d5ff";
+            break;
+        }
+        return (
+          <View className="items-center">
+            <Text className="py-1" style={{ color: filledColor }}>
+              {toTitleCase(stat)}
+            </Text>
+            <View className="flex w-full flex-row items-center">
+              <View className="flex-1">
+                <ProgressBar
+                  value={current}
+                  minValue={min}
+                  maxValue={max}
+                  filledColor={filledColor}
+                  unfilledColor={unfilledColor}
+                  showMax
+                />
+              </View>
+              {playerState.unAllocatedSkillPoints > 0 && !respeccing && (
+                <Pressable
+                  className="px-0.5"
+                  onPress={() => {
+                    vibration({ style: "light" });
+                    playerState.addSkillPoint({ to: stat });
+                  }}
+                >
+                  {({ pressed }) => (
+                    <View className={pressed ? "scale-95" : ""}>
+                      <SquarePlus height={28} width={28} />
+                    </View>
+                  )}
+                </Pressable>
+              )}
+              {playerState.allocatedSkillPoints.sanity > 0 && respeccing && (
+                <Pressable
+                  className="px-0.5"
+                  onPress={() => {
+                    vibration({ style: "light" });
+                    playerState.removeSkillPoint({ from: stat });
+                  }}
+                >
+                  {({ pressed }) => (
+                    <View className={pressed ? "scale-95" : ""}>
+                      <SquareMinus height={28} width={28} />
+                    </View>
+                  )}
+                </Pressable>
+              )}
+            </View>
+          </View>
+        );
+      }
+    }
+
+    function RenderSecondaryStatsBlock({
+      stat,
+    }: {
+      stat: "strength" | "dexterity" | "intelligence";
+    }) {
+      if (playerState) {
+        return (
+          <View className="flex items-center">
+            <Text className="py-1">{toTitleCase(stat)}</Text>
+            <View className="flex flex-row items-center">
+              <Text>
+                {stat == "strength"
+                  ? playerState.totalStrength
+                  : stat == "dexterity"
+                  ? playerState.totalDexterity
+                  : playerState.totalIntelligence}
+              </Text>
+              {stat == "strength" ? (
+                <StrengthIcon height={20} width={23} />
+              ) : stat == "dexterity" ? (
+                <DexterityIcon height={20} width={23} />
+              ) : (
+                <IntelligenceIcon height={20} width={23} />
+              )}
+              <View className="flex flex-row">
+                {playerState.unAllocatedSkillPoints > 0 && !respeccing && (
+                  <Pressable
+                    className="px-0.5"
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      playerState.addSkillPoint({ to: stat });
+                    }}
+                  >
+                    {({ pressed }) => (
+                      <View className={pressed ? "scale-95" : ""}>
+                        <SquarePlus height={28} width={28} />
+                      </View>
+                    )}
+                  </Pressable>
+                )}
+                {playerState.allocatedSkillPoints[stat] > 0 && respeccing && (
+                  <Pressable
+                    className="px-0.5"
+                    onPress={() => {
+                      vibration({ style: "light" });
+                      playerState.removeSkillPoint({
+                        from: "strength",
+                      });
+                    }}
+                  >
+                    {({ pressed }) => (
+                      <View className={pressed ? "scale-95" : ""}>
+                        <SquareMinus height={28} width={28} />
+                      </View>
+                    )}
+                  </Pressable>
+                )}
+              </View>
+            </View>
           </View>
         );
       }
@@ -555,281 +667,13 @@ const PlayerStatus = observer(
                   </Pressable>
                 </View>
               )}
-              <View className="items-center">
-                <Text className="pb-1" style={{ color: "#ef4444" }}>
-                  Health
-                </Text>
-                <View className="flex w-full flex-row items-center">
-                  <View className="flex-1">
-                    <ProgressBar
-                      value={playerState.currentHealth}
-                      maxValue={playerState.maxHealth}
-                      filledColor="#ef4444"
-                      unfilledColor="#fca5a5"
-                      showMax
-                    />
-                  </View>
-                  {playerState.unAllocatedSkillPoints > 0 && !respeccing && (
-                    <Pressable
-                      className="px-0.5"
-                      onPress={() => {
-                        vibration({ style: "light" });
-                        playerState.addSkillPoint({ to: "health" });
-                      }}
-                    >
-                      {({ pressed }) => (
-                        <View className={`${pressed && "scale-95"}`}>
-                          <SquarePlus height={28} width={28} />
-                        </View>
-                      )}
-                    </Pressable>
-                  )}
-                  {playerState.allocatedSkillPoints.health > 0 &&
-                    respeccing && (
-                      <Pressable
-                        className="px-0.5"
-                        onPress={() => {
-                          vibration({ style: "light" });
-                          playerState.removeSkillPoint({ from: "health" });
-                        }}
-                      >
-                        {({ pressed }) => (
-                          <View className={pressed ? "scale-95" : ""}>
-                            <SquareMinus height={28} width={28} />
-                          </View>
-                        )}
-                      </Pressable>
-                    )}
-                </View>
-              </View>
-              <View className="items-center">
-                <Text className="py-1" style={{ color: "#60a5fa" }}>
-                  Mana
-                </Text>
-                <View className="flex w-full flex-row items-center">
-                  <View className="flex-1">
-                    <ProgressBar
-                      value={playerState.currentMana}
-                      maxValue={playerState.maxMana}
-                      filledColor="#60a5fa"
-                      unfilledColor="#bfdbfe"
-                      showMax
-                    />
-                  </View>
-                  {playerState.unAllocatedSkillPoints > 0 && !respeccing && (
-                    <Pressable
-                      className="px-0.5"
-                      onPress={() => {
-                        vibration({ style: "light" });
-                        playerState.addSkillPoint({ to: "mana" });
-                      }}
-                    >
-                      {({ pressed }) => (
-                        <View className={pressed ? "scale-95" : ""}>
-                          <SquarePlus height={28} width={28} />
-                        </View>
-                      )}
-                    </Pressable>
-                  )}
-                  {playerState.allocatedSkillPoints.mana > 0 && respeccing && (
-                    <Pressable
-                      className="px-0.5"
-                      onPress={() => {
-                        vibration({ style: "light" });
-                        playerState.removeSkillPoint({ from: "mana" });
-                      }}
-                    >
-                      {({ pressed }) => (
-                        <View className={pressed ? "scale-95" : ""}>
-                          <SquareMinus height={28} width={28} />
-                        </View>
-                      )}
-                    </Pressable>
-                  )}
-                </View>
-              </View>
-              <View className="items-center">
-                <Text className="py-1" style={{ color: "#c084fc" }}>
-                  Sanity
-                </Text>
-                <View className="flex w-full flex-row items-center">
-                  <View className="flex-1">
-                    <ProgressBar
-                      value={playerState.currentSanity}
-                      minValue={-playerState.maxSanity}
-                      maxValue={playerState.maxSanity}
-                      filledColor="#c084fc"
-                      unfilledColor="#e9d5ff"
-                      showMax
-                    />
-                  </View>
-                  {playerState.unAllocatedSkillPoints > 0 && !respeccing && (
-                    <Pressable
-                      className="px-0.5"
-                      onPress={() => {
-                        vibration({ style: "light" });
-                        playerState.addSkillPoint({ to: "sanity" });
-                      }}
-                    >
-                      {({ pressed }) => (
-                        <View className={pressed ? "scale-95" : ""}>
-                          <SquarePlus height={28} width={28} />
-                        </View>
-                      )}
-                    </Pressable>
-                  )}
-                  {playerState.allocatedSkillPoints.sanity > 0 &&
-                    respeccing && (
-                      <Pressable
-                        className="px-0.5"
-                        onPress={() => {
-                          vibration({ style: "light" });
-                          playerState.removeSkillPoint({ from: "sanity" });
-                        }}
-                      >
-                        {({ pressed }) => (
-                          <View className={pressed ? "scale-95" : ""}>
-                            <SquareMinus height={28} width={28} />
-                          </View>
-                        )}
-                      </Pressable>
-                    )}
-                </View>
-              </View>
+              <RenderPrimaryStatsBlock stat={"health"} />
+              <RenderPrimaryStatsBlock stat={"mana"} />
+              <RenderPrimaryStatsBlock stat={"sanity"} />
               <View className="flex flex-row justify-evenly">
-                <View className="flex items-center">
-                  <Text className="py-1">Strength</Text>
-                  <View className="flex flex-row items-center">
-                    <Text>{playerState.totalStrength}</Text>
-                    <StrengthIcon color={"#ef4444"} height={20} width={23} />
-                    <View className="flex flex-row">
-                      {playerState.unAllocatedSkillPoints > 0 &&
-                        !respeccing && (
-                          <Pressable
-                            className="px-0.5"
-                            onPress={() => {
-                              vibration({ style: "light" });
-                              playerState.addSkillPoint({ to: "strength" });
-                            }}
-                          >
-                            {({ pressed }) => (
-                              <View className={pressed ? "scale-95" : ""}>
-                                <SquarePlus height={28} width={28} />
-                              </View>
-                            )}
-                          </Pressable>
-                        )}
-                      {playerState.allocatedSkillPoints.strength > 0 &&
-                        respeccing && (
-                          <Pressable
-                            className="px-0.5"
-                            onPress={() => {
-                              vibration({ style: "light" });
-                              playerState.removeSkillPoint({
-                                from: "strength",
-                              });
-                            }}
-                          >
-                            {({ pressed }) => (
-                              <View className={pressed ? "scale-95" : ""}>
-                                <SquareMinus height={28} width={28} />
-                              </View>
-                            )}
-                          </Pressable>
-                        )}
-                    </View>
-                  </View>
-                </View>
-                <View className="flex items-center">
-                  <Text className="py-1">Dexterity</Text>
-                  <View className="flex flex-row items-center">
-                    <Text>{playerState.totalDexterity}</Text>
-                    <DexterityIcon height={20} width={23} />
-                    <View className="flex flex-row items-center">
-                      {playerState.unAllocatedSkillPoints > 0 &&
-                        !respeccing && (
-                          <Pressable
-                            className="px-0.5"
-                            onPress={() => {
-                              vibration({ style: "light" });
-                              playerState.addSkillPoint({ to: "dexterity" });
-                            }}
-                          >
-                            {({ pressed }) => (
-                              <View className={pressed ? "scale-95" : ""}>
-                                <SquarePlus height={28} width={28} />
-                              </View>
-                            )}
-                          </Pressable>
-                        )}
-                      {playerState.allocatedSkillPoints.dexterity > 0 &&
-                        respeccing && (
-                          <Pressable
-                            className="px-0.5"
-                            onPress={() => {
-                              vibration({ style: "light" });
-                              playerState.removeSkillPoint({
-                                from: "dexterity",
-                              });
-                            }}
-                          >
-                            {({ pressed }) => (
-                              <View className={pressed ? "scale-95" : ""}>
-                                <SquareMinus height={28} width={28} />
-                              </View>
-                            )}
-                          </Pressable>
-                        )}
-                    </View>
-                  </View>
-                </View>
-                <View className="flex items-center">
-                  <Text className="py-1">Intelligence</Text>
-                  <View className="flex flex-row items-center">
-                    <Text>{playerState.totalIntelligence}</Text>
-                    <IntelligenceIcon
-                      color={"#60a5fa"}
-                      height={20}
-                      width={23}
-                    />
-                    <View className="flex flex-row items-center">
-                      {playerState.unAllocatedSkillPoints > 0 &&
-                        !respeccing && (
-                          <Pressable
-                            className="px-0.5"
-                            onPress={() => {
-                              vibration({ style: "light" });
-                              playerState.addSkillPoint({ to: "intelligence" });
-                            }}
-                          >
-                            {({ pressed }) => (
-                              <View className={pressed ? "scale-95" : ""}>
-                                <SquarePlus height={28} width={28} />
-                              </View>
-                            )}
-                          </Pressable>
-                        )}
-                      {playerState.allocatedSkillPoints.intelligence > 0 &&
-                        respeccing && (
-                          <Pressable
-                            className="px-0.5"
-                            onPress={() => {
-                              vibration({ style: "light" });
-                              playerState.removeSkillPoint({
-                                from: "intelligence",
-                              });
-                            }}
-                          >
-                            {({ pressed }) => (
-                              <View className={pressed ? "scale-95" : ""}>
-                                <SquareMinus height={28} width={28} />
-                              </View>
-                            )}
-                          </Pressable>
-                        )}
-                    </View>
-                  </View>
-                </View>
+                <RenderSecondaryStatsBlock stat={"strength"} />
+                <RenderSecondaryStatsBlock stat={"dexterity"} />
+                <RenderSecondaryStatsBlock stat={"intelligence"} />
               </View>
               {(playerState.equipmentStats.armor > 0 ||
                 playerState.equipmentStats.damage > 0 ||
@@ -923,7 +767,9 @@ const PlayerStatus = observer(
                 )}
                 <View className="flex flex-row justify-evenly py-1">
                   <View className="flex w-[31%]">
-                    {showingHealthChange && healthChangePopUp()}
+                    {showingHealthChange && (
+                      <ChangePopUp popUp={"health"} diff={healthDiff} />
+                    )}
                     <Text className="mx-auto" style={{ color: "#ef4444" }}>
                       Health
                     </Text>
@@ -935,7 +781,9 @@ const PlayerStatus = observer(
                     />
                   </View>
                   <View className="flex w-[31%]">
-                    {showingManaChange && manaChangePopUp()}
+                    {showingManaChange && (
+                      <ChangePopUp popUp={"mana"} diff={manaDiff} />
+                    )}
                     <Text className="mx-auto" style={{ color: "#60a5fa" }}>
                       Mana
                     </Text>
@@ -947,7 +795,9 @@ const PlayerStatus = observer(
                     />
                   </View>
                   <View className="flex w-[31%]">
-                    {showingSanityChange && sanityChangePopUp()}
+                    {showingSanityChange && (
+                      <ChangePopUp popUp={"sanity"} diff={sanityDiff} />
+                    )}
                     <Text className="mx-auto" style={{ color: "#c084fc" }}>
                       Sanity
                     </Text>
@@ -967,7 +817,9 @@ const PlayerStatus = observer(
                 isCompact ? "ml-4" : "justify-center w-full mr-8"
               } flex flex-row absolute z-top`}
             >
-              {showingGoldChange && goldChangePopUp()}
+              {showingGoldChange && (
+                <ChangePopUp popUp={"gold"} diff={goldDiff} />
+              )}
             </View>
           </Pressable>
         </>
