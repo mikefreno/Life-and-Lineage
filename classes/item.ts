@@ -110,7 +110,7 @@ export class Item {
     playerClass: "mage" | "paladin" | "necromancer" | "ranger",
   ): Spell {
     let spell = undefined;
-    if (this.itemClass == "book") {
+    if (this.itemClass == ItemClassType.Book) {
       if (playerClass == "mage") {
         const bookObj = mageBooks.find((book) => book.name == this.name);
         spell = mageSpells.find(
@@ -149,7 +149,7 @@ export class Item {
       }
     }
     if (spell) {
-      return parseSpell(spell);
+      return new Spell({ ...spell });
     }
     throw new Error("Requested a spell from a non-book item");
   }

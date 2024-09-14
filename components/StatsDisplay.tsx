@@ -19,6 +19,7 @@ import {
   IntelligenceIcon,
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
+import { ItemClassType } from "../utility/types";
 
 type BaseProps = {
   displayItem: {
@@ -139,6 +140,7 @@ export function StatsDisplay({
     }
     return null;
   };
+  useEffect(() => console.log(displayItem), [displayItem]);
 
   const SaleSection = () => {
     if (playerState) {
@@ -306,7 +308,9 @@ export function StatsDisplay({
       const spellRes = displayItem.item[0].getAttachedSpell(
         playerState.playerClass,
       );
-      return `${convertMasteryToString[spellRes.proficiencyNeeded]} level book`;
+      return `${toTitleCase(
+        spellRes.proficiencyNeeded as unknown as string,
+      )} level book`;
     }
   }
   const onLayoutView = (event: LayoutChangeEvent) => {
@@ -324,7 +328,7 @@ export function StatsDisplay({
       className="items-center rounded-md border border-zinc-600 p-4"
       onLayout={onLayoutView}
       style={
-        displayItem.item[0].itemClass == "book"
+        displayItem.item[0].itemClass == ItemClassType.Book
           ? {
               backgroundColor:
                 colorScheme == "light"
@@ -385,11 +389,11 @@ export function StatsDisplay({
       <Text className="text-sm">
         {displayItem.item[0].itemClass == "BodyArmor"
           ? "Body Armor"
-          : displayItem.item[0].itemClass == "book" && playerState
+          : displayItem.item[0].itemClass == ItemClassType.Book && playerState
           ? bookItemLabel()
           : toTitleCase(displayItem.item[0].itemClass)}
       </Text>
-      {displayItem.item[0].itemClass == "book" && playerState ? (
+      {displayItem.item[0].itemClass == ItemClassType.Book && playerState ? (
         <>
           <View className="px-2 mx-auto">
             <SpellDetails

@@ -15,7 +15,7 @@ import { Stack } from "expo-router";
 import { BlurView } from "expo-blur";
 import { useHeaderHeight } from "@react-navigation/elements";
 import GenericRaisedButton from "../components/GenericRaisedButton";
-import { MasteryLevel } from "../utility/types";
+import { ItemClassType, MasteryLevel } from "../utility/types";
 import GenericModal from "../components/GenericModal";
 import {
   convertMasteryToNumber,
@@ -35,7 +35,7 @@ export default function LearningKnowledgeScreen() {
   const { colorScheme } = useColorScheme();
 
   const books = playerState?.inventory.filter(
-    (item) => item.itemClass == "book",
+    (item) => item.itemClass == ItemClassType.Book,
   );
   const isFocused = useIsFocused();
 

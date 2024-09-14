@@ -78,12 +78,12 @@
       "attacks": ["shoot"],
       "drops": [
          {"item": "bone", "itemType":"ingredient","chance":0.75},
-         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
-         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
-         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
-         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
-         {"item": "iron arrow", "itemType":"arrow", "chance": 0.75},
-         {"item": "short bow", "itemType":"bow", "chance": 0.10}
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.5},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.5},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.5},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.5},
+         {"item": "iron arrow", "itemType":"arrow", "chance": 0.5},
+         {"item": "short bow", "itemType":"bow", "chance": 0.075}
       ],
       "goldDropRange": {"minimum": 15, "maximum":25},
       "armorValue": 10,

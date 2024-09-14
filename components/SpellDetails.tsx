@@ -90,7 +90,8 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
               />
             </View>
           ) : null}
-          {spell.baseDamage && spell.baseDamage(playerState!) > 0 ? (
+          {spell.baseDamage(playerState!) &&
+          spell.baseDamage(playerState!) > 0 ? (
             <View className="flex flex-row items-center">
               <Text>{spell.baseDamage(playerState!)}</Text>
               <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
