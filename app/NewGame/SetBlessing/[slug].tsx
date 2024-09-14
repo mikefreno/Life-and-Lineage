@@ -93,6 +93,7 @@ export default function SetBlessing() {
     return (
       <Pressable
         onPress={() => {
+          vibration({ style: "light" });
           setBlessing(element);
           blessingRef.current = element;
         }}

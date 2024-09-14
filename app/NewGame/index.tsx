@@ -146,6 +146,7 @@ export default function NewGameScreen() {
             <Pressable
               className="-ml-2"
               onPress={() => {
+                vibration({ style: "light" });
                 setSelectedClass("mage");
                 classRef.current = "mage";
               }}
@@ -180,6 +181,7 @@ export default function NewGameScreen() {
             <Pressable
               className="-mr-2"
               onPress={() => {
+                vibration({ style: "light" });
                 setSelectedClass("ranger");
                 classRef.current = "ranger";
               }}
@@ -214,6 +216,7 @@ export default function NewGameScreen() {
             <Pressable
               className="-ml-2"
               onPress={() => {
+                vibration({ style: "light" });
                 setSelectedClass("necromancer");
                 classRef.current = "necromancer";
               }}
@@ -250,6 +253,7 @@ export default function NewGameScreen() {
             <Pressable
               className="-mr-2"
               onPress={() => {
+                vibration({ style: "light" });
                 setSelectedClass("paladin");
                 classRef.current = "paladin";
               }}
