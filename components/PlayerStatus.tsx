@@ -814,7 +814,7 @@ const PlayerStatus = observer(
               <View className="flex flex-row justify-evenly">
                 <View className="flex items-center">
                   <Text className="py-1">Strength</Text>
-                  <View className="flex flex-row">
+                  <View className="flex flex-row items-center">
                     <Text>{playerState.totalStrength}</Text>
                     <StrengthIcon color={"#ef4444"} height={20} width={23} />
                     <View className="flex flex-row">
@@ -857,7 +857,7 @@ const PlayerStatus = observer(
                 </View>
                 <View className="flex items-center">
                   <Text className="py-1">Dexterity</Text>
-                  <View className="flex flex-row">
+                  <View className="flex flex-row items-center">
                     <Text>{playerState.totalDexterity}</Text>
                     <DexterityIcon height={20} width={23} />
                     <View className="flex flex-row items-center">
@@ -900,7 +900,7 @@ const PlayerStatus = observer(
                 </View>
                 <View className="flex items-center">
                   <Text className="py-1">Intelligence</Text>
-                  <View className="flex flex-row">
+                  <View className="flex flex-row items-center">
                     <Text>{playerState.totalIntelligence}</Text>
                     <IntelligenceIcon
                       color={"#60a5fa"}

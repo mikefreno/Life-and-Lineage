@@ -24,6 +24,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { Energy, Regen } from "../../assets/icons/SVGIcons";
 import { Attack } from "../../classes/attack";
 import { Spell } from "../../classes/spell";
+import { Item } from "../../classes/item";
 
 interface BattleTabProps {
   battleTab: "attacksOrNavigation" | "equipment" | "log";
@@ -51,6 +52,13 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
     setDisplayItem,
   } = dungeonData;
   const [combinedData, setCombinedData] = useState<(Attack | Spell)[]>([]);
+  const [hiddenDisplayItem, setHiddenDisplayItem] = useState<{
+    item: Item[];
+    positon: {
+      left: number;
+      top: number;
+    };
+  } | null>();
 
   const vibration = useVibration();
   const isFocused = useIsFocused();
@@ -76,6 +84,18 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
   }, [playerState]);
 
   useEffect(() => {}, [inCombat]);
+
+  useEffect(() => {
+    if (battleTab !== "equipment") {
+      setHiddenDisplayItem(displayItem);
+      setDisplayItem(null);
+    } else {
+      if (hiddenDisplayItem) {
+        setDisplayItem(hiddenDisplayItem);
+        setHiddenDisplayItem(null);
+      }
+    }
+  }, [battleTab]);
 
   const TabRender = () => {
     if (playerState) {

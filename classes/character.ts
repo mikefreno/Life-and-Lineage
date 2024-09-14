@@ -1489,6 +1489,77 @@ export class PlayerCharacter extends Character {
     }
     this.conditions = debuffArray;
   }
+  //----------------------------------Mage Only------------------------------------//
+  //----------------------------------Paladin Only---------------------------------//
+  //----------------------------------Ranger Only----------------------------------//
+  get isInStealth() {
+    return !!this.conditions.find((cond) => cond.effect.includes("stealth"));
+  }
+  public exitStealth() {
+    const filtered: Condition[] = [];
+    this.conditions.forEach((cond) => {
+      if (!cond.effect.includes("stealth")) {
+        filtered.push(cond);
+      }
+    });
+  }
+  //----------------------------------Necromancer Only------------------------------//
+  /**
+   * This is only ever needed if the player is a necromancer
+   */
+  private getBloodOrbs() {
+    return this.conditions.filter((cond) => cond.name == "blood orb");
+  }
+  /**
+   * This is only ever needed if the player is a necromancer
+   */
+  get bloodOrbCount() {
+    return this.getBloodOrbs().length;
+  }
+  /**
+   *
+   */
+  public hasEnoughBloodOrbs(spell: Spell) {
+    const bloodOrbsNeeded = spell.buffs.filter(
+      (buff) => buff == "consume blood orb",
+    ).length;
+    if (bloodOrbsNeeded > this.bloodOrbCount) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * This is only ever needed if the player is a necromancer
+   * `Throws` if the user does not have enough blood orbs; only ever call if `hasEnoughBloodOrbs` returns true
+   * Removes soonest to expire blood orbs first
+   */
+  public removeBloodOrbs(spell: Spell) {
+    const bloodOrbsNeeded = spell.buffs.filter(
+      (buff) => buff == "consume blood orb",
+    ).length;
+    if (bloodOrbsNeeded > this.bloodOrbCount) {
+      throw new Error("User does not have enough blood orbs");
+    } else {
+      let orbsToRemove = this.getBloodOrbs()
+        .sort((a, b) => a.turns - b.turns)
+        .splice(0, bloodOrbsNeeded);
+      for (let i = 0; orbsToRemove.length > 0; i++) {
+        //still make sure that we can not run past length of conditions, should not ever be hit
+        if (i > this.conditions.length) {
+          break;
+        }
+        const filtered = orbsToRemove.filter(
+          (orb) => !(orb.id == this.conditions[i].id),
+        );
+        if (filtered.length < orbsToRemove.length) {
+          // we found a match with i, remove it from this.conditions, and update removal list
+          this.conditions.splice(i, 1);
+          orbsToRemove = filtered;
+        }
+      }
+    }
+  }
   //----------------------------------Physical Combat----------------------------------//
   get physicalAttacks() {
     let builtAttacks: Attack[] = [];

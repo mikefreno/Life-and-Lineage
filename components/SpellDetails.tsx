@@ -18,7 +18,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
   const { colorScheme } = useColorScheme();
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing context");
-  const { dimensions } = appData;
+  const { dimensions, playerState } = appData;
   return (
     <View
       className="rounded-lg"
@@ -90,9 +90,9 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
               />
             </View>
           ) : null}
-          {spell.baseDamage && spell.baseDamage > 0 ? (
+          {spell.baseDamage && spell.baseDamage(playerState!) > 0 ? (
             <View className="flex flex-row items-center">
-              <Text>{spell.baseDamage}</Text>
+              <Text>{spell.baseDamage(playerState!)}</Text>
               <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
             </View>
           ) : null}

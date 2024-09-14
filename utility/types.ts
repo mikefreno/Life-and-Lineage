@@ -180,7 +180,8 @@ export type EffectOptions =
   | "thorns"
   | "revenge"
   | "blood magic consumable"
-  | "execute";
+  | "execute"
+  | "stealth";
 
 export type EffectStyle = "multiplier" | "percentage" | "flat";
 

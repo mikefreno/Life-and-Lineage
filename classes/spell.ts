@@ -71,7 +71,7 @@ export class Spell {
     this.summons = effects.summon ?? [];
   }
 
-  private baseDamage(user: PlayerCharacter) {
+  public baseDamage(user: PlayerCharacter) {
     if (this.initDamage > 0) {
       return this.initDamage + user.magicPower;
     } else return 0;
@@ -88,6 +88,9 @@ export class Spell {
       (user.currentMasteryLevel(this.element) as MasteryLevel) <
       this.proficiencyNeeded
     ) {
+      return false;
+    }
+    if (!user.hasEnoughBloodOrbs(this)) {
       return false;
     }
 
@@ -138,19 +141,24 @@ export class Spell {
     });
     const buffNames: string[] = []; // only storing names, collecting for logBuilder
     this.buffs.forEach((buff) => {
-      const newBuff = createBuff({
-        buffName: buff,
-        buffChance: 1,
-        attackPower: this.baseDamage(user),
-        maxHealth: user.nonConditionalMaxHealth,
-        maxSanity: user.nonConditionalMaxSanity,
-        applierNameString: user.fullName,
-      });
-      if (newBuff) {
-        buffNames.push(newBuff.name);
-        user.addCondition(newBuff);
+      if (buff !== "consume blood orb") {
+        const newBuff = createBuff({
+          buffName: buff,
+          buffChance: 1,
+          attackPower: this.baseDamage(user),
+          maxHealth: user.nonConditionalMaxHealth,
+          maxSanity: user.nonConditionalMaxSanity,
+          applierNameString: user.fullName,
+        });
+        if (newBuff) {
+          buffNames.push(newBuff.name);
+          user.addCondition(newBuff);
+        }
       }
     });
+    if (this.buffs.includes("consume blood orb")) {
+      user.removeBloodOrbs(this);
+    }
     let minionSpecies: string[] = [];
     this.summons.forEach((summon) => {
       const type = (user as PlayerCharacter | Enemy).createMinion(summon);

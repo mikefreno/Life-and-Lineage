@@ -80,8 +80,8 @@ export default function NewGameReview() {
           baseHealth: 120,
           baseMana: 80,
           baseStrength: 6,
-          baseIntelligence: 3,
-          baseDexterity: 4,
+          baseIntelligence: 4,
+          baseDexterity: 3,
           baseManaRegen: 5,
           baseSanity: 60,
         };

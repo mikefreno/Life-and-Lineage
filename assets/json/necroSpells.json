@@ -11,14 +11,26 @@
     }
   },
   {
-    "name": "life tap",
+    "name": "orb burst(mana)",
     "element": "blood",
     "proficiencyNeeded": "apprentice",
     "manaCost": -35,
     "effects": {
       "damage": null,
-      "selfDamage": 20,
-      "buffs": null,
+      "selfDamage": null,
+      "buffs": ["consume blood orb"],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "orb burst(health)",
+    "element": "blood",
+    "proficiencyNeeded": "apprentice",
+    "manaCost": 5,
+    "effects": {
+      "damage": null,
+      "selfDamage": -35,
+      "buffs": ["consume blood orb"],
       "debuffs": null
     }
   },
@@ -28,9 +40,21 @@
     "proficiencyNeeded": "adept",
     "manaCost": 50,
     "effects": {
-      "damage": 30,
-      "selfDamage": -30,
-      "buffs": null,
+      "damage": 25,
+      "selfDamage": -25,
+      "buffs": ["blood orb"],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "blood spear",
+    "element": "blood",
+    "proficiencyNeeded": "expert",
+    "manaCost": 75,
+    "effects": {
+      "damage": 90,
+      "selfDamage": null,
+      "buffs": ["consume blood orb"],
       "debuffs": null
     }
   },

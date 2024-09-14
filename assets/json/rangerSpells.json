@@ -34,7 +34,7 @@
     "manaCost": 50,
     "effects": {
       "damage": null,
-      "buffs": [{"name": "shadow cover", "chance": 1.0}],
+      "buffs": [{"name": "stealth", "chance": 1.0}],
       "debuffs": null
     }
   },
