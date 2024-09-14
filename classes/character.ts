@@ -1489,7 +1489,7 @@ export class PlayerCharacter extends Character {
     }
     this.conditions = debuffArray;
   }
-  //----------------------------------Mage Only------------------------------------//
+  //----------------------------------Mage Only-----------------------------------//
   //----------------------------------Paladin Only---------------------------------//
   //----------------------------------Ranger Only----------------------------------//
   get isInStealth() {
@@ -1503,7 +1503,7 @@ export class PlayerCharacter extends Character {
       }
     });
   }
-  //----------------------------------Necromancer Only------------------------------//
+  //----------------------------------Necromancer Only----------------------------------//
   /**
    * This is only ever needed if the player is a necromancer
    */
@@ -1577,12 +1577,7 @@ export class PlayerCharacter extends Character {
         const attackStrings = itemObj.attacks;
         attacks.filter((attack) => {
           if (attackStrings.includes(attack.name)) {
-            const builtAttack = new Attack({
-              name: attack.name,
-              hitChance: attack.hitChance,
-              targets: attack.targets as "single" | "cleave" | "aoe",
-              damageMult: attack.damageMult,
-            });
+            const builtAttack = Attack.fromJSON(attack);
             builtAttacks.push(builtAttack);
           }
         });
@@ -1616,7 +1611,7 @@ export class PlayerCharacter extends Character {
     this.endTurn();
   }
 
-  private endTurn() {
+  public endTurn() {
     this.regenMana();
     this.conditionTicker();
   }

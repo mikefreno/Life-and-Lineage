@@ -122,6 +122,7 @@ export const enemyTurn = ({ appData, dungeonData }: contextData) => {
     setEnemyTextString,
     setEnemyTextDummy,
     battleLogger,
+    setAttackAnimationOnGoing,
   } = dungeonData;
   if (enemyState && playerState && gameState) {
     setEnemyAttacked(true);
@@ -243,6 +244,7 @@ export const enemyTurn = ({ appData, dungeonData }: contextData) => {
           setEnemy(null);
         }
       }
+      setAttackAnimationOnGoing(false);
     }, 1000);
   }
 };
@@ -322,8 +324,7 @@ export const use = ({
   isFocused,
 }: use) => {
   if (!appData || !dungeonData) throw new Error("missing context in pass()");
-  const { battleLogger, setAttackAnimationOnGoing, setEnemyDodgeDummy } =
-    dungeonData;
+  const { battleLogger, setEnemyDodgeDummy } = dungeonData;
   const { playerState, enemyState } = appData;
   if (enemyState && playerState && isFocused) {
     if (attackOrSpell instanceof Attack) {
@@ -349,7 +350,6 @@ export const use = ({
           dungeonData,
         });
       }, 1000 * playerState.minions.length);
-      setAttackAnimationOnGoing(false);
     }, 1000);
   }
 };

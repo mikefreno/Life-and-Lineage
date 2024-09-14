@@ -167,7 +167,7 @@ export class Spell {
     user.gainProficiency(this);
 
     // we wait here for animation timings, the fade out of mana use cost
-    wait(1000).then(() => user.regenMana());
+    wait(1000).then(() => user.endTurn());
 
     return {
       logString: this.logBuilder({

@@ -5,9 +5,10 @@ import {
 } from "../utility/functions/conditions";
 import { toTitleCase } from "../utility/functions/misc/words";
 import { rollD20 } from "../utility/functions/roll";
-import type { PlayerCharacter } from "./character";
+import { PlayerCharacter } from "./character";
 import type { Enemy, Minion } from "./creatures";
 import { AttackUse } from "../utility/types";
+import { wait } from "../utility/functions/misc/wait";
 
 interface AttackFields {
   name: string;
@@ -138,30 +139,30 @@ export class Attack {
       const debuffNames: string[] = []; // only storing names, collecting for logBuilder
       let amountHealed = 0;
       this.debuffs.forEach((debuff) => {
-        if (debuff.name == "lifesteal") {
-          const roll = rollD20();
-          if (roll * 5 >= 100 - debuff.chance * 100) {
+        const roll = rollD20();
+        if (roll * 5 >= 100 - debuff.chance * 100) {
+          if (debuff.name == "lifesteal") {
             const heal = Math.round(damage * 0.5 * 4) / 4;
             amountHealed += user.restoreHealth(heal);
-          }
-        } else {
-          const newDebuff = createDebuff({
-            debuffName: debuff.name,
-            debuffChance: debuff.chance,
-            enemyMaxHP:
-              "nonConditionalMaxHealth" in target
-                ? target.nonConditionalMaxHealth
-                : target.healthMax,
-            enemyMaxSanity:
-              "nonConditionalMaxHealth" in target
-                ? target.nonConditionalMaxSanity
-                : target.sanityMax,
-            primaryAttackDamage: damagePreDR,
-            applierNameString: this.getNameReference(user),
-          });
-          if (newDebuff) {
-            debuffNames.push(newDebuff.name);
-            target.addCondition(newDebuff);
+          } else {
+            const newDebuff = createDebuff({
+              debuffName: debuff.name,
+              debuffChance: debuff.chance,
+              enemyMaxHP:
+                "nonConditionalMaxHealth" in target
+                  ? target.nonConditionalMaxHealth
+                  : target.healthMax,
+              enemyMaxSanity:
+                "nonConditionalMaxHealth" in target
+                  ? target.nonConditionalMaxSanity
+                  : target.sanityMax,
+              primaryAttackDamage: damagePreDR,
+              applierNameString: this.getNameReference(user),
+            });
+            if (newDebuff) {
+              debuffNames.push(newDebuff.name);
+              target.addCondition(newDebuff);
+            }
           }
         }
       });
@@ -192,6 +193,10 @@ export class Attack {
           const type = (user as PlayerCharacter | Enemy).createMinion(summon);
           minionSpecies.push(type);
         });
+      }
+
+      if (user instanceof PlayerCharacter) {
+        wait(1000).then(() => user.endTurn());
       }
 
       return {
