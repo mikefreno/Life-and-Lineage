@@ -400,7 +400,7 @@ const PlayerStatus = observer(
             unfilledColor = "#fca5a5";
             break;
           case "mana":
-            current = playerState.currentHealth;
+            current = playerState.currentMana;
             max = playerState.maxMana;
             filledColor = "#60a5fa";
             unfilledColor = "#bfdbfe";
