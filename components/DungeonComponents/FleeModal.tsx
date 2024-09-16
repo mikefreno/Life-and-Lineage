@@ -115,9 +115,7 @@ export default function FleeModal({
                     <GenericFlatButton
                       onPressFunction={flee}
                       disabledCondition={
-                        enemyState
-                          ? attackAnimationOnGoing || playerState.isStunned
-                          : false
+                        attackAnimationOnGoing || playerState.isStunned
                       }
                     >
                       {enemyState ? "Run!" : "Leave"}

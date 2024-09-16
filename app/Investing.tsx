@@ -4,7 +4,7 @@ import "../assets/styles/globals.css";
 import { InvestmentType, TutorialOption } from "../utility/types";
 import InvestmentCard from "../components/InvestmentCard";
 import PlayerStatus from "../components/PlayerStatus";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../components/TutorialModal";
 import { Platform, StyleSheet, View } from "react-native";
@@ -68,7 +68,7 @@ const InvestingScreen = observer(() => {
           body: "Each investment base has a number of upgrades, some with significant consequences on your character.",
         }}
       />
-      <ThemedView className="flex-1">
+      <ThemedView className="flex-1 pb-24">
         <ScrollView>
           <View style={{ paddingTop: useHeaderHeight() }}>
             {investments.map((investment: InvestmentType, idx) => (

@@ -353,7 +353,7 @@ const PlayerStatus = observer(
       }
     }
 
-    function ChangePopUp({
+    function changePopUp({
       popUp,
       diff,
     }: {
@@ -362,7 +362,13 @@ const PlayerStatus = observer(
     }) {
       const marginAdjust = popUp == "gold" ? "-mt-3" : "ml-1";
       const color =
-        popUp == "mana" ? "#60a5fa" : popUp == "health" ? "#f87171" : "#c084fc";
+        popUp == "mana"
+          ? "#60a5fa"
+          : popUp == "health"
+          ? "#f87171"
+          : popUp == "sanity"
+          ? "#c084fc"
+          : "black";
       if (diff) {
         return (
           <View className={`absolute ${marginAdjust}`}>
@@ -607,7 +613,7 @@ const PlayerStatus = observer(
         : `${positioning} mt-20 z-top w-full`;
 
       const filled = tabScreen
-        ? preprop + " bottom-0 -mb-4"
+        ? preprop + " bottom-0"
         : classname
         ? preprop + " " + classname
         : preprop;
@@ -744,7 +750,7 @@ const PlayerStatus = observer(
             className={filled}
           >
             {colorAndPlatformDependantBlur(
-              <View className={home ? "flex px-2" : "flex"}>
+              <View className="flex px-2">
                 {!isCompact && (
                   <View className="flex h-7 flex-row justify-center">
                     {!hideGold && (
@@ -767,9 +773,9 @@ const PlayerStatus = observer(
                 )}
                 <View className="flex flex-row justify-evenly py-1">
                   <View className="flex w-[31%]">
-                    {showingHealthChange && (
-                      <ChangePopUp popUp={"health"} diff={healthDiff} />
-                    )}
+                    {showingHealthChange &&
+                      changePopUp({ popUp: "health", diff: healthDiff })}
+
                     <Text className="mx-auto" style={{ color: "#ef4444" }}>
                       Health
                     </Text>
@@ -781,9 +787,8 @@ const PlayerStatus = observer(
                     />
                   </View>
                   <View className="flex w-[31%]">
-                    {showingManaChange && (
-                      <ChangePopUp popUp={"mana"} diff={manaDiff} />
-                    )}
+                    {showingManaChange &&
+                      changePopUp({ popUp: "mana", diff: manaDiff })}
                     <Text className="mx-auto" style={{ color: "#60a5fa" }}>
                       Mana
                     </Text>
@@ -795,9 +800,8 @@ const PlayerStatus = observer(
                     />
                   </View>
                   <View className="flex w-[31%]">
-                    {showingSanityChange && (
-                      <ChangePopUp popUp={"sanity"} diff={sanityDiff} />
-                    )}
+                    {showingSanityChange &&
+                      changePopUp({ popUp: "sanity", diff: sanityDiff })}
                     <Text className="mx-auto" style={{ color: "#c084fc" }}>
                       Sanity
                     </Text>
@@ -817,9 +821,8 @@ const PlayerStatus = observer(
                 isCompact ? "ml-4" : "justify-center w-full mr-8"
               } flex flex-row absolute z-top`}
             >
-              {showingGoldChange && (
-                <ChangePopUp popUp={"gold"} diff={goldDiff} />
-              )}
+              {showingGoldChange &&
+                changePopUp({ popUp: "gold", diff: goldDiff })}
             </View>
           </Pressable>
         </>

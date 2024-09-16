@@ -34,7 +34,7 @@ export default function DeathScreen() {
 
   if (gameState && playerState) {
     return (
-      <SafeAreaView>
+      <>
         <Stack.Screen
           options={{
             title: "You Died",
@@ -81,7 +81,7 @@ export default function DeathScreen() {
             <Text className="text-lg">Live a New Life</Text>
           </Pressable>
         </View>
-      </SafeAreaView>
+      </>
     );
   }
 }

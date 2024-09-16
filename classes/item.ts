@@ -149,7 +149,8 @@ export class Item {
       }
     }
     if (spell) {
-      return new Spell({ ...spell });
+      const madeSpell = new Spell({ ...spell });
+      return madeSpell;
     }
     throw new Error("Requested a spell from a non-book item");
   }

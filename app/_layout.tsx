@@ -345,21 +345,12 @@ const RootLayout = observer(() => {
       }
       setFirstLoad(false);
     }
-  }, [fontLoaded, navbarLoad, playerState]);
-
-  useEffect(() => {
-    if (fontLoaded && navbarLoad) {
-      if (
-        playerState &&
-        (playerState.currentSanity <= -50 || playerState.currentHealth <= 0)
-      ) {
-        while (router.canGoBack()) {
-          router.back();
-        }
-        router.replace("/DeathScreen");
-      }
-    }
-  }, [playerState?.currentSanity, playerState?.currentHealth]);
+  }, [
+    fontLoaded,
+    navbarLoad,
+    playerState?.currentHealth,
+    playerState?.currentSanity,
+  ]);
 
   useEffect(() => {
     if (Platform.OS == "android") {
