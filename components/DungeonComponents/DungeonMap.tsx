@@ -36,9 +36,9 @@ export interface generateTilesProps {
 }
 
 export const generateTiles = ({
-  numTiles,
-  tileSize,
-  bossDefeated,
+  numTiles = 10,
+  tileSize = 60,
+  bossDefeated = false,
 }: generateTilesProps): Tile[] => {
   const tiles: Tile[] = [];
   const activeTiles: Tile[] = [];
@@ -62,7 +62,7 @@ export const generateTiles = ({
     let validTileFound = false;
     let attempt = 0;
 
-    while (!validTileFound && attempt < 10) {
+    while (!validTileFound && attempt < 50) {
       const direction =
         directions[Math.floor(Math.random() * directions.length)];
       const newX = currentX + direction.x * tileSize;
@@ -86,6 +86,7 @@ export const generateTiles = ({
       attempt++;
     }
     if (!validTileFound) {
+      console.log("no valid tile found");
       activeTiles.splice(i, 1);
     }
   }
