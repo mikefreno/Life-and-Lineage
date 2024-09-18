@@ -125,38 +125,40 @@ const SpellsScreen = observer(() => {
           body: "Using spells will increase your proficiency in their school.",
         }}
       />
-      <ThemedView
+      <View
         className="flex-1"
         style={{
-          paddingTop: useHeaderHeight(),
           paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
         }}
       >
-        <View className="flex-1 pt-4 justify-evenly px-4">
-          {playerState?.spells && playerState.spells.length > 0 ? (
-            <ScrollView className="h-1/2">
-              {playerState.spells.map((spell) => (
-                <View key={spell.name} className="my-1 mx-auto">
-                  <SpellDetails spell={spell} />
-                </View>
-              ))}
-            </ScrollView>
-          ) : (
-            <View className="h-1/2 items-center justify-center">
-              <Text className="text-xl tracking-wide">No Known Spells.</Text>
-              <Text className="text-center tracking-wide">
-                (Books can be studied on the top right)
-              </Text>
-            </View>
-          )}
-          <View className="h-[60%]">
-            <GenericStrikeAround>Proficiencies</GenericStrikeAround>
-            <View className="flex-1 items-center">
-              {magicProficiencySection(playerState?.magicProficiencies)}
-            </View>
+        {playerState?.spells && playerState.spells.length > 0 ? (
+          <ScrollView
+            contentContainerStyle={{
+              marginTop: useHeaderHeight(),
+              flex: 1,
+            }}
+          >
+            {playerState.spells.map((spell) => (
+              <View key={spell.name} className="my-1 mx-auto">
+                <SpellDetails spell={spell} />
+              </View>
+            ))}
+          </ScrollView>
+        ) : (
+          <View className="h-1/2 items-center justify-center">
+            <Text className="text-xl tracking-wide">No Known Spells.</Text>
+            <Text className="text-center tracking-wide">
+              (Books can be studied on the top right)
+            </Text>
+          </View>
+        )}
+        <View className="h-1/2">
+          <GenericStrikeAround>Proficiencies</GenericStrikeAround>
+          <View className="flex-1 items-center">
+            {magicProficiencySection(playerState?.magicProficiencies)}
           </View>
         </View>
-      </ThemedView>
+      </View>
     </>
   );
 });

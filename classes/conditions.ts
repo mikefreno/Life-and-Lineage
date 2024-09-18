@@ -138,4 +138,5 @@ const conditionIconMap: { [key: string]: any } = {
   viruses: require("../assets/images/conditions/viruses.png"),
   blood_orb: require("../assets/images/conditions/blood_orb.png"),
   hollow_disk: require("../assets/images/conditions/hollow_disk.png"),
+  rock_hands: require("../assets/images/conditions/rock_hands.png"),
 };

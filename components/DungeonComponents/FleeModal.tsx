@@ -26,8 +26,13 @@ export default function FleeModal({
   const dungeonData = useContext(DungeonContext);
   if (!appData || !dungeonData) throw new Error("missing context");
   const { playerState, enemyState, setEnemy, gameState } = appData;
-  const { slug, enemyAttacked, attackAnimationOnGoing, battleLogger } =
-    dungeonData;
+  const {
+    slug,
+    enemyAttacked,
+    attackAnimationOnGoing,
+    battleLogger,
+    inCombat,
+  } = dungeonData;
 
   const [fleeRollFailure, setFleeRollFailure] = useState<boolean>(false);
 
@@ -41,7 +46,8 @@ export default function FleeModal({
       if (
         enemyState?.creatureSpecies == "training dummy" ||
         !enemyAttacked ||
-        roll > 13
+        roll > 13 ||
+        !inCombat
       ) {
         vibration({ style: "light" });
         setFleeRollFailure(false);
@@ -115,7 +121,8 @@ export default function FleeModal({
                     <GenericFlatButton
                       onPressFunction={flee}
                       disabledCondition={
-                        attackAnimationOnGoing || playerState.isStunned
+                        inCombat &&
+                        (attackAnimationOnGoing || playerState.isStunned)
                       }
                     >
                       {enemyState ? "Run!" : "Leave"}

@@ -299,6 +299,15 @@
       "effectStyle": ["multiplier"],
       "effectAmount": [0.75],
       "icon": "hollow_disk"
+   },
+   {
+      "name": "stone hands",
+      "style": "buff",
+      "turns": 5,
+      "effect": ["strengthen"],
+      "effectStyle": ["flat"],
+      "effectAmount": [10],
+      "icon": "rock_hands"
    }
 ]
 

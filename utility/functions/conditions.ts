@@ -236,13 +236,13 @@ export function getConditionEffectsOnAttacks({
 
       if (effect === "strengthen" && effectMagnitude !== null) {
         if (effectStyle === "flat") {
-          damageFlat -= effectMagnitude;
+          damageFlat += effectMagnitude;
         } else if (effectStyle) {
           damageMult *= 1 + effectMagnitude;
         }
       } else if (effect === "weaken" && effectMagnitude) {
         if (effectStyle === "flat") {
-          damageFlat += effectMagnitude;
+          damageFlat -= effectMagnitude;
         } else if (effectStyle) {
           damageMult *= 1 - effectMagnitude;
         }
@@ -351,8 +351,6 @@ export function getConditionEffectsOnMisc(suppliedConditions: Condition[]) {
     condition.effect.forEach((effect, index) => {
       const effectMagnitude = condition.effectMagnitude[index];
       const effectStyle = condition.effectStyle[index];
-
-      if (effectMagnitude === null) return;
 
       switch (effect) {
         case "stun":

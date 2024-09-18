@@ -120,19 +120,7 @@ export default function TabLayout() {
             headerBackground:
               Platform.OS == "ios"
                 ? () => (
-                    <BlurView
-                      blurReductionFactor={8}
-                      tint={
-                        Platform.OS == "android"
-                          ? colorScheme == "light"
-                            ? "systemMaterial"
-                            : "systemMaterialDark"
-                          : "default"
-                      }
-                      intensity={100}
-                      style={StyleSheet.absoluteFill}
-                      experimentalBlurMethod={"dimezisBlurView"}
-                    />
+                    <BlurView intensity={100} style={StyleSheet.absoluteFill} />
                   )
                 : () => (
                     <ThemedView
@@ -212,19 +200,7 @@ export default function TabLayout() {
             headerBackground:
               Platform.OS == "ios"
                 ? () => (
-                    <BlurView
-                      blurReductionFactor={8}
-                      tint={
-                        Platform.OS == "android"
-                          ? colorScheme == "light"
-                            ? "systemMaterial"
-                            : "systemMaterialDark"
-                          : "default"
-                      }
-                      intensity={100}
-                      style={StyleSheet.absoluteFill}
-                      experimentalBlurMethod={"dimezisBlurView"}
-                    />
+                    <BlurView intensity={100} style={StyleSheet.absoluteFill} />
                   )
                 : () => (
                     <ThemedView
@@ -270,19 +246,7 @@ export default function TabLayout() {
             headerBackground:
               Platform.OS == "ios"
                 ? () => (
-                    <BlurView
-                      blurReductionFactor={8}
-                      tint={
-                        Platform.OS == "android"
-                          ? colorScheme == "light"
-                            ? "systemMaterial"
-                            : "systemMaterialDark"
-                          : "default"
-                      }
-                      intensity={100}
-                      style={StyleSheet.absoluteFill}
-                      experimentalBlurMethod={"dimezisBlurView"}
-                    />
+                    <BlurView intensity={100} style={StyleSheet.absoluteFill} />
                   )
                 : () => (
                     <ThemedView
@@ -347,14 +311,6 @@ export default function TabLayout() {
               Platform.OS == "ios"
                 ? () => (
                     <BlurView
-                      blurReductionFactor={8}
-                      tint={
-                        Platform.OS == "android"
-                          ? colorScheme == "light"
-                            ? "systemMaterial"
-                            : "systemMaterialDark"
-                          : "default"
-                      }
                       intensity={100}
                       style={StyleSheet.absoluteFill}
                       experimentalBlurMethod={"dimezisBlurView"}
@@ -400,19 +356,7 @@ export default function TabLayout() {
             headerBackground:
               Platform.OS == "ios"
                 ? () => (
-                    <BlurView
-                      blurReductionFactor={8}
-                      tint={
-                        Platform.OS == "android"
-                          ? colorScheme == "light"
-                            ? "systemMaterial"
-                            : "systemMaterialDark"
-                          : "default"
-                      }
-                      intensity={100}
-                      style={StyleSheet.absoluteFill}
-                      experimentalBlurMethod={"dimezisBlurView"}
-                    />
+                    <BlurView intensity={100} style={StyleSheet.absoluteFill} />
                   )
                 : () => (
                     <ThemedView
@@ -454,19 +398,7 @@ export default function TabLayout() {
             headerBackground:
               Platform.OS == "ios"
                 ? () => (
-                    <BlurView
-                      blurReductionFactor={8}
-                      tint={
-                        Platform.OS == "android"
-                          ? colorScheme == "light"
-                            ? "systemMaterial"
-                            : "systemMaterialDark"
-                          : "default"
-                      }
-                      intensity={100}
-                      style={StyleSheet.absoluteFill}
-                      experimentalBlurMethod={"dimezisBlurView"}
-                    />
+                    <BlurView intensity={100} style={StyleSheet.absoluteFill} />
                   )
                 : () => (
                     <ThemedView

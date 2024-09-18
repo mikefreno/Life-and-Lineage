@@ -201,7 +201,9 @@ export class Creature {
   }
   //---------------------------Battle---------------------------//
   get isStunned() {
-    return getConditionEffectsOnMisc(this.conditions).isStunned;
+    const isStunned = getConditionEffectsOnMisc(this.conditions).isStunned;
+    console.log(isStunned);
+    return isStunned;
   }
 
   protected endTurn() {
