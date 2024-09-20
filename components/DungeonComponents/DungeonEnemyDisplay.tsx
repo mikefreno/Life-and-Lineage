@@ -43,7 +43,6 @@ export default function DungeonEnemyDisplay() {
   const enemyFlashOpacity = useState(new Animated.Value(1))[0];
 
   useEffect(() => {
-    console.log("Current health: ", enemyState?.health);
     if (
       enemyState &&
       enemyHealthRecord &&
