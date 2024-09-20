@@ -67,22 +67,73 @@ interface CharacterOptions {
 }
 
 /**
- * This class fully contain characters like parents, children, met characters and shopkeepers(which are a property of the `Shop` class).
+ * This class fully contains characters like parents, children, met characters and shopkeepers (which are a property of the `Shop` class).
  * This class serves as a base for the player's character - `PlayerCharacter`
  */
 export class Character {
+  /**
+   * Unique identifier for the character.
+   */
   readonly id: string;
+
+  /**
+   * Type of being (always "human" for this class).
+   */
   readonly beingType = "human";
+
+  /**
+   * First name of the character.
+   */
   readonly firstName: string;
+
+  /**
+   * Last name of the character.
+   */
   readonly lastName: string;
+
+  /**
+   * Sex of the character ("male" or "female").
+   */
   readonly sex: "male" | "female";
+
+  /**
+   * Indicates whether the character is alive.
+   */
   alive: boolean;
+
+  /**
+   * Birthdate of the character in ISO format.
+   */
   readonly birthdate: string;
+
+  /**
+   * Deathdate of the character in ISO format, or null if the character is alive.
+   */
   deathdate: string | null;
+
+  /**
+   * Job title of the character.
+   */
   job: string;
+
+  /**
+   * Indicates whether the character is the player's partner.
+   */
   isPlayerPartner: boolean;
+
+  /**
+   * Affection level of the character towards the player.
+   */
   affection: number;
+
+  /**
+   * List of qualifications the character has.
+   */
   qualifications: string[];
+
+  /**
+   * Start date of the cooldown period for the character in ISO format, if applicable.
+   */
   dateCooldownStart?: string;
 
   constructor({
@@ -128,29 +179,51 @@ export class Character {
   }
 
   /**
-   * Used to check if the character object is the same as another
+   * Used to check if the character object is the same as another.
+   * @param otherCharacter - The character to compare with.
+   * @returns True if the characters have the same ID, false otherwise.
    */
-  public equals(otherCharacter: Character) {
-    return this.id == otherCharacter.id;
+  public equals(otherCharacter: Character): boolean {
+    return this.id === otherCharacter.id;
   }
 
+  /**
+   * Computed property that returns the full name of the character.
+   * @returns The character's full name (first name + last name).
+   */
   get fullName(): string {
     return `${this.firstName} ${this.lastName}`;
   }
 
-  public addQualification(qual: string) {
+  /**
+   * Adds a qualification to the character's qualifications list.
+   * @param qual - The qualification to add.
+   */
+  public addQualification(qual: string): void {
     this.qualifications.push(qual);
   }
 
-  public setJob(job: string) {
+  /**
+   * Sets the character's job.
+   * @param job - The new job title.
+   */
+  public setJob(job: string): void {
     this.job = job;
   }
 
-  public setDateCooldownStart(date: string) {
+  /**
+   * Sets the start date of the cooldown period for the character.
+   * @param date - The date string in ISO format.
+   */
+  public setDateCooldownStart(date: string): void {
     this.dateCooldownStart = date;
   }
 
-  public deathRoll(gameDate: Date) {
+  /**
+   * Simulates a death roll for the character. This is called on non-player characters to determine if they survive or not.
+   * @param gameDate - The current date of the game.
+   */
+  public deathRoll(gameDate: Date): void {
     if (!(this instanceof PlayerCharacter)) {
       const age = calculateAge(new Date(this.birthdate), gameDate);
       const rollToLive = rollToLiveByAge(age);
@@ -168,10 +241,11 @@ export class Character {
   }
 
   /**
-   * This is called on non player characters to manage their `affection` to the player.
-   * Affection is used to calculate prices in shops and allows for certain character interactions
+   * Updates the character's affection towards the player.
+   * Affection is used to calculate prices in shops and allows for certain character interactions.
+   * @param change - The amount to add to the current affection level.
    */
-  public updateAffection(change: number) {
+  public updateAffection(change: number): void {
     if (this.affection + change >= 100) {
       this.affection = 100;
     } else if (this.affection + change < -100) {
@@ -181,6 +255,11 @@ export class Character {
     }
   }
 
+  /**
+   * Creates a Character object from a JSON object.
+   * @param json - The JSON object representing the character.
+   * @returns A new Character instance.
+   */
   static fromJSON(json: any): Character {
     const character = new Character({
       id: json.id,
