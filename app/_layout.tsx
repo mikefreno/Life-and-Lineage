@@ -18,17 +18,16 @@ import { observer } from "mobx-react-lite";
 import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
-import { fullSave, fullLoad } from "../utility/functions/save_load";
+import { fullLoad } from "../utility/functions/save_load";
 import { Dimensions, Keyboard, Platform, StyleSheet } from "react-native";
 import { View as ThemedView } from "../components/Themed";
-import { autorun, reaction } from "mobx";
 import "../assets/styles/globals.css";
 import * as NavigationBar from "expo-navigation-bar";
 import { StatusBar } from "expo-status-bar";
 import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
 import { AppContextType } from "../utility/types";
-import { AuthProvider } from "../auth/AuthContext";
+import { AuthProvider, useAuth } from "../auth/AuthContext";
 import D20DieAnimation from "../components/DieRollAnim";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
@@ -37,6 +36,7 @@ import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+import { useNetInfo } from "@react-native-community/netinfo";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -307,6 +307,8 @@ const RootLayout = observer(() => {
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
   const [navbarLoad, setNavbarLoad] = useState(false);
+  const { isConnected } = useNetInfo();
+  const auth = useAuth();
 
   const insets = useSafeAreaInsets();
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -318,6 +320,11 @@ const RootLayout = observer(() => {
   //}
   //}, []);
 
+  useEffect(() => {
+    if (isConnected && !auth.initialized) {
+      auth.initialize();
+    }
+  }, [isConnected]);
   useEffect(() => {
     if (fontLoaded && navbarLoad) {
       SplashScreen.hideAsync();

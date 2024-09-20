@@ -179,14 +179,14 @@ const DungeonLevelScreen = observer(() => {
             battleTab={battleTab}
             setBattleTab={setBattleTab}
           />
-          {playerState.minions.length > 0 ? (
+          {playerState.minionsAndPets.length > 0 ? (
             <ThemedView className="flex flex-row flex-wrap justify-evenly px-4">
-              {playerState.minions.map((minion, index) => (
+              {playerState.minionsAndPets.map((minion, index) => (
                 <ThemedView
                   key={minion.id}
                   className={`${
-                    index == playerState.minions.length - 1 &&
-                    playerState.minions.length % 2 !== 0
+                    index == playerState.minionsAndPets.length - 1 &&
+                    playerState.minionsAndPets.length % 2 !== 0
                       ? "w-full"
                       : "w-2/5"
                   } py-1`}

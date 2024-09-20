@@ -9,6 +9,7 @@ import { PlayerCharacter } from "../classes/character";
 import { Game } from "../classes/game";
 import { parseInt } from "lodash";
 import { storage } from "../utility/functions/save_load";
+import { useNetInfo } from "@react-native-community/netinfo";
 
 type EmailLogin = {
   token: string;
@@ -58,11 +59,20 @@ class AuthStore {
   private apple_user_string: string | null = null;
   private db_name: string | null = null;
   private db_token: string | null = null;
+  initialized: boolean = false;
 
   constructor() {
     makeAutoObservable(this);
-    this.initializeAuth();
-    this.initializeGoogleSignIn();
+    this.initialize();
+  }
+
+  initialize() {
+    const { isConnected } = useNetInfo();
+    if (isConnected) {
+      this._initializeAuth();
+      this.initializeGoogleSignIn();
+      this.initialized = true;
+    }
   }
 
   setAuthState = (
@@ -96,7 +106,7 @@ class AuthStore {
     return !!this.token || !!this.apple_user_string;
   }
 
-  initializeAuth = async () => {
+  private _initializeAuth = async () => {
     try {
       const [storedToken, storedEmail, storedProvider, appleUser] =
         await Promise.all([
@@ -146,6 +156,7 @@ class AuthStore {
       }
     } catch (error) {
       console.error("Error initializing auth:", error);
+
       await this.logout();
     }
   };

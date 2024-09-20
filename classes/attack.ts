@@ -6,7 +6,7 @@ import {
 } from "../utility/functions/conditions";
 import { toTitleCase } from "../utility/functions/misc/words";
 import { rollD20 } from "../utility/functions/roll";
-import { PlayerCharacter } from "./character";
+import type { PlayerCharacter } from "./character";
 import type { Enemy, Minion } from "./creatures";
 import { AttackUse } from "../utility/types";
 import { wait } from "../utility/functions/misc/wait";
@@ -203,7 +203,7 @@ export class Attack {
         });
       }
 
-      if (user instanceof PlayerCharacter) {
+      if ("birthdate" in user) {
         wait(1000).then(() => user.endTurn());
       }
 

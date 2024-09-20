@@ -31,5 +31,13 @@
       "attackPower": 2,
       "attacks": ["pluck eye", "scratch"],
       "turns": 1000
+   },
+   {
+      "name": "raven",
+      "beingType": "beast",
+      "health":50,
+      "attackPower": 2,
+      "attacks": ["pluck eye", "scratch"],
+      "turns": 1000
    }
 ]

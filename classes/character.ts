@@ -250,6 +250,7 @@ type PlayerCharacterBase = {
   conditions?: Condition[];
   inventory?: Item[];
   minions?: Minion[];
+  rangerPet?: Minion; // used to avoid removal within a dungeon
   currentDungeon?: {
     instance: string;
     level: string;
@@ -356,6 +357,8 @@ export class PlayerCharacter extends Character {
   }[];
 
   minions: Minion[];
+  rangerPet: Minion | null;
+
   jobExperience: { job: string; experience: number; rank: number }[];
   qualificationProgress: {
     name: string;
@@ -471,6 +474,8 @@ export class PlayerCharacter extends Character {
       gold ?? process.env.NODE_ENV === "development" ? 1_000_000 : 500;
 
     this.minions = minions ?? [];
+    this.rangerPet = rangerPet ?? null;
+
     this.jobExperience = jobExperience ?? [];
     this.learningSpells = learningSpells ?? [];
     this.qualificationProgress = qualificationProgress ?? [];
@@ -561,6 +566,7 @@ export class PlayerCharacter extends Character {
 
       minions: observable,
       createMinion: action,
+      summonPet: action,
       clearMinions: action,
       removeMinion: action,
 
@@ -1518,6 +1524,26 @@ export class PlayerCharacter extends Character {
       }
     });
   }
+  /**
+   * Returns the species(name) of the created minion, adds the minion to the minion list
+   */
+  public summonPet(minionName: string) {
+    const minionObj = summons.find((summon) => summon.name == minionName);
+    if (!minionObj) {
+      throw new Error(`Minion (${minionName}) not found!`);
+    }
+    const minion = new Minion({
+      creatureSpecies: minionObj.name,
+      health: minionObj.health,
+      healthMax: minionObj.health,
+      attackPower: minionObj.attackPower,
+      attacks: minionObj.attacks,
+      turnsLeftAlive: minionObj.turns,
+      beingType: minionObj.beingType as BeingType,
+    });
+    this.rangerPet = minion;
+    return minion.creatureSpecies;
+  }
   //----------------------------------Necromancer Only----------------------------------//
   /**
    * This is only ever needed if the player is a necromancer
@@ -1761,6 +1787,9 @@ export class PlayerCharacter extends Character {
     return found;
   }
   //----------------------------------Misc----------------------------------//
+  get minionsAndPets(): Minion[] {
+    return this.minions.concat(this.rangerPet ? [this.rangerPet] : []);
+  }
   public getMedicalService(
     cost: number,
     healthRestore?: number,
@@ -1869,6 +1898,7 @@ export class PlayerCharacter extends Character {
       minions: json.minions
         ? json.minions.map((minion: any) => Minion.fromJSON(minion))
         : [],
+      rangerPet: json.rangerPet ? Minion.fromJSON(json.rangerPet) : undefined,
       knownSpells: json.knownSpells,
       physicalAttacks: json.physicalAttacks,
       gold: json.gold,

@@ -277,7 +277,9 @@ export function getConditionDamageToAttacker(defenderConditions: Condition[]) {
   defenderConditions.forEach((cond) => {
     if (
       cond.effect.includes("thorns") ||
-      (cond.effect.includes("trap") && cond.trapSetupTime == 0)
+      (cond.effect.includes("trap") &&
+        cond.trapSetupTime &&
+        cond.trapSetupTime < 0)
     ) {
       healthDamage +=
         cond.effectMagnitude.reduce((acc, val) => (acc += val)) ?? 0;

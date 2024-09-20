@@ -114,7 +114,7 @@
       "damage": null,
       "buffs": null,
       "debuffs":  null,
-      "summon": ["raven"]
+      "pet": ["raven"]
     }
   },
   {
@@ -149,7 +149,7 @@
     "target": "area",
     "type": "offense",
     "proficiencyNeeded": "adept",
-    "manaCost": 10,
+    "manaCost": 100,
     "effects": {
       "damage": null,
       "buffs": ["bear trap"],

@@ -335,7 +335,7 @@
       "trapSetupTime": 2,
       "effect": ["trap"],
       "effectStyle": ["flat"],
-      "effectAmount": [50],
+      "effectAmount": [100],
       "icon": "trap"
    }
 ]

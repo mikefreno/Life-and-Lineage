@@ -395,7 +395,7 @@ export function playerMinionsTurn({ dungeonData, appData }: contextData) {
   const { battleLogger } = dungeonData;
   const { playerState, enemyState } = appData;
   if (enemyState && playerState) {
-    const suppliedMinions = playerState.minions;
+    const suppliedMinions = playerState.minionsAndPets;
     for (
       let i = 0;
       i < suppliedMinions.length &&

@@ -101,7 +101,7 @@ export class Condition {
   public tick(holder: PlayerCharacter | Creature) {
     if (!this.aura) {
       this.turns -= 1;
-      if (this.trapSetupTime && this.trapSetupTime > 0) {
+      if (this.trapSetupTime && this.trapSetupTime >= 0) {
         this.trapSetupTime -= 1;
       }
     }

@@ -23,6 +23,7 @@ interface SpellFields {
         }[]
       | null;
     summon?: string[] | undefined;
+    pet?: string;
     selfDamage?: number | undefined;
     sanityDamage?: number | undefined;
   };
@@ -47,6 +48,7 @@ export class Spell {
   buffs: string[];
   debuffs: { name: string; chance: number }[];
   summons: string[];
+  rangerPet: string | undefined;
 
   constructor({
     name,
@@ -69,6 +71,7 @@ export class Spell {
     this.buffs = effects.buffs ?? [];
     this.debuffs = effects.debuffs ?? [];
     this.summons = effects.summon ?? [];
+    this.rangerPet = effects.pet;
   }
 
   public baseDamage(user: PlayerCharacter) {
@@ -161,9 +164,13 @@ export class Spell {
     }
     let minionSpecies: string[] = [];
     this.summons.forEach((summon) => {
-      const type = (user as PlayerCharacter | Enemy).createMinion(summon);
+      const type = user.createMinion(summon);
       minionSpecies.push(type);
     });
+    if (this.rangerPet) {
+      const type = user.summonPet(this.rangerPet);
+      minionSpecies.push(type);
+    }
     user.gainProficiency(this);
 
     // we wait here for animation timings, the fade out of mana use cost
