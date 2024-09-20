@@ -9,7 +9,8 @@ import { PlayerCharacter } from "../classes/character";
 import { Game } from "../classes/game";
 import { parseInt } from "lodash";
 import { storage } from "../utility/functions/save_load";
-import { useNetInfo } from "@react-native-community/netinfo";
+import { Platform } from "react-native";
+import NetInfo from "@react-native-community/netinfo";
 
 type EmailLogin = {
   token: string;
@@ -59,20 +60,14 @@ class AuthStore {
   private apple_user_string: string | null = null;
   private db_name: string | null = null;
   private db_token: string | null = null;
-  initialized: boolean = false;
+  private isConnected: boolean = false;
+  private isInitialized: boolean = false;
 
   constructor() {
     makeAutoObservable(this);
-    this.initialize();
-  }
-
-  initialize() {
-    const { isConnected } = useNetInfo();
-    if (isConnected) {
-      this._initializeAuth();
-      this.initializeGoogleSignIn();
-      this.initialized = true;
-    }
+    this.initializeNetInfo();
+    this.initializeAuth();
+    this.initializeGoogleSignIn();
   }
 
   setAuthState = (
@@ -102,11 +97,44 @@ class AuthStore {
     return this.email;
   }
 
+  setIsConnected = (isConnected: boolean) => {
+    this.isConnected = isConnected;
+  };
+
+  setIsInitialized = (isInitialized: boolean) => {
+    this.isInitialized = isInitialized;
+  };
+
+  get isConnectedAndInitialized() {
+    return this.isConnected && this.isInitialized;
+  }
+
   get isAuthenticated() {
     return !!this.token || !!this.apple_user_string;
   }
 
-  private _initializeAuth = async () => {
+  initializeNetInfo = () => {
+    NetInfo.fetch().then((state) => {
+      this.setIsConnected(!!state.isConnected);
+    });
+
+    NetInfo.addEventListener((state) => {
+      this.setIsConnected(!!state.isConnected);
+      if (state.isConnected) {
+        this.initializeAuth();
+      }
+    });
+  };
+
+  initializeAuth = async () => {
+    if (!this.isConnected) {
+      return;
+    }
+
+    if (Platform.OS === "web" && typeof window === "undefined") {
+      // Running in server-side environment, skip storage access
+      return;
+    }
     try {
       const [storedToken, storedEmail, storedProvider, appleUser] =
         await Promise.all([
@@ -154,9 +182,9 @@ class AuthStore {
             }
         }
       }
+      this.setIsInitialized(true);
     } catch (error) {
       console.error("Error initializing auth:", error);
-
       await this.logout();
     }
   };
@@ -197,33 +225,6 @@ class AuthStore {
       console.error("Token validation error:", error);
       return false;
     }
-  };
-
-  getRemoteSaves = async () => {
-    try {
-      const res = await this.databaseExecute({ sql: `SELECT * FROM Save` });
-      const data = await res.json();
-      const rows = data.results[0].response.result.rows;
-      return this.convertHTTPResponseSaveRow(rows);
-    } catch (e) {
-      console.log(e);
-      return [];
-    }
-  };
-
-  private convertHTTPResponseSaveRow = (rows: any[][]) => {
-    let cleaned: SaveRow[] = [];
-    rows.forEach((row) =>
-      cleaned.push({
-        id: parseInt(row[0].value),
-        name: row[1].value,
-        player_state: row[2].value,
-        game_state: row[3].value,
-        created_at: row[4].value,
-        last_updated_at: row[5].value,
-      }),
-    );
-    return cleaned;
   };
 
   login = async (creds: LoginCreds) => {
@@ -329,11 +330,29 @@ class AuthStore {
     });
   };
 
+  getRemoteSaves = async () => {
+    if (!this.isConnected) {
+      throw new Error("Device is offline");
+    }
+    try {
+      const res = await this.databaseExecute({ sql: `SELECT * FROM Save` });
+      const data = await res.json();
+      const rows = data.results[0].response.result.rows;
+      return this.convertHTTPResponseSaveRow(rows);
+    } catch (e) {
+      console.log(e);
+      return [];
+    }
+  };
+
   makeRemoteSave = async ({
     name,
     playerState,
     gameState,
   }: makeRemoteSaveProps) => {
+    if (!this.isConnected) {
+      throw new Error("Device is offline");
+    }
     try {
       const time = this.formatDate(new Date());
       const res = await this.databaseExecute({
@@ -359,6 +378,9 @@ class AuthStore {
     playerState,
     gameState,
   }: overwriteRemoteSaveProps) => {
+    if (!this.isConnected) {
+      throw new Error("Device is offline");
+    }
     try {
       const updateTime = this.formatDate(new Date());
       const res = await this.databaseExecute({
@@ -380,45 +402,19 @@ class AuthStore {
   };
 
   deleteRemoteSave = async ({ id }: deleteRemoteSaveProps) => {
+    if (!this.isConnected) {
+      throw new Error("Device is offline");
+    }
     try {
-      const updateTime = this.formatDate(new Date());
-      console.log(updateTime);
       const res = await this.databaseExecute({
         sql: `DELETE FROM Save WHERE id = ?`,
         args: [id.toString()],
       });
-      const parsed = await res?.json();
-      console.log(parsed.results[0]);
+      await res?.json();
     } catch (e) {
       console.error(e);
       return [];
     }
-  };
-
-  private formatDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-  }
-
-  private appleEmailRetrieval = async (user: string) => {
-    const response = await fetch(`${API_BASE_URL}/apple/email`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userString: user }),
-    });
-    if (response.ok) {
-      const { email } = await response.json();
-      return email as string;
-    }
-    return null;
   };
 
   private checkAppleAuth = async (
@@ -530,6 +526,47 @@ class AuthStore {
     });
     return res;
   }
+
+  private convertHTTPResponseSaveRow = (rows: any[][]) => {
+    let cleaned: SaveRow[] = [];
+    rows.forEach((row) =>
+      cleaned.push({
+        id: parseInt(row[0].value),
+        name: row[1].value,
+        player_state: row[2].value,
+        game_state: row[3].value,
+        created_at: row[4].value,
+        last_updated_at: row[5].value,
+      }),
+    );
+    return cleaned;
+  };
+
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+
+  private appleEmailRetrieval = async (user: string) => {
+    const response = await fetch(`${API_BASE_URL}/apple/email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userString: user }),
+    });
+    if (response.ok) {
+      const { email } = await response.json();
+      return email as string;
+    }
+    return null;
+  };
 
   private argBuilder(args: string[]) {
     const types = args.map((arg) => this.argCheck(arg));

@@ -320,11 +320,12 @@ const RootLayout = observer(() => {
   //}
   //}, []);
 
-  useEffect(() => {
-    if (isConnected && !auth.initialized) {
-      auth.initialize();
-    }
-  }, [isConnected]);
+  //useEffect(() => {
+  //if (isConnected && !auth.initialized) {
+  //auth.initialize();
+  //}
+  //}, [isConnected]);
+
   useEffect(() => {
     if (fontLoaded && navbarLoad) {
       SplashScreen.hideAsync();

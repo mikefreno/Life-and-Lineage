@@ -405,6 +405,7 @@ export class PlayerCharacter extends Character {
     baseSanity,
     currentMana,
     baseMana,
+    rangerPet,
     baseManaRegen,
     baseStrength,
     baseIntelligence,
