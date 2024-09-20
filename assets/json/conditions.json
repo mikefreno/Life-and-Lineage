@@ -252,6 +252,15 @@
       "icon": "pray_hands"
    },
    {
+      "name": "dance of daggers",
+      "style": "buff",
+      "turns": 4,
+      "effect": ["thorns"],
+      "effectStyle": ["flat"],
+      "effectAmount": [50],
+      "icon": "dagger_ring"
+   },
+   {
       "name": "empowered guarding",
       "style": "buff",
       "turns": -1,
@@ -308,6 +317,25 @@
       "effectStyle": ["flat"],
       "effectAmount": [10],
       "icon": "rock_hands"
+   },
+   {
+      "name": "rat trap",
+      "style": "buff",
+      "turns": 10,
+      "trapSetupTime": 2,
+      "effect": ["trap"],
+      "effectStyle": ["flat"],
+      "effectAmount": [10],
+      "icon": "trap"
+   },
+   {
+      "name": "bear trap",
+      "style": "buff",
+      "turns": 10,
+      "trapSetupTime": 2,
+      "effect": ["trap"],
+      "effectStyle": ["flat"],
+      "effectAmount": [50],
+      "icon": "trap"
    }
 ]
-

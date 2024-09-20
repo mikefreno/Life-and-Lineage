@@ -13,23 +13,23 @@
     }
   },
   {
-    "name": "backstab",
+    "name": "below the belt",
     "element": "assassination",
     "target": "single",
     "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
     "effects": {
-      "damage": 25,
+      "damage": 20,
       "buffs": null,
-      "debuffs": [{"name":"burn", "chance": 0.25}]
+      "debuffs": [{"name":"stun", "chance": 0.25}]
     }
   },
   {
     "name": "shadow cover",
     "element": "assassination",
     "target": "single",
-    "type": "offense",
+    "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 50,
     "effects": {
@@ -39,101 +39,99 @@
     }
   },
   {
-    "name": "",
+    "name": "backstab",
     "element": "assassination",
     "target": "single",
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 75,
     "effects": {
-      "damage": 60,
-      "buffs": null,
-      "debuffs": [{"name":"burn", "chance": 0.25}]
+      "damage": 95,
+      "buffs": [{"name": "remove stealth"}],
+      "debuffs": null
     }
   },
   {
-    "name": "",
+    "name": "dance of daggers",
     "element": "assassination",
-    "target": "area",
+    "target": "single",
     "type": "defense",
     "proficiencyNeeded": "expert",
     "manaCost": 100,
-    "duration": 3,
     "effects": {
       "damage": null,
-      "buffs": ["projectile suppression"],
-      "debuffs": [{"name":"burn", "chance": 0.5}]
+      "buffs": ["dance of daggers"],
+      "debuffs": null
     }
   },
   {
-    "name": "",
+    "name": "shadow step",
     "element": "assassination",
-    "target": "area",
+    "target": "single",
     "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 250,
-    "duration": 5,
     "effects": {
-      "damage": 50,
-      "buffs": null,
-      "debuffs": [{"name":"burn", "chance": 0.25}]
+      "damage": 100,
+      "buffs": [{"name": "stealth", "chance": 1.0}],
+      "debuffs": null
     }
   },
   {
-    "name": "",
+    "name": "blade fan",
     "element": "assassination",
     "target": "area",
     "type": "offense",
     "proficiencyNeeded": "legend",
-    "manaCost": 600,
+    "manaCost": 400,
     "effects": {
       "damage": 275,
       "buffs": null,
-      "debuffs": [{"name":"severe burn", "chance": 0.75}]
+      "debuffs": null
     }
   },
   {
-    "name": "",
+    "name": "finalé",
     "element": "assassination",
     "target": "single",
     "type": "offense",
     "proficiencyNeeded": "legend",
-    "manaCost": 800,
+    "manaCost": 500,
     "effects": {
-      "damage": 400,
-      "buffs": null,
-      "debuffs": [{"name":"severe burn", "chance": 1.0}]
+      "damage": 500,
+      "buffs": [{"name": "remove stealth"}],
+      "debuffs": null
     }
   },
   {
-    "name": "",
+    "name": "call raven",
     "element": "beastMastery",
     "target": "single",
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 10,
     "effects": {
-      "damage": 10,
+      "damage": null,
       "buffs": null,
-      "debuffs": [{"name":"chill", "chance": 0.5}]
+      "debuffs":  null,
+      "summon": ["raven"]
     }
   },
   {
-    "name": "",
+    "name": "rat trap",
     "element": "beastMastery",
     "target": "single",
     "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
     "effects": {
-      "damage": 30,
-      "buffs": null,
-      "debuffs": null,
-      "debuffChance": null
+      "damage": null,
+      "buffs": ["rat trap"],
+      "debuffs": null
     }
   },
   {
-    "name": "",
+    "name": "call bear",
     "element": "beastMastery",
     "target": "single",
     "type": "defense",
@@ -141,49 +139,47 @@
     "manaCost": 50,
     "effects": {
       "damage": null,
-      "selfDamage": -35,
       "buffs": null,
-      "debuffs": null,
-      "debuffChance": null
+      "debuffs": null
     }
   },
   {
-    "name": "",
+    "name": "bear trap",
     "element": "beastMastery",
     "target": "area",
     "type": "offense",
     "proficiencyNeeded": "adept",
-    "manaCost": 100,
+    "manaCost": 10,
     "effects": {
-      "damage": 40,
-      "buffs": null,
-      "debuffs": [{"name":"chill", "chance": 1.0},{"name":"chill", "chance": 1.0}]
+      "damage": null,
+      "buffs": ["bear trap"],
+      "debuffs": null 
     }
   },
   {
-    "name": "",
+    "name": "call dragon welp",
     "element": "beastMastery",
     "target": "single",
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 125,
     "effects": {
-      "damage": 60,
+      "damage": null,
       "buffs": null,
-      "debuffs": [{"name":"burn", "chance": 0.5}]
+      "debuffs": null
     }
   },
   {
-    "name": "",
+    "name": "dragon trap",
     "element": "beastMastery",
     "target": "single",
     "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 200,
     "effects": {
-      "damage": 100,
-      "buffs": null,
-      "debuffs": [{"name":"chill", "chance": 0.75},{"name":"chill", "chance": 0.75},{"name":"chill", "chance": 0.75}]
+      "damage": null,
+      "buffs": ["dragon trap"],
+      "debuffs": null 
     }
   },
   {
@@ -195,9 +191,8 @@
     "manaCost": 200,
     "effects": {
       "damage": null,
-      "buffs": ["lasting heal"],
-      "debuffs": null,
-      "debuffChance": null
+      "buffs": null,
+      "debuffs": null
     }
   },
   {
@@ -211,7 +206,7 @@
     "effects": {
       "damage": 50,
       "buffs": null,
-      "debuffs": [{"name":"chill", "chance": 0.75}]
+      "debuffs": null 
     }
   },
   {
@@ -224,7 +219,7 @@
     "effects": {
       "damage": 175,
       "buffs": null,
-      "debuffs": [{"name":"severe burn", "chance": 1.0}]
+      "debuffs": null 
     }
   },
   {
@@ -238,7 +233,7 @@
     "effects": {
       "damage": 150,
       "buffs": null,
-      "debuffs": [{"name":"stun", "chance": 1.0}]
+      "debuffs": null 
     }
   },
   {
@@ -251,8 +246,7 @@
     "effects": {
       "damage": 18,
       "buffs": null,
-      "debuffs": null,
-      "debuffChance": null
+      "debuffs": null
     }
   },
   {
@@ -265,7 +259,7 @@
     "effects": {
       "damage": 25,
       "buffs": null,
-      "debuffs": [{"name":"shocked", "chance": 0.5}]
+      "debuffs": null
     }
   },
   {
@@ -278,7 +272,7 @@
     "effects": {
       "damage": 50,
       "buffs": null,
-      "debuffs": [{"name":"shocked", "chance": 0.5},{"name":"shocked", "chance": 0.5}]
+      "debuffs": null
     }
   },
   {
@@ -291,7 +285,7 @@
     "effects": {
       "damage": 50,
       "buffs": null,
-      "debuffs": [{"name":"shocked", "chance": 0.75},{"name":"stun", "chance": 0.5}]
+      "debuffs": null
     }
   },
   {
@@ -304,7 +298,7 @@
     "effects": {
       "damage": 50,
       "buffs": null,
-      "debuffs": [{"name":"shocked", "chance": 0.75},{"name":"stun", "chance": 0.5}]
+      "debuffs": null
     }
   },
   {
@@ -317,7 +311,7 @@
     "effects": {
       "damage": 75,
       "buffs": null,
-      "debuffs": [{"name":"bleed", "chance": 0.75},{"name":"bleed", "chance": 0.75}]
+      "debuffs": null 
     }
   },
   {
@@ -330,8 +324,7 @@
     "effects": {
       "damage": null,
       "buffs": ["hard to see", "damaging to hit"],
-      "debuffs": null,
-      "debuffChance": null
+      "debuffs": null
     }
   },
   {
@@ -345,8 +338,7 @@
     "effects": {
       "damage": 125,
       "buffs": null,
-      "debuffs": null,
-      "debuffChance": null
+      "debuffs": null
     }
   },
   {
@@ -360,7 +352,7 @@
     "effects": {
       "damage": 125,
       "buffs": null,
-      "debuffs": [{"name":"stun", "chance": 0.75}]
+      "debuffs": null
     }
   }
 ]

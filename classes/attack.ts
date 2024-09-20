@@ -1,6 +1,7 @@
 import {
   createBuff,
   createDebuff,
+  getConditionDamageToAttacker,
   getConditionEffectsOnAttacks,
 } from "../utility/functions/conditions";
 import { toTitleCase } from "../utility/functions/misc/words";
@@ -135,6 +136,13 @@ export class Attack {
       target.damageHealth(finalDamage);
       target.damageSanity(this.flatSanityDamage);
       user.damageHealth(this.selfDamage);
+      //check for thorns and traps on target
+      const thornsIshDamage = getConditionDamageToAttacker(
+        target.conditions,
+      ).healthDamage;
+      if (thornsIshDamage > 0) {
+        user.damageHealth(thornsIshDamage);
+      }
       // create debuff loop
       const debuffNames: string[] = []; // only storing names, collecting for logBuilder
       let amountHealed = 0;

@@ -243,7 +243,7 @@ export default function InventoryRender({
             setBuzzed(true);
           }
         }}
-        disabled={!item[0].isEquippable}
+        disabled={!item[0].isEquippable && !("shop" in props)}
         shouldReverse
       >
         <Pressable

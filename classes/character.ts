@@ -10,6 +10,7 @@ import wands from "../assets/json/items/wands.json";
 import mageSpells from "../assets/json/mageSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
+import rangerSpells from "../assets/json/rangerSpells.json";
 import { Enemy, Minion } from "./creatures";
 import summons from "../assets/json/summons.json";
 import { action, makeObservable, observable, computed } from "mobx";
@@ -569,6 +570,7 @@ export class PlayerCharacter extends Character {
       isStunned: computed,
       addCondition: action,
       conditionTicker: action,
+      conditionResolver: action,
 
       jobExperience: observable,
       getCurrentJobAndExperience: action,
@@ -1296,6 +1298,8 @@ export class PlayerCharacter extends Character {
       spellList = paladinSpells;
     } else if (this.playerClass == "necromancer") {
       spellList = necroSpells;
+    } else if (this.playerClass == "ranger") {
+      spellList = rangerSpells;
     } else spellList = mageSpells;
 
     let spells: Spell[] = [];
@@ -1474,6 +1478,17 @@ export class PlayerCharacter extends Character {
       const { turns } = this.conditions[i].tick(this);
 
       if (turns <= 0) {
+        this.conditions.splice(i, 1);
+      }
+    }
+  }
+  /**
+   * This is meant to remove conditions that are 'stale' - at 0 at end of enemy's turn
+   * Unlike conditionTicker, this does not tick conditions
+   */
+  public conditionResolver() {
+    for (let i = this.conditions.length - 1; i >= 0; i--) {
+      if (this.conditions[i].turns <= 0) {
         this.conditions.splice(i, 1);
       }
     }

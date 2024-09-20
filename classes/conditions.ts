@@ -15,6 +15,7 @@ export class Condition {
   readonly name: string;
   readonly style: "debuff" | "buff";
   turns: number;
+  trapSetupTime: number | undefined;
   readonly aura: boolean;
   readonly placedby: string;
   readonly effect: EffectOptions[];
@@ -33,6 +34,7 @@ export class Condition {
     effectMagnitude,
     healthDamage,
     sanityDamage,
+    trapSetupTime,
     placedby,
     id,
     aura,
@@ -42,6 +44,7 @@ export class Condition {
     this.name = name;
     this.style = style;
     this.turns = turns;
+    this.trapSetupTime = trapSetupTime;
     this.effect = effect;
     this.healthDamage = healthDamage;
     this.sanityDamage = sanityDamage;
@@ -50,7 +53,11 @@ export class Condition {
     this.placedby = placedby;
     this.aura = aura ?? false;
     this.icon = icon;
-    makeObservable(this, { turns: observable, tick: action });
+    makeObservable(this, {
+      turns: observable,
+      tick: action,
+      destroyTrap: action,
+    });
   }
 
   public getConditionIcon() {
@@ -94,10 +101,22 @@ export class Condition {
   public tick(holder: PlayerCharacter | Creature) {
     if (!this.aura) {
       this.turns -= 1;
+      if (this.trapSetupTime && this.trapSetupTime > 0) {
+        this.trapSetupTime -= 1;
+      }
     }
     holder.damageHealth(this.getHealthDamage());
     holder.damageSanity(this.getSanityDamage());
     return { turns: this.turns, effect: this.effect };
+  }
+
+  /**
+   * Removes the trap - to be used when the holder(defender) is first attacked
+   */
+  public destroyTrap() {
+    if (this.effect.includes("trap")) {
+      this.turns = 0;
+    }
   }
 
   static fromJSON(json: any): Condition {
@@ -107,6 +126,7 @@ export class Condition {
       name: json.name,
       style: json.style,
       turns: json.turns,
+      trapSetupTime: json.trapSetupTime,
       effect: json.effect,
       healthDamage: json.healthDamage,
       sanityDamage: json.sanityDamage,
@@ -139,4 +159,6 @@ const conditionIconMap: { [key: string]: any } = {
   blood_orb: require("../assets/images/conditions/blood_orb.png"),
   hollow_disk: require("../assets/images/conditions/hollow_disk.png"),
   rock_hands: require("../assets/images/conditions/rock_hands.png"),
+  dagger_ring: require("../assets/images/conditions/dagger_ring.png"),
+  trap: require("../assets/images/conditions/trap.png"),
 };

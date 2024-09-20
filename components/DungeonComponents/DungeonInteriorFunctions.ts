@@ -202,7 +202,9 @@ export const enemyTurn = ({ appData, dungeonData }: contextData) => {
         break;
     }
     action();
+    playerState.conditionResolver();
     enemyMinionsTurn(enemyState.minions, enemyState, playerState, battleLogger);
+    playerState.conditionResolver();
     setTimeout(() => {
       if (
         enemyState.health <= 0 ||
@@ -372,7 +374,9 @@ export const pass = ({
   if (enemyState && playerState && isFocused) {
     playerState.pass({ voluntary });
     battleLogger("You passed!");
+    enemyState.conditionResolver();
     playerMinionsTurn({ dungeonData, appData });
+    enemyState.conditionResolver();
     setTimeout(() => {
       setTimeout(() => {
         enemyTurnCheck({

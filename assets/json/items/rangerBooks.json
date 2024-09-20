@@ -1,12 +1,5 @@
 [
    {
-      "name": "book of the raven",
-      "type": "spell",
-      "teaches": "call raven",
-      "icon": "Book",
-      "baseValue": 2500
-   },
-   {
       "name": "book of throw dagger",
       "type": "spell",
       "teaches": "throw dagger",
@@ -14,9 +7,65 @@
       "baseValue": 2500
    },
    {
+      "name": "book of below the belt",
+      "type": "spell",
+      "teaches": "below the belt",
+      "icon": "Book",
+      "baseValue": 5000
+   },
+   {
+      "name": "book of shadow cover",
+      "type": "spell",
+      "teaches": "shadow cover",
+      "icon": "Book",
+      "baseValue": 20000
+   },
+   {
       "name": "book of backstab",
       "type": "spell",
       "teaches": "backstab",
+      "icon": "Book_2",
+      "baseValue": 50000
+   },
+   {
+      "name": "book of dance of daggers",
+      "type": "spell",
+      "teaches": "dance of daggers",
+      "icon": "Book_2",
+      "baseValue": 150000
+   },
+   {
+      "name": "book of shadow step",
+      "type": "spell",
+      "teaches": "shadow step",
+      "icon": "Book_2",
+      "baseValue": 200000
+   },
+   {
+      "name": "forbidden assassination techniques vol. 1",
+      "type": "spell",
+      "teaches": "blade fan",
+      "icon": "Book_3",
+      "baseValue": 500000
+   },
+   {
+      "name": "forbidden assassination techniques vol. 2",
+      "type": "spell",
+      "teaches": "finalé",
+      "icon": "Book_3",
+      "baseValue": 1000000
+   },
+   {
+      "name": "book of the raven",
+      "type": "spell",
+      "teaches": "call raven",
+      "icon": "Book",
+      "baseValue": 2500
+   },
+   {
+      "name": "book of rat trap",
+      "type": "spell",
+      "teaches": "rat trap",
       "icon": "Book",
       "baseValue": 5000
    },

@@ -178,6 +178,7 @@ export type EffectOptions =
   | "undead cower"
   | "blur"
   | "thorns"
+  | "trap"
   | "revenge"
   | "blood magic consumable"
   | "execute"
@@ -190,6 +191,7 @@ export type ConditionType = {
   name: string;
   style: "debuff" | "buff";
   turns: number;
+  trapSetupTime?: number;
   effect: EffectOptions[];
   effectStyle: EffectStyle[];
   effectMagnitude: number[];
@@ -204,6 +206,7 @@ export type ConditionObjectType = {
   name: string;
   style: "debuff" | "buff";
   turns: number;
+  trapSetupTime?: number;
   effect: EffectOptions[];
   effectStyle: EffectStyle[];
   effectAmount: number[];

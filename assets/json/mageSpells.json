@@ -128,8 +128,7 @@
     "effects": {
       "damage": 30,
       "buffs": null,
-      "debuffs": null,
-      "debuffChance": null
+      "debuffs": null
     }
   },
   {
@@ -143,8 +142,7 @@
       "damage": null,
       "selfDamage": -35,
       "buffs": null,
-      "debuffs": null,
-      "debuffChance": null
+      "debuffs": null
     }
   },
   {
@@ -196,8 +194,7 @@
     "effects": {
       "damage": null,
       "buffs": ["lasting heal"],
-      "debuffs": null,
-      "debuffChance": null
+      "debuffs": null
     }
   },
   {
@@ -251,8 +248,7 @@
     "effects": {
       "damage": 18,
       "buffs": null,
-      "debuffs": null,
-      "debuffChance": null
+      "debuffs": null
     }
   },
   {
@@ -330,8 +326,7 @@
     "effects": {
       "damage": null,
       "buffs": ["hard to see", "damaging to hit"],
-      "debuffs": null,
-      "debuffChance": null
+      "debuffs": null
     }
   },
   {
@@ -345,8 +340,7 @@
     "effects": {
       "damage": 125,
       "buffs": null,
-      "debuffs": null,
-      "debuffChance": null
+      "debuffs": null
     }
   },
   {
@@ -382,8 +376,7 @@
     "effects": {
       "damage": null, 
       "buffs": ["stone hands"], 
-      "debuffs": null, 
-      "debuffChance": null
+      "debuffs": null
     }
   },
   {
@@ -406,8 +399,7 @@
     "effects": {
       "damage": null, 
       "buffs": ["rock armor"], 
-      "debuffs": null, 
-      "debuffChance": null
+      "debuffs": null
     }
   },
   {
@@ -430,8 +422,7 @@
     "effects": {
       "damage": null, 
       "buffs": ["projectile negation"],
-      "debuffs": null, 
-      "debuffChance": null
+      "debuffs": null
     }
   },
   {

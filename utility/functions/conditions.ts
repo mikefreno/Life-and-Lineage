@@ -135,6 +135,7 @@ export function createBuff({
         name: buffObj.name,
         style: "buff",
         turns: buffObj.turns,
+        trapSetupTime: buffObj.trapSetupTime,
         effect: buffObj.effect,
         healthDamage: healthHeal.map((heal) => (heal !== null ? -heal : 0)),
         sanityDamage: sanityHeal.map((heal) => (heal !== null ? -heal : 0)),
@@ -153,7 +154,7 @@ export function createBuff({
 }
 
 export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
-  if (playerState && playerState.sanity < 0) {
+  if (playerState && playerState.currentSanity < 0) {
     const roll = rollD20();
     if (roll >= 16) {
       const debuffObj = sanityDebuffs[
@@ -170,7 +171,7 @@ export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
             debuffObj.effectStyle[index] === "multiplier" ||
             debuffObj.effectStyle[index] === "percentage"
           ) {
-            localHealthDmg *= playerState.nonBuffedMaxHealth;
+            localHealthDmg *= playerState.nonConditionalMaxHealth;
           }
           healthDamage.push(localHealthDmg);
         } else {
@@ -183,7 +184,7 @@ export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
             debuffObj.effectStyle[index] === "multiplier" ||
             debuffObj.effectStyle[index] === "percentage"
           ) {
-            localSanityDmg *= playerState.nonBuffedMaxSanity;
+            localSanityDmg *= playerState.nonConditionalMaxSanity;
           }
           sanityDamage.push(localSanityDmg);
         } else {
@@ -266,6 +267,26 @@ export function getConditionEffectsOnAttacks({
   });
 
   return { hitChanceMultiplier, damageMult, damageFlat };
+}
+/**
+ * Get's damage that will hit the ATTACKER, these conditions exist on the DEFENDER
+ */
+export function getConditionDamageToAttacker(defenderConditions: Condition[]) {
+  //at time of writing only health damage is a thing from these conditions
+  let healthDamage = 0;
+  defenderConditions.forEach((cond) => {
+    if (
+      cond.effect.includes("thorns") ||
+      (cond.effect.includes("trap") && cond.trapSetupTime == 0)
+    ) {
+      healthDamage +=
+        cond.effectMagnitude.reduce((acc, val) => (acc += val)) ?? 0;
+      if (cond.effect.includes("trap")) {
+        cond.destroyTrap();
+      }
+    }
+  });
+  return { healthDamage };
 }
 
 export function getConditionEffectsOnDefenses(suppliedConditions: Condition[]) {

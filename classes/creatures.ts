@@ -202,7 +202,6 @@ export class Creature {
   //---------------------------Battle---------------------------//
   get isStunned() {
     const isStunned = getConditionEffectsOnMisc(this.conditions).isStunned;
-    console.log(isStunned);
     return isStunned;
   }
 
@@ -232,6 +231,17 @@ export class Creature {
     }
     if (this.health <= undeadDeathCheck) {
       this.health = 0;
+    }
+  }
+  /**
+   * This is meant to remove conditions that are 'stale' - at 0 at end of enemy's turn
+   * Unlike conditionTicker, this does not tick conditions
+   */
+  public conditionResolver() {
+    for (let i = this.conditions.length - 1; i >= 0; i--) {
+      if (this.conditions[i].turns <= 0) {
+        this.conditions.splice(i, 1);
+      }
     }
   }
 
