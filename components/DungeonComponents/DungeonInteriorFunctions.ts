@@ -262,9 +262,6 @@ function enemyMinionsTurn(
       wait(1000).then(() => {
         const res = suppliedMinions[i].takeTurn({ target: playerState });
         battleLogger("(minion) " + res.logString);
-        if (suppliedMinions[i].turnsLeftAlive <= 0) {
-          enemyState.removeMinion(suppliedMinions[i]);
-        }
       });
     }
   }
@@ -406,9 +403,6 @@ export function playerMinionsTurn({ dungeonData, appData }: contextData) {
       setTimeout(() => {
         const res = suppliedMinions[i].takeTurn({ target: enemyState });
         battleLogger(res.logString);
-        if (suppliedMinions[i].turnsLeftAlive <= 0) {
-          playerState.removeMinion(suppliedMinions[i]);
-        }
       }, 1000 * i);
     }
   }

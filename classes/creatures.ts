@@ -28,7 +28,7 @@ import mageBooks from "../assets/json/items/mageBooks.json";
 import rangerBooks from "../assets/json/items/rangerBooks.json";
 import * as Crypto from "expo-crypto";
 import { Item, isStackable } from "./item";
-import { action, makeObservable, observable } from "mobx";
+import { action, autorun, makeObservable, observable } from "mobx";
 import summons from "../assets/json/summons.json";
 import { ItemClassType, BeingType } from "../utility/types";
 import { rollD20 } from "../utility/functions/roll";
@@ -61,28 +61,88 @@ type EnemyType = CreatureType & {
 
 type MinionType = CreatureType & {
   turnsLeftAlive: number;
+  parent: Enemy | PlayerCharacter;
 };
 
 /**
- * Nothing is ever simply a `Creature` this class is simply used for inheritance
- * While I hate inheritance, this is done due to the massive similarities of the `Enemy` and `Minion` class
- * Most of the attributes here are readonly
+ * This class is used as a base class for `Enemy` and `Minion` and is not meant to be instantiated directly.
+ * It contains properties and methods that are shared between enemies and minions.
+ * Most of the attributes here are readonly.
  */
 export class Creature {
+  /**
+   * Unique identifier for the creature
+   */
   readonly id: string;
+
+  /**
+   * Type of being (e.g., humanoid, animal)
+   */
   readonly beingType: BeingType;
+
+  /**
+   * Species of the creature
+   */
   readonly creatureSpecies: string;
+
+  /**
+   * Current health of the creature
+   */
   health: number;
+
+  /**
+   * Maximum health of the creature
+   */
   readonly healthMax: number;
+
+  /**
+   * Current sanity of the creature (can be null)
+   */
   sanity: number | null;
+
+  /**
+   * Maximum sanity of the creature (can be null)
+   */
   readonly sanityMax: number | null;
+
+  /**
+   * Base attack power of the creature
+   */
   readonly attackPower: number;
+
+  /**
+   * Base armor value of the creature
+   */
   readonly baseArmor: number;
+
+  /**
+   * Current energy of the creature (can be null)
+   */
   energy: number | null;
+
+  /**
+   * Maximum energy of the creature (can be null)
+   */
   readonly energyMax: number | null;
+
+  /**
+   * Energy regeneration rate of the creature (can be null)
+   */
   readonly energyRegen: number | null;
+
+  /**
+   * List of attacks the creature can perform
+   */
   readonly attacks: Attack[];
+
+  /**
+   * List of conditions affecting the creature
+   */
   conditions: Condition[];
+
+  /**
+   * Flag indicating if the creature has dropped items
+   */
   gotDrops: boolean;
 
   constructor({
@@ -101,21 +161,21 @@ export class Creature {
     attacks,
     conditions,
   }: CreatureType) {
-    this.id = id ?? Crypto.randomUUID();
+    this.id = id ?? Crypto.randomUUID(); // Assign a random UUID if id is not provided
     this.beingType = beingType;
     this.creatureSpecies = creatureSpecies;
     this.health = health;
-    this.sanity = sanity ?? null;
-    this.sanityMax = sanityMax ?? null;
+    this.sanity = sanity ?? null; // Initialize sanity to null if not provided
+    this.sanityMax = sanityMax ?? null; // Initialize sanityMax to null if not provided
     this.healthMax = healthMax;
     this.attackPower = attackPower;
-    this.baseArmor = baseArmor ?? 0;
-    this.energy = energy ?? null;
-    this.energyMax = energyMax ?? null;
-    this.energyRegen = energyRegen ?? null;
-    this.attacks = this.initAttacks(attacks);
-    this.conditions = conditions ?? [];
-    this.gotDrops = false;
+    this.baseArmor = baseArmor ?? 0; // Default base armor to 0 if not provided
+    this.energy = energy ?? null; // Initialize energy to null if not provided
+    this.energyMax = energyMax ?? null; // Initialize energyMax to null if not provided
+    this.energyRegen = energyRegen ?? null; // Initialize energyRegen to null if not provided
+    this.attacks = this.initAttacks(attacks); // Initialize attacks
+    this.conditions = conditions ?? []; // Initialize conditions to an empty array if not provided
+    this.gotDrops = false; // Initialize gotDrops to false
     makeObservable(this, {
       id: observable,
       health: observable,
@@ -140,6 +200,10 @@ export class Creature {
     return this.id === otherMonsterID;
   }
   //---------------------------Health---------------------------//
+  /**
+   * Calculates the maximum health of the creature considering any condition effects.
+   * @returns The maximum health value.
+   */
   public getMaxHealth() {
     const { healthMult, healthFlat } = getConditionEffectsOnDefenses(
       this.conditions,
@@ -147,11 +211,21 @@ export class Creature {
     return this.healthMax * healthMult + healthFlat;
   }
 
+  /**
+   * Damages the creature's health by the specified amount.
+   * @param damage - The amount of damage to apply. If null, defaults to 0.
+   * @returns The new health value after applying the damage.
+   */
   public damageHealth(damage: number | null) {
     this.health -= damage ?? 0;
     return this.health;
   }
 
+  /**
+   * Restores the creature's health by the specified amount, up to the maximum health.
+   * @param amount - The amount of health to restore.
+   * @returns The actual amount of health restored.
+   */
   public restoreHealth(amount: number) {
     if (this.health + amount < this.healthMax) {
       this.health += amount;
@@ -163,12 +237,22 @@ export class Creature {
     }
   }
   //---------------------------Sanity---------------------------//
+  /**
+   * Calculates the maximum sanity of the creature considering any condition effects.
+   * @returns The maximum sanity value, or null if sanityMax is not set.
+   */
   public getMaxSanity() {
     const { sanityMult, sanityFlat } = getConditionEffectsOnDefenses(
       this.conditions,
     );
     return this.sanityMax ? this.sanityMax * sanityMult + sanityFlat : null;
   }
+
+  /**
+   * Damages the creature's sanity by the specified amount.
+   * @param damage - The amount of sanity damage to apply. If not provided, defaults to 0.
+   * @returns The new sanity value after applying the damage, or null if sanity is not set.
+   */
   public damageSanity(damage?: number | null) {
     if (this.sanity) {
       this.sanity -= damage ?? 0;
@@ -176,6 +260,9 @@ export class Creature {
     }
   }
   //---------------------------Energy---------------------------//
+  /**
+   * Regenerates the creature's energy based on its regeneration rate.
+   */
   public regenerate() {
     if (this.energy && this.energyRegen && this.energyMax) {
       if (this.energy + this.energyRegen >= this.energyMax) {
@@ -185,6 +272,11 @@ export class Creature {
       }
     }
   }
+
+  /**
+   * Expends the creature's energy by the specified amount.
+   * @param energyCost - The amount of energy to expend.
+   */
   public expendEnergy(energyCost: number) {
     if (this.energy && this.energy < energyCost) {
       this.energy = 0;
@@ -193,6 +285,10 @@ export class Creature {
     }
   }
   //---------------------------Armor---------------------------//
+  /**
+   * Calculates the damage reduction of the creature based on its armor and condition effects.
+   * @returns The damage reduction percentage.
+   */
   public getDamageReduction() {
     const { armorMult, armorFlat } = getConditionEffectsOnDefenses(
       this.conditions,
@@ -200,6 +296,10 @@ export class Creature {
     return damageReduction(this.baseArmor * armorMult + armorFlat);
   }
   //---------------------------Battle---------------------------//
+  /**
+   * Checks if the creature is currently stunned.
+   * @returns True if the creature is stunned, otherwise false.
+   */
   get isStunned() {
     const isStunned = getConditionEffectsOnMisc(this.conditions).isStunned;
     return isStunned;
@@ -211,12 +311,20 @@ export class Creature {
       this.regenerate();
     }, 250);
   }
+
+  /**
+   * Adds a condition to the creature's list of conditions.
+   * @param condition - The condition to add. If null, does nothing.
+   */
   public addCondition(condition?: Condition | null) {
     if (condition) {
       this.conditions.push(condition);
     }
   }
 
+  /**
+   * Updates the list of conditions, removing those that have expired.
+   */
   public conditionTicker() {
     let undeadDeathCheck = -1;
     for (let i = this.conditions.length - 1; i >= 0; i--) {
@@ -233,6 +341,7 @@ export class Creature {
       this.health = 0;
     }
   }
+
   /**
    * This is meant to remove conditions that are 'stale' - at 0 at end of enemy's turn
    * Unlike conditionTicker, this does not tick conditions
@@ -244,7 +353,12 @@ export class Creature {
       }
     }
   }
-
+  /**
+   * Initializes the attacks of the creature.
+   * @param attackStrings - The attacks to initialize, either as strings or Attack objects.
+   * @returns The initialized attacks as Attack objects.
+   * @private
+   */
   private initAttacks(attackStrings: string[] | Attack[]): Attack[] {
     if (attackStrings[0] instanceof Attack) {
       return attackStrings as Attack[];
@@ -288,7 +402,10 @@ export class Creature {
   }
 
   /**
-   * Currently, this simply chooses a random attack, this should be improved - (this is to be wrapped)
+   * This method is meant to be overridden by derived classes. It currently chooses a random attack.
+   * @param {Object} params - An object containing the target to attack.
+   * @param {PlayerCharacter | Minion | Enemy} params.target - The target to attack.
+   * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
    */
   protected _takeTurn({
     target,
@@ -343,6 +460,12 @@ export class Creature {
     }
   }
   //---------------------------Misc---------------------------//
+  /**
+   * Retrieves drops from the creature, if not already retrieved.
+   * @param playerClass - The class of the player.
+   * @param bossFight - Indicates if the fight is against a boss.
+   * @returns An object containing item drops and gold.
+   */
   public getDrops(
     playerClass: "necromancer" | "paladin" | "mage" | "ranger",
     bossFight: boolean,
@@ -394,7 +517,11 @@ export class Creature {
  * in this case i == 0 is set as the `Enemy` then i >= 1 is created as a `Minion` attached to the `Enemy`
  */
 export class Enemy extends Creature {
+  /**
+   * List of minions controlled by this enemy
+   */
   minions: Minion[];
+
   constructor({
     id,
     beingType,
@@ -437,13 +564,21 @@ export class Enemy extends Creature {
     });
   }
 
+  /**
+   * Allows the enemy to take its turn.
+   * @param {Object} params - An object containing the target to attack.
+   * @param {PlayerCharacter | Minion} params.target - The target to attack.
+   * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
+   */
   public takeTurn({ target }: { target: PlayerCharacter | Minion }) {
     return this._takeTurn({ target }); //this is done as a way to easily add additional effects, note this function in Minion
   }
 
   //---------------------------Minions---------------------------//
   /**
-   * Returns the species(name) of the created minion, adds the minion to the minion list
+   * Creates a minion of the specified type and adds it to the enemy's list of minions.
+   * @param minionName - The name of the minion to create.
+   * @returns The species (name) of the created minion.
    */
   public createMinion(minionName: string) {
     const minionObj = summons.find((summon) => summon.name == minionName);
@@ -458,15 +593,24 @@ export class Enemy extends Creature {
       attacks: minionObj.attacks,
       turnsLeftAlive: minionObj.turns,
       beingType: minionObj.beingType as BeingType,
+      parent: this,
     });
     this.addMinion(minion);
     return minion.creatureSpecies;
   }
 
+  /**
+   * Adds a minion to the enemy's list of minions.
+   * @param minion - The minion to add.
+   */
   public addMinion(minion: Minion) {
     this.minions.push(minion);
   }
 
+  /**
+   * Removes a minion from the enemy's list of minions.
+   * @param minionToRemove - The minion to remove.
+   */
   public removeMinion(minionToRemove: Minion) {
     let newList: Minion[] = [];
     this.minions.forEach((minion) => {
@@ -477,6 +621,11 @@ export class Enemy extends Creature {
     this.minions = newList;
   }
 
+  /**
+   * Creates an enemy from a JSON object.
+   * @param json - The JSON object representing the enemy.
+   * @returns The created enemy.
+   */
   public static fromJSON(json: any): Enemy {
     return new Enemy({
       id: json.id,
@@ -503,11 +652,14 @@ export class Enemy extends Creature {
 
 /**
  * While this is an extension of the `Creature`, same as the `Enemy`, this can be attached to the `PlayerCharacter` in addition the `Enemy`
- * The only extension this has over the base class is the `turnsLeftAlive` property. Currently, this needs to be watched outside of the class
- * to be properly destroyed. I don't like it but the only solution in my head would create a cycle.
+ * The only extension this has over the base class is the `turnsLeftAlive` property.
  */
 export class Minion extends Creature {
+  /**
+   * The number of turns left before the minion is destroyed.
+   */
   turnsLeftAlive: number;
+  private parent: Enemy | PlayerCharacter;
 
   constructor({
     id,
@@ -525,6 +677,7 @@ export class Minion extends Creature {
     attacks,
     conditions,
     turnsLeftAlive,
+    parent,
   }: MinionType) {
     super({
       id,
@@ -543,13 +696,30 @@ export class Minion extends Creature {
       conditions,
     });
     this.turnsLeftAlive = turnsLeftAlive;
+    this.parent = parent;
 
     makeObservable(this, {
       turnsLeftAlive: observable,
       takeTurn: action,
     });
+
+    // automatically remove the minion when it reaches 0 turns left
+    autorun(() => {
+      if (this.turnsLeftAlive <= 0) {
+        if (this.parent) {
+          this.parent.removeMinion(this);
+        }
+      }
+    });
   }
 
+  /**
+   * Allows the minion to take its turn, reducing its lifespan by one turn.
+   * @param {Object} params - An object containing the target to attack.
+   * @param {PlayerCharacter | Minion | Enemy} params.target - The target to attack.
+   * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
+   * @throws {Error} If the minion's lifespan has reached zero.
+   */
   public takeTurn({ target }: { target: PlayerCharacter | Minion | Enemy }) {
     if (this.turnsLeftAlive > 0) {
       this.turnsLeftAlive--;
@@ -559,6 +729,11 @@ export class Minion extends Creature {
     }
   }
 
+  /**
+   * Creates a minion from a JSON object.
+   * @param json - The JSON object representing the minion.
+   * @returns The created minion.
+   */
   public static fromJSON(json: any): Minion {
     return new Minion({
       id: json.id,
@@ -579,6 +754,10 @@ export class Minion extends Creature {
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
+      parent:
+        json.parent instanceof PlayerCharacter
+          ? PlayerCharacter.fromJSON(json.parent)
+          : Enemy.fromJSON(json.parent),
     });
   }
 }

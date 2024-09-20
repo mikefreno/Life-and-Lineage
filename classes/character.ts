@@ -1541,6 +1541,7 @@ export class PlayerCharacter extends Character {
       attacks: minionObj.attacks,
       turnsLeftAlive: minionObj.turns,
       beingType: minionObj.beingType as BeingType,
+      parent: this,
     });
     this.rangerPet = minion;
     return minion.creatureSpecies;
@@ -1720,6 +1721,7 @@ export class PlayerCharacter extends Character {
       attacks: minionObj.attacks,
       turnsLeftAlive: minionObj.turns,
       beingType: minionObj.beingType as BeingType,
+      parent: this,
     });
     this.addMinion(minion);
     return minion.creatureSpecies;
