@@ -30,7 +30,7 @@ import * as Crypto from "expo-crypto";
 import { Item, isStackable } from "./item";
 import { action, autorun, makeObservable, observable } from "mobx";
 import summons from "../assets/json/summons.json";
-import { ItemClassType, BeingType } from "../utility/types";
+import { ItemClassType, BeingType, PlayerClassOptions } from "../utility/types";
 import { rollD20 } from "../utility/functions/roll";
 import { damageReduction } from "../utility/functions/misc/numbers";
 import { getRandomInt, toTitleCase } from "../utility/functions/misc/words";
@@ -466,10 +466,7 @@ export class Creature {
    * @param bossFight - Indicates if the fight is against a boss.
    * @returns An object containing item drops and gold.
    */
-  public getDrops(
-    playerClass: "necromancer" | "paladin" | "mage" | "ranger",
-    bossFight: boolean,
-  ) {
+  public getDrops(playerClass: PlayerClassOptions, bossFight: boolean) {
     if (this.gotDrops) return "already retrieved";
     let enemyObj;
     if (bossFight) {
@@ -771,7 +768,7 @@ export class Minion extends Creature {
 
 function itemList(
   itemType: string,
-  playerClass: "mage" | "paladin" | "necromancer" | "ranger",
+  playerClass: PlayerClassOptions,
 ): {
   name: string;
   baseValue: number;

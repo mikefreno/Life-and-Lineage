@@ -25,7 +25,7 @@ import { Character } from "./character";
 import { rollD20 } from "../utility/functions/roll";
 import { getRandomName, toTitleCase } from "../utility/functions/misc/words";
 import { generateBirthday } from "../utility/functions/misc/age";
-import { ItemClassType } from "../utility/types";
+import { ItemClassType, PlayerClassOptions } from "../utility/types";
 
 interface ShopProps {
   baseGold: number;
@@ -74,7 +74,7 @@ export class Shop {
     });
   }
 
-  public refreshInventory(playerClass: "mage" | "necromancer" | "paladin") {
+  public refreshInventory(playerClass: PlayerClassOptions) {
     const shopObj = shops.find((shop) => shop.type == this.archetype);
     if (shopObj) {
       const newCount = getRandomInt(
@@ -165,10 +165,7 @@ export class Shop {
 }
 
 //----------------------associated functions----------------------//
-function getAnItemByType(
-  type: string,
-  playerClass: "mage" | "paladin" | "necromancer" | "ranger",
-): Item {
+function getAnItemByType(type: string, playerClass: PlayerClassOptions): Item {
   type = toTitleCase(type);
   const itemTypes: { [key: string]: any[] } = {
     Arrow: arrows,
@@ -214,7 +211,7 @@ function getAnItemByType(
 export function generateInventory(
   inventoryCount: number,
   trades: string[],
-  playerClass: "mage" | "necromancer" | "paladin" | "ranger",
+  playerClass: PlayerClassOptions,
 ) {
   let items: Item[] = [];
   for (let i = 0; i < inventoryCount; i++) {
@@ -228,9 +225,7 @@ function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function createShops(
-  playerClass: "mage" | "paladin" | "necromancer" | "ranger",
-) {
+export function createShops(playerClass: PlayerClassOptions) {
   let createdShops: Shop[] = [];
   shops.forEach((shop) => {
     //want to favor likelihood of male shopkeepers slightly

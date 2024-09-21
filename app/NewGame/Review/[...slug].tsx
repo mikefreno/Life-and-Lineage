@@ -82,10 +82,10 @@ export default function NewGameReview() {
   function getStartingBaseStats({
     playerClass,
   }: {
-    playerClass: "necromancer" | "paladin" | "mage" | "ranger";
+    playerClass: PlayerClassOptions;
   }) {
     switch (playerClass) {
-      case "necromancer":
+      case PlayerClassOptions.necromancer:
         return {
           baseHealth: 80,
           baseMana: 120,
@@ -95,7 +95,7 @@ export default function NewGameReview() {
           baseManaRegen: 6,
           baseSanity: 40,
         };
-      case "paladin":
+      case PlayerClassOptions.paladin:
         return {
           baseHealth: 120,
           baseMana: 80,
@@ -105,7 +105,7 @@ export default function NewGameReview() {
           baseManaRegen: 5,
           baseSanity: 60,
         };
-      case "mage":
+      case PlayerClassOptions.mage:
         return {
           baseHealth: 100,
           baseMana: 100,
@@ -115,7 +115,7 @@ export default function NewGameReview() {
           baseManaRegen: 5,
           baseSanity: 50,
         };
-      case "ranger":
+      case PlayerClassOptions.ranger:
         return {
           baseHealth: 90,
           baseMana: 90,
@@ -164,7 +164,7 @@ export default function NewGameReview() {
         blessing: blessing as "fire" | "water" | "air" | "earth",
         parents: [mom, dad],
         birthdate: bday,
-        ...getStartingBaseStats({ playerClass: "mage" }),
+        ...getStartingBaseStats({ playerClass }),
       });
     } else {
       newCharacter = new PlayerCharacter({
@@ -175,26 +175,19 @@ export default function NewGameReview() {
         blessing: blessing as "beastMastery" | "assassination" | "arcane",
         parents: [mom, dad],
         birthdate: bday,
-        ...getStartingBaseStats({ playerClass: "ranger" }),
+        ...getStartingBaseStats({ playerClass }),
       });
     }
     return newCharacter;
   }
 
   async function startGame() {
-    if (
-      playerClass == "mage" ||
-      playerClass == "paladin" ||
-      playerClass == "necromancer" ||
-      playerClass == "ranger"
-    ) {
+    if (playerClass) {
       const player = createPlayerCharacter();
       const starterBook = getStartingBook(Element[blessing]);
       player.addToInventory(starterBook);
       const startDate = new Date().toISOString();
-      const shops = createShops(
-        playerClass as "mage" | "paladin" | "necromancer" | "ranger",
-      );
+      const shops = createShops(playerClass);
       const tutorialState = storage.getString("tutorialsEnabled");
       let parsed = true;
       if (tutorialState) {

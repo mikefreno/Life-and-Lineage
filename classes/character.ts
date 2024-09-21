@@ -23,6 +23,8 @@ import {
   MasteryLevel,
   BeingType,
   Element,
+  PlayerClassOptions,
+  isElement,
 } from "../utility/types";
 import { rollD20 } from "../utility/functions/roll";
 import shops from "../assets/json/shops.json";
@@ -31,6 +33,7 @@ import bodyArmor from "../assets/json/items/bodyArmor.json";
 import mageBooks from "../assets/json/items/mageBooks.json";
 import necroBooks from "../assets/json/items/necroBooks.json";
 import paladinBooks from "../assets/json/items/paladinBooks.json";
+import rangerBooks from "../assets/json/items/rangerBooks.json";
 import foci from "../assets/json/items/foci.json";
 import hats from "../assets/json/items/hats.json";
 import helmets from "../assets/json/items/helmets.json";
@@ -393,7 +396,7 @@ type PlayerCharacterOptions =
  * the dungeons, which are both in the game class as these persist specific player characters
  */
 export class PlayerCharacter extends Character {
-  readonly playerClass: "mage" | "necromancer" | "paladin" | "ranger";
+  readonly playerClass: PlayerClassOptions;
   readonly blessing: Element;
   readonly parents: Character[];
 
@@ -519,7 +522,7 @@ export class PlayerCharacter extends Character {
       job,
       qualifications,
     });
-    this.playerClass = playerClass;
+    this.playerClass = PlayerClassOptions[playerClass];
     this.blessing = Element[blessing];
 
     this.parents = parents;
@@ -534,7 +537,10 @@ export class PlayerCharacter extends Character {
 
     this.magicProficiencies =
       magicProficiencies ??
-      getStartingProficiencies(playerClass, Element[blessing]);
+      getStartingProficiencies(
+        PlayerClassOptions[playerClass],
+        Element[blessing],
+      );
 
     this.currentHealth = currentHealth ?? baseHealth;
     this.currentSanity = currentSanity ?? baseSanity;
@@ -1392,9 +1398,15 @@ export class PlayerCharacter extends Character {
     this.knownSpells.forEach((spell) => {
       const found = spellList.find((spellObj) => spell == spellObj.name);
       if (found) {
+        let elem: Element;
+        if (isElement(found.element)) {
+          elem = found.element;
+        } else {
+          throw new Error("found element does not conform to Element enum");
+        }
         const spell = new Spell({
           name: found.name,
-          element: Element[found.element],
+          element: elem,
           proficiencyNeeded: found.proficiencyNeeded,
           manaCost: found.manaCost,
           duration: found.duration,
@@ -2046,7 +2058,7 @@ interface performLaborProps {
 }
 
 function getStartingProficiencies(
-  playerClass: "mage" | "necromancer" | "paladin" | "ranger",
+  playerClass: PlayerClassOptions,
   blessing: Element,
 ) {
   if (playerClass == "paladin") {
@@ -2287,7 +2299,7 @@ export class Shop {
     });
   }
 
-  public refreshInventory(playerClass: "mage" | "necromancer" | "paladin") {
+  public refreshInventory(playerClass: PlayerClassOptions) {
     const shopObj = shops.find((shop) => shop.type == this.archetype);
     if (shopObj) {
       const newCount = getRandomInt(
@@ -2337,10 +2349,7 @@ export class Shop {
 
 //----------------------associated functions----------------------//
 
-function getAnItemByType(
-  type: string,
-  playerClass: "mage" | "paladin" | "necromancer",
-): Item {
+function getAnItemByType(type: string, playerClass: PlayerClassOptions): Item {
   type = toTitleCase(type);
 
   const itemTypes: { [key: string]: any[] } = {
@@ -2351,6 +2360,7 @@ function getAnItemByType(
         mage: mageBooks,
         paladin: paladinBooks,
         necromancer: necroBooks,
+        ranger: rangerBooks,
       }[playerClass] || mageBooks,
     Focus: foci,
     Hat: hats,
@@ -2383,7 +2393,7 @@ function getAnItemByType(
 export function generateInventory(
   inventoryCount: number,
   trades: string[],
-  playerClass: "mage" | "necromancer" | "paladin",
+  playerClass: PlayerClassOptions,
 ) {
   let items: Item[] = [];
   for (let i = 0; i < inventoryCount; i++) {
