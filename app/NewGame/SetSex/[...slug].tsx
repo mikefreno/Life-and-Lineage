@@ -3,20 +3,31 @@ import { View as ThemedView, Text } from "../../../components/Themed";
 import { toTitleCase } from "../../../utility/functions/misc/words";
 import { FontAwesome5, Foundation } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { useVibration } from "../../../utility/customHooks";
 import { AppContext } from "../../_layout";
 import { useColorScheme } from "nativewind";
 import TutorialModal from "../../../components/TutorialModal";
+import {
+  PlayerClassOptions,
+  TutorialOption,
+  isPlayerClassOptions,
+} from "../../../utility/types";
 import { loadStoredTutorialState } from "../../../utility/functions/misc/tutorial";
-import { TutorialOption } from "../../../utility/types";
+import { playerClassColors } from "../../../utility/elementColors";
 
 export default function SetSex() {
   const { slug } = useLocalSearchParams();
   if (!slug) {
     return router.replace("/NewGame");
   }
-  const playerClass = slug[0];
+  let playerClass: PlayerClassOptions;
+
+  if (isPlayerClassOptions(slug[0])) {
+    playerClass = slug[0];
+  } else {
+    return <Text>{`Invalid player class option: ${slug[0]}`}</Text>;
+  }
   const blessing = slug[1];
   const [sex, setSex] = useState<"male" | "female">();
   const { colorScheme } = useColorScheme();
@@ -29,29 +40,14 @@ export default function SetSex() {
   const gameState = appData?.gameState;
 
   const [showAgingTutorial, setShowAgingTutorial] = useState<boolean>(
-    !gameState ||
-      (gameState &&
+    !gameState
+      ? loadStoredTutorialState()
+      : gameState &&
         !gameState.tutorialsShown.aging &&
-        gameState.tutorialsEnabled)
+        gameState.tutorialsEnabled
       ? true
       : false,
   );
-
-  useEffect(() => {
-    if (!gameState) {
-      const res = loadStoredTutorialState();
-      setShowAgingTutorial(res);
-    }
-  }, []);
-
-  const accent =
-    playerClass == "mage"
-      ? "#2563eb"
-      : playerClass == "necromancer"
-      ? "#9333ea"
-      : playerClass == "ranger"
-      ? "#15803d"
-      : "#fcd34d";
 
   return (
     <>
@@ -78,7 +74,9 @@ export default function SetSex() {
       <ThemedView className="flex-1 items-center">
         <Text className="mt-[6vh] text-center text-2xl md:text-3xl">
           Set the sex of your{" "}
-          <Text style={{ color: accent }}>{toTitleCase(playerClass)}</Text>
+          <Text style={{ color: playerClassColors[playerClass] }}>
+            {toTitleCase(playerClass)}
+          </Text>
         </Text>
         <ThemedView className="mt-[12vh] flex w-full flex-row justify-evenly">
           <Pressable
@@ -97,7 +95,11 @@ export default function SetSex() {
                 } py-4 border`}
               >
                 <View className="mx-auto">
-                  <Foundation name="male-symbol" size={90} color={accent} />
+                  <Foundation
+                    name="male-symbol"
+                    size={90}
+                    color={playerClassColors[playerClass]}
+                  />
                 </View>
                 <Text className="text-center text-lg">Male</Text>
               </View>
@@ -119,7 +121,11 @@ export default function SetSex() {
                 } py-4 border`}
               >
                 <View className="mx-auto">
-                  <Foundation name="female-symbol" size={90} color={accent} />
+                  <Foundation
+                    name="female-symbol"
+                    size={90}
+                    color={playerClassColors[playerClass]}
+                  />
                 </View>
                 <Text className="text-center text-lg">Female</Text>
               </View>

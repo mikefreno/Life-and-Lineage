@@ -107,6 +107,18 @@ export enum Element {
   assassination = "assassination",
   arcane = "arcane",
 }
+export function isElement(value: any): value is Element {
+  return Object.values(Element).includes(value);
+}
+export enum PlayerClassOptions {
+  mage = "mage",
+  necromancer = "necromancer",
+  ranger = "ranger",
+  paladin = "paladin",
+}
+export function isPlayerClassOptions(value: any): value is PlayerClassOptions {
+  return Object.values(PlayerClassOptions).includes(value);
+}
 
 export enum AttackUse {
   success,

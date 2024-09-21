@@ -15,6 +15,11 @@ import { useVibration } from "../../../utility/customHooks";
 import { useColorScheme } from "nativewind";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { AppContext } from "../../_layout";
+import { playerClassColors } from "../../../utility/elementColors";
+import {
+  PlayerClassOptions,
+  isPlayerClassOptions,
+} from "../../../utility/types";
 
 export default function SetName() {
   const appData = useContext(AppContext);
@@ -24,7 +29,13 @@ export default function SetName() {
   if (!slug) {
     return router.replace("/NewGame");
   }
-  const playerClass = slug[0];
+  let playerClass: PlayerClassOptions;
+
+  if (isPlayerClassOptions(slug[0])) {
+    playerClass = slug[0];
+  } else {
+    return <Text>{`Invalid player class option: ${slug[0]}`}</Text>;
+  }
   const blessing = slug[1];
   const sex = slug[2];
   const [firstName, setFirstName] = useState<string>("");
@@ -40,15 +51,6 @@ export default function SetName() {
     // Trim leading and trailing spaces, then replace multiple spaces with a single space
     return str.trim().replace(/\s+/g, " ");
   }
-
-  const accent =
-    playerClass == "mage"
-      ? "#2563eb"
-      : playerClass == "necromancer"
-      ? "#9333ea"
-      : playerClass == "ranger"
-      ? "#15803d"
-      : "#fcd34d";
 
   return (
     <>
@@ -71,7 +73,7 @@ export default function SetName() {
                   Choose Your
                   <Text
                     className="text-center text-2xl md:text-3xl"
-                    style={{ color: accent }}
+                    style={{ color: playerClassColors[playerClass] }}
                   >
                     {" "}
                     {toTitleCase(playerClass)}'s{" "}

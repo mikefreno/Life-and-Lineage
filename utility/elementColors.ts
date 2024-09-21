@@ -1,4 +1,4 @@
-import { Element } from "./types";
+import { Element, PlayerClassOptions } from "./types";
 
 export const elementalColorMap: Record<
   Element,
@@ -18,4 +18,11 @@ export const elementalColorMap: Record<
   arcane: { dark: "#99e7ff", light: "#e0e7ff" },
   assassination: { dark: "#1e293b", light: "#cbd5e1" },
   beastMastery: { dark: "#854d0e", light: "#fef3c7" },
+};
+
+export const playerClassColors: Record<PlayerClassOptions, string> = {
+  mage: "#2563eb",
+  necromancer: "#9333ea",
+  ranger: "#15803d",
+  paladin: "#fcd34d",
 };

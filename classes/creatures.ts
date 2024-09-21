@@ -722,7 +722,14 @@ export class Minion extends Creature {
    */
   public takeTurn({ target }: { target: PlayerCharacter | Minion | Enemy }) {
     if (this.turnsLeftAlive > 0) {
-      this.turnsLeftAlive--;
+      if (
+        !(
+          this.parent instanceof PlayerCharacter &&
+          this.parent.rangerPet?.equals(this.id)
+        )
+      ) {
+        this.turnsLeftAlive--;
+      }
       return this._takeTurn({ target });
     } else {
       throw new Error("Minion not properly removed!");

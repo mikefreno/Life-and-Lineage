@@ -1,4 +1,4 @@
-import { Dimensions, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import {
   ScrollView,
   Text,
@@ -14,8 +14,16 @@ import { useColorScheme } from "nativewind";
 import TutorialModal from "../../../components/TutorialModal";
 import { toTitleCase } from "../../../utility/functions/misc/words";
 import { descriptionMap } from "../../../utility/descriptions";
-import { Element, TutorialOption } from "../../../utility/types";
-import { elementalColorMap } from "../../../utility/elementColors";
+import {
+  Element,
+  PlayerClassOptions,
+  TutorialOption,
+  isPlayerClassOptions,
+} from "../../../utility/types";
+import {
+  elementalColorMap,
+  playerClassColors,
+} from "../../../utility/elementColors";
 import BlessingDisplay from "../../../components/BlessingsDisplay";
 import {
   loadStoredTutorialState,
@@ -27,7 +35,13 @@ export default function SetBlessing() {
   if (!slug) {
     return router.replace("/NewGame");
   }
-  const playerClass = slug as string;
+  let playerClass: PlayerClassOptions;
+
+  if (isPlayerClassOptions(slug[0])) {
+    playerClass = slug[0];
+  } else {
+    return <Text>{`Invalid player class option: ${slug[0]}`}</Text>;
+  }
 
   const [blessing, setBlessing] = useState<Element>();
   const { colorScheme } = useColorScheme();
@@ -39,25 +53,18 @@ export default function SetBlessing() {
   const { gameState, dimensions } = appData;
 
   const [showBlessingTutorial, setShowBlessingTutorial] = useState<boolean>(
-    !gameState ||
-      (gameState &&
+    !gameState
+      ? loadStoredTutorialState()
+      : gameState &&
         !gameState.tutorialsShown.blessing &&
-        gameState.tutorialsEnabled)
+        gameState.tutorialsEnabled
       ? true
       : false,
   );
 
   const [tutorialState, setTutorialState] = useState<boolean>(
-    gameState?.tutorialsEnabled ?? true,
+    gameState?.tutorialsEnabled ?? loadStoredTutorialState(),
   );
-
-  useEffect(() => {
-    if (!gameState) {
-      const res = loadStoredTutorialState();
-      setShowBlessingTutorial(res);
-      setTutorialState(res);
-    }
-  }, []);
 
   useEffect(() => {
     if (gameState) {
@@ -76,15 +83,6 @@ export default function SetBlessing() {
       setTutorialState(gameState?.tutorialsEnabled);
     }
   }, [gameState?.tutorialsEnabled]);
-
-  const accent =
-    playerClass == "mage"
-      ? "#2563eb"
-      : playerClass == "necromancer"
-      ? "#9333ea"
-      : playerClass == "ranger"
-      ? "#15803d"
-      : "#fcd34d";
 
   interface BlessingPressableProps {
     element: Element;
@@ -207,9 +205,9 @@ export default function SetBlessing() {
         <ThemedView className="flex-1 pt-[8vh]">
           <Text className="text-center text-2xl">
             With What Blessing Was Your
-            <Text style={{ color: accent }}>{` ${toTitleCase(
-              playerClass,
-            )} `}</Text>
+            <Text
+              style={{ color: playerClassColors[playerClass] }}
+            >{` ${toTitleCase(playerClass)} `}</Text>
             Born?
           </Text>
           <>

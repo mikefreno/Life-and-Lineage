@@ -24,15 +24,35 @@ import { generateBirthday } from "../../../utility/functions/misc/age";
 import clearHistory from "../../../utility/functions/misc/nav";
 import { fullSave, storage } from "../../../utility/functions/save_load";
 import { AppContext } from "../../_layout";
-import { Element } from "../../../utility/types";
+import {
+  Element,
+  PlayerClassOptions,
+  isElement,
+  isPlayerClassOptions,
+} from "../../../utility/types";
+import {
+  elementalColorMap,
+  playerClassColors,
+} from "../../../utility/elementColors";
 
 export default function NewGameReview() {
   const { slug } = useLocalSearchParams();
   if (!slug) {
     return router.replace("/NewGame");
   }
-  const playerClass = slug[0];
-  const blessing = slug[1];
+  let playerClass: PlayerClassOptions;
+
+  if (isPlayerClassOptions(slug[0])) {
+    playerClass = slug[0];
+  } else {
+    return <Text>{`Invalid player class option: ${slug[0]}`}</Text>;
+  }
+  let blessing: Element;
+  if (isElement(slug[1])) {
+    blessing = slug[1];
+  } else {
+    return <Text>{`Invalid player blessing option: ${slug[1]}`}</Text>;
+  }
   const sex = slug[2];
   const firstName = slug[3];
   const lastName = slug[4];
@@ -215,9 +235,18 @@ export default function NewGameReview() {
         }}
       />
       <Text className="pt-[8vh] text-center text-2xl">Review</Text>
-      <Text className="pt-[16vh] text-center text-3xl">{`${firstName} ${lastName} the ${
-        blessing == "beastMastery" ? "Beast Mastery" : toTitleCase(blessing)
-      }-born ${toTitleCase(playerClass)}`}</Text>
+      <Text className="pt-[16vh] text-center text-3xl">
+        {`${firstName} ${lastName} the `}
+        <Text
+          style={{ color: elementalColorMap[blessing as Element].dark }}
+        >{`${
+          blessing == "beastMastery" ? "Beast Mastery" : toTitleCase(blessing)
+        }`}</Text>
+        -born{" "}
+        <Text style={{ color: playerClassColors[playerClass] }}>{`${toTitleCase(
+          playerClass,
+        )}`}</Text>
+      </Text>
       <Pressable
         onPress={() => startGame()}
         className="mx-auto mt-[6vh] rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"

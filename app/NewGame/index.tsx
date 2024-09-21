@@ -33,10 +33,11 @@ export default function NewGameScreen() {
   );
 
   const [showIntroTutorial, setShowIntroTutorial] = useState<boolean>(
-    !gameState ||
-      (gameState &&
+    !gameState
+      ? loadStoredTutorialState()
+      : gameState &&
         !gameState.tutorialsShown.class &&
-        gameState.tutorialsEnabled)
+        gameState.tutorialsEnabled
       ? true
       : false,
   );
@@ -56,12 +57,6 @@ export default function NewGameScreen() {
       setTutorialState(tutorialState);
     }
   }, [tutorialState]);
-
-  useEffect(() => {
-    let res = loadStoredTutorialState();
-    setShowIntroTutorial(res);
-    setTutorialState(res);
-  }, []);
 
   useEffect(() => {
     if (gameState) {
