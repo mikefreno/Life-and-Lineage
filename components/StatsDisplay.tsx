@@ -83,19 +83,19 @@ export function StatsDisplay({
     if ((reqs.intelligence || reqs.strength || reqs.dexterity) && playerState) {
       const playerMeetsStrength =
         reqs.strength &&
-        reqs.strength <
+        reqs.strength <=
           playerState.baseStrength + playerState.allocatedSkillPoints.strength;
       const playerMeetsIntelligence =
         reqs.intelligence &&
-        reqs.intelligence <
+        reqs.intelligence <=
           playerState.baseIntelligence +
             playerState.allocatedSkillPoints.intelligence;
-      const playerMeetDexterity =
+      const playerMeetsDexterity =
         reqs.dexterity &&
-        reqs.dexterity <
+        reqs.dexterity <=
           playerState.baseDexterity +
             playerState.allocatedSkillPoints.dexterity;
-      if (playerMeetsStrength && playerMeetsIntelligence) return null;
+      if (item.playerHasRequirements(playerState)) return null;
       return (
         <View className="flex items-center p-1 rounded-lg border border-red-700">
           <Text>Requires:</Text>
@@ -127,7 +127,7 @@ export function StatsDisplay({
             <View className="flex flex-row items-center justify-evenly">
               <Text
                 className="text-sm pr-1"
-                style={{ color: playerMeetDexterity ? "#22c55e" : "#b91c1c" }}
+                style={{ color: playerMeetsDexterity ? "#22c55e" : "#b91c1c" }}
               >
                 {reqs.dexterity}
               </Text>

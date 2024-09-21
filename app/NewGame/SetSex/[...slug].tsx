@@ -148,18 +148,20 @@ export default function SetSex() {
           </View>
         ) : null}
       </ThemedView>
-      <View className="absolute ml-4 mt-4">
-        <Pressable
-          className="absolute"
-          onPress={() => setShowAgingTutorial(true)}
-        >
-          <FontAwesome5
-            name="question-circle"
-            size={32}
-            color={colorScheme == "light" ? "#27272a" : "#fafafa"}
-          />
-        </Pressable>
-      </View>
+      {gameState && gameState.tutorialsEnabled && (
+        <View className="absolute ml-4 mt-4">
+          <Pressable
+            className="absolute"
+            onPress={() => setShowAgingTutorial(true)}
+          >
+            <FontAwesome5
+              name="question-circle"
+              size={32}
+              color={colorScheme == "light" ? "#27272a" : "#fafafa"}
+            />
+          </Pressable>
+        </View>
+      )}
     </>
   );
 }
