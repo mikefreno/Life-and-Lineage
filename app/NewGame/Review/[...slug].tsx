@@ -11,17 +11,17 @@ import {
   useLocalSearchParams,
   useNavigation,
 } from "expo-router";
-import {
+import clearHistory, {
   getRandomName,
   toTitleCase,
-} from "../../../utility/functions/misc/words";
+  generateBirthday,
+  wait,
+} from "../../../utility/functions/misc";
 import { Game } from "../../../classes/game";
 import { useContext } from "react";
 import { useVibration } from "../../../utility/customHooks";
 import { getRandomJobTitle } from "../../../utility/functions/characterAid";
 import { createShops } from "../../../classes/shop";
-import { generateBirthday } from "../../../utility/functions/misc/age";
-import clearHistory from "../../../utility/functions/misc/nav";
 import { fullSave, storage } from "../../../utility/functions/save_load";
 import { AppContext } from "../../_layout";
 import {
@@ -33,7 +33,7 @@ import {
 import {
   elementalColorMap,
   playerClassColors,
-} from "../../../utility/elementColors";
+} from "../../../constants/Colors";
 
 export default function NewGameReview() {
   const { slug } = useLocalSearchParams();
@@ -212,7 +212,7 @@ export default function NewGameReview() {
       setPlayerCharacter(player);
       setLogs([]);
       vibration({ style: "success" });
-      setTimeout(() => clearHistory(navigation), 500);
+      wait(250).then(() => clearHistory(navigation));
       fullSave(newGame, player);
       storage.delete("tutorialsEnabled");
     }

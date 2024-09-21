@@ -2,11 +2,14 @@ import { Item, isStackable } from "./item";
 import shops from "../assets/json/shops.json";
 import { action, makeObservable, observable } from "mobx";
 import { Character } from "./character";
-import { rollD20 } from "../utility/functions/roll";
-import { getRandomName, toTitleCase } from "../utility/functions/misc/words";
-import { generateBirthday } from "../utility/functions/misc/age";
+import {
+  getRandomName,
+  toTitleCase,
+  rollD20,
+  getItemJSONMap,
+  generateBirthday,
+} from "../utility/functions/misc";
 import { ItemClassType, PlayerClassOptions } from "../utility/types";
-import { getItemJSONMap } from "../utility/functions/misc/item";
 
 interface ShopProps {
   baseGold: number;

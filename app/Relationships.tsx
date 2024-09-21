@@ -1,5 +1,5 @@
 import { Text, View, ScrollView } from "../components/Themed";
-import { calculateAge } from "../utility/functions/misc/age";
+import { calculateAge } from "../utility/functions/misc";
 import { CharacterImage } from "../components/CharacterImage";
 import { useContext, useState } from "react";
 import { useHeaderHeight } from "@react-navigation/elements";

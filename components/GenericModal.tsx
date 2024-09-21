@@ -3,7 +3,7 @@ import { Dimensions, Platform } from "react-native";
 import Modal from "react-native-modal";
 import { View } from "./Themed";
 import { AppContext } from "../app/_layout";
-import { wait } from "../utility/functions/misc/wait";
+import { wait } from "../utility/functions/misc";
 
 interface GenericModalProps {
   isVisibleCondition: boolean;

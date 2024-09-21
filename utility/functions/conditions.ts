@@ -2,7 +2,7 @@ import conditions from "../../assets/json/conditions.json";
 import { Condition } from "../../classes/conditions";
 import { PlayerCharacter } from "../../classes/character";
 import sanityDebuffs from "../../assets/json/sanityDebuffs.json";
-import { rollD20 } from "./roll";
+import { rollD20 } from "./misc";
 import { ConditionObjectType } from "../types";
 
 interface createDebuffDeps {

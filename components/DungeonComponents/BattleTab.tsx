@@ -6,11 +6,10 @@ import {
   Platform,
   TouchableWithoutFeedback,
 } from "react-native";
-import { toTitleCase } from "../../utility/functions/misc/words";
+import { toTitleCase } from "../../utility/functions/misc";
 import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { useVibration } from "../../utility/customHooks";
-import { elementalColorMap } from "../../utility/elementColors";
 import GenericModal from "../GenericModal";
 import SpellDetails from "../SpellDetails";
 import GenericStrikeAround from "../GenericStrikeAround";
@@ -25,6 +24,7 @@ import { Energy, Regen } from "../../assets/icons/SVGIcons";
 import { Attack } from "../../classes/attack";
 import { Spell } from "../../classes/spell";
 import { Item } from "../../classes/item";
+import { elementalColorMap } from "../../constants/Colors";
 
 interface BattleTabProps {
   battleTab: "attacksOrNavigation" | "equipment" | "log";

@@ -22,9 +22,9 @@ import necromancerSpells from "../assets/json/necroSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import SpellDetails from "./SpellDetails";
 import type { MasteryLevel } from "../utility/types";
-import { toTitleCase } from "../utility/functions/misc/words";
-import { elementalColorMap } from "../utility/elementColors";
+import { toTitleCase } from "../utility/functions/misc";
 import { descriptionMap } from "../utility/descriptions";
+import { elementalColorMap } from "../constants/Colors";
 
 export function MageCodex() {
   const headerComponent = () => (

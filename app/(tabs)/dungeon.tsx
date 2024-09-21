@@ -6,7 +6,7 @@ import { useVibration } from "../../utility/customHooks";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { DungeonInstance } from "../../classes/dungeon";
-import { toTitleCase } from "../../utility/functions/misc/words";
+import { toTitleCase } from "../../utility/functions/misc";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";

@@ -5,17 +5,19 @@ import { Character } from "../classes/character";
 import GenericModal from "./GenericModal";
 import { useContext, useEffect, useState } from "react";
 import { CharacterImage } from "./CharacterImage";
-import { calculateAge } from "../utility/functions/misc/age";
+import {
+  calculateAge,
+  getDaysBetweenDates,
+  wait,
+} from "../utility/functions/misc";
 import ProgressBar from "./ProgressBar";
 import GenericFlatButton from "./GenericFlatButton";
 import GenericStrikeAround from "./GenericStrikeAround";
 import { useVibration } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
 import { useRouter } from "expo-router";
-import { getDaysBetweenDates } from "../utility/functions/misc/date";
 import { AppContext } from "../app/_layout";
 import { AffectionIcon } from "../assets/icons/SVGIcons";
-import { wait } from "../utility/functions/misc/wait";
 import { fullSave } from "../utility/functions/save_load";
 
 interface CharacterInteractionModal {

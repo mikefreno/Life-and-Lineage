@@ -140,7 +140,8 @@
     "effects": {
       "damage": null,
       "buffs": null,
-      "debuffs": null
+      "debuffs": null,
+      "pet": ["bear"]
     }
   },
   {
@@ -166,7 +167,8 @@
     "effects": {
       "damage": null,
       "buffs": null,
-      "debuffs": null
+      "debuffs": null,
+      "pet": ["dragon welp"]
     }
   },
   {
@@ -183,20 +185,21 @@
     }
   },
   {
-    "name": "",
+    "name": "call griffon",
     "element": "beastMastery",
-    "proficiencyNeeded": "master",
     "target": "area",
     "type": "defense",
+    "proficiencyNeeded": "master",
     "manaCost": 200,
     "effects": {
       "damage": null,
       "buffs": null,
-      "debuffs": null
+      "debuffs": null,
+      "pet": ["griffon"]
     }
   },
   {
-    "name": "",
+    "name": "entangle",
     "element": "beastMastery",
     "target": "area",
     "type": "offense",
@@ -206,11 +209,11 @@
     "effects": {
       "damage": 50,
       "buffs": null,
-      "debuffs": null 
+      "debuffs": [{"name": "stun", "chance": 0.75}]
     }
   },
   {
-    "name": "",
+    "name": "call dragon",
     "element": "beastMastery",
     "target": "single",
     "type": "offense",
@@ -219,20 +222,22 @@
     "effects": {
       "damage": 175,
       "buffs": null,
-      "debuffs": null 
+      "debuffs": null ,
+      "pet": ["dragon"]
     }
   },
   {
-    "name": "",
+    "name": "beast fury",
     "element": "beastMastery",
     "target": "single",
     "type": "offense",
+    "usesWeapon": "axe",
     "proficiencyNeeded": "legend",
     "duration": 2,
     "manaCost": 1100,
     "effects": {
       "damage": 150,
-      "buffs": null,
+      "buffs": ["frenzy"],
       "debuffs": null 
     }
   },

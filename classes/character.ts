@@ -3,7 +3,7 @@ import {
   getConditionEffectsOnMisc,
 } from "../utility/functions/conditions";
 import { Condition } from "./conditions";
-import { Item, isStackable } from "./item";
+import { Item } from "./item";
 import attacks from "../assets/json/playerAttacks.json";
 import weapons from "../assets/json/items/weapons.json";
 import wands from "../assets/json/items/wands.json";
@@ -26,9 +26,12 @@ import {
   PlayerClassOptions,
   isElement,
 } from "../utility/types";
-import { rollD20 } from "../utility/functions/roll";
-import { calculateAge, rollToLiveByAge } from "../utility/functions/misc/age";
-import { damageReduction } from "../utility/functions/misc/numbers";
+import {
+  calculateAge,
+  rollToLiveByAge,
+  rollD20,
+  damageReduction,
+} from "../utility/functions/misc";
 import { getMasteryLevel } from "../utility/spellHelper";
 import type {
   BoundingBox,

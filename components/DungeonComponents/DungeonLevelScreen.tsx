@@ -4,7 +4,7 @@ import { useContext, useRef, useEffect, useState } from "react";
 import { Pressable } from "react-native";
 import { Stack } from "expo-router";
 import BattleTab from "../../components/DungeonComponents/BattleTab";
-import { toTitleCase } from "../../utility/functions/misc/words";
+import { toTitleCase } from "../../utility/functions/misc";
 import PlayerStatus from "../../components/PlayerStatus";
 import ProgressBar from "../../components/ProgressBar";
 import { observer } from "mobx-react-lite";

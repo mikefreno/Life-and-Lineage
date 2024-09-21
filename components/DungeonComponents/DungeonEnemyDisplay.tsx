@@ -1,6 +1,6 @@
 import { View, Animated, Image } from "react-native";
 import { EnemyHealingAnimationBox } from "./EnemyHealingAnimationBox";
-import { toTitleCase } from "../../utility/functions/misc/words";
+import { toTitleCase } from "../../utility/functions/misc";
 import { Text } from "../Themed";
 import ProgressBar from "../ProgressBar";
 import GenericStrikeAround from "../GenericStrikeAround";

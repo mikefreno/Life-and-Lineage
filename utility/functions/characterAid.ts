@@ -1,8 +1,6 @@
 import { Character } from "../../classes/character";
-import { flipCoin } from "./roll";
+import { flipCoin, getRandomName, generateBirthday } from "./misc";
 import jobs from "../../assets/json/jobs.json";
-import { getRandomName } from "./misc/words";
-import { generateBirthday } from "./misc/age";
 import names from "../../assets/json/names.json";
 
 export function generateNewCharacter() {
@@ -16,7 +14,7 @@ export function generateNewCharacter() {
     firstName: name.firstName,
     lastName: name.lastName,
     birthdate: birthdate,
-    deathdate: null,
+    deathdate: undefined,
     job: job,
   });
   return newChar;

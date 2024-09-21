@@ -14,7 +14,7 @@ import {
   RangerIcon,
   WizardHat,
 } from "../../assets/icons/SVGIcons";
-import { loadStoredTutorialState } from "../../utility/functions/misc/tutorial";
+import { loadStoredTutorialState } from "../../utility/functions/misc";
 import { TutorialOption } from "../../utility/types";
 
 export default function NewGameScreen() {

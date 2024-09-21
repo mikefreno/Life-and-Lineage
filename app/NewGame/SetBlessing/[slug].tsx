@@ -12,7 +12,6 @@ import { AppContext } from "../../_layout";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import TutorialModal from "../../../components/TutorialModal";
-import { toTitleCase } from "../../../utility/functions/misc/words";
 import { descriptionMap } from "../../../utility/descriptions";
 import {
   Element,
@@ -20,15 +19,17 @@ import {
   TutorialOption,
   isPlayerClassOptions,
 } from "../../../utility/types";
-import {
-  elementalColorMap,
-  playerClassColors,
-} from "../../../utility/elementColors";
+
 import BlessingDisplay from "../../../components/BlessingsDisplay";
 import {
   loadStoredTutorialState,
   updateStoredTutorialState,
-} from "../../../utility/functions/misc/tutorial";
+  toTitleCase,
+} from "../../../utility/functions/misc";
+import {
+  elementalColorMap,
+  playerClassColors,
+} from "../../../constants/Colors";
 
 export default function SetBlessing() {
   const { slug } = useLocalSearchParams();

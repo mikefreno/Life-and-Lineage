@@ -2,7 +2,7 @@ import { View } from "react-native";
 import ProgressBar from "./ProgressBar";
 import { useContext, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { numberToRoman } from "../utility/functions/misc/numbers";
+import { numberToRoman } from "../utility/functions/misc";
 import type { VibrateProps } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
 import { Text } from "./Themed";

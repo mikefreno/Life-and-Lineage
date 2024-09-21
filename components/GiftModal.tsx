@@ -4,7 +4,7 @@ import { Dimensions, Pressable, View, Image } from "react-native";
 import { Text } from "./Themed";
 import { Item } from "../classes/item";
 import { useColorScheme } from "nativewind";
-import { toTitleCase } from "../utility/functions/misc/words";
+import { toTitleCase } from "../utility/functions/misc";
 import GearStatsDisplay from "./GearStatsDisplay";
 import { AppContext } from "../app/_layout";
 

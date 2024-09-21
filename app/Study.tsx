@@ -3,10 +3,9 @@ import "../assets/styles/globals.css";
 import { Pressable, Image, Platform, StyleSheet, View } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import { Item } from "../classes/item";
-import { toTitleCase } from "../utility/functions/misc/words";
+import { toTitleCase } from "../utility/functions/misc";
 import { useIsFocused } from "@react-navigation/native";
 import ProgressBar from "../components/ProgressBar";
-import { elementalColorMap } from "../utility/elementColors";
 import { useVibration } from "../utility/customHooks";
 import SpellDetails from "../components/SpellDetails";
 import PlayerStatus from "../components/PlayerStatus";
@@ -20,6 +19,7 @@ import GenericModal from "../components/GenericModal";
 import { AppContext } from "./_layout";
 import { Spell } from "../classes/spell";
 import { fullSave } from "../utility/functions/save_load";
+import { elementalColorMap } from "../constants/Colors";
 
 export default function LearningKnowledgeScreen() {
   const appData = useContext(AppContext);

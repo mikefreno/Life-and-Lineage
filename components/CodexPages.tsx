@@ -1,4 +1,4 @@
-import { FlatList, ScrollView, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { Text } from "./Themed";
 import {
   Air,

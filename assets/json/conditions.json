@@ -337,5 +337,15 @@
       "effectStyle": ["flat"],
       "effectAmount": [100],
       "icon": "trap"
+   },
+   {
+      "name": "dragon trap",
+      "style": "buff",
+      "turns": 15,
+      "trapSetupTime": 5,
+      "effect": ["trap"],
+      "effectStyle": ["flat"],
+      "effectAmount": [300],
+      "icon": "trap"
    }
 ]

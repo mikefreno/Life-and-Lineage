@@ -29,7 +29,7 @@ import {
   VengeanceCodex,
   WaterCodex,
 } from "../../../components/CodexSecondaries";
-import { toTitleCase } from "../../../utility/functions/misc/words";
+import { toTitleCase } from "../../../utility/functions/misc";
 import { useEffect, useState } from "react";
 
 const CategoryMap: { [key: string]: React.JSX.Element } = {

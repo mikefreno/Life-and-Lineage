@@ -1,16 +1,15 @@
 import { useColorScheme } from "nativewind";
 import { View as ThemedView, Text, ScrollView } from "./Themed";
 import { InvestmentType, InvestmentUpgrade } from "../utility/types";
-import { Pressable, View, StyleSheet, Animated } from "react-native";
+import { Pressable, View, Animated } from "react-native";
 import Modal from "react-native-modal";
 import { useContext, useEffect, useRef, useState } from "react";
-import { toTitleCase } from "../utility/functions/misc/words";
+import { toTitleCase, asReadableGold } from "../utility/functions/misc";
 import { Entypo } from "@expo/vector-icons";
 import { Investment } from "../classes/investment";
 import GenericModal from "./GenericModal";
 import { observer } from "mobx-react-lite";
 import { useVibration } from "../utility/customHooks";
-import { asReadableGold } from "../utility/functions/misc/numbers";
 import ThemedCard from "./ThemedCard";
 import { AppContext } from "../app/_layout";
 import GenericStrikeAround from "./GenericStrikeAround";

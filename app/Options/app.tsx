@@ -1,7 +1,7 @@
 import { Pressable, TextInput, View } from "react-native";
 import { View as ThemedView, Text } from "../../components/Themed";
 import { useContext, useEffect, useState } from "react";
-import { toTitleCase } from "../../utility/functions/misc/words";
+import { toTitleCase } from "../../utility/functions/misc";
 import { useVibration } from "../../utility/customHooks";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import { AppContext } from "../_layout";

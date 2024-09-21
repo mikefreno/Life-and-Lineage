@@ -2,7 +2,7 @@ import { Modal, Platform, Pressable, View } from "react-native";
 import GenericModal from "../GenericModal";
 import GenericFlatButton from "../GenericFlatButton";
 import { View as ThemedView, Text } from "../Themed";
-import { rollD20 } from "../../utility/functions/roll";
+import { rollD20 } from "../../utility/functions/misc";
 import { useVibration } from "../../utility/customHooks";
 import { router } from "expo-router";
 import { fullSave } from "../../utility/functions/save_load";

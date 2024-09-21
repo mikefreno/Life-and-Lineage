@@ -7,7 +7,7 @@ import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { calculateAge } from "../../utility/functions/misc/age";
+import { calculateAge } from "../../utility/functions/misc";
 import InventoryRender from "../../components/InventoryRender";
 import { AppContext } from "../_layout";
 import {

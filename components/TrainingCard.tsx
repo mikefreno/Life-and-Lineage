@@ -5,7 +5,7 @@ import { View } from "react-native";
 import { Text } from "../components/Themed";
 import ProgressBar from "./ProgressBar";
 import GenericRaisedButton from "./GenericRaisedButton";
-import { toTitleCase } from "../utility/functions/misc/words";
+import { toTitleCase } from "../utility/functions/misc";
 import { AppContext } from "../app/_layout";
 import { Coins, Sanity } from "../assets/icons/SVGIcons";
 import { fullSave } from "../utility/functions/save_load";

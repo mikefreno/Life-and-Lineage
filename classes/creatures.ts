@@ -31,9 +31,12 @@ import { Item, isStackable } from "./item";
 import { action, autorun, makeObservable, observable } from "mobx";
 import summons from "../assets/json/summons.json";
 import { ItemClassType, BeingType, PlayerClassOptions } from "../utility/types";
-import { rollD20 } from "../utility/functions/roll";
-import { damageReduction } from "../utility/functions/misc/numbers";
-import { getRandomInt, toTitleCase } from "../utility/functions/misc/words";
+import {
+  rollD20,
+  damageReduction,
+  getRandomInt,
+  toTitleCase,
+} from "../utility/functions/misc";
 import { Attack } from "./attack";
 import { PlayerCharacter } from "./character";
 import { AttackUse } from "../utility/types";

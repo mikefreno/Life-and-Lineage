@@ -4,12 +4,10 @@ import {
   getConditionDamageToAttacker,
   getConditionEffectsOnAttacks,
 } from "../utility/functions/conditions";
-import { toTitleCase } from "../utility/functions/misc/words";
-import { rollD20 } from "../utility/functions/roll";
+import { toTitleCase, rollD20, wait } from "../utility/functions/misc";
 import type { PlayerCharacter } from "./character";
 import type { Enemy, Minion } from "./creatures";
 import { AttackUse } from "../utility/types";
-import { wait } from "../utility/functions/misc/wait";
 
 interface AttackFields {
   name: string;

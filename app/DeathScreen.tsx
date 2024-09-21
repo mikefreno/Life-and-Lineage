@@ -1,11 +1,11 @@
 import { Pressable } from "react-native";
-import { View, Text, SafeAreaView } from "../components/Themed";
+import { View, Text } from "../components/Themed";
 import { Stack } from "expo-router";
 import deathMessages from "../assets/json/deathMessages.json";
 import { useContext, useEffect, useState } from "react";
 import { router } from "expo-router";
 import { CharacterImage } from "../components/CharacterImage";
-import { calculateAge } from "../utility/functions/misc/age";
+import { calculateAge } from "../utility/functions/misc";
 import { Character } from "../classes/character";
 import { AppContext } from "./_layout";
 import GenericStrikeAround from "../components/GenericStrikeAround";

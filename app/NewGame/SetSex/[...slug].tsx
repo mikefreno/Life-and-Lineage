@@ -1,6 +1,5 @@
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { View as ThemedView, Text } from "../../../components/Themed";
-import { toTitleCase } from "../../../utility/functions/misc/words";
 import { FontAwesome5, Foundation } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
 import { useContext, useRef, useState } from "react";
@@ -13,8 +12,11 @@ import {
   TutorialOption,
   isPlayerClassOptions,
 } from "../../../utility/types";
-import { loadStoredTutorialState } from "../../../utility/functions/misc/tutorial";
-import { playerClassColors } from "../../../utility/elementColors";
+import {
+  loadStoredTutorialState,
+  toTitleCase,
+} from "../../../utility/functions/misc";
+import { playerClassColors } from "../../../constants/Colors";
 
 export default function SetSex() {
   const { slug } = useLocalSearchParams();

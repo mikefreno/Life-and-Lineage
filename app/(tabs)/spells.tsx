@@ -1,23 +1,23 @@
-import { Text, View as ThemedView } from "../../components/Themed";
+import { Text } from "../../components/Themed";
 import SpellDetails from "../../components/SpellDetails";
 import { useContext } from "react";
 import { useColorScheme } from "nativewind";
 import { View, ScrollView } from "react-native";
 import { observer } from "mobx-react-lite";
 import ProgressBar from "../../components/ProgressBar";
-import { elementalColorMap } from "../../utility/elementColors";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
-import { toTitleCase } from "../../utility/functions/misc/words";
+import { toTitleCase } from "../../utility/functions/misc";
 import { Element, MasteryLevel, TutorialOption } from "../../utility/types";
 import {
   convertMasteryToNumber,
   convertMasteryToString,
 } from "../../utility/spellHelper";
 import { AppContext } from "../_layout";
+import { elementalColorMap } from "../../constants/Colors";
 
 const SpellsScreen = observer(() => {
   const appData = useContext(AppContext);

@@ -10,16 +10,16 @@ import {
 import { View as ThemedView, Text } from "../../../components/Themed";
 import { useContext, useRef, useState } from "react";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { toTitleCase } from "../../../utility/functions/misc/words";
+import { toTitleCase } from "../../../utility/functions/misc";
 import { useVibration } from "../../../utility/customHooks";
 import { useColorScheme } from "nativewind";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { AppContext } from "../../_layout";
-import { playerClassColors } from "../../../utility/elementColors";
 import {
   PlayerClassOptions,
   isPlayerClassOptions,
 } from "../../../utility/types";
+import { playerClassColors } from "../../../constants/Colors";
 
 export default function SetName() {
   const appData = useContext(AppContext);

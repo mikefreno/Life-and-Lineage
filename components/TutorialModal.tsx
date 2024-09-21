@@ -8,7 +8,7 @@ import { Pressable, Switch } from "react-native";
 import {
   loadStoredTutorialState,
   updateStoredTutorialState,
-} from "../utility/functions/misc/tutorial";
+} from "../utility/functions/misc";
 import { TutorialOption } from "../utility/types";
 import GenericModal from "./GenericModal";
 

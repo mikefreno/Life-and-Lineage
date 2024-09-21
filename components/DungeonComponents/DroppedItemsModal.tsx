@@ -3,7 +3,7 @@ import GenericModal from "../GenericModal";
 import { Item } from "../../classes/item";
 import { Pressable, View, Image } from "react-native";
 import { Text } from "../Themed";
-import { toTitleCase } from "../../utility/functions/misc/words";
+import { toTitleCase } from "../../utility/functions/misc";
 import { useContext } from "react";
 import { AppContext } from "../../app/_layout";
 import { DungeonContext } from "./DungeonContext";

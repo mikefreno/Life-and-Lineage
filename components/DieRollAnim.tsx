@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, Animated, Easing } from "react-native";
-import { rollD20 } from "../utility/functions/roll";
+import { rollD20 } from "../utility/functions/misc";
 import { D20SVG } from "../assets/icons/SVGIcons";
 import { Text } from "./Themed";
 

@@ -241,7 +241,8 @@ export type BeingType =
   | "beast"
   | "undead"
   | "demi-human"
-  | "human";
+  | "human"
+  | "draconic";
 
 /**
  * This is used mostly for simplicity. While prop drilling wouldn't be too cumbersome, this makes management a bit easier

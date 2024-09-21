@@ -3,7 +3,7 @@ import { View as ThemedView, Text } from "../Themed";
 import { Enemy, Minion } from "../../classes/creatures";
 import { EnemyImage } from "../EnemyImage";
 import ProgressBar from "../ProgressBar";
-import { toTitleCase } from "../../utility/functions/misc/words";
+import { toTitleCase } from "../../utility/functions/misc";
 import { useContext } from "react";
 import { AppContext } from "../../app/_layout";
 import { DungeonContext } from "./DungeonContext";

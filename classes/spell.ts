@@ -1,8 +1,6 @@
 import { createBuff, createDebuff } from "../utility/functions/conditions";
-import { wait } from "../utility/functions/misc/wait";
-import { toTitleCase } from "../utility/functions/misc/words";
-import { rollD20 } from "../utility/functions/roll";
-import { Element, ItemClassType, MasteryLevel } from "../utility/types";
+import { wait, toTitleCase, rollD20 } from "../utility/functions/misc";
+import { Element, MasteryLevel } from "../utility/types";
 import { PlayerCharacter } from "./character";
 import { Enemy, Minion } from "./creatures";
 

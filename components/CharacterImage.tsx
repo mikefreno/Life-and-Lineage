@@ -1,5 +1,5 @@
 import { Image } from "react-native";
-import { getCharacterImage } from "../utility/functions/misc/image";
+import { getCharacterImage } from "../utility/functions/misc";
 
 interface CharacterImageProps {
   characterAge: number;

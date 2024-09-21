@@ -33,11 +33,19 @@
       "turns": 1000
    },
    {
-      "name": "raven",
+      "name": "bear",
       "beingType": "beast",
-      "health":50,
-      "attackPower": 2,
-      "attacks": ["pluck eye", "scratch"],
+      "health":200,
+      "attackPower": 10,
+      "attacks": [],
+      "turns": 1000
+   },
+   {
+      "name": "dragon welp",
+      "beingType": "draconic",
+      "health":200,
+      "attackPower": 10,
+      "attacks": [],
       "turns": 1000
    }
 ]

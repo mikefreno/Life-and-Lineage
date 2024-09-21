@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useContext, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { toTitleCase } from "../utility/functions/misc/words";
+import { toTitleCase, damageReduction } from "../utility/functions/misc";
 import GenericModal from "./GenericModal";
 import GenericStrikeAround from "./GenericStrikeAround";
 import { useVibration } from "../utility/customHooks";
@@ -30,7 +30,6 @@ import {
   SquarePlus,
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
-import { damageReduction } from "../utility/functions/misc/numbers";
 
 interface PlayerStatus {
   hideGold?: boolean;

@@ -6,8 +6,7 @@ import {
   Image,
   View,
 } from "react-native";
-import Colors from "../../constants/Colors";
-import { elementalColorMap } from "../../utility/elementColors";
+import Colors, { elementalColorMap } from "../../constants/Colors";
 import { useColorScheme } from "nativewind";
 import { useContext } from "react";
 import { useVibration } from "../../utility/customHooks";

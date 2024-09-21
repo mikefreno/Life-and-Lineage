@@ -1,8 +1,7 @@
 import { View } from "react-native";
-import { toTitleCase } from "../utility/functions/misc/words";
+import { toTitleCase } from "../utility/functions/misc";
 import { Text } from "./Themed";
 import { useColorScheme } from "nativewind";
-import { elementalColorMap } from "../utility/elementColors";
 import {
   ClockIcon,
   Energy,
@@ -13,6 +12,7 @@ import BlessingDisplay from "./BlessingsDisplay";
 import { useContext } from "react";
 import { AppContext } from "../app/_layout";
 import { Spell } from "../classes/spell";
+import { elementalColorMap } from "../constants/Colors";
 
 export default function SpellDetails({ spell }: { spell: Spell }) {
   const { colorScheme } = useColorScheme();

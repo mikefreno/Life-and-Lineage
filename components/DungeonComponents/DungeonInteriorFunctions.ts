@@ -2,7 +2,7 @@ import type { PlayerCharacter } from "../../classes/character";
 import { Enemy, type Minion } from "../../classes/creatures";
 import { enemyGenerator } from "../../utility/enemy";
 import { getMagnitude } from "../../utility/functions/conditions";
-import { toTitleCase } from "../../utility/functions/misc/words";
+import { toTitleCase, wait } from "../../utility/functions/misc";
 import { dungeonSave, fullSave } from "../../utility/functions/save_load";
 import {
   AttackUse,
@@ -12,7 +12,6 @@ import {
 import { Item } from "../../classes/item";
 import { Spell } from "../../classes/spell";
 import { Attack } from "../../classes/attack";
-import { wait } from "../../utility/functions/misc/wait";
 
 interface addItemToPouch {
   item: Item;

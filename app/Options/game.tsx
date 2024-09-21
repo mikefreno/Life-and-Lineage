@@ -2,7 +2,7 @@ import { Text, View as ThemedView } from "../../components/Themed";
 import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../_layout";
-import { toTitleCase } from "../../utility/functions/misc/words";
+import { toTitleCase, wait } from "../../utility/functions/misc";
 import { Pressable, Switch, View } from "react-native";
 import { useVibration } from "../../utility/customHooks";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
@@ -10,7 +10,6 @@ import GenericStrikeAround from "../../components/GenericStrikeAround";
 import GenericModal from "../../components/GenericModal";
 import * as Updates from "expo-updates";
 import { fullSave } from "../../utility/functions/save_load";
-import { wait } from "../../utility/functions/misc/wait";
 import D20DieAnimation from "../../components/DieRollAnim";
 
 const healthWarningOptions: Record<number, string> = {

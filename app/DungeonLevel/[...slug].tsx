@@ -18,9 +18,8 @@ import {
 import DungeonLevelScreen from "../../components/DungeonComponents/DungeonLevelScreen";
 import { enemyGenerator } from "../../utility/enemy";
 import { getSexFromName } from "../../utility/functions/characterAid";
-import { flipCoin } from "../../utility/functions/roll";
 import D20DieAnimation from "../../components/DieRollAnim";
-import { wait } from "../../utility/functions/misc/wait";
+import { wait, flipCoin } from "../../utility/functions/misc";
 import TutorialModal from "../../components/TutorialModal";
 import { Attack } from "../../classes/attack";
 import { Spell } from "../../classes/spell";

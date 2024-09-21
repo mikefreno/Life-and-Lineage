@@ -2,10 +2,14 @@ import { Pressable, ScrollView, View } from "react-native";
 import { View as ThemedView, Text } from "../components/Themed";
 import { Activity, BadOutcome, GoodOutcome } from "../utility/types";
 import { useColorScheme } from "nativewind";
-import { flipCoin } from "../utility/functions/roll";
+import {
+  flipCoin,
+  toTitleCase,
+  calculateAge,
+  wait,
+} from "../utility/functions/misc";
 import { generateNewCharacter } from "../utility/functions/characterAid";
 import { useContext, useState } from "react";
-import { toTitleCase } from "../utility/functions/misc/words";
 import GenericModal from "./GenericModal";
 import { Character } from "../classes/character";
 import GenericRaisedButton from "./GenericRaisedButton";
@@ -15,7 +19,6 @@ import GenericStrikeAround from "./GenericStrikeAround";
 import { router } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { CharacterInteractionModal } from "./CharacterInteractionModal";
-import { calculateAge } from "../utility/functions/misc/age";
 import { CharacterImage } from "./CharacterImage";
 import ProgressBar from "./ProgressBar";
 import { AppContext } from "../app/_layout";
@@ -25,7 +28,6 @@ import {
   HealthIcon,
   Sanity,
 } from "../assets/icons/SVGIcons";
-import { wait } from "../utility/functions/misc/wait";
 import { fullSave } from "../utility/functions/save_load";
 
 interface ActivityCardProps {

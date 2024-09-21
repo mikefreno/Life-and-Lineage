@@ -7,7 +7,7 @@ import { router } from "expo-router";
 import { Item } from "../classes/item";
 import { useContext, useEffect, useState } from "react";
 import { Shop } from "../classes/shop";
-import { asReadableGold } from "../utility/functions/misc/numbers";
+import { asReadableGold, toTitleCase } from "../utility/functions/misc";
 import SpellDetails from "./SpellDetails";
 import GenericFlatButton from "./GenericFlatButton";
 import { AppContext } from "../app/_layout";
@@ -18,7 +18,6 @@ import {
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
 import { ItemClassType } from "../utility/types";
-import { toTitleCase } from "../utility/functions/misc/words";
 
 type BaseProps = {
   displayItem: {
