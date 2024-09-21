@@ -1,31 +1,12 @@
 import { Item, isStackable } from "./item";
 import shops from "../assets/json/shops.json";
-import arrows from "../assets/json/items/arrows.json";
-import artifacts from "../assets/json/items/artifacts.json";
-import bodyArmor from "../assets/json/items/bodyArmor.json";
-import bows from "../assets/json/items/bows.json";
-import mageBooks from "../assets/json/items/mageBooks.json";
-import necroBooks from "../assets/json/items/necroBooks.json";
-import paladinBooks from "../assets/json/items/paladinBooks.json";
-import rangerBooks from "../assets/json/items/rangerBooks.json";
-import foci from "../assets/json/items/foci.json";
-import hats from "../assets/json/items/hats.json";
-import helmets from "../assets/json/items/helmets.json";
-import ingredients from "../assets/json/items/ingredients.json";
-import junk from "../assets/json/items/junk.json";
-import poison from "../assets/json/items/poison.json";
-import potions from "../assets/json/items/potions.json";
-import robes from "../assets/json/items/robes.json";
-import shields from "../assets/json/items/shields.json";
-import staves from "../assets/json/items/staves.json";
-import wands from "../assets/json/items/wands.json";
-import weapons from "../assets/json/items/weapons.json";
 import { action, makeObservable, observable } from "mobx";
 import { Character } from "./character";
 import { rollD20 } from "../utility/functions/roll";
 import { getRandomName, toTitleCase } from "../utility/functions/misc/words";
 import { generateBirthday } from "../utility/functions/misc/age";
 import { ItemClassType, PlayerClassOptions } from "../utility/types";
+import { getItemJSONMap } from "../utility/functions/misc/item";
 
 interface ShopProps {
   baseGold: number;
@@ -81,7 +62,11 @@ export class Shop {
         shopObj.itemQuantityRange.minimum,
         shopObj.itemQuantityRange.maximum,
       );
-      this.inventory = generateInventory(newCount, shopObj.trades, playerClass);
+      this.inventory = generateInventory(
+        newCount,
+        shopObj.trades as ItemClassType[],
+        playerClass,
+      );
       this.lastStockRefresh = new Date().toISOString();
       this.currentGold = this.baseGold;
     } else {
@@ -165,39 +150,17 @@ export class Shop {
 }
 
 //----------------------associated functions----------------------//
-function getAnItemByType(type: string, playerClass: PlayerClassOptions): Item {
-  type = toTitleCase(type);
-  const itemTypes: { [key: string]: any[] } = {
-    Arrow: arrows,
-    Artifact: artifacts,
-    BodyArmor: bodyArmor,
-    Book:
-      {
-        mage: mageBooks,
-        paladin: paladinBooks,
-        necromancer: necroBooks,
-        ranger: rangerBooks,
-      }[playerClass] || mageBooks,
-    Bow: bows,
-    Focus: foci,
-    Hat: hats,
-    Helmet: helmets,
-    Ingredient: ingredients,
-    Junk: junk,
-    Poison: poison,
-    Potion: potions,
-    Robe: robes,
-    Shield: shields,
-    Staff: staves,
-    Wand: wands,
-    Weapon: weapons,
-  };
+function getAnItemByType(
+  type: ItemClassType,
+  playerClass: PlayerClassOptions,
+): Item {
+  const itemJSONMap = getItemJSONMap(playerClass);
 
-  if (!(type in itemTypes)) {
+  if (!(type in itemJSONMap)) {
     throw new Error(`Invalid type passed to getAnItemByType(): ${type}`);
   }
 
-  const items = itemTypes[type];
+  const items = itemJSONMap[type];
   const idx = getRandomInt(0, items.length - 1);
   const itemObj = items[idx];
 
@@ -210,7 +173,7 @@ function getAnItemByType(type: string, playerClass: PlayerClassOptions): Item {
 
 export function generateInventory(
   inventoryCount: number,
-  trades: string[],
+  trades: ItemClassType[],
   playerClass: PlayerClassOptions,
 ) {
   let items: Item[] = [];
@@ -238,7 +201,11 @@ export function createShops(playerClass: PlayerClassOptions) {
       baseGold: shop.baseGold,
       lastStockRefresh: new Date(),
       archetype: shop.type,
-      inventory: generateInventory(itemCount, shop.trades, playerClass),
+      inventory: generateInventory(
+        itemCount,
+        shop.trades as ItemClassType[],
+        playerClass,
+      ),
     });
     createdShops.push(newShop);
   });

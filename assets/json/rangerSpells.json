@@ -241,10 +241,11 @@
     "element": "arcane",
     "target": "single",
     "type": "offense",
+    "usesWeapon": "bow",
     "proficiencyNeeded": "novice",
     "manaCost": 20,
     "effects": {
-      "damage": 18,
+      "damage": 5,
       "buffs": null,
       "debuffs": null
     }

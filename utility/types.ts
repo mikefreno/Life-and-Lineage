@@ -20,21 +20,23 @@ export interface ItemOptions {
   stackable?: boolean;
 }
 export enum ItemClassType {
-  Artifact = "Artifact",
-  Potion = "Potion",
-  Poison = "Poison",
-  Junk = "Junk",
-  Ingredient = "Ingredient",
-  Wand = "Wand",
-  Focus = "Focus",
-  Weapon = "Weapon",
-  Shield = "Shield",
-  BodyArmor = "BodyArmor",
-  Helmet = "Helmet",
-  Robe = "Robe",
-  Hat = "Hat",
-  Book = "Book",
-  Arrow = "Arrow",
+  Artifact = "artifact",
+  Bow = "bow",
+  Potion = "potion",
+  Poison = "poison",
+  Junk = "junk",
+  Ingredient = "ingredient",
+  Wand = "wand",
+  Focus = "focus",
+  Weapon = "weapon",
+  Shield = "shield",
+  BodyArmor = "bodyArmor",
+  Helmet = "helmet",
+  Robe = "robe",
+  Hat = "hat",
+  Book = "book",
+  Arrow = "arrow",
+  Staff = "staff",
 }
 
 export type InvestmentType = {

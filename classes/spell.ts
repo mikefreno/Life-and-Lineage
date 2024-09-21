@@ -2,7 +2,7 @@ import { createBuff, createDebuff } from "../utility/functions/conditions";
 import { wait } from "../utility/functions/misc/wait";
 import { toTitleCase } from "../utility/functions/misc/words";
 import { rollD20 } from "../utility/functions/roll";
-import { Element, MasteryLevel } from "../utility/types";
+import { Element, ItemClassType, MasteryLevel } from "../utility/types";
 import { PlayerCharacter } from "./character";
 import { Enemy, Minion } from "./creatures";
 
@@ -13,6 +13,7 @@ interface SpellFields {
   proficiencyNeeded: MasteryLevel;
   manaCost: number;
   duration?: number;
+  usesWeapon?: string | null;
   effects: {
     damage: number | null;
     buffs: string[] | null;
@@ -39,6 +40,7 @@ export class Spell {
   name: string;
   attackStyle: "single" | "cleave" | "aoe"; //at time of writing, only implementing single target
   element: Element;
+  usesWeapon: string | null;
   proficiencyNeeded: MasteryLevel;
   duration: number;
   manaCost: number;
@@ -58,9 +60,11 @@ export class Spell {
     manaCost,
     duration,
     effects,
+    usesWeapon,
   }: SpellFields) {
     this.name = name;
     this.element = element;
+    this.usesWeapon = usesWeapon ?? null;
     (this.attackStyle = attackStyle ?? "single"),
       (this.proficiencyNeeded = proficiencyNeeded);
     this.manaCost = manaCost;
@@ -76,6 +80,18 @@ export class Spell {
 
   public baseDamage(user: PlayerCharacter) {
     if (this.initDamage > 0) {
+      if (this.usesWeapon) {
+        if (
+          user.equipment.mainHand.itemClass === this.usesWeapon //title case aligns with ItemClassType
+        ) {
+          return (
+            this.initDamage +
+            user.magicPower +
+            user.equipmentStats.damage +
+            user.attackPower
+          );
+        } else return 0;
+      }
       return this.initDamage + user.magicPower;
     } else return 0;
   }
@@ -84,9 +100,10 @@ export class Spell {
     if (user.isStunned) {
       return false;
     }
-    if (user.currentMana < this.manaCost) {
-      return false;
-    }
+    if (this.usesWeapon)
+      if (user.currentMana < this.manaCost) {
+        return false;
+      }
     if (
       (user.currentMasteryLevel(this.element) as MasteryLevel) <
       this.proficiencyNeeded

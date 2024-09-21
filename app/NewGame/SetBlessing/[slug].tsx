@@ -37,10 +37,10 @@ export default function SetBlessing() {
   }
   let playerClass: PlayerClassOptions;
 
-  if (isPlayerClassOptions(slug[0])) {
-    playerClass = slug[0];
+  if (isPlayerClassOptions(slug)) {
+    playerClass = slug;
   } else {
-    return <Text>{`Invalid player class option: ${slug[0]}`}</Text>;
+    return <Text>{`Invalid player class option: ${slug}`}</Text>;
   }
 
   const [blessing, setBlessing] = useState<Element>();

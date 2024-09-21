@@ -4,14 +4,12 @@ import GearStatsDisplay from "./GearStatsDisplay";
 import { useColorScheme } from "nativewind";
 import { useVibration } from "../utility/customHooks";
 import { router } from "expo-router";
-import { toTitleCase } from "../utility/functions/misc/words";
 import { Item } from "../classes/item";
 import { useContext, useEffect, useState } from "react";
 import { Shop } from "../classes/shop";
 import { asReadableGold } from "../utility/functions/misc/numbers";
 import SpellDetails from "./SpellDetails";
 import GenericFlatButton from "./GenericFlatButton";
-import { convertMasteryToString } from "../utility/spellHelper";
 import { AppContext } from "../app/_layout";
 import {
   Coins,
@@ -20,6 +18,7 @@ import {
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
 import { ItemClassType } from "../utility/types";
+import { toTitleCase } from "../utility/functions/misc/words";
 
 type BaseProps = {
   displayItem: {
@@ -140,7 +139,6 @@ export function StatsDisplay({
     }
     return null;
   };
-  useEffect(() => console.log(displayItem), [displayItem]);
 
   const SaleSection = () => {
     if (playerState) {
@@ -387,9 +385,9 @@ export function StatsDisplay({
         <Text className="text-sm">{toTitleCase(displayItem.item[0].slot)}</Text>
       )}
       <Text className="text-sm">
-        {displayItem.item[0].itemClass == "BodyArmor"
+        {displayItem.item[0].itemClass == "bodyArmor"
           ? "Body Armor"
-          : displayItem.item[0].itemClass == ItemClassType.Book && playerState
+          : displayItem.item[0].itemClass == "book" && playerState
           ? bookItemLabel()
           : toTitleCase(displayItem.item[0].itemClass)}
       </Text>

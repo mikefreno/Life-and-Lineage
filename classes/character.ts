@@ -27,22 +27,6 @@ import {
   isElement,
 } from "../utility/types";
 import { rollD20 } from "../utility/functions/roll";
-import shops from "../assets/json/shops.json";
-import artifacts from "../assets/json/items/artifacts.json";
-import bodyArmor from "../assets/json/items/bodyArmor.json";
-import mageBooks from "../assets/json/items/mageBooks.json";
-import necroBooks from "../assets/json/items/necroBooks.json";
-import paladinBooks from "../assets/json/items/paladinBooks.json";
-import rangerBooks from "../assets/json/items/rangerBooks.json";
-import foci from "../assets/json/items/foci.json";
-import hats from "../assets/json/items/hats.json";
-import helmets from "../assets/json/items/helmets.json";
-import ingredients from "../assets/json/items/ingredients.json";
-import junk from "../assets/json/items/junk.json";
-import poison from "../assets/json/items/poison.json";
-import potions from "../assets/json/items/potions.json";
-import robes from "../assets/json/items/robes.json";
-import shields from "../assets/json/items/shields.json";
 import { calculateAge, rollToLiveByAge } from "../utility/functions/misc/age";
 import { damageReduction } from "../utility/functions/misc/numbers";
 import { getMasteryLevel } from "../utility/spellHelper";
@@ -50,7 +34,6 @@ import type {
   BoundingBox,
   Tile,
 } from "../components/DungeonComponents/DungeonMap";
-import { toTitleCase } from "../utility/functions/misc/words";
 import { Attack } from "./attack";
 import { Spell } from "./spell";
 
@@ -1150,7 +1133,6 @@ export class PlayerCharacter extends Character {
   }
 
   public unEquipItem(item: Item[]) {
-    console.log("removing: ", item);
     const offsets = this.gatherOffsets();
     if (this.equipment.body?.equals(item[0])) {
       this.removeEquipment("body");
@@ -2126,105 +2108,103 @@ function getStartingProficiencies(
 }
 
 export function getStartingBook(playerBlessing: Element) {
-  const itemType = ItemClassType["Book"];
-
   switch (playerBlessing) {
     case "fire":
       return new Item({
         name: "book of fire bolt",
         baseValue: 2500,
-        itemClass: itemType,
+        itemClass: ItemClassType.Book,
         icon: "Book",
       });
     case "water":
       return new Item({
         name: "book of frost",
         baseValue: 2500,
-        itemClass: itemType,
+        itemClass: ItemClassType.Book,
         icon: "Book",
       });
     case "air":
       return new Item({
         name: "book of gust",
         baseValue: 2500,
-        itemClass: itemType,
+        itemClass: ItemClassType.Book,
         icon: "Book",
       });
     case "earth":
       return new Item({
         name: "book of rock toss",
         baseValue: 2500,
-        itemClass: itemType,
+        itemClass: ItemClassType.Book,
         icon: "Book",
       });
     case "blood":
       return new Item({
         name: "book of pull blood",
         baseValue: 2500,
-        itemClass: itemType,
+        itemClass: ItemClassType.Book,
         icon: "Book",
       });
     case "summoning":
       return new Item({
         name: "book of the flying skull",
         baseValue: 2500,
-        itemClass: itemType,
+        itemClass: ItemClassType.Book,
         icon: "Book",
       });
     case "pestilence":
       return new Item({
         name: "book of poison dart",
         baseValue: 2500,
-        itemClass: itemType,
+        itemClass: ItemClassType.Book,
         icon: "Book",
       });
     case "bone":
       return new Item({
         name: "book of teeth",
         baseValue: 2500,
-        itemClass: itemType,
+        itemClass: ItemClassType.Book,
         icon: "Book",
       });
     case "holy":
       return new Item({
         name: "book of flash heal",
         baseValue: 2500,
-        itemClass: itemType,
+        itemClass: ItemClassType.Book,
         icon: "Book",
       });
     case "protection":
       return new Item({
         name: "book of blessed guard",
         baseValue: 2500,
-        itemClass: itemType,
+        itemClass: ItemClassType.Book,
         icon: "Book",
       });
     case "vengeance":
       return new Item({
         name: "book of judgment",
         baseValue: 2500,
-        itemClass: itemType,
+        itemClass: ItemClassType.Book,
         icon: "Book",
       });
     case "beastMastery":
       return new Item({
         name: "book of the raven",
         baseValue: 2500,
-        itemClass: itemType,
+        itemClass: ItemClassType.Book,
         icon: "Book",
       });
     case "assassination":
       return new Item({
         name: "book of throw dagger",
         baseValue: 2500,
-        itemClass: itemType,
+        itemClass: ItemClassType.Book,
         icon: "Book",
       });
     case "arcane":
       return new Item({
         name: "book of arcane shot",
         baseValue: 2500,
-        itemClass: itemType,
+        itemClass: ItemClassType.Book,
         icon: "Book",
       });
     default:
@@ -2255,154 +2235,3 @@ type inDungeonProps =
   | enterDungeonProps
   | leaveDungeonProps
   | enterActivityProps;
-
-interface ShopProps {
-  baseGold: number;
-  currentGold?: number;
-  lastStockRefresh: Date;
-  inventory?: Item[];
-  shopKeeper: Character;
-  archetype: string;
-}
-
-export class Shop {
-  baseGold: number;
-  currentGold: number;
-  lastStockRefresh: string;
-  inventory: Item[];
-  shopKeeper: Character;
-  readonly archetype: string;
-
-  constructor({
-    baseGold,
-    currentGold,
-    lastStockRefresh,
-    inventory,
-    shopKeeper,
-    archetype,
-  }: ShopProps) {
-    this.baseGold = baseGold;
-    this.currentGold = currentGold ?? baseGold;
-    this.lastStockRefresh =
-      lastStockRefresh.toISOString() ?? new Date().toISOString();
-    this.inventory = inventory ?? [];
-    this.archetype = archetype;
-    this.shopKeeper = shopKeeper;
-    makeObservable(this, {
-      shopKeeper: observable,
-      baseGold: observable,
-      currentGold: observable,
-      lastStockRefresh: observable,
-      refreshInventory: action,
-      buyItem: action,
-      sellItem: action,
-    });
-  }
-
-  public refreshInventory(playerClass: PlayerClassOptions) {
-    const shopObj = shops.find((shop) => shop.type == this.archetype);
-    if (shopObj) {
-      const newCount = getRandomInt(
-        shopObj.itemQuantityRange.minimum,
-        shopObj.itemQuantityRange.maximum,
-      );
-      this.inventory = generateInventory(newCount, shopObj.trades, playerClass);
-      this.lastStockRefresh = new Date().toISOString();
-      this.currentGold = this.baseGold;
-    } else {
-      throw new Error("Shop not found on refreshInventory()");
-    }
-  }
-
-  private changeAffection(change: number) {
-    this.shopKeeper.affection += Math.floor(change * 4) / 4;
-  }
-
-  public buyItem(item: Item, buyPrice: number) {
-    if (Math.floor(buyPrice) <= this.currentGold) {
-      this.inventory.push(item);
-      this.currentGold -= Math.floor(buyPrice);
-      this.changeAffection(buyPrice / 1000);
-    }
-  }
-
-  public sellItem(item: Item, sellPrice: number) {
-    const idx = this.inventory.findIndex((invItem) => invItem.equals(item));
-    if (idx !== -1) {
-      this.inventory.splice(idx, 1);
-      this.currentGold += Math.floor(sellPrice);
-      this.changeAffection(sellPrice / 1000);
-    }
-  }
-
-  static fromJSON(json: any): Shop {
-    return new Shop({
-      shopKeeper: Character.fromJSON(json.shopKeeper),
-      baseGold: json.baseGold,
-      currentGold: json.currentGold,
-      lastStockRefresh: new Date(json.lastStockRefresh),
-      inventory: json.inventory.map((item: any) => Item.fromJSON(item)),
-      archetype: json.archetype,
-    });
-  }
-}
-
-//----------------------associated functions----------------------//
-
-function getAnItemByType(type: string, playerClass: PlayerClassOptions): Item {
-  type = toTitleCase(type);
-
-  const itemTypes: { [key: string]: any[] } = {
-    Artifact: artifacts,
-    BodyArmor: bodyArmor,
-    Book:
-      {
-        mage: mageBooks,
-        paladin: paladinBooks,
-        necromancer: necroBooks,
-        ranger: rangerBooks,
-      }[playerClass] || mageBooks,
-    Focus: foci,
-    Hat: hats,
-    Helmet: helmets,
-    Ingredient: ingredients,
-    Junk: junk,
-    Poison: poison,
-    Potion: potions,
-    Robe: robes,
-    Shield: shields,
-    Wand: wands,
-    Weapon: weapons,
-  };
-
-  if (!(type in itemTypes)) {
-    throw new Error(`Invalid type passed to getAnItemByType(): ${type}`);
-  }
-
-  const items = itemTypes[type];
-  const idx = getRandomInt(0, items.length - 1);
-  const itemObj = items[idx];
-
-  return Item.fromJSON({
-    ...itemObj,
-    itemClass: type,
-    stackable: isStackable(type as ItemClassType),
-  });
-}
-
-export function generateInventory(
-  inventoryCount: number,
-  trades: string[],
-  playerClass: PlayerClassOptions,
-) {
-  let items: Item[] = [];
-  for (let i = 0; i < inventoryCount; i++) {
-    const type = trades[Math.floor(Math.random() * trades.length)];
-    items.push(getAnItemByType(type, playerClass));
-  }
-  return items;
-}
-
-function getRandomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}

@@ -54,7 +54,6 @@ export default function EquipmentDisplay({
     size,
     equipped,
   }: checkReleasePositionProps) {
-    console.log(itemStack);
     if (itemStack && itemStack[0].slot) {
       let refs: React.RefObject<View>[] = [];
       if (equipped) {

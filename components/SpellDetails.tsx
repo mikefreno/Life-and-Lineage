@@ -107,6 +107,11 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
               {toTitleCase(debuff.name)} - {debuff.chance * 100}%
             </Text>
           ))}
+          {spell.usesWeapon && (
+            <Text className="text-center">
+              Requires: {toTitleCase(spell.usesWeapon)}
+            </Text>
+          )}
           {spell.selfDamage ? (
             <View className="flex flex-row items-center">
               {spell.selfDamage > 0 ? (

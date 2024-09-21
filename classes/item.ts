@@ -8,7 +8,6 @@ import paladinSpells from "../assets/json/paladinSpells.json";
 import rangerSpells from "../assets/json/rangerSpells.json";
 import * as Crypto from "expo-crypto";
 import { ItemClassType, type ItemOptions } from "../utility/types";
-import { parseSpell } from "../utility/functions/jsonParsing";
 import type { PlayerCharacter } from "./character";
 import { Spell } from "./spell";
 
