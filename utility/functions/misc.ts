@@ -20,8 +20,8 @@ import weapons from "../../assets/json/items/weapons.json";
 import wands from "../../assets/json/items/wands.json";
 import names from "../../assets/json/names.json";
 import { ItemClassType, PlayerClassOptions } from "../types";
-import { storage } from "./save_load";
 import { CommonActions, NavigationProp } from "@react-navigation/native";
+import { storage } from "./storage";
 
 export function generateBirthday(minAge: number, maxAge: number) {
   const today = new Date();

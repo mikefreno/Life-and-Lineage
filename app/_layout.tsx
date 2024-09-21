@@ -27,7 +27,7 @@ import { StatusBar } from "expo-status-bar";
 import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
 import { AppContextType } from "../utility/types";
-import { AuthProvider, useAuth } from "../auth/AuthContext";
+import { AuthProvider } from "../auth/AuthContext";
 import D20DieAnimation from "../components/DieRollAnim";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
@@ -36,7 +36,7 @@ import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { useNetInfo } from "@react-native-community/netinfo";
+import { wait } from "../utility/functions/misc";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -135,37 +135,6 @@ const Root = observer(() => {
   const [visibilityWhenOpen, setVisisbilityWhenOpen] = useState<
     boolean | "notset"
   >("notset");
-  const [expoPushToken, setExpoPushToken] = useState("");
-  const [notification, setNotification] = useState<
-    Notifications.Notification | undefined
-  >(undefined);
-  const notificationListener = useRef<Notifications.Subscription>();
-  const responseListener = useRef<Notifications.Subscription>();
-
-  useEffect(() => {
-    registerForPushNotificationsAsync()
-      .then((token) => setExpoPushToken(token ?? ""))
-      .catch((error: any) => setExpoPushToken(`${error}`));
-
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification);
-      });
-
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response);
-      });
-
-    return () => {
-      notificationListener.current &&
-        Notifications.removeNotificationSubscription(
-          notificationListener.current,
-        );
-      responseListener.current &&
-        Notifications.removeNotificationSubscription(responseListener.current);
-    };
-  }, []);
 
   const getData = async () => {
     try {
@@ -307,24 +276,52 @@ const RootLayout = observer(() => {
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
   const [navbarLoad, setNavbarLoad] = useState(false);
-  const { isConnected } = useNetInfo();
-  const auth = useAuth();
 
   const insets = useSafeAreaInsets();
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  //const auth = useAuth();
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const [notification, setNotification] = useState<
+    Notifications.Notification | undefined
+  >(undefined);
+  const notificationListener = useRef<Notifications.Subscription>();
+  const responseListener = useRef<Notifications.Subscription>();
+
+  useEffect(() => {
+    if (fontLoaded && navbarLoad) {
+      wait(500).then(() => {
+        registerForPushNotificationsAsync()
+          .then((token) => setExpoPushToken(token ?? ""))
+          .catch((error: any) => setExpoPushToken(`${error}`));
+
+        notificationListener.current =
+          Notifications.addNotificationReceivedListener((notification) => {
+            setNotification(notification);
+          });
+
+        responseListener.current =
+          Notifications.addNotificationResponseReceivedListener((response) => {
+            console.log(response);
+          });
+
+        return () => {
+          notificationListener.current &&
+            Notifications.removeNotificationSubscription(
+              notificationListener.current,
+            );
+          responseListener.current &&
+            Notifications.removeNotificationSubscription(
+              responseListener.current,
+            );
+        };
+      });
+    }
+  }, [fontLoaded, navbarLoad]);
 
   //useEffect(() => {
   //if (__DEV__) {
   //auth._debugLog();
   //}
   //}, []);
-
-  //useEffect(() => {
-  //if (isConnected && !auth.initialized) {
-  //auth.initialize();
-  //}
-  //}, [isConnected]);
 
   useEffect(() => {
     if (fontLoaded && navbarLoad) {

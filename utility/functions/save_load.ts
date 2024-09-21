@@ -3,8 +3,7 @@ import { PlayerCharacter } from "../../classes/character";
 import type { Enemy } from "../../classes/creatures";
 import { Game } from "../../classes/game";
 import type { AppContextType, DungeonContextType } from "../types";
-import { MMKV } from "react-native-mmkv";
-export const storage = new MMKV();
+import { storage } from "./storage";
 
 const _fullSave = async (
   game: Game | undefined,

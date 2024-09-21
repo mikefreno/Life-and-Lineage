@@ -2,7 +2,6 @@ import conditions from "../../assets/json/conditions.json";
 import { Condition } from "../../classes/conditions";
 import { PlayerCharacter } from "../../classes/character";
 import sanityDebuffs from "../../assets/json/sanityDebuffs.json";
-import { rollD20 } from "./misc";
 import { ConditionObjectType } from "../types";
 
 interface createDebuffDeps {
@@ -428,4 +427,7 @@ export function getMagnitude(magnitude: (number | null)[]): number {
     ? validMagnitudes.reduce((sum, value) => sum + value, 0) /
         validMagnitudes.length
     : 1;
+}
+function rollD20() {
+  return Math.floor(Math.random() * 20) + 1;
 }

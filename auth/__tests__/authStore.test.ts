@@ -1,8 +1,8 @@
-import { authStore } from "./authStore";
 import NetInfo from "@react-native-community/netinfo";
-import { storage } from "../utility/functions/save_load";
-import { PlayerCharacter } from "../classes/character";
-import { Game } from "../classes/game";
+import { storage } from "../../utility/functions/storage";
+import { authStore } from "../authStore";
+import { PlayerCharacter } from "../../classes/character";
+import { Game } from "../../classes/game";
 
 describe("AuthStore", () => {
   beforeEach(() => {

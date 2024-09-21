@@ -27,6 +27,15 @@ const user_db = `
   );
 `;
 
+const token_table = `
+  CREATE TABLE Token
+  (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    token TEXT UNIQUE,
+    last_updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+`;
+
 export type SaveRow = {
   id: number;
   name: string;

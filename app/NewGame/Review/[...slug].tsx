@@ -22,7 +22,7 @@ import { useContext } from "react";
 import { useVibration } from "../../../utility/customHooks";
 import { getRandomJobTitle } from "../../../utility/functions/characterAid";
 import { createShops } from "../../../classes/shop";
-import { fullSave, storage } from "../../../utility/functions/save_load";
+import { fullSave } from "../../../utility/functions/save_load";
 import { AppContext } from "../../_layout";
 import {
   Element,
@@ -34,6 +34,7 @@ import {
   elementalColorMap,
   playerClassColors,
 } from "../../../constants/Colors";
+import { storage } from "../../../utility/functions/storage";
 
 export default function NewGameReview() {
   const { slug } = useLocalSearchParams();

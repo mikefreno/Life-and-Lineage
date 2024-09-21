@@ -8,9 +8,9 @@ import { SaveRow } from "../utility/database";
 import { PlayerCharacter } from "../classes/character";
 import { Game } from "../classes/game";
 import { parseInt } from "lodash";
-import { storage } from "../utility/functions/save_load";
 import { Platform } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
+import { storage } from "../utility/functions/storage";
 
 type EmailLogin = {
   token: string;
