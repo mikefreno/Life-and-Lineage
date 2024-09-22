@@ -22,8 +22,8 @@
       "energy": {"maximum": 40, "regen": 10},
       "attacks": ["raise skeleton", "teeth"],
       "drops": [
-         {"item": "dagger", "itemType":"weapon","chance":0.15},
-         {"item": "dagger", "itemType":"weapon","chance":0.15},
+         {"item": "dagger", "itemType":"melee","chance":0.15},
+         {"item": "dagger", "itemType":"melee","chance":0.15},
          {"item": "adept robes", "itemType":"bodyArmor","chance":1.0},
          {"item": "apprentice hood", "itemType":"helmet","chance":0.45}
       ],
@@ -38,7 +38,7 @@
       "energy": {"maximum": 50, "regen": 10},
       "attacks": ["stab", "frenzy"],
       "drops": [
-         {"item": "longsword", "itemType":"weapon","chance":0.65}
+         {"item": "longsword", "itemType":"melee","chance":0.65}
       ],
       "goldDropRange": {"minimum": 100, "maximum":150}
    },
@@ -64,8 +64,8 @@
       "energy": {"maximum": 50, "regen": 3},
       "attacks": ["stab", "pocket sand","serrate"],
       "drops": [
-         {"item": "dagger", "itemType":"weapon","chance":0.15},
-         {"item": "dagger", "itemType":"weapon","chance":0.15},
+         {"item": "dagger", "itemType":"melee","chance":0.15},
+         {"item": "dagger", "itemType":"melee","chance":0.15},
          {"item": "cheap leather chestpiece", "itemType":"bodyArmor","chance":0.15},
          {"item": "leather headgear", "itemType":"helmet","chance":0.15}
       ],

@@ -161,12 +161,12 @@
    {
       "name": "frenzy",
       "energyCost": 10,
-      "buffs": [{"name":"frenzy", "chance": 1.0}]
+      "buffs": ["frenzy"]
    },
    {
       "name": "chug beer",
       "energyCost": 10,
-      "buffs": [{"name":"frenzy", "chance": 1.0}]
+      "buffs": ["frenzy"]
    },
    {
       "name": "spark",

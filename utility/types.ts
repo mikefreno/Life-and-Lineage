@@ -28,7 +28,7 @@ export enum ItemClassType {
   Ingredient = "ingredient",
   Wand = "wand",
   Focus = "focus",
-  Weapon = "weapon",
+  Melee = "melee",
   Shield = "shield",
   BodyArmor = "bodyArmor",
   Helmet = "helmet",
@@ -127,6 +127,14 @@ export const MasteryToString: Record<MasteryLevel, string> = {
   [MasteryLevel.Expert]: "Expert",
   [MasteryLevel.Master]: "Master",
   [MasteryLevel.Legend]: "Legend",
+};
+export const StringToMastery: Record<string, MasteryLevel> = {
+  novice: MasteryLevel.Novice,
+  apprentice: MasteryLevel.Apprentice,
+  adept: MasteryLevel.Adept,
+  expert: MasteryLevel.Expert,
+  master: MasteryLevel.Master,
+  legend: MasteryLevel.Legend,
 };
 
 export enum Element {

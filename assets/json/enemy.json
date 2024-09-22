@@ -8,8 +8,8 @@
       "energy": {"maximum": 30, "regen": 0},
       "attacks": ["raise skeleton"],
       "drops": [
-         {"item": "stick", "itemType":"weapon", "chance": 1.0},
-         {"item": "big stick", "itemType":"weapon","chance":0.85}
+         {"item": "stick", "itemType":"melee", "chance": 1.0},
+         {"item": "big stick", "itemType":"melee","chance":0.85}
       ],
       "goldDropRange": {"minimum": 0, "maximum":0},
       "armorValue": null,
@@ -61,7 +61,7 @@
       "drops": [
          {"item": "bone", "itemType":"ingredient","chance":0.75},
          {"item": "bone", "itemType":"ingredient","chance":0.75},
-         {"item": "dagger", "itemType":"weapon","chance":0.10}
+         {"item": "dagger", "itemType":"melee","chance":0.10}
       ],
       "armorValue": 10,
       "goldDropRange": {"minimum": 10, "maximum":20},
@@ -132,8 +132,8 @@
       "energy": {"maximum": 50, "regen": 5},
       "attacks": ["stab", "pocket sand", "rock throw", "torch stab"],
       "drops": [
-         {"item": "dagger", "itemType":"weapon","chance":0.10},
-         {"item": "torch", "itemType":"weapon", "chance": 0.10}
+         {"item": "dagger", "itemType":"melee","chance":0.10},
+         {"item": "torch", "itemType":"melee", "chance": 0.10}
       ],
       "goldDropRange": {"minimum": 35, "maximum":65},
       "armorValue": 10,
@@ -167,7 +167,7 @@
       "energy": {"maximum": 50, "regen": 5},
       "attacks": ["stab"],
       "drops": [
-         {"item": "longsword", "itemType":"weapon","chance":0.10}
+         {"item": "longsword", "itemType":"melee","chance":0.10}
       ],
       "goldDropRange": {"minimum": 35, "maximum":65},
       "armorValue": 10,
@@ -184,7 +184,7 @@
       "attacks": ["stab", "pocket sand", "rock throw", "torch stab"],
       "drops": [
          {"item": "adept robes", "itemType":"bodyArmor","chance":1.0},
-         {"item": "dagger", "itemType":"weapon","chance":0.35}
+         {"item": "dagger", "itemType":"melee","chance":0.35}
       ],
       "goldDropRange": {"minimum": 185, "maximum":250},
       "armorValue": null,
@@ -200,8 +200,8 @@
       "energy": {"maximum": 50, "regen": 3},
       "attacks": ["stab", "pocket sand","serrate"],
       "drops": [
-         {"item": "dagger", "itemType":"weapon","chance":0.15},
-         {"item": "dagger", "itemType":"weapon","chance":0.15},
+         {"item": "dagger", "itemType":"melee","chance":0.15},
+         {"item": "dagger", "itemType":"melee","chance":0.15},
          {"item": "cheap leather chestpiece", "itemType":"bodyArmor","chance":0.15},
          {"item": "leather headgear", "itemType":"helmet","chance":0.15}
       ],
@@ -219,7 +219,7 @@
       "energy": {"maximum": 30, "regen": 3},
       "attacks": ["headbutt", "pocket sand", "punch", "chug beer"],
       "drops": [
-         {"item": "beer stein", "itemType":"weapon","chance": 1.0}
+         {"item": "beer stein", "itemType":"melee","chance": 1.0}
       ],
       "goldDropRange": {"minimum": 40, "maximum":100},
       "armorValue": 5,
@@ -235,7 +235,7 @@
       "energy": {"maximum": 30, "regen": 3},
       "attacks": ["stab", "pocket sand"],
       "drops": [
-         {"item": "dagger", "itemType":"weapon","chance":0.75}
+         {"item": "dagger", "itemType":"melee","chance":0.75}
       ],
       "goldDropRange": {"minimum": 250, "maximum":1000},
       "armorValue": 5,

@@ -5,7 +5,7 @@ import {
 import { Condition } from "./conditions";
 import { Item } from "./item";
 import attacks from "../assets/json/playerAttacks.json";
-import weapons from "../assets/json/items/weapons.json";
+import melee from "../assets/json/items/melee.json";
 import wands from "../assets/json/items/wands.json";
 import mageSpells from "../assets/json/mageSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
@@ -24,7 +24,6 @@ import {
   BeingType,
   Element,
   PlayerClassOptions,
-  isElement,
   Attribute,
 } from "../utility/types";
 import {
@@ -33,7 +32,6 @@ import {
   rollD20,
   damageReduction,
 } from "../utility/functions/misc";
-import { getMasteryLevel } from "../utility/spellHelper";
 import type {
   BoundingBox,
   Tile,
@@ -303,7 +301,7 @@ type PlayerCharacterBase = {
     bookName: string;
     spellName: string;
     experience: number;
-    element: string;
+    element: Element;
   }[];
   qualificationProgress?: {
     name: string;
@@ -414,7 +412,7 @@ export class PlayerCharacter extends Character {
     bookName: string;
     spellName: string;
     experience: number;
-    element: string;
+    element: Element;
   }[];
 
   minions: Minion[];
@@ -562,7 +560,7 @@ export class PlayerCharacter extends Character {
         slot: "one-hand",
         stats: { baseDamage: 1 },
         baseValue: 0,
-        itemClass: ItemClassType.Weapon,
+        itemClass: ItemClassType.Melee,
       }),
       offHand: null,
       head: null,
@@ -1203,7 +1201,7 @@ export class PlayerCharacter extends Character {
       slot: "one-hand",
       stats: { baseDamage: 1 },
       baseValue: 0,
-      itemClass: "weapon" as ItemClassType,
+      itemClass: ItemClassType.Melee,
     });
   }
 
@@ -1374,27 +1372,14 @@ export class PlayerCharacter extends Character {
     this.knownSpells.forEach((spell) => {
       const found = spellList.find((spellObj) => spell == spellObj.name);
       if (found) {
-        let elem: Element;
-        if (isElement(found.element)) {
-          elem = found.element;
-        } else {
-          throw new Error("found element does not conform to Element enum");
-        }
-        const spell = new Spell({
-          name: found.name,
-          element: elem,
-          proficiencyNeeded: found.proficiencyNeeded,
-          manaCost: found.manaCost,
-          duration: found.duration,
-          effects: found.effects,
-        });
+        const spell = new Spell({ ...found });
         spells.push(spell);
       }
     });
     return spells;
   }
 
-  public learnSpellStep(bookName: string, spell: string, element: string) {
+  public learnSpellStep(bookName: string, spell: string, element: Element) {
     let spellFound = false;
 
     this.learningSpells = this.learningSpells.reduce(
@@ -1675,7 +1660,7 @@ export class PlayerCharacter extends Character {
     let builtAttacks: Attack[] = [];
     if (this.equipment.mainHand) {
       let itemObj;
-      itemObj = weapons.find(
+      itemObj = melee.find(
         (weapon) => weapon.name == this.equipment.mainHand!.name,
       );
       if (!itemObj) {

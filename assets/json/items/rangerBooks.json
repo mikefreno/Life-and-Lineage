@@ -70,11 +70,123 @@
       "baseValue": 5000
    },
    {
+      "name": "book of the bear",
+      "type": "spell",
+      "teaches": "call bear",
+      "icon": "Book",
+      "baseValue": 20000
+   },
+   {
+      "name": "book of bear trap",
+      "type": "spell",
+      "teaches": "bear trap",
+      "icon": "Book_2",
+      "baseValue": 50000
+   },
+   {
+      "name": "book of the dragon welp",
+      "type": "spell",
+      "teaches": "call dragon welp",
+      "icon": "Book_2",
+      "baseValue": 50000
+   },
+   {
+      "name": "book of dragon trap",
+      "type": "spell",
+      "teaches": "dragon trap",
+      "icon": "Book_2",
+      "baseValue": 150000
+   },
+   {
+      "name": "book of the griffon",
+      "type": "spell",
+      "teaches": "call griffon",
+      "icon": "Book_2",
+      "baseValue": 200000
+   },
+   {
+      "name": "book of entanglement",
+      "type": "spell",
+      "teaches": "entangle",
+      "icon": "Book_2",
+      "baseValue": 200000
+   },
+   {
+      "name": "forbidden beast mastery techniques vol. 1",
+      "type": "spell",
+      "teaches": "call dragon",
+      "icon": "Book_3",
+      "baseValue": 500000
+   },
+   {
+      "name": "forbidden beast mastery techniques vol. 2",
+      "type": "spell",
+      "teaches": "beast fury",
+      "icon": "Book_3",
+      "baseValue": 1000000
+   },
+   {
       "name": "book of arcane shot",
       "type": "spell",
       "teaches": "arcane shot",
       "icon": "Book",
       "baseValue": 2500
+   },
+   {
+      "name": "book of enchanted quiver",
+      "type": "spell",
+      "teaches": "enchanted quiver",
+      "icon": "Book",
+      "baseValue": 5000
+   },
+   {
+      "name": "book of seeking arrow",
+      "type": "spell",
+      "teaches": "seeking arrow",
+      "icon": "Book_2",
+      "baseValue": 50000
+   },
+   {
+      "name": "book of piercing barrage",
+      "type": "spell",
+      "teaches": "piercing barrage",
+      "icon": "Book_2",
+      "baseValue": 150000
+   },
+   {
+      "name": "book of volley",
+      "type": "spell",
+      "teaches": "volley",
+      "icon": "Book_2",
+      "baseValue": 150000
+   },
+   {
+      "name": "book of arcane missiles",
+      "type": "spell",
+      "teaches": "arcane missiles",
+      "icon": "Book_2",
+      "baseValue": 200000
+   },
+   {
+      "name": "book of moon call",
+      "type": "spell",
+      "teaches": "moon call",
+      "icon": "Book_2",
+      "baseValue": 200000
+   },
+   {
+      "name": "forbidden arcane techniques vol. 1",
+      "type": "spell",
+      "teaches": "torrent",
+      "icon": "Book_3",
+      "baseValue": 500000
+   },
+   {
+      "name": "forbidden arcane techniques vol. 2",
+      "type": "spell",
+      "teaches": "moon fire",
+      "icon": "Book_3",
+      "baseValue": 1000000
    }
-
 ]
+

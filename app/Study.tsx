@@ -14,7 +14,7 @@ import { Stack } from "expo-router";
 import { BlurView } from "expo-blur";
 import { useHeaderHeight } from "@react-navigation/elements";
 import GenericRaisedButton from "../components/GenericRaisedButton";
-import { ItemClassType, MasteryLevel } from "../utility/types";
+import { Element, ItemClassType, MasteryToString } from "../utility/types";
 import GenericModal from "../components/GenericModal";
 import { AppContext } from "./_layout";
 import { Spell } from "../classes/spell";
@@ -46,12 +46,11 @@ export default function LearningKnowledgeScreen() {
       bookName: string;
       spellName: string;
       experience: number;
-      element: string;
+      element: Element;
     }[]
   >(playerState.learningSpells);
-  const [showMasteryLevelTooLow, setShowMasteryLevelTooLow] = useState<
-    string | null
-  >(null);
+  const [showMasteryLevelTooLow, setShowMasteryLevelTooLow] =
+    useState<Element | null>(null);
 
   useEffect(() => {
     if (selectedBook && playerState) {
@@ -64,7 +63,7 @@ export default function LearningKnowledgeScreen() {
   function studySpell(
     bookName: string,
     spellName: string,
-    spellElement: string,
+    spellElement: Element,
   ) {
     if (playerState && gameState && isFocused) {
       playerState.learnSpellStep(bookName, spellName, spellElement);
@@ -84,10 +83,10 @@ export default function LearningKnowledgeScreen() {
       ),
   );
   function bookLabel() {
-    if (playerState) {
-      return `${toTitleCase(
-        selectedBookSpell?.proficiencyNeeded as unknown as string,
-      )} level book`;
+    if (playerState && selectedBookSpell) {
+      return `${
+        MasteryToString[selectedBookSpell.proficiencyNeeded]
+      } level book`;
     }
   }
 
@@ -120,53 +119,24 @@ export default function LearningKnowledgeScreen() {
         isVisibleCondition={showMasteryLevelTooLow != null}
         backFunction={() => setShowMasteryLevelTooLow(null)}
       >
-        {showMasteryLevelTooLow != null ? (
+        {showMasteryLevelTooLow && (
           <>
             <Text
               className="text-center"
               style={{
-                color:
-                  elementalColorMap[
-                    showMasteryLevelTooLow as
-                      | "fire"
-                      | "water"
-                      | "air"
-                      | "earth"
-                      | "blood"
-                      | "summoning"
-                      | "pestilence"
-                      | "bone"
-                      | "holy"
-                      | "vengeance"
-                      | "protection"
-                  ].dark,
+                color: elementalColorMap[showMasteryLevelTooLow].dark,
               }}
             >
               {`This book is beyond your knowledge in the school of ${showMasteryLevelTooLow}`}
             </Text>
             <GenericRaisedButton
               onPressFunction={() => setShowMasteryLevelTooLow(null)}
-              textColor={
-                elementalColorMap[
-                  showMasteryLevelTooLow as
-                    | "fire"
-                    | "water"
-                    | "air"
-                    | "earth"
-                    | "blood"
-                    | "summoning"
-                    | "pestilence"
-                    | "bone"
-                    | "holy"
-                    | "vengeance"
-                    | "protection"
-                ].dark
-              }
+              textColor={elementalColorMap[showMasteryLevelTooLow].dark}
             >
               Acknowledge Knowledge
             </GenericRaisedButton>
           </>
-        ) : null}
+        )}
       </GenericModal>
       <ThemedView className="flex-1 justify-between pb-20">
         <View
@@ -190,37 +160,9 @@ export default function LearningKnowledgeScreen() {
                   <View key={studyState.spellName}>
                     <Text>{toTitleCase(studyState.spellName)}</Text>
                     <ProgressBar
-                      filledColor={
-                        elementalColorMap[
-                          studyState.element as
-                            | "fire"
-                            | "water"
-                            | "air"
-                            | "earth"
-                            | "blood"
-                            | "summoning"
-                            | "pestilence"
-                            | "bone"
-                            | "holy"
-                            | "vengeance"
-                            | "protection"
-                        ].dark
-                      }
+                      filledColor={elementalColorMap[studyState.element].dark}
                       unfilledColor={
-                        elementalColorMap[
-                          studyState.element as
-                            | "fire"
-                            | "water"
-                            | "air"
-                            | "earth"
-                            | "blood"
-                            | "summoning"
-                            | "pestilence"
-                            | "bone"
-                            | "holy"
-                            | "vengeance"
-                            | "protection"
-                        ].light
+                        elementalColorMap[studyState.element].light
                       }
                       value={studyState.experience}
                       maxValue={20}
@@ -256,9 +198,7 @@ export default function LearningKnowledgeScreen() {
                 <GenericRaisedButton
                   onPressFunction={() => {
                     if (
-                      MasteryLevel[
-                        toTitleCase(selectedBookSpell.proficiencyNeeded)
-                      ] <=
+                      selectedBookSpell.proficiencyNeeded <=
                       playerState.currentMasteryLevel(selectedBookSpell.element)
                     ) {
                       vibration({ style: "light", essential: true });

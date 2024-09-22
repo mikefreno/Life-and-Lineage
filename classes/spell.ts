@@ -1,6 +1,11 @@
 import { createBuff, createDebuff } from "../utility/functions/conditions";
 import { wait, toTitleCase, rollD20 } from "../utility/functions/misc";
-import { Element, MasteryLevel, StringToElement } from "../utility/types";
+import {
+  Element,
+  MasteryLevel,
+  StringToElement,
+  StringToMastery,
+} from "../utility/types";
 import { PlayerCharacter } from "./character";
 import { Enemy, Minion } from "./creatures";
 
@@ -8,7 +13,7 @@ interface SpellFields {
   name: string;
   attackStyle?: "single" | "cleave" | "aoe";
   element: string;
-  proficiencyNeeded: MasteryLevel;
+  proficiencyNeeded: string;
   manaCost: number;
   duration?: number;
   usesWeapon?: string | null;
@@ -23,7 +28,7 @@ interface SpellFields {
       | null;
     summon?: string[] | undefined;
     pet?: string;
-    selfDamage?: number | undefined;
+    selfDamage?: number | null | undefined;
     sanityDamage?: number | undefined;
   };
 }
@@ -63,8 +68,8 @@ export class Spell {
     this.name = name;
     this.element = StringToElement[element];
     this.usesWeapon = usesWeapon ?? null;
-    (this.attackStyle = attackStyle ?? "single"),
-      (this.proficiencyNeeded = proficiencyNeeded);
+    this.attackStyle = attackStyle ?? "single";
+    this.proficiencyNeeded = StringToMastery[proficiencyNeeded];
     this.manaCost = manaCost;
     this.duration = duration ?? 1;
     this.initDamage = effects.damage ?? 0;
@@ -93,15 +98,22 @@ export class Spell {
       return this.initDamage + user.magicPower;
     } else return 0;
   }
+  public userHasRequiredWeapon(user: PlayerCharacter) {
+    return (
+      this.usesWeapon && user.equipment.mainHand.itemClass == this.usesWeapon
+    );
+  }
 
   public canBeUsed(user: PlayerCharacter) {
     if (user.isStunned) {
       return false;
     }
-    if (this.usesWeapon)
-      if (user.currentMana < this.manaCost) {
-        return false;
-      }
+    if (!this.userHasRequiredWeapon) {
+      return false;
+    }
+    if (user.currentMana < this.manaCost) {
+      return false;
+    }
     if (
       (user.currentMasteryLevel(this.element) as MasteryLevel) <
       this.proficiencyNeeded

@@ -7,7 +7,7 @@ import necroSpells from "../assets/json/necroSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import rangerSpells from "../assets/json/rangerSpells.json";
 import * as Crypto from "expo-crypto";
-import { ItemClassType, type ItemOptions } from "../utility/types";
+import { Attribute, ItemClassType, type ItemOptions } from "../utility/types";
 import type { PlayerCharacter } from "./character";
 import { Spell } from "./spell";
 
@@ -63,21 +63,22 @@ export class Item {
     if (
       this.requirements.strength &&
       this.requirements.strength >
-        player.baseStrength + player.allocatedSkillPoints.strength
+        player.baseStrength + player.allocatedSkillPoints[Attribute.strength]
     ) {
       return false;
     }
     if (
       this.requirements.intelligence &&
       this.requirements.intelligence >
-        player.baseIntelligence + player.allocatedSkillPoints.intelligence
+        player.baseIntelligence +
+          player.allocatedSkillPoints[Attribute.intelligence]
     ) {
       return false;
     }
     if (
       this.requirements.dexterity &&
       this.requirements.dexterity >
-        player.baseDexterity + player.allocatedSkillPoints.dexterity
+        player.baseDexterity + player.allocatedSkillPoints[Attribute.dexterity]
     ) {
       return false;
     }

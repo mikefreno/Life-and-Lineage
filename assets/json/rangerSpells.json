@@ -34,7 +34,7 @@
     "manaCost": 50,
     "effects": {
       "damage": null,
-      "buffs": [{"name": "stealth", "chance": 1.0}],
+      "buffs": ["stealth"],
       "debuffs": null
     }
   },
@@ -43,11 +43,12 @@
     "element": "assassination",
     "target": "single",
     "type": "offense",
+    "usesWeapon": "melee",
     "proficiencyNeeded": "adept",
     "manaCost": 75,
     "effects": {
       "damage": 95,
-      "buffs": [{"name": "remove stealth"}],
+      "buffs": ["remove stealth"],
       "debuffs": null
     }
   },
@@ -56,6 +57,7 @@
     "element": "assassination",
     "target": "single",
     "type": "defense",
+    "usesWeapon": "melee",
     "proficiencyNeeded": "expert",
     "manaCost": 100,
     "effects": {
@@ -73,7 +75,7 @@
     "manaCost": 250,
     "effects": {
       "damage": 100,
-      "buffs": [{"name": "stealth", "chance": 1.0}],
+      "buffs": ["stealth"],
       "debuffs": null
     }
   },
@@ -95,11 +97,12 @@
     "element": "assassination",
     "target": "single",
     "type": "offense",
+    "usesWeapon": "melee",
     "proficiencyNeeded": "legend",
     "manaCost": 500,
     "effects": {
       "damage": 500,
-      "buffs": [{"name": "remove stealth"}],
+      "buffs": ["remove stealth"],
       "debuffs": null
     }
   },
@@ -114,7 +117,7 @@
       "damage": null,
       "buffs": null,
       "debuffs":  null,
-      "pet": ["raven"]
+      "pet": "raven"
     }
   },
   {
@@ -141,7 +144,7 @@
       "damage": null,
       "buffs": null,
       "debuffs": null,
-      "pet": ["bear"]
+      "pet": "bear"
     }
   },
   {
@@ -168,7 +171,7 @@
       "damage": null,
       "buffs": null,
       "debuffs": null,
-      "pet": ["dragon welp"]
+      "pet": "dragon welp"
     }
   },
   {
@@ -195,7 +198,7 @@
       "damage": null,
       "buffs": null,
       "debuffs": null,
-      "pet": ["griffon"]
+      "pet": "griffon"
     }
   },
   {
@@ -220,10 +223,10 @@
     "proficiencyNeeded": "legend",
     "manaCost": 600,
     "effects": {
-      "damage": 175,
+      "damage": null,
       "buffs": null,
       "debuffs": null ,
-      "pet": ["dragon"]
+      "pet": "dragon"
     }
   },
   {
@@ -231,7 +234,7 @@
     "element": "beastMastery",
     "target": "single",
     "type": "offense",
-    "usesWeapon": "axe",
+    "usesWeapon": "melee",
     "proficiencyNeeded": "legend",
     "duration": 2,
     "manaCost": 1100,
@@ -256,25 +259,27 @@
     }
   },
   {
-    "name": "",
+    "name": "enchanted quiver",
     "element": "arcane",
     "target": "single",
     "type": "offense",
+    "usesWeapon": "bow",
     "proficiencyNeeded": "apprentice",
     "manaCost": 25,
     "effects": {
-      "damage": 25,
-      "buffs": null,
+      "damage": null,
+      "buffs": ["enchanted quiver"],
       "debuffs": null
     }
   },
   {
-    "name": "",
+    "name": "seeking arrow",
     "element": "arcane",
     "target": "single",
     "type": "offense",
+    "usesWeapon": "bow",
     "proficiencyNeeded": "adept",
-    "manaCost": 75,
+    "manaCost": 65,
     "effects": {
       "damage": 50,
       "buffs": null,
@@ -282,46 +287,49 @@
     }
   },
   {
-    "name": "",
+    "name": "piercing barrage",
     "element": "arcane",
     "target": "single",
     "type": "offense",
+    "usesWeapon": "bow",
     "proficiencyNeeded": "expert",
     "manaCost": 75,
     "effects": {
-      "damage": 50,
+      "damage": 60,
       "buffs": null,
-      "debuffs": null
+      "debuffs": [{"name": "sunder", "chance": 0.3}]
     }
   },
   {
-    "name": "",
+    "name": "volley",
     "element": "arcane",
     "target": "area",
     "type": "offense",
+    "usesWeapon": "bow",
     "proficiencyNeeded": "expert",
     "manaCost": 105,
     "effects": {
-      "damage": 50,
+      "damage": 40,
       "buffs": null,
-      "debuffs": null
+      "debuffs": [{"name": "weaken", "chance": 0.5}]
     }
   },
   {
-    "name": "",
+    "name": "arcane missiles",
     "element": "arcane",
     "target": "single",
     "type": "offense",
+    "usesWeapon": "bow",
     "proficiencyNeeded": "master",
     "manaCost": 100,
     "effects": {
-      "damage": 75,
+      "damage": 90,
       "buffs": null,
-      "debuffs": null 
+      "debuffs": [{"name": "burn", "chance": 0.4}]
     }
   },
   {
-    "name": "",
+    "name": "moon call",
     "element": "arcane",
     "target": "single",
     "type": "defense",
@@ -329,36 +337,38 @@
     "manaCost": 125,
     "effects": {
       "damage": null,
-      "buffs": ["hard to see", "damaging to hit"],
+      "buffs": ["guard", "quickened mind"],
       "debuffs": null
     }
   },
   {
-    "name": "",
+    "name": "torrent",
     "element": "arcane",
     "target": "area",
     "type": "offense",
+    "usesWeapon": "bow",
     "proficiencyNeeded": "legend",
     "duration": 3,
     "manaCost": 500,
     "effects": {
-      "damage": 125,
+      "damage": 150,
       "buffs": null,
       "debuffs": null
     }
   },
   {
-    "name": "",
+    "name": "moon fire",
     "element": "arcane",
-    "target": "single",
+    "target": "area",
     "type": "offense",
+    "usesWeapon": "bow",
     "proficiencyNeeded": "legend",
     "duration": 5,
     "manaCost": 1250,
     "effects": {
       "damage": 125,
       "buffs": null,
-      "debuffs": null
+      "debuffs": [{"name": "burn", "chance": 0.5}] 
     }
   }
 ]

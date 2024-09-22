@@ -16,7 +16,7 @@ import potions from "../../assets/json/items/potions.json";
 import robes from "../../assets/json/items/robes.json";
 import shields from "../../assets/json/items/shields.json";
 import staves from "../../assets/json/items/staves.json";
-import weapons from "../../assets/json/items/weapons.json";
+import melee from "../../assets/json/items/melee.json";
 import wands from "../../assets/json/items/wands.json";
 import names from "../../assets/json/names.json";
 import { ItemClassType, PlayerClassOptions } from "../types";
@@ -142,7 +142,7 @@ export function getItemJSONMap(
     staff: staves,
     shield: shields,
     wand: wands,
-    weapon: weapons,
+    melee: melee,
   };
 }
 

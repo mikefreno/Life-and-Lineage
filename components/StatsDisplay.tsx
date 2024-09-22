@@ -17,7 +17,7 @@ import {
   IntelligenceIcon,
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
-import { Attribute, ItemClassType } from "../utility/types";
+import { Attribute, ItemClassType, MasteryToString } from "../utility/types";
 
 type BaseProps = {
   displayItem: {
@@ -304,9 +304,7 @@ export function StatsDisplay({
       const spellRes = displayItem.item[0].getAttachedSpell(
         playerState.playerClass,
       );
-      return `${toTitleCase(
-        spellRes.proficiencyNeeded as unknown as string,
-      )} level book`;
+      return `${MasteryToString[spellRes.proficiencyNeeded]} level book`;
     }
   }
   const onLayoutView = (event: LayoutChangeEvent) => {

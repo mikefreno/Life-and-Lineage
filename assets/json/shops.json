@@ -9,7 +9,7 @@
    },
    {
       "type": "weaponsmith",
-      "trades":["weapon", "shield"],
+      "trades":["melee", "shield"],
       "baseGold": 90000,
       "itemQuantityRange": {"minimum":5, "maximum":15},
       "possiblePersonalities": ["reserved", "aggressive", "jovial"],
@@ -33,7 +33,7 @@
    },
    {
       "type":"junk dealer",
-      "trades": ["bodyArmor", "robe", "helmet", "hat", "weapon", "shield", "focus", "junk", "arrow", "staff"],
+      "trades": ["bodyArmor", "robe", "helmet", "hat", "melee", "shield", "focus", "junk", "arrow", "staff"],
       "baseGold": 50000,
       "itemQuantityRange": {"minimum":10, "maximum":20},
       "possiblePersonalities": ["creepy", "insane", "silent"],

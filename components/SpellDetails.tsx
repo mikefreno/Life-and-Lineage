@@ -3,6 +3,7 @@ import { toTitleCase } from "../utility/functions/misc";
 import { Text } from "./Themed";
 import { useColorScheme } from "nativewind";
 import {
+  BeastMasteryIcon,
   ClockIcon,
   Energy,
   HealthIcon,
@@ -81,7 +82,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
                 {toTitleCase(debuff.name)} - {debuff.chance * 100}%
               </Text>
             ))}
-            {spell.usesWeapon && (
+            {spell.usesWeapon && !spell.userHasRequiredWeapon(playerState!) && (
               <Text className="text-center">
                 Requires: {toTitleCase(spell.usesWeapon)}
               </Text>
@@ -122,6 +123,16 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
                   </View>
                 ))
               : null}
+            {spell.rangerPet && (
+              <View className="flex flex-col items-center">
+                <Text>{toTitleCase(spell.rangerPet)}</Text>
+                <BeastMasteryIcon
+                  width={14}
+                  height={14}
+                  style={{ marginLeft: 6 }}
+                />
+              </View>
+            )}
           </View>
           <View className="my-auto">
             <BlessingDisplay

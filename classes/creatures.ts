@@ -21,7 +21,7 @@ import potions from "../assets/json/items/potions.json";
 import robes from "../assets/json/items/robes.json";
 import shields from "../assets/json/items/shields.json";
 import wands from "../assets/json/items/wands.json";
-import weapons from "../assets/json/items/weapons.json";
+import melee from "../assets/json/items/melee.json";
 import necroBooks from "../assets/json/items/necroBooks.json";
 import paladinBooks from "../assets/json/items/paladinBooks.json";
 import mageBooks from "../assets/json/items/mageBooks.json";
@@ -820,8 +820,8 @@ function itemList(
       return shields;
     case "wand":
       return wands;
-    case "weapon":
-      return weapons;
+    case "melee":
+      return melee;
     default:
       throw new Error("invalid itemType");
   }

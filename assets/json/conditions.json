@@ -347,5 +347,14 @@
       "effectStyle": ["flat"],
       "effectAmount": [300],
       "icon": "trap"
+   },
+   {
+      "name": "enchanted quiver",
+      "style": "buff",
+      "turns": 10,
+      "effect": ["strengthen"],
+      "effectStyle": ["flat"],
+      "effectAmount": [5],
+      "icon": "glow_star"
    }
 ]
