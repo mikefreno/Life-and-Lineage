@@ -1,13 +1,13 @@
 import { createBuff, createDebuff } from "../utility/functions/conditions";
 import { wait, toTitleCase, rollD20 } from "../utility/functions/misc";
-import { Element, MasteryLevel } from "../utility/types";
+import { Element, MasteryLevel, StringToElement } from "../utility/types";
 import { PlayerCharacter } from "./character";
 import { Enemy, Minion } from "./creatures";
 
 interface SpellFields {
   name: string;
   attackStyle?: "single" | "cleave" | "aoe";
-  element: Element;
+  element: string;
   proficiencyNeeded: MasteryLevel;
   manaCost: number;
   duration?: number;
@@ -30,7 +30,7 @@ interface SpellFields {
 
 /**
  * This class instantiates learned spells by the `PlayerCharacter` only.
- * An instance can be made with the constructor `new Spell({})` or with `fromJSON` in most cases `fromJSON` should be used
+ * An instance can be made with the constructor `new Spell({})`
  * This used to store a reference to the user `PlayerCharacter`. This was abandoned due to creating cyclical data
  * The heart of this class is the `use` method, no other method needed for use other than `canBeUsed` as a check in UI
  */
@@ -61,7 +61,7 @@ export class Spell {
     usesWeapon,
   }: SpellFields) {
     this.name = name;
-    this.element = element;
+    this.element = StringToElement[element];
     this.usesWeapon = usesWeapon ?? null;
     (this.attackStyle = attackStyle ?? "single"),
       (this.proficiencyNeeded = proficiencyNeeded);

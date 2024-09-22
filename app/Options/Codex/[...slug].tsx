@@ -15,6 +15,9 @@ import {
 } from "../../../components/CodexPages";
 import {
   AirCodex,
+  ArcaneCodex,
+  AssassinationCodex,
+  BeastMasteryCodex,
   BloodCodex,
   BoneCodex,
   EarthCodex,
@@ -25,7 +28,8 @@ import {
   PaladinCodex,
   PestilenceCodex,
   ProtectionCodex,
-  SummonerCodex,
+  RangerCodex,
+  SummoningCodex,
   VengeanceCodex,
   WaterCodex,
 } from "../../../components/CodexSecondaries";
@@ -52,11 +56,15 @@ const SecondaryMap: { [key: string]: React.JSX.Element } = {
   Blood: <BloodCodex />,
   Pestilence: <PestilenceCodex />,
   Bone: <BoneCodex />,
-  Summoner: <SummonerCodex />,
+  Summoner: <SummoningCodex />,
   Paladin: <PaladinCodex />,
   Vengeance: <VengeanceCodex />,
   Protection: <ProtectionCodex />,
   Holy: <HolyCodex />,
+  Ranger: <RangerCodex />,
+  Assassination: <AssassinationCodex />,
+  BeastMastery: <BeastMasteryCodex />,
+  Arcane: <ArcaneCodex />,
 };
 
 export default function CodexInfo() {
@@ -73,6 +81,7 @@ export default function CodexInfo() {
   } else {
     category = slug;
   }
+  useEffect(() => console.log("SLUG: ", slug));
 
   useEffect(() => {
     const currentPath = secondary

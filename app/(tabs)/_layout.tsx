@@ -79,7 +79,10 @@ export default function TabLayout() {
             return (
               <View className="flex flex-col w-1/6">
                 <Pressable
-                  onPress={() => setShowDetailedStatusView(true)}
+                  onPress={() => {
+                    vibration({ style: "light" });
+                    setShowDetailedStatusView(true);
+                  }}
                   style={[
                     {
                       height: isCompact ? 44 : 72,

@@ -838,9 +838,11 @@ export const DexterityIcon = ({
 export const RangerIcon = ({
   color = "#15803d",
   secondaryOpacity = 0.6,
+  width = 120,
+  height = 120,
   ...props
 }) => (
-  <Svg viewBox="0 0 512 512" {...props}>
+  <Svg viewBox="0 0 512 512" height={height} width={width} {...props}>
     {/* Bow */}
     <Path
       d="M359.531 171.56l-1.156 1.157-57.25 67.188c82.006 47.945 75.587 159.267 107.283 218.03l-272.157-24.5-14.812 17.408 301.562 27.125c12.48 12.283 29.4 19.084 53.688 17.687-79.95-67.2-18.36-275.754-117.156-324.094z"

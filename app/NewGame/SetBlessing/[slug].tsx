@@ -12,9 +12,10 @@ import { AppContext } from "../../_layout";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import TutorialModal from "../../../components/TutorialModal";
-import { descriptionMap } from "../../../utility/descriptions";
+import { DescriptionMap } from "../../../utility/descriptions";
 import {
   Element,
+  ElementToString,
   PlayerClassOptions,
   TutorialOption,
   isPlayerClassOptions,
@@ -57,7 +58,7 @@ export default function SetBlessing() {
     !gameState
       ? loadStoredTutorialState()
       : gameState &&
-        !gameState.tutorialsShown.blessing &&
+        !gameState.tutorialsShown[TutorialOption.blessing] &&
         gameState.tutorialsEnabled
       ? true
       : false,
@@ -118,10 +119,7 @@ export default function SetBlessing() {
               className="text-center text-lg px-2"
               style={{ color: elementalColorMap[element].dark }}
             >
-              Blessing of{" "}
-              {element == "beastMastery"
-                ? "Beast Mastery"
-                : toTitleCase(element)}
+              Blessing of {ElementToString[element]}
             </Text>
           </View>
         )}
@@ -214,7 +212,7 @@ export default function SetBlessing() {
           <>
             {classDependantBlessings()}
             <Text className="text-center md:text-lg px-4">
-              {descriptionMap[blessing as Element]}
+              {DescriptionMap[blessing as Element]}
             </Text>
             {blessing ? (
               <View className="mx-auto h-32 py-2">

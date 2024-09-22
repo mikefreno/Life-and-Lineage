@@ -22,8 +22,6 @@ import { fullLoad } from "../utility/functions/save_load";
 import { Dimensions, Keyboard, Platform, StyleSheet } from "react-native";
 import { View as ThemedView } from "../components/Themed";
 import "../assets/styles/globals.css";
-import * as NavigationBar from "expo-navigation-bar";
-import { StatusBar } from "expo-status-bar";
 import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
 import { AppContextType } from "../utility/types";
@@ -37,6 +35,8 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { wait } from "../utility/functions/misc";
+import { API_BASE_URL } from "../config/config";
+import { updateNavBar } from "../utility/functions/android";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -130,11 +130,6 @@ const Root = observer(() => {
     useState<boolean>(false);
   const [blockSize, setBlockSize] = useState<number>();
   const { setColorScheme, colorScheme } = useColorScheme();
-  const [androidNavBarVisibility, setAndroidNavBarVisibility] =
-    useState<boolean>(false);
-  const [visibilityWhenOpen, setVisisbilityWhenOpen] = useState<
-    boolean | "notset"
-  >("notset");
 
   const getData = async () => {
     try {
@@ -242,10 +237,6 @@ const Root = observer(() => {
           dimensions,
           blockSize,
           setBlockSize,
-          androidNavBarVisibility,
-          setAndroidNavBarVisibility,
-          visibilityWhenOpen,
-          setVisisbilityWhenOpen,
         }}
       >
         <SafeAreaProvider>
@@ -267,12 +258,7 @@ const RootLayout = observer(() => {
   if (!appData) {
     throw new Error("missing context");
   }
-  const {
-    playerState,
-    gameState,
-    androidNavBarVisibility,
-    setAndroidNavBarVisibility,
-  } = appData;
+  const { playerState, gameState } = appData;
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
   const [navbarLoad, setNavbarLoad] = useState(false);
@@ -280,6 +266,7 @@ const RootLayout = observer(() => {
   const insets = useSafeAreaInsets();
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [expoPushToken, setExpoPushToken] = useState("");
+  const [sentToken, setSentToken] = useState(false);
   const [notification, setNotification] = useState<
     Notifications.Notification | undefined
   >(undefined);
@@ -316,6 +303,19 @@ const RootLayout = observer(() => {
       });
     }
   }, [fontLoaded, navbarLoad]);
+
+  useEffect(() => {
+    if (expoPushToken && !sentToken) {
+      fetch(`${API_BASE_URL}/tokens`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: expoPushToken }),
+      });
+      setSentToken(true);
+    }
+  }, [expoPushToken]);
 
   //useEffect(() => {
   //if (__DEV__) {
@@ -359,28 +359,14 @@ const RootLayout = observer(() => {
 
   useEffect(() => {
     if (Platform.OS == "android") {
-      updateNavBar();
+      setNavbarBar();
     } else {
       setNavbarLoad(true);
     }
   }, [isKeyboardVisible, insets.bottom]);
 
-  const updateNavBar = async () => {
-    const isVisible = (await NavigationBar.getVisibilityAsync()) === "visible";
-    if (androidNavBarVisibility !== isVisible) {
-      setAndroidNavBarVisibility(isVisible);
-    }
-
-    if (isKeyboardVisible && !isVisible) {
-      await NavigationBar.setVisibilityAsync("visible");
-      await NavigationBar.setPositionAsync("relative");
-      await NavigationBar.setBehaviorAsync("inset-touch");
-    } else if (!isKeyboardVisible && isVisible) {
-      await NavigationBar.setVisibilityAsync("hidden");
-      await NavigationBar.setPositionAsync("absolute");
-      await NavigationBar.setBehaviorAsync("overlay-swipe");
-    }
-
+  const setNavbarBar = async () => {
+    await updateNavBar({ isKeyboardVisible });
     if (!navbarLoad) {
       setNavbarLoad(true);
     }
@@ -416,7 +402,6 @@ const RootLayout = observer(() => {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <StatusBar />
       <Stack>
         <Stack.Screen
           name="(tabs)"

@@ -67,21 +67,39 @@ export type InvestmentUpgrade = {
   };
 };
 
+export enum Attribute {
+  health,
+  mana,
+  sanity,
+  strength,
+  intelligence,
+  dexterity,
+}
+
+export const AttributeToString: Record<Attribute, string> = {
+  [Attribute.health]: "Health",
+  [Attribute.mana]: "Mana",
+  [Attribute.sanity]: "Sanity",
+  [Attribute.strength]: "Strength",
+  [Attribute.intelligence]: "Intelligence",
+  [Attribute.dexterity]: "Dexterity",
+};
+
 export enum TutorialOption {
-  class = "class",
-  aging = "aging",
-  blessing = "blessing",
-  intro = "intro",
-  spell = "spell",
-  labor = "labor",
-  dungeon = "dungeon",
-  dungeonInterior = "dungeonInterior",
-  shops = "shops",
-  shopInterior = "shopInterior",
-  medical = "medical",
-  investing = "investing",
-  training = "training",
-  firstBossKill = "firstBossKill",
+  class,
+  aging,
+  blessing,
+  intro,
+  spell,
+  labor,
+  dungeon,
+  dungeonInterior,
+  shops,
+  shopInterior,
+  medical,
+  investing,
+  training,
+  firstBossKill,
 }
 
 export enum MasteryLevel {
@@ -93,24 +111,76 @@ export enum MasteryLevel {
   Legend,
 }
 
+export const MasteryToBarrier: Record<MasteryLevel, number> = {
+  [MasteryLevel.Novice]: 0,
+  [MasteryLevel.Apprentice]: 50,
+  [MasteryLevel.Adept]: 125,
+  [MasteryLevel.Expert]: 225,
+  [MasteryLevel.Master]: 350,
+  [MasteryLevel.Legend]: 500,
+};
+
+export const MasteryToString: Record<MasteryLevel, string> = {
+  [MasteryLevel.Novice]: "Novice",
+  [MasteryLevel.Apprentice]: "Apprentice",
+  [MasteryLevel.Adept]: "Adept",
+  [MasteryLevel.Expert]: "Expert",
+  [MasteryLevel.Master]: "Master",
+  [MasteryLevel.Legend]: "Legend",
+};
+
 export enum Element {
-  fire = "fire",
-  earth = "earth",
-  air = "air",
-  water = "water",
-  summoning = "summoning",
-  pestilence = "pestilence",
-  blood = "blood",
-  bone = "bone",
-  holy = "holy",
-  vengeance = "vengeance",
-  protection = "protection",
-  beastMastery = "beastMastery",
-  assassination = "assassination",
-  arcane = "arcane",
+  fire,
+  earth,
+  air,
+  water,
+  summoning,
+  pestilence,
+  blood,
+  bone,
+  holy,
+  vengeance,
+  protection,
+  beastMastery,
+  assassination,
+  arcane,
 }
-export function isElement(value: any): value is Element {
-  return Object.values(Element).includes(value);
+
+export const ElementToString: Record<Element, string> = {
+  [Element.fire]: "Fire",
+  [Element.earth]: "Earth",
+  [Element.air]: "Air",
+  [Element.water]: "Water",
+  [Element.summoning]: "Summoning",
+  [Element.pestilence]: "Pestilence",
+  [Element.blood]: "Blood",
+  [Element.bone]: "Bone",
+  [Element.holy]: "Holy",
+  [Element.vengeance]: "Vengeance",
+  [Element.protection]: "Protection",
+  [Element.beastMastery]: "Beast Mastery",
+  [Element.assassination]: "Assassination",
+  [Element.arcane]: "Arcane",
+};
+export const StringToElement: Record<string, Element> = {
+  fire: Element.fire,
+  earth: Element.earth,
+  air: Element.air,
+  water: Element.water,
+  summoning: Element.summoning,
+  pestilence: Element.pestilence,
+  blood: Element.blood,
+  bone: Element.bone,
+  holy: Element.holy,
+  vengeance: Element.vengeance,
+  protection: Element.protection,
+  beastMastery: Element.beastMastery,
+  assassination: Element.assassination,
+  arcane: Element.arcane,
+};
+
+export function isElement(value: number): value is Element {
+  return value >= 0 && value <= 13;
 }
 export enum PlayerClassOptions {
   mage = "mage",
@@ -356,10 +426,4 @@ export interface AppContextType {
   };
   blockSize: number | undefined;
   setBlockSize: React.Dispatch<React.SetStateAction<number | undefined>>;
-  androidNavBarVisibility: boolean;
-  setAndroidNavBarVisibility: React.Dispatch<React.SetStateAction<boolean>>;
-  visibilityWhenOpen: boolean | "notset";
-  setVisisbilityWhenOpen: React.Dispatch<
-    React.SetStateAction<boolean | "notset">
-  >;
 }

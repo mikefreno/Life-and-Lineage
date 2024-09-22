@@ -25,6 +25,7 @@ import {
   Element,
   PlayerClassOptions,
   isElement,
+  Attribute,
 } from "../utility/types";
 import {
   calculateAge,
@@ -342,33 +343,29 @@ type PlayerCharacterBase = {
   };
   investments?: Investment[];
   unAllocatedSkillPoints?: number;
-  allocatedSkillPoints?: {
-    health: number;
-    mana: number;
-    sanity: number;
-    strength: number;
-    intelligence: number;
-    dexterity: number;
-  };
-
+  allocatedSkillPoints?: Record<Attribute, number>;
   alive?: boolean;
 };
 
 type MageCharacter = PlayerCharacterBase & {
   playerClass: "mage";
-  blessing: "fire" | "water" | "air" | "earth";
+  blessing: Element.fire | Element.water | Element.air | Element.earth;
 };
 type NecromancerCharacter = PlayerCharacterBase & {
   playerClass: "necromancer";
-  blessing: "blood" | "summoning" | "pestilence" | "bone";
+  blessing:
+    | Element.blood
+    | Element.summoning
+    | Element.bone
+    | Element.pestilence;
 };
 type PaladinCharacter = PlayerCharacterBase & {
   playerClass: "paladin";
-  blessing: "holy" | "vengeance" | "protection";
+  blessing: Element.holy | Element.vengeance | Element.protection;
 };
 type RangerCharacter = PlayerCharacterBase & {
   playerClass: "ranger";
-  blessing: "assassination" | "beastMastery" | "arcane";
+  blessing: Element.assassination | Element.beastMastery | Element.arcane;
 };
 
 type PlayerCharacterOptions =
@@ -407,16 +404,12 @@ export class PlayerCharacter extends Character {
   magicProficiencies: { school: Element; proficiency: number }[];
 
   unAllocatedSkillPoints: number;
-  allocatedSkillPoints: {
-    health: number;
-    mana: number;
-    sanity: number;
-    strength: number;
-    intelligence: number;
-    dexterity: number;
-  };
+  allocatedSkillPoints: Record<Attribute, number>;
 
   knownSpells: string[];
+  /**
+   * Spells currently being learned by the player
+   */
   learningSpells: {
     bookName: string;
     spellName: string;
@@ -425,6 +418,9 @@ export class PlayerCharacter extends Character {
   }[];
 
   minions: Minion[];
+  /**
+   * Non-despawning pet, only ever not-null (had) by a Ranger class player
+   */
   rangerPet: Minion | null;
 
   jobExperience: { job: string; experience: number; rank: number }[];
@@ -435,6 +431,9 @@ export class PlayerCharacter extends Character {
   }[];
 
   conditions: Condition[];
+  /**
+   * Player's inventory,this should not be used for rendering items, getInventory should be as it stacks items
+   */
   inventory: Item[];
   currentDungeon: {
     instance: string;
@@ -509,7 +508,7 @@ export class PlayerCharacter extends Character {
       qualifications,
     });
     this.playerClass = PlayerClassOptions[playerClass];
-    this.blessing = Element[blessing];
+    this.blessing = blessing;
 
     this.parents = parents;
 
@@ -523,10 +522,7 @@ export class PlayerCharacter extends Character {
 
     this.magicProficiencies =
       magicProficiencies ??
-      getStartingProficiencies(
-        PlayerClassOptions[playerClass],
-        Element[blessing],
-      );
+      getStartingProficiencies(PlayerClassOptions[playerClass], blessing);
 
     this.currentHealth = currentHealth ?? baseHealth;
     this.currentSanity = currentSanity ?? baseSanity;
@@ -534,12 +530,12 @@ export class PlayerCharacter extends Character {
 
     this.unAllocatedSkillPoints = unAllocatedSkillPoints ?? 0;
     this.allocatedSkillPoints = allocatedSkillPoints ?? {
-      health: 0,
-      mana: 0,
-      sanity: 0,
-      strength: 0,
-      intelligence: 0,
-      dexterity: 0,
+      [Attribute.health]: 0,
+      [Attribute.mana]: 0,
+      [Attribute.sanity]: 0,
+      [Attribute.strength]: 0,
+      [Attribute.dexterity]: 0,
+      [Attribute.intelligence]: 0,
     };
 
     this.gold =
@@ -686,29 +682,27 @@ export class PlayerCharacter extends Character {
     this.addSkillPoint({ amount: 3 });
   }
 
+  /**
+   * Adds skill points to a specific attribute or to unallocated points
+   * @param amount - the amount of skill points to add, defaults to 1.
+   * @param to - the attribute to add skill points to
+   * */
   public addSkillPoint({
     amount = 1,
     to = "unallocated",
   }: {
     amount?: number;
-    to?:
-      | "health"
-      | "mana"
-      | "sanity"
-      | "strength"
-      | "intelligence"
-      | "dexterity"
-      | "unallocated";
+    to?: Attribute | "unallocated";
   }) {
     switch (to) {
-      case "health":
-      case "mana":
-      case "sanity":
-      case "strength":
-      case "intelligence":
-      case "dexterity":
-        this.unAllocatedSkillPoints -= amount;
+      case Attribute.health:
+      case Attribute.mana:
+      case Attribute.sanity:
+      case Attribute.strength:
+      case Attribute.intelligence:
+      case Attribute.dexterity:
         this.allocatedSkillPoints[to] += amount;
+        this.unAllocatedSkillPoints -= amount;
         break;
       case "unallocated":
         this.unAllocatedSkillPoints += amount;
@@ -721,13 +715,7 @@ export class PlayerCharacter extends Character {
     from,
   }: {
     amount?: number;
-    from:
-      | "health"
-      | "mana"
-      | "sanity"
-      | "strength"
-      | "intelligence"
-      | "dexterity";
+    from: Attribute;
   }) {
     if (this.allocatedSkillPoints[from] >= amount) {
       this.allocatedSkillPoints[from] -= amount;
@@ -737,12 +725,12 @@ export class PlayerCharacter extends Character {
 
   public getTotalAllocatedPoints() {
     return (
-      this.allocatedSkillPoints.health +
-      this.allocatedSkillPoints.mana +
-      this.allocatedSkillPoints.sanity +
-      this.allocatedSkillPoints.strength +
-      this.allocatedSkillPoints.intelligence +
-      this.allocatedSkillPoints.dexterity
+      this.allocatedSkillPoints[Attribute.health] +
+      this.allocatedSkillPoints[Attribute.mana] +
+      this.allocatedSkillPoints[Attribute.sanity] +
+      this.allocatedSkillPoints[Attribute.strength] +
+      this.allocatedSkillPoints[Attribute.intelligence] +
+      this.allocatedSkillPoints[Attribute.dexterity]
     );
   }
   //----------------------------------Health----------------------------------//
@@ -751,7 +739,8 @@ export class PlayerCharacter extends Character {
       this.conditions,
     );
     return (
-      (this.baseHealth + this.allocatedSkillPoints.health * 10) * healthMult +
+      (this.baseHealth + this.allocatedSkillPoints[Attribute.health] * 10) *
+        healthMult +
       this.equipmentStats.health +
       healthFlat
     );
@@ -760,7 +749,7 @@ export class PlayerCharacter extends Character {
   get nonConditionalMaxHealth() {
     return (
       this.baseHealth +
-      this.allocatedSkillPoints.health * 10 +
+      this.allocatedSkillPoints[Attribute.health] * 10 +
       this.equipmentStats.health
     );
   }
@@ -793,7 +782,8 @@ export class PlayerCharacter extends Character {
       this.conditions,
     );
     return (
-      (this.baseMana + this.allocatedSkillPoints.mana * 10) * manaMaxMult +
+      (this.baseMana + this.allocatedSkillPoints[Attribute.mana] * 10) *
+        manaMaxMult +
       this.equipmentStats.mana +
       manaMaxFlat
     );
@@ -802,7 +792,7 @@ export class PlayerCharacter extends Character {
   get nonConditionalMaxMana() {
     return (
       this.baseMana +
-      this.allocatedSkillPoints.mana * 10 +
+      this.allocatedSkillPoints[Attribute.mana] * 10 +
       this.equipmentStats.mana
     );
   }
@@ -847,7 +837,8 @@ export class PlayerCharacter extends Character {
       this.conditions,
     );
     return (
-      (this.baseSanity + this.allocatedSkillPoints.sanity * 5) * sanityMult +
+      (this.baseSanity + this.allocatedSkillPoints[Attribute.sanity] * 5) *
+        sanityMult +
       this.equipmentStats.sanity +
       sanityFlat
     );
@@ -856,7 +847,7 @@ export class PlayerCharacter extends Character {
   get nonConditionalMaxSanity() {
     return (
       this.baseSanity +
-      this.allocatedSkillPoints.sanity * 5 +
+      this.allocatedSkillPoints[Attribute.sanity] * 5 +
       this.equipmentStats.sanity
     );
   }
@@ -886,7 +877,7 @@ export class PlayerCharacter extends Character {
 
     return (
       this.baseStrength +
-      this.allocatedSkillPoints.strength +
+      this.allocatedSkillPoints[Attribute.strength] +
       this.equipmentStats.strength
     );
   }
@@ -894,7 +885,7 @@ export class PlayerCharacter extends Character {
   get nonConditionalStrength() {
     return (
       this.baseStrength +
-      this.allocatedSkillPoints.strength +
+      this.allocatedSkillPoints[Attribute.strength] +
       this.equipmentStats.strength
     );
   }
@@ -908,7 +899,7 @@ export class PlayerCharacter extends Character {
 
     return (
       this.baseIntelligence +
-      this.allocatedSkillPoints.intelligence +
+      this.allocatedSkillPoints[Attribute.intelligence] +
       this.equipmentStats.intelligence
     );
   }
@@ -916,7 +907,7 @@ export class PlayerCharacter extends Character {
   get nonConditionalIntelligence() {
     return (
       this.baseIntelligence +
-      this.allocatedSkillPoints.intelligence +
+      this.allocatedSkillPoints[Attribute.intelligence] +
       this.equipmentStats.intelligence
     );
   }
@@ -929,7 +920,7 @@ export class PlayerCharacter extends Character {
 
     return (
       this.baseDexterity +
-      this.allocatedSkillPoints.dexterity +
+      this.allocatedSkillPoints[Attribute.dexterity] +
       this.equipmentStats.dexterity
     );
   }
@@ -937,7 +928,7 @@ export class PlayerCharacter extends Character {
   get nonConditionalDexterity() {
     return (
       this.baseDexterity +
-      this.allocatedSkillPoints.dexterity +
+      this.allocatedSkillPoints[Attribute.dexterity] +
       this.equipmentStats.dexterity
     );
   }
@@ -1749,14 +1740,24 @@ export class PlayerCharacter extends Character {
     this.magicProficiencies = newProficiencies;
   }
 
-  public currentMasteryLevel(
-    school: string,
-    asString: boolean = false,
-  ): MasteryLevel | string {
+  public currentMasteryLevel(school: Element): MasteryLevel {
     const schoolProficiency = this.magicProficiencies.find(
       (prof) => prof.school == school,
     )?.proficiency;
-    return getMasteryLevel(schoolProficiency ?? 0, asString);
+
+    if (!schoolProficiency || schoolProficiency < 50) {
+      return MasteryLevel.Novice;
+    } else if (schoolProficiency < 125) {
+      return MasteryLevel.Apprentice;
+    } else if (schoolProficiency < 225) {
+      return MasteryLevel.Adept;
+    } else if (schoolProficiency < 350) {
+      return MasteryLevel.Expert;
+    } else if (schoolProficiency < 500) {
+      return MasteryLevel.Master;
+    } else {
+      return MasteryLevel.Legend;
+    }
   }
 
   private experienceGainSteps(chosenSpell: Spell) {
@@ -1935,6 +1936,11 @@ export class PlayerCharacter extends Character {
     }
   }
 
+  /**
+   * Creates a PlayerCharacter instance from a JSON object
+   * @param json - JSON representation of a PlayerCharacter
+   * @returns A new PlayerCharacter instance
+   */
   static fromJSON(json: any): PlayerCharacter {
     const player = new PlayerCharacter({
       id: json.id,
@@ -2112,98 +2118,98 @@ function getStartingProficiencies(
 
 export function getStartingBook(playerBlessing: Element) {
   switch (playerBlessing) {
-    case "fire":
+    case Element.fire:
       return new Item({
         name: "book of fire bolt",
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
       });
-    case "water":
+    case Element.water:
       return new Item({
         name: "book of frost",
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
       });
-    case "air":
+    case Element.air:
       return new Item({
         name: "book of gust",
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
       });
-    case "earth":
+    case Element.earth:
       return new Item({
         name: "book of rock toss",
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
       });
-    case "blood":
+    case Element.blood:
       return new Item({
         name: "book of pull blood",
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
       });
-    case "summoning":
+    case Element.summoning:
       return new Item({
         name: "book of the flying skull",
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
       });
-    case "pestilence":
+    case Element.pestilence:
       return new Item({
         name: "book of poison dart",
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
       });
-    case "bone":
+    case Element.bone:
       return new Item({
         name: "book of teeth",
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
       });
-    case "holy":
+    case Element.holy:
       return new Item({
         name: "book of flash heal",
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
       });
-    case "protection":
+    case Element.protection:
       return new Item({
         name: "book of blessed guard",
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
       });
-    case "vengeance":
+    case Element.vengeance:
       return new Item({
         name: "book of judgment",
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
       });
-    case "beastMastery":
+    case Element.beastMastery:
       return new Item({
         name: "book of the raven",
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
       });
-    case "assassination":
+    case Element.assassination:
       return new Item({
         name: "book of throw dagger",
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
       });
-    case "arcane":
+    case Element.arcane:
       return new Item({
         name: "book of arcane shot",
         baseValue: 2500,

@@ -16,6 +16,10 @@ import {
 } from "../../assets/icons/SVGIcons";
 import { loadStoredTutorialState } from "../../utility/functions/misc";
 import { TutorialOption } from "../../utility/types";
+import {
+  ClassDescriptionMap,
+  classDescriptionMap,
+} from "../../utility/descriptions";
 
 export default function NewGameScreen() {
   const [selectedClass, setSelectedClass] = useState<
@@ -36,7 +40,7 @@ export default function NewGameScreen() {
     !gameState
       ? loadStoredTutorialState()
       : gameState &&
-        !gameState.tutorialsShown.class &&
+        !gameState.tutorialsShown[TutorialOption.class] &&
         gameState.tutorialsEnabled
       ? true
       : false,
@@ -283,27 +287,9 @@ export default function NewGameScreen() {
               )}
             </Pressable>
           </View>
-          {selectedClass == "mage" ? (
-            <Text className="mt-[2vh] h-16 text-center md:text-lg">
-              The Mage is the default class, it is well balanced, with a focus
-              on casting elemental magic
-            </Text>
-          ) : selectedClass == "paladin" ? (
-            <Text className="mt-[2vh] h-16 text-center md:text-lg">
-              The Paladin is skilled with arms and uses holy magic, which is
-              especially powerful against the undead and protecting life.
-            </Text>
-          ) : selectedClass == "necromancer" ? (
-            <Text className="mt-[2vh] h-16 text-center md:text-lg">
-              The Necromancer controls the forces of death, they can summon
-              minions, use blood, bone and poisonous magics.
-            </Text>
-          ) : selectedClass == "ranger" ? (
-            <Text className="mt-[2vh] h-16 text-center md:text-lg">
-              The Ranger has extreme versatility, a master at archery,
-              assassination and commanding beasts
-            </Text>
-          ) : null}
+          <Text className="mt-[2vh] h-16 text-center md:text-lg">
+            {selectedClass && ClassDescriptionMap[selectedClass]}
+          </Text>
           {selectedClass && (
             <View className="mx-auto py-4 pb-[10vh]">
               <Pressable

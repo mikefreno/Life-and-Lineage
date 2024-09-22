@@ -70,7 +70,7 @@ const DungeonScreen = observer(() => {
     <>
       <TutorialModal
         isVisibleCondition={
-          (!gameState?.tutorialsShown.dungeon &&
+          (!gameState?.tutorialsShown[TutorialOption.dungeon] &&
             gameState?.tutorialsEnabled &&
             isFocused) ??
           false

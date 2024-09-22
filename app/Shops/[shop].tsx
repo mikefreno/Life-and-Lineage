@@ -199,7 +199,7 @@ const ShopInteriorScreen = observer(() => {
         />
         <TutorialModal
           isVisibleCondition={
-            (!gameState.tutorialsShown.shopInterior &&
+            (!gameState.tutorialsShown[TutorialOption.shopInterior] &&
               gameState?.tutorialsEnabled &&
               isFocused) ??
             false

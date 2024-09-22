@@ -26,6 +26,7 @@ import { fullSave } from "../../../utility/functions/save_load";
 import { AppContext } from "../../_layout";
 import {
   Element,
+  ElementToString,
   PlayerClassOptions,
   isElement,
   isPlayerClassOptions,
@@ -49,8 +50,8 @@ export default function NewGameReview() {
     return <Text>{`Invalid player class option: ${slug[0]}`}</Text>;
   }
   let blessing: Element;
-  if (isElement(slug[1])) {
-    blessing = slug[1];
+  if (isElement(Number.parseInt(slug[1]))) {
+    blessing = Number(slug[1]);
   } else {
     return <Text>{`Invalid player blessing option: ${slug[1]}`}</Text>;
   }
@@ -134,50 +135,74 @@ export default function NewGameReview() {
     const dad = createParent("male");
     let newCharacter: PlayerCharacter;
     const bday = generateBirthday(15, 15);
-    if (playerClass === "paladin") {
+    if (
+      playerClass === "paladin" &&
+      (blessing == Element.vengeance ||
+        blessing == Element.protection ||
+        blessing == Element.holy)
+    ) {
       newCharacter = new PlayerCharacter({
         firstName: firstName,
         lastName: lastName,
         sex: sex as "male" | "female",
-        playerClass: playerClass as "paladin",
-        blessing: blessing as "holy" | "vengeance" | "protection",
+        playerClass: playerClass,
+        blessing: blessing,
         parents: [mom, dad],
         birthdate: bday,
         ...getStartingBaseStats({ playerClass }),
       });
-    } else if (playerClass === "necromancer") {
+    } else if (
+      playerClass === "necromancer" &&
+      (blessing == Element.bone ||
+        blessing == Element.blood ||
+        blessing == Element.summoning ||
+        blessing == Element.pestilence)
+    ) {
       newCharacter = new PlayerCharacter({
         firstName: firstName,
         lastName: lastName,
         sex: sex as "male" | "female",
-        playerClass: playerClass as "necromancer",
-        blessing: blessing as "blood" | "summoning" | "pestilence" | "bone",
+        playerClass: playerClass,
+        blessing: blessing,
         parents: [mom, dad],
         birthdate: bday,
         ...getStartingBaseStats({ playerClass }),
       });
-    } else if (playerClass == "mage") {
+    } else if (
+      playerClass == "mage" &&
+      (blessing == Element.air ||
+        blessing == Element.fire ||
+        blessing == Element.earth ||
+        blessing == Element.water)
+    ) {
       newCharacter = new PlayerCharacter({
         firstName: firstName,
         lastName: lastName,
         sex: sex as "male" | "female",
-        playerClass: playerClass as "mage",
-        blessing: blessing as "fire" | "water" | "air" | "earth",
+        playerClass: playerClass,
+        blessing: blessing,
+        parents: [mom, dad],
+        birthdate: bday,
+        ...getStartingBaseStats({ playerClass }),
+      });
+    } else if (
+      playerClass == "ranger" &&
+      (blessing == Element.beastMastery ||
+        blessing == Element.assassination ||
+        blessing == Element.arcane)
+    ) {
+      newCharacter = new PlayerCharacter({
+        firstName: firstName,
+        lastName: lastName,
+        sex: sex as "male" | "female",
+        playerClass: playerClass,
+        blessing: blessing,
         parents: [mom, dad],
         birthdate: bday,
         ...getStartingBaseStats({ playerClass }),
       });
     } else {
-      newCharacter = new PlayerCharacter({
-        firstName: firstName,
-        lastName: lastName,
-        sex: sex as "male" | "female",
-        playerClass: playerClass as "ranger",
-        blessing: blessing as "beastMastery" | "assassination" | "arcane",
-        parents: [mom, dad],
-        birthdate: bday,
-        ...getStartingBaseStats({ playerClass }),
-      });
+      throw new Error("Incorrect Player class/blessing combination!");
     }
     return newCharacter;
   }
@@ -185,7 +210,7 @@ export default function NewGameReview() {
   async function startGame() {
     if (playerClass) {
       const player = createPlayerCharacter();
-      const starterBook = getStartingBook(Element[blessing]);
+      const starterBook = getStartingBook(blessing);
       player.addToInventory(starterBook);
       const startDate = new Date().toISOString();
       const shops = createShops(playerClass);
@@ -233,9 +258,7 @@ export default function NewGameReview() {
         {`${firstName} ${lastName} the `}
         <Text
           style={{ color: elementalColorMap[blessing as Element].dark }}
-        >{`${
-          blessing == "beastMastery" ? "Beast Mastery" : toTitleCase(blessing)
-        }`}</Text>
+        >{`${ElementToString[blessing]}`}</Text>
         -born{" "}
         <Text style={{ color: playerClassColors[playerClass] }}>{`${toTitleCase(
           playerClass,

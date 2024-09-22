@@ -1,6 +1,6 @@
-import { Element } from "./types";
+import { Element, PlayerClassOptions } from "./types";
 
-export const descriptionMap: Record<Element, string> = {
+export const DescriptionMap: Record<Element, string> = {
   [Element.fire]:
     "The School of Fire has its focus in all out damage, fire spells hit hard, and can leave enemies burnt.",
   [Element.water]:
@@ -27,5 +27,15 @@ export const descriptionMap: Record<Element, string> = {
   [Element.assassination]:
     "The School of Assassination focuses of killing before being seen.",
   [Element.arcane]:
-    "The Schoold of Arcane modifies archery with pure arcane magic.",
+    "The School of Arcane modifies archery with pure arcane magic.",
+};
+
+export const ClassDescriptionMap: Record<PlayerClassOptions, string> = {
+  mage: "The Mage is the default class, it is well balanced, with a focus on casting elemental magic",
+  paladin:
+    "The Paladin is skilled with arms and uses holy magic, which is especially powerful against the undead and protecting life.",
+  necromancer:
+    "The Necromancer controls the forces of death, they can summon minions, use blood, bone and poisonous magics.",
+  ranger:
+    "The Ranger has extreme versatility, a master at archery, assassination and commanding beasts",
 };

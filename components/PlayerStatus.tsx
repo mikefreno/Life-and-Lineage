@@ -30,6 +30,7 @@ import {
   SquarePlus,
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
+import { Attribute, AttributeToString } from "../utility/types";
 
 interface PlayerStatus {
   hideGold?: boolean;
@@ -389,7 +390,7 @@ const PlayerStatus = observer(
     function RenderPrimaryStatsBlock({
       stat,
     }: {
-      stat: "health" | "mana" | "sanity";
+      stat: Attribute.health | Attribute.mana | Attribute.sanity;
     }) {
       if (playerState) {
         let current;
@@ -398,19 +399,19 @@ const PlayerStatus = observer(
         let filledColor;
         let unfilledColor;
         switch (stat) {
-          case "health":
+          case Attribute.health:
             current = playerState.currentHealth;
             max = playerState.maxHealth;
             filledColor = "#ef4444";
             unfilledColor = "#fca5a5";
             break;
-          case "mana":
+          case Attribute.mana:
             current = playerState.currentMana;
             max = playerState.maxMana;
             filledColor = "#60a5fa";
             unfilledColor = "#bfdbfe";
             break;
-          case "sanity":
+          case Attribute.sanity:
             current = playerState.currentSanity;
             max = playerState.maxSanity;
             min = -playerState.maxSanity;
@@ -418,10 +419,11 @@ const PlayerStatus = observer(
             unfilledColor = "#e9d5ff";
             break;
         }
+
         return (
           <View className="items-center">
             <Text className="py-1" style={{ color: filledColor }}>
-              {toTitleCase(stat)}
+              {AttributeToString[stat]}
             </Text>
             <View className="flex w-full flex-row items-center">
               <View className="flex-1">
@@ -449,7 +451,7 @@ const PlayerStatus = observer(
                   )}
                 </Pressable>
               )}
-              {playerState.allocatedSkillPoints.sanity > 0 && respeccing && (
+              {playerState.allocatedSkillPoints[stat] > 0 && respeccing && (
                 <Pressable
                   className="px-0.5"
                   onPress={() => {
@@ -473,23 +475,23 @@ const PlayerStatus = observer(
     function RenderSecondaryStatsBlock({
       stat,
     }: {
-      stat: "strength" | "dexterity" | "intelligence";
+      stat: Attribute.strength | Attribute.dexterity | Attribute.intelligence;
     }) {
       if (playerState) {
         return (
           <View className="flex items-center">
-            <Text className="py-1">{toTitleCase(stat)}</Text>
+            <Text className="py-1">{AttributeToString[stat]}</Text>
             <View className="flex flex-row items-center">
               <Text>
-                {stat == "strength"
+                {stat == Attribute.strength
                   ? playerState.totalStrength
-                  : stat == "dexterity"
+                  : stat == Attribute.dexterity
                   ? playerState.totalDexterity
                   : playerState.totalIntelligence}
               </Text>
-              {stat == "strength" ? (
+              {stat == Attribute.strength ? (
                 <StrengthIcon height={20} width={23} />
-              ) : stat == "dexterity" ? (
+              ) : stat == Attribute.dexterity ? (
                 <DexterityIcon height={20} width={23} />
               ) : (
                 <IntelligenceIcon height={20} width={23} />
@@ -516,7 +518,7 @@ const PlayerStatus = observer(
                     onPress={() => {
                       vibration({ style: "light" });
                       playerState.removeSkillPoint({
-                        from: "strength",
+                        from: stat,
                       });
                     }}
                   >
@@ -672,13 +674,13 @@ const PlayerStatus = observer(
                   </Pressable>
                 </View>
               )}
-              <RenderPrimaryStatsBlock stat={"health"} />
-              <RenderPrimaryStatsBlock stat={"mana"} />
-              <RenderPrimaryStatsBlock stat={"sanity"} />
+              <RenderPrimaryStatsBlock stat={Attribute.health} />
+              <RenderPrimaryStatsBlock stat={Attribute.mana} />
+              <RenderPrimaryStatsBlock stat={Attribute.sanity} />
               <View className="flex flex-row justify-evenly">
-                <RenderSecondaryStatsBlock stat={"strength"} />
-                <RenderSecondaryStatsBlock stat={"dexterity"} />
-                <RenderSecondaryStatsBlock stat={"intelligence"} />
+                <RenderSecondaryStatsBlock stat={Attribute.strength} />
+                <RenderSecondaryStatsBlock stat={Attribute.dexterity} />
+                <RenderSecondaryStatsBlock stat={Attribute.intelligence} />
               </View>
               {(playerState.equipmentStats.armor > 0 ||
                 playerState.equipmentStats.damage > 0 ||
@@ -745,7 +747,10 @@ const PlayerStatus = observer(
             </View>
           </GenericModal>
           <Pressable
-            onPress={() => setShowDetailedStatusView(true)}
+            onPress={() => {
+              vibration({ style: "light" });
+              setShowDetailedStatusView(true);
+            }}
             className={filled}
           >
             {colorAndPlatformDependantBlur(

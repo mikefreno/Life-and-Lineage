@@ -8,27 +8,28 @@ import {
   AttackUse,
   type AppContextType,
   type DungeonContextType,
+  TutorialOption,
 } from "../../utility/types";
 import { Item } from "../../classes/item";
 import { Spell } from "../../classes/spell";
 import { Attack } from "../../classes/attack";
 
-interface addItemToPouch {
-  item: Item;
+interface AddItemToPouch {
+  items: Item[];
   dungeonData: DungeonContextType | undefined;
 }
-export function addItemToPouch({ item, dungeonData }: addItemToPouch) {
+export function addItemToPouch({ items, dungeonData }: AddItemToPouch) {
   if (!dungeonData) throw new Error("missing context in addItemToPouch()");
   const { setLeftBehindDrops } = dungeonData;
-  setLeftBehindDrops((prev) => [...prev, item]);
+  setLeftBehindDrops((prev) => [...prev, ...items]);
 }
 
-export interface contextData {
+export interface ContextData {
   dungeonData: DungeonContextType | undefined;
   appData: AppContextType | undefined;
 }
 
-export function enemyTurnCheck({ dungeonData, appData }: contextData) {
+export function enemyTurnCheck({ dungeonData, appData }: ContextData) {
   if (!appData || !dungeonData)
     throw new Error("missing context in enemyTurnCheck()");
   const { enemyState, playerState, setEnemy, gameState } = appData;
@@ -88,7 +89,7 @@ export function enemyTurnCheck({ dungeonData, appData }: contextData) {
             thisDungeon.setBossDefeated();
             gameState.openNextDungeonLevel(thisInstance!.name);
             playerState.bossDefeated();
-            if (!gameState.tutorialsShown["firstBossKill"]) {
+            if (!gameState.tutorialsShown[TutorialOption.firstBossKill]) {
               setShouldShowFirstBossKillTutorialAfterItemDrops(true);
             }
           }
@@ -104,7 +105,7 @@ export function enemyTurnCheck({ dungeonData, appData }: contextData) {
   }
 }
 
-export const enemyTurn = ({ appData, dungeonData }: contextData) => {
+export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
   if (!appData || !dungeonData)
     throw new Error("missing context in enemyTurnCheck()");
   const { enemyState, playerState, setEnemy, gameState } = appData;
@@ -266,7 +267,7 @@ function enemyMinionsTurn(
   }
 }
 
-export function getEnemy({ appData, dungeonData }: contextData) {
+export function getEnemy({ appData, dungeonData }: ContextData) {
   if (!appData || !dungeonData)
     throw new Error("missing context in getEnemy()");
   const { setEnemy } = appData;
@@ -287,7 +288,7 @@ export function getEnemy({ appData, dungeonData }: contextData) {
   }
 }
 
-export const loadBoss = ({ appData, dungeonData }: contextData) => {
+export const loadBoss = ({ appData, dungeonData }: ContextData) => {
   if (!appData || !dungeonData)
     throw new Error("missing context in loadBoss()");
   const {
@@ -385,7 +386,7 @@ export const pass = ({
   }
 };
 
-export function playerMinionsTurn({ dungeonData, appData }: contextData) {
+export function playerMinionsTurn({ dungeonData, appData }: ContextData) {
   if (!appData || !dungeonData)
     throw new Error("missing context in playerMinionsTurn()");
   const { battleLogger } = dungeonData;

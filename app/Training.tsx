@@ -50,7 +50,7 @@ const JobTraining = observer(() => {
       />
       <TutorialModal
         isVisibleCondition={
-          (gameState?.tutorialsShown.training &&
+          (gameState?.tutorialsShown[TutorialOption.training] &&
             gameState?.tutorialsEnabled &&
             isFocused) ??
           false

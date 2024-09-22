@@ -17,7 +17,7 @@ import {
   IntelligenceIcon,
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
-import { ItemClassType } from "../utility/types";
+import { Attribute, ItemClassType } from "../utility/types";
 
 type BaseProps = {
   displayItem: {
@@ -35,7 +35,7 @@ type BaseProps = {
 };
 
 type DungeonProps = BaseProps & {
-  addItemToPouch: (item: Item) => void;
+  addItemToPouch: (items: Item[]) => void;
 };
 
 type ShopProps = BaseProps & {
@@ -83,17 +83,18 @@ export function StatsDisplay({
       const playerMeetsStrength =
         reqs.strength &&
         reqs.strength <=
-          playerState.baseStrength + playerState.allocatedSkillPoints.strength;
+          playerState.baseStrength +
+            playerState.allocatedSkillPoints[Attribute.strength];
       const playerMeetsIntelligence =
         reqs.intelligence &&
         reqs.intelligence <=
           playerState.baseIntelligence +
-            playerState.allocatedSkillPoints.intelligence;
+            playerState.allocatedSkillPoints[Attribute.intelligence];
       const playerMeetsDexterity =
         reqs.dexterity &&
         reqs.dexterity <=
           playerState.baseDexterity +
-            playerState.allocatedSkillPoints.dexterity;
+            playerState.allocatedSkillPoints[Attribute.dexterity];
       if (item.playerHasRequirements(playerState)) return null;
       return (
         <View className="flex items-center p-1 rounded-lg border border-red-700">
@@ -273,7 +274,7 @@ export function StatsDisplay({
           <View className="pt-1">
             <GenericFlatButton
               onPressFunction={() => {
-                props.addItemToPouch(displayItem.item[0]);
+                props.addItemToPouch(displayItem.item);
                 clearItem();
                 playerState?.removeFromInventory(displayItem.item[0]);
               }}
@@ -284,10 +285,8 @@ export function StatsDisplay({
               <GenericFlatButton
                 className="pt-1"
                 onPressFunction={() => {
-                  displayItem.item.forEach((item) => {
-                    props.addItemToPouch(item);
-                    playerState?.removeFromInventory(item);
-                  });
+                  props.addItemToPouch(displayItem.item);
+                  playerState?.removeFromInventory(displayItem.item);
                   clearItem();
                 }}
               >

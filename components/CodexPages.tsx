@@ -2,6 +2,9 @@ import { ScrollView, View } from "react-native";
 import { Text } from "./Themed";
 import {
   Air,
+  ArcaneIcon,
+  AssassinationIcon,
+  BeastMasteryIcon,
   BloodDrop,
   Bones,
   Earth,
@@ -11,6 +14,7 @@ import {
   PaladinHammer,
   Pestilence,
   Protection,
+  RangerIcon,
   SummonerSkull,
   Vengeance,
   Water,
@@ -90,7 +94,7 @@ export function PlayerCodex() {
       <View className="p-4">
         <View>
           <Text className="text-xl text-center">
-            The player(you) has 3 potential classes:{"\n"}
+            The player(you) has 4 potential classes:{"\n"}
           </Text>
           <View className="mx-auto">
             <Link href="/Options/Codex/Player/Mage" suppressHighlighting>
@@ -128,6 +132,13 @@ export function PlayerCodex() {
             <Link href="/Options/Codex/Player/Paladin" suppressHighlighting>
               <Text style={{ color: "#fcd34d" }} className="text-xl underline">
                 The Paladin <PaladinHammer height={24} width={24} />
+              </Text>
+            </Link>
+          </View>
+          <View className="mx-auto">
+            <Link href="/Options/Codex/Player/Ranger" suppressHighlighting>
+              <Text style={{ color: "#4ade80" }} className="text-xl underline">
+                The Ranger <RangerIcon height={24} width={24} />
               </Text>
             </Link>
           </View>
@@ -247,7 +258,41 @@ export function PlayerCodex() {
             </Link>
           </View>
         </View>
-        <View></View>
+        <View className="py-2 my-2 border border-green-500 bg-green-100 dark:bg-green-950">
+          <Link
+            className="mx-auto"
+            href="/Options/Codex/Player/Ranger"
+            suppressHighlighting
+          >
+            <View className="flex items-center">
+              <RangerIcon width={64} height={64} />
+              <Text style={{ color: "#4ade80" }}>Ranger</Text>
+            </View>
+          </Link>
+          <View className="flex flex-row justify-evenly py-2">
+            <Link
+              href="/Options/Codex/Player/BeastMastery"
+              suppressHighlighting
+            >
+              <BeastMasteryIcon height={48} width={48} />
+            </Link>
+            <Link href="/Options/Codex/Player/Arcane" suppressHighlighting>
+              <ArcaneIcon height={48} width={48} />
+            </Link>
+          </View>
+          <View className="flex flex-row justify-evenly py-2">
+            <Link
+              href="/Options/Codex/Player/Assassination"
+              suppressHighlighting
+            >
+              <AssassinationIcon
+                height={48}
+                width={48}
+                color={colorScheme == "dark" ? "#f4f4f5" : "#1e293b"}
+              />
+            </Link>
+          </View>
+        </View>
       </View>
     </ScrollView>
   );

@@ -258,7 +258,9 @@ export const AppSettings = observer(() => {
               <View className="flex flex-row justify-evenly w-full">
                 <GenericFlatButton
                   onPressFunction={toggleRemoteSaveWindow}
-                  disabledCondition={loadingDBInfo}
+                  disabledCondition={
+                    loadingDBInfo || !user.isConnectedAndInitialized
+                  }
                 >
                   {loadingDBInfo ? (
                     <D20DieAnimation size={20} keepRolling />
@@ -268,7 +270,9 @@ export const AppSettings = observer(() => {
                 </GenericFlatButton>
                 <GenericFlatButton
                   onPressFunction={toggleRemoteLoadWindow}
-                  disabledCondition={loadingDBInfo}
+                  disabledCondition={
+                    loadingDBInfo || !user.isConnectedAndInitialized
+                  }
                 >
                   {loadingDBInfo ? (
                     <D20DieAnimation size={20} keepRolling />
@@ -282,20 +286,29 @@ export const AppSettings = observer(() => {
               </GenericRaisedButton>
             </>
           ) : (
-            <View className="flex flex-row justify-evenly w-full">
-              <GenericRaisedButton
-                onPressFunction={() => router.push("/Auth/sign-in")}
-              >
-                Sign In
-              </GenericRaisedButton>
-              <GenericRaisedButton
-                onPressFunction={() => router.push("/Auth/sign-up")}
-                backgroundColor={"#2563eb"}
-                textColor={"#fafafa"}
-              >
-                Sign Up
-              </GenericRaisedButton>
-            </View>
+            <>
+              {!user.isConnectedAndInitialized && (
+                <Text className="text-center italic text-sm">
+                  You are not connected to the internet
+                </Text>
+              )}
+              <View className="flex flex-row justify-evenly w-full">
+                <GenericRaisedButton
+                  onPressFunction={() => router.push("/Auth/sign-in")}
+                  disabledCondition={!user.isConnectedAndInitialized}
+                >
+                  Sign In
+                </GenericRaisedButton>
+                <GenericRaisedButton
+                  onPressFunction={() => router.push("/Auth/sign-up")}
+                  backgroundColor={"#2563eb"}
+                  textColor={"#fafafa"}
+                  disabledCondition={!user.isConnectedAndInitialized}
+                >
+                  Sign Up
+                </GenericRaisedButton>
+              </View>
+            </>
           )}
           <GenericStrikeAround>Select Color Theme</GenericStrikeAround>
           <View

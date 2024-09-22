@@ -14,8 +14,9 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { AppContext } from "../_layout";
 import { TutorialOption } from "../../utility/types";
 import { fullSave } from "../../utility/functions/save_load";
+import { observer } from "mobx-react-lite";
 
-const EarnScreen = () => {
+const EarnScreen = observer(() => {
   const appData = useContext(AppContext);
   if (!appData) {
     throw new Error("missing context");
@@ -46,7 +47,7 @@ const EarnScreen = () => {
     <>
       <TutorialModal
         isVisibleCondition={
-          (!gameState?.tutorialsShown.labor &&
+          (!gameState?.tutorialsShown[TutorialOption.labor] &&
             gameState?.tutorialsEnabled &&
             isFocused) ??
           false
@@ -141,5 +142,5 @@ const EarnScreen = () => {
       </View>
     </>
   );
-};
+});
 export default EarnScreen;

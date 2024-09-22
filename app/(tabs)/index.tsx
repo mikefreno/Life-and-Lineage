@@ -56,7 +56,7 @@ const HomeScreen = observer(() => {
       <>
         <TutorialModal
           isVisibleCondition={
-            !gameState.tutorialsShown.intro &&
+            !gameState.tutorialsShown[TutorialOption.intro] &&
             gameState.tutorialsEnabled &&
             isFocused
           }

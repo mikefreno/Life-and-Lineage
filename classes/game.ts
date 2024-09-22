@@ -83,20 +83,20 @@ export class Game {
     this.vibrationEnabled = vibrationEnabled;
     this.healthWarning = healthWarning ?? 0.2;
     this.tutorialsShown = tutorialsShown ?? {
-      class: true,
-      aging: true,
-      blessing: true,
-      intro: false,
-      spell: false,
-      labor: false,
-      dungeon: false,
-      dungeonInterior: false,
-      shops: false,
-      shopInterior: false,
-      medical: false,
-      investing: false,
-      training: false,
-      firstBossKill: false,
+      [TutorialOption.class]: true,
+      [TutorialOption.aging]: true,
+      [TutorialOption.blessing]: true,
+      [TutorialOption.intro]: false,
+      [TutorialOption.spell]: false,
+      [TutorialOption.labor]: false,
+      [TutorialOption.dungeon]: false,
+      [TutorialOption.dungeonInterior]: false,
+      [TutorialOption.shops]: false,
+      [TutorialOption.shopInterior]: false,
+      [TutorialOption.medical]: false,
+      [TutorialOption.investing]: false,
+      [TutorialOption.training]: false,
+      [TutorialOption.firstBossKill]: false,
     };
     this.tutorialsEnabled = tutorialsEnabled ?? true;
 
@@ -246,25 +246,26 @@ export class Game {
   }
 
   public updateTutorialState(tutorial: TutorialOption, state: boolean) {
+    console.log(`Setting ${tutorial} at ${state}`);
     this.tutorialsShown[tutorial] = state;
   }
 
   public resetTutorialState() {
     const defaultState = {
-      class: false,
-      aging: false,
-      blessing: false,
-      intro: false,
-      spell: false,
-      labor: false,
-      dungeon: false,
-      dungeonInterior: false,
-      shops: false,
-      shopInterior: false,
-      medical: false,
-      investing: false,
-      training: false,
-      firstBossKill: false,
+      [TutorialOption.class]: false,
+      [TutorialOption.aging]: false,
+      [TutorialOption.blessing]: false,
+      [TutorialOption.intro]: false,
+      [TutorialOption.spell]: false,
+      [TutorialOption.labor]: false,
+      [TutorialOption.dungeon]: false,
+      [TutorialOption.dungeonInterior]: false,
+      [TutorialOption.shops]: false,
+      [TutorialOption.shopInterior]: false,
+      [TutorialOption.medical]: false,
+      [TutorialOption.investing]: false,
+      [TutorialOption.training]: false,
+      [TutorialOption.firstBossKill]: false,
     };
     this.tutorialsShown = defaultState;
     this.enableTutorials();

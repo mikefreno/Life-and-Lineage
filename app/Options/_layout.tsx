@@ -1,9 +1,34 @@
 import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { type GestureResponderEvent, Pressable, View } from "react-native";
+import { useVibration } from "../../utility/customHooks";
 
 export default function OptionsLayout() {
+  const vibration = useVibration();
   return (
-    <Tabs screenOptions={{ tabBarStyle: { height: 64, paddingBottom: 16 } }}>
+    <Tabs
+      screenOptions={{
+        tabBarStyle: { height: 64, paddingBottom: 16 },
+        tabBarButton: (props) => {
+          const onPressWithVibration = (event: GestureResponderEvent) => {
+            vibration({ style: "light" });
+            if (props.onPress) props.onPress(event);
+          };
+          return (
+            <View className="flex flex-col w-1/3">
+              <Pressable
+                onPress={onPressWithVibration}
+                style={{
+                  height: 44,
+                }}
+              >
+                {props.children}
+              </Pressable>
+            </View>
+          );
+        },
+      }}
+    >
       <Tabs.Screen
         name="app"
         options={{

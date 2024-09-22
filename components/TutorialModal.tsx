@@ -76,12 +76,16 @@ export default function TutorialModal({
       setTutorialStep(3);
       tutorialStepRef.current = 3;
     } else {
-      vibration({ style: "light" });
-      if (onCloseFunction) {
-        onCloseFunction();
-      }
-      gameState?.updateTutorialState(tutorial, true);
+      closeTutorial();
     }
+  };
+
+  const closeTutorial = () => {
+    vibration({ style: "light" });
+    if (onCloseFunction) {
+      onCloseFunction();
+    }
+    gameState?.updateTutorialState(tutorial, true);
   };
 
   return (

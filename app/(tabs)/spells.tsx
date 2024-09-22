@@ -10,12 +10,14 @@ import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
-import { toTitleCase } from "../../utility/functions/misc";
-import { Element, MasteryLevel, TutorialOption } from "../../utility/types";
 import {
-  convertMasteryToNumber,
-  convertMasteryToString,
-} from "../../utility/spellHelper";
+  Element,
+  ElementToString,
+  MasteryLevel,
+  MasteryToBarrier,
+  MasteryToString,
+  TutorialOption,
+} from "../../utility/types";
 import { AppContext } from "../_layout";
 import { elementalColorMap } from "../../constants/Colors";
 
@@ -36,7 +38,7 @@ const SpellsScreen = observer(() => {
         }[]
       | undefined,
   ) {
-    if (!proficiencies) return;
+    if (!proficiencies || !playerState) return;
     return (
       <ScrollView
         className="w-full"
@@ -44,39 +46,35 @@ const SpellsScreen = observer(() => {
       >
         {proficiencies.map((magicProficiency, idx) => {
           const color = elementalColorMap[magicProficiency.school];
+          const currentMastery = playerState?.currentMasteryLevel(
+            magicProficiency.school,
+          );
+          const currentMasteryBarrier = MasteryToBarrier[currentMastery];
+          const nextMasteryBarrier =
+            MasteryToBarrier[(currentMastery + 1) as MasteryLevel];
           return (
             <View className="my-4 px-8 flex w-full flex-col" key={idx}>
               <Text
                 style={{
                   color:
-                    magicProficiency.school == "air" && colorScheme == "light"
+                    magicProficiency.school == Element.air &&
+                    colorScheme == "light"
                       ? "#71717a"
+                      : magicProficiency.school == Element.assassination
+                      ? colorScheme == "dark"
+                        ? color.light
+                        : color.dark
                       : color.dark,
                 }}
               >
-                {`${toTitleCase(magicProficiency.school)} (${toTitleCase(
-                  playerState?.currentMasteryLevel(
-                    magicProficiency.school,
-                    true,
-                  ) as string,
-                )})`}
+                {`${ElementToString[magicProficiency.school]} (${
+                  MasteryToString[currentMastery]
+                })`}
               </Text>
               <ProgressBar
                 value={magicProficiency.proficiency}
-                minValue={
-                  convertMasteryToNumber[
-                    playerState?.currentMasteryLevel(
-                      magicProficiency.school,
-                    ) as MasteryLevel
-                  ]
-                }
-                maxValue={
-                  convertMasteryToNumber[
-                    ((playerState?.currentMasteryLevel(
-                      magicProficiency.school,
-                    ) as MasteryLevel) + 1) as MasteryLevel
-                  ]
-                }
+                minValue={currentMasteryBarrier}
+                maxValue={nextMasteryBarrier}
                 unfilledColor={color.light}
                 filledColor={color.dark}
                 borderColor={color.dark}
@@ -85,19 +83,18 @@ const SpellsScreen = observer(() => {
                 className="mx-auto text-sm"
                 style={{
                   color:
-                    magicProficiency.school == "air" && colorScheme == "light"
+                    magicProficiency.school == Element.air &&
+                    colorScheme == "light"
                       ? "#71717a"
+                      : magicProficiency.school == Element.assassination
+                      ? colorScheme == "dark"
+                        ? color.light
+                        : color.dark
                       : color.dark,
                 }}
               >
                 Progression to{" "}
-                {
-                  convertMasteryToString[
-                    ((playerState?.currentMasteryLevel(
-                      magicProficiency.school,
-                    ) as MasteryLevel) + 1) as MasteryLevel
-                  ]
-                }
+                {MasteryToString[(currentMastery + 1) as MasteryLevel]}
               </Text>
             </View>
           );
@@ -110,7 +107,7 @@ const SpellsScreen = observer(() => {
     <>
       <TutorialModal
         isVisibleCondition={
-          (!gameState?.tutorialsShown.spell &&
+          (!gameState?.tutorialsShown[TutorialOption.spell] &&
             gameState?.tutorialsEnabled &&
             isFocused) ??
           false

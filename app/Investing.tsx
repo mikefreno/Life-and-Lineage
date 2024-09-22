@@ -50,7 +50,7 @@ const InvestingScreen = observer(() => {
       />
       <TutorialModal
         isVisibleCondition={
-          (!gameState?.tutorialsShown.investing &&
+          (!gameState?.tutorialsShown[TutorialOption.investing] &&
             gameState?.tutorialsEnabled &&
             isFocused) ??
           false

@@ -45,7 +45,7 @@ export default function SetSex() {
     !gameState
       ? loadStoredTutorialState()
       : gameState &&
-        !gameState.tutorialsShown.aging &&
+        !gameState.tutorialsShown[TutorialOption.aging] &&
         gameState.tutorialsEnabled
       ? true
       : false,

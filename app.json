@@ -43,7 +43,6 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "./androidStylesPlugin.js",
       "expo-router",
       "expo-apple-authentication",
       "expo-font",

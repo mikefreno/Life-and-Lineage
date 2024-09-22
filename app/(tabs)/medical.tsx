@@ -13,8 +13,9 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import { TutorialOption } from "../../utility/types";
+import { observer } from "mobx-react-lite";
 
-const MedicalScreen = () => {
+const MedicalScreen = observer(() => {
   const appData = useContext(AppContext);
   if (!appData) {
     throw new Error("Missing Context");
@@ -26,7 +27,7 @@ const MedicalScreen = () => {
     <>
       <TutorialModal
         isVisibleCondition={
-          (!gameState?.tutorialsShown.medical &&
+          (!gameState?.tutorialsShown[TutorialOption.medical] &&
             gameState?.tutorialsEnabled &&
             isFocused) ??
           false
@@ -101,5 +102,5 @@ const MedicalScreen = () => {
       </ThemedView>
     </>
   );
-};
+});
 export default MedicalScreen;

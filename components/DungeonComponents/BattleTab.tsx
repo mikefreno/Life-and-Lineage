@@ -327,8 +327,8 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                   setDisplayItem={setDisplayItem}
                   inventory={playerState.getInventory()}
                   pouchTarget={pouchRef}
-                  addItemToPouch={(item) =>
-                    addItemToPouch({ item, dungeonData })
+                  addItemToPouch={(items) =>
+                    addItemToPouch({ items, dungeonData })
                   }
                 />
               </PlatformDependantBlurView>

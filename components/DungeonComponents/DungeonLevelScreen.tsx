@@ -110,7 +110,7 @@ const DungeonLevelScreen = observer(() => {
         />
         <TutorialModal
           isVisibleCondition={
-            gameState.tutorialsShown.dungeonInterior &&
+            gameState.tutorialsShown[TutorialOption.dungeonInterior] &&
             gameState.tutorialsEnabled
           }
           tutorial={TutorialOption.dungeonInterior}
@@ -207,7 +207,9 @@ const DungeonLevelScreen = observer(() => {
               <StatsDisplay
                 displayItem={displayItem}
                 clearItem={() => setDisplayItem(null)}
-                addItemToPouch={(item) => addItemToPouch({ item, dungeonData })}
+                addItemToPouch={(items) =>
+                  addItemToPouch({ items, dungeonData })
+                }
                 topOffset={-96}
               />
             </View>
