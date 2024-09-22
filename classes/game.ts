@@ -246,7 +246,6 @@ export class Game {
   }
 
   public updateTutorialState(tutorial: TutorialOption, state: boolean) {
-    console.log(`Setting ${tutorial} at ${state}`);
     this.tutorialsShown[tutorial] = state;
   }
 
