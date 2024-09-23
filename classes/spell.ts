@@ -224,11 +224,9 @@ export class Spell {
     minionSpecies,
   }: LogProps): string {
     const userString = "You";
-    const targetString = `the ${targetName}`;
+    const targetString = `the ${toTitleCase(targetName)}`;
 
-    let returnString = `${userString} used ${toTitleCase(
-      this.name,
-    )} on ${targetString}.\n`;
+    let returnString = `${userString} used ${toTitleCase(this.name)}.\n`;
 
     // Health damage
     if (healthDamage > 0) {
@@ -254,8 +252,8 @@ export class Spell {
 
     // Summons
     if (minionSpecies.length > 0) {
-      returnString += `  • ${userString} summoned: ${minionSpecies.join(
-        ", ",
+      returnString += `  • ${userString} summoned: ${toTitleCase(
+        minionSpecies.join(", "),
       )}.\n`;
     }
 

@@ -9,12 +9,15 @@ import { fullSave } from "../../utility/functions/save_load";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../app/_layout";
 import { DungeonContext } from "./DungeonContext";
-import { type contextData, enemyTurnCheck } from "./DungeonInteriorFunctions";
+import { type ContextData, enemyTurnCheck } from "./DungeonInteriorFunctions";
 
 interface FleeModalProps {
   fleeModalShowing: boolean;
   setFleeModalShowing: React.Dispatch<React.SetStateAction<boolean>>;
-  playerMinionsTurn: ({ dungeonData, appData }: contextData) => void;
+  playerMinionsTurn: (
+    { dungeonData, appData }: ContextData,
+    callback: () => void,
+  ) => void;
 }
 export default function FleeModal({
   fleeModalShowing,
@@ -29,6 +32,7 @@ export default function FleeModal({
   const {
     slug,
     enemyAttacked,
+    setAttackAnimationOnGoing,
     attackAnimationOnGoing,
     battleLogger,
     inCombat,
@@ -42,6 +46,7 @@ export default function FleeModal({
 
   const flee = () => {
     if (playerState && gameState) {
+      setAttackAnimationOnGoing(true);
       const roll = rollD20();
       if (
         enemyState?.creatureSpecies == "training dummy" ||
@@ -52,6 +57,7 @@ export default function FleeModal({
         vibration({ style: "light" });
         setFleeRollFailure(false);
         setFleeModalShowing(false);
+        setAttackAnimationOnGoing(false);
         setTimeout(() => {
           playerState.clearMinions();
           while (router.canGoBack()) {
@@ -73,10 +79,10 @@ export default function FleeModal({
         setFleeRollFailure(true);
         vibration({ style: "error" });
         battleLogger("You failed to flee!");
-        playerMinionsTurn({ appData, dungeonData });
-        setTimeout(() => {
+
+        playerMinionsTurn({ appData, dungeonData }, () => {
           enemyTurnCheck({ appData, dungeonData });
-        }, 1000 * playerState.minions.length);
+        });
       }
     }
   };

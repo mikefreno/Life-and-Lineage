@@ -659,7 +659,7 @@ export class Minion extends Creature {
    * The number of turns left before the minion is destroyed.
    */
   turnsLeftAlive: number;
-  private parent: Enemy | PlayerCharacter;
+  private parent: Enemy | PlayerCharacter | null;
 
   constructor({
     id,
@@ -734,6 +734,12 @@ export class Minion extends Creature {
     } else {
       throw new Error("Minion not properly removed!");
     }
+  }
+  public stripParent() {
+    this.parent = null;
+  }
+  public reinstateParent(parent: PlayerCharacter | Enemy) {
+    this.parent = parent;
   }
 
   /**

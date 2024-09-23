@@ -12,6 +12,10 @@ const _fullSave = async (
   if (game && player) {
     try {
       storage.set("game", JSON.stringify(game));
+      player.minionsAndPets.forEach((minion) => minion.stripParent());
+      player.currentDungeon?.enemy?.minions.map((minion) =>
+        minion.stripParent(),
+      );
       storage.set("player", JSON.stringify(player));
     } catch (e) {
       console.log("Error in fullSave:", e);
@@ -28,14 +32,13 @@ export const fullLoad = async () => {
   try {
     const retrieved_game = storage.getString("game");
     const retrieved_player = storage.getString("player");
-    let game;
-    let player;
-    if (retrieved_game) {
-      game = Game.fromJSON(JSON.parse(retrieved_game));
-    }
-    if (retrieved_player) {
-      player = PlayerCharacter.fromJSON(JSON.parse(retrieved_player));
-    }
+    if (!retrieved_game || !retrieved_player) return;
+    let game = Game.fromJSON(JSON.parse(retrieved_game));
+    let player = PlayerCharacter.fromJSON(JSON.parse(retrieved_player));
+    player.minionsAndPets.forEach((minion) => minion.reinstateParent(player));
+    player.currentDungeon?.enemy?.minions.map((minion) =>
+      minion.reinstateParent(player.currentDungeon?.enemy),
+    );
     return { player, game };
   } catch (e) {
     console.log("Error in fullLoad:", e);

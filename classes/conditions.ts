@@ -110,6 +110,113 @@ export class Condition {
     return { turns: this.turns, effect: this.effect };
   }
 
+  static effectExplanationString({
+    effect,
+    effectStyle,
+    effectMagnitude,
+    trapSetupTime,
+  }: {
+    effect: EffectOptions;
+    effectStyle: EffectStyle;
+    effectMagnitude: number;
+    trapSetupTime: number | undefined;
+  }) {
+    switch (effect) {
+      case "stun":
+        return "Stunned";
+      case "silenced":
+        return "Silenced";
+      case "accuracy reduction":
+        return `Accuracy reduced by ${
+          effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
+        }${effectStyle == "percentage" && "%"}`;
+      case "accuracy increase":
+        return `Accuracy increased by ${
+          effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
+        }${effectStyle == "percentage" && "%"}`;
+      case "sanity heal":
+        return "";
+      case "sanity damage":
+        return "";
+      case "sanityMax increase":
+        return `Increase max sanity by ${
+          effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
+        }${effectStyle == "percentage" && "%"}`;
+      case "sanityMax decrease":
+        return `Decrease max sanity by ${
+          effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
+        }${effectStyle == "percentage" && "%"}`;
+      case "heal":
+        return "";
+      case "health damage":
+        return "";
+      case "healthMax increase":
+        return `Increases max health by ${
+          effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
+        }${effectStyle == "percentage" && "%"}`;
+      case "healthMax decrease":
+        return `Decreases max health by ${
+          effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
+        }${effectStyle == "percentage" && "%"}`;
+      case "mana regen":
+        return `Increases mana regen by ${
+          effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
+        }${effectStyle == "percentage" && "%"} each turn`;
+      case "mana drain":
+        return `Drains mana by ${
+          effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
+        }${effectStyle == "percentage" && "%"} each turn`;
+      case "manaMax increase":
+        return `Increase max mana by ${
+          effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
+        }${effectStyle == "percentage" && "%"}`;
+      case "manaMax decrease":
+        return `Decrease max mana by ${
+          effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
+        }${effectStyle == "percentage" && "%"}`;
+      case "armor increase":
+        return `Increase armor by ${
+          effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
+        }${effectStyle == "percentage" && "%"}`;
+      case "armor decrease":
+        return `Decreases armor by ${
+          effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
+        }${effectStyle == "percentage" && "%"}`;
+      case "weaken":
+        return `Decreases attack damage by ${
+          effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
+        }${effectStyle == "percentage" && "%"}`;
+      case "strengthen":
+        return `Increases attack damage by ${
+          effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
+        }${effectStyle == "percentage" && "%"}`;
+      case "destroy undead":
+        return `Destroy undead under ${effectMagnitude} health (accumulates)`;
+      case "undead cower":
+        return "Stunned";
+      case "blur":
+        return `Increased dodge chance by ${
+          effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
+        }${effectStyle == "percentage" && "%"}`;
+      case "thorns":
+        return `Damages attacker for ${effectMagnitude} health damage`;
+      case "trap":
+        if (trapSetupTime && trapSetupTime > 0) {
+          return `Setting up for ${trapSetupTime} more turns`;
+        } else {
+          return `Hits next attacker for ${effectMagnitude} health damage`;
+        }
+      case "revenge":
+        return "Will strike next attacker";
+      case "blood magic consumable":
+        return "Empowers ";
+      case "execute":
+        return "Will die at end of next turn";
+      case "stealth":
+        return "Prevents detection, allows for certain attacks to be performed";
+    }
+  }
+
   /**
    * Removes the trap - to be used when the holder(defender) is first attacked
    */

@@ -24,13 +24,16 @@ import {
   ClockIcon,
   Coins,
   DexterityIcon,
+  HealthIcon,
   IntelligenceIcon,
   RotateArrow,
+  Sanity,
   SquareMinus,
   SquarePlus,
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
 import { Attribute, AttributeToString } from "../utility/types";
+import { Condition } from "../classes/conditions";
 
 interface PlayerStatus {
   hideGold?: boolean;
@@ -308,42 +311,57 @@ const PlayerStatus = observer(
     }
 
     function detailedViewConditionRender() {
-      const effectListTypes = [
-        "accuracy reduction",
-        "accuracy increase",
-        "sanityMax increase",
-        "sanityMax decrease",
-        "healthMax increase",
-        "healthMax decrease",
-        "manaMax increase",
-        "manaMax decrease",
-        "armor increase",
-        "armor decrease",
-        "weaken",
-        "strengthen",
-      ];
       if (playerState) {
         return (
-          <View className="max-h-52">
+          <View className="max-h-64">
             <ScrollView>
               {playerState.conditions.map((condition) => (
                 <View
                   key={condition.id}
-                  className="my-1 rounded-lg bg-zinc-200 px-4 py-2 dark:bg-zinc-600"
+                  className="my-1 border rounded-lg bg-zinc-200 py-2 dark:bg-zinc-600"
                 >
-                  <View className="mb-1 flex flex-row items-center justify-center">
-                    <Image
-                      source={condition.getConditionIcon()}
-                      style={{ width: 24, height: 24 }}
-                      resizeMode="contain"
-                    />
-                    <View className="flex flex-row items-center">
-                      <Text> {condition.turns} </Text>
-                      <ClockIcon width={18} height={18} />
+                  <View className="flex-1 justify-around flex-row">
+                    <Text className="text-xl tracking-wide opacity-80">
+                      {toTitleCase(condition.name)}
+                    </Text>
+                    <View className="flex items-center">
+                      <View className="flex flex-row items-center py-1">
+                        <Image
+                          source={condition.getConditionIcon()}
+                          style={{ width: 24, height: 24 }}
+                          resizeMode="contain"
+                        />
+                        <Text> {condition.turns} </Text>
+                        <ClockIcon width={16} height={16} />
+                      </View>
+                      {condition.getHealthDamage() && (
+                        <View className="flex flex-row items-center justify-center">
+                          <Text>{condition.getHealthDamage()}</Text>
+                          <HealthIcon height={16} width={16} />
+                        </View>
+                      )}
+                      {condition.getSanityDamage() && (
+                        <View className="flex flex-row items-center justify-center">
+                          <Text>
+                            {condition.getSanityDamage()}
+                            <Sanity height={16} width={16} />
+                          </Text>
+                        </View>
+                      )}
+                      {condition.effect.map((effect, idx) => (
+                        <Text key={idx}>
+                          {Condition.effectExplanationString({
+                            effect,
+                            effectMagnitude: condition.effectMagnitude[idx],
+                            effectStyle: condition.effectStyle[idx],
+                            trapSetupTime: condition.trapSetupTime,
+                          })}
+                        </Text>
+                      ))}
                     </View>
-                  </View>
-                  <View className="flex flex-row flex-wrap justify-center">
-                    <Text>{toTitleCase(condition.name)}:</Text>
+                    <Text className="text-xl tracking-wide opacity-80">
+                      {toTitleCase(condition.style)}
+                    </Text>
                   </View>
                 </View>
               ))}

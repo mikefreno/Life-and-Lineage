@@ -183,5 +183,18 @@
       "hitChance": 1.0,
       "damageMult": 0.25,
       "debuffs": [{"name": "stun", "chance": 0.1}]
+   },
+   {
+      "name": "pluck eye",
+      "targets": "single",
+      "hitChance": 0.90,
+      "damageMult": 0.5,
+      "debuffs": [{"name": "blind", "chance": 0.9}]
+   },
+   {
+      "name": "scratch",
+      "targets": "single",
+      "hitChance": 0.95,
+      "damageMult": 1.0
    }
 ]

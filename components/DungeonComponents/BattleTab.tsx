@@ -349,7 +349,12 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                       .slice()
                       .reverse()
                       .map((text) => (
-                        <Text>{text}</Text>
+                        <Text>
+                          {text
+                            .replaceAll(`the ${playerState.fullName}`, "you")
+                            .replaceAll(`the ${playerState.fullName}`, "you")
+                            .replaceAll(`The ${playerState.fullName}`, "You")}
+                        </Text>
                       ))}
                   </ScrollView>
                 ) : (
@@ -357,7 +362,11 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                     inverted
                     data={logsState.slice().reverse()}
                     renderItem={({ item }) => (
-                      <Text className="py-1">{item}</Text>
+                      <Text className="py-1">
+                        {item
+                          .replaceAll(`the ${playerState.fullName}`, "you")
+                          .replaceAll(`The ${playerState.fullName}`, "You")}
+                      </Text>
                     )}
                   />
                 )}
@@ -396,8 +405,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                     <GenericStrikeAround>Buffs</GenericStrikeAround>
                     {attackDetails.buffs.map((buff) => (
                       <View>
-                        <Text>{buff.name}</Text>
-                        <Text>{buff.chance * 100}% effect chance</Text>
+                        <Text>{buff}</Text>
                       </View>
                     ))}
                   </>

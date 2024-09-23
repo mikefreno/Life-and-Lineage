@@ -18,7 +18,7 @@ interface AttackFields {
   flatHealthDamage?: number;
   selfDamage?: number;
   flatSanityDamage?: number;
-  buffs?: { name: string; chance: number }[];
+  buffs?: string[];
   debuffs?: { name: string; chance: number }[];
   summons?: string[];
 }
@@ -40,7 +40,7 @@ export class Attack {
   flatHealthDamage: number;
   selfDamage: number;
   flatSanityDamage: number;
-  buffs: { name: string; chance: number }[];
+  buffs: string[];
   debuffs: { name: string; chance: number }[];
   summons: string[];
 
@@ -175,8 +175,7 @@ export class Attack {
       const buffNames: string[] = []; // only storing names, collecting for logBuilder
       this.buffs.forEach((buff) => {
         const newBuff = createBuff({
-          buffName: buff.name,
-          buffChance: buff.chance,
+          buffName: buff,
           attackPower: damagePreDR,
           maxHealth:
             "nonConditionalMaxHealth" in user
@@ -255,13 +254,12 @@ export class Attack {
   private logBuilder({ result, targetName, user, ...props }: LogProps): string {
     const userString =
       "fullName" in user ? "You" : `The ${toTitleCase(user.creatureSpecies)}`;
-    const targetString = this.isPlayer(user)
-      ? `the ${toTitleCase(targetName)}`
-      : "you";
 
     switch (result) {
       case AttackUse.miss:
-        return `${userString} missed the attack against ${targetString}!`;
+        return `${userString} missed the attack against the ${toTitleCase(
+          targetName,
+        )}!`;
 
       case AttackUse.block:
         return `${toTitleCase(targetName)} blocked the attack!`;
@@ -278,7 +276,7 @@ export class Attack {
 
         let returnString = `${userString} used ${toTitleCase(
           this.name,
-        )} on ${targetString}.\n`;
+        )} on the ${toTitleCase(targetName)}.\n`;
 
         // Health damage
         if (healthDamage > 0) {
@@ -292,9 +290,9 @@ export class Attack {
 
         // Debuffs
         if (debuffNames.length > 0) {
-          returnString += `  • ${targetString} ${
-            this.isPlayer(user) ? "was" : "were"
-          } afflicted with: ${debuffNames.join(", ")}.\n`;
+          returnString += `  • The ${toTitleCase(
+            targetName,
+          )} was afflicted with: ${debuffNames.join(", ")}.\n`;
         }
 
         // Buffs

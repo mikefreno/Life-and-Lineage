@@ -325,6 +325,7 @@ export const use = ({
   if (!appData || !dungeonData) throw new Error("missing context in pass()");
   const { battleLogger, setEnemyDodgeDummy } = dungeonData;
   const { playerState, enemyState } = appData;
+
   if (enemyState && playerState && isFocused) {
     if (attackOrSpell instanceof Attack) {
       const { result, logString } = attackOrSpell.use({
@@ -334,22 +335,22 @@ export const use = ({
       if (result == AttackUse.miss) {
         setEnemyDodgeDummy((prev) => prev + 1);
       }
-
       battleLogger(logString);
     } else {
       const { logString } = attackOrSpell.use({ target, user: playerState });
       battleLogger(logString);
     }
 
-    playerMinionsTurn({ dungeonData, appData });
     setTimeout(() => {
-      setTimeout(() => {
-        enemyTurnCheck({
-          appData,
-          dungeonData,
-        });
-      }, 1000 * playerState.minions.length);
-    }, 1000);
+      playerMinionsTurn({ dungeonData, appData }, () => {
+        setTimeout(() => {
+          enemyTurnCheck({
+            appData,
+            dungeonData,
+          });
+        }, 500);
+      });
+    }, 500);
   }
 };
 
@@ -368,42 +369,53 @@ export const pass = ({
   if (!appData || !dungeonData) throw new Error("missing context in pass()");
   const { battleLogger, setAttackAnimationOnGoing } = dungeonData;
   const { playerState, enemyState } = appData;
+
   if (enemyState && playerState && isFocused) {
     playerState.pass({ voluntary });
     battleLogger("You passed!");
     enemyState.conditionResolver();
-    playerMinionsTurn({ dungeonData, appData });
-    enemyState.conditionResolver();
+
     setTimeout(() => {
-      setTimeout(() => {
-        enemyTurnCheck({
-          appData,
-          dungeonData,
-        });
-      }, 1000 * playerState.minions.length);
-      setAttackAnimationOnGoing(false);
+      playerMinionsTurn({ dungeonData, appData }, () => {
+        enemyState.conditionResolver();
+        setTimeout(() => {
+          enemyTurnCheck({
+            appData,
+            dungeonData,
+          });
+          setAttackAnimationOnGoing(false);
+        }, 750);
+      });
     }, 500);
   }
 };
 
-export function playerMinionsTurn({ dungeonData, appData }: ContextData) {
+export function playerMinionsTurn(
+  { dungeonData, appData }: ContextData,
+  callback: () => void,
+) {
   if (!appData || !dungeonData)
     throw new Error("missing context in playerMinionsTurn()");
   const { battleLogger } = dungeonData;
   const { playerState, enemyState } = appData;
+
   if (enemyState && playerState) {
     const suppliedMinions = playerState.minionsAndPets;
-    for (
-      let i = 0;
-      i < suppliedMinions.length &&
-      enemyState.equals(enemyState.id) &&
-      enemyState.health > 0;
-      i++
-    ) {
+    let completedTurns = 0;
+
+    suppliedMinions.forEach((minion, i) => {
       setTimeout(() => {
-        const res = suppliedMinions[i].takeTurn({ target: enemyState });
-        battleLogger(res.logString);
+        if (enemyState.equals(enemyState.id) && enemyState.health > 0) {
+          const res = minion.takeTurn({ target: enemyState });
+          battleLogger(res.logString);
+        }
+        completedTurns++;
+        if (completedTurns === suppliedMinions.length) {
+          callback();
+        }
       }, 1000 * i);
-    }
+    });
+  } else {
+    callback();
   }
 }

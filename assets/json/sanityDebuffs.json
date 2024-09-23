@@ -3,7 +3,7 @@
       "name": "heart attack",
       "style": "debuff",
       "turns": 5,
-      "effect": ["damage"],
+      "effect": ["health damage"],
       "effectStyle": ["percentage"],
       "effectAmount": [0.10],
       "icon": "split_heart"
@@ -12,7 +12,7 @@
       "name": "distraught",
       "style": "debuff",
       "turns": 3,
-      "effect": ["sanity"],
+      "effect": ["sanity damage"],
       "effectStyle": ["flat"],
       "effectAmount": [5],
       "icon": "distraught"
@@ -21,7 +21,7 @@
       "name": "shock",
       "style": "debuff",
       "turns": 3,
-      "effect": ["skip"],
+      "effect": ["stun"],
       "effectStyle": [null],
       "effectAmount": [null],
       "icon": "blank"

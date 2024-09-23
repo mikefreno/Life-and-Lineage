@@ -109,7 +109,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
           ) : null}
           {spell.summons
             ? spell.summons.map((summon, idx) => (
-                <View key={idx} className="flex flex-col items-center">
+                <View key={idx} className="flex flex-row items-center">
                   <Text>{toTitleCase(summon)}</Text>
                   <NecromancerSkull
                     width={14}
@@ -121,7 +121,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
               ))
             : null}
           {spell.rangerPet && (
-            <View className="flex flex-col items-center">
+            <View className="flex flex-row items-center">
               <Text>{toTitleCase(spell.rangerPet)}</Text>
               <BeastMasteryIcon
                 width={14}

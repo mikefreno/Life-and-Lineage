@@ -79,7 +79,6 @@ export function createDebuff({
 
 interface createBuffDeps {
   buffName: string;
-  buffChance: number;
   attackPower: number;
   maxHealth: number;
   maxSanity: number | null;
@@ -88,67 +87,61 @@ interface createBuffDeps {
 
 export function createBuff({
   buffName,
-  buffChance,
   attackPower,
   maxHealth,
   maxSanity = 50,
   applierNameString,
 }: createBuffDeps) {
-  const roll = rollD20();
-  if (roll * 5 >= 100 - buffChance * 100) {
-    const buffObj = conditions.find(
-      (condition) => condition.name === buffName,
-    ) as ConditionObjectType;
+  const buffObj = conditions.find(
+    (condition) => condition.name === buffName,
+  ) as ConditionObjectType;
 
-    if (buffObj) {
-      let healthHeal: (number | null)[] = [];
-      let sanityHeal: (number | null)[] = [];
+  if (buffObj) {
+    let healthHeal: (number | null)[] = [];
+    let sanityHeal: (number | null)[] = [];
 
-      buffObj.effect.forEach((eff, index) => {
-        if (eff === "heal" && buffObj.effectAmount[index] !== null) {
-          let localHealthHeal = buffObj.effectAmount[index] as number;
-          if (buffObj.effectStyle[index] === "multiplier") {
-            localHealthHeal *= attackPower;
-          } else if (buffObj.effectStyle[index] === "percentage") {
-            localHealthHeal *= maxHealth;
-          }
-          healthHeal.push(localHealthHeal);
-        } else {
-          healthHeal.push(null);
+    buffObj.effect.forEach((eff, index) => {
+      if (eff === "heal" && buffObj.effectAmount[index] !== null) {
+        let localHealthHeal = buffObj.effectAmount[index] as number;
+        if (buffObj.effectStyle[index] === "multiplier") {
+          localHealthHeal *= attackPower;
+        } else if (buffObj.effectStyle[index] === "percentage") {
+          localHealthHeal *= maxHealth;
         }
+        healthHeal.push(localHealthHeal);
+      } else {
+        healthHeal.push(null);
+      }
 
-        if (eff === "sanity heal" && buffObj.effectAmount[index] !== null) {
-          let localSanityHeal = buffObj.effectAmount[index] as number;
-          if (buffObj.effectStyle[index] === "multiplier") {
-            localSanityHeal *= attackPower;
-          } else if (buffObj.effectStyle[index] === "percentage") {
-            localSanityHeal *= maxSanity ?? 0;
-          }
-          sanityHeal.push(localSanityHeal);
-        } else {
-          sanityHeal.push(null);
+      if (eff === "sanity heal" && buffObj.effectAmount[index] !== null) {
+        let localSanityHeal = buffObj.effectAmount[index] as number;
+        if (buffObj.effectStyle[index] === "multiplier") {
+          localSanityHeal *= attackPower;
+        } else if (buffObj.effectStyle[index] === "percentage") {
+          localSanityHeal *= maxSanity ?? 0;
         }
-      });
+        sanityHeal.push(localSanityHeal);
+      } else {
+        sanityHeal.push(null);
+      }
+    });
 
-      const buff = new Condition({
-        name: buffObj.name,
-        style: "buff",
-        turns: buffObj.turns,
-        trapSetupTime: buffObj.trapSetupTime,
-        effect: buffObj.effect,
-        healthDamage: healthHeal.map((heal) => (heal !== null ? -heal : 0)),
-        sanityDamage: sanityHeal.map((heal) => (heal !== null ? -heal : 0)),
-        effectStyle: buffObj.effectStyle,
-        effectMagnitude: buffObj.effectAmount,
-        placedby: applierNameString,
-        icon: buffObj.icon,
-        aura: buffObj.aura,
-      });
+    const buff = new Condition({
+      name: buffObj.name,
+      style: "buff",
+      turns: buffObj.turns,
+      trapSetupTime: buffObj.trapSetupTime,
+      effect: buffObj.effect,
+      healthDamage: healthHeal.map((heal) => (heal !== null ? -heal : 0)),
+      sanityDamage: sanityHeal.map((heal) => (heal !== null ? -heal : 0)),
+      effectStyle: buffObj.effectStyle,
+      effectMagnitude: buffObj.effectAmount,
+      placedby: applierNameString,
+      icon: buffObj.icon,
+      aura: buffObj.aura,
+    });
 
-      return buff;
-    } else {
-      throw new Error("Failed to find buff in createBuff()");
-    }
+    return buff;
   }
 }
 
