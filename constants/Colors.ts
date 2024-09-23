@@ -37,7 +37,7 @@ export const elementalColorMap: Record<
   [Element.holy]: { dark: "#facc15", light: "#fef9c3" },
   [Element.vengeance]: { dark: "#94a3b8", light: "#f1f5f9" },
   [Element.protection]: { dark: "#3b82f6", light: "#bfdbfe" },
-  [Element.arcane]: { dark: "#99e7ff", light: "#e0e7ff" },
+  [Element.arcane]: { dark: "#06b6d4", light: "#99e7ff" },
   [Element.assassination]: { dark: "#1e293b", light: "#cbd5e1" },
   [Element.beastMastery]: { dark: "#854d0e", light: "#fef3c7" },
 };

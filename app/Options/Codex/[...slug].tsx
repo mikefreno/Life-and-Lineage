@@ -63,7 +63,7 @@ const SecondaryMap: { [key: string]: React.JSX.Element } = {
   Holy: <HolyCodex />,
   Ranger: <RangerCodex />,
   Assassination: <AssassinationCodex />,
-  BeastMastery: <BeastMasteryCodex />,
+  "Beast Mastery": <BeastMasteryCodex />,
   Arcane: <ArcaneCodex />,
 };
 
@@ -81,6 +81,8 @@ export default function CodexInfo() {
   } else {
     category = slug;
   }
+
+  useEffect(() => console.log(slug), [slug]);
 
   useEffect(() => {
     const currentPath = secondary

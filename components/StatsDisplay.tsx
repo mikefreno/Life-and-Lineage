@@ -396,7 +396,7 @@ export function StatsDisplay({
               )}
             />
           </View>
-          {!("purchaseItem" in props) && (
+          {!("purchaseItem" in props || "addItemToPouch" in props) && (
             <GenericFlatButton
               onPressFunction={() => {
                 vibration({ style: "light" });

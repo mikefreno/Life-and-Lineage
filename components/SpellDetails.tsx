@@ -14,6 +14,7 @@ import { useContext } from "react";
 import { AppContext } from "../app/_layout";
 import { Spell } from "../classes/spell";
 import { elementalColorMap } from "../constants/Colors";
+import { Element } from "../utility/types";
 
 export default function SpellDetails({ spell }: { spell: Spell }) {
   const { colorScheme } = useColorScheme();
@@ -40,7 +41,11 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
         className="flex flex-row justify-between rounded-lg p-2 dark:border"
         style={{
           borderColor:
-            colorScheme == "dark" ? elementalColorMap[spell.element].dark : "",
+            colorScheme == "dark"
+              ? spell.element == Element.assassination
+                ? elementalColorMap[spell.element].light
+                : elementalColorMap[spell.element].dark
+              : "",
         }}
       >
         <View className="my-auto w-1/4">

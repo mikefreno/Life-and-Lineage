@@ -883,7 +883,7 @@ export const AssassinationIcon = ({ color = "#1e293b", ...props }) => (
 );
 
 export const ArcaneIcon = ({
-  color = "#99e7ff",
+  color = "#06b6d4",
   secondaryOpacity = 0.4,
   ...props
 }) => (

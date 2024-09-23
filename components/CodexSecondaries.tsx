@@ -53,7 +53,12 @@ const ClassCodex = ({
             <Text
               className="text-2xl"
               style={{
-                color: elementalColorMap[school].dark,
+                color:
+                  colorScheme == "dark"
+                    ? school == Element.assassination
+                      ? elementalColorMap[school].light
+                      : elementalColorMap[school].dark
+                    : elementalColorMap[school].dark,
               }}
             >
               {ElementToString[school]}
