@@ -7,6 +7,7 @@ import { Item } from "./item";
 import attacks from "../assets/json/playerAttacks.json";
 import melee from "../assets/json/items/melee.json";
 import wands from "../assets/json/items/wands.json";
+import bows from "../assets/json/items/bows.json";
 import mageSpells from "../assets/json/mageSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
@@ -751,8 +752,15 @@ export class PlayerCharacter extends Character {
       this.equipmentStats.health
     );
   }
-
-  public damageHealth(damage?: number | null) {
+  /**
+   * attackerId is here to conform with the Creature implementation, it is unused
+   */
+  public damageHealth({
+    damage,
+  }: {
+    attackerId: string;
+    damage: number | null;
+  }) {
     if (damage) {
       if (this.currentHealth - damage > this.maxHealth) {
         this.currentHealth = this.maxHealth;
@@ -1249,7 +1257,7 @@ export class PlayerCharacter extends Character {
         throw new Error("Requested Labor on unassigned profession");
       } else {
         if (cost.health) {
-          this.damageHealth(cost.health);
+          this.damageHealth({ damage: cost.health, attackerId: this.id });
         }
         if (cost.sanity) {
           this.damageSanity(cost.sanity);
@@ -1665,6 +1673,11 @@ export class PlayerCharacter extends Character {
       );
       if (!itemObj) {
         itemObj = wands.find(
+          (weapon) => weapon.name == this.equipment.mainHand!.name,
+        );
+      }
+      if (!itemObj) {
+        itemObj = bows.find(
           (weapon) => weapon.name == this.equipment.mainHand!.name,
         );
       }

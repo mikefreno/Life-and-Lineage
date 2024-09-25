@@ -73,7 +73,7 @@
    {
       "name": "rapid shot",
       "targets": "single",
-      "hitChance": 0.9,
+      "hitChance": 0.65,
       "damageMult": 2.0
    },
    {

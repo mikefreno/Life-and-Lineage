@@ -40,6 +40,7 @@ import {
 import { Attack } from "./attack";
 import { PlayerCharacter } from "./character";
 import { AttackUse } from "../utility/types";
+import { AggroTable } from "./aggro_table";
 
 type CreatureType = {
   id?: string;
@@ -136,7 +137,7 @@ export class Creature {
   /**
    * List of attacks the creature can perform
    */
-  readonly attacks: Attack[];
+  attacks: Attack[];
 
   /**
    * List of conditions affecting the creature
@@ -147,6 +148,8 @@ export class Creature {
    * Flag indicating if the creature has dropped items
    */
   gotDrops: boolean;
+
+  aggroTable: AggroTable;
 
   constructor({
     id,
@@ -179,6 +182,8 @@ export class Creature {
     this.attacks = this.initAttacks(attacks); // Initialize attacks
     this.conditions = conditions ?? []; // Initialize conditions to an empty array if not provided
     this.gotDrops = false; // Initialize gotDrops to false
+
+    this.aggroTable = new AggroTable();
     makeObservable(this, {
       id: observable,
       health: observable,
@@ -217,10 +222,19 @@ export class Creature {
   /**
    * Damages the creature's health by the specified amount.
    * @param damage - The amount of damage to apply. If null, defaults to 0.
+   * @param attackerId - The id of the attacker
    * @returns The new health value after applying the damage.
    */
-  public damageHealth(damage: number | null) {
+  public damageHealth({
+    damage,
+    attackerId,
+  }: {
+    damage: number | null;
+    attackerId: string;
+  }): number {
     this.health -= damage ?? 0;
+    this.aggroTable.addAggro(attackerId, damage ?? 0);
+
     return this.health;
   }
 
@@ -424,8 +438,9 @@ export class Creature {
           | AttackUse.stunned;
         logString: string;
       } {
-    if (this.conditions.find((cond) => cond.name == "execute")) {
-      this.damageHealth(9999);
+    const execute = this.conditions.find((cond) => cond.name == "execute");
+    if (execute) {
+      this.damageHealth({ attackerId: execute.placedbyID, damage: 9999 });
       this.endTurn();
       return {
         result: AttackUse.stunned,
@@ -433,20 +448,42 @@ export class Creature {
       };
     }
     if (this.isStunned) {
+      const allStunSources = this.conditions.filter((cond) =>
+        cond.effect.includes("stun"),
+      );
+      allStunSources.forEach((stunSource) => {
+        this.aggroTable.addAggro(stunSource.placedbyID, 10);
+      });
       this.endTurn();
       return {
         result: AttackUse.stunned,
         logString: `${toTitleCase(this.creatureSpecies)} was stunned!`,
       };
     } else {
+      const allTargets = [
+        target,
+        ...(target instanceof PlayerCharacter ? target.minionsAndPets : []),
+      ];
+      const highestAggroTarget =
+        this.aggroTable.getHighestAggroTarget(allTargets);
+
+      if (!highestAggroTarget) {
+        this.endTurn();
+        return {
+          result: AttackUse.lowEnergy,
+          logString: `${toTitleCase(
+            this.creatureSpecies,
+          )} passed (low energy)!`,
+        };
+      }
+
       const availableAttacks = this.attacks.filter(
         (attack) => !this.energy || this.energy >= attack.energyCost,
       );
       if (availableAttacks.length > 0) {
-        const randomIndex = Math.floor(Math.random() * availableAttacks.length);
-        const chosenAttack = availableAttacks[randomIndex];
+        const chosenAttack = this.chooseAttack(availableAttacks);
         const res = chosenAttack.use({
-          target,
+          target: highestAggroTarget,
           user: this as unknown as Enemy | Minion,
         });
         this.endTurn();
@@ -462,6 +499,62 @@ export class Creature {
       }
     }
   }
+
+  private chooseAttack(availableAttacks: Attack[]): Attack {
+    const totalWeight = availableAttacks.reduce(
+      (sum, attack) => sum + this.getAttackWeight(attack),
+      0,
+    );
+    const randomValue = Math.random() * totalWeight;
+
+    let accumulatedWeight = 0;
+    for (const attack of availableAttacks) {
+      accumulatedWeight += this.getAttackWeight(attack);
+      if (randomValue <= accumulatedWeight) {
+        return attack;
+      }
+    }
+
+    // This should never happen, but as a safety net, return the last attack
+    return availableAttacks[availableAttacks.length - 1];
+  }
+
+  private getAttackWeight(attack: Attack): number {
+    const { damageMult, buffs, debuffs, summons } = attack;
+    const { health, healthMax } = this;
+    const healthPercentage = health / healthMax;
+
+    const baseWeight = 100;
+
+    let weight = baseWeight;
+
+    if (healthPercentage > 0.75) {
+      if (buffs.length > 0) {
+        weight *= 2;
+      }
+    } else if (healthPercentage < 0.35) {
+      weight += damageMult * 100;
+    } else {
+      if (debuffs.length > 0) {
+        weight *= 1.5;
+      }
+    }
+
+    if (this instanceof Enemy) {
+      if (summons.length > 0 && healthPercentage > 0.5) {
+        if (this.minions.length === 0) {
+          weight *= 5;
+        } else if (this.minions.length === 1) {
+          weight *= 1.5;
+        } else if (this.minions.length >= 2) {
+          weight /= 2;
+        }
+      }
+    }
+
+    return weight;
+  }
+
   //---------------------------Misc---------------------------//
   /**
    * Retrieves drops from the creature, if not already retrieved.

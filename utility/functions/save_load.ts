@@ -32,13 +32,16 @@ export const fullLoad = async () => {
   try {
     const retrieved_game = storage.getString("game");
     const retrieved_player = storage.getString("player");
-    if (!retrieved_game || !retrieved_player) return;
+    if (!retrieved_game || !retrieved_player)
+      return { game: undefined, player: undefined };
     let game = Game.fromJSON(JSON.parse(retrieved_game));
     let player = PlayerCharacter.fromJSON(JSON.parse(retrieved_player));
     player.minionsAndPets.forEach((minion) => minion.reinstateParent(player));
-    player.currentDungeon?.enemy?.minions.map((minion) =>
-      minion.reinstateParent(player.currentDungeon?.enemy),
-    );
+    if (player.currentDungeon && player.currentDungeon.enemy) {
+      player.currentDungeon.enemy.minions.map((minion) =>
+        minion.reinstateParent(player.currentDungeon!.enemy!),
+      );
+    }
     return { player, game };
   } catch (e) {
     console.log("Error in fullLoad:", e);

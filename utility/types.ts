@@ -290,6 +290,7 @@ export type ConditionType = {
   healthDamage: number[];
   sanityDamage: number[];
   placedby: string;
+  placedbyID: string;
   aura?: boolean;
   icon: string;
 };

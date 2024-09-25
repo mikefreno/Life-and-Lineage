@@ -151,7 +151,10 @@ export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
               playerHealthChange * 5 > effectMagnitudeValue * 10
                 ? effectMagnitudeValue * 10
                 : playerHealthChange * 5;
-            enemyState.damageHealth(revengeDamage);
+            enemyState.damageHealth({
+              attackerId: revengeCondition.placedbyID,
+              damage: revengeDamage,
+            });
             battleLogger(`You dealt ${revengeDamage} revenge damage!`);
           }
         }
@@ -375,18 +378,16 @@ export const pass = ({
     battleLogger("You passed!");
     enemyState.conditionResolver();
 
-    setTimeout(() => {
-      playerMinionsTurn({ dungeonData, appData }, () => {
-        enemyState.conditionResolver();
-        setTimeout(() => {
-          enemyTurnCheck({
-            appData,
-            dungeonData,
-          });
-          setAttackAnimationOnGoing(false);
-        }, 750);
-      });
-    }, 500);
+    playerMinionsTurn({ dungeonData, appData }, () => {
+      enemyState.conditionResolver();
+      setTimeout(() => {
+        enemyTurnCheck({
+          appData,
+          dungeonData,
+        });
+        setAttackAnimationOnGoing(false);
+      }, 750);
+    });
   }
 };
 
@@ -399,8 +400,13 @@ export function playerMinionsTurn(
   const { battleLogger } = dungeonData;
   const { playerState, enemyState } = appData;
 
-  if (enemyState && playerState) {
-    const suppliedMinions = playerState.minionsAndPets;
+  const suppliedMinions = playerState?.minionsAndPets;
+  if (
+    enemyState &&
+    playerState &&
+    suppliedMinions &&
+    suppliedMinions.length > 0
+  ) {
     let completedTurns = 0;
 
     suppliedMinions.forEach((minion, i) => {

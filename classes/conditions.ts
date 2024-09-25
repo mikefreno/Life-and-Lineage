@@ -18,6 +18,7 @@ export class Condition {
   trapSetupTime: number | undefined;
   readonly aura: boolean;
   readonly placedby: string;
+  readonly placedbyID: string;
   readonly effect: EffectOptions[];
   readonly healthDamage: number[];
   readonly sanityDamage: number[];
@@ -36,6 +37,7 @@ export class Condition {
     sanityDamage,
     trapSetupTime,
     placedby,
+    placedbyID,
     id,
     aura,
     icon,
@@ -51,6 +53,7 @@ export class Condition {
     this.effectStyle = effectStyle;
     this.effectMagnitude = effectMagnitude;
     this.placedby = placedby;
+    this.placedbyID = placedbyID;
     this.aura = aura ?? false;
     this.icon = icon;
     makeObservable(this, {
@@ -105,7 +108,10 @@ export class Condition {
         this.trapSetupTime -= 1;
       }
     }
-    holder.damageHealth(this.getHealthDamage());
+    holder.damageHealth({
+      attackerId: this.placedbyID,
+      damage: this.getHealthDamage(),
+    });
     holder.damageSanity(this.getSanityDamage());
     return { turns: this.turns, effect: this.effect };
   }

@@ -131,15 +131,15 @@ export class Attack {
       const enemyDR = target.getDamageReduction();
       const damage = damagePreDR * (1 - enemyDR);
       const finalDamage = Math.round(damage * 4) / 4; // physical damage
-      target.damageHealth(finalDamage);
+      target.damageHealth({ damage: finalDamage, attackerId: user.id });
       target.damageSanity(this.flatSanityDamage);
-      user.damageHealth(this.selfDamage);
+      user.damageHealth({ damage: this.selfDamage, attackerId: target.id }); // we will need to check against self
       //check for thorns and traps on target
       const thornsIshDamage = getConditionDamageToAttacker(
         target.conditions,
       ).healthDamage;
       if (thornsIshDamage > 0) {
-        user.damageHealth(thornsIshDamage);
+        user.damageHealth({ damage: thornsIshDamage, attackerId: target.id });
       }
       // create debuff loop
       const debuffNames: string[] = []; // only storing names, collecting for logBuilder
@@ -164,6 +164,7 @@ export class Attack {
                   : target.sanityMax,
               primaryAttackDamage: damagePreDR,
               applierNameString: this.getNameReference(user),
+              applierID: user.id,
             });
             if (newDebuff) {
               debuffNames.push(newDebuff.name);
@@ -186,6 +187,7 @@ export class Attack {
               ? user.nonConditionalMaxSanity
               : user.sanityMax,
           applierNameString: this.getNameReference(user),
+          applierID: user.id,
         });
         if (newBuff) {
           buffNames.push(newBuff.name);

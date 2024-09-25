@@ -36,6 +36,7 @@ import {
   playerClassColors,
 } from "../../../constants/Colors";
 import { storage } from "../../../utility/functions/storage";
+import { useColorScheme } from "nativewind";
 
 export default function NewGameReview() {
   const { slug } = useLocalSearchParams();
@@ -66,6 +67,7 @@ export default function NewGameReview() {
   }
   const { gameState, setGameData, setPlayerCharacter, setLogs } = appData;
   const navigation = useNavigation();
+  const { colorScheme } = useColorScheme();
 
   function createParent(sex: "female" | "male"): Character {
     const firstName = getRandomName(sex).firstName;
@@ -257,7 +259,12 @@ export default function NewGameReview() {
       <Text className="pt-[16vh] text-center text-3xl">
         {`${firstName} ${lastName} the `}
         <Text
-          style={{ color: elementalColorMap[blessing as Element].dark }}
+          style={{
+            color:
+              blessing == Element.assassination && colorScheme == "dark"
+                ? elementalColorMap[blessing].light
+                : elementalColorMap[blessing].dark,
+          }}
         >{`${ElementToString[blessing]}`}</Text>
         -born{" "}
         <Text style={{ color: playerClassColors[playerClass] }}>{`${toTitleCase(

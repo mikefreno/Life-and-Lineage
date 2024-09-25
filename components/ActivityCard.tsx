@@ -172,7 +172,10 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
     sanityDamage?: number | undefined;
   }) {
     if (effect?.healthDamage) {
-      playerState?.damageHealth(effect.healthDamage);
+      playerState?.damageHealth({
+        damage: effect.healthDamage,
+        attackerId: "bad!",
+      });
     }
     if (effect?.sanityDamage) {
       playerState?.damageSanity(effect.sanityDamage);

@@ -140,9 +140,9 @@ export class Spell {
     user.useMana(this.manaCost);
 
     const finalDamage = Math.round(this.baseDamage(user) * 4) / 4; // physical damage
-    target.damageHealth(finalDamage);
+    target.damageHealth({ damage: finalDamage, attackerId: user.id });
     target.damageSanity(this.flatSanityDamage);
-    user.damageHealth(this.selfDamage);
+    user.damageHealth({ damage: this.selfDamage, attackerId: user.id });
     // create debuff loop
     const debuffNames: string[] = []; // only storing names, collecting for logBuilder
     let amountHealed = 0;
@@ -161,6 +161,7 @@ export class Spell {
           enemyMaxSanity: target.sanityMax,
           primaryAttackDamage: this.baseDamage(user),
           applierNameString: user.fullName,
+          applierID: user.id,
         });
 
         if (newDebuff) {
@@ -174,11 +175,11 @@ export class Spell {
       if (buff !== "consume blood orb") {
         const newBuff = createBuff({
           buffName: buff,
-          buffChance: 1,
           attackPower: this.baseDamage(user),
           maxHealth: user.nonConditionalMaxHealth,
           maxSanity: user.nonConditionalMaxSanity,
           applierNameString: user.fullName,
+          applierID: user.id,
         });
         if (newBuff) {
           buffNames.push(newBuff.name);

@@ -11,6 +11,7 @@ interface createDebuffDeps {
   enemyMaxSanity?: number | null;
   primaryAttackDamage: number;
   applierNameString: string;
+  applierID: string;
 }
 export function createDebuff({
   debuffName,
@@ -19,6 +20,7 @@ export function createDebuff({
   enemyMaxSanity = 50,
   primaryAttackDamage,
   applierNameString,
+  applierID,
 }: createDebuffDeps) {
   const roll = rollD20();
   if (roll * 5 >= 100 - debuffChance * 100) {
@@ -66,6 +68,7 @@ export function createDebuff({
         effectStyle: debuffObj.effectStyle,
         effectMagnitude: debuffObj.effectAmount,
         placedby: applierNameString,
+        placedbyID: applierID,
         icon: debuffObj.icon,
         aura: debuffObj.aura,
       });
@@ -83,6 +86,7 @@ interface createBuffDeps {
   maxHealth: number;
   maxSanity: number | null;
   applierNameString: string;
+  applierID: string;
 }
 
 export function createBuff({
@@ -91,6 +95,7 @@ export function createBuff({
   maxHealth,
   maxSanity = 50,
   applierNameString,
+  applierID,
 }: createBuffDeps) {
   const buffObj = conditions.find(
     (condition) => condition.name === buffName,
@@ -137,6 +142,7 @@ export function createBuff({
       effectStyle: buffObj.effectStyle,
       effectMagnitude: buffObj.effectAmount,
       placedby: applierNameString,
+      placedbyID: applierID,
       icon: buffObj.icon,
       aura: buffObj.aura,
     });
