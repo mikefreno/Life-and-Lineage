@@ -424,11 +424,7 @@ export class Creature {
    * @param {PlayerCharacter | Minion | Enemy} params.target - The target to attack.
    * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
    */
-  protected _takeTurn({
-    target,
-  }: {
-    target: PlayerCharacter | Minion | Enemy;
-  }):
+  protected _takeTurn({ target }: { target: PlayerCharacter | Enemy }):
     | { result: AttackUse.success; logString: string; chosenAttack: Attack }
     | {
         result:
@@ -659,12 +655,11 @@ export class Enemy extends Creature {
 
   /**
    * Allows the enemy to take its turn.
-   * @param {Object} params - An object containing the target to attack.
-   * @param {PlayerCharacter | Minion} params.target - The target to attack.
+   * @param player - The player object, minions are sourced from this as well.
    * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
    */
-  public takeTurn({ target }: { target: PlayerCharacter | Minion }) {
-    return this._takeTurn({ target }); //this is done as a way to easily add additional effects, note this function in Minion
+  public takeTurn({ player }: { player: PlayerCharacter }) {
+    return this._takeTurn({ target: player }); //this is done as a way to easily add additional effects, note this function in Minion
   }
 
   //---------------------------Minions---------------------------//
@@ -813,7 +808,7 @@ export class Minion extends Creature {
    * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
    * @throws {Error} If the minion's lifespan has reached zero.
    */
-  public takeTurn({ target }: { target: PlayerCharacter | Minion | Enemy }) {
+  public takeTurn({ target }: { target: PlayerCharacter | Enemy }) {
     if (this.turnsLeftAlive > 0) {
       if (
         !(

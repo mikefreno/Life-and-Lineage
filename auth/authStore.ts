@@ -60,7 +60,7 @@ class AuthStore {
   private apple_user_string: string | null = null;
   private db_name: string | null = null;
   private db_token: string | null = null;
-  private isConnected: boolean = false;
+  isConnected: boolean = false;
   private isInitialized: boolean = false;
 
   constructor() {

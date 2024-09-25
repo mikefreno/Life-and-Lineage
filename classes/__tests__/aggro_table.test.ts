@@ -49,7 +49,7 @@ describe("Enemy", () => {
 
   beforeEach(() => {
     enemy = new Enemy({
-      beingType: "test",
+      beingType: "test" as BeingType,
       creatureSpecies: "test",
       health: 100,
       healthMax: 100,
@@ -89,9 +89,11 @@ describe("Enemy", () => {
     enemy.damageHealth({ attackerId: player.id, damage: 10 });
     enemy.damageHealth({ attackerId: minion.id, damage: 5 });
 
-    enemy.takeTurn({ target: player });
+    enemy.takeTurn({ player });
 
-    expect(enemy.aggroTable.getHighestAggroTarget.id).toBe(player.id);
+    expect(enemy.aggroTable.getHighestAggroTarget([player, minion])!.id).toBe(
+      player.id,
+    );
   });
   test("stun aggro points should make shift", () => {
     enemy.damageHealth({ attackerId: player.id, damage: 10 });
@@ -113,7 +115,10 @@ describe("Enemy", () => {
     });
     enemy.addCondition(stunCondition);
 
-    expect(enemy.aggroTable.getHighestAggroTarget.id).toBe(minion.id);
+    enemy.takeTurn({ player });
+    expect(enemy.aggroTable.getHighestAggroTarget([player, minion])!.id).toBe(
+      minion.id,
+    );
   });
 });
 

@@ -128,7 +128,7 @@ export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
     setEnemyAttacked(true);
     const startOfTurnPlayerState = { ...playerState };
     const startOfTurnEnemyState = { ...enemyState };
-    const enemyAttackRes = enemyState.takeTurn({ target: playerState }); // this should be updated to allow the enemy to target player minions
+    const enemyAttackRes = enemyState.takeTurn({ player: playerState }); // this should be updated to allow the enemy to target player minions
     battleLogger(enemyAttackRes.logString);
     let action: () => void;
     switch (enemyAttackRes.result) {

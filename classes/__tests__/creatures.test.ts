@@ -47,23 +47,22 @@ describe("Minion", () => {
 
   it("should remove the minion when turnsLeftAlive reaches 0", () => {
     expect(enemy.minions).toHaveLength(1);
-    minion.turnsLeftAlive = 1;
     minion.takeTurn({ target: enemy });
-
+    minion.takeTurn({ target: enemy });
+    minion.takeTurn({ target: enemy });
     expect(enemy.minions).toHaveLength(0);
   });
 
   it("should throw an error if minion lifespan reaches zero and it is not removed", () => {
-    minion.turnsLeftAlive = 0;
-
+    minion.takeTurn({ target: enemy });
+    minion.takeTurn({ target: enemy });
+    minion.takeTurn({ target: enemy });
     expect(() => minion.takeTurn({ target: enemy })).toThrow(
       "Minion not properly removed!",
     );
   });
 
   it("should not throw an error if minion lifespan is greater than zero", () => {
-    minion.turnsLeftAlive = 1;
-
     expect(() => minion.takeTurn({ target: enemy })).not.toThrow();
   });
 });
