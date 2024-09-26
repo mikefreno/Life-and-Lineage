@@ -73,8 +73,9 @@
    {
       "name": "rapid shot",
       "targets": "single",
-      "hitChance": 0.65,
-      "damageMult": 2.0
+      "hitChance": 0.75,
+      "damageMult": 0.85,
+      "hits": 3
    },
    {
       "name": "careful shot",

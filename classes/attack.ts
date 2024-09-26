@@ -18,6 +18,7 @@ interface AttackFields {
   flatHealthDamage?: number;
   selfDamage?: number;
   flatSanityDamage?: number;
+  hits?: number;
   buffs?: string[];
   debuffs?: { name: string; chance: number }[];
   summons?: string[];
@@ -40,6 +41,7 @@ export class Attack {
   flatHealthDamage: number;
   selfDamage: number;
   flatSanityDamage: number;
+  hits: number;
   buffs: string[];
   debuffs: { name: string; chance: number }[];
   summons: string[];
@@ -53,6 +55,7 @@ export class Attack {
     flatHealthDamage = 0,
     selfDamage = 0,
     flatSanityDamage = 0,
+    hits = 1,
     buffs = [],
     debuffs = [],
     summons = [],
@@ -65,6 +68,7 @@ export class Attack {
     this.flatHealthDamage = flatHealthDamage;
     this.selfDamage = selfDamage;
     this.flatSanityDamage = flatSanityDamage;
+    this.hits = hits ?? 1;
     this.buffs = buffs;
     this.debuffs = debuffs;
     this.summons = summons;
@@ -320,10 +324,6 @@ export class Attack {
     }
   }
 
-  private isPlayer(user: PlayerCharacter | Enemy | Minion) {
-    return !("energy" in user);
-  }
-
   /*
    * Returns a string to refer to the target or user with
    */
@@ -348,6 +348,7 @@ export class Attack {
       flatHealthDamage: json.flatHealthDamage,
       selfDamage: json.selfDamage,
       flatSanityDamage: json.flatSanityDamage,
+      hits: json.hits,
       buffs: json.buffs,
       debuffs: json.debuffs,
       summons: json.summons,
