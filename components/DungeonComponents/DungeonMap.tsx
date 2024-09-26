@@ -8,6 +8,13 @@ import PlatformDependantBlurView from "../PlatformDependantBlurView";
 import { getEnemy, loadBoss } from "./DungeonInteriorFunctions";
 import { AppContext } from "../../app/_layout";
 
+/**
+ * Represents a tile in the dungeon map.
+ * @property {number} x - The x-coordinate of the tile.
+ * @property {number} y - The y-coordinate of the tile.
+ * @property {boolean} clearedRoom - Indicates if the room at this tile has been cleared.
+ * @property {boolean} isBossRoom - Indicates if the room at this tile is a boss room.
+ */
 export interface Tile {
   x: number;
   y: number;
@@ -15,6 +22,13 @@ export interface Tile {
   isBossRoom: boolean;
 }
 
+/**
+ * Represents the bounding box of a set of tiles.
+ * @property {number} width - The width of the bounding box.
+ * @property {number} height - The height of the bounding box.
+ * @property {number} offsetX - The x-offset of the bounding box.
+ * @property {number} offsetY - The y-offset of the bounding box.
+ */
 export interface BoundingBox {
   width: number;
   height: number;
@@ -22,6 +36,9 @@ export interface BoundingBox {
   offsetY: number;
 }
 
+/**
+ * Mapping of directions to their corresponding x and y offsets.
+ */
 const directionsMapping: Record<string, { x: number; y: number }> = {
   up: { x: 0, y: -1 },
   down: { x: 0, y: 1 },
@@ -29,69 +46,70 @@ const directionsMapping: Record<string, { x: number; y: number }> = {
   right: { x: 1, y: 0 },
 };
 
+/**
+ * Props for the generateTiles function.
+ * @property {number} [numTiles=10] - The number of tiles to generate.
+ * @property {number} [tileSize=60] - The size of each tile.
+ * @property {boolean} [bossDefeated=false] - Indicates if the boss has been defeated.
+ */
 export interface generateTilesProps {
   numTiles: number;
   tileSize: number;
   bossDefeated: boolean;
 }
 
+/**
+ * Generates a set of tiles for the dungeon map.
+ * @param `generateTilesProps` props - The props for generating the tiles.
+ * @returns `Tile[]` - The generated tiles.
+ */
 export const generateTiles = ({
   numTiles = 10,
   tileSize = 60,
   bossDefeated = false,
 }: generateTilesProps): Tile[] => {
   const tiles: Tile[] = [];
-  const activeTiles: Tile[] = [];
   const directions = Object.values(directionsMapping);
 
-  let currentX = Math.floor(Math.random() * Math.floor(numTiles)) * tileSize;
-  let currentY = Math.floor(Math.random() * Math.floor(numTiles)) * tileSize;
+  // Use integer coordinates during generation
+  let currentX = Math.floor(Math.random() * numTiles);
+  let currentY = Math.floor(Math.random() * numTiles);
   const startTile: Tile = {
-    x: currentX,
-    y: currentY,
+    x: currentX * tileSize,
+    y: currentY * tileSize,
     clearedRoom: true,
     isBossRoom: false,
   };
 
   tiles.push(startTile);
-  activeTiles.push(startTile);
 
-  for (let i = 0; i < numTiles - 1; i++) {
-    const { x: currentX, y: currentY } = activeTiles[i];
+  while (tiles.length < numTiles) {
+    const currentTile = tiles[Math.floor(Math.random() * tiles.length)];
 
-    let validTileFound = false;
-    let attempt = 0;
-
-    while (!validTileFound && attempt < 50) {
-      const direction =
-        directions[Math.floor(Math.random() * directions.length)];
-      const newX = currentX + direction.x * tileSize;
-      const newY = currentY + direction.y * tileSize;
+    for (const direction of directions) {
+      const newX = currentTile.x / tileSize + direction.x;
+      const newY = currentTile.y / tileSize + direction.y;
 
       if (
         newX >= 0 &&
         newY >= 0 &&
-        !tiles.find((t) => t.x === newX && t.y === newY)
+        newX < numTiles &&
+        newY < numTiles &&
+        !tiles.find((t) => t.x === newX * tileSize && t.y === newY * tileSize)
       ) {
         const newTile: Tile = {
-          x: newX,
-          y: newY,
+          x: newX * tileSize,
+          y: newY * tileSize,
           clearedRoom: false,
           isBossRoom: false,
         };
         tiles.push(newTile);
-        activeTiles.push(newTile);
-        validTileFound = true;
+        break;
       }
-      attempt++;
-    }
-    if (!validTileFound) {
-      console.log("no valid tile found");
-      activeTiles.splice(i, 1);
     }
   }
 
-  if (!bossDefeated) {
+  if (!bossDefeated && tiles.length > 1) {
     const distanceMap = new Map<Tile, number>();
     const queue: Tile[] = [];
     queue.push(startTile);
@@ -112,16 +130,24 @@ export const generateTiles = ({
         }
       });
     }
+
     const options = Array.from(distanceMap.entries())
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3)
       .map((entry) => entry[0]);
-    const idx = Math.floor(Math.random() * 3);
+    const idx = Math.floor(Math.random() * Math.min(3, options.length));
     options[idx].isBossRoom = true;
   }
+
   return tiles;
 };
 
+/**
+ * Gets the bounding box of a set of tiles.
+ * @param {Tile[]} tiles - The tiles to get the bounding box for.
+ * @param {number} tileSize - The size of each tile.
+ * @returns {BoundingBox} - The bounding box of the tiles.
+ */
 export const getBoundingBox = (
   tiles: Tile[],
   tileSize: number,
@@ -139,6 +165,9 @@ export const getBoundingBox = (
   };
 };
 
+/**
+ * Renders the dungeon map made by `generateTiles`.
+ */
 export const DungeonMapRender = () => {
   const dungeonData = useContext(DungeonContext);
   if (!dungeonData) throw new Error("missing context");
@@ -146,6 +175,11 @@ export const DungeonMapRender = () => {
   const { colorScheme } = useColorScheme();
   const strokeWidth = 1;
 
+  /**
+   * Gets the fill color for a tile based on its state and the color scheme.
+   * @param {Tile} tile - The tile to get the fill color for.
+   * @returns {string} - The fill color for the tile.
+   */
   const getFillColor = (tile: Tile) => {
     const isCurrent =
       tile.x === currentPosition?.x && tile.y === currentPosition?.y;
@@ -154,24 +188,20 @@ export const DungeonMapRender = () => {
         return isCurrent ? "#93c5fd" : "#2563eb";
       }
 
-      //if (tile.isBossRoom) {
-      //return "#dc2626";
-      //}
-
       return isCurrent ? "#a1a1aa" : "#18181b";
     } else {
       if (tile.clearedRoom) {
         return isCurrent ? "#93c5fd" : "#2563eb";
       }
-
-      //if (tile.isBossRoom) {
-      //return "#dc2626";
-      //}
-
       return isCurrent ? "#a1a1aa" : "#e4e4e7";
     }
   };
 
+  /**
+   * Renders a single tile.
+   * @param {Tile} tile - The tile to render.
+   * @returns {JSX.Element} - The rendered tile.
+   */
   const renderTile = (tile: Tile) => {
     return (
       <Rect
@@ -224,11 +254,14 @@ export const DungeonMapRender = () => {
   );
 };
 
+/**
+ * Renders the controls for moving around the dungeon.
+ */
 export const DungeonMapControls = () => {
   const dungeonData = useContext(DungeonContext);
   const appData = useContext(AppContext);
   if (!dungeonData || !appData) throw new Error("missing context");
-  const { currentPosition, setCurrentPosition, setInCombat, tiles } =
+  const { currentPosition, setCurrentPosition, setInCombat, tiles, setTiles } =
     dungeonData;
   const { dimensions } = appData;
   const isMoveValid = (direction: keyof typeof directionsMapping) => {
@@ -243,6 +276,9 @@ export const DungeonMapControls = () => {
     return !!newTile;
   };
 
+  /**
+   * Moves the current position and updates the current tile to have been cleared.
+   */
   const move = (direction: keyof typeof directionsMapping) => {
     if (!currentPosition) return;
     const { x, y } = directionsMapping[direction];
@@ -255,6 +291,14 @@ export const DungeonMapControls = () => {
 
     if (newPosition) {
       setCurrentPosition(newPosition);
+
+      const updatedTiles = tiles.map((tile) =>
+        tile.x === newPosition.x && tile.y === newPosition.y
+          ? { ...tile, clearedRoom: true }
+          : tile,
+      );
+      setTiles(updatedTiles);
+
       if (!newPosition.clearedRoom) {
         if (newPosition.isBossRoom) {
           loadBoss({ appData, dungeonData });
@@ -267,6 +311,10 @@ export const DungeonMapControls = () => {
     }
   };
 
+  /**
+   * UI Button to move the player, if a move is invalid(past the edge of the map) that direction will be disabled
+   * @param direction - the direction ("up", "down", "left", "right") to render and check for move validity
+   */
   const ArrowButton: React.FC<{
     direction: keyof typeof directionsMapping;
   }> = ({ direction }) => {

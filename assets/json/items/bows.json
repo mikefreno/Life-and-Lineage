@@ -26,7 +26,7 @@
       "name": "long bow",
       "baseValue": 1000,
       "slot": "two-hand",
-      "attacks": ["shoot", "aimed shot"],
+      "attacks": ["shoot", "careful shot"],
       "icon":"Bow",
       "stats":{
          "damage": 10.5

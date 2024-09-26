@@ -7,6 +7,6 @@ export const DungeonContext = createContext<DungeonContextType | undefined>(
 );
 
 export const TILE_SIZE = Math.max(
-  Dimensions.get("screen").width / 10,
-  Dimensions.get("screen").height / 10,
+  Number((Dimensions.get("screen").width / 10).toFixed(0)),
+  Number((Dimensions.get("screen").height / 10).toFixed(0)),
 );

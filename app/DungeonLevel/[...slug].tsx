@@ -119,20 +119,6 @@ const DungeonProvider = observer(() => {
   }, [slug]);
 
   useEffect(() => {
-    if (instanceName !== "Activities" && instanceName !== "Personal") {
-      if (!fightingBoss && !enemyState) {
-        tiles.map((tile) => {
-          if (tile.x == currentPosition?.x && tile.y == currentPosition.y) {
-            tile.clearedRoom = true;
-            return tile;
-          }
-          return tile;
-        });
-      }
-    }
-  }, [enemyState]);
-
-  useEffect(() => {
     if (!firstLoad && !enemyState) {
       if (instanceName !== "Activities" && instanceName !== "Personal") {
         setInCombat(false);

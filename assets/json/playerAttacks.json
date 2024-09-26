@@ -77,11 +77,10 @@
       "damageMult": 2.0
    },
    {
-      "name": "aimed shot",
+      "name": "careful shot",
       "targets": "single",
       "hitChance": 1.0,
-      "damageMult": 1.5,
-      "buff": [{"name":"stun", "chance":0.5}]
+      "damageMult": 0.95
    },
    {
       "name": "poison shot",
