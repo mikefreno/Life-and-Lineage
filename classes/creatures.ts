@@ -120,19 +120,19 @@ export class Creature {
   readonly baseArmor: number;
 
   /**
-   * Current energy of the creature (can be null)
+   * Current energy of the creature
    */
-  energy: number | null;
+  energy: number;
 
   /**
-   * Maximum energy of the creature (can be null)
+   * Maximum energy of the creature
    */
-  readonly energyMax: number | null;
+  readonly energyMax: number;
 
   /**
-   * Energy regeneration rate of the creature (can be null)
+   * Energy regeneration rate of the creature
    */
-  readonly energyRegen: number | null;
+  readonly energyRegen: number;
 
   /**
    * List of attacks the creature can perform
@@ -176,9 +176,9 @@ export class Creature {
     this.healthMax = healthMax;
     this.attackPower = attackPower;
     this.baseArmor = baseArmor ?? 0; // Default base armor to 0 if not provided
-    this.energy = energy ?? null; // Initialize energy to null if not provided
-    this.energyMax = energyMax ?? null; // Initialize energyMax to null if not provided
-    this.energyRegen = energyRegen ?? null; // Initialize energyRegen to null if not provided
+    this.energy = energy ?? 0; // Initialize energy to 0 if not provided
+    this.energyMax = energyMax ?? 0; // Initialize energyMax to 0 if not provided
+    this.energyRegen = energyRegen ?? 0; // Initialize energyRegen to 0 if not provided
     this.attacks = this.initAttacks(attacks); // Initialize attacks
     this.conditions = conditions ?? []; // Initialize conditions to an empty array if not provided
     this.gotDrops = false; // Initialize gotDrops to false
@@ -281,12 +281,10 @@ export class Creature {
    * Regenerates the creature's energy based on its regeneration rate.
    */
   public regenerate() {
-    if (this.energy && this.energyRegen && this.energyMax) {
-      if (this.energy + this.energyRegen >= this.energyMax) {
-        this.energy = this.energyMax;
-      } else {
-        this.energy += this.energyRegen;
-      }
+    if (this.energy + this.energyRegen >= this.energyMax) {
+      this.energy = this.energyMax;
+    } else {
+      this.energy += this.energyRegen;
     }
   }
 

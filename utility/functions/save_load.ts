@@ -11,14 +11,15 @@ const _fullSave = async (
 ) => {
   if (game && player) {
     try {
-      storage.set("game", stringifyCircular(game));
+      const clearedInventory = game.clearInventories();
+      storage.set("game", stringifyCircular(clearedInventory));
       storage.set("player", stringifyCircular(player));
     } catch (e) {
       console.log("Error in fullSave:", e);
     }
   }
 };
-function stringifyCircular(obj) {
+function stringifyCircular(obj: any) {
   const seen = new WeakSet();
 
   return JSON.stringify(obj, (key, value) => {

@@ -1,10 +1,10 @@
 import { DungeonInstance, DungeonLevel } from "./dungeon";
-import { Shop } from "./shop";
 import dungeons from "../assets/json/dungeons.json";
 import { action, makeObservable, observable } from "mobx";
 import { PlayerCharacter } from "./character";
 import { lowSanityDebuffGenerator } from "../utility/functions/conditions";
 import { TutorialOption } from "../utility/types";
+import { Shop } from "./shop";
 
 interface GameOptions {
   date?: string;
@@ -275,6 +275,9 @@ export class Game {
   }
   public enableTutorials() {
     this.tutorialsEnabled = true;
+  }
+  public clearInventories() {
+    this.shops.forEach((shop) => shop.clearInventory());
   }
 
   static fromJSON(json: any): Game {

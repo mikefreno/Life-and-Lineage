@@ -54,9 +54,11 @@ export default function LearningKnowledgeScreen() {
 
   useEffect(() => {
     if (selectedBook && playerState) {
-      const spell = selectedBook.getAttachedSpell(playerState.playerClass);
+      const spell = selectedBook.attachedSpell;
 
-      setSelectedBookSpell(spell);
+      if (spell) {
+        setSelectedBookSpell(spell);
+      }
     }
   }, [selectedBook]);
 
@@ -77,10 +79,7 @@ export default function LearningKnowledgeScreen() {
   );
 
   const filteredBooks = books?.filter(
-    (book) =>
-      !studyingSpells?.includes(
-        book.getAttachedSpell(playerState.playerClass).name,
-      ),
+    (book) => !studyingSpells?.includes(book.attachedSpell?.name!),
   );
   function bookLabel() {
     if (playerState && selectedBookSpell) {

@@ -18,6 +18,9 @@ interface ShopProps {
   inventory?: Item[];
   shopKeeper: Character;
   archetype: string;
+  playerClass: PlayerClassOptions;
+  trades: ItemClassType[];
+  inventoryCount?: number;
 }
 
 /**
@@ -29,6 +32,9 @@ export class Shop {
   currentGold: number;
   lastStockRefresh: string;
   inventory: Item[];
+  inventoryCount: number;
+  trades: ItemClassType[];
+  playerClass: PlayerClassOptions;
   shopKeeper: Character;
   readonly archetype: string;
 
@@ -39,12 +45,18 @@ export class Shop {
     inventory,
     shopKeeper,
     archetype,
+    playerClass,
+    trades,
+    inventoryCount,
   }: ShopProps) {
     this.baseGold = baseGold;
     this.currentGold = currentGold ?? baseGold;
     this.lastStockRefresh =
       lastStockRefresh.toISOString() ?? new Date().toISOString();
     this.inventory = inventory ?? [];
+    this.trades = trades;
+    this.playerClass = playerClass;
+    this.inventoryCount = inventoryCount ?? inventory?.length ?? 0;
     this.archetype = archetype;
     this.shopKeeper = shopKeeper;
     makeObservable(this, {
@@ -55,6 +67,7 @@ export class Shop {
       refreshInventory: action,
       buyItem: action,
       sellItem: action,
+      clearInventory: action,
     });
   }
 
@@ -140,14 +153,25 @@ export class Shop {
     return condensedInventory;
   }
 
+  public clearInventory() {
+    this.inventory = [];
+  }
+
   static fromJSON(json: any): Shop {
     return new Shop({
       shopKeeper: Character.fromJSON(json.shopKeeper),
       baseGold: json.baseGold,
       currentGold: json.currentGold,
       lastStockRefresh: new Date(json.lastStockRefresh),
-      inventory: json.inventory.map((item: any) => Item.fromJSON(item)),
-      archetype: json.archetype,
+      inventory: generateInventory(
+        json.inventoryCount,
+        json.trades,
+        json.playerClass,
+      ),
+      archetype: json.archetypes,
+      playerClass: json.playerClass,
+      trades: json.trades,
+      inventoryCount: json.inventoryCount,
     });
   }
 }

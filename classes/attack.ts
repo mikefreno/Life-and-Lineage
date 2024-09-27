@@ -121,7 +121,7 @@ export class Attack {
     if (user.isStunned) {
       return false;
     }
-    if ("energy" in user && user.energy && user.energy < this.energyCost) {
+    if ("energy" in user && user.energy < this.energyCost) {
       return false;
     }
     return true;

@@ -1,4 +1,4 @@
-import { LayoutChangeEvent, Pressable, ScrollView, View } from "react-native";
+import { LayoutChangeEvent, Pressable, View } from "react-native";
 import { Text } from "./Themed";
 import GearStatsDisplay from "./GearStatsDisplay";
 import { useColorScheme } from "nativewind";
@@ -67,10 +67,6 @@ export function StatsDisplay({
   const [viewHeight, setViewHeight] = useState(dimensions.height * 0.2);
   const [blockSize, setBlockSize] = useState<number>();
   const [showingAttacks, setShowingAttacks] = useState<boolean>(false);
-
-  useEffect(() => {
-    console.log(displayItem.item[0]);
-  }, [displayItem]);
 
   useEffect(() => {
     if (dimensions.width === dimensions.lesser) {
@@ -330,8 +326,8 @@ export function StatsDisplay({
       >
         <View>
           {playerState &&
-            displayItem.item[0].attachedAttacks.map((attack) => (
-              <View key={attack.name}>
+            displayItem.item[0].attachedAttacks.map((attack, idx) => (
+              <View key={idx}>
                 {attack.AttackRender(
                   playerState,
                   displayItem.item[0].stats?.damage,
