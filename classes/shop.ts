@@ -19,8 +19,6 @@ interface ShopProps {
   shopKeeper: Character;
   archetype: string;
   playerClass: PlayerClassOptions;
-  trades: ItemClassType[];
-  inventoryCount?: number;
 }
 
 /**
@@ -32,8 +30,6 @@ export class Shop {
   currentGold: number;
   lastStockRefresh: string;
   inventory: Item[];
-  inventoryCount: number;
-  trades: ItemClassType[];
   playerClass: PlayerClassOptions;
   shopKeeper: Character;
   readonly archetype: string;
@@ -46,17 +42,13 @@ export class Shop {
     shopKeeper,
     archetype,
     playerClass,
-    trades,
-    inventoryCount,
   }: ShopProps) {
     this.baseGold = baseGold;
     this.currentGold = currentGold ?? baseGold;
     this.lastStockRefresh =
       lastStockRefresh.toISOString() ?? new Date().toISOString();
     this.inventory = inventory ?? [];
-    this.trades = trades;
     this.playerClass = playerClass;
-    this.inventoryCount = inventoryCount ?? inventory?.length ?? 0;
     this.archetype = archetype;
     this.shopKeeper = shopKeeper;
     makeObservable(this, {
@@ -71,7 +63,7 @@ export class Shop {
     });
   }
 
-  public refreshInventory(playerClass: PlayerClassOptions) {
+  public refreshInventory() {
     const shopObj = shops.find((shop) => shop.type == this.archetype);
     if (shopObj) {
       const newCount = getRandomInt(
@@ -81,7 +73,7 @@ export class Shop {
       this.inventory = generateInventory(
         newCount,
         shopObj.trades as ItemClassType[],
-        playerClass,
+        this.playerClass,
       );
       this.lastStockRefresh = new Date().toISOString();
       this.currentGold = this.baseGold;
@@ -158,21 +150,22 @@ export class Shop {
   }
 
   static fromJSON(json: any): Shop {
-    return new Shop({
+    const shop = new Shop({
       shopKeeper: Character.fromJSON(json.shopKeeper),
       baseGold: json.baseGold,
       currentGold: json.currentGold,
       lastStockRefresh: new Date(json.lastStockRefresh),
-      inventory: generateInventory(
-        json.inventoryCount,
-        json.trades,
-        json.playerClass,
-      ),
-      archetype: json.archetypes,
+      archetype: json.archetype,
       playerClass: json.playerClass,
-      trades: json.trades,
-      inventoryCount: json.inventoryCount,
+      inventory: json.inventory
+        ? json.inventory.map((item: any) => Item.fromJSON(item))
+        : [],
     });
+    if (shop.inventory.length == 0) {
+      shop.refreshInventory();
+    }
+    shop.refreshInventory();
+    return shop;
   }
 }
 
@@ -220,21 +213,14 @@ export function createShops(playerClass: PlayerClassOptions) {
   let createdShops: Shop[] = [];
   shops.forEach((shop) => {
     //want to favor likelihood of male shopkeepers slightly
-    const itemCount = getRandomInt(
-      shop.itemQuantityRange.minimum,
-      shop.itemQuantityRange.maximum,
-    );
     const newShop = new Shop({
       shopKeeper: generateShopKeeper(shop.type),
       baseGold: shop.baseGold,
       lastStockRefresh: new Date(),
       archetype: shop.type,
-      inventory: generateInventory(
-        itemCount,
-        shop.trades as ItemClassType[],
-        playerClass,
-      ),
+      playerClass,
     });
+    newShop.refreshInventory();
     createdShops.push(newShop);
   });
   return createdShops;

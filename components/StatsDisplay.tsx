@@ -327,7 +327,7 @@ export function StatsDisplay({
         <View>
           {playerState &&
             displayItem.item[0].attachedAttacks.map((attack, idx) => (
-              <View key={idx}>
+              <View key={displayItem.item[0].id + idx}>
                 {attack.AttackRender(
                   playerState,
                   displayItem.item[0].stats?.damage,

@@ -4,6 +4,7 @@ import type { Enemy } from "../../classes/creatures";
 import { Game } from "../../classes/game";
 import type { AppContextType, DungeonContextType } from "../types";
 import { storage } from "./storage";
+import { parse, stringify } from "flatted";
 
 const _fullSave = async (
   game: Game | undefined,
@@ -11,27 +12,14 @@ const _fullSave = async (
 ) => {
   if (game && player) {
     try {
-      const clearedInventory = game.clearInventories();
-      storage.set("game", stringifyCircular(clearedInventory));
-      storage.set("player", stringifyCircular(player));
+      game.clearInventories();
+      storage.set("game", stringify(game));
+      storage.set("player", stringify(player));
     } catch (e) {
-      console.log("Error in fullSave:", e);
+      console.log("Error in _fullSave:", e);
     }
   }
 };
-function stringifyCircular(obj: any) {
-  const seen = new WeakSet();
-
-  return JSON.stringify(obj, (key, value) => {
-    if (typeof value === "object" && value !== null) {
-      if (seen.has(value)) {
-        return; // Ignore circular references
-      }
-      seen.add(value);
-    }
-    return value;
-  });
-}
 
 /**
  * This should only rarely be called directly, such as app settings changes and shop transactions
@@ -44,8 +32,8 @@ export const fullLoad = async () => {
     const retrieved_player = storage.getString("player");
     if (!retrieved_game || !retrieved_player)
       return { game: undefined, player: undefined };
-    let game = Game.fromJSON(JSON.parse(retrieved_game));
-    let player = PlayerCharacter.fromJSON(JSON.parse(retrieved_player));
+    let game = Game.fromJSON(parse(retrieved_game));
+    let player = PlayerCharacter.fromJSON(parse(retrieved_player));
     return { player, game };
   } catch (e) {
     console.log("Error in fullLoad:", e);

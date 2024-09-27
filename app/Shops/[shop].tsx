@@ -24,9 +24,9 @@ import { Coins } from "../../assets/icons/SVGIcons";
 import { fullSave } from "../../utility/functions/save_load";
 import { TutorialOption } from "../../utility/types";
 
-const ONE_HOUR = 60 * 60 * 1000;
+const TEN_MINUTES = 10 * 60 * 1000;
 const ONE_SECOND = 1000;
-const REFRESH_TIME = __DEV__ ? ONE_SECOND : ONE_HOUR;
+const REFRESH_TIME = __DEV__ ? ONE_SECOND : TEN_MINUTES;
 
 const ShopInteriorScreen = observer(() => {
   const { shop } = useLocalSearchParams();
@@ -64,7 +64,7 @@ const ShopInteriorScreen = observer(() => {
       thisShop &&
       new Date(thisShop.lastStockRefresh) < new Date(Date.now() - REFRESH_TIME)
     ) {
-      thisShop.refreshInventory(playerState.playerClass);
+      thisShop.refreshInventory();
     }
     setRefreshCheck(true);
   }, [playerState]);
