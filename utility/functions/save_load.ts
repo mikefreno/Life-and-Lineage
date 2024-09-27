@@ -4,7 +4,6 @@ import type { Enemy } from "../../classes/creatures";
 import { Game } from "../../classes/game";
 import type { AppContextType, DungeonContextType } from "../types";
 import { storage } from "./storage";
-import { stringify } from "flatted";
 
 const _fullSave = async (
   game: Game | undefined,
@@ -12,13 +11,26 @@ const _fullSave = async (
 ) => {
   if (game && player) {
     try {
-      storage.set("game", stringify(game));
-      storage.set("player", JSON.stringify(player));
+      storage.set("game", stringifyCircular(game));
+      storage.set("player", stringifyCircular(player));
     } catch (e) {
       console.log("Error in fullSave:", e);
     }
   }
 };
+function stringifyCircular(obj) {
+  const seen = new WeakSet();
+
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === "object" && value !== null) {
+      if (seen.has(value)) {
+        return; // Ignore circular references
+      }
+      seen.add(value);
+    }
+    return value;
+  });
+}
 
 /**
  * This should only rarely be called directly, such as app settings changes and shop transactions

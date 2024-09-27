@@ -12,7 +12,7 @@ export default function AttackDetails({
   baseDamage: number;
 }) {
   return (
-    <>
+    <View className="flex w-full my-1 items-center bg-zinc-300 dark:bg-zinc-700 border rounded border-zinc-900 dark:border-zinc-50 pb-2">
       <Text className="text-xl">{toTitleCase(attack.name)}</Text>
       <Text>
         {toTitleCase(attack.attackStyle)}{" "}
@@ -42,7 +42,7 @@ export default function AttackDetails({
           ))}
         </>
       )}
-      <View className="my-1 w-5/6 items-center rounded-md border border-zinc-800 px-2 py-1 dark:border-zinc-100">
+      <View className="my-1 w-5/6 items-center rounded-md border border-zinc-800 px-2 py-1 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-900 ">
         <Text className="text-center">
           {baseDamage}
           {attack.hits > 1
@@ -53,6 +53,6 @@ export default function AttackDetails({
           base attack damage
         </Text>
       </View>
-    </>
+    </View>
   );
 }

@@ -17,6 +17,7 @@ import type { PlayerCharacter } from "./character";
 import { Spell } from "./spell";
 import { Attack } from "./attack";
 import attackObjects from "../assets/json/playerAttacks.json";
+import { computed, makeObservable } from "mobx";
 
 export class Item {
   readonly id: string;
@@ -41,8 +42,6 @@ export class Item {
   };
   readonly playerClass: PlayerClassOptions;
   readonly attackStrings: string[];
-  readonly Spell: Spell | undefined;
-  readonly Attacks: Attack[] | undefined;
 
   constructor({
     id,
@@ -54,7 +53,7 @@ export class Item {
     icon,
     requirements,
     playerClass,
-    attacks,
+    attacks = [],
     stackable = false,
   }: ItemOptions) {
     this.id = id ?? Crypto.randomUUID();
@@ -67,9 +66,11 @@ export class Item {
     this.requirements = requirements ?? {};
     this.stackable = stackable;
     this.playerClass = playerClass;
-    this.attackStrings = attacks ?? [];
-    this.Spell = Item.getAttachedSpell(playerClass, itemClass, name);
-    this.Attacks = Item.getAttachedAttacks(attacks ?? []);
+    this.attackStrings = attacks;
+    makeObservable(this, {
+      attachedSpell: computed,
+      attachedAttacks: computed,
+    });
   }
 
   get isEquippable() {
@@ -123,9 +124,9 @@ export class Item {
     return Math.round(this.baseValue * (1.4 - affection / 2500));
   }
 
-  static getAttachedAttacks(attacks: string[]) {
+  get attachedAttacks() {
     const builtAttacks: Attack[] = [];
-    attacks.forEach((attackString) => {
+    this.attackStrings.forEach((attackString) => {
       const found = attackObjects.find((obj) => obj.name == attackString);
       if (found) {
         // @ts-ignore
@@ -135,53 +136,44 @@ export class Item {
     return builtAttacks;
   }
 
-  static getAttachedSpell(
-    playerClass: "mage" | "paladin" | "necromancer" | "ranger",
-    itemClass: ItemClassType,
-    name: string,
-  ) {
-    let spell = undefined;
-    if (itemClass == ItemClassType.Book) {
-      if (playerClass == "mage") {
-        const bookObj = mageBooks.find((book) => book.name == name);
-        spell = mageSpells.find(
-          (mageSpell) => bookObj?.teaches == mageSpell.name,
-        );
-        if (!spell) {
-          throw new Error(`missing spell from Book Item ${this.name}`);
-        }
+  get attachedSpell() {
+    if (this.itemClass == ItemClassType.Book) {
+      let spell: any;
+      let bookObj: any;
+      switch (this.playerClass) {
+        case PlayerClassOptions.mage:
+          bookObj = mageBooks.find((book) => book.name == this.name);
+          spell = mageSpells.find(
+            (mageSpell) => bookObj?.teaches == mageSpell.name,
+          );
+          if (spell) {
+            return new Spell({ ...spell });
+          }
+        case PlayerClassOptions.necromancer:
+          bookObj = necroBooks.find((book) => book.name == this.name);
+          spell = necroSpells.find(
+            (necroSpell) => bookObj?.teaches == necroSpell.name,
+          );
+          if (spell) {
+            return new Spell({ ...spell });
+          }
+        case PlayerClassOptions.ranger:
+          bookObj = rangerBooks.find((book) => book.name == this.name);
+          spell = rangerSpells.find(
+            (paladinSpell) => bookObj?.teaches == paladinSpell.name,
+          );
+          if (spell) {
+            return new Spell({ ...spell });
+          }
+        case PlayerClassOptions.paladin:
+          bookObj = paladinBooks.find((book) => book.name == this.name);
+          spell = paladinSpells.find(
+            (paladinSpell) => bookObj?.teaches == paladinSpell.name,
+          );
+          if (spell) {
+            return new Spell({ ...spell });
+          }
       }
-      if (playerClass == "necromancer") {
-        const bookObj = necroBooks.find((book) => book.name == this.name);
-        spell = necroSpells.find(
-          (necroSpell) => bookObj?.teaches == necroSpell.name,
-        );
-        if (!spell) {
-          throw new Error(`missing spell from Book Item ${this.name}`);
-        }
-      }
-      if (playerClass == "paladin") {
-        const bookObj = paladinBooks.find((book) => book.name == this.name);
-        spell = paladinSpells.find(
-          (paladinSpell) => bookObj?.teaches == paladinSpell.name,
-        );
-        if (!spell) {
-          throw new Error(`missing spell from Book Item ${this.name}`);
-        }
-      }
-      if (playerClass == "ranger") {
-        const bookObj = rangerBooks.find((book) => book.name == this.name);
-        spell = rangerSpells.find(
-          (paladinSpell) => bookObj?.teaches == paladinSpell.name,
-        );
-        if (!spell) {
-          throw new Error(`missing spell from Book Item ${this.name}`);
-        }
-      }
-    }
-    if (spell) {
-      const madeSpell = new Spell({ ...spell });
-      return madeSpell;
     }
   }
 
@@ -196,7 +188,7 @@ export class Item {
       stackable: isStackable(json.itemClass),
       requirements: json.requirements,
       icon: json.icon,
-      attacks: json.attackStrings,
+      attacks: json.attacks,
       playerClass: json.playerClass,
     });
 

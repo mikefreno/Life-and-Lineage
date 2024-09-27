@@ -1,4 +1,4 @@
-import { LayoutChangeEvent, Pressable, View } from "react-native";
+import { LayoutChangeEvent, Pressable, ScrollView, View } from "react-native";
 import { Text } from "./Themed";
 import GearStatsDisplay from "./GearStatsDisplay";
 import { useColorScheme } from "nativewind";
@@ -18,6 +18,7 @@ import {
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
 import { Attribute, ItemClassType, MasteryToString } from "../utility/types";
+import GenericModal from "./GenericModal";
 
 type BaseProps = {
   displayItem: {
@@ -65,6 +66,11 @@ export function StatsDisplay({
   const [viewWidth, setViewWidth] = useState(dimensions.width * 0.4);
   const [viewHeight, setViewHeight] = useState(dimensions.height * 0.2);
   const [blockSize, setBlockSize] = useState<number>();
+  const [showingAttacks, setShowingAttacks] = useState<boolean>(false);
+
+  useEffect(() => {
+    console.log(displayItem.item[0]);
+  }, [displayItem]);
 
   useEffect(() => {
     if (dimensions.width === dimensions.lesser) {
@@ -300,9 +306,9 @@ export function StatsDisplay({
   };
 
   function bookItemLabel() {
-    if (playerState && displayItem.item[0].Spell) {
+    if (playerState && displayItem.item[0].attachedSpell) {
       return `${
-        MasteryToString[displayItem.item[0].Spell.proficiencyNeeded]
+        MasteryToString[displayItem.item[0].attachedSpell.proficiencyNeeded]
       } level book`;
     }
   }
@@ -317,102 +323,120 @@ export function StatsDisplay({
   }
 
   return (
-    <View
-      className="items-center rounded-md border border-zinc-600 p-4"
-      onLayout={onLayoutView}
-      style={
-        displayItem.item[0].itemClass == ItemClassType.Book
-          ? {
-              backgroundColor:
-                colorScheme == "light"
-                  ? "rgba(250, 250, 250, 0.98)"
-                  : "rgba(20, 20, 20, 0.95)",
-              left: 20,
-              top:
-                topGuard &&
-                displayItem.positon.top + (topOffset ?? 0) < topGuard
-                  ? topGuard
-                  : viewHeight + displayItem.positon.top < dimensions.height
-                  ? displayItem.positon.top + (topOffset ?? 0)
-                  : dimensions.height - (viewHeight + 20),
-            }
-          : {
-              maxWidth: dimensions.width * 0.4,
-              backgroundColor:
-                colorScheme == "light"
-                  ? "rgba(250, 250, 250, 0.98)"
-                  : "rgba(20, 20, 20, 0.95)",
-              left:
-                displayItem.positon.left + blockSize < dimensions.width * 0.6
-                  ? displayItem.positon.left + blockSize
-                  : displayItem.positon.left - viewWidth - 4,
-              top:
-                topGuard &&
-                displayItem.positon.top + (topOffset ?? 0) < topGuard
-                  ? topGuard
-                  : viewHeight + displayItem.positon.top <
-                    dimensions.height - tabBarHeight
-                  ? displayItem.positon.top + (topOffset ?? 0)
-                  : dimensions.height - (viewHeight + tabBarHeight),
-            }
-      }
-    >
-      <Pressable
-        onPress={() => clearItem()}
-        className="absolute right-0 border-zinc-600 rounded-tr rounded-bl dark:border-zinc-400 px-2 py-1"
+    <>
+      <GenericModal
+        isVisibleCondition={showingAttacks}
+        backFunction={() => setShowingAttacks(false)}
       >
-        <Text className="-mt-3 -ml-1 text-2xl">x</Text>
-      </Pressable>
-      <View>
-        <Text className="text-center">
-          {toTitleCase(displayItem.item[0].name)}
-        </Text>
-      </View>
-      {displayItem.item[0].stats && displayItem.item[0].slot ? (
-        <View className="py-2">
-          <GearStatsDisplay stats={displayItem.item[0].stats} />
-        </View>
-      ) : null}
-      <RequirementsBlock />
-      {(displayItem.item[0].slot == "one-hand" ||
-        displayItem.item[0].slot == "two-hand" ||
-        displayItem.item[0].slot == "off-hand") && (
-        <Text className="text-sm">{toTitleCase(displayItem.item[0].slot)}</Text>
-      )}
-      <Text className="text-sm">
-        {displayItem.item[0].itemClass == "bodyArmor"
-          ? "Body Armor"
-          : displayItem.item[0].itemClass == "book" && playerState
-          ? bookItemLabel()
-          : toTitleCase(displayItem.item[0].itemClass)}
-      </Text>
-      {displayItem.item[0].Attacks && playerState && (
         <View>
-          {displayItem.item[0].Attacks.map((attack) =>
-            attack.AttackRender(playerState),
-          )}
+          {playerState &&
+            displayItem.item[0].attachedAttacks.map((attack) => (
+              <View key={attack.name}>
+                {attack.AttackRender(
+                  playerState,
+                  displayItem.item[0].stats?.damage,
+                )}
+              </View>
+            ))}
         </View>
-      )}
-      {displayItem.item[0].Spell ? (
-        <>
-          <View className="px-2 mx-auto">
-            <SpellDetails spell={displayItem.item[0].Spell} />
+      </GenericModal>
+      <View
+        className="items-center rounded-md border border-zinc-600 p-4"
+        onLayout={onLayoutView}
+        style={
+          displayItem.item[0].itemClass == ItemClassType.Book
+            ? {
+                backgroundColor:
+                  colorScheme == "light"
+                    ? "rgba(250, 250, 250, 0.98)"
+                    : "rgba(20, 20, 20, 0.95)",
+                left: 20,
+                top:
+                  topGuard &&
+                  displayItem.positon.top + (topOffset ?? 0) < topGuard
+                    ? topGuard
+                    : viewHeight + displayItem.positon.top < dimensions.height
+                    ? displayItem.positon.top + (topOffset ?? 0)
+                    : dimensions.height - (viewHeight + 20),
+              }
+            : {
+                width: dimensions.width * 0.4,
+                backgroundColor:
+                  colorScheme == "light"
+                    ? "rgba(250, 250, 250, 0.98)"
+                    : "rgba(20, 20, 20, 0.95)",
+                left:
+                  displayItem.positon.left + blockSize < dimensions.width * 0.6
+                    ? displayItem.positon.left + blockSize
+                    : displayItem.positon.left - viewWidth - 4,
+                top:
+                  topGuard &&
+                  displayItem.positon.top + (topOffset ?? 0) < topGuard
+                    ? topGuard
+                    : viewHeight + displayItem.positon.top <
+                      dimensions.height - tabBarHeight
+                    ? displayItem.positon.top + (topOffset ?? 0)
+                    : dimensions.height - (viewHeight + tabBarHeight),
+              }
+        }
+      >
+        <Pressable
+          onPress={() => clearItem()}
+          className="absolute right-0 border-zinc-600 rounded-tr rounded-bl dark:border-zinc-400 px-2 py-1"
+        >
+          <Text className="-mt-3 -ml-1 text-2xl">x</Text>
+        </Pressable>
+        <View>
+          <Text className="text-center">
+            {toTitleCase(displayItem.item[0].name)}
+          </Text>
+        </View>
+        {displayItem.item[0].stats && displayItem.item[0].slot ? (
+          <View className="py-2">
+            <GearStatsDisplay stats={displayItem.item[0].stats} />
           </View>
-          {!("purchaseItem" in props || "addItemToPouch" in props) && (
-            <GenericFlatButton
-              onPressFunction={() => {
-                vibration({ style: "light" });
-                clearItem();
-                router.push("/Study");
-              }}
-              className="mt-2"
-            >
-              Study This Book
-            </GenericFlatButton>
-          )}
-        </>
-      ) : null}
-      <SaleSection />
-    </View>
+        ) : null}
+        <RequirementsBlock />
+        {(displayItem.item[0].slot == "one-hand" ||
+          displayItem.item[0].slot == "two-hand" ||
+          displayItem.item[0].slot == "off-hand") && (
+          <Text className="text-sm">
+            {toTitleCase(displayItem.item[0].slot)}
+          </Text>
+        )}
+        <Text className="text-sm">
+          {displayItem.item[0].itemClass == "bodyArmor"
+            ? "Body Armor"
+            : displayItem.item[0].itemClass == "book" && playerState
+            ? bookItemLabel()
+            : toTitleCase(displayItem.item[0].itemClass)}
+        </Text>
+        {displayItem.item[0].attachedAttacks.length > 0 && playerState && (
+          <GenericFlatButton onPressFunction={() => setShowingAttacks(true)}>
+            Show attacks
+          </GenericFlatButton>
+        )}
+        {displayItem.item[0].attachedSpell ? (
+          <>
+            <View className="px-2 mx-auto">
+              <SpellDetails spell={displayItem.item[0].attachedSpell} />
+            </View>
+            {!("purchaseItem" in props || "addItemToPouch" in props) && (
+              <GenericFlatButton
+                onPressFunction={() => {
+                  vibration({ style: "light" });
+                  clearItem();
+                  router.push("/Study");
+                }}
+                className="mt-2"
+              >
+                Study This Book
+              </GenericFlatButton>
+            )}
+          </>
+        ) : null}
+        <SaleSection />
+      </View>
+    </>
   );
 }

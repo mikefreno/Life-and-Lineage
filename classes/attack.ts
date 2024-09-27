@@ -101,6 +101,17 @@ export class Attack {
     return user.attackPower * this.damageMult + this.flatHealthDamage;
   }
 
+  public damageBasedOnWeapon(user: PlayerCharacter, weaponDamage: number) {
+    if (this.damageMult == 0) {
+      return 0;
+    }
+    return (
+      user.totalStrength * 0.5 +
+      weaponDamage * this.damageMult +
+      this.flatHealthDamage
+    );
+  }
+
   /**
    * Checks if the attack can be used based on the user's current state.
    * @param user - The user of the attack, which can be a PlayerCharacter, Enemy, or Minion.
@@ -390,7 +401,19 @@ export class Attack {
     return target.creatureSpecies;
   }
 
-  public AttackRender(user: PlayerCharacter | Enemy | Minion) {
+  public AttackRender(
+    user: PlayerCharacter | Enemy | Minion,
+    weaponDamage?: number,
+  ) {
+    if (weaponDamage) {
+      return AttackDetails({
+        attack: this,
+        baseDamage: this.damageBasedOnWeapon(
+          user as PlayerCharacter,
+          weaponDamage,
+        ),
+      });
+    }
     return AttackDetails({ attack: this, baseDamage: this.baseDamage(user) });
   }
 

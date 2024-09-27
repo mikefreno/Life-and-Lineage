@@ -243,7 +243,7 @@
       "name": "crusader's war hammer",
       "baseValue": 310000,
       "slot": "two-hand",
-      "attacks": ["slash", "cleave"],
+      "attacks": ["crushing blow"],
       "icon":"Golden_Hammer",
       "stats":{
          "damage": 45.0
