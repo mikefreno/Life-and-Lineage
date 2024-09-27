@@ -562,6 +562,7 @@ export class PlayerCharacter extends Character {
         stats: { baseDamage: 1 },
         baseValue: 0,
         itemClass: ItemClassType.Melee,
+        playerClass: PlayerClassOptions[playerClass],
       }),
       offHand: null,
       head: null,
@@ -2122,6 +2123,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        playerClass: PlayerClassOptions.mage,
       });
     case Element.water:
       return new Item({
@@ -2129,6 +2131,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        playerClass: PlayerClassOptions.mage,
       });
     case Element.air:
       return new Item({
@@ -2136,6 +2139,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        playerClass: PlayerClassOptions.mage,
       });
     case Element.earth:
       return new Item({
@@ -2143,6 +2147,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        playerClass: PlayerClassOptions.mage,
       });
     case Element.blood:
       return new Item({
@@ -2150,6 +2155,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        playerClass: PlayerClassOptions.necromancer,
       });
     case Element.summoning:
       return new Item({
@@ -2157,6 +2163,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        playerClass: PlayerClassOptions.necromancer,
       });
     case Element.pestilence:
       return new Item({
@@ -2164,6 +2171,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        playerClass: PlayerClassOptions.necromancer,
       });
     case Element.bone:
       return new Item({
@@ -2171,6 +2179,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        playerClass: PlayerClassOptions.necromancer,
       });
     case Element.holy:
       return new Item({
@@ -2178,6 +2187,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        playerClass: PlayerClassOptions.paladin,
       });
     case Element.protection:
       return new Item({
@@ -2185,6 +2195,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        playerClass: PlayerClassOptions.paladin,
       });
     case Element.vengeance:
       return new Item({
@@ -2192,6 +2203,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        playerClass: PlayerClassOptions.paladin,
       });
     case Element.beastMastery:
       return new Item({
@@ -2199,6 +2211,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        playerClass: PlayerClassOptions.ranger,
       });
     case Element.assassination:
       return new Item({
@@ -2206,6 +2219,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        playerClass: PlayerClassOptions.ranger,
       });
     case Element.arcane:
       return new Item({
@@ -2213,6 +2227,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        playerClass: PlayerClassOptions.ranger,
       });
     default:
       throw new Error("Invalid player blessing in getStartingBook()");

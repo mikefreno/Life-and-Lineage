@@ -171,6 +171,7 @@ function getAnItemByType(
     ...itemObj,
     itemClass: type,
     stackable: isStackable(type as ItemClassType),
+    playerClass: playerClass,
   });
 }
 

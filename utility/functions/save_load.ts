@@ -4,6 +4,7 @@ import type { Enemy } from "../../classes/creatures";
 import { Game } from "../../classes/game";
 import type { AppContextType, DungeonContextType } from "../types";
 import { storage } from "./storage";
+import { stringify } from "flatted";
 
 const _fullSave = async (
   game: Game | undefined,
@@ -11,11 +12,7 @@ const _fullSave = async (
 ) => {
   if (game && player) {
     try {
-      storage.set("game", JSON.stringify(game));
-      player.minionsAndPets.forEach((minion) => minion.stripParent());
-      player.currentDungeon?.enemy?.minions.map((minion) =>
-        minion.stripParent(),
-      );
+      storage.set("game", stringify(game));
       storage.set("player", JSON.stringify(player));
     } catch (e) {
       console.log("Error in fullSave:", e);
@@ -36,12 +33,6 @@ export const fullLoad = async () => {
       return { game: undefined, player: undefined };
     let game = Game.fromJSON(JSON.parse(retrieved_game));
     let player = PlayerCharacter.fromJSON(JSON.parse(retrieved_player));
-    player.minionsAndPets.forEach((minion) => minion.reinstateParent(player));
-    if (player.currentDungeon && player.currentDungeon.enemy) {
-      player.currentDungeon.enemy.minions.map((minion) =>
-        minion.reinstateParent(player.currentDungeon!.enemy!),
-      );
-    }
     return { player, game };
   } catch (e) {
     console.log("Error in fullLoad:", e);

@@ -300,11 +300,10 @@ export function StatsDisplay({
   };
 
   function bookItemLabel() {
-    if (playerState) {
-      const spellRes = displayItem.item[0].getAttachedSpell(
-        playerState.playerClass,
-      );
-      return `${MasteryToString[spellRes.proficiencyNeeded]} level book`;
+    if (playerState && displayItem.item[0].Spell) {
+      return `${
+        MasteryToString[displayItem.item[0].Spell.proficiencyNeeded]
+      } level book`;
     }
   }
   const onLayoutView = (event: LayoutChangeEvent) => {
@@ -387,14 +386,17 @@ export function StatsDisplay({
           ? bookItemLabel()
           : toTitleCase(displayItem.item[0].itemClass)}
       </Text>
-      {displayItem.item[0].itemClass == ItemClassType.Book && playerState ? (
+      {displayItem.item[0].Attacks && playerState && (
+        <View>
+          {displayItem.item[0].Attacks.map((attack) =>
+            attack.AttackRender(playerState),
+          )}
+        </View>
+      )}
+      {displayItem.item[0].Spell ? (
         <>
           <View className="px-2 mx-auto">
-            <SpellDetails
-              spell={displayItem.item[0].getAttachedSpell(
-                playerState.playerClass,
-              )}
-            />
+            <SpellDetails spell={displayItem.item[0].Spell} />
           </View>
           {!("purchaseItem" in props || "addItemToPouch" in props) && (
             <GenericFlatButton

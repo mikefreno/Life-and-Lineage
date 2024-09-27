@@ -12,7 +12,6 @@ import { useColorScheme } from "nativewind";
 import { useVibration } from "../../utility/customHooks";
 import GenericModal from "../GenericModal";
 import SpellDetails from "../SpellDetails";
-import GenericStrikeAround from "../GenericStrikeAround";
 import InventoryRender from "../InventoryRender";
 import { AppContext } from "../../app/_layout";
 import { DungeonContext } from "./DungeonContext";
@@ -389,47 +388,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
             {attackDetails instanceof Spell ? (
               <SpellDetails spell={attackDetails} />
             ) : (
-              <>
-                <Text className="text-xl">
-                  {toTitleCase(attackDetails?.name)}
-                </Text>
-                <Text>
-                  {toTitleCase(attackDetails.attackStyle)}{" "}
-                  {attackDetails.attackStyle == "single" && "Target"}
-                </Text>
-                {attackDetails.attackStyle && (
-                  <Text>{attackDetails.baseHitChance * 100}% hit chance</Text>
-                )}
-                {attackDetails.buffs && (
-                  <>
-                    <GenericStrikeAround>Buffs</GenericStrikeAround>
-                    {attackDetails.buffs.map((buff) => (
-                      <View>
-                        <Text>{buff}</Text>
-                      </View>
-                    ))}
-                  </>
-                )}
-                {attackDetails.debuffs && (
-                  <>
-                    <GenericStrikeAround>Debuffs</GenericStrikeAround>
-                    {attackDetails.debuffs.map((debuff) => (
-                      <View>
-                        <Text>{debuff.name}</Text>
-                        <Text>{debuff.chance * 100}% effect chance</Text>
-                      </View>
-                    ))}
-                  </>
-                )}
-                <View className="my-1 w-2/3 items-center rounded-md border border-zinc-800 px-2 py-1 dark:border-zinc-100">
-                  <Text className="text-center">
-                    {attackDetails.baseDamage(playerState)} base attack damage
-                  </Text>
-                  <Text className="text-center">
-                    (before enemy damage reduction)
-                  </Text>
-                </View>
-              </>
+              attackDetails.AttackRender(playerState)
             )}
           </View>
         )}

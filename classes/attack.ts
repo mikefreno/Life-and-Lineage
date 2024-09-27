@@ -8,7 +8,23 @@ import { toTitleCase, rollD20, wait } from "../utility/functions/misc";
 import type { PlayerCharacter } from "./character";
 import type { Enemy, Minion } from "./creatures";
 import { AttackUse } from "../utility/types";
+import AttackDetails from "../components/AttackDetails";
 
+/**
+ * Interface for the fields of an attack.
+ * @property {string} name - The name of the attack.
+ * @property {number} [energyCost=0] - The energy cost to perform the attack.
+ * @property {number} [hitChance=1.0] - The base hit chance of the attack.
+ * @property {"single" | "cleave" | "aoe"} [targets="single"] - The type of targets the attack can hit.
+ * @property {number} [damageMult=0] - The damage multiplier of the attack.
+ * @property {number} [flatHealthDamage=0] - The flat health damage of the attack.
+ * @property {number} [selfDamage=0] - The damage dealt to the attacker.
+ * @property {number} [flatSanityDamage=0] - The flat sanity damage of the attack.
+ * @property {string[]} [buffs=[]] - The buffs applied by the attack.
+ * @property {{ name: string; chance: number }[]} [debuffs=[]] - The debuffs applied by the attack.
+ * @property {string[]} [summons=[]] - The minions summoned by the attack.
+ * @property {number} [hits=1] - The number of hits the attack can perform.
+ */
 interface AttackFields {
   name: string;
   energyCost?: number;
@@ -55,10 +71,10 @@ export class Attack {
     flatHealthDamage = 0,
     selfDamage = 0,
     flatSanityDamage = 0,
-    hits = 1,
     buffs = [],
     debuffs = [],
     summons = [],
+    hits = 1,
   }: AttackFields) {
     this.name = name;
     this.energyCost = energyCost;
@@ -68,12 +84,16 @@ export class Attack {
     this.flatHealthDamage = flatHealthDamage;
     this.selfDamage = selfDamage;
     this.flatSanityDamage = flatSanityDamage;
-    this.hits = hits ?? 1;
+    this.hits = hits;
     this.buffs = buffs;
     this.debuffs = debuffs;
     this.summons = summons;
   }
-
+  /**
+   * Calculates the base damage of the attack based on the user's attack power and other modifiers.
+   * @param user - The user of the attack, which can be a PlayerCharacter, Enemy, or Minion.
+   * @returns The base damage of the attack.
+   */
   public baseDamage(user: PlayerCharacter | Enemy | Minion) {
     if (this.damageMult == 0) {
       return 0;
@@ -81,6 +101,11 @@ export class Attack {
     return user.attackPower * this.damageMult + this.flatHealthDamage;
   }
 
+  /**
+   * Checks if the attack can be used based on the user's current state.
+   * @param user - The user of the attack, which can be a PlayerCharacter, Enemy, or Minion.
+   * @returns True if the attack can be used, false otherwise.
+   */
   public canBeUsed(user: PlayerCharacter | Enemy | Minion) {
     if (user.isStunned) {
       return false;
@@ -91,6 +116,13 @@ export class Attack {
     return true;
   }
 
+  /**
+   * Uses the attack against a target.
+   * @param params - An object containing the user and target of the attack.
+   * @param params.user - The user of the attack, which can be a PlayerCharacter, Enemy, or Minion.
+   * @param params.target - The target of the attack, which can be an Enemy or PlayerCharacter.
+   * @returns An object containing the result of the attack and a log string.
+   */
   public use({
     user,
     target,
@@ -106,67 +138,85 @@ export class Attack {
         selfConditions: user.conditions,
         enemyConditions: target.conditions,
       });
-    if (!this.canBeUsed)
+    if (!this.canBeUsed(user)) {
       if (user.isStunned) {
         return {
           result: AttackUse.stunned,
-          logString: `${toTitleCase(this.getNameReference(user))} was stunned!`,
+          logString: `${toTitleCase(this.name)} was stunned!`,
         };
       } else {
         return {
           result: AttackUse.lowEnergy,
-          logString: `${toTitleCase(
-            this.getNameReference(user),
-          )} passed (low energy)!`,
+          logString: `${toTitleCase(this.name)} passed (low energy)!`,
         };
       }
+    }
+
+    // Expend energy if the user has energy (non-player character)
     if ("expendEnergy" in user) {
-      // PlayerCharacter's do no not have energy (can freely use attacks) - minions and enemies do (usually)
       user.expendEnergy(this.energyCost);
     }
 
-    const attemptResult = this.doesHit({
-      target,
-      conditionalHitChanceMultiplier: hitChanceMultiplier,
-    });
-    if (attemptResult == AttackUse.success) {
-      // attack has hit, now we do the damage calculation
-      const damagePreDR = this.baseDamage(user) * damageMult + damageFlat;
-      const enemyDR = target.getDamageReduction();
-      const damage = damagePreDR * (1 - enemyDR);
-      const finalDamage = Math.round(damage * 4) / 4; // physical damage
-      target.damageHealth({ damage: finalDamage, attackerId: user.id });
+    // Attempt each hit
+    const hits: AttackUse[] = [];
+    for (let i = 0; i < this.hits; i++) {
+      const attemptResult = this.doesHit({
+        target,
+        conditionalHitChanceMultiplier: hitChanceMultiplier,
+      });
+      hits.push(attemptResult);
+    }
+
+    if (hits.includes(AttackUse.success)) {
+      // Calculate total damage if any hit succeeds
+      const { totalDamage, totalDamagePreDR } = hits.reduce(
+        (acc, hitResult) => {
+          if (hitResult === AttackUse.success) {
+            const damagePreDR = this.baseDamage(user) * damageMult + damageFlat;
+            const enemyDR = target.getDamageReduction();
+            const damage = damagePreDR * (1 - enemyDR);
+            return {
+              totalDamage: acc.totalDamage + Math.round(damage * 4) / 4,
+              totalDamagePreDR: acc.totalDamagePreDR + damagePreDR,
+            };
+          }
+          return acc;
+        },
+        { totalDamage: 0, totalDamagePreDR: 0 },
+      );
+
+      target.damageHealth({ damage: totalDamage, attackerId: user.id });
       target.damageSanity(this.flatSanityDamage);
-      user.damageHealth({ damage: this.selfDamage, attackerId: target.id }); // we will need to check against self
-      //check for thorns and traps on target
+      user.damageHealth({ damage: this.selfDamage, attackerId: target.id });
+
       const thornsIshDamage = getConditionDamageToAttacker(
         target.conditions,
       ).healthDamage;
       if (thornsIshDamage > 0) {
         user.damageHealth({ damage: thornsIshDamage, attackerId: target.id });
       }
-      // create debuff loop
-      const debuffNames: string[] = []; // only storing names, collecting for logBuilder
+
+      const debuffNames: string[] = [];
       let amountHealed = 0;
       this.debuffs.forEach((debuff) => {
         const roll = rollD20();
         if (roll * 5 >= 100 - debuff.chance * 100) {
           if (debuff.name == "lifesteal") {
-            const heal = Math.round(damage * 0.5 * 4) / 4;
+            const heal = Math.round(totalDamage * 0.5 * 4) / 4;
             amountHealed += user.restoreHealth(heal);
           } else {
             const newDebuff = createDebuff({
               debuffName: debuff.name,
               debuffChance: debuff.chance,
               enemyMaxHP:
-                "nonConditionalMaxHealth" in target
+                "nonConditionalMaxHealth" in target // done due to different attributes on different classes
                   ? target.nonConditionalMaxHealth
                   : target.healthMax,
               enemyMaxSanity:
                 "nonConditionalMaxHealth" in target
                   ? target.nonConditionalMaxSanity
                   : target.sanityMax,
-              primaryAttackDamage: damagePreDR,
+              primaryAttackDamage: totalDamagePreDR,
               applierNameString: this.getNameReference(user),
               applierID: user.id,
             });
@@ -177,13 +227,14 @@ export class Attack {
           }
         }
       });
-      const buffNames: string[] = []; // only storing names, collecting for logBuilder
+
+      const buffNames: string[] = [];
       this.buffs.forEach((buff) => {
         const newBuff = createBuff({
           buffName: buff,
-          attackPower: damagePreDR,
+          attackPower: totalDamagePreDR,
           maxHealth:
-            "nonConditionalMaxHealth" in user
+            "nonConditionalMaxHealth" in user // done due to different attributes on different classes
               ? user.nonConditionalMaxHealth
               : user.healthMax,
           maxSanity:
@@ -198,6 +249,7 @@ export class Attack {
           user.addCondition(newBuff);
         }
       });
+
       let minionSpecies: string[] = [];
       if ("createMinion" in user) {
         this.summons.forEach((summon) => {
@@ -206,6 +258,7 @@ export class Attack {
         });
       }
 
+      // wait for animation timing for user (stats display).
       if ("birthdate" in user) {
         wait(1000).then(() => user.endTurn());
       }
@@ -213,28 +266,31 @@ export class Attack {
       return {
         result: AttackUse.success,
         logString: this.logBuilder({
-          result: attemptResult,
+          result: AttackUse.success,
           targetName: this.getNameReference(target),
           user,
-          healthDamage: finalDamage,
+          healthDamage: totalDamage,
           sanityDamage: this.flatSanityDamage,
           debuffNames,
           buffNames,
           minionSpecies,
         }),
       };
+    } else {
+      return {
+        result: AttackUse.miss,
+        logString: `${toTitleCase(this.name)} missed!`,
+      };
     }
-
-    return {
-      result: attemptResult,
-      logString: this.logBuilder({
-        result: attemptResult,
-        targetName: this.getNameReference(target),
-        user,
-      }),
-    };
   }
 
+  /**
+   * Determines if the attack hits the target based on the hit chance and target's block chance.
+   * @param params - An object containing the target and the conditional hit chance multiplier.
+   * @param params.target - The target of the attack.
+   * @param params.conditionalHitChanceMultiplier - A multiplier that adjusts the base hit chance.
+   * @returns The result of the hit attempt, which can be success, miss, or block.
+   */
   private doesHit({
     target,
     conditionalHitChanceMultiplier,
@@ -334,6 +390,15 @@ export class Attack {
     return target.creatureSpecies;
   }
 
+  public AttackRender(user: PlayerCharacter | Enemy | Minion) {
+    return AttackDetails({ attack: this, baseDamage: this.baseDamage(user) });
+  }
+
+  /**
+   * Creates an Attack instance from a JSON object.
+   * @param json - A JSON object containing attack properties.
+   * @returns A new Attack instance.
+   */
   static fromJSON(json: any): Attack {
     if (!json.name) {
       throw new Error("Attack name is required");
@@ -348,10 +413,10 @@ export class Attack {
       flatHealthDamage: json.flatHealthDamage,
       selfDamage: json.selfDamage,
       flatSanityDamage: json.flatSanityDamage,
-      hits: json.hits,
       buffs: json.buffs,
       debuffs: json.debuffs,
       summons: json.summons,
+      hits: json.hits || 1, // Default to single hit if not specified
     });
   }
 }

@@ -60,7 +60,7 @@
    {
       "name": "shoot",
       "targets": "single",
-      "hitChance": 0.95,
+      "hitChance": 1.0,
       "damageMult": 1.0
    },
    {
@@ -73,7 +73,7 @@
    {
       "name": "rapid shot",
       "targets": "single",
-      "hitChance": 0.75,
+      "hitChance": 0.65,
       "damageMult": 0.85,
       "hits": 3
    },

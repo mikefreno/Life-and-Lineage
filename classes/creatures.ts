@@ -589,6 +589,7 @@ export class Creature {
                 ...itemObj,
                 itemClass: drop.itemType,
                 stackable: isStackable(drop.itemType as ItemClassType),
+                playerClass: playerClass,
               }),
             );
           }

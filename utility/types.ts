@@ -18,6 +18,8 @@ export interface ItemOptions {
   icon?: string;
   requirements?: { strength?: number; intelligence?: number };
   stackable?: boolean;
+  playerClass: PlayerClassOptions;
+  attacks?: string[];
 }
 export enum ItemClassType {
   Artifact = "artifact",

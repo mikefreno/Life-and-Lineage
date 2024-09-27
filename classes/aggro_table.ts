@@ -1,5 +1,5 @@
-import { PlayerCharacter } from "./character";
-import { Enemy, Minion } from "./creatures";
+import type { PlayerCharacter } from "./character";
+import type { Enemy, Minion } from "./creatures";
 
 export class AggroTable {
   private aggroPoints: Map<string, number>;
@@ -20,7 +20,7 @@ export class AggroTable {
 
   public getHighestAggroTarget(
     targets: (PlayerCharacter | Minion | Enemy)[],
-  ): PlayerCharacter | Minion | Enemy | null {
+  ): PlayerCharacter | Minion | Enemy {
     let highestAggroTarget: PlayerCharacter | Minion | Enemy | null = null;
     let highestAggroPoints = 0;
 
@@ -37,7 +37,7 @@ export class AggroTable {
     if (highestAggroTarget) {
       return highestAggroTarget;
     } else {
-      return targets.find((target) => target instanceof PlayerCharacter)!;
+      return targets.find((target) => "fullName" in target)!;
     }
   }
 }

@@ -7,9 +7,16 @@ import necroSpells from "../assets/json/necroSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import rangerSpells from "../assets/json/rangerSpells.json";
 import * as Crypto from "expo-crypto";
-import { Attribute, ItemClassType, type ItemOptions } from "../utility/types";
+import {
+  Attribute,
+  ItemClassType,
+  PlayerClassOptions,
+  type ItemOptions,
+} from "../utility/types";
 import type { PlayerCharacter } from "./character";
 import { Spell } from "./spell";
+import { Attack } from "./attack";
+import attackObjects from "../assets/json/playerAttacks.json";
 
 export class Item {
   readonly id: string;
@@ -32,6 +39,10 @@ export class Item {
     intelligence?: number;
     dexterity?: number;
   };
+  readonly playerClass: PlayerClassOptions;
+  readonly attackStrings: string[];
+  readonly Spell: Spell | undefined;
+  readonly Attacks: Attack[] | undefined;
 
   constructor({
     id,
@@ -42,6 +53,8 @@ export class Item {
     itemClass,
     icon,
     requirements,
+    playerClass,
+    attacks,
     stackable = false,
   }: ItemOptions) {
     this.id = id ?? Crypto.randomUUID();
@@ -53,6 +66,10 @@ export class Item {
     this.icon = icon;
     this.requirements = requirements ?? {};
     this.stackable = stackable;
+    this.playerClass = playerClass;
+    this.attackStrings = attacks ?? [];
+    this.Spell = Item.getAttachedSpell(playerClass, itemClass, name);
+    this.Attacks = Item.getAttachedAttacks(attacks ?? []);
   }
 
   get isEquippable() {
@@ -106,13 +123,27 @@ export class Item {
     return Math.round(this.baseValue * (1.4 - affection / 2500));
   }
 
-  public getAttachedSpell(
+  static getAttachedAttacks(attacks: string[]) {
+    const builtAttacks: Attack[] = [];
+    attacks.forEach((attackString) => {
+      const found = attackObjects.find((obj) => obj.name == attackString);
+      if (found) {
+        // @ts-ignore
+        builtAttacks.push(new Attack({ ...found }));
+      }
+    });
+    return builtAttacks;
+  }
+
+  static getAttachedSpell(
     playerClass: "mage" | "paladin" | "necromancer" | "ranger",
-  ): Spell {
+    itemClass: ItemClassType,
+    name: string,
+  ) {
     let spell = undefined;
-    if (this.itemClass == ItemClassType.Book) {
+    if (itemClass == ItemClassType.Book) {
       if (playerClass == "mage") {
-        const bookObj = mageBooks.find((book) => book.name == this.name);
+        const bookObj = mageBooks.find((book) => book.name == name);
         spell = mageSpells.find(
           (mageSpell) => bookObj?.teaches == mageSpell.name,
         );
@@ -152,7 +183,6 @@ export class Item {
       const madeSpell = new Spell({ ...spell });
       return madeSpell;
     }
-    throw new Error("Requested a spell from a non-book item");
   }
 
   static fromJSON(json: any): Item {
@@ -166,6 +196,8 @@ export class Item {
       stackable: isStackable(json.itemClass),
       requirements: json.requirements,
       icon: json.icon,
+      attacks: json.attackStrings,
+      playerClass: json.playerClass,
     });
 
     return item;
