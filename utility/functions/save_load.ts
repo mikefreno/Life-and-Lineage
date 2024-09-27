@@ -12,14 +12,27 @@ const _fullSave = async (
 ) => {
   if (game && player) {
     try {
-      game.clearInventories();
-      storage.set("game", stringify(game));
-      storage.set("player", stringify(player));
+      storage.set("player", stringifyCircular(player));
+      storage.set("game", stringifyCircular(Game.forSaving(game)));
     } catch (e) {
       console.log("Error in _fullSave:", e);
     }
   }
 };
+
+function stringifyCircular(obj) {
+  const seen = new WeakSet();
+
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === "object" && value !== null) {
+      if (seen.has(value)) {
+        return; // Ignore circular references
+      }
+      seen.add(value);
+    }
+    return value;
+  });
+}
 
 /**
  * This should only rarely be called directly, such as app settings changes and shop transactions
@@ -28,8 +41,8 @@ export const fullSave = throttle(_fullSave, 2000);
 
 export const fullLoad = async () => {
   try {
-    const retrieved_game = storage.getString("game");
     const retrieved_player = storage.getString("player");
+    const retrieved_game = storage.getString("game");
     if (!retrieved_game || !retrieved_player)
       return { game: undefined, player: undefined };
     let game = Game.fromJSON(parse(retrieved_game));

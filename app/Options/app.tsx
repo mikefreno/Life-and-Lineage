@@ -1,4 +1,4 @@
-import { Pressable, TextInput, View } from "react-native";
+import { Platform, Pressable, TextInput, View } from "react-native";
 import { View as ThemedView, Text } from "../../components/Themed";
 import { useContext, useEffect, useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc";
@@ -16,6 +16,9 @@ import D20DieAnimation from "../../components/DieRollAnim";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { Game } from "../../classes/game";
 import { PlayerCharacter } from "../../classes/character";
+import { parse, stringify } from "flatted";
+import { createShops } from "../../classes/shop";
+import { PlayerClassOptions } from "../../utility/types";
 
 const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
@@ -114,6 +117,84 @@ export const AppSettings = observer(() => {
         setRemoteSaves(res);
         setLoadingDBInfo(false);
       }
+    };
+
+    const profiling = () => {
+      function stringifyCircular(obj: any) {
+        const seen = new WeakSet();
+
+        return JSON.stringify(obj, (key, value) => {
+          if (typeof value === "object" && value !== null) {
+            if (seen.has(value)) {
+              return; // Ignore circular references
+            }
+            seen.add(value);
+          }
+          return value;
+        });
+      }
+      const shops = createShops(PlayerClassOptions.mage);
+      const game = new Game({
+        shops: shops,
+        vibrationEnabled: "full",
+      });
+
+      const runTest = (
+        name: string,
+        testFn: (iteration: number) => void,
+        iterations: number = 1000,
+      ) => {
+        const start = Date.now();
+        for (let i = 0; i < iterations; i++) {
+          testFn(i);
+        }
+        const end = Date.now();
+        const duration = end - start;
+        console.log(
+          `(${Platform.OS}) ${name}: ${duration} ms for ${iterations} iterations`,
+        );
+        return duration;
+      };
+
+      const unclearedTime = runTest("Uncleared inventory", (iteration) => {
+        const serialized = stringify(game);
+        if (iteration % 25 == 0) {
+          Game.fromJSON(parse(serialized));
+        }
+      });
+
+      const clearedTime = runTest("Cleared inventory", (iteration) => {
+        const serialized = stringify(Game.forSaving(game));
+        if (iteration % 25 == 0) {
+          Game.fromJSON(parse(serialized));
+        }
+      });
+
+      const customCircularTime = runTest("Cleared and custom", (iteration) => {
+        const serialized = stringifyCircular(Game.forSaving(game));
+        if (iteration % 25 == 0) {
+          Game.fromJSON(JSON.parse(serialized));
+        }
+      });
+
+      let ratio = unclearedTime / clearedTime;
+      console.log(
+        `(${Platform.OS}) Uncleared inventory is ${ratio.toFixed(
+          2,
+        )}x slower than cleared inventory`,
+      );
+      ratio = clearedTime / customCircularTime;
+      console.log(
+        `(${Platform.OS}) cleared inventory is ${ratio.toFixed(
+          2,
+        )}x slower than Cleared and custom`,
+      );
+      ratio = unclearedTime / customCircularTime;
+      console.log(
+        `(${Platform.OS}) uncleared inventory is ${ratio.toFixed(
+          2,
+        )}x slower than Cleared and custom`,
+      );
     };
 
     const loadRemoteSave = async (chosenSave: SaveRow) => {
@@ -362,6 +443,13 @@ export const AppSettings = observer(() => {
               </Pressable>
             ))}
           </View>
+          {__DEV__ && (
+            <View className="w-full flex items-center">
+              <GenericRaisedButton onPressFunction={profiling}>
+                <Text>Run Profiling</Text>
+              </GenericRaisedButton>
+            </View>
+          )}
         </ThemedView>
       </>
     );

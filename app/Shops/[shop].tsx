@@ -25,8 +25,9 @@ import { fullSave } from "../../utility/functions/save_load";
 import { TutorialOption } from "../../utility/types";
 
 const TEN_MINUTES = 10 * 60 * 1000;
-const ONE_SECOND = 1000;
-const REFRESH_TIME = __DEV__ ? ONE_SECOND : TEN_MINUTES;
+//const ONE_SECOND = 1000;
+//const REFRESH_TIME = __DEV__ ? ONE_SECOND : TEN_MINUTES;
+const REFRESH_TIME = TEN_MINUTES;
 
 const ShopInteriorScreen = observer(() => {
   const { shop } = useLocalSearchParams();

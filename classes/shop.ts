@@ -59,7 +59,6 @@ export class Shop {
       refreshInventory: action,
       buyItem: action,
       sellItem: action,
-      clearInventory: action,
     });
   }
 
@@ -145,8 +144,16 @@ export class Shop {
     return condensedInventory;
   }
 
-  public clearInventory() {
-    this.inventory = [];
+  get toJSON(): any {
+    return {
+      shopKeeper: this.shopKeeper,
+      baseGold: this.baseGold,
+      currentGold: this.currentGold,
+      lastStockRefresh: this.lastStockRefresh,
+      archetype: this.archetype,
+      playerClass: this.playerClass,
+      inventory: [],
+    };
   }
 
   static fromJSON(json: any): Shop {

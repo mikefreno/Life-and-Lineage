@@ -276,9 +276,6 @@ export class Game {
   public enableTutorials() {
     this.tutorialsEnabled = true;
   }
-  public clearInventories() {
-    this.shops.forEach((shop) => shop.clearInventory());
-  }
 
   static fromJSON(json: any): Game {
     const game = new Game({
@@ -302,5 +299,11 @@ export class Game {
     });
 
     return game;
+  }
+  static forSaving(game: Game) {
+    return {
+      ...game,
+      shops: game.shops.map((shop) => shop.toJSON),
+    };
   }
 }

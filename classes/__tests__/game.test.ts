@@ -12,9 +12,14 @@ describe("Game object exploration", () => {
       shops: shops,
       vibrationEnabled: "full",
     }); // create a game object
-    const sizeOfGameSerialized = getObjectSizeInBytes(JSON.stringify(game));
-    game.clearInventories();
-    const sizeOfGameItemsCleared = getObjectSizeInBytes(JSON.stringify(game));
+    const sizeOfGameSerialized = Buffer.byteLength(
+      JSON.stringify(game),
+      "utf8",
+    );
+    const sizeOfGameItemsCleared = Buffer.byteLength(
+      JSON.stringify(Game.forSaving(game)),
+      "utf8",
+    );
 
     console.log("Size of serialized game with items:", sizeOfGameSerialized);
     console.log(
@@ -33,12 +38,11 @@ describe("Game object exploration", () => {
     suite
       .add("uncleared inventory", () => {
         const serialized = stringify(game);
-        parse(serialized);
+        Game.fromJSON(parse(serialized));
       })
       .add("cleared inventory", () => {
-        game.clearInventories();
-        const serialized = stringify(game);
-        parse(serialized);
+        const serialized = stringify(Game.forSaving(game));
+        Game.fromJSON(parse(serialized));
       })
       .on("cycle", function (event: Benchmark.Event) {
         console.log(String(event.target));
@@ -51,46 +55,5 @@ describe("Game object exploration", () => {
         done();
       })
       .run({ async: true });
-  }, 60000);
+  }, 30000);
 });
-
-function getObjectSizeInBytes(obj: any): number {
-  const seen = new WeakSet();
-
-  function sizeOf(value: any): number {
-    if (value === null || value === undefined) return 0;
-
-    const type = typeof value;
-    if (type === "number") return 8;
-    if (type === "string") return value.length * 2;
-    if (type === "boolean") return 4;
-
-    if (type === "object") {
-      if (seen.has(value)) return 0;
-      seen.add(value);
-
-      let bytes = 0;
-
-      if (Array.isArray(value)) {
-        bytes += 8; // Array overhead
-        for (let i = 0; i < value.length; i++) {
-          bytes += sizeOf(value[i]);
-        }
-      } else {
-        bytes += 8; // Object overhead
-        for (let key in value) {
-          if (Object.hasOwnProperty.call(value, key)) {
-            bytes += key.length * 2; // Key size
-            bytes += sizeOf(value[key]); // Value size
-          }
-        }
-      }
-
-      return bytes;
-    }
-
-    return 0;
-  }
-
-  return sizeOf(obj);
-}
