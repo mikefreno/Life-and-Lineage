@@ -537,8 +537,7 @@ export class PlayerCharacter extends Character {
       [Attribute.intelligence]: 0,
     };
 
-    this.gold =
-      gold ?? process.env.NODE_ENV === "development" ? 1_000_000 : 500;
+    this.gold = gold ?? 500;
 
     this.minions = minions ?? [];
     this.rangerPet = rangerPet ?? null;

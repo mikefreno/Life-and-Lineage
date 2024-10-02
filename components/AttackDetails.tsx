@@ -24,8 +24,8 @@ export default function AttackDetails({
       {attack.buffs.length > 0 && (
         <>
           <GenericStrikeAround>Buffs</GenericStrikeAround>
-          {attack.buffs.map((buff) => (
-            <View>
+          {attack.buffs.map((buff, idx) => (
+            <View key={`${buff}-${idx}`}>
               <Text>{buff}</Text>
             </View>
           ))}
@@ -34,9 +34,12 @@ export default function AttackDetails({
       {attack.debuffs.length > 0 && (
         <>
           <GenericStrikeAround>Debuffs</GenericStrikeAround>
-          {attack.debuffs.map((debuff) => (
-            <View>
-              <Text>{debuff.name}</Text>
+          {attack.debuffs.map((debuff, idx) => (
+            <View
+              key={`${debuff.name}-${idx}`}
+              className="flex w-full items-center"
+            >
+              <Text>{toTitleCase(debuff.name)}</Text>
               <Text>{debuff.chance * 100}% effect chance</Text>
             </View>
           ))}
