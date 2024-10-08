@@ -9,7 +9,6 @@ import GenericRaisedButton from "../../components/GenericRaisedButton";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import GenericModal from "../../components/GenericModal";
 import * as Updates from "expo-updates";
-import { fullSave } from "../../utility/functions/save_load";
 import D20DieAnimation from "../../components/DieRollAnim";
 
 const healthWarningOptions: Record<number, string> = {
@@ -33,7 +32,7 @@ const healthWarningKeys = [0.5, 0.25, 0.2, 0.15, 0.1, 0];
 export default function GameSettings() {
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing context!");
-  const { gameState, playerState } = appData;
+  const { gameState } = appData;
   const vibration = useVibration();
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,
@@ -92,7 +91,6 @@ export default function GameSettings() {
                   setLoading(true);
                   wait(1000).then(() => {
                     setShowTutorialResetConfirm(false);
-                    fullSave(gameState, playerState);
                     setLoading(false);
                     Updates.reloadAsync();
                   });

@@ -22,7 +22,6 @@ import { useContext } from "react";
 import { useVibration } from "../../../utility/customHooks";
 import { getRandomJobTitle } from "../../../utility/functions/characterAid";
 import { createShops } from "../../../classes/shop";
-import { fullSave } from "../../../utility/functions/save_load";
 import { AppContext } from "../../_layout";
 import {
   Element,
@@ -37,6 +36,8 @@ import {
 } from "../../../constants/Colors";
 import { storage } from "../../../utility/functions/storage";
 import { useColorScheme } from "nativewind";
+import { saveGame } from "../../../utility/functions/save_load";
+import GenericFlatButton from "../../../components/GenericFlatButton";
 
 export default function NewGameReview() {
   const { slug } = useLocalSearchParams();
@@ -231,6 +232,7 @@ export default function NewGameReview() {
           : "minimal",
         tutorialsEnabled: gameState ? gameState.tutorialsEnabled : parsed,
         tutorialsShown: gameState?.tutorialsShown,
+        playerState: player,
       });
       const colorScheme = gameState?.colorScheme;
       if (colorScheme) {
@@ -241,7 +243,7 @@ export default function NewGameReview() {
       setLogs([]);
       vibration({ style: "success" });
       wait(250).then(() => clearHistory(navigation));
-      fullSave(newGame, player);
+      saveGame(newGame);
       storage.delete("tutorialsEnabled");
     }
   }
@@ -271,12 +273,9 @@ export default function NewGameReview() {
           playerClass,
         )}`}</Text>
       </Text>
-      <Pressable
-        onPress={() => startGame()}
-        className="mx-auto mt-[6vh] rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-      >
-        <Text className="text-xl tracking-widest">Confirm?</Text>
-      </Pressable>
+      <GenericFlatButton onPressFunction={() => startGame()} className="mt-4">
+        Confirm?
+      </GenericFlatButton>
     </ThemedView>
   );
 }

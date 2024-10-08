@@ -1,53 +1,28 @@
 import { throttle } from "lodash";
-import { PlayerCharacter } from "../../classes/character";
 import type { Enemy } from "../../classes/creatures";
 import { Game } from "../../classes/game";
 import type { AppContextType, DungeonContextType } from "../types";
 import { storage } from "./storage";
 import { parse, stringify } from "flatted";
 
-const _fullSave = async (
-  game: Game | undefined,
-  player: PlayerCharacter | undefined,
-) => {
-  if (game && player) {
+const _gameSave = async (game: Game | undefined) => {
+  if (game) {
     try {
-      storage.set("player", stringify(player));
       storage.set("game", stringify(Game.forSaving(game)));
     } catch (e) {
-      console.log("Error in _fullSave:", e);
+      console.log("Error in _gameSave:", e);
     }
   }
 };
 
-//function stringifyCircular(obj) {
-//const seen = new WeakSet();
+export const saveGame = throttle(_gameSave, 500);
 
-//return JSON.stringify(obj, (key, value) => {
-//if (typeof value === "object" && value !== null) {
-//if (seen.has(value)) {
-//return; // Ignore circular references
-//}
-//seen.add(value);
-//}
-//return value;
-//});
-//}
-
-/**
- * This should only rarely be called directly, such as app settings changes and shop transactions
- */
-export const fullSave = throttle(_fullSave, 2000);
-
-export const fullLoad = async () => {
+export const loadGame = async () => {
   try {
-    const retrieved_player = storage.getString("player");
     const retrieved_game = storage.getString("game");
-    if (!retrieved_game || !retrieved_player)
-      return { game: undefined, player: undefined };
+    if (!retrieved_game) return { game: undefined };
     let game = Game.fromJSON(parse(retrieved_game));
-    let player = PlayerCharacter.fromJSON(parse(retrieved_player));
-    return { player, game };
+    return { game };
   } catch (e) {
     console.log("Error in fullLoad:", e);
     return { game: undefined, player: undefined };
@@ -85,7 +60,7 @@ export function dungeonSave({ enemy, dungeonData, appData }: dungeonSave) {
         enemy: enemy,
         fightingBoss: fightingBoss,
       });
-      fullSave(gameState, playerState);
+      saveGame(gameState);
     }
   }
 }

@@ -17,6 +17,7 @@ import {
 import { loadStoredTutorialState } from "../../utility/functions/misc";
 import { TutorialOption } from "../../utility/types";
 import { ClassDescriptionMap } from "../../utility/descriptions";
+import GenericFlatButton from "../../components/GenericFlatButton";
 
 export default function NewGameScreen() {
   const [selectedClass, setSelectedClass] = useState<
@@ -289,15 +290,14 @@ export default function NewGameScreen() {
           </Text>
           {selectedClass && (
             <View className="mx-auto py-4 pb-[10vh]">
-              <Pressable
-                onPress={() => {
+              <GenericFlatButton
+                onPressFunction={() => {
                   vibration({ style: "light" });
                   router.push(`/NewGame/SetBlessing/${classRef.current}`);
                 }}
-                className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
               >
-                <Text className="text-xl tracking-widest">Next</Text>
-              </Pressable>
+                Next
+              </GenericFlatButton>
             </View>
           )}
         </ThemedView>

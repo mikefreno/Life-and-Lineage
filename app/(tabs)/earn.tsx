@@ -13,7 +13,6 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { AppContext } from "../_layout";
 import { TutorialOption } from "../../utility/types";
-import { fullSave } from "../../utility/functions/save_load";
 import { observer } from "mobx-react-lite";
 
 const EarnScreen = observer(() => {
@@ -38,7 +37,6 @@ const EarnScreen = observer(() => {
         setShowingRejection(true);
       } else {
         playerState.setJob(title);
-        fullSave(gameState, playerState);
       }
     }
   }

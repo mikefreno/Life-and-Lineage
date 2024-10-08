@@ -25,6 +25,7 @@ describe("Serialization Benchmark", () => {
     const game = new Game({
       shops: shops,
       vibrationEnabled: "full",
+      playerState: player,
     }); // create a game object
 
     const suite = new Benchmark.Suite();

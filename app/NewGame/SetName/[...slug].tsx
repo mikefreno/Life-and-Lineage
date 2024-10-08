@@ -20,6 +20,7 @@ import {
   isPlayerClassOptions,
 } from "../../../utility/types";
 import { playerClassColors } from "../../../constants/Colors";
+import GenericFlatButton from "../../../components/GenericFlatButton";
 
 export default function SetName() {
   const appData = useContext(AppContext);
@@ -130,8 +131,8 @@ export default function SetName() {
               <View>
                 {firstName.trimEnd() && lastName.trimEnd() ? (
                   <View className="mx-auto">
-                    <Pressable
-                      onPress={() => {
+                    <GenericFlatButton
+                      onPressFunction={() => {
                         vibration({ style: "light" });
                         router.push(
                           `/NewGame/Review/${playerClass}/${blessing}/${sex}/${trimWhitespace(
@@ -139,10 +140,9 @@ export default function SetName() {
                           )}/${trimWhitespace(lastName)}`,
                         );
                       }}
-                      className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
                     >
-                      <Text className="text-xl tracking-widest">Next</Text>
-                    </Pressable>
+                      Next
+                    </GenericFlatButton>
                   </View>
                 ) : null}
               </View>

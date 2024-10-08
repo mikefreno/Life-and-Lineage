@@ -23,10 +23,11 @@ export const useVibration = () => {
     const platform = Platform.OS;
 
     if (
-      gameState &&
-      (gameState.vibrationEnabled == "full" ||
-        (gameState.vibrationEnabled == "minimal" && essential)) &&
-      (platform === "android" || platform === "ios")
+      (gameState &&
+        (gameState.vibrationEnabled == "full" ||
+          (gameState.vibrationEnabled == "minimal" && essential)) &&
+        (platform === "android" || platform === "ios")) ||
+      (!gameState && platform == "ios")
     ) {
       switch (style) {
         case "light":

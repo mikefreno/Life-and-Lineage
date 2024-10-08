@@ -82,8 +82,6 @@ export default function CodexInfo() {
     category = slug;
   }
 
-  useEffect(() => console.log(slug), [slug]);
-
   useEffect(() => {
     const currentPath = secondary
       ? `/Options/Codex/${category}/${secondary}`

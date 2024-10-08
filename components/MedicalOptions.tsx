@@ -6,7 +6,6 @@ import ThemedCard from "./ThemedCard";
 import { AppContext } from "../app/_layout";
 import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
 import { observer } from "mobx-react-lite";
-import { fullSave } from "../utility/functions/save_load";
 
 interface MedicalOptionProps {
   title: string;
@@ -43,7 +42,7 @@ const MedicalOption = observer(
             ? playerState.conditions.length
             : removeDebuffs,
         );
-        gameState.gameTick({ playerState, fullSave });
+        gameState.gameTick();
       }
     }
 

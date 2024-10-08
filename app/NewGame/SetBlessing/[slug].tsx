@@ -31,6 +31,7 @@ import {
   elementalColorMap,
   playerClassColors,
 } from "../../../constants/Colors";
+import GenericFlatButton from "../../../components/GenericFlatButton";
 
 export default function SetBlessing() {
   const { slug } = useLocalSearchParams();
@@ -221,17 +222,16 @@ export default function SetBlessing() {
             </Text>
             {blessing ? (
               <View className="mx-auto h-32 py-2">
-                <Pressable
-                  onPress={() => {
+                <GenericFlatButton
+                  onPressFunction={() => {
                     vibration({ style: "light" });
                     router.push(
                       `/NewGame/SetSex/${playerClass}/${blessingRef.current}`,
                     );
                   }}
-                  className="rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
                 >
                   <Text className="text-xl tracking-widest">Next</Text>
-                </Pressable>
+                </GenericFlatButton>
               </View>
             ) : (
               <View className="h-32"></View>

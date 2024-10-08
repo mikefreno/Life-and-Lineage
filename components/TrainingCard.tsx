@@ -8,7 +8,6 @@ import GenericRaisedButton from "./GenericRaisedButton";
 import { toTitleCase } from "../utility/functions/misc";
 import { AppContext } from "../app/_layout";
 import { Coins, Sanity } from "../assets/icons/SVGIcons";
-import { fullSave } from "../utility/functions/save_load";
 
 interface TrainingCardProps {
   name: string;
@@ -47,7 +46,7 @@ const TrainingCard = observer(
         sanityCostPerTick,
         goldCostPerTick,
       );
-      gameState.gameTick({ playerState, fullSave });
+      gameState.gameTick();
     };
 
     return (

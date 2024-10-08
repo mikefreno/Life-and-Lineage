@@ -1,10 +1,13 @@
 import { DungeonInstance, DungeonLevel } from "./dungeon";
 import dungeons from "../assets/json/dungeons.json";
-import { action, makeObservable, observable } from "mobx";
-import { PlayerCharacter } from "./character";
+import { action, makeObservable, observable, reaction } from "mobx";
+import { Character, PlayerCharacter } from "./character";
 import { lowSanityDebuffGenerator } from "../utility/functions/conditions";
 import { TutorialOption } from "../utility/types";
 import { Shop } from "./shop";
+import { calculateAge } from "../utility/functions/misc";
+import { generateNewAdoptee } from "../utility/functions/characterAid";
+import { saveGame } from "../utility/functions/save_load";
 
 interface GameOptions {
   date?: string;
@@ -18,6 +21,8 @@ interface GameOptions {
   healthWarning?: number;
   tutorialsShown?: Record<TutorialOption, boolean>;
   tutorialsEnabled?: boolean;
+  independantChildren?: Character[];
+  playerState: PlayerCharacter;
 }
 
 /**
@@ -36,6 +41,8 @@ export class Game {
   healthWarning: number;
   tutorialsShown: Record<TutorialOption, boolean>;
   tutorialsEnabled: boolean;
+  independantChildren: Character[];
+  playerState: PlayerCharacter;
 
   constructor({
     date,
@@ -49,6 +56,8 @@ export class Game {
     healthWarning,
     tutorialsShown,
     tutorialsEnabled,
+    independantChildren,
+    playerState,
   }: GameOptions) {
     this.date = date ?? new Date().toISOString();
     this.startDate = startDate ?? new Date().toISOString();
@@ -99,6 +108,8 @@ export class Game {
       [TutorialOption.firstBossKill]: false,
     };
     this.tutorialsEnabled = tutorialsEnabled ?? true;
+    this.independantChildren = independantChildren ?? [];
+    this.playerState = playerState;
 
     makeObservable(this, {
       date: observable,
@@ -111,6 +122,7 @@ export class Game {
       healthWarning: observable,
       tutorialsShown: observable,
       tutorialsEnabled: observable,
+      playerState: observable,
       gameTick: action,
       getDungeon: action,
       getInstance: action,
@@ -123,37 +135,52 @@ export class Game {
       resetTutorialState: action,
       disableTutorials: action,
       enableTutorials: action,
+      independantChildren: observable,
+      independantChildrenAgeCheck: action,
+      adopt: action,
     });
+
+    reaction(
+      () => [
+        this.date,
+        this.atDeathScreen,
+        this.colorScheme,
+        this.vibrationEnabled,
+        this.healthWarning,
+        this.tutorialsShown,
+        this.tutorialsEnabled,
+        this.independantChildren,
+        this.playerState.gold,
+        this.playerState.currentHealth,
+        this.playerState.currentMana,
+        this.playerState.currentSanity,
+        this.playerState.unAllocatedSkillPoints,
+        this.playerState.children,
+      ],
+      () => {
+        saveGame(this);
+      },
+    );
   }
 
   //----------------------------------Date----------------------------------//
 
   /**
-   * Saves the game (after all other effects), and moves the game time forward, effectively aging all characters.
+   * Moves the game time forward, effectively aging all characters.
    * Additionally will "tick" all time based events,
    * this includes affections, conditions and investements. Additionally will roll to apply a debuff if the player character
-   * has negative sanity. The full save is passed in instead of importing to prevent an import cycle
+   * has negative sanity
    */
-  public gameTick({
-    playerState,
-    fullSave,
-  }: {
-    playerState: PlayerCharacter;
-    fullSave: (
-      game: Game,
-      playerState: PlayerCharacter,
-    ) => Promise<void> | undefined;
-  }) {
+  public gameTick() {
     const dateObject = new Date(this.date);
     dateObject.setDate(dateObject.getDate() + 7);
     this.date = dateObject.toISOString();
-    if (playerState.currentSanity < 0) {
-      lowSanityDebuffGenerator(playerState);
+    if (this.playerState.currentSanity < 0) {
+      lowSanityDebuffGenerator(this.playerState);
     }
-    playerState.tickDownRelationshipAffection();
-    playerState.conditionTicker();
-    playerState.tickAllInvestments();
-    fullSave(this, playerState);
+    this.playerState.tickDownRelationshipAffection();
+    this.playerState.conditionTicker();
+    this.playerState.tickAllInvestments();
   }
   //----------------------------------Dungeon----------------------------------//
   public getDungeon(instance: string, level: string): DungeonLevel | undefined {
@@ -277,6 +304,39 @@ export class Game {
     this.tutorialsEnabled = true;
   }
 
+  /**
+   * Remove any children in `independantChildren` who are no longer minors (under 18 y.o.)
+   */
+  public independantChildrenAgeCheck() {
+    this.independantChildren = this.independantChildren.filter((child) => {
+      const age = calculateAge(new Date(child.birthdate), new Date(this.date));
+      return age < 18;
+    });
+    this.fillUpIndependantChildren();
+  }
+
+  /**
+   * Set `independantChildren` to min length (6)
+   */
+  private fillUpIndependantChildren() {
+    while (this.independantChildren.length < 6) {
+      this.independantChildren.push(generateNewAdoptee());
+    }
+  }
+
+  public adopt({
+    adoptee,
+    player,
+  }: {
+    adoptee: Character;
+    player: PlayerCharacter;
+  }) {
+    this.independantChildren = this.independantChildren.filter(
+      (child) => child.id !== adoptee.id,
+    );
+    player.adopt(adoptee);
+  }
+
   static fromJSON(json: any): Game {
     const game = new Game({
       date: json.date,
@@ -296,6 +356,8 @@ export class Game {
       healthWarning: json.healthWarning,
       tutorialsShown: json.tutorialsShown,
       tutorialsEnabled: json.tutorialsEnabled,
+      independantChildren: json.independantChildren,
+      playerState: PlayerCharacter.fromJSON(json.playerState),
     });
 
     return game;

@@ -5,7 +5,6 @@ import { View as ThemedView, Text } from "../Themed";
 import { rollD20 } from "../../utility/functions/misc";
 import { useVibration } from "../../utility/customHooks";
 import { router } from "expo-router";
-import { fullSave } from "../../utility/functions/save_load";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../app/_layout";
 import { DungeonContext } from "./DungeonContext";
@@ -73,7 +72,7 @@ export default function FleeModal({
           if (slug[0] == "Activities") {
             router.push("/Activities");
           }
-          gameState.gameTick({ playerState, fullSave });
+          gameState.gameTick();
         }, 200);
       } else {
         setFleeRollFailure(true);

@@ -18,7 +18,6 @@ import { observer } from "mobx-react-lite";
 import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
-import { fullLoad } from "../utility/functions/save_load";
 import { Dimensions, Keyboard, Platform, StyleSheet } from "react-native";
 import { View as ThemedView } from "../components/Themed";
 import "../assets/styles/globals.css";
@@ -37,6 +36,7 @@ import {
 import { wait } from "../utility/functions/misc";
 import { API_BASE_URL } from "../config/config";
 import { updateNavBar } from "../utility/functions/android";
+import { loadGame } from "../utility/functions/save_load";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -133,15 +133,14 @@ const Root = observer(() => {
 
   const getData = async () => {
     try {
-      const { game, player } = await fullLoad();
+      const { game } = await loadGame();
 
       if (game) {
         setGameData(game);
         setColorScheme(game.colorScheme);
+        setPlayerCharacter(game.playerState);
       }
-      if (player) {
-        setPlayerCharacter(player);
-      }
+
       setLoading(false);
     } catch (e) {
       console.error(e);

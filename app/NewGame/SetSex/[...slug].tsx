@@ -17,6 +17,7 @@ import {
   toTitleCase,
 } from "../../../utility/functions/misc";
 import { playerClassColors } from "../../../constants/Colors";
+import GenericFlatButton from "../../../components/GenericFlatButton";
 
 export default function SetSex() {
   const { slug } = useLocalSearchParams();
@@ -136,17 +137,16 @@ export default function SetSex() {
         </ThemedView>
         {sex ? (
           <View className="mx-auto mt-8">
-            <Pressable
-              onPress={() => {
+            <GenericFlatButton
+              onPressFunction={() => {
                 vibration({ style: "light" });
                 router.push(
                   `/NewGame/SetName/${playerClass}/${blessing}/${sexRef.current}`,
                 );
               }}
-              className="mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
             >
-              <Text className="text-xl tracking-widest">Next</Text>
-            </Pressable>
+              Next
+            </GenericFlatButton>
           </View>
         ) : null}
       </ThemedView>

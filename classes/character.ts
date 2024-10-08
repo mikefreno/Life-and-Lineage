@@ -78,7 +78,7 @@ export class Character {
   /**
    * Last name of the character.
    */
-  readonly lastName: string;
+  lastName: string;
 
   /**
    * Sex of the character ("male" or "female").
@@ -124,6 +124,10 @@ export class Character {
    * Start date of the cooldown period for the character in ISO format, if applicable.
    */
   dateCooldownStart?: string;
+  /**
+   * Will be null if not pregnant, the string is in ISO format
+   */
+  pregnancyDueDate?: string | null;
 
   constructor({
     id,
@@ -164,6 +168,8 @@ export class Character {
       deathRoll: action,
       setDateCooldownStart: action,
       updateAffection: action,
+      lastName: observable,
+      updateLastName: action,
     });
   }
 
@@ -242,6 +248,10 @@ export class Character {
     } else {
       this.affection += change;
     }
+  }
+
+  public updateLastName(newLastName: string) {
+    this.lastName = newLastName;
   }
 
   /**
@@ -660,6 +670,7 @@ export class PlayerCharacter extends Character {
       inventory: observable,
       currentDungeon: observable,
       investments: observable,
+      adopt: action,
 
       addToInventory: action,
       buyItem: action,
@@ -1210,6 +1221,7 @@ export class PlayerCharacter extends Character {
       stats: { baseDamage: 1 },
       baseValue: 0,
       itemClass: ItemClassType.Melee,
+      playerClass: this.playerClass,
     });
   }
 
@@ -1521,6 +1533,10 @@ export class PlayerCharacter extends Character {
         character.updateAffection(-0.25);
       }
     });
+  }
+  public adopt(child: Character) {
+    child.updateLastName(this.lastName);
+    this.children.push(child);
   }
   //----------------------------------Conditions----------------------------------//
   public addCondition(condition?: Condition | null) {

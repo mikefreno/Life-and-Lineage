@@ -18,7 +18,6 @@ import GenericRaisedButton from "./GenericRaisedButton";
 import { useRouter } from "expo-router";
 import { AppContext } from "../app/_layout";
 import { AffectionIcon } from "../assets/icons/SVGIcons";
-import { fullSave } from "../utility/functions/save_load";
 
 interface CharacterInteractionModal {
   character: Character | null;
@@ -26,6 +25,7 @@ interface CharacterInteractionModal {
   secondaryRequirement?: boolean;
   backdropCloses?: boolean;
   showGiftModal: () => void;
+  showAdoptionModal: (partnerName?: string) => void;
 }
 
 export const CharacterInteractionModal = observer(
@@ -35,6 +35,7 @@ export const CharacterInteractionModal = observer(
     secondaryRequirement = true,
     backdropCloses = false,
     showGiftModal,
+    showAdoptionModal,
   }: CharacterInteractionModal) => {
     const appData = useContext(AppContext);
     if (!appData) {
@@ -51,7 +52,6 @@ export const CharacterInteractionModal = observer(
           ) > 7
         : true,
     );
-
     const router = useRouter();
 
     const vibration = useVibration();
@@ -62,7 +62,7 @@ export const CharacterInteractionModal = observer(
 
     function setFight() {
       if (character && playerState && gameState) {
-        gameState.gameTick({ playerState, fullSave });
+        gameState.gameTick();
         playerState.setInDungeon({
           state: true,
           instance: "Personal",
@@ -90,6 +90,8 @@ export const CharacterInteractionModal = observer(
         );
       }
     }, [gameState?.date, character?.dateCooldownStart]);
+
+    function showPregnancyInfo() {}
 
     return (
       <GenericModal
@@ -139,7 +141,7 @@ export const CharacterInteractionModal = observer(
                           vibration({ style: "light" });
                           character.setDateCooldownStart(gameState.date);
                           character.updateAffection(5);
-                          gameState.gameTick({ playerState, fullSave });
+                          gameState.gameTick();
                         }}
                       >
                         Chat
@@ -153,6 +155,28 @@ export const CharacterInteractionModal = observer(
                       >
                         Give a Gift
                       </GenericFlatButton>
+                      {character.isPlayerPartner &&
+                        (character.sex !== playerState.sex ? (
+                          <GenericFlatButton
+                            disabledCondition={!dateAvailable}
+                            onPressFunction={() => {
+                              vibration({ style: "light" });
+                              showPregnancyInfo();
+                            }}
+                          >
+                            Try for a Baby
+                          </GenericFlatButton>
+                        ) : (
+                          <GenericFlatButton
+                            disabledCondition={!dateAvailable}
+                            onPressFunction={() => {
+                              vibration({ style: "light" });
+                              showAdoptionModal(character.fullName);
+                            }}
+                          >
+                            Adopt
+                          </GenericFlatButton>
+                        ))}
                     </View>
                     <View className="mt-2 flex flex-row justify-evenly">
                       <GenericFlatButton
@@ -161,7 +185,7 @@ export const CharacterInteractionModal = observer(
                           vibration({ style: "light" });
                           character.setDateCooldownStart(gameState.date);
                           character.updateAffection(-10);
-                          gameState.gameTick({ playerState, fullSave });
+                          gameState.gameTick();
                         }}
                       >
                         Spit in Face
@@ -190,7 +214,7 @@ export const CharacterInteractionModal = observer(
                           character.updateAffection(5);
                           if (playerState && gameState) {
                             playerState.addNewKnownCharacter(character);
-                            gameState.gameTick({ playerState, fullSave });
+                            gameState.gameTick();
                           }
                         }}
                       >
@@ -202,7 +226,7 @@ export const CharacterInteractionModal = observer(
                           character.updateAffection(-5);
                           if (playerState && gameState) {
                             playerState.addNewKnownCharacter(character);
-                            gameState.gameTick({ playerState, fullSave });
+                            gameState.gameTick();
                           }
                         }}
                       >

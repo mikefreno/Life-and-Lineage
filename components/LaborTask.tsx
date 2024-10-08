@@ -9,7 +9,6 @@ import { Text } from "./Themed";
 import ThemedCard from "./ThemedCard";
 import { AppContext } from "../app/_layout";
 import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
-import { fullSave } from "../utility/functions/save_load";
 
 interface LaborTaskProps {
   reward: number;
@@ -58,7 +57,7 @@ const LaborTask = observer(
           vibration({ style: "success", essential: true });
         }
         setExperience(newExp);
-        gameState.gameTick({ playerState, fullSave });
+        gameState.gameTick();
         setFullReward(playerState.getRewardValue(title, reward));
       }
     }

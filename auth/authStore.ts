@@ -5,7 +5,6 @@ import { API_BASE_URL } from "../config/config";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import config from "../config/google_config";
 import { SaveRow } from "../utility/database";
-import { PlayerCharacter } from "../classes/character";
 import { Game } from "../classes/game";
 import { parseInt } from "lodash";
 import { Platform } from "react-native";
@@ -39,14 +38,12 @@ interface databaseExecuteProps {
 }
 interface makeRemoteSaveProps {
   name: string;
-  playerState: PlayerCharacter;
   gameState: Game;
 }
 
 interface overwriteRemoteSaveProps {
   name: string;
   id: number;
-  playerState: PlayerCharacter;
   gameState: Game;
 }
 interface deleteRemoteSaveProps {
@@ -235,10 +232,26 @@ class AuthStore {
         appleUser = creds.appleUser;
       }
 
-      token && storage.set("userToken", token);
-      storage.set("userEmail", email);
-      storage.set("authProvider", provider);
-      appleUser && storage.set("appleUser", appleUser);
+      try {
+        token && storage.set("userToken", token);
+      } catch (error) {
+        console.error("userToken setting error:", error);
+      }
+      try {
+        email && storage.set("userEmail", email);
+      } catch (error) {
+        console.error("userEmail setting error:", error);
+      }
+      try {
+        storage.set("authProvider", provider);
+      } catch (error) {
+        console.error("authProvider setting error:", error);
+      }
+      try {
+        appleUser && storage.set("appleUser", appleUser);
+      } catch (error) {
+        console.error("appleUser setting error:", error);
+      }
 
       this.setAuthState(token ?? null, email, provider, appleUser);
     } catch (error) {
@@ -345,25 +358,15 @@ class AuthStore {
     }
   };
 
-  makeRemoteSave = async ({
-    name,
-    playerState,
-    gameState,
-  }: makeRemoteSaveProps) => {
+  makeRemoteSave = async ({ name, gameState }: makeRemoteSaveProps) => {
     if (!this.isConnected) {
       throw new Error("Device is offline");
     }
     try {
       const time = this.formatDate(new Date());
       const res = await this.databaseExecute({
-        sql: `INSERT INTO Save (name, player_state, game_state, created_at, last_updated_at) VALUES (?, ?, ?, ?, ?)`,
-        args: [
-          name,
-          JSON.stringify(playerState),
-          JSON.stringify(gameState),
-          time,
-          time,
-        ],
+        sql: `INSERT INTO Save (name, game_state, created_at, last_updated_at) VALUES (?, ?, ?, ?)`,
+        args: [name, JSON.stringify(gameState), time, time],
       });
       await res?.json();
     } catch (e) {
@@ -375,7 +378,6 @@ class AuthStore {
   overwriteRemoteSave = async ({
     name,
     id,
-    playerState,
     gameState,
   }: overwriteRemoteSaveProps) => {
     if (!this.isConnected) {
@@ -384,17 +386,10 @@ class AuthStore {
     try {
       const updateTime = this.formatDate(new Date());
       const res = await this.databaseExecute({
-        sql: `UPDATE Save SET player_state = ?, game_state = ?, last_updated_at = ? WHERE name = ? AND id = ?`,
-        args: [
-          JSON.stringify(playerState),
-          JSON.stringify(gameState),
-          updateTime,
-          name,
-          id.toString(),
-        ],
+        sql: `UPDATE Save SET game_state = ?, last_updated_at = ? WHERE name = ? AND id = ?`,
+        args: [JSON.stringify(gameState), updateTime, name, id.toString()],
       });
-      const parsed = await res?.json();
-      console.log(parsed.results[0]);
+      await res?.json();
     } catch (e) {
       console.error(e);
       return [];
@@ -533,10 +528,9 @@ class AuthStore {
       cleaned.push({
         id: parseInt(row[0].value),
         name: row[1].value,
-        player_state: row[2].value,
-        game_state: row[3].value,
-        created_at: row[4].value,
-        last_updated_at: row[5].value,
+        game_state: row[2].value,
+        created_at: row[3].value,
+        last_updated_at: row[4].value,
       }),
     );
     return cleaned;

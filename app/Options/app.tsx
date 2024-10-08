@@ -1,7 +1,11 @@
-import { Platform, Pressable, TextInput, View } from "react-native";
+import { Platform, Pressable, ScrollView, TextInput, View } from "react-native";
 import { View as ThemedView, Text } from "../../components/Themed";
 import { useContext, useEffect, useState } from "react";
-import { toTitleCase } from "../../utility/functions/misc";
+import {
+  generateBirthday,
+  getRandomName,
+  toTitleCase,
+} from "../../utility/functions/misc";
 import { useVibration } from "../../utility/customHooks";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import { AppContext } from "../_layout";
@@ -15,10 +19,11 @@ import { SaveRow } from "../../utility/database";
 import D20DieAnimation from "../../components/DieRollAnim";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { Game } from "../../classes/game";
-import { PlayerCharacter } from "../../classes/character";
+import { Character, PlayerCharacter } from "../../classes/character";
 import { parse, stringify } from "flatted";
 import { createShops } from "../../classes/shop";
-import { PlayerClassOptions } from "../../utility/types";
+import { Element, PlayerClassOptions } from "../../utility/types";
+import { getRandomJobTitle } from "../../utility/functions/characterAid";
 
 const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
@@ -96,7 +101,7 @@ export const AppSettings = observer(() => {
     const newRemoteSave = async () => {
       if (playerState && gameState && saveName.length >= 3) {
         setLoadingDBInfo(true);
-        await user.makeRemoteSave({ name: saveName, playerState, gameState });
+        await user.makeRemoteSave({ name: saveName, gameState });
         const res = await user.getRemoteSaves();
         setRemoteSaves(res);
 
@@ -110,7 +115,6 @@ export const AppSettings = observer(() => {
         user.overwriteRemoteSave({
           name: chosenSave.name,
           id: chosenSave.id,
-          playerState,
           gameState,
         });
         const res = await user.getRemoteSaves();
@@ -120,6 +124,67 @@ export const AppSettings = observer(() => {
     };
 
     const profiling = () => {
+      function createParent(sex: "female" | "male"): Character {
+        const firstName = getRandomName(sex).firstName;
+        const job = getRandomJobTitle();
+        const parent = new Character({
+          firstName: firstName,
+          lastName: "Doe",
+          sex: sex,
+          job: job,
+          affection: 85,
+          birthdate: generateBirthday(32, 55),
+        });
+        return parent;
+      }
+      function getStartingBaseStats({
+        playerClass,
+      }: {
+        playerClass: PlayerClassOptions;
+      }) {
+        switch (playerClass) {
+          case PlayerClassOptions.necromancer:
+            return {
+              baseHealth: 80,
+              baseMana: 120,
+              baseStrength: 3,
+              baseIntelligence: 6,
+              baseDexterity: 4,
+              baseManaRegen: 6,
+              baseSanity: 40,
+            };
+          case PlayerClassOptions.paladin:
+            return {
+              baseHealth: 120,
+              baseMana: 80,
+              baseStrength: 6,
+              baseIntelligence: 4,
+              baseDexterity: 3,
+              baseManaRegen: 5,
+              baseSanity: 60,
+            };
+          case PlayerClassOptions.mage:
+            return {
+              baseHealth: 100,
+              baseMana: 100,
+              baseStrength: 5,
+              baseIntelligence: 5,
+              baseDexterity: 3,
+              baseManaRegen: 5,
+              baseSanity: 50,
+            };
+          case PlayerClassOptions.ranger:
+            return {
+              baseHealth: 90,
+              baseMana: 90,
+              baseStrength: 4,
+              baseIntelligence: 3,
+              baseDexterity: 7,
+              baseManaRegen: 5,
+              baseSanity: 50,
+            };
+        }
+      }
       function stringifyCircular(obj: any) {
         const seen = new WeakSet();
 
@@ -137,6 +202,16 @@ export const AppSettings = observer(() => {
       const game = new Game({
         shops: shops,
         vibrationEnabled: "full",
+        playerState: new PlayerCharacter({
+          firstName: "John",
+          lastName: "Doe",
+          sex: "male",
+          playerClass: PlayerClassOptions.mage,
+          blessing: Element.fire,
+          parents: [createParent("female"), createParent("female")],
+          birthdate: new Date().toString(),
+          ...getStartingBaseStats({ playerClass: PlayerClassOptions.mage }),
+        }),
       });
 
       const runTest = (
@@ -198,10 +273,9 @@ export const AppSettings = observer(() => {
     };
 
     const loadRemoteSave = async (chosenSave: SaveRow) => {
-      setGameData(Game.fromJSON(JSON.parse(chosenSave.game_state)));
-      setPlayerCharacter(
-        PlayerCharacter.fromJSON(JSON.parse(chosenSave.player_state)),
-      );
+      const game = Game.fromJSON(JSON.parse(chosenSave.game_state));
+      setGameData(game);
+      setPlayerCharacter(game.playerState);
       while (router.canGoBack()) {
         router.back();
       }
@@ -291,7 +365,7 @@ export const AppSettings = observer(() => {
           backdropCloses
           size={95}
         >
-          <View className="p-2">
+          <ScrollView className="p-2">
             <Text className="text-xl">Load Saves</Text>
             <Text className="text-xl text-center" style={{ color: "#ef4444" }}>
               Make sure to backup first!
@@ -302,7 +376,7 @@ export const AppSettings = observer(() => {
                 className="w-full bg-zinc-300 dark:bg-zinc-700 border rounded border-zinc-900 dark:border-zinc-50 pb-2"
               >
                 <Pressable
-                  className="w-8 h-8 absolute items-center justify-center m-1 border bg-zinc-50 dark:bg-zinc-900 rounded-full border-zinc-900 dark:border-zinc-50"
+                  className="w-8 h-8 z-50 absolute items-center justify-center m-1 border bg-zinc-50 dark:bg-zinc-900 rounded-full border-zinc-900 dark:border-zinc-50"
                   onPress={() => {
                     vibration({ essential: true, style: "warning" });
                     deleteRemoteSave(save);
@@ -323,7 +397,7 @@ export const AppSettings = observer(() => {
                 </GenericFlatButton>
               </View>
             ))}
-          </View>
+          </ScrollView>
         </GenericModal>
         <ThemedView className="flex-1 items-center justify-center px-4">
           <GenericStrikeAround>

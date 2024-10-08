@@ -64,10 +64,7 @@ export default function TabLayout() {
             position: "absolute",
             borderTopWidth: 0,
             shadowColor: "transparent",
-            height:
-              Platform.OS == "ios"
-                ? Math.min(dimensions.greater / 8, 140)
-                : 100,
+            height: 108,
           },
           tabBarButton: (props) => {
             const onPressWithVibration = (event: GestureResponderEvent) => {

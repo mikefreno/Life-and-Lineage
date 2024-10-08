@@ -14,8 +14,20 @@ export function generateNewCharacter() {
     firstName: name.firstName,
     lastName: name.lastName,
     birthdate: birthdate,
-    deathdate: undefined,
     job: job,
+  });
+  return newChar;
+}
+export function generateNewAdoptee() {
+  const sex = flipCoin() == "Heads" ? "male" : "female";
+  const name = getRandomName(sex);
+  const birthdate = generateBirthday(1, 17);
+
+  const newChar = new Character({
+    sex: sex,
+    firstName: name.firstName,
+    lastName: name.lastName,
+    birthdate: birthdate,
   });
   return newChar;
 }

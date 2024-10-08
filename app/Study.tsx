@@ -18,7 +18,6 @@ import { Element, ItemClassType, MasteryToString } from "../utility/types";
 import GenericModal from "../components/GenericModal";
 import { AppContext } from "./_layout";
 import { Spell } from "../classes/spell";
-import { fullSave } from "../utility/functions/save_load";
 import { elementalColorMap } from "../constants/Colors";
 
 export default function LearningKnowledgeScreen() {
@@ -70,7 +69,7 @@ export default function LearningKnowledgeScreen() {
     if (playerState && gameState && isFocused) {
       playerState.learnSpellStep(bookName, spellName, spellElement);
       setSpellState(playerState.learningSpells);
-      gameState.gameTick({ playerState, fullSave });
+      gameState.gameTick({ playerState });
     }
   }
 
