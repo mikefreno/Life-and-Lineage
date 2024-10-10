@@ -17,7 +17,7 @@ import type { PlayerCharacter } from "./character";
 import { Spell } from "./spell";
 import { Attack } from "./attack";
 import attackObjects from "../assets/json/playerAttacks.json";
-import { computed, makeObservable } from "mobx";
+import { action, computed, makeObservable } from "mobx";
 
 export class Item {
   readonly id: string;
@@ -69,7 +69,7 @@ export class Item {
     this.attackStrings = attacks;
     makeObservable(this, {
       attachedSpell: computed,
-      attachedAttacks: computed,
+      attachedAttacks: action,
     });
   }
 
@@ -124,13 +124,13 @@ export class Item {
     return Math.round(this.baseValue * (1.4 - affection / 2500));
   }
 
-  get attachedAttacks() {
+  public attachedAttacks(playerState: PlayerCharacter) {
     const builtAttacks: Attack[] = [];
     this.attackStrings.forEach((attackString) => {
       const found = attackObjects.find((obj) => obj.name == attackString);
       if (found) {
         // @ts-ignore
-        builtAttacks.push(new Attack({ ...found }));
+        builtAttacks.push(new Attack({ ...found, user: playerState }));
       }
     });
     return builtAttacks;

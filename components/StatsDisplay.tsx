@@ -326,14 +326,13 @@ export function StatsDisplay({
       >
         <View>
           {playerState &&
-            displayItem.item[0].attachedAttacks.map((attack) => (
-              <View key={`${displayItem.item[0].id}-${attack.name}`}>
-                {attack.AttackRender(
-                  playerState,
-                  displayItem.item[0].stats?.damage,
-                )}
-              </View>
-            ))}
+            displayItem.item[0]
+              .attachedAttacks(playerState)
+              .map((attack) => (
+                <View key={`${displayItem.item[0].id}-${attack.name}`}>
+                  {attack.AttackRender(displayItem.item[0].stats?.damage)}
+                </View>
+              ))}
         </View>
       </GenericModal>
       <View

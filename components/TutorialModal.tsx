@@ -88,6 +88,20 @@ export default function TutorialModal({
     gameState?.updateTutorialState(tutorial, true);
   };
 
+  const NextButton = () => {
+    const nextPageExists =
+      (tutorialStepRef.current == 1 && !!pageTwo) ||
+      (tutorialStepRef.current == 2 && !!pageThree);
+    return (
+      <Pressable
+        onPress={nextPageExists && tutorialState ? press : closeTutorial}
+        className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+      >
+        <Text>{nextPageExists && tutorialState ? "Next" : "Close"}</Text>
+      </Pressable>
+    );
+  };
+
   return (
     <GenericModal
       isVisibleCondition={isVisibleCondition}
@@ -141,12 +155,7 @@ export default function TutorialModal({
               value={tutorialState}
             />
           </View>
-          <Pressable
-            onPress={press}
-            className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-          >
-            <Text>{pageTwo ? "Next" : "Close"}</Text>
-          </Pressable>
+          <NextButton />
         </>
       ) : tutorialStep == 2 && pageTwo ? (
         <>
@@ -168,12 +177,7 @@ export default function TutorialModal({
               value={tutorialState}
             />
           </View>
-          <Pressable
-            onPress={press}
-            className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-          >
-            <Text>{pageThree ? "Next" : "Close"}</Text>
-          </Pressable>
+          <NextButton />
         </>
       ) : (
         tutorialStep == 3 &&
@@ -197,12 +201,7 @@ export default function TutorialModal({
                 value={tutorialState}
               />
             </View>
-            <Pressable
-              onPress={press}
-              className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-            >
-              <Text>Close</Text>
-            </Pressable>
+            <NextButton />
           </>
         )
       )}

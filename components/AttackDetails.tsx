@@ -4,7 +4,7 @@ import GenericStrikeAround from "./GenericStrikeAround";
 import { Attack } from "../classes/attack";
 import { toTitleCase } from "../utility/functions/misc";
 
-export default function AttackDetails({
+export default function ttackDetails({
   attack,
   baseDamage,
 }: {
@@ -24,7 +24,7 @@ export default function AttackDetails({
       {attack.buffs.length > 0 && (
         <>
           <GenericStrikeAround>Buffs</GenericStrikeAround>
-          {attack.buffs.map((buff, idx) => (
+          {attack.buffStrings.map((buff, idx) => (
             <View key={`${buff}-${idx}`}>
               <Text>{buff}</Text>
             </View>
@@ -34,7 +34,7 @@ export default function AttackDetails({
       {attack.debuffs.length > 0 && (
         <>
           <GenericStrikeAround>Debuffs</GenericStrikeAround>
-          {attack.debuffs.map((debuff, idx) => (
+          {attack.debuffStrings.map((debuff, idx) => (
             <View
               key={`${debuff.name}-${idx}`}
               className="flex w-full items-center"

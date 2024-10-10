@@ -6,7 +6,6 @@ import { ConditionObjectType } from "../types";
 
 interface createDebuffDeps {
   debuffName: string;
-  debuffChance: number;
   enemyMaxHP: number;
   enemyMaxSanity?: number | null;
   primaryAttackDamage: number;
@@ -15,68 +14,64 @@ interface createDebuffDeps {
 }
 export function createDebuff({
   debuffName,
-  debuffChance,
   enemyMaxHP,
   enemyMaxSanity = 50,
   primaryAttackDamage,
   applierNameString,
   applierID,
 }: createDebuffDeps) {
-  const roll = rollD20();
-  if (roll * 5 >= 100 - debuffChance * 100) {
-    const debuffObj = conditions.find(
-      (condition) => condition.name === debuffName,
-    ) as ConditionObjectType;
+  const debuffObj = conditions.find(
+    (condition) => condition.name === debuffName,
+  ) as ConditionObjectType;
 
-    if (debuffObj) {
-      let healthDamage: number[] = [];
-      let sanityDamage: number[] = [];
+  if (debuffObj) {
+    let healthDamage: number[] = [];
+    let sanityDamage: number[] = [];
 
-      debuffObj.effect.forEach((eff, index) => {
-        if (eff === "health damage" && debuffObj.effectAmount[index] !== null) {
-          let localHealthDmg = debuffObj.effectAmount[index] as number;
-          if (debuffObj.effectStyle[index] === "multiplier") {
-            localHealthDmg *= primaryAttackDamage;
-          } else if (debuffObj.effectStyle[index] === "percentage") {
-            localHealthDmg *= enemyMaxHP;
-          }
-          healthDamage.push(localHealthDmg);
-        } else {
-          healthDamage.push(0);
+    debuffObj.effect.forEach((eff, index) => {
+      if (eff === "health damage" && debuffObj.effectAmount[index] !== null) {
+        let localHealthDmg = debuffObj.effectAmount[index] as number;
+        if (debuffObj.effectStyle[index] === "multiplier") {
+          localHealthDmg *= primaryAttackDamage;
+        } else if (debuffObj.effectStyle[index] === "percentage") {
+          localHealthDmg *= enemyMaxHP;
         }
+        healthDamage.push(localHealthDmg);
+      } else {
+        healthDamage.push(0);
+      }
 
-        if (eff === "sanity damage" && debuffObj.effectAmount[index] !== null) {
-          let localSanityDmg = debuffObj.effectAmount[index] as number;
-          if (debuffObj.effectStyle[index] === "multiplier") {
-            localSanityDmg *= primaryAttackDamage;
-          } else if (debuffObj.effectStyle[index] === "percentage") {
-            localSanityDmg *= enemyMaxSanity ?? 0;
-          }
-          sanityDamage.push(localSanityDmg);
-        } else {
-          sanityDamage.push(0);
+      if (eff === "sanity damage" && debuffObj.effectAmount[index] !== null) {
+        let localSanityDmg = debuffObj.effectAmount[index] as number;
+        if (debuffObj.effectStyle[index] === "multiplier") {
+          localSanityDmg *= primaryAttackDamage;
+        } else if (debuffObj.effectStyle[index] === "percentage") {
+          localSanityDmg *= enemyMaxSanity ?? 0;
         }
-      });
+        sanityDamage.push(localSanityDmg);
+      } else {
+        sanityDamage.push(0);
+      }
+    });
 
-      const debuff = new Condition({
-        name: debuffObj.name,
-        style: "debuff",
-        turns: debuffObj.turns,
-        effect: debuffObj.effect,
-        healthDamage: healthDamage,
-        sanityDamage: sanityDamage,
-        effectStyle: debuffObj.effectStyle,
-        effectMagnitude: debuffObj.effectAmount,
-        placedby: applierNameString,
-        placedbyID: applierID,
-        icon: debuffObj.icon,
-        aura: debuffObj.aura,
-      });
+    const debuff = new Condition({
+      name: debuffObj.name,
+      style: "debuff",
+      turns: debuffObj.turns,
+      effect: debuffObj.effect,
+      healthDamage: healthDamage,
+      sanityDamage: sanityDamage,
+      effectStyle: debuffObj.effectStyle,
+      effectMagnitude: debuffObj.effectAmount,
+      placedby: applierNameString,
+      placedbyID: applierID,
+      icon: debuffObj.icon,
+      aura: debuffObj.aura,
+    });
 
-      return debuff;
-    } else {
-      throw new Error("Failed to find debuff in createDebuff()");
-    }
+    return debuff;
+  } else {
+    throw new Error("Failed to find debuff in createDebuff()");
   }
 }
 
@@ -202,6 +197,7 @@ export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
         placedby: "low sanity",
         icon: debuffObj.icon,
         aura: debuffObj.aura,
+        placedbyID: "low sanity",
       });
 
       playerState.addCondition(debuff);

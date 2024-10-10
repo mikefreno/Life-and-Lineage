@@ -28,7 +28,7 @@ import mageBooks from "../assets/json/items/mageBooks.json";
 import rangerBooks from "../assets/json/items/rangerBooks.json";
 import * as Crypto from "expo-crypto";
 import { Item, isStackable } from "./item";
-import { action, autorun, makeObservable, observable } from "mobx";
+import { action, autorun, computed, makeObservable, observable } from "mobx";
 import summons from "../assets/json/summons.json";
 import { ItemClassType, BeingType, PlayerClassOptions } from "../utility/types";
 import {
@@ -55,7 +55,7 @@ type CreatureType = {
   energy?: number;
   energyMax?: number;
   energyRegen?: number;
-  attacks: string[] | Attack[];
+  attacks: string[];
   conditions?: Condition[];
 };
 
@@ -135,9 +135,9 @@ export class Creature {
   readonly energyRegen: number;
 
   /**
-   * List of attacks the creature can perform
+   * List of attack names the creature can perform
    */
-  attacks: Attack[];
+  readonly attackStrings: string[];
 
   /**
    * List of conditions affecting the creature
@@ -179,7 +179,7 @@ export class Creature {
     this.energy = energy ?? 0; // Initialize energy to 0 if not provided
     this.energyMax = energyMax ?? 0; // Initialize energyMax to 0 if not provided
     this.energyRegen = energyRegen ?? 0; // Initialize energyRegen to 0 if not provided
-    this.attacks = this.initAttacks(attacks); // Initialize attacks
+    this.attackStrings = attacks;
     this.conditions = conditions ?? []; // Initialize conditions to an empty array if not provided
     this.gotDrops = false; // Initialize gotDrops to false
 
@@ -200,7 +200,51 @@ export class Creature {
       equals: action,
       regenerate: action,
       expendEnergy: action,
+      attacks: computed,
     });
+  }
+
+  /**
+   * The built Attacks of the Creature
+   */
+  get attacks() {
+    const builtAttacks: Attack[] = [];
+    this.attackStrings.forEach((attackName) => {
+      const foundAttack = attacks.find(
+        (attackObj) => attackObj.name == attackName,
+      );
+      if (!foundAttack)
+        throw new Error(
+          `No matching attack found for ${attackName} in creating a ${this.creatureSpecies}`,
+        ); // name should be set before this
+      const {
+        name,
+        energyCost,
+        hitChance,
+        targets,
+        damageMult,
+        flatHealthDamage,
+        flatSanityDamage,
+        buffs,
+        debuffs,
+        summons,
+      } = foundAttack;
+      const builtAttack = new Attack({
+        name,
+        energyCost,
+        hitChance,
+        targets: targets as "single" | "aoe" | "cleave",
+        damageMult,
+        flatHealthDamage,
+        flatSanityDamage,
+        buffs,
+        debuffs,
+        summons,
+        user: this as unknown as Enemy | Minion,
+      });
+      builtAttacks.push(builtAttack);
+    });
+    return builtAttacks;
   }
 
   //---------------------------Equivalency---------------------------//
@@ -368,53 +412,6 @@ export class Creature {
       }
     }
   }
-  /**
-   * Initializes the attacks of the creature.
-   * @param attackStrings - The attacks to initialize, either as strings or Attack objects.
-   * @returns The initialized attacks as Attack objects.
-   * @private
-   */
-  private initAttacks(attackStrings: string[] | Attack[]): Attack[] {
-    if (attackStrings[0] instanceof Attack) {
-      return attackStrings as Attack[];
-    }
-    const builtAttacks: Attack[] = [];
-    attackStrings.forEach((attackName) => {
-      const foundAttack = attacks.find(
-        (attackObj) => attackObj.name == attackName,
-      );
-      if (!foundAttack)
-        throw new Error(
-          `No matching attack found for ${attackName} in creating a ${this.creatureSpecies}`,
-        ); // name should be set before this
-      const {
-        name,
-        energyCost,
-        hitChance,
-        targets,
-        damageMult,
-        flatHealthDamage,
-        flatSanityDamage,
-        buffs,
-        debuffs,
-        summons,
-      } = foundAttack;
-      const builtAttack = new Attack({
-        name,
-        energyCost,
-        hitChance,
-        targets: targets as "single" | "aoe" | "cleave",
-        damageMult,
-        flatHealthDamage,
-        flatSanityDamage,
-        buffs,
-        debuffs,
-        summons,
-      });
-      builtAttacks.push(builtAttack);
-    });
-    return builtAttacks;
-  }
 
   /**
    * This method is meant to be overridden by derived classes. It currently chooses a random attack.
@@ -478,7 +475,6 @@ export class Creature {
         const chosenAttack = this.chooseAttack(availableAttacks);
         const res = chosenAttack.use({
           target: highestAggroTarget,
-          user: this as unknown as Enemy | Minion,
         });
         this.endTurn();
         return { ...res, chosenAttack };
@@ -727,9 +723,7 @@ export class Enemy extends Creature {
       energyMax: json.energyMax,
       energyRegen: json.energyRegen,
       minions: json.minions,
-      attacks: json.attacks
-        ? json.attacks.map((attack: any) => Attack.fromJSON(attack))
-        : [],
+      attacks: json.attackStrings,
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],

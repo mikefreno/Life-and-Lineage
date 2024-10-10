@@ -1713,6 +1713,7 @@ export class PlayerCharacter extends Character {
           name: punchObj.name,
           damageMult: punchObj.damageMult,
           hitChance: punchObj.damageMult,
+          user: this,
         });
         builtAttacks.push(attack);
       }
@@ -1722,6 +1723,7 @@ export class PlayerCharacter extends Character {
         name: punchObj.name,
         damageMult: punchObj.damageMult,
         hitChance: punchObj.damageMult,
+        user: this,
       });
       builtAttacks.push(attack);
     }

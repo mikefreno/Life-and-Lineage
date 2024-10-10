@@ -167,8 +167,8 @@ export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
               setEnemyHealDummy((prev) => prev + 1);
             }
             if (
-              enemyAttackRes.chosenAttack.debuffs.length > 0 ||
-              enemyAttackRes.chosenAttack.debuffs.length > 0
+              enemyAttackRes.chosenAttack.debuffStrings.length > 0 ||
+              enemyAttackRes.chosenAttack.buffStrings.length > 0
             ) {
               setEnemyTextString(enemyAttackRes.chosenAttack.name);
               setEnemyTextDummy((prev) => prev + 1);
@@ -333,7 +333,6 @@ export const use = ({
     if (attackOrSpell instanceof Attack) {
       const { result, logString } = attackOrSpell.use({
         target,
-        user: playerState,
       });
       if (result == AttackUse.miss) {
         setEnemyDodgeDummy((prev) => prev + 1);
