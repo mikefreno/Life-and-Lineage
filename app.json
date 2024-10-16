@@ -42,6 +42,16 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
+    "metro": {
+      "requireCycleIgnorePatterns": [
+        "classes/creatures\\.ts",
+        "classes/item\\.ts",
+        "classes/attack\\.ts",
+        "classes/character\\.ts",
+        "utility/functions/save_load\\.ts",
+        "classes/game\\.ts"
+      ]
+    },
     "plugins": [
       "expo-router",
       "expo-apple-authentication",

@@ -273,10 +273,12 @@ export class Game {
   }
 
   public updateTutorialState(tutorial: TutorialOption, state: boolean) {
-    this.tutorialsShown[tutorial] = state;
+    const currentState = this.tutorialsShown;
+    currentState[tutorial] = state;
+    this.tutorialsShown = currentState;
   }
 
-  public resetTutorialState() {
+  public resetTutorialState(callbackFunction?: () => any) {
     const defaultState = {
       [TutorialOption.class]: false,
       [TutorialOption.aging]: false,
@@ -295,6 +297,9 @@ export class Game {
     };
     this.tutorialsShown = defaultState;
     this.enableTutorials();
+    if (callbackFunction) {
+      callbackFunction();
+    }
   }
 
   public disableTutorials() {

@@ -18,7 +18,13 @@ import { observer } from "mobx-react-lite";
 import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
-import { Dimensions, Keyboard, Platform, StyleSheet } from "react-native";
+import {
+  Dimensions,
+  Keyboard,
+  LogBox,
+  Platform,
+  StyleSheet,
+} from "react-native";
 import { View as ThemedView } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { BlurView } from "expo-blur";
@@ -110,8 +116,6 @@ async function registerForPushNotificationsAsync() {
     } catch (e: unknown) {
       handleRegistrationError(`${e}`);
     }
-  } else {
-    handleRegistrationError("Must use physical device for push notifications");
   }
 }
 

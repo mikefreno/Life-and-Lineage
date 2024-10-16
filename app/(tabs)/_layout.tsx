@@ -39,8 +39,7 @@ export default function TabLayout() {
   if (!appData) throw new Error("missing context");
 
   const { colorScheme } = useColorScheme();
-  const { playerState, setShowDetailedStatusView, isCompact, dimensions } =
-    appData;
+  const { playerState, setShowDetailedStatusView, isCompact } = appData;
   const vibration = useVibration();
 
   return (

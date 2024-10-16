@@ -19,7 +19,7 @@ import staves from "../../assets/json/items/staves.json";
 import melee from "../../assets/json/items/melee.json";
 import wands from "../../assets/json/items/wands.json";
 import names from "../../assets/json/names.json";
-import { ItemClassType, PlayerClassOptions } from "../types";
+import { ItemClassType, PlayerClassOptions, TutorialOption } from "../types";
 import { CommonActions, NavigationProp } from "@react-navigation/native";
 import { storage } from "./storage";
 
@@ -252,6 +252,16 @@ export function updateStoredTutorialState(state: boolean) {
 export function loadStoredTutorialState(): boolean {
   return JSON.parse(storage.getString("tutorialsEnabled") ?? "true");
 }
+export function getLocalTutorialState(tutorial: TutorialOption) {
+  return JSON.parse(storage.getString(tutorial.toString()) ?? "false");
+}
+export function setLocalTutorialState(
+  tutorial: TutorialOption,
+  state: boolean,
+) {
+  storage.set(tutorial.toString(), JSON.stringify(state));
+}
+
 export function flipCoin() {
   return Math.random() < 0.5 ? "Heads" : "Tails";
 }

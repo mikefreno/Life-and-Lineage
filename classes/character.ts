@@ -537,7 +537,7 @@ export class PlayerCharacter extends Character {
     this.currentSanity = currentSanity ?? baseSanity;
     this.currentMana = currentMana ?? baseMana;
 
-    this.unAllocatedSkillPoints = unAllocatedSkillPoints ?? 0;
+    this.unAllocatedSkillPoints = unAllocatedSkillPoints ?? __DEV__ ? 100 : 0;
     this.allocatedSkillPoints = allocatedSkillPoints ?? {
       [Attribute.health]: 0,
       [Attribute.mana]: 0,
@@ -648,6 +648,7 @@ export class PlayerCharacter extends Character {
       removeMinion: action,
 
       physicalAttacks: computed,
+      useArrow: action,
       pass: action,
 
       isStunned: computed,
@@ -1024,7 +1025,18 @@ export class PlayerCharacter extends Character {
 
     for (const [_, item] of Object.entries(this.equipment)) {
       if (item && "length" in item) {
-        continue; // arrows do not provide stats, only quiver accepts array
+        const stats = item[0]?.stats;
+        if (!stats || !item[0].playerHasRequirements(this)) continue;
+        armor += stats.armor ?? 0;
+        damage += stats.damage ?? 0;
+        mana += stats.mana ?? 0;
+        regen += stats.regen ?? 0;
+        health += stats.health ?? 0;
+        sanity += stats.sanity ?? 0;
+        blockChance += stats.blockChance ?? 0;
+        strength += stats.strength ?? 0;
+        intelligence += stats.intelligence ?? 0;
+        dexterity += stats.dexterity ?? 0;
       } else {
         const stats = item?.stats;
         if (!stats || !item.playerHasRequirements(this)) continue;
@@ -1701,7 +1713,7 @@ export class PlayerCharacter extends Character {
         const attackStrings = itemObj.attacks;
         attacks.filter((attack) => {
           if (attackStrings.includes(attack.name)) {
-            const builtAttack = Attack.fromJSON(attack);
+            const builtAttack = Attack.fromJSON({ ...attack, user: this });
             builtAttacks.push(builtAttack);
           }
         });
@@ -1728,6 +1740,12 @@ export class PlayerCharacter extends Character {
       builtAttacks.push(attack);
     }
     return builtAttacks;
+  }
+
+  public useArrow() {
+    if (this.equipment.quiver && this.equipment.quiver.length > 0) {
+      this.equipment.quiver = this.equipment.quiver.slice(0, -1);
+    }
   }
 
   public pass({ voluntary = false }: { voluntary?: boolean }) {

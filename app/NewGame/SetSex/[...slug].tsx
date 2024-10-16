@@ -12,12 +12,10 @@ import {
   TutorialOption,
   isPlayerClassOptions,
 } from "../../../utility/types";
-import {
-  loadStoredTutorialState,
-  toTitleCase,
-} from "../../../utility/functions/misc";
+import { toTitleCase } from "../../../utility/functions/misc";
 import { playerClassColors } from "../../../constants/Colors";
 import GenericFlatButton from "../../../components/GenericFlatButton";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function SetSex() {
   const { slug } = useLocalSearchParams();
@@ -37,20 +35,11 @@ export default function SetSex() {
 
   let sexRef = useRef<"male" | "female">();
   const vibration = useVibration();
+  const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
 
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing context");
   const gameState = appData?.gameState;
-
-  const [showAgingTutorial, setShowAgingTutorial] = useState<boolean>(
-    !gameState
-      ? loadStoredTutorialState()
-      : gameState &&
-        !gameState.tutorialsShown[TutorialOption.aging] &&
-        gameState.tutorialsEnabled
-      ? true
-      : false,
-  );
 
   return (
     <>
@@ -62,10 +51,10 @@ export default function SetSex() {
         }}
       />
       <TutorialModal
-        isVisibleCondition={showAgingTutorial}
         tutorial={TutorialOption.aging}
-        backFunction={() => setShowAgingTutorial(false)}
-        onCloseFunction={() => setShowAgingTutorial(false)}
+        override={forceShowTutorial}
+        clearOverride={() => setForceShowTutorial(false)}
+        isFocused={useIsFocused()}
         pageOne={{
           title: "This game focuses around the passage of time.",
           body: "Almost everything will move the game clock forward, aging the characters in the game. At a certain point it will nearly impossible to stay alive.",
@@ -155,7 +144,7 @@ export default function SetSex() {
           <View className="absolute ml-4 mt-4">
             <Pressable
               className="absolute"
-              onPress={() => setShowAgingTutorial(true)}
+              onPress={() => setForceShowTutorial(true)}
             >
               <FontAwesome5
                 name="question-circle"

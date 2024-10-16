@@ -25,6 +25,8 @@ import { Attack } from "../../classes/attack";
 import { Spell } from "../../classes/spell";
 import { TutorialOption } from "../../utility/types";
 import { useHeaderHeight } from "@react-navigation/elements";
+import StoryModal from "../../components/StoryModal";
+import { useIsFocused } from "@react-navigation/native";
 
 const DungeonProvider = observer(() => {
   const { slug } = useLocalSearchParams();
@@ -82,6 +84,7 @@ const DungeonProvider = observer(() => {
     chosenAttack: Attack | Spell | null;
   }>({ showing: false, chosenAttack: null });
   const [isReady, setIsReady] = useState(false);
+  const [showingStoryBeat, setShowingStoryBeat] = useState<string>("");
 
   const instanceName = slug[0];
   const level = slug[1];
@@ -90,6 +93,8 @@ const DungeonProvider = observer(() => {
     item: Item[];
     positon: { left: number; top: number };
   } | null>(null);
+
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     if (
@@ -199,11 +204,10 @@ const DungeonProvider = observer(() => {
       shouldShowFirstBossKillTutorialAfterItemDrops &&
       !droppedItems
     ) {
-      const timer = setTimeout(() => {
+      wait(750).then(() => {
         setShowFirstBossKillTutorial(true);
         setShouldShowFirstBossKillTutorialAfterItemDrops(false);
-      }, 250);
-      return () => clearTimeout(timer);
+      });
     }
   }, [isReady, shouldShowFirstBossKillTutorialAfterItemDrops, droppedItems]);
 
@@ -264,21 +268,29 @@ const DungeonProvider = observer(() => {
         }}
       >
         <TutorialModal
-          isVisibleCondition={
-            showFirstBossKillTutorial && gameState.tutorialsEnabled
-          }
           tutorial={TutorialOption.firstBossKill}
-          backFunction={() => setShowFirstBossKillTutorial(false)}
-          onCloseFunction={() => {
+          backFunction={() => {
             setShowFirstBossKillTutorial(false);
-            wait(500).then(() => {
+            wait(750).then(() => {
               setShowDetailedStatusView(true);
             });
           }}
+          onCloseFunction={() => {
+            setShowFirstBossKillTutorial(false);
+            wait(750).then(() => {
+              setShowDetailedStatusView(true);
+            });
+          }}
+          isFocused={isFocused && showFirstBossKillTutorial} // simply way to avoid showing
           pageOne={{
             title: "Well Fought!",
             body: "You have defeated the first boss! Every boss will reward you with stats points to distribute as you wish.",
           }}
+        />
+        <StoryModal
+          isVisible={showingStoryBeat !== ""}
+          backFunction={() => setShowingStoryBeat("")}
+          storyBeat={showingStoryBeat}
         />
         <DungeonLevelScreen />
       </DungeonContext.Provider>

@@ -40,9 +40,9 @@ export default function GenericModal({
       onBackdropPress={backdropCloses ? backFunction : undefined}
       onBackButtonPress={backFunction}
       deviceHeight={dimensions.height}
-      useNativeDriverForBackdrop
-      useNativeDriver
       statusBarTranslucent
+      useNativeDriver
+      useNativeDriverForBackdrop
       style={style}
     >
       <View

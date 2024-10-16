@@ -18,7 +18,7 @@ import clearHistory, {
   wait,
 } from "../../../utility/functions/misc";
 import { Game } from "../../../classes/game";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { useVibration } from "../../../utility/customHooks";
 import { getRandomJobTitle } from "../../../utility/functions/characterAid";
 import { createShops } from "../../../classes/shop";

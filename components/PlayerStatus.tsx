@@ -641,6 +641,7 @@ const PlayerStatus = observer(
           <GenericModal
             isVisibleCondition={showDetailedStatusView}
             backFunction={() => setShowDetailedStatusView(false)}
+            size={95}
           >
             <View>
               <View className="flex flex-row justify-between items-center py-1 w-full">

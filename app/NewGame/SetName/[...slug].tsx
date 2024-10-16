@@ -2,7 +2,6 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   TextInput,
   TouchableWithoutFeedback,
   View,

@@ -5,7 +5,6 @@ import { useColorScheme } from "nativewind";
 import { View, ScrollView } from "react-native";
 import { observer } from "mobx-react-lite";
 import ProgressBar from "../../components/ProgressBar";
-import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -20,15 +19,15 @@ import {
 } from "../../utility/types";
 import { AppContext } from "../_layout";
 import { elementalColorMap } from "../../constants/Colors";
+import { useIsFocused } from "@react-navigation/native";
 
 const SpellsScreen = observer(() => {
   const appData = useContext(AppContext);
   const { colorScheme } = useColorScheme();
-  const isFocused = useIsFocused();
 
   if (!appData) throw new Error("missing contexts");
 
-  const { isCompact, playerState, gameState } = appData;
+  const { isCompact, playerState } = appData;
 
   function magicProficiencySection(
     proficiencies:
@@ -106,13 +105,8 @@ const SpellsScreen = observer(() => {
   return (
     <>
       <TutorialModal
-        isVisibleCondition={
-          (!gameState?.tutorialsShown[TutorialOption.spell] &&
-            gameState?.tutorialsEnabled &&
-            isFocused) ??
-          false
-        }
         tutorial={TutorialOption.spell}
+        isFocused={useIsFocused()}
         pageOne={{
           title: "Magic Tab",
           body: "Here you can see your known spells, and proficiencies with each school of magic.",

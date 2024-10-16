@@ -50,7 +50,6 @@ const ShopInteriorScreen = observer(() => {
   const shopInventoryTarget = useRef<View>(null);
 
   const header = useHeaderHeight();
-  const isFocused = useIsFocused();
 
   useEffect(() => {
     if (inventoryFullNotifier) {
@@ -192,13 +191,8 @@ const ShopInteriorScreen = observer(() => {
           }}
         />
         <TutorialModal
-          isVisibleCondition={
-            (!gameState.tutorialsShown[TutorialOption.shopInterior] &&
-              gameState?.tutorialsEnabled &&
-              isFocused) ??
-            false
-          }
           tutorial={TutorialOption.shopInterior}
+          isFocused={useIsFocused()}
           pageOne={{
             title: "Shopkeepers remember you.",
             body: "The more you trade with a given shopkeeper the better deals they will have for you.",

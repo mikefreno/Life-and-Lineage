@@ -6,7 +6,6 @@ import shopObjects from "../../assets/json/shops.json";
 import { router } from "expo-router";
 import { useContext } from "react";
 import { useVibration } from "../../utility/customHooks";
-import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -14,12 +13,12 @@ import { toTitleCase, calculateAge } from "../../utility/functions/misc";
 import { AppContext } from "../_layout";
 import { TutorialOption } from "../../utility/types";
 import { observer } from "mobx-react-lite";
+import { useIsFocused } from "@react-navigation/native";
 
 const ShopsScreen = observer(() => {
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing gameData");
   const vibration = useVibration();
-  const isFocused = useIsFocused();
   const { gameState, isCompact } = appData;
 
   if (gameState) {
@@ -124,13 +123,8 @@ const ShopsScreen = observer(() => {
     return (
       <>
         <TutorialModal
-          isVisibleCondition={
-            (!gameState.tutorialsShown[TutorialOption.shops] &&
-              gameState?.tutorialsEnabled &&
-              isFocused) ??
-            false
-          }
           tutorial={TutorialOption.shops}
+          isFocused={useIsFocused()}
           pageOne={{
             title: "Shop Tab",
             body: "Each of these shops buy and sell various types of items.",

@@ -1,11 +1,10 @@
 import { Pressable, useColorScheme, View } from "react-native";
 import { ScrollView, Text, View as ThemedView } from "../../components/Themed";
 import "../../assets/styles/globals.css";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useLayoutEffect, useRef, useState } from "react";
 import { Stack, router } from "expo-router";
 import { useVibration } from "../../utility/customHooks";
 import { AppContext } from "../_layout";
-import Modal from "react-native-modal";
 import { FontAwesome5 } from "@expo/vector-icons";
 import TutorialModal from "../../components/TutorialModal";
 import {
@@ -14,12 +13,15 @@ import {
   RangerIcon,
   WizardHat,
 } from "../../assets/icons/SVGIcons";
-import { loadStoredTutorialState } from "../../utility/functions/misc";
 import { TutorialOption } from "../../utility/types";
 import { ClassDescriptionMap } from "../../utility/descriptions";
 import GenericFlatButton from "../../components/GenericFlatButton";
+import GenericModal from "../../components/GenericModal";
+import { wait } from "../../utility/functions/misc";
+import { observer } from "mobx-react-lite";
+import { useIsFocused } from "@react-navigation/native";
 
-export default function NewGameScreen() {
+const SetClassScreen = observer(() => {
   const [selectedClass, setSelectedClass] = useState<
     "mage" | "necromancer" | "paladin" | "ranger"
   >();
@@ -30,41 +32,16 @@ export default function NewGameScreen() {
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing context!");
   const { gameState, dimensions } = appData;
-  const [tutorialState, setTutorialState] = useState<boolean>(
-    gameState?.tutorialsEnabled ?? true,
-  );
 
-  const [showIntroTutorial, setShowIntroTutorial] = useState<boolean>(
-    !gameState
-      ? loadStoredTutorialState()
-      : gameState &&
-        !gameState.tutorialsShown[TutorialOption.class] &&
-        gameState.tutorialsEnabled
-      ? true
-      : false,
-  );
+  const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
 
-  const [showTutorialReset, setShowTutorialReset] = useState<boolean>(
-    gameState ? true : false,
-  );
+  const [showTutorialReset, setShowTutorialReset] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (gameState) {
-      if (tutorialState == false) {
-        gameState.disableTutorials();
-      } else {
-        gameState.enableTutorials();
-      }
-    } else {
-      setTutorialState(tutorialState);
-    }
-  }, [tutorialState]);
-
-  useEffect(() => {
-    if (gameState) {
-      setTutorialState(gameState?.tutorialsEnabled);
-    }
-  }, [gameState?.tutorialsEnabled]);
+  useLayoutEffect(() => {
+    wait(200).then(() => {
+      setShowTutorialReset(!!gameState);
+    });
+  }, []);
 
   return (
     <>
@@ -76,63 +53,48 @@ export default function NewGameScreen() {
           headerBackTitle: "Home",
         }}
       />
-      <Modal
-        animationIn="slideInUp"
-        animationOut="slideOutDown"
-        backdropOpacity={0.2}
-        animationInTiming={500}
-        animationOutTiming={300}
-        isVisible={showTutorialReset}
-        onBackdropPress={() => setShowTutorialReset(false)}
-        onBackButtonPress={() => setShowTutorialReset(false)}
-      >
-        <ThemedView
-          className="mx-auto w-5/6 rounded-xl px-6 py-4 dark:border dark:border-zinc-500"
-          style={{
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 2,
-            },
-            elevation: 4,
-            shadowOpacity: 0.25,
-            shadowRadius: 5,
-          }}
-        >
-          <Text className="text-center text-2xl">Tutorial Reset</Text>
-          <Text className="text-center text-lg">
-            Would you like to reset tutorials?
-          </Text>
-          <ThemedView className="flex flex-row">
-            <Pressable
-              onPress={() => {
-                gameState?.resetTutorialState();
-                setShowTutorialReset(false);
-                setShowIntroTutorial(true);
-              }}
-              className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-            >
-              <Text>Reset</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => setShowTutorialReset(false)}
-              className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-            >
-              <Text>Cancel</Text>
-            </Pressable>
-          </ThemedView>
-        </ThemedView>
-      </Modal>
       <TutorialModal
-        isVisibleCondition={showIntroTutorial && !showTutorialReset}
-        tutorial={TutorialOption.intro}
-        backFunction={() => setShowIntroTutorial(false)}
-        onCloseFunction={() => setShowIntroTutorial(false)}
+        tutorial={TutorialOption.class}
+        override={forceShowTutorial}
+        isFocused={useIsFocused()}
+        clearOverride={() => setForceShowTutorial(false)}
         pageOne={{
           title: "Welcome To Magic Delve!",
           body: "Let's start with selecting your class...",
         }}
       />
+      <GenericModal
+        isVisibleCondition={showTutorialReset}
+        backFunction={() => setShowTutorialReset(false)}
+      >
+        <Text className="text-center text-2xl">Tutorial Reset</Text>
+        <Text className="text-center text-lg">
+          Would you like to reset tutorials?
+        </Text>
+        <ThemedView className="flex flex-row">
+          <Pressable
+            onPress={() => {
+              setShowTutorialReset(false);
+              if (!!gameState) {
+                wait(750).then(() => {
+                  gameState.resetTutorialState(() =>
+                    setForceShowTutorial(true),
+                  );
+                });
+              }
+            }}
+            className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+          >
+            <Text>Reset</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => setShowTutorialReset(false)}
+            className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+          >
+            <Text>Cancel</Text>
+          </Pressable>
+        </ThemedView>
+      </GenericModal>
       <ScrollView>
         <ThemedView className="flex-1 items-center px-[6vw]">
           <Text className="bold pt-[4vh] text-center text-3xl">
@@ -302,21 +264,23 @@ export default function NewGameScreen() {
           )}
         </ThemedView>
       </ScrollView>
-      {(gameState && gameState.tutorialsEnabled) ||
-        (!gameState && (
-          <View className="absolute ml-4 mt-4">
-            <Pressable
-              className="absolute"
-              onPress={() => setShowIntroTutorial(true)}
-            >
-              <FontAwesome5
-                name="question-circle"
-                size={32}
-                color={colorScheme == "light" ? "#27272a" : "#fafafa"}
-              />
-            </Pressable>
-          </View>
-        ))}
+      {((gameState && gameState.tutorialsEnabled) || !gameState) && (
+        <View className="absolute ml-4 mt-4">
+          <Pressable
+            className="absolute z-top"
+            onPress={() => {
+              setForceShowTutorial(true);
+            }}
+          >
+            <FontAwesome5
+              name="question-circle"
+              size={32}
+              color={colorScheme == "light" ? "#27272a" : "#fafafa"}
+            />
+          </Pressable>
+        </View>
+      )}
     </>
   );
-}
+});
+export default SetClassScreen;

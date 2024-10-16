@@ -20,7 +20,7 @@ const EarnScreen = observer(() => {
   if (!appData) {
     throw new Error("missing context");
   }
-  const { playerState, isCompact, gameState } = appData;
+  const { playerState, isCompact } = appData;
   const [showingRejection, setShowingRejection] = useState<boolean>(false);
   const [missingPreReqs, setMissingPreReqs] = useState<string[]>([]);
 
@@ -44,13 +44,8 @@ const EarnScreen = observer(() => {
   return (
     <>
       <TutorialModal
-        isVisibleCondition={
-          (!gameState?.tutorialsShown[TutorialOption.labor] &&
-            gameState?.tutorialsEnabled &&
-            isFocused) ??
-          false
-        }
         tutorial={TutorialOption.labor}
+        isFocused={useIsFocused()}
         pageOne={{
           title: "Labor Tab",
           body: "Come here to earn gold in a (mostly) safe way. Certain jobs have qualifications which you can earn by going to the training school (top left).",

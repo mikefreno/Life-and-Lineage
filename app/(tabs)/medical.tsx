@@ -21,18 +21,13 @@ const MedicalScreen = observer(() => {
     throw new Error("Missing Context");
   }
   const isFocused = useIsFocused();
-  const { isCompact, gameState } = appData;
+  const { isCompact } = appData;
 
   return (
     <>
       <TutorialModal
-        isVisibleCondition={
-          (!gameState?.tutorialsShown[TutorialOption.medical] &&
-            gameState?.tutorialsEnabled &&
-            isFocused) ??
-          false
-        }
         tutorial={TutorialOption.medical}
+        isFocused={isFocused}
         pageOne={{
           title: "Medical Tab",
           body: "Here you can acquire various forms of medical treatment.",

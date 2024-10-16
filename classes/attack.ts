@@ -5,9 +5,9 @@ import {
   getConditionEffectsOnAttacks,
 } from "../utility/functions/conditions";
 import { toTitleCase, rollD20, wait } from "../utility/functions/misc";
-import type { PlayerCharacter } from "./character";
-import type { Enemy, Minion } from "./creatures";
-import { AttackUse } from "../utility/types";
+import { PlayerCharacter } from "./character";
+import { Enemy, Minion } from "./creatures";
+import { AttackUse, ItemClassType } from "../utility/types";
 import AttackDetails from "../components/AttackDetails";
 import type { Condition } from "./conditions";
 
@@ -278,6 +278,12 @@ export class Attack {
             const damagePreDR = this.baseDamage * damageMult + damageFlat;
             const enemyDR = target.getDamageReduction();
             const damage = damagePreDR * (1 - enemyDR);
+            if (
+              this.user instanceof PlayerCharacter &&
+              this.user.equipment.mainHand.itemClass == ItemClassType.Bow
+            ) {
+              this.user.useArrow();
+            }
             return {
               totalDamage: acc.totalDamage + Math.round(damage * 4) / 4,
             };

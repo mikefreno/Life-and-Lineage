@@ -86,10 +86,8 @@ export default function GameSettings() {
               <Pressable
                 onPress={() => {
                   vibration({ style: "warning" });
-                  gameState?.resetTutorialState();
-                  gameState?.enableTutorials();
                   setLoading(true);
-                  wait(1000).then(() => {
+                  gameState?.resetTutorialState(() => {
                     setShowTutorialResetConfirm(false);
                     setLoading(false);
                     Updates.reloadAsync();

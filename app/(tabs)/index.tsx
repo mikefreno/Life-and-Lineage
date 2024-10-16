@@ -46,8 +46,6 @@ const HomeScreen = observer(() => {
   } | null>(null);
 
   const { playerState, gameState, isCompact, dimensions } = appData;
-  const isFocused = useIsFocused();
-
   const tabBarHeight = useBottomTabBarHeight() + 10;
 
   if (playerState && gameState) {
@@ -55,12 +53,8 @@ const HomeScreen = observer(() => {
     return (
       <>
         <TutorialModal
-          isVisibleCondition={
-            !gameState.tutorialsShown[TutorialOption.intro] &&
-            gameState.tutorialsEnabled &&
-            isFocused
-          }
           tutorial={TutorialOption.intro}
+          isFocused={useIsFocused()}
           pageOne={{
             title: "Welcome!",
             body: "On this page you can view your inventory (tap the bag) and equip items to you hands, head, or body.",
@@ -143,7 +137,7 @@ const HomeScreen = observer(() => {
                     />
                   </View>
                 )}
-                <View>
+                <View className="flex justify-center">
                   <Text className="text-center text-xl dark:text-white">{`${name}`}</Text>
                   <Text className="text-center text-xl dark:text-white">{`${playerState.job}`}</Text>
                   <Text className="text-center text-xl dark:text-white">{`${

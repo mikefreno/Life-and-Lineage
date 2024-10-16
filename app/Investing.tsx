@@ -20,8 +20,6 @@ const InvestingScreen = observer(() => {
   if (!appData) {
     throw new Error("missing context");
   }
-  const { gameState } = appData;
-  const isFocused = useIsFocused();
   const { colorScheme } = useColorScheme();
 
   return (
@@ -49,13 +47,8 @@ const InvestingScreen = observer(() => {
         }}
       />
       <TutorialModal
-        isVisibleCondition={
-          (!gameState?.tutorialsShown[TutorialOption.investing] &&
-            gameState?.tutorialsEnabled &&
-            isFocused) ??
-          false
-        }
         tutorial={TutorialOption.investing}
+        isFocused={useIsFocused()}
         pageOne={{
           title: "Investing",
           body: "Put your gold to work and make time work for you.",

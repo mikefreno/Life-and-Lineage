@@ -69,13 +69,8 @@ const DungeonScreen = observer(() => {
   return (
     <>
       <TutorialModal
-        isVisibleCondition={
-          (!gameState?.tutorialsShown[TutorialOption.dungeon] &&
-            gameState?.tutorialsEnabled &&
-            isFocused) ??
-          false
-        }
         tutorial={TutorialOption.dungeon}
+        isFocused={isFocused}
         pageOne={{
           title: "Dungeon",
           body: "Here you will put all your gear and spells to work. Be prepared and you will be rewarded.",

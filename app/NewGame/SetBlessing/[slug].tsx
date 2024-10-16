@@ -4,7 +4,7 @@ import {
   Text,
   View as ThemedView,
 } from "../../../components/Themed";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
 import { useVibration } from "../../../utility/customHooks";
@@ -18,74 +18,34 @@ import {
   ElementToString,
   PlayerClassOptions,
   TutorialOption,
-  isPlayerClassOptions,
 } from "../../../utility/types";
 
 import BlessingDisplay from "../../../components/BlessingsDisplay";
-import {
-  loadStoredTutorialState,
-  updateStoredTutorialState,
-  toTitleCase,
-} from "../../../utility/functions/misc";
+import { toTitleCase } from "../../../utility/functions/misc";
 import {
   elementalColorMap,
   playerClassColors,
 } from "../../../constants/Colors";
 import GenericFlatButton from "../../../components/GenericFlatButton";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function SetBlessing() {
   const { slug } = useLocalSearchParams();
-  if (!slug) {
-    return router.replace("/NewGame");
-  }
-  let playerClass: PlayerClassOptions;
 
-  if (isPlayerClassOptions(slug)) {
-    playerClass = slug;
-  } else {
-    return <Text>{`Invalid player class option: ${slug}`}</Text>;
-  }
+  let playerClass = slug as PlayerClassOptions;
 
+  const isFocused = useIsFocused();
   const [blessing, setBlessing] = useState<Element>();
   const { colorScheme } = useColorScheme();
-  const blessingRef = useRef<Element>();
   const vibration = useVibration();
+
+  useEffect(() => {}, [isFocused]);
 
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing context");
   const { gameState, dimensions } = appData;
 
-  const [showBlessingTutorial, setShowBlessingTutorial] = useState<boolean>(
-    !gameState
-      ? loadStoredTutorialState()
-      : gameState &&
-        !gameState.tutorialsShown[TutorialOption.blessing] &&
-        gameState.tutorialsEnabled
-      ? true
-      : false,
-  );
-
-  const [tutorialState, setTutorialState] = useState<boolean>(
-    gameState?.tutorialsEnabled ?? loadStoredTutorialState(),
-  );
-
-  useEffect(() => {
-    if (gameState) {
-      if (tutorialState == false) {
-        gameState.disableTutorials();
-      } else {
-        gameState.enableTutorials();
-      }
-    } else {
-      updateStoredTutorialState(tutorialState);
-    }
-  }, [tutorialState]);
-
-  useEffect(() => {
-    if (gameState) {
-      setTutorialState(gameState?.tutorialsEnabled);
-    }
-  }, [gameState?.tutorialsEnabled]);
+  const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
 
   interface BlessingPressableProps {
     element: Element;
@@ -96,7 +56,6 @@ export default function SetBlessing() {
         onPress={() => {
           vibration({ style: "light" });
           setBlessing(element);
-          blessingRef.current = element;
         }}
         style={{
           height: dimensions.height * 0.25,
@@ -193,10 +152,10 @@ export default function SetBlessing() {
         }}
       />
       <TutorialModal
-        isVisibleCondition={showBlessingTutorial}
         tutorial={TutorialOption.blessing}
-        backFunction={() => setShowBlessingTutorial(false)}
-        onCloseFunction={() => setShowBlessingTutorial(false)}
+        isFocused={isFocused}
+        override={forceShowTutorial}
+        clearOverride={() => setForceShowTutorial(false)}
         pageOne={{
           title:
             "Magic is a extremely powerful, but often very expensive obtain.",
@@ -220,14 +179,12 @@ export default function SetBlessing() {
             <Text className="text-center md:text-lg px-4">
               {DescriptionMap[blessing as Element]}
             </Text>
-            {blessing ? (
+            {blessing == 0 || blessing ? ( // sometimes I really hate ts. Evaluation of 0 is false.
               <View className="mx-auto h-32 py-2">
                 <GenericFlatButton
                   onPressFunction={() => {
                     vibration({ style: "light" });
-                    router.push(
-                      `/NewGame/SetSex/${playerClass}/${blessingRef.current}`,
-                    );
+                    router.push(`/NewGame/SetSex/${playerClass}/${blessing}`);
                   }}
                 >
                   <Text className="text-xl tracking-widest">Next</Text>
@@ -239,21 +196,22 @@ export default function SetBlessing() {
           </>
         </ThemedView>
       </ScrollView>
-      {(gameState && gameState.tutorialsEnabled) ||
-        (!gameState && (
-          <View className="absolute ml-4 mt-4">
-            <Pressable
-              className="absolute"
-              onPress={() => setShowBlessingTutorial(true)}
-            >
-              <FontAwesome5
-                name="question-circle"
-                size={32}
-                color={colorScheme == "light" ? "#27272a" : "#fafafa"}
-              />
-            </Pressable>
-          </View>
-        ))}
+      {((gameState && gameState.tutorialsEnabled) || !gameState) && (
+        <View className="absolute ml-4 mt-4">
+          <Pressable
+            className="absolute z-top"
+            onPress={() => {
+              setForceShowTutorial(true);
+            }}
+          >
+            <FontAwesome5
+              name="question-circle"
+              size={32}
+              color={colorScheme == "light" ? "#27272a" : "#fafafa"}
+            />
+          </Pressable>
+        </View>
+      )}
     </>
   );
 }
