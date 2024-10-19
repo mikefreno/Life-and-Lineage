@@ -74,7 +74,10 @@ const TutorialModal = observer(
           setShouldShow(override);
         } else {
           if (gameState) {
-            if (gameState.tutorialsEnabled) {
+            if (
+              gameState.tutorialsEnabled ||
+              tutorial == TutorialOption.firstBossKill
+            ) {
               setShouldShow(!gameState.tutorialsShown[tutorial]);
             }
           } else {

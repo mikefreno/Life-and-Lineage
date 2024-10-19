@@ -731,6 +731,9 @@ export class Enemy extends Creature {
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
     });
+    enemy.minions = enemy.minions.map((minion) =>
+      minion.reinstateParent(enemy),
+    );
     return enemy;
   }
 }
@@ -786,11 +789,12 @@ export class Minion extends Creature {
     makeObservable(this, {
       turnsLeftAlive: observable,
       takeTurn: action,
+      reinstateParent: action,
     });
 
     // automatically remove the minion when it reaches 0 turns left
     autorun(() => {
-      if (this.turnsLeftAlive <= 0) {
+      if (this.turnsLeftAlive <= 0 || this.health) {
         if (this.parent) {
           this.parent.removeMinion(this);
         }
@@ -821,6 +825,31 @@ export class Minion extends Creature {
     }
   }
 
+  public reinstateParent(parent: PlayerCharacter | Enemy) {
+    this.parent = parent;
+    return this;
+  }
+
+  public toJSON(): any {
+    return new Minion({
+      id: this.id,
+      beingType: this.beingType,
+      creatureSpecies: this.creatureSpecies,
+      health: this.health,
+      healthMax: this.healthMax,
+      sanity: this.sanity,
+      sanityMax: this.sanityMax,
+      attackPower: this.attackPower,
+      energy: this.energy,
+      energyMax: this.energyMax,
+      energyRegen: this.energyRegen,
+      turnsLeftAlive: this.turnsLeftAlive,
+      attacks: this.attackStrings,
+      conditions: this.conditions,
+      parent: null,
+    });
+  }
+
   /**
    * Creates a minion from a JSON object.
    * @param json - The JSON object representing the minion.
@@ -844,7 +873,7 @@ export class Minion extends Creature {
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
-      parent: json.parent,
+      parent: null,
     });
   }
 }

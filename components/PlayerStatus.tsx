@@ -320,7 +320,7 @@ const PlayerStatus = observer(
                   key={condition.id}
                   className="my-1 border rounded-lg bg-zinc-200 py-2 dark:bg-zinc-600"
                 >
-                  <View className="flex-1 justify-around flex-row">
+                  <View className="flex justify-evenly flex-row">
                     <Text className="text-xl tracking-wide opacity-80">
                       {toTitleCase(condition.name)}
                     </Text>
@@ -348,20 +348,22 @@ const PlayerStatus = observer(
                           </Text>
                         </View>
                       )}
-                      {condition.effect.map((effect, idx) => (
-                        <Text key={idx}>
-                          {Condition.effectExplanationString({
-                            effect,
-                            effectMagnitude: condition.effectMagnitude[idx],
-                            effectStyle: condition.effectStyle[idx],
-                            trapSetupTime: condition.trapSetupTime,
-                          })}
-                        </Text>
-                      ))}
                     </View>
                     <Text className="text-xl tracking-wide opacity-80">
                       {toTitleCase(condition.style)}
                     </Text>
+                  </View>
+                  <View className="mx-auto">
+                    {condition.effect.map((effect, idx) => (
+                      <Text key={idx}>
+                        {Condition.effectExplanationString({
+                          effect,
+                          effectMagnitude: condition.effectMagnitude[idx],
+                          effectStyle: condition.effectStyle[idx],
+                          trapSetupTime: condition.trapSetupTime,
+                        })}
+                      </Text>
+                    ))}
                   </View>
                 </View>
               ))}

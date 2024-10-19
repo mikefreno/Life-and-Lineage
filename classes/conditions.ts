@@ -135,11 +135,11 @@ export class Condition {
       case "accuracy reduction":
         return `Accuracy reduced by ${
           effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
-        }${effectStyle == "percentage" && "%"}`;
+        }${effectStyle !== "flat" ? "%" : ""}`;
       case "accuracy increase":
         return `Accuracy increased by ${
           effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
-        }${effectStyle == "percentage" && "%"}`;
+        }${effectStyle !== "flat" ? "%" : ""}`;
       case "sanity heal":
         return "";
       case "sanity damage":
@@ -147,11 +147,11 @@ export class Condition {
       case "sanityMax increase":
         return `Increase max sanity by ${
           effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
-        }${effectStyle == "percentage" && "%"}`;
+        }${effectStyle !== "flat" ? "%" : ""}`;
       case "sanityMax decrease":
         return `Decrease max sanity by ${
           effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
-        }${effectStyle == "percentage" && "%"}`;
+        }${effectStyle !== "flat" ? "%" : ""}`;
       case "heal":
         return "";
       case "health damage":
@@ -159,43 +159,43 @@ export class Condition {
       case "healthMax increase":
         return `Increases max health by ${
           effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
-        }${effectStyle == "percentage" && "%"}`;
+        }${effectStyle !== "flat" ? "%" : ""}`;
       case "healthMax decrease":
         return `Decreases max health by ${
           effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
-        }${effectStyle == "percentage" && "%"}`;
+        }${effectStyle !== "flat" ? "%" : ""}`;
       case "mana regen":
         return `Increases mana regen by ${
           effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
-        }${effectStyle == "percentage" && "%"} each turn`;
+        }${effectStyle !== "flat" ? "%" : ""} each turn`;
       case "mana drain":
         return `Drains mana by ${
           effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
-        }${effectStyle == "percentage" && "%"} each turn`;
+        }${effectStyle !== "flat" ? "%" : ""} each turn`;
       case "manaMax increase":
         return `Increase max mana by ${
           effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
-        }${effectStyle == "percentage" && "%"}`;
+        }${effectStyle !== "flat" ? "%" : ""}`;
       case "manaMax decrease":
         return `Decrease max mana by ${
           effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
-        }${effectStyle == "percentage" && "%"}`;
+        }${effectStyle !== "flat" ? "%" : ""}`;
       case "armor increase":
         return `Increase armor by ${
           effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
-        }${effectStyle == "percentage" && "%"}`;
+        }${effectStyle !== "flat" ? "%" : ""}`;
       case "armor decrease":
         return `Decreases armor by ${
           effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
-        }${effectStyle == "percentage" && "%"}`;
+        }${effectStyle !== "flat" ? "%" : ""}`;
       case "weaken":
         return `Decreases attack damage by ${
           effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
-        }${effectStyle == "percentage" && "%"}`;
+        }${effectStyle !== "flat" ? "%" : ""}`;
       case "strengthen":
         return `Increases attack damage by ${
           effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
-        }${effectStyle == "percentage" && "%"}`;
+        }${effectStyle !== "flat" ? "%" : ""}`;
       case "destroy undead":
         return `Destroy undead under ${effectMagnitude} health (accumulates)`;
       case "undead cower":
@@ -203,7 +203,7 @@ export class Condition {
       case "blur":
         return `Increased dodge chance by ${
           effectStyle == "percentage" ? effectMagnitude * 100 : effectMagnitude
-        }${effectStyle == "percentage" && "%"}`;
+        }${effectStyle !== "flat" ? "%" : ""}`;
       case "thorns":
         return `Damages attacker for ${effectMagnitude} health damage`;
       case "trap":

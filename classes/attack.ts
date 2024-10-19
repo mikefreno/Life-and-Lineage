@@ -182,7 +182,14 @@ export class Attack {
         } else if (debuff.perHitHeal) {
           const healAmount = debuff.perHitHeal * actualizedHits;
           amountHealed += healAmount;
-          this.user.restoreHealth(healAmount);
+
+          if (!(this.user instanceof PlayerCharacter)) {
+            wait(500).then(() => {
+              this.user.restoreHealth(healAmount);
+            });
+          } else {
+            this.user.restoreHealth(healAmount);
+          }
         }
       }
     });
@@ -234,6 +241,7 @@ export class Attack {
     result: AttackUse;
     logString: string;
   } {
+    console.log(this.name, this.flatHealthDamage);
     const { hitChanceMultiplier, damageFlat, damageMult } =
       getConditionEffectsOnAttacks({
         selfConditions: this.user.conditions,

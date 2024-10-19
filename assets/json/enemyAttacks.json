@@ -155,7 +155,8 @@
       "name": "teeth",
       "energyCost": 15,
       "targets": "cleave",
-      "hitChance": 0.95,
+      "hitChance": 1.0,
+      "damageMult": 1.0,
       "flatHealthDamage": 10
    },
    {

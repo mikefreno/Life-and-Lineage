@@ -1865,6 +1865,7 @@ export class PlayerCharacter extends Character {
     });
     this.minions = newList;
   }
+
   private addMinion(minion: Minion) {
     this.minions.push(minion);
   }
