@@ -5,6 +5,10 @@ import type { AppContextType, DungeonContextType } from "../types";
 import { storage } from "./storage";
 import { PlayerCharacter } from "../../classes/character";
 import { stringify, parse } from "flatted";
+import {
+  BoundingBox,
+  type Tile,
+} from "../../components/DungeonComponents/DungeonMap";
 
 const _gameSave = async (game: Game | undefined) => {
   if (game) {
@@ -61,6 +65,47 @@ export function dungeonSave({ enemy, dungeonData, appData }: dungeonSave) {
     fightingBoss,
     mapDimensions,
   } = dungeonData;
+  if (playerState && gameState) {
+    const level = slug.length > 2 ? slug[1] + "," + slug[2] : slug[1];
+    if (tiles.length > 0) {
+      playerState.setInDungeon({
+        state: true,
+        instance: instanceName,
+        level: level,
+        dungeonMap: tiles,
+        currentPosition: currentPosition ?? tiles[0],
+        mapDimensions: mapDimensions,
+        enemy: enemy,
+        fightingBoss: fightingBoss,
+      });
+      saveGame(gameState);
+      savePlayer(playerState);
+    }
+  }
+}
+
+export function dungeonSaveEnumerated({
+  enemy,
+  appData,
+  slug,
+  tiles,
+  instanceName,
+  currentPosition,
+  mapDimensions,
+  fightingBoss,
+}: {
+  enemy: Enemy;
+  appData: AppContextType;
+  slug: string[] | string;
+  tiles: Tile[];
+  instanceName: string;
+  currentPosition: Tile | null;
+  mapDimensions: BoundingBox;
+  fightingBoss: boolean;
+}) {
+  console.log("saving");
+  if (!appData) throw new Error("missing context in dungeonSave()");
+  const { playerState, gameState } = appData;
   if (playerState && gameState) {
     const level = slug.length > 2 ? slug[1] + "," + slug[2] : slug[1];
     if (tiles.length > 0) {

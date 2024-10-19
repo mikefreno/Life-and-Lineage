@@ -241,7 +241,6 @@ export class Attack {
     result: AttackUse;
     logString: string;
   } {
-    console.log(this.name, this.flatHealthDamage);
     const { hitChanceMultiplier, damageFlat, damageMult } =
       getConditionEffectsOnAttacks({
         selfConditions: this.user.conditions,

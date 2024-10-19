@@ -1,10 +1,11 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { View, Text } from "./Themed";
+import { View, Pressable, Switch } from "react-native";
 import { Entypo } from "@expo/vector-icons";
+import { Text } from "./Themed";
 import { useColorScheme } from "nativewind";
+import { observer } from "mobx-react-lite";
 import { AppContext } from "../app/_layout";
 import { useVibration } from "../utility/customHooks";
-import { Pressable, Switch } from "react-native";
 import {
   getLocalTutorialState,
   loadStoredTutorialState,
@@ -13,31 +14,23 @@ import {
 } from "../utility/functions/misc";
 import { TutorialOption } from "../utility/types";
 import GenericModal from "./GenericModal";
-import { observer } from "mobx-react-lite";
 
-type ITutorialModalBase = {
-  tutorial: TutorialOption;
+type TutorialPage = {
+  title?: string;
+  body: string;
+};
+
+type ITutorialModal = {
   isFocused: boolean;
+  tutorial: TutorialOption;
   backFunction?: () => void;
   onCloseFunction?: () => void;
-  pageOne: { title: string; body: string };
-  pageTwo?: { title?: string; body: string };
-  pageThree?: { title?: string; body: string };
+  pageOne: TutorialPage;
+  pageTwo?: TutorialPage;
+  pageThree?: TutorialPage;
+  override?: boolean;
+  clearOverride?: () => void;
 };
-
-type ITutorialModalWithOverride = ITutorialModalBase & {
-  override: boolean;
-  clearOverride: () => void;
-};
-
-type ITutorialModalWithoutOverride = ITutorialModalBase & {
-  override?: never;
-  clearOverride?: never;
-};
-
-type ITutorialModal =
-  | ITutorialModalWithOverride
-  | ITutorialModalWithoutOverride;
 
 const TutorialModal = observer(
   ({
@@ -52,39 +45,32 @@ const TutorialModal = observer(
     clearOverride,
   }: ITutorialModal) => {
     const appData = useContext(AppContext);
-    if (!appData) {
-      throw new Error("missing context");
-    }
+    if (!appData) throw new Error("missing context");
+
     const { gameState } = appData;
-    const [tutorialStep, setTutorialStep] = useState<number>(1);
-    const tutorialStepRef = useRef<number>(1);
     const { colorScheme } = useColorScheme();
-    const [tutorialState, setTutorialState] = useState<boolean>(
-      gameState ? gameState.tutorialsEnabled : loadStoredTutorialState(),
-    );
-    const [shouldShow, setShouldShow] = useState<boolean>(false);
     const vibration = useVibration();
+
+    const [tutorialStep, setTutorialStep] = useState(1);
+    const tutorialStepRef = useRef(1);
+    const [tutorialState, setTutorialState] = useState(
+      gameState?.tutorialsEnabled ?? loadStoredTutorialState(),
+    );
+    const [shouldShow, setShouldShow] = useState(false);
 
     useEffect(() => {
       setTutorialState(
-        gameState ? gameState.tutorialsEnabled : loadStoredTutorialState(),
+        gameState?.tutorialsEnabled ?? loadStoredTutorialState(),
       );
       if (isFocused) {
-        if (override) {
-          setShouldShow(override);
-        } else {
-          if (gameState) {
-            if (
-              gameState.tutorialsEnabled ||
-              tutorial == TutorialOption.firstBossKill
-            ) {
-              setShouldShow(!gameState.tutorialsShown[tutorial]);
-            }
-          } else {
-            const tutorialsEnabled = loadStoredTutorialState();
-            setShouldShow(tutorialsEnabled && !getLocalTutorialState(tutorial));
-          }
-        }
+        setShouldShow(
+          override ||
+            (gameState
+              ? (gameState.tutorialsEnabled ||
+                  tutorial === TutorialOption.firstBossKill) &&
+                !gameState.tutorialsShown[tutorial]
+              : loadStoredTutorialState() && !getLocalTutorialState(tutorial)),
+        );
       }
     }, [
       gameState?.tutorialsEnabled,
@@ -93,13 +79,13 @@ const TutorialModal = observer(
       isFocused,
     ]);
 
-    const press = () => {
-      if (tutorialStepRef.current == 1 && pageTwo) {
-        setTutorialStep(2);
-        tutorialStepRef.current = 2;
-      } else if (tutorialStepRef.current == 2 && pageThree) {
-        setTutorialStep(3);
-        tutorialStepRef.current = 3;
+    const handlePress = () => {
+      if (
+        tutorialStepRef.current < 3 &&
+        (tutorialStepRef.current === 1 ? pageTwo : pageThree)
+      ) {
+        setTutorialStep((prev) => prev + 1);
+        tutorialStepRef.current++;
       } else {
         closeTutorial();
       }
@@ -107,23 +93,15 @@ const TutorialModal = observer(
 
     const closeTutorial = () => {
       vibration({ style: "light" });
-      if (onCloseFunction) {
-        onCloseFunction();
-      }
-      if (clearOverride) {
-        clearOverride();
-      }
+      onCloseFunction?.();
+      clearOverride?.();
       if (gameState) {
         gameState.updateTutorialState(tutorial, true);
-        if (tutorialState) {
-          gameState.enableTutorials();
-        } else {
-          gameState.disableTutorials();
-          setShouldShow(false);
-        }
+        tutorialState
+          ? gameState.enableTutorials()
+          : gameState.disableTutorials();
       } else {
         setLocalTutorialState(tutorial, true);
-
         updateStoredTutorialState(tutorialState);
       }
       setShouldShow(false);
@@ -131,11 +109,13 @@ const TutorialModal = observer(
 
     const NextButton = () => {
       const nextPageExists =
-        (tutorialStepRef.current == 1 && !!pageTwo) ||
-        (tutorialStepRef.current == 2 && !!pageThree);
+        (tutorialStepRef.current === 1 && pageTwo) ||
+        (tutorialStepRef.current === 2 && pageThree);
       return (
         <Pressable
-          onPress={nextPageExists && tutorialState ? press : closeTutorial}
+          onPress={
+            nextPageExists && tutorialState ? handlePress : closeTutorial
+          }
           className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
         >
           <Text>{nextPageExists && tutorialState ? "Next" : "Close"}</Text>
@@ -143,20 +123,34 @@ const TutorialModal = observer(
       );
     };
 
-    const handleSwitchValueChange = (val: boolean) => {
-      setTutorialState(val);
-    };
+    const renderPage = (page: TutorialPage) => (
+      <>
+        {page.title && (
+          <Text className="text-center text-2xl md:text-3xl">{page.title}</Text>
+        )}
+        <Text className="mt-2 text-center text-lg md:text-xl">{page.body}</Text>
+        {tutorial !== TutorialOption.firstBossKill && (
+          <View className="mx-auto my-[2vh] flex flex-row">
+            <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+            <Switch
+              trackColor={{ false: "#767577", true: "#3b82f6" }}
+              ios_backgroundColor="#3e3e3e"
+              thumbColor="white"
+              onValueChange={setTutorialState}
+              value={tutorialState}
+            />
+          </View>
+        )}
+        <NextButton />
+      </>
+    );
 
     return (
       <GenericModal
         isVisibleCondition={shouldShow}
         backFunction={() => {
-          if (backFunction) {
-            backFunction();
-          }
-          if (clearOverride) {
-            clearOverride();
-          }
+          backFunction?.();
+          clearOverride?.();
           if (gameState) {
             gameState.updateTutorialState(tutorial, true);
           } else {
@@ -168,10 +162,10 @@ const TutorialModal = observer(
         {pageTwo && (
           <View
             className={`flex flex-row ${
-              tutorialStep != 1 ? "justify-between" : "justify-end"
+              tutorialStep !== 1 ? "justify-between" : "justify-end"
             }`}
           >
-            {tutorialStep != 1 ? (
+            {tutorialStep !== 1 && (
               <Pressable
                 onPress={() => {
                   setTutorialStep((prev) => prev - 1);
@@ -181,85 +175,25 @@ const TutorialModal = observer(
                 <Entypo
                   name="chevron-left"
                   size={24}
-                  color={colorScheme == "dark" ? "#f4f4f5" : "black"}
+                  color={colorScheme === "dark" ? "#f4f4f5" : "black"}
                 />
               </Pressable>
-            ) : null}
+            )}
             <Text>
               {tutorialStep}/{pageThree ? 3 : 2}
             </Text>
           </View>
         )}
-        {tutorialStep == 1 ? (
-          <>
-            <Text className="text-center text-2xl md:text-3xl">
-              {pageOne.title}
-            </Text>
-            <Text className="my-4 text-center text-lg md:text-xl">
-              {pageOne.body}
-            </Text>
-            <View className="mx-auto my-[2vh] flex flex-row">
-              <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-              <Switch
-                trackColor={{ false: "#767577", true: "#3b82f6" }}
-                ios_backgroundColor="#3e3e3e"
-                thumbColor={"white"}
-                onValueChange={handleSwitchValueChange}
-                value={tutorialState}
-              />
-            </View>
-            <NextButton />
-          </>
-        ) : tutorialStep == 2 && pageTwo ? (
-          <>
-            {pageTwo.title && (
-              <Text className="text-center text-2xl md:text-3xl">
-                {pageTwo.title}
-              </Text>
-            )}
-            <Text className="mt-2 text-center text-lg md:text-xl">
-              {pageTwo.body}
-            </Text>
-            <View className="mx-auto my-[2vh] flex flex-row">
-              <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-              <Switch
-                trackColor={{ false: "#767577", true: "#3b82f6" }}
-                ios_backgroundColor="#3e3e3e"
-                thumbColor={"white"}
-                onValueChange={handleSwitchValueChange}
-                value={tutorialState}
-              />
-            </View>
-            <NextButton />
-          </>
-        ) : (
-          tutorialStep == 3 &&
-          pageThree && (
-            <>
-              {pageThree.title && (
-                <Text className="text-center text-2xl md:text-3xl">
-                  {pageThree.title}
-                </Text>
-              )}
-              <Text className="mt-2 text-center text-lg md:text-xl">
-                {pageThree.body}
-              </Text>
-              <View className="mx-auto my-[2vh] flex flex-row">
-                <Text className="my-auto text-lg">Tutorials Enabled: </Text>
-                <Switch
-                  trackColor={{ false: "#767577", true: "#3b82f6" }}
-                  ios_backgroundColor="#3e3e3e"
-                  thumbColor={"white"}
-                  onValueChange={handleSwitchValueChange}
-                  value={tutorialState}
-                />
-              </View>
-              <NextButton />
-            </>
-          )
+        {renderPage(
+          tutorialStep === 1
+            ? pageOne
+            : tutorialStep === 2
+            ? pageTwo!
+            : pageThree!,
         )}
       </GenericModal>
     );
   },
 );
+
 export default TutorialModal;

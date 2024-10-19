@@ -1,6 +1,6 @@
 import { View as ThemedView, Text } from "../../components/Themed";
-import { View, Platform, Dimensions, Image } from "react-native";
-import { useContext, useRef, useEffect, useState, RefObject } from "react";
+import { View, Platform, Dimensions } from "react-native";
+import { useContext, useRef, useEffect, useState } from "react";
 import { Pressable } from "react-native";
 import { Stack } from "expo-router";
 import BattleTab from "../../components/DungeonComponents/BattleTab";
@@ -27,17 +27,15 @@ import { addItemToPouch, playerMinionsTurn } from "./DungeonInteriorFunctions";
 import { SackIcon } from "../../assets/icons/SVGIcons";
 import D20DieAnimation from "../DieRollAnim";
 import { StatsDisplay } from "../StatsDisplay";
-import { TutorialOption, checkReleasePositionProps } from "../../utility/types";
-import { Item } from "../../classes/item";
-import Draggable from "react-native-draggable";
-import { useVibration } from "../../utility/customHooks";
+import { TutorialOption } from "../../utility/types";
+import { useIsFocused } from "@react-navigation/native";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
   const appData = useContext(AppContext);
   const dungeonData = useContext(DungeonContext);
   if (!appData || !dungeonData) throw new Error("missing context");
-  const { playerState, gameState, enemyState, blockSize } = appData;
+  const { playerState, gameState, enemyState } = appData;
 
   const {
     slug,
@@ -57,12 +55,11 @@ const DungeonLevelScreen = observer(() => {
   >("attacksOrNavigation");
   const [showLeftBehindItemsScreen, setShowLeftBehindItemsScreen] =
     useState<boolean>(false);
-  const vibration = useVibration();
+  const isFocused = useIsFocused();
 
   const [fleeModalShowing, setFleeModalShowing] = useState<boolean>(false);
 
   const pouchRef = useRef<View>(null);
-  const quiverTarget = useRef<View>(null);
 
   if (!playerState || !gameState) {
     throw new Error("No player character or game data on dungeon level");
@@ -72,163 +69,13 @@ const DungeonLevelScreen = observer(() => {
     setInventoryFullNotifier(false);
   }, [showLeftBehindItemsScreen]);
 
-  const throttledDungeonSave = throttle((state) => {
-    dungeonSave({ enemy: state, dungeonData, appData });
+  const throttledDungeonSave = throttle(() => {
+    dungeonSave({ enemy: enemyState, dungeonData, appData });
   }, 250);
 
   useEffect(() => {
-    throttledDungeonSave(enemyState);
-  }, [enemyState?.health, playerState.currentHealth]);
-
-  function checkReleasePosition({
-    itemStack,
-    xPos,
-    yPos,
-    size,
-    equipped,
-  }: checkReleasePositionProps) {
-    if (itemStack && itemStack[0].slot) {
-      let refs: React.RefObject<View>[] = [];
-      if (equipped) {
-        refs.push(inventoryTarget);
-      } else {
-        switch (itemStack[0].slot) {
-          case "head":
-            refs.push(headTarget);
-            break;
-          case "body":
-            refs.push(bodyTarget);
-            break;
-          case "two-hand":
-            refs.push(mainHandTarget, offHandTarget);
-            break;
-          case "one-hand":
-            refs.push(mainHandTarget, offHandTarget);
-            break;
-          case "off-hand":
-            refs.push(offHandTarget);
-            break;
-          case "quiver":
-            refs.push(quiverTarget);
-        }
-      }
-
-      refs.forEach((ref) => {
-        ref.current?.measureInWindow(
-          (targetX, targetY, targetWidth, targetHeight) => {
-            const isWidthAligned =
-              xPos + size / 2 >= targetX &&
-              xPos - size / 2 <= targetX + targetWidth;
-            const isHeightAligned =
-              yPos + size / 2 >= targetY &&
-              yPos - size / 2 <= targetY + targetHeight;
-            if (isWidthAligned && isHeightAligned) {
-              vibration({ style: "light", essential: true });
-              setDisplayItem(null);
-              if (
-                equipped &&
-                playerState &&
-                playerState.getInventory().length < 24
-              ) {
-                playerState?.unEquipItem(itemStack);
-              } else {
-                playerState?.equipItem(itemStack);
-              }
-            }
-          },
-        );
-      });
-    }
-  }
-
-  const EquipmentSlot = () => {
-    const [buzzed, setBuzzed] = useState<boolean>(false);
-    let ref: RefObject<View>;
-    let itemStack: Item[] = [];
-    itemStack = playerState.equipment.quiver ?? [];
-
-    const isTwoHanded = playerState.equipment.mainHand?.slot === "two-hand";
-
-    while (!blockSize) {
-      return <></>;
-    }
-
-    return (
-      <View>
-        <Text className="mb-1 text-center">Quiver</Text>
-        <View
-          className="z-50 mx-auto border border-zinc-400 rounded-lg"
-          style={{ height: blockSize, width: blockSize }}
-        >
-          <Draggable
-            onDragRelease={(_, g) => {
-              checkReleasePosition({
-                itemStack,
-                xPos: g.moveX,
-                yPos: g.moveY,
-                size: blockSize,
-                equipped: true,
-              });
-              setBuzzed(false);
-            }}
-            onDrag={() => {
-              if (!buzzed) {
-                vibration({ style: "medium", essential: true });
-                setBuzzed(true);
-              }
-            }}
-            shouldReverse
-          >
-            <Pressable
-              onPress={() => {
-                vibration({ style: "light" });
-                if (displayItem && displayItem.item[0].equals(itemStack[0])) {
-                  setDisplayItem(null);
-                } else {
-                  ref.current?.measureInWindow((x, y) => {
-                    setDisplayItem({
-                      item: itemStack,
-                      positon: { left: x, top: y },
-                    });
-                  });
-                }
-              }}
-              className="active:scale-90 active:opacity-50"
-            >
-              <View
-                className={`${
-                  itemStack[0].playerHasRequirements(playerState)
-                    ? "bg-zinc-400"
-                    : "bg-red-800"
-                } items-center rounded-lg`}
-                ref={quiverTarget}
-                style={{
-                  height: blockSize,
-                  width: blockSize,
-                  marginLeft: -1,
-                  marginTop: -1,
-                }}
-              >
-                <Image
-                  className="my-auto z-top"
-                  source={itemStack[0].getItemIcon()}
-                  style={{
-                    height: Math.min(blockSize * 0.65, 52),
-                    width: Math.min(blockSize * 0.65, 52),
-                  }}
-                />
-                {itemStack[0].stackable && itemStack.length > 1 && (
-                  <ThemedView className="absolute bottom-0 right-0 bg-opacity-50 rounded px-1">
-                    <Text>{itemStack.length}</Text>
-                  </ThemedView>
-                )}
-              </View>
-            </Pressable>
-          </Draggable>
-        </View>
-      </View>
-    );
-  };
+    throttledDungeonSave();
+  }, [enemyState?.id, enemyState?.health, playerState.currentHealth]);
 
   if (thisDungeon && playerState) {
     return (
@@ -264,11 +111,8 @@ const DungeonLevelScreen = observer(() => {
           }}
         />
         <TutorialModal
-          isVisibleCondition={
-            gameState.tutorialsShown[TutorialOption.dungeonInterior] &&
-            gameState.tutorialsEnabled
-          }
           tutorial={TutorialOption.dungeonInterior}
+          isFocused={isFocused}
           pageOne={{
             title: "Watch Your Health",
             body: "Your situation can change rapidly.",

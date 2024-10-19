@@ -14,7 +14,12 @@ import { Stack } from "expo-router";
 import { BlurView } from "expo-blur";
 import { useHeaderHeight } from "@react-navigation/elements";
 import GenericRaisedButton from "../components/GenericRaisedButton";
-import { Element, ItemClassType, MasteryToString } from "../utility/types";
+import {
+  Element,
+  ElementToString,
+  ItemClassType,
+  MasteryToString,
+} from "../utility/types";
 import GenericModal from "../components/GenericModal";
 import { AppContext } from "./_layout";
 import { Spell } from "../classes/spell";
@@ -25,7 +30,7 @@ export default function LearningKnowledgeScreen() {
   if (!appData) {
     throw new Error("missing context");
   }
-  const { playerState, gameState } = appData;
+  const { playerState, gameState, dimensions } = appData;
   if (!playerState) throw new Error("no playerState");
   const { colorScheme } = useColorScheme();
 
@@ -126,7 +131,7 @@ export default function LearningKnowledgeScreen() {
                 color: elementalColorMap[showMasteryLevelTooLow].dark,
               }}
             >
-              {`This book is beyond your knowledge in the school of ${showMasteryLevelTooLow}`}
+              {`This book is beyond your knowledge in the school of ${ElementToString[showMasteryLevelTooLow]}`}
             </Text>
             <GenericRaisedButton
               onPressFunction={() => setShowMasteryLevelTooLow(null)}
@@ -151,8 +156,8 @@ export default function LearningKnowledgeScreen() {
               <Text>(Books can be bought from the Librarian)</Text>
             </View>
           ) : null}
-          {spellState.length > 0 ? (
-            <ScrollView contentContainerClassName="h-1/2">
+          {spellState.length > 0 && (
+            <ScrollView style={{ maxHeight: dimensions.height * 0.25 }}>
               <View className="py-4 shadow-diffuse-top">
                 <Text className="text-center text-xl">Currently Studying</Text>
                 {spellState.map((studyState) => (
@@ -182,64 +187,60 @@ export default function LearningKnowledgeScreen() {
                 ))}
               </View>
             </ScrollView>
-          ) : null}
-          <ScrollView className="h-1/2 shadow-diffuse-top">
-            {selectedBook && selectedBookSpell ? (
-              <View className="flex items-center py-4">
-                <Text className="text-xl">
-                  {toTitleCase(selectedBook.name)}
-                </Text>
-                <Text className="py-2 text-lg tracking-wide">Teaches</Text>
-                <Text className="py-2 text-lg tracking-wide">
-                  ({bookLabel()})
-                </Text>
-                <SpellDetails spell={selectedBookSpell} />
-                <GenericRaisedButton
-                  onPressFunction={() => {
-                    if (
-                      selectedBookSpell.proficiencyNeeded <=
-                      playerState.currentMasteryLevel(selectedBookSpell.element)
-                    ) {
-                      vibration({ style: "light", essential: true });
-                      studySpell(
-                        selectedBook.name,
-                        selectedBookSpell.name,
-                        selectedBookSpell.element,
-                      );
-                      setSelectedBook(null);
-                    } else {
-                      setShowMasteryLevelTooLow(selectedBookSpell.element);
-                    }
-                  }}
-                >
-                  Start Studying
-                </GenericRaisedButton>
-              </View>
-            ) : null}
-            {filteredBooks.length > 0 ? (
-              <View className="py-4">
-                <Text className="text-center text-xl">Available for Study</Text>
-                <ScrollView className="mx-auto" horizontal>
-                  <View className="my-auto max-h-24 flex-wrap">
-                    {filteredBooks.map((item) => (
-                      <Pressable
-                        key={item.id}
-                        className="m-2 items-center active:scale-90 active:opacity-50"
-                        onPress={() => setSelectedBook(item)}
+          )}
+          {selectedBook && selectedBookSpell && (
+            <View className="flex items-center py-4">
+              <Text className="text-xl">{toTitleCase(selectedBook.name)}</Text>
+              <Text className="py-2 text-lg tracking-wide">Teaches</Text>
+              <Text className="py-2 text-lg tracking-wide">
+                ({bookLabel()})
+              </Text>
+              <SpellDetails spell={selectedBookSpell} />
+              <GenericRaisedButton
+                onPressFunction={() => {
+                  if (
+                    selectedBookSpell.proficiencyNeeded <=
+                    playerState.currentMasteryLevel(selectedBookSpell.element)
+                  ) {
+                    vibration({ style: "light", essential: true });
+                    studySpell(
+                      selectedBook.name,
+                      selectedBookSpell.name,
+                      selectedBookSpell.element,
+                    );
+                    setSelectedBook(null);
+                  } else {
+                    setShowMasteryLevelTooLow(selectedBookSpell.element);
+                  }
+                }}
+              >
+                Start Studying
+              </GenericRaisedButton>
+            </View>
+          )}
+          {filteredBooks.length > 0 && (
+            <View className="py-4">
+              <Text className="text-center text-xl">Available for Study</Text>
+              <ScrollView className="mx-auto" horizontal>
+                <View className="my-auto max-h-24 flex-wrap">
+                  {filteredBooks.map((item) => (
+                    <Pressable
+                      key={item.id}
+                      className="m-2 items-center active:scale-90 active:opacity-50"
+                      onPress={() => setSelectedBook(item)}
+                    >
+                      <View
+                        className="rounded-lg p-2"
+                        style={{ backgroundColor: "#a1a1aa" }}
                       >
-                        <View
-                          className="rounded-lg p-2"
-                          style={{ backgroundColor: "#a1a1aa" }}
-                        >
-                          <Image source={item.getItemIcon()} />
-                        </View>
-                      </Pressable>
-                    ))}
-                  </View>
-                </ScrollView>
-              </View>
-            ) : null}
-          </ScrollView>
+                        <Image source={item.getItemIcon()} />
+                      </View>
+                    </Pressable>
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+          )}
         </View>
       </ThemedView>
       <PlayerStatus tabScreen />

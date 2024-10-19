@@ -548,7 +548,7 @@ export class PlayerCharacter extends Character {
       [Attribute.intelligence]: 0,
     };
 
-    this.gold = gold ?? 500;
+    this.gold = gold !== undefined ? gold : __DEV__ ? 1000000 : 500;
 
     this.minions = minions ?? [];
     this.rangerPet = rangerPet ?? null;

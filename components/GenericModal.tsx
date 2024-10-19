@@ -1,7 +1,7 @@
 import { ReactNode, useContext } from "react";
 import { Platform } from "react-native";
 import Modal from "react-native-modal";
-import { View } from "./Themed";
+import { View as ThemedView } from "./Themed";
 import { AppContext } from "../app/_layout";
 
 interface GenericModalProps {
@@ -15,6 +15,16 @@ interface GenericModalProps {
 
 /**
  * `size` is a percentage, default of 83.33%(5/6)
+ * Only one can be shown at once
+ * Animation must be fully finished before another can be triggered
+ * This is 2*fade out timing
+ * Use something like:
+ ```ts
+ setShowModal(false);
+ wait(600).then(()=>{
+     setShowSecondModal(true);
+ })
+ ```
  */
 export default function GenericModal({
   isVisibleCondition,
@@ -45,7 +55,7 @@ export default function GenericModal({
       useNativeDriverForBackdrop
       style={style}
     >
-      <View
+      <ThemedView
         className="mx-auto rounded-xl px-[2vw] py-4 dark:border dark:border-zinc-500"
         style={{
           shadowColor: "#000",
@@ -60,7 +70,7 @@ export default function GenericModal({
         }}
       >
         {children}
-      </View>
+      </ThemedView>
     </Modal>
   );
 }

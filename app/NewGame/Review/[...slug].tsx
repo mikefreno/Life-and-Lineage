@@ -36,7 +36,7 @@ import {
 } from "../../../constants/Colors";
 import { storage } from "../../../utility/functions/storage";
 import { useColorScheme } from "nativewind";
-import { saveGame } from "../../../utility/functions/save_load";
+import { saveGame, savePlayer } from "../../../utility/functions/save_load";
 import GenericFlatButton from "../../../components/GenericFlatButton";
 
 export default function NewGameReview() {
@@ -232,7 +232,6 @@ export default function NewGameReview() {
           : "minimal",
         tutorialsEnabled: gameState ? gameState.tutorialsEnabled : parsed,
         tutorialsShown: gameState?.tutorialsShown,
-        playerState: player,
       });
       const colorScheme = gameState?.colorScheme;
       if (colorScheme) {
@@ -244,6 +243,7 @@ export default function NewGameReview() {
       vibration({ style: "success" });
       wait(250).then(() => clearHistory(navigation));
       saveGame(newGame);
+      savePlayer(player);
       storage.delete("tutorialsEnabled");
     }
   }
