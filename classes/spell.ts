@@ -241,9 +241,9 @@ export class Spell {
 
     // Debuffs
     if (debuffNames.length > 0) {
-      returnString += `  • ${targetString} was afflicted with: ${debuffNames.join(
-        ", ",
-      )}.\n`;
+      returnString += `  • ${toTitleCase(
+        targetString,
+      )} was afflicted with: ${debuffNames.join(", ")}.\n`;
     }
 
     // Buffs

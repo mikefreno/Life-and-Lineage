@@ -33,6 +33,7 @@ export default function LearningKnowledgeScreen() {
     (item) => item.itemClass == ItemClassType.Book,
   );
   const isFocused = useIsFocused();
+  const headerHeight = useHeaderHeight();
 
   const vibration = useVibration();
 
@@ -139,7 +140,7 @@ export default function LearningKnowledgeScreen() {
       <ThemedView className="flex-1 justify-between pb-20">
         <View
           style={{
-            paddingTop: useHeaderHeight(),
+            paddingTop: headerHeight,
             paddingHorizontal: 12,
           }}
         >

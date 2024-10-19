@@ -423,9 +423,9 @@ export class Attack {
 
         // Debuffs
         if (debuffNames.length > 0) {
-          returnString += `  • The ${toTitleCase(
-            targetName,
-          )} was afflicted with: ${debuffNames.join(", ")}.\n`;
+          returnString += `  • The ${toTitleCase(targetName)} ${
+            "fullname" in this.user ? "was" : "were"
+          } afflicted with: ${debuffNames.join(", ")}.\n`;
         }
 
         // Buffs

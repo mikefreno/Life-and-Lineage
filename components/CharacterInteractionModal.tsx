@@ -62,7 +62,7 @@ export const CharacterInteractionModal = observer(
 
     function setFight() {
       if (character && playerState && gameState) {
-        gameState.gameTick();
+        gameState.gameTick({ playerState });
         playerState.setInDungeon({
           state: true,
           instance: "Personal",
@@ -141,7 +141,7 @@ export const CharacterInteractionModal = observer(
                           vibration({ style: "light" });
                           character.setDateCooldownStart(gameState.date);
                           character.updateAffection(5);
-                          gameState.gameTick();
+                          gameState.gameTick({ playerState });
                         }}
                       >
                         Chat
@@ -185,7 +185,7 @@ export const CharacterInteractionModal = observer(
                           vibration({ style: "light" });
                           character.setDateCooldownStart(gameState.date);
                           character.updateAffection(-10);
-                          gameState.gameTick();
+                          gameState.gameTick({ playerState });
                         }}
                       >
                         Spit in Face
@@ -214,7 +214,7 @@ export const CharacterInteractionModal = observer(
                           character.updateAffection(5);
                           if (playerState && gameState) {
                             playerState.addNewKnownCharacter(character);
-                            gameState.gameTick();
+                            gameState.gameTick({ playerState });
                           }
                         }}
                       >
@@ -226,7 +226,7 @@ export const CharacterInteractionModal = observer(
                           character.updateAffection(-5);
                           if (playerState && gameState) {
                             playerState.addNewKnownCharacter(character);
-                            gameState.gameTick();
+                            gameState.gameTick({ playerState });
                           }
                         }}
                       >

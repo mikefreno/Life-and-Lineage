@@ -3,26 +3,40 @@ import type { Enemy } from "../../classes/creatures";
 import { Game } from "../../classes/game";
 import type { AppContextType, DungeonContextType } from "../types";
 import { storage } from "./storage";
-import { parse, stringify } from "flatted";
+import { PlayerCharacter } from "../../classes/character";
+import { stringify, parse } from "flatted";
 
 const _gameSave = async (game: Game | undefined) => {
   if (game) {
     try {
-      storage.set("game", stringify(Game.forSaving(game)));
+      storage.set("game", stringify(game));
     } catch (e) {
       console.log("Error in _gameSave:", e);
     }
   }
 };
+const _playerSave = async (player: PlayerCharacter | undefined) => {
+  if (player) {
+    try {
+      storage.set("player", stringify(player));
+    } catch (e) {
+      console.log("Error in _playerSave:", e);
+    }
+  }
+};
 
 export const saveGame = throttle(_gameSave, 500);
+export const savePlayer = throttle(_playerSave, 500);
 
-export const loadGame = async () => {
+export const fullLoad = async () => {
   try {
     const retrieved_game = storage.getString("game");
-    if (!retrieved_game) return { game: undefined };
+    const retrieved_player = storage.getString("player");
+    if (!retrieved_game || !retrieved_player)
+      return { game: undefined, player: undefined };
     let game = Game.fromJSON(parse(retrieved_game));
-    return { game };
+    let player = PlayerCharacter.fromJSON(parse(retrieved_player));
+    return { game, player };
   } catch (e) {
     console.log("Error in fullLoad:", e);
     return { game: undefined, player: undefined };

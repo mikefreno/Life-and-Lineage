@@ -18,13 +18,7 @@ import { observer } from "mobx-react-lite";
 import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
-import {
-  Dimensions,
-  Keyboard,
-  LogBox,
-  Platform,
-  StyleSheet,
-} from "react-native";
+import { Dimensions, Keyboard, Platform, StyleSheet } from "react-native";
 import { View as ThemedView } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { BlurView } from "expo-blur";
@@ -42,7 +36,7 @@ import {
 import { wait } from "../utility/functions/misc";
 import { API_BASE_URL } from "../config/config";
 import { updateNavBar } from "../utility/functions/android";
-import { loadGame } from "../utility/functions/save_load";
+import { fullLoad, loadGame, loadPlayer } from "../utility/functions/save_load";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -137,12 +131,12 @@ const Root = observer(() => {
 
   const getData = async () => {
     try {
-      const { game } = await loadGame();
+      const { game, player } = await fullLoad();
 
-      if (game) {
+      if (game && player) {
         setGameData(game);
         setColorScheme(game.colorScheme);
-        setPlayerCharacter(game.playerState);
+        setPlayerCharacter(player);
       }
 
       setLoading(false);

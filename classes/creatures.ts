@@ -65,7 +65,7 @@ type EnemyType = CreatureType & {
 
 type MinionType = CreatureType & {
   turnsLeftAlive: number;
-  parent: Enemy | PlayerCharacter;
+  parent: Enemy | PlayerCharacter | null;
 };
 
 /**
@@ -704,13 +704,32 @@ export class Enemy extends Creature {
     this.minions = newList;
   }
 
+  public toJSON(): any {
+    return {
+      id: this.id,
+      beingType: this.beingType,
+      creatureSpecies: this.creatureSpecies,
+      health: this.health,
+      healthMax: this.healthMax,
+      sanity: this.sanity,
+      sanityMax: this.sanityMax,
+      attackPower: this.attackPower,
+      energy: this.energy,
+      energyMax: this.energyMax,
+      energyRegen: this.energyRegen,
+      minions: this.minions.map((minion) => minion.toJSON()),
+      attackStrings: this.attackStrings,
+      conditions: this.conditions.map((condition) => condition.toJSON()),
+    };
+  }
+
   /**
    * Creates an enemy from a JSON object.
    * @param json - The JSON object representing the enemy.
    * @returns The created enemy.
    */
   public static fromJSON(json: any): Enemy {
-    return new Enemy({
+    const enemy = new Enemy({
       id: json.id,
       beingType: json.beingType,
       creatureSpecies: json.creatureSpecies,
@@ -722,12 +741,15 @@ export class Enemy extends Creature {
       energy: json.energy,
       energyMax: json.energyMax,
       energyRegen: json.energyRegen,
-      minions: json.minions,
+      minions: json.minions
+        ? json.minions.map((minion: any) => Minion.fromJSON(minion))
+        : [],
       attacks: json.attackStrings,
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
     });
+    return enemy;
   }
 }
 
@@ -816,11 +838,28 @@ export class Minion extends Creature {
       throw new Error("Minion not properly removed!");
     }
   }
-  public stripParent() {
-    this.parent = null;
-  }
+
   public reinstateParent(parent: PlayerCharacter | Enemy) {
     this.parent = parent;
+  }
+
+  toJSON(): any {
+    return {
+      id: this.id,
+      beingType: this.beingType,
+      creatureSpecies: this.creatureSpecies,
+      health: this.health,
+      healthMax: this.healthMax,
+      sanity: this.sanity,
+      sanityMax: this.sanityMax,
+      attackPower: this.attackPower,
+      energy: this.energy,
+      energyMax: this.energyMax,
+      energyRegen: this.energyRegen,
+      turnsLeftAlive: this.turnsLeftAlive,
+      attacks: this.attackStrings,
+      conditions: this.conditions.map((condition) => condition.toJSON()),
+    };
   }
 
   /**
@@ -828,7 +867,7 @@ export class Minion extends Creature {
    * @param json - The JSON object representing the minion.
    * @returns The created minion.
    */
-  public static fromJSON(json: any): Minion {
+  static fromJSON(json: any): Minion {
     return new Minion({
       id: json.id,
       beingType: json.beingType,
@@ -842,16 +881,11 @@ export class Minion extends Creature {
       energyMax: json.energyMax,
       energyRegen: json.energyRegen,
       turnsLeftAlive: json.turnsLeftAlive,
-      attacks: json.attacks
-        ? json.attacks.map((attack: any) => Attack.fromJSON(attack))
-        : [],
+      attacks: json.attackStrings,
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
-      parent:
-        json.parent instanceof PlayerCharacter
-          ? PlayerCharacter.fromJSON(json.parent)
-          : Enemy.fromJSON(json.parent),
+      parent: json.parent,
     });
   }
 }

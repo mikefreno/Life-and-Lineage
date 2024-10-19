@@ -350,8 +350,8 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                       .map((text) => (
                         <Text>
                           {text
-                            .replaceAll(`the ${playerState.fullName}`, "you")
-                            .replaceAll(`the ${playerState.fullName}`, "you")
+                            .replaceAll(`on the ${playerState.fullName}`, "")
+                            .replaceAll(`on the ${playerState.fullName}`, "")
                             .replaceAll(`The ${playerState.fullName}`, "You")}
                         </Text>
                       ))}
@@ -363,7 +363,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                     renderItem={({ item }) => (
                       <Text className="py-1">
                         {item
-                          .replaceAll(`the ${playerState.fullName}`, "you")
+                          .replaceAll(`on the ${playerState.fullName}`, "")
                           .replaceAll(`The ${playerState.fullName}`, "You")}
                       </Text>
                     )}

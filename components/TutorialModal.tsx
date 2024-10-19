@@ -123,6 +123,7 @@ const TutorialModal = observer(
 
         updateStoredTutorialState(tutorialState);
       }
+      setShouldShow(false);
     };
 
     const NextButton = () => {
@@ -158,6 +159,7 @@ const TutorialModal = observer(
           } else {
             setLocalTutorialState(tutorial, true);
           }
+          setShouldShow(false);
         }}
       >
         {pageTwo && (

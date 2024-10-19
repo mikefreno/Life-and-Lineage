@@ -177,6 +177,22 @@ export class Item {
     }
   }
 
+  toJSON(): any {
+    return {
+      id: this.id,
+      name: this.name,
+      slot: this.slot,
+      stats: this.stats,
+      baseValue: this.baseValue,
+      itemClass: this.itemClass,
+      stackable: this.stackable,
+      requirements: this.requirements,
+      icon: this.icon,
+      attacks: this.attackStrings,
+      playerClass: this.playerClass,
+    };
+  }
+
   static fromJSON(json: any): Item {
     const item = new Item({
       id: json.id,

@@ -25,6 +25,16 @@
       "turns": 100
    },
    {
+      "name": "hobgoblin",
+      "beingType": "demi-human",
+      "sanity": null,
+      "health": 160,
+      "attackPower": 15,
+      "energy": {"maximum": 50, "regen": 10},
+      "attacks": ["stab", "frenzy"],
+      "turns":1000
+   },
+   {
       "name": "raven",
       "beingType": "beast",
       "health":50,

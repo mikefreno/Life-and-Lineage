@@ -57,11 +57,11 @@ const HomeScreen = observer(() => {
           isFocused={useIsFocused()}
           pageOne={{
             title: "Welcome!",
-            body: "On this page you can view your inventory (tap the bag) and equip items to you hands, head, or body.",
+            body: "On this page you can view your inventory and equip items to you hands, head, quiver or body.",
           }}
           pageTwo={{
             title: "",
-            body: "A great place to start is to open your inventory and study the book you were given.",
+            body: "A great place to start is to study the book you were given.",
           }}
         />
         <ThemedView

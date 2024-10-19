@@ -14,7 +14,7 @@ import necroSpells from "../assets/json/necroSpells.json";
 import rangerSpells from "../assets/json/rangerSpells.json";
 import { Enemy, Minion } from "./creatures";
 import summons from "../assets/json/summons.json";
-import { action, makeObservable, observable, computed } from "mobx";
+import { action, makeObservable, observable, computed, reaction } from "mobx";
 import * as Crypto from "expo-crypto";
 import { Investment } from "./investment";
 import {
@@ -39,6 +39,7 @@ import type {
 } from "../components/DungeonComponents/DungeonMap";
 import { Attack } from "./attack";
 import { Spell } from "./spell";
+import { savePlayer } from "../utility/functions/save_load";
 
 interface CharacterOptions {
   id?: string;
@@ -252,6 +253,23 @@ export class Character {
 
   public updateLastName(newLastName: string) {
     this.lastName = newLastName;
+  }
+
+  toJSON(): any {
+    return {
+      id: this.id,
+      firstName: this.firstName,
+      lastName: this.lastName,
+      sex: this.sex,
+      birthdate: this.birthdate,
+      alive: this.alive,
+      deathdate: this.deathdate,
+      isPlayerPartner: this.isPlayerPartner,
+      job: this.job,
+      affection: this.affection,
+      qualifications: this.qualifications,
+      dateCooldownStart: this.dateCooldownStart,
+    };
   }
 
   /**
@@ -687,6 +705,20 @@ export class PlayerCharacter extends Character {
       setInDungeon: action,
       bossDefeated: action,
     });
+
+    reaction(
+      () => [
+        this.currentHealth,
+        this.currentMana,
+        this.currentSanity,
+        this.gold,
+        this.unAllocatedSkillPoints,
+      ],
+      () => {
+        console.log("fire");
+        savePlayer(this);
+      },
+    );
   }
   //----------------------------------Stats----------------------------------//
   public bossDefeated() {
@@ -1970,6 +2002,81 @@ export class PlayerCharacter extends Character {
     }
   }
 
+  toJSON(): any {
+    return {
+      id: this.id,
+      firstName: this.firstName,
+      lastName: this.lastName,
+      sex: this.sex,
+      alive: this.alive,
+      birthdate: this.birthdate,
+      deathdate: this.deathdate,
+      job: this.job,
+      qualifications: this.qualifications,
+      affection: this.affection,
+      playerClass: this.playerClass,
+      blessing: this.blessing,
+      currentHealth: this.currentHealth,
+      baseHealth: this.baseHealth,
+      currentSanity: this.currentSanity,
+      baseSanity: this.baseSanity,
+      currentMana: this.currentMana,
+      baseMana: this.baseMana,
+      baseManaRegen: this.baseManaRegen,
+      jobExperience: this.jobExperience,
+      learningSpells: this.learningSpells,
+      qualificationProgress: this.qualificationProgress,
+      magicProficiencies: this.magicProficiencies,
+      parents: this.parents.map((parent) => parent.toJSON()),
+      children: this.children.map((child) => child.toJSON()),
+      partners: this.partners.map((partner) => partner.toJSON()),
+      knownCharacters: this.knownCharacters.map((character) =>
+        character.toJSON(),
+      ),
+      minions: this.minions.map((minion) => minion.toJSON()),
+      rangerPet: this.rangerPet ? this.rangerPet.toJSON() : undefined,
+      knownSpells: this.knownSpells,
+      physicalAttacks: this.physicalAttacks,
+      gold: this.gold,
+      inventory: this.inventory.map((item) => item.toJSON()),
+      currentDungeon: this.currentDungeon
+        ? {
+            instance: this.currentDungeon.instance,
+            level: this.currentDungeon.level,
+            dungeonMap: this.currentDungeon.dungeonMap,
+            currentPosition: this.currentDungeon.currentPosition,
+            enemy: this.currentDungeon.enemy
+              ? this.currentDungeon.enemy.toJSON()
+              : null,
+            fightingBoss: this.currentDungeon.fightingBoss,
+            mapDimensions: this.currentDungeon.mapDimensions,
+          }
+        : null,
+      equipment: this.equipment
+        ? {
+            mainHand: this.equipment.mainHand.toJSON(),
+            offHand: this.equipment.offHand
+              ? this.equipment.offHand.toJSON()
+              : null,
+            body: this.equipment.body ? this.equipment.body.toJSON() : null,
+            head: this.equipment.head ? this.equipment.head.toJSON() : null,
+            quiver: this.equipment.quiver
+              ? this.equipment.quiver.map((arrow) => arrow.toJSON())
+              : null,
+          }
+        : undefined,
+      conditions: this.conditions.map((condition) => condition.toJSON()),
+      investments: this.investments
+        ? this.investments.map((investment) => investment.toJSON())
+        : undefined,
+      unAllocatedSkillPoints: this.unAllocatedSkillPoints,
+      allocatedSkillPoints: this.allocatedSkillPoints,
+      baseStrength: this.baseStrength,
+      baseIntelligence: this.baseIntelligence,
+      baseDexterity: this.baseDexterity,
+    };
+  }
+
   /**
    * Creates a PlayerCharacter instance from a JSON object
    * @param json - JSON representation of a PlayerCharacter
@@ -2068,6 +2175,7 @@ export class PlayerCharacter extends Character {
       baseIntelligence: json.baseIntelligence,
       baseDexterity: json.baseDexterity,
     });
+
     return player;
   }
 }

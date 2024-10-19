@@ -72,7 +72,7 @@ export default function FleeModal({
           if (slug[0] == "Activities") {
             router.push("/Activities");
           }
-          gameState.gameTick();
+          gameState.gameTick({ playerState });
         }, 200);
       } else {
         setFleeRollFailure(true);

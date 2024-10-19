@@ -59,7 +59,7 @@ export function enemyTurnCheck({ dungeonData, appData }: ContextData) {
           setDroppedItems(drops);
         }
         setEnemy(null);
-        gameState.gameTick();
+        gameState.gameTick({ playerState });
       } else if (slug[0] == "Personal") {
         const drops = enemyState.getDrops(
           playerState.playerClass,
@@ -69,7 +69,7 @@ export function enemyTurnCheck({ dungeonData, appData }: ContextData) {
         if (drops != "already retrieved") {
           playerState.addGold(drops.gold);
           setDroppedItems(drops);
-          gameState.gameTick();
+          gameState.gameTick({ playerState });
         }
         setEnemy(null);
       } else {
@@ -93,7 +93,7 @@ export function enemyTurnCheck({ dungeonData, appData }: ContextData) {
               setShouldShowFirstBossKillTutorialAfterItemDrops(true);
             }
           }
-          gameState.gameTick();
+          gameState.gameTick({ playerState });
         }
 
         setEnemy(null);
@@ -222,7 +222,7 @@ export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
             playerState.addGold(drops.gold);
             setDroppedItems(drops);
 
-            gameState.gameTick();
+            gameState.gameTick({ playerState });
           }
           setEnemy(null);
         } else {
@@ -237,7 +237,7 @@ export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
           if (drops != "already retrieved") {
             playerState.addGold(drops.gold);
             setDroppedItems(drops);
-            gameState.gameTick();
+            gameState.gameTick({ playerState });
             if (fightingBoss && gameState && thisDungeon) {
               setFightingBoss(false);
               playerState.bossDefeated();

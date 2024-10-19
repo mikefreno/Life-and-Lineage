@@ -65,7 +65,7 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
   function collectOnInvestment() {
     if (playerState && gameState) {
       playerState.collectFromInvestment(investment.name);
-      gameState.gameTick();
+      gameState.gameTick({ playerState });
     }
   }
 

@@ -135,6 +135,20 @@ export class Investment {
     this.goldInvested += upgradeCost;
   }
 
+  toJSON(): any {
+    return {
+      name: this.name,
+      minimumReturn: this.minimumReturn,
+      maximumReturn: this.maximumReturn,
+      turnsPerRoll: this.turnsPerRoll,
+      turnsUntilNextRoll: this.turnsUntilNextRoll,
+      maxGoldStockPile: this.maxGoldStockPile,
+      currentGoldStockPile: this.currentGoldStockPile,
+      goldInvested: this.goldInvested,
+      upgrades: this.upgrades,
+    };
+  }
+
   static fromJSON(json: any): Investment {
     const investment = new Investment({
       name: json.name,

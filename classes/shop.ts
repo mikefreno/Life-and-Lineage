@@ -144,9 +144,9 @@ export class Shop {
     return condensedInventory;
   }
 
-  get toJSON(): any {
+  toJSON(): any {
     return {
-      shopKeeper: this.shopKeeper,
+      shopKeeper: this.shopKeeper.toJSON(),
       baseGold: this.baseGold,
       currentGold: this.currentGold,
       lastStockRefresh: this.lastStockRefresh,

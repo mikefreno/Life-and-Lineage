@@ -55,6 +55,13 @@ export class DungeonInstance {
     }
   }
 
+  toJSON(): any {
+    return {
+      name: this.name,
+      levels: this.levels.map((level) => level.toJSON()),
+    };
+  }
+
   static fromJSON(json: any): DungeonInstance {
     const levels = json.levels.map((level: any) =>
       DungeonLevel.fromJSON(level),
@@ -135,6 +142,15 @@ export class DungeonLevel {
     });
 
     return boss;
+  }
+
+  toJSON(): any {
+    return {
+      level: this.level,
+      bosses: this.bosses,
+      tiles: this.tiles,
+      bossDefeated: this.bossDefeated,
+    };
   }
 
   static fromJSON(json: any): DungeonLevel {

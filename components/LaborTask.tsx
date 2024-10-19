@@ -57,7 +57,7 @@ const LaborTask = observer(
           vibration({ style: "success", essential: true });
         }
         setExperience(newExp);
-        gameState.gameTick();
+        gameState.gameTick({ playerState });
         setFullReward(playerState.getRewardValue(title, reward));
       }
     }

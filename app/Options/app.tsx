@@ -185,19 +185,7 @@ export const AppSettings = observer(() => {
             };
         }
       }
-      function stringifyCircular(obj: any) {
-        const seen = new WeakSet();
 
-        return JSON.stringify(obj, (key, value) => {
-          if (typeof value === "object" && value !== null) {
-            if (seen.has(value)) {
-              return; // Ignore circular references
-            }
-            seen.add(value);
-          }
-          return value;
-        });
-      }
       const shops = createShops(PlayerClassOptions.mage);
       const game = new Game({
         shops: shops,
@@ -231,45 +219,25 @@ export const AppSettings = observer(() => {
         return duration;
       };
 
-      const unclearedTime = runTest("Uncleared inventory", (iteration) => {
-        const serialized = stringify(game);
+      const flatted = runTest("flatted", (iteration) => {
+        const serialized = stringify({
+          ...game,
+          shops: shops.map((shop) => shop.toJSON()),
+        });
         if (iteration % 25 == 0) {
           Game.fromJSON(parse(serialized));
         }
       });
 
-      const clearedTime = runTest("Cleared inventory", (iteration) => {
-        const serialized = stringify(Game.forSaving(game));
+      const custom = runTest("custom", (iteration) => {
+        const serialized = game.toJSON();
         if (iteration % 25 == 0) {
           Game.fromJSON(parse(serialized));
         }
       });
 
-      const customCircularTime = runTest("Cleared and custom", (iteration) => {
-        const serialized = stringifyCircular(Game.forSaving(game));
-        if (iteration % 25 == 0) {
-          Game.fromJSON(JSON.parse(serialized));
-        }
-      });
-
-      let ratio = unclearedTime / clearedTime;
-      console.log(
-        `(${Platform.OS}) Uncleared inventory is ${ratio.toFixed(
-          2,
-        )}x slower than cleared inventory`,
-      );
-      ratio = clearedTime / customCircularTime;
-      console.log(
-        `(${Platform.OS}) cleared inventory is ${ratio.toFixed(
-          2,
-        )}x slower than Cleared and custom`,
-      );
-      ratio = unclearedTime / customCircularTime;
-      console.log(
-        `(${Platform.OS}) uncleared inventory is ${ratio.toFixed(
-          2,
-        )}x slower than Cleared and custom`,
-      );
+      let ratio = custom / flatted;
+      console.log(`(${Platform.OS}) custom is ${ratio.toFixed(2)}x flatted`);
     };
 
     const loadRemoteSave = async (chosenSave: SaveRow) => {

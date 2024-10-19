@@ -232,6 +232,25 @@ export class Condition {
     }
   }
 
+  toJSON(): any {
+    return {
+      id: this.id,
+      icon: this.icon,
+      name: this.name,
+      style: this.style,
+      turns: this.turns,
+      trapSetupTime: this.trapSetupTime,
+      effect: this.effect,
+      healthDamage: this.healthDamage,
+      sanityDamage: this.sanityDamage,
+      effectMagnitude: this.effectMagnitude,
+      effectStyle: this.effectStyle,
+      placedby: this.placedby,
+      aura: this.aura,
+      placedbyID: this.placedbyID,
+    };
+  }
+
   static fromJSON(json: any): Condition {
     const condition = new Condition({
       id: json.id,
@@ -247,6 +266,7 @@ export class Condition {
       effectStyle: json.effectStyle,
       placedby: json.placedby,
       aura: json.aura,
+      placedbyID: json.placedByID,
     });
     return condition;
   }

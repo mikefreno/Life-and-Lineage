@@ -78,7 +78,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           setGoodOutcome(null);
           setBadOutcome(null);
           setNothingHappened(false);
-          gameState?.gameTick();
+          gameState?.gameTick({ playerState });
           return;
         case "randomGood":
           if (!activity.randomGood) {
@@ -96,7 +96,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           setMetCharacter(null);
           setBadOutcome(null);
           setNothingHappened(false);
-          gameState?.gameTick();
+          gameState?.gameTick({ playerState });
           return setGoodOutcome(randomGoodOutcome);
         case "randomBad":
           if (!activity.randomBad) {
@@ -115,13 +115,13 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           setMetCharacter(null);
           setGoodOutcome(null);
           setNothingHappened(false);
-          gameState?.gameTick();
+          gameState?.gameTick({ playerState });
           return setBadOutcome(randomBadOutcome);
         default:
           setMetCharacter(null);
           setBadOutcome(null);
           setNothingHappened(false);
-          gameState?.gameTick();
+          gameState?.gameTick({ playerState });
           return setNothingHappened(true);
       }
     }

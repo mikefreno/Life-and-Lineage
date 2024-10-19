@@ -83,7 +83,6 @@ const DungeonProvider = observer(() => {
     showing: boolean;
     chosenAttack: Attack | Spell | null;
   }>({ showing: false, chosenAttack: null });
-  const [isReady, setIsReady] = useState(false);
   const [showingStoryBeat, setShowingStoryBeat] = useState<string>("");
 
   const instanceName = slug[0];
@@ -182,7 +181,6 @@ const DungeonProvider = observer(() => {
         setThisDungeon(gameState.getDungeon(instanceName, level));
         setThisInstance(gameState.getInstance(instanceName));
       }
-      setIsReady(true);
     }
   }, [level, instanceName, gameState]);
 
@@ -199,21 +197,13 @@ const DungeonProvider = observer(() => {
   };
 
   useEffect(() => {
-    if (
-      isReady &&
-      shouldShowFirstBossKillTutorialAfterItemDrops &&
-      !droppedItems
-    ) {
+    if (shouldShowFirstBossKillTutorialAfterItemDrops && !droppedItems) {
       wait(750).then(() => {
         setShowFirstBossKillTutorial(true);
         setShouldShowFirstBossKillTutorialAfterItemDrops(false);
       });
     }
-  }, [isReady, shouldShowFirstBossKillTutorialAfterItemDrops, droppedItems]);
-
-  if (!isReady) {
-    return <D20DieAnimation />;
-  }
+  }, [shouldShowFirstBossKillTutorialAfterItemDrops, droppedItems]);
 
   if (thisDungeon && thisInstance && gameState) {
     return (
@@ -267,26 +257,28 @@ const DungeonProvider = observer(() => {
           setDisplayItem,
         }}
       >
-        <TutorialModal
-          tutorial={TutorialOption.firstBossKill}
-          backFunction={() => {
-            setShowFirstBossKillTutorial(false);
-            wait(750).then(() => {
-              setShowDetailedStatusView(true);
-            });
-          }}
-          onCloseFunction={() => {
-            setShowFirstBossKillTutorial(false);
-            wait(750).then(() => {
-              setShowDetailedStatusView(true);
-            });
-          }}
-          isFocused={isFocused && showFirstBossKillTutorial} // simply way to avoid showing
-          pageOne={{
-            title: "Well Fought!",
-            body: "You have defeated the first boss! Every boss will reward you with stats points to distribute as you wish.",
-          }}
-        />
+        {showFirstBossKillTutorial && (
+          <TutorialModal
+            tutorial={TutorialOption.firstBossKill}
+            backFunction={() => {
+              setShowFirstBossKillTutorial(false);
+              wait(750).then(() => {
+                setShowDetailedStatusView(true);
+              });
+            }}
+            onCloseFunction={() => {
+              setShowFirstBossKillTutorial(false);
+              wait(750).then(() => {
+                setShowDetailedStatusView(true);
+              });
+            }}
+            isFocused={isFocused}
+            pageOne={{
+              title: "Well Fought!",
+              body: "You have defeated the first boss! Every boss will reward you with stats points to distribute as you wish.",
+            }}
+          />
+        )}
         <StoryModal
           isVisible={showingStoryBeat !== ""}
           backFunction={() => setShowingStoryBeat("")}

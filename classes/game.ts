@@ -22,7 +22,6 @@ interface GameOptions {
   tutorialsShown?: Record<TutorialOption, boolean>;
   tutorialsEnabled?: boolean;
   independantChildren?: Character[];
-  playerState: PlayerCharacter;
 }
 
 /**
@@ -42,7 +41,6 @@ export class Game {
   tutorialsShown: Record<TutorialOption, boolean>;
   tutorialsEnabled: boolean;
   independantChildren: Character[];
-  playerState: PlayerCharacter;
 
   constructor({
     date,
@@ -57,7 +55,6 @@ export class Game {
     tutorialsShown,
     tutorialsEnabled,
     independantChildren,
-    playerState,
   }: GameOptions) {
     this.date = date ?? new Date().toISOString();
     this.startDate = startDate ?? new Date().toISOString();
@@ -109,7 +106,6 @@ export class Game {
     };
     this.tutorialsEnabled = tutorialsEnabled ?? true;
     this.independantChildren = independantChildren ?? [];
-    this.playerState = playerState;
 
     makeObservable(this, {
       date: observable,
@@ -122,7 +118,6 @@ export class Game {
       healthWarning: observable,
       tutorialsShown: observable,
       tutorialsEnabled: observable,
-      playerState: observable,
       gameTick: action,
       getDungeon: action,
       getInstance: action,
@@ -150,12 +145,6 @@ export class Game {
         this.tutorialsShown,
         this.tutorialsEnabled,
         this.independantChildren,
-        this.playerState.gold,
-        this.playerState.currentHealth,
-        this.playerState.currentMana,
-        this.playerState.currentSanity,
-        this.playerState.unAllocatedSkillPoints,
-        this.playerState.children,
       ],
       () => {
         saveGame(this);
@@ -171,16 +160,16 @@ export class Game {
    * this includes affections, conditions and investements. Additionally will roll to apply a debuff if the player character
    * has negative sanity
    */
-  public gameTick() {
+  public gameTick({ playerState }: { playerState: PlayerCharacter }) {
     const dateObject = new Date(this.date);
     dateObject.setDate(dateObject.getDate() + 7);
     this.date = dateObject.toISOString();
-    if (this.playerState.currentSanity < 0) {
-      lowSanityDebuffGenerator(this.playerState);
+    if (playerState.currentSanity < 0) {
+      lowSanityDebuffGenerator(playerState);
     }
-    this.playerState.tickDownRelationshipAffection();
-    this.playerState.conditionTicker();
-    this.playerState.tickAllInvestments();
+    playerState.tickDownRelationshipAffection();
+    playerState.conditionTicker();
+    playerState.tickAllInvestments();
   }
   //----------------------------------Dungeon----------------------------------//
   public getDungeon(instance: string, level: string): DungeonLevel | undefined {
@@ -342,6 +331,25 @@ export class Game {
     player.adopt(adoptee);
   }
 
+  public toJSON(): any {
+    return {
+      date: this.date,
+      startDate: this.startDate,
+      completedInstances: this.completedInstances,
+      atDeathScreen: this.atDeathScreen,
+      dungeonInstances: this.dungeonInstances
+        ? this.dungeonInstances.map((instance) => instance.toJSON())
+        : undefined,
+      shops: this.shops ? this.shops.map((shop) => shop.toJSON()) : undefined,
+      colorScheme: this.colorScheme,
+      vibrationEnabled: this.vibrationEnabled,
+      healthWarning: this.healthWarning,
+      tutorialsShown: this.tutorialsShown,
+      tutorialsEnabled: this.tutorialsEnabled,
+      independantChildren: this.independantChildren,
+    };
+  }
+
   static fromJSON(json: any): Game {
     const game = new Game({
       date: json.date,
@@ -362,15 +370,8 @@ export class Game {
       tutorialsShown: json.tutorialsShown,
       tutorialsEnabled: json.tutorialsEnabled,
       independantChildren: json.independantChildren,
-      playerState: PlayerCharacter.fromJSON(json.playerState),
     });
 
     return game;
-  }
-  static forSaving(game: Game) {
-    return {
-      ...game,
-      shops: game.shops.map((shop) => shop.toJSON),
-    };
   }
 }
