@@ -331,23 +331,23 @@ export class Game {
     player.adopt(adoptee);
   }
 
-  public toJSON(): any {
-    return {
+  toJSON(): any {
+    const game = new Game({
       date: this.date,
       startDate: this.startDate,
       completedInstances: this.completedInstances,
       atDeathScreen: this.atDeathScreen,
-      dungeonInstances: this.dungeonInstances
-        ? this.dungeonInstances.map((instance) => instance.toJSON())
-        : undefined,
-      shops: this.shops ? this.shops.map((shop) => shop.toJSON()) : undefined,
+      dungeonInstances: this.dungeonInstances,
+      shops: this.shops.map((shop: Shop) => shop.toJSON()),
       colorScheme: this.colorScheme,
       vibrationEnabled: this.vibrationEnabled,
       healthWarning: this.healthWarning,
       tutorialsShown: this.tutorialsShown,
       tutorialsEnabled: this.tutorialsEnabled,
       independantChildren: this.independantChildren,
-    };
+    });
+
+    return game;
   }
 
   static fromJSON(json: any): Game {

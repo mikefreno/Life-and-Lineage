@@ -1,11 +1,7 @@
-import { Platform, Pressable, ScrollView, TextInput, View } from "react-native";
+import { Pressable, ScrollView, TextInput, View } from "react-native";
 import { View as ThemedView, Text } from "../../components/Themed";
 import { useContext, useEffect, useState } from "react";
-import {
-  generateBirthday,
-  getRandomName,
-  toTitleCase,
-} from "../../utility/functions/misc";
+import { toTitleCase } from "../../utility/functions/misc";
 import { useVibration } from "../../utility/customHooks";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import { AppContext } from "../_layout";
@@ -19,11 +15,6 @@ import { SaveRow } from "../../utility/database";
 import D20DieAnimation from "../../components/DieRollAnim";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { Game } from "../../classes/game";
-import { Character, PlayerCharacter } from "../../classes/character";
-import { parse, stringify } from "flatted";
-import { createShops } from "../../classes/shop";
-import { Element, PlayerClassOptions } from "../../utility/types";
-import { getRandomJobTitle } from "../../utility/functions/characterAid";
 
 const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
@@ -123,127 +114,10 @@ export const AppSettings = observer(() => {
       }
     };
 
-    const profiling = () => {
-      function createParent(sex: "female" | "male"): Character {
-        const firstName = getRandomName(sex).firstName;
-        const job = getRandomJobTitle();
-        const parent = new Character({
-          firstName: firstName,
-          lastName: "Doe",
-          sex: sex,
-          job: job,
-          affection: 85,
-          birthdate: generateBirthday(32, 55),
-        });
-        return parent;
-      }
-      function getStartingBaseStats({
-        playerClass,
-      }: {
-        playerClass: PlayerClassOptions;
-      }) {
-        switch (playerClass) {
-          case PlayerClassOptions.necromancer:
-            return {
-              baseHealth: 80,
-              baseMana: 120,
-              baseStrength: 3,
-              baseIntelligence: 6,
-              baseDexterity: 4,
-              baseManaRegen: 6,
-              baseSanity: 40,
-            };
-          case PlayerClassOptions.paladin:
-            return {
-              baseHealth: 120,
-              baseMana: 80,
-              baseStrength: 6,
-              baseIntelligence: 4,
-              baseDexterity: 3,
-              baseManaRegen: 5,
-              baseSanity: 60,
-            };
-          case PlayerClassOptions.mage:
-            return {
-              baseHealth: 100,
-              baseMana: 100,
-              baseStrength: 5,
-              baseIntelligence: 5,
-              baseDexterity: 3,
-              baseManaRegen: 5,
-              baseSanity: 50,
-            };
-          case PlayerClassOptions.ranger:
-            return {
-              baseHealth: 90,
-              baseMana: 90,
-              baseStrength: 4,
-              baseIntelligence: 3,
-              baseDexterity: 7,
-              baseManaRegen: 5,
-              baseSanity: 50,
-            };
-        }
-      }
-
-      const shops = createShops(PlayerClassOptions.mage);
-      const game = new Game({
-        shops: shops,
-        vibrationEnabled: "full",
-        playerState: new PlayerCharacter({
-          firstName: "John",
-          lastName: "Doe",
-          sex: "male",
-          playerClass: PlayerClassOptions.mage,
-          blessing: Element.fire,
-          parents: [createParent("female"), createParent("female")],
-          birthdate: new Date().toString(),
-          ...getStartingBaseStats({ playerClass: PlayerClassOptions.mage }),
-        }),
-      });
-
-      const runTest = (
-        name: string,
-        testFn: (iteration: number) => void,
-        iterations: number = 1000,
-      ) => {
-        const start = Date.now();
-        for (let i = 0; i < iterations; i++) {
-          testFn(i);
-        }
-        const end = Date.now();
-        const duration = end - start;
-        console.log(
-          `(${Platform.OS}) ${name}: ${duration} ms for ${iterations} iterations`,
-        );
-        return duration;
-      };
-
-      const flatted = runTest("flatted", (iteration) => {
-        const serialized = stringify({
-          ...game,
-          shops: shops.map((shop) => shop.toJSON()),
-        });
-        if (iteration % 25 == 0) {
-          Game.fromJSON(parse(serialized));
-        }
-      });
-
-      const custom = runTest("custom", (iteration) => {
-        const serialized = game.toJSON();
-        if (iteration % 25 == 0) {
-          Game.fromJSON(parse(serialized));
-        }
-      });
-
-      let ratio = custom / flatted;
-      console.log(`(${Platform.OS}) custom is ${ratio.toFixed(2)}x flatted`);
-    };
-
     const loadRemoteSave = async (chosenSave: SaveRow) => {
       const game = Game.fromJSON(JSON.parse(chosenSave.game_state));
       setGameData(game);
-      setPlayerCharacter(game.playerState);
+      setPlayerCharacter(playerState);
       while (router.canGoBack()) {
         router.back();
       }
@@ -485,13 +359,6 @@ export const AppSettings = observer(() => {
               </Pressable>
             ))}
           </View>
-          {__DEV__ && (
-            <View className="w-full flex items-center">
-              <GenericRaisedButton onPressFunction={profiling}>
-                <Text>Run Profiling</Text>
-              </GenericRaisedButton>
-            </View>
-          )}
         </ThemedView>
       </>
     );

@@ -156,7 +156,6 @@ export class Spell {
       } else {
         const newDebuff = createDebuff({
           debuffName: debuff.name,
-          debuffChance: debuff.chance,
           enemyMaxHP: target.healthMax,
           enemyMaxSanity: target.sanityMax,
           primaryAttackDamage: this.baseDamage(user),

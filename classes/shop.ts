@@ -146,7 +146,7 @@ export class Shop {
 
   toJSON(): any {
     return {
-      shopKeeper: this.shopKeeper.toJSON(),
+      shopKeeper: this.shopKeeper,
       baseGold: this.baseGold,
       currentGold: this.currentGold,
       lastStockRefresh: this.lastStockRefresh,

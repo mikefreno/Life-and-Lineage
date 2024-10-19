@@ -255,23 +255,6 @@ export class Character {
     this.lastName = newLastName;
   }
 
-  toJSON(): any {
-    return {
-      id: this.id,
-      firstName: this.firstName,
-      lastName: this.lastName,
-      sex: this.sex,
-      birthdate: this.birthdate,
-      alive: this.alive,
-      deathdate: this.deathdate,
-      isPlayerPartner: this.isPlayerPartner,
-      job: this.job,
-      affection: this.affection,
-      qualifications: this.qualifications,
-      dateCooldownStart: this.dateCooldownStart,
-    };
-  }
-
   /**
    * Creates a Character object from a JSON object.
    * @param json - The JSON object representing the character.
@@ -713,9 +696,9 @@ export class PlayerCharacter extends Character {
         this.currentSanity,
         this.gold,
         this.unAllocatedSkillPoints,
+        this.equipmentStats,
       ],
       () => {
-        console.log("fire");
         savePlayer(this);
       },
     );
@@ -2002,81 +1985,6 @@ export class PlayerCharacter extends Character {
     }
   }
 
-  toJSON(): any {
-    return {
-      id: this.id,
-      firstName: this.firstName,
-      lastName: this.lastName,
-      sex: this.sex,
-      alive: this.alive,
-      birthdate: this.birthdate,
-      deathdate: this.deathdate,
-      job: this.job,
-      qualifications: this.qualifications,
-      affection: this.affection,
-      playerClass: this.playerClass,
-      blessing: this.blessing,
-      currentHealth: this.currentHealth,
-      baseHealth: this.baseHealth,
-      currentSanity: this.currentSanity,
-      baseSanity: this.baseSanity,
-      currentMana: this.currentMana,
-      baseMana: this.baseMana,
-      baseManaRegen: this.baseManaRegen,
-      jobExperience: this.jobExperience,
-      learningSpells: this.learningSpells,
-      qualificationProgress: this.qualificationProgress,
-      magicProficiencies: this.magicProficiencies,
-      parents: this.parents.map((parent) => parent.toJSON()),
-      children: this.children.map((child) => child.toJSON()),
-      partners: this.partners.map((partner) => partner.toJSON()),
-      knownCharacters: this.knownCharacters.map((character) =>
-        character.toJSON(),
-      ),
-      minions: this.minions.map((minion) => minion.toJSON()),
-      rangerPet: this.rangerPet ? this.rangerPet.toJSON() : undefined,
-      knownSpells: this.knownSpells,
-      physicalAttacks: this.physicalAttacks,
-      gold: this.gold,
-      inventory: this.inventory.map((item) => item.toJSON()),
-      currentDungeon: this.currentDungeon
-        ? {
-            instance: this.currentDungeon.instance,
-            level: this.currentDungeon.level,
-            dungeonMap: this.currentDungeon.dungeonMap,
-            currentPosition: this.currentDungeon.currentPosition,
-            enemy: this.currentDungeon.enemy
-              ? this.currentDungeon.enemy.toJSON()
-              : null,
-            fightingBoss: this.currentDungeon.fightingBoss,
-            mapDimensions: this.currentDungeon.mapDimensions,
-          }
-        : null,
-      equipment: this.equipment
-        ? {
-            mainHand: this.equipment.mainHand.toJSON(),
-            offHand: this.equipment.offHand
-              ? this.equipment.offHand.toJSON()
-              : null,
-            body: this.equipment.body ? this.equipment.body.toJSON() : null,
-            head: this.equipment.head ? this.equipment.head.toJSON() : null,
-            quiver: this.equipment.quiver
-              ? this.equipment.quiver.map((arrow) => arrow.toJSON())
-              : null,
-          }
-        : undefined,
-      conditions: this.conditions.map((condition) => condition.toJSON()),
-      investments: this.investments
-        ? this.investments.map((investment) => investment.toJSON())
-        : undefined,
-      unAllocatedSkillPoints: this.unAllocatedSkillPoints,
-      allocatedSkillPoints: this.allocatedSkillPoints,
-      baseStrength: this.baseStrength,
-      baseIntelligence: this.baseIntelligence,
-      baseDexterity: this.baseDexterity,
-    };
-  }
-
   /**
    * Creates a PlayerCharacter instance from a JSON object
    * @param json - JSON representation of a PlayerCharacter
@@ -2176,6 +2084,8 @@ export class PlayerCharacter extends Character {
       baseDexterity: json.baseDexterity,
     });
 
+    player.minions.forEach((minion) => minion.reinstateParent(player));
+    player.rangerPet?.reinstateParent(player);
     return player;
   }
 }

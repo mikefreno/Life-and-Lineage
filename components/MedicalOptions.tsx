@@ -42,7 +42,7 @@ const MedicalOption = observer(
             ? playerState.conditions.length
             : removeDebuffs,
         );
-        gameState.gameTick();
+        gameState.gameTick({ playerState });
       }
     }
 
