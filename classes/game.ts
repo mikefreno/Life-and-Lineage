@@ -7,7 +7,7 @@ import { TutorialOption } from "../utility/types";
 import { Shop } from "./shop";
 import { calculateAge } from "../utility/functions/misc";
 import { generateNewAdoptee } from "../utility/functions/characterAid";
-import { saveGame } from "../utility/functions/save_load";
+import { saveGame, savePlayer } from "../utility/functions/save_load";
 
 interface GameOptions {
   date?: string;
@@ -167,6 +167,7 @@ export class Game {
     if (playerState.currentSanity < 0) {
       lowSanityDebuffGenerator(playerState);
     }
+    savePlayer(playerState);
     playerState.tickDownRelationshipAffection();
     playerState.conditionTicker();
     playerState.tickAllInvestments();
@@ -331,23 +332,10 @@ export class Game {
     player.adopt(adoptee);
   }
 
-  toJSON(): any {
-    const game = new Game({
-      date: this.date,
-      startDate: this.startDate,
-      completedInstances: this.completedInstances,
-      atDeathScreen: this.atDeathScreen,
-      dungeonInstances: this.dungeonInstances,
-      shops: this.shops.map((shop: Shop) => shop.toJSON()),
-      colorScheme: this.colorScheme,
-      vibrationEnabled: this.vibrationEnabled,
-      healthWarning: this.healthWarning,
-      tutorialsShown: this.tutorialsShown,
-      tutorialsEnabled: this.tutorialsEnabled,
-      independantChildren: this.independantChildren,
-    });
-
-    return game;
+  forSave(): any {
+    const clone = { ...this };
+    clone.shops = clone.shops.map((shop) => shop.forSave());
+    return clone;
   }
 
   static fromJSON(json: any): Game {

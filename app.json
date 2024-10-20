@@ -57,6 +57,12 @@
       "expo-apple-authentication",
       "expo-font",
       [
+        "react-native-iap",
+        {
+          "paymentProvider": "Play Store"
+        }
+      ],
+      [
         "@sentry/react-native/expo",
         {
           "organization": "mikefreno",

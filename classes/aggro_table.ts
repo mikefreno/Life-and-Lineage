@@ -37,7 +37,12 @@ export class AggroTable {
     if (highestAggroTarget) {
       return highestAggroTarget;
     } else {
-      return targets.find((target) => "fullName" in target)!;
+      const player = targets.find((target) => "fullName" in target);
+      if (player) {
+        return player;
+      } else {
+        return targets.find((target) => "minions" in target)!;
+      }
     }
   }
 }

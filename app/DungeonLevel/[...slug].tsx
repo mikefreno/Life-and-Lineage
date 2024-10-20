@@ -27,10 +27,6 @@ import { TutorialOption } from "../../utility/types";
 import { useHeaderHeight } from "@react-navigation/elements";
 import StoryModal from "../../components/StoryModal";
 import { useIsFocused } from "@react-navigation/native";
-import {
-  dungeonSave,
-  dungeonSaveEnumerated,
-} from "../../utility/functions/save_load";
 
 const DungeonProvider = observer(() => {
   const { slug } = useLocalSearchParams();
@@ -65,6 +61,7 @@ const DungeonProvider = observer(() => {
   const [droppedItems, setDroppedItems] = useState<{
     itemDrops: Item[];
     gold: number;
+    storyDrops: Item[];
   } | null>(null);
   const [inventoryFullNotifier, setInventoryFullNotifier] =
     useState<boolean>(false);

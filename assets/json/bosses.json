@@ -27,6 +27,10 @@
          {"item": "adept robes", "itemType":"bodyArmor","chance":1.0},
          {"item": "apprentice hood", "itemType":"helmet","chance":0.45}
       ],
+      "storyDrops":[
+         {"item": "bloodied note"},
+         {"item": "the deed to the whispering raven inn"}
+      ],
       "goldDropRange": {"minimum": 100, "maximum":150}
    },
    {

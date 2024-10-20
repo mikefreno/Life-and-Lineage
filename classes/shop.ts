@@ -144,16 +144,10 @@ export class Shop {
     return condensedInventory;
   }
 
-  toJSON(): any {
-    return {
-      shopKeeper: this.shopKeeper,
-      baseGold: this.baseGold,
-      currentGold: this.currentGold,
-      lastStockRefresh: this.lastStockRefresh,
-      archetype: this.archetype,
-      playerClass: this.playerClass,
-      inventory: [],
-    };
+  forSave(): any {
+    const clone = { ...this };
+    clone.inventory = [];
+    return clone;
   }
 
   static fromJSON(json: any): Shop {

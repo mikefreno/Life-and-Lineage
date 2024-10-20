@@ -1,8 +1,8 @@
-import { action, makeObservable, observable } from "mobx";
+import { action, makeObservable, observable, reaction } from "mobx";
 import * as Crypto from "expo-crypto";
 import { ConditionType, EffectOptions, EffectStyle } from "../utility/types";
-import { PlayerCharacter } from "./character";
-import { Creature } from "./creatures";
+import type { PlayerCharacter } from "./character";
+import type { Creature, Enemy, Minion } from "./creatures";
 
 /**
  * Almost everything in this class is readonly. Everything is either pre-computed or is computed in totality with all Conditions at once.
@@ -25,6 +25,7 @@ export class Condition {
   readonly effectStyle: EffectStyle[];
   readonly effectMagnitude: number[];
   readonly icon: string;
+  on: PlayerCharacter | Enemy | Minion;
 
   constructor({
     name,
@@ -41,6 +42,7 @@ export class Condition {
     id,
     aura,
     icon,
+    on,
   }: ConditionType) {
     this.id = id ?? Crypto.randomUUID();
     this.name = name;
@@ -56,11 +58,21 @@ export class Condition {
     this.placedbyID = placedbyID;
     this.aura = aura ?? false;
     this.icon = icon;
+    this.on = on;
     makeObservable(this, {
       turns: observable,
       tick: action,
       destroyTrap: action,
     });
+
+    reaction(
+      () => [this.turns],
+      () => {
+        if (this.turns <= 0) {
+          this.on.removeCondition(this);
+        }
+      },
+    );
   }
 
   public getConditionIcon() {

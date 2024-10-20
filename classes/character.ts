@@ -328,6 +328,7 @@ type PlayerCharacterBase = {
   gold?: number;
   conditions?: Condition[];
   inventory?: Item[];
+  keyItems?: Item[];
   minions?: Minion[];
   rangerPet?: Minion; // used to avoid removal within a dungeon
   currentDungeon?: {
@@ -442,9 +443,13 @@ export class PlayerCharacter extends Character {
 
   conditions: Condition[];
   /**
-   * Player's inventory,this should not be used for rendering items, getInventory should be as it stacks items
+   * Player's inventory, this should not be used for rendering items, getInventory should be as it stacks items
    */
   inventory: Item[];
+  /**
+   * Story Items, this can be directly rendered, none of these stack
+   */
+  keyItems: Item[];
   currentDungeon: {
     instance: string;
     level: string;
@@ -505,6 +510,7 @@ export class PlayerCharacter extends Character {
     investments,
     unAllocatedSkillPoints,
     allocatedSkillPoints,
+    keyItems,
   }: PlayerCharacterOptions) {
     super({
       id,
@@ -564,6 +570,7 @@ export class PlayerCharacter extends Character {
     this.conditions = conditions ?? [];
 
     this.inventory = inventory ?? [];
+    this.keyItems = keyItems ?? [];
     this.currentDungeon = currentDungeon ?? null;
     this.equipment = equipment ?? {
       mainHand: new Item({
@@ -655,7 +662,7 @@ export class PlayerCharacter extends Character {
       isStunned: computed,
       addCondition: action,
       conditionTicker: action,
-      conditionResolver: action,
+      removeCondition: action,
 
       jobExperience: observable,
       getCurrentJobAndExperience: action,
@@ -675,6 +682,7 @@ export class PlayerCharacter extends Character {
       adopt: action,
 
       addToInventory: action,
+      addToKeyItems: action,
       buyItem: action,
       removeFromInventory: action,
       sellItem: action,
@@ -973,6 +981,17 @@ export class PlayerCharacter extends Character {
     if (Array.isArray(item)) {
       this.inventory = this.inventory.concat(item);
     } else if (item && item.name !== "unarmored") {
+      this.inventory.push(item);
+    }
+  }
+
+  public addToKeyItems(item: Item | Item[]) {
+    if (Array.isArray(item)) {
+      if (item.find((item) => item.itemClass !== ItemClassType.StoryItem)) {
+        return;
+      }
+      this.keyItems = this.keyItems.concat(item);
+    } else if (item && item.itemClass === ItemClassType.StoryItem) {
       this.inventory.push(item);
     }
   }
@@ -1568,9 +1587,14 @@ export class PlayerCharacter extends Character {
   //----------------------------------Conditions----------------------------------//
   public addCondition(condition?: Condition | null) {
     if (condition) {
+      condition.on = this;
       this.conditions.push(condition);
     }
   }
+  public removeCondition(condition: Condition) {
+    this.conditions = this.conditions.filter((cond) => cond !== condition);
+  }
+
   get isStunned() {
     return this.conditions.some((condition) =>
       condition.effect.includes("stun"),
@@ -1588,17 +1612,6 @@ export class PlayerCharacter extends Character {
       const { turns } = this.conditions[i].tick(this);
 
       if (turns <= 0) {
-        this.conditions.splice(i, 1);
-      }
-    }
-  }
-  /**
-   * This is meant to remove conditions that are 'stale' - at 0 at end of enemy's turn
-   * Unlike conditionTicker, this does not tick conditions
-   */
-  public conditionResolver() {
-    for (let i = this.conditions.length - 1; i >= 0; i--) {
-      if (this.conditions[i].turns <= 0) {
         this.conditions.splice(i, 1);
       }
     }
@@ -1847,6 +1860,9 @@ export class PlayerCharacter extends Character {
       attacks: minionObj.attacks,
       turnsLeftAlive: minionObj.turns,
       beingType: minionObj.beingType as BeingType,
+      energy: minionObj.energy?.maximum,
+      energyMax: minionObj.energy?.maximum,
+      energyRegen: minionObj.energy?.regen,
       parent: this,
     });
     this.addMinion(minion);
@@ -2084,9 +2100,10 @@ export class PlayerCharacter extends Character {
       baseIntelligence: json.baseIntelligence,
       baseDexterity: json.baseDexterity,
     });
-
-    player.minions.forEach((minion) => minion.reinstateParent(player));
-    player.rangerPet?.reinstateParent(player);
+    player.minions = player.minions.map((minion) =>
+      minion.reinstateParent(player),
+    );
+    player.rangerPet = player.rangerPet?.reinstateParent(player) ?? null;
     return player;
   }
 }

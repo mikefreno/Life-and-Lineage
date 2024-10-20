@@ -24,7 +24,7 @@ import "../assets/styles/globals.css";
 import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
 import { AppContextType } from "../utility/types";
-import { AuthProvider } from "../auth/AuthContext";
+import { AuthProvider, useAuth } from "../auth/AuthContext";
 import D20DieAnimation from "../components/DieRollAnim";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
@@ -37,7 +37,16 @@ import { wait } from "../utility/functions/misc";
 import { API_BASE_URL } from "../config/config";
 import { updateNavBar } from "../utility/functions/android";
 import { fullLoad } from "../utility/functions/save_load";
-import { withIAPContext } from "react-native-iap";
+import {
+  initConnection,
+  purchaseErrorListener,
+  purchaseUpdatedListener,
+  type ProductPurchase,
+  type PurchaseError,
+  flushFailedPurchasesCachedAsPendingAndroid,
+  finishTransaction,
+  type SubscriptionPurchase,
+} from "react-native-iap";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -129,6 +138,67 @@ const Root = observer(() => {
     useState<boolean>(false);
   const [blockSize, setBlockSize] = useState<number>();
   const { setColorScheme, colorScheme } = useColorScheme();
+  const purchaseUpdateSubscription = useRef<ReturnType<
+    typeof purchaseUpdatedListener
+  > | null>(null);
+  const purchaseErrorSubscription = useRef<ReturnType<
+    typeof purchaseErrorListener
+  > | null>(null);
+
+  useEffect(() => {
+    initConnection()
+      .then(() => {
+        return flushFailedPurchasesCachedAsPendingAndroid().catch(() => {
+          // exception can happen here if:
+          // - there are pending purchases that are still pending (we can't consume a pending purchase)
+          // in any case, you might not want to do anything special with the error
+        });
+      })
+      .then(() => {
+        purchaseUpdateSubscription.current = purchaseUpdatedListener(
+          (purchase: SubscriptionPurchase | ProductPurchase) => {
+            console.log("purchaseUpdatedListener", purchase);
+            const receipt = purchase.transactionReceipt;
+            if (receipt) {
+              yourAPI
+                .deliverOrDownloadFancyInAppPurchase(receipt)
+                .then((deliveryResult) => {
+                  if (isSuccess(deliveryResult)) {
+                    // If consumable (can be purchased again)
+                    return finishTransaction({ purchase, isConsumable: true });
+                    // If not consumable
+                    // return finishTransaction({purchase, isConsumable: false});
+                  } else {
+                    // Retry / conclude the purchase is fraudulent, etc...
+                    throw new Error("Delivery unsuccessful");
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error processing purchase:", error);
+                });
+            }
+          },
+        );
+
+        purchaseErrorSubscription.current = purchaseErrorListener(
+          (error: PurchaseError) => {
+            console.warn("purchaseErrorListener", error);
+          },
+        );
+      })
+      .catch((error) => {
+        console.error("Error initializing IAP:", error);
+      });
+
+    return () => {
+      if (purchaseUpdateSubscription.current) {
+        purchaseUpdateSubscription.current.remove();
+      }
+      if (purchaseErrorSubscription.current) {
+        purchaseErrorSubscription.current.remove();
+      }
+    };
+  }, []);
 
   const getData = async () => {
     try {
@@ -256,6 +326,8 @@ const RootLayout = observer(() => {
   if (!appData) {
     throw new Error("missing context");
   }
+  const auth = useAuth();
+
   const { playerState, gameState } = appData;
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
@@ -434,7 +506,7 @@ const RootLayout = observer(() => {
     </ThemeProvider>
   );
 });
-export default Sentry.wrap(withIAPContext(Root));
+export default Sentry.wrap(Root);
 
 const headerOptions = (colorScheme: "light" | "dark", shop?: boolean) =>
   Platform.OS == "ios" || shop

@@ -29,18 +29,16 @@ export interface ContextData {
   appData: AppContextType | undefined;
 }
 
-export function enemyTurnCheck({ dungeonData, appData }: ContextData) {
+function enemyDeathHandler({ dungeonData, appData }: ContextData) {
   if (!appData || !dungeonData)
-    throw new Error("missing context in enemyTurnCheck()");
+    throw new Error("missing context in enemyPreTurnCheck()");
   const { enemyState, playerState, setEnemy, gameState } = appData;
   const {
-    slug,
     fightingBoss,
     setDroppedItems,
     thisDungeon,
     thisInstance,
     setFightingBoss,
-    setAttackAnimationOnGoing,
     battleLogger,
     setShouldShowFirstBossKillTutorialAfterItemDrops,
   } = dungeonData;
@@ -49,73 +47,53 @@ export function enemyTurnCheck({ dungeonData, appData }: ContextData) {
       enemyState.health <= 0 ||
       (enemyState.sanity && enemyState.sanity <= 0)
     ) {
-      if (slug[0] == "Activities") {
-        const drops = enemyState.getDrops(
-          playerState.playerClass,
-          fightingBoss,
-        );
-        if (drops != "already retrieved") {
-          playerState.addGold(drops.gold);
-          setDroppedItems(drops);
-        }
-        setEnemy(null);
-        gameState.gameTick({ playerState });
-      } else if (slug[0] == "Personal") {
-        const drops = enemyState.getDrops(
-          playerState.playerClass,
-          fightingBoss,
-        );
-
-        if (drops != "already retrieved") {
-          playerState.addGold(drops.gold);
-          setDroppedItems(drops);
-          gameState.gameTick({ playerState });
-        }
-        setEnemy(null);
-      } else {
-        battleLogger(
-          `You defeated the ${toTitleCase(enemyState.creatureSpecies)}`,
-        );
-
-        const drops = enemyState.getDrops(
-          playerState.playerClass,
-          fightingBoss,
-        );
-        if (drops != "already retrieved") {
-          playerState.addGold(drops.gold);
-          setDroppedItems(drops);
-          if (fightingBoss && gameState && thisDungeon) {
-            setFightingBoss(false);
-            thisDungeon.setBossDefeated();
-            gameState.openNextDungeonLevel(thisInstance!.name);
-            playerState.bossDefeated();
-            if (!gameState.tutorialsShown[TutorialOption.firstBossKill]) {
-              setShouldShowFirstBossKillTutorialAfterItemDrops(true);
-            }
-          }
-          gameState.gameTick({ playerState });
-        }
-
-        setEnemy(null);
+      battleLogger(
+        `You defeated the ${toTitleCase(enemyState.creatureSpecies)}`,
+      );
+      const { itemDrops, storyDrops, gold } = enemyState.getDrops(
+        playerState.playerClass,
+        fightingBoss,
+      );
+      if (itemDrops) {
+        playerState.addGold(gold);
+        playerState.addToKeyItems(storyDrops);
+        setDroppedItems({ itemDrops, gold, storyDrops });
       }
+      if (fightingBoss && gameState && thisDungeon) {
+        setFightingBoss(false);
+        thisDungeon.setBossDefeated();
+        gameState.openNextDungeonLevel(thisInstance!.name);
+        playerState.bossDefeated();
+        if (!gameState.tutorialsShown[TutorialOption.firstBossKill]) {
+          setShouldShowFirstBossKillTutorialAfterItemDrops(true);
+        }
+      }
+      setEnemy(null);
+      gameState.gameTick({ playerState });
+      return true;
     } else {
-      enemyTurn({ appData, dungeonData });
-      setTimeout(() => setAttackAnimationOnGoing(false), 1000);
+      return false;
     }
   }
+}
+export function enemyPreTurnCheck({ dungeonData, appData }: ContextData) {
+  if (!appData || !dungeonData)
+    throw new Error("missing context in enemyPreTurnCheck()");
+  const {} = appData;
+  const { setAttackAnimationOnGoing } = dungeonData;
+
+  const dead = enemyDeathHandler({ appData, dungeonData });
+  if (!dead) {
+    enemyTurn({ appData, dungeonData });
+  }
+  setTimeout(() => setAttackAnimationOnGoing(false), 1000);
 }
 
 export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
   if (!appData || !dungeonData)
-    throw new Error("missing context in enemyTurnCheck()");
-  const { enemyState, playerState, setEnemy, gameState } = appData;
+    throw new Error("missing context in enemyTurn()");
+  const { enemyState, playerState, gameState } = appData;
   const {
-    slug,
-    fightingBoss,
-    setDroppedItems,
-    thisDungeon,
-    thisInstance,
-    setFightingBoss,
     setEnemyAttacked,
     setEnemyHealDummy,
     setEnemyAttackDummy,
@@ -128,7 +106,7 @@ export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
     setEnemyAttacked(true);
     const startOfTurnPlayerState = { ...playerState };
     const startOfTurnEnemyState = { ...enemyState };
-    const enemyAttackRes = enemyState.takeTurn({ player: playerState }); // this should be updated to allow the enemy to target player minions
+    const enemyAttackRes = enemyState.takeTurn({ player: playerState });
     battleLogger(enemyAttackRes.logString);
     let action: () => void;
     switch (enemyAttackRes.result) {
@@ -137,8 +115,6 @@ export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
           startOfTurnPlayerState.currentHealth - playerState.currentHealth;
         const enemyHealthChange =
           startOfTurnEnemyState.health - enemyState.health;
-        const playerSanityChange =
-          startOfTurnPlayerState.currentSanity - playerState.currentSanity;
         if (playerHealthChange > 0) {
           const revengeCondition = playerState.conditions.find((condition) =>
             condition.effect.includes("revenge"),
@@ -158,8 +134,9 @@ export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
             battleLogger(`You dealt ${revengeDamage} revenge damage!`);
           }
         }
+
         action = () => {
-          if (playerHealthChange > 0 || playerSanityChange > 0) {
+          if (enemyAttackRes.chosenAttack.baseDamage > 0) {
             setEnemyAttackDummy((prev) => prev + 1);
           }
           wait(500).then(() => {
@@ -205,50 +182,9 @@ export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
         break;
     }
     action();
-    playerState.conditionResolver();
     enemyMinionsTurn(enemyState.minions, enemyState, playerState, battleLogger);
-    playerState.conditionResolver();
     setTimeout(() => {
-      if (
-        enemyState.health <= 0 ||
-        (enemyState.sanity && enemyState.sanity <= 0)
-      ) {
-        if (slug[0] == "Activities") {
-          const drops = enemyState.getDrops(
-            playerState.playerClass,
-            fightingBoss,
-          );
-          if (drops != "already retrieved") {
-            playerState.addGold(drops.gold);
-            setDroppedItems(drops);
-
-            gameState.gameTick({ playerState });
-          }
-          setEnemy(null);
-        } else {
-          battleLogger(
-            `You defeated the ${toTitleCase(enemyState.creatureSpecies)}`,
-          );
-          const drops = enemyState.getDrops(
-            playerState.playerClass,
-            fightingBoss,
-          );
-
-          if (drops != "already retrieved") {
-            playerState.addGold(drops.gold);
-            setDroppedItems(drops);
-            gameState.gameTick({ playerState });
-            if (fightingBoss && gameState && thisDungeon) {
-              setFightingBoss(false);
-              playerState.bossDefeated();
-              thisDungeon.setBossDefeated();
-              gameState.openNextDungeonLevel(thisInstance!.name);
-            }
-          }
-
-          setEnemy(null);
-        }
-      }
+      enemyDeathHandler({ dungeonData, appData });
       setAttackAnimationOnGoing(false);
     }, 1000);
   }
@@ -346,7 +282,7 @@ export const use = ({
     setTimeout(() => {
       playerMinionsTurn({ dungeonData, appData }, () => {
         setTimeout(() => {
-          enemyTurnCheck({
+          enemyPreTurnCheck({
             appData,
             dungeonData,
           });
@@ -375,12 +311,10 @@ export const pass = ({
   if (enemyState && playerState && isFocused) {
     playerState.pass({ voluntary });
     battleLogger("You passed!");
-    enemyState.conditionResolver();
 
     playerMinionsTurn({ dungeonData, appData }, () => {
-      enemyState.conditionResolver();
       setTimeout(() => {
-        enemyTurnCheck({
+        enemyPreTurnCheck({
           appData,
           dungeonData,
         });

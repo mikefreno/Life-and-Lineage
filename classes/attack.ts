@@ -175,7 +175,7 @@ export class Attack {
     const debuffNames: string[] = [];
     let amountHealed = 0;
     this.debuffs({ target }).forEach((debuff) => {
-      if (rollD20() > debuff.chance * 20) {
+      if (rollD20() > 20 - debuff.chance * 20) {
         if (debuff.debuff) {
           debuffNames.push(debuff.debuff.name);
           target.addCondition(debuff.debuff);

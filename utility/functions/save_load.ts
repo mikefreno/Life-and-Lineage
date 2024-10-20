@@ -4,16 +4,16 @@ import { Game } from "../../classes/game";
 import type { AppContextType, DungeonContextType } from "../types";
 import { storage } from "./storage";
 import { PlayerCharacter } from "../../classes/character";
-import { stringify, parse } from "flatted";
 import {
   BoundingBox,
   type Tile,
 } from "../../components/DungeonComponents/DungeonMap";
+import { parse, stringify } from "flatted";
 
 const _gameSave = async (game: Game | undefined) => {
   if (game) {
     try {
-      storage.set("game", stringify(game));
+      storage.set("game", stringify(game.forSave()));
     } catch (e) {
       console.log("Error in _gameSave:", e);
     }

@@ -10,6 +10,7 @@ import { parseInt } from "lodash";
 import { Platform } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 import { storage } from "../utility/functions/storage";
+import { validateReceiptIos } from "react-native-iap";
 
 type EmailLogin = {
   token: string;
@@ -468,6 +469,24 @@ class AuthStore {
       //ignore error, just log out
       await this.logout();
     }
+  };
+
+  public verifyPurchase = async (receipt: string) => {
+    return fetch(`${API_BASE_URL}/IAP`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ receipt }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.isValid) {
+          return { isValid: true };
+        } else {
+          throw new Error("Purchase verification failed");
+        }
+      });
   };
 
   private async databaseExecute({ sql, args }: databaseExecuteProps) {

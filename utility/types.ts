@@ -2,7 +2,7 @@ import type { DungeonInstance, DungeonLevel } from "../classes/dungeon";
 import type { Item } from "../classes/item";
 import type { Game } from "../classes/game";
 import type { PlayerCharacter } from "../classes/character";
-import type { Enemy } from "../classes/creatures";
+import type { Enemy, Minion } from "../classes/creatures";
 import React from "react";
 import { BoundingBox, Tile } from "../components/DungeonComponents/DungeonMap";
 import { Attack } from "../classes/attack";
@@ -20,6 +20,7 @@ export interface ItemOptions {
   stackable?: boolean;
   playerClass: PlayerClassOptions;
   attacks?: string[];
+  description?: string;
 }
 export enum ItemClassType {
   Artifact = "artifact",
@@ -39,6 +40,7 @@ export enum ItemClassType {
   Book = "book",
   Arrow = "arrow",
   Staff = "staff",
+  StoryItem = "storyItem",
 }
 
 export type InvestmentType = {
@@ -295,6 +297,7 @@ export type ConditionType = {
   placedbyID: string;
   aura?: boolean;
   icon: string;
+  on: PlayerCharacter | Enemy | Minion;
 };
 
 export type ConditionObjectType = {
@@ -352,12 +355,14 @@ export interface DungeonContextType {
   droppedItems: {
     itemDrops: Item[];
     gold: number;
+    storyDrops: Item[];
   } | null;
   leftBehindDrops: Item[];
   setDroppedItems: React.Dispatch<
     React.SetStateAction<{
       itemDrops: Item[];
       gold: number;
+      storyDrops: Item[];
     } | null>
   >;
   setLeftBehindDrops: React.Dispatch<React.SetStateAction<Item[]>>;

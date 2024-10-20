@@ -42,6 +42,7 @@ export class Item {
   };
   readonly playerClass: PlayerClassOptions;
   readonly attackStrings: string[];
+  readonly description: string | undefined;
 
   constructor({
     id,
@@ -51,10 +52,11 @@ export class Item {
     baseValue,
     itemClass,
     icon,
-    requirements,
+    requirements = {},
     playerClass,
     attacks = [],
     stackable = false,
+    description,
   }: ItemOptions) {
     this.id = id ?? Crypto.randomUUID();
     this.name = name;
@@ -63,10 +65,11 @@ export class Item {
     this.baseValue = baseValue;
     this.itemClass = itemClass;
     this.icon = icon;
-    this.requirements = requirements ?? {};
+    this.requirements = requirements;
     this.stackable = stackable;
     this.playerClass = playerClass;
     this.attackStrings = attacks;
+    this.description = description;
     makeObservable(this, {
       attachedSpell: computed,
       attachedAttacks: action,
@@ -251,6 +254,8 @@ const itemMap: { [key: string]: any } = {
   Axe: require("../assets/images/items/Axe.png"),
   Golden_Hammer: require("../assets/images/items/Golden_Hammer.png"),
   Harp_Bow: require("../assets/images/items/Harp_Bow.png"),
+  Paper: require("../assets/images/items/Paper.png"),
+  Scroll: require("../assets/images/items/Scroll.png"),
 };
 
 export const isStackable = (itemClass: ItemClassType) => {

@@ -26,9 +26,17 @@ import necroBooks from "../assets/json/items/necroBooks.json";
 import paladinBooks from "../assets/json/items/paladinBooks.json";
 import mageBooks from "../assets/json/items/mageBooks.json";
 import rangerBooks from "../assets/json/items/rangerBooks.json";
+import storyItems from "../assets/json/items/storyItems.json";
 import * as Crypto from "expo-crypto";
 import { Item, isStackable } from "./item";
-import { action, autorun, computed, makeObservable, observable } from "mobx";
+import {
+  action,
+  autorun,
+  computed,
+  makeObservable,
+  observable,
+  reaction,
+} from "mobx";
 import summons from "../assets/json/summons.json";
 import { ItemClassType, BeingType, PlayerClassOptions } from "../utility/types";
 import {
@@ -41,7 +49,6 @@ import { Attack } from "./attack";
 import { PlayerCharacter } from "./character";
 import { AttackUse } from "../utility/types";
 import { AggroTable } from "./aggro_table";
-import { min } from "lodash";
 
 type CreatureType = {
   id?: string;
@@ -202,6 +209,7 @@ export class Creature {
       regenerate: action,
       expendEnergy: action,
       attacks: computed,
+      removeCondition: action,
     });
   }
 
@@ -378,8 +386,13 @@ export class Creature {
    */
   public addCondition(condition?: Condition | null) {
     if (condition) {
+      condition.on = this as unknown as Enemy | Minion;
       this.conditions.push(condition);
     }
+  }
+
+  public removeCondition(condition: Condition) {
+    this.conditions = this.conditions.filter((cond) => cond !== condition);
   }
 
   /**
@@ -388,29 +401,14 @@ export class Creature {
   public conditionTicker() {
     let undeadDeathCheck = -1;
     for (let i = this.conditions.length - 1; i >= 0; i--) {
-      const { effect, turns } = this.conditions[i].tick(this);
+      const { effect } = this.conditions[i].tick(this);
 
       if (effect.includes("destroy undead")) {
         undeadDeathCheck = getMagnitude(this.conditions[i].effectMagnitude);
       }
-      if (turns <= 0) {
-        this.conditions.splice(i, 1);
-      }
     }
     if (this.health <= undeadDeathCheck) {
       this.health = 0;
-    }
-  }
-
-  /**
-   * This is meant to remove conditions that are 'stale' - at 0 at end of enemy's turn
-   * Unlike conditionTicker, this does not tick conditions
-   */
-  public conditionResolver() {
-    for (let i = this.conditions.length - 1; i >= 0; i--) {
-      if (this.conditions[i].turns <= 0) {
-        this.conditions.splice(i, 1);
-      }
     }
   }
 
@@ -454,7 +452,9 @@ export class Creature {
     } else {
       const allTargets = [
         target,
-        ...(target instanceof PlayerCharacter ? target.minionsAndPets : []),
+        ...(target instanceof PlayerCharacter
+          ? target.minionsAndPets
+          : target.minions),
       ];
       const highestAggroTarget =
         this.aggroTable.getHighestAggroTarget(allTargets);
@@ -501,6 +501,7 @@ export class Creature {
     let accumulatedWeight = 0;
     for (const attack of availableAttacks) {
       accumulatedWeight += this.getAttackWeight(attack);
+      console.log(this.creatureSpecies, attack);
       if (randomValue <= accumulatedWeight) {
         return attack;
       }
@@ -554,10 +555,28 @@ export class Creature {
    * @returns An object containing item drops and gold.
    */
   public getDrops(playerClass: PlayerClassOptions, bossFight: boolean) {
-    if (this.gotDrops) return "already retrieved";
+    if (this.gotDrops) return {};
     let enemyObj;
+    let storyDrops: Item[] = [];
     if (bossFight) {
       enemyObj = bosses.find((monster) => monster.name == this.creatureSpecies);
+      const storyDropsList = enemyObj?.storyDrops;
+      if (storyDropsList) {
+        storyDropsList.forEach((drop) => {
+          const storyItemObj = storyItems.find(
+            (item) => item.name == drop.item,
+          );
+          if (storyItemObj) {
+            const storyItem = Item.fromJSON({
+              ...storyItemObj,
+              itemClass: ItemClassType.StoryItem,
+              stackable: false,
+              playerClass,
+            });
+            storyDrops.push(storyItem);
+          }
+        });
+      }
     } else {
       enemyObj = enemies.find(
         (monster) => monster.name == this.creatureSpecies,
@@ -572,26 +591,26 @@ export class Creature {
         enemyObj.goldDropRange.minimum,
         enemyObj.goldDropRange.maximum,
       );
-      let drops: Item[] = [];
+      let itemDrops: Item[] = [];
       dropList.forEach((drop) => {
         const roll = rollD20();
         if (roll >= 20 - drop.chance * 20) {
           const items = itemList(drop.itemType, playerClass);
           const itemObj = items.find((item) => item.name == drop.item);
           if (itemObj) {
-            drops.push(
+            itemDrops.push(
               Item.fromJSON({
                 ...itemObj,
                 itemClass: drop.itemType,
                 stackable: isStackable(drop.itemType as ItemClassType),
-                playerClass: playerClass,
+                playerClass,
               }),
             );
           }
         }
       });
       this.gotDrops = true;
-      return { itemDrops: drops, gold: gold };
+      return { itemDrops, gold, storyDrops };
     }
     throw new Error("No found monster on Monster.getDrops()");
   }
@@ -789,17 +808,16 @@ export class Minion extends Creature {
     makeObservable(this, {
       turnsLeftAlive: observable,
       takeTurn: action,
-      reinstateParent: action,
     });
 
-    // automatically remove the minion when it reaches 0 turns left
-    autorun(() => {
-      if (this.turnsLeftAlive <= 0 || this.health) {
-        if (this.parent) {
-          this.parent.removeMinion(this);
+    reaction(
+      () => [this.turnsLeftAlive, this.health],
+      () => {
+        if (this.turnsLeftAlive <= 0 || this.health <= 0) {
+          this.parent?.removeMinion(this);
         }
-      }
-    });
+      },
+    );
   }
 
   /**
@@ -828,26 +846,6 @@ export class Minion extends Creature {
   public reinstateParent(parent: PlayerCharacter | Enemy) {
     this.parent = parent;
     return this;
-  }
-
-  public toJSON(): any {
-    return new Minion({
-      id: this.id,
-      beingType: this.beingType,
-      creatureSpecies: this.creatureSpecies,
-      health: this.health,
-      healthMax: this.healthMax,
-      sanity: this.sanity,
-      sanityMax: this.sanityMax,
-      attackPower: this.attackPower,
-      energy: this.energy,
-      energyMax: this.energyMax,
-      energyRegen: this.energyRegen,
-      turnsLeftAlive: this.turnsLeftAlive,
-      attacks: this.attackStrings,
-      conditions: this.conditions,
-      parent: null,
-    });
   }
 
   /**
