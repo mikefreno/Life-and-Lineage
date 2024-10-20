@@ -77,7 +77,8 @@
           "behavior": "overlay-swipe",
           "backgroundColor": "#00000080"
         }
-      ]
+      ],
+      "./custom-plugins/androidIAPSetup"
     ],
     "experiments": {
       "typedRoutes": true

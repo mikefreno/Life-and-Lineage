@@ -80,6 +80,13 @@ export default function OptionsLayout() {
           href: null,
         }}
       />
+      <Tabs.Screen
+        name="iaps"
+        options={{
+          href: null,
+          headerShown: false,
+        }}
+      />
     </Tabs>
   );
 }

@@ -36,7 +36,8 @@ import {
 import { wait } from "../utility/functions/misc";
 import { API_BASE_URL } from "../config/config";
 import { updateNavBar } from "../utility/functions/android";
-import { fullLoad, loadGame, loadPlayer } from "../utility/functions/save_load";
+import { fullLoad } from "../utility/functions/save_load";
+import { withIAPContext } from "react-native-iap";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -433,7 +434,7 @@ const RootLayout = observer(() => {
     </ThemeProvider>
   );
 });
-export default Sentry.wrap(Root);
+export default Sentry.wrap(withIAPContext(Root));
 
 const headerOptions = (colorScheme: "light" | "dark", shop?: boolean) =>
   Platform.OS == "ios" || shop
