@@ -8,7 +8,10 @@ import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../app/_layout";
 import { DungeonContext } from "./DungeonContext";
-import { type ContextData, enemyTurnCheck } from "./DungeonInteriorFunctions";
+import {
+  type ContextData,
+  enemyPreTurnCheck,
+} from "./DungeonInteriorFunctions";
 
 interface FleeModalProps {
   fleeModalShowing: boolean;
@@ -80,7 +83,7 @@ export default function FleeModal({
         battleLogger("You failed to flee!");
 
         playerMinionsTurn({ appData, dungeonData }, () => {
-          enemyTurnCheck({ appData, dungeonData });
+          enemyPreTurnCheck({ appData, dungeonData });
         });
       }
     }
