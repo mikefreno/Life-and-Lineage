@@ -501,7 +501,6 @@ export class Creature {
     let accumulatedWeight = 0;
     for (const attack of availableAttacks) {
       accumulatedWeight += this.getAttackWeight(attack);
-      console.log(this.creatureSpecies, attack);
       if (randomValue <= accumulatedWeight) {
         return attack;
       }
