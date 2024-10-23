@@ -287,8 +287,6 @@ class AuthStore {
     if (!email) {
       email = await this.appleEmailRetrieval(user);
     }
-    const givenName = credential.fullName?.givenName;
-    const lastName = credential.fullName?.familyName;
 
     const res = await fetch(`${API_BASE_URL}/apple/registration`, {
       method: "POST",
@@ -296,8 +294,6 @@ class AuthStore {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        givenName,
-        lastName,
         email,
         userString: user,
       }),
@@ -336,8 +332,6 @@ class AuthStore {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        familyName: userInfo.user.familyName,
-        givenName: userInfo.user.givenName,
         email: userInfo.user.email,
       }),
     });
