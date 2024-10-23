@@ -7,6 +7,44 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:408975857878:android:bfb27036c5b4c3503c5177",
+        "android_client_info": {
+          "package_name": "com.mikefrenodev.bloodline"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCt3Dnvo54LiUc8vBPsoAUm6sZklZY1zXA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:408975857878:android:667911a14f42e97a3c5177",
+        "android_client_info": {
+          "package_name": "com.mikefrenodev.lineage"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCt3Dnvo54LiUc8vBPsoAUm6sZklZY1zXA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:408975857878:android:ba04d988ddc0fa8e3c5177",
         "android_client_info": {
           "package_name": "com.mikefrenodev.magicdelve"
