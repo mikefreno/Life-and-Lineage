@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "bloodline",
-    "slug": "bloodline",
+    "name": "Life and Lineage",
+    "slug": "life-and-lineage",
     "version": "0.5.0",
     "orientation": "portrait",
     "icon": "assets/images/icon.png",
-    "scheme": "bloodlineapp",
+    "scheme": "lineageapp",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -18,7 +18,7 @@
     "ios": {
       "usesAppleSignIn": true,
       "supportsTablet": true,
-      "bundleIdentifier": "com.mikefrenodev.bloodline",
+      "bundleIdentifier": "com.mikefrenodev.lineage",
       "buildNumber": "1",
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true,
@@ -30,7 +30,7 @@
         "foregroundImage": "assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.mikefrenodev.bloodline",
+      "package": "com.mikefrenodev.lineage",
       "versionCode": 1,
       "googleServicesFile": "./google-services.json"
     },
@@ -50,7 +50,7 @@
         "@sentry/react-native/expo",
         {
           "organization": "mikefreno",
-          "project": "magic-delve"
+          "project": "life-and-lineage"
         }
       ],
       [
@@ -79,7 +79,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "568b9324-a4ba-421f-a938-94de1012c2f9"
+        "projectId": "f4a10fdc-c377-4a37-8ad7-27685b89b4d9"
       }
     },
     "runtimeVersion": "0.5.0",

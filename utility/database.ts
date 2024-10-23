@@ -4,8 +4,6 @@ const conductor = `
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE,
     email_verified INTEGER DEFAULT 0, 
-    given_name TEXT,
-    family_name TEXT,
     password_hash TEXT,
     apple_user_string TEXT,
     provider TEXT,

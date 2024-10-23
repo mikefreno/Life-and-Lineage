@@ -1,4 +1,4 @@
-##Notes on Magic Delve
+##Notes on Life and Lineage 
 
 ###Gotchas
 -**Modals**:

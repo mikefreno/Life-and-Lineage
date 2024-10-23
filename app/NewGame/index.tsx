@@ -59,7 +59,7 @@ const SetClassScreen = observer(() => {
         isFocused={useIsFocused()}
         clearOverride={() => setForceShowTutorial(false)}
         pageOne={{
-          title: "Welcome To Magic Delve!",
+          title: "Welcome To Life and Lineage!",
           body: "Let's start with selecting your class...",
         }}
       />
