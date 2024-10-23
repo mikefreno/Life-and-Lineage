@@ -34,6 +34,8 @@ function enemyDeathHandler({ dungeonData, appData }: ContextData) {
     throw new Error("missing context in enemyPreTurnCheck()");
   const { enemyState, playerState, setEnemy, gameState } = appData;
   const {
+    slug,
+    instanceName,
     fightingBoss,
     setDroppedItems,
     thisDungeon,
@@ -67,6 +69,9 @@ function enemyDeathHandler({ dungeonData, appData }: ContextData) {
         if (!gameState.tutorialsShown[TutorialOption.firstBossKill]) {
           setShouldShowFirstBossKillTutorialAfterItemDrops(true);
         }
+      }
+      if (instanceName === "Personal") {
+        playerState.killCharacter({ name: slug[2] });
       }
       setEnemy(null);
       gameState.gameTick({ playerState });

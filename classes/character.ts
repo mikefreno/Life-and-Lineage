@@ -50,10 +50,10 @@ interface CharacterOptions {
   alive?: boolean;
   deathdate?: string;
   job?: string;
-  isPlayerPartner?: boolean;
   affection?: number;
   qualifications?: string[];
   dateCooldownStart?: string;
+  parents?: Character[];
 }
 
 /**
@@ -107,11 +107,6 @@ export class Character {
   job: string;
 
   /**
-   * Indicates whether the character is the player's partner.
-   */
-  isPlayerPartner: boolean;
-
-  /**
    * Affection level of the character towards the player.
    */
   affection: number;
@@ -129,6 +124,7 @@ export class Character {
    * Will be null if not pregnant, the string is in ISO format
    */
   pregnancyDueDate?: string | null;
+  parents?: Character[];
 
   constructor({
     id,
@@ -139,10 +135,10 @@ export class Character {
     birthdate,
     deathdate,
     job,
-    isPlayerPartner,
     affection,
     qualifications,
     dateCooldownStart,
+    parents,
   }: CharacterOptions) {
     this.id = id ?? Crypto.randomUUID();
     this.firstName = firstName;
@@ -152,17 +148,16 @@ export class Character {
     this.birthdate = birthdate ?? new Date().toISOString();
     this.deathdate = deathdate ?? null;
     this.job = job ?? "Unemployed";
-    this.isPlayerPartner = isPlayerPartner ?? false;
     this.affection = affection ?? 0;
     this.qualifications = qualifications ?? [];
     this.dateCooldownStart = dateCooldownStart;
+    this.parents = parents;
     makeObservable(this, {
       alive: observable,
       deathdate: observable,
       job: observable,
       affection: observable,
       qualifications: observable,
-      isPlayerPartner: observable,
       dateCooldownStart: observable,
       fullName: computed,
       setJob: action,
@@ -171,6 +166,8 @@ export class Character {
       updateAffection: action,
       lastName: observable,
       updateLastName: action,
+      kill: action,
+      setParents: action,
     });
   }
 
@@ -215,6 +212,11 @@ export class Character {
     this.dateCooldownStart = date;
   }
 
+  public kill() {
+    this.alive = false;
+    this.deathdate = new Date().toISOString();
+  }
+
   /**
    * Simulates a death roll for the character. This is called on non-player characters to determine if they survive or not.
    * @param gameDate - The current date of the game.
@@ -231,8 +233,7 @@ export class Character {
       const rollThree = rollD20();
       if (rollThree >= rollToLive) return;
 
-      this.alive = false;
-      this.deathdate = new Date().toISOString();
+      this.kill();
     }
   }
 
@@ -255,6 +256,14 @@ export class Character {
     this.lastName = newLastName;
   }
 
+  public setParents(parent1: PlayerCharacter, parent2?: Character) {
+    const newParents: Character[] = [parent1];
+    if (parent2) {
+      newParents.push(parent2);
+    }
+    this.parents = newParents;
+  }
+
   /**
    * Creates a Character object from a JSON object.
    * @param json - The JSON object representing the character.
@@ -269,11 +278,13 @@ export class Character {
       birthdate: json.birthdate ?? undefined,
       alive: json.alive,
       deathdate: json.deathdate ?? null,
-      isPlayerPartner: json.isPlayerPartner,
       job: json.job,
       affection: json.affection,
       qualifications: json.qualifications,
       dateCooldownStart: json.dateCooldownStart,
+      parents: json.parents
+        ? json.parents.map((parent: any) => Character.fromJSON(parent))
+        : undefined,
     });
     return character;
   }
@@ -359,11 +370,11 @@ type PlayerCharacterBase = {
 };
 
 type MageCharacter = PlayerCharacterBase & {
-  playerClass: "mage";
+  playerClass: "mage" | PlayerClassOptions.mage;
   blessing: Element.fire | Element.water | Element.air | Element.earth;
 };
 type NecromancerCharacter = PlayerCharacterBase & {
-  playerClass: "necromancer";
+  playerClass: "necromancer" | PlayerClassOptions.necromancer;
   blessing:
     | Element.blood
     | Element.summoning
@@ -371,11 +382,11 @@ type NecromancerCharacter = PlayerCharacterBase & {
     | Element.pestilence;
 };
 type PaladinCharacter = PlayerCharacterBase & {
-  playerClass: "paladin";
+  playerClass: "paladin" | PlayerClassOptions.paladin;
   blessing: Element.holy | Element.vengeance | Element.protection;
 };
 type RangerCharacter = PlayerCharacterBase & {
-  playerClass: "ranger";
+  playerClass: "ranger" | PlayerClassOptions.ranger;
   blessing: Element.assassination | Element.beastMastery | Element.arcane;
 };
 
@@ -680,6 +691,7 @@ export class PlayerCharacter extends Character {
       currentDungeon: observable,
       investments: observable,
       adopt: action,
+      makePartner: action,
 
       addToInventory: action,
       addToKeyItems: action,
@@ -909,7 +921,10 @@ export class PlayerCharacter extends Character {
   }
 
   public changeBaseSanity(change: number) {
-    this.baseSanity + change;
+    this.baseSanity += change;
+    if (this.currentSanity > this.baseSanity) {
+      this.currentSanity = this.baseSanity;
+    }
   }
 
   //----------------------------------Strength-----------------------------------//
@@ -1505,12 +1520,89 @@ export class PlayerCharacter extends Character {
     );
     this.partners.push(character);
   }
+  public askForPartner(character: Character) {
+    if (character.affection > 75) {
+      if (rollD20() >= 5) {
+        this.makePartner(character);
+        return true;
+      }
+    } else if (character.affection > 25) {
+      if (rollD20() >= 10) {
+        this.makePartner(character);
+        return true;
+      }
+    } else if (character.affection > 25) {
+      if (rollD20() >= 15) {
+        this.makePartner(character);
+        return true;
+      }
+    } else if (character.affection > 0) {
+      if (rollD20() >= 18) {
+        this.makePartner(character);
+        return true;
+      }
+    }
+    return false;
+  }
 
   public removePartner(character: Character) {
     this.partners = this.partners.filter(
       (partner) => !character.equals(partner),
     );
     this.knownCharacters.push(character);
+  }
+
+  /**
+   * Searches the various character arrays, removing the character with the matching name, and decreases layer sanity based on closeness or relationship
+   */
+  public killCharacter({ name }: { name: string }) {
+    //this.knownCharacters.find((character))
+    const isParent = this.parents.find(
+      (character) => character.fullName == name,
+    );
+    if (isParent) {
+      this.changeBaseSanity(-25);
+      isParent.kill();
+      return;
+    }
+
+    const isPartner = this.partners.find(
+      (character) => character.fullName == name,
+    );
+    if (isPartner) {
+      this.changeBaseSanity(-25);
+      isPartner.kill();
+      return;
+    }
+
+    const isChild = this.children.find(
+      (character) => character.fullName == name,
+    );
+    if (isChild) {
+      this.changeBaseSanity(-30);
+      isChild.kill();
+      return;
+    }
+    const isKnown = this.knownCharacters.find(
+      (character) => character.fullName == name,
+    );
+    if (isKnown) {
+      if (isKnown.affection > 75) {
+        this.changeBaseSanity(-25);
+      } else if (isKnown.affection > 25) {
+        this.changeBaseSanity(-20);
+      } else if (isKnown.affection > -25) {
+        this.changeBaseSanity(-15);
+      } else if (isKnown.affection > -75) {
+        this.changeBaseSanity(-10);
+      } else {
+        this.changeBaseSanity(-5);
+      }
+      isKnown.kill();
+      return;
+    } else {
+      console.error("This should never be reached");
+    }
   }
 
   public isKnownCharacter(characterToCheck: Character) {
@@ -1580,8 +1672,9 @@ export class PlayerCharacter extends Character {
       }
     });
   }
-  public adopt(child: Character) {
+  public adopt({ child, partner }: { child: Character; partner?: Character }) {
     child.updateLastName(this.lastName);
+    child.setParents(this, partner);
     this.children.push(child);
   }
   //----------------------------------Conditions----------------------------------//
@@ -2104,6 +2197,9 @@ export class PlayerCharacter extends Character {
       minion.reinstateParent(player),
     );
     player.rangerPet = player.rangerPet?.reinstateParent(player) ?? null;
+    player.conditions = player.conditions.map((cond) =>
+      cond.reinstateParent(player),
+    );
     return player;
   }
 }

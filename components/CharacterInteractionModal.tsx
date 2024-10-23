@@ -155,17 +155,34 @@ export const CharacterInteractionModal = observer(
                       >
                         Give a Gift
                       </GenericFlatButton>
-                      {character.isPlayerPartner &&
-                        (character.sex !== playerState.sex ? (
-                          <GenericFlatButton
-                            disabledCondition={!dateAvailable}
-                            onPressFunction={() => {
-                              vibration({ style: "light" });
-                              showPregnancyInfo();
-                            }}
-                          >
-                            Try for a Baby
-                          </GenericFlatButton>
+                    </View>
+                    <View className="pt-2">
+                      {characterAge >= 18 &&
+                      playerState.partners.find((partner) =>
+                        partner.equals(character),
+                      ) ? (
+                        character.sex !== playerState.sex ? (
+                          <>
+                            <GenericFlatButton
+                              disabledCondition={!dateAvailable}
+                              onPressFunction={() => {
+                                vibration({ style: "light" });
+                                showPregnancyInfo();
+                              }}
+                            >
+                              Try for a Baby
+                            </GenericFlatButton>
+                            <GenericFlatButton
+                              disabledCondition={!dateAvailable}
+                              onPressFunction={() => {
+                                vibration({ style: "light" });
+                                showAdoptionModal(character.fullName);
+                              }}
+                              className="mt-2"
+                            >
+                              Suggest Adoption
+                            </GenericFlatButton>
+                          </>
                         ) : (
                           <GenericFlatButton
                             disabledCondition={!dateAvailable}
@@ -174,9 +191,22 @@ export const CharacterInteractionModal = observer(
                               showAdoptionModal(character.fullName);
                             }}
                           >
-                            Adopt
+                            Suggest Adoption
                           </GenericFlatButton>
-                        ))}
+                        )
+                      ) : (
+                        <GenericFlatButton
+                          disabledCondition={!dateAvailable}
+                          onPressFunction={() => {
+                            vibration({ style: "light" });
+                            character.setDateCooldownStart(gameState.date);
+                            playerState.askForPartner(character);
+                            gameState.gameTick({ playerState });
+                          }}
+                        >
+                          Start Dating?
+                        </GenericFlatButton>
+                      )}
                     </View>
                     <View className="mt-2 flex flex-row justify-evenly">
                       <GenericFlatButton

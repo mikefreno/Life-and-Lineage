@@ -25,7 +25,6 @@ import { Attack } from "../../classes/attack";
 import { Spell } from "../../classes/spell";
 import { TutorialOption } from "../../utility/types";
 import { useHeaderHeight } from "@react-navigation/elements";
-import StoryModal from "../../components/StoryModal";
 import { useIsFocused } from "@react-navigation/native";
 
 const DungeonProvider = observer(() => {
@@ -84,7 +83,6 @@ const DungeonProvider = observer(() => {
     showing: boolean;
     chosenAttack: Attack | Spell | null;
   }>({ showing: false, chosenAttack: null });
-  const [showingStoryBeat, setShowingStoryBeat] = useState<string>("");
 
   const instanceName = slug[0];
   const level = slug[1];
@@ -101,7 +99,8 @@ const DungeonProvider = observer(() => {
       (instanceName === "Activities" ||
         instanceName === "Personal" ||
         instanceName === "training grounds") &&
-      !enemyState
+      !enemyState &&
+      firstLoad
     ) {
       let name: string | undefined = undefined;
       if (slug.length > 2) {
@@ -119,6 +118,7 @@ const DungeonProvider = observer(() => {
         setEnemy(enemy);
         setEnemyAttacked(true);
         setInCombat(true);
+        setFirstLoad(false);
       });
     }
   }, [slug]);
@@ -128,7 +128,6 @@ const DungeonProvider = observer(() => {
       if (instanceName !== "Activities" && instanceName !== "Personal") {
         setInCombat(false);
       }
-      setFirstLoad(true);
     } else if (enemyState) {
       setFirstLoad(false);
     }
@@ -280,11 +279,6 @@ const DungeonProvider = observer(() => {
             }}
           />
         )}
-        <StoryModal
-          isVisible={showingStoryBeat !== ""}
-          backFunction={() => setShowingStoryBeat("")}
-          storyBeat={showingStoryBeat}
-        />
         <DungeonLevelScreen />
       </DungeonContext.Provider>
     );

@@ -1,5 +1,5 @@
 import { ReactNode, useContext } from "react";
-import { Platform } from "react-native";
+import { Dimensions, Platform } from "react-native";
 import Modal from "react-native-modal";
 import { View as ThemedView } from "./Themed";
 import { AppContext } from "../app/_layout";
@@ -34,8 +34,7 @@ export default function GenericModal({
   size,
   style,
 }: GenericModalProps) {
-  const appData = useContext(AppContext);
-  const { dimensions } = appData!;
+  const height = Dimensions.get("screen").height;
 
   return (
     <Modal
@@ -49,8 +48,8 @@ export default function GenericModal({
       isVisible={isVisibleCondition}
       onBackdropPress={backdropCloses ? backFunction : undefined}
       onBackButtonPress={backFunction}
-      deviceHeight={dimensions.height}
-      statusBarTranslucent
+      statusBarTranslucent={Platform.OS == "ios"}
+      deviceHeight={height}
       useNativeDriver
       useNativeDriverForBackdrop
       style={style}

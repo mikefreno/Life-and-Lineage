@@ -133,6 +133,7 @@ export class Game {
       independantChildren: observable,
       independantChildrenAgeCheck: action,
       adopt: action,
+      inheritance: action,
     });
 
     reaction(
@@ -250,6 +251,10 @@ export class Game {
     this.atDeathScreen = true;
   }
 
+  public inheritance() {
+    this.atDeathScreen = false;
+  }
+
   public setColorScheme(color: "light" | "dark" | "system") {
     this.colorScheme = color;
   }
@@ -322,14 +327,16 @@ export class Game {
   public adopt({
     adoptee,
     player,
+    partner = undefined,
   }: {
     adoptee: Character;
     player: PlayerCharacter;
+    partner?: Character;
   }) {
     this.independantChildren = this.independantChildren.filter(
       (child) => child.id !== adoptee.id,
     );
-    player.adopt(adoptee);
+    player.adopt({ child: adoptee, partner: partner });
   }
 
   forSave(): any {
@@ -357,7 +364,9 @@ export class Game {
       healthWarning: json.healthWarning,
       tutorialsShown: json.tutorialsShown,
       tutorialsEnabled: json.tutorialsEnabled,
-      independantChildren: json.independantChildren,
+      independantChildren: json.independantChildren
+        ? json.independantChildren.map((ind: any) => Character.fromJSON(ind))
+        : [],
     });
 
     return game;

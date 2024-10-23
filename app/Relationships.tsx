@@ -80,8 +80,12 @@ const RelationshipsScreen = observer(() => {
     return (
       <Pressable
         className="flex items-center"
-        style={{ width: dimensions.lesser * 0.35 }}
+        style={{
+          width: dimensions.lesser * 0.35,
+          opacity: character.deathdate ? 0.5 : 1,
+        }}
         key={character.id}
+        disabled={!!character.deathdate}
         onPress={() => {
           setShowInteractionModal(true);
           setSelectedCharacter(character);
@@ -105,20 +109,22 @@ const RelationshipsScreen = observer(() => {
             {character.job}
           </Text>
         </View>
-        <View className="flex w-2/3 flex-row justify-center">
-          <View className="w-3/4">
-            <ProgressBar
-              value={Math.floor(character.affection * 4) / 4}
-              minValue={-100}
-              maxValue={100}
-              filledColor="#dc2626"
-              unfilledColor="#fca5a5"
-            />
+        {!character.deathdate && (
+          <View className="flex w-2/3 flex-row justify-center">
+            <View className="w-3/4">
+              <ProgressBar
+                value={Math.floor(character.affection * 4) / 4}
+                minValue={-100}
+                maxValue={100}
+                filledColor="#dc2626"
+                unfilledColor="#fca5a5"
+              />
+            </View>
+            <View className="my-auto ml-1">
+              <AffectionIcon height={14} width={14} />
+            </View>
           </View>
-          <View className="my-auto ml-1">
-            <AffectionIcon height={14} width={14} />
-          </View>
-        </View>
+        )}
       </Pressable>
     );
   }
@@ -213,6 +219,7 @@ const RelationshipsScreen = observer(() => {
                         gameState?.adopt({
                           adoptee: item,
                           player: playerState,
+                          partner: selectedCharacter ?? undefined,
                         })
                       }
                     >

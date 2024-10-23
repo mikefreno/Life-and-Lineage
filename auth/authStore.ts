@@ -10,7 +10,6 @@ import { parseInt } from "lodash";
 import { Platform } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 import { storage } from "../utility/functions/storage";
-import { validateReceiptIos } from "react-native-iap";
 
 type EmailLogin = {
   token: string;
@@ -471,23 +470,30 @@ class AuthStore {
     }
   };
 
-  public verifyPurchase = async (receipt: string) => {
-    return fetch(`${API_BASE_URL}/IAP`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ receipt }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.isValid) {
-          return { isValid: true };
-        } else {
-          throw new Error("Purchase verification failed");
-        }
-      });
-  };
+  //public verifyPurchase = async (receipt: string) => {
+  //return fetch(`${API_BASE_URL}/IAP`, {
+  //method: "POST",
+  //headers: {
+  //"Content-Type": "application/json",
+  //},
+  //body: JSON.stringify({ receipt }),
+  //})
+  //.then((response) => response.json())
+  //.then((data) => {
+  //if (data.isValid) {
+  //return { isValid: true };
+  //} else {
+  //throw new Error("Purchase verification failed");
+  //}
+  //});
+  //};
+  //public products = () => {
+  //const skus = Platform.select({
+  //ios: ["com.mikefrenodev."],
+  //android: ["com.mikefrenodev"],
+  //});
+  //getProducts({ skus }).then((products) => console.log(products));
+  //};
 
   private async databaseExecute({ sql, args }: databaseExecuteProps) {
     if (!this.db_name || !this.db_token) {

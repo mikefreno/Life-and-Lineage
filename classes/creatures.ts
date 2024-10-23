@@ -752,6 +752,9 @@ export class Enemy extends Creature {
     enemy.minions = enemy.minions.map((minion) =>
       minion.reinstateParent(enemy),
     );
+    enemy.conditions = enemy.conditions.map((cond) =>
+      cond.reinstateParent(enemy),
+    );
     return enemy;
   }
 }
@@ -853,7 +856,7 @@ export class Minion extends Creature {
    * @returns The created minion.
    */
   static fromJSON(json: any): Minion {
-    return new Minion({
+    const minion = new Minion({
       id: json.id,
       beingType: json.beingType,
       creatureSpecies: json.creatureSpecies,
@@ -872,6 +875,10 @@ export class Minion extends Creature {
         : [],
       parent: null,
     });
+    minion.conditions = minion.conditions.map((cond) =>
+      cond.reinstateParent(minion),
+    );
+    return minion;
   }
 }
 

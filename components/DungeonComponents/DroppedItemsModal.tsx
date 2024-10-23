@@ -3,7 +3,7 @@ import GenericModal from "../GenericModal";
 import { Item } from "../../classes/item";
 import { Pressable, View, Image } from "react-native";
 import { Text } from "../Themed";
-import { toTitleCase } from "../../utility/functions/misc";
+import { toTitleCase, wait } from "../../utility/functions/misc";
 import { useContext } from "react";
 import { AppContext } from "../../app/_layout";
 import { DungeonContext } from "./DungeonContext";
@@ -17,12 +17,12 @@ export default function DroppedItemsModal() {
   if (!dungeonData || !appData) throw new Error("missing context");
   const { playerState } = appData;
   const {
-    slug,
     inventoryFullNotifier,
     droppedItems,
     setLeftBehindDrops,
     setDroppedItems,
     setInventoryFullNotifier,
+    instanceName,
   } = dungeonData;
 
   function closeImmediateItemDrops() {
@@ -40,15 +40,21 @@ export default function DroppedItemsModal() {
           const updatedDrops = prevState!.itemDrops.filter(
             (itemDrop) => !itemDrop.equals(item),
           );
-          if (updatedDrops.length == 0) {
+          const updatedStoryDrops = prevState!.storyDrops.filter(
+            (itemDrop) => !itemDrop.equals(item),
+          );
+          if (updatedDrops.length == 0 && updatedStoryDrops.length == 0) {
             return null;
           }
           return {
             ...prevState,
             gold: prevState!.gold,
             itemDrops: updatedDrops,
+            storyDrops: updatedStoryDrops,
           };
         });
+
+        closeRoutingCheck();
       } else {
         setInventoryFullNotifier(true);
       }
@@ -73,28 +79,45 @@ export default function DroppedItemsModal() {
               ...prevState,
               gold: prevState!.gold,
               itemDrops: remainingDrops,
+              storyDrops: prevState?.storyDrops ?? [],
             }
           : null;
       });
+      closeRoutingCheck();
     }
   }
+  const doneLooting = () => {
+    closeImmediateItemDrops();
+    closeRoutingCheck();
+  };
+
+  const closeRoutingCheck = () => {
+    if (instanceName === "Activities") {
+      wait(600).then(() => {
+        while (router.canGoBack()) {
+          router.back();
+        }
+        router.replace("/shops");
+        router.push("/Activities");
+      });
+    }
+    if (instanceName === "Personal") {
+      wait(600).then(() => {
+        while (router.canGoBack()) {
+          router.back();
+        }
+        router.replace("/");
+        router.push("/Relationships");
+      });
+    }
+  };
 
   const vibration = useVibration();
 
   return (
     <GenericModal
       isVisibleCondition={!!droppedItems}
-      backFunction={() => {
-        if (slug[0] == "Activities") {
-          while (router.canGoBack()) {
-            router.back();
-          }
-          router.replace("/shops");
-          router.push("/Activities");
-        } else {
-          closeImmediateItemDrops();
-        }
-      }}
+      backFunction={doneLooting}
     >
       <>
         <View className="mt-4 flex flex-row justify-center">
@@ -139,17 +162,7 @@ export default function DroppedItemsModal() {
         ) : null}
         <Pressable
           className="mx-auto my-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
-          onPress={() => {
-            if (slug[0] == "Activities") {
-              while (router.canGoBack()) {
-                router.back();
-              }
-              router.replace("/shops");
-              router.push("/Activities");
-            } else {
-              closeImmediateItemDrops();
-            }
-          }}
+          onPress={doneLooting}
         >
           <Text>Done Looting</Text>
         </Pressable>

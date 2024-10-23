@@ -1,36 +1,108 @@
-import { Pressable } from "react-native";
-import { View, Text } from "../components/Themed";
+import { Pressable, ScrollView, View } from "react-native";
+import { View as ThemedView, Text } from "../components/Themed";
 import { Stack } from "expo-router";
 import deathMessages from "../assets/json/deathMessages.json";
 import { useContext, useEffect, useState } from "react";
 import { router } from "expo-router";
 import { CharacterImage } from "../components/CharacterImage";
-import { calculateAge } from "../utility/functions/misc";
-import { Character } from "../classes/character";
+import { calculateAge, wait } from "../utility/functions/misc";
+import { Character, PlayerCharacter } from "../classes/character";
 import { AppContext } from "./_layout";
 import GenericStrikeAround from "../components/GenericStrikeAround";
+import GenericModal from "../components/GenericModal";
+import GenericFlatButton from "../components/GenericFlatButton";
+import { Element, ElementToString, PlayerClassOptions } from "../utility/types";
+import { type VibrateProps, useVibration } from "../utility/customHooks";
+import {
+  NecromancerSkull,
+  PaladinHammer,
+  RangerIcon,
+  WizardHat,
+} from "../assets/icons/SVGIcons";
+import BlessingDisplay from "../components/BlessingsDisplay";
+import { Entypo } from "@expo/vector-icons";
+import { useColorScheme } from "nativewind";
+import { elementalColorMap } from "../constants/Colors";
+import { getStartingBaseStats } from "../utility/functions/characterAid";
+import { Item } from "../classes/item";
+import { savePlayer } from "../utility/functions/save_load";
 
 export default function DeathScreen() {
   const [nextLife, setNextLife] = useState<Character | null>(null);
+  const [deathMessage, setDeathMessage] = useState<string>("");
+  const [selectedClass, setSelectedClass] = useState<PlayerClassOptions | null>(
+    null,
+  );
+  const [selectedBlessing, setSelectedBlessing] = useState<Element | null>(
+    null,
+  );
+  const [page, setPage] = useState<number>(0);
 
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing contexts");
-  const { playerState, gameState } = appData;
+  const { playerState, gameState, dimensions } = appData;
+  const vibration = useVibration();
+  const { colorScheme } = useColorScheme();
 
-  function getDeathMessage() {
+  const getDeathMessage = () => {
     const randomIndex = Math.floor(Math.random() * deathMessages.length);
     return deathMessages[randomIndex].message;
-  }
+  };
 
   useEffect(() => {
     if (gameState) {
       gameState.hitDeathScreen();
     }
+    setDeathMessage(getDeathMessage());
   }, []);
 
   function startNewGame() {
     router.push("/NewGame");
   }
+  function createPlayerCharacter() {
+    if (nextLife && selectedClass && selectedBlessing && playerState) {
+      const inventory = [
+        ...playerState.inventory,
+        playerState.equipment.mainHand.name !== "unarmored"
+          ? playerState.equipment.mainHand
+          : null,
+        playerState.equipment.body,
+        playerState.equipment.head,
+        playerState.equipment.offHand,
+      ].filter((item): item is Item => item !== null);
+      //@ts-ignore
+      const newCharacter = new PlayerCharacter({
+        firstName: nextLife.firstName,
+        lastName: nextLife.lastName,
+        sex: nextLife.sex,
+        playerClass: selectedClass,
+        blessing: selectedBlessing,
+        parents: nextLife.parents ?? [],
+        birthdate: nextLife.birthdate,
+        investments: playerState?.investments,
+        gold: playerState.gold / playerState.children.length ?? 1,
+        keyItems: playerState?.keyItems,
+        inventory: inventory,
+        ...getStartingBaseStats({ playerClass: selectedClass }),
+      });
+      return newCharacter;
+    }
+  }
+  const startNextLife = () => {
+    const newPlayerCharacter = createPlayerCharacter();
+    if (newPlayerCharacter) {
+      savePlayer(newPlayerCharacter);
+      gameState?.inheritance();
+      wait(500).then(() => {
+        while (router.canGoBack()) {
+          router.back();
+        }
+        wait(200).then(() => {
+          router.replace("/");
+        });
+      });
+    }
+  };
 
   if (gameState && playerState) {
     return (
@@ -41,34 +113,100 @@ export default function DeathScreen() {
             headerShown: false,
           }}
         />
+        <GenericModal
+          isVisibleCondition={!!nextLife}
+          backFunction={() => setNextLife(null)}
+          size={100}
+        >
+          <View>
+            {page == 0 && (
+              <>
+                <MinimalClassSelect
+                  dimensions={dimensions}
+                  vibration={vibration}
+                  selectedClass={selectedClass}
+                  setSelectedClass={setSelectedClass}
+                  colorScheme={colorScheme}
+                />
+                <GenericFlatButton
+                  onPressFunction={() => setPage(1)}
+                  disabledCondition={!selectedClass}
+                >
+                  Select Blessing
+                </GenericFlatButton>
+              </>
+            )}
+            {page == 1 && selectedClass && (
+              <>
+                <Pressable onPress={() => setPage(0)} className="absolute z-50">
+                  <Entypo
+                    name="chevron-left"
+                    size={24}
+                    color={colorScheme === "dark" ? "#f4f4f5" : "black"}
+                  />
+                </Pressable>
+                <MinimalBlessingSelect
+                  playerClass={selectedClass}
+                  blessing={selectedBlessing}
+                  setBlessing={setSelectedBlessing}
+                  vibration={vibration}
+                  colorScheme={colorScheme}
+                  dimensions={dimensions}
+                />
+                <GenericFlatButton
+                  onPressFunction={startNextLife}
+                  disabledCondition={!selectedClass}
+                >
+                  Continue Lineage
+                </GenericFlatButton>
+              </>
+            )}
+          </View>
+        </GenericModal>
         <View className="flex h-full items-center justify-center">
           <Text
             className="py-8 text-center text-3xl font-bold"
             style={{ letterSpacing: 3, color: "#ef4444" }}
           >
             {playerState.currentSanity > -50
-              ? getDeathMessage()
+              ? deathMessage
               : "You have gone insane"}
           </Text>
           {playerState.children.length > 0 ? (
             <>
-              <Text className="text-xl">Continue as one of your children</Text>
-              {playerState.children?.map((child, idx) => (
-                <Pressable key={idx} onPress={() => setNextLife(child)}>
-                  <CharacterImage
-                    characterAge={calculateAge(
-                      new Date(child.birthdate),
-                      new Date(gameState.date),
-                    )}
-                    characterSex={child.sex == "male" ? "M" : "F"}
-                  />
-                </Pressable>
-              ))}
-              {nextLife ? (
-                <Pressable>
-                  <Text>{`Live on as ${nextLife.fullName}`}</Text>
-                </Pressable>
-              ) : null}
+              <Text className="text-xl">Continue as one of your children?</Text>
+              <View className="justify-center items-center h-64">
+                <ScrollView
+                  className="w-screen"
+                  horizontal
+                  contentContainerStyle={{
+                    flexGrow: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {playerState.children?.map((child, idx) => (
+                    <Pressable
+                      key={idx}
+                      onPress={() => setNextLife(child)}
+                      className="my-auto mx-2"
+                    >
+                      <ThemedView className="shadow-lg rounded-xl p-1">
+                        <Text className="text-center text-xl">
+                          {child.firstName}
+                        </Text>
+                        <CharacterImage
+                          characterAge={calculateAge(
+                            new Date(child.birthdate),
+                            new Date(gameState.date),
+                          )}
+                          characterSex={child.sex == "male" ? "M" : "F"}
+                        />
+                      </ThemedView>
+                    </Pressable>
+                  ))}
+                </ScrollView>
+              </View>
               <GenericStrikeAround>
                 <Text>Or</Text>
               </GenericStrikeAround>
@@ -83,5 +221,229 @@ export default function DeathScreen() {
         </View>
       </>
     );
+  }
+}
+
+function MinimalClassSelect({
+  dimensions,
+  vibration,
+  selectedClass,
+  setSelectedClass,
+  colorScheme,
+}: {
+  dimensions: {
+    height: number;
+    width: number;
+    greater: number;
+    lesser: number;
+  };
+  vibration: ({ style, essential }: VibrateProps) => void;
+  selectedClass: PlayerClassOptions | null;
+  setSelectedClass: React.Dispatch<
+    React.SetStateAction<PlayerClassOptions | null>
+  >;
+  colorScheme: "light" | "dark";
+}) {
+  const ClassPressable = ({
+    classOption,
+    Icon,
+    color,
+    rotate = 0,
+    flip = false,
+  }: {
+    classOption: PlayerClassOptions;
+    Icon: React.JSX.ElementType;
+    color: string;
+    rotate?: number;
+    flip?: boolean;
+  }) => {
+    return (
+      <Pressable
+        onPress={() => {
+          vibration({ style: "light" });
+          setSelectedClass(classOption);
+        }}
+        style={{
+          height: dimensions.height * 0.25,
+          width: dimensions.width * 0.4,
+        }}
+      >
+        {({ pressed }) => (
+          <View
+            className={`${
+              pressed || selectedClass === classOption
+                ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                : "border-transparent"
+            } w-full h-full border flex items-center justify-center`}
+          >
+            <View
+              className={`
+                ${flip ? "scale-x-[-1] transform" : ""}
+                ${
+                  rotate < 0
+                    ? `-rotate-${Math.abs(rotate)}`
+                    : rotate > 0
+                    ? `rotate-${rotate}`
+                    : ""
+                }
+              `.trim()}
+            >
+              <Icon
+                style={{ marginBottom: 5 }}
+                color={colorScheme === "dark" ? color : color}
+                height={dimensions.height * 0.15}
+                width={dimensions.height * 0.15}
+              />
+            </View>
+            <Text className="mx-auto text-xl" style={{ color }}>
+              {classOption.charAt(0).toUpperCase() + classOption.slice(1)}
+            </Text>
+          </View>
+        )}
+      </Pressable>
+    );
+  };
+
+  return (
+    <View className="flex items-center justify-evenly py-6">
+      <ThemedView className="mb-8 flex flex-row justify-between">
+        <ClassPressable
+          classOption={PlayerClassOptions.mage}
+          Icon={WizardHat}
+          color="#2563eb"
+        />
+        <ClassPressable
+          classOption={PlayerClassOptions.ranger}
+          Icon={RangerIcon}
+          color="green"
+          rotate={12}
+        />
+      </ThemedView>
+      <View className="flex flex-row justify-between">
+        <ClassPressable
+          classOption={PlayerClassOptions.necromancer}
+          Icon={NecromancerSkull}
+          color="#9333ea"
+          rotate={-12}
+        />
+        <ClassPressable
+          classOption={PlayerClassOptions.paladin}
+          Icon={PaladinHammer}
+          color="#fcd34d"
+          rotate={12}
+          flip={true}
+        />
+      </View>
+    </View>
+  );
+}
+
+function MinimalBlessingSelect({
+  playerClass,
+  blessing,
+  setBlessing,
+  vibration,
+  colorScheme,
+  dimensions,
+}: {
+  playerClass: PlayerClassOptions;
+  blessing: Element | null;
+  setBlessing: React.Dispatch<React.SetStateAction<Element | null>>;
+  vibration: ({ style, essential }: VibrateProps) => void;
+  colorScheme: "light" | "dark";
+  dimensions: {
+    height: number;
+    width: number;
+    greater: number;
+    lesser: number;
+  };
+}) {
+  const BlessingPressable = ({ element }: { element: Element }) => {
+    return (
+      <Pressable
+        onPress={() => {
+          vibration({ style: "light" });
+          setBlessing(element);
+        }}
+        style={{
+          height: dimensions.height * 0.25,
+          width: dimensions.width * 0.4,
+        }}
+      >
+        {({ pressed }) => (
+          <View
+            className={`${
+              pressed || blessing == element
+                ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+                : "border-transparent"
+            } w-full h-full border flex items-center justify-center`}
+          >
+            <BlessingDisplay
+              blessing={element}
+              colorScheme={colorScheme}
+              size={dimensions.height * 0.15}
+            />
+            <Text
+              style={{
+                color: elementalColorMap[element].light,
+                marginTop: 12,
+                marginBottom: -12,
+              }}
+            >
+              {ElementToString[element]}
+            </Text>
+          </View>
+        )}
+      </Pressable>
+    );
+  };
+
+  switch (playerClass) {
+    case PlayerClassOptions.mage:
+      return (
+        <View className="flex items-center justify-evenly py-6">
+          <ThemedView className="mb-8 flex flex-row justify-between">
+            <BlessingPressable element={Element.fire} />
+            <BlessingPressable element={Element.water} />
+          </ThemedView>
+          <ThemedView className="flex flex-row justify-between">
+            <BlessingPressable element={Element.air} />
+            <BlessingPressable element={Element.earth} />
+          </ThemedView>
+        </View>
+      );
+    case PlayerClassOptions.necromancer:
+      return (
+        <View className="flex items-center justify-evenly py-6">
+          <ThemedView className="mb-8 flex flex-row justify-between">
+            <BlessingPressable element={Element.summoning} />
+            <BlessingPressable element={Element.pestilence} />
+          </ThemedView>
+          <ThemedView className="flex flex-row justify-between">
+            <BlessingPressable element={Element.bone} />
+            <BlessingPressable element={Element.blood} />
+          </ThemedView>
+        </View>
+      );
+    case PlayerClassOptions.ranger:
+      return (
+        <View className="flex items-center justify-evenly py-6">
+          <BlessingPressable element={Element.beastMastery} />
+          <ThemedView className="mt-8 flex flex-row justify-between">
+            <BlessingPressable element={Element.arcane} />
+            <BlessingPressable element={Element.assassination} />
+          </ThemedView>
+        </View>
+      );
+    case PlayerClassOptions.paladin:
+      return (
+        <View className="flex items-center justify-evenly py-6">
+          <BlessingPressable element={Element.holy} />
+          <ThemedView className="mt-8 flex flex-row justify-between">
+            <BlessingPressable element={Element.vengeance} />
+            <BlessingPressable element={Element.protection} />
+          </ThemedView>
+        </View>
+      );
   }
 }

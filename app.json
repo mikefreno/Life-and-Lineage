@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Magic Delve",
-    "slug": "magic-delve",
-    "version": "0.4.1",
+    "name": "bloodline",
+    "slug": "bloodline",
+    "version": "0.5.0",
     "orientation": "portrait",
     "icon": "assets/images/icon.png",
-    "scheme": "magicdelveapp",
+    "scheme": "bloodlineapp",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -18,7 +18,7 @@
     "ios": {
       "usesAppleSignIn": true,
       "supportsTablet": true,
-      "bundleIdentifier": "com.mikefrenodev.magicdelve",
+      "bundleIdentifier": "com.mikefrenodev.bloodline",
       "buildNumber": "1",
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true,
@@ -30,38 +30,22 @@
         "foregroundImage": "assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.mikefrenodev.magicdelve",
+      "package": "com.mikefrenodev.bloodline",
       "versionCode": 1,
       "googleServicesFile": "./google-services.json"
     },
     "androidStatusBar": {
-      "hidden":true
+      "hidden": true
     },
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "metro": {
-      "requireCycleIgnorePatterns": [
-        "classes/creatures\\.ts",
-        "classes/item\\.ts",
-        "classes/attack\\.ts",
-        "classes/character\\.ts",
-        "utility/functions/save_load\\.ts",
-        "classes/game\\.ts"
-      ]
-    },
     "plugins": [
       "expo-router",
       "expo-apple-authentication",
       "expo-font",
-      [
-        "react-native-iap",
-        {
-          "paymentProvider": "Play Store"
-        }
-      ],
       [
         "@sentry/react-native/expo",
         {
@@ -84,7 +68,8 @@
           "backgroundColor": "#00000080"
         }
       ],
-      "./custom-plugins/androidIAPSetup"
+      "./custom-plugins/androidIAPSetup",
+      "./custom-plugins/androidStylesSetup.js"
     ],
     "experiments": {
       "typedRoutes": true
@@ -94,12 +79,13 @@
         "origin": false
       },
       "eas": {
-        "projectId": "2307d673-d206-4c58-8170-5dc30a9ec500"
+        "projectId": "568b9324-a4ba-421f-a938-94de1012c2f9"
       }
     },
-    "runtimeVersion": "0.3.0",
+    "runtimeVersion": "0.5.0",
     "updates": {
       "url": "https://u.expo.dev/2307d673-d206-4c58-8170-5dc30a9ec500"
-    }
+    },
+    "owner": "mikefrenodev"
   }
 }

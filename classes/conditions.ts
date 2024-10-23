@@ -25,7 +25,7 @@ export class Condition {
   readonly effectStyle: EffectStyle[];
   readonly effectMagnitude: number[];
   readonly icon: string;
-  on: PlayerCharacter | Enemy | Minion;
+  on: PlayerCharacter | Enemy | Minion | null;
 
   constructor({
     name,
@@ -69,7 +69,7 @@ export class Condition {
       () => [this.turns],
       () => {
         if (this.turns <= 0) {
-          this.on.removeCondition(this);
+          this.on?.removeCondition(this);
         }
       },
     );
@@ -107,6 +107,11 @@ export class Condition {
       );
     }
     return totalSanityDmg ? Math.round(totalSanityDmg * 4) / 4 : null;
+  }
+
+  public reinstateParent(parent: PlayerCharacter | Enemy | Minion) {
+    this.on = parent;
+    return this;
   }
 
   /**
@@ -260,6 +265,7 @@ export class Condition {
       placedby: json.placedby,
       aura: json.aura,
       placedbyID: json.placedByID,
+      on: null,
     });
     return condition;
   }

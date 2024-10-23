@@ -1,5 +1,5 @@
 import { View as ThemedView, Text } from "../../../components/Themed";
-import { Platform, Pressable } from "react-native";
+import { Platform } from "react-native";
 import {
   Character,
   PlayerCharacter,
@@ -18,9 +18,12 @@ import clearHistory, {
   wait,
 } from "../../../utility/functions/misc";
 import { Game } from "../../../classes/game";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { useVibration } from "../../../utility/customHooks";
-import { getRandomJobTitle } from "../../../utility/functions/characterAid";
+import {
+  getRandomJobTitle,
+  getStartingBaseStats,
+} from "../../../utility/functions/characterAid";
 import { createShops } from "../../../classes/shop";
 import { AppContext } from "../../_layout";
 import {
@@ -82,55 +85,6 @@ export default function NewGameReview() {
       birthdate: generateBirthday(32, 55),
     });
     return parent;
-  }
-
-  function getStartingBaseStats({
-    playerClass,
-  }: {
-    playerClass: PlayerClassOptions;
-  }) {
-    switch (playerClass) {
-      case PlayerClassOptions.necromancer:
-        return {
-          baseHealth: 80,
-          baseMana: 120,
-          baseStrength: 3,
-          baseIntelligence: 6,
-          baseDexterity: 4,
-          baseManaRegen: 6,
-          baseSanity: 40,
-        };
-      case PlayerClassOptions.paladin:
-        return {
-          baseHealth: 120,
-          baseMana: 80,
-          baseStrength: 6,
-          baseIntelligence: 4,
-          baseDexterity: 3,
-          baseManaRegen: 5,
-          baseSanity: 60,
-        };
-      case PlayerClassOptions.mage:
-        return {
-          baseHealth: 100,
-          baseMana: 100,
-          baseStrength: 5,
-          baseIntelligence: 5,
-          baseDexterity: 3,
-          baseManaRegen: 5,
-          baseSanity: 50,
-        };
-      case PlayerClassOptions.ranger:
-        return {
-          baseHealth: 90,
-          baseMana: 90,
-          baseStrength: 4,
-          baseIntelligence: 3,
-          baseDexterity: 7,
-          baseManaRegen: 5,
-          baseSanity: 50,
-        };
-    }
   }
 
   function createPlayerCharacter() {
