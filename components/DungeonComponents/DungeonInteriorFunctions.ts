@@ -43,6 +43,8 @@ function enemyDeathHandler({ dungeonData, appData }: ContextData) {
     setFightingBoss,
     battleLogger,
     setShouldShowFirstBossKillTutorialAfterItemDrops,
+    setEnemyAttackDummy,
+    setEnemyHealDummy,
   } = dungeonData;
   if (enemyState && playerState && gameState) {
     if (
@@ -74,6 +76,8 @@ function enemyDeathHandler({ dungeonData, appData }: ContextData) {
         playerState.killCharacter({ name: slug[2] });
       }
       setEnemy(null);
+      setEnemyAttackDummy(0);
+      setEnemyHealDummy(0);
       gameState.gameTick({ playerState });
       return true;
     } else {
@@ -99,7 +103,6 @@ export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
     throw new Error("missing context in enemyTurn()");
   const { enemyState, playerState, gameState } = appData;
   const {
-    setEnemyAttacked,
     setEnemyHealDummy,
     setEnemyAttackDummy,
     setEnemyTextString,
@@ -108,7 +111,6 @@ export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
     setAttackAnimationOnGoing,
   } = dungeonData;
   if (enemyState && playerState && gameState) {
-    setEnemyAttacked(true);
     const startOfTurnPlayerState = { ...playerState };
     const startOfTurnEnemyState = { ...enemyState };
     const enemyAttackRes = enemyState.takeTurn({ player: playerState });
@@ -215,17 +217,11 @@ export function getEnemy({ appData, dungeonData }: ContextData) {
   if (!appData || !dungeonData)
     throw new Error("missing context in getEnemy()");
   const { setEnemy } = appData;
-  const {
-    level,
-    instanceName,
-    setEnemyAttacked,
-    battleLogger,
-    setAttackAnimationOnGoing,
-  } = dungeonData;
+  const { level, instanceName, battleLogger, setAttackAnimationOnGoing } =
+    dungeonData;
   const enemy = enemyGenerator(instanceName, level);
   if (enemy) {
     setEnemy(enemy);
-    setEnemyAttacked(false);
     battleLogger(`You found a ${toTitleCase(enemy.creatureSpecies)}!`);
     setAttackAnimationOnGoing(false);
     dungeonSave({ enemy, dungeonData, appData });

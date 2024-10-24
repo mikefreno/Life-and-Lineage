@@ -33,7 +33,6 @@ export default function FleeModal({
   const { playerState, enemyState, setEnemy, gameState } = appData;
   const {
     slug,
-    enemyAttacked,
     setAttackAnimationOnGoing,
     attackAnimationOnGoing,
     battleLogger,
@@ -52,7 +51,6 @@ export default function FleeModal({
       const roll = rollD20();
       if (
         enemyState?.creatureSpecies == "training dummy" ||
-        !enemyAttacked ||
         roll > 13 ||
         !inCombat
       ) {

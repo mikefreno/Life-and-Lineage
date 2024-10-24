@@ -340,8 +340,6 @@ export interface DungeonContextType {
   thisInstance: DungeonInstance;
   attackAnimationOnGoing: boolean;
   setAttackAnimationOnGoing: React.Dispatch<React.SetStateAction<boolean>>;
-  enemyAttacked: boolean;
-  setEnemyAttacked: React.Dispatch<React.SetStateAction<boolean>>;
   enemyDodgeDummy: number;
   setEnemyDodgeDummy: React.Dispatch<React.SetStateAction<number>>;
   enemyHealDummy: number;

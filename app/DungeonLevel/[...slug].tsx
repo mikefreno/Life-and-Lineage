@@ -48,7 +48,6 @@ const DungeonProvider = observer(() => {
   const [thisInstance, setThisInstance] = useState<DungeonInstance>();
   const [thisDungeon, setThisDungeon] = useState<DungeonLevel>();
   const [leftBehindDrops, setLeftBehindDrops] = useState<Item[]>([]);
-  const [enemyAttacked, setEnemyAttacked] = useState<boolean>(false);
   const [attackAnimationOnGoing, setAttackAnimationOnGoing] =
     useState<boolean>(false);
   const [enemyAttackDummy, setEnemyAttackDummy] = useState<number>(0);
@@ -116,7 +115,6 @@ const DungeonProvider = observer(() => {
         const enemy = enemyGenerator(instanceName, level, name);
         if (!enemy) throw new Error(`missing enemy, slug: ${slug}`);
         setEnemy(enemy);
-        setEnemyAttacked(true);
         setInCombat(true);
         setFirstLoad(false);
       });
@@ -145,7 +143,6 @@ const DungeonProvider = observer(() => {
         if (playerState.currentDungeon.enemy) {
           setFightingBoss(playerState.currentDungeon.fightingBoss);
           setInCombat(true);
-          setEnemyAttacked(true);
           setAttackAnimationOnGoing(false);
         }
       } else if (thisDungeon) {
@@ -216,8 +213,6 @@ const DungeonProvider = observer(() => {
           thisInstance,
           attackAnimationOnGoing,
           setAttackAnimationOnGoing,
-          enemyAttacked,
-          setEnemyAttacked,
           enemyHealDummy,
           enemyDodgeDummy,
           setEnemyDodgeDummy,

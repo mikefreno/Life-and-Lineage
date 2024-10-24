@@ -388,6 +388,8 @@ const PlayerStatus = observer(
           ? "#f87171"
           : popUp == "sanity"
           ? "#c084fc"
+          : colorScheme == "dark"
+          ? "white"
           : "black";
       if (diff) {
         return (
