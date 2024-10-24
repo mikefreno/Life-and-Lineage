@@ -170,8 +170,10 @@ export default function InventoryRender({
               const price = itemStack[0].getSellPrice(
                 shop.shopKeeper.affection,
               );
-              playerState?.sellItem(itemStack, price);
-              shop.buyItem(itemStack, price);
+              if (price <= shop.currentGold) {
+                playerState?.sellItem(itemStack, price);
+                shop.buyItem(itemStack, price);
+              }
             }
           },
         );

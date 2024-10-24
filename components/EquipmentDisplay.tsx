@@ -197,7 +197,7 @@ export default function EquipmentDisplay({
                 >
                   <View
                     className={`${
-                      itemStack[0].playerHasRequirements(playerState)
+                      itemStack[0].playerHasRequirements
                         ? "bg-zinc-400"
                         : "bg-red-800"
                     } items-center rounded-lg`}
@@ -229,9 +229,7 @@ export default function EquipmentDisplay({
           ) : slot === "Off-Hand" && isTwoHanded ? (
             <View
               className={`${
-                playerState.equipment.mainHand.playerHasRequirements(
-                  playerState,
-                )
+                playerState.equipment.mainHand.playerHasRequirements
                   ? "bg-zinc-400"
                   : "bg-red-800"
               } mx-auto z-10 items-center rounded-lg border border-zinc-400`}

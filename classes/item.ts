@@ -12,12 +12,14 @@ import {
   ItemClassType,
   PlayerClassOptions,
   type ItemOptions,
+  ItemEffect,
 } from "../utility/types";
 import type { PlayerCharacter } from "./character";
 import { Spell } from "./spell";
 import { Attack } from "./attack";
 import attackObjects from "../assets/json/playerAttacks.json";
-import { action, computed, makeObservable } from "mobx";
+import { action, computed, makeObservable, observable } from "mobx";
+import { Condition } from "./conditions";
 
 export class Item {
   readonly id: string;
@@ -40,9 +42,10 @@ export class Item {
     intelligence?: number;
     dexterity?: number;
   };
-  readonly playerClass: PlayerClassOptions;
-  readonly attackStrings: string[];
-  readonly description: string | undefined;
+  player: PlayerCharacter | null;
+  readonly attacks: string[];
+  readonly description: string | null;
+  readonly effect: ItemEffect | null;
 
   constructor({
     id,
@@ -53,10 +56,11 @@ export class Item {
     itemClass,
     icon,
     requirements = {},
-    playerClass,
+    player,
     attacks = [],
     stackable = false,
     description,
+    effect,
   }: ItemOptions) {
     this.id = id ?? Crypto.randomUUID();
     this.name = name;
@@ -67,12 +71,16 @@ export class Item {
     this.icon = icon;
     this.requirements = requirements;
     this.stackable = stackable;
-    this.playerClass = playerClass;
-    this.attackStrings = attacks;
-    this.description = description;
+    this.player = player;
+    this.attacks = attacks;
+    this.description = description ?? null;
+    this.effect = effect ?? null;
+
     makeObservable(this, {
       attachedSpell: computed,
-      attachedAttacks: action,
+      attachedAttacks: computed,
+      playerHasRequirements: computed,
+      reinstatePlayer: action,
     });
   }
 
@@ -80,28 +88,32 @@ export class Item {
     return !!this.slot;
   }
 
-  public playerHasRequirements(player: PlayerCharacter) {
-    if (
-      this.requirements.strength &&
-      this.requirements.strength >
-        player.baseStrength + player.allocatedSkillPoints[Attribute.strength]
-    ) {
-      return false;
-    }
-    if (
-      this.requirements.intelligence &&
-      this.requirements.intelligence >
-        player.baseIntelligence +
-          player.allocatedSkillPoints[Attribute.intelligence]
-    ) {
-      return false;
-    }
-    if (
-      this.requirements.dexterity &&
-      this.requirements.dexterity >
-        player.baseDexterity + player.allocatedSkillPoints[Attribute.dexterity]
-    ) {
-      return false;
+  get playerHasRequirements() {
+    if (this.player) {
+      if (
+        this.requirements.strength &&
+        this.requirements.strength >
+          this.player.baseStrength +
+            this.player.allocatedSkillPoints[Attribute.strength]
+      ) {
+        return false;
+      }
+      if (
+        this.requirements.intelligence &&
+        this.requirements.intelligence >
+          this.player.baseIntelligence +
+            this.player.allocatedSkillPoints[Attribute.intelligence]
+      ) {
+        return false;
+      }
+      if (
+        this.requirements.dexterity &&
+        this.requirements.dexterity >
+          this.player.baseDexterity +
+            this.player.allocatedSkillPoints[Attribute.dexterity]
+      ) {
+        return false;
+      }
     }
 
     return true;
@@ -127,13 +139,18 @@ export class Item {
     return Math.round(this.baseValue * (1.4 - affection / 2500));
   }
 
-  public attachedAttacks(playerState: PlayerCharacter) {
+  get attachedAttacks() {
     const builtAttacks: Attack[] = [];
-    this.attackStrings.forEach((attackString) => {
+    this.attacks.forEach((attackString) => {
       const found = attackObjects.find((obj) => obj.name == attackString);
-      if (found) {
-        // @ts-ignore
-        builtAttacks.push(new Attack({ ...found, user: playerState }));
+      if (found && this.player) {
+        builtAttacks.push(
+          new Attack({
+            ...found,
+            user: this.player,
+            targets: found.targets as "single" | "cleave" | "aoe",
+          }),
+        );
       }
     });
     return builtAttacks;
@@ -143,7 +160,7 @@ export class Item {
     if (this.itemClass == ItemClassType.Book) {
       let spell: any;
       let bookObj: any;
-      switch (this.playerClass) {
+      switch (this.player?.playerClass) {
         case PlayerClassOptions.mage:
           bookObj = mageBooks.find((book) => book.name == this.name);
           spell = mageSpells.find(
@@ -180,6 +197,13 @@ export class Item {
     }
   }
 
+  public reinstatePlayer(player: PlayerCharacter) {
+    if (this.player == null) {
+      this.player = player;
+    }
+    return this;
+  }
+
   static fromJSON(json: any): Item {
     const item = new Item({
       id: json.id,
@@ -192,7 +216,11 @@ export class Item {
       requirements: json.requirements,
       icon: json.icon,
       attacks: json.attacks,
-      playerClass: json.playerClass,
+      player: null,
+      effect:
+        json.effect && "condition" in json.effect
+          ? { condition: Condition.fromJSON(json.effect.condition) }
+          : json.effect,
     });
 
     return item;

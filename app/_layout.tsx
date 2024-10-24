@@ -134,8 +134,10 @@ const Root = observer(() => {
       const { game, player } = await fullLoad();
 
       if (game && player) {
+        game.refreshAllShops(player);
         setGameData(game);
         setColorScheme(game.colorScheme);
+        player.reinstateLinks();
         setPlayerCharacter(player);
       }
 

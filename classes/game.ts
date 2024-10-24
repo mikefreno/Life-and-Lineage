@@ -345,6 +345,10 @@ export class Game {
     return clone;
   }
 
+  public refreshAllShops(player: PlayerCharacter) {
+    this.shops.forEach((shop) => shop.refreshInventory(player));
+  }
+
   static fromJSON(json: any): Game {
     const game = new Game({
       date: json.date,

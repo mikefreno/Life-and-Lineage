@@ -553,7 +553,7 @@ export class Creature {
    * @param bossFight - Indicates if the fight is against a boss.
    * @returns An object containing item drops and gold.
    */
-  public getDrops(playerClass: PlayerClassOptions, bossFight: boolean) {
+  public getDrops(player: PlayerCharacter, bossFight: boolean) {
     if (this.gotDrops) return {};
     let enemyObj;
     let storyDrops: Item[] = [];
@@ -570,7 +570,7 @@ export class Creature {
               ...storyItemObj,
               itemClass: ItemClassType.StoryItem,
               stackable: false,
-              playerClass,
+              player,
             });
             storyDrops.push(storyItem);
           }
@@ -594,7 +594,7 @@ export class Creature {
       dropList.forEach((drop) => {
         const roll = rollD20();
         if (roll >= 20 - drop.chance * 20) {
-          const items = itemList(drop.itemType, playerClass);
+          const items = itemList(drop.itemType, player.playerClass);
           const itemObj = items.find((item) => item.name == drop.item);
           if (itemObj) {
             itemDrops.push(
@@ -602,7 +602,7 @@ export class Creature {
                 ...itemObj,
                 itemClass: drop.itemType,
                 stackable: isStackable(drop.itemType as ItemClassType),
-                playerClass,
+                player,
               }),
             );
           }

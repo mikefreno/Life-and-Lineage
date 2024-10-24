@@ -55,7 +55,7 @@ function enemyDeathHandler({ dungeonData, appData }: ContextData) {
         `You defeated the ${toTitleCase(enemyState.creatureSpecies)}`,
       );
       const { itemDrops, storyDrops, gold } = enemyState.getDrops(
-        playerState.playerClass,
+        playerState,
         fightingBoss,
       );
       if (itemDrops) {

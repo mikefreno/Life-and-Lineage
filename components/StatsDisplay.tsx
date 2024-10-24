@@ -97,7 +97,7 @@ export function StatsDisplay({
         reqs.dexterity <=
           playerState.baseDexterity +
             playerState.allocatedSkillPoints[Attribute.dexterity];
-      if (item.playerHasRequirements(playerState)) return null;
+      if (item.playerHasRequirements) return null;
       return (
         <View className="flex items-center p-1 rounded-lg border border-red-700">
           <Text>Requires:</Text>
@@ -326,13 +326,11 @@ export function StatsDisplay({
       >
         <View>
           {playerState &&
-            displayItem.item[0]
-              .attachedAttacks(playerState)
-              .map((attack) => (
-                <View key={`${displayItem.item[0].id}-${attack.name}`}>
-                  {attack.AttackRender(displayItem.item[0].stats?.damage)}
-                </View>
-              ))}
+            displayItem.item[0].attachedAttacks.map((attack) => (
+              <View key={`${displayItem.item[0].id}-${attack.name}`}>
+                {attack.AttackRender(displayItem.item[0].stats?.damage)}
+              </View>
+            ))}
         </View>
       </GenericModal>
       <View

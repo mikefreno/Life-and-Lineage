@@ -22,6 +22,7 @@ import InventoryRender from "../../components/InventoryRender";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import { Coins } from "../../assets/icons/SVGIcons";
 import { TutorialOption } from "../../utility/types";
+import ProgressBar from "../../components/ProgressBar";
 
 const TEN_MINUTES = 10 * 60 * 1000;
 //const ONE_SECOND = 1000;
@@ -59,12 +60,14 @@ const ShopInteriorScreen = observer(() => {
   }, [inventoryFullNotifier]);
 
   useEffect(() => {
-    if (
-      playerState &&
-      thisShop &&
-      new Date(thisShop.lastStockRefresh) < new Date(Date.now() - REFRESH_TIME)
-    ) {
-      thisShop.refreshInventory();
+    if (playerState && thisShop) {
+      if (
+        new Date(thisShop.lastStockRefresh) <
+        new Date(Date.now() - REFRESH_TIME)
+      ) {
+        thisShop.refreshInventory();
+      }
+      thisShop.setPlayerToInventory(playerState);
     }
     setRefreshCheck(true);
   }, [playerState]);
@@ -219,7 +222,7 @@ const ShopInteriorScreen = observer(() => {
         <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
           <ThemedView className="flex-1 justify-between">
             <ThemedView className="flex h-[40%] flex-row justify-between">
-              <View className="w-1/3 items-center my-auto">
+              <View className="items-center w-1/3 my-auto px-1">
                 <CharacterImage
                   characterAge={calculateAge(
                     new Date(thisShop.shopKeeper.birthdate),
@@ -230,13 +233,19 @@ const ShopInteriorScreen = observer(() => {
                 <Text className="text-center">
                   {thisShop.shopKeeper.fullName}'s Inventory
                 </Text>
-                <View className="flex flex-row">
+                <View className="flex flex-row mb-1">
                   <Text>{thisShop.currentGold}</Text>
                   <Coins width={16} height={16} style={{ marginLeft: 6 }} />
                 </View>
+                <ProgressBar
+                  value={thisShop.shopKeeper.affection}
+                  maxValue={100}
+                  filledColor="#ef4444"
+                  unfilledColor="#fca5a5"
+                />
               </View>
               <View
-                className="mx-2 -mt-1 w-2/3 rounded border border-zinc-300 dark:border-zinc-700"
+                className="px-2 -mt-1 shadow-soft w-2/3 rounded-l border-l border-b border-zinc-300 dark:border-zinc-700"
                 ref={shopInventoryTarget}
               >
                 <ScrollView className="my-auto">

@@ -2,6 +2,9 @@
    {
       "name":"test poison 1",
       "icon":"Green_Potion",
+      "effect":{
+         "isPoison": true
+      },
       "baseValue": 500
    },
    {

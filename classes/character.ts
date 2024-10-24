@@ -37,7 +37,6 @@ import type {
   BoundingBox,
   Tile,
 } from "../components/DungeonComponents/DungeonMap";
-import { Attack } from "./attack";
 import { Spell } from "./spell";
 import { savePlayer } from "../utility/functions/save_load";
 
@@ -590,7 +589,8 @@ export class PlayerCharacter extends Character {
         stats: { baseDamage: 1 },
         baseValue: 0,
         itemClass: ItemClassType.Melee,
-        playerClass: PlayerClassOptions[playerClass],
+        player: null,
+        attacks: ["punch"],
       }),
       offHand: null,
       head: null,
@@ -703,6 +703,7 @@ export class PlayerCharacter extends Character {
       unEquipItem: action,
       getInventory: observable,
       getDamageReduction: action,
+      reinstateLinks: action,
 
       getMedicalService: action,
       setInDungeon: action,
@@ -1074,21 +1075,23 @@ export class PlayerCharacter extends Character {
 
     for (const [_, item] of Object.entries(this.equipment)) {
       if (item && "length" in item) {
-        const stats = item[0]?.stats;
-        if (!stats || !item[0].playerHasRequirements(this)) continue;
-        armor += stats.armor ?? 0;
-        damage += stats.damage ?? 0;
-        mana += stats.mana ?? 0;
-        regen += stats.regen ?? 0;
-        health += stats.health ?? 0;
-        sanity += stats.sanity ?? 0;
-        blockChance += stats.blockChance ?? 0;
-        strength += stats.strength ?? 0;
-        intelligence += stats.intelligence ?? 0;
-        dexterity += stats.dexterity ?? 0;
+        if (this.equipment.mainHand.itemClass === ItemClassType.Bow) {
+          const stats = item[0]?.stats;
+          if (!stats || !item[0].playerHasRequirements) continue;
+          armor += stats.armor ?? 0;
+          damage += stats.damage ?? 0;
+          mana += stats.mana ?? 0;
+          regen += stats.regen ?? 0;
+          health += stats.health ?? 0;
+          sanity += stats.sanity ?? 0;
+          blockChance += stats.blockChance ?? 0;
+          strength += stats.strength ?? 0;
+          intelligence += stats.intelligence ?? 0;
+          dexterity += stats.dexterity ?? 0;
+        }
       } else {
         const stats = item?.stats;
-        if (!stats || !item.playerHasRequirements(this)) continue;
+        if (!stats || !item.playerHasRequirements) continue;
         armor += stats.armor ?? 0;
         damage += stats.damage ?? 0;
         mana += stats.mana ?? 0;
@@ -1283,6 +1286,7 @@ export class PlayerCharacter extends Character {
       baseValue: 0,
       itemClass: ItemClassType.Melee,
       playerClass: this.playerClass,
+      attacks: ["punch"],
     });
   }
 
@@ -1324,8 +1328,6 @@ export class PlayerCharacter extends Character {
 
   public performLabor({ title, cost, goldReward }: performLaborProps) {
     if (this.currentMana >= cost.mana) {
-      this.clearMinions();
-      //make sure state is aligned
       if (this.job !== title) {
         throw new Error("Requested Labor on unassigned profession");
       } else {
@@ -1814,53 +1816,7 @@ export class PlayerCharacter extends Character {
   }
   //----------------------------------Physical Combat----------------------------------//
   get physicalAttacks() {
-    let builtAttacks: Attack[] = [];
-    if (this.equipment.mainHand) {
-      let itemObj;
-      itemObj = melee.find(
-        (weapon) => weapon.name == this.equipment.mainHand!.name,
-      );
-      if (!itemObj) {
-        itemObj = wands.find(
-          (weapon) => weapon.name == this.equipment.mainHand!.name,
-        );
-      }
-      if (!itemObj) {
-        itemObj = bows.find(
-          (weapon) => weapon.name == this.equipment.mainHand!.name,
-        );
-      }
-      if (itemObj) {
-        const attackStrings = itemObj.attacks;
-        attacks.filter((attack) => {
-          if (attackStrings.includes(attack.name)) {
-            const builtAttack = Attack.fromJSON({ ...attack, user: this });
-            builtAttacks.push(builtAttack);
-          }
-        });
-      } else {
-        const punchObj = attacks.find(
-          (attackObj) => attackObj.name == "punch",
-        )!;
-        const attack = new Attack({
-          name: punchObj.name,
-          damageMult: punchObj.damageMult,
-          hitChance: punchObj.damageMult,
-          user: this,
-        });
-        builtAttacks.push(attack);
-      }
-    } else {
-      const punchObj = attacks.find((attackObj) => attackObj.name == "punch")!;
-      const attack = new Attack({
-        name: punchObj.name,
-        damageMult: punchObj.damageMult,
-        hitChance: punchObj.damageMult,
-        user: this,
-      });
-      builtAttacks.push(attack);
-    }
-    return builtAttacks;
+    return this.equipment.mainHand.attachedAttacks;
   }
 
   public useArrow() {
@@ -2095,6 +2051,20 @@ export class PlayerCharacter extends Character {
     }
   }
 
+  public reinstateLinks() {
+    this.minions = this.minions.map((minion) => minion.reinstateParent(this));
+    this.rangerPet = this.rangerPet?.reinstateParent(this) ?? null;
+    this.conditions = this.conditions.map((cond) => cond.reinstateParent(this));
+    this.inventory = this.inventory.map((item) => item.reinstatePlayer(this));
+    this.equipment.mainHand = this.equipment.mainHand.reinstatePlayer(this);
+    this.equipment.offHand =
+      this.equipment.offHand?.reinstatePlayer(this) ?? null;
+    this.equipment.body = this.equipment.body?.reinstatePlayer(this) ?? null;
+    this.equipment.head = this.equipment.head?.reinstatePlayer(this) ?? null;
+    this.equipment.quiver =
+      this.equipment.quiver?.map((item) => item.reinstatePlayer(this)) ?? null;
+  }
+
   /**
    * Creates a PlayerCharacter instance from a JSON object
    * @param json - JSON representation of a PlayerCharacter
@@ -2193,13 +2163,6 @@ export class PlayerCharacter extends Character {
       baseIntelligence: json.baseIntelligence,
       baseDexterity: json.baseDexterity,
     });
-    player.minions = player.minions.map((minion) =>
-      minion.reinstateParent(player),
-    );
-    player.rangerPet = player.rangerPet?.reinstateParent(player) ?? null;
-    player.conditions = player.conditions.map((cond) =>
-      cond.reinstateParent(player),
-    );
     return player;
   }
 }

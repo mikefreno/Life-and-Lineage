@@ -1,8 +1,11 @@
 [
    {
-      "name":"test potions 1",
+      "name":"basic healing potion",
       "icon":"Red_Potion",
-      "baseValue": 500
+      "effect":{
+         "isPoison": false 
+      },
+      "baseValue": 100
    },
    {
       "name":"test potions 2",

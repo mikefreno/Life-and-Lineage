@@ -1,7 +1,7 @@
 import { Item, isStackable } from "./item";
 import shops from "../assets/json/shops.json";
 import { action, makeObservable, observable } from "mobx";
-import { Character } from "./character";
+import { Character, PlayerCharacter } from "./character";
 import {
   getRandomName,
   toTitleCase,
@@ -18,7 +18,6 @@ interface ShopProps {
   inventory?: Item[];
   shopKeeper: Character;
   archetype: string;
-  playerClass: PlayerClassOptions;
 }
 
 /**
@@ -30,7 +29,6 @@ export class Shop {
   currentGold: number;
   lastStockRefresh: string;
   inventory: Item[];
-  playerClass: PlayerClassOptions;
   shopKeeper: Character;
   readonly archetype: string;
 
@@ -41,14 +39,12 @@ export class Shop {
     inventory,
     shopKeeper,
     archetype,
-    playerClass,
   }: ShopProps) {
     this.baseGold = baseGold;
     this.currentGold = currentGold ?? baseGold;
     this.lastStockRefresh =
       lastStockRefresh.toISOString() ?? new Date().toISOString();
     this.inventory = inventory ?? [];
-    this.playerClass = playerClass;
     this.archetype = archetype;
     this.shopKeeper = shopKeeper;
     makeObservable(this, {
@@ -62,7 +58,7 @@ export class Shop {
     });
   }
 
-  public refreshInventory() {
+  public refreshInventory(player: PlayerCharacter) {
     const shopObj = shops.find((shop) => shop.type == this.archetype);
     if (shopObj) {
       const newCount = getRandomInt(
@@ -72,7 +68,7 @@ export class Shop {
       this.inventory = generateInventory(
         newCount,
         shopObj.trades as ItemClassType[],
-        this.playerClass,
+        player,
       );
       this.lastStockRefresh = new Date().toISOString();
       this.currentGold = this.baseGold;
@@ -81,8 +77,12 @@ export class Shop {
     }
   }
 
+  public setPlayerToInventory(player: PlayerCharacter) {
+    this.inventory = this.inventory.map((item) => item.reinstatePlayer(player));
+  }
+
   private changeAffection(change: number) {
-    this.shopKeeper.affection += Math.floor(change * 4) / 4;
+    this.shopKeeper.updateAffection(Math.floor(change * 4) / 4);
   }
 
   public buyItem(itemOrItems: Item | Item[], buyPrice: number) {
@@ -94,7 +94,7 @@ export class Shop {
         this.inventory.push(item);
       });
       this.currentGold -= totalCost;
-      this.changeAffection((totalCost / 1000) * items.length);
+      this.changeAffection((totalCost / 5000) * items.length);
     } else {
       throw new Error("Not enough gold to complete the purchase");
     }
@@ -157,25 +157,17 @@ export class Shop {
       currentGold: json.currentGold,
       lastStockRefresh: new Date(json.lastStockRefresh),
       archetype: json.archetype,
-      playerClass: json.playerClass,
       inventory: json.inventory
         ? json.inventory.map((item: any) => Item.fromJSON(item))
         : [],
     });
-    if (shop.inventory.length == 0) {
-      shop.refreshInventory();
-    }
-    shop.refreshInventory();
     return shop;
   }
 }
 
 //----------------------associated functions----------------------//
-function getAnItemByType(
-  type: ItemClassType,
-  playerClass: PlayerClassOptions,
-): Item {
-  const itemJSONMap = getItemJSONMap(playerClass);
+function getAnItemByType(type: ItemClassType, player: PlayerCharacter): Item {
+  const itemJSONMap = getItemJSONMap(player.playerClass);
 
   if (!(type in itemJSONMap)) {
     throw new Error(`Invalid type passed to getAnItemByType(): ${type}`);
@@ -189,19 +181,19 @@ function getAnItemByType(
     ...itemObj,
     itemClass: type,
     stackable: isStackable(type as ItemClassType),
-    playerClass: playerClass,
+    player,
   });
 }
 
 export function generateInventory(
   inventoryCount: number,
   trades: ItemClassType[],
-  playerClass: PlayerClassOptions,
+  player: PlayerCharacter,
 ) {
   let items: Item[] = [];
   for (let i = 0; i < inventoryCount; i++) {
     const type = trades[Math.floor(Math.random() * trades.length)];
-    items.push(getAnItemByType(type, playerClass));
+    items.push(getAnItemByType(type, player));
   }
   return items;
 }

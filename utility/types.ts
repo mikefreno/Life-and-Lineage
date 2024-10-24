@@ -7,6 +7,7 @@ import React from "react";
 import { BoundingBox, Tile } from "../components/DungeonComponents/DungeonMap";
 import { Attack } from "../classes/attack";
 import { Spell } from "../classes/spell";
+import { type Condition } from "../classes/conditions";
 
 export interface ItemOptions {
   id?: string;
@@ -18,10 +19,25 @@ export interface ItemOptions {
   icon?: string;
   requirements?: { strength?: number; intelligence?: number };
   stackable?: boolean;
-  playerClass: PlayerClassOptions;
+  player: PlayerCharacter | null;
   attacks?: string[];
   description?: string;
+  effect?: ItemEffect;
 }
+
+type StatEffect = {
+  stat: Attribute;
+  amount: number;
+  turns: number;
+  isPoison?: boolean;
+};
+
+type ConditionEffect = {
+  condition: Condition;
+};
+
+export type ItemEffect = StatEffect | ConditionEffect;
+
 export enum ItemClassType {
   Artifact = "artifact",
   Bow = "bow",
@@ -297,7 +313,7 @@ export type ConditionType = {
   placedbyID: string;
   aura?: boolean;
   icon: string;
-  on: PlayerCharacter | Enemy | Minion;
+  on: PlayerCharacter | Enemy | Minion | null;
 };
 
 export type ConditionObjectType = {
