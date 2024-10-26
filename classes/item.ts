@@ -20,6 +20,7 @@ import { Attack } from "./attack";
 import attackObjects from "../assets/json/playerAttacks.json";
 import { action, computed, makeObservable, observable } from "mobx";
 import { Condition } from "./conditions";
+import { wait } from "../utility/functions/misc";
 
 export class Item {
   readonly id: string;
@@ -142,11 +143,11 @@ export class Item {
   }
 
   public getSellPrice(affection: number) {
-    return this.baseValue * (0.6 + affection / 2500);
+    return Math.round(this.baseValue * (0.6 + affection / 250));
   }
 
   public getBuyPrice(affection: number) {
-    return Math.round(this.baseValue * (1.4 - affection / 2500));
+    return Math.round(this.baseValue * (1.4 - affection / 250));
   }
 
   get attachedAttacks() {
@@ -207,7 +208,10 @@ export class Item {
     }
   }
 
-  public use() {
+  /**
+   * callback provided in the dungeon
+   */
+  public use(callback?: () => void) {
     if (!this.player) throw new Error(`Missing player on item! ${this.name}`);
     if (!this.effect) {
       throw new Error("Called 'use' on an invalid item!");
@@ -219,6 +223,9 @@ export class Item {
         this.usePotion(this.effect);
       }
       this.player.removeFromInventory(this);
+      if (callback) {
+        wait(500).then(() => callback());
+      }
     } catch (error) {
       //@ts-ignore
       throw new Error(`Failed to use item ${this.name}: ${error.message}`);
@@ -233,6 +240,9 @@ export class Item {
     }
     const amt = this.calculateEffectAmount(effect.amount);
     this.applyStatEffect(effect.stat, amt);
+    if (this.player.inCombat) {
+      this.player.endTurn();
+    }
   }
 
   private applyStatEffect(stat: "health" | "mana" | "sanity", amount: number) {
@@ -306,6 +316,7 @@ export class Item {
         json.effect && "condition" in json.effect
           ? { condition: Condition.fromJSON(json.effect.condition) }
           : json.effect,
+      activePoison: json.activePoison,
     });
 
     return item;

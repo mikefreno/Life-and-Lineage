@@ -352,6 +352,14 @@ export class Creature {
       this.energy -= energyCost;
     }
   }
+
+  public damageEnergy(damage: number) {
+    if (this.energy && this.energy < damage) {
+      this.energy = 0;
+    } else if (this.energy) {
+      this.energy -= damage;
+    }
+  }
   //---------------------------Armor---------------------------//
   /**
    * Calculates the damage reduction of the creature based on its armor and condition effects.

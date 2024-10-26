@@ -4,10 +4,6 @@ import {
 } from "../utility/functions/conditions";
 import { Condition } from "./conditions";
 import { Item } from "./item";
-import attacks from "../assets/json/playerAttacks.json";
-import melee from "../assets/json/items/melee.json";
-import wands from "../assets/json/items/wands.json";
-import bows from "../assets/json/items/bows.json";
 import mageSpells from "../assets/json/mageSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
@@ -366,6 +362,7 @@ type PlayerCharacterBase = {
   unAllocatedSkillPoints?: number;
   allocatedSkillPoints?: Record<Attribute, number>;
   alive?: boolean;
+  inCombat: boolean;
 };
 
 type MageCharacter = PlayerCharacterBase & {
@@ -460,6 +457,7 @@ export class PlayerCharacter extends Character {
    * Story Items, this can be directly rendered, none of these stack
    */
   keyItems: Item[];
+  inCombat: boolean;
   currentDungeon: {
     instance: string;
     level: string;
@@ -521,6 +519,7 @@ export class PlayerCharacter extends Character {
     unAllocatedSkillPoints,
     allocatedSkillPoints,
     keyItems,
+    inCombat,
   }: PlayerCharacterOptions) {
     super({
       id,
@@ -582,6 +581,7 @@ export class PlayerCharacter extends Character {
     this.inventory = inventory ?? [];
     this.keyItems = keyItems ?? [];
     this.currentDungeon = currentDungeon ?? null;
+    this.inCombat = inCombat ?? false;
     this.equipment = equipment ?? {
       mainHand: new Item({
         name: "unarmored",
@@ -869,6 +869,14 @@ export class PlayerCharacter extends Character {
 
   public useMana(mana: number) {
     this.currentMana -= mana;
+  }
+
+  public damageMana(damage: number) {
+    if (this.currentMana < damage) {
+      this.currentMana = 0;
+    } else {
+      this.currentMana -= damage;
+    }
   }
 
   public restoreMana(amount: number) {
@@ -2163,6 +2171,7 @@ export class PlayerCharacter extends Character {
       baseStrength: json.baseStrength,
       baseIntelligence: json.baseIntelligence,
       baseDexterity: json.baseDexterity,
+      inCombat: json.inCombat,
     });
     return player;
   }

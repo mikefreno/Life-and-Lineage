@@ -65,7 +65,7 @@ const ShopInteriorScreen = observer(() => {
         new Date(thisShop.lastStockRefresh) <
         new Date(Date.now() - REFRESH_TIME)
       ) {
-        thisShop.refreshInventory();
+        thisShop.refreshInventory(playerState);
       }
       thisShop.setPlayerToInventory(playerState);
     }

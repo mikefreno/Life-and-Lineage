@@ -9,7 +9,7 @@ import { PlayerCharacter } from "./character";
 import { Enemy, Minion } from "./creatures";
 import { AttackUse, ItemClassType } from "../utility/types";
 import AttackDetails from "../components/AttackDetails";
-import type { Condition } from "./conditions";
+import { Condition } from "./conditions";
 
 /**
  * Interface for the fields of an attack.
@@ -278,7 +278,7 @@ export class Attack {
     if (hits.includes(AttackUse.success)) {
       // Calculate total damage if any hit succeeds
       let actualizedHits = 0;
-      const { totalDamage } = hits.reduce(
+      let { totalDamage } = hits.reduce(
         (acc, hitResult) => {
           if (hitResult === AttackUse.success) {
             actualizedHits++;
@@ -299,6 +299,36 @@ export class Attack {
         },
         { totalDamage: 0 },
       );
+      // check for player applied poison
+      let sanityDmg = this.flatSanityDamage;
+      const debuffStrings: string[] = [];
+      if (
+        this.user instanceof PlayerCharacter &&
+        !!this.user.equipment.mainHand.activePoison
+      ) {
+        const effect = this.user.equipment.mainHand.consumePoison()!; // assert true - we know if is there due to if
+        if (effect instanceof Condition) {
+          target.addCondition(effect);
+          debuffStrings.push(effect.name);
+        } else {
+          switch (effect.effect) {
+            case "health":
+              totalDamage += effect.amount;
+              break;
+            case "mana":
+              if (target instanceof PlayerCharacter) {
+                // currently there are no poisons used by enemies, so this will never be triggered
+                target.damageMana(effect.amount);
+              } else {
+                target.damageEnergy(effect.amount);
+              }
+              break;
+            case "sanity":
+              sanityDmg += effect.amount;
+              break;
+          }
+        }
+      }
 
       target.damageHealth({ damage: totalDamage, attackerId: this.user.id });
       target.damageSanity(this.flatSanityDamage);
@@ -322,6 +352,7 @@ export class Attack {
         actualizedHits,
       });
       this.addBuffs();
+      const allDebuffs = debuffStrings.concat(debuffNames);
 
       let minionSpecies: string[] = [];
       if ("createMinion" in this.user) {
@@ -345,7 +376,7 @@ export class Attack {
           targetName: this.getNameReference(target),
           healthDamage: totalDamage,
           sanityDamage: this.flatSanityDamage,
-          debuffNames,
+          debuffNames: allDebuffs,
           buffNames: this.buffStrings,
           minionSpecies,
           amountHealed,

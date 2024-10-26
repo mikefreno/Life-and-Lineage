@@ -23,6 +23,9 @@ import {
 import { Attribute, ItemClassType, MasteryToString } from "../utility/types";
 import GenericModal from "./GenericModal";
 import GenericStrikeAround from "./GenericStrikeAround";
+import { Condition } from "../classes/conditions";
+import { DungeonContext } from "./DungeonComponents/DungeonContext";
+import { enemyTurn } from "./DungeonComponents/DungeonInteriorFunctions";
 
 type BaseProps = {
   displayItem: {
@@ -64,8 +67,9 @@ export function StatsDisplay({
   const { colorScheme } = useColorScheme();
   const vibration = useVibration();
 
+  const dungeonData = useContext(DungeonContext);
   const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing contexts");
+  if (!appData) throw new Error("missing context");
   const { playerState, dimensions } = appData;
   const [viewWidth, setViewWidth] = useState(dimensions.width * 0.4);
   const [viewHeight, setViewHeight] = useState(dimensions.height * 0.2);
@@ -317,7 +321,15 @@ export function StatsDisplay({
                 <Text>Provides {toTitleCase(effect.condition.name)}</Text>
               </View>
             ) : (
-              <View className="border rounded-md p-1">
+              <View
+                className={`${
+                  effect.stat == "health"
+                    ? "bg-red-200 dark:bg-red-900"
+                    : effect.stat == "mana"
+                    ? "bg-blue-200 dark:bg-blue-900"
+                    : "bg-purple-200 dark:bg-purple-900"
+                } rounded-md p-1`}
+              >
                 <Text className="text-center ">
                   Heals{" "}
                   {effect.stat == "health" ? (
@@ -336,17 +348,66 @@ export function StatsDisplay({
             ) && (
               <GenericFlatButton
                 onPressFunction={() => {
-                  firstItem.use();
+                  if (dungeonData) {
+                    firstItem.use(() => enemyTurn({ appData, dungeonData }));
+                  } else {
+                    firstItem.use();
+                  }
                   clearItem();
                 }}
                 className="pt-1"
               >
-                Consume
+                Drink
               </GenericFlatButton>
             )}
           </View>
         );
       case ItemClassType.Poison:
+        return (
+          <View>
+            {"condition" in effect ? (
+              <View>
+                <Text>Provides {toTitleCase(effect.condition.name)}</Text>
+              </View>
+            ) : (
+              <View
+                className={`${
+                  effect.stat == "health"
+                    ? "bg-red-200 dark:bg-red-900"
+                    : effect.stat == "mana"
+                    ? "bg-blue-200 dark:bg-blue-900"
+                    : "bg-purple-200 dark:bg-purple-900"
+                } rounded-md p-1`}
+              >
+                <Text className="text-center ">
+                  Deals {effect.amount.min} to {effect.amount.max} points of{" "}
+                  {effect.stat == "health" ? (
+                    <HealthIcon height={14} width={14} />
+                  ) : effect.stat == "mana" ? (
+                    <Energy height={14} width={14} />
+                  ) : (
+                    <Sanity width={14} height={14} />
+                  )}{" "}
+                  damage.
+                </Text>
+              </View>
+            )}
+            {!!playerState?.inventory.find((invItem) =>
+              invItem.equals(firstItem),
+            ) && (
+              <GenericFlatButton
+                onPressFunction={() => {
+                  firstItem.use();
+                  clearItem();
+                }}
+                className="pt-1"
+              >
+                Apply
+              </GenericFlatButton>
+            )}
+          </View>
+        );
+
       default:
         return;
     }
@@ -448,13 +509,34 @@ export function StatsDisplay({
             ? bookItemLabel()
             : toTitleCase(firstItem.itemClass)}
         </GenericStrikeAround>
-        {displayItem.item[0].stats && firstItem.slot ? (
+        {firstItem.stats && firstItem.slot && (
           <View className="py-2">
             <GearStatsDisplay stats={firstItem.stats} />
           </View>
-        ) : null}
+        )}
+        {firstItem.activePoison && (
+          <View className="rounded-md p-1 bg-[#A5D6A7] dark:bg-[#388E3C]">
+            {firstItem.activePoison instanceof Condition ? (
+              <View></View>
+            ) : (
+              <Text className="text-center">
+                {firstItem.activePoison.effect == "health" ? (
+                  <HealthIcon height={14} width={14} />
+                ) : firstItem.activePoison.effect == "mana" ? (
+                  <Energy height={14} width={14} />
+                ) : (
+                  <Sanity width={14} height={14} />
+                )}{" "}
+                poison active.
+              </Text>
+            )}
+          </View>
+        )}
         {firstItem.attachedAttacks.length > 0 && playerState && (
-          <GenericFlatButton onPressFunction={() => setShowingAttacks(true)}>
+          <GenericFlatButton
+            className="pt-1"
+            onPressFunction={() => setShowingAttacks(true)}
+          >
             Show attacks
           </GenericFlatButton>
         )}

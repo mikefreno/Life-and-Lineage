@@ -86,9 +86,9 @@ function enemyDeathHandler({ dungeonData, appData }: ContextData) {
   }
 }
 export function enemyPreTurnCheck({ dungeonData, appData }: ContextData) {
-  if (!appData || !dungeonData)
+  if (!appData || !dungeonData) {
     throw new Error("missing context in enemyPreTurnCheck()");
-  const {} = appData;
+  }
   const { setAttackAnimationOnGoing } = dungeonData;
 
   const dead = enemyDeathHandler({ appData, dungeonData });
