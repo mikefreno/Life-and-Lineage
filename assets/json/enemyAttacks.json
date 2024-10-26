@@ -49,7 +49,7 @@
    {
       "name": "cleave",
       "energyCost": 10,
-      "targets": "cleave",
+      "targets": "dual",
       "hitChance": 0.95,
       "damageMult": 0.75,
       "debuffs": [{"name":"bleed", "chance":0.35}]
@@ -154,7 +154,7 @@
    {
       "name": "teeth",
       "energyCost": 15,
-      "targets": "cleave",
+      "targets": "dual",
       "hitChance": 1.0,
       "damageMult": 1.0,
       "flatHealthDamage": 10

@@ -11,7 +11,7 @@ import { Enemy, Minion } from "./creatures";
 
 interface SpellFields {
   name: string;
-  attackStyle?: "single" | "cleave" | "aoe";
+  attackStyle?: "single" | "dual" | "aoe";
   element: string;
   proficiencyNeeded: string;
   manaCost: number;
@@ -41,7 +41,7 @@ interface SpellFields {
  */
 export class Spell {
   name: string;
-  attackStyle: "single" | "cleave" | "aoe"; //at time of writing, only implementing single target
+  attackStyle: "single" | "dual" | "aoe"; //at time of writing, only implementing single target
   element: Element;
   usesWeapon: string | null;
   proficiencyNeeded: MasteryLevel;

@@ -14,11 +14,15 @@ import { AppContext } from "../app/_layout";
 import {
   Coins,
   DexterityIcon,
+  Energy,
+  HealthIcon,
   IntelligenceIcon,
+  Sanity,
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
 import { Attribute, ItemClassType, MasteryToString } from "../utility/types";
 import GenericModal from "./GenericModal";
+import GenericStrikeAround from "./GenericStrikeAround";
 
 type BaseProps = {
   displayItem: {
@@ -67,6 +71,7 @@ export function StatsDisplay({
   const [viewHeight, setViewHeight] = useState(dimensions.height * 0.2);
   const [blockSize, setBlockSize] = useState<number>();
   const [showingAttacks, setShowingAttacks] = useState<boolean>(false);
+  const [firstItem, setFirstItem] = useState<Item>(displayItem.item[0]);
 
   useEffect(() => {
     if (dimensions.width === dimensions.lesser) {
@@ -78,9 +83,12 @@ export function StatsDisplay({
     }
   }, [dimensions.height]);
 
+  useEffect(() => {
+    setFirstItem(displayItem.item[0]);
+  }, [displayItem, displayItem.item.length]);
+
   const RequirementsBlock = () => {
-    const item = displayItem.item[0];
-    const reqs = item.requirements;
+    const reqs = firstItem.requirements;
     if ((reqs.intelligence || reqs.strength || reqs.dexterity) && playerState) {
       const playerMeetsStrength =
         reqs.strength &&
@@ -97,7 +105,7 @@ export function StatsDisplay({
         reqs.dexterity <=
           playerState.baseDexterity +
             playerState.allocatedSkillPoints[Attribute.dexterity];
-      if (item.playerHasRequirements) return null;
+      if (firstItem.playerHasRequirements) return null;
       return (
         <View className="flex items-center p-1 rounded-lg border border-red-700">
           <Text>Requires:</Text>
@@ -147,9 +155,7 @@ export function StatsDisplay({
       if ("shop" in props) {
         const { shop, sellItem, sellStack } = props;
         if (displayItem.side == "inventory") {
-          const itemPrice = displayItem.item[0].getSellPrice(
-            shop.shopKeeper.affection,
-          );
+          const itemPrice = firstItem.getSellPrice(shop.shopKeeper.affection);
           const stackPrice = itemPrice * displayItem.item.length;
           const singleIsDisabled = shop.currentGold < itemPrice;
           const stackIsDisabled = shop.currentGold < stackPrice;
@@ -158,9 +164,8 @@ export function StatsDisplay({
               <View className="flex flex-row py-1">
                 <Text>
                   {asReadableGold(
-                    displayItem.item[0].getSellPrice(
-                      shop.shopKeeper.affection,
-                    ) * (displayItem.item.length ?? 1),
+                    firstItem.getSellPrice(shop.shopKeeper.affection) *
+                      (displayItem.item.length ?? 1),
                   )}
                 </Text>
                 <Coins width={16} height={16} style={{ marginLeft: 6 }} />
@@ -169,7 +174,7 @@ export function StatsDisplay({
                 <>
                   <GenericFlatButton
                     onPressFunction={() => {
-                      sellItem(displayItem.item[0]), clearItem();
+                      sellItem(firstItem), clearItem();
                     }}
                     disabledCondition={singleIsDisabled}
                   >
@@ -205,7 +210,7 @@ export function StatsDisplay({
               ) : (
                 <GenericFlatButton
                   onPressFunction={() => {
-                    props.sellItem(displayItem.item[0]);
+                    props.sellItem(firstItem);
                     clearItem();
                   }}
                   disabledCondition={singleIsDisabled}
@@ -225,9 +230,7 @@ export function StatsDisplay({
           );
         } else if (displayItem.side == "shop") {
           const { shop, purchaseItem, purchaseStack } = props;
-          const itemPrice = displayItem.item[0].getBuyPrice(
-            shop.shopKeeper.affection,
-          );
+          const itemPrice = firstItem.getBuyPrice(shop.shopKeeper.affection);
           const stackPrice = itemPrice * displayItem.item.length;
           const singleIsDisabled = playerState.gold < itemPrice;
           const stackIsDisabled = playerState.gold < stackPrice;
@@ -236,14 +239,14 @@ export function StatsDisplay({
               <View className="flex flex-row py-1">
                 <Text>
                   {asReadableGold(
-                    displayItem.item[0].getBuyPrice(shop.shopKeeper.affection) *
+                    firstItem.getBuyPrice(shop.shopKeeper.affection) *
                       displayItem.item.length,
                   )}
                 </Text>
                 <Coins width={16} height={16} style={{ marginLeft: 6 }} />
               </View>
               <GenericFlatButton
-                onPressFunction={() => purchaseItem(displayItem.item[0])}
+                onPressFunction={() => purchaseItem(firstItem)}
                 disabledCondition={singleIsDisabled}
               >
                 <Text
@@ -258,6 +261,7 @@ export function StatsDisplay({
                 <GenericFlatButton
                   onPressFunction={() => purchaseStack(displayItem.item)}
                   disabledCondition={stackIsDisabled}
+                  className="pt-1"
                 >
                   <Text
                     className={
@@ -278,7 +282,7 @@ export function StatsDisplay({
               onPressFunction={() => {
                 props.addItemToPouch(displayItem.item);
                 clearItem();
-                playerState?.removeFromInventory(displayItem.item[0]);
+                playerState?.removeFromInventory(firstItem);
               }}
             >
               Drop
@@ -301,10 +305,57 @@ export function StatsDisplay({
     }
   };
 
+  const ConsumableSection = () => {
+    const effect = firstItem.effect;
+    if (!effect) return;
+    switch (firstItem.itemClass) {
+      case ItemClassType.Potion:
+        return (
+          <View>
+            {"condition" in effect ? (
+              <View>
+                <Text>Provides {toTitleCase(effect.condition.name)}</Text>
+              </View>
+            ) : (
+              <View className="border rounded-md p-1">
+                <Text className="text-center ">
+                  Heals{" "}
+                  {effect.stat == "health" ? (
+                    <HealthIcon height={14} width={14} />
+                  ) : effect.stat == "mana" ? (
+                    <Energy height={14} width={14} />
+                  ) : (
+                    <Sanity width={14} height={14} />
+                  )}{" "}
+                  for {effect.amount.min} to {effect.amount.max} points.
+                </Text>
+              </View>
+            )}
+            {!!playerState?.inventory.find((invItem) =>
+              invItem.equals(firstItem),
+            ) && (
+              <GenericFlatButton
+                onPressFunction={() => {
+                  firstItem.use();
+                  clearItem();
+                }}
+                className="pt-1"
+              >
+                Consume
+              </GenericFlatButton>
+            )}
+          </View>
+        );
+      case ItemClassType.Poison:
+      default:
+        return;
+    }
+  };
+
   function bookItemLabel() {
-    if (playerState && displayItem.item[0].attachedSpell) {
+    if (playerState && firstItem.attachedSpell) {
       return `${
-        MasteryToString[displayItem.item[0].attachedSpell.proficiencyNeeded]
+        MasteryToString[firstItem.attachedSpell.proficiencyNeeded]
       } level book`;
     }
   }
@@ -326,9 +377,9 @@ export function StatsDisplay({
       >
         <View>
           {playerState &&
-            displayItem.item[0].attachedAttacks.map((attack) => (
-              <View key={`${displayItem.item[0].id}-${attack.name}`}>
-                {attack.AttackRender(displayItem.item[0].stats?.damage)}
+            firstItem.attachedAttacks.map((attack) => (
+              <View key={`${firstItem.id}-${attack.name}`}>
+                {attack.AttackRender(firstItem.stats?.damage)}
               </View>
             ))}
         </View>
@@ -337,7 +388,7 @@ export function StatsDisplay({
         className="items-center rounded-md border border-zinc-600 p-4"
         onLayout={onLayoutView}
         style={
-          displayItem.item[0].itemClass == ItemClassType.Book
+          firstItem.itemClass == ItemClassType.Book
             ? {
                 backgroundColor:
                   colorScheme == "light"
@@ -380,39 +431,37 @@ export function StatsDisplay({
           <Text className="-mt-3 -ml-1 text-2xl">x</Text>
         </Pressable>
         <View>
-          <Text className="text-center">
-            {toTitleCase(displayItem.item[0].name)}
-          </Text>
+          <Text className="text-center">{toTitleCase(firstItem.name)}</Text>
         </View>
-        {displayItem.item[0].stats && displayItem.item[0].slot ? (
+        <RequirementsBlock />
+        {(firstItem.slot == "one-hand" ||
+          firstItem.slot == "two-hand" ||
+          firstItem.slot == "off-hand") && (
+          <GenericStrikeAround className="text-sm">
+            {toTitleCase(firstItem.slot)}
+          </GenericStrikeAround>
+        )}
+        <GenericStrikeAround className="text-sm">
+          {firstItem.itemClass == "bodyArmor"
+            ? "Body Armor"
+            : firstItem.itemClass == "book" && playerState
+            ? bookItemLabel()
+            : toTitleCase(firstItem.itemClass)}
+        </GenericStrikeAround>
+        {displayItem.item[0].stats && firstItem.slot ? (
           <View className="py-2">
-            <GearStatsDisplay stats={displayItem.item[0].stats} />
+            <GearStatsDisplay stats={firstItem.stats} />
           </View>
         ) : null}
-        <RequirementsBlock />
-        {(displayItem.item[0].slot == "one-hand" ||
-          displayItem.item[0].slot == "two-hand" ||
-          displayItem.item[0].slot == "off-hand") && (
-          <Text className="text-sm">
-            {toTitleCase(displayItem.item[0].slot)}
-          </Text>
-        )}
-        <Text className="text-sm">
-          {displayItem.item[0].itemClass == "bodyArmor"
-            ? "Body Armor"
-            : displayItem.item[0].itemClass == "book" && playerState
-            ? bookItemLabel()
-            : toTitleCase(displayItem.item[0].itemClass)}
-        </Text>
-        {displayItem.item[0].attachedAttacks.length > 0 && playerState && (
+        {firstItem.attachedAttacks.length > 0 && playerState && (
           <GenericFlatButton onPressFunction={() => setShowingAttacks(true)}>
             Show attacks
           </GenericFlatButton>
         )}
-        {displayItem.item[0].attachedSpell ? (
+        {firstItem.attachedSpell ? (
           <>
             <View className="px-2 mx-auto">
-              <SpellDetails spell={displayItem.item[0].attachedSpell} />
+              <SpellDetails spell={firstItem.attachedSpell} />
             </View>
             {!("purchaseItem" in props || "addItemToPouch" in props) && (
               <GenericFlatButton
@@ -428,6 +477,7 @@ export function StatsDisplay({
             )}
           </>
         ) : null}
+        <ConsumableSection />
         <SaleSection />
       </View>
     </>

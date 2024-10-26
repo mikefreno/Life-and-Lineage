@@ -96,6 +96,36 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
     }
   }, [battleTab]);
 
+  const attackHandler = (attackOrSpell: Attack | Spell) => {
+    if (enemyState) {
+      setAttackAnimationOnGoing(true);
+      vibration({ style: "light" });
+      switch (attackOrSpell.attackStyle) {
+        case "single":
+        case "dual":
+        case "aoe":
+      }
+    }
+    if (
+      attackOrSpell.attackStyle !== "aoe" &&
+      enemyState.minions.length >
+        (attackOrSpell.attackStyle == "single" ? 0 : 1)
+    ) {
+      setShowTargetSelection({
+        showing: true,
+        chosenAttack: attackOrSpell,
+      });
+    } else {
+      use({
+        target: enemyState,
+        attackOrSpell,
+        appData,
+        dungeonData,
+        isFocused,
+      });
+    }
+  };
+
   const TabRender = () => {
     if (playerState) {
       switch (battleTab) {
@@ -185,27 +215,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                                 !attackOrSpell.canBeUsed ||
                                 attackAnimationOnGoing
                               }
-                              onPress={() => {
-                                setAttackAnimationOnGoing(true);
-                                vibration({ style: "light" });
-                                if (
-                                  enemyState &&
-                                  enemyState.minions.length > 0
-                                ) {
-                                  setShowTargetSelection({
-                                    showing: true,
-                                    chosenAttack: attackOrSpell,
-                                  });
-                                } else {
-                                  use({
-                                    target: enemyState!,
-                                    attackOrSpell,
-                                    appData,
-                                    dungeonData,
-                                    isFocused,
-                                  });
-                                }
-                              }}
+                              onPress={() => attackHandler(attackOrSpell)}
                               className="mx-2 my-auto rounded px-4 py-2 shadow-sm active:scale-95 active:opacity-50"
                               style={[
                                 (!attackOrSpell.canBeUsed ||

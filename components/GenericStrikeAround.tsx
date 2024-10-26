@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 interface GenericStrikeAround {
   containerStyles?: StyleProp<ViewStyle>;
   children: string | ReactNode;
+  className: string;
 }
 
 /**
@@ -14,13 +15,14 @@ interface GenericStrikeAround {
 export default function GenericStrikeAround({
   containerStyles,
   children,
+  className,
 }: GenericStrikeAround) {
   return (
     <View style={[styles.container, containerStyles]}>
       <View style={styles.line} />
       <View style={styles.content}>
         {typeof children === "string" ? (
-          <Text className="text-xl">{children}</Text>
+          <Text className={className ? className : "text-xl"}>{children}</Text>
         ) : (
           children
         )}

@@ -242,7 +242,7 @@ export class Creature {
         name,
         energyCost,
         hitChance,
-        targets: targets as "single" | "aoe" | "cleave",
+        targets: targets as "single" | "aoe" | "dual",
         damageMult,
         flatHealthDamage,
         flatSanityDamage,

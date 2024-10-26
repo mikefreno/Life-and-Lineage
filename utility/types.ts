@@ -23,17 +23,22 @@ export interface ItemOptions {
   attacks?: string[];
   description?: string;
   effect?: ItemEffect;
+  activePoison?:
+    | Condition
+    | { effect: "health" | "mana" | "sanity"; amount: number }
+    | null;
 }
 
 type StatEffect = {
-  stat: Attribute;
-  amount: number;
-  turns: number;
+  stat: "health" | "mana" | "sanity";
+  amount: { min: number; max: number };
+  turns?: number;
   isPoison?: boolean;
 };
 
 type ConditionEffect = {
   condition: Condition;
+  isPoison?: boolean;
 };
 
 export type ItemEffect = StatEffect | ConditionEffect;

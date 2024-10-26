@@ -46,6 +46,10 @@ export class Item {
   readonly attacks: string[];
   readonly description: string | null;
   readonly effect: ItemEffect | null;
+  activePoison:
+    | Condition
+    | { effect: "health" | "mana" | "sanity"; amount: number }
+    | null;
 
   constructor({
     id,
@@ -61,6 +65,7 @@ export class Item {
     stackable = false,
     description,
     effect,
+    activePoison,
   }: ItemOptions) {
     this.id = id ?? Crypto.randomUUID();
     this.name = name;
@@ -75,12 +80,17 @@ export class Item {
     this.attacks = attacks;
     this.description = description ?? null;
     this.effect = effect ?? null;
+    this.activePoison = activePoison ?? null;
 
     makeObservable(this, {
       attachedSpell: computed,
       attachedAttacks: computed,
       playerHasRequirements: computed,
       reinstatePlayer: action,
+      use: action,
+      player: observable,
+      activePoison: observable,
+      consumePoison: action,
     });
   }
 
@@ -148,7 +158,7 @@ export class Item {
           new Attack({
             ...found,
             user: this.player,
-            targets: found.targets as "single" | "cleave" | "aoe",
+            targets: found.targets as "single" | "dual" | "aoe",
           }),
         );
       }
@@ -197,6 +207,81 @@ export class Item {
     }
   }
 
+  public use() {
+    if (!this.player) throw new Error(`Missing player on item! ${this.name}`);
+    if (!this.effect) {
+      throw new Error("Called 'use' on an invalid item!");
+    }
+    try {
+      if (this.effect.isPoison) {
+        this.applyPoison(this.effect);
+      } else {
+        this.usePotion(this.effect);
+      }
+      this.player.removeFromInventory(this);
+    } catch (error) {
+      //@ts-ignore
+      throw new Error(`Failed to use item ${this.name}: ${error.message}`);
+    }
+  }
+
+  private usePotion(effect: ItemEffect) {
+    if (!this.player) throw new Error(`Missing player on item! ${this.name}`);
+    if ("condition" in effect) {
+      this.player.addCondition(effect.condition);
+      return;
+    }
+    const amt = this.calculateEffectAmount(effect.amount);
+    this.applyStatEffect(effect.stat, amt);
+  }
+
+  private applyStatEffect(stat: "health" | "mana" | "sanity", amount: number) {
+    switch (stat) {
+      case "health":
+        this.player?.restoreHealth(amount);
+        break;
+      case "mana":
+        this.player?.restoreMana(amount);
+        break;
+      case "sanity":
+        this.player?.restoreSanity(amount);
+        break;
+      default:
+        throw new Error(`Unimplemented attribute: ${stat}`);
+    }
+  }
+
+  private applyPoison(effect: ItemEffect) {
+    if (!this.player) throw new Error(`Missing player on item! ${this.name}`);
+
+    if (this.player.equipment.mainHand.name === "unarmored") {
+      throw new Error("Can't apply poison to bare hands!");
+    }
+
+    if ("condition" in effect) {
+      this.player.equipment.mainHand.activePoison = effect.condition;
+      return;
+    }
+
+    const amt = this.calculateEffectAmount(effect.amount);
+    this.player.equipment.mainHand.activePoison = {
+      effect: effect.stat,
+      amount: amt,
+    };
+  }
+
+  private calculateEffectAmount(amount: { min: number; max: number }): number {
+    return (
+      Math.floor(Math.random() * (amount.max - amount.min + 1)) + amount.min
+    );
+  }
+
+  public consumePoison() {
+    const poison = this.activePoison;
+    this.activePoison = null;
+    return poison;
+  }
+
   public reinstatePlayer(player: PlayerCharacter) {
     if (this.player == null) {
       this.player = player;
@@ -227,11 +312,18 @@ export class Item {
   }
 }
 const itemMap: { [key: string]: any } = {
+  Amber_Potion: require("../assets/images/items/Amber_Potion.png"),
+  Amber_Potion_2: require("../assets/images/items/Amber_Potion_2.png"),
+  Amber_Potion_3: require("../assets/images/items/Amber_Potion_3.png"),
   Arrow: require("../assets/images/items/Arrow.png"),
+  Axe: require("../assets/images/items/Axe.png"),
   Bag: require("../assets/images/items/Bag.png"),
   Base_Robes: require("../assets/images/items/Robes_1.png"),
   Bat_Wing: require("../assets/images/items/Bat_Wing.png"),
+  Black_Bow: require("../assets/images/items/Black_Bow.png"),
   Blue_Potion: require("../assets/images/items/Blue_Potion.png"),
+  Blue_Potion_2: require("../assets/images/items/Blue_Potion_2.png"),
+  Blue_Potion_3: require("../assets/images/items/Blue_Potion_3.png"),
   Bone: require("../assets/images/items/Bone.png"),
   Book: require("../assets/images/items/Book.png"),
   Book_2: require("../assets/images/items/Book_2.png"),
@@ -244,9 +336,15 @@ const itemMap: { [key: string]: any } = {
   Focus_1: require("../assets/images/items/Focus_1.png"),
   Feather: require("../assets/images/items/Feather.png"),
   Goblet: require("../assets/images/items/Goblet.png"),
+  Goblin_Staff: require("../assets/images/items/Goblin_Staff.png"),
+  Golden_Hammer: require("../assets/images/items/Golden_Hammer.png"),
   Golden_Sword: require("../assets/images/items/Golden_Sword.png"),
+  Great_Bow: require("../assets/images/items/Great_Bow.png"),
   Green_Potion: require("../assets/images/items/Green_Potion.png"),
+  Green_Potion_2: require("../assets/images/items/Green_Potion_2.png"),
+  Green_Potion_3: require("../assets/images/items/Green_Potion_3.png"),
   Hammer: require("../assets/images/items/Hammer.png"),
+  Harp_Bow: require("../assets/images/items/Harp_Bow.png"),
   Helm: require("../assets/images/items/Helm.png"),
   Iron_Armor: require("../assets/images/items/Iron_Armor.png"),
   Iron_Boot: require("../assets/images/items/Iron_Boot.png"),
@@ -261,11 +359,18 @@ const itemMap: { [key: string]: any } = {
   Monster_Egg: require("../assets/images/items/Monster_Egg.png"),
   Monster_Eye: require("../assets/images/items/Monster_Eye.png"),
   Monster_Meat: require("../assets/images/items/Monster_Meat.png"),
+  Paper: require("../assets/images/items/Paper.png"),
   Patch_of_Fur: require("../assets/images/items/Patch_of_Fur.png"),
+  Purple_Potion: require("../assets/images/items/Purple_Potion.png"),
+  Purple_Potion_2: require("../assets/images/items/Purple_Potion_2.png"),
+  Purple_Potion_3: require("../assets/images/items/Purple_Potion_3.png"),
   Rat_Tail: require("../assets/images/items/Rat_Tail.png"),
   Red_Potion: require("../assets/images/items/Red_Potion.png"),
+  Red_Potion_2: require("../assets/images/items/Red_Potion_2.png"),
+  Red_Potion_3: require("../assets/images/items/Red_Potion_3.png"),
   Ruby_Staff: require("../assets/images/items/Ruby_Staff.png"),
   Sapphire_Staff: require("../assets/images/items/Sapphire_Staff.png"),
+  Scroll: require("../assets/images/items/Scroll.png"),
   Silver_Sword: require("../assets/images/items/Silver_Sword.png"),
   Skull: require("../assets/images/items/Skull.png"),
   Slime_Gel: require("../assets/images/items/Slime_Gel.png"),
@@ -276,14 +381,6 @@ const itemMap: { [key: string]: any } = {
   Wooden_Armor: require("../assets/images/items/Wooden_Armor.png"),
   Wooden_Shield: require("../assets/images/items/Wooden_Shield.png"),
   Wooden_Sword: require("../assets/images/items/Wooden_Sword.png"),
-  Goblin_Staff: require("../assets/images/items/Goblin_Staff.png"),
-  Great_Bow: require("../assets/images/items/Great_Bow.png"),
-  Black_Bow: require("../assets/images/items/Black_Bow.png"),
-  Axe: require("../assets/images/items/Axe.png"),
-  Golden_Hammer: require("../assets/images/items/Golden_Hammer.png"),
-  Harp_Bow: require("../assets/images/items/Harp_Bow.png"),
-  Paper: require("../assets/images/items/Paper.png"),
-  Scroll: require("../assets/images/items/Scroll.png"),
 };
 
 export const isStackable = (itemClass: ItemClassType) => {

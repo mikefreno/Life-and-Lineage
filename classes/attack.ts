@@ -16,7 +16,7 @@ import type { Condition } from "./conditions";
  * @property {string} name - The name of the attack.
  * @property {number} [energyCost=0] - The energy cost to perform the attack.
  * @property {number} [hitChance=1.0] - The base hit chance of the attack.
- * @property {"single" | "cleave" | "aoe"} [targets="single"] - The type of targets the attack can hit.
+ * @property {"single" | "dual" | "aoe"} [targets="single"] - The type of targets the attack can hit.
  * @property {number} [damageMult=0] - The damage multiplier of the attack.
  * @property {number} [flatHealthDamage=0] - The flat health damage of the attack.
  * @property {number} [selfDamage=0] - The damage dealt to the attacker.
@@ -30,7 +30,7 @@ interface AttackFields {
   name: string;
   energyCost?: number;
   hitChance?: number;
-  targets?: "single" | "cleave" | "aoe";
+  targets?: "single" | "dual" | "aoe";
   damageMult?: number;
   flatHealthDamage?: number;
   selfDamage?: number;
@@ -53,7 +53,7 @@ interface AttackFields {
 export class Attack {
   name: string;
   energyCost: number;
-  attackStyle: "single" | "cleave" | "aoe"; // at time of writing, only implementing single target
+  attackStyle: "single" | "dual" | "aoe"; // at time of writing, only implementing single target
   baseHitChance: number;
   damageMult: number;
   flatHealthDamage: number;

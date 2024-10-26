@@ -10,17 +10,18 @@ import {
 } from "../assets/icons/SVGIcons";
 
 interface GearStatsDisplayProps {
-  stats: Record<string, number | undefined>;
+  stats: Record<string, number> | null;
 }
 
 export default function GearStatsDisplay({ stats }: GearStatsDisplayProps) {
   if (
-    !stats.armor &&
-    !stats.damage &&
-    !stats.mana &&
-    !stats.regen &&
-    !stats.health &&
-    !stats.blockChance
+    !stats ||
+    (!stats.armor &&
+      !stats.damage &&
+      !stats.mana &&
+      !stats.regen &&
+      !stats.health &&
+      !stats.blockChance)
   ) {
     return;
   }

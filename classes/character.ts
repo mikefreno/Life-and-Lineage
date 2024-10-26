@@ -621,6 +621,7 @@ export class PlayerCharacter extends Character {
       baseMana: observable,
       currentMana: observable,
       maxMana: computed,
+      restoreMana: action,
       nonConditionalMaxMana: computed,
       useMana: action,
 
@@ -870,7 +871,7 @@ export class PlayerCharacter extends Character {
     this.currentMana -= mana;
   }
 
-  private restoreMana(amount: number) {
+  public restoreMana(amount: number) {
     if (this.currentMana + amount < this.maxMana) {
       this.currentMana += amount;
     } else {
@@ -1285,7 +1286,7 @@ export class PlayerCharacter extends Character {
       stats: { baseDamage: 1 },
       baseValue: 0,
       itemClass: ItemClassType.Melee,
-      playerClass: this.playerClass,
+      player: this,
       attacks: ["punch"],
     });
   }
