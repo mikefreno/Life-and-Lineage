@@ -21,6 +21,7 @@ interface ShopProps {
   archetype: string;
   shopKeeperPersonality: ShopkeeperPersonality;
 }
+const MAX_AFFECTION = 100;
 
 /**
  * At game start, all Shops are created, they will not be created again, in any sense. The `shopKeeper` like all `Character`'s
@@ -130,7 +131,16 @@ export class Shop {
   }
 
   private changeAffection(change: number) {
-    this.shopKeeper.updateAffection(Math.floor(change * 4) / 4);
+    const currentAffection = this.shopKeeper.affection;
+
+    if (change === 0) return;
+    if (change > 0 && currentAffection >= MAX_AFFECTION) return;
+
+    const growthFactor =
+      1 - (Math.max(0, currentAffection) / MAX_AFFECTION) ** 1.5;
+    const adjustedChange = Math.floor(change * growthFactor * 4) / 4;
+
+    this.shopKeeper.updateAffection(adjustedChange);
   }
 
   public buyItem(itemOrItems: Item | Item[], buyPrice: number) {
@@ -142,7 +152,10 @@ export class Shop {
         this.inventory.push(item);
       });
       this.currentGold -= totalCost;
-      this.changeAffection((totalCost / 5000) * items.length);
+
+      const baseChange = (totalCost / 500) * items.length;
+      const cappedChange = Math.min(baseChange, 20);
+      this.changeAffection(cappedChange);
     } else {
       throw new Error("Not enough gold to complete the purchase");
     }
@@ -162,7 +175,10 @@ export class Shop {
 
     const totalEarned = Math.floor(sellPrice) * soldCount;
     this.currentGold += totalEarned;
-    this.changeAffection((sellPrice / 1000) * soldCount);
+
+    const baseChange = (sellPrice / 500) * soldCount;
+    const cappedChange = Math.min(baseChange, 20);
+    this.changeAffection(cappedChange);
 
     if (soldCount < items.length) {
       console.warn(

@@ -24,11 +24,47 @@ import { StatsDisplay } from "../../components/StatsDisplay";
 import { Coins } from "../../assets/icons/SVGIcons";
 import { TutorialOption } from "../../utility/types";
 import ProgressBar from "../../components/ProgressBar";
+import { saveGame } from "../../utility/functions/save_load";
 
 const TEN_MINUTES = 10 * 60 * 1000;
 //const ONE_SECOND = 1000;
 //const REFRESH_TIME = __DEV__ ? ONE_SECOND : TEN_MINUTES;
 const REFRESH_TIME = TEN_MINUTES;
+
+const GreetingComponent = ({ greeting }: { greeting: string }) => {
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const fadeOut = Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 1000,
+      useNativeDriver: true,
+    });
+
+    const timer = setTimeout(() => {
+      fadeOut.start();
+    }, 3000);
+
+    return () => {
+      clearTimeout(timer);
+      fadeOut.stop();
+    };
+  }, []);
+
+  return (
+    <Animated.View
+      style={[
+        {
+          zIndex: 999,
+          opacity: fadeAnim,
+        },
+      ]}
+      className="border absolute shadow-lg rounded-md p-2 bg-[#fafafa] dark:bg-[#000000]"
+    >
+      <Text className="text-center">{greeting}</Text>
+    </Animated.View>
+  );
+};
 
 const ShopInteriorScreen = observer(() => {
   const { shop } = useLocalSearchParams();
@@ -60,10 +96,6 @@ const ShopInteriorScreen = observer(() => {
       setTimeout(() => setInventoryFullNotifier(false), 2000);
     }
   }, [inventoryFullNotifier]);
-
-  useEffect(() => {
-    console.log(thisShop?.createGreeting(playerState?.fullName!));
-  }, []);
 
   useEffect(() => {
     if (playerState && thisShop && !initialized) {
@@ -102,6 +134,7 @@ const ShopInteriorScreen = observer(() => {
         setDisplayItem(null);
       }
     }
+    saveGame(gameState);
   }
 
   const sellStack = (items: Item[]) => {
@@ -113,6 +146,7 @@ const ShopInteriorScreen = observer(() => {
         setDisplayItem(null);
       });
     }
+    saveGame(gameState);
   };
 
   const purchaseItem = (item: Item) => {
@@ -125,6 +159,7 @@ const ShopInteriorScreen = observer(() => {
       playerState.buyItem(item, itemPrice);
       thisShop.sellItem(item, itemPrice);
     }
+    saveGame(gameState);
   };
 
   const sellItem = (item: Item) => {
@@ -137,6 +172,7 @@ const ShopInteriorScreen = observer(() => {
       thisShop.buyItem(item, itemPrice);
       playerState.sellItem(item, itemPrice);
     }
+    saveGame(gameState);
   };
 
   const purchaseStack = (items: Item[]) => {
@@ -149,6 +185,7 @@ const ShopInteriorScreen = observer(() => {
         setDisplayItem(null);
       });
     }
+    saveGame(gameState);
   };
 
   interface ItemRenderProps {
@@ -191,42 +228,6 @@ const ShopInteriorScreen = observer(() => {
           }}
         />
       </Pressable>
-    );
-  };
-  const GreetingComponent = ({ greeting }: { greeting: string }) => {
-    const fadeAnim = useRef(new Animated.Value(1)).current;
-
-    useEffect(() => {
-      const fadeOut = Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 1000,
-        useNativeDriver: true,
-      });
-
-      const timer = setTimeout(() => {
-        fadeOut.start();
-      }, 3000);
-
-      return () => {
-        clearTimeout(timer);
-        fadeOut.stop();
-      };
-    }, []);
-
-    return (
-      <Animated.View
-        style={[
-          {
-            position: "absolute",
-            zIndex: 999,
-            opacity: fadeAnim,
-          },
-        ]}
-      >
-        <ThemedView className="border shadow-lg rounded-md p-2">
-          <Text className="text-center">{greeting}</Text>
-        </ThemedView>
-      </Animated.View>
     );
   };
 

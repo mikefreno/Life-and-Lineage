@@ -5,7 +5,7 @@ import { ReactNode } from "react";
 interface GenericStrikeAround {
   containerStyles?: StyleProp<ViewStyle>;
   children: string | ReactNode;
-  className: string;
+  className?: string;
 }
 
 /**

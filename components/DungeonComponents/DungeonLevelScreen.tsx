@@ -13,7 +13,7 @@ import { useColorScheme } from "nativewind";
 import TutorialModal from "../../components/TutorialModal";
 import GenericModal from "../../components/GenericModal";
 import BattleTabControls from "../../components/DungeonComponents/BattleTabControls";
-import DungeonEnemyDisplay from "../../components/DungeonComponents/DungeonEnemyDisplay";
+import DungeonEnemyDisplay from "./DungeonEnemyDisplay";
 import FleeModal from "../../components/DungeonComponents/FleeModal";
 import TargetSelection from "../../components/DungeonComponents/TargetSelection";
 import DroppedItemsModal from "../../components/DungeonComponents/DroppedItemsModal";

@@ -7,14 +7,170 @@ import GenericStrikeAround from "../GenericStrikeAround";
 import { View as ThemedView } from "../Themed";
 import { EnemyImage } from "../EnemyImage";
 import FadeOutNode from "../FadeOutNode";
-import { useContext, useEffect, useState } from "react";
+import { memo, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AppContext } from "../../app/_layout";
 import { DungeonContext } from "./DungeonContext";
+import { observer } from "mobx-react-lite";
 
-export default function DungeonEnemyDisplay() {
+const useEnemyAnimations = () => {
+  const attackAnim = useRef(new Animated.Value(0)).current;
+  const damageAnim = useRef(new Animated.Value(1)).current;
+  const textFadeAnim = useRef(new Animated.Value(1)).current;
+  const textTranslateAnim = useRef(new Animated.Value(0)).current;
+  const dodgeAnim = useRef(new Animated.Value(0)).current;
+  const flashOpacity = useRef(new Animated.Value(1)).current;
+
+  const runAttackAnimation = () => {
+    Animated.sequence([
+      Animated.timing(attackAnim, {
+        toValue: -50,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(attackAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const runDodgeAnimation = () => {
+    Animated.sequence([
+      Animated.timing(dodgeAnim, {
+        toValue: 30,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.parallel([
+        Animated.delay(200),
+        Animated.sequence([
+          Animated.timing(flashOpacity, {
+            toValue: 0.3,
+            duration: 100,
+            useNativeDriver: true,
+          }),
+          Animated.timing(flashOpacity, {
+            toValue: 1,
+            duration: 100,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]),
+      Animated.timing(dodgeAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const runDamageAnimation = (onComplete: () => void) => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(damageAnim, {
+          toValue: 0.5,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(damageAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]),
+      { iterations: 2 },
+    ).start(onComplete);
+  };
+
+  const runTextAnimation = (onComplete: () => void) => {
+    Animated.parallel([
+      Animated.timing(textFadeAnim, {
+        toValue: 0,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(textTranslateAnim, {
+        toValue: -100,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+    ]).start(onComplete);
+  };
+
+  return {
+    animations: {
+      attackAnim,
+      damageAnim,
+      textFadeAnim,
+      textTranslateAnim,
+      dodgeAnim,
+      flashOpacity,
+    },
+    runAttackAnimation,
+    runDodgeAnimation,
+    runDamageAnimation,
+    runTextAnimation,
+  };
+};
+
+const EnemyHealthChangePopUp = memo(
+  ({ healthDiff, showing }: { healthDiff: number; showing: boolean }) => {
+    if (!showing) return <View className="h-6" />;
+
+    return (
+      <View className="h-6">
+        <FadeOutNode>
+          <Text style={{ color: "#f87171" }}>
+            {healthDiff > 0 ? "+" : ""}
+            {healthDiff.toString()}
+          </Text>
+        </FadeOutNode>
+      </View>
+    );
+  },
+);
+
+const EnemyConditions = memo(({ conditions }: { conditions: any[] }) => {
+  const simplifiedConditions = useMemo(() => {
+    const condMap = new Map();
+    conditions.forEach((condition) => {
+      if (condMap.has(condition.name)) {
+        const existing = condMap.get(condition.name);
+        existing.count += 1;
+        condMap.set(condition.name, existing);
+      } else {
+        condMap.set(condition.name, {
+          name: condition.name,
+          icon: condition.getConditionIcon(),
+          count: 1,
+        });
+      }
+    });
+    return Array.from(condMap.values());
+  }, [conditions]);
+
+  return (
+    <View className="flex h-8 flex-row">
+      {simplifiedConditions.map((cond) => (
+        <ThemedView key={cond.name} className="mx-2 flex align-middle">
+          <View className="mx-auto rounded-md bg-[rgba(0,0,0,0.4)] p-0.5 dark:bg-[rgba(255,255,255,0.4)]">
+            <Image source={cond.icon} style={{ width: 22, height: 24 }} />
+          </View>
+          <Text className="text-sm">
+            {toTitleCase(cond.name)} x {cond.count}
+          </Text>
+        </ThemedView>
+      ))}
+    </View>
+  );
+});
+
+const DungeonEnemyDisplay = observer(() => {
   const appData = useContext(AppContext);
   const dungeonData = useContext(DungeonContext);
   if (!dungeonData || !appData) throw new Error("missing context");
+
   const { enemyState } = appData;
   const {
     slug,
@@ -27,313 +183,190 @@ export default function DungeonEnemyDisplay() {
     enemyDodgeDummy,
   } = dungeonData;
 
-  const [enemyHealthRecord, setEnemyHealthRecord] = useState<
-    number | undefined
-  >(enemyState?.health);
-  const [enemyHealthDiff, setEnemyHealthDiff] = useState<number>(0);
-  const [showingEnemyHealthChange, setShowingEnemyHealthChange] =
-    useState<boolean>(false);
-  const [animationCycler, setAnimationCycler] = useState<number>(0);
+  const {
+    animations,
+    runAttackAnimation,
+    runDodgeAnimation,
+    runDamageAnimation,
+    runTextAnimation,
+  } = useEnemyAnimations();
 
-  const enemyAttackAnimationValue = useState(new Animated.Value(0))[0];
-  const enemyDamagedAnimationValue = useState(new Animated.Value(1))[0];
-  const enemyTextFadeAnimation = useState(new Animated.Value(1))[0];
-  const enemyTextTranslateAnimation = useState(new Animated.Value(0))[0];
-  const enemyDodgeAnimationValue = useState(new Animated.Value(0))[0];
-  const enemyFlashOpacity = useState(new Animated.Value(1))[0];
+  const [healthState, setHealthState] = useState({
+    record: enemyState?.health,
+    diff: 0,
+    showing: false,
+  });
 
   useEffect(() => {
+    if (!enemyState) return;
+
     if (
-      enemyState &&
-      enemyHealthRecord &&
-      enemyState.health != enemyHealthRecord &&
-      enemyHealthRecord > 0
+      healthState.record &&
+      healthState.record > 0 &&
+      enemyState.health !== healthState.record
     ) {
-      setEnemyHealthDiff(enemyState.health - enemyHealthRecord);
-      setAnimationCycler(animationCycler + 1);
-      setShowingEnemyHealthChange(true);
-    } else if (enemyHealthRecord && enemyHealthRecord > 0) {
-      setEnemyHealthDiff(0);
-      setShowingEnemyHealthChange(false);
+      setHealthState((prev) => ({
+        record: enemyState.health,
+        diff: enemyState.health - (prev.record ?? 0),
+        showing: true,
+      }));
+    } else if (healthState.record && healthState.record > 0) {
+      setHealthState((prev) => ({
+        ...prev,
+        diff: 0,
+        showing: false,
+      }));
     }
-    setEnemyHealthRecord(enemyState?.health);
   }, [enemyState?.health]);
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(enemyTextFadeAnimation, {
-        toValue: 0,
-        duration: 1000,
-        useNativeDriver: true,
-      }),
-      Animated.timing(enemyTextTranslateAnimation, {
-        toValue: -100,
-        duration: 1000,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      enemyTextFadeAnimation.setValue(1);
-      enemyTextTranslateAnimation.setValue(0);
-      setEnemyTextString(undefined);
-    });
-  }, [enemyTextDummy]);
-
-  useEffect(() => {
     if (!firstLoad && enemyAttackDummy !== 0) {
-      Animated.sequence([
-        Animated.timing(enemyAttackAnimationValue, {
-          toValue: -50,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(enemyAttackAnimationValue, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      runAttackAnimation();
     }
   }, [enemyAttackDummy]);
 
   useEffect(() => {
     if (!firstLoad && enemyDodgeDummy !== 0) {
-      Animated.sequence([
-        // Move to dodge position
-        Animated.timing(enemyDodgeAnimationValue, {
-          toValue: 30,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        // Hold position and flash simultaneously
-        Animated.parallel([
-          Animated.delay(200),
-          Animated.sequence([
-            Animated.timing(enemyFlashOpacity, {
-              toValue: 0.3,
-              duration: 100,
-              useNativeDriver: true,
-            }),
-            Animated.timing(enemyFlashOpacity, {
-              toValue: 1,
-              duration: 100,
-              useNativeDriver: true,
-            }),
-          ]),
-        ]),
-        // Move back to original position
-        Animated.timing(enemyDodgeAnimationValue, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      runDodgeAnimation();
     }
   }, [enemyDodgeDummy]);
 
   useEffect(() => {
-    if (enemyHealthDiff < 0 && !firstLoad) {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(enemyDamagedAnimationValue, {
-            toValue: 0.5,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-          Animated.timing(enemyDamagedAnimationValue, {
-            toValue: 1,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-        ]),
-        { iterations: 2 },
-      ).start(() => {
+    if (healthState.diff < 0 && !firstLoad) {
+      runDamageAnimation(() => {
         setTimeout(() => {
-          setShowingEnemyHealthChange(false);
-          setEnemyHealthDiff(0);
+          setHealthState((prev) => ({
+            ...prev,
+            showing: false,
+            diff: 0,
+          }));
         }, 500);
       });
     }
-  }, [enemyHealthDiff]);
+  }, [healthState.diff]);
 
   useEffect(() => {
-    return () => setEnemyHealthDiff(-0.1);
+    runTextAnimation(() => {
+      animations.textFadeAnim.setValue(1);
+      animations.textTranslateAnim.setValue(0);
+      setEnemyTextString(undefined);
+    });
+  }, [enemyTextDummy]);
+
+  useEffect(() => {
+    return () => setHealthState((prev) => ({ ...prev, diff: -0.1 }));
   }, []);
 
-  function EnemyHealthChangePopUp() {
-    return (
-      <View className="h-6">
-        {enemyHealthDiff != -0.1 &&
-          enemyState?.health !== enemyState?.healthMax && (
-            <FadeOutNode>
-              <Text style={{ color: "#f87171" }}>
-                {enemyHealthDiff > 0 ? "+" : ""}
-                {enemyHealthDiff.toString()}
-              </Text>
-            </FadeOutNode>
-          )}
-      </View>
-    );
-  }
+  if (!enemyState) return null;
 
-  function EnemyConditionRender() {
-    if (enemyState) {
-      let simplifiedConditionsMap: Map<
-        string,
-        {
-          name: string;
-          icon: any;
-          count: number;
-        }
-      > = new Map();
-
-      enemyState.conditions.forEach((condition) => {
-        if (simplifiedConditionsMap.has(condition.name)) {
-          let existingCondition = simplifiedConditionsMap.get(condition.name)!;
-          existingCondition.count += 1;
-          simplifiedConditionsMap.set(condition.name, existingCondition);
-        } else {
-          simplifiedConditionsMap.set(condition.name, {
-            name: condition.name,
-            icon: condition.getConditionIcon(),
-            count: 1,
-          });
-        }
-      });
-      let simplifiedConditions: {
-        name: string;
-        icon: any;
-        count: number;
-      }[] = Array.from(simplifiedConditionsMap.values());
-
-      return (
-        <View className="flex h-8 flex-row">
-          {simplifiedConditions.map((cond) => (
-            <ThemedView key={cond.name} className="mx-2 flex align-middle">
-              <View className="mx-auto rounded-md bg-[rgba(0,0,0,0.4)] p-0.5 dark:bg-[rgba(255,255,255,0.4)]">
-                <Image source={cond.icon} style={{ width: 22, height: 24 }} />
-              </View>
-              <Text className="text-sm">
-                {toTitleCase(cond.name)} x {cond.count}
-              </Text>
-            </ThemedView>
-          ))}
+  return (
+    <View className="flex h-[40%] pt-8">
+      <View className="flex-1 flex-row items-center justify-evenly pl-8">
+        <View
+          className="flex flex-col items-center justify-center"
+          style={{ minWidth: "40%", maxWidth: "60%" }}
+        >
+          <Text className="text-center text-3xl">
+            {enemyState.creatureSpecies.toLowerCase().includes("generic npc")
+              ? slug[2]
+              : toTitleCase(enemyState.creatureSpecies).replace(" ", "\n")}
+          </Text>
+          <ProgressBar
+            value={enemyState.health >= 0 ? enemyState.health : 0}
+            maxValue={enemyState.healthMax}
+            filledColor="#ef4444"
+            unfilledColor="#fee2e2"
+            displayNumber={
+              enemyState.creatureSpecies.toLowerCase() == "training dummy"
+                ? true
+                : false
+            }
+            removeAtZero={true}
+          />
+          <EnemyHealthChangePopUp
+            healthDiff={healthState.diff}
+            showing={healthState.showing}
+          />
+          <EnemyConditions conditions={enemyState.conditions} />
         </View>
-      );
-    }
-  }
-
-  if (enemyState) {
-    return (
-      <View className="flex h-[40%] pt-8">
-        <View className="flex-1 flex-row items-center justify-evenly pl-8">
-          <View
-            className="flex flex-col items-center justify-center"
-            style={{ minWidth: "40%", maxWidth: "60%" }}
+        <View className="relative">
+          <Animated.View
+            className="mx-auto mt-12"
+            style={{
+              transform: [
+                {
+                  translateX: Animated.add(
+                    animations.attackAnim,
+                    animations.dodgeAnim,
+                  ),
+                },
+                {
+                  translateY: Animated.multiply(
+                    Animated.add(animations.attackAnim, animations.dodgeAnim),
+                    -1.5,
+                  ),
+                },
+              ],
+              opacity: Animated.multiply(
+                animations.damageAnim,
+                animations.flashOpacity,
+              ),
+            }}
           >
-            <Text className="text-center text-3xl">
-              {enemyState.creatureSpecies.toLowerCase().includes("generic npc")
-                ? slug[2]
-                : toTitleCase(enemyState.creatureSpecies).replace(" ", "\n")}
-            </Text>
-            <ProgressBar
-              value={enemyState.health >= 0 ? enemyState.health : 0}
-              maxValue={enemyState.healthMax}
-              filledColor="#ef4444"
-              unfilledColor="#fee2e2"
-              displayNumber={
-                enemyState.creatureSpecies.toLowerCase() == "training dummy"
-                  ? true
-                  : false
-              }
-              removeAtZero={true}
-            />
-            {showingEnemyHealthChange ? (
-              <EnemyHealthChangePopUp />
-            ) : (
-              <View className="h-6" />
-            )}
-            {EnemyConditionRender()}
-          </View>
-          <View className="relative">
-            <Animated.View
-              className="mx-auto mt-12"
-              style={{
-                transform: [
-                  {
-                    translateX: Animated.add(
-                      enemyAttackAnimationValue,
-                      enemyDodgeAnimationValue,
-                    ),
-                  },
-                  {
-                    translateY: Animated.multiply(
-                      Animated.add(
-                        enemyAttackAnimationValue,
-                        enemyDodgeAnimationValue,
-                      ),
-                      -1.5,
-                    ),
-                  },
-                ],
-                opacity: Animated.multiply(
-                  enemyDamagedAnimationValue,
-                  enemyFlashOpacity,
-                ),
-              }}
-            >
-              <EnemyImage creatureSpecies={enemyState.creatureSpecies} />
-            </Animated.View>
-            <EnemyHealingAnimationBox showHealAnimationDummy={enemyHealDummy} />
-            <Animated.View
-              style={{
-                transform: [{ translateY: enemyTextTranslateAnimation }],
-                opacity: enemyTextFadeAnimation,
-                position: "absolute",
-                left: 0,
-                right: 0,
-                top: 0,
-                bottom: 0,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {enemyTextString ? (
-                <Text
-                  className="text-xl tracking-wide text-center"
-                  numberOfLines={1}
-                >
-                  *{toTitleCase(enemyTextString)}*
-                </Text>
-              ) : null}
-            </Animated.View>
+            <EnemyImage creatureSpecies={enemyState.creatureSpecies} />
+          </Animated.View>
+          <EnemyHealingAnimationBox showHealAnimationDummy={enemyHealDummy} />
+          <Animated.View
+            style={{
+              transform: [{ translateY: animations.textTranslateAnim }],
+              opacity: animations.textFadeAnim,
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            {enemyTextString ? (
+              <Text
+                className="text-xl tracking-wide text-center"
+                numberOfLines={1}
+              >
+                *{toTitleCase(enemyTextString)}*
+              </Text>
+            ) : null}
+          </Animated.View>
+        </View>
+      </View>
+      {enemyState.minions.length > 0 ? (
+        <View className="mx-4">
+          <GenericStrikeAround>
+            <Text className="text-sm">Enemy Minions</Text>
+          </GenericStrikeAround>
+          <View className="mx-4 flex flex-row flex-wrap">
+            {enemyState.minions.map((minion) => (
+              <View
+                key={minion.id}
+                className="flex-grow px-2 py-1"
+                style={{ flexBasis: "50%" }}
+              >
+                <Text>{toTitleCase(minion.creatureSpecies)}</Text>
+                <ProgressBar
+                  filledColor="#ef4444"
+                  unfilledColor="#fee2e2"
+                  value={minion.health}
+                  maxValue={minion.healthMax}
+                  displayNumber={false}
+                />
+              </View>
+            ))}
           </View>
         </View>
-        {enemyState.minions.length > 0 ? (
-          <View className="mx-4">
-            <GenericStrikeAround>
-              <Text className="text-sm">Enemy Minions</Text>
-            </GenericStrikeAround>
-            <View className="mx-4 flex flex-row flex-wrap">
-              {enemyState.minions.map((minion) => (
-                <View
-                  key={minion.id}
-                  className="flex-grow px-2 py-1"
-                  style={{ flexBasis: "50%" }}
-                >
-                  <Text>{toTitleCase(minion.creatureSpecies)}</Text>
-                  <ProgressBar
-                    filledColor="#ef4444"
-                    unfilledColor="#fee2e2"
-                    value={minion.health}
-                    maxValue={minion.healthMax}
-                    displayNumber={false}
-                  />
-                </View>
-              ))}
-            </View>
-          </View>
-        ) : null}
-      </View>
-    );
-  }
-}
+      ) : null}
+    </View>
+  );
+});
+
+export default DungeonEnemyDisplay;

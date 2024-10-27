@@ -1198,9 +1198,9 @@ export class PlayerCharacter extends Character {
     mana: number;
     sanity: number;
   }) {
-    this.currentHealth = this.maxHealth - health;
-    this.currentMana = this.maxMana - mana;
-    this.currentSanity = this.maxSanity - sanity;
+    this.currentHealth = Math.min(this.maxHealth, this.currentHealth + health);
+    this.currentMana = Math.min(this.maxMana, this.currentMana + mana);
+    this.currentSanity = Math.min(this.maxSanity, this.currentSanity + sanity);
   }
 
   public equippedCheck(item: Item) {
