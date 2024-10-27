@@ -19,13 +19,13 @@ describe("Serialization Benchmark", () => {
       parents: [createParent("female"), createParent("female")],
       birthdate: new Date().toString(),
       ...getStartingBaseStats({ playerClass: PlayerClassOptions.mage }),
+      inCombat: false,
     }); // create a player object
 
-    const shops = createShops(PlayerClassOptions.mage);
+    const shops = createShops();
     const game = new Game({
       shops: shops,
       vibrationEnabled: "full",
-      playerState: player,
     }); // create a game object
 
     const suite = new Benchmark.Suite();

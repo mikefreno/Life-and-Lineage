@@ -7,6 +7,7 @@ import {
   ScrollView,
   View,
   TouchableWithoutFeedback,
+  Animated,
 } from "react-native";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Item } from "../../classes/item";
@@ -42,7 +43,8 @@ const ShopInteriorScreen = observer(() => {
     side?: "shop" | "inventory";
     positon: { left: number; top: number };
   } | null>(null);
-  const [refreshCheck, setRefreshCheck] = useState<boolean>(false);
+  const [initialized, setInitialized] = useState<boolean>(false);
+  const [greeting, setGreeting] = useState<string>("");
 
   const [inventoryFullNotifier, setInventoryFullNotifier] =
     useState<boolean>(false);
@@ -60,16 +62,22 @@ const ShopInteriorScreen = observer(() => {
   }, [inventoryFullNotifier]);
 
   useEffect(() => {
-    if (playerState && thisShop) {
+    console.log(thisShop?.createGreeting(playerState?.fullName!));
+  }, []);
+
+  useEffect(() => {
+    if (playerState && thisShop && !initialized) {
       if (
         new Date(thisShop.lastStockRefresh) <
-        new Date(Date.now() - REFRESH_TIME)
+          new Date(Date.now() - REFRESH_TIME) ||
+        thisShop.inventory.length == 0
       ) {
         thisShop.refreshInventory(playerState);
       }
       thisShop.setPlayerToInventory(playerState);
+      setGreeting(thisShop.createGreeting(playerState.fullName));
+      setInitialized(true);
     }
-    setRefreshCheck(true);
   }, [playerState]);
 
   while (!blockSize) {
@@ -185,8 +193,44 @@ const ShopInteriorScreen = observer(() => {
       </Pressable>
     );
   };
+  const GreetingComponent = ({ greeting }: { greeting: string }) => {
+    const fadeAnim = useRef(new Animated.Value(1)).current;
 
-  if (refreshCheck && thisShop && gameState && playerState) {
+    useEffect(() => {
+      const fadeOut = Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 1000,
+        useNativeDriver: true,
+      });
+
+      const timer = setTimeout(() => {
+        fadeOut.start();
+      }, 3000);
+
+      return () => {
+        clearTimeout(timer);
+        fadeOut.stop();
+      };
+    }, []);
+
+    return (
+      <Animated.View
+        style={[
+          {
+            position: "absolute",
+            zIndex: 999,
+            opacity: fadeAnim,
+          },
+        ]}
+      >
+        <ThemedView className="border shadow-lg rounded-md p-2">
+          <Text className="text-center">{greeting}</Text>
+        </ThemedView>
+      </Animated.View>
+    );
+  };
+
+  if (initialized && thisShop && gameState && playerState) {
     return (
       <ThemedView className="h-full">
         <Stack.Screen
@@ -230,6 +274,7 @@ const ShopInteriorScreen = observer(() => {
                   )}
                   characterSex={thisShop.shopKeeper.sex == "male" ? "M" : "F"}
                 />
+                <GreetingComponent greeting={greeting} />
                 <Text className="text-center">
                   {thisShop.shopKeeper.fullName}'s Inventory
                 </Text>

@@ -1,5 +1,6 @@
 import { Item, isStackable } from "./item";
 import shops from "../assets/json/shops.json";
+import greetings from "../assets/json/shopLines.json";
 import { action, makeObservable, observable } from "mobx";
 import { Character, PlayerCharacter } from "./character";
 import {
@@ -9,7 +10,7 @@ import {
   getItemJSONMap,
   generateBirthday,
 } from "../utility/functions/misc";
-import { ItemClassType, PlayerClassOptions } from "../utility/types";
+import { ItemClassType, ShopkeeperPersonality } from "../utility/types";
 
 interface ShopProps {
   baseGold: number;
@@ -18,6 +19,7 @@ interface ShopProps {
   inventory?: Item[];
   shopKeeper: Character;
   archetype: string;
+  shopKeeperPersonality: ShopkeeperPersonality;
 }
 
 /**
@@ -31,6 +33,7 @@ export class Shop {
   inventory: Item[];
   shopKeeper: Character;
   readonly archetype: string;
+  shopKeeperPersonality: ShopkeeperPersonality;
 
   constructor({
     baseGold,
@@ -39,6 +42,7 @@ export class Shop {
     inventory,
     shopKeeper,
     archetype,
+    shopKeeperPersonality,
   }: ShopProps) {
     this.baseGold = baseGold;
     this.currentGold = currentGold ?? baseGold;
@@ -47,15 +51,32 @@ export class Shop {
     this.inventory = inventory ?? [];
     this.archetype = archetype;
     this.shopKeeper = shopKeeper;
+    this.shopKeeperPersonality = shopKeeperPersonality;
     makeObservable(this, {
       shopKeeper: observable,
       baseGold: observable,
       currentGold: observable,
       lastStockRefresh: observable,
+      shopKeeperPersonality: observable,
       refreshInventory: action,
       buyItem: action,
       sellItem: action,
+      deathCheck: action,
     });
+  }
+
+  public deathCheck() {
+    if (this.shopKeeper.deathdate) {
+      const shopObj = shops.find((shop) => shop.type == this.archetype);
+      if (!shopObj) throw new Error(`missing ${this.archetype} in json`);
+      const randIdx = Math.floor(
+        Math.random() * shopObj.possiblePersonalities.length,
+      );
+      const personality = shopObj.possiblePersonalities[randIdx];
+      //want to favor likelihood of male shopkeepers slightly
+      this.shopKeeper = generateShopKeeper(shopObj.type);
+      this.shopKeeperPersonality = personality as ShopkeeperPersonality;
+    }
   }
 
   public refreshInventory(player: PlayerCharacter) {
@@ -75,6 +96,33 @@ export class Shop {
     } else {
       throw new Error("Shop not found on refreshInventory()");
     }
+  }
+
+  public createGreeting(playerFullName: string) {
+    if (this.shopKeeper.affection > 90) {
+      const options = greetings[this.shopKeeperPersonality]["very warm"];
+      const randIdx = Math.floor(Math.random() * options.length);
+      return options[randIdx].replaceAll("%p", playerFullName);
+    }
+    if (this.shopKeeper.affection > 75) {
+      const options = greetings[this.shopKeeperPersonality].warm;
+      const randIdx = Math.floor(Math.random() * options.length);
+      return options[randIdx].replaceAll("%p", playerFullName);
+    }
+    if (this.shopKeeper.affection > 50) {
+      const options = greetings[this.shopKeeperPersonality].positive;
+      const randIdx = Math.floor(Math.random() * options.length);
+      return options[randIdx].replaceAll("%p", playerFullName);
+    }
+    if (this.shopKeeper.affection > 25) {
+      const options =
+        greetings[this.shopKeeperPersonality]["slightly positive"];
+      const randIdx = Math.floor(Math.random() * options.length);
+      return options[randIdx].replaceAll("%p", playerFullName);
+    }
+    const options = greetings[this.shopKeeperPersonality].neutral;
+    const randIdx = Math.floor(Math.random() * options.length);
+    return options[randIdx].replaceAll("%p", playerFullName);
   }
 
   public setPlayerToInventory(player: PlayerCharacter) {
@@ -157,6 +205,7 @@ export class Shop {
       currentGold: json.currentGold,
       lastStockRefresh: new Date(json.lastStockRefresh),
       archetype: json.archetype,
+      shopKeeperPersonality: json.shopKeeperPersonality,
       inventory: json.inventory
         ? json.inventory.map((item: any) => Item.fromJSON(item))
         : [],
@@ -202,18 +251,21 @@ function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function createShops(playerClass: PlayerClassOptions) {
+export function createShops() {
   let createdShops: Shop[] = [];
   shops.forEach((shop) => {
+    const randIdx = Math.floor(
+      Math.random() * shop.possiblePersonalities.length,
+    );
+    const personality = shop.possiblePersonalities[randIdx];
     //want to favor likelihood of male shopkeepers slightly
     const newShop = new Shop({
       shopKeeper: generateShopKeeper(shop.type),
       baseGold: shop.baseGold,
       lastStockRefresh: new Date(),
       archetype: shop.type,
-      playerClass,
+      shopKeeperPersonality: personality as ShopkeeperPersonality,
     });
-    newShop.refreshInventory();
     createdShops.push(newShop);
   });
   return createdShops;

@@ -4,7 +4,7 @@ import { Shop } from "../../classes/shop";
 import { CharacterImage } from "../../components/CharacterImage";
 import shopObjects from "../../assets/json/shops.json";
 import { router } from "expo-router";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useVibration } from "../../utility/customHooks";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -14,12 +14,26 @@ import { AppContext } from "../_layout";
 import { TutorialOption } from "../../utility/types";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
+import D20DieAnimation from "../../components/DieRollAnim";
 
 const ShopsScreen = observer(() => {
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing gameData");
   const vibration = useVibration();
   const { gameState, isCompact } = appData;
+  const [isReady, setIsReady] = useState(false);
+
+  const runDeathChecks = () => {
+    gameState?.shops.forEach((shop) => shop.deathCheck());
+  };
+  useEffect(() => {
+    if (!isReady) {
+      runDeathChecks();
+      setIsReady(true);
+    }
+  }, []);
+  const headerHeight = useHeaderHeight();
+  const bottomHeight = useBottomTabBarHeight();
 
   if (gameState) {
     const renderItem = (shop: Shop) => (
@@ -135,20 +149,24 @@ const ShopsScreen = observer(() => {
           }}
         />
 
-        <ScrollView>
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              alignItems: "flex-start",
-              justifyContent: "flex-start",
-              paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
-              paddingTop: useHeaderHeight(),
-            }}
-          >
-            {gameState.shops.map((shop) => renderItem(shop))}
-          </View>
-        </ScrollView>
+        {isReady ? (
+          <ScrollView>
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                alignItems: "flex-start",
+                justifyContent: "flex-start",
+                paddingBottom: bottomHeight + (isCompact ? 0 : 28),
+                paddingTop: headerHeight,
+              }}
+            >
+              {gameState.shops.map((shop) => renderItem(shop))}
+            </View>
+          </ScrollView>
+        ) : (
+          <D20DieAnimation />
+        )}
       </>
     );
   }

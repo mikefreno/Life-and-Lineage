@@ -1,0 +1,386 @@
+{
+	"wise": {
+		"neutral": [
+			"The winds whisper of your arrival.",
+			"Fate brings another seeker.",
+			"What knowledge do you pursue?",
+			"The old ways draw you here.",
+			"Destiny moves as it must.",
+			"Seek you wisdom in these halls?"
+		],
+		"slightly positive": [
+			"Ah, your path returns to me.",
+			"The threads of destiny intertwine again.",
+			"The patterns speak of your return.",
+			"Knowledge calls to its seekers.",
+			"Your curiosity serves you well."
+		],
+		"positive": [
+			"Your presence brightens these ancient halls, %p.",
+			"The old wisdom awaits you, dear friend.",
+			"Your journey teaches us both, %p.",
+			"The mysteries welcome you back.",
+			"Wisdom grows between us, %p.",
+			"Your path shines ever brighter."
+		],
+		"warm": [
+			"My cherished pupil %p returns.",
+			"The stars themselves rejoice at your return.",
+			"The ancient ones smile upon you, %p."
+		],
+		"very warm": [
+			"My dearest %p, you honor these halls.",
+			"My heart lightens at your presence, %p.",
+			"Together we unlock deeper mysteries, %p.",
+			"The cosmos itself celebrates you, %p."
+		]
+	},
+	"reserved": {
+		"neutral": [
+			"State your business.",
+			"What do you seek?",
+			"You may browse.",
+			"Keep your hands visible.",
+			"Mind the hour.",
+			"Speak if you must."
+		],
+		"slightly positive": [
+			"Your coin is welcome here.",
+			"I have what you need.",
+			"Your return was expected.",
+			"The goods remain as before.",
+			"Perhaps you'll find something suitable.",
+			"Your discretion is noted."
+		],
+		"positive": [
+			"A familiar face. Welcome, %p.",
+			"Your presence is... acceptable.",
+			"I trust you'll find what's needed.",
+			"Your judgment proves reliable, %p.",
+			"Our dealings remain satisfactory.",
+			"Your visits are well-timed, %p."
+		],
+		"warm": [
+			"Good to see you again, %p.",
+			"Your visits bring peace.",
+			"A welcome sight, indeed.",
+			"Your company grows more pleasant, %p.",
+			"Time well spent, with you here.",
+			"Our trust runs deep now, %p."
+		],
+		"very warm": [
+			"%p... I've been waiting.",
+			"Finally, a trusted friend arrives.",
+			"Your company eases my burden, %p.",
+			"Few earn such trust, %p.",
+			"These walls brighten for you, %p.",
+			"My door always opens for you, %p."
+		]
+	},
+	"arrogant": {
+		"neutral": [
+			"Another insignificant customer.",
+			"Try not to waste my time.",
+			"Oh, you can afford my wares?",
+			"How... quaint.",
+			"I suppose you may enter."
+		],
+		"slightly positive": [
+			"Less disappointing than most.",
+			"Perhaps you're learning, finally.",
+			"Your taste shows small improvement.",
+			"At least you recognize quality."
+		],
+		"positive": [
+			"Ah, %p. At least you understand quality.",
+			"Your taste improves, %p.",
+			"Finally, someone worth my time.",
+			"You're learning our ways, %p.",
+			"Your presence becomes less tiresome.",
+			"Perhaps there's hope for you, %p."
+		],
+		"warm": [
+			"Your presence is... tolerable, %p.",
+			"%p, you've earned my attention.",
+			"I await your visits, %p.",
+			"Your company proves... agreeable, %p."
+		],
+		"very warm": [
+			"My distinguished friend %p arrives.",
+			"Ah, %p. My finest customer.",
+			"Your excellence matches mine, %p.",
+			"Few reach your standing, %p.",
+			"Together we stand above all, %p."
+		]
+	},
+	"insane": {
+		"neutral": [
+			"The shadows speak your name!",
+			"Dancing flames! Customer arrives!",
+			"Whispers, whispers, always whispers...",
+			"The walls have eyes today!",
+			"Skittering secrets everywhere!",
+			"Do you hear the colors too?"
+		],
+		"slightly positive": [
+			"The rats told me you'd return!",
+			"Your skull glows prettily today!",
+			"The voices remember your face!",
+			"Giggling shadows missed you!",
+			"The walls spoke of you!"
+		],
+		"positive": [
+			"Sweet %p! The walls missed you!",
+			"The darkness sings for you, %p!",
+			"My friend! The spiders foresaw you!",
+			"The void dances for you, %p!",
+			"These screaming stones welcome you, %p!"
+		],
+		"warm": [
+			"My precious %p! Tea with the void?",
+			"Dance with us again, dearest %p!",
+			"The shadows embrace you, %p!",
+			"Such wonderful nightmares we'll share!"
+		],
+		"very warm": [
+			"My beloved %p! We missed you!",
+			"We've been giggling about you, %p!",
+			"The void sings your praises, %p!",
+			"Let's paint with screams, dear %p!"
+		]
+	},
+	"creepy": {
+		"neutral": [
+			"Slither closer...",
+			"Fresh meat enters my shop.",
+			"Your fear smells... delicious.",
+			"I sense your beating heart.",
+			"The shadows hunger today.",
+			"Your soul shivers so sweetly."
+		],
+		"slightly positive": [
+			"Your shadow grows stronger.",
+			"The darkness remembers you.",
+			"I've been watching you.",
+			"The void marked your return."
+		],
+		"positive": [
+			"Ahhh, %p returns to the depths.",
+			"The shadows whispered of you, %p.",
+			"Your darkness calls to us, %p.",
+			"The abyss welcomes you back, %p."
+		],
+		"warm": [
+			"My precious %p, come closer.",
+			"We've been expecting you, dear %p.",
+			"The shadows embrace you, %p."
+		],
+		"very warm": [
+			"My favorite morsel, %p, returns.",
+			"Your soul blackens beautifully, %p.",
+			"Let us commune in shadow, %p.",
+			"The void sings your name, %p."
+		]
+	},
+	"incredulous": {
+		"neutral": [
+			"Well, look who wandered in.",
+			"Oh, you're actually here to buy?",
+			"Seriously? Another customer?",
+			"I can't believe this.",
+			"Is this some kind of joke?",
+			"You're really here, aren't you?"
+		],
+		"slightly positive": [
+			"Huh. You're back again.",
+			"Didn't expect to see you return.",
+			"Well, this is a surprise.",
+			"Against all odds, you're here.",
+			"Somehow, you found your way back."
+		],
+		"positive": [
+			"By the gods, %p returns!",
+			"Never thought I'd miss you, %p.",
+			"Well, if it isn't %p again!",
+			"This defies explanation, %p.",
+			"You continue to surprise me, %p."
+		],
+		"warm": [
+			"Is that really you, %p?",
+			"Against all odds, my favorite customer!",
+			"Unbelievable! %p graces us again!",
+			"You're real! You're here!"
+		],
+		"very warm": [
+			"The impossible %p returns!",
+			"My most surprising friend %p!",
+			"Miracles do happen - welcome, %p!"
+		]
+	},
+	"silent": {
+		"neutral": [
+			"...",
+			"...",
+			"...",
+			"*nods slowly*",
+			"*gestures to wares*"
+		],
+		"slightly positive": [
+			"*acknowledging nod*",
+			"...",
+			"...",
+			"*brief wave*"
+		],
+		"positive": [
+			"*warm nod*",
+			"*welcoming gesture*",
+			"*pleased expression*",
+			"*peaceful acknowledgment*"
+		],
+		"warm": [
+			"*happy recognition*",
+			"*peaceful smile*",
+			"*eyes show joy*"
+		],
+		"very warm": [
+			"*eager welcome gesture*",
+			"H-Hello, %p",
+			"*silent celebration*"
+		]
+	},
+	"calm": {
+		"neutral": [
+			"Welcome to my humble shop.",
+			"Peace be with you.",
+			"Enter and rest awhile.",
+			"Breathe deeply, friend."
+		],
+		"slightly positive": [
+			"Your return brings tranquility.",
+			"A welcome presence arrives.",
+			"Peace follows your steps.",
+			"Serenity greets your return.",
+			"The air settles with you."
+		],
+		"positive": [
+			"Peace follows you, %p.",
+			"Your spirit calms these halls, %p.",
+			"Your presence soothes all, %p.",
+			"Balance returns with you, %p."
+		],
+		"warm": [
+			"Tranquility returns with you, %p.",
+			"Your presence soothes, dear friend.",
+			"Your spirit brings such peace."
+		],
+		"very warm": [
+			"My serene friend %p returns.",
+			"Your calm spirit completes us, %p.",
+			"Welcome home %p.",
+			"Tranquility flows through you, %p.",
+			"Perfect peace with you here, %p."
+		]
+	},
+	"jovial": {
+		"neutral": [
+			"Welcome, welcome, welcome!",
+			"Another customer! Splendid!",
+			"Oh ho! Enter, enter!",
+			"Come in, come in!"
+		],
+		"slightly positive": [
+			"Wonderful to see you again!",
+			"Ah! The day brightens!",
+			"Another chance for merriment!",
+			"Such delightful timing!"
+		],
+		"positive": [
+			"If it isn't my friend %p!",
+			"Haha! %p brings joy again!",
+			"What adventures await, %p!",
+			"Time for celebration, %p!"
+		],
+		"warm": [
+			"My favorite troublemaker %p!",
+			"The best customer in the realm!",
+			"What adventures await us, %p?",
+			"Let's make mischief, %p!",
+			"Joy follows your steps, %p!",
+			"Adventure calls us, %p!"
+		],
+		"very warm": [
+			"My dearest friend %p returns!",
+			"Joy of joys! %p is here!",
+			"The party can begin, %p's arrived!",
+			"What magnificent timing, %p!"
+		]
+	},
+	"aggressive": {
+		"neutral": [
+			"Don't touch anything.",
+			"Buy something or leave.",
+			"Make it quick.",
+			"State your purpose."
+		],
+		"slightly positive": [
+			"Try not to break anything.",
+			"At least you bring coin.",
+			"You again. Fine.",
+			"Keep your weapons sheathed."
+		],
+		"positive": [
+			"You've got spine, %p.",
+			"Show me what you're made of, %p.",
+			"Your strength grows, %p."
+		],
+		"warm": [
+			"Strong as ever, %p!",
+			"Fighting fit, %p?",
+			"Ready to deal, warrior?",
+			"Your strength honors us, %p!",
+			"Stand proud, warrior %p!",
+			"Show your might, %p!"
+		],
+		"very warm": [
+			"My strongest customer returns!",
+			"Together we'll conquer, %p!",
+			"Nothing can stop us now, %p!",
+			"Victory follows you, %p!",
+			"Your strength inspires, %p!",
+			"We'll crush them all, %p!"
+		]
+	},
+	"open": {
+		"neutral": [
+			"Welcome to my shop!",
+			"Come in, come in!",
+			"Browse freely, friend.",
+			"Make yourself at home!"
+		],
+		"slightly positive": [
+			"Happy to see you again!",
+			"Such a pleasant surprise!",
+			"Another wonderful visit!"
+		],
+		"positive": [
+			"Dear %p, always welcome here!",
+			"Your friendship means much, %p.",
+			"What brings you back, friend?",
+			"My door opens wide, %p!",
+			"Share your tales, dear %p!",
+			"Your presence brings warmth, %p!"
+		],
+		"warm": [
+			"Share stories with me, %p!",
+			"Your presence brings joy, %p!",
+			"My trusted friend %p returns!",
+			"Your visits mean everything, %p!"
+		],
+		"very warm": [
+			"My dearest friend %p returns!",
+			"Your visits mean everything, %p!",
+			"Come, family should stay close, %p!",
+			"Blessed by your presence, %p!"
+		]
+	}
+}

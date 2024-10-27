@@ -106,6 +106,7 @@ export default function NewGameReview() {
         blessing: blessing,
         parents: [mom, dad],
         birthdate: bday,
+        inCombat: false,
         ...getStartingBaseStats({ playerClass }),
       });
     } else if (
@@ -123,6 +124,7 @@ export default function NewGameReview() {
         blessing: blessing,
         parents: [mom, dad],
         birthdate: bday,
+        inCombat: false,
         ...getStartingBaseStats({ playerClass }),
       });
     } else if (
@@ -140,6 +142,7 @@ export default function NewGameReview() {
         blessing: blessing,
         parents: [mom, dad],
         birthdate: bday,
+        inCombat: false,
         ...getStartingBaseStats({ playerClass }),
       });
     } else if (
@@ -156,6 +159,7 @@ export default function NewGameReview() {
         blessing: blessing,
         parents: [mom, dad],
         birthdate: bday,
+        inCombat: false,
         ...getStartingBaseStats({ playerClass }),
       });
     } else {
@@ -170,7 +174,7 @@ export default function NewGameReview() {
       const starterBook = getStartingBook(blessing);
       player.addToInventory(starterBook);
       const startDate = new Date().toISOString();
-      const shops = createShops(playerClass);
+      const shops = createShops();
       const tutorialState = storage.getString("tutorialsEnabled");
       let parsed = true;
       if (tutorialState) {
