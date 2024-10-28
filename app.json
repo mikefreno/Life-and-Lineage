@@ -2,7 +2,7 @@
   "expo": {
     "name": "Lineage",
     "slug": "life-and-lineage",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "orientation": "portrait",
     "icon": "assets/images/icon.png",
     "scheme": "lineageapp",
@@ -33,6 +33,9 @@
       "package": "com.mikefrenodev.lineage",
       "versionCode": 1,
       "googleServicesFile": "./google-services.json"
+    },
+    "macos": {
+      "minMacOSVersion": "12.0"
     },
     "androidStatusBar": {
       "hidden": true
