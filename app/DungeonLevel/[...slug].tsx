@@ -52,7 +52,6 @@ const DungeonProvider = observer(() => {
     useState<boolean>(false);
   const [enemyAttackDummy, setEnemyAttackDummy] = useState<number>(0);
   const [enemyDodgeDummy, setEnemyDodgeDummy] = useState<number>(0);
-  const [enemyHealDummy, setEnemyHealDummy] = useState<number>(0);
   const [enemyTextDummy, setEnemyTextDummy] = useState<number>(0);
   const [enemyTextString, setEnemyTextString] = useState<string>();
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
@@ -213,10 +212,8 @@ const DungeonProvider = observer(() => {
           thisInstance,
           attackAnimationOnGoing,
           setAttackAnimationOnGoing,
-          enemyHealDummy,
           enemyDodgeDummy,
           setEnemyDodgeDummy,
-          setEnemyHealDummy,
           enemyAttackDummy,
           setEnemyAttackDummy,
           enemyTextString,

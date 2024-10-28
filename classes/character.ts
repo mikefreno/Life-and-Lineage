@@ -767,6 +767,15 @@ export class PlayerCharacter extends Character {
   }) {
     if (this.allocatedSkillPoints[from] >= amount) {
       this.allocatedSkillPoints[from] -= amount;
+      if (this.currentHealth > this.maxHealth) {
+        this.currentHealth = this.maxHealth;
+      }
+      if (this.currentMana > this.maxMana) {
+        this.currentMana = this.maxMana;
+      }
+      if (this.currentSanity > this.maxSanity) {
+        this.currentSanity = this.maxSanity;
+      }
       this.addSkillPoint({ amount });
     }
   }
@@ -2255,15 +2264,15 @@ function getStartingProficiencies(
   throw new Error("Incorrect playerClass setting");
 }
 
-export function getStartingBook(playerBlessing: Element) {
-  switch (playerBlessing) {
+export function getStartingBook(player: PlayerCharacter) {
+  switch (player.blessing) {
     case Element.fire:
       return new Item({
         name: "book of fire bolt",
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        playerClass: PlayerClassOptions.mage,
+        player,
       });
     case Element.water:
       return new Item({
@@ -2271,7 +2280,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        playerClass: PlayerClassOptions.mage,
+        player,
       });
     case Element.air:
       return new Item({
@@ -2279,7 +2288,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        playerClass: PlayerClassOptions.mage,
+        player,
       });
     case Element.earth:
       return new Item({
@@ -2287,7 +2296,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        playerClass: PlayerClassOptions.mage,
+        player,
       });
     case Element.blood:
       return new Item({
@@ -2295,7 +2304,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        playerClass: PlayerClassOptions.necromancer,
+        player,
       });
     case Element.summoning:
       return new Item({
@@ -2303,7 +2312,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        playerClass: PlayerClassOptions.necromancer,
+        player,
       });
     case Element.pestilence:
       return new Item({
@@ -2311,7 +2320,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        playerClass: PlayerClassOptions.necromancer,
+        player,
       });
     case Element.bone:
       return new Item({
@@ -2319,7 +2328,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        playerClass: PlayerClassOptions.necromancer,
+        player,
       });
     case Element.holy:
       return new Item({
@@ -2327,7 +2336,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        playerClass: PlayerClassOptions.paladin,
+        player,
       });
     case Element.protection:
       return new Item({
@@ -2335,7 +2344,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        playerClass: PlayerClassOptions.paladin,
+        player,
       });
     case Element.vengeance:
       return new Item({
@@ -2343,7 +2352,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        playerClass: PlayerClassOptions.paladin,
+        player,
       });
     case Element.beastMastery:
       return new Item({
@@ -2351,7 +2360,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        playerClass: PlayerClassOptions.ranger,
+        player,
       });
     case Element.assassination:
       return new Item({
@@ -2359,7 +2368,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        playerClass: PlayerClassOptions.ranger,
+        player,
       });
     case Element.arcane:
       return new Item({
@@ -2367,7 +2376,7 @@ export function getStartingBook(playerBlessing: Element) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        playerClass: PlayerClassOptions.ranger,
+        player,
       });
     default:
       throw new Error("Invalid player blessing in getStartingBook()");

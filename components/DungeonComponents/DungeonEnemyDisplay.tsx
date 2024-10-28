@@ -1,5 +1,4 @@
 import { View, Animated, Image } from "react-native";
-import { EnemyHealingAnimationBox } from "./EnemyHealingAnimationBox";
 import { toTitleCase } from "../../utility/functions/misc";
 import { Text } from "../Themed";
 import ProgressBar from "../ProgressBar";
@@ -175,7 +174,6 @@ const DungeonEnemyDisplay = observer(() => {
   const {
     slug,
     enemyTextString,
-    enemyHealDummy,
     enemyAttackDummy,
     firstLoad,
     enemyTextDummy,
@@ -231,9 +229,38 @@ const DungeonEnemyDisplay = observer(() => {
     }
   }, [enemyDodgeDummy]);
 
+  const healingGlowAnim = useRef(new Animated.Value(0)).current;
+
+  const runHealAnimation = () => {
+    Animated.sequence([
+      Animated.timing(healingGlowAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.delay(300),
+      Animated.timing(healingGlowAnim, {
+        toValue: 0,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
   useEffect(() => {
-    if (healthState.diff < 0 && !firstLoad) {
-      runDamageAnimation(() => {
+    if (!firstLoad && healthState.diff !== 0) {
+      if (healthState.diff < 0) {
+        runDamageAnimation(() => {
+          setTimeout(() => {
+            setHealthState((prev) => ({
+              ...prev,
+              showing: false,
+              diff: 0,
+            }));
+          }, 500);
+        });
+      } else {
+        runHealAnimation();
         setTimeout(() => {
           setHealthState((prev) => ({
             ...prev,
@@ -241,7 +268,7 @@ const DungeonEnemyDisplay = observer(() => {
             diff: 0,
           }));
         }, 500);
-      });
+      }
     }
   }, [healthState.diff]);
 
@@ -313,9 +340,13 @@ const DungeonEnemyDisplay = observer(() => {
               ),
             }}
           >
-            <EnemyImage creatureSpecies={enemyState.creatureSpecies} />
+            <View style={{ position: "relative" }}>
+              <EnemyImage
+                creatureSpecies={enemyState.creatureSpecies}
+                glowAnim={healingGlowAnim}
+              />
+            </View>
           </Animated.View>
-          <EnemyHealingAnimationBox showHealAnimationDummy={enemyHealDummy} />
           <Animated.View
             style={{
               transform: [{ translateY: animations.textTranslateAnim }],

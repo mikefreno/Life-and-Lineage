@@ -44,7 +44,6 @@ function enemyDeathHandler({ dungeonData, appData }: ContextData) {
     battleLogger,
     setShouldShowFirstBossKillTutorialAfterItemDrops,
     setEnemyAttackDummy,
-    setEnemyHealDummy,
   } = dungeonData;
   if (enemyState && playerState && gameState) {
     if (
@@ -77,7 +76,6 @@ function enemyDeathHandler({ dungeonData, appData }: ContextData) {
       }
       setEnemy(null);
       setEnemyAttackDummy(0);
-      setEnemyHealDummy(0);
       gameState.gameTick({ playerState });
       return true;
     } else {
@@ -103,7 +101,6 @@ export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
     throw new Error("missing context in enemyTurn()");
   const { enemyState, playerState, gameState } = appData;
   const {
-    setEnemyHealDummy,
     setEnemyAttackDummy,
     setEnemyTextString,
     setEnemyTextDummy,
@@ -112,7 +109,6 @@ export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
   } = dungeonData;
   if (enemyState && playerState && gameState) {
     const startOfTurnPlayerState = { ...playerState };
-    const startOfTurnEnemyState = { ...enemyState };
     const enemyAttackRes = enemyState.takeTurn({ player: playerState });
     battleLogger(enemyAttackRes.logString);
     let action: () => void;
@@ -120,8 +116,7 @@ export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
       case AttackUse.success:
         const playerHealthChange =
           startOfTurnPlayerState.currentHealth - playerState.currentHealth;
-        const enemyHealthChange =
-          startOfTurnEnemyState.health - enemyState.health;
+
         if (playerHealthChange > 0) {
           const revengeCondition = playerState.conditions.find((condition) =>
             condition.effect.includes("revenge"),
@@ -147,9 +142,6 @@ export const enemyTurn = ({ appData, dungeonData }: ContextData) => {
             setEnemyAttackDummy((prev) => prev + 1);
           }
           wait(500).then(() => {
-            if (enemyHealthChange < 0) {
-              setEnemyHealDummy((prev) => prev + 1);
-            }
             if (
               enemyAttackRes.chosenAttack.debuffStrings.length > 0 ||
               enemyAttackRes.chosenAttack.buffStrings.length > 0

@@ -171,7 +171,7 @@ export default function NewGameReview() {
   async function startGame() {
     if (playerClass) {
       const player = createPlayerCharacter();
-      const starterBook = getStartingBook(blessing);
+      const starterBook = getStartingBook(player);
       player.addToInventory(starterBook);
       const startDate = new Date().toISOString();
       const shops = createShops();
