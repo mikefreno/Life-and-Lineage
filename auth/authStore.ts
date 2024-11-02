@@ -305,6 +305,7 @@ class AuthStore {
         provider: "apple",
         appleUser: credential.user,
       });
+      return res.status;
     } else if (res.status == 400) {
       throw new Error("Missing user string");
     } else if (res.status == 418) {
@@ -321,12 +322,7 @@ class AuthStore {
     if (!userInfo.idToken) {
       throw new Error("missing idToken in response");
     }
-    await this.login({
-      token: userInfo.idToken,
-      email: userInfo.user.email,
-      provider: "google",
-    });
-    await fetch(`${API_BASE_URL}/google/registration`, {
+    const res = await fetch(`${API_BASE_URL}/google/registration`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -335,6 +331,15 @@ class AuthStore {
         email: userInfo.user.email,
       }),
     });
+    await this.login({
+      token: userInfo.idToken,
+      email: userInfo.user.email,
+      provider: "google",
+    });
+    if (!res.ok) {
+      throw new Error("Failure during sign-in");
+    }
+    return res.status;
   };
 
   getRemoteSaves = async () => {

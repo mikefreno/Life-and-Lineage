@@ -5,7 +5,7 @@ import { toTitleCase } from "../../utility/functions/misc";
 import { useVibration } from "../../utility/customHooks";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import { AppContext } from "../_layout";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 import { useAuth } from "../../auth/AuthContext";
 import { observer } from "mobx-react-lite";
@@ -242,11 +242,11 @@ export const AppSettings = observer(() => {
           </ScrollView>
         </GenericModal>
         <ThemedView className="flex-1 items-center justify-center px-4">
-          <GenericRaisedButton
+          {/*<GenericRaisedButton
             onPressFunction={() => router.push("/Options/iaps")}
           >
             Go to IAPs
-          </GenericRaisedButton>
+          </GenericRaisedButton>*/}
           <GenericStrikeAround>
             <Text className="text-xl">
               Remote Backups{!user.isAuthenticated && ` (requires login)`}

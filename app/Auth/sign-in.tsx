@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 import { Text } from "../../components/Themed";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useColorScheme } from "nativewind";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 import { useAuth } from "../../auth/AuthContext";
@@ -20,6 +20,8 @@ import { GoogleIcon } from "../../assets/icons/SVGIcons";
 import D20DieAnimation from "../../components/DieRollAnim";
 import { View as ThemedView } from "../../components/Themed";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { wait } from "../../utility/functions/misc";
+import * as Updates from "expo-updates";
 
 const SignInScreen = observer(() => {
   const auth = useAuth();
@@ -31,19 +33,6 @@ const SignInScreen = observer(() => {
   const [awaitingResponse, setAwaitingResponse] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>();
   const header = useHeaderHeight();
-
-  useEffect(() => {
-    if (auth.isAuthenticated) {
-      const navigateToOptions = async () => {
-        while (router.canGoBack()) {
-          router.back();
-        }
-        router.push("/Options");
-      };
-
-      navigateToOptions();
-    }
-  }, [auth.isAuthenticated]);
 
   const attemptLogin = async () => {
     setAwaitingResponse(true);
@@ -90,6 +79,12 @@ const SignInScreen = observer(() => {
             email: result.email,
             provider: "email",
           });
+          wait(500).then(() => {
+            while (router.canGoBack()) {
+              router.back();
+            }
+            router.push("/Options");
+          });
         } else {
           setError("Login failed for an unknown reason.");
         }
@@ -100,6 +95,47 @@ const SignInScreen = observer(() => {
     } finally {
       setAwaitingResponse(false);
     }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setAwaitingResponse(true);
+    try {
+      const res = await auth.googleSignIn();
+      if (res == 200) {
+        while (router.canGoBack()) {
+          router.back();
+        }
+        router.push("/Options");
+      } else {
+        wait(250).then(() => {
+          Updates.reloadAsync();
+        });
+      }
+    } catch (e) {
+      setError("Failed to sign in with Google. Please try again.");
+    }
+    setAwaitingResponse(false);
+  };
+
+  const handleAppleSignIn = async () => {
+    setAwaitingResponse(true);
+    try {
+      const res = await auth.appleSignIn();
+      if (res == 200) {
+        while (router.canGoBack()) {
+          router.back();
+        }
+        router.push("/Options");
+      } else {
+        wait(250).then(() => {
+          Updates.reloadAsync();
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      setError("Failed to sign in with Apple. Please try again.");
+    }
+    setAwaitingResponse(false);
   };
 
   return awaitingResponse ? (
@@ -116,15 +152,7 @@ const SignInScreen = observer(() => {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <ThemedView className="flex-1 justify-center items-center">
             <Pressable
-              onPress={async () => {
-                setAwaitingResponse(true);
-                try {
-                  await auth.googleSignIn();
-                } catch (e) {
-                  setError("Failed to sign in with Google. Please try again.");
-                }
-                setAwaitingResponse(false);
-              }}
+              onPress={handleGoogleSignIn}
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -160,16 +188,7 @@ const SignInScreen = observer(() => {
                 }
                 cornerRadius={5}
                 style={{ width: 230, height: 48 }}
-                onPress={async () => {
-                  setAwaitingResponse(true);
-                  try {
-                    await auth.appleSignIn();
-                  } catch (e) {
-                    console.error(e);
-                    setError("Failed to sign in with Apple. Please try again.");
-                  }
-                  setAwaitingResponse(false);
-                }}
+                onPress={handleAppleSignIn}
               />
             )}
 

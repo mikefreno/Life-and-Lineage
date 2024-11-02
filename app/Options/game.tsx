@@ -2,7 +2,7 @@ import { Text, View as ThemedView } from "../../components/Themed";
 import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../_layout";
-import { toTitleCase, wait } from "../../utility/functions/misc";
+import { toTitleCase } from "../../utility/functions/misc";
 import { Pressable, Switch, View } from "react-native";
 import { useVibration } from "../../utility/customHooks";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
