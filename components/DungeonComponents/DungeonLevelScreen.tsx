@@ -1,5 +1,5 @@
 import { View as ThemedView, Text } from "../../components/Themed";
-import { View, Platform, Dimensions } from "react-native";
+import { View, Platform } from "react-native";
 import { useContext, useRef, useEffect, useState } from "react";
 import { Pressable } from "react-native";
 import { Stack } from "expo-router";
@@ -25,7 +25,6 @@ import { DungeonContext } from "./DungeonContext";
 import { DungeonMapRender } from "./DungeonMap";
 import { addItemToPouch, playerMinionsTurn } from "./DungeonInteriorFunctions";
 import { SackIcon } from "../../assets/icons/SVGIcons";
-import D20DieAnimation from "../DieRollAnim";
 import { StatsDisplay } from "../StatsDisplay";
 import { TutorialOption } from "../../utility/types";
 import { useIsFocused } from "@react-navigation/native";
@@ -48,6 +47,7 @@ const DungeonLevelScreen = observer(() => {
     setShowTargetSelection,
     displayItem,
     setDisplayItem,
+    firstLoad,
   } = dungeonData;
 
   const [battleTab, setBattleTab] = useState<
@@ -152,17 +152,12 @@ const DungeonLevelScreen = observer(() => {
           </>
         </GenericModal>
         <ThemedView className="flex-1" style={{ paddingBottom: 84 }}>
-          {!inCombat ? (
-            <DungeonMapRender />
-          ) : enemyState ? (
+          {enemyState && !firstLoad ? (
             <DungeonEnemyDisplay />
+          ) : !inCombat && !firstLoad ? (
+            <DungeonMapRender />
           ) : (
-            <View className="flex-1 justify-center">
-              <D20DieAnimation
-                keepRolling={true}
-                size={Dimensions.get("window").height * 0.25}
-              />
-            </View>
+            <View className="flex-1 justify-center"></View>
           )}
           <Pressable
             ref={pouchRef}

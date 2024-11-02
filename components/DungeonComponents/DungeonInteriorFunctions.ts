@@ -44,6 +44,7 @@ function enemyDeathHandler({ dungeonData, appData }: ContextData) {
     battleLogger,
     setShouldShowFirstBossKillTutorialAfterItemDrops,
     setEnemyAttackDummy,
+    setEnemyDodgeDummy,
   } = dungeonData;
   if (enemyState && playerState && gameState) {
     if (
@@ -65,7 +66,7 @@ function enemyDeathHandler({ dungeonData, appData }: ContextData) {
       if (fightingBoss && gameState && thisDungeon) {
         setFightingBoss(false);
         thisDungeon.setBossDefeated();
-        gameState.openNextDungeonLevel(thisInstance!.name);
+        gameState.openNextDungeonLevel(thisInstance);
         playerState.bossDefeated();
         if (!gameState.tutorialsShown[TutorialOption.firstBossKill]) {
           setShouldShowFirstBossKillTutorialAfterItemDrops(true);
@@ -76,6 +77,7 @@ function enemyDeathHandler({ dungeonData, appData }: ContextData) {
       }
       setEnemy(null);
       setEnemyAttackDummy(0);
+      setEnemyDodgeDummy(0);
       gameState.gameTick({ playerState });
       return true;
     } else {

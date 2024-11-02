@@ -158,80 +158,88 @@ export const CharacterInteractionModal = observer(
                     </View>
                     <View className="pt-2">
                       {characterAge >= 18 &&
-                      playerState.partners.find((partner) =>
-                        partner.equals(character),
-                      ) ? (
-                        character.sex !== playerState.sex ? (
-                          <>
-                            <GenericFlatButton
-                              disabledCondition={!dateAvailable}
-                              onPressFunction={() => {
-                                vibration({ style: "light" });
-                                showPregnancyInfo();
-                              }}
-                            >
-                              Try for a Baby
-                            </GenericFlatButton>
+                        playerState.canDate({ character, characterAge }) &&
+                        (playerState.partners.find((partner) =>
+                          partner.equals(character),
+                        ) ? (
+                          character.sex !== playerState.sex ? (
+                            <>
+                              <GenericFlatButton
+                                disabledCondition={!dateAvailable}
+                                onPressFunction={() => {
+                                  vibration({ style: "light" });
+                                  showPregnancyInfo();
+                                }}
+                              >
+                                Try for a Baby
+                              </GenericFlatButton>
+                              <GenericFlatButton
+                                disabledCondition={!dateAvailable}
+                                onPressFunction={() => {
+                                  vibration({ style: "light" });
+                                  showAdoptionModal(character.fullName);
+                                }}
+                                className="mt-2"
+                              >
+                                Suggest Adoption
+                              </GenericFlatButton>
+                            </>
+                          ) : (
                             <GenericFlatButton
                               disabledCondition={!dateAvailable}
                               onPressFunction={() => {
                                 vibration({ style: "light" });
                                 showAdoptionModal(character.fullName);
                               }}
-                              className="mt-2"
                             >
                               Suggest Adoption
                             </GenericFlatButton>
-                          </>
+                          )
                         ) : (
                           <GenericFlatButton
                             disabledCondition={!dateAvailable}
                             onPressFunction={() => {
                               vibration({ style: "light" });
-                              showAdoptionModal(character.fullName);
+                              character.setDateCooldownStart(gameState.date);
+                              playerState.askForPartner(character);
+                              gameState.gameTick({ playerState });
                             }}
                           >
-                            Suggest Adoption
+                            Start Dating?
                           </GenericFlatButton>
-                        )
-                      ) : (
-                        <GenericFlatButton
-                          disabledCondition={!dateAvailable}
-                          onPressFunction={() => {
-                            vibration({ style: "light" });
-                            character.setDateCooldownStart(gameState.date);
-                            playerState.askForPartner(character);
-                            gameState.gameTick({ playerState });
-                          }}
-                        >
-                          Start Dating?
-                        </GenericFlatButton>
-                      )}
+                        ))}
                     </View>
-                    <View className="mt-2 flex flex-row justify-evenly">
-                      <GenericFlatButton
-                        disabledCondition={!dateAvailable}
-                        onPressFunction={() => {
-                          vibration({ style: "light" });
-                          character.setDateCooldownStart(gameState.date);
-                          character.updateAffection(-10);
-                          gameState.gameTick({ playerState });
-                        }}
-                      >
-                        Spit in Face
-                      </GenericFlatButton>
-                    </View>
-                    {character.affection > -25 && (
-                      <View className="mt-2 flex flex-row justify-evenly">
-                        <GenericFlatButton
-                          onPressFunction={() => {
-                            vibration({ style: "warning", essential: true });
-                            setShowAssaultWarning(true);
-                          }}
-                        >
-                          Assault
-                        </GenericFlatButton>
-                      </View>
+                    {!playerState.characterIsChild({ character }) && (
+                      <>
+                        <View className="mt-2 flex flex-row justify-evenly">
+                          <GenericFlatButton
+                            disabledCondition={!dateAvailable}
+                            onPressFunction={() => {
+                              vibration({ style: "light" });
+                              character.setDateCooldownStart(gameState.date);
+                              character.updateAffection(-10);
+                              gameState.gameTick({ playerState });
+                            }}
+                          >
+                            Spit in Face
+                          </GenericFlatButton>
+                        </View>
+                        {character.affection > -25 && (
+                          <View className="mt-2 flex flex-row justify-evenly">
+                            <GenericFlatButton
+                              onPressFunction={() => {
+                                vibration({
+                                  style: "warning",
+                                  essential: true,
+                                });
+                                setShowAssaultWarning(true);
+                              }}
+                            >
+                              Assault
+                            </GenericFlatButton>
+                          </View>
+                        )}
+                      </>
                     )}
                   </>
                 ) : (

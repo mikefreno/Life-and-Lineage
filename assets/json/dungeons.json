@@ -1,11 +1,12 @@
 [
    {
-     "instance": "nearby cave",
+     "name": "nearby cave",
      "levels": [
        {
          "level": 1,
          "tiles": 10,
-         "boss": ["zombie"]
+         "boss": ["zombie"],
+         "unlocked": true
        },
        {
          "level": 2,
@@ -21,7 +22,7 @@
      "unlocks": ["goblin cave", "bandit hideout"]
    },
    { 
-     "instance": "goblin cave",
+     "name": "goblin cave",
      "levels": [
        {
          "level": 1,
@@ -37,7 +38,7 @@
      "unlocks":["rogue magi fortress"]
    },
    { 
-     "instance": "bandit hideout",
+     "name": "bandit hideout",
      "levels": [
        {
          "level": 1,
@@ -53,7 +54,7 @@
      "unlocks":["infested mine"]
    },
    { 
-     "instance": "rogue magi fortress",
+     "name": "rogue magi fortress",
      "levels": [
        {
          "level": 1,
@@ -79,7 +80,7 @@
      "unlocks":["dark forest"]
    }, 
    { 
-     "instance": "infested mine",
+     "name": "infested mine",
      "levels": [
        {
          "level": 1,
@@ -95,7 +96,7 @@
      "unlocks":["crystal mine"]
    },
    {
-     "instance": "dark forest",
+     "name": "dark forest",
      "levels": [
        {
          "level": 1,
@@ -111,7 +112,7 @@
      "unlocks":["corrupted temple"]
    },
    {
-     "instance": "crystal mine",
+     "name": "crystal mine",
      "levels": [
        {
          "level": 1,
@@ -127,7 +128,7 @@
      "unlocks":["corrupted temple"]
    },
    {
-     "instance": "corrupted temple",
+     "name": "corrupted temple",
      "levels": [
        {
          "level": 1,

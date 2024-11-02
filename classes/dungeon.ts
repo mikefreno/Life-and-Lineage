@@ -1,4 +1,3 @@
-import dungeons from "../assets/json/dungeons.json";
 import bosses from "../assets/json/bosses.json";
 import { Enemy } from "./creatures";
 import { action, makeObservable, observable } from "mobx";
@@ -6,14 +5,16 @@ import { BeingType } from "../utility/types";
 
 interface DungeonLevelOptions {
   level: number;
-  bosses: string[];
+  boss: string[];
   tiles: number;
+  unlocked?: boolean;
   bossDefeated?: boolean;
 }
 
 interface DungeonInstanceOptions {
   name: string;
-  levels?: DungeonLevel[];
+  unlocks: string[];
+  levels: DungeonLevel[];
 }
 
 /**
@@ -23,36 +24,29 @@ interface DungeonInstanceOptions {
 export class DungeonInstance {
   readonly name: string;
   levels: DungeonLevel[];
+  readonly unlocks: string[];
 
-  constructor({ name, levels }: DungeonInstanceOptions) {
+  constructor({ name, levels, unlocks }: DungeonInstanceOptions) {
     this.name = name;
-    this.levels = levels ?? [];
-    makeObservable(this, { levels: observable, addLevel: action });
+    this.levels = levels;
+    this.unlocks = unlocks;
+    makeObservable(this, { levels: observable, unlockNextLevel: action });
   }
 
-  public addLevel() {
-    const dungeonObj = dungeons.find(
-      (dungeon) => dungeon.instance == this.name,
-    );
-    if (dungeonObj) {
-      const nextLevelObj = dungeonObj.levels.find(
-        (level) => level.level == this.levels[this.levels.length - 1].level + 1,
-      );
-      if (nextLevelObj) {
-        this.levels.push(
-          new DungeonLevel({
-            level: nextLevelObj.level,
-            bosses: nextLevelObj.boss,
-            tiles: nextLevelObj.tiles,
-          }),
-        );
-        return true;
-      } else {
-        return false;
+  public unlockNextLevel() {
+    let currentMaxDepth = 0;
+    this.levels.forEach((level) => {
+      if (level.level > currentMaxDepth && level.unlocked) {
+        currentMaxDepth = level.level;
       }
-    } else {
-      throw new Error(`failed to add level to ${this.name} instance`);
+    });
+    for (const level of this.levels) {
+      if (level.level === currentMaxDepth + 1) {
+        level.unlock();
+        return true;
+      }
     }
+    return false;
   }
 
   static fromJSON(json: any): DungeonInstance {
@@ -63,6 +57,7 @@ export class DungeonInstance {
     const instance = new DungeonInstance({
       name: json.name,
       levels: levels,
+      unlocks: json.unlocks,
     });
 
     return instance;
@@ -75,14 +70,22 @@ export class DungeonInstance {
  */
 export class DungeonLevel {
   readonly level: number;
-  readonly bosses: string[];
+  readonly boss: string[];
   readonly tiles: number;
+  unlocked: boolean;
   bossDefeated: boolean;
 
-  constructor({ level, bosses, tiles, bossDefeated }: DungeonLevelOptions) {
+  constructor({
+    level,
+    boss,
+    tiles,
+    bossDefeated,
+    unlocked,
+  }: DungeonLevelOptions) {
     this.level = level;
-    this.bosses = bosses;
+    this.boss = boss;
     this.tiles = tiles;
+    this.unlocked = unlocked ?? false;
     this.bossDefeated = bossDefeated ?? false;
     makeObservable(this, {
       bossDefeated: observable,
@@ -91,26 +94,28 @@ export class DungeonLevel {
     });
   }
 
+  public unlock() {
+    this.unlocked = true;
+  }
+
   public setBossDefeated() {
     this.bossDefeated = true;
   }
 
-  public generateMap() {}
-
   public getBoss(instanceName: string): Enemy {
-    const bossObjects = this.bosses.map((bossName) =>
+    const bossObjects = this.boss.map((bossName) =>
       bosses.find((bossObj) => bossObj.name === bossName),
     );
 
     if (!bossObjects || bossObjects.length === 0) {
       throw new Error(
-        `No boss found in getBoss() on DungeonLevel, looking for ${this.bosses} in ${instanceName}`,
+        `No boss found in getBoss() on DungeonLevel, looking for ${this.boss} in ${instanceName}`,
       );
     }
     const [mainBoss, ...minions] = bossObjects;
     if (!mainBoss) {
       throw new Error(
-        `Main boss object not found in getBoss() on DungeonLevel, looking for ${this.bosses} in ${instanceName}`,
+        `Main boss object not found in getBoss() on DungeonLevel, looking for ${this.boss} in ${instanceName}`,
       );
     }
     const boss = new Enemy({
@@ -140,9 +145,10 @@ export class DungeonLevel {
   static fromJSON(json: any): DungeonLevel {
     const level = new DungeonLevel({
       level: json.level,
-      bosses: json.bosses,
+      boss: json.boss,
       tiles: json.tiles,
       bossDefeated: json.bossDefeated,
+      unlocked: json.unlocked ? json.unlocked : json.level == 1 ? true : false,
     });
     return level;
   }

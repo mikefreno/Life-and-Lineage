@@ -71,6 +71,13 @@
       "debuffs": [{"name":"stun", "chance":0.5}]
    },
    {
+      "name": "hack",
+      "targets": "single",
+      "hitChance": 0.85,
+      "damageMult": 0.95,
+      "debuffs":[{"name":"execute", "chance": 0.1}]
+   },
+   {
       "name": "rapid shot",
       "targets": "single",
       "hitChance": 0.65,

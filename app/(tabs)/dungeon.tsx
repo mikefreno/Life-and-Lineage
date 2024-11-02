@@ -55,11 +55,11 @@ const DungeonScreen = observer(() => {
       let deepestDungeonDepth = 0;
       gameState?.dungeonInstances.forEach((dungeonInstance) => {
         let dungeonDepth = levelOffset[dungeonInstance.name];
-        if (
-          dungeonDepth + dungeonInstance.levels.length >
-          deepestDungeonDepth
-        ) {
-          deepestDungeonDepth = dungeonDepth + dungeonInstance.levels.length;
+        const unlockedCount = dungeonInstance.levels.filter(
+          (level) => level.unlocked,
+        ).length;
+        if (dungeonDepth + unlockedCount > deepestDungeonDepth) {
+          deepestDungeonDepth = dungeonDepth + unlockedCount;
         }
       });
       setHeight(deepestDungeonDepth);
@@ -105,51 +105,53 @@ const DungeonScreen = observer(() => {
                 {toTitleCase(dungeonInstance.name)}
               </Text>
               <NonThemedView className="mx-auto">
-                {dungeonInstance.levels.map((level, levelIdx) => (
-                  <Pressable
-                    key={levelIdx}
-                    onPress={() => {
-                      while (router.canGoBack()) {
-                        router.back();
-                      }
-                      vibration({ style: "warning" });
-                      router.replace(
-                        `/DungeonLevel/${dungeonInstance.name}/${level.level}`,
-                      );
-                    }}
-                  >
-                    {({ pressed }) => (
-                      <View
-                        className={`my-2 rounded-lg px-6 py-4 ${
-                          pressed ? "scale-95 opacity-50" : ""
-                        }`}
-                        style={{
-                          shadowColor:
-                            dangerColorStep[
-                              level.level -
-                                height +
-                                5 +
-                                levelOffset[dungeonInstance.name]
-                            ],
-                          backgroundColor:
-                            dangerColorStep[
-                              level.level -
-                                height +
-                                5 +
-                                levelOffset[dungeonInstance.name]
-                            ] ?? "#fee2e2",
-                          shadowOpacity: 0.25,
-                          shadowRadius: 5,
-                          elevation: 2,
-                        }}
-                      >
-                        <Text
-                          style={{ color: "white" }}
-                        >{`Delve to Floor ${level.level}`}</Text>
-                      </View>
-                    )}
-                  </Pressable>
-                ))}
+                {dungeonInstance.levels
+                  .filter((level) => level.unlocked)
+                  .map((level, levelIdx) => (
+                    <Pressable
+                      key={levelIdx}
+                      onPress={() => {
+                        while (router.canGoBack()) {
+                          router.back();
+                        }
+                        vibration({ style: "warning" });
+                        router.replace(
+                          `/DungeonLevel/${dungeonInstance.name}/${level.level}`,
+                        );
+                      }}
+                    >
+                      {({ pressed }) => (
+                        <View
+                          className={`my-2 rounded-lg px-6 py-4 ${
+                            pressed ? "scale-95 opacity-50" : ""
+                          }`}
+                          style={{
+                            shadowColor:
+                              dangerColorStep[
+                                level.level -
+                                  height +
+                                  5 +
+                                  levelOffset[dungeonInstance.name]
+                              ],
+                            backgroundColor:
+                              dangerColorStep[
+                                level.level -
+                                  height +
+                                  5 +
+                                  levelOffset[dungeonInstance.name]
+                              ] ?? "#fee2e2",
+                            shadowOpacity: 0.25,
+                            shadowRadius: 5,
+                            elevation: 2,
+                          }}
+                        >
+                          <Text
+                            style={{ color: "white" }}
+                          >{`Delve to Floor ${level.level}`}</Text>
+                        </View>
+                      )}
+                    </Pressable>
+                  ))}
               </NonThemedView>
             </ThemedCard>
           ))}

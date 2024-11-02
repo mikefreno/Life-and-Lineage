@@ -1138,7 +1138,8 @@ export class PlayerCharacter extends Character {
   }
 
   public equipItem(item: Item[]) {
-    const offsets = this.gatherOffsets();
+    const percentages = this.gatherPercents();
+    console.log(percentages);
     switch (item[0].slot) {
       case "head":
         this.removeEquipment("head");
@@ -1188,17 +1189,18 @@ export class PlayerCharacter extends Character {
         this.removeFromInventory(item);
         break;
     }
-    this.resolveOffsets(offsets);
+    this.resolvePercentages(percentages);
   }
 
-  private gatherOffsets() {
+  private gatherPercents() {
     return {
-      health: this.maxHealth - this.currentHealth,
-      mana: this.maxMana - this.currentMana,
-      sanity: this.maxSanity - this.currentSanity,
+      health: this.currentHealth / this.maxHealth,
+      mana: this.currentMana / this.maxMana,
+      sanity: this.currentSanity / this.maxSanity,
     };
   }
-  private resolveOffsets({
+
+  private resolvePercentages({
     health,
     mana,
     sanity,
@@ -1207,9 +1209,9 @@ export class PlayerCharacter extends Character {
     mana: number;
     sanity: number;
   }) {
-    this.currentHealth = Math.min(this.maxHealth, this.currentHealth + health);
-    this.currentMana = Math.min(this.maxMana, this.currentMana + mana);
-    this.currentSanity = Math.min(this.maxSanity, this.currentSanity + sanity);
+    this.currentHealth = Math.round(this.maxHealth * health);
+    this.currentMana = Math.round(this.maxMana * mana);
+    this.currentSanity = Math.round(this.maxSanity * sanity);
   }
 
   public equippedCheck(item: Item) {
@@ -1226,7 +1228,8 @@ export class PlayerCharacter extends Character {
   }
 
   public unEquipItem(item: Item[]) {
-    const offsets = this.gatherOffsets();
+    const percentages = this.gatherPercents();
+    console.log(percentages);
     if (this.equipment.body?.equals(item[0])) {
       this.removeEquipment("body");
     } else if (this.equipment.head?.equals(item[0])) {
@@ -1238,7 +1241,7 @@ export class PlayerCharacter extends Character {
     } else if (this.equipment.quiver?.find((arrow) => arrow.equals(item[0]))) {
       this.removeEquipment("quiver");
     }
-    this.resolveOffsets(offsets);
+    this.resolvePercentages(percentages);
   }
 
   public removeEquipment(
@@ -1643,6 +1646,38 @@ export class PlayerCharacter extends Character {
       return true;
     }
 
+    return false;
+  }
+
+  public canDate({
+    character,
+    characterAge,
+  }: {
+    character: Character;
+    characterAge: number;
+  }) {
+    if (characterAge >= 18) {
+      for (const child of this.children) {
+        if (child.equals(character)) {
+          return false;
+        }
+      }
+      for (const parent of this.parents) {
+        if (parent.equals(character)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  public characterIsChild({ character }: { character: Character }) {
+    for (const child of this.children) {
+      if (child.equals(character)) {
+        return true;
+      }
+    }
     return false;
   }
 

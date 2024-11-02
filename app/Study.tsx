@@ -1,18 +1,13 @@
 import { View as ThemedView, Text, ScrollView } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { Pressable, Image, Platform, StyleSheet, View } from "react-native";
-import { useContext, useEffect, useState } from "react";
 import { Item } from "../classes/item";
 import { toTitleCase } from "../utility/functions/misc";
-import { useIsFocused } from "@react-navigation/native";
 import ProgressBar from "../components/ProgressBar";
-import { useVibration } from "../utility/customHooks";
 import SpellDetails from "../components/SpellDetails";
 import PlayerStatus from "../components/PlayerStatus";
-import { useColorScheme } from "nativewind";
 import { Stack } from "expo-router";
 import { BlurView } from "expo-blur";
-import { useHeaderHeight } from "@react-navigation/elements";
 import GenericRaisedButton from "../components/GenericRaisedButton";
 import {
   Element,
@@ -24,6 +19,11 @@ import GenericModal from "../components/GenericModal";
 import { AppContext } from "./_layout";
 import { Spell } from "../classes/spell";
 import { elementalColorMap } from "../constants/Colors";
+import { useContext, useEffect, useState } from "react";
+import { useColorScheme } from "nativewind";
+import { useIsFocused } from "@react-navigation/native";
+import { useVibration } from "../utility/customHooks";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 export default function LearningKnowledgeScreen() {
   const appData = useContext(AppContext);
@@ -31,7 +31,6 @@ export default function LearningKnowledgeScreen() {
     throw new Error("missing context");
   }
   const { playerState, gameState, dimensions } = appData;
-  if (!playerState) throw new Error("no playerState");
   const { colorScheme } = useColorScheme();
 
   const books = playerState?.inventory.filter(
@@ -47,13 +46,14 @@ export default function LearningKnowledgeScreen() {
     null,
   );
   const [spellState, setSpellState] = useState<
-    {
-      bookName: string;
-      spellName: string;
-      experience: number;
-      element: Element;
-    }[]
-  >(playerState.learningSpells);
+    | {
+        bookName: string;
+        spellName: string;
+        experience: number;
+        element: Element;
+      }[]
+    | undefined
+  >(playerState?.learningSpells);
   const [showMasteryLevelTooLow, setShowMasteryLevelTooLow] =
     useState<Element | null>(null);
 
@@ -79,7 +79,7 @@ export default function LearningKnowledgeScreen() {
     }
   }
 
-  const studyingSpells = playerState.learningSpells.map(
+  const studyingSpells = playerState?.learningSpells.map(
     (studyState) => studyState.spellName,
   );
 
@@ -149,14 +149,14 @@ export default function LearningKnowledgeScreen() {
             paddingHorizontal: 12,
           }}
         >
-          {filteredBooks.length == 0 &&
-          playerState.learningSpells.length == 0 ? (
+          {filteredBooks?.length == 0 &&
+          playerState?.learningSpells.length == 0 ? (
             <View className="items-center pt-12">
               <Text className="text-xl">No Books to Learn From</Text>
               <Text>(Books can be bought from the Librarian)</Text>
             </View>
           ) : null}
-          {spellState.length > 0 && (
+          {spellState && spellState.length > 0 && (
             <ScrollView style={{ maxHeight: dimensions.height * 0.25 }}>
               <View className="py-4 shadow-diffuse-top">
                 <Text className="text-center text-xl">Currently Studying</Text>
@@ -199,8 +199,9 @@ export default function LearningKnowledgeScreen() {
               <GenericRaisedButton
                 onPressFunction={() => {
                   if (
+                    playerState &&
                     selectedBookSpell.proficiencyNeeded <=
-                    playerState.currentMasteryLevel(selectedBookSpell.element)
+                      playerState.currentMasteryLevel(selectedBookSpell.element)
                   ) {
                     vibration({ style: "light", essential: true });
                     studySpell(
@@ -218,7 +219,7 @@ export default function LearningKnowledgeScreen() {
               </GenericRaisedButton>
             </View>
           )}
-          {filteredBooks.length > 0 && (
+          {filteredBooks && filteredBooks.length > 0 && (
             <View className="py-4">
               <Text className="text-center text-xl">Available for Study</Text>
               <ScrollView className="mx-auto" horizontal>

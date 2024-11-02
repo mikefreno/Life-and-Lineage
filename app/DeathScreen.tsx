@@ -92,7 +92,8 @@ export default function DeathScreen() {
     const newPlayerCharacter = createPlayerCharacter();
     if (newPlayerCharacter) {
       savePlayer(newPlayerCharacter);
-      gameState?.inheritance();
+      const skillPoints = gameState?.inheritance();
+      newPlayerCharacter.addSkillPoint({ amount: skillPoints });
       wait(500).then(() => {
         while (router.canGoBack()) {
           router.back();

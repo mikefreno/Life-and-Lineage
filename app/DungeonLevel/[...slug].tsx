@@ -18,7 +18,6 @@ import {
 import DungeonLevelScreen from "../../components/DungeonComponents/DungeonLevelScreen";
 import { enemyGenerator } from "../../utility/enemy";
 import { getSexFromName } from "../../utility/functions/characterAid";
-import D20DieAnimation from "../../components/DieRollAnim";
 import { wait, flipCoin } from "../../utility/functions/misc";
 import TutorialModal from "../../components/TutorialModal";
 import { Attack } from "../../classes/attack";
@@ -110,25 +109,15 @@ const DungeonProvider = observer(() => {
             ? "generic npc femaleA"
             : "generic npc femaleB";
       }
-      wait(100).then(() => {
-        const enemy = enemyGenerator(instanceName, level, name);
-        if (!enemy) throw new Error(`missing enemy, slug: ${slug}`);
-        setEnemy(enemy);
-        setInCombat(true);
-        setFirstLoad(false);
-      });
-    }
-  }, [slug]);
-
-  useEffect(() => {
-    if (!firstLoad && !enemyState) {
-      if (instanceName !== "Activities" && instanceName !== "Personal") {
-        setInCombat(false);
-      }
-    } else if (enemyState) {
+      const enemy = enemyGenerator(instanceName, level, name);
+      if (!enemy) throw new Error(`missing enemy, slug: ${slug}`);
+      setEnemy(enemy);
+      setInCombat(true);
+      setFirstLoad(false);
+    } else {
       setFirstLoad(false);
     }
-  }, [enemyState]);
+  }, [slug]);
 
   const header = useHeaderHeight();
 
@@ -163,13 +152,15 @@ const DungeonProvider = observer(() => {
       if (instanceName == "Activities" || instanceName == "Personal") {
         const tempDungeon = new DungeonLevel({
           level: 0,
-          bosses: [],
+          boss: [],
           tiles: 0,
           bossDefeated: true,
+          unlocked: true,
         });
         const tempInstance = new DungeonInstance({
           name: level,
           levels: [tempDungeon],
+          unlocks: [],
         });
         setThisDungeon(tempDungeon);
         setThisInstance(tempInstance);
@@ -191,6 +182,16 @@ const DungeonProvider = observer(() => {
     const log = `${timeOfLog}: ${whatHappened}`;
     logsState.push(log);
   };
+
+  useEffect(() => {
+    if (!firstLoad && !enemyState) {
+      if (instanceName !== "Activities" && instanceName !== "Personal") {
+        setInCombat(false);
+      }
+    } else if (enemyState) {
+      setFirstLoad(false);
+    }
+  }, [enemyState]);
 
   useEffect(() => {
     if (shouldShowFirstBossKillTutorialAfterItemDrops && !droppedItems) {
@@ -277,7 +278,7 @@ const DungeonProvider = observer(() => {
   } else {
     return (
       <View className="flex-1 justify-center" style={{ marginTop: -header }}>
-        <D20DieAnimation keepRolling={true} />
+        {/*<D20DieAnimation keepRolling={true} /> */}
       </View>
     );
   }

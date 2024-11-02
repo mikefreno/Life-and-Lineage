@@ -1,5 +1,5 @@
 import { DungeonInstance, DungeonLevel } from "./dungeon";
-import dungeons from "../assets/json/dungeons.json";
+import dungeonsJSON from "../assets/json/dungeons.json";
 import { action, makeObservable, observable, reaction } from "mobx";
 import { Character, PlayerCharacter } from "./character";
 import { lowSanityDebuffGenerator } from "../utility/functions/conditions";
@@ -32,7 +32,6 @@ export class Game {
   date: string; // compared against the startDate to calculate ages
   readonly startDate: string; // only ever set at game start, should never again be modified.
   dungeonInstances: DungeonInstance[];
-  completedInstances: string[];
   atDeathScreen: boolean;
   shops: Shop[];
   colorScheme: "system" | "dark" | "light";
@@ -41,12 +40,12 @@ export class Game {
   tutorialsShown: Record<TutorialOption, boolean>;
   tutorialsEnabled: boolean;
   independantChildren: Character[];
+  inheritedGame: boolean;
 
   constructor({
     date,
     startDate,
     dungeonInstances,
-    completedInstances,
     atDeathScreen,
     shops,
     colorScheme,
@@ -58,31 +57,7 @@ export class Game {
   }: GameOptions) {
     this.date = date ?? new Date().toISOString();
     this.startDate = startDate ?? new Date().toISOString();
-    this.dungeonInstances = dungeonInstances ?? [
-      new DungeonInstance({
-        name: "training grounds",
-        levels: [
-          new DungeonLevel({
-            level: 0,
-            bosses: [],
-            tiles: 0,
-            bossDefeated: true,
-          }),
-        ],
-      }),
-      new DungeonInstance({
-        name: "nearby cave",
-        levels: [
-          new DungeonLevel({
-            level: 1,
-            bosses: ["zombie"],
-            tiles: 10,
-            bossDefeated: false,
-          }),
-        ],
-      }),
-    ];
-    this.completedInstances = completedInstances ?? [];
+    this.dungeonInstances = dungeonInstances ?? Game.getInitDungeonState();
     this.atDeathScreen = atDeathScreen ?? false;
     this.shops = shops;
     this.colorScheme = colorScheme ?? "system";
@@ -111,7 +86,6 @@ export class Game {
       date: observable,
       dungeonInstances: observable,
       atDeathScreen: observable,
-      completedInstances: observable,
       shops: observable,
       colorScheme: observable,
       vibrationEnabled: observable,
@@ -195,51 +169,20 @@ export class Game {
   /**
    * Unlocks the next dungeon(s) when a boss has been defeated, given the name of the current dungeon the player is in.
    */
-  public openNextDungeonLevel(currentInstanceName: string) {
-    const foundInstanceObj = dungeons.find(
-      (dungeon) => dungeon.instance == currentInstanceName,
-    );
-    if (!foundInstanceObj) {
-      throw new Error("Missing instance object!");
-    } else {
-      const ownedInstance = this.dungeonInstances.find(
-        (instance) => instance.name == currentInstanceName,
-      );
-      if (!ownedInstance) {
-        throw new Error("Missing owned instance");
-      }
-      if (ownedInstance.levels.length < foundInstanceObj.levels.length) {
-        ownedInstance.addLevel();
-      } else {
-        const unlockStrings = foundInstanceObj.unlocks;
-        unlockStrings.forEach((unlock) => {
-          const found = dungeons.find((dungeon) => dungeon.instance == unlock);
-          if (!found) {
-            throw new Error("Missing instance object in unlock loop!");
-          } else {
-            let alreadyExists = false;
-            this.dungeonInstances.forEach((instance) => {
-              if (instance.name == found.instance) {
-                alreadyExists = true;
-              }
-            });
-            if (!alreadyExists) {
-              const instance = new DungeonInstance({
-                name: found.instance,
-                levels: [
-                  new DungeonLevel({
-                    level: 1,
-                    tiles: found.levels[0].tiles,
-                    bosses: found.levels[0].boss,
-                    bossDefeated: false,
-                  }),
-                ],
-              });
-              this.dungeonInstances.push(instance);
-            }
-          }
-        });
-      }
+  public openNextDungeonLevel(currentInstance: DungeonInstance) {
+    const successfullLevelUnlock = currentInstance.unlockNextLevel();
+    if (!successfullLevelUnlock) {
+      const unlockObjects: any[] = [];
+      currentInstance.unlocks.forEach((unlock) => {
+        const matchingObj = dungeonsJSON.find((obj) => obj.name == unlock);
+        if (matchingObj) {
+          unlockObjects.push(matchingObj);
+        }
+      });
+      unlockObjects.forEach((obj) => {
+        const inst = DungeonInstance.fromJSON(obj);
+        this.dungeonInstances.push(inst);
+      });
     }
   }
 
@@ -253,6 +196,15 @@ export class Game {
 
   public inheritance() {
     this.atDeathScreen = false;
+    let inheritedSkillPoints = 0;
+    this.dungeonInstances.forEach((inst) =>
+      inst.levels.forEach((dung) => {
+        if (dung.bossDefeated) {
+          inheritedSkillPoints += 3;
+        }
+      }),
+    );
+    return inheritedSkillPoints;
   }
 
   public setColorScheme(color: "light" | "dark" | "system") {
@@ -347,6 +299,29 @@ export class Game {
 
   public refreshAllShops(player: PlayerCharacter) {
     this.shops.forEach((shop) => shop.refreshInventory(player));
+  }
+
+  static getInitDungeonState() {
+    const nearbyCave = dungeonsJSON.find((inst) => inst.name == "nearby cave");
+    if (!nearbyCave) {
+      throw new Error("json parse failure: no nearby cave in dungeonsJSON");
+    }
+    return [
+      new DungeonInstance({
+        name: "training grounds",
+        unlocks: [],
+        levels: [
+          new DungeonLevel({
+            level: 0,
+            bosses: [],
+            tiles: 0,
+            bossDefeated: true,
+            unlocked: true,
+          }),
+        ],
+      }),
+      DungeonInstance.fromJSON(nearbyCave),
+    ];
   }
 
   static fromJSON(json: any): Game {

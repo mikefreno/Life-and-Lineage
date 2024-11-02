@@ -103,6 +103,7 @@
   {
     "name": "judgment",
     "element": "vengeance",
+    "usesWeapon": "melee",
     "proficiencyNeeded": "novice",
     "manaCost": 25,
     "effects": {

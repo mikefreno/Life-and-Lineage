@@ -100,29 +100,25 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
     if (enemyState) {
       setAttackAnimationOnGoing(true);
       vibration({ style: "light" });
-      switch (attackOrSpell.attackStyle) {
-        case "single":
-        case "dual":
-        case "aoe":
+      if (
+        attackOrSpell.attackStyle !== "aoe" &&
+        enemyState &&
+        enemyState.minions.length >=
+          (attackOrSpell.attackStyle == "single" ? 1 : 2)
+      ) {
+        setShowTargetSelection({
+          showing: true,
+          chosenAttack: attackOrSpell,
+        });
+      } else {
+        use({
+          target: enemyState,
+          attackOrSpell,
+          appData,
+          dungeonData,
+          isFocused,
+        });
       }
-    }
-    if (
-      attackOrSpell.attackStyle !== "aoe" &&
-      enemyState.minions.length >
-        (attackOrSpell.attackStyle == "single" ? 0 : 1)
-    ) {
-      setShowTargetSelection({
-        showing: true,
-        chosenAttack: attackOrSpell,
-      });
-    } else {
-      use({
-        target: enemyState,
-        attackOrSpell,
-        appData,
-        dungeonData,
-        isFocused,
-      });
     }
   };
 
