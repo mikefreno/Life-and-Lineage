@@ -35,6 +35,7 @@ import type {
 } from "../components/DungeonComponents/DungeonMap";
 import { Spell } from "./spell";
 import { savePlayer } from "../utility/functions/save_load";
+import storyItems from "../assets/json/items/storyItems.json";
 
 interface CharacterOptions {
   id?: string;
@@ -579,7 +580,7 @@ export class PlayerCharacter extends Character {
     this.conditions = conditions ?? [];
 
     this.inventory = inventory ?? [];
-    this.keyItems = keyItems ?? [];
+    this.keyItems = [testKeyItems()];
     this.currentDungeon = currentDungeon ?? null;
     this.inCombat = inCombat ?? false;
     this.equipment = equipment ?? {
@@ -2218,6 +2219,22 @@ export class PlayerCharacter extends Character {
       inCombat: json.inCombat,
     });
     return player;
+  }
+}
+
+function testKeyItems() {
+  const obj = storyItems.find((item) => item.name == "bloodied note");
+  if (obj) {
+    return new Item({
+      name: obj.name,
+      icon: obj.icon,
+      baseValue: obj.baseValue,
+      description: obj.description,
+      itemClass: ItemClassType.StoryItem,
+      player: null,
+    });
+  } else {
+    throw new Error("missing bloodied note");
   }
 }
 

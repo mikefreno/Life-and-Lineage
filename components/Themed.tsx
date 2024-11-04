@@ -53,6 +53,42 @@ export function Text(props: TextProps) {
     />
   );
 }
+export function CursiveText(props: TextProps) {
+  const { style, lightColor, darkColor, ...otherProps } = props;
+  const color = useThemeColor({ light: "black", dark: "white" }, "text");
+
+  return (
+    <DefaultText
+      allowFontScaling={false}
+      style={[{ color }, { fontFamily: "Cursive" }, style]}
+      {...otherProps}
+    />
+  );
+}
+export function CursiveTextBold(props: TextProps) {
+  const { style, lightColor, darkColor, ...otherProps } = props;
+  const color = useThemeColor({ light: "black", dark: "white" }, "text");
+
+  return (
+    <DefaultText
+      allowFontScaling={false}
+      style={[{ color }, { fontFamily: "CursiveBold" }, style]}
+      {...otherProps}
+    />
+  );
+}
+export function HandwrittenText(props: TextProps) {
+  const { style, lightColor, darkColor, ...otherProps } = props;
+  const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
+
+  return (
+    <DefaultText
+      allowFontScaling={false}
+      style={[{ color }, { fontFamily: "Handwritten" }, style]}
+      {...otherProps}
+    />
+  );
+}
 
 export function View(props: ViewProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;

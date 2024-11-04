@@ -252,6 +252,9 @@ const Root = observer(() => {
 const RootLayout = observer(() => {
   const [fontLoaded] = useFonts({
     PixelifySans: require("../assets/fonts/PixelifySans-Regular.ttf"),
+    Handwritten: require("../assets/fonts/Caveat-VariableFont_wght.ttf"),
+    Cursive: require("../assets/fonts/Tangerine-Regular.ttf"),
+    CursiveBold: require("../assets/fonts/Tangerine-Bold.ttf"),
   });
   const appData = useContext(AppContext);
   if (!appData) {

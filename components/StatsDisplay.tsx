@@ -1,5 +1,5 @@
-import { LayoutChangeEvent, Pressable, View } from "react-native";
-import { Text } from "./Themed";
+import { LayoutChangeEvent, Pressable, ScrollView, View } from "react-native";
+import { Text, CursiveText, HandwrittenText, CursiveTextBold } from "./Themed";
 import GearStatsDisplay from "./GearStatsDisplay";
 import { useColorScheme } from "nativewind";
 import { useVibration } from "../utility/customHooks";
@@ -76,6 +76,7 @@ export function StatsDisplay({
   const [blockSize, setBlockSize] = useState<number>();
   const [showingAttacks, setShowingAttacks] = useState<boolean>(false);
   const [firstItem, setFirstItem] = useState<Item>(displayItem.item[0]);
+  const [renderStory, setRenderStory] = useState<string | null>(null);
 
   useEffect(() => {
     if (dimensions.width === dimensions.lesser) {
@@ -413,6 +414,19 @@ export function StatsDisplay({
     }
   };
 
+  const ItemTypeLabel = (item: Item) => {
+    if (item.itemClass == ItemClassType.BodyArmor) {
+      return "Body Armor";
+    }
+    if (item.itemClass == ItemClassType.StoryItem) {
+      return "Key Item";
+    }
+    if (item.itemClass == ItemClassType.Book) {
+      return bookItemLabel();
+    }
+    return toTitleCase(item.itemClass);
+  };
+
   function bookItemLabel() {
     if (playerState && firstItem.attachedSpell) {
       return `${
@@ -420,6 +434,173 @@ export function StatsDisplay({
       } level book`;
     }
   }
+
+  interface TextSection {
+    text: string;
+    meta: boolean;
+    emphasized: boolean;
+  }
+
+  const StoryItemDescriptionRender = ({ item }: { item: Item }) => {
+    if (!item.description) {
+      throw Error(`Missing description on story item: ${item.name}`);
+    }
+    const fontMatch = item.description.match(/<Font>(.*?)<\/Font>/);
+    const font = fontMatch ? fontMatch[1].toLowerCase() : null;
+    const cleanText = item.description.replace(/<Font>.*?<\/Font>/, "");
+
+    const lines = cleanText.split(/\n/);
+    const sections: TextSection[] = [];
+    let currentSection = "";
+    let inMeta = false;
+    let metaBuffer = "";
+
+    lines.forEach((line) => {
+      if (line.startsWith("*") && line.endsWith("*")) {
+        if (currentSection) {
+          sections.push({
+            text: currentSection.trim(),
+            meta: false,
+            emphasized: false,
+          });
+          currentSection = "";
+        }
+        sections.push({
+          text: line.slice(1, -1),
+          meta: true,
+          emphasized: false,
+        });
+        return;
+      }
+
+      if (line.startsWith("*") && !inMeta) {
+        if (currentSection) {
+          sections.push({
+            text: currentSection.trim(),
+            meta: false,
+            emphasized: false,
+          });
+          currentSection = "";
+        }
+        inMeta = true;
+        metaBuffer = line.slice(1);
+        return;
+      }
+
+      if (line.endsWith("*") && inMeta) {
+        inMeta = false;
+        sections.push({
+          text: metaBuffer + "\n" + line.slice(0, -1),
+          meta: true,
+          emphasized: false,
+        });
+        metaBuffer = "";
+        return;
+      }
+
+      if (inMeta) {
+        metaBuffer += "\n" + line;
+        return;
+      }
+
+      if (line === "") {
+        if (currentSection) {
+          sections.push({
+            text: currentSection.trim(),
+            meta: false,
+            emphasized: false,
+          });
+          currentSection = "";
+        }
+      } else {
+        currentSection += (currentSection ? "\n" : "") + line;
+      }
+    });
+
+    if (currentSection) {
+      sections.push({
+        text: currentSection.trim(),
+        meta: false,
+        emphasized: false,
+      });
+    }
+
+    return (
+      <View className="pr-4">
+        <Text className="text-xl mb-4">{toTitleCase(item.name)}</Text>
+        {sections.map((section, idx) => {
+          if (section.meta) {
+            return (
+              <Text key={idx} className="text-center py-1">
+                [{section.text}]
+              </Text>
+            );
+          } else {
+            return (
+              <View key={idx} className="py-2">
+                {section.text.split("\n").map((paragraph, pIdx) => (
+                  <Text key={pIdx} className="mb-2">
+                    {paragraph
+                      .split(/(<em>.*?<\/em>)/g)
+                      .map((part, partIdx) => {
+                        const isEmphasized =
+                          part.startsWith("<em>") && part.endsWith("</em>");
+                        const cleanPart = isEmphasized
+                          ? part.replace("<em>", "").replace("</em>", "")
+                          : part;
+
+                        if (isEmphasized) {
+                          if (font == "cursive") {
+                            return (
+                              <CursiveTextBold
+                                key={partIdx}
+                                className="text-5xl tracking-widest"
+                              >
+                                {cleanPart}
+                              </CursiveTextBold>
+                            );
+                          } else {
+                            return (
+                              <HandwrittenText
+                                key={partIdx}
+                                className="text-3xl"
+                              >
+                                {cleanPart}
+                              </HandwrittenText>
+                            );
+                          }
+                        } else {
+                          if (font == "cursive") {
+                            return (
+                              <CursiveText
+                                key={partIdx}
+                                className="text-4xl tracking-widest"
+                              >
+                                {cleanPart}
+                              </CursiveText>
+                            );
+                          } else {
+                            return (
+                              <HandwrittenText
+                                key={partIdx}
+                                className="text-3xl"
+                              >
+                                {cleanPart}
+                              </HandwrittenText>
+                            );
+                          }
+                        }
+                      })}
+                  </Text>
+                ))}
+              </View>
+            );
+          }
+        })}
+      </View>
+    );
+  };
+
   const onLayoutView = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
     setViewWidth(width);
@@ -444,6 +625,14 @@ export function StatsDisplay({
               </View>
             ))}
         </View>
+      </GenericModal>
+      <GenericModal
+        isVisibleCondition={!!renderStory}
+        backFunction={() => setRenderStory(null)}
+      >
+        <ScrollView className="h-1/2">
+          <StoryItemDescriptionRender item={firstItem} />
+        </ScrollView>
       </GenericModal>
       <View
         className="items-center rounded-md border border-zinc-600 p-4"
@@ -503,11 +692,7 @@ export function StatsDisplay({
           </GenericStrikeAround>
         )}
         <GenericStrikeAround className="text-sm">
-          {firstItem.itemClass == "bodyArmor"
-            ? "Body Armor"
-            : firstItem.itemClass == "book" && playerState
-            ? bookItemLabel()
-            : toTitleCase(firstItem.itemClass)}
+          {ItemTypeLabel(firstItem)}
         </GenericStrikeAround>
         {firstItem.stats && firstItem.slot && (
           <View className="py-2">
@@ -559,6 +744,13 @@ export function StatsDisplay({
             )}
           </>
         ) : null}
+        {firstItem.itemClass == ItemClassType.StoryItem && (
+          <GenericFlatButton
+            onPressFunction={() => setRenderStory(firstItem.description)}
+          >
+            Read
+          </GenericFlatButton>
+        )}
         <ConsumableSection />
         <SaleSection />
       </View>

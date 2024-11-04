@@ -227,6 +227,11 @@ const HomeScreen = observer(() => {
                 inventory={playerState.getInventory()}
                 displayItem={displayItem}
                 setDisplayItem={setDisplayItem}
+                keyItemInventory={
+                  playerState.keyItems.length > 0
+                    ? playerState.keyItems
+                    : undefined
+                }
               />
             </View>
           </TouchableWithoutFeedback>

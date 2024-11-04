@@ -45,7 +45,16 @@
     "plugins": [
       "expo-router",
       "expo-apple-authentication",
-      "expo-font",
+      ["expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Caveat-VariableFont_wght.ttf",
+            "./assets/fonts/Tangerine-Regular.ttf",
+            "./assets/fonts/Tangerine-Bold.ttf",
+            "./assets/fonts/PixelifySans-Regular.ttf"
+          ]
+        }
+      ],
       [
         "@sentry/react-native/expo",
         {
