@@ -580,7 +580,7 @@ export class PlayerCharacter extends Character {
     this.conditions = conditions ?? [];
 
     this.inventory = inventory ?? [];
-    this.keyItems = [testKeyItems()];
+    this.keyItems = testKeyItems();
     this.currentDungeon = currentDungeon ?? null;
     this.inCombat = inCombat ?? false;
     this.equipment = equipment ?? {
@@ -1140,7 +1140,6 @@ export class PlayerCharacter extends Character {
 
   public equipItem(item: Item[]) {
     const percentages = this.gatherPercents();
-    console.log(percentages);
     switch (item[0].slot) {
       case "head":
         this.removeEquipment("head");
@@ -1230,7 +1229,6 @@ export class PlayerCharacter extends Character {
 
   public unEquipItem(item: Item[]) {
     const percentages = this.gatherPercents();
-    console.log(percentages);
     if (this.equipment.body?.equals(item[0])) {
       this.removeEquipment("body");
     } else if (this.equipment.head?.equals(item[0])) {
@@ -2223,19 +2221,11 @@ export class PlayerCharacter extends Character {
 }
 
 function testKeyItems() {
-  const obj = storyItems.find((item) => item.name == "bloodied note");
-  if (obj) {
-    return new Item({
-      name: obj.name,
-      icon: obj.icon,
-      baseValue: obj.baseValue,
-      description: obj.description,
-      itemClass: ItemClassType.StoryItem,
-      player: null,
-    });
-  } else {
-    throw new Error("missing bloodied note");
-  }
+  const items: Item[] = [];
+  storyItems.forEach((obj) => {
+    items.push(Item.fromJSON({ ...obj, itemClass: ItemClassType.StoryItem }));
+  });
+  return items;
 }
 
 interface performLaborProps {

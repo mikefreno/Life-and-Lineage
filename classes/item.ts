@@ -311,6 +311,7 @@ export class Item {
       requirements: json.requirements,
       icon: json.icon,
       attacks: json.attacks,
+      description: json.description,
       player: null,
       effect:
         json.effect && "condition" in json.effect

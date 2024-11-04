@@ -1,8 +1,12 @@
-import { ReactNode, useContext } from "react";
-import { Dimensions, Platform } from "react-native";
+import { ReactNode } from "react";
+import {
+  Dimensions,
+  Platform,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 import Modal from "react-native-modal";
 import { View as ThemedView } from "./Themed";
-import { AppContext } from "../app/_layout";
 
 interface GenericModalProps {
   isVisibleCondition: boolean;
@@ -10,7 +14,7 @@ interface GenericModalProps {
   children: ReactNode;
   backdropCloses?: boolean;
   size?: number;
-  style?: {};
+  style?: StyleProp<ViewStyle>;
 }
 
 /**

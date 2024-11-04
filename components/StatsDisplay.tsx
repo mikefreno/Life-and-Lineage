@@ -526,7 +526,7 @@ export function StatsDisplay({
     }
 
     return (
-      <View className="pr-4">
+      <View className="pr-4 h-full">
         <Text className="text-xl mb-4">{toTitleCase(item.name)}</Text>
         {sections.map((section, idx) => {
           if (section.meta) {
@@ -629,8 +629,10 @@ export function StatsDisplay({
       <GenericModal
         isVisibleCondition={!!renderStory}
         backFunction={() => setRenderStory(null)}
+        size={95}
+        style={{ maxHeight: "75%", marginTop: "auto", marginBottom: "auto" }}
       >
-        <ScrollView className="h-1/2">
+        <ScrollView>
           <StoryItemDescriptionRender item={firstItem} />
         </ScrollView>
       </GenericModal>
@@ -748,7 +750,7 @@ export function StatsDisplay({
           <GenericFlatButton
             onPressFunction={() => setRenderStory(firstItem.description)}
           >
-            Read
+            Inspect
           </GenericFlatButton>
         )}
         <ConsumableSection />
