@@ -15,6 +15,7 @@ interface GenericModalProps {
   backdropCloses?: boolean;
   size?: number;
   style?: StyleProp<ViewStyle>;
+  noPad?: boolean;
 }
 
 /**
@@ -37,6 +38,7 @@ export default function GenericModal({
   backdropCloses = true,
   size,
   style,
+  noPad,
 }: GenericModalProps) {
   const height = Dimensions.get("screen").height;
 
@@ -59,7 +61,9 @@ export default function GenericModal({
       style={style}
     >
       <ThemedView
-        className="mx-auto rounded-xl px-[2vw] py-4 dark:border dark:border-zinc-500"
+        className={`mx-auto rounded-xl ${
+          noPad ? "" : "px-[2vw] py-4"
+        } dark:border dark:border-zinc-500`}
         style={{
           shadowColor: "#000",
           shadowOffset: {

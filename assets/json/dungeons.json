@@ -58,22 +58,22 @@
      "levels": [
        {
          "level": 1,
-         "tiles": 5,
+         "tiles": 15,
          "boss": ["adept water mage"]
        },
        {
          "level": 2,
-         "tiles": 5,
+         "tiles": 15,
          "boss": ["adept air mage"]
        },
        {
          "level": 3,
-         "tiles": 10,
+         "tiles": 15,
          "boss": ["expert fire mage"]
        },
        {
          "level": 4,
-         "tiles": 15,
+         "tiles": 20,
          "boss": ["master earth mage"]
        }
      ],
@@ -89,7 +89,7 @@
        },
        {
          "level": 2,
-         "tiles": 20,
+         "tiles": 25,
          "boss": ["brood mother"]
        }
      ],
@@ -100,7 +100,7 @@
      "levels": [
        {
          "level": 1,
-         "tiles": 15,
+         "tiles": 25,
          "boss": ["griffon"]
        },
        {

@@ -546,7 +546,7 @@ export function StatsDisplay({
     }
 
     return (
-      <View className="pr-4 h-full">
+      <View className="pr-4 py-4 h-full">
         <View className="border-b mb-4 ml-4 border-zinc-500">
           <Text className="text-xl -ml-4 mr-4">{toTitleCase(item.name)}</Text>
         </View>
@@ -557,7 +557,7 @@ export function StatsDisplay({
           }}
           className="absolute right-0 border-zinc-600 rounded-tr rounded-bl dark:border-zinc-400 px-2 py-1"
         >
-          <Text className="-mt-3 text-4xl">x</Text>
+          <Text className="text-4xl">x</Text>
         </Pressable>
         {sections.map((section, idx) => {
           if (section.meta) {
@@ -666,9 +666,14 @@ export function StatsDisplay({
         isVisibleCondition={!!renderStory}
         backFunction={() => setRenderStory(null)}
         size={95}
-        style={{ maxHeight: "75%", marginTop: "auto", marginBottom: "auto" }}
+        noPad
+        style={{
+          maxHeight: "75%",
+          marginTop: "auto",
+          marginBottom: "auto",
+        }}
       >
-        <ScrollView>
+        <ScrollView className="px-4">
           <StoryItemDescriptionRender item={firstItem} />
         </ScrollView>
       </GenericModal>

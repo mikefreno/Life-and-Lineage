@@ -22,7 +22,6 @@ interface GameOptions {
   tutorialsShown?: Record<TutorialOption, boolean>;
   tutorialsEnabled?: boolean;
   independantChildren?: Character[];
-  inheritedGame?: boolean;
 }
 
 /**
@@ -41,7 +40,6 @@ export class Game {
   tutorialsShown: Record<TutorialOption, boolean>;
   tutorialsEnabled: boolean;
   independantChildren: Character[];
-  inheritedGame: boolean;
 
   constructor({
     date,
@@ -55,7 +53,6 @@ export class Game {
     tutorialsShown,
     tutorialsEnabled,
     independantChildren,
-    inheritedGame,
   }: GameOptions) {
     this.date = date ?? new Date().toISOString();
     this.startDate = startDate ?? new Date().toISOString();
@@ -84,7 +81,6 @@ export class Game {
     };
     this.tutorialsEnabled = tutorialsEnabled ?? true;
     this.independantChildren = independantChildren ?? [];
-    this.inheritedGame = inheritedGame ?? false;
 
     makeObservable(this, {
       date: observable,
@@ -351,7 +347,6 @@ export class Game {
       independantChildren: json.independantChildren
         ? json.independantChildren.map((ind: any) => Character.fromJSON(ind))
         : [],
-      inheritedGame: json.inheritedGame,
     });
 
     return game;

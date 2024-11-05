@@ -22,6 +22,7 @@ import robes from "../assets/json/items/robes.json";
 import shields from "../assets/json/items/shields.json";
 import wands from "../assets/json/items/wands.json";
 import melee from "../assets/json/items/melee.json";
+import staves from "../assets/json/items/staves.json";
 import necroBooks from "../assets/json/items/necroBooks.json";
 import paladinBooks from "../assets/json/items/paladinBooks.json";
 import mageBooks from "../assets/json/items/mageBooks.json";
@@ -29,14 +30,7 @@ import rangerBooks from "../assets/json/items/rangerBooks.json";
 import storyItems from "../assets/json/items/storyItems.json";
 import * as Crypto from "expo-crypto";
 import { Item, isStackable } from "./item";
-import {
-  action,
-  autorun,
-  computed,
-  makeObservable,
-  observable,
-  reaction,
-} from "mobx";
+import { action, computed, makeObservable, observable, reaction } from "mobx";
 import summons from "../assets/json/summons.json";
 import { ItemClassType, BeingType, PlayerClassOptions } from "../utility/types";
 import {
@@ -602,7 +596,10 @@ export class Creature {
       dropList.forEach((drop) => {
         const roll = rollD20();
         if (roll >= 20 - drop.chance * 20) {
-          const items = itemList(drop.itemType, player.playerClass);
+          const items = itemList(
+            drop.itemType as ItemClassType,
+            player.playerClass,
+          );
           const itemObj = items.find((item) => item.name == drop.item);
           if (itemObj) {
             itemDrops.push(
@@ -891,7 +888,7 @@ export class Minion extends Creature {
 }
 
 function itemList(
-  itemType: string,
+  itemType: ItemClassType,
   playerClass: PlayerClassOptions,
 ): {
   name: string;
@@ -899,16 +896,38 @@ function itemList(
   slot?: string;
   attacks?: string[];
   icon?: string;
-  stats?: Record<string, number> | null;
+  stats?: Record<string, number | undefined> | null;
 }[] {
   switch (itemType) {
-    case "arrow":
-      return arrows;
-    case "artifact":
+    case ItemClassType.Artifact:
       return artifacts;
-    case "bodyArmor":
+    case ItemClassType.Bow:
+      return bows;
+    case ItemClassType.Potion:
+      return potions;
+    case ItemClassType.Poison:
+      return poisons;
+    case ItemClassType.Junk:
+      return junk;
+    case ItemClassType.Ingredient:
+      return ingredients;
+    case ItemClassType.Wand:
+      return wands;
+    case ItemClassType.Focus:
+      return foci;
+    case ItemClassType.Melee:
+      return melee;
+    case ItemClassType.Shield:
+      return shields;
+    case ItemClassType.BodyArmor:
       return bodyArmors;
-    case "book":
+    case ItemClassType.Helmet:
+      return helmets;
+    case ItemClassType.Robe:
+      return robes;
+    case ItemClassType.Hat:
+      return hats;
+    case ItemClassType.Book:
       switch (playerClass) {
         case "necromancer":
           return necroBooks;
@@ -919,30 +938,12 @@ function itemList(
         case "ranger":
           return rangerBooks;
       }
-    case "bow":
-      return bows;
-    case "focus":
-      return foci;
-    case "hat":
-      return hats;
-    case "helmet":
-      return helmets;
-    case "ingredient":
-      return ingredients;
-    case "junk":
-      return junk;
-    case "poison":
-      return poisons;
-    case "potion":
-      return potions;
-    case "robe":
-      return robes;
-    case "shield":
-      return shields;
-    case "wand":
-      return wands;
-    case "melee":
-      return melee;
+    case ItemClassType.Arrow:
+      return arrows;
+    case ItemClassType.Staff:
+      return staves;
+    case ItemClassType.StoryItem:
+      return storyItems;
     default:
       throw new Error("invalid itemType");
   }

@@ -211,6 +211,20 @@
       "appearsOn": [1,2, "Enchanted Forest"]
    },
    {
+      "name": "novice water mage",
+      "beingType": "human",
+      "sanity": 50,
+      "healthRange": {"minimum": 50, "maximum": 75},
+      "attackPowerRange": {"minimum": 8, "maximum": 10},
+      "energy": {"maximum": 100, "regen": 15},
+      "attacks": [],
+      "drops": [],
+      "goldDropRange": {"minimum": 30, "maximum":50},
+      "armorValue": 0,
+      "appearsIn": ["rogue magi fortress"],
+      "appearsOn": [1,2,3,4]
+   },
+   {
       "name": "drunkard",
       "beingType": "human",
       "sanity": 50,
