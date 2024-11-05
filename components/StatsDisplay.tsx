@@ -438,6 +438,7 @@ export function StatsDisplay({
   interface TextSection {
     text: string;
     meta: boolean;
+    largeMeta: boolean;
     emphasized: boolean;
   }
 
@@ -454,47 +455,64 @@ export function StatsDisplay({
     let currentSection = "";
     let inMeta = false;
     let metaBuffer = "";
+    let isLargeMeta = false;
 
     lines.forEach((line) => {
-      if (line.startsWith("*") && line.endsWith("*")) {
+      // Check for single-line meta with ** or *
+      if (
+        (line.startsWith("**") && line.endsWith("**")) ||
+        (line.startsWith("*") && line.endsWith("*"))
+      ) {
         if (currentSection) {
           sections.push({
             text: currentSection.trim(),
             meta: false,
             emphasized: false,
+            largeMeta: false,
           });
           currentSection = "";
         }
+        const isDouble = line.startsWith("**");
         sections.push({
-          text: line.slice(1, -1),
+          text: line.slice(isDouble ? 2 : 1, isDouble ? -2 : -1),
           meta: true,
           emphasized: false,
+          largeMeta: isDouble,
         });
         return;
       }
 
-      if (line.startsWith("*") && !inMeta) {
+      // Check for multi-line meta start
+      if ((line.startsWith("**") || line.startsWith("*")) && !inMeta) {
         if (currentSection) {
           sections.push({
             text: currentSection.trim(),
             meta: false,
             emphasized: false,
+            largeMeta: false,
           });
           currentSection = "";
         }
         inMeta = true;
-        metaBuffer = line.slice(1);
+        isLargeMeta = line.startsWith("**");
+        metaBuffer = line.slice(isLargeMeta ? 2 : 1);
         return;
       }
 
-      if (line.endsWith("*") && inMeta) {
+      // Check for multi-line meta end
+      if (
+        (line.endsWith("**") && isLargeMeta) ||
+        (line.endsWith("*") && !isLargeMeta && inMeta)
+      ) {
         inMeta = false;
         sections.push({
-          text: metaBuffer + "\n" + line.slice(0, -1),
+          text: metaBuffer + "\n" + line.slice(0, isLargeMeta ? -2 : -1),
           meta: true,
           emphasized: false,
+          largeMeta: isLargeMeta,
         });
         metaBuffer = "";
+        isLargeMeta = false;
         return;
       }
 
@@ -509,6 +527,7 @@ export function StatsDisplay({
             text: currentSection.trim(),
             meta: false,
             emphasized: false,
+            largeMeta: false,
           });
           currentSection = "";
         }
@@ -522,16 +541,33 @@ export function StatsDisplay({
         text: currentSection.trim(),
         meta: false,
         emphasized: false,
+        largeMeta: false,
       });
     }
 
     return (
       <View className="pr-4 h-full">
-        <Text className="text-xl mb-4">{toTitleCase(item.name)}</Text>
+        <View className="border-b mb-4 ml-4 border-zinc-500">
+          <Text className="text-xl -ml-4 mr-4">{toTitleCase(item.name)}</Text>
+        </View>
+        <Pressable
+          onPress={() => {
+            vibration({ style: "light" });
+            setRenderStory(null);
+          }}
+          className="absolute right-0 border-zinc-600 rounded-tr rounded-bl dark:border-zinc-400 px-2 py-1"
+        >
+          <Text className="-mt-3 text-4xl">x</Text>
+        </Pressable>
         {sections.map((section, idx) => {
           if (section.meta) {
             return (
-              <Text key={idx} className="text-center py-1">
+              <Text
+                key={idx}
+                className={`text-center py-1 ${
+                  section.largeMeta ? "text-xl" : ""
+                }`}
+              >
                 [{section.text}]
               </Text>
             );
@@ -748,7 +784,10 @@ export function StatsDisplay({
         ) : null}
         {firstItem.itemClass == ItemClassType.StoryItem && (
           <GenericFlatButton
-            onPressFunction={() => setRenderStory(firstItem.description)}
+            onPressFunction={() => {
+              vibration({ style: "light" });
+              setRenderStory(firstItem.description);
+            }}
           >
             Inspect
           </GenericFlatButton>

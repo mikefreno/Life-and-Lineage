@@ -580,7 +580,7 @@ export class PlayerCharacter extends Character {
     this.conditions = conditions ?? [];
 
     this.inventory = inventory ?? [];
-    this.keyItems = testKeyItems();
+    this.keyItems = keyItems ?? __DEV__ ? testKeyItems() : [];
     this.currentDungeon = currentDungeon ?? null;
     this.inCombat = inCombat ?? false;
     this.equipment = equipment ?? {
@@ -1989,6 +1989,11 @@ export class PlayerCharacter extends Character {
   //----------------------------------Investments----------------------------------//
   public purchaseInvestmentBase(investment: InvestmentType) {
     this.gold -= investment.cost;
+    if (investment.requires.removes) {
+      this.keyItems = this.keyItems.filter(
+        (item) => item.name !== investment.name,
+      );
+    }
     const newInvestment = new Investment({
       name: investment.name,
       minimumReturn: investment.goldReturnRange.min,

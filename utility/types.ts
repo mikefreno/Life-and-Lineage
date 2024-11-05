@@ -82,7 +82,7 @@ export type InvestmentType = {
   name: string;
   description: string;
   cost: number;
-  requires: { requirement: string; message: string } | null;
+  requires: { requirement: string; message: string; removes: boolean };
   turnsPerReturn: number;
   goldReturnRange: {
     min: number;
@@ -139,6 +139,7 @@ export enum TutorialOption {
   investing,
   training,
   firstBossKill,
+  keyItem,
 }
 
 export enum MasteryLevel {

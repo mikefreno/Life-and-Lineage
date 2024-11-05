@@ -564,7 +564,7 @@ const PlayerStatus = observer(
           return (
             <BlurView
               intensity={100}
-              className="shadow-soft dark:shadow-soft-white mx-4 rounded-xl z-top overflow-hidden"
+              className="mx-4 rounded-xl z-top overflow-hidden "
             >
               <Animated.View
                 style={{

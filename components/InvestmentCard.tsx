@@ -38,8 +38,8 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
   );
 
   function purchaseInvestmentCheck() {
-    const requirement = investment.requires?.requirement;
-    if (requirement && gameState?.completedInstances.includes(requirement)) {
+    const requirement = investment.requires.requirement;
+    if (playerState?.keyItems.find((item) => item.name == requirement)) {
       if (playerState && playerState.gold >= investment.cost) {
         if (investment.cost / playerState.gold >= 0.2) {
           setShowInvestmentConfirmation(true);
@@ -127,242 +127,215 @@ const InvestmentCard = observer(({ investment }: InvestmentCardProps) => {
           </Pressable>
         </View>
       </GenericModal>
-      <Modal
-        animationIn="slideInUp"
-        animationOut="slideOutDown"
-        backdropOpacity={0.2}
-        animationInTiming={500}
-        animationOutTiming={300}
-        isVisible={showUpgrades}
-        onBackdropPress={() => setShowUpgrades(false)}
-        onBackButtonPress={() => setShowUpgrades(false)}
+      <GenericModal
+        isVisibleCondition={showUpgrades}
+        style={{ maxHeight: "75%", marginTop: "auto", marginBottom: "auto" }}
+        backFunction={() => setShowUpgrades(false)}
+        size={95}
       >
-        <ThemedView
-          className="mx-auto max-h-[90vh] w-full rounded-xl px-4 dark:border dark:border-zinc-500"
-          style={{
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 2,
-            },
-            elevation: 1,
-            shadowOpacity: 0.25,
-            shadowRadius: 5,
-          }}
-        >
-          <GenericStrikeAround>
-            <Text className="text-center text-xl">
-              {investment.name} Upgrades
-            </Text>
-          </GenericStrikeAround>
-          <ScrollView>
-            {investment.upgrades.map((upgrade) => {
-              const [showingBody, setShowingBody] = useState<boolean>(false);
-              const rotation = useRef(new Animated.Value(0)).current;
+        <GenericStrikeAround>
+          <Text className="text-center text-xl">
+            {investment.name} Upgrades
+          </Text>
+        </GenericStrikeAround>
+        <ScrollView>
+          {investment.upgrades.map((upgrade) => {
+            const [showingBody, setShowingBody] = useState<boolean>(false);
+            const rotation = useRef(new Animated.Value(0)).current;
 
-              useEffect(() => {
-                Animated.timing(rotation, {
-                  toValue: showingBody ? 1 : 0,
-                  duration: 200,
-                  useNativeDriver: true,
-                }).start();
-              }, [showingBody]);
+            useEffect(() => {
+              Animated.timing(rotation, {
+                toValue: showingBody ? 1 : 0,
+                duration: 200,
+                useNativeDriver: true,
+              }).start();
+            }, [showingBody]);
 
-              const rotationInterpolate = rotation.interpolate({
-                inputRange: [0, 1],
-                outputRange: ["0deg", "180deg"],
-              });
+            const rotationInterpolate = rotation.interpolate({
+              inputRange: [0, 1],
+              outputRange: ["0deg", "180deg"],
+            });
 
-              return (
-                <Pressable
-                  className="w-full"
-                  onPress={() => {
-                    vibration({ style: "light" });
-                    setShowingBody(!showingBody);
+            return (
+              <Pressable
+                className="w-full"
+                onPress={() => {
+                  vibration({ style: "light" });
+                  setShowingBody(!showingBody);
+                }}
+                key={upgrade.name}
+              >
+                <View
+                  className="m-2 rounded-xl"
+                  style={{
+                    shadowColor: "#000",
+                    shadowOffset: {
+                      width: 3,
+                      height: 1,
+                    },
+                    elevation: 3,
+                    shadowOpacity: 0.2,
+                    shadowRadius: 3,
+                    backgroundColor:
+                      "style" in upgrade
+                        ? upgrade.style == "evil"
+                          ? "#ef4444"
+                          : upgrade.style == "neutral"
+                          ? "#f59e0b"
+                          : "#10b981"
+                        : colorScheme == "light"
+                        ? "#fafafa"
+                        : "#27272a",
                   }}
-                  key={upgrade.name}
                 >
-                  <View
-                    className="m-2 rounded-xl"
-                    style={{
-                      shadowColor: "#000",
-                      shadowOffset: {
-                        width: 3,
-                        height: 1,
-                      },
-                      elevation: 3,
-                      shadowOpacity: 0.2,
-                      shadowRadius: 3,
-                      backgroundColor:
-                        "style" in upgrade
-                          ? upgrade.style == "evil"
-                            ? "#ef4444"
-                            : upgrade.style == "neutral"
-                            ? "#f59e0b"
-                            : "#10b981"
-                          : colorScheme == "light"
-                          ? "#fafafa"
-                          : "#27272a",
-                    }}
-                  >
-                    <View className="flex justify-between rounded-xl px-4 py-2 text-zinc-950 dark:border dark:border-zinc-500">
-                      <View className="flex flex-row justify-between">
-                        <Text className="bold my-auto text-xl tracking-wider dark:text-zinc-50">
-                          {upgrade.name}
-                        </Text>
-                        <Animated.View
-                          style={{
-                            transform: [{ rotate: rotationInterpolate }],
-                          }}
-                        >
-                          <Entypo
-                            name="chevron-small-down"
-                            size={24}
-                            color={
-                              colorScheme == "light" ? "#18181b" : "#fafafa"
-                            }
-                          />
-                        </Animated.View>
-                      </View>
-                      {madeInvestment?.upgrades.includes(upgrade.name) && (
-                        <Text className="my-auto text-lg tracking-wider opacity-70 dark:text-zinc-50">
-                          Purchased
-                        </Text>
-                      )}
-                      {showingBody && (
-                        <View>
-                          <Text className="bold my-auto py-2 text-center dark:text-zinc-50">
-                            {upgrade.description}
-                          </Text>
-                          <GenericStrikeAround>
-                            <Text>Effects</Text>
-                          </GenericStrikeAround>
-                          <View className="items-center py-2">
-                            {upgrade.effect.goldMinimumIncrease && (
-                              <View className="flex flex-row items-center">
-                                <Text>
-                                  Minimum return
-                                  {upgrade.effect.goldMinimumIncrease! > 0
-                                    ? ` increase: ${upgrade.effect.goldMinimumIncrease} `
-                                    : ` decrease: ${upgrade.effect.goldMinimumIncrease} `}
-                                </Text>
-                                <Coins height={14} width={14} />
-                              </View>
-                            )}
-                            {upgrade.effect.goldMaximumIncrease && (
-                              <View className="flex flex-row items-center">
-                                <Text>
-                                  Max return
-                                  {upgrade.effect.goldMaximumIncrease! > 0
-                                    ? ` increase: ${upgrade.effect.goldMaximumIncrease} `
-                                    : ` decrease: ${upgrade.effect.goldMaximumIncrease} `}
-                                </Text>
-                                <Coins height={14} width={14} />
-                              </View>
-                            )}
-                            {upgrade.effect.turnsPerRollChange && (
-                              <View className="flex flex-row items-center">
-                                <Text>
-                                  {upgrade.effect.turnsPerRollChange}{" "}
-                                </Text>
-                                <ClockIcon
-                                  height={14}
-                                  width={14}
-                                  color={
-                                    colorScheme == "dark"
-                                      ? "#fafafa"
-                                      : undefined
-                                  }
-                                />
-                              </View>
-                            )}
-                            {upgrade.effect.maxGoldStockPileIncrease && (
-                              <View className="flex flex-row items-center">
-                                <Text>
-                                  {upgrade.effect.maxGoldStockPileIncrease}{" "}
-                                </Text>
-                                <Vault height={14} width={14} />
-                              </View>
-                            )}
-                            {upgrade.effect.changeMaxSanity && (
-                              <View className="flex flex-row items-center">
-                                <Text>{upgrade.effect.changeMaxSanity} </Text>
-                                <Sanity height={14} width={14} />
-                              </View>
-                            )}
-                          </View>
-                          {!madeInvestment ||
-                            (madeInvestment &&
-                              !madeInvestment.upgrades.includes(
-                                upgrade.name,
-                              ) && (
-                                <Pressable
-                                  onPress={() => purchaseUpgradeCheck(upgrade)}
-                                  disabled={
-                                    playerState &&
-                                    playerState.gold < upgrade.cost
-                                  }
-                                  className="mx-auto my-2"
-                                >
-                                  {({ pressed }) => (
-                                    <View
-                                      className={`rounded-xl px-8 py-4 ${
-                                        pressed ? "scale-95 opacity-50" : ""
-                                      }`}
-                                      style={
-                                        playerState &&
-                                        playerState.gold >= upgrade.cost
-                                          ? {
-                                              shadowColor: "#000",
-                                              elevation: 1,
-                                              backgroundColor:
-                                                colorScheme == "light"
-                                                  ? "white"
-                                                  : "#71717a",
-                                              shadowOpacity: 0.1,
-                                              shadowRadius: 5,
-                                            }
-                                          : {
-                                              backgroundColor:
-                                                colorScheme == "light"
-                                                  ? "#ccc"
-                                                  : "#4b4b4b",
-                                              opacity: 0.5,
-                                            }
-                                      }
-                                    >
-                                      <Text className="text-center">
-                                        Purchase For
-                                      </Text>
-                                      <View className="flex flex-row items-center justify-center">
-                                        <Text className="dark:text-zinc-50">
-                                          {asReadableGold(upgrade.cost)}{" "}
-                                        </Text>
-                                        <Coins width={14} height={14} />
-                                      </View>
-                                    </View>
-                                  )}
-                                </Pressable>
-                              ))}
-                        </View>
-                      )}
+                  <View className="flex justify-between rounded-xl px-4 py-2 text-zinc-950 dark:border dark:border-zinc-500">
+                    <View className="flex flex-row justify-between">
+                      <Text className="bold my-auto text-xl tracking-wider dark:text-zinc-50">
+                        {upgrade.name}
+                      </Text>
+                      <Animated.View
+                        style={{
+                          transform: [{ rotate: rotationInterpolate }],
+                        }}
+                      >
+                        <Entypo
+                          name="chevron-small-down"
+                          size={24}
+                          color={colorScheme == "light" ? "#18181b" : "#fafafa"}
+                        />
+                      </Animated.View>
                     </View>
+                    {madeInvestment?.upgrades.includes(upgrade.name) && (
+                      <Text className="my-auto text-lg tracking-wider opacity-70 dark:text-zinc-50">
+                        Purchased
+                      </Text>
+                    )}
+                    {showingBody && (
+                      <View>
+                        <Text className="bold my-auto py-2 text-center dark:text-zinc-50">
+                          {upgrade.description}
+                        </Text>
+                        <GenericStrikeAround>
+                          <Text>Effects</Text>
+                        </GenericStrikeAround>
+                        <View className="items-center py-2">
+                          {upgrade.effect.goldMinimumIncrease && (
+                            <View className="flex flex-row items-center">
+                              <Text>
+                                Minimum return
+                                {upgrade.effect.goldMinimumIncrease! > 0
+                                  ? ` increase: ${upgrade.effect.goldMinimumIncrease} `
+                                  : ` decrease: ${upgrade.effect.goldMinimumIncrease} `}
+                              </Text>
+                              <Coins height={14} width={14} />
+                            </View>
+                          )}
+                          {upgrade.effect.goldMaximumIncrease && (
+                            <View className="flex flex-row items-center">
+                              <Text>
+                                Max return
+                                {upgrade.effect.goldMaximumIncrease! > 0
+                                  ? ` increase: ${upgrade.effect.goldMaximumIncrease} `
+                                  : ` decrease: ${upgrade.effect.goldMaximumIncrease} `}
+                              </Text>
+                              <Coins height={14} width={14} />
+                            </View>
+                          )}
+                          {upgrade.effect.turnsPerRollChange && (
+                            <View className="flex flex-row items-center">
+                              <Text>{upgrade.effect.turnsPerRollChange} </Text>
+                              <ClockIcon
+                                height={14}
+                                width={14}
+                                color={
+                                  colorScheme == "dark" ? "#fafafa" : undefined
+                                }
+                              />
+                            </View>
+                          )}
+                          {upgrade.effect.maxGoldStockPileIncrease && (
+                            <View className="flex flex-row items-center">
+                              <Text>
+                                {upgrade.effect.maxGoldStockPileIncrease}{" "}
+                              </Text>
+                              <Vault height={14} width={14} />
+                            </View>
+                          )}
+                          {upgrade.effect.changeMaxSanity && (
+                            <View className="flex flex-row items-center">
+                              <Text>{upgrade.effect.changeMaxSanity} </Text>
+                              <Sanity height={14} width={14} />
+                            </View>
+                          )}
+                        </View>
+                        {!madeInvestment ||
+                          (madeInvestment &&
+                            !madeInvestment.upgrades.includes(upgrade.name) && (
+                              <Pressable
+                                onPress={() => purchaseUpgradeCheck(upgrade)}
+                                disabled={
+                                  playerState && playerState.gold < upgrade.cost
+                                }
+                                className="mx-auto my-2"
+                              >
+                                {({ pressed }) => (
+                                  <View
+                                    className={`rounded-xl px-8 py-4 ${
+                                      pressed ? "scale-95 opacity-50" : ""
+                                    }`}
+                                    style={
+                                      playerState &&
+                                      playerState.gold >= upgrade.cost
+                                        ? {
+                                            shadowColor: "#000",
+                                            elevation: 1,
+                                            backgroundColor:
+                                              colorScheme == "light"
+                                                ? "white"
+                                                : "#71717a",
+                                            shadowOpacity: 0.1,
+                                            shadowRadius: 5,
+                                          }
+                                        : {
+                                            backgroundColor:
+                                              colorScheme == "light"
+                                                ? "#ccc"
+                                                : "#4b4b4b",
+                                            opacity: 0.5,
+                                          }
+                                    }
+                                  >
+                                    <Text className="text-center">
+                                      Purchase For
+                                    </Text>
+                                    <View className="flex flex-row items-center justify-center">
+                                      <Text className="dark:text-zinc-50">
+                                        {asReadableGold(upgrade.cost)}{" "}
+                                      </Text>
+                                      <Coins width={14} height={14} />
+                                    </View>
+                                  </View>
+                                )}
+                              </Pressable>
+                            ))}
+                      </View>
+                    )}
                   </View>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-          <Pressable
-            onPress={() => {
-              vibration({ style: "light" });
-              setShowUpgrades(false);
-            }}
-            className="mx-auto mb-4 mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
-          >
-            <Text>Close</Text>
-          </Pressable>
-        </ThemedView>
-      </Modal>
+                </View>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+        <Pressable
+          onPress={() => {
+            vibration({ style: "light" });
+            setShowUpgrades(false);
+          }}
+          className="mx-auto mb-4 mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+        >
+          <Text>Close</Text>
+        </Pressable>
+      </GenericModal>
       <ThemedCard>
         <View>
           {madeInvestment ? (

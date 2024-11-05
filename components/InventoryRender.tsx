@@ -265,7 +265,7 @@ export default function InventoryRender({
                         top: `${Math.floor(index / 12) * 48 + 8}%`,
                       }
                     : {
-                        left: `${(index % 6) * 16.67 + 2}%`,
+                        left: `${(index % 6) * 16.67 + 1.5}%`,
                         top: `${Math.floor(index / 6) * 24 + 4}%`,
                       }
                 }
@@ -287,7 +287,7 @@ export default function InventoryRender({
                         top: `${Math.floor(index / 12) * 48 + 8}%`,
                       }
                     : {
-                        left: `${(index % 6) * 16.67 + 2}%`,
+                        left: `${(index % 6) * 16.67 + 1.5}%`,
                         top: `${Math.floor(index / 6) * 24 + 4}%`,
                       }
                 }
@@ -342,7 +342,7 @@ export default function InventoryRender({
                           top: `${Math.floor(index / 12) * 48 + 8}%`,
                         }
                       : {
-                          left: `${(index % 6) * 16.67 + 2}%`,
+                          left: `${(index % 6) * 16.67 + 1.5}%`,
                           top: `${Math.floor(index / 6) * 24 + 4}%`,
                         }
                   }
@@ -364,7 +364,7 @@ export default function InventoryRender({
                           top: `${Math.floor(index / 12) * 48 + 8}%`,
                         }
                       : {
-                          left: `${(index % 6) * 16.67 + 2}%`,
+                          left: `${(index % 6) * 16.67 + 1.5}%`,
                           top: `${Math.floor(index / 6) * 24 + 4}%`,
                         }
                   }

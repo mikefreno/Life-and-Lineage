@@ -28,7 +28,6 @@
          {"item": "apprentice hood", "itemType":"helmet","chance":0.45}
       ],
       "storyDrops":[
-         {"item": "bloodied note"},
          {"item": "the deed to the whispering raven inn"}
       ],
       "goldDropRange": {"minimum": 100, "maximum":150}
@@ -56,6 +55,9 @@
       "attacks": ["spark", "bonk"],
       "drops": [
          {"item": "goblin totem", "itemType":"staff", "chance": 1.0}
+      ],
+      "storyDrops":[
+         {"item": "head of goblin shaman"}
       ],
       "goldDropRange": {"minimum": 100, "maximum":150}
    },
@@ -85,6 +87,9 @@
       "energy": {"maximum": 50, "regen": 10},
       "attacks": ["serrate", "call backup", "stab"],
       "drops": [],
+      "storyDrops":[
+         {"item": "broken seal contract"}
+      ],
       "goldDropRange": {"minimum": 2500, "maximum":3000},
       "armorValue": 30
    }

@@ -33,10 +33,15 @@ import {
   WizardHat,
 } from "../../assets/icons/SVGIcons";
 import { View as ThemedView } from "../../components/Themed";
+import TutorialModal from "../../components/TutorialModal";
+import { useIsFocused } from "@react-navigation/native";
+import { TutorialOption } from "../../utility/types";
 
 export default function TabLayout() {
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing context");
+
+  const isFocused = useIsFocused();
 
   const { colorScheme } = useColorScheme();
   const { playerState, setShowDetailedStatusView, isCompact } = appData;
@@ -44,6 +49,16 @@ export default function TabLayout() {
 
   return (
     <>
+      {playerState && playerState.keyItems.length > 0 && (
+        <TutorialModal
+          isFocused={isFocused}
+          tutorial={TutorialOption.keyItem}
+          pageOne={{
+            body: "You have recieved a key item, swipe left on your inventory to check it out.",
+            title: "Key Item Received!",
+          }}
+        />
+      )}
       <Tabs
         screenOptions={{
           tabBarBackground: () => {

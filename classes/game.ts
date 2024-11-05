@@ -22,6 +22,7 @@ interface GameOptions {
   tutorialsShown?: Record<TutorialOption, boolean>;
   tutorialsEnabled?: boolean;
   independantChildren?: Character[];
+  inheritedGame?: boolean;
 }
 
 /**
@@ -54,6 +55,7 @@ export class Game {
     tutorialsShown,
     tutorialsEnabled,
     independantChildren,
+    inheritedGame,
   }: GameOptions) {
     this.date = date ?? new Date().toISOString();
     this.startDate = startDate ?? new Date().toISOString();
@@ -78,9 +80,11 @@ export class Game {
       [TutorialOption.investing]: false,
       [TutorialOption.training]: false,
       [TutorialOption.firstBossKill]: false,
+      [TutorialOption.keyItem]: false,
     };
     this.tutorialsEnabled = tutorialsEnabled ?? true;
     this.independantChildren = independantChildren ?? [];
+    this.inheritedGame = inheritedGame ?? false;
 
     makeObservable(this, {
       date: observable,
@@ -241,6 +245,7 @@ export class Game {
       [TutorialOption.investing]: false,
       [TutorialOption.training]: false,
       [TutorialOption.firstBossKill]: false,
+      [TutorialOption.keyItem]: false,
     };
     this.tutorialsShown = defaultState;
     this.enableTutorials();
@@ -313,7 +318,7 @@ export class Game {
         levels: [
           new DungeonLevel({
             level: 0,
-            bosses: [],
+            boss: [],
             tiles: 0,
             bossDefeated: true,
             unlocked: true,
@@ -346,6 +351,7 @@ export class Game {
       independantChildren: json.independantChildren
         ? json.independantChildren.map((ind: any) => Character.fromJSON(ind))
         : [],
+      inheritedGame: json.inheritedGame,
     });
 
     return game;

@@ -1,8 +1,8 @@
 [
     {
-        "name": "Remote Rest Stop",
+        "name": "Whispering Raven Inn",
         "description": "It's cheap and in the middle of no-where. Don't expect much foot traffic. But those rare few tired souls will be grateful for a quiet refuge from the beasts of the night.",
-        "requires": {"requirement": "nearby cave", "message": "A dangerous flood of monsters is spilling out from a nearby cave, preventing anyone from getting close to this rest stop, put an end to the source before further considering purchase." },
+        "requires": {"requirement": "the deed to the whispering raven inn", "message": "A dangerous flood of monsters is spilling out from a nearby cave, preventing anyone from getting close to this rest stop, put an end to the source before further considering purchase.", "removes": false },
         "cost": 5000,
         "turnsPerReturn": 1,
         "goldReturnRange": {"min": 0, "max": 50},
@@ -37,7 +37,7 @@
     {
         "name": "Trading Route",
         "description": "Control the arteries of commerce, provide a trader with startup costs.",
-        "requires": {"requirement": "goblin cave", "message": "Goblins have been attacking the roads, clear out the goblin cave to ensure that they won't pose a danger."},
+        "requires": {"requirement": "head of goblin shaman", "message": "Goblins have been attacking the roads, clear out the goblin cave to ensure that they won't pose a danger.", "removes": true},
         "cost": 10000,
         "turnsPerReturn": 10,
         "goldReturnRange": {"min": 0, "max": 750},
@@ -90,7 +90,7 @@
     {
         "name": "Village Inn",
         "description": "A vital haven for weary travelers and thirsty locals alike. On a good night, the air is filled with laughter, music, and the clinking of golden coins (and the potential broken table).",
-        "requires": {"requirement": "bandit hideout", "message": "The writ of sale has been stolen by bandits! Get it back to proceed with the purchase."},
+        "requires": {"requirement": "broken seal contract", "message": "The writ of sale has been stolen by bandits! Get it back to proceed with the purchase.", "removes": false},
         "cost": 39500,
         "turnsPerReturn": 1,
         "goldReturnRange": {"min": -100, "max": 300},
@@ -275,7 +275,7 @@
     {
         "name": "Crystal Mine",
         "description": "Beneath ominous stone outcroppings, miners burrow deep below all other mines, discovering veins of shimmering crystal. Their glow is mesmerizing, and their magical potential immense.",
-        "requires": null,
+        "requires": {"requirement": "", "message": ""},
         "cost": 480000,
         "turnsPerReturn": 20,
         "goldReturnRange": {"min": 7000, "max": 12000},
@@ -314,7 +314,7 @@
     {
         "name": "Artifact Excavation Site",
         "description": "Hidden beneath the millennia of earth lie ancient artifacts infused with forgotten magics. Each find promises wealth, power, and a chance to rewrite history.",
-        "requires": null,
+        "requires": {"requirement": "", "message": ""},
         "cost": 1850000,
         "turnsPerReturn": 50,
         "goldReturnRange": {"min": 28500, "max": 100000},
