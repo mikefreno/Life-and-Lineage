@@ -4,7 +4,6 @@ import { PlayerClassOptions } from "../../utility/types";
 import Benchmark from "benchmark";
 import { parse, stringify } from "flatted";
 
-// my test code
 describe("Game object exploration", () => {
   it("should reduce game size", () => {
     const shops = createShops(PlayerClassOptions.mage);

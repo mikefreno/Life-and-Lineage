@@ -383,7 +383,7 @@ export class Creature {
   }
 
   /**
-   * Adds a condition to the creature's list of conditions.
+   * Adds a condition to the creature's list of conditions. Sets the `on` property.
    * @param condition - The condition to add. If null, does nothing.
    */
   public addCondition(condition?: Condition | null) {

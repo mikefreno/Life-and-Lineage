@@ -129,7 +129,7 @@ const DungeonScreen = observer(() => {
             className="absolute right-4 z-top"
             style={{ marginTop: headerHeight + warningHeight }}
           >
-            <Text style={{ fontSize: 16 }} className="text-end">
+            <Text style={{ fontSize: 16 }}>
               {currentPage + 1} of {instances.length}
             </Text>
           </View>

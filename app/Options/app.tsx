@@ -15,6 +15,8 @@ import { SaveRow } from "../../utility/database";
 import D20DieAnimation from "../../components/DieRollAnim";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { Game } from "../../classes/game";
+import { parse } from "flatted";
+import { PlayerCharacter } from "../../classes/character";
 
 const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
@@ -92,7 +94,7 @@ export const AppSettings = observer(() => {
     const newRemoteSave = async () => {
       if (playerState && gameState && saveName.length >= 3) {
         setLoadingDBInfo(true);
-        await user.makeRemoteSave({ name: saveName, gameState });
+        await user.makeRemoteSave({ name: saveName, gameState, playerState });
         const res = await user.getRemoteSaves();
         setRemoteSaves(res);
 
@@ -107,6 +109,7 @@ export const AppSettings = observer(() => {
           name: chosenSave.name,
           id: chosenSave.id,
           gameState,
+          playerState,
         });
         const res = await user.getRemoteSaves();
         setRemoteSaves(res);
@@ -115,9 +118,10 @@ export const AppSettings = observer(() => {
     };
 
     const loadRemoteSave = async (chosenSave: SaveRow) => {
-      const game = Game.fromJSON(JSON.parse(chosenSave.game_state));
+      const game = Game.fromJSON(parse(chosenSave.game_state));
+      const player = PlayerCharacter.fromJSON(parse(chosenSave.player_state));
       setGameData(game);
-      setPlayerCharacter(playerState);
+      setPlayerCharacter(player);
       while (router.canGoBack()) {
         router.back();
       }

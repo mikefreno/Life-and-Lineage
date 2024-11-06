@@ -69,6 +69,7 @@ describe("Enemy", () => {
       blessing: Element.fire,
       parents: [createParent("female"), createParent("female")],
       birthdate: new Date().toString(),
+      inCombat: false,
       ...getStartingBaseStats({ playerClass: PlayerClassOptions.mage }),
     });
 
@@ -112,6 +113,7 @@ describe("Enemy", () => {
       placedbyID: minion.id,
       icon: debuffObj.icon,
       aura: debuffObj.aura,
+      on: null,
     });
     enemy.addCondition(stunCondition);
 

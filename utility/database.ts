@@ -37,6 +37,7 @@ export type SaveRow = {
   id: number;
   name: string;
   game_state: string;
+  player_state: string;
   created_at: string;
   last_updated_at: string;
 };
