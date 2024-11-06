@@ -581,7 +581,8 @@ export class PlayerCharacter extends Character {
     this.conditions = conditions ?? [];
 
     this.inventory = inventory ?? [];
-    this.keyItems = keyItems ?? __DEV__ ? testKeyItems() : [];
+    //this.keyItems = keyItems ?? __DEV__ ? testKeyItems() : [];
+    this.keyItems = keyItems ?? [];
     this.currentDungeon = currentDungeon ?? null;
     this.inCombat = inCombat ?? false;
     this.equipment = equipment ?? {
