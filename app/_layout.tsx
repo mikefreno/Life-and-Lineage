@@ -436,6 +436,47 @@ const RootLayout = observer(() => {
           name="Shops/[shop]"
           options={headerOptions(colorScheme, true)}
         />
+        <Stack.Screen
+          name="NewGame/index"
+          options={{
+            title: "Class Select",
+            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
+            headerBackTitleStyle: { fontFamily: "PixelifySans" },
+            headerBackTitle: "Home",
+          }}
+        />
+        <Stack.Screen
+          name="NewGame/SetBlessing/[slug]"
+          options={{
+            title: "Blessing",
+            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
+            headerBackTitleStyle: { fontFamily: "PixelifySans" },
+          }}
+        />
+        <Stack.Screen
+          name="NewGame/SetSex/[...slug]"
+          options={{
+            title: "Sex Select",
+            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
+            headerBackTitleStyle: { fontFamily: "PixelifySans" },
+          }}
+        />
+        <Stack.Screen
+          name="NewGame/SetName/[...slug]"
+          options={{
+            title: "Name Set",
+            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
+            headerBackTitleStyle: { fontFamily: "PixelifySans" },
+          }}
+        />
+        <Stack.Screen
+          name="NewGame/Review/[...slug]"
+          options={{
+            title: "Review",
+            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
+            headerBackTitleStyle: { fontFamily: "PixelifySans" },
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

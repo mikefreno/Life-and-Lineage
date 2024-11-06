@@ -197,5 +197,35 @@
       "targets": "single",
       "hitChance": 0.95,
       "damageMult": 1.0
-   }
+   },
+   {
+      "name": "fire bolt", 
+      "energyCost": 20,
+      "target": "single",
+      "hitChance": 1.0,
+      "damageMult": 1.5,
+      "debuffs": [{"name":"burn", "chance": 0.25}]
+  },
+  {
+      "name": "frost",
+      "energyCost": 20,
+      "target": "single",
+      "hitChance": 1.0,
+      "damageMult": 1.0,
+      "debuffs": [{"name":"chill", "chance": 0.5}]
+  },
+  {
+      "name": "gust",
+      "energyCost": 10,
+      "target": "single",
+      "hitChance": 1.0,
+      "damageMult": 1.0
+  },
+  {
+      "name": "rock toss",
+      "energyCost": 15,
+      "hitChance": 1.0,
+      "damageMult": 1.0, 
+      "debuffs": [{"name":"stun", "chance": 0.10}]
+  }
 ]

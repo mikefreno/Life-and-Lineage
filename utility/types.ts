@@ -27,6 +27,7 @@ export interface ItemOptions {
     | Condition
     | { effect: "health" | "mana" | "sanity"; amount: number }
     | null;
+  uses?: number;
 }
 
 type StatEffect = {

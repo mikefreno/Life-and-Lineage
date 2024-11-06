@@ -33,6 +33,8 @@ const SetClassScreen = observer(() => {
   if (!appData) throw new Error("missing context!");
   const { gameState, dimensions } = appData;
 
+  const isFocused = useIsFocused();
+
   const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
 
   const [showTutorialReset, setShowTutorialReset] = useState<boolean>(false);
@@ -45,18 +47,10 @@ const SetClassScreen = observer(() => {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: "Class Select",
-          headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-          headerBackTitleStyle: { fontFamily: "PixelifySans" },
-          headerBackTitle: "Home",
-        }}
-      />
       <TutorialModal
         tutorial={TutorialOption.class}
         override={forceShowTutorial}
-        isFocused={useIsFocused()}
+        isFocused={isFocused}
         clearOverride={() => setForceShowTutorial(false)}
         pageOne={{
           title: "Welcome To Life and Lineage!",

@@ -36,6 +36,7 @@ import type {
 import { Spell } from "./spell";
 import { savePlayer } from "../utility/functions/save_load";
 import storyItems from "../assets/json/items/storyItems.json";
+import { Attack } from "./attack";
 
 interface CharacterOptions {
   id?: string;
@@ -668,7 +669,7 @@ export class PlayerCharacter extends Character {
       clearMinions: action,
       removeMinion: action,
 
-      physicalAttacks: computed,
+      weaponAttacks: computed,
       useArrow: action,
       pass: action,
 
@@ -1867,8 +1868,23 @@ export class PlayerCharacter extends Character {
     }
   }
   //----------------------------------Physical Combat----------------------------------//
-  get physicalAttacks() {
-    return this.equipment.mainHand.attachedAttacks;
+  get weaponAttacks() {
+    if (__DEV__) {
+      const fullHeal = new Attack({
+        name: "devHeal",
+        user: this,
+        selfDamage: -9999,
+      });
+      let attacks = [fullHeal, ...this.equipment.mainHand.attachedAttacks];
+      const spells = this.equipment.mainHand.providedSpells;
+      if (spells) {
+        return [...attacks, ...spells];
+      }
+      return attacks;
+    }
+    const attacks = this.equipment.mainHand.attachedAttacks;
+    const spells = this.equipment.mainHand.providedSpells ?? [];
+    return [...attacks, ...spells];
   }
 
   public useArrow() {

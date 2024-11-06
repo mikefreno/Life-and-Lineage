@@ -1,5 +1,12 @@
 import { Text, View } from "../../components/Themed";
-import { Pressable, ScrollView, View as NonThemedView } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  View as NonThemedView,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+  type LayoutChangeEvent,
+} from "react-native";
 import { router, usePathname } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { useVibration } from "../../utility/customHooks";
@@ -44,11 +51,18 @@ const DungeonScreen = observer(() => {
       (instance) => instance.name !== "training grounds",
     ) ?? [],
   );
+  const [scrollViewHeight, setScrollViewHeight] = useState(0);
+
   const pathname = usePathname();
   const [height, setHeight] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState(0);
 
   const vibration = useVibration();
   const isFocused = useIsFocused();
+  const headerHeight = useHeaderHeight();
+  const bottomHeight = useBottomTabBarHeight();
+
+  const warningHeight = 64;
 
   useEffect(() => {
     if (isFocused) {
@@ -65,6 +79,17 @@ const DungeonScreen = observer(() => {
       setHeight(deepestDungeonDepth);
     }
   }, [isFocused, gameState?.dungeonInstances, pathname]);
+
+  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const offsetY = event.nativeEvent.contentOffset.y;
+    const pageIndex = Math.round(offsetY / scrollViewHeight);
+    setCurrentPage(pageIndex);
+  };
+
+  const onLayout = (event: LayoutChangeEvent) => {
+    const { height } = event.nativeEvent.layout;
+    setScrollViewHeight(height);
+  };
 
   return (
     <>
@@ -95,16 +120,39 @@ const DungeonScreen = observer(() => {
       <View
         className="flex-1 px-8"
         style={{
-          paddingTop: useHeaderHeight() + 64,
+          paddingTop: headerHeight + warningHeight,
+          paddingBottom: bottomHeight + (isCompact ? 0 : 28),
         }}
       >
-        <ScrollView>
+        {instances.length > 1 && (
+          <View
+            className="absolute right-4 z-top"
+            style={{ marginTop: headerHeight + warningHeight }}
+          >
+            <Text style={{ fontSize: 16 }} className="text-end">
+              {currentPage + 1} of {instances.length}
+            </Text>
+          </View>
+        )}
+        <ScrollView
+          pagingEnabled
+          onScroll={onScroll}
+          onLayout={onLayout}
+          scrollEventThrottle={16}
+          contentContainerStyle={{
+            height: `${100 * instances.length}%`,
+            marginTop: -36,
+          }}
+        >
           {instances.map((dungeonInstance, dungeonInstanceIdx) => (
-            <ThemedCard key={dungeonInstanceIdx}>
+            <ThemedCard
+              key={dungeonInstanceIdx}
+              className="flex-1 justify-center mx-8"
+            >
               <Text className="text-center text-2xl tracking-widest underline">
                 {toTitleCase(dungeonInstance.name)}
               </Text>
-              <NonThemedView className="mx-auto">
+              <NonThemedView className="mx-auto justify-center">
                 {dungeonInstance.levels
                   .filter((level) => level.unlocked)
                   .map((level, levelIdx) => (
@@ -155,10 +203,6 @@ const DungeonScreen = observer(() => {
               </NonThemedView>
             </ThemedCard>
           ))}
-          <View
-            style={{ height: useBottomTabBarHeight() + (isCompact ? 0 : 28) }}
-          />
-          {/* ^ Bottom Pad ^ */}
         </ScrollView>
       </View>
     </>

@@ -78,7 +78,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
 
   useEffect(() => {
     if (playerState) {
-      setCombinedData([...playerState.physicalAttacks, ...playerState.spells]);
+      setCombinedData([...playerState.weaponAttacks, ...playerState.spells]);
     }
   }, [playerState]);
 
@@ -306,7 +306,7 @@ const TabRender = ({
                       </View>
                       {index == combinedData.length - 1 && (
                         <View
-                          className="flex flex-row justify-between rounded-lg border px-4 py-2"
+                          className="flex flex-row mt-2 justify-between rounded-lg border px-4 py-2"
                           style={{
                             borderColor:
                               colorScheme == "light" ? "#71717a" : "#a1a1aa",

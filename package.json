@@ -16,7 +16,7 @@
     "@react-native-google-signin/google-signin": "^12.2.1",
     "@react-native-masked-view/masked-view": "0.3.1",
     "@react-navigation/native": "^6.0.2",
-    "@sentry/react-native": "~5.24.3",
+    "@sentry/react-native": "~5.31.1",
     "benchmark": "^2.1.4",
     "circular-json": "^0.5.9",
     "eas-cli": "^12.6.0",

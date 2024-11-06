@@ -109,7 +109,7 @@ export class Attack {
           "nonConditionalMaxHealth" in this.user
             ? this.user.nonConditionalMaxSanity
             : this.user.sanityMax,
-        applierNameString: this.getNameReference(this.user),
+        applierNameString: this.userNameReference,
         applierID: this.user.id,
       });
       if (newBuff) {
@@ -156,7 +156,7 @@ export class Attack {
               ? target.nonConditionalMaxSanity
               : target.sanityMax,
           primaryAttackDamage: this.baseDamage * damageMult + damageFlat,
-          applierNameString: this.getNameReference(this.user),
+          applierNameString: this.userNameReference,
           applierID: this.user.id,
         });
         created.push({ debuff: built, chance: debuffString.chance });
@@ -255,7 +255,9 @@ export class Attack {
       } else {
         return {
           result: AttackUse.lowEnergy,
-          logString: `${toTitleCase(this.name)} passed (low energy)!`,
+          logString: `${toTitleCase(
+            this.userNameReference,
+          )} passed (low energy)!`,
         };
       }
     }
@@ -373,7 +375,7 @@ export class Attack {
         result: AttackUse.success,
         logString: this.logBuilder({
           result: AttackUse.success,
-          targetName: this.getNameReference(target),
+          targetName: this.getTargetNameReference(target),
           healthDamage: totalDamage,
           sanityDamage: this.flatSanityDamage,
           debuffNames: allDebuffs,
@@ -407,7 +409,8 @@ export class Attack {
     //first roll based on base hit chance combined with conditional effects (this includes both user and target)
     const rollToHit =
       20 - this.baseHitChance * conditionalHitChanceMultiplier * 20; // d&d style :)
-    if (rollD20() >= rollToHit) {
+    const roll = rollD20();
+    if (roll >= rollToHit) {
       if ("equipment" in target && target.equipmentStats.blockChance > 0) {
         const rollToPassBlock = 20 - target.equipmentStats.blockChance * 20;
         if (rollToPassBlock < rollD20()) {
@@ -420,10 +423,7 @@ export class Attack {
   }
 
   private logBuilder({ result, targetName, ...props }: LogProps): string {
-    const userString =
-      "fullName" in this.user
-        ? "You"
-        : `The ${toTitleCase(this.user.creatureSpecies)}`;
+    const userString = this.userNameReferenceForLog;
 
     switch (result) {
       case AttackUse.miss:
@@ -496,11 +496,25 @@ export class Attack {
   /*
    * Returns a string to refer to the target or user with
    */
-  private getNameReference(target: PlayerCharacter | Enemy | Minion) {
+  private getTargetNameReference(target: PlayerCharacter | Enemy | Minion) {
     if ("fullName" in target) {
-      return target.fullName;
+      return "You";
     }
     return target.creatureSpecies;
+  }
+
+  get userNameReferenceForLog() {
+    if ("fullName" in this.user) {
+      return this.user.fullName;
+    }
+    return `The ${toTitleCase(this.user.creatureSpecies)}`;
+  }
+
+  get userNameReference() {
+    if ("fullName" in this.user) {
+      return this.user.fullName;
+    }
+    return `The ${toTitleCase(this.user.creatureSpecies)}`;
   }
 
   public AttackRender(weaponDamage?: number) {

@@ -1,13 +1,9 @@
 import { Pressable, View } from "react-native";
-import {
-  ScrollView,
-  Text,
-  View as ThemedView,
-} from "../../../components/Themed";
-import { useContext, useEffect, useState } from "react";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Text, View as ThemedView } from "../../../components/Themed";
+import { useContext, useState } from "react";
+import { useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
-import { useVibration } from "../../../utility/customHooks";
+import { VibrateProps, useVibration } from "../../../utility/customHooks";
 import { AppContext } from "../../_layout";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
@@ -39,118 +35,14 @@ export default function SetBlessing() {
   const { colorScheme } = useColorScheme();
   const vibration = useVibration();
 
-  useEffect(() => {}, [isFocused]);
-
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing context");
   const { gameState, dimensions } = appData;
 
   const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
 
-  interface BlessingPressableProps {
-    element: Element;
-  }
-  const BlessingPressable = ({ element }: BlessingPressableProps) => {
-    return (
-      <Pressable
-        onPress={() => {
-          vibration({ style: "light" });
-          setBlessing(element);
-        }}
-        style={{
-          height: dimensions.height * 0.25,
-          width: dimensions.width * 0.45,
-        }}
-      >
-        {({ pressed }) => (
-          <View
-            className={`${
-              pressed || blessing == element
-                ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                : "border-transparent"
-            } w-full h-full border flex items-center justify-center`}
-          >
-            <BlessingDisplay
-              blessing={element}
-              colorScheme={colorScheme}
-              size={dimensions.height * 0.15}
-            />
-            <Text
-              className="text-center text-lg px-2"
-              style={{
-                color:
-                  element == Element.assassination && colorScheme == "dark"
-                    ? elementalColorMap[element].light
-                    : elementalColorMap[element].dark,
-              }}
-            >
-              Blessing of {ElementToString[element]}
-            </Text>
-          </View>
-        )}
-      </Pressable>
-    );
-  };
-
-  function classDependantBlessings() {
-    if (playerClass == "mage") {
-      return (
-        <View className="flex items-center justify-evenly py-6">
-          <ThemedView className="mb-8 flex flex-row justify-evenly">
-            <BlessingPressable element={Element.fire} />
-            <BlessingPressable element={Element.water} />
-          </ThemedView>
-          <ThemedView className="flex flex-row justify-evenly">
-            <BlessingPressable element={Element.air} />
-            <BlessingPressable element={Element.earth} />
-          </ThemedView>
-        </View>
-      );
-    } else if (playerClass == "necromancer") {
-      return (
-        <View className="flex items-center justify-evenly py-6">
-          <ThemedView className="mb-8 flex flex-row justify-evenly">
-            <BlessingPressable element={Element.summoning} />
-            <BlessingPressable element={Element.pestilence} />
-          </ThemedView>
-          <ThemedView className="flex flex-row justify-evenly">
-            <BlessingPressable element={Element.bone} />
-            <BlessingPressable element={Element.blood} />
-          </ThemedView>
-        </View>
-      );
-    } else if (playerClass == "paladin") {
-      return (
-        <View className="flex items-center justify-evenly py-6">
-          <BlessingPressable element={Element.holy} />
-          <ThemedView className="mt-8 flex flex-row justify-evenly">
-            <BlessingPressable element={Element.vengeance} />
-            <BlessingPressable element={Element.protection} />
-          </ThemedView>
-        </View>
-      );
-    } else if (playerClass == "ranger") {
-      return (
-        <View className="flex items-center justify-evenly py-6">
-          <BlessingPressable element={Element.beastMastery} />
-          <ThemedView className="mt-8 flex flex-row justify-evenly">
-            <BlessingPressable element={Element.arcane} />
-            <BlessingPressable element={Element.assassination} />
-          </ThemedView>
-        </View>
-      );
-    } else throw new Error("invalid class set");
-  }
-
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: "Blessing",
-          headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-          headerBackTitleStyle: { fontFamily: "PixelifySans" },
-        }}
-      />
       <TutorialModal
         tutorial={TutorialOption.blessing}
         isFocused={isFocused}
@@ -165,37 +57,42 @@ export default function SetBlessing() {
           body: "Each of the blessings are for your class, you can learn from of these schools, but not from a school for a different class.",
         }}
       />
-      <ScrollView>
-        <ThemedView className="flex-1 pt-[8vh]">
-          <Text className="text-center text-2xl">
-            With What Blessing Was Your
-            <Text
-              style={{ color: playerClassColors[playerClass] }}
-            >{` ${toTitleCase(playerClass)} `}</Text>
-            Born?
+      <ThemedView className="flex-1 pt-[8vh]">
+        <Text className="text-center text-2xl">
+          With What Blessing Was Your
+          <Text
+            style={{ color: playerClassColors[playerClass] }}
+          >{` ${toTitleCase(playerClass)} `}</Text>
+          Born?
+        </Text>
+        <>
+          <ClassDependantBlessings
+            playerClass={playerClass}
+            vibration={vibration}
+            blessing={blessing}
+            setBlessing={setBlessing}
+            colorScheme={colorScheme}
+            dimensions={dimensions}
+          />
+          <Text className="text-center md:text-lg px-4">
+            {DescriptionMap[blessing as Element]}
           </Text>
-          <>
-            {classDependantBlessings()}
-            <Text className="text-center md:text-lg px-4">
-              {DescriptionMap[blessing as Element]}
-            </Text>
-            {blessing == 0 || blessing ? ( // sometimes I really hate ts. Evaluation of 0 is false.
-              <View className="mx-auto h-32 py-2">
-                <GenericFlatButton
-                  onPressFunction={() => {
-                    vibration({ style: "light" });
-                    router.push(`/NewGame/SetSex/${playerClass}/${blessing}`);
-                  }}
-                >
-                  <Text className="text-xl tracking-widest">Next</Text>
-                </GenericFlatButton>
-              </View>
-            ) : (
-              <View className="h-32"></View>
-            )}
-          </>
-        </ThemedView>
-      </ScrollView>
+          {blessing == 0 || blessing ? ( // sometimes I really hate ts. Evaluation of 0 is false.
+            <View className="mx-auto h-32 py-2">
+              <GenericFlatButton
+                onPressFunction={() => {
+                  vibration({ style: "light" });
+                  router.push(`/NewGame/SetSex/${playerClass}/${blessing}`);
+                }}
+              >
+                <Text className="text-xl tracking-widest">Next</Text>
+              </GenericFlatButton>
+            </View>
+          ) : (
+            <View className="h-32"></View>
+          )}
+        </>
+      </ThemedView>
       {((gameState && gameState.tutorialsEnabled) || !gameState) && (
         <View className="absolute ml-4 mt-4">
           <Pressable
@@ -214,4 +111,255 @@ export default function SetBlessing() {
       )}
     </>
   );
+}
+
+const BlessingPressable = ({
+  element,
+  onPress,
+  colorScheme,
+  dimensions,
+  blessing,
+}: {
+  element: Element;
+  onPress: () => void;
+  colorScheme: "dark" | "light";
+  dimensions: {
+    height: number;
+    width: number;
+    greater: number;
+    lesser: number;
+  };
+  blessing: Element | undefined;
+}) => {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={{
+        height: dimensions.height * 0.25,
+        width: dimensions.width * 0.45,
+      }}
+    >
+      {({ pressed }) => (
+        <View
+          className={`${
+            pressed || blessing == element
+              ? "rounded-lg border-zinc-900 dark:border-zinc-50"
+              : "border-transparent"
+          } w-full h-full border flex items-center justify-center`}
+        >
+          <BlessingDisplay
+            blessing={element}
+            colorScheme={colorScheme}
+            size={dimensions.height * 0.15}
+          />
+          <Text
+            className="text-center text-lg px-2"
+            style={{
+              color:
+                element == Element.assassination && colorScheme == "dark"
+                  ? elementalColorMap[element].light
+                  : elementalColorMap[element].dark,
+            }}
+          >
+            Blessing of {ElementToString[element]}
+          </Text>
+        </View>
+      )}
+    </Pressable>
+  );
+};
+
+function ClassDependantBlessings({
+  playerClass,
+  vibration,
+  setBlessing,
+  colorScheme,
+  dimensions,
+  blessing,
+}: {
+  playerClass: PlayerClassOptions;
+  vibration: ({ style, essential }: VibrateProps) => void;
+  blessing: Element | undefined;
+  setBlessing: React.Dispatch<React.SetStateAction<Element | undefined>>;
+  colorScheme: "dark" | "light";
+  dimensions: {
+    height: number;
+    width: number;
+    greater: number;
+    lesser: number;
+  };
+}) {
+  if (playerClass == "mage") {
+    return (
+      <View className="flex items-center justify-evenly py-6">
+        <ThemedView className="mb-8 flex flex-row justify-evenly">
+          <BlessingPressable
+            element={Element.fire}
+            onPress={() => {
+              vibration({ style: "light" });
+              setBlessing(Element.fire);
+            }}
+            colorScheme={colorScheme}
+            dimensions={dimensions}
+            blessing={blessing}
+          />
+          <BlessingPressable
+            element={Element.water}
+            onPress={() => {
+              vibration({ style: "light" });
+              setBlessing(Element.water);
+            }}
+            colorScheme={colorScheme}
+            dimensions={dimensions}
+            blessing={blessing}
+          />
+        </ThemedView>
+        <ThemedView className="flex flex-row justify-evenly">
+          <BlessingPressable
+            element={Element.air}
+            onPress={() => {
+              vibration({ style: "light" });
+              setBlessing(Element.air);
+            }}
+            colorScheme={colorScheme}
+            dimensions={dimensions}
+            blessing={blessing}
+          />
+          <BlessingPressable
+            element={Element.earth}
+            onPress={() => {
+              vibration({ style: "light" });
+              setBlessing(Element.earth);
+            }}
+            colorScheme={colorScheme}
+            dimensions={dimensions}
+            blessing={blessing}
+          />
+        </ThemedView>
+      </View>
+    );
+  } else if (playerClass == "necromancer") {
+    return (
+      <View className="flex items-center justify-evenly py-6">
+        <ThemedView className="mb-8 flex flex-row justify-evenly">
+          <BlessingPressable
+            element={Element.summoning}
+            onPress={() => {
+              vibration({ style: "light" });
+              setBlessing(Element.summoning);
+            }}
+            colorScheme={colorScheme}
+            dimensions={dimensions}
+            blessing={blessing}
+          />
+          <BlessingPressable
+            element={Element.pestilence}
+            onPress={() => {
+              vibration({ style: "light" });
+              setBlessing(Element.pestilence);
+            }}
+            colorScheme={colorScheme}
+            dimensions={dimensions}
+            blessing={blessing}
+          />
+        </ThemedView>
+        <ThemedView className="flex flex-row justify-evenly">
+          <BlessingPressable
+            element={Element.bone}
+            onPress={() => {
+              vibration({ style: "light" });
+              setBlessing(Element.bone);
+            }}
+            colorScheme={colorScheme}
+            dimensions={dimensions}
+            blessing={blessing}
+          />
+          <BlessingPressable
+            element={Element.blood}
+            onPress={() => {
+              vibration({ style: "light" });
+              setBlessing(Element.blood);
+            }}
+            colorScheme={colorScheme}
+            dimensions={dimensions}
+            blessing={blessing}
+          />
+        </ThemedView>
+      </View>
+    );
+  } else if (playerClass == "paladin") {
+    return (
+      <View className="flex items-center justify-evenly py-6">
+        <BlessingPressable
+          element={Element.holy}
+          onPress={() => {
+            vibration({ style: "light" });
+            setBlessing(Element.holy);
+          }}
+          colorScheme={colorScheme}
+          dimensions={dimensions}
+          blessing={blessing}
+        />
+        <ThemedView className="mt-8 flex flex-row justify-evenly">
+          <BlessingPressable
+            element={Element.vengeance}
+            onPress={() => {
+              vibration({ style: "light" });
+              setBlessing(Element.vengeance);
+            }}
+            colorScheme={colorScheme}
+            dimensions={dimensions}
+            blessing={blessing}
+          />
+          <BlessingPressable
+            element={Element.protection}
+            onPress={() => {
+              vibration({ style: "light" });
+              setBlessing(Element.protection);
+            }}
+            colorScheme={colorScheme}
+            dimensions={dimensions}
+            blessing={blessing}
+          />
+        </ThemedView>
+      </View>
+    );
+  } else if (playerClass == "ranger") {
+    return (
+      <View className="flex items-center justify-evenly py-6">
+        <BlessingPressable
+          element={Element.beastMastery}
+          onPress={() => {
+            vibration({ style: "light" });
+            setBlessing(Element.beastMastery);
+          }}
+          colorScheme={colorScheme}
+          dimensions={dimensions}
+          blessing={blessing}
+        />
+        <ThemedView className="mt-8 flex flex-row justify-evenly">
+          <BlessingPressable
+            element={Element.arcane}
+            onPress={() => {
+              vibration({ style: "light" });
+              setBlessing(Element.arcane);
+            }}
+            colorScheme={colorScheme}
+            dimensions={dimensions}
+            blessing={blessing}
+          />
+          <BlessingPressable
+            element={Element.assassination}
+            onPress={() => {
+              vibration({ style: "light" });
+              setBlessing(Element.assassination);
+            }}
+            colorScheme={colorScheme}
+            dimensions={dimensions}
+            blessing={blessing}
+          />
+        </ThemedView>
+      </View>
+    );
+  } else throw new Error(`invalid class set: ${playerClass}`);
 }

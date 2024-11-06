@@ -51,6 +51,7 @@ export class Item {
     | Condition
     | { effect: "health" | "mana" | "sanity"; amount: number }
     | null;
+  uses: number | null;
 
   constructor({
     id,
@@ -67,6 +68,7 @@ export class Item {
     description,
     effect,
     activePoison,
+    uses,
   }: ItemOptions) {
     this.id = id ?? Crypto.randomUUID();
     this.name = name;
@@ -82,6 +84,7 @@ export class Item {
     this.description = description ?? null;
     this.effect = effect ?? null;
     this.activePoison = activePoison ?? null;
+    this.uses = uses ?? null;
 
     makeObservable(this, {
       attachedSpell: computed,
@@ -128,6 +131,30 @@ export class Item {
     }
 
     return true;
+  }
+
+  get providedSpells() {
+    if (this.itemClass == ItemClassType.Wand) {
+      const builtSpells: Spell[] = [];
+      const combinedSpellJson = [
+        ...mageSpells,
+        ...necroSpells,
+        ...paladinSpells,
+        ...rangerSpells,
+      ];
+      this.attacks.forEach((attackString) => {
+        const found = combinedSpellJson.find((obj) => obj.name == attackString);
+        if (found && this.player) {
+          builtSpells.push(
+            new Spell({
+              ...found,
+              proficiencyNeeded: "novice",
+            }),
+          );
+        }
+      });
+      return builtSpells;
+    }
   }
 
   public equals(otherItem: Item) {

@@ -13,6 +13,7 @@
       "beingType": "undead",
       "health": 40,
       "attackPower": 5,
+      "energy": {"maximum": 50, "regen": 5},
       "attacks": ["stab", "cleave"],
       "turns": 5
    },
@@ -22,6 +23,7 @@
       "sanity": 50,
       "health":50,
       "attackPower": 8,
+      "energy": {"maximum": 50, "regen": 10},
       "attacks": ["stab", "pocket sand","serrate"],
       "turns": 100
    },

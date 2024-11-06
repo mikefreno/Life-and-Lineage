@@ -5,12 +5,7 @@ import {
   PlayerCharacter,
   getStartingBook,
 } from "../../../classes/character";
-import {
-  Stack,
-  router,
-  useLocalSearchParams,
-  useNavigation,
-} from "expo-router";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import clearHistory, {
   getRandomName,
   toTitleCase,
@@ -208,13 +203,6 @@ export default function NewGameReview() {
 
   return (
     <ThemedView className="flex-1 px-6">
-      <Stack.Screen
-        options={{
-          title: "Review",
-          headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-          headerBackTitleStyle: { fontFamily: "PixelifySans" },
-        }}
-      />
       <Text className="pt-[8vh] text-center text-2xl">Review</Text>
       <Text className="pt-[16vh] text-center text-3xl">
         {`${firstName} ${lastName} the `}

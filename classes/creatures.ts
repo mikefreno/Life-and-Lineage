@@ -462,13 +462,7 @@ export class Creature {
         this.aggroTable.getHighestAggroTarget(allTargets);
 
       if (!highestAggroTarget) {
-        this.endTurn();
-        return {
-          result: AttackUse.lowEnergy,
-          logString: `${toTitleCase(
-            this.creatureSpecies,
-          )} passed (low energy)!`,
-        };
+        throw new Error(`No enemy target found for: ${this.creatureSpecies}`);
       }
 
       const availableAttacks = this.attacks.filter(

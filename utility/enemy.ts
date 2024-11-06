@@ -105,8 +105,8 @@ export const EnemyImageMap: Record<string, ImageInfo> = {
   },
   "fire mage": {
     source: require("../assets/images/monsters/fire_mage.png"),
-    width: 160,
-    height: 160,
+    width: 140,
+    height: 200,
   },
   "giant rat": {
     source: require("../assets/images/monsters/giant_rat.png"),

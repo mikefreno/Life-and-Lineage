@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { View as ThemedView, Text } from "../../../components/Themed";
 import { useContext, useRef, useState } from "react";
-import { Stack, router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { toTitleCase } from "../../../utility/functions/misc";
 import { useVibration } from "../../../utility/customHooks";
 import { useColorScheme } from "nativewind";
@@ -54,19 +54,12 @@ export default function SetName() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: "Name Set",
-          headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-          headerBackTitleStyle: { fontFamily: "PixelifySans" },
-        }}
-      />
-      <ThemedView className="flex-1" style={{ marginTop: -header }}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={{ flex: 1 }}
-        >
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ThemedView className="flex-1" style={{ marginTop: -header }}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ flex: 1 }}
+          >
             <ThemedView className="flex-1 items-center px-6 justify-center">
               <View className="flex flex-row text-center">
                 <Text className="text-center text-2xl md:text-3xl">
@@ -146,9 +139,9 @@ export default function SetName() {
                 ) : null}
               </View>
             </ThemedView>
-          </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
-      </ThemedView>
+          </KeyboardAvoidingView>
+        </ThemedView>
+      </TouchableWithoutFeedback>
     </>
   );
 }

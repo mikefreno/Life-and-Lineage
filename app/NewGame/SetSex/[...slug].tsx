@@ -1,4 +1,4 @@
-import { Stack, router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { View as ThemedView, Text } from "../../../components/Themed";
 import { FontAwesome5, Foundation } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
@@ -39,22 +39,16 @@ export default function SetSex() {
 
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing context");
-  const gameState = appData?.gameState;
+  const { gameState } = appData;
+  const isFocused = useIsFocused();
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: "Sex Select",
-          headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-          headerBackTitleStyle: { fontFamily: "PixelifySans" },
-        }}
-      />
       <TutorialModal
         tutorial={TutorialOption.aging}
         override={forceShowTutorial}
         clearOverride={() => setForceShowTutorial(false)}
-        isFocused={useIsFocused()}
+        isFocused={isFocused}
         pageOne={{
           title: "This game focuses around the passage of time.",
           body: "Almost everything will move the game clock forward, aging the characters in the game. At a certain point it will nearly impossible to stay alive.",

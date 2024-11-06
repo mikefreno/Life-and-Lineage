@@ -184,11 +184,13 @@ export const DungeonMapRender = () => {
   const getFillColor = (tile: Tile) => {
     const isCurrent =
       tile.x === currentPosition?.x && tile.y === currentPosition?.y;
+    if (tile.isBossRoom && tile.clearedRoom) {
+      return isCurrent ? "#DBA56E" : "#8B4513";
+    }
     if (colorScheme == "dark") {
       if (tile.clearedRoom) {
         return isCurrent ? "#93c5fd" : "#2563eb";
       }
-
       return isCurrent ? "#a1a1aa" : "#18181b";
     } else {
       if (tile.clearedRoom) {

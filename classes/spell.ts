@@ -13,7 +13,7 @@ interface SpellFields {
   name: string;
   attackStyle?: "single" | "dual" | "aoe";
   element: string;
-  proficiencyNeeded: string;
+  proficiencyNeeded: string | null;
   manaCost: number;
   duration?: number;
   usesWeapon?: string | null;
@@ -44,7 +44,7 @@ export class Spell {
   attackStyle: "single" | "dual" | "aoe"; //at time of writing, only implementing single target
   element: Element;
   usesWeapon: string | null;
-  proficiencyNeeded: MasteryLevel;
+  proficiencyNeeded: MasteryLevel | null;
   duration: number;
   manaCost: number;
   private initDamage: number;
@@ -69,7 +69,9 @@ export class Spell {
     this.element = StringToElement[element];
     this.usesWeapon = usesWeapon ?? null;
     this.attackStyle = attackStyle ?? "single";
-    this.proficiencyNeeded = StringToMastery[proficiencyNeeded];
+    this.proficiencyNeeded = proficiencyNeeded
+      ? StringToMastery[proficiencyNeeded]
+      : null;
     this.manaCost = manaCost;
     this.duration = duration ?? 1;
     this.initDamage = effects.damage ?? 0;
