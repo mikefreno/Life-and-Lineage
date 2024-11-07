@@ -1,8 +1,8 @@
-import { Text, View } from "../../components/Themed";
+import { Text, View as ThemedView } from "../../components/Themed";
 import {
   Pressable,
   ScrollView,
-  View as NonThemedView,
+  View,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
   type LayoutChangeEvent,
@@ -20,6 +20,7 @@ import { observer } from "mobx-react-lite";
 import ThemedCard from "../../components/ThemedCard";
 import { AppContext } from "../_layout";
 import { TutorialOption } from "../../utility/types";
+import PlatformDependantBlurView from "../../components/PlatformDependantBlurView";
 
 const dangerColorStep = [
   "#fee2e2",
@@ -45,7 +46,7 @@ const DungeonScreen = observer(() => {
   if (!appData) {
     throw new Error("Missing Context");
   }
-  const { gameState, isCompact } = appData;
+  const { gameState } = appData;
   const [instances, _] = useState<DungeonInstance[]>(
     gameState?.dungeonInstances.filter(
       (instance) => instance.name !== "training grounds",
@@ -60,7 +61,6 @@ const DungeonScreen = observer(() => {
   const vibration = useVibration();
   const isFocused = useIsFocused();
   const headerHeight = useHeaderHeight();
-  const bottomHeight = useBottomTabBarHeight();
 
   const warningHeight = 64;
 
@@ -109,19 +109,18 @@ const DungeonScreen = observer(() => {
           body: "And greater rewards. Unlock more levels by defeating each levels boss.",
         }}
       />
-      <View
+      <PlatformDependantBlurView
         className="shadow-diffuse w-full absolute z-10 px-8"
         style={{ marginTop: useHeaderHeight(), paddingBottom: 4 }}
       >
         <Text className="text-center text-2xl">
           The dungeon is a dangerous place. Be careful.
         </Text>
-      </View>
-      <View
-        className="flex-1 px-8"
+      </PlatformDependantBlurView>
+      <ThemedView
+        className="flex-1"
         style={{
           paddingTop: headerHeight + warningHeight,
-          paddingBottom: bottomHeight + (isCompact ? 0 : 28),
         }}
       >
         {instances.length > 1 && (
@@ -136,13 +135,16 @@ const DungeonScreen = observer(() => {
         )}
         <ScrollView
           pagingEnabled
+          className="-mt-20"
           onScroll={onScroll}
           onLayout={onLayout}
           scrollEventThrottle={16}
           contentContainerStyle={{
             height: `${100 * instances.length}%`,
-            marginTop: -36,
+            marginTop: -64,
+            paddingHorizontal: 12,
           }}
+          scrollIndicatorInsets={{ top: 92, right: 0, left: 0, bottom: 48 }}
         >
           {instances.map((dungeonInstance, dungeonInstanceIdx) => (
             <ThemedCard
@@ -152,7 +154,7 @@ const DungeonScreen = observer(() => {
               <Text className="text-center text-2xl tracking-widest underline">
                 {toTitleCase(dungeonInstance.name)}
               </Text>
-              <NonThemedView className="mx-auto justify-center">
+              <View className="mx-auto justify-center">
                 {dungeonInstance.levels
                   .filter((level) => level.unlocked)
                   .map((level, levelIdx) => (
@@ -200,11 +202,11 @@ const DungeonScreen = observer(() => {
                       )}
                     </Pressable>
                   ))}
-              </NonThemedView>
+              </View>
             </ThemedCard>
           ))}
         </ScrollView>
-      </View>
+      </ThemedView>
     </>
   );
 });

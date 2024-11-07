@@ -52,7 +52,7 @@ const ShopsScreen = observer(() => {
             backgroundColor: shopObjects.find(
               (shopObj) => shopObj.type == shop.archetype,
             )?.colors.lightbackground,
-            shadowOpacity: 0.2,
+            shadowOpacity: 0.5,
             shadowRadius: 4,
             borderColor: shopObjects.find(
               (shopObj) => shopObj.type == shop.archetype,
@@ -150,7 +150,9 @@ const ShopsScreen = observer(() => {
         />
 
         {isReady ? (
-          <ScrollView>
+          <ScrollView
+            scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
+          >
             <View
               style={{
                 flexDirection: "row",

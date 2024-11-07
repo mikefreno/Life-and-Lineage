@@ -19,9 +19,10 @@ const JobTraining = observer(() => {
   if (!appData) {
     throw new Error("missing context");
   }
-  const { gameState } = appData;
   const isFocused = useIsFocused();
   const { colorScheme } = useColorScheme();
+
+  const header = useHeaderHeight();
 
   return (
     <>
@@ -49,12 +50,7 @@ const JobTraining = observer(() => {
         }}
       />
       <TutorialModal
-        isVisibleCondition={
-          (gameState?.tutorialsShown[TutorialOption.training] &&
-            gameState?.tutorialsEnabled &&
-            isFocused) ??
-          false
-        }
+        isFocused={isFocused}
         tutorial={TutorialOption.training}
         pageOne={{
           title: "Labor Training",
@@ -62,9 +58,21 @@ const JobTraining = observer(() => {
         }}
       />
       <ThemedView className="flex-1">
-        <ScrollView style={{ paddingTop: useHeaderHeight() }}>
+        <ScrollView
+          style={{ paddingTop: header }}
+          scrollIndicatorInsets={{ top: 0, right: 0, left: 0, bottom: 48 }}
+        >
           <ThemedView className="px-2 pt-4">
-            {qualifications.map((qual, index) => {
+            {[
+              ...qualifications,
+              ...qualifications,
+              ...qualifications,
+              ...qualifications,
+              ...qualifications,
+              ...qualifications,
+              ...qualifications,
+              ...qualifications,
+            ].map((qual, index) => {
               return (
                 <TrainingCard
                   key={index}

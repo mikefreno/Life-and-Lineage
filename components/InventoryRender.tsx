@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import type { RefObject } from "react";
 import { Item } from "../classes/item";
 import {
@@ -245,15 +245,7 @@ export default function InventoryRender({
           )}
           <Pressable
             onPress={() => setDisplayItem(null)}
-            className={`${
-              "headTarget" in props
-                ? dimensions.greater == dimensions.height
-                  ? "h-full"
-                  : "h-1/2"
-                : "shop" in props
-                ? "mt-4 h-[90%]"
-                : "h-full"
-            } rounded-lg mx-2 border border-zinc-600 relative`}
+            className="rounded-lg mx-2 border border-zinc-600 relative h-full"
           >
             {Array.from({ length: 24 }).map((_, index) => (
               <View
@@ -266,7 +258,7 @@ export default function InventoryRender({
                       }
                     : {
                         left: `${(index % 6) * 16.67 + 1.5}%`,
-                        top: `${Math.floor(index / 6) * 24 + 4}%`,
+                        top: `${Math.floor(index / 6) * 24 + 5.5}%`,
                       }
                 }
                 key={"bg-" + index}
@@ -288,7 +280,7 @@ export default function InventoryRender({
                       }
                     : {
                         left: `${(index % 6) * 16.67 + 1.5}%`,
-                        top: `${Math.floor(index / 6) * 24 + 4}%`,
+                        top: `${Math.floor(index / 6) * 24 + 5.5}%`,
                       }
                 }
                 key={index}

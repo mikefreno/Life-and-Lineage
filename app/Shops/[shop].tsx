@@ -70,7 +70,7 @@ const ShopInteriorScreen = observer(() => {
   const { shop } = useLocalSearchParams();
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing game context");
-  const { gameState, playerState, blockSize } = appData;
+  const { gameState, playerState, blockSize, dimensions } = appData;
   const vibration = useVibration();
   const colors = shopObjects.find((shopObj) => shopObj.type == shop)?.colors;
   const thisShop = gameState?.shops.find((aShop) => aShop.archetype == shop);
@@ -314,7 +314,7 @@ const ShopInteriorScreen = observer(() => {
               </View>
             </ThemedView>
             <View className="flex-1 mx-2 mt-4">
-              <ThemedView className="flex flex-row justify-center py-4 dark:border-zinc-700">
+              <View className="flex flex-row justify-center py-4 dark:border-zinc-700">
                 <Text className=" text-center">
                   {playerState.fullName}'s Inventory
                 </Text>
@@ -333,17 +333,25 @@ const ShopInteriorScreen = observer(() => {
                     </Pressable>
                   ) : null}
                 </View>
-              </ThemedView>
-              <InventoryRender
-                selfRef={inventoryTarget}
-                shopInventoryTarget={shopInventoryTarget}
-                inventory={playerState.getInventory()}
-                shop={thisShop}
-                sellItem={sellItem}
-                sellStack={sellStack}
-                displayItem={displayItem}
-                setDisplayItem={setDisplayItem}
-              />
+              </View>
+              <View
+                className={`${
+                  dimensions.height == dimensions.greater
+                    ? "h-[90%]"
+                    : "h-[85%]"
+                }`}
+              >
+                <InventoryRender
+                  selfRef={inventoryTarget}
+                  shopInventoryTarget={shopInventoryTarget}
+                  inventory={playerState.getInventory()}
+                  shop={thisShop}
+                  sellItem={sellItem}
+                  sellStack={sellStack}
+                  displayItem={displayItem}
+                  setDisplayItem={setDisplayItem}
+                />
+              </View>
             </View>
           </ThemedView>
         </TouchableWithoutFeedback>

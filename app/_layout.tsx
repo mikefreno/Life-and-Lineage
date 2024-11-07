@@ -260,7 +260,7 @@ const RootLayout = observer(() => {
   if (!appData) {
     throw new Error("missing context");
   }
-  const auth = useAuth();
+  //const auth = useAuth();
 
   const { playerState, gameState } = appData;
   const { colorScheme } = useColorScheme();
@@ -406,7 +406,7 @@ const RootLayout = observer(() => {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
+      <Stack screenOptions={{ navigationBarHidden: true }}>
         <Stack.Screen
           name="(tabs)"
           options={{

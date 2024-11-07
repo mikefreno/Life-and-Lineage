@@ -40,24 +40,23 @@ export default function GenericModal({
   style,
   noPad,
 }: GenericModalProps) {
-  const height = Dimensions.get("screen").height;
+  const height = Dimensions.get("window").height;
 
   return (
     <Modal
       animationIn="slideInUp"
       animationOut="slideOutDown"
-      animationInTiming={500}
+      animationInTiming={600}
       animationOutTiming={300}
-      backdropTransitionInTiming={Platform.OS === "android" ? 100 : 300}
+      backdropTransitionOutTiming={Platform.OS === "android" ? 600 : 300}
+      backdropTransitionInTiming={Platform.OS === "android" ? 0 : 300}
       hasBackdrop
       backdropColor={"#000000a2"}
       isVisible={isVisibleCondition}
       onBackdropPress={backdropCloses ? backFunction : undefined}
       onBackButtonPress={backFunction}
-      statusBarTranslucent={Platform.OS == "ios"}
+      statusBarTranslucent={true}
       deviceHeight={height}
-      useNativeDriver
-      useNativeDriverForBackdrop
       style={style}
     >
       <ThemedView

@@ -1,4 +1,4 @@
-import { Text } from "../../components/Themed";
+import { Text, View as ThemedView } from "../../components/Themed";
 import SpellDetails from "../../components/SpellDetails";
 import { useContext } from "react";
 import { useColorScheme } from "nativewind";
@@ -103,7 +103,7 @@ const SpellsScreen = observer(() => {
   }
 
   return (
-    <>
+    <ThemedView className="flex-1">
       <TutorialModal
         tutorial={TutorialOption.spell}
         isFocused={useIsFocused()}
@@ -116,7 +116,7 @@ const SpellsScreen = observer(() => {
           body: "Using spells will increase your proficiency in their school.",
         }}
       />
-      <View
+      <ThemedView
         className="flex-1"
         style={{
           paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
@@ -149,8 +149,8 @@ const SpellsScreen = observer(() => {
             {magicProficiencySection(playerState?.magicProficiencies)}
           </View>
         </View>
-      </View>
-    </>
+      </ThemedView>
+    </ThemedView>
   );
 });
 export default SpellsScreen;

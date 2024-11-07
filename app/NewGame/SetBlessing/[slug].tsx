@@ -58,7 +58,7 @@ export default function SetBlessing() {
         }}
       />
       <ThemedView className="flex-1 pt-[8vh]">
-        <Text className="text-center text-2xl">
+        <Text className="text-center text-2xl px-4">
           With What Blessing Was Your
           <Text
             style={{ color: playerClassColors[playerClass] }}

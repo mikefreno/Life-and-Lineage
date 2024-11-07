@@ -12,7 +12,7 @@ import { useContext } from "react";
 import { useVibration } from "../../utility/customHooks";
 import { BlurView } from "expo-blur";
 import { StyleSheet } from "react-native";
-import PlayerStatus from "../../components/PlayerStatus";
+import PlayerStatus, { EXPANDED_PAD } from "../../components/PlayerStatus";
 import { LinearGradientBlur } from "../../components/LinearGradientBlur";
 import { AppContext } from "../_layout";
 import {
@@ -36,6 +36,9 @@ import { View as ThemedView } from "../../components/Themed";
 import TutorialModal from "../../components/TutorialModal";
 import { useIsFocused } from "@react-navigation/native";
 import { TutorialOption } from "../../utility/types";
+
+const PLAYERSTATUS_SPACER = 64;
+const TABSELECTOR_HEIGHT = 64;
 
 export default function TabLayout() {
   const appData = useContext(AppContext);
@@ -72,13 +75,14 @@ export default function TabLayout() {
           tabBarActiveTintColor: Colors[colorScheme].tint,
           tabBarLabelStyle: {
             fontFamily: "PixelifySans",
+            marginBottom: 0,
             marginLeft: 0,
           },
           tabBarStyle: {
             position: "absolute",
             borderTopWidth: 0,
             shadowColor: "transparent",
-            height: 108,
+            height: TABSELECTOR_HEIGHT + PLAYERSTATUS_SPACER,
           },
           tabBarButton: (props) => {
             const onPressWithVibration = (event: GestureResponderEvent) => {
@@ -96,14 +100,14 @@ export default function TabLayout() {
                   }}
                   style={[
                     {
-                      height: isCompact ? 44 : 72,
+                      height: isCompact ? 40 : 40 + EXPANDED_PAD,
                       marginLeft: isHome ? 12 : 0,
                       borderTopLeftRadius: isHome ? 12 : 0,
                       borderBottomLeftRadius: isHome ? 12 : 0,
                       marginRight: isMedical ? 12 : 0,
                       borderBottomRightRadius: isMedical ? 12 : 0,
                       borderTopRightRadius: isMedical ? 12 : 0,
-                      marginTop: isCompact ? 0 : -28,
+                      marginTop: isCompact ? 0 : -EXPANDED_PAD,
                     },
                   ]}
                 />
@@ -114,7 +118,7 @@ export default function TabLayout() {
                   accessibilityRole={props.accessibilityRole}
                   accessibilityState={props.accessibilityState}
                   style={{
-                    height: 44,
+                    height: TABSELECTOR_HEIGHT,
                   }}
                 >
                   {props.children}
@@ -251,7 +255,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="earn"
+          name="labor"
           options={{
             headerTransparent: true,
             headerTitleAlign: "center",

@@ -35,7 +35,9 @@ import {
 import { Attribute, AttributeToString } from "../utility/types";
 import { Condition } from "../classes/conditions";
 
-interface PlayerStatus {
+export const EXPANDED_PAD = 28;
+
+interface PlayerStatusProps {
   hideGold?: boolean;
   home?: boolean;
   tabScreen?: boolean;
@@ -49,7 +51,7 @@ const PlayerStatus = observer(
     tabScreen = false,
     positioning = "absolute",
     classname,
-  }: PlayerStatus) => {
+  }: PlayerStatusProps) => {
     const appData = useContext(AppContext);
     if (!appData) throw new Error("missing context");
     const {
@@ -630,7 +632,7 @@ const PlayerStatus = observer(
       const preprop = !isCompact
         ? home
           ? `${positioning} -mt-7 z-top w-full`
-          : `${positioning} mt-3 z-top w-full`
+          : `${positioning} mt-2 z-top w-full`
         : home
         ? `${positioning} z-top w-full`
         : `${positioning} mt-20 z-top w-full`;
@@ -774,6 +776,7 @@ const PlayerStatus = observer(
               vibration({ style: "light" });
               setShowDetailedStatusView(true);
             }}
+            style={{ marginTop: 6 }}
             className={filled}
           >
             {colorAndPlatformDependantBlur(

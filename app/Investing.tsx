@@ -10,7 +10,6 @@ import TutorialModal from "../components/TutorialModal";
 import { Platform, StyleSheet, View } from "react-native";
 import { Stack } from "expo-router";
 import { BlurView } from "expo-blur";
-import { useColorScheme } from "nativewind";
 import { AppContext } from "./_layout";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
@@ -20,7 +19,7 @@ const InvestingScreen = observer(() => {
   if (!appData) {
     throw new Error("missing context");
   }
-  const { colorScheme } = useColorScheme();
+  const header = useHeaderHeight();
 
   return (
     <>
@@ -29,21 +28,17 @@ const InvestingScreen = observer(() => {
           headerBackTitleVisible: false,
           headerTransparent: true,
           headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-          headerBackground: () => (
-            <BlurView
-              blurReductionFactor={12}
-              tint={
-                Platform.OS == "android"
-                  ? colorScheme == "light"
-                    ? "light"
-                    : "dark"
-                  : "default"
-              }
-              intensity={100}
-              style={StyleSheet.absoluteFill}
-              experimentalBlurMethod={"dimezisBlurView"}
-            />
-          ),
+          headerBackground:
+            Platform.OS == "ios"
+              ? () => (
+                  <BlurView intensity={100} style={StyleSheet.absoluteFill} />
+                )
+              : () => (
+                  <ThemedView
+                    style={StyleSheet.absoluteFill}
+                    className="shadow-soft"
+                  />
+                ),
         }}
       />
       <TutorialModal
@@ -61,9 +56,11 @@ const InvestingScreen = observer(() => {
           body: "Each investment base has a number of upgrades, some with significant consequences on your character.",
         }}
       />
-      <ThemedView className="flex-1 pb-24">
-        <ScrollView>
-          <View style={{ paddingTop: useHeaderHeight() }}>
+      <ThemedView className="flex-1">
+        <ScrollView
+          scrollIndicatorInsets={{ top: 0, right: 0, left: 0, bottom: 48 }}
+        >
+          <View style={{ paddingTop: header, paddingBottom: 96 }}>
             {investments.map((investment: InvestmentType, idx) => (
               <InvestmentCard key={idx} investment={investment} />
             ))}

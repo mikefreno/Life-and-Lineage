@@ -11,7 +11,7 @@ function addTranslucentNavAndStatus(styles) {
     appTheme.item = appTheme.item || [];
     appTheme.item.push(
       { _: "true", $: { name: "android:windowTranslucentNavigation" } },
-      { _: "true", $: { name: "android:windowTranslucentStatus" } },
+      //{ _: "true", $: { name: "android:windowTranslucentStatus" } },
     );
   }
 

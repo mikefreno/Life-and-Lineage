@@ -109,6 +109,114 @@ describe("AuthStore", () => {
       }),
     ).rejects.toThrow("Device is offline");
   });
+
+  it("should properly handle login with email credentials", async () => {
+    const mockCreds = {
+      token: "mock-token",
+      email: "test@example.com",
+      provider: "email" as const,
+    };
+
+    await authStore.login(mockCreds);
+
+    expect(storage.set).toHaveBeenCalledWith("userToken", "mock-token");
+    expect(storage.set).toHaveBeenCalledWith("userEmail", "test@example.com");
+    expect(storage.set).toHaveBeenCalledWith("authProvider", "email");
+    expect(authStore.getEmail()).toBe("test@example.com");
+    expect(authStore.isAuthenticated).toBe(true);
+  });
+
+  it("should properly handle logout", async () => {
+    await authStore.logout();
+
+    expect(storage.delete).toHaveBeenCalledWith("userToken");
+    expect(storage.delete).toHaveBeenCalledWith("userEmail");
+    expect(storage.delete).toHaveBeenCalledWith("authProvider");
+    expect(storage.delete).toHaveBeenCalledWith("appleUser");
+    expect(authStore.isAuthenticated).toBe(false);
+    expect(authStore.getEmail()).toBeNull();
+  });
+
+  it("should properly format dates", () => {
+    const testDate = new Date("2024-01-01T12:30:45");
+    const formattedDate = authStore["formatDate"](testDate);
+    expect(formattedDate).toBe("2024-01-01 12:30:45");
+  });
+
+  it("should correctly identify argument types", () => {
+    expect(authStore["argCheck"]("123")).toBe("integer");
+    expect(authStore["argCheck"]("123.45")).toBe("float");
+    expect(authStore["argCheck"]("data:image/png;base64,abc")).toBe("blob");
+    expect(authStore["argCheck"]("null")).toBe("null");
+    expect(authStore["argCheck"]("regular text")).toBe("text");
+  });
+
+  it("should properly build database arguments", () => {
+    const args = ["123", "test", "3.14"];
+    const built = authStore["argBuilder"](args);
+
+    expect(built).toEqual([
+      { type: "integer", value: "123" },
+      { type: "text", value: "test" },
+      { type: "float", value: "3.14" },
+    ]);
+  });
+
+  it("should handle database URL generation", () => {
+    authStore["db_name"] = "test-db";
+    const url = authStore.getDbURL();
+    expect(url).toBe("https://test-db-mikefreno.turso.io/v2/pipeline");
+
+    authStore["db_name"] = null;
+    const nullUrl = authStore.getDbURL();
+    expect(nullUrl).toBeUndefined();
+  });
+
+  it("should convert HTTP response save rows correctly", () => {
+    const mockRows = [
+      [
+        { value: "1" },
+        { value: "save1" },
+        { value: "{}" },
+        { value: "{}" },
+        { value: "2024-01-01 12:00:00" },
+        { value: "2024-01-01 12:00:00" },
+      ],
+    ];
+
+    const converted = authStore["convertHTTPResponseSaveRow"](mockRows);
+
+    expect(converted).toEqual([
+      {
+        id: 1,
+        name: "save1",
+        game_state: "{}",
+        player_state: "{}",
+        created_at: "2024-01-01 12:00:00",
+        last_updated_at: "2024-01-01 12:00:00",
+      },
+    ]);
+  });
+
+  it("should handle database credential setting", () => {
+    authStore.setDBCredentials("test-db", "test-token");
+
+    expect(authStore["db_name"]).toBe("test-db");
+    expect(authStore["db_token"]).toBe("test-token");
+  });
+
+  it("should validate tokens correctly", async () => {
+    const validToken = generateMockJWT();
+    const isValid = await authStore.validateToken(validToken);
+    expect(isValid).toBe(true);
+
+    const expiredToken = jwt.sign(
+      { exp: Math.floor(Date.now() / 1000) - 3600 },
+      "your_secret_key",
+    );
+    const isInvalid = await authStore.validateToken(expiredToken);
+    expect(isInvalid).toBe(false);
+  });
 });
 
 function generateMockJWT() {

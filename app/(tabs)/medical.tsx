@@ -24,7 +24,7 @@ const MedicalScreen = observer(() => {
   const { isCompact } = appData;
 
   return (
-    <>
+    <ThemedView className="flex-1">
       <TutorialModal
         tutorial={TutorialOption.medical}
         isFocused={isFocused}
@@ -38,7 +38,9 @@ const MedicalScreen = observer(() => {
         }}
       />
       <ThemedView className="flex-1">
-        <ScrollView>
+        <ScrollView
+          scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
+        >
           <ThemedView
             className="px-2"
             style={{
@@ -95,7 +97,7 @@ const MedicalScreen = observer(() => {
           </ThemedView>
         </ScrollView>
       </ThemedView>
-    </>
+    </ThemedView>
   );
 });
 export default MedicalScreen;

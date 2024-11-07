@@ -131,7 +131,7 @@
     {
         "name": "Spellbook Publisher",
         "description": "Magic drips from the quill in this establishment, as scribes imbued with arcane knowledge ink the pages of tomes that will guide the next generation of magi.",
-        "requires": {"requirement": "rogue magi fortress", "message": "A nearby fortress filled to craven magi has destroyed this building and sacked the books in its stockpile. You should clear the fortress before beginning the rebuild."},
+        "requires": {"requirement": "rogue magi fortress", "message": "A nearby fortress filled to craven magi has destroyed this building and sacked the books in its stockpile. You should clear the fortress before beginning the rebuild.", "removes": false},
         "cost": 75000,
         "turnsPerReturn": 25,
         "goldReturnRange": {"min": 500, "max": 5500},
@@ -166,7 +166,7 @@
     {
         "name": "Iron Mine",
         "description": "Deep in the earth, the rhythmic beat of picks against stone echoes out as miners unearth veins of precious iron, indispensable for smiths and warriors.",
-        "requires": {"requirement": "infested mine", "message": "The mine is completely overrun. You will need to clear it before anyone will consider entering it."},
+        "requires": {"requirement": "infested mine", "message": "The mine is completely overrun. You will need to clear it before anyone will consider entering it.", "removes":false},
         "cost": 145000,
         "turnsPerReturn": 10,
         "goldReturnRange": {"min": 1200, "max": 3000},
@@ -223,7 +223,7 @@
     {
         "name": "Monster Breeding Ranch",
         "description": "Here, creatures of nightmare and wonder are reared. Some are bred for their power in battle, others for exotic pets. All fetch a fair price on the market.",
-        "requires": {"requirement":"dark forest", "message": "This project will require an immense amount of land. Clear out the Dark Forest and you will have all the land you need."},
+        "requires": {"requirement":"dark forest", "message": "This project will require an immense amount of land. Clear out the Dark Forest and you will have all the land you need.", "removes":false},
         "cost": 220000,
         "turnsPerReturn": 15,
         "goldReturnRange": {"min": 2000, "max": 6000},
@@ -275,7 +275,7 @@
     {
         "name": "Crystal Mine",
         "description": "Beneath ominous stone outcroppings, miners burrow deep below all other mines, discovering veins of shimmering crystal. Their glow is mesmerizing, and their magical potential immense.",
-        "requires": {"requirement": "", "message": ""},
+        "requires": {"requirement": "", "message": "", "removes":false},
         "cost": 480000,
         "turnsPerReturn": 20,
         "goldReturnRange": {"min": 7000, "max": 12000},
@@ -314,7 +314,7 @@
     {
         "name": "Artifact Excavation Site",
         "description": "Hidden beneath the millennia of earth lie ancient artifacts infused with forgotten magics. Each find promises wealth, power, and a chance to rewrite history.",
-        "requires": {"requirement": "", "message": ""},
+        "requires": {"requirement": "", "message": "", "removes":false},
         "cost": 1850000,
         "turnsPerReturn": 50,
         "goldReturnRange": {"min": 28500, "max": 100000},

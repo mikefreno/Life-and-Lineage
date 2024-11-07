@@ -51,7 +51,7 @@ const HomeScreen = observer(() => {
   if (playerState && gameState) {
     const name = playerState.fullName;
     return (
-      <>
+      <ThemedView className="flex-1">
         <TutorialModal
           tutorial={TutorialOption.intro}
           isFocused={useIsFocused()}
@@ -245,7 +245,7 @@ const HomeScreen = observer(() => {
             </View>
           )}
         </ThemedView>
-      </>
+      </ThemedView>
     );
   }
 });

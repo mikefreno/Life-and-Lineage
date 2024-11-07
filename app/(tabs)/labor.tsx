@@ -1,7 +1,7 @@
 import jobs from "../../assets/json/jobs.json";
 import LaborTask from "../../components/LaborTask";
-import { ScrollView, View, Text } from "../../components/Themed";
-import { View as NonThemedView, Pressable } from "react-native";
+import { ScrollView, View as ThemedView, Text } from "../../components/Themed";
+import { View, Pressable } from "react-native";
 import { useContext, useState } from "react";
 import Modal from "react-native-modal";
 import { toTitleCase } from "../../utility/functions/misc";
@@ -42,7 +42,7 @@ const EarnScreen = observer(() => {
   }
 
   return (
-    <>
+    <ThemedView className="flex-1">
       <TutorialModal
         tutorial={TutorialOption.labor}
         isFocused={useIsFocused()}
@@ -78,7 +78,7 @@ const EarnScreen = observer(() => {
             shadowRadius: 5,
           }}
         >
-          <NonThemedView className="flex items-center">
+          <View className="flex items-center">
             <Text className="text-3xl">Rejected!</Text>
             <Text className="my-6 text-center text-lg">
               You are missing the following qualifications:
@@ -88,7 +88,7 @@ const EarnScreen = observer(() => {
                 {toTitleCase(missing)}
               </Text>
             ))}
-          </NonThemedView>
+          </View>
           <View className="mt-4 flex items-center justify-evenly">
             <Pressable
               onPress={() => {
@@ -105,8 +105,10 @@ const EarnScreen = observer(() => {
           </View>
         </View>
       </Modal>
-      <View className="flex-1">
-        <ScrollView className="">
+      <ThemedView className="flex-1">
+        <ScrollView
+          scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
+        >
           <View
             className="px-2"
             style={{
@@ -132,8 +134,8 @@ const EarnScreen = observer(() => {
               })}
           </View>
         </ScrollView>
-      </View>
-    </>
+      </ThemedView>
+    </ThemedView>
   );
 });
 export default EarnScreen;

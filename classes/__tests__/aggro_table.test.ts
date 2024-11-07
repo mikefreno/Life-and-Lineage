@@ -1,4 +1,9 @@
-import { BeingType, Element, PlayerClassOptions } from "../../utility/types";
+import {
+  AttackUse,
+  BeingType,
+  Element,
+  PlayerClassOptions,
+} from "../../utility/types";
 import { AggroTable } from "../aggro_table";
 import { Character, PlayerCharacter } from "../character";
 import { Enemy, Minion } from "../creatures";
@@ -15,7 +20,7 @@ describe("AggroTable", () => {
     aggroTable = new AggroTable();
   });
 
-  test("addAggro should increase aggro points for a target", () => {
+  it("should correctly add aggro points", () => {
     const targetId = "player1";
     aggroTable.addAggro(targetId, 10);
     expect(aggroTable["aggroPoints"].get(targetId)).toBe(10);
@@ -24,7 +29,7 @@ describe("AggroTable", () => {
     expect(aggroTable["aggroPoints"].get(targetId)).toBe(15);
   });
 
-  test("getHighestAggroTarget should return the target with highest aggro", () => {
+  it("should get the highest aggro target", () => {
     const player1 = { id: "player1" } as PlayerCharacter;
     const player2 = { id: "player2" } as PlayerCharacter;
     const minion = { id: "minion1" } as Minion;
@@ -50,7 +55,7 @@ describe("Enemy", () => {
   beforeEach(() => {
     enemy = new Enemy({
       beingType: "test" as BeingType,
-      creatureSpecies: "test",
+      creatureSpecies: "Goblin",
       health: 100,
       healthMax: 100,
       sanity: null,
@@ -96,6 +101,7 @@ describe("Enemy", () => {
       player.id,
     );
   });
+
   test("stun aggro points should make shift", () => {
     enemy.damageHealth({ attackerId: player.id, damage: 10 });
     enemy.damageHealth({ attackerId: minion.id, damage: 5 });
@@ -117,9 +123,89 @@ describe("Enemy", () => {
     });
     enemy.addCondition(stunCondition);
 
-    enemy.takeTurn({ player });
+    const result = enemy.takeTurn({ player });
+    expect(result.result).toBe(AttackUse.stunned);
+    expect(result.logString).toBe("Goblin was stunned!");
     expect(enemy.aggroTable.getHighestAggroTarget([player, minion])!.id).toBe(
       minion.id,
+    );
+  });
+
+  it("should correctly handle execute condition", () => {
+    const executeCondition = new Condition({
+      name: "execute",
+      style: "debuff",
+      turns: 1,
+      effect: ["execute"],
+      healthDamage: [9999],
+      sanityDamage: [0],
+      effectStyle: ["flat"],
+      effectMagnitude: [1],
+      placedby: "test",
+      placedbyID: "testId",
+      icon: "",
+      aura: false,
+      on: null,
+    });
+
+    enemy.conditions.push(executeCondition);
+    const result = enemy.takeTurn({ player });
+    expect(result.result).toBe(AttackUse.stunned);
+    expect(result.logString).toBe("Goblin was executed!");
+  });
+});
+
+describe("Minion takeTurn Tests", () => {
+  it("should decrement turnsLeftAlive correctly", () => {
+    const player = new PlayerCharacter({
+      firstName: "John",
+      lastName: "Doe",
+      sex: "male",
+      playerClass: PlayerClassOptions.mage,
+      blessing: Element.fire,
+      parents: [createParent("female"), createParent("female")],
+      birthdate: new Date().toString(),
+      inCombat: false,
+      ...getStartingBaseStats({ playerClass: PlayerClassOptions.mage }),
+    });
+    const minionObj = summons.find((summon) => summon.name == "skeleton")!;
+    const minion = new Minion({
+      creatureSpecies: minionObj.name,
+      health: minionObj.health,
+      healthMax: minionObj.health,
+      attackPower: minionObj.attackPower,
+      attacks: minionObj.attacks,
+      turnsLeftAlive: minionObj.turns,
+      beingType: minionObj.beingType as BeingType,
+      parent: player,
+    });
+
+    minion.takeTurn({ target: player });
+    expect(minion.turnsLeftAlive).toBe(minionObj.turns - 1);
+  });
+
+  it("should throw an error if turnsLeftAlive is 0 and not a pet", () => {
+    const player = { id: "player1" } as PlayerCharacter;
+    const minionObj = {
+      name: "skeleton",
+      health: 100,
+      attackPower: 10,
+      turns: 0,
+      beingType: "minion",
+    };
+    const minion = new Minion({
+      creatureSpecies: minionObj.name,
+      health: minionObj.health,
+      healthMax: minionObj.health,
+      attackPower: minionObj.attackPower,
+      attacks: ["punch"],
+      turnsLeftAlive: minionObj.turns,
+      beingType: minionObj.beingType as BeingType,
+      parent: player,
+    });
+
+    expect(() => minion.takeTurn({ target: player })).toThrow(
+      "Minion not properly removed!",
     );
   });
 });

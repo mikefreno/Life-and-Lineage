@@ -371,12 +371,10 @@ class AuthStore {
     }
     try {
       const time = this.formatDate(new Date());
-      const res = await this.databaseExecute({
+      await this.databaseExecute({
         sql: `INSERT INTO Save (name, game_state, player_state, created_at, last_updated_at) VALUES (?, ?, ?, ?, ?)`,
         args: [name, stringify(gameState), stringify(playerState), time, time],
       });
-      const parse = await res?.json();
-      console.log(parse.results);
     } catch (e) {
       console.error(e);
       return [];
@@ -484,31 +482,6 @@ class AuthStore {
       await this.logout();
     }
   };
-
-  //public verifyPurchase = async (receipt: string) => {
-  //return fetch(`${API_BASE_URL}/IAP`, {
-  //method: "POST",
-  //headers: {
-  //"Content-Type": "application/json",
-  //},
-  //body: JSON.stringify({ receipt }),
-  //})
-  //.then((response) => response.json())
-  //.then((data) => {
-  //if (data.isValid) {
-  //return { isValid: true };
-  //} else {
-  //throw new Error("Purchase verification failed");
-  //}
-  //});
-  //};
-  //public products = () => {
-  //const skus = Platform.select({
-  //ios: ["com.mikefrenodev."],
-  //android: ["com.mikefrenodev"],
-  //});
-  //getProducts({ skus }).then((products) => console.log(products));
-  //};
 
   private async databaseExecute({ sql, args }: databaseExecuteProps) {
     if (!this.db_name || !this.db_token) {
