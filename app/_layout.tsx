@@ -35,8 +35,8 @@ import {
 } from "react-native-safe-area-context";
 import { wait } from "../utility/functions/misc";
 import { API_BASE_URL } from "../config/config";
-import { updateNavBar } from "../utility/functions/android";
 import { fullLoad } from "../utility/functions/save_load";
+import { SystemBars } from "react-native-edge-to-edge";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -265,9 +265,9 @@ const RootLayout = observer(() => {
   const { playerState, gameState } = appData;
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
-  const [navbarLoad, setNavbarLoad] = useState(false);
+  //const [navbarLoad, setNavbarLoad] = useState(false);
 
-  const insets = useSafeAreaInsets();
+  //const insets = useSafeAreaInsets();
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [expoPushToken, setExpoPushToken] = useState("");
   const [sentToken, setSentToken] = useState(false);
@@ -278,7 +278,8 @@ const RootLayout = observer(() => {
   const responseListener = useRef<Notifications.Subscription>();
 
   useEffect(() => {
-    if (fontLoaded && navbarLoad) {
+    //if (fontLoaded && navbarLoad) {
+    if (fontLoaded) {
       wait(500).then(() => {
         registerForPushNotificationsAsync()
           .then((token) => setExpoPushToken(token ?? ""))
@@ -306,7 +307,10 @@ const RootLayout = observer(() => {
         };
       });
     }
-  }, [fontLoaded, navbarLoad]);
+  }, [
+    fontLoaded,
+    // navbarLoad
+  ]);
 
   useEffect(() => {
     if (expoPushToken && !sentToken) {
@@ -328,7 +332,8 @@ const RootLayout = observer(() => {
   //}, []);
 
   useEffect(() => {
-    if (fontLoaded && navbarLoad) {
+    //if (fontLoaded && navbarLoad) {
+    if (fontLoaded) {
       SplashScreen.hideAsync();
       if (!playerState) {
         router.replace("/NewGame");
@@ -356,45 +361,45 @@ const RootLayout = observer(() => {
     }
   }, [
     fontLoaded,
-    navbarLoad,
+    //navbarLoad,
     playerState?.currentHealth,
     playerState?.currentSanity,
   ]);
 
-  useEffect(() => {
-    if (Platform.OS == "android") {
-      setNavbarBar();
-    } else {
-      setNavbarLoad(true);
-    }
-  }, [isKeyboardVisible, insets.bottom]);
+  //useEffect(() => {
+  //if (Platform.OS == "android") {
+  //setNavbarBar();
+  //} else {
+  //setNavbarLoad(true);
+  //}
+  //}, [isKeyboardVisible, insets.bottom]);
 
-  const setNavbarBar = async () => {
-    await updateNavBar({ isKeyboardVisible });
-    if (!navbarLoad) {
-      setNavbarLoad(true);
-    }
-  };
+  //const setNavbarBar = async () => {
+  //await updateNavBar({ isKeyboardVisible });
+  //if (!navbarLoad) {
+  //setNavbarLoad(true);
+  //}
+  //};
 
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => {
-        setKeyboardVisible(true);
-      },
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      "keyboardDidHide",
-      () => {
-        setKeyboardVisible(false);
-      },
-    );
+  //useEffect(() => {
+  //const keyboardDidShowListener = Keyboard.addListener(
+  //"keyboardDidShow",
+  //() => {
+  //setKeyboardVisible(true);
+  //},
+  //);
+  //const keyboardDidHideListener = Keyboard.addListener(
+  //"keyboardDidHide",
+  //() => {
+  //setKeyboardVisible(false);
+  //},
+  //);
 
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
+  //return () => {
+  //keyboardDidHideListener.remove();
+  //keyboardDidShowListener.remove();
+  //};
+  //}, []);
 
   while (!fontLoaded) {
     return (
@@ -406,7 +411,11 @@ const RootLayout = observer(() => {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ navigationBarHidden: true }}>
+      <SystemBars
+        style="auto"
+        hidden={{ navigationBar: true, statusBar: true }}
+      />
+      <Stack>
         <Stack.Screen
           name="(tabs)"
           options={{
@@ -424,7 +433,7 @@ const RootLayout = observer(() => {
         <Stack.Screen
           name="Options"
           options={{
-            presentation: "modal",
+            presentation: "transparentModal",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
           }}
         />

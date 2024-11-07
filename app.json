@@ -34,9 +34,6 @@
       "versionCode": 1,
       "googleServicesFile": "./google-services.json"
     },
-    "androidStatusBar": {
-      "hidden": true
-    },
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -44,6 +41,7 @@
     },
     "plugins": [
       "expo-router",
+      "react-native-edge-to-edge",
       "expo-apple-authentication",
       ["expo-font",
         {
@@ -67,18 +65,7 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.976302581992-tbi6afmid4eq5dsn63t30kpfpdhjju8m"
         }
-      ],
-      [
-        "expo-navigation-bar",
-        {
-          "position": "absolute",
-          "visibility": "hidden",
-          "behavior": "overlay-swipe",
-          "backgroundColor": "#00000080"
-        }
-      ],
-      "./custom-plugins/androidIAPSetup",
-      "./custom-plugins/androidStylesSetup.js"
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -86,6 +73,7 @@
     "extra": {
       "router": {
         "origin": false
+
       },
       "eas": {
         "projectId": "f4a10fdc-c377-4a37-8ad7-27685b89b4d9"
