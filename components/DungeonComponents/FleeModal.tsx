@@ -2,7 +2,7 @@ import { Modal, Platform, Pressable, View } from "react-native";
 import GenericModal from "../GenericModal";
 import GenericFlatButton from "../GenericFlatButton";
 import { View as ThemedView, Text } from "../Themed";
-import { rollD20 } from "../../utility/functions/misc";
+import { rollD20, wait } from "../../utility/functions/misc";
 import { useVibration } from "../../utility/customHooks";
 import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
@@ -58,7 +58,7 @@ export default function FleeModal({
         setFleeRollFailure(false);
         setFleeModalShowing(false);
         setAttackAnimationOnGoing(false);
-        setTimeout(() => {
+        wait(500).then(() => {
           playerState.clearMinions();
           while (router.canGoBack()) {
             router.back();
@@ -73,8 +73,8 @@ export default function FleeModal({
           if (slug[0] == "Activities") {
             router.push("/Activities");
           }
-          gameState.gameTick({ playerState });
-        }, 200);
+          //gameState.gameTick({ playerState });
+        });
       } else {
         setFleeRollFailure(true);
         vibration({ style: "error" });
@@ -88,98 +88,38 @@ export default function FleeModal({
   };
 
   if (playerState) {
-    return Platform.OS == "ios" ? (
-      <View>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={fleeModalShowing}
-          onRequestClose={() => setFleeModalShowing(false)}
-        >
-          <Pressable
-            onPress={() => setFleeModalShowing(false)}
-            className="-mt-[100vh] h-[200vh] w-screen items-center justify-center bg-[rgba(0,0,0,.2)]"
-          >
-            <Pressable
-              onPress={(e) => e.stopPropagation()}
-              className="mt-[100vh] w-full py-4"
-            >
-              <ThemedView
-                className="mx-auto w-2/3 rounded-xl bg-zinc-50 px-6 py-4 dark:border dark:border-zinc-500 dark:bg-zinc-700"
-                style={{
-                  shadowColor: "#000",
-                  shadowOffset: {
-                    width: 0,
-                    height: 2,
-                  },
-                  shadowOpacity: 0.25,
-                  shadowRadius: 5,
-                }}
-              >
-                <ThemedView className="flex items-center justify-evenly">
-                  <Text className="text-center text-lg">
-                    {!enemyState ? "Ready to Leave?" : "Attempt to Flee?"}
-                  </Text>
-                  {playerState.isStunned ? (
-                    <Text style={{ color: "#ef4444" }}>You are stunned!</Text>
-                  ) : null}
-                  <ThemedView className="flex w-full flex-row justify-evenly pt-8">
-                    <GenericFlatButton
-                      onPressFunction={flee}
-                      disabledCondition={
-                        inCombat &&
-                        (attackAnimationOnGoing || playerState.isStunned)
-                      }
-                    >
-                      {enemyState ? "Run!" : "Leave"}
-                    </GenericFlatButton>
-                    <GenericFlatButton
-                      onPressFunction={() => {
-                        setFleeModalShowing(false);
-                        setFleeRollFailure(false);
-                      }}
-                    >
-                      Cancel
-                    </GenericFlatButton>
-                  </ThemedView>
-                  {fleeRollFailure ? (
-                    <Text className="text-center" style={{ color: "#ef4444" }}>
-                      Roll Failure!
-                    </Text>
-                  ) : null}
-                </ThemedView>
-              </ThemedView>
-            </Pressable>
-          </Pressable>
-        </Modal>
-      </View>
-    ) : (
+    return (
       <GenericModal
         isVisibleCondition={fleeModalShowing}
-        backFunction={() => setFleeModalShowing(false)}
+        backFunction={() => {
+          setFleeModalShowing(false);
+          setFleeRollFailure(false);
+        }}
       >
         <ThemedView className="flex items-center justify-evenly">
           <Text className="text-center text-lg">
-            {enemyState ? "Attempt to Flee?" : "Ready to Leave?"}
+            {!enemyState ? "Ready to Leave?" : "Attempt to Flee?"}
           </Text>
-          <ThemedView className="flex w-full flex-row justify-evenly">
-            <Pressable
-              disabled={attackAnimationOnGoing}
-              onPress={flee}
-              className="mb-4 mt-8 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+          {playerState.isStunned ? (
+            <Text style={{ color: "#ef4444" }}>You are stunned!</Text>
+          ) : null}
+          <ThemedView className="flex w-full flex-row justify-evenly pt-8">
+            <GenericFlatButton
+              onPressFunction={flee}
+              disabledCondition={
+                inCombat && (attackAnimationOnGoing || playerState.isStunned)
+              }
             >
-              <Text className="text-lg">{enemyState ? "Run!" : "Leave"}</Text>
-            </Pressable>
-            <Pressable
-              className="mb-4 mt-8 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
-              onPress={(e) => {
-                e.stopPropagation();
+              {enemyState ? "Run!" : "Leave"}
+            </GenericFlatButton>
+            <GenericFlatButton
+              onPressFunction={() => {
                 setFleeModalShowing(false);
                 setFleeRollFailure(false);
               }}
             >
-              <Text className="text-lg">Cancel</Text>
-            </Pressable>
+              Cancel
+            </GenericFlatButton>
           </ThemedView>
           {fleeRollFailure ? (
             <Text className="text-center" style={{ color: "#ef4444" }}>

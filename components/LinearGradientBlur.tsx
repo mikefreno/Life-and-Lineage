@@ -18,7 +18,7 @@ export function LinearGradientBlur() {
       : {
           colorStops: {
             0: { color: "transparent" },
-            0.5: { color: "rgba(0,0,0,0.99)" },
+            0.35: { color: "rgba(0,0,0,0.99)" },
             1: { color: "black" },
           },
         },

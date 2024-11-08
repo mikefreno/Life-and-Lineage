@@ -555,7 +555,7 @@ export class PlayerCharacter extends Character {
     this.currentSanity = currentSanity ?? baseSanity;
     this.currentMana = currentMana ?? baseMana;
 
-    this.unAllocatedSkillPoints = 0;
+    this.unAllocatedSkillPoints = unAllocatedSkillPoints ?? __DEV__ ? 100 : 0;
     this.allocatedSkillPoints = allocatedSkillPoints ?? {
       [Attribute.health]: 0,
       [Attribute.mana]: 0,
@@ -581,8 +581,7 @@ export class PlayerCharacter extends Character {
     this.conditions = conditions ?? [];
 
     this.inventory = inventory ?? [];
-    //this.keyItems = keyItems ?? __DEV__ ? testKeyItems() : [];
-    this.keyItems = keyItems ?? [];
+    this.keyItems = keyItems ?? __DEV__ ? testKeyItems() : [];
     this.currentDungeon = currentDungeon ?? null;
     this.inCombat = inCombat ?? false;
     this.equipment = equipment ?? {
@@ -1872,9 +1871,9 @@ export class PlayerCharacter extends Character {
   get weaponAttacks() {
     if (__DEV__) {
       const fullHeal = new Attack({
-        name: "devHeal",
+        name: "DevHeal",
         user: this,
-        selfDamage: -9999,
+        selfDamage: 400,
       });
       let attacks = [fullHeal, ...this.equipment.mainHand.attachedAttacks];
       const spells = this.equipment.mainHand.providedSpells;

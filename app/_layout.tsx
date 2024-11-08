@@ -4,7 +4,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, router } from "expo-router";
+import { SplashScreen, Stack, router, usePathname } from "expo-router";
 import React, {
   createContext,
   useEffect,
@@ -18,21 +18,18 @@ import { observer } from "mobx-react-lite";
 import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
-import { Dimensions, Keyboard, Platform, StyleSheet } from "react-native";
+import { Dimensions, Platform, StyleSheet } from "react-native";
 import { View as ThemedView } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
 import { AppContextType } from "../utility/types";
-import { AuthProvider, useAuth } from "../auth/AuthContext";
+import { AuthProvider } from "../auth/AuthContext";
 import D20DieAnimation from "../components/DieRollAnim";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { wait } from "../utility/functions/misc";
 import { API_BASE_URL } from "../config/config";
 import { fullLoad } from "../utility/functions/save_load";
@@ -276,6 +273,7 @@ const RootLayout = observer(() => {
   >(undefined);
   const notificationListener = useRef<Notifications.Subscription>();
   const responseListener = useRef<Notifications.Subscription>();
+  const pathname = usePathname();
 
   useEffect(() => {
     //if (fontLoaded && navbarLoad) {
@@ -342,10 +340,13 @@ const RootLayout = observer(() => {
         (playerState &&
           (playerState.currentHealth <= 0 || playerState.currentSanity <= -50))
       ) {
-        while (router.canGoBack()) {
-          router.back();
-        }
-        router.replace("/DeathScreen");
+        if (pathname !== "/DeathScreen")
+          wait(500).then(() => {
+            while (router.canGoBack()) {
+              router.back();
+            }
+            router.replace("/DeathScreen");
+          });
       } else if (playerState.currentDungeon && firstLoad) {
         while (router.canGoBack()) {
           router.back();

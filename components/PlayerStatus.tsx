@@ -776,7 +776,6 @@ const PlayerStatus = observer(
               vibration({ style: "light" });
               setShowDetailedStatusView(true);
             }}
-            style={{ marginTop: 6 }}
             className={filled}
           >
             {colorAndPlatformDependantBlur(
