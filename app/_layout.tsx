@@ -124,9 +124,9 @@ const Root = observer(() => {
   const [showDetailedStatusView, setShowDetailedStatusView] =
     useState<boolean>(false);
   const [blockSize, setBlockSize] = useState<number>();
-  const { setColorScheme, colorScheme } = useColorScheme();
+  const { setColorScheme } = useColorScheme();
 
-  const getData = async () => {
+  const loadData = async () => {
     try {
       const { game, player } = await fullLoad();
 
@@ -145,14 +145,14 @@ const Root = observer(() => {
   };
 
   useEffect(() => {
+    loadData();
+  }, []);
+
+  useEffect(() => {
     if (gameState) {
       setColorScheme(gameState.colorScheme);
     }
-  }, [gameState?.colorScheme, colorScheme]);
-
-  useEffect(() => {
-    getData();
-  }, []);
+  }, [gameState?.colorScheme]);
 
   const [dimensions, setDimensions] = useState(() => ({
     height: Dimensions.get("window").height,
@@ -257,15 +257,11 @@ const RootLayout = observer(() => {
   if (!appData) {
     throw new Error("missing context");
   }
-  //const auth = useAuth();
 
   const { playerState, gameState } = appData;
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
-  //const [navbarLoad, setNavbarLoad] = useState(false);
 
-  //const insets = useSafeAreaInsets();
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [expoPushToken, setExpoPushToken] = useState("");
   const [sentToken, setSentToken] = useState(false);
   const [notification, setNotification] = useState<
@@ -276,7 +272,6 @@ const RootLayout = observer(() => {
   const pathname = usePathname();
 
   useEffect(() => {
-    //if (fontLoaded && navbarLoad) {
     if (fontLoaded) {
       wait(500).then(() => {
         registerForPushNotificationsAsync()
@@ -305,10 +300,7 @@ const RootLayout = observer(() => {
         };
       });
     }
-  }, [
-    fontLoaded,
-    // navbarLoad
-  ]);
+  }, [fontLoaded]);
 
   useEffect(() => {
     if (expoPushToken && !sentToken) {
@@ -323,14 +315,7 @@ const RootLayout = observer(() => {
     }
   }, [expoPushToken]);
 
-  //useEffect(() => {
-  //if (__DEV__) {
-  //auth._debugLog();
-  //}
-  //}, []);
-
   useEffect(() => {
-    //if (fontLoaded && navbarLoad) {
     if (fontLoaded) {
       SplashScreen.hideAsync();
       if (!playerState) {
@@ -360,47 +345,7 @@ const RootLayout = observer(() => {
       }
       setFirstLoad(false);
     }
-  }, [
-    fontLoaded,
-    //navbarLoad,
-    playerState?.currentHealth,
-    playerState?.currentSanity,
-  ]);
-
-  //useEffect(() => {
-  //if (Platform.OS == "android") {
-  //setNavbarBar();
-  //} else {
-  //setNavbarLoad(true);
-  //}
-  //}, [isKeyboardVisible, insets.bottom]);
-
-  //const setNavbarBar = async () => {
-  //await updateNavBar({ isKeyboardVisible });
-  //if (!navbarLoad) {
-  //setNavbarLoad(true);
-  //}
-  //};
-
-  //useEffect(() => {
-  //const keyboardDidShowListener = Keyboard.addListener(
-  //"keyboardDidShow",
-  //() => {
-  //setKeyboardVisible(true);
-  //},
-  //);
-  //const keyboardDidHideListener = Keyboard.addListener(
-  //"keyboardDidHide",
-  //() => {
-  //setKeyboardVisible(false);
-  //},
-  //);
-
-  //return () => {
-  //keyboardDidHideListener.remove();
-  //keyboardDidShowListener.remove();
-  //};
-  //}, []);
+  }, [fontLoaded, playerState?.currentHealth, playerState?.currentSanity]);
 
   while (!fontLoaded) {
     return (
