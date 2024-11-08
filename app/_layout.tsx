@@ -1,8 +1,4 @@
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
+import { ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack, router, usePathname } from "expo-router";
 import React, {
@@ -34,6 +30,7 @@ import { wait } from "../utility/functions/misc";
 import { API_BASE_URL } from "../config/config";
 import { fullLoad } from "../utility/functions/save_load";
 import { SystemBars } from "react-native-edge-to-edge";
+import { DarkTheme, LightTheme } from "../constants/Colors";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -51,7 +48,7 @@ export const AppContext = createContext<AppContextType | undefined>(undefined);
 
 Sentry.init({
   dsn: "https://2cff54f8aeb50bcb7151c159cc40fe1b@o4506630160187392.ingest.sentry.io/4506630163398656",
-  debug: false, // __DEV__, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
+  debug: __DEV__, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
 });
 
 Notifications.setNotificationHandler({
@@ -356,7 +353,7 @@ const RootLayout = observer(() => {
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : LightTheme}>
       <SystemBars style="auto" />
       <Stack>
         <Stack.Screen
@@ -368,66 +365,42 @@ const RootLayout = observer(() => {
         />
         <Stack.Screen
           name="Auth"
-          options={{
-            presentation: "modal",
-            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-          }}
+          options={headerOptions({ presentation: "modal" })}
         />
         <Stack.Screen
           name="Options"
-          options={{
-            presentation: "modal",
-            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-          }}
+          options={headerOptions({ presentation: "modal" })}
         />
         <Stack.Screen
           name="Relationships"
-          options={headerOptions(colorScheme)}
+          options={headerOptions({
+            colorScheme,
+            headerBackTitleVisible: false,
+          })}
         />
         <Stack.Screen
           name="Shops/[shop]"
-          options={headerOptions(colorScheme, true)}
+          options={headerOptions({ colorScheme, shop: true })}
         />
         <Stack.Screen
           name="NewGame/index"
-          options={{
-            title: "Class Select",
-            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackTitleStyle: { fontFamily: "PixelifySans" },
-            headerBackTitle: "Home",
-          }}
+          options={headerOptions({ title: "Class Select" })}
         />
         <Stack.Screen
           name="NewGame/SetBlessing/[slug]"
-          options={{
-            title: "Blessing",
-            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackTitleStyle: { fontFamily: "PixelifySans" },
-          }}
+          options={headerOptions({ title: "Blessing Select" })}
         />
         <Stack.Screen
           name="NewGame/SetSex/[...slug]"
-          options={{
-            title: "Sex Select",
-            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackTitleStyle: { fontFamily: "PixelifySans" },
-          }}
+          options={headerOptions({ title: "Sex Select" })}
         />
         <Stack.Screen
           name="NewGame/SetName/[...slug]"
-          options={{
-            title: "Name Set",
-            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackTitleStyle: { fontFamily: "PixelifySans" },
-          }}
+          options={headerOptions({ title: "Name Set" })}
         />
         <Stack.Screen
           name="NewGame/Review/[...slug]"
-          options={{
-            title: "Review",
-            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-            headerBackTitleStyle: { fontFamily: "PixelifySans" },
-          }}
+          options={headerOptions({ title: "Review" })}
         />
       </Stack>
     </ThemeProvider>
@@ -435,8 +408,27 @@ const RootLayout = observer(() => {
 });
 export default Sentry.wrap(Root);
 
-const headerOptions = (colorScheme: "light" | "dark", shop?: boolean) =>
-  Platform.OS == "ios" || shop
+const headerOptions = ({
+  colorScheme,
+  shop,
+  title,
+  presentation,
+  headerBackTitleVisible = true,
+}: {
+  colorScheme?: "light" | "dark";
+  presentation?:
+    | "modal"
+    | "transparentModal"
+    | "containedModal"
+    | "containedTransparentModal"
+    | "fullScreenModal"
+    | "formSheet"
+    | "card";
+  shop?: boolean;
+  title?: string;
+  headerBackTitleVisible?: boolean;
+}) =>
+  shop
     ? {
         headerBackTitleVisible: false,
         headerTransparent: true,
@@ -461,6 +453,9 @@ const headerOptions = (colorScheme: "light" | "dark", shop?: boolean) =>
         ),
       }
     : {
+        title: title,
+        presentation: presentation,
+        headerBackTitleVisible: headerBackTitleVisible,
         headerTitleStyle: {
           fontFamily: "PixelifySans",
           fontSize: 22,

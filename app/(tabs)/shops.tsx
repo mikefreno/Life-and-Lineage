@@ -166,9 +166,7 @@ const ShopsScreen = observer(() => {
               {gameState.shops.map((shop) => renderItem(shop))}
             </View>
           </ScrollView>
-        ) : (
-          <D20DieAnimation />
-        )}
+        ) : null}
       </>
     );
   }

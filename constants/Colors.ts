@@ -22,6 +22,30 @@ export default {
   },
 };
 
+export const LightTheme = {
+  dark: false,
+  colors: {
+    primary: tintColorLight,
+    background: "#fafafa",
+    card: "#fafafa",
+    text: "#000",
+    border: "#ccc",
+    notification: tintColorLight,
+  },
+};
+
+export const DarkTheme = {
+  dark: true,
+  colors: {
+    primary: tintColorDark,
+    background: "#09090b",
+    card: "#18181b",
+    text: "#fff",
+    border: "#ccc",
+    notification: tintColorDark,
+  },
+};
+
 export const elementalColorMap: Record<
   Element,
   { dark: string; light: string }

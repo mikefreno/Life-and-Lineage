@@ -334,13 +334,7 @@ const ShopInteriorScreen = observer(() => {
                   ) : null}
                 </View>
               </View>
-              <View
-                className={`${
-                  dimensions.height == dimensions.greater
-                    ? "h-[90%]"
-                    : "h-[85%]"
-                }`}
-              >
+              <View className="h-[85%]">
                 <InventoryRender
                   selfRef={inventoryTarget}
                   shopInventoryTarget={shopInventoryTarget}
