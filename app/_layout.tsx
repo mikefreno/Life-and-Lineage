@@ -411,10 +411,7 @@ const RootLayout = observer(() => {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <SystemBars
-        style="auto"
-        hidden={{ navigationBar: true, statusBar: true }}
-      />
+      <SystemBars style="auto" />
       <Stack>
         <Stack.Screen
           name="(tabs)"
@@ -433,7 +430,7 @@ const RootLayout = observer(() => {
         <Stack.Screen
           name="Options"
           options={{
-            presentation: "transparentModal",
+            presentation: "modal",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
           }}
         />

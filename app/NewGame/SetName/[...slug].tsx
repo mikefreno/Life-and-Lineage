@@ -55,12 +55,9 @@ export default function SetName() {
   return (
     <>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ThemedView className="flex-1" style={{ marginTop: -header }}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1 }}
-          >
-            <ThemedView className="flex-1 items-center px-6 justify-center">
+        <ThemedView className="flex-1">
+          <KeyboardAvoidingView style={{ marginTop: -header, flex: 1 }}>
+            <ThemedView className="flex-1 px-6 items-center justify-center border">
               <View className="flex flex-row text-center">
                 <Text className="text-center text-2xl md:text-3xl">
                   Choose Your

@@ -180,7 +180,7 @@ export default function TabLayout() {
               ),
             headerLeft: () => (
               <Link href="/Options" asChild>
-                <Pressable>
+                <Pressable onPress={() => vibration({ style: "light" })}>
                   {({ pressed }) => (
                     <Gear
                       width={30}

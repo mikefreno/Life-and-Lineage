@@ -43,7 +43,8 @@
       "expo-router",
       "react-native-edge-to-edge",
       "expo-apple-authentication",
-      ["expo-font",
+      [
+        "expo-font",
         {
           "fonts": [
             "./assets/fonts/Caveat-VariableFont_wght.ttf",
@@ -65,7 +66,8 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.976302581992-tbi6afmid4eq5dsn63t30kpfpdhjju8m"
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
@@ -73,7 +75,6 @@
     "extra": {
       "router": {
         "origin": false
-
       },
       "eas": {
         "projectId": "f4a10fdc-c377-4a37-8ad7-27685b89b4d9"

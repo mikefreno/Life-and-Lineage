@@ -7,6 +7,8 @@ import {
 } from "react-native";
 import Modal from "react-native-modal";
 import { View as ThemedView } from "./Themed";
+import { platform } from "benchmark";
+import { useColorScheme } from "nativewind";
 
 interface GenericModalProps {
   isVisibleCondition: boolean;
@@ -41,6 +43,7 @@ export default function GenericModal({
   noPad,
 }: GenericModalProps) {
   const height = Dimensions.get("window").height;
+  const { colorScheme } = useColorScheme();
 
   return (
     <Modal
@@ -50,9 +53,15 @@ export default function GenericModal({
       animationOutTiming={300}
       backdropTransitionOutTiming={Platform.OS === "android" ? 600 : 300}
       backdropTransitionInTiming={Platform.OS === "android" ? 0 : 300}
-      hasBackdrop
-      backdropColor={"#000000a2"}
+      backdropColor={
+        Platform.OS == "ios"
+          ? "#000000"
+          : colorScheme == "light"
+          ? "#ffffffff"
+          : "#000000"
+      }
       isVisible={isVisibleCondition}
+      backdropOpacity={0.5}
       onBackdropPress={backdropCloses ? backFunction : undefined}
       onBackButtonPress={backFunction}
       statusBarTranslucent={true}
