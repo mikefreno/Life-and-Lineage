@@ -422,7 +422,10 @@ const RootLayout = observer(() => {
         />
         <Stack.Screen
           name="NewGame/index"
-          options={headerOptions({ title: "Class Select" })}
+          options={headerOptions({
+            title: "Class Select",
+            headerBackTitleVisible: false,
+          })}
         />
         <Stack.Screen
           name="NewGame/SetBlessing/[slug]"

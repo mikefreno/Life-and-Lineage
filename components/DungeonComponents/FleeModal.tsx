@@ -11,6 +11,7 @@ import {
   type ContextData,
   enemyPreTurnCheck,
 } from "./DungeonInteriorFunctions";
+import { savePlayer } from "../../utility/functions/save_load";
 
 interface FleeModalProps {
   fleeModalShowing: boolean;
@@ -73,6 +74,7 @@ export default function FleeModal({
             router.push("/Activities");
           }
           //gameState.gameTick({ playerState });
+          savePlayer(playerState);
         });
       } else {
         setFleeRollFailure(true);

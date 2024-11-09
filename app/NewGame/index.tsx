@@ -1,4 +1,4 @@
-import { Pressable, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { ThemedScrollView, Text, ThemedView } from "../../components/Themed";
 import "../../assets/styles/globals.css";
 import { useContext, useLayoutEffect, useRef, useState } from "react";
@@ -90,8 +90,8 @@ const SetClassScreen = observer(() => {
           </Pressable>
         </ThemedView>
       </GenericModal>
-      <ThemedScrollView>
-        <ThemedView className="flex-1 items-center px-[6vw]">
+      <ScrollView>
+        <View className="flex-1 items-center px-[6vw]">
           <Text className="bold pt-[4vh] text-center text-3xl">
             Create a Character
           </Text>
@@ -257,8 +257,8 @@ const SetClassScreen = observer(() => {
               </GenericFlatButton>
             </View>
           )}
-        </ThemedView>
-      </ThemedScrollView>
+        </View>
+      </ScrollView>
       {((gameState && gameState.tutorialsEnabled) || !gameState) && (
         <View className="absolute ml-4 mt-4">
           <Pressable

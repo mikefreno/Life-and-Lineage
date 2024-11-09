@@ -1,5 +1,5 @@
 import { Pressable, View } from "react-native";
-import { ThemedView, Text } from "../../../components/Themed";
+import { Text } from "../../../components/Themed";
 import { useContext, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
@@ -57,7 +57,7 @@ export default function SetBlessing() {
           body: "Each of the blessings are for your class, you can learn from of these schools, but not from a school for a different class.",
         }}
       />
-      <ThemedView className="flex-1 pt-[8vh]">
+      <View className="flex-1 pt-[8vh]">
         <Text className="text-center text-2xl px-4">
           With What Blessing Was Your
           <Text
@@ -92,7 +92,7 @@ export default function SetBlessing() {
             <View className="h-32"></View>
           )}
         </>
-      </ThemedView>
+      </View>
       {((gameState && gameState.tutorialsEnabled) || !gameState) && (
         <View className="absolute ml-4 mt-4">
           <Pressable
@@ -192,7 +192,7 @@ function ClassDependantBlessings({
   if (playerClass == "mage") {
     return (
       <View className="flex items-center justify-evenly py-6">
-        <ThemedView className="mb-8 flex flex-row justify-evenly">
+        <View className="mb-8 flex flex-row justify-evenly">
           <BlessingPressable
             element={Element.fire}
             onPress={() => {
@@ -213,8 +213,8 @@ function ClassDependantBlessings({
             dimensions={dimensions}
             blessing={blessing}
           />
-        </ThemedView>
-        <ThemedView className="flex flex-row justify-evenly">
+        </View>
+        <View className="flex flex-row justify-evenly">
           <BlessingPressable
             element={Element.air}
             onPress={() => {
@@ -235,13 +235,13 @@ function ClassDependantBlessings({
             dimensions={dimensions}
             blessing={blessing}
           />
-        </ThemedView>
+        </View>
       </View>
     );
   } else if (playerClass == "necromancer") {
     return (
       <View className="flex items-center justify-evenly py-6">
-        <ThemedView className="mb-8 flex flex-row justify-evenly">
+        <View className="mb-8 flex flex-row justify-evenly">
           <BlessingPressable
             element={Element.summoning}
             onPress={() => {
@@ -262,8 +262,8 @@ function ClassDependantBlessings({
             dimensions={dimensions}
             blessing={blessing}
           />
-        </ThemedView>
-        <ThemedView className="flex flex-row justify-evenly">
+        </View>
+        <View className="flex flex-row justify-evenly">
           <BlessingPressable
             element={Element.bone}
             onPress={() => {
@@ -284,7 +284,7 @@ function ClassDependantBlessings({
             dimensions={dimensions}
             blessing={blessing}
           />
-        </ThemedView>
+        </View>
       </View>
     );
   } else if (playerClass == "paladin") {
@@ -300,7 +300,7 @@ function ClassDependantBlessings({
           dimensions={dimensions}
           blessing={blessing}
         />
-        <ThemedView className="mt-8 flex flex-row justify-evenly">
+        <View className="mt-8 flex flex-row justify-evenly">
           <BlessingPressable
             element={Element.vengeance}
             onPress={() => {
@@ -321,7 +321,7 @@ function ClassDependantBlessings({
             dimensions={dimensions}
             blessing={blessing}
           />
-        </ThemedView>
+        </View>
       </View>
     );
   } else if (playerClass == "ranger") {
@@ -337,7 +337,7 @@ function ClassDependantBlessings({
           dimensions={dimensions}
           blessing={blessing}
         />
-        <ThemedView className="mt-8 flex flex-row justify-evenly">
+        <View className="mt-8 flex flex-row justify-evenly">
           <BlessingPressable
             element={Element.arcane}
             onPress={() => {
@@ -358,7 +358,7 @@ function ClassDependantBlessings({
             dimensions={dimensions}
             blessing={blessing}
           />
-        </ThemedView>
+        </View>
       </View>
     );
   } else throw new Error(`invalid class set: ${playerClass}`);

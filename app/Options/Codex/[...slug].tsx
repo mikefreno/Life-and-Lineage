@@ -1,6 +1,6 @@
 import { Href, Stack, router, useLocalSearchParams } from "expo-router";
 import { ThemedView } from "../../../components/Themed";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../../constants/Colors";
 import { useColorScheme } from "nativewind";
@@ -128,13 +128,9 @@ export default function CodexInfo() {
         }}
       />
       {secondary ? (
-        <ThemedView className="flex-1">
-          {SecondaryMap[toTitleCase(secondary)]}
-        </ThemedView>
+        <View className="flex-1">{SecondaryMap[toTitleCase(secondary)]}</View>
       ) : (
-        <ThemedView className="flex-1">
-          {CategoryMap[toTitleCase(category)]}
-        </ThemedView>
+        <View className="flex-1">{CategoryMap[toTitleCase(category)]}</View>
       )}
     </>
   );

@@ -245,7 +245,7 @@ export const AppSettings = observer(() => {
             ))}
           </ScrollView>
         </GenericModal>
-        <ThemedView className="flex-1 items-center justify-center px-4">
+        <View className="flex-1 items-center justify-center px-4">
           {/*<GenericRaisedButton
             onPressFunction={() => router.push("/Options/iaps")}
           >
@@ -368,7 +368,7 @@ export const AppSettings = observer(() => {
               </Pressable>
             ))}
           </View>
-        </ThemedView>
+        </View>
       </>
     );
   }

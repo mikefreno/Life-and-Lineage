@@ -5,7 +5,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { ThemedView, Text } from "../../../components/Themed";
+import { Text } from "../../../components/Themed";
 import { useContext, useRef, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { toTitleCase } from "../../../utility/functions/misc";
@@ -54,9 +54,9 @@ export default function SetName() {
   return (
     <>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ThemedView className="flex-1">
+        <View className="flex-1">
           <KeyboardAvoidingView style={{ marginTop: -header, flex: 1 }}>
-            <ThemedView className="flex-1 px-6 items-center justify-center border">
+            <View className="flex-1 px-6 items-center justify-center border">
               <View className="flex flex-row text-center">
                 <Text className="text-center text-2xl md:text-3xl">
                   Choose Your
@@ -134,9 +134,9 @@ export default function SetName() {
                   </View>
                 ) : null}
               </View>
-            </ThemedView>
+            </View>
           </KeyboardAvoidingView>
-        </ThemedView>
+        </View>
       </TouchableWithoutFeedback>
     </>
   );

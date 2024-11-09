@@ -107,7 +107,7 @@ export default function GameSettings() {
           </>
         )}
       </GenericModal>
-      <ThemedView className="flex-1 items-center justify-center px-4">
+      <View className="flex-1 items-center justify-center px-4">
         <GenericStrikeAround>Game Restart</GenericStrikeAround>
         <GenericRaisedButton onPressFunction={startNewGame}>
           Start New Game
@@ -135,7 +135,7 @@ export default function GameSettings() {
         </View>
         <GenericStrikeAround>Tutorials</GenericStrikeAround>
         <View className="mt-3 rounded px-4 py-2">
-          <ThemedView className="mx-auto flex flex-row">
+          <View className="mx-auto flex flex-row">
             <Text className="my-auto text-lg">Tutorials Enabled: </Text>
             <Switch
               trackColor={{ false: "#767577", true: "#3b82f6" }}
@@ -144,7 +144,7 @@ export default function GameSettings() {
               onValueChange={(bool) => setTutorialState(bool)}
               value={tutorialState}
             />
-          </ThemedView>
+          </View>
           <GenericRaisedButton
             onPressFunction={() => {
               vibration({ style: "light" });
@@ -154,7 +154,7 @@ export default function GameSettings() {
             Reset Tutorials
           </GenericRaisedButton>
         </View>
-      </ThemedView>
+      </View>
     </>
   );
 }

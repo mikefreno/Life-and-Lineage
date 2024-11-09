@@ -1,5 +1,5 @@
-import { ThemedView, Text } from "../../../components/Themed";
-import { Platform } from "react-native";
+import { Text } from "../../../components/Themed";
+import { Platform, View } from "react-native";
 import {
   Character,
   PlayerCharacter,
@@ -202,7 +202,7 @@ export default function NewGameReview() {
   }
 
   return (
-    <ThemedView className="flex-1 px-6">
+    <View className="flex-1 px-6">
       <Text className="pt-[8vh] text-center text-2xl">Review</Text>
       <Text className="pt-[16vh] text-center text-3xl">
         {`${firstName} ${lastName} the `}
@@ -222,6 +222,6 @@ export default function NewGameReview() {
       <GenericFlatButton onPressFunction={() => startGame()} className="mt-4">
         Confirm?
       </GenericFlatButton>
-    </ThemedView>
+    </View>
   );
 }

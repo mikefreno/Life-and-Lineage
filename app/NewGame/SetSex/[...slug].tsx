@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { ThemedView, Text } from "../../../components/Themed";
+import { Text } from "../../../components/Themed";
 import { FontAwesome5, Foundation } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
 import { useContext, useRef, useState } from "react";
@@ -57,14 +57,14 @@ export default function SetSex() {
           body: "However, if you have a child, you can live on through the child retaining much of what has been achieved in your previous life",
         }}
       />
-      <ThemedView className="flex-1 items-center">
+      <View className="flex-1 items-center">
         <Text className="mt-[6vh] text-center text-2xl md:text-3xl">
           Set the sex of your{" "}
           <Text style={{ color: playerClassColors[playerClass] }}>
             {toTitleCase(playerClass)}
           </Text>
         </Text>
-        <ThemedView className="mt-[12vh] flex w-full flex-row justify-evenly">
+        <View className="mt-[12vh] flex w-full flex-row justify-evenly">
           <Pressable
             className="w-1/3"
             onPress={() => {
@@ -117,7 +117,7 @@ export default function SetSex() {
               </View>
             )}
           </Pressable>
-        </ThemedView>
+        </View>
         {sex ? (
           <View className="mx-auto mt-8">
             <GenericFlatButton
@@ -132,7 +132,7 @@ export default function SetSex() {
             </GenericFlatButton>
           </View>
         ) : null}
-      </ThemedView>
+      </View>
       {(gameState && gameState.tutorialsEnabled) ||
         (!gameState && (
           <View className="absolute ml-4 mt-4">

@@ -1,4 +1,4 @@
-import { TextInput, View } from "react-native";
+import { ScrollView, TextInput, View } from "react-native";
 import { ThemedView, Text, ThemedScrollView } from "../../../components/Themed";
 import { useState } from "react";
 import CodexCategory from "../../../components/CodexCategory";
@@ -39,13 +39,13 @@ export default function Codex() {
         }}
       />
 
-      <ThemedScrollView
+      <ScrollView
         className="mx-4"
         scrollEventThrottle={16}
         onScrollBeginDrag={() => setScrolling(true)}
         onScrollEndDrag={() => setScrolling(false)}
       >
-        <ThemedView className="flex items-center">
+        <View className="flex items-center">
           {categories.map((category) => (
             <CodexCategory
               key={category}
@@ -53,8 +53,8 @@ export default function Codex() {
               scrolling={scrolling}
             />
           ))}
-        </ThemedView>
-      </ThemedScrollView>
+        </View>
+      </ScrollView>
     </View>
   );
 }
