@@ -44,6 +44,9 @@ export const DarkTheme = {
     border: "#ccc",
     notification: tintColorDark,
   },
+  fonts: {
+    regular: { fontFamily: "PixelifySans" },
+  },
 };
 
 export const elementalColorMap: Record<

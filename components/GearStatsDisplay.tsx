@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { Text } from "../components/Themed";
+import { Text } from "./Themed";
 import {
   ArmorIcon,
   Energy,

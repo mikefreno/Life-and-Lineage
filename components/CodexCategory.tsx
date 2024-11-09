@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Text } from "./Themed";
 import { Pressable, Animated, View } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useColorScheme } from "nativewind";
+import { Text } from "./Themed";
 
 interface CodexCategoryProps {
   category: string;

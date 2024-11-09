@@ -1,4 +1,4 @@
-import { Text, View as ThemedView } from "../../components/Themed";
+import { ThemedView, Text } from "../../components/Themed";
 import { router } from "expo-router";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../_layout";

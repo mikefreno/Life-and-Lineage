@@ -1,5 +1,5 @@
-import { TextInput } from "react-native";
-import { View, Text, ScrollView } from "../../../components/Themed";
+import { TextInput, View } from "react-native";
+import { ThemedView, Text, ThemedScrollView } from "../../../components/Themed";
 import { useState } from "react";
 import CodexCategory from "../../../components/CodexCategory";
 import { useColorScheme } from "nativewind";
@@ -39,13 +39,13 @@ export default function Codex() {
         }}
       />
 
-      <ScrollView
+      <ThemedScrollView
         className="mx-4"
         scrollEventThrottle={16}
         onScrollBeginDrag={() => setScrolling(true)}
         onScrollEndDrag={() => setScrolling(false)}
       >
-        <View className="flex items-center">
+        <ThemedView className="flex items-center">
           {categories.map((category) => (
             <CodexCategory
               key={category}
@@ -53,8 +53,8 @@ export default function Codex() {
               scrolling={scrolling}
             />
           ))}
-        </View>
-      </ScrollView>
+        </ThemedView>
+      </ThemedScrollView>
     </View>
   );
 }

@@ -1,5 +1,5 @@
 import { TouchableWithoutFeedback, View } from "react-native";
-import { Text, View as ThemedView } from "../../components/Themed";
+import { Text } from "../../components/Themed";
 import { useContext, useRef, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
@@ -51,7 +51,7 @@ const HomeScreen = observer(() => {
   if (playerState && gameState) {
     const name = playerState.fullName;
     return (
-      <ThemedView className="flex-1">
+      <>
         <TutorialModal
           tutorial={TutorialOption.intro}
           isFocused={useIsFocused()}
@@ -64,7 +64,7 @@ const HomeScreen = observer(() => {
             body: "A great place to start is to study the book you were given.",
           }}
         />
-        <ThemedView
+        <View
           className="flex-1"
           style={{
             paddingTop: useHeaderHeight(),
@@ -244,8 +244,8 @@ const HomeScreen = observer(() => {
               />
             </View>
           )}
-        </ThemedView>
-      </ThemedView>
+        </View>
+      </>
     );
   }
 });

@@ -6,8 +6,7 @@ import {
   type ViewStyle,
 } from "react-native";
 import Modal from "react-native-modal";
-import { View as ThemedView } from "./Themed";
-import { platform } from "benchmark";
+import { ThemedView } from "./Themed";
 import { useColorScheme } from "nativewind";
 
 interface GenericModalProps {

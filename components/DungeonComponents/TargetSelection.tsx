@@ -1,5 +1,5 @@
 import { Pressable, View } from "react-native";
-import { View as ThemedView, Text } from "../Themed";
+import { ThemedView, Text } from "../Themed";
 import { Enemy, Minion } from "../../classes/creatures";
 import { EnemyImage } from "../EnemyImage";
 import ProgressBar from "../ProgressBar";

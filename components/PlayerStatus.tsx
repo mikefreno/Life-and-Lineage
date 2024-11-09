@@ -1,5 +1,4 @@
 import ProgressBar from "./ProgressBar";
-import { Text } from "./Themed";
 import {
   ScrollView,
   Animated,
@@ -34,6 +33,7 @@ import {
 } from "../assets/icons/SVGIcons";
 import { Attribute, AttributeToString } from "../utility/types";
 import { Condition } from "../classes/conditions";
+import { Text } from "./Themed";
 
 export const EXPANDED_PAD = 28;
 

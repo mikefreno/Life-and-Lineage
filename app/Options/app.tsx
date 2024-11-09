@@ -1,5 +1,5 @@
 import { Pressable, ScrollView, TextInput, View } from "react-native";
-import { View as ThemedView, Text } from "../../components/Themed";
+import { Text, ThemedView } from "../../components/Themed";
 import { useContext, useEffect, useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc";
 import { useVibration } from "../../utility/customHooks";

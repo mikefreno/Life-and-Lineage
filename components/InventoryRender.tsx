@@ -12,7 +12,7 @@ import Draggable from "react-native-draggable";
 import { VibrateProps, useVibration } from "../utility/customHooks";
 import { checkReleasePositionProps } from "../utility/types";
 import { Shop } from "../classes/shop";
-import { Text, View as ThemedView } from "./Themed";
+import { Text, ThemedView } from "./Themed";
 import { AppContext } from "../app/_layout";
 
 type InventoryRenderBase = {
@@ -221,7 +221,6 @@ export default function InventoryRender({
         }`}
         bounces={false}
         overScrollMode="never"
-        persistentScrollbar={!!keyItemInventory}
         scrollIndicatorInsets={{ top: 0, left: 10, bottom: 0, right: 10 }}
       >
         {/* Regular Inventory Panel */}

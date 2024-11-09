@@ -1,5 +1,5 @@
 import { useColorScheme } from "nativewind";
-import { Text, ScrollView } from "./Themed";
+import { ThemedScrollView, Text } from "./Themed";
 import { InvestmentType, InvestmentUpgrade } from "../utility/types";
 import { Pressable, View, Animated } from "react-native";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -134,7 +134,7 @@ const InvestmentCard = observer(
               {investment.name} Upgrades
             </Text>
           </GenericStrikeAround>
-          <ScrollView>
+          <ThemedScrollView>
             {investment.upgrades.map((upgrade) => {
               const [showingBody, setShowingBody] = useState<boolean>(false);
               const rotation = useRef(new Animated.Value(0)).current;
@@ -330,7 +330,7 @@ const InvestmentCard = observer(
                 </Pressable>
               );
             })}
-          </ScrollView>
+          </ThemedScrollView>
           <Pressable
             onPress={() => {
               vibration({ style: "light" });

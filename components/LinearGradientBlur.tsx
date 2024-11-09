@@ -3,7 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { easeGradient } from "react-native-easing-gradient";
 import MaskedView from "@react-native-masked-view/masked-view";
 import { View, StyleSheet, Platform } from "react-native";
-import { View as ThemedView } from "./Themed";
+import { ThemedView } from "./Themed";
 
 export function LinearGradientBlur() {
   const { colors, locations } = easeGradient(

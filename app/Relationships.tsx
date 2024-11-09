@@ -1,4 +1,4 @@
-import { Text, View, ScrollView } from "../components/Themed";
+import { ThemedView, ThemedScrollView, Text } from "../components/Themed";
 import { calculateAge, wait } from "../utility/functions/misc";
 import { CharacterImage } from "../components/CharacterImage";
 import { useContext, useState } from "react";
@@ -92,26 +92,26 @@ const RelationshipsScreen = observer(() => {
         }}
       >
         <Text className="text-center text-2xl">{character.fullName}</Text>
-        <View className="mx-auto">
+        <ThemedView className="mx-auto">
           <CharacterImage
             characterAge={characterAge}
             characterSex={character.sex == "male" ? "M" : "F"}
           />
-        </View>
+        </ThemedView>
         <Text className="text-xl">
           {character.deathdate && "Died at "}
           {characterAge} Years Old
         </Text>
         <Text className="text-center text-xl">{character.fullName}</Text>
-        <View className="mx-auto">
+        <ThemedView className="mx-auto">
           <Text className="flex flex-wrap text-center text-lg">
             {character.deathdate && "Was a "}
             {character.job}
           </Text>
-        </View>
+        </ThemedView>
         {!character.deathdate && (
-          <View className="flex w-2/3 flex-row justify-center">
-            <View className="w-3/4">
+          <ThemedView className="flex w-2/3 flex-row justify-center">
+            <ThemedView className="w-3/4">
               <ProgressBar
                 value={Math.floor(character.affection * 4) / 4}
                 minValue={-100}
@@ -119,11 +119,11 @@ const RelationshipsScreen = observer(() => {
                 filledColor="#dc2626"
                 unfilledColor="#fca5a5"
               />
-            </View>
-            <View className="my-auto ml-1">
+            </ThemedView>
+            <ThemedView className="my-auto ml-1">
               <AffectionIcon height={14} width={14} />
-            </View>
-          </View>
+            </ThemedView>
+          </ThemedView>
         )}
       </Pressable>
     );
@@ -133,7 +133,7 @@ const RelationshipsScreen = observer(() => {
     if (data.length === 0) return null;
 
     return (
-      <View className="w-full" key={title}>
+      <ThemedView className="w-full" key={title}>
         <Text className="py-8 text-center text-2xl">{title}</Text>
         <FlatList
           horizontal
@@ -142,7 +142,7 @@ const RelationshipsScreen = observer(() => {
           renderItem={({ item }) => renderCharacter(item)}
           keyExtractor={(item) => item.id}
         />
-      </View>
+      </ThemedView>
     );
   };
 
@@ -198,7 +198,7 @@ const RelationshipsScreen = observer(() => {
           backFunction={() => setShowingAdoptionModal(false)}
           size={100}
         >
-          <View style={{ maxHeight: dimensions.height * 0.75 }}>
+          <ThemedView style={{ maxHeight: dimensions.height * 0.75 }}>
             <Text className="text-center text-2xl tracking-wider py-2">
               {partnerName
                 ? `Adopting with ${partnerName}`
@@ -212,7 +212,7 @@ const RelationshipsScreen = observer(() => {
                 numColumns={2}
                 data={gameState?.independantChildren}
                 renderItem={({ item }) => (
-                  <View className="flex flex-col items-center w-1/2">
+                  <ThemedView className="flex flex-col items-center w-1/2">
                     {renderCharacter(item)}
                     <GenericRaisedButton
                       onPressFunction={() =>
@@ -225,7 +225,7 @@ const RelationshipsScreen = observer(() => {
                     >
                       Adopt
                     </GenericRaisedButton>
-                  </View>
+                  </ThemedView>
                 )}
                 keyExtractor={(item) => item.id}
               />
@@ -236,7 +236,7 @@ const RelationshipsScreen = observer(() => {
                 </Text>
               </GenericStrikeAround>
             )}
-          </View>
+          </ThemedView>
         </GenericModal>
         <GiftModal
           showing={showingGiftModal}
@@ -246,16 +246,16 @@ const RelationshipsScreen = observer(() => {
           }}
           backdropCloses
         />
-        <ScrollView>
-          <View
+        <ThemedScrollView>
+          <ThemedView
             className="flex-1 items-center px-8 pb-10"
             style={{ paddingTop: useHeaderHeight() }}
           >
             {characterGroups.map((group) =>
               renderGroup(group.title, group.data),
             )}
-          </View>
-        </ScrollView>
+          </ThemedView>
+        </ThemedScrollView>
       </>
     );
   }

@@ -1,6 +1,6 @@
 import { Pressable, View, Image } from "react-native";
 import GenericModal from "../GenericModal";
-import { View as ThemedView, Text } from "../Themed";
+import { ThemedView, Text } from "../Themed";
 import { Item } from "../../classes/item";
 import { useContext } from "react";
 import { AppContext } from "../../app/_layout";

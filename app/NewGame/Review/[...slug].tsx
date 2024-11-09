@@ -1,4 +1,4 @@
-import { View as ThemedView, Text } from "../../../components/Themed";
+import { ThemedView, Text } from "../../../components/Themed";
 import { Platform } from "react-native";
 import {
   Character,

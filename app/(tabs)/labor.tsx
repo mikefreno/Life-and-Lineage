@@ -1,7 +1,6 @@
 import jobs from "../../assets/json/jobs.json";
 import LaborTask from "../../components/LaborTask";
-import { ScrollView, View as ThemedView, Text } from "../../components/Themed";
-import { View, Pressable } from "react-native";
+import { View, Pressable, ScrollView } from "react-native";
 import { useContext, useState } from "react";
 import Modal from "react-native-modal";
 import { toTitleCase } from "../../utility/functions/misc";
@@ -14,6 +13,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { AppContext } from "../_layout";
 import { TutorialOption } from "../../utility/types";
 import { observer } from "mobx-react-lite";
+import { Text } from "../../components/Themed";
 
 const EarnScreen = observer(() => {
   const appData = useContext(AppContext);
@@ -42,7 +42,7 @@ const EarnScreen = observer(() => {
   }
 
   return (
-    <ThemedView className="flex-1">
+    <>
       <TutorialModal
         tutorial={TutorialOption.labor}
         isFocused={useIsFocused()}
@@ -105,7 +105,7 @@ const EarnScreen = observer(() => {
           </View>
         </View>
       </Modal>
-      <ThemedView className="flex-1">
+      <View>
         <ScrollView
           scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
         >
@@ -134,8 +134,8 @@ const EarnScreen = observer(() => {
               })}
           </View>
         </ScrollView>
-      </ThemedView>
-    </ThemedView>
+      </View>
+    </>
   );
 });
 export default EarnScreen;

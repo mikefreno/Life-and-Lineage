@@ -1,6 +1,5 @@
 import { Pressable, ScrollView, View } from "react-native";
-import { View as ThemedView, Text } from "../components/Themed";
-import { Stack } from "expo-router";
+import { Text, ThemedView } from "../components/Themed";
 import deathMessages from "../assets/json/deathMessages.json";
 import { useContext, useEffect, useState } from "react";
 import { router } from "expo-router";
@@ -108,12 +107,6 @@ export default function DeathScreen() {
   if (gameState && playerState) {
     return (
       <>
-        <Stack.Screen
-          options={{
-            title: "You Died",
-            headerShown: false,
-          }}
-        />
         <GenericModal
           isVisibleCondition={!!nextLife}
           backFunction={() => setNextLife(null)}

@@ -32,7 +32,7 @@ import {
   Wand,
   WizardHat,
 } from "../../assets/icons/SVGIcons";
-import { View as ThemedView } from "../../components/Themed";
+import { ThemedView } from "../../components/Themed";
 import TutorialModal from "../../components/TutorialModal";
 import { useIsFocused } from "@react-navigation/native";
 import { TutorialOption } from "../../utility/types";
@@ -281,7 +281,7 @@ export default function TabLayout() {
               />
             ),
             headerLeft: () => (
-              <Link href="/Training" asChild>
+              <Link href="/Education" asChild>
                 <Pressable onPress={() => vibration({ style: "light" })}>
                   {({ pressed }) => (
                     <GraduationCapIcon

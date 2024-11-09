@@ -1,5 +1,5 @@
 import { Pressable } from "react-native";
-import { View, Text } from "../Themed";
+import { ThemedView, Text } from "../Themed";
 import { useVibration } from "../../utility/customHooks";
 import { useContext } from "react";
 import { DungeonContext } from "./DungeonContext";
@@ -19,7 +19,7 @@ export default function BattleTabControls({
   if (!dungeonData) throw new Error("missing context in BattleTabControls");
   const { inCombat } = dungeonData;
   return (
-    <View className="-mb-1 flex w-full flex-row justify-around">
+    <ThemedView className="-mb-1 flex w-full flex-row justify-around">
       <Pressable
         className={`mx-2 w-1/3 rounded-l py-4 ${
           battleTab == "attacksOrNavigation"
@@ -61,6 +61,6 @@ export default function BattleTabControls({
       >
         <Text className="text-center text-xl">Log</Text>
       </Pressable>
-    </View>
+    </ThemedView>
   );
 }

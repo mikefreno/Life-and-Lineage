@@ -1,5 +1,5 @@
-import { Stack, useLocalSearchParams } from "expo-router";
-import { View as ThemedView, Text } from "../../components/Themed";
+import { useLocalSearchParams } from "expo-router";
+import { ThemedView, Text } from "../../components/Themed";
 import { CharacterImage } from "../../components/CharacterImage";
 import {
   Pressable,
@@ -18,7 +18,7 @@ import { observer } from "mobx-react-lite";
 import TutorialModal from "../../components/TutorialModal";
 import { useHeaderHeight } from "@react-navigation/elements";
 import shopObjects from "../../assets/json/shops.json";
-import { calculateAge, toTitleCase } from "../../utility/functions/misc";
+import { calculateAge } from "../../utility/functions/misc";
 import InventoryRender from "../../components/InventoryRender";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import { Coins } from "../../assets/icons/SVGIcons";
@@ -70,7 +70,7 @@ const ShopInteriorScreen = observer(() => {
   const { shop } = useLocalSearchParams();
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing game context");
-  const { gameState, playerState, blockSize, dimensions } = appData;
+  const { gameState, playerState, blockSize } = appData;
   const vibration = useVibration();
   const colors = shopObjects.find((shopObj) => shopObj.type == shop)?.colors;
   const thisShop = gameState?.shops.find((aShop) => aShop.archetype == shop);
@@ -234,11 +234,6 @@ const ShopInteriorScreen = observer(() => {
   if (initialized && thisShop && gameState && playerState) {
     return (
       <ThemedView className="h-full">
-        <Stack.Screen
-          options={{
-            title: toTitleCase(shop as string),
-          }}
-        />
         <TutorialModal
           tutorial={TutorialOption.shopInterior}
           isFocused={isFocused}

@@ -5,8 +5,8 @@ import { observer } from "mobx-react-lite";
 import { numberToRoman } from "../utility/functions/misc";
 import type { VibrateProps } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
-import { Text } from "./Themed";
 import ThemedCard from "./ThemedCard";
+import { Text } from "./Themed";
 import { AppContext } from "../app/_layout";
 import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
 

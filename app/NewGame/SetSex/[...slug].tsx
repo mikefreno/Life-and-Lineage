@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { View as ThemedView, Text } from "../../../components/Themed";
+import { ThemedView, Text } from "../../../components/Themed";
 import { FontAwesome5, Foundation } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
 import { useContext, useRef, useState } from "react";

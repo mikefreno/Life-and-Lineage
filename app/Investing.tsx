@@ -1,5 +1,4 @@
 import investments from "../assets/json/investments.json";
-import { ScrollView, View as ThemedView } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { InvestmentType, TutorialOption } from "../utility/types";
 import InvestmentCard from "../components/InvestmentCard";
@@ -7,9 +6,7 @@ import PlayerStatus from "../components/PlayerStatus";
 import { useContext } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../components/TutorialModal";
-import { Platform, StyleSheet, View } from "react-native";
-import { Stack } from "expo-router";
-import { BlurView } from "expo-blur";
+import { ScrollView, View } from "react-native";
 import { AppContext } from "./_layout";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
@@ -23,24 +20,6 @@ const InvestingScreen = observer(() => {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          headerBackTitleVisible: false,
-          headerTransparent: true,
-          headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-          headerBackground:
-            Platform.OS == "ios"
-              ? () => (
-                  <BlurView intensity={100} style={StyleSheet.absoluteFill} />
-                )
-              : () => (
-                  <ThemedView
-                    style={StyleSheet.absoluteFill}
-                    className="shadow-soft"
-                  />
-                ),
-        }}
-      />
       <TutorialModal
         tutorial={TutorialOption.investing}
         isFocused={useIsFocused()}
@@ -49,14 +28,10 @@ const InvestingScreen = observer(() => {
           body: "Put your gold to work and make time work for you.",
         }}
         pageTwo={{
-          title: "Note:",
-          body: "You will need to clear out dungeons to unlock the purchasing of these investments.",
-        }}
-        pageThree={{
           body: "Each investment base has a number of upgrades, some with significant consequences on your character.",
         }}
       />
-      <ThemedView className="flex-1">
+      <View className="flex-1">
         <ScrollView
           scrollIndicatorInsets={{ top: 0, right: 0, left: 0, bottom: 48 }}
         >
@@ -66,7 +41,7 @@ const InvestingScreen = observer(() => {
             ))}
           </View>
         </ScrollView>
-      </ThemedView>
+      </View>
       <PlayerStatus tabScreen />
     </>
   );

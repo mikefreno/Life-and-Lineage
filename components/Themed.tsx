@@ -37,7 +37,7 @@ export function useThemeColor(
   if (colorFromProps) {
     return colorFromProps;
   } else {
-    return Colors[colorScheme as "light" | "dark"][colorName];
+    return Colors[colorScheme][colorName];
   }
 }
 
@@ -53,6 +53,7 @@ export function Text(props: TextProps) {
     />
   );
 }
+
 export function CursiveText(props: TextProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const color = useThemeColor({ light: "black", dark: "white" }, "text");
@@ -90,21 +91,21 @@ export function HandwrittenText(props: TextProps) {
   );
 }
 
-export function View(props: ViewProps) {
+export function ThemedView(props: ViewProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const backgroundColor = useThemeColor(
     { light: lightColor, dark: darkColor },
-    "background",
+    "accent",
   );
 
   return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
 }
 
-export function SafeAreaView(props: SafeAreaViewProps) {
+export function ThemedSafeAreaView(props: SafeAreaViewProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const backgroundColor = useThemeColor(
     { light: lightColor, dark: darkColor },
-    "background",
+    "accent",
   );
 
   return (
@@ -112,11 +113,11 @@ export function SafeAreaView(props: SafeAreaViewProps) {
   );
 }
 
-export function ScrollView(props: ScrollViewProps) {
+export function ThemedScrollView(props: ScrollViewProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const backgroundColor = useThemeColor(
     { light: lightColor, dark: darkColor },
-    "background",
+    "accent",
   );
 
   return (

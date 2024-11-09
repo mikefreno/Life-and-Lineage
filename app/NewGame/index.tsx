@@ -1,8 +1,8 @@
-import { Pressable, useColorScheme, View } from "react-native";
-import { ScrollView, Text, View as ThemedView } from "../../components/Themed";
+import { Pressable, View } from "react-native";
+import { ThemedScrollView, Text, ThemedView } from "../../components/Themed";
 import "../../assets/styles/globals.css";
 import { useContext, useLayoutEffect, useRef, useState } from "react";
-import { Stack, router } from "expo-router";
+import { router } from "expo-router";
 import { useVibration } from "../../utility/customHooks";
 import { AppContext } from "../_layout";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -20,18 +20,19 @@ import GenericModal from "../../components/GenericModal";
 import { wait } from "../../utility/functions/misc";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
+import { useColorScheme } from "nativewind";
 
 const SetClassScreen = observer(() => {
   const [selectedClass, setSelectedClass] = useState<
     "mage" | "necromancer" | "paladin" | "ranger"
   >();
   let classRef = useRef<"mage" | "necromancer" | "paladin" | "ranger">();
-  const colorScheme = useColorScheme();
   const vibration = useVibration();
 
   const appData = useContext(AppContext);
   if (!appData) throw new Error("missing context!");
   const { gameState, dimensions } = appData;
+  const { colorScheme } = useColorScheme();
 
   const isFocused = useIsFocused();
 
@@ -89,7 +90,7 @@ const SetClassScreen = observer(() => {
           </Pressable>
         </ThemedView>
       </GenericModal>
-      <ScrollView>
+      <ThemedScrollView>
         <ThemedView className="flex-1 items-center px-[6vw]">
           <Text className="bold pt-[4vh] text-center text-3xl">
             Create a Character
@@ -257,7 +258,7 @@ const SetClassScreen = observer(() => {
             </View>
           )}
         </ThemedView>
-      </ScrollView>
+      </ThemedScrollView>
       {((gameState && gameState.tutorialsEnabled) || !gameState) && (
         <View className="absolute ml-4 mt-4">
           <Pressable

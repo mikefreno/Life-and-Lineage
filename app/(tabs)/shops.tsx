@@ -1,5 +1,4 @@
 import { Pressable, ScrollView, View } from "react-native";
-import { Text } from "../../components/Themed";
 import { Shop } from "../../classes/shop";
 import { CharacterImage } from "../../components/CharacterImage";
 import shopObjects from "../../assets/json/shops.json";
@@ -14,7 +13,7 @@ import { AppContext } from "../_layout";
 import { TutorialOption } from "../../utility/types";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
-import D20DieAnimation from "../../components/DieRollAnim";
+import { Text } from "../../components/Themed";
 
 const ShopsScreen = observer(() => {
   const appData = useContext(AppContext);

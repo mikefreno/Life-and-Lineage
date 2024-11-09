@@ -15,7 +15,7 @@ import { Game } from "../classes/game";
 import { PlayerCharacter } from "../classes/character";
 import { Enemy } from "../classes/creatures";
 import { Dimensions, Platform, StyleSheet } from "react-native";
-import { View as ThemedView } from "../components/Themed";
+import { ThemedView } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
@@ -26,7 +26,7 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { wait } from "../utility/functions/misc";
+import { toTitleCase, wait } from "../utility/functions/misc";
 import { API_BASE_URL } from "../config/config";
 import { fullLoad } from "../utility/functions/save_load";
 import { SystemBars } from "react-native-edge-to-edge";
@@ -364,11 +364,11 @@ const RootLayout = observer(() => {
           }}
         />
         <Stack.Screen
-          name="Auth"
+          name="Options"
           options={headerOptions({ presentation: "modal" })}
         />
         <Stack.Screen
-          name="Options"
+          name="Auth"
           options={headerOptions({ presentation: "modal" })}
         />
         <Stack.Screen
@@ -379,8 +379,46 @@ const RootLayout = observer(() => {
           })}
         />
         <Stack.Screen
+          name="Study"
+          options={headerOptions({
+            title: "Magic Study",
+            colorScheme,
+            headerBackTitleVisible: false,
+          })}
+        />
+        <Stack.Screen
+          name="Education"
+          options={headerOptions({
+            colorScheme,
+            blur: true,
+            headerBackTitleVisible: false,
+          })}
+        />
+        <Stack.Screen
+          name="Activities"
+          options={headerOptions({
+            colorScheme,
+            blur: true,
+            headerBackTitleVisible: false,
+          })}
+        />
+        <Stack.Screen
+          name="Investing"
+          options={headerOptions({
+            colorScheme,
+            blur: true,
+            headerBackTitleVisible: false,
+          })}
+        />
+        <Stack.Screen
           name="Shops/[shop]"
-          options={headerOptions({ colorScheme, shop: true })}
+          options={headerOptions({
+            colorScheme,
+            blur: true,
+            title: toTitleCase(
+              (pathname.split("/")[2] ?? "").replaceAll("%20", " "),
+            ),
+          })}
         />
         <Stack.Screen
           name="NewGame/index"
@@ -402,6 +440,13 @@ const RootLayout = observer(() => {
           name="NewGame/Review/[...slug]"
           options={headerOptions({ title: "Review" })}
         />
+        <Stack.Screen
+          name="DeathScreen"
+          options={{
+            ...headerOptions({ title: "You Died" }),
+            headerShown: false,
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );
@@ -410,7 +455,7 @@ export default Sentry.wrap(Root);
 
 const headerOptions = ({
   colorScheme,
-  shop,
+  blur,
   title,
   presentation,
   headerBackTitleVisible = true,
@@ -424,12 +469,13 @@ const headerOptions = ({
     | "fullScreenModal"
     | "formSheet"
     | "card";
-  shop?: boolean;
+  blur?: boolean;
   title?: string;
   headerBackTitleVisible?: boolean;
 }) =>
-  shop
+  blur
     ? {
+        title: title,
         headerBackTitleVisible: false,
         headerTransparent: true,
         headerTitleStyle: {
@@ -454,8 +500,8 @@ const headerOptions = ({
       }
     : {
         title: title,
-        presentation: presentation,
         headerBackTitleVisible: headerBackTitleVisible,
+        presentation: presentation,
         headerTitleStyle: {
           fontFamily: "PixelifySans",
           fontSize: 22,

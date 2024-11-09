@@ -1,5 +1,5 @@
 import { Pressable, View } from "react-native";
-import { Text, View as ThemedView } from "../../../components/Themed";
+import { ThemedView, Text } from "../../../components/Themed";
 import { useContext, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";

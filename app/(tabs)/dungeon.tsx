@@ -1,4 +1,4 @@
-import { Text, View as ThemedView } from "../../components/Themed";
+import { ThemedView, Text } from "../../components/Themed";
 import {
   Pressable,
   ScrollView,
@@ -14,7 +14,6 @@ import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { DungeonInstance } from "../../classes/dungeon";
 import { toTitleCase } from "../../utility/functions/misc";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
 import ThemedCard from "../../components/ThemedCard";
@@ -117,7 +116,7 @@ const DungeonScreen = observer(() => {
           The dungeon is a dangerous place. Be careful.
         </Text>
       </PlatformDependantBlurView>
-      <ThemedView
+      <View
         className="flex-1"
         style={{
           paddingTop: headerHeight + warningHeight,
@@ -206,7 +205,7 @@ const DungeonScreen = observer(() => {
             </ThemedCard>
           ))}
         </ScrollView>
-      </ThemedView>
+      </View>
     </>
   );
 });

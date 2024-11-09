@@ -1,5 +1,5 @@
 import { Pressable, ScrollView, View } from "react-native";
-import { View as ThemedView, Text } from "../components/Themed";
+import { ThemedView, Text } from "../components/Themed";
 import { Activity, BadOutcome, GoodOutcome } from "../utility/types";
 import { useColorScheme } from "nativewind";
 import {

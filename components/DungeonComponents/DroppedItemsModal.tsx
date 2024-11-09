@@ -1,8 +1,8 @@
 import { router } from "expo-router";
 import GenericModal from "../GenericModal";
 import { Item } from "../../classes/item";
-import { Pressable, View, Image } from "react-native";
 import { Text } from "../Themed";
+import { Pressable, View, Image } from "react-native";
 import { toTitleCase, wait } from "../../utility/functions/misc";
 import { useContext } from "react";
 import { AppContext } from "../../app/_layout";

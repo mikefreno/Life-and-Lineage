@@ -1,12 +1,12 @@
 import React, { ReactNode } from "react";
 import { FlatList, View, ViewStyle } from "react-native";
-import { Text } from "./Themed";
 import { Link } from "expo-router";
 import SpellDetails from "./SpellDetails";
 import { Element, ElementToString, PlayerClassOptions } from "../utility/types";
 import { ClassDescriptionMap, DescriptionMap } from "../utility/descriptions";
 import { elementalColorMap, playerClassColors } from "../constants/Colors";
 import { Spell } from "../classes/spell";
+import { Text } from "./Themed";
 
 // Import spell data
 import mageSpells from "../assets/json/mageSpells.json";

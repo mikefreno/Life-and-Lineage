@@ -1,4 +1,4 @@
-import { ScrollView, View as ThemedView } from "../../components/Themed";
+import { ThemedScrollView, ThemedView } from "../../components/Themed";
 import healthOptions from "../../assets/json/medicalOptions/healthOptions.json";
 import manaOptions from "../../assets/json/medicalOptions/manaOptions.json";
 import sanityOptions from "../../assets/json/medicalOptions/sanityOptions.json";
@@ -8,7 +8,7 @@ import { useContext } from "react";
 import { AppContext } from "../_layout";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
@@ -24,7 +24,7 @@ const MedicalScreen = observer(() => {
   const { isCompact } = appData;
 
   return (
-    <ThemedView className="flex-1">
+    <>
       <TutorialModal
         tutorial={TutorialOption.medical}
         isFocused={isFocused}
@@ -37,11 +37,11 @@ const MedicalScreen = observer(() => {
           body: "Using items such as potions, or using spells will not tick the clock forward.",
         }}
       />
-      <ThemedView className="flex-1">
+      <View className="flex-1">
         <ScrollView
           scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
         >
-          <ThemedView
+          <View
             className="px-2"
             style={{
               paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
@@ -94,10 +94,10 @@ const MedicalScreen = observer(() => {
                 ))}
               </View>
             </View>
-          </ThemedView>
+          </View>
         </ScrollView>
-      </ThemedView>
-    </ThemedView>
+      </View>
+    </>
   );
 });
 export default MedicalScreen;

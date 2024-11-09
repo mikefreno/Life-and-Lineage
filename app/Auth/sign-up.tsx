@@ -7,7 +7,6 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { Text } from "../../components/Themed";
 import { useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
@@ -20,7 +19,7 @@ import { router } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { API_BASE_URL } from "../../config/config";
 import D20DieAnimation from "../../components/DieRollAnim";
-import { View as ThemedView } from "../../components/Themed";
+import { ThemedView, Text } from "../../components/Themed";
 import { useHeaderHeight } from "@react-navigation/elements";
 
 const SignUpScreen = observer(() => {

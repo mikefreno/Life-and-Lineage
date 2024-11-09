@@ -1,13 +1,11 @@
-import { View as ThemedView, Text, ScrollView } from "../components/Themed";
+import { ThemedView, Text } from "../components/Themed";
 import "../assets/styles/globals.css";
-import { Pressable, Image, Platform, StyleSheet, View } from "react-native";
+import { Pressable, Image, View, ScrollView } from "react-native";
 import { Item } from "../classes/item";
 import { toTitleCase } from "../utility/functions/misc";
 import ProgressBar from "../components/ProgressBar";
 import SpellDetails from "../components/SpellDetails";
 import PlayerStatus from "../components/PlayerStatus";
-import { Stack } from "expo-router";
-import { BlurView } from "expo-blur";
 import GenericRaisedButton from "../components/GenericRaisedButton";
 import {
   Element,
@@ -20,7 +18,6 @@ import { AppContext } from "./_layout";
 import { Spell } from "../classes/spell";
 import { elementalColorMap } from "../constants/Colors";
 import { useContext, useEffect, useState } from "react";
-import { useColorScheme } from "nativewind";
 import { useIsFocused } from "@react-navigation/native";
 import { useVibration } from "../utility/customHooks";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -31,7 +28,6 @@ export default function LearningKnowledgeScreen() {
     throw new Error("missing context");
   }
   const { playerState, gameState, dimensions } = appData;
-  const { colorScheme } = useColorScheme();
 
   const books = playerState?.inventory.filter(
     (item) => item.itemClass == ItemClassType.Book,
@@ -96,29 +92,6 @@ export default function LearningKnowledgeScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: "Magic Study",
-          headerBackTitleVisible: false,
-          headerTransparent: true,
-          headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-          headerBackground: () => (
-            <BlurView
-              blurReductionFactor={12}
-              tint={
-                Platform.OS == "android"
-                  ? colorScheme == "light"
-                    ? "light"
-                    : "dark"
-                  : "default"
-              }
-              intensity={100}
-              style={StyleSheet.absoluteFill}
-              experimentalBlurMethod={"dimezisBlurView"}
-            />
-          ),
-        }}
-      />
       <GenericModal
         isVisibleCondition={showMasteryLevelTooLow != null}
         backFunction={() => setShowMasteryLevelTooLow(null)}
@@ -142,7 +115,7 @@ export default function LearningKnowledgeScreen() {
           </>
         )}
       </GenericModal>
-      <ThemedView className="flex-1 justify-between pb-20">
+      <View className="flex-1 justify-between pb-20">
         <View
           style={{
             paddingTop: headerHeight,
@@ -243,7 +216,7 @@ export default function LearningKnowledgeScreen() {
             </View>
           )}
         </View>
-      </ThemedView>
+      </View>
       <PlayerStatus tabScreen />
     </>
   );

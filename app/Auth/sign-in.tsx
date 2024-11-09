@@ -7,7 +7,6 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { Text } from "../../components/Themed";
 import { useState } from "react";
 import { useColorScheme } from "nativewind";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
@@ -18,7 +17,7 @@ import { API_BASE_URL } from "../../config/config";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { GoogleIcon } from "../../assets/icons/SVGIcons";
 import D20DieAnimation from "../../components/DieRollAnim";
-import { View as ThemedView } from "../../components/Themed";
+import { ThemedView, Text } from "../../components/Themed";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { wait } from "../../utility/functions/misc";
 import * as Updates from "expo-updates";

@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, Animated, Easing } from "react-native";
+import { Text } from "./Themed";
 import { rollD20 } from "../utility/functions/misc";
 import { D20SVG } from "../assets/icons/SVGIcons";
-import { Text } from "./Themed";
 
 interface D20DieAnimationProps {
   keepRolling?: boolean;

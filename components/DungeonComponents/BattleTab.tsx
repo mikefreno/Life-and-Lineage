@@ -1,4 +1,4 @@
-import { View as ThemedView, Text, ScrollView } from "../Themed";
+import { ThemedView, ThemedScrollView, Text } from "../Themed";
 import {
   Pressable,
   FlatList,
@@ -415,7 +415,7 @@ const TabRender = ({
               }}
             >
               {Platform.OS == "web" ? (
-                <ScrollView>
+                <ThemedScrollView>
                   {logsState
                     .slice()
                     .reverse()
@@ -427,7 +427,7 @@ const TabRender = ({
                           .replaceAll(`The ${playerState.fullName}`, "You")}
                       </Text>
                     ))}
-                </ScrollView>
+                </ThemedScrollView>
               ) : (
                 <FlatList
                   inverted

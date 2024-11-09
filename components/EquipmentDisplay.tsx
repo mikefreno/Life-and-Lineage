@@ -1,6 +1,6 @@
 import { RefObject, useContext, useState } from "react";
 import { View, Image, Pressable } from "react-native";
-import { Text, View as ThemedView } from "./Themed";
+import { Text, ThemedView } from "./Themed";
 import Draggable from "react-native-draggable";
 import type { Item } from "../classes/item";
 import { useVibration } from "../utility/customHooks";

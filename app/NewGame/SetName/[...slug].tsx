@@ -1,12 +1,11 @@
 import {
   Keyboard,
   KeyboardAvoidingView,
-  Platform,
   TextInput,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { View as ThemedView, Text } from "../../../components/Themed";
+import { ThemedView, Text } from "../../../components/Themed";
 import { useContext, useRef, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { toTitleCase } from "../../../utility/functions/misc";

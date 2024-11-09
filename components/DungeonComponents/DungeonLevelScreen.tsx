@@ -1,4 +1,4 @@
-import { View as ThemedView, Text } from "../../components/Themed";
+import { ThemedView, Text } from "../../components/Themed";
 import { View, Platform } from "react-native";
 import { useContext, useRef, useEffect, useState } from "react";
 import { Pressable } from "react-native";
@@ -151,7 +151,7 @@ const DungeonLevelScreen = observer(() => {
             <TargetSelection />
           </>
         </GenericModal>
-        <ThemedView className="flex-1" style={{ paddingBottom: 84 }}>
+        <View className="flex-1" style={{ paddingBottom: 84 }}>
           {enemyState && !firstLoad ? (
             <DungeonEnemyDisplay />
           ) : !inCombat && !firstLoad ? (
@@ -209,7 +209,7 @@ const DungeonLevelScreen = observer(() => {
               />
             </View>
           )}
-        </ThemedView>
+        </View>
         <PlayerStatus positioning={"absolute"} classname="bottom-0" />
       </>
     );

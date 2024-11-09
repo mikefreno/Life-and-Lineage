@@ -1,9 +1,8 @@
 import { View, Animated, Image } from "react-native";
 import { toTitleCase } from "../../utility/functions/misc";
-import { Text } from "../Themed";
 import ProgressBar from "../ProgressBar";
 import GenericStrikeAround from "../GenericStrikeAround";
-import { View as ThemedView } from "../Themed";
+import { ThemedView, Text } from "../Themed";
 import { EnemyImage } from "../EnemyImage";
 import FadeOutNode from "../FadeOutNode";
 import { memo, useContext, useEffect, useMemo, useRef, useState } from "react";
