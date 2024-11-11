@@ -26,6 +26,7 @@ import { TutorialOption } from "../utility/types";
 import { useIsFocused } from "@react-navigation/native";
 import { dungeonSave } from "../utility/functions/save_load";
 import { throttle } from "lodash";
+import { useLocalSearchParams } from "expo-router";
 
 const DungeonCoreContext = createContext<
   | {
@@ -143,25 +144,11 @@ const TutorialStateContext = createContext<
   | undefined
 >(undefined);
 
-const DungeonUtilsContext = createContext<
-  | {
-      battleLogger: (whatHappened: string) => void;
-    }
-  | undefined
->(undefined);
-
-export const TILE_SIZE = Math.max(
-  Number((Dimensions.get("screen").width / 10).toFixed(0)),
-  Number((Dimensions.get("screen").height / 10).toFixed(0)),
-);
-
-const DungeonCoreProvider = ({
-  children,
-  slug,
-}: {
-  children: ReactNode;
-  slug: string[];
-}) => {
+const DungeonCoreProvider = ({ children }: { children: ReactNode }) => {
+  const { slug } = useLocalSearchParams();
+  if (!Array.isArray(slug)) {
+    throw new Error(`slug needs to be an array! Received ${slug}`);
+  }
   const [thisInstance, setThisInstance] = useState<DungeonInstance>();
   const [thisDungeon, setThisDungeon] = useState<DungeonLevel>();
   const { gameState, enemyState, setEnemy } = useGameState();
@@ -471,45 +458,14 @@ const TutorialStateProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-const DungeonUtilsProvider = ({
-  children,
-  logsState,
-}: {
-  children: ReactNode;
-  logsState: string[];
-}) => {
-  const battleLogger = (whatHappened: string) => {
-    const timeOfLog = new Date().toLocaleTimeString();
-    const log = `${timeOfLog}: ${whatHappened}`;
-    logsState.push(log);
-  };
+export const DungeonProvider = ({ children }: { children: ReactNode }) => {
   return (
-    <DungeonUtilsContext.Provider value={{ battleLogger }}>
-      {children}
-    </DungeonUtilsContext.Provider>
-  );
-};
-
-export const DungeonProvider = ({
-  children,
-  logsState,
-  slug,
-}: {
-  children: ReactNode;
-  logsState: string[];
-  slug: string[];
-}) => {
-  return (
-    <DungeonCoreProvider slug={slug}>
+    <DungeonCoreProvider>
       <CombatStateProvider>
         <EnemyAnimationStateProvider>
           <LootStateProvider>
             <MapStateProvider>
-              <TutorialStateProvider>
-                <DungeonUtilsProvider logsState={logsState}>
-                  {children}
-                </DungeonUtilsProvider>
-              </TutorialStateProvider>
+              <TutorialStateProvider>{children}</TutorialStateProvider>
             </MapStateProvider>
           </LootStateProvider>
         </EnemyAnimationStateProvider>
@@ -564,9 +520,7 @@ export const useTutorialState = () => {
   return context;
 };
 
-export const useDungeonUtils = () => {
-  const context = useContext(DungeonUtilsContext);
-  if (!context)
-    throw new Error("useDungeonUtils must be used within DungeonUtilsProvider");
-  return context;
-};
+export const TILE_SIZE = Math.max(
+  Number((Dimensions.get("screen").width / 10).toFixed(0)),
+  Number((Dimensions.get("screen").height / 10).toFixed(0)),
+);

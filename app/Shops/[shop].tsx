@@ -82,6 +82,7 @@ const ShopInteriorScreen = observer(() => {
   const { blockSize } = useLayout();
   const { position, isDragging, iconString, setIconString } =
     useDraggableDataState();
+
   const vibration = useVibration();
   const colors = shopObjects.find((shopObj) => shopObj.type == shop)?.colors;
   const thisShop = gameState?.shops.find((aShop) => aShop.archetype == shop);

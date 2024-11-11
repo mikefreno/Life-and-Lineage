@@ -162,23 +162,20 @@ export const useEnemyManagement = () => {
     slug,
   ]);
 
-  const enemyMinionsTurn = useCallback(
-    (
-      suppliedMinions: Minion[],
-      enemyState: Enemy | null,
-      playerState: PlayerCharacter,
-    ) => {
-      if (!enemyState || !playerState) return;
+  const enemyMinionsTurn = (
+    suppliedMinions: Minion[],
+    enemyState: Enemy | null,
+    playerState: PlayerCharacter,
+  ) => {
+    if (!enemyState || !playerState) return;
 
-      suppliedMinions.forEach((minion, index) => {
-        wait(1000 * index).then(() => {
-          const res = minion.takeTurn({ target: playerState });
-          battleLogger("(minion) " + res.logString);
-        });
+    suppliedMinions.forEach((minion, index) => {
+      wait(1000 * index).then(() => {
+        const res = minion.takeTurn({ target: playerState });
+        battleLogger("(minion) " + res.logString);
       });
-    },
-    [],
-  );
+    });
+  };
 
   const handleEnemyAction = useCallback(
     (
@@ -289,7 +286,7 @@ export const useEnemyManagement = () => {
   const enemyTurn = useCallback(() => {
     const dead = enemyDeathHandler();
     if (!dead) {
-      enemyTurn();
+      enemyAction();
     }
     setTimeout(() => setAttackAnimationOnGoing(false), 1000);
   }, [enemyDeathHandler, enemyAction]);

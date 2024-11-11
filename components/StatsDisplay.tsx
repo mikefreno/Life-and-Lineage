@@ -74,8 +74,6 @@ export function StatsDisplay({
   const [firstItem, setFirstItem] = useState<Item>(displayItem.item[0]);
   const [renderStory, setRenderStory] = useState<string | null>(null);
 
-  const { enemyTurn } = useEnemyManagement();
-
   useEffect(() => {
     if (dimensions.width === dimensions.lesser) {
       const blockSize = Math.min(dimensions.height / 5, dimensions.width / 7.5);
@@ -348,6 +346,7 @@ export function StatsDisplay({
               <GenericFlatButton
                 onPressFunction={() => {
                   if (enemyState) {
+                    const { enemyTurn } = useEnemyManagement();
                     firstItem.use(enemyTurn);
                   } else {
                     firstItem.use();

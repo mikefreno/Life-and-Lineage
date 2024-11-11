@@ -188,7 +188,6 @@ export default function NewGameReview() {
       }
       setGameData(newGame);
       setPlayerCharacter(player);
-      setLogs([]);
       vibration({ style: "success" });
       wait(250).then(() => clearHistory(navigation));
       saveGame(newGame);

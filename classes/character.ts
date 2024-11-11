@@ -1873,7 +1873,7 @@ export class PlayerCharacter extends Character {
       const fullHeal = new Attack({
         name: "DevHeal",
         user: this,
-        selfDamage: 400,
+        selfDamage: -9999,
       });
       let attacks = [fullHeal, ...this.equipment.mainHand.attachedAttacks];
       const spells = this.equipment.mainHand.providedSpells;

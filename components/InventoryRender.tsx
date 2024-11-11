@@ -7,7 +7,11 @@ import { checkReleasePositionProps } from "../utility/types";
 import { Shop } from "../classes/shop";
 import { Text } from "./Themed";
 import { InventoryItem } from "./Draggable";
-import { useGameState, useLayout } from "../stores/AppData";
+import {
+  useDraggableDataState,
+  useGameState,
+  useLayout,
+} from "../stores/AppData";
 
 type InventoryRenderBase = {
   selfRef?: RefObject<View>;
@@ -54,7 +58,7 @@ type InventoryRenderHome = InventoryRenderBase & {
 
 type InventoryRenderDungeon = InventoryRenderBase & {
   pouchTarget: RefObject<View>;
-  addItemToPouch: (item: Item[]) => void;
+  addItemToPouch: ({ items }: { items: Item[] }) => void;
 };
 
 type InventoryRenderShop = InventoryRenderBase & {
@@ -82,6 +86,7 @@ export default function InventoryRender({
   const vibration = useVibration();
   const { playerState } = useGameState();
   const { dimensions, blockSize, setBlockSize } = useLayout();
+  const { position, isDragging } = useDraggableDataState();
 
   const onLayoutView = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
@@ -319,6 +324,8 @@ export default function InventoryRender({
                       checkReleasePosition={checkReleasePosition}
                       displayItem={displayItem}
                       setIconString={setIconString}
+                      position={position}
+                      isDragging={isDragging}
                     />
                   </View>
                 </View>
@@ -395,9 +402,10 @@ export default function InventoryRender({
                         blockSize={blockSize ?? 0}
                         setDisplayItem={setDisplayItem}
                         checkReleasePosition={checkReleasePosition}
-                        dragStore={dragStore}
                         displayItem={displayItem}
                         setIconString={setIconString}
+                        position={position}
+                        isDragging={isDragging}
                       />
                     </View>
                   </View>

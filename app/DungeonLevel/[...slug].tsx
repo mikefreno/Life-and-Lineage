@@ -22,6 +22,7 @@ import { TutorialOption } from "../../utility/types";
 import { useIsFocused } from "@react-navigation/native";
 import { useGameState } from "../../stores/AppData";
 import {
+  DungeonProvider,
   useCombatState,
   useDungeonCore,
   useLootState,
@@ -197,4 +198,10 @@ const DungeonLevelScreen = observer(() => {
   }
 });
 
-export default DungeonLevelScreen;
+export default function DungeonWrapper() {
+  return (
+    <DungeonProvider>
+      <DungeonLevelScreen />
+    </DungeonProvider>
+  );
+}
