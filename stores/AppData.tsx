@@ -44,6 +44,8 @@ const LayoutContext = createContext<
       setBlockSize: React.Dispatch<React.SetStateAction<number | undefined>>;
       showDetailedStatusView: boolean;
       setShowDetailedStatusView: React.Dispatch<React.SetStateAction<boolean>>;
+      modalShowing: boolean;
+      setModalShowing: React.Dispatch<React.SetStateAction<boolean>>;
     }
   | undefined
 >(undefined);
@@ -133,6 +135,10 @@ const LayoutProvider = ({ children }: { children: ReactNode }) => {
   }));
   const [showDetailedStatusView, setShowDetailedStatusView] =
     useState<boolean>(false);
+  const [modalShowing, setModalShowing] = useState<boolean>(false);
+  useEffect(() => {
+    console.log(modalShowing);
+  }, [modalShowing]);
 
   const onChange = useCallback(
     ({
@@ -183,6 +189,8 @@ const LayoutProvider = ({ children }: { children: ReactNode }) => {
         dimensions,
         blockSize,
         setBlockSize,
+        modalShowing,
+        setModalShowing,
       }}
     >
       {children}
@@ -208,13 +216,12 @@ const DraggableDataProvider = ({ children }: { children: ReactNode }) => {
       iconString,
       setIconString,
     }),
-    [],
+    [iconString],
   );
 
   return <DragContext.Provider value={store}>{children}</DragContext.Provider>;
 };
 
-// Root provider composition
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   return (
     <GameStateProvider>

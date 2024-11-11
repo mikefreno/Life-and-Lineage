@@ -60,7 +60,8 @@ export default function NewGameReview() {
   const lastName = slug[4];
   const vibration = useVibration();
 
-  const { gameState, setGameData, setPlayerCharacter } = useGameState();
+  const { gameState, setGameData, setPlayerCharacter, setEnemy } =
+    useGameState();
   const navigation = useNavigation();
   const { colorScheme } = useColorScheme();
 
@@ -187,6 +188,7 @@ export default function NewGameReview() {
         newGame.setColorScheme(colorScheme);
       }
       setGameData(newGame);
+      setEnemy(null);
       setPlayerCharacter(player);
       vibration({ style: "success" });
       wait(250).then(() => clearHistory(navigation));

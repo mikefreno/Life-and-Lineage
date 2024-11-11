@@ -67,12 +67,6 @@ const HomeScreen = observer(() => {
     const name = playerState.fullName;
     return (
       <>
-        <ProjectedImage
-          blockSize={blockSize ?? 0}
-          iconString={iconString}
-          position={position}
-          isDragging={isDragging}
-        />
         <TutorialModal
           tutorial={TutorialOption.intro}
           isFocused={useIsFocused()}
@@ -268,6 +262,7 @@ const HomeScreen = observer(() => {
             </View>
           )}
         </View>
+        <ProjectedImage />
       </>
     );
   }

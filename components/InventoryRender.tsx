@@ -86,7 +86,6 @@ export default function InventoryRender({
   const vibration = useVibration();
   const { playerState } = useGameState();
   const { dimensions, blockSize, setBlockSize } = useLayout();
-  const { position, isDragging } = useDraggableDataState();
 
   const onLayoutView = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
@@ -195,7 +194,7 @@ export default function InventoryRender({
               setDisplayItem(null);
               vibration({ style: "light", essential: true });
               playerState?.removeFromInventory(itemStack);
-              addItemToPouch(itemStack);
+              addItemToPouch({ items: itemStack });
               return false;
             }
           },
@@ -318,14 +317,10 @@ export default function InventoryRender({
                   <View>
                     <InventoryItem
                       item={item.item}
-                      vibration={vibration}
-                      blockSize={blockSize ?? 0}
                       setDisplayItem={setDisplayItem}
                       checkReleasePosition={checkReleasePosition}
                       displayItem={displayItem}
-                      setIconString={setIconString}
-                      position={position}
-                      isDragging={isDragging}
+                      isDraggable={!!item.item[0].slot}
                     />
                   </View>
                 </View>
@@ -398,14 +393,9 @@ export default function InventoryRender({
                     <View>
                       <InventoryItem
                         item={[item]}
-                        vibration={vibration}
-                        blockSize={blockSize ?? 0}
                         setDisplayItem={setDisplayItem}
                         checkReleasePosition={checkReleasePosition}
                         displayItem={displayItem}
-                        setIconString={setIconString}
-                        position={position}
-                        isDragging={isDragging}
                       />
                     </View>
                   </View>

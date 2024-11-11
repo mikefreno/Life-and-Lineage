@@ -102,7 +102,7 @@ export default function FleeModal({
                 inCombat && (attackAnimationOnGoing || playerState.isStunned)
               }
             >
-              {enemyState ? "Run!" : "Leave"}
+              {enemyState ? "Run! (50%)" : "Leave"}
             </GenericFlatButton>
             <GenericFlatButton
               onPressFunction={() => {

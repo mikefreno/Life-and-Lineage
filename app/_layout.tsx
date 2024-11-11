@@ -19,7 +19,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AuthProvider } from "../stores/auth/Auth";
 import * as Notifications from "expo-notifications";
 import { registerForPushNotificationsAsync } from "../utility/functions/notifications";
-import { AppProvider, useGameState } from "../stores/AppData";
+import { AppProvider, useGameState, useLayout } from "../stores/AppData";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -65,6 +65,7 @@ const RootLayout = observer(() => {
     CursiveBold: require("../assets/fonts/Tangerine-Bold.ttf"),
   });
   const { playerState, gameState, appDataLoading } = useGameState();
+  const { modalShowing } = useLayout();
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
 
@@ -132,7 +133,7 @@ const RootLayout = observer(() => {
           (playerState.currentHealth <= 0 || playerState.currentSanity <= -50))
       ) {
         if (pathname !== "/DeathScreen")
-          wait(500).then(() => {
+          wait(modalShowing ? 600 : 0).then(() => {
             while (router.canGoBack()) {
               router.back();
             }

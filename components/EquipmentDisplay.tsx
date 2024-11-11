@@ -1,11 +1,11 @@
-import { RefObject, useState } from "react";
-import { View, Image, Pressable } from "react-native";
-import { Text, ThemedView } from "./Themed";
-import Draggable from "react-native-draggable";
+import { RefObject } from "react";
+import { View, Image } from "react-native";
+import { Text } from "./Themed";
 import type { Item } from "../classes/item";
 import { useVibration } from "../utility/customHooks";
 import { checkReleasePositionProps } from "../utility/types";
 import { useGameState, useLayout } from "../stores/AppData";
+import { InventoryItem } from "./Draggable";
 
 interface EquipmentDisplayProps {
   headTarget: RefObject<View>;
@@ -39,7 +39,6 @@ export default function EquipmentDisplay({
   offHandTarget,
   inventoryTarget,
   quiverTarget,
-  displayItem,
   setDisplayItem,
 }: EquipmentDisplayProps) {
   const vibration = useVibration();
@@ -99,11 +98,13 @@ export default function EquipmentDisplay({
               } else {
                 playerState?.equipItem(itemStack);
               }
+              return false;
             }
           },
         );
       });
     }
+    return true;
   }
 
   interface EquipmentSlotProps {
@@ -111,7 +112,6 @@ export default function EquipmentDisplay({
   }
 
   const EquipmentSlot = ({ slot }: EquipmentSlotProps) => {
-    const [buzzed, setBuzzed] = useState<boolean>(false);
     let ref: RefObject<View>;
     let itemStack: Item[] = [];
     if (playerState) {
@@ -156,74 +156,12 @@ export default function EquipmentDisplay({
               className="z-50 mx-auto border border-zinc-400 rounded-lg"
               style={{ height: blockSize, width: blockSize }}
             >
-              <Draggable
-                onDragRelease={(_, g) => {
-                  checkReleasePosition({
-                    itemStack,
-                    xPos: g.moveX,
-                    yPos: g.moveY,
-                    size: blockSize,
-                    equipped: true,
-                  });
-                  setBuzzed(false);
-                }}
-                onDrag={() => {
-                  if (!buzzed) {
-                    vibration({ style: "medium", essential: true });
-                    setBuzzed(true);
-                  }
-                }}
-                shouldReverse
-              >
-                <Pressable
-                  onPress={() => {
-                    vibration({ style: "light" });
-                    if (
-                      displayItem &&
-                      displayItem.item[0].equals(itemStack[0])
-                    ) {
-                      setDisplayItem(null);
-                    } else {
-                      ref.current?.measureInWindow((x, y) => {
-                        setDisplayItem({
-                          item: itemStack,
-                          positon: { left: x, top: y },
-                        });
-                      });
-                    }
-                  }}
-                  className="active:scale-90 active:opacity-50"
-                >
-                  <View
-                    className={`${
-                      itemStack[0].playerHasRequirements
-                        ? "bg-zinc-400"
-                        : "bg-red-800"
-                    } items-center rounded-lg`}
-                    ref={ref}
-                    style={{
-                      height: blockSize,
-                      width: blockSize,
-                      marginLeft: -1,
-                      marginTop: -1,
-                    }}
-                  >
-                    <Image
-                      className="my-auto z-top"
-                      source={itemStack[0].getItemIcon()}
-                      style={{
-                        height: Math.min(blockSize * 0.65, 52),
-                        width: Math.min(blockSize * 0.65, 52),
-                      }}
-                    />
-                    {itemStack[0].stackable && itemStack.length > 1 && (
-                      <ThemedView className="absolute bottom-0 right-0 bg-opacity-50 rounded px-1">
-                        <Text>{itemStack.length}</Text>
-                      </ThemedView>
-                    )}
-                  </View>
-                </Pressable>
-              </Draggable>
+              <InventoryItem
+                item={itemStack}
+                displayItem={null}
+                checkReleasePosition={checkReleasePosition}
+                setDisplayItem={setDisplayItem}
+              />
             </View>
           ) : slot === "Off-Hand" && isTwoHanded ? (
             <View

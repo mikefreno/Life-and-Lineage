@@ -52,7 +52,6 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.5",
-    "react-native-draggable": "git@github.com:mikefreno/react-native-draggable.git",
     "react-native-easing-gradient": "^1.1.1",
     "react-native-edge-to-edge": "^1.0.1",
     "react-native-gesture-handler": "~2.16.1",

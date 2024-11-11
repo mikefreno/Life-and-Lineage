@@ -11,8 +11,9 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useRef } from "react";
 import { checkReleasePositionProps } from "../utility/types";
 import { itemMap, type Item } from "../classes/item";
-import type { VibrateProps } from "../utility/customHooks";
+import { useVibration } from "../utility/customHooks";
 import { ThemedView, Text } from "./Themed";
+import { useDraggableDataState, useLayout } from "../stores/AppData";
 
 type DraggableProps = {
   children: React.ReactNode;
@@ -20,7 +21,7 @@ type DraggableProps = {
   onDrag?: (x: number, y: number) => void;
   onDragEnd?: (x: number, y: number) => void;
   shouldSnapBack: SharedValue<boolean>;
-  enabled?: boolean;
+  isDraggable?: boolean;
   x?: number;
   y?: number;
 };
@@ -31,7 +32,7 @@ const Draggable = ({
   onDrag,
   onDragEnd,
   shouldSnapBack,
-  enabled = true,
+  isDraggable = true,
   x: initialX = 0,
   y: initialY = 0,
 }: DraggableProps) => {
@@ -48,7 +49,7 @@ const Draggable = ({
   };
 
   const gesture = Gesture.Pan()
-    .enabled(enabled)
+    .enabled(isDraggable)
     .onStart((e) => {
       isDragging.value = true;
       if (onDragStart) {
@@ -118,38 +119,29 @@ export type ShopSetDisplayItem = React.Dispatch<
 
 const InventoryItem = ({
   item,
-  blockSize,
-  vibration,
-  position,
-  isDragging,
   displayItem,
   setDisplayItem,
   checkReleasePosition,
-  setIconString,
+  isDraggable,
 }: {
   item: Item[];
-  blockSize: number;
-  vibration: ({ style, essential }: VibrateProps) => void;
   displayItem: ShopDisplayItem;
   setDisplayItem: ShopSetDisplayItem;
-  position: {
-    x: SharedValue<number>;
-    offsetX: SharedValue<number>;
-    y: SharedValue<number>;
-    offsetY: SharedValue<number>;
-  };
-  isDragging: SharedValue<boolean>;
   checkReleasePosition: ({
     itemStack,
     xPos,
     yPos,
     size,
+    equipped,
   }: checkReleasePositionProps) => boolean;
-  setIconString: React.Dispatch<React.SetStateAction<string | null>>;
+  isDraggable?: boolean;
 }) => {
   const ref = useRef<View>(null);
   const opacity = useSharedValue(1);
   const shouldSnapBack = useSharedValue(false);
+  const { isDragging, position, setIconString } = useDraggableDataState();
+  const vibration = useVibration();
+  const { blockSize } = useLayout();
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -202,6 +194,7 @@ const InventoryItem = ({
       }}
       onDragEnd={handleDragEnd}
       shouldSnapBack={shouldSnapBack}
+      isDraggable={isDraggable}
     >
       <Animated.View style={animatedStyle}>
         <Pressable ref={ref} onPress={handlePress}>
@@ -231,22 +224,10 @@ const InventoryItem = ({
   );
 };
 
-const ProjectedImage = ({
-  position,
-  blockSize,
-  iconString,
-  isDragging,
-}: {
-  position: {
-    x: SharedValue<number>;
-    offsetX: SharedValue<number>;
-    y: SharedValue<number>;
-    offsetY: SharedValue<number>;
-  };
-  isDragging: SharedValue<boolean>;
-  blockSize: number;
-  iconString: string | null;
-}) => {
+const ProjectedImage = () => {
+  const { position, isDragging, iconString } = useDraggableDataState();
+  const { blockSize } = useLayout();
+
   const animatedStyle = useAnimatedStyle(() => {
     "worklet";
     return {
@@ -262,7 +243,7 @@ const ProjectedImage = ({
     };
   });
 
-  if (!iconString) {
+  if (!iconString || !blockSize) {
     return null;
   }
 

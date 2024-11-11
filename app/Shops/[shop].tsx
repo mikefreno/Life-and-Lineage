@@ -260,12 +260,7 @@ const ShopInteriorScreen = observer(() => {
           }}
         />
 
-        <ProjectedImage
-          blockSize={blockSize}
-          iconString={iconString}
-          position={position}
-          isDragging={isDragging}
-        />
+        <ProjectedImage />
         <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
           <View className="flex-1 justify-between">
             <View className="flex h-[40%] flex-row justify-between">
@@ -316,14 +311,9 @@ const ShopInteriorScreen = observer(() => {
                         <InventoryItem
                           key={item.item[0].id}
                           item={item.item}
-                          blockSize={blockSize}
-                          position={position}
-                          isDragging={isDragging}
-                          vibration={vibration}
                           displayItem={displayItem}
                           setDisplayItem={setDisplayItem}
                           checkReleasePosition={checkReleasePosition}
-                          setIconString={setIconString}
                         />
                       </View>
                     </Pressable>

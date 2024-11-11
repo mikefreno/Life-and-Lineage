@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import {
   Dimensions,
   Platform,
@@ -8,6 +8,7 @@ import {
 import Modal from "react-native-modal";
 import { ThemedView } from "./Themed";
 import { useColorScheme } from "nativewind";
+import { useGameState, useLayout } from "../stores/AppData";
 
 interface GenericModalProps {
   isVisibleCondition: boolean;
@@ -27,7 +28,7 @@ interface GenericModalProps {
  * Use something like:
  ```ts
  setShowModal(false);
- wait(600).then(()=>{
+ wait(750).then(()=>{
      setShowSecondModal(true);
  })
  ```
@@ -43,15 +44,23 @@ export default function GenericModal({
 }: GenericModalProps) {
   const height = Dimensions.get("window").height;
   const { colorScheme } = useColorScheme();
+  const { gameState } = useGameState();
+  const { setModalShowing } = useLayout();
+
+  useEffect(() => {
+    if (isVisibleCondition && !gameState?.atDeathScreen) {
+      setModalShowing(true);
+    }
+  }, [isVisibleCondition, gameState?.atDeathScreen]);
 
   return (
     <Modal
       animationIn="slideInUp"
       animationOut="slideOutDown"
-      animationInTiming={600}
+      animationInTiming={300}
       animationOutTiming={300}
-      backdropTransitionOutTiming={Platform.OS === "android" ? 600 : 300}
-      backdropTransitionInTiming={Platform.OS === "android" ? 0 : 300}
+      backdropTransitionOutTiming={300}
+      backdropTransitionInTiming={300}
       backdropColor={
         Platform.OS == "ios"
           ? "#000000"
@@ -59,7 +68,7 @@ export default function GenericModal({
           ? "#ffffffff"
           : "#000000"
       }
-      isVisible={isVisibleCondition}
+      isVisible={isVisibleCondition && !gameState?.atDeathScreen}
       backdropOpacity={0.5}
       onBackdropPress={backdropCloses ? backFunction : undefined}
       onBackButtonPress={backFunction}
