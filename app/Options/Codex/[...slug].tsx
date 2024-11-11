@@ -1,5 +1,4 @@
 import { Href, Stack, router, useLocalSearchParams } from "expo-router";
-import { ThemedView } from "../../../components/Themed";
 import { Pressable, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../../constants/Colors";

@@ -1,10 +1,9 @@
 import { Pressable, ScrollView, View } from "react-native";
-import { ThemedScrollView, Text, ThemedView } from "../../components/Themed";
+import { Text, ThemedView } from "../../components/Themed";
 import "../../assets/styles/globals.css";
-import { useContext, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { router } from "expo-router";
 import { useVibration } from "../../utility/customHooks";
-import { AppContext } from "../_layout";
 import { FontAwesome5 } from "@expo/vector-icons";
 import TutorialModal from "../../components/TutorialModal";
 import {
@@ -21,6 +20,7 @@ import { wait } from "../../utility/functions/misc";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
 import { useColorScheme } from "nativewind";
+import { useGameState, useLayout } from "../../stores/AppData";
 
 const SetClassScreen = observer(() => {
   const [selectedClass, setSelectedClass] = useState<
@@ -29,9 +29,8 @@ const SetClassScreen = observer(() => {
   let classRef = useRef<"mage" | "necromancer" | "paladin" | "ranger">();
   const vibration = useVibration();
 
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing context!");
-  const { gameState, dimensions } = appData;
+  const { gameState } = useGameState();
+  const { dimensions } = useLayout();
   const { colorScheme } = useColorScheme();
 
   const isFocused = useIsFocused();

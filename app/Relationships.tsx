@@ -1,14 +1,13 @@
 import { Text } from "../components/Themed";
 import { calculateAge, wait } from "../utility/functions/misc";
 import { CharacterImage } from "../components/CharacterImage";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Character } from "../classes/character";
 import ProgressBar from "../components/ProgressBar";
 import { CharacterInteractionModal } from "../components/CharacterInteractionModal";
 import { FlatList, Pressable, ScrollView, View } from "react-native";
 import GiftModal from "../components/GiftModal";
-import { AppContext } from "./_layout";
 import { AffectionIcon } from "../assets/icons/SVGIcons";
 import GenericModal from "../components/GenericModal";
 import { Stack } from "expo-router";
@@ -16,13 +15,11 @@ import { FontAwesome6 } from "@expo/vector-icons";
 import GenericRaisedButton from "../components/GenericRaisedButton";
 import { observer } from "mobx-react-lite";
 import GenericStrikeAround from "../components/GenericStrikeAround";
+import { useGameState, useLayout } from "../stores/AppData";
 
 const RelationshipsScreen = observer(() => {
-  const appData = useContext(AppContext);
-  if (!appData) {
-    throw new Error("missing context");
-  }
-  const { playerState, gameState, dimensions } = appData;
+  const { playerState, gameState } = useGameState();
+  const { dimensions } = useLayout();
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null,
   );

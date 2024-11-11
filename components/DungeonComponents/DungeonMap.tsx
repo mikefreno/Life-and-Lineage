@@ -3,10 +3,14 @@ import Svg, { Rect } from "react-native-svg";
 import { Dimensions, View } from "react-native";
 import GenericRaisedButton from "../GenericRaisedButton";
 import { useColorScheme } from "nativewind";
-import { DungeonContext, TILE_SIZE } from "./DungeonContext";
 import PlatformDependantBlurView from "../PlatformDependantBlurView";
-import { getEnemy, loadBoss } from "./DungeonInteriorFunctions";
-import { AppContext } from "../../app/_layout";
+import {
+  TILE_SIZE,
+  useDungeonCore,
+  useMapState,
+} from "../../stores/DungeonData";
+import { useLayout } from "../../stores/AppData";
+import { useEnemyManagement } from "../../utility/customHooks";
 
 /**
  * Represents a tile in the dungeon map.
@@ -169,9 +173,7 @@ export const getBoundingBox = (
  * Renders the dungeon map made by `generateTiles`.
  */
 export const DungeonMapRender = () => {
-  const dungeonData = useContext(DungeonContext);
-  if (!dungeonData) throw new Error("missing context");
-  const { mapDimensions, currentPosition, tiles } = dungeonData;
+  const { mapDimensions, currentPosition, tiles } = useMapState();
   const { colorScheme } = useColorScheme();
   const strokeWidth = 1;
 
@@ -260,12 +262,12 @@ export const DungeonMapRender = () => {
  * Renders the controls for moving around the dungeon.
  */
 export const DungeonMapControls = () => {
-  const dungeonData = useContext(DungeonContext);
-  const appData = useContext(AppContext);
-  if (!dungeonData || !appData) throw new Error("missing context");
-  const { currentPosition, setCurrentPosition, setInCombat, tiles, setTiles } =
-    dungeonData;
-  const { dimensions } = appData;
+  const { currentPosition, setCurrentPosition, tiles, setTiles } =
+    useMapState();
+  const { setInCombat } = useDungeonCore();
+  const { dimensions } = useLayout();
+  const { loadBoss, getEnemy } = useEnemyManagement();
+
   const isMoveValid = (direction: keyof typeof directionsMapping) => {
     if (!currentPosition) return false;
 
@@ -303,10 +305,10 @@ export const DungeonMapControls = () => {
 
       if (!newPosition.clearedRoom) {
         if (newPosition.isBossRoom) {
-          loadBoss({ appData, dungeonData });
+          loadBoss();
           setInCombat(true);
         } else {
-          getEnemy({ appData, dungeonData });
+          getEnemy();
           setInCombat(true);
         }
       }

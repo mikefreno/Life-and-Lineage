@@ -1,18 +1,15 @@
 import { useLocalSearchParams } from "expo-router";
-import { ThemedView, Text } from "../../components/Themed";
+import { Text, ThemedScrollView } from "../../components/Themed";
 import { CharacterImage } from "../../components/CharacterImage";
 import {
   Pressable,
-  Image,
-  ScrollView,
   View,
   TouchableWithoutFeedback,
   Animated,
 } from "react-native";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Item } from "../../classes/item";
 import { useIsFocused } from "@react-navigation/native";
-import { AppContext } from "../_layout";
 import { useVibration } from "../../utility/customHooks";
 import { observer } from "mobx-react-lite";
 import TutorialModal from "../../components/TutorialModal";
@@ -22,16 +19,30 @@ import { calculateAge } from "../../utility/functions/misc";
 import InventoryRender from "../../components/InventoryRender";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import { Coins } from "../../assets/icons/SVGIcons";
-import { TutorialOption } from "../../utility/types";
+import { TutorialOption, checkReleasePositionProps } from "../../utility/types";
 import ProgressBar from "../../components/ProgressBar";
 import { saveGame } from "../../utility/functions/save_load";
+import Colors from "../../constants/Colors";
+import { useColorScheme } from "nativewind";
+import { InventoryItem, ProjectedImage } from "../../components/Draggable";
+import {
+  useDraggableDataState,
+  useGameState,
+  useLayout,
+} from "../../stores/AppData";
 
 const TEN_MINUTES = 10 * 60 * 1000;
 //const ONE_SECOND = 1000;
 //const REFRESH_TIME = __DEV__ ? ONE_SECOND : TEN_MINUTES;
 const REFRESH_TIME = TEN_MINUTES;
 
-const GreetingComponent = ({ greeting }: { greeting: string }) => {
+const GreetingComponent = ({
+  greeting,
+  colorScheme,
+}: {
+  greeting: string;
+  colorScheme: "light" | "dark";
+}) => {
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -53,13 +64,12 @@ const GreetingComponent = ({ greeting }: { greeting: string }) => {
 
   return (
     <Animated.View
-      style={[
-        {
-          zIndex: 999,
-          opacity: fadeAnim,
-        },
-      ]}
-      className="border absolute shadow-lg rounded-md p-2 bg-[#fafafa] dark:bg-[#000000]"
+      style={{
+        borderColor: Colors[colorScheme].tint,
+        zIndex: 999,
+        opacity: fadeAnim,
+      }}
+      className="border absolute shadow-lg rounded-md p-2 bg-[#fafafa] dark:bg-[#000000] dark:border-[]"
     >
       <Text className="text-center">{greeting}</Text>
     </Animated.View>
@@ -68,9 +78,10 @@ const GreetingComponent = ({ greeting }: { greeting: string }) => {
 
 const ShopInteriorScreen = observer(() => {
   const { shop } = useLocalSearchParams();
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing game context");
-  const { gameState, playerState, blockSize } = appData;
+  const { gameState, playerState } = useGameState();
+  const { blockSize } = useLayout();
+  const { position, isDragging, iconString, setIconString } =
+    useDraggableDataState();
   const vibration = useVibration();
   const colors = shopObjects.find((shopObj) => shopObj.type == shop)?.colors;
   const thisShop = gameState?.shops.find((aShop) => aShop.archetype == shop);
@@ -90,6 +101,14 @@ const ShopInteriorScreen = observer(() => {
   const isFocused = useIsFocused();
 
   const header = useHeaderHeight();
+  const { colorScheme } = useColorScheme();
+
+  const [inventoryBounds, setInventoryBounds] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null>(null);
 
   useEffect(() => {
     if (inventoryFullNotifier) {
@@ -112,8 +131,32 @@ const ShopInteriorScreen = observer(() => {
     }
   }, [playerState]);
 
-  while (!blockSize) {
-    return <></>;
+  function checkReleasePosition({
+    itemStack,
+    xPos,
+    yPos,
+    size,
+  }: checkReleasePositionProps) {
+    if (itemStack && thisShop && playerState && inventoryBounds) {
+      const isWidthAligned =
+        xPos + size / 2 >= inventoryBounds.x &&
+        xPos - size / 2 <= inventoryBounds.x + inventoryBounds.width;
+      const isHeightAligned =
+        yPos + size / 2 >= inventoryBounds.y &&
+        yPos - size / 2 <= inventoryBounds.y + inventoryBounds.height;
+
+      if (isWidthAligned && isHeightAligned) {
+        setDisplayItem(null);
+        vibration({ style: "light", essential: true });
+        const price = itemStack[0].getBuyPrice(thisShop.shopKeeper.affection);
+        if (price <= playerState.gold) {
+          playerState.buyItem(itemStack, price);
+          thisShop.sellItem(itemStack, price);
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   function sellAllJunk() {
@@ -188,52 +231,9 @@ const ShopInteriorScreen = observer(() => {
     saveGame(gameState);
   };
 
-  interface ItemRenderProps {
-    item: Item[];
-  }
-
-  const ItemRender = ({ item }: ItemRenderProps) => {
-    const localRef = useRef<View>(null);
-
-    const handlePress = () => {
-      vibration({ style: "light" });
-      if (displayItem && displayItem.item[0].equals(item[0])) {
-        setDisplayItem(null);
-      } else {
-        localRef.current?.measureInWindow((x, y) => {
-          setDisplayItem({
-            item,
-            side: "shop",
-            positon: { left: x, top: y },
-          });
-        });
-      }
-    };
-
+  if (initialized && thisShop && gameState && playerState && blockSize) {
     return (
-      <Pressable
-        className="z-10 h-14 w-14 items-center justify-center rounded-lg bg-zinc-400 active:scale-90 active:opacity-50"
-        ref={localRef}
-        onPress={handlePress}
-        style={{
-          width: blockSize,
-          height: blockSize,
-        }}
-      >
-        <Image
-          source={item[0].getItemIcon()}
-          style={{
-            width: Math.min(blockSize * 0.65, 40),
-            height: Math.min(blockSize * 0.65, 40),
-          }}
-        />
-      </Pressable>
-    );
-  };
-
-  if (initialized && thisShop && gameState && playerState) {
-    return (
-      <ThemedView className="h-full">
+      <>
         <TutorialModal
           tutorial={TutorialOption.shopInterior}
           isFocused={isFocused}
@@ -259,9 +259,15 @@ const ShopInteriorScreen = observer(() => {
           }}
         />
 
+        <ProjectedImage
+          blockSize={blockSize}
+          iconString={iconString}
+          position={position}
+          isDragging={isDragging}
+        />
         <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
-          <ThemedView className="flex-1 justify-between">
-            <ThemedView className="flex h-[40%] flex-row justify-between">
+          <View className="flex-1 justify-between">
+            <View className="flex h-[40%] flex-row justify-between">
               <View className="items-center w-1/3 my-auto px-1">
                 <CharacterImage
                   characterAge={calculateAge(
@@ -270,7 +276,10 @@ const ShopInteriorScreen = observer(() => {
                   )}
                   characterSex={thisShop.shopKeeper.sex == "male" ? "M" : "F"}
                 />
-                <GreetingComponent greeting={greeting} />
+                <GreetingComponent
+                  greeting={greeting}
+                  colorScheme={colorScheme}
+                />
                 <Text className="text-center">
                   {thisShop.shopKeeper.fullName}'s Inventory
                 </Text>
@@ -286,28 +295,41 @@ const ShopInteriorScreen = observer(() => {
                 />
               </View>
               <View
-                className="px-2 -mt-1 shadow-soft w-2/3 rounded-l border-l border-b border-zinc-300 dark:border-zinc-700"
+                className="shadow-soft w-2/3 rounded-l border-l border-b border-zinc-300 dark:border-zinc-700"
                 ref={shopInventoryTarget}
               >
-                <ScrollView className="my-auto">
-                  <View className="flex flex-row flex-wrap justify-around">
-                    {thisShop.getInventory().map((item) => (
-                      <View
-                        key={item.item[0].id}
-                        className="m-2 w-1/4 items-center active:scale-90 active:opacity-50"
-                      >
-                        <ItemRender item={item.item} />
-                        {item.item[0].stackable && item.item.length > 1 && (
-                          <ThemedView className="absolute z-50 bottom-0 right-1 bg-opacity-50 rounded px-1">
-                            <Text>{item.item.length}</Text>
-                          </ThemedView>
-                        )}
+                <ThemedScrollView
+                  onScrollBeginDrag={() => setDisplayItem(null)}
+                  className="px-2 h-full"
+                  contentContainerClassName="flex flex-row flex-wrap justify-around"
+                >
+                  {thisShop.getInventory().map((item) => (
+                    <Pressable
+                      key={item.item[0].id}
+                      style={{
+                        height: blockSize * 1.4,
+                        width: blockSize * 1.5,
+                      }}
+                    >
+                      <View className="flex-1 justify-center items-center">
+                        <InventoryItem
+                          key={item.item[0].id}
+                          item={item.item}
+                          blockSize={blockSize}
+                          position={position}
+                          isDragging={isDragging}
+                          vibration={vibration}
+                          displayItem={displayItem}
+                          setDisplayItem={setDisplayItem}
+                          checkReleasePosition={checkReleasePosition}
+                          setIconString={setIconString}
+                        />
                       </View>
-                    ))}
-                  </View>
-                </ScrollView>
+                    </Pressable>
+                  ))}
+                </ThemedScrollView>
               </View>
-            </ThemedView>
+            </View>
             <View className="flex-1 mx-2 mt-4">
               <View className="flex flex-row justify-center py-4 dark:border-zinc-700">
                 <Text className=" text-center">
@@ -329,8 +351,9 @@ const ShopInteriorScreen = observer(() => {
                   ) : null}
                 </View>
               </View>
-              <View className="h-[85%]">
+              <View className="h-[85%] w-full" collapsable={false}>
                 <InventoryRender
+                  setInventoryBounds={setInventoryBounds}
                   selfRef={inventoryTarget}
                   shopInventoryTarget={shopInventoryTarget}
                   inventory={playerState.getInventory()}
@@ -339,10 +362,11 @@ const ShopInteriorScreen = observer(() => {
                   sellStack={sellStack}
                   displayItem={displayItem}
                   setDisplayItem={setDisplayItem}
+                  setIconString={setIconString}
                 />
               </View>
             </View>
-          </ThemedView>
+          </View>
         </TouchableWithoutFeedback>
         {displayItem && (
           <View className="absolute z-10">
@@ -358,8 +382,9 @@ const ShopInteriorScreen = observer(() => {
             />
           </View>
         )}
-      </ThemedView>
+      </>
     );
   }
 });
+
 export default ShopInteriorScreen;

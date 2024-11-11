@@ -4,19 +4,15 @@ import { Enemy, Minion } from "../../classes/creatures";
 import { EnemyImage } from "../EnemyImage";
 import ProgressBar from "../ProgressBar";
 import { toTitleCase } from "../../utility/functions/misc";
-import { useContext } from "react";
-import { AppContext } from "../../app/_layout";
-import { DungeonContext } from "./DungeonContext";
-import { use } from "./DungeonInteriorFunctions";
-import { useIsFocused } from "@react-navigation/native";
+import { useGameState } from "../../stores/AppData";
+import { useCombatState } from "../../stores/DungeonData";
+import { useCombatActions } from "../../utility/customHooks";
 
 export default function TargetSelectionRender() {
-  const appData = useContext(AppContext);
-  const dungeonData = useContext(DungeonContext);
-  if (!appData || !dungeonData) throw new Error("missing context");
-  const { enemyState } = appData;
-  const { showTargetSelection, setShowTargetSelection } = dungeonData;
-  const isFocused = useIsFocused();
+  const { enemyState } = useGameState();
+  const { showTargetSelection, setShowTargetSelection } = useCombatState();
+  const { useAttack } = useCombatActions();
+
   if (enemyState) {
     let targets: (Enemy | Minion)[] = [];
     targets.push(enemyState);
@@ -31,12 +27,9 @@ export default function TargetSelectionRender() {
             key={target.id}
             onPress={() => {
               if (showTargetSelection.chosenAttack) {
-                use({
+                useAttack({
                   attackOrSpell: showTargetSelection.chosenAttack,
                   target,
-                  dungeonData,
-                  appData,
-                  isFocused,
                 });
                 setShowTargetSelection({
                   showing: false,

@@ -1,11 +1,8 @@
-import { ThemedScrollView, ThemedView } from "../../components/Themed";
 import healthOptions from "../../assets/json/medicalOptions/healthOptions.json";
 import manaOptions from "../../assets/json/medicalOptions/manaOptions.json";
 import sanityOptions from "../../assets/json/medicalOptions/sanityOptions.json";
 import otherOptions from "../../assets/json/medicalOptions/otherOptions.json";
 import MedicalOption from "../../components/MedicalOptions";
-import { useContext } from "react";
-import { AppContext } from "../_layout";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { ScrollView, View } from "react-native";
@@ -14,14 +11,11 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import { TutorialOption } from "../../utility/types";
 import { observer } from "mobx-react-lite";
+import { useLayout } from "../../stores/AppData";
 
 const MedicalScreen = observer(() => {
-  const appData = useContext(AppContext);
-  if (!appData) {
-    throw new Error("Missing Context");
-  }
   const isFocused = useIsFocused();
-  const { isCompact } = appData;
+  const { isCompact } = useLayout();
 
   return (
     <>

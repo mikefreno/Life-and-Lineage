@@ -3,7 +3,11 @@ import { authStore } from "./authStore";
 
 const AuthContext = createContext(authStore);
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("Missing AuthProvider");
+  return context as NonNullable<typeof context>;
+};
 
 interface AuthProviderProps {
   children: ReactNode;

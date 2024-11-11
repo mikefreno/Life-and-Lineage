@@ -1,7 +1,6 @@
 import { ThemedView, Text } from "../../components/Themed";
 import { router } from "expo-router";
-import { useContext, useEffect, useState } from "react";
-import { AppContext } from "../_layout";
+import { useEffect, useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc";
 import { Pressable, Switch, View } from "react-native";
 import { useVibration } from "../../utility/customHooks";
@@ -10,6 +9,7 @@ import GenericStrikeAround from "../../components/GenericStrikeAround";
 import GenericModal from "../../components/GenericModal";
 import * as Updates from "expo-updates";
 import D20DieAnimation from "../../components/DieRollAnim";
+import { useGameState } from "../../stores/AppData";
 
 const healthWarningOptions: Record<number, string> = {
   0.5: "50%",
@@ -30,9 +30,7 @@ const healthWarningVals = [
 const healthWarningKeys = [0.5, 0.25, 0.2, 0.15, 0.1, 0];
 
 export default function GameSettings() {
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing context!");
-  const { gameState } = appData;
+  const { gameState } = useGameState();
   const vibration = useVibration();
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,

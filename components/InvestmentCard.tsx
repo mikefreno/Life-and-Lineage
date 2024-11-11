@@ -2,7 +2,7 @@ import { useColorScheme } from "nativewind";
 import { ThemedScrollView, Text } from "./Themed";
 import { InvestmentType, InvestmentUpgrade } from "../utility/types";
 import { Pressable, View, Animated } from "react-native";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toTitleCase, asReadableGold } from "../utility/functions/misc";
 import { Entypo } from "@expo/vector-icons";
 import { Investment } from "../classes/investment";
@@ -10,15 +10,13 @@ import GenericModal from "./GenericModal";
 import { observer } from "mobx-react-lite";
 import { useVibration } from "../utility/customHooks";
 import ThemedCard from "./ThemedCard";
-import { AppContext } from "../app/_layout";
 import GenericStrikeAround from "./GenericStrikeAround";
 import { ClockIcon, Coins, Sanity, Vault } from "../assets/icons/SVGIcons";
+import { useGameState } from "../stores/AppData";
 
 const InvestmentCard = observer(
   ({ investment }: { investment: InvestmentType }) => {
-    const appData = useContext(AppContext);
-    if (!appData) throw new Error("missing context");
-    const { playerState, gameState } = appData;
+    const { playerState, gameState } = useGameState();
 
     const { colorScheme } = useColorScheme();
 

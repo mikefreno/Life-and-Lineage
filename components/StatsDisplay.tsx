@@ -2,15 +2,14 @@ import { LayoutChangeEvent, Pressable, ScrollView, View } from "react-native";
 import { Text, CursiveText, HandwrittenText, CursiveTextBold } from "./Themed";
 import GearStatsDisplay from "./GearStatsDisplay";
 import { useColorScheme } from "nativewind";
-import { useVibration } from "../utility/customHooks";
+import { useEnemyManagement, useVibration } from "../utility/customHooks";
 import { router } from "expo-router";
 import { Item } from "../classes/item";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Shop } from "../classes/shop";
 import { asReadableGold, toTitleCase } from "../utility/functions/misc";
 import SpellDetails from "./SpellDetails";
 import GenericFlatButton from "./GenericFlatButton";
-import { AppContext } from "../app/_layout";
 import {
   Coins,
   DexterityIcon,
@@ -24,8 +23,7 @@ import { Attribute, ItemClassType, MasteryToString } from "../utility/types";
 import GenericModal from "./GenericModal";
 import GenericStrikeAround from "./GenericStrikeAround";
 import { Condition } from "../classes/conditions";
-import { DungeonContext } from "./DungeonComponents/DungeonContext";
-import { enemyTurn } from "./DungeonComponents/DungeonInteriorFunctions";
+import { useGameState, useLayout } from "../stores/AppData";
 
 type BaseProps = {
   displayItem: {
@@ -66,17 +64,17 @@ export function StatsDisplay({
 }: StatsDisplayProps) {
   const { colorScheme } = useColorScheme();
   const vibration = useVibration();
+  const { dimensions } = useLayout();
+  const { playerState, enemyState } = useGameState();
 
-  const dungeonData = useContext(DungeonContext);
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing context");
-  const { playerState, dimensions } = appData;
   const [viewWidth, setViewWidth] = useState(dimensions.width * 0.4);
   const [viewHeight, setViewHeight] = useState(dimensions.height * 0.2);
   const [blockSize, setBlockSize] = useState<number>();
   const [showingAttacks, setShowingAttacks] = useState<boolean>(false);
   const [firstItem, setFirstItem] = useState<Item>(displayItem.item[0]);
   const [renderStory, setRenderStory] = useState<string | null>(null);
+
+  const { enemyTurn } = useEnemyManagement();
 
   useEffect(() => {
     if (dimensions.width === dimensions.lesser) {
@@ -349,8 +347,8 @@ export function StatsDisplay({
             ) && (
               <GenericFlatButton
                 onPressFunction={() => {
-                  if (dungeonData) {
-                    firstItem.use(() => enemyTurn({ appData, dungeonData }));
+                  if (enemyState) {
+                    firstItem.use(enemyTurn);
                   } else {
                     firstItem.use();
                   }

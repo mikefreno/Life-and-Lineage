@@ -8,13 +8,11 @@ import {
 } from "react-native";
 import Colors, { elementalColorMap } from "../../constants/Colors";
 import { useColorScheme } from "nativewind";
-import { useContext } from "react";
 import { useVibration } from "../../utility/customHooks";
 import { BlurView } from "expo-blur";
 import { StyleSheet } from "react-native";
 import PlayerStatus, { EXPANDED_PAD } from "../../components/PlayerStatus";
 import { LinearGradientBlur } from "../../components/LinearGradientBlur";
-import { AppContext } from "../_layout";
 import {
   BookSparkles,
   BowlingBallAndPin,
@@ -36,18 +34,18 @@ import { ThemedView } from "../../components/Themed";
 import TutorialModal from "../../components/TutorialModal";
 import { useIsFocused } from "@react-navigation/native";
 import { TutorialOption } from "../../utility/types";
+import { useGameState, useLayout } from "../../stores/AppData";
 
 const PLAYERSTATUS_SPACER = 64;
 const TABSELECTOR_HEIGHT = 64;
 
 export default function TabLayout() {
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing context");
-
   const isFocused = useIsFocused();
 
   const { colorScheme } = useColorScheme();
-  const { playerState, setShowDetailedStatusView, isCompact } = appData;
+  const { playerState } = useGameState();
+  const { isCompact } = useLayout();
+  const { setShowDetailedStatusView } = useLayout();
   const vibration = useVibration();
 
   return (

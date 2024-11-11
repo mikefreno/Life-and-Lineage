@@ -1,286 +1,200 @@
-import { useContext, useEffect, useState } from "react";
-import { View } from "react-native";
-import { useLocalSearchParams } from "expo-router";
-import { DungeonInstance, DungeonLevel } from "../../classes/dungeon";
-import { Item } from "../../classes/item";
-import { AppContext } from "../../app/_layout";
+import { ThemedView, Text } from "../../components/Themed";
+import { View, Platform } from "react-native";
+import { useRef, useEffect, useState } from "react";
+import { Pressable } from "react-native";
+import { Stack } from "expo-router";
+import BattleTab from "../../components/DungeonComponents/BattleTab";
+import { toTitleCase } from "../../utility/functions/misc";
+import PlayerStatus from "../../components/PlayerStatus";
+import ProgressBar from "../../components/ProgressBar";
 import { observer } from "mobx-react-lite";
-import {
-  type BoundingBox,
-  type Tile,
-  generateTiles,
-  getBoundingBox,
-} from "../../components/DungeonComponents/DungeonMap";
-import {
-  DungeonContext,
-  TILE_SIZE,
-} from "../../components/DungeonComponents/DungeonContext";
-import DungeonLevelScreen from "../../components/DungeonComponents/DungeonLevelScreen";
-import { enemyGenerator } from "../../utility/enemy";
-import { getSexFromName } from "../../utility/functions/characterAid";
-import { wait, flipCoin } from "../../utility/functions/misc";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useColorScheme } from "nativewind";
 import TutorialModal from "../../components/TutorialModal";
-import { Attack } from "../../classes/attack";
-import { Spell } from "../../classes/spell";
+import GenericModal from "../../components/GenericModal";
+import BattleTabControls from "../../components/DungeonComponents/BattleTabControls";
+import FleeModal from "../../components/DungeonComponents/FleeModal";
+import TargetSelection from "../../components/DungeonComponents/TargetSelection";
+import DroppedItemsModal from "../../components/DungeonComponents/DroppedItemsModal";
+import LeftBehindItemsModal from "../../components/DungeonComponents/LeftBehindItemsModal";
+import { SackIcon } from "../../assets/icons/SVGIcons";
 import { TutorialOption } from "../../utility/types";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { useIsFocused } from "@react-navigation/native";
+import { useGameState } from "../../stores/AppData";
+import {
+  useCombatState,
+  useDungeonCore,
+  useLootState,
+} from "../../stores/DungeonData";
+import DungeonEnemyDisplay from "../../components/DungeonComponents/DungeonEnemyDisplay";
+import { DungeonMapRender } from "../../components/DungeonComponents/DungeonMap";
+import { StatsDisplay } from "../../components/StatsDisplay";
+import { usePouch } from "../../utility/customHooks";
 
-const DungeonProvider = observer(() => {
-  const { slug } = useLocalSearchParams();
-  if (!slug) {
-    return <View>Missing params...</View>;
-  }
+const DungeonLevelScreen = observer(() => {
+  const { colorScheme } = useColorScheme();
+  const { playerState, gameState, enemyState } = useGameState();
 
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing context");
-  const {
-    playerState,
-    gameState,
-    setEnemy,
-    enemyState,
-    logsState,
-    setShowDetailedStatusView,
-  } = appData;
+  const { firstLoad, thisDungeon, thisInstance, slug, level, inCombat } =
+    useDungeonCore();
+  const { setInventoryFullNotifier, displayItem, setDisplayItem } =
+    useLootState();
+  const { showTargetSelection, setShowTargetSelection } = useCombatState();
+  const { addItemToPouch } = usePouch();
 
-  const [fightingBoss, setFightingBoss] = useState<boolean>(false);
-  const [thisInstance, setThisInstance] = useState<DungeonInstance>();
-  const [thisDungeon, setThisDungeon] = useState<DungeonLevel>();
-  const [leftBehindDrops, setLeftBehindDrops] = useState<Item[]>([]);
-  const [attackAnimationOnGoing, setAttackAnimationOnGoing] =
+  const [battleTab, setBattleTab] = useState<
+    "attacksOrNavigation" | "equipment" | "log"
+  >("attacksOrNavigation");
+  const [showLeftBehindItemsScreen, setShowLeftBehindItemsScreen] =
     useState<boolean>(false);
-  const [enemyAttackDummy, setEnemyAttackDummy] = useState<number>(0);
-  const [enemyDodgeDummy, setEnemyDodgeDummy] = useState<number>(0);
-  const [enemyTextDummy, setEnemyTextDummy] = useState<number>(0);
-  const [enemyTextString, setEnemyTextString] = useState<string>();
-  const [firstLoad, setFirstLoad] = useState<boolean>(true);
-  const [droppedItems, setDroppedItems] = useState<{
-    itemDrops: Item[];
-    gold: number;
-    storyDrops: Item[];
-  } | null>(null);
-  const [inventoryFullNotifier, setInventoryFullNotifier] =
-    useState<boolean>(false);
-  const [tiles, setTiles] = useState<Tile[]>([]);
-  const [mapDimensions, setMapDimensions] = useState<BoundingBox>({
-    width: TILE_SIZE,
-    height: TILE_SIZE,
-    offsetX: 0,
-    offsetY: 0,
-  });
-  const [inCombat, setInCombat] = useState<boolean>(false);
-  const [currentPosition, setCurrentPosition] = useState<Tile | null>(null);
-  const [showFirstBossKillTutorial, setShowFirstBossKillTutorial] =
-    useState<boolean>(false);
-  const [
-    shouldShowFirstBossKillTutorialAfterItemDrops,
-    setShouldShowFirstBossKillTutorialAfterItemDrops,
-  ] = useState<boolean>(false);
-  const [showTargetSelection, setShowTargetSelection] = useState<{
-    showing: boolean;
-    chosenAttack: Attack | Spell | null;
-  }>({ showing: false, chosenAttack: null });
-
-  const instanceName = slug[0];
-  const level = slug[1];
-
-  const [displayItem, setDisplayItem] = useState<{
-    item: Item[];
-    positon: { left: number; top: number };
-  } | null>(null);
-
   const isFocused = useIsFocused();
 
-  useEffect(() => {
-    if (
-      (instanceName === "Activities" ||
-        instanceName === "Personal" ||
-        instanceName === "training grounds") &&
-      !enemyState &&
-      firstLoad
-    ) {
-      let name: string | undefined = undefined;
-      if (slug.length > 2) {
-        let sex = getSexFromName(slug[2].split(" ")[0]);
-        name =
-          sex === "male"
-            ? "generic npc male"
-            : flipCoin() == "Heads"
-            ? "generic npc femaleA"
-            : "generic npc femaleB";
-      }
-      const enemy = enemyGenerator(instanceName, level, name);
-      if (!enemy) throw new Error(`missing enemy, slug: ${slug}`);
-      setEnemy(enemy);
-      setInCombat(true);
-      setFirstLoad(false);
-    } else {
-      setFirstLoad(false);
-    }
-  }, [slug]);
+  const [fleeModalShowing, setFleeModalShowing] = useState<boolean>(false);
 
-  const header = useHeaderHeight();
+  const pouchRef = useRef<View>(null);
+
+  if (!playerState || !gameState) {
+    throw new Error("No player character or game data on dungeon level");
+  }
 
   useEffect(() => {
-    if (playerState) {
-      if (playerState.currentDungeon && playerState.currentDungeon.dungeonMap) {
-        setTiles(playerState.currentDungeon.dungeonMap);
-        setCurrentPosition(playerState.currentDungeon.currentPosition);
-        setMapDimensions(playerState.currentDungeon.mapDimensions);
-        setEnemy(playerState.currentDungeon.enemy);
-        if (playerState.currentDungeon.enemy) {
-          setFightingBoss(playerState.currentDungeon.fightingBoss);
-          setInCombat(true);
-          setAttackAnimationOnGoing(false);
-        }
-      } else if (thisDungeon) {
-        const generatedTiles = generateTiles({
-          numTiles: thisDungeon.tiles,
-          tileSize: TILE_SIZE,
-          bossDefeated: thisDungeon.bossDefeated ?? false,
-        });
-        setTiles(generatedTiles);
-        const dimensions = getBoundingBox(generatedTiles, TILE_SIZE);
-        setMapDimensions(dimensions);
-        setCurrentPosition(generatedTiles[0]);
-      }
-    }
-  }, [thisDungeon]);
+    setInventoryFullNotifier(false);
+  }, [showLeftBehindItemsScreen]);
 
-  useEffect(() => {
-    if (gameState) {
-      if (instanceName == "Activities" || instanceName == "Personal") {
-        const tempDungeon = new DungeonLevel({
-          level: 0,
-          boss: [],
-          tiles: 0,
-          bossDefeated: true,
-          unlocked: true,
-        });
-        const tempInstance = new DungeonInstance({
-          name: level,
-          levels: [tempDungeon],
-          unlocks: [],
-        });
-        setThisDungeon(tempDungeon);
-        setThisInstance(tempInstance);
-      } else {
-        setThisDungeon(gameState.getDungeon(instanceName, level));
-        setThisInstance(gameState.getInstance(instanceName));
-      }
-    }
-  }, [level, instanceName, gameState]);
-
-  useEffect(() => {
-    if (inventoryFullNotifier) {
-      setTimeout(() => setInventoryFullNotifier(false), 2000);
-    }
-  }, [inventoryFullNotifier]);
-
-  const battleLogger = (whatHappened: string) => {
-    const timeOfLog = new Date().toLocaleTimeString();
-    const log = `${timeOfLog}: ${whatHappened}`;
-    logsState.push(log);
-  };
-
-  useEffect(() => {
-    if (!firstLoad && !enemyState) {
-      if (instanceName !== "Activities" && instanceName !== "Personal") {
-        setInCombat(false);
-      }
-    } else if (enemyState) {
-      setFirstLoad(false);
-    }
-  }, [enemyState]);
-
-  useEffect(() => {
-    if (shouldShowFirstBossKillTutorialAfterItemDrops && !droppedItems) {
-      wait(750).then(() => {
-        setShowFirstBossKillTutorial(true);
-        setShouldShowFirstBossKillTutorialAfterItemDrops(false);
-      });
-    }
-  }, [shouldShowFirstBossKillTutorialAfterItemDrops, droppedItems]);
-
-  if (thisDungeon && thisInstance && gameState) {
+  if (thisDungeon && playerState) {
     return (
-      <DungeonContext.Provider
-        value={{
-          slug,
-          fightingBoss,
-          setFightingBoss,
-          thisDungeon,
-          thisInstance,
-          attackAnimationOnGoing,
-          setAttackAnimationOnGoing,
-          enemyDodgeDummy,
-          setEnemyDodgeDummy,
-          enemyAttackDummy,
-          setEnemyAttackDummy,
-          enemyTextString,
-          setEnemyTextString,
-          inventoryFullNotifier,
-          setInventoryFullNotifier,
-          droppedItems,
-          leftBehindDrops,
-          setDroppedItems,
-          setLeftBehindDrops,
-          firstLoad,
-          setFirstLoad,
-          tiles,
-          setTiles,
-          inCombat,
-          setInCombat,
-          enemyTextDummy,
-          setEnemyTextDummy,
-          currentPosition,
-          setCurrentPosition,
-          mapDimensions,
-          setMapDimensions,
-          level,
-          instanceName,
-          battleLogger,
-          showFirstBossKillTutorial,
-          setShowFirstBossKillTutorial,
-          shouldShowFirstBossKillTutorialAfterItemDrops,
-          setShouldShowFirstBossKillTutorialAfterItemDrops,
-          showTargetSelection,
-          setShowTargetSelection,
-          displayItem,
-          setDisplayItem,
-        }}
-      >
-        {showFirstBossKillTutorial && (
-          <TutorialModal
-            tutorial={TutorialOption.firstBossKill}
-            backFunction={() => {
-              setShowFirstBossKillTutorial(false);
-              wait(750).then(() => {
-                setShowDetailedStatusView(true);
-              });
-            }}
-            onCloseFunction={() => {
-              setShowFirstBossKillTutorial(false);
-              wait(750).then(() => {
-                setShowDetailedStatusView(true);
-              });
-            }}
-            isFocused={isFocused}
-            pageOne={{
-              title: "Well Fought!",
-              body: "You have defeated the first boss! Every boss will reward you with stats points to distribute as you wish.",
-            }}
+      <>
+        <Stack.Screen
+          options={{
+            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 20 },
+            headerLeft: () => (
+              <Pressable
+                onPress={() => {
+                  setFleeModalShowing(true);
+                }}
+              >
+                {({ pressed }) => (
+                  <MaterialCommunityIcons
+                    name="run-fast"
+                    size={28}
+                    color={colorScheme == "light" ? "#18181b" : "#fafafa"}
+                    style={{
+                      opacity: pressed ? 0.5 : 1,
+                      marginRight: Platform.OS == "android" ? 8 : 0,
+                    }}
+                  />
+                )}
+              </Pressable>
+            ),
+            title:
+              slug[0] == "Activities" || slug[0] == "Personal"
+                ? slug[1]
+                : slug[0] === "training grounds"
+                ? "Training Grounds"
+                : `${toTitleCase(thisInstance?.name as string)} Level ${level}`,
+          }}
+        />
+        <TutorialModal
+          tutorial={TutorialOption.dungeonInterior}
+          isFocused={isFocused}
+          pageOne={{
+            title: "Watch Your Health",
+            body: "Your situation can change rapidly.",
+          }}
+          pageTwo={{
+            title: "Advance by killing the boss.",
+            body: "Navigate the dungeon until you find them.",
+          }}
+          pageThree={{
+            title: "Good Luck.",
+            body: "And remember fleeing (top left) can save you.",
+          }}
+        />
+        <FleeModal
+          fleeModalShowing={fleeModalShowing}
+          setFleeModalShowing={setFleeModalShowing}
+        />
+        <DroppedItemsModal />
+        <LeftBehindItemsModal
+          showLeftBehindItemsScreen={showLeftBehindItemsScreen}
+          setShowLeftBehindItemsScreen={setShowLeftBehindItemsScreen}
+        />
+        <GenericModal
+          isVisibleCondition={showTargetSelection.showing}
+          size={100}
+          backFunction={() =>
+            setShowTargetSelection({
+              showing: false,
+              chosenAttack: null,
+            })
+          }
+        >
+          <>
+            <Text className="text-center text-2xl">Choose Your Target</Text>
+            <TargetSelection />
+          </>
+        </GenericModal>
+        <View className="flex-1" style={{ paddingBottom: 84 }}>
+          {enemyState && !firstLoad ? (
+            <DungeonEnemyDisplay />
+          ) : !inCombat && !firstLoad ? (
+            <DungeonMapRender />
+          ) : (
+            <View className="flex-1 justify-center"></View>
+          )}
+          <Pressable
+            ref={pouchRef}
+            className="absolute ml-4 mt-4"
+            onPress={() => setShowLeftBehindItemsScreen(true)}
+          >
+            <SackIcon height={32} width={32} />
+          </Pressable>
+          {inCombat && <View></View>}
+          <View className="flex-1 justify-between">
+            <BattleTab battleTab={battleTab} pouchRef={pouchRef} />
+          </View>
+          <BattleTabControls
+            battleTab={battleTab}
+            setBattleTab={setBattleTab}
           />
-        )}
-        <DungeonLevelScreen />
-      </DungeonContext.Provider>
-    );
-  } else {
-    return (
-      <View className="flex-1 justify-center" style={{ marginTop: -header }}>
-        {/*<D20DieAnimation keepRolling={true} /> */}
-      </View>
+          {playerState.minionsAndPets.length > 0 ? (
+            <ThemedView className="flex flex-row flex-wrap justify-evenly px-4">
+              {playerState.minionsAndPets.map((minion, index) => (
+                <ThemedView
+                  key={minion.id}
+                  className={`${
+                    index == playerState.minionsAndPets.length - 1 &&
+                    playerState.minionsAndPets.length % 2 !== 0
+                      ? "w-full"
+                      : "w-2/5"
+                  } py-1`}
+                >
+                  <Text>{toTitleCase(minion.creatureSpecies)}</Text>
+                  <ProgressBar
+                    filledColor="#ef4444"
+                    unfilledColor="#fee2e2"
+                    value={minion.health}
+                    maxValue={minion.healthMax}
+                  />
+                </ThemedView>
+              ))}
+            </ThemedView>
+          ) : null}
+          {displayItem && (
+            <View className="absolute z-10">
+              <StatsDisplay
+                displayItem={displayItem}
+                clearItem={() => setDisplayItem(null)}
+                addItemToPouch={(items) => addItemToPouch({ items })}
+                topOffset={-96}
+              />
+            </View>
+          )}
+        </View>
+        <PlayerStatus positioning={"absolute"} classname="bottom-0" />
+      </>
     );
   }
 });
-export default DungeonProvider;
+
+export default DungeonLevelScreen;

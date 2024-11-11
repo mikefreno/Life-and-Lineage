@@ -9,13 +9,15 @@ import {
 import { toTitleCase } from "../../utility/functions/misc";
 import { useContext, useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
-import { VibrateProps, useVibration } from "../../utility/customHooks";
+import {
+  VibrateProps,
+  useCombatActions,
+  useEnemyManagement,
+  useVibration,
+} from "../../utility/customHooks";
 import GenericModal from "../GenericModal";
 import SpellDetails from "../SpellDetails";
 import InventoryRender from "../InventoryRender";
-import { AppContext } from "../../app/_layout";
-import { DungeonContext } from "./DungeonContext";
-import { addItemToPouch, pass, use } from "./DungeonInteriorFunctions";
 import { DungeonMapControls } from "./DungeonMap";
 import PlatformDependantBlurView from "../PlatformDependantBlurView";
 import { useIsFocused } from "@react-navigation/native";
@@ -24,7 +26,13 @@ import { Attack } from "../../classes/attack";
 import { Spell } from "../../classes/spell";
 import { Item } from "../../classes/item";
 import { elementalColorMap } from "../../constants/Colors";
-import type { AppContextType, DungeonContextType } from "../../utility/types";
+import { useGameState } from "../../stores/AppData";
+import {
+  useCombatState,
+  useDungeonCore,
+  useEnemyAnimation,
+  useLootState,
+} from "../../stores/DungeonData";
 
 interface BattleTabProps {
   battleTab: "attacksOrNavigation" | "equipment" | "log";
@@ -39,17 +47,15 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
   const [attackDetailsShowing, setAttackDetailsShowing] =
     useState<boolean>(false);
 
-  const appData = useContext(AppContext);
-  const dungeonData = useContext(DungeonContext);
-  if (!appData || !dungeonData) throw new Error("missing context");
-  const { playerState, enemyState } = appData;
-  const {
-    inCombat,
-    setAttackAnimationOnGoing,
-    setShowTargetSelection,
-    displayItem,
-    setDisplayItem,
-  } = dungeonData;
+  const { playerState, enemyState } = useGameState();
+
+  const { inCombat } = useDungeonCore();
+  const {} = useEnemyManagement();
+  const { useAttack } = useCombatActions();
+  const { displayItem, setDisplayItem } = useLootState();
+  const { setAttackAnimationOnGoing } = useEnemyAnimation();
+  const { setShowTargetSelection } = useCombatState();
+
   const [combinedData, setCombinedData] = useState<(Attack | Spell)[]>([]);
   const [hiddenDisplayItem, setHiddenDisplayItem] = useState<{
     item: Item[];
@@ -111,12 +117,9 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
           chosenAttack: attackOrSpell,
         });
       } else {
-        use({
+        useAttack({
           target: enemyState,
           attackOrSpell,
-          appData,
-          dungeonData,
-          isFocused,
         });
       }
     }
@@ -189,6 +192,7 @@ const TabRender = ({
     displayItem,
     setDisplayItem,
   } = dungeonData;
+
   if (playerState) {
     switch (battleTab) {
       case "attacksOrNavigation":

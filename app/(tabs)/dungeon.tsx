@@ -8,7 +8,7 @@ import {
   type LayoutChangeEvent,
 } from "react-native";
 import { router, usePathname } from "expo-router";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useVibration } from "../../utility/customHooks";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
@@ -17,9 +17,9 @@ import { toTitleCase } from "../../utility/functions/misc";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
 import ThemedCard from "../../components/ThemedCard";
-import { AppContext } from "../_layout";
 import { TutorialOption } from "../../utility/types";
 import PlatformDependantBlurView from "../../components/PlatformDependantBlurView";
+import { useGameState } from "../../stores/AppData";
 
 const dangerColorStep = [
   "#fee2e2",
@@ -41,11 +41,7 @@ const levelOffset: Record<string, number> = {
 };
 
 const DungeonScreen = observer(() => {
-  const appData = useContext(AppContext);
-  if (!appData) {
-    throw new Error("Missing Context");
-  }
-  const { gameState } = appData;
+  const { gameState } = useGameState();
   const [instances, _] = useState<DungeonInstance[]>(
     gameState?.dungeonInstances.filter(
       (instance) => instance.name !== "training grounds",

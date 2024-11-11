@@ -1,13 +1,10 @@
-import React, { useContext } from "react";
 import { View } from "react-native";
 import { Text } from "../../components/Themed";
-import { AppContext } from "../_layout";
 import GenericAnimatedPressable from "../../components/GenericAnimatedButton";
+import { useLayout } from "../../stores/AppData";
 
 export default function InAppPurchasePage() {
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing context");
-  const { dimensions } = appData;
+  const { dimensions } = useLayout();
 
   return (
     <View

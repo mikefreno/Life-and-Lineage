@@ -2,9 +2,8 @@ import { Pressable, View, Image } from "react-native";
 import GenericModal from "../GenericModal";
 import { ThemedView, Text } from "../Themed";
 import { Item } from "../../classes/item";
-import { useContext } from "react";
-import { AppContext } from "../../app/_layout";
-import { DungeonContext } from "./DungeonContext";
+import { useGameState } from "../../stores/AppData";
+import { useLootState } from "../../stores/DungeonData";
 
 interface LeftBehindItemsModalProps {
   showLeftBehindItemsScreen: boolean;
@@ -15,16 +14,14 @@ export default function LeftBehindItemsModal({
   showLeftBehindItemsScreen,
   setShowLeftBehindItemsScreen,
 }: LeftBehindItemsModalProps) {
-  const appData = useContext(AppContext);
-  const dungeonData = useContext(DungeonContext);
-  if (!dungeonData || !appData) throw new Error("missing context");
-  const { playerState } = appData;
+  const { playerState } = useGameState();
   const {
     leftBehindDrops,
     setLeftBehindDrops,
     inventoryFullNotifier,
     setInventoryFullNotifier,
-  } = dungeonData;
+  } = useLootState();
+
   function takeItemFromPouch(item: Item) {
     if (playerState) {
       if (playerState.getInventory().length < 24) {

@@ -1,11 +1,11 @@
-import { RefObject, useContext, useState } from "react";
+import { RefObject, useState } from "react";
 import { View, Image, Pressable } from "react-native";
 import { Text, ThemedView } from "./Themed";
 import Draggable from "react-native-draggable";
 import type { Item } from "../classes/item";
 import { useVibration } from "../utility/customHooks";
 import { checkReleasePositionProps } from "../utility/types";
-import { AppContext } from "../app/_layout";
+import { useGameState, useLayout } from "../stores/AppData";
 
 interface EquipmentDisplayProps {
   headTarget: RefObject<View>;
@@ -43,9 +43,8 @@ export default function EquipmentDisplay({
   setDisplayItem,
 }: EquipmentDisplayProps) {
   const vibration = useVibration();
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing contexts");
-  const { playerState, dimensions, blockSize } = appData;
+  const { playerState } = useGameState();
+  const { blockSize, dimensions } = useLayout();
 
   function checkReleasePosition({
     itemStack,

@@ -1,5 +1,4 @@
 import SpellDetails from "../../components/SpellDetails";
-import { useContext } from "react";
 import { useColorScheme } from "nativewind";
 import { View, ScrollView } from "react-native";
 import { observer } from "mobx-react-lite";
@@ -16,18 +15,16 @@ import {
   MasteryToString,
   TutorialOption,
 } from "../../utility/types";
-import { AppContext } from "../_layout";
 import { elementalColorMap } from "../../constants/Colors";
 import { useIsFocused } from "@react-navigation/native";
 import { Text } from "../../components/Themed";
+import { useGameState, useLayout } from "../../stores/AppData";
 
 const SpellsScreen = observer(() => {
-  const appData = useContext(AppContext);
   const { colorScheme } = useColorScheme();
 
-  if (!appData) throw new Error("missing contexts");
-
-  const { isCompact, playerState } = appData;
+  const { playerState } = useGameState();
+  const { isCompact } = useLayout();
 
   function magicProficiencySection(
     proficiencies:

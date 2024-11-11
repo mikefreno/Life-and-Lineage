@@ -158,7 +158,7 @@ export class Item {
   }
 
   public equals(otherItem: Item) {
-    return this.id == otherItem.id;
+    return this.id === otherItem.id;
   }
 
   public getItemIcon() {
@@ -350,7 +350,7 @@ export class Item {
     return item;
   }
 }
-const itemMap: { [key: string]: any } = {
+export const itemMap: { [key: string]: any } = {
   Amber_Potion: require("../assets/images/items/Amber_Potion.png"),
   Amber_Potion_2: require("../assets/images/items/Amber_Potion_2.png"),
   Amber_Potion_3: require("../assets/images/items/Amber_Potion_3.png"),

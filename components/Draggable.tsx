@@ -1,0 +1,299 @@
+import { Pressable, View, Image } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  runOnJS,
+  withSpring,
+  withTiming,
+  SharedValue,
+} from "react-native-reanimated";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { useRef } from "react";
+import { checkReleasePositionProps } from "../utility/types";
+import { itemMap, type Item } from "../classes/item";
+import type { VibrateProps } from "../utility/customHooks";
+import { ThemedView, Text } from "./Themed";
+
+type DraggableProps = {
+  children: React.ReactNode;
+  onDragStart?: (x: number, y: number) => void;
+  onDrag?: (x: number, y: number) => void;
+  onDragEnd?: (x: number, y: number) => void;
+  shouldSnapBack: SharedValue<boolean>;
+  enabled?: boolean;
+  x?: number;
+  y?: number;
+};
+
+const Draggable = ({
+  children,
+  onDragStart,
+  onDrag,
+  onDragEnd,
+  shouldSnapBack,
+  enabled = true,
+  x: initialX = 0,
+  y: initialY = 0,
+}: DraggableProps) => {
+  const translateX = useSharedValue(initialX);
+  const translateY = useSharedValue(initialY);
+  const contextX = useSharedValue(0);
+  const contextY = useSharedValue(0);
+  const isDragging = useSharedValue(false);
+
+  const springConfig = {
+    damping: 15,
+    mass: 0.5,
+    stiffness: 150,
+  };
+
+  const gesture = Gesture.Pan()
+    .enabled(enabled)
+    .onStart((e) => {
+      isDragging.value = true;
+      if (onDragStart) {
+        runOnJS(onDragStart)(e.x, e.y);
+      }
+    })
+    .onUpdate((e) => {
+      translateX.value = e.translationX + contextX.value;
+      translateY.value = e.translationY + contextY.value;
+      if (onDrag) {
+        const absoluteX = e.absoluteX;
+        const absoluteY = e.absoluteY;
+        runOnJS(onDrag)(absoluteX, absoluteY);
+      }
+    })
+    .onEnd((e) => {
+      if (onDragEnd) {
+        runOnJS(onDragEnd)(e.absoluteX, e.absoluteY);
+      }
+
+      if (!shouldSnapBack.value) {
+        translateX.value = withSpring(initialX, springConfig);
+        translateY.value = withSpring(initialY, springConfig);
+        contextX.value = 0;
+        contextY.value = 0;
+
+        isDragging.value = false;
+      }
+    });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: translateX.value },
+      { translateY: translateY.value },
+    ],
+    zIndex: isDragging.value ? 999 : 1,
+  }));
+
+  return (
+    <GestureDetector gesture={gesture}>
+      <Animated.View style={[{ position: "absolute" }, animatedStyle]}>
+        {children}
+      </Animated.View>
+    </GestureDetector>
+  );
+};
+
+export type ShopDisplayItem = {
+  item: Item[];
+  side?: "shop" | "inventory" | undefined;
+  positon: {
+    left: number;
+    top: number;
+  };
+} | null;
+
+export type ShopSetDisplayItem = React.Dispatch<
+  React.SetStateAction<{
+    item: Item[];
+    side?: "shop" | "inventory" | undefined;
+    positon: {
+      left: number;
+      top: number;
+    };
+  } | null>
+>;
+
+const InventoryItem = ({
+  item,
+  blockSize,
+  vibration,
+  position,
+  isDragging,
+  displayItem,
+  setDisplayItem,
+  checkReleasePosition,
+  setIconString,
+}: {
+  item: Item[];
+  blockSize: number;
+  vibration: ({ style, essential }: VibrateProps) => void;
+  displayItem: ShopDisplayItem;
+  setDisplayItem: ShopSetDisplayItem;
+  position: {
+    x: SharedValue<number>;
+    offsetX: SharedValue<number>;
+    y: SharedValue<number>;
+    offsetY: SharedValue<number>;
+  };
+  isDragging: SharedValue<boolean>;
+  checkReleasePosition: ({
+    itemStack,
+    xPos,
+    yPos,
+    size,
+  }: checkReleasePositionProps) => boolean;
+  setIconString: React.Dispatch<React.SetStateAction<string | null>>;
+}) => {
+  const ref = useRef<View>(null);
+  const opacity = useSharedValue(1);
+  const shouldSnapBack = useSharedValue(false);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+
+  while (!blockSize) {
+    return <></>;
+  }
+
+  const handlePress = () => {
+    vibration({ style: "light" });
+    if (displayItem && displayItem.item[0].equals(item[0])) {
+      setDisplayItem(null);
+    } else {
+      ref.current?.measureInWindow((x, y) => {
+        setDisplayItem({ item, side: "shop", positon: { left: x, top: y } });
+      });
+    }
+  };
+
+  const handleDragStart = (x: number, y: number) => {
+    vibration({ style: "light" });
+    position.offsetX.value = -x;
+    position.offsetY.value = -y;
+    isDragging.value = true;
+    setIconString(item[0].icon ?? null);
+    opacity.value = withTiming(0, { duration: 0 });
+  };
+
+  const handleDragEnd = (x: number, y: number) => {
+    shouldSnapBack.value = checkReleasePosition({
+      itemStack: item,
+      xPos: x,
+      yPos: y,
+      size: blockSize,
+    });
+    setIconString(null);
+    isDragging.value = false;
+    position.x.value = 0;
+    position.y.value = 0;
+    opacity.value = withTiming(1, { duration: 50 });
+  };
+
+  return (
+    <Draggable
+      onDragStart={handleDragStart}
+      onDrag={(x, y) => {
+        position.x.value = x;
+        position.y.value = y;
+      }}
+      onDragEnd={handleDragEnd}
+      shouldSnapBack={shouldSnapBack}
+    >
+      <Animated.View style={animatedStyle}>
+        <Pressable ref={ref} onPress={handlePress}>
+          <View
+            className="items-center justify-center rounded-lg bg-zinc-400 z-top"
+            style={{
+              height: blockSize,
+              width: blockSize,
+            }}
+          >
+            <Image
+              source={item[0].getItemIcon()}
+              style={{
+                width: Math.min(blockSize * 0.65, 40),
+                height: Math.min(blockSize * 0.65, 40),
+              }}
+            />
+            {item[0].stackable && item.length > 1 && (
+              <ThemedView className="absolute bottom-0 right-0 bg-opacity-50 rounded px-1">
+                <Text>{item.length}</Text>
+              </ThemedView>
+            )}
+          </View>
+        </Pressable>
+      </Animated.View>
+    </Draggable>
+  );
+};
+
+const ProjectedImage = ({
+  position,
+  blockSize,
+  iconString,
+  isDragging,
+}: {
+  position: {
+    x: SharedValue<number>;
+    offsetX: SharedValue<number>;
+    y: SharedValue<number>;
+    offsetY: SharedValue<number>;
+  };
+  isDragging: SharedValue<boolean>;
+  blockSize: number;
+  iconString: string | null;
+}) => {
+  const animatedStyle = useAnimatedStyle(() => {
+    "worklet";
+    return {
+      transform: [
+        {
+          translateX: position.x.value + position.offsetX.value,
+        },
+        {
+          translateY: position.y.value + position.offsetY.value,
+        },
+      ],
+      opacity: isDragging.value ? 1 : 0,
+    };
+  });
+
+  if (!iconString) {
+    return null;
+  }
+
+  return (
+    <Animated.View
+      style={[
+        animatedStyle,
+        {
+          position: "absolute",
+          zIndex: 1000,
+        },
+      ]}
+    >
+      <View
+        className="items-center justify-center rounded-lg bg-zinc-400"
+        style={{
+          height: blockSize,
+          width: blockSize,
+        }}
+      >
+        <Image
+          source={itemMap[iconString]}
+          style={{
+            width: Math.min(blockSize * 0.65, 40),
+            height: Math.min(blockSize * 0.65, 40),
+          }}
+        />
+      </View>
+    </Animated.View>
+  );
+};
+
+export { InventoryItem, ProjectedImage };
+export default Draggable;

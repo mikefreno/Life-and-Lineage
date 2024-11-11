@@ -2092,7 +2092,7 @@ export class PlayerCharacter extends Character {
           dungeonMap: props.dungeonMap,
           currentPosition: props.currentPosition,
           mapDimensions: props.mapDimensions,
-          enemy: props.enemy,
+          enemy: props.enemyState,
           fightingBoss: props.fightingBoss,
         };
       } else {
@@ -2115,7 +2115,7 @@ export class PlayerCharacter extends Character {
           dungeonMap: syntheticDungeon,
           currentPosition: syntheticTile,
           mapDimensions: mapDimensions,
-          enemy: props.enemy ?? null,
+          enemy: null,
           fightingBoss: false,
         };
       }
@@ -2452,7 +2452,7 @@ type enterDungeonProps = {
   level: string;
   dungeonMap: Tile[];
   currentPosition: Tile;
-  enemy: Enemy | null;
+  enemyState: Enemy | null;
   mapDimensions: BoundingBox;
   fightingBoss: boolean;
 };

@@ -3,7 +3,7 @@ import { View } from "react-native";
 import { Text } from "./Themed";
 import { Character } from "../classes/character";
 import GenericModal from "./GenericModal";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { CharacterImage } from "./CharacterImage";
 import {
   calculateAge,
@@ -16,8 +16,8 @@ import GenericStrikeAround from "./GenericStrikeAround";
 import { useVibration } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
 import { useRouter } from "expo-router";
-import { AppContext } from "../app/_layout";
 import { AffectionIcon } from "../assets/icons/SVGIcons";
+import { useGameState } from "../stores/AppData";
 
 interface CharacterInteractionModal {
   character: Character | null;
@@ -37,11 +37,7 @@ export const CharacterInteractionModal = observer(
     showGiftModal,
     showAdoptionModal,
   }: CharacterInteractionModal) => {
-    const appData = useContext(AppContext);
-    if (!appData) {
-      throw new Error("missing context");
-    }
-    const { playerState, gameState } = appData;
+    const { playerState, gameState } = useGameState();
     const [showAssaultWarning, setShowAssaultWarning] =
       useState<boolean>(false);
     const [dateAvailable, setDateAvailable] = useState<boolean>(

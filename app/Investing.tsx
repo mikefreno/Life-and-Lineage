@@ -3,19 +3,13 @@ import "../assets/styles/globals.css";
 import { InvestmentType, TutorialOption } from "../utility/types";
 import InvestmentCard from "../components/InvestmentCard";
 import PlayerStatus from "../components/PlayerStatus";
-import { useContext } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../components/TutorialModal";
 import { ScrollView, View } from "react-native";
-import { AppContext } from "./_layout";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
 
 const InvestingScreen = observer(() => {
-  const appData = useContext(AppContext);
-  if (!appData) {
-    throw new Error("missing context");
-  }
   const header = useHeaderHeight();
 
   return (

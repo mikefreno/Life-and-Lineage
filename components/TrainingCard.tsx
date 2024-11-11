@@ -1,13 +1,13 @@
 import { observer } from "mobx-react-lite";
 import { useColorScheme } from "nativewind";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { Text } from "../components/Themed";
 import ProgressBar from "./ProgressBar";
 import GenericRaisedButton from "./GenericRaisedButton";
 import { toTitleCase } from "../utility/functions/misc";
-import { AppContext } from "../app/_layout";
 import { Coins, Sanity } from "../assets/icons/SVGIcons";
+import { useGameState } from "../stores/AppData";
 
 interface TrainingCardProps {
   name: string;
@@ -26,9 +26,7 @@ const TrainingCard = observer(
     preRequisites,
   }: TrainingCardProps) => {
     const { colorScheme } = useColorScheme();
-    const appData = useContext(AppContext);
-    if (!appData) throw new Error("missing context");
-    const { playerState, gameState } = appData;
+    const { playerState, gameState } = useGameState();
     const [experience, setExperience] = useState<number | undefined>(
       playerState?.getSpecifiedQualificationProgress(name),
     );

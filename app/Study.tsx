@@ -14,20 +14,17 @@ import {
   MasteryToString,
 } from "../utility/types";
 import GenericModal from "../components/GenericModal";
-import { AppContext } from "./_layout";
 import { Spell } from "../classes/spell";
 import { elementalColorMap } from "../constants/Colors";
 import { useContext, useEffect, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import { useVibration } from "../utility/customHooks";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { useGameState, useLayout } from "../stores/AppData";
 
 export default function LearningKnowledgeScreen() {
-  const appData = useContext(AppContext);
-  if (!appData) {
-    throw new Error("missing context");
-  }
-  const { playerState, gameState, dimensions } = appData;
+  const { playerState, gameState } = useGameState();
+  const { dimensions } = useLayout();
 
   const books = playerState?.inventory.filter(
     (item) => item.itemClass == ItemClassType.Book,

@@ -1,5 +1,5 @@
 import { ScrollView, TextInput, View } from "react-native";
-import { ThemedView, Text, ThemedScrollView } from "../../../components/Themed";
+import { Text } from "../../../components/Themed";
 import { useState } from "react";
 import CodexCategory from "../../../components/CodexCategory";
 import { useColorScheme } from "nativewind";

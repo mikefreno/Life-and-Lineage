@@ -1,12 +1,11 @@
 import { Pressable, ScrollView, View } from "react-native";
 import { Text, ThemedView } from "../components/Themed";
 import deathMessages from "../assets/json/deathMessages.json";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { router } from "expo-router";
 import { CharacterImage } from "../components/CharacterImage";
 import { calculateAge, wait } from "../utility/functions/misc";
 import { Character, PlayerCharacter } from "../classes/character";
-import { AppContext } from "./_layout";
 import GenericStrikeAround from "../components/GenericStrikeAround";
 import GenericModal from "../components/GenericModal";
 import GenericFlatButton from "../components/GenericFlatButton";
@@ -25,6 +24,7 @@ import { elementalColorMap } from "../constants/Colors";
 import { getStartingBaseStats } from "../utility/functions/characterAid";
 import { Item } from "../classes/item";
 import { savePlayer } from "../utility/functions/save_load";
+import { useGameState, useLayout } from "../stores/AppData";
 
 export default function DeathScreen() {
   const [nextLife, setNextLife] = useState<Character | null>(null);
@@ -37,9 +37,8 @@ export default function DeathScreen() {
   );
   const [page, setPage] = useState<number>(0);
 
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing contexts");
-  const { playerState, gameState, dimensions } = appData;
+  const { playerState, gameState } = useGameState();
+  const { dimensions } = useLayout();
   const vibration = useVibration();
   const { colorScheme } = useColorScheme();
 

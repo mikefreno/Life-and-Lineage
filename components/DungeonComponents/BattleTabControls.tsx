@@ -1,8 +1,7 @@
 import { Pressable } from "react-native";
 import { ThemedView, Text } from "../Themed";
 import { useVibration } from "../../utility/customHooks";
-import { useContext } from "react";
-import { DungeonContext } from "./DungeonContext";
+import { useDungeonCore } from "../../stores/DungeonData";
 
 interface BattleTabControlsProps {
   battleTab: string;
@@ -15,9 +14,7 @@ export default function BattleTabControls({
   setBattleTab,
 }: BattleTabControlsProps) {
   const vibration = useVibration();
-  const dungeonData = useContext(DungeonContext);
-  if (!dungeonData) throw new Error("missing context in BattleTabControls");
-  const { inCombat } = dungeonData;
+  const { inCombat } = useDungeonCore();
   return (
     <ThemedView className="-mb-1 flex w-full flex-row justify-around">
       <Pressable

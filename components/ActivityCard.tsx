@@ -21,24 +21,20 @@ import { observer } from "mobx-react-lite";
 import { CharacterInteractionModal } from "./CharacterInteractionModal";
 import { CharacterImage } from "./CharacterImage";
 import ProgressBar from "./ProgressBar";
-import { AppContext } from "../app/_layout";
 import {
   AffectionIcon,
   Coins,
   HealthIcon,
   Sanity,
 } from "../assets/icons/SVGIcons";
+import { useGameState } from "../stores/AppData";
 
 interface ActivityCardProps {
   activity: Activity;
 }
 
 const ActivityCard = observer(({ activity }: ActivityCardProps) => {
-  const appData = useContext(AppContext);
-  if (!appData) {
-    throw new Error("missing context");
-  }
-  const { playerState, gameState, setEnemy } = appData;
+  const { playerState, gameState, setEnemy } = useGameState();
   const { colorScheme } = useColorScheme();
   const [metCharacter, setMetCharacter] = useState<Character | null>(null);
   const [nothingHappened, setNothingHappened] = useState<boolean>(false);

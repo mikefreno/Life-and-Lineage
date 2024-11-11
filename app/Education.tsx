@@ -3,20 +3,13 @@ import qualifications from "../assets/json/qualifications.json";
 import PlayerStatus from "../components/PlayerStatus";
 import TrainingCard from "../components/TrainingCard";
 import TutorialModal from "../components/TutorialModal";
-import { useContext } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { AppContext } from "./_layout";
 import { TutorialOption } from "../utility/types";
 import { ScrollView, View } from "react-native";
 
 const JobTraining = observer(() => {
-  const appData = useContext(AppContext);
-  if (!appData) {
-    throw new Error("missing context");
-  }
   const isFocused = useIsFocused();
-
   const header = useHeaderHeight();
 
   return (

@@ -2,42 +2,33 @@ import GenericModal from "../GenericModal";
 import GenericFlatButton from "../GenericFlatButton";
 import { ThemedView, Text } from "../Themed";
 import { rollD20, wait } from "../../utility/functions/misc";
-import { useVibration } from "../../utility/customHooks";
-import { router } from "expo-router";
-import { useContext, useEffect, useState } from "react";
-import { AppContext } from "../../app/_layout";
-import { DungeonContext } from "./DungeonContext";
 import {
-  type ContextData,
-  enemyPreTurnCheck,
-} from "./DungeonInteriorFunctions";
+  useBattleLogger,
+  useCombatActions,
+  useEnemyManagement,
+  useVibration,
+} from "../../utility/customHooks";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { useGameState } from "../../stores/AppData";
+import { useDungeonCore, useEnemyAnimation } from "../../stores/DungeonData";
 import { savePlayer } from "../../utility/functions/save_load";
 
-interface FleeModalProps {
-  fleeModalShowing: boolean;
-  setFleeModalShowing: React.Dispatch<React.SetStateAction<boolean>>;
-  playerMinionsTurn: (
-    { dungeonData, appData }: ContextData,
-    callback: () => void,
-  ) => void;
-}
 export default function FleeModal({
   fleeModalShowing,
   setFleeModalShowing,
-  playerMinionsTurn,
-}: FleeModalProps) {
+}: {
+  fleeModalShowing: boolean;
+  setFleeModalShowing: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const vibration = useVibration();
-  const appData = useContext(AppContext);
-  const dungeonData = useContext(DungeonContext);
-  if (!appData || !dungeonData) throw new Error("missing context");
-  const { playerState, enemyState, setEnemy, gameState } = appData;
-  const {
-    slug,
-    setAttackAnimationOnGoing,
-    attackAnimationOnGoing,
-    battleLogger,
-    inCombat,
-  } = dungeonData;
+  const { playerState, enemyState, setEnemy, gameState } = useGameState();
+  const { inCombat, slug } = useDungeonCore();
+  const { attackAnimationOnGoing, setAttackAnimationOnGoing } =
+    useEnemyAnimation();
+  const { battleLogger } = useBattleLogger();
+  const { playerMinionsTurn } = useCombatActions();
+  const { enemyTurn } = useEnemyManagement();
 
   const [fleeRollFailure, setFleeRollFailure] = useState<boolean>(false);
 
@@ -81,8 +72,8 @@ export default function FleeModal({
         vibration({ style: "error" });
         battleLogger("You failed to flee!");
 
-        playerMinionsTurn({ appData, dungeonData }, () => {
-          enemyPreTurnCheck({ appData, dungeonData });
+        playerMinionsTurn(() => {
+          enemyTurn();
         });
       }
     }

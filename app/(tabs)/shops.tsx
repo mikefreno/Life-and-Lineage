@@ -3,23 +3,22 @@ import { Shop } from "../../classes/shop";
 import { CharacterImage } from "../../components/CharacterImage";
 import shopObjects from "../../assets/json/shops.json";
 import { router } from "expo-router";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useVibration } from "../../utility/customHooks";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { toTitleCase, calculateAge } from "../../utility/functions/misc";
-import { AppContext } from "../_layout";
 import { TutorialOption } from "../../utility/types";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
 import { Text } from "../../components/Themed";
+import { useGameState, useLayout } from "../../stores/AppData";
 
 const ShopsScreen = observer(() => {
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing gameData");
   const vibration = useVibration();
-  const { gameState, isCompact } = appData;
+  const { gameState } = useGameState();
+  const { isCompact } = useLayout();
   const [isReady, setIsReady] = useState(false);
 
   const runDeathChecks = () => {

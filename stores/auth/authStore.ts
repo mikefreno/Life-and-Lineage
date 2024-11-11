@@ -1,17 +1,17 @@
 import { makeAutoObservable } from "mobx";
 import { jwtDecode } from "jwt-decode";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { API_BASE_URL } from "../config/config";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import config from "../config/google_config";
-import { SaveRow } from "../utility/database";
-import { Game } from "../classes/game";
 import { parseInt } from "lodash";
 import { Platform } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
-import { storage } from "../utility/functions/storage";
-import { PlayerCharacter } from "../classes/character";
 import { stringify } from "flatted";
+import { PlayerCharacter } from "../../classes/character";
+import { Game } from "../../classes/game";
+import { storage } from "../../utility/functions/storage";
+import google_config from "../../config/google_config";
+import { API_BASE_URL } from "../../config/config";
+import { SaveRow } from "../../utility/database";
 
 type EmailLogin = {
   token: string;
@@ -193,8 +193,8 @@ class AuthStore {
   // needed prior to a user pressing the associated button
   initializeGoogleSignIn = () => {
     GoogleSignin.configure({
-      iosClientId: config.iosClientId,
-      webClientId: config.webClientId,
+      iosClientId: google_config.iosClientId,
+      webClientId: google_config.webClientId,
       offlineAccess: true,
       forceCodeForRefreshToken: true,
     });

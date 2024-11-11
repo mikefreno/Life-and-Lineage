@@ -1,14 +1,14 @@
 import { View } from "react-native";
 import ProgressBar from "./ProgressBar";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { numberToRoman } from "../utility/functions/misc";
 import type { VibrateProps } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
 import ThemedCard from "./ThemedCard";
 import { Text } from "./Themed";
-import { AppContext } from "../app/_layout";
 import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
+import { useGameState } from "../stores/AppData";
 
 interface LaborTaskProps {
   reward: number;
@@ -34,9 +34,7 @@ const LaborTask = observer(
     focused,
     vibration,
   }: LaborTaskProps) => {
-    const appData = useContext(AppContext);
-    if (!appData) throw new Error("missing context");
-    const { gameState, playerState } = appData;
+    const { gameState, playerState } = useGameState();
     const [fullReward, setFullReward] = useState<number | undefined>(
       playerState?.getRewardValue(title, reward),
     );

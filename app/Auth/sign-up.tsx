@@ -10,17 +10,17 @@ import {
 import { useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
-import { isValidPassword } from "../../auth/password";
 import { useVibration } from "../../utility/customHooks";
 import { GoogleIcon } from "../../assets/icons/SVGIcons";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { useAuth } from "../../auth/AuthContext";
 import { router } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { API_BASE_URL } from "../../config/config";
 import D20DieAnimation from "../../components/DieRollAnim";
 import { ThemedView, Text } from "../../components/Themed";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { useAuth } from "../../stores/auth/Auth";
+import { isValidPassword } from "../../utility/functions/password";
 
 const SignUpScreen = observer(() => {
   const { colorScheme } = useColorScheme();

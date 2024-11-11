@@ -1,7 +1,6 @@
 import { throttle } from "lodash";
 import type { Enemy } from "../../classes/creatures";
 import { Game } from "../../classes/game";
-import type { AppContextType, DungeonContextType } from "../types";
 import { storage } from "./storage";
 import { PlayerCharacter } from "../../classes/character";
 import {
@@ -47,79 +46,42 @@ export const fullLoad = async () => {
   }
 };
 
-interface dungeonSave {
-  enemy: Enemy | null;
-  dungeonData: DungeonContextType | undefined;
-  appData: AppContextType | undefined;
-}
-
-export function dungeonSave({ enemy, dungeonData, appData }: dungeonSave) {
-  if (!appData || !dungeonData)
-    throw new Error("missing context in dungeonSave()");
-  const { playerState, gameState } = appData;
-  const {
-    slug,
-    tiles,
-    instanceName,
-    currentPosition,
-    fightingBoss,
-    mapDimensions,
-  } = dungeonData;
+export function dungeonSave({
+  playerState,
+  gameState,
+  slug,
+  instanceName,
+  tiles,
+  currentPosition,
+  mapDimensions,
+  enemyState,
+  fightingBoss,
+}: {
+  playerState: PlayerCharacter | undefined;
+  gameState: Game | undefined;
+  slug: string[];
+  instanceName: string;
+  tiles: Tile[];
+  currentPosition: Tile | null;
+  mapDimensions: BoundingBox;
+  enemyState: Enemy | null;
+  fightingBoss: boolean;
+}) {
   if (playerState && gameState) {
     const level = slug.length > 2 ? slug[1] + "," + slug[2] : slug[1];
     if (tiles.length > 0) {
       playerState.setInDungeon({
         state: true,
         instance: instanceName,
-        level: level,
+        level,
         dungeonMap: tiles,
         currentPosition: currentPosition ?? tiles[0],
-        mapDimensions: mapDimensions,
-        enemy: enemy,
-        fightingBoss: fightingBoss,
+        mapDimensions,
+        enemyState,
+        fightingBoss,
       });
       saveGame(gameState);
       savePlayer(playerState);
-    }
-  }
-}
-
-export function dungeonSaveEnumerated({
-  enemy,
-  appData,
-  slug,
-  tiles,
-  instanceName,
-  currentPosition,
-  mapDimensions,
-  fightingBoss,
-}: {
-  enemy: Enemy;
-  appData: AppContextType;
-  slug: string[] | string;
-  tiles: Tile[];
-  instanceName: string;
-  currentPosition: Tile | null;
-  mapDimensions: BoundingBox;
-  fightingBoss: boolean;
-}) {
-  console.log("saving");
-  if (!appData) throw new Error("missing context in dungeonSave()");
-  const { playerState, gameState } = appData;
-  if (playerState && gameState) {
-    const level = slug.length > 2 ? slug[1] + "," + slug[2] : slug[1];
-    if (tiles.length > 0) {
-      playerState.setInDungeon({
-        state: true,
-        instance: instanceName,
-        level: level,
-        dungeonMap: tiles,
-        currentPosition: currentPosition ?? tiles[0],
-        mapDimensions: mapDimensions,
-        enemy: enemy,
-        fightingBoss: fightingBoss,
-      });
-      saveGame(gameState);
     }
   }
 }

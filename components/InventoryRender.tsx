@@ -1,19 +1,13 @@
-import React, { useContext, useRef, useState } from "react";
+import React from "react";
 import type { RefObject } from "react";
 import { Item } from "../classes/item";
-import {
-  Pressable,
-  View,
-  Image,
-  LayoutChangeEvent,
-  ScrollView,
-} from "react-native";
-import Draggable from "react-native-draggable";
-import { VibrateProps, useVibration } from "../utility/customHooks";
+import { Pressable, View, LayoutChangeEvent, ScrollView } from "react-native";
+import { useVibration } from "../utility/customHooks";
 import { checkReleasePositionProps } from "../utility/types";
 import { Shop } from "../classes/shop";
-import { Text, ThemedView } from "./Themed";
-import { AppContext } from "../app/_layout";
+import { Text } from "./Themed";
+import { InventoryItem } from "./Draggable";
+import { useGameState, useLayout } from "../stores/AppData";
 
 type InventoryRenderBase = {
   selfRef?: RefObject<View>;
@@ -39,6 +33,15 @@ type InventoryRenderBase = {
     } | null>
   >;
   keyItemInventory?: Item[];
+  setInventoryBounds?: React.Dispatch<
+    React.SetStateAction<{
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    } | null>
+  >;
+  setIconString: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 type InventoryRenderHome = InventoryRenderBase & {
@@ -72,14 +75,13 @@ export default function InventoryRender({
   displayItem,
   setDisplayItem,
   keyItemInventory,
+  setInventoryBounds,
+  setIconString,
   ...props
 }: InventoryRenderProps) {
   const vibration = useVibration();
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing contexts");
-  const { playerState, dimensions } = appData;
-  const [blockSize, setBlockSize] = useState<number>();
-  const [isDraggingItem, setIsDraggingItem] = useState<boolean>(false);
+  const { playerState } = useGameState();
+  const { dimensions, blockSize, setBlockSize } = useLayout();
 
   const onLayoutView = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
@@ -91,6 +93,21 @@ export default function InventoryRender({
         const blockSize = width / 14;
         setBlockSize(blockSize);
       }
+    }
+
+    if (setInventoryBounds) {
+      setTimeout(() => {
+        if (selfRef?.current) {
+          selfRef.current.measure((x, y, w, h, pageX, pageY) => {
+            setInventoryBounds({
+              x: pageX,
+              y: pageY,
+              width,
+              height,
+            });
+          });
+        }
+      }, 100);
     }
   };
 
@@ -153,6 +170,7 @@ export default function InventoryRender({
                   } else {
                     playerState?.equipItem(itemStack);
                   }
+                  return false;
                 }
               },
             );
@@ -173,6 +191,7 @@ export default function InventoryRender({
               vibration({ style: "light", essential: true });
               playerState?.removeFromInventory(itemStack);
               addItemToPouch(itemStack);
+              return false;
             }
           },
         );
@@ -196,132 +215,62 @@ export default function InventoryRender({
                 playerState?.sellItem(itemStack, price);
                 shop.buyItem(itemStack, price);
               }
+              return false;
             }
           },
         );
       }
     }
+    return true;
   }
 
   return (
     <>
-      <ScrollView
-        horizontal
-        pagingEnabled
-        onLayout={onLayoutView}
-        scrollEnabled={!!keyItemInventory ? !isDraggingItem : false}
-        contentContainerClassName={
-          !!keyItemInventory ? "z-top overflow-visible" : "mx-auto z-top"
-        }
-        onScrollBeginDrag={() => setDisplayItem(null)}
-        disableScrollViewPanResponder={true}
-        directionalLockEnabled={true}
-        className={`overflow-visible z-top ${
-          "headTarget" in props ? "max-h-[60%]" : ""
-        }`}
-        bounces={false}
-        overScrollMode="never"
-        scrollIndicatorInsets={{ top: 0, left: 10, bottom: 0, right: 10 }}
+      <View
+        collapsable={false}
+        ref={selfRef}
+        className={`z-top ${"headTarget" in props ? "max-h-[60%]" : ""}`}
       >
-        {/* Regular Inventory Panel */}
-        <View
-          style={{
-            width: dimensions.width,
+        <ScrollView
+          horizontal
+          pagingEnabled
+          onLayout={(e) => {
+            onLayoutView(e);
           }}
-          ref={selfRef}
+          scrollEnabled={!!keyItemInventory}
+          contentContainerClassName={
+            !!keyItemInventory ? "z-top overflow-visible" : "mx-auto z-top"
+          }
+          onScrollBeginDrag={() => setDisplayItem(null)}
+          disableScrollViewPanResponder={true}
+          directionalLockEnabled={true}
+          bounces={false}
+          overScrollMode="never"
+          collapsable={false}
+          scrollIndicatorInsets={{ top: 0, left: 10, bottom: 0, right: 10 }}
         >
-          {!!keyItemInventory && (
-            <View
-              style={{
-                width: dimensions.width,
-              }}
-              className="items-center absolute justify-center py-2 top-[40%]"
-            >
-              <Text className="text-3xl tracking-widest opacity-70">
-                Inventory
-              </Text>
-            </View>
-          )}
-          <Pressable
-            onPress={() => setDisplayItem(null)}
-            className="rounded-lg mx-2 border border-zinc-600 relative h-full"
+          {/* Regular Inventory Panel */}
+          <View
+            style={{
+              width: dimensions.width,
+            }}
+            ref={selfRef}
           >
-            {Array.from({ length: 24 }).map((_, index) => (
+            {!!keyItemInventory && (
               <View
-                className="absolute items-center justify-center"
-                style={
-                  dimensions.width === dimensions.greater
-                    ? {
-                        left: `${(index % 12) * 8.33 + 0.5}%`,
-                        top: `${Math.floor(index / 12) * 48 + 8}%`,
-                      }
-                    : {
-                        left: `${(index % 6) * 16.67 + 1.5}%`,
-                        top: `${Math.floor(index / 6) * 24 + 5.5}%`,
-                      }
-                }
-                key={"bg-" + index}
+                style={{
+                  width: dimensions.width,
+                }}
+                className="items-center absolute justify-center py-2 top-[40%]"
               >
-                <View
-                  className="rounded-lg border-zinc-300 dark:border-zinc-700 border z-0"
-                  style={{ height: blockSize, width: blockSize }}
-                />
+                <Text className="text-3xl tracking-widest opacity-70">
+                  Inventory
+                </Text>
               </View>
-            ))}
-            {inventory.slice(0, 24).map((item, index) => (
-              <View
-                className="absolute items-center justify-center z-top"
-                style={
-                  dimensions.width === dimensions.greater
-                    ? {
-                        left: `${(index % 12) * 8.33 + 0.5}%`,
-                        top: `${Math.floor(index / 12) * 48 + 8}%`,
-                      }
-                    : {
-                        left: `${(index % 6) * 16.67 + 1.5}%`,
-                        top: `${Math.floor(index / 6) * 24 + 5.5}%`,
-                      }
-                }
-                key={index}
-              >
-                <ItemRender
-                  item={item.item}
-                  vibration={vibration}
-                  blockSize={blockSize}
-                  setDisplayItem={setDisplayItem}
-                  displayItem={displayItem}
-                  checkReleasePosition={checkReleasePosition}
-                  setIsDraggingItem={setIsDraggingItem}
-                  {...props}
-                />
-              </View>
-            ))}
-          </Pressable>
-        </View>
-        {/* Key Item Inventory Panel */}
-        {keyItemInventory && (
-          <View style={{ width: dimensions.width }}>
-            <View
-              style={{
-                width: dimensions.width,
-              }}
-              className="items-center absolute justify-center py-2 top-[40%]"
-            >
-              <Text className="text-3xl tracking-widest opacity-70">
-                Key Items
-              </Text>
-            </View>
+            )}
             <Pressable
               onPress={() => setDisplayItem(null)}
-              className={`${
-                "headTarget" in props
-                  ? dimensions.greater == dimensions.height
-                    ? "h-[100%] mx-2"
-                    : "mx-2 h-[50%]"
-                  : "shop" in props
-                  ? "mt-4 h-[90%]"
-                  : "h-full mx-2"
-              } rounded-lg border border-zinc-600 relative`}
+              className="rounded-lg mx-2 border border-zinc-600 relative h-full"
             >
               {Array.from({ length: 24 }).map((_, index) => (
                 <View
@@ -334,10 +283,10 @@ export default function InventoryRender({
                         }
                       : {
                           left: `${(index % 6) * 16.67 + 1.5}%`,
-                          top: `${Math.floor(index / 6) * 24 + 4}%`,
+                          top: `${Math.floor(index / 6) * 24 + 5.5}%`,
                         }
                   }
-                  key={"key-bg-" + index}
+                  key={"bg-" + index}
                 >
                   <View
                     className="rounded-lg border-zinc-300 dark:border-zinc-700 border z-0"
@@ -345,9 +294,9 @@ export default function InventoryRender({
                   />
                 </View>
               ))}
-              {keyItemInventory.map((item, index) => (
+              {inventory.slice(0, 24).map((item, index) => (
                 <View
-                  className="absolute items-center justify-center"
+                  className="absolute items-center justify-center z-top"
                   style={
                     dimensions.width === dimensions.greater
                       ? {
@@ -356,153 +305,108 @@ export default function InventoryRender({
                         }
                       : {
                           left: `${(index % 6) * 16.67 + 1.5}%`,
-                          top: `${Math.floor(index / 6) * 24 + 4}%`,
+                          top: `${Math.floor(index / 6) * 24 + 5.5}%`,
                         }
                   }
                   key={index}
                 >
-                  <ItemRender
-                    item={[item]}
-                    vibration={vibration}
-                    blockSize={blockSize}
-                    setDisplayItem={setDisplayItem}
-                    displayItem={displayItem}
-                    checkReleasePosition={checkReleasePosition}
-                    setIsDraggingItem={setIsDraggingItem}
-                    {...props}
-                  />
+                  <View>
+                    <InventoryItem
+                      item={item.item}
+                      vibration={vibration}
+                      blockSize={blockSize ?? 0}
+                      setDisplayItem={setDisplayItem}
+                      checkReleasePosition={checkReleasePosition}
+                      displayItem={displayItem}
+                      setIconString={setIconString}
+                    />
+                  </View>
                 </View>
               ))}
             </Pressable>
           </View>
-        )}
-      </ScrollView>
+          {/* Key Item Inventory Panel */}
+          {keyItemInventory && (
+            <View style={{ width: dimensions.width }}>
+              <View
+                style={{
+                  width: dimensions.width,
+                }}
+                className="items-center absolute justify-center py-2 top-[40%]"
+              >
+                <Text className="text-3xl tracking-widest opacity-70">
+                  Key Items
+                </Text>
+              </View>
+              <Pressable
+                onPress={() => setDisplayItem(null)}
+                className={`${
+                  "headTarget" in props
+                    ? dimensions.greater == dimensions.height
+                      ? "h-[100%] mx-2"
+                      : "mx-2 h-[50%]"
+                    : "shop" in props
+                    ? "mt-4 h-[90%]"
+                    : "h-full mx-2"
+                } rounded-lg border border-zinc-600 relative`}
+              >
+                {Array.from({ length: 24 }).map((_, index) => (
+                  <View
+                    className="absolute items-center justify-center"
+                    style={
+                      dimensions.width === dimensions.greater
+                        ? {
+                            left: `${(index % 12) * 8.33 + 0.5}%`,
+                            top: `${Math.floor(index / 12) * 48 + 8}%`,
+                          }
+                        : {
+                            left: `${(index % 6) * 16.67 + 1.5}%`,
+                            top: `${Math.floor(index / 6) * 24 + 4}%`,
+                          }
+                    }
+                    key={"key-bg-" + index}
+                  >
+                    <View
+                      className="rounded-lg border-zinc-300 dark:border-zinc-700 border z-0"
+                      style={{ height: blockSize, width: blockSize }}
+                    />
+                  </View>
+                ))}
+                {keyItemInventory.map((item, index) => (
+                  <View
+                    className="absolute items-center justify-center"
+                    style={
+                      dimensions.width === dimensions.greater
+                        ? {
+                            left: `${(index % 12) * 8.33 + 0.5}%`,
+                            top: `${Math.floor(index / 12) * 48 + 8}%`,
+                          }
+                        : {
+                            left: `${(index % 6) * 16.67 + 1.5}%`,
+                            top: `${Math.floor(index / 6) * 24 + 4}%`,
+                          }
+                    }
+                    key={index}
+                  >
+                    <View>
+                      <InventoryItem
+                        item={[item]}
+                        vibration={vibration}
+                        blockSize={blockSize ?? 0}
+                        setDisplayItem={setDisplayItem}
+                        checkReleasePosition={checkReleasePosition}
+                        dragStore={dragStore}
+                        displayItem={displayItem}
+                        setIconString={setIconString}
+                      />
+                    </View>
+                  </View>
+                ))}
+              </Pressable>
+            </View>
+          )}
+        </ScrollView>
+      </View>
     </>
   );
 }
-
-interface ItemRenderProps {
-  item: Item[];
-  vibration: ({ style, essential }: VibrateProps) => void;
-  displayItem: {
-    item: Item[];
-    side?: "shop" | "inventory";
-    positon: {
-      left: number;
-      top: number;
-    };
-  } | null;
-  setDisplayItem: React.Dispatch<
-    React.SetStateAction<{
-      item: Item[];
-      side?: "shop" | "inventory" | undefined;
-      positon: {
-        left: number;
-        top: number;
-      };
-    } | null>
-  >;
-  blockSize: number | undefined;
-  checkReleasePosition: ({
-    itemStack,
-    xPos,
-    yPos,
-    size,
-    equipped,
-  }: checkReleasePositionProps) => void;
-  setIsDraggingItem: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const ItemRender = ({
-  item,
-  vibration,
-  displayItem,
-  setDisplayItem,
-  blockSize,
-  checkReleasePosition,
-  setIsDraggingItem,
-  ...props
-}: ItemRenderProps) => {
-  const [buzzed, setBuzzed] = useState(false);
-  const ref = useRef<View>(null);
-
-  const handlePress = () => {
-    vibration({ style: "light" });
-    if (displayItem && displayItem.item[0].equals(item[0])) {
-      setDisplayItem(null);
-    } else {
-      if ("shop" in props) {
-        ref.current?.measureInWindow((x, y) => {
-          setDisplayItem({
-            item,
-            side: "inventory",
-            positon: { left: x, top: y },
-          });
-        });
-      } else {
-        ref.current?.measureInWindow((x, y) => {
-          setDisplayItem({ item, positon: { left: x, top: y } });
-        });
-      }
-    }
-  };
-
-  while (!blockSize) {
-    return <></>;
-  }
-
-  return (
-    <Draggable
-      onDragRelease={(_, g) => {
-        checkReleasePosition({
-          itemStack: item,
-          xPos: g.moveX,
-          yPos: g.moveY,
-          size: blockSize,
-          equipped: false,
-        });
-        setBuzzed(false);
-        setIsDraggingItem(false);
-      }}
-      onDrag={() => {
-        if (!buzzed) {
-          vibration({ style: "medium", essential: true });
-          setBuzzed(true);
-          setIsDraggingItem(true);
-        }
-      }}
-      disabled={!item[0].isEquippable && !("shop" in props)}
-      shouldReverse
-      x={0}
-      y={0}
-      renderSize={blockSize}
-    >
-      <Pressable
-        ref={ref}
-        onPress={handlePress}
-        className="active:scale-90 active:opacity-50 z-top"
-      >
-        <View
-          className="items-center justify-center rounded-lg bg-zinc-400 z-top"
-          style={{
-            height: blockSize,
-            width: blockSize,
-          }}
-        >
-          <Image
-            source={item[0].getItemIcon()}
-            style={{
-              width: Math.min(blockSize * 0.65, 40),
-              height: Math.min(blockSize * 0.65, 40),
-            }}
-          />
-          {item[0].stackable && item.length > 1 && (
-            <ThemedView className="absolute bottom-0 right-0 bg-opacity-50 rounded px-1">
-              <Text>{item.length}</Text>
-            </ThemedView>
-          )}
-        </View>
-      </Pressable>
-    </Draggable>
-  );
-};

@@ -6,24 +6,22 @@ import {
   View,
 } from "react-native";
 import { Text } from "../../../components/Themed";
-import { useContext, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { toTitleCase } from "../../../utility/functions/misc";
 import { useVibration } from "../../../utility/customHooks";
 import { useColorScheme } from "nativewind";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { AppContext } from "../../_layout";
 import {
   PlayerClassOptions,
   isPlayerClassOptions,
 } from "../../../utility/types";
 import { playerClassColors } from "../../../constants/Colors";
 import GenericFlatButton from "../../../components/GenericFlatButton";
+import { useLayout } from "../../../stores/AppData";
 
 export default function SetName() {
-  const appData = useContext(AppContext);
-  if (!appData) return;
-  const { dimensions } = appData;
+  const { dimensions } = useLayout();
   const { slug } = useLocalSearchParams();
   if (!slug) {
     return router.replace("/NewGame");
@@ -47,7 +45,6 @@ export default function SetName() {
   const { colorScheme } = useColorScheme();
 
   function trimWhitespace(str: string) {
-    // Trim leading and trailing spaces, then replace multiple spaces with a single space
     return str.trim().replace(/\s+/g, " ");
   }
 

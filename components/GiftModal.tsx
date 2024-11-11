@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import GenericModal from "./GenericModal";
 import { Dimensions, Pressable, View, Image } from "react-native";
 import { Text } from "./Themed";
@@ -6,7 +6,7 @@ import { Item } from "../classes/item";
 import { useColorScheme } from "nativewind";
 import { toTitleCase } from "../utility/functions/misc";
 import GearStatsDisplay from "./GearStatsDisplay";
-import { AppContext } from "../app/_layout";
+import { useGameState } from "../stores/AppData";
 
 const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
@@ -22,10 +22,8 @@ export default function GiftModal({
   onCloseFunction,
   backdropCloses = false,
 }: GiftModalProps) {
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing context");
   const { colorScheme } = useColorScheme();
-  const { playerState } = appData;
+  const { playerState } = useGameState();
 
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const selectedItemRef = useRef<Item>();

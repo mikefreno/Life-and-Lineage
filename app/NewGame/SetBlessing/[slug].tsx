@@ -1,10 +1,9 @@
 import { Pressable, View } from "react-native";
 import { Text } from "../../../components/Themed";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
 import { VibrateProps, useVibration } from "../../../utility/customHooks";
-import { AppContext } from "../../_layout";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import TutorialModal from "../../../components/TutorialModal";
@@ -24,6 +23,7 @@ import {
 } from "../../../constants/Colors";
 import GenericFlatButton from "../../../components/GenericFlatButton";
 import { useIsFocused } from "@react-navigation/native";
+import { useGameState, useLayout } from "../../../stores/AppData";
 
 export default function SetBlessing() {
   const { slug } = useLocalSearchParams();
@@ -35,9 +35,8 @@ export default function SetBlessing() {
   const { colorScheme } = useColorScheme();
   const vibration = useVibration();
 
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing context");
-  const { gameState, dimensions } = appData;
+  const { gameState } = useGameState();
+  const { dimensions } = useLayout();
 
   const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
 

@@ -10,7 +10,6 @@ import {
 import { useState } from "react";
 import { useColorScheme } from "nativewind";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
-import { useAuth } from "../../auth/AuthContext";
 import { router } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { API_BASE_URL } from "../../config/config";
@@ -21,6 +20,7 @@ import { ThemedView, Text } from "../../components/Themed";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { wait } from "../../utility/functions/misc";
 import * as Updates from "expo-updates";
+import { useAuth } from "../../stores/auth/Auth";
 
 const SignInScreen = observer(() => {
   const auth = useAuth();

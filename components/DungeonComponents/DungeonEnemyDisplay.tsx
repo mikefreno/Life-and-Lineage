@@ -6,9 +6,9 @@ import { ThemedView, Text } from "../Themed";
 import { EnemyImage } from "../EnemyImage";
 import FadeOutNode from "../FadeOutNode";
 import { memo, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { AppContext } from "../../app/_layout";
-import { DungeonContext } from "./DungeonContext";
 import { observer } from "mobx-react-lite";
+import { useGameState } from "../../stores/AppData";
+import { useDungeonCore, useEnemyAnimation } from "../../stores/DungeonData";
 
 const useEnemyAnimations = () => {
   const attackAnim = useRef(new Animated.Value(0)).current;
@@ -165,20 +165,15 @@ const EnemyConditions = memo(({ conditions }: { conditions: any[] }) => {
 });
 
 const DungeonEnemyDisplay = observer(() => {
-  const appData = useContext(AppContext);
-  const dungeonData = useContext(DungeonContext);
-  if (!dungeonData || !appData) throw new Error("missing context");
-
-  const { enemyState } = appData;
+  const { enemyState } = useGameState();
+  const { slug, firstLoad } = useDungeonCore();
   const {
-    slug,
     enemyTextString,
     enemyAttackDummy,
-    firstLoad,
     enemyTextDummy,
     setEnemyTextString,
     enemyDodgeDummy,
-  } = dungeonData;
+  } = useEnemyAnimation();
 
   const {
     animations,

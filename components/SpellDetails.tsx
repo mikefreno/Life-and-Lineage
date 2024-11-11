@@ -10,17 +10,15 @@ import {
   NecromancerSkull,
 } from "../assets/icons/SVGIcons";
 import BlessingDisplay from "./BlessingsDisplay";
-import { useContext } from "react";
-import { AppContext } from "../app/_layout";
 import { Spell } from "../classes/spell";
 import { elementalColorMap } from "../constants/Colors";
 import { Element } from "../utility/types";
+import { useGameState, useLayout } from "../stores/AppData";
 
 export default function SpellDetails({ spell }: { spell: Spell }) {
   const { colorScheme } = useColorScheme();
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing context");
-  const { dimensions, playerState } = appData;
+  const { playerState } = useGameState();
+  const { dimensions } = useLayout();
   return (
     <View
       className="rounded-lg"

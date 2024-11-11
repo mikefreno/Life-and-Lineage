@@ -1,11 +1,10 @@
 import { View } from "react-native";
 import { Text } from "./Themed";
-import { useContext } from "react";
 import GenericRaisedButton from "./GenericRaisedButton";
 import ThemedCard from "./ThemedCard";
-import { AppContext } from "../app/_layout";
 import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
 import { observer } from "mobx-react-lite";
+import { useGameState } from "../stores/AppData";
 
 interface MedicalOptionProps {
   title: string;
@@ -27,9 +26,7 @@ const MedicalOption = observer(
     removeDebuffs,
     focused,
   }: MedicalOptionProps) => {
-    const appData = useContext(AppContext);
-    if (!appData) throw new Error("missing context");
-    const { playerState, gameState } = appData;
+    const { playerState, gameState } = useGameState();
 
     function visit() {
       if (playerState && gameState && focused) {

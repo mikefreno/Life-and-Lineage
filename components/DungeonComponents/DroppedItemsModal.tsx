@@ -4,26 +4,22 @@ import { Item } from "../../classes/item";
 import { Text } from "../Themed";
 import { Pressable, View, Image } from "react-native";
 import { toTitleCase, wait } from "../../utility/functions/misc";
-import { useContext } from "react";
-import { AppContext } from "../../app/_layout";
-import { DungeonContext } from "./DungeonContext";
 import { Coins } from "../../assets/icons/SVGIcons";
 import GenericFlatButton from "../GenericFlatButton";
 import { useVibration } from "../../utility/customHooks";
+import { useGameState } from "../../stores/AppData";
+import { useDungeonCore, useLootState } from "../../stores/DungeonData";
 
 export default function DroppedItemsModal() {
-  const appData = useContext(AppContext);
-  const dungeonData = useContext(DungeonContext);
-  if (!dungeonData || !appData) throw new Error("missing context");
-  const { playerState } = appData;
+  const { playerState } = useGameState();
+  const { instanceName } = useDungeonCore();
   const {
     inventoryFullNotifier,
     droppedItems,
     setLeftBehindDrops,
     setDroppedItems,
     setInventoryFullNotifier,
-    instanceName,
-  } = dungeonData;
+  } = useLootState();
 
   function closeImmediateItemDrops() {
     if (droppedItems && droppedItems.itemDrops.length > 0) {

@@ -1,13 +1,11 @@
 import { Pressable, ScrollView, TextInput, View } from "react-native";
-import { Text, ThemedView } from "../../components/Themed";
-import { useContext, useEffect, useState } from "react";
+import { Text } from "../../components/Themed";
+import { useEffect, useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc";
 import { useVibration } from "../../utility/customHooks";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
-import { AppContext } from "../_layout";
 import { router } from "expo-router";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
-import { useAuth } from "../../auth/AuthContext";
 import { observer } from "mobx-react-lite";
 import GenericModal from "../../components/GenericModal";
 import { useColorScheme } from "nativewind";
@@ -17,12 +15,16 @@ import GenericFlatButton from "../../components/GenericFlatButton";
 import { Game } from "../../classes/game";
 import { parse } from "flatted";
 import { PlayerCharacter } from "../../classes/character";
+import { useAuth } from "../../stores/auth/Auth";
+import { useGameState } from "../../stores/AppData";
 
 const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
 
 export const AppSettings = observer(() => {
   const user = useAuth();
+  const { playerState, gameState, setPlayerCharacter, setGameData } =
+    useGameState();
 
   const { colorScheme } = useColorScheme();
   const [showRemoteSaveWindow, setShowRemoteSaveWindow] =
@@ -32,12 +34,6 @@ export const AppSettings = observer(() => {
   const [remoteSaves, setRemoteSaves] = useState<SaveRow[]>([]);
   const [saveName, setSaveName] = useState<string>("");
   const [loadingDBInfo, setLoadingDBInfo] = useState<boolean>(false);
-
-  const appData = useContext(AppContext);
-  if (!appData) {
-    throw new Error("Missing context");
-  }
-  const { playerState, gameState, setPlayerCharacter, setGameData } = appData;
 
   const vibration = useVibration();
 

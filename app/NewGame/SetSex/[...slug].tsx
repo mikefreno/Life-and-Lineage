@@ -2,9 +2,8 @@ import { router, useLocalSearchParams } from "expo-router";
 import { Text } from "../../../components/Themed";
 import { FontAwesome5, Foundation } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
-import { useContext, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useVibration } from "../../../utility/customHooks";
-import { AppContext } from "../../_layout";
 import { useColorScheme } from "nativewind";
 import TutorialModal from "../../../components/TutorialModal";
 import {
@@ -16,6 +15,7 @@ import { toTitleCase } from "../../../utility/functions/misc";
 import { playerClassColors } from "../../../constants/Colors";
 import GenericFlatButton from "../../../components/GenericFlatButton";
 import { useIsFocused } from "@react-navigation/native";
+import { useGameState } from "../../../stores/AppData";
 
 export default function SetSex() {
   const { slug } = useLocalSearchParams();
@@ -37,9 +37,7 @@ export default function SetSex() {
   const vibration = useVibration();
   const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
 
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing context");
-  const { gameState } = appData;
+  const { gameState } = useGameState();
   const isFocused = useIsFocused();
 
   return (

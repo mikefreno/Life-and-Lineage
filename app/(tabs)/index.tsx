@@ -1,6 +1,6 @@
 import { TouchableWithoutFeedback, View } from "react-native";
 import { Text } from "../../components/Themed";
-import { useContext, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
@@ -9,7 +9,6 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { calculateAge } from "../../utility/functions/misc";
 import InventoryRender from "../../components/InventoryRender";
-import { AppContext } from "../_layout";
 import {
   ArmorIcon,
   Energy,
@@ -27,11 +26,20 @@ import { Item } from "../../classes/item";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import EquipmentDisplay from "../../components/EquipmentDisplay";
 import { TutorialOption } from "../../utility/types";
+import { ProjectedImage } from "../../components/Draggable";
+import {
+  useDraggableDataState,
+  useGameState,
+  useLayout,
+} from "../../stores/AppData";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
-  const appData = useContext(AppContext);
-  if (!appData) throw new Error("missing contexts");
+
+  const { blockSize, dimensions, isCompact } = useLayout();
+  const { playerState, gameState } = useGameState();
+  const { position, isDragging, iconString, setIconString } =
+    useDraggableDataState();
 
   const headTarget = useRef<View>(null);
   const bodyTarget = useRef<View>(null);
@@ -45,13 +53,26 @@ const HomeScreen = observer(() => {
     positon: { left: number; top: number };
   } | null>(null);
 
-  const { playerState, gameState, isCompact, dimensions } = appData;
   const tabBarHeight = useBottomTabBarHeight() + 10;
+  const [inventoryBounds, setInventoryBounds] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null>(null);
+
+  const header = useHeaderHeight();
 
   if (playerState && gameState) {
     const name = playerState.fullName;
     return (
       <>
+        <ProjectedImage
+          blockSize={blockSize ?? 0}
+          iconString={iconString}
+          position={position}
+          isDragging={isDragging}
+        />
         <TutorialModal
           tutorial={TutorialOption.intro}
           isFocused={useIsFocused()}
@@ -67,7 +88,7 @@ const HomeScreen = observer(() => {
         <View
           className="flex-1"
           style={{
-            paddingTop: useHeaderHeight(),
+            paddingTop: header,
             paddingBottom: tabBarHeight + (isCompact ? 0 : 28),
           }}
         >
@@ -218,6 +239,7 @@ const HomeScreen = observer(() => {
                 setDisplayItem={setDisplayItem}
               />
               <InventoryRender
+                setInventoryBounds={setInventoryBounds}
                 selfRef={inventoryTarget}
                 headTarget={headTarget}
                 bodyTarget={bodyTarget}
@@ -227,6 +249,7 @@ const HomeScreen = observer(() => {
                 inventory={playerState.getInventory()}
                 displayItem={displayItem}
                 setDisplayItem={setDisplayItem}
+                setIconString={setIconString}
                 keyItemInventory={
                   playerState.keyItems.length > 0
                     ? playerState.keyItems

@@ -1,10 +1,9 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { View, Pressable, Switch } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { Text } from "./Themed";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
-import { AppContext } from "../app/_layout";
 import { useVibration } from "../utility/customHooks";
 import {
   getLocalTutorialState,
@@ -14,6 +13,7 @@ import {
 } from "../utility/functions/misc";
 import { TutorialOption } from "../utility/types";
 import GenericModal from "./GenericModal";
+import { useGameState } from "../stores/AppData";
 
 type TutorialPage = {
   title?: string;
@@ -44,10 +44,7 @@ const TutorialModal = observer(
     override,
     clearOverride,
   }: ITutorialModal) => {
-    const appData = useContext(AppContext);
-    if (!appData) throw new Error("missing context");
-
-    const { gameState } = appData;
+    const { gameState } = useGameState();
     const { colorScheme } = useColorScheme();
     const vibration = useVibration();
 

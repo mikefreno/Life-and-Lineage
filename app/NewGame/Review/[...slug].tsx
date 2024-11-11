@@ -20,7 +20,6 @@ import {
   getStartingBaseStats,
 } from "../../../utility/functions/characterAid";
 import { createShops } from "../../../classes/shop";
-import { AppContext } from "../../_layout";
 import {
   Element,
   ElementToString,
@@ -36,6 +35,7 @@ import { storage } from "../../../utility/functions/storage";
 import { useColorScheme } from "nativewind";
 import { saveGame, savePlayer } from "../../../utility/functions/save_load";
 import GenericFlatButton from "../../../components/GenericFlatButton";
+import { useGameState } from "../../../stores/AppData";
 
 export default function NewGameReview() {
   const { slug } = useLocalSearchParams();
@@ -60,11 +60,7 @@ export default function NewGameReview() {
   const lastName = slug[4];
   const vibration = useVibration();
 
-  const appData = useContext(AppContext);
-  if (!appData) {
-    throw new Error("missing context");
-  }
-  const { gameState, setGameData, setPlayerCharacter, setLogs } = appData;
+  const { gameState, setGameData, setPlayerCharacter } = useGameState();
   const navigation = useNavigation();
   const { colorScheme } = useColorScheme();
 

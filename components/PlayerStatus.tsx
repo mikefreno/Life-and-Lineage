@@ -7,7 +7,7 @@ import {
   View,
   Platform,
 } from "react-native";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { toTitleCase, damageReduction } from "../utility/functions/misc";
 import GenericModal from "./GenericModal";
@@ -17,7 +17,6 @@ import FadeOutNode from "./FadeOutNode";
 import { BlurView } from "expo-blur";
 import { useColorScheme } from "nativewind";
 import { usePathname } from "expo-router";
-import { AppContext } from "../app/_layout";
 import { useIsFocused } from "@react-navigation/native";
 import {
   ClockIcon,
@@ -34,6 +33,7 @@ import {
 import { Attribute, AttributeToString } from "../utility/types";
 import { Condition } from "../classes/conditions";
 import { Text } from "./Themed";
+import { useGameState, useLayout } from "../stores/AppData";
 
 export const EXPANDED_PAD = 28;
 
@@ -52,16 +52,13 @@ const PlayerStatus = observer(
     positioning = "absolute",
     classname,
   }: PlayerStatusProps) => {
-    const appData = useContext(AppContext);
-    if (!appData) throw new Error("missing context");
+    const { playerState, gameState } = useGameState();
     const {
-      playerState,
-      gameState,
       isCompact,
       setIsCompact,
-      showDetailedStatusView,
       setShowDetailedStatusView,
-    } = appData;
+      showDetailedStatusView,
+    } = useLayout();
     const [readableGold, setReadableGold] = useState(
       playerState?.getReadableGold(),
     );

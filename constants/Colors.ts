@@ -1,24 +1,35 @@
 import { Element, PlayerClassOptions } from "../utility/types";
 
+// Core colors
 const tintColorLight = "#2f95dc";
 const tintColorDark = "#fff";
+const borderColor = "#ccc";
+
+// Light theme colors
+const lightBackground = "#fafafa";
+const lightText = "#000";
+
+// Dark theme colors
+const darkBackground = "#09090b";
+const darkCard = "#18181b";
+const darkText = "#fff";
 
 export default {
   light: {
-    text: "#000",
-    background: "#fafafa",
+    text: lightText,
+    background: lightBackground,
     tint: tintColorLight,
-    tabIconDefault: "#ccc",
+    tabIconDefault: borderColor,
     tabIconSelected: tintColorLight,
-    accent: "#fafafa",
+    accent: lightBackground,
   },
   dark: {
-    text: "#fff",
-    background: "#09090b",
+    text: darkText,
+    background: darkBackground,
     tint: tintColorDark,
-    tabIconDefault: "#ccc",
+    tabIconDefault: borderColor,
     tabIconSelected: tintColorDark,
-    accent: "#18181b",
+    accent: darkCard,
   },
 };
 
@@ -26,10 +37,10 @@ export const LightTheme = {
   dark: false,
   colors: {
     primary: tintColorLight,
-    background: "#fafafa",
-    card: "#fafafa",
-    text: "#000",
-    border: "#ccc",
+    background: lightBackground,
+    card: lightBackground,
+    text: lightText,
+    border: borderColor,
     notification: tintColorLight,
   },
 };
@@ -38,14 +49,11 @@ export const DarkTheme = {
   dark: true,
   colors: {
     primary: tintColorDark,
-    background: "#09090b",
-    card: "#18181b",
-    text: "#fff",
-    border: "#ccc",
+    background: darkBackground,
+    card: darkCard,
+    text: darkText,
+    border: borderColor,
     notification: tintColorDark,
-  },
-  fonts: {
-    regular: { fontFamily: "PixelifySans" },
   },
 };
 
