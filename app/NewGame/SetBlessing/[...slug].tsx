@@ -28,7 +28,7 @@ import { useGameState, useLayout } from "../../../stores/AppData";
 export default function SetBlessing() {
   const { slug } = useLocalSearchParams();
 
-  let playerClass = slug as PlayerClassOptions;
+  let playerClass = slug[0] as PlayerClassOptions;
 
   const isFocused = useIsFocused();
   const [blessing, setBlessing] = useState<Element>();
@@ -39,6 +39,9 @@ export default function SetBlessing() {
   const { dimensions } = useLayout();
 
   const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
+  while (!slug) {
+    return;
+  }
 
   return (
     <>

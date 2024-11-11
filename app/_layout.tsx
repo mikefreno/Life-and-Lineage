@@ -239,7 +239,7 @@ const RootLayout = observer(() => {
             })}
           />
           <Stack.Screen
-            name="NewGame/SetBlessing/[slug]"
+            name="NewGame/SetBlessing/[...slug]"
             options={headerOptions({ title: "Blessing Select" })}
           />
           <Stack.Screen

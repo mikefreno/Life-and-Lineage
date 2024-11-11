@@ -1,7 +1,7 @@
 import { Pressable, ScrollView, View } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
 import "../../assets/styles/globals.css";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { router } from "expo-router";
 import { useVibration } from "../../utility/customHooks";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -26,7 +26,6 @@ const SetClassScreen = observer(() => {
   const [selectedClass, setSelectedClass] = useState<
     "mage" | "necromancer" | "paladin" | "ranger"
   >();
-  let classRef = useRef<"mage" | "necromancer" | "paladin" | "ranger">();
   const vibration = useVibration();
 
   const { gameState } = useGameState();
@@ -44,6 +43,11 @@ const SetClassScreen = observer(() => {
       setShowTutorialReset(!!gameState);
     });
   }, []);
+
+  const goToNext = useCallback(() => {
+    vibration({ style: "light" });
+    router.push(`/NewGame/SetBlessing/${selectedClass}`);
+  }, [selectedClass]);
 
   return (
     <>
@@ -101,7 +105,6 @@ const SetClassScreen = observer(() => {
               onPress={() => {
                 vibration({ style: "light" });
                 setSelectedClass("mage");
-                classRef.current = "mage";
               }}
               style={{
                 height: dimensions.height * 0.25,
@@ -136,7 +139,6 @@ const SetClassScreen = observer(() => {
               onPress={() => {
                 vibration({ style: "light" });
                 setSelectedClass("ranger");
-                classRef.current = "ranger";
               }}
               style={{
                 height: dimensions.height * 0.25,
@@ -171,7 +173,6 @@ const SetClassScreen = observer(() => {
               onPress={() => {
                 vibration({ style: "light" });
                 setSelectedClass("necromancer");
-                classRef.current = "necromancer";
               }}
               style={{
                 height: dimensions.height * 0.25,
@@ -208,7 +209,6 @@ const SetClassScreen = observer(() => {
               onPress={() => {
                 vibration({ style: "light" });
                 setSelectedClass("paladin");
-                classRef.current = "paladin";
               }}
               style={{
                 height: dimensions.height * 0.25,
@@ -246,12 +246,7 @@ const SetClassScreen = observer(() => {
           </Text>
           {selectedClass && (
             <View className="mx-auto py-4 pb-[10vh]">
-              <GenericFlatButton
-                onPressFunction={() => {
-                  vibration({ style: "light" });
-                  router.push(`/NewGame/SetBlessing/${classRef.current}`);
-                }}
-              >
+              <GenericFlatButton onPressFunction={goToNext}>
                 Next
               </GenericFlatButton>
             </View>

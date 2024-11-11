@@ -12,7 +12,6 @@ import { useColorScheme } from "nativewind";
 import {
   useBattleLogger,
   useCombatActions,
-  useEnemyManagement,
   usePouch,
   useVibration,
 } from "../../utility/customHooks";
@@ -50,7 +49,6 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
   const { playerState, enemyState } = useGameState();
 
   const { inCombat } = useDungeonCore();
-  const {} = useEnemyManagement();
   const { useAttack } = useCombatActions();
   const { displayItem, setDisplayItem } = useLootState();
   const { attackAnimationOnGoing, setAttackAnimationOnGoing } =

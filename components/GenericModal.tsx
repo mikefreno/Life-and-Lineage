@@ -48,10 +48,17 @@ export default function GenericModal({
   const { setModalShowing } = useLayout();
 
   useEffect(() => {
-    if (isVisibleCondition && !gameState?.atDeathScreen) {
+    if (
+      isVisibleCondition &&
+      !(gameState?.atDeathScreen && !gameState.startingNewGame)
+    ) {
       setModalShowing(true);
     }
-  }, [isVisibleCondition, gameState?.atDeathScreen]);
+  }, [
+    isVisibleCondition,
+    gameState?.atDeathScreen,
+    gameState?.startingNewGame,
+  ]);
 
   return (
     <Modal
@@ -68,7 +75,10 @@ export default function GenericModal({
           ? "#ffffffff"
           : "#000000"
       }
-      isVisible={isVisibleCondition && !gameState?.atDeathScreen}
+      isVisible={
+        isVisibleCondition &&
+        !(gameState?.atDeathScreen && !gameState.startingNewGame)
+      }
       backdropOpacity={0.5}
       onBackdropPress={backdropCloses ? backFunction : undefined}
       onBackButtonPress={backFunction}

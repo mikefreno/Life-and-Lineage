@@ -136,9 +136,6 @@ const LayoutProvider = ({ children }: { children: ReactNode }) => {
   const [showDetailedStatusView, setShowDetailedStatusView] =
     useState<boolean>(false);
   const [modalShowing, setModalShowing] = useState<boolean>(false);
-  useEffect(() => {
-    console.log(modalShowing);
-  }, [modalShowing]);
 
   const onChange = useCallback(
     ({
@@ -232,16 +229,16 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useDraggableDataState = () => {
-  const context = useContext(DragContext);
-  if (!context) throw new Error("Missing DraggableDataProvider");
-  return context;
-};
-
 export const useGameState = () => {
   const context = useContext(GameStateContext);
   if (!context)
     throw new Error("useGameState must be used within GameStateProvider");
+  return context;
+};
+
+export const useDraggableDataState = () => {
+  const context = useContext(DragContext);
+  if (!context) throw new Error("Missing DraggableDataProvider");
   return context;
 };
 

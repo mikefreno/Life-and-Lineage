@@ -40,6 +40,7 @@ export class Game {
   tutorialsShown: Record<TutorialOption, boolean>;
   tutorialsEnabled: boolean;
   independantChildren: Character[];
+  startingNewGame = false;
 
   constructor({
     date,
@@ -108,6 +109,7 @@ export class Game {
       independantChildrenAgeCheck: action,
       adopt: action,
       inheritance: action,
+      startingNewGame: observable,
     });
 
     reaction(

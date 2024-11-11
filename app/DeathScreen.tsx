@@ -55,8 +55,12 @@ export default function DeathScreen() {
   }, []);
 
   function startNewGame() {
+    if (gameState) {
+      gameState.startingNewGame = true;
+    }
     router.push("/NewGame");
   }
+
   function createPlayerCharacter() {
     if (nextLife && selectedClass && selectedBlessing && playerState) {
       const inventory = [
