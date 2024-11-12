@@ -5,11 +5,11 @@ import { Text } from "./Themed";
 import type { ReactNode } from "react";
 
 interface GenericRaisedButtonProps {
-  onPressFunction: () => void;
+  onPress: () => void;
   backgroundColor?: ColorValue;
   children: string | ReactNode;
   textColor?: ColorValue;
-  disabledCondition?: boolean;
+  disabled?: boolean;
   vibrationStrength?:
     | "light"
     | "medium"
@@ -23,11 +23,11 @@ interface GenericRaisedButtonProps {
 }
 
 const GenericRaisedButton = ({
-  onPressFunction,
+  onPress,
   backgroundColor,
   textColor,
   children,
-  disabledCondition = false,
+  disabled = false,
   vibrationStrength = "light",
   vibrationEssentiality = false,
   disableTopLevelStyling = false,
@@ -45,9 +45,9 @@ const GenericRaisedButton = ({
           style: vibrationStrength,
           essential: vibrationEssentiality,
         });
-        onPressFunction();
+        onPress();
       }}
-      disabled={disabledCondition}
+      disabled={disabled}
       style={style}
     >
       {({ pressed }) => (
@@ -56,7 +56,7 @@ const GenericRaisedButton = ({
             pressed ? "scale-95 opacity-50" : ""
           }`}
           style={
-            !disabledCondition
+            !disabled
               ? {
                   shadowColor: "#000",
                   elevation: 2,

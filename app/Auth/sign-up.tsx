@@ -211,7 +211,7 @@ const SignUpScreen = observer(() => {
               />
             )}
             <GenericRaisedButton
-              onPressFunction={() => setUsingEmail(true)}
+              onPress={() => setUsingEmail(true)}
               backgroundColor={"#2563eb"}
               style={{ width: 230 }}
             >
@@ -328,12 +328,12 @@ const SignUpScreen = observer(() => {
                 </Text>
               )}
               <GenericRaisedButton
-                disabledCondition={
+                disabled={
                   password.length == 0 ||
                   passwordConf.length == 0 ||
                   emailAddress.length == 0
                 }
-                onPressFunction={handleEmailSignUp}
+                onPress={handleEmailSignUp}
                 backgroundColor={"#2563eb"}
                 textColor={"#fafafa"}
               >

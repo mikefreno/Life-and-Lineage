@@ -3,8 +3,8 @@ import { ColorValue, Pressable, View } from "react-native";
 import { Text } from "./Themed";
 
 type GenericFlatButton = {
-  onPressFunction: () => void;
-  disabledCondition?: boolean;
+  onPress: () => void;
+  disabled?: boolean;
   backgroundColor?: ColorValue;
   className?: string;
   children: string | ReactNode;
@@ -12,23 +12,19 @@ type GenericFlatButton = {
 };
 
 const GenericFlatButton = ({
-  onPressFunction,
-  disabledCondition = false,
+  onPress,
+  disabled = false,
   backgroundColor,
   textColor,
   children,
   className,
 }: GenericFlatButton) => {
   return (
-    <Pressable
-      disabled={disabledCondition}
-      onPress={onPressFunction}
-      className={className}
-    >
+    <Pressable disabled={disabled} onPress={onPress} className={className}>
       {({ pressed }) => (
         <View
           className={`${pressed ? "scale-95 opacity-50" : ""} ${
-            !disabledCondition
+            !disabled
               ? "mx-auto rounded-xl border border-zinc-900 px-6 py-2 dark:border-zinc-50"
               : "mx-auto rounded-xl border border-zinc-400 px-6 py-2"
           }`}
@@ -38,7 +34,7 @@ const GenericFlatButton = ({
             <Text
               className="text-center tracking-widest"
               style={
-                disabledCondition
+                disabled
                   ? { color: "#d4d4d8" }
                   : textColor
                   ? { color: textColor }

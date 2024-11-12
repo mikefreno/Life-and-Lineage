@@ -59,7 +59,14 @@ const TutorialModal = observer(
       setTutorialState(
         gameState?.tutorialsEnabled ?? loadStoredTutorialState(),
       );
-      if (isFocused) {
+      if (isFocused && tutorial == TutorialOption.keyItem) {
+        if (
+          getLocalTutorialState(TutorialOption.intro) &&
+          !getLocalTutorialState(tutorial)
+        ) {
+          setShouldShow(true);
+        }
+      } else if (isFocused) {
         setShouldShow(
           override ||
             (gameState

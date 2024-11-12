@@ -237,10 +237,8 @@ const SignInScreen = observer(() => {
                 }}
               />
               <GenericRaisedButton
-                disabledCondition={
-                  password.length == 0 || emailAddress.length == 0
-                }
-                onPressFunction={attemptLogin}
+                disabled={password.length == 0 || emailAddress.length == 0}
+                onPress={attemptLogin}
                 backgroundColor={"#2563eb"}
                 textColor={"#fafafa"}
                 style={{ height: 48 }}

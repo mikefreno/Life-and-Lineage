@@ -324,10 +324,7 @@ export const DungeonMapControls = () => {
   }> = ({ direction }) => {
     const valid = isMoveValid(direction);
     return (
-      <GenericRaisedButton
-        onPressFunction={() => move(direction)}
-        disabledCondition={!valid}
-      >
+      <GenericRaisedButton onPress={() => move(direction)} disabled={!valid}>
         {direction.charAt(0).toUpperCase() + direction.slice(1)}
       </GenericRaisedButton>
     );

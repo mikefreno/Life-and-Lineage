@@ -119,7 +119,7 @@ export default function SetSex() {
         {sex ? (
           <View className="mx-auto mt-8">
             <GenericFlatButton
-              onPressFunction={() => {
+              onPress={() => {
                 vibration({ style: "light" });
                 router.push(
                   `/NewGame/SetName/${playerClass}/${blessing}/${sexRef.current}`,

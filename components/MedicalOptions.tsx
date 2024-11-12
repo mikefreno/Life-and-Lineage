@@ -128,10 +128,7 @@ const MedicalOption = observer(
             ) : null}
           </View>
         </View>
-        <GenericRaisedButton
-          onPressFunction={visit}
-          disabledCondition={getDisabled()}
-        >
+        <GenericRaisedButton onPress={visit} disabled={getDisabled()}>
           Visit
         </GenericRaisedButton>
       </ThemedCard>

@@ -300,7 +300,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           )}
           <View className="mt-4">
             <GenericFlatButton
-              onPressFunction={() => setShowDatePartnerSelection(false)}
+              onPress={() => setShowDatePartnerSelection(false)}
             >
               Cancel
             </GenericFlatButton>
@@ -338,7 +338,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
             </View>
           )}
           <View className="mt-4">
-            <GenericFlatButton onPressFunction={() => setGoodOutcome(null)}>
+            <GenericFlatButton onPress={() => setGoodOutcome(null)}>
               Close
             </GenericFlatButton>
           </View>
@@ -360,7 +360,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                   playerState.gold >= 0.25 * badOutCome.buyOff.price && (
                     <>
                       <GenericFlatButton
-                        onPressFunction={() => payOff(badOutCome.buyOff!.price)}
+                        onPress={() => payOff(badOutCome.buyOff!.price)}
                       >
                         <View className="flex flex-row">
                           <Text>
@@ -377,9 +377,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                       </GenericStrikeAround>
                     </>
                   )}
-                <GenericFlatButton onPressFunction={goToFight}>
-                  Fight
-                </GenericFlatButton>
+                <GenericFlatButton onPress={goToFight}>Fight</GenericFlatButton>
               </View>
             </>
           ) : (
@@ -398,7 +396,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                   </View>
                 )}
               </View>
-              <GenericFlatButton onPressFunction={() => setBadOutcome(null)}>
+              <GenericFlatButton onPress={() => setBadOutcome(null)}>
                 Close
               </GenericFlatButton>
             </>
@@ -414,9 +412,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           <Text className="pb-2 text-xl">Nothing of note happened</Text>
           <Text>Could have been worse</Text>
           <View className="mt-4">
-            <GenericFlatButton
-              onPressFunction={() => setNothingHappened(false)}
-            >
+            <GenericFlatButton onPress={() => setNothingHappened(false)}>
               Close
             </GenericFlatButton>
           </View>
@@ -451,21 +447,19 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           <View className="flex flex-row ">
             {activity.alone && (
               <GenericRaisedButton
-                disabledCondition={
-                  playerState && playerState.gold < activity.cost
-                }
-                onPressFunction={visit}
+                disabled={playerState && playerState.gold < activity.cost}
+                onPress={visit}
               >
                 Visit Alone
               </GenericRaisedButton>
             )}
             {activity.date && gameState && (
               <GenericRaisedButton
-                disabledCondition={
+                disabled={
                   playerState?.getAllAdultCharacters(new Date(gameState.date))
                     .length == 0
                 }
-                onPressFunction={() => dateSelect(activity.name)}
+                onPress={() => dateSelect(activity.name)}
               >
                 Go on Date
               </GenericRaisedButton>

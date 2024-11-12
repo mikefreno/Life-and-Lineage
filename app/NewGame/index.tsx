@@ -1,8 +1,8 @@
 import { Pressable, ScrollView, View } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
 import "../../assets/styles/globals.css";
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
-import { router } from "expo-router";
+import { useLayoutEffect, useState } from "react";
+import { Link, router } from "expo-router";
 import { useVibration } from "../../utility/customHooks";
 import { FontAwesome5 } from "@expo/vector-icons";
 import TutorialModal from "../../components/TutorialModal";
@@ -43,11 +43,6 @@ const SetClassScreen = observer(() => {
       setShowTutorialReset(!!gameState);
     });
   }, []);
-
-  const goToNext = useCallback(() => {
-    vibration({ style: "light" });
-    router.push(`/NewGame/SetBlessing/${selectedClass}`);
-  }, [selectedClass]);
 
   return (
     <>
@@ -246,9 +241,15 @@ const SetClassScreen = observer(() => {
           </Text>
           {selectedClass && (
             <View className="mx-auto py-4 pb-[10vh]">
-              <GenericFlatButton onPressFunction={goToNext}>
-                Next
-              </GenericFlatButton>
+              <Link
+                href={{
+                  pathname: "/NewGame/SetBlessing/[slug]",
+                  params: { slug: selectedClass },
+                }}
+                className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 dark:border-zinc-50"
+              >
+                <Text>Next</Text>
+              </Link>
             </View>
           )}
         </View>

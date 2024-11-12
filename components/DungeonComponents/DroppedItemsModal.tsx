@@ -137,7 +137,7 @@ export default function DroppedItemsModal() {
             <Image source={item.getItemIcon()} />
             <Text className="my-auto ml-2 w-1/2">{toTitleCase(item.name)}</Text>
             <GenericFlatButton
-              onPressFunction={() => {
+              onPress={() => {
                 vibration({ style: "light" });
                 takeItem(item);
               }}

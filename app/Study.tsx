@@ -104,7 +104,7 @@ export default function LearningKnowledgeScreen() {
               {`This book is beyond your knowledge in the school of ${ElementToString[showMasteryLevelTooLow]}`}
             </Text>
             <GenericRaisedButton
-              onPressFunction={() => setShowMasteryLevelTooLow(null)}
+              onPress={() => setShowMasteryLevelTooLow(null)}
               textColor={elementalColorMap[showMasteryLevelTooLow].dark}
             >
               Acknowledge Knowledge
@@ -142,7 +142,7 @@ export default function LearningKnowledgeScreen() {
                       maxValue={20}
                     />
                     <GenericRaisedButton
-                      onPressFunction={() => {
+                      onPress={() => {
                         studySpell(
                           studyState.bookName,
                           studyState.spellName,
@@ -167,7 +167,7 @@ export default function LearningKnowledgeScreen() {
               </Text>
               <SpellDetails spell={selectedBookSpell} />
               <GenericRaisedButton
-                onPressFunction={() => {
+                onPress={() => {
                   if (
                     playerState &&
                     selectedBookSpell.proficiencyNeeded <=

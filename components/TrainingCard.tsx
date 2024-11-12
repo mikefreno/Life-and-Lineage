@@ -90,8 +90,8 @@ const TrainingCard = observer(
             <>
               {playerState.hasAllPreReqs(preRequisites) ? (
                 <GenericRaisedButton
-                  onPressFunction={progressQualification}
-                  disabledCondition={
+                  onPress={progressQualification}
+                  disabled={
                     playerState.gold < goldCostPerTick ||
                     !playerState.hasAllPreReqs(preRequisites)
                   }

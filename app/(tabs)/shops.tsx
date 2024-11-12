@@ -2,7 +2,7 @@ import { Pressable, ScrollView, View } from "react-native";
 import { Shop } from "../../classes/shop";
 import { CharacterImage } from "../../components/CharacterImage";
 import shopObjects from "../../assets/json/shops.json";
-import { router } from "expo-router";
+import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import { useVibration } from "../../utility/customHooks";
 import TutorialModal from "../../components/TutorialModal";
@@ -34,82 +34,68 @@ const ShopsScreen = observer(() => {
   const bottomHeight = useBottomTabBarHeight();
 
   if (gameState) {
-    const renderItem = (shop: Shop) => (
-      <View className="h-96 w-1/2" key={shop.shopKeeper.id}>
-        <View
-          className="m-2 flex-1 items-center justify-between rounded-xl border p-4"
-          style={{
-            shadowColor: shopObjects.find(
-              (shopObj) => shopObj.type == shop.archetype,
-            )?.colors.background,
-            shadowOffset: {
-              width: 2,
-              height: 3,
-            },
-            elevation: 4,
-            backgroundColor: shopObjects.find(
-              (shopObj) => shopObj.type == shop.archetype,
-            )?.colors.lightbackground,
-            shadowOpacity: 0.5,
-            shadowRadius: 4,
-            borderColor: shopObjects.find(
-              (shopObj) => shopObj.type == shop.archetype,
-            )?.colors.background,
-          }}
-        >
-          <Text
-            className="text-center text-2xl"
+    const renderItem = (shop: Shop) => {
+      const shopColors = shopObjects.find(
+        (shopObj) => shopObj.type == shop.archetype,
+      )?.colors;
+      return (
+        <View className="h-96 w-1/2" key={shop.shopKeeper.id}>
+          <View
+            className="m-2 flex-1 items-center justify-between rounded-xl border p-4"
             style={{
-              color: shopObjects.find(
-                (shopObj) => shopObj.type == shop.archetype,
-              )?.colors.font,
+              shadowColor: shopColors?.background,
+              shadowOffset: {
+                width: 2,
+                height: 3,
+              },
+              elevation: 4,
+              backgroundColor: shopColors?.lightbackground,
+              shadowOpacity: 0.5,
+              shadowRadius: 4,
+              borderColor: shopColors?.background,
             }}
           >
-            The {toTitleCase(shop.archetype)}
-          </Text>
-          <View className="items-center">
-            <CharacterImage
-              characterAge={calculateAge(
-                new Date(shop.shopKeeper.birthdate),
-                new Date(gameState.date),
-              )}
-              characterSex={shop.shopKeeper.sex == "male" ? "M" : "F"}
-            />
             <Text
-              className="text-center"
+              className="text-center text-2xl"
               style={{
                 color: shopObjects.find(
                   (shopObj) => shopObj.type == shop.archetype,
                 )?.colors.font,
               }}
             >
-              {shop.shopKeeper.fullName}
+              The {toTitleCase(shop.archetype)}
             </Text>
-
-            <Pressable
-              className="mt-2"
-              onPress={() => {
-                vibration({ style: "light" });
-                router.push(`/Shops/${shop.archetype}`);
-              }}
-            >
-              {({ pressed }) => (
+            <View className="items-center">
+              <CharacterImage
+                characterAge={calculateAge(
+                  new Date(shop.shopKeeper.birthdate),
+                  new Date(gameState.date),
+                )}
+                characterSex={shop.shopKeeper.sex == "male" ? "M" : "F"}
+              />
+              <Text
+                className="text-center"
+                style={{
+                  color: shopColors?.font,
+                }}
+              >
+                {shop.shopKeeper.fullName}
+              </Text>
+              <Link
+                className="mt-2"
+                href={`/Shops/${shop.archetype}`}
+                onPressIn={() => vibration({ style: "light" })}
+              >
                 <View
-                  className={`rounded-lg px-8 py-3 ${
-                    pressed ? "scale-95 opacity-50" : ""
-                  }`}
+                  className="px-8 py-3 rounded-lg"
                   style={{
-                    shadowColor: shopObjects.find(
-                      (shopObj) => shopObj.type == shop.archetype,
-                    )?.colors.background,
+                    shadowColor: shopColors?.background,
                     shadowOffset: {
                       width: 2,
                       height: 3,
                     },
                     elevation: 2,
-                    backgroundColor: shopObjects.find(
-                      (shopObj) => shopObj.type == shop.archetype,
-                    )?.colors.background,
+                    backgroundColor: shopColors?.background,
                     shadowOpacity: 0.2,
                     shadowRadius: 5,
                   }}
@@ -117,20 +103,18 @@ const ShopsScreen = observer(() => {
                   <Text
                     className="text-lg"
                     style={{
-                      color: shopObjects.find(
-                        (shopObj) => shopObj.type == shop.archetype,
-                      )?.colors.font,
+                      color: shopColors?.font,
                     }}
                   >
                     Enter
                   </Text>
                 </View>
-              )}
-            </Pressable>
+              </Link>
+            </View>
           </View>
         </View>
-      </View>
-    );
+      );
+    };
 
     return (
       <>

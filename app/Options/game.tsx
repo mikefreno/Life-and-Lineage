@@ -107,7 +107,7 @@ export default function GameSettings() {
       </GenericModal>
       <View className="flex-1 items-center justify-center px-4">
         <GenericStrikeAround>Game Restart</GenericStrikeAround>
-        <GenericRaisedButton onPressFunction={startNewGame}>
+        <GenericRaisedButton onPress={startNewGame}>
           Start New Game
         </GenericRaisedButton>
         <GenericStrikeAround>Health Warning</GenericStrikeAround>
@@ -144,7 +144,7 @@ export default function GameSettings() {
             />
           </View>
           <GenericRaisedButton
-            onPressFunction={() => {
+            onPress={() => {
               vibration({ style: "light" });
               setShowTutorialResetConfirm(true);
             }}

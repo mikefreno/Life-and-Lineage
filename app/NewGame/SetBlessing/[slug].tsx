@@ -28,7 +28,7 @@ import { useGameState, useLayout } from "../../../stores/AppData";
 export default function SetBlessing() {
   const { slug } = useLocalSearchParams();
 
-  let playerClass = slug[0] as PlayerClassOptions;
+  let playerClass = slug as PlayerClassOptions;
 
   const isFocused = useIsFocused();
   const [blessing, setBlessing] = useState<Element>();
@@ -39,9 +39,6 @@ export default function SetBlessing() {
   const { dimensions } = useLayout();
 
   const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
-  while (!slug) {
-    return;
-  }
 
   return (
     <>
@@ -82,12 +79,12 @@ export default function SetBlessing() {
           {blessing == 0 || blessing ? ( // sometimes I really hate ts. Evaluation of 0 is false.
             <View className="mx-auto h-32 py-2">
               <GenericFlatButton
-                onPressFunction={() => {
+                onPress={() => {
                   vibration({ style: "light" });
                   router.push(`/NewGame/SetSex/${playerClass}/${blessing}`);
                 }}
               >
-                <Text className="text-xl tracking-widest">Next</Text>
+                Next
               </GenericFlatButton>
             </View>
           ) : (

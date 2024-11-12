@@ -93,8 +93,8 @@ const LaborTask = observer(
         {playerState?.job == title ? (
           <>
             <GenericRaisedButton
-              onPressFunction={work}
-              disabledCondition={
+              onPress={work}
+              disabled={
                 (cost.health && playerState.currentHealth <= cost.health) ||
                 playerState.currentMana < cost.mana
               }
@@ -107,7 +107,7 @@ const LaborTask = observer(
             />
           </>
         ) : (
-          <GenericRaisedButton onPressFunction={() => applyToJob(title)}>
+          <GenericRaisedButton onPress={() => applyToJob(title)}>
             Apply
           </GenericRaisedButton>
         )}

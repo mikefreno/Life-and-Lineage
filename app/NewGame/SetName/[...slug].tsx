@@ -117,7 +117,7 @@ export default function SetName() {
                 {firstName.trimEnd() && lastName.trimEnd() ? (
                   <View className="mx-auto">
                     <GenericFlatButton
-                      onPressFunction={() => {
+                      onPress={() => {
                         vibration({ style: "light" });
                         router.push(
                           `/NewGame/Review/${playerClass}/${blessing}/${sex}/${trimWhitespace(

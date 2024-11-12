@@ -77,11 +77,10 @@ const GreetingComponent = ({
 };
 
 const ShopInteriorScreen = observer(() => {
-  const { shop } = useLocalSearchParams();
+  let { shop } = useLocalSearchParams();
   const { gameState, playerState } = useGameState();
   const { blockSize } = useLayout();
-  const { position, isDragging, iconString, setIconString } =
-    useDraggableDataState();
+  const { setIconString } = useDraggableDataState();
 
   const vibration = useVibration();
   const colors = shopObjects.find((shopObj) => shopObj.type == shop)?.colors;

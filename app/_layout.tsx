@@ -239,8 +239,8 @@ const RootLayout = observer(() => {
             })}
           />
           <Stack.Screen
-            name="NewGame/SetBlessing/[...slug]"
-            options={headerOptions({ title: "Blessing Select" })}
+            name="NewGame/SetBlessing/[slug]"
+            options={([headerOptions({ title: "Blessing Select" })], {})}
           />
           <Stack.Screen
             name="NewGame/SetSex/[...slug]"
@@ -291,6 +291,7 @@ const headerOptions = ({
   blur
     ? {
         title: title,
+        headerBackButtonMenuEnabled: false,
         headerBackTitleVisible: false,
         headerTransparent: true,
         headerTitleStyle: {
@@ -316,6 +317,7 @@ const headerOptions = ({
     : {
         title: title,
         headerBackTitleVisible: headerBackTitleVisible,
+        headerBackButtonMenuEnabled: false,
         presentation: presentation,
         headerTitleStyle: {
           fontFamily: "PixelifySans",

@@ -163,8 +163,8 @@ export const AppSettings = observer(() => {
               />
               <Text className="text-center text-sm">Min Length: 3</Text>
               <GenericFlatButton
-                onPressFunction={newRemoteSave}
-                disabledCondition={saveName.length < 3}
+                onPress={newRemoteSave}
+                disabled={saveName.length < 3}
               >
                 Save
               </GenericFlatButton>
@@ -192,7 +192,7 @@ export const AppSettings = observer(() => {
                   </View>
                   <GenericFlatButton
                     backgroundColor={colorScheme == "dark" ? "black" : "white"}
-                    onPressFunction={() => overwriteSave(save)}
+                    onPress={() => overwriteSave(save)}
                   >
                     Overwrite save
                   </GenericFlatButton>
@@ -233,7 +233,7 @@ export const AppSettings = observer(() => {
                 </View>
                 <GenericFlatButton
                   backgroundColor={colorScheme == "dark" ? "black" : "white"}
-                  onPressFunction={() => loadRemoteSave(save)}
+                  onPress={() => loadRemoteSave(save)}
                 >
                   Load Save
                 </GenericFlatButton>
@@ -243,7 +243,7 @@ export const AppSettings = observer(() => {
         </GenericModal>
         <View className="flex-1 items-center justify-center px-4">
           {/*<GenericRaisedButton
-            onPressFunction={() => router.push("/Options/iaps")}
+            onPress={() => router.push("/Options/iaps")}
           >
             Go to IAPs
           </GenericRaisedButton>*/}
@@ -259,10 +259,8 @@ export const AppSettings = observer(() => {
               </Text>
               <View className="flex flex-row justify-evenly w-full">
                 <GenericFlatButton
-                  onPressFunction={toggleRemoteSaveWindow}
-                  disabledCondition={
-                    loadingDBInfo || !user.isConnectedAndInitialized
-                  }
+                  onPress={toggleRemoteSaveWindow}
+                  disabled={loadingDBInfo || !user.isConnectedAndInitialized}
                 >
                   {loadingDBInfo ? (
                     <D20DieAnimation size={20} keepRolling />
@@ -271,10 +269,8 @@ export const AppSettings = observer(() => {
                   )}
                 </GenericFlatButton>
                 <GenericFlatButton
-                  onPressFunction={toggleRemoteLoadWindow}
-                  disabledCondition={
-                    loadingDBInfo || !user.isConnectedAndInitialized
-                  }
+                  onPress={toggleRemoteLoadWindow}
+                  disabled={loadingDBInfo || !user.isConnectedAndInitialized}
                 >
                   {loadingDBInfo ? (
                     <D20DieAnimation size={20} keepRolling />
@@ -283,7 +279,7 @@ export const AppSettings = observer(() => {
                   )}
                 </GenericFlatButton>
               </View>
-              <GenericRaisedButton onPressFunction={logout}>
+              <GenericRaisedButton onPress={logout}>
                 Sign Out
               </GenericRaisedButton>
             </>
@@ -296,16 +292,16 @@ export const AppSettings = observer(() => {
               )}
               <View className="flex flex-row justify-evenly w-full">
                 <GenericRaisedButton
-                  onPressFunction={() => router.push("/Auth/sign-in")}
-                  disabledCondition={!user.isConnectedAndInitialized}
+                  onPress={() => router.push("/Auth/sign-in")}
+                  disabled={!user.isConnectedAndInitialized}
                 >
                   Sign In
                 </GenericRaisedButton>
                 <GenericRaisedButton
-                  onPressFunction={() => router.push("/Auth/sign-up")}
+                  onPress={() => router.push("/Auth/sign-up")}
                   backgroundColor={"#2563eb"}
                   textColor={"#fafafa"}
-                  disabledCondition={!user.isConnectedAndInitialized}
+                  disabled={!user.isConnectedAndInitialized}
                 >
                   Sign Up
                 </GenericRaisedButton>

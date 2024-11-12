@@ -97,15 +97,15 @@ export default function FleeModal({
           ) : null}
           <ThemedView className="flex w-full flex-row justify-evenly pt-8">
             <GenericFlatButton
-              onPressFunction={flee}
-              disabledCondition={
+              onPress={flee}
+              disabled={
                 inCombat && (attackAnimationOnGoing || playerState.isStunned)
               }
             >
               {enemyState ? "Run! (50%)" : "Leave"}
             </GenericFlatButton>
             <GenericFlatButton
-              onPressFunction={() => {
+              onPress={() => {
                 setFleeModalShowing(false);
                 setFleeRollFailure(false);
               }}

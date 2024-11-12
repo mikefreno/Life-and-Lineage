@@ -216,7 +216,7 @@ export default function NewGameReview() {
           playerClass,
         )}`}</Text>
       </Text>
-      <GenericFlatButton onPressFunction={() => startGame()} className="mt-4">
+      <GenericFlatButton onPress={() => startGame()} className="mt-4">
         Confirm?
       </GenericFlatButton>
     </View>

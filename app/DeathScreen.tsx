@@ -126,8 +126,8 @@ export default function DeathScreen() {
                   colorScheme={colorScheme}
                 />
                 <GenericFlatButton
-                  onPressFunction={() => setPage(1)}
-                  disabledCondition={!selectedClass}
+                  onPress={() => setPage(1)}
+                  disabled={!selectedClass}
                 >
                   Select Blessing
                 </GenericFlatButton>
@@ -151,8 +151,8 @@ export default function DeathScreen() {
                   dimensions={dimensions}
                 />
                 <GenericFlatButton
-                  onPressFunction={startNextLife}
-                  disabledCondition={!selectedClass}
+                  onPress={startNextLife}
+                  disabled={!selectedClass}
                 >
                   Continue Lineage
                 </GenericFlatButton>

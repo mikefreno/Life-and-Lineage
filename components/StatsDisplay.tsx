@@ -174,10 +174,10 @@ export function StatsDisplay({
               {displayItem.item.length && displayItem.item.length > 1 ? (
                 <>
                   <GenericFlatButton
-                    onPressFunction={() => {
+                    onPress={() => {
                       sellItem(firstItem), clearItem();
                     }}
-                    disabledCondition={singleIsDisabled}
+                    disabled={singleIsDisabled}
                   >
                     <Text
                       className={
@@ -190,11 +190,11 @@ export function StatsDisplay({
                     </Text>
                   </GenericFlatButton>
                   <GenericFlatButton
-                    onPressFunction={() => {
+                    onPress={() => {
                       sellStack(displayItem.item);
                       clearItem();
                     }}
-                    disabledCondition={stackIsDisabled}
+                    disabled={stackIsDisabled}
                     className="mt-1"
                   >
                     <Text
@@ -210,11 +210,11 @@ export function StatsDisplay({
                 </>
               ) : (
                 <GenericFlatButton
-                  onPressFunction={() => {
+                  onPress={() => {
                     props.sellItem(firstItem);
                     clearItem();
                   }}
-                  disabledCondition={singleIsDisabled}
+                  disabled={singleIsDisabled}
                 >
                   <Text
                     className={
@@ -247,8 +247,8 @@ export function StatsDisplay({
                 <Coins width={16} height={16} style={{ marginLeft: 6 }} />
               </View>
               <GenericFlatButton
-                onPressFunction={() => purchaseItem(firstItem)}
-                disabledCondition={singleIsDisabled}
+                onPress={() => purchaseItem(firstItem)}
+                disabled={singleIsDisabled}
               >
                 <Text
                   className={
@@ -260,8 +260,8 @@ export function StatsDisplay({
               </GenericFlatButton>
               {displayItem.item.length > 1 && (
                 <GenericFlatButton
-                  onPressFunction={() => purchaseStack(displayItem.item)}
-                  disabledCondition={stackIsDisabled}
+                  onPress={() => purchaseStack(displayItem.item)}
+                  disabled={stackIsDisabled}
                   className="pt-1"
                 >
                   <Text
@@ -280,7 +280,7 @@ export function StatsDisplay({
         return (
           <View className="pt-1">
             <GenericFlatButton
-              onPressFunction={() => {
+              onPress={() => {
                 props.addItemToPouch(displayItem.item);
                 clearItem();
                 playerState?.removeFromInventory(firstItem);
@@ -291,7 +291,7 @@ export function StatsDisplay({
             {displayItem.item.length > 1 && (
               <GenericFlatButton
                 className="pt-1"
-                onPressFunction={() => {
+                onPress={() => {
                   props.addItemToPouch(displayItem.item);
                   playerState?.removeFromInventory(displayItem.item);
                   clearItem();
@@ -344,7 +344,7 @@ export function StatsDisplay({
               invItem.equals(firstItem),
             ) && (
               <GenericFlatButton
-                onPressFunction={() => {
+                onPress={() => {
                   if (enemyState) {
                     const { enemyTurn } = useEnemyManagement();
                     firstItem.use(enemyTurn);
@@ -394,7 +394,7 @@ export function StatsDisplay({
               invItem.equals(firstItem),
             ) && (
               <GenericFlatButton
-                onPressFunction={() => {
+                onPress={() => {
                   firstItem.use();
                   clearItem();
                 }}
@@ -760,7 +760,7 @@ export function StatsDisplay({
         {firstItem.attachedAttacks.length > 0 && playerState && (
           <GenericFlatButton
             className="pt-1"
-            onPressFunction={() => setShowingAttacks(true)}
+            onPress={() => setShowingAttacks(true)}
           >
             Show attacks
           </GenericFlatButton>
@@ -772,7 +772,7 @@ export function StatsDisplay({
             </View>
             {!("purchaseItem" in props || "addItemToPouch" in props) && (
               <GenericFlatButton
-                onPressFunction={() => {
+                onPress={() => {
                   vibration({ style: "light" });
                   clearItem();
                   router.push("/Study");
@@ -786,7 +786,7 @@ export function StatsDisplay({
         ) : null}
         {firstItem.itemClass == ItemClassType.StoryItem && (
           <GenericFlatButton
-            onPressFunction={() => {
+            onPress={() => {
               vibration({ style: "light" });
               setRenderStory(firstItem.description);
             }}
