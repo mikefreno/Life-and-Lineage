@@ -7,7 +7,7 @@ import ProgressBar from "./ProgressBar";
 import GenericRaisedButton from "./GenericRaisedButton";
 import { toTitleCase } from "../utility/functions/misc";
 import { Coins, Sanity } from "../assets/icons/SVGIcons";
-import { useGameState } from "../stores/AppData";
+import { useRootStore } from "../hooks/stores";
 
 interface TrainingCardProps {
   name: string;
@@ -26,7 +26,7 @@ const TrainingCard = observer(
     preRequisites,
   }: TrainingCardProps) => {
     const { colorScheme } = useColorScheme();
-    const { playerState, gameState } = useGameState();
+    const { playerState, gameState } = useRootStore();
     const [experience, setExperience] = useState<number | undefined>(
       playerState?.getSpecifiedQualificationProgress(name),
     );
@@ -44,7 +44,7 @@ const TrainingCard = observer(
         sanityCostPerTick,
         goldCostPerTick,
       );
-      gameState.gameTick({ playerState });
+      gameState.gameTick();
     };
 
     return (

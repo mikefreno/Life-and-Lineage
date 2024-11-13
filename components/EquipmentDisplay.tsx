@@ -1,11 +1,11 @@
 import { RefObject } from "react";
 import { View, Image } from "react-native";
 import { Text } from "./Themed";
-import type { Item } from "../classes/item";
-import { useVibration } from "../utility/customHooks";
 import { checkReleasePositionProps } from "../utility/types";
-import { useGameState, useLayout } from "../stores/AppData";
 import { InventoryItem } from "./Draggable";
+import type { Item } from "../entities/item";
+import { useVibration } from "../hooks/generic";
+import { usePlayerStore, useUIStore } from "../hooks/stores";
 
 interface EquipmentDisplayProps {
   headTarget: RefObject<View>;
@@ -42,8 +42,8 @@ export default function EquipmentDisplay({
   setDisplayItem,
 }: EquipmentDisplayProps) {
   const vibration = useVibration();
-  const { playerState } = useGameState();
-  const { blockSize, dimensions } = useLayout();
+  const playerState = usePlayerStore();
+  const { itemBlockSize, dimensions } = useUIStore();
 
   function checkReleasePosition({
     itemStack,
@@ -144,7 +144,7 @@ export default function EquipmentDisplay({
 
       const isTwoHanded = playerState.equipment.mainHand?.slot === "two-hand";
 
-      while (!blockSize) {
+      while (!itemBlockSize) {
         return <></>;
       }
 
@@ -154,7 +154,7 @@ export default function EquipmentDisplay({
           {itemStack.length > 0 ? (
             <View
               className="z-50 mx-auto border border-zinc-400 rounded-lg"
-              style={{ height: blockSize, width: blockSize }}
+              style={{ height: itemBlockSize, width: itemBlockSize }}
             >
               <InventoryItem
                 item={itemStack}
@@ -170,14 +170,14 @@ export default function EquipmentDisplay({
                   ? "bg-zinc-400"
                   : "bg-red-800"
               } mx-auto z-10 items-center rounded-lg border border-zinc-400`}
-              style={{ height: blockSize, width: blockSize }}
+              style={{ height: itemBlockSize, width: itemBlockSize }}
             >
               <Image
                 className="my-auto opacity-50"
                 source={playerState.equipment.mainHand?.getItemIcon()}
                 style={{
-                  height: Math.min(blockSize * 0.65, 52),
-                  width: Math.min(blockSize * 0.65, 52),
+                  height: Math.min(itemBlockSize * 0.65, 52),
+                  width: Math.min(itemBlockSize * 0.65, 52),
                 }}
               />
             </View>
@@ -186,8 +186,8 @@ export default function EquipmentDisplay({
               ref={ref}
               className="mx-auto rounded-lg border border-zinc-400"
               style={{
-                height: blockSize,
-                width: blockSize,
+                height: itemBlockSize,
+                width: itemBlockSize,
               }}
             />
           )}
@@ -218,7 +218,9 @@ export default function EquipmentDisplay({
       </View>
       <View
         className={`mx-auto items-center ${
-          dimensions.width == dimensions.greater ? "-mt-20" : "-mt-8"
+          dimensions.window.width == dimensions.window.greater
+            ? "-mt-20"
+            : "-mt-8"
         }`}
       >
         <EquipmentSlot slot={"Body"} />

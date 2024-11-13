@@ -4,7 +4,8 @@ import {
   Character,
   PlayerCharacter,
   getStartingBook,
-} from "../../../classes/character";
+  savePlayer,
+} from "../../../entities/character";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import clearHistory, {
   getRandomName,
@@ -12,14 +13,11 @@ import clearHistory, {
   generateBirthday,
   wait,
 } from "../../../utility/functions/misc";
-import { Game } from "../../../classes/game";
-import { useContext } from "react";
-import { useVibration } from "../../../utility/customHooks";
+import { Game, saveGame } from "../../../entities/game";
 import {
   getRandomJobTitle,
   getStartingBaseStats,
 } from "../../../utility/functions/characterAid";
-import { createShops } from "../../../classes/shop";
 import {
   Element,
   ElementToString,
@@ -33,9 +31,10 @@ import {
 } from "../../../constants/Colors";
 import { storage } from "../../../utility/functions/storage";
 import { useColorScheme } from "nativewind";
-import { saveGame, savePlayer } from "../../../utility/functions/save_load";
 import GenericFlatButton from "../../../components/GenericFlatButton";
-import { useGameState } from "../../../stores/AppData";
+import { useVibration } from "../../../hooks/generic";
+import { useRootStore } from "../../../hooks/stores";
+import { createShops } from "../../../entities/shop";
 
 export default function NewGameReview() {
   const { slug } = useLocalSearchParams();
@@ -60,8 +59,7 @@ export default function NewGameReview() {
   const lastName = slug[4];
   const vibration = useVibration();
 
-  const { gameState, setGameData, setPlayerCharacter, setEnemy } =
-    useGameState();
+  let root = useRootStore();
   const navigation = useNavigation();
   const { colorScheme } = useColorScheme();
 
@@ -166,7 +164,7 @@ export default function NewGameReview() {
       const starterBook = getStartingBook(player);
       player.addToInventory(starterBook);
       const startDate = new Date().toISOString();
-      const shops = createShops();
+      root.shopsStore.shops = createShops(root);
       const tutorialState = storage.getString("tutorialsEnabled");
       let parsed = true;
       if (tutorialState) {
@@ -174,22 +172,24 @@ export default function NewGameReview() {
       }
       const newGame = new Game({
         date: startDate,
-        shops: shops,
-        vibrationEnabled: gameState?.vibrationEnabled
-          ? gameState.vibrationEnabled
+        vibrationEnabled: root.gameState?.vibrationEnabled
+          ? root.gameState.vibrationEnabled
           : Platform.OS == "ios"
           ? "full"
           : "minimal",
-        tutorialsEnabled: gameState ? gameState.tutorialsEnabled : parsed,
-        tutorialsShown: gameState?.tutorialsShown,
+        tutorialsEnabled: root.gameState
+          ? root.gameState.tutorialsEnabled
+          : parsed,
+        tutorialsShown: root.gameState?.tutorialsShown,
+        root,
       });
-      const colorScheme = gameState?.colorScheme;
+      const colorScheme = root.gameState?.colorScheme;
       if (colorScheme) {
         newGame.setColorScheme(colorScheme);
       }
-      setGameData(newGame);
-      setEnemy(null);
-      setPlayerCharacter(player);
+      root.gameState = newGame;
+      root.enemyStore.enemies = [];
+      root.playerState = player;
       vibration({ style: "success" });
       wait(250).then(() => clearHistory(navigation));
       saveGame(newGame);

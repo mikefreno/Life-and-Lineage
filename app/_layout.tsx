@@ -19,7 +19,9 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AuthProvider } from "../stores/auth/Auth";
 import * as Notifications from "expo-notifications";
 import { registerForPushNotificationsAsync } from "../utility/functions/notifications";
-import { AppProvider, useGameState, useLayout } from "../stores/AppData";
+import { AppProvider } from "../stores/AppData";
+import { useRootStore, useUIStore } from "../hooks/stores";
+import { configure } from "mobx";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -38,6 +40,9 @@ Sentry.init({
   debug: false, //__DEV__, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
 });
 
+configure({
+  enforceActions: "never", // Disables strict mode
+});
 /**
  * This wraps the entire app, loads the player data, sets up user app settings and holds&sets the `AppContext`.
  * The responsibility of this is largely around unseen app state, whereas `RootLayout` is largely concerned with UI
@@ -64,16 +69,17 @@ const RootLayout = observer(() => {
     Cursive: require("../assets/fonts/Tangerine-Regular.ttf"),
     CursiveBold: require("../assets/fonts/Tangerine-Bold.ttf"),
   });
-  const { playerState, gameState, appDataLoading } = useGameState();
-  const { modalShowing } = useLayout();
+  const { playerState, gameState } = useRootStore();
+
+  const { modalShowing } = useUIStore();
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
 
   const [expoPushToken, setExpoPushToken] = useState("");
   const [sentToken, setSentToken] = useState(false);
-  const [notification, setNotification] = useState<
-    Notifications.Notification | undefined
-  >(undefined);
+  const [_, setNotification] = useState<Notifications.Notification | undefined>(
+    undefined,
+  );
   const notificationListener = useRef<Notifications.Subscription>();
   const responseListener = useRef<Notifications.Subscription>();
   const pathname = usePathname();
@@ -123,7 +129,7 @@ const RootLayout = observer(() => {
   }, [expoPushToken]);
 
   useEffect(() => {
-    if (fontLoaded && !appDataLoading) {
+    if (fontLoaded) {
       SplashScreen.hideAsync();
       if (!playerState) {
         router.replace("/NewGame");
@@ -240,7 +246,7 @@ const RootLayout = observer(() => {
           />
           <Stack.Screen
             name="NewGame/SetBlessing/[slug]"
-            options={([headerOptions({ title: "Blessing Select" })], {})}
+            options={headerOptions({ title: "Blessing Select" })}
           />
           <Stack.Screen
             name="NewGame/SetSex/[...slug]"

@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import Colors, { elementalColorMap } from "../../constants/Colors";
 import { useColorScheme } from "nativewind";
-import { useVibration } from "../../utility/customHooks";
 import { BlurView } from "expo-blur";
 import { StyleSheet } from "react-native";
 import PlayerStatus, { EXPANDED_PAD } from "../../components/PlayerStatus";
@@ -34,7 +33,8 @@ import { ThemedView } from "../../components/Themed";
 import TutorialModal from "../../components/TutorialModal";
 import { useIsFocused } from "@react-navigation/native";
 import { TutorialOption } from "../../utility/types";
-import { useGameState, useLayout } from "../../stores/AppData";
+import { useVibration } from "../../hooks/generic";
+import { useRootStore } from "../../hooks/stores";
 
 const PLAYERSTATUS_SPACER = 64;
 const TABSELECTOR_HEIGHT = 64;
@@ -43,9 +43,8 @@ export default function TabLayout() {
   const isFocused = useIsFocused();
 
   const { colorScheme } = useColorScheme();
-  const { playerState } = useGameState();
-  const { isCompact } = useLayout();
-  const { setShowDetailedStatusView } = useLayout();
+  const { playerState, uiStore } = useRootStore();
+
   const vibration = useVibration();
 
   return (
@@ -94,18 +93,22 @@ export default function TabLayout() {
                 <Pressable
                   onPress={() => {
                     vibration({ style: "light" });
-                    setShowDetailedStatusView(true);
+                    uiStore.detailedStatusViewShowing = true;
                   }}
                   style={[
                     {
-                      height: isCompact ? 40 : 40 + EXPANDED_PAD,
+                      height: uiStore.playerStatusIsCompact
+                        ? 40
+                        : 40 + EXPANDED_PAD,
                       marginLeft: isHome ? 12 : 0,
                       borderTopLeftRadius: isHome ? 12 : 0,
                       borderBottomLeftRadius: isHome ? 12 : 0,
                       marginRight: isMedical ? 12 : 0,
                       borderBottomRightRadius: isMedical ? 12 : 0,
                       borderTopRightRadius: isMedical ? 12 : 0,
-                      marginTop: isCompact ? 0 : -EXPANDED_PAD,
+                      marginTop: uiStore.playerStatusIsCompact
+                        ? 0
+                        : -EXPANDED_PAD,
                     },
                   ]}
                 />

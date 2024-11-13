@@ -4,7 +4,7 @@ import GenericRaisedButton from "./GenericRaisedButton";
 import ThemedCard from "./ThemedCard";
 import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
 import { observer } from "mobx-react-lite";
-import { useGameState } from "../stores/AppData";
+import { useRootStore } from "../hooks/stores";
 
 interface MedicalOptionProps {
   title: string;
@@ -26,7 +26,7 @@ const MedicalOption = observer(
     removeDebuffs,
     focused,
   }: MedicalOptionProps) => {
-    const { playerState, gameState } = useGameState();
+    const { playerState, gameState } = useRootStore();
 
     function visit() {
       if (playerState && gameState && focused) {
@@ -39,7 +39,7 @@ const MedicalOption = observer(
             ? playerState.conditions.length
             : removeDebuffs,
         );
-        gameState.gameTick({ playerState });
+        gameState.gameTick();
       }
     }
 

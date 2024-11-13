@@ -5,12 +5,10 @@ import { useEffect, useState } from "react";
 import { router } from "expo-router";
 import { CharacterImage } from "../components/CharacterImage";
 import { calculateAge, wait } from "../utility/functions/misc";
-import { Character, PlayerCharacter } from "../classes/character";
 import GenericStrikeAround from "../components/GenericStrikeAround";
 import GenericModal from "../components/GenericModal";
 import GenericFlatButton from "../components/GenericFlatButton";
 import { Element, ElementToString, PlayerClassOptions } from "../utility/types";
-import { type VibrateProps, useVibration } from "../utility/customHooks";
 import {
   NecromancerSkull,
   PaladinHammer,
@@ -22,9 +20,10 @@ import { Entypo } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import { elementalColorMap } from "../constants/Colors";
 import { getStartingBaseStats } from "../utility/functions/characterAid";
-import { Item } from "../classes/item";
-import { savePlayer } from "../utility/functions/save_load";
-import { useGameState, useLayout } from "../stores/AppData";
+import { savePlayer, type Character } from "../entities/character";
+import { useRootStore, useUIStore } from "../hooks/stores";
+import { useVibration } from "../hooks/generic";
+import { Item } from "../entities/item";
 
 export default function DeathScreen() {
   const [nextLife, setNextLife] = useState<Character | null>(null);
@@ -37,8 +36,8 @@ export default function DeathScreen() {
   );
   const [page, setPage] = useState<number>(0);
 
-  const { playerState, gameState } = useGameState();
-  const { dimensions } = useLayout();
+  const { playerState, gameState } = useRootStore();
+  const { dimensions } = useUIStore();
   const vibration = useVibration();
   const { colorScheme } = useColorScheme();
 
@@ -119,7 +118,7 @@ export default function DeathScreen() {
             {page == 0 && (
               <>
                 <MinimalClassSelect
-                  dimensions={dimensions}
+                  dimensions={dimensions.window}
                   vibration={vibration}
                   selectedClass={selectedClass}
                   setSelectedClass={setSelectedClass}
@@ -148,7 +147,7 @@ export default function DeathScreen() {
                   setBlessing={setSelectedBlessing}
                   vibration={vibration}
                   colorScheme={colorScheme}
-                  dimensions={dimensions}
+                  dimensions={dimensions.window}
                 />
                 <GenericFlatButton
                   onPress={startNextLife}
@@ -234,7 +233,13 @@ function MinimalClassSelect({
     greater: number;
     lesser: number;
   };
-  vibration: ({ style, essential }: VibrateProps) => void;
+  vibration: ({
+    style,
+    essential,
+  }: {
+    style: "light" | "medium" | "heavy" | "success" | "warning" | "error";
+    essential?: boolean | undefined;
+  }) => void;
   selectedClass: PlayerClassOptions | null;
   setSelectedClass: React.Dispatch<
     React.SetStateAction<PlayerClassOptions | null>

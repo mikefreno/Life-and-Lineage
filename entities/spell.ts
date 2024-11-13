@@ -30,6 +30,7 @@ interface SpellFields {
     pet?: string;
     selfDamage?: number | null | undefined;
     sanityDamage?: number | undefined;
+    user: PlayerCharacter | Enemy | Minion;
   };
 }
 
@@ -54,6 +55,7 @@ export class Spell {
   debuffs: { name: string; chance: number }[];
   summons: string[];
   rangerPet: string | undefined;
+  user: PlayerCharacter | Enemy | Minion;
 
   constructor({
     name,
@@ -64,6 +66,7 @@ export class Spell {
     duration,
     effects,
     usesWeapon,
+    user,
   }: SpellFields) {
     this.name = name;
     this.element = StringToElement[element];
@@ -81,6 +84,7 @@ export class Spell {
     this.debuffs = effects.debuffs ?? [];
     this.summons = effects.summon ?? [];
     this.rangerPet = effects.pet;
+    this.user = user;
   }
 
   public baseDamage(user: PlayerCharacter) {
@@ -117,8 +121,9 @@ export class Spell {
       return false;
     }
     if (
+      this.proficiencyNeeded &&
       (user.currentMasteryLevel(this.element) as MasteryLevel) <
-      this.proficiencyNeeded
+        this.proficiencyNeeded
     ) {
       return false;
     }
@@ -133,8 +138,8 @@ export class Spell {
     target,
     user,
   }: {
-    target: Enemy | Minion;
-    user: PlayerCharacter;
+    target: PlayerCharacter | Enemy | Minion;
+    user: PlayerCharacter | Enemy | Minion;
   }): { logString: string } {
     if (!this.canBeUsed) {
       return { logString: "failure" };
@@ -158,8 +163,8 @@ export class Spell {
       } else {
         const newDebuff = createDebuff({
           debuffName: debuff.name,
-          enemyMaxHP: target.healthMax,
-          enemyMaxSanity: target.sanityMax,
+          enemyMaxHP: target.maxHealth,
+          enemyMaxSanity: target.maxSanity,
           primaryAttackDamage: this.baseDamage(user),
           applierNameString: user.fullName,
           applierID: user.id,

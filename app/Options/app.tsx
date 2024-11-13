@@ -2,7 +2,6 @@ import { Pressable, ScrollView, TextInput, View } from "react-native";
 import { Text } from "../../components/Themed";
 import { useEffect, useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc";
-import { useVibration } from "../../utility/customHooks";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import { router } from "expo-router";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
@@ -12,19 +11,19 @@ import { useColorScheme } from "nativewind";
 import { SaveRow } from "../../utility/database";
 import D20DieAnimation from "../../components/DieRollAnim";
 import GenericFlatButton from "../../components/GenericFlatButton";
-import { Game } from "../../classes/game";
 import { parse } from "flatted";
-import { PlayerCharacter } from "../../classes/character";
 import { useAuth } from "../../stores/auth/Auth";
-import { useGameState } from "../../stores/AppData";
+import { useRootStore } from "../../hooks/stores";
+import { useVibration } from "../../hooks/generic";
+import { Game } from "../../entities/game";
+import { PlayerCharacter } from "../../entities/character";
 
 const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
 
 export const AppSettings = observer(() => {
   const user = useAuth();
-  const { playerState, gameState, setPlayerCharacter, setGameData } =
-    useGameState();
+  let { playerState, gameState } = useRootStore();
 
   const { colorScheme } = useColorScheme();
   const [showRemoteSaveWindow, setShowRemoteSaveWindow] =
@@ -114,10 +113,8 @@ export const AppSettings = observer(() => {
     };
 
     const loadRemoteSave = async (chosenSave: SaveRow) => {
-      const game = Game.fromJSON(parse(chosenSave.game_state));
-      const player = PlayerCharacter.fromJSON(parse(chosenSave.player_state));
-      setGameData(game);
-      setPlayerCharacter(player);
+      gameState = Game.fromJSON(parse(chosenSave.game_state));
+      playerState = PlayerCharacter.fromJSON(parse(chosenSave.player_state));
       while (router.canGoBack()) {
         router.back();
       }

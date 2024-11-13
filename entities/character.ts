@@ -34,9 +34,11 @@ import type {
   Tile,
 } from "../components/DungeonComponents/DungeonMap";
 import { Spell } from "./spell";
-import { savePlayer } from "../utility/functions/save_load";
 import storyItems from "../assets/json/items/storyItems.json";
 import { Attack } from "./attack";
+import { storage } from "../utility/functions/storage";
+import { stringify } from "flatted";
+import { throttle } from "lodash";
 
 interface CharacterOptions {
   id?: string;
@@ -653,7 +655,6 @@ export class PlayerCharacter extends Character {
 
       getInvestment: action,
       collectFromInvestment: action,
-      tickAllInvestments: action,
       purchaseInvestmentBase: action,
       purchaseInvestmentUpgrade: action,
 
@@ -675,7 +676,6 @@ export class PlayerCharacter extends Character {
 
       isStunned: computed,
       addCondition: action,
-      conditionTicker: action,
       removeCondition: action,
 
       jobExperience: observable,
@@ -706,11 +706,12 @@ export class PlayerCharacter extends Character {
       unEquipItem: action,
       getInventory: observable,
       getDamageReduction: action,
-      reinstateLinks: action,
 
       getMedicalService: action,
       setInDungeon: action,
       bossDefeated: action,
+
+      gameTurnHandler: action,
     });
 
     reaction(
@@ -726,6 +727,13 @@ export class PlayerCharacter extends Character {
         savePlayer(this);
       },
     );
+  }
+
+  public gameTurnHandler() {
+    this.tickDownRelationshipAffection();
+    this.conditionTicker();
+    this.tickAllInvestments();
+    savePlayer(this);
   }
   //----------------------------------Stats----------------------------------//
   public bossDefeated() {
@@ -1705,7 +1713,7 @@ export class PlayerCharacter extends Character {
     return allEligibleCharacters;
   }
 
-  public tickDownRelationshipAffection() {
+  private tickDownRelationshipAffection() {
     this.parents.forEach((parent) => {
       if (parent.affection > 0) {
         parent.updateAffection(-0.1);
@@ -1755,7 +1763,7 @@ export class PlayerCharacter extends Character {
     );
   }
 
-  public conditionTicker() {
+  private conditionTicker() {
     for (let i = this.conditions.length - 1; i >= 0; i--) {
       const { turns } = this.conditions[i].tick(this);
 
@@ -2037,7 +2045,7 @@ export class PlayerCharacter extends Character {
     }
   }
 
-  public tickAllInvestments() {
+  private tickAllInvestments() {
     this.investments.forEach((investment) => investment.turn());
   }
   public collectFromInvestment(investmentName: string) {
@@ -2124,19 +2132,19 @@ export class PlayerCharacter extends Character {
     }
   }
 
-  public reinstateLinks() {
-    this.minions = this.minions.map((minion) => minion.reinstateParent(this));
-    this.rangerPet = this.rangerPet?.reinstateParent(this) ?? null;
-    this.conditions = this.conditions.map((cond) => cond.reinstateParent(this));
-    this.inventory = this.inventory.map((item) => item.reinstatePlayer(this));
-    this.equipment.mainHand = this.equipment.mainHand.reinstatePlayer(this);
-    this.equipment.offHand =
-      this.equipment.offHand?.reinstatePlayer(this) ?? null;
-    this.equipment.body = this.equipment.body?.reinstatePlayer(this) ?? null;
-    this.equipment.head = this.equipment.head?.reinstatePlayer(this) ?? null;
-    this.equipment.quiver =
-      this.equipment.quiver?.map((item) => item.reinstatePlayer(this)) ?? null;
-  }
+  //public reinstateLinks() {
+  //this.minions = this.minions.map((minion) => minion.reinstateParent(this));
+  //this.rangerPet = this.rangerPet?.reinstateParent(this) ?? null;
+  //this.conditions = this.conditions.map((cond) => cond.reinstateParent(this));
+  //this.inventory = this.inventory.map((item) => item.reinstatePlayer(this));
+  //this.equipment.mainHand = this.equipment.mainHand.reinstatePlayer(this);
+  //this.equipment.offHand =
+  //this.equipment.offHand?.reinstatePlayer(this) ?? null;
+  //this.equipment.body = this.equipment.body?.reinstatePlayer(this) ?? null;
+  //this.equipment.head = this.equipment.head?.reinstatePlayer(this) ?? null;
+  //this.equipment.quiver =
+  //this.equipment.quiver?.map((item) => item.reinstatePlayer(this)) ?? null;
+  //}
 
   /**
    * Creates a PlayerCharacter instance from a JSON object
@@ -2469,3 +2477,14 @@ type inDungeonProps =
   | enterDungeonProps
   | leaveDungeonProps
   | enterActivityProps;
+
+const _playerSave = async (player: PlayerCharacter | undefined) => {
+  if (player) {
+    try {
+      storage.set("player", stringify({ ...player, root: null }));
+    } catch (e) {
+      console.log("Error in _playerSave:", e);
+    }
+  }
+};
+export const savePlayer = throttle(_playerSave, 500);

@@ -12,7 +12,6 @@
          {"item": "big stick", "itemType":"melee","chance":0.85}
       ],
       "goldDropRange": {"minimum": 0, "maximum":0},
-      "armorValue": null,
       "appearsIn": ["training grounds"],
       "appearsOn": [0]
    },
@@ -29,7 +28,6 @@
          {"item": "rat tail", "itemType":"ingredient","chance":0.5}
       ],
       "goldDropRange": {"minimum": 5, "maximum":15},
-      "armorValue": null,
       "appearsIn": ["nearby cave"],
       "appearsOn": [1,2]
    },
@@ -46,7 +44,6 @@
          {"item": "vampiric tooth", "itemType":"junk", "chance": 0.5}
       ],
       "goldDropRange": {"minimum": 5, "maximum":20},
-      "armorValue": null,
       "appearsIn": ["nearby cave"],
       "appearsOn": [1,2]
    },
@@ -103,7 +100,6 @@
          {"item": "chunk of flesh", "itemType":"junk","chance":0.75}
       ],
       "goldDropRange": {"minimum": 20, "maximum":25},
-      "armorValue": null,
       "appearsIn": ["nearby cave"],
       "appearsOn": [3]
    },
@@ -119,7 +115,6 @@
          {"item": "ghostly residue", "itemType":"ingredient","chance":0.5}
       ],
       "goldDropRange": {"minimum": 0, "maximum":0},
-      "armorValue": null,
       "appearsIn": ["nearby cave"],
       "appearsOn": [2,3]
    },
@@ -154,7 +149,6 @@
          {"item": "bone", "itemType":"ingredient","chance":0.75}
       ],
       "goldDropRange": {"minimum": 40, "maximum":55},
-      "armorValue": null,
       "appearsIn": ["goblin cave"],
       "appearsOn": [1,2]
    },
@@ -187,7 +181,6 @@
          {"item": "dagger", "itemType":"melee","chance":0.35}
       ],
       "goldDropRange": {"minimum": 185, "maximum":250},
-      "armorValue": null,
       "appearsIn": [""],
       "appearsOn": []
    },
@@ -220,7 +213,6 @@
       "attacks": ["bonk", "frost"],
       "drops": [],
       "goldDropRange": {"minimum": 200, "maximum":250},
-      "armorValue": 0,
       "appearsIn": ["rogue magi fortress"],
       "appearsOn": [1,2,3,4]
    },
@@ -234,7 +226,6 @@
       "attacks": ["bonk", "fire bolt"],
       "drops": [],
       "goldDropRange": {"minimum": 200, "maximum":250},
-      "armorValue": 0,
       "appearsIn": ["rogue magi fortress"],
       "appearsOn": [1,2,3,4]
    },
@@ -248,7 +239,6 @@
       "attacks": ["bonk", "gust"],
       "drops": [],
       "goldDropRange": {"minimum": 200, "maximum":250},
-      "armorValue": 0,
       "appearsIn": ["rogue magi fortress"],
       "appearsOn": [1,2,3,4]
    },
@@ -262,7 +252,6 @@
       "attacks": ["bonk", "rock toss"],
       "drops": [],
       "goldDropRange": {"minimum": 200, "maximum":250},
-      "armorValue": 0,
       "appearsIn": ["rogue magi fortress"],
       "appearsOn": [1,2,3,4]
    },

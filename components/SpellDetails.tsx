@@ -10,15 +10,15 @@ import {
   NecromancerSkull,
 } from "../assets/icons/SVGIcons";
 import BlessingDisplay from "./BlessingsDisplay";
-import { Spell } from "../classes/spell";
 import { elementalColorMap } from "../constants/Colors";
 import { Element } from "../utility/types";
-import { useGameState, useLayout } from "../stores/AppData";
+import { usePlayerStore, useUIStore } from "../hooks/stores";
+import type { Spell } from "../entities/spell";
 
 export default function SpellDetails({ spell }: { spell: Spell }) {
   const { colorScheme } = useColorScheme();
-  const { playerState } = useGameState();
-  const { dimensions } = useLayout();
+  const playerState = usePlayerStore();
+  const { dimensions } = useUIStore();
   return (
     <View
       className="rounded-lg"
@@ -32,7 +32,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
         backgroundColor: colorScheme == "light" ? "#fafafa" : "#27272a",
         shadowOpacity: 0.25,
         shadowRadius: 5,
-        width: dimensions.width * 0.75,
+        width: dimensions.window.width * 0.75,
       }}
     >
       <View
@@ -138,7 +138,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
           <BlessingDisplay
             blessing={spell.element}
             colorScheme={colorScheme}
-            size={dimensions.width * 0.15}
+            size={dimensions.window.width * 0.15}
           />
         </View>
       </View>

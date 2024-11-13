@@ -3,12 +3,11 @@ import ProgressBar from "./ProgressBar";
 import { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { numberToRoman } from "../utility/functions/misc";
-import type { VibrateProps } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
 import ThemedCard from "./ThemedCard";
 import { Text } from "./Themed";
 import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
-import { useGameState } from "../stores/AppData";
+import { useRootStore } from "../hooks/stores";
 
 interface LaborTaskProps {
   reward: number;
@@ -21,7 +20,13 @@ interface LaborTaskProps {
   experienceToPromote: number;
   applyToJob: (title: string) => void;
   focused: boolean;
-  vibration: ({ style, essential }: VibrateProps) => void;
+  vibration: ({
+    style,
+    essential,
+  }: {
+    style: "success" | "light" | "medium" | "heavy" | "warning" | "error";
+    essential?: boolean | undefined;
+  }) => void;
 }
 
 const LaborTask = observer(
@@ -34,7 +39,7 @@ const LaborTask = observer(
     focused,
     vibration,
   }: LaborTaskProps) => {
-    const { gameState, playerState } = useGameState();
+    const { gameState, playerState } = useRootStore();
     const [fullReward, setFullReward] = useState<number | undefined>(
       playerState?.getRewardValue(title, reward),
     );
@@ -55,7 +60,7 @@ const LaborTask = observer(
           vibration({ style: "success", essential: true });
         }
         setExperience(newExp);
-        gameState.gameTick({ playerState });
+        gameState.gameTick();
         setFullReward(playerState.getRewardValue(title, reward));
       }
     }

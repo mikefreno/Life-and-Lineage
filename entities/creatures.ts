@@ -42,23 +42,26 @@ import {
 import { Attack } from "./attack";
 import { PlayerCharacter } from "./character";
 import { AttackUse } from "../utility/types";
-import { AggroTable } from "./aggro_table";
+import { ThreatTable } from "./threatTable";
+import EnemyStore from "../stores/EnemyStore";
 
 type CreatureType = {
   id?: string;
   beingType: BeingType;
   creatureSpecies: string;
-  health: number;
-  healthMax: number;
-  sanity?: number | null;
-  sanityMax?: number | null;
+  currentHealth: number;
+  baseHealth: number;
+  currentSanity?: number | null;
+  baseSanity?: number | null;
   attackPower: number;
   baseArmor?: number;
-  energy?: number;
-  energyMax?: number;
-  energyRegen?: number;
-  attacks: string[];
+  currentMana?: number;
+  baseMana?: number;
+  manaRegen?: number;
+  attackStrings?: string[];
+  spellStrings?: string[];
   conditions?: Condition[];
+  enemyStore: EnemyStore;
 };
 
 type EnemyType = CreatureType & {
@@ -91,25 +94,13 @@ export class Creature {
    */
   readonly creatureSpecies: string;
 
-  /**
-   * Current health of the creature
-   */
-  health: number;
+  currentHealth: number;
 
-  /**
-   * Maximum health of the creature
-   */
-  readonly healthMax: number;
+  readonly baseHealth: number;
 
-  /**
-   * Current sanity of the creature (can be null)
-   */
-  sanity: number | null;
+  currentSanity: number | null;
 
-  /**
-   * Maximum sanity of the creature (can be null)
-   */
-  readonly sanityMax: number | null;
+  readonly baseSanity: number | null;
 
   /**
    * Base attack power of the creature
@@ -121,25 +112,23 @@ export class Creature {
    */
   readonly baseArmor: number;
 
-  /**
-   * Current energy of the creature
-   */
-  energy: number;
+  currentMana: number;
+
+  readonly baseMana: number;
 
   /**
-   * Maximum energy of the creature
+   * Mana regeneration per turn of the creature
    */
-  readonly energyMax: number;
-
-  /**
-   * Energy regeneration rate of the creature
-   */
-  readonly energyRegen: number;
+  readonly manaRegen: number;
 
   /**
    * List of attack names the creature can perform
    */
   readonly attackStrings: string[];
+  /**
+   * List of spell names the creature can perform
+   */
+  readonly spellStrings: string[];
 
   /**
    * List of conditions affecting the creature
@@ -151,47 +140,52 @@ export class Creature {
    */
   gotDrops: boolean;
 
-  aggroTable: AggroTable;
+  threatTable: ThreatTable = new ThreatTable();
+
+  enemyStore: EnemyStore;
 
   constructor({
     id,
     beingType,
     creatureSpecies,
-    health,
-    healthMax,
-    sanity,
-    sanityMax,
+    currentHealth,
+    baseHealth,
+    currentSanity,
+    baseSanity,
     attackPower,
     baseArmor,
-    energy,
-    energyMax,
-    energyRegen,
-    attacks,
+    currentMana,
+    baseMana,
+    manaRegen,
+    attackStrings,
+    spellStrings,
     conditions,
+    enemyStore,
   }: CreatureType) {
     this.id = id ?? Crypto.randomUUID(); // Assign a random UUID if id is not provided
     this.beingType = beingType;
     this.creatureSpecies = creatureSpecies;
-    this.health = health;
-    this.sanity = sanity ?? null; // Initialize sanity to null if not provided
-    this.sanityMax = sanityMax ?? null; // Initialize sanityMax to null if not provided
-    this.healthMax = healthMax;
+    this.currentHealth = currentHealth;
+    this.currentSanity = currentSanity ?? null; // Initialize sanity to null if not provided
+    this.baseSanity = baseSanity ?? null; // Initialize baseSanity to null if not provided
+    this.baseHealth = baseHealth;
     this.attackPower = attackPower;
     this.baseArmor = baseArmor ?? 0; // Default base armor to 0 if not provided
-    this.energy = energy ?? 0; // Initialize energy to 0 if not provided
-    this.energyMax = energyMax ?? 0; // Initialize energyMax to 0 if not provided
-    this.energyRegen = energyRegen ?? 0; // Initialize energyRegen to 0 if not provided
-    this.attackStrings = attacks;
+    this.currentMana = currentMana ?? 0; // Initialize Mana to 0 if not provided
+    this.baseMana = baseMana ?? 0; // Initialize baseMana to 0 if not provided
+    this.manaRegen = manaRegen ?? 0; // Initialize ManaRegen to 0 if not provided
+    this.attackStrings = attackStrings ?? [];
+    this.spellStrings = spellStrings ?? [];
     this.conditions = conditions ?? []; // Initialize conditions to an empty array if not provided
     this.gotDrops = false; // Initialize gotDrops to false
+    this.enemyStore = enemyStore;
 
-    this.aggroTable = new AggroTable();
     makeObservable(this, {
       id: observable,
-      health: observable,
+      currentHealth: observable,
       creatureSpecies: observable,
-      sanity: observable,
-      energy: observable,
+      currentSanity: observable,
+      currentMana: observable,
       conditions: observable,
       damageHealth: action,
       restoreHealth: action,
@@ -201,7 +195,7 @@ export class Creature {
       getDrops: action,
       equals: action,
       regenerate: action,
-      expendEnergy: action,
+      expendMana: action,
       attacks: computed,
       removeCondition: action,
     });
@@ -222,7 +216,7 @@ export class Creature {
         ); // name should be set before this
       const {
         name,
-        energyCost,
+        manaCost,
         hitChance,
         targets,
         damageMult,
@@ -232,9 +226,10 @@ export class Creature {
         debuffs,
         summons,
       } = foundAttack;
+
       const builtAttack = new Attack({
         name,
-        energyCost,
+        manaCost,
         hitChance,
         targets: targets as "single" | "aoe" | "dual",
         damageMult,
@@ -250,6 +245,8 @@ export class Creature {
     return builtAttacks;
   }
 
+  get spells() {}
+
   //---------------------------Equivalency---------------------------//
   public equals(otherMonsterID: string) {
     return this.id === otherMonsterID;
@@ -259,11 +256,11 @@ export class Creature {
    * Calculates the maximum health of the creature considering any condition effects.
    * @returns The maximum health value.
    */
-  public getMaxHealth() {
+  get maxHealth() {
     const { healthMult, healthFlat } = getConditionEffectsOnDefenses(
       this.conditions,
     );
-    return this.healthMax * healthMult + healthFlat;
+    return this.baseHealth * healthMult + healthFlat;
   }
 
   /**
@@ -279,10 +276,10 @@ export class Creature {
     damage: number | null;
     attackerId: string;
   }): number {
-    this.health -= damage ?? 0;
-    this.aggroTable.addAggro(attackerId, damage ?? 0);
+    this.currentHealth -= damage ?? 0;
+    this.threatTable.addThreat(attackerId, damage ?? 0);
 
-    return this.health;
+    return this.currentHealth;
   }
 
   /**
@@ -291,25 +288,25 @@ export class Creature {
    * @returns The actual amount of health restored.
    */
   public restoreHealth(amount: number) {
-    if (this.health + amount < this.healthMax) {
-      this.health += amount;
+    if (this.currentHealth + amount < this.baseHealth) {
+      this.currentHealth += amount;
       return amount;
     } else {
-      const amt = this.healthMax - this.health;
-      this.health = this.healthMax;
+      const amt = this.baseHealth - this.currentHealth;
+      this.currentHealth = this.baseHealth;
       return amt;
     }
   }
   //---------------------------Sanity---------------------------//
   /**
    * Calculates the maximum sanity of the creature considering any condition effects.
-   * @returns The maximum sanity value, or null if sanityMax is not set.
+   * @returns The maximum sanity value, or null if baseSanity is not set.
    */
-  public getMaxSanity() {
+  public maxSanity() {
     const { sanityMult, sanityFlat } = getConditionEffectsOnDefenses(
       this.conditions,
     );
-    return this.sanityMax ? this.sanityMax * sanityMult + sanityFlat : null;
+    return this.baseSanity ? this.baseSanity * sanityMult + sanityFlat : null;
   }
 
   /**
@@ -318,40 +315,61 @@ export class Creature {
    * @returns The new sanity value after applying the damage, or null if sanity is not set.
    */
   public damageSanity(damage?: number | null) {
-    if (this.sanity) {
-      this.sanity -= damage ?? 0;
-      return this.sanity;
+    if (this.currentSanity) {
+      this.currentSanity -= damage ?? 0;
+      return this.currentSanity;
     }
   }
-  //---------------------------Energy---------------------------//
+  //---------------------------Mana---------------------------//
   /**
-   * Regenerates the creature's energy based on its regeneration rate.
+   * Calculates the maximum sanity of the creature considering any condition effects.
+   * @returns The maximum sanity value, or null if baseSanity is not set.
+   */
+  public maxSanity() {
+    const { sanityMult, sanityFlat } = getConditionEffectsOnDefenses(
+      this.conditions,
+    );
+    return this.baseSanity ? this.baseSanity * sanityMult + sanityFlat : null;
+  }
+  /**
+   * Regenerates the creature's Mana based on its regeneration rate.
    */
   public regenerate() {
-    if (this.energy + this.energyRegen >= this.energyMax) {
-      this.energy = this.energyMax;
+    if (this.currentMana + this.ManaRegen >= this.baseMana) {
+      this.currentMana = this.baseMana;
     } else {
-      this.energy += this.energyRegen;
+      this.currentMana += this.ManaRegen;
     }
   }
 
   /**
-   * Expends the creature's energy by the specified amount.
-   * @param energyCost - The amount of energy to expend.
+   * Expends the creature's Mana by the specified amount.
+   * @param ManaCost - The amount of Mana to expend.
    */
-  public expendEnergy(energyCost: number) {
-    if (this.energy && this.energy < energyCost) {
-      this.energy = 0;
-    } else if (this.energy) {
-      this.energy -= energyCost;
+  public expendMana(ManaCost: number) {
+    if (this.currentMana && this.currentMana < ManaCost) {
+      this.currentMana = 0;
+    } else if (this.currentMana) {
+      this.currentMana -= ManaCost;
     }
   }
 
-  public damageEnergy(damage: number) {
-    if (this.energy && this.energy < damage) {
-      this.energy = 0;
-    } else if (this.energy) {
-      this.energy -= damage;
+  /**
+   * Decreases the creature's Mana by the specified amount, and adds threat.
+   * @param ManaCost - The amount of Mana to expend.
+   */
+  public damageMana({
+    damage,
+    attackerId,
+  }: {
+    damage: number;
+    attackerId: string;
+  }) {
+    if (this.currentMana && this.currentMana < damage) {
+      this.currentMana = 0;
+      this.threatTable.addThreat(attackerId, damage / 2);
+    } else if (this.currentMana) {
+      this.currentMana -= damage;
     }
   }
   //---------------------------Armor---------------------------//
@@ -409,8 +427,8 @@ export class Creature {
         undeadDeathCheck = getMagnitude(this.conditions[i].effectMagnitude);
       }
     }
-    if (this.health <= undeadDeathCheck) {
-      this.health = 0;
+    if (this.currentHealth <= undeadDeathCheck) {
+      this.currentHealth = 0;
     }
   }
 
@@ -420,31 +438,24 @@ export class Creature {
    * @param {PlayerCharacter | Minion | Enemy} params.target - The target to attack.
    * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
    */
-  protected _takeTurn({ target }: { target: PlayerCharacter | Enemy }):
-    | { result: AttackUse.success; logString: string; chosenAttack: Attack }
-    | {
-        result:
-          | AttackUse.lowEnergy
-          | AttackUse.miss
-          | AttackUse.block
-          | AttackUse.stunned;
-        logString: string;
-      } {
+  protected _takeTurn({ target }: { target: PlayerCharacter | Enemy }) {
     const execute = this.conditions.find((cond) => cond.name == "execute");
     if (execute) {
       this.damageHealth({ attackerId: execute.placedbyID, damage: 9999 });
       this.endTurn();
-      return {
-        result: AttackUse.stunned,
-        logString: `${toTitleCase(this.creatureSpecies)} was executed!`,
-      };
+      return [
+        {
+          result: AttackUse.stunned,
+          logString: `${toTitleCase(this.creatureSpecies)} was executed!`,
+        },
+      ];
     }
     if (this.isStunned) {
       const allStunSources = this.conditions.filter((cond) =>
         cond.effect.includes("stun"),
       );
       allStunSources.forEach((stunSource) => {
-        this.aggroTable.addAggro(stunSource.placedbyID, 10);
+        this.threatTable.addThreat(stunSource.placedbyID, 10);
       });
       this.endTurn();
       return {
@@ -458,88 +469,112 @@ export class Creature {
           ? target.minionsAndPets
           : target.minions),
       ];
-      const highestAggroTarget =
-        this.aggroTable.getHighestAggroTarget(allTargets);
-
-      if (!highestAggroTarget) {
-        throw new Error(`No enemy target found for: ${this.creatureSpecies}`);
-      }
 
       const availableAttacks = this.attacks.filter(
-        (attack) => !this.energy || this.energy >= attack.energyCost,
+        (attack) => !this.currentMana || this.currentMana >= attack.ManaCost,
       );
       if (availableAttacks.length > 0) {
-        const chosenAttack = this.chooseAttack(availableAttacks);
-        const res = chosenAttack.use({
-          target: highestAggroTarget,
-        });
+        const { attack, numTargets } = this.chooseAttack(
+          availableAttacks,
+          allTargets.length,
+        );
+
+        const bestTargets = this.threatTable.getHighestThreatTargets(
+          allTargets,
+          numTargets,
+        );
+
+        const res: {
+          result: AttackUse;
+          logString: string;
+        }[] = [];
+        bestTargets.forEach((target) => attack.use({ target: target }));
         this.endTurn();
-        return { ...res, chosenAttack };
+        return { ...res, attack };
       } else {
         this.endTurn();
         return {
-          result: AttackUse.lowEnergy,
-          logString: `${toTitleCase(
-            this.creatureSpecies,
-          )} passed (low energy)!`,
+          result: AttackUse.lowMana,
+          logString: `${toTitleCase(this.creatureSpecies)} passed (low Mana)!`,
         };
       }
     }
   }
 
-  private chooseAttack(availableAttacks: Attack[]): Attack {
-    const totalWeight = availableAttacks.reduce(
-      (sum, attack) => sum + this.getAttackWeight(attack),
-      0,
-    );
-    const randomValue = Math.random() * totalWeight;
+  protected chooseAttack(
+    availableAttacks: Attack[],
+    numberOfPotentialTargets: number,
+  ): { attack: Attack; numTargets: number } {
+    const scoredAttacks = availableAttacks.map((attack) => {
+      const baseDamage = attack.baseDamage;
+      const numTargets =
+        attack.attackStyle === "aoe"
+          ? numberOfPotentialTargets
+          : attack.attackStyle === "dual"
+          ? numberOfPotentialTargets > 1
+            ? 2
+            : 1
+          : 1;
+      const totalDamage = baseDamage * numTargets;
+      const heal = attack.buffs.filter((buff) => buff.effect.includes("heal"));
+      const nonHealBuffCount = attack.buffs.filter(
+        (buff) => !buff.effect.includes("heal"),
+      ).length;
+      const debuffCount = attack.debuffStrings.length;
+      const summonCount = attack.summons.length;
+      const healthPercentage = this.currentHealth / this.baseHealth;
 
-    let accumulatedWeight = 0;
-    for (const attack of availableAttacks) {
-      accumulatedWeight += this.getAttackWeight(attack);
-      if (randomValue <= accumulatedWeight) {
-        return attack;
-      }
-    }
+      // Calculate the priority score
+      let priorityScore = totalDamage;
 
-    // This should never happen, but as a safety net, return the last attack
-    return availableAttacks[availableAttacks.length - 1];
-  }
+      // Add bonus for buffs and debuffs
+      priorityScore += nonHealBuffCount * 1.25; // adjust the multiplier as needed
+      priorityScore += debuffCount * 1.25; // adjust the multiplier as needed
 
-  private getAttackWeight(attack: Attack): number {
-    const { damageMult, buffs, debuffs, summons } = attack;
-    const { health, healthMax } = this;
-    const healthPercentage = health / healthMax;
-
-    const baseWeight = 100;
-
-    let weight = baseWeight;
-
-    if (healthPercentage > 0.75) {
-      if (buffs.length > 0) {
-        weight *= 2;
-      }
-    } else if (healthPercentage < 0.35) {
-      weight += damageMult * 100;
-    } else {
-      if (debuffs.length > 0) {
-        weight *= 1.5;
-      }
-    }
-
-    if (this instanceof Enemy) {
-      if (summons.length > 0 && healthPercentage > 0.5) {
-        if (this.minions.length === 0) {
-          weight *= 5;
-        } else if (this.minions.length === 1) {
-          weight *= 1.5;
-        } else if (this.minions.length >= 2) {
-          weight /= 2;
+      if (heal && healthPercentage < 0.85) {
+        if (healthPercentage > 0.5) {
+          priorityScore * 5;
+        } else {
+          priorityScore * 10;
         }
       }
-    }
+      // Add bonus for summons based on HP and current count
+      if (summonCount > 0 && this instanceof Enemy) {
+        if (healthPercentage > 0.75) {
+          if (this.minions.length === 0) {
+            priorityScore *= 5;
+          } else if (this.minions.length === 1) {
+            priorityScore *= 1.5;
+          } else if (this.minions.length >= 2) {
+            priorityScore /= 2;
+          }
+        } else if (healthPercentage > 0.5) {
+          if (this.minions.length === 0) {
+            priorityScore *= 2;
+          } else if (this.minions.length === 1) {
+            priorityScore /= 2;
+          } else if (this.minions.length >= 2) {
+            priorityScore /= 3;
+          }
+        } else {
+          priorityScore /= 4;
+        }
+      }
 
-    return weight;
+      // Add a small random factor to introduce randomness
+      priorityScore += Math.random() * 1.25;
+
+      return { attack, priorityScore, numTargets };
+    });
+
+    // Sort the attacks by priority score in descending order
+    scoredAttacks.sort((a, b) => b.priorityScore - a.priorityScore);
+
+    // Return the attack with the highest priority score
+    return {
+      attack: scoredAttacks[0].attack,
+      numTargets: scoredAttacks[0].numTargets,
+    };
   }
 
   //---------------------------Misc---------------------------//
@@ -628,34 +663,38 @@ export class Enemy extends Creature {
     id,
     beingType,
     creatureSpecies,
-    health,
-    healthMax,
-    sanity,
-    sanityMax,
+    currentHealth,
+    baseHealth,
+    currentSanity,
+    baseSanity,
     minions,
     attackPower,
     baseArmor,
-    energy,
-    energyMax,
-    energyRegen,
-    attacks,
+    currentMana,
+    baseMana,
+    manaRegen,
+    attackStrings,
+    spellStrings,
     conditions,
+    enemyStore,
   }: EnemyType) {
     super({
       id,
       beingType,
       creatureSpecies,
-      health,
-      healthMax,
-      sanity,
-      sanityMax,
+      currentHealth,
+      baseHealth,
+      currentSanity,
+      baseSanity,
       attackPower,
       baseArmor,
-      energy,
-      energyMax,
-      energyRegen,
-      attacks,
+      currentMana,
+      baseMana,
+      manaRegen,
+      attackStrings,
+      spellStrings,
       conditions,
+      enemyStore,
     });
     this.minions = minions ?? [];
 
@@ -688,10 +727,11 @@ export class Enemy extends Creature {
     }
     const minion = new Minion({
       creatureSpecies: minionObj.name,
-      health: minionObj.health,
-      healthMax: minionObj.health,
+      currentHealth: minionObj.health,
+      baseHealth: minionObj.health,
       attackPower: minionObj.attackPower,
-      attacks: minionObj.attacks,
+      attackStrings: minionObj.attackStrings,
+      spellStrings: minionObj.spellStrings,
       turnsLeftAlive: minionObj.turns,
       beingType: minionObj.beingType as BeingType,
       parent: this,
@@ -732,18 +772,19 @@ export class Enemy extends Creature {
       id: json.id,
       beingType: json.beingType,
       creatureSpecies: json.creatureSpecies,
-      health: json.health,
-      healthMax: json.healthMax,
-      sanity: json.sanity,
-      sanityMax: json.sanityMax,
+      currentHealth: json.currentHealth,
+      baseHealth: json.maxHealth,
+      currentSanity: json.sanity,
+      baseSanity: json.baseSanity,
       attackPower: json.attackPower,
-      energy: json.energy,
-      energyMax: json.energyMax,
-      energyRegen: json.energyRegen,
+      currentMana: json.currentMana,
+      baseMana: json.baseMana,
+      ManaRegen: json.ManaRegen,
       minions: json.minions
         ? json.minions.map((minion: any) => Minion.fromJSON(minion))
         : [],
-      attacks: json.attackStrings,
+      attackStrings: json.attackStrings,
+      spellStrings: json.spellStrings,
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
@@ -773,35 +814,39 @@ export class Minion extends Creature {
     id,
     beingType,
     creatureSpecies,
-    health,
-    healthMax,
-    sanity,
-    sanityMax,
+    currentHealth,
+    baseHealth,
+    currentSanity,
+    baseSanity,
     attackPower,
     baseArmor,
-    energy,
-    energyMax,
-    energyRegen,
-    attacks,
+    currentMana,
+    baseMana,
+    manaRegen,
+    attackStrings,
+    spellStrings,
     conditions,
     turnsLeftAlive,
     parent,
+    enemyStore,
   }: MinionType) {
     super({
       id,
       beingType,
       creatureSpecies,
-      health,
-      healthMax,
-      sanity,
-      sanityMax,
+      currentHealth,
+      baseHealth,
+      currentSanity,
+      baseSanity,
       attackPower,
       baseArmor,
-      energy,
-      energyMax,
-      energyRegen,
-      attacks,
+      currentMana,
+      baseMana,
+      manaRegen,
+      attackStrings,
+      spellStrings,
       conditions,
+      enemyStore,
     });
     this.turnsLeftAlive = turnsLeftAlive;
     this.parent = parent;
@@ -812,9 +857,9 @@ export class Minion extends Creature {
     });
 
     reaction(
-      () => [this.turnsLeftAlive, this.health],
+      () => [this.turnsLeftAlive, this.currentHealth],
       () => {
-        if (this.turnsLeftAlive <= 0 || this.health <= 0) {
+        if (this.turnsLeftAlive <= 0 || this.currentHealth <= 0) {
           this.parent?.removeMinion(this);
         }
       },
@@ -859,16 +904,17 @@ export class Minion extends Creature {
       id: json.id,
       beingType: json.beingType,
       creatureSpecies: json.creatureSpecies,
-      health: json.health,
-      healthMax: json.healthMax,
-      sanity: json.sanity,
-      sanityMax: json.sanityMax,
+      currentHealth: json.currentHealth,
+      baseHealth: json.maxHealth,
+      currentSanity: json.currentSanity,
+      baseSanity: json.baseSanity,
       attackPower: json.attackPower,
-      energy: json.energy,
-      energyMax: json.energyMax,
-      energyRegen: json.energyRegen,
+      currentMana: json.currentMana,
+      baseMana: json.baseMana,
+      manaRegen: json.manaRegen,
       turnsLeftAlive: json.turnsLeftAlive,
-      attacks: json.attackStrings,
+      attackStrings: json.attackStrings,
+      spellStrings: json.spellStrings,
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],

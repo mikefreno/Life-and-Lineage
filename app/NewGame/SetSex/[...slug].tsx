@@ -3,7 +3,6 @@ import { Text } from "../../../components/Themed";
 import { FontAwesome5, Foundation } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
 import { useRef, useState } from "react";
-import { useVibration } from "../../../utility/customHooks";
 import { useColorScheme } from "nativewind";
 import TutorialModal from "../../../components/TutorialModal";
 import {
@@ -15,7 +14,8 @@ import { toTitleCase } from "../../../utility/functions/misc";
 import { playerClassColors } from "../../../constants/Colors";
 import GenericFlatButton from "../../../components/GenericFlatButton";
 import { useIsFocused } from "@react-navigation/native";
-import { useGameState } from "../../../stores/AppData";
+import { useGameStore } from "../../../hooks/stores";
+import { useVibration } from "../../../hooks/generic";
 
 export default function SetSex() {
   const { slug } = useLocalSearchParams();
@@ -37,7 +37,7 @@ export default function SetSex() {
   const vibration = useVibration();
   const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
 
-  const { gameState } = useGameState();
+  const gameState = useGameStore();
   const isFocused = useIsFocused();
 
   return (

@@ -1,5 +1,5 @@
 import { Image, Animated } from "react-native";
-import { EnemyImageMap } from "../utility/enemy";
+import { EnemyImageMap } from "../utility/enemyHelpers";
 
 interface EnemyImageProps {
   creatureSpecies: string;

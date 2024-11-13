@@ -1,7 +1,7 @@
 import { Pressable } from "react-native";
 import { ThemedView, Text } from "../Themed";
-import { useVibration } from "../../utility/customHooks";
 import { useDungeonCore } from "../../stores/DungeonData";
+import { useVibration } from "../../hooks/generic";
 
 interface BattleTabControlsProps {
   battleTab: string;

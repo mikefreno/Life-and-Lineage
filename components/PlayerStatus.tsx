@@ -12,7 +12,6 @@ import { observer } from "mobx-react-lite";
 import { toTitleCase, damageReduction } from "../utility/functions/misc";
 import GenericModal from "./GenericModal";
 import GenericStrikeAround from "./GenericStrikeAround";
-import { useVibration } from "../utility/customHooks";
 import FadeOutNode from "./FadeOutNode";
 import { BlurView } from "expo-blur";
 import { useColorScheme } from "nativewind";
@@ -31,9 +30,10 @@ import {
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
 import { Attribute, AttributeToString } from "../utility/types";
-import { Condition } from "../classes/conditions";
 import { Text } from "./Themed";
-import { useGameState, useLayout } from "../stores/AppData";
+import { useRootStore } from "../hooks/stores";
+import { useVibration } from "../hooks/generic";
+import { Condition } from "../entities/conditions";
 
 export const EXPANDED_PAD = 28;
 
@@ -52,13 +52,8 @@ const PlayerStatus = observer(
     positioning = "absolute",
     classname,
   }: PlayerStatusProps) => {
-    const { playerState, gameState } = useGameState();
-    const {
-      isCompact,
-      setIsCompact,
-      setShowDetailedStatusView,
-      showDetailedStatusView,
-    } = useLayout();
+    const { playerState, gameState, uiStore } = useRootStore();
+    let { playerStatusIsCompact, detailedStatusViewShowing } = uiStore;
     const [readableGold, setReadableGold] = useState(
       playerState?.getReadableGold(),
     );
@@ -142,17 +137,10 @@ const PlayerStatus = observer(
 
     useEffect(() => {
       if (playerState && isFocused) {
-        if (
+        playerStatusIsCompact =
           playerState.conditions.length > 0 ||
           !hideGold ||
-          playerState.unAllocatedSkillPoints > 0
-        ) {
-          if (isCompact) {
-            setIsCompact(false);
-          }
-        } else if (!isCompact) {
-          setIsCompact(true);
-        }
+          playerState.unAllocatedSkillPoints > 0;
       }
     }, [
       playerState?.conditions,
@@ -626,7 +614,7 @@ const PlayerStatus = observer(
     }
 
     if (playerState) {
-      const preprop = !isCompact
+      const preprop = !detailedStatusViewShowing
         ? home
           ? `${positioning} -mt-7 z-top w-full`
           : `${positioning} mt-2 z-top w-full`
@@ -642,8 +630,8 @@ const PlayerStatus = observer(
       return (
         <>
           <GenericModal
-            isVisibleCondition={showDetailedStatusView}
-            backFunction={() => setShowDetailedStatusView(false)}
+            isVisibleCondition={detailedStatusViewShowing}
+            backFunction={() => (detailedStatusViewShowing = false)}
             size={95}
           >
             <View>
@@ -771,13 +759,13 @@ const PlayerStatus = observer(
           <Pressable
             onPress={() => {
               vibration({ style: "light" });
-              setShowDetailedStatusView(true);
+              detailedStatusViewShowing = true;
             }}
             className={filled}
           >
             {colorAndPlatformDependantBlur(
               <View className="flex px-2">
-                {!isCompact && (
+                {!playerStatusIsCompact && (
                   <View className="flex h-7 flex-row justify-center">
                     {!hideGold && (
                       <View className="flex flex-row my-auto">
@@ -844,7 +832,7 @@ const PlayerStatus = observer(
             )}
             <View
               className={`${
-                isCompact ? "ml-4" : "justify-center w-full mr-8"
+                playerStatusIsCompact ? "ml-4" : "justify-center w-full mr-8"
               } flex flex-row absolute z-top`}
             >
               {showingGoldChange &&

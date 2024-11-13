@@ -5,10 +5,10 @@ import GenericStrikeAround from "../GenericStrikeAround";
 import { ThemedView, Text } from "../Themed";
 import { EnemyImage } from "../EnemyImage";
 import FadeOutNode from "../FadeOutNode";
-import { memo, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { useGameState } from "../../stores/AppData";
 import { useDungeonCore, useEnemyAnimation } from "../../stores/DungeonData";
+import { useEnemyStore } from "../../hooks/stores";
 
 const useEnemyAnimations = () => {
   const attackAnim = useRef(new Animated.Value(0)).current;
@@ -165,7 +165,7 @@ const EnemyConditions = memo(({ conditions }: { conditions: any[] }) => {
 });
 
 const DungeonEnemyDisplay = observer(() => {
-  const { enemyState } = useGameState();
+  const enemyStore = useEnemyStore();
   const { slug, firstLoad } = useDungeonCore();
   const {
     enemyTextString,

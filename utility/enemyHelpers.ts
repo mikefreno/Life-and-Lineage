@@ -1,5 +1,6 @@
 import enemies from "../assets/json/enemy.json";
-import { Enemy } from "../classes/creatures";
+import { Enemy } from "../entities/creatures";
+import EnemyStore from "../stores/EnemyStore";
 import { type BeingType } from "./types";
 
 function isConvertibleToNumber(str: string) {
@@ -27,6 +28,7 @@ export function getNumberInRange(minimum: number, maximum: number) {
 export function enemyGenerator(
   instance: string,
   level: string,
+  enemyStore: EnemyStore,
   nameOverride?: string,
 ) {
   const enemyJSON = pickRandomEnemyJSON(instance, level);
@@ -44,16 +46,18 @@ export function enemyGenerator(
     const enemy = new Enemy({
       beingType: enemyJSON.beingType as BeingType,
       creatureSpecies: nameOverride ?? enemyJSON.name,
-      health: enemyHealth,
-      healthMax: enemyHealth,
-      sanity: enemyJSON.sanity ?? null,
-      sanityMax: enemyJSON.sanity ?? null,
-      baseArmor: enemyJSON.armorValue ?? undefined,
+      currentHealth: enemyHealth,
+      baseHealth: enemyHealth,
+      currentMana: enemyJSON.energy.maximum,
+      baseMana: enemyJSON.energy.maximum,
+      currentSanity: enemyJSON.sanity,
+      baseSanity: enemyJSON.sanity,
+      baseArmor: enemyJSON.armorValue,
       attackPower: enemyAttackPower,
-      energy: enemyJSON.energy?.maximum,
-      energyMax: enemyJSON.energy?.maximum,
-      energyRegen: enemyJSON.energy?.regen,
-      attacks: enemyJSON.attacks,
+      manaRegen: enemyJSON.energy?.regen,
+      attackStrings: enemyJSON.attacks,
+      spellStrings: enemyJSON.spells,
+      enemyStore,
     });
     return enemy;
   }

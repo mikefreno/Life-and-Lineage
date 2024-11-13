@@ -4,7 +4,6 @@ import { View, Pressable, ScrollView } from "react-native";
 import { useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc";
 import { router } from "expo-router";
-import { useVibration } from "../../utility/customHooks";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -12,13 +11,14 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { TutorialOption } from "../../utility/types";
 import { observer } from "mobx-react-lite";
 import { Text } from "../../components/Themed";
-import { useGameState, useLayout } from "../../stores/AppData";
 import GenericModal from "../../components/GenericModal";
 import { EXPANDED_PAD } from "../../components/PlayerStatus";
+import { useVibration } from "../../hooks/generic";
+import { usePlayerStore, useUIStore } from "../../hooks/stores";
 
 const EarnScreen = observer(() => {
-  const { playerState } = useGameState();
-  const { isCompact } = useLayout();
+  const playerState = usePlayerStore();
+  const { playerStatusIsCompact } = useUIStore();
   const [showingRejection, setShowingRejection] = useState<boolean>(false);
   const [missingPreReqs, setMissingPreReqs] = useState<string[]>([]);
 
@@ -93,7 +93,8 @@ const EarnScreen = observer(() => {
             className="px-2"
             style={{
               paddingTop: headerHeight,
-              paddingBottom: bottomBarHeight + (isCompact ? 0 : EXPANDED_PAD),
+              paddingBottom:
+                bottomBarHeight + (playerStatusIsCompact ? 0 : EXPANDED_PAD),
             }}
           >
             {jobs

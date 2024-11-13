@@ -4,7 +4,6 @@ import { Entypo } from "@expo/vector-icons";
 import { Text } from "./Themed";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
-import { useVibration } from "../utility/customHooks";
 import {
   getLocalTutorialState,
   loadStoredTutorialState,
@@ -13,7 +12,8 @@ import {
 } from "../utility/functions/misc";
 import { TutorialOption } from "../utility/types";
 import GenericModal from "./GenericModal";
-import { useGameState } from "../stores/AppData";
+import { useVibration } from "../hooks/generic";
+import { useGameStore } from "../hooks/stores";
 
 type TutorialPage = {
   title?: string;
@@ -44,7 +44,7 @@ const TutorialModal = observer(
     override,
     clearOverride,
   }: ITutorialModal) => {
-    const { gameState } = useGameState();
+    const gameState = useGameStore();
     const { colorScheme } = useColorScheme();
     const vibration = useVibration();
 

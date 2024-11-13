@@ -30,7 +30,7 @@ interface AttackFields {
   name: string;
   energyCost?: number;
   hitChance?: number;
-  targets?: "single" | "dual" | "aoe";
+  targets?: "single" | "dual" | "aoe"; // aoe hits all, dual hits two, single one
   damageMult?: number;
   flatHealthDamage?: number;
   selfDamage?: number;
@@ -104,11 +104,11 @@ export class Attack {
         maxHealth:
           "nonConditionalMaxHealth" in this.user // done due to different attributes on different classes
             ? this.user.nonConditionalMaxHealth
-            : this.user.healthMax,
+            : this.user.maxHealth,
         maxSanity:
           "nonConditionalMaxHealth" in this.user
             ? this.user.nonConditionalMaxSanity
-            : this.user.sanityMax,
+            : this.user.maxSanity,
         applierNameString: this.userNameReference,
         applierID: this.user.id,
       });
@@ -150,11 +150,11 @@ export class Attack {
           enemyMaxHP:
             "nonConditionalMaxHealth" in target // done due to different attributes on different classes
               ? target.nonConditionalMaxHealth
-              : target.healthMax,
+              : target.maxHealth,
           enemyMaxSanity:
             "nonConditionalMaxHealth" in target
               ? target.nonConditionalMaxSanity
-              : target.sanityMax,
+              : target.maxSanity,
           primaryAttackDamage: this.baseDamage * damageMult + damageFlat,
           applierNameString: this.userNameReference,
           applierID: this.user.id,

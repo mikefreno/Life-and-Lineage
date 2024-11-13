@@ -8,7 +8,7 @@ import {
 import Modal from "react-native-modal";
 import { ThemedView } from "./Themed";
 import { useColorScheme } from "nativewind";
-import { useGameState, useLayout } from "../stores/AppData";
+import { useGameStore, useUIStore } from "../hooks/stores";
 
 interface GenericModalProps {
   isVisibleCondition: boolean;
@@ -44,15 +44,15 @@ export default function GenericModal({
 }: GenericModalProps) {
   const height = Dimensions.get("window").height;
   const { colorScheme } = useColorScheme();
-  const { gameState } = useGameState();
-  const { setModalShowing } = useLayout();
+  const gameState = useGameStore();
+  let { modalShowing } = useUIStore();
 
   useEffect(() => {
     if (
       isVisibleCondition &&
       !(gameState?.atDeathScreen && !gameState.startingNewGame)
     ) {
-      setModalShowing(true);
+      modalShowing = true;
     }
   }, [
     isVisibleCondition,

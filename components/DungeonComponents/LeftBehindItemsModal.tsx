@@ -1,9 +1,9 @@
 import { Pressable, View, Image } from "react-native";
 import GenericModal from "../GenericModal";
 import { ThemedView, Text } from "../Themed";
-import { Item } from "../../classes/item";
-import { useGameState } from "../../stores/AppData";
 import { useLootState } from "../../stores/DungeonData";
+import { usePlayerStore } from "../../hooks/stores";
+import type { Item } from "../../entities/item";
 
 interface LeftBehindItemsModalProps {
   showLeftBehindItemsScreen: boolean;
@@ -14,7 +14,7 @@ export default function LeftBehindItemsModal({
   showLeftBehindItemsScreen,
   setShowLeftBehindItemsScreen,
 }: LeftBehindItemsModalProps) {
-  const { playerState } = useGameState();
+  const playerState = usePlayerStore();
   const {
     leftBehindDrops,
     setLeftBehindDrops,

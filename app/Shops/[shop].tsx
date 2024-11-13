@@ -8,9 +8,7 @@ import {
   Animated,
 } from "react-native";
 import { useEffect, useRef, useState } from "react";
-import { Item } from "../../classes/item";
 import { useIsFocused } from "@react-navigation/native";
-import { useVibration } from "../../utility/customHooks";
 import { observer } from "mobx-react-lite";
 import TutorialModal from "../../components/TutorialModal";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -21,15 +19,17 @@ import { StatsDisplay } from "../../components/StatsDisplay";
 import { Coins } from "../../assets/icons/SVGIcons";
 import { TutorialOption, checkReleasePositionProps } from "../../utility/types";
 import ProgressBar from "../../components/ProgressBar";
-import { saveGame } from "../../utility/functions/save_load";
 import Colors from "../../constants/Colors";
 import { useColorScheme } from "nativewind";
 import { InventoryItem, ProjectedImage } from "../../components/Draggable";
 import {
-  useDraggableDataState,
-  useGameState,
-  useLayout,
-} from "../../stores/AppData";
+  useDraggableStore,
+  useRootStore,
+  useUIStore,
+} from "../../hooks/stores";
+import { useVibration } from "../../hooks/generic";
+import type { Item } from "../../entities/item";
+import { saveGame } from "../../entities/game";
 
 const TEN_MINUTES = 10 * 60 * 1000;
 //const ONE_SECOND = 1000;
@@ -78,9 +78,9 @@ const GreetingComponent = ({
 
 const ShopInteriorScreen = observer(() => {
   let { shop } = useLocalSearchParams();
-  const { gameState, playerState } = useGameState();
-  const { blockSize } = useLayout();
-  const { setIconString } = useDraggableDataState();
+  const { gameState, playerState } = useRootStore();
+  const { itemBlockSize } = useUIStore();
+  const { setIconString } = useDraggableStore();
 
   const vibration = useVibration();
   const colors = shopObjects.find((shopObj) => shopObj.type == shop)?.colors;
@@ -231,7 +231,7 @@ const ShopInteriorScreen = observer(() => {
     saveGame(gameState);
   };
 
-  if (initialized && thisShop && gameState && playerState && blockSize) {
+  if (initialized && thisShop && gameState && playerState && itemBlockSize) {
     return (
       <>
         <TutorialModal
@@ -302,8 +302,8 @@ const ShopInteriorScreen = observer(() => {
                     <Pressable
                       key={item.item[0].id}
                       style={{
-                        height: blockSize * 1.4,
-                        width: blockSize * 1.5,
+                        height: itemBlockSize * 1.4,
+                        width: itemBlockSize * 1.5,
                       }}
                     >
                       <View className="flex-1 justify-center items-center">

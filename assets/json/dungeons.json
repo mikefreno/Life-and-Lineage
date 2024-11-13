@@ -1,6 +1,21 @@
 [
    {
+     "name": "training grounds",
+     "id": 0,
+     "difficulty": 0,
+     "levels": [
+       {
+         "level": 1,
+         "tiles": 0,
+         "unlocked": true
+       }
+     ],
+     "unlocks": []
+   },
+   {
      "name": "nearby cave",
+     "id": 1,
+     "difficulty": 1,
      "levels": [
        {
          "level": 1,
@@ -23,6 +38,8 @@
    },
    { 
      "name": "goblin cave",
+     "id": 2,
+     "difficulty": 2,
      "levels": [
        {
          "level": 1,
@@ -39,6 +56,8 @@
    },
    { 
      "name": "bandit hideout",
+     "id": 3,
+     "difficulty": 2,
      "levels": [
        {
          "level": 1,
@@ -55,6 +74,8 @@
    },
    { 
      "name": "rogue magi fortress",
+     "id": 4,
+     "difficulty": 3,
      "levels": [
        {
          "level": 1,
@@ -81,6 +102,8 @@
    }, 
    { 
      "name": "infested mine",
+     "id": 5,
+     "difficulty": 4,
      "levels": [
        {
          "level": 1,
@@ -97,6 +120,8 @@
    },
    {
      "name": "dark forest",
+     "id": 6,
+     "difficulty": 4,
      "levels": [
        {
          "level": 1,
@@ -113,6 +138,8 @@
    },
    {
      "name": "crystal mine",
+     "id": 7,
+     "difficulty": 5,
      "levels": [
        {
          "level": 1,
@@ -129,6 +156,8 @@
    },
    {
      "name": "corrupted temple",
+     "id": 8,
+     "difficulty": 6,
      "levels": [
        {
          "level": 1,

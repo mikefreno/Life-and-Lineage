@@ -1,17 +1,12 @@
 import React from "react";
 import type { RefObject } from "react";
-import { Item } from "../classes/item";
 import { Pressable, View, LayoutChangeEvent, ScrollView } from "react-native";
-import { useVibration } from "../utility/customHooks";
 import { checkReleasePositionProps } from "../utility/types";
-import { Shop } from "../classes/shop";
 import { Text } from "./Themed";
 import { InventoryItem } from "./Draggable";
-import {
-  useDraggableDataState,
-  useGameState,
-  useLayout,
-} from "../stores/AppData";
+import type { Item } from "../entities/item";
+import { useVibration } from "../hooks/generic";
+import { usePlayerStore, useUIStore } from "../hooks/stores";
 
 type InventoryRenderBase = {
   selfRef?: RefObject<View>;
@@ -84,20 +79,11 @@ export default function InventoryRender({
   ...props
 }: InventoryRenderProps) {
   const vibration = useVibration();
-  const { playerState } = useGameState();
-  const { dimensions, blockSize, setBlockSize } = useLayout();
+  const playerState = usePlayerStore();
+  const { dimensions, itemBlockSize } = useUIStore();
 
   const onLayoutView = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
-    if (width && height) {
-      if (dimensions.width === dimensions.lesser) {
-        const blockSize = Math.min(height / 5, width / 7.5);
-        setBlockSize(blockSize);
-      } else {
-        const blockSize = width / 14;
-        setBlockSize(blockSize);
-      }
-    }
 
     if (setInventoryBounds) {
       setTimeout(() => {
@@ -256,14 +242,14 @@ export default function InventoryRender({
           {/* Regular Inventory Panel */}
           <View
             style={{
-              width: dimensions.width,
+              width: dimensions.window.width,
             }}
             ref={selfRef}
           >
             {!!keyItemInventory && (
               <View
                 style={{
-                  width: dimensions.width,
+                  width: dimensions.window.width,
                 }}
                 className="items-center absolute justify-center py-2 top-[40%]"
               >
@@ -280,7 +266,7 @@ export default function InventoryRender({
                 <View
                   className="absolute items-center justify-center"
                   style={
-                    dimensions.width === dimensions.greater
+                    dimensions.window.width === dimensions.window.greater
                       ? {
                           left: `${(index % 12) * 8.33 + 0.5}%`,
                           top: `${Math.floor(index / 12) * 48 + 8}%`,
@@ -294,7 +280,7 @@ export default function InventoryRender({
                 >
                   <View
                     className="rounded-lg border-zinc-300 dark:border-zinc-700 border z-0"
-                    style={{ height: blockSize, width: blockSize }}
+                    style={{ height: itemBlockSize, width: itemBlockSize }}
                   />
                 </View>
               ))}
@@ -302,7 +288,7 @@ export default function InventoryRender({
                 <View
                   className="absolute items-center justify-center z-top"
                   style={
-                    dimensions.width === dimensions.greater
+                    dimensions.window.width === dimensions.window.greater
                       ? {
                           left: `${(index % 12) * 8.33 + 0.5}%`,
                           top: `${Math.floor(index / 12) * 48 + 8}%`,
@@ -329,10 +315,10 @@ export default function InventoryRender({
           </View>
           {/* Key Item Inventory Panel */}
           {keyItemInventory && (
-            <View style={{ width: dimensions.width }}>
+            <View style={{ width: dimensions.window.width }}>
               <View
                 style={{
-                  width: dimensions.width,
+                  width: dimensions.window.width,
                 }}
                 className="items-center absolute justify-center py-2 top-[40%]"
               >
@@ -344,7 +330,7 @@ export default function InventoryRender({
                 onPress={() => setDisplayItem(null)}
                 className={`${
                   "headTarget" in props
-                    ? dimensions.greater == dimensions.height
+                    ? dimensions.window.greater == dimensions.window.height
                       ? "h-[100%] mx-2"
                       : "mx-2 h-[50%]"
                     : "shop" in props
@@ -356,7 +342,7 @@ export default function InventoryRender({
                   <View
                     className="absolute items-center justify-center"
                     style={
-                      dimensions.width === dimensions.greater
+                      dimensions.window.width === dimensions.window.greater
                         ? {
                             left: `${(index % 12) * 8.33 + 0.5}%`,
                             top: `${Math.floor(index / 12) * 48 + 8}%`,
@@ -370,7 +356,7 @@ export default function InventoryRender({
                   >
                     <View
                       className="rounded-lg border-zinc-300 dark:border-zinc-700 border z-0"
-                      style={{ height: blockSize, width: blockSize }}
+                      style={{ height: itemBlockSize, width: itemBlockSize }}
                     />
                   </View>
                 ))}
@@ -378,7 +364,7 @@ export default function InventoryRender({
                   <View
                     className="absolute items-center justify-center"
                     style={
-                      dimensions.width === dimensions.greater
+                      dimensions.window.width === dimensions.window.greater
                         ? {
                             left: `${(index % 12) * 8.33 + 0.5}%`,
                             top: `${Math.floor(index / 12) * 48 + 8}%`,

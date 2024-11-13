@@ -20,7 +20,6 @@ import LeftBehindItemsModal from "../../components/DungeonComponents/LeftBehindI
 import { SackIcon } from "../../assets/icons/SVGIcons";
 import { TutorialOption } from "../../utility/types";
 import { useIsFocused } from "@react-navigation/native";
-import { useGameState } from "../../stores/AppData";
 import {
   DungeonProvider,
   useCombatState,
@@ -30,11 +29,12 @@ import {
 import DungeonEnemyDisplay from "../../components/DungeonComponents/DungeonEnemyDisplay";
 import { DungeonMapRender } from "../../components/DungeonComponents/DungeonMap";
 import { StatsDisplay } from "../../components/StatsDisplay";
-import { usePouch } from "../../utility/customHooks";
+import { useRootStore } from "../../hooks/stores";
+import { usePouch } from "../../hooks/generic";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
-  const { playerState, gameState, enemyState } = useGameState();
+  const { playerState, gameState, enemyStore } = useRootStore();
 
   const { firstLoad, thisDungeon, thisInstance, slug, level, inCombat } =
     useDungeonCore();
@@ -136,7 +136,7 @@ const DungeonLevelScreen = observer(() => {
           </>
         </GenericModal>
         <View className="flex-1" style={{ paddingBottom: 84 }}>
-          {enemyState && !firstLoad ? (
+          {enemyStore.enemies.length > 0 && !firstLoad ? (
             <DungeonEnemyDisplay />
           ) : !inCombat && !firstLoad ? (
             <DungeonMapRender />
@@ -174,8 +174,8 @@ const DungeonLevelScreen = observer(() => {
                   <ProgressBar
                     filledColor="#ef4444"
                     unfilledColor="#fee2e2"
-                    value={minion.health}
-                    maxValue={minion.healthMax}
+                    value={minion.currentHealth}
+                    maxValue={minion.baseHealth}
                   />
                 </ThemedView>
               ))}

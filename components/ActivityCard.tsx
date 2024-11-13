@@ -11,7 +11,6 @@ import {
 import { generateNewCharacter } from "../utility/functions/characterAid";
 import { useContext, useState } from "react";
 import GenericModal from "./GenericModal";
-import { Character } from "../classes/character";
 import GenericRaisedButton from "./GenericRaisedButton";
 import GenericFlatButton from "./GenericFlatButton";
 import { EnemyImage } from "./EnemyImage";
@@ -27,14 +26,15 @@ import {
   HealthIcon,
   Sanity,
 } from "../assets/icons/SVGIcons";
-import { useGameState } from "../stores/AppData";
+import { useRootStore } from "../hooks/stores";
+import type { Character } from "../entities/character";
 
 interface ActivityCardProps {
   activity: Activity;
 }
 
 const ActivityCard = observer(({ activity }: ActivityCardProps) => {
-  const { playerState, gameState, setEnemy } = useGameState();
+  const { playerState, gameState, enemyStore } = useRootStore();
   const { colorScheme } = useColorScheme();
   const [metCharacter, setMetCharacter] = useState<Character | null>(null);
   const [nothingHappened, setNothingHappened] = useState<boolean>(false);
@@ -74,7 +74,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           setGoodOutcome(null);
           setBadOutcome(null);
           setNothingHappened(false);
-          gameState?.gameTick({ playerState });
+          gameState.gameTick();
           return;
         case "randomGood":
           if (!activity.randomGood) {
@@ -92,7 +92,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           setMetCharacter(null);
           setBadOutcome(null);
           setNothingHappened(false);
-          gameState?.gameTick({ playerState });
+          gameState.gameTick();
           return setGoodOutcome(randomGoodOutcome);
         case "randomBad":
           if (!activity.randomBad) {
@@ -111,13 +111,13 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           setMetCharacter(null);
           setGoodOutcome(null);
           setNothingHappened(false);
-          gameState?.gameTick({ playerState });
+          gameState.gameTick();
           return setBadOutcome(randomBadOutcome);
         default:
           setMetCharacter(null);
           setBadOutcome(null);
           setNothingHappened(false);
-          gameState?.gameTick({ playerState });
+          gameState.gameTick();
           return setNothingHappened(true);
       }
     }
@@ -265,7 +265,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   function payOff(gold: number) {
     playerState?.spendGold(gold);
     setBadOutcome(null);
-    setEnemy(null);
+    enemyStore.enemies = [];
     playerState?.setInDungeon({ state: false });
     setTimeout(() => setBadOutcome(null), 350);
   }
@@ -447,7 +447,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           <View className="flex flex-row ">
             {activity.alone && (
               <GenericRaisedButton
-                disabled={playerState && playerState.gold < activity.cost}
+                disabled={!!playerState && playerState.gold < activity.cost}
                 onPress={visit}
               >
                 Visit Alone

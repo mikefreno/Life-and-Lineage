@@ -1,8 +1,7 @@
-import { Platform } from "react-native";
-import * as Haptics from "expo-haptics";
-import { useGameState } from "../stores/AppData";
-import { useCallback, useEffect, useState } from "react";
-import { Item } from "../classes/item";
+import { useCallback } from "react";
+import { enemyGenerator } from "../utility/enemyHelpers";
+import { AttackUse, TutorialOption } from "../utility/types";
+import { toTitleCase, wait } from "../utility/functions/misc";
 import {
   useCombatState,
   useDungeonCore,
@@ -11,87 +10,17 @@ import {
   useMapState,
   useTutorialState,
 } from "../stores/DungeonData";
-import { Attack } from "../classes/attack";
-import { Spell } from "../classes/spell";
-import { Enemy, Minion } from "../classes/creatures";
-import { AttackUse, TutorialOption } from "./types";
-import { getMagnitude } from "./functions/conditions";
-import { toTitleCase, wait } from "./functions/misc";
-import { PlayerCharacter } from "../classes/character";
-import { enemyGenerator } from "./enemy";
-import { dungeonSave } from "./functions/save_load";
+import { useRootStore } from "./stores";
+import { useBattleLogger } from "./generic";
+import { Enemy, Minion } from "../entities/creatures";
+import { PlayerCharacter } from "../entities/character";
+import { Attack } from "../entities/attack";
+import { getMagnitude } from "../utility/functions/conditions";
 import { useIsFocused } from "@react-navigation/native";
-
-export interface VibrateProps {
-  style: "light" | "medium" | "heavy" | "success" | "warning" | "error";
-  essential?: boolean;
-}
-
-/**
- * This is a hook(returns a function) to create a `vibration`
- */
-export const useVibration = () => {
-  const { gameState } = useGameState();
-  /**
-   * requires a `style` for the vibration, `essential`(optional) is a signal for if the user has set in-app vibrations to 'minimal', defaults to false
-   */
-  const vibrate = ({ style, essential = false }: VibrateProps) => {
-    const platform = Platform.OS;
-
-    if (
-      (gameState &&
-        (gameState.vibrationEnabled == "full" ||
-          (gameState.vibrationEnabled == "minimal" && essential)) &&
-        (platform === "android" || platform === "ios")) ||
-      (!gameState && platform == "ios")
-    ) {
-      switch (style) {
-        case "light":
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          break;
-        case "medium":
-          if (platform == "ios") {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          } else {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }
-          break;
-        case "heavy":
-          if (platform == "ios") {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-          } else {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          }
-          break;
-        case "success":
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          break;
-        case "warning":
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-          break;
-        case "error":
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-          break;
-      }
-    }
-  };
-
-  // Return vibration function from Hook
-  return vibrate;
-};
-
-export const usePouch = () => {
-  const { setLeftBehindDrops } = useLootState();
-
-  const addItemToPouch = useCallback(({ items }: { items: Item[] }) => {
-    setLeftBehindDrops((prev) => [...prev, ...items]);
-  }, []);
-
-  return { addItemToPouch };
-};
+import { Spell } from "../entities/spell";
 
 export const useEnemyManagement = () => {
-  const { enemyState, playerState, setEnemy, gameState } = useGameState();
+  const { enemyStore, playerState, gameState, dungeonStore } = useRootStore();
   const { slug, instanceName, thisDungeon, thisInstance, level } =
     useDungeonCore();
   const {
@@ -109,7 +38,8 @@ export const useEnemyManagement = () => {
   const { fightingBoss, setFightingBoss } = useCombatState();
 
   const enemyDeathHandler = useCallback(() => {
-    if (!enemyState || !playerState || !gameState) return false;
+    if (enemyStore.enemies.length == 0 || !playerState || !gameState)
+      return false;
 
     if (
       enemyState.health <= 0 ||
@@ -133,7 +63,7 @@ export const useEnemyManagement = () => {
       if (fightingBoss && gameState && thisDungeon) {
         setFightingBoss(false);
         thisDungeon.setBossDefeated();
-        gameState.openNextDungeonLevel(thisInstance);
+        dungeonStore.openNextDungeonLevel(thisInstance);
         playerState.bossDefeated();
         if (!gameState.tutorialsShown[TutorialOption.firstBossKill]) {
           setShouldShowFirstBossKillTutorialAfterItemDrops(true);
@@ -144,15 +74,15 @@ export const useEnemyManagement = () => {
         playerState.killCharacter({ name: slug[2] });
       }
 
-      setEnemy(null);
+      enemyStore.enemies = [];
       setEnemyAttackDummy(0);
       setEnemyDodgeDummy(0);
-      gameState.gameTick({ playerState });
+      gameState.gameTick();
       return true;
     }
     return false;
   }, [
-    enemyState,
+    enemyStore.enemies,
     playerState,
     gameState,
     fightingBoss,
@@ -263,7 +193,7 @@ export const useEnemyManagement = () => {
 
       actions[enemyAttackRes.result]();
     },
-    [enemyState, playerState],
+    [enemyStore.enemies, playerState],
   );
 
   const enemyAction = () => {
@@ -292,9 +222,9 @@ export const useEnemyManagement = () => {
   }, [enemyDeathHandler, enemyAction]);
 
   const getEnemy = useCallback(() => {
-    const enemy = enemyGenerator(instanceName, level);
+    const enemy = enemyGenerator(instanceName, level, enem);
     if (enemy) {
-      setEnemy(enemy);
+      enemyStore.enemies.push(enemy);
       battleLogger(`You found a ${toTitleCase(enemy.creatureSpecies)}!`);
       setAttackAnimationOnGoing(false);
       dungeonSave({
@@ -330,7 +260,7 @@ export const useEnemyManagement = () => {
 };
 
 export const useCombatActions = () => {
-  const { playerState, enemyState } = useGameState();
+  const { playerState, enemyState } = useRootStore();
   const { setAttackAnimationOnGoing, setEnemyDodgeDummy } = useEnemyAnimation();
   const { battleLogger } = useBattleLogger();
   const { enemyTurn } = useEnemyManagement();
@@ -342,7 +272,7 @@ export const useCombatActions = () => {
 
       for (let i = 0; i < minions.length; i++) {
         await wait(1000 * i);
-        if (target.equals(target.id) && target.health > 0) {
+        if (target.equals(target.id) && target.currentHealth > 0) {
           const res = minions[i].takeTurn({ target });
           battleLogger(`(minion) ${res.logString}`);
         }
@@ -446,26 +376,5 @@ export const useCombatActions = () => {
     pass,
     useAttack,
     playerMinionsTurn,
-  };
-};
-
-export const useBattleLogger = () => {
-  const [logs, setLogs] = useState<string[]>([]);
-
-  const battleLogger = useCallback((whatHappened: string) => {
-    const timeOfLog = new Date().toLocaleTimeString();
-    const log = `${timeOfLog}: ${whatHappened}`;
-    setLogs((prev) => [...prev, log]);
-  }, []);
-
-  useEffect(() => {
-    if (logs.length > 100) {
-      setLogs((prev) => prev.slice(-100));
-    }
-  }, [logs]);
-
-  return {
-    logs,
-    battleLogger,
   };
 };

@@ -3,7 +3,6 @@ import { Text } from "../../../components/Themed";
 import { useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
-import { VibrateProps, useVibration } from "../../../utility/customHooks";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import TutorialModal from "../../../components/TutorialModal";
@@ -23,7 +22,8 @@ import {
 } from "../../../constants/Colors";
 import GenericFlatButton from "../../../components/GenericFlatButton";
 import { useIsFocused } from "@react-navigation/native";
-import { useGameState, useLayout } from "../../../stores/AppData";
+import { useVibration } from "../../../hooks/generic";
+import { useGameStore, useUIStore } from "../../../hooks/stores";
 
 export default function SetBlessing() {
   const { slug } = useLocalSearchParams();
@@ -35,8 +35,8 @@ export default function SetBlessing() {
   const { colorScheme } = useColorScheme();
   const vibration = useVibration();
 
-  const { gameState } = useGameState();
-  const { dimensions } = useLayout();
+  const gameState = useGameStore();
+  const { dimensions } = useUIStore();
 
   const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
 
@@ -71,7 +71,7 @@ export default function SetBlessing() {
             blessing={blessing}
             setBlessing={setBlessing}
             colorScheme={colorScheme}
-            dimensions={dimensions}
+            dimensions={dimensions.window}
           />
           <Text className="text-center md:text-lg px-4">
             {DescriptionMap[blessing as Element]}
@@ -177,7 +177,13 @@ function ClassDependantBlessings({
   blessing,
 }: {
   playerClass: PlayerClassOptions;
-  vibration: ({ style, essential }: VibrateProps) => void;
+  vibration: ({
+    style,
+    essential,
+  }: {
+    style: "light" | "medium" | "heavy" | "success" | "warning" | "error";
+    essential?: boolean | undefined;
+  }) => void;
   blessing: Element | undefined;
   setBlessing: React.Dispatch<React.SetStateAction<Element | undefined>>;
   colorScheme: "dark" | "light";

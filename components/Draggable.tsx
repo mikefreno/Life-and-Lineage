@@ -10,10 +10,10 @@ import Animated, {
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useRef } from "react";
 import { checkReleasePositionProps } from "../utility/types";
-import { itemMap, type Item } from "../classes/item";
-import { useVibration } from "../utility/customHooks";
 import { ThemedView, Text } from "./Themed";
-import { useDraggableDataState, useLayout } from "../stores/AppData";
+import { Item, itemMap } from "../entities/item";
+import { useVibration } from "../hooks/generic";
+import { useDraggableStore, useUIStore } from "../hooks/stores";
 
 type DraggableProps = {
   children: React.ReactNode;
@@ -139,15 +139,15 @@ const InventoryItem = ({
   const ref = useRef<View>(null);
   const opacity = useSharedValue(1);
   const shouldSnapBack = useSharedValue(false);
-  const { isDragging, position, setIconString } = useDraggableDataState();
+  const { isDragging, position, setIconString } = useDraggableStore();
   const vibration = useVibration();
-  const { blockSize } = useLayout();
+  const { itemBlockSize } = useUIStore();
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
   }));
 
-  while (!blockSize) {
+  while (!itemBlockSize) {
     return <></>;
   }
 
@@ -176,7 +176,7 @@ const InventoryItem = ({
       itemStack: item,
       xPos: x,
       yPos: y,
-      size: blockSize,
+      size: itemBlockSize,
     });
     setIconString(null);
     isDragging.value = false;
@@ -201,15 +201,15 @@ const InventoryItem = ({
           <View
             className="items-center justify-center rounded-lg bg-zinc-400 z-top"
             style={{
-              height: blockSize,
-              width: blockSize,
+              height: itemBlockSize,
+              width: itemBlockSize,
             }}
           >
             <Image
               source={item[0].getItemIcon()}
               style={{
-                width: Math.min(blockSize * 0.65, 40),
-                height: Math.min(blockSize * 0.65, 40),
+                width: Math.min(itemBlockSize * 0.65, 40),
+                height: Math.min(itemBlockSize * 0.65, 40),
               }}
             />
             {item[0].stackable && item.length > 1 && (
@@ -225,8 +225,8 @@ const InventoryItem = ({
 };
 
 const ProjectedImage = () => {
-  const { position, isDragging, iconString } = useDraggableDataState();
-  const { blockSize } = useLayout();
+  const { position, isDragging, iconString } = useDraggableStore();
+  const { playerStatusIsCompact, itemBlockSize } = useUIStore();
 
   const animatedStyle = useAnimatedStyle(() => {
     "worklet";
@@ -243,7 +243,7 @@ const ProjectedImage = () => {
     };
   });
 
-  if (!iconString || !blockSize) {
+  if (!iconString || !itemBlockSize) {
     return null;
   }
 
@@ -260,15 +260,15 @@ const ProjectedImage = () => {
       <View
         className="items-center justify-center rounded-lg bg-zinc-400"
         style={{
-          height: blockSize,
-          width: blockSize,
+          height: itemBlockSize,
+          width: itemBlockSize,
         }}
       >
         <Image
           source={itemMap[iconString]}
           style={{
-            width: Math.min(blockSize * 0.65, 40),
-            height: Math.min(blockSize * 0.65, 40),
+            width: Math.min(itemBlockSize * 0.65, 40),
+            height: Math.min(itemBlockSize * 0.65, 40),
           }}
         />
       </View>

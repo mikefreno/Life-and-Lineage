@@ -11,11 +11,13 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import { TutorialOption } from "../../utility/types";
 import { observer } from "mobx-react-lite";
-import { useLayout } from "../../stores/AppData";
+import { useUIStore } from "../../hooks/stores";
 
 const MedicalScreen = observer(() => {
   const isFocused = useIsFocused();
-  const { isCompact } = useLayout();
+  const { playerStatusIsCompact } = useUIStore();
+  const bottomTab = useBottomTabBarHeight();
+  const header = useHeaderHeight();
 
   return (
     <>
@@ -38,8 +40,8 @@ const MedicalScreen = observer(() => {
           <View
             className="px-2"
             style={{
-              paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
-              paddingTop: useHeaderHeight(),
+              paddingBottom: bottomTab + (playerStatusIsCompact ? 0 : 28),
+              paddingTop: header,
             }}
           >
             <View className="flex flex-row">

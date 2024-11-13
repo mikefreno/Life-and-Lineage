@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { View } from "react-native";
 import { Text } from "./Themed";
-import { Character } from "../classes/character";
 import GenericModal from "./GenericModal";
 import { useEffect, useState } from "react";
 import { CharacterImage } from "./CharacterImage";
@@ -13,11 +12,12 @@ import {
 import ProgressBar from "./ProgressBar";
 import GenericFlatButton from "./GenericFlatButton";
 import GenericStrikeAround from "./GenericStrikeAround";
-import { useVibration } from "../utility/customHooks";
 import GenericRaisedButton from "./GenericRaisedButton";
 import { useRouter } from "expo-router";
 import { AffectionIcon } from "../assets/icons/SVGIcons";
-import { useGameState } from "../stores/AppData";
+import { Character } from "../entities/character";
+import { useRootStore } from "../hooks/stores";
+import { useVibration } from "../hooks/generic";
 
 interface CharacterInteractionModal {
   character: Character | null;
@@ -37,7 +37,7 @@ export const CharacterInteractionModal = observer(
     showGiftModal,
     showAdoptionModal,
   }: CharacterInteractionModal) => {
-    const { playerState, gameState } = useGameState();
+    const { playerState, gameState } = useRootStore();
     const [showAssaultWarning, setShowAssaultWarning] =
       useState<boolean>(false);
     const [dateAvailable, setDateAvailable] = useState<boolean>(
@@ -58,7 +58,7 @@ export const CharacterInteractionModal = observer(
 
     function setFight() {
       if (character && playerState && gameState) {
-        gameState.gameTick({ playerState });
+        gameState.gameTick();
         playerState.setInDungeon({
           state: true,
           instance: "Personal",
@@ -137,7 +137,7 @@ export const CharacterInteractionModal = observer(
                           vibration({ style: "light" });
                           character.setDateCooldownStart(gameState.date);
                           character.updateAffection(5);
-                          gameState.gameTick({ playerState });
+                          gameState.gameTick();
                         }}
                       >
                         Chat
@@ -198,7 +198,7 @@ export const CharacterInteractionModal = observer(
                               vibration({ style: "light" });
                               character.setDateCooldownStart(gameState.date);
                               playerState.askForPartner(character);
-                              gameState.gameTick({ playerState });
+                              gameState.gameTick();
                             }}
                           >
                             Start Dating?
@@ -214,7 +214,7 @@ export const CharacterInteractionModal = observer(
                               vibration({ style: "light" });
                               character.setDateCooldownStart(gameState.date);
                               character.updateAffection(-10);
-                              gameState.gameTick({ playerState });
+                              gameState.gameTick();
                             }}
                           >
                             Spit in Face
@@ -248,7 +248,7 @@ export const CharacterInteractionModal = observer(
                           character.updateAffection(5);
                           if (playerState && gameState) {
                             playerState.addNewKnownCharacter(character);
-                            gameState.gameTick({ playerState });
+                            gameState.gameTick();
                           }
                         }}
                       >
@@ -260,7 +260,7 @@ export const CharacterInteractionModal = observer(
                           character.updateAffection(-5);
                           if (playerState && gameState) {
                             playerState.addNewKnownCharacter(character);
-                            gameState.gameTick({ playerState });
+                            gameState.gameTick();
                           }
                         }}
                       >

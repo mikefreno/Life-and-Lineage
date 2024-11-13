@@ -9,29 +9,26 @@ import {
 import { toTitleCase } from "../../utility/functions/misc";
 import { useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
-import {
-  useBattleLogger,
-  useCombatActions,
-  usePouch,
-  useVibration,
-} from "../../utility/customHooks";
+
 import GenericModal from "../GenericModal";
 import SpellDetails from "../SpellDetails";
 import InventoryRender from "../InventoryRender";
 import { DungeonMapControls } from "./DungeonMap";
 import PlatformDependantBlurView from "../PlatformDependantBlurView";
 import { Energy, Regen } from "../../assets/icons/SVGIcons";
-import { Attack } from "../../classes/attack";
-import { Spell } from "../../classes/spell";
-import { Item } from "../../classes/item";
 import { elementalColorMap } from "../../constants/Colors";
-import { useDraggableDataState, useGameState } from "../../stores/AppData";
 import {
   useCombatState,
   useDungeonCore,
   useEnemyAnimation,
   useLootState,
 } from "../../stores/DungeonData";
+import { Attack } from "../../entities/attack";
+import { Spell } from "../../entities/spell";
+import { useCombatActions } from "../../hooks/combat";
+import { Item } from "../../entities/item";
+import { useBattleLogger, usePouch, useVibration } from "../../hooks/generic";
+import { useDraggableStore, useRootStore } from "../../hooks/stores";
 
 interface BattleTabProps {
   battleTab: "attacksOrNavigation" | "equipment" | "log";
@@ -46,11 +43,12 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
   const [attackDetailsShowing, setAttackDetailsShowing] =
     useState<boolean>(false);
 
-  const { playerState, enemyState } = useGameState();
+  const { playerState, enemyStore } = useRootStore();
 
   const { inCombat } = useDungeonCore();
   const { useAttack } = useCombatActions();
   const { displayItem, setDisplayItem } = useLootState();
+  const { setIconString } = useDraggableStore();
   const { attackAnimationOnGoing, setAttackAnimationOnGoing } =
     useEnemyAnimation();
   const { setShowTargetSelection } = useCombatState();
@@ -68,7 +66,6 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
   const { logs } = useBattleLogger();
   const { addItemToPouch } = usePouch();
   const { pass } = useCombatActions();
-  const { setIconString } = useDraggableDataState();
 
   if (!playerState) return;
 
@@ -105,22 +102,22 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
   }, [battleTab]);
 
   const attackHandler = (attackOrSpell: Attack | Spell) => {
-    if (enemyState) {
+    if (enemyStore.enemies.length > 0) {
       setAttackAnimationOnGoing(true);
       vibration({ style: "light" });
-      if (
-        attackOrSpell.attackStyle !== "aoe" &&
-        enemyState &&
-        enemyState.minions.length >=
-          (attackOrSpell.attackStyle == "single" ? 1 : 2)
-      ) {
+      const enoughForDualToHitAll =
+        enemyStore.enemies.length > 1 ||
+        enemyStore.enemies[0].minions.length > 0;
+      const attackHitsAllTargets =
+        attackOrSpell.attackStyle == "aoe" || enoughForDualToHitAll;
+      if (!attackHitsAllTargets) {
         setShowTargetSelection({
           showing: true,
           chosenAttack: attackOrSpell,
         });
       } else {
         useAttack({
-          target: enemyState,
+          target: enemyStore.enemies[0],
           attackOrSpell,
         });
       }

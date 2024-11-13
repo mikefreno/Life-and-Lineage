@@ -3,13 +3,13 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc";
 import { Pressable, Switch, View } from "react-native";
-import { useVibration } from "../../utility/customHooks";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import GenericModal from "../../components/GenericModal";
 import * as Updates from "expo-updates";
 import D20DieAnimation from "../../components/DieRollAnim";
-import { useGameState } from "../../stores/AppData";
+import { useVibration } from "../../hooks/generic";
+import { useGameStore } from "../../hooks/stores";
 
 const healthWarningOptions: Record<number, string> = {
   0.5: "50%",
@@ -30,7 +30,7 @@ const healthWarningVals = [
 const healthWarningKeys = [0.5, 0.25, 0.2, 0.15, 0.1, 0];
 
 export default function GameSettings() {
-  const { gameState } = useGameState();
+  const gameState = useGameStore();
   const vibration = useVibration();
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,

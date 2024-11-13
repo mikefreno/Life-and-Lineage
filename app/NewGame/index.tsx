@@ -2,8 +2,7 @@ import { Pressable, ScrollView, View } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
 import "../../assets/styles/globals.css";
 import { useLayoutEffect, useState } from "react";
-import { Link, router } from "expo-router";
-import { useVibration } from "../../utility/customHooks";
+import { Link } from "expo-router";
 import { FontAwesome5 } from "@expo/vector-icons";
 import TutorialModal from "../../components/TutorialModal";
 import {
@@ -14,13 +13,13 @@ import {
 } from "../../assets/icons/SVGIcons";
 import { TutorialOption } from "../../utility/types";
 import { ClassDescriptionMap } from "../../utility/descriptions";
-import GenericFlatButton from "../../components/GenericFlatButton";
 import GenericModal from "../../components/GenericModal";
 import { wait } from "../../utility/functions/misc";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
 import { useColorScheme } from "nativewind";
-import { useGameState, useLayout } from "../../stores/AppData";
+import { useVibration } from "../../hooks/generic";
+import { useGameStore, useUIStore } from "../../hooks/stores";
 
 const SetClassScreen = observer(() => {
   const [selectedClass, setSelectedClass] = useState<
@@ -28,8 +27,8 @@ const SetClassScreen = observer(() => {
   >();
   const vibration = useVibration();
 
-  const { gameState } = useGameState();
-  const { dimensions } = useLayout();
+  const gameState = useGameStore();
+  const { dimensions } = useUIStore();
   const { colorScheme } = useColorScheme();
 
   const isFocused = useIsFocused();
@@ -102,8 +101,8 @@ const SetClassScreen = observer(() => {
                 setSelectedClass("mage");
               }}
               style={{
-                height: dimensions.height * 0.25,
-                width: dimensions.width * 0.45,
+                height: dimensions.window.height * 0.25,
+                width: dimensions.window.width * 0.45,
               }}
             >
               {({ pressed }) => (
@@ -117,8 +116,8 @@ const SetClassScreen = observer(() => {
                   <WizardHat
                     style={{ marginBottom: 5 }}
                     color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
-                    height={dimensions.height * 0.15}
-                    width={dimensions.height * 0.15}
+                    height={dimensions.window.height * 0.15}
+                    width={dimensions.window.height * 0.15}
                   />
                   <Text
                     className="mx-auto text-xl"
@@ -136,8 +135,8 @@ const SetClassScreen = observer(() => {
                 setSelectedClass("ranger");
               }}
               style={{
-                height: dimensions.height * 0.25,
-                width: dimensions.width * 0.45,
+                height: dimensions.window.height * 0.25,
+                width: dimensions.window.width * 0.45,
               }}
             >
               {({ pressed }) => (
@@ -151,8 +150,8 @@ const SetClassScreen = observer(() => {
                   <View className="rotate-12">
                     <RangerIcon
                       style={{ marginBottom: 5 }}
-                      height={dimensions.height * 0.15}
-                      width={dimensions.height * 0.15}
+                      height={dimensions.window.height * 0.15}
+                      width={dimensions.window.height * 0.15}
                     />
                   </View>
                   <Text className="mx-auto text-xl" style={{ color: "green" }}>
@@ -170,8 +169,8 @@ const SetClassScreen = observer(() => {
                 setSelectedClass("necromancer");
               }}
               style={{
-                height: dimensions.height * 0.25,
-                width: dimensions.width * 0.45,
+                height: dimensions.window.height * 0.25,
+                width: dimensions.window.width * 0.45,
               }}
             >
               {({ pressed }) => (
@@ -186,8 +185,8 @@ const SetClassScreen = observer(() => {
                     <NecromancerSkull
                       style={{ marginBottom: 5 }}
                       color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
-                      height={dimensions.height * 0.15}
-                      width={dimensions.height * 0.15}
+                      height={dimensions.window.height * 0.15}
+                      width={dimensions.window.height * 0.15}
                     />
                   </View>
                   <Text
@@ -206,8 +205,8 @@ const SetClassScreen = observer(() => {
                 setSelectedClass("paladin");
               }}
               style={{
-                height: dimensions.height * 0.25,
-                width: dimensions.width * 0.45,
+                height: dimensions.window.height * 0.25,
+                width: dimensions.window.width * 0.45,
               }}
             >
               {({ pressed }) => (
@@ -221,8 +220,8 @@ const SetClassScreen = observer(() => {
                   <View className="rotate-12">
                     <View className="scale-x-[-1] transform">
                       <PaladinHammer
-                        height={dimensions.height * 0.15}
-                        width={dimensions.height * 0.15}
+                        height={dimensions.window.height * 0.15}
+                        width={dimensions.window.height * 0.15}
                       />
                     </View>
                   </View>

@@ -1,17 +1,17 @@
 import { router } from "expo-router";
 import GenericModal from "../GenericModal";
-import { Item } from "../../classes/item";
 import { Text } from "../Themed";
 import { Pressable, View, Image } from "react-native";
 import { toTitleCase, wait } from "../../utility/functions/misc";
 import { Coins } from "../../assets/icons/SVGIcons";
 import GenericFlatButton from "../GenericFlatButton";
-import { useVibration } from "../../utility/customHooks";
-import { useGameState } from "../../stores/AppData";
 import { useDungeonCore, useLootState } from "../../stores/DungeonData";
+import { usePlayerStore } from "../../hooks/stores";
+import type { Item } from "../../entities/item";
+import { useVibration } from "../../hooks/generic";
 
 export default function DroppedItemsModal() {
-  const { playerState } = useGameState();
+  const playerState = usePlayerStore();
   const { instanceName } = useDungeonCore();
   const {
     inventoryFullNotifier,

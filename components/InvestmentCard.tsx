@@ -5,18 +5,18 @@ import { Pressable, View, Animated } from "react-native";
 import { useEffect, useRef, useState } from "react";
 import { toTitleCase, asReadableGold } from "../utility/functions/misc";
 import { Entypo } from "@expo/vector-icons";
-import { Investment } from "../classes/investment";
 import GenericModal from "./GenericModal";
 import { observer } from "mobx-react-lite";
-import { useVibration } from "../utility/customHooks";
 import ThemedCard from "./ThemedCard";
 import GenericStrikeAround from "./GenericStrikeAround";
 import { ClockIcon, Coins, Sanity, Vault } from "../assets/icons/SVGIcons";
-import { useGameState } from "../stores/AppData";
+import { useRootStore } from "../hooks/stores";
+import { useVibration } from "../hooks/generic";
+import type { Investment } from "../entities/investment";
 
 const InvestmentCard = observer(
   ({ investment }: { investment: InvestmentType }) => {
-    const { playerState, gameState } = useGameState();
+    const { playerState, gameState } = useRootStore();
 
     const { colorScheme } = useColorScheme();
 
@@ -59,7 +59,7 @@ const InvestmentCard = observer(
     function collectOnInvestment() {
       if (playerState && gameState) {
         playerState.collectFromInvestment(investment.name);
-        gameState.gameTick({ playerState });
+        gameState.gameTick();
       }
     }
 

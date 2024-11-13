@@ -1,7 +1,6 @@
-import { ThemedView, Text } from "../components/Themed";
+import { Text } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { Pressable, Image, View, ScrollView } from "react-native";
-import { Item } from "../classes/item";
 import { toTitleCase } from "../utility/functions/misc";
 import ProgressBar from "../components/ProgressBar";
 import SpellDetails from "../components/SpellDetails";
@@ -14,17 +13,18 @@ import {
   MasteryToString,
 } from "../utility/types";
 import GenericModal from "../components/GenericModal";
-import { Spell } from "../classes/spell";
 import { elementalColorMap } from "../constants/Colors";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
-import { useVibration } from "../utility/customHooks";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useGameState, useLayout } from "../stores/AppData";
+import { useRootStore, useUIStore } from "../hooks/stores";
+import { useVibration } from "../hooks/generic";
+import type { Item } from "../entities/item";
+import type { Spell } from "../entities/spell";
 
 export default function LearningKnowledgeScreen() {
-  const { playerState, gameState } = useGameState();
-  const { dimensions } = useLayout();
+  const { playerState, gameState } = useRootStore();
+  const { dimensions } = useUIStore();
 
   const books = playerState?.inventory.filter(
     (item) => item.itemClass == ItemClassType.Book,
@@ -68,7 +68,7 @@ export default function LearningKnowledgeScreen() {
     if (playerState && gameState && isFocused) {
       playerState.learnSpellStep(bookName, spellName, spellElement);
       setSpellState(playerState.learningSpells);
-      gameState.gameTick({ playerState });
+      gameState.gameTick();
     }
   }
 
@@ -127,7 +127,7 @@ export default function LearningKnowledgeScreen() {
             </View>
           ) : null}
           {spellState && spellState.length > 0 && (
-            <ScrollView style={{ maxHeight: dimensions.height * 0.25 }}>
+            <ScrollView style={{ maxHeight: dimensions.window.height * 0.25 }}>
               <View className="py-4 shadow-diffuse-top">
                 <Text className="text-center text-xl">Currently Studying</Text>
                 {spellState.map((studyState) => (

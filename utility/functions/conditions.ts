@@ -1,8 +1,8 @@
 import conditions from "../../assets/json/conditions.json";
-import { Condition } from "../../classes/conditions";
-import { PlayerCharacter } from "../../classes/character";
+import { Condition } from "../../entities/conditions";
 import sanityDebuffs from "../../assets/json/sanityDebuffs.json";
 import { ConditionObjectType } from "../types";
+import { PlayerCharacter } from "../../entities/character";
 
 interface createDebuffDeps {
   debuffName: string;
@@ -67,6 +67,7 @@ export function createDebuff({
       placedbyID: applierID,
       icon: debuffObj.icon,
       aura: debuffObj.aura,
+      on: null,
     });
 
     return debuff;
@@ -140,6 +141,7 @@ export function createBuff({
       placedbyID: applierID,
       icon: buffObj.icon,
       aura: buffObj.aura,
+      on: null,
     });
 
     return buff;
@@ -198,6 +200,7 @@ export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
         icon: debuffObj.icon,
         aura: debuffObj.aura,
         placedbyID: "low sanity",
+        on: null,
       });
 
       playerState.addCondition(debuff);
@@ -315,14 +318,14 @@ export function getConditionEffectsOnDefenses(suppliedConditions: Condition[]) {
             armorMult *= 1 - effectMagnitude;
           }
           break;
-        case "healthMax increase":
+        case "maxHealth increase":
           if (effectStyle === "flat") {
             healthFlat += effectMagnitude;
           } else if (effectStyle) {
             healthMult *= 1 + effectMagnitude;
           }
           break;
-        case "healthMax decrease":
+        case "maxHealth decrease":
           if (effectStyle === "flat") {
             healthFlat -= effectMagnitude;
           } else if (effectStyle) {

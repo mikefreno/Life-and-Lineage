@@ -2,11 +2,8 @@ import { LayoutChangeEvent, Pressable, ScrollView, View } from "react-native";
 import { Text, CursiveText, HandwrittenText, CursiveTextBold } from "./Themed";
 import GearStatsDisplay from "./GearStatsDisplay";
 import { useColorScheme } from "nativewind";
-import { useEnemyManagement, useVibration } from "../utility/customHooks";
 import { router } from "expo-router";
-import { Item } from "../classes/item";
 import { useEffect, useState } from "react";
-import { Shop } from "../classes/shop";
 import { asReadableGold, toTitleCase } from "../utility/functions/misc";
 import SpellDetails from "./SpellDetails";
 import GenericFlatButton from "./GenericFlatButton";
@@ -22,8 +19,12 @@ import {
 import { Attribute, ItemClassType, MasteryToString } from "../utility/types";
 import GenericModal from "./GenericModal";
 import GenericStrikeAround from "./GenericStrikeAround";
-import { Condition } from "../classes/conditions";
-import { useGameState, useLayout } from "../stores/AppData";
+import type { Item } from "../entities/item";
+import { useVibration } from "../hooks/generic";
+import { useRootStore } from "../hooks/stores";
+import { Condition } from "../entities/conditions";
+import { useEnemyManagement } from "../hooks/combat";
+import type { Shop } from "../entities/shop";
 
 type BaseProps = {
   displayItem: {
@@ -64,25 +65,14 @@ export function StatsDisplay({
 }: StatsDisplayProps) {
   const { colorScheme } = useColorScheme();
   const vibration = useVibration();
-  const { dimensions } = useLayout();
-  const { playerState, enemyState } = useGameState();
+  const { playerState, enemyStore, uiStore } = useRootStore();
+  const { dimensions, itemBlockSize } = uiStore;
 
-  const [viewWidth, setViewWidth] = useState(dimensions.width * 0.4);
-  const [viewHeight, setViewHeight] = useState(dimensions.height * 0.2);
-  const [blockSize, setBlockSize] = useState<number>();
+  const [viewWidth, setViewWidth] = useState(dimensions.window.width * 0.4);
+  const [viewHeight, setViewHeight] = useState(dimensions.window.height * 0.2);
   const [showingAttacks, setShowingAttacks] = useState<boolean>(false);
   const [firstItem, setFirstItem] = useState<Item>(displayItem.item[0]);
   const [renderStory, setRenderStory] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (dimensions.width === dimensions.lesser) {
-      const blockSize = Math.min(dimensions.height / 5, dimensions.width / 7.5);
-      setBlockSize(blockSize);
-    } else {
-      const blockSize = dimensions.width / 14;
-      setBlockSize(blockSize);
-    }
-  }, [dimensions.height]);
 
   useEffect(() => {
     setFirstItem(displayItem.item[0]);
@@ -345,7 +335,7 @@ export function StatsDisplay({
             ) && (
               <GenericFlatButton
                 onPress={() => {
-                  if (enemyState) {
+                  if (enemyStore.enemies.length > 0) {
                     const { enemyTurn } = useEnemyManagement();
                     firstItem.use(enemyTurn);
                   } else {
@@ -640,7 +630,7 @@ export function StatsDisplay({
     setViewHeight(height);
   };
 
-  while (!blockSize) {
+  while (!itemBlockSize) {
     return <></>;
   }
 
@@ -689,28 +679,30 @@ export function StatsDisplay({
                   topGuard &&
                   displayItem.positon.top + (topOffset ?? 0) < topGuard
                     ? topGuard
-                    : viewHeight + displayItem.positon.top < dimensions.height
+                    : viewHeight + displayItem.positon.top <
+                      dimensions.window.height
                     ? displayItem.positon.top + (topOffset ?? 0)
-                    : dimensions.height - (viewHeight + 20),
+                    : dimensions.window.height - (viewHeight + 20),
               }
             : {
-                width: dimensions.width * 0.4,
+                width: dimensions.window.width * 0.4,
                 backgroundColor:
                   colorScheme == "light"
                     ? "rgba(250, 250, 250, 0.98)"
                     : "rgba(20, 20, 20, 0.95)",
                 left:
-                  displayItem.positon.left + blockSize < dimensions.width * 0.6
-                    ? displayItem.positon.left + blockSize
+                  displayItem.positon.left + itemBlockSize <
+                  dimensions.window.width * 0.6
+                    ? displayItem.positon.left + itemBlockSize
                     : displayItem.positon.left - viewWidth - 4,
                 top:
                   topGuard &&
                   displayItem.positon.top + (topOffset ?? 0) < topGuard
                     ? topGuard
                     : viewHeight + displayItem.positon.top <
-                      dimensions.height - tabBarHeight
+                      dimensions.window.height - tabBarHeight
                     ? displayItem.positon.top + (topOffset ?? 0)
-                    : dimensions.height - (viewHeight + tabBarHeight),
+                    : dimensions.window.height - (viewHeight + tabBarHeight),
               }
         }
       >

@@ -6,27 +6,32 @@ import {
   useEffect,
 } from "react";
 import { Dimensions, View } from "react-native";
-import { DungeonInstance, DungeonLevel } from "../classes/dungeon";
-import type { Item } from "../classes/item";
+import { DungeonInstance, DungeonLevel } from "../entities/dungeon";
+import type { Item } from "../entities/item";
 import {
   generateTiles,
   type BoundingBox,
   type Tile,
   getBoundingBox,
 } from "../components/DungeonComponents/DungeonMap";
-import type { Attack } from "../classes/attack";
-import type { Spell } from "../classes/spell";
-import { useGameState, useLayout } from "./AppData";
+import type { Attack } from "../entities/attack";
+import type { Spell } from "../entities/spell";
 import { getSexFromName } from "../utility/functions/characterAid";
-import { enemyGenerator } from "../utility/enemy";
+import { enemyGenerator } from "../utility/enemyHelpers";
 import { flipCoin, wait } from "../utility/functions/misc";
 import { useHeaderHeight } from "@react-navigation/elements";
 import TutorialModal from "../components/TutorialModal";
 import { TutorialOption } from "../utility/types";
 import { useIsFocused } from "@react-navigation/native";
-import { dungeonSave } from "../utility/functions/save_load";
 import { throttle } from "lodash";
 import { useLocalSearchParams } from "expo-router";
+import {
+  useDungeonStore,
+  useEnemyStore,
+  useGameStore,
+  usePlayerStore,
+  useRootStore,
+} from "../hooks/stores";
 
 const DungeonCoreContext = createContext<
   | {
@@ -151,9 +156,10 @@ const DungeonCoreProvider = ({ children }: { children: ReactNode }) => {
   }
   const [thisInstance, setThisInstance] = useState<DungeonInstance>();
   const [thisDungeon, setThisDungeon] = useState<DungeonLevel>();
-  const { gameState, enemyState, setEnemy } = useGameState();
+  const { enemyStore, dungeonStore } = useRootStore();
+
   const [firstLoad, setFirstLoad] = useState<boolean>(
-    enemyState ? false : true,
+    enemyStore.enemies.length > 0 ? false : true,
   );
 
   const instanceName = slug[0];
@@ -167,7 +173,7 @@ const DungeonCoreProvider = ({ children }: { children: ReactNode }) => {
       (instanceName === "Activities" ||
         instanceName === "Personal" ||
         instanceName === "training grounds") &&
-      !enemyState &&
+      enemyStore.enemies.length == 0 &&
       firstLoad
     ) {
       let name: string | undefined = undefined;
@@ -182,7 +188,7 @@ const DungeonCoreProvider = ({ children }: { children: ReactNode }) => {
       }
       const enemy = enemyGenerator(instanceName, level, name);
       if (!enemy) throw new Error(`missing enemy, slug: ${slug}`);
-      setEnemy(enemy);
+
       setInCombat(true);
       setFirstLoad(false);
     } else {
@@ -191,28 +197,14 @@ const DungeonCoreProvider = ({ children }: { children: ReactNode }) => {
   }, [slug]);
 
   useEffect(() => {
-    if (gameState) {
-      if (instanceName == "Activities" || instanceName == "Personal") {
-        const tempDungeon = new DungeonLevel({
-          level: 0,
-          boss: [],
-          tiles: 0,
-          bossDefeated: true,
-          unlocked: true,
-        });
-        const tempInstance = new DungeonInstance({
-          name: level,
-          levels: [tempDungeon],
-          unlocks: [],
-        });
-        setThisDungeon(tempDungeon);
-        setThisInstance(tempInstance);
-      } else {
-        setThisDungeon(gameState.getDungeon(instanceName, level));
-        setThisInstance(gameState.getInstance(instanceName));
-      }
+    if (instanceName == "Activities" || instanceName == "Personal") {
+      setThisDungeon(dungeonStore.activityInstance.levels[0]);
+      setThisInstance(dungeonStore.activityInstance);
+    } else {
+      setThisDungeon(dungeonStore.getDungeon(instanceName, level));
+      setThisInstance(dungeonStore.getInstance(instanceName));
     }
-  }, [level, instanceName, gameState]);
+  }, [level, instanceName, dungeonStore]);
 
   const header = useHeaderHeight();
   if (!thisDungeon || !thisInstance) {
@@ -336,7 +328,9 @@ const MapStateProvider = ({ children }: { children: ReactNode }) => {
   });
   const [currentPosition, setCurrentPosition] = useState<Tile | null>(null);
 
-  const { playerState, gameState, enemyState, setEnemy } = useGameState();
+  const gameState = useGameStore();
+  const playerState = usePlayerStore();
+  const enemyStore = useEnemyStore();
   const { setFightingBoss, fightingBoss } = useCombatState();
   const { thisDungeon, slug, setInCombat, instanceName } = useDungeonCore();
   const { setAttackAnimationOnGoing } = useEnemyAnimation();
@@ -347,7 +341,9 @@ const MapStateProvider = ({ children }: { children: ReactNode }) => {
         setTiles(playerState.currentDungeon.dungeonMap);
         setCurrentPosition(playerState.currentDungeon.currentPosition);
         setMapDimensions(playerState.currentDungeon.mapDimensions);
-        setEnemy(playerState.currentDungeon.enemy);
+        if (playerState.currentDungeon.enemy) {
+          enemyStore.enemies.push(playerState.currentDungeon.enemy);
+        }
         if (playerState.currentDungeon.enemy) {
           setFightingBoss(playerState.currentDungeon.fightingBoss);
           setInCombat(true);
@@ -411,7 +407,7 @@ const TutorialStateProvider = ({ children }: { children: ReactNode }) => {
 
   const isFocused = useIsFocused();
   const { droppedItems } = useLootState();
-  const { setShowDetailedStatusView } = useLayout();
+  const ui = useUIStore();
 
   useEffect(() => {
     if (shouldShowFirstBossKillTutorialAfterItemDrops && !droppedItems) {
@@ -437,13 +433,13 @@ const TutorialStateProvider = ({ children }: { children: ReactNode }) => {
           backFunction={() => {
             setShowFirstBossKillTutorial(false);
             wait(750).then(() => {
-              setShowDetailedStatusView(true);
+              ui.detailedStatusViewShowing = true;
             });
           }}
           onCloseFunction={() => {
             setShowFirstBossKillTutorial(false);
             wait(750).then(() => {
-              setShowDetailedStatusView(true);
+              ui.detailedStatusViewShowing = true;
             });
           }}
           isFocused={isFocused}

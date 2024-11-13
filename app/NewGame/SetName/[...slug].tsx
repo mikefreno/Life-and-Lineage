@@ -9,7 +9,6 @@ import { Text } from "../../../components/Themed";
 import { useRef, useState } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { toTitleCase } from "../../../utility/functions/misc";
-import { useVibration } from "../../../utility/customHooks";
 import { useColorScheme } from "nativewind";
 import { useHeaderHeight } from "@react-navigation/elements";
 import {
@@ -18,10 +17,11 @@ import {
 } from "../../../utility/types";
 import { playerClassColors } from "../../../constants/Colors";
 import GenericFlatButton from "../../../components/GenericFlatButton";
-import { useLayout } from "../../../stores/AppData";
+import { useVibration } from "../../../hooks/generic";
+import { useUIStore } from "../../../hooks/stores";
 
 export default function SetName() {
-  const { dimensions } = useLayout();
+  const { dimensions } = useUIStore();
   const { slug } = useLocalSearchParams();
   if (!slug) {
     return router.replace("/NewGame");
@@ -85,7 +85,7 @@ export default function SetName() {
                 style={{
                   fontFamily: "PixelifySans",
                   paddingVertical: 8,
-                  width: Math.min(dimensions.width * 0.65, 300),
+                  width: Math.min(dimensions.window.width * 0.65, 300),
                   fontSize: 20,
                 }}
               />
@@ -108,7 +108,7 @@ export default function SetName() {
                 style={{
                   fontFamily: "PixelifySans",
                   paddingVertical: 8,
-                  width: Math.min(dimensions.width * 0.65, 300),
+                  width: Math.min(dimensions.window.width * 0.65, 300),
                   fontSize: 20,
                 }}
               />

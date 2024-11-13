@@ -3,7 +3,6 @@ import { calculateAge, wait } from "../utility/functions/misc";
 import { CharacterImage } from "../components/CharacterImage";
 import { useState } from "react";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { Character } from "../classes/character";
 import ProgressBar from "../components/ProgressBar";
 import { CharacterInteractionModal } from "../components/CharacterInteractionModal";
 import { FlatList, Pressable, ScrollView, View } from "react-native";
@@ -15,11 +14,12 @@ import { FontAwesome6 } from "@expo/vector-icons";
 import GenericRaisedButton from "../components/GenericRaisedButton";
 import { observer } from "mobx-react-lite";
 import GenericStrikeAround from "../components/GenericStrikeAround";
-import { useGameState, useLayout } from "../stores/AppData";
+import { useRootStore, useUIStore } from "../hooks/stores";
+import type { Character } from "../entities/character";
 
 const RelationshipsScreen = observer(() => {
-  const { playerState, gameState } = useGameState();
-  const { dimensions } = useLayout();
+  const { playerState, gameState } = useRootStore();
+  const { dimensions } = useUIStore();
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null,
   );
@@ -78,7 +78,7 @@ const RelationshipsScreen = observer(() => {
       <Pressable
         className="flex items-center"
         style={{
-          width: dimensions.lesser * 0.35,
+          width: dimensions.window.lesser * 0.35,
           opacity: character.deathdate ? 0.5 : 1,
         }}
         key={character.id}
@@ -195,7 +195,7 @@ const RelationshipsScreen = observer(() => {
           backFunction={() => setShowingAdoptionModal(false)}
           size={100}
         >
-          <View style={{ maxHeight: dimensions.height * 0.75 }}>
+          <View style={{ maxHeight: dimensions.window.height * 0.75 }}>
             <Text className="text-center text-2xl tracking-wider py-2">
               {partnerName
                 ? `Adopting with ${partnerName}`

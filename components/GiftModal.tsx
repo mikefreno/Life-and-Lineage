@@ -2,11 +2,11 @@ import { useRef, useState } from "react";
 import GenericModal from "./GenericModal";
 import { Dimensions, Pressable, View, Image } from "react-native";
 import { Text } from "./Themed";
-import { Item } from "../classes/item";
 import { useColorScheme } from "nativewind";
 import { toTitleCase } from "../utility/functions/misc";
 import GearStatsDisplay from "./GearStatsDisplay";
-import { useGameState } from "../stores/AppData";
+import { usePlayerStore } from "../hooks/stores";
+import type { Item } from "../entities/item";
 
 const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
@@ -23,7 +23,7 @@ export default function GiftModal({
   backdropCloses = false,
 }: GiftModalProps) {
   const { colorScheme } = useColorScheme();
-  const { playerState } = useGameState();
+  const playerState = usePlayerStore();
 
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const selectedItemRef = useRef<Item>();

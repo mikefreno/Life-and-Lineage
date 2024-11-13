@@ -1,10 +1,8 @@
-import { Pressable, ScrollView, View } from "react-native";
-import { Shop } from "../../classes/shop";
+import { ScrollView, View } from "react-native";
 import { CharacterImage } from "../../components/CharacterImage";
 import shopObjects from "../../assets/json/shops.json";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
-import { useVibration } from "../../utility/customHooks";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -13,16 +11,18 @@ import { TutorialOption } from "../../utility/types";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
 import { Text } from "../../components/Themed";
-import { useGameState, useLayout } from "../../stores/AppData";
+import { useVibration } from "../../hooks/generic";
+import { useRootStore, useUIStore } from "../../hooks/stores";
+import { type Shop } from "../../entities/shop";
 
 const ShopsScreen = observer(() => {
   const vibration = useVibration();
-  const { gameState } = useGameState();
-  const { isCompact } = useLayout();
+  const { shopsStore, gameState } = useRootStore();
+  const { playerStatusIsCompact } = useUIStore();
   const [isReady, setIsReady] = useState(false);
 
   const runDeathChecks = () => {
-    gameState?.shops.forEach((shop) => shop.deathCheck());
+    shopsStore.shops.forEach((shop) => shop.deathCheck());
   };
   useEffect(() => {
     if (!isReady) {
@@ -141,11 +141,11 @@ const ShopsScreen = observer(() => {
                 flexWrap: "wrap",
                 alignItems: "flex-start",
                 justifyContent: "flex-start",
-                paddingBottom: bottomHeight + (isCompact ? 0 : 28),
+                paddingBottom: bottomHeight + (playerStatusIsCompact ? 0 : 28),
                 paddingTop: headerHeight,
               }}
             >
-              {gameState.shops.map((shop) => renderItem(shop))}
+              {shopsStore.shops.map((shop) => renderItem(shop))}
             </View>
           </ScrollView>
         ) : null}

@@ -22,24 +22,23 @@ import {
   WizardHat,
 } from "../../assets/icons/SVGIcons";
 import BlessingDisplay from "../../components/BlessingsDisplay";
-import { Item } from "../../classes/item";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import EquipmentDisplay from "../../components/EquipmentDisplay";
 import { TutorialOption } from "../../utility/types";
 import { ProjectedImage } from "../../components/Draggable";
 import {
-  useDraggableDataState,
-  useGameState,
-  useLayout,
-} from "../../stores/AppData";
+  useDraggableStore,
+  useRootStore,
+  useUIStore,
+} from "../../hooks/stores";
+import { Item } from "../../entities/item";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
 
-  const { blockSize, dimensions, isCompact } = useLayout();
-  const { playerState, gameState } = useGameState();
-  const { position, isDragging, iconString, setIconString } =
-    useDraggableDataState();
+  const { dimensions, playerStatusIsCompact } = useUIStore();
+  const { playerState, gameState } = useRootStore();
+  const { setIconString } = useDraggableStore();
 
   const headTarget = useRef<View>(null);
   const bodyTarget = useRef<View>(null);
@@ -83,7 +82,7 @@ const HomeScreen = observer(() => {
           className="flex-1"
           style={{
             paddingTop: header,
-            paddingBottom: tabBarHeight + (isCompact ? 0 : 28),
+            paddingBottom: tabBarHeight + (playerStatusIsCompact ? 0 : 28),
           }}
         >
           <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
@@ -93,14 +92,14 @@ const HomeScreen = observer(() => {
                   <View className="mx-auto">
                     <NecromancerSkull
                       width={
-                        dimensions.height / 9 > 100
+                        dimensions.window.height / 9 > 100
                           ? 100
-                          : dimensions.height / 10
+                          : dimensions.window.height / 10
                       }
                       height={
-                        dimensions.height / 9 > 100
+                        dimensions.window.height / 9 > 100
                           ? 100
-                          : dimensions.height / 10
+                          : dimensions.window.height / 10
                       }
                       color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
                     />
@@ -109,14 +108,14 @@ const HomeScreen = observer(() => {
                   <View className="mx-auto">
                     <PaladinHammer
                       width={
-                        dimensions.height / 9 > 100
+                        dimensions.window.height / 9 > 100
                           ? 100
-                          : dimensions.height / 10
+                          : dimensions.window.height / 10
                       }
                       height={
-                        dimensions.height / 9 > 100
+                        dimensions.window.height / 9 > 100
                           ? 100
-                          : dimensions.height / 10
+                          : dimensions.window.height / 10
                       }
                     />
                   </View>
@@ -124,14 +123,14 @@ const HomeScreen = observer(() => {
                   <View className="mx-auto scale-x-[-1] transform">
                     <WizardHat
                       width={
-                        dimensions.height / 9 > 100
+                        dimensions.window.height / 9 > 100
                           ? 100
-                          : dimensions.height / 10
+                          : dimensions.window.height / 10
                       }
                       height={
-                        dimensions.height / 9 > 100
+                        dimensions.window.height / 9 > 100
                           ? 100
-                          : dimensions.height / 10
+                          : dimensions.window.height / 10
                       }
                       color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
                     />
@@ -140,14 +139,14 @@ const HomeScreen = observer(() => {
                   <View className="mx-auto">
                     <RangerIcon
                       width={
-                        dimensions.height / 9 > 100
+                        dimensions.window.height / 9 > 100
                           ? 100
-                          : dimensions.height / 10
+                          : dimensions.window.height / 10
                       }
                       height={
-                        dimensions.height / 9 > 100
+                        dimensions.window.height / 9 > 100
                           ? 100
-                          : dimensions.height / 10
+                          : dimensions.window.height / 10
                       }
                     />
                   </View>
@@ -169,7 +168,9 @@ const HomeScreen = observer(() => {
                     blessing={playerState.blessing}
                     colorScheme={colorScheme}
                     size={
-                      dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
+                      dimensions.window.height / 9 > 100
+                        ? 100
+                        : dimensions.window.height / 10
                     }
                   />
                 </View>

@@ -18,13 +18,14 @@ import {
 import { elementalColorMap } from "../../constants/Colors";
 import { useIsFocused } from "@react-navigation/native";
 import { Text } from "../../components/Themed";
-import { useGameState, useLayout } from "../../stores/AppData";
+import { usePlayerStore, useUIStore } from "../../hooks/stores";
 
 const SpellsScreen = observer(() => {
   const { colorScheme } = useColorScheme();
 
-  const { playerState } = useGameState();
-  const { isCompact } = useLayout();
+  const bottomTab = useBottomTabBarHeight();
+  const playerState = usePlayerStore();
+  const { playerStatusIsCompact } = useUIStore();
 
   function magicProficiencySection(
     proficiencies:
@@ -116,7 +117,7 @@ const SpellsScreen = observer(() => {
       <View
         className="flex-1"
         style={{
-          paddingBottom: useBottomTabBarHeight() + (isCompact ? 0 : 28),
+          paddingBottom: bottomTab + (playerStatusIsCompact ? 0 : 28),
         }}
       >
         {playerState?.spells && playerState.spells.length > 0 ? (

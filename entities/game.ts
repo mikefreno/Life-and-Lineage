@@ -1,5 +1,4 @@
 import { DungeonInstance, DungeonLevel } from "./dungeon";
-import dungeonsJSON from "../assets/json/dungeons.json";
 import { action, makeObservable, observable, reaction } from "mobx";
 import { Character, PlayerCharacter } from "./character";
 import { lowSanityDebuffGenerator } from "../utility/functions/conditions";
@@ -7,14 +6,14 @@ import { TutorialOption } from "../utility/types";
 import { Shop } from "./shop";
 import { calculateAge } from "../utility/functions/misc";
 import { generateNewAdoptee } from "../utility/functions/characterAid";
-import { saveGame, savePlayer } from "../utility/functions/save_load";
+import { RootStore } from "../stores/RootStore";
+import { storage } from "../utility/functions/storage";
+import { throttle } from "lodash";
+import { stringify } from "flatted";
 
 interface GameOptions {
   date?: string;
   startDate?: string;
-  shops: Shop[];
-  dungeonInstances?: DungeonInstance[];
-  completedInstances?: string[];
   atDeathScreen?: boolean;
   colorScheme?: "system" | "dark" | "light";
   vibrationEnabled: "full" | "minimal" | "none";
@@ -22,6 +21,7 @@ interface GameOptions {
   tutorialsShown?: Record<TutorialOption, boolean>;
   tutorialsEnabled?: boolean;
   independantChildren?: Character[];
+  root: RootStore;
 }
 
 /**
@@ -31,9 +31,7 @@ interface GameOptions {
 export class Game {
   date: string; // compared against the startDate to calculate ages
   readonly startDate: string; // only ever set at game start, should never again be modified.
-  dungeonInstances: DungeonInstance[];
   atDeathScreen: boolean;
-  shops: Shop[];
   colorScheme: "system" | "dark" | "light";
   vibrationEnabled: "full" | "minimal" | "none";
   healthWarning: number;
@@ -41,25 +39,23 @@ export class Game {
   tutorialsEnabled: boolean;
   independantChildren: Character[];
   startingNewGame = false;
+  root: RootStore;
 
   constructor({
     date,
     startDate,
-    dungeonInstances,
     atDeathScreen,
-    shops,
     colorScheme,
     vibrationEnabled,
     healthWarning,
     tutorialsShown,
     tutorialsEnabled,
     independantChildren,
+    root,
   }: GameOptions) {
     this.date = date ?? new Date().toISOString();
     this.startDate = startDate ?? new Date().toISOString();
-    this.dungeonInstances = dungeonInstances ?? Game.getInitDungeonState();
     this.atDeathScreen = atDeathScreen ?? false;
-    this.shops = shops;
     this.colorScheme = colorScheme ?? "system";
     this.vibrationEnabled = vibrationEnabled;
     this.healthWarning = healthWarning ?? 0.2;
@@ -82,21 +78,17 @@ export class Game {
     };
     this.tutorialsEnabled = tutorialsEnabled ?? true;
     this.independantChildren = independantChildren ?? [];
+    this.root = root;
 
     makeObservable(this, {
       date: observable,
-      dungeonInstances: observable,
       atDeathScreen: observable,
-      shops: observable,
       colorScheme: observable,
       vibrationEnabled: observable,
       healthWarning: observable,
       tutorialsShown: observable,
       tutorialsEnabled: observable,
       gameTick: action,
-      getDungeon: action,
-      getInstance: action,
-      openNextDungeonLevel: action,
       setColorScheme: action,
       hitDeathScreen: action,
       modifyVibrationSettings: action,
@@ -151,56 +143,18 @@ export class Game {
    * this includes affections, conditions and investements. Additionally will roll to apply a debuff if the player character
    * has negative sanity
    */
-  public gameTick({ playerState }: { playerState: PlayerCharacter }) {
+  public gameTick() {
     const dateObject = new Date(this.date);
     dateObject.setDate(dateObject.getDate() + 7);
     this.date = dateObject.toISOString();
+    const playerState = this.root.playerState;
+    if (!playerState) throw new Error("Missing player in root!");
     if (playerState.currentSanity < 0) {
       lowSanityDebuffGenerator(playerState);
     }
-    savePlayer(playerState);
-    playerState.tickDownRelationshipAffection();
-    playerState.conditionTicker();
-    playerState.tickAllInvestments();
+    playerState.gameTurnHandler();
   }
   //----------------------------------Dungeon----------------------------------//
-  public getDungeon(instance: string, level: string): DungeonLevel | undefined {
-    const foundInstance = this.dungeonInstances.find(
-      (dungeonInstance) => dungeonInstance.name == instance,
-    );
-    if (foundInstance) {
-      const found = foundInstance.levels.find(
-        (dungeonLevel) => dungeonLevel.level == Number(level),
-      );
-      return found;
-    }
-  }
-
-  public getInstance(instanceName: string) {
-    return this.dungeonInstances.find(
-      (instance) => instance.name == instanceName,
-    );
-  }
-
-  /**
-   * Unlocks the next dungeon(s) when a boss has been defeated, given the name of the current dungeon the player is in.
-   */
-  public openNextDungeonLevel(currentInstance: DungeonInstance) {
-    const successfullLevelUnlock = currentInstance.unlockNextLevel();
-    if (!successfullLevelUnlock) {
-      const unlockObjects: any[] = [];
-      currentInstance.unlocks.forEach((unlock) => {
-        const matchingObj = dungeonsJSON.find((obj) => obj.name == unlock);
-        if (matchingObj) {
-          unlockObjects.push(matchingObj);
-        }
-      });
-      unlockObjects.forEach((obj) => {
-        const inst = DungeonInstance.fromJSON(obj);
-        this.dungeonInstances.push(inst);
-      });
-    }
-  }
 
   //----------------------------------Misc----------------------------------//
   /**
@@ -213,7 +167,7 @@ export class Game {
   public inheritance() {
     this.atDeathScreen = false;
     let inheritedSkillPoints = 0;
-    this.dungeonInstances.forEach((inst) =>
+    this.root.dungeonStore.dungeonInstances.forEach((inst) =>
       inst.levels.forEach((dung) => {
         if (dung.bossDefeated) {
           inheritedSkillPoints += 3;
@@ -308,39 +262,6 @@ export class Game {
     player.adopt({ child: adoptee, partner: partner });
   }
 
-  forSave(): any {
-    const clone = { ...this };
-    clone.shops = clone.shops.map((shop) => shop.forSave());
-    return clone;
-  }
-
-  public refreshAllShops(player: PlayerCharacter) {
-    this.shops.forEach((shop) => shop.refreshInventory(player));
-  }
-
-  static getInitDungeonState() {
-    const nearbyCave = dungeonsJSON.find((inst) => inst.name == "nearby cave");
-    if (!nearbyCave) {
-      throw new Error("json parse failure: no nearby cave in dungeonsJSON");
-    }
-    return [
-      new DungeonInstance({
-        name: "training grounds",
-        unlocks: [],
-        levels: [
-          new DungeonLevel({
-            level: 0,
-            boss: [],
-            tiles: 0,
-            bossDefeated: true,
-            unlocked: true,
-          }),
-        ],
-      }),
-      DungeonInstance.fromJSON(nearbyCave),
-    ];
-  }
-
   static fromJSON(json: any): Game {
     const game = new Game({
       date: json.date,
@@ -363,8 +284,20 @@ export class Game {
       independantChildren: json.independantChildren
         ? json.independantChildren.map((ind: any) => Character.fromJSON(ind))
         : [],
+      root: json.root,
     });
 
     return game;
   }
 }
+
+const _gameSave = async (game: Game | null) => {
+  if (game) {
+    try {
+      storage.set("game", stringify({ ...game, root: null }));
+    } catch (e) {
+      console.log("Error in _gameSave:", e);
+    }
+  }
+};
+export const saveGame = throttle(_gameSave, 500);

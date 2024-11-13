@@ -1,8 +1,8 @@
-import { Character } from "../../classes/character";
 import { flipCoin, getRandomName, generateBirthday } from "./misc";
 import jobs from "../../assets/json/jobs.json";
 import names from "../../assets/json/names.json";
 import { PlayerClassOptions } from "../types";
+import { Character } from "../../entities/character";
 
 export function generateNewCharacter() {
   const sex = flipCoin() == "Heads" ? "male" : "female";

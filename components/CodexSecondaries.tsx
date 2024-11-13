@@ -5,7 +5,6 @@ import SpellDetails from "./SpellDetails";
 import { Element, ElementToString, PlayerClassOptions } from "../utility/types";
 import { ClassDescriptionMap, DescriptionMap } from "../utility/descriptions";
 import { elementalColorMap, playerClassColors } from "../constants/Colors";
-import { Spell } from "../classes/spell";
 import { Text } from "./Themed";
 
 // Import spell data
@@ -21,6 +20,7 @@ import {
   RangerIcon,
   WizardHat,
 } from "../assets/icons/SVGIcons";
+import { Spell } from "../entities/spell";
 
 const ClassCodex = ({
   classOption,

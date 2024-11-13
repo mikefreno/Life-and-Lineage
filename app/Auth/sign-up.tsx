@@ -10,7 +10,6 @@ import {
 import { useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
-import { useVibration } from "../../utility/customHooks";
 import { GoogleIcon } from "../../assets/icons/SVGIcons";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { router } from "expo-router";
@@ -21,6 +20,7 @@ import { ThemedView, Text } from "../../components/Themed";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useAuth } from "../../stores/auth/Auth";
 import { isValidPassword } from "../../utility/functions/password";
+import { useVibration } from "../../hooks/generic";
 
 const SignUpScreen = observer(() => {
   const { colorScheme } = useColorScheme();

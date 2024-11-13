@@ -1,7 +1,7 @@
 import { Item, isStackable } from "./item";
 import shops from "../assets/json/shops.json";
 import greetings from "../assets/json/shopLines.json";
-import { action, makeObservable, observable } from "mobx";
+import { action, makeObservable, observable, reaction } from "mobx";
 import { Character, PlayerCharacter } from "./character";
 import {
   getRandomName,
@@ -11,6 +11,10 @@ import {
   generateBirthday,
 } from "../utility/functions/misc";
 import { ItemClassType, ShopkeeperPersonality } from "../utility/types";
+import { RootStore } from "../stores/RootStore";
+import { storage } from "../utility/functions/storage";
+import { stringify } from "flatted";
+import { throttle } from "lodash";
 
 interface ShopProps {
   baseGold: number;
@@ -20,6 +24,7 @@ interface ShopProps {
   shopKeeper: Character;
   archetype: string;
   shopKeeperPersonality: ShopkeeperPersonality;
+  root: RootStore;
 }
 const MAX_AFFECTION = 100;
 
@@ -35,6 +40,7 @@ export class Shop {
   shopKeeper: Character;
   readonly archetype: string;
   shopKeeperPersonality: ShopkeeperPersonality;
+  root: RootStore;
 
   constructor({
     baseGold,
@@ -44,6 +50,7 @@ export class Shop {
     shopKeeper,
     archetype,
     shopKeeperPersonality,
+    root,
   }: ShopProps) {
     this.baseGold = baseGold;
     this.currentGold = currentGold ?? baseGold;
@@ -53,6 +60,8 @@ export class Shop {
     this.archetype = archetype;
     this.shopKeeper = shopKeeper;
     this.shopKeeperPersonality = shopKeeperPersonality;
+    this.root = root;
+
     makeObservable(this, {
       shopKeeper: observable,
       baseGold: observable,
@@ -64,6 +73,13 @@ export class Shop {
       sellItem: action,
       deathCheck: action,
     });
+
+    reaction(
+      () => [this.currentGold, this.shopKeeper.affection],
+      () => {
+        saveShop(this);
+      },
+    );
   }
 
   public deathCheck() {
@@ -225,6 +241,7 @@ export class Shop {
       inventory: json.inventory
         ? json.inventory.map((item: any) => Item.fromJSON(item))
         : [],
+      root: json.root, //this is not actually stored
     });
     return shop;
   }
@@ -267,7 +284,7 @@ function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function createShops() {
+export function createShops(rootStore: RootStore) {
   let createdShops: Shop[] = [];
   shops.forEach((shop) => {
     const randIdx = Math.floor(
@@ -281,6 +298,7 @@ export function createShops() {
       lastStockRefresh: new Date(),
       archetype: shop.type,
       shopKeeperPersonality: personality as ShopkeeperPersonality,
+      root: rootStore,
     });
     createdShops.push(newShop);
   });
@@ -302,3 +320,15 @@ export function generateShopKeeper(archetype: string) {
   });
   return newChar;
 }
+
+const _shopSave = async (shop: Shop | undefined) => {
+  if (shop) {
+    try {
+      storage.set(`shop_${shop.archetype}`, stringify(shop));
+    } catch (e) {
+      console.log("Error in _playerSave:", e);
+    }
+  }
+};
+
+export const saveShop = throttle(_shopSave, 500);

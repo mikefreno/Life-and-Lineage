@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import Svg, { Rect } from "react-native-svg";
 import { Dimensions, View } from "react-native";
 import GenericRaisedButton from "../GenericRaisedButton";
@@ -9,8 +8,8 @@ import {
   useDungeonCore,
   useMapState,
 } from "../../stores/DungeonData";
-import { useLayout } from "../../stores/AppData";
-import { useEnemyManagement } from "../../utility/customHooks";
+import { useUIStore } from "../../hooks/stores";
+import { useEnemyManagement } from "../../hooks/combat";
 
 /**
  * Represents a tile in the dungeon map.
@@ -265,7 +264,7 @@ export const DungeonMapControls = () => {
   const { currentPosition, setCurrentPosition, tiles, setTiles } =
     useMapState();
   const { setInCombat } = useDungeonCore();
-  const { dimensions } = useLayout();
+  const { dimensions } = useUIStore();
   const { loadBoss, getEnemy } = useEnemyManagement();
 
   const isMoveValid = (direction: keyof typeof directionsMapping) => {
@@ -333,7 +332,7 @@ export const DungeonMapControls = () => {
     <PlatformDependantBlurView className="flex-1 flex items-center w-full justify-center">
       <View
         className="w-2/3 mx-auto"
-        style={{ marginTop: -dimensions.height / 20 }}
+        style={{ marginTop: -dimensions.window.height / 20 }}
       >
         <ArrowButton direction="up" />
         <View className="flex-row justify-between w-full">

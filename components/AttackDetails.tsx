@@ -1,8 +1,8 @@
 import { View } from "react-native";
 import GenericStrikeAround from "./GenericStrikeAround";
-import { Attack } from "../classes/attack";
 import { toTitleCase } from "../utility/functions/misc";
 import { Text } from "./Themed";
+import type { Attack } from "../entities/attack";
 
 export default function AttackDetails({
   attack,
