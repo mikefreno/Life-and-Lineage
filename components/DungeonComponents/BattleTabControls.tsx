@@ -1,7 +1,7 @@
 import { Pressable } from "react-native";
 import { ThemedView, Text } from "../Themed";
-import { useDungeonCore } from "../../stores/DungeonData";
 import { useVibration } from "../../hooks/generic";
+import { useDungeonStore } from "../../hooks/stores";
 
 interface BattleTabControlsProps {
   battleTab: string;
@@ -14,7 +14,7 @@ export default function BattleTabControls({
   setBattleTab,
 }: BattleTabControlsProps) {
   const vibration = useVibration();
-  const { inCombat } = useDungeonCore();
+  const { inCombat } = useDungeonStore();
   return (
     <ThemedView className="-mb-1 flex w-full flex-row justify-around">
       <Pressable

@@ -1,7 +1,10 @@
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 import { headerOptions } from "../_layout";
 import { type ReactNode, createContext, useContext, useState } from "react";
 import type { Element, PlayerClassOptions } from "../../utility/types";
+import { useRootStore } from "../../hooks/stores";
+import { Pressable } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const NewGameContext = createContext<
   | {
@@ -62,15 +65,35 @@ export const useNewGameStore = () => {
 };
 
 export default function NewGameLayout() {
+  const { gameState } = useRootStore();
   return (
     <NewGameProvider>
-      <Stack initialRouteName={"ClassSelect"}>
+      <Stack>
         <Stack.Screen
           name="ClassSelect"
-          options={headerOptions({
-            title: "Class Select",
-            headerBackTitleVisible: false,
-          })}
+          options={{
+            ...headerOptions({
+              title: "Class Select",
+            }),
+            headerLeft: !!gameState
+              ? ({ tintColor }) => (
+                  <Pressable
+                    onPress={() => {
+                      while (router.canGoBack()) {
+                        router.back();
+                      }
+                      router.push("/Options/game");
+                    }}
+                    style={({ pressed }) => ({
+                      opacity: pressed ? 0.5 : 1,
+                      marginLeft: -12,
+                    })}
+                  >
+                    <Ionicons name="chevron-back" size={28} color={tintColor} />
+                  </Pressable>
+                )
+              : undefined,
+          }}
         />
         <Stack.Screen
           name="BlessingSelect"

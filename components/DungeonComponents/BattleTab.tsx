@@ -19,7 +19,6 @@ import { Energy, Regen } from "../../assets/icons/SVGIcons";
 import { elementalColorMap } from "../../constants/Colors";
 import {
   useCombatState,
-  useDungeonCore,
   useEnemyAnimation,
   useLootState,
 } from "../../stores/DungeonData";
@@ -28,7 +27,11 @@ import { Spell } from "../../entities/spell";
 import { useCombatActions } from "../../hooks/combat";
 import { Item } from "../../entities/item";
 import { useBattleLogger, usePouch, useVibration } from "../../hooks/generic";
-import { useDraggableStore, useRootStore } from "../../hooks/stores";
+import {
+  useDraggableStore,
+  useDungeonStore,
+  useRootStore,
+} from "../../hooks/stores";
 
 interface BattleTabProps {
   battleTab: "attacksOrNavigation" | "equipment" | "log";
@@ -44,8 +47,8 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
     useState<boolean>(false);
 
   const { playerState, enemyStore } = useRootStore();
+  const { inCombat } = useDungeonStore();
 
-  const { inCombat } = useDungeonCore();
   const { useAttack } = useCombatActions();
   const { displayItem, setDisplayItem } = useLootState();
   const { setIconString } = useDraggableStore();

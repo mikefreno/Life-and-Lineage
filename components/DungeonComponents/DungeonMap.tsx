@@ -5,7 +5,7 @@ import { useColorScheme } from "nativewind";
 import PlatformDependantBlurView from "../PlatformDependantBlurView";
 import { useDungeonStore, useUIStore } from "../../hooks/stores";
 import { TILE_SIZE } from "../../stores/DungeonStore";
-
+import { observer } from "mobx-react-lite";
 /**
  * Represents a tile in the dungeon map.
  * @property {number} x - The x-coordinate of the tile.
@@ -166,11 +166,11 @@ export const getBoundingBox = (
 /**
  * Renders the dungeon map made by `generateTiles`.
  */
-export const DungeonMapRender = () => {
+export const DungeonMapRender = observer(() => {
   const { colorScheme } = useColorScheme();
   const strokeWidth = 1;
-  const { currentPosition, currentMap, currentMapDimensions } =
-    useDungeonStore();
+  const dungeonStore = useDungeonStore();
+  const { currentMapDimensions, currentMap, currentPosition } = dungeonStore;
 
   if (!currentMapDimensions || !currentMap) {
     throw new Error("Missing map, or map dimensions within map render!");
@@ -254,14 +254,14 @@ export const DungeonMapRender = () => {
       </View>
     </View>
   );
-};
+});
 
 /**
  * Renders the controls for moving around the dungeon.
  */
-export const DungeonMapControls = () => {
-  const { currentPosition, currentMap, updateCurrentPosition } =
-    useDungeonStore();
+export const DungeonMapControls = observer(() => {
+  const dungeonStore = useDungeonStore();
+  const { currentPosition, currentMap } = dungeonStore;
 
   if (!currentPosition || !currentMap) {
     throw new Error("Missing map, or current position within control handler!");
@@ -269,7 +269,7 @@ export const DungeonMapControls = () => {
 
   const { dimensions } = useUIStore();
 
-  const isMoveValid = (direction: keyof typeof directionsMapping) => {
+  const isMoveValid = (direction: "up" | "down" | "left" | "right") => {
     if (!currentPosition) return false;
 
     const { x, y } = directionsMapping[direction];
@@ -284,48 +284,18 @@ export const DungeonMapControls = () => {
   };
 
   /**
-   * Moves the current position and updates the current tile to have been cleared.
-   */
-  const move = (direction: keyof typeof directionsMapping) => {
-    if (!currentPosition) return;
-    const { x, y } = directionsMapping[direction];
-    const newX = currentPosition.x + x * TILE_SIZE;
-    const newY = currentPosition.y + y * TILE_SIZE;
-
-    const newPosition = currentMap.find(
-      (tile) => tile.x === newX && tile.y === newY,
-    );
-
-    if (newPosition) {
-      const updatedTiles = currentMap.map((tile) =>
-        tile.x === newPosition.x && tile.y === newPosition.y
-          ? { ...tile, clearedRoom: true }
-          : tile,
-      );
-      setTiles(updatedTiles);
-
-      if (!newPosition.clearedRoom) {
-        if (newPosition.isBossRoom) {
-          loadBoss();
-          setInCombat(true);
-        } else {
-          getEnemy();
-          setInCombat(true);
-        }
-      }
-    }
-  };
-
-  /**
    * UI Button to move the player, if a move is invalid(past the edge of the map) that direction will be disabled
    * @param direction - the direction ("up", "down", "left", "right") to render and check for move validity
    */
   const ArrowButton: React.FC<{
-    direction: keyof typeof directionsMapping;
+    direction: "up" | "down" | "left" | "right";
   }> = ({ direction }) => {
     const valid = isMoveValid(direction);
     return (
-      <GenericRaisedButton onPress={() => move(direction)} disabled={!valid}>
+      <GenericRaisedButton
+        onPress={() => dungeonStore.move(direction)}
+        disabled={!valid}
+      >
         {direction.charAt(0).toUpperCase() + direction.slice(1)}
       </GenericRaisedButton>
     );
@@ -345,4 +315,4 @@ export const DungeonMapControls = () => {
       </View>
     </PlatformDependantBlurView>
   );
-};
+});

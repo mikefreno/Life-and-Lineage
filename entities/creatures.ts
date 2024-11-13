@@ -59,7 +59,6 @@ type CreatureType = {
   baseEnergy?: number;
   energyRegen?: number;
   attackStrings?: string[];
-  spellStrings?: string[];
   conditions?: Condition[];
   enemyStore?: EnemyStore;
 };
@@ -125,10 +124,6 @@ export class Creature {
    * List of attack names the creature can perform
    */
   readonly attackStrings: string[];
-  /**
-   * List of spell names the creature can perform
-   */
-  readonly spellStrings: string[];
 
   /**
    * List of conditions affecting the creature
@@ -158,7 +153,6 @@ export class Creature {
     baseEnergy,
     energyRegen,
     attackStrings,
-    spellStrings,
     conditions,
     enemyStore,
   }: CreatureType) {
@@ -175,7 +169,6 @@ export class Creature {
     this.baseEnergy = baseEnergy ?? 0; // Initialize baseMana to 0 if not provided
     this.energyRegen = energyRegen ?? 0; // Initialize ManaRegen to 0 if not provided
     this.attackStrings = attackStrings ?? [];
-    this.spellStrings = spellStrings ?? [];
     this.conditions = conditions ?? []; // Initialize conditions to an empty array if not provided
     this.gotDrops = false; // Initialize gotDrops to false
     this.enemyStore = enemyStore;
@@ -198,6 +191,9 @@ export class Creature {
       expendEnergy: action,
       attacks: computed,
       removeCondition: action,
+      maxEnergy: computed,
+      maxHealth: computed,
+      maxSanity: computed,
     });
   }
 
@@ -244,8 +240,6 @@ export class Creature {
     });
     return builtAttacks;
   }
-
-  get spells() {}
 
   //---------------------------Equivalency---------------------------//
   public equals(otherMonsterID: string) {
@@ -302,7 +296,7 @@ export class Creature {
    * Calculates the maximum sanity of the creature considering any condition effects.
    * @returns The maximum sanity value, or null if baseSanity is not set.
    */
-  public maxSanity() {
+  get maxSanity() {
     const { sanityMult, sanityFlat } = getConditionEffectsOnDefenses(
       this.conditions,
     );
@@ -347,6 +341,16 @@ export class Creature {
    * @param energyCost - The amount of Mana to expend.
    */
   public expendEnergy(energyCost: number) {
+    if (this.currentEnergy && this.currentEnergy < energyCost) {
+      this.currentEnergy = 0;
+    } else if (this.currentEnergy) {
+      this.currentEnergy -= energyCost;
+    }
+  }
+  /**
+   * Convenience, to align with the PlayerCharacter
+   */
+  public useMana(energyCost: number) {
     if (this.currentEnergy && this.currentEnergy < energyCost) {
       this.currentEnergy = 0;
     } else if (this.currentEnergy) {
@@ -438,17 +442,15 @@ export class Creature {
    * @param {PlayerCharacter | Minion | Enemy} params.target - The target to attack.
    * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
    */
-  protected _takeTurn({ target }: { target: PlayerCharacter | Enemy }) {
+  protected _takeTurn({ target }: { target: PlayerCharacter | Enemy[] }) {
     const execute = this.conditions.find((cond) => cond.name == "execute");
     if (execute) {
       this.damageHealth({ attackerId: execute.placedbyID, damage: 9999 });
       this.endTurn();
-      return [
-        {
-          result: AttackUse.stunned,
-          logString: `${toTitleCase(this.creatureSpecies)} was executed!`,
-        },
-      ];
+      return {
+        result: AttackUse.stunned,
+        logString: `${toTitleCase(this.creatureSpecies)} was executed!`,
+      };
     }
     if (this.isStunned) {
       const allStunSources = this.conditions.filter((cond) =>
@@ -462,45 +464,51 @@ export class Creature {
         result: AttackUse.stunned,
         logString: `${toTitleCase(this.creatureSpecies)} was stunned!`,
       };
-    } else {
-      const allTargets = [
-        target,
-        ...(target instanceof PlayerCharacter
-          ? target.minionsAndPets
-          : target.minions),
-      ];
+    }
+    const targets = Array.isArray(target) ? target : [target]; // turn the player to an array
 
-      const availableAttacks = this.attacks.filter(
-        (attack) =>
-          !this.currentEnergy || this.currentEnergy >= attack.energyCost,
+    // Get all targets and their minions
+    const allTargets = targets.reduce(
+      (acc: (PlayerCharacter | Enemy | Minion)[], currentTarget) => {
+        // Add the current target
+        acc.push(currentTarget);
+
+        // Add minions based on target type
+        if (currentTarget instanceof PlayerCharacter) {
+          acc.push(...currentTarget.minionsAndPets);
+        } else {
+          acc.push(...currentTarget.minions);
+        }
+
+        return acc;
+      },
+      [],
+    );
+
+    const availableAttacks = this.attacks.filter(
+      (attack) =>
+        !this.currentEnergy || this.currentEnergy >= attack.energyCost,
+    );
+    if (availableAttacks.length > 0) {
+      const { attack, numTargets } = this.chooseAttack(
+        availableAttacks,
+        allTargets.length,
       );
-      if (availableAttacks.length > 0) {
-        const { attack, numTargets } = this.chooseAttack(
-          availableAttacks,
-          allTargets.length,
-        );
 
-        const bestTargets = this.threatTable.getHighestThreatTargets(
-          allTargets,
-          numTargets,
-        );
+      const bestTargets = this.threatTable.getHighestThreatTargets(
+        allTargets,
+        numTargets,
+      );
 
-        const res: {
-          result: AttackUse;
-          logString: string;
-        }[] = [];
-        bestTargets.forEach((target) => attack.use({ target: target }));
-        this.endTurn();
-        return { ...res, attack };
-      } else {
-        this.endTurn();
-        return {
-          result: AttackUse.lowEnergy,
-          logString: `${toTitleCase(
-            this.creatureSpecies,
-          )} passed (low energy)!`,
-        };
-      }
+      const res = attack.use({ targets: bestTargets });
+      this.endTurn();
+      return { ...res, attack };
+    } else {
+      this.endTurn();
+      return {
+        result: AttackUse.lowEnergy,
+        logString: `${toTitleCase(this.creatureSpecies)} passed (low energy)!`,
+      };
     }
   }
 
@@ -677,7 +685,6 @@ export class Enemy extends Creature {
     baseEnergy,
     energyRegen,
     attackStrings,
-    spellStrings,
     conditions,
     enemyStore,
   }: EnemyType) {
@@ -695,7 +702,6 @@ export class Enemy extends Creature {
       baseEnergy,
       energyRegen,
       attackStrings,
-      spellStrings,
       conditions,
       enemyStore,
     });
@@ -737,7 +743,6 @@ export class Enemy extends Creature {
       energyRegen: minionObj.energy?.regen,
       attackPower: minionObj.attackPower,
       attackStrings: minionObj.attackStrings,
-      spellStrings: minionObj.spellStrings,
       turnsLeftAlive: minionObj.turns,
       beingType: minionObj.beingType as BeingType,
       enemyStore: this.enemyStore,
@@ -791,7 +796,6 @@ export class Enemy extends Creature {
         ? json.minions.map((minion: any) => Minion.fromJSON(minion))
         : [],
       attackStrings: json.attackStrings,
-      spellStrings: json.spellStrings,
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
@@ -832,7 +836,6 @@ export class Minion extends Creature {
     baseEnergy,
     energyRegen,
     attackStrings,
-    spellStrings,
     conditions,
     turnsLeftAlive,
     enemyStore,
@@ -852,7 +855,6 @@ export class Minion extends Creature {
       baseEnergy,
       energyRegen,
       attackStrings,
-      spellStrings,
       conditions,
       enemyStore,
     });
@@ -881,7 +883,7 @@ export class Minion extends Creature {
    * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
    * @throws {Error} If the minion's lifespan has reached zero.
    */
-  public takeTurn({ target }: { target: PlayerCharacter | Enemy }) {
+  public takeTurn({ target }: { target: PlayerCharacter | Enemy[] }) {
     if (this.turnsLeftAlive > 0) {
       if (
         !(
@@ -922,7 +924,6 @@ export class Minion extends Creature {
       energyRegen: json.manaRegen,
       turnsLeftAlive: json.turnsLeftAlive,
       attackStrings: json.attackStrings,
-      spellStrings: json.spellStrings,
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],

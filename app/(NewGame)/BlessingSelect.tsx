@@ -82,7 +82,7 @@ export default function SetBlessing() {
               <GenericFlatButton
                 onPress={() => {
                   vibration({ style: "light" });
-                  router.push(`/NewGame/SexSelect`);
+                  router.push(`/SexSelect`);
                 }}
               >
                 Next

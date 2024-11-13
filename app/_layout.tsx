@@ -133,7 +133,7 @@ const RootLayout = observer(() => {
     if (fontLoaded) {
       SplashScreen.hideAsync();
       if (!playerState) {
-        router.replace("/NewGame/ClassSelect");
+        router.replace("/ClassSelect");
       } else if (
         gameState?.atDeathScreen ||
         (playerState &&
@@ -181,7 +181,7 @@ const RootLayout = observer(() => {
             }}
           />
           <Stack.Screen
-            name="NewGame"
+            name="(NewGame)"
             options={{
               headerShown: false,
             }}

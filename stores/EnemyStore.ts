@@ -31,6 +31,7 @@ export default class EnemyStore {
     makeObservable(this, {
       enemies: observable,
       addToEnemyList: action,
+      removeEnemy: action,
       clearEnemyList: action,
     });
   }
@@ -42,6 +43,11 @@ export default class EnemyStore {
   public addToEnemyList(enemy: Enemy) {
     this.enemies.push(enemy);
     this.referenceMap.set(enemy.id, this.enemies.length);
+  }
+
+  public removeEnemy(enemy: Enemy) {
+    this.referenceMap.delete(enemy.id);
+    this.enemies = this.enemies.filter((e) => e.id !== enemy.id);
   }
 
   public getSaveReference(enemy: Enemy) {

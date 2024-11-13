@@ -5,14 +5,14 @@ import { Pressable, View, Image } from "react-native";
 import { toTitleCase, wait } from "../../utility/functions/misc";
 import { Coins } from "../../assets/icons/SVGIcons";
 import GenericFlatButton from "../GenericFlatButton";
-import { useDungeonCore, useLootState } from "../../stores/DungeonData";
-import { usePlayerStore } from "../../hooks/stores";
+import { useLootState } from "../../stores/DungeonData";
+import { useDungeonStore, usePlayerStore } from "../../hooks/stores";
 import type { Item } from "../../entities/item";
 import { useVibration } from "../../hooks/generic";
 
 export default function DroppedItemsModal() {
   const playerState = usePlayerStore();
-  const { instanceName } = useDungeonCore();
+  const { currentInstance } = useDungeonStore();
   const {
     inventoryFullNotifier,
     droppedItems,
@@ -88,7 +88,7 @@ export default function DroppedItemsModal() {
   };
 
   const closeRoutingCheck = () => {
-    if (instanceName === "Activities") {
+    if (currentInstance?.name === "Activities") {
       wait(600).then(() => {
         while (router.canGoBack()) {
           router.back();
@@ -97,7 +97,7 @@ export default function DroppedItemsModal() {
         router.push("/Activities");
       });
     }
-    if (instanceName === "Personal") {
+    if (currentInstance?.name === "Personal") {
       wait(600).then(() => {
         while (router.canGoBack()) {
           router.back();

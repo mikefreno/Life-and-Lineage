@@ -30,7 +30,6 @@ interface SpellFields {
     pet?: string;
     selfDamage?: number | null | undefined;
     sanityDamage?: number | undefined;
-    user: PlayerCharacter | Enemy | Minion;
   };
 }
 
@@ -55,7 +54,6 @@ export class Spell {
   debuffs: { name: string; chance: number }[];
   summons: string[];
   rangerPet: string | undefined;
-  user: PlayerCharacter | Enemy | Minion;
 
   constructor({
     name,
@@ -66,7 +64,6 @@ export class Spell {
     duration,
     effects,
     usesWeapon,
-    user,
   }: SpellFields) {
     this.name = name;
     this.element = StringToElement[element];
@@ -84,7 +81,6 @@ export class Spell {
     this.debuffs = effects.debuffs ?? [];
     this.summons = effects.summon ?? [];
     this.rangerPet = effects.pet;
-    this.user = user;
   }
 
   public baseDamage(user: PlayerCharacter) {
@@ -135,48 +131,62 @@ export class Spell {
   }
 
   public use({
-    target,
+    targets,
     user,
   }: {
-    target: PlayerCharacter | Enemy | Minion;
-    user: PlayerCharacter | Enemy | Minion;
+    targets: (PlayerCharacter | Enemy | Minion)[];
+    user: PlayerCharacter;
   }): { logString: string } {
-    if (!this.canBeUsed) {
+    if (!this.canBeUsed(user)) {
       return { logString: "failure" };
     }
+
     user.useMana(this.manaCost);
 
-    const finalDamage = Math.round(this.baseDamage(user) * 4) / 4; // physical damage
-    target.damageHealth({ damage: finalDamage, attackerId: user.id });
-    target.damageSanity(this.flatSanityDamage);
-    user.damageHealth({ damage: this.selfDamage, attackerId: user.id });
-    // create debuff loop
-    const debuffNames: string[] = []; // only storing names, collecting for logBuilder
-    let amountHealed = 0;
-    this.debuffs.forEach((debuff) => {
-      if (debuff.name == "lifesteal") {
-        const roll = rollD20();
-        if (roll * 5 >= 100 - debuff.chance * 100) {
-          const heal = Math.round(this.baseDamage(user) * 0.5 * 4) / 4;
-          amountHealed += user.restoreHealth(heal);
-        }
-      } else {
-        const newDebuff = createDebuff({
-          debuffName: debuff.name,
-          enemyMaxHP: target.maxHealth,
-          enemyMaxSanity: target.maxSanity,
-          primaryAttackDamage: this.baseDamage(user),
-          applierNameString: user.fullName,
-          applierID: user.id,
-        });
+    const targetResults = targets.map((target) => {
+      const finalDamage = Math.round(this.baseDamage(user) * 4) / 4;
+      target.damageHealth({ damage: finalDamage, attackerId: user.id });
+      target.damageSanity(this.flatSanityDamage);
 
-        if (newDebuff) {
-          debuffNames.push(newDebuff.name);
-          target.addCondition(newDebuff);
+      // Handle debuffs for this target
+      const debuffNames: string[] = [];
+      let amountHealed = 0;
+
+      this.debuffs.forEach((debuff) => {
+        if (debuff.name == "lifesteal") {
+          const roll = rollD20();
+          if (roll * 5 >= 100 - debuff.chance * 100) {
+            const heal = Math.round(this.baseDamage(user) * 0.5 * 4) / 4;
+            amountHealed += user.restoreHealth(heal);
+          }
+        } else {
+          const newDebuff = createDebuff({
+            debuffName: debuff.name,
+            enemyMaxHP: target.maxHealth,
+            enemyMaxSanity: target.maxSanity,
+            primaryAttackDamage: this.baseDamage(user),
+            applierNameString: user.fullName,
+            applierID: user.id,
+          });
+
+          if (newDebuff) {
+            debuffNames.push(newDebuff.name);
+            target.addCondition(newDebuff);
+          }
         }
-      }
+      });
+
+      return {
+        target,
+        damage: finalDamage,
+        sanityDamage: this.flatSanityDamage,
+        debuffNames,
+        healed: amountHealed,
+      };
     });
-    const buffNames: string[] = []; // only storing names, collecting for logBuilder
+
+    // Handle buffs (only once for the caster)
+    const buffNames: string[] = [];
     this.buffs.forEach((buff) => {
       if (buff !== "consume blood orb") {
         const newBuff = createBuff({
@@ -193,91 +203,100 @@ export class Spell {
         }
       }
     });
+
     if (this.buffs.includes("consume blood orb")) {
       user.removeBloodOrbs(this);
     }
+
+    // Handle summons (only once)
     let minionSpecies: string[] = [];
     this.summons.forEach((summon) => {
       const type = user.createMinion(summon);
       minionSpecies.push(type);
     });
+
     if (this.rangerPet) {
       const type = user.summonPet(this.rangerPet);
       minionSpecies.push(type);
     }
-    user.gainProficiency(this);
 
-    // we wait here for animation timings, the fade out of mana use cost
+    user.gainProficiency(this);
+    user.damageHealth({ damage: this.selfDamage, attackerId: user.id });
+
     wait(1000).then(() => user.endTurn());
 
     return {
-      logString: this.logBuilder({
-        targetName: target.creatureSpecies,
-        healthDamage: finalDamage,
-        sanityDamage: this.flatSanityDamage,
-        debuffNames,
+      logString: this.buildMultiTargetLog({
+        targetResults,
         buffNames,
         minionSpecies,
+        user,
       }),
     };
   }
 
-  private logBuilder({
-    targetName,
-    healthDamage,
-    sanityDamage,
-    debuffNames,
+  private buildMultiTargetLog({
+    targetResults,
     buffNames,
     minionSpecies,
-  }: LogProps): string {
-    const userString = "You";
-    const targetString = `the ${toTitleCase(targetName)}`;
-
+    user,
+  }: {
+    targetResults: Array<{
+      target: PlayerCharacter | Enemy | Minion;
+      damage: number;
+      sanityDamage: number;
+      debuffNames: string[];
+      healed: number;
+    }>;
+    buffNames: string[];
+    minionSpecies: string[];
+    user: PlayerCharacter | Enemy | Minion;
+  }): string {
+    const userString =
+      user instanceof PlayerCharacter
+        ? "You"
+        : `The ${toTitleCase(user.creatureSpecies)}`;
     let returnString = `${userString} used ${toTitleCase(this.name)}.\n`;
 
-    // Health damage
-    if (healthDamage > 0) {
-      returnString += `  • It dealt ${healthDamage} health damage.\n`;
-    }
+    targetResults.forEach((result) => {
+      const targetString =
+        result.target instanceof PlayerCharacter
+          ? "you"
+          : `the ${toTitleCase(result.target.creatureSpecies)}`;
 
-    // Sanity damage
-    if (sanityDamage > 0) {
-      returnString += `  • It caused ${sanityDamage} sanity damage.\n`;
-    }
+      if (result.damage > 0) {
+        returnString += `  • Dealt ${result.damage} damage to ${targetString}.\n`;
+      }
 
-    // Debuffs
-    if (debuffNames.length > 0) {
-      returnString += `  • ${toTitleCase(
-        targetString,
-      )} was afflicted with: ${debuffNames.join(", ")}.\n`;
-    }
+      if (result.sanityDamage > 0) {
+        returnString += `  • Caused ${result.sanityDamage} sanity damage to ${targetString}.\n`;
+      }
 
-    // Buffs
+      if (result.debuffNames.length > 0) {
+        returnString += `  • ${toTitleCase(
+          targetString,
+        )} was afflicted with: ${result.debuffNames.join(", ")}.\n`;
+      }
+
+      if (result.healed > 0) {
+        returnString += `  • Healed for ${result.healed} from ${targetString}.\n`;
+      }
+    });
+
     if (buffNames.length > 0) {
       returnString += `  • ${userString} gained: ${buffNames.join(", ")}.\n`;
     }
 
-    // Summons
     if (minionSpecies.length > 0) {
       returnString += `  • ${userString} summoned: ${toTitleCase(
         minionSpecies.join(", "),
       )}.\n`;
     }
 
-    // Self-damage
     if (this.selfDamage > 0) {
       returnString += `  • ${userString} took ${this.selfDamage} self-damage.\n`;
     }
 
     return returnString.trim();
   }
-}
-
-interface LogProps {
-  targetName: string;
-  healthDamage: number;
-  sanityDamage: number;
-  debuffNames: string[];
-  buffNames: string[];
-  minionSpecies: string[];
 }

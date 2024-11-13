@@ -39,12 +39,11 @@ export class DungeonStore {
 
     makeObservable(this, {
       inCombat: observable,
-      currentMap: observable.shallow,
-      currentMapDimensions: observable.shallow,
-      currentPosition: observable.shallow,
+      currentMap: observable,
+      currentMapDimensions: observable,
+      currentPosition: observable,
       fightingBoss: observable,
       setUpDungeon: action,
-      updateCurrentPosition: action,
       move: action,
     });
   }
@@ -81,14 +80,16 @@ export class DungeonStore {
       bossDefeated: this.currentLevel.bossDefeated,
     });
     this.currentMapDimensions = getBoundingBox(this.currentMap, TILE_SIZE);
+    console.log("inset map: ", this.currentMap[0]);
     this.currentPosition = this.currentMap[0];
   }
 
-  public updateCurrentPosition(tile: Tile) {
+  private updateCurrentPosition(tile: Tile) {
     this.currentPosition = tile;
   }
 
-  public move(direction: keyof typeof directionsMapping) {
+  public move(direction: "up" | "down" | "left" | "right") {
+    console.log("current:", this.currentPosition);
     if (!this.currentPosition || !this.currentMap) return;
 
     const { x, y } = directionsMapping[direction];
@@ -101,12 +102,12 @@ export class DungeonStore {
 
     if (newPosition) {
       this.updateCurrentPosition(newPosition);
-      this.visitRoom(newPosition);
 
       if (!newPosition.clearedRoom) {
         this.inCombat = true;
         this.fightingBoss = newPosition.isBossRoom;
         this.setEncounter(newPosition.isBossRoom);
+        this.visitRoom(newPosition);
       }
     }
   }

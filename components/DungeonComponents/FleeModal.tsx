@@ -4,7 +4,7 @@ import { ThemedView, Text } from "../Themed";
 import { rollD20, wait } from "../../utility/functions/misc";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { useDungeonCore, useEnemyAnimation } from "../../stores/DungeonData";
+import { useEnemyAnimation } from "../../stores/DungeonData";
 import { useBattleLogger, useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useCombatActions, useEnemyManagement } from "../../hooks/combat";
@@ -18,8 +18,8 @@ export default function FleeModal({
   setFleeModalShowing: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const vibration = useVibration();
-  const { playerState, enemyStore, gameState } = useRootStore();
-  const { inCombat, slug } = useDungeonCore();
+  const { playerState, enemyStore, gameState, dungeonStore } = useRootStore();
+  const { inCombat, currentInstance } = dungeonStore;
   const { attackAnimationOnGoing, setAttackAnimationOnGoing } =
     useEnemyAnimation();
   const { battleLogger } = useBattleLogger();
@@ -50,14 +50,14 @@ export default function FleeModal({
           while (router.canGoBack()) {
             router.back();
           }
-          if (slug[0] == "Activities") {
+          if (currentInstance?.name == "Activities") {
             router.replace("/shops");
           } else {
             router.replace("/dungeon");
           }
           playerState.setInDungeon({ state: false });
           enemyStore.enemies = [];
-          if (slug[0] == "Activities") {
+          if (currentInstance?.name == "Activities") {
             router.push("/Activities");
           }
           savePlayer(playerState);

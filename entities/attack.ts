@@ -237,15 +237,10 @@ export class Attack {
    * @param target - The target of the attack, which can be an Enemy, PlayerCharacter or Minion.
    * @returns An object containing the result of the attack and a log string.
    */
-  public use({ target }: { target: Enemy | PlayerCharacter | Minion }): {
+  public use({ targets }: { targets: (Enemy | PlayerCharacter | Minion)[] }): {
     result: AttackUse;
     logString: string;
   } {
-    const { hitChanceMultiplier, damageFlat, damageMult } =
-      getConditionEffectsOnAttacks({
-        selfConditions: this.user.conditions,
-        enemyConditions: target.conditions,
-      });
     if (!this.canBeUsed) {
       if (this.user.isStunned) {
         return {
@@ -267,132 +262,133 @@ export class Attack {
       this.user.expendEnergy(this.energyCost);
     }
 
-    // Attempt each hit
-    const hits: AttackUse[] = [];
-    for (let i = 0; i < this.hits; i++) {
-      const attemptResult = this.doesHit({
-        target,
-        conditionalHitChanceMultiplier: hitChanceMultiplier,
-      });
-      hits.push(attemptResult);
-    }
+    const targetResults = targets.map((target) => {
+      const { hitChanceMultiplier, damageFlat, damageMult } =
+        getConditionEffectsOnAttacks({
+          selfConditions: this.user.conditions,
+          enemyConditions: target.conditions,
+        });
 
-    if (hits.includes(AttackUse.success)) {
-      // Calculate total damage if any hit succeeds
-      let actualizedHits = 0;
-      let { totalDamage } = hits.reduce(
-        (acc, hitResult) => {
-          if (hitResult === AttackUse.success) {
-            actualizedHits++;
-            const damagePreDR = this.baseDamage * damageMult + damageFlat;
-            const enemyDR = target.getDamageReduction();
-            const damage = damagePreDR * (1 - enemyDR);
-            if (
-              this.user instanceof PlayerCharacter &&
-              this.user.equipment.mainHand.itemClass == ItemClassType.Bow
-            ) {
-              this.user.useArrow();
-            }
-            return {
-              totalDamage: acc.totalDamage + Math.round(damage * 4) / 4,
-            };
-          }
-          return acc;
-        },
-        { totalDamage: 0 },
-      );
-      // check for player applied poison
-      let sanityDmg = this.flatSanityDamage;
-      const debuffStrings: string[] = [];
-      if (
-        this.user instanceof PlayerCharacter &&
-        !!this.user.equipment.mainHand.activePoison
-      ) {
-        const effect = this.user.equipment.mainHand.consumePoison()!; // assert true - we know if is there due to if
-        if (effect instanceof Condition) {
-          target.addCondition(effect);
-          debuffStrings.push(effect.name);
-        } else {
-          switch (effect.effect) {
-            case "health":
-              totalDamage += effect.amount;
-              break;
-            case "mana":
-              if (target instanceof PlayerCharacter) {
-                // currently there are no poisons used by enemies, so this will never be triggered
-                target.damageMana(effect.amount);
-              } else {
-                target.damageEnergy({
-                  damage: effect.amount,
-                  attackerId: this.user.id,
-                });
+      // Attempt each hit
+      const hits: AttackUse[] = [];
+      for (let i = 0; i < this.hits; i++) {
+        const attemptResult = this.doesHit({
+          target,
+          conditionalHitChanceMultiplier: hitChanceMultiplier,
+        });
+        hits.push(attemptResult);
+      }
+
+      if (hits.includes(AttackUse.success)) {
+        let actualizedHits = 0;
+        let { totalDamage } = hits.reduce(
+          (acc, hitResult) => {
+            if (hitResult === AttackUse.success) {
+              actualizedHits++;
+              const damagePreDR = this.baseDamage * damageMult + damageFlat;
+              const enemyDR = target.getDamageReduction();
+              const damage = damagePreDR * (1 - enemyDR);
+
+              if (
+                this.user instanceof PlayerCharacter &&
+                this.user.equipment.mainHand.itemClass == ItemClassType.Bow
+              ) {
+                this.user.useArrow();
               }
-              break;
-            case "sanity":
-              sanityDmg += effect.amount;
-              break;
+
+              return {
+                totalDamage: acc.totalDamage + Math.round(damage * 4) / 4,
+              };
+            }
+            return acc;
+          },
+          { totalDamage: 0 },
+        );
+
+        // Handle poison effects
+        let sanityDmg = this.flatSanityDamage;
+        const debuffStrings: string[] = [];
+        if (
+          this.user instanceof PlayerCharacter &&
+          !!this.user.equipment.mainHand.activePoison
+        ) {
+          const effect = this.user.equipment.mainHand.consumePoison()!;
+          if (effect instanceof Condition) {
+            target.addCondition(effect);
+            debuffStrings.push(effect.name);
+          } else {
+            // ... handle poison effects
           }
         }
-      }
 
-      target.damageHealth({ damage: totalDamage, attackerId: this.user.id });
-      target.damageSanity(this.flatSanityDamage);
-      this.user.damageHealth({
-        damage: this.selfDamage,
-        attackerId: target.id,
-      });
+        // Apply damage and effects
+        target.damageHealth({ damage: totalDamage, attackerId: this.user.id });
+        target.damageSanity(this.flatSanityDamage);
 
-      const thornsIshDamage = getConditionDamageToAttacker(
-        target.conditions,
-      ).healthDamage;
-      if (thornsIshDamage > 0) {
-        this.user.damageHealth({
-          damage: thornsIshDamage,
-          attackerId: target.id,
+        const thornsIshDamage = getConditionDamageToAttacker(
+          target.conditions,
+        ).healthDamage;
+
+        if (thornsIshDamage > 0) {
+          this.user.damageHealth({
+            damage: thornsIshDamage,
+            attackerId: target.id,
+          });
+        }
+
+        const { debuffNames, amountHealed } = this.addDebuffs({
+          target,
+          actualizedHits,
         });
-      }
 
-      const { debuffNames, amountHealed } = this.addDebuffs({
-        target,
-        actualizedHits,
-      });
-      this.addBuffs();
-      const allDebuffs = debuffStrings.concat(debuffNames);
-
-      let minionSpecies: string[] = [];
-      if ("createMinion" in this.user) {
-        this.summons.forEach((summon) => {
-          const type = (this.user as PlayerCharacter | Enemy).createMinion(
-            summon,
-          );
-          minionSpecies.push(type);
-        });
-      }
-
-      // wait for animation timing for user (stats display).
-      if ("birthdate" in this.user) {
-        wait(1000).then(() => (this.user as PlayerCharacter).endTurn());
-      }
-
-      return {
-        result: AttackUse.success,
-        logString: this.logBuilder({
+        return {
+          target,
           result: AttackUse.success,
-          targetName: this.getTargetNameReference(target),
-          healthDamage: totalDamage,
-          sanityDamage: this.flatSanityDamage,
-          debuffNames: allDebuffs,
-          buffNames: this.buffStrings,
-          minionSpecies,
-          amountHealed,
-        }),
-      };
-    } else {
+          damage: totalDamage,
+          sanityDamage: sanityDmg,
+          debuffs: [...debuffStrings, ...debuffNames],
+          healed: amountHealed,
+        };
+      }
+
       return {
+        target,
         result: AttackUse.miss,
-        logString: `${toTitleCase(this.name)} missed!`,
       };
+    });
+
+    // Apply buffs only once for the entire attack
+    this.addBuffs();
+
+    // Handle summons
+    let minionSpecies: string[] = [];
+    if ("createMinion" in this.user) {
+      this.summons.forEach((summon) => {
+        const type = (this.user as PlayerCharacter | Enemy).createMinion(
+          summon,
+        );
+        minionSpecies.push(type);
+      });
     }
+
+    // Build combined log string
+    const logString = this.buildMultiTargetLog({
+      targetResults,
+      buffNames: this.buffStrings,
+      minionSpecies,
+    });
+
+    // wait for animation timing for user (stats display).
+    if ("birthdate" in this.user) {
+      wait(1000).then(() => (this.user as PlayerCharacter).endTurn());
+    }
+
+    return {
+      result: targetResults.some((r) => r.result === AttackUse.success)
+        ? AttackUse.success
+        : AttackUse.miss,
+      logString,
+    };
   }
 
   /**
@@ -425,75 +421,63 @@ export class Attack {
     return AttackUse.miss;
   }
 
-  private logBuilder({ result, targetName, ...props }: LogProps): string {
-    const userString = this.userNameReferenceForLog;
+  private buildMultiTargetLog({
+    targetResults,
+    buffNames,
+    minionSpecies,
+  }: {
+    targetResults: Array<{
+      target: Enemy | PlayerCharacter | Minion;
+      result: AttackUse;
+      damage?: number;
+      sanityDamage?: number;
+      debuffs?: string[];
+      healed?: number;
+    }>;
+    buffNames: string[];
+    minionSpecies: string[];
+  }): string {
+    let returnString = `${this.userNameReferenceForLog} used ${toTitleCase(
+      this.name,
+    )}.\n`;
 
-    switch (result) {
-      case AttackUse.miss:
-        return `${userString} missed the attack against the ${toTitleCase(
+    targetResults.forEach((result) => {
+      const targetName = this.getTargetNameReference(result.target);
+
+      if (result.result === AttackUse.success && result.damage) {
+        returnString += `  • Dealt ${result.damage} damage to ${toTitleCase(
           targetName,
-        )}!`;
+        )}.\n`;
 
-      case AttackUse.block:
-        return `${toTitleCase(targetName)} blocked the attack!`;
-
-      case AttackUse.success:
-        if (!("healthDamage" in props)) throw new Error("Malformed props");
-        const {
-          healthDamage,
-          sanityDamage,
-          debuffNames,
-          buffNames,
-          minionSpecies,
-          amountHealed,
-        } = props;
-
-        let returnString = `${userString} used ${toTitleCase(
-          this.name,
-        )} on the ${toTitleCase(targetName)}.\n`;
-
-        // Health damage
-        if (healthDamage > 0) {
-          returnString += `  • It dealt ${healthDamage} health damage.\n`;
+        if (result.sanityDamage) {
+          returnString += `    - Caused ${result.sanityDamage} sanity damage.\n`;
         }
 
-        // Sanity damage
-        if (sanityDamage > 0) {
-          returnString += `  • It caused ${sanityDamage} sanity damage.\n`;
+        if (result.debuffs?.length) {
+          returnString += `    - Applied: ${result.debuffs.join(", ")}.\n`;
         }
 
-        // Debuffs
-        if (debuffNames.length > 0) {
-          returnString += `  • The ${toTitleCase(targetName)} ${
-            "fullname" in this.user ? "was" : "were"
-          } afflicted with: ${debuffNames.join(", ")}.\n`;
+        if (result.healed) {
+          returnString += `    - Healed for ${result.healed}.\n`;
         }
+      } else {
+        returnString += `  • Missed ${toTitleCase(targetName)}.\n`;
+      }
+    });
 
-        // Buffs
-        if (buffNames.length > 0) {
-          returnString += `  • ${userString} gained: ${buffNames.join(
-            ", ",
-          )}.\n`;
-        }
-
-        // Summons
-        if (minionSpecies.length > 0) {
-          returnString += `  • ${userString} summoned: ${minionSpecies.join(
-            ", ",
-          )}.\n`;
-        }
-
-        // Self-damage
-        if (this.selfDamage > 0) {
-          returnString += `  • ${userString} took ${this.selfDamage} self-damage.\n`;
-        }
-
-        if (amountHealed > 0) {
-          returnString += `  • ${userString} healed for ${amountHealed} health damage.\n`;
-        }
-
-        return returnString.trim();
+    if (buffNames.length > 0) {
+      returnString += `  • Gained: ${buffNames.join(", ")}.\n`;
     }
+
+    if (minionSpecies.length > 0) {
+      returnString += `  • Summoned: ${minionSpecies.join(", ")}.\n`;
+    }
+
+    if (this.selfDamage > 0) {
+      returnString += `  • Took ${this.selfDamage} self-damage.\n`;
+    }
+
+    return returnString.trim();
   }
 
   /*
