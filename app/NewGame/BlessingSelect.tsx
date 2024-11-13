@@ -1,42 +1,43 @@
 import { Pressable, View } from "react-native";
-import { Text } from "../../../components/Themed";
+import { Text } from "../../components/Themed";
 import { useState } from "react";
-import { useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
-import TutorialModal from "../../../components/TutorialModal";
-import { DescriptionMap } from "../../../utility/descriptions";
+import TutorialModal from "../../components/TutorialModal";
+import { DescriptionMap } from "../../utility/descriptions";
 import {
   Element,
   ElementToString,
   PlayerClassOptions,
   TutorialOption,
-} from "../../../utility/types";
+} from "../../utility/types";
 
-import BlessingDisplay from "../../../components/BlessingsDisplay";
-import { toTitleCase } from "../../../utility/functions/misc";
-import {
-  elementalColorMap,
-  playerClassColors,
-} from "../../../constants/Colors";
-import GenericFlatButton from "../../../components/GenericFlatButton";
+import BlessingDisplay from "../../components/BlessingsDisplay";
+import { toTitleCase } from "../../utility/functions/misc";
+import { elementalColorMap, playerClassColors } from "../../constants/Colors";
+import GenericFlatButton from "../../components/GenericFlatButton";
 import { useIsFocused } from "@react-navigation/native";
-import { useVibration } from "../../../hooks/generic";
-import { useGameStore, useUIStore } from "../../../hooks/stores";
+import { useVibration } from "../../hooks/generic";
+import { useRootStore } from "../../hooks/stores";
+import { useNewGameStore } from "./_layout";
 
 export default function SetBlessing() {
-  const { slug } = useLocalSearchParams();
+  const { classSelection, blessingSelection, setBlessingSelection } =
+    useNewGameStore();
 
-  let playerClass = slug as PlayerClassOptions;
+  if (!classSelection) {
+    while (router.canGoBack()) {
+      router.back();
+    }
+    return;
+  }
 
   const isFocused = useIsFocused();
-  const [blessing, setBlessing] = useState<Element>();
   const { colorScheme } = useColorScheme();
   const vibration = useVibration();
-
-  const gameState = useGameStore();
-  const { dimensions } = useUIStore();
+  const { gameState, uiStore } = useRootStore();
+  const { dimensions } = uiStore;
 
   const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
 
@@ -60,28 +61,28 @@ export default function SetBlessing() {
         <Text className="text-center text-2xl px-4">
           With What Blessing Was Your
           <Text
-            style={{ color: playerClassColors[playerClass] }}
-          >{` ${toTitleCase(playerClass)} `}</Text>
+            style={{ color: playerClassColors[classSelection] }}
+          >{` ${toTitleCase(classSelection)} `}</Text>
           Born?
         </Text>
         <>
           <ClassDependantBlessings
-            playerClass={playerClass}
+            playerClass={classSelection}
             vibration={vibration}
-            blessing={blessing}
-            setBlessing={setBlessing}
+            blessing={blessingSelection}
+            setBlessing={setBlessingSelection}
             colorScheme={colorScheme}
             dimensions={dimensions.window}
           />
           <Text className="text-center md:text-lg px-4">
-            {DescriptionMap[blessing as Element]}
+            {DescriptionMap[blessingSelection as Element]}
           </Text>
-          {blessing == 0 || blessing ? ( // sometimes I really hate ts. Evaluation of 0 is false.
+          {blessingSelection == 0 || blessingSelection ? ( // sometimes I really hate ts. Evaluation of 0 is false.
             <View className="mx-auto h-32 py-2">
               <GenericFlatButton
                 onPress={() => {
                   vibration({ style: "light" });
-                  router.push(`/NewGame/SetSex/${playerClass}/${blessing}`);
+                  router.push(`/NewGame/SexSelect`);
                 }}
               >
                 Next

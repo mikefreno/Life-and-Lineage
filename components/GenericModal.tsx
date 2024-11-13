@@ -8,7 +8,7 @@ import {
 import Modal from "react-native-modal";
 import { ThemedView } from "./Themed";
 import { useColorScheme } from "nativewind";
-import { useGameStore, useUIStore } from "../hooks/stores";
+import { useGameStore, useRootStore, useUIStore } from "../hooks/stores";
 
 interface GenericModalProps {
   isVisibleCondition: boolean;
@@ -44,8 +44,8 @@ export default function GenericModal({
 }: GenericModalProps) {
   const height = Dimensions.get("window").height;
   const { colorScheme } = useColorScheme();
-  const gameState = useGameStore();
-  let { modalShowing } = useUIStore();
+  const { gameState, uiStore } = useRootStore();
+  let { modalShowing } = uiStore;
 
   useEffect(() => {
     if (

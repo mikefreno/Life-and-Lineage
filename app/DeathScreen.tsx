@@ -57,7 +57,7 @@ export default function DeathScreen() {
     if (gameState) {
       gameState.startingNewGame = true;
     }
-    router.push("/NewGame");
+    router.push("/ClassSelect");
   }
 
   function createPlayerCharacter() {

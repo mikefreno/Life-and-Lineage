@@ -24,7 +24,8 @@ const RED_FLOOR = 50;
 const TOP = 255;
 
 const DungeonScreen = observer(() => {
-  const { dungeonInstances } = useDungeonStore();
+  const dungeonStore = useDungeonStore();
+  const { dungeonInstances } = dungeonStore;
 
   const [sorted, setSorted] = useState(
     dungeonInstances
@@ -154,10 +155,9 @@ const DungeonScreen = observer(() => {
                           while (router.canGoBack()) {
                             router.back();
                           }
+                          dungeonStore.setUpDungeon(dungeonInstance, level);
                           vibration({ style: "warning" });
-                          router.replace(
-                            `/DungeonLevel/${dungeonInstance.name}/${level.level}`,
-                          );
+                          router.replace(`/DungeonLevel`);
                         }}
                       >
                         {({ pressed }) => (

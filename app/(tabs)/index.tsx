@@ -1,6 +1,6 @@
 import { TouchableWithoutFeedback, View } from "react-native";
 import { Text } from "../../components/Themed";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
@@ -26,18 +26,14 @@ import { StatsDisplay } from "../../components/StatsDisplay";
 import EquipmentDisplay from "../../components/EquipmentDisplay";
 import { TutorialOption } from "../../utility/types";
 import { ProjectedImage } from "../../components/Draggable";
-import {
-  useDraggableStore,
-  useRootStore,
-  useUIStore,
-} from "../../hooks/stores";
+import { useDraggableStore, useRootStore } from "../../hooks/stores";
 import { Item } from "../../entities/item";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
 
-  const { dimensions, playerStatusIsCompact } = useUIStore();
-  const { playerState, gameState } = useRootStore();
+  const { playerState, gameState, uiStore } = useRootStore();
+  const { dimensions, playerStatusIsCompact } = uiStore;
   const { setIconString } = useDraggableStore();
 
   const headTarget = useRef<View>(null);

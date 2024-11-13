@@ -1,4 +1,4 @@
-import { makeObservable, observable } from "mobx";
+import { action, makeObservable, observable, reaction } from "mobx";
 import { RootStore } from "./RootStore";
 import { Dimensions, EmitterSubscription, ScaledSize } from "react-native";
 
@@ -26,9 +26,7 @@ export default class UIStore {
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
-    this.playerStatusIsCompact =
-      root.playerState!.conditions.length > 0 ||
-      root.playerState!.unAllocatedSkillPoints > 0;
+    this.playerStatusIsCompact = true;
     const dimensions = {
       window: {
         height: Dimensions.get("window").height,
@@ -69,11 +67,20 @@ export default class UIStore {
 
     makeObservable(this, {
       playerStatusIsCompact: observable,
+      setPlayerStatusCompact: action,
+      detailedStatusViewShowing: observable,
+      setDetailedStatusViewShowing: action,
       dimensions: observable,
       itemBlockSize: observable,
-      detailedStatusViewShowing: observable,
       modalShowing: observable,
     });
+  }
+
+  public setPlayerStatusCompact(state: boolean) {
+    this.playerStatusIsCompact = state;
+  }
+  public setDetailedStatusViewShowing(state: boolean) {
+    this.detailedStatusViewShowing = state;
   }
 
   private handleDimensionChange({

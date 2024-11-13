@@ -5,41 +5,29 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { Text } from "../../../components/Themed";
-import { useRef, useState } from "react";
-import { router, useLocalSearchParams } from "expo-router";
-import { toTitleCase } from "../../../utility/functions/misc";
+import { Text } from "../../components/Themed";
+import { router } from "expo-router";
+import { toTitleCase } from "../../utility/functions/misc";
 import { useColorScheme } from "nativewind";
 import { useHeaderHeight } from "@react-navigation/elements";
-import {
-  PlayerClassOptions,
-  isPlayerClassOptions,
-} from "../../../utility/types";
-import { playerClassColors } from "../../../constants/Colors";
-import GenericFlatButton from "../../../components/GenericFlatButton";
-import { useVibration } from "../../../hooks/generic";
-import { useUIStore } from "../../../hooks/stores";
+import { playerClassColors } from "../../constants/Colors";
+import GenericFlatButton from "../../components/GenericFlatButton";
+import { useVibration } from "../../hooks/generic";
+import { useUIStore } from "../../hooks/stores";
+import { useNewGameStore } from "./_layout";
 
 export default function SetName() {
   const { dimensions } = useUIStore();
-  const { slug } = useLocalSearchParams();
-  if (!slug) {
-    return router.replace("/NewGame");
+  const { classSelection } = useNewGameStore();
+  if (!classSelection) {
+    router.back();
+    router.back();
+    router.back();
+    return;
   }
-  let playerClass: PlayerClassOptions;
 
-  if (isPlayerClassOptions(slug[0])) {
-    playerClass = slug[0];
-  } else {
-    return <Text>{`Invalid player class option: ${slug[0]}`}</Text>;
-  }
-  const blessing = slug[1];
-  const sex = slug[2];
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const firstNameRef = useRef<string>();
-  const lastNameRef = useRef<string>();
   const header = useHeaderHeight();
+  const { firstName, lastName, setFirstName, setLastName } = useNewGameStore();
 
   const vibration = useVibration();
   const { colorScheme } = useColorScheme();
@@ -59,10 +47,10 @@ export default function SetName() {
                   Choose Your
                   <Text
                     className="text-center text-2xl md:text-3xl"
-                    style={{ color: playerClassColors[playerClass] }}
+                    style={{ color: playerClassColors[classSelection] }}
                   >
                     {" "}
-                    {toTitleCase(playerClass)}'s{" "}
+                    {toTitleCase(classSelection)}'s{" "}
                   </Text>
                   Name
                 </Text>
@@ -74,7 +62,6 @@ export default function SetName() {
                 }
                 onChangeText={(text) => {
                   setFirstName(text.replace(/^\s+/, ""));
-                  firstNameRef.current = text.replace(/^\s+/, "");
                 }}
                 placeholder={"Given Name (First Name)"}
                 value={firstName}
@@ -94,7 +81,6 @@ export default function SetName() {
                 className="rounded border border-zinc-800 pl-2 text-black dark:border-zinc-100 dark:text-zinc-50"
                 onChangeText={(text) => {
                   setLastName(text.replace(/^\s+/, ""));
-                  lastNameRef.current = text.replace(/^\s+/, "");
                 }}
                 placeholderTextColor={
                   colorScheme == "light" ? "#d4d4d8" : "#71717a"
@@ -114,16 +100,15 @@ export default function SetName() {
               />
               <Text className="pl-1 pt-1 pb-2">Maximum Length: 16</Text>
               <View>
-                {firstName.trimEnd() && lastName.trimEnd() ? (
+                {firstName.trimEnd().length > 0 &&
+                lastName.trimEnd().length > 0 ? (
                   <View className="mx-auto">
                     <GenericFlatButton
                       onPress={() => {
                         vibration({ style: "light" });
-                        router.push(
-                          `/NewGame/Review/${playerClass}/${blessing}/${sex}/${trimWhitespace(
-                            firstName,
-                          )}/${trimWhitespace(lastName)}`,
-                        );
+                        setFirstName(trimWhitespace(firstName));
+                        setLastName(trimWhitespace(lastName));
+                        router.push(`/NewGame/Review`);
                       }}
                     >
                       Next

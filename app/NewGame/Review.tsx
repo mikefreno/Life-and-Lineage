@@ -1,62 +1,37 @@
-import { Text } from "../../../components/Themed";
+import { Text } from "../../components/Themed";
 import { Platform, View } from "react-native";
 import {
   Character,
   PlayerCharacter,
   getStartingBook,
   savePlayer,
-} from "../../../entities/character";
-import { router, useLocalSearchParams, useNavigation } from "expo-router";
+} from "../../entities/character";
+import { useNavigation } from "expo-router";
 import clearHistory, {
   getRandomName,
   toTitleCase,
   generateBirthday,
   wait,
-} from "../../../utility/functions/misc";
-import { Game, saveGame } from "../../../entities/game";
+} from "../../utility/functions/misc";
+import { Game, saveGame } from "../../entities/game";
 import {
   getRandomJobTitle,
   getStartingBaseStats,
-} from "../../../utility/functions/characterAid";
-import {
-  Element,
-  ElementToString,
-  PlayerClassOptions,
-  isElement,
-  isPlayerClassOptions,
-} from "../../../utility/types";
-import {
-  elementalColorMap,
-  playerClassColors,
-} from "../../../constants/Colors";
-import { storage } from "../../../utility/functions/storage";
+} from "../../utility/functions/characterAid";
+import { Element, ElementToString } from "../../utility/types";
+import { elementalColorMap, playerClassColors } from "../../constants/Colors";
+import { storage } from "../../utility/functions/storage";
 import { useColorScheme } from "nativewind";
-import GenericFlatButton from "../../../components/GenericFlatButton";
-import { useVibration } from "../../../hooks/generic";
-import { useRootStore } from "../../../hooks/stores";
-import { createShops } from "../../../entities/shop";
+import GenericFlatButton from "../../components/GenericFlatButton";
+import { useVibration } from "../../hooks/generic";
+import { useRootStore } from "../../hooks/stores";
+import { createShops } from "../../entities/shop";
+import { useNewGameStore } from "./_layout";
 
 export default function NewGameReview() {
-  const { slug } = useLocalSearchParams();
-  if (!slug) {
-    return router.replace("/NewGame");
-  }
-  let playerClass: PlayerClassOptions;
+  const { firstName, lastName, blessingSelection, sex, classSelection } =
+    useNewGameStore();
 
-  if (isPlayerClassOptions(slug[0])) {
-    playerClass = slug[0];
-  } else {
-    return <Text>{`Invalid player class option: ${slug[0]}`}</Text>;
-  }
-  let blessing: Element;
-  if (isElement(Number.parseInt(slug[1]))) {
-    blessing = Number(slug[1]);
-  } else {
-    return <Text>{`Invalid player blessing option: ${slug[1]}`}</Text>;
-  }
-  const sex = slug[2];
-  const firstName = slug[3];
-  const lastName = slug[4];
   const vibration = useVibration();
 
   let root = useRootStore();
@@ -83,74 +58,78 @@ export default function NewGameReview() {
     let newCharacter: PlayerCharacter;
     const bday = generateBirthday(15, 15);
     if (
-      playerClass === "paladin" &&
-      (blessing == Element.vengeance ||
-        blessing == Element.protection ||
-        blessing == Element.holy)
+      classSelection === "paladin" &&
+      (blessingSelection == Element.vengeance ||
+        blessingSelection == Element.protection ||
+        blessingSelection == Element.holy)
     ) {
       newCharacter = new PlayerCharacter({
         firstName: firstName,
         lastName: lastName,
         sex: sex as "male" | "female",
-        playerClass: playerClass,
-        blessing: blessing,
+        playerClass: classSelection,
+        blessing: blessingSelection,
         parents: [mom, dad],
         birthdate: bday,
         inCombat: false,
-        ...getStartingBaseStats({ playerClass }),
+        ...getStartingBaseStats({ classSelection }),
+        root,
       });
     } else if (
-      playerClass === "necromancer" &&
-      (blessing == Element.bone ||
-        blessing == Element.blood ||
-        blessing == Element.summoning ||
-        blessing == Element.pestilence)
+      classSelection === "necromancer" &&
+      (blessingSelection == Element.bone ||
+        blessingSelection == Element.blood ||
+        blessingSelection == Element.summoning ||
+        blessingSelection == Element.pestilence)
     ) {
       newCharacter = new PlayerCharacter({
         firstName: firstName,
         lastName: lastName,
         sex: sex as "male" | "female",
-        playerClass: playerClass,
-        blessing: blessing,
+        playerClass: classSelection,
+        blessing: blessingSelection,
         parents: [mom, dad],
         birthdate: bday,
         inCombat: false,
-        ...getStartingBaseStats({ playerClass }),
+        ...getStartingBaseStats({ classSelection }),
+        root,
       });
     } else if (
-      playerClass == "mage" &&
-      (blessing == Element.air ||
-        blessing == Element.fire ||
-        blessing == Element.earth ||
-        blessing == Element.water)
+      classSelection == "mage" &&
+      (blessingSelection == Element.air ||
+        blessingSelection == Element.fire ||
+        blessingSelection == Element.earth ||
+        blessingSelection == Element.water)
     ) {
       newCharacter = new PlayerCharacter({
         firstName: firstName,
         lastName: lastName,
         sex: sex as "male" | "female",
-        playerClass: playerClass,
-        blessing: blessing,
+        playerClass: classSelection,
+        blessing: blessingSelection,
         parents: [mom, dad],
         birthdate: bday,
         inCombat: false,
-        ...getStartingBaseStats({ playerClass }),
+        ...getStartingBaseStats({ classSelection }),
+        root,
       });
     } else if (
-      playerClass == "ranger" &&
-      (blessing == Element.beastMastery ||
-        blessing == Element.assassination ||
-        blessing == Element.arcane)
+      classSelection == "ranger" &&
+      (blessingSelection == Element.beastMastery ||
+        blessingSelection == Element.assassination ||
+        blessingSelection == Element.arcane)
     ) {
       newCharacter = new PlayerCharacter({
         firstName: firstName,
         lastName: lastName,
         sex: sex as "male" | "female",
-        playerClass: playerClass,
-        blessing: blessing,
+        playerClass: classSelection,
+        blessing: blessingSelection,
         parents: [mom, dad],
         birthdate: bday,
         inCombat: false,
-        ...getStartingBaseStats({ playerClass }),
+        ...getStartingBaseStats({ classSelection }),
+        root,
       });
     } else {
       throw new Error("Incorrect Player class/blessing combination!");
@@ -159,12 +138,11 @@ export default function NewGameReview() {
   }
 
   async function startGame() {
-    if (playerClass) {
+    if (classSelection) {
       const player = createPlayerCharacter();
       const starterBook = getStartingBook(player);
       player.addToInventory(starterBook);
       const startDate = new Date().toISOString();
-      root.shopsStore.shops = createShops(root);
       const tutorialState = storage.getString("tutorialsEnabled");
       let parsed = true;
       if (tutorialState) {
@@ -198,27 +176,30 @@ export default function NewGameReview() {
     }
   }
 
-  return (
-    <View className="flex-1 px-6">
-      <Text className="pt-[8vh] text-center text-2xl">Review</Text>
-      <Text className="pt-[16vh] text-center text-3xl">
-        {`${firstName} ${lastName} the `}
-        <Text
-          style={{
-            color:
-              blessing == Element.assassination && colorScheme == "dark"
-                ? elementalColorMap[blessing].light
-                : elementalColorMap[blessing].dark,
-          }}
-        >{`${ElementToString[blessing]}`}</Text>
-        -born{" "}
-        <Text style={{ color: playerClassColors[playerClass] }}>{`${toTitleCase(
-          playerClass,
-        )}`}</Text>
-      </Text>
-      <GenericFlatButton onPress={() => startGame()} className="mt-4">
-        Confirm?
-      </GenericFlatButton>
-    </View>
-  );
+  if (blessingSelection && classSelection) {
+    return (
+      <View className="flex-1 px-6">
+        <Text className="pt-[8vh] text-center text-2xl">Review</Text>
+        <Text className="pt-[16vh] text-center text-3xl">
+          {`${firstName} ${lastName} the `}
+          <Text
+            style={{
+              color:
+                blessingSelection == Element.assassination &&
+                colorScheme == "dark"
+                  ? elementalColorMap[blessingSelection].light
+                  : elementalColorMap[blessingSelection].dark,
+            }}
+          >{`${ElementToString[blessingSelection]}`}</Text>
+          -born{" "}
+          <Text
+            style={{ color: playerClassColors[classSelection] }}
+          >{`${toTitleCase(classSelection)}`}</Text>
+        </Text>
+        <GenericFlatButton onPress={() => startGame()} className="mt-4">
+          Confirm?
+        </GenericFlatButton>
+      </View>
+    );
+  }
 }

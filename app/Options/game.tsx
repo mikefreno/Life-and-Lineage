@@ -47,7 +47,7 @@ export default function GameSettings() {
     while (router.canGoBack()) {
       router.back();
     }
-    router.push("/NewGame");
+    router.push("/NewGame/ClassSelect");
   };
 
   useEffect(() => {

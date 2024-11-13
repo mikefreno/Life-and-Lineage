@@ -1,96 +1,207 @@
 [
-   {
-      "name": "zombie",
-      "beingType": "undead",
-      "sanity": null,
-      "health": 80,
-      "attackPower": 10,
-      "energy": {"maximum": 50, "regen": 5},
-      "attacks": ["grab", "zombie bite"],
-      "drops": [
-         {"item": "chunk of flesh", "itemType":"junk","chance":0.75},
-         {"item": "chunk of flesh", "itemType":"junk","chance":0.75}
-      ],
-      "goldDropRange": {"minimum": 100, "maximum":150}
-   },
-   {
-      "name": "necromancer",
-      "beingType": "human",
-      "sanity": 50,
-      "health": 140,
-      "attackPower": 15,
-      "energy": {"maximum": 40, "regen": 10},
-      "attacks": ["raise skeleton", "teeth"],
-      "drops": [
-         {"item": "dagger", "itemType":"melee","chance":0.15},
-         {"item": "dagger", "itemType":"melee","chance":0.15},
-         {"item": "adept robes", "itemType":"bodyArmor","chance":1.0},
-         {"item": "apprentice hood", "itemType":"helmet","chance":0.45}
-      ],
-      "storyDrops":[
-         {"item": "the deed to the whispering raven inn"}
-      ],
-      "goldDropRange": {"minimum": 100, "maximum":150}
-   },
-   {
-      "name": "hobgoblin",
-      "beingType": "demi-human",
-      "sanity": null,
-      "health": 160,
-      "attackPower": 15,
-      "energy": {"maximum": 50, "regen": 10},
-      "attacks": ["stab", "frenzy"],
-      "drops": [
-         {"item": "longsword", "itemType":"melee","chance":0.65}
-      ],
-      "goldDropRange": {"minimum": 100, "maximum":150}
-   },
-   {
-      "name": "goblin shaman",
-      "beingType": "demi-human",
-      "sanity": 50,
-      "health": 160,
-      "attackPower": 25,
-      "energy": {"maximum": 50, "regen": 10},
-      "attacks": ["spark", "bonk"],
-      "drops": [
-         {"item": "goblin totem", "itemType":"staff", "chance": 1.0}
-      ],
-      "storyDrops":[
-         {"item": "head of goblin shaman"}
-      ],
-      "goldDropRange": {"minimum": 100, "maximum":150}
-   },
-   {
-      "name": "bandit",
-      "beingType": "human",
-      "sanity": 50,
-      "health": 75,
-      "attackPower": 10,
-      "energy": {"maximum": 50, "regen": 3},
-      "attacks": ["stab", "pocket sand","serrate"],
-      "drops": [
-         {"item": "dagger", "itemType":"melee","chance":0.15},
-         {"item": "dagger", "itemType":"melee","chance":0.15},
-         {"item": "cheap leather chestpiece", "itemType":"bodyArmor","chance":0.15},
-         {"item": "leather headgear", "itemType":"helmet","chance":0.15}
-      ],
-      "goldDropRange": {"minimum": 70, "maximum":100},
-      "armorValue": 15
-   },
-   {
-      "name": "bandit boss",
-      "beingType": "human",
-      "sanity": 50,
-      "health": 200,
-      "attackPower": 22.5,
-      "energy": {"maximum": 50, "regen": 10},
-      "attacks": ["serrate", "call backup", "stab"],
-      "drops": [],
-      "storyDrops":[
-         {"item": "broken seal contract"}
-      ],
-      "goldDropRange": {"minimum": 2500, "maximum":3000},
-      "armorValue": 30
-   }
+  {
+    "name": "zombie",
+    "beingType": "undead",
+    "sanity": null,
+    "health": 80,
+    "attackPower": 10,
+    "energy": {
+      "maximum": 50,
+      "regen": 5
+    },
+    "attackStrings": [
+      "grab",
+      "zombie bite"
+    ],
+    "drops": [
+      {
+        "item": "chunk of flesh",
+        "itemType": "junk",
+        "chance": 0.75
+      },
+      {
+        "item": "chunk of flesh",
+        "itemType": "junk",
+        "chance": 0.75
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 100,
+      "maximum": 150
+    }
+  },
+  {
+    "name": "necromancer",
+    "beingType": "human",
+    "sanity": 50,
+    "health": 140,
+    "attackPower": 15,
+    "energy": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [
+      "raise skeleton",
+      "teeth"
+    ],
+    "drops": [
+      {
+        "item": "dagger",
+        "itemType": "melee",
+        "chance": 0.15
+      },
+      {
+        "item": "dagger",
+        "itemType": "melee",
+        "chance": 0.15
+      },
+      {
+        "item": "adept robes",
+        "itemType": "bodyArmor",
+        "chance": 1.0
+      },
+      {
+        "item": "apprentice hood",
+        "itemType": "helmet",
+        "chance": 0.45
+      }
+    ],
+    "storyDrops": [
+      {
+        "item": "the deed to the whispering raven inn"
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 100,
+      "maximum": 150
+    }
+  },
+  {
+    "name": "hobgoblin",
+    "beingType": "demi-human",
+    "sanity": null,
+    "health": 160,
+    "attackPower": 15,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [
+      "stab",
+      "frenzy"
+    ],
+    "drops": [
+      {
+        "item": "longsword",
+        "itemType": "melee",
+        "chance": 0.65
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 100,
+      "maximum": 150
+    }
+  },
+  {
+    "name": "goblin shaman",
+    "beingType": "demi-human",
+    "sanity": 50,
+    "health": 160,
+    "attackPower": 25,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [
+      "spark",
+      "bonk"
+    ],
+    "drops": [
+      {
+        "item": "goblin totem",
+        "itemType": "staff",
+        "chance": 1.0
+      }
+    ],
+    "storyDrops": [
+      {
+        "item": "head of goblin shaman"
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 100,
+      "maximum": 150
+    }
+  },
+  {
+    "name": "bandit",
+    "beingType": "human",
+    "sanity": 50,
+    "health": 75,
+    "attackPower": 10,
+    "energy": {
+      "maximum": 50,
+      "regen": 3
+    },
+    "attackStrings": [
+      "stab",
+      "pocket sand",
+      "serrate"
+    ],
+    "drops": [
+      {
+        "item": "dagger",
+        "itemType": "melee",
+        "chance": 0.15
+      },
+      {
+        "item": "dagger",
+        "itemType": "melee",
+        "chance": 0.15
+      },
+      {
+        "item": "cheap leather chestpiece",
+        "itemType": "bodyArmor",
+        "chance": 0.15
+      },
+      {
+        "item": "leather headgear",
+        "itemType": "helmet",
+        "chance": 0.15
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 70,
+      "maximum": 100
+    },
+    "armorValue": 15
+  },
+  {
+    "name": "bandit boss",
+    "beingType": "human",
+    "sanity": 50,
+    "health": 200,
+    "attackPower": 22.5,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [
+      "serrate",
+      "call backup",
+      "stab"
+    ],
+    "drops": [],
+    "storyDrops": [
+      {
+        "item": "broken seal contract"
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 2500,
+      "maximum": 3000
+    },
+    "armorValue": 30
+  }
 ]
+

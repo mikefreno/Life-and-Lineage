@@ -1,175 +1,323 @@
 [
-   {
-     "name": "training grounds",
-     "id": 0,
-     "difficulty": 0,
-     "levels": [
-       {
-         "level": 1,
-         "tiles": 0,
-         "unlocked": true
-       }
-     ],
-     "unlocks": []
-   },
-   {
-     "name": "nearby cave",
-     "id": 1,
-     "difficulty": 1,
-     "levels": [
-       {
-         "level": 1,
-         "tiles": 10,
-         "boss": ["zombie"],
-         "unlocked": true
-       },
-       {
-         "level": 2,
-         "tiles": 10,
-         "boss": ["zombie"]
-       },
-       {
-         "level": 3,
-         "tiles": 15,
-         "boss": ["necromancer"]
-       }
-     ],
-     "unlocks": ["goblin cave", "bandit hideout"]
-   },
-   { 
-     "name": "goblin cave",
-     "id": 2,
-     "difficulty": 2,
-     "levels": [
-       {
-         "level": 1,
-         "tiles": 10,
-         "boss": ["hobgoblin"]
-       },
-       {
-         "level": 2,
-         "tiles": 15,
-         "boss": ["goblin shaman", "hobgoblin"]
-       }
-     ],
-     "unlocks":["rogue magi fortress"]
-   },
-   { 
-     "name": "bandit hideout",
-     "id": 3,
-     "difficulty": 2,
-     "levels": [
-       {
-         "level": 1,
-         "tiles": 10,
-         "boss": ["bandit", "bandit"]
-       },
-       {
-         "level": 2,
-         "tiles": 20,
-         "boss": ["bandit boss", "bandit"]
-       }
-     ],
-     "unlocks":["infested mine"]
-   },
-   { 
-     "name": "rogue magi fortress",
-     "id": 4,
-     "difficulty": 3,
-     "levels": [
-       {
-         "level": 1,
-         "tiles": 15,
-         "boss": ["adept water mage"]
-       },
-       {
-         "level": 2,
-         "tiles": 15,
-         "boss": ["adept air mage"]
-       },
-       {
-         "level": 3,
-         "tiles": 15,
-         "boss": ["expert fire mage"]
-       },
-       {
-         "level": 4,
-         "tiles": 20,
-         "boss": ["master earth mage"]
-       }
-     ],
-     "unlocks":["dark forest"]
-   }, 
-   { 
-     "name": "infested mine",
-     "id": 5,
-     "difficulty": 4,
-     "levels": [
-       {
-         "level": 1,
-         "tiles": 20,
-         "boss": ["venomous spider"]
-       },
-       {
-         "level": 2,
-         "tiles": 25,
-         "boss": ["brood mother"]
-       }
-     ],
-     "unlocks":["crystal mine"]
-   },
-   {
-     "name": "dark forest",
-     "id": 6,
-     "difficulty": 4,
-     "levels": [
-       {
-         "level": 1,
-         "tiles": 25,
-         "boss": ["griffon"]
-       },
-       {
-         "level": 2,
-         "tiles": 30,
-         "boss": ["chimera"]
-       }
-     ],
-     "unlocks":["corrupted temple"]
-   },
-   {
-     "name": "crystal mine",
-     "id": 7,
-     "difficulty": 5,
-     "levels": [
-       {
-         "level": 1,
-         "tiles": 20,
-         "boss": ["cave troll"]
-       },
-       {
-         "level": 2,
-         "tiles": 25,
-         "boss": ["moon bull"]
-       }
-     ],
-     "unlocks":["corrupted temple"]
-   },
-   {
-     "name": "corrupted temple",
-     "id": 8,
-     "difficulty": 6,
-     "levels": [
-       {
-         "level": 1,
-         "tiles": 20,
-         "boss": ["blood paladin"]
-       },
-       {
-         "level": 2,
-         "tiles": 25,
-         "boss": ["blood priest", "blood paladin"]
-       }
-     ],
-     "unlocks":[]
-   }
+  {
+    "name": "training grounds",
+    "id": 0,
+    "difficulty": 0,
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 0,
+        "unlocked": true,
+        "normalEncounters": [
+          [
+            {
+              "name": "training dummy",
+              "scaler": 1
+            }
+          ]
+        ],
+        "bossEncounter": []
+      }
+    ],
+    "unlocks": []
+  },
+  {
+    "name": "nearby cave",
+    "id": 1,
+    "difficulty": 1,
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 10,
+        "unlocked": true,
+        "normalEncounters": [
+          [
+            {
+              "name": "giant rat",
+              "scaler": 1
+            }
+          ],
+          [
+            {
+              "name": "bat",
+              "scaler": 1
+            }
+          ]
+        ],
+        "bossEncounter": [
+          {
+            "name": "zombie",
+            "scaler": 1
+          }
+        ]
+      },
+      {
+        "level": 2,
+        "tiles": 10,
+        "normalEncounters": [
+          [
+            {
+              "name": "giant rat",
+              "scaler": 1
+            }
+          ],
+          [
+            {
+              "name": "bat",
+              "scaler": 1
+            }
+          ],
+          [
+            {
+              "name": "bat",
+              "scaler": 0.75
+            },
+            {
+              "name": "bat",
+              "scaler": 0.75
+            }
+          ]
+        ],
+        "bossEncounter": [
+          {
+            "name": "zombie",
+            "scaler": 1.25
+          }
+        ]
+      },
+      {
+        "level": 3,
+        "tiles": 15,
+        "normalEncounters": [
+          [
+            {
+              "name": "giant rat",
+              "scaler": 1
+            }
+          ],
+          [
+            {
+              "name": "bat",
+              "scaler": 1
+            }
+          ],
+          [
+            {
+              "name": "bat",
+              "scaler": 0.75
+            },
+            {
+              "name": "bat",
+              "scaler": 0.75
+            }
+          ],
+          [
+            {
+              "name": "giant rat",
+              "scaler": 0.5
+            },
+            {
+              "name": "bat",
+              "scaler": 0.75
+            }
+          ]
+        ],
+        "bossEncounter": [
+          {
+            "name": "necromancer",
+            "scaler": 1
+          }
+        ]
+      }
+    ],
+    "unlocks": [
+      "goblin cave",
+      "bandit hideout"
+    ]
+  },
+  {
+    "name": "goblin cave",
+    "id": 2,
+    "difficulty": 2,
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 10,
+        "boss": [
+          "hobgoblin"
+        ]
+      },
+      {
+        "level": 2,
+        "tiles": 15,
+        "boss": [
+          "goblin shaman",
+          "hobgoblin"
+        ]
+      }
+    ],
+    "unlocks": [
+      "rogue magi fortress"
+    ]
+  },
+  {
+    "name": "bandit hideout",
+    "id": 3,
+    "difficulty": 2,
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 10,
+        "boss": [
+          "bandit",
+          "bandit"
+        ]
+      },
+      {
+        "level": 2,
+        "tiles": 20,
+        "boss": [
+          "bandit boss",
+          "bandit"
+        ]
+      }
+    ],
+    "unlocks": [
+      "infested mine"
+    ]
+  },
+  {
+    "name": "rogue magi fortress",
+    "id": 4,
+    "difficulty": 3,
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 15,
+        "boss": [
+          "adept water mage"
+        ]
+      },
+      {
+        "level": 2,
+        "tiles": 15,
+        "boss": [
+          "adept air mage"
+        ]
+      },
+      {
+        "level": 3,
+        "tiles": 15,
+        "boss": [
+          "expert fire mage"
+        ]
+      },
+      {
+        "level": 4,
+        "tiles": 20,
+        "boss": [
+          "master earth mage"
+        ]
+      }
+    ],
+    "unlocks": [
+      "dark forest"
+    ]
+  },
+  {
+    "name": "infested mine",
+    "id": 5,
+    "difficulty": 4,
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 20,
+        "boss": [
+          "venomous spider"
+        ]
+      },
+      {
+        "level": 2,
+        "tiles": 25,
+        "boss": [
+          "brood mother"
+        ]
+      }
+    ],
+    "unlocks": [
+      "crystal mine"
+    ]
+  },
+  {
+    "name": "dark forest",
+    "id": 6,
+    "difficulty": 4,
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 25,
+        "boss": [
+          "griffon"
+        ]
+      },
+      {
+        "level": 2,
+        "tiles": 30,
+        "boss": [
+          "chimera"
+        ]
+      }
+    ],
+    "unlocks": [
+      "corrupted temple"
+    ]
+  },
+  {
+    "name": "crystal mine",
+    "id": 7,
+    "difficulty": 5,
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 20,
+        "boss": [
+          "cave troll"
+        ]
+      },
+      {
+        "level": 2,
+        "tiles": 25,
+        "boss": [
+          "moon bull"
+        ]
+      }
+    ],
+    "unlocks": [
+      "corrupted temple"
+    ]
+  },
+  {
+    "name": "corrupted temple",
+    "id": 8,
+    "difficulty": 6,
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 20,
+        "boss": [
+          "blood paladin"
+        ]
+      },
+      {
+        "level": 2,
+        "tiles": 25,
+        "boss": [
+          "blood priest",
+          "blood paladin"
+        ]
+      }
+    ],
+    "unlocks": []
+  }
 ]
+

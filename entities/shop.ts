@@ -284,27 +284,6 @@ function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function createShops(rootStore: RootStore) {
-  let createdShops: Shop[] = [];
-  shops.forEach((shop) => {
-    const randIdx = Math.floor(
-      Math.random() * shop.possiblePersonalities.length,
-    );
-    const personality = shop.possiblePersonalities[randIdx];
-    //want to favor likelihood of male shopkeepers slightly
-    const newShop = new Shop({
-      shopKeeper: generateShopKeeper(shop.type),
-      baseGold: shop.baseGold,
-      lastStockRefresh: new Date(),
-      archetype: shop.type,
-      shopKeeperPersonality: personality as ShopkeeperPersonality,
-      root: rootStore,
-    });
-    createdShops.push(newShop);
-  });
-  return createdShops;
-}
-
 export function generateShopKeeper(archetype: string) {
   const sex = rollD20() <= 12 ? "male" : "female";
   const name = getRandomName(sex);
@@ -320,15 +299,3 @@ export function generateShopKeeper(archetype: string) {
   });
   return newChar;
 }
-
-const _shopSave = async (shop: Shop | undefined) => {
-  if (shop) {
-    try {
-      storage.set(`shop_${shop.archetype}`, stringify(shop));
-    } catch (e) {
-      console.log("Error in _playerSave:", e);
-    }
-  }
-};
-
-export const saveShop = throttle(_shopSave, 500);

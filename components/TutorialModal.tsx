@@ -13,7 +13,7 @@ import {
 import { TutorialOption } from "../utility/types";
 import GenericModal from "./GenericModal";
 import { useVibration } from "../hooks/generic";
-import { useGameStore } from "../hooks/stores";
+import { useRootStore } from "../hooks/stores";
 
 type TutorialPage = {
   title?: string;
@@ -44,7 +44,7 @@ const TutorialModal = observer(
     override,
     clearOverride,
   }: ITutorialModal) => {
-    const gameState = useGameStore();
+    const { gameState } = useRootStore();
     const { colorScheme } = useColorScheme();
     const vibration = useVibration();
 

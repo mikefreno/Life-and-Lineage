@@ -1,43 +1,38 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { Text } from "../../../components/Themed";
-import { FontAwesome5, Foundation } from "@expo/vector-icons";
-import { Pressable, View } from "react-native";
+import {
+  type PlayerClassOptions,
+  isPlayerClassOptions,
+  TutorialOption,
+} from "../../utility/types";
+import TutorialModal from "../../components/TutorialModal";
+import { useGameStore, useRootStore } from "../../hooks/stores";
+import { useVibration } from "../../hooks/generic";
+import { useIsFocused } from "@react-navigation/native";
 import { useRef, useState } from "react";
 import { useColorScheme } from "nativewind";
-import TutorialModal from "../../../components/TutorialModal";
-import {
-  PlayerClassOptions,
-  TutorialOption,
-  isPlayerClassOptions,
-} from "../../../utility/types";
-import { toTitleCase } from "../../../utility/functions/misc";
-import { playerClassColors } from "../../../constants/Colors";
-import GenericFlatButton from "../../../components/GenericFlatButton";
-import { useIsFocused } from "@react-navigation/native";
-import { useGameStore } from "../../../hooks/stores";
-import { useVibration } from "../../../hooks/generic";
+import { Pressable, View } from "react-native";
+import { Text } from "../../components/Themed";
+import { playerClassColors } from "../../constants/Colors";
+import { toTitleCase } from "../../utility/functions/misc";
+import { FontAwesome5, Foundation } from "@expo/vector-icons";
+import GenericFlatButton from "../../components/GenericFlatButton";
+import { useNewGameStore } from "./_layout";
 
 export default function SetSex() {
-  const { slug } = useLocalSearchParams();
-  if (!slug) {
-    return router.replace("/NewGame");
-  }
-  let playerClass: PlayerClassOptions;
-
-  if (isPlayerClassOptions(slug[0])) {
-    playerClass = slug[0];
-  } else {
-    return <Text>{`Invalid player class option: ${slug[0]}`}</Text>;
-  }
-  const blessing = slug[1];
   const [sex, setSex] = useState<"male" | "female">();
   const { colorScheme } = useColorScheme();
+  const { classSelection } = useNewGameStore();
+  if (!classSelection) {
+    router.back();
+    router.back();
+    return;
+  }
 
   let sexRef = useRef<"male" | "female">();
   const vibration = useVibration();
   const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
 
-  const gameState = useGameStore();
+  const { gameState } = useRootStore();
   const isFocused = useIsFocused();
 
   return (
@@ -58,8 +53,8 @@ export default function SetSex() {
       <View className="flex-1 items-center">
         <Text className="mt-[6vh] text-center text-2xl md:text-3xl">
           Set the sex of your{" "}
-          <Text style={{ color: playerClassColors[playerClass] }}>
-            {toTitleCase(playerClass)}
+          <Text style={{ color: playerClassColors[classSelection] }}>
+            {toTitleCase(classSelection)}
           </Text>
         </Text>
         <View className="mt-[12vh] flex w-full flex-row justify-evenly">
@@ -82,7 +77,7 @@ export default function SetSex() {
                   <Foundation
                     name="male-symbol"
                     size={90}
-                    color={playerClassColors[playerClass]}
+                    color={playerClassColors[classSelection]}
                   />
                 </View>
                 <Text className="text-center text-lg">Male</Text>
@@ -108,7 +103,7 @@ export default function SetSex() {
                   <Foundation
                     name="female-symbol"
                     size={90}
-                    color={playerClassColors[playerClass]}
+                    color={playerClassColors[classSelection]}
                   />
                 </View>
                 <Text className="text-center text-lg">Female</Text>
@@ -121,9 +116,7 @@ export default function SetSex() {
             <GenericFlatButton
               onPress={() => {
                 vibration({ style: "light" });
-                router.push(
-                  `/NewGame/SetName/${playerClass}/${blessing}/${sexRef.current}`,
-                );
+                router.push(`/NewGame/NameSelect`);
               }}
             >
               Next

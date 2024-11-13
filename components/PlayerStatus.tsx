@@ -53,7 +53,6 @@ const PlayerStatus = observer(
     classname,
   }: PlayerStatusProps) => {
     const { playerState, gameState, uiStore } = useRootStore();
-    let { playerStatusIsCompact, detailedStatusViewShowing } = uiStore;
     const [readableGold, setReadableGold] = useState(
       playerState?.getReadableGold(),
     );
@@ -101,8 +100,6 @@ const PlayerStatus = observer(
       outputRange: ["transparent", "rgba(180,30,30,0.4)"],
     });
 
-    const isFocused = useIsFocused();
-
     useEffect(() => {
       if (playerState?.getTotalAllocatedPoints() == 0) {
         setRespeccing(false);
@@ -134,19 +131,6 @@ const PlayerStatus = observer(
         startHealthWarningAnimation();
       }
     }, [pathname, showingHealthWarningPulse]);
-
-    useEffect(() => {
-      if (playerState && isFocused) {
-        playerStatusIsCompact =
-          playerState.conditions.length > 0 ||
-          !hideGold ||
-          playerState.unAllocatedSkillPoints > 0;
-      }
-    }, [
-      playerState?.conditions,
-      playerState?.unAllocatedSkillPoints,
-      pathname,
-    ]);
 
     useEffect(() => {
       if (
@@ -614,7 +598,7 @@ const PlayerStatus = observer(
     }
 
     if (playerState) {
-      const preprop = !detailedStatusViewShowing
+      const preprop = !uiStore.playerStatusIsCompact
         ? home
           ? `${positioning} -mt-7 z-top w-full`
           : `${positioning} mt-2 z-top w-full`
@@ -630,8 +614,8 @@ const PlayerStatus = observer(
       return (
         <>
           <GenericModal
-            isVisibleCondition={detailedStatusViewShowing}
-            backFunction={() => (detailedStatusViewShowing = false)}
+            isVisibleCondition={uiStore.detailedStatusViewShowing}
+            backFunction={() => uiStore.setDetailedStatusViewShowing(false)}
             size={95}
           >
             <View>
@@ -759,13 +743,13 @@ const PlayerStatus = observer(
           <Pressable
             onPress={() => {
               vibration({ style: "light" });
-              detailedStatusViewShowing = true;
+              uiStore.setPlayerStatusCompact(true);
             }}
             className={filled}
           >
             {colorAndPlatformDependantBlur(
               <View className="flex px-2">
-                {!playerStatusIsCompact && (
+                {!uiStore.playerStatusIsCompact && (
                   <View className="flex h-7 flex-row justify-center">
                     {!hideGold && (
                       <View className="flex flex-row my-auto">
@@ -832,7 +816,9 @@ const PlayerStatus = observer(
             )}
             <View
               className={`${
-                playerStatusIsCompact ? "ml-4" : "justify-center w-full mr-8"
+                uiStore.playerStatusIsCompact
+                  ? "ml-4"
+                  : "justify-center w-full mr-8"
               } flex flex-row absolute z-top`}
             >
               {showingGoldChange &&

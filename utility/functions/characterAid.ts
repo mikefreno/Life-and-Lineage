@@ -43,11 +43,11 @@ export function getSexFromName(firstName: string) {
   return res?.sex ?? "male";
 }
 export function getStartingBaseStats({
-  playerClass,
+  classSelection,
 }: {
-  playerClass: PlayerClassOptions;
+  classSelection: PlayerClassOptions;
 }) {
-  switch (playerClass) {
+  switch (classSelection) {
     case PlayerClassOptions.necromancer:
       return {
         baseHealth: 80,

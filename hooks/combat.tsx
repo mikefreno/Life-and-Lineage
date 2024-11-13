@@ -4,10 +4,8 @@ import { AttackUse, TutorialOption } from "../utility/types";
 import { toTitleCase, wait } from "../utility/functions/misc";
 import {
   useCombatState,
-  useDungeonCore,
   useEnemyAnimation,
   useLootState,
-  useMapState,
   useTutorialState,
 } from "../stores/DungeonData";
 import { useRootStore } from "./stores";
@@ -21,8 +19,8 @@ import { Spell } from "../entities/spell";
 
 export const useEnemyManagement = () => {
   const { enemyStore, playerState, gameState, dungeonStore } = useRootStore();
-  const { slug, instanceName, thisDungeon, thisInstance, level } =
-    useDungeonCore();
+  const { fightingBoss, currentInstance, currentLevel } = dungeonStore;
+
   const {
     setEnemyAttackDummy,
     setEnemyTextString,
@@ -34,8 +32,6 @@ export const useEnemyManagement = () => {
   const { setDroppedItems } = useLootState();
   const { setShouldShowFirstBossKillTutorialAfterItemDrops } =
     useTutorialState();
-  const { tiles, mapDimensions, currentPosition } = useMapState();
-  const { fightingBoss, setFightingBoss } = useCombatState();
 
   const enemyDeathHandler = useCallback(() => {
     if (enemyStore.enemies.length == 0 || !playerState || !gameState)
@@ -60,19 +56,19 @@ export const useEnemyManagement = () => {
         setDroppedItems({ itemDrops, gold, storyDrops });
       }
 
-      if (fightingBoss && gameState && thisDungeon) {
-        setFightingBoss(false);
-        thisDungeon.setBossDefeated();
-        dungeonStore.openNextDungeonLevel(thisInstance);
+      if (fightingBoss && gameState && currentLevel && currentInstance) {
+        dungeonStore.setInBossFight(false);
+        currentLevel.setBossDefeated();
+        dungeonStore.openNextDungeonLevel(currentInstance);
         playerState.bossDefeated();
         if (!gameState.tutorialsShown[TutorialOption.firstBossKill]) {
           setShouldShowFirstBossKillTutorialAfterItemDrops(true);
         }
       }
 
-      if (instanceName === "Personal") {
-        playerState.killCharacter({ name: slug[2] });
-      }
+      //if (currentInstance=== "Personal") {
+      //playerState.killCharacter({ name: slug[2] });
+      //}
 
       enemyStore.enemies = [];
       setEnemyAttackDummy(0);
@@ -86,7 +82,6 @@ export const useEnemyManagement = () => {
     playerState,
     gameState,
     fightingBoss,
-    thisDungeon,
     thisInstance,
     instanceName,
     slug,

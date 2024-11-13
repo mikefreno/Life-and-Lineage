@@ -1,12 +1,14 @@
-import bosses from "../assets/json/bosses.json";
 import { Enemy } from "./creatures";
-import { action, makeObservable, observable } from "mobx";
-import { BeingType } from "../utility/types";
+import { action, computed, makeObservable, observable } from "mobx";
 import { DungeonStore } from "../stores/DungeonStore";
+import enemiesJSON from "../assets/json/enemy.json";
+import bossesJSON from "../assets/json/bosses.json";
+import type { BeingType } from "../utility/types";
 
 interface DungeonLevelOptions {
   level: number;
-  boss: string[];
+  bossEncounter: { name: string; scaler: number }[];
+  normalEncounters: { name: string; scaler: number }[][];
   tiles: number;
   unlocked?: boolean;
   bossDefeated?: boolean;
@@ -88,7 +90,8 @@ export class DungeonInstance {
  */
 export class DungeonLevel {
   readonly level: number;
-  readonly boss: string[];
+  readonly bossEncounter: { name: string; scaler: number }[];
+  readonly normalEncounters: { name: string; scaler: number }[][];
   readonly tiles: number;
   unlocked: boolean;
   bossDefeated: boolean;
@@ -96,21 +99,24 @@ export class DungeonLevel {
 
   constructor({
     level,
-    boss,
+    bossEncounter,
+    normalEncounters,
     tiles,
     bossDefeated,
     unlocked,
     dungeonStore,
   }: DungeonLevelOptions) {
     this.level = level;
-    this.boss = boss;
+    this.bossEncounter = bossEncounter;
+    this.normalEncounters = normalEncounters;
     this.tiles = tiles;
     this.unlocked = unlocked ?? false;
     this.bossDefeated = bossDefeated ?? false;
     this.dungeonStore = dungeonStore;
     makeObservable(this, {
       bossDefeated: observable,
-      getBoss: action,
+      generateBossEncounter: computed,
+      generateNormalEncounter: computed,
       setBossDefeated: action,
     });
   }
@@ -123,52 +129,95 @@ export class DungeonLevel {
     this.bossDefeated = true;
   }
 
-  public getBoss(instanceName: string): Enemy {
-    const bossObjects = this.boss.map((bossName) =>
-      bosses.find((bossObj) => bossObj.name === bossName),
-    );
-
-    if (!bossObjects || bossObjects.length === 0) {
-      throw new Error(
-        `No boss found in getBoss() on DungeonLevel, looking for ${this.boss} in ${instanceName}`,
-      );
-    }
-    const [mainBoss, ...minions] = bossObjects;
-    if (!mainBoss) {
-      throw new Error(
-        `Main boss object not found in getBoss() on DungeonLevel, looking for ${this.boss} in ${instanceName}`,
-      );
-    }
-    const boss = new Enemy({
-      beingType: mainBoss.beingType as BeingType,
-      creatureSpecies: mainBoss.name,
-      currentHealth: mainBoss.health,
-      baseHealth: mainBoss.health,
-      currentSanity: mainBoss.sanity,
-      baseSanity: mainBoss.sanity,
-      attackPower: mainBoss.attackPower,
-      currentMana: mainBoss.energy.maximum,
-      baseMana: mainBoss.energy.maximum,
-      manaRegen: mainBoss.energy.regen,
-      attackStrings: mainBoss.attacks,
-      spellStrings: mainBoss.spells,
-      baseArmor: mainBoss.armorValue,
-      enemyStore: this.dungeonStore.root.enemyStore,
-    });
-
-    minions.forEach((minion) => {
-      if (minion) {
-        boss.createMinion(minion.name);
+  get generateNormalEncounter(): Enemy[] {
+    const fightIdx = Math.random() * this.normalEncounters.length;
+    const enemiesSpec = this.normalEncounters[fightIdx];
+    const enemies = enemiesSpec.map((enemySpec) => {
+      let enemyJSON = enemiesJSON.find((json) => json.name == enemySpec.name);
+      if (!enemyJSON) {
+        throw new Error(`missing enemy: ${enemySpec.name}`);
       }
-    });
+      if (enemySpec.scaler != 1) {
+        enemyJSON.goldDropRange.minimum *= enemySpec.scaler;
+        enemyJSON.goldDropRange.maximum *= enemySpec.scaler;
+        enemyJSON.healthRange.minimum *= enemySpec.scaler;
+        enemyJSON.healthRange.maximum *= enemySpec.scaler;
+        enemyJSON.attackPowerRange.minimum *= enemySpec.scaler;
+        enemyJSON.attackPowerRange.maximum *= enemySpec.scaler;
+      }
+      const hp =
+        Math.floor(
+          Math.random() *
+            (enemyJSON.healthRange.maximum - enemyJSON.healthRange.minimum + 1),
+        ) + enemyJSON.healthRange.minimum;
+      const ap =
+        Math.floor(
+          Math.random() *
+            (enemyJSON.attackPowerRange.maximum -
+              enemyJSON.attackPowerRange.minimum +
+              1),
+        ) + enemyJSON.attackPowerRange.minimum;
 
-    return boss;
+      return new Enemy({
+        beingType: enemyJSON.beingType as BeingType,
+        creatureSpecies: enemyJSON.name,
+        currentHealth: hp,
+        baseHealth: hp,
+        currentSanity: enemyJSON.sanity,
+        baseSanity: enemyJSON.sanity,
+        attackPower: ap,
+        baseArmor: enemyJSON.armorValue,
+        currentEnergy: enemyJSON.energy.maximum,
+        baseEnergy: enemyJSON.energy.maximum,
+        energyRegen: enemyJSON.energy.regen,
+        attackStrings: enemyJSON.attackStrings,
+        spellStrings: enemyJSON.spellStrings,
+        enemyStore: this.dungeonStore.root.enemyStore,
+      });
+    });
+    console.log(enemies);
+    return enemies;
+  }
+
+  get generateBossEncounter(): Enemy[] {
+    const bosses = this.bossEncounter.map((bossSpec) => {
+      let bossJSON = bossesJSON.find((json) => json.name == bossSpec.name);
+      if (!bossJSON) {
+        throw new Error(`missing enemy: ${bossSpec.name}`);
+      }
+      if (bossSpec.scaler != 1) {
+        bossJSON.goldDropRange.minimum *= bossSpec.scaler;
+        bossJSON.goldDropRange.maximum *= bossSpec.scaler;
+        bossJSON.health *= bossSpec.scaler;
+        bossJSON.energy.maximum *= bossSpec.scaler;
+        bossJSON.energy.regen *= bossSpec.scaler;
+      }
+      return new Enemy({
+        beingType: bossJSON.beingType as BeingType,
+        creatureSpecies: bossJSON.name,
+        currentHealth: bossJSON.health,
+        baseHealth: bossJSON.health,
+        currentSanity: bossJSON.sanity,
+        baseSanity: bossJSON.sanity,
+        attackPower: bossJSON.attackPower,
+        baseArmor: bossJSON.armorValue,
+        currentEnergy: bossJSON.energy.maximum,
+        baseEnergy: bossJSON.energy.maximum,
+        energyRegen: bossJSON.energy.regen,
+        attackStrings: bossJSON.attackStrings,
+        spellStrings: bossJSON.spellStrings,
+        enemyStore: this.dungeonStore.root.enemyStore,
+      });
+    });
+    console.log(bosses);
+    return bosses;
   }
 
   static fromJSON(json: any): DungeonLevel {
     const level = new DungeonLevel({
       level: json.level,
-      boss: json.boss,
+      bossEncounter: json.bossEncounter,
+      normalEncounters: json.normalEncounters,
       tiles: json.tiles,
       bossDefeated: json.bossDefeated,
       unlocked: json.unlocked ? json.unlocked : json.level == 1 ? true : false,

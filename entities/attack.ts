@@ -104,11 +104,11 @@ export class Attack {
         maxHealth:
           "nonConditionalMaxHealth" in this.user // done due to different attributes on different classes
             ? this.user.nonConditionalMaxHealth
-            : this.user.maxHealth,
+            : this.user.baseHealth,
         maxSanity:
           "nonConditionalMaxHealth" in this.user
             ? this.user.nonConditionalMaxSanity
-            : this.user.maxSanity,
+            : this.user.baseSanity,
         applierNameString: this.userNameReference,
         applierID: this.user.id,
       });
@@ -150,11 +150,11 @@ export class Attack {
           enemyMaxHP:
             "nonConditionalMaxHealth" in target // done due to different attributes on different classes
               ? target.nonConditionalMaxHealth
-              : target.maxHealth,
+              : target.baseHealth,
           enemyMaxSanity:
             "nonConditionalMaxHealth" in target
               ? target.nonConditionalMaxSanity
-              : target.maxSanity,
+              : target.baseSanity,
           primaryAttackDamage: this.baseDamage * damageMult + damageFlat,
           applierNameString: this.userNameReference,
           applierID: this.user.id,
@@ -226,7 +226,7 @@ export class Attack {
     if (this.user.isStunned) {
       return false;
     }
-    if ("energy" in this.user && this.user.energy < this.energyCost) {
+    if ("baseEnergy" in this.user && this.user.baseEnergy < this.energyCost) {
       return false;
     }
     return true;
@@ -322,7 +322,10 @@ export class Attack {
                 // currently there are no poisons used by enemies, so this will never be triggered
                 target.damageMana(effect.amount);
               } else {
-                target.damageEnergy(effect.amount);
+                target.damageEnergy({
+                  damage: effect.amount,
+                  attackerId: this.user.id,
+                });
               }
               break;
             case "sanity":

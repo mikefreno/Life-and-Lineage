@@ -3,13 +3,8 @@ import { Dimensions, View } from "react-native";
 import GenericRaisedButton from "../GenericRaisedButton";
 import { useColorScheme } from "nativewind";
 import PlatformDependantBlurView from "../PlatformDependantBlurView";
-import {
-  TILE_SIZE,
-  useDungeonCore,
-  useMapState,
-} from "../../stores/DungeonData";
-import { useUIStore } from "../../hooks/stores";
-import { useEnemyManagement } from "../../hooks/combat";
+import { useDungeonStore, useUIStore } from "../../hooks/stores";
+import { TILE_SIZE } from "../../stores/DungeonStore";
 
 /**
  * Represents a tile in the dungeon map.
@@ -172,10 +167,14 @@ export const getBoundingBox = (
  * Renders the dungeon map made by `generateTiles`.
  */
 export const DungeonMapRender = () => {
-  const { mapDimensions, currentPosition, tiles } = useMapState();
   const { colorScheme } = useColorScheme();
   const strokeWidth = 1;
+  const { currentPosition, currentMap, currentMapDimensions } =
+    useDungeonStore();
 
+  if (!currentMapDimensions || !currentMap) {
+    throw new Error("Missing map, or map dimensions within map render!");
+  }
   /**
    * Gets the fill color for a tile based on its state and the color scheme.
    * @param {Tile} tile - The tile to get the fill color for.
@@ -209,8 +208,8 @@ export const DungeonMapRender = () => {
     return (
       <Rect
         key={`${tile.x}-${tile.y}`}
-        x={tile.x - mapDimensions.offsetX}
-        y={tile.y - mapDimensions.offsetY}
+        x={tile.x - currentMapDimensions.offsetX}
+        y={tile.y - currentMapDimensions.offsetY}
         width={TILE_SIZE}
         height={TILE_SIZE}
         fill={getFillColor(tile)}
@@ -228,10 +227,10 @@ export const DungeonMapRender = () => {
   const yOrigin = windowHeight * 0.2 - TILE_SIZE / 2;
   // Distance from map's top left piece
   const offsetX = currentPosition
-    ? currentPosition.x - mapDimensions.offsetX
+    ? currentPosition.x - currentMapDimensions.offsetX
     : 0;
   const offsetY = currentPosition
-    ? currentPosition.y - mapDimensions.offsetY
+    ? currentPosition.y - currentMapDimensions.offsetY
     : 0;
 
   return (
@@ -244,13 +243,13 @@ export const DungeonMapRender = () => {
         }}
       >
         <Svg
-          width={mapDimensions.width}
-          height={mapDimensions.height}
+          width={currentMapDimensions.width}
+          height={currentMapDimensions.height}
           viewBox={`${-strokeWidth / 2} ${-strokeWidth / 2} ${
-            mapDimensions.width + strokeWidth
-          } ${mapDimensions.height + strokeWidth}`}
+            currentMapDimensions.width + strokeWidth
+          } ${currentMapDimensions.height + strokeWidth}`}
         >
-          {tiles.map((tile) => renderTile(tile))}
+          {currentMap.map((tile) => renderTile(tile))}
         </Svg>
       </View>
     </View>
@@ -261,11 +260,14 @@ export const DungeonMapRender = () => {
  * Renders the controls for moving around the dungeon.
  */
 export const DungeonMapControls = () => {
-  const { currentPosition, setCurrentPosition, tiles, setTiles } =
-    useMapState();
-  const { setInCombat } = useDungeonCore();
+  const { currentPosition, currentMap, updateCurrentPosition } =
+    useDungeonStore();
+
+  if (!currentPosition || !currentMap) {
+    throw new Error("Missing map, or current position within control handler!");
+  }
+
   const { dimensions } = useUIStore();
-  const { loadBoss, getEnemy } = useEnemyManagement();
 
   const isMoveValid = (direction: keyof typeof directionsMapping) => {
     if (!currentPosition) return false;
@@ -274,7 +276,9 @@ export const DungeonMapControls = () => {
     const newX = currentPosition.x + x * TILE_SIZE;
     const newY = currentPosition.y + y * TILE_SIZE;
 
-    const newTile = tiles.find((tile) => tile.x === newX && tile.y === newY);
+    const newTile = currentMap.find(
+      (tile) => tile.x === newX && tile.y === newY,
+    );
 
     return !!newTile;
   };
@@ -288,14 +292,12 @@ export const DungeonMapControls = () => {
     const newX = currentPosition.x + x * TILE_SIZE;
     const newY = currentPosition.y + y * TILE_SIZE;
 
-    const newPosition = tiles.find(
+    const newPosition = currentMap.find(
       (tile) => tile.x === newX && tile.y === newY,
     );
 
     if (newPosition) {
-      setCurrentPosition(newPosition);
-
-      const updatedTiles = tiles.map((tile) =>
+      const updatedTiles = currentMap.map((tile) =>
         tile.x === newPosition.x && tile.y === newPosition.y
           ? { ...tile, clearedRoom: true }
           : tile,

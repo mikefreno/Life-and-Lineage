@@ -2,7 +2,7 @@ import { Pressable, ScrollView, View } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
 import "../../assets/styles/globals.css";
 import { useLayoutEffect, useState } from "react";
-import { Link } from "expo-router";
+import { router } from "expo-router";
 import { FontAwesome5 } from "@expo/vector-icons";
 import TutorialModal from "../../components/TutorialModal";
 import {
@@ -11,7 +11,7 @@ import {
   RangerIcon,
   WizardHat,
 } from "../../assets/icons/SVGIcons";
-import { TutorialOption } from "../../utility/types";
+import { PlayerClassOptions, TutorialOption } from "../../utility/types";
 import { ClassDescriptionMap } from "../../utility/descriptions";
 import GenericModal from "../../components/GenericModal";
 import { wait } from "../../utility/functions/misc";
@@ -19,15 +19,15 @@ import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
 import { useColorScheme } from "nativewind";
 import { useVibration } from "../../hooks/generic";
-import { useGameStore, useUIStore } from "../../hooks/stores";
+import { useRootStore, useUIStore } from "../../hooks/stores";
+import GenericFlatButton from "../../components/GenericFlatButton";
+import { useNewGameStore } from "./_layout";
 
 const SetClassScreen = observer(() => {
-  const [selectedClass, setSelectedClass] = useState<
-    "mage" | "necromancer" | "paladin" | "ranger"
-  >();
   const vibration = useVibration();
+  const { classSelection, setClassSelection } = useNewGameStore();
 
-  const gameState = useGameStore();
+  const { gameState } = useRootStore();
   const { dimensions } = useUIStore();
   const { colorScheme } = useColorScheme();
 
@@ -98,7 +98,7 @@ const SetClassScreen = observer(() => {
               className="-ml-2"
               onPress={() => {
                 vibration({ style: "light" });
-                setSelectedClass("mage");
+                setClassSelection(PlayerClassOptions.mage);
               }}
               style={{
                 height: dimensions.window.height * 0.25,
@@ -108,7 +108,7 @@ const SetClassScreen = observer(() => {
               {({ pressed }) => (
                 <View
                   className={`${
-                    pressed || selectedClass == "mage"
+                    pressed || classSelection == PlayerClassOptions.mage
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
                   } w-full h-full border flex items-center justify-center`}
@@ -132,7 +132,7 @@ const SetClassScreen = observer(() => {
               className="-mr-2"
               onPress={() => {
                 vibration({ style: "light" });
-                setSelectedClass("ranger");
+                setClassSelection(PlayerClassOptions.ranger);
               }}
               style={{
                 height: dimensions.window.height * 0.25,
@@ -142,7 +142,7 @@ const SetClassScreen = observer(() => {
               {({ pressed }) => (
                 <View
                   className={`${
-                    pressed || selectedClass == "ranger"
+                    pressed || classSelection == PlayerClassOptions.ranger
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
                   } w-full h-full border flex items-center justify-center`}
@@ -166,7 +166,7 @@ const SetClassScreen = observer(() => {
               className="-ml-2"
               onPress={() => {
                 vibration({ style: "light" });
-                setSelectedClass("necromancer");
+                setClassSelection(PlayerClassOptions.necromancer);
               }}
               style={{
                 height: dimensions.window.height * 0.25,
@@ -176,7 +176,7 @@ const SetClassScreen = observer(() => {
               {({ pressed }) => (
                 <View
                   className={`${
-                    pressed || selectedClass == "necromancer"
+                    pressed || classSelection == PlayerClassOptions.necromancer
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
                   } w-full h-full border flex items-center justify-center`}
@@ -202,7 +202,7 @@ const SetClassScreen = observer(() => {
               className="-mr-2"
               onPress={() => {
                 vibration({ style: "light" });
-                setSelectedClass("paladin");
+                setClassSelection(PlayerClassOptions.paladin);
               }}
               style={{
                 height: dimensions.window.height * 0.25,
@@ -212,7 +212,7 @@ const SetClassScreen = observer(() => {
               {({ pressed }) => (
                 <View
                   className={`${
-                    pressed || selectedClass == "paladin"
+                    pressed || classSelection == PlayerClassOptions.paladin
                       ? "rounded-lg border-zinc-900 dark:border-zinc-50"
                       : "border-transparent"
                   } w-full h-full border flex items-center justify-center`}
@@ -236,19 +236,18 @@ const SetClassScreen = observer(() => {
             </Pressable>
           </View>
           <Text className="mt-[2vh] h-16 text-center md:text-lg">
-            {selectedClass && ClassDescriptionMap[selectedClass]}
+            {classSelection && ClassDescriptionMap[classSelection]}
           </Text>
-          {selectedClass && (
+          {classSelection && (
             <View className="mx-auto py-4 pb-[10vh]">
-              <Link
-                href={{
-                  pathname: "/NewGame/SetBlessing/[slug]",
-                  params: { slug: selectedClass },
+              <GenericFlatButton
+                onPress={() => {
+                  vibration({ style: "light" });
+                  router.push(`/NewGame/BlessingSelect`);
                 }}
-                className="mx-auto rounded-xl border border-zinc-900 px-6 py-2 dark:border-zinc-50"
               >
                 <Text>Next</Text>
-              </Link>
+              </GenericFlatButton>
             </View>
           )}
         </View>

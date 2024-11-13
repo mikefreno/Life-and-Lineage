@@ -1,43 +1,41 @@
-import { ThemedView, Text } from "../../components/Themed";
+import { ThemedView, Text } from "../components/Themed";
 import { View, Platform } from "react-native";
 import { useRef, useEffect, useState } from "react";
 import { Pressable } from "react-native";
 import { Stack } from "expo-router";
-import BattleTab from "../../components/DungeonComponents/BattleTab";
-import { toTitleCase } from "../../utility/functions/misc";
-import PlayerStatus from "../../components/PlayerStatus";
-import ProgressBar from "../../components/ProgressBar";
+import BattleTab from "../components/DungeonComponents/BattleTab";
+import { toTitleCase } from "../utility/functions/misc";
+import PlayerStatus from "../components/PlayerStatus";
+import ProgressBar from "../components/ProgressBar";
 import { observer } from "mobx-react-lite";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
-import TutorialModal from "../../components/TutorialModal";
-import GenericModal from "../../components/GenericModal";
-import BattleTabControls from "../../components/DungeonComponents/BattleTabControls";
-import FleeModal from "../../components/DungeonComponents/FleeModal";
-import TargetSelection from "../../components/DungeonComponents/TargetSelection";
-import DroppedItemsModal from "../../components/DungeonComponents/DroppedItemsModal";
-import LeftBehindItemsModal from "../../components/DungeonComponents/LeftBehindItemsModal";
-import { SackIcon } from "../../assets/icons/SVGIcons";
-import { TutorialOption } from "../../utility/types";
+import TutorialModal from "../components/TutorialModal";
+import GenericModal from "../components/GenericModal";
+import BattleTabControls from "../components/DungeonComponents/BattleTabControls";
+import FleeModal from "../components/DungeonComponents/FleeModal";
+import TargetSelection from "../components/DungeonComponents/TargetSelection";
+import DroppedItemsModal from "../components/DungeonComponents/DroppedItemsModal";
+import LeftBehindItemsModal from "../components/DungeonComponents/LeftBehindItemsModal";
+import { SackIcon } from "../assets/icons/SVGIcons";
+import { TutorialOption } from "../utility/types";
 import { useIsFocused } from "@react-navigation/native";
 import {
   DungeonProvider,
   useCombatState,
-  useDungeonCore,
   useLootState,
-} from "../../stores/DungeonData";
-import DungeonEnemyDisplay from "../../components/DungeonComponents/DungeonEnemyDisplay";
-import { DungeonMapRender } from "../../components/DungeonComponents/DungeonMap";
-import { StatsDisplay } from "../../components/StatsDisplay";
-import { useRootStore } from "../../hooks/stores";
-import { usePouch } from "../../hooks/generic";
+} from "../stores/DungeonData";
+import DungeonEnemyDisplay from "../components/DungeonComponents/DungeonEnemyDisplay";
+import { DungeonMapRender } from "../components/DungeonComponents/DungeonMap";
+import { StatsDisplay } from "../components/StatsDisplay";
+import { useRootStore } from "../hooks/stores";
+import { usePouch } from "../hooks/generic";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
-  const { playerState, gameState, enemyStore } = useRootStore();
+  const { playerState, gameState, enemyStore, dungeonStore } = useRootStore();
+  const { currentLevel, currentInstance, inCombat } = dungeonStore;
 
-  const { firstLoad, thisDungeon, thisInstance, slug, level, inCombat } =
-    useDungeonCore();
   const { setInventoryFullNotifier, displayItem, setDisplayItem } =
     useLootState();
   const { showTargetSelection, setShowTargetSelection } = useCombatState();
@@ -62,7 +60,7 @@ const DungeonLevelScreen = observer(() => {
     setInventoryFullNotifier(false);
   }, [showLeftBehindItemsScreen]);
 
-  if (thisDungeon && playerState) {
+  if (currentLevel && playerState) {
     return (
       <>
         <Stack.Screen
@@ -87,12 +85,9 @@ const DungeonLevelScreen = observer(() => {
                 )}
               </Pressable>
             ),
-            title:
-              slug[0] == "Activities" || slug[0] == "Personal"
-                ? slug[1]
-                : slug[0] === "training grounds"
-                ? "Training Grounds"
-                : `${toTitleCase(thisInstance?.name as string)} Level ${level}`,
+            title: `${toTitleCase(currentInstance?.name as string)} Level ${
+              currentLevel.level
+            }`,
           }}
         />
         <TutorialModal
@@ -136,9 +131,9 @@ const DungeonLevelScreen = observer(() => {
           </>
         </GenericModal>
         <View className="flex-1" style={{ paddingBottom: 84 }}>
-          {enemyStore.enemies.length > 0 && !firstLoad ? (
+          {enemyStore.enemies.length > 0 ? (
             <DungeonEnemyDisplay />
-          ) : !inCombat && !firstLoad ? (
+          ) : !inCombat ? (
             <DungeonMapRender />
           ) : (
             <View className="flex-1 justify-center"></View>

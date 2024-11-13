@@ -93,7 +93,7 @@ export default function TabLayout() {
                 <Pressable
                   onPress={() => {
                     vibration({ style: "light" });
-                    uiStore.detailedStatusViewShowing = true;
+                    uiStore.setDetailedStatusViewShowing(true);
                   }}
                   style={[
                     {

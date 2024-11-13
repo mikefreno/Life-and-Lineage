@@ -1,290 +1,656 @@
 [
-   {
-      "name": "training dummy",
-      "beingType": "block o wood",
-      "sanity": null,
-      "healthRange": {"minimum": 9999, "maximum": 9999},
-      "attackPowerRange": {"minimum": 0, "maximum": 0},
-      "energy": {"maximum": 30, "regen": 0},
-      "attacks": ["raise skeleton"],
-      "drops": [
-         {"item": "stick", "itemType":"melee", "chance": 1.0},
-         {"item": "big stick", "itemType":"melee","chance":0.85}
-      ],
-      "goldDropRange": {"minimum": 0, "maximum":0},
-      "appearsIn": ["training grounds"],
-      "appearsOn": [0]
-   },
-   {
-      "name": "giant rat",
-      "beingType": "beast",
-      "sanity": null,
-      "healthRange": {"minimum": 20, "maximum": 50},
-      "attackPowerRange": {"minimum": 2, "maximum": 5},
-      "energy": {"maximum": 30, "regen": 5},
-      "attacks": ["bite"],
-      "drops": [
-         {"item": "patch of hair", "itemType":"junk", "chance": 0.85},
-         {"item": "rat tail", "itemType":"ingredient","chance":0.5}
-      ],
-      "goldDropRange": {"minimum": 5, "maximum":15},
-      "appearsIn": ["nearby cave"],
-      "appearsOn": [1,2]
-   },
-   {
-      "name": "bat",
-      "beingType": "beast",
-      "sanity": null,
-      "healthRange": {"minimum": 10, "maximum": 20},
-      "attackPowerRange": {"minimum": 3, "maximum": 8},
-      "energy": {"maximum": 30, "regen": 5},
-      "attacks": ["vampiric bite"],
-      "drops": [
-         {"item": "bat wing", "itemType":"ingredient","chance":0.75},
-         {"item": "vampiric tooth", "itemType":"junk", "chance": 0.5}
-      ],
-      "goldDropRange": {"minimum": 5, "maximum":20},
-      "appearsIn": ["nearby cave"],
-      "appearsOn": [1,2]
-   },
-   {
-      "name": "skeleton",
-      "beingType": "undead",
-      "sanity": null,
-      "healthRange": {"minimum": 40, "maximum": 60},
-      "attackPowerRange": {"minimum": 4, "maximum": 8},
-      "energy": {"maximum": 50, "regen": 5},
-      "attacks": ["stab", "cleave"],
-      "drops": [
-         {"item": "bone", "itemType":"ingredient","chance":0.75},
-         {"item": "bone", "itemType":"ingredient","chance":0.75},
-         {"item": "dagger", "itemType":"melee","chance":0.10}
-      ],
-      "armorValue": 10,
-      "goldDropRange": {"minimum": 10, "maximum":20},
-      "appearsIn": ["nearby cave"],
-      "appearsOn": [2,3]
-   },
-   {
-      "name": "skeleton archer",
-      "beingType": "undead",
-      "sanity": null,
-      "healthRange": {"minimum": 30, "maximum": 50},
-      "attackPowerRange": {"minimum": 4, "maximum": 8},
-      "energy": {"maximum": 50, "regen": 5},
-      "attacks": ["shoot"],
-      "drops": [
-         {"item": "bone", "itemType":"ingredient","chance":0.75},
-         {"item": "iron arrow", "itemType":"arrow", "chance": 0.5},
-         {"item": "iron arrow", "itemType":"arrow", "chance": 0.5},
-         {"item": "iron arrow", "itemType":"arrow", "chance": 0.5},
-         {"item": "iron arrow", "itemType":"arrow", "chance": 0.5},
-         {"item": "iron arrow", "itemType":"arrow", "chance": 0.5},
-         {"item": "short bow", "itemType":"bow", "chance": 0.075}
-      ],
-      "goldDropRange": {"minimum": 15, "maximum":25},
-      "armorValue": 10,
-      "appearsIn": ["nearby cave"],
-      "appearsOn": [2,3]
-   },
-   {
-      "name": "zombie",
-      "beingType": "undead",
-      "sanity": null,
-      "healthRange": {"minimum": 40, "maximum": 60},
-      "attackPowerRange": {"minimum": 5, "maximum": 10},
-      "energy": {"maximum": 50, "regen": 5},
-      "attacks": ["grab", "zombie bite"],
-      "drops": [
-         {"item": "chunk of flesh", "itemType":"junk","chance":0.75},
-         {"item": "chunk of flesh", "itemType":"junk","chance":0.75}
-      ],
-      "goldDropRange": {"minimum": 20, "maximum":25},
-      "appearsIn": ["nearby cave"],
-      "appearsOn": [3]
-   },
-   {
-      "name": "ghost",
-      "beingType": "undead",
-      "sanity": null,
-      "healthRange": {"minimum": 30, "maximum": 55},
-      "attackPowerRange": {"minimum": 0, "maximum": 0},
-      "energy": {"maximum": 25, "regen": 5},
-      "attacks": ["wail"],
-      "drops": [
-         {"item": "ghostly residue", "itemType":"ingredient","chance":0.5}
-      ],
-      "goldDropRange": {"minimum": 0, "maximum":0},
-      "appearsIn": ["nearby cave"],
-      "appearsOn": [2,3]
-   },
-   {
-      "name": "goblin",
-      "beingType": "demi-human",
-      "sanity": null,
-      "healthRange": {"minimum": 50, "maximum": 70},
-      "attackPowerRange": {"minimum": 5, "maximum": 10},
-      "energy": {"maximum": 50, "regen": 5},
-      "attacks": ["stab", "pocket sand", "rock throw", "torch stab"],
-      "drops": [
-         {"item": "dagger", "itemType":"melee","chance":0.10},
-         {"item": "torch", "itemType":"melee", "chance": 0.10}
-      ],
-      "goldDropRange": {"minimum": 35, "maximum":65},
-      "armorValue": 10,
-      "appearsIn": ["goblin cave"],
-      "appearsOn": [1,2]
-   },
-   {
-      "name": "worg",
-      "beingType": "beast",
-      "sanity": null,
-      "healthRange": {"minimum": 40, "maximum": 70},
-      "attackPowerRange": {"minimum": 10, "maximum": 15},
-      "energy": {"maximum": 50, "regen": 5},
-      "attacks": ["bite", "tackle"],
-      "drops": [
-         {"item": "patch of hair", "itemType":"junk", "chance": 0.85},
-         {"item": "bone", "itemType":"ingredient","chance":0.75},
-         {"item": "bone", "itemType":"ingredient","chance":0.75}
-      ],
-      "goldDropRange": {"minimum": 40, "maximum":55},
-      "appearsIn": ["goblin cave"],
-      "appearsOn": [1,2]
-   },
-   {
-      "name": "hobgoblin",
-      "beingType": "demi-human",
-      "sanity": null,
-      "healthRange": {"minimum": 80, "maximum": 80},
-      "attackPowerRange": {"minimum": 7, "maximum": 14},
-      "energy": {"maximum": 50, "regen": 5},
-      "attacks": ["stab"],
-      "drops": [
-         {"item": "longsword", "itemType":"melee","chance":0.10}
-      ],
-      "goldDropRange": {"minimum": 35, "maximum":65},
-      "armorValue": 10,
-      "appearsIn": ["goblin cave"],
-      "appearsOn": [2]
-   },
-   {
-      "name": "goblin shaman",
-      "beingType": "demi-human",
-      "sanity": null,
-      "healthRange": {"minimum": 60, "maximum": 80},
-      "attackPowerRange": {"minimum": 15, "maximum": 20},
-      "energy": {"maximum": 50, "regen": 5},
-      "attacks": ["stab", "pocket sand", "rock throw", "torch stab"],
-      "drops": [
-         {"item": "adept robes", "itemType":"bodyArmor","chance":1.0},
-         {"item": "dagger", "itemType":"melee","chance":0.35}
-      ],
-      "goldDropRange": {"minimum": 185, "maximum":250},
-      "appearsIn": [""],
-      "appearsOn": []
-   },
-   {
-      "name": "bandit",
-      "beingType": "human",
-      "sanity": 50,
-      "healthRange": {"minimum": 50, "maximum": 75},
-      "attackPowerRange": {"minimum": 8, "maximum": 10},
-      "energy": {"maximum": 50, "regen": 3},
-      "attacks": ["stab", "pocket sand","serrate"],
-      "drops": [
-         {"item": "dagger", "itemType":"melee","chance":0.15},
-         {"item": "dagger", "itemType":"melee","chance":0.15},
-         {"item": "cheap leather chestpiece", "itemType":"bodyArmor","chance":0.15},
-         {"item": "leather headgear", "itemType":"helmet","chance":0.15}
-      ],
-      "goldDropRange": {"minimum": 30, "maximum":50},
-      "armorValue": 15,
-      "appearsIn": ["bandit hideout", "Activities"],
-      "appearsOn": [1,2, "Enchanted Forest"]
-   },
-   {
-      "name": "novice water mage",
-      "beingType": "human",
-      "sanity": 50,
-      "healthRange": {"minimum": 50, "maximum": 75},
-      "attackPowerRange": {"minimum": 15, "maximum": 20},
-      "energy": {"maximum": 40, "regen": 10},
-      "attacks": ["bonk", "frost"],
-      "drops": [],
-      "goldDropRange": {"minimum": 200, "maximum":250},
-      "appearsIn": ["rogue magi fortress"],
-      "appearsOn": [1,2,3,4]
-   },
-   {
-      "name": "novice fire mage",
-      "beingType": "human",
-      "sanity": 50,
-      "healthRange": {"minimum": 50, "maximum": 75},
-      "attackPowerRange": {"minimum": 15, "maximum": 20},
-      "energy": {"maximum": 40, "regen": 10},
-      "attacks": ["bonk", "fire bolt"],
-      "drops": [],
-      "goldDropRange": {"minimum": 200, "maximum":250},
-      "appearsIn": ["rogue magi fortress"],
-      "appearsOn": [1,2,3,4]
-   },
-   {
-      "name": "novice air mage",
-      "beingType": "human",
-      "sanity": 50,
-      "healthRange": {"minimum": 50, "maximum": 75},
-      "attackPowerRange": {"minimum": 15, "maximum": 20},
-      "energy": {"maximum": 40, "regen": 10},
-      "attacks": ["bonk", "gust"],
-      "drops": [],
-      "goldDropRange": {"minimum": 200, "maximum":250},
-      "appearsIn": ["rogue magi fortress"],
-      "appearsOn": [1,2,3,4]
-   },
-   {
-      "name": "novice earth mage",
-      "beingType": "human",
-      "sanity": 50,
-      "healthRange": {"minimum": 75, "maximum": 100},
-      "attackPowerRange": {"minimum": 12, "maximum": 16},
-      "energy": {"maximum": 40, "regen": 10},
-      "attacks": ["bonk", "rock toss"],
-      "drops": [],
-      "goldDropRange": {"minimum": 200, "maximum":250},
-      "appearsIn": ["rogue magi fortress"],
-      "appearsOn": [1,2,3,4]
-   },
-   {
-      "name": "drunkard",
-      "beingType": "human",
-      "sanity": 50,
-      "healthRange": {"minimum": 60, "maximum": 85},
-      "attackPowerRange": {"minimum": 10, "maximum": 10},
-      "energy": {"maximum": 30, "regen": 3},
-      "attacks": ["headbutt", "pocket sand", "punch", "chug beer"],
-      "drops": [
-         {"item": "beer stein", "itemType":"melee","chance": 1.0}
-      ],
-      "goldDropRange": {"minimum": 40, "maximum":100},
-      "armorValue": 5,
-      "appearsIn": ["Activities"],
-      "appearsOn": ["Local Pub", "Festival"]
-   },
-   {
-      "name": "generic npc",
-      "beingType": "human",
-      "sanity": 50,
-      "healthRange": {"minimum": 60, "maximum": 85},
-      "attackPowerRange": {"minimum": 10, "maximum": 10},
-      "energy": {"maximum": 30, "regen": 3},
-      "attacks": ["stab", "pocket sand"],
-      "drops": [
-         {"item": "dagger", "itemType":"melee","chance":0.75}
-      ],
-      "goldDropRange": {"minimum": 250, "maximum":1000},
-      "armorValue": 5,
-      "appearsIn": ["Personal"],
-      "appearsOn": ["Personal Assault"]
-   }
+  {
+    "name": "training dummy",
+    "beingType": "block o wood",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 9999,
+      "maximum": 9999
+    },
+    "attackPowerRange": {
+      "minimum": 0,
+      "maximum": 0
+    },
+    "energy": {
+      "maximum": 30,
+      "regen": 0
+    },
+    "attackStrings": [],
+    "drops": [
+      {
+        "item": "stick",
+        "itemType": "melee",
+        "chance": 1.0
+      },
+      {
+        "item": "big stick",
+        "itemType": "melee",
+        "chance": 0.85
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 0,
+      "maximum": 0
+    }
+  },
+  {
+    "name": "giant rat",
+    "beingType": "beast",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 20,
+      "maximum": 50
+    },
+    "attackPowerRange": {
+      "minimum": 2,
+      "maximum": 5
+    },
+    "energy": {
+      "maximum": 30,
+      "regen": 5
+    },
+    "attackStrings": [
+      "bite"
+    ],
+    "drops": [
+      {
+        "item": "patch of hair",
+        "itemType": "junk",
+        "chance": 0.85
+      },
+      {
+        "item": "rat tail",
+        "itemType": "ingredient",
+        "chance": 0.5
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 5,
+      "maximum": 15
+    }
+  },
+  {
+    "name": "bat",
+    "beingType": "beast",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 10,
+      "maximum": 20
+    },
+    "attackPowerRange": {
+      "minimum": 3,
+      "maximum": 8
+    },
+    "energy": {
+      "maximum": 30,
+      "regen": 5
+    },
+    "attackStrings": [
+      "vampiric bite"
+    ],
+    "drops": [
+      {
+        "item": "bat wing",
+        "itemType": "ingredient",
+        "chance": 0.75
+      },
+      {
+        "item": "vampiric tooth",
+        "itemType": "junk",
+        "chance": 0.5
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 5,
+      "maximum": 20
+    }
+  },
+  {
+    "name": "skeleton",
+    "beingType": "undead",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 40,
+      "maximum": 60
+    },
+    "attackPowerRange": {
+      "minimum": 4,
+      "maximum": 8
+    },
+    "energy": {
+      "maximum": 50,
+      "regen": 5
+    },
+    "attackStrings": [
+      "stab",
+      "cleave"
+    ],
+    "drops": [
+      {
+        "item": "bone",
+        "itemType": "ingredient",
+        "chance": 0.75
+      },
+      {
+        "item": "bone",
+        "itemType": "ingredient",
+        "chance": 0.75
+      },
+      {
+        "item": "dagger",
+        "itemType": "melee",
+        "chance": 0.10
+      }
+    ],
+    "armorValue": 10,
+    "goldDropRange": {
+      "minimum": 10,
+      "maximum": 20
+    }
+  },
+  {
+    "name": "skeleton archer",
+    "beingType": "undead",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 30,
+      "maximum": 50
+    },
+    "attackPowerRange": {
+      "minimum": 4,
+      "maximum": 8
+    },
+    "energy": {
+      "maximum": 50,
+      "regen": 5
+    },
+    "attackStrings": [
+      "shoot"
+    ],
+    "drops": [
+      {
+        "item": "bone",
+        "itemType": "ingredient",
+        "chance": 0.75
+      },
+      {
+        "item": "iron arrow",
+        "itemType": "arrow",
+        "chance": 0.5
+      },
+      {
+        "item": "iron arrow",
+        "itemType": "arrow",
+        "chance": 0.5
+      },
+      {
+        "item": "iron arrow",
+        "itemType": "arrow",
+        "chance": 0.5
+      },
+      {
+        "item": "iron arrow",
+        "itemType": "arrow",
+        "chance": 0.5
+      },
+      {
+        "item": "iron arrow",
+        "itemType": "arrow",
+        "chance": 0.5
+      },
+      {
+        "item": "short bow",
+        "itemType": "bow",
+        "chance": 0.075
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 15,
+      "maximum": 25
+    },
+    "armorValue": 10
+  },
+  {
+    "name": "zombie",
+    "beingType": "undead",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 40,
+      "maximum": 60
+    },
+    "attackPowerRange": {
+      "minimum": 5,
+      "maximum": 10
+    },
+    "energy": {
+      "maximum": 50,
+      "regen": 5
+    },
+    "attackStrings": [
+      "grab",
+      "zombie bite"
+    ],
+    "drops": [
+      {
+        "item": "chunk of flesh",
+        "itemType": "junk",
+        "chance": 0.75
+      },
+      {
+        "item": "chunk of flesh",
+        "itemType": "junk",
+        "chance": 0.75
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 20,
+      "maximum": 25
+    }
+  },
+  {
+    "name": "ghost",
+    "beingType": "undead",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 30,
+      "maximum": 55
+    },
+    "attackPowerRange": {
+      "minimum": 0,
+      "maximum": 0
+    },
+    "energy": {
+      "maximum": 25,
+      "regen": 5
+    },
+    "attackStrings": [
+      "wail"
+    ],
+    "drops": [
+      {
+        "item": "ghostly residue",
+        "itemType": "ingredient",
+        "chance": 0.5
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 0,
+      "maximum": 0
+    }
+  },
+  {
+    "name": "goblin",
+    "beingType": "demi-human",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 50,
+      "maximum": 70
+    },
+    "attackPowerRange": {
+      "minimum": 5,
+      "maximum": 10
+    },
+    "energy": {
+      "maximum": 50,
+      "regen": 5
+    },
+    "attackStrings": [
+      "stab",
+      "pocket sand",
+      "rock throw",
+      "torch stab"
+    ],
+    "drops": [
+      {
+        "item": "dagger",
+        "itemType": "melee",
+        "chance": 0.10
+      },
+      {
+        "item": "torch",
+        "itemType": "melee",
+        "chance": 0.10
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 35,
+      "maximum": 65
+    },
+    "armorValue": 10
+  },
+  {
+    "name": "worg",
+    "beingType": "beast",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 40,
+      "maximum": 70
+    },
+    "attackPowerRange": {
+      "minimum": 10,
+      "maximum": 15
+    },
+    "energy": {
+      "maximum": 50,
+      "regen": 5
+    },
+    "attackStrings": [
+      "bite",
+      "tackle"
+    ],
+    "drops": [
+      {
+        "item": "patch of hair",
+        "itemType": "junk",
+        "chance": 0.85
+      },
+      {
+        "item": "bone",
+        "itemType": "ingredient",
+        "chance": 0.75
+      },
+      {
+        "item": "bone",
+        "itemType": "ingredient",
+        "chance": 0.75
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 40,
+      "maximum": 55
+    }
+  },
+  {
+    "name": "hobgoblin",
+    "beingType": "demi-human",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 80,
+      "maximum": 80
+    },
+    "attackPowerRange": {
+      "minimum": 7,
+      "maximum": 14
+    },
+    "energy": {
+      "maximum": 50,
+      "regen": 5
+    },
+    "attackStrings": [
+      "stab"
+    ],
+    "drops": [
+      {
+        "item": "longsword",
+        "itemType": "melee",
+        "chance": 0.10
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 35,
+      "maximum": 65
+    },
+    "armorValue": 10
+  },
+  {
+    "name": "goblin shaman",
+    "beingType": "demi-human",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 60,
+      "maximum": 80
+    },
+    "attackPowerRange": {
+      "minimum": 15,
+      "maximum": 20
+    },
+    "energy": {
+      "maximum": 50,
+      "regen": 5
+    },
+    "attackStrings": [
+      "stab",
+      "pocket sand",
+      "rock throw",
+      "torch stab"
+    ],
+    "drops": [
+      {
+        "item": "adept robes",
+        "itemType": "bodyArmor",
+        "chance": 1.0
+      },
+      {
+        "item": "dagger",
+        "itemType": "melee",
+        "chance": 0.35
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 185,
+      "maximum": 250
+    }
+  },
+  {
+    "name": "bandit",
+    "beingType": "human",
+    "sanity": 50,
+    "healthRange": {
+      "minimum": 50,
+      "maximum": 75
+    },
+    "attackPowerRange": {
+      "minimum": 8,
+      "maximum": 10
+    },
+    "energy": {
+      "maximum": 50,
+      "regen": 3
+    },
+    "attackStrings": [
+      "stab",
+      "pocket sand",
+      "serrate"
+    ],
+    "drops": [
+      {
+        "item": "dagger",
+        "itemType": "melee",
+        "chance": 0.15
+      },
+      {
+        "item": "dagger",
+        "itemType": "melee",
+        "chance": 0.15
+      },
+      {
+        "item": "cheap leather chestpiece",
+        "itemType": "bodyArmor",
+        "chance": 0.15
+      },
+      {
+        "item": "leather headgear",
+        "itemType": "helmet",
+        "chance": 0.15
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 30,
+      "maximum": 50
+    },
+    "armorValue": 15
+  },
+  {
+    "name": "novice water mage",
+    "beingType": "human",
+    "sanity": 50,
+    "healthRange": {
+      "minimum": 50,
+      "maximum": 75
+    },
+    "attackPowerRange": {
+      "minimum": 15,
+      "maximum": 20
+    },
+    "energy": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [
+      "bonk",
+      "frost"
+    ],
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 200,
+      "maximum": 250
+    }
+  },
+  {
+    "name": "novice fire mage",
+    "beingType": "human",
+    "sanity": 50,
+    "healthRange": {
+      "minimum": 50,
+      "maximum": 75
+    },
+    "attackPowerRange": {
+      "minimum": 15,
+      "maximum": 20
+    },
+    "energy": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [
+      "bonk",
+      "fire bolt"
+    ],
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 200,
+      "maximum": 250
+    }
+  },
+  {
+    "name": "novice air mage",
+    "beingType": "human",
+    "sanity": 50,
+    "healthRange": {
+      "minimum": 50,
+      "maximum": 75
+    },
+    "attackPowerRange": {
+      "minimum": 15,
+      "maximum": 20
+    },
+    "energy": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [
+      "bonk",
+      "gust"
+    ],
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 200,
+      "maximum": 250
+    }
+  },
+  {
+    "name": "novice earth mage",
+    "beingType": "human",
+    "sanity": 50,
+    "healthRange": {
+      "minimum": 75,
+      "maximum": 100
+    },
+    "attackPowerRange": {
+      "minimum": 12,
+      "maximum": 16
+    },
+    "energy": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [
+      "bonk",
+      "rock toss"
+    ],
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 200,
+      "maximum": 250
+    }
+  },
+  {
+    "name": "drunkard",
+    "beingType": "human",
+    "sanity": 50,
+    "healthRange": {
+      "minimum": 60,
+      "maximum": 85
+    },
+    "attackPowerRange": {
+      "minimum": 10,
+      "maximum": 10
+    },
+    "energy": {
+      "maximum": 30,
+      "regen": 3
+    },
+    "attackStrings": [
+      "headbutt",
+      "pocket sand",
+      "punch",
+      "chug beer"
+    ],
+    "drops": [
+      {
+        "item": "beer stein",
+        "itemType": "melee",
+        "chance": 1.0
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 40,
+      "maximum": 100
+    },
+    "armorValue": 5
+  },
+  {
+    "name": "generic npc",
+    "beingType": "human",
+    "sanity": 50,
+    "healthRange": {
+      "minimum": 60,
+      "maximum": 85
+    },
+    "attackPowerRange": {
+      "minimum": 10,
+      "maximum": 10
+    },
+    "energy": {
+      "maximum": 30,
+      "regen": 3
+    },
+    "attackStrings": [
+      "stab",
+      "pocket sand"
+    ],
+    "drops": [
+      {
+        "item": "dagger",
+        "itemType": "melee",
+        "chance": 0.75
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 250,
+      "maximum": 1000
+    },
+    "armorValue": 5
+  }
 ]
+

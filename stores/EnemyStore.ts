@@ -2,7 +2,7 @@ import { parse } from "flatted";
 import { Enemy } from "../entities/creatures";
 import { storage } from "../utility/functions/storage";
 import { RootStore } from "./RootStore";
-import { makeObservable, observable } from "mobx";
+import { action, makeObservable, observable } from "mobx";
 
 export default class EnemyStore {
   enemies: Enemy[];
@@ -28,7 +28,15 @@ export default class EnemyStore {
     this.referenceMap = map;
     this.root = root;
 
-    makeObservable(this, { enemies: observable });
+    makeObservable(this, {
+      enemies: observable,
+      addToEnemyList: action,
+      clearEnemyList: action,
+    });
+  }
+
+  public clearEnemyList() {
+    this.enemies = [];
   }
 
   public addToEnemyList(enemy: Enemy) {

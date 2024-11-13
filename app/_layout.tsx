@@ -21,7 +21,6 @@ import * as Notifications from "expo-notifications";
 import { registerForPushNotificationsAsync } from "../utility/functions/notifications";
 import { AppProvider } from "../stores/AppData";
 import { useRootStore, useUIStore } from "../hooks/stores";
-import { configure } from "mobx";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -40,9 +39,6 @@ Sentry.init({
   debug: false, //__DEV__, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
 });
 
-configure({
-  enforceActions: "never", // Disables strict mode
-});
 /**
  * This wraps the entire app, loads the player data, sets up user app settings and holds&sets the `AppContext`.
  * The responsibility of this is largely around unseen app state, whereas `RootLayout` is largely concerned with UI
@@ -69,7 +65,8 @@ const RootLayout = observer(() => {
     Cursive: require("../assets/fonts/Tangerine-Regular.ttf"),
     CursiveBold: require("../assets/fonts/Tangerine-Bold.ttf"),
   });
-  const { playerState, gameState } = useRootStore();
+  const rootStore = useRootStore();
+  const { playerState, gameState } = rootStore;
 
   const { modalShowing } = useUIStore();
   const { colorScheme } = useColorScheme();
@@ -83,6 +80,10 @@ const RootLayout = observer(() => {
   const notificationListener = useRef<Notifications.Subscription>();
   const responseListener = useRef<Notifications.Subscription>();
   const pathname = usePathname();
+
+  useEffect(() => {
+    rootStore.setPathName(pathname);
+  }, [pathname]);
 
   useEffect(() => {
     if (fontLoaded) {
@@ -132,7 +133,7 @@ const RootLayout = observer(() => {
     if (fontLoaded) {
       SplashScreen.hideAsync();
       if (!playerState) {
-        router.replace("/NewGame");
+        router.replace("/NewGame/ClassSelect");
       } else if (
         gameState?.atDeathScreen ||
         (playerState &&
@@ -177,7 +178,12 @@ const RootLayout = observer(() => {
             name="(tabs)"
             options={{
               headerShown: false,
-              autoHideHomeIndicator: true,
+            }}
+          />
+          <Stack.Screen
+            name="NewGame"
+            options={{
+              headerShown: false,
             }}
           />
           <Stack.Screen
@@ -238,29 +244,6 @@ const RootLayout = observer(() => {
             })}
           />
           <Stack.Screen
-            name="NewGame/index"
-            options={headerOptions({
-              title: "Class Select",
-              headerBackTitleVisible: false,
-            })}
-          />
-          <Stack.Screen
-            name="NewGame/SetBlessing/[slug]"
-            options={headerOptions({ title: "Blessing Select" })}
-          />
-          <Stack.Screen
-            name="NewGame/SetSex/[...slug]"
-            options={headerOptions({ title: "Sex Select" })}
-          />
-          <Stack.Screen
-            name="NewGame/SetName/[...slug]"
-            options={headerOptions({ title: "Name Set" })}
-          />
-          <Stack.Screen
-            name="NewGame/Review/[...slug]"
-            options={headerOptions({ title: "Review" })}
-          />
-          <Stack.Screen
             name="DeathScreen"
             options={{
               ...headerOptions({ title: "You Died" }),
@@ -274,7 +257,7 @@ const RootLayout = observer(() => {
 });
 export default Sentry.wrap(Root);
 
-const headerOptions = ({
+export const headerOptions = ({
   colorScheme,
   blur,
   title,

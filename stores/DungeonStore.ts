@@ -4,32 +4,132 @@ import dungeonsJSON from "../assets/json/dungeons.json";
 import { storage } from "../utility/functions/storage";
 import { parse, stringify } from "flatted";
 import { throttle } from "lodash";
+import { action, makeObservable, observable } from "mobx";
+import {
+  BoundingBox,
+  Tile,
+  generateTiles,
+  getBoundingBox,
+} from "../components/DungeonComponents/DungeonMap";
+import { Dimensions } from "react-native";
 
 export class DungeonStore {
-  dungeonInstances: DungeonInstance[];
   root: RootStore;
-
+  dungeonInstances: DungeonInstance[];
   activityInstance: DungeonInstance;
+  currentInstance: DungeonInstance | undefined;
+  currentLevel: DungeonLevel | undefined;
+
+  currentMap: Tile[] | undefined;
+  currentMapDimensions: BoundingBox | undefined;
+  currentPosition: Tile | undefined;
+  inCombat: boolean;
+  fightingBoss: boolean;
 
   constructor({ root }: { root: RootStore }) {
     this.dungeonInstances = this.hydrateDungeonState();
     this.activityInstance = this.initActivityDungeon();
+    this.inCombat = false;
+    this.fightingBoss = false;
+    this.currentMap = undefined;
+    this.currentMapDimensions = undefined;
+    this.currentPosition = undefined;
+
     this.root = root;
+
+    makeObservable(this, {
+      inCombat: observable,
+      currentMap: observable.shallow,
+      currentMapDimensions: observable.shallow,
+      currentPosition: observable.shallow,
+      fightingBoss: observable,
+      setUpDungeon: action,
+      updateCurrentPosition: action,
+      move: action,
+    });
   }
 
-  public getDungeonLevel(
-    instance: string,
-    level: string,
-  ): DungeonLevel | undefined {
-    const foundInstance = this.dungeonInstances.find(
-      (dungeonInstance) => dungeonInstance.name == instance,
-    );
-    if (foundInstance) {
-      const found = foundInstance.levels.find(
-        (dungeonLevel) => dungeonLevel.level == Number(level),
+  public setInBossFight(state: boolean) {
+    this.fightingBoss = state;
+  }
+
+  public setUpDungeon(
+    instance: string | DungeonInstance,
+    level: string | DungeonLevel,
+  ) {
+    if (instance instanceof DungeonInstance && level instanceof DungeonLevel) {
+      this.currentInstance = instance;
+      this.currentLevel = level;
+    } else {
+      const foundInstance = this.dungeonInstances.find(
+        (dungeonInstance) => dungeonInstance.name == instance,
       );
-      return found;
+      if (foundInstance) {
+        this.currentInstance = foundInstance;
+        const found = foundInstance.levels.find(
+          (dungeonLevel) => dungeonLevel.level == Number(level),
+        );
+        this.currentLevel = found;
+      }
     }
+    if (!this.currentLevel) {
+      throw new Error("Failed to set up dungeon: No valid level found");
+    }
+    this.currentMap = generateTiles({
+      numTiles: this.currentLevel.tiles,
+      tileSize: TILE_SIZE,
+      bossDefeated: this.currentLevel.bossDefeated,
+    });
+    this.currentMapDimensions = getBoundingBox(this.currentMap, TILE_SIZE);
+    this.currentPosition = this.currentMap[0];
+  }
+
+  public updateCurrentPosition(tile: Tile) {
+    this.currentPosition = tile;
+  }
+
+  public move(direction: keyof typeof directionsMapping) {
+    if (!this.currentPosition || !this.currentMap) return;
+
+    const { x, y } = directionsMapping[direction];
+    const newX = this.currentPosition.x + x * TILE_SIZE;
+    const newY = this.currentPosition.y + y * TILE_SIZE;
+
+    const newPosition = this.currentMap.find(
+      (tile) => tile.x === newX && tile.y === newY,
+    );
+
+    if (newPosition) {
+      this.updateCurrentPosition(newPosition);
+      this.visitRoom(newPosition);
+
+      if (!newPosition.clearedRoom) {
+        this.inCombat = true;
+        this.fightingBoss = newPosition.isBossRoom;
+        this.setEncounter(newPosition.isBossRoom);
+      }
+    }
+  }
+
+  private visitRoom(room: Tile) {
+    if (this.currentMap) {
+      for (let tile of this.currentMap) {
+        if (tile.x == room.x && tile.y == room.y) {
+          tile.clearedRoom = true;
+        }
+      }
+    }
+  }
+
+  public setEncounter(isBossFight: boolean) {
+    if (!this.currentLevel) {
+      throw new Error("No dungeon level set!");
+    }
+    const enemies = isBossFight
+      ? this.currentLevel.generateBossEncounter
+      : this.currentLevel.generateNormalEncounter;
+    this.root.enemyStore.clearEnemyList();
+    enemies.forEach((enemy) => this.root.enemyStore.addToEnemyList(enemy));
   }
 
   public getInstance(instanceName: string) {
@@ -89,13 +189,14 @@ export class DungeonStore {
   }
 
   setActivityName(name: string) {
-    this.activityInstance.name = name;
+    this.activityInstance.name = name.replaceAll("%20", " ");
   }
 
   initActivityDungeon() {
     const activityDungeon = new DungeonLevel({
       level: 0,
-      boss: [],
+      bossEncounter: [],
+      normalEncounters: [],
       tiles: 0,
       bossDefeated: true,
       unlocked: true,
@@ -126,3 +227,15 @@ const _dungeonInstanceSave = async (dungeon: DungeonInstance | undefined) => {
 };
 
 export const saveDungeonInstance = throttle(_dungeonInstanceSave, 500);
+
+export const TILE_SIZE = Math.max(
+  Number((Dimensions.get("screen").width / 10).toFixed(0)),
+  Number((Dimensions.get("screen").height / 10).toFixed(0)),
+);
+
+const directionsMapping: Record<string, { x: number; y: number }> = {
+  up: { x: 0, y: -1 },
+  down: { x: 0, y: 1 },
+  left: { x: -1, y: 0 },
+  right: { x: 1, y: 0 },
+};

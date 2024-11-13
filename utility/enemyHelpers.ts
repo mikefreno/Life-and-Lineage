@@ -25,12 +25,17 @@ export function getNumberInRange(minimum: number, maximum: number) {
   return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
 }
 
-export function enemyGenerator(
-  instance: string,
-  level: string,
-  enemyStore: EnemyStore,
-  nameOverride?: string,
-) {
+export function enemyGenerator({
+  instance,
+  level,
+  enemyStore,
+  nameOverride,
+}: {
+  instance: string;
+  level: string;
+  enemyStore: EnemyStore;
+  nameOverride?: string;
+}) {
   const enemyJSON = pickRandomEnemyJSON(instance, level);
   if (enemyJSON) {
     const enemyHealth = getNumberInRange(

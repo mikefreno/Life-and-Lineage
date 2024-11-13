@@ -39,6 +39,7 @@ import { Attack } from "./attack";
 import { storage } from "../utility/functions/storage";
 import { stringify } from "flatted";
 import { throttle } from "lodash";
+import type { RootStore } from "../stores/RootStore";
 
 interface CharacterOptions {
   id?: string;
@@ -367,6 +368,7 @@ type PlayerCharacterBase = {
   allocatedSkillPoints?: Record<Attribute, number>;
   alive?: boolean;
   inCombat: boolean;
+  root: RootStore;
 };
 
 type MageCharacter = PlayerCharacterBase & {
@@ -480,6 +482,7 @@ export class PlayerCharacter extends Character {
     quiver: Item[] | null;
   };
   investments: Investment[];
+  root: RootStore;
 
   constructor({
     id,
@@ -524,6 +527,7 @@ export class PlayerCharacter extends Character {
     allocatedSkillPoints,
     keyItems,
     inCombat,
+    root,
   }: PlayerCharacterOptions) {
     super({
       id,
@@ -602,6 +606,7 @@ export class PlayerCharacter extends Character {
       quiver: null,
     };
     this.investments = investments ?? [];
+    this.root = root;
 
     // this is where we set what is to be watched for mutation by mobX.
     // observable are state that is for mutated attributes, computed are for `get`s and
@@ -1807,10 +1812,10 @@ export class PlayerCharacter extends Character {
     }
     const minion = new Minion({
       creatureSpecies: minionObj.name,
-      health: minionObj.health,
-      healthMax: minionObj.health,
+      currentHealth: minionObj.health,
+      baseHealth: minionObj.health,
       attackPower: minionObj.attackPower,
-      attacks: minionObj.attacks,
+      attackStrings: minionObj.attackStrings,
       turnsLeftAlive: minionObj.turns,
       beingType: minionObj.beingType as BeingType,
       parent: this,
@@ -1979,14 +1984,14 @@ export class PlayerCharacter extends Character {
     }
     const minion = new Minion({
       creatureSpecies: minionObj.name,
-      health: minionObj.health,
-      healthMax: minionObj.health,
+      currentHealth: minionObj.health,
+      baseHealth: minionObj.health,
       attackPower: minionObj.attackPower,
-      attacks: minionObj.attacks,
+      attackStrings: minionObj.attackStrings,
       turnsLeftAlive: minionObj.turns,
       beingType: minionObj.beingType as BeingType,
-      energy: minionObj.energy?.maximum,
-      energyMax: minionObj.energy?.maximum,
+      currentEnergy: minionObj.energy?.maximum,
+      baseEnergy: minionObj.energy?.maximum,
       energyRegen: minionObj.energy?.regen,
       parent: this,
     });
@@ -2244,6 +2249,7 @@ export class PlayerCharacter extends Character {
       baseIntelligence: json.baseIntelligence,
       baseDexterity: json.baseDexterity,
       inCombat: json.inCombat,
+      root: json.root,
     });
     return player;
   }
