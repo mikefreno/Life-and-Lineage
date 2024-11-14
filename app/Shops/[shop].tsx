@@ -78,13 +78,13 @@ const GreetingComponent = ({
 
 const ShopInteriorScreen = observer(() => {
   let { shop } = useLocalSearchParams();
-  const { gameState, playerState } = useRootStore();
+  const { gameState, playerState, shopsStore } = useRootStore();
   const { itemBlockSize } = useUIStore();
   const { setIconString } = useDraggableStore();
 
   const vibration = useVibration();
   const colors = shopObjects.find((shopObj) => shopObj.type == shop)?.colors;
-  const thisShop = gameState?.shops.find((aShop) => aShop.archetype == shop);
+  const thisShop = shopsStore.getShop(shop as string);
   const [displayItem, setDisplayItem] = useState<{
     item: Item[];
     side?: "shop" | "inventory";

@@ -319,7 +319,7 @@ export class Creature {
    * Calculates the maximum sanity of the creature considering any condition effects.
    * @returns The maximum sanity value, or null if baseSanity is not set.
    */
-  public maxEnergy() {
+  get maxEnergy() {
     const { manaMaxFlat, manaMaxMult } = getConditionEffectsOnMisc(
       this.conditions,
     );

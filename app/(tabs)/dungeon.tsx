@@ -19,9 +19,10 @@ import { TutorialOption } from "../../utility/types";
 import PlatformDependantBlurView from "../../components/PlatformDependantBlurView";
 import { useVibration } from "../../hooks/generic";
 import { useDungeonStore } from "../../hooks/stores";
+import type { DungeonInstance } from "../../entities/dungeon";
 
-const RED_FLOOR = 50;
-const TOP = 255;
+const MIN_RED = 50;
+const MAX_RED = 255;
 
 const DungeonScreen = observer(() => {
   const dungeonStore = useDungeonStore();
@@ -32,11 +33,7 @@ const DungeonScreen = observer(() => {
       .filter((inst) => inst.name !== "training grounds")
       .sort((a, b) => a.difficulty - b.difficulty),
   );
-  const [step, setStep] = useState(
-    TOP -
-      RED_FLOOR / sorted[sorted.length - 1].difficulty -
-      sorted[0].difficulty,
-  );
+  const [step, setStep] = useState((MAX_RED - MIN_RED) / (sorted.length - 1));
   const [scrollViewHeight, setScrollViewHeight] = useState(0);
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -52,11 +49,7 @@ const DungeonScreen = observer(() => {
       .filter((inst) => inst.name !== "training grounds")
       .sort((a, b) => a.difficulty - b.difficulty);
     setSorted(sorted);
-    setStep(
-      TOP -
-        RED_FLOOR / sorted[sorted.length - 1].difficulty -
-        sorted[0].difficulty,
-    );
+    setStep((MAX_RED - MIN_RED) / (sorted.length - 1));
   }, [dungeonInstances]);
 
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -68,6 +61,46 @@ const DungeonScreen = observer(() => {
   const onLayout = (event: LayoutChangeEvent) => {
     const { height } = event.nativeEvent.layout;
     setScrollViewHeight(height);
+  };
+
+  const getInstanceColor = (idx: number) => {
+    if (sorted.length <= 1) {
+      return `rgb(255, ${255 - MIN_RED}, ${255 - MIN_RED})`;
+    }
+    const progress = idx / (sorted.length - 1);
+    const red = Math.round(MIN_RED + (MAX_RED - MIN_RED) * progress);
+    return `rgb(255, ${255 - red}, ${255 - red})`;
+  };
+
+  const getLevelColor = (
+    instance: DungeonInstance,
+    levelIdx: number,
+    instanceIdx: number,
+    totalInstances: number,
+  ) => {
+    // Get current instance's base color
+    const currentInstanceRed =
+      MIN_RED + ((MAX_RED - MIN_RED) * instanceIdx) / (totalInstances - 1);
+
+    // Get next instance's base color (or MAX_RED if this is the last instance)
+    const nextInstanceRed =
+      instanceIdx === totalInstances - 1
+        ? MAX_RED
+        : MIN_RED +
+          ((MAX_RED - MIN_RED) * (instanceIdx + 1)) / (totalInstances - 1);
+
+    // Calculate the step between current and next instance
+    const totalLevels = instance.levels.length;
+    const redStep = (nextInstanceRed - currentInstanceRed) / totalLevels;
+
+    // Calculate this level's red value
+    const red = Math.round(currentInstanceRed + redStep * levelIdx);
+
+    return `rgb(255, ${255 - red}, ${255 - red})`;
+  };
+
+  const textColor = (redValue: number) => {
+    return redValue > 192 ? "black" : "white";
   };
 
   return (
@@ -126,62 +159,65 @@ const DungeonScreen = observer(() => {
           scrollIndicatorInsets={{ top: 92, right: 0, left: 0, bottom: 48 }}
         >
           {sorted.map((dungeonInstance, dungeonInstanceIdx) => {
-            const bottomRange = dungeonInstanceIdx * step;
-            const perLevel =
-              step /
-              dungeonInstance.levels.filter((lvl) => lvl.unlocked).length;
+            console.log(dungeonInstance.name);
+            dungeonInstance.levels.map((lvl) =>
+              console.log(lvl.level, lvl.unlocked),
+            );
             return (
               <ThemedCard
                 key={dungeonInstanceIdx}
                 className="flex-1 justify-center mx-8"
-                style={{
-                  backgroundColor: `rgba(${bottomRange},
-                    0,
-                    0,
-                    0.7,
-                  )`,
-                }}
               >
                 <Text className="text-center text-2xl tracking-widest underline">
                   {toTitleCase(dungeonInstance.name)}
                 </Text>
                 <View className="mx-auto justify-center">
-                  {dungeonInstance.levels
-                    .filter((level) => level.unlocked)
-                    .map((level, levelIdx) => (
-                      <Pressable
-                        key={levelIdx}
-                        onPress={() => {
-                          while (router.canGoBack()) {
-                            router.back();
-                          }
-                          dungeonStore.setUpDungeon(dungeonInstance, level);
-                          vibration({ style: "warning" });
-                          router.replace(`/DungeonLevel`);
-                        }}
-                      >
-                        {({ pressed }) => (
-                          <View
-                            className={`my-2 rounded-lg px-6 py-4 ${
-                              pressed ? "scale-95 opacity-50" : ""
-                            }`}
+                  {dungeonInstance.levels.map((level, levelIdx) => (
+                    <Pressable
+                      key={levelIdx}
+                      onPress={() => {
+                        while (router.canGoBack()) {
+                          router.back();
+                        }
+                        dungeonStore.setUpDungeon(dungeonInstance, level);
+                        vibration({ style: "warning" });
+                        router.replace(`/DungeonLevel`);
+                      }}
+                    >
+                      {({ pressed }) => (
+                        <View
+                          className={`my-2 rounded-lg px-6 py-4 ${
+                            pressed ? "scale-95 opacity-50" : ""
+                          }`}
+                          style={{
+                            backgroundColor: getLevelColor(
+                              dungeonInstance,
+                              levelIdx,
+                              dungeonInstanceIdx,
+                              sorted.length,
+                            ),
+                            shadowOpacity: 0.25,
+                            shadowRadius: 5,
+                            elevation: 2,
+                          }}
+                        >
+                          <Text
                             style={{
-                              shadowColor: ``,
-                              backgroundColor: `rgba(${
-                                bottomRange + perLevel * levelIdx
-                              }, 0, 0, 0.7)`,
-                              shadowOpacity: 0.25,
-                              shadowRadius: 5,
-                              elevation: 2,
+                              color: textColor(
+                                MIN_RED +
+                                  ((MAX_RED - MIN_RED) * levelIdx) /
+                                    dungeonInstance.levels.length +
+                                  ((MAX_RED - MIN_RED) * dungeonInstanceIdx) /
+                                    sorted.length,
+                              ),
                             }}
                           >
-                            <Text
-                              style={{ color: "white" }}
-                            >{`Delve to Floor ${level.level}`}</Text>
-                          </View>
-                        )}
-                      </Pressable>
-                    ))}
+                            {`Delve to Floor ${level.level}`}
+                          </Text>
+                        </View>
+                      )}
+                    </Pressable>
+                  ))}
                 </View>
               </ThemedCard>
             );

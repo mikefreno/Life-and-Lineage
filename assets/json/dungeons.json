@@ -143,8 +143,39 @@
       {
         "level": 1,
         "tiles": 10,
+        "unlocked": true,
         "boss": [
           "hobgoblin"
+        ],
+        "normalEncounters": [
+          [
+            {
+              "name": "giant rat",
+              "scaler": 1
+            }
+          ],
+          [
+            {
+              "name": "bat",
+              "scaler": 1
+            }
+          ],
+          [
+            {
+              "name": "bat",
+              "scaler": 0.75
+            },
+            {
+              "name": "bat",
+              "scaler": 0.75
+            }
+          ]
+        ],
+        "bossEncounter": [
+          {
+            "name": "zombie",
+            "scaler": 1.25
+          }
         ]
       },
       {
@@ -168,6 +199,7 @@
       {
         "level": 1,
         "tiles": 10,
+        "unlocked": true,
         "boss": [
           "bandit",
           "bandit"

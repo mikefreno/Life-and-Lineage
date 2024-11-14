@@ -1,11 +1,7 @@
 import { useCallback } from "react";
 import { AttackUse, TutorialOption } from "../utility/types";
 import { toTitleCase, wait } from "../utility/functions/misc";
-import {
-  useEnemyAnimation,
-  useLootState,
-  useTutorialState,
-} from "../stores/DungeonData";
+import { useLootState, useTutorialState } from "../stores/DungeonData";
 import { useEnemyStore, usePlayerStore, useRootStore } from "./stores";
 import { useBattleLogger } from "./generic";
 import { Enemy, Minion } from "../entities/creatures";
@@ -18,14 +14,6 @@ import { Spell } from "../entities/spell";
 export const useEnemyManagement = () => {
   const { enemyStore, playerState, gameState, dungeonStore } = useRootStore();
   const { fightingBoss, currentInstance, currentLevel } = dungeonStore;
-
-  const {
-    setEnemyAttackDummy,
-    setEnemyTextString,
-    setEnemyTextDummy,
-    setAttackAnimationOnGoing,
-    setEnemyDodgeDummy,
-  } = useEnemyAnimation();
   const { battleLogger } = useBattleLogger();
   const { setDroppedItems } = useLootState();
   const { setShouldShowFirstBossKillTutorialAfterItemDrops } =
@@ -60,14 +48,12 @@ export const useEnemyManagement = () => {
             dungeonStore.setInBossFight(false);
             currentLevel.setBossDefeated();
             dungeonStore.openNextDungeonLevel(currentInstance);
+            enemyStore.clearEnemyList();
             playerState.bossDefeated();
             if (!gameState.tutorialsShown[TutorialOption.firstBossKill]) {
               setShouldShowFirstBossKillTutorialAfterItemDrops(true);
             }
           }
-
-          setEnemyAttackDummy(0);
-          setEnemyDodgeDummy(0);
           gameState.gameTick();
         }
 
@@ -103,8 +89,8 @@ export const useEnemyManagement = () => {
       },
       startOfTurnPlayerHP: number,
     ) => {
-      if (!playerState) return;
-
+      const animationStore = enemyStore.getAnimationStore(enemy.id);
+      if (!playerState || !animationStore) return;
       const playerHealthChange =
         startOfTurnPlayerHP - playerState.currentHealth;
 
@@ -136,37 +122,37 @@ export const useEnemyManagement = () => {
             enemyAttackRes.chosenAttack &&
             enemyAttackRes.chosenAttack.baseDamage > 0
           ) {
-            setEnemyAttackDummy((prev) => prev + 1);
+            animationStore?.triggerAttack();
             wait(500).then(() => {
               if (
                 enemyAttackRes.chosenAttack!.debuffStrings.length > 0 ||
                 enemyAttackRes.chosenAttack!.buffStrings.length > 0
               ) {
-                setEnemyTextString(enemyAttackRes.chosenAttack!.name);
-                setEnemyTextDummy((prev) => prev + 1);
+                animationStore.setTextString(enemyAttackRes.chosenAttack!.name);
+                animationStore.triggerText();
               }
             });
           }
         },
 
         [AttackUse.miss]: () => {
-          setEnemyAttackDummy((prev) => prev + 1);
+          animationStore.triggerAttack();
           wait(500).then(() => {
-            setEnemyTextString("miss");
-            setEnemyTextDummy((prev) => prev + 1);
+            animationStore.setTextString("miss");
+            animationStore.triggerText();
           });
         },
         [AttackUse.block]: () => {
-          setEnemyTextString("blocked");
-          setEnemyTextDummy((prev) => prev + 1);
+          animationStore.setTextString("blocked");
+          animationStore.triggerText();
         },
         [AttackUse.stunned]: () => {
-          setEnemyTextString("stunned");
-          setEnemyTextDummy((prev) => prev + 1);
+          animationStore.setTextString("stunned");
+          animationStore.triggerText();
         },
         [AttackUse.lowEnergy]: () => {
-          setEnemyTextString("pass");
-          setEnemyTextDummy((prev) => prev + 1);
+          animationStore.setTextString("pass");
+          animationStore.triggerText();
         },
       };
 
@@ -189,7 +175,7 @@ export const useEnemyManagement = () => {
           // Check for death after action
           setTimeout(() => {
             enemyDeathHandler(enemy);
-            setAttackAnimationOnGoing(false);
+            enemyStore.attackAnimationSet = false;
           }, 1000);
         }
       });
@@ -202,7 +188,6 @@ export const useEnemyManagement = () => {
 export const useCombatActions = () => {
   const enemyStore = useEnemyStore();
   const playerState = usePlayerStore();
-  const { setAttackAnimationOnGoing, setEnemyDodgeDummy } = useEnemyAnimation();
   const { battleLogger } = useBattleLogger();
   const { enemyTurn, enemyDeathHandler } = useEnemyManagement();
   const isFocused = useIsFocused();
@@ -242,7 +227,7 @@ export const useCombatActions = () => {
       if (attackOrSpell instanceof Attack) {
         const { result, logString } = attackOrSpell.use({ targets });
         if (result === AttackUse.miss) {
-          setEnemyDodgeDummy((prev) => prev + 1);
+          //setEnemyDodgeDummy((prev) => prev + 1);
         }
         return logString;
       }
@@ -253,7 +238,7 @@ export const useCombatActions = () => {
       });
       return logString;
     },
-    [playerState, setEnemyDodgeDummy],
+    [playerState],
   );
 
   const pass = useCallback(
@@ -266,7 +251,7 @@ export const useCombatActions = () => {
       playerMinionsTurn(() => {
         setTimeout(() => {
           enemyTurn();
-          setAttackAnimationOnGoing(false);
+          enemyStore.attackAnimationSet = false;
         }, 750);
       });
     },
@@ -275,7 +260,7 @@ export const useCombatActions = () => {
       battleLogger,
       playerMinionsTurn,
       enemyTurn,
-      setAttackAnimationOnGoing,
+      enemyStore.attackAnimationsOnGoing,
     ],
   );
 

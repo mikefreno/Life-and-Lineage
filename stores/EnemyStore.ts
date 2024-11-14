@@ -3,10 +3,13 @@ import { Enemy } from "../entities/creatures";
 import { storage } from "../utility/functions/storage";
 import { RootStore } from "./RootStore";
 import { action, makeObservable, observable } from "mobx";
+import { AnimationStore } from "./AnimationStore";
 
 export default class EnemyStore {
   enemies: Enemy[];
-  referenceMap: Map<string, number>;
+  saveReferenceMap: Map<string, number>;
+  animationStoreMap: Map<string, AnimationStore>;
+  attackAnimationsOnGoing: boolean;
   root: RootStore;
 
   constructor({ root }: { root: RootStore }) {
@@ -24,8 +27,16 @@ export default class EnemyStore {
       retrieved_enemies.push(hydratedEnemy);
       i++;
     }
+
+    this.attackAnimationsOnGoing = false;
     this.enemies = retrieved_enemies;
-    this.referenceMap = map;
+    this.saveReferenceMap = map;
+
+    this.animationStoreMap = new Map();
+    this.enemies.forEach((enemy) => {
+      this.animationStoreMap.set(enemy.id, new AnimationStore());
+    });
+
     this.root = root;
 
     makeObservable(this, {
@@ -35,22 +46,33 @@ export default class EnemyStore {
       clearEnemyList: action,
     });
   }
-
-  public clearEnemyList() {
-    this.enemies = [];
+  set attackAnimationSet(state: boolean) {
+    this.attackAnimationsOnGoing = state;
   }
 
   public addToEnemyList(enemy: Enemy) {
     this.enemies.push(enemy);
-    this.referenceMap.set(enemy.id, this.enemies.length);
+    this.saveReferenceMap.set(enemy.id, this.enemies.length);
+    this.animationStoreMap.set(enemy.id, new AnimationStore());
   }
 
   public removeEnemy(enemy: Enemy) {
-    this.referenceMap.delete(enemy.id);
+    this.saveReferenceMap.delete(enemy.id);
+    this.animationStoreMap.delete(enemy.id);
     this.enemies = this.enemies.filter((e) => e.id !== enemy.id);
   }
 
+  public clearEnemyList() {
+    this.enemies = [];
+    this.saveReferenceMap.clear();
+    this.animationStoreMap.clear();
+  }
+
+  public getAnimationStore(enemyId: string): AnimationStore | undefined {
+    return this.animationStoreMap.get(enemyId);
+  }
+
   public getSaveReference(enemy: Enemy) {
-    return this.referenceMap.get(enemy.id);
+    return this.saveReferenceMap.get(enemy.id);
   }
 }

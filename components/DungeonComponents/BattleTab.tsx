@@ -17,11 +17,7 @@ import { DungeonMapControls } from "./DungeonMap";
 import PlatformDependantBlurView from "../PlatformDependantBlurView";
 import { Energy, Regen } from "../../assets/icons/SVGIcons";
 import { elementalColorMap } from "../../constants/Colors";
-import {
-  useCombatState,
-  useEnemyAnimation,
-  useLootState,
-} from "../../stores/DungeonData";
+import { useCombatState, useLootState } from "../../stores/DungeonData";
 import { Attack } from "../../entities/attack";
 import { Spell } from "../../entities/spell";
 import { useCombatActions } from "../../hooks/combat";
@@ -52,8 +48,6 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
   const { useAttack } = useCombatActions();
   const { displayItem, setDisplayItem } = useLootState();
   const { setIconString } = useDraggableStore();
-  const { attackAnimationOnGoing, setAttackAnimationOnGoing } =
-    useEnemyAnimation();
   const { setShowTargetSelection } = useCombatState();
 
   const [combinedData, setCombinedData] = useState<(Attack | Spell)[]>([]);
@@ -106,7 +100,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
 
   const attackHandler = (attackOrSpell: Attack | Spell) => {
     if (enemyStore.enemies.length > 0) {
-      setAttackAnimationOnGoing(true);
+      enemyStore.attackAnimationSet = true;
       vibration({ style: "light" });
       const enoughForDualToHitAll =
         enemyStore.enemies.length > 1 ||
@@ -225,13 +219,16 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                         </View>
                         <Pressable
                           disabled={
-                            !attackOrSpell.canBeUsed || attackAnimationOnGoing
+                            !attackOrSpell.canBeUsed ||
+                            enemyStore.attackAnimationsOnGoing
                           }
                           onPress={() => attackHandler(attackOrSpell)}
                           className="mx-2 my-auto rounded px-4 py-2 shadow-sm active:scale-95 active:opacity-50"
                           style={[
                             (!attackOrSpell.canBeUsed ||
-                              attackAnimationOnGoing) && { opacity: 0.5 },
+                              enemyStore.attackAnimationsOnGoing) && {
+                              opacity: 0.5,
+                            },
                             {
                               backgroundColor:
                                 "element" in attackOrSpell
@@ -272,9 +269,9 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                           </View>
                         </View>
                         <Pressable
-                          disabled={attackAnimationOnGoing}
+                          disabled={enemyStore.attackAnimationsOnGoing}
                           onPress={() => {
-                            setAttackAnimationOnGoing(true);
+                            enemyStore.attackAnimationSet = true;
                             vibration({ style: "light" });
                             pass({ voluntary: true });
                           }}
@@ -283,7 +280,8 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                             backgroundColor:
                               colorScheme == "light" ? "#d4d4d8" : "#27272a",
                             opacity:
-                              playerState.isStunned || attackAnimationOnGoing
+                              playerState.isStunned ||
+                              enemyStore.attackAnimationsOnGoing
                                 ? 0.5
                                 : 1.0,
                           }}
@@ -310,14 +308,14 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                     <Text className="text-xl">Pass</Text>
                   </View>
                   <Pressable
-                    disabled={attackAnimationOnGoing}
+                    disabled={enemyStore.attackAnimationsOnGoing}
                     onPress={() => {
-                      setAttackAnimationOnGoing(true);
+                      enemyStore.attackAnimationSet = true;
                       vibration({ style: "light" });
                       pass({ voluntary: true });
                     }}
                     className={`${
-                      attackAnimationOnGoing
+                      enemyStore.attackAnimationsOnGoing
                         ? ""
                         : "bg-zinc-300 dark:bg-zinc-700"
                     } mx-2 my-auto rounded px-4 py-2 active:scale-95 active:opacity-50`}

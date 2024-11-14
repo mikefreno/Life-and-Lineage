@@ -27,7 +27,7 @@ export class DungeonStore {
   fightingBoss: boolean;
 
   constructor({ root }: { root: RootStore }) {
-    this.dungeonInstances = this.hydrateDungeonState();
+    this.dungeonInstances = this.getInitDungeonState();
     this.activityInstance = this.initActivityDungeon();
     this.inCombat = false;
     this.fightingBoss = false;
@@ -80,7 +80,6 @@ export class DungeonStore {
       bossDefeated: this.currentLevel.bossDefeated,
     });
     this.currentMapDimensions = getBoundingBox(this.currentMap, TILE_SIZE);
-    console.log("inset map: ", this.currentMap[0]);
     this.currentPosition = this.currentMap[0];
   }
 
@@ -89,7 +88,6 @@ export class DungeonStore {
   }
 
   public move(direction: "up" | "down" | "left" | "right") {
-    console.log("current:", this.currentPosition);
     if (!this.currentPosition || !this.currentMap) return;
 
     const { x, y } = directionsMapping[direction];
@@ -165,7 +163,9 @@ export class DungeonStore {
     ids.forEach((id) => {
       const retrieved = storage.getString(`dungeon_${id}`);
       if (retrieved) {
-        dungeonInstances.push(DungeonInstance.fromJSON(parse(retrieved)));
+        dungeonInstances.push(
+          DungeonInstance.fromJSON({ ...parse(retrieved), dungeonStore: this }),
+        );
       }
     });
     return dungeonInstances.length > 0
@@ -174,19 +174,27 @@ export class DungeonStore {
   }
 
   getInitDungeonState() {
+    const banditHideout = DungeonInstance.fromJSON({
+      ...dungeonsJSON.find((inst) => inst.name == "bandit hideout"),
+      dungeonStore: this,
+    });
+    const goblinCave = DungeonInstance.fromJSON({
+      ...dungeonsJSON.find((inst) => inst.name == "goblin cave"),
+      dungeonStore: this,
+    });
     const nearbyCave = DungeonInstance.fromJSON({
       ...dungeonsJSON.find((inst) => inst.name == "nearby cave"),
-      root: this,
+      dungeonStore: this,
     });
     const trainingGrounds = DungeonInstance.fromJSON({
       ...dungeonsJSON.find((inst) => inst.name == "training grounds"),
-      root: this,
+      dungeonStore: this,
     });
 
     _dungeonInstanceSave(nearbyCave);
     _dungeonInstanceSave(trainingGrounds);
 
-    return [trainingGrounds, nearbyCave];
+    return [trainingGrounds, nearbyCave, goblinCave, banditHideout];
   }
 
   setActivityName(name: string) {

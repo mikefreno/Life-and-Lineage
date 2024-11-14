@@ -65,12 +65,10 @@ export class RootStore {
     );
   }
   get compactPath() {
-    console.log(this.currentPath);
     return compactPaths.includes(this.currentPath);
   }
 
   setPathName(pathname: string) {
-    console.log(pathname);
     this.currentPath = pathname;
   }
 }

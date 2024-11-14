@@ -4,7 +4,6 @@ import { ThemedView, Text } from "../Themed";
 import { rollD20, wait } from "../../utility/functions/misc";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { useEnemyAnimation } from "../../stores/DungeonData";
 import { useBattleLogger, useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useCombatActions, useEnemyManagement } from "../../hooks/combat";
@@ -20,8 +19,6 @@ export default function FleeModal({
   const vibration = useVibration();
   const { playerState, enemyStore, gameState, dungeonStore } = useRootStore();
   const { inCombat, currentInstance } = dungeonStore;
-  const { attackAnimationOnGoing, setAttackAnimationOnGoing } =
-    useEnemyAnimation();
   const { battleLogger } = useBattleLogger();
   const { playerMinionsTurn } = useCombatActions();
   const { enemyTurn } = useEnemyManagement();
@@ -34,7 +31,7 @@ export default function FleeModal({
 
   const flee = () => {
     if (playerState && gameState) {
-      setAttackAnimationOnGoing(true);
+      enemyStore.attackAnimationSet = true;
       const roll = rollD20();
       if (
         enemyStore.enemies[0].creatureSpecies == "training dummy" ||
@@ -44,7 +41,7 @@ export default function FleeModal({
         vibration({ style: "light" });
         setFleeRollFailure(false);
         setFleeModalShowing(false);
-        setAttackAnimationOnGoing(false);
+        enemyStore.attackAnimationSet = false;
         wait(500).then(() => {
           playerState.clearMinions();
           while (router.canGoBack()) {
@@ -96,7 +93,8 @@ export default function FleeModal({
             <GenericFlatButton
               onPress={flee}
               disabled={
-                inCombat && (attackAnimationOnGoing || playerState.isStunned)
+                inCombat &&
+                (enemyStore.attackAnimationsOnGoing || playerState.isStunned)
               }
             >
               {enemyStore.enemies.length == 0 ? "Run! (50%)" : "Leave"}

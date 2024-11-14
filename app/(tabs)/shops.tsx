@@ -22,8 +22,9 @@ const ShopsScreen = observer(() => {
   const [isReady, setIsReady] = useState(false);
 
   const runDeathChecks = () => {
-    shopsStore.shops.forEach((shop) => shop.deathCheck());
+    shopsStore.shopsMap.forEach((shop) => shop.deathCheck());
   };
+
   useEffect(() => {
     if (!isReady) {
       runDeathChecks();
@@ -145,7 +146,9 @@ const ShopsScreen = observer(() => {
                 paddingTop: headerHeight,
               }}
             >
-              {shopsStore.shops.map((shop) => renderItem(shop))}
+              {[...shopsStore.shopsMap.values()].map((shop) =>
+                renderItem(shop),
+              )}
             </View>
           </ScrollView>
         ) : null}

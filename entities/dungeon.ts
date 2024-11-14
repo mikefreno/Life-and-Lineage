@@ -34,6 +34,7 @@ export class DungeonInstance {
   readonly difficulty: number;
   levels: DungeonLevel[];
   readonly unlocks: string[];
+  dungeonStore: DungeonStore;
 
   constructor({
     id,
@@ -41,12 +42,14 @@ export class DungeonInstance {
     difficulty,
     levels,
     unlocks,
+    dungeonStore,
   }: DungeonInstanceOptions) {
     this.id = id;
     this.name = name;
     this.difficulty = difficulty;
     this.levels = levels;
     this.unlocks = unlocks;
+    this.dungeonStore = dungeonStore;
     makeObservable(this, { levels: observable, unlockNextLevel: action });
   }
 
@@ -114,6 +117,7 @@ export class DungeonLevel {
     this.bossDefeated = bossDefeated ?? false;
     this.dungeonStore = dungeonStore;
     makeObservable(this, {
+      unlocked: observable,
       bossDefeated: observable,
       generateBossEncounter: computed,
       generateNormalEncounter: computed,
@@ -130,7 +134,7 @@ export class DungeonLevel {
   }
 
   get generateNormalEncounter(): Enemy[] {
-    const fightIdx = Math.random() * this.normalEncounters.length;
+    const fightIdx = Math.floor(Math.random() * this.normalEncounters.length);
     const enemiesSpec = this.normalEncounters[fightIdx];
     const enemies = enemiesSpec.map((enemySpec) => {
       let enemyJSON = enemiesJSON.find((json) => json.name == enemySpec.name);
@@ -171,11 +175,9 @@ export class DungeonLevel {
         baseEnergy: enemyJSON.energy.maximum,
         energyRegen: enemyJSON.energy.regen,
         attackStrings: enemyJSON.attackStrings,
-        spellStrings: enemyJSON.spellStrings,
         enemyStore: this.dungeonStore.root.enemyStore,
       });
     });
-    console.log(enemies);
     return enemies;
   }
 
@@ -205,7 +207,6 @@ export class DungeonLevel {
         baseEnergy: bossJSON.energy.maximum,
         energyRegen: bossJSON.energy.regen,
         attackStrings: bossJSON.attackStrings,
-        spellStrings: bossJSON.spellStrings,
         enemyStore: this.dungeonStore.root.enemyStore,
       });
     });

@@ -40,6 +40,7 @@ export const useUIStore = () => {
   const { uiStore } = useRootStore();
   return uiStore;
 };
+
 export const useDraggableStore = () => {
   const dragStore = useContext(DragContext);
   if (!dragStore)

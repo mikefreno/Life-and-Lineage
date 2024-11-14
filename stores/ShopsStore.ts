@@ -18,29 +18,28 @@ const SHOP_ARCHETYPES = [
 ];
 
 export class ShopStore {
-  shops: Shop[];
+  shopsMap: Map<string, Shop>;
   root: RootStore;
 
   constructor({ root }: { root: RootStore }) {
-    this.shops = this.hydrateShopState();
+    this.shopsMap = this.hydrateShopState();
     this.root = root;
-  }
-
-  public refreshAllShops() {
-    this.shops.forEach((shop) => shop.refreshInventory(this.root.playerState!));
   }
 
   hydrateShopState() {
     try {
-      const builtShops = SHOP_ARCHETYPES.map((archetype) => {
-        console.log(`loading at: shop_${archetype.replaceAll(" ", "_")}`);
+      const map = new Map<string, Shop>();
+      SHOP_ARCHETYPES.forEach((archetype) => {
         const shopData = storage.getString(`shop_${archetype}`);
         if (!shopData) {
           throw new Error(`Failed to load ${archetype}`);
         }
-        return Shop.fromJSON({ ...parse(shopData), root: this.root });
+        map.set(
+          archetype,
+          Shop.fromJSON({ ...parse(shopData), root: this.root }),
+        );
       });
-      return builtShops;
+      return map;
     } catch (e) {
       console.log(e);
     }
@@ -48,7 +47,7 @@ export class ShopStore {
   }
 
   getInitShopsState() {
-    let createdShops: Shop[] = [];
+    const map = new Map<string, Shop>();
     shopsJSON.forEach((shop) => {
       const randIdx = Math.floor(
         Math.random() * shop.possiblePersonalities.length,
@@ -63,15 +62,18 @@ export class ShopStore {
         root: this.root,
       });
       _shopSave(newShop);
-      createdShops.push(newShop);
+      map.set(shop.type, newShop);
     });
-    return createdShops;
+    return map;
+  }
+
+  public getShop(archetype: string) {
+    return this.shopsMap.get(archetype);
   }
 }
 
 const _shopSave = async (shop: Shop | undefined) => {
   if (shop) {
-    console.log(`saving at: shop_${shop.archetype.replaceAll(" ", "_")}`);
     try {
       storage.set(
         `shop_${shop.archetype.replaceAll(" ", "_")}`,
