@@ -237,7 +237,7 @@ const HomeScreen = observer(() => {
                 mainHandTarget={mainHandTarget}
                 offHandTarget={offHandTarget}
                 quiverTarget={quiverTarget}
-                inventory={playerState.getInventory()}
+                inventory={playerState.inventory}
                 displayItem={displayItem}
                 setDisplayItem={setDisplayItem}
                 setIconString={setIconString}
@@ -259,7 +259,6 @@ const HomeScreen = observer(() => {
             </View>
           )}
         </View>
-        <ProjectedImage />
       </>
     );
   }

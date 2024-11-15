@@ -21,6 +21,7 @@ import * as Notifications from "expo-notifications";
 import { registerForPushNotificationsAsync } from "../utility/functions/notifications";
 import { AppProvider } from "../stores/AppData";
 import { useRootStore, useUIStore } from "../hooks/stores";
+import { ProjectedImage } from "../components/Draggable";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -58,7 +59,7 @@ const Root = observer(() => {
 /**
  * This focuses on getting the UI set, and relieving the splash screen when ready
  */
-const RootLayout = observer(() => {
+const RootLayout = () => {
   const [fontLoaded] = useFonts({
     PixelifySans: require("../assets/fonts/PixelifySans-Regular.ttf"),
     Handwritten: require("../assets/fonts/Caveat-VariableFont_wght.ttf"),
@@ -172,6 +173,7 @@ const RootLayout = observer(() => {
   return (
     <GestureHandlerRootView>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : LightTheme}>
+        <ProjectedImage />
         <SystemBars style="auto" />
         <Stack>
           <Stack.Screen
@@ -254,7 +256,7 @@ const RootLayout = observer(() => {
       </ThemeProvider>
     </GestureHandlerRootView>
   );
-});
+};
 export default Sentry.wrap(Root);
 
 export const headerOptions = ({

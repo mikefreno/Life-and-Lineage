@@ -266,16 +266,7 @@ export class Game {
     const game = new Game({
       date: json.date,
       startDate: json.startDate,
-      completedInstances: json.completedInstances,
       atDeathScreen: json.atDeathScreen,
-      dungeonInstances: json.dungeonInstances
-        ? json.dungeonInstances.map((instance: any) =>
-            DungeonInstance.fromJSON(instance),
-          )
-        : undefined,
-      shops: json.shops
-        ? json.shops.map((shop: any) => Shop.fromJSON(shop))
-        : undefined,
       colorScheme: json.colorScheme,
       vibrationEnabled: json.vibrationEnabled,
       healthWarning: json.healthWarning,

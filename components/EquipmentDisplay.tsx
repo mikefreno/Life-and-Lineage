@@ -92,7 +92,7 @@ export default function EquipmentDisplay({
               if (
                 equipped &&
                 playerState &&
-                playerState.getInventory().length < 24
+                playerState.inventory.length < 24
               ) {
                 playerState?.unEquipItem(itemStack);
               } else {

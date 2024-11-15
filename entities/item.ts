@@ -11,16 +11,15 @@ import {
   Attribute,
   ItemClassType,
   PlayerClassOptions,
-  type ItemOptions,
   ItemEffect,
 } from "../utility/types";
-import type { PlayerCharacter } from "./character";
 import { Spell } from "./spell";
 import { Attack } from "./attack";
 import attackObjects from "../assets/json/playerAttacks.json";
 import { action, computed, makeObservable, observable } from "mobx";
 import { Condition } from "./conditions";
 import { wait } from "../utility/functions/misc";
+import type { RootStore } from "../stores/RootStore";
 
 export class Item {
   readonly id: string;
@@ -43,7 +42,6 @@ export class Item {
     intelligence?: number;
     dexterity?: number;
   };
-  player: PlayerCharacter | null;
   readonly attacks: string[];
   readonly description: string | null;
   readonly effect: ItemEffect | null;
@@ -52,6 +50,7 @@ export class Item {
     | { effect: "health" | "mana" | "sanity"; amount: number }
     | null;
   uses: number | null;
+  root: RootStore;
 
   constructor({
     id,
@@ -62,14 +61,33 @@ export class Item {
     itemClass,
     icon,
     requirements = {},
-    player,
+    root,
     attacks = [],
     stackable = false,
     description,
     effect,
     activePoison,
     uses,
-  }: ItemOptions) {
+  }: {
+    id?: string;
+    name: string;
+    slot?: "head" | "body" | "one-hand" | "two-hand" | "off-hand" | null;
+    stats?: Record<string, number> | null;
+    baseValue: number;
+    itemClass: ItemClassType;
+    icon?: string;
+    requirements?: { strength?: number; intelligence?: number };
+    stackable?: boolean;
+    attacks?: string[];
+    description?: string;
+    effect?: ItemEffect;
+    activePoison?:
+      | Condition
+      | { effect: "health" | "mana" | "sanity"; amount: number }
+      | null;
+    uses?: number;
+    root: RootStore;
+  }) {
     this.id = id ?? Crypto.randomUUID();
     this.name = name;
     this.slot = slot ?? null;
@@ -79,7 +97,7 @@ export class Item {
     this.icon = icon;
     this.requirements = requirements;
     this.stackable = stackable;
-    this.player = player;
+    this.root = root;
     this.attacks = attacks;
     this.description = description ?? null;
     this.effect = effect ?? null;
@@ -90,9 +108,7 @@ export class Item {
       attachedSpell: computed,
       attachedAttacks: computed,
       playerHasRequirements: computed,
-      reinstatePlayer: action,
       use: action,
-      player: observable,
       activePoison: observable,
       consumePoison: action,
     });
@@ -103,28 +119,28 @@ export class Item {
   }
 
   get playerHasRequirements() {
-    if (this.player) {
+    if (this.root.playerState) {
       if (
         this.requirements.strength &&
         this.requirements.strength >
-          this.player.baseStrength +
-            this.player.allocatedSkillPoints[Attribute.strength]
+          this.root.playerState.baseStrength +
+            this.root.playerState.allocatedSkillPoints[Attribute.strength]
       ) {
         return false;
       }
       if (
         this.requirements.intelligence &&
         this.requirements.intelligence >
-          this.player.baseIntelligence +
-            this.player.allocatedSkillPoints[Attribute.intelligence]
+          this.root.playerState.baseIntelligence +
+            this.root.playerState.allocatedSkillPoints[Attribute.intelligence]
       ) {
         return false;
       }
       if (
         this.requirements.dexterity &&
         this.requirements.dexterity >
-          this.player.baseDexterity +
-            this.player.allocatedSkillPoints[Attribute.dexterity]
+          this.root.playerState.baseDexterity +
+            this.root.playerState.allocatedSkillPoints[Attribute.dexterity]
       ) {
         return false;
       }
@@ -144,7 +160,7 @@ export class Item {
       ];
       this.attacks.forEach((attackString) => {
         const found = combinedSpellJson.find((obj) => obj.name == attackString);
-        if (found && this.player) {
+        if (found && this.root.playerState) {
           builtSpells.push(
             new Spell({
               ...found,
@@ -181,11 +197,11 @@ export class Item {
     const builtAttacks: Attack[] = [];
     this.attacks.forEach((attackString) => {
       const found = attackObjects.find((obj) => obj.name == attackString);
-      if (found && this.player) {
+      if (found && this.root.playerState) {
         builtAttacks.push(
           new Attack({
             ...found,
-            user: this.player,
+            user: this.root.playerState,
             targets: found.targets as "single" | "dual" | "aoe",
           }),
         );
@@ -198,7 +214,7 @@ export class Item {
     if (this.itemClass == ItemClassType.Book) {
       let spell: any;
       let bookObj: any;
-      switch (this.player?.playerClass) {
+      switch (this.root.playerState?.playerClass) {
         case PlayerClassOptions.mage:
           bookObj = mageBooks.find((book) => book.name == this.name);
           spell = mageSpells.find(
@@ -239,7 +255,8 @@ export class Item {
    * callback provided in the dungeon
    */
   public use(callback?: () => void) {
-    if (!this.player) throw new Error(`Missing player on item! ${this.name}`);
+    if (!this.root.playerState)
+      throw new Error(`Missing player on item! ${this.name}`);
     if (!this.effect) {
       throw new Error("Called 'use' on an invalid item!");
     }
@@ -249,7 +266,7 @@ export class Item {
       } else {
         this.usePotion(this.effect);
       }
-      this.player.removeFromInventory(this);
+      this.root.playerState.removeFromInventory(this);
       if (callback) {
         wait(500).then(() => callback());
       }
@@ -260,28 +277,29 @@ export class Item {
   }
 
   private usePotion(effect: ItemEffect) {
-    if (!this.player) throw new Error(`Missing player on item! ${this.name}`);
+    if (!this.root.playerState)
+      throw new Error(`Missing player on item! ${this.name}`);
     if ("condition" in effect) {
-      this.player.addCondition(effect.condition);
+      this.root.playerState.addCondition(effect.condition);
       return;
     }
     const amt = this.calculateEffectAmount(effect.amount);
     this.applyStatEffect(effect.stat, amt);
-    if (this.player.inCombat) {
-      this.player.endTurn();
+    if (this.root.dungeonStore.inCombat) {
+      this.root.playerState.endTurn();
     }
   }
 
   private applyStatEffect(stat: "health" | "mana" | "sanity", amount: number) {
     switch (stat) {
       case "health":
-        this.player?.restoreHealth(amount);
+        this.root.playerState?.restoreHealth(amount);
         break;
       case "mana":
-        this.player?.restoreMana(amount);
+        this.root.playerState?.restoreMana(amount);
         break;
       case "sanity":
-        this.player?.restoreSanity(amount);
+        this.root.playerState?.restoreSanity(amount);
         break;
       default:
         throw new Error(`Unimplemented attribute: ${stat}`);
@@ -289,19 +307,20 @@ export class Item {
   }
 
   private applyPoison(effect: ItemEffect) {
-    if (!this.player) throw new Error(`Missing player on item! ${this.name}`);
+    if (!this.root.playerState)
+      throw new Error(`Missing player on item! ${this.name}`);
 
-    if (this.player.equipment.mainHand.name === "unarmored") {
+    if (this.root.playerState.equipment.mainHand.name === "unarmored") {
       throw new Error("Can't apply poison to bare hands!");
     }
 
     if ("condition" in effect) {
-      this.player.equipment.mainHand.activePoison = effect.condition;
+      this.root.playerState.equipment.mainHand.activePoison = effect.condition;
       return;
     }
 
     const amt = this.calculateEffectAmount(effect.amount);
-    this.player.equipment.mainHand.activePoison = {
+    this.root.playerState.equipment.mainHand.activePoison = {
       effect: effect.stat,
       amount: amt,
     };
@@ -319,13 +338,6 @@ export class Item {
     return poison;
   }
 
-  public reinstatePlayer(player: PlayerCharacter) {
-    if (this.player == null) {
-      this.player = player;
-    }
-    return this;
-  }
-
   static fromJSON(json: any): Item {
     const item = new Item({
       id: json.id,
@@ -339,12 +351,12 @@ export class Item {
       icon: json.icon,
       attacks: json.attacks,
       description: json.description,
-      player: null,
       effect:
         json.effect && "condition" in json.effect
           ? { condition: Condition.fromJSON(json.effect.condition) }
           : json.effect,
       activePoison: json.activePoison,
+      root: json.root,
     });
 
     return item;

@@ -21,7 +21,7 @@ import { TutorialOption, checkReleasePositionProps } from "../../utility/types";
 import ProgressBar from "../../components/ProgressBar";
 import Colors from "../../constants/Colors";
 import { useColorScheme } from "nativewind";
-import { InventoryItem, ProjectedImage } from "../../components/Draggable";
+import { InventoryItem } from "../../components/Draggable";
 import {
   useDraggableStore,
   useRootStore,
@@ -123,10 +123,9 @@ const ShopInteriorScreen = observer(() => {
           new Date(Date.now() - REFRESH_TIME) ||
         thisShop.inventory.length == 0
       ) {
-        thisShop.refreshInventory(playerState);
+        thisShop.refreshInventory();
       }
-      thisShop.setPlayerToInventory(playerState);
-      setGreeting(thisShop.createGreeting(playerState.fullName));
+      setGreeting(thisShop.createGreeting);
       setInitialized(true);
     }
   }, [playerState]);
@@ -259,7 +258,6 @@ const ShopInteriorScreen = observer(() => {
           }}
         />
 
-        <ProjectedImage />
         <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
           <View className="flex-1 justify-between">
             <View className="flex h-[40%] flex-row justify-between">
@@ -298,7 +296,7 @@ const ShopInteriorScreen = observer(() => {
                   className="px-2 h-full"
                   contentContainerClassName="flex flex-row flex-wrap justify-around"
                 >
-                  {thisShop.getInventory().map((item) => (
+                  {thisShop.inventory.map((item) => (
                     <Pressable
                       key={item.item[0].id}
                       style={{
@@ -329,7 +327,7 @@ const ShopInteriorScreen = observer(() => {
                   <Text> ( {playerState!.getReadableGold()}</Text>
                   <Coins width={16} height={16} style={{ marginLeft: 6 }} />
                   <Text> )</Text>
-                  {playerState.inventory.some(
+                  {playerState.baseInventory.some(
                     (item) => item.itemClass == "junk",
                   ) ? (
                     <Pressable
@@ -346,7 +344,7 @@ const ShopInteriorScreen = observer(() => {
                   setInventoryBounds={setInventoryBounds}
                   selfRef={inventoryTarget}
                   shopInventoryTarget={shopInventoryTarget}
-                  inventory={playerState.getInventory()}
+                  inventory={playerState.inventory}
                   shop={thisShop}
                   sellItem={sellItem}
                   sellStack={sellStack}

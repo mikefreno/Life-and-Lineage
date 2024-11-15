@@ -1,7 +1,7 @@
 import { Item, isStackable } from "./item";
 import shops from "../assets/json/shops.json";
 import greetings from "../assets/json/shopLines.json";
-import { action, makeObservable, observable, reaction } from "mobx";
+import { action, computed, makeObservable, observable, reaction } from "mobx";
 import { Character, PlayerCharacter } from "./character";
 import {
   getRandomName,
@@ -12,15 +12,13 @@ import {
 } from "../utility/functions/misc";
 import { ItemClassType, ShopkeeperPersonality } from "../utility/types";
 import { RootStore } from "../stores/RootStore";
-import { storage } from "../utility/functions/storage";
-import { stringify } from "flatted";
-import { throttle } from "lodash";
+import { saveShop } from "../stores/ShopsStore";
 
 interface ShopProps {
   baseGold: number;
   currentGold?: number;
   lastStockRefresh: Date;
-  inventory?: Item[];
+  baseInventory?: Item[];
   shopKeeper: Character;
   archetype: string;
   shopKeeperPersonality: ShopkeeperPersonality;
@@ -36,7 +34,7 @@ export class Shop {
   readonly baseGold: number;
   currentGold: number;
   lastStockRefresh: string;
-  inventory: Item[];
+  baseInventory: Item[];
   shopKeeper: Character;
   readonly archetype: string;
   shopKeeperPersonality: ShopkeeperPersonality;
@@ -46,7 +44,7 @@ export class Shop {
     baseGold,
     currentGold,
     lastStockRefresh,
-    inventory,
+    baseInventory,
     shopKeeper,
     archetype,
     shopKeeperPersonality,
@@ -56,7 +54,7 @@ export class Shop {
     this.currentGold = currentGold ?? baseGold;
     this.lastStockRefresh =
       lastStockRefresh.toISOString() ?? new Date().toISOString();
-    this.inventory = inventory ?? [];
+    this.baseInventory = baseInventory ?? [];
     this.archetype = archetype;
     this.shopKeeper = shopKeeper;
     this.shopKeeperPersonality = shopKeeperPersonality;
@@ -72,6 +70,7 @@ export class Shop {
       buyItem: action,
       sellItem: action,
       deathCheck: action,
+      createGreeting: computed,
     });
 
     reaction(
@@ -96,17 +95,17 @@ export class Shop {
     }
   }
 
-  public refreshInventory(player: PlayerCharacter) {
+  public refreshInventory() {
     const shopObj = shops.find((shop) => shop.type == this.archetype);
     if (shopObj) {
       const newCount = getRandomInt(
         shopObj.itemQuantityRange.minimum,
         shopObj.itemQuantityRange.maximum,
       );
-      this.inventory = generateInventory(
+      this.baseInventory = generateInventory(
         newCount,
         shopObj.trades as ItemClassType[],
-        player,
+        this.root.playerState!,
       );
       this.lastStockRefresh = new Date().toISOString();
       this.currentGold = this.baseGold;
@@ -115,7 +114,8 @@ export class Shop {
     }
   }
 
-  public createGreeting(playerFullName: string) {
+  get createGreeting() {
+    const playerFullName = this.root.playerState?.fullName || "";
     if (this.shopKeeper.affection > 90) {
       const options = greetings[this.shopKeeperPersonality]["very warm"];
       const randIdx = Math.floor(Math.random() * options.length);
@@ -142,10 +142,6 @@ export class Shop {
     return options[randIdx].replaceAll("%p", playerFullName);
   }
 
-  public setPlayerToInventory(player: PlayerCharacter) {
-    this.inventory = this.inventory.map((item) => item.reinstatePlayer(player));
-  }
-
   private changeAffection(change: number) {
     const currentAffection = this.shopKeeper.affection;
 
@@ -165,7 +161,7 @@ export class Shop {
 
     if (totalCost <= this.currentGold) {
       items.forEach((item) => {
-        this.inventory.push(item);
+        this.baseInventory.push(item);
       });
       this.currentGold -= totalCost;
 
@@ -182,7 +178,9 @@ export class Shop {
     let soldCount = 0;
 
     items.forEach((item) => {
-      const idx = this.inventory.findIndex((invItem) => invItem.equals(item));
+      const idx = this.baseInventory.findIndex((invItem) =>
+        invItem.equals(item),
+      );
       if (idx !== -1) {
         this.inventory.splice(idx, 1);
         soldCount++;
@@ -203,9 +201,9 @@ export class Shop {
     }
   }
 
-  public getInventory() {
+  get inventory() {
     const condensedInventory: { item: Item[] }[] = [];
-    this.inventory.forEach((item) => {
+    this.baseInventory.forEach((item) => {
       if (item.stackable) {
         let found = false;
         condensedInventory.forEach((entry) => {
@@ -224,12 +222,6 @@ export class Shop {
     return condensedInventory;
   }
 
-  forSave(): any {
-    const clone = { ...this };
-    clone.inventory = [];
-    return clone;
-  }
-
   static fromJSON(json: any): Shop {
     const shop = new Shop({
       shopKeeper: Character.fromJSON(json.shopKeeper),
@@ -238,8 +230,10 @@ export class Shop {
       lastStockRefresh: new Date(json.lastStockRefresh),
       archetype: json.archetype,
       shopKeeperPersonality: json.shopKeeperPersonality,
-      inventory: json.inventory
-        ? json.inventory.map((item: any) => Item.fromJSON(item))
+      baseInventory: json.baseInventory
+        ? json.baseInventory.map((item: any) =>
+            Item.fromJSON({ ...item, root: json.root }),
+          )
         : [],
       root: json.root, //this is not actually stored
     });
@@ -263,7 +257,7 @@ function getAnItemByType(type: ItemClassType, player: PlayerCharacter): Item {
     ...itemObj,
     itemClass: type,
     stackable: isStackable(type as ItemClassType),
-    player,
+    root: player.root,
   });
 }
 

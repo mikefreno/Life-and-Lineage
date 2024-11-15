@@ -330,7 +330,7 @@ export function StatsDisplay({
                 </Text>
               </View>
             )}
-            {!!playerState?.inventory.find((invItem) =>
+            {!!playerState?.baseInventory.find((invItem) =>
               invItem.equals(firstItem),
             ) && (
               <GenericFlatButton
@@ -380,7 +380,7 @@ export function StatsDisplay({
                 </Text>
               </View>
             )}
-            {!!playerState?.inventory.find((invItem) =>
+            {!!playerState?.baseInventory.find((invItem) =>
               invItem.equals(firstItem),
             ) && (
               <GenericFlatButton

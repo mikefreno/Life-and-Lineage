@@ -78,65 +78,22 @@ type MinionType = CreatureType & {
  * Most of the attributes here are readonly.
  */
 export class Creature {
-  /**
-   * Unique identifier for the creature
-   */
   readonly id: string;
-
-  /**
-   * Type of being (e.g., humanoid, animal)
-   */
   readonly beingType: BeingType;
-
-  /**
-   * Species of the creature
-   */
   readonly creatureSpecies: string;
-
   currentHealth: number;
-
   readonly baseHealth: number;
-
   currentSanity: number | null;
-
   readonly baseSanity: number | null;
-
-  /**
-   * Base attack power of the creature
-   */
   readonly attackPower: number;
-
-  /**
-   * Base armor value of the creature
-   */
   readonly baseArmor: number;
-
   currentEnergy: number;
-
   readonly baseEnergy: number;
-
-  /**
-   * energy regeneration per turn of the creature
-   */
   readonly energyRegen: number;
-
-  /**
-   * List of attack names the creature can perform
-   */
   readonly attackStrings: string[];
-
-  /**
-   * List of conditions affecting the creature
-   */
   conditions: Condition[];
-
-  /**
-   * Flag indicating if the creature has dropped items
-   */
   gotDrops: boolean;
-
   threatTable: ThreatTable = new ThreatTable();
-
   enemyStore: EnemyStore | undefined;
 
   constructor({
@@ -612,7 +569,7 @@ export class Creature {
               ...storyItemObj,
               itemClass: ItemClassType.StoryItem,
               stackable: false,
-              player,
+              root: this.enemyStore?.root,
             });
             storyDrops.push(storyItem);
           }
@@ -647,7 +604,7 @@ export class Creature {
                 ...itemObj,
                 itemClass: drop.itemType,
                 stackable: isStackable(drop.itemType as ItemClassType),
-                player,
+                root: this.enemyStore?.root,
               }),
             );
           }
@@ -712,6 +669,18 @@ export class Enemy extends Creature {
       addMinion: action,
       removeMinion: action,
     });
+
+    reaction(
+      () => [
+        this.currentHealth,
+        this.minions,
+        this.currentSanity,
+        this.currentEnergy,
+      ],
+      () => {
+        saveEnemy(this);
+      },
+    );
   }
 
   /**

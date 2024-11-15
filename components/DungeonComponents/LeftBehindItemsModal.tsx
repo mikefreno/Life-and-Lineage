@@ -24,7 +24,7 @@ export default function LeftBehindItemsModal({
 
   function takeItemFromPouch(item: Item) {
     if (playerState) {
-      if (playerState.getInventory().length < 24) {
+      if (playerState.inventory.length < 24) {
         playerState.addToInventory(item);
         setLeftBehindDrops((prev) =>
           prev.filter((dropItem) => !dropItem.equals(item)),
@@ -37,7 +37,7 @@ export default function LeftBehindItemsModal({
 
   function takeAllItemsFromPouch() {
     if (playerState) {
-      const availableSpace = 24 - playerState.getInventory().length;
+      const availableSpace = 24 - playerState.inventory.length;
       if (availableSpace === 0) {
         setInventoryFullNotifier(true);
         return;

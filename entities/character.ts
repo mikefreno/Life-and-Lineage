@@ -61,68 +61,18 @@ interface CharacterOptions {
  * This class serves as a base for the player's character - `PlayerCharacter`
  */
 export class Character {
-  /**
-   * Unique identifier for the character.
-   */
   readonly id: string;
-
-  /**
-   * Type of being (always "human" for this class).
-   */
   readonly beingType = "human";
-
-  /**
-   * First name of the character.
-   */
   readonly firstName: string;
-
-  /**
-   * Last name of the character.
-   */
   lastName: string;
-
-  /**
-   * Sex of the character ("male" or "female").
-   */
   readonly sex: "male" | "female";
-
-  /**
-   * Indicates whether the character is alive.
-   */
   alive: boolean;
-
-  /**
-   * Birthdate of the character in ISO format.
-   */
   readonly birthdate: string;
-
-  /**
-   * Deathdate of the character in ISO format, or null if the character is alive.
-   */
   deathdate: string | null;
-
-  /**
-   * Job title of the character.
-   */
   job: string;
-
-  /**
-   * Affection level of the character towards the player.
-   */
   affection: number;
-
-  /**
-   * List of qualifications the character has.
-   */
   qualifications: string[];
-
-  /**
-   * Start date of the cooldown period for the character in ISO format, if applicable.
-   */
   dateCooldownStart?: string;
-  /**
-   * Will be null if not pregnant, the string is in ISO format
-   */
   pregnancyDueDate?: string | null;
   parents?: Character[];
 
@@ -264,11 +214,6 @@ export class Character {
     this.parents = newParents;
   }
 
-  /**
-   * Creates a Character object from a JSON object.
-   * @param json - The JSON object representing the character.
-   * @returns A new Character instance.
-   */
   static fromJSON(json: any): Character {
     const character = new Character({
       id: json.id,
@@ -338,7 +283,7 @@ type PlayerCharacterBase = {
   knownSpells?: string[];
   gold?: number;
   conditions?: Condition[];
-  inventory?: Item[];
+  baseInventory?: Item[];
   keyItems?: Item[];
   minions?: Minion[];
   rangerPet?: Minion; // used to avoid removal within a dungeon
@@ -431,9 +376,7 @@ export class PlayerCharacter extends Character {
   allocatedSkillPoints: Record<Attribute, number>;
 
   knownSpells: string[];
-  /**
-   * Spells currently being learned by the player
-   */
+
   learningSpells: {
     bookName: string;
     spellName: string;
@@ -442,9 +385,7 @@ export class PlayerCharacter extends Character {
   }[];
 
   minions: Minion[];
-  /**
-   * Non-despawning pet, only ever not-null (had) by a Ranger class player
-   */
+
   rangerPet: Minion | null;
 
   jobExperience: { job: string; experience: number; rank: number }[];
@@ -455,13 +396,7 @@ export class PlayerCharacter extends Character {
   }[];
 
   conditions: Condition[];
-  /**
-   * Player's inventory, this should not be used for rendering items, getInventory should be as it stacks items
-   */
-  inventory: Item[];
-  /**
-   * Story Items, this can be directly rendered, none of these stack
-   */
+  baseInventory: Item[];
   keyItems: Item[];
   inCombat: boolean;
   currentDungeon: {
@@ -519,7 +454,7 @@ export class PlayerCharacter extends Character {
     knownCharacters,
     knownSpells,
     gold,
-    inventory,
+    baseInventory,
     currentDungeon,
     equipment,
     investments,
@@ -586,8 +521,8 @@ export class PlayerCharacter extends Character {
     this.knownSpells = knownSpells ?? [];
     this.conditions = conditions ?? [];
 
-    this.inventory = inventory ?? [];
-    this.keyItems = keyItems ?? __DEV__ ? testKeyItems() : [];
+    this.baseInventory = baseInventory ?? [];
+    this.keyItems = keyItems ?? __DEV__ ? testKeyItems(root) : [];
     this.currentDungeon = currentDungeon ?? null;
     this.inCombat = inCombat ?? false;
     this.equipment = equipment ?? {
@@ -597,8 +532,8 @@ export class PlayerCharacter extends Character {
         stats: { baseDamage: 1 },
         baseValue: 0,
         itemClass: ItemClassType.Melee,
-        player: null,
         attacks: ["punch"],
+        root,
       }),
       offHand: null,
       head: null,
@@ -695,12 +630,12 @@ export class PlayerCharacter extends Character {
       children: observable,
       partners: observable,
       conditions: observable,
-      inventory: observable,
       currentDungeon: observable,
       investments: observable,
       adopt: action,
       makePartner: action,
 
+      baseInventory: observable,
       addToInventory: action,
       addToKeyItems: action,
       buyItem: action,
@@ -709,7 +644,7 @@ export class PlayerCharacter extends Character {
       equipment: observable,
       equipItem: action,
       unEquipItem: action,
-      getInventory: observable,
+      inventory: computed,
       getDamageReduction: action,
 
       getMedicalService: action,
@@ -1028,9 +963,9 @@ export class PlayerCharacter extends Character {
   //----------------------------------Inventory----------------------------------//
   public addToInventory(item: Item | Item[] | null) {
     if (Array.isArray(item)) {
-      this.inventory = this.inventory.concat(item);
+      this.baseInventory = this.baseInventory.concat(item);
     } else if (item && item.name !== "unarmored") {
-      this.inventory.push(item);
+      this.baseInventory.push(item);
     }
   }
 
@@ -1041,7 +976,7 @@ export class PlayerCharacter extends Character {
       }
       this.keyItems = this.keyItems.concat(item);
     } else if (item && item.itemClass === ItemClassType.StoryItem) {
-      this.inventory.push(item);
+      this.keyItems.push(item);
     }
   }
 
@@ -1053,9 +988,9 @@ export class PlayerCharacter extends Character {
     }
   }
   private removeSingleItem(item: Item) {
-    const idx = this.inventory.findIndex((invItem) => invItem.equals(item));
+    const idx = this.baseInventory.findIndex((invItem) => invItem.equals(item));
     if (idx !== -1) {
-      this.inventory.splice(idx, 1);
+      this.baseInventory.splice(idx, 1);
     }
   }
 
@@ -1065,7 +1000,7 @@ export class PlayerCharacter extends Character {
 
     if (totalCost <= this.gold) {
       items.forEach((item) => {
-        this.inventory.push(item);
+        this.baseInventory.push(item);
       });
       this.gold -= totalCost;
     } else {
@@ -1078,9 +1013,11 @@ export class PlayerCharacter extends Character {
     let soldCount = 0;
 
     items.forEach((item) => {
-      const idx = this.inventory.findIndex((invItem) => invItem.equals(item));
+      const idx = this.baseInventory.findIndex((invItem) =>
+        invItem.equals(item),
+      );
       if (idx !== -1) {
-        this.inventory.splice(idx, 1);
+        this.baseInventory.splice(idx, 1);
         soldCount++;
       }
     });
@@ -1281,9 +1218,9 @@ export class PlayerCharacter extends Character {
   /**
    * This should always be used over the `inventory` field
    */
-  public getInventory() {
+  get inventory() {
     const condensedInventory: { item: Item[] }[] = [];
-    this.inventory.forEach((item) => {
+    this.baseInventory.forEach((item) => {
       if (item.stackable) {
         let found = false;
         condensedInventory.forEach((entry) => {
@@ -2137,20 +2074,6 @@ export class PlayerCharacter extends Character {
     }
   }
 
-  //public reinstateLinks() {
-  //this.minions = this.minions.map((minion) => minion.reinstateParent(this));
-  //this.rangerPet = this.rangerPet?.reinstateParent(this) ?? null;
-  //this.conditions = this.conditions.map((cond) => cond.reinstateParent(this));
-  //this.inventory = this.inventory.map((item) => item.reinstatePlayer(this));
-  //this.equipment.mainHand = this.equipment.mainHand.reinstatePlayer(this);
-  //this.equipment.offHand =
-  //this.equipment.offHand?.reinstatePlayer(this) ?? null;
-  //this.equipment.body = this.equipment.body?.reinstatePlayer(this) ?? null;
-  //this.equipment.head = this.equipment.head?.reinstatePlayer(this) ?? null;
-  //this.equipment.quiver =
-  //this.equipment.quiver?.map((item) => item.reinstatePlayer(this)) ?? null;
-  //}
-
   /**
    * Creates a PlayerCharacter instance from a JSON object
    * @param json - JSON representation of a PlayerCharacter
@@ -2202,8 +2125,10 @@ export class PlayerCharacter extends Character {
       knownSpells: json.knownSpells,
       physicalAttacks: json.physicalAttacks,
       gold: json.gold,
-      inventory: json.inventory
-        ? json.inventory.map((item: any) => Item.fromJSON(item))
+      baseInventory: json.baseInventory
+        ? json.baseInventory.map((item: any) =>
+            Item.fromJSON({ ...item, root: json.root }),
+          )
         : [],
       currentDungeon: json.currentDungeon
         ? {
@@ -2218,23 +2143,20 @@ export class PlayerCharacter extends Character {
             mapDimensions: json.currentDungeon.mapDimensions,
           }
         : null,
-      equipment: json.equipment
-        ? {
-            mainHand: Item.fromJSON(json.equipment.mainHand),
-            offHand: json.equipment.offHand
-              ? Item.fromJSON(json.equipment.offHand)
+      equipment: json.equipment && {
+        ...Object.fromEntries(
+          ["mainHand", "offHand", "body", "head"].map((slot) => [
+            slot,
+            json.equipment[slot]
+              ? Item.fromJSON({ ...json.equipment[slot], root: json.root })
               : null,
-            body: json.equipment.body
-              ? Item.fromJSON(json.equipment.body)
-              : null,
-            head: json.equipment.head
-              ? Item.fromJSON(json.equipment.head)
-              : null,
-            quiver: json.equipment.quiver
-              ? json.equipment.quiver.map((arrow: any) => Item.fromJSON(arrow))
-              : null,
-          }
-        : undefined,
+          ]),
+        ),
+        quiver:
+          json.equipment.quiver?.map((arrow: any) =>
+            Item.fromJSON({ ...arrow, root: json.root }),
+          ) ?? null,
+      },
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
@@ -2255,10 +2177,12 @@ export class PlayerCharacter extends Character {
   }
 }
 
-function testKeyItems() {
+function testKeyItems(root: RootStore) {
   const items: Item[] = [];
   storyItems.forEach((obj) => {
-    items.push(Item.fromJSON({ ...obj, itemClass: ItemClassType.StoryItem }));
+    items.push(
+      Item.fromJSON({ ...obj, itemClass: ItemClassType.StoryItem, root }),
+    );
   });
   return items;
 }
@@ -2349,7 +2273,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        player,
+        root: player.root,
       });
     case Element.water:
       return new Item({
@@ -2357,7 +2281,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        player,
+        root: player.root,
       });
     case Element.air:
       return new Item({
@@ -2365,7 +2289,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        player,
+        root: player.root,
       });
     case Element.earth:
       return new Item({
@@ -2373,7 +2297,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        player,
+        root: player.root,
       });
     case Element.blood:
       return new Item({
@@ -2381,7 +2305,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        player,
+        root: player.root,
       });
     case Element.summoning:
       return new Item({
@@ -2389,7 +2313,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        player,
+        root: player.root,
       });
     case Element.pestilence:
       return new Item({
@@ -2397,7 +2321,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        player,
+        root: player.root,
       });
     case Element.bone:
       return new Item({
@@ -2405,7 +2329,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        player,
+        root: player.root,
       });
     case Element.holy:
       return new Item({
@@ -2413,7 +2337,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        player,
+        root: player.root,
       });
     case Element.protection:
       return new Item({
@@ -2421,7 +2345,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        player,
+        root: player.root,
       });
     case Element.vengeance:
       return new Item({
@@ -2429,7 +2353,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        player,
+        root: player.root,
       });
     case Element.beastMastery:
       return new Item({
@@ -2437,7 +2361,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        player,
+        root: player.root,
       });
     case Element.assassination:
       return new Item({
@@ -2445,7 +2369,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        player,
+        root: player.root,
       });
     case Element.arcane:
       return new Item({
@@ -2453,7 +2377,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
-        player,
+        root: player.root,
       });
     default:
       throw new Error("Invalid player blessing in getStartingBook()");

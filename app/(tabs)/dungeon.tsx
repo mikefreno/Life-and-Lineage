@@ -21,7 +21,7 @@ import { useVibration } from "../../hooks/generic";
 import { useDungeonStore } from "../../hooks/stores";
 import type { DungeonInstance } from "../../entities/dungeon";
 
-const MIN_RED = 50;
+const MIN_RED = 75;
 const MAX_RED = 255;
 
 const DungeonScreen = observer(() => {
@@ -33,7 +33,6 @@ const DungeonScreen = observer(() => {
       .filter((inst) => inst.name !== "training grounds")
       .sort((a, b) => a.difficulty - b.difficulty),
   );
-  const [step, setStep] = useState((MAX_RED - MIN_RED) / (sorted.length - 1));
   const [scrollViewHeight, setScrollViewHeight] = useState(0);
 
   const [currentPage, setCurrentPage] = useState(0);
@@ -49,7 +48,6 @@ const DungeonScreen = observer(() => {
       .filter((inst) => inst.name !== "training grounds")
       .sort((a, b) => a.difficulty - b.difficulty);
     setSorted(sorted);
-    setStep((MAX_RED - MIN_RED) / (sorted.length - 1));
   }, [dungeonInstances]);
 
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -61,15 +59,6 @@ const DungeonScreen = observer(() => {
   const onLayout = (event: LayoutChangeEvent) => {
     const { height } = event.nativeEvent.layout;
     setScrollViewHeight(height);
-  };
-
-  const getInstanceColor = (idx: number) => {
-    if (sorted.length <= 1) {
-      return `rgb(255, ${255 - MIN_RED}, ${255 - MIN_RED})`;
-    }
-    const progress = idx / (sorted.length - 1);
-    const red = Math.round(MIN_RED + (MAX_RED - MIN_RED) * progress);
-    return `rgb(255, ${255 - red}, ${255 - red})`;
   };
 
   const getLevelColor = (
@@ -97,10 +86,6 @@ const DungeonScreen = observer(() => {
     const red = Math.round(currentInstanceRed + redStep * levelIdx);
 
     return `rgb(255, ${255 - red}, ${255 - red})`;
-  };
-
-  const textColor = (redValue: number) => {
-    return redValue > 192 ? "black" : "white";
   };
 
   return (
@@ -159,10 +144,6 @@ const DungeonScreen = observer(() => {
           scrollIndicatorInsets={{ top: 92, right: 0, left: 0, bottom: 48 }}
         >
           {sorted.map((dungeonInstance, dungeonInstanceIdx) => {
-            console.log(dungeonInstance.name);
-            dungeonInstance.levels.map((lvl) =>
-              console.log(lvl.level, lvl.unlocked),
-            );
             return (
               <ThemedCard
                 key={dungeonInstanceIdx}
@@ -203,13 +184,7 @@ const DungeonScreen = observer(() => {
                         >
                           <Text
                             style={{
-                              color: textColor(
-                                MIN_RED +
-                                  ((MAX_RED - MIN_RED) * levelIdx) /
-                                    dungeonInstance.levels.length +
-                                  ((MAX_RED - MIN_RED) * dungeonInstanceIdx) /
-                                    sorted.length,
-                              ),
+                              color: "white",
                             }}
                           >
                             {`Delve to Floor ${level.level}`}

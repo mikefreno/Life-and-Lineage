@@ -64,6 +64,7 @@ export class RootStore {
       },
     );
   }
+
   get compactPath() {
     return compactPaths.includes(this.currentPath);
   }

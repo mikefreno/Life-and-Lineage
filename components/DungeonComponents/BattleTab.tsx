@@ -333,7 +333,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
             <InventoryRender
               displayItem={displayItem}
               setDisplayItem={setDisplayItem}
-              inventory={playerState.getInventory()}
+              inventory={playerState.inventory}
               pouchTarget={pouchRef}
               addItemToPouch={addItemToPouch}
               setIconString={setIconString}

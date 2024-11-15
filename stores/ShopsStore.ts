@@ -22,8 +22,8 @@ export class ShopStore {
   root: RootStore;
 
   constructor({ root }: { root: RootStore }) {
-    this.shopsMap = this.hydrateShopState();
     this.root = root;
+    this.shopsMap = this.hydrateShopState();
   }
 
   hydrateShopState() {

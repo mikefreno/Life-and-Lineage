@@ -1,35 +1,7 @@
-import type { DungeonInstance, DungeonLevel } from "../classes/dungeon";
-import type { Item } from "../classes/item";
-import type { Game } from "../classes/game";
-import type { PlayerCharacter } from "../classes/character";
-import type { Enemy, Minion } from "../classes/creatures";
-import React from "react";
-import { BoundingBox, Tile } from "../components/DungeonComponents/DungeonMap";
-import { Attack } from "../classes/attack";
-import { Spell } from "../classes/spell";
-import { type Condition } from "../classes/conditions";
-import { type SharedValue } from "react-native-reanimated";
-
-export interface ItemOptions {
-  id?: string;
-  name: string;
-  slot?: "head" | "body" | "one-hand" | "two-hand" | "off-hand" | null;
-  stats?: Record<string, number> | null;
-  baseValue: number;
-  itemClass: ItemClassType;
-  icon?: string;
-  requirements?: { strength?: number; intelligence?: number };
-  stackable?: boolean;
-  player: PlayerCharacter | null;
-  attacks?: string[];
-  description?: string;
-  effect?: ItemEffect;
-  activePoison?:
-    | Condition
-    | { effect: "health" | "mana" | "sanity"; amount: number }
-    | null;
-  uses?: number;
-}
+import type { PlayerCharacter } from "../entities/character";
+import type { Condition } from "../entities/conditions";
+import type { Enemy, Minion } from "../entities/creatures";
+import type { Item } from "../entities/item";
 
 type StatEffect = {
   stat: "health" | "mana" | "sanity";

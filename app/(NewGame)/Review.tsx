@@ -25,7 +25,6 @@ import { useColorScheme } from "nativewind";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
-import { createShops } from "../../entities/shop";
 import { useNewGameStore } from "./_layout";
 
 export default function NewGameReview() {
