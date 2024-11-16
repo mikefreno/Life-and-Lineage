@@ -26,7 +26,7 @@ export default function LearningKnowledgeScreen() {
   const { playerState, gameState } = useRootStore();
   const { dimensions } = useUIStore();
 
-  const books = playerState?.inventory.filter(
+  const books = playerState?.baseInventory.filter(
     (item) => item.itemClass == ItemClassType.Book,
   );
   const isFocused = useIsFocused();

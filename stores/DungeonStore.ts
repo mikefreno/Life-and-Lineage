@@ -27,7 +27,7 @@ export class DungeonStore {
   fightingBoss: boolean;
 
   constructor({ root }: { root: RootStore }) {
-    this.dungeonInstances = this.getInitDungeonState();
+    this.dungeonInstances = this.hydrateDungeonState();
     this.activityInstance = this.initActivityDungeon();
     this.inCombat = false;
     this.fightingBoss = false;
@@ -174,14 +174,6 @@ export class DungeonStore {
   }
 
   getInitDungeonState() {
-    const banditHideout = DungeonInstance.fromJSON({
-      ...dungeonsJSON.find((inst) => inst.name == "bandit hideout"),
-      dungeonStore: this,
-    });
-    const goblinCave = DungeonInstance.fromJSON({
-      ...dungeonsJSON.find((inst) => inst.name == "goblin cave"),
-      dungeonStore: this,
-    });
     const nearbyCave = DungeonInstance.fromJSON({
       ...dungeonsJSON.find((inst) => inst.name == "nearby cave"),
       dungeonStore: this,
@@ -194,7 +186,7 @@ export class DungeonStore {
     _dungeonInstanceSave(nearbyCave);
     _dungeonInstanceSave(trainingGrounds);
 
-    return [trainingGrounds, nearbyCave, goblinCave, banditHideout];
+    return [trainingGrounds, nearbyCave];
   }
 
   setActivityName(name: string) {

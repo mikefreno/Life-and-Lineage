@@ -100,7 +100,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
 
   const attackHandler = (attackOrSpell: Attack | Spell) => {
     if (enemyStore.enemies.length > 0) {
-      enemyStore.attackAnimationSet = true;
+      enemyStore.setAttackAnimationOngoing(true);
       vibration({ style: "light" });
       const enoughForDualToHitAll =
         enemyStore.enemies.length > 1 ||
@@ -271,7 +271,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                         <Pressable
                           disabled={enemyStore.attackAnimationsOnGoing}
                           onPress={() => {
-                            enemyStore.attackAnimationSet = true;
+                            enemyStore.setAttackAnimationOngoing(true);
                             vibration({ style: "light" });
                             pass({ voluntary: true });
                           }}
@@ -310,7 +310,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
                   <Pressable
                     disabled={enemyStore.attackAnimationsOnGoing}
                     onPress={() => {
-                      enemyStore.attackAnimationSet = true;
+                      enemyStore.setAttackAnimationOngoing(true);
                       vibration({ style: "light" });
                       pass({ voluntary: true });
                     }}

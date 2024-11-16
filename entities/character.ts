@@ -1476,7 +1476,7 @@ export class PlayerCharacter extends Character {
         return spellWithExp;
       }
     });
-    const book = this.inventory.find((item) => item.name == bookName);
+    const book = this.baseInventory.find((item) => item.name == bookName);
     if (book) {
       this.removeFromInventory(book);
     }

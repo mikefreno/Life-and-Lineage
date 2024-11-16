@@ -7,7 +7,9 @@ import { useEffect, useState } from "react";
 import { useBattleLogger, useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useCombatActions, useEnemyManagement } from "../../hooks/combat";
-import { savePlayer } from "../../entities/character";
+import { PlayerCharacter, savePlayer } from "../../entities/character";
+import { observer } from "mobx-react-lite";
+import EnemyStore from "../../stores/EnemyStore";
 
 export default function FleeModal({
   fleeModalShowing,
@@ -31,7 +33,7 @@ export default function FleeModal({
 
   const flee = () => {
     if (playerState && gameState) {
-      enemyStore.attackAnimationSet = true;
+      enemyStore.setAttackAnimationOngoing(true);
       const roll = rollD20();
       if (
         enemyStore.enemies[0].creatureSpecies == "training dummy" ||
@@ -41,7 +43,7 @@ export default function FleeModal({
         vibration({ style: "light" });
         setFleeRollFailure(false);
         setFleeModalShowing(false);
-        enemyStore.attackAnimationSet = false;
+        enemyStore.setAttackAnimationOngoing(false);
         wait(500).then(() => {
           playerState.clearMinions();
           while (router.canGoBack()) {
@@ -90,15 +92,12 @@ export default function FleeModal({
             <Text style={{ color: "#ef4444" }}>You are stunned!</Text>
           ) : null}
           <ThemedView className="flex w-full flex-row justify-evenly pt-8">
-            <GenericFlatButton
-              onPress={flee}
-              disabled={
-                inCombat &&
-                (enemyStore.attackAnimationsOnGoing || playerState.isStunned)
-              }
-            >
-              {enemyStore.enemies.length == 0 ? "Run! (50%)" : "Leave"}
-            </GenericFlatButton>
+            <FleeButton
+              enemyStore={enemyStore}
+              playerState={playerState}
+              inCombat={inCombat}
+              flee={flee}
+            />
             <GenericFlatButton
               onPress={() => {
                 setFleeModalShowing(false);
@@ -118,3 +117,29 @@ export default function FleeModal({
     );
   }
 }
+
+const FleeButton = observer(
+  ({
+    enemyStore,
+    playerState,
+    inCombat,
+    flee,
+  }: {
+    enemyStore: EnemyStore;
+    playerState: PlayerCharacter;
+    inCombat: boolean;
+    flee: () => void;
+  }) => {
+    return (
+      <GenericFlatButton
+        onPress={flee}
+        disabled={
+          inCombat &&
+          (enemyStore.attackAnimationsOnGoing || playerState.isStunned)
+        }
+      >
+        {enemyStore.enemies.length == 0 ? "Run! (50%)" : "Leave"}
+      </GenericFlatButton>
+    );
+  },
+);

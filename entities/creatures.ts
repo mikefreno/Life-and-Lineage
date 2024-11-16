@@ -678,7 +678,9 @@ export class Enemy extends Creature {
         this.currentEnergy,
       ],
       () => {
-        saveEnemy(this);
+        if (this.enemyStore) {
+          this.enemyStore.saveEnemy(this);
+        }
       },
     );
   }
@@ -833,6 +835,7 @@ export class Minion extends Creature {
     makeObservable(this, {
       turnsLeftAlive: observable,
       takeTurn: action,
+      reinstateParent: action,
     });
 
     reaction(

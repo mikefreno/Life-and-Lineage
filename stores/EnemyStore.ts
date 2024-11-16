@@ -23,12 +23,15 @@ export default class EnemyStore {
 
     makeObservable(this, {
       enemies: observable,
+      attackAnimationsOnGoing: observable,
       addToEnemyList: action,
+      setAttackAnimationOngoing: action,
       removeEnemy: action,
       clearEnemyList: action,
     });
   }
-  set attackAnimationSet(state: boolean) {
+
+  public setAttackAnimationOngoing(state: boolean) {
     this.attackAnimationsOnGoing = state;
   }
 
@@ -57,7 +60,7 @@ export default class EnemyStore {
     (parse(storedIds) as string[]).forEach((str) => {
       const retrieved = storage.getString(`enemy_${str}`);
       if (!retrieved) return;
-      const enemy = Enemy.fromJSON({ ...parse(retrieved), root: this.root });
+      const enemy = Enemy.fromJSON({ ...parse(retrieved), enemyStore: this });
       map.set(enemy.id, new AnimationStore());
       enemies.push(enemy);
     });
@@ -69,12 +72,18 @@ export default class EnemyStore {
   }
 
   private enemySave = async (enemy: Enemy) => {
-    const str = this.enemies.map((enemy) => enemy.id);
-    storage.set("enemyIDs", stringify(str));
-    try {
-      storage.set(`enemy_${enemy?.id}`, stringify({ ...enemy, root: null }));
-    } catch (e) {
-      console.log("Error in _playerSave:", e);
+    if (this.enemies) {
+      const str = this.enemies.map((enemy) => enemy.id);
+
+      storage.set("enemyIDs", stringify(str));
+      try {
+        storage.set(
+          `enemy_${enemy?.id}`,
+          stringify({ ...enemy, enemyStore: null }),
+        );
+      } catch (e) {
+        console.log("Error in _playerSave:", e);
+      }
     }
   };
   public saveEnemy = throttle(this.enemySave, 250);

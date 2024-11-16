@@ -289,6 +289,10 @@ export const headerOptions = ({
           fontFamily: "PixelifySans",
           fontSize: 22,
         },
+        headerBackTitleStyle: {
+          fontFamily: "PixelifySans",
+          fontSize: 16,
+        },
         headerBackground: () => (
           <BlurView
             blurReductionFactor={12}
@@ -310,6 +314,10 @@ export const headerOptions = ({
         headerBackTitleVisible: headerBackTitleVisible,
         headerBackButtonMenuEnabled: false,
         presentation: presentation,
+        headerBackTitleStyle: {
+          fontFamily: "PixelifySans",
+          fontSize: 16,
+        },
         headerTitleStyle: {
           fontFamily: "PixelifySans",
           fontSize: 22,
