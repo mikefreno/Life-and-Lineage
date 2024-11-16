@@ -1,4 +1,4 @@
-import { Link, Tabs } from "expo-router";
+import { Link, Tabs, useNavigation } from "expo-router";
 import {
   GestureResponderEvent,
   Platform,
@@ -132,6 +132,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
+            lazy: false,
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
@@ -212,6 +213,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="spells"
           options={{
+            lazy: false,
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
@@ -258,6 +260,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="labor"
           options={{
+            lazy: false,
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
@@ -322,6 +325,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="dungeon"
           options={{
+            lazy: false,
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
@@ -368,6 +372,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="shops"
           options={{
+            lazy: false,
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
@@ -410,6 +415,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="medical"
           options={{
+            lazy: false,
             headerTransparent: true,
             headerTitleAlign: "center",
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },

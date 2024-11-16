@@ -1,10 +1,12 @@
-import { ThemedView, ThemedScrollView, Text } from "../Themed";
+import { ThemedView, Text } from "../Themed";
 import {
   Pressable,
   FlatList,
   View,
   Platform,
   TouchableWithoutFeedback,
+  ScrollView,
+  Button,
 } from "react-native";
 import { toTitleCase } from "../../utility/functions/misc";
 import { useEffect, useState } from "react";
@@ -22,19 +24,22 @@ import { Attack } from "../../entities/attack";
 import { Spell } from "../../entities/spell";
 import { useCombatActions } from "../../hooks/combat";
 import { Item } from "../../entities/item";
-import { useBattleLogger, usePouch, useVibration } from "../../hooks/generic";
+import { usePouch, useVibration } from "../../hooks/generic";
 import {
   useDraggableStore,
   useDungeonStore,
   useRootStore,
 } from "../../hooks/stores";
+import { DungeonStore } from "../../stores/DungeonStore";
+import { PlayerCharacter } from "../../entities/character";
+import { observer } from "mobx-react-lite";
 
 interface BattleTabProps {
   battleTab: "attacksOrNavigation" | "equipment" | "log";
   pouchRef: React.RefObject<View>;
 }
 
-export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
+const BattleTab = observer(({ battleTab, pouchRef }: BattleTabProps) => {
   const { colorScheme } = useColorScheme();
   const [attackDetails, setAttackDetails] = useState<Attack | Spell | null>(
     null,
@@ -43,7 +48,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
     useState<boolean>(false);
 
   const { playerState, enemyStore } = useRootStore();
-  const { inCombat } = useDungeonStore();
+  const dungeonStore = useDungeonStore();
 
   const { useAttack } = useCombatActions();
   const { displayItem, setDisplayItem } = useLootState();
@@ -60,7 +65,6 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
   } | null>();
 
   const vibration = useVibration();
-  const { logs } = useBattleLogger();
   const { addItemToPouch } = usePouch();
   const { pass } = useCombatActions();
 
@@ -83,8 +87,6 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
       setCombinedData([...playerState.weaponAttacks, ...playerState.spells]);
     }
   }, [playerState]);
-
-  useEffect(() => {}, [inCombat]);
 
   useEffect(() => {
     if (battleTab !== "equipment") {
@@ -140,7 +142,7 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
       </GenericModal>
 
       {battleTab == "attacksOrNavigation" ? (
-        !inCombat ? (
+        !dungeonStore.inCombat ? (
           <DungeonMapControls />
         ) : (
           <View className="w-full h-full px-2">
@@ -347,6 +349,10 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
         </TouchableWithoutFeedback>
       ) : (
         <PlatformDependantBlurView className="flex-1 px-2">
+          <Button
+            title="Add Log"
+            onPress={() => dungeonStore.addLog("Manual log entry")}
+          />
           <ThemedView
             className="flex-1 pl-1 rounded-lg border border-zinc-600"
             style={{
@@ -354,23 +360,20 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
             }}
           >
             {Platform.OS == "web" ? (
-              <ThemedScrollView>
-                {logs
-                  .slice()
-                  .reverse()
-                  .map((text) => (
-                    <Text>
-                      {text
-                        .replaceAll(`on the ${playerState.fullName}`, "")
-                        .replaceAll(`on the ${playerState.fullName}`, "")
-                        .replaceAll(`The ${playerState.fullName}`, "You")}
-                    </Text>
-                  ))}
-              </ThemedScrollView>
+              <ScrollView>
+                {dungeonStore.reversedLogs.map((text) => (
+                  <Text>
+                    {text
+                      .replaceAll(`on the ${playerState.fullName}`, "")
+                      .replaceAll(`on the ${playerState.fullName}`, "")
+                      .replaceAll(`The ${playerState.fullName}`, "You")}
+                  </Text>
+                ))}
+              </ScrollView>
             ) : (
               <FlatList
                 inverted
-                data={logs.slice().reverse()}
+                data={dungeonStore.reversedLogs}
                 renderItem={({ item }) => (
                   <Text className="py-1">
                     {item
@@ -385,4 +388,6 @@ export default function BattleTab({ battleTab, pouchRef }: BattleTabProps) {
       )}
     </>
   );
-}
+});
+
+export default BattleTab;

@@ -4,7 +4,13 @@ import dungeonsJSON from "../assets/json/dungeons.json";
 import { storage } from "../utility/functions/storage";
 import { parse, stringify } from "flatted";
 import { throttle } from "lodash";
-import { action, makeObservable, observable } from "mobx";
+import {
+  action,
+  computed,
+  makeObservable,
+  observable,
+  runInAction,
+} from "mobx";
 import {
   BoundingBox,
   Tile,
@@ -26,7 +32,10 @@ export class DungeonStore {
   inCombat: boolean;
   fightingBoss: boolean;
 
+  logs: string[] = [];
+
   constructor({ root }: { root: RootStore }) {
+    console.log("Creating DungeonStore instance");
     this.dungeonInstances = this.hydrateDungeonState();
     this.activityInstance = this.initActivityDungeon();
     this.inCombat = false;
@@ -43,8 +52,11 @@ export class DungeonStore {
       currentMapDimensions: observable,
       currentPosition: observable,
       fightingBoss: observable,
+      logs: observable,
+      addLog: action,
       setUpDungeon: action,
       move: action,
+      reversedLogs: computed,
     });
   }
 
@@ -108,6 +120,23 @@ export class DungeonStore {
         this.visitRoom(newPosition);
       }
     }
+  }
+
+  get reversedLogs() {
+    return this.logs.slice().reverse();
+  }
+
+  public addLog(whatHappened: string) {
+    if (!this.logs) {
+      console.log("no logs");
+      this.logs = []; // Ensure logs exists
+    }
+    runInAction(() => {
+      const timeOfLog = new Date().toLocaleTimeString();
+      const log = `${timeOfLog}: ${whatHappened}`;
+      this.logs.push(log);
+      console.log("All logs:", this.logs);
+    });
   }
 
   private visitRoom(room: Tile) {

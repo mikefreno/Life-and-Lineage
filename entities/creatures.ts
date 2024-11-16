@@ -668,6 +668,7 @@ export class Enemy extends Creature {
       minions: observable,
       addMinion: action,
       removeMinion: action,
+      hydrationLinking: action,
     });
 
     reaction(
@@ -745,6 +746,17 @@ export class Enemy extends Creature {
     this.minions = newList;
   }
 
+  public hydrationLinking() {
+    this.reinstateMinionParent();
+    this.reinstateConditionParent();
+  }
+  private reinstateMinionParent() {
+    this.minions.forEach((minion) => minion.reinstateParent(this));
+  }
+  private reinstateConditionParent() {
+    this.conditions.forEach((cond) => cond.reinstateParent(this));
+  }
+
   /**
    * Creates an enemy from a JSON object.
    * @param json - The JSON object representing the enemy.
@@ -772,12 +784,7 @@ export class Enemy extends Creature {
         : [],
       enemyStore: json.enemyStore,
     });
-    enemy.minions = enemy.minions.map((minion) =>
-      minion.reinstateParent(enemy),
-    );
-    enemy.conditions = enemy.conditions.map((cond) =>
-      cond.reinstateParent(enemy),
-    );
+    enemy.hydrationLinking();
     return enemy;
   }
 }

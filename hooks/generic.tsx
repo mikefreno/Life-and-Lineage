@@ -70,24 +70,3 @@ export const usePouch = () => {
 
   return { addItemToPouch };
 };
-
-export const useBattleLogger = () => {
-  const [logs, setLogs] = useState<string[]>([]);
-
-  const battleLogger = useCallback((whatHappened: string) => {
-    const timeOfLog = new Date().toLocaleTimeString();
-    const log = `${timeOfLog}: ${whatHappened}`;
-    setLogs((prev) => [...prev, log]);
-  }, []);
-
-  useEffect(() => {
-    if (logs.length > 100) {
-      setLogs((prev) => prev.slice(-100));
-    }
-  }, [logs]);
-
-  return {
-    logs,
-    battleLogger,
-  };
-};

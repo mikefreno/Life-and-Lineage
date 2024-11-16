@@ -252,7 +252,7 @@ const EnemyDisplay = observer(
     }, [animationStore.textDummy]);
 
     useEffect(() => {
-      if (animationStore.textDummy !== 0) {
+      if (animationStore.attackDummy !== 0) {
         animations.runAttackAnimation();
       }
     }, [animationStore.attackDummy]);

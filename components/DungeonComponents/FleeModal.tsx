@@ -4,8 +4,8 @@ import { ThemedView, Text } from "../Themed";
 import { rollD20, wait } from "../../utility/functions/misc";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { useBattleLogger, useVibration } from "../../hooks/generic";
-import { useRootStore } from "../../hooks/stores";
+import { useVibration } from "../../hooks/generic";
+import { useDungeonStore, useRootStore } from "../../hooks/stores";
 import { useCombatActions, useEnemyManagement } from "../../hooks/combat";
 import { PlayerCharacter, savePlayer } from "../../entities/character";
 import { observer } from "mobx-react-lite";
@@ -19,9 +19,8 @@ export default function FleeModal({
   setFleeModalShowing: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const vibration = useVibration();
-  const { playerState, enemyStore, gameState, dungeonStore } = useRootStore();
-  const { inCombat, currentInstance } = dungeonStore;
-  const { battleLogger } = useBattleLogger();
+  const { playerState, enemyStore, gameState } = useRootStore();
+  const { inCombat, currentInstance, addLog } = useDungeonStore();
   const { playerMinionsTurn } = useCombatActions();
   const { enemyTurn } = useEnemyManagement();
 
@@ -64,7 +63,7 @@ export default function FleeModal({
       } else {
         setFleeRollFailure(true);
         vibration({ style: "error" });
-        battleLogger("You failed to flee!");
+        addLog("You failed to flee!");
 
         playerMinionsTurn(() => {
           enemyTurn();
