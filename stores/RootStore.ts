@@ -25,10 +25,15 @@ export class RootStore {
   dungeonStore: DungeonStore;
   uiStore: UIStore;
   currentPath: string = "";
+  constructed: boolean = false;
+  atDeathScreen: boolean = false;
 
   constructor() {
     const retrieved_game = storage.getString("game");
     const retrieved_player = storage.getString("player");
+
+    this.uiStore = new UIStore({ root: this });
+    this.shopsStore = new ShopStore({ root: this });
 
     this.gameState = retrieved_game
       ? Game.fromJSON({ ...parse(retrieved_game), root: this })
@@ -36,14 +41,15 @@ export class RootStore {
     this.playerState = retrieved_player
       ? PlayerCharacter.fromJSON({ ...parse(retrieved_player), root: this })
       : null;
-    this.enemyStore = new EnemyStore({ root: this });
-    this.shopsStore = new ShopStore({ root: this });
 
+    this.enemyStore = new EnemyStore({ root: this });
     this.dungeonStore = new DungeonStore({ root: this });
-    this.uiStore = new UIStore({ root: this });
+
+    this.constructed = true;
 
     makeObservable(this, {
       currentPath: observable,
+      constructed: observable,
       setPathName: action,
       compactPath: computed,
     });

@@ -14,11 +14,10 @@ import { Text } from "../../components/Themed";
 import GenericModal from "../../components/GenericModal";
 import { EXPANDED_PAD } from "../../components/PlayerStatus";
 import { useVibration } from "../../hooks/generic";
-import { usePlayerStore, useUIStore } from "../../hooks/stores";
+import { useRootStore } from "../../hooks/stores";
 
 const EarnScreen = observer(() => {
-  const playerState = usePlayerStore();
-  const { playerStatusIsCompact } = useUIStore();
+  const { playerState, uiStore } = useRootStore();
   const [showingRejection, setShowingRejection] = useState<boolean>(false);
   const [missingPreReqs, setMissingPreReqs] = useState<string[]>([]);
 
@@ -94,7 +93,8 @@ const EarnScreen = observer(() => {
             style={{
               paddingTop: headerHeight,
               paddingBottom:
-                bottomBarHeight + (playerStatusIsCompact ? 0 : EXPANDED_PAD),
+                bottomBarHeight +
+                (uiStore.playerStatusIsCompact ? 0 : EXPANDED_PAD),
             }}
           >
             {jobs

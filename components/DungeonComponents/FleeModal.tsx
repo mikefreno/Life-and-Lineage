@@ -5,7 +5,7 @@ import { rollD20, wait } from "../../utility/functions/misc";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { useVibration } from "../../hooks/generic";
-import { useDungeonStore, useRootStore } from "../../hooks/stores";
+import { useRootStore } from "../../hooks/stores";
 import { useCombatActions, useEnemyManagement } from "../../hooks/combat";
 import { PlayerCharacter, savePlayer } from "../../entities/character";
 import { observer } from "mobx-react-lite";
@@ -19,8 +19,7 @@ export default function FleeModal({
   setFleeModalShowing: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const vibration = useVibration();
-  const { playerState, enemyStore, gameState } = useRootStore();
-  const { inCombat, currentInstance, addLog } = useDungeonStore();
+  const { playerState, enemyStore, gameState, dungeonStore } = useRootStore();
   const { playerMinionsTurn } = useCombatActions();
   const { enemyTurn } = useEnemyManagement();
 
@@ -37,7 +36,7 @@ export default function FleeModal({
       if (
         enemyStore.enemies[0].creatureSpecies == "training dummy" ||
         roll > 13 ||
-        !inCombat
+        !dungeonStore.inCombat
       ) {
         vibration({ style: "light" });
         setFleeRollFailure(false);
@@ -48,14 +47,15 @@ export default function FleeModal({
           while (router.canGoBack()) {
             router.back();
           }
-          if (currentInstance?.name == "Activities") {
+          if (dungeonStore.currentInstance?.name == "Activities") {
             router.replace("/shops");
           } else {
             router.replace("/dungeon");
           }
           playerState.setInDungeon({ state: false });
-          enemyStore.enemies = [];
-          if (currentInstance?.name == "Activities") {
+          enemyStore.clearEnemyList();
+          dungeonStore.setInCombat(false);
+          if (dungeonStore.currentInstance?.name == "Activities") {
             router.push("/Activities");
           }
           savePlayer(playerState);
@@ -63,7 +63,7 @@ export default function FleeModal({
       } else {
         setFleeRollFailure(true);
         vibration({ style: "error" });
-        addLog("You failed to flee!");
+        dungeonStore.addLog("You failed to flee!");
 
         playerMinionsTurn(() => {
           enemyTurn();
@@ -94,7 +94,7 @@ export default function FleeModal({
             <FleeButton
               enemyStore={enemyStore}
               playerState={playerState}
-              inCombat={inCombat}
+              inCombat={dungeonStore.inCombat}
               flee={flee}
             />
             <GenericFlatButton

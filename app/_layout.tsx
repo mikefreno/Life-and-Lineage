@@ -131,7 +131,7 @@ const RootLayout = () => {
   }, [expoPushToken]);
 
   useEffect(() => {
-    if (fontLoaded) {
+    if (fontLoaded && rootStore.constructed) {
       SplashScreen.hideAsync();
       if (!playerState) {
         router.replace("/ClassSelect");
@@ -160,7 +160,12 @@ const RootLayout = () => {
       }
       setFirstLoad(false);
     }
-  }, [fontLoaded, playerState?.currentHealth, playerState?.currentSanity]);
+  }, [
+    fontLoaded,
+    playerState?.currentHealth,
+    playerState?.currentSanity,
+    rootStore.constructed,
+  ]);
 
   while (!fontLoaded) {
     return (

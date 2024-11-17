@@ -7,9 +7,9 @@ import { EnemyImage } from "../EnemyImage";
 import FadeOutNode from "../FadeOutNode";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { useEnemyStore } from "../../hooks/stores";
 import type { Enemy } from "../../entities/creatures";
 import type { AnimationStore } from "../../stores/AnimationStore";
+import { useRootStore } from "../../hooks/stores";
 
 const useEnemyAnimations = () => {
   const attackAnim = useRef(new Animated.Value(0)).current;
@@ -166,7 +166,7 @@ const EnemyConditions = memo(({ conditions }: { conditions: any[] }) => {
 });
 
 const DungeonEnemyDisplay = observer(() => {
-  const enemyStore = useEnemyStore();
+  const { enemyStore } = useRootStore();
 
   if (enemyStore.enemies.length == 0) return null;
 
@@ -262,6 +262,11 @@ const EnemyDisplay = observer(
         animations.runDodgeAnimation();
       }
     }, [animationStore.dodgeDummy]);
+
+    useEffect(
+      () => console.log(animationStore.textString),
+      [animationStore.textString],
+    );
 
     useEffect(() => {
       if (

@@ -1,11 +1,7 @@
-import { router, useLocalSearchParams } from "expo-router";
-import {
-  type PlayerClassOptions,
-  isPlayerClassOptions,
-  TutorialOption,
-} from "../../utility/types";
+import { router } from "expo-router";
+import { TutorialOption } from "../../utility/types";
 import TutorialModal from "../../components/TutorialModal";
-import { useGameStore, useRootStore } from "../../hooks/stores";
+import { useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
 import { useIsFocused } from "@react-navigation/native";
 import { useRef, useState } from "react";

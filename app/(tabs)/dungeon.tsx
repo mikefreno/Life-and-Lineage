@@ -18,14 +18,14 @@ import ThemedCard from "../../components/ThemedCard";
 import { TutorialOption } from "../../utility/types";
 import PlatformDependantBlurView from "../../components/PlatformDependantBlurView";
 import { useVibration } from "../../hooks/generic";
-import { useDungeonStore } from "../../hooks/stores";
 import type { DungeonInstance } from "../../entities/dungeon";
+import { useRootStore } from "../../hooks/stores";
 
 const MIN_RED = 20;
 const MAX_RED = 255;
 
 const DungeonScreen = observer(() => {
-  const dungeonStore = useDungeonStore();
+  const { dungeonStore } = useRootStore();
   const { dungeonInstances } = dungeonStore;
 
   const [sorted, setSorted] = useState(

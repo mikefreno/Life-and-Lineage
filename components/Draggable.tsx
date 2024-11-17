@@ -13,7 +13,7 @@ import { checkReleasePositionProps } from "../utility/types";
 import { ThemedView, Text } from "./Themed";
 import { Item, itemMap } from "../entities/item";
 import { useVibration } from "../hooks/generic";
-import { useDraggableStore, useUIStore } from "../hooks/stores";
+import { useDraggableStore, useRootStore } from "../hooks/stores";
 
 type DraggableProps = {
   children: React.ReactNode;
@@ -141,13 +141,13 @@ const InventoryItem = ({
   const shouldSnapBack = useSharedValue(false);
   const { isDragging, position, setIconString } = useDraggableStore();
   const vibration = useVibration();
-  const { itemBlockSize } = useUIStore();
+  const { uiStore } = useRootStore();
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
   }));
 
-  while (!itemBlockSize) {
+  while (!uiStore.itemBlockSize) {
     return <></>;
   }
 
@@ -176,7 +176,7 @@ const InventoryItem = ({
       itemStack: item,
       xPos: x,
       yPos: y,
-      size: itemBlockSize,
+      size: uiStore.itemBlockSize,
     });
     setIconString(null);
     isDragging.value = false;
@@ -201,15 +201,15 @@ const InventoryItem = ({
           <View
             className="items-center justify-center rounded-lg bg-zinc-400 z-top"
             style={{
-              height: itemBlockSize,
-              width: itemBlockSize,
+              height: uiStore.itemBlockSize,
+              width: uiStore.itemBlockSize,
             }}
           >
             <Image
               source={item[0].getItemIcon()}
               style={{
-                width: Math.min(itemBlockSize * 0.65, 40),
-                height: Math.min(itemBlockSize * 0.65, 40),
+                width: Math.min(uiStore.itemBlockSize * 0.65, 40),
+                height: Math.min(uiStore.itemBlockSize * 0.65, 40),
               }}
             />
             {item[0].stackable && item.length > 1 && (
@@ -226,7 +226,7 @@ const InventoryItem = ({
 
 const ProjectedImage = () => {
   const { position, isDragging, iconString } = useDraggableStore();
-  const { playerStatusIsCompact, itemBlockSize } = useUIStore();
+  const { uiStore } = useRootStore();
 
   const animatedStyle = useAnimatedStyle(() => {
     "worklet";
@@ -243,7 +243,7 @@ const ProjectedImage = () => {
     };
   });
 
-  if (!iconString || !itemBlockSize) {
+  if (!iconString || !uiStore.itemBlockSize) {
     return null;
   }
 
@@ -260,15 +260,15 @@ const ProjectedImage = () => {
       <View
         className="items-center justify-center rounded-lg bg-zinc-400"
         style={{
-          height: itemBlockSize,
-          width: itemBlockSize,
+          height: uiStore.itemBlockSize,
+          width: uiStore.itemBlockSize,
         }}
       >
         <Image
           source={itemMap[iconString]}
           style={{
-            width: Math.min(itemBlockSize * 0.65, 40),
-            height: Math.min(itemBlockSize * 0.65, 40),
+            width: Math.min(uiStore.itemBlockSize * 0.65, 40),
+            height: Math.min(uiStore.itemBlockSize * 0.65, 40),
           }}
         />
       </View>

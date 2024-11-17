@@ -3,9 +3,9 @@ import { Dimensions, View } from "react-native";
 import GenericRaisedButton from "../GenericRaisedButton";
 import { useColorScheme } from "nativewind";
 import PlatformDependantBlurView from "../PlatformDependantBlurView";
-import { useDungeonStore, useUIStore } from "../../hooks/stores";
 import { TILE_SIZE } from "../../stores/DungeonStore";
 import { observer } from "mobx-react-lite";
+import { useRootStore } from "../../hooks/stores";
 /**
  * Represents a tile in the dungeon map.
  * @property {number} x - The x-coordinate of the tile.
@@ -169,7 +169,7 @@ export const getBoundingBox = (
 export const DungeonMapRender = observer(() => {
   const { colorScheme } = useColorScheme();
   const strokeWidth = 1;
-  const dungeonStore = useDungeonStore();
+  const { dungeonStore } = useRootStore();
   const { currentMapDimensions, currentMap, currentPosition } = dungeonStore;
 
   if (!currentMapDimensions || !currentMap) {
@@ -260,14 +260,12 @@ export const DungeonMapRender = observer(() => {
  * Renders the controls for moving around the dungeon.
  */
 export const DungeonMapControls = observer(() => {
-  const dungeonStore = useDungeonStore();
+  const { dungeonStore, uiStore } = useRootStore();
   const { currentPosition, currentMap } = dungeonStore;
 
   if (!currentPosition || !currentMap) {
     throw new Error("Missing map, or current position within control handler!");
   }
-
-  const { dimensions } = useUIStore();
 
   const isMoveValid = (direction: "up" | "down" | "left" | "right") => {
     if (!currentPosition) return false;
@@ -304,7 +302,7 @@ export const DungeonMapControls = observer(() => {
     <PlatformDependantBlurView className="flex-1 flex items-center w-full justify-center">
       <View
         className="w-2/3 mx-auto"
-        style={{ marginTop: -dimensions.window.height / 20 }}
+        style={{ marginTop: -uiStore.dimensions.window.height / 20 }}
       >
         <ArrowButton direction="up" />
         <View className="flex-row justify-between w-full">

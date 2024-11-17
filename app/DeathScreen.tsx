@@ -21,7 +21,7 @@ import { useColorScheme } from "nativewind";
 import { elementalColorMap } from "../constants/Colors";
 import { getStartingBaseStats } from "../utility/functions/characterAid";
 import { savePlayer, type Character } from "../entities/character";
-import { useRootStore, useUIStore } from "../hooks/stores";
+import { useRootStore } from "../hooks/stores";
 import { useVibration } from "../hooks/generic";
 import { Item } from "../entities/item";
 
@@ -36,8 +36,7 @@ export default function DeathScreen() {
   );
   const [page, setPage] = useState<number>(0);
 
-  const { playerState, gameState } = useRootStore();
-  const { dimensions } = useUIStore();
+  const { playerState, gameState, uiStore } = useRootStore();
   const vibration = useVibration();
   const { colorScheme } = useColorScheme();
 
@@ -84,7 +83,7 @@ export default function DeathScreen() {
         gold: playerState.gold / playerState.children.length ?? 1,
         keyItems: playerState?.keyItems,
         inventory: inventory,
-        ...getStartingBaseStats({ playerClass: selectedClass }),
+        ...getStartingBaseStats({ classSelection: selectedClass }),
       });
       return newCharacter;
     }
@@ -118,7 +117,7 @@ export default function DeathScreen() {
             {page == 0 && (
               <>
                 <MinimalClassSelect
-                  dimensions={dimensions.window}
+                  dimensions={uiStore.dimensions.window}
                   vibration={vibration}
                   selectedClass={selectedClass}
                   setSelectedClass={setSelectedClass}
@@ -147,7 +146,7 @@ export default function DeathScreen() {
                   setBlessing={setSelectedBlessing}
                   vibration={vibration}
                   colorScheme={colorScheme}
-                  dimensions={dimensions.window}
+                  dimensions={uiStore.dimensions.window}
                 />
                 <GenericFlatButton
                   onPress={startNextLife}
@@ -351,7 +350,13 @@ function MinimalBlessingSelect({
   playerClass: PlayerClassOptions;
   blessing: Element | null;
   setBlessing: React.Dispatch<React.SetStateAction<Element | null>>;
-  vibration: ({ style, essential }: VibrateProps) => void;
+  vibration: ({
+    style,
+    essential,
+  }: {
+    style: "light" | "medium" | "heavy" | "success" | "warning" | "error";
+    essential?: boolean | undefined;
+  }) => void;
   colorScheme: "light" | "dark";
   dimensions: {
     height: number;

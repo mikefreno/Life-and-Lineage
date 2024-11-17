@@ -12,13 +12,12 @@ import {
 import BlessingDisplay from "./BlessingsDisplay";
 import { elementalColorMap } from "../constants/Colors";
 import { Element } from "../utility/types";
-import { usePlayerStore, useUIStore } from "../hooks/stores";
 import type { Spell } from "../entities/spell";
+import { useRootStore } from "../hooks/stores";
 
 export default function SpellDetails({ spell }: { spell: Spell }) {
   const { colorScheme } = useColorScheme();
-  const playerState = usePlayerStore();
-  const { dimensions } = useUIStore();
+  const { playerState, uiStore } = useRootStore();
   return (
     <View
       className="rounded-lg"
@@ -32,7 +31,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
         backgroundColor: colorScheme == "light" ? "#fafafa" : "#27272a",
         shadowOpacity: 0.25,
         shadowRadius: 5,
-        width: dimensions.window.width * 0.75,
+        width: uiStore.dimensions.window.width * 0.75,
       }}
     >
       <View
@@ -138,7 +137,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
           <BlessingDisplay
             blessing={spell.element}
             colorScheme={colorScheme}
-            size={dimensions.window.width * 0.15}
+            size={uiStore.dimensions.window.width * 0.15}
           />
         </View>
       </View>

@@ -5,8 +5,8 @@ import { Text } from "./Themed";
 import { useColorScheme } from "nativewind";
 import { toTitleCase } from "../utility/functions/misc";
 import GearStatsDisplay from "./GearStatsDisplay";
-import { usePlayerStore } from "../hooks/stores";
 import type { Item } from "../entities/item";
+import { useRootStore } from "../hooks/stores";
 
 const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
@@ -23,7 +23,7 @@ export default function GiftModal({
   backdropCloses = false,
 }: GiftModalProps) {
   const { colorScheme } = useColorScheme();
-  const playerState = usePlayerStore();
+  const { playerState } = useRootStore();
 
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const selectedItemRef = useRef<Item>();

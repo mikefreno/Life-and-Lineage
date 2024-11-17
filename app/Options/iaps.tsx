@@ -1,15 +1,15 @@
 import { View } from "react-native";
 import { Text } from "../../components/Themed";
 import GenericAnimatedPressable from "../../components/GenericAnimatedButton";
-import { useLayout } from "../../stores/AppData";
+import { useRootStore } from "../../hooks/stores";
 
 export default function InAppPurchasePage() {
-  const { dimensions } = useLayout();
+  const { uiStore } = useRootStore();
 
   return (
     <View
       className="flex-1 items-start mt-16"
-      style={{ paddingHorizontal: dimensions.width * 0.1 }}
+      style={{ paddingHorizontal: uiStore.dimensions.window.width * 0.1 }}
     >
       <GenericAnimatedPressable>
         <Text className="text-lg text-center">

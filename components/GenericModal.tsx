@@ -8,7 +8,7 @@ import {
 import Modal from "react-native-modal";
 import { ThemedView } from "./Themed";
 import { useColorScheme } from "nativewind";
-import { useGameStore, useRootStore, useUIStore } from "../hooks/stores";
+import { useRootStore } from "../hooks/stores";
 
 interface GenericModalProps {
   isVisibleCondition: boolean;

@@ -9,7 +9,7 @@ import GenericModal from "../../components/GenericModal";
 import * as Updates from "expo-updates";
 import D20DieAnimation from "../../components/DieRollAnim";
 import { useVibration } from "../../hooks/generic";
-import { useGameStore } from "../../hooks/stores";
+import { useRootStore } from "../../hooks/stores";
 
 const healthWarningOptions: Record<number, string> = {
   0.5: "50%",
@@ -30,14 +30,14 @@ const healthWarningVals = [
 const healthWarningKeys = [0.5, 0.25, 0.2, 0.15, 0.1, 0];
 
 export default function GameSettings() {
-  const gameState = useGameStore();
+  const { gameState, uiStore } = useRootStore();
   const vibration = useVibration();
   const [tutorialState, setTutorialState] = useState<boolean>(
     gameState?.tutorialsEnabled ?? true,
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedHealthWarning, setSelectedHealthWarning] = useState<string>(
-    gameState ? healthWarningOptions[gameState?.healthWarning] : "25%",
+    gameState ? healthWarningOptions[uiStore.healthWarning ?? 0.2] : "25%",
   );
   const [showTutorialResetConfirm, setShowTutorialResetConfirm] =
     useState<boolean>(false);
@@ -61,7 +61,7 @@ export default function GameSettings() {
   }, [tutorialState]);
 
   const healthWarningSetter = (choice: number) => {
-    gameState?.setHealthWarning(choice);
+    uiStore.setHealthWarning(choice);
     setSelectedHealthWarning(healthWarningOptions[choice]);
   };
 

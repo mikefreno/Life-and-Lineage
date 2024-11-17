@@ -9,7 +9,7 @@ import {
   wait,
 } from "../utility/functions/misc";
 import { generateNewCharacter } from "../utility/functions/characterAid";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import GenericModal from "./GenericModal";
 import GenericRaisedButton from "./GenericRaisedButton";
 import GenericFlatButton from "./GenericFlatButton";

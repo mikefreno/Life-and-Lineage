@@ -43,11 +43,13 @@ export default class EnemyStore {
   public removeEnemy(enemy: Enemy) {
     this.animationStoreMap.delete(enemy.id);
     this.enemies = this.enemies.filter((e) => e.id !== enemy.id);
+    this.clearPersistedEnemy(enemy.id);
   }
 
   public clearEnemyList() {
     this.enemies = [];
     this.animationStoreMap.clear();
+    this.clearPersistedEnemies();
   }
 
   public hydrateEnemies() {
@@ -87,4 +89,25 @@ export default class EnemyStore {
     }
   };
   public saveEnemy = throttle(this.enemySave, 250);
+
+  private clearPersistedEnemies() {
+    storage.delete("enemyIDs");
+
+    const allKeys = storage.getAllKeys();
+    allKeys.forEach((key) => {
+      if (key.startsWith("enemy_")) {
+        storage.delete(key);
+      }
+    });
+  }
+  private clearPersistedEnemy(enemyId: string) {
+    storage.delete(`enemy_${enemyId}`);
+
+    const storedIds = storage.getString("enemyIDs");
+    if (storedIds) {
+      const ids = parse(storedIds) as string[];
+      const updatedIds = ids.filter((id) => id !== enemyId);
+      storage.set("enemyIDs", stringify(updatedIds));
+    }
+  }
 }

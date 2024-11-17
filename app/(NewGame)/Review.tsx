@@ -149,21 +149,13 @@ export default function NewGameReview() {
       }
       const newGame = new Game({
         date: startDate,
-        vibrationEnabled: root.gameState?.vibrationEnabled
-          ? root.gameState.vibrationEnabled
-          : Platform.OS == "ios"
-          ? "full"
-          : "minimal",
+        startDate,
         tutorialsEnabled: root.gameState
           ? root.gameState.tutorialsEnabled
           : parsed,
         tutorialsShown: root.gameState?.tutorialsShown,
         root,
       });
-      const colorScheme = root.gameState?.colorScheme;
-      if (colorScheme) {
-        newGame.setColorScheme(colorScheme);
-      }
       root.gameState = newGame;
       root.enemyStore.enemies = [];
       root.playerState = player;

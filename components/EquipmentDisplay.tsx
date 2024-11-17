@@ -5,7 +5,7 @@ import { checkReleasePositionProps } from "../utility/types";
 import { InventoryItem } from "./Draggable";
 import type { Item } from "../entities/item";
 import { useVibration } from "../hooks/generic";
-import { usePlayerStore, useUIStore } from "../hooks/stores";
+import { useRootStore } from "../hooks/stores";
 
 interface EquipmentDisplayProps {
   headTarget: RefObject<View>;
@@ -42,8 +42,7 @@ export default function EquipmentDisplay({
   setDisplayItem,
 }: EquipmentDisplayProps) {
   const vibration = useVibration();
-  const playerState = usePlayerStore();
-  const { itemBlockSize, dimensions } = useUIStore();
+  const { playerState, uiStore } = useRootStore();
 
   function checkReleasePosition({
     itemStack,
@@ -144,7 +143,7 @@ export default function EquipmentDisplay({
 
       const isTwoHanded = playerState.equipment.mainHand?.slot === "two-hand";
 
-      while (!itemBlockSize) {
+      while (!uiStore.itemBlockSize) {
         return <></>;
       }
 
@@ -154,7 +153,10 @@ export default function EquipmentDisplay({
           {itemStack.length > 0 ? (
             <View
               className="z-50 mx-auto border border-zinc-400 rounded-lg"
-              style={{ height: itemBlockSize, width: itemBlockSize }}
+              style={{
+                height: uiStore.itemBlockSize,
+                width: uiStore.itemBlockSize,
+              }}
             >
               <InventoryItem
                 item={itemStack}
@@ -170,14 +172,17 @@ export default function EquipmentDisplay({
                   ? "bg-zinc-400"
                   : "bg-red-800"
               } mx-auto z-10 items-center rounded-lg border border-zinc-400`}
-              style={{ height: itemBlockSize, width: itemBlockSize }}
+              style={{
+                height: uiStore.itemBlockSize,
+                width: uiStore.itemBlockSize,
+              }}
             >
               <Image
                 className="my-auto opacity-50"
                 source={playerState.equipment.mainHand?.getItemIcon()}
                 style={{
-                  height: Math.min(itemBlockSize * 0.65, 52),
-                  width: Math.min(itemBlockSize * 0.65, 52),
+                  height: Math.min(uiStore.itemBlockSize * 0.65, 52),
+                  width: Math.min(uiStore.itemBlockSize * 0.65, 52),
                 }}
               />
             </View>
@@ -186,8 +191,8 @@ export default function EquipmentDisplay({
               ref={ref}
               className="mx-auto rounded-lg border border-zinc-400"
               style={{
-                height: itemBlockSize,
-                width: itemBlockSize,
+                height: uiStore.itemBlockSize,
+                width: uiStore.itemBlockSize,
               }}
             />
           )}
@@ -218,7 +223,7 @@ export default function EquipmentDisplay({
       </View>
       <View
         className={`mx-auto items-center ${
-          dimensions.window.width == dimensions.window.greater
+          uiStore.dimensions.window.width == uiStore.dimensions.window.greater
             ? "-mt-20"
             : "-mt-8"
         }`}

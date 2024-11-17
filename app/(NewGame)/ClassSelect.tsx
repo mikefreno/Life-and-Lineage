@@ -19,7 +19,7 @@ import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
 import { useColorScheme } from "nativewind";
 import { useVibration } from "../../hooks/generic";
-import { useRootStore, useUIStore } from "../../hooks/stores";
+import { useRootStore } from "../../hooks/stores";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { useNewGameStore } from "./_layout";
 
@@ -27,8 +27,7 @@ const SetClassScreen = observer(() => {
   const vibration = useVibration();
   const { classSelection, setClassSelection } = useNewGameStore();
 
-  const { gameState } = useRootStore();
-  const { dimensions } = useUIStore();
+  const { gameState, uiStore } = useRootStore();
   const { colorScheme } = useColorScheme();
 
   const isFocused = useIsFocused();
@@ -101,8 +100,8 @@ const SetClassScreen = observer(() => {
                 setClassSelection(PlayerClassOptions.mage);
               }}
               style={{
-                height: dimensions.window.height * 0.25,
-                width: dimensions.window.width * 0.45,
+                height: uiStore.dimensions.window.height * 0.25,
+                width: uiStore.dimensions.window.width * 0.45,
               }}
             >
               {({ pressed }) => (
@@ -116,8 +115,8 @@ const SetClassScreen = observer(() => {
                   <WizardHat
                     style={{ marginBottom: 5 }}
                     color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
-                    height={dimensions.window.height * 0.15}
-                    width={dimensions.window.height * 0.15}
+                    height={uiStore.dimensions.window.height * 0.15}
+                    width={uiStore.dimensions.window.height * 0.15}
                   />
                   <Text
                     className="mx-auto text-xl"
@@ -135,8 +134,8 @@ const SetClassScreen = observer(() => {
                 setClassSelection(PlayerClassOptions.ranger);
               }}
               style={{
-                height: dimensions.window.height * 0.25,
-                width: dimensions.window.width * 0.45,
+                height: uiStore.dimensions.window.height * 0.25,
+                width: uiStore.dimensions.window.width * 0.45,
               }}
             >
               {({ pressed }) => (
@@ -150,8 +149,8 @@ const SetClassScreen = observer(() => {
                   <View className="rotate-12">
                     <RangerIcon
                       style={{ marginBottom: 5 }}
-                      height={dimensions.window.height * 0.15}
-                      width={dimensions.window.height * 0.15}
+                      height={uiStore.dimensions.window.height * 0.15}
+                      width={uiStore.dimensions.window.height * 0.15}
                     />
                   </View>
                   <Text className="mx-auto text-xl" style={{ color: "green" }}>
@@ -169,8 +168,8 @@ const SetClassScreen = observer(() => {
                 setClassSelection(PlayerClassOptions.necromancer);
               }}
               style={{
-                height: dimensions.window.height * 0.25,
-                width: dimensions.window.width * 0.45,
+                height: uiStore.dimensions.window.height * 0.25,
+                width: uiStore.dimensions.window.width * 0.45,
               }}
             >
               {({ pressed }) => (
@@ -185,8 +184,8 @@ const SetClassScreen = observer(() => {
                     <NecromancerSkull
                       style={{ marginBottom: 5 }}
                       color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
-                      height={dimensions.window.height * 0.15}
-                      width={dimensions.window.height * 0.15}
+                      height={uiStore.dimensions.window.height * 0.15}
+                      width={uiStore.dimensions.window.height * 0.15}
                     />
                   </View>
                   <Text
@@ -205,8 +204,8 @@ const SetClassScreen = observer(() => {
                 setClassSelection(PlayerClassOptions.paladin);
               }}
               style={{
-                height: dimensions.window.height * 0.25,
-                width: dimensions.window.width * 0.45,
+                height: uiStore.dimensions.window.height * 0.25,
+                width: uiStore.dimensions.window.width * 0.45,
               }}
             >
               {({ pressed }) => (
@@ -220,8 +219,8 @@ const SetClassScreen = observer(() => {
                   <View className="rotate-12">
                     <View className="scale-x-[-1] transform">
                       <PaladinHammer
-                        height={dimensions.window.height * 0.15}
-                        width={dimensions.window.height * 0.15}
+                        height={uiStore.dimensions.window.height * 0.15}
+                        width={uiStore.dimensions.window.height * 0.15}
                       />
                     </View>
                   </View>

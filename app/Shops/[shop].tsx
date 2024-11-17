@@ -22,11 +22,7 @@ import ProgressBar from "../../components/ProgressBar";
 import Colors from "../../constants/Colors";
 import { useColorScheme } from "nativewind";
 import { InventoryItem } from "../../components/Draggable";
-import {
-  useDraggableStore,
-  useRootStore,
-  useUIStore,
-} from "../../hooks/stores";
+import { useDraggableStore, useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
 import type { Item } from "../../entities/item";
 import { saveGame } from "../../entities/game";
@@ -78,8 +74,7 @@ const GreetingComponent = ({
 
 const ShopInteriorScreen = observer(() => {
   let { shop } = useLocalSearchParams();
-  const { gameState, playerState, shopsStore } = useRootStore();
-  const { itemBlockSize } = useUIStore();
+  const { gameState, playerState, shopsStore, uiStore } = useRootStore();
   const { setIconString } = useDraggableStore();
 
   const vibration = useVibration();
@@ -161,7 +156,7 @@ const ShopInteriorScreen = observer(() => {
   function sellAllJunk() {
     if (thisShop) {
       const itemsToSell: Item[] = [];
-      playerState?.inventory.forEach((item) => {
+      playerState?.baseInventory.forEach((item) => {
         if (item.itemClass == "junk") {
           itemsToSell.push(item);
         }
@@ -230,7 +225,13 @@ const ShopInteriorScreen = observer(() => {
     saveGame(gameState);
   };
 
-  if (initialized && thisShop && gameState && playerState && itemBlockSize) {
+  if (
+    initialized &&
+    thisShop &&
+    gameState &&
+    playerState &&
+    uiStore.itemBlockSize
+  ) {
     return (
       <>
         <TutorialModal
@@ -300,8 +301,8 @@ const ShopInteriorScreen = observer(() => {
                     <Pressable
                       key={item.item[0].id}
                       style={{
-                        height: itemBlockSize * 1.4,
-                        width: itemBlockSize * 1.5,
+                        height: uiStore.itemBlockSize * 1.4,
+                        width: uiStore.itemBlockSize * 1.5,
                       }}
                     >
                       <View className="flex-1 justify-center items-center">

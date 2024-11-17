@@ -1,6 +1,12 @@
-import { action, makeObservable, observable } from "mobx";
+import { action, makeObservable, observable, reaction } from "mobx";
 import { RootStore } from "./RootStore";
-import { Dimensions, EmitterSubscription, ScaledSize } from "react-native";
+import {
+  Dimensions,
+  EmitterSubscription,
+  Platform,
+  ScaledSize,
+} from "react-native";
+import { storage } from "../utility/functions/storage";
 
 export default class UIStore {
   root: RootStore;
@@ -23,6 +29,9 @@ export default class UIStore {
   detailedStatusViewShowing: boolean;
   modalShowing: boolean;
   readonly dimensionsSubscription: EmitterSubscription;
+  colorScheme: "system" | "dark" | "light";
+  vibrationEnabled: "full" | "minimal" | "none";
+  healthWarning: number;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
@@ -65,6 +74,13 @@ export default class UIStore {
     this.detailedStatusViewShowing = false;
     this.modalShowing = false;
 
+    const { vibrationEnabled, colorScheme, healthWarning } =
+      this.hydrateUISettings();
+    this.vibrationEnabled =
+      vibrationEnabled ?? Platform.OS == "ios" ? "full" : "minimal";
+    this.colorScheme = colorScheme ?? "system";
+    this.healthWarning = healthWarning ?? 0.2;
+
     makeObservable(this, {
       playerStatusIsCompact: observable,
       setPlayerStatusCompact: action,
@@ -73,7 +89,32 @@ export default class UIStore {
       dimensions: observable,
       itemBlockSize: observable,
       modalShowing: observable,
+      colorScheme: observable,
+      vibrationEnabled: observable,
+      healthWarning: observable,
+      setColorScheme: action,
+      modifyVibrationSettings: action,
+      setHealthWarning: action,
     });
+
+    reaction(
+      () => [this.colorScheme, this.healthWarning, this.vibrationEnabled],
+      () => {
+        this.persistUISettings();
+      },
+    );
+  }
+
+  public setColorScheme(color: "light" | "dark" | "system") {
+    this.colorScheme = color;
+  }
+
+  public modifyVibrationSettings(targetState: "full" | "minimal" | "none") {
+    this.vibrationEnabled = targetState;
+  }
+
+  public setHealthWarning(desiredValue: number) {
+    this.healthWarning = desiredValue;
   }
 
   public setPlayerStatusCompact(state: boolean) {
@@ -132,5 +173,31 @@ export default class UIStore {
       blockSize = dimensions.window.width / 14;
     }
     return blockSize;
+  }
+
+  hydrateUISettings(): {
+    colorScheme: "system" | "dark" | "light" | undefined;
+    vibrationEnabled: "full" | "minimal" | "none" | undefined;
+    healthWarning: number | undefined;
+  } {
+    const stored = storage.getString("ui_settings");
+    if (!stored) {
+      return {
+        colorScheme: undefined,
+        vibrationEnabled: undefined,
+        healthWarning: undefined,
+      };
+    }
+    return JSON.parse(stored);
+  }
+  persistUISettings() {
+    storage.set(
+      "ui_settings",
+      JSON.stringify({
+        colorScheme: this.colorScheme,
+        vibrationEnabled: this.vibrationEnabled,
+        healthWarning: this.healthWarning,
+      }),
+    );
   }
 }

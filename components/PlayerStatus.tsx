@@ -16,7 +16,6 @@ import FadeOutNode from "./FadeOutNode";
 import { BlurView } from "expo-blur";
 import { useColorScheme } from "nativewind";
 import { usePathname } from "expo-router";
-import { useIsFocused } from "@react-navigation/native";
 import {
   ClockIcon,
   Coins,
@@ -52,7 +51,7 @@ const PlayerStatus = observer(
     positioning = "absolute",
     classname,
   }: PlayerStatusProps) => {
-    const { playerState, gameState, uiStore } = useRootStore();
+    const { playerState, uiStore } = useRootStore();
     const [readableGold, setReadableGold] = useState(
       playerState?.getReadableGold(),
     );
@@ -202,9 +201,8 @@ const PlayerStatus = observer(
     useEffect(() => {
       if (
         playerState &&
-        gameState &&
         playerState.currentHealth / playerState.maxHealth <=
-          gameState.healthWarning
+          uiStore.healthWarning
       ) {
         if (!showingHealthWarningPulse) {
           setShowingHealthWarningPulse(true);
@@ -214,7 +212,7 @@ const PlayerStatus = observer(
           setShowingHealthWarningPulse(false);
         }
       }
-    }, [playerState?.currentHealth, gameState?.healthWarning]);
+    }, [playerState?.currentHealth, uiStore.healthWarning]);
 
     useEffect(() => {
       setReadableGold(playerState?.getReadableGold());

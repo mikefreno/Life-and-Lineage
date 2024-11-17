@@ -147,7 +147,11 @@ const DungeonLevelScreen = observer(() => {
           </Pressable>
           {inCombat && <View></View>}
           <View className="flex-1 justify-between">
-            <BattleTab battleTab={battleTab} pouchRef={pouchRef} />
+            <BattleTab
+              battleTab={battleTab}
+              pouchRef={pouchRef}
+              logs={dungeonStore.logs}
+            />
           </View>
           <BattleTabControls
             battleTab={battleTab}

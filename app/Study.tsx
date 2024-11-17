@@ -17,14 +17,13 @@ import { elementalColorMap } from "../constants/Colors";
 import { useEffect, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useRootStore, useUIStore } from "../hooks/stores";
+import { useRootStore } from "../hooks/stores";
 import { useVibration } from "../hooks/generic";
 import type { Item } from "../entities/item";
 import type { Spell } from "../entities/spell";
 
 export default function LearningKnowledgeScreen() {
-  const { playerState, gameState } = useRootStore();
-  const { dimensions } = useUIStore();
+  const { playerState, gameState, uiStore } = useRootStore();
 
   const books = playerState?.baseInventory.filter(
     (item) => item.itemClass == ItemClassType.Book,
@@ -127,7 +126,9 @@ export default function LearningKnowledgeScreen() {
             </View>
           ) : null}
           {spellState && spellState.length > 0 && (
-            <ScrollView style={{ maxHeight: dimensions.window.height * 0.25 }}>
+            <ScrollView
+              style={{ maxHeight: uiStore.dimensions.window.height * 0.25 }}
+            >
               <View className="py-4 shadow-diffuse-top">
                 <Text className="text-center text-xl">Currently Studying</Text>
                 {spellState.map((studyState) => (

@@ -12,13 +12,12 @@ import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
 import { Text } from "../../components/Themed";
 import { useVibration } from "../../hooks/generic";
-import { useRootStore, useUIStore } from "../../hooks/stores";
+import { useRootStore } from "../../hooks/stores";
 import { type Shop } from "../../entities/shop";
 
 const ShopsScreen = observer(() => {
   const vibration = useVibration();
-  const { shopsStore, gameState } = useRootStore();
-  const { playerStatusIsCompact } = useUIStore();
+  const { shopsStore, gameState, uiStore } = useRootStore();
   const [isReady, setIsReady] = useState(false);
 
   const runDeathChecks = () => {
@@ -142,7 +141,8 @@ const ShopsScreen = observer(() => {
                 flexWrap: "wrap",
                 alignItems: "flex-start",
                 justifyContent: "flex-start",
-                paddingBottom: bottomHeight + (playerStatusIsCompact ? 0 : 28),
+                paddingBottom:
+                  bottomHeight + (uiStore.playerStatusIsCompact ? 0 : 28),
                 paddingTop: headerHeight,
               }}
             >

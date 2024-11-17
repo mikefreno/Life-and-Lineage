@@ -5,11 +5,11 @@ import ProgressBar from "../ProgressBar";
 import { toTitleCase } from "../../utility/functions/misc";
 import { useCombatState } from "../../stores/DungeonData";
 import { useCombatActions } from "../../hooks/combat";
-import { useEnemyStore } from "../../hooks/stores";
 import type { Enemy, Minion } from "../../entities/creatures";
+import { useRootStore } from "../../hooks/stores";
 
 export default function TargetSelectionRender() {
-  const enemyStore = useEnemyStore();
+  const { enemyStore } = useRootStore();
   const { showTargetSelection, setShowTargetSelection } = useCombatState();
   const { useAttack } = useCombatActions();
 

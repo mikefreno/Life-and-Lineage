@@ -14,12 +14,11 @@ import { FontAwesome6 } from "@expo/vector-icons";
 import GenericRaisedButton from "../components/GenericRaisedButton";
 import { observer } from "mobx-react-lite";
 import GenericStrikeAround from "../components/GenericStrikeAround";
-import { useRootStore, useUIStore } from "../hooks/stores";
+import { useRootStore } from "../hooks/stores";
 import type { Character } from "../entities/character";
 
 const RelationshipsScreen = observer(() => {
-  const { playerState, gameState } = useRootStore();
-  const { dimensions } = useUIStore();
+  const { playerState, gameState, uiStore } = useRootStore();
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null,
   );
@@ -78,7 +77,7 @@ const RelationshipsScreen = observer(() => {
       <Pressable
         className="flex items-center"
         style={{
-          width: dimensions.window.lesser * 0.35,
+          width: uiStore.dimensions.window.lesser * 0.35,
           opacity: character.deathdate ? 0.5 : 1,
         }}
         key={character.id}
@@ -195,7 +194,7 @@ const RelationshipsScreen = observer(() => {
           backFunction={() => setShowingAdoptionModal(false)}
           size={100}
         >
-          <View style={{ maxHeight: dimensions.window.height * 0.75 }}>
+          <View style={{ maxHeight: uiStore.dimensions.window.height * 0.75 }}>
             <Text className="text-center text-2xl tracking-wider py-2">
               {partnerName
                 ? `Adopting with ${partnerName}`

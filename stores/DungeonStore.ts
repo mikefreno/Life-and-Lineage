@@ -32,10 +32,9 @@ export class DungeonStore {
   inCombat: boolean;
   fightingBoss: boolean;
 
-  logs: string[] = [];
+  logs: string[];
 
   constructor({ root }: { root: RootStore }) {
-    console.log("Creating DungeonStore instance");
     this.dungeonInstances = this.hydrateDungeonState();
     this.activityInstance = this.initActivityDungeon();
     this.inCombat = false;
@@ -43,6 +42,7 @@ export class DungeonStore {
     this.currentMap = undefined;
     this.currentMapDimensions = undefined;
     this.currentPosition = undefined;
+    this.logs = [];
 
     this.root = root;
 
@@ -57,6 +57,7 @@ export class DungeonStore {
       setUpDungeon: action,
       move: action,
       reversedLogs: computed,
+      setInCombat: action,
     });
   }
 
@@ -97,6 +98,10 @@ export class DungeonStore {
 
   private updateCurrentPosition(tile: Tile) {
     this.currentPosition = tile;
+  }
+
+  setInCombat(state: boolean) {
+    this.inCombat = state;
   }
 
   public move(direction: "up" | "down" | "left" | "right") {

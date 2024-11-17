@@ -23,9 +23,9 @@ const vibrationOptions = ["full", "minimal", "none"];
 
 export const AppSettings = observer(() => {
   const user = useAuth();
-  let { playerState, gameState } = useRootStore();
+  let { playerState, gameState, uiStore } = useRootStore();
 
-  const { colorScheme } = useColorScheme();
+  const { colorScheme, setColorScheme } = useColorScheme();
   const [showRemoteSaveWindow, setShowRemoteSaveWindow] =
     useState<boolean>(false);
   const [showRemoteLoadWidow, setShowRemoteLoadWindow] =
@@ -38,29 +38,30 @@ export const AppSettings = observer(() => {
 
   if (gameState) {
     const [selectedThemeOption, setSelectedThemeOption] = useState<number>(
-      themeOptions.indexOf(gameState.colorScheme),
+      themeOptions.indexOf(uiStore.colorScheme),
     );
+
     const [selectedVibrationOption, setSelectedVibrationOption] =
-      useState<number>(vibrationOptions.indexOf(gameState.vibrationEnabled));
+      useState<number>(vibrationOptions.indexOf(uiStore.vibrationEnabled));
 
     function setColorTheme(index: number, option: "system" | "light" | "dark") {
-      if (gameState) {
-        vibration({ style: "light" });
-        gameState.setColorScheme(option);
-        setSelectedThemeOption(index);
-      }
+      vibration({ style: "light" });
+      uiStore.setColorScheme(option);
+      setSelectedThemeOption(index);
     }
 
     function setVibrationLevel(
       index: number,
       option: "full" | "minimal" | "none",
     ) {
-      if (gameState) {
-        gameState.modifyVibrationSettings(option);
-        setSelectedVibrationOption(index);
-        vibration({ style: "light" });
-      }
+      uiStore.modifyVibrationSettings(option);
+      setSelectedVibrationOption(index);
+      vibration({ style: "light" });
     }
+
+    useEffect(() => {
+      setColorScheme(uiStore.colorScheme);
+    }, [uiStore.colorScheme]);
 
     useEffect(() => {
       if (user.isAuthenticated) {

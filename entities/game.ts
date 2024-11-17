@@ -15,9 +15,6 @@ interface GameOptions {
   date?: string;
   startDate?: string;
   atDeathScreen?: boolean;
-  colorScheme?: "system" | "dark" | "light";
-  vibrationEnabled: "full" | "minimal" | "none";
-  healthWarning?: number;
   tutorialsShown?: Record<TutorialOption, boolean>;
   tutorialsEnabled?: boolean;
   independantChildren?: Character[];
@@ -32,9 +29,6 @@ export class Game {
   date: string; // compared against the startDate to calculate ages
   readonly startDate: string; // only ever set at game start, should never again be modified.
   atDeathScreen: boolean;
-  colorScheme: "system" | "dark" | "light";
-  vibrationEnabled: "full" | "minimal" | "none";
-  healthWarning: number;
   tutorialsShown: Record<TutorialOption, boolean>;
   tutorialsEnabled: boolean;
   independantChildren: Character[];
@@ -45,9 +39,6 @@ export class Game {
     date,
     startDate,
     atDeathScreen,
-    colorScheme,
-    vibrationEnabled,
-    healthWarning,
     tutorialsShown,
     tutorialsEnabled,
     independantChildren,
@@ -56,9 +47,6 @@ export class Game {
     this.date = date ?? new Date().toISOString();
     this.startDate = startDate ?? new Date().toISOString();
     this.atDeathScreen = atDeathScreen ?? false;
-    this.colorScheme = colorScheme ?? "system";
-    this.vibrationEnabled = vibrationEnabled;
-    this.healthWarning = healthWarning ?? 0.2;
     this.tutorialsShown = tutorialsShown ?? {
       [TutorialOption.class]: true,
       [TutorialOption.aging]: true,
@@ -83,16 +71,10 @@ export class Game {
     makeObservable(this, {
       date: observable,
       atDeathScreen: observable,
-      colorScheme: observable,
-      vibrationEnabled: observable,
-      healthWarning: observable,
       tutorialsShown: observable,
       tutorialsEnabled: observable,
       gameTick: action,
-      setColorScheme: action,
       hitDeathScreen: action,
-      modifyVibrationSettings: action,
-      setHealthWarning: action,
       updateTutorialState: action,
       resetTutorialState: action,
       disableTutorials: action,
@@ -108,9 +90,6 @@ export class Game {
       () => [
         this.date,
         this.atDeathScreen,
-        this.colorScheme,
-        this.vibrationEnabled,
-        this.healthWarning,
         this.tutorialsEnabled,
         this.independantChildren,
         this.tutorialsShown[0],
@@ -175,18 +154,6 @@ export class Game {
       }),
     );
     return inheritedSkillPoints;
-  }
-
-  public setColorScheme(color: "light" | "dark" | "system") {
-    this.colorScheme = color;
-  }
-
-  public modifyVibrationSettings(targetState: "full" | "minimal" | "none") {
-    this.vibrationEnabled = targetState;
-  }
-
-  public setHealthWarning(desiredValue: number) {
-    this.healthWarning = desiredValue;
   }
 
   public updateTutorialState(tutorial: TutorialOption, state: boolean) {
@@ -267,9 +234,6 @@ export class Game {
       date: json.date,
       startDate: json.startDate,
       atDeathScreen: json.atDeathScreen,
-      colorScheme: json.colorScheme,
-      vibrationEnabled: json.vibrationEnabled,
-      healthWarning: json.healthWarning,
       tutorialsShown: json.tutorialsShown,
       tutorialsEnabled: json.tutorialsEnabled,
       independantChildren: json.independantChildren
