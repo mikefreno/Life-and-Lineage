@@ -5,29 +5,14 @@ import {
   useState,
   useEffect,
 } from "react";
-import { Dimensions } from "react-native";
 import type { Item } from "../entities/item";
-import {
-  generateTiles,
-  type BoundingBox,
-  type Tile,
-  getBoundingBox,
-} from "../components/DungeonComponents/DungeonMap";
 import type { Attack } from "../entities/attack";
 import type { Spell } from "../entities/spell";
 import { wait } from "../utility/functions/misc";
 import TutorialModal from "../components/TutorialModal";
 import { TutorialOption } from "../utility/types";
 import { useIsFocused } from "@react-navigation/native";
-import { throttle } from "lodash";
-import {
-  useDungeonStore,
-  useEnemyStore,
-  useGameStore,
-  usePlayerStore,
-  useRootStore,
-  useUIStore,
-} from "../hooks/stores";
+import { useRootStore } from "../hooks/stores";
 
 const CombatStateContext = createContext<
   | {
@@ -40,26 +25,6 @@ const CombatStateContext = createContext<
           showing: boolean;
           chosenAttack: Attack | Spell | null;
         }>
-      >;
-    }
-  | undefined
->(undefined);
-
-const EnemyAnimationStateContext = createContext<
-  | {
-      attackAnimationOnGoing: boolean;
-      setAttackAnimationOnGoing: React.Dispatch<React.SetStateAction<boolean>>;
-      enemyHealthDiff: number;
-      setEnemyHealthDiff: React.Dispatch<React.SetStateAction<number>>;
-      enemyDodgeDummy: number;
-      setEnemyDodgeDummy: React.Dispatch<React.SetStateAction<number>>;
-      enemyAttackDummy: number;
-      setEnemyAttackDummy: React.Dispatch<React.SetStateAction<number>>;
-      enemyTextDummy: number;
-      setEnemyTextDummy: React.Dispatch<React.SetStateAction<number>>;
-      enemyTextString: string | undefined;
-      setEnemyTextString: React.Dispatch<
-        React.SetStateAction<string | undefined>
       >;
     }
   | undefined
@@ -102,18 +67,6 @@ const LootStateContext = createContext<
     }
   | undefined
 >(undefined);
-
-//const MapStateContext = createContext<
-//| {
-//tiles: Tile[];
-//setTiles: React.Dispatch<React.SetStateAction<Tile[]>>;
-//currentPosition: Tile | null;
-//setCurrentPosition: React.Dispatch<React.SetStateAction<Tile | null>>;
-//mapDimensions: BoundingBox;
-//setMapDimensions: React.Dispatch<React.SetStateAction<BoundingBox>>;
-//}
-//| undefined
-//>(undefined);
 
 const TutorialStateContext = createContext<
   | {
@@ -195,7 +148,7 @@ const TutorialStateProvider = ({ children }: { children: ReactNode }) => {
 
   const isFocused = useIsFocused();
   const { droppedItems } = useLootState();
-  const ui = useUIStore();
+  const { uiStore } = useRootStore();
 
   useEffect(() => {
     if (shouldShowFirstBossKillTutorialAfterItemDrops && !droppedItems) {
@@ -221,13 +174,13 @@ const TutorialStateProvider = ({ children }: { children: ReactNode }) => {
           backFunction={() => {
             setShowFirstBossKillTutorial(false);
             wait(750).then(() => {
-              ui.detailedStatusViewShowing = true;
+              uiStore.detailedStatusViewShowing = true;
             });
           }}
           onCloseFunction={() => {
             setShowFirstBossKillTutorial(false);
             wait(750).then(() => {
-              ui.detailedStatusViewShowing = true;
+              uiStore.detailedStatusViewShowing = true;
             });
           }}
           isFocused={isFocused}
@@ -265,13 +218,6 @@ export const useLootState = () => {
     throw new Error("useLootState must be used within LootStateProvider");
   return context;
 };
-
-//export const useMapState = () => {
-//const context = useContext(MapStateContext);
-//if (!context)
-//throw new Error("useMapState must be used within MapStateProvider");
-//return context;
-//};
 
 export const useTutorialState = () => {
   const context = useContext(TutorialStateContext);

@@ -7,6 +7,7 @@ import EnemyStore from "./EnemyStore";
 import { DungeonStore } from "./DungeonStore";
 import { ShopStore } from "./ShopsStore";
 import { action, computed, makeObservable, observable, reaction } from "mobx";
+import { AuthStore } from "./AuthStore";
 
 const compactPaths = [
   "/",
@@ -24,6 +25,7 @@ export class RootStore {
   shopsStore: ShopStore;
   dungeonStore: DungeonStore;
   uiStore: UIStore;
+  authStore: AuthStore;
   currentPath: string = "";
   constructed: boolean = false;
   atDeathScreen: boolean = false;
@@ -32,6 +34,7 @@ export class RootStore {
     const retrieved_game = storage.getString("game");
     const retrieved_player = storage.getString("player");
 
+    this.authStore = new AuthStore({ root: this });
     this.uiStore = new UIStore({ root: this });
     this.shopsStore = new ShopStore({ root: this });
 

@@ -16,11 +16,10 @@ import { API_BASE_URL } from "../config/config";
 import { SystemBars } from "react-native-edge-to-edge";
 import { DarkTheme, LightTheme } from "../constants/Colors";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { AuthProvider } from "../stores/auth/Auth";
 import * as Notifications from "expo-notifications";
 import { registerForPushNotificationsAsync } from "../utility/functions/notifications";
 import { AppProvider } from "../stores/AppData";
-import { useRootStore, useUIStore } from "../hooks/stores";
+import { useRootStore } from "../hooks/stores";
 import { ProjectedImage } from "../components/Draggable";
 
 export {
@@ -46,13 +45,11 @@ Sentry.init({
  */
 const Root = observer(() => {
   return (
-    <AuthProvider>
-      <AppProvider>
-        <SafeAreaProvider>
-          <RootLayout />
-        </SafeAreaProvider>
-      </AppProvider>
-    </AuthProvider>
+    <AppProvider>
+      <SafeAreaProvider>
+        <RootLayout />
+      </SafeAreaProvider>
+    </AppProvider>
   );
 });
 
@@ -67,9 +64,8 @@ const RootLayout = () => {
     CursiveBold: require("../assets/fonts/Tangerine-Bold.ttf"),
   });
   const rootStore = useRootStore();
-  const { playerState, gameState } = rootStore;
+  const { playerState, gameState, uiStore } = rootStore;
 
-  const { modalShowing } = useUIStore();
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
 
@@ -141,7 +137,7 @@ const RootLayout = () => {
           (playerState.currentHealth <= 0 || playerState.currentSanity <= -50))
       ) {
         if (pathname !== "/DeathScreen")
-          wait(modalShowing ? 600 : 0).then(() => {
+          wait(uiStore.modalShowing ? 600 : 0).then(() => {
             while (router.canGoBack()) {
               router.back();
             }

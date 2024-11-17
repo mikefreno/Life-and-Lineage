@@ -1,12 +1,12 @@
 import { Platform } from "react-native";
 import * as Haptics from "expo-haptics";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { useRootStore } from "./stores";
 import { useLootState } from "../stores/DungeonData";
 import type { Item } from "../entities/item";
 
 export const useVibration = () => {
-  const { gameState } = useRootStore();
+  const { uiStore } = useRootStore();
   /**
    * requires a `style` for the vibration, `essential`(optional) is a signal for if the user has set in-app vibrations to 'minimal', defaults to false
    */
@@ -20,11 +20,9 @@ export const useVibration = () => {
     const platform = Platform.OS;
 
     if (
-      (gameState &&
-        (gameState.vibrationEnabled == "full" ||
-          (gameState.vibrationEnabled == "minimal" && essential)) &&
-        (platform === "android" || platform === "ios")) ||
-      (!gameState && platform == "ios")
+      (uiStore.vibrationEnabled == "full" ||
+        (uiStore.vibrationEnabled == "minimal" && essential)) &&
+      (platform === "android" || platform === "ios")
     ) {
       switch (style) {
         case "light":

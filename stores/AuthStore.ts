@@ -6,12 +6,13 @@ import { parseInt } from "lodash";
 import { Platform } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
 import { stringify } from "flatted";
-import { PlayerCharacter } from "../../classes/character";
-import { Game } from "../../classes/game";
-import { storage } from "../../utility/functions/storage";
-import google_config from "../../config/google_config";
-import { API_BASE_URL } from "../../config/config";
-import { SaveRow } from "../../utility/database";
+import { storage } from "../utility/functions/storage";
+import google_config from "../config/google_config";
+import { API_BASE_URL } from "../config/config";
+import { SaveRow } from "../utility/database";
+import type { PlayerCharacter } from "../entities/character";
+import type { Game } from "../entities/game";
+import type { RootStore } from "./RootStore";
 
 type EmailLogin = {
   token: string;
@@ -54,7 +55,7 @@ interface deleteRemoteSaveProps {
   id: number;
 }
 
-class AuthStore {
+export class AuthStore {
   private token: string | null = null;
   private email: string | null = null;
   private provider: "email" | "apple" | "google" | null = null;
@@ -63,12 +64,14 @@ class AuthStore {
   private db_token: string | null = null;
   isConnected: boolean = false;
   private isInitialized: boolean = false;
+  root: RootStore;
 
-  constructor() {
-    makeAutoObservable(this);
+  constructor({ root }: { root: RootStore }) {
     this.initializeNetInfo();
     this.initializeAuth();
     this.initializeGoogleSignIn();
+    this.root = root;
+    makeAutoObservable(this);
   }
 
   setAuthState = (
@@ -628,5 +631,3 @@ class AuthStore {
     }
   };
 }
-
-export const authStore = new AuthStore();

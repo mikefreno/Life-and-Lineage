@@ -2,12 +2,7 @@ import { useCallback } from "react";
 import { AttackUse, TutorialOption } from "../utility/types";
 import { toTitleCase, wait } from "../utility/functions/misc";
 import { useLootState, useTutorialState } from "../stores/DungeonData";
-import {
-  useDungeonStore,
-  useEnemyStore,
-  usePlayerStore,
-  useRootStore,
-} from "./stores";
+import { useRootStore } from "./stores";
 import { Enemy, Minion } from "../entities/creatures";
 import { PlayerCharacter } from "../entities/character";
 import { Attack } from "../entities/attack";
@@ -16,15 +11,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { Spell } from "../entities/spell";
 
 export const useEnemyManagement = () => {
-  const { enemyStore, playerState, gameState } = useRootStore();
-  const {
-    fightingBoss,
-    currentInstance,
-    currentLevel,
-    addLog,
-    setInBossFight,
-    openNextDungeonLevel,
-  } = useDungeonStore();
+  const { enemyStore, playerState, gameState, dungeonStore } = useRootStore();
   const { setDroppedItems } = useLootState();
   const { setShouldShowFirstBossKillTutorialAfterItemDrops } =
     useTutorialState();
@@ -37,11 +24,13 @@ export const useEnemyManagement = () => {
         enemy.currentHealth <= 0 ||
         (enemy.currentSanity && enemy.currentSanity <= 0)
       ) {
-        addLog(`You defeated the ${toTitleCase(enemy.creatureSpecies)}`);
+        dungeonStore.addLog(
+          `You defeated the ${toTitleCase(enemy.creatureSpecies)}`,
+        );
 
         const { itemDrops, storyDrops, gold } = enemy.getDrops(
           playerState,
-          fightingBoss,
+          dungeonStore.fightingBoss,
         );
 
         if (itemDrops) {
@@ -54,10 +43,14 @@ export const useEnemyManagement = () => {
 
         // Check if this was the last enemy
         if (enemyStore.enemies.length === 0) {
-          if (fightingBoss && currentLevel && currentInstance) {
-            setInBossFight(false);
-            currentLevel.setBossDefeated();
-            openNextDungeonLevel(currentInstance);
+          if (
+            dungeonStore.fightingBoss &&
+            dungeonStore.currentLevel &&
+            dungeonStore.currentInstance
+          ) {
+            dungeonStore.setInBossFight(false);
+            dungeonStore.currentLevel.setBossDefeated();
+            dungeonStore.openNextDungeonLevel(dungeonStore.currentInstance);
             enemyStore.clearEnemyList();
             playerState.bossDefeated();
             if (!gameState.tutorialsShown[TutorialOption.firstBossKill]) {
@@ -71,7 +64,13 @@ export const useEnemyManagement = () => {
       }
       return false;
     },
-    [playerState, gameState, fightingBoss, currentInstance, currentLevel],
+    [
+      playerState,
+      gameState,
+      dungeonStore.fightingBoss,
+      dungeonStore.currentInstance,
+      dungeonStore.currentLevel,
+    ],
   );
 
   const enemyMinionsTurn = (
@@ -84,7 +83,7 @@ export const useEnemyManagement = () => {
     suppliedMinions.forEach((minion, index) => {
       wait(1000 * index).then(() => {
         const res = minion.takeTurn({ target: playerState });
-        addLog("(minion) " + res.logString);
+        dungeonStore.addLog("(minion) " + res.logString);
       });
     });
   };
@@ -122,7 +121,7 @@ export const useEnemyManagement = () => {
             attackerId: revengeCondition.placedbyID,
             damage: revengeDamage,
           });
-          addLog(`You dealt ${revengeDamage} revenge damage!`);
+          dungeonStore.addLog(`You dealt ${revengeDamage} revenge damage!`);
         }
       }
 
@@ -176,7 +175,7 @@ export const useEnemyManagement = () => {
         if (!enemyDeathHandler(enemy)) {
           const startOfTurnPlayerHP = { ...playerState }.currentHealth ?? 0;
           const enemyAttackRes = enemy.takeTurn({ player: playerState! });
-          addLog(enemyAttackRes.logString);
+          dungeonStore.addLog(enemyAttackRes.logString);
 
           handleEnemyAction(enemy, enemyAttackRes, startOfTurnPlayerHP);
           enemyMinionsTurn(enemy.minions, enemy, playerState!);
@@ -195,9 +194,7 @@ export const useEnemyManagement = () => {
 };
 
 export const useCombatActions = () => {
-  const enemyStore = useEnemyStore();
-  const playerState = usePlayerStore();
-  const { addLog } = useDungeonStore();
+  const { enemyStore, playerState, dungeonStore } = useRootStore();
   const { enemyTurn, enemyDeathHandler } = useEnemyManagement();
   const isFocused = useIsFocused();
 
@@ -208,14 +205,14 @@ export const useCombatActions = () => {
       for (let i = 0; i < minions.length; i++) {
         await wait(1000 * i);
         const res = minions[i].takeTurn({ target });
-        addLog(`(minion) ${res.logString}`);
+        dungeonStore.addLog(`(minion) ${res.logString}`);
         completedTurns++;
         if (completedTurns === minions.length) {
           callback();
         }
       }
     },
-    [addLog],
+    [],
   );
 
   const playerMinionsTurn = useCallback(
@@ -255,7 +252,7 @@ export const useCombatActions = () => {
       if (!playerState || !isFocused) return;
 
       playerState.pass({ voluntary });
-      addLog("You passed!");
+      dungeonStore.addLog("You passed!");
 
       playerMinionsTurn(() => {
         setTimeout(() => {
@@ -266,7 +263,6 @@ export const useCombatActions = () => {
     },
     [
       playerState,
-      addLog,
       playerMinionsTurn,
       enemyTurn,
       enemyStore.attackAnimationsOnGoing,
@@ -284,7 +280,7 @@ export const useCombatActions = () => {
       if (!playerState || !isFocused) return;
 
       const logString = handleAttackResult(attackOrSpell, [target]);
-      addLog(logString);
+      dungeonStore.addLog(logString);
 
       // Check if target died and handle it
       const targetEnemy = enemyStore.enemies.find((e) => e.id === target.id);
@@ -306,7 +302,6 @@ export const useCombatActions = () => {
       enemyStore.enemies,
       playerState,
       handleAttackResult,
-      addLog,
       playerMinionsTurn,
       enemyTurn,
     ],

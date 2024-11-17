@@ -1,8 +1,8 @@
 import NetInfo from "@react-native-community/netinfo";
 import { storage } from "../../utility/functions/storage";
-import { authStore } from "../authStore";
-import { PlayerCharacter } from "../../classes/character";
-import { Game } from "../../classes/game";
+import { authStore } from "../AuthStore";
+import { PlayerCharacter } from "../../entities/character";
+import { Game } from "../../entities/game";
 import jwt from "jsonwebtoken";
 jest.mock("../../utility/functions/storage");
 
