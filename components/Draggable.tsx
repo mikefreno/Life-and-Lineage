@@ -97,26 +97,6 @@ const Draggable = ({
   );
 };
 
-export type ShopDisplayItem = {
-  item: Item[];
-  side?: "shop" | "inventory" | undefined;
-  positon: {
-    left: number;
-    top: number;
-  };
-} | null;
-
-export type ShopSetDisplayItem = React.Dispatch<
-  React.SetStateAction<{
-    item: Item[];
-    side?: "shop" | "inventory" | undefined;
-    positon: {
-      left: number;
-      top: number;
-    };
-  } | null>
->;
-
 const InventoryItem = ({
   item,
   displayItem,
@@ -125,8 +105,23 @@ const InventoryItem = ({
   isDraggable,
 }: {
   item: Item[];
-  displayItem: ShopDisplayItem;
-  setDisplayItem: ShopSetDisplayItem;
+  displayItem: {
+    item: Item[];
+    side?: "shop" | "inventory" | undefined;
+    position: {
+      left: number;
+      top: number;
+    };
+  } | null;
+  setDisplayItem: (
+    params: {
+      item: Item[];
+      position: {
+        left: number;
+        top: number;
+      };
+    } | null,
+  ) => void;
   checkReleasePosition: ({
     itemStack,
     xPos,
@@ -157,7 +152,7 @@ const InventoryItem = ({
       setDisplayItem(null);
     } else {
       ref.current?.measureInWindow((x, y) => {
-        setDisplayItem({ item, side: "shop", positon: { left: x, top: y } });
+        setDisplayItem({ item, position: { left: x, top: y } });
       });
     }
   };

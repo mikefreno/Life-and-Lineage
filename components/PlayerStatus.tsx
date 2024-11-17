@@ -741,7 +741,6 @@ const PlayerStatus = observer(
           <Pressable
             onPress={() => {
               vibration({ style: "light" });
-              uiStore.setPlayerStatusCompact(true);
             }}
             className={filled}
           >

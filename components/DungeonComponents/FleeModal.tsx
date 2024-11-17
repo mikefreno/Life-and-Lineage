@@ -34,6 +34,7 @@ export default function FleeModal({
       enemyStore.setAttackAnimationOngoing(true);
       const roll = rollD20();
       if (
+        enemyStore.enemies.length == 0 ||
         enemyStore.enemies[0].creatureSpecies == "training dummy" ||
         roll > 13 ||
         !dungeonStore.inCombat
@@ -137,7 +138,7 @@ const FleeButton = observer(
           (enemyStore.attackAnimationsOnGoing || playerState.isStunned)
         }
       >
-        {enemyStore.enemies.length == 0 ? "Run! (50%)" : "Leave"}
+        {enemyStore.enemies.length > 0 ? "Run! (50%)" : "Leave"}
       </GenericFlatButton>
     );
   },

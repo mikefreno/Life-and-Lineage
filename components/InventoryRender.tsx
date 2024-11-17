@@ -16,7 +16,7 @@ type InventoryRenderBase = {
   displayItem: {
     item: Item[];
     side?: "shop" | "inventory";
-    positon: {
+    position: {
       left: number;
       top: number;
     };
@@ -25,7 +25,7 @@ type InventoryRenderBase = {
     React.SetStateAction<{
       item: Item[];
       side?: "shop" | "inventory";
-      positon: {
+      position: {
         left: number;
         top: number;
       };
@@ -225,7 +225,10 @@ export default function InventoryRender({
               }
             : {
                 left: `${(index % 6) * 16.67 + 1.5}%`,
-                top: `${Math.floor(index / 6) * 24 + 5.5}%`,
+                top: `${
+                  Math.floor(index / 6) * 24 +
+                  (uiStore.playerStatusIsCompact ? 5.5 : 5.0)
+                }%`,
               }
         }
         key={index}
@@ -233,7 +236,13 @@ export default function InventoryRender({
         <View>
           <InventoryItem
             item={item.item}
-            setDisplayItem={setDisplayItem}
+            setDisplayItem={(params) => {
+              if (params) {
+                setDisplayItem({ ...params, side: "inventory" });
+              } else {
+                setDisplayItem(null);
+              }
+            }}
             checkReleasePosition={checkReleasePosition}
             displayItem={displayItem}
             isDraggable={!!item.item[0].slot}
@@ -306,11 +315,17 @@ export default function InventoryRender({
                     uiStore.dimensions.window.greater
                       ? {
                           left: `${(index % 12) * 8.33 + 0.5}%`,
-                          top: `${Math.floor(index / 12) * 48 + 8}%`,
+                          top: `${
+                            Math.floor(index / 12) * 48 +
+                            (uiStore.playerStatusIsCompact ? 8.0 : 7.5)
+                          }%`,
                         }
                       : {
                           left: `${(index % 6) * 16.67 + 1.5}%`,
-                          top: `${Math.floor(index / 6) * 24 + 5.5}%`,
+                          top: `${
+                            Math.floor(index / 6) * 24 +
+                            (uiStore.playerStatusIsCompact ? 5.5 : 5.0)
+                          }%`,
                         }
                   }
                   key={"bg-" + index}
@@ -361,11 +376,17 @@ export default function InventoryRender({
                       uiStore.dimensions.window.greater
                         ? {
                             left: `${(index % 12) * 8.33 + 0.5}%`,
-                            top: `${Math.floor(index / 12) * 48 + 8}%`,
+                            top: `${
+                              Math.floor(index / 12) * 48 +
+                              (uiStore.playerStatusIsCompact ? 8.0 : 7.5)
+                            }%`,
                           }
                         : {
                             left: `${(index % 6) * 16.67 + 1.5}%`,
-                            top: `${Math.floor(index / 6) * 24 + 4}%`,
+                            top: `${
+                              Math.floor(index / 6) * 24 +
+                              (uiStore.playerStatusIsCompact ? 5.5 : 5.0)
+                            }%`,
                           }
                     }
                     key={"key-bg-" + index}
@@ -387,11 +408,17 @@ export default function InventoryRender({
                       uiStore.dimensions.window.greater
                         ? {
                             left: `${(index % 12) * 8.33 + 0.5}%`,
-                            top: `${Math.floor(index / 12) * 48 + 8}%`,
+                            top: `${
+                              Math.floor(index / 12) * 48 +
+                              (uiStore.playerStatusIsCompact ? 8.0 : 7.5)
+                            }%`,
                           }
                         : {
                             left: `${(index % 6) * 16.67 + 1.5}%`,
-                            top: `${Math.floor(index / 6) * 24 + 4}%`,
+                            top: `${
+                              Math.floor(index / 6) * 24 +
+                              (uiStore.playerStatusIsCompact ? 5.5 : 5.0)
+                            }%`,
                           }
                     }
                     key={index}

@@ -83,7 +83,7 @@ const ShopInteriorScreen = observer(() => {
   const [displayItem, setDisplayItem] = useState<{
     item: Item[];
     side?: "shop" | "inventory";
-    positon: { left: number; top: number };
+    position: { left: number; top: number };
   } | null>(null);
   const [initialized, setInitialized] = useState<boolean>(false);
   const [greeting, setGreeting] = useState<string>("");
@@ -193,8 +193,8 @@ const ShopInteriorScreen = observer(() => {
       if (displayItem?.item.length && displayItem.item.length == 1) {
         setDisplayItem(null);
       }
-      playerState.buyItem(item, itemPrice);
       thisShop.sellItem(item, itemPrice);
+      playerState.buyItem(item, itemPrice);
     }
     saveGame(gameState);
   };
@@ -310,7 +310,13 @@ const ShopInteriorScreen = observer(() => {
                           key={item.item[0].id}
                           item={item.item}
                           displayItem={displayItem}
-                          setDisplayItem={setDisplayItem}
+                          setDisplayItem={(params) => {
+                            if (params) {
+                              setDisplayItem({ ...params, side: "shop" });
+                            } else {
+                              setDisplayItem(null);
+                            }
+                          }}
                           checkReleasePosition={checkReleasePosition}
                         />
                       </View>

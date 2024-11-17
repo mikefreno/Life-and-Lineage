@@ -16,7 +16,7 @@ interface EquipmentDisplayProps {
   inventoryTarget: RefObject<View>;
   displayItem: {
     item: Item[];
-    positon: {
+    position: {
       left: number;
       top: number;
     };
@@ -24,7 +24,7 @@ interface EquipmentDisplayProps {
   setDisplayItem: React.Dispatch<
     React.SetStateAction<{
       item: Item[];
-      positon: {
+      position: {
         left: number;
         top: number;
       };
@@ -208,7 +208,7 @@ export default function EquipmentDisplay({
         <View className="flex-1 flex items-center justify-center -ml-[10vw]">
           <EquipmentSlot slot="Head" />
         </View>
-        <View className="flex-1 flex items-center justify-end -mt-[4vh] -ml-[10vw]">
+        <View className="flex-1 flex items-center justify-end -mt-[3vh] -ml-[10vw]">
           <EquipmentSlot slot="Quiver" />
         </View>
       </View>

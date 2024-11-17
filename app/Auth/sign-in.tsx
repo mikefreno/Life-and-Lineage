@@ -20,10 +20,10 @@ import { ThemedView, Text } from "../../components/Themed";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { wait } from "../../utility/functions/misc";
 import * as Updates from "expo-updates";
-import { useAuth } from "../../stores/auth/Auth";
+import { useRootStore } from "../../hooks/stores";
 
 const SignInScreen = observer(() => {
-  const auth = useAuth();
+  const { authStore } = useRootStore();
 
   const { colorScheme } = useColorScheme();
 
@@ -73,7 +73,7 @@ const SignInScreen = observer(() => {
         return;
       } else {
         if (result.success) {
-          await auth.login({
+          await authStore.login({
             token: result.token,
             email: result.email,
             provider: "email",
@@ -99,7 +99,7 @@ const SignInScreen = observer(() => {
   const handleGoogleSignIn = async () => {
     setAwaitingResponse(true);
     try {
-      const res = await auth.googleSignIn();
+      const res = await authStore.googleSignIn();
       if (res == 200) {
         while (router.canGoBack()) {
           router.back();
@@ -119,7 +119,7 @@ const SignInScreen = observer(() => {
   const handleAppleSignIn = async () => {
     setAwaitingResponse(true);
     try {
-      const res = await auth.appleSignIn();
+      const res = await authStore.appleSignIn();
       if (res == 200) {
         while (router.canGoBack()) {
           router.back();

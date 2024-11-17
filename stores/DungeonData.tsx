@@ -50,7 +50,7 @@ const LootStateContext = createContext<
       setLeftBehindDrops: React.Dispatch<React.SetStateAction<Item[]>>;
       displayItem: {
         item: Item[];
-        positon: {
+        position: {
           left: number;
           top: number;
         };
@@ -58,7 +58,7 @@ const LootStateContext = createContext<
       setDisplayItem: React.Dispatch<
         React.SetStateAction<{
           item: Item[];
-          positon: {
+          position: {
             left: number;
             top: number;
           };
@@ -109,7 +109,7 @@ const LootStateProvider = ({ children }: { children: ReactNode }) => {
   const [leftBehindDrops, setLeftBehindDrops] = useState<Item[]>([]);
   const [displayItem, setDisplayItem] = useState<{
     item: Item[];
-    positon: { left: number; top: number };
+    position: { left: number; top: number };
   } | null>(null);
   const [inventoryFullNotifier, setInventoryFullNotifier] =
     useState<boolean>(false);

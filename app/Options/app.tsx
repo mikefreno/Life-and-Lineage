@@ -12,7 +12,6 @@ import { SaveRow } from "../../utility/database";
 import D20DieAnimation from "../../components/DieRollAnim";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { parse } from "flatted";
-import { useAuth } from "../../stores/auth/Auth";
 import { useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
 import { Game } from "../../entities/game";
@@ -22,8 +21,7 @@ const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
 
 export const AppSettings = observer(() => {
-  const user = useAuth();
-  let { playerState, gameState, uiStore } = useRootStore();
+  let { playerState, gameState, uiStore, authStore } = useRootStore();
 
   const { colorScheme, setColorScheme } = useColorScheme();
   const [showRemoteSaveWindow, setShowRemoteSaveWindow] =
@@ -64,19 +62,19 @@ export const AppSettings = observer(() => {
     }, [uiStore.colorScheme]);
 
     useEffect(() => {
-      if (user.isAuthenticated) {
+      if (authStore.isAuthenticated) {
         setLoadingDBInfo(true);
-        user.getRemoteSaves().then((rows) => {
+        authStore.getRemoteSaves().then((rows) => {
           setRemoteSaves(rows);
           setLoadingDBInfo(false);
         });
       } else {
         setRemoteSaves([]);
       }
-    }, [user.isAuthenticated]);
+    }, [authStore.isAuthenticated]);
 
     const logout = async () => {
-      await user.logout();
+      await authStore.logout();
     };
 
     const toggleRemoteSaveWindow = () => {
@@ -90,8 +88,12 @@ export const AppSettings = observer(() => {
     const newRemoteSave = async () => {
       if (playerState && gameState && saveName.length >= 3) {
         setLoadingDBInfo(true);
-        await user.makeRemoteSave({ name: saveName, gameState, playerState });
-        const res = await user.getRemoteSaves();
+        await authStore.makeRemoteSave({
+          name: saveName,
+          gameState,
+          playerState,
+        });
+        const res = await authStore.getRemoteSaves();
         setRemoteSaves(res);
 
         setLoadingDBInfo(false);
@@ -101,13 +103,13 @@ export const AppSettings = observer(() => {
     const overwriteSave = async (chosenSave: SaveRow) => {
       if (playerState && gameState) {
         setLoadingDBInfo(true);
-        user.overwriteRemoteSave({
+        authStore.overwriteRemoteSave({
           name: chosenSave.name,
           id: chosenSave.id,
           gameState,
           playerState,
         });
-        const res = await user.getRemoteSaves();
+        const res = await authStore.getRemoteSaves();
         setRemoteSaves(res);
         setLoadingDBInfo(false);
       }
@@ -123,8 +125,8 @@ export const AppSettings = observer(() => {
 
     const deleteRemoteSave = async (chosenSave: SaveRow) => {
       setLoadingDBInfo(true);
-      await user.deleteRemoteSave({ id: chosenSave.id });
-      const res = await user.getRemoteSaves();
+      await authStore.deleteRemoteSave({ id: chosenSave.id });
+      const res = await authStore.getRemoteSaves();
       setRemoteSaves(res);
       setLoadingDBInfo(false);
     };
@@ -247,18 +249,20 @@ export const AppSettings = observer(() => {
           </GenericRaisedButton>*/}
           <GenericStrikeAround>
             <Text className="text-xl">
-              Remote Backups{!user.isAuthenticated && ` (requires login)`}
+              Remote Backups{!authStore.isAuthenticated && ` (requires login)`}
             </Text>
           </GenericStrikeAround>
-          {user.isAuthenticated ? (
+          {authStore.isAuthenticated ? (
             <>
               <Text className="text-center py-2">
-                Logged in as: {user.getEmail()}
+                Logged in as: {authStore.getEmail()}
               </Text>
               <View className="flex flex-row justify-evenly w-full">
                 <GenericFlatButton
                   onPress={toggleRemoteSaveWindow}
-                  disabled={loadingDBInfo || !user.isConnectedAndInitialized}
+                  disabled={
+                    loadingDBInfo || !authStore.isConnectedAndInitialized
+                  }
                 >
                   {loadingDBInfo ? (
                     <D20DieAnimation size={20} keepRolling />
@@ -268,7 +272,9 @@ export const AppSettings = observer(() => {
                 </GenericFlatButton>
                 <GenericFlatButton
                   onPress={toggleRemoteLoadWindow}
-                  disabled={loadingDBInfo || !user.isConnectedAndInitialized}
+                  disabled={
+                    loadingDBInfo || !authStore.isConnectedAndInitialized
+                  }
                 >
                   {loadingDBInfo ? (
                     <D20DieAnimation size={20} keepRolling />
@@ -283,7 +289,7 @@ export const AppSettings = observer(() => {
             </>
           ) : (
             <>
-              {!user.isConnectedAndInitialized && (
+              {!authStore.isConnectedAndInitialized && (
                 <Text className="text-center italic text-sm">
                   You are not connected to the internet
                 </Text>
@@ -291,7 +297,7 @@ export const AppSettings = observer(() => {
               <View className="flex flex-row justify-evenly w-full">
                 <GenericRaisedButton
                   onPress={() => router.push("/Auth/sign-in")}
-                  disabled={!user.isConnectedAndInitialized}
+                  disabled={!authStore.isConnectedAndInitialized}
                 >
                   Sign In
                 </GenericRaisedButton>
@@ -299,7 +305,7 @@ export const AppSettings = observer(() => {
                   onPress={() => router.push("/Auth/sign-up")}
                   backgroundColor={"#2563eb"}
                   textColor={"#fafafa"}
-                  disabled={!user.isConnectedAndInitialized}
+                  disabled={!authStore.isConnectedAndInitialized}
                 >
                   Sign Up
                 </GenericRaisedButton>

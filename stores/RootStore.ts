@@ -66,9 +66,11 @@ export class RootStore {
       () => {
         this.uiStore.setPlayerStatusCompact(
           !!this.playerState &&
-            (this.playerState.unAllocatedSkillPoints > 0 ||
+            !(
+              this.playerState.unAllocatedSkillPoints > 0 ||
               !this.compactPath ||
-              this.playerState.conditions.length > 0),
+              this.playerState.conditions.length > 0
+            ),
         );
       },
     );

@@ -18,14 +18,14 @@ import { API_BASE_URL } from "../../config/config";
 import D20DieAnimation from "../../components/DieRollAnim";
 import { ThemedView, Text } from "../../components/Themed";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useAuth } from "../../stores/auth/Auth";
 import { isValidPassword } from "../../utility/functions/password";
 import { useVibration } from "../../hooks/generic";
+import { useRootStore } from "../../hooks/stores";
 
 const SignUpScreen = observer(() => {
   const { colorScheme } = useColorScheme();
   const vibration = useVibration();
-  const auth = useAuth();
+  const { authStore } = useRootStore();
 
   const [emailAddress, setEmailAddress] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -42,7 +42,7 @@ const SignUpScreen = observer(() => {
   const header = useHeaderHeight();
 
   useEffect(() => {
-    if (auth.isAuthenticated) {
+    if (authStore.isAuthenticated) {
       const navigateToOptions = async () => {
         while (router.canGoBack()) {
           router.back();
@@ -52,7 +52,7 @@ const SignUpScreen = observer(() => {
 
       navigateToOptions();
     }
-  }, [auth.isAuthenticated, router]);
+  }, [authStore.isAuthenticated, router]);
 
   useEffect(() => setError(""), [usingEmail]);
 
@@ -137,7 +137,7 @@ const SignUpScreen = observer(() => {
   const handleGoogleSignUp = async () => {
     setAwaitingResponse(true);
     try {
-      await auth.googleSignIn();
+      await authStore.googleSignIn();
       setAwaitingResponse(false);
     } catch (error) {
       setError("Failed to sign up with Google. Please try again.");
@@ -148,7 +148,7 @@ const SignUpScreen = observer(() => {
   const handleAppleSignUp = async () => {
     setAwaitingResponse(true);
     try {
-      await auth.appleSignIn();
+      await authStore.appleSignIn();
       setAwaitingResponse(false);
     } catch (error) {
       setError("Failed to sign up with Apple. Please try again.");

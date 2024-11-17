@@ -30,7 +30,7 @@ type BaseProps = {
   displayItem: {
     item: Item[];
     side?: "shop" | "inventory";
-    positon: {
+    position: {
       left: number;
       top: number;
     };
@@ -677,11 +677,11 @@ export function StatsDisplay({
                 left: 20,
                 top:
                   topGuard &&
-                  displayItem.positon.top + (topOffset ?? 0) < topGuard
+                  displayItem.position.top + (topOffset ?? 0) < topGuard
                     ? topGuard
-                    : viewHeight + displayItem.positon.top <
+                    : viewHeight + displayItem.position.top <
                       dimensions.window.height
-                    ? displayItem.positon.top + (topOffset ?? 0)
+                    ? displayItem.position.top + (topOffset ?? 0)
                     : dimensions.window.height - (viewHeight + 20),
               }
             : {
@@ -691,17 +691,17 @@ export function StatsDisplay({
                     ? "rgba(250, 250, 250, 0.98)"
                     : "rgba(20, 20, 20, 0.95)",
                 left:
-                  displayItem.positon.left + itemBlockSize <
+                  displayItem.position.left + itemBlockSize <
                   dimensions.window.width * 0.6
-                    ? displayItem.positon.left + itemBlockSize
-                    : displayItem.positon.left - viewWidth - 4,
+                    ? displayItem.position.left + itemBlockSize
+                    : displayItem.position.left - viewWidth - 4,
                 top:
                   topGuard &&
-                  displayItem.positon.top + (topOffset ?? 0) < topGuard
+                  displayItem.position.top + (topOffset ?? 0) < topGuard
                     ? topGuard
-                    : viewHeight + displayItem.positon.top <
+                    : viewHeight + displayItem.position.top <
                       dimensions.window.height - tabBarHeight
-                    ? displayItem.positon.top + (topOffset ?? 0)
+                    ? displayItem.position.top + (topOffset ?? 0)
                     : dimensions.window.height - (viewHeight + tabBarHeight),
               }
         }

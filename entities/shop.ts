@@ -182,7 +182,7 @@ export class Shop {
         invItem.equals(item),
       );
       if (idx !== -1) {
-        this.inventory.splice(idx, 1);
+        this.baseInventory.splice(idx, 1);
         soldCount++;
       }
     });

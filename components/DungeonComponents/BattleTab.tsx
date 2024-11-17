@@ -54,7 +54,7 @@ const BattleTab = observer(
     const [combinedData, setCombinedData] = useState<(Attack | Spell)[]>([]);
     const [hiddenDisplayItem, setHiddenDisplayItem] = useState<{
       item: Item[];
-      positon: {
+      position: {
         left: number;
         top: number;
       };
@@ -371,8 +371,8 @@ const BattleTab = observer(
                   renderItem={({ item }) => (
                     <Text className="py-1">
                       {item
-                        .replaceAll(`on the ${playerState.fullName}`, "")
-                        .replaceAll(`The ${playerState.fullName}`, "You")}
+                        .replaceAll(`${playerState.fullName}`, "You")
+                        .replaceAll(`on the ${playerState.fullName}`, "")}
                     </Text>
                   )}
                 />
