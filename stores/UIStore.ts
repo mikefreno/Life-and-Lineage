@@ -76,8 +76,10 @@ export default class UIStore {
 
     const { vibrationEnabled, colorScheme, healthWarning } =
       this.hydrateUISettings();
+
     this.vibrationEnabled =
       vibrationEnabled ?? Platform.OS == "ios" ? "full" : "minimal";
+
     this.colorScheme = colorScheme ?? "system";
     this.healthWarning = healthWarning ?? 0.2;
 

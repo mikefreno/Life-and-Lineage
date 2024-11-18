@@ -210,7 +210,6 @@ export class DungeonLevel {
         enemyStore: this.dungeonStore.root.enemyStore,
       });
     });
-    console.log(bosses);
     return bosses;
   }
 

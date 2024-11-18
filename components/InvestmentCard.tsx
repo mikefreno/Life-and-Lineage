@@ -160,16 +160,8 @@ const InvestmentCard = observer(
                   key={upgrade.name}
                 >
                   <View
-                    className="m-2 rounded-xl"
+                    className="m-2 rounded-xl shadow shadow-black/20 android:shadow-black/90 android:elevation-3"
                     style={{
-                      shadowColor: "#000",
-                      shadowOffset: {
-                        width: 3,
-                        height: 1,
-                      },
-                      elevation: 3,
-                      shadowOpacity: 0.2,
-                      shadowRadius: 3,
                       backgroundColor:
                         "style" in upgrade
                           ? upgrade.style == "evil"

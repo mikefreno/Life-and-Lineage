@@ -14,6 +14,7 @@ module.exports = {
         "diffuse-top-white": "0px -5px 10px rgba(255, 255, 255, 0.05)",
         "soft-white": "0px 5px 15px rgba(255, 255, 255, 0.10)",
         "soft-top-white": "0px -5px 15px rgba(255, 255, 255, 0.10)",
+        "card-offset": "3px 1px 3px rgba(0, 0, 0, 0.2)",
       },
       colors: {
         zinc: {

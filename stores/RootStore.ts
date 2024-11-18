@@ -6,17 +6,8 @@ import UIStore from "./UIStore";
 import EnemyStore from "./EnemyStore";
 import { DungeonStore } from "./DungeonStore";
 import { ShopStore } from "./ShopsStore";
-import { action, computed, makeObservable, observable, reaction } from "mobx";
+import { action, makeObservable, observable, reaction } from "mobx";
 import { AuthStore } from "./AuthStore";
-
-const compactPaths = [
-  "/",
-  "/spells",
-  "/labor",
-  "/dungeon",
-  "/shops",
-  "/medical",
-];
 
 export class RootStore {
   gameState: Game | null;
@@ -26,7 +17,6 @@ export class RootStore {
   dungeonStore: DungeonStore;
   uiStore: UIStore;
   authStore: AuthStore;
-  currentPath: string = "";
   constructed: boolean = false;
   atDeathScreen: boolean = false;
 
@@ -51,16 +41,13 @@ export class RootStore {
     this.constructed = true;
 
     makeObservable(this, {
-      currentPath: observable,
       constructed: observable,
       setPathName: action,
-      compactPath: computed,
     });
 
     reaction(
       () => [
         this.playerState?.unAllocatedSkillPoints,
-        this.compactPath,
         this.playerState?.conditions.length,
       ],
       () => {
@@ -68,16 +55,11 @@ export class RootStore {
           !!this.playerState &&
             !(
               this.playerState.unAllocatedSkillPoints > 0 ||
-              !this.compactPath ||
               this.playerState.conditions.length > 0
             ),
         );
       },
     );
-  }
-
-  get compactPath() {
-    return compactPaths.includes(this.currentPath);
   }
 
   setPathName(pathname: string) {

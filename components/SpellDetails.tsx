@@ -20,18 +20,14 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
   const { playerState, uiStore } = useRootStore();
   return (
     <View
-      className="rounded-lg"
+      className={`rounded-lg shadow shadow-[${
+        elementalColorMap[spell.element].dark
+      }]/25`}
       style={{
-        shadowColor: elementalColorMap[spell.element].dark,
-        shadowOffset: {
-          width: 2,
-          height: 3,
-        },
-        elevation: 6,
         backgroundColor: colorScheme == "light" ? "#fafafa" : "#27272a",
-        shadowOpacity: 0.25,
         shadowRadius: 5,
         width: uiStore.dimensions.window.width * 0.75,
+        elevation: 6,
       }}
     >
       <View

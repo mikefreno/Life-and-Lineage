@@ -140,7 +140,6 @@ export class DungeonStore {
       const timeOfLog = new Date().toLocaleTimeString();
       const log = `${timeOfLog}: ${whatHappened}`;
       this.logs.push(log);
-      console.log("All logs:", this.logs);
     });
   }
 

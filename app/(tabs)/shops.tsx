@@ -14,6 +14,7 @@ import { Text } from "../../components/Themed";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { type Shop } from "../../entities/shop";
+import { EXPANDED_PAD } from "../../components/PlayerStatus";
 
 const ShopsScreen = observer(() => {
   const vibration = useVibration();
@@ -41,18 +42,11 @@ const ShopsScreen = observer(() => {
       return (
         <View className="h-96 w-1/2" key={shop.shopKeeper.id}>
           <View
-            className="m-2 flex-1 items-center justify-between rounded-xl border p-4"
+            className={`m-2 flex-1 items-center justify-between rounded-xl border p-4 android:elevation-4 shadow-[${shopColors?.background}]/50`}
             style={{
-              shadowColor: shopColors?.background,
-              shadowOffset: {
-                width: 2,
-                height: 3,
-              },
-              elevation: 4,
               backgroundColor: shopColors?.lightbackground,
-              shadowOpacity: 0.5,
-              shadowRadius: 4,
               borderColor: shopColors?.background,
+              elevation: 4,
             }}
           >
             <Text
@@ -142,7 +136,8 @@ const ShopsScreen = observer(() => {
                 alignItems: "flex-start",
                 justifyContent: "flex-start",
                 paddingBottom:
-                  bottomHeight + (uiStore.playerStatusIsCompact ? 0 : 28),
+                  bottomHeight +
+                  (uiStore.playerStatusIsCompact ? 0 : EXPANDED_PAD),
                 paddingTop: headerHeight,
               }}
             >

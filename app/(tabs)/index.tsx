@@ -27,6 +27,7 @@ import EquipmentDisplay from "../../components/EquipmentDisplay";
 import { TutorialOption } from "../../utility/types";
 import { useDraggableStore, useRootStore } from "../../hooks/stores";
 import D20DieAnimation from "../../components/DieRollAnim";
+import { EXPANDED_PAD } from "../../components/PlayerStatus";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -118,7 +119,8 @@ const HomeScreen = observer(() => {
         className="flex-1"
         style={{
           paddingTop: header,
-          paddingBottom: tabBarHeight + (playerStatusIsCompact ? 0 : 28),
+          paddingBottom:
+            tabBarHeight + (playerStatusIsCompact ? 0 : EXPANDED_PAD),
         }}
       >
         <TouchableWithoutFeedback onPress={clearDisplayItem}>

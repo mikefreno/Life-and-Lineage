@@ -19,11 +19,13 @@ import { elementalColorMap } from "../../constants/Colors";
 import { useIsFocused } from "@react-navigation/native";
 import { Text } from "../../components/Themed";
 import { useRootStore } from "../../hooks/stores";
+import { EXPANDED_PAD } from "../../components/PlayerStatus";
 
 const SpellsScreen = observer(() => {
   const { colorScheme } = useColorScheme();
 
   const bottomTab = useBottomTabBarHeight();
+  const header = useHeaderHeight();
   const { playerState, uiStore } = useRootStore();
 
   function magicProficiencySection(
@@ -35,68 +37,59 @@ const SpellsScreen = observer(() => {
       | undefined,
   ) {
     if (!proficiencies || !playerState) return;
-    return (
-      <ScrollView
-        className="w-full"
-        contentContainerStyle={{ paddingBottom: 10 }}
-      >
-        {proficiencies.map((magicProficiency, idx) => {
-          const color = elementalColorMap[magicProficiency.school];
-          const currentMastery = playerState?.currentMasteryLevel(
-            magicProficiency.school,
-          );
-          const currentMasteryBarrier = MasteryToBarrier[currentMastery];
-          const nextMasteryBarrier =
-            MasteryToBarrier[(currentMastery + 1) as MasteryLevel];
-          return (
-            <View className="my-4 px-8 flex w-full flex-col" key={idx}>
-              <Text
-                style={{
-                  color:
-                    magicProficiency.school == Element.air &&
-                    colorScheme == "light"
-                      ? "#71717a"
-                      : magicProficiency.school == Element.assassination
-                      ? colorScheme == "dark"
-                        ? color.light
-                        : color.dark
-                      : color.dark,
-                }}
-              >
-                {`${ElementToString[magicProficiency.school]} (${
-                  MasteryToString[currentMastery]
-                })`}
-              </Text>
-              <ProgressBar
-                value={magicProficiency.proficiency}
-                minValue={currentMasteryBarrier}
-                maxValue={nextMasteryBarrier}
-                unfilledColor={color.light}
-                filledColor={color.dark}
-                borderColor={color.dark}
-              />
-              <Text
-                className="mx-auto text-sm"
-                style={{
-                  color:
-                    magicProficiency.school == Element.air &&
-                    colorScheme == "light"
-                      ? "#71717a"
-                      : magicProficiency.school == Element.assassination
-                      ? colorScheme == "dark"
-                        ? color.light
-                        : color.dark
-                      : color.dark,
-                }}
-              >
-                Progression to{" "}
-                {MasteryToString[(currentMastery + 1) as MasteryLevel]}
-              </Text>
-            </View>
-          );
-        })}
-      </ScrollView>
-    );
+    return proficiencies.map((magicProficiency, idx) => {
+      const color = elementalColorMap[magicProficiency.school];
+      const currentMastery = playerState?.currentMasteryLevel(
+        magicProficiency.school,
+      );
+      const currentMasteryBarrier = MasteryToBarrier[currentMastery];
+      const nextMasteryBarrier =
+        MasteryToBarrier[(currentMastery + 1) as MasteryLevel];
+      return (
+        <View className="my-2 px-8 flex w-full flex-col" key={idx}>
+          <Text
+            style={{
+              color:
+                magicProficiency.school == Element.air && colorScheme == "light"
+                  ? "#71717a"
+                  : magicProficiency.school == Element.assassination
+                  ? colorScheme == "dark"
+                    ? color.light
+                    : color.dark
+                  : color.dark,
+            }}
+          >
+            {`${ElementToString[magicProficiency.school]} (${
+              MasteryToString[currentMastery]
+            })`}
+          </Text>
+          <ProgressBar
+            value={magicProficiency.proficiency}
+            minValue={currentMasteryBarrier}
+            maxValue={nextMasteryBarrier}
+            unfilledColor={color.light}
+            filledColor={color.dark}
+            borderColor={color.dark}
+          />
+          <Text
+            className="mx-auto text-sm"
+            style={{
+              color:
+                magicProficiency.school == Element.air && colorScheme == "light"
+                  ? "#71717a"
+                  : magicProficiency.school == Element.assassination
+                  ? colorScheme == "dark"
+                    ? color.light
+                    : color.dark
+                  : color.dark,
+            }}
+          >
+            Progression to{" "}
+            {MasteryToString[(currentMastery + 1) as MasteryLevel]}
+          </Text>
+        </View>
+      );
+    });
   }
 
   return (
@@ -116,13 +109,14 @@ const SpellsScreen = observer(() => {
       <View
         className="flex-1"
         style={{
-          paddingBottom: bottomTab + (uiStore.playerStatusIsCompact ? 0 : 28),
+          marginTop: header,
+          paddingBottom:
+            bottomTab + (uiStore.playerStatusIsCompact ? 0 : EXPANDED_PAD),
         }}
       >
         {playerState?.spells && playerState.spells.length > 0 ? (
           <ScrollView
             contentContainerStyle={{
-              marginTop: useHeaderHeight(),
               flex: 1,
             }}
           >
@@ -133,18 +127,16 @@ const SpellsScreen = observer(() => {
             ))}
           </ScrollView>
         ) : (
-          <View className="h-1/2 items-center justify-center">
+          <View className="flex-1 items-center justify-center">
             <Text className="text-xl tracking-wide">No Known Spells.</Text>
             <Text className="text-center tracking-wide">
               (Books can be studied on the top right)
             </Text>
           </View>
         )}
-        <View className="h-1/2">
-          <GenericStrikeAround>Proficiencies</GenericStrikeAround>
-          <View className="flex-1 items-center">
-            {magicProficiencySection(playerState?.magicProficiencies)}
-          </View>
+        <GenericStrikeAround>Proficiencies</GenericStrikeAround>
+        <View className="flex-1 items-center">
+          {magicProficiencySection(playerState?.magicProficiencies)}
         </View>
       </View>
     </>

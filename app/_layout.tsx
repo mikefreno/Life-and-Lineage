@@ -66,7 +66,7 @@ const RootLayout = () => {
   const rootStore = useRootStore();
   const { playerState, gameState, uiStore } = rootStore;
 
-  const { colorScheme } = useColorScheme();
+  const { colorScheme, setColorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
 
   const [expoPushToken, setExpoPushToken] = useState("");
@@ -77,10 +77,6 @@ const RootLayout = () => {
   const notificationListener = useRef<Notifications.Subscription>();
   const responseListener = useRef<Notifications.Subscription>();
   const pathname = usePathname();
-
-  useEffect(() => {
-    rootStore.setPathName(pathname);
-  }, [pathname]);
 
   useEffect(() => {
     if (fontLoaded) {
@@ -162,6 +158,10 @@ const RootLayout = () => {
     playerState?.currentSanity,
     rootStore.constructed,
   ]);
+
+  useEffect(() => {
+    setColorScheme(uiStore.colorScheme);
+  }, [uiStore.colorScheme]);
 
   while (!fontLoaded) {
     return (

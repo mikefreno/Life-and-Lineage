@@ -89,16 +89,10 @@ export default function GenericModal({
       <ThemedView
         className={`mx-auto rounded-xl ${
           noPad ? "" : "px-[2vw] py-4"
-        } dark:border dark:border-zinc-500`}
+        } dark:border dark:border-zinc-500 shadow shadow-black/25`}
         style={{
-          shadowColor: "#000",
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          elevation: 2,
-          shadowOpacity: 0.25,
           shadowRadius: 5,
+          elevation: 2,
           width: size ? `${size}%` : "83.3333%",
         }}
       >

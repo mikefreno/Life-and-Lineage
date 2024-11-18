@@ -118,19 +118,20 @@ const DungeonLevelScreen = observer(() => {
         <GenericModal
           isVisibleCondition={showTargetSelection.showing}
           size={100}
-          backFunction={() =>
+          backFunction={() => {
             setShowTargetSelection({
               showing: false,
               chosenAttack: null,
-            })
-          }
+            });
+            enemyStore.setAttackAnimationOngoing(false);
+          }}
         >
           <>
             <Text className="text-center text-2xl">Choose Your Target</Text>
             <TargetSelection />
           </>
         </GenericModal>
-        <View className="flex-1" style={{ paddingBottom: 84 }}>
+        <View className="flex-1" style={{ paddingBottom: 74 }}>
           {enemyStore.enemies.length > 0 ? (
             <DungeonEnemyDisplay />
           ) : !inCombat ? (

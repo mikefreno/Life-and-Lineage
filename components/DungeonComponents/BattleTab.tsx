@@ -103,8 +103,12 @@ const BattleTab = observer(
         const enoughForDualToHitAll =
           enemyStore.enemies.length > 1 ||
           enemyStore.enemies[0].minions.length > 0;
+
         const attackHitsAllTargets =
-          attackOrSpell.attackStyle == "aoe" || enoughForDualToHitAll;
+          attackOrSpell.attackStyle == "aoe" ||
+          enoughForDualToHitAll ||
+          enemyStore.enemies.length === 1;
+
         if (!attackHitsAllTargets) {
           setShowTargetSelection({
             showing: true,

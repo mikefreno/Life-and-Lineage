@@ -94,7 +94,14 @@ const useEnemyAnimations = () => {
         duration: 1000,
         useNativeDriver: true,
       }),
-    ]).start(onComplete);
+    ]).start(({ finished }) => {
+      if (finished) {
+        console.log("Animation completed");
+        onComplete();
+      } else {
+        console.log("Animation was interrupted");
+      }
+    });
   };
 
   return {
@@ -262,11 +269,6 @@ const EnemyDisplay = observer(
         animations.runDodgeAnimation();
       }
     }, [animationStore.dodgeDummy]);
-
-    useEffect(
-      () => console.log(animationStore.textString),
-      [animationStore.textString],
-    );
 
     useEffect(() => {
       if (

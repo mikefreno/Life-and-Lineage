@@ -45,6 +45,7 @@ export const AppSettings = observer(() => {
     function setColorTheme(index: number, option: "system" | "light" | "dark") {
       vibration({ style: "light" });
       uiStore.setColorScheme(option);
+      setColorScheme(option);
       setSelectedThemeOption(index);
     }
 
@@ -56,10 +57,6 @@ export const AppSettings = observer(() => {
       setSelectedVibrationOption(index);
       vibration({ style: "light" });
     }
-
-    useEffect(() => {
-      setColorScheme(uiStore.colorScheme);
-    }, [uiStore.colorScheme]);
 
     useEffect(() => {
       if (authStore.isAuthenticated) {

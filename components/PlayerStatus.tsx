@@ -7,7 +7,7 @@ import {
   View,
   Platform,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { toTitleCase, damageReduction } from "../utility/functions/misc";
 import GenericModal from "./GenericModal";
@@ -33,8 +33,9 @@ import { Text } from "./Themed";
 import { useRootStore } from "../hooks/stores";
 import { useVibration } from "../hooks/generic";
 import { Condition } from "../entities/conditions";
+import { PlayerCharacter } from "../entities/character";
 
-export const EXPANDED_PAD = 28;
+export const EXPANDED_PAD = 16;
 
 interface PlayerStatusProps {
   hideGold?: boolean;
@@ -378,155 +379,6 @@ const PlayerStatus = observer(
       }
     }
 
-    function RenderPrimaryStatsBlock({
-      stat,
-    }: {
-      stat: Attribute.health | Attribute.mana | Attribute.sanity;
-    }) {
-      if (playerState) {
-        let current;
-        let max;
-        let min = 0;
-        let filledColor;
-        let unfilledColor;
-        switch (stat) {
-          case Attribute.health:
-            current = playerState.currentHealth;
-            max = playerState.maxHealth;
-            filledColor = "#ef4444";
-            unfilledColor = "#fca5a5";
-            break;
-          case Attribute.mana:
-            current = playerState.currentMana;
-            max = playerState.maxMana;
-            filledColor = "#60a5fa";
-            unfilledColor = "#bfdbfe";
-            break;
-          case Attribute.sanity:
-            current = playerState.currentSanity;
-            max = playerState.maxSanity;
-            min = -playerState.maxSanity;
-            filledColor = "#c084fc";
-            unfilledColor = "#e9d5ff";
-            break;
-        }
-
-        return (
-          <View className="items-center">
-            <Text className="py-1" style={{ color: filledColor }}>
-              {AttributeToString[stat]}
-            </Text>
-            <View className="flex w-full flex-row items-center">
-              <View className="flex-1">
-                <ProgressBar
-                  value={current}
-                  minValue={min}
-                  maxValue={max}
-                  filledColor={filledColor}
-                  unfilledColor={unfilledColor}
-                  showMax
-                />
-              </View>
-              {playerState.unAllocatedSkillPoints > 0 && !respeccing && (
-                <Pressable
-                  className="px-0.5"
-                  onPress={() => {
-                    vibration({ style: "light" });
-                    playerState.addSkillPoint({ to: stat });
-                  }}
-                >
-                  {({ pressed }) => (
-                    <View className={pressed ? "scale-95" : ""}>
-                      <SquarePlus height={28} width={28} />
-                    </View>
-                  )}
-                </Pressable>
-              )}
-              {playerState.allocatedSkillPoints[stat] > 0 && respeccing && (
-                <Pressable
-                  className="px-0.5"
-                  onPress={() => {
-                    vibration({ style: "light" });
-                    playerState.removeSkillPoint({ from: stat });
-                  }}
-                >
-                  {({ pressed }) => (
-                    <View className={pressed ? "scale-95" : ""}>
-                      <SquareMinus height={28} width={28} />
-                    </View>
-                  )}
-                </Pressable>
-              )}
-            </View>
-          </View>
-        );
-      }
-    }
-
-    function RenderSecondaryStatsBlock({
-      stat,
-    }: {
-      stat: Attribute.strength | Attribute.dexterity | Attribute.intelligence;
-    }) {
-      if (playerState) {
-        return (
-          <View className="flex items-center">
-            <Text className="py-1">{AttributeToString[stat]}</Text>
-            <View className="flex flex-row items-center">
-              <Text>
-                {stat == Attribute.strength
-                  ? playerState.totalStrength
-                  : stat == Attribute.dexterity
-                  ? playerState.totalDexterity
-                  : playerState.totalIntelligence}
-              </Text>
-              {stat == Attribute.strength ? (
-                <StrengthIcon height={20} width={23} />
-              ) : stat == Attribute.dexterity ? (
-                <DexterityIcon height={20} width={23} />
-              ) : (
-                <IntelligenceIcon height={20} width={23} />
-              )}
-              <View className="flex flex-row">
-                {playerState.unAllocatedSkillPoints > 0 && !respeccing && (
-                  <Pressable
-                    className="px-0.5"
-                    onPress={() => {
-                      vibration({ style: "light" });
-                      playerState.addSkillPoint({ to: stat });
-                    }}
-                  >
-                    {({ pressed }) => (
-                      <View className={pressed ? "scale-95" : ""}>
-                        <SquarePlus height={28} width={28} />
-                      </View>
-                    )}
-                  </Pressable>
-                )}
-                {playerState.allocatedSkillPoints[stat] > 0 && respeccing && (
-                  <Pressable
-                    className="px-0.5"
-                    onPress={() => {
-                      vibration({ style: "light" });
-                      playerState.removeSkillPoint({
-                        from: stat,
-                      });
-                    }}
-                  >
-                    {({ pressed }) => (
-                      <View className={pressed ? "scale-95" : ""}>
-                        <SquareMinus height={28} width={28} />
-                      </View>
-                    )}
-                  </Pressable>
-                )}
-              </View>
-            </View>
-          </View>
-        );
-      }
-    }
-
     function colorAndPlatformDependantBlur(children: JSX.Element) {
       if (home) {
         if (colorScheme == "dark" && Platform.OS == "ios") {
@@ -596,9 +448,9 @@ const PlayerStatus = observer(
     }
 
     if (playerState) {
-      const preprop = !uiStore.playerStatusIsCompact
+      const preprop = !(uiStore.playerStatusIsCompact && home)
         ? home
-          ? `${positioning} -mt-7 z-top w-full`
+          ? `${positioning} -mt-4 z-top w-full`
           : `${positioning} mt-2 z-top w-full`
         : home
         ? `${positioning} z-top w-full`
@@ -666,13 +518,43 @@ const PlayerStatus = observer(
                   </Pressable>
                 </View>
               )}
-              <RenderPrimaryStatsBlock stat={Attribute.health} />
-              <RenderPrimaryStatsBlock stat={Attribute.mana} />
-              <RenderPrimaryStatsBlock stat={Attribute.sanity} />
+              <RenderPrimaryStatsBlock
+                stat={Attribute.health}
+                playerState={playerState}
+                respeccing={respeccing}
+                vibration={vibration}
+              />
+              <RenderPrimaryStatsBlock
+                stat={Attribute.mana}
+                playerState={playerState}
+                respeccing={respeccing}
+                vibration={vibration}
+              />
+              <RenderPrimaryStatsBlock
+                stat={Attribute.sanity}
+                playerState={playerState}
+                respeccing={respeccing}
+                vibration={vibration}
+              />
               <View className="flex flex-row justify-evenly">
-                <RenderSecondaryStatsBlock stat={Attribute.strength} />
-                <RenderSecondaryStatsBlock stat={Attribute.dexterity} />
-                <RenderSecondaryStatsBlock stat={Attribute.intelligence} />
+                <RenderSecondaryStatsBlock
+                  stat={Attribute.strength}
+                  playerState={playerState}
+                  respeccing={respeccing}
+                  vibration={vibration}
+                />
+                <RenderSecondaryStatsBlock
+                  stat={Attribute.dexterity}
+                  playerState={playerState}
+                  respeccing={respeccing}
+                  vibration={vibration}
+                />
+                <RenderSecondaryStatsBlock
+                  stat={Attribute.intelligence}
+                  playerState={playerState}
+                  respeccing={respeccing}
+                  vibration={vibration}
+                />
               </View>
               {(playerState.equipmentStats.armor > 0 ||
                 playerState.equipmentStats.damage > 0 ||
@@ -741,13 +623,14 @@ const PlayerStatus = observer(
           <Pressable
             onPress={() => {
               vibration({ style: "light" });
+              uiStore.setDetailedStatusViewShowing(true);
             }}
             className={filled}
           >
             {colorAndPlatformDependantBlur(
               <View className="flex px-2">
-                {!uiStore.playerStatusIsCompact && (
-                  <View className="flex h-7 flex-row justify-center">
+                {!(uiStore.playerStatusIsCompact && home) && (
+                  <View className="flex py-0.5 h-4 flex-row justify-center">
                     {!hideGold && (
                       <View className="flex flex-row my-auto">
                         <Text>{readableGold}</Text>
@@ -813,7 +696,7 @@ const PlayerStatus = observer(
             )}
             <View
               className={`${
-                uiStore.playerStatusIsCompact
+                uiStore.playerStatusIsCompact && home
                   ? "ml-4"
                   : "justify-center w-full mr-8"
               } flex flex-row absolute z-top`}
@@ -828,3 +711,331 @@ const PlayerStatus = observer(
   },
 );
 export default PlayerStatus;
+
+function RenderPrimaryStatsBlock({
+  stat,
+  playerState,
+  respeccing,
+  vibration,
+}: {
+  stat: Attribute.health | Attribute.mana | Attribute.sanity;
+  playerState: PlayerCharacter;
+  respeccing: boolean;
+  vibration: ({
+    style,
+    essential,
+  }: {
+    style: "light" | "medium" | "heavy" | "success" | "warning" | "error";
+    essential?: boolean | undefined;
+  }) => void;
+}) {
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number>(0);
+  const [amountToShift, setAmountToShift] = useState<number>(0);
+  const singlePressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const getMaxAmount = useCallback(() => {
+    return respeccing
+      ? playerState.allocatedSkillPoints[stat]
+      : playerState.unAllocatedSkillPoints;
+  }, [stat, playerState, respeccing]);
+
+  const updateAmount = useCallback(() => {
+    const elapsedTime = Date.now() - startTimeRef.current;
+    const baseInterval = 200;
+    const speedUpFactor = Math.max(1, Math.floor(elapsedTime / 1000));
+    const effectiveInterval = baseInterval / speedUpFactor;
+
+    const newAmount = Math.floor(elapsedTime / effectiveInterval);
+    const maxAmount = getMaxAmount();
+    setAmountToShift(Math.min(newAmount, maxAmount));
+  }, [getMaxAmount]);
+
+  const handlePressIn = useCallback(() => {
+    vibration({ style: "light" });
+    startTimeRef.current = Date.now();
+
+    singlePressTimeoutRef.current = setTimeout(() => {
+      setAmountToShift(1);
+      intervalRef.current = setInterval(updateAmount, 50);
+    }, 150);
+  }, [updateAmount, vibration]);
+
+  const handlePressOut = useCallback(
+    (func: "remove" | "increase") => {
+      if (singlePressTimeoutRef.current) {
+        clearTimeout(singlePressTimeoutRef.current);
+        singlePressTimeoutRef.current = null;
+      }
+
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+
+      const finalAmount = amountToShift > 0 ? amountToShift : 1;
+
+      if (playerState) {
+        if (func === "remove") {
+          playerState.removeSkillPoint({
+            from: stat,
+            amount: finalAmount,
+          });
+        } else {
+          playerState.addSkillPoint({
+            to: stat,
+            amount: finalAmount,
+          });
+        }
+      }
+
+      setAmountToShift(0);
+    },
+    [amountToShift, playerState, stat],
+  );
+
+  if (!playerState) return null;
+
+  let current;
+  let max;
+  let min = 0;
+  let filledColor;
+  let unfilledColor;
+  const pointValue = stat === Attribute.sanity ? 5 : 10;
+
+  switch (stat) {
+    case Attribute.health:
+      current = playerState.currentHealth;
+      max =
+        playerState.maxHealth +
+        amountToShift * (respeccing ? -pointValue : pointValue);
+      filledColor = "#ef4444";
+      unfilledColor = "#fca5a5";
+      break;
+    case Attribute.mana:
+      current = playerState.currentMana;
+      max =
+        playerState.maxMana +
+        amountToShift * (respeccing ? -pointValue : pointValue);
+      filledColor = "#60a5fa";
+      unfilledColor = "#bfdbfe";
+      break;
+    case Attribute.sanity:
+      current = playerState.currentSanity;
+      max =
+        playerState.maxSanity +
+        amountToShift * (respeccing ? -pointValue : pointValue);
+      min =
+        -playerState.maxSanity +
+        amountToShift * (respeccing ? pointValue : -pointValue);
+      filledColor = "#c084fc";
+      unfilledColor = "#e9d5ff";
+      break;
+  }
+
+  return (
+    <View className="items-center">
+      <Text className="py-1" style={{ color: filledColor }}>
+        {AttributeToString[stat]}
+      </Text>
+      <View className="flex w-full flex-row items-center">
+        <View className="flex-1">
+          <ProgressBar
+            value={current}
+            minValue={min}
+            maxValue={max}
+            filledColor={filledColor}
+            unfilledColor={unfilledColor}
+            showMax
+          />
+        </View>
+        {playerState.unAllocatedSkillPoints > 0 && !respeccing && (
+          <Pressable
+            className="px-0.5"
+            onPressIn={handlePressIn}
+            onPressOut={() => handlePressOut("increase")}
+          >
+            {({ pressed }) => (
+              <View className={pressed ? "scale-95" : ""}>
+                <SquarePlus height={28} width={28} />
+                {amountToShift > 1 && (
+                  <Text className="absolute -top-4 -right-4 text-xs">
+                    +{amountToShift}
+                  </Text>
+                )}
+              </View>
+            )}
+          </Pressable>
+        )}
+        {playerState.allocatedSkillPoints[stat] > 0 && respeccing && (
+          <Pressable
+            className="px-0.5"
+            onPressIn={handlePressIn}
+            onPressOut={() => handlePressOut("remove")}
+          >
+            {({ pressed }) => (
+              <View className={pressed ? "scale-95" : ""}>
+                <SquareMinus height={28} width={28} />
+                {amountToShift > 1 && (
+                  <Text className="absolute -top-4 -right-4 text-xs">
+                    -{amountToShift}
+                  </Text>
+                )}
+              </View>
+            )}
+          </Pressable>
+        )}
+      </View>
+    </View>
+  );
+}
+
+function RenderSecondaryStatsBlock({
+  stat,
+  playerState,
+  respeccing,
+  vibration,
+}: {
+  stat: Attribute.strength | Attribute.dexterity | Attribute.intelligence;
+  playerState: PlayerCharacter;
+  respeccing: boolean;
+  vibration: ({
+    style,
+    essential,
+  }: {
+    style: "light" | "medium" | "heavy" | "success" | "warning" | "error";
+    essential?: boolean | undefined;
+  }) => void;
+}) {
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number>(0);
+  const [amountToShift, setAmountToShift] = useState<number>(0);
+  const singlePressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const getMaxAmount = useCallback(() => {
+    return respeccing
+      ? playerState.allocatedSkillPoints[stat]
+      : playerState.unAllocatedSkillPoints;
+  }, [stat, playerState, respeccing]);
+
+  const updateAmount = useCallback(() => {
+    const elapsedTime = Date.now() - startTimeRef.current;
+
+    const baseInterval = 200;
+    const speedUpFactor = Math.max(1, Math.floor(elapsedTime / 1000));
+    const effectiveInterval = baseInterval / speedUpFactor;
+
+    const newAmount = Math.floor(elapsedTime / effectiveInterval);
+    const maxAmount = getMaxAmount();
+    setAmountToShift(Math.min(newAmount, maxAmount));
+  }, [stat, playerState, respeccing, getMaxAmount]);
+
+  const handlePressIn = () => {
+    vibration({ style: "light" });
+    startTimeRef.current = Date.now();
+
+    singlePressTimeoutRef.current = setTimeout(() => {
+      setAmountToShift(1);
+      intervalRef.current = setInterval(updateAmount, 50);
+    }, 150);
+  };
+
+  const handlePressOut = (func: "remove" | "increase") => {
+    // Clear single press timeout
+    if (singlePressTimeoutRef.current) {
+      clearTimeout(singlePressTimeoutRef.current);
+      singlePressTimeoutRef.current = null;
+    }
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    const finalAmount = amountToShift > 0 ? amountToShift : 1;
+
+    if (playerState) {
+      if (func === "remove") {
+        playerState.removeSkillPoint({
+          from: stat,
+          amount: finalAmount,
+        });
+      } else {
+        playerState.addSkillPoint({
+          to: stat,
+          amount: finalAmount,
+        });
+      }
+    }
+
+    setAmountToShift(0);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearTimeout(intervalRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <View className="flex items-center">
+      <Text className="py-1">{AttributeToString[stat]}</Text>
+      <View className="flex flex-row items-center">
+        <Text className={`${amountToShift > 0 ? "-ml-4" : ""}`}>
+          {(stat === Attribute.strength
+            ? playerState.totalStrength
+            : stat === Attribute.dexterity
+            ? playerState.totalDexterity
+            : playerState.totalIntelligence) +
+            (amountToShift > 0
+              ? respeccing
+                ? -amountToShift
+                : amountToShift
+              : 0)}
+          {amountToShift > 0
+            ? respeccing
+              ? `(${-amountToShift})`
+              : `(${amountToShift})`
+            : ""}
+        </Text>
+        {stat === Attribute.strength ? (
+          <StrengthIcon height={20} width={23} />
+        ) : stat === Attribute.dexterity ? (
+          <DexterityIcon height={20} width={23} />
+        ) : (
+          <IntelligenceIcon height={20} width={23} />
+        )}
+        <View className="flex flex-row">
+          {playerState.unAllocatedSkillPoints > 0 && !respeccing && (
+            <Pressable
+              className="px-0.5"
+              onPressIn={handlePressIn}
+              onPressOut={() => handlePressOut("increase")}
+            >
+              {({ pressed }) => (
+                <View className={pressed ? "scale-95" : ""}>
+                  <SquarePlus height={28} width={28} />
+                </View>
+              )}
+            </Pressable>
+          )}
+          {playerState.allocatedSkillPoints[stat] > 0 && respeccing && (
+            <Pressable
+              className="px-0.5"
+              onPressIn={handlePressIn}
+              onPressOut={() => handlePressOut("remove")}
+            >
+              {({ pressed }) => (
+                <View className={pressed ? "scale-95" : ""}>
+                  <SquareMinus height={28} width={28} />
+                </View>
+              )}
+            </Pressable>
+          )}
+        </View>
+      </View>
+    </View>
+  );
+}

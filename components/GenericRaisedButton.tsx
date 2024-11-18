@@ -58,7 +58,7 @@ const GenericRaisedButton = ({
           style={
             !disabled
               ? {
-                  shadowColor: "#000",
+                  shadowColor: colorScheme == "light" ? "black" : "white",
                   elevation: 2,
                   backgroundColor: backgroundColor
                     ? backgroundColor
