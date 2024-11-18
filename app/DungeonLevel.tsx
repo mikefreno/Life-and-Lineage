@@ -30,6 +30,7 @@ import { DungeonMapRender } from "../components/DungeonComponents/DungeonMap";
 import { StatsDisplay } from "../components/StatsDisplay";
 import { usePlayerStore, useRootStore } from "../hooks/stores";
 import { usePouch } from "../hooks/generic";
+import D20DieAnimation from "../components/DieRollAnim";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -187,6 +188,12 @@ const DungeonLevelScreen = observer(() => {
         </View>
         <PlayerStatus positioning={"absolute"} classname="bottom-0" />
       </>
+    );
+  } else {
+    return (
+      <View className="flex-1 justify-center align-middle">
+        <D20DieAnimation keepRolling={true} />
+      </View>
     );
   }
 });

@@ -4,7 +4,9 @@ import GenericRaisedButton from "./GenericRaisedButton";
 import ThemedCard from "./ThemedCard";
 import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
 import { observer } from "mobx-react-lite";
-import { useRootStore } from "../hooks/stores";
+import { useGameStore, usePlayerStore } from "../hooks/stores";
+import { AccelerationCurves } from "../utility/functions/misc";
+import { useAcceleratedAction } from "../hooks/generic";
 
 interface MedicalOptionProps {
   title: string;
@@ -26,10 +28,24 @@ const MedicalOption = observer(
     removeDebuffs,
     focused,
   }: MedicalOptionProps) => {
-    const { playerState, gameState } = useRootStore();
+    const playerState = usePlayerStore();
+    const gameState = useGameStore();
+
+    const { start, stop } = useAcceleratedAction(
+      () => null, // Return null to indicate unlimited mode
+      {
+        minHoldTime: 350,
+        maxSpeed: 10,
+        accelerationCurve: AccelerationCurves.linear,
+        action: visit,
+        minActionAmount: 1,
+        maxActionAmount: 50,
+        debounceTime: 50,
+      },
+    );
 
     function visit() {
-      if (playerState && gameState && focused) {
+      if (focused) {
         playerState.getMedicalService(
           cost,
           healthRestore == "fill" ? playerState.maxHealth : healthRestore,
@@ -128,7 +144,11 @@ const MedicalOption = observer(
             ) : null}
           </View>
         </View>
-        <GenericRaisedButton onPress={visit} disabled={getDisabled()}>
+        <GenericRaisedButton
+          onPressIn={start}
+          onPressOut={stop}
+          disabled={getDisabled()}
+        >
           Visit
         </GenericRaisedButton>
       </ThemedCard>

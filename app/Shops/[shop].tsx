@@ -331,7 +331,7 @@ const ShopInteriorScreen = observer(() => {
                   {playerState.fullName}'s Inventory
                 </Text>
                 <View className="flex flex-row">
-                  <Text> ( {playerState!.getReadableGold()}</Text>
+                  <Text> ( {playerState.readableGold} )</Text>
                   <Coins width={16} height={16} style={{ marginLeft: 6 }} />
                   <Text> )</Text>
                   {playerState.baseInventory.some(

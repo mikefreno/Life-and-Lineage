@@ -23,6 +23,14 @@ import { ItemClassType, PlayerClassOptions, TutorialOption } from "../types";
 import { CommonActions, NavigationProp } from "@react-navigation/native";
 import { storage } from "./storage";
 
+export const AccelerationCurves = {
+  linear: (t: number) => 1 + t,
+  quadratic: (t: number) => 1 + Math.pow(t, 2),
+  cubic: (t: number) => 1 + Math.pow(t, 3),
+  exponential: (t: number) => Math.exp(t) - 1,
+  // Add more curves as needed
+};
+
 export function generateBirthday(minAge: number, maxAge: number) {
   const today = new Date();
   const minDate = new Date();

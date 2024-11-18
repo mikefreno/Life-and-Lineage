@@ -63,10 +63,10 @@ export default function TabLayout() {
         screenOptions={{
           tabBarBackground: () => {
             return (
-              <>
+              <View className="-mx-2">
                 <PlayerStatus home hideGold />
                 <LinearGradientBlur />
-              </>
+              </View>
             );
           },
           tabBarActiveTintColor: Colors[colorScheme].tint,

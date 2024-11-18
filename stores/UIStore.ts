@@ -97,6 +97,7 @@ export default class UIStore {
       setColorScheme: action,
       modifyVibrationSettings: action,
       setHealthWarning: action,
+      handleDimensionChange: action,
     });
 
     reaction(
@@ -126,7 +127,7 @@ export default class UIStore {
     this.detailedStatusViewShowing = state;
   }
 
-  private handleDimensionChange({
+  public handleDimensionChange({
     window,
     screen,
   }: {

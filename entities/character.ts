@@ -566,7 +566,7 @@ export class PlayerCharacter extends Character {
       gold: observable,
       spendGold: action,
       addGold: action,
-      getReadableGold: action,
+      readableGold: computed,
 
       getInvestment: action,
       collectFromInvestment: action,
@@ -1235,7 +1235,7 @@ export class PlayerCharacter extends Character {
   }
 
   //----------------------------------Gold----------------------------------//
-  public getReadableGold() {
+  get readableGold() {
     if (this.gold > 10_000_000_000) {
       const cleanedUp = (this.gold / 1_000_000_000).toFixed(2);
       return `${parseFloat(cleanedUp).toLocaleString()}B`;
@@ -1271,7 +1271,10 @@ export class PlayerCharacter extends Character {
   }
 
   public performLabor({ title, cost, goldReward }: performLaborProps) {
-    if (this.currentMana >= cost.mana) {
+    if (
+      this.currentMana >= cost.mana &&
+      (cost.health ? this.currentHealth > cost.health : true)
+    ) {
       if (this.job !== title) {
         throw new Error("Requested Labor on unassigned profession");
       } else {

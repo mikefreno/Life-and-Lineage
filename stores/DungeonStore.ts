@@ -81,6 +81,7 @@ export class DungeonStore {
       setInCombat: action,
       setInBossFight: action,
       hasPersistedState: computed,
+      clearDungeonState: action,
     });
 
     reaction(

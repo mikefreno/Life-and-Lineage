@@ -1,9 +1,12 @@
-import { Platform } from "react-native";
+import { Platform, Animated } from "react-native";
 import * as Haptics from "expo-haptics";
-import { useCallback } from "react";
+import { useEffect, useCallback, useRef, useState } from "react";
 import { useRootStore } from "./stores";
 import { useLootState } from "../stores/DungeonData";
 import type { Item } from "../entities/item";
+import { AccelerationCurves } from "../utility/functions/misc";
+import { DEFAULT_FADEOUT_TIME } from "../components/Themed";
+import type { PlayerCharacter } from "../entities/character";
 
 export const useVibration = () => {
   const { uiStore } = useRootStore();
@@ -59,6 +62,176 @@ export const useVibration = () => {
   return vibrate;
 };
 
+interface AccelerationConfig<T> {
+  minHoldTime?: number;
+  maxSpeed?: number;
+  accelerationCurve?: (t: number) => number;
+  updateInterval?: number;
+  action?: (amount: number, totalExecuted: number) => T;
+  minActionAmount?: number;
+  maxActionAmount?: number;
+  debounceTime?: number;
+  onError?: (error: Error) => void;
+}
+
+const defaultConfig: AccelerationConfig<void> = {
+  minHoldTime: 250,
+  maxSpeed: 10,
+  accelerationCurve: AccelerationCurves.cubic,
+  updateInterval: 16,
+  minActionAmount: 1,
+};
+
+export function useAcceleratedAction<T = void>(
+  getMaxAmount: () => number | null, // null when in action mode
+  config: AccelerationConfig<T> = {},
+) {
+  const {
+    minHoldTime,
+    maxSpeed,
+    accelerationCurve,
+    updateInterval,
+    action,
+    minActionAmount,
+    maxActionAmount,
+    debounceTime,
+    onError,
+  } = { ...defaultConfig, ...config };
+
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number>(0);
+  const [amount, setAmount] = useState<number>(0);
+  const singlePressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastAmountRef = useRef<number>(0);
+  const totalExecutedRef = useRef<number>(0);
+
+  const updateAmount = useCallback(() => {
+    try {
+      const elapsedTime = Date.now() - startTimeRef.current;
+      const maxAmount = getMaxAmount();
+
+      if (elapsedTime < minHoldTime!) {
+        if (!action) {
+          setAmount(1);
+        }
+        return;
+      }
+
+      const adjustedTime = (elapsedTime - minHoldTime!) / 1000;
+      const accelerationFactor = Math.min(
+        accelerationCurve!(adjustedTime),
+        maxSpeed!,
+      );
+
+      const pointsPerSecond = accelerationFactor;
+      const newAmount = 1 + Math.floor(pointsPerSecond * adjustedTime);
+
+      if (action) {
+        // Action mode: execute directly without max limit
+        const amountDiff = newAmount - lastAmountRef.current;
+        const executionAmount = Math.max(
+          minActionAmount ?? 1,
+          Math.min(amountDiff, maxActionAmount ?? Infinity),
+        );
+
+        if (executionAmount > 0) {
+          action(executionAmount, totalExecutedRef.current);
+          totalExecutedRef.current += executionAmount;
+          lastAmountRef.current = newAmount;
+        }
+      } else {
+        // Synthetic mode: respect max amount
+        const currentAmount =
+          maxAmount !== null ? Math.min(newAmount, maxAmount) : newAmount;
+        setAmount(currentAmount);
+      }
+    } catch (error) {
+      onError?.(error as Error);
+    }
+  }, [
+    getMaxAmount,
+    minHoldTime,
+    maxSpeed,
+    accelerationCurve,
+    action,
+    minActionAmount,
+    maxActionAmount,
+    onError,
+  ]);
+
+  const debouncedUpdateAmount = useCallback(() => {
+    if (debounceTime && debounceTime > 0) {
+      const now = Date.now();
+      const timeSinceLastUpdate = now - (lastUpdateTimeRef.current || 0);
+
+      if (timeSinceLastUpdate >= debounceTime) {
+        updateAmount();
+        lastUpdateTimeRef.current = now;
+      }
+    } else {
+      updateAmount();
+    }
+  }, [updateAmount, debounceTime]);
+
+  const lastUpdateTimeRef = useRef<number>(0);
+
+  const start = useCallback(() => {
+    startTimeRef.current = Date.now();
+    lastAmountRef.current = 0;
+    totalExecutedRef.current = 0;
+    lastUpdateTimeRef.current = 0;
+
+    singlePressTimeoutRef.current = setTimeout(() => {
+      if (action) {
+        // Execute action once for single press
+        action(minActionAmount ?? 1, totalExecutedRef.current);
+        totalExecutedRef.current += minActionAmount ?? 1;
+      } else {
+        setAmount(1);
+      }
+      intervalRef.current = setInterval(debouncedUpdateAmount, updateInterval);
+    }, 150);
+  }, [debouncedUpdateAmount, updateInterval, action, minActionAmount]);
+
+  const stop = useCallback(() => {
+    if (singlePressTimeoutRef.current) {
+      clearTimeout(singlePressTimeoutRef.current);
+      singlePressTimeoutRef.current = null;
+
+      // Execute action immediately for quick taps
+      if (action) {
+        action(minActionAmount ?? 1, totalExecutedRef.current);
+        totalExecutedRef.current += minActionAmount ?? 1;
+      }
+    }
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    const finalAmount = action
+      ? totalExecutedRef.current
+      : amount > 0
+      ? amount
+      : 1;
+
+    setAmount(0);
+    lastAmountRef.current = 0;
+    totalExecutedRef.current = 0;
+    lastUpdateTimeRef.current = 0;
+
+    return finalAmount;
+  }, [amount, action, minActionAmount]);
+
+  return {
+    amount,
+    start,
+    stop,
+    totalExecuted: totalExecutedRef.current,
+  };
+}
+
 export const usePouch = () => {
   const { setLeftBehindDrops } = useLootState();
 
@@ -67,4 +240,116 @@ export const usePouch = () => {
   }, []);
 
   return { addItemToPouch };
+};
+
+export type StatType = "health" | "mana" | "sanity" | "gold";
+
+export interface StatChange {
+  current: number;
+  cumulative: number;
+  isShowing: boolean;
+}
+
+export const useStatChanges = (playerState: PlayerCharacter) => {
+  const [statChanges, setStatChanges] = useState<Record<StatType, StatChange>>({
+    health: { current: 0, cumulative: 0, isShowing: false },
+    mana: { current: 0, cumulative: 0, isShowing: false },
+    sanity: { current: 0, cumulative: 0, isShowing: false },
+    gold: { current: 0, cumulative: 0, isShowing: false },
+  });
+
+  const lastUpdateTimeRef = useRef<Record<StatType, number>>({
+    health: 0,
+    mana: 0,
+    sanity: 0,
+    gold: 0,
+  });
+
+  const [records, setRecords] = useState({
+    health: playerState?.currentHealth,
+    mana: playerState?.currentMana,
+    sanity: playerState?.currentSanity,
+    gold: playerState?.gold,
+  });
+
+  const [healthDamageFlash] = useState(new Animated.Value(0));
+  const [animationCycler, setAnimationCycler] = useState(0);
+
+  useEffect(() => {
+    const updateStat = (
+      stat: StatType,
+      currentValue: number,
+      recordValue: number,
+    ) => {
+      if (currentValue !== recordValue) {
+        const diff = currentValue - recordValue;
+        lastUpdateTimeRef.current[stat] = Date.now();
+
+        setStatChanges((prev) => ({
+          ...prev,
+          [stat]: {
+            current: diff,
+            cumulative: prev[stat].isShowing
+              ? prev[stat].cumulative + diff
+              : diff,
+            isShowing: true,
+          },
+        }));
+        setAnimationCycler((prev) => prev + 1);
+
+        // Set timeout to clear the stat change
+        setTimeout(() => {
+          const timeSinceLastUpdate =
+            Date.now() - lastUpdateTimeRef.current[stat];
+          if (timeSinceLastUpdate >= DEFAULT_FADEOUT_TIME) {
+            setStatChanges((prev) => ({
+              ...prev,
+              [stat]: { current: 0, cumulative: 0, isShowing: false },
+            }));
+          }
+        }, DEFAULT_FADEOUT_TIME);
+      }
+    };
+
+    if (playerState) {
+      // Health special case for damage flash
+      if (playerState.currentHealth !== records.health) {
+        if (playerState.currentHealth - records.health < 0) {
+          Animated.sequence([
+            Animated.timing(healthDamageFlash, {
+              toValue: 1,
+              duration: 200,
+              useNativeDriver: false,
+            }),
+            Animated.timing(healthDamageFlash, {
+              toValue: 0,
+              duration: 200,
+              useNativeDriver: false,
+            }),
+          ]).start();
+        }
+      }
+
+      // Update all stats
+      updateStat("health", playerState.currentHealth, records.health);
+      updateStat("mana", playerState.currentMana, records.mana);
+      updateStat("sanity", playerState.currentSanity, records.sanity);
+      updateStat("gold", playerState.gold, records.gold);
+
+      // Update records
+      setRecords({
+        health: playerState.currentHealth,
+        mana: playerState.currentMana,
+        sanity: playerState.currentSanity,
+        gold: playerState.gold,
+      });
+    }
+  }, [
+    playerState?.currentHealth,
+    playerState?.currentMana,
+    playerState?.currentSanity,
+    playerState?.gold,
+  ]);
+
+  return { statChanges, animationCycler, healthDamageFlash };
 };

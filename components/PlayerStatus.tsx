@@ -9,7 +9,11 @@ import {
 } from "react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { toTitleCase, damageReduction } from "../utility/functions/misc";
+import {
+  toTitleCase,
+  damageReduction,
+  AccelerationCurves,
+} from "../utility/functions/misc";
 import GenericModal from "./GenericModal";
 import GenericStrikeAround from "./GenericStrikeAround";
 import FadeOutNode from "./FadeOutNode";
@@ -31,7 +35,13 @@ import {
 import { Attribute, AttributeToString } from "../utility/types";
 import { Text } from "./Themed";
 import { useRootStore } from "../hooks/stores";
-import { useVibration } from "../hooks/generic";
+import {
+  StatChange,
+  StatType,
+  useAcceleratedAction,
+  useStatChanges,
+  useVibration,
+} from "../hooks/generic";
 import { Condition } from "../entities/conditions";
 import { PlayerCharacter } from "../entities/character";
 
@@ -53,41 +63,17 @@ const PlayerStatus = observer(
     classname,
   }: PlayerStatusProps) => {
     const { playerState, uiStore } = useRootStore();
-    const [readableGold, setReadableGold] = useState(
-      playerState?.getReadableGold(),
-    );
-    const [healthRecord, setHealthRecord] = useState<number | undefined>(
-      playerState?.currentHealth,
-    );
-    const [sanityRecord, setSanityRecord] = useState<number | undefined>(
-      playerState?.currentSanity,
-    );
-    const [manaRecord, setManaRecord] = useState<number | undefined>(
-      playerState?.currentMana,
-    );
-    const [goldRecord, setGoldRecord] = useState<number | undefined>(
-      playerState?.gold,
-    );
-    const [healthDiff, setHealthDiff] = useState<number>(0);
-    const [sanityDiff, setSanityDiff] = useState<number>(0);
-    const [manaDiff, setManaDiff] = useState<number>(0);
-    const [goldDiff, setGoldDiff] = useState<number>(0);
-    const [showingHealthChange, setShowingHealthChange] =
-      useState<boolean>(false);
-    const [showingSanityChange, setShowingSanityChange] =
-      useState<boolean>(false);
-    const [showingManaChange, setShowingManaChange] = useState<boolean>(false);
-    const [showingGoldChange, setShowingGoldChange] = useState<boolean>(false);
-    const [animationCycler, setAnimationCycler] = useState<number>(0);
     const [showingHealthWarningPulse, setShowingHealthWarningPulse] =
       useState<boolean>(false);
-    const healthDamageFlash = useState(new Animated.Value(0))[0];
     const healthWarningAnimatedValue = useState(new Animated.Value(0))[0];
     const [respeccing, setRespeccing] = useState<boolean>(false);
 
     const vibration = useVibration();
     const { colorScheme } = useColorScheme();
 
+    const { statChanges, animationCycler, healthDamageFlash } = useStatChanges(
+      playerState!,
+    );
     const pathname = usePathname();
 
     const healthWarningInterpolation = healthWarningAnimatedValue.interpolate({
@@ -135,73 +121,6 @@ const PlayerStatus = observer(
     useEffect(() => {
       if (
         playerState &&
-        healthRecord &&
-        playerState.currentHealth != healthRecord
-      ) {
-        if (playerState?.currentHealth - healthRecord < 0) {
-          Animated.sequence([
-            Animated.timing(healthDamageFlash, {
-              toValue: 1,
-              duration: 200,
-              useNativeDriver: false,
-            }),
-            Animated.timing(healthDamageFlash, {
-              toValue: 0,
-              duration: 200,
-              useNativeDriver: false,
-            }),
-          ]).start();
-        }
-        setHealthDiff(playerState?.currentHealth - healthRecord);
-        setShowingHealthChange(true);
-        setAnimationCycler(animationCycler + 1);
-      } else {
-        setHealthDiff(0);
-        setShowingHealthChange(false);
-      }
-      if (
-        playerState &&
-        sanityRecord &&
-        playerState.currentSanity != sanityRecord
-      ) {
-        setSanityDiff(playerState?.currentSanity - sanityRecord);
-        setShowingSanityChange(true);
-        setAnimationCycler(animationCycler + 1);
-      } else {
-        setSanityDiff(0);
-        setShowingSanityChange(false);
-      }
-      if (playerState && manaRecord && playerState.currentMana != manaRecord) {
-        setManaDiff(playerState?.currentMana - manaRecord);
-        setShowingManaChange(true);
-        setAnimationCycler(animationCycler + 1);
-      } else {
-        setManaDiff(0);
-        setShowingManaChange(false);
-      }
-      if (playerState && goldRecord && playerState.gold != manaRecord) {
-        setGoldDiff(playerState?.gold - goldRecord);
-        setShowingGoldChange(true);
-        setAnimationCycler(animationCycler + 1);
-      } else {
-        setGoldDiff(0);
-        setShowingGoldChange(false);
-      }
-
-      setHealthRecord(playerState?.currentHealth);
-      setSanityRecord(playerState?.currentSanity);
-      setManaRecord(playerState?.currentMana);
-      setGoldRecord(playerState?.gold);
-    }, [
-      playerState?.currentHealth,
-      playerState?.currentSanity,
-      playerState?.currentMana,
-      playerState?.gold,
-    ]);
-
-    useEffect(() => {
-      if (
-        playerState &&
         playerState.currentHealth / playerState.maxHealth <=
           uiStore.healthWarning
       ) {
@@ -214,10 +133,6 @@ const PlayerStatus = observer(
         }
       }
     }, [playerState?.currentHealth, uiStore.healthWarning]);
-
-    useEffect(() => {
-      setReadableGold(playerState?.getReadableGold());
-    }, [playerState?.gold]);
 
     function conditionRenderer() {
       if (playerState) {
@@ -343,42 +258,6 @@ const PlayerStatus = observer(
       }
     }
 
-    function changePopUp({
-      popUp,
-      diff,
-    }: {
-      popUp: "health" | "mana" | "sanity" | "gold";
-      diff: number;
-    }) {
-      const marginAdjust = popUp == "gold" ? "-mt-3" : "ml-1";
-      const color =
-        popUp == "mana"
-          ? "#60a5fa"
-          : popUp == "health"
-          ? "#f87171"
-          : popUp == "sanity"
-          ? "#c084fc"
-          : colorScheme == "dark"
-          ? "white"
-          : "black";
-      if (diff) {
-        return (
-          <View className={`absolute ${marginAdjust}`}>
-            <FadeOutNode
-              animationCycler={animationCycler}
-              className="flex flex-row"
-            >
-              <Text className="pr-0.5 text-sm" style={{ color: color }}>
-                {diff > 0 ? "+" : ""}
-                {diff.toString()}
-              </Text>
-              {popUp == "gold" && <Coins />}
-            </FadeOutNode>
-          </View>
-        );
-      }
-    }
-
     function colorAndPlatformDependantBlur(children: JSX.Element) {
       if (home) {
         if (colorScheme == "dark" && Platform.OS == "ios") {
@@ -472,7 +351,7 @@ const PlayerStatus = observer(
               <View className="flex flex-row justify-between items-center py-1 w-full">
                 <View className="flex-1 justify-end items-center">
                   <View className="flex flex-row -ml-4">
-                    <Text>{readableGold}</Text>
+                    <Text>{playerState.readableGold}</Text>
                     <Coins width={16} height={16} style={{ marginLeft: 6 }} />
                   </View>
                 </View>
@@ -497,6 +376,7 @@ const PlayerStatus = observer(
               {playerState.getTotalAllocatedPoints() > 0 && (
                 <View className="absolute right-0 -mt-1">
                   <Pressable
+                    disabled={playerState.root.dungeonStore.inCombat}
                     onPress={() => {
                       setRespeccing(!respeccing);
                       vibration({ style: "light", essential: true });
@@ -506,7 +386,11 @@ const PlayerStatus = observer(
                       <View
                         className={`${pressed && "scale-90"} ${
                           respeccing
-                            ? "scale-x-[-1] bg-green-600"
+                            ? playerState.root.dungeonStore.inCombat
+                              ? "scale-x-[-1] bg-gray-400"
+                              : "scale-x-[-1] bg-green-600"
+                            : playerState.root.dungeonStore.inCombat
+                            ? " bg-gray-400"
                             : "bg-red-600"
                         } h-[30] w-[30] items-center rounded-md`}
                       >
@@ -633,7 +517,7 @@ const PlayerStatus = observer(
                   <View className="flex py-0.5 h-4 flex-row justify-center">
                     {!hideGold && (
                       <View className="flex flex-row my-auto">
-                        <Text>{readableGold}</Text>
+                        <Text>{playerState.readableGold}</Text>
                         <Coins
                           width={16}
                           height={16}
@@ -651,10 +535,16 @@ const PlayerStatus = observer(
                 )}
                 <View className="flex flex-row justify-evenly py-1">
                   <View className="flex w-[31%]">
-                    {showingHealthChange &&
-                      changePopUp({ popUp: "health", diff: healthDiff })}
-
-                    <Text className="mx-auto" style={{ color: "#ef4444" }}>
+                    <ChangePopUp
+                      popUp={"health"}
+                      change={statChanges.health}
+                      animationCycler={animationCycler}
+                      colorScheme={colorScheme}
+                    />
+                    <Text
+                      className="text-right w-full pr-4"
+                      style={{ color: "#ef4444" }}
+                    >
                       Health
                     </Text>
                     <ProgressBar
@@ -665,9 +555,16 @@ const PlayerStatus = observer(
                     />
                   </View>
                   <View className="flex w-[31%]">
-                    {showingManaChange &&
-                      changePopUp({ popUp: "mana", diff: manaDiff })}
-                    <Text className="mx-auto" style={{ color: "#60a5fa" }}>
+                    <ChangePopUp
+                      popUp={"mana"}
+                      change={statChanges.mana}
+                      animationCycler={animationCycler}
+                      colorScheme={colorScheme}
+                    />
+                    <Text
+                      className="text-right w-full pr-4"
+                      style={{ color: "#60a5fa" }}
+                    >
                       Mana
                     </Text>
                     <ProgressBar
@@ -678,9 +575,16 @@ const PlayerStatus = observer(
                     />
                   </View>
                   <View className="flex w-[31%]">
-                    {showingSanityChange &&
-                      changePopUp({ popUp: "sanity", diff: sanityDiff })}
-                    <Text className="mx-auto" style={{ color: "#c084fc" }}>
+                    <ChangePopUp
+                      popUp={"sanity"}
+                      change={statChanges.sanity}
+                      animationCycler={animationCycler}
+                      colorScheme={colorScheme}
+                    />
+                    <Text
+                      className="text-right w-full pr-4"
+                      style={{ color: "#c084fc" }}
+                    >
                       Sanity
                     </Text>
                     <ProgressBar
@@ -701,8 +605,12 @@ const PlayerStatus = observer(
                   : "justify-center w-full mr-8"
               } flex flex-row absolute z-top`}
             >
-              {showingGoldChange &&
-                changePopUp({ popUp: "gold", diff: goldDiff })}
+              <ChangePopUp
+                popUp={"gold"}
+                change={statChanges.gold}
+                animationCycler={animationCycler}
+                colorScheme={colorScheme}
+              />
             </View>
           </Pressable>
         </>
@@ -712,6 +620,7 @@ const PlayerStatus = observer(
 );
 export default PlayerStatus;
 
+const MIN_HOLD_TIME = 150; // milliseconds
 function RenderPrimaryStatsBlock({
   stat,
   playerState,
@@ -742,12 +651,21 @@ function RenderPrimaryStatsBlock({
 
   const updateAmount = useCallback(() => {
     const elapsedTime = Date.now() - startTimeRef.current;
-    const baseInterval = 200;
-    const speedUpFactor = Math.max(1, Math.floor(elapsedTime / 1000));
-    const effectiveInterval = baseInterval / speedUpFactor;
-
-    const newAmount = Math.floor(elapsedTime / effectiveInterval);
     const maxAmount = getMaxAmount();
+
+    if (elapsedTime < MIN_HOLD_TIME) {
+      setAmountToShift(1);
+      return;
+    }
+
+    const adjustedTime = elapsedTime - MIN_HOLD_TIME;
+    const accelerationFactor = Math.min(
+      1 + Math.pow(adjustedTime / 1000, 1.5),
+      10,
+    );
+    const pointsPerSecond = accelerationFactor;
+    const newAmount = 1 + Math.floor(pointsPerSecond * (adjustedTime / 1000));
+
     setAmountToShift(Math.min(newAmount, maxAmount));
   }, [getMaxAmount]);
 
@@ -859,7 +777,7 @@ function RenderPrimaryStatsBlock({
               <View className={pressed ? "scale-95" : ""}>
                 <SquarePlus height={28} width={28} />
                 {amountToShift > 1 && (
-                  <Text className="absolute -top-4 -right-4 text-xs">
+                  <Text className="absolute -top-3 -left-3 text-xs">
                     +{amountToShift}
                   </Text>
                 )}
@@ -877,7 +795,7 @@ function RenderPrimaryStatsBlock({
               <View className={pressed ? "scale-95" : ""}>
                 <SquareMinus height={28} width={28} />
                 {amountToShift > 1 && (
-                  <Text className="absolute -top-4 -right-4 text-xs">
+                  <Text className="absolute -top-3 -left-3 text-xs">
                     -{amountToShift}
                   </Text>
                 )}
@@ -907,77 +825,47 @@ function RenderSecondaryStatsBlock({
     essential?: boolean | undefined;
   }) => void;
 }) {
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const startTimeRef = useRef<number>(0);
-  const [amountToShift, setAmountToShift] = useState<number>(0);
-  const singlePressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
   const getMaxAmount = useCallback(() => {
     return respeccing
       ? playerState.allocatedSkillPoints[stat]
       : playerState.unAllocatedSkillPoints;
   }, [stat, playerState, respeccing]);
 
-  const updateAmount = useCallback(() => {
-    const elapsedTime = Date.now() - startTimeRef.current;
+  const {
+    amount: amountToShift,
+    start: handlePressIn,
+    stop: handlePressOut,
+  } = useAcceleratedAction(getMaxAmount, {
+    minHoldTime: 250,
+    maxSpeed: 10,
+    accelerationCurve: AccelerationCurves.quadratic,
+  });
 
-    const baseInterval = 200;
-    const speedUpFactor = Math.max(1, Math.floor(elapsedTime / 1000));
-    const effectiveInterval = baseInterval / speedUpFactor;
+  const onPressOut = useCallback(
+    (func: "remove" | "increase") => {
+      const finalAmount = handlePressOut();
 
-    const newAmount = Math.floor(elapsedTime / effectiveInterval);
-    const maxAmount = getMaxAmount();
-    setAmountToShift(Math.min(newAmount, maxAmount));
-  }, [stat, playerState, respeccing, getMaxAmount]);
+      if (playerState) {
+        if (func === "remove") {
+          playerState.removeSkillPoint({
+            from: stat,
+            amount: finalAmount,
+          });
+        } else {
+          playerState.addSkillPoint({
+            to: stat,
+            amount: finalAmount,
+          });
+        }
+      }
+    },
+    [handlePressOut, playerState, stat],
+  );
 
-  const handlePressIn = () => {
+  const onPressIn = useCallback(() => {
     vibration({ style: "light" });
-    startTimeRef.current = Date.now();
-
-    singlePressTimeoutRef.current = setTimeout(() => {
-      setAmountToShift(1);
-      intervalRef.current = setInterval(updateAmount, 50);
-    }, 150);
-  };
-
-  const handlePressOut = (func: "remove" | "increase") => {
-    // Clear single press timeout
-    if (singlePressTimeoutRef.current) {
-      clearTimeout(singlePressTimeoutRef.current);
-      singlePressTimeoutRef.current = null;
-    }
-
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-
-    const finalAmount = amountToShift > 0 ? amountToShift : 1;
-
-    if (playerState) {
-      if (func === "remove") {
-        playerState.removeSkillPoint({
-          from: stat,
-          amount: finalAmount,
-        });
-      } else {
-        playerState.addSkillPoint({
-          to: stat,
-          amount: finalAmount,
-        });
-      }
-    }
-
-    setAmountToShift(0);
-  };
-
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current) {
-        clearTimeout(intervalRef.current);
-      }
-    };
-  }, []);
+    handlePressIn();
+  }, [handlePressIn, vibration]);
 
   return (
     <View className="flex items-center">
@@ -1011,8 +899,8 @@ function RenderSecondaryStatsBlock({
           {playerState.unAllocatedSkillPoints > 0 && !respeccing && (
             <Pressable
               className="px-0.5"
-              onPressIn={handlePressIn}
-              onPressOut={() => handlePressOut("increase")}
+              onPressIn={onPressIn}
+              onPressOut={() => onPressOut("increase")}
             >
               {({ pressed }) => (
                 <View className={pressed ? "scale-95" : ""}>
@@ -1024,8 +912,8 @@ function RenderSecondaryStatsBlock({
           {playerState.allocatedSkillPoints[stat] > 0 && respeccing && (
             <Pressable
               className="px-0.5"
-              onPressIn={handlePressIn}
-              onPressOut={() => handlePressOut("remove")}
+              onPressIn={onPressIn}
+              onPressOut={() => onPressOut("remove")}
             >
               {({ pressed }) => (
                 <View className={pressed ? "scale-95" : ""}>
@@ -1039,3 +927,51 @@ function RenderSecondaryStatsBlock({
     </View>
   );
 }
+
+const ChangePopUp = ({
+  popUp,
+  change,
+  animationCycler,
+  colorScheme,
+}: {
+  popUp: StatType;
+  change: StatChange;
+  animationCycler: number;
+  colorScheme: "light" | "dark";
+}) => {
+  const marginAdjust = popUp === "gold" ? "-mt-3" : "-ml-2";
+  const color =
+    popUp === "mana"
+      ? "#60a5fa"
+      : popUp === "health"
+      ? "#ef4444"
+      : popUp === "sanity"
+      ? "#c084fc"
+      : colorScheme === "dark"
+      ? "white"
+      : "black";
+
+  if (change.isShowing) {
+    return (
+      <View className={`absolute ${marginAdjust}`}>
+        <FadeOutNode
+          animationCycler={animationCycler}
+          className="flex flex-row"
+        >
+          <Text className="pr-2 text-sm" style={{ color }}>
+            {change.current > 0 ? "+" : ""}
+            {change.current}
+            {change.cumulative !== change.current && (
+              <>
+                ({change.cumulative > 0 ? "+" : ""}
+                {change.cumulative})
+              </>
+            )}
+          </Text>
+          {popUp === "gold" && <Coins />}
+        </FadeOutNode>
+      </View>
+    );
+  }
+  return null;
+};

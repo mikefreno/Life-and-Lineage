@@ -7,7 +7,8 @@ import GenericRaisedButton from "./GenericRaisedButton";
 import ThemedCard from "./ThemedCard";
 import { Text } from "./Themed";
 import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
-import { useRootStore } from "../hooks/stores";
+import { useGameStore, usePlayerStore } from "../hooks/stores";
+import { useAcceleratedAction } from "../hooks/generic";
 
 interface LaborTaskProps {
   reward: number;
@@ -39,7 +40,9 @@ const LaborTask = observer(
     focused,
     vibration,
   }: LaborTaskProps) => {
-    const { gameState, playerState } = useRootStore();
+    const playerState = usePlayerStore();
+    const gameState = useGameStore();
+
     const [fullReward, setFullReward] = useState<number | undefined>(
       playerState?.getRewardValue(title, reward),
     );
@@ -48,8 +51,21 @@ const LaborTask = observer(
       playerState?.getJobExperience(title),
     );
 
+    const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
+      () => null, // Return null to indicate unlimited mode
+      {
+        minHoldTime: 350,
+        maxSpeed: 10,
+        accelerationCurve: (t) => 1 + Math.pow(t, 1.7),
+        action: work,
+        minActionAmount: 1,
+        maxActionAmount: 50,
+        debounceTime: 50,
+      },
+    );
+
     function work() {
-      if (playerState && gameState && focused) {
+      if (focused) {
         playerState.performLabor({
           title: title,
           cost: cost,
@@ -98,7 +114,8 @@ const LaborTask = observer(
         {playerState?.job == title ? (
           <>
             <GenericRaisedButton
-              onPress={work}
+              onPressIn={handlePressIn}
+              onPressOut={handlePressOut}
               disabled={
                 (cost.health && playerState.currentHealth <= cost.health) ||
                 playerState.currentMana < cost.mana

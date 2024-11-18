@@ -5,7 +5,9 @@ import type { ReactNode } from "react";
 import { useVibration } from "../hooks/generic";
 
 interface GenericRaisedButtonProps {
-  onPress: () => void;
+  onPress?: () => void;
+  onPressIn?: () => void;
+  onPressOut?: () => void;
   backgroundColor?: ColorValue;
   children: string | ReactNode;
   textColor?: ColorValue;
@@ -24,6 +26,8 @@ interface GenericRaisedButtonProps {
 
 const GenericRaisedButton = ({
   onPress,
+  onPressIn,
+  onPressOut,
   backgroundColor,
   textColor,
   children,
@@ -45,7 +49,23 @@ const GenericRaisedButton = ({
           style: vibrationStrength,
           essential: vibrationEssentiality,
         });
-        onPress();
+        if (onPress) {
+          onPress();
+        }
+      }}
+      onPressIn={() => {
+        vibration({
+          style: vibrationStrength,
+          essential: vibrationEssentiality,
+        });
+        if (onPressIn) {
+          onPressIn();
+        }
+      }}
+      onPressOut={() => {
+        if (onPressOut) {
+          onPressOut();
+        }
       }}
       disabled={disabled}
       style={style}
