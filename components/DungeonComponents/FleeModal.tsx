@@ -5,7 +5,7 @@ import { rollD20, wait } from "../../utility/functions/misc";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { useVibration } from "../../hooks/generic";
-import { useRootStore } from "../../hooks/stores";
+import { useGameStore, usePlayerStore, useRootStore } from "../../hooks/stores";
 import { useCombatActions, useEnemyManagement } from "../../hooks/combat";
 import { PlayerCharacter, savePlayer } from "../../entities/character";
 import { observer } from "mobx-react-lite";
@@ -19,7 +19,10 @@ export default function FleeModal({
   setFleeModalShowing: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const vibration = useVibration();
-  const { playerState, enemyStore, gameState, dungeonStore } = useRootStore();
+  const rootStore = useRootStore();
+  const { enemyStore, dungeonStore } = rootStore;
+  const playerState = usePlayerStore();
+  const gameState = useGameStore();
   const { playerMinionsTurn } = useCombatActions();
   const { enemyTurn } = useEnemyManagement();
 
@@ -42,9 +45,8 @@ export default function FleeModal({
         vibration({ style: "light" });
         setFleeRollFailure(false);
         setFleeModalShowing(false);
-        enemyStore.setAttackAnimationOngoing(false);
+        rootStore.leaveDungeon();
         wait(500).then(() => {
-          playerState.clearMinions();
           while (router.canGoBack()) {
             router.back();
           }
@@ -53,9 +55,6 @@ export default function FleeModal({
           } else {
             router.replace("/dungeon");
           }
-          playerState.setInDungeon({ state: false });
-          enemyStore.clearEnemyList();
-          dungeonStore.setInCombat(false);
           if (dungeonStore.currentInstance?.name == "Activities") {
             router.push("/Activities");
           }

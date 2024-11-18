@@ -287,20 +287,6 @@ type PlayerCharacterBase = {
   keyItems?: Item[];
   minions?: Minion[];
   rangerPet?: Minion; // used to avoid removal within a dungeon
-  currentDungeon?: {
-    instance: string;
-    level: string;
-    dungeonMap: Tile[];
-    currentPosition: Tile;
-    enemy: Enemy | null;
-    fightingBoss: boolean;
-    mapDimensions: {
-      width: number;
-      height: number;
-      offsetX: number;
-      offsetY: number;
-    };
-  } | null;
   equipment?: {
     mainHand: Item;
     offHand: Item | null;
@@ -399,15 +385,6 @@ export class PlayerCharacter extends Character {
   baseInventory: Item[];
   keyItems: Item[];
   inCombat: boolean;
-  currentDungeon: {
-    instance: string;
-    level: string;
-    dungeonMap: Tile[];
-    currentPosition: Tile;
-    enemy: Enemy | null;
-    fightingBoss: boolean;
-    mapDimensions: BoundingBox;
-  } | null;
   equipment: {
     // nulls indicate a lack of equipment in the given slot
     mainHand: Item; // main hand is never null, weapons are replaced with 'unarmored'
@@ -455,7 +432,6 @@ export class PlayerCharacter extends Character {
     knownSpells,
     gold,
     baseInventory,
-    currentDungeon,
     equipment,
     investments,
     unAllocatedSkillPoints,
@@ -523,7 +499,6 @@ export class PlayerCharacter extends Character {
 
     this.baseInventory = baseInventory ?? [];
     this.keyItems = keyItems ?? __DEV__ ? testKeyItems(root) : [];
-    this.currentDungeon = currentDungeon ?? null;
     this.inCombat = inCombat ?? false;
     this.equipment = equipment ?? {
       mainHand: new Item({
@@ -630,7 +605,6 @@ export class PlayerCharacter extends Character {
       children: observable,
       partners: observable,
       conditions: observable,
-      currentDungeon: observable,
       investments: observable,
       adopt: action,
       makePartner: action,
@@ -648,7 +622,6 @@ export class PlayerCharacter extends Character {
       getDamageReduction: action,
 
       getMedicalService: action,
-      setInDungeon: action,
       bossDefeated: action,
 
       gameTurnHandler: action,
@@ -1256,7 +1229,7 @@ export class PlayerCharacter extends Character {
       stats: { baseDamage: 1 },
       baseValue: 0,
       itemClass: ItemClassType.Melee,
-      player: this,
+      root: this.root,
       attacks: ["punch"],
     });
   }
@@ -2033,47 +2006,6 @@ export class PlayerCharacter extends Character {
     }
   }
 
-  public setInDungeon(props: inDungeonProps) {
-    if (props.state) {
-      if ("dungeonMap" in props) {
-        this.currentDungeon = {
-          instance: props.instance,
-          level: props.level,
-          dungeonMap: props.dungeonMap,
-          currentPosition: props.currentPosition,
-          mapDimensions: props.mapDimensions,
-          enemy: props.enemyState,
-          fightingBoss: props.fightingBoss,
-        };
-      } else {
-        const syntheticTile: Tile = {
-          x: 0,
-          y: 0,
-          clearedRoom: false,
-          isBossRoom: false,
-        };
-        const syntheticDungeon = [syntheticTile];
-        const mapDimensions = {
-          width: 0,
-          height: 0,
-          offsetX: 0,
-          offsetY: 0,
-        };
-        this.currentDungeon = {
-          instance: props.instance,
-          level: props.level,
-          dungeonMap: syntheticDungeon,
-          currentPosition: syntheticTile,
-          mapDimensions: mapDimensions,
-          enemy: null,
-          fightingBoss: false,
-        };
-      }
-    } else {
-      this.currentDungeon = null;
-    }
-  }
-
   /**
    * Creates a PlayerCharacter instance from a JSON object
    * @param json - JSON representation of a PlayerCharacter
@@ -2130,19 +2062,6 @@ export class PlayerCharacter extends Character {
             Item.fromJSON({ ...item, root: json.root }),
           )
         : [],
-      currentDungeon: json.currentDungeon
-        ? {
-            instance: json.currentDungeon.instance,
-            level: json.currentDungeon.level,
-            dungeonMap: json.currentDungeon.dungeonMap,
-            currentPosition: json.currentDungeon.currentPosition,
-            enemy: json.currentDungeon.enemy
-              ? Enemy.fromJSON(json.currentDungeon.enemy)
-              : null,
-            fightingBoss: json.currentDungeon.fightingBoss,
-            mapDimensions: json.currentDungeon.mapDimensions,
-          }
-        : null,
       equipment: json.equipment && {
         ...Object.fromEntries(
           ["mainHand", "offHand", "body", "head"].map((slot) => [
@@ -2383,30 +2302,6 @@ export function getStartingBook(player: PlayerCharacter) {
       throw new Error("Invalid player blessing in getStartingBook()");
   }
 }
-
-type enterDungeonProps = {
-  state: true;
-  instance: string;
-  level: string;
-  dungeonMap: Tile[];
-  currentPosition: Tile;
-  enemyState: Enemy | null;
-  mapDimensions: BoundingBox;
-  fightingBoss: boolean;
-};
-
-type enterActivityProps = {
-  state: true;
-  instance: "Activities" | "Personal";
-  level: string;
-};
-type leaveDungeonProps = {
-  state: false;
-};
-type inDungeonProps =
-  | enterDungeonProps
-  | leaveDungeonProps
-  | enterActivityProps;
 
 const _playerSave = async (player: PlayerCharacter | undefined) => {
   if (player) {

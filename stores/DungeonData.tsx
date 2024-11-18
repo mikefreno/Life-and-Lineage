@@ -174,13 +174,13 @@ const TutorialStateProvider = ({ children }: { children: ReactNode }) => {
           backFunction={() => {
             setShowFirstBossKillTutorial(false);
             wait(750).then(() => {
-              uiStore.detailedStatusViewShowing = true;
+              uiStore.setDetailedStatusViewShowing(true);
             });
           }}
           onCloseFunction={() => {
             setShowFirstBossKillTutorial(false);
             wait(750).then(() => {
-              uiStore.detailedStatusViewShowing = true;
+              uiStore.setDetailedStatusViewShowing(true);
             });
           }}
           isFocused={isFocused}

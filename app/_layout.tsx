@@ -64,7 +64,7 @@ const RootLayout = () => {
     CursiveBold: require("../assets/fonts/Tangerine-Bold.ttf"),
   });
   const rootStore = useRootStore();
-  const { playerState, gameState, uiStore } = rootStore;
+  const { playerState, gameState, uiStore, dungeonStore } = rootStore;
 
   const { colorScheme, setColorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
@@ -139,16 +139,11 @@ const RootLayout = () => {
             }
             router.replace("/DeathScreen");
           });
-      } else if (playerState.currentDungeon && firstLoad) {
+      } else if (dungeonStore.hasPersistedState && firstLoad) {
         while (router.canGoBack()) {
           router.back();
         }
-        router.replace(
-          `/DungeonLevel/${playerState.currentDungeon
-            ?.instance}/${playerState.currentDungeon?.level
-            .toString()
-            .replace(",", "/")}`,
-        );
+        router.push("/DungeonLevel");
       }
       setFirstLoad(false);
     }
@@ -157,6 +152,7 @@ const RootLayout = () => {
     playerState?.currentHealth,
     playerState?.currentSanity,
     rootStore.constructed,
+    dungeonStore.hasPersistedState,
   ]);
 
   useEffect(() => {

@@ -59,19 +59,13 @@ export const CharacterInteractionModal = observer(
     function setFight() {
       if (character && playerState && gameState) {
         gameState.gameTick();
-        playerState.setInDungeon({
-          state: true,
-          instance: "Personal",
-          level: `Personal Assault,${character.fullName}`,
-        });
+        //TODO: Setup dungeon level and instance
         closeFunction();
         wait(500).then(() => {
           while (router.canGoBack()) {
             router.back();
           }
-          router.replace(
-            `/DungeonLevel/Personal/Personal\ Assault/${character.fullName}`,
-          );
+          router.replace(`/DungeonLevel/`);
         });
       }
     }

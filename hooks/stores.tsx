@@ -8,6 +8,24 @@ export const useRootStore = () => {
   return root;
 };
 
+export const usePlayerStore = () => {
+  const { playerState } = useRootStore();
+  if (!playerState)
+    throw new Error(
+      "No player state when calling usePlayerStore, use Root if possibly undefined",
+    );
+  return playerState;
+};
+
+export const useGameStore = () => {
+  const { gameState } = useRootStore();
+  if (!gameState)
+    throw new Error(
+      "No game state when calling useGameStore, use Root if possibly undefined",
+    );
+  return gameState;
+};
+
 export const useDraggableStore = () => {
   const dragStore = useContext(DragContext);
   if (!dragStore)

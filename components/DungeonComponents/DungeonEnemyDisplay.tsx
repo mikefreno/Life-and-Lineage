@@ -94,14 +94,7 @@ const useEnemyAnimations = () => {
         duration: 1000,
         useNativeDriver: true,
       }),
-    ]).start(({ finished }) => {
-      if (finished) {
-        console.log("Animation completed");
-        onComplete();
-      } else {
-        console.log("Animation was interrupted");
-      }
-    });
+    ]).start(onComplete);
   };
 
   return {

@@ -9,6 +9,7 @@ import {
   computed,
   makeObservable,
   observable,
+  reaction,
   runInAction,
 } from "mobx";
 import {
@@ -23,34 +24,54 @@ export class DungeonStore {
   root: RootStore;
   dungeonInstances: DungeonInstance[];
   activityInstance: DungeonInstance;
+
   currentInstance: DungeonInstance | undefined;
   currentLevel: DungeonLevel | undefined;
-
   currentMap: Tile[] | undefined;
   currentMapDimensions: BoundingBox | undefined;
   currentPosition: Tile | undefined;
-  inCombat: boolean;
-  fightingBoss: boolean;
+  inCombat: boolean = false;
+  fightingBoss: boolean = false;
 
-  logs: string[];
+  logs: string[] = [];
 
   constructor({ root }: { root: RootStore }) {
+    this.root = root;
     this.dungeonInstances = this.hydrateDungeonState();
     this.activityInstance = this.initActivityDungeon();
-    this.inCombat = false;
-    this.fightingBoss = false;
-    this.currentMap = undefined;
-    this.currentMapDimensions = undefined;
-    this.currentPosition = undefined;
-    this.logs = [];
 
-    this.root = root;
+    const currentDungeonHydration = this.hydrateCurrentDungeonState();
+    if (!currentDungeonHydration) {
+      this.clearDungeonState();
+    } else {
+      const {
+        currentInstance,
+        currentLevel,
+        currentMap,
+        currentMapDimensions,
+        currentPosition,
+        inCombat,
+        fightingBoss,
+        logs,
+      } = currentDungeonHydration;
+
+      this.currentInstance = currentInstance;
+      this.currentLevel = currentLevel;
+      this.currentMap = currentMap;
+      this.currentMapDimensions = currentMapDimensions;
+      this.currentPosition = currentPosition;
+      this.inCombat = inCombat;
+      this.fightingBoss = fightingBoss;
+      this.logs = logs;
+    }
 
     makeObservable(this, {
       inCombat: observable,
       currentMap: observable,
       currentMapDimensions: observable,
       currentPosition: observable,
+      currentLevel: observable,
+      currentInstance: observable,
       fightingBoss: observable,
       logs: observable,
       addLog: action,
@@ -58,7 +79,75 @@ export class DungeonStore {
       move: action,
       reversedLogs: computed,
       setInCombat: action,
+      setInBossFight: action,
+      hasPersistedState: computed,
     });
+
+    reaction(
+      () => this.currentInstance,
+      (instance) => {
+        if (instance) {
+          storage.set("currentInstanceId", instance.id);
+        }
+      },
+    );
+
+    reaction(
+      () => this.currentLevel,
+      (level) => {
+        if (level) {
+          storage.set("currentLevelNumber", level.level);
+        }
+      },
+    );
+
+    reaction(
+      () => this.currentMap,
+      (map) => {
+        if (map) {
+          storage.set("currentMap", stringify(map));
+        }
+      },
+    );
+
+    reaction(
+      () => this.currentMapDimensions,
+      (dimensions) => {
+        if (dimensions) {
+          storage.set("currentMapDimensions", stringify(dimensions));
+        }
+      },
+    );
+
+    reaction(
+      () => this.currentPosition,
+      (position) => {
+        if (position) {
+          storage.set("currentPosition", stringify(position));
+        }
+      },
+    );
+
+    reaction(
+      () => this.inCombat,
+      (inCombat) => {
+        storage.set("inCombat", inCombat);
+      },
+    );
+
+    reaction(
+      () => this.fightingBoss,
+      (fightingBoss) => {
+        storage.set("fightingBoss", fightingBoss);
+      },
+    );
+
+    reaction(
+      () => this.logs,
+      (logs) => {
+        storage.set("logs", stringify(logs));
+      },
+    );
   }
 
   public setInBossFight(state: boolean) {
@@ -133,8 +222,7 @@ export class DungeonStore {
 
   public addLog(whatHappened: string) {
     if (!this.logs) {
-      console.log("no logs");
-      this.logs = []; // Ensure logs exists
+      this.logs = [];
     }
     runInAction(() => {
       const timeOfLog = new Date().toLocaleTimeString();
@@ -204,6 +292,90 @@ export class DungeonStore {
     return dungeonInstances.length > 0
       ? dungeonInstances
       : this.getInitDungeonState();
+  }
+
+  hydrateCurrentDungeonState() {
+    try {
+      const currentInstanceId = storage.getNumber("currentInstanceId");
+      const currentLevelNumber = storage.getNumber("currentLevelNumber");
+      const currentMapStr = storage.getString("currentMap");
+      const currentMapDimensionsStr = storage.getString("currentMapDimensions");
+      const currentPositionStr = storage.getString("currentPosition");
+      const inCombat = storage.getBoolean("inCombat") ?? false;
+      const fightingBoss = storage.getBoolean("fightingBoss") ?? false;
+      const logsStr = storage.getString("logs") ?? "";
+
+      if (
+        currentInstanceId === undefined ||
+        currentLevelNumber === undefined ||
+        !currentMapStr ||
+        !currentMapDimensionsStr ||
+        !currentPositionStr
+      ) {
+        return;
+      }
+
+      const currentInstance = this.dungeonInstances.find(
+        (instance) => instance.id === currentInstanceId,
+      );
+
+      if (!currentInstance) return;
+
+      const currentLevel = currentInstance.levels.find(
+        (level) => level.level === currentLevelNumber,
+      );
+
+      if (!currentLevel) return;
+
+      const currentMap = parse(currentMapStr);
+      const currentMapDimensions = parse(currentMapDimensionsStr);
+      const currentPosition = parse(currentPositionStr);
+      const logs = logsStr ? parse(logsStr) : [];
+
+      return {
+        currentInstance,
+        currentLevel,
+        currentMap,
+        currentMapDimensions,
+        currentPosition,
+        inCombat,
+        fightingBoss,
+        logs,
+      };
+    } catch (error) {
+      console.error("Error hydrating dungeon state:", error);
+      return false;
+    }
+  }
+
+  get hasPersistedState(): boolean {
+    return !!(
+      this.currentInstance &&
+      this.currentLevel &&
+      this.currentMap &&
+      this.currentMapDimensions &&
+      this.currentPosition
+    );
+  }
+
+  public clearDungeonState() {
+    this.currentInstance = undefined;
+    this.currentLevel = undefined;
+    this.currentMap = undefined;
+    this.currentMapDimensions = undefined;
+    this.currentPosition = undefined;
+    this.inCombat = false;
+    this.fightingBoss = false;
+    this.logs = [];
+
+    storage.delete("currentInstance");
+    storage.delete("currentLevel");
+    storage.delete("currentMap");
+    storage.delete("currentMapDimensions");
+    storage.delete("currentPosition");
+    storage.delete("inCombat");
+    storage.delete("fightingBoss");
+    storage.delete("logs");
   }
 
   getInitDungeonState() {

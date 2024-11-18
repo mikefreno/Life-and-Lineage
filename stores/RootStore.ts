@@ -6,7 +6,7 @@ import UIStore from "./UIStore";
 import EnemyStore from "./EnemyStore";
 import { DungeonStore } from "./DungeonStore";
 import { ShopStore } from "./ShopsStore";
-import { action, makeObservable, observable, reaction } from "mobx";
+import { makeObservable, observable, reaction } from "mobx";
 import { AuthStore } from "./AuthStore";
 
 export class RootStore {
@@ -42,7 +42,6 @@ export class RootStore {
 
     makeObservable(this, {
       constructed: observable,
-      setPathName: action,
     });
 
     reaction(
@@ -62,7 +61,9 @@ export class RootStore {
     );
   }
 
-  setPathName(pathname: string) {
-    this.currentPath = pathname;
+  leaveDungeon() {
+    this.playerState?.clearMinions();
+    this.enemyStore.clearEnemyList();
+    this.dungeonStore.clearDungeonState();
   }
 }

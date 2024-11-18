@@ -28,13 +28,14 @@ import {
 import DungeonEnemyDisplay from "../components/DungeonComponents/DungeonEnemyDisplay";
 import { DungeonMapRender } from "../components/DungeonComponents/DungeonMap";
 import { StatsDisplay } from "../components/StatsDisplay";
-import { useRootStore } from "../hooks/stores";
+import { usePlayerStore, useRootStore } from "../hooks/stores";
 import { usePouch } from "../hooks/generic";
 
 const DungeonLevelScreen = observer(() => {
   const { colorScheme } = useColorScheme();
-  const { playerState, gameState, enemyStore, dungeonStore } = useRootStore();
+  const { enemyStore, dungeonStore } = useRootStore();
   const { currentLevel, currentInstance, inCombat } = dungeonStore;
+  const playerState = usePlayerStore();
 
   const { setInventoryFullNotifier, displayItem, setDisplayItem } =
     useLootState();
@@ -52,15 +53,11 @@ const DungeonLevelScreen = observer(() => {
 
   const pouchRef = useRef<View>(null);
 
-  if (!playerState || !gameState) {
-    throw new Error("No player character or game data on dungeon level");
-  }
-
   useEffect(() => {
     setInventoryFullNotifier(false);
   }, [showLeftBehindItemsScreen]);
 
-  if (currentLevel && playerState) {
+  if (currentLevel) {
     return (
       <>
         <Stack.Screen
@@ -148,11 +145,7 @@ const DungeonLevelScreen = observer(() => {
           </Pressable>
           {inCombat && <View></View>}
           <View className="flex-1 justify-between">
-            <BattleTab
-              battleTab={battleTab}
-              pouchRef={pouchRef}
-              logs={dungeonStore.logs}
-            />
+            <BattleTab battleTab={battleTab} pouchRef={pouchRef} />
           </View>
           <BattleTabControls
             battleTab={battleTab}

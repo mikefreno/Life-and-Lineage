@@ -24,18 +24,21 @@ import { Spell } from "../../entities/spell";
 import { useCombatActions } from "../../hooks/combat";
 import { Item } from "../../entities/item";
 import { usePouch, useVibration } from "../../hooks/generic";
-import { useDraggableStore, useRootStore } from "../../hooks/stores";
+import {
+  useDraggableStore,
+  useGameStore,
+  usePlayerStore,
+  useRootStore,
+} from "../../hooks/stores";
 import { observer } from "mobx-react-lite";
 
 const BattleTab = observer(
   ({
     battleTab,
     pouchRef,
-    logs,
   }: {
     battleTab: "attacksOrNavigation" | "equipment" | "log";
     pouchRef: React.RefObject<View>;
-    logs: string[];
   }) => {
     const { colorScheme } = useColorScheme();
     const [attackDetails, setAttackDetails] = useState<Attack | Spell | null>(
@@ -44,7 +47,8 @@ const BattleTab = observer(
     const [attackDetailsShowing, setAttackDetailsShowing] =
       useState<boolean>(false);
 
-    const { playerState, enemyStore, dungeonStore } = useRootStore();
+    const { enemyStore, dungeonStore } = useRootStore();
+    const playerState = usePlayerStore();
 
     const { useAttack } = useCombatActions();
     const { displayItem, setDisplayItem } = useLootState();
@@ -64,8 +68,6 @@ const BattleTab = observer(
     const { addItemToPouch } = usePouch();
     const { pass } = useCombatActions();
 
-    if (!playerState) return;
-
     useEffect(() => {
       if (attackDetails) {
         setAttackDetailsShowing(true);
@@ -79,10 +81,8 @@ const BattleTab = observer(
     }, [attackDetailsShowing]);
 
     useEffect(() => {
-      if (playerState) {
-        setCombinedData([...playerState.weaponAttacks, ...playerState.spells]);
-      }
-    }, [playerState]);
+      setCombinedData([...playerState.weaponAttacks, ...playerState.spells]);
+    }, [playerState.weaponAttacks, playerState.spells]);
 
     useEffect(() => {
       if (battleTab !== "equipment") {
@@ -359,7 +359,7 @@ const BattleTab = observer(
             >
               {Platform.OS == "web" ? (
                 <ScrollView>
-                  {logs.map((text) => (
+                  {dungeonStore.reversedLogs.map((text) => (
                     <Text>
                       {text
                         .replaceAll(`on the ${playerState.fullName}`, "")
@@ -371,7 +371,7 @@ const BattleTab = observer(
               ) : (
                 <FlatList
                   inverted
-                  data={logs}
+                  data={dungeonStore.reversedLogs}
                   renderItem={({ item }) => (
                     <Text className="py-1">
                       {item

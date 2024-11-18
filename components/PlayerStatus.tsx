@@ -368,7 +368,7 @@ const PlayerStatus = observer(
               animationCycler={animationCycler}
               className="flex flex-row"
             >
-              <Text className="pr-0.5" style={{ color: color }}>
+              <Text className="pr-0.5 text-sm" style={{ color: color }}>
                 {diff > 0 ? "+" : ""}
                 {diff.toString()}
               </Text>
