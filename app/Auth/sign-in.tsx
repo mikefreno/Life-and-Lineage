@@ -19,7 +19,6 @@ import D20DieAnimation from "../../components/DieRollAnim";
 import { ThemedView, Text } from "../../components/Themed";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { wait } from "../../utility/functions/misc";
-import * as Updates from "expo-updates";
 import { useRootStore } from "../../hooks/stores";
 
 const SignInScreen = observer(() => {
@@ -97,15 +96,9 @@ const SignInScreen = observer(() => {
   const handleGoogleSignIn = async () => {
     setAwaitingResponse(true);
     try {
-      const res = await authStore.googleSignIn();
-      if (res == 200) {
-        router.dismissAll();
-        router.push("/Options");
-      } else {
-        wait(250).then(() => {
-          Updates.reloadAsync();
-        });
-      }
+      await authStore.googleSignIn();
+      router.dismissAll();
+      router.push("/Options");
     } catch (e) {
       setError("Failed to sign in with Google. Please try again.");
     }
@@ -115,15 +108,9 @@ const SignInScreen = observer(() => {
   const handleAppleSignIn = async () => {
     setAwaitingResponse(true);
     try {
-      const res = await authStore.appleSignIn();
-      if (res == 200) {
-        router.dismissAll();
-        router.push("/Options");
-      } else {
-        wait(250).then(() => {
-          Updates.reloadAsync();
-        });
-      }
+      await authStore.appleSignIn();
+      router.dismissAll();
+      router.push("/Options");
     } catch (e) {
       console.error(e);
       setError("Failed to sign in with Apple. Please try again.");

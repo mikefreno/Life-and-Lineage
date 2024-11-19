@@ -6,7 +6,6 @@ import { Pressable, Switch, View } from "react-native";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import GenericModal from "../../components/GenericModal";
-import * as Updates from "expo-updates";
 import D20DieAnimation from "../../components/DieRollAnim";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
@@ -84,7 +83,7 @@ export default function GameSettings() {
                   tutorialStore.resetTutorialState(() => {
                     setShowTutorialResetConfirm(false);
                     setLoading(false);
-                    Updates.reloadAsync();
+                    router.dismissAll();
                   });
                 }}
                 className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"

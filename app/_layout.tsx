@@ -21,7 +21,6 @@ import { registerForPushNotificationsAsync } from "../utility/functions/notifica
 import { useRootStore } from "../hooks/stores";
 import { ProjectedImage } from "../components/Draggable";
 import { AppProvider } from "../providers/AppData";
-import { BackButtonDisplayMode } from "react-native-screens";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -127,7 +126,7 @@ const RootLayout = () => {
     if (fontLoaded && rootStore.constructed) {
       SplashScreen.hideAsync();
       if (!playerState) {
-        router.replace("/ClassSelect");
+        router.replace("/NewGame/ClassSelect");
       } else if (
         rootStore.atDeathScreen ||
         (playerState &&
@@ -342,6 +341,7 @@ const RootLayout = () => {
               ),
             }}
           />
+          <Stack.Screen name="DungeonLevel" />
           <Stack.Screen
             name="DeathScreen"
             options={{

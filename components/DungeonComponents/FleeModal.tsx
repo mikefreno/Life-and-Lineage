@@ -46,7 +46,6 @@ export default function FleeModal({
         setFleeModalShowing(false);
         rootStore.leaveDungeon();
         wait(500).then(() => {
-          router.dismissAll();
           if (dungeonStore.currentInstance?.name == "Activities") {
             router.replace("/shops");
           } else {
