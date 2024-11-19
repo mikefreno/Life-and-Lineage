@@ -950,7 +950,10 @@ const ChangePopUp = ({
 
   return (
     <View className={`${change.isShowing ? "" : "opacity-0"} ${marginAdjust}`}>
-      <FadeOutNode animationCycler={animationCycler} className="flex flex-row">
+      <FadeOutNode
+        animationCycler={animationCycler}
+        className="flex flex-row my-auto"
+      >
         <Text className="pr-2 text-sm" style={{ color }}>
           {change.current > 0 ? "+" : ""}
           {change.current}
@@ -961,7 +964,7 @@ const ChangePopUp = ({
             </>
           )}
         </Text>
-        {popUp === "gold" && <Coins />}
+        {popUp === "gold" && <Coins height={14} width={14} />}
       </FadeOutNode>
     </View>
   );

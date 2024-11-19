@@ -5,6 +5,7 @@ import type { Element, PlayerClassOptions } from "../../utility/types";
 import { useRootStore } from "../../hooks/stores";
 import { Pressable } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { HeaderBackButton } from "@react-navigation/elements";
 
 const NewGameContext = createContext<
   | {
@@ -72,39 +73,85 @@ export default function NewGameLayout() {
         <Stack.Screen
           name="ClassSelect"
           options={{
-            ...headerOptions({
-              title: "Class Select",
-            }),
+            title: "Class Select",
+            headerBackButtonMenuEnabled: false,
+            headerBackTitleStyle: {
+              fontFamily: "PixelifySans",
+              fontSize: 16,
+            },
+            headerTitleStyle: {
+              fontFamily: "PixelifySans",
+              fontSize: 22,
+            },
             headerLeft: !!playerState
               ? ({ tintColor }) => (
-                  <Pressable
+                  <HeaderBackButton
                     onPress={router.dismissAll}
-                    style={({ pressed }) => ({
-                      opacity: pressed ? 0.5 : 1,
-                      marginLeft: -12,
-                    })}
-                  >
-                    <Ionicons name="chevron-back" size={28} color={tintColor} />
-                  </Pressable>
+                    tintColor={tintColor}
+                    displayMode="generic"
+                  />
                 )
               : undefined,
           }}
         />
         <Stack.Screen
           name="BlessingSelect"
-          options={headerOptions({ title: "Blessing Select" })}
+          options={{
+            title: "Blessing Select",
+            headerBackButtonMenuEnabled: false,
+            headerBackTitleStyle: {
+              fontFamily: "PixelifySans",
+              fontSize: 16,
+            },
+            headerTitleStyle: {
+              fontFamily: "PixelifySans",
+              fontSize: 22,
+            },
+          }}
         />
         <Stack.Screen
           name="SexSelect"
-          options={headerOptions({ title: "Sex Select" })}
+          options={{
+            title: "Sex Select",
+            headerBackButtonMenuEnabled: false,
+            headerBackTitleStyle: {
+              fontFamily: "PixelifySans",
+              fontSize: 16,
+            },
+            headerTitleStyle: {
+              fontFamily: "PixelifySans",
+              fontSize: 22,
+            },
+          }}
         />
         <Stack.Screen
           name="NameSelect"
-          options={headerOptions({ title: "Name Set" })}
+          options={{
+            title: "Name Select",
+            headerBackButtonMenuEnabled: false,
+            headerBackTitleStyle: {
+              fontFamily: "PixelifySans",
+              fontSize: 16,
+            },
+            headerTitleStyle: {
+              fontFamily: "PixelifySans",
+              fontSize: 22,
+            },
+          }}
         />
         <Stack.Screen
           name="Review"
-          options={headerOptions({ title: "Review" })}
+          options={{
+            headerBackButtonMenuEnabled: false,
+            headerBackTitleStyle: {
+              fontFamily: "PixelifySans",
+              fontSize: 16,
+            },
+            headerTitleStyle: {
+              fontFamily: "PixelifySans",
+              fontSize: 22,
+            },
+          }}
         />
       </Stack>
     </NewGameProvider>

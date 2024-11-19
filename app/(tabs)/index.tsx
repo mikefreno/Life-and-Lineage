@@ -30,7 +30,7 @@ import { EXPANDED_PAD } from "../../components/PlayerStatus";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
-  const { playerState, gameState, uiStore, constructed } = useRootStore();
+  const { playerState, uiStore, constructed } = useRootStore();
   const { dimensions, playerStatusIsCompact } = uiStore;
   const { setIconString } = useDraggableStore();
 
@@ -78,18 +78,18 @@ const HomeScreen = observer(() => {
   }, [playerState?.playerClass, dimensions.window.height, colorScheme]);
 
   const playerStats = useMemo(() => {
-    if (!playerState || !gameState) return null;
+    if (!playerState) return null;
     const name = playerState.fullName;
     const age = playerState.age;
     return { name, job: playerState.job, age };
-  }, [playerState, gameState]);
+  }, [playerState]);
 
   const equipmentStats = useMemo(() => {
     if (!playerState) return null;
     return playerState.equipmentStats;
   }, [playerState?.equipmentStats]);
 
-  if (!constructed || !playerState || !gameState) {
+  if (!playerState) {
     return (
       <ThemedView className="flex-1 items-center justify-center">
         <D20DieAnimation keepRolling={true} />

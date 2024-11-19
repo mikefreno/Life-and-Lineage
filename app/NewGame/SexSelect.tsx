@@ -113,7 +113,7 @@ export default function SetSex() {
             <GenericFlatButton
               onPress={() => {
                 vibration({ style: "light" });
-                router.push(`/NameSelect`);
+                router.push(`/NewGame/NameSelect`);
               }}
             >
               Next

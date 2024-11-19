@@ -79,7 +79,11 @@ const _shopSave = async (shop: Shop | undefined) => {
     try {
       storage.set(
         `shop_${shop.archetype.replaceAll(" ", "_")}`,
-        stringify({ ...shop, root: null }),
+        stringify({
+          ...shop,
+          shopKeeper: { ...shop.shopKeeper, root: null },
+          root: null,
+        }),
       );
     } catch (e) {
       console.log("Error in _playerSave:", e);

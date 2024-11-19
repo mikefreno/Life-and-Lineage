@@ -37,7 +37,7 @@ import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 
 const PLAYERSTATUS_SPACER = 64;
-const TABSELECTOR_HEIGHT = 50;
+const TABSELECTOR_HEIGHT = 48;
 
 export default function TabLayout() {
   const isFocused = useIsFocused();
@@ -80,6 +80,7 @@ export default function TabLayout() {
             position: "absolute",
             borderTopWidth: 0,
             shadowColor: "transparent",
+            paddingHorizontal: 4,
             height: PLAYERSTATUS_SPACER + TABSELECTOR_HEIGHT,
           },
           tabBarIconStyle: {
@@ -105,7 +106,6 @@ export default function TabLayout() {
                       height: uiStore.playerStatusIsCompact
                         ? TABSELECTOR_HEIGHT
                         : TABSELECTOR_HEIGHT + EXPANDED_PAD,
-                      marginLeft: isHome ? 12 : 0,
                       borderTopLeftRadius: isHome ? 12 : 0,
                       borderBottomLeftRadius: isHome ? 12 : 0,
                       borderBottomRightRadius: isMedical ? 12 : 0,

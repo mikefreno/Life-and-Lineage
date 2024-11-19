@@ -13,8 +13,8 @@ import { lowSanityDebuffGenerator } from "../utility/functions/conditions";
 import { TutorialStore } from "./TutorialStore";
 
 export class RootStore {
-  time: TimeStore;
   playerState: PlayerCharacter | null;
+  time: TimeStore;
   enemyStore: EnemyStore;
   shopsStore: ShopStore;
   dungeonStore: DungeonStore;

@@ -108,7 +108,7 @@ export default function SetName() {
                         vibration({ style: "light" });
                         setFirstName(trimWhitespace(firstName));
                         setLastName(trimWhitespace(lastName));
-                        router.push(`/Review`);
+                        router.push(`/NewGame/Review`);
                       }}
                     >
                       Next

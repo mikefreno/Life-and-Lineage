@@ -1,7 +1,7 @@
 import { ThemedView, Text } from "../../components/Themed";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { toTitleCase } from "../../utility/functions/misc";
+import { toTitleCase, wait } from "../../utility/functions/misc";
 import { Pressable, Switch, View } from "react-native";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
@@ -45,7 +45,7 @@ export default function GameSettings() {
   const startNewGame = () => {
     vibration({ style: "warning" });
     router.dismissAll();
-    router.push("/ClassSelect");
+    wait(0).then(() => router.push("/NewGame/ClassSelect"));
   };
 
   useEffect(() => {

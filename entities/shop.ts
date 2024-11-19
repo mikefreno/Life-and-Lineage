@@ -223,7 +223,7 @@ export class Shop {
 
   static fromJSON(json: any): Shop {
     const shop = new Shop({
-      shopKeeper: Character.fromJSON(json.shopKeeper),
+      shopKeeper: Character.fromJSON({ ...json.shopKeeper, root: json.root }),
       baseGold: json.baseGold,
       currentGold: json.currentGold,
       lastStockRefresh: new Date(json.lastStockRefresh),

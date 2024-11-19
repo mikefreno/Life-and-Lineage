@@ -242,7 +242,7 @@ const SetClassScreen = observer(() => {
               <GenericFlatButton
                 onPress={() => {
                   vibration({ style: "light" });
-                  router.push(`/BlessingSelect`);
+                  router.push(`/NewGame/BlessingSelect`);
                 }}
               >
                 <Text>Next</Text>

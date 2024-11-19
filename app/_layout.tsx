@@ -21,6 +21,7 @@ import { registerForPushNotificationsAsync } from "../utility/functions/notifica
 import { useRootStore } from "../hooks/stores";
 import { ProjectedImage } from "../components/Draggable";
 import { AppProvider } from "../providers/AppData";
+import { BackButtonDisplayMode } from "react-native-screens";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -176,74 +177,215 @@ const RootLayout = () => {
             }}
           />
           <Stack.Screen
-            name="(NewGame)"
+            name="NewGame"
             options={{
               headerShown: false,
               presentation: "card",
             }}
           />
-          <Stack.Screen
-            name="Options"
-            options={headerOptions({ presentation: "modal" })}
-          />
-          <Stack.Screen
-            name="Auth"
-            options={headerOptions({ presentation: "modal" })}
-          />
+
           <Stack.Screen
             name="Relationships"
-            options={headerOptions({
-              colorScheme,
-              headerBackTitleVisible: false,
-            })}
+            options={{
+              headerBackButtonDisplayMode: "minimal",
+              headerBackButtonMenuEnabled: false,
+              headerBackTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 16,
+              },
+              headerTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 22,
+              },
+            }}
           />
           <Stack.Screen
             name="Study"
-            options={headerOptions({
+            options={{
               title: "Magic Study",
-              colorScheme,
-              headerBackTitleVisible: false,
-            })}
+              headerBackButtonDisplayMode: "minimal",
+              headerBackButtonMenuEnabled: false,
+              headerBackTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 16,
+              },
+              headerTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 22,
+              },
+            }}
           />
           <Stack.Screen
             name="Education"
-            options={headerOptions({
-              colorScheme,
-              blur: true,
-              headerBackTitleVisible: false,
-            })}
+            options={{
+              headerBackButtonMenuEnabled: false,
+              headerBackButtonDisplayMode: "minimal",
+              headerTransparent: true,
+              headerTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 22,
+              },
+              headerBackTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 16,
+              },
+              headerBackground: () => (
+                <BlurView
+                  blurReductionFactor={12}
+                  tint={
+                    Platform.OS == "android"
+                      ? colorScheme == "light"
+                        ? "light"
+                        : "dark"
+                      : "default"
+                  }
+                  intensity={100}
+                  style={StyleSheet.absoluteFill}
+                  experimentalBlurMethod={"dimezisBlurView"}
+                />
+              ),
+            }}
           />
           <Stack.Screen
             name="Activities"
-            options={headerOptions({
-              colorScheme,
-              blur: true,
-              headerBackTitleVisible: false,
-            })}
+            options={{
+              headerBackButtonMenuEnabled: false,
+              headerBackButtonDisplayMode: "minimal",
+              headerTransparent: true,
+              headerTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 22,
+              },
+              headerBackTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 16,
+              },
+              headerBackground: () => (
+                <BlurView
+                  blurReductionFactor={12}
+                  tint={
+                    Platform.OS == "android"
+                      ? colorScheme == "light"
+                        ? "light"
+                        : "dark"
+                      : "default"
+                  }
+                  intensity={100}
+                  style={StyleSheet.absoluteFill}
+                  experimentalBlurMethod={"dimezisBlurView"}
+                />
+              ),
+            }}
           />
           <Stack.Screen
             name="Investing"
-            options={headerOptions({
-              colorScheme,
-              blur: true,
-              headerBackTitleVisible: false,
-            })}
+            options={{
+              headerBackButtonMenuEnabled: false,
+              headerBackButtonDisplayMode: "minimal",
+              headerTransparent: true,
+              headerTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 22,
+              },
+              headerBackTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 16,
+              },
+              headerBackground: () => (
+                <BlurView
+                  blurReductionFactor={12}
+                  tint={
+                    Platform.OS == "android"
+                      ? colorScheme == "light"
+                        ? "light"
+                        : "dark"
+                      : "default"
+                  }
+                  intensity={100}
+                  style={StyleSheet.absoluteFill}
+                  experimentalBlurMethod={"dimezisBlurView"}
+                />
+              ),
+            }}
           />
           <Stack.Screen
             name="Shops/[shop]"
-            options={headerOptions({
-              colorScheme,
-              blur: true,
+            options={{
               title: toTitleCase(
                 (pathname.split("/")[2] ?? "").replaceAll("%20", " "),
               ),
-            })}
+              headerBackButtonMenuEnabled: false,
+              headerBackButtonDisplayMode: "minimal",
+              headerTransparent: true,
+              headerTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 22,
+              },
+              headerBackTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 16,
+              },
+              headerBackground: () => (
+                <BlurView
+                  blurReductionFactor={12}
+                  tint={
+                    Platform.OS == "android"
+                      ? colorScheme == "light"
+                        ? "light"
+                        : "dark"
+                      : "default"
+                  }
+                  intensity={100}
+                  style={StyleSheet.absoluteFill}
+                  experimentalBlurMethod={"dimezisBlurView"}
+                />
+              ),
+            }}
           />
           <Stack.Screen
             name="DeathScreen"
             options={{
-              ...headerOptions({ title: "You Died" }),
-              headerShown: false,
+              title: "You Died",
+              headerBackButtonDisplayMode: "minimal",
+              headerBackButtonMenuEnabled: false,
+              headerBackTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 16,
+              },
+              headerTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 22,
+              },
+            }}
+          />
+          <Stack.Screen
+            name="Options"
+            options={{
+              presentation: "modal",
+              headerBackButtonMenuEnabled: false,
+              headerBackTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 16,
+              },
+              headerTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 22,
+              },
+            }}
+          />
+          <Stack.Screen
+            name="Auth"
+            options={{
+              presentation: "modal",
+              headerBackButtonMenuEnabled: false,
+              headerBackTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 16,
+              },
+              headerTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 22,
+              },
             }}
           />
         </Stack>
@@ -252,68 +394,3 @@ const RootLayout = () => {
   );
 };
 export default Sentry.wrap(Root);
-
-export const headerOptions = ({
-  colorScheme,
-  blur,
-  title,
-  presentation,
-  headerBackTitleVisible = true,
-}: {
-  colorScheme?: "light" | "dark";
-  presentation?:
-    | "modal"
-    | "transparentModal"
-    | "containedModal"
-    | "containedTransparentModal"
-    | "fullScreenModal"
-    | "formSheet"
-    | "card";
-  blur?: boolean;
-  title?: string;
-  headerBackTitleVisible?: boolean;
-}) =>
-  blur
-    ? {
-        title: title,
-        headerBackButtonMenuEnabled: false,
-        headerBackTitleVisible: false,
-        headerTransparent: true,
-        headerTitleStyle: {
-          fontFamily: "PixelifySans",
-          fontSize: 22,
-        },
-        headerBackTitleStyle: {
-          fontFamily: "PixelifySans",
-          fontSize: 16,
-        },
-        headerBackground: () => (
-          <BlurView
-            blurReductionFactor={12}
-            tint={
-              Platform.OS == "android"
-                ? colorScheme == "light"
-                  ? "light"
-                  : "dark"
-                : "default"
-            }
-            intensity={100}
-            style={StyleSheet.absoluteFill}
-            experimentalBlurMethod={"dimezisBlurView"}
-          />
-        ),
-      }
-    : {
-        title: title,
-        headerBackTitleVisible: headerBackTitleVisible,
-        headerBackButtonMenuEnabled: false,
-        presentation: presentation,
-        headerBackTitleStyle: {
-          fontFamily: "PixelifySans",
-          fontSize: 16,
-        },
-        headerTitleStyle: {
-          fontFamily: "PixelifySans",
-          fontSize: 22,
-        },
-      };

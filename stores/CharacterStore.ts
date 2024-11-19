@@ -6,6 +6,16 @@ import { throttle } from "lodash";
 import { Character, PlayerCharacter } from "../entities/character";
 
 export class CharacterStore {
+  adopt(arg0: {
+    adoptee: Character;
+    player: PlayerCharacter;
+    partner: Character | undefined;
+  }): void {
+    throw new Error("Method not implemented.");
+  }
+  independantChildrenAgeCheck() {
+    throw new Error("Method not implemented.");
+  }
   @observable characters: Character[] = [];
   @observable independentChildren: Character[] = [];
   root: RootStore;

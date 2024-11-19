@@ -11,7 +11,6 @@ import google_config from "../config/google_config";
 import { API_BASE_URL } from "../config/config";
 import { SaveRow } from "../utility/database";
 import type { PlayerCharacter } from "../entities/character";
-import type { Game } from "../entities/game";
 import type { RootStore } from "./RootStore";
 
 type EmailLogin = {
@@ -41,14 +40,12 @@ interface databaseExecuteProps {
 }
 interface makeRemoteSaveProps {
   name: string;
-  gameState: Game;
   playerState: PlayerCharacter;
 }
 
 interface overwriteRemoteSaveProps {
   name: string;
   id: number;
-  gameState: Game;
   playerState: PlayerCharacter;
 }
 interface deleteRemoteSaveProps {
@@ -364,19 +361,15 @@ export class AuthStore {
     }
   };
 
-  makeRemoteSave = async ({
-    name,
-    gameState,
-    playerState,
-  }: makeRemoteSaveProps) => {
+  makeRemoteSave = async ({ name, playerState }: makeRemoteSaveProps) => {
     if (!this.isConnected) {
       throw new Error("Device is offline");
     }
     try {
       const time = this.formatDate(new Date());
       await this.databaseExecute({
-        sql: `INSERT INTO Save (name, game_state, player_state, created_at, last_updated_at) VALUES (?, ?, ?, ?, ?)`,
-        args: [name, stringify(gameState), stringify(playerState), time, time],
+        sql: `INSERT INTO Save (name, player_state, created_at, last_updated_at) VALUES (?, ?, ?, ?, ?)`,
+        args: [name, stringify(playerState), time, time],
       });
     } catch (e) {
       console.error(e);
@@ -387,7 +380,6 @@ export class AuthStore {
   overwriteRemoteSave = async ({
     name,
     id,
-    gameState,
     playerState,
   }: overwriteRemoteSaveProps) => {
     if (!this.isConnected) {
@@ -396,14 +388,8 @@ export class AuthStore {
     try {
       const updateTime = this.formatDate(new Date());
       const res = await this.databaseExecute({
-        sql: `UPDATE Save SET game_state = ?, player_state = ?, last_updated_at = ? WHERE name = ? AND id = ?`,
-        args: [
-          stringify(gameState),
-          stringify(playerState),
-          updateTime,
-          name,
-          id.toString(),
-        ],
+        sql: `UPDATE Save SET player_state = ?, last_updated_at = ? WHERE name = ? AND id = ?`,
+        args: [stringify(playerState), updateTime, name, id.toString()],
       });
       await res?.json();
     } catch (e) {
@@ -544,10 +530,9 @@ export class AuthStore {
       cleaned.push({
         id: parseInt(row[0].value),
         name: row[1].value,
-        game_state: row[2].value,
-        player_state: row[3].value,
-        created_at: row[4].value,
-        last_updated_at: row[5].value,
+        player_state: row[2].value,
+        created_at: row[3].value,
+        last_updated_at: row[4].value,
       }),
     );
     return cleaned;

@@ -246,7 +246,7 @@ export class Character {
       firstName: json.firstName,
       lastName: json.lastName,
       sex: json.sex,
-      birthdate: json.birthdate ?? undefined,
+      birthdate: json.birthdate,
       alive: json.alive,
       deathdate: json.deathdate ?? null,
       job: json.job,
@@ -501,7 +501,7 @@ export class PlayerCharacter extends Character {
     this.currentSanity = currentSanity ?? baseSanity;
     this.currentMana = currentMana ?? baseMana;
 
-    this.unAllocatedSkillPoints = unAllocatedSkillPoints ?? __DEV__ ? 100 : 0;
+    this.unAllocatedSkillPoints = unAllocatedSkillPoints ?? 0;
     this.allocatedSkillPoints = allocatedSkillPoints ?? {
       [Attribute.health]: 0,
       [Attribute.mana]: 0,
@@ -511,7 +511,7 @@ export class PlayerCharacter extends Character {
       [Attribute.intelligence]: 0,
     };
 
-    this.gold = gold !== undefined ? gold : __DEV__ ? 1000000 : 500;
+    this.gold = gold !== undefined ? gold : 500;
 
     this.minions = minions ?? [];
     this.rangerPet = rangerPet ?? null;

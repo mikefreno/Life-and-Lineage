@@ -53,7 +53,7 @@ export default function DeathScreen() {
 
   function startNewGame() {
     root.startingNewGame = true;
-    router.push("/ClassSelect");
+    router.push("/NewGame/ClassSelect");
   }
 
   function createPlayerCharacter() {
