@@ -1,4 +1,4 @@
-import { Link, Tabs, useNavigation } from "expo-router";
+import { Link, Tabs } from "expo-router";
 import {
   GestureResponderEvent,
   Platform,
@@ -32,12 +32,12 @@ import {
 import { ThemedView } from "../../components/Themed";
 import TutorialModal from "../../components/TutorialModal";
 import { useIsFocused } from "@react-navigation/native";
-import { TutorialOption } from "../../utility/types";
+import { Element, TutorialOption } from "../../utility/types";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 
 const PLAYERSTATUS_SPACER = 64;
-const TABSELECTOR_HEIGHT = 64;
+const TABSELECTOR_HEIGHT = 50;
 
 export default function TabLayout() {
   const isFocused = useIsFocused();
@@ -72,14 +72,19 @@ export default function TabLayout() {
           tabBarActiveTintColor: Colors[colorScheme].tint,
           tabBarLabelStyle: {
             fontFamily: "PixelifySans",
-            marginBottom: 0,
-            marginLeft: 0,
+            marginLeft: "auto",
+            marginRight: "auto",
+            marginTop: 4,
           },
           tabBarStyle: {
             position: "absolute",
             borderTopWidth: 0,
             shadowColor: "transparent",
-            height: TABSELECTOR_HEIGHT + PLAYERSTATUS_SPACER,
+            height: PLAYERSTATUS_SPACER + TABSELECTOR_HEIGHT,
+          },
+          tabBarIconStyle: {
+            marginLeft: "auto",
+            marginRight: "auto",
           },
           tabBarButton: (props) => {
             const onPressWithVibration = (event: GestureResponderEvent) => {
@@ -89,7 +94,7 @@ export default function TabLayout() {
             const isHome = props.accessibilityLabel?.includes("Home");
             const isMedical = props.accessibilityLabel?.includes("Medical");
             return (
-              <View className="flex flex-col w-1/6">
+              <View>
                 <Pressable
                   onPress={() => {
                     vibration({ style: "light" });
@@ -98,12 +103,11 @@ export default function TabLayout() {
                   style={[
                     {
                       height: uiStore.playerStatusIsCompact
-                        ? 40
-                        : 40 + EXPANDED_PAD,
+                        ? TABSELECTOR_HEIGHT
+                        : TABSELECTOR_HEIGHT + EXPANDED_PAD,
                       marginLeft: isHome ? 12 : 0,
                       borderTopLeftRadius: isHome ? 12 : 0,
                       borderBottomLeftRadius: isHome ? 12 : 0,
-                      marginRight: isMedical ? 12 : 0,
                       borderBottomRightRadius: isMedical ? 12 : 0,
                       borderTopRightRadius: isMedical ? 12 : 0,
                       marginTop: uiStore.playerStatusIsCompact
@@ -244,7 +248,10 @@ export default function TabLayout() {
                     <BookSparkles
                       width={26}
                       height={28}
-                      color={elementalColorMap[playerState!.blessing].dark}
+                      color={
+                        elementalColorMap[playerState?.blessing ?? Element.fire]
+                          .dark
+                      }
                       style={{
                         marginRight: 15,
                         marginBottom: 3,

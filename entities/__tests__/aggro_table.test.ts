@@ -4,20 +4,20 @@ import {
   Element,
   PlayerClassOptions,
 } from "../../utility/types";
-import { AggroTable } from "../aggro_table";
 import { Character, PlayerCharacter } from "../character";
 import { Enemy, Minion } from "../creatures";
-import { generateBirthday, getRandomName } from "../../utility/functions/misc";
+import { getRandomName } from "../../utility/functions/misc";
 import { getRandomJobTitle } from "../../utility/functions/characterAid";
 import summons from "../../assets/json/summons.json";
 import conditions from "../../assets/json/conditions.json";
 import { Condition } from "../conditions";
+import { ThreatTable } from "../threatTable";
 
 describe("AggroTable", () => {
-  let aggroTable: AggroTable;
+  let aggroTable: ThreatTable;
 
   beforeEach(() => {
-    aggroTable = new AggroTable();
+    aggroTable = new ThreatTable();
   });
 
   it("should correctly add aggro points", () => {

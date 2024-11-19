@@ -79,9 +79,7 @@ const SignInScreen = observer(() => {
             provider: "email",
           });
           wait(500).then(() => {
-            while (router.canGoBack()) {
-              router.back();
-            }
+            router.dismissAll();
             router.push("/Options");
           });
         } else {
@@ -101,9 +99,7 @@ const SignInScreen = observer(() => {
     try {
       const res = await authStore.googleSignIn();
       if (res == 200) {
-        while (router.canGoBack()) {
-          router.back();
-        }
+        router.dismissAll();
         router.push("/Options");
       } else {
         wait(250).then(() => {
@@ -121,9 +117,7 @@ const SignInScreen = observer(() => {
     try {
       const res = await authStore.appleSignIn();
       if (res == 200) {
-        while (router.canGoBack()) {
-          router.back();
-        }
+        router.dismissAll();
         router.push("/Options");
       } else {
         wait(250).then(() => {

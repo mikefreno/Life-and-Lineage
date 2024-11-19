@@ -1,5 +1,5 @@
 import { Text } from "../../components/Themed";
-import { Platform, View } from "react-native";
+import { View } from "react-native";
 import {
   Character,
   PlayerCharacter,
@@ -158,6 +158,9 @@ export default function NewGameReview() {
       root.gameState = newGame;
       root.enemyStore.clearEnemyList();
       root.playerState = player;
+      if (!root.shopsStore) {
+        root.initShopsStore();
+      }
       vibration({ style: "success" });
       wait(250).then(() => clearHistory(navigation));
       saveGame(newGame);

@@ -1,5 +1,5 @@
 import { getRandomJobTitle } from "../../utility/functions/characterAid";
-import { generateBirthday, getRandomName } from "../../utility/functions/misc";
+import { getRandomName } from "../../utility/functions/misc";
 import {
   AttackUse,
   BeingType,

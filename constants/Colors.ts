@@ -1,3 +1,4 @@
+import type { Theme } from "@react-navigation/native";
 import { Element, PlayerClassOptions } from "../utility/types";
 
 // Core colors
@@ -33,8 +34,26 @@ export default {
   },
 };
 
-export const LightTheme = {
+export const LightTheme: Theme = {
   dark: false,
+  fonts: {
+    regular: {
+      fontFamily: "PixelifySans",
+      fontWeight: "normal",
+    },
+    medium: {
+      fontFamily: "PixelifySans",
+      fontWeight: "normal",
+    },
+    bold: {
+      fontFamily: "PixelifySans",
+      fontWeight: "normal",
+    },
+    heavy: {
+      fontFamily: "PixelifySans",
+      fontWeight: "normal",
+    },
+  },
   colors: {
     primary: tintColorLight,
     background: lightBackground,
@@ -45,8 +64,26 @@ export const LightTheme = {
   },
 };
 
-export const DarkTheme = {
+export const DarkTheme: Theme = {
   dark: true,
+  fonts: {
+    regular: {
+      fontFamily: "PixelifySans",
+      fontWeight: "normal",
+    },
+    medium: {
+      fontFamily: "PixelifySans",
+      fontWeight: "normal",
+    },
+    bold: {
+      fontFamily: "PixelifySans",
+      fontWeight: "normal",
+    },
+    heavy: {
+      fontFamily: "PixelifySans",
+      fontWeight: "normal",
+    },
+  },
   colors: {
     primary: tintColorDark,
     background: darkBackground,

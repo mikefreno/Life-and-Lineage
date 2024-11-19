@@ -1,13 +1,12 @@
 import { View } from "react-native";
 import ProgressBar from "./ProgressBar";
-import { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { AccelerationCurves, numberToRoman } from "../utility/functions/misc";
 import GenericRaisedButton from "./GenericRaisedButton";
 import ThemedCard from "./ThemedCard";
 import { Text } from "./Themed";
 import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
-import { useGameStore, usePlayerStore } from "../hooks/stores";
+import { useRootStore } from "../hooks/stores";
 import { useAcceleratedAction } from "../hooks/generic";
 
 interface LaborTaskProps {
@@ -40,8 +39,7 @@ const LaborTask = observer(
     focused,
     vibration,
   }: LaborTaskProps) => {
-    const playerState = usePlayerStore();
-    const gameState = useGameStore();
+    const { playerState, gameState } = useRootStore();
 
     const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
       () => null, // Return null to indicate unlimited mode
@@ -58,16 +56,16 @@ const LaborTask = observer(
 
     function work() {
       if (focused) {
-        playerState.performLabor({
+        playerState?.performLabor({
           title: title,
           cost: cost,
           goldReward: playerState?.getRewardValue(title, reward) ?? reward,
         });
-        const newExp = playerState.getJobExperience(title);
+        const newExp = playerState?.getJobExperience(title);
         if (newExp == 0) {
           vibration({ style: "success", essential: true });
         }
-        gameState.gameTick();
+        gameState?.gameTick();
       }
     }
 

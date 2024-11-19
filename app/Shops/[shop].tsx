@@ -13,7 +13,6 @@ import { observer } from "mobx-react-lite";
 import TutorialModal from "../../components/TutorialModal";
 import { useHeaderHeight } from "@react-navigation/elements";
 import shopObjects from "../../assets/json/shops.json";
-import { calculateAge } from "../../utility/functions/misc";
 import InventoryRender from "../../components/InventoryRender";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import { Coins } from "../../assets/icons/SVGIcons";
@@ -264,10 +263,7 @@ const ShopInteriorScreen = observer(() => {
             <View className="flex h-[40%] flex-row justify-between">
               <View className="items-center w-1/3 my-auto px-1">
                 <CharacterImage
-                  characterAge={calculateAge(
-                    new Date(thisShop.shopKeeper.birthdate),
-                    new Date(gameState.date),
-                  )}
+                  characterAge={thisShop.shopKeeper.age ?? 0}
                   characterSex={thisShop.shopKeeper.sex == "male" ? "M" : "F"}
                 />
                 <GreetingComponent

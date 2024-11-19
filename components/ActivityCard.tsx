@@ -234,9 +234,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
     setBadOutcome(null);
     wait(500).then(() => {
       if (badOutCome && badOutCome.fight && badOutCome.dungeonTitle) {
-        while (router.canGoBack()) {
-          router.back();
-        }
+        router.dismissAll();
         router.replace(`/DungeonLevel/Activities/${badOutCome?.dungeonTitle}`);
       } else {
         throw new Error("missing enemy object!");

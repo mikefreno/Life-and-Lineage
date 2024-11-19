@@ -172,9 +172,7 @@ const DungeonScreen = observer(() => {
                       <Pressable
                         key={levelIdx}
                         onPress={() => {
-                          while (router.canGoBack()) {
-                            router.back();
-                          }
+                          router.dismissAll();
                           dungeonStore.setUpDungeon(dungeonInstance, level);
                           vibration({ style: "warning" });
                           router.replace(`/DungeonLevel`);

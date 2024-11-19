@@ -74,8 +74,8 @@ const RootLayout = () => {
   const [_, setNotification] = useState<Notifications.Notification | undefined>(
     undefined,
   );
-  const notificationListener = useRef<Notifications.Subscription>();
-  const responseListener = useRef<Notifications.Subscription>();
+  const notificationListener = useRef<Notifications.EventSubscription>();
+  const responseListener = useRef<Notifications.EventSubscription>();
   const pathname = usePathname();
 
   useEffect(() => {
@@ -134,15 +134,11 @@ const RootLayout = () => {
       ) {
         if (pathname !== "/DeathScreen")
           wait(uiStore.modalShowing ? 600 : 0).then(() => {
-            while (router.canGoBack()) {
-              router.back();
-            }
+            router.dismissAll();
             router.replace("/DeathScreen");
           });
       } else if (dungeonStore.hasPersistedState && firstLoad) {
-        while (router.canGoBack()) {
-          router.back();
-        }
+        router.dismissAll();
         router.push("/DungeonLevel");
       }
       setFirstLoad(false);

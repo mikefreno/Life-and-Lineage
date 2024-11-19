@@ -27,9 +27,7 @@ export default function SetBlessing() {
     useNewGameStore();
 
   if (!classSelection) {
-    while (router.canGoBack()) {
-      router.back();
-    }
+    router.dismissAll();
     return;
   }
 

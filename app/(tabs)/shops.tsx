@@ -22,7 +22,7 @@ const ShopsScreen = observer(() => {
   const [isReady, setIsReady] = useState(false);
 
   const runDeathChecks = () => {
-    shopsStore.shopsMap.forEach((shop) => shop.deathCheck());
+    shopsStore?.shopsMap.forEach((shop) => shop.deathCheck());
   };
 
   useEffect(() => {
@@ -61,7 +61,7 @@ const ShopsScreen = observer(() => {
             </Text>
             <View className="items-center">
               <CharacterImage
-                characterAge={shop.shopKeeper.age}
+                characterAge={shop.shopKeeper.age ?? 0}
                 characterSex={shop.shopKeeper.sex == "male" ? "M" : "F"}
               />
               <Text
@@ -138,9 +138,10 @@ const ShopsScreen = observer(() => {
                 paddingTop: headerHeight,
               }}
             >
-              {[...shopsStore.shopsMap.values()].map((shop) =>
-                renderItem(shop),
-              )}
+              {shopsStore &&
+                [...shopsStore.shopsMap.values()].map((shop) =>
+                  renderItem(shop),
+                )}
             </View>
           </ScrollView>
         ) : null}

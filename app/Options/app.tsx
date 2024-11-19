@@ -120,9 +120,7 @@ export const AppSettings = observer(() => {
         root,
       });
       root.setPlayer(player);
-      while (router.canGoBack()) {
-        router.back();
-      }
+      router.dismissAll();
     };
 
     const deleteRemoteSave = async (chosenSave: SaveRow) => {

@@ -13,7 +13,7 @@ export class RootStore {
   gameState: Game | null;
   playerState: PlayerCharacter | null;
   enemyStore: EnemyStore;
-  shopsStore: ShopStore;
+  shopsStore: ShopStore | undefined;
   dungeonStore: DungeonStore;
   uiStore: UIStore;
   authStore: AuthStore;
@@ -26,7 +26,6 @@ export class RootStore {
 
     this.authStore = new AuthStore({ root: this });
     this.uiStore = new UIStore({ root: this });
-    this.shopsStore = new ShopStore({ root: this });
 
     this.gameState = retrieved_game
       ? Game.fromJSON({ ...parse(retrieved_game), root: this })
@@ -35,6 +34,9 @@ export class RootStore {
       ? PlayerCharacter.fromJSON({ ...parse(retrieved_player), root: this })
       : null;
 
+    this.shopsStore = retrieved_player
+      ? new ShopStore({ root: this })
+      : undefined;
     this.enemyStore = new EnemyStore({ root: this });
     this.dungeonStore = new DungeonStore({ root: this });
 
@@ -67,6 +69,10 @@ export class RootStore {
 
   setGame(game: Game) {
     this.gameState = game;
+  }
+
+  initShopsStore() {
+    this.shopsStore = new ShopStore({ root: this });
   }
 
   leaveDungeon() {

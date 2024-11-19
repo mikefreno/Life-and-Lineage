@@ -95,12 +95,8 @@ export default function DeathScreen() {
       const skillPoints = gameState?.inheritance();
       newPlayerCharacter.addSkillPoint({ amount: skillPoints });
       wait(500).then(() => {
-        while (router.canGoBack()) {
-          router.back();
-        }
-        wait(200).then(() => {
-          router.replace("/");
-        });
+        router.dismissAll();
+        router.replace("/");
       });
     }
   };
@@ -191,7 +187,7 @@ export default function DeathScreen() {
                           {child.firstName}
                         </Text>
                         <CharacterImage
-                          characterAge={child.age}
+                          characterAge={child.age ?? 0}
                           characterSex={child.sex == "male" ? "M" : "F"}
                         />
                       </ThemedView>

@@ -1,12 +1,9 @@
 import Benchmark from "benchmark";
 import { stringify, parse } from "flatted";
 import CircularJSON from "circular-json";
-import { Character, PlayerCharacter } from "../../../classes/character";
-import { Game } from "../../../classes/game";
 import { Element, PlayerClassOptions } from "../../types";
-import { generateBirthday, getRandomName } from "../misc";
+import { getRandomName } from "../misc";
 import { getRandomJobTitle } from "../characterAid";
-import { createShops } from "../../../classes/shop";
 
 describe("Serialization Benchmark", () => {
   it("compares flatted's stringify, custom serialization, and JSON.stringify", (done) => {

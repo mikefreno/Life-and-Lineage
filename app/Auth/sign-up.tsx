@@ -44,9 +44,7 @@ const SignUpScreen = observer(() => {
   useEffect(() => {
     if (authStore.isAuthenticated) {
       const navigateToOptions = async () => {
-        while (router.canGoBack()) {
-          router.back();
-        }
+        router.dismissAll();
         router.push("/Options");
       };
 

@@ -44,9 +44,7 @@ export default function GameSettings() {
 
   const startNewGame = () => {
     vibration({ style: "warning" });
-    while (router.canGoBack()) {
-      router.back();
-    }
+    router.dismissAll();
     router.push("/ClassSelect");
   };
 

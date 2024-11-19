@@ -1,6 +1,6 @@
 import jobs from "../../assets/json/jobs.json";
 import LaborTask from "../../components/LaborTask";
-import { View, Pressable, ScrollView } from "react-native";
+import { View, ScrollView } from "react-native";
 import { useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc";
 import { router } from "expo-router";

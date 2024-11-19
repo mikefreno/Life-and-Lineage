@@ -4,7 +4,7 @@ import GenericRaisedButton from "./GenericRaisedButton";
 import ThemedCard from "./ThemedCard";
 import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
 import { observer } from "mobx-react-lite";
-import { useGameStore, usePlayerStore } from "../hooks/stores";
+import { useRootStore } from "../hooks/stores";
 import { AccelerationCurves } from "../utility/functions/misc";
 import { useAcceleratedAction } from "../hooks/generic";
 
@@ -28,8 +28,7 @@ const MedicalOption = observer(
     removeDebuffs,
     focused,
   }: MedicalOptionProps) => {
-    const playerState = usePlayerStore();
-    const gameState = useGameStore();
+    const { playerState, gameState } = useRootStore();
 
     const { start, stop } = useAcceleratedAction(
       () => null, // Return null to indicate unlimited mode
@@ -46,7 +45,7 @@ const MedicalOption = observer(
 
     function visit() {
       if (focused) {
-        playerState.getMedicalService(
+        playerState?.getMedicalService(
           cost,
           healthRestore == "fill" ? playerState.maxHealth : healthRestore,
           sanityRestore == "fill" ? playerState.maxSanity : sanityRestore,
@@ -55,7 +54,7 @@ const MedicalOption = observer(
             ? playerState.conditions.length
             : removeDebuffs,
         );
-        gameState.gameTick();
+        gameState?.gameTick();
       }
     }
 

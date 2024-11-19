@@ -8,7 +8,6 @@ import {
   toTitleCase,
   rollD20,
   getItemJSONMap,
-  generateBirthday,
 } from "../utility/functions/misc";
 import { ItemClassType, ShopkeeperPersonality } from "../utility/types";
 import { RootStore } from "../stores/RootStore";
@@ -90,7 +89,7 @@ export class Shop {
       );
       const personality = shopObj.possiblePersonalities[randIdx];
       //want to favor likelihood of male shopkeepers slightly
-      this.shopKeeper = generateShopKeeper(shopObj.type);
+      this.shopKeeper = generateShopKeeper(shopObj.type, this.root);
       this.shopKeeperPersonality = personality as ShopkeeperPersonality;
     }
   }
@@ -278,18 +277,19 @@ function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function generateShopKeeper(archetype: string) {
+export function generateShopKeeper(archetype: string, root: RootStore) {
   const sex = rollD20() <= 12 ? "male" : "female";
   const name = getRandomName(sex);
-  const birthdate = generateBirthday(25, 70);
+  const birthdate = root.gameState?.timeStore.generateBirthDateInRange(25, 70);
   const job = toTitleCase(archetype);
 
   const newChar = new Character({
     sex: sex,
     firstName: name.firstName,
     lastName: name.lastName,
-    birthdate: birthdate,
+    birthdate: birthdate!,
     job: job,
+    root,
   });
   return newChar;
 }

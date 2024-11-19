@@ -78,12 +78,7 @@ export default function NewGameLayout() {
             headerLeft: !!gameState
               ? ({ tintColor }) => (
                   <Pressable
-                    onPress={() => {
-                      while (router.canGoBack()) {
-                        router.back();
-                      }
-                      router.push("/Options/game");
-                    }}
+                    onPress={router.dismissAll}
                     style={({ pressed }) => ({
                       opacity: pressed ? 0.5 : 1,
                       marginLeft: -12,

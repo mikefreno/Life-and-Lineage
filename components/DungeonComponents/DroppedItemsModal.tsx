@@ -89,18 +89,14 @@ export default function DroppedItemsModal() {
   const closeRoutingCheck = () => {
     if (dungeonStore.currentInstance?.name === "Activities") {
       wait(600).then(() => {
-        while (router.canGoBack()) {
-          router.back();
-        }
+        router.dismissAll();
         router.replace("/shops");
         router.push("/Activities");
       });
     }
     if (dungeonStore.currentInstance?.name === "Personal") {
       wait(600).then(() => {
-        while (router.canGoBack()) {
-          router.back();
-        }
+        router.dismissAll();
         router.replace("/");
         router.push("/Relationships");
       });

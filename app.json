@@ -2,7 +2,7 @@
   "expo": {
     "name": "Lineage",
     "slug": "life-and-lineage",
-    "version": "0.5.4",
+    "version": "0.6.0",
     "orientation": "portrait",
     "icon": "assets/images/icon.png",
     "scheme": "lineageapp",
@@ -79,10 +79,11 @@
         "projectId": "f4a10fdc-c377-4a37-8ad7-27685b89b4d9"
       }
     },
-    "runtimeVersion": "0.5.0",
+    "runtimeVersion": "0.6.0",
     "updates": {
       "url": "https://u.expo.dev/2307d673-d206-4c58-8170-5dc30a9ec500"
     },
     "owner": "mikefrenodev"
   }
 }
+

@@ -54,7 +54,7 @@ export class ShopStore {
       );
       const personality = shop.possiblePersonalities[randIdx];
       const newShop = new Shop({
-        shopKeeper: generateShopKeeper(shop.type),
+        shopKeeper: generateShopKeeper(shop.type, this.root),
         baseGold: shop.baseGold,
         lastStockRefresh: new Date(),
         archetype: shop.type,

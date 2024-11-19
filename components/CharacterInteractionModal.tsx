@@ -4,7 +4,7 @@ import { Text } from "./Themed";
 import GenericModal from "./GenericModal";
 import { useEffect, useState } from "react";
 import { CharacterImage } from "./CharacterImage";
-import { getDaysBetweenDates, wait } from "../utility/functions/misc";
+import { wait } from "../utility/functions/misc";
 import ProgressBar from "./ProgressBar";
 import GenericFlatButton from "./GenericFlatButton";
 import GenericStrikeAround from "./GenericStrikeAround";
@@ -52,9 +52,7 @@ export const CharacterInteractionModal = observer(
         //TODO: Setup dungeon level and instance
         closeFunction();
         wait(500).then(() => {
-          while (router.canGoBack()) {
-            router.back();
-          }
+          router.dismissAll();
           router.replace(`/DungeonLevel/`);
         });
       }
