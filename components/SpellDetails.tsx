@@ -26,7 +26,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
       style={{
         backgroundColor: colorScheme == "light" ? "#fafafa" : "#27272a",
         shadowRadius: 5,
-        width: uiStore.dimensions.window.width * 0.75,
+        width: uiStore.dimensions.width * 0.75,
         elevation: 6,
       }}
     >
@@ -133,7 +133,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
           <BlessingDisplay
             blessing={spell.element}
             colorScheme={colorScheme}
-            size={uiStore.dimensions.window.width * 0.15}
+            size={uiStore.dimensions.width * 0.15}
           />
         </View>
       </View>

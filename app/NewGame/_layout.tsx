@@ -1,10 +1,7 @@
 import { Stack, router } from "expo-router";
-import { headerOptions } from "../_layout";
 import { type ReactNode, createContext, useContext, useState } from "react";
 import type { Element, PlayerClassOptions } from "../../utility/types";
 import { useRootStore } from "../../hooks/stores";
-import { Pressable } from "react-native";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { HeaderBackButton } from "@react-navigation/elements";
 
 const NewGameContext = createContext<

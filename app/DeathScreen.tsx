@@ -1,10 +1,10 @@
-import { Pressable, ScrollView, View } from "react-native";
+import { Platform, Pressable, ScrollView, View } from "react-native";
 import { Text, ThemedView } from "../components/Themed";
 import deathMessages from "../assets/json/deathMessages.json";
 import { useEffect, useState } from "react";
-import { router } from "expo-router";
+import { Stack, router } from "expo-router";
 import { CharacterImage } from "../components/CharacterImage";
-import { wait } from "../utility/functions/misc";
+import { toTitleCase, wait } from "../utility/functions/misc";
 import GenericStrikeAround from "../components/GenericStrikeAround";
 import GenericModal from "../components/GenericModal";
 import GenericFlatButton from "../components/GenericFlatButton";
@@ -16,7 +16,7 @@ import {
   WizardHat,
 } from "../assets/icons/SVGIcons";
 import BlessingDisplay from "../components/BlessingsDisplay";
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import { elementalColorMap } from "../constants/Colors";
 import { getStartingBaseStats } from "../utility/functions/characterAid";
@@ -37,7 +37,7 @@ export default function DeathScreen() {
   const [page, setPage] = useState<number>(0);
 
   const root = useRootStore();
-  const { playerState, uiStore } = root;
+  const { playerState, uiStore, dungeonStore } = root;
   const vibration = useVibration();
   const { colorScheme } = useColorScheme();
 
@@ -101,6 +101,34 @@ export default function DeathScreen() {
   if (playerState) {
     return (
       <>
+        <Stack.Screen
+          name="DungeonLevel"
+          options={{
+            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 20 },
+            headerLeft: () => (
+              <Pressable
+                onPress={() => {
+                  dungeonStore.setFleeModalShowing(true);
+                }}
+              >
+                {({ pressed }) => (
+                  <MaterialCommunityIcons
+                    name="run-fast"
+                    size={28}
+                    color={colorScheme == "light" ? "#18181b" : "#fafafa"}
+                    style={{
+                      opacity: pressed ? 0.5 : 1,
+                      marginRight: Platform.OS == "android" ? 8 : 0,
+                    }}
+                  />
+                )}
+              </Pressable>
+            ),
+            title: `${toTitleCase(
+              dungeonStore.currentInstance?.name as string,
+            )} Level ${dungeonStore.currentLevel?.level}`,
+          }}
+        />
         <GenericModal
           isVisibleCondition={!!nextLife}
           backFunction={() => setNextLife(null)}
@@ -110,7 +138,7 @@ export default function DeathScreen() {
             {page == 0 && (
               <>
                 <MinimalClassSelect
-                  dimensions={uiStore.dimensions.window}
+                  dimensions={uiStore.dimensions}
                   vibration={vibration}
                   selectedClass={selectedClass}
                   setSelectedClass={setSelectedClass}
@@ -139,7 +167,7 @@ export default function DeathScreen() {
                   setBlessing={setSelectedBlessing}
                   vibration={vibration}
                   colorScheme={colorScheme}
-                  dimensions={uiStore.dimensions.window}
+                  dimensions={uiStore.dimensions}
                 />
                 <GenericFlatButton
                   onPress={startNextLife}

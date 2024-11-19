@@ -15,6 +15,7 @@ import GenericFlatButton from "../../components/GenericFlatButton";
 import { useVibration } from "../../hooks/generic";
 import { useNewGameStore } from "./_layout";
 import { useRootStore } from "../../hooks/stores";
+import GenericFlatLink from "../../components/GenericLink";
 
 export default function SetName() {
   const { uiStore } = useRootStore();
@@ -41,7 +42,7 @@ export default function SetName() {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View className="flex-1">
           <KeyboardAvoidingView style={{ marginTop: -header, flex: 1 }}>
-            <View className="flex-1 px-6 items-center justify-center border">
+            <View className="flex-1 px-6 pb-16 items-center justify-center border">
               <View className="flex flex-row text-center">
                 <Text className="text-center text-2xl md:text-3xl">
                   Choose Your
@@ -72,7 +73,7 @@ export default function SetName() {
                 style={{
                   fontFamily: "PixelifySans",
                   paddingVertical: 8,
-                  width: Math.min(uiStore.dimensions.window.width * 0.65, 300),
+                  width: Math.min(uiStore.dimensions.width * 0.65, 300),
                   fontSize: 20,
                 }}
               />
@@ -94,7 +95,7 @@ export default function SetName() {
                 style={{
                   fontFamily: "PixelifySans",
                   paddingVertical: 8,
-                  width: Math.min(uiStore.dimensions.window.width * 0.65, 300),
+                  width: Math.min(uiStore.dimensions.width * 0.65, 300),
                   fontSize: 20,
                 }}
               />
@@ -103,16 +104,15 @@ export default function SetName() {
                 {firstName.trimEnd().length > 0 &&
                 lastName.trimEnd().length > 0 ? (
                   <View className="mx-auto">
-                    <GenericFlatButton
+                    <GenericFlatLink
                       onPress={() => {
-                        vibration({ style: "light" });
                         setFirstName(trimWhitespace(firstName));
                         setLastName(trimWhitespace(lastName));
-                        router.push(`/NewGame/Review`);
                       }}
+                      href="./Review"
                     >
-                      Next
-                    </GenericFlatButton>
+                      <Text>Next</Text>
+                    </GenericFlatLink>
                   </View>
                 ) : null}
               </View>

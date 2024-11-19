@@ -6,12 +6,7 @@ import {
   getStartingBook,
   savePlayer,
 } from "../../entities/character";
-import { useNavigation } from "expo-router";
-import clearHistory, {
-  getRandomName,
-  toTitleCase,
-  wait,
-} from "../../utility/functions/misc";
+import { getRandomName, toTitleCase } from "../../utility/functions/misc";
 import {
   getRandomJobTitle,
   getStartingBaseStats,
@@ -20,10 +15,10 @@ import { Element, ElementToString } from "../../utility/types";
 import { elementalColorMap, playerClassColors } from "../../constants/Colors";
 import { storage } from "../../utility/functions/storage";
 import { useColorScheme } from "nativewind";
-import GenericFlatButton from "../../components/GenericFlatButton";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
+import GenericFlatLink from "../../components/GenericLink";
 
 export default function NewGameReview() {
   const { firstName, lastName, blessingSelection, sex, classSelection } =
@@ -32,7 +27,6 @@ export default function NewGameReview() {
   const vibration = useVibration();
 
   let root = useRootStore();
-  const navigation = useNavigation();
   const { colorScheme } = useColorScheme();
 
   function createParent(sex: "female" | "male"): Character {
@@ -148,11 +142,8 @@ export default function NewGameReview() {
       player.addToInventory(starterBook);
       root.enemyStore.clearEnemyList();
       root.playerState = player;
-
       vibration({ style: "success" });
-      wait(250).then(() => clearHistory(navigation));
       savePlayer(player);
-      storage.delete("tutorialsEnabled");
     }
   }
 
@@ -176,9 +167,9 @@ export default function NewGameReview() {
             style={{ color: playerClassColors[classSelection] }}
           >{`${toTitleCase(classSelection)}`}</Text>
         </Text>
-        <GenericFlatButton onPress={() => startGame()} className="mt-4">
-          Confirm?
-        </GenericFlatButton>
+        <GenericFlatLink className="mt-2" onPress={startGame} href="../(tabs)">
+          <Text>Confirm?</Text>
+        </GenericFlatLink>
       </View>
     );
   }

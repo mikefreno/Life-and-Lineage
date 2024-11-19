@@ -1,10 +1,9 @@
-import { ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack, router, usePathname } from "expo-router";
 import React, { useEffect, useState, useRef } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
-import { Platform, StyleSheet } from "react-native";
+import { Platform, Pressable, StyleSheet } from "react-native";
 import { ThemedView } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { BlurView } from "expo-blur";
@@ -21,6 +20,8 @@ import { registerForPushNotificationsAsync } from "../utility/functions/notifica
 import { useRootStore } from "../hooks/stores";
 import { ProjectedImage } from "../components/Draggable";
 import { AppProvider } from "../providers/AppData";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { ThemeProvider } from "@react-navigation/native";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -66,7 +67,7 @@ const RootLayout = () => {
   const rootStore = useRootStore();
   const { playerState, uiStore, dungeonStore } = rootStore;
 
-  const { colorScheme, setColorScheme } = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
 
   const [expoPushToken, setExpoPushToken] = useState("");
@@ -138,8 +139,7 @@ const RootLayout = () => {
             router.replace("/DeathScreen");
           });
       } else if (dungeonStore.hasPersistedState && firstLoad) {
-        router.dismissAll();
-        router.push("/DungeonLevel");
+        router.replace("/DungeonLevel");
       }
       setFirstLoad(false);
     }
@@ -151,11 +151,7 @@ const RootLayout = () => {
     dungeonStore.hasPersistedState,
   ]);
 
-  useEffect(() => {
-    setColorScheme(uiStore.colorScheme);
-  }, [uiStore.colorScheme]);
-
-  while (!fontLoaded) {
+  while (!fontLoaded || !rootStore.constructed) {
     return (
       <ThemedView className="flex-1 items-center justify-center">
         <D20DieAnimation keepRolling={!fontLoaded} />
@@ -166,8 +162,8 @@ const RootLayout = () => {
   return (
     <GestureHandlerRootView>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : LightTheme}>
+        <SystemBars style={colorScheme == "light" ? "dark" : "light"} />
         <ProjectedImage />
-        <SystemBars style="auto" />
         <Stack>
           <Stack.Screen
             name="(tabs)"
@@ -341,7 +337,34 @@ const RootLayout = () => {
               ),
             }}
           />
-          <Stack.Screen name="DungeonLevel" />
+          <Stack.Screen
+            name="DungeonLevel"
+            options={{
+              headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 20 },
+              headerLeft: () => (
+                <Pressable
+                  onPress={() => {
+                    dungeonStore.setFleeModalShowing(true);
+                  }}
+                >
+                  {({ pressed }) => (
+                    <MaterialCommunityIcons
+                      name="run-fast"
+                      size={28}
+                      color={colorScheme == "light" ? "#18181b" : "#fafafa"}
+                      style={{
+                        opacity: pressed ? 0.5 : 1,
+                        marginRight: Platform.OS == "android" ? 8 : 0,
+                      }}
+                    />
+                  )}
+                </Pressable>
+              ),
+              title: `${toTitleCase(
+                dungeonStore.currentInstance?.name as string,
+              )} Level ${dungeonStore.currentLevel?.level}`,
+            }}
+          />
           <Stack.Screen
             name="DeathScreen"
             options={{

@@ -104,6 +104,7 @@ export function useAcceleratedAction<T = void>(
   const singlePressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastAmountRef = useRef<number>(0);
   const totalExecutedRef = useRef<number>(0);
+  const isActiveRef = useRef<boolean>(false);
 
   const updateAmount = useCallback(() => {
     try {
@@ -176,6 +177,12 @@ export function useAcceleratedAction<T = void>(
   const lastUpdateTimeRef = useRef<number>(0);
 
   const start = useCallback(() => {
+    if (isActiveRef.current) {
+      // If an action is already in progress, don't start a new one
+      return;
+    }
+
+    isActiveRef.current = true;
     startTimeRef.current = Date.now();
     lastAmountRef.current = 0;
     totalExecutedRef.current = 0;
@@ -183,7 +190,6 @@ export function useAcceleratedAction<T = void>(
 
     singlePressTimeoutRef.current = setTimeout(() => {
       if (action) {
-        // Execute action once for single press
         action(minActionAmount ?? 1, totalExecutedRef.current);
         totalExecutedRef.current += minActionAmount ?? 1;
       } else {
@@ -194,6 +200,13 @@ export function useAcceleratedAction<T = void>(
   }, [debouncedUpdateAmount, updateInterval, action, minActionAmount]);
 
   const stop = useCallback(() => {
+    if (!isActiveRef.current) {
+      // If no action is in progress, don't do anything
+      return 0;
+    }
+
+    isActiveRef.current = false;
+
     if (singlePressTimeoutRef.current) {
       clearTimeout(singlePressTimeoutRef.current);
       singlePressTimeoutRef.current = null;
@@ -223,6 +236,17 @@ export function useAcceleratedAction<T = void>(
 
     return finalAmount;
   }, [amount, action, minActionAmount]);
+
+  useEffect(() => {
+    return () => {
+      if (singlePressTimeoutRef.current) {
+        clearTimeout(singlePressTimeoutRef.current);
+      }
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
 
   return {
     amount,

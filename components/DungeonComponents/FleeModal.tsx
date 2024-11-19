@@ -7,17 +7,10 @@ import { useEffect, useState } from "react";
 import { useVibration } from "../../hooks/generic";
 import { usePlayerStore, useRootStore } from "../../hooks/stores";
 import { useCombatActions, useEnemyManagement } from "../../hooks/combat";
-import { PlayerCharacter, savePlayer } from "../../entities/character";
+import { savePlayer } from "../../entities/character";
 import { observer } from "mobx-react-lite";
-import EnemyStore from "../../stores/EnemyStore";
 
-export default function FleeModal({
-  fleeModalShowing,
-  setFleeModalShowing,
-}: {
-  fleeModalShowing: boolean;
-  setFleeModalShowing: React.Dispatch<React.SetStateAction<boolean>>;
-}) {
+const FleeModal = observer(() => {
   const vibration = useVibration();
   const rootStore = useRootStore();
   const { enemyStore, dungeonStore } = rootStore;
@@ -29,7 +22,7 @@ export default function FleeModal({
 
   useEffect(() => {
     setFleeRollFailure(false);
-  }, [fleeModalShowing]);
+  }, [dungeonStore.fleeModalShowing]);
 
   const flee = () => {
     if (playerState) {
@@ -38,13 +31,12 @@ export default function FleeModal({
       if (
         enemyStore.enemies.length == 0 ||
         enemyStore.enemies[0].creatureSpecies == "training dummy" ||
-        roll > 13 ||
+        roll > 10 ||
         !dungeonStore.inCombat
       ) {
         vibration({ style: "light" });
         setFleeRollFailure(false);
-        setFleeModalShowing(false);
-        rootStore.leaveDungeon();
+        dungeonStore.setFleeModalShowing(false);
         wait(500).then(() => {
           if (dungeonStore.currentInstance?.name == "Activities") {
             router.replace("/shops");
@@ -54,6 +46,8 @@ export default function FleeModal({
           if (dungeonStore.currentInstance?.name == "Activities") {
             router.push("/Activities");
           }
+
+          rootStore.leaveDungeon();
           savePlayer(playerState);
         });
       } else {
@@ -71,9 +65,9 @@ export default function FleeModal({
   if (playerState) {
     return (
       <GenericModal
-        isVisibleCondition={fleeModalShowing}
+        isVisibleCondition={dungeonStore.fleeModalShowing}
         backFunction={() => {
-          setFleeModalShowing(false);
+          dungeonStore.setFleeModalShowing(false);
           setFleeRollFailure(false);
         }}
       >
@@ -87,15 +81,18 @@ export default function FleeModal({
             <Text style={{ color: "#ef4444" }}>You are stunned!</Text>
           ) : null}
           <ThemedView className="flex w-full flex-row justify-evenly pt-8">
-            <FleeButton
-              enemyStore={enemyStore}
-              playerState={playerState}
-              inCombat={dungeonStore.inCombat}
-              flee={flee}
-            />
+            <GenericFlatButton
+              onPress={flee}
+              disabled={
+                dungeonStore.inCombat &&
+                (enemyStore.attackAnimationsOnGoing || playerState.isStunned)
+              }
+            >
+              {enemyStore.enemies.length > 0 ? "Run! (50%)" : "Leave"}
+            </GenericFlatButton>
             <GenericFlatButton
               onPress={() => {
-                setFleeModalShowing(false);
+                dungeonStore.setFleeModalShowing(false);
                 setFleeRollFailure(false);
               }}
             >
@@ -111,30 +108,6 @@ export default function FleeModal({
       </GenericModal>
     );
   }
-}
+});
 
-const FleeButton = observer(
-  ({
-    enemyStore,
-    playerState,
-    inCombat,
-    flee,
-  }: {
-    enemyStore: EnemyStore;
-    playerState: PlayerCharacter;
-    inCombat: boolean;
-    flee: () => void;
-  }) => {
-    return (
-      <GenericFlatButton
-        onPress={flee}
-        disabled={
-          inCombat &&
-          (enemyStore.attackAnimationsOnGoing || playerState.isStunned)
-        }
-      >
-        {enemyStore.enemies.length > 0 ? "Run! (50%)" : "Leave"}
-      </GenericFlatButton>
-    );
-  },
-);
+export default FleeModal;

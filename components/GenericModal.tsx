@@ -42,7 +42,7 @@ export default function GenericModal({
   style,
   noPad,
 }: GenericModalProps) {
-  const height = Dimensions.get("window").height;
+  const height = Dimensions.get("screen").height;
   const { colorScheme } = useColorScheme();
   const root = useRootStore();
   const { uiStore } = root;
@@ -76,6 +76,7 @@ export default function GenericModal({
       onBackdropPress={backdropCloses ? backFunction : undefined}
       onBackButtonPress={backFunction}
       statusBarTranslucent={true}
+      coverScreen={true}
       deviceHeight={height}
       style={style}
     >

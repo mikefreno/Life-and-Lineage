@@ -37,7 +37,7 @@ import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 
 const PLAYERSTATUS_SPACER = 64;
-const TABSELECTOR_HEIGHT = 48;
+const TABSELECTOR_HEIGHT = 52;
 
 export default function TabLayout() {
   const isFocused = useIsFocused();
@@ -72,8 +72,7 @@ export default function TabLayout() {
           tabBarActiveTintColor: Colors[colorScheme].tint,
           tabBarLabelStyle: {
             fontFamily: "PixelifySans",
-            marginLeft: "auto",
-            marginRight: "auto",
+            marginHorizontal: "auto",
             marginTop: 4,
           },
           tabBarStyle: {
@@ -84,16 +83,13 @@ export default function TabLayout() {
             height: PLAYERSTATUS_SPACER + TABSELECTOR_HEIGHT,
           },
           tabBarIconStyle: {
-            marginLeft: "auto",
-            marginRight: "auto",
+            marginHorizontal: "auto",
           },
           tabBarButton: (props) => {
             const onPressWithVibration = (event: GestureResponderEvent) => {
               vibration({ style: "light" });
               if (props.onPress) props.onPress(event);
             };
-            const isHome = props.accessibilityLabel?.includes("Home");
-            const isMedical = props.accessibilityLabel?.includes("Medical");
             return (
               <View>
                 <Pressable
@@ -106,10 +102,6 @@ export default function TabLayout() {
                       height: uiStore.playerStatusIsCompact
                         ? TABSELECTOR_HEIGHT
                         : TABSELECTOR_HEIGHT + EXPANDED_PAD,
-                      borderTopLeftRadius: isHome ? 12 : 0,
-                      borderBottomLeftRadius: isHome ? 12 : 0,
-                      borderBottomRightRadius: isMedical ? 12 : 0,
-                      borderTopRightRadius: isMedical ? 12 : 0,
                       marginTop: uiStore.playerStatusIsCompact
                         ? 0
                         : -EXPANDED_PAD,
@@ -154,19 +146,13 @@ export default function TabLayout() {
             title: "Home",
             tabBarIcon: ({ color }) =>
               playerState?.playerClass == "necromancer" ? (
-                <NecromancerSkull
-                  width={28}
-                  height={26}
-                  color={color}
-                  style={{ marginBottom: -3 }}
-                />
+                <NecromancerSkull width={28} height={26} color={color} />
               ) : playerState?.playerClass == "paladin" ? (
                 <PaladinHammer
                   width={28}
                   height={26}
                   color={color}
                   useOpacity={true}
-                  style={{ marginBottom: -3 }}
                 />
               ) : playerState?.playerClass == "ranger" ? (
                 <RangerIcon
@@ -174,15 +160,9 @@ export default function TabLayout() {
                   height={26}
                   color={color}
                   useOpacity={true}
-                  style={{ marginBottom: -3 }}
                 />
               ) : (
-                <WizardHat
-                  width={28}
-                  height={26}
-                  color={color}
-                  style={{ marginBottom: -3 }}
-                />
+                <WizardHat width={28} height={26} color={color} />
               ),
             headerLeft: () => (
               <Link href="/Options" asChild>
@@ -234,12 +214,7 @@ export default function TabLayout() {
                   ),
             title: "Spells",
             tabBarIcon: ({ color }) => (
-              <Wand
-                width={26}
-                height={26}
-                color={color}
-                style={{ marginBottom: -3 }}
-              />
+              <Wand width={26} height={26} color={color} />
             ),
             headerRight: () => (
               <Link href="/Study" asChild>
@@ -284,12 +259,7 @@ export default function TabLayout() {
                   ),
             title: "Labor",
             tabBarIcon: ({ color }) => (
-              <Broom
-                width={30}
-                height={26}
-                color={color}
-                style={{ marginBottom: -3 }}
-              />
+              <Broom width={30} height={26} color={color} />
             ),
             headerLeft: () => (
               <Link href="/Education" asChild>
@@ -353,12 +323,7 @@ export default function TabLayout() {
                   ),
             title: "Dungeon",
             tabBarIcon: ({ color }) => (
-              <Dungeon
-                width={28}
-                height={28}
-                color={color}
-                style={{ marginBottom: -3 }}
-              />
+              <Dungeon width={28} height={28} color={color} />
             ),
             headerRight: () => (
               <Link href="/DungeonLevel/training grounds/0" asChild>
@@ -396,12 +361,7 @@ export default function TabLayout() {
                   ),
             title: "Shops",
             tabBarIcon: ({ color }) => (
-              <Potion
-                width={28}
-                height={30}
-                color={color}
-                style={{ marginBottom: -3 }}
-              />
+              <Potion width={28} height={30} color={color} />
             ),
             headerRight: () => (
               <Link href="/Activities" asChild>
@@ -439,12 +399,7 @@ export default function TabLayout() {
                   ),
             title: "Medical",
             tabBarIcon: ({ color }) => (
-              <Medical
-                width={30}
-                height={28}
-                color={color}
-                style={{ marginBottom: -3 }}
-              />
+              <Medical width={30} height={28} color={color} />
             ),
           }}
         />

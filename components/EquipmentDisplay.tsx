@@ -223,7 +223,7 @@ export default function EquipmentDisplay({
       </View>
       <View
         className={`mx-auto items-center ${
-          uiStore.dimensions.window.width == uiStore.dimensions.window.greater
+          uiStore.dimensions.width == uiStore.dimensions.greater
             ? "-mt-20"
             : "-mt-8"
         }`}

@@ -73,18 +73,16 @@ const ShopsScreen = observer(() => {
               {shop.shopKeeper.fullName}
             </Text>
             <Link
-              className="mt-2"
+              className="mt-2 active:scale-95 active:opacity-50"
               href={`/Shops/${shop.archetype}`}
               onPressIn={() => vibration({ style: "light" })}
+              suppressHighlighting
+              style={{}}
             >
               <View
                 className="px-8 py-3 rounded-lg"
                 style={{
                   shadowColor: shopColors?.background,
-                  shadowOffset: {
-                    width: 2,
-                    height: 3,
-                  },
                   elevation: 2,
                   backgroundColor: shopColors?.background,
                   shadowOpacity: 0.2,

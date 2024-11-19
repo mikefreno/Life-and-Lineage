@@ -4,16 +4,15 @@ import TutorialModal from "../../components/TutorialModal";
 import { useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
 import { useIsFocused } from "@react-navigation/native";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useColorScheme } from "nativewind";
 import { Pressable, View } from "react-native";
 import { Text } from "../../components/Themed";
 import { playerClassColors } from "../../constants/Colors";
 import { toTitleCase } from "../../utility/functions/misc";
 import { FontAwesome5, Foundation } from "@expo/vector-icons";
-import GenericFlatButton from "../../components/GenericFlatButton";
 import { useNewGameStore } from "./_layout";
-import { TutorialStore } from "../../stores/TutorialStore";
+import GenericFlatLink from "../../components/GenericLink";
 
 export default function SetSex() {
   const [sex, setSex] = useState<"male" | "female">();
@@ -25,7 +24,6 @@ export default function SetSex() {
     return;
   }
 
-  let sexRef = useRef<"male" | "female">();
   const vibration = useVibration();
   const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
 
@@ -59,7 +57,7 @@ export default function SetSex() {
             className="w-1/3"
             onPress={() => {
               setSex("male");
-              sexRef.current = "male";
+              vibration({ style: "light" });
             }}
           >
             {({ pressed }) => (
@@ -85,7 +83,7 @@ export default function SetSex() {
             className="w-1/3"
             onPress={() => {
               setSex("female");
-              sexRef.current = "female";
+              vibration({ style: "light" });
             }}
           >
             {({ pressed }) => (
@@ -110,14 +108,9 @@ export default function SetSex() {
         </View>
         {sex ? (
           <View className="mx-auto mt-8">
-            <GenericFlatButton
-              onPress={() => {
-                vibration({ style: "light" });
-                router.push(`/NewGame/NameSelect`);
-              }}
-            >
-              Next
-            </GenericFlatButton>
+            <GenericFlatLink href="./NameSelect">
+              <Text>Next</Text>
+            </GenericFlatLink>
           </View>
         ) : null}
       </View>

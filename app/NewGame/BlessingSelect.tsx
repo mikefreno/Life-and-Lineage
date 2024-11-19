@@ -21,6 +21,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
+import GenericFlatLink from "../../components/GenericLink";
 
 export default function SetBlessing() {
   const { classSelection, blessingSelection, setBlessingSelection } =
@@ -55,7 +56,7 @@ export default function SetBlessing() {
           body: "Each of the blessings are for your class, you can learn from of these schools, but not from a school for a different class.",
         }}
       />
-      <View className="flex-1 pt-[8vh]">
+      <View className="flex-1 pt-8">
         <Text className="text-center text-2xl px-4">
           With What Blessing Was Your
           <Text
@@ -70,21 +71,16 @@ export default function SetBlessing() {
             blessing={blessingSelection}
             setBlessing={setBlessingSelection}
             colorScheme={colorScheme}
-            dimensions={dimensions.window}
+            dimensions={dimensions}
           />
           <Text className="text-center md:text-lg px-4">
             {DescriptionMap[blessingSelection as Element]}
           </Text>
           {blessingSelection == 0 || blessingSelection ? ( // sometimes I really hate ts. Evaluation of 0 is false.
             <View className="mx-auto h-32 py-2">
-              <GenericFlatButton
-                onPress={() => {
-                  vibration({ style: "light" });
-                  router.push(`/NewGame/SexSelect`);
-                }}
-              >
-                Next
-              </GenericFlatButton>
+              <GenericFlatLink href={"./SexSelect"}>
+                <Text>Next</Text>
+              </GenericFlatLink>
             </View>
           ) : (
             <View className="h-32"></View>

@@ -218,7 +218,7 @@ export default function InventoryRender({
       <View
         className="absolute items-center justify-center z-top"
         style={
-          uiStore.dimensions.window.width === uiStore.dimensions.window.greater
+          uiStore.dimensions.width === uiStore.dimensions.greater
             ? {
                 left: `${(index % 12) * 8.33 + 0.5}%`,
                 top: `${Math.floor(index / 12) * 48 + 8}%`,
@@ -252,8 +252,8 @@ export default function InventoryRender({
     ));
   }, [
     inventory,
-    uiStore.dimensions.window.width,
-    uiStore.dimensions.window.greater,
+    uiStore.dimensions.width,
+    uiStore.dimensions.greater,
     setDisplayItem,
     checkReleasePosition,
     displayItem,
@@ -287,14 +287,14 @@ export default function InventoryRender({
           {/* Regular Inventory Panel */}
           <View
             style={{
-              width: uiStore.dimensions.window.width,
+              width: uiStore.dimensions.width,
             }}
             ref={selfRef}
           >
             {!!keyItemInventory && (
               <View
                 style={{
-                  width: uiStore.dimensions.window.width,
+                  width: uiStore.dimensions.width,
                 }}
                 className="items-center absolute justify-center py-2 top-[40%]"
               >
@@ -311,8 +311,7 @@ export default function InventoryRender({
                 <View
                   className="absolute items-center justify-center"
                   style={
-                    uiStore.dimensions.window.width ===
-                    uiStore.dimensions.window.greater
+                    uiStore.dimensions.width === uiStore.dimensions.greater
                       ? {
                           left: `${(index % 12) * 8.33 + 0.5}%`,
                           top: `${
@@ -344,10 +343,10 @@ export default function InventoryRender({
           </View>
           {/* Key Item Inventory Panel */}
           {keyItemInventory && (
-            <View style={{ width: uiStore.dimensions.window.width }}>
+            <View style={{ width: uiStore.dimensions.width }}>
               <View
                 style={{
-                  width: uiStore.dimensions.window.width,
+                  width: uiStore.dimensions.width,
                 }}
                 className="items-center absolute justify-center py-2 top-[40%]"
               >
@@ -359,8 +358,7 @@ export default function InventoryRender({
                 onPress={() => setDisplayItem(null)}
                 className={`${
                   "headTarget" in props
-                    ? uiStore.dimensions.window.greater ==
-                      uiStore.dimensions.window.height
+                    ? uiStore.dimensions.greater == uiStore.dimensions.height
                       ? "h-[100%] mx-2"
                       : "mx-2 h-[50%]"
                     : "shop" in props
@@ -372,8 +370,7 @@ export default function InventoryRender({
                   <View
                     className="absolute items-center justify-center"
                     style={
-                      uiStore.dimensions.window.width ===
-                      uiStore.dimensions.window.greater
+                      uiStore.dimensions.width === uiStore.dimensions.greater
                         ? {
                             left: `${(index % 12) * 8.33 + 0.5}%`,
                             top: `${
@@ -404,8 +401,7 @@ export default function InventoryRender({
                   <View
                     className="absolute items-center justify-center"
                     style={
-                      uiStore.dimensions.window.width ===
-                      uiStore.dimensions.window.greater
+                      uiStore.dimensions.width === uiStore.dimensions.greater
                         ? {
                             left: `${(index % 12) * 8.33 + 0.5}%`,
                             top: `${

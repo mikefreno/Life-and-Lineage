@@ -9,7 +9,7 @@ export default function InAppPurchasePage() {
   return (
     <View
       className="flex-1 items-start mt-16"
-      style={{ paddingHorizontal: uiStore.dimensions.window.width * 0.1 }}
+      style={{ paddingHorizontal: uiStore.dimensions.width * 0.1 }}
     >
       <GenericAnimatedPressable>
         <Text className="text-lg text-center">

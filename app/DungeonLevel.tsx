@@ -1,15 +1,12 @@
 import { ThemedView, Text } from "../components/Themed";
-import { View, Platform } from "react-native";
+import { View } from "react-native";
 import { useRef, useEffect, useState } from "react";
 import { Pressable } from "react-native";
-import { Stack } from "expo-router";
 import BattleTab from "../components/DungeonComponents/BattleTab";
 import { toTitleCase } from "../utility/functions/misc";
 import PlayerStatus from "../components/PlayerStatus";
 import ProgressBar from "../components/ProgressBar";
 import { observer } from "mobx-react-lite";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useColorScheme } from "nativewind";
 import TutorialModal from "../components/TutorialModal";
 import GenericModal from "../components/GenericModal";
 import BattleTabControls from "../components/DungeonComponents/BattleTabControls";
@@ -33,9 +30,8 @@ import { usePouch } from "../hooks/generic";
 import D20DieAnimation from "../components/DieRollAnim";
 
 const DungeonLevelScreen = observer(() => {
-  const { colorScheme } = useColorScheme();
   const { enemyStore, dungeonStore } = useRootStore();
-  const { currentLevel, currentInstance, inCombat } = dungeonStore;
+  const { currentLevel, inCombat } = dungeonStore;
   const playerState = usePlayerStore();
 
   const { setInventoryFullNotifier, displayItem, setDisplayItem } =
@@ -50,8 +46,6 @@ const DungeonLevelScreen = observer(() => {
     useState<boolean>(false);
   const isFocused = useIsFocused();
 
-  const [fleeModalShowing, setFleeModalShowing] = useState<boolean>(false);
-
   const pouchRef = useRef<View>(null);
 
   useEffect(() => {
@@ -61,33 +55,6 @@ const DungeonLevelScreen = observer(() => {
   if (currentLevel) {
     return (
       <>
-        <Stack.Screen
-          options={{
-            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 20 },
-            headerLeft: () => (
-              <Pressable
-                onPress={() => {
-                  setFleeModalShowing(true);
-                }}
-              >
-                {({ pressed }) => (
-                  <MaterialCommunityIcons
-                    name="run-fast"
-                    size={28}
-                    color={colorScheme == "light" ? "#18181b" : "#fafafa"}
-                    style={{
-                      opacity: pressed ? 0.5 : 1,
-                      marginRight: Platform.OS == "android" ? 8 : 0,
-                    }}
-                  />
-                )}
-              </Pressable>
-            ),
-            title: `${toTitleCase(currentInstance?.name as string)} Level ${
-              currentLevel.level
-            }`,
-          }}
-        />
         <TutorialModal
           tutorial={TutorialOption.dungeonInterior}
           isFocused={isFocused}
@@ -104,10 +71,7 @@ const DungeonLevelScreen = observer(() => {
             body: "And remember fleeing (top left) can save you.",
           }}
         />
-        <FleeModal
-          fleeModalShowing={fleeModalShowing}
-          setFleeModalShowing={setFleeModalShowing}
-        />
+        <FleeModal />
         <DroppedItemsModal />
         <LeftBehindItemsModal
           showLeftBehindItemsScreen={showLeftBehindItemsScreen}

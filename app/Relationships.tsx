@@ -70,7 +70,7 @@ const RelationshipsScreen = observer(() => {
       <Pressable
         className="flex items-center"
         style={{
-          width: uiStore.dimensions.window.lesser * 0.35,
+          width: uiStore.dimensions.lesser * 0.35,
           opacity: character.deathdate ? 0.5 : 1,
         }}
         key={character.id}
@@ -187,7 +187,7 @@ const RelationshipsScreen = observer(() => {
           backFunction={() => setShowingAdoptionModal(false)}
           size={100}
         >
-          <View style={{ maxHeight: uiStore.dimensions.window.height * 0.75 }}>
+          <View style={{ maxHeight: uiStore.dimensions.height * 0.75 }}>
             <Text className="text-center text-2xl tracking-wider py-2">
               {partnerName
                 ? `Adopting with ${partnerName}`

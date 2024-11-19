@@ -68,8 +68,8 @@ export function StatsDisplay({
   const { playerState, enemyStore, uiStore } = useRootStore();
   const { dimensions, itemBlockSize } = uiStore;
 
-  const [viewWidth, setViewWidth] = useState(dimensions.window.width * 0.4);
-  const [viewHeight, setViewHeight] = useState(dimensions.window.height * 0.2);
+  const [viewWidth, setViewWidth] = useState(dimensions.width * 0.4);
+  const [viewHeight, setViewHeight] = useState(dimensions.height * 0.2);
   const [showingAttacks, setShowingAttacks] = useState<boolean>(false);
   const [firstItem, setFirstItem] = useState<Item>(displayItem.item[0]);
   const [renderStory, setRenderStory] = useState<string | null>(null);
@@ -679,20 +679,19 @@ export function StatsDisplay({
                   topGuard &&
                   displayItem.position.top + (topOffset ?? 0) < topGuard
                     ? topGuard
-                    : viewHeight + displayItem.position.top <
-                      dimensions.window.height
+                    : viewHeight + displayItem.position.top < dimensions.height
                     ? displayItem.position.top + (topOffset ?? 0)
-                    : dimensions.window.height - (viewHeight + 20),
+                    : dimensions.height - (viewHeight + 20),
               }
             : {
-                width: dimensions.window.width * 0.4,
+                width: dimensions.width * 0.4,
                 backgroundColor:
                   colorScheme == "light"
                     ? "rgba(250, 250, 250, 0.98)"
                     : "rgba(20, 20, 20, 0.95)",
                 left:
                   displayItem.position.left + itemBlockSize <
-                  dimensions.window.width * 0.6
+                  dimensions.width * 0.6
                     ? displayItem.position.left + itemBlockSize
                     : displayItem.position.left - viewWidth - 4,
                 top:
@@ -700,9 +699,9 @@ export function StatsDisplay({
                   displayItem.position.top + (topOffset ?? 0) < topGuard
                     ? topGuard
                     : viewHeight + displayItem.position.top <
-                      dimensions.window.height - tabBarHeight
+                      dimensions.height - tabBarHeight
                     ? displayItem.position.top + (topOffset ?? 0)
-                    : dimensions.window.height - (viewHeight + tabBarHeight),
+                    : dimensions.height - (viewHeight + tabBarHeight),
               }
         }
       >

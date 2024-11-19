@@ -33,6 +33,7 @@ export class DungeonStore {
   inCombat: boolean = false;
   fightingBoss: boolean = false;
 
+  fleeModalShowing: boolean = false;
   logs: string[] = [];
 
   constructor({ root }: { root: RootStore }) {
@@ -79,6 +80,8 @@ export class DungeonStore {
       move: action,
       reversedLogs: computed,
       setInCombat: action,
+      fleeModalShowing: observable,
+      setFleeModalShowing: action,
       setInBossFight: action,
       hasPersistedState: computed,
       clearDungeonState: action,
@@ -192,6 +195,10 @@ export class DungeonStore {
 
   setInCombat(state: boolean) {
     this.inCombat = state;
+  }
+
+  setFleeModalShowing(state: boolean) {
+    this.fleeModalShowing = state;
   }
 
   public move(direction: "up" | "down" | "left" | "right") {

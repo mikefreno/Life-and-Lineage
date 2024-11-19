@@ -30,7 +30,7 @@ import { EXPANDED_PAD } from "../../components/PlayerStatus";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
-  const { playerState, uiStore, constructed } = useRootStore();
+  const { playerState, uiStore } = useRootStore();
   const { dimensions, playerStatusIsCompact } = uiStore;
   const { setIconString } = useDraggableStore();
 
@@ -51,8 +51,7 @@ const HomeScreen = observer(() => {
   const clearDisplayItem = useCallback(() => setDisplayItem(null), []);
 
   const playerIcon = useMemo(() => {
-    const iconSize =
-      dimensions.window.height / 9 > 100 ? 100 : dimensions.window.height / 10;
+    const iconSize = dimensions.height / 9 > 100 ? 100 : dimensions.height / 10;
     switch (playerState?.playerClass) {
       case "necromancer":
         return (
@@ -75,7 +74,7 @@ const HomeScreen = observer(() => {
       default:
         return <RangerIcon width={iconSize} height={iconSize} />;
     }
-  }, [playerState?.playerClass, dimensions.window.height, colorScheme]);
+  }, [playerState?.playerClass, dimensions.height, colorScheme]);
 
   const playerStats = useMemo(() => {
     if (!playerState) return null;
@@ -137,9 +136,7 @@ const HomeScreen = observer(() => {
                   blessing={playerState.blessing}
                   colorScheme={colorScheme}
                   size={
-                    dimensions.window.height / 9 > 100
-                      ? 100
-                      : dimensions.window.height / 10
+                    dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
                   }
                 />
               </View>

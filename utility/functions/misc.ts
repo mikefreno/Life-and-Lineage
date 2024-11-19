@@ -18,6 +18,7 @@ import shields from "../../assets/json/items/shields.json";
 import staves from "../../assets/json/items/staves.json";
 import melee from "../../assets/json/items/melee.json";
 import wands from "../../assets/json/items/wands.json";
+import storyItems from "../../assets/json/items/storyItems.json";
 import names from "../../assets/json/names.json";
 import { ItemClassType, PlayerClassOptions, TutorialOption } from "../types";
 import { CommonActions, NavigationProp } from "@react-navigation/native";
@@ -124,6 +125,7 @@ export function getItemJSONMap(
     shield: shields,
     wand: wands,
     melee: melee,
+    storyItem: storyItems,
   };
 }
 
@@ -227,36 +229,10 @@ export function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function updateStoredTutorialState(state: boolean) {
-  storage.set("tutorialsEnabled", JSON.stringify(state));
-}
-export function loadStoredTutorialState(): boolean {
-  return JSON.parse(storage.getString("tutorialsEnabled") ?? "true");
-}
-export function getLocalTutorialState(tutorial: TutorialOption) {
-  return JSON.parse(storage.getString(tutorial.toString()) ?? "false");
-}
-export function setLocalTutorialState(
-  tutorial: TutorialOption,
-  state: boolean,
-) {
-  storage.set(tutorial.toString(), JSON.stringify(state));
-}
-
 export function flipCoin() {
   return Math.random() < 0.5 ? "Heads" : "Tails";
 }
 
 export function rollD20() {
   return Math.floor(Math.random() * 20) + 1;
-}
-
-export default function clearHistory(
-  navigation: NavigationProp<ReactNavigation.RootParamList>,
-) {
-  navigation.dispatch(
-    CommonActions.reset({
-      routes: [{ key: "(tabs)", name: "(tabs)" }],
-    }),
-  );
 }

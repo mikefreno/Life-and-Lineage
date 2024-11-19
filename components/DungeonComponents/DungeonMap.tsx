@@ -302,7 +302,7 @@ export const DungeonMapControls = observer(() => {
     <PlatformDependantBlurView className="flex-1 flex items-center w-full justify-center">
       <View
         className="w-2/3 mx-auto"
-        style={{ marginTop: -uiStore.dimensions.window.height / 20 }}
+        style={{ marginTop: -uiStore.dimensions.height / 20 }}
       >
         <ArrowButton direction="up" />
         <View className="flex-row justify-between w-full">
