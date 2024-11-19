@@ -280,7 +280,7 @@ function getRandomInt(min: number, max: number): number {
 export function generateShopKeeper(archetype: string, root: RootStore) {
   const sex = rollD20() <= 12 ? "male" : "female";
   const name = getRandomName(sex);
-  const birthdate = root.gameState?.timeStore.generateBirthDateInRange(25, 70);
+  const birthdate = root.time.generateBirthDateInRange(25, 70);
   const job = toTitleCase(archetype);
 
   const newChar = new Character({

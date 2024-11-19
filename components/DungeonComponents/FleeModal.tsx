@@ -5,7 +5,7 @@ import { rollD20, wait } from "../../utility/functions/misc";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { useVibration } from "../../hooks/generic";
-import { useGameStore, usePlayerStore, useRootStore } from "../../hooks/stores";
+import { usePlayerStore, useRootStore } from "../../hooks/stores";
 import { useCombatActions, useEnemyManagement } from "../../hooks/combat";
 import { PlayerCharacter, savePlayer } from "../../entities/character";
 import { observer } from "mobx-react-lite";
@@ -22,7 +22,6 @@ export default function FleeModal({
   const rootStore = useRootStore();
   const { enemyStore, dungeonStore } = rootStore;
   const playerState = usePlayerStore();
-  const gameState = useGameStore();
   const { playerMinionsTurn } = useCombatActions();
   const { enemyTurn } = useEnemyManagement();
 
@@ -33,7 +32,7 @@ export default function FleeModal({
   }, [fleeModalShowing]);
 
   const flee = () => {
-    if (playerState && gameState) {
+    if (playerState) {
       enemyStore.setAttackAnimationOngoing(true);
       const roll = rollD20();
       if (

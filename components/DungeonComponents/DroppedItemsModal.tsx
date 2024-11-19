@@ -5,7 +5,7 @@ import { Pressable, View, Image } from "react-native";
 import { toTitleCase, wait } from "../../utility/functions/misc";
 import { Coins } from "../../assets/icons/SVGIcons";
 import GenericFlatButton from "../GenericFlatButton";
-import { useLootState } from "../../stores/DungeonData";
+import { useLootState } from "../../providers/DungeonData";
 import type { Item } from "../../entities/item";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";

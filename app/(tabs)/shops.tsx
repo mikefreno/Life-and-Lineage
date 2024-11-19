@@ -18,7 +18,7 @@ import { EXPANDED_PAD } from "../../components/PlayerStatus";
 
 const ShopsScreen = observer(() => {
   const vibration = useVibration();
-  const { shopsStore, gameState, uiStore } = useRootStore();
+  const { shopsStore, uiStore } = useRootStore();
   const [isReady, setIsReady] = useState(false);
 
   const runDeathChecks = () => {
@@ -31,122 +31,119 @@ const ShopsScreen = observer(() => {
       setIsReady(true);
     }
   }, []);
+
   const headerHeight = useHeaderHeight();
   const bottomHeight = useBottomTabBarHeight();
 
-  if (gameState) {
-    const renderItem = (shop: Shop) => {
-      const shopColors = shopObjects.find(
-        (shopObj) => shopObj.type == shop.archetype,
-      )?.colors;
-      return (
-        <View className="h-96 w-1/2" key={shop.shopKeeper.id}>
-          <View
-            className={`m-2 flex-1 items-center justify-between rounded-xl border p-4 android:elevation-4 shadow-[${shopColors?.background}]/50`}
+  const renderItem = (shop: Shop) => {
+    const shopColors = shopObjects.find(
+      (shopObj) => shopObj.type == shop.archetype,
+    )?.colors;
+    return (
+      <View className="h-96 w-1/2" key={shop.shopKeeper.id}>
+        <View
+          className={`m-2 flex-1 items-center justify-between rounded-xl border p-4 android:elevation-4 shadow-[${shopColors?.background}]/50`}
+          style={{
+            backgroundColor: shopColors?.lightbackground,
+            borderColor: shopColors?.background,
+            elevation: 4,
+          }}
+        >
+          <Text
+            className="text-center text-2xl"
             style={{
-              backgroundColor: shopColors?.lightbackground,
-              borderColor: shopColors?.background,
-              elevation: 4,
+              color: shopObjects.find(
+                (shopObj) => shopObj.type == shop.archetype,
+              )?.colors.font,
             }}
           >
+            The {toTitleCase(shop.archetype)}
+          </Text>
+          <View className="items-center">
+            <CharacterImage
+              characterAge={shop.shopKeeper.age ?? 0}
+              characterSex={shop.shopKeeper.sex == "male" ? "M" : "F"}
+            />
             <Text
-              className="text-center text-2xl"
+              className="text-center"
               style={{
-                color: shopObjects.find(
-                  (shopObj) => shopObj.type == shop.archetype,
-                )?.colors.font,
+                color: shopColors?.font,
               }}
             >
-              The {toTitleCase(shop.archetype)}
+              {shop.shopKeeper.fullName}
             </Text>
-            <View className="items-center">
-              <CharacterImage
-                characterAge={shop.shopKeeper.age ?? 0}
-                characterSex={shop.shopKeeper.sex == "male" ? "M" : "F"}
-              />
-              <Text
-                className="text-center"
+            <Link
+              className="mt-2"
+              href={`/Shops/${shop.archetype}`}
+              onPressIn={() => vibration({ style: "light" })}
+            >
+              <View
+                className="px-8 py-3 rounded-lg"
                 style={{
-                  color: shopColors?.font,
+                  shadowColor: shopColors?.background,
+                  shadowOffset: {
+                    width: 2,
+                    height: 3,
+                  },
+                  elevation: 2,
+                  backgroundColor: shopColors?.background,
+                  shadowOpacity: 0.2,
+                  shadowRadius: 5,
                 }}
               >
-                {shop.shopKeeper.fullName}
-              </Text>
-              <Link
-                className="mt-2"
-                href={`/Shops/${shop.archetype}`}
-                onPressIn={() => vibration({ style: "light" })}
-              >
-                <View
-                  className="px-8 py-3 rounded-lg"
+                <Text
+                  className="text-lg"
                   style={{
-                    shadowColor: shopColors?.background,
-                    shadowOffset: {
-                      width: 2,
-                      height: 3,
-                    },
-                    elevation: 2,
-                    backgroundColor: shopColors?.background,
-                    shadowOpacity: 0.2,
-                    shadowRadius: 5,
+                    color: shopColors?.font,
                   }}
                 >
-                  <Text
-                    className="text-lg"
-                    style={{
-                      color: shopColors?.font,
-                    }}
-                  >
-                    Enter
-                  </Text>
-                </View>
-              </Link>
-            </View>
+                  Enter
+                </Text>
+              </View>
+            </Link>
           </View>
         </View>
-      );
-    };
-
-    return (
-      <>
-        <TutorialModal
-          tutorial={TutorialOption.shops}
-          isFocused={useIsFocused()}
-          pageOne={{
-            title: "Shop Tab",
-            body: "Each of these shops buy and sell various types of items.",
-          }}
-          pageTwo={{
-            title: "Stock Refresh Schedule",
-            body: "Each shop refreshes its stock and gold supply every real world hour.",
-          }}
-        />
-
-        {isReady ? (
-          <ScrollView
-            scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                flexWrap: "wrap",
-                alignItems: "flex-start",
-                justifyContent: "flex-start",
-                paddingBottom:
-                  bottomHeight +
-                  (uiStore.playerStatusIsCompact ? 0 : EXPANDED_PAD),
-                paddingTop: headerHeight,
-              }}
-            >
-              {shopsStore &&
-                [...shopsStore.shopsMap.values()].map((shop) =>
-                  renderItem(shop),
-                )}
-            </View>
-          </ScrollView>
-        ) : null}
-      </>
+      </View>
     );
-  }
+  };
+
+  return (
+    <>
+      <TutorialModal
+        tutorial={TutorialOption.shops}
+        isFocused={useIsFocused()}
+        pageOne={{
+          title: "Shop Tab",
+          body: "Each of these shops buy and sell various types of items.",
+        }}
+        pageTwo={{
+          title: "Stock Refresh Schedule",
+          body: "Each shop refreshes its stock and gold supply every real world hour.",
+        }}
+      />
+
+      {isReady ? (
+        <ScrollView
+          scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              alignItems: "flex-start",
+              justifyContent: "flex-start",
+              paddingBottom:
+                bottomHeight +
+                (uiStore.playerStatusIsCompact ? 0 : EXPANDED_PAD),
+              paddingTop: headerHeight,
+            }}
+          >
+            {shopsStore &&
+              [...shopsStore.shopsMap.values()].map((shop) => renderItem(shop))}
+          </View>
+        </ScrollView>
+      ) : null}
+    </>
+  );
 });
 export default ShopsScreen;

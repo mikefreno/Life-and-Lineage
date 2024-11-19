@@ -13,6 +13,7 @@ import { toTitleCase } from "../../utility/functions/misc";
 import { FontAwesome5, Foundation } from "@expo/vector-icons";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { useNewGameStore } from "./_layout";
+import { TutorialStore } from "../../stores/TutorialStore";
 
 export default function SetSex() {
   const [sex, setSex] = useState<"male" | "female">();
@@ -28,7 +29,7 @@ export default function SetSex() {
   const vibration = useVibration();
   const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
 
-  const { gameState } = useRootStore();
+  const { playerState, tutorialStore } = useRootStore();
   const isFocused = useIsFocused();
 
   return (
@@ -120,21 +121,20 @@ export default function SetSex() {
           </View>
         ) : null}
       </View>
-      {(gameState && gameState.tutorialsEnabled) ||
-        (!gameState && (
-          <View className="absolute ml-4 mt-4">
-            <Pressable
-              className="absolute"
-              onPress={() => setForceShowTutorial(true)}
-            >
-              <FontAwesome5
-                name="question-circle"
-                size={32}
-                color={colorScheme == "light" ? "#27272a" : "#fafafa"}
-              />
-            </Pressable>
-          </View>
-        ))}
+      {(tutorialStore.tutorialsEnabled || !playerState) && (
+        <View className="absolute ml-4 mt-4">
+          <Pressable
+            className="absolute"
+            onPress={() => setForceShowTutorial(true)}
+          >
+            <FontAwesome5
+              name="question-circle"
+              size={32}
+              color={colorScheme == "light" ? "#27272a" : "#fafafa"}
+            />
+          </Pressable>
+        </View>
+      )}
     </>
   );
 }

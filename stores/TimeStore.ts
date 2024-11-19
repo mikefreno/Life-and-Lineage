@@ -1,20 +1,15 @@
-import { action, computed, makeObservable, observable } from "mobx";
+import { action, computed, makeObservable, observable, reaction } from "mobx";
 import { RootStore } from "./RootStore";
+import { storage } from "../utility/functions/storage";
+import { parse, stringify } from "flatted";
 
 export class TimeStore {
   week: number;
   year: number;
   root: RootStore;
 
-  constructor({
-    week,
-    year,
-    root,
-  }: {
-    week: number;
-    year: number;
-    root: RootStore;
-  }) {
+  constructor({ root }: { root: RootStore }) {
+    const { week, year } = this.hydrate();
     this.week = week;
     this.year = year;
     this.root = root;
@@ -25,6 +20,12 @@ export class TimeStore {
       tick: action,
       currentDate: computed,
     });
+
+    reaction(
+      () => [this.week, this.year],
+      () =>
+        storage.set("time", stringify({ week: this.week, year: this.year })),
+    );
   }
 
   tick() {
@@ -57,21 +58,29 @@ export class TimeStore {
     return yearDiff;
   }
 
-  generateBirthDateForAge(age: number) {
-    const year = this.year - age;
+  generateBirthDateInRange(minAge: number, maxAge: number) {
+    const year =
+      this.year - maxAge + Math.floor(Math.random() * (maxAge - minAge));
     const week = Math.floor(Math.random() * 52);
 
     return { year, week };
   }
 
-  generateBirthDateInRange(minYear: number, maxYear: number) {
-    const year = minYear + Math.floor(Math.random() * (maxYear - minYear + 1));
+  generateBirthDateForAge(targetAge: number) {
+    const year = this.year - targetAge;
     const week = Math.floor(Math.random() * 52);
 
+    if (week > this.week) {
+      return { year: year - 1, week };
+    }
     return { year, week };
   }
 
-  static fromJSON(json: any): TimeStore {
-    return new TimeStore({ week: json.week, year: json.year, root: json.root });
+  hydrate() {
+    const timeStr = storage.getString("time");
+    if (!timeStr) {
+      return { week: 0, year: 1300 }; // new game time
+    }
+    return parse(timeStr) as { week: number; year: number };
   }
 }

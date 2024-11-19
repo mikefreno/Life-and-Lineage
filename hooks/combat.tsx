@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { AttackUse, TutorialOption } from "../utility/types";
 import { toTitleCase, wait } from "../utility/functions/misc";
-import { useLootState, useTutorialState } from "../stores/DungeonData";
+import { useLootState, useTutorialState } from "../providers/DungeonData";
 import { useRootStore } from "./stores";
 import { Enemy, Minion } from "../entities/creatures";
 import { PlayerCharacter } from "../entities/character";
@@ -11,14 +11,15 @@ import { useIsFocused } from "@react-navigation/native";
 import { Spell } from "../entities/spell";
 
 export const useEnemyManagement = () => {
-  const { enemyStore, playerState, gameState, dungeonStore } = useRootStore();
+  const root = useRootStore();
+  const { enemyStore, playerState, dungeonStore, tutorialStore } = root;
   const { setDroppedItems } = useLootState();
   const { setShouldShowFirstBossKillTutorialAfterItemDrops } =
     useTutorialState();
 
   const enemyDeathHandler = useCallback(
     (enemy: Enemy) => {
-      if (!playerState || !gameState) return false;
+      if (!playerState) return false;
 
       if (
         enemy.currentHealth <= 0 ||
@@ -53,11 +54,11 @@ export const useEnemyManagement = () => {
             dungeonStore.openNextDungeonLevel(dungeonStore.currentInstance);
             enemyStore.clearEnemyList();
             playerState.bossDefeated();
-            if (!gameState.tutorialsShown[TutorialOption.firstBossKill]) {
+            if (!tutorialStore.tutorialsShown[TutorialOption.firstBossKill]) {
               setShouldShowFirstBossKillTutorialAfterItemDrops(true);
             }
           }
-          gameState.gameTick();
+          root.gameTick();
         }
 
         return true;
@@ -66,7 +67,6 @@ export const useEnemyManagement = () => {
     },
     [
       playerState,
-      gameState,
       dungeonStore.fightingBoss,
       dungeonStore.currentInstance,
       dungeonStore.currentLevel,

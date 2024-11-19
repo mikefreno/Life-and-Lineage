@@ -16,7 +16,8 @@ import type { Investment } from "../entities/investment";
 
 const InvestmentCard = observer(
   ({ investment }: { investment: InvestmentType }) => {
-    const { playerState, gameState } = useRootStore();
+    const root = useRootStore();
+    const { playerState } = root;
 
     const { colorScheme } = useColorScheme();
 
@@ -57,9 +58,9 @@ const InvestmentCard = observer(
     }
 
     function collectOnInvestment() {
-      if (playerState && gameState) {
+      if (playerState) {
         playerState.collectFromInvestment(investment.name);
-        gameState.gameTick();
+        root.gameTick();
       }
     }
 

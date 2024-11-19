@@ -1,7 +1,7 @@
 import { Pressable, View, Image } from "react-native";
 import GenericModal from "../GenericModal";
 import { ThemedView, Text } from "../Themed";
-import { useLootState } from "../../stores/DungeonData";
+import { useLootState } from "../../providers/DungeonData";
 import type { Item } from "../../entities/item";
 import { useRootStore } from "../../hooks/stores";
 

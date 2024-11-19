@@ -81,7 +81,7 @@ export default function GiftModal({
               <View className="h-14 w-14 rounded-lg bg-zinc-200 dark:bg-zinc-700" />
             </View>
           ))}
-          {playerState!.inventory.slice(0, 24).map((item, index) => (
+          {playerState!.baseInventory.slice(0, 24).map((item, index) => (
             <View
               className="absolute items-center justify-center"
               style={{

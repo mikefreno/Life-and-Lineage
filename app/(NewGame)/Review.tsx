@@ -12,7 +12,6 @@ import clearHistory, {
   toTitleCase,
   wait,
 } from "../../utility/functions/misc";
-import { Game, saveGame } from "../../entities/game";
 import {
   getRandomJobTitle,
   getStartingBaseStats,
@@ -25,7 +24,6 @@ import GenericFlatButton from "../../components/GenericFlatButton";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
-import { TimeStore } from "../../stores/TimeStore";
 
 export default function NewGameReview() {
   const { firstName, lastName, blessingSelection, sex, classSelection } =
@@ -37,7 +35,7 @@ export default function NewGameReview() {
   const navigation = useNavigation();
   const { colorScheme } = useColorScheme();
 
-  function createParent(sex: "female" | "male", game: Game): Character {
+  function createParent(sex: "female" | "male"): Character {
     const firstName = getRandomName(sex).firstName;
     const job = getRandomJobTitle();
     const parent = new Character({
@@ -46,17 +44,17 @@ export default function NewGameReview() {
       sex: sex,
       job: job,
       affection: 85,
-      birthdate: game.timeStore.generateBirthDateInRange(32, 55),
+      birthdate: root.time.generateBirthDateInRange(32, 55),
       root,
     });
     return parent;
   }
 
-  function createPlayerCharacter(game: Game) {
-    const mom = createParent("female", game);
-    const dad = createParent("male", game);
+  function createPlayerCharacter() {
+    const mom = createParent("female");
+    const dad = createParent("male");
     let newCharacter: PlayerCharacter;
-    const bday = game.timeStore.generateBirthDateForAge(15);
+    const bday = root.time.generateBirthDateForAge(15);
     if (
       classSelection === "paladin" &&
       (blessingSelection == Element.vengeance ||
@@ -144,26 +142,15 @@ export default function NewGameReview() {
       if (tutorialState) {
         parsed = JSON.parse(tutorialState);
       }
-      const newGame = new Game({
-        timeStore: new TimeStore({ week: 0, year: 1300, root }),
-        tutorialsEnabled: root.gameState
-          ? root.gameState.tutorialsEnabled
-          : parsed,
-        tutorialsShown: root.gameState?.tutorialsShown,
-        root,
-      });
-      const player = createPlayerCharacter(newGame);
+
+      const player = createPlayerCharacter();
       const starterBook = getStartingBook(player);
       player.addToInventory(starterBook);
-      root.gameState = newGame;
       root.enemyStore.clearEnemyList();
       root.playerState = player;
-      if (!root.shopsStore) {
-        root.initShopsStore();
-      }
+
       vibration({ style: "success" });
       wait(250).then(() => clearHistory(navigation));
-      saveGame(newGame);
       savePlayer(player);
       storage.delete("tutorialsEnabled");
     }

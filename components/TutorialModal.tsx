@@ -4,12 +4,6 @@ import { Entypo } from "@expo/vector-icons";
 import { Text } from "./Themed";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
-import {
-  getLocalTutorialState,
-  loadStoredTutorialState,
-  setLocalTutorialState,
-  updateStoredTutorialState,
-} from "../utility/functions/misc";
 import { TutorialOption } from "../utility/types";
 import GenericModal from "./GenericModal";
 import { useVibration } from "../hooks/generic";
@@ -44,41 +38,28 @@ const TutorialModal = observer(
     override,
     clearOverride,
   }: ITutorialModal) => {
-    const { gameState } = useRootStore();
+    const { tutorialStore } = useRootStore();
     const { colorScheme } = useColorScheme();
     const vibration = useVibration();
 
     const [tutorialStep, setTutorialStep] = useState(1);
     const tutorialStepRef = useRef(1);
     const [tutorialState, setTutorialState] = useState(
-      gameState?.tutorialsEnabled ?? loadStoredTutorialState(),
+      tutorialStore.tutorialsEnabled,
     );
     const [shouldShow, setShouldShow] = useState(false);
 
     useEffect(() => {
-      setTutorialState(
-        gameState?.tutorialsEnabled ?? loadStoredTutorialState(),
+      setTutorialState(tutorialStore.tutorialsEnabled);
+      setShouldShow(
+        override ||
+          ((tutorialStore.tutorialsEnabled ||
+            tutorial === TutorialOption.firstBossKill) &&
+            !tutorialStore.tutorialsShown[tutorial]),
       );
-      if (isFocused && tutorial == TutorialOption.keyItem) {
-        if (
-          getLocalTutorialState(TutorialOption.intro) &&
-          !getLocalTutorialState(tutorial)
-        ) {
-          setShouldShow(true);
-        }
-      } else if (isFocused) {
-        setShouldShow(
-          override ||
-            (gameState
-              ? (gameState.tutorialsEnabled ||
-                  tutorial === TutorialOption.firstBossKill) &&
-                !gameState.tutorialsShown[tutorial]
-              : loadStoredTutorialState() && !getLocalTutorialState(tutorial)),
-        );
-      }
     }, [
-      gameState?.tutorialsEnabled,
-      gameState?.tutorialsShown[tutorial],
+      tutorialStore.tutorialsEnabled,
+      tutorialStore.tutorialsShown[tutorial],
       override,
       isFocused,
     ]);
@@ -99,15 +80,11 @@ const TutorialModal = observer(
       vibration({ style: "light" });
       onCloseFunction?.();
       clearOverride?.();
-      if (gameState) {
-        gameState.updateTutorialState(tutorial, true);
-        tutorialState
-          ? gameState.enableTutorials()
-          : gameState.disableTutorials();
-      } else {
-        setLocalTutorialState(tutorial, true);
-        updateStoredTutorialState(tutorialState);
-      }
+      tutorialStore.updateTutorialState(tutorial, true);
+      tutorialState
+        ? tutorialStore.enableTutorials()
+        : tutorialStore.disableTutorials();
+
       setShouldShow(false);
     };
 
@@ -157,11 +134,8 @@ const TutorialModal = observer(
         backFunction={() => {
           backFunction?.();
           clearOverride?.();
-          if (gameState) {
-            gameState.updateTutorialState(tutorial, true);
-          } else {
-            setLocalTutorialState(tutorial, true);
-          }
+          tutorialStore.updateTutorialState(tutorial, true);
+
           setShouldShow(false);
         }}
       >

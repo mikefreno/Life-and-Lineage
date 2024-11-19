@@ -18,7 +18,7 @@ import { DungeonMapControls } from "./DungeonMap";
 import PlatformDependantBlurView from "../PlatformDependantBlurView";
 import { Energy, Regen } from "../../assets/icons/SVGIcons";
 import { elementalColorMap } from "../../constants/Colors";
-import { useCombatState, useLootState } from "../../stores/DungeonData";
+import { useCombatState, useLootState } from "../../providers/DungeonData";
 import { Attack } from "../../entities/attack";
 import { Spell } from "../../entities/spell";
 import { useCombatActions } from "../../hooks/combat";
@@ -26,7 +26,6 @@ import { Item } from "../../entities/item";
 import { usePouch, useVibration } from "../../hooks/generic";
 import {
   useDraggableStore,
-  useGameStore,
   usePlayerStore,
   useRootStore,
 } from "../../hooks/stores";

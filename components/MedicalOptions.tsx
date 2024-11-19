@@ -28,7 +28,8 @@ const MedicalOption = observer(
     removeDebuffs,
     focused,
   }: MedicalOptionProps) => {
-    const { playerState, gameState } = useRootStore();
+    const root = useRootStore();
+    const { playerState } = root;
 
     const { start, stop } = useAcceleratedAction(
       () => null, // Return null to indicate unlimited mode
@@ -54,7 +55,7 @@ const MedicalOption = observer(
             ? playerState.conditions.length
             : removeDebuffs,
         );
-        gameState?.gameTick();
+        root.gameTick();
       }
     }
 

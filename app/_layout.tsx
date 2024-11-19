@@ -18,9 +18,9 @@ import { DarkTheme, LightTheme } from "../constants/Colors";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as Notifications from "expo-notifications";
 import { registerForPushNotificationsAsync } from "../utility/functions/notifications";
-import { AppProvider } from "../stores/AppData";
 import { useRootStore } from "../hooks/stores";
 import { ProjectedImage } from "../components/Draggable";
+import { AppProvider } from "../providers/AppData";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -64,7 +64,7 @@ const RootLayout = () => {
     CursiveBold: require("../assets/fonts/Tangerine-Bold.ttf"),
   });
   const rootStore = useRootStore();
-  const { playerState, gameState, uiStore, dungeonStore } = rootStore;
+  const { playerState, uiStore, dungeonStore } = rootStore;
 
   const { colorScheme, setColorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
@@ -128,7 +128,7 @@ const RootLayout = () => {
       if (!playerState) {
         router.replace("/ClassSelect");
       } else if (
-        gameState?.atDeathScreen ||
+        rootStore.atDeathScreen ||
         (playerState &&
           (playerState.currentHealth <= 0 || playerState.currentSanity <= -50))
       ) {
@@ -179,6 +179,7 @@ const RootLayout = () => {
             name="(NewGame)"
             options={{
               headerShown: false,
+              presentation: "card",
             }}
           />
           <Stack.Screen

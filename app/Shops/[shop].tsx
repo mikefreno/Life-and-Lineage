@@ -24,7 +24,6 @@ import { InventoryItem } from "../../components/Draggable";
 import { useDraggableStore, useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
 import type { Item } from "../../entities/item";
-import { saveGame } from "../../entities/game";
 
 const TEN_MINUTES = 10 * 60 * 1000;
 //const ONE_SECOND = 1000;
@@ -73,7 +72,7 @@ const GreetingComponent = ({
 
 const ShopInteriorScreen = observer(() => {
   let { shop } = useLocalSearchParams();
-  const { gameState, playerState, shopsStore, uiStore } = useRootStore();
+  const { playerState, shopsStore, uiStore } = useRootStore();
   const { setIconString } = useDraggableStore();
 
   const vibration = useVibration();
@@ -170,7 +169,6 @@ const ShopInteriorScreen = observer(() => {
         setDisplayItem(null);
       }
     }
-    saveGame(gameState);
   }
 
   const sellStack = (items: Item[]) => {
@@ -182,7 +180,6 @@ const ShopInteriorScreen = observer(() => {
         setDisplayItem(null);
       });
     }
-    saveGame(gameState);
   };
 
   const purchaseItem = (item: Item) => {
@@ -195,7 +192,6 @@ const ShopInteriorScreen = observer(() => {
       thisShop.sellItem(item, itemPrice);
       playerState.buyItem(item, itemPrice);
     }
-    saveGame(gameState);
   };
 
   const sellItem = (item: Item) => {
@@ -208,7 +204,6 @@ const ShopInteriorScreen = observer(() => {
       thisShop.buyItem(item, itemPrice);
       playerState.sellItem(item, itemPrice);
     }
-    saveGame(gameState);
   };
 
   const purchaseStack = (items: Item[]) => {
@@ -221,16 +216,9 @@ const ShopInteriorScreen = observer(() => {
         setDisplayItem(null);
       });
     }
-    saveGame(gameState);
   };
 
-  if (
-    initialized &&
-    thisShop &&
-    gameState &&
-    playerState &&
-    uiStore.itemBlockSize
-  ) {
+  if (initialized && thisShop && playerState && uiStore.itemBlockSize) {
     return (
       <>
         <TutorialModal

@@ -30,14 +30,14 @@ const healthWarningVals = [
 const healthWarningKeys = [0.5, 0.25, 0.2, 0.15, 0.1, 0];
 
 export default function GameSettings() {
-  const { gameState, uiStore } = useRootStore();
+  const { uiStore, tutorialStore } = useRootStore();
   const vibration = useVibration();
   const [tutorialState, setTutorialState] = useState<boolean>(
-    gameState?.tutorialsEnabled ?? true,
+    tutorialStore.tutorialsEnabled ?? true,
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedHealthWarning, setSelectedHealthWarning] = useState<string>(
-    gameState ? healthWarningOptions[uiStore.healthWarning ?? 0.2] : "25%",
+    healthWarningOptions[uiStore.healthWarning ?? 0.2],
   );
   const [showTutorialResetConfirm, setShowTutorialResetConfirm] =
     useState<boolean>(false);
@@ -49,12 +49,10 @@ export default function GameSettings() {
   };
 
   useEffect(() => {
-    if (gameState) {
-      if (tutorialState == false) {
-        gameState.disableTutorials();
-      } else {
-        gameState.enableTutorials();
-      }
+    if (tutorialState == false) {
+      tutorialStore.disableTutorials();
+    } else {
+      tutorialStore.enableTutorials();
     }
   }, [tutorialState]);
 
@@ -83,7 +81,7 @@ export default function GameSettings() {
                 onPress={() => {
                   vibration({ style: "warning" });
                   setLoading(true);
-                  gameState?.resetTutorialState(() => {
+                  tutorialStore.resetTutorialState(() => {
                     setShowTutorialResetConfirm(false);
                     setLoading(false);
                     Updates.reloadAsync();

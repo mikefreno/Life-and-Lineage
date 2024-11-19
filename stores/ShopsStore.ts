@@ -30,7 +30,9 @@ export class ShopStore {
     try {
       const map = new Map<string, Shop>();
       SHOP_ARCHETYPES.forEach((archetype) => {
-        const shopData = storage.getString(`shop_${archetype}`);
+        const shopData = storage.getString(
+          `shop_${archetype.replaceAll(" ", "_")}`,
+        );
         if (!shopData) {
           throw new Error(`Failed to load ${archetype}`);
         }

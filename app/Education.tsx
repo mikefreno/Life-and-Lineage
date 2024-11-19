@@ -11,8 +11,8 @@ import { useRootStore } from "../hooks/stores";
 const JobTraining = () => {
   const isFocused = useIsFocused();
   const header = useHeaderHeight();
-  const { gameState, playerState } = useRootStore();
-  if (!gameState || !playerState) {
+  const { playerState } = useRootStore();
+  if (!playerState) {
     return null;
   }
 
@@ -42,7 +42,6 @@ const JobTraining = () => {
                   goldCostPerTick={qual.goldCostPerTick}
                   preRequisites={qual.prerequisites}
                   playerState={playerState}
-                  gameState={gameState}
                 />
               );
             })}

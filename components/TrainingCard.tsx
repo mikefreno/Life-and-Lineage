@@ -9,7 +9,7 @@ import { Coins, Sanity } from "../assets/icons/SVGIcons";
 import { useAcceleratedAction } from "../hooks/generic";
 import { useMemo } from "react";
 import type { PlayerCharacter } from "../entities/character";
-import type { Game } from "../entities/game";
+import { useRootStore } from "../hooks/stores";
 
 interface TrainingCardProps {
   name: string;
@@ -18,7 +18,6 @@ interface TrainingCardProps {
   sanityCostPerTick: number;
   preRequisites: string[] | null;
   playerState: PlayerCharacter;
-  gameState: Game;
 }
 
 const CostDisplay = ({
@@ -55,98 +54,100 @@ const MissingPreReqs = ({ missing }: { missing: string[] }) => (
   </View>
 );
 
-const TrainingCard = ({
-  name,
-  ticks,
-  goldCostPerTick,
-  sanityCostPerTick,
-  preRequisites,
-  playerState,
-  gameState,
-}: TrainingCardProps) => {
-  const { colorScheme } = useColorScheme();
+const TrainingCard = observer(
+  ({
+    name,
+    ticks,
+    goldCostPerTick,
+    sanityCostPerTick,
+    preRequisites,
+    playerState,
+  }: TrainingCardProps) => {
+    const { colorScheme } = useColorScheme();
+    const root = useRootStore();
 
-  const cardStyle = useMemo(
-    () => ({
-      shadowColor: "#000",
-      shadowOffset: { width: 3, height: 1 },
-      elevation: 1,
-      backgroundColor: colorScheme === "light" ? "#fafafa" : "#27272a",
-      shadowOpacity: 0.2,
-      shadowRadius: 3,
-    }),
-    [colorScheme],
-  );
-
-  const progressQualification = () => {
-    playerState.incrementQualificationProgress(
-      name,
-      ticks,
-      sanityCostPerTick,
-      goldCostPerTick,
+    const cardStyle = useMemo(
+      () => ({
+        shadowColor: "#000",
+        shadowOffset: { width: 3, height: 1 },
+        elevation: 1,
+        backgroundColor: colorScheme === "light" ? "#fafafa" : "#27272a",
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+      }),
+      [colorScheme],
     );
-    gameState.gameTick();
-  };
 
-  const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
-    () => null,
-    {
-      minHoldTime: 350,
-      maxSpeed: 10,
-      accelerationCurve: AccelerationCurves.linear,
-      action: progressQualification,
-      minActionAmount: 1,
-      maxActionAmount: 50,
-      debounceTime: 50,
-    },
-  );
+    const progressQualification = () => {
+      playerState.incrementQualificationProgress(
+        name,
+        ticks,
+        sanityCostPerTick,
+        goldCostPerTick,
+      );
+      root.gameTick();
+    };
 
-  const isCompleted = playerState?.qualifications.includes(name);
-  const hasPreReqs = playerState.hasAllPreReqs(preRequisites);
-  const isDisabled = playerState.gold < goldCostPerTick || !hasPreReqs;
-  const progress = playerState?.getSpecifiedQualificationProgress(name) ?? 0;
+    const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
+      () => null,
+      {
+        minHoldTime: 350,
+        maxSpeed: 10,
+        accelerationCurve: AccelerationCurves.linear,
+        action: progressQualification,
+        minActionAmount: 1,
+        maxActionAmount: 50,
+        debounceTime: 50,
+      },
+    );
 
-  return (
-    <View className="m-2 rounded-xl" style={cardStyle}>
-      <View className="flex justify-between rounded-xl px-4 py-2 text-zinc-950 dark:border dark:border-zinc-500">
-        <View className="flex flex-row justify-between">
-          <Text className="bold my-auto w-2/3 text-xl dark:text-zinc-50">
-            {toTitleCase(name)}
-          </Text>
-          {!isCompleted && (
-            <CostDisplay
-              goldCost={goldCostPerTick}
-              sanityCost={sanityCostPerTick}
-            />
-          )}
-        </View>
+    const isCompleted = playerState?.qualifications.includes(name);
+    const hasPreReqs = playerState.hasAllPreReqs(preRequisites);
+    const isDisabled = playerState.gold < goldCostPerTick || !hasPreReqs;
+    const progress = playerState?.getSpecifiedQualificationProgress(name) ?? 0;
 
-        {!isCompleted ? (
-          <>
-            {hasPreReqs && (
-              <GenericRaisedButton
-                onPressIn={handlePressIn}
-                onPressOut={handlePressOut}
-                disabled={isDisabled}
-              >
-                {hasPreReqs ? "Study" : "Locked"}
-              </GenericRaisedButton>
-            )}
-
-            {hasPreReqs ? (
-              <ProgressBar value={progress} maxValue={ticks} />
-            ) : (
-              <MissingPreReqs
-                missing={playerState.missingPreReqs(preRequisites) ?? []}
+    return (
+      <View className="m-2 rounded-xl" style={cardStyle}>
+        <View className="flex justify-between rounded-xl px-4 py-2 text-zinc-950 dark:border dark:border-zinc-500">
+          <View className="flex flex-row justify-between">
+            <Text className="bold my-auto w-2/3 text-xl dark:text-zinc-50">
+              {toTitleCase(name)}
+            </Text>
+            {!isCompleted && (
+              <CostDisplay
+                goldCost={goldCostPerTick}
+                sanityCost={sanityCostPerTick}
               />
             )}
-          </>
-        ) : (
-          <Text>Completed!</Text>
-        )}
+          </View>
+
+          {!isCompleted ? (
+            <>
+              {hasPreReqs && (
+                <GenericRaisedButton
+                  onPressIn={handlePressIn}
+                  onPressOut={handlePressOut}
+                  disabled={isDisabled}
+                >
+                  {hasPreReqs ? "Study" : "Locked"}
+                </GenericRaisedButton>
+              )}
+
+              {hasPreReqs ? (
+                <ProgressBar value={progress} maxValue={ticks} />
+              ) : (
+                <MissingPreReqs
+                  missing={playerState.missingPreReqs(preRequisites) ?? []}
+                />
+              )}
+            </>
+          ) : (
+            <Text>Completed!</Text>
+          )}
+        </View>
       </View>
-    </View>
-  );
-};
+    );
+  },
+);
 
 export default TrainingCard;

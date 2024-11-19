@@ -24,7 +24,7 @@ import {
   DungeonProvider,
   useCombatState,
   useLootState,
-} from "../stores/DungeonData";
+} from "../providers/DungeonData";
 import DungeonEnemyDisplay from "../components/DungeonComponents/DungeonEnemyDisplay";
 import { DungeonMapRender } from "../components/DungeonComponents/DungeonMap";
 import { StatsDisplay } from "../components/StatsDisplay";

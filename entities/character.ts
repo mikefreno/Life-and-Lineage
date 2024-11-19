@@ -120,6 +120,25 @@ export class Character {
       setParents: action,
       age: computed,
     });
+
+    reaction(
+      () => [
+        this.lastName,
+        this.alive,
+        this.deathdate,
+        this.job,
+        this.affection,
+        this.qualifications,
+        this.dateCooldownStart,
+        this.pregnancyDueDate,
+        this.parents,
+      ],
+      () => {
+        if (this.root.characterStore) {
+          this.root.characterStore.saveCharacter(this);
+        }
+      },
+    );
   }
 
   /**
@@ -132,7 +151,7 @@ export class Character {
   }
 
   get age() {
-    return this.root.gameState?.timeStore.calculateAge({
+    return this.root.time.calculateAge({
       birthWeek: this.birthdate.week,
       birthYear: this.birthdate.year,
     });
@@ -167,12 +186,12 @@ export class Character {
    * @param date - The date string in ISO format.
    */
   public setDateCooldownStart(): void {
-    this.dateCooldownStart = this.root.gameState?.timeStore.currentDate;
+    this.dateCooldownStart = this.root.time.currentDate;
   }
 
   public kill() {
     this.alive = false;
-    this.deathdate = this.root.gameState?.timeStore.currentDate ?? null;
+    this.deathdate = this.root.time.currentDate ?? null;
   }
 
   /**
@@ -181,7 +200,7 @@ export class Character {
    */
   public deathRoll(): void {
     if (!(this instanceof PlayerCharacter)) {
-      const rollToLive = rollToLiveByAge(this.age);
+      const rollToLive = rollToLiveByAge(this.age ?? 0);
 
       const rollOne = rollD20();
       if (rollOne >= rollToLive) return;

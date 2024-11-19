@@ -65,7 +65,7 @@ export const useNewGameStore = () => {
 };
 
 export default function NewGameLayout() {
-  const { gameState } = useRootStore();
+  const { playerState } = useRootStore();
   return (
     <NewGameProvider>
       <Stack>
@@ -75,7 +75,7 @@ export default function NewGameLayout() {
             ...headerOptions({
               title: "Class Select",
             }),
-            headerLeft: !!gameState
+            headerLeft: !!playerState
               ? ({ tintColor }) => (
                   <Pressable
                     onPress={router.dismissAll}

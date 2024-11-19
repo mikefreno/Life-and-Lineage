@@ -23,7 +23,8 @@ import type { Item } from "../entities/item";
 import type { Spell } from "../entities/spell";
 
 export default function LearningKnowledgeScreen() {
-  const { playerState, gameState, uiStore } = useRootStore();
+  const root = useRootStore();
+  const { playerState, uiStore } = root;
 
   const books = playerState?.baseInventory.filter(
     (item) => item.itemClass == ItemClassType.Book,
@@ -64,10 +65,10 @@ export default function LearningKnowledgeScreen() {
     spellName: string,
     spellElement: Element,
   ) {
-    if (playerState && gameState && isFocused) {
+    if (playerState && isFocused) {
       playerState.learnSpellStep(bookName, spellName, spellElement);
       setSpellState(playerState.learningSpells);
-      gameState.gameTick();
+      root.gameTick();
     }
   }
 

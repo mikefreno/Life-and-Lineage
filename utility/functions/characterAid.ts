@@ -8,7 +8,7 @@ import type { RootStore } from "../../stores/RootStore";
 export function generateNewCharacter(root: RootStore) {
   const sex = flipCoin() == "Heads" ? "male" : "female";
   const name = getRandomName(sex);
-  const birthdate = root.gameState!.timeStore.generateBirthDateInRange(18, 65);
+  const birthdate = root.time.generateBirthDateInRange(18, 65);
   const job = getRandomJobTitle();
 
   const newChar = new Character({
@@ -24,7 +24,7 @@ export function generateNewCharacter(root: RootStore) {
 export function generateNewAdoptee(root: RootStore) {
   const sex = flipCoin() == "Heads" ? "male" : "female";
   const name = getRandomName(sex);
-  const birthdate = root.gameState!.timeStore.generateBirthDateInRange(1, 17);
+  const birthdate = root.time.generateBirthDateInRange(1, 17);
 
   const newChar = new Character({
     sex: sex,

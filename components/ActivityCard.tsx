@@ -29,7 +29,8 @@ interface ActivityCardProps {
 }
 
 const ActivityCard = observer(({ activity }: ActivityCardProps) => {
-  const { playerState, gameState, enemyStore } = useRootStore();
+  const root = useRootStore();
+  const { playerState, enemyStore } = root;
   const { colorScheme } = useColorScheme();
   const [metCharacter, setMetCharacter] = useState<Character | null>(null);
   const [nothingHappened, setNothingHappened] = useState<boolean>(false);
@@ -52,13 +53,13 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   }
 
   function visit() {
-    if (playerState && activity.alone && gameState) {
+    if (playerState && activity.alone) {
       let chosenOutcome = activityRoller(activity.alone);
       switch (chosenOutcome) {
         case "meetingSomeone":
           const flipRes = flipCoin();
           if (flipRes == "Heads" || playerState.knownCharacters.length == 0) {
-            const res = generateNewCharacter();
+            const res = generateNewCharacter(root);
             setMetCharacter(res);
           } else {
             let knownChar = playerState.getAdultCharacter();
@@ -67,7 +68,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           setGoodOutcome(null);
           setBadOutcome(null);
           setNothingHappened(false);
-          gameState.gameTick();
+          root.gameTick();
           return;
         case "randomGood":
           if (!activity.randomGood) {
@@ -85,7 +86,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           setMetCharacter(null);
           setBadOutcome(null);
           setNothingHappened(false);
-          gameState.gameTick();
+          root.gameTick();
           return setGoodOutcome(randomGoodOutcome);
         case "randomBad":
           if (!activity.randomBad) {
@@ -104,20 +105,20 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           setMetCharacter(null);
           setGoodOutcome(null);
           setNothingHappened(false);
-          gameState.gameTick();
+          root.gameTick();
           return setBadOutcome(randomBadOutcome);
         default:
           setMetCharacter(null);
           setBadOutcome(null);
           setNothingHappened(false);
-          gameState.gameTick();
+          root.gameTick();
           return setNothingHappened(true);
       }
     }
   }
 
   function date(character: Character) {
-    if (playerState && activity.date && gameState && character) {
+    if (playerState && activity.date && character) {
       let chosenOutcome = activityRoller({
         decreaseAffection: activity.date.decreaseAffection,
         increaseAffection: activity.date.increaseAffection,
@@ -178,56 +179,54 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   }
 
   function renderCharacter(character: Character) {
-    if (gameState) {
-      return (
-        <Pressable
-          key={character.id}
-          onPress={() => date(character)}
-          className="w-[48%]"
-        >
-          {({ pressed }) => (
-            <View
-              className={`${
-                pressed && "scale-95"
-              } my-2 flex w-full items-center rounded border border-zinc-400`}
-            >
-              <Text className="text-center text-2xl">{character.fullName}</Text>
-              <View className="mx-auto">
-                <CharacterImage
-                  characterAge={character.age}
-                  characterSex={character.sex == "male" ? "M" : "F"}
+    return (
+      <Pressable
+        key={character.id}
+        onPress={() => date(character)}
+        className="w-[48%]"
+      >
+        {({ pressed }) => (
+          <View
+            className={`${
+              pressed && "scale-95"
+            } my-2 flex w-full items-center rounded border border-zinc-400`}
+          >
+            <Text className="text-center text-2xl">{character.fullName}</Text>
+            <View className="mx-auto">
+              <CharacterImage
+                characterAge={character.age}
+                characterSex={character.sex == "male" ? "M" : "F"}
+              />
+            </View>
+            <Text className="text-xl">
+              {character.deathdate && "Died at "}
+              {character.age} Years Old
+            </Text>
+            <Text className="text-center text-xl">{character.fullName}</Text>
+            <View className="mx-auto">
+              <Text className="flex flex-wrap text-center text-lg">
+                {character.deathdate && "Was a "}
+                {character.job}
+              </Text>
+            </View>
+            <View className="flex w-2/3 flex-row justify-center">
+              <View className="w-3/4">
+                <ProgressBar
+                  value={Math.floor(character.affection * 4) / 4}
+                  minValue={-100}
+                  maxValue={100}
+                  filledColor="#dc2626"
+                  unfilledColor="#fca5a5"
                 />
               </View>
-              <Text className="text-xl">
-                {character.deathdate && "Died at "}
-                {character.age} Years Old
-              </Text>
-              <Text className="text-center text-xl">{character.fullName}</Text>
-              <View className="mx-auto">
-                <Text className="flex flex-wrap text-center text-lg">
-                  {character.deathdate && "Was a "}
-                  {character.job}
-                </Text>
-              </View>
-              <View className="flex w-2/3 flex-row justify-center">
-                <View className="w-3/4">
-                  <ProgressBar
-                    value={Math.floor(character.affection * 4) / 4}
-                    minValue={-100}
-                    maxValue={100}
-                    filledColor="#dc2626"
-                    unfilledColor="#fca5a5"
-                  />
-                </View>
-                <View className="my-auto ml-1">
-                  <AffectionIcon height={14} width={14} />
-                </View>
+              <View className="my-auto ml-1">
+                <AffectionIcon height={14} width={14} />
               </View>
             </View>
-          )}
-        </Pressable>
-      );
-    }
+          </View>
+        )}
+      </Pressable>
+    );
   }
 
   function goToFight() {
@@ -261,7 +260,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           <Text className="px-4 text-center text-2xl">
             Who would you like to {dateDestination} with?
           </Text>
-          {playerState && gameState && (
+          {playerState && (
             <ScrollView className="w-full">
               <View
                 style={{
@@ -433,7 +432,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                 Visit Alone
               </GenericRaisedButton>
             )}
-            {activity.date && gameState && (
+            {activity.date && (
               <GenericRaisedButton
                 disabled={playerState?.getAllAdultCharacters().length == 0}
                 onPress={() => dateSelect(activity.name)}

@@ -27,7 +27,7 @@ const SetClassScreen = observer(() => {
   const vibration = useVibration();
   const { classSelection, setClassSelection } = useNewGameStore();
 
-  const { gameState, uiStore } = useRootStore();
+  const { uiStore, playerState, tutorialStore } = useRootStore();
   const { colorScheme } = useColorScheme();
 
   const isFocused = useIsFocused();
@@ -38,7 +38,7 @@ const SetClassScreen = observer(() => {
 
   useLayoutEffect(() => {
     wait(200).then(() => {
-      setShowTutorialReset(!!gameState);
+      setShowTutorialReset(!!playerState);
     });
   }, []);
 
@@ -66,9 +66,9 @@ const SetClassScreen = observer(() => {
           <Pressable
             onPress={() => {
               setShowTutorialReset(false);
-              if (!!gameState) {
+              if (!!playerState) {
                 wait(750).then(() => {
-                  gameState.resetTutorialState(() =>
+                  tutorialStore.resetTutorialState(() =>
                     setForceShowTutorial(true),
                   );
                 });
@@ -251,7 +251,7 @@ const SetClassScreen = observer(() => {
           )}
         </View>
       </ScrollView>
-      {((gameState && gameState.tutorialsEnabled) || !gameState) && (
+      {(tutorialStore.tutorialsEnabled || !playerState) && (
         <View className="absolute ml-4 mt-4">
           <Pressable
             className="absolute z-top"

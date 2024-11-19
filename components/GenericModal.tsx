@@ -44,21 +44,15 @@ export default function GenericModal({
 }: GenericModalProps) {
   const height = Dimensions.get("window").height;
   const { colorScheme } = useColorScheme();
-  const { gameState, uiStore } = useRootStore();
+  const root = useRootStore();
+  const { uiStore } = root;
   let { modalShowing } = uiStore;
 
   useEffect(() => {
-    if (
-      isVisibleCondition &&
-      !(gameState?.atDeathScreen && !gameState.startingNewGame)
-    ) {
+    if (isVisibleCondition && !(root.atDeathScreen && !root.startingNewGame)) {
       modalShowing = true;
     }
-  }, [
-    isVisibleCondition,
-    gameState?.atDeathScreen,
-    gameState?.startingNewGame,
-  ]);
+  }, [isVisibleCondition, root.atDeathScreen, root.startingNewGame]);
 
   return (
     <Modal
@@ -76,8 +70,7 @@ export default function GenericModal({
           : "#000000"
       }
       isVisible={
-        isVisibleCondition &&
-        !(gameState?.atDeathScreen && !gameState.startingNewGame)
+        isVisibleCondition && !(root.atDeathScreen && !root.startingNewGame)
       }
       backdropOpacity={0.5}
       onBackdropPress={backdropCloses ? backFunction : undefined}

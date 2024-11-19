@@ -39,7 +39,8 @@ const LaborTask = observer(
     focused,
     vibration,
   }: LaborTaskProps) => {
-    const { playerState, gameState } = useRootStore();
+    const root = useRootStore();
+    const { playerState } = root;
 
     const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
       () => null, // Return null to indicate unlimited mode
@@ -65,7 +66,7 @@ const LaborTask = observer(
         if (newExp == 0) {
           vibration({ style: "success", essential: true });
         }
-        gameState?.gameTick();
+        root.gameTick();
       }
     }
 

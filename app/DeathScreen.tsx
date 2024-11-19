@@ -36,7 +36,8 @@ export default function DeathScreen() {
   );
   const [page, setPage] = useState<number>(0);
 
-  const { playerState, gameState, uiStore } = useRootStore();
+  const root = useRootStore();
+  const { playerState, uiStore } = root;
   const vibration = useVibration();
   const { colorScheme } = useColorScheme();
 
@@ -46,16 +47,12 @@ export default function DeathScreen() {
   };
 
   useEffect(() => {
-    if (gameState) {
-      gameState.hitDeathScreen();
-    }
+    root.hitDeathScreen();
     setDeathMessage(getDeathMessage());
   }, []);
 
   function startNewGame() {
-    if (gameState) {
-      gameState.startingNewGame = true;
-    }
+    root.startingNewGame = true;
     router.push("/ClassSelect");
   }
 
@@ -92,7 +89,7 @@ export default function DeathScreen() {
     const newPlayerCharacter = createPlayerCharacter();
     if (newPlayerCharacter) {
       savePlayer(newPlayerCharacter);
-      const skillPoints = gameState?.inheritance();
+      const skillPoints = root.inheritance();
       newPlayerCharacter.addSkillPoint({ amount: skillPoints });
       wait(500).then(() => {
         router.dismissAll();
@@ -101,7 +98,7 @@ export default function DeathScreen() {
     }
   };
 
-  if (gameState && playerState) {
+  if (playerState) {
     return (
       <>
         <GenericModal

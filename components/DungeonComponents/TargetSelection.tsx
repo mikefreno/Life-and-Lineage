@@ -3,7 +3,7 @@ import { ThemedView, Text } from "../Themed";
 import { EnemyImage } from "../EnemyImage";
 import ProgressBar from "../ProgressBar";
 import { toTitleCase } from "../../utility/functions/misc";
-import { useCombatState } from "../../stores/DungeonData";
+import { useCombatState } from "../../providers/DungeonData";
 import { useCombatActions } from "../../hooks/combat";
 import type { Enemy, Minion } from "../../entities/creatures";
 import { useRootStore } from "../../hooks/stores";

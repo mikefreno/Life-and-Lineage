@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { DragContext, StoreContext } from "../stores/AppData";
+import { DragContext, StoreContext } from "../providers/AppData";
 
 // root hook
 export const useRootStore = () => {
@@ -15,15 +15,6 @@ export const usePlayerStore = () => {
       "No player state when calling usePlayerStore, use Root if possibly undefined",
     );
   return playerState;
-};
-
-export const useGameStore = () => {
-  const { gameState } = useRootStore();
-  if (!gameState)
-    throw new Error(
-      "No game state when calling useGameStore, use Root if possibly undefined",
-    );
-  return gameState;
 };
 
 export const useDraggableStore = () => {

@@ -33,13 +33,14 @@ export const CharacterInteractionModal = observer(
     showGiftModal,
     showAdoptionModal,
   }: CharacterInteractionModal) => {
-    const { playerState, gameState } = useRootStore();
+    const root = useRootStore();
+    const { playerState } = root;
     const [showAssaultWarning, setShowAssaultWarning] =
       useState<boolean>(false);
     const [dateAvailable, setDateAvailable] = useState<boolean>(
       character?.dateCooldownStart
-        ? character.dateCooldownStart.week !== gameState?.timeStore.week &&
-            character.dateCooldownStart.year !== gameState?.timeStore.year
+        ? character.dateCooldownStart.week !== root.time.week &&
+            character.dateCooldownStart.year !== root.time.year
         : true,
     );
     const router = useRouter();
@@ -47,8 +48,8 @@ export const CharacterInteractionModal = observer(
     const vibration = useVibration();
 
     function setFight() {
-      if (character && playerState && gameState) {
-        gameState.gameTick();
+      if (character && playerState) {
+        root.gameTick();
         //TODO: Setup dungeon level and instance
         closeFunction();
         wait(500).then(() => {
@@ -61,15 +62,11 @@ export const CharacterInteractionModal = observer(
     useEffect(() => {
       if (character?.dateCooldownStart) {
         setDateAvailable(
-          character.dateCooldownStart.week !== gameState?.timeStore.week &&
-            character.dateCooldownStart.year !== gameState?.timeStore.year,
+          character.dateCooldownStart.week !== root.time.week &&
+            character.dateCooldownStart.year !== root.time.year,
         );
       }
-    }, [
-      gameState?.timeStore.year,
-      gameState?.timeStore.week,
-      character?.dateCooldownStart,
-    ]);
+    }, [root.time.year, root.time.week, character?.dateCooldownStart]);
 
     function showPregnancyInfo() {}
 
@@ -80,7 +77,7 @@ export const CharacterInteractionModal = observer(
         backFunction={closeFunction}
         size={100}
       >
-        {character && gameState && (
+        {character && (
           <View className="">
             <Text className="text-center text-xl">{character.fullName}</Text>
             <View className="mx-auto">
@@ -121,7 +118,7 @@ export const CharacterInteractionModal = observer(
                           vibration({ style: "light" });
                           character.setDateCooldownStart();
                           character.updateAffection(5);
-                          gameState.gameTick();
+                          root.gameTick();
                         }}
                       >
                         Chat
@@ -185,7 +182,7 @@ export const CharacterInteractionModal = observer(
                               vibration({ style: "light" });
                               character.setDateCooldownStart();
                               playerState.askForPartner(character);
-                              gameState.gameTick();
+                              root.gameTick();
                             }}
                           >
                             Start Dating?
@@ -201,7 +198,7 @@ export const CharacterInteractionModal = observer(
                               vibration({ style: "light" });
                               character.setDateCooldownStart();
                               character.updateAffection(-10);
-                              gameState.gameTick();
+                              root.gameTick();
                             }}
                           >
                             Spit in Face
@@ -233,9 +230,9 @@ export const CharacterInteractionModal = observer(
                         onPress={() => {
                           vibration({ style: "light" });
                           character.updateAffection(5);
-                          if (playerState && gameState) {
+                          if (playerState) {
                             playerState.addNewKnownCharacter(character);
-                            gameState.gameTick();
+                            root.gameTick();
                           }
                         }}
                       >
@@ -245,9 +242,9 @@ export const CharacterInteractionModal = observer(
                         onPress={() => {
                           vibration({ style: "light" });
                           character.updateAffection(-5);
-                          if (playerState && gameState) {
+                          if (playerState) {
                             playerState.addNewKnownCharacter(character);
-                            gameState.gameTick();
+                            root.gameTick();
                           }
                         }}
                       >

@@ -18,7 +18,7 @@ import { useRootStore } from "../hooks/stores";
 import type { Character } from "../entities/character";
 
 const RelationshipsScreen = observer(() => {
-  const { playerState, gameState, uiStore } = useRootStore();
+  const { playerState, uiStore, characterStore } = useRootStore();
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null,
   );
@@ -145,12 +145,12 @@ const RelationshipsScreen = observer(() => {
       setShowInteractionModal(false);
       wait(500).then(() => {
         setPartnerName(partnerName);
-        gameState?.independantChildrenAgeCheck();
+        characterStore.independantChildrenAgeCheck();
         setShowingAdoptionModal(true);
       });
     } else {
       setPartnerName(partnerName);
-      gameState?.independantChildrenAgeCheck();
+      characterStore.independantChildrenAgeCheck();
       setShowingAdoptionModal(true);
     }
   };
@@ -196,13 +196,13 @@ const RelationshipsScreen = observer(() => {
             {playerState.age >= 18 ? (
               <FlatList
                 numColumns={2}
-                data={gameState?.independantChildren}
+                data={characterStore.independentChildren}
                 renderItem={({ item }) => (
                   <View className="flex flex-col items-center w-1/2">
                     {renderCharacter(item)}
                     <GenericRaisedButton
                       onPress={() =>
-                        gameState?.adopt({
+                        characterStore.adopt({
                           adoptee: item,
                           player: playerState,
                           partner: selectedCharacter ?? undefined,
