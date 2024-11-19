@@ -61,6 +61,14 @@ export class RootStore {
     );
   }
 
+  setPlayer(player: PlayerCharacter) {
+    this.playerState = player;
+  }
+
+  setGame(game: Game) {
+    this.gameState = game;
+  }
+
   leaveDungeon() {
     this.playerState?.clearMinions();
     this.enemyStore.clearEnemyList();

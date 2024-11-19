@@ -4,7 +4,7 @@ import deathMessages from "../assets/json/deathMessages.json";
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
 import { CharacterImage } from "../components/CharacterImage";
-import { calculateAge, wait } from "../utility/functions/misc";
+import { wait } from "../utility/functions/misc";
 import GenericStrikeAround from "../components/GenericStrikeAround";
 import GenericModal from "../components/GenericModal";
 import GenericFlatButton from "../components/GenericFlatButton";
@@ -191,10 +191,7 @@ export default function DeathScreen() {
                           {child.firstName}
                         </Text>
                         <CharacterImage
-                          characterAge={calculateAge(
-                            new Date(child.birthdate),
-                            new Date(gameState.date),
-                          )}
+                          characterAge={child.age}
                           characterSex={child.sex == "male" ? "M" : "F"}
                         />
                       </ThemedView>

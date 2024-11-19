@@ -1,5 +1,5 @@
 import { Text } from "../components/Themed";
-import { calculateAge, wait } from "../utility/functions/misc";
+import { wait } from "../utility/functions/misc";
 import { CharacterImage } from "../components/CharacterImage";
 import { useState } from "react";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -66,13 +66,6 @@ const RelationshipsScreen = observer(() => {
   ];
 
   function renderCharacter(character: Character) {
-    const characterAge = calculateAge(
-      new Date(character.birthdate),
-      character.deathdate
-        ? new Date(character.deathdate)
-        : new Date(gameState!.date),
-    );
-
     return (
       <Pressable
         className="flex items-center"
@@ -90,13 +83,13 @@ const RelationshipsScreen = observer(() => {
         <Text className="text-center text-2xl">{character.fullName}</Text>
         <View className="mx-auto">
           <CharacterImage
-            characterAge={characterAge}
+            characterAge={character.age}
             characterSex={character.sex == "male" ? "M" : "F"}
           />
         </View>
         <Text className="text-xl">
           {character.deathdate && "Died at "}
-          {characterAge} Years Old
+          {character.age} Years Old
         </Text>
         <Text className="text-center text-xl">{character.fullName}</Text>
         <View className="mx-auto">
@@ -200,10 +193,7 @@ const RelationshipsScreen = observer(() => {
                 ? `Adopting with ${partnerName}`
                 : "Independent Adoption"}
             </Text>
-            {calculateAge(
-              new Date(playerState.birthdate),
-              new Date(gameState!.date),
-            ) >= 18 ? (
+            {playerState.age >= 18 ? (
               <FlatList
                 numColumns={2}
                 data={gameState?.independantChildren}

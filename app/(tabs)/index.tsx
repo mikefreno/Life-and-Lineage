@@ -7,7 +7,6 @@ import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { calculateAge } from "../../utility/functions/misc";
 import InventoryRender from "../../components/InventoryRender";
 import {
   ArmorIcon,
@@ -81,10 +80,7 @@ const HomeScreen = observer(() => {
   const playerStats = useMemo(() => {
     if (!playerState || !gameState) return null;
     const name = playerState.fullName;
-    const age = calculateAge(
-      new Date(playerState.birthdate),
-      new Date(gameState.date),
-    );
+    const age = playerState.age;
     return { name, job: playerState.job, age };
   }, [playerState, gameState]);
 

@@ -2,12 +2,7 @@ import { Pressable, ScrollView, View } from "react-native";
 import { ThemedView, Text } from "../components/Themed";
 import { Activity, BadOutcome, GoodOutcome } from "../utility/types";
 import { useColorScheme } from "nativewind";
-import {
-  flipCoin,
-  toTitleCase,
-  calculateAge,
-  wait,
-} from "../utility/functions/misc";
+import { flipCoin, toTitleCase, wait } from "../utility/functions/misc";
 import { generateNewCharacter } from "../utility/functions/characterAid";
 import { useState } from "react";
 import GenericModal from "./GenericModal";
@@ -66,9 +61,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
             const res = generateNewCharacter();
             setMetCharacter(res);
           } else {
-            let knownChar = playerState.getAdultCharacter(
-              new Date(gameState.date),
-            );
+            let knownChar = playerState.getAdultCharacter();
             setMetCharacter(knownChar);
           }
           setGoodOutcome(null);
@@ -181,22 +174,11 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
     setNothingHappened(false);
     setGoodOutcome(null);
 
-    playerState?.setInDungeon({
-      state: true,
-      instance: "Activities",
-      level: outcome.dungeonTitle ?? "",
-    });
+    //TODO: Setup instance / fight
   }
 
   function renderCharacter(character: Character) {
     if (gameState) {
-      const characterAge = calculateAge(
-        new Date(character.birthdate),
-        character.deathdate
-          ? new Date(character.deathdate)
-          : new Date(gameState.date),
-      );
-
       return (
         <Pressable
           key={character.id}
@@ -212,13 +194,13 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
               <Text className="text-center text-2xl">{character.fullName}</Text>
               <View className="mx-auto">
                 <CharacterImage
-                  characterAge={characterAge}
+                  characterAge={character.age}
                   characterSex={character.sex == "male" ? "M" : "F"}
                 />
               </View>
               <Text className="text-xl">
                 {character.deathdate && "Died at "}
-                {characterAge} Years Old
+                {character.age} Years Old
               </Text>
               <Text className="text-center text-xl">{character.fullName}</Text>
               <View className="mx-auto">
@@ -266,7 +248,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
     playerState?.spendGold(gold);
     setBadOutcome(null);
     enemyStore.enemies = [];
-    playerState?.setInDungeon({ state: false });
+    // set up instance and level
     setTimeout(() => setBadOutcome(null), 350);
   }
 
@@ -293,7 +275,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                 }}
               >
                 {playerState
-                  .getAllAdultCharacters(new Date(gameState.date))
+                  .getAllAdultCharacters()
                   .map((character) => renderCharacter(character))}
               </View>
             </ScrollView>
@@ -455,10 +437,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
             )}
             {activity.date && gameState && (
               <GenericRaisedButton
-                disabled={
-                  playerState?.getAllAdultCharacters(new Date(gameState.date))
-                    .length == 0
-                }
+                disabled={playerState?.getAllAdultCharacters().length == 0}
                 onPress={() => dateSelect(activity.name)}
               >
                 Go on Date

@@ -15,6 +15,7 @@ import GenericModal from "../../components/GenericModal";
 import { EXPANDED_PAD } from "../../components/PlayerStatus";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
+import GenericFlatButton from "../../components/GenericFlatButton";
 
 const EarnScreen = observer(() => {
   const { playerState, uiStore } = useRootStore();
@@ -69,20 +70,17 @@ const EarnScreen = observer(() => {
             </Text>
           ))}
         </View>
-        <View className="mt-4 flex items-center justify-evenly">
-          <Pressable
-            onPress={() => {
-              vibration({ style: "light" });
-              setTimeout(() => {
-                setShowingRejection(false);
-              }, 300);
-              router.push("/Training");
-            }}
-            className="rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
-          >
-            <Text className="text-lg">Gain Qualifications</Text>
-          </Pressable>
-        </View>
+        <GenericFlatButton
+          onPress={() => {
+            vibration({ style: "light" });
+            setTimeout(() => {
+              setShowingRejection(false);
+            }, 300);
+            router.push("/Education");
+          }}
+        >
+          Gain Qualifications
+        </GenericFlatButton>
       </GenericModal>
       <View>
         <ScrollView

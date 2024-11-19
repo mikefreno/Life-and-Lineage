@@ -4,11 +4,7 @@ import { Text } from "./Themed";
 import GenericModal from "./GenericModal";
 import { useEffect, useState } from "react";
 import { CharacterImage } from "./CharacterImage";
-import {
-  calculateAge,
-  getDaysBetweenDates,
-  wait,
-} from "../utility/functions/misc";
+import { getDaysBetweenDates, wait } from "../utility/functions/misc";
 import ProgressBar from "./ProgressBar";
 import GenericFlatButton from "./GenericFlatButton";
 import GenericStrikeAround from "./GenericStrikeAround";
@@ -41,20 +37,14 @@ export const CharacterInteractionModal = observer(
     const [showAssaultWarning, setShowAssaultWarning] =
       useState<boolean>(false);
     const [dateAvailable, setDateAvailable] = useState<boolean>(
-      character?.dateCooldownStart && gameState?.date
-        ? getDaysBetweenDates(
-            new Date(character.dateCooldownStart),
-            new Date(gameState.date),
-          ) > 7
+      character?.dateCooldownStart
+        ? character.dateCooldownStart.week !== gameState?.timeStore.week &&
+            character.dateCooldownStart.year !== gameState?.timeStore.year
         : true,
     );
     const router = useRouter();
 
     const vibration = useVibration();
-    const characterAge =
-      character && gameState
-        ? calculateAge(new Date(character.birthdate), new Date(gameState.date))
-        : 0;
 
     function setFight() {
       if (character && playerState && gameState) {
@@ -71,15 +61,17 @@ export const CharacterInteractionModal = observer(
     }
 
     useEffect(() => {
-      if (character?.dateCooldownStart && gameState?.date) {
+      if (character?.dateCooldownStart) {
         setDateAvailable(
-          getDaysBetweenDates(
-            new Date(character.dateCooldownStart),
-            new Date(gameState.date),
-          ) > 7,
+          character.dateCooldownStart.week !== gameState?.timeStore.week &&
+            character.dateCooldownStart.year !== gameState?.timeStore.year,
         );
       }
-    }, [gameState?.date, character?.dateCooldownStart]);
+    }, [
+      gameState?.timeStore.year,
+      gameState?.timeStore.week,
+      character?.dateCooldownStart,
+    ]);
 
     function showPregnancyInfo() {}
 
@@ -95,14 +87,14 @@ export const CharacterInteractionModal = observer(
             <Text className="text-center text-xl">{character.fullName}</Text>
             <View className="mx-auto">
               <CharacterImage
-                characterAge={characterAge}
+                characterAge={character.age}
                 characterSex={character.sex == "male" ? "M" : "F"}
               />
             </View>
             {!showAssaultWarning ? (
               <View>
                 <View className="items-center">
-                  <Text>{characterAge} years old</Text>
+                  <Text>{character.age} years old</Text>
                   <Text className="px-10 text-center">
                     Works as a {character.job}
                   </Text>
@@ -129,7 +121,7 @@ export const CharacterInteractionModal = observer(
                         disabled={!dateAvailable}
                         onPress={() => {
                           vibration({ style: "light" });
-                          character.setDateCooldownStart(gameState.date);
+                          character.setDateCooldownStart();
                           character.updateAffection(5);
                           gameState.gameTick();
                         }}
@@ -147,8 +139,11 @@ export const CharacterInteractionModal = observer(
                       </GenericFlatButton>
                     </View>
                     <View className="pt-2">
-                      {characterAge >= 18 &&
-                        playerState.canDate({ character, characterAge }) &&
+                      {character.age >= 18 &&
+                        playerState.canDate({
+                          character,
+                          characterAge: character.age,
+                        }) &&
                         (playerState.partners.find((partner) =>
                           partner.equals(character),
                         ) ? (
@@ -190,7 +185,7 @@ export const CharacterInteractionModal = observer(
                             disabled={!dateAvailable}
                             onPress={() => {
                               vibration({ style: "light" });
-                              character.setDateCooldownStart(gameState.date);
+                              character.setDateCooldownStart();
                               playerState.askForPartner(character);
                               gameState.gameTick();
                             }}
@@ -206,7 +201,7 @@ export const CharacterInteractionModal = observer(
                             disabled={!dateAvailable}
                             onPress={() => {
                               vibration({ style: "light" });
-                              character.setDateCooldownStart(gameState.date);
+                              character.setDateCooldownStart();
                               character.updateAffection(-10);
                               gameState.gameTick();
                             }}

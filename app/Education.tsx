@@ -1,4 +1,3 @@
-import { observer } from "mobx-react-lite";
 import qualifications from "../assets/json/qualifications.json";
 import PlayerStatus from "../components/PlayerStatus";
 import TrainingCard from "../components/TrainingCard";
@@ -7,10 +6,15 @@ import { useIsFocused } from "@react-navigation/native";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { TutorialOption } from "../utility/types";
 import { ScrollView, View } from "react-native";
+import { useRootStore } from "../hooks/stores";
 
-const JobTraining = observer(() => {
+const JobTraining = () => {
   const isFocused = useIsFocused();
   const header = useHeaderHeight();
+  const { gameState, playerState } = useRootStore();
+  if (!gameState || !playerState) {
+    return null;
+  }
 
   return (
     <>
@@ -37,6 +41,8 @@ const JobTraining = observer(() => {
                   sanityCostPerTick={qual.sanityCostPerTick}
                   goldCostPerTick={qual.goldCostPerTick}
                   preRequisites={qual.prerequisites}
+                  playerState={playerState}
+                  gameState={gameState}
                 />
               );
             })}
@@ -46,5 +52,5 @@ const JobTraining = observer(() => {
       <PlayerStatus tabScreen />
     </>
   );
-});
+};
 export default JobTraining;

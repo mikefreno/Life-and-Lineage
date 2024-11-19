@@ -21,8 +21,8 @@ const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
 
 export const AppSettings = observer(() => {
-  let { playerState, gameState, uiStore, authStore } = useRootStore();
-
+  let root = useRootStore();
+  const { playerState, gameState, uiStore, authStore } = root;
   const { colorScheme, setColorScheme } = useColorScheme();
   const [showRemoteSaveWindow, setShowRemoteSaveWindow] =
     useState<boolean>(false);
@@ -113,8 +113,13 @@ export const AppSettings = observer(() => {
     };
 
     const loadRemoteSave = async (chosenSave: SaveRow) => {
-      gameState = Game.fromJSON(parse(chosenSave.game_state));
-      playerState = PlayerCharacter.fromJSON(parse(chosenSave.player_state));
+      const game = Game.fromJSON(parse(chosenSave.game_state));
+      root.setGame(game);
+      const player = PlayerCharacter.fromJSON({
+        ...parse(chosenSave.player_state),
+        root,
+      });
+      root.setPlayer(player);
       while (router.canGoBack()) {
         router.back();
       }

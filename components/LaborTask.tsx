@@ -43,14 +43,6 @@ const LaborTask = observer(
     const playerState = usePlayerStore();
     const gameState = useGameStore();
 
-    const [fullReward, setFullReward] = useState<number | undefined>(
-      playerState?.getRewardValue(title, reward),
-    );
-
-    const [experience, setExperience] = useState(
-      playerState?.getJobExperience(title),
-    );
-
     const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
       () => null, // Return null to indicate unlimited mode
       {
@@ -75,9 +67,7 @@ const LaborTask = observer(
         if (newExp == 0) {
           vibration({ style: "success", essential: true });
         }
-        setExperience(newExp);
         gameState.gameTick();
-        setFullReward(playerState.getRewardValue(title, reward));
       }
     }
 
@@ -90,7 +80,9 @@ const LaborTask = observer(
           </Text>
           <View className="my-auto -mb-8 mt-8 w-1/3">
             <View className="flex w-full flex-row items-center justify-evenly">
-              <Text className="dark:text-zinc-50">{fullReward}</Text>
+              <Text className="dark:text-zinc-50">
+                {playerState?.getRewardValue(title, reward)}
+              </Text>
               <Coins width={14} height={14} style={{ marginLeft: 6 }} />
             </View>
             <View className="flex w-full flex-row items-center justify-evenly">
@@ -124,7 +116,7 @@ const LaborTask = observer(
               Work
             </GenericRaisedButton>
             <ProgressBar
-              value={experience ?? 0}
+              value={playerState?.getJobExperience(title) ?? 0}
               maxValue={experienceToPromote}
             />
           </>

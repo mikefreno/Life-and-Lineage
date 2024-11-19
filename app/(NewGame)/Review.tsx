@@ -10,7 +10,6 @@ import { useNavigation } from "expo-router";
 import clearHistory, {
   getRandomName,
   toTitleCase,
-  generateBirthday,
   wait,
 } from "../../utility/functions/misc";
 import { Game, saveGame } from "../../entities/game";
@@ -26,6 +25,7 @@ import GenericFlatButton from "../../components/GenericFlatButton";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
+import { TimeStore } from "../../stores/TimeStore";
 
 export default function NewGameReview() {
   const { firstName, lastName, blessingSelection, sex, classSelection } =
@@ -37,7 +37,7 @@ export default function NewGameReview() {
   const navigation = useNavigation();
   const { colorScheme } = useColorScheme();
 
-  function createParent(sex: "female" | "male"): Character {
+  function createParent(sex: "female" | "male", game: Game): Character {
     const firstName = getRandomName(sex).firstName;
     const job = getRandomJobTitle();
     const parent = new Character({
@@ -46,16 +46,17 @@ export default function NewGameReview() {
       sex: sex,
       job: job,
       affection: 85,
-      birthdate: generateBirthday(32, 55),
+      birthdate: game.timeStore.generateBirthDateInRange(32, 55),
+      root,
     });
     return parent;
   }
 
-  function createPlayerCharacter() {
-    const mom = createParent("female");
-    const dad = createParent("male");
+  function createPlayerCharacter(game: Game) {
+    const mom = createParent("female", game);
+    const dad = createParent("male", game);
     let newCharacter: PlayerCharacter;
-    const bday = generateBirthday(15, 15);
+    const bday = game.timeStore.generateBirthDateForAge(15);
     if (
       classSelection === "paladin" &&
       (blessingSelection == Element.vengeance ||
@@ -138,26 +139,24 @@ export default function NewGameReview() {
 
   async function startGame() {
     if (classSelection) {
-      const player = createPlayerCharacter();
-      const starterBook = getStartingBook(player);
-      player.addToInventory(starterBook);
-      const startDate = new Date().toISOString();
-      const tutorialState = storage.getString("tutorialsEnabled");
       let parsed = true;
+      const tutorialState = storage.getString("tutorialsEnabled");
       if (tutorialState) {
         parsed = JSON.parse(tutorialState);
       }
       const newGame = new Game({
-        date: startDate,
-        startDate,
+        timeStore: new TimeStore({ week: 0, year: 1300, root }),
         tutorialsEnabled: root.gameState
           ? root.gameState.tutorialsEnabled
           : parsed,
         tutorialsShown: root.gameState?.tutorialsShown,
         root,
       });
+      const player = createPlayerCharacter(newGame);
+      const starterBook = getStartingBook(player);
+      player.addToInventory(starterBook);
       root.gameState = newGame;
-      root.enemyStore.enemies = [];
+      root.enemyStore.clearEnemyList();
       root.playerState = player;
       vibration({ style: "success" });
       wait(250).then(() => clearHistory(navigation));

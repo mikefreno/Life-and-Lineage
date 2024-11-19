@@ -149,63 +149,63 @@ export function createBuff({
 }
 
 export function lowSanityDebuffGenerator(playerState: PlayerCharacter) {
-  if (playerState && playerState.currentSanity < 0) {
-    const roll = rollD20();
-    if (roll >= 16) {
-      const debuffObj = sanityDebuffs[
-        Math.floor(Math.random() * sanityDebuffs.length)
-      ] as ConditionObjectType;
+  if (!playerState || playerState.currentSanity >= 0) return;
 
-      let healthDamage: number[] = [];
-      let sanityDamage: number[] = [];
+  const roll = rollD20();
+  if (roll < 16) return;
 
-      debuffObj.effect.forEach((eff, index) => {
-        if (eff === "health damage" && debuffObj.effectAmount[index] !== null) {
-          let localHealthDmg = debuffObj.effectAmount[index] as number;
-          if (
-            debuffObj.effectStyle[index] === "multiplier" ||
-            debuffObj.effectStyle[index] === "percentage"
-          ) {
-            localHealthDmg *= playerState.nonConditionalMaxHealth;
-          }
-          healthDamage.push(localHealthDmg);
-        } else {
-          healthDamage.push(0);
-        }
+  const debuffObj = sanityDebuffs[
+    Math.floor(Math.random() * sanityDebuffs.length)
+  ] as ConditionObjectType;
 
-        if (eff === "sanity damage" && debuffObj.effectAmount[index] !== null) {
-          let localSanityDmg = debuffObj.effectAmount[index] as number;
-          if (
-            debuffObj.effectStyle[index] === "multiplier" ||
-            debuffObj.effectStyle[index] === "percentage"
-          ) {
-            localSanityDmg *= playerState.nonConditionalMaxSanity;
-          }
-          sanityDamage.push(localSanityDmg);
-        } else {
-          sanityDamage.push(0);
-        }
-      });
+  // Pre-calculate multipliers
+  const healthMultiplier = playerState.nonConditionalMaxHealth;
+  const sanityMultiplier = playerState.nonConditionalMaxSanity;
 
-      const debuff = new Condition({
-        name: debuffObj.name,
-        style: "debuff",
-        turns: debuffObj.turns,
-        effect: debuffObj.effect,
-        healthDamage: healthDamage,
-        sanityDamage: sanityDamage,
-        effectStyle: debuffObj.effectStyle,
-        effectMagnitude: debuffObj.effectAmount,
-        placedby: "low sanity",
-        icon: debuffObj.icon,
-        aura: debuffObj.aura,
-        placedbyID: "low sanity",
-        on: null,
-      });
+  const { healthDamage, sanityDamage } = debuffObj.effect.reduce(
+    (acc, effect, index) => {
+      const amount = debuffObj.effectAmount[index];
+      const style = debuffObj.effectStyle[index];
+      const isMultiplier = style === "multiplier" || style === "percentage";
 
-      playerState.addCondition(debuff);
-    }
-  }
+      if (effect === "health damage" && amount !== null) {
+        acc.healthDamage.push(
+          isMultiplier ? amount * healthMultiplier : amount,
+        );
+      } else {
+        acc.healthDamage.push(0);
+      }
+
+      if (effect === "sanity damage" && amount !== null) {
+        acc.sanityDamage.push(
+          isMultiplier ? amount * sanityMultiplier : amount,
+        );
+      } else {
+        acc.sanityDamage.push(0);
+      }
+
+      return acc;
+    },
+    { healthDamage: [] as number[], sanityDamage: [] as number[] },
+  );
+
+  const debuff = new Condition({
+    name: debuffObj.name,
+    style: "debuff",
+    turns: debuffObj.turns,
+    effect: debuffObj.effect,
+    healthDamage,
+    sanityDamage,
+    effectStyle: debuffObj.effectStyle,
+    effectMagnitude: debuffObj.effectAmount,
+    placedby: "low sanity",
+    icon: debuffObj.icon,
+    aura: debuffObj.aura,
+    placedbyID: "low sanity",
+    on: null,
+  });
+
+  playerState.addCondition(debuff);
 }
 
 interface getConditionEffectsOnAttacksProps {

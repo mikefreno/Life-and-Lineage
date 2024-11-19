@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { toTitleCase, calculateAge } from "../../utility/functions/misc";
+import { toTitleCase } from "../../utility/functions/misc";
 import { TutorialOption } from "../../utility/types";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
@@ -61,10 +61,7 @@ const ShopsScreen = observer(() => {
             </Text>
             <View className="items-center">
               <CharacterImage
-                characterAge={calculateAge(
-                  new Date(shop.shopKeeper.birthdate),
-                  new Date(gameState.date),
-                )}
+                characterAge={shop.shopKeeper.age}
                 characterSex={shop.shopKeeper.sex == "male" ? "M" : "F"}
               />
               <Text

@@ -28,23 +28,7 @@ export const AccelerationCurves = {
   quadratic: (t: number) => 1 + Math.pow(t, 2),
   cubic: (t: number) => 1 + Math.pow(t, 3),
   exponential: (t: number) => Math.exp(t) - 1,
-  // Add more curves as needed
 };
-
-export function generateBirthday(minAge: number, maxAge: number) {
-  const today = new Date();
-  const minDate = new Date();
-  const maxDate = new Date();
-
-  minDate.setFullYear(today.getFullYear() - maxAge - 1);
-  minDate.setDate(minDate.getDate() + 1);
-  maxDate.setFullYear(today.getFullYear() - minAge);
-
-  const diff = maxDate.getTime() - minDate.getTime();
-  const randomTimestamp = Math.random() * diff + minDate.getTime();
-
-  return new Date(randomTimestamp).toISOString();
-}
 
 export function deathProbabilityByAge(age: number) {
   const a = 0.072;
@@ -57,17 +41,6 @@ export function rollToLiveByAge(age: number) {
   const deathProbability = deathProbabilityByAge(age);
   const rollToLive = Math.ceil(deathProbability * 10) + 1;
   return rollToLive;
-}
-
-export function calculateAge(birthdate: Date, gameDate: Date) {
-  let age = gameDate.getFullYear() - birthdate.getFullYear();
-  const m = gameDate.getMonth() - birthdate.getMonth();
-
-  if (m < 0 || (m === 0 && gameDate.getDate() < birthdate.getDate())) {
-    age--;
-  }
-
-  return age;
 }
 
 export function getDaysBetweenDates(startDate: Date, endDate: Date): number {

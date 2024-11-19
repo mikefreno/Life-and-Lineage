@@ -8,7 +8,7 @@ import mageSpells from "../assets/json/mageSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
 import rangerSpells from "../assets/json/rangerSpells.json";
-import { Enemy, Minion } from "./creatures";
+import { Minion } from "./creatures";
 import summons from "../assets/json/summons.json";
 import { action, makeObservable, observable, computed, reaction } from "mobx";
 import * as Crypto from "expo-crypto";
@@ -24,15 +24,10 @@ import {
   Attribute,
 } from "../utility/types";
 import {
-  calculateAge,
   rollToLiveByAge,
   rollD20,
   damageReduction,
 } from "../utility/functions/misc";
-import type {
-  BoundingBox,
-  Tile,
-} from "../components/DungeonComponents/DungeonMap";
 import { Spell } from "./spell";
 import storyItems from "../assets/json/items/storyItems.json";
 import { Attack } from "./attack";
@@ -46,14 +41,15 @@ interface CharacterOptions {
   firstName: string;
   lastName: string;
   sex: "male" | "female";
-  birthdate?: string;
+  birthdate: { year: number; week: number };
   alive?: boolean;
-  deathdate?: string;
+  deathdate?: { year: number; week: number };
   job?: string;
   affection?: number;
   qualifications?: string[];
-  dateCooldownStart?: string;
+  dateCooldownStart?: { year: number; week: number };
   parents?: Character[];
+  root: RootStore;
 }
 
 /**
@@ -67,14 +63,15 @@ export class Character {
   lastName: string;
   readonly sex: "male" | "female";
   alive: boolean;
-  readonly birthdate: string;
-  deathdate: string | null;
+  readonly birthdate: { year: number; week: number };
+  deathdate: { year: number; week: number } | null;
   job: string;
   affection: number;
   qualifications: string[];
-  dateCooldownStart?: string;
+  dateCooldownStart?: { year: number; week: number };
   pregnancyDueDate?: string | null;
   parents?: Character[];
+  root: RootStore;
 
   constructor({
     id,
@@ -89,19 +86,22 @@ export class Character {
     qualifications,
     dateCooldownStart,
     parents,
+    root,
   }: CharacterOptions) {
     this.id = id ?? Crypto.randomUUID();
     this.firstName = firstName;
     this.lastName = lastName;
     this.sex = sex;
     this.alive = alive ?? true;
-    this.birthdate = birthdate ?? new Date().toISOString();
+    this.birthdate = birthdate;
     this.deathdate = deathdate ?? null;
     this.job = job ?? "Unemployed";
     this.affection = affection ?? 0;
     this.qualifications = qualifications ?? [];
     this.dateCooldownStart = dateCooldownStart;
     this.parents = parents;
+    this.root = root;
+
     makeObservable(this, {
       alive: observable,
       deathdate: observable,
@@ -118,6 +118,7 @@ export class Character {
       updateLastName: action,
       kill: action,
       setParents: action,
+      age: computed,
     });
   }
 
@@ -128,6 +129,13 @@ export class Character {
    */
   public equals(otherCharacter: Character): boolean {
     return this.id === otherCharacter.id;
+  }
+
+  get age() {
+    return this.root.gameState?.timeStore.calculateAge({
+      birthWeek: this.birthdate.week,
+      birthYear: this.birthdate.year,
+    });
   }
 
   /**
@@ -158,23 +166,22 @@ export class Character {
    * Sets the start date of the cooldown period for the character.
    * @param date - The date string in ISO format.
    */
-  public setDateCooldownStart(date: string): void {
-    this.dateCooldownStart = date;
+  public setDateCooldownStart(): void {
+    this.dateCooldownStart = this.root.gameState?.timeStore.currentDate;
   }
 
   public kill() {
     this.alive = false;
-    this.deathdate = new Date().toISOString();
+    this.deathdate = this.root.gameState?.timeStore.currentDate ?? null;
   }
 
   /**
    * Simulates a death roll for the character. This is called on non-player characters to determine if they survive or not.
    * @param gameDate - The current date of the game.
    */
-  public deathRoll(gameDate: Date): void {
+  public deathRoll(): void {
     if (!(this instanceof PlayerCharacter)) {
-      const age = calculateAge(new Date(this.birthdate), gameDate);
-      const rollToLive = rollToLiveByAge(age);
+      const rollToLive = rollToLiveByAge(this.age);
 
       const rollOne = rollD20();
       if (rollOne >= rollToLive) return;
@@ -228,8 +235,11 @@ export class Character {
       qualifications: json.qualifications,
       dateCooldownStart: json.dateCooldownStart,
       parents: json.parents
-        ? json.parents.map((parent: any) => Character.fromJSON(parent))
+        ? json.parents.map((parent: any) =>
+            Character.fromJSON({ ...parent, root: json.root }),
+          )
         : undefined,
+      root: json.root,
     });
     return character;
   }
@@ -249,13 +259,13 @@ type PlayerCharacterBase = {
   baseDexterity: number;
   baseManaRegen: number;
   parents: Character[];
-  birthdate: string;
+  birthdate: { year: number; week: number };
 
   //values that are set based on above, vary during normal gameplay
   currentHealth?: number;
   currentMana?: number;
   currentSanity?: number;
-  deathdate?: string;
+  deathdate?: { year: number; week: number };
   job?: string;
   qualifications?: string[];
   affection?: number;
@@ -394,7 +404,6 @@ export class PlayerCharacter extends Character {
     quiver: Item[] | null;
   };
   investments: Investment[];
-  root: RootStore;
 
   constructor({
     id,
@@ -450,6 +459,7 @@ export class PlayerCharacter extends Character {
       deathdate,
       job,
       qualifications,
+      root,
     });
     this.playerClass = PlayerClassOptions[playerClass];
     this.blessing = blessing;
@@ -516,7 +526,6 @@ export class PlayerCharacter extends Character {
       quiver: null,
     };
     this.investments = investments ?? [];
-    this.root = root;
 
     // this is where we set what is to be watched for mutation by mobX.
     // observable are state that is for mutated attributes, computed are for `get`s and
@@ -1331,35 +1340,36 @@ export class PlayerCharacter extends Character {
     sanityCost: number,
     goldCost: number,
   ) {
-    let foundQual = false;
-    this.qualificationProgress.forEach((qual) => {
-      if (qual.name == name) {
-        foundQual = true;
-        this.damageSanity(sanityCost);
-        this.spendGold(goldCost);
-        if (ticksToProgress > qual.progress + 1) {
-          qual.progress++;
-        } else {
-          qual.completed = true;
-          this.addQualification(qual.name);
-        }
-      }
-    });
-    if (!foundQual) {
+    if (this.currentSanity > -this.maxSanity) {
       this.damageSanity(sanityCost);
       this.spendGold(goldCost);
-      this.qualificationProgress.push({
-        name: name,
-        progress: 1,
-        completed: false,
-      });
+
+      const qualIndex = this.qualificationProgress.findIndex(
+        (qual) => qual.name === name,
+      );
+
+      if (qualIndex === -1) {
+        this.qualificationProgress.push({
+          name,
+          progress: 1,
+          completed: false,
+        });
+        return;
+      }
+
+      const qual = this.qualificationProgress[qualIndex];
+      if (ticksToProgress > qual.progress + 1) {
+        qual.progress++;
+      } else {
+        qual.completed = true;
+        this.addQualification(qual.name);
+      }
     }
   }
 
   public getSpecifiedQualificationProgress(name: string) {
-    const found = this.qualificationProgress.find((qual) => qual.name == name)
+    return this.qualificationProgress.find((qual) => qual.name == name)
       ?.progress;
-    return found;
   }
 
   public hasAllPreReqs(preReqs: string[] | null) {
@@ -1607,8 +1617,8 @@ export class PlayerCharacter extends Character {
     return false;
   }
 
-  public getAdultCharacter(gameDate: Date) {
-    const allEligibleCharacters = this.getAllAdultCharacters(gameDate);
+  public getAdultCharacter() {
+    const allEligibleCharacters = this.getAllAdultCharacters();
     const randomIndex = Math.floor(
       Math.random() * allEligibleCharacters.length,
     );
@@ -1616,17 +1626,13 @@ export class PlayerCharacter extends Character {
     return allEligibleCharacters[randomIndex];
   }
 
-  public getAllAdultCharacters(gameDate: Date) {
+  public getAllAdultCharacters() {
     const allEligibleCharacters = [
       ...this.knownCharacters,
       ...this.partners,
       ...this.children,
       ...this.parents,
-    ].filter(
-      (character) =>
-        calculateAge(new Date(character.birthdate), gameDate) >= 18 &&
-        !character.deathdate,
-    );
+    ].filter((character) => character.age >= 18 && !character.deathdate);
 
     return allEligibleCharacters;
   }
@@ -2040,17 +2046,23 @@ export class PlayerCharacter extends Character {
       qualificationProgress: json.qualificationProgress,
       magicProficiencies: json.magicProficiencies,
       parents: json.parents
-        ? json.parents.map((parent: any) => Character.fromJSON(parent))
+        ? json.parents.map((parent: any) =>
+            Character.fromJSON({ ...parent, root: json.root }),
+          )
         : [],
       children: json.children
-        ? json.children.map((child: any) => Character.fromJSON(child))
+        ? json.children.map((child: any) =>
+            Character.fromJSON({ ...child, root: json.root }),
+          )
         : [],
       partners: json.partners
-        ? json.partners.map((partner: any) => Character.fromJSON(partner))
+        ? json.partners.map((partner: any) =>
+            Character.fromJSON({ ...partner, root: json.root }),
+          )
         : [],
       knownCharacters: json.knownCharacters
         ? json.knownCharacters.map((relationships: any) =>
-            Character.fromJSON(relationships),
+            Character.fromJSON({ ...relationships, root: json.root }),
           )
         : [],
       minions: json.minions

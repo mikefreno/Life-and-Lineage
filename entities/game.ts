@@ -1,19 +1,16 @@
-import { DungeonInstance, DungeonLevel } from "./dungeon";
 import { action, makeObservable, observable, reaction } from "mobx";
 import { Character, PlayerCharacter } from "./character";
 import { lowSanityDebuffGenerator } from "../utility/functions/conditions";
 import { TutorialOption } from "../utility/types";
-import { Shop } from "./shop";
-import { calculateAge } from "../utility/functions/misc";
 import { generateNewAdoptee } from "../utility/functions/characterAid";
 import { RootStore } from "../stores/RootStore";
 import { storage } from "../utility/functions/storage";
 import { throttle } from "lodash";
 import { stringify } from "flatted";
+import { TimeStore } from "../stores/TimeStore";
 
 interface GameOptions {
-  date?: string;
-  startDate?: string;
+  timeStore: TimeStore;
   atDeathScreen?: boolean;
   tutorialsShown?: Record<TutorialOption, boolean>;
   tutorialsEnabled?: boolean;
@@ -26,8 +23,7 @@ interface GameOptions {
  * The above would include obvious things like the app settings (vibration, tutorials and health warning level, color scheme) date properties and shops
  */
 export class Game {
-  date: string; // compared against the startDate to calculate ages
-  readonly startDate: string; // only ever set at game start, should never again be modified.
+  timeStore: TimeStore;
   atDeathScreen: boolean;
   tutorialsShown: Record<TutorialOption, boolean>;
   tutorialsEnabled: boolean;
@@ -36,16 +32,14 @@ export class Game {
   root: RootStore;
 
   constructor({
-    date,
-    startDate,
+    timeStore,
     atDeathScreen,
     tutorialsShown,
     tutorialsEnabled,
     independantChildren,
     root,
   }: GameOptions) {
-    this.date = date ?? new Date().toISOString();
-    this.startDate = startDate ?? new Date().toISOString();
+    this.timeStore = timeStore;
     this.atDeathScreen = atDeathScreen ?? false;
     this.tutorialsShown = tutorialsShown ?? {
       [TutorialOption.class]: true,
@@ -69,7 +63,6 @@ export class Game {
     this.root = root;
 
     makeObservable(this, {
-      date: observable,
       atDeathScreen: observable,
       tutorialsShown: observable,
       tutorialsEnabled: observable,
@@ -88,7 +81,6 @@ export class Game {
 
     reaction(
       () => [
-        this.date,
         this.atDeathScreen,
         this.tutorialsEnabled,
         this.independantChildren,
@@ -123,9 +115,7 @@ export class Game {
    * has negative sanity
    */
   public gameTick() {
-    const dateObject = new Date(this.date);
-    dateObject.setDate(dateObject.getDate() + 7);
-    this.date = dateObject.toISOString();
+    this.timeStore.tick();
     const playerState = this.root.playerState;
     if (!playerState) throw new Error("Missing player in root!");
     if (playerState.currentSanity < 0) {
@@ -199,7 +189,10 @@ export class Game {
    */
   public independantChildrenAgeCheck() {
     this.independantChildren = this.independantChildren.filter((child) => {
-      const age = calculateAge(new Date(child.birthdate), new Date(this.date));
+      const age = this.timeStore.calculateAge({
+        birthYear: child.birthdate.year,
+        birthWeek: child.birthdate.week,
+      });
       return age < 18;
     });
     this.fillUpIndependantChildren();
@@ -210,7 +203,7 @@ export class Game {
    */
   private fillUpIndependantChildren() {
     while (this.independantChildren.length < 6) {
-      this.independantChildren.push(generateNewAdoptee());
+      this.independantChildren.push(generateNewAdoptee(this.root));
     }
   }
 
@@ -231,13 +224,14 @@ export class Game {
 
   static fromJSON(json: any): Game {
     const game = new Game({
-      date: json.date,
-      startDate: json.startDate,
+      timeStore: TimeStore.fromJSON({ ...json.timeStore, root: json.root }),
       atDeathScreen: json.atDeathScreen,
       tutorialsShown: json.tutorialsShown,
       tutorialsEnabled: json.tutorialsEnabled,
       independantChildren: json.independantChildren
-        ? json.independantChildren.map((ind: any) => Character.fromJSON(ind))
+        ? json.independantChildren.map((ind: any) =>
+            Character.fromJSON({ ...ind, root: json.root }),
+          )
         : [],
       root: json.root,
     });
