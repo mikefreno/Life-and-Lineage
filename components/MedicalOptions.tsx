@@ -35,7 +35,7 @@ const MedicalOption = observer(
       () => null, // Return null to indicate unlimited mode
       {
         minHoldTime: 350,
-        maxSpeed: 10,
+        maxSpeed: 3,
         accelerationCurve: AccelerationCurves.linear,
         action: visit,
         minActionAmount: 1,

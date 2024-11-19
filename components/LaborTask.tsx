@@ -2,7 +2,7 @@ import { View } from "react-native";
 import ProgressBar from "./ProgressBar";
 import { useState } from "react";
 import { observer } from "mobx-react-lite";
-import { numberToRoman } from "../utility/functions/misc";
+import { AccelerationCurves, numberToRoman } from "../utility/functions/misc";
 import GenericRaisedButton from "./GenericRaisedButton";
 import ThemedCard from "./ThemedCard";
 import { Text } from "./Themed";
@@ -56,7 +56,7 @@ const LaborTask = observer(
       {
         minHoldTime: 350,
         maxSpeed: 10,
-        accelerationCurve: (t) => 1 + Math.pow(t, 1.7),
+        accelerationCurve: AccelerationCurves.linear,
         action: work,
         minActionAmount: 1,
         maxActionAmount: 50,

@@ -535,18 +535,17 @@ const PlayerStatus = observer(
                 )}
                 <View className="flex flex-row justify-evenly py-1">
                   <View className="flex w-[31%]">
-                    <ChangePopUp
-                      popUp={"health"}
-                      change={statChanges.health}
-                      animationCycler={animationCycler}
-                      colorScheme={colorScheme}
-                    />
-                    <Text
-                      className="text-right w-full pr-4"
-                      style={{ color: "#ef4444" }}
-                    >
-                      Health
-                    </Text>
+                    <View className="flex flex-row justify-between">
+                      <Text className="pl-1" style={{ color: "#ef4444" }}>
+                        Health
+                      </Text>
+                      <ChangePopUp
+                        popUp={"health"}
+                        change={statChanges.health}
+                        animationCycler={animationCycler}
+                        colorScheme={colorScheme}
+                      />
+                    </View>
                     <ProgressBar
                       value={playerState.currentHealth}
                       maxValue={playerState.maxHealth}
@@ -555,18 +554,17 @@ const PlayerStatus = observer(
                     />
                   </View>
                   <View className="flex w-[31%]">
-                    <ChangePopUp
-                      popUp={"mana"}
-                      change={statChanges.mana}
-                      animationCycler={animationCycler}
-                      colorScheme={colorScheme}
-                    />
-                    <Text
-                      className="text-right w-full pr-4"
-                      style={{ color: "#60a5fa" }}
-                    >
-                      Mana
-                    </Text>
+                    <View className="flex flex-row justify-between">
+                      <Text className="pl-1" style={{ color: "#60a5fa" }}>
+                        Mana
+                      </Text>
+                      <ChangePopUp
+                        popUp={"mana"}
+                        change={statChanges.mana}
+                        animationCycler={animationCycler}
+                        colorScheme={colorScheme}
+                      />
+                    </View>
                     <ProgressBar
                       value={playerState.currentMana}
                       maxValue={playerState.maxMana}
@@ -575,18 +573,17 @@ const PlayerStatus = observer(
                     />
                   </View>
                   <View className="flex w-[31%]">
-                    <ChangePopUp
-                      popUp={"sanity"}
-                      change={statChanges.sanity}
-                      animationCycler={animationCycler}
-                      colorScheme={colorScheme}
-                    />
-                    <Text
-                      className="text-right w-full pr-4"
-                      style={{ color: "#c084fc" }}
-                    >
-                      Sanity
-                    </Text>
+                    <View className="flex flex-row justify-between">
+                      <Text className="pl-1" style={{ color: "#c084fc" }}>
+                        Sanity
+                      </Text>
+                      <ChangePopUp
+                        popUp={"sanity"}
+                        change={statChanges.sanity}
+                        animationCycler={animationCycler}
+                        colorScheme={colorScheme}
+                      />
+                    </View>
                     <ProgressBar
                       value={playerState.currentSanity}
                       minValue={-playerState.maxSanity}
@@ -838,7 +835,7 @@ function RenderSecondaryStatsBlock({
   } = useAcceleratedAction(getMaxAmount, {
     minHoldTime: 250,
     maxSpeed: 10,
-    accelerationCurve: AccelerationCurves.quadratic,
+    accelerationCurve: AccelerationCurves.linear,
   });
 
   const onPressOut = useCallback(
@@ -939,7 +936,7 @@ const ChangePopUp = ({
   animationCycler: number;
   colorScheme: "light" | "dark";
 }) => {
-  const marginAdjust = popUp === "gold" ? "-mt-3" : "-ml-2";
+  const marginAdjust = popUp === "gold" ? "-mt-3" : "";
   const color =
     popUp === "mana"
       ? "#60a5fa"
@@ -951,27 +948,21 @@ const ChangePopUp = ({
       ? "white"
       : "black";
 
-  if (change.isShowing) {
-    return (
-      <View className={`absolute ${marginAdjust}`}>
-        <FadeOutNode
-          animationCycler={animationCycler}
-          className="flex flex-row"
-        >
-          <Text className="pr-2 text-sm" style={{ color }}>
-            {change.current > 0 ? "+" : ""}
-            {change.current}
-            {change.cumulative !== change.current && (
-              <>
-                ({change.cumulative > 0 ? "+" : ""}
-                {change.cumulative})
-              </>
-            )}
-          </Text>
-          {popUp === "gold" && <Coins />}
-        </FadeOutNode>
-      </View>
-    );
-  }
-  return null;
+  return (
+    <View className={`${change.isShowing ? "" : "opacity-0"} ${marginAdjust}`}>
+      <FadeOutNode animationCycler={animationCycler} className="flex flex-row">
+        <Text className="pr-2 text-sm" style={{ color }}>
+          {change.current > 0 ? "+" : ""}
+          {change.current}
+          {change.cumulative !== change.current && (
+            <>
+              ({change.cumulative > 0 ? "+" : ""}
+              {change.cumulative})
+            </>
+          )}
+        </Text>
+        {popUp === "gold" && <Coins />}
+      </FadeOutNode>
+    </View>
+  );
 };
