@@ -60,17 +60,12 @@ const findClosestEnemyImage = (searchTerm: string) => {
 export function EnemyImage({ creatureSpecies, glowAnim }: EnemyImageProps) {
   const enemy = findClosestEnemyImage(creatureSpecies);
 
-  if (!enemy) {
-    console.warn(`No match found for creature: ${creatureSpecies}`);
-  }
-
   const baseImage = (
     <Image
       source={enemy ? enemy.source : require("../assets/images/items/Egg.png")}
       style={{
         width: enemy?.width ?? 150,
         height: enemy?.height ?? 150,
-        marginTop: enemy?.heightOffset ?? 0,
       }}
     />
   );
@@ -87,6 +82,7 @@ export function EnemyImage({ creatureSpecies, glowAnim }: EnemyImageProps) {
           inputRange: [0, 1],
           outputRange: [0, 1],
         }),
+        height: enemy?.height ?? 150,
       }}
     >
       <Animated.View

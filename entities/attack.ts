@@ -238,18 +238,24 @@ export class Attack {
    * @returns An object containing the result of the attack and a log string.
    */
   public use({ targets }: { targets: (Enemy | PlayerCharacter | Minion)[] }): {
-    result: AttackUse;
+    result: { target: string; result: AttackUse }[];
     logString: string;
   } {
     if (!this.canBeUsed) {
       if (this.user.isStunned) {
         return {
-          result: AttackUse.stunned,
+          result: targets.map(({ id }) => ({
+            target: id,
+            result: AttackUse.stunned,
+          })),
           logString: `${toTitleCase(this.name)} was stunned!`,
         };
       } else {
         return {
-          result: AttackUse.lowEnergy,
+          result: targets.map(({ id }) => ({
+            target: id,
+            result: AttackUse.lowEnergy,
+          })),
           logString: `${toTitleCase(
             this.userNameReference,
           )} passed (low energy)!`,
@@ -321,7 +327,6 @@ export class Attack {
           }
         }
 
-        // Apply damage and effects
         target.damageHealth({ damage: totalDamage, attackerId: this.user.id });
         target.damageSanity(this.flatSanityDamage);
 
@@ -384,9 +389,10 @@ export class Attack {
     }
 
     return {
-      result: targetResults.some((r) => r.result === AttackUse.success)
-        ? AttackUse.success
-        : AttackUse.miss,
+      result: targetResults.map(({ target, result }) => ({
+        target: target.id,
+        result,
+      })),
       logString,
     };
   }

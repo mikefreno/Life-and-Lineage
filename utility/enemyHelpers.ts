@@ -24,8 +24,7 @@ export const EnemyImageMap: Record<string, ImageInfo> = {
   bat: {
     source: require("../assets/images/monsters/bat.png"),
     width: 120,
-    height: 120,
-    heightOffset: -60,
+    height: 100,
   },
   "brood mother": {
     source: require("../assets/images/monsters/brood_mother.png"),

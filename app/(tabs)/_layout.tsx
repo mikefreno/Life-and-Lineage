@@ -308,13 +308,7 @@ export default function TabLayout() {
             headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
             headerBackground:
               Platform.OS == "ios"
-                ? () => (
-                    <BlurView
-                      intensity={100}
-                      style={StyleSheet.absoluteFill}
-                      experimentalBlurMethod={"dimezisBlurView"}
-                    />
-                  )
+                ? () => <BlurView style={StyleSheet.absoluteFill} />
                 : () => (
                     <ThemedView
                       style={StyleSheet.absoluteFill}

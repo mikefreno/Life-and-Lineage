@@ -78,9 +78,7 @@ export class TutorialStore {
           tutorialsEnabled: this.tutorialsEnabled,
         }),
       );
-    } catch (e) {
-      console.error("Error saving game settings:", e);
-    }
+    } catch (e) {}
   };
 
   public saveGameSettings = throttle(this._saveGameSettings, 500);

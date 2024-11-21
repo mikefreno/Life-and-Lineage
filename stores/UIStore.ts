@@ -27,7 +27,13 @@ export default class UIStore {
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
-    this.playerStatusIsCompact = true;
+    this.playerStatusIsCompact = this.root.playerState
+      ? !(
+          this.root.playerState.unAllocatedSkillPoints > 0 ||
+          this.root.playerState.conditions.length > 0
+        )
+      : true;
+
     const dimensions = {
       height: Dimensions.get("window").height,
       width: Dimensions.get("window").width,
@@ -55,8 +61,7 @@ export default class UIStore {
     const { vibrationEnabled, colorScheme, healthWarning } =
       this.hydrateUISettings();
 
-    this.vibrationEnabled =
-      vibrationEnabled ?? Platform.OS == "ios" ? "full" : "minimal";
+    this.vibrationEnabled = vibrationEnabled;
 
     this.colorScheme = colorScheme ?? "system";
     this.healthWarning = healthWarning ?? 0.2;
@@ -77,6 +82,22 @@ export default class UIStore {
       setHealthWarning: action,
       handleDimensionChange: action,
     });
+
+    reaction(
+      () => [
+        this.root.playerState?.unAllocatedSkillPoints,
+        this.root.playerState?.conditions.length,
+      ],
+      () => {
+        this.setPlayerStatusCompact(
+          !!this.root.playerState &&
+            !(
+              this.root.playerState.unAllocatedSkillPoints > 0 ||
+              this.root.playerState.conditions.length > 0
+            ),
+        );
+      },
+    );
 
     reaction(
       () => [this.colorScheme, this.healthWarning, this.vibrationEnabled],
@@ -133,14 +154,14 @@ export default class UIStore {
 
   hydrateUISettings(): {
     colorScheme: "system" | "dark" | "light" | undefined;
-    vibrationEnabled: "full" | "minimal" | "none" | undefined;
+    vibrationEnabled: "full" | "minimal" | "none";
     healthWarning: number | undefined;
   } {
     const stored = storage.getString("ui_settings");
     if (!stored) {
       return {
         colorScheme: undefined,
-        vibrationEnabled: undefined,
+        vibrationEnabled: Platform.OS === "ios" ? "full" : "minimal",
         healthWarning: undefined,
       };
     }

@@ -20,7 +20,6 @@ import { useIsFocused } from "@react-navigation/native";
 import { useColorScheme } from "nativewind";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
-import GenericFlatButton from "../../components/GenericFlatButton";
 import { useNewGameStore } from "./_layout";
 import GenericFlatLink from "../../components/GenericLink";
 

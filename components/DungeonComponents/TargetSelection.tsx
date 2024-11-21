@@ -20,7 +20,7 @@ export default function TargetSelectionRender() {
   );
 
   return (
-    <ThemedView className="w-full">
+    <View className="w-full">
       {targets.map((target) => (
         <Pressable
           key={target.id}
@@ -59,6 +59,6 @@ export default function TargetSelectionRender() {
           </View>
         </Pressable>
       ))}
-    </ThemedView>
+    </View>
   );
 }

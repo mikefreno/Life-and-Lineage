@@ -2,7 +2,7 @@ import { parse, stringify } from "flatted";
 import { Enemy } from "../entities/creatures";
 import { storage } from "../utility/functions/storage";
 import { RootStore } from "./RootStore";
-import { action, makeObservable, observable, reaction } from "mobx";
+import { action, makeObservable, observable } from "mobx";
 import { AnimationStore } from "./AnimationStore";
 import { throttle } from "lodash";
 
@@ -29,14 +29,6 @@ export default class EnemyStore {
       removeEnemy: action,
       clearEnemyList: action,
     });
-    reaction(
-      () => this.enemies,
-      (enemies) => {
-        if (enemies.length == 0) {
-          this.root.dungeonStore.setInCombat(false);
-        }
-      },
-    );
   }
 
   public setAttackAnimationOngoing(state: boolean) {
@@ -92,9 +84,7 @@ export default class EnemyStore {
           `enemy_${enemy?.id}`,
           stringify({ ...enemy, enemyStore: null }),
         );
-      } catch (e) {
-        console.log("Error in _playerSave:", e);
-      }
+      } catch (e) {}
     }
   };
   public saveEnemy = throttle(this.enemySave, 250);

@@ -1,6 +1,7 @@
-import React, { createContext, type ReactNode, useMemo, useState } from "react";
+import React, { createContext, type ReactNode, useMemo } from "react";
 import { RootStore } from "../stores/RootStore";
 import { type SharedValue, useSharedValue } from "react-native-reanimated";
+import { DraggableDataStore } from "../stores/DraggableDataStore";
 
 export const StoreContext = createContext<RootStore | undefined>(undefined);
 
@@ -13,8 +14,7 @@ export const DragContext = createContext<
         offsetY: SharedValue<number>;
       };
       isDragging: SharedValue<boolean>;
-      iconString: string | null;
-      setIconString: React.Dispatch<React.SetStateAction<string | null>>;
+      draggableClassStore: DraggableDataStore;
     }
   | undefined
 >(undefined);
@@ -28,7 +28,7 @@ const StoreProvider = ({ children }: { children: ReactNode }) => {
 };
 
 const DraggableDataProvider = ({ children }: { children: ReactNode }) => {
-  const [iconString, setIconString] = useState<string | null>(null);
+  const draggableClassStore = new DraggableDataStore();
 
   const position = {
     x: useSharedValue(0),
@@ -36,16 +36,16 @@ const DraggableDataProvider = ({ children }: { children: ReactNode }) => {
     y: useSharedValue(0),
     offsetY: useSharedValue(0),
   };
-  const isDragging = useSharedValue(false);
+
+  const isDragging = useSharedValue<boolean>(false);
 
   const store = useMemo(
     () => ({
       position,
       isDragging,
-      iconString,
-      setIconString,
+      draggableClassStore,
     }),
-    [iconString],
+    [isDragging.value, draggableClassStore.iconString],
   );
 
   return <DragContext.Provider value={store}>{children}</DragContext.Provider>;

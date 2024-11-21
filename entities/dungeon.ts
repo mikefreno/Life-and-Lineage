@@ -1,6 +1,6 @@
 import { Enemy } from "./creatures";
-import { action, computed, makeObservable, observable } from "mobx";
-import { DungeonStore } from "../stores/DungeonStore";
+import { action, computed, makeObservable, observable, reaction } from "mobx";
+import { DungeonStore, saveDungeonInstance } from "../stores/DungeonStore";
 import enemiesJSON from "../assets/json/enemy.json";
 import bossesJSON from "../assets/json/bosses.json";
 import type { BeingType } from "../utility/types";
@@ -12,6 +12,7 @@ interface DungeonLevelOptions {
   tiles: number;
   unlocked?: boolean;
   bossDefeated?: boolean;
+  parent: DungeonInstance;
   dungeonStore: DungeonStore;
 }
 
@@ -47,10 +48,17 @@ export class DungeonInstance {
     this.id = id;
     this.name = name;
     this.difficulty = difficulty;
-    this.levels = levels;
+    this.levels = levels.map((level: any) =>
+      DungeonLevel.fromJSON({ ...level, dungeonStore, parent: this }),
+    );
     this.unlocks = unlocks;
     this.dungeonStore = dungeonStore;
-    makeObservable(this, { levels: observable, unlockNextLevel: action });
+    makeObservable(this, { levels: observable.deep, unlockNextLevel: action });
+
+    reaction(
+      () => [this.levels],
+      () => saveDungeonInstance(this),
+    );
   }
 
   public unlockNextLevel() {
@@ -70,15 +78,11 @@ export class DungeonInstance {
   }
 
   static fromJSON(json: any): DungeonInstance {
-    const levels = json.levels.map((level: any) =>
-      DungeonLevel.fromJSON({ ...level, dungeonStore: json.dungeonStore }),
-    );
-
     const instance = new DungeonInstance({
       id: json.id,
       name: json.name,
       difficulty: json.difficulty,
-      levels: levels,
+      levels: json.levels,
       unlocks: json.unlocks,
       dungeonStore: json.dungeonStore,
     });
@@ -98,6 +102,7 @@ export class DungeonLevel {
   readonly tiles: number;
   unlocked: boolean;
   bossDefeated: boolean;
+  parent: DungeonInstance;
   dungeonStore: DungeonStore;
 
   constructor({
@@ -107,6 +112,7 @@ export class DungeonLevel {
     tiles,
     bossDefeated,
     unlocked,
+    parent,
     dungeonStore,
   }: DungeonLevelOptions) {
     this.level = level;
@@ -115,6 +121,7 @@ export class DungeonLevel {
     this.tiles = tiles;
     this.unlocked = unlocked ?? false;
     this.bossDefeated = bossDefeated ?? false;
+    this.parent = parent;
     this.dungeonStore = dungeonStore;
     makeObservable(this, {
       unlocked: observable,
@@ -123,6 +130,11 @@ export class DungeonLevel {
       generateNormalEncounter: computed,
       setBossDefeated: action,
     });
+
+    reaction(
+      () => [this.unlocked, this.bossDefeated],
+      () => saveDungeonInstance(parent),
+    );
   }
 
   public unlock() {
@@ -221,6 +233,7 @@ export class DungeonLevel {
       tiles: json.tiles,
       bossDefeated: json.bossDefeated,
       unlocked: json.unlocked ? json.unlocked : json.level == 1 ? true : false,
+      parent: json.parent,
       dungeonStore: json.dungeonStore,
     });
     return level;

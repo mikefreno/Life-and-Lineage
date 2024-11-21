@@ -7,6 +7,7 @@ import type { Item } from "../entities/item";
 import { AccelerationCurves } from "../utility/functions/misc";
 import { DEFAULT_FADEOUT_TIME } from "../components/Themed";
 import type { PlayerCharacter } from "../entities/character";
+import { isAction } from "mobx";
 
 export const useVibration = () => {
   const { uiStore } = useRootStore();
@@ -62,6 +63,74 @@ export const useVibration = () => {
   return vibrate;
 };
 
+const useSmartExecution = (isActiveRef: React.MutableRefObject<boolean>) => {
+  const queueRef = useRef<(() => void)[]>([]);
+  const isProcessingRef = useRef(false);
+  const lastExecutionTimeRef = useRef(0);
+  const baseThrottleTime = 8;
+
+  const clearQueue = useCallback(() => {
+    queueRef.current = [];
+    isProcessingRef.current = false;
+  }, []);
+
+  const enqueue = useCallback(
+    (task: () => void) => {
+      if (!isActiveRef.current) return;
+      queueRef.current.push(task);
+      processQueue();
+    },
+    [isActiveRef],
+  );
+
+  const processQueue = useCallback(() => {
+    if (
+      !isActiveRef.current ||
+      isProcessingRef.current ||
+      queueRef.current.length === 0
+    ) {
+      return;
+    }
+
+    const now = Date.now();
+    const timeSinceLastExecution = now - lastExecutionTimeRef.current;
+
+    isProcessingRef.current = true;
+    const task = queueRef.current.shift()!;
+    const executionStart = performance.now();
+
+    Promise.resolve(task())
+      .then(() => {
+        if (!isActiveRef.current) {
+          isProcessingRef.current = false;
+          return;
+        }
+
+        const executionTime = performance.now() - executionStart;
+        const dynamicThrottleTime = Math.max(baseThrottleTime, executionTime);
+
+        if (timeSinceLastExecution < dynamicThrottleTime) {
+          setTimeout(() => {
+            isProcessingRef.current = false;
+            lastExecutionTimeRef.current = Date.now();
+            processQueue();
+          }, dynamicThrottleTime - timeSinceLastExecution);
+        } else {
+          isProcessingRef.current = false;
+          lastExecutionTimeRef.current = now;
+          setTimeout(() => processQueue(), 0);
+        }
+      })
+      .catch((error) => {
+        isProcessingRef.current = false;
+        console.error("Task failed:", error);
+        setTimeout(() => processQueue(), 0);
+      });
+  }, [isActiveRef]);
+
+  return { enqueue, clearQueue };
+};
+
 interface AccelerationConfig<T> {
   minHoldTime?: number;
   maxSpeed?: number;
@@ -77,13 +146,13 @@ interface AccelerationConfig<T> {
 const defaultConfig: AccelerationConfig<void> = {
   minHoldTime: 250,
   maxSpeed: 10,
-  accelerationCurve: AccelerationCurves.cubic,
+  accelerationCurve: AccelerationCurves.linear,
   updateInterval: 16,
   minActionAmount: 1,
 };
 
 export function useAcceleratedAction<T = void>(
-  getMaxAmount: () => number | null, // null when in action mode
+  getMaxAmount: () => number | null,
   config: AccelerationConfig<T> = {},
 ) {
   const {
@@ -105,6 +174,7 @@ export function useAcceleratedAction<T = void>(
   const lastAmountRef = useRef<number>(0);
   const totalExecutedRef = useRef<number>(0);
   const isActiveRef = useRef<boolean>(false);
+  const { enqueue, clearQueue } = useSmartExecution(isActiveRef);
 
   const updateAmount = useCallback(() => {
     try {
@@ -128,20 +198,20 @@ export function useAcceleratedAction<T = void>(
       const newAmount = 1 + Math.floor(pointsPerSecond * adjustedTime);
 
       if (action) {
-        // Action mode: execute directly without max limit
-        const amountDiff = newAmount - lastAmountRef.current;
-        const executionAmount = Math.max(
-          minActionAmount ?? 1,
-          Math.min(amountDiff, maxActionAmount ?? Infinity),
-        );
+        enqueue(() => {
+          const amountDiff = newAmount - lastAmountRef.current;
+          const executionAmount = Math.max(
+            minActionAmount ?? 1,
+            Math.min(amountDiff, maxActionAmount ?? Infinity),
+          );
 
-        if (executionAmount > 0) {
-          action(executionAmount, totalExecutedRef.current);
-          totalExecutedRef.current += executionAmount;
-          lastAmountRef.current = newAmount;
-        }
+          if (executionAmount > 0) {
+            action(executionAmount, totalExecutedRef.current);
+            totalExecutedRef.current += executionAmount;
+            lastAmountRef.current = newAmount;
+          }
+        });
       } else {
-        // Synthetic mode: respect max amount
         const currentAmount =
           maxAmount !== null ? Math.min(newAmount, maxAmount) : newAmount;
         setAmount(currentAmount);
@@ -158,6 +228,7 @@ export function useAcceleratedAction<T = void>(
     minActionAmount,
     maxActionAmount,
     onError,
+    enqueue,
   ]);
 
   const debouncedUpdateAmount = useCallback(() => {
@@ -201,11 +272,11 @@ export function useAcceleratedAction<T = void>(
 
   const stop = useCallback(() => {
     if (!isActiveRef.current) {
-      // If no action is in progress, don't do anything
       return 0;
     }
 
     isActiveRef.current = false;
+    clearQueue();
 
     if (singlePressTimeoutRef.current) {
       clearTimeout(singlePressTimeoutRef.current);
@@ -235,7 +306,7 @@ export function useAcceleratedAction<T = void>(
     lastUpdateTimeRef.current = 0;
 
     return finalAmount;
-  }, [amount, action, minActionAmount]);
+  }, [amount, action, minActionAmount, clearQueue]);
 
   useEffect(() => {
     return () => {

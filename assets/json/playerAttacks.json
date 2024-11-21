@@ -1,106 +1,142 @@
 [
-   {
-      "name": "punch",
-      "targets": "single",
-      "hitChance": 1.0,
-      "damageMult": 1.0
-   },
-   {
-      "name": "hit",
-      "targets": "single",
-      "hitChance": 1.0,
-      "damageMult": 1.0
-   },
-   {
-      "name": "stab",
-      "targets": "single",
-      "hitChance": 0.95,
-      "damageMult": 1.0,
-      "debuffs": [{"name":"bleed", "chance":0.2}]
-   },
-   {
-      "name": "torch stab",
-      "targets": "single",
-      "hitChance": 1.0,
-      "damageMult": 1.0,
-      "debuffs": [{"name":"burn", "chance":0.85}]
-   },
-   {
-      "name": "slash",
-      "targets": "single",
-      "hitChance": 1.0,
-      "damageMult": 1.0
-   },
-   {
-      "name": "cleave",
-      "targets": "dual",
-      "hitChance": 0.85,
-      "damageMult": 1.0
-   },
-   {
-      "name": "crushing blow",
-      "targets": "single",
-      "hitChance": 0.95,
-      "damageMult": 1.0,
-      "debuffs": [{"name":"stun", "chance":0.25}]
-   },
-   {
-      "name": "crushing blow",
-      "targets": "single",
-      "hitChance": 0.95,
-      "damageMult": 1.0,
-      "debuffs": [{"name":"execute", "chance":0.05}]
-   },
-   {
-      "name": "cast",
-      "targets": "single",
-      "hitChance": 1.0,
-      "damageMult": 1.0
-   },
-   {
-      "name": "shoot",
-      "targets": "single",
-      "hitChance": 1.0,
-      "damageMult": 1.0
-   },
-   {
-      "name": "rooting shot",
-      "targets": "single",
-      "hitChance": 0.95,
-      "damageMult": 0.75,
-      "debuffs": [{"name":"stun", "chance":0.5}]
-   },
-   {
-      "name": "hack",
-      "targets": "single",
-      "hitChance": 0.85,
-      "damageMult": 0.95,
-      "debuffs":[{"name":"execute", "chance": 0.1}]
-   },
-   {
-      "name": "rapid shot",
-      "targets": "single",
-      "hitChance": 0.65,
-      "damageMult": 0.85,
-      "hits": 3
-   },
-   {
-      "name": "careful shot",
-      "targets": "single",
-      "hitChance": 1.0,
-      "damageMult": 0.95
-   },
-   {
-      "name": "poison shot",
-      "targets": "single",
-      "hitChance": 1.0,
-      "damageMult": 0.85,
-      "debuffs": [{"name":"poison", "chance": 0.65}]
-   },
-   {
-      "name": "overdraw",
-      "targets": "single",
-      "hitChance": 0.80,
-      "damageMult": 1.75
-   }
+  {
+    "name": "punch",
+    "targets": "single",
+    "hitChance": 1.0,
+    "damageMult": 1.0
+  },
+  {
+    "name": "hit",
+    "targets": "single",
+    "hitChance": 1.0,
+    "damageMult": 1.0
+  },
+  {
+    "name": "stab",
+    "targets": "single",
+    "hitChance": 0.95,
+    "damageMult": 1.0,
+    "debuffs": [
+      {
+        "name": "bleed",
+        "chance": 0.2
+      }
+    ]
+  },
+  {
+    "name": "torch stab",
+    "targets": "single",
+    "hitChance": 1.0,
+    "damageMult": 1.0,
+    "debuffs": [
+      {
+        "name": "burn",
+        "chance": 0.85
+      }
+    ]
+  },
+  {
+    "name": "slash",
+    "targets": "single",
+    "hitChance": 1.0,
+    "damageMult": 1.0
+  },
+  {
+    "name": "cleave",
+    "targets": "dual",
+    "hitChance": 0.85,
+    "damageMult": 1.0
+  },
+  {
+    "name": "crushing blow",
+    "targets": "single",
+    "hitChance": 0.95,
+    "damageMult": 1.0,
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.25
+      }
+    ]
+  },
+  {
+    "name": "crushing blow",
+    "targets": "single",
+    "hitChance": 0.95,
+    "damageMult": 1.0,
+    "debuffs": [
+      {
+        "name": "execute",
+        "chance": 0.05
+      }
+    ]
+  },
+  {
+    "name": "cast",
+    "targets": "single",
+    "hitChance": 1.0,
+    "damageMult": 1.0
+  },
+  {
+    "name": "shoot",
+    "targets": "single",
+    "hitChance": 1.0,
+    "damageMult": 1.0
+  },
+  {
+    "name": "rooting shot",
+    "targets": "single",
+    "hitChance": 0.95,
+    "damageMult": 0.75,
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "name": "hack",
+    "targets": "single",
+    "hitChance": 0.85,
+    "damageMult": 0.95,
+    "debuffs": [
+      {
+        "name": "execute",
+        "chance": 0.1
+      }
+    ]
+  },
+  {
+    "name": "rapid shot",
+    "targets": "single",
+    "hitChance": 0.65,
+    "damageMult": 0.85,
+    "hits": 3
+  },
+  {
+    "name": "careful shot",
+    "targets": "single",
+    "hitChance": 1.0,
+    "damageMult": 0.95
+  },
+  {
+    "name": "poison shot",
+    "targets": "single",
+    "hitChance": 1.0,
+    "damageMult": 0.85,
+    "debuffs": [
+      {
+        "name": "poison",
+        "chance": 0.65
+      }
+    ]
+  },
+  {
+    "name": "overdraw",
+    "targets": "single",
+    "hitChance": 0.80,
+    "damageMult": 1.75
+  }
 ]
+

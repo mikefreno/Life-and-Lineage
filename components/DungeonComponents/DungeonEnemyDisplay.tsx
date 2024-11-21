@@ -285,7 +285,7 @@ const EnemyDisplay = observer(
 
     return (
       <View className="flex-1 flex-row items-center justify-evenly pl-8">
-        <View className="flex-1 flex-row items-center justify-evenly pl-8">
+        <View className="flex-1 flex-row items-center justify-evenly">
           <View
             className="flex flex-col items-center justify-center"
             style={{ minWidth: "40%", maxWidth: "60%" }}
@@ -315,7 +315,7 @@ const EnemyDisplay = observer(
           </View>
           <View className="relative">
             <Animated.View
-              className="mx-auto mt-12"
+              className="mx-auto"
               style={{
                 transform: [
                   {

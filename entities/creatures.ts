@@ -399,13 +399,25 @@ export class Creature {
    * @param {PlayerCharacter | Minion | Enemy} params.target - The target to attack.
    * @returns {Object} - An object indicating the result of the turn, including the chosen attack.
    */
-  protected _takeTurn({ target }: { target: PlayerCharacter | Enemy[] }) {
+  protected _takeTurn({ target }: { target: PlayerCharacter | Enemy[] }): {
+    attack?: Attack;
+    result: {
+      target: string;
+      result: AttackUse;
+    }[];
+    logString: string;
+  } {
     const execute = this.conditions.find((cond) => cond.name == "execute");
     if (execute) {
       this.damageHealth({ attackerId: execute.placedbyID, damage: 9999 });
       this.endTurn();
       return {
-        result: AttackUse.stunned,
+        result: Array.isArray(target)
+          ? target.map((enemy) => ({
+              target: enemy.id,
+              result: AttackUse.stunned,
+            }))
+          : [{ target: target.id, result: AttackUse.stunned }],
         logString: `${toTitleCase(this.creatureSpecies)} was executed!`,
       };
     }
@@ -418,7 +430,12 @@ export class Creature {
       });
       this.endTurn();
       return {
-        result: AttackUse.stunned,
+        result: Array.isArray(target)
+          ? target.map((enemy) => ({
+              target: enemy.id,
+              result: AttackUse.stunned,
+            }))
+          : [{ target: target.id, result: AttackUse.stunned }],
         logString: `${toTitleCase(this.creatureSpecies)} was stunned!`,
       };
     }
@@ -463,7 +480,12 @@ export class Creature {
     } else {
       this.endTurn();
       return {
-        result: AttackUse.lowEnergy,
+        result: Array.isArray(target)
+          ? target.map((enemy) => ({
+              target: enemy.id,
+              result: AttackUse.lowEnergy,
+            }))
+          : [{ target: target.id, result: AttackUse.lowEnergy }],
         logString: `${toTitleCase(this.creatureSpecies)} passed (low energy)!`,
       };
     }

@@ -22,6 +22,8 @@ import { ProjectedImage } from "../components/Draggable";
 import { AppProvider } from "../providers/AppData";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ThemeProvider } from "@react-navigation/native";
+import FleeModal from "../components/DungeonComponents/FleeModal";
+import { DungeonProvider } from "../providers/DungeonData";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -47,9 +49,11 @@ Sentry.init({
 const Root = observer(() => {
   return (
     <AppProvider>
-      <SafeAreaProvider>
-        <RootLayout />
-      </SafeAreaProvider>
+      <DungeonProvider>
+        <SafeAreaProvider>
+          <RootLayout />
+        </SafeAreaProvider>
+      </DungeonProvider>
     </AppProvider>
   );
 });
@@ -57,7 +61,7 @@ const Root = observer(() => {
 /**
  * This focuses on getting the UI set, and relieving the splash screen when ready
  */
-const RootLayout = () => {
+const RootLayout = observer(() => {
   const [fontLoaded] = useFonts({
     PixelifySans: require("../assets/fonts/PixelifySans-Regular.ttf"),
     Handwritten: require("../assets/fonts/Caveat-VariableFont_wght.ttf"),
@@ -65,7 +69,7 @@ const RootLayout = () => {
     CursiveBold: require("../assets/fonts/Tangerine-Bold.ttf"),
   });
   const rootStore = useRootStore();
-  const { playerState, uiStore, dungeonStore } = rootStore;
+  const { playerState, dungeonStore } = rootStore;
 
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
@@ -92,9 +96,9 @@ const RootLayout = () => {
           });
 
         responseListener.current =
-          Notifications.addNotificationResponseReceivedListener((response) => {
-            console.log(response);
-          });
+          Notifications.addNotificationResponseReceivedListener(
+            (response) => {},
+          );
 
         return () => {
           notificationListener.current &&
@@ -124,25 +128,30 @@ const RootLayout = () => {
   }, [expoPushToken]);
 
   useEffect(() => {
-    if (fontLoaded && rootStore.constructed) {
+    if (
+      rootStore.atDeathScreen ||
+      (playerState &&
+        (playerState.currentHealth <= 0 ||
+          playerState.currentSanity <= -playerState.maxSanity))
+    ) {
+      if (pathname !== "/DungeonLevel") {
+        router.replace("/DeathScreen");
+      }
+    }
+  }, [playerState?.currentHealth, playerState?.currentSanity]);
+
+  // TODO: Break down this logic and move it, so I drop the top level observer
+  useEffect(() => {
+    if (fontLoaded && rootStore.constructed && firstLoad) {
+      console.log("persisted: ", dungeonStore.hasPersistedState);
       SplashScreen.hideAsync();
       if (!playerState) {
         router.replace("/NewGame/ClassSelect");
-      } else if (
-        rootStore.atDeathScreen ||
-        (playerState &&
-          (playerState.currentHealth <= 0 || playerState.currentSanity <= -50))
-      ) {
-        if (pathname !== "/DeathScreen")
-          wait(uiStore.modalShowing ? 600 : 0).then(() => {
-            router.dismissAll();
-            router.replace("/DeathScreen");
-          });
-      } else if (dungeonStore.hasPersistedState && firstLoad) {
+      } else if (dungeonStore.hasPersistedState) {
         router.replace("/DungeonLevel");
       }
-      setFirstLoad(false);
     }
+    setFirstLoad(false);
   }, [
     fontLoaded,
     playerState?.currentHealth,
@@ -164,7 +173,8 @@ const RootLayout = () => {
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : LightTheme}>
         <SystemBars style={colorScheme == "light" ? "dark" : "light"} />
         <ProjectedImage />
-        <Stack>
+        <FleeModal />
+        <Stack screenOptions={{ autoHideHomeIndicator: true }}>
           <Stack.Screen
             name="(tabs)"
             options={{
@@ -415,5 +425,5 @@ const RootLayout = () => {
       </ThemeProvider>
     </GestureHandlerRootView>
   );
-};
+});
 export default Sentry.wrap(Root);

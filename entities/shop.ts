@@ -192,12 +192,6 @@ export class Shop {
     const baseChange = (sellPrice / 500) * soldCount;
     const cappedChange = Math.min(baseChange, 20);
     this.changeAffection(cappedChange);
-
-    if (soldCount < items.length) {
-      console.warn(
-        `Only ${soldCount} out of ${items.length} items were found and sold.`,
-      );
-    }
   }
 
   get inventory() {

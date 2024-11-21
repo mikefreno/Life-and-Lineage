@@ -86,6 +86,7 @@ export default function NewGameLayout() {
                     onPress={router.dismissAll}
                     tintColor={tintColor}
                     displayMode="generic"
+                    style={{ marginLeft: -16 }}
                   />
                 )
               : undefined,

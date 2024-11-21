@@ -1,7 +1,6 @@
 import type { PlayerCharacter } from "../entities/character";
 import type { Condition } from "../entities/conditions";
 import type { Enemy, Minion } from "../entities/creatures";
-import type { Item } from "../entities/item";
 
 type StatEffect = {
   stat: "health" | "mana" | "sanity";
@@ -321,14 +320,6 @@ export type ConditionObjectType = {
   icon: string;
   aura?: boolean;
 };
-
-export interface checkReleasePositionProps {
-  itemStack: Item[] | null;
-  xPos: number;
-  yPos: number;
-  size: number;
-  equipped?: boolean;
-}
 
 export type BeingType =
   | "block o wood"

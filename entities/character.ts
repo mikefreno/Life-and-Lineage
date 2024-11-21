@@ -4,6 +4,7 @@ import {
 } from "../utility/functions/conditions";
 import { Condition } from "./conditions";
 import { Item } from "./item";
+import jobsJSON from "../assets/json/jobs.json";
 import mageSpells from "../assets/json/mageSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
@@ -289,11 +290,7 @@ type PlayerCharacterBase = {
   qualifications?: string[];
   affection?: number;
   magicProficiencies?: { school: Element; proficiency: number }[];
-  jobExperience?: {
-    job: string;
-    experience: number;
-    rank: number;
-  }[];
+  jobs?: Map<string, JobData>;
   learningSpells?: {
     bookName: string;
     spellName: string;
@@ -358,6 +355,17 @@ type PlayerCharacterOptions =
   | PaladinCharacter
   | RangerCharacter;
 
+export interface JobData {
+  title: string;
+  cost: { mana: number; health?: number };
+  qualifications: string[] | null;
+  experienceToPromote: number;
+  reward: { gold: number };
+  currentExperience: number;
+  currentRank: number;
+  rankMultiplier: number;
+}
+
 /**
  * This is the heart of most state and progression changes in the game, with the only notable exceptions being the game time and
  * the dungeons, which are both in the game class as these persist specific player characters
@@ -403,12 +411,12 @@ export class PlayerCharacter extends Character {
 
   rangerPet: Minion | null;
 
-  jobExperience: { job: string; experience: number; rank: number }[];
   qualificationProgress: {
     name: string;
     progress: number;
     completed: boolean;
   }[];
+  jobs: Map<string, JobData>;
 
   conditions: Condition[];
   baseInventory: Item[];
@@ -448,7 +456,6 @@ export class PlayerCharacter extends Character {
     baseIntelligence,
     baseDexterity,
     minions,
-    jobExperience,
     learningSpells,
     qualificationProgress,
     magicProficiencies,
@@ -467,6 +474,7 @@ export class PlayerCharacter extends Character {
     keyItems,
     inCombat,
     root,
+    jobs,
   }: PlayerCharacterOptions) {
     super({
       id,
@@ -501,7 +509,7 @@ export class PlayerCharacter extends Character {
     this.currentSanity = currentSanity ?? baseSanity;
     this.currentMana = currentMana ?? baseMana;
 
-    this.unAllocatedSkillPoints = unAllocatedSkillPoints ?? 0;
+    this.unAllocatedSkillPoints = unAllocatedSkillPoints ?? __DEV__ ? 100 : 0;
     this.allocatedSkillPoints = allocatedSkillPoints ?? {
       [Attribute.health]: 0,
       [Attribute.mana]: 0,
@@ -511,12 +519,12 @@ export class PlayerCharacter extends Character {
       [Attribute.intelligence]: 0,
     };
 
-    this.gold = gold !== undefined ? gold : 500;
+    this.gold = gold !== undefined ? gold : __DEV__ ? 1000000 : 500;
 
     this.minions = minions ?? [];
     this.rangerPet = rangerPet ?? null;
 
-    this.jobExperience = jobExperience ?? [];
+    this.jobs = jobs ?? this.initJobs();
     this.learningSpells = learningSpells ?? [];
     this.qualificationProgress = qualificationProgress ?? [];
 
@@ -527,7 +535,7 @@ export class PlayerCharacter extends Character {
     this.conditions = conditions ?? [];
 
     this.baseInventory = baseInventory ?? [];
-    this.keyItems = keyItems ?? __DEV__ ? testKeyItems(root) : [];
+    this.keyItems = keyItems ?? []; //__DEV__ ? testKeyItems(root) : [];
     this.inCombat = inCombat ?? false;
     this.equipment = equipment ?? {
       mainHand: new Item({
@@ -621,7 +629,7 @@ export class PlayerCharacter extends Character {
       addCondition: action,
       removeCondition: action,
 
-      jobExperience: observable,
+      jobs: observable.deep,
       getCurrentJobAndExperience: action,
       incrementQualificationProgress: action,
       qualificationProgress: observable,
@@ -671,10 +679,32 @@ export class PlayerCharacter extends Character {
   }
 
   public gameTurnHandler() {
-    this.tickDownRelationshipAffection();
-    this.conditionTicker();
-    this.tickAllInvestments();
-    savePlayer(this);
+    //condition ticker
+    for (let i = this.conditions.length - 1; i >= 0; i--) {
+      const { turns } = this.conditions[i].tick(this);
+      if (turns <= 0) {
+        this.conditions.splice(i, 1);
+      }
+    }
+
+    // affection ticker
+    const updateAffection = (character: Character, rate: number) => {
+      if (character.affection > 0) {
+        character.updateAffection(-rate);
+      }
+    };
+
+    this.parents.forEach((parent) => updateAffection(parent, 0.1));
+    this.partners.forEach((partner) => updateAffection(partner, 0.15));
+    this.children.forEach((child) => updateAffection(child, 0.15));
+    this.knownCharacters.forEach((character) =>
+      updateAffection(character, 0.25),
+    );
+
+    // investment ticker
+    for (let i = 0; i < this.investments.length; i++) {
+      this.investments[i].turn();
+    }
   }
   //----------------------------------Stats----------------------------------//
   public bossDefeated() {
@@ -1024,12 +1054,6 @@ export class PlayerCharacter extends Character {
     });
 
     this.gold += Math.floor(sellPrice) * soldCount;
-
-    if (soldCount < items.length) {
-      console.warn(
-        `Only ${soldCount} out of ${items.length} items were found and sold.`,
-      );
-    }
   }
 
   get equipmentStats() {
@@ -1090,9 +1114,15 @@ export class PlayerCharacter extends Character {
     };
   }
 
-  public equipItem(item: Item[]) {
+  public equipItem(
+    item: Item[],
+    slot: "head" | "main-hand" | "off-hand" | "body" | "quiver",
+  ) {
+    if (!item[0].slot) {
+      return;
+    }
     const percentages = this.gatherPercents();
-    switch (item[0].slot) {
+    switch (slot) {
       case "head":
         this.removeEquipment("head");
         this.equipment.head = item[0];
@@ -1104,36 +1134,40 @@ export class PlayerCharacter extends Character {
         this.removeFromInventory(item[0]);
         break;
       case "off-hand":
-        this.removeEquipment("offHand");
+        if (
+          (this.equipment.mainHand.name == "unarmored" ||
+            this.equipment.mainHand.slot == "two-hand") &&
+          (item[0].slot == "two-hand" ||
+            item[0].itemClass == ItemClassType.Melee ||
+            item[0].itemClass == ItemClassType.Wand ||
+            item[0].itemClass == ItemClassType.Staff)
+        ) {
+          this.equipItem(item, "main-hand");
+          break;
+        }
+        this.removeEquipment("off-hand");
         if (this.equipment.mainHand.slot == "two-hand") {
-          this.removeEquipment("mainHand");
+          this.removeEquipment("main-hand");
           this.setUnarmored();
         }
         this.equipment.offHand = item[0];
         this.removeFromInventory(item[0]);
         break;
-      case "two-hand":
-        this.removeEquipment("mainHand");
-        this.removeEquipment("offHand");
-        this.equipment.mainHand = item[0];
-        this.removeFromInventory(item[0]);
-        break;
-      case "one-hand":
-        if (this.equipment.mainHand.name == "unarmored") {
-          this.equipment.mainHand = item[0];
-        } else if (this.equipment.mainHand.slot == "two-hand") {
-          this.removeEquipment("mainHand");
-          this.equipment.mainHand = item[0];
+      case "main-hand":
+        if (
+          item[0].itemClass == ItemClassType.Shield &&
+          !this.equipment.offHand
+        ) {
+          this.equipment.offHand = item[0];
+          this.removeFromInventory(item[0]);
         } else {
-          if (this.equipment.offHand?.slot == "off-hand") {
-            this.removeEquipment("mainHand");
-            this.equipment.mainHand = item[0];
-          } else {
-            this.removeEquipment("offHand");
-            this.equipment.offHand = item[0];
+          this.removeEquipment("main-hand");
+          if (item[0].slot == "two-hand") {
+            this.removeEquipment("off-hand");
           }
+          this.equipment.mainHand = item[0];
+          this.removeFromInventory(item[0]);
         }
-        this.removeFromInventory(item[0]);
         break;
       case "quiver":
         this.removeEquipment("quiver");
@@ -1186,9 +1220,9 @@ export class PlayerCharacter extends Character {
     } else if (this.equipment.head?.equals(item[0])) {
       this.removeEquipment("head");
     } else if (this.equipment.mainHand.equals(item[0])) {
-      this.removeEquipment("mainHand");
+      this.removeEquipment("main-hand");
     } else if (this.equipment.offHand?.equals(item[0])) {
-      this.removeEquipment("offHand");
+      this.removeEquipment("off-hand");
     } else if (this.equipment.quiver?.find((arrow) => arrow.equals(item[0]))) {
       this.removeEquipment("quiver");
     }
@@ -1196,12 +1230,12 @@ export class PlayerCharacter extends Character {
   }
 
   public removeEquipment(
-    slot: "mainHand" | "offHand" | "body" | "head" | "quiver",
+    slot: "main-hand" | "off-hand" | "body" | "head" | "quiver",
   ) {
-    if (slot === "mainHand") {
+    if (slot === "main-hand") {
       this.addToInventory(this.equipment.mainHand);
       this.setUnarmored();
-    } else if (slot === "offHand") {
+    } else if (slot === "off-hand") {
       this.addToInventory(this.equipment.offHand);
       this.equipment.offHand = null;
     } else if (slot == "body") {
@@ -1290,68 +1324,88 @@ export class PlayerCharacter extends Character {
   }
   //----------------------------------Work----------------------------------//
   public getCurrentJobAndExperience() {
-    const job = this.jobExperience.find((job) => job.job == this.job);
-    return { title: this.job, experience: job?.experience ?? 0 };
-  }
-  public getJobExperience(title: string): number {
-    const job = this.jobExperience.find((job) => job.job === title);
-    return job ? job.experience : 0;
+    const job = this.jobs.get(this.job);
+    return { title: this.job, experience: job?.currentExperience ?? 0 };
   }
 
-  public performLabor({ title, cost, goldReward }: performLaborProps) {
+  public getJobExperience(title: string): number {
+    return this.jobs.get(title)?.currentExperience ?? 0;
+  }
+
+  public performLabor({ title, cost, goldReward }: performLaborProps): boolean {
     if (
-      this.currentMana >= cost.mana &&
-      (cost.health ? this.currentHealth > cost.health : true)
+      this.currentMana < cost.mana ||
+      (cost.health && this.currentHealth <= cost.health) ||
+      this.job !== title
     ) {
-      if (this.job !== title) {
-        throw new Error("Requested Labor on unassigned profession");
-      } else {
-        if (cost.health) {
-          this.damageHealth({ damage: cost.health, attackerId: this.id });
-        }
-        if (cost.sanity) {
-          this.damageSanity(cost.sanity);
-        }
-        this.useMana(cost.mana);
-        this.addGold(goldReward);
-        this.gainExperience();
-      }
+      return false;
     }
+
+    if (cost.health) {
+      this.damageHealth({ damage: cost.health, attackerId: this.id });
+    }
+    if (cost.sanity) {
+      this.damageSanity(cost.sanity);
+    }
+
+    this.useMana(cost.mana);
+    this.addGold(goldReward);
+    this.gainExperience();
+
+    return true;
   }
 
   public getRewardValue(jobTitle: string, baseReward: number) {
-    const job = this.jobExperience.find((job) => job.job == jobTitle);
+    const job = this.jobs.get(jobTitle);
     if (job) {
-      return Math.floor(baseReward + (baseReward * job.rank) / 5);
+      return Math.floor(baseReward + (baseReward * job.currentRank) / 5);
     } else {
       return baseReward;
     }
   }
 
   public getJobRank(jobTitle: string) {
-    const job = this.jobExperience.find((job) => job.job === jobTitle);
-    return job ? job.rank : 0;
+    const job = this.jobs.get(jobTitle);
+    return job ? job.currentRank : 0;
   }
 
   private gainExperience() {
-    let jobFound = false;
+    let jobData = this.jobs.get(this.job);
+    if (!jobData) return;
+    let exp = jobData.currentExperience;
+    let rank = jobData.currentRank;
 
-    this.jobExperience.forEach((job) => {
-      if (job.job === this.job) {
-        jobFound = true;
-        if (job.experience < 49) {
-          job.experience++;
-        } else {
-          job.experience = 0;
-          job.rank++;
-        }
-      }
-    });
-
-    if (!jobFound) {
-      this.jobExperience.push({ job: this.job, experience: 1, rank: 0 });
+    if (exp < jobData.experienceToPromote - 1) {
+      exp++;
+    } else {
+      exp = 0;
+      rank++;
     }
+
+    this.jobs.set(this.job, {
+      ...jobData,
+      currentRank: rank,
+      currentExperience: exp,
+    });
   }
+
+  private initJobs() {
+    const tempMap = new Map();
+    for (const job of jobsJSON) {
+      tempMap.set(job.title, {
+        ...job,
+        cost: {
+          mana: job.cost.mana,
+          health: job.cost.health || 0,
+        },
+        qualifications: job.qualifications || [],
+        currentExperience: 0,
+        currentRank: 0,
+      });
+    }
+    return tempMap;
+  }
+
   //----------------------------------Qualification----------------------------------//
   public incrementQualificationProgress(
     name: string,
@@ -1359,29 +1413,33 @@ export class PlayerCharacter extends Character {
     sanityCost: number,
     goldCost: number,
   ) {
-    if (this.currentSanity > -this.maxSanity) {
-      this.damageSanity(sanityCost);
-      this.spendGold(goldCost);
-
-      const qualIndex = this.qualificationProgress.findIndex(
-        (qual) => qual.name === name,
-      );
-
-      if (qualIndex === -1) {
+    if (this.currentSanity - sanityCost > -this.maxSanity) {
+      let foundQual = false;
+      this.qualificationProgress.forEach((qual) => {
+        if (qual.name == name) {
+          foundQual = true;
+          if (!qual.completed) {
+            this.damageSanity(sanityCost);
+            this.spendGold(goldCost);
+            if (ticksToProgress > qual.progress + 1) {
+              qual.progress++;
+            } else {
+              qual.completed = true;
+              this.addQualification(qual.name);
+            }
+            this.root.gameTick();
+          }
+        }
+      });
+      if (!foundQual) {
+        this.damageSanity(sanityCost);
+        this.spendGold(goldCost);
         this.qualificationProgress.push({
-          name,
+          name: name,
           progress: 1,
           completed: false,
         });
-        return;
-      }
-
-      const qual = this.qualificationProgress[qualIndex];
-      if (ticksToProgress > qual.progress + 1) {
-        qual.progress++;
-      } else {
-        qual.completed = true;
-        this.addQualification(qual.name);
+        this.root.gameTick();
       }
     }
   }
@@ -1579,7 +1637,6 @@ export class PlayerCharacter extends Character {
       isKnown.kill();
       return;
     } else {
-      console.error("This should never be reached");
     }
   }
 
@@ -2060,7 +2117,7 @@ export class PlayerCharacter extends Character {
       currentMana: json.currentMana,
       baseMana: json.baseMana,
       baseManaRegen: json.baseManaRegen,
-      jobExperience: json.jobExperience,
+      jobs: deserializeJobs(json.jobs),
       learningSpells: json.learningSpells,
       qualificationProgress: json.qualificationProgress,
       magicProficiencies: json.magicProficiencies,
@@ -2128,6 +2185,19 @@ export class PlayerCharacter extends Character {
     });
     return player;
   }
+}
+
+export function serializeJobs(jobs: Map<string, JobData>) {
+  const jobsObject: Record<string, JobData> = {};
+  for (const [key, value] of jobs.entries()) {
+    jobsObject[key] = value;
+  }
+  return JSON.stringify(jobsObject);
+}
+
+function deserializeJobs(serializedJobs: string) {
+  const jobsObject: Record<string, JobData> = JSON.parse(serializedJobs);
+  return new Map(Object.entries(jobsObject));
 }
 
 function testKeyItems(root: RootStore) {
@@ -2339,11 +2409,10 @@ export function getStartingBook(player: PlayerCharacter) {
 
 const _playerSave = async (player: PlayerCharacter | undefined) => {
   if (player) {
-    try {
-      storage.set("player", stringify({ ...player, root: null }));
-    } catch (e) {
-      console.log("Error in _playerSave:", e);
-    }
+    storage.set(
+      "player",
+      stringify({ ...player, jobs: serializeJobs(player.jobs), root: null }),
+    );
   }
 };
 export const savePlayer = throttle(_playerSave, 500);

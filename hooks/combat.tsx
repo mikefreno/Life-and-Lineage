@@ -33,33 +33,32 @@ export const useEnemyManagement = () => {
           playerState,
           dungeonStore.fightingBoss,
         );
-
-        if (itemDrops) {
-          playerState.addGold(gold);
-          playerState.addToKeyItems(storyDrops);
-          setDroppedItems({ itemDrops, gold, storyDrops });
-        }
-
-        enemyStore.removeEnemy(enemy);
-
-        // Check if this was the last enemy
-        if (enemyStore.enemies.length === 0) {
-          if (
-            dungeonStore.fightingBoss &&
-            dungeonStore.currentLevel &&
-            dungeonStore.currentInstance
-          ) {
-            dungeonStore.setInBossFight(false);
-            dungeonStore.currentLevel.setBossDefeated();
-            dungeonStore.openNextDungeonLevel(dungeonStore.currentInstance);
-            enemyStore.clearEnemyList();
-            playerState.bossDefeated();
-            if (!tutorialStore.tutorialsShown[TutorialOption.firstBossKill]) {
-              setShouldShowFirstBossKillTutorialAfterItemDrops(true);
-            }
+        wait(500).then(() => {
+          if (itemDrops) {
+            playerState.addGold(gold);
+            playerState.addToKeyItems(storyDrops);
+            setDroppedItems({ itemDrops, gold, storyDrops });
           }
-          root.gameTick();
-        }
+
+          enemyStore.removeEnemy(enemy);
+          if (enemyStore.enemies.length === 0) {
+            if (
+              dungeonStore.fightingBoss &&
+              dungeonStore.currentLevel &&
+              dungeonStore.currentInstance
+            ) {
+              dungeonStore.setInBossFight(false);
+              dungeonStore.currentLevel.setBossDefeated();
+              dungeonStore.openNextDungeonLevel(dungeonStore.currentInstance);
+              enemyStore.clearEnemyList();
+              playerState.bossDefeated();
+              if (!tutorialStore.tutorialsShown[TutorialOption.firstBossKill]) {
+                setShouldShowFirstBossKillTutorialAfterItemDrops(true);
+              }
+            }
+            dungeonStore.setInCombat(false);
+          }
+        });
 
         return true;
       }
@@ -92,9 +91,12 @@ export const useEnemyManagement = () => {
     (
       enemy: Enemy,
       enemyAttackRes: {
-        result: AttackUse;
+        attack?: Attack | undefined;
+        result: {
+          target: string;
+          result: AttackUse;
+        }[];
         logString: string;
-        attack?: Attack;
       },
       startOfTurnPlayerHP: number,
     ) => {
@@ -127,19 +129,18 @@ export const useEnemyManagement = () => {
 
       const actions: Record<AttackUse, (playerHealthChange: number) => void> = {
         [AttackUse.success]: (playerHealthChange) => {
-          if (enemyAttackRes.attack && playerHealthChange !== 0) {
-            animationStore?.triggerAttack();
+          animationStore.triggerAttack();
 
-            wait(500).then(() => {
-              if (
-                enemyAttackRes.attack!.debuffStrings.length > 0 ||
-                enemyAttackRes.attack!.buffStrings.length > 0
-              ) {
-                animationStore.setTextString(enemyAttackRes.attack!.name);
-                animationStore.triggerText();
-              }
-            });
-          }
+          wait(500).then(() => {
+            if (
+              playerHealthChange > 0 ||
+              enemyAttackRes.attack!.debuffStrings.length > 0 ||
+              enemyAttackRes.attack!.buffStrings.length > 0
+            ) {
+              animationStore.setTextString(enemyAttackRes.attack!.name);
+              animationStore.triggerText();
+            }
+          });
         },
 
         [AttackUse.miss]: () => {
@@ -163,7 +164,20 @@ export const useEnemyManagement = () => {
         },
       };
 
-      actions[enemyAttackRes.result](playerHealthChange);
+      if (!enemyAttackRes.attack) {
+        actions[enemyAttackRes.result[0].result](playerHealthChange);
+      } else {
+        const playerAsTarget = enemyAttackRes.result.find(
+          ({ target }) => target === playerState.id,
+        );
+        if (playerAsTarget) {
+          actions[playerAsTarget.result](playerHealthChange);
+        } else {
+          actions[enemyAttackRes.result[0].result](playerHealthChange);
+        }
+      }
+      //const playerRes =
+      //actions[enemyAttackRes.find((res)=>res.target == playerState.id)(playerHealthChange);
     },
     [playerState],
   );
@@ -232,8 +246,11 @@ export const useCombatActions = () => {
     (attackOrSpell: Attack | Spell, targets: (Enemy | Minion)[]) => {
       if (attackOrSpell instanceof Attack) {
         const { result, logString } = attackOrSpell.use({ targets });
-        if (result === AttackUse.miss) {
-          //setEnemyDodgeDummy((prev) => prev + 1);
+        for (const res of result) {
+          if (res.result == AttackUse.miss) {
+            const animStore = enemyStore.getAnimationStore(res.target);
+            animStore?.triggerDodge();
+          }
         }
         return logString;
       }

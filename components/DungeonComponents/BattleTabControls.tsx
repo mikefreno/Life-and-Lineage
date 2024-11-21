@@ -18,7 +18,7 @@ export default function BattleTabControls({
   return (
     <ThemedView className="-mb-1 flex w-full flex-row justify-around">
       <Pressable
-        className={`w-1/3 rounded-l py-4 ${
+        className={`w-1/3  py-4 ${
           battleTab == "attacksOrNavigation"
             ? "bg-zinc-150 dark:bg-zinc-800"
             : "active:bg-zinc-200 dark:active:bg-zinc-700"
@@ -46,7 +46,7 @@ export default function BattleTabControls({
         <Text className="text-center text-xl">Equipment</Text>
       </Pressable>
       <Pressable
-        className={`w-1/3 rounded-r py-4 ${
+        className={`w-1/3  py-4 ${
           battleTab == "log"
             ? "bg-zinc-150 dark:bg-zinc-800"
             : "active:bg-zinc-200 dark:active:bg-zinc-700"

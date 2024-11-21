@@ -86,7 +86,6 @@ const SignInScreen = observer(() => {
         }
       }
     } catch (e) {
-      console.error("Network Error:", e);
       setError("Network error. Please check your connection and try again.");
     } finally {
       setAwaitingResponse(false);
@@ -112,7 +111,6 @@ const SignInScreen = observer(() => {
       router.dismissAll();
       router.push("/Options");
     } catch (e) {
-      console.error(e);
       setError("Failed to sign in with Apple. Please try again.");
     }
     setAwaitingResponse(false);

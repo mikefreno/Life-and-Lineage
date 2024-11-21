@@ -75,6 +75,9 @@ export class Condition {
     );
   }
 
+  private cachedHealthDamage: number | null = null;
+  private cachedSanityDamage: number | null = null;
+
   public getConditionIcon() {
     if (this.icon) {
       return conditionIconMap[this.icon];
@@ -83,35 +86,34 @@ export class Condition {
     }
   }
 
-  public getHealthDamage() {
-    let totalHealthDmg: number | null = null;
-    if (typeof this.healthDamage == "number") {
-      totalHealthDmg = this.healthDamage;
-    } else if (this.healthDamage) {
-      totalHealthDmg = this.healthDamage.reduce(
-        (acc, val) => (acc ?? 0) + (val ?? 0),
-        0,
-      );
-    }
-    return totalHealthDmg ? Math.round(totalHealthDmg * 4) / 4 : null;
-  }
-
-  public getSanityDamage() {
-    let totalSanityDmg: number | null = null;
-    if (typeof this.sanityDamage == "number") {
-      totalSanityDmg = this.sanityDamage;
-    } else if (this.sanityDamage) {
-      totalSanityDmg = this.sanityDamage.reduce(
-        (acc, val) => (acc ?? 0) + (val ?? 0),
-        0,
-      );
-    }
-    return totalSanityDmg ? Math.round(totalSanityDmg * 4) / 4 : null;
-  }
-
   public reinstateParent(parent: PlayerCharacter | Enemy | Minion) {
     this.on = parent;
     return this;
+  }
+
+  public getHealthDamage() {
+    if (this.cachedHealthDamage === null) {
+      this.cachedHealthDamage = this.calculateDamage(this.healthDamage);
+    }
+    return this.cachedHealthDamage;
+  }
+
+  public getSanityDamage() {
+    if (this.cachedSanityDamage === null) {
+      this.cachedSanityDamage = this.calculateDamage(this.sanityDamage);
+    }
+    return this.cachedSanityDamage;
+  }
+
+  private calculateDamage(
+    damage: number | number[] | undefined,
+  ): number | null {
+    if (typeof damage === "number") return Math.round(damage * 4) / 4;
+    if (Array.isArray(damage)) {
+      const total = damage.reduce((acc, val) => acc + (val ?? 0), 0);
+      return Math.round(total * 4) / 4;
+    }
+    return null;
   }
 
   /**
@@ -120,16 +122,21 @@ export class Condition {
    */
   public tick(holder: PlayerCharacter | Creature) {
     if (!this.aura) {
-      this.turns -= 1;
-      if (this.trapSetupTime && this.trapSetupTime >= 0) {
-        this.trapSetupTime -= 1;
+      this.turns--;
+      if (this.trapSetupTime && this.trapSetupTime > 0) {
+        this.trapSetupTime--;
       }
     }
-    holder.damageHealth({
-      attackerId: this.placedbyID,
-      damage: this.getHealthDamage(),
-    });
-    holder.damageSanity(this.getSanityDamage());
+    const healthDamage = this.getHealthDamage();
+    const sanityDamage = this.getSanityDamage();
+
+    if (healthDamage)
+      holder.damageHealth({
+        attackerId: this.placedbyID,
+        damage: healthDamage,
+      });
+    if (sanityDamage) holder.damageSanity(sanityDamage);
+
     return { turns: this.turns, effect: this.effect };
   }
 

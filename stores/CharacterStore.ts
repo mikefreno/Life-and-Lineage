@@ -131,9 +131,7 @@ export class CharacterStore {
         `character_${character.id}`,
         stringify({ ...character, root: null }),
       );
-    } catch (e) {
-      console.log("Error in characterSave:", e);
-    }
+    } catch (e) {}
   };
   public saveCharacter = throttle(this.characterSave, 250);
 

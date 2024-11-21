@@ -185,7 +185,6 @@ export class AuthStore {
       }
       this.setIsInitialized(true);
     } catch (error) {
-      console.error("Error initializing auth:", error);
       await this.logout();
     }
   };
@@ -223,7 +222,6 @@ export class AuthStore {
       }
       return false;
     } catch (error) {
-      console.error("Token validation error:", error);
       return false;
     }
   };
@@ -238,29 +236,19 @@ export class AuthStore {
 
       try {
         token && storage.set("userToken", token);
-      } catch (error) {
-        console.error("userToken setting error:", error);
-      }
+      } catch (error) {}
       try {
         email && storage.set("userEmail", email);
-      } catch (error) {
-        console.error("userEmail setting error:", error);
-      }
+      } catch (error) {}
       try {
         storage.set("authProvider", provider);
-      } catch (error) {
-        console.error("authProvider setting error:", error);
-      }
+      } catch (error) {}
       try {
         appleUser && storage.set("appleUser", appleUser);
-      } catch (error) {
-        console.error("appleUser setting error:", error);
-      }
+      } catch (error) {}
 
       this.setAuthState(token ?? null, email, provider, appleUser);
-    } catch (error) {
-      console.error("Login error:", error);
-    }
+    } catch (error) {}
   };
 
   logout = async () => {
@@ -274,9 +262,7 @@ export class AuthStore {
       storage.delete("appleUser");
       this.setAuthState(null, null, null);
       this.setDBCredentials(null, null);
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+    } catch (error) {}
   };
 
   appleSignIn = async () => {
@@ -356,7 +342,6 @@ export class AuthStore {
       const rows = data.results[0].response.result.rows;
       return this.convertHTTPResponseSaveRow(rows);
     } catch (e) {
-      console.log(e);
       return [];
     }
   };
@@ -372,7 +357,6 @@ export class AuthStore {
         args: [name, stringify(playerState), time, time],
       });
     } catch (e) {
-      console.error(e);
       return [];
     }
   };
@@ -393,7 +377,6 @@ export class AuthStore {
       });
       await res?.json();
     } catch (e) {
-      console.error(e);
       return [];
     }
   };
@@ -409,7 +392,6 @@ export class AuthStore {
       });
       await res?.json();
     } catch (e) {
-      console.error(e);
       return [];
     }
   };
@@ -445,7 +427,6 @@ export class AuthStore {
         await this.logout();
       }
     } catch (error) {
-      console.error("Apple auth refresh error:", error);
       await this.logout();
     }
   };
@@ -591,28 +572,30 @@ export class AuthStore {
   }
 
   _debugLog = async () => {
-    try {
-      const [storedToken, storedEmail, storedProvider, appleUser] =
-        await Promise.all([
-          storage.getString("userToken"),
-          storage.getString("userEmail"),
-          storage.getString("authProvider"),
-          storage.getString("appleUser"),
-        ]);
+    if (__DEV__) {
+      try {
+        const [storedToken, storedEmail, storedProvider, appleUser] =
+          await Promise.all([
+            storage.getString("userToken"),
+            storage.getString("userEmail"),
+            storage.getString("authProvider"),
+            storage.getString("appleUser"),
+          ]);
 
-      console.log("*******USER AUTH STATE*******");
-      console.log("Stored Token:", storedToken);
-      console.log("Stored Email:", storedEmail);
-      console.log("Stored Provider:", storedProvider);
-      console.log("Stored Apple User:", appleUser);
-      console.log("State Token:", this.token);
-      console.log("State Email:", this.email);
-      console.log("State Provider:", this.provider);
-      console.log("State Apple User:", this.apple_user_string);
-      console.log("State DB Name:", this.db_name);
-      console.log("State DB Token:", this.db_token);
-    } catch (error) {
-      console.error("Error in _debugLog:", error);
+        console.log("*******USER AUTH STATE*******");
+        console.log("Stored Token:", storedToken);
+        console.log("Stored Email:", storedEmail);
+        console.log("Stored Provider:", storedProvider);
+        console.log("Stored Apple User:", appleUser);
+        console.log("State Token:", this.token);
+        console.log("State Email:", this.email);
+        console.log("State Provider:", this.provider);
+        console.log("State Apple User:", this.apple_user_string);
+        console.log("State DB Name:", this.db_name);
+        console.log("State DB Token:", this.db_token);
+      } catch (error) {
+        console.error("Error in _debugLog:", error);
+      }
     }
   };
 }

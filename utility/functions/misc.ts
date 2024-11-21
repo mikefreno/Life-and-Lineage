@@ -20,9 +20,8 @@ import melee from "../../assets/json/items/melee.json";
 import wands from "../../assets/json/items/wands.json";
 import storyItems from "../../assets/json/items/storyItems.json";
 import names from "../../assets/json/names.json";
-import { ItemClassType, PlayerClassOptions, TutorialOption } from "../types";
+import { ItemClassType, PlayerClassOptions } from "../types";
 import { CommonActions, NavigationProp } from "@react-navigation/native";
-import { storage } from "./storage";
 
 export const AccelerationCurves = {
   linear: (t: number) => 1 + t,
@@ -235,4 +234,60 @@ export function flipCoin() {
 
 export function rollD20() {
   return Math.floor(Math.random() * 20) + 1;
+}
+
+export default function clearHistory(
+  navigation: NavigationProp<ReactNavigation.RootParamList>,
+) {
+  navigation.dispatch(
+    CommonActions.reset({
+      routes: [{ key: "(tabs)", name: "(tabs)" }],
+    }),
+  );
+}
+
+export function checkReleasePosition({
+  bounds,
+  position,
+  runOnSuccess,
+  handleSnapBack,
+}: {
+  bounds: {
+    key: string;
+    bounds:
+      | {
+          x: number;
+          y: number;
+          width: number;
+          height: number;
+        }
+      | null
+      | undefined;
+  }[];
+  position: { x: number; y: number };
+  runOnSuccess: (args: any) => void;
+  handleSnapBack: () => void;
+}) {
+  //console.log(`Dropping at (x:${position.x}, y:${position.y}`);
+  for (const bound of bounds) {
+    if (bound.bounds) {
+      //console.log(
+      //`Checking(${bound.key}) between (x:${bound.bounds.x} - ${
+      //bound.bounds.x + bound.bounds.width
+      //}, y: ${bound.bounds.y} - ${bound.bounds.y + bound.bounds.height})`,
+      //);
+      const isWidthAligned =
+        position.x > bound.bounds.x &&
+        position.x < bound.bounds.x + bound.bounds.width;
+      const isHeightAligned =
+        position.y > bound.bounds.y &&
+        position.y < bound.bounds.y + bound.bounds.height;
+
+      if (isWidthAligned && isHeightAligned) {
+        runOnSuccess(bound.key);
+        return;
+      }
+    }
+  }
+  handleSnapBack();
 }

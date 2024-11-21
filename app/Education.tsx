@@ -41,7 +41,6 @@ const JobTraining = () => {
                   sanityCostPerTick={qual.sanityCostPerTick}
                   goldCostPerTick={qual.goldCostPerTick}
                   preRequisites={qual.prerequisites}
-                  playerState={playerState}
                 />
               );
             })}

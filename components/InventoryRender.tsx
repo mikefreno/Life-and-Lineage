@@ -1,18 +1,18 @@
-import React, { useMemo, type RefObject } from "react";
 import { Pressable, View, LayoutChangeEvent, ScrollView } from "react-native";
-import { checkReleasePositionProps } from "../utility/types";
 import { Text } from "./Themed";
 import { InventoryItem } from "./Draggable";
 import type { Item } from "../entities/item";
 import { useVibration } from "../hooks/generic";
-import type { Shop } from "../entities/shop";
-import { useRootStore } from "../hooks/stores";
+import { useDraggableStore, useRootStore } from "../hooks/stores";
+import { useRef } from "react";
+import { usePathname } from "expo-router";
 
-type InventoryRenderBase = {
-  selfRef?: RefObject<View>;
-  inventory: {
-    item: Item[];
-  }[];
+export default function InventoryRender({
+  displayItem,
+  setDisplayItem,
+  targetBounds,
+  runOnSuccess,
+}: {
   displayItem: {
     item: Item[];
     side?: "shop" | "inventory";
@@ -31,340 +31,110 @@ type InventoryRenderBase = {
       };
     } | null>
   >;
-  keyItemInventory?: Item[];
-  setInventoryBounds?: React.Dispatch<
-    React.SetStateAction<{
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-    } | null>
-  >;
-  setIconString: React.Dispatch<React.SetStateAction<string | null>>;
-};
-
-type InventoryRenderHome = InventoryRenderBase & {
-  headTarget: RefObject<View>;
-  bodyTarget: RefObject<View>;
-  mainHandTarget: RefObject<View>;
-  offHandTarget: RefObject<View>;
-  quiverTarget: RefObject<View>;
-};
-
-type InventoryRenderDungeon = InventoryRenderBase & {
-  pouchTarget: RefObject<View>;
-  addItemToPouch: ({ items }: { items: Item[] }) => void;
-};
-
-type InventoryRenderShop = InventoryRenderBase & {
-  shopInventoryTarget: RefObject<View>;
-  shop: Shop;
-  sellItem: (item: Item) => void;
-  sellStack: (items: Item[]) => void;
-};
-
-type InventoryRenderProps =
-  | InventoryRenderHome
-  | InventoryRenderDungeon
-  | InventoryRenderShop;
-
-export default function InventoryRender({
-  selfRef,
-  inventory,
-  displayItem,
-  setDisplayItem,
-  keyItemInventory,
-  setInventoryBounds,
-  setIconString,
-  ...props
-}: InventoryRenderProps) {
+  targetBounds: {
+    key: string;
+    bounds:
+      | {
+          x: number;
+          y: number;
+          width: number;
+          height: number;
+        }
+      | null
+      | undefined;
+  }[];
+  runOnSuccess: (args?: any, args2?: any) => void;
+}) {
+  const selfRef = useRef<View | null>(null);
   const vibration = useVibration();
   const { playerState, uiStore } = useRootStore();
+  const { draggableClassStore } = useDraggableStore();
+  const pathname = usePathname();
+
+  const dropHandler = (droppedOnKey: string, item: Item[]) => {
+    vibration({ style: "light" });
+    switch (droppedOnKey) {
+      case "shopInventory":
+        runOnSuccess(item);
+        break;
+      case "head":
+      case "main-hand":
+      case "off-hand":
+      case "body":
+      case "quiver":
+        playerState?.equipItem(item, droppedOnKey);
+        break;
+    }
+  };
 
   const onLayoutView = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
 
-    if (setInventoryBounds) {
-      setTimeout(() => {
-        if (selfRef?.current) {
-          selfRef.current.measure((x, y, w, h, pageX, pageY) => {
-            setInventoryBounds({
-              x: pageX,
-              y: pageY,
-              width,
-              height,
-            });
+    setTimeout(() => {
+      if (selfRef.current) {
+        selfRef.current.measure((x, y, w, h, pageX, pageY) => {
+          draggableClassStore.setInventoryBounds({
+            x: pageX,
+            y: pageY,
+            width,
+            height,
           });
-        }
-      }, 100);
-    }
+        });
+      }
+    }, 100);
   };
 
-  function checkReleasePosition({
-    itemStack,
-    xPos,
-    yPos,
-    size,
-    equipped,
-  }: checkReleasePositionProps) {
-    if (itemStack) {
-      if ("headTarget" in props) {
-        const {
-          headTarget,
-          bodyTarget,
-          mainHandTarget,
-          offHandTarget,
-          quiverTarget,
-        } = props;
-        if (itemStack[0].slot) {
-          let refs: React.RefObject<View>[] = [];
-          switch (itemStack[0].slot) {
-            case "head":
-              refs.push(headTarget);
-              break;
-            case "body":
-              refs.push(bodyTarget);
-              break;
-            case "two-hand":
-              refs.push(mainHandTarget, offHandTarget);
-              break;
-            case "one-hand":
-              refs.push(mainHandTarget, offHandTarget);
-              break;
-            case "off-hand":
-              refs.push(offHandTarget);
-              break;
-            case "quiver":
-              refs.push(quiverTarget);
-              break;
-          }
-          refs.forEach((ref) => {
-            ref.current?.measureInWindow(
-              (targetX, targetY, targetWidth, targetHeight) => {
-                const isWidthAligned =
-                  xPos + size / 2 >= targetX &&
-                  xPos - size / 2 <= targetX + targetWidth;
-                const isHeightAligned =
-                  yPos + size / 2 >= targetY &&
-                  yPos - size / 2 <= targetY + targetHeight;
-                if (isWidthAligned && isHeightAligned) {
-                  setDisplayItem(null);
-                  vibration({ style: "light", essential: true });
-                  if (
-                    equipped &&
-                    playerState &&
-                    playerState.inventory.length < 24
-                  ) {
-                    playerState?.unEquipItem(itemStack);
-                  } else {
-                    playerState?.equipItem(itemStack);
-                  }
-                  return false;
-                }
-              },
-            );
-          });
-        }
-      } else if ("pouchTarget" in props) {
-        const { pouchTarget, addItemToPouch } = props;
-        pouchTarget.current?.measureInWindow(
-          (targetX, targetY, targetWidth, targetHeight) => {
-            const isWidthAligned =
-              xPos + size / 2 >= targetX &&
-              xPos - size / 2 <= targetX + targetWidth;
-            const isHeightAligned =
-              yPos + size / 2 >= targetY &&
-              yPos - size / 2 <= targetY + targetHeight;
-            if (isWidthAligned && isHeightAligned) {
-              setDisplayItem(null);
-              vibration({ style: "light", essential: true });
-              playerState?.removeFromInventory(itemStack);
-              addItemToPouch({ items: itemStack });
-              return false;
-            }
-          },
-        );
-      } else {
-        const { shopInventoryTarget, shop } = props;
-        shopInventoryTarget.current?.measureInWindow(
-          (targetX, targetY, targetWidth, targetHeight) => {
-            const isWidthAligned =
-              xPos + size / 2 >= targetX &&
-              xPos - size / 2 <= targetX + targetWidth;
-            const isHeightAligned =
-              yPos + size / 2 >= targetY &&
-              yPos - size / 2 <= targetY + targetHeight;
-            if (isWidthAligned && isHeightAligned) {
-              setDisplayItem(null);
-              vibration({ style: "light", essential: true });
-              const price = itemStack[0].getSellPrice(
-                shop.shopKeeper.affection,
-              );
-              if (price <= shop.currentGold) {
-                playerState?.sellItem(itemStack, price);
-                shop.buyItem(itemStack, price);
-              }
-              return false;
-            }
-          },
-        );
-      }
-    }
-    return true;
-  }
-
-  const memoizedInventoryItems = useMemo(() => {
-    return inventory.slice(0, 24).map((item, index) => (
-      <View
-        className="absolute items-center justify-center z-top"
-        style={
-          uiStore.dimensions.width === uiStore.dimensions.greater
-            ? {
-                left: `${(index % 12) * 8.33 + 0.5}%`,
-                top: `${Math.floor(index / 12) * 48 + 8}%`,
-              }
-            : {
-                left: `${(index % 6) * 16.67 + 1.5}%`,
-                top: `${
-                  Math.floor(index / 6) * 24 +
-                  (uiStore.playerStatusIsCompact ? 5.5 : 5.0)
-                }%`,
-              }
-        }
-        key={index}
-      >
-        <View>
-          <InventoryItem
-            item={item.item}
-            setDisplayItem={(params) => {
-              if (params) {
-                setDisplayItem({ ...params, side: "inventory" });
-              } else {
-                setDisplayItem(null);
-              }
-            }}
-            checkReleasePosition={checkReleasePosition}
-            displayItem={displayItem}
-            isDraggable={!!item.item[0].slot}
-          />
-        </View>
-      </View>
-    ));
-  }, [
-    inventory,
-    uiStore.dimensions.width,
-    uiStore.dimensions.greater,
-    setDisplayItem,
-    checkReleasePosition,
-    displayItem,
-  ]);
-
-  return (
-    <>
-      <View
-        collapsable={false}
-        ref={selfRef}
-        className={`z-top ${"headTarget" in props ? "max-h-[60%]" : ""}`}
-      >
-        <ScrollView
-          horizontal
-          pagingEnabled
-          onLayout={(e) => {
-            onLayoutView(e);
-          }}
-          scrollEnabled={!!keyItemInventory}
-          contentContainerClassName={
-            !!keyItemInventory ? "z-top overflow-visible" : "mx-auto z-top"
-          }
-          onScrollBeginDrag={() => setDisplayItem(null)}
-          disableScrollViewPanResponder={true}
-          directionalLockEnabled={true}
-          bounces={false}
-          overScrollMode="never"
+  if (playerState) {
+    return (
+      <>
+        <View
           collapsable={false}
-          scrollIndicatorInsets={{ top: 0, left: 10, bottom: 0, right: 10 }}
+          ref={selfRef}
+          className={`z-top ${
+            pathname === "/"
+              ? "max-h-[60%]"
+              : pathname.split("/")[1].toLowerCase() == "shops"
+              ? "-ml-2"
+              : ""
+          }`}
         >
-          {/* Regular Inventory Panel */}
-          <View
-            style={{
-              width: uiStore.dimensions.width,
+          <ScrollView
+            horizontal
+            pagingEnabled
+            onLayout={(e) => {
+              onLayoutView(e);
             }}
-            ref={selfRef}
+            scrollEnabled={playerState.keyItems.length > 0}
+            onScrollBeginDrag={() => setDisplayItem(null)}
+            disableScrollViewPanResponder={true}
+            directionalLockEnabled={true}
+            bounces={false}
+            overScrollMode="never"
+            collapsable={false}
+            scrollIndicatorInsets={{ top: 0, left: 10, bottom: 0, right: 10 }}
           >
-            {!!keyItemInventory && (
-              <View
-                style={{
-                  width: uiStore.dimensions.width,
-                }}
-                className="items-center absolute justify-center py-2 top-[40%]"
-              >
-                <Text className="text-3xl tracking-widest opacity-70">
-                  Inventory
-                </Text>
-              </View>
-            )}
-            <Pressable
-              onPress={() => setDisplayItem(null)}
-              className="rounded-lg mx-2 border border-zinc-600 relative h-full"
+            {/* Regular Inventory Panel */}
+            <View
+              style={{
+                width: uiStore.dimensions.width,
+              }}
+              ref={selfRef}
             >
-              {Array.from({ length: 24 }).map((_, index) => (
+              {playerState.keyItems.length > 0 && (
                 <View
-                  className="absolute items-center justify-center"
-                  style={
-                    uiStore.dimensions.width === uiStore.dimensions.greater
-                      ? {
-                          left: `${(index % 12) * 8.33 + 0.5}%`,
-                          top: `${
-                            Math.floor(index / 12) * 48 +
-                            (uiStore.playerStatusIsCompact ? 8.0 : 7.5)
-                          }%`,
-                        }
-                      : {
-                          left: `${(index % 6) * 16.67 + 1.5}%`,
-                          top: `${
-                            Math.floor(index / 6) * 24 +
-                            (uiStore.playerStatusIsCompact ? 5.5 : 5.0)
-                          }%`,
-                        }
-                  }
-                  key={"bg-" + index}
+                  style={{
+                    width: uiStore.dimensions.width,
+                  }}
+                  className="items-center absolute justify-center py-2 top-[40%]"
                 >
-                  <View
-                    className="rounded-lg border-zinc-300 dark:border-zinc-700 border z-0"
-                    style={{
-                      height: uiStore.itemBlockSize,
-                      width: uiStore.itemBlockSize,
-                    }}
-                  />
+                  <Text className="text-3xl tracking-widest opacity-70">
+                    Inventory
+                  </Text>
                 </View>
-              ))}
-              {memoizedInventoryItems}
-            </Pressable>
-          </View>
-          {/* Key Item Inventory Panel */}
-          {keyItemInventory && (
-            <View style={{ width: uiStore.dimensions.width }}>
-              <View
-                style={{
-                  width: uiStore.dimensions.width,
-                }}
-                className="items-center absolute justify-center py-2 top-[40%]"
-              >
-                <Text className="text-3xl tracking-widest opacity-70">
-                  Key Items
-                </Text>
-              </View>
+              )}
               <Pressable
                 onPress={() => setDisplayItem(null)}
-                className={`${
-                  "headTarget" in props
-                    ? uiStore.dimensions.greater == uiStore.dimensions.height
-                      ? "h-[100%] mx-2"
-                      : "mx-2 h-[50%]"
-                    : "shop" in props
-                    ? "mt-4 h-[90%]"
-                    : "h-full mx-2"
-                } rounded-lg border border-zinc-600 relative`}
+                className="rounded-lg mx-2 border border-zinc-600 relative h-full"
               >
                 {Array.from({ length: 24 }).map((_, index) => (
                   <View
@@ -386,7 +156,7 @@ export default function InventoryRender({
                             }%`,
                           }
                     }
-                    key={"key-bg-" + index}
+                    key={"bg-" + index}
                   >
                     <View
                       className="rounded-lg border-zinc-300 dark:border-zinc-700 border z-0"
@@ -397,17 +167,14 @@ export default function InventoryRender({
                     />
                   </View>
                 ))}
-                {keyItemInventory.map((item, index) => (
+                {playerState.inventory.slice(0, 24).map((item, index) => (
                   <View
-                    className="absolute items-center justify-center"
+                    className="absolute items-center justify-center z-top"
                     style={
                       uiStore.dimensions.width === uiStore.dimensions.greater
                         ? {
                             left: `${(index % 12) * 8.33 + 0.5}%`,
-                            top: `${
-                              Math.floor(index / 12) * 48 +
-                              (uiStore.playerStatusIsCompact ? 8.0 : 7.5)
-                            }%`,
+                            top: `${Math.floor(index / 12) * 48 + 8}%`,
                           }
                         : {
                             left: `${(index % 6) * 16.67 + 1.5}%`,
@@ -417,23 +184,125 @@ export default function InventoryRender({
                             }%`,
                           }
                     }
-                    key={index}
+                    key={item.item[0].id}
                   >
                     <View>
                       <InventoryItem
-                        item={[item]}
-                        setDisplayItem={setDisplayItem}
-                        checkReleasePosition={checkReleasePosition}
+                        item={item.item}
+                        setDisplayItem={(params) => {
+                          if (params) {
+                            setDisplayItem({ ...params, side: "inventory" });
+                          } else {
+                            setDisplayItem(null);
+                          }
+                        }}
                         displayItem={displayItem}
+                        isDraggable={!!item.item[0].slot}
+                        targetBounds={targetBounds}
+                        runOnSuccess={(droppedOnKey) =>
+                          dropHandler(droppedOnKey, item.item)
+                        }
                       />
                     </View>
                   </View>
                 ))}
               </Pressable>
             </View>
-          )}
-        </ScrollView>
-      </View>
-    </>
-  );
+            {/* Key Item Inventory Panel */}
+            {playerState.keyItems.length > 0 && (
+              <View style={{ width: uiStore.dimensions.width }}>
+                <View
+                  style={{
+                    width: uiStore.dimensions.width,
+                  }}
+                  className="items-center absolute justify-center py-2 top-[40%]"
+                >
+                  <Text className="text-3xl tracking-widest opacity-70">
+                    Key Items
+                  </Text>
+                </View>
+                <Pressable
+                  onPress={() => setDisplayItem(null)}
+                  className={`${
+                    pathname == "/"
+                      ? uiStore.dimensions.greater == uiStore.dimensions.height
+                        ? "h-[100%] mx-2"
+                        : "mx-2 h-[50%]"
+                      : pathname.split("/")[1].toLowerCase() == "shops"
+                      ? "mt-4 h-[90%]"
+                      : "h-full mx-2"
+                  } rounded-lg border border-zinc-600 relative`}
+                >
+                  {Array.from({ length: 24 }).map((_, index) => (
+                    <View
+                      className="absolute items-center justify-center"
+                      style={
+                        uiStore.dimensions.width === uiStore.dimensions.greater
+                          ? {
+                              left: `${(index % 12) * 8.33 + 0.5}%`,
+                              top: `${
+                                Math.floor(index / 12) * 48 +
+                                (uiStore.playerStatusIsCompact ? 8.0 : 7.5)
+                              }%`,
+                            }
+                          : {
+                              left: `${(index % 6) * 16.67 + 1.5}%`,
+                              top: `${
+                                Math.floor(index / 6) * 24 +
+                                (uiStore.playerStatusIsCompact ? 5.5 : 5.0)
+                              }%`,
+                            }
+                      }
+                      key={"key-bg-" + index}
+                    >
+                      <View
+                        className="rounded-lg border-zinc-300 dark:border-zinc-700 border z-0"
+                        style={{
+                          height: uiStore.itemBlockSize,
+                          width: uiStore.itemBlockSize,
+                        }}
+                      />
+                    </View>
+                  ))}
+                  {playerState.keyItems.map((item, index) => (
+                    <View
+                      className="absolute items-center justify-center"
+                      style={
+                        uiStore.dimensions.width === uiStore.dimensions.greater
+                          ? {
+                              left: `${(index % 12) * 8.33 + 0.5}%`,
+                              top: `${
+                                Math.floor(index / 12) * 48 +
+                                (uiStore.playerStatusIsCompact ? 8.0 : 7.5)
+                              }%`,
+                            }
+                          : {
+                              left: `${(index % 6) * 16.67 + 1.5}%`,
+                              top: `${
+                                Math.floor(index / 6) * 24 +
+                                (uiStore.playerStatusIsCompact ? 5.5 : 5.0)
+                              }%`,
+                            }
+                      }
+                      key={index}
+                    >
+                      <View>
+                        <InventoryItem
+                          item={[item]}
+                          setDisplayItem={setDisplayItem}
+                          displayItem={displayItem}
+                          targetBounds={[]}
+                          runOnSuccess={() => null}
+                        />
+                      </View>
+                    </View>
+                  ))}
+                </Pressable>
+              </View>
+            )}
+          </ScrollView>
+        </View>
+      </>
+    );
+  }
 }

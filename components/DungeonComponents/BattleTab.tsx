@@ -34,10 +34,8 @@ import { observer } from "mobx-react-lite";
 const BattleTab = observer(
   ({
     battleTab,
-    pouchRef,
   }: {
     battleTab: "attacksOrNavigation" | "equipment" | "log";
-    pouchRef: React.RefObject<View>;
   }) => {
     const { colorScheme } = useColorScheme();
     const [attackDetails, setAttackDetails] = useState<Attack | Spell | null>(
@@ -51,7 +49,7 @@ const BattleTab = observer(
 
     const { useAttack } = useCombatActions();
     const { displayItem, setDisplayItem } = useLootState();
-    const { setIconString } = useDraggableStore();
+    const { draggableClassStore } = useDraggableStore();
     const { setShowTargetSelection } = useCombatState();
 
     const [combinedData, setCombinedData] = useState<(Attack | Spell)[]>([]);
@@ -105,7 +103,7 @@ const BattleTab = observer(
 
         const attackHitsAllTargets =
           attackOrSpell.attackStyle == "aoe" ||
-          enoughForDualToHitAll ||
+          (attackOrSpell.attackStyle == "dual" && enoughForDualToHitAll) ||
           enemyStore.enemies.length === 1;
 
         if (!attackHitsAllTargets) {
@@ -336,15 +334,9 @@ const BattleTab = observer(
               <InventoryRender
                 displayItem={displayItem}
                 setDisplayItem={setDisplayItem}
-                inventory={playerState.inventory}
-                pouchTarget={pouchRef}
-                addItemToPouch={addItemToPouch}
-                setIconString={setIconString}
-                keyItemInventory={
-                  playerState.keyItems.length > 0
-                    ? playerState.keyItems
-                    : undefined
-                }
+                targetBounds={[
+                  draggableClassStore.ancillaryBoundsMap.get("pouch") ?? null,
+                ]}
               />
             </PlatformDependantBlurView>
           </TouchableWithoutFeedback>

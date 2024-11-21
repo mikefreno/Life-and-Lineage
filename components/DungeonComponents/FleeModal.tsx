@@ -5,7 +5,7 @@ import { rollD20, wait } from "../../utility/functions/misc";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { useVibration } from "../../hooks/generic";
-import { usePlayerStore, useRootStore } from "../../hooks/stores";
+import { useRootStore } from "../../hooks/stores";
 import { useCombatActions, useEnemyManagement } from "../../hooks/combat";
 import { savePlayer } from "../../entities/character";
 import { observer } from "mobx-react-lite";
@@ -13,8 +13,7 @@ import { observer } from "mobx-react-lite";
 const FleeModal = observer(() => {
   const vibration = useVibration();
   const rootStore = useRootStore();
-  const { enemyStore, dungeonStore } = rootStore;
-  const playerState = usePlayerStore();
+  const { enemyStore, dungeonStore, playerState } = rootStore;
   const { playerMinionsTurn } = useCombatActions();
   const { enemyTurn } = useEnemyManagement();
 
@@ -36,20 +35,18 @@ const FleeModal = observer(() => {
       ) {
         vibration({ style: "light" });
         setFleeRollFailure(false);
+        rootStore.leaveDungeon();
         dungeonStore.setFleeModalShowing(false);
-        wait(500).then(() => {
-          if (dungeonStore.currentInstance?.name == "Activities") {
-            router.replace("/shops");
-          } else {
-            router.replace("/dungeon");
-          }
-          if (dungeonStore.currentInstance?.name == "Activities") {
-            router.push("/Activities");
-          }
+        if (dungeonStore.currentInstance?.name == "Activities") {
+          router.replace("/shops");
+        } else {
+          router.replace("/dungeon");
+        }
+        if (dungeonStore.currentInstance?.name == "Activities") {
+          router.push("/Activities");
+        }
 
-          rootStore.leaveDungeon();
-          savePlayer(playerState);
-        });
+        savePlayer(playerState);
       } else {
         setFleeRollFailure(true);
         vibration({ style: "error" });

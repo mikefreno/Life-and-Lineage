@@ -6,6 +6,7 @@ import {
   View,
   TouchableWithoutFeedback,
   Animated,
+  LayoutChangeEvent,
 } from "react-native";
 import { useEffect, useRef, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
@@ -16,7 +17,7 @@ import shopObjects from "../../assets/json/shops.json";
 import InventoryRender from "../../components/InventoryRender";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import { Coins } from "../../assets/icons/SVGIcons";
-import { TutorialOption, checkReleasePositionProps } from "../../utility/types";
+import { TutorialOption } from "../../utility/types";
 import ProgressBar from "../../components/ProgressBar";
 import Colors from "../../constants/Colors";
 import { useColorScheme } from "nativewind";
@@ -73,8 +74,9 @@ const GreetingComponent = ({
 const ShopInteriorScreen = observer(() => {
   let { shop } = useLocalSearchParams();
   const { playerState, shopsStore, uiStore } = useRootStore();
-  const { setIconString } = useDraggableStore();
+  const { draggableClassStore } = useDraggableStore();
 
+  const shopInventoryTarget = useRef<View | null>(null);
   const vibration = useVibration();
   const colors = shopObjects.find((shopObj) => shopObj.type == shop)?.colors;
   const thisShop = shopsStore.getShop(shop as string);
@@ -89,19 +91,34 @@ const ShopInteriorScreen = observer(() => {
   const [inventoryFullNotifier, setInventoryFullNotifier] =
     useState<boolean>(false);
 
-  const inventoryTarget = useRef<View>(null);
-  const shopInventoryTarget = useRef<View>(null);
   const isFocused = useIsFocused();
 
   const header = useHeaderHeight();
   const { colorScheme } = useColorScheme();
 
-  const [inventoryBounds, setInventoryBounds] = useState<{
+  const [shopInventoryBounds, setShopInventoryBounds] = useState<{
     x: number;
     y: number;
     width: number;
     height: number;
   } | null>(null);
+
+  const setShopBoundsOnLayout = (event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+
+    setTimeout(() => {
+      if (shopInventoryTarget.current) {
+        shopInventoryTarget.current.measure((x, y, w, h, pageX, pageY) => {
+          setShopInventoryBounds({
+            x: pageX,
+            y: pageY,
+            width,
+            height,
+          });
+        });
+      }
+    }, 100);
+  };
 
   useEffect(() => {
     if (inventoryFullNotifier) {
@@ -122,34 +139,6 @@ const ShopInteriorScreen = observer(() => {
       setInitialized(true);
     }
   }, [playerState]);
-
-  function checkReleasePosition({
-    itemStack,
-    xPos,
-    yPos,
-    size,
-  }: checkReleasePositionProps) {
-    if (itemStack && thisShop && playerState && inventoryBounds) {
-      const isWidthAligned =
-        xPos + size / 2 >= inventoryBounds.x &&
-        xPos - size / 2 <= inventoryBounds.x + inventoryBounds.width;
-      const isHeightAligned =
-        yPos + size / 2 >= inventoryBounds.y &&
-        yPos - size / 2 <= inventoryBounds.y + inventoryBounds.height;
-
-      if (isWidthAligned && isHeightAligned) {
-        setDisplayItem(null);
-        vibration({ style: "light", essential: true });
-        const price = itemStack[0].getBuyPrice(thisShop.shopKeeper.affection);
-        if (price <= playerState.gold) {
-          playerState.buyItem(itemStack, price);
-          thisShop.sellItem(itemStack, price);
-          return false;
-        }
-      }
-    }
-    return true;
-  }
 
   function sellAllJunk() {
     if (thisShop) {
@@ -172,7 +161,7 @@ const ShopInteriorScreen = observer(() => {
   }
 
   const sellStack = (items: Item[]) => {
-    if (playerState && displayItem && thisShop) {
+    if (playerState && thisShop) {
       items.forEach((item) => {
         const itemPrice = item.getSellPrice(thisShop.shopKeeper.affection);
         thisShop.buyItem(item, itemPrice);
@@ -273,6 +262,7 @@ const ShopInteriorScreen = observer(() => {
                 />
               </View>
               <View
+                onLayout={(e) => setShopBoundsOnLayout(e)}
                 className="shadow-soft w-2/3 rounded-l border-l border-b border-zinc-300 dark:border-zinc-700"
                 ref={shopInventoryTarget}
               >
@@ -294,6 +284,13 @@ const ShopInteriorScreen = observer(() => {
                           key={item.item[0].id}
                           item={item.item}
                           displayItem={displayItem}
+                          targetBounds={[
+                            {
+                              key: "playerInventory",
+                              bounds: draggableClassStore.inventoryBounds,
+                            },
+                          ]}
+                          runOnSuccess={() => purchaseStack(item.item)}
                           setDisplayItem={(params) => {
                             if (params) {
                               setDisplayItem({ ...params, side: "shop" });
@@ -301,7 +298,6 @@ const ShopInteriorScreen = observer(() => {
                               setDisplayItem(null);
                             }
                           }}
-                          checkReleasePosition={checkReleasePosition}
                         />
                       </View>
                     </Pressable>
@@ -332,16 +328,12 @@ const ShopInteriorScreen = observer(() => {
               </View>
               <View className="h-[85%] w-full" collapsable={false}>
                 <InventoryRender
-                  setInventoryBounds={setInventoryBounds}
-                  selfRef={inventoryTarget}
-                  shopInventoryTarget={shopInventoryTarget}
-                  inventory={playerState.inventory}
-                  shop={thisShop}
-                  sellItem={sellItem}
-                  sellStack={sellStack}
                   displayItem={displayItem}
                   setDisplayItem={setDisplayItem}
-                  setIconString={setIconString}
+                  targetBounds={[
+                    { key: "shopInventory", bounds: shopInventoryBounds },
+                  ]}
+                  runOnSuccess={(item: Item[]) => sellStack(item)}
                 />
               </View>
             </View>

@@ -122,7 +122,7 @@ const ShopsScreen = observer(() => {
 
       {isReady ? (
         <ScrollView
-          scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
+          scrollIndicatorInsets={{ top: 120, right: 0, left: 0, bottom: 48 }}
         >
           <View
             style={{

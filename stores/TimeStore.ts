@@ -29,12 +29,8 @@ export class TimeStore {
   }
 
   tick() {
-    if (this.week == 51) {
-      this.year++;
-      this.week = 0;
-    } else {
-      this.week++;
-    }
+    this.week = (this.week + 1) % 52;
+    if (this.week === 0) this.year++;
   }
 
   get currentDate() {

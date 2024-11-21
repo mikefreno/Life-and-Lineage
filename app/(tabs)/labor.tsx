@@ -1,7 +1,6 @@
-import jobs from "../../assets/json/jobs.json";
 import LaborTask from "../../components/LaborTask";
 import { View, ScrollView } from "react-native";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc";
 import { router } from "expo-router";
 import { useIsFocused } from "@react-navigation/native";
@@ -26,8 +25,8 @@ const EarnScreen = observer(() => {
 
   function applyToJob(title: string) {
     if (playerState) {
-      const found = jobs.find((job) => job.title == title);
-      if (!found) throw new Error("Missing job is JSON!");
+      const found = playerState.jobs.get(title);
+      if (!found) throw new Error("Missing job is playerState.jobs!");
       const res = playerState.missingPreReqs(found.qualifications);
       if (res) {
         setMissingPreReqs(res);
@@ -37,84 +36,90 @@ const EarnScreen = observer(() => {
       }
     }
   }
+
+  const sortedJobs = useMemo(() => {
+    if (!playerState?.jobs) return [];
+    return Array.from(playerState.jobs).sort(
+      ([, jobA], [, jobB]) => jobA.reward.gold - jobB.reward.gold,
+    );
+  }, [playerState?.jobs]);
+
   const headerHeight = useHeaderHeight();
   const bottomBarHeight = useBottomTabBarHeight();
   const isFocused = useIsFocused();
 
-  return (
-    <>
-      <TutorialModal
-        tutorial={TutorialOption.labor}
-        isFocused={isFocused}
-        pageOne={{
-          title: "Labor Tab",
-          body: "Come here to earn gold in a (mostly) safe way. Certain jobs have qualifications which you can earn by going to the training school (top left).",
-        }}
-        pageTwo={{
-          title: "There are other options to earn gold.",
-          body: "If you have a stockpile, you can invest to earn passively (top right). And the dungeon, which is far more dangerous than any job, but promises great riches.",
-        }}
-      />
-      <GenericModal
-        isVisibleCondition={showingRejection}
-        backFunction={() => setShowingRejection(false)}
-      >
-        <View className="flex items-center">
-          <Text className="text-3xl">Rejected!</Text>
-          <Text className="my-6 text-center text-lg">
-            You are missing the following qualifications:
-          </Text>
-          {missingPreReqs.map((missing) => (
-            <Text key={missing} className="py-1 text-lg">
-              {toTitleCase(missing)}
-            </Text>
-          ))}
-        </View>
-        <GenericFlatButton
-          onPress={() => {
-            vibration({ style: "light" });
-            setTimeout(() => {
-              setShowingRejection(false);
-            }, 300);
-            router.push("/Education");
+  if (playerState) {
+    return (
+      <>
+        <TutorialModal
+          tutorial={TutorialOption.labor}
+          isFocused={isFocused}
+          pageOne={{
+            title: "Labor Tab",
+            body: "Come here to earn gold in a (mostly) safe way. Certain jobs have qualifications which you can earn by going to the training school (top left).",
           }}
+          pageTwo={{
+            title: "There are other options to earn gold.",
+            body: "If you have a stockpile, you can invest to earn passively (top right). And the dungeon, which is far more dangerous than any job, but promises great riches.",
+          }}
+        />
+        <GenericModal
+          isVisibleCondition={showingRejection}
+          backFunction={() => setShowingRejection(false)}
         >
-          Gain Qualifications
-        </GenericFlatButton>
-      </GenericModal>
-      <View>
-        <ScrollView
-          scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
-        >
-          <View
-            className="px-2"
-            style={{
-              paddingTop: headerHeight,
-              paddingBottom:
-                bottomBarHeight +
-                (uiStore.playerStatusIsCompact ? 0 : EXPANDED_PAD),
+          <View className="flex items-center">
+            <Text className="text-3xl">Rejected!</Text>
+            <Text className="my-6 text-center text-lg">
+              You are missing the following qualifications:
+            </Text>
+            {missingPreReqs.map((missing) => (
+              <Text key={missing} className="py-1 text-lg">
+                {toTitleCase(missing)}
+              </Text>
+            ))}
+          </View>
+          <GenericFlatButton
+            onPress={() => {
+              vibration({ style: "light" });
+              setTimeout(() => {
+                setShowingRejection(false);
+              }, 300);
+              router.push("/Education");
             }}
           >
-            {jobs
-              .sort((aJob, bJob) => aJob.reward.gold - bJob.reward.gold)
-              .map((Job, index) => {
-                return (
-                  <LaborTask
-                    key={index}
-                    title={Job.title}
-                    reward={Job.reward.gold}
-                    cost={Job.cost}
-                    experienceToPromote={Job.experienceToPromote}
-                    applyToJob={applyToJob}
-                    focused={isFocused}
-                    vibration={vibration}
-                  />
-                );
-              })}
-          </View>
-        </ScrollView>
-      </View>
-    </>
-  );
+            Gain Qualifications
+          </GenericFlatButton>
+        </GenericModal>
+        <View>
+          <ScrollView
+            scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
+          >
+            <View
+              className="px-2"
+              style={{
+                paddingTop: headerHeight,
+                paddingBottom:
+                  bottomBarHeight +
+                  (uiStore.playerStatusIsCompact ? 0 : EXPANDED_PAD),
+              }}
+            >
+              {sortedJobs.map(([key, jobData]) => (
+                <LaborTask
+                  key={key}
+                  title={jobData.title}
+                  reward={jobData.reward.gold}
+                  cost={jobData.cost}
+                  experienceToPromote={jobData.experienceToPromote}
+                  applyToJob={applyToJob}
+                  focused={isFocused}
+                  vibration={vibration}
+                />
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+      </>
+    );
+  }
 });
 export default EarnScreen;

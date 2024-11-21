@@ -1,19 +1,15 @@
-import { RefObject } from "react";
-import { View, Image } from "react-native";
+import { View, Image, type LayoutChangeEvent } from "react-native";
 import { Text } from "./Themed";
-import { checkReleasePositionProps } from "../utility/types";
 import { InventoryItem } from "./Draggable";
 import type { Item } from "../entities/item";
-import { useVibration } from "../hooks/generic";
-import { useRootStore } from "../hooks/stores";
+import { useDraggableStore, useRootStore } from "../hooks/stores";
+import { useCallback, useRef } from "react";
+import { PlayerCharacter } from "../entities/character";
+import UIStore from "../stores/UIStore";
+import { DraggableDataStore } from "../stores/DraggableDataStore";
+import { observer } from "mobx-react-lite";
 
 interface EquipmentDisplayProps {
-  headTarget: RefObject<View>;
-  bodyTarget: RefObject<View>;
-  mainHandTarget: RefObject<View>;
-  offHandTarget: RefObject<View>;
-  quiverTarget: RefObject<View>;
-  inventoryTarget: RefObject<View>;
   displayItem: {
     item: Item[];
     position: {
@@ -33,110 +29,131 @@ interface EquipmentDisplayProps {
 }
 
 export default function EquipmentDisplay({
-  headTarget,
-  bodyTarget,
-  mainHandTarget,
-  offHandTarget,
-  inventoryTarget,
-  quiverTarget,
   setDisplayItem,
 }: EquipmentDisplayProps) {
-  const vibration = useVibration();
   const { playerState, uiStore } = useRootStore();
+  const { draggableClassStore } = useDraggableStore();
 
-  function checkReleasePosition({
-    itemStack,
-    xPos,
-    yPos,
-    size,
-    equipped,
-  }: checkReleasePositionProps) {
-    if (itemStack && itemStack[0].slot) {
-      let refs: React.RefObject<View>[] = [];
-      if (equipped) {
-        refs.push(inventoryTarget);
-      } else {
-        switch (itemStack[0].slot) {
-          case "head":
-            refs.push(headTarget);
-            break;
-          case "body":
-            refs.push(bodyTarget);
-            break;
-          case "two-hand":
-            refs.push(mainHandTarget, offHandTarget);
-            break;
-          case "one-hand":
-            refs.push(mainHandTarget, offHandTarget);
-            break;
-          case "off-hand":
-            refs.push(offHandTarget);
-            break;
-          case "quiver":
-            refs.push(quiverTarget);
-        }
-      }
-      refs.forEach((ref) => {
-        ref.current?.measureInWindow(
-          (targetX, targetY, targetWidth, targetHeight) => {
-            const isWidthAligned =
-              xPos + size / 2 >= targetX &&
-              xPos - size / 2 <= targetX + targetWidth;
-            const isHeightAligned =
-              yPos + size / 2 >= targetY &&
-              yPos - size / 2 <= targetY + targetHeight;
-            if (isWidthAligned && isHeightAligned) {
-              vibration({ style: "light", essential: true });
-              setDisplayItem(null);
-              if (
-                equipped &&
-                playerState &&
-                playerState.inventory.length < 24
-              ) {
-                playerState?.unEquipItem(itemStack);
-              } else {
-                playerState?.equipItem(itemStack);
-              }
-              return false;
-            }
-          },
-        );
-      });
-    }
-    return true;
+  if (playerState) {
+    return (
+      <View className="pb-2 my-auto z-10">
+        <View className="flex flex-row items-center justify-between w-full">
+          <View className="flex-1" />
+          <View className="flex-1 flex items-center justify-center -ml-[10vw]">
+            <EquipmentSlot
+              slot="Head"
+              playerState={playerState}
+              uiStore={uiStore}
+              draggableClassStore={draggableClassStore}
+              setDisplayItem={setDisplayItem}
+              inventoryBounds={draggableClassStore.inventoryBounds}
+            />
+          </View>
+          <View className="flex-1 flex items-center justify-end -mt-[3vh] -ml-[10vw]">
+            <EquipmentSlot
+              slot="Quiver"
+              playerState={playerState}
+              uiStore={uiStore}
+              draggableClassStore={draggableClassStore}
+              setDisplayItem={setDisplayItem}
+              inventoryBounds={draggableClassStore.inventoryBounds}
+            />
+          </View>
+        </View>
+
+        <View className="flex flex-row justify-evenly -mt-4">
+          <View className="-ml-2 mr-2">
+            <EquipmentSlot
+              slot={"Main-Hand"}
+              playerState={playerState}
+              uiStore={uiStore}
+              draggableClassStore={draggableClassStore}
+              setDisplayItem={setDisplayItem}
+              inventoryBounds={draggableClassStore.inventoryBounds}
+            />
+          </View>
+          <View className="">
+            <EquipmentSlot
+              slot={"Off-Hand"}
+              playerState={playerState}
+              uiStore={uiStore}
+              draggableClassStore={draggableClassStore}
+              setDisplayItem={setDisplayItem}
+              inventoryBounds={draggableClassStore.inventoryBounds}
+            />
+          </View>
+        </View>
+        <View
+          className={`mx-auto items-center ${
+            uiStore.dimensions.width == uiStore.dimensions.greater
+              ? "-mt-20"
+              : "-mt-8"
+          }`}
+        >
+          <EquipmentSlot
+            slot={"Body"}
+            playerState={playerState}
+            uiStore={uiStore}
+            draggableClassStore={draggableClassStore}
+            setDisplayItem={setDisplayItem}
+            inventoryBounds={draggableClassStore.inventoryBounds}
+          />
+        </View>
+      </View>
+    );
   }
+}
 
-  interface EquipmentSlotProps {
+const EquipmentSlot = observer(
+  ({
+    slot,
+    playerState,
+    uiStore,
+    draggableClassStore,
+    setDisplayItem,
+    inventoryBounds,
+  }: {
     slot: "Head" | "Main-Hand" | "Off-Hand" | "Body" | "Quiver";
-  }
-
-  const EquipmentSlot = ({ slot }: EquipmentSlotProps) => {
-    let ref: RefObject<View>;
+    playerState: PlayerCharacter;
+    uiStore: UIStore;
+    draggableClassStore: DraggableDataStore;
+    setDisplayItem: React.Dispatch<
+      React.SetStateAction<{
+        item: Item[];
+        position: {
+          left: number;
+          top: number;
+        };
+      } | null>
+    >;
+    inventoryBounds: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    } | null;
+  }) => {
     let itemStack: Item[] = [];
+    const selfRef = useRef<View | null>(null);
     if (playerState) {
       switch (slot) {
         case "Head":
-          ref = headTarget;
           playerState.equipment.head &&
             itemStack.push(playerState.equipment.head);
           break;
         case "Main-Hand":
-          ref = mainHandTarget;
           playerState.equipment.mainHand.name !== "unarmored" &&
             itemStack.push(playerState.equipment.mainHand);
           break;
         case "Off-Hand":
-          ref = offHandTarget;
           playerState.equipment.offHand &&
             itemStack.push(playerState.equipment.offHand);
           break;
         case "Body":
-          ref = bodyTarget;
           playerState.equipment.body &&
             itemStack.push(playerState.equipment.body);
           break;
         case "Quiver":
-          ref = quiverTarget;
           itemStack = playerState.equipment.quiver ?? [];
           break;
       }
@@ -147,89 +164,111 @@ export default function EquipmentDisplay({
         return <></>;
       }
 
+      const setBoundsOnLayout = useCallback(
+        (event: LayoutChangeEvent) => {
+          const { width, height } = event.nativeEvent.layout;
+
+          setTimeout(() => {
+            if (selfRef.current) {
+              selfRef.current.measure((x, y, w, h, pageX, pageY) => {
+                draggableClassStore.setAncillaryBounds(slot.toLowerCase(), {
+                  x: pageX,
+                  y: pageY,
+                  width,
+                  height,
+                });
+              });
+            }
+          }, 100);
+        },
+        [uiStore.dimensions],
+      );
+
       return (
-        <View>
+        <>
           <Text className="mb-1 text-center">{slot}</Text>
-          {itemStack.length > 0 ? (
-            <View
-              className="z-50 mx-auto border border-zinc-400 rounded-lg"
-              style={{
-                height: uiStore.itemBlockSize,
-                width: uiStore.itemBlockSize,
-              }}
-            >
-              <InventoryItem
-                item={itemStack}
-                displayItem={null}
-                checkReleasePosition={checkReleasePosition}
-                setDisplayItem={setDisplayItem}
-              />
-            </View>
-          ) : slot === "Off-Hand" && isTwoHanded ? (
-            <View
-              className={`${
-                playerState.equipment.mainHand.playerHasRequirements
-                  ? "bg-zinc-400"
-                  : "bg-red-800"
-              } mx-auto z-10 items-center rounded-lg border border-zinc-400`}
-              style={{
-                height: uiStore.itemBlockSize,
-                width: uiStore.itemBlockSize,
-              }}
-            >
-              <Image
-                className="my-auto opacity-50"
-                source={playerState.equipment.mainHand?.getItemIcon()}
+          <View onLayout={(e) => setBoundsOnLayout(e)} ref={selfRef}>
+            {itemStack.length > 0 ? (
+              <View
+                className="z-50 mx-auto border border-zinc-400 rounded-lg"
                 style={{
-                  height: Math.min(uiStore.itemBlockSize * 0.65, 52),
-                  width: Math.min(uiStore.itemBlockSize * 0.65, 52),
+                  height: uiStore.itemBlockSize,
+                  width: uiStore.itemBlockSize,
+                }}
+              >
+                <InventoryItem
+                  item={itemStack}
+                  setDisplayItem={(params) => {
+                    setDisplayItem(params);
+                  }}
+                  targetBounds={[
+                    { key: "playerInventory", bounds: inventoryBounds },
+                    {
+                      key: "head",
+                      bounds:
+                        draggableClassStore.ancillaryBoundsMap.get("head"),
+                    },
+                    {
+                      key: "main-hand",
+                      bounds:
+                        draggableClassStore.ancillaryBoundsMap.get("main-hand"),
+                    },
+                    {
+                      key: "off-hand",
+                      bounds:
+                        draggableClassStore.ancillaryBoundsMap.get("off-hand"),
+                    },
+                    {
+                      key: "body",
+                      bounds:
+                        draggableClassStore.ancillaryBoundsMap.get("body"),
+                    },
+                    {
+                      key: "quiver",
+                      bounds:
+                        draggableClassStore.ancillaryBoundsMap.get("quiver"),
+                    },
+                  ]}
+                  runOnSuccess={() => {
+                    playerState.unEquipItem(itemStack);
+                  }}
+                  displayItem={null}
+                  isDraggable={true}
+                />
+              </View>
+            ) : slot === "Off-Hand" && isTwoHanded ? (
+              <View
+                className={`${
+                  playerState.equipment.mainHand.playerHasRequirements
+                    ? "bg-zinc-400"
+                    : "bg-red-800"
+                } mx-auto z-10 items-center rounded-lg border border-zinc-400`}
+                style={{
+                  height: uiStore.itemBlockSize,
+                  width: uiStore.itemBlockSize,
+                }}
+              >
+                <Image
+                  className="my-auto opacity-50"
+                  source={playerState.equipment.mainHand?.getItemIcon()}
+                  style={{
+                    height: Math.min(uiStore.itemBlockSize * 0.65, 52),
+                    width: Math.min(uiStore.itemBlockSize * 0.65, 52),
+                  }}
+                />
+              </View>
+            ) : (
+              <View
+                className="mx-auto rounded-lg border border-zinc-400"
+                style={{
+                  height: uiStore.itemBlockSize,
+                  width: uiStore.itemBlockSize,
                 }}
               />
-            </View>
-          ) : (
-            <View
-              ref={ref}
-              className="mx-auto rounded-lg border border-zinc-400"
-              style={{
-                height: uiStore.itemBlockSize,
-                width: uiStore.itemBlockSize,
-              }}
-            />
-          )}
-        </View>
+            )}
+          </View>
+        </>
       );
     }
-  };
-
-  return (
-    <View className="pb-2 my-auto z-10">
-      <View className="flex flex-row items-center justify-between w-full">
-        <View className="flex-1" />
-        <View className="flex-1 flex items-center justify-center -ml-[10vw]">
-          <EquipmentSlot slot="Head" />
-        </View>
-        <View className="flex-1 flex items-center justify-end -mt-[3vh] -ml-[10vw]">
-          <EquipmentSlot slot="Quiver" />
-        </View>
-      </View>
-
-      <View className="flex flex-row justify-evenly -mt-4">
-        <View className="-ml-2 mr-2">
-          <EquipmentSlot slot={"Main-Hand"} />
-        </View>
-        <View className="">
-          <EquipmentSlot slot={"Off-Hand"} />
-        </View>
-      </View>
-      <View
-        className={`mx-auto items-center ${
-          uiStore.dimensions.width == uiStore.dimensions.greater
-            ? "-mt-20"
-            : "-mt-8"
-        }`}
-      >
-        <EquipmentSlot slot={"Body"} />
-      </View>
-    </View>
-  );
-}
+  },
+);

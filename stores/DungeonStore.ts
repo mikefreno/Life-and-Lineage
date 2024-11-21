@@ -351,7 +351,6 @@ export class DungeonStore {
         logs,
       };
     } catch (error) {
-      console.error("Error hydrating dungeon state:", error);
       return false;
     }
   }
@@ -434,9 +433,7 @@ const _dungeonInstanceSave = async (dungeon: DungeonInstance | undefined) => {
   if (dungeon) {
     try {
       storage.set(`dungeon_${dungeon.id}`, stringify(dungeon));
-    } catch (e) {
-      console.log("Error in _playerSave:", e);
-    }
+    } catch (e) {}
   }
 };
 

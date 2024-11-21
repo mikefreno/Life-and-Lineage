@@ -1,6 +1,6 @@
 import { TouchableWithoutFeedback, View } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
@@ -27,22 +27,18 @@ import { TutorialOption } from "../../utility/types";
 import { useDraggableStore, useRootStore } from "../../hooks/stores";
 import D20DieAnimation from "../../components/DieRollAnim";
 import { EXPANDED_PAD } from "../../components/PlayerStatus";
+import type { Item } from "../../entities/item";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
   const { playerState, uiStore } = useRootStore();
   const { dimensions, playerStatusIsCompact } = uiStore;
-  const { setIconString } = useDraggableStore();
+  const { draggableClassStore } = useDraggableStore();
 
-  const headTarget = useRef(null);
-  const bodyTarget = useRef(null);
-  const mainHandTarget = useRef(null);
-  const offHandTarget = useRef(null);
-  const quiverTarget = useRef(null);
-  const inventoryTarget = useRef(null);
-
-  const [displayItem, setDisplayItem] = useState(null);
-  const [inventoryBounds, setInventoryBounds] = useState(null);
+  const [displayItem, setDisplayItem] = useState<{
+    item: Item[];
+    position: { left: number; top: number };
+  } | null>(null);
 
   const tabBarHeight = useBottomTabBarHeight() + 10;
   const header = useHeaderHeight();
@@ -187,32 +183,37 @@ const HomeScreen = observer(() => {
               )}
             </View>
             <EquipmentDisplay
-              headTarget={headTarget}
-              bodyTarget={bodyTarget}
-              mainHandTarget={mainHandTarget}
-              offHandTarget={offHandTarget}
-              inventoryTarget={inventoryTarget}
-              quiverTarget={quiverTarget}
               displayItem={displayItem}
               setDisplayItem={setDisplayItem}
             />
             <InventoryRender
-              setInventoryBounds={setInventoryBounds}
-              selfRef={inventoryTarget}
-              headTarget={headTarget}
-              bodyTarget={bodyTarget}
-              mainHandTarget={mainHandTarget}
-              offHandTarget={offHandTarget}
-              quiverTarget={quiverTarget}
-              inventory={playerState.inventory}
               displayItem={displayItem}
               setDisplayItem={setDisplayItem}
-              setIconString={setIconString}
-              keyItemInventory={
-                playerState.keyItems.length > 0
-                  ? playerState.keyItems
-                  : undefined
-              }
+              targetBounds={[
+                {
+                  key: "head",
+                  bounds: draggableClassStore.ancillaryBoundsMap.get("head"),
+                },
+                {
+                  key: "main-hand",
+                  bounds:
+                    draggableClassStore.ancillaryBoundsMap.get("main-hand"),
+                },
+                {
+                  key: "off-hand",
+                  bounds:
+                    draggableClassStore.ancillaryBoundsMap.get("off-hand"),
+                },
+                {
+                  key: "body",
+                  bounds: draggableClassStore.ancillaryBoundsMap.get("body"),
+                },
+                {
+                  key: "quiver",
+                  bounds: draggableClassStore.ancillaryBoundsMap.get("quiver"),
+                },
+              ]}
+              runOnSuccess={() => null}
             />
           </View>
         </TouchableWithoutFeedback>

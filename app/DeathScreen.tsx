@@ -24,6 +24,7 @@ import { savePlayer, type Character } from "../entities/character";
 import { useRootStore } from "../hooks/stores";
 import { useVibration } from "../hooks/generic";
 import { Item } from "../entities/item";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 export default function DeathScreen() {
   const [nextLife, setNextLife] = useState<Character | null>(null);
@@ -97,38 +98,11 @@ export default function DeathScreen() {
       });
     }
   };
+  const header = useHeaderHeight();
 
   if (playerState) {
     return (
       <>
-        <Stack.Screen
-          name="DungeonLevel"
-          options={{
-            headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 20 },
-            headerLeft: () => (
-              <Pressable
-                onPress={() => {
-                  dungeonStore.setFleeModalShowing(true);
-                }}
-              >
-                {({ pressed }) => (
-                  <MaterialCommunityIcons
-                    name="run-fast"
-                    size={28}
-                    color={colorScheme == "light" ? "#18181b" : "#fafafa"}
-                    style={{
-                      opacity: pressed ? 0.5 : 1,
-                      marginRight: Platform.OS == "android" ? 8 : 0,
-                    }}
-                  />
-                )}
-              </Pressable>
-            ),
-            title: `${toTitleCase(
-              dungeonStore.currentInstance?.name as string,
-            )} Level ${dungeonStore.currentLevel?.level}`,
-          }}
-        />
         <GenericModal
           isVisibleCondition={!!nextLife}
           backFunction={() => setNextLife(null)}
@@ -179,7 +153,10 @@ export default function DeathScreen() {
             )}
           </View>
         </GenericModal>
-        <View className="flex h-full items-center justify-center">
+        <View
+          className="flex-1 items-center justify-center"
+          style={{ top: -header }}
+        >
           <Text
             className="py-8 text-center text-3xl font-bold"
             style={{ letterSpacing: 3, color: "#ef4444" }}

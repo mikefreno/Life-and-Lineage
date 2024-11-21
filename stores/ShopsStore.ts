@@ -42,9 +42,7 @@ export class ShopStore {
         );
       });
       return map;
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
     return this.getInitShopsState();
   }
 
@@ -85,9 +83,7 @@ const _shopSave = async (shop: Shop | undefined) => {
           root: null,
         }),
       );
-    } catch (e) {
-      console.log("Error in _playerSave:", e);
-    }
+    } catch (e) {}
   }
 };
 

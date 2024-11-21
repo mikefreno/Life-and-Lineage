@@ -1,6 +1,6 @@
 import { ThemedView, Text } from "../components/Themed";
-import { View } from "react-native";
-import { useRef, useEffect, useState } from "react";
+import { type LayoutChangeEvent, View } from "react-native";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
 import BattleTab from "../components/DungeonComponents/BattleTab";
 import { toTitleCase } from "../utility/functions/misc";
@@ -10,29 +10,30 @@ import { observer } from "mobx-react-lite";
 import TutorialModal from "../components/TutorialModal";
 import GenericModal from "../components/GenericModal";
 import BattleTabControls from "../components/DungeonComponents/BattleTabControls";
-import FleeModal from "../components/DungeonComponents/FleeModal";
 import TargetSelection from "../components/DungeonComponents/TargetSelection";
 import DroppedItemsModal from "../components/DungeonComponents/DroppedItemsModal";
 import LeftBehindItemsModal from "../components/DungeonComponents/LeftBehindItemsModal";
 import { SackIcon } from "../assets/icons/SVGIcons";
 import { TutorialOption } from "../utility/types";
 import { useIsFocused } from "@react-navigation/native";
-import {
-  DungeonProvider,
-  useCombatState,
-  useLootState,
-} from "../providers/DungeonData";
+import { useCombatState, useLootState } from "../providers/DungeonData";
 import DungeonEnemyDisplay from "../components/DungeonComponents/DungeonEnemyDisplay";
 import { DungeonMapRender } from "../components/DungeonComponents/DungeonMap";
 import { StatsDisplay } from "../components/StatsDisplay";
-import { usePlayerStore, useRootStore } from "../hooks/stores";
+import {
+  useDraggableStore,
+  usePlayerStore,
+  useRootStore,
+} from "../hooks/stores";
 import { usePouch } from "../hooks/generic";
 import D20DieAnimation from "../components/DieRollAnim";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 const DungeonLevelScreen = observer(() => {
-  const { enemyStore, dungeonStore } = useRootStore();
+  const { enemyStore, dungeonStore, uiStore } = useRootStore();
   const { currentLevel, inCombat } = dungeonStore;
   const playerState = usePlayerStore();
+  const { draggableClassStore } = useDraggableStore();
 
   const { setInventoryFullNotifier, displayItem, setDisplayItem } =
     useLootState();
@@ -45,8 +46,29 @@ const DungeonLevelScreen = observer(() => {
   const [showLeftBehindItemsScreen, setShowLeftBehindItemsScreen] =
     useState<boolean>(false);
   const isFocused = useIsFocused();
+  const header = useHeaderHeight();
 
   const pouchRef = useRef<View>(null);
+
+  const setPouchBoundsOnLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      const { width, height } = event.nativeEvent.layout;
+
+      setTimeout(() => {
+        if (pouchRef.current) {
+          pouchRef.current.measure((x, y, w, h, pageX, pageY) => {
+            draggableClassStore.setAncillaryBounds("pouch", {
+              x: pageX,
+              y: pageY - header,
+              width,
+              height,
+            });
+          });
+        }
+      }, 100);
+    },
+    [uiStore.dimensions],
+  );
 
   useEffect(() => {
     setInventoryFullNotifier(false);
@@ -71,7 +93,6 @@ const DungeonLevelScreen = observer(() => {
             body: "And remember fleeing (top left) can save you.",
           }}
         />
-        <FleeModal />
         <DroppedItemsModal />
         <LeftBehindItemsModal
           showLeftBehindItemsScreen={showLeftBehindItemsScreen}
@@ -88,21 +109,16 @@ const DungeonLevelScreen = observer(() => {
             enemyStore.setAttackAnimationOngoing(false);
           }}
         >
-          <>
+          <ThemedView>
             <Text className="text-center text-2xl">Choose Your Target</Text>
             <TargetSelection />
-          </>
+          </ThemedView>
         </GenericModal>
         <View className="flex-1" style={{ paddingBottom: 74 }}>
-          {enemyStore.enemies.length > 0 ? (
-            <DungeonEnemyDisplay />
-          ) : !inCombat ? (
-            <DungeonMapRender />
-          ) : (
-            <View className="flex-1 justify-center"></View>
-          )}
+          {inCombat ? <DungeonEnemyDisplay /> : <DungeonMapRender />}
           <Pressable
             ref={pouchRef}
+            onLayout={(e) => setPouchBoundsOnLayout(e)}
             className="absolute ml-4 mt-4"
             onPress={() => setShowLeftBehindItemsScreen(true)}
           >
@@ -110,7 +126,7 @@ const DungeonLevelScreen = observer(() => {
           </Pressable>
           {inCombat && <View></View>}
           <View className="flex-1 justify-between">
-            <BattleTab battleTab={battleTab} pouchRef={pouchRef} />
+            <BattleTab battleTab={battleTab} />
           </View>
           <BattleTabControls
             battleTab={battleTab}
@@ -162,10 +178,4 @@ const DungeonLevelScreen = observer(() => {
   }
 });
 
-export default function DungeonWrapper() {
-  return (
-    <DungeonProvider>
-      <DungeonLevelScreen />
-    </DungeonProvider>
-  );
-}
+export default DungeonLevelScreen;

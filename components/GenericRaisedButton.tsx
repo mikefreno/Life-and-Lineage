@@ -5,8 +5,10 @@ import type { ReactNode } from "react";
 import { useVibration } from "../hooks/generic";
 
 interface GenericRaisedButtonProps {
+  ref?: any;
   onPress?: () => void;
   onPressIn?: () => void;
+  onLongPress?: () => void;
   onPressOut?: () => void;
   backgroundColor?: ColorValue;
   children: string | ReactNode;
@@ -25,8 +27,10 @@ interface GenericRaisedButtonProps {
 }
 
 const GenericRaisedButton = ({
+  ref,
   onPress,
   onPressIn,
+  onLongPress,
   onPressOut,
   backgroundColor,
   textColor,
@@ -53,6 +57,15 @@ const GenericRaisedButton = ({
           onPress();
         }
       }}
+      onLongPress={() => {
+        vibration({
+          style: vibrationStrength,
+          essential: vibrationEssentiality,
+        });
+        if (onLongPress) {
+          onLongPress();
+        }
+      }}
       onPressIn={() => {
         vibration({
           style: vibrationStrength,
@@ -72,6 +85,7 @@ const GenericRaisedButton = ({
     >
       {({ pressed }) => (
         <View
+          ref={ref}
           className={`rounded-xl px-8 py-4 ${
             pressed ? "scale-95 opacity-50" : ""
           }`}
