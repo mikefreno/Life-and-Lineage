@@ -1,6 +1,6 @@
 import { TouchableWithoutFeedback, View } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
@@ -28,6 +28,7 @@ import { useDraggableStore, useRootStore } from "../../hooks/stores";
 import D20DieAnimation from "../../components/DieRollAnim";
 import { EXPANDED_PAD } from "../../components/PlayerStatus";
 import type { Item } from "../../entities/item";
+import { LayoutAnimation } from "react-native";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
@@ -92,6 +93,20 @@ const HomeScreen = observer(() => {
     );
   }
 
+  const layoutDimensions = useMemo(
+    () => ({
+      paddingTop: header,
+      paddingBottom: tabBarHeight + (playerStatusIsCompact ? 0 : EXPANDED_PAD),
+    }),
+    [header, tabBarHeight, playerStatusIsCompact],
+  );
+
+  useEffect(() => {
+    if (isFocused) {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    }
+  }, [isFocused]);
+
   return (
     <>
       <TutorialModal
@@ -106,14 +121,7 @@ const HomeScreen = observer(() => {
           body: "A great place to start is to study the book you were given.",
         }}
       />
-      <View
-        className="flex-1"
-        style={{
-          paddingTop: header,
-          paddingBottom:
-            tabBarHeight + (playerStatusIsCompact ? 0 : EXPANDED_PAD),
-        }}
-      >
+      <View className="flex-1" style={layoutDimensions}>
         <TouchableWithoutFeedback onPress={clearDisplayItem}>
           <View className="p-1 md:py-4">
             <View className="flex-row">
@@ -187,6 +195,7 @@ const HomeScreen = observer(() => {
               setDisplayItem={setDisplayItem}
             />
             <InventoryRender
+              screen="home"
               displayItem={displayItem}
               setDisplayItem={setDisplayItem}
               targetBounds={[

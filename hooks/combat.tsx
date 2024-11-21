@@ -33,7 +33,6 @@ export const useEnemyManagement = () => {
           playerState,
           dungeonStore.fightingBoss,
         );
-        console.log(gold);
         wait(500).then(() => {
           if (itemDrops) {
             playerState.addGold(gold);

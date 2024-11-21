@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { type GestureResponderEvent, Pressable, View } from "react-native";
+import { type GestureResponderEvent, Pressable } from "react-native";
 import { useVibration } from "../../hooks/generic";
 
 export default function AuthRoutesLayout() {
@@ -8,6 +8,7 @@ export default function AuthRoutesLayout() {
   return (
     <Tabs
       screenOptions={{
+        tabBarIconStyle: { marginHorizontal: "auto" },
         tabBarStyle: { height: 64, paddingBottom: 16 },
         tabBarButton: (props) => {
           const onPressWithVibration = (event: GestureResponderEvent) => {
@@ -15,16 +16,14 @@ export default function AuthRoutesLayout() {
             if (props.onPress) props.onPress(event);
           };
           return (
-            <View className="flex flex-col w-1/2">
-              <Pressable
-                onPress={onPressWithVibration}
-                style={{
-                  height: 44,
-                }}
-              >
-                {props.children}
-              </Pressable>
-            </View>
+            <Pressable
+              onPress={onPressWithVibration}
+              style={{
+                height: 44,
+              }}
+            >
+              {props.children}
+            </Pressable>
           );
         },
       }}

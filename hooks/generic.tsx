@@ -176,6 +176,8 @@ export function useAcceleratedAction<T = void>(
   const isActiveRef = useRef<boolean>(false);
   const { enqueue, clearQueue } = useSmartExecution(isActiveRef);
 
+  const actionArgsRef = useRef<any | undefined>(undefined);
+
   const updateAmount = useCallback(() => {
     try {
       const elapsedTime = Date.now() - startTimeRef.current;
@@ -247,28 +249,38 @@ export function useAcceleratedAction<T = void>(
 
   const lastUpdateTimeRef = useRef<number>(0);
 
-  const start = useCallback(() => {
-    if (isActiveRef.current) {
-      // If an action is already in progress, don't start a new one
-      return;
-    }
-
-    isActiveRef.current = true;
-    startTimeRef.current = Date.now();
-    lastAmountRef.current = 0;
-    totalExecutedRef.current = 0;
-    lastUpdateTimeRef.current = 0;
-
-    singlePressTimeoutRef.current = setTimeout(() => {
-      if (action) {
-        action(minActionAmount ?? 1, totalExecutedRef.current);
-        totalExecutedRef.current += minActionAmount ?? 1;
-      } else {
-        setAmount(1);
+  const start = useCallback(
+    (args?: any) => {
+      if (isActiveRef.current) {
+        // If an action is already in progress, don't start a new one
+        return;
       }
-      intervalRef.current = setInterval(debouncedUpdateAmount, updateInterval);
-    }, 150);
-  }, [debouncedUpdateAmount, updateInterval, action, minActionAmount]);
+      actionArgsRef.current = args;
+      isActiveRef.current = true;
+      startTimeRef.current = Date.now();
+      lastAmountRef.current = 0;
+      totalExecutedRef.current = 0;
+      lastUpdateTimeRef.current = 0;
+
+      singlePressTimeoutRef.current = setTimeout(() => {
+        if (action) {
+          action(
+            minActionAmount ?? 1,
+            totalExecutedRef.current,
+            actionArgsRef.current!,
+          );
+          totalExecutedRef.current += minActionAmount ?? 1;
+        } else {
+          setAmount(1);
+        }
+        intervalRef.current = setInterval(
+          debouncedUpdateAmount,
+          updateInterval,
+        );
+      }, 150);
+    },
+    [debouncedUpdateAmount, updateInterval, action, minActionAmount],
+  );
 
   const stop = useCallback(() => {
     if (!isActiveRef.current) {

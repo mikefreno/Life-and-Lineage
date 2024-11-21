@@ -62,14 +62,14 @@ export class RootStore {
     if (!this.playerState) throw new Error("Missing player in root!");
 
     if (this.playerState.currentSanity < 0) {
-      lowSanityDebuffGenerator(this.playerState);
+      this.generateLowSanityDebuff();
     }
 
     this.playerState.gameTurnHandler();
   }
 
   private generateLowSanityDebuff() {
-    if (Math.random() < 0.75) return; // 75% chance to skip (equivalent to roll < 16 on D20)
+    if (Math.random() < 0.75) return;
 
     const debuffObj = this.getRandomSanityDebuff();
     const debuff = this.createDebuffFromObject(debuffObj);

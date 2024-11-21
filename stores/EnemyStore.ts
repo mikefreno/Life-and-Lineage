@@ -37,7 +37,10 @@ export default class EnemyStore {
 
   public addToEnemyList(enemy: Enemy) {
     this.enemies.push(enemy);
-    this.animationStoreMap.set(enemy.id, new AnimationStore());
+    this.animationStoreMap.set(
+      enemy.id,
+      new AnimationStore({ root: this.root }),
+    );
   }
 
   public removeEnemy(enemy: Enemy) {
@@ -64,7 +67,7 @@ export default class EnemyStore {
       const retrieved = storage.getString(`enemy_${str}`);
       if (!retrieved) return;
       const enemy = Enemy.fromJSON({ ...parse(retrieved), enemyStore: this });
-      map.set(enemy.id, new AnimationStore());
+      map.set(enemy.id, new AnimationStore({ root: this.root }));
       enemies.push(enemy);
     });
     return { enemies, map };

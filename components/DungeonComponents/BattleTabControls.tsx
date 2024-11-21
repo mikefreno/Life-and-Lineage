@@ -43,7 +43,7 @@ export default function BattleTabControls({
           setBattleTab("equipment");
         }}
       >
-        <Text className="text-center text-xl">Equipment</Text>
+        <Text className="text-center text-xl">Inventory</Text>
       </Pressable>
       <Pressable
         className={`w-1/3  py-4 ${

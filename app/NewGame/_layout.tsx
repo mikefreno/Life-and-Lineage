@@ -63,10 +63,12 @@ export const useNewGameStore = () => {
 };
 
 export default function NewGameLayout() {
-  const { playerState } = useRootStore();
+  const { playerState, uiStore } = useRootStore();
   return (
     <NewGameProvider>
-      <Stack>
+      <Stack
+        screenOptions={{ animation: uiStore.reduceMotion ? "none" : undefined }}
+      >
         <Stack.Screen
           name="ClassSelect"
           options={{

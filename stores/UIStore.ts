@@ -1,6 +1,7 @@
 import { action, makeObservable, observable, reaction } from "mobx";
 import { RootStore } from "./RootStore";
 import {
+  AccessibilityInfo,
   Dimensions,
   EmitterSubscription,
   Platform,
@@ -24,6 +25,7 @@ export default class UIStore {
   colorScheme: "system" | "dark" | "light";
   vibrationEnabled: "full" | "minimal" | "none";
   healthWarning: number;
+  reduceMotion: boolean;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
@@ -58,13 +60,19 @@ export default class UIStore {
     this.detailedStatusViewShowing = false;
     this.modalShowing = false;
 
-    const { vibrationEnabled, colorScheme, healthWarning } =
+    const { vibrationEnabled, colorScheme, healthWarning, reduceMotion } =
       this.hydrateUISettings();
-
     this.vibrationEnabled = vibrationEnabled;
 
-    this.colorScheme = colorScheme ?? "system";
-    this.healthWarning = healthWarning ?? 0.2;
+    this.colorScheme = colorScheme;
+    this.healthWarning = healthWarning;
+
+    if (reduceMotion == undefined) {
+      this.reduceMotion = false;
+      AccessibilityInfo.isReduceMotionEnabled().then(this.setReduceMotion);
+    } else {
+      this.reduceMotion = reduceMotion;
+    }
 
     makeObservable(this, {
       playerStatusIsCompact: observable,
@@ -81,6 +89,8 @@ export default class UIStore {
       modifyVibrationSettings: action,
       setHealthWarning: action,
       handleDimensionChange: action,
+      reduceMotion: observable,
+      setReduceMotion: action,
     });
 
     reaction(
@@ -100,7 +110,12 @@ export default class UIStore {
     );
 
     reaction(
-      () => [this.colorScheme, this.healthWarning, this.vibrationEnabled],
+      () => [
+        this.colorScheme,
+        this.healthWarning,
+        this.vibrationEnabled,
+        this.reduceMotion,
+      ],
       () => {
         this.persistUISettings();
       },
@@ -109,6 +124,10 @@ export default class UIStore {
 
   public setColorScheme(color: "light" | "dark" | "system") {
     this.colorScheme = color;
+  }
+
+  public setReduceMotion(state: boolean) {
+    this.reduceMotion = state;
   }
 
   public modifyVibrationSettings(targetState: "full" | "minimal" | "none") {
@@ -153,20 +172,23 @@ export default class UIStore {
   }
 
   hydrateUISettings(): {
-    colorScheme: "system" | "dark" | "light" | undefined;
+    colorScheme: "system" | "dark" | "light";
     vibrationEnabled: "full" | "minimal" | "none";
-    healthWarning: number | undefined;
+    healthWarning: number;
+    reduceMotion: boolean | undefined;
   } {
     const stored = storage.getString("ui_settings");
     if (!stored) {
       return {
-        colorScheme: undefined,
+        colorScheme: "system",
         vibrationEnabled: Platform.OS === "ios" ? "full" : "minimal",
-        healthWarning: undefined,
+        healthWarning: 0.2,
+        reduceMotion: undefined,
       };
     }
     return JSON.parse(stored);
   }
+
   persistUISettings() {
     storage.set(
       "ui_settings",
@@ -174,6 +196,7 @@ export default class UIStore {
         colorScheme: this.colorScheme,
         vibrationEnabled: this.vibrationEnabled,
         healthWarning: this.healthWarning,
+        reduceMotion: this.reduceMotion,
       }),
     );
   }

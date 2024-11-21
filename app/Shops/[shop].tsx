@@ -328,6 +328,7 @@ const ShopInteriorScreen = observer(() => {
               </View>
               <View className="h-[85%] w-full" collapsable={false}>
                 <InventoryRender
+                  screen="shop"
                   displayItem={displayItem}
                   setDisplayItem={setDisplayItem}
                   targetBounds={[

@@ -91,18 +91,18 @@ const LaborTask = observer(
               <Text className="dark:text-zinc-50">-{cost.mana}</Text>
               <Energy width={14} height={14} style={{ marginLeft: 6 }} />
             </View>
-            {cost.health ? (
+            {!!cost.health && (
               <View className="flex w-full flex-row items-center justify-evenly">
                 <Text className="dark:text-zinc-50">-{cost.health}</Text>
                 <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
               </View>
-            ) : null}
-            {cost.sanity ? (
+            )}
+            {!!cost.sanity && (
               <View className="flex w-full flex-row items-center justify-evenly">
                 <Text className="dark:text-zinc-50">-{cost.sanity}</Text>
                 <Sanity width={14} height={14} style={{ marginLeft: 6 }} />
               </View>
-            ) : null}
+            )}
           </View>
         </View>
         {playerState?.job == title ? (

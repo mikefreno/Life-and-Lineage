@@ -24,6 +24,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ThemeProvider } from "@react-navigation/native";
 import FleeModal from "../components/DungeonComponents/FleeModal";
 import { DungeonProvider } from "../providers/DungeonData";
+import { ErrorBoundary } from "../components/ErrorBoundary";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -51,7 +52,9 @@ const Root = observer(() => {
     <AppProvider>
       <DungeonProvider>
         <SafeAreaProvider>
-          <RootLayout />
+          <ErrorBoundary>
+            <RootLayout />
+          </ErrorBoundary>
         </SafeAreaProvider>
       </DungeonProvider>
     </AppProvider>
@@ -69,7 +72,7 @@ const RootLayout = observer(() => {
     CursiveBold: require("../assets/fonts/Tangerine-Bold.ttf"),
   });
   const rootStore = useRootStore();
-  const { playerState, dungeonStore } = rootStore;
+  const { playerState, dungeonStore, uiStore } = rootStore;
 
   const { colorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
@@ -172,7 +175,11 @@ const RootLayout = observer(() => {
         <SystemBars style={colorScheme == "light" ? "dark" : "light"} />
         <ProjectedImage />
         <FleeModal />
-        <Stack screenOptions={{ autoHideHomeIndicator: true }}>
+        <Stack
+          screenOptions={{
+            animation: uiStore.reduceMotion ? "none" : undefined,
+          }}
+        >
           <Stack.Screen
             name="(tabs)"
             options={{
@@ -392,7 +399,8 @@ const RootLayout = observer(() => {
           <Stack.Screen
             name="Options"
             options={{
-              presentation: "modal",
+              presentation: uiStore.reduceMotion ? "card" : "modal",
+              headerBackButtonDisplayMode: "minimal",
               headerBackButtonMenuEnabled: false,
               headerBackTitleStyle: {
                 fontFamily: "PixelifySans",
@@ -407,7 +415,7 @@ const RootLayout = observer(() => {
           <Stack.Screen
             name="Auth"
             options={{
-              presentation: "modal",
+              presentation: uiStore.reduceMotion ? "card" : "modal",
               headerBackButtonMenuEnabled: false,
               headerBackTitleStyle: {
                 fontFamily: "PixelifySans",

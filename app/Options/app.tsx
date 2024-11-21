@@ -47,6 +47,11 @@ export const AppSettings = observer(() => {
     setSelectedThemeOption(index);
   }
 
+  function setReduceMotion(state: boolean) {
+    vibration({ style: "light" });
+    uiStore.setReduceMotion(state);
+  }
+
   function setVibrationLevel(
     index: number,
     option: "full" | "minimal" | "none",
@@ -349,6 +354,42 @@ export const AppSettings = observer(() => {
               </Text>
             </Pressable>
           ))}
+        </View>
+        <GenericStrikeAround>Reduce Motion</GenericStrikeAround>
+        <View
+          className="rounded px-4 py-2"
+          style={{ marginLeft: -48, marginTop: 12 }}
+        >
+          <Pressable
+            className="mb-4 ml-10 flex flex-row"
+            onPress={() => {
+              setReduceMotion(true);
+            }}
+          >
+            <View
+              className={
+                uiStore.reduceMotion
+                  ? "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 bg-blue-500 dark:border-zinc-50 dark:bg-blue-600"
+                  : "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 dark:border-zinc-50"
+              }
+            />
+            <Text className="text-2xl tracking-widest">On</Text>
+          </Pressable>
+          <Pressable
+            className="mb-4 ml-10 flex flex-row"
+            onPress={() => {
+              setReduceMotion(false);
+            }}
+          >
+            <View
+              className={
+                !uiStore.reduceMotion
+                  ? "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 bg-blue-500 dark:border-zinc-50 dark:bg-blue-600"
+                  : "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 dark:border-zinc-50"
+              }
+            />
+            <Text className="text-2xl tracking-widest">Off</Text>
+          </Pressable>
         </View>
       </View>
     </>

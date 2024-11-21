@@ -56,8 +56,8 @@ export default function GenericModal({
 
   return (
     <Modal
-      animationIn="slideInUp"
-      animationOut="slideOutDown"
+      animationIn={uiStore.reduceMotion ? "fadeIn" : "slideInUp"}
+      animationOut={uiStore.reduceMotion ? "fadeOut" : "slideOutDown"}
       animationInTiming={300}
       animationOutTiming={300}
       backdropTransitionOutTiming={300}

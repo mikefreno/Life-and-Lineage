@@ -332,6 +332,7 @@ const BattleTab = observer(
           <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
             <PlatformDependantBlurView className="flex-1">
               <InventoryRender
+                screen="dungeon"
                 displayItem={displayItem}
                 setDisplayItem={setDisplayItem}
                 targetBounds={[

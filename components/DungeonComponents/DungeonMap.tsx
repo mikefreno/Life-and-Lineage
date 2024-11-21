@@ -234,7 +234,7 @@ export const DungeonMapRender = observer(() => {
     : 0;
 
   return (
-    <View className="h-[40vh]">
+    <View className="h-[45%]">
       <View
         className="absolute"
         style={{

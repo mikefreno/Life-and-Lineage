@@ -1,9 +1,15 @@
-import { LayoutChangeEvent, Pressable, ScrollView, View } from "react-native";
+import {
+  Animated,
+  LayoutChangeEvent,
+  Pressable,
+  ScrollView,
+  View,
+} from "react-native";
 import { Text, CursiveText, HandwrittenText, CursiveTextBold } from "./Themed";
 import GearStatsDisplay from "./GearStatsDisplay";
 import { useColorScheme } from "nativewind";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { asReadableGold, toTitleCase } from "../utility/functions/misc";
 import SpellDetails from "./SpellDetails";
 import GenericFlatButton from "./GenericFlatButton";
@@ -73,6 +79,45 @@ export function StatsDisplay({
   const [showingAttacks, setShowingAttacks] = useState<boolean>(false);
   const [firstItem, setFirstItem] = useState<Item>(displayItem.item[0]);
   const [renderStory, setRenderStory] = useState<string | null>(null);
+  const animatedLeft = useRef(new Animated.Value(0)).current;
+  const animatedTop = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Calculate target positions
+    const targetLeft =
+      firstItem.itemClass == ItemClassType.Book
+        ? 20
+        : displayItem.position.left + itemBlockSize < dimensions.width * 0.6
+        ? displayItem.position.left + itemBlockSize
+        : displayItem.position.left - viewWidth - 4;
+
+    const targetTop =
+      topGuard && displayItem.position.top + (topOffset ?? 0) < topGuard
+        ? topGuard
+        : viewHeight + displayItem.position.top <
+          dimensions.height - tabBarHeight
+        ? displayItem.position.top + (topOffset ?? 0)
+        : dimensions.height - (viewHeight + tabBarHeight);
+
+    if (uiStore.reduceMotion) {
+      animatedLeft.setValue(targetLeft);
+      animatedTop.setValue(targetTop);
+    } else {
+      Animated.spring(animatedLeft, {
+        toValue: targetLeft,
+        useNativeDriver: false,
+        tension: 100,
+        friction: 8,
+      }).start();
+
+      Animated.spring(animatedTop, {
+        toValue: targetTop,
+        useNativeDriver: false,
+        tension: 100,
+        friction: 8,
+      }).start();
+    }
+  }, [displayItem.position, viewWidth, viewHeight]);
 
   useEffect(() => {
     setFirstItem(displayItem.item[0]);
@@ -664,46 +709,22 @@ export function StatsDisplay({
           <StoryItemDescriptionRender item={firstItem} />
         </ScrollView>
       </GenericModal>
-      <View
+      <Animated.View
         className="items-center rounded-md border border-zinc-600 p-4"
         onLayout={onLayoutView}
-        style={
+        style={[
           firstItem.itemClass == ItemClassType.Book
-            ? {
-                backgroundColor:
-                  colorScheme == "light"
-                    ? "rgba(250, 250, 250, 0.98)"
-                    : "rgba(20, 20, 20, 0.95)",
-                left: 20,
-                top:
-                  topGuard &&
-                  displayItem.position.top + (topOffset ?? 0) < topGuard
-                    ? topGuard
-                    : viewHeight + displayItem.position.top < dimensions.height
-                    ? displayItem.position.top + (topOffset ?? 0)
-                    : dimensions.height - (viewHeight + 20),
-              }
-            : {
-                width: dimensions.width * 0.4,
-                backgroundColor:
-                  colorScheme == "light"
-                    ? "rgba(250, 250, 250, 0.98)"
-                    : "rgba(20, 20, 20, 0.95)",
-                left:
-                  displayItem.position.left + itemBlockSize <
-                  dimensions.width * 0.6
-                    ? displayItem.position.left + itemBlockSize
-                    : displayItem.position.left - viewWidth - 4,
-                top:
-                  topGuard &&
-                  displayItem.position.top + (topOffset ?? 0) < topGuard
-                    ? topGuard
-                    : viewHeight + displayItem.position.top <
-                      dimensions.height - tabBarHeight
-                    ? displayItem.position.top + (topOffset ?? 0)
-                    : dimensions.height - (viewHeight + tabBarHeight),
-              }
-        }
+            ? {}
+            : { width: dimensions.width * 0.4 },
+          {
+            backgroundColor:
+              colorScheme == "light"
+                ? "rgba(250, 250, 250, 0.98)"
+                : "rgba(20, 20, 20, 0.95)",
+            left: animatedLeft,
+            top: animatedTop,
+          },
+        ]}
       >
         <Pressable
           onPress={() => clearItem()}
@@ -787,7 +808,7 @@ export function StatsDisplay({
         )}
         <ConsumableSection />
         <SaleSection />
-      </View>
+      </Animated.View>
     </>
   );
 }

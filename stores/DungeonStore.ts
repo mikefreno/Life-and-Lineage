@@ -258,6 +258,31 @@ export class DungeonStore {
       : this.currentLevel.generateNormalEncounter;
     this.root.enemyStore.clearEnemyList();
     enemies.forEach((enemy) => this.root.enemyStore.addToEnemyList(enemy));
+
+    if (enemies.length === 1) {
+      this.addLog(`You have run into a ${enemies[0].creatureSpecies}`);
+    } else {
+      const speciesCount = enemies.reduce(
+        (acc, enemy) => {
+          acc[enemy.creatureSpecies] = (acc[enemy.creatureSpecies] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      );
+
+      const speciesStrings = Object.entries(speciesCount).map(
+        ([species, count]) => {
+          return count === 1 ? `a ${species}` : `${count} ${species}s`;
+        },
+      );
+
+      const lastSpecies = speciesStrings.pop();
+      const log = speciesStrings.length
+        ? `You have run into ${speciesStrings.join(", ")} and ${lastSpecies}.`
+        : `You have run into ${lastSpecies}.`;
+
+      this.addLog(log);
+    }
   }
 
   public getInstance(instanceName: string) {
@@ -282,6 +307,7 @@ export class DungeonStore {
       unlockObjects.forEach((obj) => {
         const inst = DungeonInstance.fromJSON(obj);
         this.dungeonInstances.push(inst);
+        saveDungeonInstance(inst);
       });
     }
   }

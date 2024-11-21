@@ -1,7 +1,7 @@
 import { Text } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { Pressable, Image, View, ScrollView } from "react-native";
-import { toTitleCase } from "../utility/functions/misc";
+import { AccelerationCurves, toTitleCase } from "../utility/functions/misc";
 import ProgressBar from "../components/ProgressBar";
 import SpellDetails from "../components/SpellDetails";
 import PlayerStatus from "../components/PlayerStatus";
@@ -86,6 +86,19 @@ export default function LearningKnowledgeScreen() {
       } level book`;
     }
   }
+
+  const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
+    () => null, // Return null to indicate unlimited mode
+    {
+      minHoldTime: 350,
+      maxSpeed: 10,
+      accelerationCurve: AccelerationCurves.linear,
+      action: work,
+      minActionAmount: 1,
+      maxActionAmount: 50,
+      debounceTime: 50,
+    },
+  );
 
   return (
     <>

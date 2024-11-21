@@ -12,6 +12,7 @@ export default function InventoryRender({
   setDisplayItem,
   targetBounds,
   runOnSuccess,
+  screen,
 }: {
   displayItem: {
     item: Item[];
@@ -44,6 +45,7 @@ export default function InventoryRender({
       | undefined;
   }[];
   runOnSuccess: (args?: any, args2?: any) => void;
+  screen: "home" | "shop" | "dungeon";
 }) {
   const selfRef = useRef<View | null>(null);
   const vibration = useVibration();
@@ -70,18 +72,16 @@ export default function InventoryRender({
   const onLayoutView = (event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
 
-    setTimeout(() => {
-      if (selfRef.current) {
-        selfRef.current.measure((x, y, w, h, pageX, pageY) => {
-          draggableClassStore.setInventoryBounds({
-            x: pageX,
-            y: pageY,
-            width,
-            height,
-          });
+    if (selfRef.current) {
+      selfRef.current.measure((x, y, w, h, pageX, pageY) => {
+        draggableClassStore.setInventoryBounds({
+          x: pageX,
+          y: pageY,
+          width,
+          height,
         });
-      }
-    }, 100);
+      });
+    }
   };
 
   if (playerState) {
@@ -91,11 +91,7 @@ export default function InventoryRender({
           collapsable={false}
           ref={selfRef}
           className={`z-top ${
-            pathname === "/"
-              ? "max-h-[60%]"
-              : pathname.split("/")[1].toLowerCase() == "shops"
-              ? "-ml-2"
-              : ""
+            screen === "home" ? "max-h-[60%]" : screen === "shop" ? "-ml-2" : ""
           }`}
         >
           <ScrollView
@@ -224,11 +220,11 @@ export default function InventoryRender({
                 <Pressable
                   onPress={() => setDisplayItem(null)}
                   className={`${
-                    pathname == "/"
+                    screen == "home"
                       ? uiStore.dimensions.greater == uiStore.dimensions.height
                         ? "h-[100%] mx-2"
                         : "mx-2 h-[50%]"
-                      : pathname.split("/")[1].toLowerCase() == "shops"
+                      : screen == "shop"
                       ? "mt-4 h-[90%]"
                       : "h-full mx-2"
                   } rounded-lg border border-zinc-600 relative`}
