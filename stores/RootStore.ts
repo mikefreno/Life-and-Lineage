@@ -13,11 +13,7 @@ import { lowSanityDebuffGenerator } from "../utility/functions/conditions";
 import { TutorialStore } from "./TutorialStore";
 import { Condition } from "../entities/conditions";
 import sanityDebuffs from "../assets/json/sanityDebuffs.json";
-import {
-  ConditionObjectType,
-  EffectOptions,
-  EffectStyle,
-} from "../utility/types";
+import { ConditionObjectType, EffectOptions } from "../utility/types";
 
 export class RootStore {
   playerState: PlayerCharacter | null;

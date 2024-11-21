@@ -143,27 +143,25 @@ const RootLayout = observer(() => {
   // TODO: Break down this logic and move it, so I drop the top level observer
   useEffect(() => {
     if (fontLoaded && rootStore.constructed && firstLoad) {
-      console.log("persisted: ", dungeonStore.hasPersistedState);
       SplashScreen.hideAsync();
       if (!playerState) {
         router.replace("/NewGame/ClassSelect");
       } else if (dungeonStore.hasPersistedState) {
         router.replace("/DungeonLevel");
       }
+      setFirstLoad(false);
     }
-    setFirstLoad(false);
   }, [
     fontLoaded,
-    playerState?.currentHealth,
-    playerState?.currentSanity,
     rootStore.constructed,
     dungeonStore.hasPersistedState,
+    firstLoad,
   ]);
 
   while (!fontLoaded || !rootStore.constructed) {
     return (
       <ThemedView className="flex-1 items-center justify-center">
-        <D20DieAnimation keepRolling={!fontLoaded} />
+        <D20DieAnimation keepRolling={true} />
       </ThemedView>
     );
   }

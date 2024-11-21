@@ -56,7 +56,8 @@
     "react-native-screens": "^4.0.0",
     "react-native-svg": "15.8.0",
     "react-native-web": "~0.19.6",
-    "expo-linking": "~7.0.3"
+    "expo-linking": "~7.0.3",
+    "expo-updates": "~0.26.8"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -83,4 +84,3 @@
   },
   "private": true
 }
-
