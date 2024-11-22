@@ -13,7 +13,7 @@ import { observer } from "mobx-react-lite";
 const FleeModal = observer(() => {
   const vibration = useVibration();
   const rootStore = useRootStore();
-  const { enemyStore, dungeonStore, playerState, uiStore } = rootStore;
+  const { enemyStore, dungeonStore, playerState } = rootStore;
   const { playerMinionsTurn } = useCombatActions();
   const { enemyTurn } = useEnemyManagement();
 

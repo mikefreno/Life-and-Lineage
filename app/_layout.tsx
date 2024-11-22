@@ -3,7 +3,7 @@ import { SplashScreen, Stack, router, usePathname } from "expo-router";
 import React, { useEffect, useState, useRef } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
-import { Appearance, Platform, Pressable, StyleSheet } from "react-native";
+import { Platform, Pressable, StyleSheet } from "react-native";
 import { ThemedView } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { BlurView } from "expo-blur";
@@ -118,13 +118,10 @@ const RootLayout = observer(() => {
   }, [fontLoaded]);
 
   useEffect(() => {
-    console.log("setting nativewind to:", uiStore.colorScheme);
-    setColorScheme(uiStore.colorScheme);
-  }, [uiStore.colorScheme]);
-
-  useEffect(() => {
-    console.log("nativewind has been set to:", colorScheme);
-  }, [colorScheme]);
+    if (!firstLoad && rootStore.constructed) {
+      setColorScheme(uiStore.colorScheme);
+    }
+  }, [uiStore.colorScheme, firstLoad, rootStore.constructed]);
 
   useEffect(() => {
     if (expoPushToken && !sentToken) {
@@ -161,6 +158,7 @@ const RootLayout = observer(() => {
       } else if (dungeonStore.hasPersistedState) {
         router.replace("/DungeonLevel");
       }
+      setColorScheme(uiStore.colorScheme);
       setFirstLoad(false);
     }
   }, [
@@ -181,7 +179,7 @@ const RootLayout = observer(() => {
   return (
     <GestureHandlerRootView>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : LightTheme}>
-        <SystemBars style={"auto"} />
+        <SystemBars style={colorScheme == "dark" ? "light" : "dark"} />
         <ProjectedImage />
         <FleeModal />
         <Stack

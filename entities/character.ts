@@ -2156,7 +2156,7 @@ export class PlayerCharacter extends Character {
       currentMana: json.currentMana,
       baseMana: json.baseMana,
       baseManaRegen: json.baseManaRegen,
-      jobs: deserializeJobs(json.jobs),
+      jobs: json.jobs ? deserializeJobs(json.jobs) : new Map(),
       learningSpells: json.learningSpells,
       qualificationProgress: json.qualificationProgress,
       magicProficiencies: json.magicProficiencies,

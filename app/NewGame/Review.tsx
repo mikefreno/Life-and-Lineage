@@ -24,6 +24,7 @@ import GenericFlatButton from "../../components/GenericFlatButton";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
+import { useEffect } from "react";
 
 export default function NewGameReview() {
   const { firstName, lastName, blessingSelection, sex, classSelection } =

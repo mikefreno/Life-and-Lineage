@@ -1,5 +1,10 @@
 import { ThemedView, Text } from "../components/Themed";
-import { type LayoutChangeEvent, View, Platform } from "react-native";
+import {
+  type LayoutChangeEvent,
+  View,
+  Platform,
+  Dimensions,
+} from "react-native";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
 import BattleTab from "../components/DungeonComponents/BattleTab";
@@ -32,7 +37,7 @@ import { ParallaxBackground } from "../components/DungeonComponents/ParallaxBack
 import { LinearGradientBlur } from "../components/LinearGradientBlur";
 import { BlurView } from "expo-blur";
 import { useColorScheme } from "nativewind";
-import { toJS } from "mobx";
+import { ParallaxAsWrapper } from "../components/DungeonComponents/ParallaxWrapper";
 
 const DungeonLevelScreen = observer(() => {
   const { enemyStore, dungeonStore, uiStore } = useRootStore();
@@ -88,17 +93,17 @@ const DungeonLevelScreen = observer(() => {
 
   if (currentLevel) {
     return (
-      <View style={{ paddingTop: header }} className="flex-1">
-        <ParallaxBackground
-          backgroundName={"Cave"}
-          inCombat={inCombat}
-          playerPosition={{
-            x: dungeonStore.currentPosition?.x ?? 0,
-            y: dungeonStore.currentPosition?.y ?? 0,
-          }}
-          boundingBox={dungeonStore.currentMapDimensions!}
-          reduceMotion={uiStore.reduceMotion}
-        />
+      <ParallaxAsWrapper
+        style={{ paddingTop: header }}
+        backgroundName={"Cave"}
+        inCombat={inCombat}
+        playerPosition={{
+          x: dungeonStore.currentPosition?.x ?? 0,
+          y: dungeonStore.currentPosition?.y ?? 0,
+        }}
+        boundingBox={dungeonStore.currentMapDimensions!}
+        reduceMotion={uiStore.reduceMotion}
+      >
         <TutorialModal
           tutorial={TutorialOption.dungeonInterior}
           isFocused={isFocused}
@@ -206,7 +211,7 @@ const DungeonLevelScreen = observer(() => {
           )}
         </View>
         <PlayerStatus positioning={"absolute"} classname="bottom-0" />
-      </View>
+      </ParallaxAsWrapper>
     );
   } else {
     return (

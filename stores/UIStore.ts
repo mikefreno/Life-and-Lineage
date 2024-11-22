@@ -68,6 +68,7 @@ export default class UIStore {
       reduceMotion,
       colorHeldForDungeon,
     } = this.hydrateUISettings();
+
     this.vibrationEnabled = vibrationEnabled;
 
     this.colorScheme = colorScheme ?? "system";
@@ -131,10 +132,6 @@ export default class UIStore {
         this.persistUISettings();
       },
     );
-    reaction(
-      () => [this.colorScheme],
-      () => console.log("in store:", this.colorScheme),
-    );
   }
 
   dungeonSetter() {
@@ -144,7 +141,6 @@ export default class UIStore {
 
   clearDungeonColor() {
     if (this.colorHeldForDungeon) {
-      console.log("setting in store back to: ", this.colorScheme);
       this.colorScheme = this.colorHeldForDungeon;
       this.colorHeldForDungeon = undefined;
     }
@@ -216,6 +212,7 @@ export default class UIStore {
         colorHeldForDungeon: undefined,
       };
     }
+    console.log("stored:", JSON.parse(stored));
     return JSON.parse(stored);
   }
 

@@ -19,6 +19,7 @@ import {
   getBoundingBox,
 } from "../components/DungeonComponents/DungeonMap";
 import { Dimensions } from "react-native";
+import { wait } from "../utility/functions/misc";
 
 export class DungeonStore {
   root: RootStore;
@@ -216,12 +217,14 @@ export class DungeonStore {
     if (newPosition) {
       this.updateCurrentPosition(newPosition);
 
-      if (!newPosition.clearedRoom) {
-        this.inCombat = true;
-        this.fightingBoss = newPosition.isBossRoom;
-        this.setEncounter(newPosition.isBossRoom);
-        this.visitRoom(newPosition);
-      }
+      wait(350).then(() => {
+        if (!newPosition.clearedRoom) {
+          this.inCombat = true;
+          this.fightingBoss = newPosition.isBossRoom;
+          this.setEncounter(newPosition.isBossRoom);
+          this.visitRoom(newPosition);
+        }
+      });
     }
   }
 

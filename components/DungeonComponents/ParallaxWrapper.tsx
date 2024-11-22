@@ -1,6 +1,13 @@
 import { toJS } from "mobx";
-import React, { useEffect } from "react";
-import { View, Dimensions, StyleSheet, Image } from "react-native";
+import React, { type ReactNode, useEffect } from "react";
+import {
+  View,
+  Dimensions,
+  StyleSheet,
+  Image,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -134,12 +141,14 @@ const backgroundImages = {
   },
 };
 
-export const ParallaxBackground = ({
+export const ParallaxAsWrapper = ({
   backgroundName,
   inCombat = false,
   reduceMotion = false,
   playerPosition,
   boundingBox,
+  style,
+  children,
 }: {
   backgroundName: keyof typeof backgroundImages;
   inCombat: boolean;
@@ -151,6 +160,8 @@ export const ParallaxBackground = ({
     offsetX: number;
     offsetY: number;
   };
+  style?: StyleProp<ViewStyle>;
+  children: ReactNode;
 }) => {
   const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
   const scrollX = useSharedValue(0);
@@ -236,21 +247,17 @@ export const ParallaxBackground = ({
     for (let i = layerCount; i >= 1; i--) {
       const moveRate = 1 - (i - 1) / layerCount;
 
-      const animatedStyle = useAnimatedStyle(() => {
-        const xOffset = plainInCombat
-          ? scrollX.value * moveRate
-          : translateX.value * moveRate;
-
-        const yOffset = !plainInCombat ? translateY.value * moveRate : 0;
-
-        return {
-          transform: [
-            { translateX: xOffset },
-            { translateY: yOffset },
-            { scale: finalScale },
-          ],
-        };
-      });
+      const animatedStyle = useAnimatedStyle(() => ({
+        transform: [
+          {
+            translateX: plainInCombat
+              ? scrollX.value * moveRate
+              : translateX.value * moveRate,
+          },
+          { translateY: !plainInCombat ? translateY.value * moveRate : 0 },
+          { scale: finalScale },
+        ],
+      }));
 
       const tileGroups = [
         { offset: -size.width * imagesNeeded },
@@ -267,7 +274,6 @@ export const ParallaxBackground = ({
               width: size.width * imagesNeeded * 3,
               height: size.height,
               left: (screenWidth - scaledWidth) / 2,
-              bottom: Dimensions.get("window").height * 0.4,
             },
             animatedStyle,
           ]}
@@ -304,30 +310,43 @@ export const ParallaxBackground = ({
     return layers;
   };
 
-  if (plainReduceMotion) {
-    return (
-      <Image
-        source={imageSet[0]}
-        style={[
-          styles.backgroundImage,
-          {
-            width: scaledWidth,
-            height: scaledHeight,
-            left: (screenWidth - scaledWidth) / 4,
-            bottom: Dimensions.get("window").height * 0.4, // Align to bottom of screen
-          },
-        ]}
-      />
-    );
-  }
+  const backgroundContent = plainReduceMotion ? (
+    <Image
+      source={imageSet[0]}
+      style={[
+        styles.backgroundImage,
+        {
+          width: scaledWidth,
+          height: scaledHeight,
+          left: (screenWidth - scaledWidth) / 4,
+        },
+      ]}
+    />
+  ) : (
+    renderLayers()
+  );
 
-  return <View style={styles.container}>{renderLayers()}</View>;
+  return (
+    <View style={[styles.container, style]}>
+      <View style={styles.backgroundContainer}>{backgroundContent}</View>
+      <View style={styles.childrenContainer}>{children}</View>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  backgroundContainer: {
     ...StyleSheet.absoluteFillObject,
     overflow: "hidden",
+    justifyContent: "center", // Center vertically
+    alignItems: "center", // Center horizontally
+    bottom: 0,
+  },
+  childrenContainer: {
+    flex: 1,
   },
   layerContainer: {
     position: "absolute",

@@ -1,8 +1,7 @@
-import { Pressable, ScrollView, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
 import "../../assets/styles/globals.css";
 import { useLayoutEffect, useState } from "react";
-import { Link, router } from "expo-router";
 import { FontAwesome5 } from "@expo/vector-icons";
 import TutorialModal from "../../components/TutorialModal";
 import {
