@@ -32,6 +32,7 @@ import { ParallaxBackground } from "../components/DungeonComponents/ParallaxBack
 import { LinearGradientBlur } from "../components/LinearGradientBlur";
 import { BlurView } from "expo-blur";
 import { useColorScheme } from "nativewind";
+import { toJS } from "mobx";
 
 const DungeonLevelScreen = observer(() => {
   const { enemyStore, dungeonStore, uiStore } = useRootStore();
@@ -89,7 +90,7 @@ const DungeonLevelScreen = observer(() => {
     return (
       <View style={{ paddingTop: header }} className="flex-1">
         <ParallaxBackground
-          backgroundName={"StormyMountain"}
+          backgroundName={"Cave"}
           inCombat={inCombat}
           playerPosition={{
             x: dungeonStore.currentPosition?.x ?? 0,

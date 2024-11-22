@@ -1,3 +1,4 @@
+import { toJS } from "mobx";
 import React, { useEffect } from "react";
 import { View, Dimensions, StyleSheet, Image } from "react-native";
 import Animated, {
@@ -164,34 +165,45 @@ export const ParallaxBackground = ({
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
 
+  // Convert observable props to plain objects
+  const plainPlayerPosition = toJS(playerPosition);
+  const plainBoundingBox = toJS(boundingBox);
+  const plainInCombat = toJS(inCombat);
+  const plainReduceMotion = toJS(reduceMotion);
+
   const { imageSet, size } = backgroundImages[backgroundName];
   const layerCount = Object.keys(imageSet).length - 1;
 
-  // Calculate scaling to cover screen while maintaining aspect ratio
+  // Calculate scaling to fill screen height and maintain aspect ratio
   const screenRatio = screenWidth / screenHeight;
   const imageRatio = size.width / size.height;
 
-  const scale =
+  // Always scale to fill screen height
+  const baseScale = screenHeight / size.height;
+
+  // Ensure width covers screen if needed
+  const finalScale =
     screenRatio > imageRatio
-      ? screenWidth / size.width
-      : screenHeight / size.height;
+      ? Math.max(baseScale, screenWidth / size.width)
+      : baseScale;
 
-  const scaledWidth = size.width * scale;
-  const scaledHeight = size.height * scale;
+  const scaledWidth = size.width * finalScale;
+  const scaledHeight = size.height * finalScale;
 
-  const imagesNeeded = Math.ceil(screenWidth / size.width) * 10;
+  // Calculate how many images needed to cover screen width plus buffer
+  const imagesNeeded = Math.ceil((screenWidth / (size.width * finalScale)) * 3);
 
   useEffect(() => {
-    if (inCombat) {
+    if (plainInCombat) {
       const totalWidth = size.width * imagesNeeded;
 
       scrollX.value = withRepeat(
         withTiming(-totalWidth, {
-          duration: 30000 * imagesNeeded, // will take 5 minutes before snapping back
+          duration: 10000 * imagesNeeded,
           easing: Easing.linear,
         }),
         -1,
-        false,
+        true,
       );
 
       return () => {
@@ -199,27 +211,114 @@ export const ParallaxBackground = ({
         scrollX.value = 0;
       };
     }
-  }, [inCombat]);
+  }, [plainInCombat]);
 
   useEffect(() => {
-    if (!inCombat) {
+    if (!plainInCombat) {
+      // Calculate relative position within bounding box
       const relativeX =
-        playerPosition.x - boundingBox.offsetX - boundingBox.width / 2;
-      const relativeY =
-        playerPosition.y - boundingBox.offsetY - boundingBox.height / 2;
+        plainPlayerPosition.x -
+        plainBoundingBox.offsetX -
+        plainBoundingBox.width / 2;
+
+      // Calculate vertical position relative to bounding box
+      const relativeY = plainPlayerPosition.y - plainBoundingBox.offsetY;
+      const boundingBoxVerticalCenter = plainBoundingBox.height / 2;
+      const verticalOffset = relativeY - boundingBoxVerticalCenter;
+
+      // Limit vertical movement
+      const maxVerticalMove = scaledHeight * 0.3; // Adjust this value as needed
+      const constrainedVerticalOffset = Math.max(
+        Math.min(verticalOffset, maxVerticalMove),
+        -maxVerticalMove,
+      );
 
       translateX.value = withSpring(-relativeX, {
         damping: 15,
         stiffness: 50,
       });
-      translateY.value = withSpring(-relativeY, {
+      translateY.value = withSpring(-constrainedVerticalOffset, {
         damping: 15,
         stiffness: 50,
       });
     }
-  }, [playerPosition, boundingBox, inCombat]);
+  }, [plainPlayerPosition, plainBoundingBox, plainInCombat]);
 
-  if (reduceMotion) {
+  const renderLayers = () => {
+    const layers = [];
+    for (let i = layerCount; i >= 1; i--) {
+      const moveRate = 1 - (i - 1) / layerCount;
+
+      const animatedStyle = useAnimatedStyle(() => {
+        const xOffset = plainInCombat
+          ? scrollX.value * moveRate
+          : translateX.value * moveRate;
+
+        const yOffset = !plainInCombat ? translateY.value * moveRate : 0;
+
+        return {
+          transform: [
+            { translateX: xOffset },
+            { translateY: yOffset },
+            { scale: finalScale },
+          ],
+        };
+      });
+
+      // Create three sets of images to ensure seamless tiling
+      const tileGroups = [
+        { offset: -size.width * imagesNeeded },
+        { offset: 0 },
+        { offset: size.width * imagesNeeded },
+      ];
+
+      layers.push(
+        <Animated.View
+          key={i}
+          style={[
+            styles.layerContainer,
+            {
+              width: size.width * imagesNeeded * 3, // Triple the width for three sets
+              height: size.height,
+              left: (screenWidth - scaledWidth) / 2,
+              bottom: Dimensions.get("window").height * 0.4,
+            },
+            animatedStyle,
+          ]}
+        >
+          {tileGroups.map((group, groupIndex) => (
+            <View
+              key={groupIndex}
+              style={{
+                position: "absolute",
+                left: group.offset,
+                width: size.width * imagesNeeded,
+                height: size.height,
+              }}
+            >
+              {[...Array(imagesNeeded)].map((_, index) => (
+                <Image
+                  key={index}
+                  source={imageSet[i]}
+                  style={[
+                    styles.backgroundImage,
+                    {
+                      width: size.width,
+                      height: size.height,
+                      left: index * size.width,
+                    },
+                  ]}
+                />
+              ))}
+            </View>
+          ))}
+        </Animated.View>,
+      );
+    }
+    return layers;
+  };
+
+  if (plainReduceMotion) {
     return (
       <Image
         source={imageSet[0]}
@@ -228,70 +327,13 @@ export const ParallaxBackground = ({
           {
             width: scaledWidth,
             height: scaledHeight,
-            transform: [{ scale }],
+            left: (screenWidth - scaledWidth) / 4,
+            bottom: Dimensions.get("window").height * 0.4, // Align to bottom of screen
           },
         ]}
       />
     );
   }
-
-  const renderLayers = () => {
-    const layers = [];
-    // Start from layerCount (7) down to 1 (not 0)
-    for (let i = layerCount; i >= 1; i--) {
-      const moveRate = 1 - (i - 1) / layerCount;
-      const isBackingLayer = i === layerCount;
-
-      const animatedStyle = useAnimatedStyle(() => {
-        const xOffset = inCombat
-          ? scrollX.value * moveRate
-          : translateX.value * moveRate;
-
-        const yOffset =
-          !inCombat && !isBackingLayer ? translateY.value * moveRate : 0;
-
-        return {
-          transform: [
-            { translateX: xOffset },
-            { translateY: yOffset },
-            { scale },
-          ],
-        };
-      });
-
-      layers.push(
-        <Animated.View
-          key={i}
-          style={[
-            styles.layerContainer,
-            {
-              width: size.width * imagesNeeded,
-              height: size.height,
-              left: (screenWidth - scaledWidth) / 2 - size.width * 2,
-              top: (screenHeight - scaledHeight) / 2,
-            },
-            animatedStyle,
-          ]}
-        >
-          {[...Array(imagesNeeded)].map((_, index) => (
-            <Image
-              key={index}
-              source={imageSet[i]}
-              style={[
-                styles.backgroundImage,
-                {
-                  width: size.width,
-                  height: size.height,
-                  left: index * size.width,
-                },
-              ]}
-            />
-          ))}
-        </Animated.View>,
-      );
-    }
-    return layers;
-  };
 
   return <View style={styles.container}>{renderLayers()}</View>;
 };
@@ -308,5 +350,3 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
 });
-
-export default ParallaxBackground;
