@@ -51,7 +51,6 @@ export default function InventoryRender({
   const vibration = useVibration();
   const { playerState, uiStore } = useRootStore();
   const { draggableClassStore } = useDraggableStore();
-  const pathname = usePathname();
 
   const dropHandler = (droppedOnKey: string, item: Item[]) => {
     vibration({ style: "light" });
@@ -193,7 +192,9 @@ export default function InventoryRender({
                           }
                         }}
                         displayItem={displayItem}
-                        isDraggable={!!item.item[0].slot}
+                        isDraggable={
+                          screen == "home" ? !!item.item[0].slot : true
+                        }
                         targetBounds={targetBounds}
                         runOnSuccess={(droppedOnKey) =>
                           dropHandler(droppedOnKey, item.item)

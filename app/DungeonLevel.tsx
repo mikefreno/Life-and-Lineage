@@ -1,5 +1,5 @@
 import { ThemedView, Text } from "../components/Themed";
-import { type LayoutChangeEvent, View } from "react-native";
+import { type LayoutChangeEvent, View, Platform } from "react-native";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
 import BattleTab from "../components/DungeonComponents/BattleTab";
@@ -28,6 +28,10 @@ import {
 import { usePouch } from "../hooks/generic";
 import D20DieAnimation from "../components/DieRollAnim";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { ParallaxBackground } from "../components/DungeonComponents/ParallaxBackground";
+import { LinearGradientBlur } from "../components/LinearGradientBlur";
+import { BlurView } from "expo-blur";
+import { useColorScheme } from "nativewind";
 
 const DungeonLevelScreen = observer(() => {
   const { enemyStore, dungeonStore, uiStore } = useRootStore();
@@ -39,6 +43,7 @@ const DungeonLevelScreen = observer(() => {
     useLootState();
   const { showTargetSelection, setShowTargetSelection } = useCombatState();
   const { addItemToPouch } = usePouch();
+  const { colorScheme } = useColorScheme();
 
   const [battleTab, setBattleTab] = useState<
     "attacksOrNavigation" | "equipment" | "log"
@@ -71,12 +76,28 @@ const DungeonLevelScreen = observer(() => {
   );
 
   useEffect(() => {
+    if (colorScheme != "dark") {
+      uiStore.dungeonSetter();
+    }
+  }, []);
+
+  useEffect(() => {
     setInventoryFullNotifier(false);
   }, [showLeftBehindItemsScreen]);
 
   if (currentLevel) {
     return (
-      <>
+      <View style={{ paddingTop: header }} className="flex-1">
+        <ParallaxBackground
+          backgroundName={"StormyMountain"}
+          inCombat={inCombat}
+          playerPosition={{
+            x: dungeonStore.currentPosition?.x ?? 0,
+            y: dungeonStore.currentPosition?.y ?? 0,
+          }}
+          boundingBox={dungeonStore.currentMapDimensions!}
+          reduceMotion={uiStore.reduceMotion}
+        />
         <TutorialModal
           tutorial={TutorialOption.dungeonInterior}
           isFocused={isFocused}
@@ -114,47 +135,64 @@ const DungeonLevelScreen = observer(() => {
             <TargetSelection />
           </ThemedView>
         </GenericModal>
-        <View className="flex-1" style={{ paddingBottom: 74 }}>
-          {inCombat ? <DungeonEnemyDisplay /> : <DungeonMapRender />}
+        <View
+          style={{
+            marginTop: header + 16,
+            position: "absolute",
+            marginLeft: 16,
+          }}
+        >
           <Pressable
             ref={pouchRef}
             onLayout={(e) => setPouchBoundsOnLayout(e)}
-            className="absolute ml-4 mt-4"
             onPress={() => setShowLeftBehindItemsScreen(true)}
           >
             <SackIcon height={32} width={32} />
           </Pressable>
-          {inCombat && <View></View>}
-          <View className="flex-1 justify-between">
-            <BattleTab battleTab={battleTab} />
+        </View>
+        <View className="flex-1" style={{ paddingBottom: 74 }}>
+          {inCombat ? <DungeonEnemyDisplay /> : <DungeonMapRender />}
+          <View className="flex-1">
+            {Platform.OS == "ios" ? (
+              <LinearGradientBlur className="absolute" />
+            ) : (
+              <BlurView
+                experimentalBlurMethod="dimezisBlurView"
+                className="flex-1 absolute"
+              />
+            )}
+            {inCombat && <View></View>}
+            <View className="flex-1 justify-between">
+              <BattleTab battleTab={battleTab} />
+            </View>
+            <BattleTabControls
+              battleTab={battleTab}
+              setBattleTab={setBattleTab}
+            />
+            {playerState.minionsAndPets.length > 0 ? (
+              <View className="flex flex-row flex-wrap justify-evenly px-4">
+                {playerState.minionsAndPets.map((minion, index) => (
+                  <View
+                    key={minion.id}
+                    className={`${
+                      index == playerState.minionsAndPets.length - 1 &&
+                      playerState.minionsAndPets.length % 2 !== 0
+                        ? "w-full"
+                        : "w-2/5"
+                    } py-1`}
+                  >
+                    <Text>{toTitleCase(minion.creatureSpecies)}</Text>
+                    <ProgressBar
+                      filledColor="#ef4444"
+                      unfilledColor="#fee2e2"
+                      value={minion.currentHealth}
+                      maxValue={minion.baseHealth}
+                    />
+                  </View>
+                ))}
+              </View>
+            ) : null}
           </View>
-          <BattleTabControls
-            battleTab={battleTab}
-            setBattleTab={setBattleTab}
-          />
-          {playerState.minionsAndPets.length > 0 ? (
-            <ThemedView className="flex flex-row flex-wrap justify-evenly px-4">
-              {playerState.minionsAndPets.map((minion, index) => (
-                <ThemedView
-                  key={minion.id}
-                  className={`${
-                    index == playerState.minionsAndPets.length - 1 &&
-                    playerState.minionsAndPets.length % 2 !== 0
-                      ? "w-full"
-                      : "w-2/5"
-                  } py-1`}
-                >
-                  <Text>{toTitleCase(minion.creatureSpecies)}</Text>
-                  <ProgressBar
-                    filledColor="#ef4444"
-                    unfilledColor="#fee2e2"
-                    value={minion.currentHealth}
-                    maxValue={minion.baseHealth}
-                  />
-                </ThemedView>
-              ))}
-            </ThemedView>
-          ) : null}
           {displayItem && (
             <View className="absolute z-10">
               <StatsDisplay
@@ -167,7 +205,7 @@ const DungeonLevelScreen = observer(() => {
           )}
         </View>
         <PlayerStatus positioning={"absolute"} classname="bottom-0" />
-      </>
+      </View>
     );
   } else {
     return (

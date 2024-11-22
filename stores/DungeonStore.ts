@@ -34,6 +34,7 @@ export class DungeonStore {
   fightingBoss: boolean = false;
 
   fleeModalShowing: boolean = false;
+  heldColorScheme: "light" | "dark" | "system" | undefined;
   logs: string[] = [];
 
   constructor({ root }: { root: RootStore }) {
@@ -307,7 +308,7 @@ export class DungeonStore {
       unlockObjects.forEach((obj) => {
         const inst = DungeonInstance.fromJSON(obj);
         this.dungeonInstances.push(inst);
-        saveDungeonInstance(inst);
+        _dungeonInstanceSave(inst);
       });
     }
   }

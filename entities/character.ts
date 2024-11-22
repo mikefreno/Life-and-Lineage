@@ -1056,6 +1056,45 @@ export class PlayerCharacter extends Character {
     this.gold += Math.floor(sellPrice) * soldCount;
   }
 
+  public purchaseStack(itemStack: Item[], shopArchetype: string) {
+    const shop = this.root.shopsStore.getShop(shopArchetype);
+    if (!shop)
+      throw new Error(`Shop with archetype ${shopArchetype} not found`);
+
+    let totalCost = 0;
+    let purchaseCount = 0;
+    const shopAffection = shop.shopKeeper.affection;
+    const playerInventory = this.baseInventory;
+    const shopInventory = shop.baseInventory;
+
+    for (let i = 0, len = itemStack.length; i < len; i++) {
+      const item = itemStack[i];
+      const itemPrice = Math.floor(
+        item.baseValue * (1.4 - shopAffection / 250),
+      ); // Inline getBuyPrice
+
+      if (this.gold < itemPrice) break;
+
+      this.gold -= itemPrice;
+      totalCost += itemPrice;
+      playerInventory.push(item);
+      purchaseCount++;
+    }
+
+    if (purchaseCount > 0) {
+      // Remove purchased items from shop inventory
+      shopInventory.splice(0, purchaseCount);
+
+      shop.addGold(totalCost);
+
+      const baseChange = (totalCost / 500) * purchaseCount;
+      const cappedChange = baseChange < 20 ? baseChange : 20;
+      shop.changeAffection(cappedChange);
+    }
+
+    return purchaseCount;
+  }
+
   get equipmentStats() {
     let armor = 0;
     let damage = 0;

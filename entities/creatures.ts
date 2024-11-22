@@ -607,9 +607,11 @@ export class Creature {
     }
     if (enemyObj) {
       const dropList = enemyObj.drops;
-      const gold = getRandomInt(
-        enemyObj.goldDropRange.minimum,
-        enemyObj.goldDropRange.maximum,
+      const gold = Math.round(
+        getRandomInt(
+          enemyObj.goldDropRange.minimum,
+          enemyObj.goldDropRange.maximum,
+        ),
       );
       let itemDrops: Item[] = [];
       dropList.forEach((drop) => {

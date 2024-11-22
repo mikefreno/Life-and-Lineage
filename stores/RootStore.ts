@@ -9,7 +9,6 @@ import { action, makeObservable, observable } from "mobx";
 import { AuthStore } from "./AuthStore";
 import { TimeStore } from "./TimeStore";
 import { CharacterStore } from "./CharacterStore";
-import { lowSanityDebuffGenerator } from "../utility/functions/conditions";
 import { TutorialStore } from "./TutorialStore";
 import { Condition } from "../entities/conditions";
 import sanityDebuffs from "../assets/json/sanityDebuffs.json";
@@ -149,5 +148,6 @@ export class RootStore {
     this.playerState?.clearMinions();
     this.enemyStore.clearEnemyList();
     this.dungeonStore.clearDungeonState();
+    this.uiStore.clearDungeonColor();
   }
 }

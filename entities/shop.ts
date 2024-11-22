@@ -70,6 +70,8 @@ export class Shop {
       sellItem: action,
       deathCheck: action,
       createGreeting: computed,
+      purchaseStack: action,
+      addGold: action,
     });
 
     reaction(
@@ -78,6 +80,10 @@ export class Shop {
         saveShop(this);
       },
     );
+  }
+
+  public addGold(amount: number) {
+    this.currentGold += amount;
   }
 
   public deathCheck() {
@@ -141,7 +147,7 @@ export class Shop {
     return options[randIdx].replaceAll("%p", playerFullName);
   }
 
-  private changeAffection(change: number) {
+  public changeAffection(change: number) {
     const currentAffection = this.shopKeeper.affection;
 
     if (change === 0) return;
@@ -194,6 +200,47 @@ export class Shop {
     this.changeAffection(cappedChange);
   }
 
+  public purchaseStack(items: Item[]) {
+    const playerState = this.root.playerState;
+    if (!playerState) {
+      throw new Error("Player state is not available");
+    }
+
+    let totalPrice = 0;
+    const successfullySoldItems: Item[] = [];
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      const itemPrice = item.getSellPrice(this.shopKeeper.affection);
+      if (this.currentGold >= itemPrice) {
+        // Shop can afford to buy the item
+        this.currentGold -= itemPrice;
+        this.baseInventory.push(item);
+        totalPrice += itemPrice;
+        successfullySoldItems.push(item);
+      }
+    }
+
+    if (successfullySoldItems.length > 0) {
+      playerState.addGold(totalPrice);
+      for (let i = 0; i < successfullySoldItems.length; i++) {
+        const item = successfullySoldItems[i];
+        for (let j = 0; j < playerState.baseInventory.length; j++) {
+          if (playerState.baseInventory[j].equals(item)) {
+            playerState.baseInventory.splice(j, 1);
+            break;
+          }
+        }
+      }
+
+      const baseChange = (totalPrice / 500) * successfullySoldItems.length;
+      const cappedChange = Math.min(baseChange, 20);
+      this.changeAffection(cappedChange);
+    }
+
+    return successfullySoldItems.length;
+  }
+
   get inventory() {
     const condensedInventory: { item: Item[] }[] = [];
     this.baseInventory.forEach((item) => {
@@ -235,36 +282,78 @@ export class Shop {
 }
 
 //----------------------associated functions----------------------//
-function getAnItemByType(type: ItemClassType, player: PlayerCharacter): Item {
-  const itemJSONMap = getItemJSONMap(player.playerClass);
-
-  if (!(type in itemJSONMap)) {
-    throw new Error(`Invalid type passed to getAnItemByType(): ${type}`);
-  }
-
-  const items = itemJSONMap[type];
-  const idx = getRandomInt(0, items.length - 1);
-  const itemObj = items[idx];
-
-  return Item.fromJSON({
-    ...itemObj,
-    itemClass: type,
-    stackable: isStackable(type as ItemClassType),
-    root: player.root,
-  });
-}
 
 export function generateInventory(
   inventoryCount: number,
   trades: ItemClassType[],
   player: PlayerCharacter,
-) {
-  let items: Item[] = [];
+): Item[] {
+  const itemJSONMap = getItemJSONMap(player.playerClass);
+  const tradesLength = trades.length;
+  const items: Item[] = new Array(inventoryCount);
+
+  // Precalculate player stats
+  const playerStats = {
+    strength: player.nonConditionalStrength,
+    intelligence: player.nonConditionalIntelligence,
+    dexterity: player.nonConditionalDexterity,
+  };
+
   for (let i = 0; i < inventoryCount; i++) {
-    const type = trades[Math.floor(Math.random() * trades.length)];
-    items.push(getAnItemByType(type, player));
+    const type = trades[Math.floor(Math.random() * tradesLength)];
+
+    if (!(type in itemJSONMap)) {
+      throw new Error(`Invalid type in trades array: ${type}`);
+    }
+
+    const typeItems = itemJSONMap[type];
+    const weightedItems = createWeightedItems(typeItems, playerStats);
+
+    const selectedItem =
+      weightedItems[Math.floor(Math.random() * weightedItems.length)];
+
+    items[i] = Item.fromJSON({
+      ...selectedItem,
+      itemClass: type,
+      stackable: isStackable(type),
+      root: player.root,
+    });
   }
+
   return items;
+}
+
+function createWeightedItems(
+  items: any[],
+  playerStats: { strength: number; intelligence: number; dexterity: number },
+): any[] {
+  const weightedItems: any[] = [];
+  const usableWeight = 3;
+
+  for (const item of items) {
+    const weight = isItemUsableByPlayerWithStats(item, playerStats)
+      ? usableWeight
+      : 1;
+    for (let i = 0; i < weight; i++) {
+      weightedItems.push(item);
+    }
+  }
+
+  return weightedItems;
+}
+
+function isItemUsableByPlayerWithStats(
+  item: any,
+  stats: { strength: number; intelligence: number; dexterity: number },
+): boolean {
+  if (!item.requirements) return true;
+
+  const reqs = item.requirements;
+  return (
+    (!reqs.strength || stats.strength >= reqs.strength) &&
+    (!reqs.intelligence || stats.intelligence >= reqs.intelligence) &&
+    (!reqs.dexterity || stats.dexterity >= reqs.dexterity)
+  );
 }
 
 function getRandomInt(min: number, max: number): number {

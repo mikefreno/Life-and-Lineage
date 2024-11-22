@@ -1,7 +1,7 @@
 import GenericModal from "../GenericModal";
 import GenericFlatButton from "../GenericFlatButton";
 import { ThemedView, Text } from "../Themed";
-import { rollD20, wait } from "../../utility/functions/misc";
+import { rollD20 } from "../../utility/functions/misc";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { useVibration } from "../../hooks/generic";
@@ -13,7 +13,7 @@ import { observer } from "mobx-react-lite";
 const FleeModal = observer(() => {
   const vibration = useVibration();
   const rootStore = useRootStore();
-  const { enemyStore, dungeonStore, playerState } = rootStore;
+  const { enemyStore, dungeonStore, playerState, uiStore } = rootStore;
   const { playerMinionsTurn } = useCombatActions();
   const { enemyTurn } = useEnemyManagement();
 

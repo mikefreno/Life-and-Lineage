@@ -65,7 +65,7 @@ export default function TabLayout() {
             return (
               <View className="-mx-2">
                 <PlayerStatus home hideGold />
-                <LinearGradientBlur />
+                <LinearGradientBlur intensity={100} />
               </View>
             );
           },

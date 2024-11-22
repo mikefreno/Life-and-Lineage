@@ -3,7 +3,7 @@ import { SplashScreen, Stack, router, usePathname } from "expo-router";
 import React, { useEffect, useState, useRef } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
-import { Platform, Pressable, StyleSheet } from "react-native";
+import { Appearance, Platform, Pressable, StyleSheet } from "react-native";
 import { ThemedView } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { BlurView } from "expo-blur";
@@ -74,7 +74,7 @@ const RootLayout = observer(() => {
   const rootStore = useRootStore();
   const { playerState, dungeonStore, uiStore } = rootStore;
 
-  const { colorScheme } = useColorScheme();
+  const { colorScheme, setColorScheme } = useColorScheme();
   const [firstLoad, setFirstLoad] = useState(true);
 
   const [expoPushToken, setExpoPushToken] = useState("");
@@ -116,6 +116,15 @@ const RootLayout = observer(() => {
       });
     }
   }, [fontLoaded]);
+
+  useEffect(() => {
+    console.log("setting nativewind to:", uiStore.colorScheme);
+    setColorScheme(uiStore.colorScheme);
+  }, [uiStore.colorScheme]);
+
+  useEffect(() => {
+    console.log("nativewind has been set to:", colorScheme);
+  }, [colorScheme]);
 
   useEffect(() => {
     if (expoPushToken && !sentToken) {
@@ -172,7 +181,7 @@ const RootLayout = observer(() => {
   return (
     <GestureHandlerRootView>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : LightTheme}>
-        <SystemBars style={colorScheme == "light" ? "dark" : "light"} />
+        <SystemBars style={"auto"} />
         <ProjectedImage />
         <FleeModal />
         <Stack
@@ -356,6 +365,22 @@ const RootLayout = observer(() => {
             name="DungeonLevel"
             options={{
               headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 20 },
+              headerTransparent: true,
+              headerBackground: () => (
+                <BlurView
+                  blurReductionFactor={12}
+                  tint={
+                    Platform.OS == "android"
+                      ? colorScheme == "light"
+                        ? "light"
+                        : "dark"
+                      : "default"
+                  }
+                  intensity={50}
+                  style={StyleSheet.absoluteFill}
+                  experimentalBlurMethod={"dimezisBlurView"}
+                />
+              ),
               headerLeft: () => (
                 <Pressable
                   onPress={() => {

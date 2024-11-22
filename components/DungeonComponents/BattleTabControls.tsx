@@ -1,5 +1,5 @@
-import { Pressable } from "react-native";
-import { ThemedView, Text } from "../Themed";
+import { View, Pressable } from "react-native";
+import { Text } from "../Themed";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 
@@ -16,12 +16,12 @@ export default function BattleTabControls({
   const vibration = useVibration();
   const { dungeonStore } = useRootStore();
   return (
-    <ThemedView className="-mb-1 flex w-full flex-row justify-around">
+    <View className="-mb-1 flex w-full flex-row justify-around">
       <Pressable
         className={`w-1/3  py-4 ${
           battleTab == "attacksOrNavigation"
-            ? "bg-zinc-150 dark:bg-zinc-800"
-            : "active:bg-zinc-200 dark:active:bg-zinc-700"
+            ? "bg-zinc-150/30 dark:bg-zinc-800/30"
+            : "active:bg-zinc-200/30 dark:active:bg-zinc-700/30"
         }`}
         onPress={() => {
           vibration({ style: "light" });
@@ -35,8 +35,8 @@ export default function BattleTabControls({
       <Pressable
         className={`w-1/3 py-4 ${
           battleTab == "equipment"
-            ? " bg-zinc-150 dark:bg-zinc-800"
-            : "active:bg-zinc-200 dark:active:bg-zinc-700"
+            ? " bg-zinc-150/30 dark:bg-zinc-800/30"
+            : "active:bg-zinc-200/30 dark:active:bg-zinc-700/30"
         }`}
         onPress={() => {
           vibration({ style: "light" });
@@ -48,8 +48,8 @@ export default function BattleTabControls({
       <Pressable
         className={`w-1/3  py-4 ${
           battleTab == "log"
-            ? "bg-zinc-150 dark:bg-zinc-800"
-            : "active:bg-zinc-200 dark:active:bg-zinc-700"
+            ? "bg-zinc-150/30 dark:bg-zinc-800/30"
+            : "active:bg-zinc-200/30 dark:active:bg-zinc-700/30"
         }`}
         onPress={() => {
           vibration({ style: "light" });
@@ -58,6 +58,6 @@ export default function BattleTabControls({
       >
         <Text className="text-center text-xl">Log</Text>
       </Pressable>
-    </ThemedView>
+    </View>
   );
 }

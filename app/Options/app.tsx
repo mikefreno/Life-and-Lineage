@@ -22,7 +22,7 @@ const vibrationOptions = ["full", "minimal", "none"];
 export const AppSettings = observer(() => {
   let root = useRootStore();
   const { playerState, uiStore, authStore } = root;
-  const { colorScheme, setColorScheme } = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const [showRemoteSaveWindow, setShowRemoteSaveWindow] =
     useState<boolean>(false);
   const [showRemoteLoadWidow, setShowRemoteLoadWindow] =
@@ -43,7 +43,6 @@ export const AppSettings = observer(() => {
   function setColorTheme(index: number, option: "system" | "light" | "dark") {
     vibration({ style: "light" });
     uiStore.setColorScheme(option);
-    setColorScheme(option);
     setSelectedThemeOption(index);
   }
 

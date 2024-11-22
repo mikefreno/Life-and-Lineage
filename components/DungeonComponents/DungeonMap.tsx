@@ -2,7 +2,6 @@ import Svg, { Rect } from "react-native-svg";
 import { Dimensions, View } from "react-native";
 import GenericRaisedButton from "../GenericRaisedButton";
 import { useColorScheme } from "nativewind";
-import PlatformDependantBlurView from "../PlatformDependantBlurView";
 import { TILE_SIZE } from "../../stores/DungeonStore";
 import { observer } from "mobx-react-lite";
 import { useRootStore } from "../../hooks/stores";
@@ -79,12 +78,25 @@ export const generateTiles = ({
     isBossRoom: false,
   };
 
+  const weightedDirections = [
+    directionsMapping.left,
+    directionsMapping.right,
+    directionsMapping.left, // Add extra horizontal directions
+    directionsMapping.right,
+    directionsMapping.up,
+    directionsMapping.down,
+  ];
+
   tiles.push(startTile);
 
   while (tiles.length < numTiles) {
     const currentTile = tiles[Math.floor(Math.random() * tiles.length)];
 
-    for (const direction of directions) {
+    const shuffledDirections = [...weightedDirections].sort(
+      () => Math.random() - 0.5,
+    );
+
+    for (const direction of shuffledDirections) {
       const newX = currentTile.x / tileSize + direction.x;
       const newY = currentTile.y / tileSize + direction.y;
 
@@ -299,7 +311,7 @@ export const DungeonMapControls = observer(() => {
     );
   };
   return (
-    <PlatformDependantBlurView className="flex-1 flex items-center w-full justify-center">
+    <View className="flex-1 flex items-center w-full justify-center">
       <View
         className="w-2/3 mx-auto"
         style={{ marginTop: -uiStore.dimensions.height / 20 }}
@@ -311,6 +323,6 @@ export const DungeonMapControls = observer(() => {
         </View>
         <ArrowButton direction="down" />
       </View>
-    </PlatformDependantBlurView>
+    </View>
   );
 });

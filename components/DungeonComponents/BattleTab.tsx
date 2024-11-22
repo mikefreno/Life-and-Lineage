@@ -10,12 +10,10 @@ import {
 import { toTitleCase } from "../../utility/functions/misc";
 import { useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
-
 import GenericModal from "../GenericModal";
 import SpellDetails from "../SpellDetails";
 import InventoryRender from "../InventoryRender";
 import { DungeonMapControls } from "./DungeonMap";
-import PlatformDependantBlurView from "../PlatformDependantBlurView";
 import { Energy, Regen } from "../../assets/icons/SVGIcons";
 import { elementalColorMap } from "../../constants/Colors";
 import { useCombatState, useLootState } from "../../providers/DungeonData";
@@ -149,18 +147,19 @@ const BattleTab = observer(
                   inverted
                   renderItem={({ item: attackOrSpell, index }) => (
                     <>
-                      <View
+                      <ThemedView
                         className="mt-2 rounded-lg border px-4 py-2"
-                        style={{
-                          backgroundColor:
-                            attackOrSpell instanceof Spell
-                              ? elementalColorMap[attackOrSpell.element].light
-                              : undefined,
-                          borderColor:
-                            attackOrSpell instanceof Spell
-                              ? elementalColorMap[attackOrSpell.element].dark
-                              : "#52525b",
-                        }}
+                        style={
+                          attackOrSpell instanceof Spell
+                            ? {
+                                backgroundColor:
+                                  elementalColorMap[attackOrSpell.element]
+                                    .light,
+                                borderColor:
+                                  elementalColorMap[attackOrSpell.element].dark,
+                              }
+                            : {}
+                        }
                       >
                         <View className="flex flex-row justify-between">
                           <View className="flex flex-col justify-center">
@@ -252,7 +251,7 @@ const BattleTab = observer(
                             </Text>
                           </Pressable>
                         </View>
-                      </View>
+                      </ThemedView>
                       {index == combinedData.length - 1 && (
                         <View
                           className="flex flex-row mt-2 justify-between rounded-lg border px-4 py-2"
@@ -330,7 +329,7 @@ const BattleTab = observer(
           )
         ) : battleTab == "equipment" ? (
           <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
-            <PlatformDependantBlurView className="flex-1">
+            <View className="flex-1">
               <InventoryRender
                 screen="dungeon"
                 displayItem={displayItem}
@@ -339,16 +338,11 @@ const BattleTab = observer(
                   draggableClassStore.ancillaryBoundsMap.get("pouch") ?? null,
                 ]}
               />
-            </PlatformDependantBlurView>
+            </View>
           </TouchableWithoutFeedback>
         ) : (
-          <PlatformDependantBlurView className="flex-1 px-2">
-            <ThemedView
-              className="flex-1 pl-1 rounded-lg border border-zinc-600"
-              style={{
-                backgroundColor: colorScheme == "dark" ? "#09090b" : "#fff",
-              }}
-            >
+          <View className="flex-1 px-2">
+            <View className="flex-1 pl-1 rounded-lg border border-zinc-600">
               {Platform.OS == "web" ? (
                 <ScrollView>
                   {dungeonStore.reversedLogs.map((text) => (
@@ -373,8 +367,8 @@ const BattleTab = observer(
                   )}
                 />
               )}
-            </ThemedView>
-          </PlatformDependantBlurView>
+            </View>
+          </View>
         )}
       </>
     );

@@ -8,7 +8,7 @@ import {
   Animated,
   LayoutChangeEvent,
 } from "react-native";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import { observer } from "mobx-react-lite";
 import TutorialModal from "../../components/TutorialModal";
@@ -141,34 +141,26 @@ const ShopInteriorScreen = observer(() => {
   }, [playerState]);
 
   function sellAllJunk() {
-    if (thisShop) {
-      const itemsToSell: Item[] = [];
-      playerState?.baseInventory.forEach((item) => {
-        if (item.itemClass == "junk") {
-          itemsToSell.push(item);
-        }
-      });
+    if (thisShop && playerState) {
+      const itemsToSell = playerState.baseInventory.filter(
+        (item) => item.itemClass === "junk",
+      );
 
-      itemsToSell.forEach((item) => {
+      let totalEarned = 0;
+      for (const item of itemsToSell) {
         const price = item.getSellPrice(thisShop.shopKeeper.affection);
         thisShop.buyItem(item, price);
-        playerState?.sellItem(item, price);
-      });
+        playerState.sellItem(item, price);
+        totalEarned += price;
+      }
       if (displayItem?.item[0].itemClass == "junk") {
         setDisplayItem(null);
       }
     }
   }
 
-  const sellStack = (items: Item[]) => {
-    if (playerState && thisShop) {
-      items.forEach((item) => {
-        const itemPrice = item.getSellPrice(thisShop.shopKeeper.affection);
-        thisShop.buyItem(item, itemPrice);
-        playerState.sellItem(item, itemPrice);
-        setDisplayItem(null);
-      });
-    }
+  const sellStack = (itemStack: Item[]) => {
+    thisShop?.purchaseStack(itemStack);
   };
 
   const purchaseItem = (item: Item) => {
@@ -195,16 +187,8 @@ const ShopInteriorScreen = observer(() => {
     }
   };
 
-  const purchaseStack = (items: Item[]) => {
-    if (playerState && thisShop) {
-      vibration({ style: "light" });
-      items.forEach((item) => {
-        const itemPrice = item.getBuyPrice(thisShop.shopKeeper.affection);
-        playerState.buyItem(item, itemPrice);
-        thisShop.sellItem(item, itemPrice);
-        setDisplayItem(null);
-      });
-    }
+  const purchaseStack = (itemStack: Item[]) => {
+    playerState?.purchaseStack(itemStack, thisShop?.archetype!);
   };
 
   if (initialized && thisShop && playerState && uiStore.itemBlockSize) {

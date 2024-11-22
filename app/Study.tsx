@@ -87,18 +87,18 @@ export default function LearningKnowledgeScreen() {
     }
   }
 
-  const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
-    () => null, // Return null to indicate unlimited mode
-    {
-      minHoldTime: 350,
-      maxSpeed: 10,
-      accelerationCurve: AccelerationCurves.linear,
-      action: work,
-      minActionAmount: 1,
-      maxActionAmount: 50,
-      debounceTime: 50,
-    },
-  );
+  //const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
+  //() => null, // Return null to indicate unlimited mode
+  //{
+  //minHoldTime: 350,
+  //maxSpeed: 10,
+  //accelerationCurve: AccelerationCurves.linear,
+  //action: work,
+  //minActionAmount: 1,
+  //maxActionAmount: 50,
+  //debounceTime: 50,
+  //},
+  //);
 
   return (
     <>

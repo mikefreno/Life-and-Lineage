@@ -5,7 +5,13 @@ import MaskedView from "@react-native-masked-view/masked-view";
 import { View, StyleSheet, Platform } from "react-native";
 import { ThemedView } from "./Themed";
 
-export function LinearGradientBlur() {
+export function LinearGradientBlur({
+  intensity = 50,
+  className = "",
+}: {
+  intensity?: number;
+  className?: string;
+}) {
   const { colors, locations } = easeGradient(
     Platform.OS == "ios"
       ? {
@@ -25,7 +31,7 @@ export function LinearGradientBlur() {
   );
 
   return (
-    <View style={{ height: "100%", width: "100%" }}>
+    <View style={{ height: "100%", width: "100%" }} className={className}>
       <MaskedView
         maskElement={
           <LinearGradient
@@ -37,7 +43,7 @@ export function LinearGradientBlur() {
         style={[StyleSheet.absoluteFill]}
       >
         {Platform.OS == "ios" ? (
-          <BlurView intensity={100} style={StyleSheet.absoluteFill} />
+          <BlurView intensity={intensity} style={StyleSheet.absoluteFill} />
         ) : (
           <ThemedView style={StyleSheet.absoluteFill} />
         )}

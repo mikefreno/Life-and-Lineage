@@ -26,6 +26,7 @@ export default class UIStore {
   vibrationEnabled: "full" | "minimal" | "none";
   healthWarning: number;
   reduceMotion: boolean;
+  colorHeldForDungeon: "system" | "dark" | "light" | undefined;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
@@ -60,11 +61,17 @@ export default class UIStore {
     this.detailedStatusViewShowing = false;
     this.modalShowing = false;
 
-    const { vibrationEnabled, colorScheme, healthWarning, reduceMotion } =
-      this.hydrateUISettings();
+    const {
+      vibrationEnabled,
+      colorScheme,
+      healthWarning,
+      reduceMotion,
+      colorHeldForDungeon,
+    } = this.hydrateUISettings();
     this.vibrationEnabled = vibrationEnabled;
 
-    this.colorScheme = colorScheme;
+    this.colorScheme = colorScheme ?? "system";
+    this.colorHeldForDungeon = colorHeldForDungeon;
     this.healthWarning = healthWarning;
 
     if (reduceMotion == undefined) {
@@ -91,6 +98,9 @@ export default class UIStore {
       handleDimensionChange: action,
       reduceMotion: observable,
       setReduceMotion: action,
+      dungeonSetter: action,
+      colorHeldForDungeon: observable,
+      clearDungeonColor: action,
     });
 
     reaction(
@@ -115,11 +125,29 @@ export default class UIStore {
         this.healthWarning,
         this.vibrationEnabled,
         this.reduceMotion,
+        this.colorHeldForDungeon,
       ],
       () => {
         this.persistUISettings();
       },
     );
+    reaction(
+      () => [this.colorScheme],
+      () => console.log("in store:", this.colorScheme),
+    );
+  }
+
+  dungeonSetter() {
+    this.colorHeldForDungeon = this.colorScheme;
+    this.colorScheme = "dark";
+  }
+
+  clearDungeonColor() {
+    if (this.colorHeldForDungeon) {
+      console.log("setting in store back to: ", this.colorScheme);
+      this.colorScheme = this.colorHeldForDungeon;
+      this.colorHeldForDungeon = undefined;
+    }
   }
 
   public setColorScheme(color: "light" | "dark" | "system") {
@@ -176,6 +204,7 @@ export default class UIStore {
     vibrationEnabled: "full" | "minimal" | "none";
     healthWarning: number;
     reduceMotion: boolean | undefined;
+    colorHeldForDungeon: "system" | "dark" | "light" | undefined;
   } {
     const stored = storage.getString("ui_settings");
     if (!stored) {
@@ -184,6 +213,7 @@ export default class UIStore {
         vibrationEnabled: Platform.OS === "ios" ? "full" : "minimal",
         healthWarning: 0.2,
         reduceMotion: undefined,
+        colorHeldForDungeon: undefined,
       };
     }
     return JSON.parse(stored);
@@ -197,6 +227,7 @@ export default class UIStore {
         vibrationEnabled: this.vibrationEnabled,
         healthWarning: this.healthWarning,
         reduceMotion: this.reduceMotion,
+        colorHeldForDungeon: this.colorHeldForDungeon,
       }),
     );
   }

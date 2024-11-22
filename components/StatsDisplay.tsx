@@ -79,8 +79,12 @@ export function StatsDisplay({
   const [showingAttacks, setShowingAttacks] = useState<boolean>(false);
   const [firstItem, setFirstItem] = useState<Item>(displayItem.item[0]);
   const [renderStory, setRenderStory] = useState<string | null>(null);
-  const animatedLeft = useRef(new Animated.Value(0)).current;
-  const animatedTop = useRef(new Animated.Value(0)).current;
+  const animatedLeft = useRef(
+    new Animated.Value(uiStore.dimensions.width / 3),
+  ).current;
+  const animatedTop = useRef(
+    new Animated.Value(uiStore.dimensions.height / 3),
+  ).current;
 
   useEffect(() => {
     // Calculate target positions
