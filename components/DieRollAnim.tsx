@@ -32,7 +32,7 @@ const D20DieAnimation = observer(
       setTimeout(() => setDiceValue(rollD20()), 750);
       Animated.timing(spinValue, {
         toValue: 1,
-        duration: slowRoll ? 5000 : 1000,
+        duration: slowRoll ? 5000 : 2500,
         easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
       }).start(() => {
@@ -68,7 +68,7 @@ const D20DieAnimation = observer(
               : {
                   transform: slowRoll
                     ? [{ rotateY: spin }]
-                    : [{ rotateZ: spin }, { rotateY: spin }, { scale: scale }],
+                    : [{ rotateY: spin }, { scale: scale }],
                   height: size,
                   width: size,
                 }

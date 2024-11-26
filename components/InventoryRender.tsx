@@ -129,7 +129,7 @@ export default function InventoryRender({
               )}
               <Pressable
                 onPress={() => setDisplayItem(null)}
-                className="rounded-lg mx-2 border border-zinc-600 relative h-full"
+                className="border border-zinc-600 rounded-lg mx-2 relative h-full"
               >
                 {Array.from({ length: 24 }).map((_, index) => (
                   <View

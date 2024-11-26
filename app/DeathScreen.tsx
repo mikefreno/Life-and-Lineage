@@ -188,10 +188,7 @@ export default function DeathScreen() {
                         <Text className="text-center text-xl">
                           {child.firstName}
                         </Text>
-                        <CharacterImage
-                          characterAge={child.age ?? 0}
-                          characterSex={child.sex == "male" ? "M" : "F"}
-                        />
+                        <CharacterImage character={child} />
                       </ThemedView>
                     </Pressable>
                   ))}

@@ -253,7 +253,7 @@ const BattleTab = observer(
                         </View>
                       </ThemedView>
                       {index == combinedData.length - 1 && (
-                        <View
+                        <ThemedView
                           className="flex flex-row mt-2 justify-between rounded-lg border px-4 py-2"
                           style={{
                             borderColor:
@@ -287,7 +287,7 @@ const BattleTab = observer(
                           >
                             <Text className="text-xl">Use</Text>
                           </Pressable>
-                        </View>
+                        </ThemedView>
                       )}
                     </>
                   )}
@@ -341,7 +341,7 @@ const BattleTab = observer(
             </View>
           </TouchableWithoutFeedback>
         ) : (
-          <View className="flex-1 px-2">
+          <View className="flex-1 px-2 ">
             <View className="flex-1 pl-1 rounded-lg border border-zinc-600">
               {Platform.OS == "web" ? (
                 <ScrollView>

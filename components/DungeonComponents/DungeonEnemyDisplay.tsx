@@ -171,7 +171,7 @@ const DungeonEnemyDisplay = observer(() => {
   if (enemyStore.enemies.length == 0) return null;
 
   return (
-    <View className="flex h-[45%] pt-8">
+    <View className="flex-1 pt-4">
       {enemyStore.enemies.map((enemy) => (
         <EnemyDisplay
           key={enemy.id}

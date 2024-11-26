@@ -4,6 +4,7 @@ import { DungeonStore, saveDungeonInstance } from "../stores/DungeonStore";
 import enemiesJSON from "../assets/json/enemy.json";
 import bossesJSON from "../assets/json/bosses.json";
 import type { BeingType } from "../utility/types";
+import { ParallaxOptions } from "../components/DungeonComponents/Parallax";
 
 interface DungeonLevelOptions {
   level: number;
@@ -18,6 +19,7 @@ interface DungeonLevelOptions {
 
 interface DungeonInstanceOptions {
   id: number;
+  bgName: ParallaxOptions;
   name: string;
   difficulty: number;
   unlocks: string[];
@@ -31,6 +33,7 @@ interface DungeonInstanceOptions {
  */
 export class DungeonInstance {
   readonly id: number;
+  readonly bgName: ParallaxOptions;
   name: string;
   readonly difficulty: number;
   levels: DungeonLevel[];
@@ -39,6 +42,7 @@ export class DungeonInstance {
 
   constructor({
     id,
+    bgName,
     name,
     difficulty,
     levels,
@@ -46,6 +50,7 @@ export class DungeonInstance {
     dungeonStore,
   }: DungeonInstanceOptions) {
     this.id = id;
+    this.bgName = bgName;
     this.name = name;
     this.difficulty = difficulty;
     this.levels = levels.map((level: any) =>
@@ -80,6 +85,7 @@ export class DungeonInstance {
   static fromJSON(json: any): DungeonInstance {
     const instance = new DungeonInstance({
       id: json.id,
+      bgName: json.bgName,
       name: json.name,
       difficulty: json.difficulty,
       levels: json.levels,

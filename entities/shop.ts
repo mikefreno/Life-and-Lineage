@@ -9,7 +9,7 @@ import {
   rollD20,
   getItemJSONMap,
 } from "../utility/functions/misc";
-import { ItemClassType, ShopkeeperPersonality } from "../utility/types";
+import { ItemClassType, Personality } from "../utility/types";
 import { RootStore } from "../stores/RootStore";
 import { saveShop } from "../stores/ShopsStore";
 
@@ -20,7 +20,6 @@ interface ShopProps {
   baseInventory?: Item[];
   shopKeeper: Character;
   archetype: string;
-  shopKeeperPersonality: ShopkeeperPersonality;
   root: RootStore;
 }
 const MAX_AFFECTION = 100;
@@ -36,7 +35,6 @@ export class Shop {
   baseInventory: Item[];
   shopKeeper: Character;
   readonly archetype: string;
-  shopKeeperPersonality: ShopkeeperPersonality;
   root: RootStore;
 
   constructor({
@@ -46,7 +44,6 @@ export class Shop {
     baseInventory,
     shopKeeper,
     archetype,
-    shopKeeperPersonality,
     root,
   }: ShopProps) {
     this.baseGold = baseGold;
@@ -56,7 +53,6 @@ export class Shop {
     this.baseInventory = baseInventory ?? [];
     this.archetype = archetype;
     this.shopKeeper = shopKeeper;
-    this.shopKeeperPersonality = shopKeeperPersonality;
     this.root = root;
 
     makeObservable(this, {
@@ -64,7 +60,6 @@ export class Shop {
       baseGold: observable,
       currentGold: observable,
       lastStockRefresh: observable,
-      shopKeeperPersonality: observable,
       refreshInventory: action,
       buyItem: action,
       sellItem: action,
@@ -90,13 +85,7 @@ export class Shop {
     if (this.shopKeeper.deathdate) {
       const shopObj = shops.find((shop) => shop.type == this.archetype);
       if (!shopObj) throw new Error(`missing ${this.archetype} in json`);
-      const randIdx = Math.floor(
-        Math.random() * shopObj.possiblePersonalities.length,
-      );
-      const personality = shopObj.possiblePersonalities[randIdx];
-      //want to favor likelihood of male shopkeepers slightly
       this.shopKeeper = generateShopKeeper(shopObj.type, this.root);
-      this.shopKeeperPersonality = personality as ShopkeeperPersonality;
     }
   }
 
@@ -122,27 +111,27 @@ export class Shop {
   get createGreeting() {
     const playerFullName = this.root.playerState?.fullName || "";
     if (this.shopKeeper.affection > 90) {
-      const options = greetings[this.shopKeeperPersonality]["very warm"];
+      const options = greetings[this.shopKeeper.personality!]["very warm"];
       const randIdx = Math.floor(Math.random() * options.length);
       return options[randIdx].replaceAll("%p", playerFullName);
     }
     if (this.shopKeeper.affection > 75) {
-      const options = greetings[this.shopKeeperPersonality].warm;
+      const options = greetings[this.shopKeeper.personality!].warm;
       const randIdx = Math.floor(Math.random() * options.length);
       return options[randIdx].replaceAll("%p", playerFullName);
     }
     if (this.shopKeeper.affection > 50) {
-      const options = greetings[this.shopKeeperPersonality].positive;
+      const options = greetings[this.shopKeeper.personality!].positive;
       const randIdx = Math.floor(Math.random() * options.length);
       return options[randIdx].replaceAll("%p", playerFullName);
     }
     if (this.shopKeeper.affection > 25) {
       const options =
-        greetings[this.shopKeeperPersonality]["slightly positive"];
+        greetings[this.shopKeeper.personality!]["slightly positive"];
       const randIdx = Math.floor(Math.random() * options.length);
       return options[randIdx].replaceAll("%p", playerFullName);
     }
-    const options = greetings[this.shopKeeperPersonality].neutral;
+    const options = greetings[this.shopKeeper.personality!].neutral;
     const randIdx = Math.floor(Math.random() * options.length);
     return options[randIdx].replaceAll("%p", playerFullName);
   }
@@ -269,7 +258,6 @@ export class Shop {
       currentGold: json.currentGold,
       lastStockRefresh: new Date(json.lastStockRefresh),
       archetype: json.archetype,
-      shopKeeperPersonality: json.shopKeeperPersonality,
       baseInventory: json.baseInventory
         ? json.baseInventory.map((item: any) =>
             Item.fromJSON({ ...item, root: json.root }),
@@ -365,12 +353,18 @@ export function generateShopKeeper(archetype: string, root: RootStore) {
   const name = getRandomName(sex);
   const birthdate = root.time.generateBirthDateInRange(25, 70);
   const job = toTitleCase(archetype);
+  const shopObj = shops.find((obj) => obj.type == archetype);
+  const randIdx = Math.floor(
+    Math.random() * shopObj!.possiblePersonalities.length,
+  );
+  const personality = shopObj!.possiblePersonalities[randIdx];
 
   const newChar = new Character({
     sex: sex,
     firstName: name.firstName,
     lastName: name.lastName,
     birthdate: birthdate!,
+    personality: personality as Personality,
     job: job,
     root,
   });

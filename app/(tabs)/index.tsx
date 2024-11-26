@@ -73,18 +73,6 @@ const HomeScreen = observer(() => {
     }
   }, [playerState?.playerClass, dimensions.height, colorScheme]);
 
-  const playerStats = useMemo(() => {
-    if (!playerState) return null;
-    const name = playerState.fullName;
-    const age = playerState.age;
-    return { name, job: playerState.job, age };
-  }, [playerState]);
-
-  const equipmentStats = useMemo(() => {
-    if (!playerState) return null;
-    return playerState.equipmentStats;
-  }, [playerState?.equipmentStats]);
-
   if (!playerState) {
     return (
       <ThemedView className="flex-1 items-center justify-center">
@@ -128,12 +116,12 @@ const HomeScreen = observer(() => {
               <View className="mx-auto">{playerIcon}</View>
               <View className="flex justify-center">
                 <Text className="text-center text-xl dark:text-white">
-                  {playerStats?.name}
+                  {playerState.fullName}
                 </Text>
                 <Text className="text-center text-xl dark:text-white">
-                  {playerStats?.job}
+                  {playerState.job}
                 </Text>
-                <Text className="text-center text-xl dark:text-white">{`${playerStats?.age} years old`}</Text>
+                <Text className="text-center text-xl dark:text-white">{`${playerState.age} years old`}</Text>
               </View>
               <View className="mx-auto">
                 <BlessingDisplay
@@ -150,9 +138,10 @@ const HomeScreen = observer(() => {
         <TouchableWithoutFeedback onPress={clearDisplayItem}>
           <View className="flex-1 justify-between relative z-10 h-full">
             <View className="absolute pl-2">
-              {equipmentStats && equipmentStats.damage > 0 && (
+              {playerState.equipmentStats.damage > 0 && (
                 <Text className="text-center">
-                  <Sword height={12} width={12} /> {equipmentStats.damage}
+                  <Sword height={12} width={12} />{" "}
+                  {playerState.equipmentStats.damage}
                 </Text>
               )}
               {playerState.equipmentStats.armor > 0 && (

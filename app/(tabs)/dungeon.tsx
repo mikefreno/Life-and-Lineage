@@ -11,7 +11,7 @@ import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
-import { toTitleCase } from "../../utility/functions/misc";
+import { toTitleCase, wait } from "../../utility/functions/misc";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
 import ThemedCard from "../../components/ThemedCard";
@@ -25,7 +25,7 @@ const MIN_RED = 20;
 const MAX_RED = 255;
 
 const DungeonScreen = observer(() => {
-  const { dungeonStore } = useRootStore();
+  const { dungeonStore, uiStore } = useRootStore();
   const { dungeonInstances } = dungeonStore;
 
   const [sorted, setSorted] = useState(
@@ -171,9 +171,10 @@ const DungeonScreen = observer(() => {
                     .map((level, levelIdx) => (
                       <Pressable
                         key={levelIdx}
-                        onPress={() => {
-                          dungeonStore.setUpDungeon(dungeonInstance, level);
+                        onPress={async () => {
+                          await uiStore.setIsLoading(true);
                           vibration({ style: "warning" });
+                          dungeonStore.setUpDungeon(dungeonInstance, level);
                           router.replace(`/DungeonLevel`);
                         }}
                       >

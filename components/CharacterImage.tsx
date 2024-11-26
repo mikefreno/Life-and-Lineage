@@ -1,20 +1,18 @@
-import { Image } from "react-native";
-import { getCharacterImage } from "../utility/functions/misc";
+import { Dimensions, Image } from "react-native";
+import { getCharacterImage, toTitleCase } from "../utility/functions/misc";
+import { Character } from "../entities/character";
 
-interface CharacterImageProps {
-  characterAge: number;
-  characterSex: "M" | "F";
-}
-
-export function CharacterImage({
-  characterAge,
-  characterSex,
-}: CharacterImageProps) {
+export function CharacterImage({ character }: { character: Character }) {
+  const scale = Dimensions.get("window").width * 0.4;
   return (
     <>
       <Image
-        source={getCharacterImage(characterAge, characterSex)}
-        style={{ width: 120, height: 160 }}
+        source={getCharacterImage(
+          character.age,
+          (toTitleCase(character.sex) as "Male") || "Female",
+          character.personality!,
+        )}
+        style={{ width: scale, height: scale }}
       />
     </>
   );

@@ -246,7 +246,7 @@ export const DungeonMapRender = observer(() => {
     : 0;
 
   return (
-    <View className="h-[45%]">
+    <View className="flex-1">
       <View
         className="absolute"
         style={{
@@ -273,7 +273,7 @@ export const DungeonMapRender = observer(() => {
  */
 export const DungeonMapControls = observer(() => {
   const { dungeonStore, uiStore } = useRootStore();
-  const { currentPosition, currentMap } = dungeonStore;
+  const { currentPosition, currentMap, movementQueued } = dungeonStore;
 
   if (!currentPosition || !currentMap) {
     throw new Error("Missing map, or current position within control handler!");
@@ -303,8 +303,9 @@ export const DungeonMapControls = observer(() => {
     const valid = isMoveValid(direction);
     return (
       <GenericRaisedButton
+        key={direction}
         onPress={() => dungeonStore.move(direction)}
-        disabled={!valid}
+        disabled={!valid || movementQueued}
       >
         {direction.charAt(0).toUpperCase() + direction.slice(1)}
       </GenericRaisedButton>

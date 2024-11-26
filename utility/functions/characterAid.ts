@@ -1,4 +1,4 @@
-import { flipCoin, getRandomName } from "./misc";
+import { flipCoin, getRandomName, getRandomPersonality } from "./misc";
 import jobs from "../../assets/json/jobs.json";
 import names from "../../assets/json/names.json";
 import { PlayerClassOptions } from "../types";
@@ -10,6 +10,7 @@ export function generateNewCharacter(root: RootStore) {
   const name = getRandomName(sex);
   const birthdate = root.time.generateBirthDateInRange(18, 65);
   const job = getRandomJobTitle();
+  const randomPersonality = getRandomPersonality();
 
   const newChar = new Character({
     sex: sex,
@@ -17,6 +18,7 @@ export function generateNewCharacter(root: RootStore) {
     lastName: name.lastName,
     birthdate: birthdate,
     job: job,
+    personality: randomPersonality,
     root,
   });
   return newChar;
@@ -25,12 +27,14 @@ export function generateNewAdoptee(root: RootStore) {
   const sex = flipCoin() == "Heads" ? "male" : "female";
   const name = getRandomName(sex);
   const birthdate = root.time.generateBirthDateInRange(1, 17);
+  const randomPersonality = getRandomPersonality();
 
   const newChar = new Character({
     sex: sex,
     firstName: name.firstName,
     lastName: name.lastName,
     birthdate: birthdate,
+    personality: randomPersonality,
     root,
   });
   return newChar;

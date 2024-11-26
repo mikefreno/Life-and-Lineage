@@ -14,13 +14,38 @@ import {
 } from "../utility/types";
 import GenericModal from "../components/GenericModal";
 import { elementalColorMap } from "../constants/Colors";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useRootStore } from "../hooks/stores";
-import { useVibration } from "../hooks/generic";
+import { useAcceleratedAction, useVibration } from "../hooks/generic";
 import type { Item } from "../entities/item";
 import type { Spell } from "../entities/spell";
+
+const StudyButton = ({ studyState, onStudy }) => {
+  const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
+    () => null,
+    {
+      minHoldTime: 350,
+      maxSpeed: 10,
+      accelerationCurve: AccelerationCurves.linear,
+      action: () => onStudy(studyState),
+      minActionAmount: 1,
+      maxActionAmount: 50,
+      debounceTime: 50,
+    },
+  );
+
+  return (
+    <GenericRaisedButton
+      onPress={() => onStudy(studyState)}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+    >
+      Continue Studying
+    </GenericRaisedButton>
+  );
+};
 
 export default function LearningKnowledgeScreen() {
   const root = useRootStore();
@@ -87,18 +112,13 @@ export default function LearningKnowledgeScreen() {
     }
   }
 
-  //const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
-  //() => null, // Return null to indicate unlimited mode
-  //{
-  //minHoldTime: 350,
-  //maxSpeed: 10,
-  //accelerationCurve: AccelerationCurves.linear,
-  //action: work,
-  //minActionAmount: 1,
-  //maxActionAmount: 50,
-  //debounceTime: 50,
-  //},
-  //);
+  const continueStudying = useCallback(
+    (studyState) => {
+      studySpell(studyState.bookName, studyState.spellName, studyState.element);
+      vibration({ style: "light" });
+    },
+    [studySpell],
+  );
 
   return (
     <>
@@ -154,18 +174,10 @@ export default function LearningKnowledgeScreen() {
                       value={studyState.experience}
                       maxValue={20}
                     />
-                    <GenericRaisedButton
-                      onPress={() => {
-                        studySpell(
-                          studyState.bookName,
-                          studyState.spellName,
-                          studyState.element,
-                        );
-                        vibration({ style: "light" });
-                      }}
-                    >
-                      Continue Studying
-                    </GenericRaisedButton>
+                    <StudyButton
+                      studyState={studyState}
+                      onStudy={continueStudying}
+                    />
                   </View>
                 ))}
               </View>

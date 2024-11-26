@@ -20,7 +20,7 @@ import melee from "../../assets/json/items/melee.json";
 import wands from "../../assets/json/items/wands.json";
 import storyItems from "../../assets/json/items/storyItems.json";
 import names from "../../assets/json/names.json";
-import { ItemClassType, PlayerClassOptions } from "../types";
+import { ItemClassType, Personality, PlayerClassOptions } from "../types";
 import { CommonActions, NavigationProp } from "@react-navigation/native";
 
 export const AccelerationCurves = {
@@ -29,6 +29,12 @@ export const AccelerationCurves = {
   cubic: (t: number) => 1 + Math.pow(t, 3),
   exponential: (t: number) => Math.exp(t) - 1,
 };
+
+export function getRandomPersonality(): Personality {
+  const personalities = Object.values(Personality);
+  const randomIndex = Math.floor(Math.random() * personalities.length);
+  return personalities[randomIndex];
+}
 
 export function deathProbabilityByAge(age: number) {
   const a = 0.072;
@@ -43,58 +49,164 @@ export function rollToLiveByAge(age: number) {
   return rollToLive;
 }
 
-export function getDaysBetweenDates(startDate: Date, endDate: Date): number {
-  const oneDayMs = 1000 * 60 * 60 * 24;
-  const startMs = startDate.getTime();
-  const endMs = endDate.getTime();
+type Sex = "Male" | "Female";
+type AgeGroup = "Elder" | "Adult" | "Youth";
 
-  const diffDays = Math.round((endMs - startMs) / oneDayMs);
-
-  return diffDays;
-}
-const heads = {
-  Elderly_M: require("../../assets/images/heads/Elderly_M.png"),
-  Elderly_F: require("../../assets/images/heads/Elderly_F.png"),
-  Aging_M: require("../../assets/images/heads/Aging_M.png"),
-  Aging_F: require("../../assets/images/heads/Aging_F.png"),
-  MA_M: require("../../assets/images/heads/MA_M.png"),
-  MA_F: require("../../assets/images/heads/MA_F.png"),
-  Adult_M: require("../../assets/images/heads/Adult_M.png"),
-  Adult_F: require("../../assets/images/heads/Adult_F.png"),
-  YA_M: require("../../assets/images/heads/YA_M.png"),
-  YA_F: require("../../assets/images/heads/YA_F.png"),
-  Teen_M: require("../../assets/images/heads/Teen_M.png"),
-  Teen_F: require("../../assets/images/heads/Teen_F.png"),
-  Child_M: require("../../assets/images/heads/Child_M.png"),
-  Child_F: require("../../assets/images/heads/Child_F.png"),
-  Baby_M: require("../../assets/images/heads/Baby_M.png"),
-  Baby_F: require("../../assets/images/heads/Baby_F.png"),
+const PERSONALITY_SETS: Record<
+  Sex,
+  Record<Personality, Record<AgeGroup, any>>
+> = {
+  Male: {
+    [Personality.AGGRESSIVE]: {
+      Elder: require("../../assets/images/heads/Male_Aggressive/Elder.png"),
+      Adult: require("../../assets/images/heads/Male_Aggressive/Adult.png"),
+      Youth: require("../../assets/images/heads/Male_Aggressive/Youth.png"),
+    },
+    [Personality.ARROGANT]: {
+      Elder: require("../../assets/images/heads/Male_Arrogant/Elder.png"),
+      Adult: require("../../assets/images/heads/Male_Arrogant/Adult.png"),
+      Youth: require("../../assets/images/heads/Male_Arrogant/Youth.png"),
+    },
+    [Personality.CALM]: {
+      Elder: require("../../assets/images/heads/Male_Calm/Elder.png"),
+      Adult: require("../../assets/images/heads/Male_Calm/Adult.png"),
+      Youth: require("../../assets/images/heads/Male_Calm/Youth.png"),
+    },
+    [Personality.CREEPY]: {
+      Elder: require("../../assets/images/heads/Male_Creepy/Elder.png"),
+      Adult: require("../../assets/images/heads/Male_Creepy/Adult.png"),
+      Youth: require("../../assets/images/heads/Male_Creepy/Youth.png"),
+    },
+    [Personality.INCREDULOUS]: {
+      Elder: require("../../assets/images/heads/Male_Incredulous/Elder.png"),
+      Adult: require("../../assets/images/heads/Male_Incredulous/Adult.png"),
+      Youth: require("../../assets/images/heads/Male_Incredulous/Youth.png"),
+    },
+    [Personality.INSANE]: {
+      Elder: require("../../assets/images/heads/Male_Insane/Elder.png"),
+      Adult: require("../../assets/images/heads/Male_Insane/Adult.png"),
+      Youth: require("../../assets/images/heads/Male_Insane/Youth.png"),
+    },
+    [Personality.JOVIAL]: {
+      Elder: require("../../assets/images/heads/Male_Jovial/Elder.png"),
+      Adult: require("../../assets/images/heads/Male_Jovial/Adult.png"),
+      Youth: require("../../assets/images/heads/Male_Jovial/Youth.png"),
+    },
+    [Personality.OPEN]: {
+      Elder: require("../../assets/images/heads/Male_Open/Elder.png"),
+      Adult: require("../../assets/images/heads/Male_Open/Adult.png"),
+      Youth: require("../../assets/images/heads/Male_Open/Youth.png"),
+    },
+    [Personality.RESERVED]: {
+      Elder: require("../../assets/images/heads/Male_Reserved/Elder.png"),
+      Adult: require("../../assets/images/heads/Male_Reserved/Adult.png"),
+      Youth: require("../../assets/images/heads/Male_Reserved/Youth.png"),
+    },
+    [Personality.SILENT]: {
+      Elder: require("../../assets/images/heads/Male_Silent/Elder.png"),
+      Adult: require("../../assets/images/heads/Male_Silent/Adult.png"),
+      Youth: require("../../assets/images/heads/Male_Silent/Youth.png"),
+    },
+    [Personality.WISE]: {
+      Elder: require("../../assets/images/heads/Male_Wise/Elder.png"),
+      Adult: require("../../assets/images/heads/Male_Wise/Adult.png"),
+      Youth: require("../../assets/images/heads/Male_Wise/Youth.png"),
+    },
+  },
+  Female: {
+    [Personality.AGGRESSIVE]: {
+      Elder: require("../../assets/images/heads/Female_Aggressive/Elder.png"),
+      Adult: require("../../assets/images/heads/Female_Aggressive/Adult.png"),
+      Youth: require("../../assets/images/heads/Female_Aggressive/Youth.png"),
+    },
+    [Personality.ARROGANT]: {
+      Elder: require("../../assets/images/heads/Female_Arrogant/Elder.png"),
+      Adult: require("../../assets/images/heads/Female_Arrogant/Adult.png"),
+      Youth: require("../../assets/images/heads/Female_Arrogant/Youth.png"),
+    },
+    [Personality.CALM]: {
+      Elder: require("../../assets/images/heads/Female_Calm/Elder.png"),
+      Adult: require("../../assets/images/heads/Female_Calm/Adult.png"),
+      Youth: require("../../assets/images/heads/Female_Calm/Youth.png"),
+    },
+    [Personality.CREEPY]: {
+      Elder: require("../../assets/images/heads/Female_Creepy/Elder.png"),
+      Adult: require("../../assets/images/heads/Female_Creepy/Adult.png"),
+      Youth: require("../../assets/images/heads/Female_Creepy/Youth.png"),
+    },
+    [Personality.INCREDULOUS]: {
+      Elder: require("../../assets/images/heads/Female_Incredulous/Elder.png"),
+      Adult: require("../../assets/images/heads/Female_Incredulous/Adult.png"),
+      Youth: require("../../assets/images/heads/Female_Incredulous/Youth.png"),
+    },
+    [Personality.INSANE]: {
+      Elder: require("../../assets/images/heads/Female_Insane/Elder.png"),
+      Adult: require("../../assets/images/heads/Female_Insane/Adult.png"),
+      Youth: require("../../assets/images/heads/Female_Insane/Youth.png"),
+    },
+    [Personality.JOVIAL]: {
+      Elder: require("../../assets/images/heads/Female_Jovial/Elder.png"),
+      Adult: require("../../assets/images/heads/Female_Jovial/Adult.png"),
+      Youth: require("../../assets/images/heads/Female_Jovial/Youth.png"),
+    },
+    [Personality.OPEN]: {
+      Elder: require("../../assets/images/heads/Female_Open/Elder.png"),
+      Adult: require("../../assets/images/heads/Female_Open/Adult.png"),
+      Youth: require("../../assets/images/heads/Female_Open/Youth.png"),
+    },
+    [Personality.RESERVED]: {
+      Elder: require("../../assets/images/heads/Female_Reserved/Elder.png"),
+      Adult: require("../../assets/images/heads/Female_Reserved/Adult.png"),
+      Youth: require("../../assets/images/heads/Female_Reserved/Youth.png"),
+    },
+    [Personality.SILENT]: {
+      Elder: require("../../assets/images/heads/Female_Silent/Elder.png"),
+      Adult: require("../../assets/images/heads/Female_Silent/Adult.png"),
+      Youth: require("../../assets/images/heads/Female_Silent/Youth.png"),
+    },
+    [Personality.WISE]: {
+      Elder: require("../../assets/images/heads/Female_Wise/Elder.png"),
+      Adult: require("../../assets/images/heads/Female_Wise/Adult.png"),
+      Youth: require("../../assets/images/heads/Female_Wise/Youth.png"),
+    },
+  },
 };
 
-export function getCharacterImage(age: number, sex: "M" | "F") {
-  if (age > 75) {
-    return heads[`Elderly_${sex}`];
+const CHILD_IMAGES = {
+  boy: require("../../assets/images/heads/boy.png"),
+  girl: require("../../assets/images/heads/girl.png"),
+  toddler: require("../../assets/images/heads/toddler.png"),
+} as const;
+
+const AGE_THRESHOLDS = {
+  TODDLER: 3,
+  CHILD: 15,
+  YOUTH: 20,
+  ADULT: 60,
+} as const;
+
+export function getCharacterImage(
+  age: number,
+  sex: "Male" | "Female",
+  personality: Personality,
+) {
+  if (age <= AGE_THRESHOLDS.TODDLER) {
+    return CHILD_IMAGES.toddler;
   }
-  if (age > 60) {
-    return heads[`Aging_${sex}`];
+  if (age <= AGE_THRESHOLDS.CHILD) {
+    return CHILD_IMAGES[sex === "Male" ? "boy" : "girl"];
   }
-  if (age > 45) {
-    return heads[`MA_${sex}`];
-  }
-  if (age > 30) {
-    return heads[`Adult_${sex}`];
-  }
-  if (age > 20) {
-    return heads[`YA_${sex}`];
-  }
-  if (age > 15) {
-    return heads[`Teen_${sex}`];
-  }
-  if (age > 4) {
-    return heads[`Child_${sex}`];
+
+  let ageGroup;
+  if (age > AGE_THRESHOLDS.ADULT) {
+    ageGroup = "Elder";
+  } else if (age > AGE_THRESHOLDS.YOUTH) {
+    ageGroup = "Adult";
   } else {
-    return heads[`Baby_${sex}`];
+    ageGroup = "Youth";
   }
+
+  return PERSONALITY_SETS[sex][personality][ageGroup];
 }
 
 export function getItemJSONMap(

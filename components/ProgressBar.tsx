@@ -1,5 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, StyleSheet, Platform } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  Easing,
+} from "react-native-reanimated";
 import { Text } from "./Themed";
 
 interface ProgressBarProps {
@@ -13,6 +19,7 @@ interface ProgressBarProps {
   displayNumber?: boolean;
   removeAtZero?: boolean;
   showMax?: boolean;
+  animationDuration?: number;
 }
 
 const ProgressBar = ({
@@ -26,8 +33,25 @@ const ProgressBar = ({
   displayNumber = true,
   removeAtZero = false,
   showMax = false,
+  animationDuration = 300,
 }: ProgressBarProps) => {
-  const width = ((value - minValue) / (maxValue - minValue)) * 100;
+  const width = useSharedValue(0);
+
+  useEffect(() => {
+    const percentage = ((value - minValue) / (maxValue - minValue)) * 100;
+    const adjustedWidth = !removeAtZero && percentage < 8 ? 8 : percentage;
+
+    width.value = withTiming(adjustedWidth, {
+      duration: animationDuration,
+      easing: Easing.out(Easing.ease),
+    });
+  }, [value, minValue, maxValue, removeAtZero, animationDuration]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      width: `${width.value}%`,
+    };
+  });
 
   return (
     <View
@@ -40,18 +64,14 @@ const ProgressBar = ({
         },
       ]}
     >
-      <View
+      <Animated.View
         style={[
           styles.inner,
           {
-            width: !removeAtZero
-              ? width < 8
-                ? "8%"
-                : `${width}%`
-              : `${width}%`,
             backgroundColor: filledColor,
             position: "absolute",
           },
+          animatedStyle,
         ]}
       >
         {displayNumber && (
@@ -67,7 +87,7 @@ const ProgressBar = ({
             </Text>
           </View>
         )}
-      </View>
+      </Animated.View>
     </View>
   );
 };

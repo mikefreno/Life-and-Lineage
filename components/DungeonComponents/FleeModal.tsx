@@ -1,7 +1,7 @@
 import GenericModal from "../GenericModal";
 import GenericFlatButton from "../GenericFlatButton";
 import { ThemedView, Text } from "../Themed";
-import { rollD20 } from "../../utility/functions/misc";
+import { rollD20, wait } from "../../utility/functions/misc";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { useVibration } from "../../hooks/generic";
@@ -13,7 +13,7 @@ import { observer } from "mobx-react-lite";
 const FleeModal = observer(() => {
   const vibration = useVibration();
   const rootStore = useRootStore();
-  const { enemyStore, dungeonStore, playerState } = rootStore;
+  const { enemyStore, dungeonStore, playerState, uiStore } = rootStore;
   const { playerMinionsTurn } = useCombatActions();
   const { enemyTurn } = useEnemyManagement();
 
@@ -34,19 +34,25 @@ const FleeModal = observer(() => {
         !dungeonStore.inCombat
       ) {
         vibration({ style: "light" });
-        setFleeRollFailure(false);
-        rootStore.leaveDungeon();
         dungeonStore.setFleeModalShowing(false);
-        if (dungeonStore.currentInstance?.name == "Activities") {
-          router.replace("/shops");
-        } else {
-          router.replace("/dungeon");
-        }
-        if (dungeonStore.currentInstance?.name == "Activities") {
-          router.push("/Activities");
-        }
+        wait(100).then(() => {
+          uiStore.setIsLoading(true).then(() => {
+            setFleeRollFailure(false);
+            rootStore.leaveDungeon();
+            if (dungeonStore.currentInstance?.name == "Activities") {
+              router.replace("/shops");
+            } else {
+              router.replace("/dungeon");
+            }
+            if (dungeonStore.currentInstance?.name == "Activities") {
+              router.push("/Activities");
+            }
 
-        savePlayer(playerState);
+            savePlayer(playerState);
+
+            wait(200).then(() => uiStore.setIsLoading(false));
+          });
+        });
       } else {
         setFleeRollFailure(true);
         vibration({ style: "error" });

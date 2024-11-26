@@ -37,18 +37,18 @@ export enum ItemClassType {
   StoryItem = "storyItem",
 }
 
-export enum ShopkeeperPersonality {
-  WISE = "wise",
-  RESERVED = "reserved",
+export enum Personality {
+  AGGRESSIVE = "aggressive",
   ARROGANT = "arrogant",
-  INSANE = "insane",
+  CALM = "calm",
   CREEPY = "creepy",
   INCREDULOUS = "incredulous",
-  SILENT = "silent",
-  CALM = "calm",
+  INSANE = "insane",
   JOVIAL = "jovial",
-  AGGRESSIVE = "aggressive",
   OPEN = "open",
+  RESERVED = "reserved",
+  SILENT = "silent",
+  WISE = "wise",
 }
 
 export type InvestmentType = {

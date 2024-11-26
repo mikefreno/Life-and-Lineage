@@ -1,14 +1,9 @@
 import { ThemedView, Text } from "../components/Themed";
-import {
-  type LayoutChangeEvent,
-  View,
-  Platform,
-  Dimensions,
-} from "react-native";
+import { type LayoutChangeEvent, View } from "react-native";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
 import BattleTab from "../components/DungeonComponents/BattleTab";
-import { toTitleCase } from "../utility/functions/misc";
+import { toTitleCase, wait } from "../utility/functions/misc";
 import PlayerStatus from "../components/PlayerStatus";
 import ProgressBar from "../components/ProgressBar";
 import { observer } from "mobx-react-lite";
@@ -33,11 +28,9 @@ import {
 import { usePouch } from "../hooks/generic";
 import D20DieAnimation from "../components/DieRollAnim";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { ParallaxBackground } from "../components/DungeonComponents/ParallaxBackground";
 import { LinearGradientBlur } from "../components/LinearGradientBlur";
-import { BlurView } from "expo-blur";
 import { useColorScheme } from "nativewind";
-import { ParallaxAsWrapper } from "../components/DungeonComponents/ParallaxWrapper";
+import { Parallax } from "../components/DungeonComponents/Parallax";
 
 const DungeonLevelScreen = observer(() => {
   const { enemyStore, dungeonStore, uiStore } = useRootStore();
@@ -85,6 +78,7 @@ const DungeonLevelScreen = observer(() => {
     if (colorScheme != "dark") {
       uiStore.dungeonSetter();
     }
+    wait(200).then(() => uiStore.setIsLoading(false));
   }, []);
 
   useEffect(() => {
@@ -93,17 +87,7 @@ const DungeonLevelScreen = observer(() => {
 
   if (currentLevel) {
     return (
-      <ParallaxAsWrapper
-        style={{ paddingTop: header }}
-        backgroundName={"Cave"}
-        inCombat={inCombat}
-        playerPosition={{
-          x: dungeonStore.currentPosition?.x ?? 0,
-          y: dungeonStore.currentPosition?.y ?? 0,
-        }}
-        boundingBox={dungeonStore.currentMapDimensions!}
-        reduceMotion={uiStore.reduceMotion}
-      >
+      <>
         <TutorialModal
           tutorial={TutorialOption.dungeonInterior}
           isFocused={isFocused}
@@ -146,6 +130,7 @@ const DungeonLevelScreen = observer(() => {
             marginTop: header + 16,
             position: "absolute",
             marginLeft: 16,
+            zIndex: 9999,
           }}
         >
           <Pressable
@@ -156,17 +141,19 @@ const DungeonLevelScreen = observer(() => {
             <SackIcon height={32} width={32} />
           </Pressable>
         </View>
-        <View className="flex-1" style={{ paddingBottom: 74 }}>
+        <Parallax
+          backgroundName={"Cave"}
+          inCombat={inCombat}
+          playerPosition={{
+            x: dungeonStore.currentPosition?.x ?? 0,
+            y: dungeonStore.currentPosition?.y ?? 0,
+          }}
+          boundingBox={dungeonStore.currentMapDimensions!}
+          reduceMotion={uiStore.reduceMotion}
+        >
           {inCombat ? <DungeonEnemyDisplay /> : <DungeonMapRender />}
           <View className="flex-1">
-            {Platform.OS == "ios" ? (
-              <LinearGradientBlur className="absolute" />
-            ) : (
-              <BlurView
-                experimentalBlurMethod="dimezisBlurView"
-                className="flex-1 absolute"
-              />
-            )}
+            <LinearGradientBlur className="absolute" />
             {inCombat && <View></View>}
             <View className="flex-1 justify-between">
               <BattleTab battleTab={battleTab} />
@@ -209,9 +196,9 @@ const DungeonLevelScreen = observer(() => {
               />
             </View>
           )}
-        </View>
+        </Parallax>
         <PlayerStatus positioning={"absolute"} classname="bottom-0" />
-      </ParallaxAsWrapper>
+      </>
     );
   } else {
     return (

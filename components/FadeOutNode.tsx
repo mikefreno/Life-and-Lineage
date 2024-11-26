@@ -1,5 +1,10 @@
-import React, { type ReactNode, useEffect, useRef } from "react";
-import { Animated } from "react-native";
+import React, { type ReactNode, useEffect } from "react";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  runOnJS,
+} from "react-native-reanimated";
 import { DEFAULT_FADEOUT_TIME } from "./Themed";
 
 interface FadeOutChildProps {
@@ -7,7 +12,7 @@ interface FadeOutChildProps {
   className?: string;
   duration?: number;
   clearingFunction?: () => void;
-  animationCycler?: number; //dummy prop to re-trigger animation
+  animationCycler?: number; // dummy prop to re-trigger animation
 }
 
 const FadeOutNode = React.memo(
@@ -18,28 +23,30 @@ const FadeOutNode = React.memo(
     clearingFunction,
     animationCycler,
   }: FadeOutChildProps) => {
-    const fadeAnim = useRef(new Animated.Value(1)).current;
+    const opacity = useSharedValue(1);
+
+    const animatedStyle = useAnimatedStyle(() => {
+      return {
+        opacity: opacity.value,
+      };
+    });
 
     useEffect(() => {
-      fadeAnim.setValue(1);
+      opacity.value = 1;
 
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: duration,
-        useNativeDriver: true,
-      }).start(clearingFunction);
-    }, [fadeAnim, duration, clearingFunction, animationCycler]);
+      opacity.value = withTiming(0, { duration }, (finished) => {
+        if (finished && clearingFunction) {
+          runOnJS(clearingFunction)();
+        }
+      });
+    }, [opacity, duration, clearingFunction, animationCycler]);
 
     return (
-      <Animated.View
-        className={className}
-        style={{
-          opacity: fadeAnim,
-        }}
-      >
+      <Animated.View className={className} style={animatedStyle}>
         {children}
       </Animated.View>
     );
   },
 );
+
 export default FadeOutNode;

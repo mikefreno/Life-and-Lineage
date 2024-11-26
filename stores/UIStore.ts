@@ -2,12 +2,14 @@ import { action, makeObservable, observable, reaction } from "mobx";
 import { RootStore } from "./RootStore";
 import {
   AccessibilityInfo,
+  Appearance,
   Dimensions,
   EmitterSubscription,
   Platform,
   ScaledSize,
 } from "react-native";
 import { storage } from "../utility/functions/storage";
+import { wait } from "../utility/functions/misc";
 
 export default class UIStore {
   root: RootStore;
@@ -27,6 +29,7 @@ export default class UIStore {
   healthWarning: number;
   reduceMotion: boolean;
   colorHeldForDungeon: "system" | "dark" | "light" | undefined;
+  isLoading: boolean = false;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
@@ -70,7 +73,6 @@ export default class UIStore {
     } = this.hydrateUISettings();
 
     this.vibrationEnabled = vibrationEnabled;
-
     this.colorScheme = colorScheme ?? "system";
     this.colorHeldForDungeon = colorHeldForDungeon;
     this.healthWarning = healthWarning;
@@ -100,8 +102,10 @@ export default class UIStore {
       reduceMotion: observable,
       setReduceMotion: action,
       dungeonSetter: action,
+      isLoading: observable,
       colorHeldForDungeon: observable,
       clearDungeonColor: action,
+      setIsLoading: action,
     });
 
     reaction(
@@ -143,6 +147,12 @@ export default class UIStore {
     if (this.colorHeldForDungeon) {
       this.colorScheme = this.colorHeldForDungeon;
       this.colorHeldForDungeon = undefined;
+    }
+  }
+  async setIsLoading(state: boolean) {
+    this.isLoading = state;
+    if (state) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
   }
 
@@ -212,7 +222,6 @@ export default class UIStore {
         colorHeldForDungeon: undefined,
       };
     }
-    console.log("stored:", JSON.parse(stored));
     return JSON.parse(stored);
   }
 
@@ -227,5 +236,11 @@ export default class UIStore {
         colorHeldForDungeon: this.colorHeldForDungeon,
       }),
     );
+  }
+
+  destroy() {
+    if (this.dimensionsSubscription) {
+      this.dimensionsSubscription.remove();
+    }
   }
 }

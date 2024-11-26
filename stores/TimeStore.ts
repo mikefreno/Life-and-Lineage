@@ -37,23 +37,6 @@ export class TimeStore {
     return { year: this.year, week: this.week };
   }
 
-  calculateAge({
-    birthYear,
-    birthWeek,
-  }: {
-    birthYear: number;
-    birthWeek: number;
-  }): number {
-    const yearDiff = this.year - birthYear;
-    const weekDiff = this.week - birthWeek;
-
-    if (weekDiff < 0) {
-      return yearDiff - 1;
-    }
-
-    return yearDiff;
-  }
-
   generateBirthDateInRange(minAge: number, maxAge: number) {
     const year =
       this.year - maxAge + Math.floor(Math.random() * (maxAge - minAge));

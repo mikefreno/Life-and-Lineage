@@ -23,6 +23,7 @@ import {
   Element,
   PlayerClassOptions,
   Attribute,
+  Personality,
 } from "../utility/types";
 import {
   rollToLiveByAge,
@@ -42,6 +43,7 @@ interface CharacterOptions {
   firstName: string;
   lastName: string;
   sex: "male" | "female";
+  personality: Personality | null;
   birthdate: { year: number; week: number };
   alive?: boolean;
   deathdate?: { year: number; week: number };
@@ -62,6 +64,7 @@ export class Character {
   readonly beingType = "human";
   readonly firstName: string;
   lastName: string;
+  readonly personality: Personality | null; // null only for the playerCharacter
   readonly sex: "male" | "female";
   alive: boolean;
   readonly birthdate: { year: number; week: number };
@@ -86,6 +89,7 @@ export class Character {
     affection,
     qualifications,
     dateCooldownStart,
+    personality,
     parents,
     root,
   }: CharacterOptions) {
@@ -93,6 +97,7 @@ export class Character {
     this.firstName = firstName;
     this.lastName = lastName;
     this.sex = sex;
+    this.personality = personality;
     this.alive = alive ?? true;
     this.birthdate = birthdate;
     this.deathdate = deathdate ?? null;
@@ -114,6 +119,7 @@ export class Character {
       setJob: action,
       deathRoll: action,
       setDateCooldownStart: action,
+      birthdate: observable,
       updateAffection: action,
       lastName: observable,
       updateLastName: action,
@@ -152,10 +158,14 @@ export class Character {
   }
 
   get age() {
-    return this.root.time.calculateAge({
-      birthWeek: this.birthdate.week,
-      birthYear: this.birthdate.year,
-    });
+    const yearDiff = this.root.time.year - this.birthdate.year;
+    const weekDiff = this.root.time.week - this.birthdate.week;
+
+    if (weekDiff < 0) {
+      return yearDiff - 1;
+    }
+
+    return yearDiff;
   }
 
   /**
@@ -251,6 +261,7 @@ export class Character {
       alive: json.alive,
       deathdate: json.deathdate ?? null,
       job: json.job,
+      personality: json.personality,
       affection: json.affection,
       qualifications: json.qualifications,
       dateCooldownStart: json.dateCooldownStart,
@@ -324,7 +335,6 @@ type PlayerCharacterBase = {
   unAllocatedSkillPoints?: number;
   allocatedSkillPoints?: Record<Attribute, number>;
   alive?: boolean;
-  inCombat: boolean;
   root: RootStore;
 };
 
@@ -421,7 +431,6 @@ export class PlayerCharacter extends Character {
   conditions: Condition[];
   baseInventory: Item[];
   keyItems: Item[];
-  inCombat: boolean;
   equipment: {
     // nulls indicate a lack of equipment in the given slot
     mainHand: Item; // main hand is never null, weapons are replaced with 'unarmored'
@@ -472,7 +481,6 @@ export class PlayerCharacter extends Character {
     unAllocatedSkillPoints,
     allocatedSkillPoints,
     keyItems,
-    inCombat,
     root,
     jobs,
   }: PlayerCharacterOptions) {
@@ -483,6 +491,7 @@ export class PlayerCharacter extends Character {
       sex,
       birthdate,
       alive,
+      personality: null,
       deathdate,
       job,
       qualifications,
@@ -536,7 +545,6 @@ export class PlayerCharacter extends Character {
 
     this.baseInventory = baseInventory ?? [];
     this.keyItems = keyItems ?? []; //__DEV__ ? testKeyItems(root) : [];
-    this.inCombat = inCombat ?? false;
     this.equipment = equipment ?? {
       mainHand: new Item({
         name: "unarmored",
@@ -620,6 +628,7 @@ export class PlayerCharacter extends Character {
       summonPet: action,
       clearMinions: action,
       removeMinion: action,
+      minionsAndPets: computed,
 
       weaponAttacks: computed,
       useArrow: action,
@@ -656,6 +665,7 @@ export class PlayerCharacter extends Character {
       unEquipItem: action,
       inventory: computed,
       getDamageReduction: action,
+      purchaseStack: action,
 
       getMedicalService: action,
       bossDefeated: action,
@@ -723,19 +733,21 @@ export class PlayerCharacter extends Character {
     amount?: number;
     to?: Attribute | "unallocated";
   }) {
-    switch (to) {
-      case Attribute.health:
-      case Attribute.mana:
-      case Attribute.sanity:
-      case Attribute.strength:
-      case Attribute.intelligence:
-      case Attribute.dexterity:
-        this.allocatedSkillPoints[to] += amount;
-        this.unAllocatedSkillPoints -= amount;
-        break;
-      case "unallocated":
-        this.unAllocatedSkillPoints += amount;
-        break;
+    if (this.unAllocatedSkillPoints >= amount) {
+      switch (to) {
+        case Attribute.health:
+        case Attribute.mana:
+        case Attribute.sanity:
+        case Attribute.strength:
+        case Attribute.intelligence:
+        case Attribute.dexterity:
+          this.allocatedSkillPoints[to] += amount;
+          this.unAllocatedSkillPoints -= amount;
+          break;
+        case "unallocated":
+          this.unAllocatedSkillPoints += amount;
+          break;
+      }
     }
   }
 
@@ -1067,8 +1079,15 @@ export class PlayerCharacter extends Character {
     const playerInventory = this.baseInventory;
     const shopInventory = shop.baseInventory;
 
-    for (let i = 0, len = itemStack.length; i < len; i++) {
+    for (let i = 0; i < itemStack.length; i++) {
       const item = itemStack[i];
+
+      // Check if the item exists in the shop inventory
+      const shopItemIndex = shopInventory.findIndex(
+        (shopItem) => shopItem.id === item.id,
+      );
+      if (shopItemIndex === -1) continue;
+
       const itemPrice = Math.floor(
         item.baseValue * (1.4 - shopAffection / 250),
       ); // Inline getBuyPrice
@@ -1078,13 +1097,14 @@ export class PlayerCharacter extends Character {
       this.gold -= itemPrice;
       totalCost += itemPrice;
       playerInventory.push(item);
+
+      // Remove the item from shop inventory immediately
+      shopInventory.splice(shopItemIndex, 1);
+
       purchaseCount++;
     }
 
     if (purchaseCount > 0) {
-      // Remove purchased items from shop inventory
-      shopInventory.splice(0, purchaseCount);
-
       shop.addGold(totalCost);
 
       const baseChange = (totalCost / 500) * purchaseCount;
@@ -2105,6 +2125,7 @@ export class PlayerCharacter extends Character {
   get minionsAndPets(): Minion[] {
     return this.minions.concat(this.rangerPet ? [this.rangerPet] : []);
   }
+
   public getMedicalService(
     cost: number,
     healthRestore?: number,
@@ -2219,7 +2240,6 @@ export class PlayerCharacter extends Character {
       baseStrength: json.baseStrength,
       baseIntelligence: json.baseIntelligence,
       baseDexterity: json.baseDexterity,
-      inCombat: json.inCombat,
       root: json.root,
     });
     return player;
@@ -2446,12 +2466,18 @@ export function getStartingBook(player: PlayerCharacter) {
   }
 }
 
-const _playerSave = async (player: PlayerCharacter | undefined) => {
+const _playerSave = async (
+  player: PlayerCharacter | undefined,
+  callback?: () => void,
+) => {
   if (player) {
     storage.set(
       "player",
       stringify({ ...player, jobs: serializeJobs(player.jobs), root: null }),
     );
+  }
+  if (callback) {
+    callback();
   }
 };
 export const savePlayer = throttle(_playerSave, 500);

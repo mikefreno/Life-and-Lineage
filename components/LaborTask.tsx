@@ -43,7 +43,7 @@ const LaborTask = observer(
     const { playerState } = root;
 
     const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
-      () => null, // Return null to indicate unlimited mode
+      () => null,
       {
         minHoldTime: 350,
         maxSpeed: 10,

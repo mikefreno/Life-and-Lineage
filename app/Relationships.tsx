@@ -82,10 +82,7 @@ const RelationshipsScreen = observer(() => {
       >
         <Text className="text-center text-2xl">{character.fullName}</Text>
         <View className="mx-auto">
-          <CharacterImage
-            characterAge={character.age}
-            characterSex={character.sex == "male" ? "M" : "F"}
-          />
+          <CharacterImage character={character} />
         </View>
         <Text className="text-xl">
           {character.deathdate && "Died at "}

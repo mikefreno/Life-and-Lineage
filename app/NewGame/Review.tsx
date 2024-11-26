@@ -9,6 +9,7 @@ import {
 import { useNavigation } from "expo-router";
 import clearHistory, {
   getRandomName,
+  getRandomPersonality,
   toTitleCase,
   wait,
 } from "../../utility/functions/misc";
@@ -24,7 +25,6 @@ import GenericFlatButton from "../../components/GenericFlatButton";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
-import { useEffect } from "react";
 
 export default function NewGameReview() {
   const { firstName, lastName, blessingSelection, sex, classSelection } =
@@ -39,9 +39,11 @@ export default function NewGameReview() {
   function createParent(sex: "female" | "male"): Character {
     const firstName = getRandomName(sex).firstName;
     const job = getRandomJobTitle();
+    const personality = getRandomPersonality();
     const parent = new Character({
       firstName: firstName,
       lastName: lastName,
+      personality,
       sex: sex,
       job: job,
       affection: 85,
@@ -70,7 +72,6 @@ export default function NewGameReview() {
         blessing: blessingSelection,
         parents: [mom, dad],
         birthdate: bday,
-        inCombat: false,
         ...getStartingBaseStats({ classSelection }),
         root,
       });
@@ -89,7 +90,6 @@ export default function NewGameReview() {
         blessing: blessingSelection,
         parents: [mom, dad],
         birthdate: bday,
-        inCombat: false,
         ...getStartingBaseStats({ classSelection }),
         root,
       });
@@ -108,7 +108,6 @@ export default function NewGameReview() {
         blessing: blessingSelection,
         parents: [mom, dad],
         birthdate: bday,
-        inCombat: false,
         ...getStartingBaseStats({ classSelection }),
         root,
       });
@@ -126,7 +125,6 @@ export default function NewGameReview() {
         blessing: blessingSelection,
         parents: [mom, dad],
         birthdate: bday,
-        inCombat: false,
         ...getStartingBaseStats({ classSelection }),
         root,
       });

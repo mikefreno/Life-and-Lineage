@@ -3,7 +3,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { easeGradient } from "react-native-easing-gradient";
 import MaskedView from "@react-native-masked-view/masked-view";
 import { View, StyleSheet, Platform } from "react-native";
-import { ThemedView } from "./Themed";
 
 export function LinearGradientBlur({
   intensity = 50,
@@ -45,7 +44,12 @@ export function LinearGradientBlur({
         {Platform.OS == "ios" ? (
           <BlurView intensity={intensity} style={StyleSheet.absoluteFill} />
         ) : (
-          <ThemedView style={StyleSheet.absoluteFill} />
+          <BlurView intensity={100} style={StyleSheet.absoluteFill}>
+            <View
+              style={StyleSheet.absoluteFill}
+              className="bg-zinc-100 dark:bg-zinc-800/90"
+            ></View>
+          </BlurView>
         )}
       </MaskedView>
     </View>

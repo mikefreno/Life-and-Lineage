@@ -12,6 +12,7 @@ import {
 
 import Colors from "../constants/Colors";
 import { useColorScheme } from "nativewind";
+import { forwardRef } from "react";
 
 type ThemeProps = {
   lightColor?: string;
@@ -41,18 +42,19 @@ export function useThemeColor(
   }
 }
 
-export function Text(props: TextProps) {
+export const Text = forwardRef<DefaultText, TextProps>((props, ref) => {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
 
   return (
     <DefaultText
+      ref={ref}
       allowFontScaling={false}
       style={[{ color }, { fontFamily: "PixelifySans" }, style]}
       {...otherProps}
     />
   );
-}
+});
 
 export function CursiveText(props: TextProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;

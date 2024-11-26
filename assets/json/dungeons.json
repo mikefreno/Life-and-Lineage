@@ -23,6 +23,7 @@
   },
   {
     "name": "nearby cave",
+    "bgName": "Cave",
     "id": 1,
     "difficulty": 1,
     "levels": [
@@ -137,6 +138,7 @@
   },
   {
     "name": "goblin cave",
+    "bgName": "Cave",
     "id": 2,
     "difficulty": 3,
     "levels": [
@@ -193,6 +195,7 @@
   },
   {
     "name": "bandit hideout",
+    "bgName": "Village",
     "id": 3,
     "difficulty": 3,
     "levels": [

@@ -3,7 +3,12 @@ import { SplashScreen, Stack, router, usePathname } from "expo-router";
 import React, { useEffect, useState, useRef } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
-import { Platform, Pressable, StyleSheet } from "react-native";
+import {
+  Platform,
+  Pressable,
+  StyleSheet,
+  useColorScheme as useNativeColor,
+} from "react-native";
 import { ThemedView } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { BlurView } from "expo-blur";
@@ -25,6 +30,7 @@ import { ThemeProvider } from "@react-navigation/native";
 import FleeModal from "../components/DungeonComponents/FleeModal";
 import { DungeonProvider } from "../providers/DungeonData";
 import { ErrorBoundary } from "../components/ErrorBoundary";
+import { LoadingBoundary } from "../components/LoadingBoundary";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -53,7 +59,9 @@ const Root = observer(() => {
       <DungeonProvider>
         <SafeAreaProvider>
           <ErrorBoundary>
-            <RootLayout />
+            <LoadingBoundary>
+              <RootLayout />
+            </LoadingBoundary>
           </ErrorBoundary>
         </SafeAreaProvider>
       </DungeonProvider>
@@ -75,6 +83,7 @@ const RootLayout = observer(() => {
   const { playerState, dungeonStore, uiStore } = rootStore;
 
   const { colorScheme, setColorScheme } = useColorScheme();
+  const systemColor = useNativeColor();
   const [firstLoad, setFirstLoad] = useState(true);
 
   const [expoPushToken, setExpoPushToken] = useState("");
@@ -118,10 +127,15 @@ const RootLayout = observer(() => {
   }, [fontLoaded]);
 
   useEffect(() => {
-    if (!firstLoad && rootStore.constructed) {
+    if (!firstLoad && rootStore.constructed && systemColor) {
       setColorScheme(uiStore.colorScheme);
     }
-  }, [uiStore.colorScheme, firstLoad, rootStore.constructed]);
+  }, [
+    uiStore.colorScheme,
+    firstLoad,
+    rootStore.constructed,
+    uiStore.triggerRerender,
+  ]);
 
   useEffect(() => {
     if (expoPushToken && !sentToken) {
@@ -376,7 +390,6 @@ const RootLayout = observer(() => {
                   }
                   intensity={50}
                   style={StyleSheet.absoluteFill}
-                  experimentalBlurMethod={"dimezisBlurView"}
                 />
               ),
               headerLeft: () => (

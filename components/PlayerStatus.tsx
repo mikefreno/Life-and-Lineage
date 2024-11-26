@@ -219,18 +219,18 @@ const PlayerStatus = observer(
                         <Text> {condition.turns} </Text>
                         <ClockIcon width={16} height={16} />
                       </View>
-                      {condition.getHealthDamage() && (
+                      {!!condition.getHealthDamage() && (
                         <View className="flex flex-row items-center justify-center">
                           <Text>{condition.getHealthDamage()}</Text>
                           <HealthIcon height={16} width={16} />
                         </View>
                       )}
-                      {condition.getSanityDamage() && (
+                      {!!condition.getSanityDamage() && (
                         <View className="flex flex-row items-center justify-center">
-                          <Text>
-                            {condition.getSanityDamage()}
+                          <Text>{condition.getSanityDamage()}</Text>
+                          <View style={{ marginLeft: 4 }}>
                             <Sanity height={16} width={16} />
-                          </Text>
+                          </View>
                         </View>
                       )}
                     </View>
@@ -360,17 +360,17 @@ const PlayerStatus = observer(
                     {playerState.fullName}
                   </Text>
                 </View>
-                <View className="flex-1">
-                  {/* This empty View takes up space on the right*/}
-                </View>
+                <View className="flex-1"></View>
               </View>
               {playerState.unAllocatedSkillPoints > 0 && (
                 <Text
-                  className="text-center text-xl"
+                  className="text-xl text-center"
                   style={{ color: "#16a34a" }}
+                  numberOfLines={2}
+                  adjustsFontSizeToFit={true}
                 >
                   You have {playerState.unAllocatedSkillPoints} unallocated
-                  Skill Points!
+                  {"\n"}Skill Points!
                 </Text>
               )}
               {playerState.getTotalAllocatedPoints() > 0 && (
@@ -617,7 +617,6 @@ const PlayerStatus = observer(
 );
 export default PlayerStatus;
 
-const MIN_HOLD_TIME = 150; // milliseconds
 function RenderPrimaryStatsBlock({
   stat,
   playerState,
@@ -635,79 +634,47 @@ function RenderPrimaryStatsBlock({
     essential?: boolean | undefined;
   }) => void;
 }) {
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const startTimeRef = useRef<number>(0);
-  const [amountToShift, setAmountToShift] = useState<number>(0);
-  const singlePressTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
   const getMaxAmount = useCallback(() => {
     return respeccing
       ? playerState.allocatedSkillPoints[stat]
       : playerState.unAllocatedSkillPoints;
   }, [stat, playerState, respeccing]);
 
-  const updateAmount = useCallback(() => {
-    const elapsedTime = Date.now() - startTimeRef.current;
-    const maxAmount = getMaxAmount();
-
-    if (elapsedTime < MIN_HOLD_TIME) {
-      setAmountToShift(1);
-      return;
+  const action = useCallback(() => {
+    if (playerState) {
+      if (respeccing) {
+        playerState.removeSkillPoint({
+          from: stat,
+        });
+      } else {
+        playerState.addSkillPoint({
+          to: stat,
+        });
+      }
     }
+  }, [playerState, stat, respeccing]);
 
-    const adjustedTime = elapsedTime - MIN_HOLD_TIME;
-    const accelerationFactor = Math.min(
-      1 + Math.pow(adjustedTime / 1000, 1.5),
-      10,
-    );
-    const pointsPerSecond = accelerationFactor;
-    const newAmount = 1 + Math.floor(pointsPerSecond * (adjustedTime / 1000));
-
-    setAmountToShift(Math.min(newAmount, maxAmount));
-  }, [getMaxAmount]);
-
-  const handlePressIn = useCallback(() => {
-    vibration({ style: "light" });
-    startTimeRef.current = Date.now();
-
-    singlePressTimeoutRef.current = setTimeout(() => {
-      setAmountToShift(1);
-      intervalRef.current = setInterval(updateAmount, 50);
-    }, 150);
-  }, [updateAmount, vibration]);
-
-  const handlePressOut = useCallback(
-    (func: "remove" | "increase") => {
-      if (singlePressTimeoutRef.current) {
-        clearTimeout(singlePressTimeoutRef.current);
-        singlePressTimeoutRef.current = null;
-      }
-
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-
-      const finalAmount = amountToShift > 0 ? amountToShift : 1;
-
-      if (playerState) {
-        if (func === "remove") {
-          playerState.removeSkillPoint({
-            from: stat,
-            amount: finalAmount,
-          });
-        } else {
-          playerState.addSkillPoint({
-            to: stat,
-            amount: finalAmount,
-          });
-        }
-      }
-
-      setAmountToShift(0);
+  const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
+    () => null,
+    {
+      minHoldTime: 350,
+      maxSpeed: 10,
+      accelerationCurve: AccelerationCurves.linear,
+      action,
+      minActionAmount: 1,
+      maxActionAmount: getMaxAmount(),
+      debounceTime: 50,
     },
-    [amountToShift, playerState, stat],
   );
+
+  const onPressIn = useCallback(() => {
+    vibration({ style: "light" });
+    handlePressIn();
+  }, [handlePressIn, vibration]);
+
+  const onPressOut = useCallback(() => {
+    handlePressOut();
+  }, [handlePressOut]);
 
   if (!playerState) return null;
 
@@ -716,37 +683,31 @@ function RenderPrimaryStatsBlock({
   let min = 0;
   let filledColor;
   let unfilledColor;
-  const pointValue = stat === Attribute.sanity ? 5 : 10;
 
   switch (stat) {
     case Attribute.health:
       current = playerState.currentHealth;
-      max =
-        playerState.maxHealth +
-        amountToShift * (respeccing ? -pointValue : pointValue);
+      max = playerState.maxHealth;
       filledColor = "#ef4444";
       unfilledColor = "#fca5a5";
       break;
     case Attribute.mana:
       current = playerState.currentMana;
-      max =
-        playerState.maxMana +
-        amountToShift * (respeccing ? -pointValue : pointValue);
+      max = playerState.maxMana;
       filledColor = "#60a5fa";
       unfilledColor = "#bfdbfe";
       break;
     case Attribute.sanity:
       current = playerState.currentSanity;
-      max =
-        playerState.maxSanity +
-        amountToShift * (respeccing ? -pointValue : pointValue);
-      min =
-        -playerState.maxSanity +
-        amountToShift * (respeccing ? pointValue : -pointValue);
+      max = playerState.maxSanity;
+      min = -playerState.maxSanity;
       filledColor = "#c084fc";
       unfilledColor = "#e9d5ff";
       break;
   }
+  const shouldShow =
+    (playerState.unAllocatedSkillPoints > 0 && !respeccing) ||
+    (playerState.allocatedSkillPoints[stat] > 0 && respeccing);
 
   return (
     <View className="items-center">
@@ -764,37 +725,19 @@ function RenderPrimaryStatsBlock({
             showMax
           />
         </View>
-        {playerState.unAllocatedSkillPoints > 0 && !respeccing && (
+        {shouldShow && (
           <Pressable
             className="px-0.5"
-            onPressIn={handlePressIn}
-            onPressOut={() => handlePressOut("increase")}
+            onPressIn={onPressIn}
+            onPressOut={onPressOut}
+            disabled={!shouldShow}
           >
             {({ pressed }) => (
               <View className={pressed ? "scale-95" : ""}>
-                <SquarePlus height={28} width={28} />
-                {amountToShift > 1 && (
-                  <Text className="absolute -top-3 -left-3 text-xs">
-                    +{amountToShift}
-                  </Text>
-                )}
-              </View>
-            )}
-          </Pressable>
-        )}
-        {playerState.allocatedSkillPoints[stat] > 0 && respeccing && (
-          <Pressable
-            className="px-0.5"
-            onPressIn={handlePressIn}
-            onPressOut={() => handlePressOut("remove")}
-          >
-            {({ pressed }) => (
-              <View className={pressed ? "scale-95" : ""}>
-                <SquareMinus height={28} width={28} />
-                {amountToShift > 1 && (
-                  <Text className="absolute -top-3 -left-3 text-xs">
-                    -{amountToShift}
-                  </Text>
+                {respeccing ? (
+                  <SquareMinus height={28} width={28} />
+                ) : (
+                  <SquarePlus height={28} width={28} />
                 )}
               </View>
             )}
@@ -828,35 +771,31 @@ function RenderSecondaryStatsBlock({
       : playerState.unAllocatedSkillPoints;
   }, [stat, playerState, respeccing]);
 
-  const {
-    amount: amountToShift,
-    start: handlePressIn,
-    stop: handlePressOut,
-  } = useAcceleratedAction(getMaxAmount, {
-    minHoldTime: 250,
-    maxSpeed: 10,
-    accelerationCurve: AccelerationCurves.linear,
-  });
-
-  const onPressOut = useCallback(
-    (func: "remove" | "increase") => {
-      const finalAmount = handlePressOut();
-
-      if (playerState) {
-        if (func === "remove") {
-          playerState.removeSkillPoint({
-            from: stat,
-            amount: finalAmount,
-          });
-        } else {
-          playerState.addSkillPoint({
-            to: stat,
-            amount: finalAmount,
-          });
-        }
+  const action = useCallback(() => {
+    if (playerState) {
+      if (respeccing) {
+        playerState.removeSkillPoint({
+          from: stat,
+        });
+      } else {
+        playerState.addSkillPoint({
+          to: stat,
+        });
       }
+    }
+  }, [playerState, stat, respeccing]);
+
+  const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
+    () => null,
+    {
+      minHoldTime: 350,
+      maxSpeed: 10,
+      accelerationCurve: AccelerationCurves.cubic,
+      action,
+      minActionAmount: 1,
+      maxActionAmount: getMaxAmount(),
+      debounceTime: 50,
     },
-    [handlePressOut, playerState, stat],
   );
 
   const onPressIn = useCallback(() => {
@@ -864,26 +803,24 @@ function RenderSecondaryStatsBlock({
     handlePressIn();
   }, [handlePressIn, vibration]);
 
+  const onPressOut = useCallback(() => {
+    handlePressOut();
+  }, [handlePressOut]);
+
+  const shouldShow =
+    (respeccing && playerState.allocatedSkillPoints[stat] > 0) ||
+    (!respeccing && playerState.unAllocatedSkillPoints > 0);
+
   return (
     <View className="flex items-center">
       <Text className="py-1">{AttributeToString[stat]}</Text>
       <View className="flex flex-row items-center">
-        <Text className={`${amountToShift > 0 ? "-ml-4" : ""}`}>
-          {(stat === Attribute.strength
+        <Text>
+          {stat === Attribute.strength
             ? playerState.totalStrength
             : stat === Attribute.dexterity
             ? playerState.totalDexterity
-            : playerState.totalIntelligence) +
-            (amountToShift > 0
-              ? respeccing
-                ? -amountToShift
-                : amountToShift
-              : 0)}
-          {amountToShift > 0
-            ? respeccing
-              ? `(${-amountToShift})`
-              : `(${amountToShift})`
-            : ""}
+            : playerState.totalIntelligence}
         </Text>
         {stat === Attribute.strength ? (
           <StrengthIcon height={20} width={23} />
@@ -892,34 +829,26 @@ function RenderSecondaryStatsBlock({
         ) : (
           <IntelligenceIcon height={20} width={23} />
         )}
-        <View className="flex flex-row">
-          {playerState.unAllocatedSkillPoints > 0 && !respeccing && (
+        {shouldShow && (
+          <View className="flex flex-row">
             <Pressable
               className="px-0.5"
               onPressIn={onPressIn}
-              onPressOut={() => onPressOut("increase")}
+              onPressOut={onPressOut}
+              disabled={!shouldShow}
             >
               {({ pressed }) => (
                 <View className={pressed ? "scale-95" : ""}>
-                  <SquarePlus height={28} width={28} />
+                  {respeccing ? (
+                    <SquareMinus height={28} width={28} />
+                  ) : (
+                    <SquarePlus height={28} width={28} />
+                  )}
                 </View>
               )}
             </Pressable>
-          )}
-          {playerState.allocatedSkillPoints[stat] > 0 && respeccing && (
-            <Pressable
-              className="px-0.5"
-              onPressIn={onPressIn}
-              onPressOut={() => onPressOut("remove")}
-            >
-              {({ pressed }) => (
-                <View className={pressed ? "scale-95" : ""}>
-                  <SquareMinus height={28} width={28} />
-                </View>
-              )}
-            </Pressable>
-          )}
-        </View>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -954,7 +883,7 @@ const ChangePopUp = ({
         animationCycler={animationCycler}
         className="flex flex-row my-auto"
       >
-        <Text className="pr-2 text-sm" style={{ color }}>
+        <Text className="pr-2 text-xs" style={{ color }}>
           {change.current > 0 ? "+" : ""}
           {change.current}
           {change.cumulative !== change.current && (

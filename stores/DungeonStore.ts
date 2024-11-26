@@ -33,6 +33,7 @@ export class DungeonStore {
   currentPosition: Tile | undefined;
   inCombat: boolean = false;
   fightingBoss: boolean = false;
+  movementQueued: boolean = false;
 
   fleeModalShowing: boolean = false;
   heldColorScheme: "light" | "dark" | "system" | undefined;
@@ -77,6 +78,8 @@ export class DungeonStore {
       currentInstance: observable,
       fightingBoss: observable,
       logs: observable,
+      movementQueued: observable,
+      toggleMovement: action,
       addLog: action,
       setUpDungeon: action,
       move: action,
@@ -84,6 +87,7 @@ export class DungeonStore {
       setInCombat: action,
       fleeModalShowing: observable,
       setFleeModalShowing: action,
+      setEncounter: action,
       setInBossFight: action,
       hasPersistedState: computed,
       clearDungeonState: action,
@@ -156,6 +160,10 @@ export class DungeonStore {
     );
   }
 
+  public toggleMovement() {
+    this.movementQueued = !this.movementQueued;
+  }
+
   public setInBossFight(state: boolean) {
     this.fightingBoss = state;
   }
@@ -205,6 +213,7 @@ export class DungeonStore {
 
   public move(direction: "up" | "down" | "left" | "right") {
     if (!this.currentPosition || !this.currentMap) return;
+    this.toggleMovement();
 
     const { x, y } = directionsMapping[direction];
     const newX = this.currentPosition.x + x * TILE_SIZE;
@@ -217,14 +226,19 @@ export class DungeonStore {
     if (newPosition) {
       this.updateCurrentPosition(newPosition);
 
-      wait(350).then(() => {
-        if (!newPosition.clearedRoom) {
-          this.inCombat = true;
-          this.fightingBoss = newPosition.isBossRoom;
-          this.setEncounter(newPosition.isBossRoom);
-          this.visitRoom(newPosition);
-        }
-      });
+      if (!newPosition.clearedRoom) {
+        wait(350).then(() => {
+          runInAction(() => {
+            this.inCombat = true;
+            this.fightingBoss = newPosition.isBossRoom;
+            this.setEncounter(newPosition.isBossRoom);
+            this.visitRoom(newPosition);
+            this.toggleMovement();
+          });
+        });
+      } else {
+        this.toggleMovement();
+      }
     }
   }
 

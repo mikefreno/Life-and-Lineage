@@ -7,8 +7,9 @@ import {
   TouchableWithoutFeedback,
   Animated,
   LayoutChangeEvent,
+  LayoutAnimation,
 } from "react-native";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import { observer } from "mobx-react-lite";
 import TutorialModal from "../../components/TutorialModal";
@@ -191,6 +192,12 @@ const ShopInteriorScreen = observer(() => {
     playerState?.purchaseStack(itemStack, thisShop?.archetype!);
   };
 
+  useEffect(() => {
+    if (isFocused) {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    }
+  }, [isFocused]);
+
   if (initialized && thisShop && playerState && uiStore.itemBlockSize) {
     return (
       <>
@@ -223,10 +230,7 @@ const ShopInteriorScreen = observer(() => {
           <View className="flex-1 justify-between">
             <View className="flex h-[40%] flex-row justify-between">
               <View className="items-center w-1/3 my-auto px-1">
-                <CharacterImage
-                  characterAge={thisShop.shopKeeper.age ?? 0}
-                  characterSex={thisShop.shopKeeper.sex == "male" ? "M" : "F"}
-                />
+                <CharacterImage character={thisShop.shopKeeper} />
                 <GreetingComponent
                   greeting={greeting}
                   colorScheme={colorScheme}
