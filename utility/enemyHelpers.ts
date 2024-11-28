@@ -65,23 +65,23 @@ export const EnemyImageMap = {
   bandit_light: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Bandit_Heavy/ATTACK.png"),
+        anim: require("../assets/images/monsters/Bandit_Light/ATTACK.png"),
         frames: 4,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Bandit_Heavy/HURT.png"),
+        anim: require("../assets/images/monsters/Bandit_Light/HURT.png"),
         frames: 4,
       },
       death: {
-        anim: require("../assets/images/monsters/Bandit_Heavy/DEATH.png"),
+        anim: require("../assets/images/monsters/Bandit_Light/DEATH.png"),
         frames: 8,
       },
       idle: {
-        anim: require("../assets/images/monsters/Bandit_Heavy/IDLE.png"),
+        anim: require("../assets/images/monsters/Bandit_Light/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Bandit_Heavy/MOVE.png"),
+        anim: require("../assets/images/monsters/Bandit_Light/MOVE.png"),
         frames: 8,
       },
     },
@@ -277,6 +277,8 @@ export const EnemyImageMap = {
     },
     height: 100,
     width: 125,
+    displayHeight: 200,
+    displayWidth: 250,
   },
   cyclops: {
     sets: {
@@ -307,6 +309,8 @@ export const EnemyImageMap = {
     },
     height: 125,
     width: 158,
+    displayHeight: 200,
+    displayWidth: 250,
   },
   demon_boss: {
     sets: {
@@ -337,6 +341,8 @@ export const EnemyImageMap = {
     },
     height: 148,
     width: 162,
+    displayHeight: 300,
+    displayWidth: 328,
   },
   demon_samurai_p1: {
     sets: {
@@ -370,11 +376,13 @@ export const EnemyImageMap = {
       },
       shout: {
         anim: require("../assets/images/monsters/Demon_Samurai/SHOUT.png"),
-        frames: 8,
+        frames: 17,
       },
     },
     height: 108,
     width: 128,
+    displayHeight: 277,
+    displayWidth: 328,
     mirror: true,
   },
   demon_samurai_p2: {
@@ -409,11 +417,13 @@ export const EnemyImageMap = {
       },
       shout: {
         anim: require("../assets/images/monsters/Demon_Samurai/SHOUT.png"),
-        frames: 8,
+        frames: 17,
       },
     },
     height: 108,
     width: 128,
+    displayHeight: 277,
+    displayWidth: 328,
     mirror: true,
   },
   dragon: {
@@ -441,6 +451,9 @@ export const EnemyImageMap = {
     },
     height: 140,
     width: 140,
+    displayHeight: 300,
+    displayWidth: 300,
+    topOffset: 44,
   },
   dwarf_warrior: {
     sets: {
@@ -467,6 +480,8 @@ export const EnemyImageMap = {
     },
     height: 100,
     width: 100,
+    displayHeight: 220,
+    displayWidth: 220,
   },
   flying_eye: {
     sets: {
@@ -486,9 +501,15 @@ export const EnemyImageMap = {
         anim: require("../assets/images/monsters/Flying_Eye/MOVE.png"),
         frames: 6,
       },
+      idle: {
+        anim: require("../assets/images/monsters/Flying_Eye/MOVE.png"),
+        frames: 6,
+      },
     },
     height: 150,
     width: 150,
+    topOffset: 44,
+    mirror: true,
   },
   gargoyle: {
     sets: {
@@ -572,6 +593,9 @@ export const EnemyImageMap = {
     },
     height: 96,
     width: 96,
+    displayHeight: 260,
+    displayWidth: 260,
+    mirror: true,
   },
   gladiator_female: {
     sets: {
@@ -587,6 +611,10 @@ export const EnemyImageMap = {
         anim: require("../assets/images/monsters/Gladiator_Female/HURT.png"),
         frames: 7,
       },
+      jump: {
+        anim: require("../assets/images/monsters/Gladiator_Female/JUMP.png"),
+        frames: 3,
+      },
       idle: {
         anim: require("../assets/images/monsters/Gladiator_Female/IDLE.png"),
         frames: 4,
@@ -596,8 +624,11 @@ export const EnemyImageMap = {
         frames: 6,
       },
     },
-    height: 94,
+    height: 84,
     width: 106,
+    displayHeight: 260,
+    displayWidth: 260,
+    mirror: true,
   },
   gladiator_hammer: {
     sets: {
@@ -624,6 +655,9 @@ export const EnemyImageMap = {
     },
     height: 84,
     width: 106,
+    displayHeight: 260,
+    displayWidth: 260,
+    mirror: true,
   },
   gladiator_longsword: {
     sets: {
@@ -650,6 +684,9 @@ export const EnemyImageMap = {
     },
     height: 96,
     width: 96,
+    displayHeight: 260,
+    displayWidth: 260,
+    mirror: true,
   },
   gladiator_spear: {
     sets: {
@@ -676,6 +713,10 @@ export const EnemyImageMap = {
     },
     height: 100,
     width: 150,
+    displayHeight: 260,
+    displayWidth: 300,
+    topOffset: 20,
+    mirror: true,
   },
   gladiator_shortsword: {
     sets: {
@@ -702,6 +743,9 @@ export const EnemyImageMap = {
     },
     height: 96,
     width: 96,
+    displayHeight: 260,
+    displayWidth: 260,
+    mirror: true,
   },
   goblin: {
     sets: {
@@ -732,6 +776,8 @@ export const EnemyImageMap = {
     },
     height: 78,
     width: 116,
+    displayHeight: 180,
+    displayWidth: 180,
   },
   golem: {
     sets: {
@@ -758,6 +804,9 @@ export const EnemyImageMap = {
     },
     height: 125,
     width: 158,
+    topOffset: 20,
+    displayHeight: 260,
+    displayWidth: 260,
   },
   gryphon: {
     sets: {
@@ -788,6 +837,9 @@ export const EnemyImageMap = {
     },
     height: 103,
     width: 112,
+    displayHeight: 260,
+    displayWidth: 260,
+    mirror: true,
   },
   harpy: {
     sets: {
@@ -840,6 +892,8 @@ export const EnemyImageMap = {
     },
     height: 150,
     width: 150,
+    displayHeight: 300,
+    displayWidth: 300,
   },
   huge_knight: {
     sets: {
@@ -866,6 +920,11 @@ export const EnemyImageMap = {
     },
     height: 187,
     width: 237,
+    mirror: true,
+    topOffset: 40,
+    leftOffset: 40,
+    displayHeight: 240,
+    displayWidth: 300,
   },
   imp: {
     sets: {
@@ -892,6 +951,10 @@ export const EnemyImageMap = {
     },
     height: 100,
     width: 100,
+    topOffset: 10,
+    displayHeight: 170,
+    displayWidth: 170,
+    mirror: true,
   },
   kobold: {
     sets: {
@@ -930,6 +993,9 @@ export const EnemyImageMap = {
     },
     height: 96,
     width: 148,
+    displayHeight: 140,
+    displayWidth: 170,
+    mirror: true,
   },
   lizardman: {
     sets: {
@@ -956,6 +1022,9 @@ export const EnemyImageMap = {
     },
     height: 125,
     width: 158,
+    displayHeight: 160,
+    displayWidth: 190,
+    mirror: true,
   },
   medusa: {
     sets: {
@@ -986,6 +1055,8 @@ export const EnemyImageMap = {
     },
     height: 125,
     width: 150,
+    displayHeight: 200,
+    displayWidth: 240,
   },
   mimic: {
     sets: {
@@ -1016,6 +1087,10 @@ export const EnemyImageMap = {
     },
     height: 125,
     width: 158,
+    mirror: true,
+    topOffset: 20,
+    displayHeight: 200,
+    displayWidth: 240,
   },
   minotaur: {
     sets: {
@@ -1046,6 +1121,9 @@ export const EnemyImageMap = {
     },
     height: 128,
     width: 128,
+    mirror: true,
+    displayHeight: 180,
+    displayWidth: 180,
   },
   necromancer: {
     sets: {
@@ -1081,6 +1159,9 @@ export const EnemyImageMap = {
     height: 128,
     width: 160,
     mirror: true,
+    topOffset: -44,
+    displayHeight: 500,
+    displayWidth: 500,
   },
   orc_masked: {
     sets: {
@@ -1107,32 +1188,8 @@ export const EnemyImageMap = {
     },
     height: 80,
     width: 150,
-  },
-  poison_skull: {
-    sets: {
-      attack_1: {
-        anim: require("../assets/images/monsters/Poison_Skull/ATTACK.png"),
-        frames: 9,
-      },
-      death: {
-        anim: require("../assets/images/monsters/Poison_Skull/DEATH.png"),
-        frames: 9,
-      },
-      hurt: {
-        anim: require("../assets/images/monsters/Poison_Skull/HURT.png"),
-        frames: 3,
-      },
-      idle: {
-        anim: require("../assets/images/monsters/Poison_Skull/IDLE.png"),
-        frames: 6,
-      },
-      move: {
-        anim: require("../assets/images/monsters/Poison_Skull/MOVE.png"),
-        frames: 5,
-      },
-    },
-    height: 100,
-    width: 150,
+    displayHeight: 300,
+    displayWidth: 300,
   },
   pyromancer: {
     sets: {
@@ -1162,6 +1219,9 @@ export const EnemyImageMap = {
     },
     height: 100,
     width: 100,
+    mirror: true,
+    displayHeight: 170,
+    displayWidth: 170,
   },
   rat: {
     sets: {
@@ -1192,6 +1252,7 @@ export const EnemyImageMap = {
     },
     height: 44,
     width: 62,
+    mirror: true,
   },
   rat_corrupt: {
     sets: {
@@ -1222,36 +1283,7 @@ export const EnemyImageMap = {
     },
     height: 44,
     width: 62,
-  },
-  rat_knight: {
-    sets: {
-      attack_1: {
-        anim: require("../assets/images/monsters/Rat_Knight/ATTACK.png"),
-        frames: 14,
-      },
-      block: {
-        anim: require("../assets/images/monsters/Rat_Knight/BLOCK.png"),
-        frames: 8,
-      },
-      hurt: {
-        anim: require("../assets/images/monsters/Rat_Knight/HURT.png"),
-        frames: 6,
-      },
-      death: {
-        anim: require("../assets/images/monsters/Rat_Knight/DEATH.png"),
-        frames: 20,
-      },
-      idle: {
-        anim: require("../assets/images/monsters/Rat_Knight/IDLE.png"),
-        frames: 28,
-      },
-      move: {
-        anim: require("../assets/images/monsters/Rat_Knight/MOVE.png"),
-        frames: 8,
-      },
-    },
-    height: 48,
-    width: 48,
+    mirror: true,
   },
   rat_putrid: {
     sets: {
@@ -1282,6 +1314,7 @@ export const EnemyImageMap = {
     },
     height: 44,
     width: 62,
+    mirror: true,
   },
   samurai_armor: {
     sets: {
@@ -1336,6 +1369,9 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 96,
+    mirror: true,
+    displayHeight: 200,
+    displayWidth: 240,
   },
   samurai_dual: {
     sets: {
@@ -1374,6 +1410,9 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 96,
+    mirror: true,
+    displayHeight: 200,
+    displayWidth: 240,
   },
   samurai_female: {
     sets: {
@@ -1420,6 +1459,9 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 96,
+    mirror: true,
+    displayHeight: 200,
+    displayWidth: 240,
   },
   samurai_huge: {
     sets: {
@@ -1458,6 +1500,10 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 98,
+    mirror: true,
+    topOffset: -20,
+    displayHeight: 220,
+    displayWidth: 260,
   },
   samurai_old: {
     sets: {
@@ -1516,6 +1562,10 @@ export const EnemyImageMap = {
     },
     height: 96,
     width: 96,
+    mirror: true,
+    topOffset: -20,
+    displayHeight: 260,
+    displayWidth: 260,
   },
   samurai_rice: {
     sets: {
@@ -1550,6 +1600,10 @@ export const EnemyImageMap = {
     },
     height: 84,
     width: 106,
+    mirror: true,
+    topOffset: -20,
+    displayHeight: 200,
+    displayWidth: 240,
   },
   samurai_wolf: {
     sets: {
@@ -1592,6 +1646,9 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 192,
+    leftOffset: 20,
+    displayHeight: 200,
+    displayWidth: 300,
   },
   satyr: {
     sets: {
@@ -1618,6 +1675,8 @@ export const EnemyImageMap = {
     },
     height: 100,
     width: 125,
+    displayHeight: 180,
+    displayWidth: 200,
   },
   skeleton: {
     sets: {
@@ -1677,6 +1736,7 @@ export const EnemyImageMap = {
     },
     height: 128,
     width: 128,
+    topOffset: 20,
     mirror: true,
   },
   spider_dark: {
@@ -1700,6 +1760,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   spider_dark_brood: {
     sets: {
@@ -1722,6 +1783,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   spider_dark_small: {
     sets: {
@@ -1744,6 +1806,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   spider_default: {
     sets: {
@@ -1766,6 +1829,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   spider_default_brood: {
     sets: {
@@ -1788,6 +1852,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   spider_default_small: {
     sets: {
@@ -1810,6 +1875,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   spider_demon: {
     sets: {
@@ -1832,6 +1898,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   spider_demon_brood: {
     sets: {
@@ -1854,6 +1921,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   spider_demon_small: {
     sets: {
@@ -1876,6 +1944,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   spider_wood: {
     sets: {
@@ -1898,6 +1967,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   spider_wood_brood: {
     sets: {
@@ -1920,6 +1990,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   spider_wood_small: {
     sets: {
@@ -1942,6 +2013,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   viking_assassin: {
     sets: {
@@ -1972,6 +2044,9 @@ export const EnemyImageMap = {
     },
     height: 65,
     width: 100,
+    displayHeight: 240,
+    displayWidth: 300,
+    mirror: true,
   },
   viking_axe: {
     sets: {
@@ -2002,6 +2077,9 @@ export const EnemyImageMap = {
     },
     height: 65,
     width: 100,
+    displayHeight: 240,
+    displayWidth: 300,
+    mirror: true,
   },
   viking_giant: {
     sets: {
@@ -2032,6 +2110,10 @@ export const EnemyImageMap = {
     },
     height: 80,
     width: 100,
+    topOffset: -20,
+    displayHeight: 240,
+    displayWidth: 300,
+    mirror: true,
   },
   viking_spearthrower: {
     sets: {
@@ -2058,6 +2140,9 @@ export const EnemyImageMap = {
     },
     height: 65,
     width: 100,
+    displayHeight: 240,
+    displayWidth: 300,
+    mirror: true,
   },
   werewolf: {
     sets: {
@@ -2071,7 +2156,7 @@ export const EnemyImageMap = {
       },
       spawn: {
         anim: require("../assets/images/monsters/Werewolf/TRANSFORMATION.png"),
-        frames: 9,
+        frames: 8,
       },
       hurt: {
         anim: require("../assets/images/monsters/Werewolf/HURT.png"),
@@ -2092,6 +2177,9 @@ export const EnemyImageMap = {
     },
     height: 125,
     width: 158,
+    displayHeight: 240,
+    displayWidth: 260,
+    mirror: true,
   },
   witch: {
     sets: {
@@ -2118,6 +2206,8 @@ export const EnemyImageMap = {
     },
     height: 125,
     width: 125,
+    displayHeight: 180,
+    displayWidth: 180,
   },
   wizard_black: {
     sets: {
@@ -2150,6 +2240,9 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
+    displayHeight: 190,
+    displayWidth: 190,
   },
   wizard_blackblue: {
     sets: {
@@ -2182,6 +2275,9 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
+    displayHeight: 190,
+    displayWidth: 190,
   },
   wizard_blue: {
     sets: {
@@ -2214,6 +2310,9 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
+    displayHeight: 190,
+    displayWidth: 190,
   },
   wizard_classic: {
     sets: {
@@ -2244,6 +2343,9 @@ export const EnemyImageMap = {
     },
     height: 78,
     width: 128,
+    topOffset: 10,
+    displayHeight: 180,
+    displayWidth: 230,
   },
   wizard_darkpurple: {
     sets: {
@@ -2276,6 +2378,9 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
+    displayHeight: 190,
+    displayWidth: 190,
   },
   wizard_earthen: {
     sets: {
@@ -2308,6 +2413,9 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
+    displayHeight: 190,
+    displayWidth: 190,
   },
   wizard_gray: {
     sets: {
@@ -2340,6 +2448,9 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
+    displayHeight: 190,
+    displayWidth: 190,
   },
   wizard_green: {
     sets: {
@@ -2372,6 +2483,9 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
+    displayHeight: 190,
+    displayWidth: 190,
   },
   wizard_purple: {
     sets: {
@@ -2404,6 +2518,9 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
+    displayHeight: 190,
+    displayWidth: 190,
   },
   wizard_redblack: {
     sets: {
@@ -2436,6 +2553,9 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
+    displayHeight: 190,
+    displayWidth: 190,
   },
   wizard_yellow: {
     sets: {
@@ -2464,6 +2584,9 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
+    displayHeight: 190,
+    displayWidth: 190,
   },
   zombie: {
     sets: {

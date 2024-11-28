@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Dimensions, View } from "react-native";
+import { View } from "react-native";
 import { Image } from "expo-image";
 import { EnemyImageValueOption } from "../utility/enemyHelpers";
 import { useRootStore } from "../hooks/stores";
@@ -34,11 +34,13 @@ export const AnimatedSprite: React.FC<AnimatedSpriteProps> = ({
   // Original sprite dimensions
   const spriteWidth = spriteSet.width;
   const spriteHeight = spriteSet.height;
+  const topOffset = spriteSet.topOffset ?? 0;
+  const leftOffset = spriteSet.leftOffset ?? 0;
 
   const displayWidthActual =
-    spriteSet.displayWidth ?? uiStore.dimensions.width * 0.8;
+    spriteSet.displayWidth ?? Math.max(150, spriteWidth);
   const displayHeightActual =
-    spriteSet.displayHeight ?? uiStore.dimensions.height * 0.5;
+    spriteSet.displayHeight ?? Math.max(150, spriteHeight);
 
   // Scale factors
   const scaleX = displayWidthActual / spriteWidth;
@@ -100,7 +102,8 @@ export const AnimatedSprite: React.FC<AnimatedSpriteProps> = ({
         height: spriteHeight,
         transform: [{ scale }, ...mirrorTransform],
         overflow: "hidden",
-        top: -spriteHeight / 2,
+        top: -spriteHeight / 2 + topOffset,
+        left: leftOffset,
       }}
     >
       <Image

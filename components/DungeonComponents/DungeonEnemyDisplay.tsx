@@ -342,7 +342,7 @@ const EnemyDisplay = observer(
           }}
         >
           <AnimatedSprite
-            spriteSet={EnemyImageMap.bat_blood}
+            spriteSet={EnemyImageMap.zombie}
             initialAnimationState={"idle"}
             defaultAnimationState={"idle"}
             currentAnimationState={"idle"}

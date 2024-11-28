@@ -223,7 +223,6 @@ export const Parallax = ({
   children: ReactNode;
 }) => {
   const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
-  const { uiStore } = useRootStore();
   const scrollX = useSharedValue(0);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
@@ -314,8 +313,10 @@ export const Parallax = ({
               : translateX.value * moveRate,
           },
           {
-            translateY:
-              (translateY.value / 2) * moveRate + (scaledHeight - screenHeight),
+            translateY: plainInCombat
+              ? 0
+              : (translateY.value / 2) * moveRate +
+                (scaledHeight - screenHeight),
           },
           { scale },
         ],
