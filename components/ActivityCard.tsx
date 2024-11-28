@@ -8,7 +8,6 @@ import { useState } from "react";
 import GenericModal from "./GenericModal";
 import GenericRaisedButton from "./GenericRaisedButton";
 import GenericFlatButton from "./GenericFlatButton";
-import { EnemyImage } from "./EnemyImage";
 import GenericStrikeAround from "./GenericStrikeAround";
 import { router } from "expo-router";
 import { observer } from "mobx-react-lite";
@@ -329,7 +328,6 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           <Text className="pb-2 text-2xl">{badOutCome?.name}</Text>
           {badOutCome?.fight ? (
             <>
-              <EnemyImage creatureSpecies={badOutCome.fight} />
               <View className="mt-4 flex justify-evenly">
                 {badOutCome.buyOff &&
                   playerState &&

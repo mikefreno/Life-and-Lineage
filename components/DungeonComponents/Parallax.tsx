@@ -103,6 +103,20 @@ const backgroundImages = {
     size: { width: 1280, height: 720 },
     verticalOffset: -0.05,
   },
+  Forest: {
+    imageSet: {
+      0: require("../../assets/backgrounds/Forest/0.png"),
+      1: require("../../assets/backgrounds/Forest/1.png"),
+      2: require("../../assets/backgrounds/Forest/2.png"),
+      3: require("../../assets/backgrounds/Forest/3.png"),
+      4: require("../../assets/backgrounds/Forest/4.png"),
+      5: require("../../assets/backgrounds/Forest/5.png"),
+      6: require("../../assets/backgrounds/Forest/6.png"),
+      7: require("../../assets/backgrounds/Forest/7.png"),
+    },
+    size: { width: 285, height: 131 },
+    verticalOffset: -0.35,
+  },
   PineForest: {
     imageSet: {
       0: require("../../assets/backgrounds/PineForest/0.png"),
@@ -184,17 +198,6 @@ const ParallaxEffect = ({ effect, size, style }) => {
       contentFit="cover"
     />
   );
-};
-
-const preloadImages = async () => {
-  // For local assets, we don't actually need to prefetch
-  // We can just verify that all the required assets exist
-  return new Promise<void>((resolve) => {
-    // Small timeout to allow the JS engine to process other tasks
-    setTimeout(() => {
-      resolve();
-    }, 0);
-  });
 };
 
 export const Parallax = ({

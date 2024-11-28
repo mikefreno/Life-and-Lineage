@@ -1,6 +1,5 @@
 import { Pressable, View } from "react-native";
-import { ThemedView, Text } from "../Themed";
-import { EnemyImage } from "../EnemyImage";
+import { Text } from "../Themed";
 import ProgressBar from "../ProgressBar";
 import { toTitleCase } from "../../utility/functions/misc";
 import { useCombatState } from "../../providers/DungeonData";
@@ -39,9 +38,7 @@ export default function TargetSelectionRender() {
           className="m-4 rounded-lg border border-zinc-400 px-4 py-2 shadow-lg active:scale-95 active:opacity-50 dark:border-zinc-700"
         >
           <View className="flex flex-row justify-evenly">
-            <View className="my-auto">
-              <EnemyImage creatureSpecies={target.creatureSpecies} />
-            </View>
+            <View className="my-auto"></View>
             <View className="my-auto flex w-1/3">
               <View className="">
                 <Text className="text-center">

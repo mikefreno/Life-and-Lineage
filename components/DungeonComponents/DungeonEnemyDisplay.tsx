@@ -3,13 +3,21 @@ import { toTitleCase } from "../../utility/functions/misc";
 import ProgressBar from "../ProgressBar";
 import GenericStrikeAround from "../GenericStrikeAround";
 import { ThemedView, Text } from "../Themed";
-import { EnemyImage } from "../EnemyImage";
 import FadeOutNode from "../FadeOutNode";
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import {
+  SetStateAction,
+  memo,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { observer } from "mobx-react-lite";
 import type { Enemy } from "../../entities/creatures";
 import type { AnimationStore } from "../../stores/AnimationStore";
 import { useRootStore } from "../../hooks/stores";
+import { AnimatedSprite } from "../AnimatedSprite";
+import { EnemyImageMap } from "../../utility/enemyHelpers";
 
 const useEnemyAnimations = () => {
   const attackAnim = useRef(new Animated.Value(0)).current;
@@ -197,6 +205,9 @@ const EnemyDisplay = observer(
       diff: 0,
       showing: false,
     });
+    const [animationState, setAnimationState] = useState<string | undefined>(
+      "idle",
+    );
 
     const healingGlowAnim = useRef(new Animated.Value(0)).current;
 
@@ -341,9 +352,12 @@ const EnemyDisplay = observer(
               }}
             >
               <View style={{ position: "relative" }}>
-                <EnemyImage
-                  creatureSpecies={enemy.creatureSpecies}
-                  glowAnim={healingGlowAnim}
+                <AnimatedSprite
+                  spriteSet={EnemyImageMap.demon_samurai_p2}
+                  initialAnimationState={"idle"}
+                  defaultAnimationState={"attack_1"}
+                  currentAnimationState={"attack_1"}
+                  setCurrentAnimationState={setAnimationState}
                 />
               </View>
             </Animated.View>

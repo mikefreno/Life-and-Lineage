@@ -44,6 +44,7 @@ import { PlayerCharacter } from "./character";
 import { AttackUse } from "../utility/types";
 import { ThreatTable } from "./threatTable";
 import EnemyStore from "../stores/EnemyStore";
+import { EnemyImageKeyOption } from "../utility/enemyHelpers";
 
 type CreatureType = {
   id?: string;
@@ -61,6 +62,7 @@ type CreatureType = {
   attackStrings?: string[];
   conditions?: Condition[];
   enemyStore?: EnemyStore;
+  sprite: EnemyImageKeyOption;
 };
 
 type EnemyType = CreatureType & {
@@ -95,6 +97,7 @@ export class Creature {
   gotDrops: boolean;
   threatTable: ThreatTable = new ThreatTable();
   enemyStore: EnemyStore | undefined;
+  readonly sprite: EnemyImageKeyOption;
 
   constructor({
     id,
@@ -112,6 +115,7 @@ export class Creature {
     attackStrings,
     conditions,
     enemyStore,
+    sprite,
   }: CreatureType) {
     this.id = id ?? Crypto.randomUUID(); // Assign a random UUID if id is not provided
     this.beingType = beingType;
@@ -129,6 +133,7 @@ export class Creature {
     this.conditions = conditions ?? []; // Initialize conditions to an empty array if not provided
     this.gotDrops = false; // Initialize gotDrops to false
     this.enemyStore = enemyStore;
+    this.sprite = sprite;
 
     makeObservable(this, {
       id: observable,
@@ -668,9 +673,11 @@ export class Enemy extends Creature {
     attackStrings,
     conditions,
     enemyStore,
+    sprite,
   }: EnemyType) {
     super({
       id,
+      sprite,
       beingType,
       creatureSpecies,
       currentHealth,
@@ -742,6 +749,7 @@ export class Enemy extends Creature {
       turnsLeftAlive: minionObj.turns,
       beingType: minionObj.beingType as BeingType,
       enemyStore: this.enemyStore,
+      sprite: minionObj.sprite,
       parent: this,
     });
     this.addMinion(minion);
@@ -807,6 +815,7 @@ export class Enemy extends Creature {
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
       enemyStore: json.enemyStore,
+      sprite: json.sprite,
     });
     enemy.hydrationLinking();
     return enemy;
@@ -841,6 +850,7 @@ export class Minion extends Creature {
     conditions,
     turnsLeftAlive,
     enemyStore,
+    sprite,
     parent,
   }: MinionType) {
     super({
@@ -858,6 +868,7 @@ export class Minion extends Creature {
       energyRegen,
       attackStrings,
       conditions,
+      sprite,
       enemyStore,
     });
     this.turnsLeftAlive = turnsLeftAlive;
@@ -930,6 +941,7 @@ export class Minion extends Creature {
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
+      sprite: json.sprite,
       parent: null,
     });
     minion.conditions = minion.conditions.map((cond) =>
