@@ -4,14 +4,7 @@ import ProgressBar from "../ProgressBar";
 import GenericStrikeAround from "../GenericStrikeAround";
 import { ThemedView, Text } from "../Themed";
 import FadeOutNode from "../FadeOutNode";
-import {
-  SetStateAction,
-  memo,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import type { Enemy } from "../../entities/creatures";
 import type { AnimationStore } from "../../stores/AnimationStore";
@@ -295,98 +288,91 @@ const EnemyDisplay = observer(
     }, [enemy?.currentHealth]);
 
     return (
-      <View className="flex-1 flex-row items-center justify-evenly pl-8">
-        <View className="flex-1 flex-row items-center justify-evenly">
-          <View
-            className="flex flex-col items-center justify-center"
-            style={{ minWidth: "40%", maxWidth: "60%" }}
-          >
-            <Text className="text-center text-3xl">
-              {enemy.creatureSpecies.toLowerCase().includes("generic npc")
-                ? ""
-                : toTitleCase(enemy.creatureSpecies).replace(" ", "\n")}
-            </Text>
-            <ProgressBar
-              value={enemy.currentHealth >= 0 ? enemy.currentHealth : 0}
-              maxValue={enemy.maxHealth}
-              filledColor="#ef4444"
-              unfilledColor="#fee2e2"
-              displayNumber={
-                enemy.creatureSpecies.toLowerCase() == "training dummy"
-                  ? true
-                  : false
-              }
-              removeAtZero={true}
-            />
-            <EnemyHealthChangePopUp
-              healthDiff={healthState.diff}
-              showing={healthState.showing}
-            />
-            <EnemyConditions conditions={enemy.conditions} />
-          </View>
-          <View className="relative">
-            <Animated.View
-              className="mx-auto"
-              style={{
-                transform: [
-                  {
-                    translateX: Animated.add(
-                      animations.animations.attackAnim,
-                      animations.animations.dodgeAnim,
-                    ),
-                  },
-                  {
-                    translateY: Animated.multiply(
-                      Animated.add(
-                        animations.animations.attackAnim,
-                        animations.animations.dodgeAnim,
-                      ),
-                      -1.5,
-                    ),
-                  },
-                ],
-                opacity: Animated.multiply(
-                  animations.animations.damageAnim,
-                  animations.animations.flashOpacity,
-                ),
-              }}
-            >
-              <View style={{ position: "relative" }}>
-                <AnimatedSprite
-                  spriteSet={EnemyImageMap.demon_samurai_p2}
-                  initialAnimationState={"idle"}
-                  defaultAnimationState={"attack_1"}
-                  currentAnimationState={"attack_1"}
-                  setCurrentAnimationState={setAnimationState}
-                />
-              </View>
-            </Animated.View>
-            <Animated.View
-              style={{
-                transform: [
-                  { translateY: animations.animations.textTranslateAnim },
-                ],
-                opacity: animations.animations.textFadeAnim,
-                position: "absolute",
-                left: 0,
-                right: 0,
-                top: 0,
-                bottom: 0,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {animationStore.textString ? (
-                <Text
-                  className="text-xl tracking-wide text-center"
-                  numberOfLines={1}
-                >
-                  *{toTitleCase(animationStore.textString)}*
-                </Text>
-              ) : null}
-            </Animated.View>
-          </View>
+      <View className="flex-1 flex-row items-center justify-evenly">
+        <View
+          className="flex flex-col items-center justify-center"
+          style={{ minWidth: "40%", maxWidth: "60%" }}
+        >
+          <Text className="text-center text-3xl">
+            {enemy.creatureSpecies.toLowerCase().includes("generic npc")
+              ? ""
+              : toTitleCase(enemy.creatureSpecies).replace(" ", "\n")}
+          </Text>
+          <ProgressBar
+            value={enemy.currentHealth >= 0 ? enemy.currentHealth : 0}
+            maxValue={enemy.maxHealth}
+            filledColor="#ef4444"
+            unfilledColor="#fee2e2"
+            displayNumber={
+              enemy.creatureSpecies.toLowerCase() == "training dummy"
+                ? true
+                : false
+            }
+            removeAtZero={true}
+          />
+          <EnemyHealthChangePopUp
+            healthDiff={healthState.diff}
+            showing={healthState.showing}
+          />
+          <EnemyConditions conditions={enemy.conditions} />
         </View>
+        <Animated.View
+          style={{
+            transform: [
+              {
+                translateX: Animated.add(
+                  animations.animations.attackAnim,
+                  animations.animations.dodgeAnim,
+                ),
+              },
+              {
+                translateY: Animated.multiply(
+                  Animated.add(
+                    animations.animations.attackAnim,
+                    animations.animations.dodgeAnim,
+                  ),
+                  -1.5,
+                ),
+              },
+            ],
+            opacity: Animated.multiply(
+              animations.animations.damageAnim,
+              animations.animations.flashOpacity,
+            ),
+          }}
+        >
+          <AnimatedSprite
+            spriteSet={EnemyImageMap.bat_blood}
+            initialAnimationState={"idle"}
+            defaultAnimationState={"idle"}
+            currentAnimationState={"idle"}
+            setCurrentAnimationState={setAnimationState}
+          />
+        </Animated.View>
+        <Animated.View
+          style={{
+            transform: [
+              { translateY: animations.animations.textTranslateAnim },
+            ],
+            opacity: animations.animations.textFadeAnim,
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {animationStore.textString ? (
+            <Text
+              className="text-xl tracking-wide text-center"
+              numberOfLines={1}
+            >
+              *{toTitleCase(animationStore.textString)}*
+            </Text>
+          ) : null}
+        </Animated.View>
         {enemy.minions.length > 0 ? (
           <View className="mx-4">
             <GenericStrikeAround>

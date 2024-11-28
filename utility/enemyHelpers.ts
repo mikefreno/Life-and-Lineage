@@ -34,9 +34,7 @@ export const EnemyImageMap = {
       },
     },
     height: 125,
-    displayHeight: 175,
     width: 158,
-    displayWidth: 221,
   },
   bandit_heavy: {
     sets: {
@@ -111,6 +109,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   bat_brown: {
     sets: {
@@ -133,6 +132,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   bat_feral: {
     sets: {
@@ -155,6 +155,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   bat_gray: {
     sets: {
@@ -177,6 +178,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   bat_origin: {
     sets: {
@@ -199,6 +201,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   bat_vampire: {
     sets: {
@@ -221,6 +224,7 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
   },
   centaur: {
     sets: {
@@ -247,8 +251,6 @@ export const EnemyImageMap = {
     },
     height: 100,
     width: 100,
-    displayHeight: 160,
-    displayWidth: 160,
   },
   cerebus: {
     sets: {
@@ -275,8 +277,6 @@ export const EnemyImageMap = {
     },
     height: 100,
     width: 125,
-    displayHeight: 200,
-    displayWidth: 250,
   },
   cyclops: {
     sets: {
@@ -307,8 +307,6 @@ export const EnemyImageMap = {
     },
     height: 125,
     width: 158,
-    displayHeight: 200,
-    displayWidth: 250,
   },
   demon_boss: {
     sets: {
@@ -377,8 +375,6 @@ export const EnemyImageMap = {
     },
     height: 108,
     width: 128,
-    displayHeight: 216,
-    displayWidth: 256,
     mirror: true,
   },
   demon_samurai_p2: {
@@ -418,8 +414,6 @@ export const EnemyImageMap = {
     },
     height: 108,
     width: 128,
-    displayHeight: 216,
-    displayWidth: 256,
     mirror: true,
   },
   dragon: {
@@ -550,9 +544,7 @@ export const EnemyImageMap = {
       },
     },
     height: 64,
-    displayHeight: 128,
     width: 64,
-    displayWidth: 128,
     mirror: true,
   },
   gladiator_archer: {
@@ -1087,9 +1079,7 @@ export const EnemyImageMap = {
       },
     },
     height: 128,
-    displayHeight: 300,
     width: 160,
-    displayWidth: 375,
     mirror: true,
   },
   orc_masked: {
@@ -1657,9 +1647,7 @@ export const EnemyImageMap = {
       },
     },
     height: 78,
-    displayHeight: 120,
     width: 89,
-    displayWidth: 140,
   },
   skeleton_mage: {
     sets: {
@@ -1688,9 +1676,7 @@ export const EnemyImageMap = {
       projectile: require("../assets/images/monsters/Skeleton_Mage/projectile.png"),
     },
     height: 128,
-    displayHeight: 160,
     width: 128,
-    displayWidth: 160,
     mirror: true,
   },
   spider_dark: {
@@ -2510,7 +2496,5 @@ export const EnemyImageMap = {
     height: 32,
     width: 32,
     mirror: true,
-    displayHeight: 150,
-    displayWidth: 150,
   },
 };

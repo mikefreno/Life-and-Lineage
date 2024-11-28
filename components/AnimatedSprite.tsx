@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Dimensions, View } from "react-native";
 import { Image } from "expo-image";
 import { EnemyImageValueOption } from "../utility/enemyHelpers";
+import { useRootStore } from "../hooks/stores";
 
 interface AnimatedSpriteProps {
   spriteSet: EnemyImageValueOption;
@@ -28,14 +29,16 @@ export const AnimatedSprite: React.FC<AnimatedSpriteProps> = ({
   const [activeAnimation, setActiveAnimation] = useState(initialAnimationState);
   const animationRef = useRef<NodeJS.Timeout>();
   const frameCompletionCounter = useRef(0);
+  const { uiStore } = useRootStore();
 
   // Original sprite dimensions
   const spriteWidth = spriteSet.width;
   const spriteHeight = spriteSet.height;
 
-  // Display dimensions (use original if not provided)
-  const displayWidthActual = spriteSet.displayWidth ?? spriteWidth;
-  const displayHeightActual = spriteSet.displayHeight ?? spriteHeight;
+  const displayWidthActual =
+    spriteSet.displayWidth ?? uiStore.dimensions.width * 0.8;
+  const displayHeightActual =
+    spriteSet.displayHeight ?? uiStore.dimensions.height * 0.5;
 
   // Scale factors
   const scaleX = displayWidthActual / spriteWidth;
@@ -93,34 +96,22 @@ export const AnimatedSprite: React.FC<AnimatedSpriteProps> = ({
   return (
     <View
       style={{
-        width: displayWidthActual,
-        height: displayHeightActual,
+        width: spriteWidth,
+        height: spriteHeight,
+        transform: [{ scale }, ...mirrorTransform],
         overflow: "hidden",
-        alignItems: "center",
-        justifyContent: "center",
-        position: "absolute",
-        left: -displayHeightActual / 2 - Dimensions.get("window").width / 4,
-        top: -displayHeightActual / 2,
+        top: -spriteHeight / 2,
       }}
     >
-      <View
+      <Image
         style={{
-          width: spriteWidth,
+          position: "absolute",
+          width: spriteWidth * spriteSet.sets[activeAnimation].frames,
           height: spriteHeight,
-          transform: [{ scale }, ...mirrorTransform],
-          overflow: "hidden",
+          left: -currentFrame * spriteWidth,
         }}
-      >
-        <Image
-          style={{
-            position: "absolute",
-            width: spriteWidth * spriteSet.sets[activeAnimation].frames,
-            height: spriteHeight,
-            left: -currentFrame * spriteWidth,
-          }}
-          source={spriteSet.sets[activeAnimation].anim}
-        />
-      </View>
+        source={spriteSet.sets[activeAnimation].anim}
+      />
     </View>
   );
 };
