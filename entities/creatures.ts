@@ -655,6 +655,7 @@ export class Enemy extends Creature {
    * List of minions controlled by this enemy
    */
   minions: Minion[];
+  phaseTrigger: number | null;
 
   constructor({
     id,
@@ -715,6 +716,18 @@ export class Enemy extends Creature {
         }
       },
     );
+
+    reaction(
+      () => [this.currentHealth],
+      () => {
+        if (
+          this.phaseTrigger &&
+          this.currentHealth / this.maxHealth <= this.phaseTrigger
+        ) {
+          this.triggerPhaseTransition();
+        }
+      },
+    );
   }
 
   /**
@@ -755,6 +768,8 @@ export class Enemy extends Creature {
     this.addMinion(minion);
     return minion.creatureSpecies;
   }
+
+  private triggerPhaseTransition() {}
 
   /**
    * Adds a minion to the enemy's list of minions.

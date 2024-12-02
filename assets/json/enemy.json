@@ -37,6 +37,7 @@
     "name": "giant rat",
     "beingType": "beast",
     "sanity": null,
+    "defaultSprite": "rat",
     "healthRange": {
       "minimum": 20,
       "maximum": 50
@@ -71,6 +72,7 @@
   },
   {
     "name": "bat",
+    "defaultSprite": "bat_origin",
     "beingType": "beast",
     "sanity": null,
     "healthRange": {
@@ -107,6 +109,7 @@
   },
   {
     "name": "skeleton",
+    "defaultSprite": "skeleton",
     "beingType": "undead",
     "sanity": null,
     "healthRange": {
@@ -150,6 +153,7 @@
   },
   {
     "name": "skeleton archer",
+    "defaultSprite": "skeleton",
     "beingType": "undead",
     "sanity": null,
     "healthRange": {
@@ -213,6 +217,7 @@
   {
     "name": "zombie",
     "beingType": "undead",
+    "defaultSprite": "zombie",
     "sanity": null,
     "healthRange": {
       "minimum": 40,
@@ -249,6 +254,7 @@
   },
   {
     "name": "ghost",
+    "defaultSprite": "ghost",
     "beingType": "undead",
     "sanity": null,
     "healthRange": {
@@ -280,6 +286,7 @@
   },
   {
     "name": "goblin",
+    "defaultSprite": "goblin",
     "beingType": "demi-human",
     "sanity": null,
     "healthRange": {
@@ -433,6 +440,7 @@
   },
   {
     "name": "bandit",
+    "defaultSprite": "bandit_light",
     "beingType": "human",
     "sanity": 50,
     "healthRange": {

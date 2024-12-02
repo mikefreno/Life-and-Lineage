@@ -1,5 +1,5 @@
 import { View, Animated, Image } from "react-native";
-import { toTitleCase } from "../../utility/functions/misc";
+import { toTitleCase, wait } from "../../utility/functions/misc";
 import ProgressBar from "../ProgressBar";
 import GenericStrikeAround from "../GenericStrikeAround";
 import { ThemedView, Text } from "../Themed";
@@ -20,19 +20,31 @@ const useEnemyAnimations = () => {
   const dodgeAnim = useRef(new Animated.Value(0)).current;
   const flashOpacity = useRef(new Animated.Value(1)).current;
 
-  const runAttackAnimation = () => {
+  const runAttackAnimation = (
+    onReachPeak: () => void,
+    onComplete: () => void,
+  ) => {
     Animated.sequence([
+      // Move forward (run move animation)
       Animated.timing(attackAnim, {
         toValue: -50,
         duration: 200,
         useNativeDriver: true,
       }),
+      // Hold position (run attack animation)
+      Animated.delay(400), // Adjust this duration based on your attack animation length
+      // Move back (run move animation again)
       Animated.timing(attackAnim, {
         toValue: 0,
         duration: 200,
         useNativeDriver: true,
       }),
-    ]).start();
+    ]).start((finished) => {
+      if (finished) onComplete();
+    });
+
+    // Call onReachPeak after the forward movement
+    setTimeout(onReachPeak, 200);
   };
 
   const runDodgeAnimation = () => {
@@ -201,8 +213,8 @@ const EnemyDisplay = observer(
     const [animationState, setAnimationState] = useState<string | undefined>(
       "idle",
     );
-
     const healingGlowAnim = useRef(new Animated.Value(0)).current;
+    const attackStateRef = useRef<"start" | "attacking" | "returning">("start");
 
     const runHealAnimation = () => {
       Animated.sequence([
@@ -232,6 +244,11 @@ const EnemyDisplay = observer(
               }));
             }, 500);
           });
+          if (enemy.currentHealth <= 0) {
+            setAnimationState("death");
+          } else {
+            setAnimationState("hurt");
+          }
         } else {
           runHealAnimation();
           setTimeout(() => {
@@ -257,13 +274,38 @@ const EnemyDisplay = observer(
 
     useEffect(() => {
       if (animationStore.attackDummy !== 0) {
-        animations.runAttackAnimation();
+        attackStateRef.current = "start";
+        setAnimationState("move");
+
+        animations.runAttackAnimation(
+          () => {
+            // This callback runs when the sprite reaches its peak distance
+            attackStateRef.current = "attacking";
+            setAnimationState("attack_1");
+          },
+          () => {
+            // This callback runs when the entire sequence completes
+            attackStateRef.current = "start";
+            setAnimationState("idle");
+          },
+        );
       }
     }, [animationStore.attackDummy]);
 
     useEffect(() => {
+      if (
+        attackStateRef.current === "returning" &&
+        animations.animations.attackAnim._value === 0
+      ) {
+        setAnimationState("idle");
+        attackStateRef.current = "start";
+      }
+    }, [animations.animations.attackAnim]);
+
+    useEffect(() => {
       if (animationStore.dodgeDummy !== 0) {
         animations.runDodgeAnimation();
+        setAnimationState("jump");
       }
     }, [animationStore.dodgeDummy]);
 
@@ -342,10 +384,8 @@ const EnemyDisplay = observer(
           }}
         >
           <AnimatedSprite
-            spriteSet={EnemyImageMap.zombie}
-            initialAnimationState={"idle"}
-            defaultAnimationState={"idle"}
-            currentAnimationState={"idle"}
+            spriteSet={EnemyImageMap.mimic}
+            currentAnimationState={animationState}
             setCurrentAnimationState={setAnimationState}
           />
         </Animated.View>

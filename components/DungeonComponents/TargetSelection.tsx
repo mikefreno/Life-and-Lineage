@@ -6,6 +6,8 @@ import { useCombatState } from "../../providers/DungeonData";
 import { useCombatActions } from "../../hooks/combat";
 import type { Enemy, Minion } from "../../entities/creatures";
 import { useRootStore } from "../../hooks/stores";
+import { AnimatedSprite } from "../AnimatedSprite";
+import { EnemyImageMap } from "../../utility/enemyHelpers";
 
 export default function TargetSelectionRender() {
   const { enemyStore } = useRootStore();
@@ -38,20 +40,26 @@ export default function TargetSelectionRender() {
           className="m-4 rounded-lg border border-zinc-400 px-4 py-2 shadow-lg active:scale-95 active:opacity-50 dark:border-zinc-700"
         >
           <View className="flex flex-row justify-evenly">
-            <View className="my-auto"></View>
+            <View className="my-auto">
+              <AnimatedSprite
+                spriteSet={EnemyImageMap.viking_axe}
+                initialAnimationState={"idle"}
+                defaultAnimationState={"idle"}
+                currentAnimationState={"idle"}
+                setCurrentAnimationState={undefined}
+              />
+            </View>
             <View className="my-auto flex w-1/3">
-              <View className="">
-                <Text className="text-center">
-                  {toTitleCase(target.creatureSpecies)}
-                </Text>
-                <ProgressBar
-                  filledColor="#ef4444"
-                  unfilledColor="#fee2e2"
-                  value={target.currentHealth}
-                  maxValue={target.maxHealth}
-                  displayNumber={false}
-                />
-              </View>
+              <Text className="text-center">
+                {toTitleCase(target.creatureSpecies)}
+              </Text>
+              <ProgressBar
+                filledColor="#ef4444"
+                unfilledColor="#fee2e2"
+                value={target.currentHealth}
+                maxValue={target.maxHealth}
+                displayNumber={false}
+              />
             </View>
           </View>
         </Pressable>

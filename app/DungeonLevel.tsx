@@ -142,7 +142,7 @@ const DungeonLevelScreen = observer(() => {
           </Pressable>
         </View>
         <Parallax
-          backgroundName={"Cave"}
+          backgroundName={"AutumnForest"}
           inCombat={inCombat}
           playerPosition={{
             x: dungeonStore.currentPosition?.x ?? 0,

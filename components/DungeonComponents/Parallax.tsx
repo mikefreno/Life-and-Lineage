@@ -19,7 +19,6 @@ import Animated, {
 import { Image } from "expo-image";
 import { TILE_SIZE } from "../../stores/DungeonStore";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useRootStore } from "../../hooks/stores";
 
 const backgroundImages = {
   AbandonedValley: {
@@ -47,6 +46,48 @@ const backgroundImages = {
     size: { width: 960, height: 180 },
     verticalOffset: -0.3,
   },
+  Castle_Atrium: {
+    imageSet: {
+      0: require("../../assets/backgrounds/Castle_Atrium/0.png"),
+      1: require("../../assets/backgrounds/Castle_Atrium/1.png"),
+      2: require("../../assets/backgrounds/Castle_Atrium/2.png"),
+      3: require("../../assets/backgrounds/Castle_Atrium/3.png"),
+    },
+    size: { width: 576, height: 324 },
+    verticalOffset: -0.3,
+  },
+  Castle_Entrance: {
+    imageSet: {
+      0: require("../../assets/backgrounds/Castle_Entrance/0.png"),
+      1: require("../../assets/backgrounds/Castle_Entrance/1.png"),
+      2: require("../../assets/backgrounds/Castle_Entrance/2.png"),
+      3: require("../../assets/backgrounds/Castle_Entrance/3.png"),
+      4: require("../../assets/backgrounds/Castle_Entrance/4.png"),
+    },
+    size: { width: 576, height: 324 },
+    verticalOffset: -0.3,
+  },
+  Castle_Hall: {
+    imageSet: {
+      0: require("../../assets/backgrounds/Castle_Hall/0.png"),
+      1: require("../../assets/backgrounds/Castle_Hall/1.png"),
+      2: require("../../assets/backgrounds/Castle_Hall/2.png"),
+      3: require("../../assets/backgrounds/Castle_Hall/3.png"),
+    },
+    size: { width: 576, height: 324 },
+    verticalOffset: -0.3,
+  },
+  Castle_Ramparts: {
+    imageSet: {
+      0: require("../../assets/backgrounds/Castle_Ramparts/0.png"),
+      1: require("../../assets/backgrounds/Castle_Ramparts/1.png"),
+      2: require("../../assets/backgrounds/Castle_Ramparts/2.png"),
+      3: require("../../assets/backgrounds/Castle_Ramparts/3.png"),
+      4: require("../../assets/backgrounds/Castle_Ramparts/4.png"),
+    },
+    size: { width: 576, height: 324 },
+    verticalOffset: -0.3,
+  },
   Cave: {
     imageSet: {
       0: require("../../assets/backgrounds/Cave/0.png"),
@@ -61,6 +102,52 @@ const backgroundImages = {
     size: { width: 384, height: 216 },
     verticalOffset: -0.25,
   },
+  CrystalCave_1: {
+    imageSet: {
+      0: require("../../assets/backgrounds/CrystalCave_1/0.png"),
+      1: require("../../assets/backgrounds/CrystalCave_1/1.png"),
+      2: require("../../assets/backgrounds/CrystalCave_1/2.png"),
+      3: require("../../assets/backgrounds/CrystalCave_1/3.png"),
+      4: require("../../assets/backgrounds/CrystalCave_1/4.png"),
+      5: require("../../assets/backgrounds/CrystalCave_1/5.png"),
+    },
+    size: { width: 576, height: 324 },
+    verticalOffset: -0.3,
+  },
+  CrystalCave_2: {
+    imageSet: {
+      0: require("../../assets/backgrounds/CrystalCave_2/0.png"),
+      1: require("../../assets/backgrounds/CrystalCave_2/1.png"),
+      2: require("../../assets/backgrounds/CrystalCave_2/2.png"),
+      3: require("../../assets/backgrounds/CrystalCave_2/3.png"),
+      4: require("../../assets/backgrounds/CrystalCave_2/4.png"),
+    },
+    size: { width: 576, height: 324 },
+    verticalOffset: -0.3,
+  },
+  CrystalCave_3: {
+    imageSet: {
+      0: require("../../assets/backgrounds/CrystalCave_3/0.png"),
+      1: require("../../assets/backgrounds/CrystalCave_3/1.png"),
+      2: require("../../assets/backgrounds/CrystalCave_3/2.png"),
+      3: require("../../assets/backgrounds/CrystalCave_3/3.png"),
+      4: require("../../assets/backgrounds/CrystalCave_3/4.png"),
+    },
+    size: { width: 576, height: 324 },
+    verticalOffset: -0.3,
+  },
+  CrystalCave_4: {
+    imageSet: {
+      0: require("../../assets/backgrounds/CrystalCave_4/0.png"),
+      1: require("../../assets/backgrounds/CrystalCave_4/1.png"),
+      2: require("../../assets/backgrounds/CrystalCave_4/2.png"),
+      3: require("../../assets/backgrounds/CrystalCave_4/3.png"),
+      4: require("../../assets/backgrounds/CrystalCave_4/4.png"),
+      5: require("../../assets/backgrounds/CrystalCave_4/5.png"),
+    },
+    size: { width: 576, height: 324 },
+    verticalOffset: -0.3,
+  },
   DeadForest: {
     imageSet: {
       0: require("../../assets/backgrounds/DeadForest/0.png"),
@@ -72,6 +159,17 @@ const backgroundImages = {
       6: require("../../assets/backgrounds/DeadForest/6.png"),
     },
     size: { width: 384, height: 216 },
+    verticalOffset: -0.25,
+  },
+  DemonWoods: {
+    imageSet: {
+      0: require("../../assets/backgrounds/DemonWoods/0.png"),
+      1: require("../../assets/backgrounds/DemonWoods/1.png"),
+      2: require("../../assets/backgrounds/DemonWoods/2.png"),
+      3: require("../../assets/backgrounds/DemonWoods/3.png"),
+      4: require("../../assets/backgrounds/DemonWoods/4.png"),
+    },
+    size: { width: 480, height: 272 },
     verticalOffset: -0.25,
   },
   Dock: {

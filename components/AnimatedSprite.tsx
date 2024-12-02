@@ -2,12 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { Image } from "expo-image";
 import { EnemyImageValueOption } from "../utility/enemyHelpers";
-import { useRootStore } from "../hooks/stores";
 
 interface AnimatedSpriteProps {
   spriteSet: EnemyImageValueOption;
-  initialAnimationState: string;
-  defaultAnimationState: string;
   currentAnimationState: string | undefined;
   setCurrentAnimationState: React.Dispatch<
     React.SetStateAction<string | undefined>
@@ -19,17 +16,17 @@ interface AnimatedSpriteProps {
 
 export const AnimatedSprite: React.FC<AnimatedSpriteProps> = ({
   spriteSet,
-  initialAnimationState,
-  defaultAnimationState,
   currentAnimationState,
   setCurrentAnimationState,
   fps = 8,
 }) => {
   const [currentFrame, setCurrentFrame] = useState(0);
-  const [activeAnimation, setActiveAnimation] = useState(initialAnimationState);
+  const [activeAnimation, setActiveAnimation] = useState(
+    "spawn" in spriteSet.sets ? "spawn" : "idle",
+  );
   const animationRef = useRef<NodeJS.Timeout>();
   const frameCompletionCounter = useRef(0);
-  const { uiStore } = useRootStore();
+  const hasSpawnAnimationPlayed = useRef(false);
 
   // Original sprite dimensions
   const spriteWidth = spriteSet.width;
@@ -48,6 +45,8 @@ export const AnimatedSprite: React.FC<AnimatedSpriteProps> = ({
   const scale = Math.min(scaleX, scaleY);
   const mirrorTransform = spriteSet.mirror ? [{ scaleX: -1 }] : [];
 
+  useEffect(() => console.log(activeAnimation),[activeAnimation]);
+
   useEffect(() => {
     const runAnimation = () => {
       animationRef.current = setInterval(() => {
@@ -63,21 +62,30 @@ export const AnimatedSprite: React.FC<AnimatedSpriteProps> = ({
       }, 1000 / fps);
     };
 
-    const handleAnimationCompletion = () => {
-      if (activeAnimation === currentAnimationState) {
-        setCurrentAnimationState(undefined);
-        setActiveAnimation(defaultAnimationState);
-      }
-    };
+    // Handle spawn animation completion
+    if (
+      activeAnimation === "spawn" &&
+      frameCompletionCounter.current > 0 &&
+      !hasSpawnAnimationPlayed.current
+    ) {
+      hasSpawnAnimationPlayed.current = true;
+      setActiveAnimation("idle");
+      setCurrentAnimationState(undefined);
+      frameCompletionCounter.current = 0;
+      return;
+    }
 
+    // Handle other animation state changes
     if (currentAnimationState && currentAnimationState !== activeAnimation) {
       setActiveAnimation(currentAnimationState);
       frameCompletionCounter.current = 0;
       setCurrentFrame(0);
     }
 
-    if (frameCompletionCounter.current > 0) {
-      handleAnimationCompletion();
+    // Handle animation completion
+    if (frameCompletionCounter.current > 0 && activeAnimation !== "idle") {
+      setCurrentAnimationState(undefined);
+      setActiveAnimation("idle");
     }
 
     runAnimation();
@@ -91,9 +99,13 @@ export const AnimatedSprite: React.FC<AnimatedSpriteProps> = ({
     activeAnimation,
     currentAnimationState,
     fps,
-    defaultAnimationState,
     setCurrentAnimationState,
+    spriteSet.sets,
   ]);
+
+  const validAnimation = spriteSet.sets[activeAnimation]
+    ? activeAnimation
+    : "idle";
 
   return (
     <View
@@ -109,11 +121,11 @@ export const AnimatedSprite: React.FC<AnimatedSpriteProps> = ({
       <Image
         style={{
           position: "absolute",
-          width: spriteWidth * spriteSet.sets[activeAnimation].frames,
+          width: spriteWidth * spriteSet.sets[validAnimation].frames,
           height: spriteHeight,
           left: -currentFrame * spriteWidth,
         }}
-        source={spriteSet.sets[activeAnimation].anim}
+        source={spriteSet.sets[validAnimation].anim}
       />
     </View>
   );

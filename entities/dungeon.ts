@@ -5,6 +5,7 @@ import enemiesJSON from "../assets/json/enemy.json";
 import bossesJSON from "../assets/json/bosses.json";
 import type { BeingType } from "../utility/types";
 import { ParallaxOptions } from "../components/DungeonComponents/Parallax";
+import { EnemyImageKeyOption, EnemyImageMap } from "../utility/enemyHelpers";
 
 interface DungeonLevelOptions {
   level: number;
@@ -15,6 +16,7 @@ interface DungeonLevelOptions {
   bossDefeated?: boolean;
   parent: DungeonInstance;
   dungeonStore: DungeonStore;
+  parallaxOverride?: string;
 }
 
 interface DungeonInstanceOptions {
@@ -25,6 +27,7 @@ interface DungeonInstanceOptions {
   unlocks: string[];
   levels: DungeonLevel[];
   dungeonStore: DungeonStore;
+  parallax: string;
 }
 
 /**
@@ -91,6 +94,7 @@ export class DungeonInstance {
       levels: json.levels,
       unlocks: json.unlocks,
       dungeonStore: json.dungeonStore,
+      parallax: json.parallax,
     });
 
     return instance;
@@ -103,13 +107,22 @@ export class DungeonInstance {
  */
 export class DungeonLevel {
   readonly level: number;
-  readonly bossEncounter: { name: string; scaler: number }[];
-  readonly normalEncounters: { name: string; scaler: number }[][];
+  readonly bossEncounter: {
+    name: string;
+    scaler: number;
+    spriteOverride?: string;
+  }[];
+  readonly normalEncounters: {
+    name: string;
+    scaler: number;
+    spriteOverride?: string[];
+  }[][];
   readonly tiles: number;
   unlocked: boolean;
   bossDefeated: boolean;
   parent: DungeonInstance;
   dungeonStore: DungeonStore;
+  parallaxOverride: string | null;
 
   constructor({
     level,
@@ -119,6 +132,7 @@ export class DungeonLevel {
     bossDefeated,
     unlocked,
     parent,
+    parallaxOverride,
     dungeonStore,
   }: DungeonLevelOptions) {
     this.level = level;
@@ -128,6 +142,7 @@ export class DungeonLevel {
     this.unlocked = unlocked ?? false;
     this.bossDefeated = bossDefeated ?? false;
     this.parent = parent;
+    this.parallaxOverride = parallaxOverride ?? null;
     this.dungeonStore = dungeonStore;
     makeObservable(this, {
       unlocked: observable,
@@ -179,6 +194,18 @@ export class DungeonLevel {
               enemyJSON.attackPowerRange.minimum +
               1),
         ) + enemyJSON.attackPowerRange.minimum;
+      let sprite: string | undefined;
+      if (enemySpec.spriteOverride) {
+        sprite =
+          enemySpec.spriteOverride[
+            Math.floor(Math.random() * enemySpec.spriteOverride.length)
+          ];
+      } else {
+        sprite = enemyJSON.defaultSprite;
+      }
+      if (!sprite || !(sprite in EnemyImageMap)) {
+        throw new Error(`Missing sprite on ${enemyJSON.name}`);
+      }
 
       return new Enemy({
         beingType: enemyJSON.beingType as BeingType,
@@ -193,6 +220,7 @@ export class DungeonLevel {
         baseEnergy: enemyJSON.energy.maximum,
         energyRegen: enemyJSON.energy.regen,
         attackStrings: enemyJSON.attackStrings,
+        sprite: sprite as EnemyImageKeyOption,
         enemyStore: this.dungeonStore.root.enemyStore,
       });
     });
@@ -225,6 +253,7 @@ export class DungeonLevel {
         baseEnergy: bossJSON.energy.maximum,
         energyRegen: bossJSON.energy.regen,
         attackStrings: bossJSON.attackStrings,
+        sprite: bossJSON.sprite as EnemyImageKeyOption,
         enemyStore: this.dungeonStore.root.enemyStore,
       });
     });

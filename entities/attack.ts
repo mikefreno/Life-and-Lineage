@@ -39,6 +39,7 @@ interface AttackFields {
   buffs?: string[];
   debuffs?: { name: string; chance: number }[];
   summons?: string[];
+  uses?: number;
   user: PlayerCharacter | Enemy | Minion;
 }
 
@@ -63,6 +64,7 @@ export class Attack {
   buffStrings: string[];
   debuffStrings: { name: string; chance: number }[];
   summons: string[];
+  uses: number | null; // mainly for enemies, attacks / heals that have limited uses (balance)
   user: PlayerCharacter | Enemy | Minion;
 
   constructor({
@@ -78,6 +80,7 @@ export class Attack {
     debuffs = [],
     summons = [],
     hits = 1,
+    uses,
     user,
   }: AttackFields) {
     this.name = name;
@@ -89,6 +92,7 @@ export class Attack {
     this.selfDamage = selfDamage;
     this.flatSanityDamage = flatSanityDamage;
     this.hits = hits;
+    this.uses = uses ?? null;
     this.buffStrings = buffs;
     this.debuffStrings = debuffs;
     this.summons = summons;

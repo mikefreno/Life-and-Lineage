@@ -454,6 +454,7 @@ export const EnemyImageMap = {
     displayHeight: 300,
     displayWidth: 300,
     topOffset: 44,
+    leftOffset: -24,
   },
   dwarf_warrior: {
     sets: {
