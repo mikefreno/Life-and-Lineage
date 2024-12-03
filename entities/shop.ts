@@ -8,6 +8,7 @@ import {
   toTitleCase,
   rollD20,
   getItemJSONMap,
+  getClassSpecificBookList,
 } from "../utility/functions/misc";
 import { ItemClassType, Personality } from "../utility/types";
 import { RootStore } from "../stores/RootStore";
@@ -278,7 +279,26 @@ export function generateInventory(
 ): Item[] {
   const itemJSONMap = getItemJSONMap(player.playerClass);
   const tradesLength = trades.length;
-  const items: Item[] = new Array(inventoryCount);
+  let items: Item[] = [];
+
+  // Special case: Add missing novice spell books if Books are in trades
+  if (trades.includes(ItemClassType.Book)) {
+    const classBooks = getClassSpecificBookList(player.playerClass);
+    const noviceBooks = classBooks.filter((book) => book.baseValue === 2500);
+    const missingNoviceBooks = noviceBooks.filter(
+      (book) => !player.knownSpells.includes(book.teaches),
+    );
+
+    // Add missing novice books to items
+    items = missingNoviceBooks.map((book) =>
+      Item.fromJSON({
+        ...book,
+        itemClass: ItemClassType.Book,
+        stackable: isStackable(ItemClassType.Book),
+        root: player.root,
+      }),
+    );
+  }
 
   // Precalculate player stats
   const playerStats = {
@@ -300,12 +320,14 @@ export function generateInventory(
     const selectedItem =
       weightedItems[Math.floor(Math.random() * weightedItems.length)];
 
-    items[i] = Item.fromJSON({
-      ...selectedItem,
-      itemClass: type,
-      stackable: isStackable(type),
-      root: player.root,
-    });
+    items.push(
+      Item.fromJSON({
+        ...selectedItem,
+        itemClass: type,
+        stackable: isStackable(type),
+        root: player.root,
+      }),
+    );
   }
 
   return items;

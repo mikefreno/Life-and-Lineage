@@ -216,13 +216,7 @@ export function getItemJSONMap(
     artifact: artifacts,
     arrow: arrows,
     bodyArmor: bodyArmor,
-    book:
-      {
-        mage: mageBooks,
-        paladin: paladinBooks,
-        necromancer: necroBooks,
-        ranger: rangerBooks,
-      }[playerClass] || mageBooks,
+    book: getClassSpecificBookList(playerClass),
     bow: bows,
     focus: foci,
     hat: hats,
@@ -238,6 +232,19 @@ export function getItemJSONMap(
     melee: melee,
     storyItem: storyItems,
   };
+}
+
+export function getClassSpecificBookList(playerClass: PlayerClassOptions) {
+  switch (playerClass) {
+    case PlayerClassOptions.necromancer:
+      return necroBooks;
+    case PlayerClassOptions.ranger:
+      return rangerBooks;
+    case PlayerClassOptions.paladin:
+      return paladinBooks;
+    default:
+      return mageBooks;
+  }
 }
 
 export function numberToRoman(num: number): string {

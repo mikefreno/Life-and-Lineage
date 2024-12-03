@@ -197,7 +197,6 @@ export const useEnemyManagement = () => {
           // Check for death after action
           setTimeout(() => {
             enemyDeathHandler(enemy);
-            enemyStore.setAttackAnimationOngoing(false);
           }, 1000);
         }
       });
@@ -274,7 +273,6 @@ export const useCombatActions = () => {
       playerMinionsTurn(() => {
         setTimeout(() => {
           enemyTurn();
-          enemyStore.setAttackAnimationOngoing(false);
         }, 750);
       });
     },

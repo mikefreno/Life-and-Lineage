@@ -142,7 +142,9 @@ const DungeonLevelScreen = observer(() => {
           </Pressable>
         </View>
         <Parallax
-          backgroundName={"AutumnForest"}
+          backgroundName={
+            currentLevel.parallaxOverride ?? currentLevel.parent.bgName
+          }
           inCombat={inCombat}
           playerPosition={{
             x: dungeonStore.currentPosition?.x ?? 0,
@@ -187,7 +189,7 @@ const DungeonLevelScreen = observer(() => {
             ) : null}
           </View>
           {displayItem && (
-            <View className="absolute z-10">
+            <View className="absolute z-10" pointerEvents="box-none">
               <StatsDisplay
                 displayItem={displayItem}
                 clearItem={() => setDisplayItem(null)}

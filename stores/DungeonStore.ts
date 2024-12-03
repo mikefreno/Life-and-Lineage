@@ -11,6 +11,7 @@ import {
   observable,
   reaction,
   runInAction,
+  toJS,
 } from "mobx";
 import {
   BoundingBox,
@@ -112,7 +113,7 @@ export class DungeonStore {
     );
 
     reaction(
-      () => this.currentMap,
+      () => toJS(this.currentMap),
       (map) => {
         if (map) {
           storage.set("currentMap", stringify(map));
@@ -379,7 +380,13 @@ export class DungeonStore {
 
       if (!currentLevel) return;
 
-      const currentMap = parse(currentMapStr);
+      const currentMap: Tile[] = parse(currentMapStr).map((tile: any) => ({
+        x: tile.x,
+        y: tile.y,
+        clearedRoom: Boolean(tile.clearedRoom),
+        isBossRoom: Boolean(tile.isBossRoom),
+      }));
+
       const currentMapDimensions = parse(currentMapDimensionsStr);
       const currentPosition = parse(currentPositionStr);
       const logs = logsStr ? parse(logsStr) : [];

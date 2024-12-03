@@ -67,6 +67,10 @@ export class RootStore {
     this.playerState.gameTurnHandler();
   }
 
+  inheritance() {
+    throw new Error("Method not implemented.");
+  }
+
   private generateLowSanityDebuff() {
     if (Math.random() < 0.75) return;
 

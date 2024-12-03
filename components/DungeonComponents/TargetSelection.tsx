@@ -8,6 +8,7 @@ import type { Enemy, Minion } from "../../entities/creatures";
 import { useRootStore } from "../../hooks/stores";
 import { AnimatedSprite } from "../AnimatedSprite";
 import { EnemyImageMap } from "../../utility/enemyHelpers";
+import { useState } from "react";
 
 export default function TargetSelectionRender() {
   const { enemyStore } = useRootStore();
@@ -42,11 +43,8 @@ export default function TargetSelectionRender() {
           <View className="flex flex-row justify-evenly">
             <View className="my-auto">
               <AnimatedSprite
-                spriteSet={EnemyImageMap.viking_axe}
-                initialAnimationState={"idle"}
-                defaultAnimationState={"idle"}
+                spriteSet={EnemyImageMap[target.sprite]}
                 currentAnimationState={"idle"}
-                setCurrentAnimationState={undefined}
               />
             </View>
             <View className="my-auto flex w-1/3">

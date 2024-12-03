@@ -1,5 +1,5 @@
 import { View, Animated, Image } from "react-native";
-import { toTitleCase, wait } from "../../utility/functions/misc";
+import { toTitleCase } from "../../utility/functions/misc";
 import ProgressBar from "../ProgressBar";
 import GenericStrikeAround from "../GenericStrikeAround";
 import { ThemedView, Text } from "../Themed";
@@ -7,7 +7,7 @@ import FadeOutNode from "../FadeOutNode";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import type { Enemy } from "../../entities/creatures";
-import type { AnimationStore } from "../../stores/AnimationStore";
+import { FPS, type AnimationStore } from "../../stores/AnimationStore";
 import { useRootStore } from "../../hooks/stores";
 import { AnimatedSprite } from "../AnimatedSprite";
 import { EnemyImageMap } from "../../utility/enemyHelpers";
@@ -19,32 +19,47 @@ const useEnemyAnimations = () => {
   const textTranslateAnim = useRef(new Animated.Value(0)).current;
   const dodgeAnim = useRef(new Animated.Value(0)).current;
   const flashOpacity = useRef(new Animated.Value(1)).current;
+  const { enemyStore } = useRootStore();
 
-  const runAttackAnimation = (
-    onReachPeak: () => void,
-    onComplete: () => void,
-  ) => {
+  const runAttackAnimation = ({
+    moveAnimationFrames = 6,
+    attackAnimationFrames = 6,
+    onReachPeak,
+    onAttackEnd,
+    onComplete,
+  }: {
+    moveAnimationFrames?: number;
+    attackAnimationFrames?: number;
+    onReachPeak: () => void;
+    onAttackEnd: () => void;
+    onComplete: () => void;
+  }) => {
+    const moveDuration = (moveAnimationFrames / FPS) * 1000;
+    const attackDuration = (attackAnimationFrames / FPS) * 1000;
+
+    enemyStore.incrementActiveAnimations();
+
     Animated.sequence([
-      // Move forward (run move animation)
       Animated.timing(attackAnim, {
         toValue: -50,
-        duration: 200,
+        duration: moveDuration,
         useNativeDriver: true,
       }),
-      // Hold position (run attack animation)
-      Animated.delay(400), // Adjust this duration based on your attack animation length
-      // Move back (run move animation again)
+      Animated.delay(attackDuration),
       Animated.timing(attackAnim, {
         toValue: 0,
-        duration: 200,
+        duration: moveDuration,
         useNativeDriver: true,
       }),
     ]).start((finished) => {
-      if (finished) onComplete();
+      if (finished) {
+        onComplete();
+        enemyStore.decrementActiveAnimations();
+      }
     });
 
-    // Call onReachPeak after the forward movement
-    setTimeout(onReachPeak, 200);
+    setTimeout(onReachPeak, moveDuration);
+    setTimeout(onAttackEnd, moveDuration + attackDuration);
   };
 
   const runDodgeAnimation = () => {
@@ -77,22 +92,43 @@ const useEnemyAnimations = () => {
     ]).start();
   };
 
-  const runDamageAnimation = (onComplete: () => void) => {
+  const runDamageAnimation = (
+    onComplete: () => void,
+    animationFrames: number,
+    isDeathAnimation: boolean = false,
+  ) => {
+    const FPS = 8; // Assuming 8 frames per second, adjust if different
+    const animationDuration = (animationFrames / FPS) * 1000; // Convert to milliseconds
+
+    // For death animation, we want the damage animation to last the full duration
+    const iterations = isDeathAnimation
+      ? Math.ceil(animationDuration / 400)
+      : 2;
+
+    // Adjust the duration of each flash based on the animation length
+    const flashDuration = isDeathAnimation
+      ? 200
+      : Math.min(200, animationDuration / 4);
+
     Animated.loop(
       Animated.sequence([
         Animated.timing(damageAnim, {
           toValue: 0.5,
-          duration: 200,
+          duration: flashDuration,
           useNativeDriver: true,
         }),
         Animated.timing(damageAnim, {
           toValue: 1,
-          duration: 200,
+          duration: flashDuration,
           useNativeDriver: true,
         }),
       ]),
-      { iterations: 2 },
-    ).start(onComplete);
+      { iterations: iterations },
+    ).start(() => {
+      // Ensure the opacity is reset to 1 at the end
+      damageAnim.setValue(1);
+      onComplete();
+    });
   };
 
   const runTextAnimation = (onComplete: () => void) => {
@@ -235,16 +271,25 @@ const EnemyDisplay = observer(
     useEffect(() => {
       if (healthState.diff !== 0) {
         if (healthState.diff < 0) {
-          animations.runDamageAnimation(() => {
-            setTimeout(() => {
-              setHealthState((prev) => ({
-                ...prev,
-                showing: false,
-                diff: 0,
-              }));
-            }, 500);
-          });
-          if (enemy.currentHealth <= 0) {
+          const hurtFrames = EnemyImageMap[enemy.sprite].sets.hurt?.frames || 6;
+          const deathFrames =
+            EnemyImageMap[enemy.sprite].sets.death?.frames || 12;
+          const isDeathAnimation = enemy.currentHealth <= 0;
+
+          animations.runDamageAnimation(
+            () => {
+              setTimeout(() => {
+                setHealthState((prev) => ({
+                  ...prev,
+                  showing: false,
+                  diff: 0,
+                }));
+              }, 500);
+            },
+            isDeathAnimation ? deathFrames : hurtFrames,
+            isDeathAnimation,
+          );
+          if (isDeathAnimation) {
             setAnimationState("death");
           } else {
             setAnimationState("hurt");
@@ -276,31 +321,17 @@ const EnemyDisplay = observer(
       if (animationStore.attackDummy !== 0) {
         attackStateRef.current = "start";
         setAnimationState("move");
+        const sets = EnemyImageMap[enemy.sprite].sets;
 
-        animations.runAttackAnimation(
-          () => {
-            // This callback runs when the sprite reaches its peak distance
-            attackStateRef.current = "attacking";
-            setAnimationState("attack_1");
-          },
-          () => {
-            // This callback runs when the entire sequence completes
-            attackStateRef.current = "start";
-            setAnimationState("idle");
-          },
-        );
+        animations.runAttackAnimation({
+          attackAnimationFrames: sets.attack_1.frames,
+          moveAnimationFrames: sets.move?.frames,
+          onReachPeak: () => setAnimationState("attack_1"),
+          onAttackEnd: () => setAnimationState("move"),
+          onComplete: () => setAnimationState("idle"),
+        });
       }
     }, [animationStore.attackDummy]);
-
-    useEffect(() => {
-      if (
-        attackStateRef.current === "returning" &&
-        animations.animations.attackAnim._value === 0
-      ) {
-        setAnimationState("idle");
-        attackStateRef.current = "start";
-      }
-    }, [animations.animations.attackAnim]);
 
     useEffect(() => {
       if (animationStore.dodgeDummy !== 0) {
@@ -384,7 +415,7 @@ const EnemyDisplay = observer(
           }}
         >
           <AnimatedSprite
-            spriteSet={EnemyImageMap.mimic}
+            spriteSet={EnemyImageMap[enemy.sprite]}
             currentAnimationState={animationState}
             setCurrentAnimationState={setAnimationState}
           />

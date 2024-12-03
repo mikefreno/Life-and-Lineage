@@ -97,7 +97,7 @@ export class Creature {
   gotDrops: boolean;
   threatTable: ThreatTable = new ThreatTable();
   enemyStore: EnemyStore | undefined;
-  readonly sprite: EnemyImageKeyOption;
+  readonly sprite: EnemyImageKeyOption = "zombie";
 
   constructor({
     id,
@@ -695,6 +695,7 @@ export class Enemy extends Creature {
       enemyStore,
     });
     this.minions = minions ?? [];
+    this.phaseTrigger = null; // currently phases have not been implemented
 
     makeObservable(this, {
       minions: observable,

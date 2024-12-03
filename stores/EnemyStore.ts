@@ -10,6 +10,7 @@ export default class EnemyStore {
   enemies: Enemy[];
   animationStoreMap: Map<string, AnimationStore>;
   attackAnimationsOnGoing: boolean;
+  activeAnimationCount: number = 0;
   root: RootStore;
 
   constructor({ root }: { root: RootStore }) {
@@ -28,7 +29,23 @@ export default class EnemyStore {
       setAttackAnimationOngoing: action,
       removeEnemy: action,
       clearEnemyList: action,
+      activeAnimationCount: observable,
+      incrementActiveAnimations: action,
+      decrementActiveAnimations: action,
     });
+  }
+
+  incrementActiveAnimations() {
+    this.activeAnimationCount++;
+    this.setAttackAnimationOngoing(true);
+  }
+
+  decrementActiveAnimations() {
+    this.activeAnimationCount--;
+    if (this.activeAnimationCount <= 0) {
+      this.activeAnimationCount = 0;
+      this.setAttackAnimationOngoing(false);
+    }
   }
 
   public setAttackAnimationOngoing(state: boolean) {
@@ -41,6 +58,7 @@ export default class EnemyStore {
       enemy.id,
       new AnimationStore({ root: this.root }),
     );
+    this.enemySave(enemy);
   }
 
   public removeEnemy(enemy: Enemy) {
@@ -90,6 +108,7 @@ export default class EnemyStore {
       } catch (e) {}
     }
   };
+
   public saveEnemy = throttle(this.enemySave, 250);
 
   private clearPersistedEnemies() {
@@ -102,6 +121,7 @@ export default class EnemyStore {
       }
     });
   }
+
   private clearPersistedEnemy(enemyId: string) {
     storage.delete(`enemy_${enemyId}`);
 

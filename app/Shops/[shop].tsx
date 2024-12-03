@@ -28,9 +28,9 @@ import { useVibration } from "../../hooks/generic";
 import type { Item } from "../../entities/item";
 
 const TEN_MINUTES = 10 * 60 * 1000;
-//const ONE_SECOND = 1000;
-//const REFRESH_TIME = __DEV__ ? ONE_SECOND : TEN_MINUTES;
-const REFRESH_TIME = TEN_MINUTES;
+const ONE_SECOND = 1000;
+const REFRESH_TIME = __DEV__ ? ONE_SECOND : TEN_MINUTES;
+//const REFRESH_TIME = TEN_MINUTES;
 
 const GreetingComponent = ({
   greeting,
@@ -329,7 +329,7 @@ const ShopInteriorScreen = observer(() => {
           </View>
         </TouchableWithoutFeedback>
         {displayItem && (
-          <View className="absolute z-10">
+          <View className="absolute z-10" pointerEvents="box-none">
             <StatsDisplay
               displayItem={displayItem}
               shop={thisShop}

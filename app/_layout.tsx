@@ -31,6 +31,9 @@ import FleeModal from "../components/DungeonComponents/FleeModal";
 import { DungeonProvider } from "../providers/DungeonData";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 import { LoadingBoundary } from "../components/LoadingBoundary";
+import { PlayerCharacter } from "../entities/character";
+import { RootStore } from "../stores/RootStore";
+import { DungeonStore } from "../stores/DungeonStore";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -130,12 +133,7 @@ const RootLayout = observer(() => {
     if (!firstLoad && rootStore.constructed && systemColor) {
       setColorScheme(uiStore.colorScheme);
     }
-  }, [
-    uiStore.colorScheme,
-    firstLoad,
-    rootStore.constructed,
-    uiStore.triggerRerender,
-  ]);
+  }, [uiStore.colorScheme, firstLoad, rootStore.constructed]);
 
   useEffect(() => {
     if (expoPushToken && !sentToken) {
@@ -150,36 +148,70 @@ const RootLayout = observer(() => {
     }
   }, [expoPushToken]);
 
-  useEffect(() => {
-    if (
-      rootStore.atDeathScreen ||
-      (playerState &&
-        (playerState.currentHealth <= 0 ||
-          playerState.currentSanity <= -playerState.maxSanity))
-    ) {
-      if (pathname !== "/DungeonLevel") {
-        router.replace("/DeathScreen");
-      }
+  const handleRouting = (
+    playerState: PlayerCharacter | undefined,
+    rootStore: RootStore,
+    dungeonStore: DungeonStore,
+    pathname: string,
+  ) => {
+    if (!playerState) {
+      router.replace("/NewGame/ClassSelect");
+      return;
     }
-  }, [playerState?.currentHealth, playerState?.currentSanity]);
 
-  // TODO: Break down this logic and move it, so I drop the top level observer
+    const isDead =
+      rootStore.atDeathScreen ||
+      playerState.currentHealth <= 0 ||
+      playerState.currentSanity <= -playerState.maxSanity;
+
+    if (isDead && pathname !== "/DeathScreen") {
+      router.replace("/DeathScreen");
+      return;
+    }
+
+    if (dungeonStore.hasPersistedState) {
+      router.replace("/DungeonLevel");
+    }
+  };
+
+  // Initial load effect
   useEffect(() => {
-    if (fontLoaded && rootStore.constructed && firstLoad) {
-      SplashScreen.hideAsync();
-      if (!playerState) {
-        router.replace("/NewGame/ClassSelect");
-      } else if (dungeonStore.hasPersistedState) {
-        router.replace("/DungeonLevel");
+    const initializeApp = async () => {
+      if (fontLoaded && rootStore.constructed && firstLoad) {
+        await SplashScreen.hideAsync();
+        setColorScheme(uiStore.colorScheme);
+        handleRouting(playerState, rootStore, dungeonStore, pathname);
+        setFirstLoad(false);
       }
-      setColorScheme(uiStore.colorScheme);
-      setFirstLoad(false);
+    };
+
+    initializeApp();
+  }, [fontLoaded, rootStore.constructed, firstLoad]);
+
+  // Death check effect
+  useEffect(() => {
+    if (!firstLoad && playerState) {
+      const isDead =
+        rootStore.atDeathScreen ||
+        playerState.currentHealth <= 0 ||
+        playerState.currentSanity <= -playerState.maxSanity;
+
+      if (
+        isDead &&
+        pathname !== "/DeathScreen" &&
+        pathname.split("/")[1] !== "NewGame"
+      ) {
+        // Add a small delay to ensure root layout is mounted
+        setTimeout(() => {
+          router.replace("/DeathScreen");
+        }, 0);
+      }
     }
   }, [
-    fontLoaded,
-    rootStore.constructed,
-    dungeonStore.hasPersistedState,
     firstLoad,
+    playerState?.currentHealth,
+    playerState?.currentSanity,
+    rootStore.atDeathScreen,
   ]);
 
   while (!fontLoaded || !rootStore.constructed) {

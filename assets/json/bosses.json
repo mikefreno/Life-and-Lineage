@@ -13,6 +13,7 @@
       "grab",
       "zombie bite"
     ],
+    "sprite": "zombie",
     "drops": [
       {
         "item": "chunk of flesh",
@@ -44,6 +45,7 @@
       "raise skeleton",
       "teeth"
     ],
+    "sprite": "necromancer",
     "drops": [
       {
         "item": "dagger",

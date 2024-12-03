@@ -1,5 +1,6 @@
 import { action, makeObservable, observable } from "mobx";
 import { type RootStore } from "./RootStore";
+export const FPS = 12;
 
 export class AnimationStore {
   textString: string | undefined = undefined;

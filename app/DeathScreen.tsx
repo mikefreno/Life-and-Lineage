@@ -38,7 +38,7 @@ export default function DeathScreen() {
   const [page, setPage] = useState<number>(0);
 
   const root = useRootStore();
-  const { playerState, uiStore, dungeonStore } = root;
+  const { playerState, uiStore } = root;
   const vibration = useVibration();
   const { colorScheme } = useColorScheme();
 

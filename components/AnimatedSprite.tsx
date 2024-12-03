@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { Image } from "expo-image";
-import { EnemyImageValueOption } from "../utility/enemyHelpers";
+import { EnemyImageMap, EnemyImageValueOption } from "../utility/enemyHelpers";
+import { FPS } from "../stores/AnimationStore";
 
 interface AnimatedSpriteProps {
   spriteSet: EnemyImageValueOption;
   currentAnimationState: string | undefined;
-  setCurrentAnimationState: React.Dispatch<
+  setCurrentAnimationState?: React.Dispatch<
     React.SetStateAction<string | undefined>
   >;
   displayHeight?: number;
@@ -15,15 +16,12 @@ interface AnimatedSpriteProps {
 }
 
 export const AnimatedSprite: React.FC<AnimatedSpriteProps> = ({
-  spriteSet,
+  spriteSet = EnemyImageMap["zombie"],
   currentAnimationState,
   setCurrentAnimationState,
-  fps = 8,
 }) => {
   const [currentFrame, setCurrentFrame] = useState(0);
-  const [activeAnimation, setActiveAnimation] = useState(
-    "spawn" in spriteSet.sets ? "spawn" : "idle",
-  );
+  const [activeAnimation, setActiveAnimation] = useState("idle");
   const animationRef = useRef<NodeJS.Timeout>();
   const frameCompletionCounter = useRef(0);
   const hasSpawnAnimationPlayed = useRef(false);
@@ -45,21 +43,30 @@ export const AnimatedSprite: React.FC<AnimatedSpriteProps> = ({
   const scale = Math.min(scaleX, scaleY);
   const mirrorTransform = spriteSet.mirror ? [{ scaleX: -1 }] : [];
 
-  useEffect(() => console.log(activeAnimation),[activeAnimation]);
-
   useEffect(() => {
     const runAnimation = () => {
       animationRef.current = setInterval(() => {
         setCurrentFrame((prevFrame) => {
-          const currentSet = spriteSet.sets[activeAnimation];
-          const nextFrame = (prevFrame + 1) % currentSet.frames;
+          const nextFrame =
+            (prevFrame + 1) %
+            (activeAnimation in spriteSet.sets &&
+            spriteSet.sets[activeAnimation]
+              ? spriteSet.sets[activeAnimation].frames
+              : spriteSet.sets.idle.frames);
 
           if (nextFrame === 0) {
             frameCompletionCounter.current += 1;
+
+            if (
+              activeAnimation !== "idle" &&
+              currentAnimationState === undefined
+            ) {
+              setActiveAnimation("idle");
+            }
           }
           return nextFrame;
         });
-      }, 1000 / fps);
+      }, 1000 / FPS);
     };
 
     // Handle spawn animation completion
@@ -70,12 +77,14 @@ export const AnimatedSprite: React.FC<AnimatedSpriteProps> = ({
     ) {
       hasSpawnAnimationPlayed.current = true;
       setActiveAnimation("idle");
-      setCurrentAnimationState(undefined);
+
+      if (setCurrentAnimationState) {
+        setCurrentAnimationState(undefined);
+      }
       frameCompletionCounter.current = 0;
       return;
     }
 
-    // Handle other animation state changes
     if (currentAnimationState && currentAnimationState !== activeAnimation) {
       setActiveAnimation(currentAnimationState);
       frameCompletionCounter.current = 0;
@@ -84,7 +93,9 @@ export const AnimatedSprite: React.FC<AnimatedSpriteProps> = ({
 
     // Handle animation completion
     if (frameCompletionCounter.current > 0 && activeAnimation !== "idle") {
-      setCurrentAnimationState(undefined);
+      if (setCurrentAnimationState) {
+        setCurrentAnimationState(undefined);
+      }
       setActiveAnimation("idle");
     }
 
@@ -98,14 +109,10 @@ export const AnimatedSprite: React.FC<AnimatedSpriteProps> = ({
   }, [
     activeAnimation,
     currentAnimationState,
-    fps,
+    FPS,
     setCurrentAnimationState,
     spriteSet.sets,
   ]);
-
-  const validAnimation = spriteSet.sets[activeAnimation]
-    ? activeAnimation
-    : "idle";
 
   return (
     <View
@@ -121,11 +128,20 @@ export const AnimatedSprite: React.FC<AnimatedSpriteProps> = ({
       <Image
         style={{
           position: "absolute",
-          width: spriteWidth * spriteSet.sets[validAnimation].frames,
+          width:
+            spriteWidth *
+            (activeAnimation in spriteSet.sets &&
+            spriteSet.sets[activeAnimation]
+              ? spriteSet.sets[activeAnimation].frames
+              : spriteSet.sets.idle.frames),
           height: spriteHeight,
           left: -currentFrame * spriteWidth,
         }}
-        source={spriteSet.sets[validAnimation].anim}
+        source={
+          activeAnimation in spriteSet.sets && spriteSet.sets[activeAnimation]
+            ? spriteSet.sets[activeAnimation].anim
+            : spriteSet.sets.idle.anim
+        }
       />
     </View>
   );

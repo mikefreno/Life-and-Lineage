@@ -216,7 +216,7 @@ const HomeScreen = observer(() => {
           </View>
         </TouchableWithoutFeedback>
         {displayItem && (
-          <View className="absolute z-10">
+          <View className="absolute z-10" pointerEvents="box-none">
             <StatsDisplay
               displayItem={displayItem}
               clearItem={clearDisplayItem}
