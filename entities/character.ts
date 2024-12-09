@@ -1310,7 +1310,7 @@ export class PlayerCharacter extends Character {
   }
 
   /**
-   * This should always be used over the `inventory` field
+   * This should always be used over the `baseInventory` field
    */
   get inventory() {
     const condensedInventory: { item: Item[] }[] = [];

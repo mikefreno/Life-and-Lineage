@@ -20,7 +20,11 @@ import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import { elementalColorMap } from "../constants/Colors";
 import { getStartingBaseStats } from "../utility/functions/characterAid";
-import { savePlayer, type Character } from "../entities/character";
+import {
+  savePlayer,
+  type Character,
+  PlayerCharacter,
+} from "../entities/character";
 import { useRootStore } from "../hooks/stores";
 import { useVibration } from "../hooks/generic";
 import { Item } from "../entities/item";
@@ -80,8 +84,9 @@ export default function DeathScreen() {
         investments: playerState?.investments,
         gold: playerState.gold / playerState.children.length ?? 1,
         keyItems: playerState?.keyItems,
-        inventory: inventory,
+        baseInventory: inventory,
         ...getStartingBaseStats({ classSelection: selectedClass }),
+        root,
       });
       return newCharacter;
     }

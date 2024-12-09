@@ -21,11 +21,11 @@ import {
 } from "../components/DungeonComponents/DungeonMap";
 import { Dimensions } from "react-native";
 import { wait } from "../utility/functions/misc";
+import { ParallaxOptions } from "../components/DungeonComponents/Parallax";
 
 export class DungeonStore {
   root: RootStore;
   dungeonInstances: DungeonInstance[];
-  activityInstance: DungeonInstance;
 
   currentInstance: DungeonInstance | undefined;
   currentLevel: DungeonLevel | undefined;
@@ -43,7 +43,6 @@ export class DungeonStore {
   constructor({ root }: { root: RootStore }) {
     this.root = root;
     this.dungeonInstances = this.hydrateDungeonState();
-    this.activityInstance = this.initActivityDungeon();
 
     const currentDungeonHydration = this.hydrateCurrentDungeonState();
     if (!currentDungeonHydration) {
@@ -452,11 +451,21 @@ export class DungeonStore {
     return [trainingGrounds, nearbyCave];
   }
 
-  setActivityName(name: string) {
-    this.activityInstance.name = name.replaceAll("%20", " ");
-  }
+  //setActivityName(name: string) {
+  //this.activityInstance.name = name.replaceAll("%20", " ");
+  //}
 
-  initActivityDungeon() {
+  initActivityDungeon(background: ParallaxOptions) {
+    const activityInstance = new DungeonInstance({
+      name: "activity",
+      levels: [] as DungeonLevel[],
+      unlocks: [],
+      id: -1,
+      difficulty: -1,
+      dungeonStore: this,
+      bgName: background,
+    });
+
     const activityDungeon = new DungeonLevel({
       level: 0,
       bossEncounter: [],
@@ -465,16 +474,9 @@ export class DungeonStore {
       bossDefeated: true,
       unlocked: true,
       dungeonStore: this,
+      parent: activityInstance,
     });
-
-    const activityInstance = new DungeonInstance({
-      name: "activity",
-      levels: [activityDungeon],
-      unlocks: [],
-      id: -1,
-      difficulty: -1,
-      dungeonStore: this,
-    });
+    activityInstance.setLevels([activityDungeon]);
 
     return activityInstance;
   }

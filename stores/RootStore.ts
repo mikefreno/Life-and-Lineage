@@ -1,4 +1,9 @@
-import { PlayerCharacter } from "../entities/character";
+import {
+  Character,
+  PlayerCharacter,
+  getStartingBook,
+  savePlayer,
+} from "../entities/character";
 import { storage } from "../utility/functions/storage";
 import { parse } from "flatted";
 import UIStore from "./UIStore";
@@ -68,7 +73,25 @@ export class RootStore {
   }
 
   inheritance() {
-    throw new Error("Method not implemented.");
+    let points = 0;
+    for (const inst of this.dungeonStore.dungeonInstances) {
+      for (const level of inst.levels) {
+        if (level.bossDefeated) {
+          points += 3;
+        }
+      }
+    }
+    return points;
+  }
+
+  newGame(newPlayer: PlayerCharacter) {
+    const starterBook = getStartingBook(newPlayer);
+    newPlayer.addToInventory(starterBook);
+    this.enemyStore.clearEnemyList();
+    this.playerState = newPlayer;
+    this.shopsStore.shopsMap = this.shopsStore.getInitShopsState();
+    savePlayer(newPlayer);
+    this.clearDeathScreen();
   }
 
   private generateLowSanityDebuff() {

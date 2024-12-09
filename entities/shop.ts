@@ -281,15 +281,17 @@ export function generateInventory(
   const tradesLength = trades.length;
   let items: Item[] = [];
 
-  // Special case: Add missing novice spell books if Books are in trades
   if (trades.includes(ItemClassType.Book)) {
     const classBooks = getClassSpecificBookList(player.playerClass);
     const noviceBooks = classBooks.filter((book) => book.baseValue === 2500);
     const missingNoviceBooks = noviceBooks.filter(
-      (book) => !player.knownSpells.includes(book.teaches),
+      (book) =>
+        !(
+          player.knownSpells.includes(book.teaches) &&
+          player.baseInventory.find((item) => item.name == book.name)
+        ),
     );
 
-    // Add missing novice books to items
     items = missingNoviceBooks.map((book) =>
       Item.fromJSON({
         ...book,

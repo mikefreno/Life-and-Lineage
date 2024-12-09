@@ -18,8 +18,34 @@ import { Attack } from "./attack";
 import attackObjects from "../assets/json/playerAttacks.json";
 import { action, computed, makeObservable, observable } from "mobx";
 import { Condition } from "./conditions";
-import { wait } from "../utility/functions/misc";
+import { toTitleCase, wait } from "../utility/functions/misc";
 import type { RootStore } from "../stores/RootStore";
+import PREFIXES from "../assets/json/prefix.json";
+import SUFFIXES from "../assets/json/suffix.json";
+
+interface ItemProps {
+  id?: string;
+  name: string;
+  slot?: "head" | "body" | "one-hand" | "two-hand" | "off-hand" | null;
+  stats?: Record<string, number> | null;
+  baseValue: number;
+  itemClass: ItemClassType;
+  icon?: string;
+  requirements?: { strength?: number; intelligence?: number };
+  stackable?: boolean;
+  attacks?: string[];
+  description?: string;
+  effect?: ItemEffect;
+  activePoison?:
+    | Condition
+    | { effect: "health" | "mana" | "sanity"; amount: number }
+    | null;
+  rarity?: "normal" | "magic" | "rare" | null;
+  prefix?: Affix | null;
+  suffix?: Affix | null;
+  uses?: number;
+  root: RootStore;
+}
 
 export class Item {
   readonly id: string;
@@ -33,7 +59,10 @@ export class Item {
     | "quiver"
     | null;
   readonly itemClass: ItemClassType;
+  readonly rarity: "normal" | "magic" | "rare" | null;
   readonly stats: Record<string, number> | null;
+  readonly prefix: {} | null;
+  readonly suffix: {} | null;
   readonly baseValue: number;
   readonly icon: string | undefined;
   readonly stackable: boolean;
@@ -60,6 +89,9 @@ export class Item {
     baseValue,
     itemClass,
     icon,
+    rarity,
+    prefix,
+    suffix,
     requirements = {},
     root,
     attacks = [],
@@ -68,30 +100,46 @@ export class Item {
     effect,
     activePoison,
     uses,
-  }: {
-    id?: string;
-    name: string;
-    slot?: "head" | "body" | "one-hand" | "two-hand" | "off-hand" | null;
-    stats?: Record<string, number> | null;
-    baseValue: number;
-    itemClass: ItemClassType;
-    icon?: string;
-    requirements?: { strength?: number; intelligence?: number };
-    stackable?: boolean;
-    attacks?: string[];
-    description?: string;
-    effect?: ItemEffect;
-    activePoison?:
-      | Condition
-      | { effect: "health" | "mana" | "sanity"; amount: number }
-      | null;
-    uses?: number;
-    root: RootStore;
-  }) {
-    this.id = id ?? Crypto.randomUUID();
-    this.name = name;
+  }: ItemProps) {
+    this.id = id ?? crypto.randomUUID();
+
+    if (ItemRarityService.isEquipable(slot ?? null)) {
+      if (prefix || suffix || rarity) {
+        this.rarity = rarity ?? "normal";
+        this.prefix = prefix ?? null;
+        this.suffix = suffix ?? null;
+        this.stats = stats ?? null;
+        this.name = name;
+      } else {
+        const rolledRarity = ItemRarityService.rollRarity();
+        const { prefix: rolledPrefix, suffix: rolledSuffix } =
+          ItemRarityService.generateAffixes(rolledRarity);
+
+        this.rarity = rolledRarity;
+        this.prefix = rolledPrefix;
+        this.suffix = rolledSuffix;
+
+        this.stats = ItemRarityService.applyAffixesToStats(
+          stats ?? null,
+          rolledPrefix,
+          rolledSuffix,
+        );
+
+        this.name = ItemRarityService.generateItemName(
+          name,
+          rolledPrefix,
+          rolledSuffix,
+        );
+      }
+    } else {
+      this.rarity = "normal";
+      this.prefix = null;
+      this.suffix = null;
+      this.stats = stats ?? null;
+      this.name = name;
+    }
+
     this.slot = slot ?? null;
-    this.stats = stats ?? null;
     this.baseValue = baseValue;
     this.itemClass = itemClass;
     this.icon = icon;
@@ -105,6 +153,7 @@ export class Item {
     this.uses = uses ?? null;
 
     makeObservable(this, {
+      name: observable,
       attachedSpell: computed,
       attachedAttacks: computed,
       playerHasRequirements: computed,
@@ -344,6 +393,9 @@ export class Item {
       name: json.name,
       slot: json.slot,
       stats: json.stats,
+      prefix: json.prefix,
+      suffix: json.suffix,
+      rarity: json.rarity,
       baseValue: json.baseValue,
       itemClass: json.itemClass,
       stackable: isStackable(json.itemClass),
@@ -446,3 +498,186 @@ export const isStackable = (itemClass: ItemClassType) => {
       return false;
   }
 };
+
+type Affix = {
+  name: {
+    [tier: string]: string;
+  };
+  modifier: {
+    [stat: string]:
+      | Array<{
+          [tier: string]: {
+            min: number;
+            max: number;
+          };
+        }>
+      | undefined;
+  };
+  tiers: number;
+};
+
+function hasProp<K extends PropertyKey>(
+  data: object,
+  prop: K,
+): data is Record<K, unknown> {
+  return prop in data;
+}
+
+function assertNonNull<T>(value: T | null | undefined): asserts value is T {
+  if (value === null || value === undefined) {
+    throw new Error("Value is null or undefined");
+  }
+}
+
+const RARITY_CHANCES = {
+  RARE: 10,
+  MAGIC: 25,
+};
+
+export class ItemRarityService {
+  static isEquipable(slot: string | null): boolean {
+    if (!slot) return false;
+    return [
+      "head",
+      "body",
+      "one-hand",
+      "two-hand",
+      "off-hand",
+      "quiver",
+    ].includes(slot);
+  }
+
+  static rollRarity(): "normal" | "magic" | "rare" {
+    const roll = Math.random() * 100;
+
+    if (roll <= RARITY_CHANCES.RARE) {
+      return "rare";
+    } else if (roll <= RARITY_CHANCES.RARE + RARITY_CHANCES.MAGIC) {
+      return "magic";
+    }
+
+    return "normal";
+  }
+
+  static getRandomAffix(affixes: Affix[]): { affix: Affix; tier: number } {
+    const index = Math.floor(Math.random() * affixes.length);
+    const affix = affixes[index];
+    const tier = this.rollTier(affix.tiers);
+    return { affix, tier };
+  }
+
+  static rollTier(maxTier: number): number {
+    const T1_CHANCE = 0.05;
+    const base = Math.pow(T1_CHANCE, 1 / (maxTier - 1));
+
+    const roll = Math.random();
+    let cumulativeProbability = 0;
+
+    for (let tier = maxTier; tier >= 1; tier--) {
+      const probability = Math.pow(base, tier - 1) * (1 - base);
+      cumulativeProbability += probability;
+
+      if (roll <= cumulativeProbability) {
+        return tier;
+      }
+    }
+    return maxTier;
+  }
+
+  static generateAffixes(rarity: "normal" | "magic" | "rare"): {
+    prefix: { affix: Affix; tier: number } | null;
+    suffix: { affix: Affix; tier: number } | null;
+  } {
+    switch (rarity) {
+      case "rare":
+        return {
+          prefix: this.getRandomAffix(PREFIXES as Affix[]),
+          suffix: this.getRandomAffix(SUFFIXES),
+        };
+      case "magic":
+        // 50/50 chance for prefix or suffix
+        return Math.random() < 0.5
+          ? { prefix: this.getRandomAffix(PREFIXES as Affix[]), suffix: null }
+          : { prefix: null, suffix: this.getRandomAffix(SUFFIXES) };
+      default:
+        return { prefix: null, suffix: null };
+    }
+  }
+
+  static rollStatValue(range: { min: number; max: number }): number {
+    return Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
+  }
+
+  static applyAffixesToStats(
+    baseStats: Record<string, number> | null,
+    prefix: { affix: Affix; tier: number } | null,
+    suffix: { affix: Affix; tier: number } | null,
+  ): Record<string, number> {
+    const stats = { ...baseStats } || {};
+
+    const applyModifiers = (affix: Affix, tier: number) => {
+      Object.entries(affix.modifier).forEach(([stat, modifiers]) => {
+        if (modifiers) {
+          modifiers.forEach((modifier) => {
+            if (hasProp(modifier, tier.toString())) {
+              const range = modifier[tier.toString()];
+              assertNonNull(range);
+              const value = this.rollStatValue(range);
+              stats[stat] = (stats[stat] || 0) + value;
+            }
+          });
+        }
+      });
+    };
+
+    if (prefix) {
+      applyModifiers(prefix.affix, prefix.tier);
+    }
+    if (suffix) {
+      applyModifiers(suffix.affix, suffix.tier);
+    }
+
+    return stats;
+  }
+
+  static generateItemName(
+    baseName: string,
+    prefix: { affix: Affix; tier: number } | null,
+    suffix: { affix: Affix; tier: number } | null,
+  ): string {
+    let name = baseName;
+    if (prefix) {
+      name = `${toTitleCase(
+        prefix.affix.name[prefix.tier.toString()],
+      )} ${name}`;
+    }
+    if (suffix) {
+      name = `${name} of the ${toTitleCase(
+        suffix.affix.name[suffix.tier.toString()],
+      )}`;
+    }
+    return name;
+  }
+  static calculateValueModifier(tier: number): number {
+    const baseMod = 2; // 200% increase for tier 1
+    const reductionFactor = 0.65;
+    return Math.pow(baseMod * reductionFactor, tier - 1);
+  }
+
+  static calculateModifiedValue(
+    baseValue: number,
+    prefix: { affix: Affix; tier: number } | null,
+    suffix: { affix: Affix; tier: number } | null,
+  ): number {
+    let valueModifier = 1;
+
+    if (prefix) {
+      valueModifier += this.calculateValueModifier(prefix.tier);
+    }
+    if (suffix) {
+      valueModifier += this.calculateValueModifier(suffix.tier);
+    }
+
+    return Math.round(baseValue * valueModifier);
+  }
+}

@@ -1,5 +1,6 @@
 import {
   Animated,
+  Dimensions,
   LayoutChangeEvent,
   Pressable,
   ScrollView,
@@ -87,13 +88,14 @@ export function StatsDisplay({
   ).current;
 
   useEffect(() => {
+    const pad = 4;
     // Calculate target positions
     const targetLeft =
       firstItem.itemClass == ItemClassType.Book
-        ? 20
+        ? Dimensions.get("window").width * 0.125 - 20
         : displayItem.position.left + itemBlockSize < dimensions.width * 0.6
-        ? displayItem.position.left + itemBlockSize
-        : displayItem.position.left - viewWidth - 4;
+        ? displayItem.position.left + itemBlockSize + pad
+        : displayItem.position.left - viewWidth - pad;
 
     const targetTop =
       topGuard && displayItem.position.top + (topOffset ?? 0) < topGuard
@@ -591,7 +593,11 @@ export function StatsDisplay({
             vibration({ style: "light" });
             setRenderStory(null);
           }}
-          className="absolute right-0 border-zinc-600 rounded-tr rounded-bl dark:border-zinc-400 px-2 py-1"
+          className={`${
+            displayItem.position.left + itemBlockSize < dimensions.width * 0.6
+              ? "left-0"
+              : "right-0"
+          } absolute border-zinc-600 rounded-tr rounded-bl dark:border-zinc-400 px-2 py-1`}
         >
           <Text className="text-4xl">x</Text>
         </Pressable>
@@ -732,7 +738,11 @@ export function StatsDisplay({
       >
         <Pressable
           onPress={() => clearItem()}
-          className="absolute right-0 border-zinc-600 rounded-tr rounded-bl dark:border-zinc-400 px-2 py-1"
+          className={`${
+            displayItem.position.left + itemBlockSize < dimensions.width * 0.6
+              ? "left-0"
+              : "right-0"
+          } absolute border-zinc-600 rounded-tr rounded-bl dark:border-zinc-400 px-2 py-1`}
         >
           <Text className="-mt-3 -ml-1 text-2xl">x</Text>
         </Pressable>

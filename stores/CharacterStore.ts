@@ -4,29 +4,35 @@ import { RootStore } from "./RootStore";
 import { action, makeObservable, observable, reaction } from "mobx";
 import { throttle } from "lodash";
 import { Character, PlayerCharacter } from "../entities/character";
+import {
+  flipCoin,
+  getRandomName,
+  getRandomPersonality,
+} from "../utility/functions/misc";
 
 export class CharacterStore {
-  adopt(arg0: {
-    adoptee: Character;
-    player: PlayerCharacter;
-    partner: Character | undefined;
-  }): void {
-    throw new Error("Method not implemented.");
-  }
-  independantChildrenAgeCheck() {
-    throw new Error("Method not implemented.");
-  }
-  @observable characters: Character[] = [];
-  @observable independentChildren: Character[] = [];
+  characters: Character[] = [];
+  independentChildren: Character[] = []; // adoptable
   root: RootStore;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
-    makeObservable(this);
 
     const { characters, independentChildren } = this.hydrateCharacters();
     this.characters = characters;
     this.independentChildren = independentChildren;
+
+    makeObservable(this, {
+      characters: observable,
+      independentChildren: observable,
+      createIndependantChild: action,
+      addCharacter: action,
+      removeCharacter: action,
+      setPlayer: action,
+      clearCharacters: action,
+      adopt: action,
+      independantChildrenAgeCheck: action,
+    });
 
     reaction(
       () => [this.characters, this.independentChildren],
@@ -36,42 +42,77 @@ export class CharacterStore {
     );
   }
 
-  @action
+  adopt({
+    child,
+    partner,
+  }: {
+    child: Character;
+    partner: Character | undefined;
+  }) {
+    this.removeIndependentChild({ child, adopting: true });
+    this.root.playerState?.adopt({ child, partner });
+  }
+
+  independantChildrenAgeCheck() {
+    for (const child of this.independentChildren) {
+      if (child.age >= 16) {
+        this.removeIndependentChild({ child });
+        this.independentChildren;
+      }
+    }
+  }
+
   addCharacter(character: Character) {
     this.characters.push(character);
     this.saveCharacter(character);
   }
 
-  @action
   removeCharacter(characterId: string) {
     this.characters = this.characters.filter((c) => c.id !== characterId);
     this.clearPersistedCharacter(characterId);
   }
 
-  @action
   setPlayer(player: PlayerCharacter) {
     this.addCharacter(player);
   }
 
-  @action
-  addIndependentChild(child: Character) {
-    this.independentChildren.push(child);
-    this.saveCharacter(child);
-  }
-
-  @action
-  removeIndependentChild(childId: string) {
-    this.independentChildren = this.independentChildren.filter(
-      (c) => c.id !== childId,
-    );
-    this.clearPersistedCharacter(childId);
-  }
-
-  @action
   clearCharacters() {
     this.characters = [];
     this.independentChildren = [];
     this.clearPersistedCharacters();
+  }
+
+  public createIndependantChild() {
+    const sex = flipCoin() == "Heads" ? "male" : "female";
+    const name = getRandomName(sex);
+    const birthdate = this.root.time.generateBirthDateInRange(1, 17);
+    const randomPersonality = getRandomPersonality();
+
+    const child = new Character({
+      sex: sex,
+      firstName: name.firstName,
+      lastName: name.lastName,
+      birthdate: birthdate,
+      personality: randomPersonality,
+      root: this.root,
+    });
+    this.independentChildren.push(child);
+    this.saveCharacter(child);
+  }
+
+  private removeIndependentChild({
+    child,
+    adopting = false,
+  }: {
+    child: Character;
+    adopting?: boolean;
+  }) {
+    this.independentChildren.filter((char) => char.id !== child.id);
+    if (adopting) {
+      this.addCharacter(child);
+    } else {
+      this.clearPersistedCharacter(child.id);
+    }
   }
 
   private hydrateCharacters() {

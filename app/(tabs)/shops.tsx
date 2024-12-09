@@ -60,7 +60,9 @@ const ShopsScreen = observer(() => {
             The {toTitleCase(shop.archetype)}
           </Text>
           <View className="items-center">
-            <CharacterImage character={shop.shopKeeper} />
+            <View className="w-1/2">
+              <CharacterImage character={shop.shopKeeper} />
+            </View>
             <Text
               className="text-center"
               style={{

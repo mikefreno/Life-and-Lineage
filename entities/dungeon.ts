@@ -27,7 +27,6 @@ interface DungeonInstanceOptions {
   unlocks: string[];
   levels: DungeonLevel[];
   dungeonStore: DungeonStore;
-  parallax: string;
 }
 
 /**
@@ -61,7 +60,11 @@ export class DungeonInstance {
     );
     this.unlocks = unlocks;
     this.dungeonStore = dungeonStore;
-    makeObservable(this, { levels: observable.deep, unlockNextLevel: action });
+    makeObservable(this, {
+      levels: observable.deep,
+      setLevels: action,
+      unlockNextLevel: action,
+    });
 
     reaction(
       () => [this.levels],
@@ -85,6 +88,13 @@ export class DungeonInstance {
     return false;
   }
 
+  /**
+   * Use this for activity / assault instance set up
+   */
+  public setLevels(levels: DungeonLevel[]) {
+    this.levels = levels;
+  }
+
   static fromJSON(json: any): DungeonInstance {
     const instance = new DungeonInstance({
       id: json.id,
@@ -94,7 +104,6 @@ export class DungeonInstance {
       levels: json.levels,
       unlocks: json.unlocks,
       dungeonStore: json.dungeonStore,
-      parallax: json.parallax,
     });
 
     return instance;

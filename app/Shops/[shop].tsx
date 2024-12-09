@@ -30,7 +30,6 @@ import type { Item } from "../../entities/item";
 const TEN_MINUTES = 10 * 60 * 1000;
 const ONE_SECOND = 1000;
 const REFRESH_TIME = __DEV__ ? ONE_SECOND : TEN_MINUTES;
-//const REFRESH_TIME = TEN_MINUTES;
 
 const GreetingComponent = ({
   greeting,
@@ -228,9 +227,9 @@ const ShopInteriorScreen = observer(() => {
 
         <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
           <View className="flex-1 justify-between">
-            <View className="flex h-[40%] flex-row justify-between">
+            <View className="flex h-[40%] flex-row justify-evenly">
               <View className="items-center w-1/3 my-auto px-1">
-                <CharacterImage character={thisShop.shopKeeper} />
+                <CharacterImage character={thisShop.shopKeeper} scale={0.3} />
                 <GreetingComponent
                   greeting={greeting}
                   colorScheme={colorScheme}
@@ -251,7 +250,7 @@ const ShopInteriorScreen = observer(() => {
               </View>
               <View
                 onLayout={(e) => setShopBoundsOnLayout(e)}
-                className="shadow-soft w-2/3 rounded-l border-l border-b border-zinc-300 dark:border-zinc-700"
+                className="shadow-soft flex-1 rounded-l border-l border-b border-zinc-300 dark:border-zinc-700"
                 ref={shopInventoryTarget}
               >
                 <ThemedScrollView

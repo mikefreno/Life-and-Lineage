@@ -141,17 +141,10 @@ export default function NewGameReview() {
       if (tutorialState) {
         parsed = JSON.parse(tutorialState);
       }
-
       const player = createPlayerCharacter();
-      const starterBook = getStartingBook(player);
-      player.addToInventory(starterBook);
-      root.enemyStore.clearEnemyList();
-      root.playerState = player;
-      root.clearDeathScreen();
+      root.newGame(player);
       vibration({ style: "success" });
       wait(250).then(() => clearHistory(navigation));
-      savePlayer(player);
-      storage.delete("tutorialsEnabled");
     }
   }
 

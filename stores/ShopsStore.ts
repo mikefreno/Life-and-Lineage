@@ -3,7 +3,6 @@ import type { RootStore } from "./RootStore";
 import { storage } from "../utility/functions/storage";
 import { throttle } from "lodash";
 import { parse, stringify } from "flatted";
-import { type ShopkeeperPersonality } from "../utility/types";
 import shopsJSON from "../assets/json/shops.json";
 
 const SHOP_ARCHETYPES = [
@@ -49,16 +48,11 @@ export class ShopStore {
   getInitShopsState() {
     const map = new Map<string, Shop>();
     shopsJSON.forEach((shop) => {
-      const randIdx = Math.floor(
-        Math.random() * shop.possiblePersonalities.length,
-      );
-      const personality = shop.possiblePersonalities[randIdx];
       const newShop = new Shop({
         shopKeeper: generateShopKeeper(shop.type, this.root),
         baseGold: shop.baseGold,
         lastStockRefresh: new Date(),
         archetype: shop.type,
-        shopKeeperPersonality: personality as ShopkeeperPersonality,
         root: this.root,
       });
       _shopSave(newShop);
