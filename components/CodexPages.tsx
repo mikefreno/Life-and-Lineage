@@ -59,16 +59,27 @@ export function GearCodex() {
       </View>
       <View>
         <GenericStrikeAround>Bases</GenericStrikeAround>
-        Bases are the essentially the state of the item if it is 'Normal', these
-        will have some basic stats like damage for weapons and armor for armor.
-        They will also determine the stat requirements for the item.
+        <Text>
+          Bases are the essentially the state of the item if it is 'Normal',
+          these will have some basic stats like damage for weapons and armor for
+          armor. They will also determine the stat requirements for the item.
+        </Text>
       </View>
       <View>
         <GenericStrikeAround>Rarity</GenericStrikeAround>
-        This can be 'Normal'
+        <Text>
+          'Rarity' can be 'Normal', 'Magic' or 'Rare'. 'Magic' items have one
+          affix, this can be either a 'Prefix' or 'Suffix'. 'Rare' items have
+          both a 'Prefix' and 'Suffix'.
+        </Text>
       </View>
       <View>
         <GenericStrikeAround>Affixes</GenericStrikeAround>
+        <Text>
+          'Affixes' are of two variants, 'Prefix' or 'Suffix'. Prefixes add
+          attribute or defensive modifiers to items and Suffixes add offensive
+          modifiers.
+        </Text>
       </View>
     </View>
   );

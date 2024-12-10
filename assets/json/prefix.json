@@ -289,7 +289,7 @@
       "1": "impenetrable"
     },
     "modifier": {
-      "armor": [
+      "armorAdded": [
         {
           "4": {
             "min": 5,
@@ -320,7 +320,7 @@
       "1": "unyielding"
     },
     "modifier": {
-      "armor": [
+      "armorAdded": [
         {
           "4": {
             "min": 3,
@@ -373,16 +373,16 @@
       "fireResistance": [
         {
           "3": {
-            "min": 8,
-            "max": 10
+            "min": 0.08,
+            "max": 0.10
           },
           "2": {
-            "min": 11,
-            "max": 13
+            "min": 0.11,
+            "max": 0.13
           },
           "1": {
-            "min": 14,
-            "max": 16
+            "min": 0.14,
+            "max": 0.16
           }
         }
       ]
@@ -399,16 +399,16 @@
       "coldResistance": [
         {
           "3": {
-            "min": 8,
-            "max": 10
+            "min": 0.08,
+            "max": 0.10
           },
           "2": {
-            "min": 11,
-            "max": 13
+            "min": 0.11,
+            "max": 0.13
           },
           "1": {
-            "min": 14,
-            "max": 16
+            "min": 0.14,
+            "max": 0.16
           }
         }
       ]
@@ -425,16 +425,16 @@
       "lightningResistance": [
         {
           "3": {
-            "min": 8,
-            "max": 10
+            "min": 0.8,
+            "max": 0.10
           },
           "2": {
-            "min": 11,
-            "max": 13
+            "min": 0.11,
+            "max": 0.13
           },
           "1": {
-            "min": 14,
-            "max": 16
+            "min": 0.14,
+            "max": 0.16
           }
         }
       ]
@@ -451,16 +451,16 @@
       "poisonResistance": [
         {
           "3": {
-            "min": 8,
-            "max": 10
+            "min": 0.08,
+            "max": 0.10
           },
           "2": {
-            "min": 11,
-            "max": 13
+            "min": 0.11,
+            "max": 0.13
           },
           "1": {
-            "min": 14,
-            "max": 16
+            "min": 0.14,
+            "max": 0.16
           }
         }
       ]

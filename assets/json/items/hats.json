@@ -6,8 +6,7 @@
     "slot": "head",
     "stats": {
       "armor": 3,
-      "manaRegen": 1,
-      "mana": 0
+      "manaRegen": 1
     },
     "requirements": {
       "intelligence": 5
@@ -34,8 +33,7 @@
     "slot": "head",
     "stats": {
       "armor": 5,
-      "mana": 100,
-      "manaRegen": 0
+      "mana": 100
     },
     "requirements": {
       "intelligence": 8

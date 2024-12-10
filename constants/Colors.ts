@@ -1,5 +1,6 @@
 import type { Theme } from "@react-navigation/native";
-import { Element, PlayerClassOptions } from "../utility/types";
+import { Element, PlayerClassOptions, Rarity } from "../utility/types";
+import { ColorValue } from "react-native";
 
 // Core colors
 const tintColorLight = "#2f95dc";
@@ -119,4 +120,25 @@ export const playerClassColors: Record<PlayerClassOptions, string> = {
   necromancer: "#9333ea",
   ranger: "#15803d",
   paladin: "#fcd34d",
+};
+
+export const rarityColors: Record<
+  Rarity,
+  {
+    background: { dark: ColorValue; light: ColorValue };
+    text: ColorValue | undefined;
+  }
+> = {
+  [Rarity.NORMAL]: {
+    background: { dark: "#09090bFA", light: "#f4f4f5" },
+    text: undefined,
+  },
+  [Rarity.MAGIC]: {
+    background: { dark: "#172554FA", light: "#dbeafe" },
+    text: "#3b82f6",
+  },
+  [Rarity.RARE]: {
+    background: { dark: "#2e1065FA", light: "#ede9fe" },
+    text: "#9333ea",
+  },
 };

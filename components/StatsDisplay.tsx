@@ -23,7 +23,12 @@ import {
   Sanity,
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
-import { Attribute, ItemClassType, MasteryToString } from "../utility/types";
+import {
+  Attribute,
+  ItemClassType,
+  MasteryToString,
+  RarityAsString,
+} from "../utility/types";
 import GenericModal from "./GenericModal";
 import GenericStrikeAround from "./GenericStrikeAround";
 import type { Item } from "../entities/item";
@@ -32,7 +37,7 @@ import { useRootStore } from "../hooks/stores";
 import { Condition } from "../entities/conditions";
 import { useEnemyManagement } from "../hooks/combat";
 import type { Shop } from "../entities/shop";
-import { Fish } from "lucide-react";
+import { rarityColors } from "../constants/Colors";
 
 type BaseProps = {
   displayItem: {
@@ -686,22 +691,6 @@ export function StatsDisplay({
     setViewHeight(height);
   };
 
-  const getMainBGColor = () => {
-    if (
-      firstItem.isEquippable &&
-      firstItem.rarity &&
-      firstItem.rarity !== "normal"
-    ) {
-      if (firstItem.rarity == "rare") {
-        return colorScheme == "light" ? "#ede9fe" : "#2e1065";
-      } else {
-        return colorScheme == "light" ? "#dbeafe" : "#172554";
-      }
-    } else {
-      return colorScheme == "light" ? "#f4f4f5" : "#09090b";
-    }
-  };
-
   while (!itemBlockSize) {
     return <></>;
   }
@@ -716,7 +705,7 @@ export function StatsDisplay({
           {playerState &&
             firstItem.attachedAttacks.map((attack) => (
               <View key={`${firstItem.id}-${attack.name}`}>
-                {attack.AttackRender(firstItem.stats?.damage)}
+                {attack.AttackRender(firstItem.totalDamage)}
               </View>
             ))}
         </View>
@@ -737,14 +726,15 @@ export function StatsDisplay({
         </ScrollView>
       </GenericModal>
       <Animated.View
-        className={`items-center rounded-md border border-zinc-600 p-4 bg-[${getMainBGColor()}]/90`}
+        className={`items-center rounded-md border border-zinc-600 p-4`}
         onLayout={onLayoutView}
         style={[
           firstItem.itemClass == ItemClassType.Book
             ? {}
             : { width: dimensions.width * 0.4 },
           {
-            backgroundColor: getMainBGColor(),
+            backgroundColor:
+              rarityColors[firstItem.rarity].background[colorScheme],
             left: animatedLeft,
             top: animatedTop,
           },
@@ -761,26 +751,22 @@ export function StatsDisplay({
           <Text className="-mt-3 -ml-1 text-2xl">x</Text>
         </Pressable>
         <View>
-          <Text className="text-center">{toTitleCase(firstItem.name)}</Text>
+          <Text className="text-center">{firstItem.name}</Text>
         </View>
         <RequirementsBlock />
-        {firstItem.isEquippable && firstItem.rarity && (
-          <GenericStrikeAround>
-            <Text
-              className="text-lg"
-              style={{
-                color:
-                  firstItem.rarity == "rare"
-                    ? "#9333ea"
-                    : firstItem.rarity == "magic"
-                    ? "#3b82f6"
-                    : undefined,
-              }}
-            >
-              {toTitleCase(firstItem.rarity)}
-            </Text>
-          </GenericStrikeAround>
-        )}
+        {firstItem.isEquippable &&
+          firstItem.itemClass !== ItemClassType.Arrow && (
+            <GenericStrikeAround>
+              <Text
+                className="text-lg"
+                style={{
+                  color: rarityColors[firstItem.rarity ?? 0].text,
+                }}
+              >
+                {RarityAsString[firstItem.rarity]}
+              </Text>
+            </GenericStrikeAround>
+          )}
         {(firstItem.slot == "one-hand" ||
           firstItem.slot == "two-hand" ||
           firstItem.slot == "off-hand") && (
@@ -794,7 +780,7 @@ export function StatsDisplay({
 
         {firstItem.stats && firstItem.slot && (
           <View className="py-2">
-            <GearStatsDisplay stats={firstItem.stats} />
+            <GearStatsDisplay item={firstItem} />
           </View>
         )}
         {firstItem.activePoison && (

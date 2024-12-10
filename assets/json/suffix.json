@@ -63,10 +63,10 @@
   },
   {
     "name": {
-      "4": "chilling",
+      "4": "chilled",
       "3": "frozen",
-      "2": "arctic",
-      "1": "glacial"
+      "2": "glacier",
+      "1": "arctic"
     },
     "modifier": {
       "coldDamageAdded": [
@@ -95,8 +95,8 @@
   {
     "name": {
       "4": "static",
-      "3": "shocking",
-      "2": "electrifying",
+      "3": "shocked",
+      "2": "electrified",
       "1": "thunderous"
     },
     "modifier": {
@@ -165,20 +165,20 @@
       "physicalDamageMultiplier": [
         {
           "4": {
-            "min": 5,
-            "max": 8
+            "min": 0.05,
+            "max": 0.08
           },
           "3": {
-            "min": 9,
-            "max": 12
+            "min": 0.09,
+            "max": 0.12
           },
           "2": {
-            "min": 13,
-            "max": 16
+            "min": 0.13,
+            "max": 0.16
           },
           "1": {
-            "min": 17,
-            "max": 20
+            "min": 0.17,
+            "max": 0.20
           }
         }
       ],
@@ -216,20 +216,20 @@
       "fireDamageMultiplier": [
         {
           "4": {
-            "min": 5,
-            "max": 8
+            "min": 0.05,
+            "max": 0.08
           },
           "3": {
-            "min": 9,
-            "max": 12
+            "min": 0.09,
+            "max": 0.12
           },
           "2": {
-            "min": 13,
-            "max": 16
+            "min": 0.13,
+            "max": 0.16
           },
           "1": {
-            "min": 17,
-            "max": 20
+            "min": 0.17,
+            "max": 0.20
           }
         }
       ],
@@ -258,7 +258,7 @@
   },
   {
     "name": {
-      "4": "icy",
+      "4": "chilly",
       "3": "frigid",
       "2": "frozen",
       "1": "arctic"
@@ -267,20 +267,20 @@
       "coldDamageMultiplier": [
         {
           "4": {
-            "min": 5,
-            "max": 8
+            "min": 0.05,
+            "max": 0.08
           },
           "3": {
-            "min": 9,
-            "max": 12
+            "min": 0.09,
+            "max": 0.12
           },
           "2": {
-            "min": 13,
-            "max": 16
+            "min": 0.13,
+            "max": 0.16
           },
           "1": {
-            "min": 17,
-            "max": 20
+            "min": 0.17,
+            "max": 0.20
           }
         }
       ],
@@ -318,20 +318,20 @@
       "lightningDamageMultiplier": [
         {
           "4": {
-            "min": 5,
-            "max": 8
+            "min": 0.05,
+            "max": 0.08
           },
           "3": {
-            "min": 9,
-            "max": 12
+            "min": 0.09,
+            "max": 0.12
           },
           "2": {
-            "min": 13,
-            "max": 16
+            "min": 0.13,
+            "max": 0.16
           },
           "1": {
-            "min": 17,
-            "max": 20
+            "min": 0.17,
+            "max": 0.20
           }
         }
       ],
@@ -362,27 +362,27 @@
     "name": {
       "4": "toxic",
       "3": "virulent",
-      "2": "pestilent",
+      "2": "malignant",
       "1": "plague-bearer"
     },
     "modifier": {
       "poisonDamageMultiplier": [
         {
           "4": {
-            "min": 5,
-            "max": 8
+            "min": 0.05,
+            "max": 0.08
           },
           "3": {
-            "min": 9,
-            "max": 12
+            "min": 0.09,
+            "max": 0.12
           },
           "2": {
-            "min": 13,
-            "max": 16
+            "min": 0.13,
+            "max": 0.16
           },
           "1": {
-            "min": 17,
-            "max": 20
+            "min": 0.17,
+            "max": 0.20
           }
         }
       ],

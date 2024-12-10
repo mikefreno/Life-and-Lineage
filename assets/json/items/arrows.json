@@ -6,7 +6,7 @@
     "icon": "Arrow",
     "stackable": true,
     "stats": {
-      "damage": 1.0
+      "physicalDamage": 1.0
     }
   },
   {
@@ -15,7 +15,7 @@
     "slot": "quiver",
     "icon": "Arrow",
     "stats": {
-      "damage": 1.5
+      "physicalDamage": 1.5
     },
     "requirements": {
       "dexterity": 5
@@ -27,7 +27,7 @@
     "slot": "quiver",
     "icon": "Arrow",
     "stats": {
-      "damage": 2.5
+      "physicalDamage": 2.5
     },
     "requirements": {
       "dexterity": 10
@@ -39,7 +39,7 @@
     "slot": "quiver",
     "icon": "Arrow",
     "stats": {
-      "damage": 3.5
+      "physicalDamage": 3.5
     },
     "requirements": {
       "dexterity": 15
@@ -51,7 +51,7 @@
     "slot": "quiver",
     "icon": "Arrow",
     "stats": {
-      "damage": 4.0
+      "physicalDamage": 4.0
     },
     "requirements": {
       "strength": 10,
@@ -64,7 +64,7 @@
     "slot": "quiver",
     "icon": "Arrow",
     "stats": {
-      "damage": 5.0
+      "physicalDamage": 5.0
     },
     "requirements": {
       "strength": 10,

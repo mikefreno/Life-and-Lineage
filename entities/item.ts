@@ -11,6 +11,8 @@ import {
   ItemClassType,
   PlayerClassOptions,
   ItemEffect,
+  Modifier,
+  Rarity,
 } from "../utility/types";
 import { Spell } from "./spell";
 import { Attack } from "./attack";
@@ -27,7 +29,7 @@ interface ItemProps {
   id?: string;
   name: string;
   slot?: "head" | "body" | "one-hand" | "two-hand" | "off-hand" | null;
-  stats?: Record<string, number> | null;
+  stats?: Partial<Record<Modifier, number>> | null;
   baseValue: number;
   itemClass: ItemClassType;
   icon?: string;
@@ -40,7 +42,7 @@ interface ItemProps {
     | Condition
     | { effect: "health" | "mana" | "sanity"; amount: number }
     | null;
-  rarity?: "normal" | "magic" | "rare" | null;
+  rarity?: Rarity | null;
   prefix?: {
     affix: Affix;
     tier: number;
@@ -65,8 +67,8 @@ export class Item {
     | "quiver"
     | null;
   readonly itemClass: ItemClassType;
-  readonly rarity: "normal" | "magic" | "rare" | null;
-  readonly stats: Record<string, number> | null;
+  readonly rarity: Rarity;
+  readonly stats: Partial<Record<Modifier, number>> | null;
   readonly prefix: {
     affix: Affix;
     tier: number;
@@ -120,7 +122,7 @@ export class Item {
       itemClass !== ItemClassType.Arrow
     ) {
       if (prefix || suffix || rarity) {
-        this.rarity = rarity ?? "normal";
+        this.rarity = rarity ?? Rarity.NORMAL;
         this.prefix = prefix ?? null;
         this.suffix = suffix ?? null;
         this.stats = stats ?? null;
@@ -147,7 +149,7 @@ export class Item {
         );
       }
     } else {
-      this.rarity = "normal";
+      this.rarity = Rarity.NORMAL;
       this.prefix = null;
       this.suffix = null;
       this.stats = stats ?? null;
@@ -169,6 +171,13 @@ export class Item {
 
     makeObservable(this, {
       name: observable,
+      totalPhysicalDamage: computed,
+      totalFireDamage: computed,
+      totalColdDamage: computed,
+      totalLightningDamage: computed,
+      totalPoisonDamage: computed,
+      totalDamage: computed,
+      totalArmor: computed,
       attachedSpell: computed,
       attachedAttacks: computed,
       playerHasRequirements: computed,
@@ -338,6 +347,55 @@ export class Item {
       //@ts-ignore
       throw new Error(`Failed to use item ${this.name}: ${error.message}`);
     }
+  }
+
+  get totalPhysicalDamage() {
+    return this.calculateTotalDamage("physical");
+  }
+
+  get totalFireDamage() {
+    return this.calculateTotalDamage("fire");
+  }
+
+  get totalColdDamage() {
+    return this.calculateTotalDamage("cold");
+  }
+
+  get totalLightningDamage() {
+    return this.calculateTotalDamage("lightning");
+  }
+
+  get totalPoisonDamage() {
+    return this.calculateTotalDamage("poison");
+  }
+
+  get totalDamage() {
+    return [
+      this.totalPhysicalDamage,
+      this.totalFireDamage,
+      this.totalColdDamage,
+      this.totalLightningDamage,
+      this.totalPoisonDamage,
+    ].reduce((sum, damage) => sum + damage, 0);
+  }
+
+  get totalArmor() {
+    if (!this.stats) return 0;
+    return Math.round((this.stats.armor ?? 0) + (this.stats.armorAdded ?? 0));
+  }
+
+  private calculateTotalDamage(
+    damageType: "physical" | "fire" | "cold" | "lightning" | "poison",
+  ): number {
+    if (!this.stats) return 0;
+
+    const baseDamage = this.stats[`${damageType}Damage`] ?? 0;
+    const addedDamage = this.stats[`${damageType}DamageAdded`] ?? 0;
+    const multiplier = this.stats[`${damageType}DamageMultiplier`] ?? 0;
+
+    if (!baseDamage && !addedDamage) return 0;
+
+    return (baseDamage + addedDamage) * (1 + multiplier);
   }
 
   private usePotion(effect: ItemEffect) {
@@ -562,16 +620,16 @@ export class ItemRarityService {
     ].includes(slot);
   }
 
-  static rollRarity(): "normal" | "magic" | "rare" {
+  static rollRarity(): Rarity {
     const roll = Math.random() * 100;
 
     if (roll <= RARITY_CHANCES.RARE) {
-      return "rare";
+      return Rarity.RARE;
     } else if (roll <= RARITY_CHANCES.RARE + RARITY_CHANCES.MAGIC) {
-      return "magic";
+      return Rarity.MAGIC;
     }
 
-    return "normal";
+    return Rarity.NORMAL;
   }
 
   static getRandomAffix(affixes: Affix[]): { affix: Affix; tier: number } {
@@ -600,17 +658,17 @@ export class ItemRarityService {
     return maxTier;
   }
 
-  static generateAffixes(rarity: "normal" | "magic" | "rare"): {
+  static generateAffixes(rarity: Rarity): {
     prefix: { affix: Affix; tier: number } | null;
     suffix: { affix: Affix; tier: number } | null;
   } {
     switch (rarity) {
-      case "rare":
+      case Rarity.RARE:
         return {
           prefix: this.getRandomAffix(PREFIXES as Affix[]),
           suffix: this.getRandomAffix(SUFFIXES),
         };
-      case "magic":
+      case Rarity.MAGIC:
         // 50/50 chance for prefix or suffix
         return Math.random() < 0.5
           ? { prefix: this.getRandomAffix(PREFIXES as Affix[]), suffix: null }
@@ -661,7 +719,7 @@ export class ItemRarityService {
     prefix: { affix: Affix; tier: number } | null,
     suffix: { affix: Affix; tier: number } | null,
   ): string {
-    let name = baseName;
+    let name = toTitleCase(baseName);
     if (prefix) {
       name = `${toTitleCase(
         prefix.affix.name[prefix.tier.toString()],

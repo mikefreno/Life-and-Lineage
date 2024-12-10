@@ -19,7 +19,7 @@ export default function GenericStrikeAround({
 }: GenericStrikeAround) {
   return (
     <View className={`flex-row items-center ${containerStyles || ""}`}>
-      <View className="flex-1 border-t border-gray-800 dark:border-gray-300" />
+      <View className="flex-1 border-t border-gray-500" />
       <View className="mx-2.5">
         {typeof children === "string" ? (
           <Text className={className || "text-xl"}>{children}</Text>
@@ -27,7 +27,7 @@ export default function GenericStrikeAround({
           children
         )}
       </View>
-      <View className="flex-1 border-t border-gray-800 dark:border-gray-300" />
+      <View className="flex-1 border-t border-gray-500 " />
     </View>
   );
 }

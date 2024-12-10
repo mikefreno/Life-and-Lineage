@@ -122,7 +122,7 @@ const GenericRaisedButton = ({
     }
     return {
       backgroundColor:
-        backgroundColor || (colorScheme === "light" ? "white" : "#3f3f46"),
+        backgroundColor || (colorScheme === "light" ? "#fafafa" : "#3f3f46"),
       opacity: 0.5,
     };
   }, [colorScheme, disabled, backgroundColor]);
@@ -130,8 +130,9 @@ const GenericRaisedButton = ({
   const textStyle = React.useMemo(
     () => ({
       color: textColor || (colorScheme === "light" ? "#27272a" : "#fafafa"),
+      opacity: disabled ? 0.5 : 1,
     }),
-    [colorScheme, textColor],
+    [colorScheme, textColor, disabled],
   );
 
   return (

@@ -25,22 +25,39 @@ export type Modifier =
   | "dexterity"
   | "intelligence"
   | "armor"
+  | "armorAdded"
   | "blockChance"
   | "dodgeChance"
   | "fireResistance"
   | "coldResistance"
   | "lightningResistance"
   | "poisonResistance"
+  | "physicalDamage"
   | "physicalDamageAdded"
-  | "fireDamageAdded"
-  | "coldDamageAdded"
-  | "lightningDamageAdded"
-  | "poisonDamageAdded"
   | "physicalDamageMultiplier"
+  | "fireDamage"
+  | "fireDamageAdded"
   | "fireDamageMultiplier"
+  | "coldDamage"
+  | "coldDamageAdded"
   | "coldDamageMultiplier"
+  | "lightningDamage"
+  | "lightningDamageAdded"
   | "lightningDamageMultiplier"
+  | "poisonDamage"
+  | "poisonDamageAdded"
   | "poisonDamageMultiplier";
+
+export enum Rarity {
+  NORMAL,
+  MAGIC,
+  RARE,
+}
+export const RarityAsString: Record<Rarity, string> = {
+  [Rarity.NORMAL]: "Normal",
+  [Rarity.MAGIC]: "Magic",
+  [Rarity.RARE]: "Rare",
+};
 
 export type ItemEffect = StatEffect | ConditionEffect;
 

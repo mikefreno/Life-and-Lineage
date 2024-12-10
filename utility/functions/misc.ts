@@ -30,6 +30,11 @@ export const AccelerationCurves = {
   exponential: (t: number) => Math.exp(t) - 1,
 };
 
+export const cleanRoundToTenths = (num: number): string => {
+  const rounded = Math.round(num * 10) / 10;
+  return rounded % 1 === 0 ? rounded.toString() : rounded.toFixed(1);
+};
+
 export function getRandomPersonality(): Personality {
   const personalities = Object.values(Personality);
   const randomIndex = Math.floor(Math.random() * personalities.length);

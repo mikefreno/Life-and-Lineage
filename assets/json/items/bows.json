@@ -9,7 +9,7 @@
     ],
     "icon": "Bow",
     "stats": {
-      "damage": 5.5
+      "physicalDamage": 5.5
     }
   },
   {
@@ -22,7 +22,7 @@
     ],
     "icon": "Bow",
     "stats": {
-      "damage": 7.5
+      "physicalDamage": 7.5
     },
     "requirements": {
       "dexterity": 5
@@ -38,7 +38,7 @@
     ],
     "icon": "Bow",
     "stats": {
-      "damage": 10.5
+      "physicalDamage": 10.5
     },
     "requirements": {
       "dexterity": 7
@@ -54,7 +54,7 @@
     ],
     "icon": "Bow",
     "stats": {
-      "damage": 12.5
+      "physicalDamage": 12.5
     },
     "requirements": {
       "dexterity": 12
@@ -70,7 +70,7 @@
     ],
     "icon": "Great_Bow",
     "stats": {
-      "damage": 19
+      "physicalDamage": 19
     },
     "requirements": {
       "strength": 10,
@@ -87,7 +87,7 @@
     ],
     "icon": "Great_Bow",
     "stats": {
-      "damage": 22
+      "physicalDamage": 22
     },
     "requirements": {
       "strength": 10,
@@ -104,7 +104,7 @@
     ],
     "icon": "Harp_Bow",
     "stats": {
-      "damage": 25
+      "physicalDamage": 25
     },
     "requirements": {
       "dexterity": 20
@@ -120,7 +120,7 @@
     ],
     "icon": "Black_Bow",
     "stats": {
-      "damage": 29
+      "physicalDamage": 29
     },
     "requirements": {
       "dexterity": 30
@@ -136,7 +136,7 @@
     ],
     "icon": "Great_Bow",
     "stats": {
-      "damage": 32
+      "physicalDamage": 32
     },
     "requirements": {
       "strength": 20,

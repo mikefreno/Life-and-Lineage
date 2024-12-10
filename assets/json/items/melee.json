@@ -8,7 +8,7 @@
     ],
     "icon": "Wood_Log",
     "stats": {
-      "damage": 2.5
+      "physicalDamage": 2.5
     }
   },
   {
@@ -20,7 +20,7 @@
     ],
     "icon": "Wood_Log",
     "stats": {
-      "damage": 4.5
+      "physicalDamage": 4.5
     },
     "requirements": {
       "strength": 5
@@ -35,7 +35,7 @@
     ],
     "icon": "Torch",
     "stats": {
-      "damage": 2.5
+      "physicalDamage": 2.5
     }
   },
   {
@@ -47,7 +47,7 @@
     ],
     "icon": "Knife",
     "stats": {
-      "damage": 4.5
+      "physicalDamage": 4.5
     }
   },
   {
@@ -59,7 +59,7 @@
     ],
     "icon": "Iron_Sword",
     "stats": {
-      "damage": 7.5
+      "physicalDamage": 7.5
     }
   },
   {
@@ -71,7 +71,7 @@
     ],
     "icon": "Hammer",
     "stats": {
-      "damage": 6.5
+      "physicalDamage": 6.5
     },
     "requirements": {
       "strength": 8
@@ -86,7 +86,7 @@
     ],
     "icon": "Hammer",
     "stats": {
-      "damage": 10.5
+      "physicalDamage": 10.5
     },
     "requirements": {
       "strength": 10
@@ -101,7 +101,7 @@
     ],
     "icon": "Iron_Sword",
     "stats": {
-      "damage": 10.0
+      "physicalDamage": 10.0
     },
     "requirements": {
       "strength": 8,
@@ -118,7 +118,7 @@
     ],
     "icon": "Iron_Sword",
     "stats": {
-      "damage": 20.0
+      "physicalDamage": 20.0
     },
     "requirements": {
       "strength": 12
@@ -133,7 +133,7 @@
     ],
     "icon": "Silver_Sword",
     "stats": {
-      "damage": 16.0
+      "physicalDamage": 16.0
     },
     "requirements": {
       "strength": 10,
@@ -150,7 +150,7 @@
     ],
     "icon": "Axe",
     "stats": {
-      "damage": 20.0
+      "physicalDamage": 20.0
     },
     "requirements": {
       "strength": 15
@@ -166,7 +166,7 @@
     ],
     "icon": "Iron_Sword",
     "stats": {
-      "damage": 29.5
+      "physicalDamage": 29.5
     },
     "requirements": {
       "strength": 20
@@ -182,7 +182,7 @@
     ],
     "icon": "Knife",
     "stats": {
-      "damage": 22.0
+      "physicalDamage": 22.0
     },
     "requirements": {
       "strength": 10,
@@ -198,7 +198,7 @@
     ],
     "icon": "Axe",
     "stats": {
-      "damage": 33.5
+      "physicalDamage": 33.5
     },
     "requirements": {
       "strength": 28
@@ -214,7 +214,7 @@
     ],
     "icon": "Iron_Sword",
     "stats": {
-      "damage": 37.5
+      "physicalDamage": 37.5
     },
     "requirements": {
       "strength": 30
@@ -230,7 +230,7 @@
     ],
     "icon": "Golden_Sword",
     "stats": {
-      "damage": 35.0
+      "physicalDamage": 35.0
     },
     "requirements": {
       "strength": 25,
@@ -246,7 +246,7 @@
     ],
     "icon": "Axe",
     "stats": {
-      "damage": 30.5
+      "physicalDamage": 30.5
     },
     "requirements": {
       "strength": 33
@@ -262,7 +262,7 @@
     ],
     "icon": "Golden_Sword",
     "stats": {
-      "damage": 35.5
+      "physicalDamage": 35.5
     },
     "requirements": {
       "strength": 32
@@ -278,7 +278,7 @@
     ],
     "icon": "Golden_Sword",
     "stats": {
-      "damage": 33.0
+      "physicalDamage": 33.0
     },
     "requirements": {
       "strength": 30,
@@ -294,7 +294,7 @@
     ],
     "icon": "Golden_Hammer",
     "stats": {
-      "damage": 45.0
+      "physicalDamage": 45.0
     },
     "requirements": {
       "strength": 45
