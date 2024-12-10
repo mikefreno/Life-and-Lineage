@@ -1,5 +1,10 @@
 import type { Theme } from "@react-navigation/native";
-import { Element, PlayerClassOptions, Rarity } from "../utility/types";
+import {
+  Element,
+  MerchantType,
+  PlayerClassOptions,
+  Rarity,
+} from "../utility/types";
 import { ColorValue } from "react-native";
 
 // Core colors
@@ -140,5 +145,55 @@ export const rarityColors: Record<
   [Rarity.RARE]: {
     background: { dark: "#2e1065FA", light: "#ede9fe" },
     text: "#9333ea",
+  },
+};
+
+export const shopColors: Record<
+  MerchantType,
+  {
+    background: ColorValue;
+    border: ColorValue;
+    text: ColorValue;
+  }
+> = {
+  armorer: {
+    background: "#BCBCBC",
+    border: "#787878",
+    text: "#282828",
+  },
+  weaponsmith: {
+    background: "#DD9191",
+    border: "#B22222",
+    text: "#505050",
+  },
+  weaver: {
+    background: "#CDB5A7",
+    border: "#9F8170",
+    text: "#8A2BE2",
+  },
+  archanist: {
+    background: "#9582D9",
+    border: "#4B0082",
+    text: "#FFD700",
+  },
+  "junk dealer": {
+    background: "#E6BF99",
+    border: "#CD7F32",
+    text: "#8B4513",
+  },
+  fletcher: {
+    background: "#E5D3B3",
+    border: "#725339",
+    text: "#2C1810",
+  },
+  apothecary: {
+    background: "#9ECCB8",
+    border: "#3D9970",
+    text: "#800080",
+  },
+  librarian: {
+    background: "#FFFFF8",
+    border: "#f3eac1",
+    text: "#8B4513",
   },
 };

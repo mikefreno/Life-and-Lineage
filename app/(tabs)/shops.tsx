@@ -15,6 +15,7 @@ import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { type Shop } from "../../entities/shop";
 import { EXPANDED_PAD } from "../../components/PlayerStatus";
+import { shopColors } from "../../constants/Colors";
 
 const ShopsScreen = observer(() => {
   const vibration = useVibration();
@@ -36,25 +37,23 @@ const ShopsScreen = observer(() => {
   const bottomHeight = useBottomTabBarHeight();
 
   const renderItem = (shop: Shop) => {
-    const shopColors = shopObjects.find(
-      (shopObj) => shopObj.type == shop.archetype,
-    )?.colors;
+    const colors = shopColors[shop.archetype];
     return (
       <View className="h-96 w-1/2" key={shop.shopKeeper.id}>
         <View
-          className={`m-2 flex-1 items-center justify-between rounded-xl border p-4 android:elevation-4 shadow-[${shopColors?.background}]/50`}
+          className={`m-2 flex-1 items-center justify-between rounded-xl border p-4 android:elevation-4`}
           style={{
-            backgroundColor: shopColors?.lightbackground,
-            borderColor: shopColors?.background,
+            backgroundColor: colors.background,
+            borderColor: colors.border,
+            shadowColor: colors.border,
+            shadowOpacity: 0.3,
             elevation: 4,
           }}
         >
           <Text
             className="text-center text-2xl"
             style={{
-              color: shopObjects.find(
-                (shopObj) => shopObj.type == shop.archetype,
-              )?.colors.font,
+              color: colors.text,
             }}
           >
             The {toTitleCase(shop.archetype)}
@@ -66,7 +65,7 @@ const ShopsScreen = observer(() => {
             <Text
               className="text-center"
               style={{
-                color: shopColors?.font,
+                color: colors.text,
               }}
             >
               {shop.shopKeeper.fullName}
@@ -81,17 +80,17 @@ const ShopsScreen = observer(() => {
               <View
                 className="px-8 py-3 rounded-lg"
                 style={{
-                  shadowColor: shopColors?.background,
+                  shadowColor: colors.border,
                   elevation: 2,
-                  backgroundColor: shopColors?.background,
-                  shadowOpacity: 0.2,
+                  backgroundColor: colors.border,
+                  shadowOpacity: 0.5,
                   shadowRadius: 5,
                 }}
               >
                 <Text
                   className="text-lg"
                   style={{
-                    color: shopColors?.font,
+                    color: colors.text,
                   }}
                 >
                   Enter

@@ -10,7 +10,7 @@ import {
   getItemJSONMap,
   getClassSpecificBookList,
 } from "../utility/functions/misc";
-import { ItemClassType, Personality } from "../utility/types";
+import { ItemClassType, MerchantType, Personality } from "../utility/types";
 import { RootStore } from "../stores/RootStore";
 import { saveShop } from "../stores/ShopsStore";
 
@@ -20,7 +20,7 @@ interface ShopProps {
   lastStockRefresh: Date;
   baseInventory?: Item[];
   shopKeeper: Character;
-  archetype: string;
+  archetype: MerchantType;
   root: RootStore;
 }
 const MAX_AFFECTION = 100;
@@ -35,7 +35,7 @@ export class Shop {
   lastStockRefresh: string;
   baseInventory: Item[];
   shopKeeper: Character;
-  readonly archetype: string;
+  readonly archetype: MerchantType;
   root: RootStore;
 
   constructor({

@@ -373,3 +373,13 @@ export type BeingType =
   | "demi-human"
   | "human"
   | "draconic";
+
+export type MerchantType =
+  | "armorer"
+  | "weaponsmith"
+  | "weaver"
+  | "archanist"
+  | "junk dealer"
+  | "fletcher"
+  | "apothecary"
+  | "librarian";
