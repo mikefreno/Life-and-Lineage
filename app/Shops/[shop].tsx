@@ -18,9 +18,9 @@ import shopObjects from "../../assets/json/shops.json";
 import InventoryRender from "../../components/InventoryRender";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import { Coins } from "../../assets/icons/SVGIcons";
-import { TutorialOption } from "../../utility/types";
+import { MerchantType, TutorialOption } from "../../utility/types";
 import ProgressBar from "../../components/ProgressBar";
-import Colors from "../../constants/Colors";
+import Colors, { shopColors } from "../../constants/Colors";
 import { useColorScheme } from "nativewind";
 import { InventoryItem } from "../../components/Draggable";
 import { useDraggableStore, useRootStore } from "../../hooks/stores";
@@ -78,7 +78,7 @@ const ShopInteriorScreen = observer(() => {
 
   const shopInventoryTarget = useRef<View | null>(null);
   const vibration = useVibration();
-  const colors = shopObjects.find((shopObj) => shopObj.type == shop)?.colors;
+  const colors = shopColors[shop as MerchantType];
   const thisShop = shopsStore.getShop(shop as string);
   const [displayItem, setDisplayItem] = useState<{
     item: Item[];
