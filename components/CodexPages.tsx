@@ -23,6 +23,7 @@ import {
 import { useColorScheme } from "nativewind";
 import { Link } from "expo-router";
 import { GenericCarousel } from "./GenericCarousel";
+import GenericStrikeAround from "./GenericStrikeAround";
 
 export function CombatCodex() {
   const images = [
@@ -49,7 +50,26 @@ export function DungeonCodex() {
 export function GearCodex() {
   return (
     <View>
-      <View></View>
+      <View>
+        <Text>
+          At it's core, gear(equipable items) is the culmination of 3 factors;
+          bases (which are the specific item variant), rarity ('Normal', 'Magic'
+          or 'Rare') and affixes(explained in detail later).
+        </Text>
+      </View>
+      <View>
+        <GenericStrikeAround>Bases</GenericStrikeAround>
+        Bases are the essentially the state of the item if it is 'Normal', these
+        will have some basic stats like damage for weapons and armor for armor.
+        They will also determine the stat requirements for the item.
+      </View>
+      <View>
+        <GenericStrikeAround>Rarity</GenericStrikeAround>
+        This can be 'Normal'
+      </View>
+      <View>
+        <GenericStrikeAround>Affixes</GenericStrikeAround>
+      </View>
     </View>
   );
 }

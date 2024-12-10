@@ -4,78 +4,91 @@ import {
   ArmorIcon,
   Energy,
   HealthIcon,
-  Regen,
   ShieldSlashIcon,
-  Sword,
 } from "../assets/icons/SVGIcons";
+import { Modifier } from "../utility/types";
+
+const ModifierLabel: Record<Modifier, string> = {
+  health: "Health",
+  mana: "Mana",
+  sanity: "Sanity",
+  healthRegen: "Health Regen",
+  manaRegen: "Mana Regen",
+  sanityRegen: "Sanity Regen",
+  strength: "Strength",
+  dexterity: "Dexterity",
+  intelligence: "Intelligence",
+  armor: "Armor",
+  blockChance: "Block Chance",
+  dodgeChance: "Dodge Chance",
+  fireResistance: "Fire Resist",
+  coldResistance: "Cold Resist",
+  lightningResistance: "Lightning Resist",
+  poisonResistance: "Poison Resist",
+  physicalDamageAdded: "Physical Damage",
+  fireDamageAdded: "Fire Damage",
+  coldDamageAdded: "Cold Damage",
+  lightningDamageAdded: "Lightning Damage",
+  poisonDamageAdded: "Poison Damage",
+  physicalDamageMultiplier: "Physical Dmg Mult",
+  fireDamageMultiplier: "Fire Dmg Mult",
+  coldDamageMultiplier: "Cold Dmg Mult",
+  lightningDamageMultiplier: "Lightning Dmg Mult",
+  poisonDamageMultiplier: "Poison Dmg Mult",
+};
 
 interface GearStatsDisplayProps {
-  stats: Record<string, number> | null;
+  stats: Partial<Record<Modifier, number>>;
 }
 
-export default function GearStatsDisplay({ stats }: GearStatsDisplayProps) {
-  if (
-    !stats ||
-    (!stats.armor &&
-      !stats.damage &&
-      !stats.mana &&
-      !stats.regen &&
-      !stats.health &&
-      !stats.blockChance)
-  ) {
-    return;
+const StatRow: React.FC<{ modifier: Modifier; value: number }> = ({
+  modifier,
+  value,
+}) => {
+  let icon = null;
+  let displayValue = value;
+
+  switch (modifier) {
+    case "health":
+      icon = <HealthIcon height={14} width={14} />;
+      break;
+    case "mana":
+      icon = <Energy height={14} width={14} />;
+      break;
+    case "armor":
+      icon = <ArmorIcon height={14} width={14} />;
+      break;
+    case "blockChance":
+      icon = <ShieldSlashIcon height={14} width={14} />;
+      displayValue = Math.round(value * 100);
+      break;
+    default:
+      icon = <Text className="text-xs">{ModifierLabel[modifier]}</Text>;
   }
 
   return (
-    <View className="flex items-center rounded-lg bg-zinc-300 px-8 py-1 dark:bg-zinc-700">
-      {stats.armor ? (
-        <View className="flex flex-row">
-          <Text>{stats.armor} </Text>
-          <View className="my-auto">
-            <ArmorIcon height={14} width={14} />
-          </View>
+    <View className="flex flex-row items-center space-x-1">
+      <Text>
+        {displayValue}
+        {modifier === "blockChance" ? "%" : ""}{" "}
+      </Text>
+      <View className="my-auto">{icon}</View>
+    </View>
+  );
+};
+
+export default function GearStatsDisplay({ stats }: GearStatsDisplayProps) {
+  if (!stats || Object.keys(stats).length === 0) {
+    return null;
+  }
+
+  return (
+    <View className="flex flex-wrap items-center justify-center rounded-lg bg-zinc-300/50 px-4 py-2 dark:bg-zinc-700/50">
+      {Object.entries(stats).map(([key, value]) => (
+        <View key={key} className="m-1">
+          <StatRow modifier={key as Modifier} value={value} />
         </View>
-      ) : null}
-      {stats.damage ? (
-        <View className="flex flex-row">
-          <Text>{stats.damage} </Text>
-          <View className="my-auto">
-            <Sword height={14} width={14} />
-          </View>
-        </View>
-      ) : null}
-      {stats.mana ? (
-        <View className="flex flex-row">
-          <Text>{stats.mana} </Text>
-          <View className="my-auto">
-            <Energy height={14} width={14} />
-          </View>
-        </View>
-      ) : null}
-      {stats.regen ? (
-        <View className="flex flex-row">
-          <Text>{stats.regen} </Text>
-          <View className="my-auto">
-            <Regen height={14} width={14} />
-          </View>
-        </View>
-      ) : null}
-      {stats.health ? (
-        <View className="flex flex-row">
-          <Text>{stats.health} </Text>
-          <View className="my-auto">
-            <HealthIcon height={14} width={14} />
-          </View>
-        </View>
-      ) : null}
-      {stats.blockChance ? (
-        <View className="flex flex-row">
-          <Text>{Math.round(stats.blockChance * 100)}% </Text>
-          <View className="my-auto">
-            <ShieldSlashIcon height={14} width={14} />
-          </View>
-        </View>
-      ) : null}
+      ))}
     </View>
   );
 }

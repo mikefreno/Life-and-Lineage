@@ -547,6 +547,9 @@ export class PlayerCharacter extends Character {
     this.keyItems = keyItems ?? []; //__DEV__ ? testKeyItems(root) : [];
     this.equipment = equipment ?? {
       mainHand: new Item({
+        rarity: "normal",
+        prefix: null,
+        suffix: null,
         name: "unarmored",
         slot: "one-hand",
         stats: { baseDamage: 1 },

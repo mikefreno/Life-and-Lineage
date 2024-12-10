@@ -1,141 +1,141 @@
 [
-   {
-      "name": "cloth robes",
-      "baseValue": 200,
-      "icon": "Base_Robes",
-      "slot": "body",
-      "stats":{
-         "armor": 4,
-         "mana": 15,
-         "regen": 0
-      }
-   },
-   {
-      "name": "apprentice robes",
-      "baseValue": 1500,
-      "icon": "Base_Robes",
-      "slot": "body",
-      "stats":{
-         "armor": 6,
-         "mana": 25,
-         "regen": 0
-      },
-      "requirements": {
-         "intelligence": 5
-      }
-   },
-   {
-      "name": "adept robes",
-      "baseValue": 2500,
-      "icon": "Base_Robes",
-      "slot": "body",
-      "stats":{
-         "armor": 8,
-         "mana": 50,
-         "regen": 2
-      },
-      "requirements": {
-         "intelligence": 8
-      }
-   },
-   {
-      "name": "mage robes",
-      "baseValue": 2500,
-      "icon": "Base_Robes",
-      "slot": "body",
-      "stats":{
-         "armor": 8,
-         "mana": 100,
-         "regen": 0
-      },
-      "requirements": {
-         "intelligence": 15
-      }
-   },
-   {
-      "name": "gorgeous robes",
-      "baseValue": 6500,
-      "icon": "Base_Robes",
-      "slot": "body",
-      "stats":{
-         "armor": 10,
-         "mana": 100,
-         "regen": 2
-      },
-      "requirements": {
-         "intelligence": 20
-      }
-   },
-   {
-      "name": "expert robes",
-      "baseValue": 25000,
-      "icon": "Base_Robes",
-      "slot": "body",
-      "stats":{
-         "armor": 10,
-         "mana": 150,
-         "regen": 5
-      },
-      "requirements": {
-         "intelligence": 30
-      }
-   },
-   {
-      "name": "rouge magi's vestment",
-      "baseValue": 47500,
-      "icon": "Base_Robes",
-      "slot": "body",
-      "stats":{
-         "armor": 16,
-         "regen": 12
-      },
-      "requirements": {
-         "strength": 5,
-         "intelligence": 30
-      }
-   },
-   {
-      "name": "war mage's vestment",
-      "baseValue": 95000,
-      "icon": "Base_Robes",
-      "slot": "body",
-      "stats":{
-         "armor": 28,
-         "mana": 100,
-         "regen": 8,
-         "health": 100
-      },
-      "requirements": {
-         "strength": 10,
-         "intelligence": 30
-      }
-   },
-   {
-      "name": "ancient silks",
-      "baseValue": 200000,
-      "icon": "Base_Robes",
-      "slot": "body",
-      "stats":{
-         "mana": 400,
-         "regen": 20
-      },
-      "requirements": {
-         "intelligence": 40
-      }
-   },
-   {
-      "name": "arch-mage's robes",
-      "baseValue": 450000,
-      "icon": "Base_Robes",
-      "slot": "body",
-      "stats":{
-         "armor": 25,
-         "mana": 350,
-         "regen": 20
-      },
-      "requirements": {
-         "intelligence": 50
-      }
-   }
+  {
+    "name": "cloth robes",
+    "baseValue": 200,
+    "icon": "Base_Robes",
+    "slot": "body",
+    "stats": {
+      "armor": 4,
+      "mana": 15,
+      "manaRegen": 0
+    }
+  },
+  {
+    "name": "apprentice robes",
+    "baseValue": 1500,
+    "icon": "Base_Robes",
+    "slot": "body",
+    "stats": {
+      "armor": 6,
+      "mana": 25,
+      "manaRegen": 0
+    },
+    "requirements": {
+      "intelligence": 5
+    }
+  },
+  {
+    "name": "adept robes",
+    "baseValue": 2500,
+    "icon": "Base_Robes",
+    "slot": "body",
+    "stats": {
+      "armor": 8,
+      "mana": 50,
+      "manaRegen": 2
+    },
+    "requirements": {
+      "intelligence": 8
+    }
+  },
+  {
+    "name": "mage robes",
+    "baseValue": 2500,
+    "icon": "Base_Robes",
+    "slot": "body",
+    "stats": {
+      "armor": 8,
+      "mana": 100,
+      "manaRegen": 0
+    },
+    "requirements": {
+      "intelligence": 15
+    }
+  },
+  {
+    "name": "gorgeous robes",
+    "baseValue": 6500,
+    "icon": "Base_Robes",
+    "slot": "body",
+    "stats": {
+      "armor": 10,
+      "mana": 100,
+      "manaRegen": 2
+    },
+    "requirements": {
+      "intelligence": 20
+    }
+  },
+  {
+    "name": "expert robes",
+    "baseValue": 25000,
+    "icon": "Base_Robes",
+    "slot": "body",
+    "stats": {
+      "armor": 10,
+      "mana": 150,
+      "manaRegen": 5
+    },
+    "requirements": {
+      "intelligence": 30
+    }
+  },
+  {
+    "name": "rouge magi's vestment",
+    "baseValue": 47500,
+    "icon": "Base_Robes",
+    "slot": "body",
+    "stats": {
+      "armor": 16,
+      "manaRegen": 12
+    },
+    "requirements": {
+      "strength": 5,
+      "intelligence": 30
+    }
+  },
+  {
+    "name": "war mage's vestment",
+    "baseValue": 95000,
+    "icon": "Base_Robes",
+    "slot": "body",
+    "stats": {
+      "armor": 28,
+      "mana": 100,
+      "manaRegen": 8,
+      "health": 100
+    },
+    "requirements": {
+      "strength": 10,
+      "intelligence": 30
+    }
+  },
+  {
+    "name": "ancient silks",
+    "baseValue": 200000,
+    "icon": "Base_Robes",
+    "slot": "body",
+    "stats": {
+      "mana": 400,
+      "manaRegen": 20
+    },
+    "requirements": {
+      "intelligence": 40
+    }
+  },
+  {
+    "name": "arch-mage's robes",
+    "baseValue": 450000,
+    "icon": "Base_Robes",
+    "slot": "body",
+    "stats": {
+      "armor": 25,
+      "mana": 350,
+      "manaRegen": 20
+    },
+    "requirements": {
+      "intelligence": 50
+    }
+  }
 ]
 

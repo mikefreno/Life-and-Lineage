@@ -6,7 +6,6 @@ import mageSpells from "../assets/json/mageSpells.json";
 import necroSpells from "../assets/json/necroSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import rangerSpells from "../assets/json/rangerSpells.json";
-import * as Crypto from "expo-crypto";
 import {
   Attribute,
   ItemClassType,
@@ -22,6 +21,7 @@ import { toTitleCase, wait } from "../utility/functions/misc";
 import type { RootStore } from "../stores/RootStore";
 import PREFIXES from "../assets/json/prefix.json";
 import SUFFIXES from "../assets/json/suffix.json";
+import * as Crypto from "expo-crypto";
 
 interface ItemProps {
   id?: string;
@@ -41,8 +41,14 @@ interface ItemProps {
     | { effect: "health" | "mana" | "sanity"; amount: number }
     | null;
   rarity?: "normal" | "magic" | "rare" | null;
-  prefix?: Affix | null;
-  suffix?: Affix | null;
+  prefix?: {
+    affix: Affix;
+    tier: number;
+  } | null;
+  suffix?: {
+    affix: Affix;
+    tier: number;
+  } | null;
   uses?: number;
   root: RootStore;
 }
@@ -61,8 +67,14 @@ export class Item {
   readonly itemClass: ItemClassType;
   readonly rarity: "normal" | "magic" | "rare" | null;
   readonly stats: Record<string, number> | null;
-  readonly prefix: {} | null;
-  readonly suffix: {} | null;
+  readonly prefix: {
+    affix: Affix;
+    tier: number;
+  } | null;
+  readonly suffix: {
+    affix: Affix;
+    tier: number;
+  } | null;
   readonly baseValue: number;
   readonly icon: string | undefined;
   readonly stackable: boolean;
@@ -101,9 +113,12 @@ export class Item {
     activePoison,
     uses,
   }: ItemProps) {
-    this.id = id ?? crypto.randomUUID();
+    this.id = id ?? Crypto.randomUUID();
 
-    if (ItemRarityService.isEquipable(slot ?? null)) {
+    if (
+      ItemRarityService.isEquipable(slot ?? null) &&
+      itemClass !== ItemClassType.Arrow
+    ) {
       if (prefix || suffix || rarity) {
         this.rarity = rarity ?? "normal";
         this.prefix = prefix ?? null;
@@ -499,7 +514,7 @@ export const isStackable = (itemClass: ItemClassType) => {
   }
 };
 
-type Affix = {
+export type Affix = {
   name: {
     [tier: string]: string;
   };
@@ -573,14 +588,15 @@ export class ItemRarityService {
     const roll = Math.random();
     let cumulativeProbability = 0;
 
-    for (let tier = maxTier; tier >= 1; tier--) {
-      const probability = Math.pow(base, tier - 1) * (1 - base);
+    for (let tier = 1; tier <= maxTier; tier++) {
+      const probability = Math.pow(base, maxTier - tier) * (1 - base);
       cumulativeProbability += probability;
 
       if (roll <= cumulativeProbability) {
         return tier;
       }
     }
+
     return maxTier;
   }
 
@@ -658,10 +674,11 @@ export class ItemRarityService {
     }
     return name;
   }
+
   static calculateValueModifier(tier: number): number {
     const baseMod = 2; // 200% increase for tier 1
     const reductionFactor = 0.65;
-    return Math.pow(baseMod * reductionFactor, tier - 1);
+    return baseMod * Math.pow(reductionFactor, tier - 1);
   }
 
   static calculateModifiedValue(

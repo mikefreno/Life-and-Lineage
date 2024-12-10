@@ -32,6 +32,7 @@ import { useRootStore } from "../hooks/stores";
 import { Condition } from "../entities/conditions";
 import { useEnemyManagement } from "../hooks/combat";
 import type { Shop } from "../entities/shop";
+import { Fish } from "lucide-react";
 
 type BaseProps = {
   displayItem: {
@@ -685,6 +686,22 @@ export function StatsDisplay({
     setViewHeight(height);
   };
 
+  const getMainBGColor = () => {
+    if (
+      firstItem.isEquippable &&
+      firstItem.rarity &&
+      firstItem.rarity !== "normal"
+    ) {
+      if (firstItem.rarity == "rare") {
+        return colorScheme == "light" ? "#ede9fe" : "#2e1065";
+      } else {
+        return colorScheme == "light" ? "#dbeafe" : "#172554";
+      }
+    } else {
+      return colorScheme == "light" ? "#f4f4f5" : "#09090b";
+    }
+  };
+
   while (!itemBlockSize) {
     return <></>;
   }
@@ -720,17 +737,14 @@ export function StatsDisplay({
         </ScrollView>
       </GenericModal>
       <Animated.View
-        className="items-center rounded-md border border-zinc-600 p-4"
+        className={`items-center rounded-md border border-zinc-600 p-4 bg-[${getMainBGColor()}]/90`}
         onLayout={onLayoutView}
         style={[
           firstItem.itemClass == ItemClassType.Book
             ? {}
             : { width: dimensions.width * 0.4 },
           {
-            backgroundColor:
-              colorScheme == "light"
-                ? "rgba(250, 250, 250, 0.98)"
-                : "rgba(20, 20, 20, 0.95)",
+            backgroundColor: getMainBGColor(),
             left: animatedLeft,
             top: animatedTop,
           },
@@ -750,6 +764,23 @@ export function StatsDisplay({
           <Text className="text-center">{toTitleCase(firstItem.name)}</Text>
         </View>
         <RequirementsBlock />
+        {firstItem.isEquippable && firstItem.rarity && (
+          <GenericStrikeAround>
+            <Text
+              className="text-lg"
+              style={{
+                color:
+                  firstItem.rarity == "rare"
+                    ? "#9333ea"
+                    : firstItem.rarity == "magic"
+                    ? "#3b82f6"
+                    : undefined,
+              }}
+            >
+              {toTitleCase(firstItem.rarity)}
+            </Text>
+          </GenericStrikeAround>
+        )}
         {(firstItem.slot == "one-hand" ||
           firstItem.slot == "two-hand" ||
           firstItem.slot == "off-hand") && (
@@ -760,6 +791,7 @@ export function StatsDisplay({
         <GenericStrikeAround className="text-sm">
           {ItemTypeLabel(firstItem)}
         </GenericStrikeAround>
+
         {firstItem.stats && firstItem.slot && (
           <View className="py-2">
             <GearStatsDisplay stats={firstItem.stats} />

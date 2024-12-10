@@ -7,7 +7,7 @@ import {
   View,
   Platform,
 } from "react-native";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import {
   toTitleCase,

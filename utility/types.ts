@@ -14,33 +14,33 @@ type ConditionEffect = {
   isPoison?: boolean;
 };
 
-export enum Modifier {
-  health,
-  mana,
-  sanity,
-  healthRegen,
-  manaRegen,
-  sanityRegen,
-  strength,
-  dexterity,
-  intelligence,
-  armor,
-  fireResistance,
-  coldResistance,
-  lightningResistance,
-  poisonResistance,
-  physicalDamageAdded,
-  fireDamageAdded,
-  coldDamageAdded,
-  lightningDamageAdded,
-  poisonDamageAdded,
-  physicalDamageMultiplier,
-  fireDamageMultipier,
-  coldDamageMutliplier,
-  lightningDamageMultiplier,
-  poisonDamageMultiplier,
-}
-export type mod = {};
+export type Modifier =
+  | "health"
+  | "mana"
+  | "sanity"
+  | "healthRegen"
+  | "manaRegen"
+  | "sanityRegen"
+  | "strength"
+  | "dexterity"
+  | "intelligence"
+  | "armor"
+  | "blockChance"
+  | "dodgeChance"
+  | "fireResistance"
+  | "coldResistance"
+  | "lightningResistance"
+  | "poisonResistance"
+  | "physicalDamageAdded"
+  | "fireDamageAdded"
+  | "coldDamageAdded"
+  | "lightningDamageAdded"
+  | "poisonDamageAdded"
+  | "physicalDamageMultiplier"
+  | "fireDamageMultiplier"
+  | "coldDamageMultiplier"
+  | "lightningDamageMultiplier"
+  | "poisonDamageMultiplier";
 
 export type ItemEffect = StatEffect | ConditionEffect;
 

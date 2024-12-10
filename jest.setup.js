@@ -1,5 +1,4 @@
 import "react-native-gesture-handler/jestSetup";
-jest.mock("react-native/Libraries/Animated/NativeAnimatedHelper");
 
 jest.mock("expo-apple-authentication", () => {
   return {
@@ -23,15 +22,15 @@ jest.mock("@react-native-google-signin/google-signin", () => {
   };
 });
 
-jest.mock("./utility/functions/save_load", () => {
-  return {
-    storage: {
-      getString: jest.fn(),
-      set: jest.fn(),
-      delete: jest.fn(),
-    },
-  };
-});
+//jest.mock("./utility/functions/save_load", () => {
+//return {
+//storage: {
+//getString: jest.fn(),
+//set: jest.fn(),
+//delete: jest.fn(),
+//},
+//};
+//});
 
 jest.mock("@react-native-community/netinfo", () => {
   return {

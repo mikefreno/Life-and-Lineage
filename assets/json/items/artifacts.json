@@ -1,12 +1,13 @@
 [
-   {
-      "name":"test artifact 1",
-      "icon": "Goblet",
-      "baseValue": 500
-   },
-   {
-      "name":"test artifact 2",
-      "icon": "Goblet",
-      "baseValue": 2500
-   }
+  {
+    "name": "test artifact 1",
+    "icon": "Goblet",
+    "baseValue": 500
+  },
+  {
+    "name": "test artifact 2",
+    "icon": "Goblet",
+    "baseValue": 2500
+  }
 ]
+

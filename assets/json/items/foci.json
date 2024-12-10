@@ -1,28 +1,29 @@
 [
-   {
-      "name":"test focus 1",
-      "icon": "Focus_1",
-      "slot": "off-hand",
-      "stats":{
-         "mana": 25,
-         "damage": 2
-      },
-      "requirements":{
-         "intelligence": 5
-      },
-      "baseValue": 500
-   },
-   {
-      "name":"test focus 2",
-      "icon": "Focus_1",
-      "slot": "off-hand",
-      "stats":{
-         "mana": 50,
-         "damage": 5
-      },
-      "requirements":{
-         "intelligence": 10
-      },
-      "baseValue": 2500
-   }
+  {
+    "name": "test focus 1",
+    "icon": "Focus_1",
+    "slot": "off-hand",
+    "stats": {
+      "mana": 25,
+      "damage": 2
+    },
+    "requirements": {
+      "intelligence": 5
+    },
+    "baseValue": 500
+  },
+  {
+    "name": "test focus 2",
+    "icon": "Focus_1",
+    "slot": "off-hand",
+    "stats": {
+      "mana": 50,
+      "damage": 5
+    },
+    "requirements": {
+      "intelligence": 10
+    },
+    "baseValue": 2500
+  }
 ]
+

@@ -1,4 +1,4 @@
-import { View, StyleSheet, ViewStyle, StyleProp } from "react-native";
+import { View, ViewStyle, StyleProp } from "react-native";
 import { Text } from "./Themed";
 import { ReactNode } from "react";
 
@@ -18,30 +18,16 @@ export default function GenericStrikeAround({
   className,
 }: GenericStrikeAround) {
   return (
-    <View style={[styles.container, containerStyles]}>
-      <View style={styles.line} />
-      <View style={styles.content}>
+    <View className={`flex-row items-center ${containerStyles || ""}`}>
+      <View className="flex-1 border-t border-gray-800 dark:border-gray-300" />
+      <View className="mx-2.5">
         {typeof children === "string" ? (
-          <Text className={className ? className : "text-xl"}>{children}</Text>
+          <Text className={className || "text-xl"}>{children}</Text>
         ) : (
           children
         )}
       </View>
-      <View style={styles.line} />
+      <View className="flex-1 border-t border-gray-800 dark:border-gray-300" />
     </View>
   );
 }
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  content: {
-    marginHorizontal: 10,
-  },
-  line: {
-    flex: 1,
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
-  },
-});
