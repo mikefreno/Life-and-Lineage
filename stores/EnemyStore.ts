@@ -9,13 +9,14 @@ import { throttle } from "lodash";
 export default class EnemyStore {
   enemies: Enemy[];
   animationStoreMap: Map<string, AnimationStore>;
-  attackAnimationsOnGoing: boolean;
-  activeAnimationCount: number = 0;
+  attackAnimationsOnGoing: boolean = false;
+  deathAnimationsOnGoing: boolean = false;
+  attackAnimationCount: number = 0;
+  deathAnimationsCount: number = 0;
   root: RootStore;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
-    this.attackAnimationsOnGoing = false;
 
     const { enemies, map } = this.hydrateEnemies();
 
@@ -29,27 +30,47 @@ export default class EnemyStore {
       setAttackAnimationOngoing: action,
       removeEnemy: action,
       clearEnemyList: action,
-      activeAnimationCount: observable,
-      incrementActiveAnimations: action,
-      decrementActiveAnimations: action,
+      attackAnimationCount: observable,
+      deathAnimationsCount: observable,
+      incrementAttackAnimations: action,
+      decrementAttackAnimations: action,
     });
   }
 
-  incrementActiveAnimations() {
-    this.activeAnimationCount++;
+  incrementAttackAnimations() {
+    this.attackAnimationCount++;
     this.setAttackAnimationOngoing(true);
   }
 
-  decrementActiveAnimations() {
-    this.activeAnimationCount--;
-    if (this.activeAnimationCount <= 0) {
-      this.activeAnimationCount = 0;
+  decrementAttackAnimations() {
+    this.attackAnimationCount--;
+    if (this.attackAnimationCount <= 0) {
+      this.attackAnimationCount = 0;
       this.setAttackAnimationOngoing(false);
+    }
+  }
+
+  incrementDeathAnimations() {
+    this.deathAnimationsCount++;
+    this.setDeathAnimationOngoing(true);
+  }
+
+  decrementDeathAnimations() {
+    this.deathAnimationsCount--;
+    if (this.deathAnimationsCount <= 0) {
+      this.deathAnimationsCount = 0;
+      this.setDeathAnimationOngoing(false);
+      if (this.root.enemyStore.enemies.length == 0) {
+        this.root.dungeonStore.setInCombat(false);
+      }
     }
   }
 
   public setAttackAnimationOngoing(state: boolean) {
     this.attackAnimationsOnGoing = state;
+  }
+  public setDeathAnimationOngoing(ongoing: boolean) {
+    this.deathAnimationsOnGoing = ongoing;
   }
 
   public addToEnemyList(enemy: Enemy) {

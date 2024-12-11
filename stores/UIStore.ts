@@ -2,14 +2,12 @@ import { action, makeObservable, observable, reaction } from "mobx";
 import { RootStore } from "./RootStore";
 import {
   AccessibilityInfo,
-  Appearance,
   Dimensions,
   EmitterSubscription,
   Platform,
   ScaledSize,
 } from "react-native";
 import { storage } from "../utility/functions/storage";
-import { wait } from "../utility/functions/misc";
 
 export default class UIStore {
   root: RootStore;

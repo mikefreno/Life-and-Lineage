@@ -1,10 +1,10 @@
-import { Platform, Pressable, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { Text, ThemedView } from "../components/Themed";
 import deathMessages from "../assets/json/deathMessages.json";
 import { useEffect, useState } from "react";
-import { Stack, router } from "expo-router";
+import { router } from "expo-router";
 import { CharacterImage } from "../components/CharacterImage";
-import { toTitleCase, wait } from "../utility/functions/misc";
+import { wait } from "../utility/functions/misc";
 import GenericStrikeAround from "../components/GenericStrikeAround";
 import GenericModal from "../components/GenericModal";
 import GenericFlatButton from "../components/GenericFlatButton";
@@ -16,7 +16,7 @@ import {
   WizardHat,
 } from "../assets/icons/SVGIcons";
 import BlessingDisplay from "../components/BlessingsDisplay";
-import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import { useColorScheme } from "nativewind";
 import { elementalColorMap } from "../constants/Colors";
 import { getStartingBaseStats } from "../utility/functions/characterAid";

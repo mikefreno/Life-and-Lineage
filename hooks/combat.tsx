@@ -56,7 +56,6 @@ export const useEnemyManagement = () => {
                 setShouldShowFirstBossKillTutorialAfterItemDrops(true);
               }
             }
-            dungeonStore.setInCombat(false);
           }
         });
 

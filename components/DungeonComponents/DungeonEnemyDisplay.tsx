@@ -12,6 +12,19 @@ import { useRootStore } from "../../hooks/stores";
 import { AnimatedSprite } from "../AnimatedSprite";
 import { EnemyImageMap } from "../../utility/enemyHelpers";
 
+const calculateAdjustedFrameRate = (
+  frames: number,
+  maxDuration: number = 400,
+) => {
+  const normalDuration = (frames / FPS) * 1000;
+  if (normalDuration <= maxDuration) {
+    return { duration: normalDuration, adjustedFPS: FPS };
+  }
+
+  const adjustedFPS = (frames * 1000) / maxDuration;
+  return { duration: maxDuration, adjustedFPS };
+};
+
 const useEnemyAnimations = () => {
   const attackAnim = useRef(new Animated.Value(0)).current;
   const damageAnim = useRef(new Animated.Value(1)).current;
@@ -19,7 +32,7 @@ const useEnemyAnimations = () => {
   const textTranslateAnim = useRef(new Animated.Value(0)).current;
   const dodgeAnim = useRef(new Animated.Value(0)).current;
   const flashOpacity = useRef(new Animated.Value(1)).current;
-  const { enemyStore } = useRootStore();
+  const { enemyStore, uiStore } = useRootStore();
 
   const runAttackAnimation = ({
     moveAnimationFrames = 6,
@@ -34,32 +47,49 @@ const useEnemyAnimations = () => {
     onAttackEnd: () => void;
     onComplete: () => void;
   }) => {
-    const moveDuration = (moveAnimationFrames / FPS) * 1000;
-    const attackDuration = (attackAnimationFrames / FPS) * 1000;
+    const { duration: moveDuration } =
+      calculateAdjustedFrameRate(moveAnimationFrames);
+    const { duration: attackDuration } = calculateAdjustedFrameRate(
+      attackAnimationFrames,
+    );
 
-    enemyStore.incrementActiveAnimations();
+    enemyStore.incrementAttackAnimations();
 
-    Animated.sequence([
-      Animated.timing(attackAnim, {
-        toValue: -50,
-        duration: moveDuration,
-        useNativeDriver: true,
-      }),
-      Animated.delay(attackDuration),
-      Animated.timing(attackAnim, {
-        toValue: 0,
-        duration: moveDuration,
-        useNativeDriver: true,
-      }),
-    ]).start((finished) => {
-      if (finished) {
-        onComplete();
-        enemyStore.decrementActiveAnimations();
-      }
-    });
+    if (uiStore.reduceMotion) {
+      // Only do attack animation, no movement
+      onReachPeak(); // Call immediately since we're not moving
 
-    setTimeout(onReachPeak, moveDuration);
-    setTimeout(onAttackEnd, moveDuration + attackDuration);
+      Animated.sequence([Animated.delay(attackDuration)]).start((finished) => {
+        if (finished) {
+          onAttackEnd();
+          onComplete();
+          enemyStore.decrementAttackAnimations();
+        }
+      });
+    } else {
+      // Full animation sequence
+      Animated.sequence([
+        Animated.timing(attackAnim, {
+          toValue: -50,
+          duration: moveDuration,
+          useNativeDriver: true,
+        }),
+        Animated.delay(attackDuration),
+        Animated.timing(attackAnim, {
+          toValue: 0,
+          duration: moveDuration,
+          useNativeDriver: true,
+        }),
+      ]).start((finished) => {
+        if (finished) {
+          onComplete();
+          enemyStore.decrementAttackAnimations();
+        }
+      });
+
+      setTimeout(onReachPeak, moveDuration);
+      setTimeout(onAttackEnd, moveDuration + attackDuration);
+    }
   };
 
   const runDodgeAnimation = () => {
@@ -92,20 +122,41 @@ const useEnemyAnimations = () => {
     ]).start();
   };
 
+  const runDeathAnimation = (deathFrames: number, onComplete: () => void) => {
+    const deathDuration = (deathFrames / FPS) * 1000;
+
+    enemyStore.incrementDeathAnimations();
+
+    Animated.sequence([
+      Animated.timing(damageAnim, {
+        toValue: 0.5,
+        duration: deathDuration / 2,
+        useNativeDriver: true,
+      }),
+      Animated.timing(damageAnim, {
+        toValue: 0,
+        duration: deathDuration / 2,
+        useNativeDriver: true,
+      }),
+    ]).start((finished) => {
+      if (finished) {
+        onComplete();
+        enemyStore.decrementDeathAnimations();
+      }
+    });
+  };
+
   const runDamageAnimation = (
     onComplete: () => void,
     animationFrames: number,
     isDeathAnimation: boolean = false,
   ) => {
-    const FPS = 8; // Assuming 8 frames per second, adjust if different
-    const animationDuration = (animationFrames / FPS) * 1000; // Convert to milliseconds
+    const animationDuration = (animationFrames / FPS) * 1000;
 
-    // For death animation, we want the damage animation to last the full duration
     const iterations = isDeathAnimation
       ? Math.ceil(animationDuration / 400)
       : 2;
 
-    // Adjust the duration of each flash based on the animation length
     const flashDuration = isDeathAnimation
       ? 200
       : Math.min(200, animationDuration / 4);
@@ -125,7 +176,6 @@ const useEnemyAnimations = () => {
       ]),
       { iterations: iterations },
     ).start(() => {
-      // Ensure the opacity is reset to 1 at the end
       damageAnim.setValue(1);
       onComplete();
     });
@@ -159,6 +209,7 @@ const useEnemyAnimations = () => {
     runDodgeAnimation,
     runDamageAnimation,
     runTextAnimation,
+    runDeathAnimation,
   };
 };
 
@@ -240,6 +291,7 @@ const EnemyDisplay = observer(
     enemy: Enemy;
     animationStore: AnimationStore;
   }) => {
+    const { uiStore } = useRootStore();
     const animations = useEnemyAnimations();
     const [healthState, setHealthState] = useState({
       record: enemy.currentHealth,
@@ -276,8 +328,9 @@ const EnemyDisplay = observer(
             EnemyImageMap[enemy.sprite].sets.death?.frames || 12;
           const isDeathAnimation = enemy.currentHealth <= 0;
 
-          animations.runDamageAnimation(
-            () => {
+          if (isDeathAnimation) {
+            setAnimationState("death");
+            animations.runDeathAnimation(deathFrames, () => {
               setTimeout(() => {
                 setHealthState((prev) => ({
                   ...prev,
@@ -285,10 +338,24 @@ const EnemyDisplay = observer(
                   diff: 0,
                 }));
               }, 500);
-            },
-            isDeathAnimation ? deathFrames : hurtFrames,
-            isDeathAnimation,
-          );
+            });
+          } else {
+            animations.runDamageAnimation(
+              () => {
+                setAnimationState("idle");
+                setTimeout(() => {
+                  setHealthState((prev) => ({
+                    ...prev,
+                    showing: false,
+                    diff: 0,
+                  }));
+                }, 500);
+              },
+              isDeathAnimation ? deathFrames : hurtFrames,
+              isDeathAnimation,
+            );
+          }
+
           if (isDeathAnimation) {
             setAnimationState("death");
           } else {
@@ -320,14 +387,22 @@ const EnemyDisplay = observer(
     useEffect(() => {
       if (animationStore.attackDummy !== 0) {
         attackStateRef.current = "start";
-        setAnimationState("move");
+        setAnimationState(uiStore.reduceMotion ? "attack_1" : "move");
         const sets = EnemyImageMap[enemy.sprite].sets;
 
         animations.runAttackAnimation({
           attackAnimationFrames: sets.attack_1.frames,
           moveAnimationFrames: sets.move?.frames,
-          onReachPeak: () => setAnimationState("attack_1"),
-          onAttackEnd: () => setAnimationState("move"),
+          onReachPeak: () => {
+            if (!uiStore.reduceMotion) {
+              setAnimationState("attack_1");
+            }
+          },
+          onAttackEnd: () => {
+            if (!uiStore.reduceMotion) {
+              setAnimationState("move");
+            }
+          },
           onComplete: () => setAnimationState("idle"),
         });
       }

@@ -24,22 +24,18 @@ export class AnimationStore {
   }
 
   setTextString(text: string | undefined) {
-    if (this.root.uiStore.reduceMotion) return;
     this.textString = text;
   }
 
   triggerAttack() {
-    if (this.root.uiStore.reduceMotion) return;
     this.attackDummy += 1;
   }
 
   triggerText() {
-    if (this.root.uiStore.reduceMotion) return;
     this.textDummy += 1;
   }
 
   triggerDodge() {
-    if (this.root.uiStore.reduceMotion) return;
     this.dodgeDummy += 1;
   }
 }

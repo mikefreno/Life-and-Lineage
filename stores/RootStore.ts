@@ -1,5 +1,4 @@
 import {
-  Character,
   PlayerCharacter,
   getStartingBook,
   savePlayer,

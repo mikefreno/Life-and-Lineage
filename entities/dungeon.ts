@@ -16,7 +16,7 @@ interface DungeonLevelOptions {
   bossDefeated?: boolean;
   parent: DungeonInstance;
   dungeonStore: DungeonStore;
-  parallaxOverride?: string;
+  parallaxOverride?: ParallaxOptions;
 }
 
 interface DungeonInstanceOptions {
@@ -131,7 +131,7 @@ export class DungeonLevel {
   bossDefeated: boolean;
   parent: DungeonInstance;
   dungeonStore: DungeonStore;
-  parallaxOverride: string | null;
+  parallaxOverride: ParallaxOptions | null;
 
   constructor({
     level,
