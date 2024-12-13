@@ -4,8 +4,10 @@ import { storage } from "../utility/functions/storage";
 import { throttle } from "lodash";
 import { parse, stringify } from "flatted";
 import shopsJSON from "../assets/json/shops.json";
+import { MerchantType } from "../utility/types";
+import { action, makeObservable, observable } from "mobx";
 
-const SHOP_ARCHETYPES = [
+const SHOP_ARCHETYPES: MerchantType[] = [
   "armorer",
   "weaponsmith",
   "weaver",
@@ -17,17 +19,23 @@ const SHOP_ARCHETYPES = [
 ];
 
 export class ShopStore {
-  shopsMap: Map<string, Shop>;
+  shopsMap: Map<MerchantType, Shop>;
   root: RootStore;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
     this.shopsMap = this.hydrateShopState();
+
+    makeObservable(this, {
+      shopsMap: observable,
+      fromCheckpointData: action,
+      setShops: action,
+    });
   }
 
   hydrateShopState() {
     try {
-      const map = new Map<string, Shop>();
+      const map = new Map<MerchantType, Shop>();
       SHOP_ARCHETYPES.forEach((archetype) => {
         const shopData = storage.getString(
           `shop_${archetype.replaceAll(" ", "_")}`,
@@ -46,23 +54,42 @@ export class ShopStore {
   }
 
   getInitShopsState() {
-    const map = new Map<string, Shop>();
+    const map = new Map<MerchantType, Shop>();
     shopsJSON.forEach((shop) => {
       const newShop = new Shop({
         shopKeeper: generateShopKeeper(shop.type, this.root),
         baseGold: shop.baseGold,
-        lastStockRefresh: new Date(),
-        archetype: shop.type,
+        lastStockRefresh: this.root.time.currentDate,
+        archetype: shop.type as MerchantType,
         root: this.root,
       });
       _shopSave(newShop);
-      map.set(shop.type, newShop);
+      map.set(shop.type as MerchantType, newShop);
     });
     return map;
   }
 
-  public getShop(archetype: string) {
+  public getShop(archetype: MerchantType) {
     return this.shopsMap.get(archetype);
+  }
+  setShops(arg0: Map<MerchantType, Shop>) {
+    this.shopsMap = arg0;
+  }
+
+  toCheckpointData() {
+    return Array.from(this.shopsMap.entries()).map(([_, shop]) => ({
+      ...shop,
+      shopKeeper: { ...shop.shopKeeper, root: null },
+      root: null,
+    }));
+  }
+
+  fromCheckpointData(data: any) {
+    this.shopsMap.clear();
+    data.forEach((shopData: any) => {
+      const shop = Shop.fromJSON({ ...shopData, root: this.root });
+      this.shopsMap.set(shop.archetype as MerchantType, shop);
+    });
   }
 }
 

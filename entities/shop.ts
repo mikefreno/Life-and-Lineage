@@ -17,7 +17,10 @@ import { saveShop } from "../stores/ShopsStore";
 interface ShopProps {
   baseGold: number;
   currentGold?: number;
-  lastStockRefresh: Date;
+  lastStockRefresh: {
+    year: number;
+    week: number;
+  };
   baseInventory?: Item[];
   shopKeeper: Character;
   archetype: MerchantType;
@@ -32,7 +35,10 @@ const MAX_AFFECTION = 100;
 export class Shop {
   readonly baseGold: number;
   currentGold: number;
-  lastStockRefresh: string;
+  lastStockRefresh: {
+    year: number;
+    week: number;
+  };
   baseInventory: Item[];
   shopKeeper: Character;
   readonly archetype: MerchantType;
@@ -49,8 +55,7 @@ export class Shop {
   }: ShopProps) {
     this.baseGold = baseGold;
     this.currentGold = currentGold ?? baseGold;
-    this.lastStockRefresh =
-      lastStockRefresh.toISOString() ?? new Date().toISOString();
+    this.lastStockRefresh = lastStockRefresh ?? root.time.currentDate;
     this.baseInventory = baseInventory ?? [];
     this.archetype = archetype;
     this.shopKeeper = shopKeeper;
@@ -102,7 +107,7 @@ export class Shop {
         shopObj.trades as ItemClassType[],
         this.root.playerState!,
       );
-      this.lastStockRefresh = new Date().toISOString();
+      this.lastStockRefresh = this.root.time.currentDate;
       this.currentGold = this.baseGold;
     } else {
       throw new Error("Shop not found on refreshInventory()");
@@ -257,14 +262,14 @@ export class Shop {
       shopKeeper: Character.fromJSON({ ...json.shopKeeper, root: json.root }),
       baseGold: json.baseGold,
       currentGold: json.currentGold,
-      lastStockRefresh: new Date(json.lastStockRefresh),
+      lastStockRefresh: json.lastStockRefresh,
       archetype: json.archetype,
       baseInventory: json.baseInventory
         ? json.baseInventory.map((item: any) =>
             Item.fromJSON({ ...item, root: json.root }),
           )
         : [],
-      root: json.root, //this is not actually stored
+      root: json.root,
     });
     return shop;
   }

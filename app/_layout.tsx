@@ -1,5 +1,5 @@
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, router, usePathname } from "expo-router";
+import { Stack, router, usePathname } from "expo-router";
 import React, { useEffect, useState, useRef } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
@@ -9,6 +9,7 @@ import {
   StyleSheet,
   useColorScheme as useNativeColor,
 } from "react-native";
+import * as SplashScreen from "expo-splash-screen";
 import { ThemedView } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { BlurView } from "expo-blur";
@@ -46,6 +47,9 @@ export const unstable_settings = {
 };
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+SplashScreen.setOptions({
+  fade: Platform.OS === "ios",
+});
 
 Sentry.init({
   dsn: "https://2cff54f8aeb50bcb7151c159cc40fe1b@o4506630160187392.ingest.sentry.io/4506630163398656",
@@ -149,7 +153,7 @@ const RootLayout = observer(() => {
   }, [expoPushToken]);
 
   const handleRouting = (
-    playerState: PlayerCharacter | undefined,
+    playerState: PlayerCharacter | null,
     rootStore: RootStore,
     dungeonStore: DungeonStore,
     pathname: string,
@@ -165,6 +169,13 @@ const RootLayout = observer(() => {
       playerState.currentSanity <= -playerState.maxSanity;
 
     if (isDead && pathname !== "/DeathScreen") {
+      if (rootStore.dungeonStore.heldColorScheme) {
+        rootStore.uiStore.setColorScheme(
+          rootStore.dungeonStore.heldColorScheme,
+        );
+
+        setColorScheme(rootStore.dungeonStore.heldColorScheme);
+      }
       router.replace("/DeathScreen");
       return;
     }
@@ -174,12 +185,11 @@ const RootLayout = observer(() => {
     }
   };
 
-  // Initial load effect
   useEffect(() => {
     const initializeApp = async () => {
       if (fontLoaded && rootStore.constructed && firstLoad) {
-        await SplashScreen.hideAsync();
         setColorScheme(uiStore.colorScheme);
+        await SplashScreen.hideAsync();
         handleRouting(playerState, rootStore, dungeonStore, pathname);
         setFirstLoad(false);
       }
@@ -188,7 +198,6 @@ const RootLayout = observer(() => {
     initializeApp();
   }, [fontLoaded, rootStore.constructed, firstLoad]);
 
-  // Death check effect
   useEffect(() => {
     if (!firstLoad && playerState) {
       const isDead =
@@ -201,7 +210,6 @@ const RootLayout = observer(() => {
         pathname !== "/DeathScreen" &&
         pathname.split("/")[1] !== "NewGame"
       ) {
-        // Add a small delay to ensure root layout is mounted
         setTimeout(() => {
           router.replace("/DeathScreen");
         }, 0);

@@ -45,6 +45,15 @@ export default function DeathScreen() {
   const { playerState, uiStore } = root;
   const vibration = useVibration();
   const { colorScheme } = useColorScheme();
+  const [checkpoints, setCheckpoints] = useState<
+    {
+      id: number;
+      timestamp: number;
+      playerAge: number;
+    }[]
+  >([]);
+  const [isCheckpointListExpanded, setIsCheckpointListExpanded] =
+    useState(false);
 
   const getDeathMessage = () => {
     const randomIndex = Math.floor(Math.random() * deathMessages.length);
@@ -54,12 +63,18 @@ export default function DeathScreen() {
   useEffect(() => {
     root.hitDeathScreen();
     setDeathMessage(getDeathMessage());
+    loadCheckpoints();
   }, []);
 
   function startNewGame() {
     root.startingNewGame = true;
     router.push("/NewGame/ClassSelect");
   }
+
+  const loadCheckpoints = async () => {
+    const checkpointList = await root.getCheckpointsList();
+    setCheckpoints(checkpointList);
+  };
 
   function createPlayerCharacter() {
     if (nextLife && selectedClass && selectedBlessing && playerState) {
@@ -104,6 +119,16 @@ export default function DeathScreen() {
     }
   };
   const header = useHeaderHeight();
+
+  const loadCheckpoint = async (id: number) => {
+    const loaded = await root.loadCheckpoint(id);
+    if (loaded) {
+      root.clearDeathScreen();
+      router.replace("/");
+    } else {
+      console.error("Failed to load checkpoint");
+    }
+  };
 
   if (playerState) {
     return (
@@ -170,6 +195,25 @@ export default function DeathScreen() {
               ? deathMessage
               : "You have gone insane"}
           </Text>
+          <Pressable
+            onPress={() =>
+              setIsCheckpointListExpanded(!isCheckpointListExpanded)
+            }
+            className="my-4 p-2 bg-blue-500 rounded"
+          >
+            <Text className="text-white">
+              {isCheckpointListExpanded
+                ? "Hide Checkpoints"
+                : "Show Checkpoints"}
+            </Text>
+          </Pressable>
+
+          {isCheckpointListExpanded && (
+            <CheckpointList
+              checkpoints={checkpoints}
+              onSelect={loadCheckpoint}
+            />
+          )}
           {playerState.children.length > 0 ? (
             <>
               <Text className="text-xl">Continue as one of your children?</Text>
@@ -451,3 +495,30 @@ function MinimalBlessingSelect({
       );
   }
 }
+
+const CheckpointList = ({
+  checkpoints,
+  onSelect,
+}: {
+  checkpoints: {
+    id: number;
+    timestamp: number;
+    playerAge: number;
+  }[];
+  onSelect: (id: number) => void;
+}) => (
+  <ScrollView className="max-h-48 w-full">
+    {checkpoints.map((checkpoint) => (
+      <Pressable
+        key={checkpoint.id}
+        onPress={() => onSelect(checkpoint.id)}
+        className="p-2 border-b border-gray-200 dark:border-gray-700"
+      >
+        <Text>
+          Checkpoint {checkpoint.id} - Age: {checkpoint.playerAge}
+        </Text>
+        <Text>{new Date(checkpoint.timestamp).toLocaleString()}</Text>
+      </Pressable>
+    ))}
+  </ScrollView>
+);

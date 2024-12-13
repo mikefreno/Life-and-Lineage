@@ -62,16 +62,18 @@ type CreatureType = {
   attackStrings?: string[];
   conditions?: Condition[];
   enemyStore?: EnemyStore;
-  sprite: EnemyImageKeyOption;
+  sprite?: EnemyImageKeyOption | null; // null for minions;
 };
 
 type EnemyType = CreatureType & {
   minions?: Minion[];
+  sprite: EnemyImageKeyOption;
 };
 
 type MinionType = CreatureType & {
   turnsLeftAlive: number;
   parent: Enemy | PlayerCharacter | null;
+  sprite?: null;
 };
 
 /**
@@ -97,7 +99,7 @@ export class Creature {
   gotDrops: boolean;
   threatTable: ThreatTable = new ThreatTable();
   enemyStore: EnemyStore | undefined;
-  readonly sprite: EnemyImageKeyOption = "zombie";
+  readonly sprite: EnemyImageKeyOption | null;
 
   constructor({
     id,
@@ -763,7 +765,6 @@ export class Enemy extends Creature {
       turnsLeftAlive: minionObj.turns,
       beingType: minionObj.beingType as BeingType,
       enemyStore: this.enemyStore,
-      sprite: minionObj.sprite,
       parent: this,
     });
     this.addMinion(minion);
@@ -866,7 +867,7 @@ export class Minion extends Creature {
     conditions,
     turnsLeftAlive,
     enemyStore,
-    sprite,
+    sprite = null,
     parent,
   }: MinionType) {
     super({
@@ -957,7 +958,6 @@ export class Minion extends Creature {
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
-      sprite: json.sprite,
       parent: null,
     });
     minion.conditions = minion.conditions.map((cond) =>

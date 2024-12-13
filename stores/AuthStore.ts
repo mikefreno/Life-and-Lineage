@@ -5,12 +5,12 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { parseInt } from "lodash";
 import { Platform } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
-import { stringify } from "flatted";
+import { parse, stringify } from "flatted";
 import { storage } from "../utility/functions/storage";
 import google_config from "../config/google_config";
 import { API_BASE_URL } from "../config/config";
-import { SaveRow } from "../utility/database";
-import type { PlayerCharacter } from "../entities/character";
+import { CheckpointRow } from "../utility/database";
+import { serializeJobs } from "../entities/character";
 import type { RootStore } from "./RootStore";
 
 type EmailLogin = {
@@ -37,19 +37,6 @@ type LoginCreds = EmailLogin | GoogleLogin | AppleLogin;
 interface databaseExecuteProps {
   sql: string;
   args?: string[];
-}
-interface makeRemoteSaveProps {
-  name: string;
-  playerState: PlayerCharacter;
-}
-
-interface overwriteRemoteSaveProps {
-  name: string;
-  id: number;
-  playerState: PlayerCharacter;
-}
-interface deleteRemoteSaveProps {
-  id: number;
 }
 
 export class AuthStore {
@@ -332,67 +319,180 @@ export class AuthStore {
     return res.status;
   };
 
-  getRemoteSaves = async () => {
+  makeRemoteSave = async (name: string) => {
     if (!this.isConnected) {
       throw new Error("Device is offline");
     }
     try {
-      const res = await this.databaseExecute({ sql: `SELECT * FROM Save` });
-      const data = await res.json();
-      const rows = data.results[0].response.result.rows;
-      return this.convertHTTPResponseSaveRow(rows);
-    } catch (e) {
-      return [];
-    }
-  };
+      const timestamp = this.formatDate(new Date());
+      const playerAge = this.root.playerState?.age || 0;
 
-  makeRemoteSave = async ({ name, playerState }: makeRemoteSaveProps) => {
-    if (!this.isConnected) {
-      throw new Error("Device is offline");
-    }
-    try {
-      const time = this.formatDate(new Date());
+      const playerData = stringify({
+        ...this.root.playerState,
+        jobs: serializeJobs(this.root.playerState!.jobs),
+        root: null,
+      });
+      const timeData = stringify(this.root.time.toCheckpointData());
+      const dungeonData = stringify(this.root.dungeonStore.toCheckpointData());
+      const characterData = stringify(
+        this.root.characterStore.toCheckpointData(),
+      );
+      const shopsData = stringify(this.root.shopsStore.toCheckpointData());
+
       await this.databaseExecute({
-        sql: `INSERT INTO Save (name, player_state, created_at, last_updated_at) VALUES (?, ?, ?, ?, ?)`,
-        args: [name, stringify(playerState), time, time],
+        sql: `
+        INSERT INTO checkpoints (
+          name,
+          created_at,
+          last_updated, 
+          player_age, 
+          player_data, 
+          time_data, 
+          dungeon_data, 
+          character_data, 
+          shops_data
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+        args: [
+          name,
+          timestamp.toString(),
+          timestamp.toString(),
+          playerAge.toString(),
+          playerData,
+          timeData,
+          dungeonData,
+          characterData,
+          shopsData,
+        ],
       });
     } catch (e) {
-      return [];
+      console.error("Error creating remote checkpoint:", e);
     }
   };
 
-  overwriteRemoteSave = async ({
-    name,
-    id,
-    playerState,
-  }: overwriteRemoteSaveProps) => {
+  overwriteRemoteSave = async (id: number) => {
     if (!this.isConnected) {
       throw new Error("Device is offline");
     }
     try {
-      const updateTime = this.formatDate(new Date());
-      const res = await this.databaseExecute({
-        sql: `UPDATE Save SET player_state = ?, last_updated_at = ? WHERE name = ? AND id = ?`,
-        args: [stringify(playerState), updateTime, name, id.toString()],
+      const timestamp = this.formatDate(new Date());
+      const playerAge = this.root.playerState?.age || 0;
+
+      const playerData = stringify({
+        ...this.root.playerState,
+        jobs: serializeJobs(this.root.playerState!.jobs),
+        root: null,
       });
-      await res?.json();
+      const timeData = stringify(this.root.time.toCheckpointData());
+      const dungeonData = stringify(this.root.dungeonStore.toCheckpointData());
+      const characterData = stringify(
+        this.root.characterStore.toCheckpointData(),
+      );
+      const shopsData = stringify(this.root.shopsStore.toCheckpointData());
+
+      await this.databaseExecute({
+        sql: `
+        UPDATE checkpoints 
+        SET 
+          last_updated = ?,
+          player_age = ?,
+          player_data = ?,
+          time_data = ?,
+          dungeon_data = ?,
+          character_data = ?,
+          shops_data = ?
+        WHERE id = ?
+      `,
+        args: [
+          timestamp,
+          playerAge.toString(),
+          playerData,
+          timeData,
+          dungeonData,
+          characterData,
+          shopsData,
+          id.toString(),
+        ],
+      });
     } catch (e) {
-      return [];
+      console.error("Error overwriting remote checkpoint:", e);
     }
   };
 
-  deleteRemoteSave = async ({ id }: deleteRemoteSaveProps) => {
+  getRemoteCheckpoints = async () => {
     if (!this.isConnected) {
       throw new Error("Device is offline");
     }
     try {
-      const res = await this.databaseExecute({
-        sql: `DELETE FROM Save WHERE id = ?`,
+      const response = await this.databaseExecute({
+        sql: `SELECT * FROM checkpoints ORDER BY last_updated DESC`,
+      });
+
+      if (!response?.results?.[0]?.response?.result?.rows) {
+        console.warn(
+          "No rows found in response or unexpected response structure",
+        );
+        return [];
+      }
+
+      const convertedRows = this.convertHTTPResponseCheckpointRow(
+        response.results[0].response.result.rows,
+      );
+
+      return convertedRows;
+    } catch (e) {
+      console.error("Error fetching remote checkpoints:", e);
+      return [];
+    }
+  };
+
+  getRemoteCheckpoint = async (id: number) => {
+    if (!this.isConnected) {
+      throw new Error("Device is offline");
+    }
+    try {
+      const response = await this.databaseExecute({
+        sql: `SELECT * FROM checkpoints WHERE id = ? LIMIT 1`,
         args: [id.toString()],
       });
-      await res?.json();
+
+      if (
+        !response?.results?.[0]?.response?.result?.rows ||
+        response.results[0].response.result.rows.length === 0
+      ) {
+        console.warn(`No checkpoint found with id: ${id}`);
+        return null;
+      }
+
+      const rawRows = response.results[0].response.result.rows;
+
+      const convertedRows = this.convertHTTPResponseCheckpointRow(rawRows);
+
+      if (convertedRows.length === 0) {
+        console.warn(`No checkpoint data after conversion for id: ${id}`);
+        return null;
+      }
+
+      const checkpoint = convertedRows[0];
+
+      return checkpoint;
     } catch (e) {
-      return [];
+      console.error(`Error fetching remote checkpoint with id ${id}:`, e);
+      throw e;
+    }
+  };
+
+  deleteRemoteCheckpoint = async (id: number) => {
+    if (!this.isConnected) {
+      throw new Error("Device is offline");
+    }
+    try {
+      await this.databaseExecute({
+        sql: `DELETE FROM checkpoints WHERE id = ?`,
+        args: [id.toString()],
+      });
+    } catch (e) {
+      console.error("Error deleting remote checkpoint:", e);
     }
   };
 
@@ -484,42 +584,57 @@ export class AuthStore {
         throw new Error("url build failed!");
       }
     }
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${this.db_token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        requests: [
-          {
-            type: "execute",
-            stmt: args
-              ? { sql: sql, args: this.argBuilder(args) }
-              : { sql: sql },
-          },
-          { type: "close" },
-        ],
-      }),
-    });
-    return res;
+
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.db_token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          requests: [
+            {
+              type: "execute",
+              stmt: args
+                ? { sql: sql, args: this.argBuilder(args) }
+                : { sql: sql },
+            },
+            { type: "close" },
+          ],
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      return await res.json();
+    } catch (error) {
+      console.error("Database execution error:", error);
+      throw error;
+    }
   }
 
-  private convertHTTPResponseSaveRow = (rows: any[][]) => {
-    let cleaned: SaveRow[] = [];
-    rows.forEach((row) =>
-      cleaned.push({
+  private convertHTTPResponseCheckpointRow = (rows: any[][]) => {
+    return rows.map((row) => {
+      const converted = {
         id: parseInt(row[0].value),
         name: row[1].value,
-        player_state: row[2].value,
-        created_at: row[3].value,
-        last_updated_at: row[4].value,
-      }),
-    );
-    return cleaned;
+        created_at: row[2].value,
+        last_updated: row[3].value,
+        player_age: parseInt(row[4].value),
+        player_data: parse(row[5].value),
+        time_data: parse(row[6].value),
+        dungeon_data: parse(row[7].value),
+        character_data: parse(row[8].value),
+        shops_data: parse(row[9].value),
+      };
+      return converted;
+    });
   };
 
-  private formatDate(date: Date): string {
+  formatDate(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");

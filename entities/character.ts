@@ -24,6 +24,7 @@ import {
   PlayerClassOptions,
   Attribute,
   Personality,
+  Rarity,
 } from "../utility/types";
 import {
   rollToLiveByAge,
@@ -547,12 +548,12 @@ export class PlayerCharacter extends Character {
     this.keyItems = keyItems ?? []; //__DEV__ ? testKeyItems(root) : [];
     this.equipment = equipment ?? {
       mainHand: new Item({
-        rarity: "normal",
+        rarity: Rarity.NORMAL,
         prefix: null,
         suffix: null,
         name: "unarmored",
         slot: "one-hand",
-        stats: { baseDamage: 1 },
+        stats: { physicalDamage: 1 },
         baseValue: 0,
         itemClass: ItemClassType.Melee,
         attacks: ["punch"],
@@ -1136,9 +1137,9 @@ export class PlayerCharacter extends Character {
           const stats = item[0]?.stats;
           if (!stats || !item[0].playerHasRequirements) continue;
           armor += stats.armor ?? 0;
-          damage += stats.damage ?? 0;
+          damage += stats.physicalDamage ?? 0;
           mana += stats.mana ?? 0;
-          regen += stats.regen ?? 0;
+          regen += stats.manaRegen ?? 0;
           health += stats.health ?? 0;
           sanity += stats.sanity ?? 0;
           blockChance += stats.blockChance ?? 0;
@@ -1150,9 +1151,9 @@ export class PlayerCharacter extends Character {
         const stats = item?.stats;
         if (!stats || !item.playerHasRequirements) continue;
         armor += stats.armor ?? 0;
-        damage += stats.damage ?? 0;
+        damage += stats.physicalDamage ?? 0;
         mana += stats.mana ?? 0;
-        regen += stats.regen ?? 0;
+        regen += stats.manaRegen ?? 0;
         health += stats.health ?? 0;
         sanity += stats.sanity ?? 0;
         blockChance += stats.blockChance ?? 0;
@@ -1350,8 +1351,9 @@ export class PlayerCharacter extends Character {
     this.equipment.mainHand = new Item({
       name: "unarmored",
       slot: "one-hand",
-      stats: { baseDamage: 1 },
+      stats: { physicalDamage: 1 },
       baseValue: 0,
+      rarity: Rarity.NORMAL,
       itemClass: ItemClassType.Melee,
       root: this.root,
       attacks: ["punch"],

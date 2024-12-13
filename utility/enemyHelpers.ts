@@ -1209,6 +1209,114 @@ export const EnemyImageMap = {
     displayHeight: 500,
     displayWidth: 500,
   },
+  npc_man: {
+    sets: {
+      attack_1: {
+        anim: require("../assets/images/monsters/NPC_Man/ATTACK.png"),
+        frames: 4,
+      },
+      death: {
+        anim: require("../assets/images/monsters/NPC_Man/DEATH.png"),
+        frames: 4,
+      },
+      hurt: {
+        anim: require("../assets/images/monsters/NPC_Man/HURT.png"),
+        frames: 2,
+      },
+      idle: {
+        anim: require("../assets/images/monsters/NPC_Man/IDLE.png"),
+        frames: 4,
+      },
+      move: {
+        anim: require("../assets/images/monsters/NPC_Man/MOVE.png"),
+        frames: 6,
+      },
+      spawn: null,
+    },
+    height: 48,
+    width: 48,
+  },
+  npc_man_old: {
+    sets: {
+      attack_1: {
+        anim: require("../assets/images/monsters/NPC_Man_Old/ATTACK.png"),
+        frames: 4,
+      },
+      death: {
+        anim: require("../assets/images/monsters/NPC_Man_Old/DEATH.png"),
+        frames: 4,
+      },
+      hurt: {
+        anim: require("../assets/images/monsters/NPC_Man_Old/HURT.png"),
+        frames: 2,
+      },
+      idle: {
+        anim: require("../assets/images/monsters/NPC_Man_Old/IDLE.png"),
+        frames: 4,
+      },
+      move: {
+        anim: require("../assets/images/monsters/NPC_Man_Old/MOVE.png"),
+        frames: 6,
+      },
+      spawn: null,
+    },
+    height: 48,
+    width: 48,
+  },
+  npc_woman: {
+    sets: {
+      attack_1: {
+        anim: require("../assets/images/monsters/NPC_Woman/ATTACK.png"),
+        frames: 4,
+      },
+      death: {
+        anim: require("../assets/images/monsters/NPC_Woman/DEATH.png"),
+        frames: 4,
+      },
+      hurt: {
+        anim: require("../assets/images/monsters/NPC_Woman/HURT.png"),
+        frames: 2,
+      },
+      idle: {
+        anim: require("../assets/images/monsters/NPC_Woman/IDLE.png"),
+        frames: 4,
+      },
+      move: {
+        anim: require("../assets/images/monsters/NPC_Woman/MOVE.png"),
+        frames: 6,
+      },
+      spawn: null,
+    },
+    height: 48,
+    width: 48,
+  },
+  npc_woman_old: {
+    sets: {
+      attack_1: {
+        anim: require("../assets/images/monsters/NPC_Woman_Old/ATTACK.png"),
+        frames: 4,
+      },
+      death: {
+        anim: require("../assets/images/monsters/NPC_Woman_Old/DEATH.png"),
+        frames: 4,
+      },
+      hurt: {
+        anim: require("../assets/images/monsters/NPC_Woman_Old/HURT.png"),
+        frames: 2,
+      },
+      idle: {
+        anim: require("../assets/images/monsters/NPC_Woman_Old/IDLE.png"),
+        frames: 4,
+      },
+      move: {
+        anim: require("../assets/images/monsters/NPC_Woman_Old/MOVE.png"),
+        frames: 6,
+      },
+      spawn: null,
+    },
+    height: 48,
+    width: 48,
+  },
   orc_masked: {
     sets: {
       attack_1: {
@@ -1365,6 +1473,62 @@ export const EnemyImageMap = {
     },
     height: 44,
     width: 62,
+    mirror: true,
+  },
+  reaper: {
+    sets: {
+      attack_1: {
+        anim: require("../assets/images/monsters/Reaper/ATTACK_1.png"),
+        frames: 5,
+      },
+      attack_2: {
+        anim: require("../assets/images/monsters/Reaper/ATTACK_2.png"),
+        frames: 7,
+      },
+      attack_3: {
+        anim: require("../assets/images/monsters/Reaper/ATTACK_SUMMON.png"),
+        frames: 4,
+      },
+      hurt: {
+        anim: require("../assets/images/monsters/Reaper/HURT.png"),
+        frames: 12,
+      },
+      death: {
+        anim: require("../assets/images/monsters/Reaper/DEATH.png"),
+        frames: 18,
+      },
+      dodge: {
+        anim: require("../assets/images/monsters/Reaper/DODGE.png"),
+        frames: 12,
+      },
+      idle: {
+        anim: require("../assets/images/monsters/Reaper/IDLE.png"),
+        frames: 4,
+      },
+
+      spawn: null,
+    },
+    height: 100,
+    width: 100,
+    mirror: true,
+  },
+  reaper_summon: {
+    sets: {
+      summon_idle: {
+        anim: require("../assets/images/monsters/Reaper/SUMMON_IDLE.png"),
+        frames: 4,
+      },
+      summon_spawn: {
+        anim: require("../assets/images/monsters/Reaper/SUMMON_SPAWN.png"),
+        frames: 6,
+      },
+      summon_death: {
+        anim: require("../assets/images/monsters/Reaper/SUMMON_DEATH.png"),
+        frames: 6,
+      },
+    },
+    height: 50,
+    width: 50,
     mirror: true,
   },
   samurai_armor: {

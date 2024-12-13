@@ -1,6 +1,5 @@
 import { ScrollView, View } from "react-native";
 import { CharacterImage } from "../../components/CharacterImage";
-import shopObjects from "../../assets/json/shops.json";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
 import TutorialModal from "../../components/TutorialModal";
@@ -38,6 +37,8 @@ const ShopsScreen = observer(() => {
 
   const renderItem = (shop: Shop) => {
     const colors = shopColors[shop.archetype];
+    if (!colors) return;
+
     return (
       <View className="h-96 w-1/2" key={shop.shopKeeper.id}>
         <View

@@ -22,6 +22,8 @@ import storyItems from "../../assets/json/items/storyItems.json";
 import names from "../../assets/json/names.json";
 import { ItemClassType, Personality, PlayerClassOptions } from "../types";
 import { CommonActions, NavigationProp } from "@react-navigation/native";
+import { Character } from "../../entities/character";
+import { Enemy } from "../../entities/creatures";
 
 export const AccelerationCurves = {
   linear: (t: number) => 1 + t,
@@ -415,3 +417,42 @@ export function checkReleasePosition({
   }
   handleSnapBack();
 }
+
+export const generateEnemyFromNPC = (character: Character) => {
+  const { health, energy, attackPower, regen } = getNPCAsEnemyStats();
+  const sprite = getAnimatedSpriteForNPC(character);
+  return new Enemy({
+    beingType: "human",
+    creatureSpecies: character.fullName,
+    currentHealth: health,
+    baseHealth: health,
+    energyRegen: regen,
+    currentEnergy: energy,
+    baseEnergy: energy,
+    sprite,
+    attackPower,
+  });
+};
+
+const getAnimatedSpriteForNPC = (character: Character) => {
+  if (character.sex == "male") {
+    if (character.age > 50) {
+      return "npc_man_old";
+    }
+    return "npc_man";
+  } else {
+    if (character.age > 50) {
+      return "npc_woman_old";
+    }
+    return "npc_woman";
+  }
+};
+
+const getNPCAsEnemyStats = () => {
+  const health = getRandomInt(75, 200);
+  const energy = getRandomInt(20, 60);
+  const attackPower = getRandomInt(10, 15);
+  const regen = getRandomInt(3, 5);
+
+  return { health, energy, attackPower, regen };
+};

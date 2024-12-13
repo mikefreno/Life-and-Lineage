@@ -8,13 +8,12 @@ import GenericRaisedButton from "../../components/GenericRaisedButton";
 import { observer } from "mobx-react-lite";
 import GenericModal from "../../components/GenericModal";
 import { useColorScheme } from "nativewind";
-import { SaveRow } from "../../utility/database";
+import { CheckpointRow } from "../../utility/database";
 import D20DieAnimation from "../../components/DieRollAnim";
 import GenericFlatButton from "../../components/GenericFlatButton";
-import { parse } from "flatted";
 import { useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
-import { PlayerCharacter } from "../../entities/character";
+import { thirdPartyErrorFilterIntegration } from "@sentry/core";
 
 const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
@@ -27,7 +26,7 @@ export const AppSettings = observer(() => {
     useState<boolean>(false);
   const [showRemoteLoadWidow, setShowRemoteLoadWindow] =
     useState<boolean>(false);
-  const [remoteSaves, setRemoteSaves] = useState<SaveRow[]>([]);
+  const [remoteSaves, setRemoteSaves] = useState<CheckpointRow[]>([]);
   const [saveName, setSaveName] = useState<string>("");
   const [loadingDBInfo, setLoadingDBInfo] = useState<boolean>(false);
 
@@ -63,7 +62,7 @@ export const AppSettings = observer(() => {
   useEffect(() => {
     if (authStore.isAuthenticated) {
       setLoadingDBInfo(true);
-      authStore.getRemoteSaves().then((rows) => {
+      authStore.getRemoteCheckpoints().then((rows) => {
         setRemoteSaves(rows);
         setLoadingDBInfo(false);
       });
@@ -87,47 +86,38 @@ export const AppSettings = observer(() => {
   const newRemoteSave = async () => {
     if (playerState && saveName.length >= 3) {
       setLoadingDBInfo(true);
-      await authStore.makeRemoteSave({
-        name: saveName,
-        playerState,
-      });
-      const res = await authStore.getRemoteSaves();
+      await authStore.makeRemoteSave(saveName);
+      const res = await authStore.getRemoteCheckpoints();
       setRemoteSaves(res);
 
       setLoadingDBInfo(false);
     }
   };
 
-  const overwriteSave = async (chosenSave: SaveRow) => {
+  const overwriteSave = async (chosenCheckpoint: CheckpointRow) => {
     if (playerState) {
       setLoadingDBInfo(true);
-      authStore.overwriteRemoteSave({
-        name: chosenSave.name,
-        id: chosenSave.id,
-        playerState,
-      });
-      const res = await authStore.getRemoteSaves();
+      authStore.overwriteRemoteSave(chosenCheckpoint.id);
+      const res = await authStore.getRemoteCheckpoints();
       setRemoteSaves(res);
       setLoadingDBInfo(false);
     }
   };
 
-  const loadRemoteSave = async (chosenSave: SaveRow) => {
-    const player = PlayerCharacter.fromJSON({
-      ...parse(chosenSave.player_state),
-      root,
-    });
-    root.setPlayer(player);
-    router.dismissAll();
-  };
-
-  const deleteRemoteSave = async (chosenSave: SaveRow) => {
+  const deleteRemoteSave = async (chosenCheckpoint: CheckpointRow) => {
     setLoadingDBInfo(true);
-    await authStore.deleteRemoteSave({ id: chosenSave.id });
-    const res = await authStore.getRemoteSaves();
+    await authStore.deleteRemoteCheckpoint(chosenCheckpoint.id);
+    const res = await authStore.getRemoteCheckpoints();
     setRemoteSaves(res);
     setLoadingDBInfo(false);
   };
+
+  async function loadRemoteCheckpoint(id: number) {
+    setLoadingDBInfo(true);
+    await root.loadRemoteCheckpoint(id);
+    setLoadingDBInfo(false);
+    router.dismissAll();
+  }
 
   return (
     <>
@@ -183,7 +173,7 @@ export const AppSettings = observer(() => {
                 </Pressable>
                 <Text className="text-xl pt-2 text-center">{save.name}</Text>
                 <View className="flex flex-col w-full items-end py-2">
-                  <Text className="">Last updated: {save.last_updated_at}</Text>
+                  <Text className="">Last updated: {save.last_updated}</Text>
                   <Text className="">Created at: {save.created_at}</Text>
                 </View>
                 <GenericFlatButton
@@ -224,12 +214,12 @@ export const AppSettings = observer(() => {
               </Pressable>
               <Text className="text-xl pt-2 text-center">{save.name}</Text>
               <View className="flex flex-col w-full items-end py-2">
-                <Text className="">Last updated: {save.last_updated_at}</Text>
+                <Text className="">Last updated: {save.last_updated}</Text>
                 <Text className="">Created at: {save.created_at}</Text>
               </View>
               <GenericFlatButton
                 backgroundColor={colorScheme == "dark" ? "black" : "white"}
-                onPress={() => loadRemoteSave(save)}
+                onPress={() => loadRemoteCheckpoint(save.id)}
               >
                 Load Save
               </GenericFlatButton>
@@ -237,160 +227,168 @@ export const AppSettings = observer(() => {
           ))}
         </ScrollView>
       </GenericModal>
-      <View className="flex-1 items-center justify-center px-4">
-        {/*<GenericRaisedButton
+      <ScrollView>
+        <View className="flex-1 items-center justify-center px-4">
+          {/*<GenericRaisedButton
             onPress={() => router.push("/Options/iaps")}
           >
             Go to IAPs
           </GenericRaisedButton>*/}
-        <GenericStrikeAround>
-          <Text className="text-xl">
-            Remote Backups{!authStore.isAuthenticated && ` (requires login)`}
-          </Text>
-        </GenericStrikeAround>
-        {authStore.isAuthenticated ? (
-          <>
-            <Text className="text-center py-2">
-              Logged in as: {authStore.getEmail()}
+          <GenericStrikeAround>
+            <Text className="text-xl">
+              Remote Backups{!authStore.isAuthenticated && ` (requires login)`}
             </Text>
-            <View className="flex flex-row justify-evenly w-full">
-              <GenericFlatButton
-                onPress={toggleRemoteSaveWindow}
-                disabled={loadingDBInfo || !authStore.isConnectedAndInitialized}
-              >
-                {loadingDBInfo ? (
-                  <D20DieAnimation size={20} keepRolling />
-                ) : (
-                  "Make\n Cloud Save"
-                )}
-              </GenericFlatButton>
-              <GenericFlatButton
-                onPress={toggleRemoteLoadWindow}
-                disabled={loadingDBInfo || !authStore.isConnectedAndInitialized}
-              >
-                {loadingDBInfo ? (
-                  <D20DieAnimation size={20} keepRolling />
-                ) : (
-                  "Load\n Cloud Save"
-                )}
-              </GenericFlatButton>
-            </View>
-            <GenericRaisedButton onPress={logout}>Sign Out</GenericRaisedButton>
-          </>
-        ) : (
-          <>
-            {!authStore.isConnectedAndInitialized && (
-              <Text className="text-center italic text-sm">
-                You are not connected to the internet
+          </GenericStrikeAround>
+          {authStore.isAuthenticated ? (
+            <>
+              <Text className="text-center py-2">
+                Logged in as: {authStore.getEmail()}
               </Text>
-            )}
-            <View className="flex flex-row justify-evenly w-full">
-              <GenericRaisedButton
-                onPress={() => router.push("/Auth/sign-in")}
-                disabled={!authStore.isConnectedAndInitialized}
-              >
-                Sign In
+              <View className="flex flex-row justify-evenly w-full">
+                <GenericFlatButton
+                  onPress={toggleRemoteSaveWindow}
+                  disabled={
+                    loadingDBInfo || !authStore.isConnectedAndInitialized
+                  }
+                >
+                  {loadingDBInfo ? (
+                    <D20DieAnimation size={20} keepRolling />
+                  ) : (
+                    "Make\n Cloud Save"
+                  )}
+                </GenericFlatButton>
+                <GenericFlatButton
+                  onPress={toggleRemoteLoadWindow}
+                  disabled={
+                    loadingDBInfo || !authStore.isConnectedAndInitialized
+                  }
+                >
+                  {loadingDBInfo ? (
+                    <D20DieAnimation size={20} keepRolling />
+                  ) : (
+                    "Load\n Cloud Save"
+                  )}
+                </GenericFlatButton>
+              </View>
+              <GenericRaisedButton onPress={logout}>
+                Sign Out
               </GenericRaisedButton>
-              <GenericRaisedButton
-                onPress={() => router.push("/Auth/sign-up")}
-                backgroundColor={"#2563eb"}
-                textColor={"#fafafa"}
-                disabled={!authStore.isConnectedAndInitialized}
-              >
-                Sign Up
-              </GenericRaisedButton>
-            </View>
-          </>
-        )}
-        <GenericStrikeAround>Select Color Theme</GenericStrikeAround>
-        <View
-          className="rounded px-4 py-2"
-          style={{ marginLeft: -48, marginTop: 12 }}
-        >
-          {themeOptions.map((item, index) => (
-            <Pressable
-              key={index}
-              className="mb-4 ml-10 flex flex-row"
-              onPress={() =>
-                setColorTheme(index, item as "system" | "light" | "dark")
-              }
-            >
-              <View
-                className={
-                  selectedThemeOption == index
-                    ? "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 bg-blue-500 dark:border-zinc-50 dark:bg-blue-600"
-                    : "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 dark:border-zinc-50"
+            </>
+          ) : (
+            <>
+              {!authStore.isConnectedAndInitialized && (
+                <Text className="text-center italic text-sm">
+                  You are not connected to the internet
+                </Text>
+              )}
+              <View className="flex flex-row justify-evenly w-full">
+                <GenericRaisedButton
+                  onPress={() => router.push("/Auth/sign-in")}
+                  disabled={!authStore.isConnectedAndInitialized}
+                >
+                  Sign In
+                </GenericRaisedButton>
+                <GenericRaisedButton
+                  onPress={() => router.push("/Auth/sign-up")}
+                  backgroundColor={"#2563eb"}
+                  textColor={"#fafafa"}
+                  disabled={!authStore.isConnectedAndInitialized}
+                >
+                  Sign Up
+                </GenericRaisedButton>
+              </View>
+            </>
+          )}
+          <GenericStrikeAround>Select Color Theme</GenericStrikeAround>
+          <View
+            className="rounded px-4 py-2"
+            style={{ marginLeft: -48, marginTop: 12 }}
+          >
+            {themeOptions.map((item, index) => (
+              <Pressable
+                key={index}
+                className="mb-4 ml-10 flex flex-row"
+                onPress={() =>
+                  setColorTheme(index, item as "system" | "light" | "dark")
                 }
-              />
-              <Text className="text-2xl tracking-widest">
-                {toTitleCase(item)}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-        <GenericStrikeAround>Vibration Settings</GenericStrikeAround>
-        <View
-          className="rounded px-4 py-2"
-          style={{ marginLeft: -48, marginTop: 12 }}
-        >
-          {vibrationOptions.map((item, index) => (
+              >
+                <View
+                  className={
+                    selectedThemeOption == index
+                      ? "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 bg-blue-500 dark:border-zinc-50 dark:bg-blue-600"
+                      : "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 dark:border-zinc-50"
+                  }
+                />
+                <Text className="text-2xl tracking-widest">
+                  {toTitleCase(item)}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+          <GenericStrikeAround>Vibration Settings</GenericStrikeAround>
+          <View
+            className="rounded px-4 py-2"
+            style={{ marginLeft: -48, marginTop: 12 }}
+          >
+            {vibrationOptions.map((item, index) => (
+              <Pressable
+                key={index}
+                className="mb-4 ml-10 flex flex-row"
+                onPress={() => {
+                  setVibrationLevel(index, item as "full" | "minimal" | "none");
+                }}
+              >
+                <View
+                  className={
+                    selectedVibrationOption == index
+                      ? "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 bg-blue-500 dark:border-zinc-50 dark:bg-blue-600"
+                      : "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 dark:border-zinc-50"
+                  }
+                />
+                <Text className="text-2xl tracking-widest">
+                  {toTitleCase(item)}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+          <GenericStrikeAround>Reduce Motion</GenericStrikeAround>
+          <View
+            className="rounded px-4 py-2"
+            style={{ marginLeft: -48, marginTop: 12 }}
+          >
             <Pressable
-              key={index}
               className="mb-4 ml-10 flex flex-row"
               onPress={() => {
-                setVibrationLevel(index, item as "full" | "minimal" | "none");
+                setReduceMotion(true);
               }}
             >
               <View
                 className={
-                  selectedVibrationOption == index
+                  uiStore.reduceMotion
                     ? "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 bg-blue-500 dark:border-zinc-50 dark:bg-blue-600"
                     : "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 dark:border-zinc-50"
                 }
               />
-              <Text className="text-2xl tracking-widest">
-                {toTitleCase(item)}
-              </Text>
+              <Text className="text-2xl tracking-widest">On</Text>
             </Pressable>
-          ))}
+            <Pressable
+              className="mb-4 ml-10 flex flex-row"
+              onPress={() => {
+                setReduceMotion(false);
+              }}
+            >
+              <View
+                className={
+                  !uiStore.reduceMotion
+                    ? "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 bg-blue-500 dark:border-zinc-50 dark:bg-blue-600"
+                    : "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 dark:border-zinc-50"
+                }
+              />
+              <Text className="text-2xl tracking-widest">Off</Text>
+            </Pressable>
+          </View>
         </View>
-        <GenericStrikeAround>Reduce Motion</GenericStrikeAround>
-        <View
-          className="rounded px-4 py-2"
-          style={{ marginLeft: -48, marginTop: 12 }}
-        >
-          <Pressable
-            className="mb-4 ml-10 flex flex-row"
-            onPress={() => {
-              setReduceMotion(true);
-            }}
-          >
-            <View
-              className={
-                uiStore.reduceMotion
-                  ? "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 bg-blue-500 dark:border-zinc-50 dark:bg-blue-600"
-                  : "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 dark:border-zinc-50"
-              }
-            />
-            <Text className="text-2xl tracking-widest">On</Text>
-          </Pressable>
-          <Pressable
-            className="mb-4 ml-10 flex flex-row"
-            onPress={() => {
-              setReduceMotion(false);
-            }}
-          >
-            <View
-              className={
-                !uiStore.reduceMotion
-                  ? "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 bg-blue-500 dark:border-zinc-50 dark:bg-blue-600"
-                  : "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 dark:border-zinc-50"
-              }
-            />
-            <Text className="text-2xl tracking-widest">Off</Text>
-          </Pressable>
-        </View>
-      </View>
+      </ScrollView>
     </>
   );
 });

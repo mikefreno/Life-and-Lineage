@@ -31,6 +31,7 @@ export class CharacterStore {
       setPlayer: action,
       clearCharacters: action,
       adopt: action,
+      fromCheckpointData: action,
       independantChildrenAgeCheck: action,
     });
 
@@ -213,5 +214,25 @@ export class CharacterStore {
       const updatedIds = ids.filter((id) => id !== characterId);
       storage.set("independentChildIDs", stringify(updatedIds));
     }
+  }
+
+  toCheckpointData() {
+    return {
+      characters: this.characters.map((char) =>
+        stringify({ ...char, root: null }),
+      ),
+      independentChildren: this.independentChildren.map((child) =>
+        stringify({ ...child, root: null }),
+      ),
+    };
+  }
+
+  fromCheckpointData(data: any) {
+    this.characters = data.characters.map((charData: any) =>
+      Character.fromJSON({ ...charData, root: this.root }),
+    );
+    this.independentChildren = data.independentChildren.map((childData: any) =>
+      Character.fromJSON({ ...childData, root: this.root }),
+    );
   }
 }

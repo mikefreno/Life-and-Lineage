@@ -20,8 +20,9 @@ import {
   getBoundingBox,
 } from "../components/DungeonComponents/DungeonMap";
 import { Dimensions } from "react-native";
-import { wait } from "../utility/functions/misc";
+import { generateEnemyFromNPC, wait } from "../utility/functions/misc";
 import { ParallaxOptions } from "../components/DungeonComponents/Parallax";
+import { Character } from "../entities/character";
 
 export class DungeonStore {
   root: RootStore;
@@ -91,6 +92,7 @@ export class DungeonStore {
       setInBossFight: action,
       hasPersistedState: computed,
       clearDungeonState: action,
+      resetVolatileState: action,
     });
 
     reaction(
@@ -172,6 +174,7 @@ export class DungeonStore {
     instance: string | DungeonInstance,
     level: string | DungeonLevel,
   ) {
+    this.root.createCheckpoint();
     if (instance instanceof DungeonInstance && level instanceof DungeonLevel) {
       this.currentInstance = instance;
       this.currentLevel = level;
@@ -451,6 +454,10 @@ export class DungeonStore {
     return [trainingGrounds, nearbyCave];
   }
 
+  setUpAssault(character: Character) {
+    const characterAsEnemy = generateEnemyFromNPC(character);
+  }
+
   //setActivityName(name: string) {
   //this.activityInstance.name = name.replaceAll("%20", " ");
   //}
@@ -480,12 +487,49 @@ export class DungeonStore {
 
     return activityInstance;
   }
+
+  toCheckpointData() {
+    return {
+      dungeonInstances: this.dungeonInstances.map((instance) => ({
+        ...instance,
+        dungeonStore: null,
+        levels: instance.levels.map((level) => ({
+          ...level,
+          dungeonStore: null,
+          parent: null,
+        })),
+      })),
+    };
+  }
+
+  fromCheckpointData(data: any) {
+    this.dungeonInstances = data.dungeonInstances.map((instanceData: any) =>
+      DungeonInstance.fromJSON({ ...instanceData, dungeonStore: this }),
+    );
+  }
+
+  resetVolatileState() {
+    this.currentInstance = undefined;
+    this.currentLevel = undefined;
+    this.currentMap = undefined;
+    this.currentMapDimensions = undefined;
+    this.currentPosition = undefined;
+    this.inCombat = false;
+    this.fightingBoss = false;
+    this.movementQueued = false;
+    this.fleeModalShowing = false;
+    this.heldColorScheme = undefined;
+    this.logs = [];
+  }
 }
 
 const _dungeonInstanceSave = async (dungeon: DungeonInstance | undefined) => {
   if (dungeon) {
     try {
-      storage.set(`dungeon_${dungeon.id}`, stringify(dungeon));
+      storage.set(
+        `dungeon_${dungeon.id}`,
+        stringify({ ...dungeon, dungeonStore: null }),
+      );
     } catch (e) {}
   }
 };

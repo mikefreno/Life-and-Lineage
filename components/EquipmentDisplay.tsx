@@ -142,7 +142,7 @@ const EquipmentSlot = observer(
             itemStack.push(playerState.equipment.head);
           break;
         case "Main-Hand":
-          playerState.equipment.mainHand.name !== "unarmored" &&
+          playerState.equipment.mainHand.name.toLowerCase() !== "unarmored" &&
             itemStack.push(playerState.equipment.mainHand);
           break;
         case "Off-Hand":

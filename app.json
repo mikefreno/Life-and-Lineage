@@ -7,11 +7,6 @@
     "icon": "assets/images/icon.png",
     "scheme": "lineageapp",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -55,6 +50,18 @@
         }
       ],
       [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#fafafa",
+          "image": "./assets/images/splash.png",
+          "dark": {
+            "image": "./assets/images/splash.png",
+            "backgroundColor": "#09090b"
+          },
+          "imageWidth": 400
+        }
+      ],
+      [
         "@sentry/react-native/expo",
         {
           "organization": "mikefreno",
@@ -66,7 +73,8 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.976302581992-tbi6afmid4eq5dsn63t30kpfpdhjju8m"
         }
-      ]
+      ],
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true
@@ -86,4 +94,3 @@
     "owner": "mikefrenodev"
   }
 }
-

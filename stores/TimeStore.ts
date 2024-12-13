@@ -19,6 +19,7 @@ export class TimeStore {
       year: observable,
       tick: action,
       currentDate: computed,
+      fromCheckpointData: action,
     });
 
     reaction(
@@ -61,5 +62,17 @@ export class TimeStore {
       return { week: 0, year: 1300 }; // new game time
     }
     return parse(timeStr) as { week: number; year: number };
+  }
+
+  toCheckpointData() {
+    return {
+      week: this.week,
+      year: this.year,
+    };
+  }
+
+  fromCheckpointData(data: any) {
+    this.week = data.week;
+    this.year = data.year;
   }
 }
