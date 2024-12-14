@@ -25,11 +25,14 @@ import {
   Attribute,
   Personality,
   Rarity,
+  MerchantType,
 } from "../utility/types";
 import {
   rollToLiveByAge,
   rollD20,
   damageReduction,
+  getRandomName,
+  getRandomPersonality,
 } from "../utility/functions/misc";
 import { Spell } from "./spell";
 import storyItems from "../assets/json/items/storyItems.json";
@@ -53,6 +56,8 @@ interface CharacterOptions {
   qualifications?: string[];
   dateCooldownStart?: { year: number; week: number };
   parents?: Character[];
+  pregnancyDueDate?: { year: number; week: number };
+  isPregnant?: boolean;
   root: RootStore;
 }
 
@@ -74,8 +79,9 @@ export class Character {
   affection: number;
   qualifications: string[];
   dateCooldownStart?: { year: number; week: number };
-  pregnancyDueDate?: string | null;
   parents?: Character[];
+  pregnancyDueDate?: { year: number; week: number };
+  isPregnant: boolean;
   root: RootStore;
 
   constructor({
@@ -91,6 +97,8 @@ export class Character {
     qualifications,
     dateCooldownStart,
     personality,
+    pregnancyDueDate,
+    isPregnant = false,
     parents,
     root,
   }: CharacterOptions) {
@@ -107,7 +115,9 @@ export class Character {
     this.qualifications = qualifications ?? [];
     this.dateCooldownStart = dateCooldownStart;
     this.parents = parents;
-    this.root = root;
+    (this.pregnancyDueDate = pregnancyDueDate),
+      (this.isPregnant = isPregnant),
+      (this.root = root);
 
     makeObservable(this, {
       alive: observable,
@@ -126,6 +136,8 @@ export class Character {
       updateLastName: action,
       kill: action,
       setParents: action,
+      pregnancyDueDate: observable,
+      isPregnant: observable,
       age: computed,
     });
 
@@ -252,6 +264,49 @@ export class Character {
     this.parents = newParents;
   }
 
+  public initiatePregnancy() {
+    if (this.isPregnant || this.sex === "male") return false;
+
+    const currentDate = this.root.time.currentDate;
+    this.isPregnant = true;
+    this.pregnancyDueDate = {
+      year:
+        currentDate.week + 40 >= 52 ? currentDate.year + 1 : currentDate.year,
+      week: (currentDate.week + 40) % 52,
+    };
+
+    return true;
+  }
+
+  public giveBirth(): Character | null {
+    if (!this.isPregnant || !this.pregnancyDueDate) return null;
+
+    const currentDate = this.root.time.currentDate;
+    if (
+      currentDate.year < this.pregnancyDueDate.year ||
+      (currentDate.year === this.pregnancyDueDate.year &&
+        currentDate.week < this.pregnancyDueDate.week)
+    ) {
+      return null;
+    }
+
+    this.isPregnant = false;
+    this.pregnancyDueDate = undefined;
+
+    const sex = Math.random() > 0.5 ? "male" : "female";
+
+    const baby = new Character({
+      firstName: getRandomName(sex).firstName,
+      lastName: this.lastName,
+      sex,
+      personality: getRandomPersonality(),
+      birthdate: currentDate,
+      root: this.root,
+    });
+
+    return baby;
+  }
+
   static fromJSON(json: any): Character {
     const character = new Character({
       id: json.id,
@@ -271,6 +326,8 @@ export class Character {
             Character.fromJSON({ ...parent, root: json.root }),
           )
         : undefined,
+      pregnancyDueDate: json.pregnancyDueDate,
+      isPregnant: json.isPregnant,
       root: json.root,
     });
     return character;
@@ -336,6 +393,8 @@ type PlayerCharacterBase = {
   unAllocatedSkillPoints?: number;
   allocatedSkillPoints?: Record<Attribute, number>;
   alive?: boolean;
+  pregnancyDueDate?: { year: number; week: number };
+  isPregnant?: boolean;
   root: RootStore;
 };
 
@@ -483,6 +542,8 @@ export class PlayerCharacter extends Character {
     allocatedSkillPoints,
     keyItems,
     root,
+    isPregnant,
+    pregnancyDueDate,
     jobs,
   }: PlayerCharacterOptions) {
     super({
@@ -496,6 +557,8 @@ export class PlayerCharacter extends Character {
       deathdate,
       job,
       qualifications,
+      pregnancyDueDate,
+      isPregnant,
       root,
     });
     this.playerClass = PlayerClassOptions[playerClass];
@@ -1011,7 +1074,7 @@ export class PlayerCharacter extends Character {
   public addToInventory(item: Item | Item[] | null) {
     if (Array.isArray(item)) {
       this.baseInventory = this.baseInventory.concat(item);
-    } else if (item && item.name !== "unarmored") {
+    } else if (item && item.name.toLowerCase() !== "unarmored") {
       this.baseInventory.push(item);
     }
   }
@@ -1072,7 +1135,7 @@ export class PlayerCharacter extends Character {
     this.gold += Math.floor(sellPrice) * soldCount;
   }
 
-  public purchaseStack(itemStack: Item[], shopArchetype: string) {
+  public purchaseStack(itemStack: Item[], shopArchetype: MerchantType) {
     const shop = this.root.shopsStore.getShop(shopArchetype);
     if (!shop)
       throw new Error(`Shop with archetype ${shopArchetype} not found`);
@@ -1354,6 +1417,8 @@ export class PlayerCharacter extends Character {
       stats: { physicalDamage: 1 },
       baseValue: 0,
       rarity: Rarity.NORMAL,
+      prefix: null,
+      suffix: null,
       itemClass: ItemClassType.Melee,
       root: this.root,
       attacks: ["punch"],
@@ -2018,7 +2083,7 @@ export class PlayerCharacter extends Character {
     ) {
       const levelDif =
         (this.currentMasteryLevel(chosenSpell.element) as MasteryLevel) -
-        chosenSpell.proficiencyNeeded;
+        (chosenSpell.proficiencyNeeded ?? MasteryLevel.Novice);
       switch (levelDif) {
         case 0:
           return 2;
@@ -2245,6 +2310,8 @@ export class PlayerCharacter extends Character {
       baseStrength: json.baseStrength,
       baseIntelligence: json.baseIntelligence,
       baseDexterity: json.baseDexterity,
+      pregnancyDueDate: json.pregnancyDueDate,
+      isPregnant: json.isPregnant,
       root: json.root,
     });
     return player;

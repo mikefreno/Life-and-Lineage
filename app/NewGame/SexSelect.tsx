@@ -59,6 +59,8 @@ export default function SetSex() {
               setSex("male");
               vibration({ style: "light" });
             }}
+            accessibilityRole="button"
+            accessibilityLabel="Select Male"
           >
             {({ pressed }) => (
               <View
@@ -85,6 +87,8 @@ export default function SetSex() {
               setSex("female");
               vibration({ style: "light" });
             }}
+            accessibilityRole="button"
+            accessibilityLabel="Select Female"
           >
             {({ pressed }) => (
               <View
@@ -108,7 +112,11 @@ export default function SetSex() {
         </View>
         {sex ? (
           <View className="mx-auto mt-8">
-            <GenericFlatLink href="./NameSelect">
+            <GenericFlatLink
+              href="./NameSelect"
+              accessibilityRole="link"
+              accessibilityLabel="Next"
+            >
               <Text>Next</Text>
             </GenericFlatLink>
           </View>
@@ -119,6 +127,8 @@ export default function SetSex() {
           <Pressable
             className="absolute"
             onPress={() => setForceShowTutorial(true)}
+            accessibilityRole="button"
+            accessibilityLabel="Show Tutorial"
           >
             <FontAwesome5
               name="question-circle"

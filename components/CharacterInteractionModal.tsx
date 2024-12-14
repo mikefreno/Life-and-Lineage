@@ -43,6 +43,10 @@ export const CharacterInteractionModal = observer(
             character.dateCooldownStart.year !== root.time.year
         : true,
     );
+
+    const [pregnancyMessage, setPregnancyMessage] = useState<string | null>(
+      null,
+    );
     const router = useRouter();
 
     const vibration = useVibration();
@@ -68,7 +72,23 @@ export const CharacterInteractionModal = observer(
       }
     }, [root.time.year, root.time.week, character?.dateCooldownStart]);
 
-    function showPregnancyInfo() {}
+    function attemptPregnancy(character: Character) {
+      if (playerState && character) {
+        const mother = playerState.sex === "female" ? playerState : character;
+
+        if (mother.initiatePregnancy()) {
+          setPregnancyMessage(`${mother.firstName} is now pregnant!`);
+          setTimeout(() => setPregnancyMessage(null), 3000);
+        } else {
+          setPregnancyMessage(
+            `The attempt was unsuccessful. ${mother.firstName} might already be pregnant.`,
+          );
+          setTimeout(() => setPregnancyMessage(null), 3000);
+        }
+
+        root.gameTick();
+      }
+    }
 
     return (
       <GenericModal
@@ -145,7 +165,7 @@ export const CharacterInteractionModal = observer(
                                 disabled={!dateAvailable}
                                 onPress={() => {
                                   vibration({ style: "light" });
-                                  showPregnancyInfo();
+                                  attemptPregnancy(character);
                                 }}
                               >
                                 Try for a Baby

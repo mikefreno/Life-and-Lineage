@@ -8,6 +8,7 @@ import {
   ScaledSize,
 } from "react-native";
 import { storage } from "../utility/functions/storage";
+import { Character } from "../entities/character";
 
 export default class UIStore {
   root: RootStore;
@@ -28,6 +29,7 @@ export default class UIStore {
   reduceMotion: boolean;
   colorHeldForDungeon: "system" | "dark" | "light" | undefined;
   isLoading: boolean = false;
+  newbornBaby: Character | null = null;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
@@ -104,6 +106,8 @@ export default class UIStore {
       colorHeldForDungeon: observable,
       clearDungeonColor: action,
       setIsLoading: action,
+      newbornBaby: observable,
+      setNewbornBaby: action,
     });
 
     reaction(
@@ -152,6 +156,10 @@ export default class UIStore {
     if (state) {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
+  }
+
+  setNewbornBaby(baby: Character | null) {
+    this.newbornBaby = baby;
   }
 
   public setColorScheme(color: "light" | "dark" | "system") {

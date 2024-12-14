@@ -1,11 +1,6 @@
 import { Text } from "../../components/Themed";
 import { View } from "react-native";
-import {
-  Character,
-  PlayerCharacter,
-  getStartingBook,
-  savePlayer,
-} from "../../entities/character";
+import { Character, PlayerCharacter } from "../../entities/character";
 import { useNavigation } from "expo-router";
 import clearHistory, {
   getRandomName,
@@ -151,7 +146,12 @@ export default function NewGameReview() {
   if (blessingSelection !== undefined && classSelection !== undefined) {
     return (
       <View className="flex-1 px-6">
-        <Text className="pt-[8vh] text-center text-2xl">Review</Text>
+        <Text
+          className="pt-[8vh] text-center text-2xl"
+          accessibilityRole="header"
+        >
+          Review
+        </Text>
         <Text className="pt-[16vh] text-center text-3xl">
           {`${firstName} ${lastName} the `}
           <Text
@@ -168,7 +168,12 @@ export default function NewGameReview() {
             style={{ color: playerClassColors[classSelection] }}
           >{`${toTitleCase(classSelection)}`}</Text>
         </Text>
-        <GenericFlatButton onPress={() => startGame()} className="mt-4">
+        <GenericFlatButton
+          onPress={() => startGame()}
+          className="mt-4"
+          accessibilityRole="button"
+          accessibilityLabel="Confirm"
+        >
           Confirm?
         </GenericFlatButton>
       </View>

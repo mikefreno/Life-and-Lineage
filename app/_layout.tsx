@@ -7,10 +7,11 @@ import {
   Platform,
   Pressable,
   StyleSheet,
+  View,
   useColorScheme as useNativeColor,
 } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
-import { ThemedView } from "../components/Themed";
+import { ThemedView, Text } from "../components/Themed";
 import "../assets/styles/globals.css";
 import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
@@ -32,9 +33,12 @@ import FleeModal from "../components/DungeonComponents/FleeModal";
 import { DungeonProvider } from "../providers/DungeonData";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 import { LoadingBoundary } from "../components/LoadingBoundary";
-import { PlayerCharacter } from "../entities/character";
+import { Character, PlayerCharacter } from "../entities/character";
 import { RootStore } from "../stores/RootStore";
 import { DungeonStore } from "../stores/DungeonStore";
+import GenericModal from "../components/GenericModal";
+import { CharacterImage } from "../components/CharacterImage";
+import GenericFlatButton from "../components/GenericFlatButton";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -101,6 +105,8 @@ const RootLayout = observer(() => {
   const notificationListener = useRef<Notifications.EventSubscription>();
   const responseListener = useRef<Notifications.EventSubscription>();
   const pathname = usePathname();
+  const [showBirthModal, setShowBirthModal] = useState(false);
+  const [newbornBaby, setNewbornBaby] = useState<Character | null>(null);
 
   useEffect(() => {
     if (fontLoaded) {
@@ -222,6 +228,50 @@ const RootLayout = observer(() => {
     rootStore.atDeathScreen,
   ]);
 
+  useEffect(() => {
+    if (uiStore.newbornBaby) {
+      setNewbornBaby(uiStore.newbornBaby);
+      setShowBirthModal(true);
+      uiStore.setNewbornBaby(null);
+    }
+  }, [uiStore.newbornBaby]);
+
+  const BirthAnnouncementModal = observer(() => (
+    <GenericModal
+      isVisibleCondition={showBirthModal}
+      backFunction={() => setShowBirthModal(false)}
+      accessibilityLabel="Birth Announcement"
+    >
+      <View className="items-center">
+        <Text className="text-center text-2xl">A Child is Born!</Text>
+        {newbornBaby && (
+          <>
+            <Text className="text-center text-xl mt-4">
+              {newbornBaby.fullName}
+            </Text>
+            <Text className="text-center mt-2">
+              Sex: {toTitleCase(newbornBaby.sex)}
+            </Text>
+            <View className="mt-4">
+              <CharacterImage character={newbornBaby} />
+            </View>
+            <Text className="text-center mt-4">
+              Born to: {newbornBaby.parents?.[0].fullName}
+              {newbornBaby.parents?.[1] &&
+                ` and ${newbornBaby.parents[1].fullName}`}
+            </Text>
+          </>
+        )}
+        <GenericFlatButton
+          onPress={() => setShowBirthModal(false)}
+          className="mt-4"
+        >
+          Close
+        </GenericFlatButton>
+      </View>
+    </GenericModal>
+  ));
+
   while (!fontLoaded || !rootStore.constructed) {
     return (
       <ThemedView className="flex-1 items-center justify-center">
@@ -236,6 +286,8 @@ const RootLayout = observer(() => {
         <SystemBars style={colorScheme == "dark" ? "light" : "dark"} />
         <ProjectedImage />
         <FleeModal />
+        <BirthAnnouncementModal />
+
         <Stack
           screenOptions={{
             animation: uiStore.reduceMotion ? "none" : undefined,

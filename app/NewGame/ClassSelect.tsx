@@ -56,6 +56,7 @@ const SetClassScreen = observer(() => {
       <GenericModal
         isVisibleCondition={showTutorialReset}
         backFunction={() => setShowTutorialReset(false)}
+        accessibilityRole="alert"
       >
         <Text className="text-center text-2xl">Tutorial Reset</Text>
         <Text className="text-center text-lg">
@@ -74,19 +75,26 @@ const SetClassScreen = observer(() => {
               }
             }}
             className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+            accessibilityRole="button"
+            accessibilityLabel="Reset Tutorial"
           >
             <Text>Reset</Text>
           </Pressable>
           <Pressable
             onPress={() => setShowTutorialReset(false)}
             className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+            accessibilityRole="button"
+            accessibilityLabel="Cancel"
           >
             <Text>Cancel</Text>
           </Pressable>
         </ThemedView>
       </GenericModal>
       <View className="flex-1 items-center px-[6vw]">
-        <Text className="bold pt-[4vh] text-center text-3xl">
+        <Text
+          className="bold pt-[4vh] text-center text-3xl"
+          accessibilityRole="header"
+        >
           Create a Character
         </Text>
         <Text className="pt-[2vh] text-center text-2xl">Select Class</Text>
@@ -101,6 +109,8 @@ const SetClassScreen = observer(() => {
               height: uiStore.dimensions.height * 0.25,
               width: uiStore.dimensions.width * 0.45,
             }}
+            accessibilityRole="button"
+            accessibilityLabel="Select Mage"
           >
             {({ pressed }) => (
               <View
@@ -132,6 +142,8 @@ const SetClassScreen = observer(() => {
               height: uiStore.dimensions.height * 0.25,
               width: uiStore.dimensions.width * 0.45,
             }}
+            accessibilityRole="button"
+            accessibilityLabel="Select Ranger"
           >
             {({ pressed }) => (
               <View
@@ -166,6 +178,8 @@ const SetClassScreen = observer(() => {
               height: uiStore.dimensions.height * 0.25,
               width: uiStore.dimensions.width * 0.45,
             }}
+            accessibilityRole="button"
+            accessibilityLabel="Select Necromancer"
           >
             {({ pressed }) => (
               <View
@@ -199,6 +213,8 @@ const SetClassScreen = observer(() => {
               height: uiStore.dimensions.height * 0.25,
               width: uiStore.dimensions.width * 0.45,
             }}
+            accessibilityRole="button"
+            accessibilityLabel="Select Paladin"
           >
             {({ pressed }) => (
               <View
@@ -228,7 +244,11 @@ const SetClassScreen = observer(() => {
         </Text>
         {classSelection && (
           <View className="mx-auto py-4 pb-[10vh]">
-            <GenericFlatLink href="./BlessingSelect">
+            <GenericFlatLink
+              href="./BlessingSelect"
+              accessibilityRole="link"
+              accessibilityLabel="Next"
+            >
               <Text>Next</Text>
             </GenericFlatLink>
           </View>
@@ -241,6 +261,8 @@ const SetClassScreen = observer(() => {
             onPress={() => {
               setForceShowTutorial(true);
             }}
+            accessibilityRole="button"
+            accessibilityLabel="Show Tutorial"
           >
             <FontAwesome5
               name="question-circle"

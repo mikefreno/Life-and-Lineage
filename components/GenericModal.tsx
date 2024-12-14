@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import {
+  type AccessibilityRole,
   Dimensions,
   Platform,
   type StyleProp,
@@ -18,6 +19,16 @@ interface GenericModalProps {
   size?: number;
   style?: StyleProp<ViewStyle>;
   noPad?: boolean;
+  accessibilityRole?: AccessibilityRole;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  accessibilityState?: {
+    disabled?: boolean;
+    selected?: boolean;
+    checked?: boolean | "mixed";
+    busy?: boolean;
+    expanded?: boolean;
+  };
 }
 
 /**
@@ -41,6 +52,7 @@ export default function GenericModal({
   size,
   style,
   noPad,
+  ...props
 }: GenericModalProps) {
   const height = Dimensions.get("screen").height;
   const { colorScheme } = useColorScheme();
@@ -79,6 +91,7 @@ export default function GenericModal({
       coverScreen={true}
       deviceHeight={height}
       style={style}
+      {...props}
     >
       <ThemedView
         className={`mx-auto rounded-xl ${

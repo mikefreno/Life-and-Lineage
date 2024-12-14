@@ -11,8 +11,6 @@ import { toTitleCase } from "../../utility/functions/misc";
 import { useColorScheme } from "nativewind";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { playerClassColors } from "../../constants/Colors";
-import GenericFlatButton from "../../components/GenericFlatButton";
-import { useVibration } from "../../hooks/generic";
 import { useNewGameStore } from "./_layout";
 import { useRootStore } from "../../hooks/stores";
 import GenericFlatLink from "../../components/GenericLink";
@@ -30,7 +28,6 @@ export default function SetName() {
   const header = useHeaderHeight();
   const { firstName, lastName, setFirstName, setLastName } = useNewGameStore();
 
-  const vibration = useVibration();
   const { colorScheme } = useColorScheme();
 
   function trimWhitespace(str: string) {
@@ -39,11 +36,17 @@ export default function SetName() {
 
   return (
     <>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <TouchableWithoutFeedback
+        onPress={Keyboard.dismiss}
+        accessibilityRole="none"
+      >
         <View className="flex-1">
           <KeyboardAvoidingView style={{ marginTop: -header, flex: 1 }}>
             <View className="flex-1 px-6 pb-16 items-center justify-center border">
-              <View className="flex flex-row text-center">
+              <View
+                className="flex flex-row text-center"
+                accessibilityRole="header"
+              >
                 <Text className="text-center text-2xl md:text-3xl">
                   Choose Your
                   <Text
@@ -76,6 +79,8 @@ export default function SetName() {
                   width: Math.min(uiStore.dimensions.width * 0.65, 300),
                   fontSize: 20,
                 }}
+                accessibilityHint="Enter Your Character's First Name"
+                accessibilityLabel="First Name"
               />
               <Text className="pl-1 pt-1 pb-2">Maximum Length: 16</Text>
               <TextInput
@@ -98,6 +103,8 @@ export default function SetName() {
                   width: Math.min(uiStore.dimensions.width * 0.65, 300),
                   fontSize: 20,
                 }}
+                accessibilityHint="Enter Your Character's Last Name"
+                accessibilityLabel="Last Name"
               />
               <Text className="pl-1 pt-1 pb-2">Maximum Length: 16</Text>
               <View>
@@ -110,6 +117,8 @@ export default function SetName() {
                         setLastName(trimWhitespace(lastName));
                       }}
                       href="./Review"
+                      accessibilityRole="link"
+                      accessibilityLabel="Next"
                     >
                       <Text>Next</Text>
                     </GenericFlatLink>

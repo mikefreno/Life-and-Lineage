@@ -19,7 +19,6 @@ import { Condition } from "../entities/conditions";
 import sanityDebuffs from "../assets/json/sanityDebuffs.json";
 import { ConditionObjectType, EffectOptions } from "../utility/types";
 import * as SQLite from "expo-sqlite";
-import { CheckpointRow } from "../utility/database";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -78,6 +77,7 @@ export class RootStore {
     }
 
     this.playerState.gameTurnHandler();
+    this.checkForBirths();
   }
 
   inheritance() {
@@ -100,6 +100,33 @@ export class RootStore {
     this.shopsStore.setShops(this.shopsStore.getInitShopsState());
     savePlayer(newPlayer);
     this.clearDeathScreen();
+  }
+
+  checkForBirths() {
+    if (!this.playerState) return;
+
+    // Check player if female
+    if (this.playerState.sex === "female" && this.playerState.isPregnant) {
+      const baby = this.playerState.giveBirth();
+      if (baby) {
+        this.playerState.children.push(baby);
+        this.characterStore.addCharacter(baby);
+        this.uiStore.setNewbornBaby(baby);
+      }
+    }
+
+    // Check partners
+    this.playerState.partners.forEach((partner) => {
+      if (partner.sex === "female" && partner.isPregnant) {
+        const baby = partner.giveBirth();
+        if (baby) {
+          this.playerState?.children.push(baby);
+          partner.children.push(baby);
+          this.characterStore.addCharacter(baby);
+          this.uiStore.setNewbornBaby(baby);
+        }
+      }
+    });
   }
 
   private generateLowSanityDebuff() {

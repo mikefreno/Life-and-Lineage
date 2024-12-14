@@ -13,7 +13,6 @@ export type CodexEntry = {
 export function searchCodex(searchTerm: string): CodexEntry[] {
   const lowercasedTerm = searchTerm.toLowerCase();
 
-  // First, get all matching results
   const results = codexData.filter(
     (entry) =>
       entry.title.toLowerCase().includes(lowercasedTerm) ||
@@ -21,32 +20,26 @@ export function searchCodex(searchTerm: string): CodexEntry[] {
       entry.tags.some((tag) => tag.toLowerCase().includes(lowercasedTerm)),
   );
 
-  // Then, rank the results
   const rankedResults = results.map((entry) => {
     let score = 0;
 
-    // Higher score for exact matches in title
     if (entry.title.toLowerCase().includes(lowercasedTerm)) {
       score += 3;
     }
 
-    // Even higher score for starts-with matches in title
     if (entry.title.toLowerCase().startsWith(lowercasedTerm)) {
       score += 5;
     }
 
-    // Score for matches in content
     if (entry.content.toLowerCase().includes(lowercasedTerm)) {
       score += 1;
     }
 
-    // Score for matches in tags
     const tagMatches = entry.tags.filter((tag) =>
       tag.toLowerCase().includes(lowercasedTerm),
     ).length;
     score += tagMatches * 2;
 
-    // Boost score for more specific entries (those with subcategories)
     if (entry.subcategory) {
       score += 2;
     }
@@ -54,15 +47,12 @@ export function searchCodex(searchTerm: string): CodexEntry[] {
     return { entry, score };
   });
 
-  // Sort by score in descending order
   rankedResults.sort((a, b) => b.score - a.score);
 
-  // Return only the entries, not the scores
   return rankedResults.map((result) => result.entry);
 }
 
 export const codexData: CodexEntry[] = [
-  // Player Category
   {
     id: "player-overview",
     title: "Player Classes Overview",
@@ -158,7 +148,6 @@ export const codexData: CodexEntry[] = [
     route: "/Options/Codex/Player/Air",
   },
 
-  // Necromancer Schools
   {
     id: "magic-blood",
     title: "Blood Magic",
@@ -225,7 +214,6 @@ export const codexData: CodexEntry[] = [
     route: "/Options/Codex/Player/Vengeance",
   },
 
-  // Ranger Schools
   {
     id: "magic-beast-mastery",
     title: "Beast Mastery",
@@ -255,7 +243,6 @@ export const codexData: CodexEntry[] = [
     route: "/Options/Codex/Player/Arcane",
   },
 
-  // Gear Category
   {
     id: "gear-basics",
     title: "Gear Basics",
@@ -266,7 +253,6 @@ export const codexData: CodexEntry[] = [
     route: "/Options/Codex/Gear",
   },
 
-  // Labor Category
   {
     id: "labor-overview",
     title: "Labor System",
@@ -277,7 +263,6 @@ export const codexData: CodexEntry[] = [
     route: "/Options/Codex/Labor",
   },
 
-  // Relationships Category
   {
     id: "relationships-overview",
     title: "Relationships System",
@@ -287,7 +272,6 @@ export const codexData: CodexEntry[] = [
     route: "/Options/Codex/Relationships",
   },
 
-  // Combat Category
   {
     id: "combat-overview",
     title: "Combat System",

@@ -127,6 +127,7 @@ export class Item {
         this.suffix = suffix ?? null;
         this.stats = stats ?? null;
         this.name = name;
+        this.baseValue = baseValue;
       } else {
         const rolledRarity = ItemRarityService.rollRarity();
         const { prefix: rolledPrefix, suffix: rolledSuffix } =
@@ -147,6 +148,11 @@ export class Item {
           rolledPrefix,
           rolledSuffix,
         );
+        this.baseValue = ItemRarityService.calculateModifiedValue(
+          baseValue,
+          rolledPrefix,
+          rolledSuffix,
+        );
       }
     } else {
       this.rarity = Rarity.NORMAL;
@@ -154,10 +160,10 @@ export class Item {
       this.suffix = null;
       this.stats = stats ?? null;
       this.name = name;
+      this.baseValue = baseValue;
     }
 
     this.slot = slot ?? null;
-    this.baseValue = baseValue;
     this.itemClass = itemClass;
     this.icon = icon;
     this.requirements = requirements;
@@ -432,7 +438,10 @@ export class Item {
     if (!this.root.playerState)
       throw new Error(`Missing player on item! ${this.name}`);
 
-    if (this.root.playerState.equipment.mainHand.name === "unarmored") {
+    if (
+      this.root.playerState.equipment.mainHand.name.toLowerCase() ===
+      "unarmored"
+    ) {
       throw new Error("Can't apply poison to bare hands!");
     }
 

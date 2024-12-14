@@ -1,5 +1,10 @@
 import { ReactNode } from "react";
-import { ColorValue, Pressable, View } from "react-native";
+import {
+  type AccessibilityRole,
+  ColorValue,
+  Pressable,
+  View,
+} from "react-native";
 import { Text } from "./Themed";
 
 type GenericFlatButton = {
@@ -9,6 +14,16 @@ type GenericFlatButton = {
   className?: string;
   children: string | ReactNode;
   textColor?: string;
+  accessibilityRole?: AccessibilityRole;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  accessibilityState?: {
+    disabled?: boolean;
+    selected?: boolean;
+    checked?: boolean | "mixed";
+    busy?: boolean;
+    expanded?: boolean;
+  };
 };
 
 const GenericFlatButton = ({
@@ -18,9 +33,15 @@ const GenericFlatButton = ({
   textColor,
   children,
   className,
+  ...props
 }: GenericFlatButton) => {
   return (
-    <Pressable disabled={disabled} onPress={onPress} className={className}>
+    <Pressable
+      disabled={disabled}
+      onPress={onPress}
+      className={className}
+      {...props}
+    >
       {({ pressed }) => (
         <View
           className={`${pressed ? "scale-95 opacity-50" : ""} ${

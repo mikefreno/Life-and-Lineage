@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { View, Pressable, Switch } from "react-native";
+import { View, Pressable, Switch, AccessibilityRole } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { Text } from "./Themed";
 import { useColorScheme } from "nativewind";
@@ -24,6 +24,16 @@ type ITutorialModal = {
   pageThree?: TutorialPage;
   override?: boolean;
   clearOverride?: () => void;
+  accessibilityRole?: AccessibilityRole;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  accessibilityState?: {
+    disabled?: boolean;
+    selected?: boolean;
+    checked?: boolean | "mixed";
+    busy?: boolean;
+    expanded?: boolean;
+  };
 };
 
 const TutorialModal = observer(
@@ -37,6 +47,7 @@ const TutorialModal = observer(
     pageThree,
     override,
     clearOverride,
+    ...props
   }: ITutorialModal) => {
     const { tutorialStore } = useRootStore();
     const { colorScheme } = useColorScheme();
@@ -138,6 +149,8 @@ const TutorialModal = observer(
 
           setShouldShow(false);
         }}
+        accessibilityRole="alert"
+        {...props}
       >
         {pageTwo && (
           <View

@@ -80,7 +80,7 @@ export default function DeathScreen() {
     if (nextLife && selectedClass && selectedBlessing && playerState) {
       const inventory = [
         ...playerState.inventory,
-        playerState.equipment.mainHand.name !== "unarmored"
+        playerState.equipment.mainHand.name.toLowerCase() !== "unarmored"
           ? playerState.equipment.mainHand
           : null,
         playerState.equipment.body,

@@ -16,7 +16,6 @@ import {
 import BlessingDisplay from "../../components/BlessingsDisplay";
 import { toTitleCase } from "../../utility/functions/misc";
 import { elementalColorMap, playerClassColors } from "../../constants/Colors";
-import GenericFlatButton from "../../components/GenericFlatButton";
 import { useIsFocused } from "@react-navigation/native";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
@@ -57,7 +56,7 @@ export default function SetBlessing() {
         }}
       />
       <View className="flex-1 pt-8">
-        <Text className="text-center text-2xl px-4">
+        <Text className="text-center text-2xl px-4" accessibilityRole="header">
           With What Blessing Was Your
           <Text
             style={{ color: playerClassColors[classSelection] }}
@@ -78,7 +77,11 @@ export default function SetBlessing() {
           </Text>
           {blessingSelection == 0 || blessingSelection ? ( // sometimes I really hate ts. Evaluation of 0 is false.
             <View className="mx-auto h-32 py-2">
-              <GenericFlatLink href={"./SexSelect"}>
+              <GenericFlatLink
+                href={"./SexSelect"}
+                accessibilityRole="link"
+                accessibilityLabel="Next"
+              >
                 <Text>Next</Text>
               </GenericFlatLink>
             </View>
@@ -95,6 +98,8 @@ export default function SetBlessing() {
               onPress={() => {
                 setForceShowTutorial(true);
               }}
+              accessibilityRole="button"
+              accessibilityLabel="Show Tutorial"
             >
               <FontAwesome5
                 name="question-circle"
@@ -133,6 +138,8 @@ const BlessingPressable = ({
         height: dimensions.height * 0.25,
         width: dimensions.width * 0.45,
       }}
+      accessibilityRole="button"
+      accessibilityLabel={`Select Blessing of ${ElementToString[element]}`}
     >
       {({ pressed }) => (
         <View
@@ -362,5 +369,5 @@ function ClassDependantBlessings({
         </View>
       </View>
     );
-  } else throw new Error(`invalid class set: ${playerClass}`);
+  }
 }

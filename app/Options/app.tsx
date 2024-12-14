@@ -13,7 +13,6 @@ import D20DieAnimation from "../../components/DieRollAnim";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
-import { thirdPartyErrorFilterIntegration } from "@sentry/core";
 
 const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
@@ -228,7 +227,7 @@ export const AppSettings = observer(() => {
         </ScrollView>
       </GenericModal>
       <ScrollView>
-        <View className="flex-1 items-center justify-center px-4">
+        <View className="flex-1 items-center justify-center px-4 pt-12">
           {/*<GenericRaisedButton
             onPress={() => router.push("/Options/iaps")}
           >
