@@ -278,6 +278,7 @@ export class DungeonStore {
       ? this.currentLevel.generateBossEncounter
       : this.currentLevel.generateNormalEncounter;
     this.root.enemyStore.clearEnemyList();
+    if (!enemies) return;
     enemies.forEach((enemy) => this.root.enemyStore.addToEnemyList(enemy));
 
     if (enemies.length === 1) {

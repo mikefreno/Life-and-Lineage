@@ -1,17 +1,8 @@
 import { Text } from "../../components/Themed";
 import { View } from "react-native";
-import { Character, PlayerCharacter } from "../../entities/character";
 import { useNavigation } from "expo-router";
-import clearHistory, {
-  getRandomName,
-  getRandomPersonality,
-  toTitleCase,
-  wait,
-} from "../../utility/functions/misc";
-import {
-  getRandomJobTitle,
-  getStartingBaseStats,
-} from "../../utility/functions/characterAid";
+import clearHistory, { toTitleCase, wait } from "../../utility/functions/misc";
+import { createPlayerCharacter } from "../../utility/functions/characterAid";
 import { Element, ElementToString } from "../../utility/types";
 import { elementalColorMap, playerClassColors } from "../../constants/Colors";
 import { storage } from "../../utility/functions/storage";
@@ -31,112 +22,21 @@ export default function NewGameReview() {
   const navigation = useNavigation();
   const { colorScheme } = useColorScheme();
 
-  function createParent(sex: "female" | "male"): Character {
-    const firstName = getRandomName(sex).firstName;
-    const job = getRandomJobTitle();
-    const personality = getRandomPersonality();
-    const parent = new Character({
-      firstName: firstName,
-      lastName: lastName,
-      personality,
-      sex: sex,
-      job: job,
-      affection: 85,
-      birthdate: root.time.generateBirthDateInRange(32, 55),
-      root,
-    });
-    return parent;
-  }
-
-  function createPlayerCharacter() {
-    const mom = createParent("female");
-    const dad = createParent("male");
-    let newCharacter: PlayerCharacter;
-    const bday = root.time.generateBirthDateForAge(15);
-    if (
-      classSelection === "paladin" &&
-      (blessingSelection == Element.vengeance ||
-        blessingSelection == Element.protection ||
-        blessingSelection == Element.holy)
-    ) {
-      newCharacter = new PlayerCharacter({
-        firstName: firstName,
-        lastName: lastName,
-        sex: sex as "male" | "female",
-        playerClass: classSelection,
-        blessing: blessingSelection,
-        parents: [mom, dad],
-        birthdate: bday,
-        ...getStartingBaseStats({ classSelection }),
-        root,
-      });
-    } else if (
-      classSelection === "necromancer" &&
-      (blessingSelection == Element.bone ||
-        blessingSelection == Element.blood ||
-        blessingSelection == Element.summoning ||
-        blessingSelection == Element.pestilence)
-    ) {
-      newCharacter = new PlayerCharacter({
-        firstName: firstName,
-        lastName: lastName,
-        sex: sex as "male" | "female",
-        playerClass: classSelection,
-        blessing: blessingSelection,
-        parents: [mom, dad],
-        birthdate: bday,
-        ...getStartingBaseStats({ classSelection }),
-        root,
-      });
-    } else if (
-      classSelection == "mage" &&
-      (blessingSelection == Element.air ||
-        blessingSelection == Element.fire ||
-        blessingSelection == Element.earth ||
-        blessingSelection == Element.water)
-    ) {
-      newCharacter = new PlayerCharacter({
-        firstName: firstName,
-        lastName: lastName,
-        sex: sex as "male" | "female",
-        playerClass: classSelection,
-        blessing: blessingSelection,
-        parents: [mom, dad],
-        birthdate: bday,
-        ...getStartingBaseStats({ classSelection }),
-        root,
-      });
-    } else if (
-      classSelection == "ranger" &&
-      (blessingSelection == Element.beastMastery ||
-        blessingSelection == Element.assassination ||
-        blessingSelection == Element.arcane)
-    ) {
-      newCharacter = new PlayerCharacter({
-        firstName: firstName,
-        lastName: lastName,
-        sex: sex as "male" | "female",
-        playerClass: classSelection,
-        blessing: blessingSelection,
-        parents: [mom, dad],
-        birthdate: bday,
-        ...getStartingBaseStats({ classSelection }),
-        root,
-      });
-    } else {
-      throw new Error("Incorrect Player class/blessing combination!");
-    }
-    return newCharacter;
-  }
-
   async function startGame() {
-    if (classSelection) {
+    if (classSelection && sex && blessingSelection) {
       let parsed = true;
       const tutorialState = storage.getString("tutorialsEnabled");
       if (tutorialState) {
         parsed = JSON.parse(tutorialState);
       }
-      const player = createPlayerCharacter();
+      const player = createPlayerCharacter({
+        sex,
+        root,
+        firstName,
+        lastName,
+        blessingSelection,
+        classSelection,
+      });
       root.newGame(player);
       vibration({ style: "success" });
       wait(250).then(() => clearHistory(navigation));

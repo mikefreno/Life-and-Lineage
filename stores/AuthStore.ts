@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, makeObservable } from "mobx";
 import { jwtDecode } from "jwt-decode";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
@@ -9,7 +9,6 @@ import { parse, stringify } from "flatted";
 import { storage } from "../utility/functions/storage";
 import google_config from "../config/google_config";
 import { API_BASE_URL } from "../config/config";
-import { CheckpointRow } from "../utility/database";
 import { serializeJobs } from "../entities/character";
 import type { RootStore } from "./RootStore";
 
@@ -51,10 +50,15 @@ export class AuthStore {
   root: RootStore;
 
   constructor({ root }: { root: RootStore }) {
+    this.root = root;
+
+    this.isConnected = false;
+    this.isInitialized = false;
+
     this.initializeNetInfo();
     this.initializeAuth();
     this.initializeGoogleSignIn();
-    this.root = root;
+
     makeAutoObservable(this);
   }
 

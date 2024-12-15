@@ -1,3 +1,5 @@
+import Root from "../../app/+html";
+import { Rarity } from "../../utility/types";
 import { Affix, ItemRarityService } from "../item";
 
 const MOCK_PREFIXES: Affix[] = [
@@ -84,31 +86,35 @@ describe("ItemRarityService", () => {
   describe("rollRarity", () => {
     it("should return rare for rolls <= RARE chance", () => {
       Math.random = jest.fn().mockReturnValue(0.05);
-      expect(ItemRarityService.rollRarity()).toBe("rare");
+      expect(ItemRarityService.rollRarity()).toBe(Rarity.RARE);
     });
 
     it("should return magic for rolls between RARE and MAGIC+RARE chance", () => {
       Math.random = jest.fn().mockReturnValue(0.15);
-      expect(ItemRarityService.rollRarity()).toBe("magic");
+      expect(ItemRarityService.rollRarity()).toBe(Rarity.MAGIC);
     });
 
     it("should return normal for rolls > MAGIC+RARE chance", () => {
       Math.random = jest.fn().mockReturnValue(0.5);
-      expect(ItemRarityService.rollRarity()).toBe("normal");
+      expect(ItemRarityService.rollRarity()).toBe(Rarity.NORMAL);
     });
 
     it("should maintain proper distribution over many rolls", () => {
       const rolls = 10000;
-      const results = { rare: 0, magic: 0, normal: 0 };
+      const results = {
+        [Rarity.NORMAL]: 0,
+        [Rarity.MAGIC]: 0,
+        [Rarity.RARE]: 0,
+      };
 
       for (let i = 0; i < rolls; i++) {
         const rarity = ItemRarityService.rollRarity();
         results[rarity]++;
       }
 
-      expect(results.rare / rolls).toBeCloseTo(0.1, 1);
-      expect(results.magic / rolls).toBeCloseTo(0.25, 1);
-      expect(results.normal / rolls).toBeCloseTo(0.65, 1);
+      expect(results[Rarity.RARE] / rolls).toBeCloseTo(0.1, 1);
+      expect(results[Rarity.MAGIC] / rolls).toBeCloseTo(0.25, 1);
+      expect(results[Rarity.NORMAL] / rolls).toBeCloseTo(0.65, 1);
     });
   });
 
@@ -157,25 +163,25 @@ describe("ItemRarityService", () => {
 
   describe("generateAffixes", () => {
     it("should generate both prefix and suffix for rare items", () => {
-      const result = ItemRarityService.generateAffixes("rare");
+      const result = ItemRarityService.generateAffixes(Rarity.RARE);
       expect(result.prefix).not.toBeNull();
       expect(result.suffix).not.toBeNull();
     });
 
     it("should generate either prefix or suffix for magic items", () => {
       Math.random = jest.fn().mockReturnValue(0.3);
-      let result = ItemRarityService.generateAffixes("magic");
+      let result = ItemRarityService.generateAffixes(Rarity.MAGIC);
       expect(result.prefix).not.toBeNull();
       expect(result.suffix).toBeNull();
 
       Math.random = jest.fn().mockReturnValue(0.7);
-      result = ItemRarityService.generateAffixes("magic");
+      result = ItemRarityService.generateAffixes(Rarity.MAGIC);
       expect(result.prefix).toBeNull();
       expect(result.suffix).not.toBeNull();
     });
 
     it("should generate no affixes for normal items", () => {
-      const result = ItemRarityService.generateAffixes("normal");
+      const result = ItemRarityService.generateAffixes(Rarity.NORMAL);
       expect(result.prefix).toBeNull();
       expect(result.suffix).toBeNull();
     });

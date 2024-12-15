@@ -176,6 +176,7 @@ export class DungeonLevel {
   }
 
   get generateNormalEncounter(): Enemy[] {
+    if (this.normalEncounters.length == 0) return;
     const fightIdx = Math.floor(Math.random() * this.normalEncounters.length);
     const enemiesSpec = this.normalEncounters[fightIdx];
     const enemies = enemiesSpec.map((enemySpec) => {

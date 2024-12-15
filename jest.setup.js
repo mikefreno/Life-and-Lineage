@@ -22,21 +22,11 @@ jest.mock("@react-native-google-signin/google-signin", () => {
   };
 });
 
-//jest.mock("./utility/functions/save_load", () => {
-//return {
-//storage: {
-//getString: jest.fn(),
-//set: jest.fn(),
-//delete: jest.fn(),
-//},
-//};
-//});
-
 jest.mock("@react-native-community/netinfo", () => {
   return {
-    fetch: jest.fn(() => Promise.resolve({ isConnected: true })),
+    fetch: jest.fn(() => Promise.resolve({ isConnected: false })),
     addEventListener: jest.fn((callback) => {
-      callback({ isConnected: true });
+      callback({ isConnected: false });
       return jest.fn();
     }),
   };

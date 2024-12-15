@@ -1,58 +1,149 @@
 [
-   {
-      "type": "armorer",
-      "trades":["bodyArmor", "helmet", "shield"],
-      "baseGold": 120000,
-      "itemQuantityRange": {"minimum":3, "maximum":10},
-      "possiblePersonalities": ["reserved", "open", "jovial"],
-   },
-   {
-      "type": "weaponsmith",
-      "trades":["melee", "shield"],
-      "baseGold": 90000,
-      "itemQuantityRange": {"minimum":5, "maximum":15},
-      "possiblePersonalities": ["reserved", "aggressive", "jovial"],
-   },
-   {
-      "type": "weaver",
-      "trades":["robe", "hat"],
-      "baseGold": 150000,
-      "itemQuantityRange": {"minimum":2, "maximum":5},
-      "possiblePersonalities": ["reserved", "silent", "calm"],
-   },
-   {
-      "type": "archanist",
-      "trades":["wand", "focus", "staff"],
-      "baseGold": 100000,
-      "itemQuantityRange": {"minimum":3, "maximum":6},
-      "possiblePersonalities": ["wise", "silent", "insane"],
-   },
-   {
-      "type":"junk dealer",
-      "trades": ["bodyArmor", "robe", "helmet", "hat", "melee", "shield", "focus", "junk", "arrow", "staff"],
-      "baseGold": 50000,
-      "itemQuantityRange": {"minimum":10, "maximum":20},
-      "possiblePersonalities": ["creepy", "insane", "silent"],
-   },
-   {
-      "type":"fletcher",
-      "trades": ["bow", "arrow"],
-      "baseGold": 20000,
-      "itemQuantityRange": {"minimum":10, "maximum":20},
-      "possiblePersonalities": ["reserved", "incredulous", "arrogant"],
-   },
-   {
-      "type": "apothecary",
-      "trades": ["potion", "poison", "ingredient"],
-      "baseGold": 30000,
-      "itemQuantityRange": {"minimum":10, "maximum":20},
-      "possiblePersonalities": ["wise", "insane", "creepy"],
-   },
-   {
-      "type":"librarian",
-      "trades": ["book"],
-      "baseGold": 60000,
-      "itemQuantityRange": {"minimum":2, "maximum":4},
-      "possiblePersonalities": ["wise", "reserved", "arrogant"],
-   }
+  {
+    "type": "armorer",
+    "trades": [
+      "bodyArmor",
+      "helmet",
+      "shield"
+    ],
+    "baseGold": 120000,
+    "itemQuantityRange": {
+      "minimum": 3,
+      "maximum": 10
+    },
+    "possiblePersonalities": [
+      "reserved",
+      "open",
+      "jovial"
+    ]
+  },
+  {
+    "type": "weaponsmith",
+    "trades": [
+      "melee",
+      "shield"
+    ],
+    "baseGold": 90000,
+    "itemQuantityRange": {
+      "minimum": 5,
+      "maximum": 15
+    },
+    "possiblePersonalities": [
+      "reserved",
+      "aggressive",
+      "jovial"
+    ]
+  },
+  {
+    "type": "weaver",
+    "trades": [
+      "robe",
+      "hat"
+    ],
+    "baseGold": 150000,
+    "itemQuantityRange": {
+      "minimum": 2,
+      "maximum": 5
+    },
+    "possiblePersonalities": [
+      "reserved",
+      "silent",
+      "calm"
+    ]
+  },
+  {
+    "type": "archanist",
+    "trades": [
+      "wand",
+      "focus",
+      "staff"
+    ],
+    "baseGold": 100000,
+    "itemQuantityRange": {
+      "minimum": 3,
+      "maximum": 6
+    },
+    "possiblePersonalities": [
+      "wise",
+      "silent",
+      "insane"
+    ]
+  },
+  {
+    "type": "junk dealer",
+    "trades": [
+      "bodyArmor",
+      "robe",
+      "helmet",
+      "hat",
+      "melee",
+      "shield",
+      "focus",
+      "junk",
+      "arrow",
+      "staff"
+    ],
+    "baseGold": 50000,
+    "itemQuantityRange": {
+      "minimum": 10,
+      "maximum": 20
+    },
+    "possiblePersonalities": [
+      "creepy",
+      "insane",
+      "silent"
+    ]
+  },
+  {
+    "type": "fletcher",
+    "trades": [
+      "bow",
+      "arrow"
+    ],
+    "baseGold": 20000,
+    "itemQuantityRange": {
+      "minimum": 10,
+      "maximum": 20
+    },
+    "possiblePersonalities": [
+      "reserved",
+      "incredulous",
+      "arrogant"
+    ]
+  },
+  {
+    "type": "apothecary",
+    "trades": [
+      "potion",
+      "poison",
+      "ingredient"
+    ],
+    "baseGold": 30000,
+    "itemQuantityRange": {
+      "minimum": 10,
+      "maximum": 20
+    },
+    "possiblePersonalities": [
+      "wise",
+      "insane",
+      "creepy"
+    ]
+  },
+  {
+    "type": "librarian",
+    "trades": [
+      "book"
+    ],
+    "baseGold": 60000,
+    "itemQuantityRange": {
+      "minimum": 2,
+      "maximum": 4
+    },
+    "possiblePersonalities": [
+      "wise",
+      "reserved",
+      "arrogant"
+    ]
+  }
 ]
+

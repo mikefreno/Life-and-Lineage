@@ -108,7 +108,9 @@ export class CharacterStore {
     child: Character;
     adopting?: boolean;
   }) {
-    this.independentChildren.filter((char) => char.id !== child.id);
+    this.independentChildren = this.independentChildren.filter(
+      (char) => char.id !== child.id,
+    );
     if (adopting) {
       this.addCharacter(child);
     } else {
