@@ -345,7 +345,7 @@ export class Creature {
    * Calculates the damage reduction of the creature based on its armor and condition effects.
    * @returns The damage reduction percentage.
    */
-  public getDamageReduction() {
+  public getPhysicalDamageReduction() {
     const { armorMult, armorFlat } = getConditionEffectsOnDefenses(
       this.conditions,
     );

@@ -1,5 +1,4 @@
-import Root from "../../app/+html";
-import { Rarity } from "../../utility/types";
+import { Modifier, Rarity } from "../../utility/types";
 import { Affix, ItemRarityService } from "../item";
 
 const MOCK_PREFIXES: Affix[] = [
@@ -219,7 +218,7 @@ describe("ItemRarityService", () => {
 
   describe("applyAffixesToStats", () => {
     it("should correctly apply prefix and suffix modifiers", () => {
-      const baseStats = { health: 100, healthRegen: 1 };
+      const baseStats = { health: 100, HealthRegen: 1 };
       const prefix = {
         affix: MOCK_PREFIXES[0],
         tier: 1,
@@ -237,8 +236,8 @@ describe("ItemRarityService", () => {
         suffix,
       );
 
-      expect(result.health).toBe(baseStats.health + 30 + 24); // min values from tier 1
-      expect(result.healthRegen).toBe(baseStats.healthRegen + 3); // min value from tier 1
+      expect(result.get(Modifier.Health)).toBe(154); // min values from tier 1
+      expect(result.get(Modifier.HealthRegen)).toBe(4); // min value from tier 1
     });
 
     it("should work with null base stats", () => {
@@ -251,7 +250,7 @@ describe("ItemRarityService", () => {
 
       const result = ItemRarityService.applyAffixesToStats(null, prefix, null);
 
-      expect(result.health).toBe(30); // min value from tier 1
+      expect(result.get(Modifier.Health)).toBe(30); // min value from tier 1
     });
   });
 

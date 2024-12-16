@@ -26,6 +26,7 @@ import {
   Personality,
   Rarity,
   MerchantType,
+  Modifier,
 } from "../utility/types";
 import {
   rollToLiveByAge,
@@ -492,8 +493,7 @@ export class PlayerCharacter extends Character {
   baseInventory: Item[];
   keyItems: Item[];
   equipment: {
-    // nulls indicate a lack of equipment in the given slot
-    mainHand: Item; // main hand is never null, weapons are replaced with 'unarmored'
+    mainHand: Item;
     offHand: Item | null;
     head: Item | null;
     body: Item | null;
@@ -616,7 +616,7 @@ export class PlayerCharacter extends Character {
         suffix: null,
         name: "unarmored",
         slot: "one-hand",
-        stats: { physicalDamage: 1 },
+        stats: { [Modifier.PhysicalDamage]: 1 },
         baseValue: 0,
         itemClass: ItemClassType.Melee,
         attacks: ["punch"],
@@ -731,13 +731,28 @@ export class PlayerCharacter extends Character {
       equipItem: action,
       unEquipItem: action,
       inventory: computed,
-      getDamageReduction: action,
+      getPhysicalDamageReduction: action,
       purchaseStack: action,
 
       getMedicalService: action,
       bossDefeated: action,
 
       gameTurnHandler: action,
+
+      totalPhysicalDamage: computed,
+      totalFireDamage: computed,
+      totalColdDamage: computed,
+      totalLightningDamage: computed,
+      totalPoisonDamage: computed,
+      totalDamage: computed,
+
+      fireResistance: computed,
+      coldResistance: computed,
+      lightningResistance: computed,
+      poisonResistance: computed,
+      totalArmor: computed,
+      dodgeChance: computed,
+      blockChance: computed,
     });
 
     reaction(
@@ -858,7 +873,7 @@ export class PlayerCharacter extends Character {
     return (
       (this.baseHealth + this.allocatedSkillPoints[Attribute.health] * 10) *
         healthMult +
-      this.equipmentStats.health +
+      (this.equipmentStats.get(Modifier.Health) ?? 0) +
       healthFlat
     );
   }
@@ -867,9 +882,10 @@ export class PlayerCharacter extends Character {
     return (
       this.baseHealth +
       this.allocatedSkillPoints[Attribute.health] * 10 +
-      this.equipmentStats.health
+      (this.equipmentStats.get(Modifier.Health) ?? 0)
     );
   }
+
   /**
    * attackerId is here to conform with the Creature implementation, it is unused
    */
@@ -908,7 +924,7 @@ export class PlayerCharacter extends Character {
     return (
       (this.baseMana + this.allocatedSkillPoints[Attribute.mana] * 10) *
         manaMaxMult +
-      this.equipmentStats.mana +
+      (this.equipmentStats.get(Modifier.Mana) ?? 0) +
       manaMaxFlat
     );
   }
@@ -917,7 +933,7 @@ export class PlayerCharacter extends Character {
     return (
       this.baseMana +
       this.allocatedSkillPoints[Attribute.mana] * 10 +
-      this.equipmentStats.mana
+      (this.equipmentStats.get(Modifier.Mana) ?? 0)
     );
   }
 
@@ -927,13 +943,15 @@ export class PlayerCharacter extends Character {
     );
     return (
       this.baseManaRegen * manaRegenMult +
-      this.equipmentStats.regen +
+      (this.equipmentStats.get(Modifier.ManaRegen) ?? 0) +
       manaRegenFlat
     );
   }
 
   get nonConditionalManaRegen() {
-    return this.baseManaRegen + this.equipmentStats.regen;
+    return (
+      this.baseManaRegen + (this.equipmentStats.get(Modifier.ManaRegen) ?? 0)
+    );
   }
 
   public useMana(mana: number) {
@@ -971,7 +989,7 @@ export class PlayerCharacter extends Character {
     return (
       (this.baseSanity + this.allocatedSkillPoints[Attribute.sanity] * 5) *
         sanityMult +
-      this.equipmentStats.sanity +
+      (this.equipmentStats.get(Modifier.Sanity) ?? 0) +
       sanityFlat
     );
   }
@@ -980,7 +998,7 @@ export class PlayerCharacter extends Character {
     return (
       this.baseSanity +
       this.allocatedSkillPoints[Attribute.sanity] * 5 +
-      this.equipmentStats.sanity
+      (this.equipmentStats.get(Modifier.Sanity) ?? 0)
     );
   }
 
@@ -1013,7 +1031,7 @@ export class PlayerCharacter extends Character {
     return (
       this.baseStrength +
       this.allocatedSkillPoints[Attribute.strength] +
-      this.equipmentStats.strength
+      (this.equipmentStats.get(Modifier.Strength) ?? 0)
     );
   }
 
@@ -1021,12 +1039,12 @@ export class PlayerCharacter extends Character {
     return (
       this.baseStrength +
       this.allocatedSkillPoints[Attribute.strength] +
-      this.equipmentStats.strength
+      (this.equipmentStats.get(Modifier.Strength) ?? 0)
     );
   }
 
   get attackPower() {
-    return this.totalStrength * 0.5 + this.equipmentStats.damage;
+    return this.totalStrength * 0.5 + this.totalDamage;
   }
   //----------------------------------Intelligence-------------------------------//
   get totalIntelligence() {
@@ -1035,7 +1053,7 @@ export class PlayerCharacter extends Character {
     return (
       this.baseIntelligence +
       this.allocatedSkillPoints[Attribute.intelligence] +
-      this.equipmentStats.intelligence
+      (this.equipmentStats.get(Modifier.Intelligence) ?? 0)
     );
   }
 
@@ -1043,7 +1061,7 @@ export class PlayerCharacter extends Character {
     return (
       this.baseIntelligence +
       this.allocatedSkillPoints[Attribute.intelligence] +
-      this.equipmentStats.intelligence
+      (this.equipmentStats.get(Modifier.Intelligence) ?? 0)
     );
   }
   get magicPower() {
@@ -1056,7 +1074,7 @@ export class PlayerCharacter extends Character {
     return (
       this.baseDexterity +
       this.allocatedSkillPoints[Attribute.dexterity] +
-      this.equipmentStats.dexterity
+      (this.equipmentStats.get(Modifier.Dexterity) ?? 0)
     );
   }
 
@@ -1064,7 +1082,7 @@ export class PlayerCharacter extends Character {
     return (
       this.baseDexterity +
       this.allocatedSkillPoints[Attribute.dexterity] +
-      this.equipmentStats.dexterity
+      (this.equipmentStats.get(Modifier.Dexterity) ?? 0)
     );
   }
   get criticalChance() {
@@ -1183,61 +1201,176 @@ export class PlayerCharacter extends Character {
   }
 
   get equipmentStats() {
-    let armor = 0;
-    let damage = 0;
-    let mana = 0;
-    let regen = 0;
-    let health = 0;
-    let sanity = 0;
-    let blockChance = 0;
-    let strength = 0;
-    let intelligence = 0;
-    let dexterity = 0;
+    const stats = new Map<Modifier, number>();
 
     for (const [_, item] of Object.entries(this.equipment)) {
       if (item && "length" in item) {
         if (this.equipment.mainHand.itemClass === ItemClassType.Bow) {
-          const stats = item[0]?.stats;
-          if (!stats || !item[0].playerHasRequirements) continue;
-          armor += stats.armor ?? 0;
-          damage += stats.physicalDamage ?? 0;
-          mana += stats.mana ?? 0;
-          regen += stats.manaRegen ?? 0;
-          health += stats.health ?? 0;
-          sanity += stats.sanity ?? 0;
-          blockChance += stats.blockChance ?? 0;
-          strength += stats.strength ?? 0;
-          intelligence += stats.intelligence ?? 0;
-          dexterity += stats.dexterity ?? 0;
+          const itemStats = item[0]?.stats;
+          if (!itemStats || !item[0].playerHasRequirements) continue;
+
+          itemStats.forEach((value, key) => {
+            stats.set(key, (stats.get(key) ?? 0) + value);
+          });
         }
       } else {
-        const stats = item?.stats;
-        if (!stats || !item.playerHasRequirements) continue;
-        armor += stats.armor ?? 0;
-        damage += stats.physicalDamage ?? 0;
-        mana += stats.mana ?? 0;
-        regen += stats.manaRegen ?? 0;
-        health += stats.health ?? 0;
-        sanity += stats.sanity ?? 0;
-        blockChance += stats.blockChance ?? 0;
-        strength += stats.strength ?? 0;
-        intelligence += stats.intelligence ?? 0;
-        dexterity += stats.dexterity ?? 0;
+        const itemStats = item?.stats;
+        if (!itemStats || !item.playerHasRequirements) continue;
+
+        itemStats.forEach((value, key) => {
+          stats.set(key, (stats.get(key) ?? 0) + value);
+        });
       }
     }
 
-    return {
-      armor,
-      damage,
-      mana,
-      regen,
-      health,
-      sanity,
-      blockChance,
-      strength,
-      intelligence,
-      dexterity,
-    };
+    return stats;
+  }
+
+  private calculateTotalDamage(
+    baseDamageModifier: Modifier,
+    addedDamageModifier: Modifier,
+    multiplierModifier: Modifier,
+  ): number {
+    let baseDamage = 0;
+    let addedDamage = 0;
+    let multiplier = 1;
+
+    for (const [_, item] of Object.entries(this.equipment)) {
+      if (Array.isArray(item)) {
+        baseDamage += item[0].stats?.get(baseDamageModifier) || 0;
+      } else if (item && item.stats) {
+        baseDamage += item.stats.get(baseDamageModifier) || 0;
+        addedDamage += item.stats.get(addedDamageModifier) || 0;
+        multiplier += item.stats.get(multiplierModifier) || 0;
+      }
+    }
+
+    return (baseDamage + addedDamage) * multiplier;
+  }
+
+  get totalPhysicalDamage(): number {
+    return this.calculateTotalDamage(
+      Modifier.PhysicalDamage,
+      Modifier.PhysicalDamageAdded,
+      Modifier.PhysicalDamageMultiplier,
+    );
+  }
+
+  get totalFireDamage(): number {
+    return this.calculateTotalDamage(
+      Modifier.FireDamage,
+      Modifier.FireDamageAdded,
+      Modifier.FireDamageMultiplier,
+    );
+  }
+
+  get totalColdDamage(): number {
+    return this.calculateTotalDamage(
+      Modifier.ColdDamage,
+      Modifier.ColdDamageAdded,
+      Modifier.ColdDamageMultiplier,
+    );
+  }
+
+  get totalLightningDamage(): number {
+    return this.calculateTotalDamage(
+      Modifier.LightningDamage,
+      Modifier.LightningDamageAdded,
+      Modifier.LightningDamageMultiplier,
+    );
+  }
+
+  get totalPoisonDamage(): number {
+    return this.calculateTotalDamage(
+      Modifier.PoisonDamage,
+      Modifier.PoisonDamageAdded,
+      Modifier.PoisonDamageMultiplier,
+    );
+  }
+
+  get totalDamage(): number {
+    return (
+      this.totalPhysicalDamage +
+      this.totalFireDamage +
+      this.totalColdDamage +
+      this.totalLightningDamage +
+      this.totalPoisonDamage
+    );
+  }
+
+  private calculateTotalResistance(resistanceModifier: Modifier): number {
+    let resistance = 0;
+    for (const [_, item] of Object.entries(this.equipment)) {
+      if (Array.isArray(item)) {
+        // arrows - no mods
+        continue;
+      } else if (item && item.stats) {
+        resistance += item.stats.get(resistanceModifier) || 0;
+      }
+    }
+    // Cap resistance at 75%
+    return Math.min(resistance, 75);
+  }
+
+  get fireResistance(): number {
+    return this.calculateTotalResistance(Modifier.FireResistance);
+  }
+
+  get coldResistance(): number {
+    return this.calculateTotalResistance(Modifier.ColdResistance);
+  }
+
+  get lightningResistance(): number {
+    return this.calculateTotalResistance(Modifier.LightningResistance);
+  }
+
+  get poisonResistance(): number {
+    return this.calculateTotalResistance(Modifier.PoisonResistance);
+  }
+
+  get totalArmor(): number {
+    let baseArmor = 0;
+    let addedArmor = 0;
+    for (const [_, item] of Object.entries(this.equipment)) {
+      if (Array.isArray(item)) {
+        // arrows - no mods
+        continue;
+      } else if (item && item.stats) {
+        baseArmor += item.stats.get(Modifier.Armor) || 0;
+        addedArmor += item.stats.get(Modifier.ArmorAdded) || 0;
+      }
+    }
+    return baseArmor + addedArmor;
+  }
+
+  get dodgeChance(): number {
+    let dodgeChance = 0;
+    for (const [_, item] of Object.entries(this.equipment)) {
+      if (Array.isArray(item)) {
+        // arrows - no mods
+        continue;
+      } else if (item && item.stats) {
+        dodgeChance += item.stats.get(Modifier.DodgeChance) || 0;
+      }
+    }
+    // Base dodge chance from dexterity (assuming 1 dexterity = 0.1% dodge chance)
+    const baseDodgeChance = this.totalDexterity * 0.1;
+    // Cap dodge chance at 75%
+    return Math.min(dodgeChance + baseDodgeChance, 75);
+  }
+
+  get blockChance(): number {
+    let blockChance = 0;
+    for (const [_, item] of Object.entries(this.equipment)) {
+      if (Array.isArray(item)) {
+        // arrows - no mods
+        continue;
+      } else if (item && item.stats) {
+        blockChance += item.stats.get(Modifier.BlockChance) || 0;
+      }
+    }
+    // Cap block chance at 75%
+    return Math.min(blockChance, 75);
   }
 
   public equipItem(
@@ -1403,18 +1536,18 @@ export class PlayerCharacter extends Character {
   /**
    * This includes `conditional` effects, it returns a float between 0 and 0.925 (hard cap)
    */
-  public getDamageReduction() {
+  public getPhysicalDamageReduction() {
     const { armorMult, armorFlat } = getConditionEffectsOnDefenses(
       this.conditions,
     );
-    return damageReduction(this.equipmentStats.armor * armorMult + armorFlat);
+    return damageReduction(this.totalArmor * armorMult + armorFlat);
   }
 
   private setUnarmored() {
     this.equipment.mainHand = new Item({
       name: "unarmored",
       slot: "one-hand",
-      stats: { physicalDamage: 1 },
+      stats: { [Modifier.PhysicalDamage]: 1 },
       baseValue: 0,
       rarity: Rarity.NORMAL,
       prefix: null,
@@ -1842,28 +1975,6 @@ export class PlayerCharacter extends Character {
     return allEligibleCharacters;
   }
 
-  private tickDownRelationshipAffection() {
-    this.parents.forEach((parent) => {
-      if (parent.affection > 0) {
-        parent.updateAffection(-0.1);
-      }
-    });
-    this.partners.forEach((partner) => {
-      if (partner.affection > 0) {
-        partner.updateAffection(-0.15);
-      }
-    });
-    this.children.forEach((child) => {
-      if (child.affection > 0) {
-        child.updateAffection(-0.15);
-      }
-    });
-    this.knownCharacters.forEach((character) => {
-      if (character.affection > 0) {
-        character.updateAffection(-0.25);
-      }
-    });
-  }
   public adopt({ child, partner }: { child: Character; partner?: Character }) {
     child.updateLastName(this.lastName);
     child.setParents(this, partner);
@@ -2174,9 +2285,6 @@ export class PlayerCharacter extends Character {
     }
   }
 
-  private tickAllInvestments() {
-    this.investments.forEach((investment) => investment.turn());
-  }
   public collectFromInvestment(investmentName: string) {
     const found = this.investments.find(
       (investment) => investment.name == investmentName,
@@ -2185,6 +2293,7 @@ export class PlayerCharacter extends Character {
       this.gold += found.collectGold();
     }
   }
+
   public getInvestment(investmentName: string) {
     const found = this.investments.find(
       (investment) => investment.name == investmentName,

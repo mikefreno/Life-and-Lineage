@@ -10,9 +10,10 @@ import {
   Attribute,
   ItemClassType,
   PlayerClassOptions,
-  ItemEffect,
+  type ItemEffect,
   Modifier,
   Rarity,
+  stringToModifier,
 } from "../utility/types";
 import { Spell } from "./spell";
 import { Attack } from "./attack";
@@ -68,7 +69,7 @@ export class Item {
     | null;
   readonly itemClass: ItemClassType;
   readonly rarity: Rarity;
-  readonly stats: Partial<Record<Modifier, number>> | null;
+  readonly stats: Map<Modifier, number> | null;
   readonly prefix: {
     affix: Affix;
     tier: number;
@@ -125,7 +126,14 @@ export class Item {
         this.rarity = rarity ?? Rarity.NORMAL;
         this.prefix = prefix ?? null;
         this.suffix = suffix ?? null;
-        this.stats = stats ?? null;
+        this.stats = stats
+          ? new Map(
+              Object.entries(stats).map(([key, value]) => [
+                stringToModifier(key)!,
+                value,
+              ]),
+            )
+          : null;
         this.name = name;
         this.baseValue = baseValue;
       } else {
@@ -158,7 +166,14 @@ export class Item {
       this.rarity = Rarity.NORMAL;
       this.prefix = null;
       this.suffix = null;
-      this.stats = stats ?? null;
+      this.stats = stats
+        ? new Map(
+            Object.entries(stats).map(([key, value]) => [
+              stringToModifier(key)!,
+              value,
+            ]),
+          )
+        : null;
       this.name = name;
       this.baseValue = baseValue;
     }
@@ -387,7 +402,10 @@ export class Item {
 
   get totalArmor() {
     if (!this.stats) return 0;
-    return Math.round((this.stats.armor ?? 0) + (this.stats.armorAdded ?? 0));
+    return Math.round(
+      (this.stats.get(Modifier.Armor) ?? 0) +
+        (this.stats.get(Modifier.ArmorAdded) ?? 0),
+    );
   }
 
   private calculateTotalDamage(
@@ -395,9 +413,12 @@ export class Item {
   ): number {
     if (!this.stats) return 0;
 
-    const baseDamage = this.stats[`${damageType}Damage`] ?? 0;
-    const addedDamage = this.stats[`${damageType}DamageAdded`] ?? 0;
-    const multiplier = this.stats[`${damageType}DamageMultiplier`] ?? 0;
+    const baseDamage =
+      this.stats.get(stringToModifier(`${damageType}Damage`)!) ?? 0;
+    const addedDamage =
+      this.stats.get(stringToModifier(`${damageType}DamageAdded`)!) ?? 0;
+    const multiplier =
+      this.stats.get(stringToModifier(`${damageType}DamageMultiplier`)!) ?? 0;
 
     if (!baseDamage && !addedDamage) return 0;
 
@@ -496,90 +517,6 @@ export class Item {
     return item;
   }
 }
-export const itemMap: { [key: string]: any } = {
-  Amber_Potion: require("../assets/images/items/Amber_Potion.png"),
-  Amber_Potion_2: require("../assets/images/items/Amber_Potion_2.png"),
-  Amber_Potion_3: require("../assets/images/items/Amber_Potion_3.png"),
-  Arrow: require("../assets/images/items/Arrow.png"),
-  Axe: require("../assets/images/items/Axe.png"),
-  Bag: require("../assets/images/items/Bag.png"),
-  Base_Robes: require("../assets/images/items/Robes_1.png"),
-  Bat_Wing: require("../assets/images/items/Bat_Wing.png"),
-  Black_Bow: require("../assets/images/items/Black_Bow.png"),
-  Blue_Potion: require("../assets/images/items/Blue_Potion.png"),
-  Blue_Potion_2: require("../assets/images/items/Blue_Potion_2.png"),
-  Blue_Potion_3: require("../assets/images/items/Blue_Potion_3.png"),
-  Bone: require("../assets/images/items/Bone.png"),
-  Book: require("../assets/images/items/Book.png"),
-  Book_2: require("../assets/images/items/Book_2.png"),
-  Book_3: require("../assets/images/items/Book_3.png"),
-  Bow: require("../assets/images/items/Bow.png"),
-  Chunk_of_Flesh: require("../assets/images/items/Chunk_of_Flesh.png"),
-  Egg: require("../assets/images/items/Egg.png"),
-  Emerald_Staff: require("../assets/images/items/Emerald_Staff.png"),
-  Fang: require("../assets/images/items/Fang.png"),
-  Focus_1: require("../assets/images/items/Focus_1.png"),
-  Feather: require("../assets/images/items/Feather.png"),
-  Goblet: require("../assets/images/items/Goblet.png"),
-  Goblin_Staff: require("../assets/images/items/Goblin_Staff.png"),
-  Golden_Hammer: require("../assets/images/items/Golden_Hammer.png"),
-  Golden_Sword: require("../assets/images/items/Golden_Sword.png"),
-  Great_Bow: require("../assets/images/items/Great_Bow.png"),
-  Green_Potion: require("../assets/images/items/Green_Potion.png"),
-  Green_Potion_2: require("../assets/images/items/Green_Potion_2.png"),
-  Green_Potion_3: require("../assets/images/items/Green_Potion_3.png"),
-  Hammer: require("../assets/images/items/Hammer.png"),
-  Harp_Bow: require("../assets/images/items/Harp_Bow.png"),
-  Helm: require("../assets/images/items/Helm.png"),
-  Iron_Armor: require("../assets/images/items/Iron_Armor.png"),
-  Iron_Boot: require("../assets/images/items/Iron_Boot.png"),
-  Iron_Helmet: require("../assets/images/items/Iron_Helmet.png"),
-  Iron_Shield: require("../assets/images/items/Iron_Shield.png"),
-  Iron_Sword: require("../assets/images/items/Iron_Sword.png"),
-  Knife: require("../assets/images/items/Knife.png"),
-  Leather_Armor: require("../assets/images/items/Leather_Armor.png"),
-  Leather_Boots: require("../assets/images/items/Leather_Boot.png"),
-  Leather_Helmet: require("../assets/images/items/Leather_Helmet.png"),
-  Magic_Wand: require("../assets/images/items/Magic_Wand.png"),
-  Monster_Egg: require("../assets/images/items/Monster_Egg.png"),
-  Monster_Eye: require("../assets/images/items/Monster_Eye.png"),
-  Monster_Meat: require("../assets/images/items/Monster_Meat.png"),
-  Paper: require("../assets/images/items/Paper.png"),
-  Patch_of_Fur: require("../assets/images/items/Patch_of_Fur.png"),
-  Purple_Potion: require("../assets/images/items/Purple_Potion.png"),
-  Purple_Potion_2: require("../assets/images/items/Purple_Potion_2.png"),
-  Purple_Potion_3: require("../assets/images/items/Purple_Potion_3.png"),
-  Rat_Tail: require("../assets/images/items/Rat_Tail.png"),
-  Red_Potion: require("../assets/images/items/Red_Potion.png"),
-  Red_Potion_2: require("../assets/images/items/Red_Potion_2.png"),
-  Red_Potion_3: require("../assets/images/items/Red_Potion_3.png"),
-  Ruby_Staff: require("../assets/images/items/Ruby_Staff.png"),
-  Sapphire_Staff: require("../assets/images/items/Sapphire_Staff.png"),
-  Scroll: require("../assets/images/items/Scroll.png"),
-  Silver_Sword: require("../assets/images/items/Silver_Sword.png"),
-  Skull: require("../assets/images/items/Skull.png"),
-  Slime_Gel: require("../assets/images/items/Slime_Gel.png"),
-  Topaz_Staff: require("../assets/images/items/Topaz_Staff.png"),
-  Torch: require("../assets/images/items/Torch.png"),
-  Wizard_Hat: require("../assets/images/items/Wizard_Hat.png"),
-  Wood_Log: require("../assets/images/items/Wood_Log.png"),
-  Wooden_Armor: require("../assets/images/items/Wooden_Armor.png"),
-  Wooden_Shield: require("../assets/images/items/Wooden_Shield.png"),
-  Wooden_Sword: require("../assets/images/items/Wooden_Sword.png"),
-};
-
-export const isStackable = (itemClass: ItemClassType) => {
-  switch (itemClass.toLowerCase()) {
-    case ItemClassType.Potion:
-    case ItemClassType.Poison:
-    case ItemClassType.Junk:
-    case ItemClassType.Ingredient:
-    case ItemClassType.Arrow:
-      return true;
-    default:
-      return false;
-  }
-};
 
 export type Affix = {
   name: {
@@ -692,21 +629,35 @@ export class ItemRarityService {
   }
 
   static applyAffixesToStats(
-    baseStats: Record<string, number> | null,
+    baseStats: Partial<Record<string, number>> | null,
     prefix: { affix: Affix; tier: number } | null,
     suffix: { affix: Affix; tier: number } | null,
-  ): Record<string, number> {
-    const stats = { ...baseStats } || {};
+  ): Map<Modifier, number> {
+    console.log(baseStats);
+    const stats = baseStats
+      ? new Map(
+          Object.entries(baseStats).map(([key, value]) => [
+            stringToModifier(key)!,
+            value,
+          ]),
+        )
+      : new Map();
+
+    console.log("Initial stats:", Object.fromEntries(stats));
 
     const applyModifiers = (affix: Affix, tier: number) => {
-      Object.entries(affix.modifier).forEach(([stat, modifiers]) => {
-        if (modifiers) {
+      Object.entries(affix.modifier).forEach(([statString, modifiers]) => {
+        const stat = stringToModifier(statString);
+        if (stat !== undefined && modifiers) {
           modifiers.forEach((modifier) => {
             if (hasProp(modifier, tier.toString())) {
               const range = modifier[tier.toString()];
               assertNonNull(range);
               const value = this.rollStatValue(range);
-              stats[stat] = (stats[stat] || 0) + value;
+              console.log(`Adding ${value} to ${statString}`);
+              const currentValue = stats.get(stat) || 0;
+              stats.set(stat, currentValue + value);
+              console.log(`New value for ${statString}: ${stats.get(stat)}`);
             }
           });
         }
@@ -714,12 +665,21 @@ export class ItemRarityService {
     };
 
     if (prefix) {
+      console.log(
+        "Applying prefix:",
+        prefix.affix.name[prefix.tier.toString()],
+      );
       applyModifiers(prefix.affix, prefix.tier);
     }
     if (suffix) {
+      console.log(
+        "Applying suffix:",
+        suffix.affix.name[suffix.tier.toString()],
+      );
       applyModifiers(suffix.affix, suffix.tier);
     }
 
+    console.log("Final stats:", Object.fromEntries(stats));
     return stats;
   }
 
@@ -765,3 +725,88 @@ export class ItemRarityService {
     return Math.round(baseValue * valueModifier);
   }
 }
+
+export const itemMap: { [key: string]: any } = {
+  Amber_Potion: require("../assets/images/items/Amber_Potion.png"),
+  Amber_Potion_2: require("../assets/images/items/Amber_Potion_2.png"),
+  Amber_Potion_3: require("../assets/images/items/Amber_Potion_3.png"),
+  Arrow: require("../assets/images/items/Arrow.png"),
+  Axe: require("../assets/images/items/Axe.png"),
+  Bag: require("../assets/images/items/Bag.png"),
+  Base_Robes: require("../assets/images/items/Robes_1.png"),
+  Bat_Wing: require("../assets/images/items/Bat_Wing.png"),
+  Black_Bow: require("../assets/images/items/Black_Bow.png"),
+  Blue_Potion: require("../assets/images/items/Blue_Potion.png"),
+  Blue_Potion_2: require("../assets/images/items/Blue_Potion_2.png"),
+  Blue_Potion_3: require("../assets/images/items/Blue_Potion_3.png"),
+  Bone: require("../assets/images/items/Bone.png"),
+  Book: require("../assets/images/items/Book.png"),
+  Book_2: require("../assets/images/items/Book_2.png"),
+  Book_3: require("../assets/images/items/Book_3.png"),
+  Bow: require("../assets/images/items/Bow.png"),
+  Chunk_of_Flesh: require("../assets/images/items/Chunk_of_Flesh.png"),
+  Egg: require("../assets/images/items/Egg.png"),
+  Emerald_Staff: require("../assets/images/items/Emerald_Staff.png"),
+  Fang: require("../assets/images/items/Fang.png"),
+  Focus_1: require("../assets/images/items/Focus_1.png"),
+  Feather: require("../assets/images/items/Feather.png"),
+  Goblet: require("../assets/images/items/Goblet.png"),
+  Goblin_Staff: require("../assets/images/items/Goblin_Staff.png"),
+  Golden_Hammer: require("../assets/images/items/Golden_Hammer.png"),
+  Golden_Sword: require("../assets/images/items/Golden_Sword.png"),
+  Great_Bow: require("../assets/images/items/Great_Bow.png"),
+  Green_Potion: require("../assets/images/items/Green_Potion.png"),
+  Green_Potion_2: require("../assets/images/items/Green_Potion_2.png"),
+  Green_Potion_3: require("../assets/images/items/Green_Potion_3.png"),
+  Hammer: require("../assets/images/items/Hammer.png"),
+  Harp_Bow: require("../assets/images/items/Harp_Bow.png"),
+  Helm: require("../assets/images/items/Helm.png"),
+  Iron_Armor: require("../assets/images/items/Iron_Armor.png"),
+  Iron_Boot: require("../assets/images/items/Iron_Boot.png"),
+  Iron_Helmet: require("../assets/images/items/Iron_Helmet.png"),
+  Iron_Shield: require("../assets/images/items/Iron_Shield.png"),
+  Iron_Sword: require("../assets/images/items/Iron_Sword.png"),
+  Knife: require("../assets/images/items/Knife.png"),
+  Leather_Armor: require("../assets/images/items/Leather_Armor.png"),
+  Leather_Boots: require("../assets/images/items/Leather_Boot.png"),
+  Leather_Helmet: require("../assets/images/items/Leather_Helmet.png"),
+  Magic_Wand: require("../assets/images/items/Magic_Wand.png"),
+  Monster_Egg: require("../assets/images/items/Monster_Egg.png"),
+  Monster_Eye: require("../assets/images/items/Monster_Eye.png"),
+  Monster_Meat: require("../assets/images/items/Monster_Meat.png"),
+  Paper: require("../assets/images/items/Paper.png"),
+  Patch_of_Fur: require("../assets/images/items/Patch_of_Fur.png"),
+  Purple_Potion: require("../assets/images/items/Purple_Potion.png"),
+  Purple_Potion_2: require("../assets/images/items/Purple_Potion_2.png"),
+  Purple_Potion_3: require("../assets/images/items/Purple_Potion_3.png"),
+  Rat_Tail: require("../assets/images/items/Rat_Tail.png"),
+  Red_Potion: require("../assets/images/items/Red_Potion.png"),
+  Red_Potion_2: require("../assets/images/items/Red_Potion_2.png"),
+  Red_Potion_3: require("../assets/images/items/Red_Potion_3.png"),
+  Ruby_Staff: require("../assets/images/items/Ruby_Staff.png"),
+  Sapphire_Staff: require("../assets/images/items/Sapphire_Staff.png"),
+  Scroll: require("../assets/images/items/Scroll.png"),
+  Silver_Sword: require("../assets/images/items/Silver_Sword.png"),
+  Skull: require("../assets/images/items/Skull.png"),
+  Slime_Gel: require("../assets/images/items/Slime_Gel.png"),
+  Topaz_Staff: require("../assets/images/items/Topaz_Staff.png"),
+  Torch: require("../assets/images/items/Torch.png"),
+  Wizard_Hat: require("../assets/images/items/Wizard_Hat.png"),
+  Wood_Log: require("../assets/images/items/Wood_Log.png"),
+  Wooden_Armor: require("../assets/images/items/Wooden_Armor.png"),
+  Wooden_Shield: require("../assets/images/items/Wooden_Shield.png"),
+  Wooden_Sword: require("../assets/images/items/Wooden_Sword.png"),
+};
+
+export const isStackable = (itemClass: ItemClassType) => {
+  switch (itemClass.toLowerCase()) {
+    case ItemClassType.Potion:
+    case ItemClassType.Poison:
+    case ItemClassType.Junk:
+    case ItemClassType.Ingredient:
+    case ItemClassType.Arrow:
+      return true;
+    default:
+      return false;
+  }
+};

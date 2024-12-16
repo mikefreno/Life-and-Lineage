@@ -14,39 +14,133 @@ type ConditionEffect = {
   isPoison?: boolean;
 };
 
-export type Modifier =
-  | "health"
-  | "mana"
-  | "sanity"
-  | "healthRegen"
-  | "manaRegen"
-  | "sanityRegen"
-  | "strength"
-  | "dexterity"
-  | "intelligence"
-  | "armor"
-  | "armorAdded"
-  | "blockChance"
-  | "dodgeChance"
-  | "fireResistance"
-  | "coldResistance"
-  | "lightningResistance"
-  | "poisonResistance"
-  | "physicalDamage"
-  | "physicalDamageAdded"
-  | "physicalDamageMultiplier"
-  | "fireDamage"
-  | "fireDamageAdded"
-  | "fireDamageMultiplier"
-  | "coldDamage"
-  | "coldDamageAdded"
-  | "coldDamageMultiplier"
-  | "lightningDamage"
-  | "lightningDamageAdded"
-  | "lightningDamageMultiplier"
-  | "poisonDamage"
-  | "poisonDamageAdded"
-  | "poisonDamageMultiplier";
+export enum Modifier {
+  Health,
+  Mana,
+  Sanity,
+  HealthRegen,
+  ManaRegen,
+  SanityRegen,
+  Strength,
+  Dexterity,
+  Intelligence,
+  Armor,
+  ArmorAdded,
+  BlockChance,
+  DodgeChance,
+  FireResistance,
+  ColdResistance,
+  LightningResistance,
+  PoisonResistance,
+  PhysicalDamage,
+  PhysicalDamageAdded,
+  PhysicalDamageMultiplier,
+  FireDamage,
+  FireDamageAdded,
+  FireDamageMultiplier,
+  ColdDamage,
+  ColdDamageAdded,
+  ColdDamageMultiplier,
+  LightningDamage,
+  LightningDamageAdded,
+  LightningDamageMultiplier,
+  PoisonDamage,
+  PoisonDamageAdded,
+  PoisonDamageMultiplier,
+}
+
+export enum DamageTypes {
+  PHYSICAL,
+  FIRE,
+  COLD,
+  LIGHTNING,
+  POISON,
+}
+
+export function stringToModifier(key: string): Modifier | undefined {
+  const modifierKey = key.toLowerCase();
+  switch (modifierKey) {
+    case "health":
+      return Modifier.Health;
+    case "mana":
+      return Modifier.Mana;
+    case "sanity":
+      return Modifier.Sanity;
+    case "healthregen":
+      return Modifier.HealthRegen;
+    case "manaregen":
+      return Modifier.ManaRegen;
+    case "sanityregen":
+      return Modifier.SanityRegen;
+    case "strength":
+      return Modifier.Strength;
+    case "dexterity":
+      return Modifier.Dexterity;
+    case "intelligence":
+      return Modifier.Intelligence;
+    case "armor":
+      return Modifier.Armor;
+    case "armoradded":
+      return Modifier.ArmorAdded;
+    case "blockchance":
+      return Modifier.BlockChance;
+    case "dodgechance":
+      return Modifier.DodgeChance;
+    case "fireresistance":
+      return Modifier.FireResistance;
+    case "coldresistance":
+      return Modifier.ColdResistance;
+    case "lightningresistance":
+      return Modifier.LightningResistance;
+    case "poisonresistance":
+      return Modifier.PoisonResistance;
+    case "physicaldamage":
+      return Modifier.PhysicalDamage;
+    case "physicaldamageadded":
+      return Modifier.PhysicalDamageAdded;
+    case "physicaldamagemultiplier":
+      return Modifier.PhysicalDamageMultiplier;
+    case "firedamage":
+      return Modifier.FireDamage;
+    case "firedamageadded":
+      return Modifier.FireDamageAdded;
+    case "firedamagemultiplier":
+      return Modifier.FireDamageMultiplier;
+    case "colddamage":
+      return Modifier.ColdDamage;
+    case "colddamageadded":
+      return Modifier.ColdDamageAdded;
+    case "colddamagemultiplier":
+      return Modifier.ColdDamageMultiplier;
+    case "lightningdamage":
+      return Modifier.LightningDamage;
+    case "lightningdamageadded":
+      return Modifier.LightningDamageAdded;
+    case "lightningdamagemultiplier":
+      return Modifier.LightningDamageMultiplier;
+    case "poisondamage":
+      return Modifier.PoisonDamage;
+    case "poisondamageadded":
+      return Modifier.PoisonDamageAdded;
+    case "poisondamagemultiplier":
+      return Modifier.PoisonDamageMultiplier;
+    default:
+      console.warn(`Unknown modifier: ${key}`);
+      return undefined;
+  }
+}
+
+export function modifierToString(modifier: Modifier): string {
+  return Modifier[modifier]
+    .toLowerCase()
+    .replace(/_/g, "")
+    .replace(/damage/g, " damage")
+    .replace(/resistance/g, " resistance")
+    .replace(/chance/g, " chance")
+    .replace(/multiplier/g, " multiplier")
+    .replace(/added/g, " added")
+    .replace(/regen/g, " regen");
+}
 
 export enum Rarity {
   NORMAL,

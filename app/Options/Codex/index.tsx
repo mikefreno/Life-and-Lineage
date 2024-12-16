@@ -3,9 +3,9 @@ import { Text } from "../../../components/Themed";
 import { useEffect, useState } from "react";
 import CodexCategory from "../../../components/CodexCategory";
 import { useColorScheme } from "nativewind";
-import { CodexEntry, searchCodex } from "../../../utility/codex";
 import { router } from "expo-router";
 import ThemedCard from "../../../components/ThemedCard";
+import { CodexEntry, searchCodex } from "../../../utility/functions/codex";
 
 const categories = [
   "Player",
