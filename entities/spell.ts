@@ -3,6 +3,7 @@ import { wait, toTitleCase, rollD20 } from "../utility/functions/misc";
 import {
   Element,
   MasteryLevel,
+  Modifier,
   StringToElement,
   StringToMastery,
 } from "../utility/types";
@@ -92,7 +93,7 @@ export class Spell {
           return (
             this.initDamage +
             user.magicPower +
-            user.equipmentStats.damage +
+            (user.totalDamage ?? 0) +
             user.attackPower
           );
         } else return 0;
@@ -100,9 +101,10 @@ export class Spell {
       return this.initDamage + user.magicPower;
     } else return 0;
   }
+
   public userHasRequiredWeapon(user: PlayerCharacter) {
     return (
-      this.usesWeapon && user.equipment.mainHand.itemClass == this.usesWeapon
+      this.usesWeapon && user.equipment.mainHand.itemClass === this.usesWeapon
     );
   }
 
@@ -110,7 +112,7 @@ export class Spell {
     if (user.isStunned) {
       return false;
     }
-    if (!this.userHasRequiredWeapon) {
+    if (this.usesWeapon && !this.userHasRequiredWeapon(user)) {
       return false;
     }
     if (user.currentMana < this.manaCost) {

@@ -176,11 +176,14 @@ export class DungeonLevel {
   }
 
   get generateNormalEncounter(): Enemy[] {
-    if (this.normalEncounters.length == 0) return;
+    if (this.normalEncounters.length == 0)
+      throw new Error("No normal encounters");
     const fightIdx = Math.floor(Math.random() * this.normalEncounters.length);
     const enemiesSpec = this.normalEncounters[fightIdx];
     const enemies = enemiesSpec.map((enemySpec) => {
-      let enemyJSON = enemiesJSON.find((json) => json.name == enemySpec.name);
+      let enemyJSON = JSON.parse(
+        JSON.stringify(enemiesJSON.find((json) => json.name == enemySpec.name)),
+      );
       if (!enemyJSON) {
         throw new Error(`missing enemy: ${enemySpec.name}`);
       }
@@ -229,6 +232,8 @@ export class DungeonLevel {
         currentEnergy: enemyJSON.energy.maximum,
         baseEnergy: enemyJSON.energy.maximum,
         energyRegen: enemyJSON.energy.regen,
+        goldDropRange: enemyJSON.goldDropRange,
+        drops: enemyJSON.drops,
         attackStrings: enemyJSON.attackStrings,
         sprite: sprite as EnemyImageKeyOption,
         enemyStore: this.dungeonStore.root.enemyStore,
@@ -243,27 +248,36 @@ export class DungeonLevel {
       if (!bossJSON) {
         throw new Error(`missing enemy: ${bossSpec.name}`);
       }
+
+      // Create a deep copy of the boss JSON to avoid modifying the original
+      let scaledBossJSON = JSON.parse(JSON.stringify(bossJSON));
+
       if (bossSpec.scaler != 1) {
-        bossJSON.goldDropRange.minimum *= bossSpec.scaler;
-        bossJSON.goldDropRange.maximum *= bossSpec.scaler;
-        bossJSON.health *= bossSpec.scaler;
-        bossJSON.energy.maximum *= bossSpec.scaler;
-        bossJSON.energy.regen *= bossSpec.scaler;
+        scaledBossJSON.goldDropRange.minimum *= bossSpec.scaler;
+        scaledBossJSON.goldDropRange.maximum *= bossSpec.scaler;
+        scaledBossJSON.health *= bossSpec.scaler;
+        scaledBossJSON.attackPower *= bossSpec.scaler;
+        scaledBossJSON.energy.maximum *= bossSpec.scaler;
+        scaledBossJSON.energy.regen *= bossSpec.scaler;
       }
+
       return new Enemy({
-        beingType: bossJSON.beingType as BeingType,
-        creatureSpecies: bossJSON.name,
-        currentHealth: bossJSON.health,
-        baseHealth: bossJSON.health,
-        currentSanity: bossJSON.sanity,
-        baseSanity: bossJSON.sanity,
-        attackPower: bossJSON.attackPower,
-        baseArmor: bossJSON.armorValue,
-        currentEnergy: bossJSON.energy.maximum,
-        baseEnergy: bossJSON.energy.maximum,
-        energyRegen: bossJSON.energy.regen,
-        attackStrings: bossJSON.attackStrings,
-        sprite: bossJSON.sprite as EnemyImageKeyOption,
+        beingType: scaledBossJSON.beingType as BeingType,
+        creatureSpecies: scaledBossJSON.name,
+        currentHealth: scaledBossJSON.health,
+        baseHealth: scaledBossJSON.health,
+        currentSanity: scaledBossJSON.sanity,
+        baseSanity: scaledBossJSON.sanity,
+        attackPower: scaledBossJSON.attackPower,
+        baseArmor: scaledBossJSON.armorValue,
+        currentEnergy: scaledBossJSON.energy.maximum,
+        baseEnergy: scaledBossJSON.energy.maximum,
+        energyRegen: scaledBossJSON.energy.regen,
+        attackStrings: scaledBossJSON.attackStrings,
+        storyItems: scaledBossJSON.storyDrops,
+        goldDropRange: scaledBossJSON.goldDropRange,
+        drops: scaledBossJSON.drops,
+        sprite: scaledBossJSON.sprite as EnemyImageKeyOption,
         enemyStore: this.dungeonStore.root.enemyStore,
       });
     });

@@ -74,7 +74,7 @@ export class ThreatTable {
     const relativeHP = target.currentHealth / highestHP;
     const relativeAttackPower = target.attackPower / highestAttackPower;
 
-    points *=
+    let hpMultiplier =
       relativeHP > 0.95
         ? 0.5
         : relativeHP < 0.1
@@ -85,7 +85,7 @@ export class ThreatTable {
         ? 1.5
         : 1.0;
 
-    points *=
+    let apMultiplier =
       relativeAttackPower > 0.95
         ? 4.0
         : relativeAttackPower < 0.1
@@ -96,6 +96,6 @@ export class ThreatTable {
         ? 0.75
         : 1.0;
 
-    return points;
+    return points * hpMultiplier * apMultiplier;
   }
 }

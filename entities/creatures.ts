@@ -66,8 +66,21 @@ type CreatureType = {
 };
 
 type EnemyType = CreatureType & {
+  gotDrops?: boolean;
   minions?: Minion[];
   sprite: EnemyImageKeyOption;
+  drops: {
+    item: string;
+    itemType: ItemClassType;
+    chance: number;
+  }[];
+  goldDropRange: {
+    minimum: number;
+    maximum: number;
+  };
+  storyDrops?: {
+    item: string;
+  }[];
 };
 
 type MinionType = CreatureType & {
@@ -96,7 +109,6 @@ export class Creature {
   readonly energyRegen: number;
   readonly attackStrings: string[];
   conditions: Condition[];
-  gotDrops: boolean;
   threatTable: ThreatTable = new ThreatTable();
   enemyStore: EnemyStore | undefined;
   readonly sprite: EnemyImageKeyOption | null;
@@ -133,7 +145,6 @@ export class Creature {
     this.energyRegen = energyRegen ?? 0; // Initialize ManaRegen to 0 if not provided
     this.attackStrings = attackStrings ?? [];
     this.conditions = conditions ?? []; // Initialize conditions to an empty array if not provided
-    this.gotDrops = false; // Initialize gotDrops to false
     this.enemyStore = enemyStore;
     this.sprite = sprite;
 
@@ -149,7 +160,6 @@ export class Creature {
       damageSanity: action,
       addCondition: action,
       conditionTicker: action,
-      getDrops: action,
       equals: action,
       regenerate: action,
       expendEnergy: action,
@@ -573,79 +583,6 @@ export class Creature {
       numTargets: scoredAttacks[0].numTargets,
     };
   }
-
-  //---------------------------Misc---------------------------//
-  /**
-   * Retrieves drops from the creature, if not already retrieved.
-   * @param playerClass - The class of the player.
-   * @param bossFight - Indicates if the fight is against a boss.
-   * @returns An object containing item drops and gold.
-   */
-  public getDrops(player: PlayerCharacter, bossFight: boolean) {
-    if (this.gotDrops) return {};
-    let enemyObj;
-    let storyDrops: Item[] = [];
-    if (bossFight) {
-      enemyObj = bosses.find((monster) => monster.name == this.creatureSpecies);
-      const storyDropsList = enemyObj?.storyDrops;
-      if (storyDropsList) {
-        storyDropsList.forEach((drop) => {
-          const storyItemObj = storyItems.find(
-            (item) => item.name == drop.item,
-          );
-          if (storyItemObj) {
-            const storyItem = Item.fromJSON({
-              ...storyItemObj,
-              itemClass: ItemClassType.StoryItem,
-              stackable: false,
-              root: this.enemyStore?.root,
-            });
-            storyDrops.push(storyItem);
-          }
-        });
-      }
-    } else {
-      enemyObj = enemies.find(
-        (monster) => monster.name == this.creatureSpecies,
-      );
-    }
-    if (!enemyObj) {
-      enemyObj = enemies.find((monster) => monster.name == "generic npc");
-    }
-    if (enemyObj) {
-      const dropList = enemyObj.drops;
-      const gold = Math.round(
-        getRandomInt(
-          enemyObj.goldDropRange.minimum,
-          enemyObj.goldDropRange.maximum,
-        ),
-      );
-      let itemDrops: Item[] = [];
-      dropList.forEach((drop) => {
-        const roll = rollD20();
-        if (roll >= 20 - drop.chance * 20) {
-          const items = itemList(
-            drop.itemType as ItemClassType,
-            player.playerClass,
-          );
-          const itemObj = items.find((item) => item.name == drop.item);
-          if (itemObj) {
-            itemDrops.push(
-              Item.fromJSON({
-                ...itemObj,
-                itemClass: drop.itemType,
-                stackable: isStackable(drop.itemType as ItemClassType),
-                root: this.enemyStore?.root,
-              }),
-            );
-          }
-        }
-      });
-      this.gotDrops = true;
-      return { itemDrops, gold, storyDrops };
-    }
-    throw new Error("No found monster on Monster.getDrops()");
-  }
 }
 
 /**
@@ -653,11 +590,21 @@ export class Creature {
  * in this case i == 0 is set as the `Enemy` then i >= 1 is created as a `Minion` attached to the `Enemy`
  */
 export class Enemy extends Creature {
-  /**
-   * List of minions controlled by this enemy
-   */
   minions: Minion[];
   phaseTrigger: number | null;
+  gotDrops: boolean;
+  drops: {
+    item: string;
+    itemType: ItemClassType;
+    chance: number;
+  }[];
+  goldDropRange: {
+    minimum: number;
+    maximum: number;
+  };
+  storyDrops?: {
+    item: string;
+  }[];
 
   constructor({
     id,
@@ -676,7 +623,11 @@ export class Enemy extends Creature {
     attackStrings,
     conditions,
     enemyStore,
+    gotDrops,
     sprite,
+    drops,
+    goldDropRange,
+    storyDrops,
   }: EnemyType) {
     super({
       id,
@@ -697,13 +648,21 @@ export class Enemy extends Creature {
       enemyStore,
     });
     this.minions = minions ?? [];
-    this.phaseTrigger = null; // currently phases have not been implemented
+    this.phaseTrigger = null;
+    this.gotDrops = gotDrops ?? false;
+    this.drops = drops ?? [];
+    this.goldDropRange = goldDropRange ?? { minimum: 0, maximum: 0 };
+    this.storyDrops = storyDrops;
 
     makeObservable(this, {
       minions: observable,
+      drops: observable,
+      goldDropRange: observable,
+      storyDrops: observable,
       addMinion: action,
       removeMinion: action,
       hydrationLinking: action,
+      getDrops: action,
     });
 
     reaction(
@@ -740,6 +699,58 @@ export class Enemy extends Creature {
    */
   public takeTurn({ player }: { player: PlayerCharacter }) {
     return this._takeTurn({ target: player }); //this is done as a way to easily add additional effects, note this function in Minion
+  }
+
+  /**
+   * Retrieves drops from the creature, if not already retrieved.
+   * @param playerClass - The class of the player.
+   * @param bossFight - Indicates if the fight is against a boss.
+   * @returns An object containing item drops and gold.
+   */
+  public getDrops(player: PlayerCharacter, bossFight: boolean) {
+    if (this.gotDrops) return {};
+
+    let storyDrops: Item[] = [];
+    if (bossFight && this.storyDrops) {
+      this.storyDrops.forEach((drop) => {
+        const storyItemObj = storyItems.find((item) => item.name === drop.item);
+        if (storyItemObj) {
+          const storyItem = Item.fromJSON({
+            ...storyItemObj,
+            itemClass: ItemClassType.StoryItem,
+            stackable: false,
+            root: this.enemyStore?.root,
+          });
+          storyDrops.push(storyItem);
+        }
+      });
+    }
+
+    const gold = Math.round(
+      getRandomInt(this.goldDropRange.minimum, this.goldDropRange.maximum),
+    );
+
+    let itemDrops: Item[] = [];
+    this.drops.forEach((drop) => {
+      const roll = rollD20();
+      if (roll >= 20 - drop.chance * 20) {
+        const items = itemList(drop.itemType, player.playerClass);
+        const itemObj = items.find((item) => item.name === drop.item);
+        if (itemObj) {
+          itemDrops.push(
+            Item.fromJSON({
+              ...itemObj,
+              itemClass: drop.itemType,
+              stackable: isStackable(drop.itemType),
+              root: this.enemyStore?.root,
+            }),
+          );
+        }
+      }
+    });
+
+    this.gotDrops = true;
+    return { itemDrops, gold, storyDrops };
   }
 
   //---------------------------Minions---------------------------//
@@ -833,6 +844,9 @@ export class Enemy extends Creature {
         : [],
       enemyStore: json.enemyStore,
       sprite: json.sprite,
+      drops: json.drops,
+      storyDrops: json.storyDrops,
+      goldDropRange: json.goldDropRange,
     });
     enemy.hydrationLinking();
     return enemy;

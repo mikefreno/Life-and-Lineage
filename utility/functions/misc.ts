@@ -429,6 +429,17 @@ export const generateEnemyFromNPC = (character: Character) => {
     energyRegen: regen,
     currentEnergy: energy,
     baseEnergy: energy,
+    drops: [
+      {
+        item: "dagger",
+        itemType: "melee" as ItemClassType,
+        chance: 0.75,
+      },
+    ],
+    goldDropRange: {
+      minimum: 250,
+      maximum: 1000,
+    },
     sprite,
     attackPower,
   });

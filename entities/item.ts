@@ -633,7 +633,6 @@ export class ItemRarityService {
     prefix: { affix: Affix; tier: number } | null,
     suffix: { affix: Affix; tier: number } | null,
   ): Map<Modifier, number> {
-    console.log(baseStats);
     const stats = baseStats
       ? new Map(
           Object.entries(baseStats).map(([key, value]) => [
@@ -642,8 +641,6 @@ export class ItemRarityService {
           ]),
         )
       : new Map();
-
-    console.log("Initial stats:", Object.fromEntries(stats));
 
     const applyModifiers = (affix: Affix, tier: number) => {
       Object.entries(affix.modifier).forEach(([statString, modifiers]) => {
@@ -654,10 +651,8 @@ export class ItemRarityService {
               const range = modifier[tier.toString()];
               assertNonNull(range);
               const value = this.rollStatValue(range);
-              console.log(`Adding ${value} to ${statString}`);
               const currentValue = stats.get(stat) || 0;
               stats.set(stat, currentValue + value);
-              console.log(`New value for ${statString}: ${stats.get(stat)}`);
             }
           });
         }
@@ -665,21 +660,12 @@ export class ItemRarityService {
     };
 
     if (prefix) {
-      console.log(
-        "Applying prefix:",
-        prefix.affix.name[prefix.tier.toString()],
-      );
       applyModifiers(prefix.affix, prefix.tier);
     }
     if (suffix) {
-      console.log(
-        "Applying suffix:",
-        suffix.affix.name[suffix.tier.toString()],
-      );
       applyModifiers(suffix.affix, suffix.tier);
     }
 
-    console.log("Final stats:", Object.fromEntries(stats));
     return stats;
   }
 
