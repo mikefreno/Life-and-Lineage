@@ -72,7 +72,27 @@ type CreatureType = {
   basePoisonResistance?: number;
 };
 
+interface Phase {
+  triggerHealth: number;
+  sprite?: EnemyImageKeyOption;
+  dialogue?: string;
+  attackPower?: number;
+  baseArmor?: number;
+  energyRegen?: number;
+  attackStrings?: string[];
+  basePhysicalDamage?: number;
+  baseFireDamage?: number;
+  baseColdDamage?: number;
+  baseLightningDamage?: number;
+  basePoisonDamage?: number;
+  baseFireResistance?: number;
+  baseColdResistance?: number;
+  baseLightningResistance?: number;
+  basePoisonResistance?: number;
+}
+
 type EnemyType = CreatureType & {
+  phases?: Phase[];
   gotDrops?: boolean;
   minions?: Minion[];
   sprite: EnemyImageKeyOption;
@@ -109,29 +129,27 @@ export class Creature {
   readonly baseHealth: number;
   currentSanity: number | null;
   readonly baseSanity: number | null;
-  readonly attackPower: number;
+  attackPower: number;
   readonly baseArmor: number;
   currentEnergy: number;
   readonly baseEnergy: number;
   readonly energyRegen: number;
-  readonly attackStrings: string[];
+  attackStrings: string[];
   conditions: Condition[];
   threatTable: ThreatTable = new ThreatTable();
   enemyStore: EnemyStore | undefined;
-  readonly sprite: EnemyImageKeyOption | null;
+  sprite: EnemyImageKeyOption | null;
 
-  // New properties for damage types
-  readonly basePhysicalDamage: number;
-  readonly baseFireDamage: number;
-  readonly baseColdDamage: number;
-  readonly baseLightningDamage: number;
-  readonly basePoisonDamage: number;
+  basePhysicalDamage: number;
+  baseFireDamage: number;
+  baseColdDamage: number;
+  baseLightningDamage: number;
+  basePoisonDamage: number;
 
-  // New properties for resistances
-  readonly baseFireResistance: number;
-  readonly baseColdResistance: number;
-  readonly baseLightningResistance: number;
-  readonly basePoisonResistance: number;
+  baseFireResistance: number;
+  baseColdResistance: number;
+  baseLightningResistance: number;
+  basePoisonResistance: number;
 
   constructor({
     id,
@@ -209,6 +227,18 @@ export class Creature {
       maxEnergy: computed,
       maxHealth: computed,
       maxSanity: computed,
+      attackStrings: observable,
+      attackPower: observable,
+      sprite: observable,
+      baseFireResistance: observable,
+      baseColdResistance: observable,
+      baseLightningResistance: observable,
+      basePoisonResistance: observable,
+      basePhysicalDamage: observable,
+      baseColdDamage: observable,
+      baseFireDamage: observable,
+      basePoisonDamage: observable,
+      baseLightningDamage: observable,
       fireResistance: computed,
       coldResistance: computed,
       lightningResistance: computed,
@@ -506,21 +536,15 @@ export class Creature {
         logString: `${toTitleCase(this.creatureSpecies)} was stunned!`,
       };
     }
-    const targets = Array.isArray(target) ? target : [target]; // turn the player to an array
-
-    // Get all targets and their minions
+    const targets = Array.isArray(target) ? target : [target];
     const allTargets = targets.reduce(
       (acc: (PlayerCharacter | Enemy | Minion)[], currentTarget) => {
-        // Add the current target
         acc.push(currentTarget);
-
-        // Add minions based on target type
         if (currentTarget instanceof PlayerCharacter) {
-          acc.push(...currentTarget.minionsAndPets);
+          acc.push(...(currentTarget.minionsAndPets || []));
         } else {
-          acc.push(...currentTarget.minions);
+          acc.push(...(currentTarget.minions || []));
         }
-
         return acc;
       },
       [],
@@ -678,7 +702,8 @@ export class Creature {
  */
 export class Enemy extends Creature {
   minions: Minion[];
-  phaseTrigger: number | null;
+  private phases: Phase[];
+  currentPhase: number;
   gotDrops: boolean;
   drops: {
     item: string;
@@ -715,6 +740,7 @@ export class Enemy extends Creature {
     drops,
     goldDropRange,
     storyDrops,
+    phases,
   }: EnemyType) {
     super({
       id,
@@ -735,11 +761,14 @@ export class Enemy extends Creature {
       enemyStore,
     });
     this.minions = minions ?? [];
-    this.phaseTrigger = null;
     this.gotDrops = gotDrops ?? false;
     this.drops = drops ?? [];
     this.goldDropRange = goldDropRange ?? { minimum: 0, maximum: 0 };
     this.storyDrops = storyDrops;
+
+    this.phases =
+      phases?.sort((a, b) => b.triggerHealth - a.triggerHealth) || [];
+    this.currentPhase = -1;
 
     makeObservable(this, {
       minions: observable,
@@ -750,6 +779,7 @@ export class Enemy extends Creature {
       removeMinion: action,
       hydrationLinking: action,
       getDrops: action,
+      currentPhase: observable,
     });
 
     reaction(
@@ -770,13 +800,48 @@ export class Enemy extends Creature {
       () => [this.currentHealth],
       () => {
         if (
-          this.phaseTrigger &&
-          this.currentHealth / this.maxHealth <= this.phaseTrigger
+          this.phases[this.currentPhase + 1] &&
+          this.currentHealth / this.maxHealth <=
+            this.phases[this.currentPhase + 1].triggerHealth
         ) {
           this.triggerPhaseTransition();
         }
       },
     );
+  }
+
+  private triggerPhaseTransition() {
+    this.currentPhase++;
+    const phase = this.phases[this.currentPhase];
+
+    if (phase.sprite) this.sprite = phase.sprite;
+    if (phase.attackPower) this.attackPower = phase.attackPower;
+    if (phase.baseArmor) this.baseArmor = phase.baseArmor;
+    if (phase.energyRegen) this.energyRegen = phase.energyRegen;
+    if (phase.attackStrings) this.attackStrings = phase.attackStrings;
+    if (phase.basePhysicalDamage)
+      this.basePhysicalDamage = phase.basePhysicalDamage;
+    if (phase.baseFireDamage) this.baseFireDamage = phase.baseFireDamage;
+    if (phase.baseColdDamage) this.baseColdDamage = phase.baseColdDamage;
+    if (phase.baseLightningDamage)
+      this.baseLightningDamage = phase.baseLightningDamage;
+    if (phase.basePoisonDamage) this.basePoisonDamage = phase.basePoisonDamage;
+    if (phase.baseFireResistance)
+      this.baseFireResistance = phase.baseFireResistance;
+    if (phase.baseColdResistance)
+      this.baseColdResistance = phase.baseColdResistance;
+    if (phase.baseLightningResistance)
+      this.baseLightningResistance = phase.baseLightningResistance;
+    if (phase.basePoisonResistance)
+      this.basePoisonResistance = phase.basePoisonResistance;
+
+    if (phase.dialogue && this.enemyStore) {
+      const animationStore = this.enemyStore.getAnimationStore(this.id);
+      if (animationStore) {
+        animationStore.setDialogueString(phase.dialogue);
+        animationStore.triggerDialogue();
+      }
+    }
   }
 
   /**
@@ -795,7 +860,7 @@ export class Enemy extends Creature {
    * @returns An object containing item drops and gold.
    */
   public getDrops(player: PlayerCharacter, bossFight: boolean) {
-    if (this.gotDrops) return {};
+    if (this.gotDrops) return { itemDrops: [], gold: 0, storyDrops: [] };
 
     let storyDrops: Item[] = [];
     if (bossFight && this.storyDrops) {
@@ -847,7 +912,9 @@ export class Enemy extends Creature {
    * @returns The species (name) of the created minion.
    */
   public createMinion(minionName: string) {
-    const minionObj = summons.find((summon) => summon.name == minionName);
+    const minionObj = summons.find(
+      (summon) => summon.name.toLowerCase() == minionName.toLowerCase(),
+    );
     if (!minionObj) {
       throw new Error(`Minion (${minionName}) not found!`);
     }
@@ -868,8 +935,6 @@ export class Enemy extends Creature {
     this.addMinion(minion);
     return minion.creatureSpecies;
   }
-
-  private triggerPhaseTransition() {}
 
   /**
    * Adds a minion to the enemy's list of minions.
@@ -943,6 +1008,7 @@ export class Enemy extends Creature {
       baseColdResistance: json.baseColdResistance,
       baseLightningResistance: json.baseLightningResistance,
       basePoisonResistance: json.basePoisonResistance,
+      phases: json.phases || [],
     });
     enemy.hydrationLinking();
     return enemy;

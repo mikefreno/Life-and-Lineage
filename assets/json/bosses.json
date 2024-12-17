@@ -46,26 +46,34 @@
       "teeth"
     ],
     "sprite": "necromancer",
+    "basePhysicalDamage": 15,
+    "baseFireDamage": 20,
+    "baseColdDamage": 0,
+    "baseLightningDamage": 0,
+    "basePoisonDamage": 10,
+    "baseFireResistance": 0,
+    "baseColdResistance": 0,
+    "baseLightningResistance": 0,
+    "basePoisonResistance": 0,
+    "phases": [
+      {
+        "triggerHealth": 0.5,
+        "sprite": "reaper",
+        "attackPower": 20,
+        "dialogue": "Witness my true power!",
+        "baseFireResistance": 0.2,
+        "attackStrings": [
+          "raise skeleton",
+          "teeth",
+          "fireball"
+        ]
+      }
+    ],
     "drops": [
       {
         "item": "dagger",
         "itemType": "melee",
         "chance": 0.15
-      },
-      {
-        "item": "dagger",
-        "itemType": "melee",
-        "chance": 0.15
-      },
-      {
-        "item": "adept robes",
-        "itemType": "bodyArmor",
-        "chance": 1.0
-      },
-      {
-        "item": "apprentice hood",
-        "itemType": "helmet",
-        "chance": 0.45
       }
     ],
     "storyDrops": [

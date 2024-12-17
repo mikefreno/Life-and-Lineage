@@ -25,6 +25,14 @@ const calculateAdjustedFrameRate = (
   return { duration: maxDuration, adjustedFPS };
 };
 
+const DialogueBox = memo(({ text }: { text: string }) => {
+  return (
+    <ThemedView className="absolute top-[-50] left-0 right-0 mx-auto p-2 rounded-lg bg-opacity-80 max-w-[80%]">
+      <Text className="text-center text-lg">{text}</Text>
+    </ThemedView>
+  );
+});
+
 const useEnemyAnimations = () => {
   const attackAnim = useRef(new Animated.Value(0)).current;
   const damageAnim = useRef(new Animated.Value(1)).current;
@@ -304,6 +312,32 @@ const EnemyDisplay = observer(
     const healingGlowAnim = useRef(new Animated.Value(0)).current;
     const attackStateRef = useRef<"start" | "attacking" | "returning">("start");
 
+    const dialogueAnim = useRef(new Animated.Value(0)).current;
+
+    const runDialogueAnimation = (onComplete: () => void) => {
+      Animated.sequence([
+        Animated.timing(dialogueAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.delay(2000), // Show dialogue for 2 seconds
+        Animated.timing(dialogueAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start(onComplete);
+    };
+
+    useEffect(() => {
+      if (animationStore.dialogueDummy !== 0) {
+        runDialogueAnimation(() => {
+          animationStore.setDialogueString(undefined);
+        });
+      }
+    }, [animationStore.dialogueDummy]);
+
     const runHealAnimation = () => {
       Animated.sequence([
         Animated.timing(healingGlowAnim, {
@@ -494,6 +528,9 @@ const EnemyDisplay = observer(
             currentAnimationState={animationState}
             setCurrentAnimationState={setAnimationState}
           />
+          {animationStore.dialogueString && (
+            <DialogueBox text={animationStore.dialogueString} />
+          )}
         </Animated.View>
         <Animated.View
           style={{
