@@ -42,6 +42,11 @@ describe("Attack", () => {
       totalLightningDamage: 4,
       totalPoisonDamage: 2,
       equipmentStats: new Map(),
+      getPhysicalDamageReduction: jest.fn().mockReturnValue(0), // Add this
+      fireResistance: 0,
+      coldResistance: 0,
+      lightningResistance: 0,
+      poisonResistance: 0,
     } as unknown as PlayerCharacter;
 
     mockEnemy = {
@@ -58,6 +63,11 @@ describe("Attack", () => {
       coldResistance: 0,
       lightningResistance: 0,
       poisonResistance: 0,
+      totalPhysicalDamage: 8,
+      totalFireDamage: 4,
+      totalColdDamage: 3,
+      totalLightningDamage: 2,
+      totalPoisonDamage: 1,
     } as unknown as Enemy;
   });
 
@@ -206,8 +216,8 @@ describe("Attack", () => {
     });
   });
 
-  describe("damage calculations", () => {
-    it("should calculate damage for all damage types", () => {
+  describe("player damage calculations", () => {
+    it("should calculate player damage for all damage types", () => {
       const attack = new Attack({
         name: "Test Attack",
         damageMult: 1.5,
@@ -219,15 +229,15 @@ describe("Attack", () => {
       const result = attack.use({ targets: [mockEnemy] });
       const damages = result.result[0].damages!;
 
-      expect(damages.physical).toBe(20); // (10 * 1.5 + 5) * 1
-      expect(damages.fire).toBe(12.5); // (5 * 1.5 + 5) * 1
-      expect(damages.cold).toBe(9.5); // (3 * 1.5 + 5) * 1
-      expect(damages.lightning).toBe(11); // (4 * 1.5 + 5) * 1
-      expect(damages.poison).toBe(8); // (2 * 1.5 + 5) * 1
-      expect(damages.total).toBe(61); // sum of all damages
+      expect(damages.physical).toBe(20);
+      expect(damages.fire).toBe(12.5);
+      expect(damages.cold).toBe(9.5);
+      expect(damages.lightning).toBe(11);
+      expect(damages.poison).toBe(8);
+      expect(damages.total).toBe(61);
     });
 
-    it("should apply resistances correctly", () => {
+    it("should apply enemy resistances correctly", () => {
       const attack = new Attack({
         name: "Test Attack",
         damageMult: 1.0,
@@ -236,23 +246,23 @@ describe("Attack", () => {
         hitChance: 1.0,
       });
 
-      mockEnemy.fireResistance = 75; // 75% fire resistance
-      mockEnemy.coldResistance = 25; // 25% cold resistance
-      mockEnemy.lightningResistance = 0; // 0% lightning resistance
-      mockEnemy.poisonResistance = 100; // 100% poison resistance
+      mockEnemy.fireResistance = 75;
+      mockEnemy.coldResistance = 25;
+      mockEnemy.lightningResistance = 0;
+      mockEnemy.poisonResistance = 100;
 
       const result = attack.use({ targets: [mockEnemy] });
       const damages = result.result[0].damages!;
 
       expect(damages.physical).toBe(10);
-      expect(damages.fire).toBe(1.25); // 5 * 0.25 (75% reduction)
-      expect(damages.cold).toBe(2.25); // 3 * 0.75 (25% reduction)
-      expect(damages.lightning).toBe(4); // 4 * 1.0 (0% reduction)
-      expect(damages.poison).toBe(0); // 2 * 0 (100% reduction)
-      expect(damages.total).toBe(17.5); // sum of all reduced damages
+      expect(damages.fire).toBe(1.25);
+      expect(damages.cold).toBe(2.25);
+      expect(damages.lightning).toBe(4);
+      expect(damages.poison).toBe(0);
+      expect(damages.total).toBe(17.5);
     });
 
-    it("should handle multiple hits correctly", () => {
+    it("should handle multiple player hits correctly", () => {
       const attack = new Attack({
         name: "Test Attack",
         damageMult: 1.0,
@@ -264,7 +274,88 @@ describe("Attack", () => {
       const result = attack.use({ targets: [mockEnemy] });
       const damages = result.result[0].damages!;
 
-      expect(damages.total).toBe(48); // (10 + 5 + 3 + 4 + 2) * 2 hits
+      expect(damages.total).toBe(48);
+    });
+  });
+
+  describe("enemy damage calculations", () => {
+    it("should calculate enemy damage for all damage types", () => {
+      const attack = new Attack({
+        name: "Enemy Attack",
+        damageMult: 1.5,
+        flatHealthDamage: 5,
+        user: mockEnemy,
+        hitChance: 1.0,
+      });
+
+      mockEnemy.totalPhysicalDamage = 8;
+      mockEnemy.totalFireDamage = 4;
+      mockEnemy.totalColdDamage = 3;
+      mockEnemy.totalLightningDamage = 2;
+      mockEnemy.totalPoisonDamage = 1;
+
+      const result = attack.use({ targets: [mockUser] });
+      const damages = result.result[0].damages!;
+
+      expect(damages.physical).toBe(17); // (8 * 1.5 + 5) * 1
+      expect(damages.fire).toBe(11); // (4 * 1.5 + 5) * 1
+      expect(damages.cold).toBe(9.5); // (3 * 1.5 + 5) * 1
+      expect(damages.lightning).toBe(8); // (2 * 1.5 + 5) * 1
+      expect(damages.poison).toBe(6.5); // (1 * 1.5 + 5) * 1
+      expect(damages.total).toBe(52);
+    });
+
+    it("should apply player resistances correctly", () => {
+      const attack = new Attack({
+        name: "Enemy Attack",
+        damageMult: 1.0,
+        flatHealthDamage: 0,
+        user: mockEnemy,
+        hitChance: 1.0,
+      });
+
+      mockUser.fireResistance = 75;
+      mockUser.coldResistance = 25;
+      mockUser.lightningResistance = 0;
+      mockUser.poisonResistance = 100;
+      mockUser.getPhysicalDamageReduction = jest.fn().mockReturnValue(50);
+
+      mockEnemy.totalPhysicalDamage = 8;
+      mockEnemy.totalFireDamage = 4;
+      mockEnemy.totalColdDamage = 3;
+      mockEnemy.totalLightningDamage = 2;
+      mockEnemy.totalPoisonDamage = 1;
+
+      const result = attack.use({ targets: [mockUser] });
+      const damages = result.result[0].damages!;
+
+      expect(damages.physical).toBe(4); // 8 * (1 - 50/100)
+      expect(damages.fire).toBe(1); // 4 * (1 - 75/100)
+      expect(damages.cold).toBe(2.25); // 3 * (1 - 25/100)
+      expect(damages.lightning).toBe(2); // 2 * (1 - 0/100)
+      expect(damages.poison).toBe(0); // 1 * (1 - 100/100)
+      expect(damages.total).toBe(9.25);
+    });
+
+    it("should handle multiple enemy hits correctly", () => {
+      const attack = new Attack({
+        name: "Enemy Attack",
+        damageMult: 1.0,
+        flatHealthDamage: 0,
+        hits: 2,
+        user: mockEnemy,
+      });
+
+      mockEnemy.totalPhysicalDamage = 8;
+      mockEnemy.totalFireDamage = 4;
+      mockEnemy.totalColdDamage = 3;
+      mockEnemy.totalLightningDamage = 2;
+      mockEnemy.totalPoisonDamage = 1;
+
+      const result = attack.use({ targets: [mockUser] });
+      const damages = result.result[0].damages!;
+
+      expect(damages.total).toBe(36); // (8 + 4 + 3 + 2 + 1) * 2 hits
     });
   });
 });

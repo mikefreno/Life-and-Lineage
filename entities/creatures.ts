@@ -1,6 +1,4 @@
 import attacks from "../assets/json/enemyAttacks.json";
-import enemies from "../assets/json/enemy.json";
-import bosses from "../assets/json/bosses.json";
 import {
   getConditionEffectsOnDefenses,
   getConditionEffectsOnMisc,
@@ -63,6 +61,15 @@ type CreatureType = {
   conditions?: Condition[];
   enemyStore?: EnemyStore;
   sprite?: EnemyImageKeyOption | null; // null for minions;
+  basePhysicalDamage?: number;
+  baseFireDamage?: number;
+  baseColdDamage?: number;
+  baseLightningDamage?: number;
+  basePoisonDamage?: number;
+  baseFireResistance?: number;
+  baseColdResistance?: number;
+  baseLightningResistance?: number;
+  basePoisonResistance?: number;
 };
 
 type EnemyType = CreatureType & {
@@ -113,6 +120,19 @@ export class Creature {
   enemyStore: EnemyStore | undefined;
   readonly sprite: EnemyImageKeyOption | null;
 
+  // New properties for damage types
+  readonly basePhysicalDamage: number;
+  readonly baseFireDamage: number;
+  readonly baseColdDamage: number;
+  readonly baseLightningDamage: number;
+  readonly basePoisonDamage: number;
+
+  // New properties for resistances
+  readonly baseFireResistance: number;
+  readonly baseColdResistance: number;
+  readonly baseLightningResistance: number;
+  readonly basePoisonResistance: number;
+
   constructor({
     id,
     beingType,
@@ -130,6 +150,16 @@ export class Creature {
     conditions,
     enemyStore,
     sprite,
+    basePhysicalDamage,
+    baseFireDamage,
+    baseColdDamage,
+    baseLightningDamage,
+    basePoisonDamage,
+
+    baseFireResistance,
+    baseColdResistance,
+    baseLightningResistance,
+    basePoisonResistance,
   }: CreatureType) {
     this.id = id ?? Crypto.randomUUID(); // Assign a random UUID if id is not provided
     this.beingType = beingType;
@@ -147,6 +177,17 @@ export class Creature {
     this.conditions = conditions ?? []; // Initialize conditions to an empty array if not provided
     this.enemyStore = enemyStore;
     this.sprite = sprite;
+
+    this.basePhysicalDamage = basePhysicalDamage ?? 0;
+    this.baseFireDamage = baseFireDamage ?? 0;
+    this.baseColdDamage = baseColdDamage ?? 0;
+    this.baseLightningDamage = baseLightningDamage ?? 0;
+    this.basePoisonDamage = basePoisonDamage ?? 0;
+
+    this.baseFireResistance = baseFireResistance ?? 0;
+    this.baseColdResistance = baseColdResistance ?? 0;
+    this.baseLightningResistance = baseLightningResistance ?? 0;
+    this.basePoisonResistance = basePoisonResistance ?? 0;
 
     makeObservable(this, {
       id: observable,
@@ -168,6 +209,15 @@ export class Creature {
       maxEnergy: computed,
       maxHealth: computed,
       maxSanity: computed,
+      fireResistance: computed,
+      coldResistance: computed,
+      lightningResistance: computed,
+      poisonResistance: computed,
+      totalPhysicalDamage: computed,
+      totalColdDamage: computed,
+      totalFireDamage: computed,
+      totalPoisonDamage: computed,
+      totalLightningDamage: computed,
     });
   }
 
@@ -583,6 +633,43 @@ export class Creature {
       numTargets: scoredAttacks[0].numTargets,
     };
   }
+
+  //---------------------------Resistances---------------------------//
+  get fireResistance() {
+    return this.baseFireResistance; // add conditional modifiers if they exist
+  }
+
+  get coldResistance() {
+    return this.baseColdResistance;
+  }
+
+  get lightningResistance() {
+    return this.baseLightningResistance;
+  }
+
+  get poisonResistance() {
+    return this.basePoisonResistance;
+  }
+  //---------------------------Damage Types---------------------------//
+  get totalPhysicalDamage() {
+    return this.attackPower; // or some other implementation
+  }
+
+  get totalFireDamage() {
+    return this.baseFireDamage;
+  }
+
+  get totalColdDamage() {
+    return this.baseColdDamage;
+  }
+
+  get totalLightningDamage() {
+    return this.baseLightningDamage;
+  }
+
+  get totalPoisonDamage() {
+    return this.basePoisonDamage;
+  }
 }
 
 /**
@@ -847,6 +934,15 @@ export class Enemy extends Creature {
       drops: json.drops,
       storyDrops: json.storyDrops,
       goldDropRange: json.goldDropRange,
+      basePhysicalDamage: json.basePhysicalDamage,
+      baseFireDamage: json.baseFireDamage,
+      baseColdDamage: json.baseColdDamage,
+      baseLightningDamage: json.baseLightningDamage,
+      basePoisonDamage: json.basePoisonDamage,
+      baseFireResistance: json.baseFireResistance,
+      baseColdResistance: json.baseColdResistance,
+      baseLightningResistance: json.baseLightningResistance,
+      basePoisonResistance: json.basePoisonResistance,
     });
     enemy.hydrationLinking();
     return enemy;
@@ -972,6 +1068,15 @@ export class Minion extends Creature {
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
+      basePhysicalDamage: json.basePhysicalDamage,
+      baseFireDamage: json.baseFireDamage,
+      baseColdDamage: json.baseColdDamage,
+      baseLightningDamage: json.baseLightningDamage,
+      basePoisonDamage: json.basePoisonDamage,
+      baseFireResistance: json.baseFireResistance,
+      baseColdResistance: json.baseColdResistance,
+      baseLightningResistance: json.baseLightningResistance,
+      basePoisonResistance: json.basePoisonResistance,
       parent: null,
     });
     minion.conditions = minion.conditions.map((cond) =>
