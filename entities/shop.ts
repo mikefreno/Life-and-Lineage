@@ -116,28 +116,31 @@ export class Shop {
 
   get createGreeting() {
     const playerFullName = this.root.playerState?.fullName || "";
+    const personality = this.shopKeeper.personality || "wise";
+
+    if (!greetings[personality]) {
+      throw new Error(`No greetings defined for personality: ${personality}`);
+    }
+
+    let options;
     if (this.shopKeeper.affection > 90) {
-      const options = greetings[this.shopKeeper.personality!]["very warm"];
-      const randIdx = Math.floor(Math.random() * options.length);
-      return options[randIdx].replaceAll("%p", playerFullName);
+      options = greetings[personality]["very warm"];
+    } else if (this.shopKeeper.affection > 75) {
+      options = greetings[personality].warm;
+    } else if (this.shopKeeper.affection > 50) {
+      options = greetings[personality].positive;
+    } else if (this.shopKeeper.affection > 25) {
+      options = greetings[personality]["slightly positive"];
+    } else {
+      options = greetings[personality].neutral;
     }
-    if (this.shopKeeper.affection > 75) {
-      const options = greetings[this.shopKeeper.personality!].warm;
-      const randIdx = Math.floor(Math.random() * options.length);
-      return options[randIdx].replaceAll("%p", playerFullName);
+
+    if (!options || options.length === 0) {
+      throw new Error(
+        `No greeting options for affection level with personality: ${personality}`,
+      );
     }
-    if (this.shopKeeper.affection > 50) {
-      const options = greetings[this.shopKeeper.personality!].positive;
-      const randIdx = Math.floor(Math.random() * options.length);
-      return options[randIdx].replaceAll("%p", playerFullName);
-    }
-    if (this.shopKeeper.affection > 25) {
-      const options =
-        greetings[this.shopKeeper.personality!]["slightly positive"];
-      const randIdx = Math.floor(Math.random() * options.length);
-      return options[randIdx].replaceAll("%p", playerFullName);
-    }
-    const options = greetings[this.shopKeeper.personality!].neutral;
+
     const randIdx = Math.floor(Math.random() * options.length);
     return options[randIdx].replaceAll("%p", playerFullName);
   }
@@ -178,8 +181,8 @@ export class Shop {
     let soldCount = 0;
 
     items.forEach((item) => {
-      const idx = this.baseInventory.findIndex((invItem) =>
-        invItem.equals(item),
+      const idx = this.baseInventory.findIndex(
+        (invItem) => item.id === invItem.id,
       );
       if (idx !== -1) {
         this.baseInventory.splice(idx, 1);
@@ -187,10 +190,10 @@ export class Shop {
       }
     });
 
-    const totalEarned = Math.floor(sellPrice) * soldCount;
+    const totalEarned = Math.floor(sellPrice * soldCount);
     this.currentGold += totalEarned;
 
-    const baseChange = (sellPrice / 500) * soldCount;
+    const baseChange = totalEarned / 500;
     const cappedChange = Math.min(baseChange, 20);
     this.changeAffection(cappedChange);
   }
@@ -204,31 +207,30 @@ export class Shop {
     let totalPrice = 0;
     const successfullySoldItems: Item[] = [];
 
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
+    for (const item of items) {
       const itemPrice = item.getSellPrice(this.shopKeeper.affection);
       if (this.currentGold >= itemPrice) {
-        // Shop can afford to buy the item
-        this.currentGold -= itemPrice;
-        this.baseInventory.push(item);
+        this.buyItem(item, itemPrice);
         totalPrice += itemPrice;
         successfullySoldItems.push(item);
+      } else {
+        break;
       }
     }
 
     if (successfullySoldItems.length > 0) {
       playerState.addGold(totalPrice);
-      for (let i = 0; i < successfullySoldItems.length; i++) {
-        const item = successfullySoldItems[i];
-        for (let j = 0; j < playerState.baseInventory.length; j++) {
-          if (playerState.baseInventory[j].equals(item)) {
-            playerState.baseInventory.splice(j, 1);
-            break;
-          }
-        }
-      }
 
-      const baseChange = (totalPrice / 500) * successfullySoldItems.length;
+      successfullySoldItems.forEach((item) => {
+        const index = playerState.baseInventory.findIndex(
+          (invItem) => invItem.id === item.id,
+        );
+        if (index !== -1) {
+          playerState.baseInventory.splice(index, 1);
+        }
+      });
+
+      const baseChange = totalPrice / 500;
       const cappedChange = Math.min(baseChange, 20);
       this.changeAffection(cappedChange);
     }

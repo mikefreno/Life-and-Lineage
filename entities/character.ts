@@ -139,6 +139,8 @@ export class Character {
       setParents: action,
       pregnancyDueDate: observable,
       isPregnant: observable,
+      initiatePregnancy: action,
+      giveBirth: action,
       age: computed,
     });
 

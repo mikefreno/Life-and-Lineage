@@ -7,14 +7,23 @@ import { Personality } from "../../utility/types";
 jest.mock("../character");
 jest.mock("../item");
 jest.mock("../../assets/json/shopLines.json", () => ({
-  cheerful: {
-    "very warm": ["Very warm greeting %p"],
-    warm: ["Warm greeting %p"],
-    positive: ["Positive greeting %p"],
-    "slightly positive": ["Slightly positive greeting %p"],
-    neutral: ["Neutral greeting %p"],
+  wise: {
+    neutral: ["The winds whisper of your arrival."],
+    "slightly positive": ["Ah, your path returns to me."],
+    positive: ["Your presence brightens these ancient halls, %p."],
+    warm: ["The ancient ones smile upon you, %p."],
+    "very warm": ["The cosmos itself celebrates you, %p."],
   },
 }));
+
+const mockPlayerState = {
+  fullName: "Test Player",
+  playerClass: "mage",
+  gold: 1000,
+  baseInventory: [] as Item[],
+  addGold: jest.fn(),
+  removeFromInventory: jest.fn(),
+};
 
 const mockRootStore = {
   time: {
@@ -23,12 +32,7 @@ const mockRootStore = {
       .fn()
       .mockReturnValue({ year: 1990, week: 1 }),
   },
-  playerState: {
-    fullName: "Test Player",
-    playerClass: "mage",
-    gold: 1000,
-    baseInventory: [],
-  },
+  playerState: mockPlayerState,
 };
 
 describe("Shop", () => {
@@ -41,7 +45,7 @@ describe("Shop", () => {
       firstName: "John",
       lastName: "Doe",
       birthdate: { year: 1990, week: 1 },
-      personality: Personality.JOVIAL,
+      personality: Personality.WISE,
       job: "Merchant",
       root: mockRootStore,
     }) as jest.Mocked<Character>;
@@ -138,6 +142,23 @@ describe("Shop", () => {
     });
   });
 
+  describe("createGreeting", () => {
+    it("should create very warm greeting for high affection", () => {
+      mockShopKeeper.affection = 95;
+      expect(shop.createGreeting).toContain("Test Player");
+    });
+
+    it("should create warm greeting for good affection", () => {
+      mockShopKeeper.affection = 80;
+      expect(shop.createGreeting).toContain("Test Player");
+    });
+
+    it("should create neutral greeting for low affection", () => {
+      mockShopKeeper.affection = 20;
+      expect(shop.createGreeting).not.toContain("Test Player");
+    });
+  });
+
   describe("buyItem", () => {
     it("should buy a single item if shop has enough gold", () => {
       const mockItem = new Item({} as any);
@@ -163,17 +184,30 @@ describe("Shop", () => {
 
   describe("sellItem", () => {
     it("should sell a single item", () => {
-      const mockItem = new Item({} as any);
+      const mockItem = new Item({
+        // ... item properties
+        equals: jest.fn().mockImplementation(function (
+          this: Item,
+          otherItem: Item,
+        ) {
+          return this.id === otherItem.id;
+        }),
+        getSellPrice: jest.fn().mockReturnValue(100),
+      } as any);
+
       shop.baseInventory = [mockItem];
 
       shop.sellItem(mockItem, 100);
 
       expect(shop.currentGold).toBe(1100);
-      expect(shop.baseInventory).not.toContain(mockItem);
+      expect(shop.baseInventory).toHaveLength(0);
     });
 
     it("should sell multiple items", () => {
-      const mockItems = [new Item({} as any), new Item({} as any)];
+      const mockItems = [
+        new Item({ equals: jest.fn() } as any),
+        new Item({ equals: jest.fn() } as any),
+      ];
       shop.baseInventory = [...mockItems];
 
       shop.sellItem(mockItems, 100);
@@ -184,26 +218,64 @@ describe("Shop", () => {
   });
 
   describe("purchaseStack", () => {
+    let initialPlayerGold: number;
+    let mockItems: Item[];
+
+    beforeEach(() => {
+      initialPlayerGold = mockRootStore.playerState.gold;
+      mockRootStore.playerState.addGold.mockClear();
+      mockRootStore.playerState.baseInventory = [];
+
+      // Create unique items for each test
+      mockItems = Array(20)
+        .fill(null)
+        .map((_, index) => {
+          const item = new Item({
+            id: `item-${index}`,
+            getSellPrice: jest.fn().mockReturnValue(100),
+            equals: jest.fn().mockImplementation(function (
+              this: Item,
+              otherItem: Item,
+            ) {
+              return this.id === otherItem.id;
+            }),
+          } as any);
+          mockRootStore.playerState.baseInventory.push(item);
+          return item;
+        });
+    });
+
     it("should purchase as many items as shop can afford", () => {
-      const mockItems = Array(20).fill(new Item({} as any));
-      shop.addGold(1000);
+      shop.currentGold = 1500; // Shop can afford 15 items
 
       const purchasedCount = shop.purchaseStack(mockItems);
 
-      expect(purchasedCount).toBeLessThan(20);
-      expect(shop.currentGold).toBeLessThan(500);
+      expect(purchasedCount).toBe(15);
+      expect(shop.currentGold).toBe(0);
+      expect(mockRootStore.playerState.addGold).toHaveBeenCalledWith(1500);
+      expect(mockRootStore.playerState.baseInventory).toHaveLength(5); // 20 - 15
     });
 
     it("should update player inventory and gold", () => {
-      const mockItems = [new Item({} as any)];
-      const initialPlayerGold = mockRootStore.playerState.gold;
+      const itemPrice = 100;
+      const mockItems = [
+        new Item({
+          id: "test-item-1",
+          getSellPrice: jest.fn().mockReturnValue(itemPrice),
+          equals: jest.fn(),
+        } as any),
+      ];
+
+      // Add the item to player's inventory
+      mockRootStore.playerState.baseInventory = [...mockItems];
+
+      // Ensure shop has enough gold
+      shop.currentGold = itemPrice * 2;
 
       shop.purchaseStack(mockItems);
 
-      expect(mockRootStore.playerState.gold).toBeGreaterThan(initialPlayerGold);
-      expect(mockRootStore.playerState.baseInventory).not.toContain(
-        mockItems[0],
-      );
+      expect(mockRootStore.playerState.addGold).toHaveBeenCalledWith(itemPrice);
+      expect(mockRootStore.playerState.baseInventory).toHaveLength(0);
     });
   });
 });
