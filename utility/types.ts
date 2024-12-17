@@ -125,8 +125,7 @@ export function stringToModifier(key: string): Modifier | undefined {
     case "poisondamagemultiplier":
       return Modifier.PoisonDamageMultiplier;
     default:
-      console.warn(`Unknown modifier: ${key}`);
-      return undefined;
+      return key as unknown as Modifier;
   }
 }
 

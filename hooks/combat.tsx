@@ -202,7 +202,7 @@ export const useEnemyManagement = () => {
     });
   }, [enemyStore.enemies, playerState, handleEnemyAction, enemyDeathHandler]);
 
-  return { enemyTurn, enemyDeathHandler };
+  return { enemyTurn, enemyMinionsTurn, enemyDeathHandler };
 };
 
 export const useCombatActions = () => {

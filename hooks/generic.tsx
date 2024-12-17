@@ -7,7 +7,6 @@ import type { Item } from "../entities/item";
 import { AccelerationCurves } from "../utility/functions/misc";
 import { DEFAULT_FADEOUT_TIME } from "../components/Themed";
 import type { PlayerCharacter } from "../entities/character";
-import { isAction } from "mobx";
 
 export const useVibration = () => {
   const { uiStore } = useRootStore();
@@ -63,7 +62,9 @@ export const useVibration = () => {
   return vibrate;
 };
 
-const useSmartExecution = (isActiveRef: React.MutableRefObject<boolean>) => {
+export const useSmartExecution = (
+  isActiveRef: React.MutableRefObject<boolean>,
+) => {
   const queueRef = useRef<(() => void)[]>([]);
   const isProcessingRef = useRef(false);
   const lastExecutionTimeRef = useRef(0);

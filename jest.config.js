@@ -9,4 +9,5 @@ module.exports = {
   coveragePathIgnorePatterns: ["node_modules", "assets", "config"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   setupFiles: ["./jest.setup.js"],
+  setupFilesAfterEnv: ["@testing-library/react-native/extend-expect"],
 };

@@ -2538,6 +2538,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        rarity: Rarity.NORMAL,
         root: player.root,
       });
     case Element.water:
@@ -2546,6 +2547,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        rarity: Rarity.NORMAL,
         root: player.root,
       });
     case Element.air:
@@ -2554,6 +2556,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        rarity: Rarity.NORMAL,
         root: player.root,
       });
     case Element.earth:
@@ -2562,6 +2565,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        rarity: Rarity.NORMAL,
         root: player.root,
       });
     case Element.blood:
@@ -2570,6 +2574,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        rarity: Rarity.NORMAL,
         root: player.root,
       });
     case Element.summoning:
@@ -2578,6 +2583,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        rarity: Rarity.NORMAL,
         root: player.root,
       });
     case Element.pestilence:
@@ -2586,6 +2592,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        rarity: Rarity.NORMAL,
         root: player.root,
       });
     case Element.bone:
@@ -2594,6 +2601,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        rarity: Rarity.NORMAL,
         root: player.root,
       });
     case Element.holy:
@@ -2602,6 +2610,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        rarity: Rarity.NORMAL,
         root: player.root,
       });
     case Element.protection:
@@ -2610,6 +2619,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        rarity: Rarity.NORMAL,
         root: player.root,
       });
     case Element.vengeance:
@@ -2618,6 +2628,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        rarity: Rarity.NORMAL,
         root: player.root,
       });
     case Element.beastMastery:
@@ -2626,6 +2637,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        rarity: Rarity.NORMAL,
         root: player.root,
       });
     case Element.assassination:
@@ -2634,6 +2646,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        rarity: Rarity.NORMAL,
         root: player.root,
       });
     case Element.arcane:
@@ -2642,6 +2655,7 @@ export function getStartingBook(player: PlayerCharacter) {
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",
+        rarity: Rarity.NORMAL,
         root: player.root,
       });
     default:
