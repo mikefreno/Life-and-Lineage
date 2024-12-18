@@ -231,6 +231,7 @@ const EquipmentSlot = observer(
                   ]}
                   runOnSuccess={() => {
                     playerState.unEquipItem(itemStack);
+                    setDisplayItem(null);
                   }}
                   displayItem={null}
                   isDraggable={true}

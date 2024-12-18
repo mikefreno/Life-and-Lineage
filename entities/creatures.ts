@@ -130,7 +130,7 @@ export class Creature {
   currentSanity: number | null;
   readonly baseSanity: number | null;
   attackPower: number;
-  readonly baseArmor: number;
+  baseArmor: number;
   currentEnergy: number;
   readonly baseEnergy: number;
   readonly energyRegen: number;
@@ -230,6 +230,7 @@ export class Creature {
       attackStrings: observable,
       attackPower: observable,
       sprite: observable,
+      baseArmor: observable,
       baseFireResistance: observable,
       baseColdResistance: observable,
       baseLightningResistance: observable,
@@ -811,35 +812,55 @@ export class Enemy extends Creature {
   }
 
   private triggerPhaseTransition() {
-    this.currentPhase++;
-    const phase = this.phases[this.currentPhase];
+    // Check both phases before transitioning
+    while (
+      this.phases[this.currentPhase + 1] &&
+      this.currentHealth / this.baseHealth <=
+        this.phases[this.currentPhase + 1].triggerHealth
+    ) {
+      this.currentPhase++;
+      const phase = this.phases[this.currentPhase];
 
-    if (phase.sprite) this.sprite = phase.sprite;
-    if (phase.attackPower) this.attackPower = phase.attackPower;
-    if (phase.baseArmor) this.baseArmor = phase.baseArmor;
-    if (phase.energyRegen) this.energyRegen = phase.energyRegen;
-    if (phase.attackStrings) this.attackStrings = phase.attackStrings;
-    if (phase.basePhysicalDamage)
-      this.basePhysicalDamage = phase.basePhysicalDamage;
-    if (phase.baseFireDamage) this.baseFireDamage = phase.baseFireDamage;
-    if (phase.baseColdDamage) this.baseColdDamage = phase.baseColdDamage;
-    if (phase.baseLightningDamage)
-      this.baseLightningDamage = phase.baseLightningDamage;
-    if (phase.basePoisonDamage) this.basePoisonDamage = phase.basePoisonDamage;
-    if (phase.baseFireResistance)
-      this.baseFireResistance = phase.baseFireResistance;
-    if (phase.baseColdResistance)
-      this.baseColdResistance = phase.baseColdResistance;
-    if (phase.baseLightningResistance)
-      this.baseLightningResistance = phase.baseLightningResistance;
-    if (phase.basePoisonResistance)
-      this.basePoisonResistance = phase.basePoisonResistance;
+      if (phase.attackPower) {
+        this.attackPower = phase.attackPower;
+      }
 
-    if (phase.dialogue && this.enemyStore) {
-      const animationStore = this.enemyStore.getAnimationStore(this.id);
-      if (animationStore) {
-        animationStore.setDialogueString(phase.dialogue);
-        animationStore.triggerDialogue();
+      if (phase.sprite) this.sprite = phase.sprite;
+      if (phase.attackPower) this.attackPower = phase.attackPower;
+      if (phase.baseArmor) this.baseArmor = phase.baseArmor;
+      if (phase.energyRegen) this.energyRegen = phase.energyRegen;
+      if (phase.attackStrings) this.attackStrings = phase.attackStrings;
+      if (phase.basePhysicalDamage)
+        this.basePhysicalDamage = phase.basePhysicalDamage;
+      if (phase.baseFireDamage) this.baseFireDamage = phase.baseFireDamage;
+      if (phase.baseColdDamage) this.baseColdDamage = phase.baseColdDamage;
+      if (phase.baseLightningDamage)
+        this.baseLightningDamage = phase.baseLightningDamage;
+      if (phase.basePoisonDamage)
+        this.basePoisonDamage = phase.basePoisonDamage;
+      if (phase.baseFireResistance)
+        this.baseFireResistance = phase.baseFireResistance;
+      if (phase.baseColdResistance)
+        this.baseColdResistance = phase.baseColdResistance;
+      if (phase.baseLightningResistance)
+        this.baseLightningResistance = phase.baseLightningResistance;
+      if (phase.basePoisonResistance)
+        this.basePoisonResistance = phase.basePoisonResistance;
+
+      if (phase.dialogue && this.enemyStore) {
+        const animationStore = this.enemyStore.getAnimationStore(this.id);
+        if (animationStore) {
+          animationStore.setDialogueString(phase.dialogue);
+          animationStore.triggerDialogue();
+        }
+      }
+
+      if (phase.dialogue && this.enemyStore) {
+        const animationStore = this.enemyStore.getAnimationStore(this.id);
+        if (animationStore) {
+          animationStore.setDialogueString(phase.dialogue);
+          animationStore.triggerDialogue();
+        }
       }
     }
   }

@@ -5,8 +5,23 @@ import { PlayerCharacter } from "../character";
 import { Condition } from "../conditions";
 import { Enemy, Minion } from "../creatures";
 
-jest.mock("../../stores/EnemyStore");
+jest.mock("../../stores/EnemyStore", () => {
+  return jest.fn().mockImplementation(() => ({
+    getAnimationStore: jest.fn().mockReturnValue({
+      setDialogueString: jest.fn(),
+      triggerDialogue: jest.fn(),
+    }),
+    saveEnemy: jest.fn(),
+  }));
+});
 jest.mock("../../stores/RootStore");
+
+// Also mock the random functions
+jest.mock("../../utility/functions/misc", () => ({
+  ...jest.requireActual("../../utility/functions/misc"),
+  rollD20: jest.fn().mockReturnValue(20), // Always succeed
+  getRandomInt: jest.fn().mockReturnValue(10), // Return minimum value
+}));
 
 describe("Enemy Class", () => {
   let enemy: Enemy;
@@ -33,7 +48,9 @@ describe("Enemy Class", () => {
       attackPower: 10,
       sprite: "zombie",
       attackStrings: ["bite"],
-      drops: [{ item: "Gold Coin", itemType: ItemClassType.Junk, chance: 1 }],
+      drops: [
+        { item: "patch of fur", itemType: ItemClassType.Junk, chance: 1 },
+      ],
       goldDropRange: { minimum: 10, maximum: 20 },
       enemyStore: mockEnemyStore,
       phases: [
@@ -94,7 +111,7 @@ describe("Enemy Class", () => {
     expect(drops.gold).toBeGreaterThanOrEqual(10);
     expect(drops.gold).toBeLessThanOrEqual(20);
     expect(drops.itemDrops.length).toBe(1);
-    expect(drops.itemDrops[0].name).toBe("Gold Coin");
+    expect(drops.itemDrops[0].name).toBe("patch of fur");
   });
 
   test("Enemy minion management", () => {
@@ -121,6 +138,94 @@ describe("Enemy Class", () => {
 
     enemy.conditionTicker();
     expect(enemy.currentHealth).toBeLessThan(100);
+  });
+
+  test("Enemy energy management", () => {
+    enemy = new Enemy({
+      // ... basic properties ...
+      currentEnergy: 50,
+      baseEnergy: 100,
+      energyRegen: 10,
+    });
+
+    enemy.expendEnergy(20);
+    expect(enemy.currentEnergy).toBe(30);
+
+    enemy.regenerate();
+    expect(enemy.currentEnergy).toBe(40);
+  });
+
+  test("Enemy resistance calculations", () => {
+    enemy = new Enemy({
+      // ... basic properties ...
+      baseFireResistance: 10,
+      baseColdResistance: 15,
+      baseLightningResistance: 20,
+      basePoisonResistance: 25,
+    });
+
+    expect(enemy.fireResistance).toBe(10);
+    expect(enemy.coldResistance).toBe(15);
+    expect(enemy.lightningResistance).toBe(20);
+    expect(enemy.poisonResistance).toBe(25);
+  });
+
+  test("Enemy damage type calculations", () => {
+    enemy = new Enemy({
+      // ... basic properties ...
+      basePhysicalDamage: 10,
+      baseFireDamage: 5,
+      baseColdDamage: 5,
+      baseLightningDamage: 5,
+      basePoisonDamage: 5,
+    });
+
+    expect(enemy.totalPhysicalDamage).toBe(10);
+    expect(enemy.totalFireDamage).toBe(5);
+    expect(enemy.totalColdDamage).toBe(5);
+    expect(enemy.totalLightningDamage).toBe(5);
+    expect(enemy.totalPoisonDamage).toBe(5);
+  });
+
+  test("Enemy condition stacking", () => {
+    const condition1 = new Condition({
+      name: "Poison",
+      turns: 3,
+      style: "debuff",
+      effect: ["health damage"],
+      healthDamage: [5],
+      effectStyle: ["flat"],
+      placedbyID: enemy.id,
+    });
+
+    const condition2 = new Condition({
+      name: "Poison",
+      turns: 2,
+      style: "debuff",
+      effect: ["health damage"],
+      healthDamage: [3],
+      effectStyle: ["flat"],
+      placedbyID: enemy.id,
+    });
+
+    enemy.addCondition(condition1);
+    enemy.addCondition(condition2);
+    expect(enemy.conditions.length).toBe(2);
+
+    enemy.conditionTicker();
+    expect(enemy.currentHealth).toBeLessThan(92); // 100 - 5 - 3
+  });
+
+  test("Enemy story drops", () => {
+    enemy = new Enemy({
+      // ... basic properties ...
+      storyDrops: [{ item: "head of goblin shaman" }],
+    });
+
+    const mockPlayer = { playerClass: "mage" } as PlayerCharacter;
+    const drops = enemy.getDrops(mockPlayer, true); // true for boss fight
+    expect(drops.storyDrops?.length).toBe(1);
+    expect(drops.storyDrops?.[0].name).toBe("head of goblin shaman");
   });
 });
 
@@ -160,6 +265,7 @@ describe("Minion Class", () => {
       currentHealth: 50,
       baseHealth: 50,
       attackPower: 5,
+      attackStrings: ["bite"],
       turnsLeftAlive: 3,
       parent: mockParent,
     });
@@ -193,5 +299,43 @@ describe("Minion Class", () => {
     mockParent.addMinion(minion);
     minion.damageHealth({ damage: 50, attackerId: "player1" });
     expect(mockParent.minions.length).toBe(0);
+  });
+
+  test("Minion energy management", () => {
+    minion = new Minion({
+      beingType: "undead",
+      creatureSpecies: "Skeleton",
+      currentHealth: 50,
+      baseHealth: 50,
+      attackPower: 5,
+      attackStrings: ["bite"],
+      turnsLeftAlive: 3,
+      parent: mockParent,
+    });
+
+    minion.expendEnergy(10);
+    expect(minion.currentEnergy).toBe(20);
+
+    minion.regenerate();
+    expect(minion.currentEnergy).toBe(25);
+  });
+
+  test("Minion parent relationship", () => {
+    expect(minion.parent).toBe(mockParent);
+
+    newParent = new Enemy({
+      beingType: "undead",
+      creatureSpecies: "Necromancer",
+      currentHealth: 200,
+      baseHealth: 200,
+      attackPower: 20,
+      attackStrings: ["bite"],
+      sprite: "necromancer",
+      enemyStore: mockEnemyStore,
+      phases: [],
+    });
+
+    minion.reinstateParent(newParent);
+    expect(minion.parent).toBe(newParent);
   });
 });

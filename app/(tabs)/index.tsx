@@ -1,6 +1,6 @@
-import { TouchableWithoutFeedback, View } from "react-native";
+import { Pressable, TouchableWithoutFeedback, View } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
@@ -9,32 +9,31 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import InventoryRender from "../../components/InventoryRender";
 import {
-  ArmorIcon,
-  Energy,
-  HealthIcon,
   NecromancerSkull,
   PaladinHammer,
   RangerIcon,
-  Regen,
-  ShieldSlashIcon,
-  Sword,
   WizardHat,
 } from "../../assets/icons/SVGIcons";
 import BlessingDisplay from "../../components/BlessingsDisplay";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import EquipmentDisplay from "../../components/EquipmentDisplay";
-import { TutorialOption } from "../../utility/types";
+import { Modifier, TutorialOption } from "../../utility/types";
 import { useDraggableStore, useRootStore } from "../../hooks/stores";
 import D20DieAnimation from "../../components/DieRollAnim";
 import { EXPANDED_PAD } from "../../components/PlayerStatus";
 import type { Item } from "../../entities/item";
 import { LayoutAnimation } from "react-native";
+import { getStatInfo, getTotalValue } from "../../utility/functions/stats";
+import { Image } from "expo-image";
+import { StashDisplay } from "../../components/StashDisplay";
 
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
-  const { playerState, uiStore } = useRootStore();
+  const { playerState, uiStore, stashStore } = useRootStore();
   const { dimensions, playerStatusIsCompact } = uiStore;
   const { draggableClassStore } = useDraggableStore();
+  const [showStash, setShowStash] = useState(false);
+  const stashButtonRef = useRef(null);
 
   const [displayItem, setDisplayItem] = useState<{
     item: Item[];
@@ -80,6 +79,18 @@ const HomeScreen = observer(() => {
       </ThemedView>
     );
   }
+  const setStashTargetLayout = () => {
+    if (stashButtonRef.current) {
+      stashButtonRef.current.measure((x, y, width, height, pageX, pageY) => {
+        draggableClassStore.setAncillaryBounds("stash", {
+          x: pageX,
+          y: pageY,
+          width,
+          height,
+        });
+      });
+    }
+  };
 
   const layoutDimensions = useMemo(
     () => ({
@@ -108,6 +119,13 @@ const HomeScreen = observer(() => {
           title: "",
           body: "A great place to start is to study the book you were given.",
         }}
+      />
+
+      <StashDisplay
+        clear={() => setShowStash(false)}
+        showingStash={showStash}
+        setDisplayItem={setDisplayItem}
+        displayItem={displayItem}
       />
       <View className="flex-1" style={layoutDimensions}>
         <TouchableWithoutFeedback onPress={clearDisplayItem}>
@@ -138,47 +156,32 @@ const HomeScreen = observer(() => {
         <TouchableWithoutFeedback onPress={clearDisplayItem}>
           <View className="flex-1 justify-between relative z-10 h-full">
             <View className="absolute pl-2">
-              {playerState.equipmentStats.damage > 0 && (
-                <Text className="text-center">
-                  <Sword height={12} width={12} />{" "}
-                  {playerState.equipmentStats.damage}
-                </Text>
-              )}
-              {playerState.equipmentStats.armor > 0 && (
-                <>
-                  <Text className="text-center">
-                    <ArmorIcon height={12} width={12} />{" "}
-                    {playerState.equipmentStats.armor}
-                  </Text>
-                </>
-              )}
-              {playerState.equipmentStats.blockChance > 0 && (
-                <Text className="text-center">
-                  <ShieldSlashIcon height={12} width={12} />{" "}
-                  {(playerState.equipmentStats.blockChance * 100).toFixed(1)}%
-                </Text>
-              )}
-              {playerState.equipmentStats.mana > 0 && (
-                <>
-                  <Text className="text-center">
-                    <Energy height={12} width={12} />{" "}
-                    {playerState.equipmentStats.mana}
-                  </Text>
-                </>
-              )}
-              {playerState.equipmentStats.regen > 0 && (
-                <Text className="text-center">
-                  <Regen height={12} width={12} />{" "}
-                  {playerState.equipmentStats.regen}
-                </Text>
-              )}
-              {playerState.equipmentStats.health > 0 && (
-                <Text className="text-center">
-                  <HealthIcon height={12} width={12} />{" "}
-                  {playerState.equipmentStats.health}
-                </Text>
+              {Array.from(playerState.equipmentStats.entries()).map(
+                ([mod, value]) => {
+                  const statInfo = getStatInfo(mod as Modifier);
+                  if (!value || value <= 0) return null;
+
+                  const Icon = statInfo.icon;
+                  return (
+                    <Text key={mod} className="text-center">
+                      <Icon height={12} width={12} />{" "}
+                      {getTotalValue(mod as Modifier, value)}
+                    </Text>
+                  );
+                },
               )}
             </View>
+            <Pressable
+              ref={stashButtonRef}
+              onLayout={setStashTargetLayout}
+              onPress={() => setShowStash(true)}
+              className="absolute right-2 z-top rounded-lg"
+            >
+              <Image
+                source={require("../../assets/images/icons/Chest.png")}
+                style={{ width: 48, height: 48 }}
+              />
+            </Pressable>
             <EquipmentDisplay
               displayItem={displayItem}
               setDisplayItem={setDisplayItem}
@@ -210,13 +213,17 @@ const HomeScreen = observer(() => {
                   key: "quiver",
                   bounds: draggableClassStore.ancillaryBoundsMap.get("quiver"),
                 },
+                {
+                  key: "stash",
+                  bounds: draggableClassStore.ancillaryBoundsMap.get("stash"),
+                },
               ]}
-              runOnSuccess={() => null}
+              runOnSuccess={(item) => stashStore.addItem(item)}
             />
           </View>
         </TouchableWithoutFeedback>
         {displayItem && (
-          <View className="absolute z-10" pointerEvents="box-none">
+          <View className="absolute z-top" pointerEvents="box-none">
             <StatsDisplay
               displayItem={displayItem}
               clearItem={clearDisplayItem}

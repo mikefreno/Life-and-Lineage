@@ -42,7 +42,7 @@ import { rarityColors } from "../constants/Colors";
 type BaseProps = {
   displayItem: {
     item: Item[];
-    side?: "shop" | "inventory";
+    side?: "shop" | "inventory" | "stash";
     position: {
       left: number;
       top: number;
@@ -828,6 +828,16 @@ export function StatsDisplay({
             )}
           </>
         ) : null}
+        {displayItem.side == "stash" && (
+          <GenericFlatButton
+            onPress={() => {
+              playerState?.root.stashStore.removeItem(displayItem.item);
+              clearItem();
+            }}
+          >
+            Add to Inventory
+          </GenericFlatButton>
+        )}
         {firstItem.itemClass == ItemClassType.StoryItem && (
           <GenericFlatButton
             onPress={() => {

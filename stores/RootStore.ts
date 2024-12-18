@@ -19,6 +19,7 @@ import { Condition } from "../entities/conditions";
 import sanityDebuffs from "../assets/json/sanityDebuffs.json";
 import { ConditionObjectType, EffectOptions } from "../utility/types";
 import * as SQLite from "expo-sqlite";
+import { StashStore } from "./StashStore";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -28,7 +29,7 @@ export class RootStore {
   dungeonStore: DungeonStore;
   uiStore: UIStore;
   authStore: AuthStore;
-
+  stashStore: StashStore;
   characterStore: CharacterStore;
   tutorialStore: TutorialStore;
 
@@ -53,6 +54,7 @@ export class RootStore {
     this.dungeonStore = new DungeonStore({ root: this });
     this.characterStore = new CharacterStore({ root: this });
     this.tutorialStore = new TutorialStore({ root: this });
+    this.stashStore = new StashStore({ root: this });
 
     this.constructed = true;
 

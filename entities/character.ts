@@ -765,6 +765,7 @@ export class PlayerCharacter extends Character {
         this.gold,
         this.unAllocatedSkillPoints,
         this.equipmentStats,
+        this.baseInventory.length,
       ],
       () => {
         savePlayer(this);
@@ -2215,7 +2216,9 @@ export class PlayerCharacter extends Character {
    * Returns the species(name) of the created minion, adds the minion to the minion list
    */
   public createMinion(minionName: string) {
-    const minionObj = summons.find((summon) => summon.name == minionName);
+    const minionObj = summons.find(
+      (summon) => summon.name.toLowerCase() == minionName.toLowerCase(),
+    );
     if (!minionObj) {
       throw new Error(`Minion (${minionName}) not found!`);
     }

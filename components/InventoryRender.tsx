@@ -5,7 +5,6 @@ import type { Item } from "../entities/item";
 import { useVibration } from "../hooks/generic";
 import { useDraggableStore, useRootStore } from "../hooks/stores";
 import { useRef } from "react";
-import { usePathname } from "expo-router";
 
 export default function InventoryRender({
   displayItem,
@@ -57,6 +56,7 @@ export default function InventoryRender({
     switch (droppedOnKey) {
       case "shopInventory":
         runOnSuccess(item);
+        setDisplayItem(null);
         break;
       case "head":
       case "main-hand":
@@ -64,6 +64,11 @@ export default function InventoryRender({
       case "body":
       case "quiver":
         playerState?.equipItem(item, droppedOnKey);
+        setDisplayItem(null);
+        break;
+      case "stash":
+        runOnSuccess(item);
+        setDisplayItem(null);
         break;
     }
   };
@@ -192,9 +197,7 @@ export default function InventoryRender({
                           }
                         }}
                         displayItem={displayItem}
-                        isDraggable={
-                          screen == "home" ? !!item.item[0].slot : true
-                        }
+                        isDraggable={true}
                         targetBounds={targetBounds}
                         runOnSuccess={(droppedOnKey) =>
                           dropHandler(droppedOnKey, item.item)
