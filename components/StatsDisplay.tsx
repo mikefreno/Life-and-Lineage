@@ -834,6 +834,7 @@ export function StatsDisplay({
               playerState?.root.stashStore.removeItem(displayItem.item);
               clearItem();
             }}
+            className="py-2"
           >
             Add to Inventory
           </GenericFlatButton>

@@ -124,8 +124,6 @@ const HomeScreen = observer(() => {
       <StashDisplay
         clear={() => setShowStash(false)}
         showingStash={showStash}
-        setDisplayItem={setDisplayItem}
-        displayItem={displayItem}
       />
       <View className="flex-1" style={layoutDimensions}>
         <TouchableWithoutFeedback onPress={clearDisplayItem}>
@@ -171,21 +169,21 @@ const HomeScreen = observer(() => {
                 },
               )}
             </View>
+            <EquipmentDisplay
+              displayItem={displayItem}
+              setDisplayItem={setDisplayItem}
+            />
             <Pressable
               ref={stashButtonRef}
               onLayout={setStashTargetLayout}
               onPress={() => setShowStash(true)}
-              className="absolute right-2 z-top rounded-lg"
+              className="z-top rounded-lg -mt-20 mb-6 px-4"
             >
               <Image
                 source={require("../../assets/images/icons/Chest.png")}
                 style={{ width: 48, height: 48 }}
               />
             </Pressable>
-            <EquipmentDisplay
-              displayItem={displayItem}
-              setDisplayItem={setDisplayItem}
-            />
             <InventoryRender
               screen="home"
               displayItem={displayItem}

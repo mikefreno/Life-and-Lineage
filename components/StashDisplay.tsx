@@ -162,7 +162,10 @@ export const StashDisplay = observer(
             {displayItem && (
               <View
                 className="absolute z-top"
-                style={{ top: -uiStore.dimensions.height * 0.17, left: -20 }}
+                style={{
+                  top: -uiStore.dimensions.height * 0.17,
+                  left: -uiStore.dimensions.width * 0.065,
+                }}
                 pointerEvents="box-none"
               >
                 <StatsDisplay
