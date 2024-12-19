@@ -19,7 +19,7 @@ const D20DieAnimation = observer(
     keepRolling = false,
     size = 220,
     slowRoll = false,
-    showNumber = true,
+    showNumber = false,
     replaceNum,
   }: D20DieAnimationProps) => {
     const [diceValue, setDiceValue] = useState<number | undefined>();
@@ -52,6 +52,16 @@ const D20DieAnimation = observer(
       outputRange: [1, 0.5, 1],
     });
 
+    const animatedStyle = uiStore.reduceMotion
+      ? { height: size, width: size }
+      : {
+          transform: slowRoll
+            ? [{ rotateY: spin }]
+            : [{ rotateY: spin }, { scale: scale }],
+          height: size,
+          width: size,
+        };
+
     useEffect(() => {
       if (keepRolling) {
         roll();
@@ -62,17 +72,7 @@ const D20DieAnimation = observer(
       <View className="flex justify-center items-center">
         <Animated.View
           className="justify-center items-center"
-          style={
-            uiStore.reduceMotion
-              ? { height: size, width: size }
-              : {
-                  transform: slowRoll
-                    ? [{ rotateY: spin }]
-                    : [{ rotateY: spin }, { scale: scale }],
-                  height: size,
-                  width: size,
-                }
-          }
+          style={animatedStyle}
         >
           <D20SVG />
           {showNumber ? (
@@ -88,4 +88,5 @@ const D20DieAnimation = observer(
     );
   },
 );
+
 export default D20DieAnimation;

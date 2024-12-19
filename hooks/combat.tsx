@@ -12,7 +12,8 @@ import { Spell } from "../entities/spell";
 
 export const useEnemyManagement = () => {
   const root = useRootStore();
-  const { enemyStore, playerState, dungeonStore, tutorialStore } = root;
+  const { enemyStore, playerState, dungeonStore, tutorialStore, uiStore } =
+    root;
   const { setDroppedItems } = useLootState();
   const { setShouldShowFirstBossKillTutorialAfterItemDrops } =
     useTutorialState();
@@ -152,14 +153,17 @@ export const useEnemyManagement = () => {
         [AttackUse.block]: () => {
           animationStore.setTextString("blocked");
           animationStore.triggerText();
+          enemyStore.decrementAttackAnimations();
         },
         [AttackUse.stunned]: () => {
           animationStore.setTextString("stunned");
           animationStore.triggerText();
+          enemyStore.decrementAttackAnimations();
         },
         [AttackUse.lowEnergy]: () => {
           animationStore.setTextString("pass");
           animationStore.triggerText();
+          enemyStore.decrementAttackAnimations();
         },
       };
 

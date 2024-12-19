@@ -9,11 +9,7 @@ import {
 } from "react-native";
 import { useCallback, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import {
-  toTitleCase,
-  damageReduction,
-  AccelerationCurves,
-} from "../utility/functions/misc";
+import { toTitleCase, AccelerationCurves } from "../utility/functions/misc";
 import GenericModal from "./GenericModal";
 import GenericStrikeAround from "./GenericStrikeAround";
 import FadeOutNode from "./FadeOutNode";
@@ -385,7 +381,9 @@ const PlayerStatus = observer(
         <ScrollView className="flex-1">
           {stats.map((modifier) => {
             const value = equipmentStats.get(modifier);
-            if (!value || value <= 0) return null;
+            if (!value || value <= 0) {
+              return null;
+            }
 
             return (
               <StatDisplay key={modifier} modifier={modifier} value={value} />
@@ -515,7 +513,7 @@ const PlayerStatus = observer(
                   <GenericStrikeAround>Equipment Stats</GenericStrikeAround>
                   <View
                     className="flex-row mt-2"
-                    style={{ height: uiStore.dimensions.height * 0.3 }}
+                    style={{ maxHeight: uiStore.dimensions.height * 0.3 }}
                   >
                     <View className="flex-1 mr-1">
                       <Text className="text-center font-bold mb-1">

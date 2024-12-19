@@ -1,9 +1,4 @@
-import {
-  Pressable,
-  ScrollView,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { Pressable, TouchableWithoutFeedback, View } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useColorScheme } from "nativewind";
@@ -22,13 +17,12 @@ import {
 import BlessingDisplay from "../../components/BlessingsDisplay";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import EquipmentDisplay from "../../components/EquipmentDisplay";
-import { Modifier, TutorialOption } from "../../utility/types";
+import { TutorialOption } from "../../utility/types";
 import { useDraggableStore, useRootStore } from "../../hooks/stores";
 import D20DieAnimation from "../../components/DieRollAnim";
 import { EXPANDED_PAD } from "../../components/PlayerStatus";
 import type { Item } from "../../entities/item";
 import { LayoutAnimation } from "react-native";
-import { getStatInfo, getTotalValue } from "../../utility/functions/stats";
 import { Image } from "expo-image";
 import { StashDisplay } from "../../components/StashDisplay";
 

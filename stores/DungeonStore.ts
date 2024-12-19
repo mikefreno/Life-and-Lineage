@@ -175,7 +175,7 @@ export class DungeonStore {
     instance: string | DungeonInstance,
     level: string | DungeonLevel,
   ) {
-    this.root.createCheckpoint();
+    this.root.saveStore.createCheckpoint(true);
     if (instance instanceof DungeonInstance && level instanceof DungeonLevel) {
       this.currentInstance = instance;
       this.currentLevel = level;

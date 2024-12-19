@@ -323,183 +323,6 @@ export class AuthStore {
     return res.status;
   };
 
-  makeRemoteSave = async (name: string) => {
-    if (!this.isConnected) {
-      throw new Error("Device is offline");
-    }
-    try {
-      const timestamp = this.formatDate(new Date());
-      const playerAge = this.root.playerState?.age || 0;
-
-      const playerData = stringify({
-        ...this.root.playerState,
-        jobs: serializeJobs(this.root.playerState!.jobs),
-        root: null,
-      });
-      const timeData = stringify(this.root.time.toCheckpointData());
-      const dungeonData = stringify(this.root.dungeonStore.toCheckpointData());
-      const characterData = stringify(
-        this.root.characterStore.toCheckpointData(),
-      );
-      const shopsData = stringify(this.root.shopsStore.toCheckpointData());
-
-      await this.databaseExecute({
-        sql: `
-        INSERT INTO checkpoints (
-          name,
-          created_at,
-          last_updated, 
-          player_age, 
-          player_data, 
-          time_data, 
-          dungeon_data, 
-          character_data, 
-          shops_data
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-        args: [
-          name,
-          timestamp.toString(),
-          timestamp.toString(),
-          playerAge.toString(),
-          playerData,
-          timeData,
-          dungeonData,
-          characterData,
-          shopsData,
-        ],
-      });
-    } catch (e) {
-      console.error("Error creating remote checkpoint:", e);
-    }
-  };
-
-  overwriteRemoteSave = async (id: number) => {
-    if (!this.isConnected) {
-      throw new Error("Device is offline");
-    }
-    try {
-      const timestamp = this.formatDate(new Date());
-      const playerAge = this.root.playerState?.age || 0;
-
-      const playerData = stringify({
-        ...this.root.playerState,
-        jobs: serializeJobs(this.root.playerState!.jobs),
-        root: null,
-      });
-      const timeData = stringify(this.root.time.toCheckpointData());
-      const dungeonData = stringify(this.root.dungeonStore.toCheckpointData());
-      const characterData = stringify(
-        this.root.characterStore.toCheckpointData(),
-      );
-      const shopsData = stringify(this.root.shopsStore.toCheckpointData());
-
-      await this.databaseExecute({
-        sql: `
-        UPDATE checkpoints 
-        SET 
-          last_updated = ?,
-          player_age = ?,
-          player_data = ?,
-          time_data = ?,
-          dungeon_data = ?,
-          character_data = ?,
-          shops_data = ?
-        WHERE id = ?
-      `,
-        args: [
-          timestamp,
-          playerAge.toString(),
-          playerData,
-          timeData,
-          dungeonData,
-          characterData,
-          shopsData,
-          id.toString(),
-        ],
-      });
-    } catch (e) {
-      console.error("Error overwriting remote checkpoint:", e);
-    }
-  };
-
-  getRemoteCheckpoints = async () => {
-    if (!this.isConnected) {
-      throw new Error("Device is offline");
-    }
-    try {
-      const response = await this.databaseExecute({
-        sql: `SELECT * FROM checkpoints ORDER BY last_updated DESC`,
-      });
-
-      if (!response?.results?.[0]?.response?.result?.rows) {
-        console.warn(
-          "No rows found in response or unexpected response structure",
-        );
-        return [];
-      }
-
-      const convertedRows = this.convertHTTPResponseCheckpointRow(
-        response.results[0].response.result.rows,
-      );
-
-      return convertedRows;
-    } catch (e) {
-      console.error("Error fetching remote checkpoints:", e);
-      return [];
-    }
-  };
-
-  getRemoteCheckpoint = async (id: number) => {
-    if (!this.isConnected) {
-      throw new Error("Device is offline");
-    }
-    try {
-      const response = await this.databaseExecute({
-        sql: `SELECT * FROM checkpoints WHERE id = ? LIMIT 1`,
-        args: [id.toString()],
-      });
-
-      if (
-        !response?.results?.[0]?.response?.result?.rows ||
-        response.results[0].response.result.rows.length === 0
-      ) {
-        console.warn(`No checkpoint found with id: ${id}`);
-        return null;
-      }
-
-      const rawRows = response.results[0].response.result.rows;
-
-      const convertedRows = this.convertHTTPResponseCheckpointRow(rawRows);
-
-      if (convertedRows.length === 0) {
-        console.warn(`No checkpoint data after conversion for id: ${id}`);
-        return null;
-      }
-
-      const checkpoint = convertedRows[0];
-
-      return checkpoint;
-    } catch (e) {
-      console.error(`Error fetching remote checkpoint with id ${id}:`, e);
-      throw e;
-    }
-  };
-
-  deleteRemoteCheckpoint = async (id: number) => {
-    if (!this.isConnected) {
-      throw new Error("Device is offline");
-    }
-    try {
-      await this.databaseExecute({
-        sql: `DELETE FROM checkpoints WHERE id = ?`,
-        args: [id.toString()],
-      });
-    } catch (e) {
-      console.error("Error deleting remote checkpoint:", e);
-    }
-  };
-
   private checkAppleAuth = async (
     appleUser: string | null,
     email: string | null,
@@ -557,7 +380,7 @@ export class AuthStore {
     }
   };
 
-  private async databaseExecute({ sql, args }: databaseExecuteProps) {
+  async databaseExecute({ sql, args }: databaseExecuteProps) {
     if (!this.db_name || !this.db_token) {
       const credsRes = await fetch(`${API_BASE_URL}/database/creds`, {
         method: "POST",
@@ -620,50 +443,6 @@ export class AuthStore {
     }
   }
 
-  private convertHTTPResponseCheckpointRow = (rows: any[][]) => {
-    return rows.map((row) => {
-      const converted = {
-        id: parseInt(row[0].value),
-        name: row[1].value,
-        created_at: row[2].value,
-        last_updated: row[3].value,
-        player_age: parseInt(row[4].value),
-        player_data: parse(row[5].value),
-        time_data: parse(row[6].value),
-        dungeon_data: parse(row[7].value),
-        character_data: parse(row[8].value),
-        shops_data: parse(row[9].value),
-      };
-      return converted;
-    });
-  };
-
-  formatDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-  }
-
-  private appleEmailRetrieval = async (user: string) => {
-    const response = await fetch(`${API_BASE_URL}/apple/email`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userString: user }),
-    });
-    if (response.ok) {
-      const { email } = await response.json();
-      return email as string;
-    }
-    return null;
-  };
-
   private argBuilder(args: string[]) {
     const types = args.map((arg) => this.argCheck(arg));
     const built: { type: string; value: string }[] = [];
@@ -689,6 +468,21 @@ export class AuthStore {
 
     return "text";
   }
+
+  private appleEmailRetrieval = async (user: string) => {
+    const response = await fetch(`${API_BASE_URL}/apple/email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userString: user }),
+    });
+    if (response.ok) {
+      const { email } = await response.json();
+      return email as string;
+    }
+    return null;
+  };
 
   _debugLog = async () => {
     if (__DEV__) {

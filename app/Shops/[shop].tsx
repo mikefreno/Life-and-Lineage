@@ -14,7 +14,6 @@ import { useIsFocused } from "@react-navigation/native";
 import { observer } from "mobx-react-lite";
 import TutorialModal from "../../components/TutorialModal";
 import { useHeaderHeight } from "@react-navigation/elements";
-import shopObjects from "../../assets/json/shops.json";
 import InventoryRender from "../../components/InventoryRender";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import { Coins } from "../../assets/icons/SVGIcons";
@@ -73,13 +72,13 @@ const GreetingComponent = ({
 
 const ShopInteriorScreen = observer(() => {
   let { shop } = useLocalSearchParams();
-  const { playerState, shopsStore, uiStore } = useRootStore();
+  const { playerState, shopsStore, uiStore, time } = useRootStore();
   const { draggableClassStore } = useDraggableStore();
 
   const shopInventoryTarget = useRef<View | null>(null);
   const vibration = useVibration();
   const colors = shopColors[shop as MerchantType];
-  const thisShop = shopsStore.getShop(shop as string);
+  const thisShop = shopsStore.getShop(shop as MerchantType);
   const [displayItem, setDisplayItem] = useState<{
     item: Item[];
     side?: "shop" | "inventory";
@@ -129,9 +128,8 @@ const ShopInteriorScreen = observer(() => {
   useEffect(() => {
     if (playerState && thisShop && !initialized) {
       if (
-        new Date(thisShop.lastStockRefresh) <
-          new Date(Date.now() - REFRESH_TIME) ||
-        thisShop.inventory.length == 0
+        thisShop.lastStockRefresh.year < time.year ||
+        thisShop.lastStockRefresh.week + 4 <= time.week
       ) {
         thisShop.refreshInventory();
       }

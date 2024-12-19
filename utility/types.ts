@@ -321,6 +321,7 @@ export const ElementToString: Record<Element, string> = {
   [Element.assassination]: "Assassination",
   [Element.arcane]: "Arcane",
 };
+
 export const StringToElement: Record<string, Element> = {
   fire: Element.fire,
   earth: Element.earth,

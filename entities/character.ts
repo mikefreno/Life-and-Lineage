@@ -43,12 +43,22 @@ import { stringify } from "flatted";
 import { throttle } from "lodash";
 import type { RootStore } from "../stores/RootStore";
 
-interface CharacterOptions {
+export interface JobData {
+  title: string;
+  cost: { mana: number; health?: number };
+  qualifications: string[] | null;
+  experienceToPromote: number;
+  reward: { gold: number };
+  currentExperience: number;
+  currentRank: number;
+  rankMultiplier: number;
+}
+
+interface BaseCharacterOptions {
   id?: string;
   firstName: string;
   lastName: string;
   sex: "male" | "female";
-  personality: Personality | null;
   birthdate: { year: number; week: number };
   alive?: boolean;
   deathdate?: { year: number; week: number };
@@ -56,11 +66,89 @@ interface CharacterOptions {
   affection?: number;
   qualifications?: string[];
   dateCooldownStart?: { year: number; week: number };
-  parents?: Character[];
   pregnancyDueDate?: { year: number; week: number };
   isPregnant?: boolean;
+  parentIds?: string[];
+  childrenIds?: string[];
+  partnerIds?: string[];
+  knownCharacterIds?: string[];
   root: RootStore;
 }
+
+interface CharacterOptions extends BaseCharacterOptions {
+  personality: Personality | null;
+}
+
+interface PlayerCharacterBase extends BaseCharacterOptions {
+  baseHealth: number;
+  baseMana: number;
+  baseSanity: number;
+  baseStrength: number;
+  baseIntelligence: number;
+  baseDexterity: number;
+  baseManaRegen: number;
+
+  currentHealth?: number;
+  currentMana?: number;
+  currentSanity?: number;
+  magicProficiencies?: { school: Element; proficiency: number }[];
+  jobs?: Map<string, JobData>;
+  learningSpells?: {
+    bookName: string;
+    spellName: string;
+    experience: number;
+    element: Element;
+  }[];
+  qualificationProgress?: {
+    name: string;
+    progress: number;
+    completed: boolean;
+  }[];
+  knownSpells?: string[];
+  gold?: number;
+  conditions?: Condition[];
+  baseInventory?: Item[];
+  keyItems?: Item[];
+  minions?: Minion[];
+  rangerPet?: Minion;
+  equipment?: {
+    mainHand: Item;
+    offHand: Item | null;
+    head: Item | null;
+    body: Item | null;
+    quiver: Item[] | null;
+  };
+  investments?: Investment[];
+  unAllocatedSkillPoints?: number;
+  allocatedSkillPoints?: Record<Attribute, number>;
+}
+
+type MageCharacter = PlayerCharacterBase & {
+  playerClass: "mage" | PlayerClassOptions.mage;
+  blessing: Element.fire | Element.water | Element.air | Element.earth;
+};
+type NecromancerCharacter = PlayerCharacterBase & {
+  playerClass: "necromancer" | PlayerClassOptions.necromancer;
+  blessing:
+    | Element.blood
+    | Element.summoning
+    | Element.bone
+    | Element.pestilence;
+};
+type PaladinCharacter = PlayerCharacterBase & {
+  playerClass: "paladin" | PlayerClassOptions.paladin;
+  blessing: Element.holy | Element.vengeance | Element.protection;
+};
+type RangerCharacter = PlayerCharacterBase & {
+  playerClass: "ranger" | PlayerClassOptions.ranger;
+  blessing: Element.assassination | Element.beastMastery | Element.arcane;
+};
+
+type PlayerCharacterOptions =
+  | MageCharacter
+  | NecromancerCharacter
+  | PaladinCharacter
+  | RangerCharacter;
 
 /**
  * This class fully contains characters like parents, children, met characters and shopkeepers (which are a property of the `Shop` class).
@@ -80,9 +168,14 @@ export class Character {
   affection: number;
   qualifications: string[];
   dateCooldownStart?: { year: number; week: number };
-  parents?: Character[];
   pregnancyDueDate?: { year: number; week: number };
   isPregnant: boolean;
+
+  childrenIds: string[];
+  partnerIds: string[];
+  parentIds: string[];
+  knownCharacterIds: string[];
+
   root: RootStore;
 
   constructor({
@@ -100,13 +193,22 @@ export class Character {
     personality,
     pregnancyDueDate,
     isPregnant = false,
-    parents,
+    childrenIds,
+    parentIds,
+    partnerIds,
+    knownCharacterIds,
     root,
   }: CharacterOptions) {
     this.id = id ?? Crypto.randomUUID();
     this.firstName = firstName;
     this.lastName = lastName;
     this.sex = sex;
+
+    this.parentIds = parentIds ?? [];
+    this.childrenIds = childrenIds ?? [];
+    this.partnerIds = partnerIds ?? [];
+    this.knownCharacterIds = knownCharacterIds ?? [];
+
     this.personality = personality;
     this.alive = alive ?? true;
     this.birthdate = birthdate;
@@ -115,7 +217,6 @@ export class Character {
     this.affection = affection ?? 0;
     this.qualifications = qualifications ?? [];
     this.dateCooldownStart = dateCooldownStart;
-    this.parents = parents;
     (this.pregnancyDueDate = pregnancyDueDate),
       (this.isPregnant = isPregnant),
       (this.root = root);
@@ -142,6 +243,17 @@ export class Character {
       initiatePregnancy: action,
       giveBirth: action,
       age: computed,
+      parentIds: observable,
+      childrenIds: observable,
+      partnerIds: observable,
+      parents: computed,
+      children: computed,
+      partners: computed,
+      makePartner: action,
+      removePartner: action,
+      addChild: action,
+      knownCharacterIds: observable,
+      knownCharacters: computed,
     });
 
     reaction(
@@ -162,6 +274,66 @@ export class Character {
         }
       },
     );
+  }
+
+  get parents(): Character[] {
+    return this.parentIds.map((id) =>
+      this.root.characterStore.getCharacter(id),
+    );
+  }
+
+  get children(): Character[] {
+    return this.childrenIds.map((id) =>
+      this.root.characterStore.getCharacter(id),
+    );
+  }
+
+  get partners(): Character[] {
+    return this.partnerIds.map((id) =>
+      this.root.characterStore.getCharacter(id),
+    );
+  }
+
+  get knownCharacters(): Character[] {
+    return this.knownCharacterIds.map((id) =>
+      this.root.characterStore.getCharacter(id),
+    );
+  }
+
+  public addKnownCharacter(character: Character) {
+    if (!this.knownCharacterIds.includes(character.id)) {
+      this.knownCharacterIds.push(character.id);
+    }
+  }
+
+  public removeKnownCharacter(character: Character) {
+    this.knownCharacterIds = this.knownCharacterIds.filter(
+      (id) => id !== character.id,
+    );
+  }
+
+  public makePartner(character: Character) {
+    if (!this.partnerIds.includes(character.id)) {
+      this.partnerIds.push(character.id);
+    }
+  }
+
+  public removePartner(character: Character) {
+    this.partnerIds = this.partnerIds.filter((id) => id !== character.id);
+  }
+
+  public addChild(child: Character) {
+    if (!this.childrenIds.includes(child.id)) {
+      this.childrenIds.push(child.id);
+    }
+  }
+
+  public setParents(parent1: Character, parent2?: Character) {
+    const newParentIds: string[] = [parent1.id];
+    if (parent2) {
+      newParentIds.push(parent2.id);
+    }
+    this.parentIds = newParentIds;
   }
 
   /**
@@ -259,14 +431,6 @@ export class Character {
     this.lastName = newLastName;
   }
 
-  public setParents(parent1: PlayerCharacter, parent2?: Character) {
-    const newParents: Character[] = [parent1];
-    if (parent2) {
-      newParents.push(parent2);
-    }
-    this.parents = newParents;
-  }
-
   public initiatePregnancy() {
     if (this.isPregnant || this.sex === "male") return false;
 
@@ -324,119 +488,16 @@ export class Character {
       affection: json.affection,
       qualifications: json.qualifications,
       dateCooldownStart: json.dateCooldownStart,
-      parents: json.parents
-        ? json.parents.map((parent: any) =>
-            Character.fromJSON({ ...parent, root: json.root }),
-          )
-        : undefined,
+      parentIds: json.parentIds ?? [],
+      childrenIds: json.childrenIds ?? [],
+      partnerIds: json.partnerIds ?? [],
       pregnancyDueDate: json.pregnancyDueDate,
       isPregnant: json.isPregnant,
+      knownCharacterIds: json.knownCharacterIds ?? [],
       root: json.root,
     });
     return character;
   }
-}
-
-type PlayerCharacterBase = {
-  id?: string;
-  //required values to creation
-  firstName: string;
-  lastName: string;
-  sex: "male" | "female";
-  baseHealth: number;
-  baseMana: number;
-  baseSanity: number;
-  baseStrength: number;
-  baseIntelligence: number;
-  baseDexterity: number;
-  baseManaRegen: number;
-  parents: Character[];
-  birthdate: { year: number; week: number };
-
-  //values that are set based on above, vary during normal gameplay
-  currentHealth?: number;
-  currentMana?: number;
-  currentSanity?: number;
-  deathdate?: { year: number; week: number };
-  job?: string;
-  qualifications?: string[];
-  affection?: number;
-  magicProficiencies?: { school: Element; proficiency: number }[];
-  jobs?: Map<string, JobData>;
-  learningSpells?: {
-    bookName: string;
-    spellName: string;
-    experience: number;
-    element: Element;
-  }[];
-  qualificationProgress?: {
-    name: string;
-    progress: number;
-    completed: boolean;
-  }[];
-  children?: Character[];
-  partners?: Character[];
-  knownCharacters?: Character[];
-  physicalAttacks?: string[];
-  knownSpells?: string[];
-  gold?: number;
-  conditions?: Condition[];
-  baseInventory?: Item[];
-  keyItems?: Item[];
-  minions?: Minion[];
-  rangerPet?: Minion; // used to avoid removal within a dungeon
-  equipment?: {
-    mainHand: Item;
-    offHand: Item | null;
-    head: Item | null;
-    body: Item | null;
-    quiver: Item[] | null;
-  };
-  investments?: Investment[];
-  unAllocatedSkillPoints?: number;
-  allocatedSkillPoints?: Record<Attribute, number>;
-  alive?: boolean;
-  pregnancyDueDate?: { year: number; week: number };
-  isPregnant?: boolean;
-  root: RootStore;
-};
-
-type MageCharacter = PlayerCharacterBase & {
-  playerClass: "mage" | PlayerClassOptions.mage;
-  blessing: Element.fire | Element.water | Element.air | Element.earth;
-};
-type NecromancerCharacter = PlayerCharacterBase & {
-  playerClass: "necromancer" | PlayerClassOptions.necromancer;
-  blessing:
-    | Element.blood
-    | Element.summoning
-    | Element.bone
-    | Element.pestilence;
-};
-type PaladinCharacter = PlayerCharacterBase & {
-  playerClass: "paladin" | PlayerClassOptions.paladin;
-  blessing: Element.holy | Element.vengeance | Element.protection;
-};
-type RangerCharacter = PlayerCharacterBase & {
-  playerClass: "ranger" | PlayerClassOptions.ranger;
-  blessing: Element.assassination | Element.beastMastery | Element.arcane;
-};
-
-type PlayerCharacterOptions =
-  | MageCharacter
-  | NecromancerCharacter
-  | PaladinCharacter
-  | RangerCharacter;
-
-export interface JobData {
-  title: string;
-  cost: { mana: number; health?: number };
-  qualifications: string[] | null;
-  experienceToPromote: number;
-  reward: { gold: number };
-  currentExperience: number;
-  currentRank: number;
-  rankMultiplier: number;
 }
 
 /**
@@ -446,11 +507,6 @@ export interface JobData {
 export class PlayerCharacter extends Character {
   readonly playerClass: PlayerClassOptions;
   readonly blessing: Element;
-  readonly parents: Character[];
-
-  children: Character[];
-  partners: Character[];
-  knownCharacters: Character[];
 
   baseHealth: number;
   baseSanity: number;
@@ -522,10 +578,6 @@ export class PlayerCharacter extends Character {
     qualificationProgress,
     magicProficiencies,
     conditions,
-    parents,
-    children,
-    partners,
-    knownCharacters,
     knownSpells,
     gold,
     baseInventory,
@@ -545,8 +597,6 @@ export class PlayerCharacter extends Character {
     });
     this.playerClass = PlayerClassOptions[playerClass];
     this.blessing = blessing;
-
-    this.parents = parents;
 
     this.baseHealth = baseHealth;
     this.baseSanity = baseSanity;
@@ -582,10 +632,6 @@ export class PlayerCharacter extends Character {
     this.jobs = jobs ?? this.initJobs();
     this.learningSpells = learningSpells ?? [];
     this.qualificationProgress = qualificationProgress ?? [];
-
-    this.children = children ?? [];
-    this.partners = partners ?? [];
-    this.knownCharacters = knownCharacters ?? [];
     this.knownSpells = knownSpells ?? [];
     this.conditions = conditions ?? [];
 
@@ -698,12 +744,9 @@ export class PlayerCharacter extends Character {
       performLabor: action,
       getSpecifiedQualificationProgress: action,
 
-      children: observable,
-      partners: observable,
       conditions: observable,
       investments: observable,
       adopt: action,
-      makePartner: action,
 
       baseInventory: observable,
       addToInventory: action,
@@ -774,9 +817,6 @@ export class PlayerCharacter extends Character {
     this.parents.forEach((parent) => updateAffection(parent, 0.1));
     this.partners.forEach((partner) => updateAffection(partner, 0.15));
     this.children.forEach((child) => updateAffection(child, 0.15));
-    this.knownCharacters.forEach((character) =>
-      updateAffection(character, 0.25),
-    );
 
     // investment ticker
     for (let i = 0; i < this.investments.length; i++) {
@@ -876,9 +916,8 @@ export class PlayerCharacter extends Character {
       this.conditions,
     );
     return (
-      this.baseManaRegen * healthRegenMult +
-      (this.equipmentStats.get(Modifier.HealthRegen) ?? 0) +
-      healthRegenFlat
+      healthRegenFlat * healthRegenMult +
+      (this.equipmentStats.get(Modifier.HealthRegen) ?? 0)
     );
   }
 
@@ -1824,16 +1863,6 @@ export class PlayerCharacter extends Character {
     this.learningSpells = newLearningState;
   }
   //----------------------------------Relationships----------------------------------//
-  public addNewKnownCharacter(character: Character) {
-    this.knownCharacters.push(character);
-  }
-
-  public makePartner(character: Character) {
-    this.knownCharacters = this.knownCharacters.filter(
-      (knownCharacter) => !character.equals(knownCharacter),
-    );
-    this.partners.push(character);
-  }
   public askForPartner(character: Character) {
     if (character.affection > 75) {
       if (rollD20() >= 5) {
@@ -1857,13 +1886,6 @@ export class PlayerCharacter extends Character {
       }
     }
     return false;
-  }
-
-  public removePartner(character: Character) {
-    this.partners = this.partners.filter(
-      (partner) => !character.equals(partner),
-    );
-    this.knownCharacters.push(character);
   }
 
   /**
@@ -2379,32 +2401,12 @@ export class PlayerCharacter extends Character {
       learningSpells: json.learningSpells,
       qualificationProgress: json.qualificationProgress,
       magicProficiencies: json.magicProficiencies,
-      parents: json.parents
-        ? json.parents.map((parent: any) =>
-            Character.fromJSON({ ...parent, root: json.root }),
-          )
-        : [],
-      children: json.children
-        ? json.children.map((child: any) =>
-            Character.fromJSON({ ...child, root: json.root }),
-          )
-        : [],
-      partners: json.partners
-        ? json.partners.map((partner: any) =>
-            Character.fromJSON({ ...partner, root: json.root }),
-          )
-        : [],
-      knownCharacters: json.knownCharacters
-        ? json.knownCharacters.map((relationships: any) =>
-            Character.fromJSON({ ...relationships, root: json.root }),
-          )
-        : [],
       minions: json.minions
         ? json.minions.map((minion: any) => Minion.fromJSON(minion))
         : [],
       rangerPet: json.rangerPet ? Minion.fromJSON(json.rangerPet) : undefined,
       knownSpells: json.knownSpells,
-      physicalAttacks: json.physicalAttacks,
+      knownCharacterIds: json.knownCharacterIds ?? [],
       gold: json.gold,
       baseInventory: json.baseInventory
         ? json.baseInventory.map((item: any) =>

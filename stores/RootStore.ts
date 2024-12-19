@@ -2,10 +2,9 @@ import {
   PlayerCharacter,
   getStartingBook,
   savePlayer,
-  serializeJobs,
 } from "../entities/character";
 import { storage } from "../utility/functions/storage";
-import { parse, stringify } from "flatted";
+import { parse } from "flatted";
 import UIStore from "./UIStore";
 import EnemyStore from "./EnemyStore";
 import { DungeonStore } from "./DungeonStore";
@@ -18,8 +17,8 @@ import { TutorialStore } from "./TutorialStore";
 import { Condition } from "../entities/conditions";
 import sanityDebuffs from "../assets/json/sanityDebuffs.json";
 import { ConditionObjectType, EffectOptions } from "../utility/types";
-import * as SQLite from "expo-sqlite";
 import { StashStore } from "./StashStore";
+import { SaveStore } from "./SaveStore";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -32,13 +31,11 @@ export class RootStore {
   stashStore: StashStore;
   characterStore: CharacterStore;
   tutorialStore: TutorialStore;
+  saveStore: SaveStore;
 
   constructed: boolean = false;
   atDeathScreen: boolean = false;
   startingNewGame: boolean = false;
-
-  // @ts-ignore
-  private db: SQLite.SQLiteDatabase;
 
   constructor() {
     const retrieved_player = storage.getString("player");
@@ -55,10 +52,9 @@ export class RootStore {
     this.characterStore = new CharacterStore({ root: this });
     this.tutorialStore = new TutorialStore({ root: this });
     this.stashStore = new StashStore({ root: this });
+    this.saveStore = new SaveStore({ root: this });
 
     this.constructed = true;
-
-    this.initializeDatabase();
 
     makeObservable(this, {
       constructed: observable,
@@ -66,7 +62,6 @@ export class RootStore {
       startingNewGame: observable,
       hitDeathScreen: action,
       clearDeathScreen: action,
-      loadRemoteCheckpoint: action,
     });
   }
 
@@ -94,7 +89,7 @@ export class RootStore {
     return points;
   }
 
-  newGame(newPlayer: PlayerCharacter) {
+  async newGame(newPlayer: PlayerCharacter) {
     const starterBook = getStartingBook(newPlayer);
     newPlayer.addToInventory(starterBook);
 
@@ -104,6 +99,7 @@ export class RootStore {
     this.playerState = newPlayer;
     this.shopsStore.setShops(this.shopsStore.getInitShopsState());
     savePlayer(newPlayer);
+    await this.saveStore.createNewGame(newPlayer.fullName);
     this.clearDeathScreen();
   }
 
@@ -216,139 +212,5 @@ export class RootStore {
     this.enemyStore.clearEnemyList();
     this.dungeonStore.clearDungeonState();
     this.uiStore.clearDungeonColor();
-  }
-
-  private async initializeDatabase() {
-    this.db = await SQLite.openDatabaseAsync("checkpoints.db");
-    await this.db.execAsync(`
-      CREATE TABLE IF NOT EXISTS checkpoints (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        timestamp INTEGER NOT NULL,
-        player_age INTEGER NOT NULL,
-        player_data TEXT,
-        time_data TEXT,
-        dungeon_data TEXT,
-        character_data TEXT,
-        shops_data TEXT
-      )
-    `);
-  }
-
-  async createCheckpoint() {
-    const timestamp = Date.now();
-    const playerAge = this.playerState?.age || 0;
-    const playerData = stringify({
-      ...this.playerState,
-      jobs: serializeJobs(this.playerState!.jobs),
-      root: null,
-    });
-    const timeData = stringify(this.time.toCheckpointData());
-    const dungeonData = stringify(this.dungeonStore.toCheckpointData());
-    const characterData = stringify(this.characterStore.toCheckpointData());
-    const shopsData = stringify(this.shopsStore.toCheckpointData());
-
-    await this.db.runAsync(
-      `INSERT INTO checkpoints (timestamp, player_age, player_data, time_data, dungeon_data, character_data, shops_data) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [
-        timestamp,
-        playerAge,
-        playerData,
-        timeData,
-        dungeonData,
-        characterData,
-        shopsData,
-      ],
-    );
-
-    await this.db.runAsync(`
-      DELETE FROM checkpoints 
-      WHERE id NOT IN (
-        SELECT id FROM checkpoints 
-        ORDER BY timestamp DESC 
-        LIMIT 5
-      )
-    `);
-  }
-
-  async loadCheckpoint(id?: number) {
-    let query: string;
-    let params: any[] = [];
-
-    if (id !== undefined) {
-      query = "SELECT * FROM checkpoints WHERE id = ? LIMIT 1";
-      params = [id];
-    } else {
-      query = "SELECT * FROM checkpoints ORDER BY timestamp DESC LIMIT 1";
-    }
-
-    try {
-      const result = await this.db.getFirstAsync<{
-        player_data: string;
-        time_data: string;
-        dungeon_data: string;
-        character_data: string;
-        shops_data: string;
-      }>(query, params);
-
-      if (result) {
-        this.playerState = PlayerCharacter.fromJSON({
-          ...parse(result.player_data),
-          root: this,
-        });
-        this.time.fromCheckpointData(parse(result.time_data));
-        this.dungeonStore.fromCheckpointData(parse(result.dungeon_data));
-        this.characterStore.fromCheckpointData(parse(result.character_data));
-        this.shopsStore.fromCheckpointData(parse(result.shops_data));
-
-        this.dungeonStore.resetVolatileState();
-
-        return true;
-      }
-    } catch (error) {
-      console.error("Error loading checkpoint:", error);
-    }
-
-    return false;
-  }
-
-  loadRemoteCheckpoint = async (id: number) => {
-    let loading = "playerstate";
-    try {
-      const checkpoint = await this.authStore.getRemoteCheckpoint(id);
-      if (checkpoint) {
-        this.playerState = PlayerCharacter.fromJSON({
-          ...checkpoint.player_data,
-          root: this,
-        });
-        this.time.fromCheckpointData(checkpoint.time_data);
-        this.dungeonStore.fromCheckpointData(checkpoint.dungeon_data);
-        this.characterStore.fromCheckpointData(checkpoint.character_data);
-        this.shopsStore.fromCheckpointData(checkpoint.shops_data);
-
-        this.dungeonStore.resetVolatileState();
-
-        return true;
-      }
-    } catch (error) {
-      console.log("Error during ", loading);
-      console.error("Error loading remote checkpoint:", error);
-    }
-  };
-
-  async getCheckpointsList() {
-    const results = await this.db.getAllAsync<{
-      id: number;
-      timestamp: number;
-      player_age: number;
-    }>(
-      "SELECT id, timestamp, player_age FROM checkpoints ORDER BY timestamp DESC",
-    );
-
-    return results.map((result) => ({
-      id: result.id,
-      timestamp: result.timestamp,
-      playerAge: result.player_age,
-    }));
   }
 }

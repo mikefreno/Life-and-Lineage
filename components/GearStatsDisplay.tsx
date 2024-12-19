@@ -13,6 +13,7 @@ import {
   getTotalValue,
   shouldShowModifier,
 } from "../utility/functions/stats";
+import { useVibration } from "../hooks/generic";
 
 const StatRow = observer(
   ({
@@ -68,6 +69,8 @@ export default function GearStatsDisplay({ item }: { item: Item }) {
       item.itemClass === ItemClassType.Shield) &&
     item.totalArmor > 0;
 
+  const vibrate = useVibration();
+
   return (
     <>
       <GenericModal
@@ -119,8 +122,14 @@ export default function GearStatsDisplay({ item }: { item: Item }) {
         </View>
       </GenericModal>
       <Pressable
-        onLongPress={() => setShowingDetailedView(true)}
-        className="flex flex-col rounded-lg bg-zinc-300/50 px-4 py-2 dark:bg-zinc-700/50"
+        onPressIn={() => {
+          vibrate({ style: "light" });
+        }}
+        onLongPress={() => {
+          vibrate({ style: "medium" });
+          setShowingDetailedView(true);
+        }}
+        className="flex flex-col rounded-lg bg-zinc-300/50 mx-1 p-2 dark:bg-zinc-700/50"
       >
         <View className="flex flex-row flex-wrap items-center justify-center">
           {shouldShowTotalDamage && (

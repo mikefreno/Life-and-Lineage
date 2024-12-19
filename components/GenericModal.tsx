@@ -19,6 +19,7 @@ interface GenericModalProps {
   size?: number;
   style?: StyleProp<ViewStyle>;
   noPad?: boolean;
+  isCheckPointModal?: boolean;
   accessibilityRole?: AccessibilityRole;
   accessibilityLabel?: string;
   accessibilityHint?: string;
@@ -52,6 +53,7 @@ export default function GenericModal({
   size,
   style,
   noPad,
+  isCheckPointModal = false,
   ...props
 }: GenericModalProps) {
   const height = Dimensions.get("screen").height;
@@ -61,7 +63,10 @@ export default function GenericModal({
   let { modalShowing } = uiStore;
 
   useEffect(() => {
-    if (isVisibleCondition && !(root.atDeathScreen && !root.startingNewGame)) {
+    if (
+      isVisibleCondition &&
+      !(root.atDeathScreen && !isCheckPointModal && !root.startingNewGame)
+    ) {
       modalShowing = true;
     }
   }, [isVisibleCondition, root.atDeathScreen, root.startingNewGame]);
@@ -82,7 +87,8 @@ export default function GenericModal({
           : "#000000"
       }
       isVisible={
-        isVisibleCondition && !(root.atDeathScreen && !root.startingNewGame)
+        isVisibleCondition &&
+        !(root.atDeathScreen && !isCheckPointModal && !root.startingNewGame)
       }
       backdropOpacity={0.5}
       onBackdropPress={backdropCloses ? backFunction : undefined}

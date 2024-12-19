@@ -9,6 +9,7 @@ import GenericModal from "../../components/GenericModal";
 import D20DieAnimation from "../../components/DieRollAnim";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
+import CheckpointModal from "../../components/CheckpointModal";
 
 const healthWarningOptions: Record<number, string> = {
   0.5: "50%",
@@ -40,6 +41,7 @@ export default function GameSettings() {
   );
   const [showTutorialResetConfirm, setShowTutorialResetConfirm] =
     useState<boolean>(false);
+  const [showCheckpoints, setShowCheckpoints] = useState<boolean>(false);
 
   const startNewGame = () => {
     vibration({ style: "warning" });
@@ -100,7 +102,16 @@ export default function GameSettings() {
           </>
         )}
       </GenericModal>
+      <CheckpointModal
+        allowSaving
+        isVisible={showCheckpoints}
+        onClose={() => setShowCheckpoints(false)}
+      />
       <View className="flex-1 items-center justify-center px-4">
+        <GenericStrikeAround>Game Saves</GenericStrikeAround>
+        <GenericRaisedButton onPress={() => setShowCheckpoints(true)}>
+          Manage Game Saves
+        </GenericRaisedButton>
         <GenericStrikeAround>Game Restart</GenericStrikeAround>
         <GenericRaisedButton onPress={startNewGame}>
           Start New Game

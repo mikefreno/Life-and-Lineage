@@ -68,6 +68,14 @@ export class CharacterStore {
     this.saveCharacter(character);
   }
 
+  getCharacter(characterId: string) {
+    const found = this.characters.find((char) => char.id == characterId);
+    if (!found) {
+      throw new Error(`Character not found! (${characterId})`);
+    }
+    return found;
+  }
+
   removeCharacter(characterId: string) {
     this.characters = this.characters.filter((c) => c.id !== characterId);
     this.clearPersistedCharacter(characterId);

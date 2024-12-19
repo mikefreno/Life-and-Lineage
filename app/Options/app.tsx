@@ -19,7 +19,7 @@ const vibrationOptions = ["full", "minimal", "none"];
 
 export const AppSettings = observer(() => {
   let root = useRootStore();
-  const { playerState, uiStore, authStore } = root;
+  const { playerState, uiStore, authStore, saveStore } = root;
   const { colorScheme } = useColorScheme();
   const [showRemoteSaveWindow, setShowRemoteSaveWindow] =
     useState<boolean>(false);
@@ -61,7 +61,7 @@ export const AppSettings = observer(() => {
   useEffect(() => {
     if (authStore.isAuthenticated) {
       setLoadingDBInfo(true);
-      authStore.getRemoteCheckpoints().then((rows) => {
+      saveStore.getRemoteCheckpoints().then((rows) => {
         setRemoteSaves(rows);
         setLoadingDBInfo(false);
       });
@@ -85,8 +85,8 @@ export const AppSettings = observer(() => {
   const newRemoteSave = async () => {
     if (playerState && saveName.length >= 3) {
       setLoadingDBInfo(true);
-      await authStore.makeRemoteSave(saveName);
-      const res = await authStore.getRemoteCheckpoints();
+      await saveStore.makeRemoteSave(saveName);
+      const res = await saveStore.getRemoteCheckpoints();
       setRemoteSaves(res);
 
       setLoadingDBInfo(false);
@@ -96,8 +96,8 @@ export const AppSettings = observer(() => {
   const overwriteSave = async (chosenCheckpoint: CheckpointRow) => {
     if (playerState) {
       setLoadingDBInfo(true);
-      authStore.overwriteRemoteSave(chosenCheckpoint.id);
-      const res = await authStore.getRemoteCheckpoints();
+      saveStore.overwriteRemoteSave(chosenCheckpoint.id);
+      const res = await saveStore.getRemoteCheckpoints();
       setRemoteSaves(res);
       setLoadingDBInfo(false);
     }
@@ -105,15 +105,15 @@ export const AppSettings = observer(() => {
 
   const deleteRemoteSave = async (chosenCheckpoint: CheckpointRow) => {
     setLoadingDBInfo(true);
-    await authStore.deleteRemoteCheckpoint(chosenCheckpoint.id);
-    const res = await authStore.getRemoteCheckpoints();
+    await saveStore.deleteRemoteCheckpoint(chosenCheckpoint.id);
+    const res = await saveStore.getRemoteCheckpoints();
     setRemoteSaves(res);
     setLoadingDBInfo(false);
   };
 
   async function loadRemoteCheckpoint(id: number) {
     setLoadingDBInfo(true);
-    await root.loadRemoteCheckpoint(id);
+    await saveStore.loadRemoteCheckpoint(id);
     setLoadingDBInfo(false);
     router.dismissAll();
   }

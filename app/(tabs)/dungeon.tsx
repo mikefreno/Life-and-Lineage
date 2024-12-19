@@ -11,7 +11,7 @@ import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
-import { toTitleCase, wait } from "../../utility/functions/misc";
+import { toTitleCase } from "../../utility/functions/misc";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
 import ThemedCard from "../../components/ThemedCard";

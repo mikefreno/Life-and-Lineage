@@ -21,8 +21,10 @@ export function generateNewCharacter(root: RootStore) {
     personality: randomPersonality,
     root,
   });
+  root.characterStore.addCharacter(newChar);
   return newChar;
 }
+
 export function generateNewAdoptee(root: RootStore) {
   const sex = flipCoin() == "Heads" ? "male" : "female";
   const name = getRandomName(sex);
@@ -37,6 +39,7 @@ export function generateNewAdoptee(root: RootStore) {
     personality: randomPersonality,
     root,
   });
+  root.characterStore.addCharacter(newChar);
   return newChar;
 }
 
@@ -49,6 +52,7 @@ export function getSexFromName(firstName: string) {
   const res = names.find((name) => name.firstName == firstName);
   return res?.sex ?? "male";
 }
+
 export function getStartingBaseStats({
   classSelection,
 }: {
@@ -116,6 +120,7 @@ export function createParent(
     birthdate: root.time.generateBirthDateInRange(32, 55),
     root,
   });
+  root.characterStore.addCharacter(parent);
   return parent;
 }
 
@@ -138,78 +143,53 @@ export function createPlayerCharacter({
   const dad = createParent("male", root, lastName);
   let newCharacter: PlayerCharacter;
   const bday = root.time.generateBirthDateForAge(15);
+
+  const basePlayerOptions = {
+    firstName,
+    lastName,
+    sex,
+    playerClass: classSelection,
+    blessing: blessingSelection,
+    parentIds: [mom.id, dad.id], // Changed from parents array to parentIds
+    birthdate: bday,
+    ...getStartingBaseStats({ classSelection }),
+    root,
+  };
+
   if (
-    classSelection === "paladin" &&
+    classSelection === PlayerClassOptions.paladin &&
     (blessingSelection == Element.vengeance ||
       blessingSelection == Element.protection ||
       blessingSelection == Element.holy)
   ) {
-    newCharacter = new PlayerCharacter({
-      firstName: firstName,
-      lastName: lastName,
-      sex,
-      playerClass: classSelection,
-      blessing: blessingSelection,
-      parents: [mom, dad],
-      birthdate: bday,
-      ...getStartingBaseStats({ classSelection }),
-      root,
-    });
+    newCharacter = new PlayerCharacter(basePlayerOptions);
   } else if (
-    classSelection === "necromancer" &&
+    classSelection === PlayerClassOptions.necromancer &&
     (blessingSelection == Element.bone ||
       blessingSelection == Element.blood ||
       blessingSelection == Element.summoning ||
       blessingSelection == Element.pestilence)
   ) {
-    newCharacter = new PlayerCharacter({
-      firstName: firstName,
-      lastName: lastName,
-      sex: sex as "male" | "female",
-      playerClass: classSelection,
-      blessing: blessingSelection,
-      parents: [mom, dad],
-      birthdate: bday,
-      ...getStartingBaseStats({ classSelection }),
-      root,
-    });
+    newCharacter = new PlayerCharacter(basePlayerOptions);
   } else if (
-    classSelection == "mage" &&
+    classSelection == PlayerClassOptions.mage &&
     (blessingSelection == Element.air ||
       blessingSelection == Element.fire ||
       blessingSelection == Element.earth ||
       blessingSelection == Element.water)
   ) {
-    newCharacter = new PlayerCharacter({
-      firstName: firstName,
-      lastName: lastName,
-      sex: sex as "male" | "female",
-      playerClass: classSelection,
-      blessing: blessingSelection,
-      parents: [mom, dad],
-      birthdate: bday,
-      ...getStartingBaseStats({ classSelection }),
-      root,
-    });
+    newCharacter = new PlayerCharacter(basePlayerOptions);
   } else if (
-    classSelection == "ranger" &&
+    classSelection == PlayerClassOptions.ranger &&
     (blessingSelection == Element.beastMastery ||
       blessingSelection == Element.assassination ||
       blessingSelection == Element.arcane)
   ) {
-    newCharacter = new PlayerCharacter({
-      firstName: firstName,
-      lastName: lastName,
-      sex: sex as "male" | "female",
-      playerClass: classSelection,
-      blessing: blessingSelection,
-      parents: [mom, dad],
-      birthdate: bday,
-      ...getStartingBaseStats({ classSelection }),
-      root,
-    });
+    newCharacter = new PlayerCharacter(basePlayerOptions);
   } else {
     throw new Error("Incorrect Player class/blessing combination!");
   }
+
+  root.characterStore.addCharacter(newCharacter);
   return newCharacter;
 }

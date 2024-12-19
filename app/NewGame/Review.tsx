@@ -21,7 +21,7 @@ export default function NewGameReview() {
   const navigation = useNavigation();
   const { colorScheme } = useColorScheme();
 
-  function startGame() {
+  async function startGame() {
     if (classSelection && sex && blessingSelection !== undefined) {
       const player = createPlayerCharacter({
         sex,
@@ -32,7 +32,7 @@ export default function NewGameReview() {
         classSelection,
       });
 
-      root.newGame(player);
+      await root.newGame(player);
       vibration({ style: "success" });
       wait(250).then(() => clearHistory(navigation));
     }
