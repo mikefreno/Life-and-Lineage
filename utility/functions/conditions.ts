@@ -364,6 +364,8 @@ export function getConditionEffectsOnMisc(suppliedConditions: Condition[]) {
   let stunned = false;
   let manaRegenFlat = 0;
   let manaRegenMult = 1;
+  let healthRegenFlat = 0;
+  let healthRegenMult = 1;
   let manaMaxFlat = 0;
   let manaMaxMult = 1;
 
@@ -414,6 +416,8 @@ export function getConditionEffectsOnMisc(suppliedConditions: Condition[]) {
     manaRegenMult,
     manaMaxFlat,
     manaMaxMult,
+    healthRegenFlat,
+    healthRegenMult,
   };
 }
 

@@ -1,4 +1,9 @@
-import { Pressable, TouchableWithoutFeedback, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useColorScheme } from "nativewind";
@@ -153,22 +158,25 @@ const HomeScreen = observer(() => {
         </TouchableWithoutFeedback>
         <TouchableWithoutFeedback onPress={clearDisplayItem}>
           <View className="flex-1 justify-between relative z-10 h-full">
-            <View className="absolute pl-2">
-              {Array.from(playerState.equipmentStats.entries()).map(
-                ([mod, value]) => {
-                  const statInfo = getStatInfo(mod as Modifier);
-                  if (!value || value <= 0) return null;
+            {/*<View className="absolute pl-2 z-top">
+              <ScrollView style={{ maxHeight: dimensions.height * 0.3 }}>
+                {Array.from(playerState.equipmentStats.entries()).map(
+                  ([mod, value]) => {
+                    const statInfo = getStatInfo(mod as Modifier);
+                    if (!value || value <= 0) return null;
 
-                  const Icon = statInfo.icon;
-                  return (
-                    <Text key={mod} className="text-center">
-                      <Icon height={12} width={12} />{" "}
-                      {getTotalValue(mod as Modifier, value)}
-                    </Text>
-                  );
-                },
-              )}
-            </View>
+                    const Icon = statInfo.icon;
+                    return (
+                      <Text key={mod} className="text-center">
+                        <Icon height={12} width={12} />{" "}
+                        {getTotalValue(mod as Modifier, value)}
+                      </Text>
+                    );
+                  },
+                )}
+              </ScrollView>
+            </View>*/}
+            {/* May add this back, but idk if I really want it - cluttered*/}
             <EquipmentDisplay
               displayItem={displayItem}
               setDisplayItem={setDisplayItem}
@@ -177,7 +185,7 @@ const HomeScreen = observer(() => {
               ref={stashButtonRef}
               onLayout={setStashTargetLayout}
               onPress={() => setShowStash(true)}
-              className="z-top rounded-lg -mt-20 mb-6 px-4"
+              className="z-top rounded-lg -mt-16 px-4 w-20 h-20"
             >
               <Image
                 source={require("../../assets/images/icons/Chest.png")}

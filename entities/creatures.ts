@@ -720,46 +720,16 @@ export class Enemy extends Creature {
   }[];
 
   constructor({
-    id,
-    beingType,
-    creatureSpecies,
-    currentHealth,
-    baseHealth,
-    currentSanity,
-    baseSanity,
     minions,
-    attackPower,
-    baseArmor,
-    currentEnergy,
-    baseEnergy,
-    energyRegen,
-    attackStrings,
-    conditions,
-    enemyStore,
     gotDrops,
-    sprite,
     drops,
     goldDropRange,
     storyDrops,
     phases,
+    ...props
   }: EnemyType) {
     super({
-      id,
-      sprite,
-      beingType,
-      creatureSpecies,
-      currentHealth,
-      baseHealth,
-      currentSanity,
-      baseSanity,
-      attackPower,
-      baseArmor,
-      currentEnergy,
-      baseEnergy,
-      energyRegen,
-      attackStrings,
-      conditions,
-      enemyStore,
+      ...props,
     });
     this.minions = minions ?? [];
     this.gotDrops = gotDrops ?? false;
@@ -904,6 +874,8 @@ export class Enemy extends Creature {
     );
 
     let itemDrops: Item[] = [];
+
+    // Process enemy-specific drops
     this.drops.forEach((drop) => {
       const roll = rollD20();
       if (roll >= 20 - drop.chance * 20) {
@@ -921,6 +893,50 @@ export class Enemy extends Creature {
         }
       }
     });
+
+    // Process instance-specific drops
+    const currentInstance = this.enemyStore?.root.dungeonStore.currentInstance;
+    if (currentInstance?.instanceDrops) {
+      currentInstance.instanceDrops.forEach((drop) => {
+        const roll = rollD20();
+        if (roll >= 20 - drop.chance * 20) {
+          const items = itemList(drop.itemType, player.playerClass);
+          const itemObj = items.find((item) => item.name === drop.item);
+          if (itemObj) {
+            itemDrops.push(
+              Item.fromJSON({
+                ...itemObj,
+                itemClass: drop.itemType,
+                stackable: isStackable(drop.itemType),
+                root: this.enemyStore?.root,
+              }),
+            );
+          }
+        }
+      });
+    }
+
+    // Process level-specific drops
+    const currentLevel = this.enemyStore?.root.dungeonStore.currentLevel;
+    if (currentLevel?.levelDrops) {
+      currentLevel.levelDrops.forEach((drop) => {
+        const roll = rollD20();
+        if (roll >= 20 - drop.chance * 20) {
+          const items = itemList(drop.itemType, player.playerClass);
+          const itemObj = items.find((item) => item.name === drop.item);
+          if (itemObj) {
+            itemDrops.push(
+              Item.fromJSON({
+                ...itemObj,
+                itemClass: drop.itemType,
+                stackable: isStackable(drop.itemType),
+                root: this.enemyStore?.root,
+              }),
+            );
+          }
+        }
+      });
+    }
 
     this.gotDrops = true;
     return { itemDrops, gold, storyDrops };
@@ -1047,43 +1063,10 @@ export class Minion extends Creature {
   turnsLeftAlive: number;
   private parent: Enemy | PlayerCharacter | null;
 
-  constructor({
-    id,
-    beingType,
-    creatureSpecies,
-    currentHealth,
-    baseHealth,
-    currentSanity,
-    baseSanity,
-    attackPower,
-    baseArmor,
-    currentEnergy,
-    baseEnergy,
-    energyRegen,
-    attackStrings,
-    conditions,
-    turnsLeftAlive,
-    enemyStore,
-    sprite = null,
-    parent,
-  }: MinionType) {
+  constructor({ sprite = null, turnsLeftAlive, parent, ...props }: MinionType) {
     super({
-      id,
-      beingType,
-      creatureSpecies,
-      currentHealth,
-      baseHealth,
-      currentSanity,
-      baseSanity,
-      attackPower,
-      baseArmor,
-      currentEnergy,
-      baseEnergy,
-      energyRegen,
-      attackStrings,
-      conditions,
+      ...props,
       sprite,
-      enemyStore,
     });
     this.turnsLeftAlive = turnsLeftAlive;
     this.parent = parent;

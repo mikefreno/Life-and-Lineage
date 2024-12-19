@@ -120,7 +120,8 @@ export class Item {
 
     if (
       ItemRarityService.isEquipable(slot ?? null) &&
-      itemClass !== ItemClassType.Arrow
+      itemClass !== ItemClassType.Arrow &&
+      name.toLowerCase() !== "unarmored"
     ) {
       if (prefix || suffix || rarity) {
         this.rarity = rarity ?? Rarity.NORMAL;
@@ -488,6 +489,28 @@ export class Item {
     const poison = this.activePoison;
     this.activePoison = null;
     return poison;
+  }
+
+  toJSON() {
+    return {
+      id: this.id,
+      name: this.name,
+      slot: this.slot,
+      itemClass: this.itemClass,
+      rarity: this.rarity,
+      stats: this.stats ? Object.fromEntries(this.stats) : null,
+      prefix: this.prefix,
+      suffix: this.suffix,
+      baseValue: this.baseValue,
+      icon: this.icon,
+      stackable: this.stackable,
+      requirements: this.requirements,
+      attacks: this.attacks,
+      description: this.description,
+      effect: this.effect,
+      activePoison: this.activePoison,
+      uses: this.uses,
+    };
   }
 
   static fromJSON(json: any): Item {

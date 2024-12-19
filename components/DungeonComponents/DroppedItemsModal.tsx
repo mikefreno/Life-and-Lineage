@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import GenericModal from "../GenericModal";
 import { Text } from "../Themed";
-import { Pressable, View, Image } from "react-native";
+import { Pressable, View, Image, useColorScheme } from "react-native";
 import { toTitleCase, wait } from "../../utility/functions/misc";
 import { Coins } from "../../assets/icons/SVGIcons";
 import GenericFlatButton from "../GenericFlatButton";
@@ -9,6 +9,8 @@ import { useLootState } from "../../providers/DungeonData";
 import type { Item } from "../../entities/item";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
+import { rarityColors } from "../../constants/Colors";
+import { Rarity } from "../../utility/types";
 
 export default function DroppedItemsModal() {
   const { playerState, dungeonStore } = useRootStore();
@@ -19,6 +21,7 @@ export default function DroppedItemsModal() {
     setDroppedItems,
     setInventoryFullNotifier,
   } = useLootState();
+  const colorScheme = useColorScheme();
 
   function closeImmediateItemDrops() {
     if (droppedItems && droppedItems.itemDrops.length > 0) {
@@ -127,10 +130,33 @@ export default function DroppedItemsModal() {
         {droppedItems?.itemDrops.map((item) => (
           <View
             key={item.id}
-            className="mt-2 flex flex-row justify-between items-center"
+            className="mt-2 flex flex-row justify-between items-center p-2 rounded-lg"
+            style={{
+              backgroundColor:
+                colorScheme === "dark"
+                  ? rarityColors[item.rarity].background.dark
+                  : rarityColors[item.rarity].background.light,
+            }}
           >
-            <Image source={item.getItemIcon()} />
-            <Text className="my-auto ml-2 w-1/2">{toTitleCase(item.name)}</Text>
+            <View className="flex flex-row items-center">
+              <Image source={item.getItemIcon()} />
+              {item.rarity !== Rarity.NORMAL && (
+                <View
+                  className="h-3 w-3 rounded-full ml-1"
+                  style={{
+                    backgroundColor: rarityColors[item.rarity].background.light,
+                  }}
+                />
+              )}
+            </View>
+            <Text
+              className="my-auto ml-2 w-1/2"
+              style={{
+                color: rarityColors[item.rarity].text ?? "white",
+              }}
+            >
+              {toTitleCase(item.name)}
+            </Text>
             <GenericFlatButton
               onPress={() => {
                 vibration({ style: "light" });

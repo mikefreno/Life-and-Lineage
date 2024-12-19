@@ -504,17 +504,8 @@ export class PlayerCharacter extends Character {
   investments: Investment[];
 
   constructor({
-    id,
-    firstName,
-    lastName,
     playerClass,
     blessing,
-    sex,
-    alive,
-    birthdate,
-    deathdate,
-    job,
-    qualifications,
     currentHealth,
     baseHealth,
     currentSanity,
@@ -544,24 +535,13 @@ export class PlayerCharacter extends Character {
     allocatedSkillPoints,
     keyItems,
     root,
-    isPregnant,
-    pregnancyDueDate,
     jobs,
+    ...props
   }: PlayerCharacterOptions) {
     super({
-      id,
-      firstName,
-      lastName,
-      sex,
-      birthdate,
-      alive,
-      personality: null,
-      deathdate,
-      job,
-      qualifications,
-      pregnancyDueDate,
-      isPregnant,
+      ...props,
       root,
+      personality: null,
     });
     this.playerClass = PlayerClassOptions[playerClass];
     this.blessing = blessing;
@@ -641,6 +621,8 @@ export class PlayerCharacter extends Character {
       nonConditionalMaxHealth: computed, // refers to base, stat points, + gear only
       restoreHealth: action,
       damageHealth: action,
+      totalHealthRegen: computed,
+      regenHealth: action,
 
       baseSanity: observable,
       currentSanity: observable,
@@ -889,6 +871,25 @@ export class PlayerCharacter extends Character {
     );
   }
 
+  get totalHealthRegen() {
+    const { healthRegenFlat, healthRegenMult } = getConditionEffectsOnMisc(
+      this.conditions,
+    );
+    return (
+      this.baseManaRegen * healthRegenMult +
+      (this.equipmentStats.get(Modifier.HealthRegen) ?? 0) +
+      healthRegenFlat
+    );
+  }
+
+  public regenHealth() {
+    if (this.currentHealth + this.totalHealthRegen < this.maxHealth) {
+      this.currentHealth += this.totalHealthRegen;
+    } else {
+      this.currentHealth = this.maxHealth;
+    }
+  }
+
   /**
    * attackerId is here to conform with the Creature implementation, it is unused
    */
@@ -1118,6 +1119,7 @@ export class PlayerCharacter extends Character {
       this.removeSingleItem(itemOrItems);
     }
   }
+
   private removeSingleItem(item: Item) {
     const idx = this.baseInventory.findIndex((invItem) => invItem.equals(item));
     if (idx !== -1) {
@@ -1475,41 +1477,52 @@ export class PlayerCharacter extends Character {
     return false;
   }
 
-  public unEquipItem(item: Item[]) {
-    const percentages = this.gatherPercents();
-    if (this.equipment.body?.equals(item[0])) {
-      this.removeEquipment("body");
-    } else if (this.equipment.head?.equals(item[0])) {
-      this.removeEquipment("head");
-    } else if (this.equipment.mainHand.equals(item[0])) {
-      this.removeEquipment("main-hand");
-    } else if (this.equipment.offHand?.equals(item[0])) {
-      this.removeEquipment("off-hand");
-    } else if (this.equipment.quiver?.find((arrow) => arrow.equals(item[0]))) {
-      this.removeEquipment("quiver");
-    }
-    this.resolvePercentages(percentages);
-  }
-
   public removeEquipment(
     slot: "main-hand" | "off-hand" | "body" | "head" | "quiver",
+    addToInventory: boolean = true,
   ) {
     if (slot === "main-hand") {
-      this.addToInventory(this.equipment.mainHand);
+      const item = this.equipment.mainHand;
+      if (addToInventory) this.addToInventory(item);
       this.setUnarmored();
+      return item;
     } else if (slot === "off-hand") {
-      this.addToInventory(this.equipment.offHand);
+      const item = this.equipment.offHand;
+      if (addToInventory) this.addToInventory(item);
       this.equipment.offHand = null;
+      return item;
     } else if (slot == "body") {
-      this.addToInventory(this.equipment.body);
+      const item = this.equipment.body;
+      if (addToInventory) this.addToInventory(item);
       this.equipment.body = null;
+      return item;
     } else if (slot == "head") {
-      this.addToInventory(this.equipment.head);
+      const item = this.equipment.head;
+      if (addToInventory) this.addToInventory(item);
       this.equipment.head = null;
+      return item;
     } else if (slot == "quiver") {
-      this.addToInventory(this.equipment.quiver);
+      const item = this.equipment.quiver;
+      if (addToInventory) this.addToInventory(item);
       this.equipment.quiver = null;
+      return item;
     }
+  }
+
+  public unEquipItem(item: Item[], addToInventory: boolean = true) {
+    const percentages = this.gatherPercents();
+    if (this.equipment.body?.equals(item[0])) {
+      this.removeEquipment("body", addToInventory);
+    } else if (this.equipment.head?.equals(item[0])) {
+      this.removeEquipment("head", addToInventory);
+    } else if (this.equipment.mainHand.equals(item[0])) {
+      this.removeEquipment("main-hand", addToInventory);
+    } else if (this.equipment.offHand?.equals(item[0])) {
+      this.removeEquipment("off-hand", addToInventory);
+    } else if (this.equipment.quiver?.find((arrow) => arrow.equals(item[0]))) {
+      this.removeEquipment("quiver", addToInventory);
+    }
+    this.resolvePercentages(percentages);
   }
 
   /**
@@ -2153,6 +2166,7 @@ export class PlayerCharacter extends Character {
 
   public endTurn() {
     this.regenMana();
+    this.regenHealth();
     this.conditionTicker();
   }
 
@@ -2671,11 +2685,26 @@ const _playerSave = async (
   callback?: () => void,
 ) => {
   if (player) {
-    storage.set(
-      "player",
-      stringify({ ...player, jobs: serializeJobs(player.jobs), root: null }),
-    );
+    try {
+      const playerData = {
+        ...player,
+        jobs: serializeJobs(player.jobs),
+        baseInventory: player.baseInventory.map((item) => item.toJSON()),
+        equipment: {
+          head: player.equipment.head?.toJSON(),
+          body: player.equipment.body?.toJSON(),
+          mainHand: player.equipment.mainHand.toJSON(),
+          offHand: player.equipment.offHand?.toJSON(),
+        },
+        root: undefined,
+      };
+
+      storage.set("player", stringify(playerData));
+    } catch (error) {
+      console.error("Error saving player:", error);
+    }
   }
+
   if (callback) {
     callback();
   }

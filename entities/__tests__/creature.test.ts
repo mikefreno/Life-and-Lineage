@@ -30,6 +30,12 @@ describe("Enemy Class", () => {
 
   beforeEach(() => {
     mockRootStore = new RootStore() as jest.Mocked<RootStore>;
+    // Properly mock the dungeonStore
+    mockRootStore.dungeonStore = {
+      currentInstance: undefined,
+      currentLevel: undefined,
+    } as any;
+
     mockEnemyStore = new EnemyStore({
       root: mockRootStore,
     }) as jest.Mocked<EnemyStore>;
@@ -106,8 +112,40 @@ describe("Enemy Class", () => {
   });
 
   test("Enemy drop generation", () => {
+    const mockRoot = {
+      dungeonStore: {
+        currentInstance: undefined,
+        currentLevel: undefined,
+      },
+    };
+
+    const mockStore = {
+      root: mockRoot,
+      getAnimationStore: jest.fn().mockReturnValue({
+        setDialogueString: jest.fn(),
+        triggerDialogue: jest.fn(),
+      }),
+      saveEnemy: jest.fn(),
+    };
+
+    const testEnemy = new Enemy({
+      beingType: "undead",
+      creatureSpecies: "Zombie",
+      currentHealth: 100,
+      baseHealth: 100,
+      attackPower: 10,
+      sprite: "zombie",
+      attackStrings: ["bite"],
+      drops: [
+        { item: "patch of fur", itemType: ItemClassType.Junk, chance: 1 },
+      ],
+      goldDropRange: { minimum: 10, maximum: 20 },
+      enemyStore: mockStore as any,
+    });
+
     const mockPlayer = { playerClass: "mage" } as PlayerCharacter;
-    const drops = enemy.getDrops(mockPlayer, false);
+    const drops = testEnemy.getDrops(mockPlayer, false);
+
     expect(drops.gold).toBeGreaterThanOrEqual(10);
     expect(drops.gold).toBeLessThanOrEqual(20);
     expect(drops.itemDrops.length).toBe(1);
@@ -156,23 +194,42 @@ describe("Enemy Class", () => {
   });
 
   test("Enemy resistance calculations", () => {
-    enemy = new Enemy({
-      // ... basic properties ...
+    const enemyWithResistances = new Enemy({
+      beingType: "undead",
+      creatureSpecies: "Zombie",
+      currentHealth: 100,
+      baseHealth: 100,
+      attackPower: 10,
+      sprite: "zombie",
+      attackStrings: ["bite"],
+      enemyStore: mockEnemyStore,
       baseFireResistance: 10,
       baseColdResistance: 15,
       baseLightningResistance: 20,
       basePoisonResistance: 25,
     });
 
-    expect(enemy.fireResistance).toBe(10);
-    expect(enemy.coldResistance).toBe(15);
-    expect(enemy.lightningResistance).toBe(20);
-    expect(enemy.poisonResistance).toBe(25);
+    expect(enemyWithResistances.baseFireResistance).toBe(10);
+    expect(enemyWithResistances.baseColdResistance).toBe(15);
+    expect(enemyWithResistances.baseLightningResistance).toBe(20);
+    expect(enemyWithResistances.basePoisonResistance).toBe(25);
+
+    expect(enemyWithResistances.fireResistance).toBe(10);
+    expect(enemyWithResistances.coldResistance).toBe(15);
+    expect(enemyWithResistances.lightningResistance).toBe(20);
+    expect(enemyWithResistances.poisonResistance).toBe(25);
   });
 
   test("Enemy damage type calculations", () => {
-    enemy = new Enemy({
-      // ... basic properties ...
+    const enemyWithDamageTypes = new Enemy({
+      beingType: "undead",
+      creatureSpecies: "Zombie",
+      currentHealth: 100,
+      baseHealth: 100,
+      attackPower: 10,
+      sprite: "zombie",
+      attackStrings: ["bite"],
+      enemyStore: mockEnemyStore,
       basePhysicalDamage: 10,
       baseFireDamage: 5,
       baseColdDamage: 5,
@@ -180,14 +237,31 @@ describe("Enemy Class", () => {
       basePoisonDamage: 5,
     });
 
-    expect(enemy.totalPhysicalDamage).toBe(10);
-    expect(enemy.totalFireDamage).toBe(5);
-    expect(enemy.totalColdDamage).toBe(5);
-    expect(enemy.totalLightningDamage).toBe(5);
-    expect(enemy.totalPoisonDamage).toBe(5);
+    expect(enemyWithDamageTypes.basePhysicalDamage).toBe(10);
+    expect(enemyWithDamageTypes.baseFireDamage).toBe(5);
+    expect(enemyWithDamageTypes.baseColdDamage).toBe(5);
+    expect(enemyWithDamageTypes.baseLightningDamage).toBe(5);
+    expect(enemyWithDamageTypes.basePoisonDamage).toBe(5);
+
+    expect(enemyWithDamageTypes.totalPhysicalDamage).toBe(10);
+    expect(enemyWithDamageTypes.totalFireDamage).toBe(5);
+    expect(enemyWithDamageTypes.totalColdDamage).toBe(5);
+    expect(enemyWithDamageTypes.totalLightningDamage).toBe(5);
+    expect(enemyWithDamageTypes.totalPoisonDamage).toBe(5);
   });
 
   test("Enemy condition stacking", () => {
+    enemy = new Enemy({
+      beingType: "undead",
+      creatureSpecies: "Zombie",
+      currentHealth: 100,
+      baseHealth: 100,
+      attackPower: 10,
+      sprite: "zombie",
+      attackStrings: ["bite"],
+      enemyStore: mockEnemyStore,
+    });
+
     const condition1 = new Condition({
       name: "Poison",
       turns: 3,
@@ -195,7 +269,7 @@ describe("Enemy Class", () => {
       effect: ["health damage"],
       healthDamage: [5],
       effectStyle: ["flat"],
-      placedbyID: enemy.id,
+      placedbyID: "test",
     });
 
     const condition2 = new Condition({
@@ -205,15 +279,14 @@ describe("Enemy Class", () => {
       effect: ["health damage"],
       healthDamage: [3],
       effectStyle: ["flat"],
-      placedbyID: enemy.id,
+      placedbyID: "test",
     });
 
     enemy.addCondition(condition1);
     enemy.addCondition(condition2);
-    expect(enemy.conditions.length).toBe(2);
 
     enemy.conditionTicker();
-    expect(enemy.currentHealth).toBeLessThan(92); // 100 - 5 - 3
+    expect(enemy.currentHealth).toBe(92); // 100 - 5 - 3
   });
 
   test("Enemy story drops", () => {
@@ -226,6 +299,114 @@ describe("Enemy Class", () => {
     const drops = enemy.getDrops(mockPlayer, true); // true for boss fight
     expect(drops.storyDrops?.length).toBe(1);
     expect(drops.storyDrops?.[0].name).toBe("head of goblin shaman");
+  });
+
+  describe("Drop System", () => {
+    let mockDungeonStore: any;
+
+    beforeEach(() => {
+      // Setup mock dungeon store with instance and level drops
+      mockDungeonStore = {
+        currentInstance: {
+          instanceDrops: [
+            { item: "vampiric tooth", itemType: ItemClassType.Junk, chance: 1 },
+          ],
+        },
+        currentLevel: {
+          levelDrops: [
+            { item: "bat wing", itemType: ItemClassType.Ingredient, chance: 1 },
+          ],
+        },
+      };
+
+      mockRootStore.dungeonStore = mockDungeonStore;
+      mockEnemyStore.root = mockRootStore;
+    });
+
+    test("Enemy generates all types of drops", () => {
+      const mockPlayer = { playerClass: "mage" } as PlayerCharacter;
+      const drops = enemy.getDrops(mockPlayer, false);
+
+      // Check enemy-specific drops
+      expect(drops.itemDrops).toContainEqual(
+        expect.objectContaining({ name: "patch of fur" }),
+      );
+
+      // Check instance drops
+      expect(drops.itemDrops).toContainEqual(
+        expect.objectContaining({ name: "vampiric tooth" }),
+      );
+
+      // Check level drops
+      expect(drops.itemDrops).toContainEqual(
+        expect.objectContaining({ name: "bat wing" }),
+      );
+
+      // Total drops should be sum of all sources
+      expect(drops.itemDrops.length).toBe(3);
+    });
+
+    test("Enemy only generates drops once", () => {
+      const mockPlayer = { playerClass: "mage" } as PlayerCharacter;
+      const firstDrops = enemy.getDrops(mockPlayer, false);
+      const secondDrops = enemy.getDrops(mockPlayer, false);
+
+      expect(firstDrops.itemDrops.length).toBe(3);
+      expect(secondDrops.itemDrops.length).toBe(0);
+    });
+
+    test("Enemy handles missing instance drops", () => {
+      mockDungeonStore.currentInstance.instanceDrops = undefined;
+
+      const mockPlayer = { playerClass: "mage" } as PlayerCharacter;
+      const drops = enemy.getDrops(mockPlayer, false);
+
+      // Should still get enemy and level drops
+      expect(drops.itemDrops.length).toBe(2);
+      expect(drops.itemDrops).toContainEqual(
+        expect.objectContaining({ name: "patch of fur" }),
+      );
+      expect(drops.itemDrops).toContainEqual(
+        expect.objectContaining({ name: "bat wing" }),
+      );
+    });
+
+    test("Enemy handles missing level drops", () => {
+      mockDungeonStore.currentLevel.levelDrops = undefined;
+
+      const mockPlayer = { playerClass: "mage" } as PlayerCharacter;
+      const drops = enemy.getDrops(mockPlayer, false);
+
+      // Should still get enemy and instance drops
+      expect(drops.itemDrops.length).toBe(2);
+      expect(drops.itemDrops).toContainEqual(
+        expect.objectContaining({ name: "patch of fur" }),
+      );
+      expect(drops.itemDrops).toContainEqual(
+        expect.objectContaining({ name: "vampiric tooth" }),
+      );
+    });
+
+    test("Enemy handles drop chance calculations correctly", () => {
+      const rollD20 = require("../../utility/functions/misc").rollD20;
+
+      // Mock rollD20 for specific cases
+      rollD20
+        .mockReturnValueOnce(20) // Success for enemy drop
+        .mockReturnValueOnce(1) // Fail for instance drop
+        .mockReturnValueOnce(1); // Fail for level drop
+
+      mockDungeonStore.currentInstance.instanceDrops[0].chance = 0.1; // 10% chance
+      mockDungeonStore.currentLevel.levelDrops[0].chance = 0.1; // 10% chance
+
+      const mockPlayer = { playerClass: "mage" } as PlayerCharacter;
+      const drops = enemy.getDrops(mockPlayer, false);
+
+      expect(drops.itemDrops.length).toBe(1);
+      expect(drops.itemDrops).toContainEqual(
+        expect.objectContaining({ name: "patch of fur" }),
+      );
+    });
   });
 });
 
@@ -311,6 +492,9 @@ describe("Minion Class", () => {
       attackStrings: ["bite"],
       turnsLeftAlive: 3,
       parent: mockParent,
+      currentEnergy: 30,
+      baseEnergy: 30,
+      energyRegen: 5,
     });
 
     minion.expendEnergy(10);

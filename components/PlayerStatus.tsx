@@ -32,7 +32,7 @@ import {
   SquarePlus,
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
-import { Attribute, AttributeToString } from "../utility/types";
+import { Attribute, AttributeToString, Modifier } from "../utility/types";
 import { Text } from "./Themed";
 import { useRootStore } from "../hooks/stores";
 import {
@@ -44,8 +44,39 @@ import {
 } from "../hooks/generic";
 import { Condition } from "../entities/conditions";
 import { PlayerCharacter } from "../entities/character";
+import {
+  DEFENSIVE_STATS,
+  OFFENSIVE_STATS,
+  getTotalValue,
+  statMapping,
+} from "../utility/functions/stats";
 
 export const EXPANDED_PAD = 16;
+
+const StatDisplay = ({
+  modifier,
+  value,
+}: {
+  modifier: Modifier;
+  value: number;
+}) => {
+  const statInfo = statMapping[modifier];
+  const Icon = statInfo.icon;
+
+  return (
+    <View className="my-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+      <View className="flex-row items-center justify-center">
+        <Icon height={14} width={14} />
+        <Text className="text-center ml-2 font-semibold">
+          {getTotalValue(modifier, value)}
+        </Text>
+      </View>
+      <Text className="text-center text-xs text-gray-500 mt-1">
+        {statInfo.description}
+      </Text>
+    </View>
+  );
+};
 
 interface PlayerStatusProps {
   hideGold?: boolean;
@@ -326,6 +357,44 @@ const PlayerStatus = observer(
       }
     }
 
+    const StatCategory = ({
+      category,
+      stats,
+      equipmentStats,
+    }: {
+      category: "offensive" | "defensive";
+      stats: Modifier[];
+      equipmentStats: Map<Modifier, number>;
+    }) => {
+      const hasStats = stats.some((modifier) => {
+        const value = equipmentStats.get(modifier);
+        return value && value > 0;
+      });
+
+      if (!hasStats) {
+        return (
+          <View className="flex-1 justify-center items-center">
+            <Text className="text-center text-gray-500 italic">
+              No {category} stats from equipment
+            </Text>
+          </View>
+        );
+      }
+
+      return (
+        <ScrollView className="flex-1">
+          {stats.map((modifier) => {
+            const value = equipmentStats.get(modifier);
+            if (!value || value <= 0) return null;
+
+            return (
+              <StatDisplay key={modifier} modifier={modifier} value={value} />
+            );
+          })}
+        </ScrollView>
+      );
+    };
+
     if (playerState) {
       const preprop = !(uiStore.playerStatusIsCompact && home)
         ? home
@@ -440,62 +509,37 @@ const PlayerStatus = observer(
                   vibration={vibration}
                 />
               </View>
-              {(playerState.equipmentStats.armor > 0 ||
-                playerState.equipmentStats.damage > 0 ||
-                playerState.equipmentStats.health > 0 ||
-                playerState.equipmentStats.regen > 0 ||
-                playerState.equipmentStats.mana > 0 ||
-                playerState.equipmentStats.blockChance > 0) && (
+
+              {playerState.equipmentStats.size > 0 ? (
                 <View className="py-1">
-                  <GenericStrikeAround>Gear Stats</GenericStrikeAround>
-                  {playerState.equipmentStats.damage > 0 && (
-                    <Text className="text-center">
-                      Attack Damage: {playerState.equipmentStats.damage}
-                    </Text>
-                  )}
-                  {playerState.equipmentStats.armor > 0 && (
-                    <>
-                      <Text className="text-center">
-                        Total Armor: {playerState.equipmentStats.armor}
+                  <GenericStrikeAround>Equipment Stats</GenericStrikeAround>
+                  <View
+                    className="flex-row mt-2"
+                    style={{ height: uiStore.dimensions.height * 0.3 }}
+                  >
+                    <View className="flex-1 mr-1">
+                      <Text className="text-center font-bold mb-1">
+                        Offensive
                       </Text>
-                      <Text className="text-center">
-                        Physical Damage Reduction:{" "}
-                        {(
-                          damageReduction(playerState.equipmentStats.armor) *
-                          100
-                        ).toFixed(1)}
-                        %
+                      <StatCategory
+                        stats={OFFENSIVE_STATS}
+                        equipmentStats={playerState.equipmentStats}
+                        category={"offensive"}
+                      />
+                    </View>
+                    <View className="flex-1 ml-1">
+                      <Text className="text-center font-bold mb-1">
+                        Defensive
                       </Text>
-                    </>
-                  )}
-                  {playerState.equipmentStats.blockChance > 0 && (
-                    <Text className="text-center">
-                      Chance to block:{" "}
-                      {(playerState.equipmentStats.blockChance * 100).toFixed(
-                        1,
-                      )}
-                      %
-                    </Text>
-                  )}
-                  {playerState.equipmentStats.mana > 0 && (
-                    <>
-                      <Text className="text-center">
-                        Mana: +{playerState.equipmentStats.mana}
-                      </Text>
-                    </>
-                  )}
-                  {playerState.equipmentStats.regen > 0 && (
-                    <Text className="text-center">
-                      Mana Regen: +{playerState.equipmentStats.regen}
-                    </Text>
-                  )}
-                  {playerState.equipmentStats.health > 0 && (
-                    <Text className="text-center">
-                      Health: +{playerState.equipmentStats.health}
-                    </Text>
-                  )}
+                      <StatCategory
+                        stats={DEFENSIVE_STATS}
+                        equipmentStats={playerState.equipmentStats}
+                        category={"defensive"}
+                      />
+                    </View>
+                  </View>
                 </View>
-              )}
+              ) : null}
               {playerState.conditions.length > 0 ? (
                 <View>
                   <GenericStrikeAround>Conditions</GenericStrikeAround>

@@ -188,6 +188,44 @@ export const statMapping: Record<Modifier, StatInfo> = {
   },
 };
 
+export const DEFENSIVE_STATS = [
+  Modifier.Health,
+  Modifier.HealthRegen,
+  Modifier.Mana,
+  Modifier.ManaRegen,
+  Modifier.Sanity,
+  Modifier.SanityRegen,
+  Modifier.Armor,
+  Modifier.ArmorAdded,
+  Modifier.BlockChance,
+  Modifier.DodgeChance,
+  Modifier.FireResistance,
+  Modifier.ColdResistance,
+  Modifier.LightningResistance,
+  Modifier.PoisonResistance,
+];
+
+export const OFFENSIVE_STATS = [
+  Modifier.Strength,
+  Modifier.Dexterity,
+  Modifier.Intelligence,
+  Modifier.PhysicalDamage,
+  Modifier.PhysicalDamageAdded,
+  Modifier.PhysicalDamageMultiplier,
+  Modifier.FireDamage,
+  Modifier.FireDamageAdded,
+  Modifier.FireDamageMultiplier,
+  Modifier.ColdDamage,
+  Modifier.ColdDamageAdded,
+  Modifier.ColdDamageMultiplier,
+  Modifier.LightningDamage,
+  Modifier.LightningDamageAdded,
+  Modifier.LightningDamageMultiplier,
+  Modifier.PoisonDamage,
+  Modifier.PoisonDamageAdded,
+  Modifier.PoisonDamageMultiplier,
+];
+
 export const getStatInfo = (mod: Modifier): StatInfo => {
   return statMapping[mod] || { icon: () => null };
 };

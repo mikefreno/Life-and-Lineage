@@ -97,7 +97,10 @@ export class RootStore {
   newGame(newPlayer: PlayerCharacter) {
     const starterBook = getStartingBook(newPlayer);
     newPlayer.addToInventory(starterBook);
+
     this.enemyStore.clearEnemyList();
+    this.dungeonStore.resetForNewGame();
+
     this.playerState = newPlayer;
     this.shopsStore.setShops(this.shopsStore.getInitShopsState());
     savePlayer(newPlayer);

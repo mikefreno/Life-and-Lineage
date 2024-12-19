@@ -5,7 +5,6 @@ import clearHistory, { toTitleCase, wait } from "../../utility/functions/misc";
 import { createPlayerCharacter } from "../../utility/functions/characterAid";
 import { Element, ElementToString } from "../../utility/types";
 import { elementalColorMap, playerClassColors } from "../../constants/Colors";
-import { storage } from "../../utility/functions/storage";
 import { useColorScheme } from "nativewind";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { useVibration } from "../../hooks/generic";
@@ -22,13 +21,8 @@ export default function NewGameReview() {
   const navigation = useNavigation();
   const { colorScheme } = useColorScheme();
 
-  async function startGame() {
-    if (classSelection && sex && blessingSelection) {
-      let parsed = true;
-      const tutorialState = storage.getString("tutorialsEnabled");
-      if (tutorialState) {
-        parsed = JSON.parse(tutorialState);
-      }
+  function startGame() {
+    if (classSelection && sex && blessingSelection !== undefined) {
       const player = createPlayerCharacter({
         sex,
         root,
@@ -37,6 +31,7 @@ export default function NewGameReview() {
         blessingSelection,
         classSelection,
       });
+
       root.newGame(player);
       vibration({ style: "success" });
       wait(250).then(() => clearHistory(navigation));
@@ -69,7 +64,7 @@ export default function NewGameReview() {
           >{`${toTitleCase(classSelection)}`}</Text>
         </Text>
         <GenericFlatButton
-          onPress={() => startGame()}
+          onPress={startGame}
           className="mt-4"
           accessibilityRole="button"
           accessibilityLabel="Confirm"

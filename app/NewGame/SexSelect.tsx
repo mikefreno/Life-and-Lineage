@@ -15,9 +15,8 @@ import { useNewGameStore } from "./_layout";
 import GenericFlatLink from "../../components/GenericLink";
 
 export default function SetSex() {
-  const [sex, setSex] = useState<"male" | "female">();
   const { colorScheme } = useColorScheme();
-  const { classSelection } = useNewGameStore();
+  const { classSelection, sex, setSex } = useNewGameStore();
   if (!classSelection) {
     router.back();
     router.back();

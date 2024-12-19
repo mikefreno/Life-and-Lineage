@@ -93,6 +93,7 @@ export class DungeonStore {
       hasPersistedState: computed,
       clearDungeonState: action,
       resetVolatileState: action,
+      resetForNewGame: action,
     });
 
     reaction(
@@ -332,6 +333,11 @@ export class DungeonStore {
         _dungeonInstanceSave(inst);
       });
     }
+  }
+
+  resetForNewGame() {
+    this.clearDungeonState();
+    this.dungeonInstances = this.getInitDungeonState();
   }
 
   hydrateDungeonState() {

@@ -228,9 +228,19 @@ const EquipmentSlot = observer(
                       bounds:
                         draggableClassStore.ancillaryBoundsMap.get("quiver"),
                     },
+                    {
+                      key: "stash",
+                      bounds:
+                        draggableClassStore.ancillaryBoundsMap.get("stash"),
+                    },
                   ]}
-                  runOnSuccess={() => {
-                    playerState.unEquipItem(itemStack);
+                  runOnSuccess={(droppedOnKey) => {
+                    if (droppedOnKey === "stash") {
+                      playerState.unEquipItem(itemStack, false);
+                      playerState.root.stashStore.addItem(itemStack);
+                    } else {
+                      playerState.unEquipItem(itemStack);
+                    }
                     setDisplayItem(null);
                   }}
                   displayItem={null}

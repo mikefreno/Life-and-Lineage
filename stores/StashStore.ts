@@ -3,6 +3,7 @@ import { RootStore } from "./RootStore";
 import { Item } from "../entities/item";
 import { stringify, parse } from "flatted";
 import { storage } from "../utility/functions/storage";
+import { ItemClassType, Rarity } from "../utility/types";
 
 export class StashStore {
   root: RootStore;
@@ -55,9 +56,27 @@ export class StashStore {
     }
   }
 
+  private initializeWithDummyData() {
+    if (this.items.length === 0) {
+      for (let i = 0; i < 60; i++) {
+        const dummyItem = new Item({
+          name: `Test Item ${i}`,
+          description: "A dummy item for testing",
+          icon: "sword",
+          rarity: Rarity.NORMAL,
+          itemClass: ItemClassType.Melee,
+          baseValue: 100,
+          root: this.root,
+        });
+        this.addItem([dummyItem]);
+      }
+    }
+  }
+
   addItem(item: Item[]) {
     this.items.push({ item });
     this.root.playerState?.removeFromInventory(item);
+    this.root.playerState;
   }
 
   removeItem(itemToRemove: Item[]) {

@@ -125,7 +125,7 @@ export function stringToModifier(key: string): Modifier | undefined {
     case "poisondamagemultiplier":
       return Modifier.PoisonDamageMultiplier;
     default:
-      return key as unknown as Modifier;
+      return Number.parseInt(key) as Modifier;
   }
 }
 

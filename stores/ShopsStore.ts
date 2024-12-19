@@ -100,6 +100,7 @@ const _shopSave = async (shop: Shop | undefined) => {
         `shop_${shop.archetype.replaceAll(" ", "_")}`,
         stringify({
           ...shop,
+          baseInventory: shop.baseInventory.map((item) => item.toJSON()),
           shopKeeper: { ...shop.shopKeeper, root: null },
           root: null,
         }),

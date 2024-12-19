@@ -3,7 +3,7 @@ import { action, computed, makeObservable, observable, reaction } from "mobx";
 import { DungeonStore, saveDungeonInstance } from "../stores/DungeonStore";
 import enemiesJSON from "../assets/json/enemy.json";
 import bossesJSON from "../assets/json/bosses.json";
-import type { BeingType } from "../utility/types";
+import type { BeingType, ItemClassType } from "../utility/types";
 import { ParallaxOptions } from "../components/DungeonComponents/Parallax";
 import { EnemyImageKeyOption, EnemyImageMap } from "../utility/enemyHelpers";
 
@@ -17,6 +17,11 @@ interface DungeonLevelOptions {
   parent: DungeonInstance;
   dungeonStore: DungeonStore;
   parallaxOverride?: ParallaxOptions;
+  levelDrops?: {
+    item: string;
+    itemType: ItemClassType;
+    chance: number;
+  }[];
 }
 
 interface DungeonInstanceOptions {
@@ -27,6 +32,11 @@ interface DungeonInstanceOptions {
   unlocks: string[];
   levels: DungeonLevel[];
   dungeonStore: DungeonStore;
+  instanceDrops?: {
+    item: string;
+    itemType: ItemClassType;
+    chance: number;
+  }[];
 }
 
 /**
@@ -41,6 +51,11 @@ export class DungeonInstance {
   levels: DungeonLevel[];
   readonly unlocks: string[];
   dungeonStore: DungeonStore;
+  readonly instanceDrops: {
+    item: string;
+    itemType: ItemClassType;
+    chance: number;
+  }[];
 
   constructor({
     id,
@@ -50,6 +65,7 @@ export class DungeonInstance {
     levels,
     unlocks,
     dungeonStore,
+    instanceDrops,
   }: DungeonInstanceOptions) {
     this.id = id;
     this.bgName = bgName;
@@ -60,6 +76,8 @@ export class DungeonInstance {
     );
     this.unlocks = unlocks;
     this.dungeonStore = dungeonStore;
+    this.instanceDrops = instanceDrops ?? [];
+
     makeObservable(this, {
       levels: observable.deep,
       setLevels: action,
@@ -104,6 +122,7 @@ export class DungeonInstance {
       levels: json.levels,
       unlocks: json.unlocks,
       dungeonStore: json.dungeonStore,
+      instanceDrops: json.instanceDrops,
     });
 
     return instance;
@@ -132,6 +151,11 @@ export class DungeonLevel {
   parent: DungeonInstance;
   dungeonStore: DungeonStore;
   parallaxOverride: ParallaxOptions | null;
+  readonly levelDrops: {
+    item: string;
+    itemType: ItemClassType;
+    chance: number;
+  }[];
 
   constructor({
     level,
@@ -143,6 +167,7 @@ export class DungeonLevel {
     parent,
     parallaxOverride,
     dungeonStore,
+    levelDrops,
   }: DungeonLevelOptions) {
     this.level = level;
     this.bossEncounter = bossEncounter;
@@ -153,6 +178,8 @@ export class DungeonLevel {
     this.parent = parent;
     this.parallaxOverride = parallaxOverride ?? null;
     this.dungeonStore = dungeonStore;
+    this.levelDrops = levelDrops ?? [];
+
     makeObservable(this, {
       unlocked: observable,
       bossDefeated: observable,
@@ -294,6 +321,7 @@ export class DungeonLevel {
       unlocked: json.unlocked ? json.unlocked : json.level == 1 ? true : false,
       parent: json.parent,
       dungeonStore: json.dungeonStore,
+      levelDrops: json.levelDrops,
     });
     return level;
   }

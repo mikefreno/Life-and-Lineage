@@ -26,11 +26,25 @@
     "bgName": "Cave",
     "id": 1,
     "difficulty": 1,
+    "instanceDrops": [
+      {
+        "item": "stick",
+        "itemType": "melee",
+        "chance": 1.0
+      }
+    ],
     "levels": [
       {
         "level": 1,
         "tiles": 10,
         "unlocked": true,
+        "levelDrops": [
+          {
+            "item": "stick",
+            "itemType": "melee",
+            "chance": 1.0
+          }
+        ],
         "normalEncounters": [
           [
             {
