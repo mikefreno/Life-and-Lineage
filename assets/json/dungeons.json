@@ -84,9 +84,8 @@
             "scaler": 1
           },
           {
-            "name": "ritual alter",
+            "name": "ritual altar",
             "countChances": {
-              "0": 0,
               "1": 1
             },
             "scaler": 1

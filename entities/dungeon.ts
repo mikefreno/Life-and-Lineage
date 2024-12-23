@@ -186,7 +186,13 @@ export class DungeonLevel {
     this.normalEncounters = normalEncounters;
     this.specialEncounters = specialEncounters
       ? specialEncounters.map(
-          (enc) => new SpecialEncounter({ name: enc.name, scaler: enc.scaler }),
+          (enc) =>
+            new SpecialEncounter({
+              name: enc.name,
+              countChances: enc.countChances,
+              scaler: enc.scaler,
+              parent: this,
+            }),
         )
       : [];
     this.tiles = tiles;
@@ -203,6 +209,7 @@ export class DungeonLevel {
       generateBossEncounter: computed,
       generateNormalEncounter: computed,
       setBossDefeated: action,
+      unlock: action,
     });
 
     reaction(
@@ -225,9 +232,7 @@ export class DungeonLevel {
     const fightIdx = Math.floor(Math.random() * this.normalEncounters.length);
     const enemiesSpec = this.normalEncounters[fightIdx];
     const enemies = enemiesSpec.map((enemySpec) => {
-      let enemyJSON = JSON.parse(
-        JSON.stringify(enemiesJSON.find((json) => json.name == enemySpec.name)),
-      );
+      let enemyJSON = enemiesJSON.find((json) => json.name == enemySpec.name);
       if (!enemyJSON) {
         throw new Error(`missing enemy: ${enemySpec.name}`);
       }
@@ -294,7 +299,7 @@ export class DungeonLevel {
       }
 
       // Create a deep copy of the boss JSON to avoid modifying the original
-      let scaledBossJSON = JSON.parse(JSON.stringify(bossJSON));
+      let scaledBossJSON = { ...bossJSON };
 
       if (bossSpec.scaler != 1) {
         scaledBossJSON.goldDropRange.minimum *= bossSpec.scaler;
@@ -341,7 +346,6 @@ export class DungeonLevel {
       dungeonStore: json.dungeonStore,
       levelDrops: json.levelDrops,
     });
-    level.specialEncounters.forEach((encounter) => encounter.setParent(level));
     return level;
   }
 }
@@ -383,16 +387,18 @@ export class SpecialEncounter {
     scaler,
     countChances,
     activated,
+    parent,
   }: {
     name: string;
     scaler: number;
     countChances: Record<string, number>;
     activated?: boolean;
+    parent: DungeonLevel;
   }) {
     this.countChances = countChances;
     this.name = name;
     this.scaler = scaler;
-    this.parentLevel = null;
+    this.parentLevel = parent;
     this.activated = activated ?? false;
     const encounter = specialEncountersJSON.find(
       (encounter) => encounter.name === name,
@@ -421,7 +427,6 @@ export class SpecialEncounter {
     makeObservable(this, {
       activated: observable,
       parentLevel: observable,
-      setParent: action,
       activate: action,
     });
   }
@@ -500,15 +505,15 @@ export class SpecialEncounter {
     }
     if (outcome.result?.gold) {
       gold = getRandomInt(outcome.result.gold.min, outcome.result.gold.max);
+      root.playerState?.addGold(gold);
     }
     if (outcome.result?.battle) {
       enemies = outcome.result.battle.map((enemy) => {
-        let enemyJSON = JSON.parse(
-          JSON.stringify(enemiesJSON.find((json) => json.name == enemy)),
-        );
+        let enemyJSON = enemiesJSON.find((json) => json.name == enemy);
         if (!enemyJSON) {
           throw new Error(`missing enemy: ${enemy}`);
         }
+        enemyJSON = { ...enemyJSON };
         if (this.scaler != 1) {
           enemyJSON.goldDropRange.minimum *= this.scaler;
           enemyJSON.goldDropRange.maximum *= this.scaler;
@@ -532,7 +537,7 @@ export class SpecialEncounter {
                 1),
           ) + enemyJSON.attackPowerRange.minimum;
 
-        return new Enemy({
+        const made = new Enemy({
           beingType: enemyJSON.beingType as BeingType,
           creatureSpecies: enemyJSON.name,
           currentHealth: hp,
@@ -550,6 +555,8 @@ export class SpecialEncounter {
           sprite: enemyJSON.sprite as EnemyImageKeyOption,
           enemyStore: root.enemyStore,
         });
+        root.enemyStore.addToEnemyList(made);
+        return made;
       });
     }
     if (outcome.result?.effect) {
@@ -580,15 +587,12 @@ export class SpecialEncounter {
     };
   }
 
-  public setParent(level: DungeonLevel) {
-    this.parentLevel = level;
-  }
-
   static fromJSON(json: any) {
     return new SpecialEncounter({
       name: json.name,
       scaler: json.scaler,
       countChances: json.countChances,
+      parent: json.parent,
     });
   }
 }

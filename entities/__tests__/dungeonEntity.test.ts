@@ -1,4 +1,4 @@
-import { DungeonInstance, DungeonLevel } from "../dungeon";
+import { DungeonInstance, DungeonLevel, SpecialEncounter } from "../dungeon";
 import { Enemy } from "../creatures";
 import { DungeonStore } from "../../stores/DungeonStore";
 import { runInAction } from "mobx";
@@ -37,6 +37,30 @@ jest.mock("../../assets/json/enemy.json", () => [
     },
     defaultSprite: "testSprite",
   },
+  {
+    name: "bandit", // Add the bandit enemy
+    beingType: "human",
+    sanity: 100,
+    healthRange: {
+      minimum: 30,
+      maximum: 60,
+    },
+    attackPowerRange: {
+      minimum: 3,
+      maximum: 7,
+    },
+    energy: {
+      maximum: 20,
+      regen: 3,
+    },
+    attackStrings: ["bandit attack 1", "bandit attack 2"],
+    drops: [],
+    goldDropRange: {
+      minimum: 5,
+      maximum: 15,
+    },
+    sprite: "testSprite", // Make sure this matches a key in your EnemyImageMap mock
+  },
 ]);
 
 jest.mock("../../assets/json/bosses.json", () => [
@@ -60,9 +84,42 @@ jest.mock("../../assets/json/bosses.json", () => [
   },
 ]);
 
+jest.mock("../../assets/json/specialEncounters.json", () => [
+  {
+    name: "camp",
+    image: "camp",
+    prompt: "Set up camp?",
+    goodOutcome: {
+      chance: 0.25,
+      message: "Rested well",
+      result: { effect: { sanity: 50, health: 50 } },
+    },
+    neutralOutcome: {
+      chance: 0.65,
+      message: "Somewhat rested",
+      result: { effect: { sanity: 10, health: 10 } },
+    },
+    badOutcome: {
+      chance: 0.1,
+      message: "Ambushed!",
+      result: { battle: ["bandit"] },
+    },
+  },
+  // Add more mock special encounters as needed
+]);
+
 const mockDungeonStore = {
   root: {
-    enemyStore: {},
+    enemyStore: {
+      addToEnemyList: jest.fn().mockImplementation((enemy) => enemy),
+    },
+    playerState: {
+      addGold: jest.fn(),
+      restoreHealth: jest.fn(),
+      restoreMana: jest.fn(),
+      restoreSanity: jest.fn(),
+      playerClass: "mage", // or whatever default class you use
+    },
     time: {
       currentDate: { year: 2023, week: 1 },
     },
@@ -305,5 +362,103 @@ describe("fromJSON", () => {
     expect(level.level).toBe(3);
     expect(level.unlocked).toBe(true);
     expect(level.bossDefeated).toBe(true);
+  });
+});
+
+describe("Special Encounters", () => {
+  let dungeonInstance: DungeonInstance;
+  let dungeonLevel: DungeonLevel;
+
+  beforeEach(() => {
+    dungeonInstance = new DungeonInstance({
+      id: 1,
+      bgName: "Cave",
+      name: "Test Dungeon",
+      difficulty: 1,
+      unlocks: [],
+      levels: [],
+      dungeonStore: mockDungeonStore,
+    });
+
+    dungeonLevel = new DungeonLevel({
+      level: 1,
+      bossEncounter: [],
+      normalEncounters: [],
+      specialEncounters: [
+        { name: "camp", scaler: 1, countChances: { "1": 1.0 } },
+      ],
+      tiles: 10,
+      parent: dungeonInstance,
+      dungeonStore: mockDungeonStore,
+    });
+  });
+
+  it("should create special encounters from JSON", () => {
+    expect(dungeonLevel.specialEncounters.length).toBe(1);
+    const encounter = dungeonLevel.specialEncounters[0];
+    expect(encounter.name).toBe("camp");
+    expect(encounter.scaler).toBe(1);
+    expect(encounter.countChances).toEqual({ "1": 1.0 });
+    expect(encounter.prompt).toBe("Set up camp?");
+  });
+
+  it("should determine correct count for level based on chances", () => {
+    const encounter = dungeonLevel.specialEncounters[0];
+    expect(encounter.countForLevel).toBe(1);
+  });
+
+  it("should activate special encounter and return outcome", () => {
+    const encounter = dungeonLevel.specialEncounters[0];
+
+    // Mock Math.random to force specific outcomes
+    const originalRandom = Math.random;
+
+    // Test good outcome
+    Math.random = jest.fn().mockReturnValue(0.1);
+    let result = encounter.activate();
+    expect(result.message).toBe("Rested well");
+    expect(result.health).toBe(50);
+    expect(result.sanity).toBe(50);
+    expect(
+      mockDungeonStore.root.playerState?.restoreHealth,
+    ).toHaveBeenCalledWith(50);
+    expect(
+      mockDungeonStore.root.playerState?.restoreSanity,
+    ).toHaveBeenCalledWith(50);
+
+    // Reset mock
+    jest.clearAllMocks();
+
+    // Test neutral outcome
+    Math.random = jest.fn().mockReturnValue(0.5);
+    result = encounter.activate();
+    expect(result.message).toBe("Somewhat rested");
+    expect(result.health).toBe(10);
+    expect(result.sanity).toBe(10);
+    expect(
+      mockDungeonStore.root.playerState?.restoreHealth,
+    ).toHaveBeenCalledWith(10);
+    expect(
+      mockDungeonStore.root.playerState?.restoreSanity,
+    ).toHaveBeenCalledWith(10);
+
+    // Reset mock
+    jest.clearAllMocks();
+
+    // Test bad outcome
+    Math.random = jest.fn().mockReturnValue(0.95);
+    result = encounter.activate();
+    expect(result.message).toBe("Ambushed!");
+    expect(result.enemies).toBeDefined();
+    expect(result.enemies?.[0].creatureSpecies).toBe("bandit");
+    expect(mockDungeonStore.root.enemyStore.addToEnemyList).toHaveBeenCalled();
+
+    // Restore original Math.random
+    Math.random = originalRandom;
+  });
+
+  it("should correctly set parent level for special encounters", () => {
+    const encounter = dungeonLevel.specialEncounters[0];
+    expect(encounter.parentLevel).toBe(dungeonLevel);
   });
 });

@@ -227,13 +227,6 @@ export class DungeonStore {
     this.fleeModalShowing = state;
   }
 
-  private initiateSpecialBattle(enemyNames: string[]) {
-    enemyNames.map((name) => {
-      const enemy = this.root.enemyStore.addToEnemyList(enemy);
-    });
-    this.inCombat = true;
-  }
-
   public move(direction: "up" | "down" | "left" | "right") {
     if (!this.currentPosition || !this.currentMap) return;
     this.toggleMovement();
@@ -252,9 +245,14 @@ export class DungeonStore {
       if (!newPosition.clearedRoom) {
         wait(350).then(() => {
           runInAction(() => {
-            this.inCombat = true;
-            this.fightingBoss = newPosition.isBossRoom;
-            this.setEncounter(newPosition.isBossRoom);
+            if (newPosition.specialEncounter) {
+              this.setCurrentSpecialEncounter(newPosition.specialEncounter);
+              this.inSpecialRoom = true;
+            } else {
+              this.inCombat = true;
+              this.fightingBoss = newPosition.isBossRoom;
+              this.setEncounter(newPosition.isBossRoom);
+            }
             this.visitRoom(newPosition);
             this.toggleMovement();
           });
@@ -263,6 +261,10 @@ export class DungeonStore {
         this.toggleMovement();
       }
     }
+  }
+
+  setCurrentSpecialEncounter(encounter: SpecialEncounter | null) {
+    this.currentSpecialEncounter = encounter;
   }
 
   get reversedLogs() {

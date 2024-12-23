@@ -18,7 +18,7 @@ export interface Tile {
   y: number;
   clearedRoom: boolean;
   isBossRoom: boolean;
-  hasSpecialEncounter?: SpecialEncounter;
+  specialEncounter?: SpecialEncounter;
 }
 
 /**
@@ -86,9 +86,10 @@ export const generateTiles = ({
   };
 
   const weightedDirections = [
+    // favor horizontal
     directionsMapping.left,
     directionsMapping.right,
-    directionsMapping.left, // Add extra horizontal directions
+    directionsMapping.left,
     directionsMapping.right,
     directionsMapping.up,
     directionsMapping.down,
@@ -155,6 +156,18 @@ export const generateTiles = ({
     const idx = Math.floor(Math.random() * Math.min(3, options.length));
     options[idx].isBossRoom = true;
   }
+
+  specials.forEach(({ count, specialEncounter }) => {
+    const availableTiles = tiles.filter(
+      (tile) => !tile.isBossRoom && !tile.specialEncounter,
+    );
+
+    for (let i = 0; i < count && availableTiles.length > 0; i++) {
+      const randomIndex = Math.floor(Math.random() * availableTiles.length);
+      availableTiles[randomIndex].specialEncounter = specialEncounter;
+      availableTiles.splice(randomIndex, 1);
+    }
+  });
 
   return tiles;
 };
