@@ -1,4 +1,8 @@
-import { DungeonInstance, DungeonLevel } from "../entities/dungeon";
+import {
+  DungeonInstance,
+  DungeonLevel,
+  SpecialEncounter,
+} from "../entities/dungeon";
 import type { RootStore } from "./RootStore";
 import dungeonsJSON from "../assets/json/dungeons.json";
 import { storage } from "../utility/functions/storage";
@@ -33,7 +37,9 @@ export class DungeonStore {
   currentMap: Tile[] | undefined;
   currentMapDimensions: BoundingBox | undefined;
   currentPosition: Tile | undefined;
+  currentSpecialEncounter: SpecialEncounter | null = null;
   inCombat: boolean = false;
+  inSpecialRoom: boolean = false;
   fightingBoss: boolean = false;
   movementQueued: boolean = false;
 
@@ -194,10 +200,16 @@ export class DungeonStore {
     if (!this.currentLevel) {
       throw new Error("Failed to set up dungeon: No valid level found");
     }
+    const specials = this.currentLevel.specialEncounters.map(
+      (specialEncounter) => {
+        return { count: specialEncounter.countForLevel, specialEncounter };
+      },
+    );
     this.currentMap = generateTiles({
       numTiles: this.currentLevel.tiles,
       tileSize: TILE_SIZE,
       bossDefeated: this.currentLevel.bossDefeated,
+      specials,
     });
     this.currentMapDimensions = getBoundingBox(this.currentMap, TILE_SIZE);
     this.currentPosition = this.currentMap[0];
@@ -213,6 +225,13 @@ export class DungeonStore {
 
   setFleeModalShowing(state: boolean) {
     this.fleeModalShowing = state;
+  }
+
+  private initiateSpecialBattle(enemyNames: string[]) {
+    enemyNames.map((name) => {
+      const enemy = this.root.enemyStore.addToEnemyList(enemy);
+    });
+    this.inCombat = true;
   }
 
   public move(direction: "up" | "down" | "left" | "right") {

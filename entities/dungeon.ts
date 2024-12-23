@@ -1,4 +1,4 @@
-import { Enemy } from "./creatures";
+import { Enemy, itemList } from "./creatures";
 import { action, computed, makeObservable, observable, reaction } from "mobx";
 import { DungeonStore, saveDungeonInstance } from "../stores/DungeonStore";
 import enemiesJSON from "../assets/json/enemy.json";
@@ -6,11 +6,21 @@ import bossesJSON from "../assets/json/bosses.json";
 import type { BeingType, ItemClassType } from "../utility/types";
 import { ParallaxOptions } from "../components/DungeonComponents/Parallax";
 import { EnemyImageKeyOption, EnemyImageMap } from "../utility/enemyHelpers";
+import specialEncountersJSON from "../assets/json/specialEncounters.json";
+import { Item, isStackable } from "./item";
+import { getRandomInt } from "../utility/functions/misc";
 
 interface DungeonLevelOptions {
   level: number;
   bossEncounter: { name: string; scaler: number }[];
   normalEncounters: { name: string; scaler: number }[][];
+  specialEncounters: {
+    name: string;
+    countChances: {
+      [key: string]: number;
+    };
+    scaler: number;
+  }[];
   tiles: number;
   unlocked?: boolean;
   bossDefeated?: boolean;
@@ -145,6 +155,7 @@ export class DungeonLevel {
     scaler: number;
     spriteOverride?: string[];
   }[][];
+  readonly specialEncounters: SpecialEncounter[];
   readonly tiles: number;
   unlocked: boolean;
   bossDefeated: boolean;
@@ -161,6 +172,7 @@ export class DungeonLevel {
     level,
     bossEncounter,
     normalEncounters,
+    specialEncounters,
     tiles,
     bossDefeated,
     unlocked,
@@ -172,6 +184,11 @@ export class DungeonLevel {
     this.level = level;
     this.bossEncounter = bossEncounter;
     this.normalEncounters = normalEncounters;
+    this.specialEncounters = specialEncounters
+      ? specialEncounters.map(
+          (enc) => new SpecialEncounter({ name: enc.name, scaler: enc.scaler }),
+        )
+      : [];
     this.tiles = tiles;
     this.unlocked = unlocked ?? false;
     this.bossDefeated = bossDefeated ?? false;
@@ -316,6 +333,7 @@ export class DungeonLevel {
       level: json.level,
       bossEncounter: json.bossEncounter,
       normalEncounters: json.normalEncounters,
+      specialEncounters: json.specialEncounters,
       tiles: json.tiles,
       bossDefeated: json.bossDefeated,
       unlocked: json.unlocked ? json.unlocked : json.level == 1 ? true : false,
@@ -323,6 +341,254 @@ export class DungeonLevel {
       dungeonStore: json.dungeonStore,
       levelDrops: json.levelDrops,
     });
+    level.specialEncounters.forEach((encounter) => encounter.setParent(level));
     return level;
+  }
+}
+
+interface SpecialEncounterOutcome {
+  chance: number;
+  message: string;
+  result: {
+    drops?: {
+      name: string;
+      itemType: string;
+      chance: number;
+    }[];
+    gold?: {
+      min: number;
+      max: number;
+    };
+    battle?: string[];
+    effect?: {
+      [stat: string]: number;
+    };
+  } | null;
+}
+
+export class SpecialEncounter {
+  readonly countChances: Record<string, number>;
+  readonly name: string;
+  readonly prompt: string;
+  readonly image: string;
+  readonly scaler: number;
+  readonly goodOutcome: SpecialEncounterOutcome;
+  readonly badOutcome: SpecialEncounterOutcome;
+  readonly neutralOutcome: SpecialEncounterOutcome;
+  activated: boolean;
+  parentLevel: DungeonLevel | null;
+
+  constructor({
+    name,
+    scaler,
+    countChances,
+    activated,
+  }: {
+    name: string;
+    scaler: number;
+    countChances: Record<string, number>;
+    activated?: boolean;
+  }) {
+    this.countChances = countChances;
+    this.name = name;
+    this.scaler = scaler;
+    this.parentLevel = null;
+    this.activated = activated ?? false;
+    const encounter = specialEncountersJSON.find(
+      (encounter) => encounter.name === name,
+    );
+    if (!encounter) {
+      throw new Error(`Special encounter details not found for: ${name}`);
+    }
+    this.prompt = encounter.prompt;
+    this.goodOutcome = encounter.goodOutcome ?? {
+      chance: 0,
+      message: "",
+      result: null,
+    };
+    this.badOutcome = encounter.badOutcome ?? {
+      chance: 0,
+      message: "",
+      result: null,
+    };
+    this.neutralOutcome = encounter.neutralOutcome ?? {
+      chance: 0,
+      message: "",
+      result: null,
+    };
+    this.image = encounter.image;
+
+    makeObservable(this, {
+      activated: observable,
+      parentLevel: observable,
+      setParent: action,
+      activate: action,
+    });
+  }
+
+  get countForLevel() {
+    const random = Math.random();
+    let sum = 0;
+
+    for (const [key, probability] of Object.entries(this.countChances)) {
+      sum += probability;
+      if (random <= sum) {
+        return Number.parseInt(key);
+      }
+    }
+
+    return Number.parseInt(
+      Object.keys(this.countChances)[Object.keys(this.countChances).length - 1],
+    );
+  }
+
+  public activate() {
+    const random = Math.random();
+    let cumulative = 0;
+
+    const outcomes = [
+      { type: "good", ...this.goodOutcome },
+      { type: "neutral", ...this.neutralOutcome },
+      { type: "bad", ...this.badOutcome },
+    ];
+
+    for (const outcome of outcomes) {
+      cumulative += outcome.chance;
+      if (random <= cumulative) {
+        this.activated = true;
+        return this.processOutcome(outcome);
+      }
+    }
+
+    throw new Error(`Outcome selection failure on ${this.name}`);
+  }
+
+  private processOutcome(outcome: SpecialEncounterOutcome) {
+    let drops: Item[] = [];
+    let gold: number | undefined;
+    let enemies: Enemy[] = [];
+    let health: number | undefined;
+    let mana: number | undefined;
+    let sanity: number | undefined;
+    const root = this.parentLevel?.parent.dungeonStore.root;
+    if (!root) {
+      throw new Error("Missing root link in SpecialEncounter");
+    }
+    if (outcome.result?.drops) {
+      for (const potentialDrop of outcome.result.drops) {
+        const roll = Math.random();
+        if (roll >= 1 - potentialDrop.chance) {
+          const items = itemList(
+            potentialDrop.itemType as ItemClassType,
+            root.playerState?.playerClass!,
+          );
+          const itemObj = items.find(
+            (item) => item.name === potentialDrop.name,
+          );
+          if (itemObj) {
+            drops.push(
+              Item.fromJSON({
+                ...itemObj,
+                itemClass: potentialDrop.itemType,
+                stackable: isStackable(potentialDrop.itemType as ItemClassType),
+                root,
+              }),
+            );
+          }
+        }
+      }
+    }
+    if (outcome.result?.gold) {
+      gold = getRandomInt(outcome.result.gold.min, outcome.result.gold.max);
+    }
+    if (outcome.result?.battle) {
+      enemies = outcome.result.battle.map((enemy) => {
+        let enemyJSON = JSON.parse(
+          JSON.stringify(enemiesJSON.find((json) => json.name == enemy)),
+        );
+        if (!enemyJSON) {
+          throw new Error(`missing enemy: ${enemy}`);
+        }
+        if (this.scaler != 1) {
+          enemyJSON.goldDropRange.minimum *= this.scaler;
+          enemyJSON.goldDropRange.maximum *= this.scaler;
+          enemyJSON.healthRange.minimum *= this.scaler;
+          enemyJSON.healthRange.maximum *= this.scaler;
+          enemyJSON.attackPowerRange.minimum *= this.scaler;
+          enemyJSON.attackPowerRange.maximum *= this.scaler;
+        }
+        const hp =
+          Math.floor(
+            Math.random() *
+              (enemyJSON.healthRange.maximum -
+                enemyJSON.healthRange.minimum +
+                1),
+          ) + enemyJSON.healthRange.minimum;
+        const ap =
+          Math.floor(
+            Math.random() *
+              (enemyJSON.attackPowerRange.maximum -
+                enemyJSON.attackPowerRange.minimum +
+                1),
+          ) + enemyJSON.attackPowerRange.minimum;
+
+        return new Enemy({
+          beingType: enemyJSON.beingType as BeingType,
+          creatureSpecies: enemyJSON.name,
+          currentHealth: hp,
+          baseHealth: hp,
+          currentSanity: enemyJSON.sanity,
+          baseSanity: enemyJSON.sanity,
+          attackPower: ap,
+          baseArmor: enemyJSON.armorValue,
+          currentEnergy: enemyJSON.energy.maximum,
+          baseEnergy: enemyJSON.energy.maximum,
+          energyRegen: enemyJSON.energy.regen,
+          goldDropRange: enemyJSON.goldDropRange,
+          drops: enemyJSON.drops,
+          attackStrings: enemyJSON.attackStrings,
+          sprite: enemyJSON.sprite as EnemyImageKeyOption,
+          enemyStore: root.enemyStore,
+        });
+      });
+    }
+    if (outcome.result?.effect) {
+      const healthEffect = outcome.result.effect["health"];
+      const manaEffect = outcome.result.effect["mana"];
+      const sanityEffect = outcome.result.effect["sanity"];
+      if (healthEffect) {
+        root.playerState?.restoreHealth(healthEffect);
+        health = healthEffect;
+      }
+      if (manaEffect) {
+        root.playerState?.restoreMana(manaEffect);
+        mana = manaEffect;
+      }
+      if (sanityEffect) {
+        root.playerState?.restoreSanity(sanityEffect);
+        sanity = sanityEffect;
+      }
+    }
+    return {
+      message: outcome.message,
+      health,
+      sanity,
+      mana,
+      drops: drops.length > 0 ? drops : undefined,
+      gold,
+      enemies: enemies.length > 0 ? enemies : undefined,
+    };
+  }
+
+  public setParent(level: DungeonLevel) {
+    this.parentLevel = level;
+  }
+
+  static fromJSON(json: any) {
+    return new SpecialEncounter({
+      name: json.name,
+      scaler: json.scaler,
+      countChances: json.countChances,
+    });
   }
 }

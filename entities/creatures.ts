@@ -877,8 +877,8 @@ export class Enemy extends Creature {
 
     // Process enemy-specific drops
     this.drops.forEach((drop) => {
-      const roll = rollD20();
-      if (roll >= 20 - drop.chance * 20) {
+      const roll = Math.random();
+      if (roll >= 1 - drop.chance) {
         const items = itemList(drop.itemType, player.playerClass);
         const itemObj = items.find((item) => item.name === drop.item);
         if (itemObj) {
@@ -1156,7 +1156,7 @@ export class Minion extends Creature {
   }
 }
 
-function itemList(
+export function itemList(
   itemType: ItemClassType,
   playerClass: PlayerClassOptions,
 ): {

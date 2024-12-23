@@ -5,6 +5,7 @@ import { useColorScheme } from "nativewind";
 import { TILE_SIZE } from "../../stores/DungeonStore";
 import { observer } from "mobx-react-lite";
 import { useRootStore } from "../../hooks/stores";
+import { SpecialEncounter } from "../../entities/dungeon";
 /**
  * Represents a tile in the dungeon map.
  * @property {number} x - The x-coordinate of the tile.
@@ -17,6 +18,7 @@ export interface Tile {
   y: number;
   clearedRoom: boolean;
   isBossRoom: boolean;
+  hasSpecialEncounter?: SpecialEncounter;
 }
 
 /**
@@ -53,6 +55,10 @@ export interface generateTilesProps {
   numTiles: number;
   tileSize: number;
   bossDefeated: boolean;
+  specials: {
+    count: number;
+    specialEncounter: SpecialEncounter;
+  }[];
 }
 
 /**
@@ -64,6 +70,7 @@ export const generateTiles = ({
   numTiles = 10,
   tileSize = 60,
   bossDefeated = false,
+  specials = [],
 }: generateTilesProps): Tile[] => {
   const tiles: Tile[] = [];
   const directions = Object.values(directionsMapping);
