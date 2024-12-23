@@ -5,12 +5,11 @@ import {
   getSexFromName,
   getStartingBaseStats,
   createParent,
-  createPlayerCharacter,
 } from "../characterAid";
 import { flipCoin, getRandomName, getRandomPersonality } from "../misc";
-import { PlayerClassOptions, Element } from "../../types";
+import { PlayerClassOptions } from "../../types";
 import { RootStore } from "../../../stores/RootStore";
-import { Character, PlayerCharacter } from "../../../entities/character";
+import { Character } from "../../../entities/character";
 import { TimeStore } from "../../../stores/TimeStore";
 
 // Mock dependencies

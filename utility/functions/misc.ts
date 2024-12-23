@@ -394,14 +394,8 @@ export function checkReleasePosition({
   runOnSuccess: (args: any) => void;
   handleSnapBack: () => void;
 }) {
-  //console.log(`Dropping at (x:${position.x}, y:${position.y}`);
   for (const bound of bounds) {
     if (bound.bounds) {
-      //console.log(
-      //`Checking(${bound.key}) between (x:${bound.bounds.x} - ${
-      //bound.bounds.x + bound.bounds.width
-      //}, y: ${bound.bounds.y} - ${bound.bounds.y + bound.bounds.height})`,
-      //);
       const isWidthAligned =
         position.x > bound.bounds.x &&
         position.x < bound.bounds.x + bound.bounds.width;

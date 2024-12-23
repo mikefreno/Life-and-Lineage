@@ -159,12 +159,17 @@ export const generateTiles = ({
 
   specials.forEach(({ count, specialEncounter }) => {
     const availableTiles = tiles.filter(
-      (tile) => !tile.isBossRoom && !tile.specialEncounter,
+      (tile) => !tile.isBossRoom && !tile.specialEncounter && tile !== tiles[0],
     );
 
-    for (let i = 0; i < count && availableTiles.length > 0; i++) {
+    for (let i = 0; i < count; i++) {
+      if (availableTiles.length === 0) break;
+
       const randomIndex = Math.floor(Math.random() * availableTiles.length);
-      availableTiles[randomIndex].specialEncounter = specialEncounter;
+      const chosenTile = availableTiles[randomIndex];
+      chosenTile.specialEncounter = specialEncounter;
+
+      // Remove the chosen tile from available tiles
       availableTiles.splice(randomIndex, 1);
     }
   });

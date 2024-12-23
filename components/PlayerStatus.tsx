@@ -513,7 +513,7 @@ const PlayerStatus = observer(
                   <GenericStrikeAround>Equipment Stats</GenericStrikeAround>
                   <View
                     className="flex-row mt-2"
-                    style={{ maxHeight: uiStore.dimensions.height * 0.3 }}
+                    style={{ height: uiStore.dimensions.height * 0.3 }}
                   >
                     <View className="flex-1 mr-1">
                       <Text className="text-center font-bold mb-1">

@@ -86,7 +86,7 @@ export default function SetName() {
               <TextInput
                 className="rounded border border-zinc-800 pl-2 text-black dark:border-zinc-100 dark:text-zinc-50"
                 onChangeText={(text) => {
-                  setLastName(text.replace(/^\s+/, ""));
+                  setLastName(text);
                 }}
                 placeholderTextColor={
                   colorScheme == "light" ? "#d4d4d8" : "#71717a"

@@ -289,8 +289,6 @@ describe("Spell", () => {
         user: mockPlayer,
       });
 
-      console.log("Use result:", result);
-
       expect(mockPlayer.useMana).toHaveBeenCalledWith(10);
       expect(mockEnemy.damageHealth).toHaveBeenCalled();
       expect(mockEnemy.damageSanity).toHaveBeenCalledWith(10);

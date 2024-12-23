@@ -12,8 +12,14 @@ export class SaveStore {
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
-    this.initializeDatabase();
-    this.hydrateCurrentGameId;
+    this.hydrateCurrentGameId();
+    (async () => {
+      try {
+        await this.initializeDatabase();
+      } catch (error) {
+        console.error("Error in SaveStore constructor:", error);
+      }
+    })();
 
     makeObservable(this, {
       db: observable,
@@ -500,7 +506,6 @@ export class SaveStore {
         return true;
       }
     } catch (error) {
-      console.log("Error during ", loading);
       console.error("Error loading remote checkpoint:", error);
     }
   };

@@ -31,6 +31,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { LinearGradientBlur } from "../components/LinearGradientBlur";
 import { useColorScheme } from "nativewind";
 import { Parallax } from "../components/DungeonComponents/Parallax";
+import { Image } from "expo-image";
 
 const DungeonLevelScreen = observer(() => {
   const { enemyStore, dungeonStore, uiStore } = useRootStore();
@@ -153,7 +154,19 @@ const DungeonLevelScreen = observer(() => {
           boundingBox={dungeonStore.currentMapDimensions!}
           reduceMotion={uiStore.reduceMotion}
         >
-          {inCombat ? <DungeonEnemyDisplay /> : <DungeonMapRender />}
+          {dungeonStore.currentSpecialEncounter ? (
+            <View className="flex-1">
+              <Image
+                source={dungeonStore.currentSpecialEncounter.imageToShow}
+                style={{ width: 200, height: 200 }}
+                contentFit="contain"
+              />
+            </View>
+          ) : inCombat ? (
+            <DungeonEnemyDisplay />
+          ) : (
+            <DungeonMapRender />
+          )}
           <View className="flex-1">
             <LinearGradientBlur className="absolute" />
             {inCombat && <View></View>}

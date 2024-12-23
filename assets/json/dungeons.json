@@ -31,7 +31,7 @@
       {
         "item": "stick",
         "itemType": "melee",
-        "chance": 1.0
+        "chance": 0.05
       }
     ],
     "levels": [
