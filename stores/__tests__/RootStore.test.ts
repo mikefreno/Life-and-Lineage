@@ -4,7 +4,11 @@ import { Element, PlayerClassOptions } from "../../utility/types";
 import { RootStore } from "../RootStore";
 
 jest.mock("expo-sqlite", () => ({
-  openDatabaseAsync: jest.fn().mockResolvedValue({
+  openDatabase: jest.fn().mockReturnValue({
+    transaction: jest.fn(),
+    exec: jest.fn(),
+    run: jest.fn(),
+    runAsync: jest.fn().mockResolvedValue({ insertId: 1 }), // Add this line
     execAsync: jest.fn().mockResolvedValue(null),
   }),
 }));

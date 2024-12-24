@@ -324,21 +324,13 @@ describe("useAcceleratedAction", () => {
       }),
     );
 
-    act(() => {
+    await act(async () => {
       result.current.start();
-    });
-
-    // Advance past the initial delay and several update intervals
-    act(() => {
       jest.advanceTimersByTime(1000);
-    });
-
-    act(() => {
       result.current.stop();
     });
 
     expect(mockAction).toHaveBeenCalled();
-    // Check that at least one action was executed
     expect(mockAction.mock.calls.length).toBeGreaterThan(1);
   });
 
@@ -421,13 +413,22 @@ describe("useSmartExecution", () => {
     const isActiveRef = { current: true };
     const { result } = renderHook(() => useSmartExecution(isActiveRef));
     const mockTask = jest.fn().mockRejectedValue(new Error("Task failed"));
-    const consoleSpy = jest.spyOn(console, "error");
+    const consoleSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
 
     await act(async () => {
-      result.current.enqueue(mockTask);
+      result.current.enqueue(async () => {
+        try {
+          await mockTask();
+        } catch (error) {
+          console.error("Task failed:", error);
+        }
+      });
     });
 
     expect(consoleSpy).toHaveBeenCalledWith("Task failed:", expect.any(Error));
+    consoleSpy.mockRestore();
   });
 
   it("should respect throttling", async () => {

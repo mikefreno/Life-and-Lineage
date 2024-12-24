@@ -878,7 +878,7 @@ export class Enemy extends Creature {
     // Process enemy-specific drops
     this.drops.forEach((drop) => {
       const roll = Math.random();
-      if (roll >= 1 - drop.chance) {
+      if (roll > 1 - drop.chance) {
         const items = itemList(drop.itemType, player.playerClass);
         const itemObj = items.find((item) => item.name === drop.item);
         if (itemObj) {
@@ -898,8 +898,8 @@ export class Enemy extends Creature {
     const currentInstance = this.enemyStore?.root.dungeonStore.currentInstance;
     if (currentInstance?.instanceDrops) {
       currentInstance.instanceDrops.forEach((drop) => {
-        const roll = rollD20();
-        if (roll >= 20 - drop.chance * 20) {
+        const roll = Math.random();
+        if (roll > 1 - drop.chance) {
           const items = itemList(drop.itemType, player.playerClass);
           const itemObj = items.find((item) => item.name === drop.item);
           if (itemObj) {
@@ -920,8 +920,8 @@ export class Enemy extends Creature {
     const currentLevel = this.enemyStore?.root.dungeonStore.currentLevel;
     if (currentLevel?.levelDrops) {
       currentLevel.levelDrops.forEach((drop) => {
-        const roll = rollD20();
-        if (roll >= 20 - drop.chance * 20) {
+        const roll = Math.random();
+        if (roll > 1 - drop.chance) {
           const items = itemList(drop.itemType, player.playerClass);
           const itemObj = items.find((item) => item.name === drop.item);
           if (itemObj) {

@@ -89,6 +89,7 @@ export class DungeonStore {
       currentLevel: observable,
       currentInstance: observable,
       currentSpecialEncounter: observable,
+      setCurrentSpecialEncounter: action,
       fightingBoss: observable,
       logs: observable,
       movementQueued: observable,

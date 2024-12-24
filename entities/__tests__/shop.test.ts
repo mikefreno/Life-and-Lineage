@@ -5,7 +5,30 @@ import { Personality } from "../../utility/types";
 
 // Mock dependencies
 jest.mock("../character");
-jest.mock("../item");
+jest.mock("../item", () => {
+  const mockIsStackable = jest.fn((type) => {
+    const stackableTypes = ["consumable", "ingredient", "scroll", "ammunition"];
+    return stackableTypes.includes(type.toLowerCase());
+  });
+
+  const MockItem = jest.fn().mockImplementation((props) => ({
+    id: props.id || Math.random().toString(),
+    ...props,
+    equals: jest.fn((other) => other.id === props.id),
+    toJSON: jest.fn(() => ({ ...props })),
+    getSellPrice: jest.fn().mockReturnValue(100),
+  }));
+
+  // Add static fromJSON method
+  // @ts-ignore
+  MockItem.fromJSON = jest.fn((json) => new MockItem(json));
+
+  return {
+    Item: MockItem,
+    isStackable: mockIsStackable,
+  };
+});
+
 jest.mock("../../assets/json/shopLines.json", () => ({
   wise: {
     neutral: ["The winds whisper of your arrival."],
@@ -116,9 +139,9 @@ describe("Shop", () => {
 
   describe("refreshInventory", () => {
     it("should refresh inventory and reset gold", () => {
-      shop.addGold(-500); // Use action instead of direct assignment
+      shop.addGold(-500);
       const mockItem = new Item({} as any);
-      shop.baseInventory.push(mockItem); // Use push instead of reassignment
+      shop.baseInventory.push(mockItem);
 
       shop.refreshInventory();
 
@@ -185,7 +208,6 @@ describe("Shop", () => {
   describe("sellItem", () => {
     it("should sell a single item", () => {
       const mockItem = new Item({
-        // ... item properties
         equals: jest.fn().mockImplementation(function (
           this: Item,
           otherItem: Item,
@@ -226,30 +248,26 @@ describe("Shop", () => {
       mockRootStore.playerState.addGold.mockClear();
       mockRootStore.playerState.baseInventory = [];
 
-      // Create unique items for each test
       mockItems = Array(20)
         .fill(null)
         .map((_, index) => {
           const item = new Item({
             id: `item-${index}`,
-            getSellPrice: jest.fn().mockReturnValue(100),
-            equals: jest.fn().mockImplementation(function (
-              this: Item,
-              otherItem: Item,
-            ) {
-              return this.id === otherItem.id;
-            }),
           } as any);
+
+          item.getSellPrice = jest.fn().mockReturnValue(100);
+
           mockRootStore.playerState.baseInventory.push(item);
           return item;
         });
     });
 
     it("should purchase as many items as shop can afford", () => {
-      shop.currentGold = 1500; // Shop can afford 15 items
+      shop.setGold(1500);
 
       const purchasedCount = shop.purchaseStack(mockItems);
 
+      expect(shop.baseInventory.length).toBe(15);
       expect(purchasedCount).toBe(15);
       expect(shop.currentGold).toBe(0);
       expect(mockRootStore.playerState.addGold).toHaveBeenCalledWith(1500);
@@ -261,16 +279,12 @@ describe("Shop", () => {
       const mockItems = [
         new Item({
           id: "test-item-1",
-          getSellPrice: jest.fn().mockReturnValue(itemPrice),
-          equals: jest.fn(),
         } as any),
       ];
 
-      // Add the item to player's inventory
       mockRootStore.playerState.baseInventory = [...mockItems];
 
-      // Ensure shop has enough gold
-      shop.currentGold = itemPrice * 2;
+      shop.setGold(itemPrice * 2);
 
       shop.purchaseStack(mockItems);
 

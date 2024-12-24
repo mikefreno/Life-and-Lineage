@@ -703,11 +703,13 @@ export class PlayerCharacter extends Character {
       removeSkillPoint: action,
       allocatedSkillPoints: observable,
       unAllocatedSkillPoints: observable,
+      setUnAllocatedSkillPoints: action,
 
       gold: observable,
       spendGold: action,
       addGold: action,
       readableGold: computed,
+      setGold: action,
 
       getInvestment: action,
       collectFromInvestment: action,
@@ -889,6 +891,12 @@ export class PlayerCharacter extends Character {
       this.allocatedSkillPoints[Attribute.intelligence] +
       this.allocatedSkillPoints[Attribute.dexterity]
     );
+  }
+
+  public setUnAllocatedSkillPoints(points: number) {
+    if (__DEV__) {
+      this.unAllocatedSkillPoints = points;
+    }
   }
   //----------------------------------Health----------------------------------//
   get maxHealth() {
@@ -1639,6 +1647,12 @@ export class PlayerCharacter extends Character {
   public addGold(gold: number) {
     this.gold += gold;
   }
+
+  public setGold(gold: number) {
+    if (__DEV__) {
+      this.gold = gold;
+    }
+  }
   //----------------------------------Work----------------------------------//
   public getCurrentJobAndExperience() {
     const job = this.jobs.get(this.job);
@@ -2026,7 +2040,9 @@ export class PlayerCharacter extends Character {
     }
   }
   public removeCondition(condition: Condition) {
-    this.conditions = this.conditions.filter((cond) => cond !== condition);
+    this.conditions = this.conditions.filter(
+      (cond) => cond.id !== condition.id,
+    );
   }
 
   get isStunned() {

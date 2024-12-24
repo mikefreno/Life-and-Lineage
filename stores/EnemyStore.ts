@@ -34,6 +34,8 @@ export default class EnemyStore {
       deathAnimationsCount: observable,
       incrementAttackAnimations: action,
       decrementAttackAnimations: action,
+      decrementDeathAnimations: action,
+      incrementDeathAnimations: action,
     });
   }
 

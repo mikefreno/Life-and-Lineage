@@ -155,10 +155,14 @@ const DungeonLevelScreen = observer(() => {
           reduceMotion={uiStore.reduceMotion}
         >
           {dungeonStore.currentSpecialEncounter ? (
-            <View className="flex-1">
+            <View className="flex-1 items-end px-6">
               <Image
                 source={dungeonStore.currentSpecialEncounter.imageToShow}
-                style={{ width: 200, height: 200 }}
+                style={{
+                  width: 200,
+                  height: 200,
+                  marginVertical: "auto",
+                }}
                 contentFit="contain"
               />
             </View>

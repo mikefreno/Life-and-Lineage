@@ -52,6 +52,9 @@ describe("Character Generation Functions", () => {
     // Setup mock RootStore
     mockRoot = {
       time: mockTimeStore,
+      characterStore: {
+        addCharacter: jest.fn(),
+      },
     } as unknown as jest.Mocked<RootStore>;
 
     // Setup default mock returns

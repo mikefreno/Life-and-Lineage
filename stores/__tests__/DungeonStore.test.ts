@@ -2,15 +2,34 @@ import { DungeonInstance, DungeonLevel } from "../../entities/dungeon";
 import { DungeonStore, TILE_SIZE } from "../DungeonStore";
 import { RootStore } from "../RootStore";
 
+jest.mock("../SaveStore", () => ({
+  SaveStore: jest.fn().mockImplementation(() => ({
+    createCheckpoint: jest.fn(),
+  })),
+}));
+
+// Mock other necessary stores
+jest.mock("../EnemyStore", () => ({
+  EnemyStore: jest.fn().mockImplementation(() => ({
+    clearEnemyList: jest.fn(),
+    addToEnemyList: jest.fn(),
+  })),
+}));
+
 describe("DungeonStore", () => {
   let dungeonStore: DungeonStore;
   let mockRootStore: RootStore;
 
   beforeEach(() => {
     mockRootStore = {
-      enemyStore: { clearEnemyList: jest.fn() },
-      createCheckpoint: jest.fn(),
-    } as unknown as RootStore;
+      saveStore: {
+        createCheckpoint: jest.fn(),
+      },
+      enemyStore: {
+        clearEnemyList: jest.fn(),
+        addToEnemyList: jest.fn(),
+      },
+    };
     dungeonStore = new DungeonStore({ root: mockRootStore });
   });
 

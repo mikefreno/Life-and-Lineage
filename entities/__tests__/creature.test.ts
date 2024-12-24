@@ -388,24 +388,78 @@ describe("Enemy Class", () => {
     });
 
     test("Enemy handles drop chance calculations correctly", () => {
-      const rollD20 = require("../../utility/functions/misc").rollD20;
+      const iterations = 50000;
+      const enemyDropChance = 0.1;
+      const instanceDropChance = 0.1;
+      const levelDropChance = 0.1;
 
-      // Mock rollD20 for specific cases
-      rollD20
-        .mockReturnValueOnce(20) // Success for enemy drop
-        .mockReturnValueOnce(1) // Fail for instance drop
-        .mockReturnValueOnce(1); // Fail for level drop
-
-      mockDungeonStore.currentInstance.instanceDrops[0].chance = 0.1; // 10% chance
-      mockDungeonStore.currentLevel.levelDrops[0].chance = 0.1; // 10% chance
+      // Set up drop chances
+      enemy.drops = [
+        {
+          item: "patch of fur",
+          chance: enemyDropChance,
+          itemType: ItemClassType.Junk,
+        },
+      ];
+      mockDungeonStore.currentInstance.instanceDrops = [
+        {
+          item: "vampiric tooth",
+          chance: instanceDropChance,
+          itemType: ItemClassType.Junk,
+        },
+      ];
+      mockDungeonStore.currentLevel.levelDrops = [
+        {
+          item: "chunk of flesh",
+          chance: levelDropChance,
+          itemType: ItemClassType.Junk,
+        },
+      ];
 
       const mockPlayer = { playerClass: "mage" } as PlayerCharacter;
-      const drops = enemy.getDrops(mockPlayer, false);
 
-      expect(drops.itemDrops.length).toBe(1);
-      expect(drops.itemDrops).toContainEqual(
-        expect.objectContaining({ name: "patch of fur" }),
-      );
+      let enemyDropCount = 0;
+      let instanceDropCount = 0;
+      let levelDropCount = 0;
+
+      for (let i = 0; i < iterations; i++) {
+        const drops = enemy.getDrops(mockPlayer, false);
+
+        // Reset gotDrops flag for next iteration
+        enemy.gotDrops = false;
+
+        enemyDropCount += drops.itemDrops.filter(
+          (item) => item.name === "patch of fur",
+        ).length;
+        instanceDropCount += drops.itemDrops.filter(
+          (item) => item.name === "vampiric tooth",
+        ).length;
+        levelDropCount += drops.itemDrops.filter(
+          (item) => item.name === "chunk of flesh",
+        ).length;
+
+        if (i === 0) {
+          console.log("First iteration drops:", drops.itemDrops);
+        }
+      }
+
+      const enemyDropRate = enemyDropCount / iterations;
+      const instanceDropRate = instanceDropCount / iterations;
+      const levelDropRate = levelDropCount / iterations;
+
+      console.log("Drop rates:", {
+        enemyDropRate,
+        instanceDropRate,
+        levelDropRate,
+        enemyDropCount,
+        instanceDropCount,
+        levelDropCount,
+      });
+
+      // Use toBeCloseTo for floating point comparison
+      expect(enemyDropRate).toBeCloseTo(enemyDropChance, 2);
+      expect(instanceDropRate).toBeCloseTo(instanceDropChance, 2);
+      expect(levelDropRate).toBeCloseTo(levelDropChance, 2);
     });
   });
 });

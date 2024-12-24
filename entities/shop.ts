@@ -73,6 +73,7 @@ export class Shop {
       createGreeting: computed,
       purchaseStack: action,
       addGold: action,
+      setGold: action,
     });
 
     reaction(
@@ -85,6 +86,12 @@ export class Shop {
 
   public addGold(amount: number) {
     this.currentGold += amount;
+  }
+
+  public setGold(amount: number) {
+    if (__DEV__) {
+      this.currentGold = amount;
+    }
   }
 
   public deathCheck() {
@@ -210,7 +217,7 @@ export class Shop {
     for (const item of items) {
       const itemPrice = item.getSellPrice(this.shopKeeper.affection);
       if (this.currentGold >= itemPrice) {
-        this.buyItem(item, itemPrice);
+        this.currentGold -= itemPrice;
         totalPrice += itemPrice;
         successfullySoldItems.push(item);
       } else {
@@ -228,6 +235,7 @@ export class Shop {
         if (index !== -1) {
           playerState.baseInventory.splice(index, 1);
         }
+        this.baseInventory.push(item);
       });
 
       const baseChange = totalPrice / 500;
