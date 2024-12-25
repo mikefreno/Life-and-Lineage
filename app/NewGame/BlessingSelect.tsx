@@ -21,6 +21,7 @@ import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
 import GenericFlatLink from "../../components/GenericLink";
+import { FadeSlide } from "../../components/AnimatedWrappers";
 
 export default function SetBlessing() {
   const { classSelection, blessingSelection, setBlessingSelection } =
@@ -75,40 +76,41 @@ export default function SetBlessing() {
           <Text className="text-center md:text-lg px-4">
             {DescriptionMap[blessingSelection as Element]}
           </Text>
-          {blessingSelection == 0 || blessingSelection ? ( // sometimes I really hate ts. Evaluation of 0 is false.
-            <View className="mx-auto h-32 py-2">
-              <GenericFlatLink
-                href={"./SexSelect"}
-                accessibilityRole="link"
-                accessibilityLabel="Next"
-              >
-                <Text>Next</Text>
-              </GenericFlatLink>
-            </View>
-          ) : (
-            <View className="h-32"></View>
-          )}
+          <View className="mx-auto h-32 py-2">
+            <FadeSlide show={blessingSelection == 0 || !!blessingSelection}>
+              {({ showing }) => (
+                <GenericFlatLink
+                  href={"./SexSelect"}
+                  accessibilityRole="link"
+                  accessibilityLabel="Next"
+                  disabled={!showing}
+                >
+                  <Text>Next</Text>
+                </GenericFlatLink>
+              )}
+            </FadeSlide>
+          </View>
         </>
       </View>
-      {tutorialStore.tutorialsEnabled ||
-        (!playerState && (
-          <View className="absolute ml-4 mt-4">
-            <Pressable
-              className="absolute z-top"
-              onPress={() => {
-                setForceShowTutorial(true);
-              }}
-              accessibilityRole="button"
-              accessibilityLabel="Show Tutorial"
-            >
-              <FontAwesome5
-                name="question-circle"
-                size={32}
-                color={colorScheme == "light" ? "#27272a" : "#fafafa"}
-              />
-            </Pressable>
-          </View>
-        ))}
+
+      {(tutorialStore.tutorialsEnabled || !playerState) && (
+        <View className="absolute ml-4 mt-4">
+          <Pressable
+            className="absolute z-top"
+            onPress={() => {
+              setForceShowTutorial(true);
+            }}
+            accessibilityRole="button"
+            accessibilityLabel="Show Tutorial"
+          >
+            <FontAwesome5
+              name="question-circle"
+              size={32}
+              color={colorScheme == "light" ? "#27272a" : "#fafafa"}
+            />
+          </Pressable>
+        </View>
+      )}
     </>
   );
 }

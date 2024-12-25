@@ -13,6 +13,7 @@ import { toTitleCase } from "../../utility/functions/misc";
 import { FontAwesome5, Foundation } from "@expo/vector-icons";
 import { useNewGameStore } from "./_layout";
 import GenericFlatLink from "../../components/GenericLink";
+import { FadeSlide } from "../../components/AnimatedWrappers";
 
 export default function SetSex() {
   const { colorScheme } = useColorScheme();
@@ -109,17 +110,20 @@ export default function SetSex() {
             )}
           </Pressable>
         </View>
-        {sex ? (
-          <View className="mx-auto mt-8">
-            <GenericFlatLink
-              href="./NameSelect"
-              accessibilityRole="link"
-              accessibilityLabel="Next"
-            >
-              <Text>Next</Text>
-            </GenericFlatLink>
-          </View>
-        ) : null}
+        <View className="mx-auto mt-8">
+          <FadeSlide show={!!sex}>
+            {({ showing }) => (
+              <GenericFlatLink
+                disabled={!showing}
+                href="./NameSelect"
+                accessibilityRole="link"
+                accessibilityLabel="Next"
+              >
+                <Text>Next</Text>
+              </GenericFlatLink>
+            )}
+          </FadeSlide>
+        </View>
       </View>
       {(tutorialStore.tutorialsEnabled || !playerState) && (
         <View className="absolute ml-4 mt-4">

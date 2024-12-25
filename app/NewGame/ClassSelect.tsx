@@ -21,6 +21,7 @@ import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
 import GenericFlatLink from "../../components/GenericLink";
+import { FadeSlide } from "../../components/AnimatedWrappers";
 
 const SetClassScreen = observer(() => {
   const vibration = useVibration();
@@ -242,17 +243,20 @@ const SetClassScreen = observer(() => {
         <Text className="mt-[2vh] h-16 text-center md:text-lg">
           {classSelection && ClassDescriptionMap[classSelection]}
         </Text>
-        {classSelection && (
-          <View className="mx-auto py-4 pb-[10vh]">
-            <GenericFlatLink
-              href="./BlessingSelect"
-              accessibilityRole="link"
-              accessibilityLabel="Next"
-            >
-              <Text>Next</Text>
-            </GenericFlatLink>
-          </View>
-        )}
+        <View className="mx-auto pt-4 pb-[10vh]">
+          <FadeSlide show={!!classSelection}>
+            {({ showing }) => (
+              <GenericFlatLink
+                disabled={!showing}
+                href="./BlessingSelect"
+                accessibilityRole="link"
+                accessibilityLabel="Next"
+              >
+                <Text>Next</Text>
+              </GenericFlatLink>
+            )}
+          </FadeSlide>
+        </View>
       </View>
       {(tutorialStore.tutorialsEnabled || !playerState) && (
         <View className="absolute ml-4 mt-4">

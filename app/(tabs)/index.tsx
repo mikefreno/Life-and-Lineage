@@ -29,7 +29,6 @@ import { StashDisplay } from "../../components/StashDisplay";
 const HomeScreen = observer(() => {
   const { colorScheme } = useColorScheme();
   const { playerState, uiStore, stashStore } = useRootStore();
-  const { dimensions, playerStatusIsCompact } = uiStore;
   const { draggableClassStore } = useDraggableStore();
   const [showStash, setShowStash] = useState(false);
   const stashButtonRef = useRef(null);
@@ -46,7 +45,10 @@ const HomeScreen = observer(() => {
   const clearDisplayItem = useCallback(() => setDisplayItem(null), []);
 
   const playerIcon = useMemo(() => {
-    const iconSize = dimensions.height / 9 > 100 ? 100 : dimensions.height / 10;
+    const iconSize =
+      uiStore.dimensions.height / 9 > 100
+        ? 100
+        : uiStore.dimensions.height / 10;
     switch (playerState?.playerClass) {
       case "necromancer":
         return (
@@ -69,7 +71,7 @@ const HomeScreen = observer(() => {
       default:
         return <RangerIcon width={iconSize} height={iconSize} />;
     }
-  }, [playerState?.playerClass, dimensions.height, colorScheme]);
+  }, [playerState?.playerClass, uiStore.dimensions.height, colorScheme]);
 
   if (!playerState) {
     return (
@@ -94,9 +96,10 @@ const HomeScreen = observer(() => {
   const layoutDimensions = useMemo(
     () => ({
       paddingTop: header,
-      paddingBottom: tabBarHeight + (playerStatusIsCompact ? 0 : EXPANDED_PAD),
+      paddingBottom:
+        tabBarHeight + (uiStore.playerStatusIsCompact ? 0 : EXPANDED_PAD),
     }),
-    [header, tabBarHeight, playerStatusIsCompact],
+    [header, tabBarHeight, uiStore.playerStatusIsCompact],
   );
 
   useEffect(() => {
@@ -143,7 +146,9 @@ const HomeScreen = observer(() => {
                   blessing={playerState.blessing}
                   colorScheme={colorScheme}
                   size={
-                    dimensions.height / 9 > 100 ? 100 : dimensions.height / 10
+                    uiStore.dimensions.height / 9 > 100
+                      ? 100
+                      : uiStore.dimensions.height / 10
                   }
                 />
               </View>

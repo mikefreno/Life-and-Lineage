@@ -135,10 +135,12 @@ type NecromancerCharacter = PlayerCharacterBase & {
     | Element.bone
     | Element.pestilence;
 };
+
 type PaladinCharacter = PlayerCharacterBase & {
   playerClass: "paladin" | PlayerClassOptions.paladin;
   blessing: Element.holy | Element.vengeance | Element.protection;
 };
+
 type RangerCharacter = PlayerCharacterBase & {
   playerClass: "ranger" | PlayerClassOptions.ranger;
   blessing: Element.assassination | Element.beastMastery | Element.arcane;

@@ -13,6 +13,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { playerClassColors } from "../../constants/Colors";
 import { useNewGameStore } from "./_layout";
 import { useRootStore } from "../../hooks/stores";
+import { FadeSlide } from "../../components/AnimatedWrappers";
 import GenericFlatLink from "../../components/GenericLink";
 
 export default function SetName() {
@@ -67,6 +68,9 @@ export default function SetName() {
                 onChangeText={(text) => {
                   setFirstName(text.replace(/^\s+/, ""));
                 }}
+                onBlur={() => {
+                  setFirstName(trimWhitespace(firstName));
+                }}
                 placeholder={"Given Name (First Name)"}
                 value={firstName}
                 autoCorrect={false}
@@ -86,7 +90,10 @@ export default function SetName() {
               <TextInput
                 className="rounded border border-zinc-800 pl-2 text-black dark:border-zinc-100 dark:text-zinc-50"
                 onChangeText={(text) => {
-                  setLastName(text);
+                  setLastName(text.replace(/^\s+/, ""));
+                }}
+                onBlur={() => {
+                  setLastName(trimWhitespace(lastName));
                 }}
                 placeholderTextColor={
                   colorScheme == "light" ? "#d4d4d8" : "#71717a"
@@ -108,22 +115,25 @@ export default function SetName() {
               />
               <Text className="pl-1 pt-1 pb-2">Maximum Length: 16</Text>
               <View>
-                {firstName.trimEnd().length > 0 &&
-                lastName.trimEnd().length > 0 ? (
-                  <View className="mx-auto">
-                    <GenericFlatLink
-                      onPress={() => {
-                        setFirstName(trimWhitespace(firstName));
-                        setLastName(trimWhitespace(lastName));
-                      }}
-                      href="./Review"
-                      accessibilityRole="link"
-                      accessibilityLabel="Next"
-                    >
-                      <Text>Next</Text>
-                    </GenericFlatLink>
-                  </View>
-                ) : null}
+                <View className="mx-auto">
+                  <FadeSlide
+                    show={
+                      firstName.trimEnd().length > 0 &&
+                      lastName.trimEnd().length > 0
+                    }
+                  >
+                    {({ showing }) => (
+                      <GenericFlatLink
+                        disabled={!showing}
+                        href="./Review"
+                        accessibilityRole="link"
+                        accessibilityLabel="Next"
+                      >
+                        <Text>Next</Text>
+                      </GenericFlatLink>
+                    )}
+                  </FadeSlide>
+                </View>
               </View>
             </View>
           </KeyboardAvoidingView>

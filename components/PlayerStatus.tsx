@@ -7,7 +7,7 @@ import {
   View,
   Platform,
 } from "react-native";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { toTitleCase, AccelerationCurves } from "../utility/functions/misc";
 import GenericModal from "./GenericModal";
@@ -93,6 +93,12 @@ const PlayerStatus = observer(
     const [showingHealthWarningPulse, setShowingHealthWarningPulse] =
       useState<boolean>(false);
     const healthWarningAnimatedValue = useState(new Animated.Value(0))[0];
+    const [ownedOffensive, setOwnedOffensive] = useState<Map<Modifier, number>>(
+      new Map(),
+    );
+    const [ownedDefensive, setOwnedDefensive] = useState<Map<Modifier, number>>(
+      new Map(),
+    );
     const [respeccing, setRespeccing] = useState<boolean>(false);
 
     const vibration = useVibration();
@@ -146,6 +152,8 @@ const PlayerStatus = observer(
     }, [pathname, showingHealthWarningPulse]);
 
     useEffect(() => {
+      let animationLoop: Animated.CompositeAnimation | null = null;
+
       if (
         playerState &&
         playerState.currentHealth / playerState.maxHealth <=
@@ -153,13 +161,71 @@ const PlayerStatus = observer(
       ) {
         if (!showingHealthWarningPulse) {
           setShowingHealthWarningPulse(true);
+
+          animationLoop = Animated.loop(
+            Animated.sequence([
+              Animated.timing(healthWarningAnimatedValue, {
+                toValue: 1,
+                duration: 1000,
+                useNativeDriver: true,
+              }),
+              Animated.timing(healthWarningAnimatedValue, {
+                toValue: 0,
+                duration: 1000,
+                useNativeDriver: true,
+              }),
+            ]),
+            {
+              iterations: -1,
+            },
+          );
+
+          animationLoop.start();
         }
-      } else {
-        if (showingHealthWarningPulse) {
-          setShowingHealthWarningPulse(false);
-        }
+      } else if (showingHealthWarningPulse) {
+        setShowingHealthWarningPulse(false);
       }
-    }, [playerState?.currentHealth, uiStore.healthWarning]);
+
+      // Cleanup
+      return () => {
+        if (animationLoop) {
+          animationLoop.stop();
+        }
+      };
+    }, [
+      playerState?.currentHealth,
+      playerState?.maxHealth,
+      uiStore.healthWarning,
+      showingHealthWarningPulse,
+    ]);
+
+    const prevEquipmentRef = useRef<string>("");
+
+    useEffect(() => {
+      if (!playerState?.equipmentStats) return;
+
+      const currentEquipment = JSON.stringify(
+        Array.from(playerState.equipmentStats.entries()),
+      );
+      if (currentEquipment === prevEquipmentRef.current) return;
+
+      prevEquipmentRef.current = currentEquipment;
+
+      const offensive = new Map(
+        Array.from(playerState.equipmentStats.entries()).filter(
+          ([key, value]) => OFFENSIVE_STATS.includes(key) && value > 0,
+        ),
+      );
+
+      const defensive = new Map(
+        Array.from(playerState.equipmentStats.entries()).filter(
+          ([key, value]) => DEFENSIVE_STATS.includes(key) && value > 0,
+        ),
+      );
+
+      setOwnedOffensive(offensive);
+      setOwnedDefensive(defensive);
+    }, [playerState?.equipmentStats]);
 
     function conditionRenderer() {
       if (playerState) {
@@ -356,18 +422,11 @@ const PlayerStatus = observer(
     const StatCategory = ({
       category,
       stats,
-      equipmentStats,
     }: {
       category: "offensive" | "defensive";
-      stats: Modifier[];
-      equipmentStats: Map<Modifier, number>;
+      stats: Map<Modifier, number>;
     }) => {
-      const hasStats = stats.some((modifier) => {
-        const value = equipmentStats.get(modifier);
-        return value && value > 0;
-      });
-
-      if (!hasStats) {
+      if (!stats.size || stats.size == 0) {
         return (
           <View className="flex-1 justify-center items-center">
             <Text className="text-center text-gray-500 italic">
@@ -379,8 +438,7 @@ const PlayerStatus = observer(
 
       return (
         <ScrollView className="flex-1">
-          {stats.map((modifier) => {
-            const value = equipmentStats.get(modifier);
+          {Array.from(stats).map(([modifier, value]) => {
             if (!value || value <= 0) {
               return null;
             }
@@ -392,6 +450,9 @@ const PlayerStatus = observer(
         </ScrollView>
       );
     };
+    if (!playerState) {
+      return;
+    }
 
     if (playerState) {
       const preprop = !(uiStore.playerStatusIsCompact && home)
@@ -513,25 +574,28 @@ const PlayerStatus = observer(
                   <GenericStrikeAround>Equipment Stats</GenericStrikeAround>
                   <View
                     className="flex-row mt-2"
-                    style={{ height: uiStore.dimensions.height * 0.3 }}
+                    style={{
+                      height: Math.min(
+                        uiStore.dimensions.height * 0.3,
+                        Math.max(ownedOffensive.size, ownedDefensive.size) * 64,
+                      ),
+                    }}
                   >
-                    <View className="flex-1 mr-1">
+                    <View className="w-1/2 mr-1">
                       <Text className="text-center font-bold mb-1">
                         Offensive
                       </Text>
                       <StatCategory
-                        stats={OFFENSIVE_STATS}
-                        equipmentStats={playerState.equipmentStats}
+                        stats={ownedOffensive}
                         category={"offensive"}
                       />
                     </View>
-                    <View className="flex-1 ml-1">
+                    <View className="w-1/2 ml-1">
                       <Text className="text-center font-bold mb-1">
                         Defensive
                       </Text>
                       <StatCategory
-                        stats={DEFENSIVE_STATS}
-                        equipmentStats={playerState.equipmentStats}
+                        stats={ownedDefensive}
                         category={"defensive"}
                       />
                     </View>

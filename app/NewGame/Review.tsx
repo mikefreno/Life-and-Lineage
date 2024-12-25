@@ -10,6 +10,7 @@ import GenericFlatButton from "../../components/GenericFlatButton";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
+import { FadeSlide } from "../../components/AnimatedWrappers";
 
 export default function NewGameReview() {
   const { firstName, lastName, blessingSelection, sex, classSelection } =
@@ -63,14 +64,16 @@ export default function NewGameReview() {
             style={{ color: playerClassColors[classSelection] }}
           >{`${toTitleCase(classSelection)}`}</Text>
         </Text>
-        <GenericFlatButton
-          onPress={startGame}
-          className="mt-4"
-          accessibilityRole="button"
-          accessibilityLabel="Confirm"
-        >
-          Confirm?
-        </GenericFlatButton>
+        <FadeSlide>
+          <GenericFlatButton
+            onPress={startGame}
+            className="mt-4"
+            accessibilityRole="button"
+            accessibilityLabel="Confirm"
+          >
+            Confirm?
+          </GenericFlatButton>
+        </FadeSlide>
       </View>
     );
   }

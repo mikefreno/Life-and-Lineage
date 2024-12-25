@@ -1,4 +1,4 @@
-import { Link, Tabs } from "expo-router";
+import { Link, Tabs, useRouter } from "expo-router";
 import {
   GestureResponderEvent,
   Platform,
@@ -43,8 +43,9 @@ export default function TabLayout() {
   const isFocused = useIsFocused();
 
   const { colorScheme } = useColorScheme();
-  const { playerState, uiStore } = useRootStore();
+  const { playerState, uiStore, dungeonStore } = useRootStore();
 
+  const router = useRouter();
   const vibration = useVibration();
 
   return (
@@ -320,18 +321,23 @@ export default function TabLayout() {
               <Dungeon width={28} height={28} color={color} />
             ),
             headerRight: () => (
-              <Link href="/DungeonLevel/training grounds/0" asChild>
-                <Pressable onPress={() => vibration({ style: "light" })}>
-                  {({ pressed }) => (
-                    <Sword
-                      width={30}
-                      height={30}
-                      color={"#BF9069"}
-                      style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                    />
-                  )}
-                </Pressable>
-              </Link>
+              <Pressable
+                onPress={async () => {
+                  await uiStore.setIsLoading(true);
+                  vibration({ style: "warning" });
+                  dungeonStore.setUpDungeon("training grounds", "1");
+                  router.replace(`/DungeonLevel`);
+                }}
+              >
+                {({ pressed }) => (
+                  <Sword
+                    width={30}
+                    height={30}
+                    color={"#BF9069"}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
             ),
           }}
         />

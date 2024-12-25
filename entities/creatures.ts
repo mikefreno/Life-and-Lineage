@@ -32,7 +32,6 @@ import { action, computed, makeObservable, observable, reaction } from "mobx";
 import summons from "../assets/json/summons.json";
 import { ItemClassType, BeingType, PlayerClassOptions } from "../utility/types";
 import {
-  rollD20,
   damageReduction,
   getRandomInt,
   toTitleCase,
