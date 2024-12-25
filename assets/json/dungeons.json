@@ -1,6 +1,7 @@
 [
   {
     "name": "training grounds",
+    "bgName": "Castle_Atrium",
     "id": 0,
     "difficulty": 0,
     "levels": [
@@ -39,13 +40,6 @@
         "level": 1,
         "tiles": 15,
         "unlocked": true,
-        "levelDrops": [
-          {
-            "item": "stick",
-            "itemType": "melee",
-            "chance": 1.0
-          }
-        ],
         "normalEncounters": [
           [
             {
@@ -98,13 +92,19 @@
         "normalEncounters": [
           [
             {
-              "name": "giant rat",
+              "name": "skeleton",
               "scaler": 1
             }
           ],
           [
             {
-              "name": "bat",
+              "name": "skeleton archer",
+              "scaler": 1
+            }
+          ],
+          [
+            {
+              "name": "ghost",
               "scaler": 1
             }
           ],
@@ -124,6 +124,40 @@
             "name": "zombie",
             "scaler": 1.25
           }
+        ],
+        "specialEncounters": [
+          {
+            "name": "camp",
+            "countChances": {
+              "1": 1.0
+            },
+            "scaler": 1
+          },
+          {
+            "name": "chest",
+            "countChances": {
+              "0": 0.1,
+              "1": 0.8,
+              "2": 0.1
+            },
+            "scaler": 1
+          },
+          {
+            "name": "ritual altar",
+            "countChances": {
+              "0": 0.5,
+              "1": 0.5
+            },
+            "scaler": 1
+          },
+          {
+            "name": "water basin",
+            "countChances": {
+              "0": 0.5,
+              "1": 0.5
+            },
+            "scaler": 1
+          }
         ]
       },
       {
@@ -132,33 +166,55 @@
         "normalEncounters": [
           [
             {
-              "name": "giant rat",
+              "name": "skeleton",
               "scaler": 1
             }
           ],
           [
             {
-              "name": "bat",
+              "name": "skeleton archer",
               "scaler": 1
             }
           ],
           [
             {
-              "name": "bat",
+              "name": "ghost",
+              "scaler": 1
+            }
+          ],
+          [
+            {
+              "name": "zombie",
+              "scaler": 1
+            }
+          ],
+          [
+            {
+              "name": "skeleton",
               "scaler": 0.75
             },
             {
-              "name": "bat",
+              "name": "skeleton",
               "scaler": 0.75
             }
           ],
           [
             {
-              "name": "giant rat",
-              "scaler": 0.5
+              "name": "skeleton",
+              "scaler": 0.75
             },
             {
-              "name": "bat",
+              "name": "skeleton archer",
+              "scaler": 0.75
+            }
+          ],
+          [
+            {
+              "name": "skeleton archer",
+              "scaler": 0.75
+            },
+            {
+              "name": "skeleton archer",
               "scaler": 0.75
             }
           ]
@@ -166,6 +222,40 @@
         "bossEncounter": [
           {
             "name": "necromancer",
+            "scaler": 1
+          }
+        ],
+        "specialEncounters": [
+          {
+            "name": "camp",
+            "countChances": {
+              "2": 1.0
+            },
+            "scaler": 1
+          },
+          {
+            "name": "chest",
+            "countChances": {
+              "0": 0.1,
+              "1": 0.8,
+              "2": 0.1
+            },
+            "scaler": 1
+          },
+          {
+            "name": "ritual altar",
+            "countChances": {
+              "0": 0.5,
+              "1": 0.5
+            },
+            "scaler": 1
+          },
+          {
+            "name": "water basin",
+            "countChances": {
+              "0": 0.5,
+              "1": 0.5
+            },
             "scaler": 1
           }
         ]
@@ -192,7 +282,7 @@
         "normalEncounters": [
           [
             {
-              "name": "giant rat",
+              "name": "goblin",
               "scaler": 1
             }
           ],

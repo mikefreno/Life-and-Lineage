@@ -814,6 +814,74 @@ export const EnemyImageMap = {
     displayHeight: 180,
     displayWidth: 180,
   },
+  goblin_2: {
+    sets: {
+      attack_1: {
+        anim: require("../assets/images/monsters/Goblin_2/ATTACK_1.png"),
+        frames: 7,
+      },
+      death: {
+        anim: require("../assets/images/monsters/Goblin_2/DEATH.png"),
+        frames: 12,
+      },
+      hurt: {
+        anim: require("../assets/images/monsters/Goblin_2/HURT.png"),
+        frames: 4,
+      },
+      idle: {
+        anim: require("../assets/images/monsters/Goblin_2/IDLE.png"),
+        frames: 4,
+      },
+      move: {
+        anim: require("../assets/images/monsters/Goblin_2/MOVE.png"),
+        frames: 8,
+      },
+      spawn: null,
+    },
+    height: 80,
+    width: 80,
+    displayHeight: 160,
+    displayWidth: 160,
+  },
+  goblin_mage: {
+    sets: {
+      attack_1: {
+        anim: require("../assets/images/monsters/Goblin_Mage/ATTACK_1.png"),
+        frames: 11,
+      },
+      attack_2: {
+        anim: require("../assets/images/monsters/Goblin_Mage/ATTACK_2.png"),
+        frames: 14,
+      },
+      death: {
+        anim: require("../assets/images/monsters/Goblin_Mage/DEATH.png"),
+        frames: 12,
+      },
+      hurt: {
+        anim: require("../assets/images/monsters/Goblin_Mage/HURT.png"),
+        frames: 4,
+      },
+      idle: {
+        anim: require("../assets/images/monsters/Goblin_Mage/IDLE.png"),
+        frames: 4,
+      },
+      move: {
+        anim: require("../assets/images/monsters/Goblin_Mage/MOVE.png"),
+        frames: 8,
+      },
+      spawn: null,
+    },
+    effects: {
+      projectile: {
+        anim: require("../assets/images/monsters/Goblin_Mage/PROJECTILE.png"),
+        frames: 9,
+      },
+    },
+    height: 80,
+    width: 80,
+    displayHeight: 160,
+    displayWidth: 160,
+  },
   golem: {
     sets: {
       attack_1: {
@@ -1932,6 +2000,73 @@ export const EnemyImageMap = {
     height: 78,
     width: 89,
   },
+  skeleton_warrior: {
+    sets: {
+      attack_1: {
+        anim: require("../assets/images/monsters/Skeleton_Warrior/ATTACK_1.png"),
+        frames: 7,
+      },
+      hurt: {
+        anim: require("../assets/images/monsters/Skeleton_Warrior/HURT.png"),
+        frames: 4,
+      },
+      death: {
+        anim: require("../assets/images/monsters/Skeleton_Warrior/DEATH.png"),
+        frames: 9,
+      },
+      idle: {
+        anim: require("../assets/images/monsters/Skeleton_Warrior/IDLE.png"),
+        frames: 4,
+      },
+      move: {
+        anim: require("../assets/images/monsters/Skeleton_Warrior/MOVE.png"),
+        frames: 8,
+      },
+      block: {
+        anim: require("../assets/images/monsters/Skeleton_Warrior/BLOCK.png"),
+        frames: 5,
+      },
+      spawn: {
+        anim: require("../assets/images/monsters/Skeleton_Warrior/SPAWN.png"),
+        frames: 9,
+      },
+    },
+    height: 80,
+    width: 110,
+  },
+  skeleton_archer: {
+    sets: {
+      attack_1: {
+        anim: require("../assets/images/monsters/Skeleton_Archer/ATTACK_1.png"),
+        frames: 9,
+      },
+      hurt: {
+        anim: require("../assets/images/monsters/Skeleton_Archer/HURT.png"),
+        frames: 4,
+      },
+      death: {
+        anim: require("../assets/images/monsters/Skeleton_Archer/DEATH.png"),
+        frames: 9,
+      },
+      idle: {
+        anim: require("../assets/images/monsters/Skeleton_Archer/IDLE.png"),
+        frames: 4,
+      },
+      move: {
+        anim: require("../assets/images/monsters/Skeleton_Archer/MOVE.png"),
+        frames: 8,
+      },
+      spawn: null,
+    },
+    effects: {
+      projectile: {
+        anim: require("../assets/images/monsters/Skeleton_Archer/PROJECTILE.png"),
+        frames: 4,
+      },
+    },
+    height: 80,
+    width: 110,
+  },
   skeleton_mage: {
     sets: {
       attack_1: {
@@ -2859,6 +2994,40 @@ export const EnemyImageMap = {
     },
     height: 64,
     width: 64,
+    mirror: true,
+    displayHeight: 190,
+    displayWidth: 190,
+  },
+  wolf_black: {
+    sets: {
+      attack_1: {
+        anim: require("../assets/images/monsters/Wolf_Black/ATTACK_1.png"),
+        frames: 7,
+      },
+      attack_2: {
+        anim: require("../assets/images/monsters/Wolf_Black/ATTACK_2.png"),
+        frames: 7,
+      },
+      hurt: {
+        anim: require("../assets/images/monsters/Wolf_Black/HURT.png"),
+        frames: 4,
+      },
+      death: {
+        anim: require("../assets/images/monsters/Wolf_Black/DEATH.png"),
+        frames: 5,
+      },
+      idle: {
+        anim: require("../assets/images/monsters/Wolf_Black/IDLE.png"),
+        frames: 6,
+      },
+      move: {
+        anim: require("../assets/images/monsters/Wolf_Black/MOVE.png"),
+        frames: 8,
+      },
+      spawn: null,
+    },
+    height: 100,
+    width: 100,
     mirror: true,
     displayHeight: 190,
     displayWidth: 190,

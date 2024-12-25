@@ -577,7 +577,9 @@ const PlayerStatus = observer(
                     style={{
                       height: Math.min(
                         uiStore.dimensions.height * 0.3,
-                        Math.max(ownedOffensive.size, ownedDefensive.size) * 64,
+                        Math.max(ownedOffensive.size, ownedDefensive.size) *
+                          70 +
+                          10,
                       ),
                     }}
                   >

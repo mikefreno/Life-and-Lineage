@@ -327,6 +327,7 @@
   },
   {
     "name": "worg",
+    "defaultSprite": "wolf_black",
     "beingType": "beast",
     "sanity": null,
     "healthRange": {
@@ -402,6 +403,7 @@
   {
     "name": "goblin shaman",
     "beingType": "demi-human",
+    "defaultSprite": "goblin_mage",
     "sanity": null,
     "healthRange": {
       "minimum": 60,
