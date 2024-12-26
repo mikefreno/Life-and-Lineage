@@ -4,6 +4,7 @@
     "slug": "life-and-lineage",
     "version": "0.7.1",
     "orientation": "portrait",
+    "newArchEnabled": true,
     "icon": "assets/images/icon.png",
     "scheme": "lineageapp",
     "userInterfaceStyle": "automatic",
@@ -94,3 +95,4 @@
     "owner": "mikefrenodev"
   }
 }
+
