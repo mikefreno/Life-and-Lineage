@@ -286,7 +286,7 @@
   },
   {
     "name": "goblin",
-    "defaultSprite": "goblin",
+    "defaultSprite": "goblin_2",
     "beingType": "demi-human",
     "sanity": null,
     "healthRange": {

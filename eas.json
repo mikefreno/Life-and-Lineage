@@ -1,6 +1,7 @@
 {
   "cli": {
-    "version": ">= 5.9.3"
+    "version": ">= 5.9.3",
+    "appVersionSource": "local"
   },
   "build": {
     "development": {
@@ -15,10 +16,22 @@
       "channel": "preview"
     },
     "production": {
-      "channel": "production"
+      "channel": "production",
+      "env": {
+        "EXPO_USE_LOCAL_NODE_MODULES": "1"
+      },
+      "cache": {
+        "key": "local-modules",
+        "paths": [
+          "node_modules/**/*"
+        ]
+      },
+      "developmentClient": false,
+      "autoIncrement": true
     }
   },
   "submit": {
     "production": {}
   }
 }
+
