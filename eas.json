@@ -17,16 +17,6 @@
     },
     "production": {
       "channel": "production",
-      "env": {
-        "EXPO_USE_LOCAL_NODE_MODULES": "1"
-      },
-      "cache": {
-        "key": "local-modules",
-        "paths": [
-          "node_modules/**/*"
-        ]
-      },
-      "developmentClient": false,
       "autoIncrement": true
     }
   },
