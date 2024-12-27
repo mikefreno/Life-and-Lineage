@@ -730,7 +730,11 @@ export class Enemy extends Creature {
     super({
       ...props,
     });
-    this.minions = minions ?? [];
+    this.minions = minions
+      ? minions.map((minion: any) =>
+          Minion.fromJSON({ ...minion, parent: this }),
+        )
+      : [];
     this.gotDrops = gotDrops ?? false;
     this.drops = drops ?? [];
     this.goldDropRange = goldDropRange ?? { minimum: 0, maximum: 0 };
@@ -1073,7 +1077,6 @@ export class Minion extends Creature {
     makeObservable(this, {
       turnsLeftAlive: observable,
       takeTurn: action,
-      reinstateParent: action,
     });
 
     reaction(
@@ -1109,11 +1112,6 @@ export class Minion extends Creature {
     }
   }
 
-  public reinstateParent(parent: PlayerCharacter | Enemy) {
-    this.parent = parent;
-    return this;
-  }
-
   /**
    * Creates a minion from a JSON object.
    * @param json - The JSON object representing the minion.
@@ -1146,11 +1144,8 @@ export class Minion extends Creature {
       baseColdResistance: json.baseColdResistance,
       baseLightningResistance: json.baseLightningResistance,
       basePoisonResistance: json.basePoisonResistance,
-      parent: null,
+      parent: json.parent,
     });
-    minion.conditions = minion.conditions.map((cond) =>
-      cond.reinstateParent(minion),
-    );
     return minion;
   }
 }

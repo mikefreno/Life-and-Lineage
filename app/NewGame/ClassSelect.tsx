@@ -1,3 +1,4 @@
+import React from "react";
 import { Pressable, View } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
 import "../../assets/styles/globals.css";

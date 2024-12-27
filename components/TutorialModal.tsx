@@ -64,7 +64,7 @@ const TutorialModal = observer(
       setTutorialState(tutorialStore.tutorialsEnabled);
       setShouldShow(
         override ||
-          ((!tutorialStore.tutorialsEnabled ||
+          ((tutorialStore.tutorialsEnabled ||
             tutorial === TutorialOption.firstBossKill) &&
             !tutorialStore.tutorialsShown[tutorial]),
       );

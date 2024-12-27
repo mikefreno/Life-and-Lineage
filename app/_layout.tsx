@@ -287,7 +287,6 @@ const RootLayout = observer(() => {
         <ProjectedImage />
         <FleeModal />
         <BirthAnnouncementModal />
-
         <Stack
           screenOptions={{
             animation: uiStore.reduceMotion ? "none" : undefined,
@@ -304,6 +303,7 @@ const RootLayout = observer(() => {
             options={{
               headerShown: false,
               presentation: "card",
+              animation: !playerState ? "fade" : undefined,
             }}
           />
 

@@ -1,4 +1,11 @@
-import { Pressable, TouchableWithoutFeedback, View } from "react-native";
+import React from "react";
+import {
+  LayoutChangeEvent,
+  Pressable,
+  TouchableWithoutFeedback,
+  View,
+  LayoutAnimation,
+} from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useColorScheme } from "nativewind";
@@ -14,6 +21,7 @@ import {
   RangerIcon,
   WizardHat,
 } from "../../assets/icons/SVGIcons";
+import "expo-router/entry";
 import BlessingDisplay from "../../components/BlessingsDisplay";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import EquipmentDisplay from "../../components/EquipmentDisplay";
@@ -22,7 +30,6 @@ import { useDraggableStore, useRootStore } from "../../hooks/stores";
 import D20DieAnimation from "../../components/DieRollAnim";
 import { EXPANDED_PAD } from "../../components/PlayerStatus";
 import type { Item } from "../../entities/item";
-import { LayoutAnimation } from "react-native";
 import { Image } from "expo-image";
 import { StashDisplay } from "../../components/StashDisplay";
 
@@ -31,7 +38,7 @@ const HomeScreen = observer(() => {
   const { playerState, uiStore, stashStore } = useRootStore();
   const { draggableClassStore } = useDraggableStore();
   const [showStash, setShowStash] = useState(false);
-  const stashButtonRef = useRef(null);
+  const stashButtonRef = useRef<View>(null);
 
   const [displayItem, setDisplayItem] = useState<{
     item: Item[];
@@ -73,26 +80,6 @@ const HomeScreen = observer(() => {
     }
   }, [playerState?.playerClass, uiStore.dimensions.height, colorScheme]);
 
-  if (!playerState) {
-    return (
-      <ThemedView className="flex-1 items-center justify-center">
-        <D20DieAnimation keepRolling={true} />
-      </ThemedView>
-    );
-  }
-  const setStashTargetLayout = () => {
-    if (stashButtonRef.current) {
-      stashButtonRef.current.measure((x, y, width, height, pageX, pageY) => {
-        draggableClassStore.setAncillaryBounds("stash", {
-          x: pageX,
-          y: pageY,
-          width,
-          height,
-        });
-      });
-    }
-  };
-
   const layoutDimensions = useMemo(
     () => ({
       paddingTop: header,
@@ -107,6 +94,34 @@ const HomeScreen = observer(() => {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     }
   }, [isFocused]);
+
+  const setStashBoundsOnLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      const { width, height } = event.nativeEvent.layout;
+
+      setTimeout(() => {
+        if (stashButtonRef.current) {
+          stashButtonRef.current.measure((x, y, w, h, pageX, pageY) => {
+            draggableClassStore.setAncillaryBounds("pouch", {
+              x: pageX,
+              y: pageY - header,
+              width,
+              height,
+            });
+          });
+        }
+      }, 100);
+    },
+    [uiStore.dimensions],
+  );
+
+  if (!playerState) {
+    return (
+      <ThemedView className="flex-1 items-center justify-center">
+        <D20DieAnimation keepRolling={true} />
+      </ThemedView>
+    );
+  }
 
   return (
     <>
@@ -182,7 +197,7 @@ const HomeScreen = observer(() => {
             />
             <Pressable
               ref={stashButtonRef}
-              onLayout={setStashTargetLayout}
+              onLayout={setStashBoundsOnLayout}
               onPress={() => setShowStash(true)}
               className="z-top rounded-lg -mt-16 px-4 w-20 h-20"
             >

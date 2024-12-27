@@ -1,4 +1,4 @@
-import { makeObservable, observable, action, reaction } from "mobx";
+import { makeObservable, action, reaction, observable, toJS } from "mobx";
 import { parse, stringify } from "flatted";
 import { storage } from "../utility/functions/storage";
 import { throttle } from "lodash";
@@ -6,8 +6,8 @@ import { RootStore } from "./RootStore";
 import { TutorialOption } from "../utility/types";
 
 export class TutorialStore {
-  @observable tutorialsShown: Record<TutorialOption, boolean>;
-  @observable tutorialsEnabled: boolean;
+  tutorialsShown: Record<TutorialOption, boolean>;
+  tutorialsEnabled: boolean;
   root: RootStore;
 
   constructor({ root }: { root: RootStore }) {
@@ -15,25 +15,29 @@ export class TutorialStore {
     const { tutorialsEnabled, tutorialsShown } = this.hydrate();
 
     this.tutorialsShown = tutorialsShown;
-
     this.tutorialsEnabled = tutorialsEnabled;
 
-    makeObservable(this);
+    makeObservable(this, {
+      tutorialsShown: observable,
+      tutorialsEnabled: observable,
+      updateTutorialState: action,
+      resetTutorialState: action,
+      disableTutorials: action,
+      enableTutorials: action,
+    });
 
     reaction(
-      () => [this.tutorialsEnabled, ...Object.values(this.tutorialsShown)],
+      () => [this.tutorialsEnabled, toJS(this.tutorialsShown)],
       () => {
         this.saveGameSettings();
       },
     );
   }
 
-  @action
   updateTutorialState(tutorial: TutorialOption, state: boolean) {
     this.tutorialsShown[tutorial] = state;
   }
 
-  @action
   resetTutorialState(callbackFunction?: () => void) {
     const defaultState = {
       [TutorialOption.class]: false,
@@ -59,12 +63,10 @@ export class TutorialStore {
     }
   }
 
-  @action
   disableTutorials() {
     this.tutorialsEnabled = false;
   }
 
-  @action
   enableTutorials() {
     this.tutorialsEnabled = true;
   }
@@ -78,13 +80,15 @@ export class TutorialStore {
           tutorialsEnabled: this.tutorialsEnabled,
         }),
       );
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   public saveGameSettings = throttle(this._saveGameSettings, 500);
 
   hydrate() {
-    const retrieved = storage.getString("gameSettings");
+    const retrieved = storage.getString("tutorials");
     if (!retrieved) {
       return {
         tutorialsShown: {

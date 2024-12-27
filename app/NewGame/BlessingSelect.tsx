@@ -57,7 +57,14 @@ export default function SetBlessing() {
         }}
       />
       <View className="flex-1 pt-8">
-        <Text className="text-center text-2xl px-4" accessibilityRole="header">
+        <Text
+          className="text-center text-2xl px-4"
+          style={{
+            maxWidth: dimensions.width * 0.75,
+            marginHorizontal: "auto",
+          }}
+          accessibilityRole="header"
+        >
           With What Blessing Was Your
           <Text
             style={{ color: playerClassColors[classSelection] }}

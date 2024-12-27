@@ -616,7 +616,8 @@ export class PlayerCharacter extends Character {
     this.currentSanity = currentSanity ?? baseSanity;
     this.currentMana = currentMana ?? baseMana;
 
-    this.unAllocatedSkillPoints = unAllocatedSkillPoints ?? __DEV__ ? 100 : 0;
+    //this.unAllocatedSkillPoints = unAllocatedSkillPoints ?? __DEV__ ? 100 : 0;
+    this.unAllocatedSkillPoints = unAllocatedSkillPoints ?? 0;
     this.allocatedSkillPoints = allocatedSkillPoints ?? {
       [Attribute.health]: 0,
       [Attribute.mana]: 0,
@@ -626,10 +627,15 @@ export class PlayerCharacter extends Character {
       [Attribute.intelligence]: 0,
     };
 
-    this.gold = gold !== undefined ? gold : __DEV__ ? 1000000 : 500;
+    //this.gold = gold !== undefined ? gold : __DEV__ ? 1000000 : 500;
+    this.gold = gold !== undefined ? gold : 500;
 
-    this.minions = minions ?? [];
-    this.rangerPet = rangerPet ?? null;
+    this.minions = minions
+      ? minions.map((minion) => Minion.fromJSON({ ...minion, parent: this }))
+      : [];
+    this.rangerPet = rangerPet
+      ? Minion.fromJSON({ ...rangerPet, parent: this })
+      : null;
 
     this.jobs = jobs ?? this.initJobs();
     this.learningSpells = learningSpells ?? [];
@@ -747,6 +753,7 @@ export class PlayerCharacter extends Character {
       removeEquipment: action,
       performLabor: action,
       getSpecifiedQualificationProgress: action,
+      gainProficiency: action,
 
       conditions: observable,
       investments: observable,
@@ -2419,10 +2426,8 @@ export class PlayerCharacter extends Character {
       learningSpells: json.learningSpells,
       qualificationProgress: json.qualificationProgress,
       magicProficiencies: json.magicProficiencies,
-      minions: json.minions
-        ? json.minions.map((minion: any) => Minion.fromJSON(minion))
-        : [],
-      rangerPet: json.rangerPet ? Minion.fromJSON(json.rangerPet) : undefined,
+      minions: json.minions,
+      rangerPet: json.rangerPet,
       knownSpells: json.knownSpells,
       knownCharacterIds: json.knownCharacterIds ?? [],
       gold: json.gold,

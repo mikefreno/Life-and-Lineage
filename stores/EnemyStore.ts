@@ -2,7 +2,7 @@ import { parse, stringify } from "flatted";
 import { Enemy } from "../entities/creatures";
 import { storage } from "../utility/functions/storage";
 import { RootStore } from "./RootStore";
-import { action, makeObservable, observable } from "mobx";
+import { action, makeObservable, observable, reaction } from "mobx";
 import { AnimationStore } from "./AnimationStore";
 import { throttle } from "lodash";
 
@@ -37,6 +37,23 @@ export default class EnemyStore {
       decrementDeathAnimations: action,
       incrementDeathAnimations: action,
     });
+
+    reaction(
+      () => [
+        this.deathAnimationsCount,
+        this.attackAnimationCount,
+        this.enemies.length,
+      ],
+      () => {
+        if (
+          this.deathAnimationsCount == 0 &&
+          this.attackAnimationCount == 0 &&
+          this.enemies.length == 0
+        ) {
+          this.root.dungeonStore.setInCombat(false);
+        }
+      },
+    );
   }
 
   incrementAttackAnimations() {
