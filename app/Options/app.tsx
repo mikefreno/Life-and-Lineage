@@ -1,4 +1,10 @@
-import { Pressable, ScrollView, TextInput, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  TextInput,
+  View,
+  StyleSheet,
+} from "react-native";
 import { Text } from "../../components/Themed";
 import { useEffect, useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc";
@@ -13,13 +19,14 @@ import D20DieAnimation from "../../components/DieRollAnim";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
+import Slider from "@react-native-community/slider";
 
 const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
 
 export const AppSettings = observer(() => {
   let root = useRootStore();
-  const { playerState, uiStore, authStore, saveStore } = root;
+  const { playerState, uiStore, authStore, saveStore, audioStore } = root;
   const { colorScheme } = useColorScheme();
   const [showRemoteSaveWindow, setShowRemoteSaveWindow] =
     useState<boolean>(false);
@@ -57,6 +64,22 @@ export const AppSettings = observer(() => {
     setSelectedVibrationOption(index);
     vibration({ style: "light" });
   }
+
+  const renderSlider = (label: string, type: keyof AudioLevels) => (
+    <View style={styles.sliderContainer}>
+      <Text style={styles.label}>{label}</Text>
+      <Slider
+        style={styles.slider}
+        minimumValue={0}
+        maximumValue={1}
+        value={audioStore.levels[type]}
+        onValueChange={(value) => audioStore.setAudioLevel(type, value)}
+      />
+      <Text style={styles.value}>
+        {Math.round(audioStore.levels[type] * 100)}%
+      </Text>
+    </View>
+  );
 
   useEffect(() => {
     if (authStore.isAuthenticated) {
@@ -324,6 +347,19 @@ export const AppSettings = observer(() => {
               </Pressable>
             ))}
           </View>
+
+          <GenericStrikeAround>Audio Settings</GenericStrikeAround>
+          {renderSlider("Master Volume", "master")}
+          {renderSlider("Ambient Music", "ambientMusic")}
+          {renderSlider("Sound Effects", "soundEffects")}
+          {renderSlider("Combat Music", "combatMusic")}
+          {renderSlider("Combat Sound Effects", "combatSoundEffects")}
+          <Pressable
+            style={styles.muteButton}
+            onPress={() => audioStore.toggleMute()}
+          >
+            {audioStore.levels.muted ? "Unmute" : "Mute All"}
+          </Pressable>
           <GenericStrikeAround>Vibration Settings</GenericStrikeAround>
           <View
             className="rounded px-4 py-2"
@@ -392,3 +428,31 @@ export const AppSettings = observer(() => {
   );
 });
 export default AppSettings;
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+  },
+  sliderContainer: {
+    marginBottom: 16,
+  },
+  label: {
+    marginBottom: 8,
+  },
+  slider: {
+    width: "100%",
+    height: 40,
+  },
+  value: {
+    textAlign: "right",
+  },
+  muteButton: {
+    padding: 10,
+    backgroundColor: "#333",
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  muteButtonText: {
+    color: "white",
+  },
+});

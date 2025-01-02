@@ -457,11 +457,10 @@ export class Attack {
     poison: number;
     total: number;
   } {
-    const physical =
-      this.calculateDamageType(
-        this.user.totalPhysicalDamage,
-        target.getPhysicalDamageReduction(),
-      ) + (this.user instanceof PlayerCharacter ? this.user.attackPower : 0);
+    const physical = this.calculateDamageType(
+      this.user.totalPhysicalDamage,
+      target.getPhysicalDamageReduction(),
+    );
 
     const fire = this.calculateDamageType(
       this.user.totalFireDamage,

@@ -61,9 +61,7 @@ export class DungeonStore {
         currentMap,
         currentMapDimensions,
         currentPosition,
-        currentSpecialEncounter,
         inCombat,
-        inSpecialRoom,
         fightingBoss,
         logs,
       } = currentDungeonHydration;
@@ -73,23 +71,23 @@ export class DungeonStore {
       this.currentMap = currentMap;
       this.currentMapDimensions = currentMapDimensions;
       this.currentPosition = currentPosition;
-      this.currentSpecialEncounter = currentSpecialEncounter;
       this.inCombat = inCombat;
-      this.inSpecialRoom = inSpecialRoom;
       this.fightingBoss = fightingBoss;
       this.logs = logs;
     }
 
     makeObservable(this, {
       inCombat: observable,
-      inSpecialRoom: observable,
       currentMap: observable,
       currentMapDimensions: observable,
       currentPosition: observable,
       currentLevel: observable,
       currentInstance: observable,
+<<<<<<< HEAD
       currentSpecialEncounter: observable,
       setCurrentSpecialEncounter: action,
+=======
+>>>>>>> parent of cb574f9 (dungeon work (specialEncounters))
       fightingBoss: observable,
       logs: observable,
       movementQueued: observable,
@@ -131,34 +129,16 @@ export class DungeonStore {
       () => toJS(this.currentMap),
       (map) => {
         if (map) {
-          const serializedMap = map.map((tile) => ({
-            ...tile,
-            specialEncounter: tile.specialEncounter
-              ? {
-                  name: tile.specialEncounter.name,
-                  scaler: tile.specialEncounter.scaler,
-                  countChances: tile.specialEncounter.countChances,
-                  activated: tile.specialEncounter.activated,
-                  parentLevel: null,
-                }
-              : undefined,
-          }));
-          storage.set("currentMap", stringify(serializedMap));
+          storage.set("currentMap", stringify(map));
         }
       },
     );
 
     reaction(
-      () => this.currentPosition,
-      (position) => {
-        if (position) {
-          storage.set(
-            "currentPosition",
-            stringify({
-              x: position.x,
-              y: position.y,
-            }),
-          );
+      () => this.currentMapDimensions,
+      (dimensions) => {
+        if (dimensions) {
+          storage.set("currentMapDimensions", stringify(dimensions));
         }
       },
     );
@@ -180,11 +160,6 @@ export class DungeonStore {
     );
 
     reaction(
-      () => this.inSpecialRoom,
-      (inSpecialRoom) => storage.set("inSpecialRoom", inSpecialRoom),
-    );
-
-    reaction(
       () => this.fightingBoss,
       (fightingBoss) => {
         storage.set("fightingBoss", fightingBoss);
@@ -195,25 +170,6 @@ export class DungeonStore {
       () => this.logs,
       (logs) => {
         storage.set("logs", stringify(logs));
-      },
-    );
-
-    reaction(
-      () => this.currentSpecialEncounter,
-      (encounter) => {
-        if (encounter) {
-          storage.set(
-            "currentSpecialEncounter",
-            stringify({
-              name: encounter.name,
-              scaler: encounter.scaler,
-              countChances: encounter.countChances,
-              activated: encounter.activated,
-            }),
-          );
-        } else {
-          storage.delete("currentSpecialEncounter");
-        }
       },
     );
   }
@@ -249,13 +205,11 @@ export class DungeonStore {
     if (!this.currentLevel) {
       throw new Error("Failed to set up dungeon: No valid level found");
     }
-
     const specials = this.currentLevel.specialEncounters.map(
       (specialEncounter) => {
         return { count: specialEncounter.countForLevel, specialEncounter };
       },
     );
-
     this.currentMap = generateTiles({
       numTiles: this.currentLevel.tiles,
       tileSize: TILE_SIZE,
@@ -293,26 +247,24 @@ export class DungeonStore {
     if (newPosition) {
       this.updateCurrentPosition(newPosition);
 
-      if (newPosition.clearedRoom) {
-        this.toggleMovement();
-        return;
-      }
-
-      wait(350).then(() => {
-        runInAction(() => {
-          if (newPosition.specialEncounter) {
-            this.setCurrentSpecialEncounter(newPosition.specialEncounter);
-            this.inSpecialRoom = true;
-            this.visitRoom(newPosition); // Mark as visited
-          } else {
-            this.inCombat = true;
-            this.fightingBoss = newPosition.isBossRoom;
-            this.setEncounter(newPosition.isBossRoom);
-            this.visitRoom(newPosition); // Mark as visited
-          }
-          this.toggleMovement();
+      if (!newPosition.clearedRoom) {
+        wait(350).then(() => {
+          runInAction(() => {
+            if (newPosition.specialEncounter) {
+              this.setCurrentSpecialEncounter(newPosition.specialEncounter);
+              this.inSpecialRoom = true;
+            } else {
+              this.inCombat = true;
+              this.fightingBoss = newPosition.isBossRoom;
+              this.setEncounter(newPosition.isBossRoom);
+            }
+            this.visitRoom(newPosition);
+            this.toggleMovement();
+          });
         });
-      });
+      } else {
+        this.toggleMovement();
+      }
     }
   }
 
@@ -322,11 +274,6 @@ export class DungeonStore {
 
   get reversedLogs() {
     return this.logs.slice().reverse();
-  }
-
-  public leaveSpecialEncounterRoom() {
-    this.currentSpecialEncounter = null;
-    this.inSpecialRoom = false;
   }
 
   public addLog(whatHappened: string) {
@@ -342,11 +289,10 @@ export class DungeonStore {
 
   private visitRoom(room: Tile) {
     if (this.currentMap) {
-      const targetTile = this.currentMap.find(
-        (tile) => tile.x === room.x && tile.y === room.y,
-      );
-      if (targetTile) {
-        targetTile.clearedRoom = true;
+      for (let tile of this.currentMap) {
+        if (tile.x == room.x && tile.y == room.y) {
+          tile.clearedRoom = true;
+        }
       }
     }
   }
@@ -444,7 +390,6 @@ export class DungeonStore {
       const currentMapDimensionsStr = storage.getString("currentMapDimensions");
       const currentPositionStr = storage.getString("currentPosition");
       const inCombat = storage.getBoolean("inCombat") ?? false;
-      const inSpecialRoom = storage.getBoolean("inSpecialRoom") ?? false;
       const fightingBoss = storage.getBoolean("fightingBoss") ?? false;
       const logsStr = storage.getString("logs") ?? "";
 
@@ -470,50 +415,15 @@ export class DungeonStore {
 
       if (!currentLevel) return;
 
-      const currentMap: Tile[] = parse(currentMapStr).map((tile: any) => {
-        const baseTile = {
-          x: tile.x,
-          y: tile.y,
-          clearedRoom: Boolean(tile.clearedRoom),
-          isBossRoom: Boolean(tile.isBossRoom),
-        };
-
-        if (tile.specialEncounter) {
-          return {
-            ...baseTile,
-            specialEncounter: SpecialEncounter.fromJSON({
-              ...tile.specialEncounter,
-              parent: currentLevel,
-            }),
-          };
-        }
-
-        return baseTile;
-      });
-
-      const specialEncounterStr = storage.getString("currentSpecialEncounter");
-      let currentSpecialEncounter = null;
-
-      if (specialEncounterStr && currentLevel) {
-        const encounterData = parse(specialEncounterStr);
-        currentSpecialEncounter = SpecialEncounter.fromJSON({
-          ...encounterData,
-          parent: currentLevel,
-        });
-      }
+      const currentMap: Tile[] = parse(currentMapStr).map((tile: any) => ({
+        x: tile.x,
+        y: tile.y,
+        clearedRoom: Boolean(tile.clearedRoom),
+        isBossRoom: Boolean(tile.isBossRoom),
+      }));
 
       const currentMapDimensions = parse(currentMapDimensionsStr);
-      const currentPositionData = parse(currentPositionStr);
-
-      let currentPosition = currentMap.find(
-        (tile) =>
-          tile.x === currentPositionData.x && tile.y === currentPositionData.y,
-      );
-
-      if (!currentPosition) {
-        currentPosition = currentMap[0];
-      }
-
+      const currentPosition = parse(currentPositionStr);
       const logs = logsStr ? parse(logsStr) : [];
 
       return {
@@ -522,9 +432,7 @@ export class DungeonStore {
         currentMap,
         currentMapDimensions,
         currentPosition,
-        currentSpecialEncounter,
         inCombat,
-        inSpecialRoom,
         fightingBoss,
         logs,
       };
@@ -640,7 +548,6 @@ export class DungeonStore {
     this.currentMapDimensions = undefined;
     this.currentPosition = undefined;
     this.inCombat = false;
-    this.inSpecialRoom = false;
     this.fightingBoss = false;
     this.movementQueued = false;
     this.fleeModalShowing = false;

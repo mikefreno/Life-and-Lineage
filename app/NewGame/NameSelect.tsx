@@ -91,9 +91,12 @@ export default function SetName() {
                 className="rounded border border-zinc-800 pl-2 text-black dark:border-zinc-100 dark:text-zinc-50"
                 onChangeText={(text) => {
                   setLastName(text.replace(/^\s+/, ""));
+<<<<<<< HEAD
                 }}
                 onBlur={() => {
                   setLastName(trimWhitespace(lastName));
+=======
+>>>>>>> parent of cb574f9 (dungeon work (specialEncounters))
                 }}
                 placeholderTextColor={
                   colorScheme == "light" ? "#d4d4d8" : "#71717a"

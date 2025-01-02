@@ -48,16 +48,11 @@ const mockRootStore = {
     currentDate: { year: 2023, week: 1 },
     year: 2023,
     week: 1,
-    generateBirthDateInRange: jest
-      .fn()
-      .mockReturnValue({ year: 1300, week: 0 }),
-    generateBirthDateForAge: jest.fn().mockReturnValue({ year: 1285, week: 0 }),
   },
   characterStore: {
-    addCharacter: jest.fn(),
     saveCharacter: jest.fn(),
   },
-} as unknown as RootStore;
+};
 
 describe("PlayerCharacter", () => {
   let player: PlayerCharacter;
@@ -128,7 +123,10 @@ describe("PlayerCharacter", () => {
         slot: "one-hand",
         baseValue: 10,
         itemClass: ItemClassType.Melee,
+<<<<<<< HEAD
         stats: {},
+=======
+>>>>>>> parent of cb574f9 (dungeon work (specialEncounters))
         root: mockRootStore,
       });
     });

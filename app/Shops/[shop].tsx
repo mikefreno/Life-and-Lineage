@@ -128,7 +128,6 @@ const ShopInteriorScreen = observer(() => {
   useEffect(() => {
     if (playerState && thisShop && !initialized) {
       if (
-        thisShop.inventory.length == 0 ||
         thisShop.lastStockRefresh.year < time.year ||
         thisShop.lastStockRefresh.week + 4 <= time.week
       ) {

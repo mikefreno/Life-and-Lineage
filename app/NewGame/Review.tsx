@@ -1,6 +1,6 @@
 import { Text } from "../../components/Themed";
 import { View } from "react-native";
-import { useNavigation } from "expo-router";
+import { router, useNavigation } from "expo-router";
 import clearHistory, { toTitleCase, wait } from "../../utility/functions/misc";
 import { createPlayerCharacter } from "../../utility/functions/characterAid";
 import { Element, ElementToString } from "../../utility/types";
@@ -35,7 +35,7 @@ export default function NewGameReview() {
 
       await root.newGame(player);
       vibration({ style: "success" });
-      wait(250).then(() => clearHistory(navigation));
+      router.dismissAll();
     }
   }
 

@@ -50,3 +50,5 @@ magic-delve-messager-firebase-adminsdk-kfxxy-88e8768e79.json
 
 expo-env.d.ts
 # @end expo-cli
+
+.env.local

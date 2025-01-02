@@ -76,7 +76,7 @@
   },
   {
     "name": "ritual altar",
-    "image": "ritual_altar",
+    "image": "altar",
     "prompt": "You come across an ominous altar. Do you approach it?",
     "goodOutcome": {
       "chance": 0.5,

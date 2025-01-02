@@ -29,11 +29,7 @@ export default function BattleTabControls({
         }}
       >
         <Text className="text-center text-xl">
-          {dungeonStore.currentSpecialEncounter
-            ? dungeonStore.currentSpecialEncounter.name
-            : dungeonStore.inCombat
-            ? "Attacks"
-            : "Navigation"}
+          {dungeonStore.inCombat ? "Attacks" : "Navigation"}
         </Text>
       </Pressable>
       <Pressable

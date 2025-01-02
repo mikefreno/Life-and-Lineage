@@ -587,10 +587,6 @@ export class SpecialEncounter {
     };
   }
 
-  get imageToShow() {
-    return specialEncounterImageMap[this.image];
-  }
-
   static fromJSON(json: any) {
     return new SpecialEncounter({
       name: json.name,
@@ -600,10 +596,3 @@ export class SpecialEncounter {
     });
   }
 }
-
-const specialEncounterImageMap: Record<string, any> = {
-  camp: require("../assets/images/icons/camp.png"),
-  chest: require("../assets/images/icons/Chest.png"),
-  ritual_altar: require("../assets/images/icons/ritual_altar.png"),
-  water_basin: require("../assets/images/icons/water_basin.png"),
-};

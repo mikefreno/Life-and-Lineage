@@ -64,8 +64,9 @@
       [
         "@sentry/react-native/expo",
         {
-          "organization": "mikefreno",
-          "project": "life-and-lineage"
+          "url": "https://sentry.io/",
+          "project": "life-and-lineage",
+          "organization": "mikefreno"
         }
       ],
       [
@@ -74,7 +75,8 @@
           "iosUrlScheme": "com.googleusercontent.apps.976302581992-tbi6afmid4eq5dsn63t30kpfpdhjju8m"
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true
@@ -94,4 +96,3 @@
     "owner": "mikefrenodev"
   }
 }
-

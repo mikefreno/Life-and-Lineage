@@ -21,12 +21,14 @@ import { useColorScheme } from "nativewind";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
-import GenericFlatLink from "../../components/GenericLink";
 import { FadeSlide } from "../../components/AnimatedWrappers";
+import GenericFlatButton from "../../components/GenericFlatButton";
+import { useRouter } from "expo-router";
 
 const SetClassScreen = observer(() => {
   const vibration = useVibration();
   const { classSelection, setClassSelection } = useNewGameStore();
+  const router = useRouter();
 
   const { uiStore, playerState, tutorialStore } = useRootStore();
   const { colorScheme } = useColorScheme();
@@ -247,14 +249,14 @@ const SetClassScreen = observer(() => {
         <View className="mx-auto pt-4 pb-[10vh]">
           <FadeSlide show={!!classSelection}>
             {({ showing }) => (
-              <GenericFlatLink
+              <GenericFlatButton
                 disabled={!showing}
-                href="./BlessingSelect"
+                onPress={() => router.push("/NewGame/BlessingSelect")}
                 accessibilityRole="link"
                 accessibilityLabel="Next"
               >
                 <Text>Next</Text>
-              </GenericFlatLink>
+              </GenericFlatButton>
             )}
           </FadeSlide>
         </View>

@@ -19,6 +19,7 @@ import sanityDebuffs from "../assets/json/sanityDebuffs.json";
 import { ConditionObjectType, EffectOptions } from "../utility/types";
 import { StashStore } from "./StashStore";
 import { SaveStore } from "./SaveStore";
+import { AudioStore } from "./AudioStore";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -32,6 +33,7 @@ export class RootStore {
   characterStore: CharacterStore;
   tutorialStore: TutorialStore;
   saveStore: SaveStore;
+  audioStore: AudioStore;
 
   constructed: boolean = false;
   atDeathScreen: boolean = false;
@@ -53,6 +55,7 @@ export class RootStore {
     this.tutorialStore = new TutorialStore({ root: this });
     this.stashStore = new StashStore({ root: this });
     this.saveStore = new SaveStore({ root: this });
+    this.audioStore = new AudioStore({ root: this });
 
     this.constructed = true;
 

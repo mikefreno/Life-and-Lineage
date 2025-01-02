@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import { toTitleCase } from "../../utility/functions/misc";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useColorScheme } from "nativewind";
 import GenericModal from "../GenericModal";
 import SpellDetails from "../SpellDetails";
@@ -28,7 +28,6 @@ import {
   useRootStore,
 } from "../../hooks/stores";
 import { observer } from "mobx-react-lite";
-import { Enemy } from "../../entities/creatures";
 
 const BattleTab = observer(
   ({
@@ -40,17 +39,6 @@ const BattleTab = observer(
     const [attackDetails, setAttackDetails] = useState<Attack | Spell | null>(
       null,
     );
-    const [showEncounterResultModal, setShowEncounterResultModal] =
-      useState(false);
-    const [encounterResult, setEncounterResult] = useState<{
-      message: string;
-      health: number | undefined;
-      sanity: number | undefined;
-      mana: number | undefined;
-      drops: Item[] | undefined;
-      gold: number | undefined;
-      enemies: Enemy[] | undefined;
-    } | null>(null);
     const [attackDetailsShowing, setAttackDetailsShowing] =
       useState<boolean>(false);
 
@@ -103,22 +91,6 @@ const BattleTab = observer(
       }
     }, [battleTab]);
 
-    const handleSpecialEncounter = useCallback(
-      (action: "activate" | "ignore") => {
-        if (action === "activate" && dungeonStore.currentSpecialEncounter) {
-          const result = dungeonStore.currentSpecialEncounter.activate();
-          setEncounterResult(result);
-          setShowEncounterResultModal(true);
-          if (result.drops) {
-            result.drops.forEach((item) => addItemToPouch({ items: [item] }));
-          }
-        } else {
-          dungeonStore.leaveSpecialEncounterRoom();
-        }
-      },
-      [dungeonStore.currentSpecialEncounter],
-    );
-
     const attackHandler = (attackOrSpell: Attack | Spell) => {
       if (enemyStore.enemies.length > 0) {
         enemyStore.setAttackAnimationOngoing(true);
@@ -149,46 +121,6 @@ const BattleTab = observer(
     return (
       <>
         <GenericModal
-          isVisibleCondition={showEncounterResultModal}
-          backFunction={() => {
-            setShowEncounterResultModal(false);
-            dungeonStore.setCurrentSpecialEncounter(null);
-          }}
-          size={80}
-        >
-          <View className="p-4">
-            <Text className="text-xl text-center mb-4">
-              {encounterResult?.message}
-            </Text>
-            {encounterResult?.health && (
-              <Text className="text-lg">Health: {encounterResult.health}</Text>
-            )}
-            {encounterResult?.sanity && (
-              <Text className="text-lg">Sanity: {encounterResult.sanity}</Text>
-            )}
-            {encounterResult?.mana && (
-              <Text className="text-lg">Mana: {encounterResult.mana}</Text>
-            )}
-            {encounterResult?.gold && (
-              <Text className="text-lg">Gold: {encounterResult.gold}</Text>
-            )}
-            {encounterResult?.drops && (
-              <Text className="text-lg">
-                Items:{" "}
-                {encounterResult.drops.map((item) => item.name).join(", ")}
-              </Text>
-            )}
-            {encounterResult?.enemies && (
-              <Text className="text-lg">
-                Enemies:{" "}
-                {encounterResult.enemies
-                  .map((enemy) => enemy.creatureSpecies)
-                  .join(", ")}
-              </Text>
-            )}
-          </View>
-        </GenericModal>
-        <GenericModal
           isVisibleCondition={attackDetailsShowing}
           backFunction={() => setAttackDetailsShowing(false)}
           size={attackDetails instanceof Spell ? 100 : undefined}
@@ -206,29 +138,7 @@ const BattleTab = observer(
 
         {battleTab == "attacksOrNavigation" ? (
           !dungeonStore.inCombat ? (
-            dungeonStore.currentSpecialEncounter ? (
-              <View className="w-full h-full px-2 justify-center">
-                <Text className="text-xl text-center mb-4">
-                  {dungeonStore.currentSpecialEncounter.prompt}
-                </Text>
-                <View className="flex-row justify-around">
-                  <Pressable
-                    className="bg-green-500 px-4 py-2 rounded"
-                    onPress={() => handleSpecialEncounter("activate")}
-                  >
-                    <Text className="text-white text-xl">Activate</Text>
-                  </Pressable>
-                  <Pressable
-                    className="bg-red-500 px-4 py-2 rounded"
-                    onPress={() => handleSpecialEncounter("ignore")}
-                  >
-                    <Text className="text-white text-xl">Ignore</Text>
-                  </Pressable>
-                </View>
-              </View>
-            ) : (
-              <DungeonMapControls />
-            )
+            <DungeonMapControls />
           ) : (
             <View className="w-full h-full px-2">
               {!playerState.isStunned ? (

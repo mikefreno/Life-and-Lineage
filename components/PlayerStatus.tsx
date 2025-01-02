@@ -574,6 +574,7 @@ const PlayerStatus = observer(
                   <GenericStrikeAround>Equipment Stats</GenericStrikeAround>
                   <View
                     className="flex-row mt-2"
+<<<<<<< HEAD
                     style={{
                       height: Math.min(
                         uiStore.dimensions.height * 0.3,
@@ -582,6 +583,9 @@ const PlayerStatus = observer(
                           10,
                       ),
                     }}
+=======
+                    style={{ maxHeight: uiStore.dimensions.height * 0.3 }}
+>>>>>>> parent of cb574f9 (dungeon work (specialEncounters))
                   >
                     <View className="w-1/2 mr-1">
                       <Text className="text-center font-bold mb-1">
