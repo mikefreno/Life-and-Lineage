@@ -1,5 +1,4 @@
 import investments from "../assets/json/investments.json";
-import "../assets/styles/globals.css";
 import { InvestmentType, TutorialOption } from "../utility/types";
 import InvestmentCard from "../components/InvestmentCard";
 import PlayerStatus from "../components/PlayerStatus";

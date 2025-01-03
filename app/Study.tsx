@@ -1,5 +1,4 @@
 import { Text } from "../components/Themed";
-import "../assets/styles/globals.css";
 import { Pressable, Image, View, ScrollView } from "react-native";
 import { AccelerationCurves, toTitleCase } from "../utility/functions/misc";
 import ProgressBar from "../components/ProgressBar";

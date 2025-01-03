@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, useColorScheme, View } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
 import "../../assets/styles/globals.css";
 import { useLayoutEffect, useState } from "react";
@@ -17,21 +17,24 @@ import GenericModal from "../../components/GenericModal";
 import { wait } from "../../utility/functions/misc";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
-import { useColorScheme } from "nativewind";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
 import { FadeSlide } from "../../components/AnimatedWrappers";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { useRouter } from "expo-router";
+import { useStyles } from "../../hooks/styles";
 
 const SetClassScreen = observer(() => {
   const vibration = useVibration();
   const { classSelection, setClassSelection } = useNewGameStore();
   const router = useRouter();
-
   const { uiStore, playerState, tutorialStore } = useRootStore();
-  const { colorScheme } = useColorScheme();
+  const { height, width } = uiStore.dimensions;
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+
+  const styles = useStyles();
 
   const isFocused = useIsFocused();
 
@@ -62,11 +65,13 @@ const SetClassScreen = observer(() => {
         backFunction={() => setShowTutorialReset(false)}
         accessibilityRole="alert"
       >
-        <Text className="text-center text-2xl">Tutorial Reset</Text>
-        <Text className="text-center text-lg">
+        <Text style={[styles.text2xl, { textAlign: "center" }]}>
+          Tutorial Reset
+        </Text>
+        <Text style={[styles.textLg, { textAlign: "center" }]}>
           Would you like to reset tutorials?
         </Text>
-        <ThemedView className="flex flex-row">
+        <ThemedView style={{ flexDirection: "row" }}>
           <Pressable
             onPress={() => {
               setShowTutorialReset(false);
@@ -78,7 +83,7 @@ const SetClassScreen = observer(() => {
                 });
               }
             }}
-            className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+            style={styles.tutorialResetButton}
             accessibilityRole="button"
             accessibilityLabel="Reset Tutorial"
           >
@@ -86,7 +91,7 @@ const SetClassScreen = observer(() => {
           </Pressable>
           <Pressable
             onPress={() => setShowTutorialReset(false)}
-            className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+            style={styles.tutorialResetButton}
             accessibilityRole="button"
             accessibilityLabel="Cancel"
           >
@@ -94,159 +99,266 @@ const SetClassScreen = observer(() => {
           </Pressable>
         </ThemedView>
       </GenericModal>
-      <View className="flex-1 items-center px-[6vw]">
+
+      <View style={styles.newGameContainer}>
         <Text
-          className="bold pt-[4vh] text-center text-3xl"
+          style={[
+            styles.text3xl,
+            styles.bold,
+            {
+              paddingTop: height * 0.04,
+              textAlign: "center",
+            },
+          ]}
           accessibilityRole="header"
         >
           Create a Character
         </Text>
-        <Text className="pt-[2vh] text-center text-2xl">Select Class</Text>
-        <View className="flex w-full flex-row justify-evenly">
+        <Text
+          style={[
+            styles.text2xl,
+            { paddingTop: height * 0.02, textAlign: "center" },
+          ]}
+        >
+          Select Class
+        </Text>
+
+        <View
+          style={{
+            flexDirection: "row",
+            width: "100%",
+            justifyContent: "space-evenly",
+          }}
+        >
           <Pressable
-            className="-ml-2"
+            style={{
+              marginLeft: -8,
+              height: height * 0.25,
+              width: width * 0.45,
+            }}
             onPress={() => {
               vibration({ style: "light" });
               setClassSelection(PlayerClassOptions.mage);
-            }}
-            style={{
-              height: uiStore.dimensions.height * 0.25,
-              width: uiStore.dimensions.width * 0.45,
             }}
             accessibilityRole="button"
             accessibilityLabel="Select Mage"
           >
             {({ pressed }) => (
               <View
-                className={`${
+                style={[
+                  styles.border,
+                  {
+                    width: "100%",
+                    height: "100%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
                   pressed || classSelection == PlayerClassOptions.mage
-                    ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                    : "border-transparent"
-                } w-full h-full border flex items-center justify-center`}
+                    ? [
+                        {
+                          borderRadius: 8,
+                          borderColor: isDark ? "#fafafa" : "#27272a",
+                        },
+                      ]
+                    : { borderColor: "transparent" },
+                ]}
               >
                 <WizardHat
                   style={{ marginBottom: 5 }}
-                  color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
-                  height={uiStore.dimensions.height * 0.15}
-                  width={uiStore.dimensions.height * 0.15}
+                  color={isDark ? "#2563eb" : "#1e40af"}
+                  height={height * 0.15}
+                  width={height * 0.15}
                 />
-                <Text className="mx-auto text-xl" style={{ color: "#2563eb" }}>
+                <Text
+                  style={[
+                    styles.textXl,
+                    { textAlign: "center", color: "#2563eb" },
+                  ]}
+                >
                   Mage
                 </Text>
               </View>
             )}
           </Pressable>
+
           <Pressable
-            className="-mr-2"
+            style={{
+              marginRight: -8,
+              height: height * 0.25,
+              width: width * 0.45,
+            }}
             onPress={() => {
               vibration({ style: "light" });
               setClassSelection(PlayerClassOptions.ranger);
-            }}
-            style={{
-              height: uiStore.dimensions.height * 0.25,
-              width: uiStore.dimensions.width * 0.45,
             }}
             accessibilityRole="button"
             accessibilityLabel="Select Ranger"
           >
             {({ pressed }) => (
               <View
-                className={`${
+                style={[
+                  styles.border,
+                  {
+                    width: "100%",
+                    height: "100%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
                   pressed || classSelection == PlayerClassOptions.ranger
-                    ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                    : "border-transparent"
-                } w-full h-full border flex items-center justify-center`}
+                    ? [
+                        {
+                          borderRadius: 8,
+                          borderColor: isDark ? "#fafafa" : "#27272a",
+                        },
+                      ]
+                    : { borderColor: "transparent" },
+                ]}
               >
-                <View className="rotate-12">
+                <View style={{ transform: [{ rotate: "12deg" }] }}>
                   <RangerIcon
                     style={{ marginBottom: 5 }}
-                    height={uiStore.dimensions.height * 0.15}
-                    width={uiStore.dimensions.height * 0.15}
+                    height={height * 0.15}
+                    width={height * 0.15}
                   />
                 </View>
-                <Text className="mx-auto text-xl" style={{ color: "green" }}>
+                <Text
+                  style={[
+                    styles.textXl,
+                    { textAlign: "center", color: "green" },
+                  ]}
+                >
                   Ranger
                 </Text>
               </View>
             )}
           </Pressable>
         </View>
-        <View className="flex w-full flex-row justify-evenly">
+
+        <View
+          style={{
+            flexDirection: "row",
+            width: "100%",
+            justifyContent: "space-evenly",
+          }}
+        >
           <Pressable
-            className="-ml-2"
+            style={{
+              marginLeft: -8,
+              height: height * 0.25,
+              width: width * 0.45,
+            }}
             onPress={() => {
               vibration({ style: "light" });
               setClassSelection(PlayerClassOptions.necromancer);
-            }}
-            style={{
-              height: uiStore.dimensions.height * 0.25,
-              width: uiStore.dimensions.width * 0.45,
             }}
             accessibilityRole="button"
             accessibilityLabel="Select Necromancer"
           >
             {({ pressed }) => (
               <View
-                className={`${
+                style={[
+                  styles.border,
+                  {
+                    width: "100%",
+                    height: "100%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
                   pressed || classSelection == PlayerClassOptions.necromancer
-                    ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                    : "border-transparent"
-                } w-full h-full border flex items-center justify-center`}
+                    ? [
+                        {
+                          borderRadius: 8,
+                          borderColor: isDark ? "#fafafa" : "#27272a",
+                        },
+                      ]
+                    : { borderColor: "transparent" },
+                ]}
               >
-                <View className="-rotate-12">
+                <View style={{ transform: [{ rotate: "-12deg" }] }}>
                   <NecromancerSkull
                     style={{ marginBottom: 5 }}
-                    color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
-                    height={uiStore.dimensions.height * 0.15}
-                    width={uiStore.dimensions.height * 0.15}
+                    color={isDark ? "#9333ea" : "#6b21a8"}
+                    height={height * 0.15}
+                    width={height * 0.15}
                   />
                 </View>
-                <Text className="mx-auto text-xl" style={{ color: "#9333ea" }}>
+                <Text
+                  style={[
+                    styles.textXl,
+                    { textAlign: "center", color: "#9333ea" },
+                  ]}
+                >
                   Necromancer
                 </Text>
               </View>
             )}
           </Pressable>
+
           <Pressable
-            className="-mr-2"
+            style={{
+              marginRight: -8,
+              height: height * 0.25,
+              width: width * 0.45,
+            }}
             onPress={() => {
               vibration({ style: "light" });
               setClassSelection(PlayerClassOptions.paladin);
-            }}
-            style={{
-              height: uiStore.dimensions.height * 0.25,
-              width: uiStore.dimensions.width * 0.45,
             }}
             accessibilityRole="button"
             accessibilityLabel="Select Paladin"
           >
             {({ pressed }) => (
               <View
-                className={`${
+                style={[
+                  styles.border,
+                  {
+                    width: "100%",
+                    height: "100%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
                   pressed || classSelection == PlayerClassOptions.paladin
-                    ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                    : "border-transparent"
-                } w-full h-full border flex items-center justify-center`}
+                    ? [
+                        {
+                          borderRadius: 8,
+                          borderColor: isDark ? "#fafafa" : "#27272a",
+                        },
+                      ]
+                    : { borderColor: "transparent" },
+                ]}
               >
-                <View className="rotate-12">
-                  <View className="scale-x-[-1] transform">
+                <View style={{ transform: [{ rotate: "12deg" }] }}>
+                  <View style={{ transform: [{ scaleX: -1 }] }}>
                     <PaladinHammer
-                      height={uiStore.dimensions.height * 0.15}
-                      width={uiStore.dimensions.height * 0.15}
+                      height={height * 0.15}
+                      width={height * 0.15}
                     />
                   </View>
                 </View>
-                <Text className="mx-auto text-xl" style={{ color: "#fcd34d" }}>
+                <Text
+                  style={[
+                    styles.textXl,
+                    { textAlign: "center", color: "#fcd34d" },
+                  ]}
+                >
                   Paladin
                 </Text>
               </View>
             )}
           </Pressable>
         </View>
-        <Text className="mt-[2vh] h-16 text-center md:text-lg">
+
+        <Text style={styles.classDescriptionText}>
           {classSelection && ClassDescriptionMap[classSelection]}
         </Text>
-        <View className="mx-auto pt-4 pb-[10vh]">
+
+        <View
+          style={{
+            marginHorizontal: "auto",
+            paddingTop: 16,
+            paddingBottom: height * 0.1,
+          }}
+        >
           <FadeSlide show={!!classSelection}>
             {({ showing }) => (
               <GenericFlatButton
@@ -261,10 +373,11 @@ const SetClassScreen = observer(() => {
           </FadeSlide>
         </View>
       </View>
+
       {(tutorialStore.tutorialsEnabled || !playerState) && (
-        <View className="absolute ml-4 mt-4">
+        <View style={styles.tutorialButtonContainer}>
           <Pressable
-            className="absolute z-top"
+            style={{ position: "absolute" }}
             onPress={() => {
               setForceShowTutorial(true);
             }}
@@ -274,7 +387,7 @@ const SetClassScreen = observer(() => {
             <FontAwesome5
               name="question-circle"
               size={32}
-              color={colorScheme == "light" ? "#27272a" : "#fafafa"}
+              color={isDark ? "#fafafa" : "#27272a"}
             />
           </Pressable>
         </View>

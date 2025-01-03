@@ -1,3 +1,4 @@
+import React from "react";
 import { router } from "expo-router";
 import { TutorialOption } from "../../utility/types";
 import TutorialModal from "../../components/TutorialModal";
@@ -5,8 +6,7 @@ import { useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
 import { useIsFocused } from "@react-navigation/native";
 import { useState } from "react";
-import { useColorScheme } from "nativewind";
-import { Pressable, View } from "react-native";
+import { Pressable, useColorScheme, View } from "react-native";
 import { Text } from "../../components/Themed";
 import { playerClassColors } from "../../constants/Colors";
 import { toTitleCase } from "../../utility/functions/misc";
@@ -14,21 +14,23 @@ import { FontAwesome5, Foundation } from "@expo/vector-icons";
 import { useNewGameStore } from "./_layout";
 import GenericFlatLink from "../../components/GenericLink";
 import { FadeSlide } from "../../components/AnimatedWrappers";
+import { useStyles } from "../../hooks/styles";
 
 export default function SetSex() {
-  const { colorScheme } = useColorScheme();
+  const styles = useStyles();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
   const { classSelection, sex, setSex } = useNewGameStore();
+  const vibration = useVibration();
+  const [forceShowTutorial, setForceShowTutorial] = useState(false);
+  const { playerState, tutorialStore } = useRootStore();
+  const isFocused = useIsFocused();
+
   if (!classSelection) {
     router.back();
     router.back();
     return;
   }
-
-  const vibration = useVibration();
-  const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
-
-  const { playerState, tutorialStore } = useRootStore();
-  const isFocused = useIsFocused();
 
   return (
     <>
@@ -39,22 +41,21 @@ export default function SetSex() {
         isFocused={isFocused}
         pageOne={{
           title: "This game focuses around the passage of time.",
-          body: "Almost everything will move the game clock forward, aging the characters in the game. At a certain point it will nearly impossible to stay alive.",
+          body: "Almost everything will move the game clock forward, aging the characters in the game. At a certain point it will be nearly impossible to stay alive.",
         }}
         pageTwo={{
-          body: "However, if you have a child, you can live on through the child retaining much of what has been achieved in your previous life",
+          body: "However, if you have a child, you can live on through the child, retaining much of what has been achieved in your previous life.",
         }}
       />
-      <View className="flex-1 items-center">
-        <Text className="mt-[6vh] text-center text-2xl md:text-3xl">
+      <View style={styles.newGameContainer}>
+        <Text style={[styles.text2xl, styles.newGameHeader]}>
           Set the sex of your{" "}
           <Text style={{ color: playerClassColors[classSelection] }}>
             {toTitleCase(classSelection)}
           </Text>
         </Text>
-        <View className="mt-[12vh] flex w-full flex-row justify-evenly">
+        <View style={styles.sexSelectionRow}>
           <Pressable
-            className="w-1/3"
             onPress={() => {
               setSex("male");
               vibration({ style: "light" });
@@ -64,25 +65,30 @@ export default function SetSex() {
           >
             {({ pressed }) => (
               <View
-                className={`${
+                style={[
+                  styles.sexOption,
                   pressed || sex == "male"
-                    ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                    : "border-transparent"
-                } py-4 border`}
+                    ? {
+                        borderRadius: 8,
+                        borderColor: isDark ? "#fafafa" : "#27272a",
+                      }
+                    : { borderColor: "transparent" },
+                ]}
               >
-                <View className="mx-auto">
+                <View style={{ marginHorizontal: "auto" }}>
                   <Foundation
                     name="male-symbol"
                     size={90}
                     color={playerClassColors[classSelection]}
                   />
                 </View>
-                <Text className="text-center text-lg">Male</Text>
+                <Text style={[styles.textLg, { textAlign: "center" }]}>
+                  Male
+                </Text>
               </View>
             )}
           </Pressable>
           <Pressable
-            className="w-1/3"
             onPress={() => {
               setSex("female");
               vibration({ style: "light" });
@@ -92,25 +98,31 @@ export default function SetSex() {
           >
             {({ pressed }) => (
               <View
-                className={`${
+                style={[
+                  styles.sexOption,
                   pressed || sex == "female"
-                    ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                    : "border-transparent"
-                } py-4 border`}
+                    ? {
+                        borderRadius: 8,
+                        borderColor: isDark ? "#fafafa" : "#27272a",
+                      }
+                    : { borderColor: "transparent" },
+                ]}
               >
-                <View className="mx-auto">
+                <View style={{ marginHorizontal: "auto" }}>
                   <Foundation
                     name="female-symbol"
                     size={90}
                     color={playerClassColors[classSelection]}
                   />
                 </View>
-                <Text className="text-center text-lg">Female</Text>
+                <Text style={[styles.textLg, { textAlign: "center" }]}>
+                  Female
+                </Text>
               </View>
             )}
           </Pressable>
         </View>
-        <View className="mx-auto mt-8">
+        <View style={{ marginHorizontal: "auto", marginTop: 32 }}>
           <FadeSlide show={!!sex}>
             {({ showing }) => (
               <GenericFlatLink
@@ -126,9 +138,9 @@ export default function SetSex() {
         </View>
       </View>
       {(tutorialStore.tutorialsEnabled || !playerState) && (
-        <View className="absolute ml-4 mt-4">
+        <View style={{ position: "absolute", marginLeft: 16, marginTop: 16 }}>
           <Pressable
-            className="absolute"
+            style={{ position: "absolute" }}
             onPress={() => setForceShowTutorial(true)}
             accessibilityRole="button"
             accessibilityLabel="Show Tutorial"
@@ -136,7 +148,7 @@ export default function SetSex() {
             <FontAwesome5
               name="question-circle"
               size={32}
-              color={colorScheme == "light" ? "#27272a" : "#fafafa"}
+              color={isDark ? "#fafafa" : "#27272a"}
             />
           </Pressable>
         </View>

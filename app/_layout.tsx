@@ -1,7 +1,6 @@
 import { useFonts } from "expo-font";
 import { Stack, router, usePathname } from "expo-router";
 import React, { useEffect, useState, useRef } from "react";
-import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
 import {
   Platform,
@@ -12,7 +11,6 @@ import {
 } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { ThemedView, Text } from "../components/Themed";
-import "../assets/styles/globals.css";
 import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
 import D20DieAnimation from "../components/DieRollAnim";
@@ -40,16 +38,12 @@ import GenericModal from "../components/GenericModal";
 import { CharacterImage } from "../components/CharacterImage";
 import GenericFlatButton from "../components/GenericFlatButton";
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
+export { ErrorBoundary } from "expo-router";
 
 export const unstable_settings = {
-  // Ensure that reloading on ﻿/modal keeps a back button present.
   initialRouteName: "(tabs)",
 };
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+
 SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({
   fade: Platform.OS === "ios",

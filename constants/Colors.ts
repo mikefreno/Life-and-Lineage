@@ -10,31 +10,35 @@ import { ColorValue } from "react-native";
 // Core colors
 const tintColorLight = "#2f95dc";
 const tintColorDark = "#fff";
-const borderColor = "#ccc";
+const defaultTab = "#ccc";
 
 // Light theme colors
 const lightBackground = "#fafafa";
 const lightText = "#000";
+const lightBorder = "#27272a";
 
 // Dark theme colors
 const darkBackground = "#09090b";
 const darkCard = "#18181b";
 const darkText = "#fff";
+const darkBorder = "#fafafa";
 
 export default {
   light: {
     text: lightText,
+    border: lightBorder,
     background: lightBackground,
     tint: tintColorLight,
-    tabIconDefault: borderColor,
+    tabIconDefault: defaultTab,
     tabIconSelected: tintColorLight,
     accent: lightBackground,
   },
   dark: {
     text: darkText,
+    border: darkBorder,
     background: darkBackground,
     tint: tintColorDark,
-    tabIconDefault: borderColor,
+    tabIconDefault: defaultTab,
     tabIconSelected: tintColorDark,
     accent: darkCard,
   },
@@ -65,7 +69,7 @@ export const LightTheme: Theme = {
     background: lightBackground,
     card: lightBackground,
     text: lightText,
-    border: borderColor,
+    border: lightBorder,
     notification: tintColorLight,
   },
 };
@@ -95,7 +99,7 @@ export const DarkTheme: Theme = {
     background: darkBackground,
     card: darkCard,
     text: darkText,
-    border: borderColor,
+    border: darkBorder,
     notification: tintColorDark,
   },
 };

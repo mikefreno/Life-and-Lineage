@@ -1,9 +1,9 @@
-import { Pressable, View } from "react-native";
+import React from "react";
+import { Pressable, useColorScheme, View } from "react-native";
 import { Text } from "../../components/Themed";
 import { useState } from "react";
 import { router } from "expo-router";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { useColorScheme } from "nativewind";
 import TutorialModal from "../../components/TutorialModal";
 import { DescriptionMap } from "../../utility/descriptions";
 import {
@@ -22,24 +22,26 @@ import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
 import GenericFlatLink from "../../components/GenericLink";
 import { FadeSlide } from "../../components/AnimatedWrappers";
+import { useStyles } from "../../hooks/styles";
 
 export default function SetBlessing() {
   const { classSelection, blessingSelection, setBlessingSelection } =
     useNewGameStore();
 
+  const isFocused = useIsFocused();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const vibration = useVibration();
+  const { uiStore, tutorialStore, playerState } = useRootStore();
+  const { dimensions } = uiStore;
+  const styles = useStyles();
+
+  const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
+
   if (!classSelection) {
     router.dismissAll();
     return;
   }
-
-  const isFocused = useIsFocused();
-  const { colorScheme } = useColorScheme();
-  const vibration = useVibration();
-  const { uiStore, tutorialStore, playerState } = useRootStore();
-  const { dimensions } = uiStore;
-
-  const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
-
   return (
     <>
       <TutorialModal
@@ -49,71 +51,82 @@ export default function SetBlessing() {
         clearOverride={() => setForceShowTutorial(false)}
         pageOne={{
           title:
-            "Magic is a extremely powerful, but often very expensive obtain.",
-          body: "You will start with a book providing a spell pertaining to blessing you choose, and a higher starting point in that school.",
+            "Magic is extremely powerful, but often very expensive to obtain.",
+          body: "You will start with a book providing a spell pertaining to the blessing you choose, and a higher starting point in that school.",
         }}
         pageTwo={{
-          body: "Each of the blessings are for your class, you can learn from of these schools, but not from a school for a different class.",
+          body: "Each of the blessings are for your class. You can learn from these schools, but not from a school for a different class.",
         }}
       />
-      <View className="flex-1 pt-8">
+
+      <View style={styles.newGameContainer}>
         <Text
-          className="text-center text-2xl px-4"
-          style={{
-            maxWidth: dimensions.width * 0.75,
-            marginHorizontal: "auto",
-          }}
+          style={[
+            styles.text2xl,
+            {
+              textAlign: "center",
+              paddingHorizontal: 16,
+              maxWidth: dimensions.width * 0.75,
+              marginHorizontal: "auto",
+            },
+          ]}
           accessibilityRole="header"
         >
           With What Blessing Was Your
-          <Text
-            style={{ color: playerClassColors[classSelection] }}
-          >{` ${toTitleCase(classSelection)} `}</Text>
+          <Text style={{ color: playerClassColors[classSelection] }}>
+            {` ${toTitleCase(classSelection)} `}
+          </Text>
           Born?
         </Text>
-        <>
-          <ClassDependantBlessings
-            playerClass={classSelection}
-            vibration={vibration}
-            blessing={blessingSelection}
-            setBlessing={setBlessingSelection}
-            colorScheme={colorScheme}
-            dimensions={dimensions}
-          />
-          <Text className="text-center md:text-lg px-4">
-            {DescriptionMap[blessingSelection as Element]}
-          </Text>
-          <View className="mx-auto h-32 py-2">
-            <FadeSlide show={blessingSelection == 0 || !!blessingSelection}>
-              {({ showing }) => (
-                <GenericFlatLink
-                  href={"./SexSelect"}
-                  accessibilityRole="link"
-                  accessibilityLabel="Next"
-                  disabled={!showing}
-                >
-                  <Text>Next</Text>
-                </GenericFlatLink>
-              )}
-            </FadeSlide>
-          </View>
-        </>
+
+        <ClassDependantBlessings
+          playerClass={classSelection}
+          vibration={vibration}
+          blessing={blessingSelection}
+          setBlessing={setBlessingSelection}
+          colorScheme={colorScheme}
+          dimensions={dimensions}
+        />
+
+        <Text
+          style={[
+            styles.textLg,
+            { textAlign: "center", paddingHorizontal: 16 },
+          ]}
+        >
+          {DescriptionMap[blessingSelection as Element]}
+        </Text>
+
+        <View
+          style={{ marginHorizontal: "auto", height: 128, paddingVertical: 8 }}
+        >
+          <FadeSlide show={blessingSelection == 0 || !!blessingSelection}>
+            {({ showing }) => (
+              <GenericFlatLink
+                href={"./SexSelect"}
+                accessibilityRole="link"
+                accessibilityLabel="Next"
+                disabled={!showing}
+              >
+                <Text>Next</Text>
+              </GenericFlatLink>
+            )}
+          </FadeSlide>
+        </View>
       </View>
 
       {(tutorialStore.tutorialsEnabled || !playerState) && (
-        <View className="absolute ml-4 mt-4">
+        <View style={{ position: "absolute", marginLeft: 16, marginTop: 16 }}>
           <Pressable
-            className="absolute z-top"
-            onPress={() => {
-              setForceShowTutorial(true);
-            }}
+            style={{ position: "absolute" }}
+            onPress={() => setForceShowTutorial(true)}
             accessibilityRole="button"
             accessibilityLabel="Show Tutorial"
           >
             <FontAwesome5
               name="question-circle"
               size={32}
-              color={colorScheme == "light" ? "#27272a" : "#fafafa"}
+              color={isDark ? "#fafafa" : "#27272a"}
             />
           </Pressable>
         </View>
@@ -140,6 +153,9 @@ const BlessingPressable = ({
   };
   blessing: Element | undefined;
 }) => {
+  const styles = useStyles();
+  const isDark = colorScheme === "dark";
+
   return (
     <Pressable
       onPress={onPress}
@@ -152,11 +168,12 @@ const BlessingPressable = ({
     >
       {({ pressed }) => (
         <View
-          className={`${
+          style={[
+            styles.blessingPressable,
             pressed || blessing == element
-              ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-              : "border-transparent"
-          } w-full h-full border flex items-center justify-center`}
+              ? { borderRadius: 8, borderColor: isDark ? "#fafafa" : "#27272a" }
+              : { borderColor: "transparent" },
+          ]}
         >
           <BlessingDisplay
             blessing={element}
@@ -164,13 +181,17 @@ const BlessingPressable = ({
             size={dimensions.height * 0.15}
           />
           <Text
-            className="text-center text-lg px-2"
-            style={{
-              color:
-                element == Element.assassination && colorScheme == "dark"
-                  ? elementalColorMap[element].light
-                  : elementalColorMap[element].dark,
-            }}
+            style={[
+              styles.textLg,
+              {
+                textAlign: "center",
+                paddingHorizontal: 8,
+                color:
+                  element == Element.assassination && colorScheme == "dark"
+                    ? elementalColorMap[element].light
+                    : elementalColorMap[element].dark,
+              },
+            ]}
           >
             Blessing of {ElementToString[element]}
           </Text>
@@ -206,10 +227,12 @@ function ClassDependantBlessings({
     lesser: number;
   };
 }) {
+  const styles = useStyles();
+
   if (playerClass == "mage") {
     return (
-      <View className="flex items-center justify-evenly py-6">
-        <View className="mb-8 flex flex-row justify-evenly">
+      <View style={styles.blessingClassContainer}>
+        <View style={[styles.blessingRow, { marginBottom: 32 }]}>
           <BlessingPressable
             element={Element.fire}
             onPress={() => {
@@ -231,7 +254,7 @@ function ClassDependantBlessings({
             blessing={blessing}
           />
         </View>
-        <View className="flex flex-row justify-evenly">
+        <View style={styles.blessingRow}>
           <BlessingPressable
             element={Element.air}
             onPress={() => {
@@ -257,8 +280,8 @@ function ClassDependantBlessings({
     );
   } else if (playerClass == "necromancer") {
     return (
-      <View className="flex items-center justify-evenly py-6">
-        <View className="mb-8 flex flex-row justify-evenly">
+      <View style={styles.blessingClassContainer}>
+        <View style={[styles.blessingRow, { marginBottom: 32 }]}>
           <BlessingPressable
             element={Element.summoning}
             onPress={() => {
@@ -280,7 +303,7 @@ function ClassDependantBlessings({
             blessing={blessing}
           />
         </View>
-        <View className="flex flex-row justify-evenly">
+        <View style={styles.blessingRow}>
           <BlessingPressable
             element={Element.bone}
             onPress={() => {
@@ -306,7 +329,7 @@ function ClassDependantBlessings({
     );
   } else if (playerClass == "paladin") {
     return (
-      <View className="flex items-center justify-evenly py-6">
+      <View style={styles.blessingClassContainer}>
         <BlessingPressable
           element={Element.holy}
           onPress={() => {
@@ -317,7 +340,7 @@ function ClassDependantBlessings({
           dimensions={dimensions}
           blessing={blessing}
         />
-        <View className="mt-8 flex flex-row justify-evenly">
+        <View style={[styles.blessingRow, { marginTop: 32 }]}>
           <BlessingPressable
             element={Element.vengeance}
             onPress={() => {
@@ -343,7 +366,7 @@ function ClassDependantBlessings({
     );
   } else if (playerClass == "ranger") {
     return (
-      <View className="flex items-center justify-evenly py-6">
+      <View style={styles.blessingClassContainer}>
         <BlessingPressable
           element={Element.beastMastery}
           onPress={() => {
@@ -354,7 +377,7 @@ function ClassDependantBlessings({
           dimensions={dimensions}
           blessing={blessing}
         />
-        <View className="mt-8 flex flex-row justify-evenly">
+        <View style={[styles.blessingRow, { marginTop: 32 }]}>
           <BlessingPressable
             element={Element.arcane}
             onPress={() => {
@@ -379,4 +402,5 @@ function ClassDependantBlessings({
       </View>
     );
   }
+  return null;
 }
