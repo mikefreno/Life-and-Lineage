@@ -1,7 +1,8 @@
+import React from "react";
 import { router } from "expo-router";
 import GenericModal from "../GenericModal";
 import { Text } from "../Themed";
-import { Pressable, View, Image, useColorScheme } from "react-native";
+import { Pressable, View, Image } from "react-native";
 import { toTitleCase, wait } from "../../utility/functions/misc";
 import { Coins } from "../../assets/icons/SVGIcons";
 import GenericFlatButton from "../GenericFlatButton";
@@ -11,9 +12,10 @@ import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { rarityColors } from "../../constants/Colors";
 import { Rarity } from "../../utility/types";
+import { useStyles } from "../../hooks/styles";
 
 export default function DroppedItemsModal() {
-  const { playerState, dungeonStore } = useRootStore();
+  const { playerState, dungeonStore, uiStore } = useRootStore();
   const {
     inventoryFullNotifier,
     droppedItems,
@@ -21,7 +23,7 @@ export default function DroppedItemsModal() {
     setDroppedItems,
     setInventoryFullNotifier,
   } = useLootState();
-  const colorScheme = useColorScheme();
+  const styles = useStyles();
 
   function closeImmediateItemDrops() {
     if (droppedItems && droppedItems.itemDrops.length > 0) {
@@ -114,46 +116,52 @@ export default function DroppedItemsModal() {
       backFunction={doneLooting}
     >
       <>
-        <View className="mt-4 flex flex-row justify-center">
+        <View style={styles.droppedItemHeader}>
           <Text>You picked up {droppedItems?.gold}</Text>
           <Coins width={16} height={16} style={{ marginLeft: 6 }} />
         </View>
         <Text
-          className="text-center text-lg"
-          style={{
-            color: "#ef4444",
-            opacity: inventoryFullNotifier ? 1 : 0,
-          }}
+          style={[
+            styles.inventoryFullText,
+            { opacity: inventoryFullNotifier ? 1 : 0 },
+          ]}
         >
           Inventory is full!
         </Text>
         {droppedItems?.itemDrops.map((item) => (
           <View
             key={item.id}
-            className="mt-2 flex flex-row justify-between items-center p-2 rounded-lg"
-            style={{
-              backgroundColor:
-                colorScheme === "dark"
-                  ? rarityColors[item.rarity].background.dark
-                  : rarityColors[item.rarity].background.light,
-            }}
+            style={[
+              styles.droppedItemRow,
+              {
+                backgroundColor:
+                  uiStore.colorScheme === "dark"
+                    ? rarityColors[item.rarity].background.dark
+                    : rarityColors[item.rarity].background.light,
+              },
+            ]}
           >
-            <View className="flex flex-row items-center">
+            <View style={styles.itemIconContainer}>
               <Image source={item.getItemIcon()} />
               {item.rarity !== Rarity.NORMAL && (
                 <View
-                  className="h-3 w-3 rounded-full ml-1"
-                  style={{
-                    backgroundColor: rarityColors[item.rarity].background.light,
-                  }}
+                  style={[
+                    styles.itemRarityDot,
+                    {
+                      backgroundColor:
+                        rarityColors[item.rarity].background.light,
+                    },
+                  ]}
                 />
               )}
             </View>
             <Text
-              className="my-auto ml-2 w-1/2"
-              style={{
-                color: rarityColors[item.rarity].text ?? "white",
-              }}
+              style={[
+                styles.itemNameText,
+                {
+                  color: rarityColors[item.rarity].text ?? "white",
+                },
+              ]}
             >
               {toTitleCase(item.name)}
             </Text>
@@ -169,7 +177,7 @@ export default function DroppedItemsModal() {
         ))}
         {droppedItems && droppedItems.itemDrops.length > 0 ? (
           <Pressable
-            className="mx-auto mt-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+            style={[styles.flatButtonContainer, { marginTop: 16 }]}
             onPress={() => {
               takeAllItems();
             }}
@@ -178,7 +186,7 @@ export default function DroppedItemsModal() {
           </Pressable>
         ) : null}
         <Pressable
-          className="mx-auto my-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+          style={[styles.flatButtonContainer, { marginVertical: 16 }]}
           onPress={doneLooting}
         >
           <Text>Done Looting</Text>

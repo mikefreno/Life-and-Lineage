@@ -24,7 +24,7 @@ describe("UIStore", () => {
   });
 
   test("setColorScheme", () => {
-    uiStore.setColorScheme("dark");
+    uiStore.setPreferedColorScheme("dark");
     expect(uiStore.colorScheme).toBe("dark");
   });
 

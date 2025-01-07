@@ -1,3 +1,4 @@
+import React from "react";
 import { ThemedView, Text } from "../Themed";
 import {
   Pressable,
@@ -9,7 +10,6 @@ import {
 } from "react-native";
 import { toTitleCase } from "../../utility/functions/misc";
 import { useEffect, useState } from "react";
-import { useColorScheme } from "nativewind";
 import GenericModal from "../GenericModal";
 import SpellDetails from "../SpellDetails";
 import InventoryRender from "../InventoryRender";
@@ -28,6 +28,7 @@ import {
   useRootStore,
 } from "../../hooks/stores";
 import { observer } from "mobx-react-lite";
+import { useStyles } from "../../hooks/styles";
 
 const BattleTab = observer(
   ({
@@ -35,14 +36,13 @@ const BattleTab = observer(
   }: {
     battleTab: "attacksOrNavigation" | "equipment" | "log";
   }) => {
-    const { colorScheme } = useColorScheme();
     const [attackDetails, setAttackDetails] = useState<Attack | Spell | null>(
       null,
     );
     const [attackDetailsShowing, setAttackDetailsShowing] =
       useState<boolean>(false);
 
-    const { enemyStore, dungeonStore } = useRootStore();
+    const { enemyStore, dungeonStore, uiStore } = useRootStore();
     const playerState = usePlayerStore();
 
     const { useAttack } = useCombatActions();
@@ -118,6 +118,7 @@ const BattleTab = observer(
       }
     };
 
+    const styles = useStyles();
     return (
       <>
         <GenericModal
@@ -126,7 +127,7 @@ const BattleTab = observer(
           size={attackDetails instanceof Spell ? 100 : undefined}
         >
           {attackDetails && (
-            <View className="flex items-center">
+            <View style={styles.flexColumnCenter}>
               {attackDetails instanceof Spell ? (
                 <SpellDetails spell={attackDetails} />
               ) : (
@@ -140,7 +141,7 @@ const BattleTab = observer(
           !dungeonStore.inCombat ? (
             <DungeonMapControls />
           ) : (
-            <View className="w-full h-full px-2">
+            <View style={styles.battleTabContainer}>
               {!playerState.isStunned ? (
                 <FlatList
                   data={combinedData}
@@ -148,48 +149,46 @@ const BattleTab = observer(
                   renderItem={({ item: attackOrSpell, index }) => (
                     <>
                       <ThemedView
-                        className="mt-2 rounded-lg border px-4 py-2"
-                        style={
-                          attackOrSpell instanceof Spell
-                            ? {
-                                backgroundColor:
-                                  elementalColorMap[attackOrSpell.element]
-                                    .light,
-                                borderColor:
-                                  elementalColorMap[attackOrSpell.element].dark,
-                              }
-                            : {}
-                        }
+                        style={[
+                          styles.attackCardContainer,
+                          attackOrSpell instanceof Spell && {
+                            backgroundColor:
+                              elementalColorMap[attackOrSpell.element].light,
+                            borderColor:
+                              elementalColorMap[attackOrSpell.element].dark,
+                          },
+                        ]}
                       >
-                        <View className="flex flex-row justify-between">
-                          <View className="flex flex-col justify-center">
+                        <View style={styles.attackCardContent}>
+                          <View style={styles.attackInfoContainer}>
                             <Pressable
-                              onPress={() => {
-                                setAttackDetails(attackOrSpell);
-                              }}
+                              onPress={() => setAttackDetails(attackOrSpell)}
                             >
                               <Text
-                                className="text-xl"
-                                style={{
-                                  color:
-                                    attackOrSpell instanceof Spell
-                                      ? elementalColorMap[attackOrSpell.element]
-                                          .dark
-                                      : colorScheme == "dark"
-                                      ? "#fafafa"
-                                      : "#09090b",
-                                }}
+                                style={[
+                                  styles.textXl,
+                                  {
+                                    color:
+                                      attackOrSpell instanceof Spell
+                                        ? elementalColorMap[
+                                            attackOrSpell.element
+                                          ].dark
+                                        : uiStore.colorScheme == "dark"
+                                        ? "#fafafa"
+                                        : "#09090b",
+                                  },
+                                ]}
                               >
                                 {toTitleCase(attackOrSpell.name)}
                               </Text>
                               {attackOrSpell instanceof Attack &&
                               attackOrSpell.baseHitChance ? (
-                                <Text className="text-lg">{`${
+                                <Text style={styles.textLg}>{`${
                                   attackOrSpell.baseHitChance * 100
                                 }% hit chance`}</Text>
                               ) : (
                                 attackOrSpell instanceof Spell && (
-                                  <View className="flex flex-row">
+                                  <View style={styles.spellCostContainer}>
                                     <Text
                                       style={{
                                         color:
@@ -200,12 +199,12 @@ const BattleTab = observer(
                                     >
                                       {attackOrSpell.manaCost}
                                     </Text>
-                                    <View className="my-auto pl-1">
+                                    <View style={styles.energyIcon}>
                                       <Energy
                                         height={14}
                                         width={14}
                                         color={
-                                          colorScheme == "dark"
+                                          uiStore.colorScheme == "dark"
                                             ? "#2563eb"
                                             : undefined
                                         }
@@ -222,24 +221,25 @@ const BattleTab = observer(
                               enemyStore.attackAnimationsOnGoing
                             }
                             onPress={() => attackHandler(attackOrSpell)}
-                            className="mx-2 my-auto rounded px-4 py-2 shadow-sm active:scale-95 active:opacity-50"
                             style={[
-                              (!attackOrSpell.canBeUsed ||
-                                enemyStore.attackAnimationsOnGoing) && {
-                                opacity: 0.5,
-                              },
+                              styles.actionButton,
                               {
+                                opacity:
+                                  !attackOrSpell.canBeUsed ||
+                                  enemyStore.attackAnimationsOnGoing
+                                    ? 0.5
+                                    : 1,
                                 backgroundColor:
                                   "element" in attackOrSpell
                                     ? elementalColorMap[attackOrSpell.element]
                                         .dark
-                                    : colorScheme == "light"
+                                    : uiStore.colorScheme == "light"
                                     ? "#d4d4d8"
                                     : "#27272a",
                               },
                             ]}
                           >
-                            <Text className="text-xl">
+                            <Text style={styles.textXl}>
                               {playerState.isStunned
                                 ? "Stunned!"
                                 : attackOrSpell instanceof Spell
@@ -254,15 +254,19 @@ const BattleTab = observer(
                       </ThemedView>
                       {index == combinedData.length - 1 && (
                         <ThemedView
-                          className="flex flex-row mt-2 justify-between rounded-lg border px-4 py-2"
-                          style={{
-                            borderColor:
-                              colorScheme == "light" ? "#71717a" : "#a1a1aa",
-                          }}
+                          style={[
+                            styles.passCardContainer,
+                            {
+                              borderColor:
+                                uiStore.colorScheme == "light"
+                                  ? "#71717a"
+                                  : "#a1a1aa",
+                            },
+                          ]}
                         >
-                          <View className="flex flex-col justify-center">
-                            <Text className="text-xl">Pass</Text>
-                            <View className="items-center align-middle flex flex-row">
+                          <View style={styles.attackInfoContainer}>
+                            <Text style={styles.textXl}>Pass</Text>
+                            <View style={styles.regenContainer}>
                               <Text>2x</Text>
                               <Regen width={12} height={12} />
                             </View>
@@ -274,18 +278,22 @@ const BattleTab = observer(
                               vibration({ style: "light" });
                               pass({ voluntary: true });
                             }}
-                            className="mx-2 my-auto rounded px-4 py-2 shadow-sm active:scale-95 active:opacity-50"
-                            style={{
-                              backgroundColor:
-                                colorScheme == "light" ? "#d4d4d8" : "#27272a",
-                              opacity:
-                                playerState.isStunned ||
-                                enemyStore.attackAnimationsOnGoing
-                                  ? 0.5
-                                  : 1.0,
-                            }}
+                            style={[
+                              styles.actionButton,
+                              {
+                                backgroundColor:
+                                  uiStore.colorScheme == "light"
+                                    ? "#d4d4d8"
+                                    : "#27272a",
+                                opacity:
+                                  playerState.isStunned ||
+                                  enemyStore.attackAnimationsOnGoing
+                                    ? 0.5
+                                    : 1.0,
+                              },
+                            ]}
                           >
-                            <Text className="text-xl">Use</Text>
+                            <Text style={styles.textXl}>Use</Text>
                           </Pressable>
                         </ThemedView>
                       )}
@@ -293,19 +301,21 @@ const BattleTab = observer(
                   )}
                 />
               ) : (
-                <View className="my-auto px-4 py-2 shadow">
-                  <Text className="text-center text-2xl tracking-wide">
-                    Stunned!
-                  </Text>
+                <View style={styles.stunnedContainer}>
+                  <Text style={styles.stunnedText}>Stunned!</Text>
                   <View
-                    className="flex flex-row justify-between rounded-lg border px-4 py-2"
-                    style={{
-                      borderColor:
-                        colorScheme == "light" ? "#71717a" : "#a1a1aa",
-                    }}
+                    style={[
+                      styles.passCardContainer,
+                      {
+                        borderColor:
+                          uiStore.colorScheme == "light"
+                            ? "#71717a"
+                            : "#a1a1aa",
+                      },
+                    ]}
                   >
-                    <View className="flex flex-col justify-center">
-                      <Text className="text-xl">Pass</Text>
+                    <View style={styles.attackInfoContainer}>
+                      <Text style={styles.textXl}>Pass</Text>
                     </View>
                     <Pressable
                       disabled={enemyStore.attackAnimationsOnGoing}
@@ -314,13 +324,18 @@ const BattleTab = observer(
                         vibration({ style: "light" });
                         pass({ voluntary: true });
                       }}
-                      className={`${
-                        enemyStore.attackAnimationsOnGoing
-                          ? ""
-                          : "bg-zinc-300 dark:bg-zinc-700"
-                      } mx-2 my-auto rounded px-4 py-2 active:scale-95 active:opacity-50`}
+                      style={[
+                        styles.actionButton,
+                        {
+                          backgroundColor:
+                            uiStore.colorScheme == "light"
+                              ? "#d4d4d8"
+                              : "#27272a",
+                          opacity: enemyStore.attackAnimationsOnGoing ? 0.5 : 1,
+                        },
+                      ]}
                     >
-                      <Text className="text-xl">Use</Text>
+                      <Text style={styles.textXl}>Use</Text>
                     </Pressable>
                   </View>
                 </View>
@@ -329,7 +344,7 @@ const BattleTab = observer(
           )
         ) : battleTab == "equipment" ? (
           <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
-            <View className="flex-1">
+            <View style={{ flex: 1 }}>
               <InventoryRender
                 screen="dungeon"
                 displayItem={displayItem}
@@ -341,12 +356,12 @@ const BattleTab = observer(
             </View>
           </TouchableWithoutFeedback>
         ) : (
-          <View className="flex-1 px-2 ">
-            <View className="flex-1 pl-1 rounded-lg border border-zinc-600">
+          <View style={styles.logContainer}>
+            <View style={styles.logContent}>
               {Platform.OS == "web" ? (
                 <ScrollView>
                   {dungeonStore.reversedLogs.map((text) => (
-                    <Text>
+                    <Text style={styles.logText}>
                       {text
                         .replaceAll(`on the ${playerState.fullName}`, "")
                         .replaceAll(`on the ${playerState.fullName}`, "")
@@ -359,7 +374,7 @@ const BattleTab = observer(
                   inverted
                   data={dungeonStore.reversedLogs}
                   renderItem={({ item }) => (
-                    <Text className="py-1">
+                    <Text style={styles.logText}>
                       {item
                         .replaceAll(`${playerState.fullName}`, "You")
                         .replaceAll(`on the ${playerState.fullName}`, "")}

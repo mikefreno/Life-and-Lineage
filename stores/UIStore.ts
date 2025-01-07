@@ -1,7 +1,8 @@
-import { action, makeObservable, observable, reaction } from "mobx";
+import { action, computed, makeObservable, observable, reaction } from "mobx";
 import { RootStore } from "./RootStore";
 import {
   AccessibilityInfo,
+  Appearance,
   Dimensions,
   EmitterSubscription,
   Platform,
@@ -23,7 +24,7 @@ export default class UIStore {
   detailedStatusViewShowing: boolean;
   modalShowing: boolean;
   readonly dimensionsSubscription: EmitterSubscription;
-  colorScheme: "system" | "dark" | "light";
+  preferedColorScheme: "system" | "dark" | "light";
   vibrationEnabled: "full" | "minimal" | "none";
   healthWarning: number;
   reduceMotion: boolean;
@@ -66,14 +67,14 @@ export default class UIStore {
 
     const {
       vibrationEnabled,
-      colorScheme,
+      preferedColorScheme,
       healthWarning,
       reduceMotion,
       colorHeldForDungeon,
     } = this.hydrateUISettings();
 
     this.vibrationEnabled = vibrationEnabled;
-    this.colorScheme = colorScheme ?? "system";
+    this.preferedColorScheme = preferedColorScheme ?? "system";
     this.colorHeldForDungeon = colorHeldForDungeon;
     this.healthWarning = healthWarning;
 
@@ -92,22 +93,23 @@ export default class UIStore {
       dimensions: observable,
       itemBlockSize: observable,
       modalShowing: observable,
-      colorScheme: observable,
+      preferedColorScheme: observable,
       vibrationEnabled: observable,
       healthWarning: observable,
-      setColorScheme: action,
+      setPreferedColorScheme: action,
       modifyVibrationSettings: action,
       setHealthWarning: action,
       handleDimensionChange: action,
       reduceMotion: observable,
       setReduceMotion: action,
-      dungeonSetter: action,
       isLoading: observable,
       colorHeldForDungeon: observable,
-      clearDungeonColor: action,
       setIsLoading: action,
       newbornBaby: observable,
       setNewbornBaby: action,
+      colorScheme: computed,
+      dungeonSetter: action,
+      clearDungeonColor: action,
     });
 
     reaction(
@@ -128,7 +130,7 @@ export default class UIStore {
 
     reaction(
       () => [
-        this.colorScheme,
+        this.preferedColorScheme,
         this.healthWarning,
         this.vibrationEnabled,
         this.reduceMotion,
@@ -140,17 +142,25 @@ export default class UIStore {
     );
   }
 
+  get colorScheme(): "light" | "dark" {
+    if (this.preferedColorScheme == "system") {
+      return Appearance.getColorScheme() as "light" | "dark";
+    } else {
+      return this.preferedColorScheme;
+    }
+  }
+
   dungeonSetter() {
-    this.colorHeldForDungeon = this.colorScheme;
-    this.colorScheme = "dark";
+    this.colorHeldForDungeon = this.preferedColorScheme;
+    this.preferedColorScheme = "dark";
   }
 
   clearDungeonColor() {
     if (this.colorHeldForDungeon) {
-      this.colorScheme = this.colorHeldForDungeon;
-      this.colorHeldForDungeon = undefined;
+      this.preferedColorScheme = this.colorHeldForDungeon;
     }
   }
+
   async setIsLoading(state: boolean) {
     this.isLoading = state;
     if (state) {
@@ -162,8 +172,8 @@ export default class UIStore {
     this.newbornBaby = baby;
   }
 
-  public setColorScheme(color: "light" | "dark" | "system") {
-    this.colorScheme = color;
+  public setPreferedColorScheme(color: "light" | "dark" | "system") {
+    this.preferedColorScheme = color;
   }
 
   public setReduceMotion(state: boolean) {
@@ -212,7 +222,7 @@ export default class UIStore {
   }
 
   hydrateUISettings(): {
-    colorScheme: "system" | "dark" | "light";
+    preferedColorScheme: "system" | "dark" | "light";
     vibrationEnabled: "full" | "minimal" | "none";
     healthWarning: number;
     reduceMotion: boolean | undefined;
@@ -221,7 +231,7 @@ export default class UIStore {
     const stored = storage.getString("ui_settings");
     if (!stored) {
       return {
-        colorScheme: "system",
+        preferedColorScheme: "system",
         vibrationEnabled: Platform.OS === "ios" ? "full" : "minimal",
         healthWarning: 0.2,
         reduceMotion: undefined,
@@ -235,7 +245,7 @@ export default class UIStore {
     storage.set(
       "ui_settings",
       JSON.stringify({
-        colorScheme: this.colorScheme,
+        preferedColorScheme: this.preferedColorScheme,
         vibrationEnabled: this.vibrationEnabled,
         healthWarning: this.healthWarning,
         reduceMotion: this.reduceMotion,

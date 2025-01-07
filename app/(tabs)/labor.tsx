@@ -1,3 +1,4 @@
+import React from "react";
 import LaborTask from "../../components/LaborTask";
 import { View, ScrollView } from "react-native";
 import { useMemo, useState } from "react";
@@ -15,11 +16,13 @@ import { EXPANDED_PAD } from "../../components/PlayerStatus";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import GenericFlatButton from "../../components/GenericFlatButton";
+import { useStyles } from "../../hooks/styles";
 
-const EarnScreen = observer(() => {
+const LaborScreen = observer(() => {
   const { playerState, uiStore } = useRootStore();
   const [showingRejection, setShowingRejection] = useState<boolean>(false);
   const [missingPreReqs, setMissingPreReqs] = useState<string[]>([]);
+  const styles = useStyles();
 
   const vibration = useVibration();
 
@@ -67,13 +70,13 @@ const EarnScreen = observer(() => {
           isVisibleCondition={showingRejection}
           backFunction={() => setShowingRejection(false)}
         >
-          <View className="flex items-center">
-            <Text className="text-3xl">Rejected!</Text>
-            <Text className="my-6 text-center text-lg">
+          <View style={{ alignItems: "center" }}>
+            <Text style={styles.text3xl}>Rejected!</Text>
+            <Text style={styles.rejectionModalText}>
               You are missing the following qualifications:
             </Text>
             {missingPreReqs.map((missing) => (
-              <Text key={missing} className="py-1 text-lg">
+              <Text key={missing} style={styles.qualificationText}>
                 {toTitleCase(missing)}
               </Text>
             ))}
@@ -95,13 +98,15 @@ const EarnScreen = observer(() => {
             scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
           >
             <View
-              className="px-2"
-              style={{
-                paddingTop: headerHeight,
-                paddingBottom:
-                  bottomBarHeight +
-                  (uiStore.playerStatusIsCompact ? 0 : EXPANDED_PAD),
-              }}
+              style={[
+                {
+                  paddingHorizontal: 8,
+                  paddingTop: headerHeight,
+                  paddingBottom:
+                    bottomBarHeight +
+                    (uiStore.playerStatusIsCompact ? 0 : EXPANDED_PAD),
+                },
+              ]}
             >
               {sortedJobs.map(([key, jobData]) => (
                 <LaborTask
@@ -122,4 +127,5 @@ const EarnScreen = observer(() => {
     );
   }
 });
-export default EarnScreen;
+
+export default LaborScreen;

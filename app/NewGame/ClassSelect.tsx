@@ -1,7 +1,6 @@
 import React from "react";
-import { Pressable, useColorScheme, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
-import "../../assets/styles/globals.css";
 import { useLayoutEffect, useState } from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
 import TutorialModal from "../../components/TutorialModal";
@@ -31,8 +30,7 @@ const SetClassScreen = observer(() => {
   const router = useRouter();
   const { uiStore, playerState, tutorialStore } = useRootStore();
   const { height, width } = uiStore.dimensions;
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const isDark = uiStore.colorScheme === "dark";
 
   const styles = useStyles();
 

@@ -1,5 +1,5 @@
+import React from "react";
 import SpellDetails from "../../components/SpellDetails";
-import { useColorScheme } from "nativewind";
 import { View, ScrollView } from "react-native";
 import { observer } from "mobx-react-lite";
 import ProgressBar from "../../components/ProgressBar";
@@ -20,13 +20,13 @@ import { useIsFocused } from "@react-navigation/native";
 import { Text } from "../../components/Themed";
 import { useRootStore } from "../../hooks/stores";
 import { EXPANDED_PAD } from "../../components/PlayerStatus";
+import { useStyles } from "../../hooks/styles";
 
 const SpellsScreen = observer(() => {
-  const { colorScheme } = useColorScheme();
-
   const bottomTab = useBottomTabBarHeight();
   const header = useHeaderHeight();
   const { playerState, uiStore } = useRootStore();
+  const styles = useStyles();
 
   function magicProficiencySection(
     proficiencies:
@@ -46,14 +46,15 @@ const SpellsScreen = observer(() => {
       const nextMasteryBarrier =
         MasteryToBarrier[(currentMastery + 1) as MasteryLevel];
       return (
-        <View className="my-2 px-8 flex w-full flex-col" key={idx}>
+        <View style={styles.proficiencyContainer} key={idx}>
           <Text
             style={{
               color:
-                magicProficiency.school == Element.air && colorScheme == "light"
+                magicProficiency.school == Element.air &&
+                uiStore.colorScheme == "light"
                   ? "#71717a"
                   : magicProficiency.school == Element.assassination
-                  ? colorScheme == "dark"
+                  ? uiStore.colorScheme == "dark"
                     ? color.light
                     : color.dark
                   : color.dark,
@@ -72,13 +73,15 @@ const SpellsScreen = observer(() => {
             borderColor={color.dark}
           />
           <Text
-            className="mx-auto text-sm"
             style={{
+              textAlign: "center",
+              fontSize: 14,
               color:
-                magicProficiency.school == Element.air && colorScheme == "light"
+                magicProficiency.school == Element.air &&
+                uiStore.colorScheme == "light"
                   ? "#71717a"
                   : magicProficiency.school == Element.assassination
-                  ? colorScheme == "dark"
+                  ? uiStore.colorScheme == "dark"
                     ? color.light
                     : color.dark
                   : color.dark,
@@ -107,35 +110,33 @@ const SpellsScreen = observer(() => {
         }}
       />
       <View
-        className="flex-1"
         style={{
+          flex: 1,
           marginTop: header,
           paddingBottom:
             bottomTab + (uiStore.playerStatusIsCompact ? 0 : EXPANDED_PAD),
         }}
       >
         {playerState?.spells && playerState.spells.length > 0 ? (
-          <ScrollView
-            contentContainerStyle={{
-              flex: 1,
-            }}
-          >
+          <ScrollView contentContainerStyle={{ flex: 1 }}>
             {playerState.spells.map((spell) => (
-              <View key={spell.name} className="my-1 mx-auto">
+              <View key={spell.name} style={styles.spellContainer}>
                 <SpellDetails spell={spell} />
               </View>
             ))}
           </ScrollView>
         ) : (
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-xl tracking-wide">No Known Spells.</Text>
-            <Text className="text-center tracking-wide">
+          <View style={styles.noSpellsContainer}>
+            <Text style={[styles.textXl, { letterSpacing: 1 }]}>
+              No Known Spells.
+            </Text>
+            <Text style={{ textAlign: "center", letterSpacing: 1 }}>
               (Books can be studied on the top right)
             </Text>
           </View>
         )}
         <GenericStrikeAround>Proficiencies</GenericStrikeAround>
-        <View className="flex-1 items-center">
+        <View style={{ flex: 1, alignItems: "center" }}>
           {magicProficiencySection(playerState?.magicProficiencies)}
         </View>
       </View>

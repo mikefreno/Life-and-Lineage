@@ -11,8 +11,8 @@ import {
 } from "react-native";
 
 import Colors from "../constants/Colors";
-import { useColorScheme } from "nativewind";
 import { forwardRef } from "react";
+import { useRootStore } from "../hooks/stores";
 
 type ThemeProps = {
   lightColor?: string;
@@ -32,13 +32,13 @@ export function useThemeColor(
   props: { light?: string; dark?: string },
   colorName: keyof typeof Colors.light & keyof typeof Colors.dark,
 ) {
-  const { colorScheme } = useColorScheme() ?? "light";
-  const colorFromProps = props[colorScheme as "light" | "dark"];
+  const { uiStore } = useRootStore();
+  const colorFromProps = props[uiStore.colorScheme as "light" | "dark"];
 
   if (colorFromProps) {
     return colorFromProps;
   } else {
-    return Colors[colorScheme][colorName];
+    return Colors[uiStore.colorScheme][colorName];
   }
 }
 

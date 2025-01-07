@@ -1,13 +1,13 @@
 import React from "react";
 import { Platform } from "react-native";
 import { BlurView } from "expo-blur";
-import { useColorScheme } from "nativewind";
 import { StyleSheet } from "react-native";
 import PlayerStatus from "./PlayerStatus";
 import { LinearGradientBlur } from "./LinearGradientBlur";
+import { useRootStore } from "../hooks/stores";
 
 const CustomTabBar = React.memo(() => {
-  const { colorScheme } = useColorScheme();
+  const { uiStore } = useRootStore();
 
   return (
     <>
@@ -17,7 +17,9 @@ const CustomTabBar = React.memo(() => {
       ) : (
         <BlurView
           tint={
-            colorScheme == "light" ? "systemMaterial" : "systemMaterialDark"
+            uiStore.colorScheme == "light"
+              ? "systemMaterial"
+              : "systemMaterialDark"
           }
           intensity={100}
           style={StyleSheet.absoluteFill}

@@ -1,20 +1,18 @@
 import { type ReactNode } from "react";
-import { View } from "react-native";
+import { ViewStyle, View } from "react-native";
+import { useStyles } from "../hooks/styles";
 import { ThemedView } from "./Themed";
 
 interface ThemedCard {
   children?: ReactNode;
-  className?: string;
+  style?: ViewStyle;
 }
-export default function ThemedCard({ children, className = "" }: ThemedCard) {
+export default function ThemedCard({ children, style }: ThemedCard) {
+  const styles = useStyles();
+
   return (
-    <View className={`m-2 rounded-xl ${className}`}>
-      <ThemedView
-        className="flex justify-between rounded-xl px-4 py-2 shadow dark:border dark:border-zinc-500 shadow-black/20 android:shadow-black/90"
-        style={{ elevation: 3 }}
-      >
-        {children}
-      </ThemedView>
+    <View style={{ margin: 8, borderRadius: 12, ...style }}>
+      <ThemedView style={styles.themedCard}>{children}</ThemedView>
     </View>
   );
 }

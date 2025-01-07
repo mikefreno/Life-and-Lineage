@@ -8,10 +8,11 @@ import type { Enemy, Minion } from "../../entities/creatures";
 import { useRootStore } from "../../hooks/stores";
 import { AnimatedSprite } from "../AnimatedSprite";
 import { EnemyImageMap } from "../../utility/enemyHelpers";
-import { useState } from "react";
+import { flex, useStyles } from "../../hooks/styles";
 
 export default function TargetSelectionRender() {
-  const { enemyStore } = useRootStore();
+  const styles = useStyles();
+  const { enemyStore, uiStore } = useRootStore();
   const { showTargetSelection, setShowTargetSelection } = useCombatState();
   const { useAttack } = useCombatActions();
 
@@ -22,7 +23,12 @@ export default function TargetSelectionRender() {
   );
 
   return (
-    <View className="w-full">
+    <View
+      style={{
+        marginVertical: "auto",
+        width: "33.333%",
+      }}
+    >
       {targets.map((target) => (
         <Pressable
           key={target.id}
@@ -38,17 +44,23 @@ export default function TargetSelectionRender() {
               });
             }
           }}
-          className="m-4 rounded-lg border border-zinc-400 px-4 py-2 shadow-lg active:scale-95 active:opacity-50 dark:border-zinc-700"
+          style={[
+            styles.targetButton,
+            {
+              borderColor:
+                uiStore.colorScheme === "dark" ? "#404040" : "#a3a3a3",
+            },
+          ]}
         >
-          <View className="flex flex-row justify-evenly">
-            <View className="my-auto">
+          <View style={flex.rowEvenly}>
+            <View style={{ marginVertical: "auto" }}>
               <AnimatedSprite
                 spriteSet={EnemyImageMap[target.sprite]}
                 currentAnimationState={"idle"}
               />
             </View>
-            <View className="my-auto flex w-1/3">
-              <Text className="text-center">
+            <View style={[styles.myAuto, { width: "33%" }]}>
+              <Text style={{ textAlign: "center" }}>
                 {toTitleCase(target.creatureSpecies)}
               </Text>
               <ProgressBar

@@ -1,8 +1,10 @@
+import React from "react";
 import { View } from "react-native";
 import GenericStrikeAround from "./GenericStrikeAround";
 import { toTitleCase } from "../utility/functions/misc";
 import { Text } from "./Themed";
 import type { Attack } from "../entities/attack";
+import { useStyles } from "../hooks/styles";
 
 export default function AttackDetails({
   attack,
@@ -11,9 +13,10 @@ export default function AttackDetails({
   attack: Attack;
   baseDamage: number;
 }) {
+  const styles = useStyles();
   return (
-    <View className="flex w-full my-1 items-center bg-zinc-300 dark:bg-zinc-700 border rounded border-zinc-900 dark:border-zinc-50 pb-2">
-      <Text className="text-xl">{toTitleCase(attack.name)}</Text>
+    <View style={styles.attackDetailsContainer}>
+      <Text style={styles.textXl}>{toTitleCase(attack.name)}</Text>
       <Text>
         {toTitleCase(attack.attackStyle)}{" "}
         {attack.attackStyle == "single" && "Target"}
@@ -37,7 +40,7 @@ export default function AttackDetails({
           {attack.debuffStrings.map((debuff, idx) => (
             <View
               key={`${debuff.name}-${idx}`}
-              className="flex w-full items-center"
+              style={styles.attackEffectContainer}
             >
               <Text>{toTitleCase(debuff.name)}</Text>
               <Text>{debuff.chance * 100}% effect chance</Text>
@@ -45,8 +48,8 @@ export default function AttackDetails({
           ))}
         </>
       )}
-      <View className="my-1 w-5/6 items-center rounded-md border border-zinc-800 px-2 py-1 dark:border-zinc-100 bg-zinc-50 dark:bg-zinc-900 ">
-        <Text className="text-center">
+      <View style={styles.attackDamageBox}>
+        <Text style={{ textAlign: "center" }}>
           {baseDamage}
           {attack.hits > 1
             ? `x${attack.hits}(${

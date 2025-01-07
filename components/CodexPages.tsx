@@ -20,10 +20,10 @@ import {
   Water,
   WizardHat,
 } from "../assets/icons/SVGIcons";
-import { useColorScheme } from "nativewind";
 import { Link } from "expo-router";
 import { GenericCarousel } from "./GenericCarousel";
 import GenericStrikeAround from "./GenericStrikeAround";
+import { useRootStore } from "../hooks/stores";
 
 export function CombatCodex() {
   const images = [
@@ -118,7 +118,7 @@ export function MagicCodex() {
 }
 
 export function PlayerCodex() {
-  const { colorScheme } = useColorScheme();
+  const { uiStore } = useRootStore();
 
   return (
     <ScrollView>
@@ -131,7 +131,7 @@ export function PlayerCodex() {
             <Link href="/Options/Codex/Player/Mage" suppressHighlighting>
               <Text
                 style={{
-                  color: colorScheme == "dark" ? "#2563eb" : "#1e40af",
+                  color: uiStore.colorScheme == "dark" ? "#2563eb" : "#1e40af",
                 }}
                 className="text-xl underline"
               >
@@ -139,7 +139,7 @@ export function PlayerCodex() {
                 <WizardHat
                   height={24}
                   width={24}
-                  color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
+                  color={uiStore.colorScheme == "dark" ? "#2563eb" : "#1e40af"}
                 />
               </Text>
             </Link>
@@ -147,14 +147,16 @@ export function PlayerCodex() {
           <View className="mx-auto">
             <Link href="/Options/Codex/Player/Necromancer" suppressHighlighting>
               <Text
-                style={{ color: colorScheme == "dark" ? "#9333ea" : "#6b21a8" }}
+                style={{
+                  color: uiStore.colorScheme == "dark" ? "#9333ea" : "#6b21a8",
+                }}
                 className="text-xl underline"
               >
                 The Necromancer{" "}
                 <NecromancerSkull
                   height={24}
                   width={24}
-                  color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
+                  color={uiStore.colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
                 />
               </Text>
             </Link>
@@ -195,11 +197,12 @@ export function PlayerCodex() {
                 <WizardHat
                   height={64}
                   width={64}
-                  color={colorScheme == "dark" ? "#2563eb" : "#1e40af"}
+                  color={uiStore.colorScheme == "dark" ? "#2563eb" : "#1e40af"}
                 />
                 <Text
                   style={{
-                    color: colorScheme == "dark" ? "#2563eb" : "#1e40af",
+                    color:
+                      uiStore.colorScheme == "dark" ? "#2563eb" : "#1e40af",
                   }}
                 >
                   Mage
@@ -234,10 +237,12 @@ export function PlayerCodex() {
               <NecromancerSkull
                 width={64}
                 height={64}
-                color={colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
+                color={uiStore.colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
               />
               <Text
-                style={{ color: colorScheme == "dark" ? "#9333ea" : "#6b21a8" }}
+                style={{
+                  color: uiStore.colorScheme == "dark" ? "#9333ea" : "#6b21a8",
+                }}
               >
                 Necromancer
               </Text>
@@ -251,7 +256,7 @@ export function PlayerCodex() {
               <Pestilence
                 height={48}
                 width={48}
-                color={colorScheme == "dark" ? "#84cc16" : "#65a30d"}
+                color={uiStore.colorScheme == "dark" ? "#84cc16" : "#65a30d"}
               />
             </Link>
           </View>
@@ -319,7 +324,7 @@ export function PlayerCodex() {
               <AssassinationIcon
                 height={48}
                 width={48}
-                color={colorScheme == "dark" ? "#f4f4f5" : "#1e293b"}
+                color={uiStore.colorScheme == "dark" ? "#f4f4f5" : "#1e293b"}
               />
             </Link>
           </View>

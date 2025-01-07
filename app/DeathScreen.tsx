@@ -1,3 +1,4 @@
+import React from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { Text, ThemedView } from "../components/Themed";
 import deathMessages from "../assets/json/deathMessages.json";
@@ -17,8 +18,7 @@ import {
 } from "../assets/icons/SVGIcons";
 import BlessingDisplay from "../components/BlessingsDisplay";
 import { Entypo } from "@expo/vector-icons";
-import { useColorScheme } from "nativewind";
-import { elementalColorMap } from "../constants/Colors";
+import Colors, { elementalColorMap } from "../constants/Colors";
 import { getStartingBaseStats } from "../utility/functions/characterAid";
 import {
   savePlayer,
@@ -30,6 +30,7 @@ import { useVibration } from "../hooks/generic";
 import { Item } from "../entities/item";
 import { useHeaderHeight } from "@react-navigation/elements";
 import CheckpointModal from "../components/CheckpointModal";
+import { flex, text, tw, useStyles } from "../hooks/styles";
 
 export default function DeathScreen() {
   const [nextLife, setNextLife] = useState<Character | null>(null);
@@ -47,8 +48,8 @@ export default function DeathScreen() {
   const root = useRootStore();
   const { playerState, uiStore } = root;
   const vibration = useVibration();
-  const { colorScheme } = useColorScheme();
   const header = useHeaderHeight();
+  const styles = useStyles();
 
   const getDeathMessage = () => {
     const randomIndex = Math.floor(Math.random() * deathMessages.length);
@@ -86,7 +87,7 @@ export default function DeathScreen() {
         parents: nextLife.parents ?? [],
         birthdate: nextLife.birthdate,
         investments: playerState?.investments,
-        gold: playerState.gold / playerState.children.length ?? 1,
+        gold: playerState.gold / playerState.children.length,
         keyItems: playerState?.keyItems,
         baseInventory: inventory,
         ...getStartingBaseStats({ classSelection: selectedClass }),
@@ -125,7 +126,7 @@ export default function DeathScreen() {
                   vibration={vibration}
                   selectedClass={selectedClass}
                   setSelectedClass={setSelectedClass}
-                  colorScheme={colorScheme}
+                  colorScheme={uiStore.colorScheme}
                 />
                 <GenericFlatButton
                   onPress={() => setPage(1)}
@@ -137,11 +138,11 @@ export default function DeathScreen() {
             )}
             {page == 1 && selectedClass && (
               <>
-                <Pressable onPress={() => setPage(0)} className="absolute z-50">
+                <Pressable onPress={() => setPage(0)} style={styles.backButton}>
                   <Entypo
                     name="chevron-left"
                     size={24}
-                    color={colorScheme === "dark" ? "#f4f4f5" : "black"}
+                    color={uiStore.colorScheme === "dark" ? "#f4f4f5" : "black"}
                   />
                 </Pressable>
                 <MinimalBlessingSelect
@@ -149,7 +150,7 @@ export default function DeathScreen() {
                   blessing={selectedBlessing}
                   setBlessing={setSelectedBlessing}
                   vibration={vibration}
-                  colorScheme={colorScheme}
+                  colorScheme={uiStore.colorScheme}
                   dimensions={uiStore.dimensions}
                 />
                 <GenericFlatButton
@@ -167,14 +168,8 @@ export default function DeathScreen() {
           onClose={() => setIsCheckpointModalVisible(false)}
           allowSaving={false}
         />
-        <View
-          className="flex-1 items-center justify-center"
-          style={{ top: -header }}
-        >
-          <Text
-            className="py-8 text-center text-3xl font-bold"
-            style={{ letterSpacing: 3, color: "#ef4444" }}
-          >
+        <View style={[styles.centeredContainer, { top: -header }]}>
+          <Text style={styles.deathMessage}>
             {playerState.currentSanity > -50
               ? deathMessage
               : "You have gone insane"}
@@ -183,170 +178,40 @@ export default function DeathScreen() {
             Load A Checkpoint
           </GenericFlatButton>
 
-          {playerState.children.length > 0 ? (
+          {playerState.children.length > 0 && (
             <>
-              <Text className="text-xl">Continue as one of your children?</Text>
-              <View className="justify-center items-center h-64">
+              <Text style={text.xl}>Continue as one of your children?</Text>
+              <View style={styles.childrenContainer}>
                 <ScrollView
-                  className="w-screen"
                   horizontal
-                  contentContainerStyle={{
-                    flexGrow: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
+                  contentContainerStyle={[flex.columnCenter, { flexGrow: 1 }]}
                 >
                   {playerState.children?.map((child, idx) => (
                     <Pressable
                       key={idx}
                       onPress={() => setNextLife(child)}
-                      className="my-auto mx-2"
+                      style={[tw.myAuto, tw.mx2]}
                     >
-                      <ThemedView className="shadow-lg rounded-xl p-1">
-                        <Text className="text-center text-xl">
+                      <View style={styles.childCard}>
+                        <Text style={{ textAlign: "center", ...text.xl }}>
                           {child.firstName}
                         </Text>
                         <CharacterImage character={child} />
-                      </ThemedView>
+                      </View>
                     </Pressable>
                   ))}
                 </ScrollView>
               </View>
-              <GenericStrikeAround>
-                <Text>Or</Text>
-              </GenericStrikeAround>
             </>
-          ) : null}
-          <Pressable
-            onPress={startNewGame}
-            className="mt-2 border px-4 py-2 active:scale-95 active:bg-zinc-100 dark:border-zinc-50 active:dark:bg-zinc-600"
-          >
-            <Text className="text-lg">Live a New Life</Text>
+          )}
+
+          <Pressable style={styles.newLifeButton} onPress={startNewGame}>
+            <Text style={text.lg}>Live a New Life</Text>
           </Pressable>
         </View>
       </>
     );
   }
-}
-
-function MinimalClassSelect({
-  dimensions,
-  vibration,
-  selectedClass,
-  setSelectedClass,
-  colorScheme,
-}: {
-  dimensions: {
-    height: number;
-    width: number;
-    greater: number;
-    lesser: number;
-  };
-  vibration: ({
-    style,
-    essential,
-  }: {
-    style: "light" | "medium" | "heavy" | "success" | "warning" | "error";
-    essential?: boolean | undefined;
-  }) => void;
-  selectedClass: PlayerClassOptions | null;
-  setSelectedClass: React.Dispatch<
-    React.SetStateAction<PlayerClassOptions | null>
-  >;
-  colorScheme: "light" | "dark";
-}) {
-  const ClassPressable = ({
-    classOption,
-    Icon,
-    color,
-    rotate = 0,
-    flip = false,
-  }: {
-    classOption: PlayerClassOptions;
-    Icon: React.JSX.ElementType;
-    color: string;
-    rotate?: number;
-    flip?: boolean;
-  }) => {
-    return (
-      <Pressable
-        onPress={() => {
-          vibration({ style: "light" });
-          setSelectedClass(classOption);
-        }}
-        style={{
-          height: dimensions.height * 0.25,
-          width: dimensions.width * 0.4,
-        }}
-      >
-        {({ pressed }) => (
-          <View
-            className={`${
-              pressed || selectedClass === classOption
-                ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                : "border-transparent"
-            } w-full h-full border flex items-center justify-center`}
-          >
-            <View
-              className={`
-                ${flip ? "scale-x-[-1] transform" : ""}
-                ${
-                  rotate < 0
-                    ? `-rotate-${Math.abs(rotate)}`
-                    : rotate > 0
-                    ? `rotate-${rotate}`
-                    : ""
-                }
-              `.trim()}
-            >
-              <Icon
-                style={{ marginBottom: 5 }}
-                color={colorScheme === "dark" ? color : color}
-                height={dimensions.height * 0.15}
-                width={dimensions.height * 0.15}
-              />
-            </View>
-            <Text className="mx-auto text-xl" style={{ color }}>
-              {classOption.charAt(0).toUpperCase() + classOption.slice(1)}
-            </Text>
-          </View>
-        )}
-      </Pressable>
-    );
-  };
-
-  return (
-    <View className="flex items-center justify-evenly py-6">
-      <ThemedView className="mb-8 flex flex-row justify-between">
-        <ClassPressable
-          classOption={PlayerClassOptions.mage}
-          Icon={WizardHat}
-          color="#2563eb"
-        />
-        <ClassPressable
-          classOption={PlayerClassOptions.ranger}
-          Icon={RangerIcon}
-          color="green"
-          rotate={12}
-        />
-      </ThemedView>
-      <View className="flex flex-row justify-between">
-        <ClassPressable
-          classOption={PlayerClassOptions.necromancer}
-          Icon={NecromancerSkull}
-          color="#9333ea"
-          rotate={-12}
-        />
-        <ClassPressable
-          classOption={PlayerClassOptions.paladin}
-          Icon={PaladinHammer}
-          color="#fcd34d"
-          rotate={12}
-          flip={true}
-        />
-      </View>
-    </View>
-  );
 }
 
 function MinimalBlessingSelect({
@@ -375,6 +240,8 @@ function MinimalBlessingSelect({
     lesser: number;
   };
 }) {
+  const styles = useStyles();
+
   const BlessingPressable = ({ element }: { element: Element }) => {
     return (
       <Pressable
@@ -389,11 +256,12 @@ function MinimalBlessingSelect({
       >
         {({ pressed }) => (
           <View
-            className={`${
-              pressed || blessing == element
-                ? "rounded-lg border-zinc-900 dark:border-zinc-50"
-                : "border-transparent"
-            } w-full h-full border flex items-center justify-center`}
+            style={[
+              styles.blessingContainer,
+              pressed || blessing === element
+                ? { borderColor: Colors[colorScheme].border }
+                : { borderColor: "transparent" },
+            ]}
           >
             <BlessingDisplay
               blessing={element}
@@ -402,9 +270,9 @@ function MinimalBlessingSelect({
             />
             <Text
               style={{
+                ...tw.mt3,
+                ...tw.mb3,
                 color: elementalColorMap[element].light,
-                marginTop: 12,
-                marginBottom: -12,
               }}
             >
               {ElementToString[element]}
@@ -415,52 +283,47 @@ function MinimalBlessingSelect({
     );
   };
 
+  const renderBlessingRows = (elements: Element[][]) => (
+    <View style={styles.classContainer}>
+      {elements.map((row, rowIndex) => (
+        <View
+          key={rowIndex}
+          style={[
+            {
+              ...flex.rowBetween,
+              ...tw.mb8,
+            },
+            rowIndex > 0 && tw.mt8,
+          ]}
+        >
+          {row.map((element) => (
+            <BlessingPressable key={element} element={element} />
+          ))}
+        </View>
+      ))}
+    </View>
+  );
+
   switch (playerClass) {
     case PlayerClassOptions.mage:
-      return (
-        <View className="flex items-center justify-evenly py-6">
-          <ThemedView className="mb-8 flex flex-row justify-between">
-            <BlessingPressable element={Element.fire} />
-            <BlessingPressable element={Element.water} />
-          </ThemedView>
-          <ThemedView className="flex flex-row justify-between">
-            <BlessingPressable element={Element.air} />
-            <BlessingPressable element={Element.earth} />
-          </ThemedView>
-        </View>
-      );
+      return renderBlessingRows([
+        [Element.fire, Element.water],
+        [Element.air, Element.earth],
+      ]);
     case PlayerClassOptions.necromancer:
-      return (
-        <View className="flex items-center justify-evenly py-6">
-          <ThemedView className="mb-8 flex flex-row justify-between">
-            <BlessingPressable element={Element.summoning} />
-            <BlessingPressable element={Element.pestilence} />
-          </ThemedView>
-          <ThemedView className="flex flex-row justify-between">
-            <BlessingPressable element={Element.bone} />
-            <BlessingPressable element={Element.blood} />
-          </ThemedView>
-        </View>
-      );
+      return renderBlessingRows([
+        [Element.summoning, Element.pestilence],
+        [Element.bone, Element.blood],
+      ]);
     case PlayerClassOptions.ranger:
-      return (
-        <View className="flex items-center justify-evenly py-6">
-          <BlessingPressable element={Element.beastMastery} />
-          <ThemedView className="mt-8 flex flex-row justify-between">
-            <BlessingPressable element={Element.arcane} />
-            <BlessingPressable element={Element.assassination} />
-          </ThemedView>
-        </View>
-      );
+      return renderBlessingRows([
+        [Element.beastMastery],
+        [Element.arcane, Element.assassination],
+      ]);
     case PlayerClassOptions.paladin:
-      return (
-        <View className="flex items-center justify-evenly py-6">
-          <BlessingPressable element={Element.holy} />
-          <ThemedView className="mt-8 flex flex-row justify-between">
-            <BlessingPressable element={Element.vengeance} />
-            <BlessingPressable element={Element.protection} />
-          </ThemedView>
-        </View>
-      );
+      return renderBlessingRows([
+        [Element.holy],
+        [Element.vengeance, Element.protection],
+      ]);
   }
 }

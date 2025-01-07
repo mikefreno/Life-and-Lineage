@@ -1,5 +1,5 @@
+import React from "react";
 import { observer } from "mobx-react-lite";
-import { useColorScheme } from "nativewind";
 import { View } from "react-native";
 import { Text } from "../components/Themed";
 import ProgressBar from "./ProgressBar";
@@ -60,20 +60,20 @@ const TrainingCard = observer(
     sanityCostPerTick,
     preRequisites,
   }: TrainingCardProps) => {
-    const { colorScheme } = useColorScheme();
     const root = useRootStore();
-    const { playerState } = root;
+    const { playerState, uiStore } = root;
 
     const cardStyle = useMemo(
       () => ({
         shadowColor: "#000",
         shadowOffset: { width: 3, height: 1 },
         elevation: 1,
-        backgroundColor: colorScheme === "light" ? "#fafafa" : "#27272a",
+        backgroundColor:
+          uiStore.colorScheme === "light" ? "#fafafa" : "#27272a",
         shadowOpacity: 0.2,
         shadowRadius: 3,
       }),
-      [colorScheme],
+      [uiStore.colorScheme],
     );
 
     const progressQualification = useCallback(() => {

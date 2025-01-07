@@ -15,6 +15,7 @@ import GenericModal from "./GenericModal";
 import { useCallback, useRef, useState } from "react";
 import { StatsDisplay } from "./StatsDisplay";
 import GenericStrikeAround from "./GenericStrikeAround";
+import { useStyles } from "../hooks/styles";
 
 type StashDisplayProps = {
   showingStash: boolean;
@@ -23,6 +24,7 @@ type StashDisplayProps = {
 export const StashDisplay = observer(
   ({ showingStash, clear }: StashDisplayProps) => {
     const { uiStore, stashStore } = useRootStore();
+    const styles = useStyles();
     const [displayItem, setDisplayItem] = useState<{
       item: Item[];
       position: { left: number; top: number };
@@ -90,27 +92,38 @@ export const StashDisplay = observer(
         size={100}
       >
         <View
-          style={{ height: uiStore.dimensions.height * 0.66 }}
-          className="w-full"
+          style={[
+            { height: uiStore.dimensions.height * 0.66 },
+            { width: "100%" },
+          ]}
           onLayout={onModalLayout}
         >
-          <View className="flex-row justify-center p-2">
+          <View style={styles.tabsContainer}>
             {Array.from({ length: totalPages }).map((_, index) => (
               <Pressable
                 key={`tab-${index}`}
                 onPress={() => handleTabPress(index)}
-                className={`px-4 py-2 mx-1 rounded-lg ${
-                  currentPage === index
-                    ? "bg-blue-500"
-                    : "bg-gray-300 dark:bg-gray-700"
-                }`}
+                style={[
+                  styles.tabButton,
+                  {
+                    backgroundColor:
+                      currentPage === index
+                        ? "#3b82f6"
+                        : uiStore.colorScheme === "dark"
+                        ? "#374151"
+                        : "#d1d5db",
+                  },
+                ]}
               >
                 <Text
-                  className={`${
-                    currentPage === index
-                      ? "text-white"
-                      : "text-gray-700 dark:text-gray-300"
-                  }`}
+                  style={{
+                    color:
+                      currentPage === index
+                        ? "#ffffff"
+                        : uiStore.colorScheme === "dark"
+                        ? "#d1d5db"
+                        : "#374151",
+                  }}
                 >
                   {index + 1}
                 </Text>
@@ -137,59 +150,45 @@ export const StashDisplay = observer(
             {Array.from({ length: totalPages }).map((_, pageIndex) => (
               <View
                 key={`page-${pageIndex}`}
-                className="flex-1 px-2"
-                style={{
-                  width: modalWidth,
-                }}
+                style={[styles.stashPage, { width: modalWidth }]}
               >
-                <View
-                  style={{
-                    position: "absolute",
-                    width: "100%",
-                    height: "100%",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    zIndex: -1, // Ensure it's behind the slots
-                  }}
-                >
-                  <Text className="text-xl tracking-widest opacity-70">
+                <View style={styles.stashPageOverlay}>
+                  <Text style={styles.stashPageText}>
                     Stash Tab {pageIndex + 1}
                   </Text>
                 </View>
                 <Pressable
                   onPress={() => setDisplayItem(null)}
-                  className="border border-zinc-600 rounded-lg relative flex-1"
+                  style={styles.stashContainer}
                 >
-                  {/* Background slots */}
                   {Array.from({ length: SLOTS_PER_PAGE }).map((_, index) => (
                     <View
-                      className="absolute items-center justify-center"
-                      style={
+                      style={[
+                        styles.inventorySlot,
                         uiStore.dimensions.width === uiStore.dimensions.greater
                           ? {
-                              // Change from 12 columns to 8 columns for greater width
-                              left: `${(index % 8) * 12.5 + 8}%`, // 100 / 8 = 12.5
-                              top: `${Math.floor(index / 8) * 33.33 + 6}%`, // 3 rows: 100 / 3 = 33.33
+                              left: `${(index % 8) * 12.5 + 8}%`,
+                              top: `${Math.floor(index / 8) * 33.33 + 6}%`,
                             }
                           : {
-                              // Change from 6 columns to 4 columns for smaller width
-                              left: `${(index % 4) * 25 + 5}%`, // 100 / 4 = 25
-                              top: `${Math.floor(index / 4) * 16.67 + 3}%`, // 6 rows: 100 / 6 = 16.67
-                            }
-                      }
+                              left: `${(index % 4) * 25 + 5}%`,
+                              top: `${Math.floor(index / 4) * 16.67 + 3}%`,
+                            },
+                      ]}
                       key={`bg-${pageIndex}-${index}`}
                     >
                       <View
-                        className="rounded-lg border-zinc-300 dark:border-zinc-700 border z-0"
-                        style={{
-                          height: uiStore.itemBlockSize,
-                          width: uiStore.itemBlockSize,
-                        }}
+                        style={[
+                          styles.slotBackground,
+                          {
+                            height: uiStore.itemBlockSize,
+                            width: uiStore.itemBlockSize,
+                          },
+                        ]}
                       />
                     </View>
                   ))}
 
-                  {/* Items */}
                   {stashStore.items
                     .slice(
                       pageIndex * SLOTS_PER_PAGE,
@@ -197,21 +196,20 @@ export const StashDisplay = observer(
                     )
                     .map((item, index) => (
                       <View
-                        className="absolute items-center justify-center z-top"
-                        style={
+                        style={[
+                          styles.inventorySlot,
+                          { zIndex: 10 },
                           uiStore.dimensions.width ===
                           uiStore.dimensions.greater
                             ? {
-                                // Change from 12 columns to 8 columns for greater width
-                                left: `${(index % 8) * 12.5 + 8}%`, // 100 / 8 = 12.5
-                                top: `${Math.floor(index / 8) * 33.33 + 6}%`, // 3 rows: 100 / 3 = 33.33
+                                left: `${(index % 8) * 12.5 + 8}%`,
+                                top: `${Math.floor(index / 8) * 33.33 + 6}%`,
                               }
                             : {
-                                // Change from 6 columns to 4 columns for smaller width
-                                left: `${(index % 4) * 25 + 5}%`, // 100 / 4 = 25
-                                top: `${Math.floor(index / 4) * 16.67 + 3}%`, // 6 rows: 100 / 6 = 16.67
-                              }
-                        }
+                                left: `${(index % 4) * 25 + 5}%`,
+                                top: `${Math.floor(index / 4) * 16.67 + 3}%`,
+                              },
+                        ]}
                         key={item.item[0].id}
                       >
                         <View>
@@ -237,11 +235,13 @@ export const StashDisplay = observer(
             ))}
             {displayItem && (
               <View
-                className="absolute z-top"
-                style={{
-                  top: -uiStore.dimensions.height * 0.17,
-                  left: -uiStore.dimensions.width * 0.065,
-                }}
+                style={[
+                  styles.raisedAbsolutePosition,
+                  {
+                    top: -uiStore.dimensions.height * 0.17,
+                    left: -uiStore.dimensions.width * 0.065,
+                  },
+                ]}
                 pointerEvents="box-none"
               >
                 <StatsDisplay
@@ -251,8 +251,8 @@ export const StashDisplay = observer(
               </View>
             )}
           </ScrollView>
-          {totalPages == 1 && (
-            <GenericStrikeAround className="text-center">
+          {totalPages === 1 && (
+            <GenericStrikeAround style={{ textAlign: "center" }}>
               {`More tabs will be added\n as items are added`}
             </GenericStrikeAround>
           )}

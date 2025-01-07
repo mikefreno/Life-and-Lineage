@@ -2,13 +2,7 @@ import { useFonts } from "expo-font";
 import { Stack, router, usePathname } from "expo-router";
 import React, { useEffect, useState, useRef } from "react";
 import { observer } from "mobx-react-lite";
-import {
-  Platform,
-  Pressable,
-  StyleSheet,
-  View,
-  useColorScheme as useNativeColor,
-} from "react-native";
+import { Platform, Pressable, StyleSheet, View } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { ThemedView, Text } from "../components/Themed";
 import { BlurView } from "expo-blur";
@@ -37,6 +31,7 @@ import { DungeonStore } from "../stores/DungeonStore";
 import GenericModal from "../components/GenericModal";
 import { CharacterImage } from "../components/CharacterImage";
 import GenericFlatButton from "../components/GenericFlatButton";
+import { tw, useStyles } from "../hooks/styles";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -86,9 +81,8 @@ const RootLayout = observer(() => {
   });
   const rootStore = useRootStore();
   const { playerState, dungeonStore, uiStore } = rootStore;
+  const styles = useStyles();
 
-  const { colorScheme, setColorScheme } = useColorScheme();
-  const systemColor = useNativeColor();
   const [firstLoad, setFirstLoad] = useState(true);
 
   const [expoPushToken, setExpoPushToken] = useState("");
@@ -134,12 +128,6 @@ const RootLayout = observer(() => {
   }, [fontLoaded]);
 
   useEffect(() => {
-    if (!firstLoad && rootStore.constructed && systemColor) {
-      setColorScheme(uiStore.colorScheme);
-    }
-  }, [uiStore.colorScheme, firstLoad, rootStore.constructed]);
-
-  useEffect(() => {
     if (expoPushToken && !sentToken) {
       fetch(`${API_BASE_URL}/tokens`, {
         method: "POST",
@@ -169,13 +157,6 @@ const RootLayout = observer(() => {
       playerState.currentSanity <= -playerState.maxSanity;
 
     if (isDead && pathname !== "/DeathScreen") {
-      if (rootStore.dungeonStore.heldColorScheme) {
-        rootStore.uiStore.setColorScheme(
-          rootStore.dungeonStore.heldColorScheme,
-        );
-
-        setColorScheme(rootStore.dungeonStore.heldColorScheme);
-      }
       router.replace("/DeathScreen");
       return;
     }
@@ -188,7 +169,6 @@ const RootLayout = observer(() => {
   useEffect(() => {
     const initializeApp = async () => {
       if (fontLoaded && rootStore.constructed && firstLoad) {
-        setColorScheme(uiStore.colorScheme);
         await SplashScreen.hideAsync();
         handleRouting(playerState, rootStore, dungeonStore, pathname);
         setFirstLoad(false);
@@ -246,7 +226,7 @@ const RootLayout = observer(() => {
             <Text className="text-center mt-2">
               Sex: {toTitleCase(newbornBaby.sex)}
             </Text>
-            <View className="mt-4">
+            <View style={tw.mt4}>
               <CharacterImage character={newbornBaby} />
             </View>
             <Text className="text-center mt-4">
@@ -258,7 +238,7 @@ const RootLayout = observer(() => {
         )}
         <GenericFlatButton
           onPress={() => setShowBirthModal(false)}
-          className="mt-4"
+          style={tw.mt4}
         >
           Close
         </GenericFlatButton>
@@ -268,7 +248,9 @@ const RootLayout = observer(() => {
 
   while (!fontLoaded || !rootStore.constructed) {
     return (
-      <ThemedView className="flex-1 items-center justify-center">
+      <ThemedView
+        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+      >
         <D20DieAnimation keepRolling={true} />
       </ThemedView>
     );
@@ -276,8 +258,10 @@ const RootLayout = observer(() => {
 
   return (
     <GestureHandlerRootView>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : LightTheme}>
-        <SystemBars style={colorScheme == "dark" ? "light" : "dark"} />
+      <ThemeProvider
+        value={uiStore.colorScheme === "dark" ? DarkTheme : LightTheme}
+      >
+        <SystemBars style={uiStore.colorScheme == "dark" ? "light" : "dark"} />
         <ProjectedImage />
         <FleeModal />
         <BirthAnnouncementModal />
@@ -351,7 +335,7 @@ const RootLayout = observer(() => {
                   blurReductionFactor={12}
                   tint={
                     Platform.OS == "android"
-                      ? colorScheme == "light"
+                      ? uiStore.colorScheme == "light"
                         ? "light"
                         : "dark"
                       : "default"
@@ -382,7 +366,7 @@ const RootLayout = observer(() => {
                   blurReductionFactor={12}
                   tint={
                     Platform.OS == "android"
-                      ? colorScheme == "light"
+                      ? uiStore.colorScheme == "light"
                         ? "light"
                         : "dark"
                       : "default"
@@ -413,7 +397,7 @@ const RootLayout = observer(() => {
                   blurReductionFactor={12}
                   tint={
                     Platform.OS == "android"
-                      ? colorScheme == "light"
+                      ? uiStore.colorScheme == "light"
                         ? "light"
                         : "dark"
                       : "default"
@@ -447,7 +431,7 @@ const RootLayout = observer(() => {
                   blurReductionFactor={12}
                   tint={
                     Platform.OS == "android"
-                      ? colorScheme == "light"
+                      ? uiStore.colorScheme == "light"
                         ? "light"
                         : "dark"
                       : "default"
@@ -469,7 +453,7 @@ const RootLayout = observer(() => {
                   blurReductionFactor={12}
                   tint={
                     Platform.OS == "android"
-                      ? colorScheme == "light"
+                      ? uiStore.colorScheme == "light"
                         ? "light"
                         : "dark"
                       : "default"
@@ -488,7 +472,9 @@ const RootLayout = observer(() => {
                     <MaterialCommunityIcons
                       name="run-fast"
                       size={28}
-                      color={colorScheme == "light" ? "#18181b" : "#fafafa"}
+                      color={
+                        uiStore.colorScheme == "light" ? "#18181b" : "#fafafa"
+                      }
                       style={{
                         opacity: pressed ? 0.5 : 1,
                         marginRight: Platform.OS == "android" ? 8 : 0,

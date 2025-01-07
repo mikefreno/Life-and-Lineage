@@ -11,6 +11,7 @@ import { FPS, type AnimationStore } from "../../stores/AnimationStore";
 import { useRootStore } from "../../hooks/stores";
 import { AnimatedSprite } from "../AnimatedSprite";
 import { EnemyImageMap } from "../../utility/enemyHelpers";
+import { text, tw, useStyles } from "../../hooks/styles";
 
 const calculateAdjustedFrameRate = (
   frames: number,
@@ -239,6 +240,8 @@ const EnemyHealthChangePopUp = memo(
 );
 
 const EnemyConditions = memo(({ conditions }: { conditions: any[] }) => {
+  const styles = useStyles();
+  const { uiStore } = useRootStore();
   const simplifiedConditions = useMemo(() => {
     const condMap = new Map();
     conditions.forEach((condition) => {
@@ -258,13 +261,23 @@ const EnemyConditions = memo(({ conditions }: { conditions: any[] }) => {
   }, [conditions]);
 
   return (
-    <View className="flex h-8 flex-row">
+    <View style={styles.enemyConditionsContainer}>
       {simplifiedConditions.map((cond) => (
-        <ThemedView key={cond.name} className="mx-2 flex align-middle">
-          <View className="mx-auto rounded-md bg-[rgba(0,0,0,0.4)] p-0.5 dark:bg-[rgba(255,255,255,0.4)]">
+        <ThemedView key={cond.name} style={styles.conditionIconContainer}>
+          <View
+            style={[
+              styles.conditionIcon,
+              {
+                backgroundColor:
+                  uiStore.colorScheme === "dark"
+                    ? "rgba(255,255,255,0.4)"
+                    : "rgba(0,0,0,0.4)",
+              },
+            ]}
+          >
             <Image source={cond.icon} style={{ width: 22, height: 24 }} />
           </View>
-          <Text className="text-sm">
+          <Text style={{ fontSize: 14 }}>
             {toTitleCase(cond.name)} x {cond.count}
           </Text>
         </ThemedView>
@@ -274,12 +287,13 @@ const EnemyConditions = memo(({ conditions }: { conditions: any[] }) => {
 });
 
 const DungeonEnemyDisplay = observer(() => {
+  const styles = useStyles();
   const { enemyStore } = useRootStore();
 
   if (enemyStore.enemies.length == 0) return null;
 
   return (
-    <View className="flex-1 pt-4">
+    <View style={styles.enemyDisplayContainer}>
       {enemyStore.enemies.map((enemy) => (
         <EnemyDisplay
           key={enemy.id}
@@ -300,6 +314,7 @@ const EnemyDisplay = observer(
     animationStore: AnimationStore;
   }) => {
     const { uiStore } = useRootStore();
+    const styles = useStyles();
     const animations = useEnemyAnimations();
     const [healthState, setHealthState] = useState({
       record: enemy.currentHealth,
@@ -470,12 +485,14 @@ const EnemyDisplay = observer(
     }, [enemy?.currentHealth]);
 
     return (
-      <View className="flex-1 flex-row items-center justify-evenly">
-        <View
-          className="flex flex-col items-center justify-center"
-          style={{ minWidth: "40%", maxWidth: "60%" }}
-        >
-          <Text className="text-center text-3xl">
+      <View style={styles.enemyRow}>
+        <View style={styles.enemyInfoContainer}>
+          <Text
+            style={{
+              ...text["3xl"],
+              textAlign: "center",
+            }}
+          >
             {enemy.creatureSpecies.toLowerCase().includes("generic npc")
               ? ""
               : toTitleCase(enemy.creatureSpecies).replace(" ", "\n")}
@@ -487,8 +504,6 @@ const EnemyDisplay = observer(
             unfilledColor="#fee2e2"
             displayNumber={
               enemy.creatureSpecies.toLowerCase() == "training dummy"
-                ? true
-                : false
             }
             removeAtZero={true}
           />
@@ -533,23 +548,19 @@ const EnemyDisplay = observer(
           )}
         </Animated.View>
         <Animated.View
-          style={{
-            transform: [
-              { translateY: animations.animations.textTranslateAnim },
-            ],
-            opacity: animations.animations.textFadeAnim,
-            position: "absolute",
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+          style={[
+            styles.textAnimationContainer,
+            {
+              transform: [
+                { translateY: animations.animations.textTranslateAnim },
+              ],
+              opacity: animations.animations.textFadeAnim,
+            },
+          ]}
         >
           {animationStore.textString ? (
             <Text
-              className="text-xl tracking-wide text-center"
+              style={{ letterSpacing: 1, textAlign: "center", ...styles.xl }}
               numberOfLines={1}
             >
               *{toTitleCase(animationStore.textString)}*
@@ -557,16 +568,19 @@ const EnemyDisplay = observer(
           ) : null}
         </Animated.View>
         {enemy.minions.length > 0 ? (
-          <View className="mx-4">
+          <View style={styles.mx4}>
             <GenericStrikeAround>
-              <Text className="text-sm">Enemy Minions</Text>
+              <Text style={{ fontSize: 14 }}>Enemy Minions</Text>
             </GenericStrikeAround>
-            <View className="mx-4 flex flex-row flex-wrap">
+            <View style={styles.minionRow}>
               {enemy.minions.map((minion) => (
                 <View
                   key={minion.id}
-                  className="flex-grow px-2 py-1"
-                  style={{ flexBasis: "50%" }}
+                  style={{
+                    flexGrow: 1,
+                    paddingHorizontal: 8,
+                    paddingVertical: 4,
+                  }}
                 >
                   <Text>{toTitleCase(minion.creatureSpecies)}</Text>
                   <ProgressBar

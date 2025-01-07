@@ -1,3 +1,4 @@
+import React from "react";
 import { ThemedView, Text } from "../components/Themed";
 import { type LayoutChangeEvent, View } from "react-native";
 import { useRef, useEffect, useState, useCallback } from "react";
@@ -29,8 +30,9 @@ import { usePouch } from "../hooks/generic";
 import D20DieAnimation from "../components/DieRollAnim";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { LinearGradientBlur } from "../components/LinearGradientBlur";
-import { useColorScheme } from "nativewind";
 import { Parallax } from "../components/DungeonComponents/Parallax";
+import { Image } from "expo-image";
+import { useStyles } from "../hooks/styles";
 
 const DungeonLevelScreen = observer(() => {
   const { enemyStore, dungeonStore, uiStore } = useRootStore();
@@ -42,7 +44,7 @@ const DungeonLevelScreen = observer(() => {
     useLootState();
   const { showTargetSelection, setShowTargetSelection } = useCombatState();
   const { addItemToPouch } = usePouch();
-  const { colorScheme } = useColorScheme();
+  const colorScheme = uiStore.colorScheme;
 
   const [battleTab, setBattleTab] = useState<
     "attacksOrNavigation" | "equipment" | "log"
@@ -51,6 +53,7 @@ const DungeonLevelScreen = observer(() => {
     useState<boolean>(false);
   const isFocused = useIsFocused();
   const header = useHeaderHeight();
+  const styles = useStyles();
 
   const pouchRef = useRef<View>(null);
 
@@ -121,7 +124,7 @@ const DungeonLevelScreen = observer(() => {
           }}
         >
           <ThemedView>
-            <Text className="text-center text-2xl">Choose Your Target</Text>
+            <Text style={{ width: "100%" }}>Choose Your Target</Text>
             <TargetSelection />
           </ThemedView>
         </GenericModal>
@@ -153,9 +156,8 @@ const DungeonLevelScreen = observer(() => {
           boundingBox={dungeonStore.currentMapDimensions!}
           reduceMotion={uiStore.reduceMotion}
         >
-<<<<<<< HEAD
           {dungeonStore.currentSpecialEncounter ? (
-            <View className="flex-1 items-end px-6">
+            <View style={styles.dungeonSpecialEncounter}>
               <Image
                 source={dungeonStore.currentSpecialEncounter.imageToShow}
                 style={{
@@ -171,13 +173,10 @@ const DungeonLevelScreen = observer(() => {
           ) : (
             <DungeonMapRender />
           )}
-=======
-          {inCombat ? <DungeonEnemyDisplay /> : <DungeonMapRender />}
->>>>>>> parent of cb574f9 (dungeon work (specialEncounters))
-          <View className="flex-1">
-            <LinearGradientBlur className="absolute" />
-            {inCombat && <View></View>}
-            <View className="flex-1 justify-between">
+          <View style={{ flex: 1 }}>
+            <LinearGradientBlur style={{ position: "absolute" }} />
+            {inCombat && <View />}
+            <View style={styles.dungeonMainContainer}>
               <BattleTab battleTab={battleTab} />
             </View>
             <BattleTabControls
@@ -185,16 +184,20 @@ const DungeonLevelScreen = observer(() => {
               setBattleTab={setBattleTab}
             />
             {playerState.minionsAndPets.length > 0 ? (
-              <View className="flex flex-row flex-wrap justify-evenly px-4">
+              <View style={styles.minionContainer}>
                 {playerState.minionsAndPets.map((minion, index) => (
                   <View
                     key={minion.id}
-                    className={`${
-                      index == playerState.minionsAndPets.length - 1 &&
-                      playerState.minionsAndPets.length % 2 !== 0
-                        ? "w-full"
-                        : "w-2/5"
-                    } py-1`}
+                    style={[
+                      styles.minionBlock,
+                      {
+                        width:
+                          index === playerState.minionsAndPets.length - 1 &&
+                          playerState.minionsAndPets.length % 2 !== 0
+                            ? "100%"
+                            : "40%",
+                      },
+                    ]}
                   >
                     <Text>{toTitleCase(minion.creatureSpecies)}</Text>
                     <ProgressBar
@@ -209,7 +212,7 @@ const DungeonLevelScreen = observer(() => {
             ) : null}
           </View>
           {displayItem && (
-            <View className="absolute z-10" pointerEvents="box-none">
+            <View style={styles.statsDisplayOverlay} pointerEvents="box-none">
               <StatsDisplay
                 displayItem={displayItem}
                 clearItem={() => setDisplayItem(null)}
@@ -219,16 +222,15 @@ const DungeonLevelScreen = observer(() => {
             </View>
           )}
         </Parallax>
-        <PlayerStatus positioning={"absolute"} classname="bottom-0" />
+        <PlayerStatus positioning="absolute" style={{ bottom: 0 }} />
       </>
     );
   } else {
     return (
-      <View className="flex-1 justify-center align-middle">
+      <View style={styles.loadingContainer}>
         <D20DieAnimation keepRolling={true} />
       </View>
     );
   }
 });
-
 export default DungeonLevelScreen;

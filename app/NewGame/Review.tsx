@@ -1,5 +1,5 @@
 import { Text } from "../../components/Themed";
-import { useColorScheme, View } from "react-native";
+import { View } from "react-native";
 import { useNavigation } from "expo-router";
 import clearHistory, { toTitleCase, wait } from "../../utility/functions/misc";
 import { createPlayerCharacter } from "../../utility/functions/characterAid";
@@ -20,8 +20,8 @@ export default function NewGameReview() {
 
   let root = useRootStore();
   const navigation = useNavigation();
-  const colorScheme = useColorScheme();
   const styles = useStyles();
+  const { uiStore } = useRootStore();
 
   async function startGame() {
     if (classSelection && sex && blessingSelection !== undefined) {
@@ -52,7 +52,7 @@ export default function NewGameReview() {
             style={{
               color:
                 blessingSelection == Element.assassination &&
-                colorScheme == "dark"
+                uiStore.colorScheme == "dark"
                   ? elementalColorMap[blessingSelection].light
                   : elementalColorMap[blessingSelection].dark,
             }}

@@ -8,7 +8,6 @@ import {
   View,
 } from "react-native";
 import Colors, { elementalColorMap } from "../../constants/Colors";
-import { useColorScheme } from "nativewind";
 import { BlurView } from "expo-blur";
 import { StyleSheet } from "react-native";
 import PlayerStatus, { EXPANDED_PAD } from "../../components/PlayerStatus";
@@ -43,7 +42,6 @@ const TABSELECTOR_HEIGHT = 52;
 export default function TabLayout() {
   const isFocused = useIsFocused();
 
-  const { colorScheme } = useColorScheme();
   const { playerState, uiStore, dungeonStore } = useRootStore();
 
   const router = useRouter();
@@ -66,13 +64,13 @@ export default function TabLayout() {
           screenOptions={{
             tabBarBackground: () => {
               return (
-                <View className="-mx-2">
+                <View style={{ marginHorizontal: -8 }}>
                   <PlayerStatus home hideGold />
                   <LinearGradientBlur intensity={100} />
                 </View>
               );
             },
-            tabBarActiveTintColor: Colors[colorScheme].tint,
+            tabBarActiveTintColor: Colors[uiStore.colorScheme].tint,
             tabBarLabelStyle: {
               fontFamily: "PixelifySans",
               marginHorizontal: "auto",
@@ -177,7 +175,9 @@ export default function TabLayout() {
                       <Gear
                         width={30}
                         height={26}
-                        color={Colors[colorScheme as "light" | "dark"].text}
+                        color={
+                          Colors[uiStore.colorScheme as "light" | "dark"].text
+                        }
                         style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }}
                       />
                     )}
@@ -281,7 +281,9 @@ export default function TabLayout() {
                       <GraduationCapIcon
                         width={28}
                         height={28}
-                        color={colorScheme == "light" ? "#3f3f46" : "#e4e4e7"}
+                        color={
+                          uiStore.colorScheme == "light" ? "#3f3f46" : "#e4e4e7"
+                        }
                         style={{
                           marginLeft: 15,
                           marginBottom: 3,

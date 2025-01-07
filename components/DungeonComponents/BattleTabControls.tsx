@@ -2,6 +2,7 @@ import { View, Pressable } from "react-native";
 import { Text } from "../Themed";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
+import { useStyles } from "../../hooks/styles";
 
 interface BattleTabControlsProps {
   battleTab: string;
@@ -13,50 +14,52 @@ export default function BattleTabControls({
   battleTab,
   setBattleTab,
 }: BattleTabControlsProps) {
+  const styles = useStyles();
   const vibration = useVibration();
-  const { dungeonStore } = useRootStore();
+  const { dungeonStore, uiStore } = useRootStore();
+
+  const getBackgroundColor = (tab: string) => ({
+    backgroundColor:
+      battleTab === tab
+        ? uiStore.colorScheme === "dark"
+          ? "rgba(39, 39, 42, 0.3)"
+          : "rgba(244, 244, 245, 0.3)"
+        : undefined,
+  });
+
   return (
-    <View className="-mb-1 flex w-full flex-row justify-around">
+    <View style={styles.battleTabControls}>
       <Pressable
-        className={`w-1/3  py-4 ${
-          battleTab == "attacksOrNavigation"
-            ? "bg-zinc-150/30 dark:bg-zinc-800/30"
-            : "active:bg-zinc-200/30 dark:active:bg-zinc-700/30"
-        }`}
+        style={[
+          styles.battleTabButton,
+          getBackgroundColor("attacksOrNavigation"),
+        ]}
         onPress={() => {
           vibration({ style: "light" });
           setBattleTab("attacksOrNavigation");
         }}
       >
-        <Text className="text-center text-xl">
+        <Text style={[styles.textXl, { textAlign: "center" }]}>
           {dungeonStore.inCombat ? "Attacks" : "Navigation"}
         </Text>
       </Pressable>
       <Pressable
-        className={`w-1/3 py-4 ${
-          battleTab == "equipment"
-            ? " bg-zinc-150/30 dark:bg-zinc-800/30"
-            : "active:bg-zinc-200/30 dark:active:bg-zinc-700/30"
-        }`}
+        style={[styles.battleTabButton, getBackgroundColor("equipment")]}
         onPress={() => {
           vibration({ style: "light" });
           setBattleTab("equipment");
         }}
       >
-        <Text className="text-center text-xl">Inventory</Text>
+        <Text style={[styles.textXl, { textAlign: "center" }]}>Inventory</Text>
       </Pressable>
       <Pressable
-        className={`w-1/3  py-4 ${
-          battleTab == "log"
-            ? "bg-zinc-150/30 dark:bg-zinc-800/30"
-            : "active:bg-zinc-200/30 dark:active:bg-zinc-700/30"
-        }`}
+        style={[styles.battleTabButton, getBackgroundColor("log")]}
         onPress={() => {
           vibration({ style: "light" });
           setBattleTab("log");
         }}
       >
-        <Text className="text-center text-xl">Log</Text>
+        <Text style={[styles.textXl, { textAlign: "center" }]}>Log</Text>
       </Pressable>
     </View>
   );

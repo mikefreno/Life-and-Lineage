@@ -5,6 +5,7 @@ import D20DieAnimation from "./DieRollAnim";
 import GenericFlatButton from "./GenericFlatButton";
 import * as Updates from "expo-updates";
 import { useRootStore } from "../hooks/stores";
+import { useStyles } from "../hooks/styles";
 
 export class ErrorBoundary extends Component {
   constructor(props) {
@@ -29,12 +30,13 @@ export class ErrorBoundary extends Component {
 }
 function ErrorRender() {
   const root = useRootStore();
+  const styles = useStyles();
   return (
-    <View className="flex-1 justify-center align-middle py-24">
-      <View className="flex-1 justify-evenly">
-        <Text className="text-center">Something went wrong.</Text>
+    <View style={styles.errorContainer}>
+      <View style={styles.errorInnerContainer}>
+        <Text style={{ textAlign: "center" }}>Something went wrong.</Text>
 
-        <View className=" w-full mx-auto">
+        <View style={styles.dieContainer}>
           <D20DieAnimation
             keepRolling={true}
             slowRoll={true}
@@ -42,14 +44,14 @@ function ErrorRender() {
           />
         </View>
         <GenericFlatButton
-          className="mt-2"
+          style={{ marginTop: 8 }}
           onPress={() => Updates.reloadAsync()}
         >
           Restart
         </GenericFlatButton>
         {__DEV__ && (
           <GenericFlatButton
-            className="mt-2"
+            style={{ marginTop: 8 }}
             onPress={() => root.leaveDungeon()}
           >
             Clear Dungeon

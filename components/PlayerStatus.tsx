@@ -1,3 +1,4 @@
+import React from "react";
 import ProgressBar from "./ProgressBar";
 import {
   ScrollView,
@@ -6,6 +7,7 @@ import {
   Pressable,
   View,
   Platform,
+  ViewStyle,
 } from "react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
@@ -14,7 +16,6 @@ import GenericModal from "./GenericModal";
 import GenericStrikeAround from "./GenericStrikeAround";
 import FadeOutNode from "./FadeOutNode";
 import { BlurView } from "expo-blur";
-import { useColorScheme } from "nativewind";
 import { usePathname } from "expo-router";
 import {
   ClockIcon,
@@ -46,6 +47,7 @@ import {
   getTotalValue,
   statMapping,
 } from "../utility/functions/stats";
+import { useStyles } from "../hooks/styles";
 
 export const EXPANDED_PAD = 16;
 
@@ -79,7 +81,7 @@ interface PlayerStatusProps {
   home?: boolean;
   tabScreen?: boolean;
   positioning?: string;
-  classname?: string;
+  style?: ViewStyle;
 }
 const PlayerStatus = observer(
   ({
@@ -87,9 +89,10 @@ const PlayerStatus = observer(
     home = false,
     tabScreen = false,
     positioning = "absolute",
-    classname,
+    style,
   }: PlayerStatusProps) => {
     const { playerState, uiStore } = useRootStore();
+    const styles = useStyles();
     const [showingHealthWarningPulse, setShowingHealthWarningPulse] =
       useState<boolean>(false);
     const healthWarningAnimatedValue = useState(new Animated.Value(0))[0];
@@ -102,7 +105,6 @@ const PlayerStatus = observer(
     const [respeccing, setRespeccing] = useState<boolean>(false);
 
     const vibration = useVibration();
-    const { colorScheme } = useColorScheme();
 
     const { statChanges, animationCycler, healthDamageFlash } = useStatChanges(
       playerState!,
@@ -253,21 +255,17 @@ const PlayerStatus = observer(
             });
           }
         });
-        let simplifiedConditions: {
-          name: string;
-          icon: any;
-          count: number;
-        }[] = Array.from(simplifiedConditionsMap.values());
+        let simplifiedConditions = Array.from(simplifiedConditionsMap.values());
 
         return (
-          <View className="flex flex-row justify-around">
+          <View style={styles.conditionRow}>
             {simplifiedConditions.map((cond) => (
-              <View key={cond.name} className="mx-0.5 flex align-middle">
+              <View key={cond.name} style={styles.conditionIcon}>
                 <Image
                   source={cond.icon}
                   style={[
-                    colorScheme == "dark" &&
-                    ["blind", "stun"].includes(cond.name)
+                    ["blind", "stun"].includes(cond.name) &&
+                    uiStore.colorScheme === "dark"
                       ? {
                           backgroundColor: "rgba(255, 255, 255, 0.5)",
                           borderRadius: 20,
@@ -291,19 +289,23 @@ const PlayerStatus = observer(
     function detailedViewConditionRender() {
       if (playerState) {
         return (
-          <View className="max-h-64">
+          <View style={styles.detailedConditionContainer}>
             <ScrollView>
               {playerState.conditions.map((condition) => (
-                <View
-                  key={condition.id}
-                  className="my-1 border rounded-lg bg-zinc-200 py-2 dark:bg-zinc-600"
-                >
-                  <View className="flex justify-evenly flex-row">
-                    <Text className="text-xl tracking-wide opacity-80">
+                <View key={condition.id} style={styles.detailedConditionCard}>
+                  <View style={styles.conditionHeader}>
+                    <Text
+                      style={[
+                        styles.textXl,
+                        { letterSpacing: 1, opacity: 0.8 },
+                      ]}
+                    >
                       {toTitleCase(condition.name)}
                     </Text>
-                    <View className="flex items-center">
-                      <View className="flex flex-row items-center py-1">
+                    <View style={styles.flexColumnCenter}>
+                      <View
+                        style={[styles.flexRowCenter, { paddingVertical: 4 }]}
+                      >
                         <Image
                           source={condition.getConditionIcon()}
                           style={{ width: 24, height: 24 }}
@@ -313,13 +315,13 @@ const PlayerStatus = observer(
                         <ClockIcon width={16} height={16} />
                       </View>
                       {!!condition.getHealthDamage() && (
-                        <View className="flex flex-row items-center justify-center">
+                        <View style={styles.flexRowCenter}>
                           <Text>{condition.getHealthDamage()}</Text>
                           <HealthIcon height={16} width={16} />
                         </View>
                       )}
                       {!!condition.getSanityDamage() && (
-                        <View className="flex flex-row items-center justify-center">
+                        <View style={styles.flexRowCenter}>
                           <Text>{condition.getSanityDamage()}</Text>
                           <View style={{ marginLeft: 4 }}>
                             <Sanity height={16} width={16} />
@@ -327,11 +329,16 @@ const PlayerStatus = observer(
                         </View>
                       )}
                     </View>
-                    <Text className="text-xl tracking-wide opacity-80">
+                    <Text
+                      style={[
+                        styles.textXl,
+                        { letterSpacing: 1, opacity: 0.8 },
+                      ]}
+                    >
                       {toTitleCase(condition.style)}
                     </Text>
                   </View>
-                  <View className="mx-auto">
+                  <View style={{ marginHorizontal: "auto" }}>
                     {condition.effect.map((effect, idx) => (
                       <Text key={idx}>
                         {Condition.effectExplanationString({
@@ -353,11 +360,18 @@ const PlayerStatus = observer(
 
     function colorAndPlatformDependantBlur(children: JSX.Element) {
       if (home) {
-        if (colorScheme == "dark" && Platform.OS == "ios") {
+        if (uiStore.colorScheme === "dark" && Platform.OS === "ios") {
           return (
             <BlurView
               intensity={100}
-              className="mx-4 rounded-xl z-top overflow-hidden "
+              style={[
+                {
+                  marginHorizontal: 16,
+                  borderRadius: 12,
+                  zIndex: 10,
+                  overflow: "hidden",
+                },
+              ]}
             >
               <Animated.View
                 style={{
@@ -374,7 +388,21 @@ const PlayerStatus = observer(
           );
         } else {
           return (
-            <View className="shadow-soft dark:shadow-soft-white mx-4 rounded-xl z-top  bg-zinc-50 dark:bg-zinc-800">
+            <View
+              style={{
+                marginHorizontal: 16,
+                borderRadius: 12,
+                zIndex: 10,
+                backgroundColor:
+                  uiStore.colorScheme === "dark" ? "#27272a" : "#fafafa",
+                shadowColor:
+                  uiStore.colorScheme === "dark" ? "#ffffff" : "#000000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+              }}
+            >
               <Animated.View
                 style={{
                   display: "flex",
@@ -393,15 +421,23 @@ const PlayerStatus = observer(
       } else {
         return (
           <BlurView
-            intensity={Platform.OS == "ios" ? 100 : 0}
-            className="shadow-soft dark:shadow-soft-white z-top overflow-hidden pb-6"
+            intensity={Platform.OS === "ios" ? 100 : 0}
             style={{
+              zIndex: 10,
+              overflow: "hidden",
+              paddingBottom: 24,
               backgroundColor:
-                Platform.OS != "ios"
-                  ? colorScheme == "dark"
+                Platform.OS !== "ios"
+                  ? uiStore.colorScheme === "dark"
                     ? "#27272a"
                     : "#fafafa"
                   : "transparent",
+              shadowColor:
+                uiStore.colorScheme === "dark" ? "#ffffff" : "#000000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
             }}
           >
             <Animated.View
@@ -428,8 +464,14 @@ const PlayerStatus = observer(
     }) => {
       if (!stats.size || stats.size == 0) {
         return (
-          <View className="flex-1 justify-center items-center">
-            <Text className="text-center text-gray-500 italic">
+          <View style={[styles.flexColumnCenter, { flex: 1 }]}>
+            <Text
+              style={{
+                textAlign: "center",
+                color: "#6b7280",
+                fontStyle: "italic",
+              }}
+            >
               No {category} stats from equipment
             </Text>
           </View>
@@ -437,7 +479,7 @@ const PlayerStatus = observer(
       }
 
       return (
-        <ScrollView className="flex-1">
+        <ScrollView style={{ flex: 1 }}>
           {Array.from(stats).map(([modifier, value]) => {
             if (!value || value <= 0) {
               return null;
@@ -450,283 +492,323 @@ const PlayerStatus = observer(
         </ScrollView>
       );
     };
+
     if (!playerState) {
-      return;
+      return null;
     }
 
-    if (playerState) {
-      const preprop = !(uiStore.playerStatusIsCompact && home)
-        ? home
-          ? `${positioning} -mt-4 z-top w-full`
-          : `${positioning} mt-2 z-top w-full`
-        : home
-        ? `${positioning} z-top w-full`
-        : `${positioning} mt-20 z-top w-full`;
+    const positionStyle = !(uiStore.playerStatusIsCompact && home)
+      ? ({
+          position: positioning as "absolute" | "relative",
+          marginTop: home ? -16 : 8,
+          zIndex: 10,
+          width: "100%",
+        } as const)
+      : ({
+          position: positioning as "absolute" | "relative",
+          zIndex: 10,
+          width: "100%",
+        } as const);
 
-      const filled = tabScreen
-        ? preprop + " bottom-0"
-        : classname
-        ? preprop + " " + classname
-        : preprop;
-      return (
-        <>
-          <GenericModal
-            isVisibleCondition={uiStore.detailedStatusViewShowing}
-            backFunction={() => uiStore.setDetailedStatusViewShowing(false)}
-            size={95}
-          >
-            <View>
-              <View className="flex flex-row justify-between items-center py-1 w-full">
-                <View className="flex-1 justify-end items-center">
-                  <View className="flex flex-row -ml-4">
-                    <Text>{playerState.readableGold}</Text>
-                    <Coins width={16} height={16} style={{ marginLeft: 6 }} />
-                  </View>
-                </View>
-                <View className="flex-1 flex items-center">
-                  <Text className="text-xl text-center">
-                    {playerState.fullName}
-                  </Text>
-                </View>
-                <View className="flex-1"></View>
-              </View>
-              {playerState.unAllocatedSkillPoints > 0 && (
-                <Text
-                  className="text-xl text-center"
-                  style={{ color: "#16a34a" }}
-                  numberOfLines={2}
-                  adjustsFontSizeToFit={true}
-                >
-                  You have {playerState.unAllocatedSkillPoints} unallocated
-                  {"\n"}Skill Points!
-                </Text>
-              )}
-              {playerState.getTotalAllocatedPoints() > 0 && (
-                <View className="absolute right-0 -mt-1">
-                  <Pressable
-                    disabled={playerState.root.dungeonStore.inCombat}
-                    onPress={() => {
-                      setRespeccing(!respeccing);
-                      vibration({ style: "light", essential: true });
-                    }}
-                  >
-                    {({ pressed }) => (
-                      <View
-                        className={`${pressed && "scale-90"} ${
-                          respeccing
-                            ? playerState.root.dungeonStore.inCombat
-                              ? "scale-x-[-1] bg-gray-400"
-                              : "scale-x-[-1] bg-green-600"
-                            : playerState.root.dungeonStore.inCombat
-                            ? " bg-gray-400"
-                            : "bg-red-600"
-                        } h-[30] w-[30] items-center rounded-md`}
-                      >
-                        <View className="my-auto">
-                          <RotateArrow height={18} width={18} color={"white"} />
-                        </View>
-                      </View>
-                    )}
-                  </Pressable>
-                </View>
-              )}
-              <RenderPrimaryStatsBlock
-                stat={Attribute.health}
-                playerState={playerState}
-                respeccing={respeccing}
-                vibration={vibration}
-              />
-              <RenderPrimaryStatsBlock
-                stat={Attribute.mana}
-                playerState={playerState}
-                respeccing={respeccing}
-                vibration={vibration}
-              />
-              <RenderPrimaryStatsBlock
-                stat={Attribute.sanity}
-                playerState={playerState}
-                respeccing={respeccing}
-                vibration={vibration}
-              />
-              <View className="flex flex-row justify-evenly">
-                <RenderSecondaryStatsBlock
-                  stat={Attribute.strength}
-                  playerState={playerState}
-                  respeccing={respeccing}
-                  vibration={vibration}
-                />
-                <RenderSecondaryStatsBlock
-                  stat={Attribute.dexterity}
-                  playerState={playerState}
-                  respeccing={respeccing}
-                  vibration={vibration}
-                />
-                <RenderSecondaryStatsBlock
-                  stat={Attribute.intelligence}
-                  playerState={playerState}
-                  respeccing={respeccing}
-                  vibration={vibration}
-                />
-              </View>
+    const finalPosition = tabScreen
+      ? { ...positionStyle, bottom: 0 }
+      : style
+      ? { ...positionStyle, ...style }
+      : positionStyle;
 
-              {playerState.equipmentStats.size > 0 ? (
-                <View className="py-1">
-                  <GenericStrikeAround>Equipment Stats</GenericStrikeAround>
-                  <View
-                    className="flex-row mt-2"
-<<<<<<< HEAD
-                    style={{
-                      height: Math.min(
-                        uiStore.dimensions.height * 0.3,
-                        Math.max(ownedOffensive.size, ownedDefensive.size) *
-                          70 +
-                          10,
-                      ),
-                    }}
-=======
-                    style={{ maxHeight: uiStore.dimensions.height * 0.3 }}
->>>>>>> parent of cb574f9 (dungeon work (specialEncounters))
-                  >
-                    <View className="w-1/2 mr-1">
-                      <Text className="text-center font-bold mb-1">
-                        Offensive
-                      </Text>
-                      <StatCategory
-                        stats={ownedOffensive}
-                        category={"offensive"}
-                      />
-                    </View>
-                    <View className="w-1/2 ml-1">
-                      <Text className="text-center font-bold mb-1">
-                        Defensive
-                      </Text>
-                      <StatCategory
-                        stats={ownedDefensive}
-                        category={"defensive"}
-                      />
-                    </View>
-                  </View>
-                </View>
-              ) : null}
-              {playerState.conditions.length > 0 ? (
-                <View>
-                  <GenericStrikeAround>Conditions</GenericStrikeAround>
-                  {detailedViewConditionRender()}
-                </View>
-              ) : null}
-            </View>
-          </GenericModal>
-          <Pressable
-            onPress={() => {
-              vibration({ style: "light" });
-              uiStore.setDetailedStatusViewShowing(true);
-            }}
-            className={filled}
-          >
-            {colorAndPlatformDependantBlur(
-              <View className="flex px-2">
-                {!(uiStore.playerStatusIsCompact && home) && (
-                  <View className="flex py-0.5 h-4 flex-row justify-center">
-                    {!hideGold && (
-                      <View className="flex flex-row my-auto">
-                        <Text>{playerState.readableGold}</Text>
-                        <Coins
-                          width={16}
-                          height={16}
-                          style={{ marginLeft: 6 }}
-                        />
-                      </View>
-                    )}
-                    {playerState.unAllocatedSkillPoints > 0 && (
-                      <View className="px-1 my-auto">
-                        <SquarePlus height={16} width={16} />
-                      </View>
-                    )}
-                    <View>{conditionRenderer()}</View>
-                  </View>
-                )}
-                <View className="flex flex-row justify-evenly py-1">
-                  <View className="flex w-[31%]">
-                    <View className="flex flex-row justify-between">
-                      <Text className="pl-1" style={{ color: "#ef4444" }}>
-                        Health
-                      </Text>
-                      <ChangePopUp
-                        popUp={"health"}
-                        change={statChanges.health}
-                        animationCycler={animationCycler}
-                        colorScheme={colorScheme}
-                      />
-                    </View>
-                    <ProgressBar
-                      value={playerState.currentHealth}
-                      maxValue={playerState.maxHealth}
-                      filledColor="#ef4444"
-                      unfilledColor="#fca5a5"
-                    />
-                  </View>
-                  <View className="flex w-[31%]">
-                    <View className="flex flex-row justify-between">
-                      <Text className="pl-1" style={{ color: "#60a5fa" }}>
-                        Mana
-                      </Text>
-                      <ChangePopUp
-                        popUp={"mana"}
-                        change={statChanges.mana}
-                        animationCycler={animationCycler}
-                        colorScheme={colorScheme}
-                      />
-                    </View>
-                    <ProgressBar
-                      value={playerState.currentMana}
-                      maxValue={playerState.maxMana}
-                      filledColor="#60a5fa"
-                      unfilledColor="#bfdbfe"
-                    />
-                  </View>
-                  <View className="flex w-[31%]">
-                    <View className="flex flex-row justify-between">
-                      <Text className="pl-1" style={{ color: "#c084fc" }}>
-                        Sanity
-                      </Text>
-                      <ChangePopUp
-                        popUp={"sanity"}
-                        change={statChanges.sanity}
-                        animationCycler={animationCycler}
-                        colorScheme={colorScheme}
-                      />
-                    </View>
-                    <ProgressBar
-                      value={playerState.currentSanity}
-                      minValue={-playerState.maxSanity}
-                      maxValue={playerState.maxSanity}
-                      filledColor="#c084fc"
-                      unfilledColor="#e9d5ff"
-                    />
-                  </View>
-                </View>
-              </View>,
-            )}
+    return (
+      <>
+        <GenericModal
+          isVisibleCondition={uiStore.detailedStatusViewShowing}
+          backFunction={() => uiStore.setDetailedStatusViewShowing(false)}
+          size={95}
+        >
+          <View>
             <View
-              className={`${
-                uiStore.playerStatusIsCompact && home
-                  ? "ml-4"
-                  : "justify-center w-full mr-8"
-              } flex flex-row absolute z-top`}
+              style={[
+                styles.flexRowBetween,
+                { alignItems: "center", paddingVertical: 4, width: "100%" },
+              ]}
             >
-              <ChangePopUp
-                popUp={"gold"}
-                change={statChanges.gold}
-                animationCycler={animationCycler}
-                colorScheme={colorScheme}
+              <View style={[styles.flexColumnCenter, { flex: 1 }]}>
+                <View style={{ marginLeft: -16, flexDirection: "row" }}>
+                  <Text>{playerState.readableGold}</Text>
+                  <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+                </View>
+              </View>
+              <View style={[styles.flexColumnCenter, { flex: 1 }]}>
+                <Text style={[styles.textXl, { textAlign: "center" }]}>
+                  {playerState.fullName}
+                </Text>
+              </View>
+              <View style={{ flex: 1 }} />
+            </View>
+
+            {playerState.unAllocatedSkillPoints > 0 && (
+              <Text
+                style={[
+                  styles.textXl,
+                  { color: "#16a34a", textAlign: "center" },
+                ]}
+                numberOfLines={2}
+                adjustsFontSizeToFit={true}
+              >
+                You have {playerState.unAllocatedSkillPoints} unallocated
+                {"\n"}Skill Points!
+              </Text>
+            )}
+
+            {playerState.getTotalAllocatedPoints() > 0 && (
+              <View style={{ position: "absolute", right: 0, marginTop: -4 }}>
+                <Pressable
+                  disabled={playerState.root.dungeonStore.inCombat}
+                  onPress={() => {
+                    setRespeccing(!respeccing);
+                    vibration({ style: "light", essential: true });
+                  }}
+                >
+                  {({ pressed }) => (
+                    <View
+                      style={[
+                        styles.respecButton,
+                        {
+                          transform: [
+                            { scale: pressed ? 0.9 : 1 },
+                            { scaleX: respeccing ? -1 : 1 },
+                          ],
+                          backgroundColor: playerState.root.dungeonStore
+                            .inCombat
+                            ? "#9ca3af"
+                            : respeccing
+                            ? "#16a34a"
+                            : "#dc2626",
+                        },
+                      ]}
+                    >
+                      <View style={{ marginVertical: "auto" }}>
+                        <RotateArrow height={18} width={18} color={"white"} />
+                      </View>
+                    </View>
+                  )}
+                </Pressable>
+              </View>
+            )}
+
+            <RenderPrimaryStatsBlock
+              stat={Attribute.health}
+              playerState={playerState}
+              respeccing={respeccing}
+              vibration={vibration}
+            />
+            <RenderPrimaryStatsBlock
+              stat={Attribute.mana}
+              playerState={playerState}
+              respeccing={respeccing}
+              vibration={vibration}
+            />
+            <RenderPrimaryStatsBlock
+              stat={Attribute.sanity}
+              playerState={playerState}
+              respeccing={respeccing}
+              vibration={vibration}
+            />
+
+            <View style={styles.flexRowEvenly}>
+              <RenderSecondaryStatsBlock
+                stat={Attribute.strength}
+                playerState={playerState}
+                respeccing={respeccing}
+                vibration={vibration}
+              />
+              <RenderSecondaryStatsBlock
+                stat={Attribute.dexterity}
+                playerState={playerState}
+                respeccing={respeccing}
+                vibration={vibration}
+              />
+              <RenderSecondaryStatsBlock
+                stat={Attribute.intelligence}
+                playerState={playerState}
+                respeccing={respeccing}
+                vibration={vibration}
               />
             </View>
-          </Pressable>
-        </>
-      );
-    }
+
+            {playerState.equipmentStats.size > 0 ? (
+              <View style={{ paddingVertical: 4 }}>
+                <GenericStrikeAround>Equipment Stats</GenericStrikeAround>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginTop: 8,
+                    height: Math.min(
+                      uiStore.dimensions.height * 0.3,
+                      Math.max(ownedOffensive.size, ownedDefensive.size) * 70 +
+                        10,
+                    ),
+                  }}
+                >
+                  <View style={[styles.equipmentStatsSection]}>
+                    <Text
+                      style={[
+                        styles.bold,
+                        { textAlign: "center", marginBottom: 4 },
+                      ]}
+                    >
+                      Offensive
+                    </Text>
+                    <StatCategory
+                      stats={ownedOffensive}
+                      category={"offensive"}
+                    />
+                  </View>
+                  <View style={[styles.equipmentStatsSection]}>
+                    <Text
+                      style={[
+                        styles.bold,
+                        { textAlign: "center", marginBottom: 4 },
+                      ]}
+                    >
+                      Defensive
+                    </Text>
+                    <StatCategory
+                      stats={ownedDefensive}
+                      category={"defensive"}
+                    />
+                  </View>
+                </View>
+              </View>
+            ) : null}
+
+            {playerState.conditions.length > 0 ? (
+              <View>
+                <GenericStrikeAround>Conditions</GenericStrikeAround>
+                {detailedViewConditionRender()}
+              </View>
+            ) : null}
+          </View>
+        </GenericModal>
+        <Pressable
+          onPress={() => {
+            vibration({ style: "light" });
+            uiStore.setDetailedStatusViewShowing(true);
+          }}
+          style={finalPosition}
+        >
+          {colorAndPlatformDependantBlur(
+            <View style={styles.playerStatusContent}>
+              {!(uiStore.playerStatusIsCompact && home) && (
+                <View
+                  style={[
+                    styles.flexRowCenter,
+                    { height: 16, paddingVertical: 2 },
+                  ]}
+                >
+                  {!hideGold && (
+                    <View
+                      style={[styles.flexRowCenter, { marginVertical: "auto" }]}
+                    >
+                      <Text>{playerState.readableGold}</Text>
+                      <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+                    </View>
+                  )}
+                  {playerState.unAllocatedSkillPoints > 0 && (
+                    <View
+                      style={{ paddingHorizontal: 4, marginVertical: "auto" }}
+                    >
+                      <SquarePlus height={16} width={16} />
+                    </View>
+                  )}
+                  <View>{conditionRenderer()}</View>
+                </View>
+              )}
+              <View style={styles.statsRow}>
+                <View style={styles.statBlock}>
+                  <View style={styles.statHeader}>
+                    <Text style={{ paddingLeft: 4, color: "#ef4444" }}>
+                      Health
+                    </Text>
+                    <ChangePopUp
+                      popUp={"health"}
+                      change={statChanges.health}
+                      animationCycler={animationCycler}
+                      colorScheme={uiStore.colorScheme}
+                    />
+                  </View>
+                  <ProgressBar
+                    value={playerState.currentHealth}
+                    maxValue={playerState.maxHealth}
+                    filledColor="#ef4444"
+                    unfilledColor="#fca5a5"
+                  />
+                </View>
+                <View style={styles.statBlock}>
+                  <View style={styles.statHeader}>
+                    <Text style={{ paddingLeft: 4, color: "#60a5fa" }}>
+                      Mana
+                    </Text>
+                    <ChangePopUp
+                      popUp={"mana"}
+                      change={statChanges.mana}
+                      animationCycler={animationCycler}
+                      colorScheme={uiStore.colorScheme}
+                    />
+                  </View>
+                  <ProgressBar
+                    value={playerState.currentMana}
+                    maxValue={playerState.maxMana}
+                    filledColor="#60a5fa"
+                    unfilledColor="#bfdbfe"
+                  />
+                </View>
+                <View style={styles.statBlock}>
+                  <View style={styles.statHeader}>
+                    <Text style={{ paddingLeft: 4, color: "#c084fc" }}>
+                      Sanity
+                    </Text>
+                    <ChangePopUp
+                      popUp={"sanity"}
+                      change={statChanges.sanity}
+                      animationCycler={animationCycler}
+                      colorScheme={uiStore.colorScheme}
+                    />
+                  </View>
+                  <ProgressBar
+                    value={playerState.currentSanity}
+                    minValue={-playerState.maxSanity}
+                    maxValue={playerState.maxSanity}
+                    filledColor="#c084fc"
+                    unfilledColor="#e9d5ff"
+                  />
+                </View>
+              </View>
+            </View>,
+          )}
+          <View
+            style={[
+              styles.flexRowCenter,
+              {
+                position: "absolute",
+                zIndex: 10,
+                ...(uiStore.playerStatusIsCompact && home
+                  ? { marginLeft: 16 }
+                  : { width: "100%", marginRight: 32 }),
+              },
+            ]}
+          >
+            <ChangePopUp
+              popUp={"gold"}
+              change={statChanges.gold}
+              animationCycler={animationCycler}
+              colorScheme={uiStore.colorScheme}
+            />
+          </View>
+        </Pressable>
+      </>
+    );
   },
 );
+
 export default PlayerStatus;
 
 function RenderPrimaryStatsBlock({
@@ -779,6 +861,7 @@ function RenderPrimaryStatsBlock({
     },
   );
 
+  const styles = useStyles();
   const onPressIn = useCallback(() => {
     vibration({ style: "light" });
     handlePressIn();
@@ -822,12 +905,14 @@ function RenderPrimaryStatsBlock({
     (playerState.allocatedSkillPoints[stat] > 0 && respeccing);
 
   return (
-    <View className="items-center">
-      <Text className="py-1" style={{ color: filledColor }}>
+    <View style={styles.flexColumnCenter}>
+      <Text style={{ paddingVertical: 4, color: filledColor }}>
         {AttributeToString[stat]}
       </Text>
-      <View className="flex w-full flex-row items-center">
-        <View className="flex-1">
+      <View
+        style={[styles.flexRowCenter, { width: "100%", alignItems: "center" }]}
+      >
+        <View style={{ flex: 1 }}>
           <ProgressBar
             value={current}
             minValue={min}
@@ -839,13 +924,13 @@ function RenderPrimaryStatsBlock({
         </View>
         {shouldShow && (
           <Pressable
-            className="px-0.5"
+            style={{ paddingHorizontal: 2 }}
             onPressIn={onPressIn}
             onPressOut={onPressOut}
             disabled={!shouldShow}
           >
             {({ pressed }) => (
-              <View className={pressed ? "scale-95" : ""}>
+              <View style={{ transform: [{ scale: pressed ? 0.95 : 1 }] }}>
                 {respeccing ? (
                   <SquareMinus height={28} width={28} />
                 ) : (
@@ -883,6 +968,7 @@ function RenderSecondaryStatsBlock({
       : playerState.unAllocatedSkillPoints;
   }, [stat, playerState, respeccing]);
 
+  const styles = useStyles();
   const action = useCallback(() => {
     if (playerState) {
       if (respeccing) {
@@ -924,9 +1010,9 @@ function RenderSecondaryStatsBlock({
     (!respeccing && playerState.unAllocatedSkillPoints > 0);
 
   return (
-    <View className="flex items-center">
-      <Text className="py-1">{AttributeToString[stat]}</Text>
-      <View className="flex flex-row items-center">
+    <View style={styles.flexColumnCenter}>
+      <Text style={{ paddingVertical: 4 }}>{AttributeToString[stat]}</Text>
+      <View style={[styles.flexRowCenter, { alignItems: "center" }]}>
         <Text>
           {stat === Attribute.strength
             ? playerState.totalStrength
@@ -942,15 +1028,15 @@ function RenderSecondaryStatsBlock({
           <IntelligenceIcon height={20} width={23} />
         )}
         {shouldShow && (
-          <View className="flex flex-row">
+          <View style={styles.flexRowCenter}>
             <Pressable
-              className="px-0.5"
+              style={{ paddingHorizontal: 2 }}
               onPressIn={onPressIn}
               onPressOut={onPressOut}
               disabled={!shouldShow}
             >
               {({ pressed }) => (
-                <View className={pressed ? "scale-95" : ""}>
+                <View style={{ transform: [{ scale: pressed ? 0.95 : 1 }] }}>
                   {respeccing ? (
                     <SquareMinus height={28} width={28} />
                   ) : (
@@ -965,7 +1051,6 @@ function RenderSecondaryStatsBlock({
     </View>
   );
 }
-
 const ChangePopUp = ({
   popUp,
   change,
@@ -977,7 +1062,6 @@ const ChangePopUp = ({
   animationCycler: number;
   colorScheme: "light" | "dark";
 }) => {
-  const marginAdjust = popUp === "gold" ? "-mt-3" : "";
   const color =
     popUp === "mana"
       ? "#60a5fa"
@@ -990,12 +1074,17 @@ const ChangePopUp = ({
       : "black";
 
   return (
-    <View className={`${change.isShowing ? "" : "opacity-0"} ${marginAdjust}`}>
+    <View
+      style={[
+        popUp === "gold" && { marginTop: -12 },
+        { opacity: change.isShowing ? 1 : 0 },
+      ]}
+    >
       <FadeOutNode
         animationCycler={animationCycler}
-        className="flex flex-row my-auto"
+        style={{ marginVertical: "auto", flexDirection: "row" }}
       >
-        <Text className="pr-2 text-xs" style={{ color }}>
+        <Text style={{ paddingRight: 8, fontSize: 12, color }}>
           {change.current > 0 ? "+" : ""}
           {change.current}
           {change.cumulative !== change.current && (

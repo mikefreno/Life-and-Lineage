@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
@@ -32,13 +31,15 @@ import { EXPANDED_PAD } from "../../components/PlayerStatus";
 import type { Item } from "../../entities/item";
 import { Image } from "expo-image";
 import { StashDisplay } from "../../components/StashDisplay";
+import { useStyles } from "../../hooks/styles";
 
 const HomeScreen = observer(() => {
-  const { colorScheme } = useColorScheme();
   const { playerState, uiStore, stashStore } = useRootStore();
   const { draggableClassStore } = useDraggableStore();
   const [showStash, setShowStash] = useState(false);
   const stashButtonRef = useRef<View>(null);
+  const isDark = uiStore.colorScheme === "dark";
+  const styles = useStyles();
 
   const [displayItem, setDisplayItem] = useState<{
     item: Item[];
@@ -62,7 +63,7 @@ const HomeScreen = observer(() => {
           <NecromancerSkull
             width={iconSize}
             height={iconSize}
-            color={colorScheme === "dark" ? "#9333ea" : "#6b21a8"}
+            color={uiStore.colorScheme === "dark" ? "#9333ea" : "#6b21a8"}
           />
         );
       case "paladin":
@@ -72,13 +73,17 @@ const HomeScreen = observer(() => {
           <WizardHat
             width={iconSize}
             height={iconSize}
-            color={colorScheme === "dark" ? "#2563eb" : "#1e40af"}
+            color={uiStore.colorScheme === "dark" ? "#2563eb" : "#1e40af"}
           />
         );
       default:
         return <RangerIcon width={iconSize} height={iconSize} />;
     }
-  }, [playerState?.playerClass, uiStore.dimensions.height, colorScheme]);
+  }, [
+    playerState?.playerClass,
+    uiStore.dimensions.height,
+    uiStore.colorScheme,
+  ]);
 
   const layoutDimensions = useMemo(
     () => ({
@@ -142,24 +147,48 @@ const HomeScreen = observer(() => {
         clear={() => setShowStash(false)}
         showingStash={showStash}
       />
-      <View className="flex-1" style={layoutDimensions}>
+      <View style={[{ flex: 1 }, layoutDimensions]}>
         <TouchableWithoutFeedback onPress={clearDisplayItem}>
-          <View className="p-1 md:py-4">
-            <View className="flex-row">
-              <View className="mx-auto">{playerIcon}</View>
-              <View className="flex justify-center">
-                <Text className="text-center text-xl dark:text-white">
+          <View style={{ padding: 4 }}>
+            <View
+              style={{
+                flexDirection: "row",
+              }}
+            >
+              <View style={{ marginHorizontal: "auto" }}>{playerIcon}</View>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  style={[
+                    styles.textXl,
+                    { textAlign: "center", color: isDark ? "white" : "black" },
+                  ]}
+                >
                   {playerState.fullName}
                 </Text>
-                <Text className="text-center text-xl dark:text-white">
+                <Text
+                  style={[
+                    styles.textXl,
+                    { textAlign: "center", color: isDark ? "white" : "black" },
+                  ]}
+                >
                   {playerState.job}
                 </Text>
-                <Text className="text-center text-xl dark:text-white">{`${playerState.age} years old`}</Text>
+                <Text
+                  style={[
+                    styles.textXl,
+                    { textAlign: "center", color: isDark ? "white" : "black" },
+                  ]}
+                >{`${playerState.age} years old`}</Text>
               </View>
-              <View className="mx-auto">
+              <View style={{ marginHorizontal: "auto" }}>
                 <BlessingDisplay
                   blessing={playerState.blessing}
-                  colorScheme={colorScheme}
+                  colorScheme={uiStore.colorScheme}
                   size={
                     uiStore.dimensions.height / 9 > 100
                       ? 100
@@ -171,26 +200,7 @@ const HomeScreen = observer(() => {
           </View>
         </TouchableWithoutFeedback>
         <TouchableWithoutFeedback onPress={clearDisplayItem}>
-          <View className="flex-1 justify-between relative z-10 h-full">
-            {/*<View className="absolute pl-2 z-top">
-              <ScrollView style={{ maxHeight: dimensions.height * 0.3 }}>
-                {Array.from(playerState.equipmentStats.entries()).map(
-                  ([mod, value]) => {
-                    const statInfo = getStatInfo(mod as Modifier);
-                    if (!value || value <= 0) return null;
-
-                    const Icon = statInfo.icon;
-                    return (
-                      <Text key={mod} className="text-center">
-                        <Icon height={12} width={12} />{" "}
-                        {getTotalValue(mod as Modifier, value)}
-                      </Text>
-                    );
-                  },
-                )}
-              </ScrollView>
-            </View>*/}
-            {/* May add this back, but idk if I really want it - cluttered*/}
+          <View style={styles.inventoryContainer}>
             <EquipmentDisplay
               displayItem={displayItem}
               setDisplayItem={setDisplayItem}
@@ -199,7 +209,7 @@ const HomeScreen = observer(() => {
               ref={stashButtonRef}
               onLayout={setStashBoundsOnLayout}
               onPress={() => setShowStash(true)}
-              className="z-top rounded-lg -mt-16 px-4 w-20 h-20"
+              style={styles.stashButton}
             >
               <Image
                 source={require("../../assets/images/icons/Chest.png")}
@@ -243,7 +253,10 @@ const HomeScreen = observer(() => {
           </View>
         </TouchableWithoutFeedback>
         {displayItem && (
-          <View className="absolute z-top" pointerEvents="box-none">
+          <View
+            style={{ position: "absolute", zIndex: 10 }}
+            pointerEvents="box-none"
+          >
             <StatsDisplay
               displayItem={displayItem}
               clearItem={clearDisplayItem}
@@ -255,5 +268,4 @@ const HomeScreen = observer(() => {
     </>
   );
 });
-
 export default HomeScreen;

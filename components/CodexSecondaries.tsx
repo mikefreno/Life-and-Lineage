@@ -13,7 +13,6 @@ import necromancerSpells from "../assets/json/necroSpells.json";
 import paladinSpells from "../assets/json/paladinSpells.json";
 import rangerSpells from "../assets/json/rangerSpells.json";
 import BlessingDisplay from "./BlessingsDisplay";
-import { useColorScheme } from "nativewind";
 import {
   NecromancerSkull,
   PaladinHammer,
@@ -21,6 +20,7 @@ import {
   WizardHat,
 } from "../assets/icons/SVGIcons";
 import { Spell } from "../entities/spell";
+import { useRootStore } from "../hooks/stores";
 
 const ClassCodex = ({
   classOption,
@@ -33,7 +33,8 @@ const ClassCodex = ({
   schools: Element[];
   spells: any[];
 }) => {
-  const { colorScheme } = useColorScheme();
+  const { uiStore } = useRootStore();
+
   const headerComponent = () => (
     <View className="px-4 pt-4">
       <View className="items-center">{icon}</View>
@@ -54,7 +55,7 @@ const ClassCodex = ({
               className="text-2xl"
               style={{
                 color:
-                  colorScheme == "dark"
+                  uiStore.colorScheme == "dark"
                     ? school == Element.assassination
                       ? elementalColorMap[school].light
                       : elementalColorMap[school].dark
@@ -65,7 +66,7 @@ const ClassCodex = ({
             </Text>
             {BlessingDisplay({
               blessing: school,
-              colorScheme: colorScheme,
+              colorScheme: uiStore.colorScheme,
               size: 24,
             })}
           </Link>
@@ -104,11 +105,15 @@ const ElementCodex = ({
   element: Element;
   spells: any[];
 }) => {
-  const { colorScheme } = useColorScheme();
+  const { uiStore } = useRootStore();
+
   const headerComponent = () => (
     <View className="px-4 pt-4">
       <View className="items-center">
-        {BlessingDisplay({ blessing: element, colorScheme: colorScheme })}
+        {BlessingDisplay({
+          blessing: element,
+          colorScheme: uiStore.colorScheme,
+        })}
       </View>
       <View className="items-center">
         <Text className="text-center pt-8">

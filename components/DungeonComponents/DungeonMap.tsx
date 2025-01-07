@@ -1,11 +1,11 @@
 import Svg, { Rect } from "react-native-svg";
 import { Dimensions, View } from "react-native";
 import GenericRaisedButton from "../GenericRaisedButton";
-import { useColorScheme } from "nativewind";
 import { TILE_SIZE } from "../../stores/DungeonStore";
 import { observer } from "mobx-react-lite";
 import { useRootStore } from "../../hooks/stores";
 import { SpecialEncounter } from "../../entities/dungeon";
+import { useStyles } from "../../hooks/styles";
 /**
  * Represents a tile in the dungeon map.
  * @property {number} x - The x-coordinate of the tile.
@@ -199,9 +199,8 @@ export const getBoundingBox = (
  * Renders the dungeon map made by `generateTiles`.
  */
 export const DungeonMapRender = observer(() => {
-  const { colorScheme } = useColorScheme();
   const strokeWidth = 1;
-  const { dungeonStore } = useRootStore();
+  const { dungeonStore, uiStore } = useRootStore();
   const { currentMapDimensions, currentMap, currentPosition } = dungeonStore;
 
   if (!currentMapDimensions || !currentMap) {
@@ -218,7 +217,7 @@ export const DungeonMapRender = observer(() => {
     if (tile.isBossRoom && tile.clearedRoom) {
       return isCurrent ? "#DBA56E" : "#8B4513";
     }
-    if (colorScheme == "dark") {
+    if (uiStore.colorScheme == "dark") {
       if (tile.clearedRoom) {
         return isCurrent ? "#93c5fd" : "#2563eb";
       }
@@ -266,10 +265,10 @@ export const DungeonMapRender = observer(() => {
     : 0;
 
   return (
-    <View className="flex-1">
+    <View style={{ flex: 1 }}>
       <View
-        className="absolute"
         style={{
+          position: "absolute",
           left: xOrigin - offsetX,
           top: yOrigin - offsetY,
         }}
@@ -294,6 +293,7 @@ export const DungeonMapRender = observer(() => {
 export const DungeonMapControls = observer(() => {
   const { dungeonStore, uiStore } = useRootStore();
   const { currentPosition, currentMap, movementQueued } = dungeonStore;
+  const styles = useStyles();
 
   if (!currentPosition || !currentMap) {
     throw new Error("Missing map, or current position within control handler!");
@@ -332,13 +332,16 @@ export const DungeonMapControls = observer(() => {
     );
   };
   return (
-    <View className="flex-1 flex items-center w-full justify-center">
+    <View style={styles.dungeonControlsContainer}>
       <View
-        className="w-2/3 mx-auto"
-        style={{ marginTop: -uiStore.dimensions.height / 20 }}
+        style={{
+          marginTop: -uiStore.dimensions.height / 20,
+          width: "66.666%",
+          marginHorizontal: "auto",
+        }}
       >
         <ArrowButton direction="up" />
-        <View className="flex-row justify-between w-full">
+        <View style={styles.arrowButtonRow}>
           <ArrowButton direction="left" />
           <ArrowButton direction="right" />
         </View>

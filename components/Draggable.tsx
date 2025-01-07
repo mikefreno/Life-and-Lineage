@@ -1,3 +1,4 @@
+import React from "react";
 import { Pressable, View, Image } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -15,6 +16,7 @@ import { useVibration } from "../hooks/generic";
 import { useDraggableStore, useRootStore } from "../hooks/stores";
 import { checkReleasePosition } from "../utility/functions/misc";
 import { observer } from "mobx-react-lite";
+import { useStyles } from "../hooks/styles";
 
 type DraggableProps = {
   children: React.ReactNode;
@@ -174,6 +176,7 @@ const InventoryItem = observer(
     const { isDragging, position, draggableClassStore } = useDraggableStore();
     const vibration = useVibration();
     const { uiStore } = useRootStore();
+    const styles = useStyles();
 
     const animatedStyle = useAnimatedStyle(() => ({
       opacity: opacity.value,
@@ -237,11 +240,13 @@ const InventoryItem = observer(
         <Animated.View style={animatedStyle}>
           <Pressable ref={ref} onPress={handlePress}>
             <View
-              className="items-center justify-center rounded-lg bg-zinc-400 z-top"
-              style={{
-                height: uiStore.itemBlockSize,
-                width: uiStore.itemBlockSize,
-              }}
+              style={[
+                styles.inventoryItemContainer,
+                {
+                  height: uiStore.itemBlockSize,
+                  width: uiStore.itemBlockSize,
+                },
+              ]}
             >
               <Image
                 source={item[0].getItemIcon()}
@@ -251,7 +256,7 @@ const InventoryItem = observer(
                 }}
               />
               {item[0].stackable && item.length > 1 && (
-                <ThemedView className="absolute bottom-0 right-0 bg-opacity-50 rounded px-1">
+                <ThemedView style={styles.stackIndicator}>
                   <Text>{item.length}</Text>
                 </ThemedView>
               )}
@@ -282,26 +287,22 @@ const ProjectedImage = observer(() => {
     };
   });
 
+  const styles = useStyles();
+
   if (!draggableClassStore.iconString || !uiStore.itemBlockSize) {
     return null;
   }
 
   return (
-    <Animated.View
-      style={[
-        animatedStyle,
-        {
-          position: "absolute",
-          zIndex: 1000,
-        },
-      ]}
-    >
+    <Animated.View style={[animatedStyle, styles.projectedImageContainer]}>
       <View
-        className="items-center justify-center rounded-lg bg-zinc-400"
-        style={{
-          height: uiStore.itemBlockSize,
-          width: uiStore.itemBlockSize,
-        }}
+        style={[
+          styles.inventoryItemContainer,
+          {
+            height: uiStore.itemBlockSize,
+            width: uiStore.itemBlockSize,
+          },
+        ]}
       >
         <Image
           source={itemMap[draggableClassStore.iconString]}

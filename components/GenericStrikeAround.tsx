@@ -1,11 +1,17 @@
-import { View, ViewStyle, StyleProp } from "react-native";
+import {
+  View,
+  type ViewStyle,
+  type StyleProp,
+  type TextStyle,
+} from "react-native";
 import { Text } from "./Themed";
 import { ReactNode } from "react";
+import { useStyles } from "../hooks/styles";
 
 interface GenericStrikeAround {
   containerStyles?: StyleProp<ViewStyle>;
   children: string | ReactNode;
-  className?: string;
+  style?: TextStyle;
 }
 
 /**
@@ -15,19 +21,21 @@ interface GenericStrikeAround {
 export default function GenericStrikeAround({
   containerStyles,
   children,
-  className,
+  style,
 }: GenericStrikeAround) {
+  const styles = useStyles();
+
   return (
-    <View className={`flex-row items-center ${containerStyles || ""}`}>
-      <View className="flex-1 border-t border-gray-500" />
-      <View className="mx-2.5">
+    <View style={[styles.strikeAroundContainer, containerStyles]}>
+      <View style={styles.strikeAroundLine} />
+      <View style={styles.strikeAroundContent}>
         {typeof children === "string" ? (
-          <Text className={className || "text-xl"}>{children}</Text>
+          <Text style={style || { fontSize: 20 }}>{children}</Text>
         ) : (
           children
         )}
       </View>
-      <View className="flex-1 border-t border-gray-500 " />
+      <View style={styles.strikeAroundLine} />
     </View>
   );
 }

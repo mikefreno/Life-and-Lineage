@@ -1,3 +1,4 @@
+import React from "react";
 import { ThemedView, Text } from "../../components/Themed";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
@@ -10,6 +11,7 @@ import D20DieAnimation from "../../components/DieRollAnim";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import CheckpointModal from "../../components/CheckpointModal";
+import { useStyles } from "../../hooks/styles";
 
 const healthWarningOptions: Record<number, string> = {
   0.5: "50%",
@@ -31,10 +33,12 @@ const healthWarningKeys = [0.5, 0.25, 0.2, 0.15, 0.1, 0];
 
 export default function GameSettings() {
   const { uiStore, tutorialStore } = useRootStore();
+  const styles = useStyles();
   const vibration = useVibration();
   const [tutorialState, setTutorialState] = useState<boolean>(
     tutorialStore.tutorialsEnabled ?? true,
   );
+
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedHealthWarning, setSelectedHealthWarning] = useState<string>(
     healthWarningOptions[uiStore.healthWarning ?? 0.2],
@@ -72,12 +76,14 @@ export default function GameSettings() {
           <D20DieAnimation keepRolling={true} />
         ) : (
           <>
-            <Text className="text-center text-lg">
+            <Text style={styles.tutorialResetConfirmText}>
               This will reset all tutorials, some may not make sense based on
               your current game/player/inventory state (And restart the app).
             </Text>
-            <Text className="text-center text-2xl">Are you sure?</Text>
-            <ThemedView className="flex flex-row">
+            <Text style={[styles.text2xl, { textAlign: "center" }]}>
+              Are you sure?
+            </Text>
+            <View style={styles.tutorialResetButtonRow}>
               <Pressable
                 onPress={() => {
                   vibration({ style: "warning" });
@@ -88,59 +94,62 @@ export default function GameSettings() {
                     router.dismissAll();
                   });
                 }}
-                className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                style={styles.tutorialResetButton}
               >
                 <Text>Reset</Text>
               </Pressable>
               <Pressable
                 onPress={() => setShowTutorialResetConfirm(false)}
-                className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                style={styles.tutorialResetButton}
               >
                 <Text>Cancel</Text>
               </Pressable>
-            </ThemedView>
+            </View>
           </>
         )}
       </GenericModal>
+
       <CheckpointModal
         allowSaving
         isVisible={showCheckpoints}
         onClose={() => setShowCheckpoints(false)}
       />
-      <View className="flex-1 items-center justify-center px-4">
+
+      <View style={styles.gameSettingsContainer}>
         <GenericStrikeAround>Game Saves</GenericStrikeAround>
         <GenericRaisedButton onPress={() => setShowCheckpoints(true)}>
           Manage Game Saves
         </GenericRaisedButton>
+
         <GenericStrikeAround>Game Restart</GenericStrikeAround>
         <GenericRaisedButton onPress={startNewGame}>
           Start New Game
         </GenericRaisedButton>
+
         <GenericStrikeAround>Health Warning</GenericStrikeAround>
-        <View className="mt-3 rounded px-4 py-2">
+        <View style={styles.healthWarningContainer}>
           {healthWarningVals.map((item, idx) => (
             <Pressable
               key={idx}
-              className="mb-2 ml-10 flex flex-row"
+              style={styles.healthWarningOption}
               onPress={() => healthWarningSetter(healthWarningKeys[idx])}
             >
               <View
-                className={
-                  selectedHealthWarning == healthWarningVals[idx]
-                    ? "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 bg-blue-500 dark:border-zinc-50 dark:bg-blue-600"
-                    : "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 dark:border-zinc-50"
-                }
+                style={[
+                  styles.optionCircle,
+                  selectedHealthWarning == healthWarningVals[idx] &&
+                    styles.optionCircleSelected,
+                ]}
               />
-              <Text className="text-2xl tracking-widest">
-                {toTitleCase(item)}
-              </Text>
+              <Text style={styles.text2xl}>{toTitleCase(item)}</Text>
             </Pressable>
           ))}
         </View>
+
         <GenericStrikeAround>Tutorials</GenericStrikeAround>
-        <View className="mt-3 rounded px-4 py-2">
-          <View className="mx-auto flex flex-row">
-            <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+        <View style={styles.optionContainer}>
+          <View style={styles.tutorialSwitchRow}>
+            <Text style={styles.textLg}>Tutorials Enabled: </Text>
             <Switch
               trackColor={{ false: "#767577", true: "#3b82f6" }}
               ios_backgroundColor="#3e3e3e"

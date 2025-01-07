@@ -6,7 +6,7 @@ import { useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
 import { useIsFocused } from "@react-navigation/native";
 import { useState } from "react";
-import { Pressable, useColorScheme, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Text } from "../../components/Themed";
 import { playerClassColors } from "../../constants/Colors";
 import { toTitleCase } from "../../utility/functions/misc";
@@ -18,12 +18,12 @@ import { useStyles } from "../../hooks/styles";
 
 export default function SetSex() {
   const styles = useStyles();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
   const { classSelection, sex, setSex } = useNewGameStore();
   const vibration = useVibration();
   const [forceShowTutorial, setForceShowTutorial] = useState(false);
-  const { playerState, tutorialStore } = useRootStore();
+  const { playerState, tutorialStore, uiStore } = useRootStore();
+
+  const isDark = uiStore.colorScheme === "dark";
   const isFocused = useIsFocused();
 
   if (!classSelection) {

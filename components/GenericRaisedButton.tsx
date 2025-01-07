@@ -1,4 +1,3 @@
-import { useColorScheme } from "nativewind";
 import React from "react";
 import { StyleSheet, ColorValue, Pressable } from "react-native";
 import Animated, {
@@ -10,6 +9,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useVibration } from "../hooks/generic";
 import { Text } from "./Themed";
+import { useRootStore } from "../hooks/stores";
 
 interface GenericRaisedButtonProps {
   ref?: React.RefObject<any>;
@@ -64,11 +64,11 @@ const GenericRaisedButton = ({
   disableTopLevelStyling = false,
   style,
 }: GenericRaisedButtonProps) => {
-  const { colorScheme } = useColorScheme();
   const vibration = useVibration();
 
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
+  const { uiStore } = useRootStore();
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -112,27 +112,30 @@ const GenericRaisedButton = ({
   const dynamicButtonStyle = React.useMemo(() => {
     if (!disabled) {
       return {
-        shadowColor: colorScheme === "light" ? "black" : "white",
+        shadowColor: uiStore.colorScheme === "light" ? "black" : "white",
         elevation: 2,
         backgroundColor:
-          backgroundColor || (colorScheme === "light" ? "white" : "#71717a"),
+          backgroundColor ||
+          (uiStore.colorScheme === "light" ? "white" : "#71717a"),
         shadowOpacity: 0.1,
         shadowRadius: 5,
       };
     }
     return {
       backgroundColor:
-        backgroundColor || (colorScheme === "light" ? "#fafafa" : "#3f3f46"),
+        backgroundColor ||
+        (uiStore.colorScheme === "light" ? "#fafafa" : "#3f3f46"),
       opacity: 0.5,
     };
-  }, [colorScheme, disabled, backgroundColor]);
+  }, [uiStore.colorScheme, disabled, backgroundColor]);
 
   const textStyle = React.useMemo(
     () => ({
-      color: textColor || (colorScheme === "light" ? "#27272a" : "#fafafa"),
+      color:
+        textColor || (uiStore.colorScheme === "light" ? "#27272a" : "#fafafa"),
       opacity: disabled ? 0.5 : 1,
     }),
-    [colorScheme, textColor, disabled],
+    [uiStore.colorScheme, textColor, disabled],
   );
 
   return (

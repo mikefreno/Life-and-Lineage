@@ -1,3 +1,4 @@
+import React from "react";
 import { View, Image, type LayoutChangeEvent } from "react-native";
 import { Text } from "./Themed";
 import { InventoryItem } from "./Draggable";
@@ -8,6 +9,7 @@ import { PlayerCharacter } from "../entities/character";
 import UIStore from "../stores/UIStore";
 import { DraggableDataStore } from "../stores/DraggableDataStore";
 import { observer } from "mobx-react-lite";
+import { useStyles } from "../hooks/styles";
 
 interface EquipmentDisplayProps {
   displayItem: {
@@ -33,13 +35,21 @@ export default function EquipmentDisplay({
 }: EquipmentDisplayProps) {
   const { playerState, uiStore } = useRootStore();
   const { draggableClassStore } = useDraggableStore();
+  const styles = useStyles();
 
   if (playerState) {
     return (
-      <View className="pb-2 my-auto z-10">
-        <View className="flex flex-row items-center justify-between w-full">
-          <View className="flex-1" />
-          <View className="flex-1 flex items-center justify-center -ml-[10vw]">
+      <View style={styles.equipmentContainer}>
+        <View style={styles.equipmentTopRow}>
+          <View style={{ flex: 1 }} />
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+              marginLeft: "-10%",
+            }}
+          >
             <EquipmentSlot
               slot="Head"
               playerState={playerState}
@@ -49,7 +59,15 @@ export default function EquipmentDisplay({
               inventoryBounds={draggableClassStore.inventoryBounds}
             />
           </View>
-          <View className="flex-1 flex items-center justify-end -mt-[3vh] -ml-[10vw]">
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "flex-end",
+              marginTop: "-3%",
+              marginLeft: "-10%",
+            }}
+          >
             <EquipmentSlot
               slot="Quiver"
               playerState={playerState}
@@ -61,8 +79,8 @@ export default function EquipmentDisplay({
           </View>
         </View>
 
-        <View className="flex flex-row justify-evenly -mt-4">
-          <View className="-ml-2 mr-2">
+        <View style={styles.equipmentMiddleRow}>
+          <View style={{ marginLeft: -8, marginRight: 8 }}>
             <EquipmentSlot
               slot={"Main-Hand"}
               playerState={playerState}
@@ -72,7 +90,7 @@ export default function EquipmentDisplay({
               inventoryBounds={draggableClassStore.inventoryBounds}
             />
           </View>
-          <View className="">
+          <View>
             <EquipmentSlot
               slot={"Off-Hand"}
               playerState={playerState}
@@ -84,11 +102,15 @@ export default function EquipmentDisplay({
           </View>
         </View>
         <View
-          className={`mx-auto items-center ${
+          style={[
+            {
+              marginHorizontal: "auto",
+              alignItems: "center",
+            },
             uiStore.dimensions.width == uiStore.dimensions.greater
-              ? "-mt-20"
-              : "-mt-8"
-          }`}
+              ? { marginTop: -80 }
+              : { marginTop: -32 },
+          ]}
         >
           <EquipmentSlot
             slot={"Body"}
@@ -135,6 +157,7 @@ const EquipmentSlot = observer(
   }) => {
     let itemStack: Item[] = [];
     const selfRef = useRef<View | null>(null);
+    const styles = useStyles();
     if (playerState) {
       switch (slot) {
         case "Head":
@@ -186,15 +209,17 @@ const EquipmentSlot = observer(
 
       return (
         <>
-          <Text className="mb-1 text-center">{slot}</Text>
+          <Text style={{ marginBottom: 4, textAlign: "center" }}>{slot}</Text>
           <View onLayout={(e) => setBoundsOnLayout(e)} ref={selfRef}>
             {itemStack.length > 0 ? (
               <View
-                className="z-50 mx-auto border border-zinc-400 rounded-lg"
-                style={{
-                  height: uiStore.itemBlockSize,
-                  width: uiStore.itemBlockSize,
-                }}
+                style={[
+                  styles.equipmentSlotContainer,
+                  {
+                    height: uiStore.itemBlockSize,
+                    width: uiStore.itemBlockSize,
+                  },
+                ]}
               >
                 <InventoryItem
                   item={itemStack}
@@ -249,32 +274,38 @@ const EquipmentSlot = observer(
               </View>
             ) : slot === "Off-Hand" && isTwoHanded ? (
               <View
-                className={`${
-                  playerState.equipment.mainHand.playerHasRequirements
-                    ? "bg-zinc-400"
-                    : "bg-red-800"
-                } mx-auto z-10 items-center rounded-lg border border-zinc-400`}
-                style={{
-                  height: uiStore.itemBlockSize,
-                  width: uiStore.itemBlockSize,
-                }}
+                style={[
+                  styles.twoHandedSlot,
+                  {
+                    height: uiStore.itemBlockSize,
+                    width: uiStore.itemBlockSize,
+                    backgroundColor: playerState.equipment.mainHand
+                      .playerHasRequirements
+                      ? "#a1a1aa"
+                      : "#991b1b",
+                  },
+                ]}
               >
                 <Image
-                  className="my-auto opacity-50"
+                  style={[
+                    { marginVertical: "auto", opacity: 0.5 },
+                    {
+                      height: Math.min(uiStore.itemBlockSize * 0.65, 52),
+                      width: Math.min(uiStore.itemBlockSize * 0.65, 52),
+                    },
+                  ]}
                   source={playerState.equipment.mainHand?.getItemIcon()}
-                  style={{
-                    height: Math.min(uiStore.itemBlockSize * 0.65, 52),
-                    width: Math.min(uiStore.itemBlockSize * 0.65, 52),
-                  }}
                 />
               </View>
             ) : (
               <View
-                className="mx-auto rounded-lg border border-zinc-400"
-                style={{
-                  height: uiStore.itemBlockSize,
-                  width: uiStore.itemBlockSize,
-                }}
+                style={[
+                  styles.emptySlot,
+                  {
+                    height: uiStore.itemBlockSize,
+                    width: uiStore.itemBlockSize,
+                  },
+                ]}
               />
             )}
           </View>

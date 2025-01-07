@@ -1,3 +1,4 @@
+import React from "react";
 import qualifications from "../assets/json/qualifications.json";
 import PlayerStatus from "../components/PlayerStatus";
 import TrainingCard from "../components/TrainingCard";
@@ -7,11 +8,13 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { TutorialOption } from "../utility/types";
 import { ScrollView, View } from "react-native";
 import { useRootStore } from "../hooks/stores";
+import { tw } from "../hooks/styles";
 
 const JobTraining = () => {
   const isFocused = useIsFocused();
   const header = useHeaderHeight();
   const { playerState } = useRootStore();
+
   if (!playerState) {
     return null;
   }
@@ -26,24 +29,22 @@ const JobTraining = () => {
           body: "Here you can gain access to better jobs, just keep a careful eye on your sanity.",
         }}
       />
-      <View className="flex-1">
+      <View style={{ flex: 1 }}>
         <ScrollView
           style={{ paddingTop: header }}
           scrollIndicatorInsets={{ top: 0, right: 0, left: 0, bottom: 48 }}
         >
-          <View className="px-2 pt-4">
-            {qualifications.map((qual, index) => {
-              return (
-                <TrainingCard
-                  key={index}
-                  name={qual.name}
-                  ticks={qual.ticks}
-                  sanityCostPerTick={qual.sanityCostPerTick}
-                  goldCostPerTick={qual.goldCostPerTick}
-                  preRequisites={qual.prerequisites}
-                />
-              );
-            })}
+          <View style={[tw.px2, tw.pt4]}>
+            {qualifications.map((qual, index) => (
+              <TrainingCard
+                key={index}
+                name={qual.name}
+                ticks={qual.ticks}
+                sanityCostPerTick={qual.sanityCostPerTick}
+                goldCostPerTick={qual.goldCostPerTick}
+                preRequisites={qual.prerequisites}
+              />
+            ))}
           </View>
         </ScrollView>
       </View>

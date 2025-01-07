@@ -9,6 +9,7 @@ import { useRootStore } from "../../hooks/stores";
 import { useCombatActions, useEnemyManagement } from "../../hooks/combat";
 import { savePlayer } from "../../entities/character";
 import { observer } from "mobx-react-lite";
+import { useStyles } from "../../hooks/styles";
 
 const FleeModal = observer(() => {
   const vibration = useVibration();
@@ -16,6 +17,7 @@ const FleeModal = observer(() => {
   const { enemyStore, dungeonStore, playerState, uiStore } = rootStore;
   const { playerMinionsTurn } = useCombatActions();
   const { enemyTurn } = useEnemyManagement();
+  const styles = useStyles();
 
   const [fleeRollFailure, setFleeRollFailure] = useState<boolean>(false);
 
@@ -74,8 +76,13 @@ const FleeModal = observer(() => {
           setFleeRollFailure(false);
         }}
       >
-        <ThemedView className="flex items-center justify-evenly">
-          <Text className="text-center text-lg">
+        <ThemedView
+          style={{
+            ...styles.columnCenter,
+            justifyContent: "space-evenly",
+          }}
+        >
+          <Text style={{ textAlign: "center", ...styles.xl }}>
             {enemyStore.enemies.length == 0
               ? "Ready to Leave?"
               : "Attempt to Flee?"}
@@ -83,7 +90,7 @@ const FleeModal = observer(() => {
           {playerState.isStunned ? (
             <Text style={{ color: "#ef4444" }}>You are stunned!</Text>
           ) : null}
-          <ThemedView className="flex w-full flex-row justify-evenly pt-8">
+          <ThemedView style={styles.fleeButtonRow}>
             <GenericFlatButton
               onPress={flee}
               disabled={
@@ -103,7 +110,7 @@ const FleeModal = observer(() => {
             </GenericFlatButton>
           </ThemedView>
           {fleeRollFailure ? (
-            <Text className="text-center" style={{ color: "#ef4444" }}>
+            <Text style={{ textAlign: "center", color: "#ef4444" }}>
               Roll Failure!
             </Text>
           ) : null}

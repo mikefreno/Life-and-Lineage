@@ -1,3 +1,4 @@
+import React from "react";
 import { Pressable, View, LayoutChangeEvent, ScrollView } from "react-native";
 import { Text } from "./Themed";
 import { InventoryItem } from "./Draggable";
@@ -6,6 +7,7 @@ import { useVibration } from "../hooks/generic";
 import { useDraggableStore, useRootStore } from "../hooks/stores";
 import { useRef } from "react";
 import { observer } from "mobx-react-lite";
+import { useStyles } from "../hooks/styles";
 
 const InventoryRender = observer(
   ({
@@ -52,6 +54,7 @@ const InventoryRender = observer(
     const vibration = useVibration();
     const { playerState, uiStore } = useRootStore();
     const { draggableClassStore } = useDraggableStore();
+    const styles = useStyles();
 
     const dropHandler = (droppedOnKey: string, item: Item[]) => {
       vibration({ style: "light" });
@@ -96,20 +99,18 @@ const InventoryRender = observer(
           <View
             collapsable={false}
             ref={selfRef}
-            className={`z-top ${
+            style={[
               screen === "home"
-                ? "max-h-[60%]"
+                ? styles.inventoryContainer
                 : screen === "shop"
-                ? "-ml-2"
-                : ""
-            }`}
+                ? styles.shopInventoryContainer
+                : null,
+            ]}
           >
             <ScrollView
               horizontal
               pagingEnabled
-              onLayout={(e) => {
-                onLayoutView(e);
-              }}
+              onLayout={(e) => onLayoutView(e)}
               scrollEnabled={playerState.keyItems.length > 0}
               onScrollBeginDrag={() => setDisplayItem(null)}
               disableScrollViewPanResponder={true}
@@ -120,32 +121,25 @@ const InventoryRender = observer(
               scrollIndicatorInsets={{ top: 0, left: 10, bottom: 0, right: 10 }}
             >
               {/* Regular Inventory Panel */}
-              <View
-                style={{
-                  width: uiStore.dimensions.width,
-                }}
-                ref={selfRef}
-              >
+              <View style={{ width: uiStore.dimensions.width }} ref={selfRef}>
                 {playerState.keyItems.length > 0 && (
                   <View
-                    style={{
-                      width: uiStore.dimensions.width,
-                    }}
-                    className="items-center absolute justify-center py-2 top-[40%]"
+                    style={[
+                      styles.keyItemsText,
+                      { width: uiStore.dimensions.width },
+                    ]}
                   >
-                    <Text className="text-3xl tracking-widest opacity-70">
-                      Inventory
-                    </Text>
+                    <Text style={styles.text3xl}>Inventory</Text>
                   </View>
                 )}
                 <Pressable
                   onPress={() => setDisplayItem(null)}
-                  className="border border-zinc-600 rounded-lg mx-2 relative h-full"
+                  style={styles.inventoryPanel}
                 >
                   {Array.from({ length: 24 }).map((_, index) => (
                     <View
-                      className="absolute items-center justify-center"
-                      style={
+                      style={[
+                        styles.inventorySlot,
                         uiStore.dimensions.width === uiStore.dimensions.greater
                           ? {
                               left: `${(index % 12) * 8.33 + 0.5}%`,
@@ -160,23 +154,30 @@ const InventoryRender = observer(
                                 Math.floor(index / 6) * 24 +
                                 (uiStore.playerStatusIsCompact ? 5.5 : 5.0)
                               }%`,
-                            }
-                      }
+                            },
+                      ]}
                       key={"bg-" + index}
                     >
                       <View
-                        className="rounded-lg border-zinc-300 dark:border-zinc-700 border z-0"
-                        style={{
-                          height: uiStore.itemBlockSize,
-                          width: uiStore.itemBlockSize,
-                        }}
+                        style={[
+                          styles.slotBackground,
+                          {
+                            height: uiStore.itemBlockSize,
+                            width: uiStore.itemBlockSize,
+                          },
+                        ]}
                       />
                     </View>
                   ))}
                   {playerState.inventory.slice(0, 24).map((item, index) => (
                     <View
-                      className="absolute items-center justify-center z-top"
-                      style={
+                      style={[
+                        {
+                          position: "absolute",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          zIndex: 10,
+                        },
                         uiStore.dimensions.width === uiStore.dimensions.greater
                           ? {
                               left: `${(index % 12) * 8.33 + 0.5}%`,
@@ -188,8 +189,8 @@ const InventoryRender = observer(
                                 Math.floor(index / 6) * 24 +
                                 (uiStore.playerStatusIsCompact ? 5.5 : 5.0)
                               }%`,
-                            }
-                      }
+                            },
+                      ]}
                       key={item.item[0].id}
                     >
                       <View>
@@ -214,36 +215,38 @@ const InventoryRender = observer(
                   ))}
                 </Pressable>
               </View>
+
               {/* Key Item Inventory Panel */}
               {playerState.keyItems.length > 0 && (
                 <View style={{ width: uiStore.dimensions.width }}>
                   <View
-                    style={{
-                      width: uiStore.dimensions.width,
-                    }}
-                    className="items-center absolute justify-center py-2 top-[40%]"
+                    style={[
+                      styles.keyItemsText,
+                      { width: uiStore.dimensions.width },
+                    ]}
                   >
-                    <Text className="text-3xl tracking-widest opacity-70">
-                      Key Items
-                    </Text>
+                    <Text style={styles.text3xl}>Key Items</Text>
                   </View>
                   <Pressable
                     onPress={() => setDisplayItem(null)}
-                    className={`${
+                    style={[
                       screen == "home"
-                        ? uiStore.dimensions.greater ==
-                          uiStore.dimensions.height
-                          ? "h-[100%] mx-2"
-                          : "mx-2 h-[50%]"
+                        ? styles.keyItemPanel
                         : screen == "shop"
-                        ? "mt-4 h-[90%]"
-                        : "h-full mx-2"
-                    } rounded-lg border border-zinc-600 relative`}
+                        ? styles.shopKeyItemPanel
+                        : { height: "100%", marginHorizontal: 8 },
+                      {
+                        borderRadius: 8,
+                        borderWidth: 1,
+                        borderColor: "#52525b",
+                        position: "relative",
+                      },
+                    ]}
                   >
                     {Array.from({ length: 24 }).map((_, index) => (
                       <View
-                        className="absolute items-center justify-center"
-                        style={
+                        style={[
+                          styles.inventorySlot,
                           uiStore.dimensions.width ===
                           uiStore.dimensions.greater
                             ? {
@@ -259,23 +262,25 @@ const InventoryRender = observer(
                                   Math.floor(index / 6) * 24 +
                                   (uiStore.playerStatusIsCompact ? 5.5 : 5.0)
                                 }%`,
-                              }
-                        }
+                              },
+                        ]}
                         key={"key-bg-" + index}
                       >
                         <View
-                          className="rounded-lg border-zinc-300 dark:border-zinc-700 border z-0"
-                          style={{
-                            height: uiStore.itemBlockSize,
-                            width: uiStore.itemBlockSize,
-                          }}
+                          style={[
+                            styles.slotBackground,
+                            {
+                              height: uiStore.itemBlockSize,
+                              width: uiStore.itemBlockSize,
+                            },
+                          ]}
                         />
                       </View>
                     ))}
                     {playerState.keyItems.map((item, index) => (
                       <View
-                        className="absolute items-center justify-center"
-                        style={
+                        style={[
+                          styles.inventorySlot,
                           uiStore.dimensions.width ===
                           uiStore.dimensions.greater
                             ? {
@@ -291,8 +296,8 @@ const InventoryRender = observer(
                                   Math.floor(index / 6) * 24 +
                                   (uiStore.playerStatusIsCompact ? 5.5 : 5.0)
                                 }%`,
-                              }
-                        }
+                              },
+                        ]}
                         key={index}
                       >
                         <View>

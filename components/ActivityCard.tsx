@@ -1,7 +1,7 @@
+import React from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { ThemedView, Text } from "../components/Themed";
 import { Activity, BadOutcome, GoodOutcome } from "../utility/types";
-import { useColorScheme } from "nativewind";
 import { flipCoin, toTitleCase, wait } from "../utility/functions/misc";
 import { generateNewCharacter } from "../utility/functions/characterAid";
 import { useState } from "react";
@@ -22,6 +22,7 @@ import {
 } from "../assets/icons/SVGIcons";
 import { useRootStore } from "../hooks/stores";
 import type { Character } from "../entities/character";
+import { useStyles } from "../hooks/styles";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -29,8 +30,7 @@ interface ActivityCardProps {
 
 const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   const root = useRootStore();
-  const { playerState, enemyStore } = root;
-  const { colorScheme } = useColorScheme();
+  const { playerState, enemyStore, uiStore } = root;
   const [metCharacter, setMetCharacter] = useState<Character | null>(null);
   const [nothingHappened, setNothingHappened] = useState<boolean>(false);
   const [badOutCome, setBadOutcome] = useState<BadOutcome | null>(null);
@@ -38,6 +38,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   const [showDatePartnerSelection, setShowDatePartnerSelection] =
     useState<boolean>(false);
   const [dateDestination, setDateDestination] = useState<string>("");
+  const styles = useStyles();
 
   function activityRoller(outcomes: { [key: string]: number }) {
     const keys = Object.keys(outcomes);
@@ -182,45 +183,42 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
       <Pressable
         key={character.id}
         onPress={() => date(character)}
-        className="w-[48%]"
+        style={({ pressed }) => [
+          styles.characterCard,
+          pressed && { transform: [{ scale: 0.95 }] },
+        ]}
       >
-        {({ pressed }) => (
-          <View
-            className={`${
-              pressed && "scale-95"
-            } my-2 flex w-full items-center rounded border border-zinc-400`}
-          >
-            <Text className="text-center text-2xl">{character.fullName}</Text>
-            <View className="mx-auto">
-              <CharacterImage character={character} />
-            </View>
-            <Text className="text-xl">
-              {character.deathdate && "Died at "}
-              {character.age} Years Old
-            </Text>
-            <Text className="text-center text-xl">{character.fullName}</Text>
-            <View className="mx-auto">
-              <Text className="flex flex-wrap text-center text-lg">
-                {character.deathdate && "Was a "}
-                {character.job}
-              </Text>
-            </View>
-            <View className="flex w-2/3 flex-row justify-center">
-              <View className="w-3/4">
-                <ProgressBar
-                  value={Math.floor(character.affection * 4) / 4}
-                  minValue={-100}
-                  maxValue={100}
-                  filledColor="#dc2626"
-                  unfilledColor="#fca5a5"
-                />
-              </View>
-              <View className="my-auto ml-1">
-                <AffectionIcon height={14} width={14} />
-              </View>
-            </View>
+        <Text style={[styles["2xl"], styles.textCenter]}>
+          {character.fullName}
+        </Text>
+        <View style={styles.itemsCenter}>
+          <CharacterImage character={character} />
+        </View>
+        <Text style={styles.xl}>
+          {character.deathdate && "Died at "}
+          {character.age} Years Old
+        </Text>
+        <Text style={[styles.xl, styles.textCenter]}>{character.fullName}</Text>
+        <View style={styles.itemsCenter}>
+          <Text style={[styles.lg, styles.textCenter, styles.wrap]}>
+            {character.deathdate && "Was a "}
+            {character.job}
+          </Text>
+        </View>
+        <View style={[styles.rowCenter, { width: "66%" }]}>
+          <View style={{ width: "75%" }}>
+            <ProgressBar
+              value={Math.floor(character.affection * 4) / 4}
+              minValue={-100}
+              maxValue={100}
+              filledColor="#dc2626"
+              unfilledColor="#fca5a5"
+            />
           </View>
-        )}
+          <View style={[styles.itemsCenter, { marginLeft: 4 }]}>
+            <AffectionIcon height={14} width={14} />
+          </View>
+        </View>
       </Pressable>
     );
   }
@@ -252,28 +250,26 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
         backFunction={() => setShowDatePartnerSelection(false)}
         size={100}
       >
-        <View className="items-center">
-          <Text className="px-4 text-center text-2xl">
+        <View style={{ alignItems: "center" }}>
+          <Text
+            style={[
+              styles["2xl"],
+              styles.textCenter,
+              { paddingHorizontal: 16 },
+            ]}
+          >
             Who would you like to {dateDestination} with?
           </Text>
           {playerState && (
-            <ScrollView className="w-full">
-              <View
-                style={{
-                  paddingVertical: 12,
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                }}
-              >
+            <ScrollView style={{ width: "100%" }}>
+              <View style={styles.characterGrid}>
                 {playerState
                   .getAllAdultCharacters()
                   .map((character) => renderCharacter(character))}
               </View>
             </ScrollView>
           )}
-          <View className="mt-4">
+          <View style={{ marginTop: 16 }}>
             <GenericFlatButton
               onPress={() => setShowDatePartnerSelection(false)}
             >
@@ -292,27 +288,29 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
         backdropCloses={false}
         backFunction={() => setGoodOutcome(null)}
       >
-        <View className="items-center">
-          <Text className="text-center text-lg">{goodOutcome?.name}</Text>
+        <View style={{ alignItems: "center" }}>
+          <Text style={[styles.lg, styles.textCenter]}>
+            {goodOutcome?.name}
+          </Text>
           {goodOutcome?.effect.gold && (
-            <View className="flex flex-row items-center">
+            <View style={styles.rowCenter}>
               <Text>{goodOutcome?.effect.gold} </Text>
               <Coins width={14} height={14} />
             </View>
           )}
           {goodOutcome?.effect.sanityRestore && (
-            <View className="flex flex-row items-center">
+            <View style={styles.rowCenter}>
               <Text>{goodOutcome?.effect.sanityRestore} </Text>
               <Sanity width={14} height={14} />
             </View>
           )}
           {goodOutcome?.effect.healthRestore && (
-            <View className="flex flex-row items-center">
+            <View style={styles.rowCenter}>
               <Text>{goodOutcome?.effect.healthRestore} </Text>
               <HealthIcon width={14} height={14} />
             </View>
           )}
-          <View className="mt-4">
+          <View style={{ marginTop: 16 }}>
             <GenericFlatButton onPress={() => setGoodOutcome(null)}>
               Close
             </GenericFlatButton>
@@ -324,11 +322,13 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
         backdropCloses={false}
         backFunction={() => setBadOutcome(null)}
       >
-        <View className="items-center">
-          <Text className="pb-2 text-2xl">{badOutCome?.name}</Text>
+        <View style={{ alignItems: "center" }}>
+          <Text style={[styles["2xl"], { paddingBottom: 8 }]}>
+            {badOutCome?.name}
+          </Text>
           {badOutCome?.fight ? (
             <>
-              <View className="mt-4 flex justify-evenly">
+              <View style={[styles.columnEvenly, { marginTop: 16 }]}>
                 {badOutCome.buyOff &&
                   playerState &&
                   playerState.gold >= 0.25 * badOutCome.buyOff.price && (
@@ -336,7 +336,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                       <GenericFlatButton
                         onPress={() => payOff(badOutCome.buyOff!.price)}
                       >
-                        <View className="flex flex-row">
+                        <View style={{ flexDirection: "row" }}>
                           <Text>
                             Save yourself for{" "}
                             {badOutCome.buyOff.price <= playerState?.gold
@@ -347,7 +347,9 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                         </View>
                       </GenericFlatButton>
                       <GenericStrikeAround>
-                        <Text className="my-2 text-lg">Or</Text>
+                        <Text style={[styles.lg, { marginVertical: 8 }]}>
+                          Or
+                        </Text>
                       </GenericStrikeAround>
                     </>
                   )}
@@ -356,15 +358,15 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
             </>
           ) : (
             <>
-              <View className="pb-4">
+              <View style={{ paddingBottom: 16 }}>
                 {badOutCome?.effect?.healthDamage && (
-                  <View className="flex flex-row items-center">
+                  <View style={styles.rowCenter}>
                     <Text>- {badOutCome.effect.healthDamage}</Text>
                     <HealthIcon height={14} width={14} />
                   </View>
                 )}
                 {badOutCome?.effect?.sanityDamage && (
-                  <View className="flex flex-row items-center">
+                  <View style={styles.rowCenter}>
                     <Text>- {badOutCome.effect.sanityDamage} </Text>
                     <Sanity height={14} width={14} />
                   </View>
@@ -382,43 +384,32 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
         backdropCloses={false}
         backFunction={() => setNothingHappened(false)}
       >
-        <View className="items-center">
-          <Text className="pb-2 text-xl">Nothing of note happened</Text>
+        <View style={{ alignItems: "center" }}>
+          <Text style={[styles.xl, { paddingBottom: 8 }]}>
+            Nothing of note happened
+          </Text>
           <Text>Could have been worse</Text>
-          <View className="mt-4">
+          <View style={{ marginTop: 16 }}>
             <GenericFlatButton onPress={() => setNothingHappened(false)}>
               Close
             </GenericFlatButton>
           </View>
         </View>
       </GenericModal>
-      <ThemedView
-        className="m-2 rounded-xl"
-        style={{
-          shadowColor: "#000",
-          shadowOffset: {
-            width: 3,
-            height: 1,
-          },
-          elevation: 3,
-          shadowOpacity: 0.2,
-          backgroundColor: colorScheme == "light" ? "#fafafa" : "#27272a",
-          shadowRadius: 3,
-        }}
-      >
-        <View className="flex justify-between rounded-xl px-4 py-2 text-zinc-950 dark:border dark:border-zinc-500">
-          <View className="flex flex-row justify-between">
-            <Text className="bold w-3/4 text-xl dark:text-zinc-50">
+      <ThemedView style={styles.activityCard}>
+        <View style={styles.activityCardInner}>
+          <View style={styles.rowBetween}>
+            <Text style={[styles.xl, styles.bold, { width: "75%" }]}>
               {toTitleCase(activity.name)}
             </Text>
-            <View className="flex flex-row items-center">
-              <Text className="bold text-xl dark:text-zinc-50">
+            <View style={styles.rowCenter}>
+              <Text style={[styles.xl, styles.bold]}>
                 {activity.cost == 0 ? "free" : activity.cost}{" "}
               </Text>
               {activity.cost !== 0 && <Coins height={14} width={14} />}
             </View>
           </View>
-          <View className="flex flex-row ">
+          <View style={{ flexDirection: "row" }}>
             {activity.alone && (
               <GenericRaisedButton
                 disabled={!!playerState && playerState.gold < activity.cost}
@@ -441,4 +432,5 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
     </>
   );
 });
+
 export default ActivityCard;

@@ -20,6 +20,8 @@ import { useRootStore } from "../hooks/stores";
 import { useAcceleratedAction, useVibration } from "../hooks/generic";
 import type { Item } from "../entities/item";
 import type { Spell } from "../entities/spell";
+import React from "react";
+import { useStyles } from "../hooks/styles";
 
 const StudyButton = ({ studyState, onStudy }) => {
   const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
@@ -49,6 +51,7 @@ const StudyButton = ({ studyState, onStudy }) => {
 export default function LearningKnowledgeScreen() {
   const root = useRootStore();
   const { playerState, uiStore } = root;
+  const styles = useStyles();
 
   const books = playerState?.baseInventory.filter(
     (item) => item.itemClass == ItemClassType.Book,
@@ -128,10 +131,12 @@ export default function LearningKnowledgeScreen() {
         {showMasteryLevelTooLow && (
           <>
             <Text
-              className="text-center"
-              style={{
-                color: elementalColorMap[showMasteryLevelTooLow].dark,
-              }}
+              style={[
+                styles.textCenter,
+                {
+                  color: elementalColorMap[showMasteryLevelTooLow].dark,
+                },
+              ]}
             >
               {`This book is beyond your knowledge in the school of ${ElementToString[showMasteryLevelTooLow]}`}
             </Text>
@@ -144,7 +149,11 @@ export default function LearningKnowledgeScreen() {
           </>
         )}
       </GenericModal>
-      <View className="flex-1 justify-between pb-20">
+      <View
+        style={[
+          { flex: 1, justifyContent: "space-between", paddingBottom: 20 },
+        ]}
+      >
         <View
           style={{
             paddingTop: headerHeight,
@@ -153,15 +162,17 @@ export default function LearningKnowledgeScreen() {
         >
           {filteredBooks?.length == 0 &&
           playerState?.learningSpells.length == 0 ? (
-            <View className="items-center pt-12">
-              <Text className="text-xl">No Books to Learn From</Text>
+            <View style={[styles.flexColumnCenter, styles.pt12]}>
+              <Text style={styles.textXl}>No Books to Learn From</Text>
               <Text>(Books can be bought from the Librarian)</Text>
             </View>
           ) : null}
           {spellState && spellState.length > 0 && (
             <ScrollView style={{ maxHeight: uiStore.dimensions.height * 0.25 }}>
-              <View className="py-4 shadow-diffuse-top">
-                <Text className="text-center text-xl">Currently Studying</Text>
+              <View style={[styles.py4]}>
+                <Text style={[styles.textCenter, styles.textXl]}>
+                  Currently Studying
+                </Text>
                 {spellState.map((studyState) => (
                   <View key={studyState.spellName}>
                     <Text>{toTitleCase(studyState.spellName)}</Text>
@@ -183,10 +194,14 @@ export default function LearningKnowledgeScreen() {
             </ScrollView>
           )}
           {selectedBook && selectedBookSpell && (
-            <View className="flex items-center py-4">
-              <Text className="text-xl">{toTitleCase(selectedBook.name)}</Text>
-              <Text className="py-2 text-lg tracking-wide">Teaches</Text>
-              <Text className="py-2 text-lg tracking-wide">
+            <View style={[styles.flexColumnCenter, styles.py4]}>
+              <Text style={styles.textXl}>
+                {toTitleCase(selectedBook.name)}
+              </Text>
+              <Text style={[styles.py2, styles.textLg, { letterSpacing: 0.1 }]}>
+                Teaches
+              </Text>
+              <Text style={[styles.py2, styles.textLg, { letterSpacing: 0.1 }]}>
                 ({bookLabel()})
               </Text>
               <SpellDetails spell={selectedBookSpell} />
@@ -214,19 +229,24 @@ export default function LearningKnowledgeScreen() {
             </View>
           )}
           {filteredBooks && filteredBooks.length > 0 && (
-            <View className="py-4">
-              <Text className="text-center text-xl">Available for Study</Text>
-              <ScrollView className="mx-auto" horizontal>
-                <View className="my-auto max-h-24 flex-wrap">
+            <View style={styles.py4}>
+              <Text style={[styles.textCenter, styles.textXl]}>
+                Available for Study
+              </Text>
+              <ScrollView horizontal>
+                <View style={[styles.my2, { maxHeight: 96, flexWrap: "wrap" }]}>
                   {filteredBooks.map((item) => (
                     <Pressable
                       key={item.id}
-                      className="m-2 items-center active:scale-90 active:opacity-50"
+                      style={[styles.m2, styles.flexColumnCenter]}
                       onPress={() => setSelectedBook(item)}
                     >
                       <View
-                        className="rounded-lg p-2"
-                        style={{ backgroundColor: "#a1a1aa" }}
+                        style={[
+                          styles.p2,
+                          styles.lg,
+                          { backgroundColor: "#a1a1aa" },
+                        ]}
                       >
                         <Image source={item.getItemIcon()} />
                       </View>

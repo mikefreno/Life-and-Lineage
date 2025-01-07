@@ -1,3 +1,4 @@
+import React from "react";
 import { Text } from "../components/Themed";
 import { wait } from "../utility/functions/misc";
 import { CharacterImage } from "../components/CharacterImage";

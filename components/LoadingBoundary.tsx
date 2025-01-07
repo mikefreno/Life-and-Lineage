@@ -3,6 +3,7 @@ import D20DieAnimation from "./DieRollAnim";
 import { useRootStore } from "../hooks/stores";
 import { type ReactNode, useEffect, useRef } from "react";
 import { observer } from "mobx-react-lite";
+import { useStyles } from "../hooks/styles";
 
 export const LoadingBoundary = observer(
   ({ children }: { children: ReactNode }) => {
@@ -20,7 +21,7 @@ export const LoadingBoundary = observer(
     }, [uiStore.isLoading]);
 
     return (
-      <View className="flex-1">
+      <View style={{ flex: 1 }}>
         <Animated.View
           style={{
             ...StyleSheet.absoluteFillObject,
@@ -29,8 +30,15 @@ export const LoadingBoundary = observer(
           }}
           pointerEvents={uiStore.isLoading ? "auto" : "none"}
         >
-          <View className="flex-1 justify-center align-middle py-24">
-            <View className="flex-1 justify-evenly">
+          <View
+            style={{
+              paddingHorizontal: 64,
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <View style={{ flex: 1, justifyContent: "space-evenly" }}>
               <D20DieAnimation
                 keepRolling={true}
                 slowRoll={true}

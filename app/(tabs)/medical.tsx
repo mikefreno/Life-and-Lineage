@@ -1,3 +1,4 @@
+import React from "react";
 import healthOptions from "../../assets/json/medicalOptions/healthOptions.json";
 import manaOptions from "../../assets/json/medicalOptions/manaOptions.json";
 import sanityOptions from "../../assets/json/medicalOptions/sanityOptions.json";
@@ -12,12 +13,14 @@ import GenericStrikeAround from "../../components/GenericStrikeAround";
 import { TutorialOption } from "../../utility/types";
 import { observer } from "mobx-react-lite";
 import { useRootStore } from "../../hooks/stores";
+import { useStyles } from "../../hooks/styles";
 
 const MedicalScreen = observer(() => {
   const isFocused = useIsFocused();
   const { uiStore } = useRootStore();
   const bottomTab = useBottomTabBarHeight();
   const header = useHeaderHeight();
+  const styles = useStyles();
 
   return (
     <>
@@ -33,20 +36,22 @@ const MedicalScreen = observer(() => {
           body: "Using items such as potions, or using spells will not tick the clock forward.",
         }}
       />
-      <View className="flex-1">
+      <View style={{ flex: 1 }}>
         <ScrollView
           scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
         >
           <View
-            className="px-2"
-            style={{
-              paddingBottom:
-                bottomTab + (uiStore.playerStatusIsCompact ? 0 : 28),
-              paddingTop: header,
-            }}
+            style={[
+              {
+                paddingHorizontal: 8,
+                paddingBottom:
+                  bottomTab + (uiStore.playerStatusIsCompact ? 0 : 28),
+                paddingTop: header,
+              },
+            ]}
           >
-            <View className="flex flex-row">
-              <View className="w-1/2">
+            <View style={{ flexDirection: "row" }}>
+              <View style={{ width: "50%" }}>
                 <GenericStrikeAround>Health</GenericStrikeAround>
                 {healthOptions.map((medOption, index) => (
                   <MedicalOption
@@ -68,7 +73,7 @@ const MedicalScreen = observer(() => {
                   />
                 ))}
               </View>
-              <View className="w-1/2">
+              <View style={{ width: "50%" }}>
                 <GenericStrikeAround>Mana</GenericStrikeAround>
                 {manaOptions.map((medOption, index) => (
                   <MedicalOption

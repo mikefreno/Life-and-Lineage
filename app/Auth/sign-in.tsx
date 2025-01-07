@@ -8,7 +8,6 @@ import {
   View,
 } from "react-native";
 import { useState } from "react";
-import { useColorScheme } from "nativewind";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 import { router } from "expo-router";
 import { observer } from "mobx-react-lite";
@@ -22,9 +21,7 @@ import { wait } from "../../utility/functions/misc";
 import { useRootStore } from "../../hooks/stores";
 
 const SignInScreen = observer(() => {
-  const { authStore } = useRootStore();
-
-  const { colorScheme } = useColorScheme();
+  const { authStore, uiStore } = useRootStore();
 
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
@@ -136,8 +133,10 @@ const SignInScreen = observer(() => {
                 alignItems: "center",
                 justifyContent: "space-between",
                 borderWidth: 1,
-                borderColor: colorScheme == "dark" ? "#fafafa" : "#27272a",
-                backgroundColor: colorScheme == "dark" ? "#27272a" : "#ffffff",
+                borderColor:
+                  uiStore.colorScheme == "dark" ? "#fafafa" : "#27272a",
+                backgroundColor:
+                  uiStore.colorScheme == "dark" ? "#27272a" : "#ffffff",
                 paddingHorizontal: 12,
                 marginTop: -8,
                 marginBottom: 8,
@@ -160,7 +159,7 @@ const SignInScreen = observer(() => {
                   AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
                 }
                 buttonStyle={
-                  colorScheme == "dark"
+                  uiStore.colorScheme == "dark"
                     ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE
                     : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
                 }
@@ -180,7 +179,7 @@ const SignInScreen = observer(() => {
               <TextInput
                 className="my-6 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
                 placeholderTextColor={
-                  colorScheme == "light" ? "#d4d4d8" : "#71717a"
+                  uiStore.colorScheme == "light" ? "#d4d4d8" : "#71717a"
                 }
                 autoComplete={"email"}
                 inputMode={"email"}
@@ -199,7 +198,7 @@ const SignInScreen = observer(() => {
               <TextInput
                 className="mt-6 mb-2 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
                 placeholderTextColor={
-                  colorScheme == "light" ? "#d4d4d8" : "#71717a"
+                  uiStore.colorScheme == "light" ? "#d4d4d8" : "#71717a"
                 }
                 onChangeText={(text) => setPassword(text)}
                 placeholder={"Enter Password..."}

@@ -1,3 +1,4 @@
+import React from "react";
 import investments from "../assets/json/investments.json";
 import { InvestmentType, TutorialOption } from "../utility/types";
 import InvestmentCard from "../components/InvestmentCard";
@@ -24,7 +25,7 @@ const InvestingScreen = observer(() => {
           body: "Each investment base has a number of upgrades, some with significant consequences on your character.",
         }}
       />
-      <View className="flex-1">
+      <View style={{ flex: 1 }}>
         <ScrollView
           scrollIndicatorInsets={{ top: 0, right: 0, left: 0, bottom: 48 }}
         >

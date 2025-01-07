@@ -5,7 +5,6 @@ import { useRootStore } from "../hooks/stores";
 import GenericModal from "./GenericModal";
 import { Text } from "./Themed";
 import ThemedCard from "./ThemedCard";
-import { useColorScheme } from "nativewind";
 import { parse } from "flatted";
 import { Element, ElementToString } from "../utility/types";
 import clearHistory, { toTitleCase, wait } from "../utility/functions/misc";
@@ -36,7 +35,6 @@ const CheckpointModal = ({
     id: number;
     action: "overwrite" | "delete" | "load";
   } | null>(null);
-  const { colorScheme } = useColorScheme();
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -235,7 +233,7 @@ const CheckpointModal = ({
             <NecromancerSkull
               width={iconSize}
               height={iconSize}
-              color={colorScheme === "dark" ? "#9333ea" : "#6b21a8"}
+              color={uiStore.colorScheme === "dark" ? "#9333ea" : "#6b21a8"}
             />
           );
         case "paladin":
@@ -245,7 +243,7 @@ const CheckpointModal = ({
             <WizardHat
               width={iconSize}
               height={iconSize}
-              color={colorScheme === "dark" ? "#2563eb" : "#1e40af"}
+              color={uiStore.colorScheme === "dark" ? "#2563eb" : "#1e40af"}
             />
           );
         default:
@@ -277,7 +275,7 @@ const CheckpointModal = ({
                 {getClassIcon()}
                 <BlessingDisplay
                   blessing={latestCheckpoint.player_data.blessing}
-                  colorScheme={colorScheme}
+                  colorScheme={uiStore.colorScheme}
                   size={40}
                 />
               </View>
@@ -289,7 +287,7 @@ const CheckpointModal = ({
               <Ionicons
                 name="chevron-down"
                 size={24}
-                color={colorScheme == "dark" ? "white" : "black"}
+                color={uiStore.colorScheme == "dark" ? "white" : "black"}
               />
             </Animated.View>
           </ThemedCard>

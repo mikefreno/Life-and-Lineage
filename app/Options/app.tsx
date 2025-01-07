@@ -1,10 +1,5 @@
-import {
-  Pressable,
-  ScrollView,
-  TextInput,
-  View,
-  StyleSheet,
-} from "react-native";
+import React from "react";
+import { Pressable, ScrollView, TextInput, View } from "react-native";
 import { Text } from "../../components/Themed";
 import { useEffect, useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc";
@@ -13,21 +8,20 @@ import { router } from "expo-router";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 import { observer } from "mobx-react-lite";
 import GenericModal from "../../components/GenericModal";
-import { useColorScheme } from "nativewind";
 import { CheckpointRow } from "../../utility/database";
 import D20DieAnimation from "../../components/DieRollAnim";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
-import Slider from "@react-native-community/slider";
+import { useStyles } from "../../hooks/styles";
 
 const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
 
 export const AppSettings = observer(() => {
   let root = useRootStore();
-  const { playerState, uiStore, authStore, saveStore, audioStore } = root;
-  const { colorScheme } = useColorScheme();
+  const { playerState, uiStore, authStore, saveStore } = root;
+  const isDark = uiStore.colorScheme === "dark";
   const [showRemoteSaveWindow, setShowRemoteSaveWindow] =
     useState<boolean>(false);
   const [showRemoteLoadWidow, setShowRemoteLoadWindow] =
@@ -37,6 +31,7 @@ export const AppSettings = observer(() => {
   const [loadingDBInfo, setLoadingDBInfo] = useState<boolean>(false);
 
   const vibration = useVibration();
+  const styles = useStyles();
 
   const [selectedThemeOption, setSelectedThemeOption] = useState<number>(
     themeOptions.indexOf(uiStore.colorScheme),
@@ -47,7 +42,7 @@ export const AppSettings = observer(() => {
 
   function setColorTheme(index: number, option: "system" | "light" | "dark") {
     vibration({ style: "light" });
-    uiStore.setColorScheme(option);
+    uiStore.setPreferedColorScheme(option);
     setSelectedThemeOption(index);
   }
 
@@ -64,22 +59,6 @@ export const AppSettings = observer(() => {
     setSelectedVibrationOption(index);
     vibration({ style: "light" });
   }
-
-  const renderSlider = (label: string, type: keyof AudioLevels) => (
-    <View style={styles.sliderContainer}>
-      <Text style={styles.label}>{label}</Text>
-      <Slider
-        style={styles.slider}
-        minimumValue={0}
-        maximumValue={1}
-        value={audioStore.levels[type]}
-        onValueChange={(value) => audioStore.setAudioLevel(type, value)}
-      />
-      <Text style={styles.value}>
-        {Math.round(audioStore.levels[type] * 100)}%
-      </Text>
-    </View>
-  );
 
   useEffect(() => {
     if (authStore.isAuthenticated) {
@@ -152,26 +131,20 @@ export const AppSettings = observer(() => {
         {loadingDBInfo ? (
           <D20DieAnimation keepRolling />
         ) : (
-          <View className="p-2">
-            <Text className="text-xl">Remote Saving</Text>
+          <View style={styles.modalContainer}>
+            <Text style={styles.textXl}>Remote Saving</Text>
             <GenericStrikeAround>Make New Save</GenericStrikeAround>
             <TextInput
-              className="mx-4 mt-6 rounded border  border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
-              placeholderTextColor={
-                colorScheme == "light" ? "#d4d4d8" : "#71717a"
-              }
+              style={styles.modalTextInput}
+              placeholderTextColor={isDark ? "#d4d4d8" : "#71717a"}
               onChangeText={(text) => setSaveName(text)}
               placeholder={"New Save Name"}
               autoCorrect={false}
               value={saveName}
-              style={{
-                fontFamily: "PixelifySans",
-                paddingVertical: 8,
-                minWidth: "50%",
-                fontSize: 20,
-              }}
             />
-            <Text className="text-center text-sm">Min Length: 3</Text>
+            <Text style={{ textAlign: "center", fontSize: 14 }}>
+              Min Length: 3
+            </Text>
             <GenericFlatButton
               onPress={newRemoteSave}
               disabled={saveName.length < 3}
@@ -180,26 +153,30 @@ export const AppSettings = observer(() => {
             </GenericFlatButton>
             <GenericStrikeAround>Current Saves</GenericStrikeAround>
             {remoteSaves.map((save) => (
-              <View
-                key={save.id}
-                className="w-full bg-zinc-300 dark:bg-zinc-700 border rounded border-zinc-900 dark:border-zinc-50 pb-2"
-              >
+              <View key={save.id} style={styles.remoteSaveContainer}>
                 <Pressable
-                  className="w-8 h-8 -mb-8 z-top items-center justify-center m-1 border bg-zinc-50 dark:bg-zinc-900 rounded-full border-zinc-900 dark:border-zinc-50"
+                  style={styles.remoteSaveDeleteButton}
                   onPress={() => {
                     vibration({ essential: true, style: "warning" });
                     deleteRemoteSave(save);
                   }}
                 >
-                  <Text className="text-center">X</Text>
+                  <Text style={{ textAlign: "center" }}>X</Text>
                 </Pressable>
-                <Text className="text-xl pt-2 text-center">{save.name}</Text>
-                <View className="flex flex-col w-full items-end py-2">
-                  <Text className="">Last updated: {save.last_updated}</Text>
-                  <Text className="">Created at: {save.created_at}</Text>
+                <Text
+                  style={[
+                    styles.textXl,
+                    { paddingTop: 8, textAlign: "center" },
+                  ]}
+                >
+                  {save.name}
+                </Text>
+                <View style={styles.remoteSaveInfo}>
+                  <Text>Last updated: {save.last_updated}</Text>
+                  <Text>Created at: {save.created_at}</Text>
                 </View>
                 <GenericFlatButton
-                  backgroundColor={colorScheme == "dark" ? "black" : "white"}
+                  backgroundColor={isDark ? "black" : "white"}
                   onPress={() => overwriteSave(save)}
                 >
                   Overwrite save
@@ -209,38 +186,42 @@ export const AppSettings = observer(() => {
           </View>
         )}
       </GenericModal>
+
       <GenericModal
         isVisibleCondition={showRemoteLoadWidow}
         backFunction={() => setShowRemoteLoadWindow(false)}
         backdropCloses
         size={95}
       >
-        <ScrollView className="p-2">
-          <Text className="text-xl">Load Saves</Text>
-          <Text className="text-xl text-center" style={{ color: "#ef4444" }}>
+        <ScrollView style={styles.modalContainer}>
+          <Text style={styles.textXl}>Load Saves</Text>
+          <Text
+            style={[styles.textXl, { textAlign: "center", color: "#ef4444" }]}
+          >
             Make sure to backup first!
           </Text>
           {remoteSaves.map((save) => (
-            <View
-              key={save.id}
-              className="w-full bg-zinc-300 dark:bg-zinc-700 border rounded border-zinc-900 dark:border-zinc-50 pb-2"
-            >
+            <View key={save.id} style={styles.remoteSaveContainer}>
               <Pressable
-                className="w-8 h-8 z-50 absolute items-center justify-center m-1 border bg-zinc-50 dark:bg-zinc-900 rounded-full border-zinc-900 dark:border-zinc-50"
+                style={styles.remoteSaveDeleteButton}
                 onPress={() => {
                   vibration({ essential: true, style: "warning" });
                   deleteRemoteSave(save);
                 }}
               >
-                <Text className="text-center">X</Text>
+                <Text style={{ textAlign: "center" }}>X</Text>
               </Pressable>
-              <Text className="text-xl pt-2 text-center">{save.name}</Text>
-              <View className="flex flex-col w-full items-end py-2">
-                <Text className="">Last updated: {save.last_updated}</Text>
-                <Text className="">Created at: {save.created_at}</Text>
+              <Text
+                style={[styles.textXl, { paddingTop: 8, textAlign: "center" }]}
+              >
+                {save.name}
+              </Text>
+              <View style={styles.remoteSaveInfo}>
+                <Text>Last updated: {save.last_updated}</Text>
+                <Text>Created at: {save.created_at}</Text>
               </View>
               <GenericFlatButton
-                backgroundColor={colorScheme == "dark" ? "black" : "white"}
+                backgroundColor={isDark ? "black" : "white"}
                 onPress={() => loadRemoteCheckpoint(save.id)}
               >
                 Load Save
@@ -249,24 +230,20 @@ export const AppSettings = observer(() => {
           ))}
         </ScrollView>
       </GenericModal>
+
       <ScrollView>
-        <View className="flex-1 items-center justify-center px-4 pt-12">
-          {/*<GenericRaisedButton
-            onPress={() => router.push("/Options/iaps")}
-          >
-            Go to IAPs
-          </GenericRaisedButton>*/}
+        <View style={styles.settingsContainer}>
           <GenericStrikeAround>
-            <Text className="text-xl">
+            <Text style={styles.textXl}>
               Remote Backups{!authStore.isAuthenticated && ` (requires login)`}
             </Text>
           </GenericStrikeAround>
           {authStore.isAuthenticated ? (
             <>
-              <Text className="text-center py-2">
+              <Text style={{ textAlign: "center", paddingVertical: 8 }}>
                 Logged in as: {authStore.getEmail()}
               </Text>
-              <View className="flex flex-row justify-evenly w-full">
+              <View style={styles.buttonRow}>
                 <GenericFlatButton
                   onPress={toggleRemoteSaveWindow}
                   disabled={
@@ -299,11 +276,17 @@ export const AppSettings = observer(() => {
           ) : (
             <>
               {!authStore.isConnectedAndInitialized && (
-                <Text className="text-center italic text-sm">
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontStyle: "italic",
+                    fontSize: 14,
+                  }}
+                >
                   You are not connected to the internet
                 </Text>
               )}
-              <View className="flex flex-row justify-evenly w-full">
+              <View style={styles.buttonRow}>
                 <GenericRaisedButton
                   onPress={() => router.push("/Auth/sign-in")}
                   disabled={!authStore.isConnectedAndInitialized}
@@ -321,105 +304,74 @@ export const AppSettings = observer(() => {
               </View>
             </>
           )}
+
           <GenericStrikeAround>Select Color Theme</GenericStrikeAround>
-          <View
-            className="rounded px-4 py-2"
-            style={{ marginLeft: -48, marginTop: 12 }}
-          >
+          <View style={styles.optionContainer}>
             {themeOptions.map((item, index) => (
               <Pressable
                 key={index}
-                className="mb-4 ml-10 flex flex-row"
+                style={styles.optionRow}
                 onPress={() =>
                   setColorTheme(index, item as "system" | "light" | "dark")
                 }
               >
                 <View
-                  className={
-                    selectedThemeOption == index
-                      ? "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 bg-blue-500 dark:border-zinc-50 dark:bg-blue-600"
-                      : "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 dark:border-zinc-50"
-                  }
+                  style={[
+                    styles.optionCircle,
+                    selectedThemeOption == index && styles.optionCircleSelected,
+                  ]}
                 />
-                <Text className="text-2xl tracking-widest">
-                  {toTitleCase(item)}
-                </Text>
+                <Text style={styles.text2xl}>{toTitleCase(item)}</Text>
+              </Pressable>
+            ))}
+          </View>
+          <GenericStrikeAround>Vibration Settings</GenericStrikeAround>
+          <View style={styles.optionContainer}>
+            {vibrationOptions.map((item, index) => (
+              <Pressable
+                key={index}
+                style={styles.optionRow}
+                onPress={() =>
+                  setVibrationLevel(index, item as "full" | "minimal" | "none")
+                }
+              >
+                <View
+                  style={[
+                    styles.optionCircle,
+                    selectedVibrationOption == index &&
+                      styles.optionCircleSelected,
+                  ]}
+                />
+                <Text style={styles.text2xl}>{toTitleCase(item)}</Text>
               </Pressable>
             ))}
           </View>
 
-          <GenericStrikeAround>Audio Settings</GenericStrikeAround>
-          {renderSlider("Master Volume", "master")}
-          {renderSlider("Ambient Music", "ambientMusic")}
-          {renderSlider("Sound Effects", "soundEffects")}
-          {renderSlider("Combat Music", "combatMusic")}
-          {renderSlider("Combat Sound Effects", "combatSoundEffects")}
-          <Pressable
-            style={styles.muteButton}
-            onPress={() => audioStore.toggleMute()}
-          >
-            {audioStore.levels.muted ? "Unmute" : "Mute All"}
-          </Pressable>
-          <GenericStrikeAround>Vibration Settings</GenericStrikeAround>
-          <View
-            className="rounded px-4 py-2"
-            style={{ marginLeft: -48, marginTop: 12 }}
-          >
-            {vibrationOptions.map((item, index) => (
-              <Pressable
-                key={index}
-                className="mb-4 ml-10 flex flex-row"
-                onPress={() => {
-                  setVibrationLevel(index, item as "full" | "minimal" | "none");
-                }}
-              >
-                <View
-                  className={
-                    selectedVibrationOption == index
-                      ? "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 bg-blue-500 dark:border-zinc-50 dark:bg-blue-600"
-                      : "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 dark:border-zinc-50"
-                  }
-                />
-                <Text className="text-2xl tracking-widest">
-                  {toTitleCase(item)}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
           <GenericStrikeAround>Reduce Motion</GenericStrikeAround>
-          <View
-            className="rounded px-4 py-2"
-            style={{ marginLeft: -48, marginTop: 12 }}
-          >
+          <View style={styles.optionContainer}>
             <Pressable
-              className="mb-4 ml-10 flex flex-row"
-              onPress={() => {
-                setReduceMotion(true);
-              }}
+              style={styles.optionRow}
+              onPress={() => setReduceMotion(true)}
             >
               <View
-                className={
-                  uiStore.reduceMotion
-                    ? "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 bg-blue-500 dark:border-zinc-50 dark:bg-blue-600"
-                    : "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 dark:border-zinc-50"
-                }
+                style={[
+                  styles.optionCircle,
+                  uiStore.reduceMotion && styles.optionCircleSelected,
+                ]}
               />
-              <Text className="text-2xl tracking-widest">On</Text>
+              <Text style={styles.text2xl}>On</Text>
             </Pressable>
             <Pressable
-              className="mb-4 ml-10 flex flex-row"
-              onPress={() => {
-                setReduceMotion(false);
-              }}
+              style={styles.optionRow}
+              onPress={() => setReduceMotion(false)}
             >
               <View
-                className={
-                  !uiStore.reduceMotion
-                    ? "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 bg-blue-500 dark:border-zinc-50 dark:bg-blue-600"
-                    : "my-auto mr-4 h-4 w-4 rounded-full border border-zinc-900 dark:border-zinc-50"
-                }
+                style={[
+                  styles.optionCircle,
+                  !uiStore.reduceMotion && styles.optionCircleSelected,
+                ]}
               />
-              <Text className="text-2xl tracking-widest">Off</Text>
+              <Text style={styles.text2xl}>Off</Text>
             </Pressable>
           </View>
         </View>
@@ -428,31 +380,3 @@ export const AppSettings = observer(() => {
   );
 });
 export default AppSettings;
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-  },
-  sliderContainer: {
-    marginBottom: 16,
-  },
-  label: {
-    marginBottom: 8,
-  },
-  slider: {
-    width: "100%",
-    height: 40,
-  },
-  value: {
-    textAlign: "right",
-  },
-  muteButton: {
-    padding: 10,
-    backgroundColor: "#333",
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  muteButtonText: {
-    color: "white",
-  },
-});

@@ -1,3 +1,4 @@
+import React from "react";
 import { View } from "react-native";
 import { Text } from "./Themed";
 import GenericRaisedButton from "./GenericRaisedButton";
@@ -7,6 +8,7 @@ import { observer } from "mobx-react-lite";
 import { useRootStore } from "../hooks/stores";
 import { AccelerationCurves } from "../utility/functions/misc";
 import { useAcceleratedAction } from "../hooks/generic";
+import { useStyles } from "../hooks/styles";
 
 interface MedicalOptionProps {
   title: string;
@@ -29,7 +31,9 @@ const MedicalOption = observer(
     focused,
   }: MedicalOptionProps) => {
     const root = useRootStore();
-    const { playerState } = root;
+    const { playerState, uiStore } = root;
+    const isDark = uiStore.colorScheme === "dark";
+    const styles = useStyles();
 
     const { start, stop } = useAcceleratedAction(
       () => null, // Return null to indicate unlimited mode
@@ -90,24 +94,24 @@ const MedicalOption = observer(
 
     return (
       <ThemedCard>
-        <View className="flex flex-row justify-between">
-          <Text className="bold my-auto w-2/3 text-xl dark:text-zinc-50">
-            {title}
-          </Text>
-          <View className="-mb-4 mt-4 w-[40%]">
-            <View className="flex w-full flex-row items-center justify-evenly">
+        <View style={styles.medicalOptionContainer}>
+          <Text style={styles.medicalOptionTitle}>{title}</Text>
+          <View style={styles.medicalCostContainer}>
+            <View style={styles.costRow}>
               {cost > 0 ? (
                 <>
-                  <Text className="dark:text-zinc-50">{cost}</Text>
+                  <Text>{cost}</Text>
                   <Coins width={14} height={14} style={{ marginLeft: 6 }} />
                 </>
               ) : (
-                <Text className="dark:text-zinc-50">Free</Text>
+                <Text style={{ color: isDark ? "#fafafa" : "#09090b" }}>
+                  Free
+                </Text>
               )}
             </View>
             {healthRestore ? (
-              <View className="flex w-full flex-row items-center justify-evenly">
-                <Text className="dark:text-zinc-50">
+              <View style={styles.costRow}>
+                <Text>
                   {healthRestore == "fill"
                     ? playerState?.maxHealth
                     : healthRestore}
@@ -116,16 +120,16 @@ const MedicalOption = observer(
               </View>
             ) : null}
             {manaRestore ? (
-              <View className="flex w-full flex-row items-center justify-evenly">
-                <Text className="dark:text-zinc-50">
+              <View style={styles.costRow}>
+                <Text>
                   {manaRestore == "fill" ? playerState?.maxMana : manaRestore}
                 </Text>
                 <Energy width={14} height={14} style={{ marginLeft: 6 }} />
               </View>
             ) : null}
             {sanityRestore ? (
-              <View className="flex w-full flex-row items-center justify-evenly">
-                <Text className="dark:text-zinc-50">
+              <View style={styles.costRow}>
+                <Text>
                   {sanityRestore == "fill"
                     ? (playerState?.maxSanity ?? 50) * 2
                     : sanityRestore}
@@ -134,8 +138,8 @@ const MedicalOption = observer(
               </View>
             ) : null}
             {removeDebuffs ? (
-              <View className="flex w-full flex-row items-center justify-evenly">
-                <Text className="text-center">
+              <View style={styles.costRow}>
+                <Text style={{ textAlign: "center" }}>
                   {`Remove ${removeDebuffs} ${
                     removeDebuffs !== 1 ? "debuffs" : "debuff"
                   }`}

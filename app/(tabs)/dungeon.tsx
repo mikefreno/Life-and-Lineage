@@ -21,6 +21,7 @@ import PlatformDependantBlurView from "../../components/PlatformDependantBlurVie
 import { useVibration } from "../../hooks/generic";
 import type { DungeonInstance } from "../../entities/dungeon";
 import { useRootStore } from "../../hooks/stores";
+import { useStyles } from "../../hooks/styles";
 
 const MIN_RED = 20;
 const MAX_RED = 255;
@@ -41,6 +42,7 @@ const DungeonScreen = observer(() => {
   const vibration = useVibration();
   const isFocused = useIsFocused();
   const headerHeight = useHeaderHeight();
+  const styles = useStyles();
 
   const warningHeight = 64;
 
@@ -121,23 +123,29 @@ const DungeonScreen = observer(() => {
         }}
       />
       <PlatformDependantBlurView
-        className="shadow-diffuse w-full absolute z-10 px-8"
-        style={{ marginTop: useHeaderHeight(), paddingBottom: 4 }}
+        style={[
+          styles.warningContainer,
+          { marginTop: useHeaderHeight(), paddingBottom: 4 },
+        ]}
       >
-        <Text className="text-center text-2xl">
+        <Text style={{ textAlign: "center", fontSize: 24, lineHeight: 32 }}>
           The dungeon is a dangerous place. Be careful.
         </Text>
       </PlatformDependantBlurView>
       <View
-        className="flex-1"
-        style={{
-          paddingTop: headerHeight + warningHeight,
-        }}
+        style={[
+          {
+            flex: 1,
+            paddingTop: headerHeight + warningHeight,
+          },
+        ]}
       >
         {sorted.length > 1 && (
           <View
-            className="absolute right-4 z-top"
-            style={{ marginTop: headerHeight + warningHeight }}
+            style={[
+              styles.pageIndicator,
+              { marginTop: headerHeight + warningHeight },
+            ]}
           >
             <Text style={{ fontSize: 16 }}>
               {currentPage + 1} of {sorted.length}
@@ -146,7 +154,6 @@ const DungeonScreen = observer(() => {
         )}
         <ScrollView
           pagingEnabled
-          className="-mt-20"
           onScroll={onScroll}
           onLayout={onLayout}
           scrollEventThrottle={16}
@@ -156,17 +163,20 @@ const DungeonScreen = observer(() => {
             paddingHorizontal: 12,
           }}
           scrollIndicatorInsets={{ top: 92, right: 0, left: 0, bottom: 48 }}
+          style={styles.dungeonScrollView}
         >
           {sorted.map((dungeonInstance, dungeonInstanceIdx) => {
             return (
               <ThemedCard
                 key={dungeonInstanceIdx}
-                className="flex-1 justify-center mx-8"
+                style={styles.dungeonInstanceCard}
               >
-                <Text className="text-center text-2xl tracking-widest underline">
+                <Text style={styles.dungeonInstanceTitle}>
                   {toTitleCase(dungeonInstance.name)}
                 </Text>
-                <View className="mx-auto justify-center">
+                <View
+                  style={{ marginHorizontal: "auto", justifyContent: "center" }}
+                >
                   {dungeonInstance.levels
                     .filter((level) => level.unlocked)
                     .map((level, levelIdx) => (
@@ -181,26 +191,24 @@ const DungeonScreen = observer(() => {
                       >
                         {({ pressed }) => (
                           <View
-                            className={`my-2 rounded-lg px-6 py-4 ${
-                              pressed ? "scale-95 opacity-50" : ""
-                            }`}
-                            style={{
-                              backgroundColor: getLevelColor(
-                                dungeonInstance,
-                                levelIdx,
-                                sorted[sorted.length - 1].difficulty,
-                                sorted[dungeonInstanceIdx + 1],
-                              ),
-                              shadowOpacity: 0.25,
-                              shadowRadius: 5,
-                              elevation: 2,
-                            }}
+                            style={[
+                              styles.levelContainer,
+                              {
+                                backgroundColor: getLevelColor(
+                                  dungeonInstance,
+                                  levelIdx,
+                                  sorted[sorted.length - 1].difficulty,
+                                  sorted[dungeonInstanceIdx + 1],
+                                ),
+                                shadowOpacity: 0.25,
+                                shadowRadius: 5,
+                                elevation: 2,
+                                opacity: pressed ? 0.5 : 1,
+                                transform: [{ scale: pressed ? 0.95 : 1 }],
+                              },
+                            ]}
                           >
-                            <Text
-                              style={{
-                                color: "white",
-                              }}
-                            >
+                            <Text style={{ color: "white" }}>
                               {`Delve to Floor ${level.level}`}
                             </Text>
                           </View>

@@ -1,7 +1,7 @@
 import { Animated, View } from "react-native";
 import { useEffect, useRef, useState } from "react";
-import { useColorScheme } from "nativewind";
 import Colors from "../constants/Colors";
+import { useRootStore } from "../hooks/stores";
 
 interface AnimatedWrapperProps {
   children:
@@ -93,7 +93,7 @@ export function FadeGrow({
   const bottomHeight = useRef(new Animated.Value(0)).current;
   const [showing, setShowing] = useState(false);
   const [contentHeight, setContentHeight] = useState(0);
-  const { colorScheme } = useColorScheme();
+  const { uiStore } = useRootStore();
 
   useEffect(() => {
     if (contentHeight === 0) return;
@@ -159,7 +159,7 @@ export function FadeGrow({
             left: 0,
             right: 0,
             height: topHeight,
-            backgroundColor: Colors[colorScheme].background,
+            backgroundColor: Colors[uiStore.colorScheme].background,
           }}
         />
 
@@ -171,7 +171,7 @@ export function FadeGrow({
             left: 0,
             right: 0,
             height: bottomHeight,
-            backgroundColor: Colors[colorScheme].background,
+            backgroundColor: Colors[uiStore.colorScheme].background,
           }}
         />
       </View>

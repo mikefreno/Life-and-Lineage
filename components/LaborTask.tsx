@@ -1,3 +1,4 @@
+import React from "react";
 import { View } from "react-native";
 import ProgressBar from "./ProgressBar";
 import { observer } from "mobx-react-lite";
@@ -8,6 +9,7 @@ import { Text } from "./Themed";
 import { Coins, Energy, HealthIcon, Sanity } from "../assets/icons/SVGIcons";
 import { useRootStore } from "../hooks/stores";
 import { useAcceleratedAction } from "../hooks/generic";
+import { useStyles } from "../hooks/styles";
 
 interface LaborTaskProps {
   reward: number;
@@ -40,7 +42,9 @@ const LaborTask = observer(
     vibration,
   }: LaborTaskProps) => {
     const root = useRootStore();
-    const { playerState } = root;
+    const { playerState, uiStore } = root;
+    const isDark = uiStore.colorScheme === "dark";
+    const styles = useStyles();
 
     const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
       () => null,
@@ -75,31 +79,37 @@ const LaborTask = observer(
 
     return (
       <ThemedCard>
-        <View className="flex flex-row justify-between">
-          <Text className="bold my-auto w-2/3 text-xl dark:text-zinc-50">
+        <View style={styles.flexRowBetween}>
+          <Text style={styles.laborTaskTitle}>
             {title}{" "}
             {playerState && numberToRoman(playerState.getJobRank(title))}
           </Text>
-          <View className="my-auto -mb-8 mt-8 w-1/3">
-            <View className="flex w-full flex-row items-center justify-evenly">
-              <Text className="dark:text-zinc-50">
+          <View style={styles.costContainer}>
+            <View style={styles.costRow}>
+              <Text style={{ color: isDark ? "#fafafa" : "#09090b" }}>
                 {playerState?.getRewardValue(title, reward)}
               </Text>
               <Coins width={14} height={14} style={{ marginLeft: 6 }} />
             </View>
-            <View className="flex w-full flex-row items-center justify-evenly">
-              <Text className="dark:text-zinc-50">-{cost.mana}</Text>
+            <View style={styles.costRow}>
+              <Text style={{ color: isDark ? "#fafafa" : "#09090b" }}>
+                -{cost.mana}
+              </Text>
               <Energy width={14} height={14} style={{ marginLeft: 6 }} />
             </View>
             {!!cost.health && (
-              <View className="flex w-full flex-row items-center justify-evenly">
-                <Text className="dark:text-zinc-50">-{cost.health}</Text>
+              <View style={styles.costRow}>
+                <Text style={{ color: isDark ? "#fafafa" : "#09090b" }}>
+                  -{cost.health}
+                </Text>
                 <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
               </View>
             )}
             {!!cost.sanity && (
-              <View className="flex w-full flex-row items-center justify-evenly">
-                <Text className="dark:text-zinc-50">-{cost.sanity}</Text>
+              <View style={styles.costRow}>
+                <Text style={{ color: isDark ? "#fafafa" : "#09090b" }}>
+                  -{cost.sanity}
+                </Text>
                 <Sanity width={14} height={14} style={{ marginLeft: 6 }} />
               </View>
             )}

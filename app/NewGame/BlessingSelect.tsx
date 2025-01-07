@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, useColorScheme, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { Text } from "../../components/Themed";
 import { useState } from "react";
 import { router } from "expo-router";
@@ -29,11 +29,10 @@ export default function SetBlessing() {
     useNewGameStore();
 
   const isFocused = useIsFocused();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
   const vibration = useVibration();
   const { uiStore, tutorialStore, playerState } = useRootStore();
-  const { dimensions } = uiStore;
+  const { dimensions, colorScheme } = uiStore;
+  const isDark = colorScheme === "dark";
   const styles = useStyles();
 
   const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);

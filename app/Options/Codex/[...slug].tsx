@@ -1,8 +1,8 @@
+import React from "react";
 import { Href, Stack, router, useLocalSearchParams } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../../constants/Colors";
-import { useColorScheme } from "nativewind";
 import {
   CombatCodex,
   DungeonCodex,
@@ -34,6 +34,7 @@ import {
 } from "../../../components/CodexSecondaries";
 import { toTitleCase } from "../../../utility/functions/misc";
 import { useEffect, useState } from "react";
+import { useRootStore } from "../../../hooks/stores";
 
 const CategoryMap: { [key: string]: React.JSX.Element } = {
   Combat: <CombatCodex />,
@@ -68,7 +69,7 @@ const SecondaryMap: { [key: string]: React.JSX.Element } = {
 
 export default function CodexInfo() {
   let { slug } = useLocalSearchParams();
-  const { colorScheme } = useColorScheme();
+  const { uiStore } = useRootStore();
 
   const [history, setHistory] = useState<Href<string>[]>([]);
   let category: string;
@@ -88,7 +89,7 @@ export default function CodexInfo() {
 
     setHistory((prev) => {
       if (prev[prev.length - 1] !== currentPath) {
-        return [...prev, currentPath as Href<string>];
+        return [...prev, currentPath as Href];
       }
       return prev;
     });
@@ -117,7 +118,7 @@ export default function CodexInfo() {
                 <Ionicons
                   name={"chevron-back"}
                   size={36}
-                  color={Colors[colorScheme as "light" | "dark"].tint}
+                  color={Colors[uiStore.colorScheme as "light" | "dark"].tint}
                   style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }}
                 />
               )}
@@ -127,9 +128,9 @@ export default function CodexInfo() {
         }}
       />
       {secondary ? (
-        <View className="flex-1">{SecondaryMap[toTitleCase(secondary)]}</View>
+        <View style={{ flex: 1 }}>{SecondaryMap[toTitleCase(secondary)]}</View>
       ) : (
-        <View className="flex-1">{CategoryMap[toTitleCase(category)]}</View>
+        <View style={{ flex: 1 }}>{CategoryMap[toTitleCase(category)]}</View>
       )}
     </>
   );

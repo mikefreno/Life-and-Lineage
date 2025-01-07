@@ -8,8 +8,8 @@ import {
 } from "react-native";
 import Modal from "react-native-modal";
 import { ThemedView } from "./Themed";
-import { useColorScheme } from "nativewind";
 import { useRootStore } from "../hooks/stores";
+import { useStyles } from "../hooks/styles";
 
 interface GenericModalProps {
   isVisibleCondition: boolean;
@@ -57,10 +57,10 @@ export default function GenericModal({
   ...props
 }: GenericModalProps) {
   const height = Dimensions.get("screen").height;
-  const { colorScheme } = useColorScheme();
   const root = useRootStore();
   const { uiStore } = root;
-  let { modalShowing } = uiStore;
+  let { modalShowing, colorScheme } = uiStore;
+  const styles = useStyles();
 
   useEffect(() => {
     if (
@@ -100,14 +100,16 @@ export default function GenericModal({
       {...props}
     >
       <ThemedView
-        className={`mx-auto rounded-xl ${
-          noPad ? "" : "px-[2vw] py-4"
-        } dark:border dark:border-zinc-500 shadow shadow-black/25`}
-        style={{
-          shadowRadius: 5,
-          elevation: 2,
-          width: size ? `${size}%` : "83.3333%",
-        }}
+        style={[
+          styles.modalContent,
+          {
+            width: size ? `${size}%` : "83.3333%",
+            paddingHorizontal: noPad ? 0 : "2%",
+            paddingVertical: noPad ? 0 : 16,
+            borderWidth: uiStore.colorScheme === "dark" ? 1 : 0,
+            borderColor: uiStore.colorScheme === "dark" ? "#71717a" : undefined,
+          },
+        ]}
       >
         {children}
       </ThemedView>

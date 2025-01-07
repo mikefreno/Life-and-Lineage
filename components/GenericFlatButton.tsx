@@ -4,14 +4,17 @@ import {
   ColorValue,
   Pressable,
   View,
+  type ViewStyle,
 } from "react-native";
 import { Text } from "./Themed";
+import { useStyles } from "../hooks/styles";
+import { useRootStore } from "../hooks/stores";
 
 type GenericFlatButton = {
   onPress: () => void;
   disabled?: boolean;
   backgroundColor?: ColorValue;
-  className?: string;
+  style?: ViewStyle;
   children: string | ReactNode;
   textColor?: string;
   accessibilityRole?: AccessibilityRole;
@@ -32,35 +35,39 @@ const GenericFlatButton = ({
   backgroundColor,
   textColor,
   children,
-  className,
+  style,
   ...props
 }: GenericFlatButton) => {
+  const styles = useStyles();
+  const { uiStore } = useRootStore();
   return (
-    <Pressable
-      disabled={disabled}
-      onPress={onPress}
-      className={className}
-      {...props}
-    >
+    <Pressable disabled={disabled} onPress={onPress} style={style} {...props}>
       {({ pressed }) => (
         <View
-          className={`${pressed ? "scale-95 opacity-50" : ""} ${
-            !disabled
-              ? "mx-auto rounded-xl border border-zinc-900 px-6 py-2 dark:border-zinc-50"
-              : "mx-auto rounded-xl border border-zinc-400 px-6 py-2"
-          }`}
-          style={{ backgroundColor: backgroundColor }}
+          style={[
+            styles.flatButtonContainer,
+            {
+              borderColor: disabled
+                ? "#a1a1aa"
+                : uiStore.colorScheme === "dark"
+                ? "#fafafa"
+                : "#18181b",
+              backgroundColor,
+              transform: [{ scale: pressed ? 0.95 : 1 }],
+              opacity: pressed ? 0.5 : 1,
+            },
+          ]}
         >
           {typeof children === "string" ? (
             <Text
-              className="text-center tracking-widest"
-              style={
+              style={[
+                styles.flatButtonText,
                 disabled
                   ? { color: "#d4d4d8" }
                   : textColor
                   ? { color: textColor }
-                  : {}
-              }
+                  : {},
+              ]}
             >
               {children}
             </Text>
@@ -72,4 +79,5 @@ const GenericFlatButton = ({
     </Pressable>
   );
 };
+
 export default GenericFlatButton;

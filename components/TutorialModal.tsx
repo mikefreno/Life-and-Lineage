@@ -1,13 +1,15 @@
+import React from "react";
 import { useEffect, useRef, useState } from "react";
 import { View, Pressable, Switch, AccessibilityRole } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { Text } from "./Themed";
-import { useColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
 import { TutorialOption } from "../utility/types";
 import GenericModal from "./GenericModal";
 import { useVibration } from "../hooks/generic";
 import { useRootStore } from "../hooks/stores";
+import { text, tw, useStyles } from "../hooks/styles";
+import Colors from "../constants/Colors";
 
 type TutorialPage = {
   title?: string;
@@ -49,9 +51,10 @@ const TutorialModal = observer(
     clearOverride,
     ...props
   }: ITutorialModal) => {
-    const { tutorialStore } = useRootStore();
-    const { colorScheme } = useColorScheme();
+    const { tutorialStore, uiStore } = useRootStore();
+    const styles = useStyles();
     const vibration = useVibration();
+    const theme = Colors[uiStore.colorScheme];
 
     const [tutorialStep, setTutorialStep] = useState(1);
     const tutorialStepRef = useRef(1);
@@ -108,7 +111,13 @@ const TutorialModal = observer(
           onPress={
             nextPageExists && tutorialState ? handlePress : closeTutorial
           }
-          className="mx-auto mt-2 rounded-xl border border-zinc-900 px-6 py-2 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+          style={[
+            styles.nextButton,
+            {
+              transform: [{ scale: 0.95 }],
+              opacity: 0.5,
+            },
+          ]}
         >
           <Text>
             {nextPageExists && tutorialState ? "Next" : "Acknowledge Knowledge"}
@@ -120,14 +129,26 @@ const TutorialModal = observer(
     const renderPage = (page: TutorialPage) => (
       <>
         {page.title && (
-          <Text className="text-center text-2xl md:text-3xl">{page.title}</Text>
+          <Text style={[{ textAlign: "center" }, styles.titleText]}>
+            {page.title}
+          </Text>
         )}
-        <Text className="mt-2 text-center text-lg md:text-xl">{page.body}</Text>
+        <Text style={[tw.mt2, { textAlign: "center" }, styles.bodyText]}>
+          {page.body}
+        </Text>
         {tutorial !== TutorialOption.firstBossKill && (
-          <View className="mx-auto my-[2vh] flex flex-row">
-            <Text className="my-auto text-lg">Tutorials Enabled: </Text>
+          <View
+            style={{
+              marginHorizontal: "auto",
+              flexDirection: "row",
+              ...tw.my2,
+            }}
+          >
+            <Text style={[text.xl, { marginVertical: "auto" }]}>
+              Tutorials Enabled:{" "}
+            </Text>
             <Switch
-              trackColor={{ false: "#767577", true: "#3b82f6" }}
+              trackColor={{ false: "#767577", true: theme.interactive }}
               ios_backgroundColor="#3e3e3e"
               thumbColor="white"
               onValueChange={setTutorialState}
@@ -146,7 +167,6 @@ const TutorialModal = observer(
           backFunction?.();
           clearOverride?.();
           tutorialStore.updateTutorialState(tutorial, true);
-
           setShouldShow(false);
         }}
         accessibilityRole="alert"
@@ -154,9 +174,11 @@ const TutorialModal = observer(
       >
         {pageTwo && (
           <View
-            className={`flex flex-row ${
-              tutorialStep !== 1 ? "justify-between" : "justify-end"
-            }`}
+            style={[
+              tutorialStep !== 1
+                ? styles.flexRowBetween
+                : { justifyContent: "flex-end" },
+            ]}
           >
             {tutorialStep !== 1 && (
               <Pressable
@@ -168,7 +190,7 @@ const TutorialModal = observer(
                 <Entypo
                   name="chevron-left"
                   size={24}
-                  color={colorScheme === "dark" ? "#f4f4f5" : "black"}
+                  color={uiStore.colorScheme === "dark" ? "#f4f4f5" : "black"}
                 />
               </Pressable>
             )}

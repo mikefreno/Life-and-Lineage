@@ -1,9 +1,11 @@
+import React from "react";
 import { Pressable, View, Image } from "react-native";
 import GenericModal from "../GenericModal";
 import { ThemedView, Text } from "../Themed";
 import { useLootState } from "../../providers/DungeonData";
 import type { Item } from "../../entities/item";
 import { useRootStore } from "../../hooks/stores";
+import { useStyles } from "../../hooks/styles";
 
 interface LeftBehindItemsModalProps {
   showLeftBehindItemsScreen: boolean;
@@ -15,6 +17,7 @@ export default function LeftBehindItemsModal({
   setShowLeftBehindItemsScreen,
 }: LeftBehindItemsModalProps) {
   const { playerState } = useRootStore();
+  const styles = useStyles();
   const {
     leftBehindDrops,
     setLeftBehindDrops,
@@ -60,8 +63,9 @@ export default function LeftBehindItemsModal({
     >
       <>
         <Text
-          className="text-center text-lg"
           style={{
+            ...styles.xl,
+            textAlign: "center",
             color: "#ef4444",
             opacity: inventoryFullNotifier ? 1 : 0,
           }}
@@ -71,26 +75,23 @@ export default function LeftBehindItemsModal({
         {leftBehindDrops.length > 0 ? (
           <>
             {leftBehindDrops.map((item) => (
-              <View
-                key={item.id}
-                className="my-2 flex flex-row justify-between"
-              >
-                <View className="flex flex-row">
+              <View key={item.id} style={styles.leftBehindItemRow}>
+                <View style={{ flexDirection: "row" }}>
                   <Image source={item.getItemIcon()} />
-                  <Text className="my-auto">{item.name}</Text>
+                  <Text style={{ marginVertical: "auto" }}>{item.name}</Text>
                 </View>
                 <Pressable
                   onPress={() => {
                     takeItemFromPouch(item);
                   }}
-                  className="rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+                  style={styles.flatButtonContainer}
                 >
                   <Text>Take</Text>
                 </Pressable>
               </View>
             ))}
             <Pressable
-              className="mx-auto mt-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+              style={[styles.flatButtonContainer, { marginTop: 16 }]}
               onPress={takeAllItemsFromPouch}
             >
               <Text>Take All</Text>
@@ -98,11 +99,13 @@ export default function LeftBehindItemsModal({
           </>
         ) : (
           <ThemedView>
-            <Text className="text-center">You find no items on the ground</Text>
+            <Text style={{ textAlign: "center" }}>
+              You find no items on the ground
+            </Text>
           </ThemedView>
         )}
         <Pressable
-          className="mx-auto mt-4 rounded-xl border border-zinc-900 px-4 py-2 active:scale-95 active:opacity-50 dark:border-zinc-50"
+          style={[styles.flatButtonContainer, { marginTop: 16 }]}
           onPress={() => setShowLeftBehindItemsScreen(false)}
         >
           <Text>Close</Text>

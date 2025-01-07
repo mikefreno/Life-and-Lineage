@@ -6,10 +6,11 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 import { DEFAULT_FADEOUT_TIME } from "./Themed";
+import { type ViewStyle } from "react-native";
 
 interface FadeOutChildProps {
   children: ReactNode;
-  className?: string;
+  style?: ViewStyle;
   duration?: number;
   clearingFunction?: () => void;
   animationCycler?: number; // dummy prop to re-trigger animation
@@ -17,7 +18,7 @@ interface FadeOutChildProps {
 
 const FadeOutNode = React.memo(
   ({
-    className,
+    style,
     duration = DEFAULT_FADEOUT_TIME,
     children,
     clearingFunction,
@@ -42,9 +43,7 @@ const FadeOutNode = React.memo(
     }, [opacity, duration, clearingFunction, animationCycler]);
 
     return (
-      <Animated.View className={className} style={animatedStyle}>
-        {children}
-      </Animated.View>
+      <Animated.View style={[animatedStyle, style]}>{children}</Animated.View>
     );
   },
 );

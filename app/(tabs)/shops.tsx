@@ -1,3 +1,4 @@
+import React from "react";
 import { ScrollView, View } from "react-native";
 import { CharacterImage } from "../../components/CharacterImage";
 import { Link } from "expo-router";
@@ -15,11 +16,13 @@ import { useRootStore } from "../../hooks/stores";
 import { type Shop } from "../../entities/shop";
 import { EXPANDED_PAD } from "../../components/PlayerStatus";
 import { shopColors } from "../../constants/Colors";
+import { useStyles } from "../../hooks/styles";
 
 const ShopsScreen = observer(() => {
   const vibration = useVibration();
   const { shopsStore, uiStore } = useRootStore();
   const [isReady, setIsReady] = useState(false);
+  const styles = useStyles();
 
   const runDeathChecks = () => {
     shopsStore?.shopsMap.forEach((shop) => shop.deathCheck());
@@ -40,62 +43,63 @@ const ShopsScreen = observer(() => {
     if (!colors) return;
 
     return (
-      <View className="h-96 w-1/2" key={shop.shopKeeper.id}>
+      <View style={styles.shopCard} key={shop.shopKeeper.id}>
         <View
-          className={`m-2 flex-1 items-center justify-between rounded-xl border p-4 android:elevation-4`}
-          style={{
-            backgroundColor: colors.background,
-            borderColor: colors.border,
-            shadowColor: colors.border,
-            shadowOpacity: 0.3,
-            elevation: 4,
-          }}
+          style={[
+            styles.shopCardInner,
+            {
+              backgroundColor: colors.background,
+              borderColor: colors.border,
+              shadowColor: colors.border,
+              shadowOpacity: 0.3,
+              elevation: 4,
+            },
+          ]}
         >
           <Text
-            className="text-center text-2xl"
             style={{
+              textAlign: "center",
+              fontSize: 24,
+              lineHeight: 32,
               color: colors.text,
             }}
           >
             The {toTitleCase(shop.archetype)}
           </Text>
-          <View className="items-center">
-            <View className="w-1/2">
-              <CharacterImage character={shop.shopKeeper} />
-            </View>
-            <Text
-              className="text-center"
+          <View
+            style={{
+              alignItems: "center",
+            }}
+          >
+            <View
               style={{
-                color: colors.text,
+                width: "50%",
               }}
             >
+              <CharacterImage character={shop.shopKeeper} />
+            </View>
+            <Text style={{ textAlign: "center", color: colors.text }}>
               {shop.shopKeeper.fullName}
             </Text>
             <Link
-              className="mt-2 active:scale-95 active:opacity-50"
+              style={{ marginBottom: 8 }}
               href={`/Shops/${shop.archetype}`}
               onPressIn={() => vibration({ style: "light" })}
               suppressHighlighting
-              style={{}}
             >
               <View
-                className="px-8 py-3 rounded-lg"
-                style={{
-                  shadowColor: colors.border,
-                  elevation: 2,
-                  backgroundColor: colors.border,
-                  shadowOpacity: 0.5,
-                  shadowRadius: 5,
-                }}
+                style={[
+                  styles.enterButtonInner,
+                  {
+                    shadowColor: colors.border,
+                    elevation: 2,
+                    backgroundColor: colors.border,
+                    shadowOpacity: 0.5,
+                    shadowRadius: 5,
+                  },
+                ]}
               >
-                <Text
-                  className="text-lg"
-                  style={{
-                    color: colors.text,
-                  }}
-                >
-                  Enter
-                </Text>
+                <Text style={{ fontSize: 18, color: colors.text }}>Enter</Text>
               </View>
             </Link>
           </View>

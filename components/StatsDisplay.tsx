@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import { Text, CursiveText, HandwrittenText, CursiveTextBold } from "./Themed";
 import GearStatsDisplay from "./GearStatsDisplay";
-import { useColorScheme } from "nativewind";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { asReadableGold, toTitleCase } from "../utility/functions/misc";
@@ -23,12 +22,7 @@ import {
   Sanity,
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
-import {
-  Attribute,
-  ItemClassType,
-  MasteryToString,
-  RarityAsString,
-} from "../utility/types";
+import { Attribute, ItemClassType, RarityAsString } from "../utility/types";
 import GenericModal from "./GenericModal";
 import GenericStrikeAround from "./GenericStrikeAround";
 import type { Item } from "../entities/item";
@@ -37,7 +31,9 @@ import { useRootStore } from "../hooks/stores";
 import { Condition } from "../entities/conditions";
 import { useEnemyManagement } from "../hooks/combat";
 import type { Shop } from "../entities/shop";
-import { rarityColors } from "../constants/Colors";
+import Colors, { rarityColors } from "../constants/Colors";
+import { tw, useStyles } from "../hooks/styles";
+import React from "react";
 
 type BaseProps = {
   displayItem: {
@@ -76,10 +72,11 @@ export function StatsDisplay({
   tabBarHeight = 20,
   ...props
 }: StatsDisplayProps) {
-  const { colorScheme } = useColorScheme();
+  const styles = useStyles();
   const vibration = useVibration();
   const { playerState, enemyStore, uiStore } = useRootStore();
-  const { dimensions, itemBlockSize } = uiStore;
+  const { dimensions, itemBlockSize, colorScheme } = uiStore;
+  const theme = Colors[colorScheme];
 
   const [viewWidth, setViewWidth] = useState(dimensions.width * 0.4);
   const [viewHeight, setViewHeight] = useState(dimensions.height * 0.2);
@@ -95,7 +92,6 @@ export function StatsDisplay({
 
   useEffect(() => {
     const pad = 4;
-    // Calculate target positions
     const targetLeft =
       firstItem.itemClass == ItemClassType.Book
         ? Dimensions.get("window").width * 0.125 - 20
@@ -135,349 +131,11 @@ export function StatsDisplay({
     setFirstItem(displayItem.item[0]);
   }, [displayItem, displayItem.item.length]);
 
-  const RequirementsBlock = () => {
-    const reqs = firstItem.requirements;
-    if ((reqs.intelligence || reqs.strength || reqs.dexterity) && playerState) {
-      const playerMeetsStrength =
-        reqs.strength &&
-        reqs.strength <=
-          playerState.baseStrength +
-            playerState.allocatedSkillPoints[Attribute.strength];
-      const playerMeetsIntelligence =
-        reqs.intelligence &&
-        reqs.intelligence <=
-          playerState.baseIntelligence +
-            playerState.allocatedSkillPoints[Attribute.intelligence];
-      const playerMeetsDexterity =
-        reqs.dexterity &&
-        reqs.dexterity <=
-          playerState.baseDexterity +
-            playerState.allocatedSkillPoints[Attribute.dexterity];
-      if (firstItem.playerHasRequirements) return null;
-      return (
-        <View className="flex items-center p-1 rounded-lg border border-red-700">
-          <Text>Requires:</Text>
-          {reqs.strength && (
-            <View className="flex flex-row items-center justify-evenly">
-              <Text
-                className="text-sm"
-                style={{ color: playerMeetsStrength ? "#22c55e" : "#b91c1c" }}
-              >
-                {reqs.strength}
-              </Text>
-              <StrengthIcon height={14} width={16} />
-            </View>
-          )}
-          {reqs.intelligence && (
-            <View className="flex flex-row items-center justify-evenly">
-              <Text
-                className="text-sm pr-1"
-                style={{
-                  color: playerMeetsIntelligence ? "#22c55e" : "#b91c1c",
-                }}
-              >
-                {reqs.intelligence}
-              </Text>
-              <IntelligenceIcon height={14} width={16} />
-            </View>
-          )}
-          {reqs.dexterity && (
-            <View className="flex flex-row items-center justify-evenly">
-              <Text
-                className="text-sm pr-1"
-                style={{ color: playerMeetsDexterity ? "#22c55e" : "#b91c1c" }}
-              >
-                {reqs.dexterity}
-              </Text>
-              <DexterityIcon height={14} width={16} />
-            </View>
-          )}
-        </View>
-      );
-    }
-    return null;
+  const onLayoutView = (event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+    setViewWidth(width);
+    setViewHeight(height);
   };
-
-  const SaleSection = () => {
-    if (playerState) {
-      if ("shop" in props) {
-        const { shop, sellItem, sellStack } = props;
-        if (displayItem.side == "inventory") {
-          const itemPrice = firstItem.getSellPrice(shop.shopKeeper.affection);
-          const stackPrice = itemPrice * displayItem.item.length;
-          const singleIsDisabled = shop.currentGold < itemPrice;
-          const stackIsDisabled = shop.currentGold < stackPrice;
-          return (
-            <>
-              <View className="flex flex-row py-1">
-                <Text>
-                  {asReadableGold(
-                    firstItem.getSellPrice(shop.shopKeeper.affection) *
-                      (displayItem.item.length ?? 1),
-                  )}
-                </Text>
-                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
-              </View>
-              {displayItem.item.length && displayItem.item.length > 1 ? (
-                <>
-                  <GenericFlatButton
-                    onPress={() => {
-                      sellItem(firstItem), clearItem();
-                    }}
-                    disabled={singleIsDisabled}
-                  >
-                    <Text
-                      className={
-                        singleIsDisabled
-                          ? "opacity-50 text-center"
-                          : "text-center"
-                      }
-                    >
-                      Sell One
-                    </Text>
-                  </GenericFlatButton>
-                  <GenericFlatButton
-                    onPress={() => {
-                      sellStack(displayItem.item);
-                      clearItem();
-                    }}
-                    disabled={stackIsDisabled}
-                    className="mt-1"
-                  >
-                    <Text
-                      className={
-                        stackIsDisabled
-                          ? "opacity-50 text-center"
-                          : "text-center"
-                      }
-                    >
-                      Sell All
-                    </Text>
-                  </GenericFlatButton>
-                </>
-              ) : (
-                <GenericFlatButton
-                  onPress={() => {
-                    props.sellItem(firstItem);
-                    clearItem();
-                  }}
-                  disabled={singleIsDisabled}
-                >
-                  <Text
-                    className={
-                      singleIsDisabled
-                        ? "opacity-50 text-center"
-                        : "text-center"
-                    }
-                  >
-                    Sell
-                  </Text>
-                </GenericFlatButton>
-              )}
-            </>
-          );
-        } else if (displayItem.side == "shop") {
-          const { shop, purchaseItem, purchaseStack } = props;
-          const itemPrice = firstItem.getBuyPrice(shop.shopKeeper.affection);
-          const stackPrice = itemPrice * displayItem.item.length;
-          const singleIsDisabled = playerState.gold < itemPrice;
-          const stackIsDisabled = playerState.gold < stackPrice;
-          return (
-            <>
-              <View className="flex flex-row py-1">
-                <Text>
-                  {asReadableGold(
-                    firstItem.getBuyPrice(shop.shopKeeper.affection) *
-                      displayItem.item.length,
-                  )}
-                </Text>
-                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
-              </View>
-              <GenericFlatButton
-                onPress={() => purchaseItem(firstItem)}
-                disabled={singleIsDisabled}
-              >
-                <Text
-                  className={
-                    singleIsDisabled ? "opacity-50 text-center" : "text-center"
-                  }
-                >
-                  Buy {displayItem.item.length == 1 ? "Item" : "One"}
-                </Text>
-              </GenericFlatButton>
-              {displayItem.item.length > 1 && (
-                <GenericFlatButton
-                  onPress={() => purchaseStack(displayItem.item)}
-                  disabled={stackIsDisabled}
-                  className="pt-1"
-                >
-                  <Text
-                    className={
-                      stackIsDisabled ? "opacity-50 text-center" : "text-center"
-                    }
-                  >
-                    Buy All
-                  </Text>
-                </GenericFlatButton>
-              )}
-            </>
-          );
-        }
-      } else if ("addItemToPouch" in props) {
-        return (
-          <View className="pt-1">
-            <GenericFlatButton
-              onPress={() => {
-                props.addItemToPouch(displayItem.item);
-                clearItem();
-                playerState?.removeFromInventory(firstItem);
-              }}
-            >
-              Drop
-            </GenericFlatButton>
-            {displayItem.item.length > 1 && (
-              <GenericFlatButton
-                className="pt-1"
-                onPress={() => {
-                  props.addItemToPouch(displayItem.item);
-                  playerState?.removeFromInventory(displayItem.item);
-                  clearItem();
-                }}
-              >
-                Drop All
-              </GenericFlatButton>
-            )}
-          </View>
-        );
-      }
-    }
-  };
-
-  const ConsumableSection = () => {
-    const effect = firstItem.effect;
-    if (!effect) return;
-    switch (firstItem.itemClass) {
-      case ItemClassType.Potion:
-        return (
-          <View>
-            {"condition" in effect ? (
-              <View>
-                <Text>Provides {toTitleCase(effect.condition.name)}</Text>
-              </View>
-            ) : (
-              <View
-                className={`${
-                  effect.stat == "health"
-                    ? "bg-red-200 dark:bg-red-900"
-                    : effect.stat == "mana"
-                    ? "bg-blue-200 dark:bg-blue-900"
-                    : "bg-purple-200 dark:bg-purple-900"
-                } rounded-md p-1`}
-              >
-                <Text className="text-center ">
-                  Heals{" "}
-                  {effect.stat == "health" ? (
-                    <HealthIcon height={14} width={14} />
-                  ) : effect.stat == "mana" ? (
-                    <Energy height={14} width={14} />
-                  ) : (
-                    <Sanity width={14} height={14} />
-                  )}{" "}
-                  for {effect.amount.min} to {effect.amount.max} points.
-                </Text>
-              </View>
-            )}
-            {!!playerState?.baseInventory.find((invItem) =>
-              invItem.equals(firstItem),
-            ) && (
-              <GenericFlatButton
-                onPress={() => {
-                  if (enemyStore.enemies.length > 0) {
-                    const { enemyTurn } = useEnemyManagement();
-                    firstItem.use(enemyTurn);
-                  } else {
-                    firstItem.use();
-                  }
-                  clearItem();
-                }}
-                className="pt-1"
-              >
-                Drink
-              </GenericFlatButton>
-            )}
-          </View>
-        );
-      case ItemClassType.Poison:
-        return (
-          <View>
-            {"condition" in effect ? (
-              <View>
-                <Text>Provides {toTitleCase(effect.condition.name)}</Text>
-              </View>
-            ) : (
-              <View
-                className={`${
-                  effect.stat == "health"
-                    ? "bg-red-200 dark:bg-red-900"
-                    : effect.stat == "mana"
-                    ? "bg-blue-200 dark:bg-blue-900"
-                    : "bg-purple-200 dark:bg-purple-900"
-                } rounded-md p-1`}
-              >
-                <Text className="text-center ">
-                  Deals {effect.amount.min} to {effect.amount.max} points of{" "}
-                  {effect.stat == "health" ? (
-                    <HealthIcon height={14} width={14} />
-                  ) : effect.stat == "mana" ? (
-                    <Energy height={14} width={14} />
-                  ) : (
-                    <Sanity width={14} height={14} />
-                  )}{" "}
-                  damage.
-                </Text>
-              </View>
-            )}
-            {!!playerState?.baseInventory.find((invItem) =>
-              invItem.equals(firstItem),
-            ) && (
-              <GenericFlatButton
-                onPress={() => {
-                  firstItem.use();
-                  clearItem();
-                }}
-                className="pt-1"
-              >
-                Apply
-              </GenericFlatButton>
-            )}
-          </View>
-        );
-
-      default:
-        return;
-    }
-  };
-
-  const ItemTypeLabel = (item: Item) => {
-    if (item.itemClass == ItemClassType.BodyArmor) {
-      return "Body Armor";
-    }
-    if (item.itemClass == ItemClassType.StoryItem) {
-      return "Key Item";
-    }
-    if (item.itemClass == ItemClassType.Book) {
-      return bookItemLabel();
-    }
-    return toTitleCase(item.itemClass);
-  };
-
-  function bookItemLabel() {
-    if (playerState && firstItem.attachedSpell) {
-      return `${
-        MasteryToString[firstItem.attachedSpell.proficiencyNeeded]
-      } level book`;
-    }
-  }
 
   interface TextSection {
     text: string;
@@ -485,7 +143,6 @@ export function StatsDisplay({
     largeMeta: boolean;
     emphasized: boolean;
   }
-
   const StoryItemDescriptionRender = ({ item }: { item: Item }) => {
     if (!item.description) {
       throw Error(`Missing description on story item: ${item.name}`);
@@ -502,7 +159,6 @@ export function StatsDisplay({
     let isLargeMeta = false;
 
     lines.forEach((line) => {
-      // Check for single-line meta with ** or *
       if (
         (line.startsWith("**") && line.endsWith("**")) ||
         (line.startsWith("*") && line.endsWith("*"))
@@ -526,7 +182,6 @@ export function StatsDisplay({
         return;
       }
 
-      // Check for multi-line meta start
       if ((line.startsWith("**") || line.startsWith("*")) && !inMeta) {
         if (currentSection) {
           sections.push({
@@ -543,7 +198,6 @@ export function StatsDisplay({
         return;
       }
 
-      // Check for multi-line meta end
       if (
         (line.endsWith("**") && isLargeMeta) ||
         (line.endsWith("*") && !isLargeMeta && inMeta)
@@ -590,40 +244,48 @@ export function StatsDisplay({
     }
 
     return (
-      <View className="pr-4 py-4 h-full">
-        <View className="border-b mb-4 ml-4 border-zinc-500">
-          <Text className="text-xl -ml-4 mr-4">{toTitleCase(item.name)}</Text>
+      <View style={styles.storyContainer}>
+        <View style={styles.storyHeaderContainer}>
+          <Text style={{ marginLeft: -16, marginRight: 16, ...styles.textXl }}>
+            {toTitleCase(item.name)}
+          </Text>
         </View>
         <Pressable
           onPress={() => {
             vibration({ style: "light" });
             setRenderStory(null);
           }}
-          className={`${
-            displayItem.position.left + itemBlockSize < dimensions.width * 0.6
-              ? "left-0"
-              : "right-0"
-          } absolute border-zinc-600 rounded-tr rounded-bl dark:border-zinc-400 px-2 py-1`}
+          style={[
+            styles.closeButton,
+            {
+              [displayItem.position.left + itemBlockSize <
+              dimensions.width * 0.6
+                ? "left"
+                : "right"]: 0,
+            },
+          ]}
         >
-          <Text className="text-4xl">x</Text>
+          <Text style={{ fontSize: 36 }}>x</Text>
         </Pressable>
         {sections.map((section, idx) => {
           if (section.meta) {
             return (
               <Text
                 key={idx}
-                className={`text-center py-1 ${
-                  section.largeMeta ? "text-xl" : ""
-                }`}
+                style={[
+                  { textAlign: "center" },
+                  tw.py1,
+                  section.largeMeta && styles.textXl,
+                ]}
               >
                 [{section.text}]
               </Text>
             );
           } else {
             return (
-              <View key={idx} className="py-2">
+              <View key={idx} style={tw.py2}>
                 {section.text.split("\n").map((paragraph, pIdx) => (
-                  <Text key={pIdx} className="mb-2">
+                  <Text key={pIdx} style={tw.mb2}>
                     {paragraph
                       .split(/(<em>.*?<\/em>)/g)
                       .map((part, partIdx) => {
@@ -638,7 +300,7 @@ export function StatsDisplay({
                             return (
                               <CursiveTextBold
                                 key={partIdx}
-                                className="text-5xl tracking-widest"
+                                style={{ fontSize: 48, letterSpacing: 2 }}
                               >
                                 {cleanPart}
                               </CursiveTextBold>
@@ -647,7 +309,7 @@ export function StatsDisplay({
                             return (
                               <HandwrittenText
                                 key={partIdx}
-                                className="text-3xl"
+                                style={{ fontSize: 30 }}
                               >
                                 {cleanPart}
                               </HandwrittenText>
@@ -658,7 +320,7 @@ export function StatsDisplay({
                             return (
                               <CursiveText
                                 key={partIdx}
-                                className="text-4xl tracking-widest"
+                                style={{ fontSize: 36, letterSpacing: 2 }}
                               >
                                 {cleanPart}
                               </CursiveText>
@@ -667,7 +329,7 @@ export function StatsDisplay({
                             return (
                               <HandwrittenText
                                 key={partIdx}
-                                className="text-3xl"
+                                style={{ fontSize: 30 }}
                               >
                                 {cleanPart}
                               </HandwrittenText>
@@ -685,14 +347,344 @@ export function StatsDisplay({
     );
   };
 
-  const onLayoutView = (event: LayoutChangeEvent) => {
-    const { width, height } = event.nativeEvent.layout;
-    setViewWidth(width);
-    setViewHeight(height);
+  const RequirementsBlock = () => {
+    const reqs = firstItem.requirements;
+    if ((reqs.intelligence || reqs.strength || reqs.dexterity) && playerState) {
+      const playerMeetsStrength =
+        reqs.strength &&
+        reqs.strength <=
+          playerState.baseStrength +
+            playerState.allocatedSkillPoints[Attribute.strength];
+      const playerMeetsIntelligence =
+        reqs.intelligence &&
+        reqs.intelligence <=
+          playerState.baseIntelligence +
+            playerState.allocatedSkillPoints[Attribute.intelligence];
+      const playerMeetsDexterity =
+        reqs.dexterity &&
+        reqs.dexterity <=
+          playerState.baseDexterity +
+            playerState.allocatedSkillPoints[Attribute.dexterity];
+      if (firstItem.playerHasRequirements) return null;
+      return (
+        <View
+          style={[
+            styles.consumableEffectContainer,
+            { borderColor: theme.error, borderWidth: 1 },
+          ]}
+        >
+          <Text>Requires:</Text>
+          {reqs.strength && (
+            <View
+              style={[styles.flexRowCenter, { justifyContent: "space-evenly" }]}
+            >
+              <Text
+                style={{
+                  color: playerMeetsStrength ? theme.success : theme.error,
+                }}
+              >
+                {reqs.strength}
+              </Text>
+              <StrengthIcon height={14} width={16} />
+            </View>
+          )}
+          {reqs.intelligence && (
+            <View
+              style={[styles.flexRowCenter, { justifyContent: "space-evenly" }]}
+            >
+              <Text
+                style={{
+                  color: playerMeetsIntelligence ? theme.success : theme.error,
+                }}
+              >
+                {reqs.intelligence}
+              </Text>
+              <IntelligenceIcon height={14} width={16} />
+            </View>
+          )}
+          {reqs.dexterity && (
+            <View
+              style={[styles.flexRowCenter, { justifyContent: "space-evenly" }]}
+            >
+              <Text
+                style={{
+                  color: playerMeetsDexterity ? theme.success : theme.error,
+                }}
+              >
+                {reqs.dexterity}
+              </Text>
+              <DexterityIcon height={14} width={16} />
+            </View>
+          )}
+        </View>
+      );
+    }
+    return null;
   };
 
-  while (!itemBlockSize) {
-    return <></>;
+  const ConsumableSection = () => {
+    const effect = firstItem.effect;
+    if (!effect) return null;
+
+    switch (firstItem.itemClass) {
+      case ItemClassType.Potion:
+        return (
+          <View>
+            {"condition" in effect ? (
+              <View>
+                <Text>Provides {toTitleCase(effect.condition.name)}</Text>
+              </View>
+            ) : (
+              <View
+                style={
+                  effect.stat === "health"
+                    ? styles.healthEffectContainer
+                    : effect.stat === "mana"
+                    ? styles.manaEffectContainer
+                    : styles.sanityEffectContainer
+                }
+              >
+                <Text style={{ textAlign: "center" }}>
+                  Heals{" "}
+                  {effect.stat == "health" ? (
+                    <HealthIcon height={14} width={14} />
+                  ) : effect.stat == "mana" ? (
+                    <Energy height={14} width={14} />
+                  ) : (
+                    <Sanity width={14} height={14} />
+                  )}{" "}
+                  for {effect.amount.min} to {effect.amount.max} points.
+                </Text>
+              </View>
+            )}
+            {!!playerState?.baseInventory.find((invItem) =>
+              invItem.equals(firstItem),
+            ) && (
+              <GenericFlatButton
+                onPress={() => {
+                  if (enemyStore.enemies.length > 0) {
+                    const { enemyTurn } = useEnemyManagement();
+                    firstItem.use(enemyTurn);
+                  } else {
+                    firstItem.use();
+                  }
+                  clearItem();
+                }}
+                style={tw.pt1}
+              >
+                Drink
+              </GenericFlatButton>
+            )}
+          </View>
+        );
+      case ItemClassType.Poison:
+        return (
+          <View>
+            {"condition" in effect ? (
+              <View>
+                <Text>Provides {toTitleCase(effect.condition.name)}</Text>
+              </View>
+            ) : (
+              <View
+                style={
+                  effect.stat === "health"
+                    ? styles.healthEffectContainer
+                    : effect.stat === "mana"
+                    ? styles.manaEffectContainer
+                    : styles.sanityEffectContainer
+                }
+              >
+                <Text style={{ textAlign: "center" }}>
+                  Deals {effect.amount.min} to {effect.amount.max} points of{" "}
+                  {effect.stat == "health" ? (
+                    <HealthIcon height={14} width={14} />
+                  ) : effect.stat == "mana" ? (
+                    <Energy height={14} width={14} />
+                  ) : (
+                    <Sanity width={14} height={14} />
+                  )}{" "}
+                  damage.
+                </Text>
+              </View>
+            )}
+            {!!playerState?.baseInventory.find((invItem) =>
+              invItem.equals(firstItem),
+            ) && (
+              <GenericFlatButton
+                onPress={() => {
+                  firstItem.use();
+                  clearItem();
+                }}
+                style={tw.pt1}
+              >
+                Apply
+              </GenericFlatButton>
+            )}
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const SaleSection = () => {
+    if (playerState) {
+      if ("shop" in props) {
+        const { shop, sellItem, sellStack, purchaseItem, purchaseStack } =
+          props;
+        if (displayItem.side == "inventory") {
+          const itemPrice = firstItem.getSellPrice(shop.shopKeeper.affection);
+          const stackPrice = itemPrice * displayItem.item.length;
+          const singleIsDisabled = shop.currentGold < itemPrice;
+          const stackIsDisabled = shop.currentGold < stackPrice;
+          return (
+            <>
+              <View style={[styles.flexRowCenter, tw.py1]}>
+                <Text>
+                  {asReadableGold(
+                    firstItem.getSellPrice(shop.shopKeeper.affection) *
+                      (displayItem.item.length ?? 1),
+                  )}
+                </Text>
+                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+              </View>
+              {displayItem.item.length && displayItem.item.length > 1 ? (
+                <>
+                  <GenericFlatButton
+                    onPress={() => {
+                      sellItem(firstItem);
+                      clearItem();
+                    }}
+                    disabled={singleIsDisabled}
+                  >
+                    <Text
+                      style={[
+                        { textAlign: "center" },
+                        singleIsDisabled && { opacity: 0.5 },
+                      ]}
+                    >
+                      Sell One
+                    </Text>
+                  </GenericFlatButton>
+                  <GenericFlatButton
+                    onPress={() => {
+                      sellStack(displayItem.item);
+                      clearItem();
+                    }}
+                    disabled={stackIsDisabled}
+                    style={tw.mt1}
+                  >
+                    <Text
+                      style={[
+                        { textAlign: "center" },
+                        stackIsDisabled && { opacity: 0.5 },
+                      ]}
+                    >
+                      Sell All
+                    </Text>
+                  </GenericFlatButton>
+                </>
+              ) : (
+                <GenericFlatButton
+                  onPress={() => {
+                    sellItem(firstItem);
+                    clearItem();
+                  }}
+                  disabled={singleIsDisabled}
+                >
+                  <Text
+                    style={[
+                      { textAlign: "center" },
+                      singleIsDisabled && { opacity: 0.5 },
+                    ]}
+                  >
+                    Sell
+                  </Text>
+                </GenericFlatButton>
+              )}
+            </>
+          );
+        } else if (displayItem.side == "shop") {
+          const itemPrice = firstItem.getBuyPrice(shop.shopKeeper.affection);
+          const stackPrice = itemPrice * displayItem.item.length;
+          const singleIsDisabled = playerState.gold < itemPrice;
+          const stackIsDisabled = playerState.gold < stackPrice;
+          return (
+            <>
+              <View style={[styles.flexRowCenter, tw.py1]}>
+                <Text>
+                  {asReadableGold(
+                    firstItem.getBuyPrice(shop.shopKeeper.affection) *
+                      displayItem.item.length,
+                  )}
+                </Text>
+                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+              </View>
+              <GenericFlatButton
+                onPress={() => purchaseItem(firstItem)}
+                disabled={singleIsDisabled}
+              >
+                <Text
+                  style={[
+                    { textAlign: "center" },
+                    singleIsDisabled && { opacity: 0.5 },
+                  ]}
+                >
+                  Buy {displayItem.item.length == 1 ? "Item" : "One"}
+                </Text>
+              </GenericFlatButton>
+              {displayItem.item.length > 1 && (
+                <GenericFlatButton
+                  onPress={() => purchaseStack(displayItem.item)}
+                  disabled={stackIsDisabled}
+                  style={tw.pt1}
+                >
+                  <Text
+                    style={[
+                      { textAlign: "center" },
+                      stackIsDisabled && { opacity: 0.5 },
+                    ]}
+                  >
+                    Buy All
+                  </Text>
+                </GenericFlatButton>
+              )}
+            </>
+          );
+        }
+      } else if ("addItemToPouch" in props) {
+        return (
+          <View style={tw.pt1}>
+            <GenericFlatButton
+              onPress={() => {
+                props.addItemToPouch(displayItem.item);
+                clearItem();
+                playerState?.removeFromInventory(firstItem);
+              }}
+            >
+              Drop
+            </GenericFlatButton>
+            {displayItem.item.length > 1 && (
+              <GenericFlatButton
+                style={tw.pt1}
+                onPress={() => {
+                  props.addItemToPouch(displayItem.item);
+                  playerState?.removeFromInventory(displayItem.item);
+                  clearItem();
+                }}
+              >
+                Drop All
+              </GenericFlatButton>
+            )}
+          </View>
+        );
+      }
+    }
+    return null;
+  };
+
+  if (!itemBlockSize) {
+    return null;
   }
 
   return (
@@ -715,20 +707,15 @@ export function StatsDisplay({
         backFunction={() => setRenderStory(null)}
         size={95}
         noPad
-        style={{
-          maxHeight: "75%",
-          marginTop: "auto",
-          marginBottom: "auto",
-        }}
+        style={styles.storyModalContainer}
       >
-        <ScrollView className="px-4">
+        <ScrollView style={tw.px4}>
           <StoryItemDescriptionRender item={firstItem} />
         </ScrollView>
       </GenericModal>
       <Animated.View
-        className={`items-center rounded-md border border-zinc-600 p-4`}
-        onLayout={onLayoutView}
         style={[
+          styles.statsDisplayContainer,
           firstItem.itemClass == ItemClassType.Book
             ? {}
             : { width: dimensions.width * 0.4 },
@@ -739,29 +726,36 @@ export function StatsDisplay({
             top: animatedTop,
           },
         ]}
+        onLayout={onLayoutView}
       >
         <Pressable
           onPress={() => clearItem()}
-          className={`${
-            displayItem.position.left + itemBlockSize < dimensions.width * 0.6
-              ? "left-0"
-              : "right-0"
-          } absolute border-zinc-600 rounded-tr rounded-bl dark:border-zinc-400 px-2 py-1`}
+          style={[
+            styles.closeButton,
+            {
+              [displayItem.position.left + itemBlockSize <
+              dimensions.width * 0.6
+                ? "left"
+                : "right"]: 0,
+            },
+          ]}
         >
-          <Text className="-mt-3 -ml-1 text-2xl">x</Text>
+          <Text style={{ marginTop: -12, marginLeft: -4, ...styles.text2xl }}>
+            x
+          </Text>
         </Pressable>
         <View>
-          <Text className="text-center">{firstItem.name}</Text>
+          <Text style={{ textAlign: "center" }}>{firstItem.name}</Text>
         </View>
         <RequirementsBlock />
         {firstItem.isEquippable &&
           firstItem.itemClass !== ItemClassType.Arrow && (
             <GenericStrikeAround>
               <Text
-                className="text-lg"
-                style={{
-                  color: rarityColors[firstItem.rarity ?? 0].text,
-                }}
+                style={[
+                  styles.textLg,
+                  { color: rarityColors[firstItem.rarity ?? 0].text },
+                ]}
               >
                 {RarityAsString[firstItem.rarity]}
               </Text>
@@ -770,25 +764,25 @@ export function StatsDisplay({
         {(firstItem.slot == "one-hand" ||
           firstItem.slot == "two-hand" ||
           firstItem.slot == "off-hand") && (
-          <GenericStrikeAround className="text-sm">
+          <GenericStrikeAround style={styles.textSm}>
             {toTitleCase(firstItem.slot)}
           </GenericStrikeAround>
         )}
-        <GenericStrikeAround className="text-sm">
+        <GenericStrikeAround style={styles.textSm}>
           {ItemTypeLabel(firstItem)}
         </GenericStrikeAround>
 
         {firstItem.stats && firstItem.slot && (
-          <View className="py-2">
+          <View style={tw.py2}>
             <GearStatsDisplay item={firstItem} />
           </View>
         )}
         {firstItem.activePoison && (
-          <View className="rounded-md p-1 bg-[#A5D6A7] dark:bg-[#388E3C]">
+          <View style={styles.poisonContainer}>
             {firstItem.activePoison instanceof Condition ? (
-              <View></View>
+              <View />
             ) : (
-              <Text className="text-center">
+              <Text style={{ textAlign: "center" }}>
                 {firstItem.activePoison.effect == "health" ? (
                   <HealthIcon height={14} width={14} />
                 ) : firstItem.activePoison.effect == "mana" ? (
@@ -803,15 +797,15 @@ export function StatsDisplay({
         )}
         {firstItem.attachedAttacks.length > 0 && playerState && (
           <GenericFlatButton
-            className="pt-1"
+            style={tw.pt1}
             onPress={() => setShowingAttacks(true)}
           >
             Show attacks
           </GenericFlatButton>
         )}
-        {firstItem.attachedSpell ? (
+        {firstItem.attachedSpell && (
           <>
-            <View className="px-2 mx-auto">
+            <View style={tw.px2}>
               <SpellDetails spell={firstItem.attachedSpell} />
             </View>
             {!("purchaseItem" in props || "addItemToPouch" in props) && (
@@ -821,20 +815,20 @@ export function StatsDisplay({
                   clearItem();
                   router.push("/Study");
                 }}
-                className="mt-2"
+                style={tw.mt2}
               >
                 Study This Book
               </GenericFlatButton>
             )}
           </>
-        ) : null}
+        )}
         {displayItem.side == "stash" && (
           <GenericFlatButton
             onPress={() => {
               playerState?.root.stashStore.removeItem(displayItem.item);
               clearItem();
             }}
-            className="py-2"
+            style={tw.py2}
           >
             Add to Inventory
           </GenericFlatButton>

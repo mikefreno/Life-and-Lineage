@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Pressable, Animated, View } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useColorScheme } from "nativewind";
 import { Text } from "./Themed";
+import { useRootStore } from "../hooks/stores";
+import { useStyles } from "../hooks/styles";
 
 interface CodexCategoryProps {
   category: string;
@@ -16,8 +17,8 @@ export default function CodexCategory({
 }: CodexCategoryProps) {
   const [animationTriggered, setAnimationtriggered] = useState(false);
   const animatedValue = useState(new Animated.Value(0))[0];
-
-  const { colorScheme } = useColorScheme();
+  const { uiStore } = useRootStore();
+  const styles = useStyles();
 
   useEffect(() => {
     Animated.timing(animatedValue, {
@@ -56,7 +57,7 @@ export default function CodexCategory({
   return (
     <Pressable
       key={category}
-      className="w-full"
+      style={{ width: "100%" }}
       onPressOut={() => {
         if (!scrolling) {
           handlePressOut();
@@ -65,16 +66,15 @@ export default function CodexCategory({
     >
       {({ pressed }) => (
         <View
-          className="mx-2 my-6 w-full border-b-[0.5px] border-zinc-700 py-2 dark:border-zinc-100"
-          style={{ maxWidth: 512, opacity: pressed ? 0.5 : 1 }}
+          style={[styles.categoryContainer, { opacity: pressed ? 0.5 : 1 }]}
         >
-          <View className="flex flex-row justify-between px-2">
-            <Text className="my-auto text-xl">{category}</Text>
+          <View style={styles.categoryContent}>
+            <Text style={styles.textXl}>{category}</Text>
             <Animated.View style={chevronAnimatedStyle}>
               <Entypo
                 name="chevron-thin-right"
                 size={24}
-                color={colorScheme == "dark" ? "white" : "black"}
+                color={uiStore.colorScheme == "dark" ? "white" : "black"}
                 style={{ opacity: pressed ? 0.5 : 1 }}
               />
             </Animated.View>

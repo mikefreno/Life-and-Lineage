@@ -1,3 +1,4 @@
+import React from "react";
 import { useLocalSearchParams } from "expo-router";
 import { Text, ThemedScrollView } from "../../components/Themed";
 import { CharacterImage } from "../../components/CharacterImage";
@@ -20,24 +21,19 @@ import { Coins } from "../../assets/icons/SVGIcons";
 import { MerchantType, TutorialOption } from "../../utility/types";
 import ProgressBar from "../../components/ProgressBar";
 import Colors, { shopColors } from "../../constants/Colors";
-import { useColorScheme } from "nativewind";
 import { InventoryItem } from "../../components/Draggable";
 import { useDraggableStore, useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
 import type { Item } from "../../entities/item";
+import { useStyles } from "../../hooks/styles";
 
 const TEN_MINUTES = 10 * 60 * 1000;
 const ONE_SECOND = 1000;
 const REFRESH_TIME = __DEV__ ? ONE_SECOND : TEN_MINUTES;
 
-const GreetingComponent = ({
-  greeting,
-  colorScheme,
-}: {
-  greeting: string;
-  colorScheme: "light" | "dark";
-}) => {
+const GreetingComponent = ({ greeting }: { greeting: string }) => {
   const fadeAnim = useRef(new Animated.Value(1)).current;
+  const styles = useStyles();
 
   useEffect(() => {
     const fadeOut = Animated.timing(fadeAnim, {
@@ -58,14 +54,14 @@ const GreetingComponent = ({
 
   return (
     <Animated.View
-      style={{
-        borderColor: Colors[colorScheme].tint,
-        zIndex: 999,
-        opacity: fadeAnim,
-      }}
-      className="border absolute shadow-lg rounded-md p-2 bg-[#fafafa] dark:bg-[#000000] dark:border-[]"
+      style={[
+        styles.greetingContainer,
+        {
+          opacity: fadeAnim,
+        },
+      ]}
     >
-      <Text className="text-center">{greeting}</Text>
+      <Text style={styles.textCenter}>{greeting}</Text>
     </Animated.View>
   );
 };
@@ -89,11 +85,9 @@ const ShopInteriorScreen = observer(() => {
 
   const [inventoryFullNotifier, setInventoryFullNotifier] =
     useState<boolean>(false);
-
   const isFocused = useIsFocused();
-
   const header = useHeaderHeight();
-  const { colorScheme } = useColorScheme();
+  const styles = useStyles();
 
   const [shopInventoryBounds, setShopInventoryBounds] = useState<{
     x: number;
@@ -224,18 +218,15 @@ const ShopInteriorScreen = observer(() => {
         />
 
         <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
-          <View className="flex-1 justify-between">
-            <View className="flex h-[40%] flex-row justify-evenly">
-              <View className="items-center w-1/3 my-auto px-1">
+          <View style={[styles.flexColumnBetween, { flex: 1 }]}>
+            <View style={[styles.flexRowEvenly, { height: "40%" }]}>
+              <View style={[styles.flexColumnCenter, styles.shopKeeperSection]}>
                 <CharacterImage character={thisShop.shopKeeper} scale={0.3} />
-                <GreetingComponent
-                  greeting={greeting}
-                  colorScheme={colorScheme}
-                />
-                <Text className="text-center">
+                <GreetingComponent greeting={greeting} />
+                <Text style={styles.textCenter}>
                   {thisShop.shopKeeper.fullName}'s Inventory
                 </Text>
-                <View className="flex flex-row mb-1">
+                <View style={[styles.flexRowCenter, styles.mb1]}>
                   <Text>{thisShop.currentGold}</Text>
                   <Coins width={16} height={16} style={{ marginLeft: 6 }} />
                 </View>
@@ -248,13 +239,16 @@ const ShopInteriorScreen = observer(() => {
               </View>
               <View
                 onLayout={(e) => setShopBoundsOnLayout(e)}
-                className="shadow-soft flex-1 rounded-l border-l border-b border-zinc-300 dark:border-zinc-700"
+                style={styles.shopInventoryContainer}
                 ref={shopInventoryTarget}
               >
                 <ThemedScrollView
                   onScrollBeginDrag={() => setDisplayItem(null)}
-                  className="px-2 h-full"
-                  contentContainerClassName="flex flex-row flex-wrap justify-around"
+                  style={styles.px2}
+                  contentContainerStyle={[
+                    styles.flexRowEvenly,
+                    { flexWrap: "wrap" },
+                  ]}
                 >
                   {thisShop.inventory.map((item) => (
                     <Pressable
@@ -264,7 +258,7 @@ const ShopInteriorScreen = observer(() => {
                         width: uiStore.itemBlockSize * 1.5,
                       }}
                     >
-                      <View className="flex-1 justify-center items-center">
+                      <View style={styles.columnCenter}>
                         <InventoryItem
                           key={item.item[0].id}
                           item={item.item}
@@ -290,28 +284,36 @@ const ShopInteriorScreen = observer(() => {
                 </ThemedScrollView>
               </View>
             </View>
-            <View className="flex-1 mx-2 mt-4">
-              <View className="flex flex-row justify-center py-4 dark:border-zinc-700">
-                <Text className=" text-center">
+            <View style={styles.playerInventorySection}>
+              <View
+                style={{
+                  ...styles.rowCenter,
+                  ...styles.py4,
+                }}
+              >
+                <Text style={styles.textCenter}>
                   {playerState.fullName}'s Inventory
                 </Text>
-                <View className="flex flex-row">
+                <View style={styles.rowCenter}>
                   <Text> ( {playerState.readableGold} )</Text>
                   <Coins width={16} height={16} style={{ marginLeft: 6 }} />
                   <Text> )</Text>
                   {playerState.baseInventory.some(
                     (item) => item.itemClass == "junk",
-                  ) ? (
+                  ) && (
                     <Pressable
                       onPress={sellAllJunk}
-                      className="ml-2 rounded-xl border border-zinc-900 px-6 text-lg active:scale-95 active:opacity-50 dark:border-zinc-50"
+                      style={styles.sellJunkButton}
                     >
                       <Text>Sell Junk</Text>
                     </Pressable>
-                  ) : null}
+                  )}
                 </View>
               </View>
-              <View className="h-[85%] w-full" collapsable={false}>
+              <View
+                style={{ height: "85%", width: "100%" }}
+                collapsable={false}
+              >
                 <InventoryRender
                   screen="shop"
                   displayItem={displayItem}
@@ -326,7 +328,7 @@ const ShopInteriorScreen = observer(() => {
           </View>
         </TouchableWithoutFeedback>
         {displayItem && (
-          <View className="absolute z-10" pointerEvents="box-none">
+          <View style={styles.raisedAbsolutePosition} pointerEvents="box-none">
             <StatsDisplay
               displayItem={displayItem}
               shop={thisShop}

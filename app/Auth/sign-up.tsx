@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -8,7 +9,6 @@ import {
   View,
 } from "react-native";
 import { useEffect, useState } from "react";
-import { useColorScheme } from "nativewind";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 import { GoogleIcon } from "../../assets/icons/SVGIcons";
 import * as AppleAuthentication from "expo-apple-authentication";
@@ -21,11 +21,12 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { isValidPassword } from "../../utility/functions/password";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
+import { useStyles } from "../../hooks/styles";
 
 const SignUpScreen = observer(() => {
-  const { colorScheme } = useColorScheme();
   const vibration = useVibration();
-  const { authStore } = useRootStore();
+  const { authStore, uiStore } = useRootStore();
+  const styles = useStyles();
 
   const [emailAddress, setEmailAddress] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -155,42 +156,24 @@ const SignUpScreen = observer(() => {
   };
 
   return (
-    <ThemedView className="flex-1">
+    <ThemedView style={{ flex: 1 }}>
       {awaitingResponse ? (
-        <View className="pt-[25vh]">
+        <View style={{ paddingTop: 0.25 * uiStore.dimensions.height }}>
           <D20DieAnimation keepRolling={awaitingResponse} />
         </View>
       ) : !usingEmail ? (
         <>
           {error && (
-            <Text className="text-center" style={{ color: "#ef4444" }}>
+            <Text style={{ textAlign: "center", color: "#ef4444" }}>
               {error}
             </Text>
           )}
-          <View className="flex items-center mt-[20vh] px-4">
+          <View style={styles.authProviderContainer}>
             <Pressable
               onPress={handleGoogleSignUp}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                borderWidth: 1,
-                borderColor: colorScheme == "dark" ? "#fafafa" : "#27272a",
-                backgroundColor: colorScheme == "dark" ? "#27272a" : "#ffffff",
-                paddingHorizontal: 12,
-                marginTop: -8,
-                marginBottom: 8,
-                paddingVertical: 8,
-                borderRadius: 5,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: 0.2,
-                shadowRadius: 1.41,
-                elevation: 2,
-                width: 230,
-              }}
+              style={styles.providerButton}
             >
-              <Text className="text-xl">Register with Google</Text>
+              <Text style={styles.xl}>Register with Google</Text>
               <GoogleIcon height={20} width={20} />
             </Pressable>
             {Platform.OS == "ios" && (
@@ -199,7 +182,7 @@ const SignUpScreen = observer(() => {
                   AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
                 }
                 buttonStyle={
-                  colorScheme == "dark"
+                  uiStore.colorScheme == "dark"
                     ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE
                     : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
                 }
@@ -213,7 +196,9 @@ const SignUpScreen = observer(() => {
               backgroundColor={"#2563eb"}
               style={{ width: 230 }}
             >
-              <Text className="text-xl text-center" style={{ color: "white" }}>
+              <Text
+                style={{ fontSize: 20, textAlign: "center", color: "white" }}
+              >
                 Email
               </Text>
             </GenericRaisedButton>
@@ -223,17 +208,19 @@ const SignUpScreen = observer(() => {
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           keyboardVerticalOffset={header + (Platform.OS == "ios" ? 20 : 0)}
-          className="flex-1"
+          style={{ flex: 1 }}
         >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View className="flex-1 justify-evenly">
-              <Text className="text-center text-3xl pt-4">
+            <View style={{ flex: 1, justifyContent: "space-evenly" }}>
+              <Text
+                style={{ textAlign: "center", fontSize: 30, paddingTop: 16 }}
+              >
                 Email Registration
               </Text>
               <TextInput
-                className="mx-16 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
+                style={[styles.input, styles.xl]}
                 placeholderTextColor={
-                  colorScheme == "light" ? "#d4d4d8" : "#71717a"
+                  uiStore.colorScheme == "light" ? "#d4d4d8" : "#71717a"
                 }
                 autoComplete={"email"}
                 inputMode={"email"}
@@ -242,20 +229,16 @@ const SignUpScreen = observer(() => {
                 autoCorrect={false}
                 autoCapitalize={"none"}
                 value={emailAddress}
-                style={{
-                  fontFamily: "PixelifySans",
-                  paddingVertical: 8,
-                  minWidth: "50%",
-                  fontSize: 20,
-                }}
               />
               <View>
                 <TextInput
-                  className={`mx-16 rounded border border-zinc-800 pl-2 text-xl  dark:border-zinc-100  ${
-                    isAutofilled ? "text-black" : "text-black dark:text-zinc-50"
-                  }`}
+                  style={[
+                    styles.input,
+                    styles.xl,
+                    isAutofilled && { color: "black" },
+                  ]}
                   placeholderTextColor={
-                    colorScheme == "light" ? "#d4d4d8" : "#71717a"
+                    uiStore.colorScheme == "light" ? "#d4d4d8" : "#71717a"
                   }
                   onChangeText={(text) => setPassword(text)}
                   placeholder={"Enter Password..."}
@@ -267,25 +250,21 @@ const SignUpScreen = observer(() => {
                   passwordRules={
                     "minlength: 8; required: lower; required: upper; required: digit,[oqtu-#&'()+,./;?@]; required: [-];"
                   }
-                  style={{
-                    fontFamily: "PixelifySans",
-                    paddingVertical: 8,
-                    minWidth: "50%",
-                    fontSize: 20,
-                  }}
                 />
-                <Text className="text-center">
+                <Text style={{ textAlign: "center" }}>
                   Password must contain at least 8 characters, a lower-case,
                   upper-case, and either a number or special character(!@$%
                   etc.)
                 </Text>
               </View>
               <TextInput
-                className={`mx-16 rounded border border-zinc-800 pl-2 text-xl  dark:border-zinc-100  ${
-                  isAutofilled ? "text-black" : "text-black dark:text-zinc-50"
-                }`}
+                style={[
+                  styles.input,
+                  styles.xl,
+                  isAutofilled && { color: "black" },
+                ]}
                 placeholderTextColor={
-                  colorScheme == "light" ? "#d4d4d8" : "#71717a"
+                  uiStore.colorScheme == "light" ? "#d4d4d8" : "#71717a"
                 }
                 onChangeText={(text) => setPasswordConf(text)}
                 placeholder={"Confirm Password..."}
@@ -297,31 +276,25 @@ const SignUpScreen = observer(() => {
                 passwordRules={
                   "minlength: 8; required: lower; required: upper; required: digit,[oqtu-#&'()+,./;?@]; required: [-];"
                 }
-                style={{
-                  fontFamily: "PixelifySans",
-                  paddingVertical: 8,
-                  minWidth: "50%",
-                  fontSize: 20,
-                }}
               />
               {shortPassword && (
-                <Text className="text-center" style={{ color: "#ef4444" }}>
+                <Text style={{ textAlign: "center", color: "#ef4444" }}>
                   Password too short, must be at least 8 chars
                 </Text>
               )}
               {simplePassword && (
-                <Text className="text-center" style={{ color: "#ef4444" }}>
+                <Text style={{ textAlign: "center", color: "#ef4444" }}>
                   Password must contain a lower-case, upper-case, and either a
                   number or special character(!@$% etc.)
                 </Text>
               )}
               {passwordMismatch && (
-                <Text className="text-center" style={{ color: "#ef4444" }}>
+                <Text style={{ textAlign: "center", color: "#ef4444" }}>
                   Passwords must match!
                 </Text>
               )}
               {error && (
-                <Text className="text-center" style={{ color: "#ef4444" }}>
+                <Text style={{ textAlign: "center", color: "#ef4444" }}>
                   {error}
                 </Text>
               )}
@@ -342,9 +315,11 @@ const SignUpScreen = observer(() => {
                   setUsingEmail(false);
                   vibration({ essential: true, style: "medium" });
                 }}
-                className="m-8"
+                style={{ margin: 32 }}
               >
-                <Text className="underline" style={{ color: "#3b82f6" }}>
+                <Text
+                  style={{ textDecorationLine: "underline", color: "#3b82f6" }}
+                >
                   Use a provider instead
                 </Text>
               </Pressable>
@@ -352,8 +327,8 @@ const SignUpScreen = observer(() => {
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
       ) : (
-        <View className="pt-[25vh]">
-          <Text className="text-center text-2xl">
+        <View style={{ paddingTop: "25vh" }}>
+          <Text style={{ textAlign: "center", fontSize: 24 }}>
             A verification email has been sent! Check your email (and spam
             folder) to complete registration.
           </Text>

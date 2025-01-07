@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Foundation, MaterialCommunityIcons } from "@expo/vector-icons";
 import { type GestureResponderEvent, Pressable } from "react-native";
 import { useVibration } from "../../hooks/generic";
 
@@ -32,7 +32,7 @@ export default function OptionsLayout() {
         name="app"
         options={{
           headerShown: false,
-          title: "App Settings",
+          title: "App",
           tabBarLabelStyle: { fontFamily: "PixelifySans" },
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
@@ -47,7 +47,7 @@ export default function OptionsLayout() {
         name="game"
         options={{
           headerShown: false,
-          title: "Game Settings",
+          title: "Game",
           tabBarLabelStyle: { fontFamily: "PixelifySans" },
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
@@ -55,6 +55,17 @@ export default function OptionsLayout() {
               size={24}
               color={color}
             />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="audio"
+        options={{
+          headerShown: false,
+          title: "Audio",
+          tabBarLabelStyle: { fontFamily: "PixelifySans" },
+          tabBarIcon: ({ color }) => (
+            <Foundation name="sound" size={24} color={color} />
           ),
         }}
       />

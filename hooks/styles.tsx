@@ -1,97 +1,122 @@
-import { StyleSheet, useColorScheme } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { useRootStore } from "./stores";
 import Colors from "../constants/Colors";
 
 export const useStyles = () => {
-  const colorScheme = useColorScheme();
   const { uiStore } = useRootStore();
   const { height, width, greater, lesser } = uiStore.dimensions;
 
-  const isDark = colorScheme === "dark";
-  const dark = Colors.dark;
-  const light = Colors.light;
-
-  const textXl = { fontSize: 20, lineHeight: 28 };
-  const textLg = { fontSize: 18, lineHeight: 28 };
-  const text2xl = { fontSize: 24, lineHeight: 32 };
-  const text3xl = { fontSize: 30, lineHeight: 36 };
-
-  const bold = { fontWeight: 700 as const };
-  const italic = { fontStyle: "italic" as const };
+  const platform = Platform.OS;
+  const theme = Colors[uiStore.colorScheme];
 
   const border = {
     borderWidth: 1,
-    borderColor: isDark ? dark.border : light.border,
+    borderColor: Colors[uiStore.colorScheme].border,
   };
+
+  const raisedAbsolutePosition = {
+    position: "absolute",
+    zIndex: 10,
+  } as const;
+
+  const roundedBorder = {
+    borderWidth: 1,
+    ...radius.md,
+    borderColor: theme.border,
+  } as const;
+
+  const centeredContainer = {
+    ...flex.columnCenter,
+    flex: 1,
+  } as const;
+
+  const themedCard = {
+    justifyContent: "space-between",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 } as const,
+    shadowOpacity: platform === "android" ? 0.9 : 0.2,
+    shadowRadius: 1.5,
+    elevation: 3,
+    ...(uiStore.colorScheme === "dark" &&
+      ({
+        borderWidth: 1,
+        borderColor: "#71717a",
+      } as const)),
+  } as const;
 
   return StyleSheet.create({
     // ---- Generics ---- //
-    textLg,
-    textXl,
-    text2xl,
-    text3xl,
-    bold,
-    italic,
+    ...flex,
+    ...tw,
+    ...radius,
+    ...text,
+    ...font,
     border,
+    themedCard,
+    roundedBorder,
+    raisedAbsolutePosition,
+    textCenter: {
+      textAlign: "center",
+    },
+    itemsCenter: {
+      alignItems: "center",
+    },
+    centeredContainer,
     // ---- New Game ---- //
     newGameContainer: {
-      flex: 1,
-      alignItems: "center",
+      ...centeredContainer,
+      justifyContent: "flex-start",
       paddingHorizontal: 0.06 * width,
-    },
+    } as const,
+
     newGameHeader: {
-      ...text2xl,
+      ...text["2xl"],
       textAlign: "center",
       paddingTop: 0.02 * height,
-    },
-    tutorialResetButton: {
-      marginHorizontal: "auto",
-      marginTop: 8,
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: isDark ? "#fafafa" : "#27272a",
-      paddingHorizontal: 24,
-      paddingVertical: 8,
-    },
+    } as const,
+
     tutorialButtonContainer: {
-      position: "absolute",
-      marginLeft: 16,
-      marginTop: 16,
-    },
+      ...raisedAbsolutePosition,
+      ...tw.ml4,
+      ...tw.mt4,
+    } as const,
     // ---- New Game - Class Select ---- //
     classSelectButton: {
       marginHorizontal: "auto",
       marginTop: 8,
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: isDark ? "#fafafa" : "#27272a",
+      ...roundedBorder,
+      ...radius.lg,
       paddingHorizontal: 24,
       paddingVertical: 8,
     },
+
     classDescriptionText: {
       marginTop: height * 0.02,
       height: 64,
       textAlign: "center",
-    },
+    } as const,
 
     // ---- New Game - Blessing Select ---- //
     blessingClassContainer: {
       alignItems: "center",
       justifyContent: "space-evenly",
       paddingVertical: 24,
-    },
+    } as const,
     blessingRow: {
       flexDirection: "row",
       justifyContent: "space-evenly",
       marginBottom: 32,
-    },
+    } as const,
     blessingPressable: {
       borderWidth: 1,
       width: "100%",
       height: "100%",
       alignItems: "center",
       justifyContent: "center",
-    },
+    } as const,
 
     // ---- New Game - Sex Select ---- //
     sexSelectionRow: {
@@ -99,12 +124,12 @@ export const useStyles = () => {
       flexDirection: "row",
       width: "100%",
       justifyContent: "space-evenly",
-    },
+    } as const,
     sexOption: {
       width: "33%",
       paddingVertical: 16,
       borderWidth: 1,
-    },
+    } as const,
 
     // ---- New Game - Name Select ---- //
     nameContainer: {
@@ -113,7 +138,7 @@ export const useStyles = () => {
       paddingBottom: 64,
       alignItems: "center",
       justifyContent: "center",
-    },
+    } as const,
     nameInput: {
       borderRadius: 4,
       borderWidth: 1,
@@ -121,6 +146,1651 @@ export const useStyles = () => {
       paddingVertical: 8,
       fontFamily: "PixelifySans",
       fontSize: 20,
+    } as const,
+
+    // ---- Options ---- //
+    optionContainer: {
+      borderRadius: 4,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      marginLeft: -48,
+      marginTop: 12,
+    } as const,
+    optionRow: {
+      flexDirection: "row",
+      marginBottom: 16,
+      marginLeft: 40,
+    } as const,
+    optionCircle: {
+      marginVertical: "auto",
+      marginRight: 16,
+      height: 16,
+      width: 16,
+      borderRadius: 9999,
+      borderWidth: 1,
+      borderColor: theme.border,
+    } as const,
+    //optionCircleSelected: {
+    //backgroundColor: uiStore.colorScheme === "dark" ? "#2563eb" : "#3b82f6",
+    //} as const,
+    modalTextInput: {
+      marginHorizontal: 16,
+      marginTop: 24,
+      borderWidth: 1,
+      borderRadius: 4,
+      paddingLeft: 8,
+      fontFamily: "PixelifySans",
+      paddingVertical: 8,
+      minWidth: "50%",
+      fontSize: 20,
+      borderColor: theme.border,
+      color: theme.accent,
+    } as const,
+    settingsContainer: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 16,
+      paddingTop: 48,
+    } as const,
+    //modalContainer: {
+    //padding: 8,
+    //} as const,
+    remoteSaveContainer: {
+      width: "100%",
+      backgroundColor: uiStore.colorScheme === "dark" ? "#3f3f46" : "#d4d4d4",
+      ...roundedBorder,
+      paddingBottom: 8,
+    } as const,
+    remoteSaveDeleteButton: {
+      width: 32,
+      height: 32,
+      marginBottom: -32,
+      zIndex: 10,
+      alignItems: "center",
+      justifyContent: "center",
+      margin: 4,
+      borderWidth: 1,
+      backgroundColor: theme.background,
+      borderRadius: 9999,
+      borderColor: theme.border,
+    } as const,
+    remoteSaveInfo: {
+      flexDirection: "column",
+      width: "100%",
+      alignItems: "flex-end",
+      paddingVertical: 8,
+    } as const,
+    //buttonRow: {
+    //...flex.rowEvenly,
+    //width: "100%",
+    //},
+    //optionSwitch: {
+    //flexDirection: "row",
+    //marginHorizontal: "auto",
+    //},
+    gameSettingsContainer: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: 16,
+    } as const,
+    //tutorialResetConfirmText: {
+    //textAlign: "center",
+    //fontSize: 18,
+    //} as const,
+    //tutorialResetButtonRow: {
+    //flexDirection: "row",
+    //} as const,
+    tutorialResetButton: {
+      marginHorizontal: "auto",
+      marginTop: 8,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: theme.border,
+      paddingHorizontal: 24,
+      paddingVertical: 8,
+    } as const,
+    healthWarningContainer: {
+      marginTop: 12,
+      borderRadius: 4,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+    } as const,
+    healthWarningOption: {
+      marginBottom: 8,
+      marginLeft: 40,
+      flexDirection: "row",
+    } as const,
+    //tutorialSwitchRow: {
+    //marginHorizontal: "auto",
+    //flexDirection: "row",
+    //} as const,
+    codexInput: {
+      marginHorizontal: 64,
+      marginVertical: 24,
+      borderRadius: 4,
+      borderWidth: 1,
+      borderColor: theme.border,
+      paddingLeft: 8,
+      fontSize: 20,
+      color: theme.accent,
+      fontFamily: "PixelifySans",
+      paddingVertical: 8,
+      minWidth: "50%",
+    } as const,
+    categoryContainer: {
+      marginHorizontal: 8,
+      marginVertical: 24,
+      width: "100%",
+      borderBottomWidth: 0.5,
+      borderBottomColor: theme.border,
+      paddingVertical: 8,
+      maxWidth: 512,
+    } as const,
+    categoryContent: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingHorizontal: 8,
+    } as const,
+
+    // ---- Main Tabs ---- //
+    // ---- Main Tabs - Home ---- //
+    inventoryContainer: {
+      flex: 1,
+      justifyContent: "space-between",
+      position: "relative",
+      zIndex: 10,
+      height: "100%",
+    } as const,
+    inventorySlot: {
+      position: "absolute",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    stashButton: {
+      zIndex: 10,
+      borderRadius: 8,
+      marginTop: -64,
+      paddingHorizontal: 16,
+      width: 80,
+      height: 80,
+    } as const,
+    equipmentContainer: {
+      paddingBottom: 8,
+      marginVertical: "auto",
+      zIndex: 10,
+    } as const,
+    equipmentTopRow: {
+      ...flex.rowBetween,
+      alignItems: "center",
+      width: "100%",
+    } as const,
+    //equipmentMiddleRow: {
+    //...flex.rowEvenly,
+    //marginTop: -12,
+    //} as const,
+    equipmentSlotContainer: {
+      zIndex: 50,
+      marginHorizontal: "auto",
+      borderWidth: 1,
+      borderColor: "#a1a1aa",
+      borderRadius: 8,
+    } as const,
+    twoHandedSlot: {
+      marginHorizontal: "auto",
+      zIndex: 10,
+      alignItems: "center",
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: "#a1a1aa",
+    } as const,
+    emptySlot: {
+      marginHorizontal: "auto",
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: "#a1a1aa",
+    } as const,
+
+    // ---- Inventory ---- //
+    //inventoryContainerChild: {
+    //zIndex: 10,
+    //maxHeight: "60%",
+    //} as const,
+    //shopInventoryContainer: {
+    //zIndex: 10,
+    //marginLeft: -8,
+    //} as const,
+    inventoryPanel: {
+      borderWidth: 1,
+      borderColor: "#52525b",
+      borderRadius: 8,
+      marginHorizontal: 8,
+      position: "relative",
+      height: "100%",
+    } as const,
+    keyItemsText: {
+      position: "absolute",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 8,
+      top: "40%",
+    } as const,
+    slotBackground: {
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: theme.secondary,
+      zIndex: 0,
+    } as const,
+    keyItemPanel: {
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: "#52525b",
+      position: "relative",
+      marginHorizontal: 8,
+      height: greater === height ? "100%" : "50%",
+    } as const,
+    shopKeyItemPanel: {
+      marginTop: 16,
+      height: "90%",
+    } as const,
+
+    inventoryItemContainer: {
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 8,
+      backgroundColor: "#a1a1aa",
+      zIndex: 10,
+    } as const,
+    stackIndicator: {
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      borderRadius: 4,
+      paddingHorizontal: 4,
+    } as const,
+    projectedImageContainer: {
+      position: "absolute",
+      zIndex: 1000,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 8,
+      backgroundColor: "#a1a1aa",
+    } as const,
+
+    // ---- Main Tabs - Spells ---- //
+    proficiencyContainer: {
+      marginVertical: 8,
+      paddingHorizontal: 32,
+      width: "100%",
+    } as const,
+    noSpellsContainer: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    } as const,
+    spellContainer: {
+      marginVertical: 4,
+      marginHorizontal: "auto",
+    } as const,
+    // ---- Main Tabs - Labor ---- //
+    rejectionModalText: {
+      marginVertical: 24,
+      textAlign: "center",
+      fontSize: 18,
+      lineHeight: 28,
+    } as const,
+    qualificationText: {
+      paddingVertical: 4,
+      fontSize: 18,
+      lineHeight: 28,
+    } as const,
+    laborTaskTitle: {
+      fontWeight: "700",
+      marginVertical: "auto",
+      width: "66%",
+      fontSize: 20,
+      color: theme.text,
+    } as const,
+    costContainer: {
+      marginVertical: "auto",
+      marginBottom: -32,
+      marginTop: 32,
+      width: "33%",
+    } as const,
+    costRow: {
+      ...flex.rowEvenly,
+      width: "100%",
+      alignItems: "center",
+    } as const,
+
+    // ---- Main Tabs - Dungeon ---- //
+    warningContainer: {
+      shadowColor: "#000",
+      width: "100%",
+      position: "absolute",
+      zIndex: 10,
+      paddingHorizontal: 32,
+    } as const,
+    pageIndicator: {
+      position: "absolute",
+      right: 16,
+      zIndex: 10,
+    } as const,
+    dungeonScrollView: {
+      marginTop: -80,
+    } as const,
+    dungeonInstanceCard: {
+      flex: 1,
+      justifyContent: "center",
+      marginHorizontal: 32,
+    } as const,
+    dungeonInstanceTitle: {
+      textAlign: "center",
+      fontSize: 24,
+      lineHeight: 32,
+      letterSpacing: 0.1,
+      textDecorationLine: "underline",
+    } as const,
+    levelContainer: {
+      marginVertical: 8,
+      borderRadius: 8,
+      paddingHorizontal: 24,
+      paddingVertical: 16,
+    } as const,
+
+    // ---- Main Tabs - Shop ---- //
+    shopCard: {
+      height: 384,
+      width: "50%",
+    } as const,
+    shopCardInner: {
+      margin: 8,
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "space-between",
+      borderRadius: 12,
+      borderWidth: 1,
+      padding: 16,
+    } as const,
+    enterButtonInner: {
+      paddingHorizontal: 32,
+      paddingVertical: 12,
+      borderRadius: 8,
+    } as const,
+    // ---- Main Tabs - Medical ---- //
+    medicalOptionContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+    } as const,
+
+    medicalOptionTitle: {
+      fontWeight: "700",
+      marginVertical: "auto",
+      width: "60%",
+      fontSize: 20,
+      color: theme.text,
+    } as const,
+
+    medicalCostContainer: {
+      marginBottom: -16,
+      marginTop: 16,
+      width: "40%",
+    } as const,
+    // ---- Death Screen ---- //
+    deathMessage: {
+      ...text["3xl"],
+      ...font.bold,
+      textAlign: "center",
+      letterSpacing: 3,
+      color: "#ef4444",
+      ...tw.py8,
+    },
+    childrenContainer: {
+      ...flex.columnCenter,
+      height: tw_base[64],
+    },
+    childCard: {
+      ...themedCard,
+      ...radius.xl,
+      ...tw.p1,
+    },
+    newLifeButton: {
+      ...tw.mt2,
+      ...border,
+      ...tw.px4,
+      ...tw.py2,
+    },
+    // ---- Stash ---- //
+    tabsContainer: {
+      flexDirection: "row",
+      justifyContent: "center",
+      padding: 8,
+    } as const,
+
+    tabButton: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      marginHorizontal: 4,
+      borderRadius: 8,
+    } as const,
+
+    //stashPage: {
+    //flex: 1,
+    //paddingHorizontal: 8,
+    //} as const,
+
+    stashPageOverlay: {
+      position: "absolute",
+      width: "100%",
+      height: "100%",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: -1,
+    } as const,
+
+    stashPageText: {
+      fontSize: 20,
+      letterSpacing: 2,
+      opacity: 0.7,
+    } as const,
+
+    stashContainer: {
+      borderWidth: 1,
+      borderColor: "#52525b",
+      borderRadius: 8,
+      position: "relative",
+      flex: 1,
+    } as const,
+
+    strikeAroundContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+    } as const,
+
+    strikeAroundLine: {
+      flex: 1,
+      borderTopWidth: 1,
+      borderTopColor: "#6b7280",
+    } as const,
+
+    strikeAroundContent: {
+      marginHorizontal: 10,
+    } as const,
+
+    modalContent: {
+      marginHorizontal: "auto",
+      borderRadius: 12,
+      shadowColor: "rgba(0, 0, 0, 0.25)",
+      shadowRadius: 5,
+      elevation: 2,
+    } as const,
+    errorContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      paddingVertical: 96,
+    } as const,
+
+    //errorInnerContainer: {
+    //flex: 1,
+    //justifyContent: "space-evenly",
+    //} as const,
+
+    //dieContainer: {
+    //width: "100%",
+    //marginHorizontal: "auto",
+    //} as const,
+
+    flatButtonContainer: {
+      marginHorizontal: "auto",
+      borderRadius: 12,
+      borderWidth: 1,
+      paddingHorizontal: 24,
+      paddingVertical: 8,
+    } as const,
+
+    flatButtonText: {
+      textAlign: "center",
+      letterSpacing: 2,
+    } as const,
+
+    flatLinkContainer: {
+      marginHorizontal: "auto",
+      borderRadius: 12,
+      borderWidth: 1,
+      paddingHorizontal: 24,
+      paddingVertical: 8,
+    } as const,
+
+    // ---- Player Status ---- //
+    playerStatusContainer: {
+      position: "absolute",
+      zIndex: 10,
+      width: "100%",
+    } as const,
+
+    playerStatusContent: {
+      flex: 1,
+      paddingHorizontal: 8,
+    } as const,
+
+    statsRow: {
+      flexDirection: "row",
+      justifyContent: "space-evenly",
+      paddingVertical: 4,
+    } as const,
+
+    //statBlock: {
+    //width: "31%",
+    //} as const,
+
+    //statHeader: {
+    //flexDirection: "row",
+    //justifyContent: "space-between",
+    //} as const,
+
+    //conditionRow: {
+    //flexDirection: "row",
+    //justifyContent: "space-around",
+    //} as const,
+
+    conditionIcon: {
+      marginHorizontal: 2,
+      flex: 1,
+      alignItems: "center",
+    } as const,
+
+    detailedConditionContainer: {
+      maxHeight: 256,
+    } as const,
+
+    detailedConditionCard: {
+      marginVertical: 4,
+      borderRadius: 8,
+      paddingVertical: 8,
+      backgroundColor: uiStore.colorScheme === "dark" ? "#52525b" : "#e4e4e7",
+    } as const,
+
+    //conditionHeader: {
+    //flexDirection: "row",
+    //justifyContent: "space-evenly",
+    //} as const,
+
+    respecButton: {
+      height: 30,
+      width: 30,
+      alignItems: "center",
+      borderRadius: 6,
+    } as const,
+
+    //statsContainer: {
+    //flexDirection: "row",
+    //marginTop: 8,
+    //} as const,
+
+    equipmentStatsSection: {
+      width: "50%",
+      marginHorizontal: 4,
+    } as const,
+    // ---- Attack Details ---- //
+    attackDetailsContainer: {
+      flex: 1,
+      width: "100%",
+      marginVertical: 4,
+      alignItems: "center",
+      backgroundColor: uiStore.colorScheme === "dark" ? "#3f3f46" : "#d4d4d8",
+      borderWidth: 1,
+      borderRadius: 4,
+      borderColor: uiStore.colorScheme === "dark" ? "#fafafa" : "#18181b",
+      paddingBottom: 8,
+    } as const,
+
+    attackEffectContainer: {
+      flex: 1,
+      width: "100%",
+      alignItems: "center",
+    } as const,
+
+    attackDamageBox: {
+      marginVertical: 4,
+      width: "83.333%",
+      alignItems: "center",
+      borderRadius: 6,
+      borderWidth: 1,
+      borderColor: uiStore.colorScheme === "dark" ? "#fafafa" : "#27272a",
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      backgroundColor: uiStore.colorScheme === "dark" ? "#18181b" : "#fafafa",
+    } as const,
+
+    targetSelectionHeader: {
+      textAlign: "center",
+      fontSize: 24,
+      lineHeight: 32,
+    } as const,
+
+    dungeonSpecialEncounter: {
+      flex: 1,
+      alignItems: "flex-end",
+      paddingHorizontal: 24,
+    } as const,
+
+    //dungeonMainContainer: {
+    //flex: 1,
+    //justifyContent: "space-between",
+    //} as const,
+
+    minionContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-evenly",
+      paddingHorizontal: 16,
+    } as const,
+
+    //minionBlock: {
+    //paddingVertical: 4,
+    //} as const,
+
+    //statsDisplayOverlay: {
+    //position: "absolute",
+    //zIndex: 10,
+    //} as const,
+
+    loadingContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    } as const,
+
+    battleTabContainer: {
+      width: "100%",
+      height: "100%",
+      paddingHorizontal: 8,
+    } as const,
+
+    attackCardContainer: {
+      marginTop: 8,
+      borderRadius: 8,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderWidth: 1,
+    } as const,
+
+    //attackCardContent: {
+    //flexDirection: "row",
+    //justifyContent: "space-between",
+    //} as const,
+
+    //attackInfoContainer: {
+    //flexDirection: "column",
+    //justifyContent: "center",
+    //} as const,
+
+    //spellCostContainer: {
+    //flexDirection: "row",
+    //} as const,
+
+    //energyIcon: {
+    //marginVertical: "auto",
+    //paddingLeft: 4,
+    //} as const,
+
+    actionButton: {
+      marginHorizontal: 8,
+      marginVertical: "auto",
+      borderRadius: 4,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 1,
+    } as const,
+
+    passCardContainer: {
+      flexDirection: "row",
+      marginTop: 8,
+      justifyContent: "space-between",
+      borderRadius: 8,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderWidth: 1,
+    } as const,
+
+    //regenContainer: {
+    //alignItems: "center",
+    //flexDirection: "row",
+    //} as const,
+
+    stunnedContainer: {
+      marginVertical: "auto",
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+    } as const,
+
+    stunnedText: {
+      textAlign: "center",
+      fontSize: 24,
+      letterSpacing: 1,
+    } as const,
+
+    //logContainer: {
+    //flex: 1,
+    //paddingHorizontal: 8,
+    //} as const,
+
+    logContent: {
+      flex: 1,
+      paddingLeft: 4,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: "#52525b",
+    } as const,
+
+    //logText: {
+    //paddingVertical: 4,
+    //} as const,
+    battleTabControls: {
+      marginBottom: -4,
+      flexDirection: "row",
+      width: "100%",
+      justifyContent: "space-around",
+    } as const,
+
+    //battleTabButton: {
+    //width: "33.333%",
+    //paddingVertical: 16,
+    //} as const,
+
+    //droppedItemHeader: {
+    //marginTop: 16,
+    //...flex.rowCenter,
+    //} as const,
+
+    inventoryFullText: {
+      ...text.lg,
+      textAlign: "center",
+      color: "#ef4444",
+    } as const,
+
+    droppedItemRow: {
+      marginTop: 8,
+      ...flex.rowBetween,
+      alignItems: "center",
+      padding: 8,
+      borderRadius: 8,
+    } as const,
+    //itemIconContainer: {
+    //...flex.rowCenter,
+    //alignItems: "center",
+    //} as const,
+    itemRarityDot: {
+      height: 12,
+      width: 12,
+      borderRadius: 9999,
+      marginLeft: 4,
+    } as const,
+
+    itemNameText: {
+      marginVertical: "auto",
+      marginLeft: 8,
+      width: "50%",
+    } as const,
+    //enemyHealthPopUpContainer: {
+    //height: 24,
+    //} as const,
+
+    //enemyConditionsContainer: {
+    //height: 32,
+    //flexDirection: "row",
+    //} as const,
+
+    //conditionIconContainer: {
+    //marginHorizontal: 8,
+    //alignItems: "center",
+    //} as const,
+
+    //enemyDisplayContainer: {
+    //flex: 1,
+    //paddingTop: 16,
+    //} as const,
+
+    enemyRow: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-evenly",
+    } as const,
+
+    enemyInfoContainer: {
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      minWidth: "40%",
+      maxWidth: "60%",
+    } as const,
+    textAnimationContainer: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      justifyContent: "center",
+      alignItems: "center",
+    } as const,
+    minionRow: {
+      marginHorizontal: 16,
+      flexDirection: "row",
+      flexWrap: "wrap",
+    } as const,
+    dungeonControlsContainer: {
+      flex: 1,
+      alignItems: "center",
+      width: "100%",
+      justifyContent: "center",
+    } as const,
+    arrowButtonRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      width: "100%",
+    } as const,
+    fleeButtonRow: {
+      ...flex.rowEvenly,
+      width: "100%",
+      paddingTop: 32,
+    } as const,
+    leftBehindItemRow: {
+      marginVertical: 8,
+      flexDirection: "row",
+      justifyContent: "space-between",
+    } as const,
+    targetButton: {
+      margin: 16,
+      borderRadius: 8,
+      borderWidth: 1,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    } as const,
+    investmentButton: {
+      marginHorizontal: "auto",
+      marginTop: 8,
+      ...roundedBorder,
+      paddingHorizontal: 24,
+      paddingVertical: 8,
+    },
+    pressedStyle: {
+      transform: [{ scale: 0.95 }],
+      opacity: 0.5,
+    },
+    activeButton: {
+      backgroundColor: theme.background,
+      shadowColor: theme.shadow,
+      elevation: 1,
+      shadowOpacity: 0.1,
+      shadowRadius: 5,
+    },
+    disabledButton: {
+      backgroundColor: theme.secondary,
+      opacity: 0.5,
+    },
+    greetingContainer: {
+      ...tw.p2,
+      ...radius.lg,
+      ...raisedAbsolutePosition,
+      borderColor: theme.tint,
+      backgroundColor: theme.background,
+    },
+    sellJunkButton: {
+      ...tw.ml2,
+      ...tw.px6,
+      ...radius.xl,
+      ...border,
+      borderColor: theme.border,
+    },
+    shopKeeperSection: {
+      ...tw.my4,
+      ...tw.px1,
+      width: "33%",
+    },
+    shopsInventoryContainer: {
+      flex: 1,
+      ...radius.lg,
+      borderLeftWidth: 1,
+      borderBottomWidth: 1,
+      borderColor: theme.secondary,
+    },
+    playerInventorySection: {
+      flex: 1,
+      ...tw.mx2,
+      ...tw.mt4,
+    },
+    statsDisplayContainer: {
+      ...flex.columnCenter,
+      ...radius.md,
+      borderWidth: 1,
+      borderColor: theme.secondary,
+      ...tw.p4,
+    },
+    closeButton: {
+      position: "absolute",
+      borderColor: theme.secondary,
+      borderTopRightRadius: 12,
+      borderBottomLeftRadius: 12,
+      ...tw.px2,
+      ...tw.py1,
+    },
+    consumableEffectContainer: {
+      borderRadius: 6,
+      ...tw.p1,
+    },
+    poisonContainer: {
+      borderRadius: 6,
+      ...tw.p1,
+      backgroundColor: uiStore.colorScheme === "dark" ? "#388E3C" : "#A5D6A7",
+    },
+    storyModalContainer: {
+      maxHeight: "75%",
+      marginVertical: "auto",
+    },
+    storyContainer: {
+      ...tw.pr4,
+      ...tw.py4,
+      height: "100%",
+    },
+    storyHeaderContainer: {
+      borderBottomWidth: 1,
+      borderColor: theme.secondary,
+      ...tw.mb4,
+      ...tw.ml4,
+    },
+    healthEffectContainer: {
+      borderRadius: 6,
+      ...tw.p1,
+      backgroundColor: theme.health,
+    },
+    manaEffectContainer: {
+      borderRadius: 6,
+      ...tw.p1,
+      backgroundColor: theme.mana,
+    },
+    sanityEffectContainer: {
+      borderRadius: 6,
+      ...tw.p1,
+      backgroundColor: theme.sanity,
+    },
+    nextButton: {
+      marginHorizontal: "auto",
+      marginTop: 8,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: uiStore.colorScheme === "dark" ? theme.border : "#27272a",
+      paddingHorizontal: 24,
+      paddingVertical: 8,
+    },
+    titleText: greater > 768 ? text["3xl"] : text["2xl"],
+    bodyText: greater > 768 ? text.xl : text.lg,
+    classContainer: {
+      ...flex.columnCenter,
+      justifyContent: "space-evenly",
+      ...tw.py6,
+    },
+    blessingContainer: {
+      ...flex.columnCenter,
+      height: "100%",
+      width: "100%",
+      borderWidth: 1,
+      borderRadius: 8,
+    },
+    classPressable: {
+      ...flex.columnCenter,
+      borderWidth: 1,
+      borderRadius: 8,
+      height: "100%",
+      width: "100%",
+    },
+    // ---- Auth --- //
+    authProviderContainer: {
+      flexDirection: "column",
+      alignItems: "center",
+      marginTop: 0.2 * height,
+      paddingHorizontal: 16,
+    },
+    providerButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      borderWidth: 1,
+      borderColor: uiStore.colorScheme == "dark" ? "#fafafa" : "#27272a",
+      backgroundColor: uiStore.colorScheme == "dark" ? "#27272a" : "#ffffff",
+      paddingHorizontal: 12,
+      marginTop: -8,
+      marginBottom: 8,
+      paddingVertical: 8,
+      borderRadius: 5,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.2,
+      shadowRadius: 1.41,
+      elevation: 2,
+      width: 230,
+    },
+    input: {
+      marginHorizontal: 64,
+      borderRadius: 4,
+      borderWidth: 1,
+      borderColor: uiStore.colorScheme == "dark" ? "#fafafa" : "#27272a",
+      paddingLeft: 8,
+      paddingVertical: 8,
+      minWidth: "50%",
+      fontFamily: "PixelifySans",
+    },
+
+    // ---- Spell Details ---- //
+    spellCard: {
+      borderRadius: 8,
+      shadowOpacity: 0.25,
+      shadowRadius: 5,
+      elevation: 6,
+      backgroundColor: uiStore.colorScheme == "light" ? "#fafafa" : "#27272a",
+      width: width * 0.75,
+    },
+    spellHeader: {
+      ...flex.rowBetween,
+      ...roundedBorder,
+      padding: 8,
+      ...(uiStore.colorScheme == "dark" && {
+        borderWidth: 1,
+      }),
+    },
+    // ---- Activity Card ---- //
+    activityCard: {
+      margin: 8,
+      borderRadius: 12,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 3,
+        height: 1,
+      },
+      elevation: 3,
+      shadowOpacity: 0.2,
+      backgroundColor: uiStore.colorScheme == "light" ? "#fafafa" : "#27272a",
+      shadowRadius: 3,
+    },
+    activityCardInner: {
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      ...(uiStore.colorScheme === "dark" && {
+        borderWidth: 1,
+        borderColor: "#71717a",
+      }),
+    },
+    characterCard: {
+      width: "48%",
+      marginVertical: 8,
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: "#a1a1aa",
+      borderRadius: 4,
+    },
+    characterGrid: {
+      paddingVertical: 12,
+      flexDirection: "row",
+      flexWrap: "wrap",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
     },
   });
+};
+
+export const tw_base = {
+  0: 0,
+  1: 4,
+  2: 8,
+  3: 12,
+  4: 16,
+  5: 20,
+  6: 24,
+  7: 28,
+  8: 32,
+  9: 36,
+  10: 40,
+  11: 44,
+  12: 48,
+  14: 56,
+  16: 64,
+  20: 80,
+  24: 96,
+  28: 112,
+  32: 128,
+  36: 144,
+  40: 160,
+  44: 176,
+  48: 192,
+  52: 208,
+  56: 224,
+  60: 240,
+  64: 256,
+  72: 288,
+  80: 320,
+  96: 384,
+} as const;
+
+export const tw = {
+  m0: { margin: 0 },
+  m1: { margin: 4 },
+  m2: { margin: 8 },
+  m3: { margin: 12 },
+  m4: { margin: 16 },
+  m5: { margin: 20 },
+  m6: { margin: 24 },
+  m7: { margin: 28 },
+  m8: { margin: 32 },
+  m9: { margin: 36 },
+  m10: { margin: 40 },
+  m11: { margin: 44 },
+  m12: { margin: 48 },
+  m14: { margin: 56 },
+  m16: { margin: 64 },
+  m20: { margin: 80 },
+  m24: { margin: 96 },
+  m28: { margin: 112 },
+  m32: { margin: 128 },
+  m36: { margin: 144 },
+  m40: { margin: 160 },
+  m44: { margin: 176 },
+  m48: { margin: 192 },
+  m52: { margin: 208 },
+  m56: { margin: 224 },
+  m60: { margin: 240 },
+  m64: { margin: 256 },
+  m72: { margin: 288 },
+  m80: { margin: 320 },
+  m96: { margin: 384 },
+
+  mt0: { marginTop: 0 },
+  mt1: { marginTop: 4 },
+  mt2: { marginTop: 8 },
+  mt3: { marginTop: 12 },
+  mt4: { marginTop: 16 },
+  mt5: { marginTop: 20 },
+  mt6: { marginTop: 24 },
+  mt7: { marginTop: 28 },
+  mt8: { marginTop: 32 },
+  mt9: { marginTop: 36 },
+  mt10: { marginTop: 40 },
+  mt11: { marginTop: 44 },
+  mt12: { marginTop: 48 },
+  mt14: { marginTop: 56 },
+  mt16: { marginTop: 64 },
+  mt20: { marginTop: 80 },
+  mt24: { marginTop: 96 },
+  mt28: { marginTop: 112 },
+  mt32: { marginTop: 128 },
+  mt36: { marginTop: 144 },
+  mt40: { marginTop: 160 },
+  mt44: { marginTop: 176 },
+  mt48: { marginTop: 192 },
+  mt52: { marginTop: 208 },
+  mt56: { marginTop: 224 },
+  mt60: { marginTop: 240 },
+  mt64: { marginTop: 256 },
+  mt72: { marginTop: 288 },
+  mt80: { marginTop: 320 },
+  mt96: { marginTop: 384 },
+
+  mb0: { marginBottom: 0 },
+  mb1: { marginBottom: 4 },
+  mb2: { marginBottom: 8 },
+  mb3: { marginBottom: 12 },
+  mb4: { marginBottom: 16 },
+  mb5: { marginBottom: 20 },
+  mb6: { marginBottom: 24 },
+  mb7: { marginBottom: 28 },
+  mb8: { marginBottom: 32 },
+  mb9: { marginBottom: 36 },
+  mb10: { marginBottom: 40 },
+  mb11: { marginBottom: 44 },
+  mb12: { marginBottom: 48 },
+  mb14: { marginBottom: 56 },
+  mb16: { marginBottom: 64 },
+  mb20: { marginBottom: 80 },
+  mb24: { marginBottom: 96 },
+  mb28: { marginBottom: 112 },
+  mb32: { marginBottom: 128 },
+  mb36: { marginBottom: 144 },
+  mb40: { marginBottom: 160 },
+  mb44: { marginBottom: 176 },
+  mb48: { marginBottom: 192 },
+  mb52: { marginBottom: 208 },
+  mb56: { marginBottom: 224 },
+  mb60: { marginBottom: 240 },
+  mb64: { marginBottom: 256 },
+  mb72: { marginBottom: 288 },
+  mb80: { marginBottom: 320 },
+  mb96: { marginBottom: 384 },
+
+  ml0: { marginLeft: 0 },
+  ml1: { marginLeft: 4 },
+  ml2: { marginLeft: 8 },
+  ml3: { marginLeft: 12 },
+  ml4: { marginLeft: 16 },
+  ml5: { marginLeft: 20 },
+  ml6: { marginLeft: 24 },
+  ml7: { marginLeft: 28 },
+  ml8: { marginLeft: 32 },
+  ml9: { marginLeft: 36 },
+  ml10: { marginLeft: 40 },
+  ml11: { marginLeft: 44 },
+  ml12: { marginLeft: 48 },
+  ml14: { marginLeft: 56 },
+  ml16: { marginLeft: 64 },
+  ml20: { marginLeft: 80 },
+  ml24: { marginLeft: 96 },
+  ml28: { marginLeft: 112 },
+  ml32: { marginLeft: 128 },
+  ml36: { marginLeft: 144 },
+  ml40: { marginLeft: 160 },
+  ml44: { marginLeft: 176 },
+  ml48: { marginLeft: 192 },
+  ml52: { marginLeft: 208 },
+  ml56: { marginLeft: 224 },
+  ml60: { marginLeft: 240 },
+  ml64: { marginLeft: 256 },
+  ml72: { marginLeft: 288 },
+  ml80: { marginLeft: 320 },
+  ml96: { marginLeft: 384 },
+
+  mr0: { marginRight: 0 },
+  mr1: { marginRight: 4 },
+  mr2: { marginRight: 8 },
+  mr3: { marginRight: 12 },
+  mr4: { marginRight: 16 },
+  mr5: { marginRight: 20 },
+  mr6: { marginRight: 24 },
+  mr7: { marginRight: 28 },
+  mr8: { marginRight: 32 },
+  mr9: { marginRight: 36 },
+  mr10: { marginRight: 40 },
+  mr11: { marginRight: 44 },
+  mr12: { marginRight: 48 },
+  mr14: { marginRight: 56 },
+  mr16: { marginRight: 64 },
+  mr20: { marginRight: 80 },
+  mr24: { marginRight: 96 },
+  mr28: { marginRight: 112 },
+  mr32: { marginRight: 128 },
+  mr36: { marginRight: 144 },
+  mr40: { marginRight: 160 },
+  mr44: { marginRight: 176 },
+  mr48: { marginRight: 192 },
+  mr52: { marginRight: 208 },
+  mr56: { marginRight: 224 },
+  mr60: { marginRight: 240 },
+  mr64: { marginRight: 256 },
+  mr72: { marginRight: 288 },
+  mr80: { marginRight: 320 },
+  mr96: { marginRight: 384 },
+
+  mx0: { marginHorizontal: 0 },
+  mx1: { marginHorizontal: 4 },
+  mx2: { marginHorizontal: 8 },
+  mx3: { marginHorizontal: 12 },
+  mx4: { marginHorizontal: 16 },
+  mx5: { marginHorizontal: 20 },
+  mx6: { marginHorizontal: 24 },
+  mx7: { marginHorizontal: 28 },
+  mx8: { marginHorizontal: 32 },
+  mx9: { marginHorizontal: 36 },
+  mx10: { marginHorizontal: 40 },
+  mx11: { marginHorizontal: 44 },
+  mx12: { marginHorizontal: 48 },
+  mx14: { marginHorizontal: 56 },
+  mx16: { marginHorizontal: 64 },
+  mx20: { marginHorizontal: 80 },
+  mx24: { marginHorizontal: 96 },
+  mx28: { marginHorizontal: 112 },
+  mx32: { marginHorizontal: 128 },
+  mx36: { marginHorizontal: 144 },
+  mx40: { marginHorizontal: 160 },
+  mx44: { marginHorizontal: 176 },
+  mx48: { marginHorizontal: 192 },
+  mx52: { marginHorizontal: 208 },
+  mx56: { marginHorizontal: 224 },
+  mx60: { marginHorizontal: 240 },
+  mx64: { marginHorizontal: 256 },
+  mx72: { marginHorizontal: 288 },
+  mx80: { marginHorizontal: 320 },
+  mx96: { marginHorizontal: 384 },
+  mxAuto: { marginHorizontal: "auto" },
+
+  my0: { marginVertical: 0 },
+  my1: { marginVertical: 4 },
+  my2: { marginVertical: 8 },
+  my3: { marginVertical: 12 },
+  my4: { marginVertical: 16 },
+  my5: { marginVertical: 20 },
+  my6: { marginVertical: 24 },
+  my7: { marginVertical: 28 },
+  my8: { marginVertical: 32 },
+  my9: { marginVertical: 36 },
+  my10: { marginVertical: 40 },
+  my11: { marginVertical: 44 },
+  my12: { marginVertical: 48 },
+  my14: { marginVertical: 56 },
+  my16: { marginVertical: 64 },
+  my20: { marginVertical: 80 },
+  my24: { marginVertical: 96 },
+  my28: { marginVertical: 112 },
+  my32: { marginVertical: 128 },
+  my36: { marginVertical: 144 },
+  my40: { marginVertical: 160 },
+  my44: { marginVertical: 176 },
+  my48: { marginVertical: 192 },
+  my52: { marginVertical: 208 },
+  my56: { marginVertical: 224 },
+  my60: { marginVertical: 240 },
+  my64: { marginVertical: 256 },
+  my72: { marginVertical: 288 },
+  my80: { marginVertical: 320 },
+  my96: { marginVertical: 384 },
+  myAuto: { marginVertical: "auto" },
+
+  p0: { padding: 0 },
+  p1: { padding: 4 },
+  p2: { padding: 8 },
+  p3: { padding: 12 },
+  p4: { padding: 16 },
+  p5: { padding: 20 },
+  p6: { padding: 24 },
+  p7: { padding: 28 },
+  p8: { padding: 32 },
+  p9: { padding: 36 },
+  p10: { padding: 40 },
+  p11: { padding: 44 },
+  p12: { padding: 48 },
+  p14: { padding: 56 },
+  p16: { padding: 64 },
+  p20: { padding: 80 },
+  p24: { padding: 96 },
+  p28: { padding: 112 },
+  p32: { padding: 128 },
+  p36: { padding: 144 },
+  p40: { padding: 160 },
+  p44: { padding: 176 },
+  p48: { padding: 192 },
+  p52: { padding: 208 },
+  p56: { padding: 224 },
+  p60: { padding: 240 },
+  p64: { padding: 256 },
+  p72: { padding: 288 },
+  p80: { padding: 320 },
+  p96: { padding: 384 },
+
+  pt0: { paddingTop: 0 },
+  pt1: { paddingTop: 4 },
+  pt2: { paddingTop: 8 },
+  pt3: { paddingTop: 12 },
+  pt4: { paddingTop: 16 },
+  pt5: { paddingTop: 20 },
+  pt6: { paddingTop: 24 },
+  pt7: { paddingTop: 28 },
+  pt8: { paddingTop: 32 },
+  pt9: { paddingTop: 36 },
+  pt10: { paddingTop: 40 },
+  pt11: { paddingTop: 44 },
+  pt12: { paddingTop: 48 },
+  pt14: { paddingTop: 56 },
+  pt16: { paddingTop: 64 },
+  pt20: { paddingTop: 80 },
+  pt24: { paddingTop: 96 },
+  pt28: { paddingTop: 112 },
+  pt32: { paddingTop: 128 },
+  pt36: { paddingTop: 144 },
+  pt40: { paddingTop: 160 },
+  pt44: { paddingTop: 176 },
+  pt48: { paddingTop: 192 },
+  pt52: { paddingTop: 208 },
+  pt56: { paddingTop: 224 },
+  pt60: { paddingTop: 240 },
+  pt64: { paddingTop: 256 },
+  pt72: { paddingTop: 288 },
+  pt80: { paddingTop: 320 },
+  pt96: { paddingTop: 384 },
+
+  pb0: { paddingBottom: 0 },
+  pb1: { paddingBottom: 4 },
+  pb2: { paddingBottom: 8 },
+  pb3: { paddingBottom: 12 },
+  pb4: { paddingBottom: 16 },
+  pb5: { paddingBottom: 20 },
+  pb6: { paddingBottom: 24 },
+  pb7: { paddingBottom: 28 },
+  pb8: { paddingBottom: 32 },
+  pb9: { paddingBottom: 36 },
+  pb10: { paddingBottom: 40 },
+  pb11: { paddingBottom: 44 },
+  pb12: { paddingBottom: 48 },
+  pb14: { paddingBottom: 56 },
+  pb16: { paddingBottom: 64 },
+  pb20: { paddingBottom: 80 },
+  pb24: { paddingBottom: 96 },
+  pb28: { paddingBottom: 112 },
+  pb32: { paddingBottom: 128 },
+  pb36: { paddingBottom: 144 },
+  pb40: { paddingBottom: 160 },
+  pb44: { paddingBottom: 176 },
+  pb48: { paddingBottom: 192 },
+  pb52: { paddingBottom: 208 },
+  pb56: { paddingBottom: 224 },
+  pb60: { paddingBottom: 240 },
+  pb64: { paddingBottom: 256 },
+  pb72: { paddingBottom: 288 },
+  pb80: { paddingBottom: 320 },
+  pb96: { paddingBottom: 384 },
+
+  pl0: { paddingLeft: 0 },
+  pl1: { paddingLeft: 4 },
+  pl2: { paddingLeft: 8 },
+  pl3: { paddingLeft: 12 },
+  pl4: { paddingLeft: 16 },
+  pl5: { paddingLeft: 20 },
+  pl6: { paddingLeft: 24 },
+  pl7: { paddingLeft: 28 },
+  pl8: { paddingLeft: 32 },
+  pl9: { paddingLeft: 36 },
+  pl10: { paddingLeft: 40 },
+  pl11: { paddingLeft: 44 },
+  pl12: { paddingLeft: 48 },
+  pl14: { paddingLeft: 56 },
+  pl16: { paddingLeft: 64 },
+  pl20: { paddingLeft: 80 },
+  pl24: { paddingLeft: 96 },
+  pl28: { paddingLeft: 112 },
+  pl32: { paddingLeft: 128 },
+  pl36: { paddingLeft: 144 },
+  pl40: { paddingLeft: 160 },
+  pl44: { paddingLeft: 176 },
+  pl48: { paddingLeft: 192 },
+  pl52: { paddingLeft: 208 },
+  pl56: { paddingLeft: 224 },
+  pl60: { paddingLeft: 240 },
+  pl64: { paddingLeft: 256 },
+  pl72: { paddingLeft: 288 },
+  pl80: { paddingLeft: 320 },
+  pl96: { paddingLeft: 384 },
+
+  pr0: { paddingRight: 0 },
+  pr1: { paddingRight: 4 },
+  pr2: { paddingRight: 8 },
+  pr3: { paddingRight: 12 },
+  pr4: { paddingRight: 16 },
+  pr5: { paddingRight: 20 },
+  pr6: { paddingRight: 24 },
+  pr7: { paddingRight: 28 },
+  pr8: { paddingRight: 32 },
+  pr9: { paddingRight: 36 },
+  pr10: { paddingRight: 40 },
+  pr11: { paddingRight: 44 },
+  pr12: { paddingRight: 48 },
+  pr14: { paddingRight: 56 },
+  pr16: { paddingRight: 64 },
+  pr20: { paddingRight: 80 },
+  pr24: { paddingRight: 96 },
+  pr28: { paddingRight: 112 },
+  pr32: { paddingRight: 128 },
+  pr36: { paddingRight: 144 },
+  pr40: { paddingRight: 160 },
+  pr44: { paddingRight: 176 },
+  pr48: { paddingRight: 192 },
+  pr52: { paddingRight: 208 },
+  pr56: { paddingRight: 224 },
+  pr60: { paddingRight: 240 },
+  pr64: { paddingRight: 256 },
+  pr72: { paddingRight: 288 },
+  pr80: { paddingRight: 320 },
+  pr96: { paddingRight: 384 },
+
+  px0: { paddingHorizontal: 0 },
+  px1: { paddingHorizontal: 4 },
+  px2: { paddingHorizontal: 8 },
+  px3: { paddingHorizontal: 12 },
+  px4: { paddingHorizontal: 16 },
+  px5: { paddingHorizontal: 20 },
+  px6: { paddingHorizontal: 24 },
+  px7: { paddingHorizontal: 28 },
+  px8: { paddingHorizontal: 32 },
+  px9: { paddingHorizontal: 36 },
+  px10: { paddingHorizontal: 40 },
+  px11: { paddingHorizontal: 44 },
+  px12: { paddingHorizontal: 48 },
+  px14: { paddingHorizontal: 56 },
+  px16: { paddingHorizontal: 64 },
+  px20: { paddingHorizontal: 80 },
+  px24: { paddingHorizontal: 96 },
+  px28: { paddingHorizontal: 112 },
+  px32: { paddingHorizontal: 128 },
+  px36: { paddingHorizontal: 144 },
+  px40: { paddingHorizontal: 160 },
+  px44: { paddingHorizontal: 176 },
+  px48: { paddingHorizontal: 192 },
+  px52: { paddingHorizontal: 208 },
+  px56: { paddingHorizontal: 224 },
+  px60: { paddingHorizontal: 240 },
+  px64: { paddingHorizontal: 256 },
+  px72: { paddingHorizontal: 288 },
+  px80: { paddingHorizontal: 320 },
+  px96: { paddingHorizontal: 384 },
+
+  py0: { paddingVertical: 0 },
+  py1: { paddingVertical: 4 },
+  py2: { paddingVertical: 8 },
+  py3: { paddingVertical: 12 },
+  py4: { paddingVertical: 16 },
+  py5: { paddingVertical: 20 },
+  py6: { paddingVertical: 24 },
+  py7: { paddingVertical: 28 },
+  py8: { paddingVertical: 32 },
+  py9: { paddingVertical: 36 },
+  py10: { paddingVertical: 40 },
+  py11: { paddingVertical: 44 },
+  py12: { paddingVertical: 48 },
+  py14: { paddingVertical: 56 },
+  py16: { paddingVertical: 64 },
+  py20: { paddingVertical: 80 },
+  py24: { paddingVertical: 96 },
+  py28: { paddingVertical: 112 },
+  py32: { paddingVertical: 128 },
+  py36: { paddingVertical: 144 },
+  py40: { paddingVertical: 160 },
+  py44: { paddingVertical: 176 },
+  py48: { paddingVertical: 192 },
+  py52: { paddingVertical: 208 },
+  py56: { paddingVertical: 224 },
+  py60: { paddingVertical: 240 },
+  py64: { paddingVertical: 256 },
+  py72: { paddingVertical: 288 },
+  py80: { paddingVertical: 320 },
+  py96: { paddingVertical: 384 },
+} as const;
+
+export const radius = {
+  none: { borderRadius: 0 },
+  sm: { borderRadius: 2 },
+  md: { borderRadius: 6 },
+  lg: { borderRadius: 8 },
+  xl: { borderRadius: 12 },
+  "2xl": { borderRadius: 16 },
+  "3xl": { borderRadius: 24 },
+  full: { borderRadius: 9999 },
+
+  tSm: { borderTopLeftRadius: 2, borderTopRightRadius: 2 },
+  tMd: { borderTopLeftRadius: 6, borderTopRightRadius: 6 },
+  tLg: { borderTopLeftRadius: 8, borderTopRightRadius: 8 },
+  tXl: { borderTopLeftRadius: 12, borderTopRightRadius: 12 },
+  t2xl: { borderTopLeftRadius: 16, borderTopRightRadius: 16 },
+
+  bSm: { borderBottomLeftRadius: 2, borderBottomRightRadius: 2 },
+  bMd: { borderBottomLeftRadius: 6, borderBottomRightRadius: 6 },
+  bLg: { borderBottomLeftRadius: 8, borderBottomRightRadius: 8 },
+  bXl: { borderBottomLeftRadius: 12, borderBottomRightRadius: 12 },
+  b2xl: { borderBottomLeftRadius: 16, borderBottomRightRadius: 16 },
+} as const;
+
+export const text = {
+  xs: { fontSize: 12, lineHeight: 16 },
+  sm: { fontSize: 14, lineHeight: 20 },
+  md: { fontSize: 16, lineHeight: 24 },
+  lg: { fontSize: 18, lineHeight: 28 },
+  xl: { fontSize: 20, lineHeight: 28 },
+  "2xl": { fontSize: 24, lineHeight: 32 },
+  "3xl": { fontSize: 30, lineHeight: 36 },
+  "4xl": { fontSize: 36, lineHeight: 40 },
+  "5xl": { fontSize: 48, lineHeight: 48 },
+};
+
+export const font = {
+  bold: { fontWeight: 700 as const },
+  italic: { fontStyle: "italic" as const },
+};
+
+export const flex = {
+  columnCenter: {
+    justifyContent: "center",
+    alignItems: "center",
+  } as const,
+
+  columnEvenly: {
+    justifyContent: "space-evenly",
+    alignItems: "center",
+  } as const,
+
+  columnBetween: {
+    justifyContent: "space-between",
+    alignItems: "center",
+  } as const,
+
+  rowBetween: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  } as const,
+
+  rowCenter: {
+    flexDirection: "row",
+    justifyContent: "center",
+  } as const,
+
+  rowEvenly: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+  } as const,
+  wrap: {
+    flexWrap: "wrap",
+  } as const,
 };

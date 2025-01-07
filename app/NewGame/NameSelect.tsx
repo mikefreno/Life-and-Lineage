@@ -3,7 +3,6 @@ import {
   KeyboardAvoidingView,
   TextInput,
   TouchableWithoutFeedback,
-  useColorScheme,
   View,
 } from "react-native";
 import { Text } from "../../components/Themed";
@@ -19,9 +18,8 @@ import { useStyles } from "../../hooks/styles";
 
 export default function SetName() {
   const styles = useStyles();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
   const { uiStore } = useRootStore();
+  const isDark = uiStore.colorScheme === "dark";
   const { classSelection, firstName, lastName, setFirstName, setLastName } =
     useNewGameStore();
   const header = useHeaderHeight();
