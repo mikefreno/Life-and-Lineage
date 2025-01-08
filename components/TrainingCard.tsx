@@ -9,6 +9,7 @@ import { Coins, Sanity } from "../assets/icons/SVGIcons";
 import { useAcceleratedAction } from "../hooks/generic";
 import { useCallback, useMemo } from "react";
 import { useRootStore } from "../hooks/stores";
+import { useStyles, radius } from "../hooks/styles";
 
 interface TrainingCardProps {
   name: string;
@@ -19,33 +20,73 @@ interface TrainingCardProps {
 }
 
 const CostDisplay = ({
+  styles,
   goldCost,
   sanityCost,
+  colorScheme,
 }: {
+  styles: ReturnType<typeof useStyles>;
   goldCost: number;
   sanityCost: number;
+  colorScheme: "light" | "dark";
 }) => (
-  <View className="my-auto -mb-8 mt-8 w-1/3">
+  <View
+    style={{
+      ...styles.myAuto,
+      marginBottom: -32,
+      marginTop: 32,
+      width: "33%",
+    }}
+  >
     {goldCost === 0 ? (
-      <Text className="mx-auto dark:text-zinc-50">Free</Text>
+      <Text
+        style={{
+          ...styles.mxAuto,
+          color: colorScheme === "dark" ? "#fafafa" : undefined,
+        }}
+      >
+        Free
+      </Text>
     ) : (
-      <View className="flex w-full flex-row items-center justify-evenly">
-        <Text className="dark:text-zinc-50">{goldCost}</Text>
+      <View
+        style={{
+          ...styles.rowEvenly,
+          width: "100%",
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ color: colorScheme === "dark" ? "#fafafa" : undefined }}>
+          {goldCost}
+        </Text>
         <Coins width={14} height={14} style={{ marginLeft: 6 }} />
       </View>
     )}
-    <View className="flex w-full flex-row items-center justify-evenly">
-      <Text className="dark:text-zinc-50">-{sanityCost}</Text>
+    <View
+      style={{
+        ...styles.rowEvenly,
+        width: "100%",
+        alignItems: "center",
+      }}
+    >
+      <Text style={{ color: colorScheme === "dark" ? "#fafafa" : undefined }}>
+        -{sanityCost}
+      </Text>
       <Sanity width={14} height={14} style={{ marginLeft: 6 }} />
     </View>
   </View>
 );
 
-const MissingPreReqs = ({ missing }: { missing: string[] }) => (
-  <View className="flex items-center">
-    <Text className="text-lg">Missing:</Text>
+const MissingPreReqs = ({
+  styles,
+  missing,
+}: {
+  styles: ReturnType<typeof useStyles>;
+  missing: string[];
+}) => (
+  <View style={styles.itemsCenter}>
+    <Text style={styles.lg}>Missing:</Text>
     {missing.map((item) => (
-      <Text key={item} className="py-1">
+      <Text key={item} style={styles.py1}>
         {toTitleCase(item)}
       </Text>
     ))}
@@ -62,6 +103,7 @@ const TrainingCard = observer(
   }: TrainingCardProps) => {
     const root = useRootStore();
     const { playerState, uiStore } = root;
+    const styles = useStyles();
 
     const cardStyle = useMemo(
       () => ({
@@ -108,16 +150,42 @@ const TrainingCard = observer(
 
     if (playerState) {
       return (
-        <View className="m-2 rounded-xl" style={cardStyle}>
-          <View className="flex justify-between rounded-xl px-4 py-2 text-zinc-950 dark:border dark:border-zinc-500">
-            <View className="flex flex-row justify-between">
-              <Text className="bold my-auto w-2/3 text-xl dark:text-zinc-50">
+        <View
+          style={{
+            ...styles.m2,
+            ...radius.xl,
+            ...cardStyle,
+          }}
+        >
+          <View
+            style={{
+              ...styles.columnBetween,
+              ...radius.xl,
+              ...styles.px4,
+              ...styles.py2,
+              borderWidth: uiStore.colorScheme === "dark" ? 1 : 0,
+              borderColor:
+                uiStore.colorScheme === "dark" ? "#71717a" : undefined,
+            }}
+          >
+            <View style={styles.rowBetween}>
+              <Text
+                style={{
+                  ...styles.xl,
+                  ...styles.bold,
+                  ...styles.myAuto,
+                  width: "66%",
+                  color: uiStore.colorScheme === "dark" ? "#fafafa" : "#18181b",
+                }}
+              >
                 {toTitleCase(name)}
               </Text>
               {!isCompleted && (
                 <CostDisplay
                   goldCost={goldCostPerTick}
                   sanityCost={sanityCostPerTick}
+                  styles={styles}
+                  colorScheme={uiStore.colorScheme}
                 />
               )}
             </View>
@@ -142,6 +210,7 @@ const TrainingCard = observer(
                   <ProgressBar value={progress ?? 0} maxValue={ticks} />
                 ) : (
                   <MissingPreReqs
+                    styles={styles}
                     missing={playerState?.missingPreReqs(preRequisites) ?? []}
                   />
                 )}

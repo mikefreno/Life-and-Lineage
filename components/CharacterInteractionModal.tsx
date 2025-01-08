@@ -14,6 +14,8 @@ import { AffectionIcon } from "../assets/icons/SVGIcons";
 import { Character } from "../entities/character";
 import { useRootStore } from "../hooks/stores";
 import { useVibration } from "../hooks/generic";
+import { flex, text, useStyles } from "../hooks/styles";
+import React from "react";
 
 interface CharacterInteractionModal {
   character: Character | null;
@@ -48,6 +50,7 @@ export const CharacterInteractionModal = observer(
       null,
     );
     const router = useRouter();
+    const styles = useStyles();
 
     const vibration = useVibration();
 
@@ -98,20 +101,22 @@ export const CharacterInteractionModal = observer(
         size={100}
       >
         {character && (
-          <View className="">
-            <Text className="text-center text-xl">{character.fullName}</Text>
-            <View className="mx-auto">
+          <View>
+            <Text style={{ textAlign: "center", ...text.xl }}>
+              {character.fullName}
+            </Text>
+            <View style={{ marginHorizontal: "auto" }}>
               <CharacterImage character={character} />
             </View>
             {!showAssaultWarning ? (
               <View>
-                <View className="items-center">
+                <View style={{ alignItems: "center" }}>
                   <Text>{character.age} years old</Text>
-                  <Text className="px-10 text-center">
+                  <Text style={{ paddingHorizontal: 40, textAlign: "center" }}>
                     Works as a {character.job}
                   </Text>
-                  <View className="flex w-2/3 flex-row justify-center">
-                    <View className="w-3/4">
+                  <View style={[flex.rowCenter, { width: "66%" }]}>
+                    <View style={{ width: "75%" }}>
                       <ProgressBar
                         value={Math.floor(character.affection * 4) / 4}
                         minValue={-100}
@@ -120,7 +125,7 @@ export const CharacterInteractionModal = observer(
                         unfilledColor="#fca5a5"
                       />
                     </View>
-                    <View className="my-auto ml-1">
+                    <View style={{ marginVertical: "auto", marginLeft: 4 }}>
                       <AffectionIcon height={14} width={14} />
                     </View>
                   </View>
@@ -128,7 +133,7 @@ export const CharacterInteractionModal = observer(
                 {playerState?.isKnownCharacter(character) ? (
                   <>
                     <GenericStrikeAround>Interactions</GenericStrikeAround>
-                    <View className="mt-2 flex flex-row justify-evenly">
+                    <View style={[flex.rowEvenly, { marginTop: 8 }]}>
                       <GenericFlatButton
                         disabled={!dateAvailable}
                         onPress={() => {
@@ -150,7 +155,7 @@ export const CharacterInteractionModal = observer(
                         Give a Gift
                       </GenericFlatButton>
                     </View>
-                    <View className="pt-2">
+                    <View style={{ paddingTop: 8 }}>
                       {character.age >= 18 &&
                         playerState.canDate({
                           character,
@@ -176,7 +181,7 @@ export const CharacterInteractionModal = observer(
                                   vibration({ style: "light" });
                                   showAdoptionModal(character.fullName);
                                 }}
-                                className="mt-2"
+                                style={{ marginTop: 8 }}
                               >
                                 Suggest Adoption
                               </GenericFlatButton>
@@ -208,7 +213,7 @@ export const CharacterInteractionModal = observer(
                     </View>
                     {!playerState.characterIsChild({ character }) && (
                       <>
-                        <View className="mt-2 flex flex-row justify-evenly">
+                        <View style={[flex.rowEvenly, { marginTop: 8 }]}>
                           <GenericFlatButton
                             disabled={!dateAvailable}
                             onPress={() => {
@@ -222,7 +227,7 @@ export const CharacterInteractionModal = observer(
                           </GenericFlatButton>
                         </View>
                         {character.affection > -25 && (
-                          <View className="mt-2 flex flex-row justify-evenly">
+                          <View style={[flex.rowEvenly, { marginTop: 8 }]}>
                             <GenericFlatButton
                               onPress={() => {
                                 vibration({
@@ -242,7 +247,7 @@ export const CharacterInteractionModal = observer(
                 ) : (
                   <>
                     <GenericStrikeAround>Greetings</GenericStrikeAround>
-                    <View className="mt-2 flex flex-row justify-evenly">
+                    <View style={[flex.rowEvenly, { marginTop: 8 }]}>
                       <GenericFlatButton
                         onPress={() => {
                           vibration({ style: "light" });
@@ -270,7 +275,7 @@ export const CharacterInteractionModal = observer(
                     </View>
                   </>
                 )}
-                <View className="mt-2">
+                <View style={{ marginTop: 8 }}>
                   <GenericFlatButton onPress={closeFunction}>
                     Close
                   </GenericFlatButton>
@@ -279,19 +284,22 @@ export const CharacterInteractionModal = observer(
             ) : (
               <View>
                 <Text
-                  className="text-center text-2xl"
-                  style={{ color: "#ef4444" }}
+                  style={{
+                    textAlign: "center",
+                    color: "#ef4444",
+                    ...text["2xl"],
+                  }}
                 >
                   Warning:{" "}
                 </Text>
-                <Text className="text-center text-lg">
+                <Text style={{ textAlign: "center", ...text.lg }}>
                   Are you certain you want to do that? You will start a fight{" "}
                   <Text style={{ color: "#ef4444" }}>
                     that could end in {character.fullName}'s death.
                   </Text>
                 </Text>
-                <View className="mt-2 flex flex-row justify-evenly">
-                  <View className="my-auto">
+                <View style={[flex.rowEvenly, { marginTop: 8 }]}>
+                  <View style={{ marginVertical: "auto" }}>
                     <GenericFlatButton
                       backgroundColor={"#450a0a"}
                       textColor={"#a1a1aa"}

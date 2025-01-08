@@ -69,16 +69,27 @@ const D20DieAnimation = observer(
     }, [keepRolling]);
 
     return (
-      <View className="flex justify-center items-center">
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+        }}
+      >
         <Animated.View
-          className="justify-center items-center"
-          style={animatedStyle}
+          style={[
+            animatedStyle,
+            { justifyContent: "center", alignItems: "center" },
+          ]}
         >
           <D20SVG />
           {showNumber ? (
             <Text
-              className="absolute"
-              style={{ paddingTop: size / 24, fontSize: size / 6 }}
+              style={{
+                paddingTop: size / 24,
+                fontSize: size / 6,
+                position: "absolute",
+              }}
             >
               {replaceNum ? replaceNum : diceValue ?? ""}
             </Text>

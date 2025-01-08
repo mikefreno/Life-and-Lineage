@@ -21,6 +21,7 @@ import {
 } from "../assets/icons/SVGIcons";
 import { Spell } from "../entities/spell";
 import { useRootStore } from "../hooks/stores";
+import { useStyles } from "../hooks/styles";
 
 const ClassCodex = ({
   classOption,
@@ -34,12 +35,13 @@ const ClassCodex = ({
   spells: any[];
 }) => {
   const { uiStore } = useRootStore();
+  const styles = useStyles();
 
   const headerComponent = () => (
-    <View className="px-4 pt-4">
-      <View className="items-center">{icon}</View>
-      <View className="items-center">
-        <Text className="text-center pt-8">
+    <View style={[styles.px4, styles.pt4]}>
+      <View style={styles.columnCenter}>{icon}</View>
+      <View style={styles.columnCenter}>
+        <Text style={[styles.textCenter, styles.pt8]}>
           {ClassDescriptionMap[classOption]}
         </Text>
         <Text>
@@ -52,8 +54,8 @@ const ClassCodex = ({
             suppressHighlighting
           >
             <Text
-              className="text-2xl"
               style={{
+                ...styles["2xl"],
                 color:
                   uiStore.colorScheme == "dark"
                     ? school == Element.assassination
@@ -72,8 +74,13 @@ const ClassCodex = ({
           </Link>
         ))}
         <Text
-          className="text-2xl py-4"
-          style={{ color: playerClassColors[classOption] }}
+          style={[
+            styles["2xl"],
+            styles.py4,
+            {
+              color: playerClassColors[classOption],
+            },
+          ]}
         >
           Available Spells:
         </Text>
@@ -82,7 +89,7 @@ const ClassCodex = ({
   );
 
   const renderItem = ({ item }) => (
-    <View className="py-2 mx-auto">
+    <View style={[styles.py2, styles.mxAuto]}>
       <SpellDetails spell={new Spell({ ...item })} />
     </View>
   );
@@ -106,22 +113,26 @@ const ElementCodex = ({
   spells: any[];
 }) => {
   const { uiStore } = useRootStore();
+  const styles = useStyles();
 
   const headerComponent = () => (
-    <View className="px-4 pt-4">
-      <View className="items-center">
+    <View style={styles.px4}>
+      <View style={styles.itemsCenter}>
         {BlessingDisplay({
           blessing: element,
           colorScheme: uiStore.colorScheme,
         })}
       </View>
-      <View className="items-center">
-        <Text className="text-center pt-8">
+      <View style={styles.itemsCenter}>
+        <Text style={[styles.textCenter, styles.pt8]}>
           {DescriptionMap[element as Element]}
         </Text>
         <Text
-          className="text-2xl py-4"
-          style={{ color: elementalColorMap[element].dark }}
+          style={{
+            color: elementalColorMap[element].dark,
+            ...styles["2xl"],
+            ...styles.py4,
+          }}
         >
           Available Spells:
         </Text>
@@ -130,7 +141,7 @@ const ElementCodex = ({
   );
 
   const renderItem = ({ item }) => (
-    <View className="py-2 mx-auto">
+    <View style={[styles.py2, styles.mxAuto]}>
       <SpellDetails spell={new Spell({ ...item })} />
     </View>
   );

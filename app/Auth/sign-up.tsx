@@ -218,7 +218,7 @@ const SignUpScreen = observer(() => {
                 Email Registration
               </Text>
               <TextInput
-                style={[styles.input, styles.xl]}
+                style={[styles.authInput, styles.xl]}
                 placeholderTextColor={
                   uiStore.colorScheme == "light" ? "#d4d4d8" : "#71717a"
                 }
@@ -233,7 +233,7 @@ const SignUpScreen = observer(() => {
               <View>
                 <TextInput
                   style={[
-                    styles.input,
+                    styles.authInput,
                     styles.xl,
                     isAutofilled && { color: "black" },
                   ]}
@@ -259,7 +259,7 @@ const SignUpScreen = observer(() => {
               </View>
               <TextInput
                 style={[
-                  styles.input,
+                  styles.authInput,
                   styles.xl,
                   isAutofilled && { color: "black" },
                 ]}
@@ -327,7 +327,7 @@ const SignUpScreen = observer(() => {
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
       ) : (
-        <View style={{ paddingTop: "25vh" }}>
+        <View style={{ paddingTop: uiStore.dimensions.height * 0.25 }}>
           <Text style={{ textAlign: "center", fontSize: 24 }}>
             A verification email has been sent! Check your email (and spam
             folder) to complete registration.

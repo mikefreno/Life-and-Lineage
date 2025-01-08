@@ -19,9 +19,13 @@ import { ThemedView, Text } from "../../components/Themed";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { wait } from "../../utility/functions/misc";
 import { useRootStore } from "../../hooks/stores";
+import { useStyles } from "../../hooks/styles";
+import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const SignInScreen = observer(() => {
   const { authStore, uiStore } = useRootStore();
+  const styles = useStyles();
+  const theme = Colors[uiStore.colorScheme];
 
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
@@ -114,45 +118,26 @@ const SignInScreen = observer(() => {
   };
 
   return awaitingResponse ? (
-    <ThemedView className="pt-[25vh] flex-1">
+    <ThemedView style={{ flex: 1, ...styles.pt48 }}>
       <D20DieAnimation keepRolling={true} />
     </ThemedView>
   ) : (
-    <ThemedView className="flex-1">
+    <ThemedView style={{ flex: 1 }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
         keyboardVerticalOffset={header}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <ThemedView className="flex-1 justify-center items-center">
+          <ThemedView style={{ flex: 1, ...styles.columnCenter }}>
             <Pressable
               onPress={handleGoogleSignIn}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                borderWidth: 1,
-                borderColor:
-                  uiStore.colorScheme == "dark" ? "#fafafa" : "#27272a",
-                backgroundColor:
-                  uiStore.colorScheme == "dark" ? "#27272a" : "#ffffff",
-                paddingHorizontal: 12,
-                marginTop: -8,
-                marginBottom: 8,
-                paddingVertical: 8,
-                borderRadius: 5,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: 0.2,
-                shadowRadius: 1.41,
-                elevation: 2,
-                width: 230,
-              }}
+              style={styles.providerButton}
             >
-              <Text className="text-xl">Sign in with Google</Text>
+              <Text style={styles.xl}>Sign in with Google</Text>
               <GoogleIcon height={20} width={20} />
             </Pressable>
+
             {Platform.OS == "ios" && (
               <AppleAuthentication.AppleAuthenticationButton
                 buttonType={
@@ -169,56 +154,54 @@ const SignInScreen = observer(() => {
               />
             )}
 
-            <View className="w-3/4 pt-6 pb-16">
+            <View style={{ width: "75%", ...styles.pt6, ...styles.pb16 }}>
               {error && (
-                <Text className="text-center px-6" style={{ color: "#ef4444" }}>
+                <Text
+                  style={{
+                    ...styles.textCenter,
+                    ...styles.px6,
+                    color: theme.error,
+                  }}
+                >
                   {error}
                 </Text>
               )}
-              <Text className="text-center text-3xl pt-4">Email Login</Text>
+              <Text
+                style={{
+                  ...styles.textCenter,
+                  ...styles["3xl"],
+                  ...styles.pt4,
+                }}
+              >
+                Email Login
+              </Text>
               <TextInput
-                className="my-6 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
-                placeholderTextColor={
-                  uiStore.colorScheme == "light" ? "#d4d4d8" : "#71717a"
-                }
+                style={styles.authInput}
+                placeholderTextColor={theme.secondary}
                 autoComplete={"email"}
                 inputMode={"email"}
-                onChangeText={(text) => setEmailAddress(text)}
+                onChangeText={setEmailAddress}
                 placeholder={"Enter Email Address..."}
                 autoCorrect={false}
                 autoCapitalize={"none"}
                 value={emailAddress}
-                style={{
-                  fontFamily: "PixelifySans",
-                  paddingVertical: 8,
-                  minWidth: "50%",
-                  fontSize: 20,
-                }}
               />
               <TextInput
-                className="mt-6 mb-2 rounded border border-zinc-800 pl-2 text-xl text-black dark:border-zinc-100 dark:text-zinc-50"
-                placeholderTextColor={
-                  uiStore.colorScheme == "light" ? "#d4d4d8" : "#71717a"
-                }
-                onChangeText={(text) => setPassword(text)}
+                style={styles.authInput}
+                placeholderTextColor={theme.secondary}
+                onChangeText={setPassword}
                 placeholder={"Enter Password..."}
                 autoComplete={"current-password"}
                 autoCorrect={false}
                 autoCapitalize={"none"}
                 secureTextEntry
                 value={password}
-                style={{
-                  fontFamily: "PixelifySans",
-                  paddingVertical: 8,
-                  minWidth: "50%",
-                  fontSize: 20,
-                }}
               />
               <GenericRaisedButton
                 disabled={password.length == 0 || emailAddress.length == 0}
                 onPress={attemptLogin}
-                backgroundColor={"#2563eb"}
-                textColor={"#fafafa"}
+                backgroundColor={theme.interactive}
+                textColor={theme.text}
                 style={{ height: 48 }}
               >
                 Sign In
@@ -230,4 +213,5 @@ const SignInScreen = observer(() => {
     </ThemedView>
   );
 });
+
 export default SignInScreen;

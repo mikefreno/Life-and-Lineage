@@ -11,7 +11,7 @@ import { FPS, type AnimationStore } from "../../stores/AnimationStore";
 import { useRootStore } from "../../hooks/stores";
 import { AnimatedSprite } from "../AnimatedSprite";
 import { EnemyImageMap } from "../../utility/enemyHelpers";
-import { text, tw, useStyles } from "../../hooks/styles";
+import { text, tw, tw_base, useStyles } from "../../hooks/styles";
 
 const calculateAdjustedFrameRate = (
   frames: number,
@@ -27,9 +27,10 @@ const calculateAdjustedFrameRate = (
 };
 
 const DialogueBox = memo(({ text }: { text: string }) => {
+  const styles = useStyles();
   return (
-    <ThemedView className="absolute top-[-50] left-0 right-0 mx-auto p-2 rounded-lg bg-opacity-80 max-w-[80%]">
-      <Text className="text-center text-lg">{text}</Text>
+    <ThemedView style={styles.dialogueBox}>
+      <Text style={{ ...styles.textCenter, ...styles.lg }}>{text}</Text>
     </ThemedView>
   );
 });
@@ -224,10 +225,10 @@ const useEnemyAnimations = () => {
 
 const EnemyHealthChangePopUp = memo(
   ({ healthDiff, showing }: { healthDiff: number; showing: boolean }) => {
-    if (!showing) return <View className="h-6" />;
+    if (!showing) return <View style={{ height: tw_base[6] }} />;
 
     return (
-      <View className="h-6">
+      <View style={{ height: tw_base[6] }}>
         <FadeOutNode>
           <Text style={{ color: "#f87171" }}>
             {healthDiff > 0 ? "+" : ""}

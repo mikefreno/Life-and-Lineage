@@ -35,6 +35,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { Element, TutorialOption } from "../../utility/types";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
+import { shadows } from "../../hooks/styles";
 
 const PLAYERSTATUS_SPACER = 64;
 const TABSELECTOR_HEIGHT = 52;
@@ -143,8 +144,7 @@ export default function TabLayout() {
                     )
                   : () => (
                       <ThemedView
-                        style={StyleSheet.absoluteFill}
-                        className="shadow-soft"
+                        style={[StyleSheet.absoluteFill, shadows.soft]}
                       />
                     ),
               title: "Home",
@@ -217,8 +217,7 @@ export default function TabLayout() {
                     )
                   : () => (
                       <ThemedView
-                        style={StyleSheet.absoluteFill}
-                        className="shadow-soft"
+                        style={[StyleSheet.absoluteFill, shadows.soft]}
                       />
                     ),
               title: "Spells",
@@ -266,8 +265,7 @@ export default function TabLayout() {
                     )
                   : () => (
                       <ThemedView
-                        style={StyleSheet.absoluteFill}
-                        className="shadow-soft"
+                        style={[StyleSheet.absoluteFill, shadows.soft]}
                       />
                     ),
               title: "Labor",
@@ -326,8 +324,7 @@ export default function TabLayout() {
                   ? () => <BlurView style={StyleSheet.absoluteFill} />
                   : () => (
                       <ThemedView
-                        style={StyleSheet.absoluteFill}
-                        className="shadow-soft"
+                        style={[StyleSheet.absoluteFill, shadows.soft]}
                       />
                     ),
               title: "Dungeon",
@@ -372,8 +369,7 @@ export default function TabLayout() {
                     )
                   : () => (
                       <ThemedView
-                        style={StyleSheet.absoluteFill}
-                        className="shadow-soft"
+                        style={[StyleSheet.absoluteFill, shadows.soft]}
                       />
                     ),
               title: "Shops",
@@ -413,8 +409,7 @@ export default function TabLayout() {
                     )
                   : () => (
                       <ThemedView
-                        style={StyleSheet.absoluteFill}
-                        className="shadow-soft"
+                        style={[StyleSheet.absoluteFill, shadows.soft]}
                       />
                     ),
               title: "Medical",

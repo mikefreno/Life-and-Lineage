@@ -17,8 +17,10 @@ import { observer } from "mobx-react-lite";
 import GenericStrikeAround from "../components/GenericStrikeAround";
 import { useRootStore } from "../hooks/stores";
 import type { Character } from "../entities/character";
+import { flex, text, useStyles } from "../hooks/styles";
 
 const RelationshipsScreen = observer(() => {
+  const styles = useStyles();
   const { playerState, uiStore, characterStore } = useRootStore();
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null,
@@ -26,6 +28,9 @@ const RelationshipsScreen = observer(() => {
   const [showInteractionModal, setShowInteractionModal] =
     useState<boolean>(false);
   const [showingGiftModal, setShowingGiftModal] = useState<boolean>(false);
+  const [showingAdoptionModal, setShowingAdoptionModal] =
+    useState<boolean>(false);
+  const [partnerName, setPartnerName] = useState<string>();
 
   const characterGroups = [
     { title: "Children", data: playerState?.children || [] },
@@ -69,11 +74,13 @@ const RelationshipsScreen = observer(() => {
   function renderCharacter(character: Character) {
     return (
       <Pressable
-        className="flex items-center"
-        style={{
-          width: uiStore.dimensions.lesser * 0.35,
-          opacity: character.deathdate ? 0.5 : 1,
-        }}
+        style={[
+          flex.columnCenter,
+          {
+            width: uiStore.dimensions.lesser * 0.35,
+            opacity: character.deathdate ? 0.5 : 1,
+          },
+        ]}
         key={character.id}
         disabled={!!character.deathdate}
         onPress={() => {
@@ -81,24 +88,28 @@ const RelationshipsScreen = observer(() => {
           setSelectedCharacter(character);
         }}
       >
-        <Text className="text-center text-2xl">{character.fullName}</Text>
-        <View className="mx-auto">
+        <Text style={{ textAlign: "center", ...text["2xl"] }}>
+          {character.fullName}
+        </Text>
+        <View style={{ marginHorizontal: "auto" }}>
           <CharacterImage character={character} />
         </View>
-        <Text className="text-xl">
+        <Text style={text.xl}>
           {character.deathdate && "Died at "}
           {character.age} Years Old
         </Text>
-        <Text className="text-center text-xl">{character.fullName}</Text>
-        <View className="mx-auto">
-          <Text className="flex flex-wrap text-center text-lg">
+        <Text style={{ textAlign: "center", ...text.xl }}>
+          {character.fullName}
+        </Text>
+        <View style={{ marginHorizontal: "auto" }}>
+          <Text style={{ textAlign: "center", flexWrap: "wrap", ...text.lg }}>
             {character.deathdate && "Was a "}
             {character.job}
           </Text>
         </View>
         {!character.deathdate && (
-          <View className="flex w-2/3 flex-row justify-center">
-            <View className="w-3/4">
+          <View style={styles.affectionContainer}>
+            <View style={{ width: "75%" }}>
               <ProgressBar
                 value={Math.floor(character.affection * 4) / 4}
                 minValue={-100}
@@ -107,7 +118,7 @@ const RelationshipsScreen = observer(() => {
                 unfilledColor="#fca5a5"
               />
             </View>
-            <View className="my-auto ml-1">
+            <View style={{ marginVertical: "auto", marginLeft: 4 }}>
               <AffectionIcon height={14} width={14} />
             </View>
           </View>
@@ -120,23 +131,22 @@ const RelationshipsScreen = observer(() => {
     if (data.length === 0) return null;
 
     return (
-      <View className="w-full" key={title}>
-        <Text className="py-8 text-center text-2xl">{title}</Text>
+      <View style={{ width: "100%" }} key={title}>
+        <Text
+          style={{ paddingVertical: 32, textAlign: "center", ...text["2xl"] }}
+        >
+          {title}
+        </Text>
         <FlatList
           horizontal
           data={data}
-          contentContainerClassName="flex flex-row justify-evenly min-w-full"
+          contentContainerStyle={[flex.rowEvenly, { minWidth: "100%" }]}
           renderItem={({ item }) => renderCharacter(item)}
           keyExtractor={(item) => item.id}
         />
       </View>
     );
   };
-
-  const [showingAdoptionModal, setShowingAdoptionModal] =
-    useState<boolean>(false);
-
-  const [partnerName, setPartnerName] = useState<string>();
 
   const showAdoptionModal = (partnerName?: string) => {
     if (showInteractionModal) {
@@ -186,7 +196,7 @@ const RelationshipsScreen = observer(() => {
           size={100}
         >
           <View style={{ maxHeight: uiStore.dimensions.height * 0.75 }}>
-            <Text className="text-center text-2xl tracking-wider py-2">
+            <Text style={styles.adoptionTitle}>
               {partnerName
                 ? `Adopting with ${partnerName}`
                 : "Independent Adoption"}
@@ -196,7 +206,7 @@ const RelationshipsScreen = observer(() => {
                 numColumns={2}
                 data={characterStore.independentChildren}
                 renderItem={({ item }) => (
-                  <View className="flex flex-col items-center w-1/2">
+                  <View style={styles.adoptionCharacterContainer}>
                     {renderCharacter(item)}
                     <GenericRaisedButton
                       onPress={() =>
@@ -215,7 +225,7 @@ const RelationshipsScreen = observer(() => {
               />
             ) : (
               <GenericStrikeAround>
-                <Text className="text-center">
+                <Text style={{ textAlign: "center" }}>
                   You are not yet old enough to adopt
                 </Text>
               </GenericStrikeAround>
@@ -232,8 +242,7 @@ const RelationshipsScreen = observer(() => {
         />
         <ScrollView>
           <View
-            className="flex-1 items-center px-8 pb-10"
-            style={{ paddingTop: useHeaderHeight() }}
+            style={[styles.mainContainer, { paddingTop: useHeaderHeight() }]}
           >
             {characterGroups.map((group) =>
               renderGroup(group.title, group.data),

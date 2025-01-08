@@ -51,19 +51,19 @@ export const useStyles = () => {
     // ---- Generics ---- //
     ...flex,
     ...tw,
-    ...radius,
     ...text,
     ...font,
+    ...shadows,
     border,
     themedCard,
     roundedBorder,
     raisedAbsolutePosition,
     textCenter: {
       textAlign: "center",
-    },
+    } as const,
     itemsCenter: {
       alignItems: "center",
-    },
+    } as const,
     centeredContainer,
     // ---- New Game ---- //
     newGameContainer: {
@@ -91,7 +91,7 @@ export const useStyles = () => {
       ...radius.lg,
       paddingHorizontal: 24,
       paddingVertical: 8,
-    },
+    } as const,
 
     classDescriptionText: {
       marginTop: height * 0.02,
@@ -307,7 +307,7 @@ export const useStyles = () => {
       position: "absolute",
       alignItems: "center",
       justifyContent: "center",
-    },
+    } as const,
     stashButton: {
       zIndex: 10,
       borderRadius: 8,
@@ -546,22 +546,22 @@ export const useStyles = () => {
       letterSpacing: 3,
       color: "#ef4444",
       ...tw.py8,
-    },
+    } as const,
     childrenContainer: {
       ...flex.columnCenter,
       height: tw_base[64],
-    },
+    } as const,
     childCard: {
       ...themedCard,
       ...radius.xl,
       ...tw.p1,
-    },
+    } as const,
     newLifeButton: {
       ...tw.mt2,
       ...border,
       ...tw.px4,
       ...tw.py2,
-    },
+    } as const,
     // ---- Stash ---- //
     tabsContainer: {
       flexDirection: "row",
@@ -843,7 +843,7 @@ export const useStyles = () => {
       borderRadius: 4,
       paddingHorizontal: 16,
       paddingVertical: 8,
-      shadowOffset: { width: 0, height: 1 },
+      shadowOffset: { width: 0, height: 1 } as const,
       shadowOpacity: 0.1,
       shadowRadius: 1,
     } as const,
@@ -1012,7 +1012,7 @@ export const useStyles = () => {
       paddingHorizontal: 16,
       paddingVertical: 8,
       shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
+      shadowOffset: { width: 0, height: 2 } as const,
       shadowOpacity: 0.25,
       shadowRadius: 3.84,
       elevation: 5,
@@ -1023,60 +1023,60 @@ export const useStyles = () => {
       ...roundedBorder,
       paddingHorizontal: 24,
       paddingVertical: 8,
-    },
+    } as const,
     pressedStyle: {
       transform: [{ scale: 0.95 }],
       opacity: 0.5,
-    },
+    } as const,
     activeButton: {
       backgroundColor: theme.background,
       shadowColor: theme.shadow,
       elevation: 1,
       shadowOpacity: 0.1,
       shadowRadius: 5,
-    },
+    } as const,
     disabledButton: {
       backgroundColor: theme.secondary,
       opacity: 0.5,
-    },
+    } as const,
     greetingContainer: {
       ...tw.p2,
       ...radius.lg,
       ...raisedAbsolutePosition,
       borderColor: theme.tint,
       backgroundColor: theme.background,
-    },
+    } as const,
     sellJunkButton: {
       ...tw.ml2,
       ...tw.px6,
       ...radius.xl,
       ...border,
       borderColor: theme.border,
-    },
+    } as const,
     shopKeeperSection: {
       ...tw.my4,
       ...tw.px1,
       width: "33%",
-    },
+    } as const,
     shopsInventoryContainer: {
       flex: 1,
       ...radius.lg,
       borderLeftWidth: 1,
       borderBottomWidth: 1,
       borderColor: theme.secondary,
-    },
+    } as const,
     playerInventorySection: {
       flex: 1,
       ...tw.mx2,
       ...tw.mt4,
-    },
+    } as const,
     statsDisplayContainer: {
       ...flex.columnCenter,
       ...radius.md,
       borderWidth: 1,
       borderColor: theme.secondary,
       ...tw.p4,
-    },
+    } as const,
     closeButton: {
       position: "absolute",
       borderColor: theme.secondary,
@@ -1084,46 +1084,46 @@ export const useStyles = () => {
       borderBottomLeftRadius: 12,
       ...tw.px2,
       ...tw.py1,
-    },
+    } as const,
     consumableEffectContainer: {
       borderRadius: 6,
       ...tw.p1,
-    },
+    } as const,
     poisonContainer: {
       borderRadius: 6,
       ...tw.p1,
       backgroundColor: uiStore.colorScheme === "dark" ? "#388E3C" : "#A5D6A7",
-    },
+    } as const,
     storyModalContainer: {
       maxHeight: "75%",
       marginVertical: "auto",
-    },
+    } as const,
     storyContainer: {
       ...tw.pr4,
       ...tw.py4,
       height: "100%",
-    },
+    } as const,
     storyHeaderContainer: {
       borderBottomWidth: 1,
       borderColor: theme.secondary,
       ...tw.mb4,
       ...tw.ml4,
-    },
+    } as const,
     healthEffectContainer: {
       borderRadius: 6,
       ...tw.p1,
       backgroundColor: theme.health,
-    },
+    } as const,
     manaEffectContainer: {
       borderRadius: 6,
       ...tw.p1,
       backgroundColor: theme.mana,
-    },
+    } as const,
     sanityEffectContainer: {
       borderRadius: 6,
       ...tw.p1,
       backgroundColor: theme.sanity,
-    },
+    } as const,
     nextButton: {
       marginHorizontal: "auto",
       marginTop: 8,
@@ -1132,65 +1132,64 @@ export const useStyles = () => {
       borderColor: uiStore.colorScheme === "dark" ? theme.border : "#27272a",
       paddingHorizontal: 24,
       paddingVertical: 8,
-    },
+    } as const,
     titleText: greater > 768 ? text["3xl"] : text["2xl"],
     bodyText: greater > 768 ? text.xl : text.lg,
     classContainer: {
       ...flex.columnCenter,
       justifyContent: "space-evenly",
       ...tw.py6,
-    },
+    } as const,
     blessingContainer: {
       ...flex.columnCenter,
       height: "100%",
       width: "100%",
       borderWidth: 1,
       borderRadius: 8,
-    },
+    } as const,
     classPressable: {
       ...flex.columnCenter,
       borderWidth: 1,
       borderRadius: 8,
       height: "100%",
       width: "100%",
-    },
+    } as const,
     // ---- Auth --- //
     authProviderContainer: {
       flexDirection: "column",
       alignItems: "center",
       marginTop: 0.2 * height,
       paddingHorizontal: 16,
-    },
+    } as const,
     providerButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
+      ...flex.rowBetween,
       borderWidth: 1,
-      borderColor: uiStore.colorScheme == "dark" ? "#fafafa" : "#27272a",
-      backgroundColor: uiStore.colorScheme == "dark" ? "#27272a" : "#ffffff",
+      borderColor: theme.border,
+      backgroundColor: theme.background,
       paddingHorizontal: 12,
       marginTop: -8,
       marginBottom: 8,
       paddingVertical: 8,
       borderRadius: 5,
-      shadowColor: "#000",
+      shadowColor: theme.shadow,
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.2,
       shadowRadius: 1.41,
       elevation: 2,
       width: 230,
-    },
-    input: {
-      marginHorizontal: 64,
-      borderRadius: 4,
+    } as const,
+    authInput: {
+      marginVertical: 24,
+      borderRadius: 6,
       borderWidth: 1,
-      borderColor: uiStore.colorScheme == "dark" ? "#fafafa" : "#27272a",
+      borderColor: theme.border,
       paddingLeft: 8,
+      color: theme.text,
+      fontFamily: "PixelifySans",
       paddingVertical: 8,
       minWidth: "50%",
-      fontFamily: "PixelifySans",
-    },
-
+      fontSize: 20,
+    } as const,
     // ---- Spell Details ---- //
     spellCard: {
       borderRadius: 8,
@@ -1199,7 +1198,7 @@ export const useStyles = () => {
       elevation: 6,
       backgroundColor: uiStore.colorScheme == "light" ? "#fafafa" : "#27272a",
       width: width * 0.75,
-    },
+    } as const,
     spellHeader: {
       ...flex.rowBetween,
       ...roundedBorder,
@@ -1207,7 +1206,7 @@ export const useStyles = () => {
       ...(uiStore.colorScheme == "dark" && {
         borderWidth: 1,
       }),
-    },
+    } as const,
     // ---- Activity Card ---- //
     activityCard: {
       margin: 8,
@@ -1216,12 +1215,12 @@ export const useStyles = () => {
       shadowOffset: {
         width: 3,
         height: 1,
-      },
+      } as const,
       elevation: 3,
       shadowOpacity: 0.2,
       backgroundColor: uiStore.colorScheme == "light" ? "#fafafa" : "#27272a",
       shadowRadius: 3,
-    },
+    } as const,
     activityCardInner: {
       borderRadius: 12,
       paddingHorizontal: 16,
@@ -1230,7 +1229,7 @@ export const useStyles = () => {
         borderWidth: 1,
         borderColor: "#71717a",
       }),
-    },
+    } as const,
     characterCard: {
       width: "48%",
       marginVertical: 8,
@@ -1238,14 +1237,85 @@ export const useStyles = () => {
       borderWidth: 1,
       borderColor: "#a1a1aa",
       borderRadius: 4,
-    },
+    } as const,
     characterGrid: {
       paddingVertical: 12,
       flexDirection: "row",
       flexWrap: "wrap",
       alignItems: "flex-start",
       justifyContent: "space-between",
-    },
+    } as const,
+    gearStatsContainer: {
+      flexDirection: "column",
+      borderRadius: 8,
+      backgroundColor:
+        uiStore.colorScheme === "dark"
+          ? "rgba(63, 63, 70, 0.5)"
+          : "rgba(212, 212, 216, 0.5)",
+      marginHorizontal: 4,
+      padding: 8,
+    } as const,
+    gearStatsRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      alignItems: "center",
+      justifyContent: "center",
+    } as const,
+
+    statRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      width: "100%",
+      margin: 2,
+      columnGap: 4,
+    } as const,
+
+    // ---- Relationships ---- //
+    mainContainer: {
+      flex: 1,
+      alignItems: "center",
+      paddingHorizontal: 32,
+      paddingBottom: 40,
+    } as const,
+
+    affectionContainer: {
+      width: "66%",
+      flexDirection: "row",
+      justifyContent: "center",
+    } as const,
+
+    adoptionTitle: {
+      textAlign: "center",
+      letterSpacing: 2,
+      paddingVertical: 8,
+    } as const,
+
+    adoptionCharacterContainer: {
+      flex: 1,
+      flexDirection: "column",
+      alignItems: "center",
+      width: "50%",
+    } as const,
+    dialogueBox: {
+      position: "absolute",
+      top: -50,
+      left: 0,
+      right: 0,
+      marginHorizontal: "auto",
+      padding: 8,
+      borderRadius: 8,
+      backgroundColor: theme.background,
+      opacity: 0.8,
+      maxWidth: "80%",
+    } as const,
+    raisedCard: {
+      width: "100%",
+      ...radius.lg,
+      ...shadows.soft,
+      alignItems: "center",
+      padding: 16,
+    } as const,
   });
 };
 
@@ -1753,7 +1823,7 @@ export const text = {
   "3xl": { fontSize: 30, lineHeight: 36 },
   "4xl": { fontSize: 36, lineHeight: 40 },
   "5xl": { fontSize: 48, lineHeight: 48 },
-};
+} as const;
 
 export const font = {
   bold: { fontWeight: 700 as const },
@@ -1793,4 +1863,69 @@ export const flex = {
   wrap: {
     flexWrap: "wrap",
   } as const,
-};
+} as const;
+export const shadows = {
+  diffuse: {
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  diffuseTop: {
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: -5 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  soft: {
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.25,
+    shadowRadius: 15,
+    elevation: 4,
+  },
+  softTop: {
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: -5 },
+    shadowOpacity: 0.25,
+    shadowRadius: 15,
+    elevation: 4,
+  },
+  diffuseWhite: {
+    shadowColor: "#ffffff",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  diffuseTopWhite: {
+    shadowColor: "#ffffff",
+    shadowOffset: { width: 0, height: -5 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  softWhite: {
+    shadowColor: "#ffffff",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.1,
+    shadowRadius: 15,
+    elevation: 3,
+  },
+  softTopWhite: {
+    shadowColor: "#ffffff",
+    shadowOffset: { width: 0, height: -5 },
+    shadowOpacity: 0.1,
+    shadowRadius: 15,
+    elevation: 3,
+  },
+  cardOffset: {
+    shadowColor: "#000000",
+    shadowOffset: { width: 3, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+} as const;

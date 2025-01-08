@@ -1,6 +1,7 @@
 import { type ReactNode, useRef } from "react";
 import { Pressable, Animated, View } from "react-native";
 import { ThemedView } from "./Themed";
+import { useStyles } from "../hooks/styles";
 
 const AnimatedThemedView = Animated.createAnimatedComponent(View);
 
@@ -12,6 +13,7 @@ export default function GenericAnimatedPressable({
   onPress?: () => void;
 }) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const styles = useStyles();
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -32,16 +34,14 @@ export default function GenericAnimatedPressable({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       onPress={onPress}
-      className="w-full"
+      style={{ width: "100%" }}
     >
       <AnimatedThemedView
         style={{
           transform: [{ scale: scaleAnim }],
         }}
       >
-        <ThemedView className="w-full rounded-lg shadow-lg items-center p-4">
-          {children}
-        </ThemedView>
+        <ThemedView style={styles.raisedCard}>{children}</ThemedView>
       </AnimatedThemedView>
     </Pressable>
   );

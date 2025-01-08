@@ -47,7 +47,8 @@ import {
   getTotalValue,
   statMapping,
 } from "../utility/functions/stats";
-import { useStyles } from "../hooks/styles";
+import { radius, useStyles } from "../hooks/styles";
+import Colors from "../constants/Colors";
 
 export const EXPANDED_PAD = 16;
 
@@ -60,16 +61,33 @@ const StatDisplay = ({
 }) => {
   const statInfo = statMapping[modifier];
   const Icon = statInfo.icon;
+  const styles = useStyles();
+  const { uiStore } = useRootStore();
+  const theme = Colors[uiStore.colorScheme];
 
   return (
-    <View className="my-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-      <View className="flex-row items-center justify-center">
+    <View
+      style={{
+        ...styles.my2,
+        ...styles.p2,
+        ...radius.lg,
+        backgroundColor: theme.secondary,
+      }}
+    >
+      <View style={{ ...styles.rowCenter }}>
         <Icon height={14} width={14} />
-        <Text className="text-center ml-2 font-semibold">
+        <Text style={{ ...styles.ml2, ...styles.bold }}>
           {getTotalValue(modifier, value)}
         </Text>
       </View>
-      <Text className="text-center text-xs text-gray-500 mt-1">
+      <Text
+        style={{
+          ...styles.textCenter,
+          ...styles.xs,
+          ...styles.mt1,
+          color: theme.border,
+        }}
+      >
         {statInfo.description}
       </Text>
     </View>

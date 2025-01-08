@@ -16,6 +16,7 @@ import {
 } from "../assets/icons/SVGIcons";
 import BlessingDisplay from "./BlessingsDisplay";
 import { useNavigation } from "expo-router";
+import { radius, useStyles } from "../hooks/styles";
 
 const CheckpointModal = ({
   isVisible,
@@ -31,6 +32,7 @@ const CheckpointModal = ({
   const [expandedGames, setExpandedGames] = useState<Record<number, boolean>>(
     {},
   );
+  const styles = useStyles();
   const [confirmingAction, setConfirmingAction] = useState<{
     id: number;
     action: "overwrite" | "delete" | "load";
@@ -131,13 +133,13 @@ const CheckpointModal = ({
     item: any;
     gameId: number;
   }) => (
-    <View className="ml-4 mt-2">
+    <View style={{ ...styles.ml4, ...styles.mt2 }}>
       <View>
         <Text>{saveStore.formatDate(new Date(item.timestamp))}</Text>
         <Text>{item.is_auto_save ? "Auto Save" : "Manual Save"}</Text>
         <Text>Player Age: {item.player_age}</Text>
       </View>
-      <View className="flex-row mt-2">
+      <View style={{ ...styles.rowCenter, ...styles.mt2 }}>
         {confirmingAction && confirmingAction.id === item.id ? (
           <>
             <TouchableOpacity
@@ -150,21 +152,29 @@ const CheckpointModal = ({
                   handleLoad(item.id, gameId);
                 }
               }}
-              className={`p-2 rounded mr-2 ${
-                confirmingAction.action === "load"
-                  ? "bg-green-500"
-                  : confirmingAction.action === "overwrite"
-                  ? "bg-blue-500"
-                  : "bg-red-500"
-              }`}
+              style={{
+                ...styles.p2,
+                ...radius.md,
+                ...styles.mr2,
+                backgroundColor:
+                  confirmingAction.action === "load"
+                    ? "#22c55e"
+                    : confirmingAction.action === "overwrite"
+                    ? "#3b82f6"
+                    : "#ef4444",
+              }}
             >
-              <Text className="text-white">Confirm</Text>
+              <Text style={{ color: "#fff" }}>Confirm</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setConfirmingAction(null)}
-              className="bg-gray-500 p-2 rounded"
+              style={{
+                backgroundColor: "#6b7280",
+                ...styles.p2,
+                ...radius.md,
+              }}
             >
-              <Text className="text-white">Cancel</Text>
+              <Text style={{ color: "#fff" }}>Cancel</Text>
             </TouchableOpacity>
           </>
         ) : (
@@ -173,27 +183,41 @@ const CheckpointModal = ({
               onPress={() =>
                 setConfirmingAction({ id: item.id, action: "load" })
               }
-              className="bg-green-500 p-2 rounded mr-2"
+              style={{
+                backgroundColor: "#22c55e",
+                ...styles.p2,
+                ...radius.md,
+                ...styles.mr2,
+              }}
             >
-              <Text className="text-white">Load</Text>
+              <Text style={{ color: "#fff" }}>Load</Text>
             </TouchableOpacity>
             {allowSaving && (
               <TouchableOpacity
                 onPress={() =>
                   setConfirmingAction({ id: item.id, action: "overwrite" })
                 }
-                className="bg-blue-500 p-2 rounded mr-2"
+                style={{
+                  backgroundColor: "#3b82f6",
+                  ...styles.p2,
+                  ...radius.md,
+                  ...styles.mr2,
+                }}
               >
-                <Text className="text-white">Overwrite</Text>
+                <Text style={{ color: "#fff" }}>Overwrite</Text>
               </TouchableOpacity>
             )}
             <TouchableOpacity
               onPress={() =>
                 setConfirmingAction({ id: item.id, action: "delete" })
               }
-              className="bg-red-500 p-2 rounded"
+              style={{
+                backgroundColor: "#ef4444",
+                ...styles.p2,
+                ...radius.md,
+              }}
             >
-              <Text className="text-white">Delete</Text>
+              <Text style={{ color: "#fff" }}>Delete</Text>
             </TouchableOpacity>
           </>
         )}
@@ -252,12 +276,12 @@ const CheckpointModal = ({
     };
 
     return (
-      <View className="mb-4">
+      <View style={styles.mb4}>
         <TouchableOpacity onPress={() => toggleGameExpansion(gameId)}>
           <ThemedCard>
-            <View className="flex flex-row justify-between">
+            <View style={styles.rowBetween}>
               <View>
-                <Text className="font-bold">
+                <Text style={styles.bold}>
                   {`${latestCheckpoint.player_data.firstName} ${latestCheckpoint.player_data.lastName}`}
                 </Text>
                 <Text>
@@ -271,7 +295,12 @@ const CheckpointModal = ({
                   }
                 </Text>
               </View>
-              <View className="flex justify-between h-24">
+              <View
+                style={{
+                  ...styles.columnBetween,
+                  height: 96,
+                }}
+              >
                 {getClassIcon()}
                 <BlessingDisplay
                   blessing={latestCheckpoint.player_data.blessing}
@@ -281,8 +310,12 @@ const CheckpointModal = ({
               </View>
             </View>
             <Animated.View
-              className="absolute bottom-0 p-2"
-              style={{ transform: [{ rotate: spin }] }}
+              style={{
+                ...styles.p2,
+                position: "absolute",
+                bottom: 0,
+                transform: [{ rotate: spin }],
+              }}
             >
               <Ionicons
                 name="chevron-down"
@@ -314,14 +347,20 @@ const CheckpointModal = ({
         marginVertical: "auto",
       }}
     >
-      <Text className="text-2xl font-bold mb-4">Saved Games</Text>
+      <Text style={{ ...styles["2xl"], ...styles.bold, ...styles.mb4 }}>
+        Saved Games
+      </Text>
       {allowSaving && (
-        <View className="flex-row mb-4">
+        <View style={{ ...styles.rowBetween, ...styles.mb4 }}>
           <TouchableOpacity
             onPress={handleNewSave}
-            className="bg-blue-500 p-2 rounded"
+            style={{
+              ...styles.p2,
+              ...radius.md,
+              backgroundColor: "#3b82f6",
+            }}
           >
-            <Text className="text-white">Save</Text>
+            <Text style={{ color: "#ffffff" }}>Save</Text>
           </TouchableOpacity>
         </View>
       )}

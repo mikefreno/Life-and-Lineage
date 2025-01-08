@@ -216,20 +216,22 @@ const RootLayout = observer(() => {
       backFunction={() => setShowBirthModal(false)}
       accessibilityLabel="Birth Announcement"
     >
-      <View className="items-center">
-        <Text className="text-center text-2xl">A Child is Born!</Text>
+      <View style={styles.itemsCenter}>
+        <Text style={{ ...styles["2xl"], ...styles.textCenter }}>
+          A Child is Born!
+        </Text>
         {newbornBaby && (
           <>
-            <Text className="text-center text-xl mt-4">
+            <Text style={{ ...styles.xl, ...styles.textCenter, ...styles.mt4 }}>
               {newbornBaby.fullName}
             </Text>
-            <Text className="text-center mt-2">
+            <Text style={{ ...styles.textCenter, ...styles.mt2 }}>
               Sex: {toTitleCase(newbornBaby.sex)}
             </Text>
-            <View style={tw.mt4}>
+            <View style={styles.mt4}>
               <CharacterImage character={newbornBaby} />
             </View>
-            <Text className="text-center mt-4">
+            <Text style={{ ...styles.textCenter, ...styles.mt4 }}>
               Born to: {newbornBaby.parents?.[0].fullName}
               {newbornBaby.parents?.[1] &&
                 ` and ${newbornBaby.parents[1].fullName}`}
@@ -238,7 +240,7 @@ const RootLayout = observer(() => {
         )}
         <GenericFlatButton
           onPress={() => setShowBirthModal(false)}
-          style={tw.mt4}
+          style={styles.mt4}
         >
           Close
         </GenericFlatButton>

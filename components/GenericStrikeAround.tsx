@@ -15,7 +15,7 @@ interface GenericStrikeAround {
 }
 
 /**
- * Pass in a string to render as <Text className="text-xl">{children}</Text>
+ * Pass in a string to render as <Text style={...text.xl}>{children}</Text>
  * Or pass in a node
  */
 export default function GenericStrikeAround({

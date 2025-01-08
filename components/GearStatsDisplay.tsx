@@ -14,6 +14,9 @@ import {
   shouldShowModifier,
 } from "../utility/functions/stats";
 import { useVibration } from "../hooks/generic";
+import { flex, text, useStyles } from "../hooks/styles";
+import React from "react";
+import { useRootStore } from "../hooks/stores";
 
 const StatRow = observer(
   ({
@@ -27,6 +30,8 @@ const StatRow = observer(
     detailed?: boolean;
     item: Item;
   }) => {
+    const styles = useStyles();
+
     if (!detailed && !shouldShowModifier(mod, item)) {
       return null;
     }
@@ -36,9 +41,13 @@ const StatRow = observer(
     const value = getTotalValue(mod, magnitude);
 
     return (
-      <View className="flex flex-row items-center justify-between w-full space-x-1 m-0.5">
+      <View style={styles.statRow}>
         <Icon height={detailed ? 24 : 18} width={detailed ? 24 : 18} />
-        <Text className={`${detailed ? "pl-4 text-center" : ""}`}>
+        <Text
+          style={
+            detailed ? { paddingLeft: 16, textAlign: "center" } : undefined
+          }
+        >
           {`${value} ${detailed ? statInfo.description || "" : ""}`}
           {detailed && statInfo.shouldShowTotal
             ? ` (${cleanRoundToTenths(item.stats?.get(mod) ?? 0)})`
@@ -50,9 +59,12 @@ const StatRow = observer(
 );
 
 export default function GearStatsDisplay({ item }: { item: Item }) {
+  const { uiStore } = useRootStore();
+
   if (!item.stats || item.stats.size === 0) {
     return null;
   }
+
   const [showingDetailedView, setShowingDetailedView] = useState(false);
   const shouldShowTotalDamage =
     (item.itemClass === ItemClassType.Bow ||
@@ -77,17 +89,17 @@ export default function GearStatsDisplay({ item }: { item: Item }) {
         isVisibleCondition={showingDetailedView}
         backFunction={() => setShowingDetailedView(false)}
       >
-        <View className="px-4">
-          <View className="flex flex-row justify-between pb-4">
+        <View style={{ paddingHorizontal: 16 }}>
+          <View style={[, { paddingBottom: 16 }]}>
             {shouldShowTotalDamage ? (
-              <View className="w-1/2">
-                <Text className="text-3xl" numberOfLines={2}>
+              <View style={{ width: "50%" }}>
+                <Text style={{ numberOfLines: 2, ...text["3xl"] }}>
                   {cleanRoundToTenths(item.totalDamage)} Total Damage
                 </Text>
               </View>
             ) : shouldShowTotalArmor ? (
-              <View className="w-1/2">
-                <Text className="text-3xl" numberOfLines={2}>
+              <View style={{ width: "50%" }}>
+                <Text style={{ numberOfLines: 2, ...text["3xl"] }}>
                   {cleanRoundToTenths(item.totalArmor)} Total Armor
                 </Text>
               </View>
@@ -99,13 +111,12 @@ export default function GearStatsDisplay({ item }: { item: Item }) {
               style={{
                 width: 48,
                 height: 48,
-                marginTop: "auto",
-                marginBottom: "auto",
+                marginVertical: "auto",
               }}
             />
           </View>
           {Array.from(item.stats.entries()).map(([key, value]) => (
-            <View key={key} className="">
+            <View key={key}>
               <StatRow
                 mod={key as Modifier}
                 magnitude={value}
@@ -115,7 +126,7 @@ export default function GearStatsDisplay({ item }: { item: Item }) {
             </View>
           ))}
           <GenericStrikeAround>
-            <Text className="text-sm text-center">
+            <Text style={{ textAlign: "center", ...text.sm }}>
               ( ) Indicates cumulative effect as a standalone item.
             </Text>
           </GenericStrikeAround>
@@ -129,26 +140,42 @@ export default function GearStatsDisplay({ item }: { item: Item }) {
           vibrate({ style: "medium" });
           setShowingDetailedView(true);
         }}
-        className="flex flex-col rounded-lg bg-zinc-300/50 mx-1 p-2 dark:bg-zinc-700/50"
+        style={{
+          flexDirection: "column",
+          borderRadius: 8,
+          backgroundColor:
+            uiStore.colorScheme === "dark"
+              ? "rgba(63, 63, 70, 0.5)"
+              : "rgba(212, 212, 216, 0.5)",
+          marginHorizontal: 4,
+          padding: 8,
+        }}
       >
-        <View className="flex flex-row flex-wrap items-center justify-center">
+        <View style={[flex.columnCenter, flex.wrap]}>
           {shouldShowTotalDamage && (
-            <Text className="text-xl text-center">
+            <Text style={{ textAlign: "center", ...text.xl }}>
               {cleanRoundToTenths(item.totalDamage)} Total Damage
             </Text>
           )}
           {shouldShowTotalArmor && (
-            <Text className="text-xl text-center">
+            <Text style={{ textAlign: "center", ...text.xl }}>
               {cleanRoundToTenths(item.totalArmor)} Total Armor
             </Text>
           )}
           {Array.from(item.stats.entries()).map(([key, value]) => (
-            <View key={key} className="w-3/5">
+            <View key={key} style={{ width: "60%" }}>
               <StatRow mod={key as Modifier} magnitude={value} item={item} />
             </View>
           ))}
         </View>
-        <Text className="mt-2 text-sm text-center w-full">
+        <Text
+          style={{
+            marginTop: 8,
+            textAlign: "center",
+            width: "100%",
+            ...text.sm,
+          }}
+        >
           Hold for more detail
         </Text>
       </Pressable>

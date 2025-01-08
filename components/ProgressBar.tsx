@@ -75,7 +75,14 @@ const ProgressBar = ({
         ]}
       >
         {displayNumber && (
-          <View className={`mx-auto flex-1 flex-wrap overflow-visible`}>
+          <View
+            style={{
+              marginHorizontal: "auto",
+              flex: 1,
+              flexWrap: "wrap",
+              overflow: "visible",
+            }}
+          >
             <Text
               style={{
                 marginTop: borderColor ? -2 : -1,

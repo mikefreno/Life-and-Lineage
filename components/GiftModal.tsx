@@ -7,6 +7,8 @@ import { toTitleCase } from "../utility/functions/misc";
 import GearStatsDisplay from "./GearStatsDisplay";
 import type { Item } from "../entities/item";
 import { useRootStore } from "../hooks/stores";
+import { radius, useStyles } from "../hooks/styles";
+import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
@@ -23,6 +25,8 @@ export default function GiftModal({
   backdropCloses = false,
 }: GiftModalProps) {
   const { playerState, uiStore } = useRootStore();
+  const styles = useStyles();
+  const theme = Colors[uiStore.colorScheme];
 
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const selectedItemRef = useRef<Item>();
@@ -32,12 +36,12 @@ export default function GiftModal({
   interface ItemRenderProps {
     item: Item;
   }
+
   const ItemRender = ({ item }: ItemRenderProps) => {
     const localRef = useRef<View>(null);
     return (
       <Pressable
         ref={localRef}
-        className="h-14 w-14 items-center justify-center rounded-lg bg-zinc-400 active:scale-90 active:opacity-50"
         onPress={() => {
           if (selectedItem?.equals(item)) {
             setSelectedItem(null);
@@ -54,10 +58,25 @@ export default function GiftModal({
           }
         }}
       >
-        <Image source={item.getItemIcon()} />
+        {({ pressed }) => (
+          <View
+            style={{
+              ...styles.itemsCenter,
+              ...radius.lg,
+              height: 56,
+              width: 56,
+              backgroundColor: "#a1a1aa",
+              transform: [{ scale: pressed ? 0.9 : 1 }],
+              opacity: pressed ? 0.5 : 1,
+            }}
+          >
+            <Image source={item.getItemIcon()} />
+          </View>
+        )}
       </Pressable>
     );
   };
+
   return (
     <GenericModal
       backdropCloses={backdropCloses}
@@ -65,11 +84,22 @@ export default function GiftModal({
       backFunction={onCloseFunction}
     >
       <>
-        <View className="absolute bottom-0 mx-auto flex h-full w-full flex-wrap rounded-lg">
+        <View
+          style={{
+            position: "absolute",
+            bottom: 0,
+            ...styles.mxAuto,
+            height: "100%",
+            width: "100%",
+            ...styles.wrap,
+            ...radius.lg,
+          }}
+        >
           {Array.from({ length: 24 }).map((_, index) => (
             <View
-              className="absolute items-center justify-center"
               style={{
+                position: "absolute",
+                ...styles.itemsCenter,
                 left: `${
                   (index % 6) * 16.67 + 1 * (Math.floor(deviceWidth / 400) + 1)
                 }%`,
@@ -77,13 +107,22 @@ export default function GiftModal({
               }}
               key={"bg-" + index}
             >
-              <View className="h-14 w-14 rounded-lg bg-zinc-200 dark:bg-zinc-700" />
+              <View
+                style={{
+                  height: 56,
+                  width: 56,
+                  ...radius.lg,
+                  backgroundColor:
+                    uiStore.colorScheme === "dark" ? "#3f3f46" : "#e4e4e7",
+                }}
+              />
             </View>
           ))}
           {playerState!.baseInventory.slice(0, 24).map((item, index) => (
             <View
-              className="absolute items-center justify-center"
               style={{
+                position: "absolute",
+                ...styles.itemsCenter,
                 left: `${
                   (index % 6) * 16.67 + 1 * (Math.floor(deviceWidth / 400) + 1)
                 }%`,
@@ -97,9 +136,14 @@ export default function GiftModal({
         </View>
         {selectedItem && statsLeftPos && statsTopPos ? (
           <View
-            className="absolute items-center rounded-md border border-zinc-600 p-4"
             style={{
-              shadowColor: "#000",
+              position: "absolute",
+              ...styles.itemsCenter,
+              ...radius.md,
+              borderWidth: 1,
+              borderColor: theme.border,
+              ...styles.p4,
+              shadowColor: theme.shadow,
               shadowOffset: {
                 width: 0,
                 height: 2,
@@ -125,21 +169,21 @@ export default function GiftModal({
             }}
           >
             <View>
-              <Text className="text-center">
+              <Text style={styles.textCenter}>
                 {toTitleCase(selectedItem.name)}
               </Text>
             </View>
             {selectedItem.stats && selectedItem.slot ? (
-              <View className="py-2">
+              <View style={styles.py2}>
                 <GearStatsDisplay stats={selectedItem.stats} />
               </View>
             ) : null}
             {(selectedItem.slot == "one-hand" ||
               selectedItem.slot == "two-hand" ||
               selectedItem.slot == "off-hand") && (
-              <Text className="text-sm">{toTitleCase(selectedItem.slot)}</Text>
+              <Text style={styles.sm}>{toTitleCase(selectedItem.slot)}</Text>
             )}
-            <Text className="text-sm">
+            <Text style={styles.sm}>
               {selectedItem.itemClass == "bodyArmor"
                 ? "Body Armor"
                 : toTitleCase(selectedItem.itemClass)}
