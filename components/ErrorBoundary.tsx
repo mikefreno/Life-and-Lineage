@@ -33,10 +33,20 @@ function ErrorRender() {
   const styles = useStyles();
   return (
     <View style={styles.errorContainer}>
-      <View style={styles.errorInnerContainer}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "space-evenly",
+        }}
+      >
         <Text style={{ textAlign: "center" }}>Something went wrong.</Text>
 
-        <View style={styles.dieContainer}>
+        <View
+          style={{
+            width: "100%",
+            marginHorizontal: "auto",
+          }}
+        >
           <D20DieAnimation
             keepRolling={true}
             slowRoll={true}

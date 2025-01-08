@@ -25,7 +25,7 @@ import { InventoryItem } from "../../components/Draggable";
 import { useDraggableStore, useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
 import type { Item } from "../../entities/item";
-import { useStyles } from "../../hooks/styles";
+import { flex, tw, useStyles } from "../../hooks/styles";
 
 const TEN_MINUTES = 10 * 60 * 1000;
 const ONE_SECOND = 1000;
@@ -218,15 +218,15 @@ const ShopInteriorScreen = observer(() => {
         />
 
         <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
-          <View style={[styles.flexColumnBetween, { flex: 1 }]}>
-            <View style={[styles.flexRowEvenly, { height: "40%" }]}>
-              <View style={[styles.flexColumnCenter, styles.shopKeeperSection]}>
+          <View style={[flex.columnBetween, { flex: 1 }]}>
+            <View style={[flex.rowEvenly, { height: "40%" }]}>
+              <View style={[flex.columnCenter, styles.shopKeeperSection]}>
                 <CharacterImage character={thisShop.shopKeeper} scale={0.3} />
                 <GreetingComponent greeting={greeting} />
                 <Text style={styles.textCenter}>
                   {thisShop.shopKeeper.fullName}'s Inventory
                 </Text>
-                <View style={[styles.flexRowCenter, styles.mb1]}>
+                <View style={[flex.rowCenter, tw.mb1]}>
                   <Text>{thisShop.currentGold}</Text>
                   <Coins width={16} height={16} style={{ marginLeft: 6 }} />
                 </View>
@@ -239,16 +239,13 @@ const ShopInteriorScreen = observer(() => {
               </View>
               <View
                 onLayout={(e) => setShopBoundsOnLayout(e)}
-                style={styles.shopInventoryContainer}
+                style={styles.shopsInventoryContainer}
                 ref={shopInventoryTarget}
               >
                 <ThemedScrollView
                   onScrollBeginDrag={() => setDisplayItem(null)}
-                  style={styles.px2}
-                  contentContainerStyle={[
-                    styles.flexRowEvenly,
-                    { flexWrap: "wrap" },
-                  ]}
+                  style={tw.px2}
+                  contentContainerStyle={[flex.rowEvenly, flex.wrap]}
                 >
                   {thisShop.inventory.map((item) => (
                     <Pressable

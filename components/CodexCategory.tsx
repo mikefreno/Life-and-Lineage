@@ -69,7 +69,7 @@ export default function CodexCategory({
           style={[styles.categoryContainer, { opacity: pressed ? 0.5 : 1 }]}
         >
           <View style={styles.categoryContent}>
-            <Text style={styles.textXl}>{category}</Text>
+            <Text style={styles.xl}>{category}</Text>
             <Animated.View style={chevronAnimatedStyle}>
               <Entypo
                 name="chevron-thin-right"

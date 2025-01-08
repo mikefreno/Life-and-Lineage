@@ -176,7 +176,7 @@ const TutorialModal = observer(
           <View
             style={[
               tutorialStep !== 1
-                ? styles.flexRowBetween
+                ? styles.rowBetween
                 : { justifyContent: "flex-end" },
             ]}
           >

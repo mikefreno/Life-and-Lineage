@@ -1,5 +1,5 @@
 import React from "react";
-import { ThemedView, Text } from "../../components/Themed";
+import { Text } from "../../components/Themed";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { toTitleCase, wait } from "../../utility/functions/misc";
@@ -11,7 +11,7 @@ import D20DieAnimation from "../../components/DieRollAnim";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import CheckpointModal from "../../components/CheckpointModal";
-import { useStyles } from "../../hooks/styles";
+import { text, useStyles } from "../../hooks/styles";
 
 const healthWarningOptions: Record<number, string> = {
   0.5: "50%",
@@ -76,14 +76,19 @@ export default function GameSettings() {
           <D20DieAnimation keepRolling={true} />
         ) : (
           <>
-            <Text style={styles.tutorialResetConfirmText}>
+            <Text
+              style={{
+                textAlign: "center",
+                ...text.lg,
+              }}
+            >
               This will reset all tutorials, some may not make sense based on
               your current game/player/inventory state (And restart the app).
             </Text>
-            <Text style={[styles.text2xl, { textAlign: "center" }]}>
+            <Text style={{ textAlign: "center", ...text["2xl"] }}>
               Are you sure?
             </Text>
-            <View style={styles.tutorialResetButtonRow}>
+            <View style={{ flexDirection: "row" }}>
               <Pressable
                 onPress={() => {
                   vibration({ style: "warning" });
@@ -137,19 +142,21 @@ export default function GameSettings() {
               <View
                 style={[
                   styles.optionCircle,
-                  selectedHealthWarning == healthWarningVals[idx] &&
-                    styles.optionCircleSelected,
+                  selectedHealthWarning == healthWarningVals[idx] && {
+                    backgroundColor:
+                      uiStore.colorScheme === "dark" ? "#2563eb" : "#3b82f6",
+                  },
                 ]}
               />
-              <Text style={styles.text2xl}>{toTitleCase(item)}</Text>
+              <Text style={text["2xl"]}>{toTitleCase(item)}</Text>
             </Pressable>
           ))}
         </View>
 
         <GenericStrikeAround>Tutorials</GenericStrikeAround>
         <View style={styles.optionContainer}>
-          <View style={styles.tutorialSwitchRow}>
-            <Text style={styles.textLg}>Tutorials Enabled: </Text>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={text.lg}>Tutorials Enabled: </Text>
             <Switch
               trackColor={{ false: "#767577", true: "#3b82f6" }}
               ios_backgroundColor="#3e3e3e"

@@ -12,7 +12,7 @@ import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { rarityColors } from "../../constants/Colors";
 import { Rarity } from "../../utility/types";
-import { useStyles } from "../../hooks/styles";
+import { flex, useStyles } from "../../hooks/styles";
 
 export default function DroppedItemsModal() {
   const { playerState, dungeonStore, uiStore } = useRootStore();
@@ -116,7 +116,12 @@ export default function DroppedItemsModal() {
       backFunction={doneLooting}
     >
       <>
-        <View style={styles.droppedItemHeader}>
+        <View
+          style={{
+            marginTop: 16,
+            ...flex.rowCenter,
+          }}
+        >
           <Text>You picked up {droppedItems?.gold}</Text>
           <Coins width={16} height={16} style={{ marginLeft: 6 }} />
         </View>
@@ -141,17 +146,19 @@ export default function DroppedItemsModal() {
               },
             ]}
           >
-            <View style={styles.itemIconContainer}>
+            <View
+              style={{
+                ...flex.rowCenter,
+                alignItems: "center",
+              }}
+            >
               <Image source={item.getItemIcon()} />
               {item.rarity !== Rarity.NORMAL && (
                 <View
-                  style={[
-                    styles.itemRarityDot,
-                    {
-                      backgroundColor:
-                        rarityColors[item.rarity].background.light,
-                    },
-                  ]}
+                  style={{
+                    ...styles.itemRarityDot,
+                    backgroundColor: rarityColors[item.rarity].background.light,
+                  }}
                 />
               )}
             </View>

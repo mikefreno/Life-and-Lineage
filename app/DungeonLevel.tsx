@@ -176,7 +176,12 @@ const DungeonLevelScreen = observer(() => {
           <View style={{ flex: 1 }}>
             <LinearGradientBlur style={{ position: "absolute" }} />
             {inCombat && <View />}
-            <View style={styles.dungeonMainContainer}>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "space-between",
+              }}
+            >
               <BattleTab battleTab={battleTab} />
             </View>
             <BattleTabControls
@@ -188,16 +193,14 @@ const DungeonLevelScreen = observer(() => {
                 {playerState.minionsAndPets.map((minion, index) => (
                   <View
                     key={minion.id}
-                    style={[
-                      styles.minionBlock,
-                      {
-                        width:
-                          index === playerState.minionsAndPets.length - 1 &&
-                          playerState.minionsAndPets.length % 2 !== 0
-                            ? "100%"
-                            : "40%",
-                      },
-                    ]}
+                    style={{
+                      ...styles.py1,
+                      width:
+                        index === playerState.minionsAndPets.length - 1 &&
+                        playerState.minionsAndPets.length % 2 !== 0
+                          ? "100%"
+                          : "40%",
+                    }}
                   >
                     <Text>{toTitleCase(minion.creatureSpecies)}</Text>
                     <ProgressBar
@@ -212,7 +215,13 @@ const DungeonLevelScreen = observer(() => {
             ) : null}
           </View>
           {displayItem && (
-            <View style={styles.statsDisplayOverlay} pointerEvents="box-none">
+            <View
+              style={{
+                position: "absolute",
+                zIndex: 10,
+              }}
+              pointerEvents="box-none"
+            >
               <StatsDisplay
                 displayItem={displayItem}
                 clearItem={() => setDisplayItem(null)}

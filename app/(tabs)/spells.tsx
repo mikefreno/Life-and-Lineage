@@ -127,7 +127,7 @@ const SpellsScreen = observer(() => {
           </ScrollView>
         ) : (
           <View style={styles.noSpellsContainer}>
-            <Text style={[styles.textXl, { letterSpacing: 1 }]}>
+            <Text style={[styles.xl, { letterSpacing: 1 }]}>
               No Known Spells.
             </Text>
             <Text style={{ textAlign: "center", letterSpacing: 1 }}>

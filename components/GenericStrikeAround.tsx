@@ -26,9 +26,9 @@ export default function GenericStrikeAround({
   const styles = useStyles();
 
   return (
-    <View style={[styles.strikeAroundContainer, containerStyles]}>
+    <View style={[styles.rowItemsCenter, containerStyles]}>
       <View style={styles.strikeAroundLine} />
-      <View style={styles.strikeAroundContent}>
+      <View style={styles.mx2}>
         {typeof children === "string" ? (
           <Text style={style || { fontSize: 20 }}>{children}</Text>
         ) : (

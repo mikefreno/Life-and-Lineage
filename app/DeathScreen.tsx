@@ -214,6 +214,135 @@ export default function DeathScreen() {
   }
 }
 
+function MinimalClassSelect({
+  dimensions,
+  vibration,
+  selectedClass,
+  setSelectedClass,
+  colorScheme,
+}: {
+  dimensions: {
+    height: number;
+    width: number;
+    greater: number;
+    lesser: number;
+  };
+  vibration: ({
+    style,
+    essential,
+  }: {
+    style: "light" | "medium" | "heavy" | "success" | "warning" | "error";
+    essential?: boolean | undefined;
+  }) => void;
+  selectedClass: PlayerClassOptions | null;
+  setSelectedClass: React.Dispatch<
+    React.SetStateAction<PlayerClassOptions | null>
+  >;
+  colorScheme: "light" | "dark";
+}) {
+  const styles = useStyles();
+
+  const ClassPressable = ({
+    classOption,
+    Icon,
+    color,
+    rotate = 0,
+    flip = false,
+  }: {
+    classOption: PlayerClassOptions;
+    Icon: React.JSX.ElementType;
+    color: string;
+    rotate?: number;
+    flip?: boolean;
+  }) => {
+    return (
+      <Pressable
+        onPress={() => {
+          vibration({ style: "light" });
+          setSelectedClass(classOption);
+        }}
+        style={{
+          height: dimensions.height * 0.25,
+          width: dimensions.width * 0.4,
+        }}
+      >
+        {({ pressed }) => (
+          <View
+            style={[
+              {
+                width: "100%",
+                height: "100%",
+                borderWidth: 1,
+                alignItems: "center",
+                justifyContent: "center",
+                borderColor:
+                  pressed || selectedClass === classOption
+                    ? colorScheme === "dark"
+                      ? "#fafafa"
+                      : "#27272a"
+                    : "transparent",
+                borderRadius: 8,
+              },
+            ]}
+          >
+            <View
+              style={{
+                transform: [
+                  { scaleX: flip ? -1 : 1 },
+                  { rotate: `${rotate}deg` },
+                ],
+              }}
+            >
+              <Icon
+                style={{ marginBottom: 5 }}
+                color={color}
+                height={dimensions.height * 0.15}
+                width={dimensions.height * 0.15}
+              />
+            </View>
+            <Text style={[text.xl, { color, marginHorizontal: "auto" }]}>
+              {classOption.charAt(0).toUpperCase() + classOption.slice(1)}
+            </Text>
+          </View>
+        )}
+      </Pressable>
+    );
+  };
+
+  return (
+    <View style={styles.classContainer}>
+      <ThemedView style={[flex.rowBetween, tw.mb8]}>
+        <ClassPressable
+          classOption={PlayerClassOptions.mage}
+          Icon={WizardHat}
+          color="#2563eb"
+        />
+        <ClassPressable
+          classOption={PlayerClassOptions.ranger}
+          Icon={RangerIcon}
+          color="green"
+          rotate={12}
+        />
+      </ThemedView>
+      <View style={flex.rowBetween}>
+        <ClassPressable
+          classOption={PlayerClassOptions.necromancer}
+          Icon={NecromancerSkull}
+          color="#9333ea"
+          rotate={-12}
+        />
+        <ClassPressable
+          classOption={PlayerClassOptions.paladin}
+          Icon={PaladinHammer}
+          color="#fcd34d"
+          rotate={12}
+          flip={true}
+        />
+      </View>
+    </View>
+  );
+}
+
 function MinimalBlessingSelect({
   playerClass,
   blessing,

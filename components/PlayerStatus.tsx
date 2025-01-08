@@ -47,7 +47,7 @@ import {
   getTotalValue,
   statMapping,
 } from "../utility/functions/stats";
-import { radius, useStyles } from "../hooks/styles";
+import { radius, tw_base, useStyles } from "../hooks/styles";
 import Colors from "../constants/Colors";
 
 export const EXPANDED_PAD = 16;
@@ -276,7 +276,7 @@ const PlayerStatus = observer(
         let simplifiedConditions = Array.from(simplifiedConditionsMap.values());
 
         return (
-          <View style={styles.conditionRow}>
+          <View style={styles.rowAround}>
             {simplifiedConditions.map((cond) => (
               <View key={cond.name} style={styles.conditionIcon}>
                 <Image
@@ -307,23 +307,18 @@ const PlayerStatus = observer(
     function detailedViewConditionRender() {
       if (playerState) {
         return (
-          <View style={styles.detailedConditionContainer}>
+          <View style={{ height: tw_base[64] }}>
             <ScrollView>
               {playerState.conditions.map((condition) => (
                 <View key={condition.id} style={styles.detailedConditionCard}>
-                  <View style={styles.conditionHeader}>
+                  <View style={styles.rowEvenly}>
                     <Text
-                      style={[
-                        styles.textXl,
-                        { letterSpacing: 1, opacity: 0.8 },
-                      ]}
+                      style={{ letterSpacing: 1, opacity: 0.8, ...styles.xl }}
                     >
                       {toTitleCase(condition.name)}
                     </Text>
-                    <View style={styles.flexColumnCenter}>
-                      <View
-                        style={[styles.flexRowCenter, { paddingVertical: 4 }]}
-                      >
+                    <View style={styles.columnCenter}>
+                      <View style={[styles.rowCenter, { paddingVertical: 4 }]}>
                         <Image
                           source={condition.getConditionIcon()}
                           style={{ width: 24, height: 24 }}
@@ -333,13 +328,13 @@ const PlayerStatus = observer(
                         <ClockIcon width={16} height={16} />
                       </View>
                       {!!condition.getHealthDamage() && (
-                        <View style={styles.flexRowCenter}>
+                        <View style={styles.rowCenter}>
                           <Text>{condition.getHealthDamage()}</Text>
                           <HealthIcon height={16} width={16} />
                         </View>
                       )}
                       {!!condition.getSanityDamage() && (
-                        <View style={styles.flexRowCenter}>
+                        <View style={styles.rowCenter}>
                           <Text>{condition.getSanityDamage()}</Text>
                           <View style={{ marginLeft: 4 }}>
                             <Sanity height={16} width={16} />
@@ -348,10 +343,7 @@ const PlayerStatus = observer(
                       )}
                     </View>
                     <Text
-                      style={[
-                        styles.textXl,
-                        { letterSpacing: 1, opacity: 0.8 },
-                      ]}
+                      style={{ letterSpacing: 1, opacity: 0.8, ...styles.xl }}
                     >
                       {toTitleCase(condition.style)}
                     </Text>
@@ -482,7 +474,7 @@ const PlayerStatus = observer(
     }) => {
       if (!stats.size || stats.size == 0) {
         return (
-          <View style={[styles.flexColumnCenter, { flex: 1 }]}>
+          <View style={[styles.columnCenter, { flex: 1 }]}>
             <Text
               style={{
                 textAlign: "center",
@@ -543,19 +535,21 @@ const PlayerStatus = observer(
         >
           <View>
             <View
-              style={[
-                styles.flexRowBetween,
-                { alignItems: "center", paddingVertical: 4, width: "100%" },
-              ]}
+              style={{
+                alignItems: "center",
+                paddingVertical: 4,
+                width: "100%",
+                ...styles.rowBetween,
+              }}
             >
-              <View style={[styles.flexColumnCenter, { flex: 1 }]}>
+              <View style={[styles.columnCenter, { flex: 1 }]}>
                 <View style={{ marginLeft: -16, flexDirection: "row" }}>
                   <Text>{playerState.readableGold}</Text>
                   <Coins width={16} height={16} style={{ marginLeft: 6 }} />
                 </View>
               </View>
-              <View style={[styles.flexColumnCenter, { flex: 1 }]}>
-                <Text style={[styles.textXl, { textAlign: "center" }]}>
+              <View style={[styles.columnCenter, { flex: 1 }]}>
+                <Text style={[styles.xl, { textAlign: "center" }]}>
                   {playerState.fullName}
                 </Text>
               </View>
@@ -564,10 +558,7 @@ const PlayerStatus = observer(
 
             {playerState.unAllocatedSkillPoints > 0 && (
               <Text
-                style={[
-                  styles.textXl,
-                  { color: "#16a34a", textAlign: "center" },
-                ]}
+                style={{ color: "#16a34a", textAlign: "center", ...styles.xl }}
                 numberOfLines={2}
                 adjustsFontSizeToFit={true}
               >
@@ -631,7 +622,7 @@ const PlayerStatus = observer(
               vibration={vibration}
             />
 
-            <View style={styles.flexRowEvenly}>
+            <View style={styles.rowEvenly}>
               <RenderSecondaryStatsBlock
                 stat={Attribute.strength}
                 playerState={playerState}
@@ -717,14 +708,15 @@ const PlayerStatus = observer(
             <View style={styles.playerStatusContent}>
               {!(uiStore.playerStatusIsCompact && home) && (
                 <View
-                  style={[
-                    styles.flexRowCenter,
-                    { height: 16, paddingVertical: 2 },
-                  ]}
+                  style={{
+                    height: 16,
+                    paddingVertical: 2,
+                    ...styles.rowCenter,
+                  }}
                 >
                   {!hideGold && (
                     <View
-                      style={[styles.flexRowCenter, { marginVertical: "auto" }]}
+                      style={[styles.rowCenter, { marginVertical: "auto" }]}
                     >
                       <Text>{playerState.readableGold}</Text>
                       <Coins width={16} height={16} style={{ marginLeft: 6 }} />
@@ -741,8 +733,12 @@ const PlayerStatus = observer(
                 </View>
               )}
               <View style={styles.statsRow}>
-                <View style={styles.statBlock}>
-                  <View style={styles.statHeader}>
+                <View
+                  style={{
+                    width: "31%",
+                  }}
+                >
+                  <View style={styles.rowBetween}>
                     <Text style={{ paddingLeft: 4, color: "#ef4444" }}>
                       Health
                     </Text>
@@ -760,8 +756,12 @@ const PlayerStatus = observer(
                     unfilledColor="#fca5a5"
                   />
                 </View>
-                <View style={styles.statBlock}>
-                  <View style={styles.statHeader}>
+                <View
+                  style={{
+                    width: "31%",
+                  }}
+                >
+                  <View style={styles.rowBetween}>
                     <Text style={{ paddingLeft: 4, color: "#60a5fa" }}>
                       Mana
                     </Text>
@@ -779,8 +779,12 @@ const PlayerStatus = observer(
                     unfilledColor="#bfdbfe"
                   />
                 </View>
-                <View style={styles.statBlock}>
-                  <View style={styles.statHeader}>
+                <View
+                  style={{
+                    width: "31%",
+                  }}
+                >
+                  <View style={styles.rowBetween}>
                     <Text style={{ paddingLeft: 4, color: "#c084fc" }}>
                       Sanity
                     </Text>
@@ -803,16 +807,14 @@ const PlayerStatus = observer(
             </View>,
           )}
           <View
-            style={[
-              styles.flexRowCenter,
-              {
-                position: "absolute",
-                zIndex: 10,
-                ...(uiStore.playerStatusIsCompact && home
-                  ? { marginLeft: 16 }
-                  : { width: "100%", marginRight: 32 }),
-              },
-            ]}
+            style={{
+              position: "absolute",
+              zIndex: 10,
+              ...styles.rowCenter,
+              ...(uiStore.playerStatusIsCompact && home
+                ? { marginLeft: 16 }
+                : { width: "100%", marginRight: 32 }),
+            }}
           >
             <ChangePopUp
               popUp={"gold"}
@@ -923,12 +925,12 @@ function RenderPrimaryStatsBlock({
     (playerState.allocatedSkillPoints[stat] > 0 && respeccing);
 
   return (
-    <View style={styles.flexColumnCenter}>
+    <View style={styles.columnCenter}>
       <Text style={{ paddingVertical: 4, color: filledColor }}>
         {AttributeToString[stat]}
       </Text>
       <View
-        style={[styles.flexRowCenter, { width: "100%", alignItems: "center" }]}
+        style={{ width: "100%", alignItems: "center", ...styles.rowCenter }}
       >
         <View style={{ flex: 1 }}>
           <ProgressBar
@@ -1028,9 +1030,9 @@ function RenderSecondaryStatsBlock({
     (!respeccing && playerState.unAllocatedSkillPoints > 0);
 
   return (
-    <View style={styles.flexColumnCenter}>
+    <View style={styles.columnCenter}>
       <Text style={{ paddingVertical: 4 }}>{AttributeToString[stat]}</Text>
-      <View style={[styles.flexRowCenter, { alignItems: "center" }]}>
+      <View style={[styles.rowCenter, { alignItems: "center" }]}>
         <Text>
           {stat === Attribute.strength
             ? playerState.totalStrength
@@ -1046,7 +1048,7 @@ function RenderSecondaryStatsBlock({
           <IntelligenceIcon height={20} width={23} />
         )}
         {shouldShow && (
-          <View style={styles.flexRowCenter}>
+          <View style={styles.rowCenter}>
             <Pressable
               style={{ paddingHorizontal: 2 }}
               onPressIn={onPressIn}

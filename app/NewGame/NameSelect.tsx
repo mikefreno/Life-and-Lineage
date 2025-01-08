@@ -14,7 +14,7 @@ import { useNewGameStore } from "./_layout";
 import { useRootStore } from "../../hooks/stores";
 import { FadeSlide } from "../../components/AnimatedWrappers";
 import GenericFlatLink from "../../components/GenericLink";
-import { useStyles } from "../../hooks/styles";
+import { text, useStyles } from "../../hooks/styles";
 
 export default function SetName() {
   const styles = useStyles();
@@ -44,16 +44,14 @@ export default function SetName() {
         <KeyboardAvoidingView style={{ marginTop: -header, flex: 1 }}>
           <View style={styles.nameContainer}>
             <View style={{ flexDirection: "row" }} accessibilityRole="header">
-              <Text style={[styles.text2xl, { textAlign: "center" }]}>
+              <Text style={{ textAlign: "center", ...text["2xl"] }}>
                 Choose Your
                 <Text
-                  style={[
-                    styles.text2xl,
-                    {
-                      textAlign: "center",
-                      color: playerClassColors[classSelection],
-                    },
-                  ]}
+                  style={{
+                    ...text["2xl"],
+                    textAlign: "center",
+                    color: playerClassColors[classSelection],
+                  }}
                 >
                   {" "}
                   {toTitleCase(classSelection)}'s{" "}

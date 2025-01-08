@@ -22,7 +22,12 @@ import {
   Sanity,
   StrengthIcon,
 } from "../assets/icons/SVGIcons";
-import { Attribute, ItemClassType, RarityAsString } from "../utility/types";
+import {
+  Attribute,
+  ItemClassType,
+  MasteryToString,
+  RarityAsString,
+} from "../utility/types";
 import GenericModal from "./GenericModal";
 import GenericStrikeAround from "./GenericStrikeAround";
 import type { Item } from "../entities/item";
@@ -246,7 +251,7 @@ export function StatsDisplay({
     return (
       <View style={styles.storyContainer}>
         <View style={styles.storyHeaderContainer}>
-          <Text style={{ marginLeft: -16, marginRight: 16, ...styles.textXl }}>
+          <Text style={{ marginLeft: -16, marginRight: 16, ...styles.xl }}>
             {toTitleCase(item.name)}
           </Text>
         </View>
@@ -275,7 +280,7 @@ export function StatsDisplay({
                 style={[
                   { textAlign: "center" },
                   tw.py1,
-                  section.largeMeta && styles.textXl,
+                  section.largeMeta && styles.xl,
                 ]}
               >
                 [{section.text}]
@@ -376,7 +381,7 @@ export function StatsDisplay({
           <Text>Requires:</Text>
           {reqs.strength && (
             <View
-              style={[styles.flexRowCenter, { justifyContent: "space-evenly" }]}
+              style={[styles.rowCenter, { justifyContent: "space-evenly" }]}
             >
               <Text
                 style={{
@@ -390,7 +395,7 @@ export function StatsDisplay({
           )}
           {reqs.intelligence && (
             <View
-              style={[styles.flexRowCenter, { justifyContent: "space-evenly" }]}
+              style={[styles.rowCenter, { justifyContent: "space-evenly" }]}
             >
               <Text
                 style={{
@@ -404,7 +409,7 @@ export function StatsDisplay({
           )}
           {reqs.dexterity && (
             <View
-              style={[styles.flexRowCenter, { justifyContent: "space-evenly" }]}
+              style={[styles.rowCenter, { justifyContent: "space-evenly" }]}
             >
               <Text
                 style={{
@@ -526,7 +531,25 @@ export function StatsDisplay({
         return null;
     }
   };
-
+  const ItemTypeLabel = (item: Item) => {
+    if (item.itemClass == ItemClassType.BodyArmor) {
+      return "Body Armor";
+    }
+    if (item.itemClass == ItemClassType.StoryItem) {
+      return "Key Item";
+    }
+    if (item.itemClass == ItemClassType.Book) {
+      return bookItemLabel();
+    }
+    return toTitleCase(item.itemClass);
+  };
+  function bookItemLabel() {
+    if (playerState && firstItem.attachedSpell) {
+      return `${
+        MasteryToString[firstItem.attachedSpell.proficiencyNeeded]
+      } level book`;
+    }
+  }
   const SaleSection = () => {
     if (playerState) {
       if ("shop" in props) {
@@ -539,7 +562,7 @@ export function StatsDisplay({
           const stackIsDisabled = shop.currentGold < stackPrice;
           return (
             <>
-              <View style={[styles.flexRowCenter, tw.py1]}>
+              <View style={[styles.rowCenter, tw.py1]}>
                 <Text>
                   {asReadableGold(
                     firstItem.getSellPrice(shop.shopKeeper.affection) *
@@ -611,7 +634,7 @@ export function StatsDisplay({
           const stackIsDisabled = playerState.gold < stackPrice;
           return (
             <>
-              <View style={[styles.flexRowCenter, tw.py1]}>
+              <View style={[styles.rowCenter, tw.py1]}>
                 <Text>
                   {asReadableGold(
                     firstItem.getBuyPrice(shop.shopKeeper.affection) *
@@ -740,7 +763,7 @@ export function StatsDisplay({
             },
           ]}
         >
-          <Text style={{ marginTop: -12, marginLeft: -4, ...styles.text2xl }}>
+          <Text style={{ marginTop: -12, marginLeft: -4, ...styles["2xl"] }}>
             x
           </Text>
         </Pressable>
@@ -752,10 +775,10 @@ export function StatsDisplay({
           firstItem.itemClass !== ItemClassType.Arrow && (
             <GenericStrikeAround>
               <Text
-                style={[
-                  styles.textLg,
-                  { color: rarityColors[firstItem.rarity ?? 0].text },
-                ]}
+                style={{
+                  color: rarityColors[firstItem.rarity ?? 0].text,
+                  ...styles.lg,
+                }}
               >
                 {RarityAsString[firstItem.rarity]}
               </Text>
@@ -764,11 +787,11 @@ export function StatsDisplay({
         {(firstItem.slot == "one-hand" ||
           firstItem.slot == "two-hand" ||
           firstItem.slot == "off-hand") && (
-          <GenericStrikeAround style={styles.textSm}>
+          <GenericStrikeAround style={styles.sm}>
             {toTitleCase(firstItem.slot)}
           </GenericStrikeAround>
         )}
-        <GenericStrikeAround style={styles.textSm}>
+        <GenericStrikeAround style={styles.sm}>
           {ItemTypeLabel(firstItem)}
         </GenericStrikeAround>
 

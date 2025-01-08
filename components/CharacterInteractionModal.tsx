@@ -14,7 +14,7 @@ import { AffectionIcon } from "../assets/icons/SVGIcons";
 import { Character } from "../entities/character";
 import { useRootStore } from "../hooks/stores";
 import { useVibration } from "../hooks/generic";
-import { flex, text, useStyles } from "../hooks/styles";
+import { flex, text } from "../hooks/styles";
 import React from "react";
 
 interface CharacterInteractionModal {
@@ -50,7 +50,6 @@ export const CharacterInteractionModal = observer(
       null,
     );
     const router = useRouter();
-    const styles = useStyles();
 
     const vibration = useVibration();
 

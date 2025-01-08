@@ -2,7 +2,7 @@ import { View, Pressable } from "react-native";
 import { Text } from "../Themed";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
-import { useStyles } from "../../hooks/styles";
+import { text, useStyles } from "../../hooks/styles";
 
 interface BattleTabControlsProps {
   battleTab: string;
@@ -31,7 +31,10 @@ export default function BattleTabControls({
     <View style={styles.battleTabControls}>
       <Pressable
         style={[
-          styles.battleTabButton,
+          {
+            width: "33.333%",
+            paddingVertical: 16,
+          },
           getBackgroundColor("attacksOrNavigation"),
         ]}
         onPress={() => {
@@ -39,27 +42,39 @@ export default function BattleTabControls({
           setBattleTab("attacksOrNavigation");
         }}
       >
-        <Text style={[styles.textXl, { textAlign: "center" }]}>
+        <Text style={{ textAlign: "center", ...text.xl }}>
           {dungeonStore.inCombat ? "Attacks" : "Navigation"}
         </Text>
       </Pressable>
       <Pressable
-        style={[styles.battleTabButton, getBackgroundColor("equipment")]}
+        style={[
+          {
+            width: "33.333%",
+            paddingVertical: 16,
+          },
+          getBackgroundColor("equipment"),
+        ]}
         onPress={() => {
           vibration({ style: "light" });
           setBattleTab("equipment");
         }}
       >
-        <Text style={[styles.textXl, { textAlign: "center" }]}>Inventory</Text>
+        <Text style={{ textAlign: "center", ...text.xl }}>Inventory</Text>
       </Pressable>
       <Pressable
-        style={[styles.battleTabButton, getBackgroundColor("log")]}
+        style={[
+          {
+            width: "33.333%",
+            paddingVertical: 16,
+          },
+          getBackgroundColor("log"),
+        ]}
         onPress={() => {
           vibration({ style: "light" });
           setBattleTab("log");
         }}
       >
-        <Text style={[styles.textXl, { textAlign: "center" }]}>Log</Text>
+        <Text style={{ textAlign: "center", ...text.xl }}>Log</Text>
       </Pressable>
     </View>
   );

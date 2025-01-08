@@ -13,7 +13,7 @@ import D20DieAnimation from "../../components/DieRollAnim";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
-import { useStyles } from "../../hooks/styles";
+import { flex, text, useStyles } from "../../hooks/styles";
 
 const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
@@ -131,8 +131,8 @@ export const AppSettings = observer(() => {
         {loadingDBInfo ? (
           <D20DieAnimation keepRolling />
         ) : (
-          <View style={styles.modalContainer}>
-            <Text style={styles.textXl}>Remote Saving</Text>
+          <View style={styles.px2}>
+            <Text style={text.xl}>Remote Saving</Text>
             <GenericStrikeAround>Make New Save</GenericStrikeAround>
             <TextInput
               style={styles.modalTextInput}
@@ -164,10 +164,7 @@ export const AppSettings = observer(() => {
                   <Text style={{ textAlign: "center" }}>X</Text>
                 </Pressable>
                 <Text
-                  style={[
-                    styles.textXl,
-                    { paddingTop: 8, textAlign: "center" },
-                  ]}
+                  style={{ paddingTop: 8, textAlign: "center", ...text.xl }}
                 >
                   {save.name}
                 </Text>
@@ -193,11 +190,9 @@ export const AppSettings = observer(() => {
         backdropCloses
         size={95}
       >
-        <ScrollView style={styles.modalContainer}>
-          <Text style={styles.textXl}>Load Saves</Text>
-          <Text
-            style={[styles.textXl, { textAlign: "center", color: "#ef4444" }]}
-          >
+        <ScrollView style={styles.px2}>
+          <Text style={text.xl}>Load Saves</Text>
+          <Text style={{ textAlign: "center", color: "#ef4444", ...text.xl }}>
             Make sure to backup first!
           </Text>
           {remoteSaves.map((save) => (
@@ -211,9 +206,7 @@ export const AppSettings = observer(() => {
               >
                 <Text style={{ textAlign: "center" }}>X</Text>
               </Pressable>
-              <Text
-                style={[styles.textXl, { paddingTop: 8, textAlign: "center" }]}
-              >
+              <Text style={{ paddingTop: 8, textAlign: "center", ...text.xl }}>
                 {save.name}
               </Text>
               <View style={styles.remoteSaveInfo}>
@@ -234,7 +227,7 @@ export const AppSettings = observer(() => {
       <ScrollView>
         <View style={styles.settingsContainer}>
           <GenericStrikeAround>
-            <Text style={styles.textXl}>
+            <Text style={text.xl}>
               Remote Backups{!authStore.isAuthenticated && ` (requires login)`}
             </Text>
           </GenericStrikeAround>
@@ -243,7 +236,12 @@ export const AppSettings = observer(() => {
               <Text style={{ textAlign: "center", paddingVertical: 8 }}>
                 Logged in as: {authStore.getEmail()}
               </Text>
-              <View style={styles.buttonRow}>
+              <View
+                style={{
+                  ...flex.rowEvenly,
+                  width: "100%",
+                }}
+              >
                 <GenericFlatButton
                   onPress={toggleRemoteSaveWindow}
                   disabled={
@@ -286,7 +284,12 @@ export const AppSettings = observer(() => {
                   You are not connected to the internet
                 </Text>
               )}
-              <View style={styles.buttonRow}>
+              <View
+                style={{
+                  ...flex.rowEvenly,
+                  width: "100%",
+                }}
+              >
                 <GenericRaisedButton
                   onPress={() => router.push("/Auth/sign-in")}
                   disabled={!authStore.isConnectedAndInitialized}
@@ -318,10 +321,13 @@ export const AppSettings = observer(() => {
                 <View
                   style={[
                     styles.optionCircle,
-                    selectedThemeOption == index && styles.optionCircleSelected,
+                    selectedThemeOption == index && {
+                      backgroundColor:
+                        uiStore.colorScheme === "dark" ? "#2563eb" : "#3b82f6",
+                    },
                   ]}
                 />
-                <Text style={styles.text2xl}>{toTitleCase(item)}</Text>
+                <Text style={text["2xl"]}>{toTitleCase(item)}</Text>
               </Pressable>
             ))}
           </View>
@@ -338,11 +344,13 @@ export const AppSettings = observer(() => {
                 <View
                   style={[
                     styles.optionCircle,
-                    selectedVibrationOption == index &&
-                      styles.optionCircleSelected,
+                    selectedVibrationOption == index && {
+                      backgroundColor:
+                        uiStore.colorScheme === "dark" ? "#2563eb" : "#3b82f6",
+                    },
                   ]}
                 />
-                <Text style={styles.text2xl}>{toTitleCase(item)}</Text>
+                <Text style={text["2xl"]}>{toTitleCase(item)}</Text>
               </Pressable>
             ))}
           </View>
@@ -356,10 +364,13 @@ export const AppSettings = observer(() => {
               <View
                 style={[
                   styles.optionCircle,
-                  uiStore.reduceMotion && styles.optionCircleSelected,
+                  uiStore.reduceMotion && {
+                    backgroundColor:
+                      uiStore.colorScheme === "dark" ? "#2563eb" : "#3b82f6",
+                  },
                 ]}
               />
-              <Text style={styles.text2xl}>On</Text>
+              <Text style={text["2xl"]}>On</Text>
             </Pressable>
             <Pressable
               style={styles.optionRow}
@@ -368,10 +379,13 @@ export const AppSettings = observer(() => {
               <View
                 style={[
                   styles.optionCircle,
-                  !uiStore.reduceMotion && styles.optionCircleSelected,
+                  !uiStore.reduceMotion && {
+                    backgroundColor:
+                      uiStore.colorScheme === "dark" ? "#2563eb" : "#3b82f6",
+                  },
                 ]}
               />
-              <Text style={styles.text2xl}>Off</Text>
+              <Text style={text["2xl"]}>Off</Text>
             </Pressable>
           </View>
         </View>

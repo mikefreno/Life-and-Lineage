@@ -22,7 +22,7 @@ import { useNewGameStore } from "./_layout";
 import { FadeSlide } from "../../components/AnimatedWrappers";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { useRouter } from "expo-router";
-import { useStyles } from "../../hooks/styles";
+import { text, useStyles } from "../../hooks/styles";
 
 const SetClassScreen = observer(() => {
   const vibration = useVibration();
@@ -63,10 +63,10 @@ const SetClassScreen = observer(() => {
         backFunction={() => setShowTutorialReset(false)}
         accessibilityRole="alert"
       >
-        <Text style={[styles.text2xl, { textAlign: "center" }]}>
+        <Text style={{ textAlign: "center", ...text["2xl"] }}>
           Tutorial Reset
         </Text>
-        <Text style={[styles.textLg, { textAlign: "center" }]}>
+        <Text style={{ textAlign: "center", ...text.xl }}>
           Would you like to reset tutorials?
         </Text>
         <ThemedView style={{ flexDirection: "row" }}>
@@ -100,23 +100,22 @@ const SetClassScreen = observer(() => {
 
       <View style={styles.newGameContainer}>
         <Text
-          style={[
-            styles.text3xl,
-            styles.bold,
-            {
-              paddingTop: height * 0.04,
-              textAlign: "center",
-            },
-          ]}
+          style={{
+            ...styles.bold,
+            ...styles["3xl"],
+            paddingTop: height * 0.04,
+            textAlign: "center",
+          }}
           accessibilityRole="header"
         >
           Create a Character
         </Text>
         <Text
-          style={[
-            styles.text2xl,
-            { paddingTop: height * 0.02, textAlign: "center" },
-          ]}
+          style={{
+            paddingTop: height * 0.02,
+            textAlign: "center",
+            ...styles["2xl"],
+          }}
         >
           Select Class
         </Text>
@@ -168,10 +167,11 @@ const SetClassScreen = observer(() => {
                   width={height * 0.15}
                 />
                 <Text
-                  style={[
-                    styles.textXl,
-                    { textAlign: "center", color: "#2563eb" },
-                  ]}
+                  style={{
+                    textAlign: "center",
+                    color: "#2563eb",
+                    ...styles.xl,
+                  }}
                 >
                   Mage
                 </Text>
@@ -220,10 +220,7 @@ const SetClassScreen = observer(() => {
                   />
                 </View>
                 <Text
-                  style={[
-                    styles.textXl,
-                    { textAlign: "center", color: "green" },
-                  ]}
+                  style={{ textAlign: "center", color: "green", ...styles.xl }}
                 >
                   Ranger
                 </Text>
@@ -281,10 +278,11 @@ const SetClassScreen = observer(() => {
                   />
                 </View>
                 <Text
-                  style={[
-                    styles.textXl,
-                    { textAlign: "center", color: "#9333ea" },
-                  ]}
+                  style={{
+                    textAlign: "center",
+                    color: "#9333ea",
+                    ...styles.xl,
+                  }}
                 >
                   Necromancer
                 </Text>
@@ -334,10 +332,11 @@ const SetClassScreen = observer(() => {
                   </View>
                 </View>
                 <Text
-                  style={[
-                    styles.textXl,
-                    { textAlign: "center", color: "#fcd34d" },
-                  ]}
+                  style={{
+                    textAlign: "center",
+                    color: "#fcd34d",
+                    ...styles.xl,
+                  }}
                 >
                   Paladin
                 </Text>

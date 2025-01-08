@@ -21,7 +21,7 @@ import { useAcceleratedAction, useVibration } from "../hooks/generic";
 import type { Item } from "../entities/item";
 import type { Spell } from "../entities/spell";
 import React from "react";
-import { useStyles } from "../hooks/styles";
+import { radius, text, useStyles } from "../hooks/styles";
 
 const StudyButton = ({ studyState, onStudy }) => {
   const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
@@ -162,15 +162,15 @@ export default function LearningKnowledgeScreen() {
         >
           {filteredBooks?.length == 0 &&
           playerState?.learningSpells.length == 0 ? (
-            <View style={[styles.flexColumnCenter, styles.pt12]}>
-              <Text style={styles.textXl}>No Books to Learn From</Text>
+            <View style={[styles.columnCenter, styles.pt12]}>
+              <Text style={text.xl}>No Books to Learn From</Text>
               <Text>(Books can be bought from the Librarian)</Text>
             </View>
           ) : null}
           {spellState && spellState.length > 0 && (
             <ScrollView style={{ maxHeight: uiStore.dimensions.height * 0.25 }}>
               <View style={[styles.py4]}>
-                <Text style={[styles.textCenter, styles.textXl]}>
+                <Text style={[styles.textCenter, styles.xl]}>
                   Currently Studying
                 </Text>
                 {spellState.map((studyState) => (
@@ -194,14 +194,12 @@ export default function LearningKnowledgeScreen() {
             </ScrollView>
           )}
           {selectedBook && selectedBookSpell && (
-            <View style={[styles.flexColumnCenter, styles.py4]}>
-              <Text style={styles.textXl}>
-                {toTitleCase(selectedBook.name)}
-              </Text>
-              <Text style={[styles.py2, styles.textLg, { letterSpacing: 0.1 }]}>
+            <View style={[styles.columnCenter, styles.py4]}>
+              <Text style={styles.xl}>{toTitleCase(selectedBook.name)}</Text>
+              <Text style={[styles.py2, styles.lg, { letterSpacing: 0.1 }]}>
                 Teaches
               </Text>
-              <Text style={[styles.py2, styles.textLg, { letterSpacing: 0.1 }]}>
+              <Text style={[styles.py2, styles.lg, { letterSpacing: 0.1 }]}>
                 ({bookLabel()})
               </Text>
               <SpellDetails spell={selectedBookSpell} />
@@ -230,7 +228,7 @@ export default function LearningKnowledgeScreen() {
           )}
           {filteredBooks && filteredBooks.length > 0 && (
             <View style={styles.py4}>
-              <Text style={[styles.textCenter, styles.textXl]}>
+              <Text style={[styles.textCenter, styles.xl]}>
                 Available for Study
               </Text>
               <ScrollView horizontal>
@@ -238,13 +236,13 @@ export default function LearningKnowledgeScreen() {
                   {filteredBooks.map((item) => (
                     <Pressable
                       key={item.id}
-                      style={[styles.m2, styles.flexColumnCenter]}
+                      style={[styles.m2, styles.columnCenter]}
                       onPress={() => setSelectedBook(item)}
                     >
                       <View
                         style={[
                           styles.p2,
-                          styles.lg,
+                          radius.lg,
                           { backgroundColor: "#a1a1aa" },
                         ]}
                       >

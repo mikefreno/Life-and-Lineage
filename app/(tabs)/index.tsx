@@ -31,7 +31,7 @@ import { EXPANDED_PAD } from "../../components/PlayerStatus";
 import type { Item } from "../../entities/item";
 import { Image } from "expo-image";
 import { StashDisplay } from "../../components/StashDisplay";
-import { useStyles } from "../../hooks/styles";
+import { text, useStyles } from "../../hooks/styles";
 
 const HomeScreen = observer(() => {
   const { playerState, uiStore, stashStore } = useRootStore();
@@ -165,26 +165,29 @@ const HomeScreen = observer(() => {
                 }}
               >
                 <Text
-                  style={[
-                    styles.textXl,
-                    { textAlign: "center", color: isDark ? "white" : "black" },
-                  ]}
+                  style={{
+                    textAlign: "center",
+                    color: isDark ? "white" : "black",
+                    ...text.xl,
+                  }}
                 >
                   {playerState.fullName}
                 </Text>
                 <Text
-                  style={[
-                    styles.textXl,
-                    { textAlign: "center", color: isDark ? "white" : "black" },
-                  ]}
+                  style={{
+                    textAlign: "center",
+                    color: isDark ? "white" : "black",
+                    ...text.xl,
+                  }}
                 >
                   {playerState.job}
                 </Text>
                 <Text
-                  style={[
-                    styles.textXl,
-                    { textAlign: "center", color: isDark ? "white" : "black" },
-                  ]}
+                  style={{
+                    textAlign: "center",
+                    color: isDark ? "white" : "black",
+                    ...text.xl,
+                  }}
                 >{`${playerState.age} years old`}</Text>
               </View>
               <View style={{ marginHorizontal: "auto" }}>

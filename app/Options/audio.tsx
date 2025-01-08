@@ -36,8 +36,8 @@ const AudioSettings = observer(() => {
         {renderSlider("Combat Music", "combatMusic")}
         {renderSlider("Combat Sound Effects", "combatSoundEffects")}
 
-        <View style={styles.flexRowEvenly}>
-          <Text style={[styles.myAuto, styles.textXl]}>Mute</Text>
+        <View style={styles.rowEvenly}>
+          <Text style={[styles.myAuto, styles.xl]}>Mute</Text>
           <Switch
             trackColor={{ false: "#767577", true: "#3b82f6" }}
             ios_backgroundColor="#3e3e3e"

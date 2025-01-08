@@ -71,7 +71,7 @@ const LaborScreen = observer(() => {
           backFunction={() => setShowingRejection(false)}
         >
           <View style={{ alignItems: "center" }}>
-            <Text style={styles.text3xl}>Rejected!</Text>
+            <Text style={styles["3xl"]}>Rejected!</Text>
             <Text style={styles.rejectionModalText}>
               You are missing the following qualifications:
             </Text>

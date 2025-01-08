@@ -22,7 +22,7 @@ import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
 import GenericFlatLink from "../../components/GenericLink";
 import { FadeSlide } from "../../components/AnimatedWrappers";
-import { useStyles } from "../../hooks/styles";
+import { text, useStyles } from "../../hooks/styles";
 
 export default function SetBlessing() {
   const { classSelection, blessingSelection, setBlessingSelection } =
@@ -60,15 +60,13 @@ export default function SetBlessing() {
 
       <View style={styles.newGameContainer}>
         <Text
-          style={[
-            styles.text2xl,
-            {
-              textAlign: "center",
-              paddingHorizontal: 16,
-              maxWidth: dimensions.width * 0.75,
-              marginHorizontal: "auto",
-            },
-          ]}
+          style={{
+            ...text["2xl"],
+            textAlign: "center",
+            paddingHorizontal: 16,
+            maxWidth: dimensions.width * 0.75,
+            marginHorizontal: "auto",
+          }}
           accessibilityRole="header"
         >
           With What Blessing Was Your
@@ -88,10 +86,7 @@ export default function SetBlessing() {
         />
 
         <Text
-          style={[
-            styles.textLg,
-            { textAlign: "center", paddingHorizontal: 16 },
-          ]}
+          style={{ textAlign: "center", paddingHorizontal: 16, ...text.lg }}
         >
           {DescriptionMap[blessingSelection as Element]}
         </Text>
@@ -180,17 +175,15 @@ const BlessingPressable = ({
             size={dimensions.height * 0.15}
           />
           <Text
-            style={[
-              styles.textLg,
-              {
-                textAlign: "center",
-                paddingHorizontal: 8,
-                color:
-                  element == Element.assassination && colorScheme == "dark"
-                    ? elementalColorMap[element].light
-                    : elementalColorMap[element].dark,
-              },
-            ]}
+            style={{
+              ...text.lg,
+              textAlign: "center",
+              paddingHorizontal: 8,
+              color:
+                element == Element.assassination && colorScheme == "dark"
+                  ? elementalColorMap[element].light
+                  : elementalColorMap[element].dark,
+            }}
           >
             Blessing of {ElementToString[element]}
           </Text>

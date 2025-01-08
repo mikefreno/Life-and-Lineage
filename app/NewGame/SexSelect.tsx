@@ -14,7 +14,7 @@ import { FontAwesome5, Foundation } from "@expo/vector-icons";
 import { useNewGameStore } from "./_layout";
 import GenericFlatLink from "../../components/GenericLink";
 import { FadeSlide } from "../../components/AnimatedWrappers";
-import { useStyles } from "../../hooks/styles";
+import { text, useStyles } from "../../hooks/styles";
 
 export default function SetSex() {
   const styles = useStyles();
@@ -48,7 +48,7 @@ export default function SetSex() {
         }}
       />
       <View style={styles.newGameContainer}>
-        <Text style={[styles.text2xl, styles.newGameHeader]}>
+        <Text style={[text.['2xl'], styles.newGameHeader]}>
           Set the sex of your{" "}
           <Text style={{ color: playerClassColors[classSelection] }}>
             {toTitleCase(classSelection)}
@@ -82,7 +82,7 @@ export default function SetSex() {
                     color={playerClassColors[classSelection]}
                   />
                 </View>
-                <Text style={[styles.textLg, { textAlign: "center" }]}>
+                <Text style={{ textAlign: "center", ...text.lg }}>
                   Male
                 </Text>
               </View>
@@ -115,7 +115,7 @@ export default function SetSex() {
                     color={playerClassColors[classSelection]}
                   />
                 </View>
-                <Text style={[styles.textLg, { textAlign: "center" }]}>
+                <Text style={ { textAlign: "center", ...text.lg }}>
                   Female
                 </Text>
               </View>

@@ -28,7 +28,7 @@ import {
   useRootStore,
 } from "../../hooks/stores";
 import { observer } from "mobx-react-lite";
-import { useStyles } from "../../hooks/styles";
+import { flex, text, useStyles } from "../../hooks/styles";
 
 const BattleTab = observer(
   ({
@@ -127,7 +127,7 @@ const BattleTab = observer(
           size={attackDetails instanceof Spell ? 100 : undefined}
         >
           {attackDetails && (
-            <View style={styles.flexColumnCenter}>
+            <View style={flex.columnCenter}>
               {attackDetails instanceof Spell ? (
                 <SpellDetails spell={attackDetails} />
               ) : (
@@ -150,7 +150,7 @@ const BattleTab = observer(
                     <>
                       <ThemedView
                         style={[
-                          styles.attackCardContainer,
+                          styles.rowBetween,
                           attackOrSpell instanceof Spell && {
                             backgroundColor:
                               elementalColorMap[attackOrSpell.element].light,
@@ -159,14 +159,14 @@ const BattleTab = observer(
                           },
                         ]}
                       >
-                        <View style={styles.attackCardContent}>
-                          <View style={styles.attackInfoContainer}>
+                        <View style={flex.rowBetween}>
+                          <View style={styles.columnCenter}>
                             <Pressable
                               onPress={() => setAttackDetails(attackOrSpell)}
                             >
                               <Text
                                 style={[
-                                  styles.textXl,
+                                  text.xl,
                                   {
                                     color:
                                       attackOrSpell instanceof Spell
@@ -183,12 +183,12 @@ const BattleTab = observer(
                               </Text>
                               {attackOrSpell instanceof Attack &&
                               attackOrSpell.baseHitChance ? (
-                                <Text style={styles.textLg}>{`${
+                                <Text style={text.lg}>{`${
                                   attackOrSpell.baseHitChance * 100
                                 }% hit chance`}</Text>
                               ) : (
                                 attackOrSpell instanceof Spell && (
-                                  <View style={styles.spellCostContainer}>
+                                  <View style={{ flexDirection: "row" }}>
                                     <Text
                                       style={{
                                         color:
@@ -199,7 +199,12 @@ const BattleTab = observer(
                                     >
                                       {attackOrSpell.manaCost}
                                     </Text>
-                                    <View style={styles.energyIcon}>
+                                    <View
+                                      style={{
+                                        marginVertical: "auto",
+                                        paddingLeft: 4,
+                                      }}
+                                    >
                                       <Energy
                                         height={14}
                                         width={14}
@@ -239,7 +244,7 @@ const BattleTab = observer(
                               },
                             ]}
                           >
-                            <Text style={styles.textXl}>
+                            <Text style={text.xl}>
                               {playerState.isStunned
                                 ? "Stunned!"
                                 : attackOrSpell instanceof Spell
@@ -264,9 +269,9 @@ const BattleTab = observer(
                             },
                           ]}
                         >
-                          <View style={styles.attackInfoContainer}>
-                            <Text style={styles.textXl}>Pass</Text>
-                            <View style={styles.regenContainer}>
+                          <View style={styles.columnCenter}>
+                            <Text style={text.xl}>Pass</Text>
+                            <View style={{ flexDirection: "row" }}>
                               <Text>2x</Text>
                               <Regen width={12} height={12} />
                             </View>
@@ -293,7 +298,7 @@ const BattleTab = observer(
                               },
                             ]}
                           >
-                            <Text style={styles.textXl}>Use</Text>
+                            <Text style={text.xl}>Use</Text>
                           </Pressable>
                         </ThemedView>
                       )}
@@ -314,8 +319,13 @@ const BattleTab = observer(
                       },
                     ]}
                   >
-                    <View style={styles.attackInfoContainer}>
-                      <Text style={styles.textXl}>Pass</Text>
+                    <View
+                      style={{
+                        justifyContent: "center",
+                        flexDirection: "column",
+                      }}
+                    >
+                      <Text style={text.xl}>Pass</Text>
                     </View>
                     <Pressable
                       disabled={enemyStore.attackAnimationsOnGoing}
@@ -335,7 +345,7 @@ const BattleTab = observer(
                         },
                       ]}
                     >
-                      <Text style={styles.textXl}>Use</Text>
+                      <Text style={text.xl}>Use</Text>
                     </Pressable>
                   </View>
                 </View>
@@ -356,12 +366,12 @@ const BattleTab = observer(
             </View>
           </TouchableWithoutFeedback>
         ) : (
-          <View style={styles.logContainer}>
+          <View style={{ flex: 1, paddingHorizontal: 8 }}>
             <View style={styles.logContent}>
               {Platform.OS == "web" ? (
                 <ScrollView>
                   {dungeonStore.reversedLogs.map((text) => (
-                    <Text style={styles.logText}>
+                    <Text style={{ paddingVertical: 4 }}>
                       {text
                         .replaceAll(`on the ${playerState.fullName}`, "")
                         .replaceAll(`on the ${playerState.fullName}`, "")
@@ -374,7 +384,7 @@ const BattleTab = observer(
                   inverted
                   data={dungeonStore.reversedLogs}
                   renderItem={({ item }) => (
-                    <Text style={styles.logText}>
+                    <Text style={{ paddingVertical: 4 }}>
                       {item
                         .replaceAll(`${playerState.fullName}`, "You")
                         .replaceAll(`on the ${playerState.fullName}`, "")}

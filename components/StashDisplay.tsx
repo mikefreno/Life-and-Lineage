@@ -150,7 +150,7 @@ export const StashDisplay = observer(
             {Array.from({ length: totalPages }).map((_, pageIndex) => (
               <View
                 key={`page-${pageIndex}`}
-                style={[styles.stashPage, { width: modalWidth }]}
+                style={{ width: modalWidth, flex: 1, paddingHorizontal: 8 }}
               >
                 <View style={styles.stashPageOverlay}>
                   <Text style={styles.stashPageText}>

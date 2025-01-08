@@ -16,7 +16,7 @@ export default function AttackDetails({
   const styles = useStyles();
   return (
     <View style={styles.attackDetailsContainer}>
-      <Text style={styles.textXl}>{toTitleCase(attack.name)}</Text>
+      <Text style={styles.xl}>{toTitleCase(attack.name)}</Text>
       <Text>
         {toTitleCase(attack.attackStyle)}{" "}
         {attack.attackStyle == "single" && "Target"}

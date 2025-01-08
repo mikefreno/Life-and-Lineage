@@ -103,7 +103,10 @@ const InventoryRender = observer(
               screen === "home"
                 ? styles.inventoryContainer
                 : screen === "shop"
-                ? styles.shopInventoryContainer
+                ? {
+                    zIndex: 10,
+                    marginLeft: -8,
+                  }
                 : null,
             ]}
           >
@@ -129,7 +132,7 @@ const InventoryRender = observer(
                       { width: uiStore.dimensions.width },
                     ]}
                   >
-                    <Text style={styles.text3xl}>Inventory</Text>
+                    <Text style={styles["3xl"]}>Inventory</Text>
                   </View>
                 )}
                 <Pressable
@@ -225,7 +228,7 @@ const InventoryRender = observer(
                       { width: uiStore.dimensions.width },
                     ]}
                   >
-                    <Text style={styles.text3xl}>Key Items</Text>
+                    <Text style={styles["3xl"]}>Key Items</Text>
                   </View>
                   <Pressable
                     onPress={() => setDisplayItem(null)}

@@ -71,7 +71,6 @@ export const useStyles = () => {
       justifyContent: "flex-start",
       paddingHorizontal: 0.06 * width,
     } as const,
-
     newGameHeader: {
       ...text["2xl"],
       textAlign: "center",
@@ -170,9 +169,6 @@ export const useStyles = () => {
       borderWidth: 1,
       borderColor: theme.border,
     } as const,
-    //optionCircleSelected: {
-    //backgroundColor: uiStore.colorScheme === "dark" ? "#2563eb" : "#3b82f6",
-    //} as const,
     modalTextInput: {
       marginHorizontal: 16,
       marginTop: 24,
@@ -193,9 +189,6 @@ export const useStyles = () => {
       paddingHorizontal: 16,
       paddingTop: 48,
     } as const,
-    //modalContainer: {
-    //padding: 8,
-    //} as const,
     remoteSaveContainer: {
       width: "100%",
       backgroundColor: uiStore.colorScheme === "dark" ? "#3f3f46" : "#d4d4d4",
@@ -221,27 +214,12 @@ export const useStyles = () => {
       alignItems: "flex-end",
       paddingVertical: 8,
     } as const,
-    //buttonRow: {
-    //...flex.rowEvenly,
-    //width: "100%",
-    //},
-    //optionSwitch: {
-    //flexDirection: "row",
-    //marginHorizontal: "auto",
-    //},
     gameSettingsContainer: {
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
       paddingHorizontal: 16,
     } as const,
-    //tutorialResetConfirmText: {
-    //textAlign: "center",
-    //fontSize: 18,
-    //} as const,
-    //tutorialResetButtonRow: {
-    //flexDirection: "row",
-    //} as const,
     tutorialResetButton: {
       marginHorizontal: "auto",
       marginTop: 8,
@@ -262,10 +240,6 @@ export const useStyles = () => {
       marginLeft: 40,
       flexDirection: "row",
     } as const,
-    //tutorialSwitchRow: {
-    //marginHorizontal: "auto",
-    //flexDirection: "row",
-    //} as const,
     codexInput: {
       marginHorizontal: 64,
       marginVertical: 24,
@@ -326,10 +300,10 @@ export const useStyles = () => {
       alignItems: "center",
       width: "100%",
     } as const,
-    //equipmentMiddleRow: {
-    //...flex.rowEvenly,
-    //marginTop: -12,
-    //} as const,
+    equipmentMiddleRow: {
+      ...flex.rowEvenly,
+      marginTop: -12,
+    } as const,
     equipmentSlotContainer: {
       zIndex: 50,
       marginHorizontal: "auto",
@@ -351,16 +325,7 @@ export const useStyles = () => {
       borderWidth: 1,
       borderColor: "#a1a1aa",
     } as const,
-
     // ---- Inventory ---- //
-    //inventoryContainerChild: {
-    //zIndex: 10,
-    //maxHeight: "60%",
-    //} as const,
-    //shopInventoryContainer: {
-    //zIndex: 10,
-    //marginLeft: -8,
-    //} as const,
     inventoryPanel: {
       borderWidth: 1,
       borderColor: "#52525b",
@@ -575,12 +540,6 @@ export const useStyles = () => {
       marginHorizontal: 4,
       borderRadius: 8,
     } as const,
-
-    //stashPage: {
-    //flex: 1,
-    //paddingHorizontal: 8,
-    //} as const,
-
     stashPageOverlay: {
       position: "absolute",
       width: "100%",
@@ -589,13 +548,11 @@ export const useStyles = () => {
       alignItems: "center",
       zIndex: -1,
     } as const,
-
     stashPageText: {
       fontSize: 20,
       letterSpacing: 2,
       opacity: 0.7,
     } as const,
-
     stashContainer: {
       borderWidth: 1,
       borderColor: "#52525b",
@@ -603,22 +560,11 @@ export const useStyles = () => {
       position: "relative",
       flex: 1,
     } as const,
-
-    strikeAroundContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-    } as const,
-
     strikeAroundLine: {
       flex: 1,
       borderTopWidth: 1,
       borderTopColor: "#6b7280",
     } as const,
-
-    strikeAroundContent: {
-      marginHorizontal: 10,
-    } as const,
-
     modalContent: {
       marginHorizontal: "auto",
       borderRadius: 12,
@@ -632,17 +578,6 @@ export const useStyles = () => {
       alignItems: "center",
       paddingVertical: 96,
     } as const,
-
-    //errorInnerContainer: {
-    //flex: 1,
-    //justifyContent: "space-evenly",
-    //} as const,
-
-    //dieContainer: {
-    //width: "100%",
-    //marginHorizontal: "auto",
-    //} as const,
-
     flatButtonContainer: {
       marginHorizontal: "auto",
       borderRadius: 12,
@@ -675,61 +610,28 @@ export const useStyles = () => {
       flex: 1,
       paddingHorizontal: 8,
     } as const,
-
     statsRow: {
       flexDirection: "row",
       justifyContent: "space-evenly",
       paddingVertical: 4,
     } as const,
-
-    //statBlock: {
-    //width: "31%",
-    //} as const,
-
-    //statHeader: {
-    //flexDirection: "row",
-    //justifyContent: "space-between",
-    //} as const,
-
-    //conditionRow: {
-    //flexDirection: "row",
-    //justifyContent: "space-around",
-    //} as const,
-
     conditionIcon: {
       marginHorizontal: 2,
       flex: 1,
       alignItems: "center",
     } as const,
-
-    detailedConditionContainer: {
-      maxHeight: 256,
-    } as const,
-
     detailedConditionCard: {
       marginVertical: 4,
       borderRadius: 8,
       paddingVertical: 8,
       backgroundColor: uiStore.colorScheme === "dark" ? "#52525b" : "#e4e4e7",
     } as const,
-
-    //conditionHeader: {
-    //flexDirection: "row",
-    //justifyContent: "space-evenly",
-    //} as const,
-
     respecButton: {
       height: 30,
       width: 30,
       alignItems: "center",
       borderRadius: 6,
     } as const,
-
-    //statsContainer: {
-    //flexDirection: "row",
-    //marginTop: 8,
-    //} as const,
-
     equipmentStatsSection: {
       width: "50%",
       marginHorizontal: 4,
@@ -746,13 +648,11 @@ export const useStyles = () => {
       borderColor: uiStore.colorScheme === "dark" ? "#fafafa" : "#18181b",
       paddingBottom: 8,
     } as const,
-
     attackEffectContainer: {
       flex: 1,
       width: "100%",
       alignItems: "center",
     } as const,
-
     attackDamageBox: {
       marginVertical: 4,
       width: "83.333%",
@@ -764,40 +664,22 @@ export const useStyles = () => {
       paddingVertical: 4,
       backgroundColor: uiStore.colorScheme === "dark" ? "#18181b" : "#fafafa",
     } as const,
-
     targetSelectionHeader: {
       textAlign: "center",
       fontSize: 24,
       lineHeight: 32,
     } as const,
-
     dungeonSpecialEncounter: {
       flex: 1,
       alignItems: "flex-end",
       paddingHorizontal: 24,
     } as const,
-
-    //dungeonMainContainer: {
-    //flex: 1,
-    //justifyContent: "space-between",
-    //} as const,
-
     minionContainer: {
       flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "space-evenly",
       paddingHorizontal: 16,
     } as const,
-
-    //minionBlock: {
-    //paddingVertical: 4,
-    //} as const,
-
-    //statsDisplayOverlay: {
-    //position: "absolute",
-    //zIndex: 10,
-    //} as const,
-
     loadingContainer: {
       flex: 1,
       justifyContent: "center",
@@ -809,7 +691,6 @@ export const useStyles = () => {
       height: "100%",
       paddingHorizontal: 8,
     } as const,
-
     attackCardContainer: {
       marginTop: 8,
       borderRadius: 8,
@@ -817,26 +698,6 @@ export const useStyles = () => {
       paddingVertical: 8,
       borderWidth: 1,
     } as const,
-
-    //attackCardContent: {
-    //flexDirection: "row",
-    //justifyContent: "space-between",
-    //} as const,
-
-    //attackInfoContainer: {
-    //flexDirection: "column",
-    //justifyContent: "center",
-    //} as const,
-
-    //spellCostContainer: {
-    //flexDirection: "row",
-    //} as const,
-
-    //energyIcon: {
-    //marginVertical: "auto",
-    //paddingLeft: 4,
-    //} as const,
-
     actionButton: {
       marginHorizontal: 8,
       marginVertical: "auto",
@@ -847,7 +708,6 @@ export const useStyles = () => {
       shadowOpacity: 0.1,
       shadowRadius: 1,
     } as const,
-
     passCardContainer: {
       flexDirection: "row",
       marginTop: 8,
@@ -857,29 +717,16 @@ export const useStyles = () => {
       paddingVertical: 8,
       borderWidth: 1,
     } as const,
-
-    //regenContainer: {
-    //alignItems: "center",
-    //flexDirection: "row",
-    //} as const,
-
     stunnedContainer: {
       marginVertical: "auto",
       paddingHorizontal: 16,
       paddingVertical: 8,
     } as const,
-
     stunnedText: {
       textAlign: "center",
       fontSize: 24,
       letterSpacing: 1,
     } as const,
-
-    //logContainer: {
-    //flex: 1,
-    //paddingHorizontal: 8,
-    //} as const,
-
     logContent: {
       flex: 1,
       paddingLeft: 4,
@@ -887,33 +734,17 @@ export const useStyles = () => {
       borderWidth: 1,
       borderColor: "#52525b",
     } as const,
-
-    //logText: {
-    //paddingVertical: 4,
-    //} as const,
     battleTabControls: {
       marginBottom: -4,
       flexDirection: "row",
       width: "100%",
       justifyContent: "space-around",
     } as const,
-
-    //battleTabButton: {
-    //width: "33.333%",
-    //paddingVertical: 16,
-    //} as const,
-
-    //droppedItemHeader: {
-    //marginTop: 16,
-    //...flex.rowCenter,
-    //} as const,
-
     inventoryFullText: {
       ...text.lg,
       textAlign: "center",
       color: "#ef4444",
     } as const,
-
     droppedItemRow: {
       marginTop: 8,
       ...flex.rowBetween,
@@ -921,48 +752,23 @@ export const useStyles = () => {
       padding: 8,
       borderRadius: 8,
     } as const,
-    //itemIconContainer: {
-    //...flex.rowCenter,
-    //alignItems: "center",
-    //} as const,
     itemRarityDot: {
       height: 12,
       width: 12,
       borderRadius: 9999,
       marginLeft: 4,
     } as const,
-
     itemNameText: {
       marginVertical: "auto",
       marginLeft: 8,
       width: "50%",
     } as const,
-    //enemyHealthPopUpContainer: {
-    //height: 24,
-    //} as const,
-
-    //enemyConditionsContainer: {
-    //height: 32,
-    //flexDirection: "row",
-    //} as const,
-
-    //conditionIconContainer: {
-    //marginHorizontal: 8,
-    //alignItems: "center",
-    //} as const,
-
-    //enemyDisplayContainer: {
-    //flex: 1,
-    //paddingTop: 16,
-    //} as const,
-
     enemyRow: {
       flex: 1,
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-evenly",
     } as const,
-
     enemyInfoContainer: {
       flexDirection: "column",
       alignItems: "center",
@@ -1261,7 +1067,6 @@ export const useStyles = () => {
       alignItems: "center",
       justifyContent: "center",
     } as const,
-
     statRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -1270,7 +1075,6 @@ export const useStyles = () => {
       margin: 2,
       columnGap: 4,
     } as const,
-
     // ---- Relationships ---- //
     mainContainer: {
       flex: 1,
@@ -1278,19 +1082,16 @@ export const useStyles = () => {
       paddingHorizontal: 32,
       paddingBottom: 40,
     } as const,
-
     affectionContainer: {
       width: "66%",
       flexDirection: "row",
       justifyContent: "center",
     } as const,
-
     adoptionTitle: {
       textAlign: "center",
       letterSpacing: 2,
       paddingVertical: 8,
     } as const,
-
     adoptionCharacterContainer: {
       flex: 1,
       flexDirection: "column",
@@ -1855,10 +1656,17 @@ export const flex = {
     flexDirection: "row",
     justifyContent: "center",
   } as const,
-
+  rowItemsCenter: {
+    flexDirection: "row",
+    alignItems: "center",
+  } as const,
   rowEvenly: {
     flexDirection: "row",
     justifyContent: "space-evenly",
+  } as const,
+  rowAround: {
+    flexDirection: "row",
+    justifyContent: "space-around",
   } as const,
   wrap: {
     flexWrap: "wrap",
