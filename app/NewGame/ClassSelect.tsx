@@ -103,22 +103,13 @@ const SetClassScreen = observer(() => {
           style={{
             ...styles.bold,
             ...styles["3xl"],
-            paddingTop: height * 0.04,
             textAlign: "center",
           }}
           accessibilityRole="header"
         >
           Create a Character
         </Text>
-        <Text
-          style={{
-            paddingTop: height * 0.02,
-            textAlign: "center",
-            ...styles["2xl"],
-          }}
-        >
-          Select Class
-        </Text>
+        <Text style={styles.newGameHeader}>Select Class</Text>
 
         <View
           style={{

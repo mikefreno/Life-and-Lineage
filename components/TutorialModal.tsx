@@ -8,7 +8,7 @@ import { TutorialOption } from "../utility/types";
 import GenericModal from "./GenericModal";
 import { useVibration } from "../hooks/generic";
 import { useRootStore } from "../hooks/stores";
-import { text, tw, useStyles } from "../hooks/styles";
+import { text, tw, tw_base, useStyles } from "../hooks/styles";
 import Colors from "../constants/Colors";
 
 type TutorialPage = {
@@ -111,28 +111,65 @@ const TutorialModal = observer(
           onPress={
             nextPageExists && tutorialState ? handlePress : closeTutorial
           }
-          style={[
-            styles.nextButton,
-            {
-              transform: [{ scale: 0.95 }],
-              opacity: 0.5,
-            },
-          ]}
         >
-          <Text>
-            {nextPageExists && tutorialState ? "Next" : "Acknowledge Knowledge"}
-          </Text>
+          {({ pressed }) => (
+            <View
+              style={[
+                styles.nextButton,
+                pressed && {
+                  transform: [{ scale: 0.95 }],
+                  opacity: 0.5,
+                },
+              ]}
+            >
+              <Text>
+                {nextPageExists && tutorialState
+                  ? "Next"
+                  : "Acknowledge Knowledge"}
+              </Text>
+            </View>
+          )}
         </Pressable>
       );
     };
 
     const renderPage = (page: TutorialPage) => (
       <>
-        {page.title && (
-          <Text style={[{ textAlign: "center" }, styles.titleText]}>
-            {page.title}
+        <View style={[styles.rowBetween, { alignItems: "center" }]}>
+          <View style={{ width: tw_base[6] }}>
+            {tutorialStep !== 1 ? (
+              <Pressable
+                onPress={() => {
+                  setTutorialStep((prev) => prev - 1);
+                  tutorialStepRef.current--;
+                }}
+              >
+                <Entypo
+                  name="chevron-left"
+                  size={24}
+                  color={uiStore.colorScheme === "dark" ? "#f4f4f5" : "black"}
+                />
+              </Pressable>
+            ) : (
+              <View></View>
+            )}
+          </View>
+          {page.title && (
+            <Text
+              style={{
+                textAlign: "center",
+                flex: 1,
+                paddingHorizontal: 10,
+                ...styles.titleText,
+              }}
+            >
+              {page.title}
+            </Text>
+          )}
+          <Text style={{ width: tw_base[6] }}>
+            {tutorialStep}/{pageThree ? 3 : 2}
           </Text>
-        )}
+        </View>
         <Text style={[tw.mt2, { textAlign: "center" }, styles.bodyText]}>
           {page.body}
         </Text>
@@ -172,33 +209,6 @@ const TutorialModal = observer(
         accessibilityRole="alert"
         {...props}
       >
-        {pageTwo && (
-          <View
-            style={[
-              tutorialStep !== 1
-                ? styles.rowBetween
-                : { justifyContent: "flex-end" },
-            ]}
-          >
-            {tutorialStep !== 1 && (
-              <Pressable
-                onPress={() => {
-                  setTutorialStep((prev) => prev - 1);
-                  tutorialStepRef.current--;
-                }}
-              >
-                <Entypo
-                  name="chevron-left"
-                  size={24}
-                  color={uiStore.colorScheme === "dark" ? "#f4f4f5" : "black"}
-                />
-              </Pressable>
-            )}
-            <Text>
-              {tutorialStep}/{pageThree ? 3 : 2}
-            </Text>
-          </View>
-        )}
         {renderPage(
           tutorialStep === 1
             ? pageOne

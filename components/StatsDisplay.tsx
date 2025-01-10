@@ -753,15 +753,14 @@ export function StatsDisplay({
       >
         <Pressable
           onPress={() => clearItem()}
-          style={[
-            styles.closeButton,
-            {
-              [displayItem.position.left + itemBlockSize <
-              dimensions.width * 0.6
-                ? "left"
-                : "right"]: 0,
-            },
-          ]}
+          style={{
+            ...styles.raisedAbsolutePosition,
+            ...styles.closeButton,
+            top: 0,
+            [displayItem.position.left + itemBlockSize < dimensions.width * 0.6
+              ? "left"
+              : "right"]: 0,
+          }}
         >
           <Text style={{ marginTop: -12, marginLeft: -4, ...styles["2xl"] }}>
             x

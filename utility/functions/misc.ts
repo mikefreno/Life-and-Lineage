@@ -21,7 +21,11 @@ import wands from "../../assets/json/items/wands.json";
 import storyItems from "../../assets/json/items/storyItems.json";
 import names from "../../assets/json/names.json";
 import { ItemClassType, Personality, PlayerClassOptions } from "../types";
-import { CommonActions, NavigationProp } from "@react-navigation/native";
+import {
+  CommonActions,
+  NavigationProp,
+  NavigationState,
+} from "@react-navigation/native";
 import { Character } from "../../entities/character";
 import { Enemy } from "../../entities/creatures";
 
@@ -363,7 +367,12 @@ export function rollD20() {
 }
 
 export default function clearHistory(
-  navigation: NavigationProp<ReactNavigation.RootParamList>,
+  navigation: Omit<
+    NavigationProp<ReactNavigation.RootParamList>,
+    "getState"
+  > & {
+    getState(): NavigationState | undefined;
+  },
 ) {
   navigation.dispatch(
     CommonActions.reset({

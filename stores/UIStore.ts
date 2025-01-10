@@ -25,6 +25,7 @@ export default class UIStore {
   modalShowing: boolean;
   readonly dimensionsSubscription: EmitterSubscription;
   preferedColorScheme: "system" | "dark" | "light";
+  systemColorScheme: "light" | "dark";
   vibrationEnabled: "full" | "minimal" | "none";
   healthWarning: number;
   reduceMotion: boolean;
@@ -65,6 +66,8 @@ export default class UIStore {
     this.detailedStatusViewShowing = false;
     this.modalShowing = false;
 
+    this.systemColorScheme = Appearance.getColorScheme() || "light";
+
     const {
       vibrationEnabled,
       preferedColorScheme,
@@ -77,6 +80,10 @@ export default class UIStore {
     this.preferedColorScheme = preferedColorScheme ?? "system";
     this.colorHeldForDungeon = colorHeldForDungeon;
     this.healthWarning = healthWarning;
+
+    Appearance.addChangeListener(({ colorScheme }) => {
+      this.setSystemColorScheme((colorScheme as "light" | "dark") || "light");
+    });
 
     if (reduceMotion == undefined) {
       this.reduceMotion = false;
@@ -107,6 +114,8 @@ export default class UIStore {
       setIsLoading: action,
       newbornBaby: observable,
       setNewbornBaby: action,
+      systemColorScheme: observable,
+      setSystemColorScheme: action,
       colorScheme: computed,
       dungeonSetter: action,
       clearDungeonColor: action,
@@ -142,11 +151,15 @@ export default class UIStore {
     );
   }
 
+  setSystemColorScheme(colorScheme: "light" | "dark") {
+    this.systemColorScheme = colorScheme;
+  }
+
   get colorScheme(): "light" | "dark" {
-    if (this.preferedColorScheme == "system") {
-      return Appearance.getColorScheme() as "light" | "dark";
+    if (this.preferedColorScheme === "system") {
+      return this.systemColorScheme;
     } else {
-      return this.preferedColorScheme;
+      return this.preferedColorScheme as "light" | "dark";
     }
   }
 

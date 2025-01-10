@@ -13,8 +13,8 @@ import { playerClassColors } from "../../constants/Colors";
 import { useNewGameStore } from "./_layout";
 import { useRootStore } from "../../hooks/stores";
 import { FadeSlide } from "../../components/AnimatedWrappers";
-import GenericFlatLink from "../../components/GenericLink";
-import { text, useStyles } from "../../hooks/styles";
+import { text, tw_base, useStyles } from "../../hooks/styles";
+import GenericFlatButton from "../../components/GenericFlatButton";
 
 export default function SetName() {
   const styles = useStyles();
@@ -44,7 +44,13 @@ export default function SetName() {
         <KeyboardAvoidingView style={{ marginTop: -header, flex: 1 }}>
           <View style={styles.nameContainer}>
             <View style={{ flexDirection: "row" }} accessibilityRole="header">
-              <Text style={{ textAlign: "center", ...text["2xl"] }}>
+              <Text
+                style={{
+                  textAlign: "center",
+                  ...text["2xl"],
+                  paddingBottom: tw_base[2],
+                }}
+              >
                 Choose Your
                 <Text
                   style={{
@@ -124,14 +130,14 @@ export default function SetName() {
                   }
                 >
                   {({ showing }) => (
-                    <GenericFlatLink
+                    <GenericFlatButton
                       disabled={!showing}
-                      href="./Review"
+                      onPress={() => router.push("/NewGame/Review")}
                       accessibilityRole="link"
                       accessibilityLabel="Next"
                     >
                       <Text>Next</Text>
-                    </GenericFlatLink>
+                    </GenericFlatButton>
                   )}
                 </FadeSlide>
               </View>

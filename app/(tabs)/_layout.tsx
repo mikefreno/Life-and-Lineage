@@ -140,6 +140,7 @@ export default function TabLayout() {
                       <BlurView
                         intensity={100}
                         style={StyleSheet.absoluteFill}
+                        tint={uiStore.colorScheme}
                       />
                     )
                   : () => (
@@ -213,6 +214,7 @@ export default function TabLayout() {
                       <BlurView
                         intensity={100}
                         style={StyleSheet.absoluteFill}
+                        tint={uiStore.colorScheme}
                       />
                     )
                   : () => (
@@ -261,6 +263,7 @@ export default function TabLayout() {
                       <BlurView
                         intensity={100}
                         style={StyleSheet.absoluteFill}
+                        tint={uiStore.colorScheme}
                       />
                     )
                   : () => (
@@ -321,7 +324,13 @@ export default function TabLayout() {
               headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
               headerBackground:
                 Platform.OS == "ios"
-                  ? () => <BlurView style={StyleSheet.absoluteFill} />
+                  ? () => (
+                      <BlurView
+                        intensity={100}
+                        style={StyleSheet.absoluteFill}
+                        tint={uiStore.colorScheme}
+                      />
+                    )
                   : () => (
                       <ThemedView
                         style={[StyleSheet.absoluteFill, shadows.soft]}
@@ -365,6 +374,7 @@ export default function TabLayout() {
                       <BlurView
                         intensity={100}
                         style={StyleSheet.absoluteFill}
+                        tint={uiStore.colorScheme}
                       />
                     )
                   : () => (
@@ -405,6 +415,7 @@ export default function TabLayout() {
                       <BlurView
                         intensity={100}
                         style={StyleSheet.absoluteFill}
+                        tint={uiStore.colorScheme}
                       />
                     )
                   : () => (

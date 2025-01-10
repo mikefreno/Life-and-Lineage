@@ -1,8 +1,11 @@
 import { Text } from "../../components/Themed";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { useNavigation } from "expo-router";
 import clearHistory, { toTitleCase, wait } from "../../utility/functions/misc";
-import { createPlayerCharacter } from "../../utility/functions/characterAid";
+import {
+  createPlayerCharacter,
+  getStartingBaseStats,
+} from "../../utility/functions/characterAid";
 import { Element, ElementToString } from "../../utility/types";
 import { elementalColorMap, playerClassColors } from "../../constants/Colors";
 import GenericFlatButton from "../../components/GenericFlatButton";
@@ -11,6 +14,18 @@ import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
 import { FadeSlide } from "../../components/AnimatedWrappers";
 import { tw_base, useStyles } from "../../hooks/styles";
+import {
+  DexterityIcon,
+  Energy,
+  HealthIcon,
+  IntelligenceIcon,
+  Regen,
+  Sanity,
+  SquareMinus,
+  SquarePlus,
+  StrengthIcon,
+} from "../../assets/icons/SVGIcons";
+import { useEffect, useState } from "react";
 
 export default function NewGameReview() {
   const { firstName, lastName, blessingSelection, sex, classSelection } =
@@ -19,12 +34,20 @@ export default function NewGameReview() {
   const vibration = useVibration();
 
   let root = useRootStore();
-  const navigation = useNavigation();
   const styles = useStyles();
+  const navigation = useNavigation();
   const { uiStore } = useRootStore();
+  const [allocatedStats, setAllocatedStats] = useState<BaseStats | null>(null);
+  const [remainingPoints, setRemainingPoints] = useState<number>(3);
+  const baseStats = getStartingBaseStats({ classSelection });
 
   async function startGame() {
-    if (classSelection && sex && blessingSelection !== undefined) {
+    if (
+      classSelection &&
+      sex &&
+      blessingSelection !== undefined &&
+      allocatedStats
+    ) {
       const player = createPlayerCharacter({
         sex,
         root,
@@ -32,6 +55,7 @@ export default function NewGameReview() {
         lastName,
         blessingSelection,
         classSelection,
+        allocatedStats,
       });
 
       await root.newGame(player);
@@ -39,6 +63,10 @@ export default function NewGameReview() {
       wait(250).then(() => clearHistory(navigation));
     }
   }
+  const handleStatsAllocated = (stats: BaseStats, remaining: number) => {
+    setAllocatedStats(stats);
+    setRemainingPoints(remaining);
+  };
 
   if (blessingSelection !== undefined && classSelection !== undefined) {
     return (
@@ -62,12 +90,17 @@ export default function NewGameReview() {
             style={{ color: playerClassColors[classSelection] }}
           >{`${toTitleCase(classSelection)}`}</Text>
         </Text>
+        <StatAllocation
+          baseStats={baseStats}
+          onStatsAllocated={handleStatsAllocated}
+        />
         <FadeSlide>
           <GenericFlatButton
             onPress={startGame}
             style={{ marginTop: tw_base[4] }}
             accessibilityRole="button"
             accessibilityLabel="Confirm"
+            disabled={!allocatedStats || remainingPoints > 0}
           >
             Confirm?
           </GenericFlatButton>
@@ -75,4 +108,154 @@ export default function NewGameReview() {
       </View>
     );
   }
+}
+
+type BaseStats = ReturnType<typeof getStartingBaseStats>;
+type StatKey = keyof BaseStats;
+
+interface StatAllocationProps {
+  baseStats: BaseStats;
+  onStatsAllocated: (stats: BaseStats, remainingPoints: number) => void;
+}
+
+// Type for stat increments/decrements
+type StatIncrements = {
+  [K in StatKey]: number;
+};
+
+const statIncrements: StatIncrements = {
+  baseHealth: 10,
+  baseMana: 10,
+  baseSanity: 5,
+  baseStrength: 1,
+  baseIntelligence: 1,
+  baseDexterity: 1,
+  baseManaRegen: 1,
+};
+
+export function StatAllocation({
+  baseStats,
+  onStatsAllocated,
+}: StatAllocationProps) {
+  const [remainingPoints, setRemainingPoints] = useState(3);
+  const [stats, setStats] = useState<BaseStats>(baseStats);
+  const styles = useStyles();
+
+  const handleIncrement = (stat: StatKey) => {
+    if (remainingPoints <= 0) return;
+
+    const increment = statIncrements[stat];
+
+    const newStats = {
+      ...stats,
+      [stat]: stats[stat] + increment,
+    };
+    setStats(newStats);
+    setRemainingPoints((prev) => prev - 1);
+    onStatsAllocated(newStats, remainingPoints - 1);
+  };
+
+  const handleDecrement = (stat: StatKey) => {
+    if (stats[stat] <= baseStats[stat]) return;
+
+    const decrement = statIncrements[stat];
+
+    const newStats = {
+      ...stats,
+      [stat]: stats[stat] - decrement,
+    };
+    setStats(newStats);
+    setRemainingPoints((prev) => prev + 1);
+    onStatsAllocated(newStats, remainingPoints + 1);
+  };
+
+  interface StatRowProps {
+    stat: StatKey;
+    icon: JSX.Element;
+    value: number;
+  }
+
+  const StatRow = ({ stat, icon, value }: StatRowProps) => (
+    <View style={styles.statRow}>
+      <View style={styles.rowItemsCenter}>
+        {icon}
+        <Text style={{ marginLeft: 8 }}>{value}</Text>
+      </View>
+      <View style={[styles.rowItemsCenter, { gap: 16 }]}>
+        <Pressable
+          onPress={() => handleDecrement(stat)}
+          disabled={stats[stat] <= baseStats[stat]}
+        >
+          <SquareMinus
+            height={20}
+            width={20}
+            opacity={stats[stat] <= baseStats[stat] ? 0.5 : 1}
+          />
+        </Pressable>
+        <Pressable
+          onPress={() => handleIncrement(stat)}
+          disabled={remainingPoints <= 0}
+        >
+          <SquarePlus
+            height={20}
+            width={20}
+            opacity={remainingPoints <= 0 ? 0.5 : 1}
+          />
+        </Pressable>
+      </View>
+    </View>
+  );
+
+  return (
+    <View style={[styles.gearStatsContainer, { paddingHorizontal: 16 }]}>
+      <Text
+        style={[
+          styles.lg,
+          { color: "#ef4444", textAlign: "center", marginBottom: 16 },
+        ]}
+      >
+        Warning: Stat allocations are permanent and cannot be changed later!
+      </Text>
+
+      <Text style={[styles.xl, styles.textCenter, { marginBottom: 16 }]}>
+        Remaining Points: {remainingPoints}
+      </Text>
+
+      <StatRow
+        stat="baseHealth"
+        icon={<HealthIcon height={20} width={23} />}
+        value={stats.baseHealth}
+      />
+      <StatRow
+        stat="baseMana"
+        icon={<Energy height={20} width={23} />}
+        value={stats.baseMana}
+      />
+      <StatRow
+        stat="baseSanity"
+        icon={<Sanity height={20} width={23} />}
+        value={stats.baseSanity}
+      />
+      <StatRow
+        stat="baseStrength"
+        icon={<StrengthIcon height={20} width={23} />}
+        value={stats.baseStrength}
+      />
+      <StatRow
+        stat="baseIntelligence"
+        icon={<IntelligenceIcon height={20} width={23} />}
+        value={stats.baseIntelligence}
+      />
+      <StatRow
+        stat="baseDexterity"
+        icon={<DexterityIcon height={20} width={23} />}
+        value={stats.baseDexterity}
+      />
+      <StatRow
+        stat="baseManaRegen"
+        icon={<Regen height={20} width={23} />}
+        value={stats.baseManaRegen}
+      />
+    </View>
+  );
 }

@@ -94,6 +94,7 @@ export class DungeonStore {
       toggleMovement: action,
       addLog: action,
       setUpDungeon: action,
+      isInDungeon: computed,
       move: action,
       reversedLogs: computed,
       setInCombat: action,
@@ -214,6 +215,10 @@ export class DungeonStore {
         }
       },
     );
+  }
+
+  get isInDungeon() {
+    return !!(this.currentInstance && this.currentLevel);
   }
 
   public toggleMovement() {

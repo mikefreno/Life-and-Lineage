@@ -1,4 +1,4 @@
-import { makeObservable, observable, action } from "mobx";
+import { makeObservable, observable, action, reaction } from "mobx";
 import { storage } from "../utility/functions/storage";
 import { RootStore } from "./RootStore";
 import { Audio } from "expo-av";
@@ -60,6 +60,7 @@ export class AudioStore {
       isSoundEffectsLoaded: observable,
       isAmbientLoaded: observable,
       isCombatLoaded: observable,
+      loadAudioResources: action,
       playAmbient: action,
       playCombat: action,
       playSfx: action,
@@ -68,6 +69,44 @@ export class AudioStore {
     });
 
     this.initializeAudio();
+
+    reaction(
+      () => this.isAmbientLoaded,
+      (val) => {
+        if (val) {
+          this.playAmbient();
+        }
+      },
+    );
+
+    reaction(
+      () => ({
+        inDungeon: this.root.dungeonStore.isInDungeon,
+        inMarket: this.root.shopsStore.inMarket,
+        playerAge: this.root.playerState?.age ?? 0,
+      }),
+      (current, previous) => {
+        if (
+          current.inDungeon !== previous?.inDungeon ||
+          current.inMarket !== previous?.inMarket ||
+          (!current.inDungeon &&
+            !current.inMarket &&
+            current.playerAge !== previous?.playerAge)
+        ) {
+          this.playAmbient();
+        }
+      },
+    );
+    reaction(
+      () => this.root.dungeonStore.inCombat,
+      (inCombat) => {
+        if (inCombat) {
+          this.playCombat({ track: "basic" });
+        } else {
+          this.playAmbient();
+        }
+      },
+    );
   }
 
   private async initializeAudio() {
@@ -83,7 +122,7 @@ export class AudioStore {
     }
   }
 
-  private async loadAudioResources() {
+  async loadAudioResources() {
     try {
       await this.loadSoundEffects();
       this.isSoundEffectsLoaded = true;
@@ -136,21 +175,51 @@ export class AudioStore {
     await Promise.all(loadPromises);
   }
 
-  async playAmbient({
-    track,
-    duration = DEFAULT_FADE,
-    disableFadeOut = false,
-  }: {
-    track: keyof typeof AMBIENT_TRACKS;
+  async playAmbient(params?: {
+    track?: keyof typeof AMBIENT_TRACKS;
     duration?: number;
     disableFadeOut?: boolean;
   }) {
+    const {
+      track,
+      duration = DEFAULT_FADE,
+      disableFadeOut = false,
+    } = params ?? {};
+
     if (!this.isAmbientLoaded || this.isTransitioning) return;
 
+    console.log("in dungeon: ", this.root.dungeonStore.isInDungeon);
+    console.log("in market: ", this.root.shopsStore.inMarket);
     try {
       this.isTransitioning = true;
-      const newSound = this.ambientPlayers.get(track);
-      if (!newSound) throw new Error(`Ambient track ${track} not found`);
+      let selectedTrack = track;
+      if (!selectedTrack) {
+        const playerAge = this.root.playerState?.age ?? 0;
+
+        if (this.root.dungeonStore.isInDungeon) {
+          selectedTrack = "dungeon";
+        } else if (this.root.shopsStore.inMarket) {
+          selectedTrack = "shops";
+        } else {
+          // Age-based ambient music selection
+          if (playerAge < 30) {
+            selectedTrack = "young";
+          } else if (playerAge < 60) {
+            selectedTrack = "middle";
+          } else {
+            selectedTrack = "old";
+          }
+        }
+      }
+
+      if (this.currentAmbientTrack === selectedTrack) {
+        this.isTransitioning = false;
+        return;
+      }
+
+      const newSound = this.ambientPlayers.get(selectedTrack);
+      if (!newSound)
+        throw new Error(`Ambient track ${selectedTrack} not found`);
 
       const targetVolume = this.getEffectiveVolume("ambientMusic");
 
@@ -185,9 +254,9 @@ export class AudioStore {
       await newSound.playAsync();
       await this.fadeSound(newSound, 0, targetVolume, duration);
 
-      this.currentAmbientTrack = track;
+      this.currentAmbientTrack = selectedTrack;
     } catch (error) {
-      console.error(`Failed to play ambient track ${track}:`, error);
+      console.error(`Failed to play ambient track:`, error);
     } finally {
       this.isTransitioning = false;
     }

@@ -154,26 +154,24 @@ export default function GameSettings() {
         </View>
 
         <GenericStrikeAround>Tutorials</GenericStrikeAround>
-        <View style={styles.optionContainer}>
-          <View style={{ flexDirection: "row" }}>
-            <Text style={text.lg}>Tutorials Enabled: </Text>
-            <Switch
-              trackColor={{ false: "#767577", true: "#3b82f6" }}
-              ios_backgroundColor="#3e3e3e"
-              thumbColor={"white"}
-              onValueChange={(bool) => setTutorialState(bool)}
-              value={tutorialState}
-            />
-          </View>
-          <GenericRaisedButton
-            onPress={() => {
-              vibration({ style: "light" });
-              setShowTutorialResetConfirm(true);
-            }}
-          >
-            Reset Tutorials
-          </GenericRaisedButton>
+        <View style={[styles.rowItemsCenter, styles.pt4]}>
+          <Text style={text.lg}>Tutorials Enabled: </Text>
+          <Switch
+            trackColor={{ false: "#767577", true: "#3b82f6" }}
+            ios_backgroundColor="#3e3e3e"
+            thumbColor={"white"}
+            onValueChange={(bool) => setTutorialState(bool)}
+            value={tutorialState}
+          />
         </View>
+        <GenericRaisedButton
+          onPress={() => {
+            vibration({ style: "light" });
+            setShowTutorialResetConfirm(true);
+          }}
+        >
+          Reset Tutorials
+        </GenericRaisedButton>
       </View>
     </>
   );

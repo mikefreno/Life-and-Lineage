@@ -12,9 +12,9 @@ import { playerClassColors } from "../../constants/Colors";
 import { toTitleCase } from "../../utility/functions/misc";
 import { FontAwesome5, Foundation } from "@expo/vector-icons";
 import { useNewGameStore } from "./_layout";
-import GenericFlatLink from "../../components/GenericLink";
 import { FadeSlide } from "../../components/AnimatedWrappers";
 import { text, useStyles } from "../../hooks/styles";
+import GenericFlatButton from "../../components/GenericFlatButton";
 
 export default function SetSex() {
   const styles = useStyles();
@@ -48,7 +48,7 @@ export default function SetSex() {
         }}
       />
       <View style={styles.newGameContainer}>
-        <Text style={[text.['2xl'], styles.newGameHeader]}>
+        <Text style={[text["2xl"], styles.newGameHeader]}>
           Set the sex of your{" "}
           <Text style={{ color: playerClassColors[classSelection] }}>
             {toTitleCase(classSelection)}
@@ -60,6 +60,7 @@ export default function SetSex() {
               setSex("male");
               vibration({ style: "light" });
             }}
+            style={{ width: "50%" }}
             accessibilityRole="button"
             accessibilityLabel="Select Male"
           >
@@ -82,9 +83,7 @@ export default function SetSex() {
                     color={playerClassColors[classSelection]}
                   />
                 </View>
-                <Text style={{ textAlign: "center", ...text.lg }}>
-                  Male
-                </Text>
+                <Text style={{ textAlign: "center", ...text.lg }}>Male</Text>
               </View>
             )}
           </Pressable>
@@ -92,6 +91,10 @@ export default function SetSex() {
             onPress={() => {
               setSex("female");
               vibration({ style: "light" });
+            }}
+            style={{
+              width: "50%",
+              marginHorizontal: "auto",
             }}
             accessibilityRole="button"
             accessibilityLabel="Select Female"
@@ -115,9 +118,7 @@ export default function SetSex() {
                     color={playerClassColors[classSelection]}
                   />
                 </View>
-                <Text style={ { textAlign: "center", ...text.lg }}>
-                  Female
-                </Text>
+                <Text style={{ textAlign: "center", ...text.lg }}>Female</Text>
               </View>
             )}
           </Pressable>
@@ -125,14 +126,14 @@ export default function SetSex() {
         <View style={{ marginHorizontal: "auto", marginTop: 32 }}>
           <FadeSlide show={!!sex}>
             {({ showing }) => (
-              <GenericFlatLink
+              <GenericFlatButton
                 disabled={!showing}
-                href="./NameSelect"
+                onPress={() => router.push("/NewGame/NameSelect")}
                 accessibilityRole="link"
                 accessibilityLabel="Next"
               >
                 <Text>Next</Text>
-              </GenericFlatLink>
+              </GenericFlatButton>
             )}
           </FadeSlide>
         </View>

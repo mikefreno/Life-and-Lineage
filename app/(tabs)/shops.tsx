@@ -1,7 +1,7 @@
 import React from "react";
-import { ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { CharacterImage } from "../../components/CharacterImage";
-import { Link } from "expo-router";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -35,6 +35,16 @@ const ShopsScreen = observer(() => {
     }
   }, []);
 
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    shopsStore.setOnShopTab(isFocused);
+
+    return () => {
+      shopsStore.setOnShopTab(false);
+    };
+  }, [isFocused]);
+
   const headerHeight = useHeaderHeight();
   const bottomHeight = useBottomTabBarHeight();
 
@@ -63,6 +73,7 @@ const ShopsScreen = observer(() => {
               lineHeight: 32,
               color: colors.text,
             }}
+            numberOfLines={2}
           >
             The {toTitleCase(shop.archetype)}
           </Text>
@@ -81,27 +92,35 @@ const ShopsScreen = observer(() => {
             <Text style={{ textAlign: "center", color: colors.text }}>
               {shop.shopKeeper.fullName}
             </Text>
-            <Link
+            <Pressable
               style={{ marginBottom: 8 }}
-              href={`/Shops/${shop.archetype}`}
-              onPressIn={() => vibration({ style: "light" })}
-              suppressHighlighting
+              onPress={() => {
+                vibration({ style: "light" });
+                shopsStore.setCurrentShop(shop);
+                router.push(`/ShopInterior`);
+              }}
             >
-              <View
-                style={[
-                  styles.enterButtonInner,
-                  {
-                    shadowColor: colors.border,
-                    elevation: 2,
-                    backgroundColor: colors.border,
-                    shadowOpacity: 0.5,
-                    shadowRadius: 5,
-                  },
-                ]}
-              >
-                <Text style={{ fontSize: 18, color: colors.text }}>Enter</Text>
-              </View>
-            </Link>
+              {({ pressed }) => (
+                <View
+                  style={[
+                    {
+                      ...styles.enterButtonInner,
+                      shadowColor: colors.border,
+                      elevation: 2,
+                      backgroundColor: colors.border,
+                      shadowOpacity: 0.5,
+                      shadowRadius: 5,
+                      opacity: pressed ? 0.5 : 1,
+                      transform: [{ scale: pressed ? 0.95 : 1 }],
+                    },
+                  ]}
+                >
+                  <Text style={{ fontSize: 18, color: colors.text }}>
+                    Enter
+                  </Text>
+                </View>
+              )}
+            </Pressable>
           </View>
         </View>
       </View>

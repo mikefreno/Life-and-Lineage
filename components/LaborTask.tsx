@@ -79,7 +79,7 @@ const LaborTask = observer(
 
     return (
       <ThemedCard>
-        <View style={styles.flexRowBetween}>
+        <View style={styles.rowBetween}>
           <Text style={styles.laborTaskTitle}>
             {title}{" "}
             {playerState && numberToRoman(playerState.getJobRank(title))}

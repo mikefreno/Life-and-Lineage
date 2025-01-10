@@ -56,7 +56,7 @@ export function getSexFromName(firstName: string) {
 export function getStartingBaseStats({
   classSelection,
 }: {
-  classSelection: PlayerClassOptions;
+  classSelection: PlayerClassOptions | undefined;
 }) {
   switch (classSelection) {
     case PlayerClassOptions.necromancer:
@@ -90,6 +90,7 @@ export function getStartingBaseStats({
         baseSanity: 50,
       };
     case PlayerClassOptions.ranger:
+    default:
       return {
         baseHealth: 90,
         baseMana: 90,
@@ -131,6 +132,7 @@ export function createPlayerCharacter({
   firstName,
   lastName,
   sex,
+  allocatedStats,
 }: {
   root: RootStore;
   classSelection: PlayerClassOptions;
@@ -138,6 +140,15 @@ export function createPlayerCharacter({
   firstName: string;
   lastName: string;
   sex: "male" | "female";
+  allocatedStats: {
+    baseHealth: number;
+    baseMana: number;
+    baseStrength: number;
+    baseIntelligence: number;
+    baseDexterity: number;
+    baseManaRegen: number;
+    baseSanity: number;
+  };
 }) {
   const mom = createParent("female", root, lastName);
   const dad = createParent("male", root, lastName);
@@ -152,7 +163,7 @@ export function createPlayerCharacter({
     blessing: blessingSelection,
     parentIds: [mom.id, dad.id], // Changed from parents array to parentIds
     birthdate: bday,
-    ...getStartingBaseStats({ classSelection }),
+    ...allocatedStats,
     root,
   };
 

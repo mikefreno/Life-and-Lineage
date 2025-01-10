@@ -9,7 +9,7 @@ export default function AuthRoutesLayout() {
     <Tabs
       screenOptions={{
         tabBarIconStyle: { marginHorizontal: "auto" },
-        tabBarStyle: { height: 64, paddingBottom: 16 },
+        tabBarStyle: { height: 80, paddingBottom: 16 },
         tabBarButton: (props) => {
           const onPressWithVibration = (event: GestureResponderEvent) => {
             vibration({ style: "light" });
@@ -19,6 +19,7 @@ export default function AuthRoutesLayout() {
             <Pressable
               onPress={onPressWithVibration}
               style={{
+                marginVertical: "auto",
                 height: 44,
               }}
             >

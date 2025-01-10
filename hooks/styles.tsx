@@ -70,13 +70,13 @@ export const useStyles = () => {
       ...centeredContainer,
       justifyContent: "flex-start",
       paddingHorizontal: 0.06 * width,
+      paddingTop: 0.04 * height,
     } as const,
     newGameHeader: {
       ...text["2xl"],
       textAlign: "center",
-      paddingTop: 0.02 * height,
+      paddingVertical: 0.02 * height,
     } as const,
-
     tutorialButtonContainer: {
       ...raisedAbsolutePosition,
       ...tw.ml4,
@@ -99,16 +99,6 @@ export const useStyles = () => {
     } as const,
 
     // ---- New Game - Blessing Select ---- //
-    blessingClassContainer: {
-      alignItems: "center",
-      justifyContent: "space-evenly",
-      paddingVertical: 24,
-    } as const,
-    blessingRow: {
-      flexDirection: "row",
-      justifyContent: "space-evenly",
-      marginBottom: 32,
-    } as const,
     blessingPressable: {
       borderWidth: 1,
       width: "100%",
@@ -123,9 +113,10 @@ export const useStyles = () => {
       flexDirection: "row",
       width: "100%",
       justifyContent: "space-evenly",
+      marginHorizontal: "auto",
     } as const,
     sexOption: {
-      width: "33%",
+      width: "100%",
       paddingVertical: 16,
       borderWidth: 1,
     } as const,
@@ -477,7 +468,8 @@ export const useStyles = () => {
       justifyContent: "space-between",
       borderRadius: 12,
       borderWidth: 1,
-      padding: 16,
+      paddingVertical: 16,
+      paddingHorizontal: 8,
     } as const,
     enterButtonInner: {
       paddingHorizontal: 32,
@@ -847,6 +839,7 @@ export const useStyles = () => {
     } as const,
     greetingContainer: {
       ...tw.p2,
+      marginTop: -48,
       ...radius.lg,
       ...raisedAbsolutePosition,
       borderColor: theme.tint,
@@ -873,8 +866,9 @@ export const useStyles = () => {
     } as const,
     playerInventorySection: {
       flex: 1,
+      height: "60%",
       ...tw.mx2,
-      ...tw.mt4,
+      ...tw.pt4,
     } as const,
     statsDisplayContainer: {
       ...flex.columnCenter,
@@ -1615,15 +1609,15 @@ export const radius = {
 } as const;
 
 export const text = {
-  xs: { fontSize: 12, lineHeight: 16 },
-  sm: { fontSize: 14, lineHeight: 20 },
-  md: { fontSize: 16, lineHeight: 24 },
-  lg: { fontSize: 18, lineHeight: 28 },
-  xl: { fontSize: 20, lineHeight: 28 },
-  "2xl": { fontSize: 24, lineHeight: 32 },
-  "3xl": { fontSize: 30, lineHeight: 36 },
-  "4xl": { fontSize: 36, lineHeight: 40 },
-  "5xl": { fontSize: 48, lineHeight: 48 },
+  xs: { fontSize: 10, lineHeight: 12 },
+  sm: { fontSize: 12, lineHeight: 16 },
+  md: { fontSize: 14, lineHeight: 20 },
+  lg: { fontSize: 16, lineHeight: 24 },
+  xl: { fontSize: 18, lineHeight: 24 },
+  "2xl": { fontSize: 22, lineHeight: 28 },
+  "3xl": { fontSize: 26, lineHeight: 32 },
+  "4xl": { fontSize: 32, lineHeight: 36 },
+  "5xl": { fontSize: 44, lineHeight: 48 },
 } as const;
 
 export const font = {

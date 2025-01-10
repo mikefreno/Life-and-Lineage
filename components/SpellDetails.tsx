@@ -38,14 +38,26 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
           },
         ]}
       >
-        <View style={[styles.itemsCenter, { width: "25%" }]}>
+        <View
+          style={{
+            width: "25%",
+            marginVertical: "auto",
+            ...styles.itemsCenter,
+          }}
+        >
           <Text style={styles.textCenter}>{toTitleCase(spell.name)}</Text>
           <View style={styles.rowCenter}>
             <Text>{spell.manaCost}</Text>
             <Energy width={14} height={14} style={{ marginLeft: 6 }} />
           </View>
         </View>
-        <View style={[styles.itemsCenter, { width: "40%" }]}>
+        <View
+          style={{
+            width: "40%",
+            marginVertical: "auto",
+            ...styles.itemsCenter,
+          }}
+        >
           {spell.duration > 1 && (
             <View style={styles.rowCenter}>
               <Text>{spell.duration}</Text>
@@ -78,7 +90,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
               Requires: {toTitleCase(spell.usesWeapon)}
             </Text>
           )}
-          {spell.selfDamage && (
+          {spell.selfDamage ? (
             <View style={styles.rowCenter}>
               {spell.selfDamage > 0 ? (
                 <>
@@ -100,7 +112,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
                 </>
               ) : null}
             </View>
-          )}
+          ) : null}
           {spell.summons?.map((summon, idx) => (
             <View key={idx} style={styles.rowCenter}>
               <Text>{toTitleCase(summon)}</Text>
@@ -112,7 +124,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
               />
             </View>
           ))}
-          {spell.rangerPet && (
+          {spell.rangerPet ? (
             <View style={styles.rowCenter}>
               <Text>{toTitleCase(spell.rangerPet)}</Text>
               <BeastMasteryIcon
@@ -121,7 +133,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
                 style={{ marginLeft: 6 }}
               />
             </View>
-          )}
+          ) : null}
         </View>
         <View style={{ marginVertical: "auto" }}>
           <BlessingDisplay

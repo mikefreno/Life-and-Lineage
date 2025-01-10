@@ -34,7 +34,7 @@ export const AppSettings = observer(() => {
   const styles = useStyles();
 
   const [selectedThemeOption, setSelectedThemeOption] = useState<number>(
-    themeOptions.indexOf(uiStore.colorScheme),
+    themeOptions.indexOf(uiStore.preferedColorScheme),
   );
 
   const [selectedVibrationOption, setSelectedVibrationOption] =

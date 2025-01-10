@@ -20,9 +20,9 @@ import { useIsFocused } from "@react-navigation/native";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
-import GenericFlatLink from "../../components/GenericLink";
 import { FadeSlide } from "../../components/AnimatedWrappers";
 import { text, useStyles } from "../../hooks/styles";
+import GenericFlatButton from "../../components/GenericFlatButton";
 
 export default function SetBlessing() {
   const { classSelection, blessingSelection, setBlessingSelection } =
@@ -61,11 +61,8 @@ export default function SetBlessing() {
       <View style={styles.newGameContainer}>
         <Text
           style={{
-            ...text["2xl"],
-            textAlign: "center",
-            paddingHorizontal: 16,
+            ...styles.newGameHeader,
             maxWidth: dimensions.width * 0.75,
-            marginHorizontal: "auto",
           }}
           accessibilityRole="header"
         >
@@ -86,7 +83,12 @@ export default function SetBlessing() {
         />
 
         <Text
-          style={{ textAlign: "center", paddingHorizontal: 16, ...text.lg }}
+          style={{
+            textAlign: "center",
+            paddingHorizontal: 16,
+            paddingTop: 16,
+            ...text.lg,
+          }}
         >
           {DescriptionMap[blessingSelection as Element]}
         </Text>
@@ -96,14 +98,14 @@ export default function SetBlessing() {
         >
           <FadeSlide show={blessingSelection == 0 || !!blessingSelection}>
             {({ showing }) => (
-              <GenericFlatLink
-                href={"./SexSelect"}
+              <GenericFlatButton
+                onPress={() => router.push("/NewGame/SexSelect")}
                 accessibilityRole="link"
                 accessibilityLabel="Next"
                 disabled={!showing}
               >
                 <Text>Next</Text>
-              </GenericFlatLink>
+              </GenericFlatButton>
             )}
           </FadeSlide>
         </View>
@@ -223,8 +225,8 @@ function ClassDependantBlessings({
 
   if (playerClass == "mage") {
     return (
-      <View style={styles.blessingClassContainer}>
-        <View style={[styles.blessingRow, { marginBottom: 32 }]}>
+      <View style={styles.columnEvenly}>
+        <View style={styles.rowEvenly}>
           <BlessingPressable
             element={Element.fire}
             onPress={() => {
@@ -246,7 +248,7 @@ function ClassDependantBlessings({
             blessing={blessing}
           />
         </View>
-        <View style={styles.blessingRow}>
+        <View style={styles.rowEvenly}>
           <BlessingPressable
             element={Element.air}
             onPress={() => {
@@ -272,8 +274,8 @@ function ClassDependantBlessings({
     );
   } else if (playerClass == "necromancer") {
     return (
-      <View style={styles.blessingClassContainer}>
-        <View style={[styles.blessingRow, { marginBottom: 32 }]}>
+      <View style={styles.columnEvenly}>
+        <View style={styles.rowEvenly}>
           <BlessingPressable
             element={Element.summoning}
             onPress={() => {
@@ -295,7 +297,7 @@ function ClassDependantBlessings({
             blessing={blessing}
           />
         </View>
-        <View style={styles.blessingRow}>
+        <View style={styles.rowEvenly}>
           <BlessingPressable
             element={Element.bone}
             onPress={() => {
@@ -321,7 +323,7 @@ function ClassDependantBlessings({
     );
   } else if (playerClass == "paladin") {
     return (
-      <View style={styles.blessingClassContainer}>
+      <View style={styles.columnEvenly}>
         <BlessingPressable
           element={Element.holy}
           onPress={() => {
@@ -332,7 +334,7 @@ function ClassDependantBlessings({
           dimensions={dimensions}
           blessing={blessing}
         />
-        <View style={[styles.blessingRow, { marginTop: 32 }]}>
+        <View style={styles.rowEvenly}>
           <BlessingPressable
             element={Element.vengeance}
             onPress={() => {
@@ -358,7 +360,7 @@ function ClassDependantBlessings({
     );
   } else if (playerClass == "ranger") {
     return (
-      <View style={styles.blessingClassContainer}>
+      <View style={styles.columnEvenly}>
         <BlessingPressable
           element={Element.beastMastery}
           onPress={() => {
@@ -369,7 +371,7 @@ function ClassDependantBlessings({
           dimensions={dimensions}
           blessing={blessing}
         />
-        <View style={[styles.blessingRow, { marginTop: 32 }]}>
+        <View style={styles.rowEvenly}>
           <BlessingPressable
             element={Element.arcane}
             onPress={() => {

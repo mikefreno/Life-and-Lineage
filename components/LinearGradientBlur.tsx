@@ -44,9 +44,17 @@ export function LinearGradientBlur({
         style={[StyleSheet.absoluteFill]}
       >
         {Platform.OS == "ios" ? (
-          <BlurView intensity={intensity} style={StyleSheet.absoluteFill} />
+          <BlurView
+            intensity={intensity}
+            style={StyleSheet.absoluteFill}
+            tint={uiStore.colorScheme}
+          />
         ) : (
-          <BlurView intensity={100} style={StyleSheet.absoluteFill}>
+          <BlurView
+            intensity={100}
+            style={StyleSheet.absoluteFill}
+            tint={uiStore.colorScheme}
+          >
             <View
               style={[
                 StyleSheet.absoluteFill,

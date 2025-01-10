@@ -31,7 +31,7 @@ import { DungeonStore } from "../stores/DungeonStore";
 import GenericModal from "../components/GenericModal";
 import { CharacterImage } from "../components/CharacterImage";
 import GenericFlatButton from "../components/GenericFlatButton";
-import { tw, useStyles } from "../hooks/styles";
+import { useStyles } from "../hooks/styles";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -80,7 +80,8 @@ const RootLayout = observer(() => {
     CursiveBold: require("../assets/fonts/Tangerine-Bold.ttf"),
   });
   const rootStore = useRootStore();
-  const { playerState, dungeonStore, uiStore } = rootStore;
+  const { playerState, dungeonStore, uiStore, audioStore, shopsStore } =
+    rootStore;
   const styles = useStyles();
 
   const [firstLoad, setFirstLoad] = useState(true);
@@ -176,7 +177,12 @@ const RootLayout = observer(() => {
     };
 
     initializeApp();
-  }, [fontLoaded, rootStore.constructed, firstLoad]);
+  }, [
+    fontLoaded,
+    rootStore.constructed,
+    firstLoad,
+    audioStore.isAmbientLoaded,
+  ]);
 
   useEffect(() => {
     if (!firstLoad && playerState) {
@@ -412,11 +418,9 @@ const RootLayout = observer(() => {
             }}
           />
           <Stack.Screen
-            name="Shops/[shop]"
+            name="ShopInterior"
             options={{
-              title: toTitleCase(
-                (pathname.split("/")[2] ?? "").replaceAll("%20", " "),
-              ),
+              title: toTitleCase(shopsStore.currentShop?.archetype),
               headerBackButtonMenuEnabled: false,
               headerBackButtonDisplayMode: "minimal",
               headerTransparent: true,
