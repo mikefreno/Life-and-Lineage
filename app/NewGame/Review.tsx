@@ -25,7 +25,7 @@ import {
   SquarePlus,
   StrengthIcon,
 } from "../../assets/icons/SVGIcons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function NewGameReview() {
   const { firstName, lastName, blessingSelection, sex, classSelection } =

@@ -160,7 +160,7 @@ const TutorialModal = observer(
                 textAlign: "center",
                 flex: 1,
                 paddingHorizontal: 10,
-                ...styles.titleText,
+                ...text["2xl"],
               }}
             >
               {page.title}

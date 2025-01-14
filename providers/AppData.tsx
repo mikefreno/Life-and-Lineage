@@ -5,6 +5,15 @@ import { DraggableDataStore } from "../stores/DraggableDataStore";
 
 export const StoreContext = createContext<RootStore | undefined>(undefined);
 
+let rootStoreInstance: RootStore | null = null;
+
+export const getRootStore = (): RootStore => {
+  if (!rootStoreInstance) {
+    rootStoreInstance = new RootStore();
+  }
+  return rootStoreInstance;
+};
+
 export const DragContext = createContext<
   | {
       position: {
@@ -20,7 +29,7 @@ export const DragContext = createContext<
 >(undefined);
 
 const StoreProvider = ({ children }: { children: ReactNode }) => {
-  const store = new RootStore();
+  const store = useMemo(() => getRootStore(), []);
 
   return (
     <StoreContext.Provider value={store}>{children}</StoreContext.Provider>

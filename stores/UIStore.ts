@@ -23,7 +23,7 @@ export const LOADING_TIPS: string[] = [
   "Health potions can save your life in tough battles",
   "Some enemies are weak to certain types of damage",
   "Don't forget to upgrade your skills when you level up",
-  "The boss is usually in the furthest room",
+  "Bosses rarely spawn near the dungeon entry",
   "You can flee from battles if you're outmatched",
   "Selling unused items can provide valuable gold",
   "Some special encounters may have hidden rewards",
@@ -50,7 +50,6 @@ export default class UIStore {
   healthWarning: number;
   reduceMotion: boolean;
   colorHeldForDungeon: "system" | "dark" | "light" | undefined;
-  isLoading: boolean = false;
   newbornBaby: Character | null = null;
 
   constructed: boolean = false;
@@ -152,9 +151,7 @@ export default class UIStore {
       handleDimensionChange: action,
       reduceMotion: observable,
       setReduceMotion: action,
-      isLoading: observable,
       colorHeldForDungeon: observable,
-      setIsLoading: action,
       newbornBaby: observable,
       setNewbornBaby: action,
       systemColorScheme: observable,
@@ -195,14 +192,30 @@ export default class UIStore {
         this.persistUISettings();
       },
     );
+
+    reaction(
+      () => this.completedLoadingSteps,
+      (completedSteps) => {
+        if (completedSteps > 0 && completedSteps === this.totalLoadingSteps) {
+          setTimeout(() => {
+            runInAction(() => {
+              this.completedLoadingSteps = 0;
+              this.totalLoadingSteps = 0;
+            });
+          }, 500);
+        }
+      },
+    );
   }
 
   debugLoadingStatus() {
-    console.log("Loading Status:");
-    Object.entries(this.storeLoadingStatus).forEach(([key, value]) => {
-      console.log(`${key}: ${value}`);
-    });
-    console.log(`Total Progress: ${this.displayedProgress}`);
+    if (__DEV__) {
+      console.log("Loading Status:");
+      Object.entries(this.storeLoadingStatus).forEach(([key, value]) => {
+        console.log(`${key}: ${value}`);
+      });
+      console.log(`Total Progress: ${this.displayedProgress}`);
+    }
   }
 
   markStoreAsLoaded(storeName: keyof typeof this.storeLoadingStatus) {
@@ -215,7 +228,11 @@ export default class UIStore {
   }
 
   get allResourcesLoaded() {
-    return Object.values(this.storeLoadingStatus).every((status) => status);
+    const storesLoaded = Object.values(this.storeLoadingStatus).every(
+      (status) => status,
+    );
+    const stepsComplete = this.completedLoadingSteps >= this.totalLoadingSteps;
+    return storesLoaded && stepsComplete;
   }
 
   private startTipCycle() {
@@ -255,6 +272,11 @@ export default class UIStore {
         this.completedLoadingSteps + 1,
         this.totalLoadingSteps,
       );
+
+      if (this.totalLoadingSteps > 0) {
+        this.displayedProgress =
+          (this.completedLoadingSteps / this.totalLoadingSteps) * 100;
+      }
     });
   }
 
@@ -263,13 +285,18 @@ export default class UIStore {
       if (!this.progressIncrementing) return;
 
       runInAction(() => {
+        if (this.totalLoadingSteps === 0) {
+          this.displayedProgress = 100;
+          return;
+        }
+
         const targetProgress =
           (this.completedLoadingSteps / this.totalLoadingSteps) * 100;
-        const baseIncrement = 1; // Increased for smoother animation
 
+        // Smoothly animate to the target progress
         if (this.displayedProgress < targetProgress) {
           const distance = targetProgress - this.displayedProgress;
-          const increment = Math.max(baseIncrement, distance * 0.1);
+          const increment = Math.max(1, distance * 0.1);
           this.displayedProgress = Math.min(
             this.displayedProgress + increment,
             targetProgress,
@@ -277,7 +304,12 @@ export default class UIStore {
         }
 
         if (this.completedLoadingSteps >= this.totalLoadingSteps) {
-          this.completeLoading();
+          // If all steps are complete, finish the animation
+          if (this.displayedProgress >= 100) {
+            this.completeLoading();
+          } else {
+            requestAnimationFrame(animate);
+          }
         } else {
           requestAnimationFrame(animate);
         }
@@ -292,8 +324,8 @@ export default class UIStore {
       this.progressIncrementing = false;
       this.displayedProgress = 100;
       setTimeout(() => {
-        this.setIsLoading(false);
         this.displayedProgress = 0;
+        this.totalLoadingSteps = 0;
         this.completedLoadingSteps = 0;
       }, 500);
     });
@@ -319,13 +351,6 @@ export default class UIStore {
   clearDungeonColor() {
     if (this.colorHeldForDungeon) {
       this.preferedColorScheme = this.colorHeldForDungeon;
-    }
-  }
-
-  async setIsLoading(state: boolean) {
-    this.isLoading = state;
-    if (state) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
     }
   }
 

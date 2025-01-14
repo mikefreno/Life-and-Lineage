@@ -181,11 +181,13 @@ const DungeonScreen = observer(() => {
                     .map((level, levelIdx) => (
                       <Pressable
                         key={levelIdx}
-                        onPress={async () => {
-                          await uiStore.setIsLoading(true);
+                        onPress={() => {
+                          uiStore.setTotalLoadingSteps(6);
                           vibration({ style: "warning" });
                           dungeonStore.setUpDungeon(dungeonInstance, level);
+                          uiStore.incrementLoadingStep();
                           router.replace(`/DungeonLevel`);
+                          uiStore.incrementLoadingStep();
                         }}
                       >
                         {({ pressed }) => (

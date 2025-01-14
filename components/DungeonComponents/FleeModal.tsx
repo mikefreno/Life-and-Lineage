@@ -38,22 +38,25 @@ const FleeModal = observer(() => {
         vibration({ style: "light" });
         dungeonStore.setFleeModalShowing(false);
         wait(100).then(() => {
-          uiStore.setIsLoading(true).then(() => {
-            setFleeRollFailure(false);
-            rootStore.leaveDungeon();
-            if (dungeonStore.currentInstance?.name == "Activities") {
-              router.replace("/shops");
-            } else {
-              router.replace("/dungeon");
-            }
-            if (dungeonStore.currentInstance?.name == "Activities") {
-              router.push("/Activities");
-            }
+          uiStore.setTotalLoadingSteps(4);
 
-            savePlayer(playerState);
+          rootStore.leaveDungeon();
+          uiStore.incrementLoadingStep();
 
-            wait(200).then(() => uiStore.setIsLoading(false));
-          });
+          if (dungeonStore.currentInstance?.name == "Activities") {
+            router.replace("/shops");
+          } else {
+            router.replace("/dungeon");
+          }
+          uiStore.incrementLoadingStep();
+
+          if (dungeonStore.currentInstance?.name == "Activities") {
+            router.push("/Activities");
+          }
+          uiStore.incrementLoadingStep();
+
+          savePlayer(playerState);
+          uiStore.incrementLoadingStep();
         });
       } else {
         setFleeRollFailure(true);

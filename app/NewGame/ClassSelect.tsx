@@ -2,7 +2,7 @@ import React from "react";
 import { Pressable, View } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
 import { useLayoutEffect, useState } from "react";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import TutorialModal from "../../components/TutorialModal";
 import {
   NecromancerSkull,
@@ -28,7 +28,7 @@ const SetClassScreen = observer(() => {
   const vibration = useVibration();
   const { classSelection, setClassSelection } = useNewGameStore();
   const router = useRouter();
-  const { uiStore, playerState, tutorialStore } = useRootStore();
+  const { uiStore, playerState, tutorialStore, audioStore } = useRootStore();
   const { height, width } = uiStore.dimensions;
   const isDark = uiStore.colorScheme === "dark";
 
@@ -380,6 +380,31 @@ const SetClassScreen = observer(() => {
           </Pressable>
         </View>
       )}
+      <View
+        style={{ position: "absolute", zIndex: 10, marginTop: 16, right: 16 }}
+      >
+        <Pressable
+          onPress={() => {
+            audioStore.setMuteValue(!audioStore.muted);
+          }}
+          accessibilityRole="button"
+          accessibilityLabel="Show Tutorial"
+        >
+          {audioStore.muted ? (
+            <MaterialIcons
+              name="music-off"
+              size={32}
+              color={isDark ? "#fafafa" : "#27272a"}
+            />
+          ) : (
+            <MaterialIcons
+              name="music-note"
+              size={32}
+              color={isDark ? "#fafafa" : "#27272a"}
+            />
+          )}
+        </Pressable>
+      </View>
     </>
   );
 });

@@ -14,6 +14,7 @@ export const LoadingBoundary = observer(
     const fadeAnim = useRef(new Animated.Value(1)).current;
 
     useEffect(() => {
+      fadeAnim.setValue(!uiStore.allResourcesLoaded ? 1 : 0);
       Animated.timing(fadeAnim, {
         toValue: !uiStore.allResourcesLoaded ? 1 : 0,
         duration: 200,
@@ -22,7 +23,8 @@ export const LoadingBoundary = observer(
     }, [
       uiStore.allResourcesLoaded,
       uiStore.displayedProgress,
-      uiStore.storeLoadingStatus,
+      uiStore.completedLoadingSteps,
+      uiStore.totalLoadingSteps,
     ]);
 
     return (

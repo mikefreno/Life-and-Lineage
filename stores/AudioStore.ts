@@ -52,7 +52,12 @@ export class AudioStore {
   private currentAmbientTrack: string | null = null;
   private currentCombatTrack: string | null = null;
 
-  private isTransitioning: boolean = false;
+  private audioQueue: Array<{
+    type: "ambient" | "combat";
+    params?: any;
+  }> = [];
+  private isProcessingQueue = false;
+  private activeTransitions: Map<string, { cancel: () => void }> = new Map();
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
@@ -76,15 +81,6 @@ export class AudioStore {
     });
 
     this.initializeAudio();
-
-    reaction(
-      () => this.isAmbientLoaded,
-      (val) => {
-        if (val) {
-          this.playAmbient();
-        }
-      },
-    );
 
     reaction(
       () => ({
@@ -116,7 +112,7 @@ export class AudioStore {
   private async initializeAudio() {
     try {
       await Audio.setAudioModeAsync({
-        playsInSilentModeIOS: false,
+        playsInSilentModeIOS: true,
         staysActiveInBackground: false,
         shouldDuckAndroid: true,
       });
@@ -142,6 +138,10 @@ export class AudioStore {
           runInAction(() => (this.isCombatLoaded = true)),
         ),
       ]);
+
+      if (this.isAmbientLoaded) {
+        this.playAmbient();
+      }
     } catch (error) {
       console.error("Failed to load audio resources:", error);
     }
@@ -185,7 +185,52 @@ export class AudioStore {
     await Promise.all(loadPromises);
   }
 
-  async playAmbient(params?: {
+  playAmbient(params?: {
+    track?: keyof typeof AMBIENT_TRACKS;
+    duration?: number;
+    disableFadeOut?: boolean;
+  }) {
+    this.audioQueue.push({ type: "ambient", params });
+    this.processAudioQueue();
+  }
+
+  playCombat(params: {
+    track: keyof typeof COMBAT_TRACKS;
+    duration?: number;
+    disableFadeOut?: boolean;
+  }) {
+    this.audioQueue.push({ type: "combat", params });
+    this.processAudioQueue();
+  }
+
+  private async processAudioQueue() {
+    if (this.isProcessingQueue || this.audioQueue.length === 0) return;
+
+    this.isProcessingQueue = true;
+    const { type, params } = this.audioQueue.pop()!;
+    this.audioQueue = []; // Clear remaining queue
+
+    try {
+      if (type === "ambient") {
+        await this.playAmbientInternal(params);
+      } else if (type === "combat") {
+        await this.playCombatInternal(params);
+      }
+    } catch (error) {
+      console.error("Error processing audio queue:", error);
+    } finally {
+      this.isProcessingQueue = false;
+      if (this.audioQueue.length > 0) {
+        this.processAudioQueue();
+      }
+    }
+  }
+
+  private get hasActiveTransition(): boolean {
+    return this.activeTransitions.size > 0;
+  }
+
+  private async playAmbientInternal(params?: {
     track?: keyof typeof AMBIENT_TRACKS;
     duration?: number;
     disableFadeOut?: boolean;
@@ -196,128 +241,180 @@ export class AudioStore {
       disableFadeOut = false,
     } = params ?? {};
 
-    if (!this.isAmbientLoaded || this.isTransitioning) return;
+    if (!this.isAmbientLoaded) return;
 
     try {
-      this.isTransitioning = true;
       let selectedTrack = track;
       if (!selectedTrack) {
         const playerAge = this.root.playerState?.age ?? 0;
-
         if (this.root.dungeonStore.isInDungeon) {
           selectedTrack = "dungeon";
         } else if (this.root.shopsStore.inMarket) {
           selectedTrack = "shops";
         } else {
-          if (playerAge < 30) {
-            selectedTrack = "young";
-          } else if (playerAge < 60) {
-            selectedTrack = "middle";
-          } else {
-            selectedTrack = "old";
+          selectedTrack =
+            playerAge < 30 ? "young" : playerAge < 60 ? "middle" : "old";
+        }
+      }
+
+      if (this.currentAmbientTrack === selectedTrack) return;
+
+      const newSound = this.ambientPlayers.get(selectedTrack!);
+      if (!newSound)
+        throw new Error(`Ambient track ${selectedTrack} not found`);
+
+      const hadActiveTransition = this.hasActiveTransition;
+      this.cancelAllTransitions();
+
+      // Handle current tracks
+      if (hadActiveTransition) {
+        // Immediate stop if we were in a transition
+        if (this.currentAmbientTrack) {
+          const currentSound = this.ambientPlayers.get(
+            this.currentAmbientTrack,
+          );
+          if (currentSound) {
+            await currentSound.setVolumeAsync(0);
+            await currentSound.stopAsync();
+          }
+        }
+        if (this.currentCombatTrack) {
+          const combatSound = this.combatPlayers.get(this.currentCombatTrack);
+          if (combatSound) {
+            await combatSound.setVolumeAsync(0);
+            await combatSound.stopAsync();
+          }
+        }
+      } else if (!disableFadeOut) {
+        // Start fadeout for current tracks
+        if (this.currentAmbientTrack) {
+          const currentSound = this.ambientPlayers.get(
+            this.currentAmbientTrack,
+          );
+          if (currentSound) {
+            this.fadeSound(
+              currentSound,
+              await this.getCurrentVolume(currentSound),
+              0,
+              duration / 2,
+              "fadeout",
+            )
+              .then(() => currentSound.stopAsync())
+              .catch(console.error);
+          }
+        }
+        if (this.currentCombatTrack) {
+          const combatSound = this.combatPlayers.get(this.currentCombatTrack);
+          if (combatSound) {
+            this.fadeSound(
+              combatSound,
+              await this.getCurrentVolume(combatSound),
+              0,
+              duration / 2,
+              "fadeout",
+            )
+              .then(() => combatSound.stopAsync())
+              .catch(console.error);
           }
         }
       }
 
-      if (this.currentAmbientTrack === selectedTrack) {
-        this.isTransitioning = false;
-        return;
-      }
-
-      const newSound = this.ambientPlayers.get(selectedTrack);
-      if (!newSound)
-        throw new Error(`Ambient track ${selectedTrack} not found`);
-
+      // Start new track
       const targetVolume = this.getEffectiveVolume("ambientMusic");
-
-      // Fade out current ambient or combat track if playing
-      if (this.currentAmbientTrack && !disableFadeOut) {
-        const currentSound = this.ambientPlayers.get(this.currentAmbientTrack);
-        if (currentSound) {
-          await this.fadeSound(
-            currentSound,
-            this.getEffectiveVolume("ambientMusic"),
-            0,
-            duration,
-          );
-          await currentSound.stopAsync();
-        }
-      } else if (this.currentCombatTrack && !disableFadeOut) {
-        const currentSound = this.combatPlayers.get(this.currentCombatTrack);
-        if (currentSound) {
-          await this.fadeSound(
-            currentSound,
-            this.getEffectiveVolume("combatMusic"),
-            0,
-            duration,
-          );
-          await currentSound.stopAsync();
-        }
-        this.currentCombatTrack = null;
-      }
-
-      // Play and fade in new track
       await newSound.setVolumeAsync(0);
       await newSound.playAsync();
-      await this.fadeSound(newSound, 0, targetVolume, duration);
+      this.fadeSound(newSound, 0, targetVolume, duration, "fadein").catch(
+        console.error,
+      );
 
+      this.currentCombatTrack = null;
       this.currentAmbientTrack = selectedTrack;
     } catch (error) {
       console.error(`Failed to play ambient track:`, error);
-    } finally {
-      this.isTransitioning = false;
     }
   }
 
-  async playCombat({
-    track,
-    duration = DEFAULT_FADE,
-    disableFadeOut = false,
-  }: {
+  private async playCombatInternal(params: {
     track: keyof typeof COMBAT_TRACKS;
     duration?: number;
     disableFadeOut?: boolean;
   }) {
-    if (!this.isCombatLoaded || this.isTransitioning) return;
+    const { track, duration = DEFAULT_FADE, disableFadeOut = false } = params;
+
+    if (!this.isCombatLoaded) return;
 
     try {
-      this.isTransitioning = true;
+      if (this.currentCombatTrack === track) return;
+
       const newSound = this.combatPlayers.get(track);
       if (!newSound) throw new Error(`Combat track ${track} not found`);
 
-      const targetVolume = this.getEffectiveVolume("combatMusic");
+      const hadActiveTransition = this.hasActiveTransition;
+      this.cancelAllTransitions();
 
-      // Fade out current ambient or combat track if playing
-      if (this.currentAmbientTrack && !disableFadeOut) {
-        const currentSound = this.ambientPlayers.get(this.currentAmbientTrack);
-        if (currentSound) {
-          await this.fadeSound(
-            currentSound,
-            this.getEffectiveVolume("ambientMusic"),
-            0,
-            duration,
+      // Handle current tracks
+      if (hadActiveTransition) {
+        if (this.currentAmbientTrack) {
+          const ambientSound = this.ambientPlayers.get(
+            this.currentAmbientTrack,
           );
-          await currentSound.stopAsync();
+          if (ambientSound) {
+            await ambientSound.setVolumeAsync(0);
+            await ambientSound.stopAsync();
+          }
         }
-        this.currentAmbientTrack = null;
-      } else if (this.currentCombatTrack && !disableFadeOut) {
-        const currentSound = this.combatPlayers.get(this.currentCombatTrack);
-        if (currentSound) {
-          await this.fadeSound(currentSound, targetVolume, 0, duration);
-          await currentSound.stopAsync();
+        if (this.currentCombatTrack) {
+          const currentSound = this.combatPlayers.get(this.currentCombatTrack);
+          if (currentSound) {
+            await currentSound.setVolumeAsync(0);
+            await currentSound.stopAsync();
+          }
+        }
+      } else if (!disableFadeOut) {
+        if (this.currentAmbientTrack) {
+          const ambientSound = this.ambientPlayers.get(
+            this.currentAmbientTrack,
+          );
+          if (ambientSound) {
+            this.fadeSound(
+              ambientSound,
+              await this.getCurrentVolume(ambientSound),
+              0,
+              duration / 2,
+              "fadeout",
+            )
+              .then(() => ambientSound.stopAsync())
+              .catch(console.error);
+          }
+        }
+        if (this.currentCombatTrack) {
+          const currentSound = this.combatPlayers.get(this.currentCombatTrack);
+          if (currentSound) {
+            this.fadeSound(
+              currentSound,
+              await this.getCurrentVolume(currentSound),
+              0,
+              duration / 2,
+              "fadeout",
+            )
+              .then(() => currentSound.stopAsync())
+              .catch(console.error);
+          }
         }
       }
 
-      // Play and fade in new track
+      // Start new track
+      const targetVolume = this.getEffectiveVolume("combatMusic");
       await newSound.setVolumeAsync(0);
       await newSound.playAsync();
-      await this.fadeSound(newSound, 0, targetVolume, duration);
+      this.fadeSound(newSound, 0, targetVolume, duration, "fadein").catch(
+        console.error,
+      );
 
+      this.currentAmbientTrack = null;
       this.currentCombatTrack = track;
     } catch (error) {
       console.error(`Failed to play combat track ${track}:`, error);
-    } finally {
-      this.isTransitioning = false;
     }
   }
 
@@ -327,7 +424,6 @@ export class AudioStore {
     try {
       const sound = this.soundEffects.get(id);
       if (sound) {
-        // Set the volume and play immediately
         await sound.setVolumeAsync(this.getEffectiveVolume("soundEffects"));
         await sound.replayAsync();
       } else {
@@ -338,22 +434,71 @@ export class AudioStore {
     }
   }
 
+  private async getCurrentVolume(sound: Sound): Promise<number> {
+    try {
+      const status = await sound.getStatusAsync();
+      return status.isLoaded ? status.volume : 0;
+    } catch {
+      return 0;
+    }
+  }
   private async fadeSound(
     sound: Sound,
     startVolume: number,
     endVolume: number,
     duration: number,
+    transitionId: string,
   ): Promise<void> {
-    const steps = Math.max(duration / FADE_INTERVAL, 1);
-    const volumeStep = (endVolume - startVolume) / steps;
+    this.cancelTransition(transitionId);
 
-    for (let i = 0; i <= steps; i++) {
-      const volume = startVolume + volumeStep * i;
-      await sound.setVolumeAsync(Math.max(0, Math.min(1, volume)));
-      if (i < steps) {
-        await new Promise((resolve) => setTimeout(resolve, FADE_INTERVAL));
-      }
+    return new Promise((resolve) => {
+      const steps = Math.max(duration / FADE_INTERVAL, 1);
+      const volumeStep = (endVolume - startVolume) / steps;
+      let currentStep = 0;
+      let isCancelled = false;
+
+      const interval = setInterval(() => {
+        if (isCancelled) {
+          clearInterval(interval);
+          resolve();
+          return;
+        }
+
+        currentStep++;
+        const volume = startVolume + volumeStep * currentStep;
+        sound
+          .setVolumeAsync(Math.max(0, Math.min(1, volume)))
+          .catch(console.error);
+
+        if (currentStep >= steps) {
+          clearInterval(interval);
+          this.activeTransitions.delete(transitionId);
+          resolve();
+        }
+      }, FADE_INTERVAL);
+
+      this.activeTransitions.set(transitionId, {
+        cancel: () => {
+          isCancelled = true;
+          this.activeTransitions.delete(transitionId);
+        },
+      });
+    });
+  }
+
+  private cancelTransition(transitionId: string) {
+    const transition = this.activeTransitions.get(transitionId);
+    if (transition) {
+      transition.cancel();
+      this.activeTransitions.delete(transitionId);
     }
+  }
+
+  private cancelAllTransitions() {
+    for (const transition of this.activeTransitions.values()) {
+      transition.cancel();
+    }
+    this.activeTransitions.clear();
   }
 
   private getEffectiveVolume(
@@ -398,18 +543,22 @@ export class AudioStore {
   }
 
   private async updateAllVolumes() {
-    if (this.currentAmbientTrack) {
-      const sound = this.ambientPlayers.get(this.currentAmbientTrack);
-      if (sound)
-        await sound.setVolumeAsync(this.getEffectiveVolume("ambientMusic"));
-    }
-    if (this.currentCombatTrack) {
-      const sound = this.combatPlayers.get(this.currentCombatTrack);
-      if (sound)
-        await sound.setVolumeAsync(this.getEffectiveVolume("combatMusic"));
-    }
-    for (const sound of this.soundEffects.values()) {
-      await sound.setVolumeAsync(this.getEffectiveVolume("soundEffects"));
+    try {
+      if (this.currentAmbientTrack) {
+        const sound = this.ambientPlayers.get(this.currentAmbientTrack);
+        if (sound)
+          await sound.setVolumeAsync(this.getEffectiveVolume("ambientMusic"));
+      }
+      if (this.currentCombatTrack) {
+        const sound = this.combatPlayers.get(this.currentCombatTrack);
+        if (sound)
+          await sound.setVolumeAsync(this.getEffectiveVolume("combatMusic"));
+      }
+      for (const sound of this.soundEffects.values()) {
+        await sound.setVolumeAsync(this.getEffectiveVolume("soundEffects"));
+      }
+    } catch (error) {
+      console.error("Error updating volumes:", error);
     }
   }
 
@@ -434,5 +583,27 @@ export class AudioStore {
       muted: this.muted,
     };
     storage.set("audio_settings", JSON.stringify(settings));
+  }
+
+  cleanup() {
+    this.cancelAllTransitions();
+    this.audioQueue = [];
+    this.isProcessingQueue = false;
+
+    if (this.currentAmbientTrack) {
+      const sound = this.ambientPlayers.get(this.currentAmbientTrack);
+      if (sound) {
+        sound.stopAsync().catch(console.error);
+      }
+    }
+    if (this.currentCombatTrack) {
+      const sound = this.combatPlayers.get(this.currentCombatTrack);
+      if (sound) {
+        sound.stopAsync().catch(console.error);
+      }
+    }
+
+    this.currentAmbientTrack = null;
+    this.currentCombatTrack = null;
   }
 }

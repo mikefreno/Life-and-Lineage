@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
-import { Text } from "../components/Themed";
+import { Text, ThemedView } from "../components/Themed";
 import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -73,21 +73,6 @@ const Root = observer(() => {
       SplashScreen.hideAsync();
     }
   }, [mainFontLoaded, error]);
-
-  while (!mainFontLoaded) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
-        }}
-      >
-        <D20SVG />
-      </View>
-    );
-  }
 
   return (
     <AppProvider>

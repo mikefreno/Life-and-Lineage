@@ -79,70 +79,64 @@ const DungeonLevelScreen = observer(() => {
   );
 
   useEffect(() => {
-    const initializeDungeon = async () => {
-      try {
-        if (colorScheme != "dark") {
-          uiStore.dungeonSetter();
-        }
+    if (colorScheme != "dark") {
+      uiStore.dungeonSetter();
+    }
 
-        await Promise.all([
-          new Promise<void>((resolve) => {
-            if (dungeonStore.currentMap && dungeonStore.currentPosition) {
-              resolve();
-            } else {
-              const disposer = reaction(
-                () => ({
-                  map: dungeonStore.currentMap,
-                  position: dungeonStore.currentPosition,
-                }),
-                ({ map, position }) => {
-                  if (map && position) {
-                    disposer();
-                    resolve();
-                  }
-                },
-              );
-            }
+    // First promise for map and position
+    const mapPromise = new Promise<void>((resolve) => {
+      if (dungeonStore.currentMap && dungeonStore.currentPosition) {
+        resolve();
+      } else {
+        const disposer = reaction(
+          () => ({
+            map: dungeonStore.currentMap,
+            position: dungeonStore.currentPosition,
           }),
-
-          new Promise<void>((resolve) => {
-            if (audioStore.isAmbientLoaded && audioStore.isSoundEffectsLoaded) {
+          ({ map, position }) => {
+            if (map && position) {
+              disposer();
               resolve();
-            } else {
-              const disposer = reaction(
-                () => ({
-                  ambient: audioStore.isAmbientLoaded,
-                  combat: audioStore.isCombatLoaded,
-                  sfx: audioStore.isSoundEffectsLoaded,
-                }),
-                ({ ambient, combat, sfx }) => {
-                  if (ambient && combat && sfx) {
-                    disposer();
-                    resolve();
-                  }
-                },
-              );
             }
-          }),
-        ]);
-
-        await wait(200);
-
-        runInAction(() => {
-          uiStore.setIsLoading(false);
-        });
-      } catch (error) {
-        console.error("Failed to initialize dungeon:", error);
-        // Fallback loading removal after timeout
-        wait(2000).then(() => uiStore.setIsLoading(false));
+          },
+        );
       }
-    };
+    });
 
-    initializeDungeon();
+    mapPromise
+      .then(() => {
+        uiStore.incrementLoadingStep();
 
-    return () => {
-      uiStore.setIsLoading(true); // Reset loading state
-    };
+        return new Promise<void>((resolve) => {
+          if (audioStore.isAmbientLoaded && audioStore.isSoundEffectsLoaded) {
+            resolve();
+          } else {
+            const disposer = reaction(
+              () => ({
+                ambient: audioStore.isAmbientLoaded,
+                combat: audioStore.isCombatLoaded,
+                sfx: audioStore.isSoundEffectsLoaded,
+              }),
+              ({ ambient, combat, sfx }) => {
+                if (ambient && combat && sfx) {
+                  disposer();
+                  resolve();
+                }
+              },
+            );
+          }
+        });
+      })
+      .then(() => {
+        uiStore.incrementLoadingStep();
+        return wait(200);
+      })
+      .then(() => {
+        uiStore.incrementLoadingStep();
+      })
+      .catch((error) => {
+        uiStore.completeLoading();
+      });
   }, []);
 
   useEffect(() => {
