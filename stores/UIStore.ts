@@ -136,31 +136,40 @@ export default class UIStore {
 
     makeObservable(this, {
       playerStatusIsCompact: observable,
-      setPlayerStatusCompact: action,
       detailedStatusViewShowing: observable,
-      setDetailedStatusViewShowing: action,
       dimensions: observable,
       itemBlockSize: observable,
       modalShowing: observable,
       preferedColorScheme: observable,
       vibrationEnabled: observable,
       healthWarning: observable,
+      storeLoadingStatus: observable,
+      totalLoadingSteps: observable,
+      completedLoadingSteps: observable,
+      systemColorScheme: observable,
+      newbornBaby: observable,
+      colorHeldForDungeon: observable,
+      currentTipIndex: observable,
+
+      startTipCycle: action,
+      completeLoading: action,
+      setTotalLoadingSteps: action,
+      setPlayerStatusCompact: action,
+      setDetailedStatusViewShowing: action,
       setPreferedColorScheme: action,
       modifyVibrationSettings: action,
       setHealthWarning: action,
       handleDimensionChange: action,
       reduceMotion: observable,
       setReduceMotion: action,
-      colorHeldForDungeon: observable,
-      newbornBaby: observable,
       setNewbornBaby: action,
-      systemColorScheme: observable,
       setSystemColorScheme: action,
-      colorScheme: computed,
       dungeonSetter: action,
       clearDungeonColor: action,
       markStoreAsLoaded: action,
-      storeLoadingStatus: observable,
+
+      colorScheme: computed,
+      allResourcesLoaded: computed,
     });
 
     reaction(
@@ -235,19 +244,12 @@ export default class UIStore {
     return storesLoaded && stepsComplete;
   }
 
-  private startTipCycle() {
-    this.currentTipIndex = Math.floor(Math.random() * LOADING_TIPS.length);
-
+  startTipCycle() {
     const cycleTips = () => {
       if (!this.progressIncrementing) return;
-
-      runInAction(() => {
-        this.currentTipIndex = (this.currentTipIndex + 1) % LOADING_TIPS.length;
-      });
-
+      this.currentTipIndex = (this.currentTipIndex + 1) % LOADING_TIPS.length;
       setTimeout(cycleTips, 3000);
     };
-
     setTimeout(cycleTips, 3000);
   }
 
@@ -256,14 +258,13 @@ export default class UIStore {
   }
 
   setTotalLoadingSteps(steps: number) {
-    runInAction(() => {
-      this.totalLoadingSteps = steps;
-      this.completedLoadingSteps = 0;
-      this.displayedProgress = 0;
-      this.progressIncrementing = true;
-      this.startProgressAnimation();
-      this.startTipCycle();
-    });
+    this.displayedProgress = 0;
+    this.completedLoadingSteps = 0;
+    this.totalLoadingSteps = steps;
+    this.progressIncrementing = true;
+    this.currentTipIndex = Math.floor(Math.random() * LOADING_TIPS.length);
+    this.startProgressAnimation();
+    this.startTipCycle();
   }
 
   incrementLoadingStep() {
@@ -320,15 +321,15 @@ export default class UIStore {
   }
 
   completeLoading() {
-    runInAction(() => {
-      this.progressIncrementing = false;
-      this.displayedProgress = 100;
-      setTimeout(() => {
+    this.progressIncrementing = false;
+    this.displayedProgress = 100;
+    setTimeout(() => {
+      runInAction(() => {
         this.displayedProgress = 0;
         this.totalLoadingSteps = 0;
         this.completedLoadingSteps = 0;
-      }, 500);
-    });
+      });
+    }, 500);
   }
 
   setSystemColorScheme(colorScheme: "light" | "dark") {

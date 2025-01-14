@@ -31,8 +31,6 @@ import GenericModal from "../components/GenericModal";
 import { CharacterImage } from "../components/CharacterImage";
 import GenericFlatButton from "../components/GenericFlatButton";
 import { useStyles } from "../hooks/styles";
-import D20DieAnimation from "../components/DieRollAnim";
-import { D20SVG } from "../assets/icons/SVGIcons";
 
 export { ErrorBoundary } from "expo-router";
 

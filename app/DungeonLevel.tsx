@@ -33,7 +33,7 @@ import { LinearGradientBlur } from "../components/LinearGradientBlur";
 import { Parallax } from "../components/DungeonComponents/Parallax";
 import { Image } from "expo-image";
 import { useStyles } from "../hooks/styles";
-import { reaction, runInAction } from "mobx";
+import { reaction } from "mobx";
 
 const DungeonLevelScreen = observer(() => {
   const { enemyStore, dungeonStore, uiStore, audioStore } = useRootStore();
@@ -83,8 +83,7 @@ const DungeonLevelScreen = observer(() => {
       uiStore.dungeonSetter();
     }
 
-    // First promise for map and position
-    const mapPromise = new Promise<void>((resolve) => {
+    new Promise<void>((resolve) => {
       if (dungeonStore.currentMap && dungeonStore.currentPosition) {
         resolve();
       } else {
@@ -101,12 +100,9 @@ const DungeonLevelScreen = observer(() => {
           },
         );
       }
-    });
-
-    mapPromise
+    })
       .then(() => {
         uiStore.incrementLoadingStep();
-
         return new Promise<void>((resolve) => {
           if (audioStore.isAmbientLoaded && audioStore.isSoundEffectsLoaded) {
             resolve();
@@ -129,10 +125,9 @@ const DungeonLevelScreen = observer(() => {
       })
       .then(() => {
         uiStore.incrementLoadingStep();
-        return wait(200);
-      })
-      .then(() => {
-        uiStore.incrementLoadingStep();
+        wait(500).then(() => {
+          uiStore.incrementLoadingStep();
+        });
       })
       .catch((error) => {
         uiStore.completeLoading();

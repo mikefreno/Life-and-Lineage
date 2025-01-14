@@ -182,7 +182,7 @@ const DungeonScreen = observer(() => {
                       <Pressable
                         key={levelIdx}
                         onPress={() => {
-                          uiStore.setTotalLoadingSteps(6);
+                          uiStore.setTotalLoadingSteps(5);
                           vibration({ style: "warning" });
                           dungeonStore.setUpDungeon(dungeonInstance, level);
                           uiStore.incrementLoadingStep();

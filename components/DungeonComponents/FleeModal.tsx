@@ -38,7 +38,7 @@ const FleeModal = observer(() => {
         vibration({ style: "light" });
         dungeonStore.setFleeModalShowing(false);
         wait(100).then(() => {
-          uiStore.setTotalLoadingSteps(4);
+          uiStore.setTotalLoadingSteps(3);
 
           rootStore.leaveDungeon();
           uiStore.incrementLoadingStep();
