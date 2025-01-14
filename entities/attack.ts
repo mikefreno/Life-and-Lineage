@@ -10,6 +10,7 @@ import { Enemy, Minion } from "./creatures";
 import { AttackUse, ItemClassType, Modifier } from "../utility/types";
 import AttackDetails from "../components/AttackDetails";
 import { Condition } from "./conditions";
+import { useStyles } from "../hooks/styles";
 
 /**
  * Interface for the fields of an attack.
@@ -598,9 +599,13 @@ export class Attack {
     return `The ${toTitleCase(this.user.creatureSpecies)}`;
   }
 
-  public AttackRender(weaponDamage?: number) {
+  public AttackRender(
+    styles: ReturnType<typeof useStyles>,
+    weaponDamage?: number,
+  ) {
     if (weaponDamage) {
       return AttackDetails({
+        styles,
         attack: this,
         baseDamage: this.damageBasedOnWeapon(
           this.user as PlayerCharacter,
@@ -608,7 +613,7 @@ export class Attack {
         ),
       });
     }
-    return AttackDetails({ attack: this, baseDamage: this.baseDamage });
+    return AttackDetails({ styles, attack: this, baseDamage: this.baseDamage });
   }
 
   /**

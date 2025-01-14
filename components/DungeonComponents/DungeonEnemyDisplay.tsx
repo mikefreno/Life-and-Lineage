@@ -11,7 +11,7 @@ import { FPS, type AnimationStore } from "../../stores/AnimationStore";
 import { useRootStore } from "../../hooks/stores";
 import { AnimatedSprite } from "../AnimatedSprite";
 import { EnemyImageMap } from "../../utility/enemyHelpers";
-import { text, tw_base, useStyles } from "../../hooks/styles";
+import { flex, text, tw, tw_base, useStyles } from "../../hooks/styles";
 
 const calculateAdjustedFrameRate = (
   frames: number,
@@ -265,11 +265,12 @@ const EnemyConditions = memo(({ conditions }: { conditions: any[] }) => {
     <View
       style={{
         flex: 1,
+        flexDirection: "row",
         paddingTop: 16,
       }}
     >
       {simplifiedConditions.map((cond) => (
-        <ThemedView key={cond.name} style={styles.conditionIconContainer}>
+        <ThemedView key={cond.name} style={flex.columnCenter}>
           <View
             style={[
               styles.conditionIcon,
@@ -300,8 +301,8 @@ const DungeonEnemyDisplay = observer(() => {
   return (
     <View
       style={{
-        marginHorizontal: 8,
-        alignItems: "center",
+        ...flex.rowEvenly,
+        flex: 1,
       }}
     >
       {enemyStore.enemies.map((enemy) => (

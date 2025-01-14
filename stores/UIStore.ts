@@ -1,4 +1,11 @@
-import { action, computed, makeObservable, observable, reaction } from "mobx";
+import {
+  action,
+  computed,
+  makeObservable,
+  observable,
+  reaction,
+  runInAction,
+} from "mobx";
 import { RootStore } from "./RootStore";
 import {
   AccessibilityInfo,
@@ -10,6 +17,19 @@ import {
 } from "react-native";
 import { storage } from "../utility/functions/storage";
 import { Character } from "../entities/character";
+
+export const LOADING_TIPS: string[] = [
+  "Remember to check your equipment before entering a dungeon",
+  "Health potions can save your life in tough battles",
+  "Some enemies are weak to certain types of damage",
+  "Don't forget to upgrade your skills when you level up",
+  "The boss is usually in the furthest room",
+  "You can flee from battles if you're outmatched",
+  "Selling unused items can provide valuable gold",
+  "Some special encounters may have hidden rewards",
+  "Not all treasures are worth the risk",
+  "Keep an eye on your health during exploration",
+];
 
 export default class UIStore {
   root: RootStore;
@@ -32,6 +52,29 @@ export default class UIStore {
   colorHeldForDungeon: "system" | "dark" | "light" | undefined;
   isLoading: boolean = false;
   newbornBaby: Character | null = null;
+
+  constructed: boolean = false;
+  totalLoadingSteps: number = 0;
+  completedLoadingSteps: number = 0;
+  displayedProgress: number = 0;
+  currentTipIndex: number = 0;
+  progressIncrementing: boolean = false;
+
+  storeLoadingStatus: Record<string, boolean> = {
+    player: false,
+    time: false,
+    auth: false,
+    shops: false,
+    enemy: false,
+    dungeon: false,
+    character: false,
+    tutorial: false,
+    stash: false,
+    save: false,
+    audio: false,
+    ambient: false,
+    fonts: false,
+  };
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
@@ -119,6 +162,8 @@ export default class UIStore {
       colorScheme: computed,
       dungeonSetter: action,
       clearDungeonColor: action,
+      markStoreAsLoaded: action,
+      storeLoadingStatus: observable,
     });
 
     reaction(
@@ -140,6 +185,7 @@ export default class UIStore {
     reaction(
       () => [
         this.preferedColorScheme,
+        this.colorHeldForDungeon,
         this.healthWarning,
         this.vibrationEnabled,
         this.reduceMotion,
@@ -149,6 +195,108 @@ export default class UIStore {
         this.persistUISettings();
       },
     );
+  }
+
+  debugLoadingStatus() {
+    console.log("Loading Status:");
+    Object.entries(this.storeLoadingStatus).forEach(([key, value]) => {
+      console.log(`${key}: ${value}`);
+    });
+    console.log(`Total Progress: ${this.displayedProgress}`);
+  }
+
+  markStoreAsLoaded(storeName: keyof typeof this.storeLoadingStatus) {
+    this.storeLoadingStatus[storeName] = true;
+    const loadedCount = Object.values(this.storeLoadingStatus).filter(
+      Boolean,
+    ).length;
+    const totalCount = Object.keys(this.storeLoadingStatus).length;
+    this.displayedProgress = (loadedCount / totalCount) * 100;
+  }
+
+  get allResourcesLoaded() {
+    return Object.values(this.storeLoadingStatus).every((status) => status);
+  }
+
+  private startTipCycle() {
+    this.currentTipIndex = Math.floor(Math.random() * LOADING_TIPS.length);
+
+    const cycleTips = () => {
+      if (!this.progressIncrementing) return;
+
+      runInAction(() => {
+        this.currentTipIndex = (this.currentTipIndex + 1) % LOADING_TIPS.length;
+      });
+
+      setTimeout(cycleTips, 3000);
+    };
+
+    setTimeout(cycleTips, 3000);
+  }
+
+  getCurrentTip() {
+    return LOADING_TIPS[this.currentTipIndex];
+  }
+
+  setTotalLoadingSteps(steps: number) {
+    runInAction(() => {
+      this.totalLoadingSteps = steps;
+      this.completedLoadingSteps = 0;
+      this.displayedProgress = 0;
+      this.progressIncrementing = true;
+      this.startProgressAnimation();
+      this.startTipCycle();
+    });
+  }
+
+  incrementLoadingStep() {
+    runInAction(() => {
+      this.completedLoadingSteps = Math.min(
+        this.completedLoadingSteps + 1,
+        this.totalLoadingSteps,
+      );
+    });
+  }
+
+  private startProgressAnimation() {
+    const animate = () => {
+      if (!this.progressIncrementing) return;
+
+      runInAction(() => {
+        const targetProgress =
+          (this.completedLoadingSteps / this.totalLoadingSteps) * 100;
+        const baseIncrement = 1; // Increased for smoother animation
+
+        if (this.displayedProgress < targetProgress) {
+          const distance = targetProgress - this.displayedProgress;
+          const increment = Math.max(baseIncrement, distance * 0.1);
+          this.displayedProgress = Math.min(
+            this.displayedProgress + increment,
+            targetProgress,
+          );
+        }
+
+        if (this.completedLoadingSteps >= this.totalLoadingSteps) {
+          this.completeLoading();
+        } else {
+          requestAnimationFrame(animate);
+        }
+      });
+    };
+
+    animate();
+  }
+
+  completeLoading() {
+    runInAction(() => {
+      this.progressIncrementing = false;
+      this.displayedProgress = 100;
+      setTimeout(() => {
+        this.setIsLoading(false);
+        this.displayedProgress = 0;
+        this.completedLoadingSteps = 0;
+      }, 500);
+    });
   }
 
   setSystemColorScheme(colorScheme: "light" | "dark") {

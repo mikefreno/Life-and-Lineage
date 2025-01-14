@@ -1,8 +1,15 @@
-import { makeObservable, observable, action, reaction } from "mobx";
+import {
+  makeObservable,
+  observable,
+  action,
+  reaction,
+  runInAction,
+} from "mobx";
 import { storage } from "../utility/functions/storage";
 import { RootStore } from "./RootStore";
 import { Audio } from "expo-av";
 import { Sound } from "expo-av/build/Audio/Sound";
+import { debounce } from "lodash";
 
 const AMBIENT_TRACKS = {
   shops: require("../assets/music/shops.m4a"),
@@ -84,9 +91,16 @@ export class AudioStore {
         inDungeon: this.root.dungeonStore.isInDungeon,
         inMarket: this.root.shopsStore.inMarket,
         playerAge: this.root.playerState?.age ?? 0,
+        inCombat: this.root.dungeonStore.inCombat,
       }),
-      (current, previous) => {
-        if (
+      debounce((current, previous) => {
+        if (current.inCombat !== previous?.inCombat) {
+          if (current.inCombat) {
+            this.playCombat({ track: "basic" });
+          } else {
+            this.playAmbient();
+          }
+        } else if (
           current.inDungeon !== previous?.inDungeon ||
           current.inMarket !== previous?.inMarket ||
           (!current.inDungeon &&
@@ -95,25 +109,15 @@ export class AudioStore {
         ) {
           this.playAmbient();
         }
-      },
-    );
-    reaction(
-      () => this.root.dungeonStore.inCombat,
-      (inCombat) => {
-        if (inCombat) {
-          this.playCombat({ track: "basic" });
-        } else {
-          this.playAmbient();
-        }
-      },
+      }, 250),
     );
   }
 
   private async initializeAudio() {
     try {
       await Audio.setAudioModeAsync({
-        playsInSilentModeIOS: true,
-        staysActiveInBackground: true,
+        playsInSilentModeIOS: false,
+        staysActiveInBackground: false,
         shouldDuckAndroid: true,
       });
       await this.loadAudioResources();
@@ -124,14 +128,20 @@ export class AudioStore {
 
   async loadAudioResources() {
     try {
-      await this.loadSoundEffects();
-      this.isSoundEffectsLoaded = true;
-
-      await this.loadAmbientTracks();
-      this.isAmbientLoaded = true;
-
-      await this.loadCombatTracks();
-      this.isCombatLoaded = true;
+      await Promise.all([
+        this.loadSoundEffects().then(() =>
+          runInAction(() => (this.isSoundEffectsLoaded = true)),
+        ),
+        this.loadAmbientTracks().then(() =>
+          runInAction(() => {
+            this.isAmbientLoaded = true;
+            this.root.uiStore.markStoreAsLoaded("ambient");
+          }),
+        ),
+        this.loadCombatTracks().then(() =>
+          runInAction(() => (this.isCombatLoaded = true)),
+        ),
+      ]);
     } catch (error) {
       console.error("Failed to load audio resources:", error);
     }
@@ -188,8 +198,6 @@ export class AudioStore {
 
     if (!this.isAmbientLoaded || this.isTransitioning) return;
 
-    console.log("in dungeon: ", this.root.dungeonStore.isInDungeon);
-    console.log("in market: ", this.root.shopsStore.inMarket);
     try {
       this.isTransitioning = true;
       let selectedTrack = track;
@@ -201,7 +209,6 @@ export class AudioStore {
         } else if (this.root.shopsStore.inMarket) {
           selectedTrack = "shops";
         } else {
-          // Age-based ambient music selection
           if (playerAge < 30) {
             selectedTrack = "young";
           } else if (playerAge < 60) {

@@ -374,6 +374,7 @@ const PlayerStatus = observer(
           return (
             <BlurView
               intensity={100}
+              tint={uiStore.colorScheme}
               style={[
                 {
                   marginHorizontal: 16,
@@ -432,6 +433,7 @@ const PlayerStatus = observer(
         return (
           <BlurView
             intensity={Platform.OS === "ios" ? 100 : 0}
+            tint={uiStore.colorScheme}
             style={{
               zIndex: 10,
               overflow: "hidden",

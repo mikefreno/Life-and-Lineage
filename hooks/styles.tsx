@@ -563,6 +563,8 @@ export const useStyles = () => {
       shadowColor: "rgba(0, 0, 0, 0.25)",
       shadowRadius: 5,
       elevation: 2,
+      borderWidth: uiStore.colorScheme === "dark" ? 1 : 0,
+      borderColor: uiStore.colorScheme === "dark" ? "#71717a" : undefined,
     } as const,
     errorContainer: {
       flex: 1,
@@ -639,6 +641,7 @@ export const useStyles = () => {
       borderRadius: 4,
       borderColor: uiStore.colorScheme === "dark" ? "#fafafa" : "#18181b",
       paddingBottom: 8,
+      minHeight: 64,
     } as const,
     attackEffectContainer: {
       flex: 1,
@@ -700,15 +703,16 @@ export const useStyles = () => {
       shadowOpacity: 0.1,
       shadowRadius: 1,
     } as const,
-    passCardContainer: {
-      flexDirection: "row",
-      marginTop: 8,
-      justifyContent: "space-between",
-      borderRadius: 8,
-      paddingHorizontal: 16,
-      paddingVertical: 8,
+    attackCardBase: {
+      ...flex.rowBetween,
+      ...tw.mt2,
+      ...radius.lg,
+      ...tw.px2,
+      ...tw.py1,
       borderWidth: 1,
-    } as const,
+      borderColor: theme.border,
+      width: "100%",
+    },
     stunnedContainer: {
       marginVertical: "auto",
       paddingHorizontal: 16,
@@ -727,7 +731,6 @@ export const useStyles = () => {
       borderColor: "#52525b",
     } as const,
     battleTabControls: {
-      marginBottom: -4,
       flexDirection: "row",
       width: "100%",
       justifyContent: "space-around",
@@ -767,6 +770,8 @@ export const useStyles = () => {
       justifyContent: "center",
       minWidth: "40%",
       maxWidth: "60%",
+      height: 48,
+      marginTop: -24,
     } as const,
     textAnimationContainer: {
       position: "absolute",

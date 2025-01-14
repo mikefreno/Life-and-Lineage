@@ -9,11 +9,12 @@ import { useStyles } from "../hooks/styles";
 export default function AttackDetails({
   attack,
   baseDamage,
+  styles,
 }: {
   attack: Attack;
   baseDamage: number;
+  styles: ReturnType<typeof useStyles>;
 }) {
-  const styles = useStyles();
   return (
     <View style={styles.attackDetailsContainer}>
       <Text style={styles.xl}>{toTitleCase(attack.name)}</Text>

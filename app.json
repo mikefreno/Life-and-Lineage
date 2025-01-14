@@ -14,7 +14,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.mikefrenodev.lineage",
-      "buildNumber": "7",
+      "buildNumber": "8",
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true,
         "aps-environment": "development"
@@ -26,7 +26,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.mikefrenodev.lineage",
-      "versionCode": 2,
+      "versionCode": 3,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
@@ -95,4 +95,3 @@
     "owner": "mikefrenodev"
   }
 }
-

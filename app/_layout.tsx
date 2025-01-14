@@ -4,10 +4,9 @@ import React, { useEffect, useState, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
-import { ThemedView, Text } from "../components/Themed";
+import { Text } from "../components/Themed";
 import { BlurView } from "expo-blur";
 import * as Sentry from "@sentry/react-native";
-import D20DieAnimation from "../components/DieRollAnim";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { toTitleCase, wait } from "../utility/functions/misc";
 import { API_BASE_URL } from "../config/config";
@@ -32,6 +31,8 @@ import GenericModal from "../components/GenericModal";
 import { CharacterImage } from "../components/CharacterImage";
 import GenericFlatButton from "../components/GenericFlatButton";
 import { useStyles } from "../hooks/styles";
+import D20DieAnimation from "../components/DieRollAnim";
+import { D20SVG } from "../assets/icons/SVGIcons";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -54,13 +55,47 @@ Sentry.init({
  * The responsibility of this is largely around unseen app state, whereas `RootLayout` is largely concerned with UI
  */
 const Root = observer(() => {
+  const [mainFontLoaded, error] = useFonts({
+    PixelifySans: require("../assets/fonts/PixelifySans-Regular.ttf"),
+  });
+
+  const [otherFontsLoaded] = useFonts({
+    Handwritten: require("../assets/fonts/Caveat-VariableFont_wght.ttf"),
+    Cursive: require("../assets/fonts/Tangerine-Regular.ttf"),
+    CursiveBold: require("../assets/fonts/Tangerine-Bold.ttf"),
+  });
+
+  useEffect(() => {
+    if (error) {
+      console.error(error);
+    }
+    if (mainFontLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [mainFontLoaded, error]);
+
+  while (!mainFontLoaded) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+        }}
+      >
+        <D20SVG />
+      </View>
+    );
+  }
+
   return (
     <AppProvider>
       <DungeonProvider>
         <SafeAreaProvider>
           <ErrorBoundary>
             <LoadingBoundary>
-              <RootLayout />
+              <RootLayout fontLoaded={mainFontLoaded} />
             </LoadingBoundary>
           </ErrorBoundary>
         </SafeAreaProvider>
@@ -72,13 +107,7 @@ const Root = observer(() => {
 /**
  * This focuses on getting the UI set, and relieving the splash screen when ready
  */
-const RootLayout = observer(() => {
-  const [fontLoaded] = useFonts({
-    PixelifySans: require("../assets/fonts/PixelifySans-Regular.ttf"),
-    Handwritten: require("../assets/fonts/Caveat-VariableFont_wght.ttf"),
-    Cursive: require("../assets/fonts/Tangerine-Regular.ttf"),
-    CursiveBold: require("../assets/fonts/Tangerine-Bold.ttf"),
-  });
+const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   const rootStore = useRootStore();
   const { playerState, dungeonStore, uiStore, audioStore, shopsStore } =
     rootStore;
@@ -169,8 +198,13 @@ const RootLayout = observer(() => {
 
   useEffect(() => {
     const initializeApp = async () => {
-      if (fontLoaded && rootStore.constructed && firstLoad) {
-        await SplashScreen.hideAsync();
+      if (
+        fontLoaded &&
+        rootStore.constructed &&
+        firstLoad &&
+        audioStore.isAmbientLoaded
+      ) {
+        uiStore.markStoreAsLoaded("fonts");
         handleRouting(playerState, rootStore, dungeonStore, pathname);
         setFirstLoad(false);
       }
@@ -253,16 +287,6 @@ const RootLayout = observer(() => {
       </View>
     </GenericModal>
   ));
-
-  while (!fontLoaded || !rootStore.constructed) {
-    return (
-      <ThemedView
-        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-      >
-        <D20DieAnimation keepRolling={true} />
-      </ThemedView>
-    );
-  }
 
   return (
     <GestureHandlerRootView>

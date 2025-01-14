@@ -13,7 +13,7 @@ export class SaveStore {
   constructor({ root }: { root: RootStore }) {
     this.root = root;
     this.initializeDatabase();
-    this.hydrateCurrentGameId;
+    this.hydrateCurrentGameId();
 
     makeObservable(this, {
       db: observable,

@@ -430,11 +430,11 @@ export const Parallax = ({
         <Animated.View
           key={i}
           style={[
-            styles.layerContainer,
             {
               width: size.width * imagesNeeded * 3,
               height: size.height,
               left: (screenWidth - scaledWidth) / 2,
+              position: "absolute",
             },
             animatedStyle,
           ]}
@@ -453,14 +453,12 @@ export const Parallax = ({
                 <Image
                   key={index}
                   source={imageSet[i]}
-                  style={[
-                    styles.backgroundImage,
-                    {
-                      width: size.width,
-                      height: size.height,
-                      left: index * size.width,
-                    },
-                  ]}
+                  style={{
+                    width: size.width,
+                    height: size.height,
+                    left: index * size.width,
+                    position: "absolute",
+                  }}
                   contentFit="cover"
                 />
               ))}
@@ -494,15 +492,13 @@ export const Parallax = ({
   const backgroundContent = plainReduceMotion ? (
     <Image
       source={imageSet[0]}
-      style={[
-        styles.backgroundImage,
-        {
-          width: scaledWidth,
-          height: scaledHeight,
-          top: -(scaledHeight - screenHeight) / 2,
-          left: (screenWidth - scaledWidth) / 2,
-        },
-      ]}
+      style={{
+        width: scaledWidth,
+        height: scaledHeight,
+        top: -(scaledHeight - screenHeight) / 2,
+        left: (screenWidth - scaledWidth) / 2,
+        position: "absolute",
+      }}
       contentFit="cover"
     />
   ) : (
@@ -510,43 +506,23 @@ export const Parallax = ({
   );
 
   return (
-    <View style={[styles.container, style, { paddingBottom: 70 }]}>
+    <View style={[{ flex: 1 }, style]}>
       <View
-        style={[
-          styles.backgroundContainer,
-          {
-            height: screenHeight,
-            marginTop: !plainReduceMotion
-              ? -verticalOffset * screenHeight
-              : undefined,
-            bottom: 0,
-          },
-        ]}
+        style={{
+          ...StyleSheet.absoluteFillObject,
+          height: screenHeight,
+          marginTop: !plainReduceMotion
+            ? -verticalOffset * screenHeight
+            : undefined,
+          bottom: 0,
+        }}
       >
         {backgroundContent}
         {!plainReduceMotion && renderEffects()}
       </View>
-      <View style={[styles.childrenContainer, { paddingTop: header }]}>
+      <View style={{ paddingTop: header, flex: 1, paddingBottom: 74 }}>
         {children}
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  backgroundContainer: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  childrenContainer: {
-    flex: 1,
-  },
-  layerContainer: {
-    position: "absolute",
-  },
-  backgroundImage: {
-    position: "absolute",
-  },
-});

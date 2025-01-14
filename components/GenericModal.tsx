@@ -3,6 +3,7 @@ import {
   type AccessibilityRole,
   Dimensions,
   Platform,
+  ScrollView,
   type StyleProp,
   type ViewStyle,
 } from "react-native";
@@ -100,18 +101,20 @@ export default function GenericModal({
       {...props}
     >
       <ThemedView
-        style={[
-          styles.modalContent,
-          {
-            width: size ? `${size}%` : "83.3333%",
-            paddingHorizontal: noPad ? 0 : "2%",
-            paddingVertical: noPad ? 0 : 16,
-            borderWidth: uiStore.colorScheme === "dark" ? 1 : 0,
-            borderColor: uiStore.colorScheme === "dark" ? "#71717a" : undefined,
-          },
-        ]}
+        style={{
+          ...styles.modalContent,
+          width: size ? `${size}%` : "83.3333%",
+          paddingHorizontal: noPad ? 0 : "2%",
+          paddingVertical: noPad ? 0 : 16,
+        }}
       >
-        {children}
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          showsVerticalScrollIndicator={false}
+          scrollEnabled={false}
+        >
+          {children}
+        </ScrollView>
       </ThemedView>
     </Modal>
   );

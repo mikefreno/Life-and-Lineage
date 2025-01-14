@@ -1,24 +1,29 @@
-import { View, Animated, StyleSheet } from "react-native";
-import D20DieAnimation from "./DieRollAnim";
+import { ReactNode, useEffect, useRef } from "react";
+import { StyleSheet, View } from "react-native";
 import { useRootStore } from "../hooks/stores";
-import { type ReactNode, useEffect, useRef } from "react";
+import { Animated } from "react-native";
 import { observer } from "mobx-react-lite";
-import { useStyles } from "../hooks/styles";
+import D20DieAnimation from "./DieRollAnim";
+import ProgressBar from "./ProgressBar";
+import Colors from "../constants/Colors";
+import { Text } from "./Themed";
 
 export const LoadingBoundary = observer(
   ({ children }: { children: ReactNode }) => {
     const { uiStore } = useRootStore();
-    const fadeAnim = useRef(
-      new Animated.Value(uiStore.isLoading ? 1 : 0),
-    ).current;
+    const fadeAnim = useRef(new Animated.Value(1)).current;
 
     useEffect(() => {
       Animated.timing(fadeAnim, {
-        toValue: uiStore.isLoading ? 1 : 0,
+        toValue: !uiStore.allResourcesLoaded ? 1 : 0,
         duration: 200,
         useNativeDriver: true,
       }).start();
-    }, [uiStore.isLoading]);
+    }, [
+      uiStore.allResourcesLoaded,
+      uiStore.displayedProgress,
+      uiStore.storeLoadingStatus,
+    ]);
 
     return (
       <View style={{ flex: 1 }}>
@@ -26,24 +31,25 @@ export const LoadingBoundary = observer(
           style={{
             ...StyleSheet.absoluteFillObject,
             opacity: fadeAnim,
-            zIndex: uiStore.isLoading ? 1 : 0,
+            zIndex: !uiStore.allResourcesLoaded ? 1 : 0,
+            backgroundColor: Colors[uiStore.colorScheme].background,
           }}
-          pointerEvents={uiStore.isLoading ? "auto" : "none"}
+          pointerEvents={!uiStore.allResourcesLoaded ? "auto" : "none"}
         >
-          <View
-            style={{
-              paddingHorizontal: 64,
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <View style={{ flex: 1, justifyContent: "space-evenly" }}>
+          <View style={styles.container}>
+            <View style={styles.contentContainer}>
               <D20DieAnimation
                 keepRolling={true}
                 slowRoll={true}
                 showNumber={false}
               />
+              <View style={styles.progressContainer}>
+                <ProgressBar
+                  value={Math.round(uiStore.displayedProgress)}
+                  maxValue={100}
+                />
+                <Text style={styles.tipText}>{uiStore.getCurrentTip()}</Text>
+              </View>
             </View>
           </View>
         </Animated.View>
@@ -62,3 +68,28 @@ export const LoadingBoundary = observer(
     );
   },
 );
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 32,
+  },
+  contentContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    maxWidth: 400,
+    width: "100%",
+  },
+  progressContainer: {
+    width: "100%",
+    alignItems: "center",
+    marginTop: 32,
+  },
+  tipText: {
+    marginTop: 16,
+    textAlign: "center",
+    fontSize: 16,
+  },
+});

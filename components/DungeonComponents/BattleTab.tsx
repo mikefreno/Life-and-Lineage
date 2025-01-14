@@ -28,7 +28,7 @@ import {
   useRootStore,
 } from "../../hooks/stores";
 import { observer } from "mobx-react-lite";
-import { flex, text, useStyles } from "../../hooks/styles";
+import { flex, text, tw, useStyles } from "../../hooks/styles";
 
 const BattleTab = observer(
   ({
@@ -62,6 +62,7 @@ const BattleTab = observer(
     const vibration = useVibration();
     const { addItemToPouch } = usePouch();
     const { pass } = useCombatActions();
+    const styles = useStyles();
 
     useEffect(() => {
       if (attackDetails) {
@@ -118,25 +119,23 @@ const BattleTab = observer(
       }
     };
 
-    const styles = useStyles();
     return (
-      <>
+      <View style={{ flex: 1 }}>
         <GenericModal
           isVisibleCondition={attackDetailsShowing}
           backFunction={() => setAttackDetailsShowing(false)}
           size={attackDetails instanceof Spell ? 100 : undefined}
         >
           {attackDetails && (
-            <View style={flex.columnCenter}>
+            <View style={{ alignItems: "center" }}>
               {attackDetails instanceof Spell ? (
                 <SpellDetails spell={attackDetails} />
               ) : (
-                attackDetails.AttackRender()
+                attackDetails.AttackRender(styles)
               )}
             </View>
           )}
         </GenericModal>
-
         {battleTab == "attacksOrNavigation" ? (
           !dungeonStore.inCombat ? (
             <DungeonMapControls />
@@ -149,17 +148,16 @@ const BattleTab = observer(
                   renderItem={({ item: attackOrSpell, index }) => (
                     <>
                       <ThemedView
-                        style={[
-                          styles.rowBetween,
+                        style={
                           attackOrSpell instanceof Spell && {
                             backgroundColor:
                               elementalColorMap[attackOrSpell.element].light,
                             borderColor:
                               elementalColorMap[attackOrSpell.element].dark,
-                          },
-                        ]}
+                          }
+                        }
                       >
-                        <View style={flex.rowBetween}>
+                        <View style={styles.attackCardBase}>
                           <View style={styles.columnCenter}>
                             <Pressable
                               onPress={() => setAttackDetails(attackOrSpell)}
@@ -258,20 +256,10 @@ const BattleTab = observer(
                         </View>
                       </ThemedView>
                       {index == combinedData.length - 1 && (
-                        <ThemedView
-                          style={[
-                            styles.passCardContainer,
-                            {
-                              borderColor:
-                                uiStore.colorScheme == "light"
-                                  ? "#71717a"
-                                  : "#a1a1aa",
-                            },
-                          ]}
-                        >
+                        <ThemedView style={styles.attackCardBase}>
                           <View style={styles.columnCenter}>
                             <Text style={text.xl}>Pass</Text>
-                            <View style={{ flexDirection: "row" }}>
+                            <View style={styles.rowItemsCenter}>
                               <Text>2x</Text>
                               <Regen width={12} height={12} />
                             </View>
@@ -308,23 +296,8 @@ const BattleTab = observer(
               ) : (
                 <View style={styles.stunnedContainer}>
                   <Text style={styles.stunnedText}>Stunned!</Text>
-                  <View
-                    style={[
-                      styles.passCardContainer,
-                      {
-                        borderColor:
-                          uiStore.colorScheme == "light"
-                            ? "#71717a"
-                            : "#a1a1aa",
-                      },
-                    ]}
-                  >
-                    <View
-                      style={{
-                        justifyContent: "center",
-                        flexDirection: "column",
-                      }}
-                    >
+                  <View style={styles.attackCardBase}>
+                    <View style={styles.columnCenter}>
                       <Text style={text.xl}>Pass</Text>
                     </View>
                     <Pressable
@@ -366,7 +339,7 @@ const BattleTab = observer(
             </View>
           </TouchableWithoutFeedback>
         ) : (
-          <View style={{ flex: 1, paddingHorizontal: 8 }}>
+          <View style={{ flex: 1, ...tw.px2 }}>
             <View style={styles.logContent}>
               {Platform.OS == "web" ? (
                 <ScrollView>
@@ -381,6 +354,7 @@ const BattleTab = observer(
                 </ScrollView>
               ) : (
                 <FlatList
+                  style={{ width: "100%" }}
                   inverted
                   data={dungeonStore.reversedLogs}
                   renderItem={({ item }) => (
@@ -395,7 +369,7 @@ const BattleTab = observer(
             </View>
           </View>
         )}
-      </>
+      </View>
     );
   },
 );

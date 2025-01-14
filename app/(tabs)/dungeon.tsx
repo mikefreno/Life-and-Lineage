@@ -63,7 +63,6 @@ const DungeonScreen = observer(() => {
     const { height } = event.nativeEvent.layout;
     setScrollViewHeight(height);
   };
-
   const getLevelColor = useMemo(() => {
     const cache = new Map();
 
@@ -125,7 +124,7 @@ const DungeonScreen = observer(() => {
       <PlatformDependantBlurView
         style={[
           styles.warningContainer,
-          { marginTop: useHeaderHeight(), paddingBottom: 4 },
+          { marginTop: headerHeight, paddingBottom: 4 },
         ]}
       >
         <Text style={{ textAlign: "center", fontSize: 24, lineHeight: 32 }}>

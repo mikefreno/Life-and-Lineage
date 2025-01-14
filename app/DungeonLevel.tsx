@@ -33,9 +33,10 @@ import { LinearGradientBlur } from "../components/LinearGradientBlur";
 import { Parallax } from "../components/DungeonComponents/Parallax";
 import { Image } from "expo-image";
 import { useStyles } from "../hooks/styles";
+import { reaction, runInAction } from "mobx";
 
 const DungeonLevelScreen = observer(() => {
-  const { enemyStore, dungeonStore, uiStore } = useRootStore();
+  const { enemyStore, dungeonStore, uiStore, audioStore } = useRootStore();
   const { currentLevel, inCombat } = dungeonStore;
   const playerState = usePlayerStore();
   const { draggableClassStore } = useDraggableStore();
@@ -78,10 +79,70 @@ const DungeonLevelScreen = observer(() => {
   );
 
   useEffect(() => {
-    if (colorScheme != "dark") {
-      uiStore.dungeonSetter();
-    }
-    wait(200).then(() => uiStore.setIsLoading(false));
+    const initializeDungeon = async () => {
+      try {
+        if (colorScheme != "dark") {
+          uiStore.dungeonSetter();
+        }
+
+        await Promise.all([
+          new Promise<void>((resolve) => {
+            if (dungeonStore.currentMap && dungeonStore.currentPosition) {
+              resolve();
+            } else {
+              const disposer = reaction(
+                () => ({
+                  map: dungeonStore.currentMap,
+                  position: dungeonStore.currentPosition,
+                }),
+                ({ map, position }) => {
+                  if (map && position) {
+                    disposer();
+                    resolve();
+                  }
+                },
+              );
+            }
+          }),
+
+          new Promise<void>((resolve) => {
+            if (audioStore.isAmbientLoaded && audioStore.isSoundEffectsLoaded) {
+              resolve();
+            } else {
+              const disposer = reaction(
+                () => ({
+                  ambient: audioStore.isAmbientLoaded,
+                  combat: audioStore.isCombatLoaded,
+                  sfx: audioStore.isSoundEffectsLoaded,
+                }),
+                ({ ambient, combat, sfx }) => {
+                  if (ambient && combat && sfx) {
+                    disposer();
+                    resolve();
+                  }
+                },
+              );
+            }
+          }),
+        ]);
+
+        await wait(200);
+
+        runInAction(() => {
+          uiStore.setIsLoading(false);
+        });
+      } catch (error) {
+        console.error("Failed to initialize dungeon:", error);
+        // Fallback loading removal after timeout
+        wait(2000).then(() => uiStore.setIsLoading(false));
+      }
+    };
+
+    initializeDungeon();
+
+    return () => {
+      uiStore.setIsLoading(true); // Reset loading state
+    };
   }, []);
 
   useEffect(() => {
@@ -175,15 +236,7 @@ const DungeonLevelScreen = observer(() => {
           )}
           <View style={{ flex: 1 }}>
             <LinearGradientBlur style={{ position: "absolute" }} />
-            {inCombat && <View />}
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "space-between",
-              }}
-            >
-              <BattleTab battleTab={battleTab} />
-            </View>
+            <BattleTab battleTab={battleTab} />
             <BattleTabControls
               battleTab={battleTab}
               setBattleTab={setBattleTab}

@@ -43,6 +43,8 @@ export class DungeonStore {
   fightingBoss: boolean = false;
   movementQueued: boolean = false;
   fleeModalShowing: boolean = false;
+  private movementQueue: Array<"up" | "down" | "left" | "right"> = [];
+  private isProcessingMovement: boolean = false;
   logs: string[] = [];
 
   constructor({ root }: { root: RootStore }) {
@@ -282,7 +284,13 @@ export class DungeonStore {
   }
 
   public move(direction: "up" | "down" | "left" | "right") {
-    if (!this.currentPosition || !this.currentMap) return;
+    if (this.isProcessingMovement) return; // Prevent multiple movements
+    this.isProcessingMovement = true;
+
+    if (!this.currentPosition || !this.currentMap) {
+      this.isProcessingMovement = false;
+      return;
+    }
     this.toggleMovement();
 
     const { x, y } = directionsMapping[direction];
@@ -298,6 +306,7 @@ export class DungeonStore {
 
       if (newPosition.clearedRoom) {
         this.toggleMovement();
+        this.isProcessingMovement = false;
         return;
       }
 
@@ -306,16 +315,20 @@ export class DungeonStore {
           if (newPosition.specialEncounter) {
             this.setCurrentSpecialEncounter(newPosition.specialEncounter);
             this.inSpecialRoom = true;
-            this.visitRoom(newPosition); // Mark as visited
+            this.visitRoom(newPosition);
           } else {
             this.inCombat = true;
             this.fightingBoss = newPosition.isBossRoom;
             this.setEncounter(newPosition.isBossRoom);
-            this.visitRoom(newPosition); // Mark as visited
+            this.visitRoom(newPosition);
           }
           this.toggleMovement();
+          this.isProcessingMovement = false;
         });
       });
+    } else {
+      this.toggleMovement();
+      this.isProcessingMovement = false;
     }
   }
 

@@ -40,22 +40,44 @@ export class RootStore {
   startingNewGame: boolean = false;
 
   constructor() {
+    this.uiStore = new UIStore({ root: this });
+
     const retrieved_player = storage.getString("player");
     this.playerState = retrieved_player
       ? PlayerCharacter.fromJSON({ ...parse(retrieved_player), root: this })
       : null;
 
+    this.uiStore.markStoreAsLoaded("player");
+
     this.time = new TimeStore({ root: this });
+    this.uiStore.markStoreAsLoaded("time");
+
     this.authStore = new AuthStore({ root: this });
-    this.uiStore = new UIStore({ root: this });
+    this.uiStore.markStoreAsLoaded("auth");
+
     this.shopsStore = new ShopStore({ root: this });
+    this.uiStore.markStoreAsLoaded("shops");
+
     this.enemyStore = new EnemyStore({ root: this });
+    this.uiStore.markStoreAsLoaded("enemy");
+
     this.dungeonStore = new DungeonStore({ root: this });
+    this.uiStore.markStoreAsLoaded("dungeon");
+
     this.characterStore = new CharacterStore({ root: this });
+    this.uiStore.markStoreAsLoaded("character");
+
     this.tutorialStore = new TutorialStore({ root: this });
+    this.uiStore.markStoreAsLoaded("tutorial");
+
     this.stashStore = new StashStore({ root: this });
+    this.uiStore.markStoreAsLoaded("stash");
+
     this.saveStore = new SaveStore({ root: this });
+    this.uiStore.markStoreAsLoaded("save");
+
     this.audioStore = new AudioStore({ root: this });
+    this.uiStore.markStoreAsLoaded("audio");
 
     this.constructed = true;
 
@@ -109,7 +131,6 @@ export class RootStore {
   checkForBirths() {
     if (!this.playerState) return;
 
-    // Check player if female
     if (this.playerState.sex === "female" && this.playerState.isPregnant) {
       const baby = this.playerState.giveBirth();
       if (baby) {

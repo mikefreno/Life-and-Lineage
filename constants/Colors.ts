@@ -21,7 +21,7 @@ const lightBorder = "#27272a";
 const darkBackground = "#09090b";
 const darkCard = "#18181b";
 const darkText = "#fff";
-const darkBorder = "#fafafa";
+const darkBorder = "#a1a1aa";
 
 export default {
   light: {
