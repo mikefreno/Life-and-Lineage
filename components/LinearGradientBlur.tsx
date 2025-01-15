@@ -36,8 +36,8 @@ export function LinearGradientBlur({
       <MaskedView
         maskElement={
           <LinearGradient
-            locations={locations}
-            colors={colors}
+            locations={[locations[0], locations[1], ...locations]}
+            colors={[colors[0], colors[1], ...colors]}
             style={StyleSheet.absoluteFill}
           />
         }

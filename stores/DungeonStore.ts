@@ -231,7 +231,7 @@ export class DungeonStore {
     this.fightingBoss = state;
   }
 
-  public setUpDungeon(
+  public async setUpDungeon(
     instance: string | DungeonInstance,
     level: string | DungeonLevel,
   ) {

@@ -60,6 +60,7 @@ const StatRow = observer(
 
 export default function GearStatsDisplay({ item }: { item: Item }) {
   const { uiStore } = useRootStore();
+  const styles = useStyles();
 
   if (!item.stats || item.stats.size === 0) {
     return null;
@@ -90,16 +91,16 @@ export default function GearStatsDisplay({ item }: { item: Item }) {
         backFunction={() => setShowingDetailedView(false)}
       >
         <View style={{ paddingHorizontal: 16 }}>
-          <View style={[, { paddingBottom: 16 }]}>
+          <View style={[styles.rowBetween, { paddingBottom: 12 }]}>
             {shouldShowTotalDamage ? (
               <View style={{ width: "50%" }}>
-                <Text style={{ numberOfLines: 2, ...text["3xl"] }}>
+                <Text numberOfLines={2} style={text["3xl"]}>
                   {cleanRoundToTenths(item.totalDamage)} Total Damage
                 </Text>
               </View>
             ) : shouldShowTotalArmor ? (
               <View style={{ width: "50%" }}>
-                <Text style={{ numberOfLines: 2, ...text["3xl"] }}>
+                <Text numberOfLines={2} style={text["3xl"]}>
                   {cleanRoundToTenths(item.totalArmor)} Total Armor
                 </Text>
               </View>
@@ -151,7 +152,7 @@ export default function GearStatsDisplay({ item }: { item: Item }) {
           padding: 8,
         }}
       >
-        <View style={[flex.columnCenter, flex.wrap]}>
+        <View style={[flex.rowCenter, flex.wrap, { alignItems: "center" }]}>
           {shouldShowTotalDamage && (
             <Text style={{ textAlign: "center", ...text.xl }}>
               {cleanRoundToTenths(item.totalDamage)} Total Damage

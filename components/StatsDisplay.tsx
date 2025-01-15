@@ -762,7 +762,7 @@ export function StatsDisplay({
               : "right"]: 0,
           }}
         >
-          <Text style={{ marginTop: -12, marginLeft: -4, ...styles["2xl"] }}>
+          <Text style={{ marginTop: -8, marginLeft: 0, ...styles["2xl"] }}>
             x
           </Text>
         </Pressable>

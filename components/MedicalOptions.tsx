@@ -94,8 +94,8 @@ const MedicalOption = observer(
 
     return (
       <ThemedCard>
-        <View style={styles.medicalOptionContainer}>
-          <Text style={styles.medicalOptionTitle}>{title}</Text>
+        <View style={styles.rowBetween}>
+          <Text style={styles.cardTitle}>{title}</Text>
           <View style={styles.medicalCostContainer}>
             <View style={styles.costRow}>
               {cost > 0 ? (

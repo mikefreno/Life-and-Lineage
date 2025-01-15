@@ -184,8 +184,9 @@ const DungeonScreen = observer(() => {
                         onPress={() => {
                           uiStore.setTotalLoadingSteps(5);
                           vibration({ style: "warning" });
-                          dungeonStore.setUpDungeon(dungeonInstance, level);
-                          uiStore.incrementLoadingStep();
+                          dungeonStore
+                            .setUpDungeon(dungeonInstance, level)
+                            .then(() => uiStore.incrementLoadingStep());
                           router.replace(`/DungeonLevel`);
                           uiStore.incrementLoadingStep();
                         }}

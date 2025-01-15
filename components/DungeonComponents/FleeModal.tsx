@@ -25,48 +25,69 @@ const FleeModal = observer(() => {
     setFleeRollFailure(false);
   }, [dungeonStore.fleeModalShowing]);
 
-  const flee = () => {
-    if (playerState) {
+  const flee = async () => {
+    if (!playerState) return;
+
+    try {
       enemyStore.setAttackAnimationOngoing(true);
       const roll = rollD20();
-      if (
-        enemyStore.enemies.length == 0 ||
-        enemyStore.enemies[0].creatureSpecies == "training dummy" ||
+
+      const canFlee =
+        enemyStore.enemies.length === 0 ||
+        enemyStore.enemies[0].creatureSpecies === "training dummy" ||
         roll > 10 ||
-        !dungeonStore.inCombat
-      ) {
-        vibration({ style: "light" });
-        dungeonStore.setFleeModalShowing(false);
-        wait(100).then(() => {
-          uiStore.setTotalLoadingSteps(3);
+        !dungeonStore.inCombat;
 
-          rootStore.leaveDungeon();
-          uiStore.incrementLoadingStep();
-
-          if (dungeonStore.currentInstance?.name == "Activities") {
-            router.replace("/shops");
-          } else {
-            router.replace("/dungeon");
-          }
-          uiStore.incrementLoadingStep();
-
-          if (dungeonStore.currentInstance?.name == "Activities") {
-            router.push("/Activities");
-          }
-          uiStore.incrementLoadingStep();
-
-          savePlayer(playerState);
-          uiStore.incrementLoadingStep();
-        });
+      if (canFlee) {
+        await handleSuccessfulFlee();
       } else {
-        setFleeRollFailure(true);
-        vibration({ style: "error" });
-        dungeonStore.addLog("You failed to flee!");
-
-        playerMinionsTurn(() => {
-          enemyTurn();
-        });
+        await handleFailedFlee();
       }
+    } catch (error) {
+      console.error("Error during flee attempt:", error);
+      uiStore.setError("Failed to process flee attempt");
+      enemyStore.setAttackAnimationOngoing(false);
+    }
+  };
+
+  const handleSuccessfulFlee = async () => {
+    try {
+      vibration({ style: "light" });
+      dungeonStore.setFleeModalShowing(false);
+
+      await wait(250);
+      uiStore.setTotalLoadingSteps(3);
+
+      // Handle dungeon exit and player save in parallel
+      await Promise.all([
+        rootStore.leaveDungeon().then(() => uiStore.incrementLoadingStep()),
+        savePlayer(playerState!).then(() => uiStore.incrementLoadingStep()),
+      ]);
+
+      if (dungeonStore.currentInstance?.name === "Activities") {
+        router.replace("/shops");
+        router.push("/Activities");
+      } else {
+        router.replace("/dungeon");
+      }
+
+      uiStore.incrementLoadingStep();
+    } catch (error) {
+      console.error("Error during successful flee:", error);
+    }
+  };
+
+  const handleFailedFlee = async () => {
+    try {
+      setFleeRollFailure(true);
+      vibration({ style: "error" });
+      dungeonStore.addLog("You failed to flee!");
+
+      playerMinionsTurn(() => {
+        enemyTurn();
+      });
+    } catch (error) {
+      console.error("Error during failed flee:", error);
     }
   };
 

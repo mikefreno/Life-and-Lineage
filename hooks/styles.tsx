@@ -65,6 +65,13 @@ export const useStyles = () => {
       alignItems: "center",
     } as const,
     centeredContainer,
+    cardTitle: {
+      fontWeight: "700",
+      marginVertical: "auto",
+      width: "66%",
+      ...text.xl,
+      color: theme.text,
+    } as const,
     // ---- New Game ---- //
     newGameContainer: {
       ...centeredContainer,
@@ -402,13 +409,7 @@ export const useStyles = () => {
       fontSize: 18,
       lineHeight: 28,
     } as const,
-    laborTaskTitle: {
-      fontWeight: "700",
-      marginVertical: "auto",
-      width: "66%",
-      fontSize: 20,
-      color: theme.text,
-    } as const,
+
     costContainer: {
       marginVertical: "auto",
       marginBottom: -32,
@@ -477,18 +478,6 @@ export const useStyles = () => {
       borderRadius: 8,
     } as const,
     // ---- Main Tabs - Medical ---- //
-    medicalOptionContainer: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-    } as const,
-
-    medicalOptionTitle: {
-      fontWeight: "700",
-      marginVertical: "auto",
-      width: "60%",
-      fontSize: 20,
-      color: theme.text,
-    } as const,
 
     medicalCostContainer: {
       marginBottom: -16,
@@ -1617,10 +1606,10 @@ export const text = {
   xs: { fontSize: 10, lineHeight: 12 },
   sm: { fontSize: 12, lineHeight: 16 },
   md: { fontSize: 14, lineHeight: 20 },
-  lg: { fontSize: 16, lineHeight: 24 },
-  xl: { fontSize: 18, lineHeight: 24 },
-  "2xl": { fontSize: 22, lineHeight: 28 },
-  "3xl": { fontSize: 26, lineHeight: 32 },
+  lg: { fontSize: 18, lineHeight: 24 },
+  xl: { fontSize: 20, lineHeight: 24 },
+  "2xl": { fontSize: 24, lineHeight: 28 },
+  "3xl": { fontSize: 28, lineHeight: 32 },
   "4xl": { fontSize: 32, lineHeight: 36 },
   "5xl": { fontSize: 44, lineHeight: 48 },
 } as const;

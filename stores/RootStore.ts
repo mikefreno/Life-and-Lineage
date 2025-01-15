@@ -231,7 +231,7 @@ export class RootStore {
     this.playerState = player;
   }
 
-  leaveDungeon() {
+  async leaveDungeon() {
     this.playerState?.clearMinions();
     this.enemyStore.clearEnemyList();
     this.dungeonStore.clearDungeonState();
