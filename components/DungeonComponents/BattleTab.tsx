@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { ThemedView, Text } from "../Themed";
 import {
   Pressable,
@@ -29,6 +29,8 @@ import {
 } from "../../hooks/stores";
 import { observer } from "mobx-react-lite";
 import { text, tw, useStyles } from "../../hooks/styles";
+import { Enemy } from "../../entities/creatures";
+import GenericRaisedButton from "../GenericRaisedButton";
 
 const BattleTab = observer(
   ({
@@ -63,6 +65,33 @@ const BattleTab = observer(
     const { addItemToPouch } = usePouch();
     const { pass } = useCombatActions();
     const styles = useStyles();
+
+    const [showEncounterResultModal, setShowEncounterResultModal] =
+      useState(false);
+    const [encounterResult, setEncounterResult] = useState<{
+      message: string;
+      health?: number;
+      sanity?: number;
+      mana?: number;
+      drops?: Item[];
+      gold?: number;
+      enemies?: Enemy[];
+    } | null>(null);
+
+    const handleSpecialEncounter = useCallback(
+      (action: "activate" | "ignore") => {
+        if (action === "activate" && dungeonStore.currentSpecialEncounter) {
+          const result = dungeonStore.currentSpecialEncounter.activate();
+          setEncounterResult(result);
+          setShowEncounterResultModal(true);
+          if (result.drops) {
+            result.drops.forEach((item) => addItemToPouch({ items: [item] }));
+          }
+        }
+        dungeonStore.leaveSpecialEncounterRoom();
+      },
+      [dungeonStore.currentSpecialEncounter],
+    );
 
     useEffect(() => {
       if (attackDetails) {
@@ -136,9 +165,66 @@ const BattleTab = observer(
             </View>
           )}
         </GenericModal>
+
+        <GenericModal
+          isVisibleCondition={showEncounterResultModal}
+          backFunction={() => {
+            setShowEncounterResultModal(false);
+            dungeonStore.setCurrentSpecialEncounter(null);
+          }}
+          size={80}
+        >
+          <ThemedView style={styles.encounterResultContainer}>
+            <Text style={styles.encounterResultTitle}>
+              {encounterResult?.message}
+            </Text>
+            {encounterResult?.health && (
+              <Text>Health: {encounterResult.health}</Text>
+            )}
+            {encounterResult?.sanity && (
+              <Text>Sanity: {encounterResult.sanity}</Text>
+            )}
+            {encounterResult?.mana && <Text>Mana: {encounterResult.mana}</Text>}
+            {encounterResult?.gold && <Text>Gold: {encounterResult.gold}</Text>}
+            {encounterResult?.drops && (
+              <Text>
+                Items:{" "}
+                {encounterResult.drops.map((item) => item.name).join(", ")}
+              </Text>
+            )}
+            {encounterResult?.enemies && (
+              <Text>
+                Enemies:{" "}
+                {encounterResult.enemies
+                  .map((enemy) => enemy.creatureSpecies)
+                  .join(", ")}
+              </Text>
+            )}
+          </ThemedView>
+        </GenericModal>
         {battleTab == "attacksOrNavigation" ? (
           !dungeonStore.inCombat ? (
-            <DungeonMapControls />
+            dungeonStore.currentSpecialEncounter ? (
+              <ThemedView style={styles.specialEncounterContainer}>
+                <Text style={styles.specialEncounterPrompt}>
+                  {dungeonStore.currentSpecialEncounter.prompt}
+                </Text>
+                <View style={styles.specialEncounterButtonContainer}>
+                  <GenericRaisedButton
+                    onPress={() => handleSpecialEncounter("activate")}
+                  >
+                    Activate
+                  </GenericRaisedButton>
+                  <GenericRaisedButton
+                    onPress={() => handleSpecialEncounter("ignore")}
+                  >
+                    Ignore
+                  </GenericRaisedButton>
+                </View>
+              </ThemedView>
+            ) : (
+              <DungeonMapControls />
+            )
           ) : (
             <View style={styles.battleTabContainer}>
               {!playerState.isStunned ? (

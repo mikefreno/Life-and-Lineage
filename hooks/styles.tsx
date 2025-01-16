@@ -1105,6 +1105,31 @@ export const useStyles = () => {
       alignItems: "center",
       padding: 16,
     } as const,
+
+    // remove all these
+    encounterResultContainer: {
+      padding: 16,
+    },
+    encounterResultTitle: {
+      fontSize: 20,
+      textAlign: "center",
+      marginBottom: 16,
+    },
+    specialEncounterContainer: {
+      width: "100%",
+      height: "100%",
+      padding: 8,
+      justifyContent: "center",
+    },
+    specialEncounterPrompt: {
+      fontSize: 20,
+      textAlign: "center",
+      marginBottom: 16,
+    },
+    specialEncounterButtonContainer: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+    },
   });
 };
 

@@ -17,6 +17,7 @@ import { useDraggableStore, useRootStore } from "../hooks/stores";
 import { checkReleasePosition } from "../utility/functions/misc";
 import { observer } from "mobx-react-lite";
 import { useStyles } from "../hooks/styles";
+import Colors from "../constants/Colors";
 
 type DraggableProps = {
   children: React.ReactNode;
@@ -257,7 +258,9 @@ const InventoryItem = observer(
               />
               {item[0].stackable && item.length > 1 && (
                 <ThemedView style={styles.stackIndicator}>
-                  <Text>{item.length}</Text>
+                  <Text style={{ color: Colors["dark"].text }}>
+                    {item.length}
+                  </Text>
                 </ThemedView>
               )}
             </View>

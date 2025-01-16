@@ -104,21 +104,20 @@ export const DungeonMapRender = observer(() => {
  */
 export const DungeonMapControls = observer(() => {
   const { dungeonStore, uiStore } = useRootStore();
-  const { currentPosition, currentMap, movementQueued } = dungeonStore;
   const styles = useStyles();
 
-  if (!currentPosition || !currentMap) {
+  if (!dungeonStore.currentPosition || !dungeonStore.currentMap) {
     throw new Error("Missing map, or current position within control handler!");
   }
 
   const isMoveValid = (direction: "up" | "down" | "left" | "right") => {
-    if (!currentPosition) return false;
+    if (!dungeonStore.currentPosition || !dungeonStore.currentMap) return false;
 
     const { x, y } = directionsMapping[direction];
-    const newX = currentPosition.x + x * TILE_SIZE;
-    const newY = currentPosition.y + y * TILE_SIZE;
+    const newX = dungeonStore.currentPosition.x + x * TILE_SIZE;
+    const newY = dungeonStore.currentPosition.y + y * TILE_SIZE;
 
-    const newTile = currentMap.find(
+    const newTile = dungeonStore.currentMap.find(
       (tile) => tile.x === newX && tile.y === newY,
     );
 
@@ -137,7 +136,7 @@ export const DungeonMapControls = observer(() => {
       <GenericRaisedButton
         key={direction}
         onPress={() => dungeonStore.move(direction)}
-        disabled={!valid || movementQueued}
+        disabled={!valid || dungeonStore.movementQueued}
       >
         {direction.charAt(0).toUpperCase() + direction.slice(1)}
       </GenericRaisedButton>

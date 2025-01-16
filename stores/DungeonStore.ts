@@ -107,6 +107,7 @@ export class DungeonStore {
       clearDungeonState: action,
       resetVolatileState: action,
       resetForNewGame: action,
+      leaveSpecialEncounterRoom: action,
     });
 
     reaction(
@@ -243,6 +244,7 @@ export class DungeonStore {
   public async setUpDungeon(
     instance: string | DungeonInstance,
     level: string | DungeonLevel,
+    isActivityEncounter: boolean = false,
   ) {
     this.root.saveStore.createCheckpoint(true);
     if (instance instanceof DungeonInstance && level instanceof DungeonLevel) {
@@ -275,9 +277,14 @@ export class DungeonStore {
       tileSize: TILE_SIZE,
       bossDefeated: this.currentLevel.bossDefeated,
       specials,
+      isActivityEncounter,
     });
     this.currentMapDimensions = getBoundingBox(this.currentMap, TILE_SIZE);
     this.currentPosition = this.currentMap[0];
+
+    if (isActivityEncounter) {
+      this.inCombat = true;
+    }
   }
 
   private updateCurrentPosition(tile: Tile) {
@@ -293,7 +300,7 @@ export class DungeonStore {
   }
 
   public move(direction: "up" | "down" | "left" | "right") {
-    if (this.isProcessingMovement) return; // Prevent multiple movements
+    if (this.isProcessingMovement) return;
     this.isProcessingMovement = true;
 
     if (!this.currentPosition || !this.currentMap) {
@@ -320,20 +327,25 @@ export class DungeonStore {
       }
 
       wait(350).then(() => {
-        runInAction(() => {
-          if (newPosition.specialEncounter) {
+        if (newPosition.specialEncounter) {
+          runInAction(() => {
             this.setCurrentSpecialEncounter(newPosition.specialEncounter);
             this.inSpecialRoom = true;
+            this.inCombat = false;
             this.visitRoom(newPosition);
-          } else {
+          });
+        } else {
+          runInAction(() => {
+            this.setCurrentSpecialEncounter(null);
+            this.inSpecialRoom = false;
             this.inCombat = true;
             this.fightingBoss = newPosition.isBossRoom;
             this.setEncounter(newPosition.isBossRoom);
             this.visitRoom(newPosition);
-          }
-          this.toggleMovement();
-          this.isProcessingMovement = false;
-        });
+          });
+        }
+        this.toggleMovement();
+        this.isProcessingMovement = false;
       });
     } else {
       this.toggleMovement();
@@ -380,36 +392,24 @@ export class DungeonStore {
     if (!this.currentLevel) {
       throw new Error("No dungeon level set!");
     }
+
     const enemies = isBossFight
       ? this.currentLevel.generateBossEncounter
       : this.currentLevel.generateNormalEncounter;
+
     this.root.enemyStore.clearEnemyList();
-    if (!enemies) return;
+    if (!enemies || enemies.length === 0) {
+      console.error("No enemies generated for encounter");
+      this.inCombat = false; // Reset combat state if no enemies
+      return;
+    }
+
     enemies.forEach((enemy) => this.root.enemyStore.addToEnemyList(enemy));
 
-    if (enemies.length === 1) {
-      this.addLog(`You have run into a ${enemies[0].creatureSpecies}`);
-    } else {
-      const speciesCount = enemies.reduce(
-        (acc, enemy) => {
-          acc[enemy.creatureSpecies] = (acc[enemy.creatureSpecies] || 0) + 1;
-          return acc;
-        },
-        {} as Record<string, number>,
-      );
-
-      const speciesStrings = Object.entries(speciesCount).map(
-        ([species, count]) => {
-          return count === 1 ? `a ${species}` : `${count} ${species}s`;
-        },
-      );
-
-      const lastSpecies = speciesStrings.pop();
-      const log = speciesStrings.length
-        ? `You have run into ${speciesStrings.join(", ")} and ${lastSpecies}.`
-        : `You have run into ${lastSpecies}.`;
-
-      this.addLog(log);
+    // Validation
+    if (this.root.enemyStore.enemies.length === 0) {
+      console.error("Failed to add enemies to enemy store");
+      this.inCombat = false;
     }
   }
 
@@ -566,13 +566,6 @@ export class DungeonStore {
       this.currentMapDimensions &&
       this.currentPosition
     );
-    console.log("Checking hasPersistedState:", result, {
-      hasInstance: !!this.currentInstance,
-      hasLevel: !!this.currentLevel,
-      hasMap: !!this.currentMap,
-      hasDimensions: !!this.currentMapDimensions,
-      hasPosition: !!this.currentPosition,
-    });
     return result;
   }
 
@@ -643,6 +636,7 @@ export class DungeonStore {
       bossDefeated: true,
       unlocked: true,
       dungeonStore: this,
+      specialEncounters: [],
       parent: activityInstance,
     });
     activityInstance.setLevels([activityDungeon]);

@@ -23,6 +23,9 @@ import {
 import { useRootStore } from "../hooks/stores";
 import type { Character } from "../entities/character";
 import { useStyles } from "../hooks/styles";
+import { DungeonLevel } from "../entities/dungeon";
+import { AnimatedSprite } from "./AnimatedSprite";
+import { EnemyImageMap } from "../utility/enemyHelpers";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -30,7 +33,7 @@ interface ActivityCardProps {
 
 const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   const root = useRootStore();
-  const { playerState, enemyStore, uiStore } = root;
+  const { playerState, enemyStore } = root;
   const [metCharacter, setMetCharacter] = useState<Character | null>(null);
   const [nothingHappened, setNothingHappened] = useState<boolean>(false);
   const [badOutCome, setBadOutcome] = useState<BadOutcome | null>(null);
@@ -172,10 +175,38 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   }
 
   function setFight(outcome: BadOutcome) {
-    setNothingHappened(false);
-    setGoodOutcome(null);
+    if (!outcome.fight || !outcome.dungeonTitle) return;
 
-    //TODO: Setup instance / fight
+    const activityInstance = root.dungeonStore.initActivityDungeon(
+      outcome.background ?? "AutumnForest",
+    );
+
+    const enemies = outcome.fight.enemies
+      .map((enemy) =>
+        Array(enemy.count).fill({
+          name: enemy.name,
+          scaler: enemy.scaler,
+        }),
+      )
+      .flat();
+
+    // Create a new level with the encounters
+    const activityDungeon = new DungeonLevel({
+      level: 0,
+      bossEncounter: [],
+      normalEncounters: [enemies],
+      tiles: 1,
+      bossDefeated: true,
+      unlocked: true,
+      dungeonStore: root.dungeonStore,
+      specialEncounters: [],
+      parent: activityInstance,
+    });
+
+    activityInstance.setLevels([activityDungeon]);
+
+    root.dungeonStore.setUpDungeon(activityInstance, activityDungeon, true);
+    root.dungeonStore.setEncounter(false);
   }
 
   function renderCharacter(character: Character) {
@@ -226,21 +257,20 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   function goToFight() {
     setBadOutcome(null);
     wait(500).then(() => {
-      if (badOutCome && badOutCome.fight && badOutCome.dungeonTitle) {
+      if (badOutCome?.dungeonTitle) {
         router.dismissAll();
-        router.replace(`/DungeonLevel/Activities/${badOutCome?.dungeonTitle}`);
-      } else {
-        throw new Error("missing enemy object!");
+        router.replace(`/DungeonLevel`);
       }
     });
   }
 
   function payOff(gold: number) {
-    playerState?.spendGold(gold);
+    if (!playerState) return;
+    playerState.spendGold(gold);
     setBadOutcome(null);
-    enemyStore.enemies = [];
-    // set up instance and level
-    setTimeout(() => setBadOutcome(null), 350);
+    root.enemyStore.clearEnemyList();
+    root.dungeonStore.clearDungeonState();
+    wait(350).then(() => setBadOutcome(null));
   }
 
   return (
@@ -329,6 +359,10 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           {badOutCome?.fight ? (
             <>
               <View style={[styles.columnEvenly, { marginTop: 16 }]}>
+                <AnimatedSprite
+                  spriteSet={EnemyImageMap[badOutCome.fight.enemies[0].image]}
+                  currentAnimationState="idle"
+                />
                 {badOutCome.buyOff &&
                   playerState &&
                   playerState.gold >= 0.25 * badOutCome.buyOff.price && (

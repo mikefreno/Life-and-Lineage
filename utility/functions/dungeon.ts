@@ -83,6 +83,7 @@ export interface generateTilesProps {
     count: number;
     specialEncounter: SpecialEncounter;
   }[];
+  isActivityEncounter?: boolean;
 }
 
 /**
@@ -95,7 +96,18 @@ export const generateTiles = ({
   tileSize = 60,
   bossDefeated = false,
   specials = [],
+  isActivityEncounter,
 }: generateTilesProps): Tile[] => {
+  if (isActivityEncounter) {
+    return [
+      {
+        x: 0,
+        y: 0,
+        clearedRoom: false,
+        isBossRoom: false,
+      },
+    ];
+  }
   const tiles: Tile[] = [];
   const directions = Object.values(directionsMapping);
 

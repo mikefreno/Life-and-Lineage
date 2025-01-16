@@ -490,7 +490,7 @@ describe("Minion Class", () => {
       attackPower: 20,
       attackStrings: ["bite"],
       sprite: "necromancer",
-      enemyStore: mockEnemyStore,
+      root: mockRootStore,
       phases: [],
     });
 
@@ -569,11 +569,10 @@ describe("Minion Class", () => {
       attackPower: 20,
       attackStrings: ["bite"],
       sprite: "necromancer",
-      enemyStore: mockEnemyStore,
+      root: mockRootStore,
       phases: [],
     });
 
-    minion.reinstateParent(newParent);
     expect(minion.parent).toBe(newParent);
   });
 });

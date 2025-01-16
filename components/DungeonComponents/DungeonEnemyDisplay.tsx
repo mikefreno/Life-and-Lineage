@@ -296,10 +296,6 @@ const EnemyConditions = memo(({ conditions }: { conditions: any[] }) => {
 const DungeonEnemyDisplay = observer(() => {
   const { enemyStore } = useRootStore();
 
-  useEffect(() => {
-    console.log("enemies in store?: ", !!enemyStore.enemies);
-  });
-
   if (enemyStore.enemies.length == 0) {
     return null;
   }
