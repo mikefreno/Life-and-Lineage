@@ -209,7 +209,7 @@ const DungeonLevelScreen = observer(() => {
           {dungeonStore.currentSpecialEncounter ? (
             <View style={styles.dungeonSpecialEncounter}>
               <Image
-                source={dungeonStore.currentSpecialEncounter.image}
+                source={dungeonStore.currentSpecialEncounter.imageSource}
                 style={{
                   width: 200,
                   height: 200,

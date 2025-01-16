@@ -428,6 +428,7 @@ export class SpecialEncounter {
       activated: observable,
       parentLevel: observable,
       activate: action,
+      imageSource: computed,
     });
   }
 
@@ -466,6 +467,10 @@ export class SpecialEncounter {
     }
 
     throw new Error(`Outcome selection failure on ${this.name}`);
+  }
+
+  get imageSource(): any {
+    return specialEncounterImageMap[this.image];
   }
 
   private processOutcome(outcome: SpecialEncounterOutcome) {
@@ -596,3 +601,10 @@ export class SpecialEncounter {
     });
   }
 }
+
+const specialEncounterImageMap: Record<string, any> = {
+  camp: require("../assets/images/icons/camp.png"),
+  chest: require("../assets/images/icons/Chest.png"),
+  ritual_altar: require("../assets/images/icons/ritual_altar.png"),
+  water_basin: require("../assets/images/icons/water_basin.png"),
+};
