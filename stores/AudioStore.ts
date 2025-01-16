@@ -190,6 +190,9 @@ export class AudioStore {
     duration?: number;
     disableFadeOut?: boolean;
   }) {
+    if (!this.isAmbientLoaded) {
+      return;
+    }
     this.audioQueue.push({ type: "ambient", params });
     this.processAudioQueue();
   }
@@ -199,6 +202,9 @@ export class AudioStore {
     duration?: number;
     disableFadeOut?: boolean;
   }) {
+    if (!this.isCombatLoaded) {
+      return;
+    }
     this.audioQueue.push({ type: "combat", params });
     this.processAudioQueue();
   }
@@ -208,7 +214,7 @@ export class AudioStore {
 
     this.isProcessingQueue = true;
     const { type, params } = this.audioQueue.pop()!;
-    this.audioQueue = []; // Clear remaining queue
+    this.audioQueue = [];
 
     try {
       if (type === "ambient") {

@@ -150,6 +150,7 @@ export function createPlayerCharacter({
     baseSanity: number;
   };
 }) {
+  root.characterStore.clearCharacters();
   const mom = createParent("female", root, lastName);
   const dad = createParent("male", root, lastName);
   let newCharacter: PlayerCharacter;

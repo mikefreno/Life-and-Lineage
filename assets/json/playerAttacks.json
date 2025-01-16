@@ -6,6 +6,12 @@
     "damageMult": 1.0
   },
   {
+    "name": "dev punch",
+    "targets": "single",
+    "hitChance": 1.0,
+    "damageMult": 100.0
+  },
+  {
     "name": "hit",
     "targets": "single",
     "hitChance": 1.0,

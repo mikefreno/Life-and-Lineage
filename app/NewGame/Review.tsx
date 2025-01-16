@@ -63,6 +63,7 @@ export default function NewGameReview() {
       wait(250).then(() => clearHistory(navigation));
     }
   }
+
   const handleStatsAllocated = (stats: BaseStats, remaining: number) => {
     setAllocatedStats(stats);
     setRemainingPoints(remaining);

@@ -219,9 +219,9 @@ export class Character {
     this.affection = affection ?? 0;
     this.qualifications = qualifications ?? [];
     this.dateCooldownStart = dateCooldownStart;
-    (this.pregnancyDueDate = pregnancyDueDate),
-      (this.isPregnant = isPregnant),
-      (this.root = root);
+    this.pregnancyDueDate = pregnancyDueDate;
+    this.isPregnant = isPregnant;
+    this.root = root;
 
     makeObservable(this, {
       alive: observable,
@@ -268,10 +268,12 @@ export class Character {
         this.qualifications,
         this.dateCooldownStart,
         this.pregnancyDueDate,
-        this.parents,
+        this.parentIds,
+        this.childrenIds,
+        this.partnerIds,
       ],
       () => {
-        if (this.root.characterStore) {
+        if (this.root?.characterStore) {
           this.root.characterStore.saveCharacter(this);
         }
       },
@@ -502,10 +504,6 @@ export class Character {
   }
 }
 
-/**
- * This is the heart of most state and progression changes in the game, with the only notable exceptions being the game time and
- * the dungeons, which are both in the game class as these persist specific player characters
- */
 export class PlayerCharacter extends Character {
   readonly playerClass: PlayerClassOptions;
   readonly blessing: Element;
@@ -655,7 +653,7 @@ export class PlayerCharacter extends Character {
         stats: { [Modifier.PhysicalDamage]: 1 },
         baseValue: 0,
         itemClass: ItemClassType.Melee,
-        attacks: ["punch"],
+        attacks: __DEV__ ? ["punch", "dev punch"] : ["punch"],
         root,
       }),
       offHand: null,
@@ -1626,7 +1624,7 @@ export class PlayerCharacter extends Character {
       suffix: null,
       itemClass: ItemClassType.Melee,
       root: this.root,
-      attacks: ["punch"],
+      attacks: __DEV__ ? ["punch", "dev punch"] : ["punch"],
     });
   }
 
@@ -2429,7 +2427,6 @@ export class PlayerCharacter extends Character {
       minions: json.minions,
       rangerPet: json.rangerPet,
       knownSpells: json.knownSpells,
-      knownCharacterIds: json.knownCharacterIds ?? [],
       gold: json.gold,
       baseInventory: json.baseInventory
         ? json.baseInventory.map((item: any) =>
@@ -2465,6 +2462,11 @@ export class PlayerCharacter extends Character {
       baseDexterity: json.baseDexterity,
       pregnancyDueDate: json.pregnancyDueDate,
       isPregnant: json.isPregnant,
+      //character refs
+      parentIds: json.parentIds ?? [],
+      childrenIds: json.childrenIds ?? [],
+      partnerIds: json.partnerIds ?? [],
+      knownCharacterIds: json.knownCharacterIds ?? [],
       root: json.root,
     });
     return player;

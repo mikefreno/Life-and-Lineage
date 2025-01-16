@@ -53,7 +53,7 @@ describe("CharacterStore", () => {
     characterStore.adopt({ child, partner });
 
     expect(characterStore.independentChildren).not.toContain(child);
-    expect(mockRootStore.playerState.adopt).toHaveBeenCalledWith({
+    expect(mockRootStore.playerState?.adopt).toHaveBeenCalledWith({
       child,
       partner,
     });

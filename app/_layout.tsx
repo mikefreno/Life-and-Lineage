@@ -161,6 +161,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   ) => {
     if (!playerState) {
       router.replace("/NewGame/ClassSelect");
+      wait(350).then(() => uiStore.markStoreAsLoaded("routing"));
       return;
     }
 
@@ -171,12 +172,17 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
 
     if (isDead && pathname !== "/DeathScreen") {
       router.replace("/DeathScreen");
+      wait(350).then(() => uiStore.markStoreAsLoaded("routing"));
       return;
     }
 
     if (dungeonStore.hasPersistedState) {
       router.replace("/DungeonLevel");
+      wait(350).then(() => uiStore.markStoreAsLoaded("routing"));
+      return;
     }
+
+    uiStore.markStoreAsLoaded("routing");
   };
 
   useEffect(() => {

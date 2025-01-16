@@ -36,11 +36,12 @@ import { Element, TutorialOption } from "../../utility/types";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { shadows } from "../../hooks/styles";
+import { observer } from "mobx-react-lite";
 
 const PLAYERSTATUS_SPACER = 64;
 const TABSELECTOR_HEIGHT = 52;
 
-export default function TabLayout() {
+const TabLayout = observer(() => {
   const isFocused = useIsFocused();
 
   const { playerState, uiStore, dungeonStore } = useRootStore();
@@ -433,4 +434,5 @@ export default function TabLayout() {
       )}
     </>
   );
-}
+});
+export default TabLayout;

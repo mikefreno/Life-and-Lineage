@@ -28,7 +28,7 @@ import {
   useRootStore,
 } from "../../hooks/stores";
 import { observer } from "mobx-react-lite";
-import { flex, text, tw, useStyles } from "../../hooks/styles";
+import { text, tw, useStyles } from "../../hooks/styles";
 
 const BattleTab = observer(
   ({

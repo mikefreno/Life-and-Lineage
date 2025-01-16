@@ -1,5 +1,6 @@
+import { Dimensions } from "react-native";
 import { DungeonInstance, DungeonLevel } from "../../entities/dungeon";
-import { DungeonStore, TILE_SIZE } from "../DungeonStore";
+import { DungeonStore } from "../DungeonStore";
 import { RootStore } from "../RootStore";
 
 jest.mock("../SaveStore", () => ({
@@ -15,6 +16,11 @@ jest.mock("../EnemyStore", () => ({
     addToEnemyList: jest.fn(),
   })),
 }));
+
+const TILE_SIZE = Math.max(
+  Number((Dimensions.get("screen").width / 10).toFixed(0)),
+  Number((Dimensions.get("screen").height / 10).toFixed(0)),
+);
 
 describe("DungeonStore", () => {
   let dungeonStore: DungeonStore;
@@ -75,14 +81,19 @@ describe("DungeonStore", () => {
   });
 
   test("move", () => {
+    const mockEncounter = {
+      name: "zombie",
+      scaler: 1,
+    };
+
     const mockInstance = new DungeonInstance({
       name: "Test Dungeon",
       levels: [
         new DungeonLevel({
           level: 1,
           tiles: 10,
-          bossEncounter: [],
-          normalEncounters: [],
+          bossEncounter: [mockEncounter],
+          normalEncounters: [[mockEncounter]],
           unlocked: true,
           bossDefeated: false,
           dungeonStore: dungeonStore,

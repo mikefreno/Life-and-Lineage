@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Text } from "../components/Themed";
 import { wait } from "../utility/functions/misc";
 import { CharacterImage } from "../components/CharacterImage";
@@ -140,7 +140,7 @@ const RelationshipsScreen = observer(() => {
         <FlatList
           horizontal
           data={data}
-          contentContainerStyle={[flex.rowEvenly, { minWidth: "100%" }]}
+          contentContainerStyle={[flex.rowBetween, { minWidth: "100%" }]}
           renderItem={({ item }) => renderCharacter(item)}
           keyExtractor={(item) => item.id}
         />
@@ -162,6 +162,26 @@ const RelationshipsScreen = observer(() => {
       setShowingAdoptionModal(true);
     }
   };
+
+  if (!playerState) {
+    return (
+      <View style={[flex.columnCenter, { flex: 1 }]}>
+        <Text style={text.xl}>Unable to load relationship data</Text>
+      </View>
+    );
+  }
+
+  const hasAnyCharacters = characterGroups.some(
+    (group) => group.data.length > 0,
+  );
+
+  if (!hasAnyCharacters) {
+    return (
+      <View style={[flex.columnCenter, { flex: 1 }]}>
+        <Text style={text.xl}>You haven't met anyone yet!</Text>
+      </View>
+    );
+  }
 
   if (playerState) {
     return (

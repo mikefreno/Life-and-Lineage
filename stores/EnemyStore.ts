@@ -39,6 +39,13 @@ export default class EnemyStore {
     });
 
     reaction(
+      () => [this.enemies.length, this.animationStoreMap.size],
+      () => {
+        this.enemies.forEach((enemy) => this.saveEnemy(enemy));
+      },
+    );
+
+    reaction(
       () => [
         this.deathAnimationsCount,
         this.attackAnimationCount,
@@ -136,17 +143,15 @@ export default class EnemyStore {
   }
 
   private enemySave = async (enemy: Enemy) => {
-    if (this.enemies) {
-      const str = this.enemies.map((enemy) => enemy.id);
+    const str = this.enemies.map((enemy) => enemy.id);
 
-      storage.set("enemyIDs", stringify(str));
-      try {
-        storage.set(
-          `enemy_${enemy?.id}`,
-          stringify({ ...enemy, enemyStore: null }),
-        );
-      } catch (e) {}
-    }
+    storage.set("enemyIDs", stringify(str));
+    try {
+      storage.set(
+        `enemy_${enemy?.id}`,
+        stringify({ ...enemy, enemyStore: null }),
+      );
+    } catch (e) {}
   };
 
   public saveEnemy = throttle(this.enemySave, 250);
@@ -155,11 +160,13 @@ export default class EnemyStore {
     storage.delete("enemyIDs");
 
     const allKeys = storage.getAllKeys();
-    allKeys.forEach((key) => {
-      if (key.startsWith("enemy_")) {
-        storage.delete(key);
-      }
-    });
+    if (allKeys) {
+      allKeys.forEach((key) => {
+        if (key.startsWith("enemy_")) {
+          storage.delete(key);
+        }
+      });
+    }
   }
 
   private clearPersistedEnemy(enemyId: string) {

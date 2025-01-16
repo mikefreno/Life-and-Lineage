@@ -22,7 +22,7 @@ import {
   Tile,
   generateTiles,
   getBoundingBox,
-} from "../components/DungeonComponents/DungeonMap";
+} from "../utility/functions/dungeon";
 import { Dimensions } from "react-native";
 import { generateEnemyFromNPC, wait } from "../utility/functions/misc";
 import { ParallaxOptions } from "../components/DungeonComponents/Parallax";
@@ -43,7 +43,6 @@ export class DungeonStore {
   fightingBoss: boolean = false;
   movementQueued: boolean = false;
   fleeModalShowing: boolean = false;
-  private movementQueue: Array<"up" | "down" | "left" | "right"> = [];
   private isProcessingMovement: boolean = false;
   logs: string[] = [];
 
@@ -111,19 +110,23 @@ export class DungeonStore {
     });
 
     reaction(
-      () => this.currentInstance,
-      (instance) => {
-        if (instance) {
-          storage.set("currentInstanceId", instance.id);
+      () => this.currentInstance?.id,
+      (instanceId) => {
+        if (instanceId !== undefined) {
+          storage.set("currentInstanceId", instanceId);
+        } else {
+          storage.delete("currentInstanceId");
         }
       },
     );
 
     reaction(
-      () => this.currentLevel,
+      () => this.currentLevel?.level,
       (level) => {
-        if (level) {
-          storage.set("currentLevelNumber", level.level);
+        if (level !== undefined) {
+          storage.set("currentLevelNumber", level);
+        } else {
+          storage.delete("currentLevelNumber");
         }
       },
     );
@@ -145,6 +148,19 @@ export class DungeonStore {
               : undefined,
           }));
           storage.set("currentMap", stringify(serializedMap));
+        } else {
+          storage.delete("currentMap");
+        }
+      },
+    );
+
+    reaction(
+      () => this.currentMapDimensions,
+      (dimensions) => {
+        if (dimensions) {
+          storage.set("currentMapDimensions", stringify(dimensions));
+        } else {
+          storage.delete("currentMapDimensions");
         }
       },
     );
@@ -160,15 +176,8 @@ export class DungeonStore {
               y: position.y,
             }),
           );
-        }
-      },
-    );
-
-    reaction(
-      () => this.currentPosition,
-      (position) => {
-        if (position) {
-          storage.set("currentPosition", stringify(position));
+        } else {
+          storage.delete("currentPosition");
         }
       },
     );
@@ -550,13 +559,21 @@ export class DungeonStore {
   }
 
   get hasPersistedState(): boolean {
-    return !!(
+    const result = !!(
       this.currentInstance &&
       this.currentLevel &&
       this.currentMap &&
       this.currentMapDimensions &&
       this.currentPosition
     );
+    console.log("Checking hasPersistedState:", result, {
+      hasInstance: !!this.currentInstance,
+      hasLevel: !!this.currentLevel,
+      hasMap: !!this.currentMap,
+      hasDimensions: !!this.currentMapDimensions,
+      hasPosition: !!this.currentPosition,
+    });
+    return result;
   }
 
   public clearDungeonState() {
@@ -565,7 +582,9 @@ export class DungeonStore {
     this.currentMap = undefined;
     this.currentMapDimensions = undefined;
     this.currentPosition = undefined;
+    this.currentSpecialEncounter = null;
     this.inCombat = false;
+    this.inSpecialRoom = false;
     this.fightingBoss = false;
     this.logs = [];
 
@@ -574,6 +593,8 @@ export class DungeonStore {
     storage.delete("currentMap");
     storage.delete("currentMapDimensions");
     storage.delete("currentPosition");
+    storage.delete("currentSpecialEncounter");
+    storage.delete("inSpecialRoom");
     storage.delete("inCombat");
     storage.delete("fightingBoss");
     storage.delete("logs");

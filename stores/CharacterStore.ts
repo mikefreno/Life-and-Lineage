@@ -18,7 +18,7 @@ export class CharacterStore {
   constructor({ root }: { root: RootStore }) {
     this.root = root;
 
-    const { characters, independentChildren } = this.hydrateCharacters();
+    const { characters, independentChildren } = this.hydrateCharacters(root);
     this.characters = characters;
     this.independentChildren = independentChildren;
 
@@ -36,7 +36,7 @@ export class CharacterStore {
     });
 
     reaction(
-      () => [this.characters, this.independentChildren],
+      () => [this.characters.length, this.independentChildren.length],
       () => {
         this.saveCharacterIds();
       },
@@ -65,12 +65,26 @@ export class CharacterStore {
 
   addCharacter(character: Character) {
     this.characters.push(character);
-    this.saveCharacter(character);
+    this.characterSave(character);
   }
 
-  getCharacter(characterId: string) {
-    const found = this.characters.find((char) => char.id == characterId);
+  getCharacter(characterId: string): Character {
+    const found = this.characters.find((char) => char.id === characterId);
     if (!found) {
+      const stored = storage.getString(`character_${characterId}`);
+      if (stored) {
+        try {
+          const character = Character.fromJSON({
+            ...parse(stored),
+            root: this.root,
+          });
+          this.characters.push(character);
+          return character;
+        } catch (e) {
+          console.error("Error loading character from storage:", e);
+        }
+      }
+
       throw new Error(`Character not found! (${characterId})`);
     }
     return found;
@@ -126,7 +140,7 @@ export class CharacterStore {
     }
   }
 
-  private hydrateCharacters() {
+  private hydrateCharacters(root: RootStore) {
     const storedCharacterIds = storage.getString("characterIDs");
     const storedIndependentChildIds = storage.getString("independentChildIDs");
     const storedPlayerId = storage.getString("playerID");
@@ -140,16 +154,16 @@ export class CharacterStore {
       (parse(storedCharacterIds) as string[]).forEach((id) => {
         const retrieved = storage.getString(`character_${id}`);
         if (retrieved) {
-          const character = Character.fromJSON({
-            ...parse(retrieved),
-            root: this.root,
-          });
-          characters.push(character);
+          try {
+            const character = Character.fromJSON({ ...parse(retrieved), root });
+            characters.push(character);
+          } catch (e) {
+            console.error("Error hydrating character:", id, e);
+          }
         }
       });
     }
 
-    // Hydrate independent children
     if (storedIndependentChildIds) {
       (parse(storedIndependentChildIds) as string[]).forEach((id) => {
         const retrieved = storage.getString(`character_${id}`);
@@ -179,12 +193,19 @@ export class CharacterStore {
 
   private characterSave = async (character: Character) => {
     try {
-      storage.set(
-        `character_${character.id}`,
-        stringify({ ...character, root: null }),
-      );
-    } catch (e) {}
+      const key = `character_${character.id}`;
+      const data = stringify({ ...character, root: null });
+      storage.set(key, data);
+
+      const stored = storage.getString(key);
+      if (!stored) {
+        console.error("Failed to verify character save:", character.id);
+      }
+    } catch (e) {
+      console.error("Error saving character:", e);
+    }
   };
+
   public saveCharacter = throttle(this.characterSave, 250);
 
   private saveCharacterIds = () => {
@@ -201,11 +222,13 @@ export class CharacterStore {
     storage.delete("playerID");
 
     const allKeys = storage.getAllKeys();
-    allKeys.forEach((key) => {
-      if (key.startsWith("character_")) {
-        storage.delete(key);
-      }
-    });
+    if (allKeys) {
+      allKeys.forEach((key) => {
+        if (key.startsWith("character_")) {
+          storage.delete(key);
+        }
+      });
+    }
   }
 
   private clearPersistedCharacter(characterId: string) {

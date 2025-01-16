@@ -31,3 +31,42 @@ jest.mock("@react-native-community/netinfo", () => {
     }),
   };
 });
+
+jest.mock("expo-av", () => ({
+  Audio: {
+    Sound: {
+      createAsync: jest.fn().mockResolvedValue({
+        sound: {
+          playAsync: jest.fn(),
+          stopAsync: jest.fn(),
+          setVolumeAsync: jest.fn(),
+          getStatusAsync: jest
+            .fn()
+            .mockResolvedValue({ isLoaded: true, volume: 1 }),
+        },
+      }),
+    },
+    setAudioModeAsync: jest.fn(),
+  },
+}));
+
+jest.mock("./utility/functions/storage", () => ({
+  storage: {
+    getString: jest.fn(),
+    set: jest.fn(),
+    getAllKeys: jest.fn().mockReturnValue([]),
+    delete: jest.fn(),
+  },
+}));
+
+jest.mock("./hooks/generic", () => ({
+  AccelerationCurves: {
+    linear: "linear",
+  },
+}));
+
+jest.mock("./components/GenericRaisedButton", () => ({}));
+jest.mock("./components/DungeonComponents/DungeonMap", () => ({}));
+jest.mock("./components/Themed", () => ({}));
+jest.mock("./components/GenericStrikeAround", () => ({}));
+jest.mock("./components/AttackDetails", () => ({}));

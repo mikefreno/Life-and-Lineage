@@ -1,15 +1,16 @@
 import GenericModal from "../GenericModal";
 import GenericFlatButton from "../GenericFlatButton";
 import { ThemedView, Text } from "../Themed";
-import { rollD20, wait } from "../../utility/functions/misc";
+import { wait } from "../../utility/functions/misc";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useCombatActions, useEnemyManagement } from "../../hooks/combat";
 import { savePlayer } from "../../entities/character";
 import { observer } from "mobx-react-lite";
 import { useStyles } from "../../hooks/styles";
+import { calculateFleeChance, fleeRoll } from "../../utility/functions/dungeon";
 
 const FleeModal = observer(() => {
   const vibration = useVibration();
@@ -30,13 +31,12 @@ const FleeModal = observer(() => {
 
     try {
       enemyStore.setAttackAnimationOngoing(true);
-      const roll = rollD20();
 
       const canFlee =
         enemyStore.enemies.length === 0 ||
         enemyStore.enemies[0].creatureSpecies === "training dummy" ||
-        roll > 10 ||
-        !dungeonStore.inCombat;
+        !dungeonStore.inCombat ||
+        fleeRoll(playerState, dungeonStore);
 
       if (canFlee) {
         await handleSuccessfulFlee();
@@ -45,35 +45,40 @@ const FleeModal = observer(() => {
       }
     } catch (error) {
       console.error("Error during flee attempt:", error);
-      uiStore.setError("Failed to process flee attempt");
       enemyStore.setAttackAnimationOngoing(false);
     }
   };
 
   const handleSuccessfulFlee = async () => {
     try {
+      uiStore.setTotalLoadingSteps(4);
+      await wait(150);
+
       vibration({ style: "light" });
       dungeonStore.setFleeModalShowing(false);
 
-      await wait(250);
-      uiStore.setTotalLoadingSteps(3);
+      uiStore.incrementLoadingStep();
 
-      // Handle dungeon exit and player save in parallel
       await Promise.all([
         rootStore.leaveDungeon().then(() => uiStore.incrementLoadingStep()),
         savePlayer(playerState!).then(() => uiStore.incrementLoadingStep()),
       ]);
 
       if (dungeonStore.currentInstance?.name === "Activities") {
-        router.replace("/shops");
-        router.push("/Activities");
+        wait(100)
+          .then(() => router.replace("/shops"))
+          .then(() => router.push("/Activities"))
+          .then(() => wait(200))
+          .then(() => uiStore.incrementLoadingStep());
       } else {
-        router.replace("/dungeon");
+        wait(100)
+          .then(() => router.replace("/dungeon"))
+          .then(() => wait(200))
+          .then(() => uiStore.incrementLoadingStep());
       }
-
-      uiStore.incrementLoadingStep();
     } catch (error) {
       console.error("Error during successful flee:", error);
+      uiStore.completeLoading();
     }
   };
 
@@ -90,6 +95,14 @@ const FleeModal = observer(() => {
       console.error("Error during failed flee:", error);
     }
   };
+
+  const fleeChance = useMemo(() => {
+    if (!playerState || !dungeonStore.currentInstance) return 100;
+    return calculateFleeChance(
+      playerState.totalDexterity,
+      dungeonStore.currentInstance.difficulty,
+    );
+  }, [playerState?.totalDexterity, dungeonStore.currentInstance?.difficulty]);
 
   if (playerState) {
     return (
@@ -122,7 +135,9 @@ const FleeModal = observer(() => {
                 (enemyStore.attackAnimationsOnGoing || playerState.isStunned)
               }
             >
-              {enemyStore.enemies.length > 0 ? "Run! (50%)" : "Leave"}
+              {enemyStore.enemies.length > 0
+                ? `Run! (${Math.round(fleeChance)}%)`
+                : "Leave"}
             </GenericFlatButton>
             <GenericFlatButton
               onPress={() => {

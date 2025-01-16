@@ -1,231 +1,345 @@
 [
-   {
-      "name": "stab",
-      "energyCost": 5,
-      "targets": "single",
-      "hitChance": 1.0,
-      "damageMult": 1.0,
-      "debuffs": [{"name":"bleed", "chance":0.20}]
-   },
-   {
-      "name": "serrate",
-      "energyCost": 15,
-      "targets": "single",
-      "hitChance": 0.90,
-      "damageMult": 1.0,
-      "debuffs": [{"name":"hemmorage", "chance":0.25}]
-   },
-   {
-      "name": "bite",
-      "energyCost": 10,
-      "targets": "single",
-      "hitChance": 0.95,
-      "damageMult": 1.25
-   },
-   {
-      "name": "zombie bite",
-      "energyCost": 15,
-      "targets": "single",
-      "hitChance": 0.95,
-      "damageMult": 1.25,
-      "debuffs": [{"name":"diseased", "chance":0.05}]
-   },
-   {
-      "name": "vampiric bite",
-      "energyCost": 10,
-      "targets": "single",
-      "hitChance": 0.90,
-      "damageMult": 0.85,
-      "debuffs": [{"name":"lifesteal", "chance":0.65}]
-   },
-   { 
-      "name": "torch stab",
-      "energyCost": 5,
-      "targets": "single",
-      "hitChance": 0.95,
-      "damageMult": 0.85,
-      "debuffs": [{"name":"burn", "chance":0.75}]
-   },
-   {
-      "name": "cleave",
-      "energyCost": 10,
-      "targets": "dual",
-      "hitChance": 0.95,
-      "damageMult": 0.75,
-      "debuffs": [{"name":"bleed", "chance":0.35}]
-   },
-   {
-      "name": "rock throw",
-      "energyCost": 5,
-      "targets": "single",
-      "hitChance": 0.95,
-      "damageMult": 1.25,
-      "debuffs": [{"name":"stun", "chance":0.15}]
-   },
-   {
-      "name": "grab",
-      "energyCost": 20,
-      "targets": "single",
-      "hitChance": 0.75,
-      "damageMult": 1.0,
-      "debuffs": [{"name":"stun", "chance":0.35}]
-   },
-   {
-      "name": "tackle",
-      "energyCost": 20,
-      "targets": "single",
-      "hitChance": 0.75,
-      "damageMult": 0.25,
-      "debuffs": [{"name":"stun", "chance":0.4}]
-   },
-   {
-      "name": "bolder throw",
-      "energyCost": 25,
-      "targets": "aoe",
-      "hitChance": 0.85,
-      "damageMult": 1.5,
-      "debuffs": [{"name":"stun", "chance":0.25}]
-   },
-   {
-      "name": "pocket sand",
-      "energyCost": 5,
-      "targets": "single",
-      "hitChance": 0.90,
-      "damageMult": 0.0,
-      "debuffs": [{"name":"blind", "chance":0.75}]
-   },
-   {
-      "name": "poison spray",
-      "energyCost": 10,
-      "targets": "single",
-      "hitChance": 1.0,
-      "damageMult": 0.0,
-      "debuffs": [{"name":"poison", "chance":0.35}]
-   },
-   {
-      "name": "wail",
-      "energyCost": 20,
-      "targets": "aoe",
-      "hitChance": 0.85,
-      "damageMult": 0.0,
-      "flatSanityDamage": 5,
-      "debuffs": [{"name":"fear", "chance":0.50}]
-   },
-   {
-      "name": "shoot",
-      "energyCost": 15,
-      "targets": "single",
-      "hitChance": 0.75,
-      "damageMult": 1.75
-   },
-   {
-      "name": "head slam",
-      "energyCost": 10,
-      "targets": "single",
-      "hitChance": 0.95,
-      "damageMult": 1.0,
-      "debuffs": [{"name":"stun", "chance": 0.10}]
-   },
-   {
-      "name": "headbutt",
-      "energyCost": 10,
-      "targets": "single",
-      "hitChance": 0.85,
-      "damageMult": 1.0,
-      "debuffs": [{"name":"stun", "chance": 0.20}]
-   },
-   {
-      "name": "punch",
-      "energyCost": 5,
-      "targets": "single",
-      "hitChance": 0.95,
-      "damageMult": 1.0
-   },
-   {
-      "name": "call backup",
-      "energyCost": 30,
-      "summons": ["bandit"]
-   },
-   {
-      "name": "raise skeleton",
-      "energyCost": 35,
-      "summons": ["skeleton"]
-   },
-   {
-      "name": "teeth",
-      "energyCost": 15,
-      "targets": "dual",
-      "hitChance": 1.0,
-      "damageMult": 1.0,
-      "flatHealthDamage": 10
-   },
-   {
-      "name": "frenzy",
-      "energyCost": 10,
-      "buffs": ["frenzy"]
-   },
-   {
-      "name": "chug beer",
-      "energyCost": 10,
-      "buffs": ["frenzy"]
-   },
-   {
-      "name": "spark",
-      "energyCost": 25,
-      "targets": "single",
-      "hitChance":0.85,
-      "damageMult": 1.0,
-      "debuffs": [{"name": "stun", "chance": 0.5}]
-   },
-   {
-      "name": "bonk",
-      "energyCost": 5,
-      "targets": "single",
-      "hitChance": 1.0,
-      "damageMult": 0.25,
-      "debuffs": [{"name": "stun", "chance": 0.1}]
-   },
-   {
-      "name": "pluck eye",
-      "targets": "single",
-      "hitChance": 0.90,
-      "damageMult": 0.5,
-      "debuffs": [{"name": "blind", "chance": 0.9}]
-   },
-   {
-      "name": "scratch",
-      "targets": "single",
-      "hitChance": 0.95,
-      "damageMult": 1.0
-   },
-   {
-      "name": "fire bolt", 
-      "energyCost": 20,
-      "target": "single",
-      "hitChance": 1.0,
-      "damageMult": 1.5,
-      "debuffs": [{"name":"burn", "chance": 0.25}]
+  {
+    "name": "stab",
+    "energyCost": 5,
+    "targets": "single",
+    "hitChance": 1.0,
+    "damageMult": 1.0,
+    "debuffs": [
+      {
+        "name": "bleed",
+        "chance": 0.20
+      }
+    ]
   },
   {
-      "name": "frost",
-      "energyCost": 20,
-      "target": "single",
-      "hitChance": 1.0,
-      "damageMult": 1.0,
-      "debuffs": [{"name":"chill", "chance": 0.5}]
+    "name": "serrate",
+    "energyCost": 15,
+    "targets": "single",
+    "hitChance": 0.90,
+    "damageMult": 1.0,
+    "debuffs": [
+      {
+        "name": "hemmorage",
+        "chance": 0.25
+      }
+    ]
   },
   {
-      "name": "gust",
-      "energyCost": 10,
-      "target": "single",
-      "hitChance": 1.0,
-      "damageMult": 1.0
+    "name": "bite",
+    "energyCost": 10,
+    "targets": "single",
+    "hitChance": 0.95,
+    "damageMult": 1.25
   },
   {
-      "name": "rock toss",
-      "energyCost": 15,
-      "hitChance": 1.0,
-      "damageMult": 1.0, 
-      "debuffs": [{"name":"stun", "chance": 0.10}]
+    "name": "zombie bite",
+    "energyCost": 15,
+    "targets": "single",
+    "hitChance": 0.95,
+    "damageMult": 1.25,
+    "debuffs": [
+      {
+        "name": "diseased",
+        "chance": 0.05
+      }
+    ]
+  },
+  {
+    "name": "vampiric bite",
+    "energyCost": 10,
+    "targets": "single",
+    "hitChance": 0.90,
+    "damageMult": 0.85,
+    "debuffs": [
+      {
+        "name": "lifesteal",
+        "chance": 0.65
+      }
+    ]
+  },
+  {
+    "name": "torch stab",
+    "energyCost": 5,
+    "targets": "single",
+    "hitChance": 0.95,
+    "damageMult": 0.85,
+    "debuffs": [
+      {
+        "name": "burn",
+        "chance": 0.75
+      }
+    ]
+  },
+  {
+    "name": "cleave",
+    "energyCost": 10,
+    "targets": "dual",
+    "hitChance": 0.95,
+    "damageMult": 0.75,
+    "debuffs": [
+      {
+        "name": "bleed",
+        "chance": 0.35
+      }
+    ]
+  },
+  {
+    "name": "rock throw",
+    "energyCost": 5,
+    "targets": "single",
+    "hitChance": 0.95,
+    "damageMult": 1.25,
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.15
+      }
+    ]
+  },
+  {
+    "name": "grab",
+    "energyCost": 20,
+    "targets": "single",
+    "hitChance": 0.75,
+    "damageMult": 1.0,
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.35
+      }
+    ]
+  },
+  {
+    "name": "tackle",
+    "energyCost": 20,
+    "targets": "single",
+    "hitChance": 0.75,
+    "damageMult": 0.25,
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.4
+      }
+    ]
+  },
+  {
+    "name": "bolder throw",
+    "energyCost": 25,
+    "targets": "aoe",
+    "hitChance": 0.85,
+    "damageMult": 1.5,
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.25
+      }
+    ]
+  },
+  {
+    "name": "pocket sand",
+    "energyCost": 5,
+    "targets": "single",
+    "hitChance": 0.90,
+    "damageMult": 0.0,
+    "debuffs": [
+      {
+        "name": "blind",
+        "chance": 0.75
+      }
+    ]
+  },
+  {
+    "name": "poison spray",
+    "energyCost": 10,
+    "targets": "single",
+    "hitChance": 1.0,
+    "damageMult": 0.0,
+    "debuffs": [
+      {
+        "name": "poison",
+        "chance": 0.35
+      }
+    ]
+  },
+  {
+    "name": "wail",
+    "energyCost": 20,
+    "targets": "aoe",
+    "hitChance": 0.85,
+    "damageMult": 0.0,
+    "flatSanityDamage": 5,
+    "debuffs": [
+      {
+        "name": "fear",
+        "chance": 0.50
+      }
+    ]
+  },
+  {
+    "name": "shoot",
+    "energyCost": 15,
+    "targets": "single",
+    "hitChance": 0.75,
+    "damageMult": 1.75
+  },
+  {
+    "name": "head slam",
+    "energyCost": 10,
+    "targets": "single",
+    "hitChance": 0.95,
+    "damageMult": 1.0,
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.10
+      }
+    ]
+  },
+  {
+    "name": "headbutt",
+    "energyCost": 10,
+    "targets": "single",
+    "hitChance": 0.85,
+    "damageMult": 1.0,
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.20
+      }
+    ]
+  },
+  {
+    "name": "punch",
+    "energyCost": 5,
+    "targets": "single",
+    "hitChance": 0.95,
+    "damageMult": 1.0
+  },
+  {
+    "name": "call backup",
+    "energyCost": 30,
+    "summons": [
+      "bandit"
+    ]
+  },
+  {
+    "name": "raise skeleton",
+    "energyCost": 35,
+    "summons": [
+      "skeleton"
+    ]
+  },
+  {
+    "name": "teeth",
+    "energyCost": 15,
+    "targets": "dual",
+    "hitChance": 1.0,
+    "damageMult": 1.0,
+    "flatHealthDamage": 10
+  },
+  {
+    "name": "frenzy",
+    "energyCost": 10,
+    "buffs": [
+      "frenzy"
+    ]
+  },
+  {
+    "name": "chug beer",
+    "energyCost": 10,
+    "buffs": [
+      "frenzy"
+    ]
+  },
+  {
+    "name": "spark",
+    "energyCost": 25,
+    "targets": "single",
+    "hitChance": 0.85,
+    "damageMult": 1.0,
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "name": "bonk",
+    "energyCost": 5,
+    "targets": "single",
+    "hitChance": 1.0,
+    "damageMult": 0.25,
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.1
+      }
+    ]
+  },
+  {
+    "name": "pluck eye",
+    "targets": "single",
+    "hitChance": 0.90,
+    "damageMult": 0.5,
+    "debuffs": [
+      {
+        "name": "blind",
+        "chance": 0.9
+      }
+    ]
+  },
+  {
+    "name": "scratch",
+    "targets": "single",
+    "hitChance": 0.95,
+    "damageMult": 1.0
+  },
+  {
+    "name": "fire bolt",
+    "energyCost": 20,
+    "target": "single",
+    "hitChance": 1.0,
+    "damageMult": 1.5,
+    "debuffs": [
+      {
+        "name": "burn",
+        "chance": 0.25
+      }
+    ]
+  },
+  {
+    "name": "frost",
+    "energyCost": 20,
+    "target": "single",
+    "hitChance": 1.0,
+    "damageMult": 1.0,
+    "debuffs": [
+      {
+        "name": "chill",
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "name": "gust",
+    "energyCost": 10,
+    "target": "single",
+    "hitChance": 1.0,
+    "damageMult": 1.0
+  },
+  {
+    "name": "rock toss",
+    "energyCost": 15,
+    "hitChance": 1.0,
+    "damageMult": 1.0,
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.10
+      }
+    ]
   }
 ]
+

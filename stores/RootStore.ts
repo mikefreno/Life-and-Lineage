@@ -115,11 +115,11 @@ export class RootStore {
   }
 
   async newGame(newPlayer: PlayerCharacter) {
-    const starterBook = getStartingBook(newPlayer);
-    newPlayer.addToInventory(starterBook);
-
     this.enemyStore.clearEnemyList();
     this.dungeonStore.resetForNewGame();
+
+    const starterBook = getStartingBook(newPlayer);
+    newPlayer.addToInventory(starterBook);
 
     this.playerState = newPlayer;
     this.shopsStore.setShops(this.shopsStore.getInitShopsState());

@@ -123,10 +123,7 @@ describe("PlayerCharacter", () => {
         slot: "one-hand",
         baseValue: 10,
         itemClass: ItemClassType.Melee,
-<<<<<<< HEAD
         stats: {},
-=======
->>>>>>> parent of cb574f9 (dungeon work (specialEncounters))
         root: mockRootStore,
       });
     });

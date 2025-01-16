@@ -12,7 +12,7 @@ import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { rarityColors } from "../../constants/Colors";
 import { Rarity } from "../../utility/types";
-import { flex, useStyles } from "../../hooks/styles";
+import { flex, tw, tw_base, useStyles } from "../../hooks/styles";
 
 export default function DroppedItemsModal() {
   const { playerState, dungeonStore, uiStore } = useRootStore();
@@ -133,71 +133,71 @@ export default function DroppedItemsModal() {
         >
           Inventory is full!
         </Text>
-        {droppedItems?.itemDrops.map((item) => (
-          <View
-            key={item.id}
-            style={[
-              styles.droppedItemRow,
-              {
-                backgroundColor:
-                  uiStore.colorScheme === "dark"
-                    ? rarityColors[item.rarity].background.dark
-                    : rarityColors[item.rarity].background.light,
-              },
-            ]}
-          >
+        <View style={styles.mb2}>
+          {droppedItems?.itemDrops.map((item) => (
             <View
-              style={{
-                ...flex.rowCenter,
-                alignItems: "center",
-              }}
-            >
-              <Image source={item.getItemIcon()} />
-              {item.rarity !== Rarity.NORMAL && (
-                <View
-                  style={{
-                    ...styles.itemRarityDot,
-                    backgroundColor: rarityColors[item.rarity].background.light,
-                  }}
-                />
-              )}
-            </View>
-            <Text
+              key={item.id}
               style={[
-                styles.itemNameText,
+                styles.droppedItemRow,
                 {
-                  color: rarityColors[item.rarity].text ?? "white",
+                  backgroundColor:
+                    uiStore.colorScheme === "dark"
+                      ? rarityColors[item.rarity].background.dark
+                      : rarityColors[item.rarity].background.light,
                 },
               ]}
             >
-              {toTitleCase(item.name)}
-            </Text>
-            <GenericFlatButton
-              onPress={() => {
-                vibration({ style: "light" });
-                takeItem(item);
-              }}
-            >
-              <Text>Take</Text>
-            </GenericFlatButton>
-          </View>
-        ))}
+              <View
+                style={{
+                  ...flex.rowCenter,
+                  alignItems: "center",
+                }}
+              >
+                <Image source={item.getItemIcon()} />
+                {item.rarity !== Rarity.NORMAL && (
+                  <View
+                    style={{
+                      ...styles.itemRarityDot,
+                      backgroundColor:
+                        rarityColors[item.rarity].background.light,
+                    }}
+                  />
+                )}
+              </View>
+              <Text
+                style={[
+                  styles.itemNameText,
+                  {
+                    color: rarityColors[item.rarity].text ?? "white",
+                  },
+                ]}
+              >
+                {toTitleCase(item.name)}
+              </Text>
+              <GenericFlatButton
+                onPress={() => {
+                  vibration({ style: "light" });
+                  takeItem(item);
+                }}
+              >
+                <Text>Take</Text>
+              </GenericFlatButton>
+            </View>
+          ))}
+        </View>
         {droppedItems && droppedItems.itemDrops.length > 0 ? (
-          <Pressable
-            style={[styles.flatButtonContainer, { marginTop: 16 }]}
+          <GenericFlatButton
+            style={tw.my2}
             onPress={() => {
               takeAllItems();
             }}
           >
             <Text>Take All</Text>
-          </Pressable>
+          </GenericFlatButton>
         ) : null}
-        <Pressable
-          style={[styles.flatButtonContainer, { marginVertical: 16 }]}
-          onPress={doneLooting}
-        >
+        <GenericFlatButton style={tw.my2} onPress={doneLooting}>
           <Text>Done Looting</Text>
-        </Pressable>
+        </GenericFlatButton>
       </>
     </GenericModal>
   );

@@ -42,6 +42,7 @@ import { AttackUse } from "../utility/types";
 import { ThreatTable } from "./threatTable";
 import EnemyStore from "../stores/EnemyStore";
 import { EnemyImageKeyOption } from "../utility/enemyHelpers";
+import { RootStore } from "../stores/RootStore";
 
 type CreatureType = {
   id?: string;
@@ -58,7 +59,7 @@ type CreatureType = {
   energyRegen?: number;
   attackStrings?: string[];
   conditions?: Condition[];
-  enemyStore?: EnemyStore;
+  root?: RootStore;
   sprite?: EnemyImageKeyOption | null; // null for minions;
   basePhysicalDamage?: number;
   baseFireDamage?: number;
@@ -136,7 +137,6 @@ export class Creature {
   attackStrings: string[];
   conditions: Condition[];
   threatTable: ThreatTable = new ThreatTable();
-  enemyStore: EnemyStore | undefined;
   sprite: EnemyImageKeyOption | null;
 
   basePhysicalDamage: number;
@@ -149,6 +149,8 @@ export class Creature {
   baseColdResistance: number;
   baseLightningResistance: number;
   basePoisonResistance: number;
+
+  root: RootStore | undefined;
 
   constructor({
     id,
@@ -165,7 +167,7 @@ export class Creature {
     energyRegen,
     attackStrings,
     conditions,
-    enemyStore,
+    root,
     sprite,
     basePhysicalDamage,
     baseFireDamage,
@@ -192,7 +194,7 @@ export class Creature {
     this.energyRegen = energyRegen ?? 0; // Initialize ManaRegen to 0 if not provided
     this.attackStrings = attackStrings ?? [];
     this.conditions = conditions ?? []; // Initialize conditions to an empty array if not provided
-    this.enemyStore = enemyStore;
+    this.root = root;
     this.sprite = sprite;
 
     this.basePhysicalDamage = basePhysicalDamage ?? 0;
@@ -751,7 +753,6 @@ export class Enemy extends Creature {
       storyDrops: observable,
       addMinion: action,
       removeMinion: action,
-      hydrationLinking: action,
       getDrops: action,
       currentPhase: observable,
     });
@@ -764,8 +765,8 @@ export class Enemy extends Creature {
         this.currentEnergy,
       ],
       () => {
-        if (this.enemyStore) {
-          this.enemyStore.saveEnemy(this);
+        if (this.root) {
+          this.root.enemyStore.saveEnemy(this);
         }
       },
     );
@@ -969,7 +970,7 @@ export class Enemy extends Creature {
       attackStrings: minionObj.attackStrings,
       turnsLeftAlive: minionObj.turns,
       beingType: minionObj.beingType as BeingType,
-      enemyStore: this.enemyStore,
+      root: this.root,
       parent: this,
     });
     this.addMinion(minion);
@@ -998,24 +999,13 @@ export class Enemy extends Creature {
     this.minions = newList;
   }
 
-  public hydrationLinking() {
-    this.reinstateMinionParent();
-    this.reinstateConditionParent();
-  }
-  private reinstateMinionParent() {
-    this.minions.forEach((minion) => minion.reinstateParent(this));
-  }
-  private reinstateConditionParent() {
-    this.conditions.forEach((cond) => cond.reinstateParent(this));
-  }
-
   /**
    * Creates an enemy from a JSON object.
    * @param json - The JSON object representing the enemy.
    * @returns The created enemy.
    */
   public static fromJSON(json: any): Enemy {
-    const enemy = new Enemy({
+    return new Enemy({
       id: json.id,
       beingType: json.beingType,
       creatureSpecies: json.creatureSpecies,
@@ -1034,7 +1024,6 @@ export class Enemy extends Creature {
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],
-      enemyStore: json.enemyStore,
       sprite: json.sprite,
       drops: json.drops,
       storyDrops: json.storyDrops,
@@ -1049,9 +1038,8 @@ export class Enemy extends Creature {
       baseLightningResistance: json.baseLightningResistance,
       basePoisonResistance: json.basePoisonResistance,
       phases: json.phases || [],
+      root: json.root,
     });
-    enemy.hydrationLinking();
-    return enemy;
   }
 }
 

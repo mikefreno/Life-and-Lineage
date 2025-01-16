@@ -73,6 +73,7 @@ export default class UIStore {
     audio: false,
     ambient: false,
     fonts: false,
+    routing: false,
   };
 
   constructor({ root }: { root: RootStore }) {
@@ -247,7 +248,11 @@ export default class UIStore {
   startTipCycle() {
     const cycleTips = () => {
       if (!this.progressIncrementing) return;
-      this.currentTipIndex = (this.currentTipIndex + 1) % LOADING_TIPS.length;
+      runInAction(
+        () =>
+          (this.currentTipIndex =
+            (this.currentTipIndex + 1) % LOADING_TIPS.length),
+      );
       setTimeout(cycleTips, 3000);
     };
     setTimeout(cycleTips, 3000);
@@ -262,7 +267,12 @@ export default class UIStore {
     this.completedLoadingSteps = 0;
     this.totalLoadingSteps = steps;
     this.progressIncrementing = true;
-    this.currentTipIndex = Math.floor(Math.random() * LOADING_TIPS.length);
+    runInAction(
+      () =>
+        (this.currentTipIndex = Math.floor(
+          Math.random() * LOADING_TIPS.length,
+        )),
+    );
     this.startProgressAnimation();
     this.startTipCycle();
   }

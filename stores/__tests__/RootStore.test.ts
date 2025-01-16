@@ -13,6 +13,24 @@ jest.mock("expo-sqlite", () => ({
   }),
 }));
 
+jest.mock("../SaveStore", () => ({
+  SaveStore: jest.fn().mockImplementation(() => ({
+    initializeDatabase: jest.fn().mockResolvedValue(undefined),
+    loadGame: jest.fn().mockResolvedValue(undefined),
+    saveGame: jest.fn().mockResolvedValue(undefined),
+    createNewGame: jest.fn().mockResolvedValue(undefined),
+  })),
+}));
+
+jest.mock("../CharacterStore", () => ({
+  CharacterStore: jest.fn().mockImplementation(() => ({
+    characterSave: jest.fn().mockResolvedValue(undefined),
+    clearPersistedCharacters: jest.fn(),
+    clearCharacters: jest.fn(),
+    addCharacter: jest.fn(),
+  })),
+}));
+
 describe("RootStore", () => {
   let rootStore: RootStore;
 
