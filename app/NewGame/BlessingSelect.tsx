@@ -1,9 +1,9 @@
 import React from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { Text } from "../../components/Themed";
 import { useState } from "react";
 import { router } from "expo-router";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import TutorialModal from "../../components/TutorialModal";
 import { DescriptionMap } from "../../utility/descriptions";
 import {
@@ -30,7 +30,7 @@ export default function SetBlessing() {
 
   const isFocused = useIsFocused();
   const vibration = useVibration();
-  const { uiStore, tutorialStore, playerState } = useRootStore();
+  const { uiStore, tutorialStore, playerState, audioStore } = useRootStore();
   const { dimensions, colorScheme } = uiStore;
   const isDark = colorScheme === "dark";
   const styles = useStyles();
@@ -58,75 +58,106 @@ export default function SetBlessing() {
         }}
       />
 
-      <View style={styles.newGameContainer}>
-        <Text
-          style={{
-            ...styles.newGameHeader,
-            maxWidth: dimensions.width * 0.75,
-          }}
-          accessibilityRole="header"
-        >
-          With What Blessing Was Your
-          <Text style={{ color: playerClassColors[classSelection] }}>
-            {` ${toTitleCase(classSelection)} `}
+      <ScrollView>
+        <View style={styles.newGameContainer}>
+          <Text
+            style={{
+              ...styles.newGameHeader,
+              maxWidth: dimensions.width * 0.75,
+            }}
+            accessibilityRole="header"
+          >
+            With What Blessing Was Your
+            <Text style={{ color: playerClassColors[classSelection] }}>
+              {` ${toTitleCase(classSelection)} `}
+            </Text>
+            Born?
           </Text>
-          Born?
-        </Text>
 
-        <ClassDependantBlessings
-          playerClass={classSelection}
-          vibration={vibration}
-          blessing={blessingSelection}
-          setBlessing={setBlessingSelection}
-          colorScheme={colorScheme}
-          dimensions={dimensions}
-        />
+          <ClassDependantBlessings
+            playerClass={classSelection}
+            vibration={vibration}
+            blessing={blessingSelection}
+            setBlessing={setBlessingSelection}
+            colorScheme={colorScheme}
+            dimensions={dimensions}
+          />
 
-        <Text
-          style={{
-            textAlign: "center",
-            paddingHorizontal: 16,
-            paddingTop: 16,
-            ...text.lg,
-          }}
-        >
-          {DescriptionMap[blessingSelection as Element]}
-        </Text>
+          <Text
+            style={{
+              textAlign: "center",
+              paddingHorizontal: 16,
+              paddingTop: 16,
+              ...text.lg,
+            }}
+          >
+            {DescriptionMap[blessingSelection as Element]}
+          </Text>
 
-        <View
-          style={{ marginHorizontal: "auto", height: 128, paddingVertical: 8 }}
-        >
-          <FadeSlide show={blessingSelection == 0 || !!blessingSelection}>
-            {({ showing }) => (
-              <GenericFlatButton
-                onPress={() => router.push("/NewGame/SexSelect")}
-                accessibilityRole="link"
-                accessibilityLabel="Next"
-                disabled={!showing}
-              >
-                <Text>Next</Text>
-              </GenericFlatButton>
-            )}
-          </FadeSlide>
+          <View
+            style={{
+              marginHorizontal: "auto",
+              height: 128,
+              paddingVertical: 8,
+            }}
+          >
+            <FadeSlide show={blessingSelection == 0 || !!blessingSelection}>
+              {({ showing }) => (
+                <GenericFlatButton
+                  onPress={() => router.push("/NewGame/SexSelect")}
+                  accessibilityRole="link"
+                  accessibilityLabel="Next"
+                  disabled={!showing}
+                >
+                  <Text>Next</Text>
+                </GenericFlatButton>
+              )}
+            </FadeSlide>
+          </View>
         </View>
-      </View>
 
-      {(tutorialStore.tutorialsEnabled || !playerState) && (
-        <View style={{ position: "absolute", marginLeft: 16, marginTop: 16 }}>
+        {(tutorialStore.tutorialsEnabled || !playerState) && (
+          <View style={{ position: "absolute", marginLeft: 16, marginTop: 16 }}>
+            <Pressable
+              style={{ position: "absolute" }}
+              onPress={() => setForceShowTutorial(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Show Tutorial"
+            >
+              <FontAwesome5
+                name="question-circle"
+                size={32}
+                color={isDark ? "#fafafa" : "#27272a"}
+              />
+            </Pressable>
+          </View>
+        )}
+        <View
+          style={{ position: "absolute", zIndex: 10, marginTop: 16, right: 16 }}
+        >
           <Pressable
-            style={{ position: "absolute" }}
-            onPress={() => setForceShowTutorial(true)}
+            onPress={() => {
+              audioStore.setMuteValue(!audioStore.muted);
+            }}
             accessibilityRole="button"
             accessibilityLabel="Show Tutorial"
           >
-            <FontAwesome5
-              name="question-circle"
-              size={32}
-              color={isDark ? "#fafafa" : "#27272a"}
-            />
+            {audioStore.muted ? (
+              <MaterialIcons
+                name="music-off"
+                size={32}
+                color={isDark ? "#fafafa" : "#27272a"}
+              />
+            ) : (
+              <MaterialIcons
+                name="music-note"
+                size={32}
+                color={isDark ? "#fafafa" : "#27272a"}
+              />
+            )}
           </Pressable>
         </View>
-      )}
+      </ScrollView>
     </>
   );
 }

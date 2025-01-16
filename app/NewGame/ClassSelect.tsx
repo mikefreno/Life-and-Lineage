@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
 import { useLayoutEffect, useState } from "react";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
@@ -26,7 +26,8 @@ import { text, useStyles } from "../../hooks/styles";
 
 const SetClassScreen = observer(() => {
   const vibration = useVibration();
-  const { classSelection, setClassSelection } = useNewGameStore();
+  const { classSelection, setClassSelection, setBlessingSelection } =
+    useNewGameStore();
   const router = useRouter();
   const { uiStore, playerState, tutorialStore, audioStore } = useRootStore();
   const { height, width } = uiStore.dimensions;
@@ -98,269 +99,287 @@ const SetClassScreen = observer(() => {
         </ThemedView>
       </GenericModal>
 
-      <View style={styles.newGameContainer}>
-        <Text
-          style={{
-            ...styles.bold,
-            ...styles["3xl"],
-            textAlign: "center",
-          }}
-          accessibilityRole="header"
-        >
-          Create a Character
-        </Text>
-        <Text style={styles.newGameHeader}>Select Class</Text>
-
-        <View
-          style={{
-            flexDirection: "row",
-            width: "100%",
-            justifyContent: "space-evenly",
-          }}
-        >
-          <Pressable
+      <ScrollView>
+        <View style={styles.newGameContainer}>
+          <Text
             style={{
-              marginLeft: -8,
-              height: height * 0.25,
-              width: width * 0.45,
+              ...styles.bold,
+              ...styles["3xl"],
+              textAlign: "center",
             }}
-            onPress={() => {
-              vibration({ style: "light" });
-              setClassSelection(PlayerClassOptions.mage);
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Select Mage"
+            accessibilityRole="header"
           >
-            {({ pressed }) => (
-              <View
-                style={[
-                  styles.border,
-                  {
-                    width: "100%",
-                    height: "100%",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  },
-                  pressed || classSelection == PlayerClassOptions.mage
-                    ? [
-                        {
-                          borderRadius: 8,
-                          borderColor: isDark ? "#fafafa" : "#27272a",
-                        },
-                      ]
-                    : { borderColor: "transparent" },
-                ]}
-              >
-                <WizardHat
-                  style={{ marginBottom: 5 }}
-                  color={isDark ? "#2563eb" : "#1e40af"}
-                  height={height * 0.15}
-                  width={height * 0.15}
-                />
-                <Text
-                  style={{
-                    textAlign: "center",
-                    color: "#2563eb",
-                    ...styles.xl,
-                  }}
+            Create a Character
+          </Text>
+          <Text style={styles.newGameHeader}>Select Class</Text>
+
+          <View
+            style={{
+              flexDirection: "row",
+              width: "100%",
+              justifyContent: "space-evenly",
+            }}
+          >
+            <Pressable
+              style={{
+                marginLeft: -8,
+                height: height * 0.25,
+                width: width * 0.45,
+              }}
+              onPress={() => {
+                vibration({ style: "light" });
+                if (classSelection !== PlayerClassOptions.mage) {
+                  setClassSelection(PlayerClassOptions.mage);
+                  setBlessingSelection(undefined);
+                }
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Select Mage"
+            >
+              {({ pressed }) => (
+                <View
+                  style={[
+                    styles.border,
+                    {
+                      width: "100%",
+                      height: "100%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    },
+                    pressed || classSelection == PlayerClassOptions.mage
+                      ? [
+                          {
+                            borderRadius: 8,
+                            borderColor: isDark ? "#fafafa" : "#27272a",
+                          },
+                        ]
+                      : { borderColor: "transparent" },
+                  ]}
                 >
-                  Mage
-                </Text>
-              </View>
-            )}
-          </Pressable>
-
-          <Pressable
-            style={{
-              marginRight: -8,
-              height: height * 0.25,
-              width: width * 0.45,
-            }}
-            onPress={() => {
-              vibration({ style: "light" });
-              setClassSelection(PlayerClassOptions.ranger);
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Select Ranger"
-          >
-            {({ pressed }) => (
-              <View
-                style={[
-                  styles.border,
-                  {
-                    width: "100%",
-                    height: "100%",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  },
-                  pressed || classSelection == PlayerClassOptions.ranger
-                    ? [
-                        {
-                          borderRadius: 8,
-                          borderColor: isDark ? "#fafafa" : "#27272a",
-                        },
-                      ]
-                    : { borderColor: "transparent" },
-                ]}
-              >
-                <View style={{ transform: [{ rotate: "12deg" }] }}>
-                  <RangerIcon
+                  <WizardHat
                     style={{ marginBottom: 5 }}
+                    color={isDark ? "#2563eb" : "#1e40af"}
                     height={height * 0.15}
                     width={height * 0.15}
                   />
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      color: "#2563eb",
+                      ...styles.xl,
+                    }}
+                  >
+                    Mage
+                  </Text>
                 </View>
-                <Text
-                  style={{ textAlign: "center", color: "green", ...styles.xl }}
-                >
-                  Ranger
-                </Text>
-              </View>
-            )}
-          </Pressable>
-        </View>
+              )}
+            </Pressable>
 
-        <View
-          style={{
-            flexDirection: "row",
-            width: "100%",
-            justifyContent: "space-evenly",
-          }}
-        >
-          <Pressable
-            style={{
-              marginLeft: -8,
-              height: height * 0.25,
-              width: width * 0.45,
-            }}
-            onPress={() => {
-              vibration({ style: "light" });
-              setClassSelection(PlayerClassOptions.necromancer);
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Select Necromancer"
-          >
-            {({ pressed }) => (
-              <View
-                style={[
-                  styles.border,
-                  {
-                    width: "100%",
-                    height: "100%",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  },
-                  pressed || classSelection == PlayerClassOptions.necromancer
-                    ? [
-                        {
-                          borderRadius: 8,
-                          borderColor: isDark ? "#fafafa" : "#27272a",
-                        },
-                      ]
-                    : { borderColor: "transparent" },
-                ]}
-              >
-                <View style={{ transform: [{ rotate: "-12deg" }] }}>
-                  <NecromancerSkull
-                    style={{ marginBottom: 5 }}
-                    color={isDark ? "#9333ea" : "#6b21a8"}
-                    height={height * 0.15}
-                    width={height * 0.15}
-                  />
-                </View>
-                <Text
-                  style={{
-                    textAlign: "center",
-                    color: "#9333ea",
-                    ...styles.xl,
-                  }}
+            <Pressable
+              style={{
+                marginRight: -8,
+                height: height * 0.25,
+                width: width * 0.45,
+              }}
+              onPress={() => {
+                vibration({ style: "light" });
+                if (classSelection !== PlayerClassOptions.ranger) {
+                  setClassSelection(PlayerClassOptions.ranger);
+                  setBlessingSelection(undefined);
+                }
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Select Ranger"
+            >
+              {({ pressed }) => (
+                <View
+                  style={[
+                    styles.border,
+                    {
+                      width: "100%",
+                      height: "100%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    },
+                    pressed || classSelection == PlayerClassOptions.ranger
+                      ? [
+                          {
+                            borderRadius: 8,
+                            borderColor: isDark ? "#fafafa" : "#27272a",
+                          },
+                        ]
+                      : { borderColor: "transparent" },
+                  ]}
                 >
-                  Necromancer
-                </Text>
-              </View>
-            )}
-          </Pressable>
-
-          <Pressable
-            style={{
-              marginRight: -8,
-              height: height * 0.25,
-              width: width * 0.45,
-            }}
-            onPress={() => {
-              vibration({ style: "light" });
-              setClassSelection(PlayerClassOptions.paladin);
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Select Paladin"
-          >
-            {({ pressed }) => (
-              <View
-                style={[
-                  styles.border,
-                  {
-                    width: "100%",
-                    height: "100%",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  },
-                  pressed || classSelection == PlayerClassOptions.paladin
-                    ? [
-                        {
-                          borderRadius: 8,
-                          borderColor: isDark ? "#fafafa" : "#27272a",
-                        },
-                      ]
-                    : { borderColor: "transparent" },
-                ]}
-              >
-                <View style={{ transform: [{ rotate: "12deg" }] }}>
-                  <View style={{ transform: [{ scaleX: -1 }] }}>
-                    <PaladinHammer
+                  <View style={{ transform: [{ rotate: "12deg" }] }}>
+                    <RangerIcon
+                      style={{ marginBottom: 5 }}
                       height={height * 0.15}
                       width={height * 0.15}
                     />
                   </View>
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      color: "green",
+                      ...styles.xl,
+                    }}
+                  >
+                    Ranger
+                  </Text>
                 </View>
-                <Text
-                  style={{
-                    textAlign: "center",
-                    color: "#fcd34d",
-                    ...styles.xl,
-                  }}
+              )}
+            </Pressable>
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              width: "100%",
+              justifyContent: "space-evenly",
+            }}
+          >
+            <Pressable
+              style={{
+                marginLeft: -8,
+                height: height * 0.25,
+                width: width * 0.45,
+              }}
+              onPress={() => {
+                vibration({ style: "light" });
+                if (classSelection !== PlayerClassOptions.necromancer) {
+                  setClassSelection(PlayerClassOptions.necromancer);
+                  setBlessingSelection(undefined);
+                }
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Select Necromancer"
+            >
+              {({ pressed }) => (
+                <View
+                  style={[
+                    styles.border,
+                    {
+                      width: "100%",
+                      height: "100%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    },
+                    pressed || classSelection == PlayerClassOptions.necromancer
+                      ? [
+                          {
+                            borderRadius: 8,
+                            borderColor: isDark ? "#fafafa" : "#27272a",
+                          },
+                        ]
+                      : { borderColor: "transparent" },
+                  ]}
                 >
-                  Paladin
-                </Text>
-              </View>
-            )}
-          </Pressable>
-        </View>
+                  <View style={{ transform: [{ rotate: "-12deg" }] }}>
+                    <NecromancerSkull
+                      style={{ marginBottom: 5 }}
+                      color={isDark ? "#9333ea" : "#6b21a8"}
+                      height={height * 0.15}
+                      width={height * 0.15}
+                    />
+                  </View>
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      color: "#9333ea",
+                      ...styles.xl,
+                    }}
+                  >
+                    Necromancer
+                  </Text>
+                </View>
+              )}
+            </Pressable>
 
-        <Text style={styles.classDescriptionText}>
-          {classSelection && ClassDescriptionMap[classSelection]}
-        </Text>
+            <Pressable
+              style={{
+                marginRight: -8,
+                height: height * 0.25,
+                width: width * 0.45,
+              }}
+              onPress={() => {
+                vibration({ style: "light" });
+                if (classSelection !== PlayerClassOptions.paladin) {
+                  setClassSelection(PlayerClassOptions.paladin);
+                  setBlessingSelection(undefined);
+                }
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Select Paladin"
+            >
+              {({ pressed }) => (
+                <View
+                  style={[
+                    styles.border,
+                    {
+                      width: "100%",
+                      height: "100%",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    },
+                    pressed || classSelection == PlayerClassOptions.paladin
+                      ? [
+                          {
+                            borderRadius: 8,
+                            borderColor: isDark ? "#fafafa" : "#27272a",
+                          },
+                        ]
+                      : { borderColor: "transparent" },
+                  ]}
+                >
+                  <View style={{ transform: [{ rotate: "12deg" }] }}>
+                    <View style={{ transform: [{ scaleX: -1 }] }}>
+                      <PaladinHammer
+                        height={height * 0.15}
+                        width={height * 0.15}
+                      />
+                    </View>
+                  </View>
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      color: "#fcd34d",
+                      ...styles.xl,
+                    }}
+                  >
+                    Paladin
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+          </View>
 
-        <View
-          style={{
-            marginHorizontal: "auto",
-            paddingTop: 16,
-            paddingBottom: height * 0.1,
-          }}
-        >
-          <FadeSlide show={!!classSelection}>
-            {({ showing }) => (
-              <GenericFlatButton
-                disabled={!showing}
-                onPress={() => router.push("/NewGame/BlessingSelect")}
-                accessibilityRole="link"
-                accessibilityLabel="Next"
-              >
-                <Text>Next</Text>
-              </GenericFlatButton>
-            )}
-          </FadeSlide>
+          <Text style={styles.classDescriptionText}>
+            {classSelection && ClassDescriptionMap[classSelection]}
+          </Text>
+
+          <View
+            style={{
+              marginHorizontal: "auto",
+              paddingTop: 16,
+              paddingBottom: height * 0.1,
+            }}
+          >
+            <FadeSlide show={!!classSelection}>
+              {({ showing }) => (
+                <GenericFlatButton
+                  disabled={!showing}
+                  onPress={() => router.push("/NewGame/BlessingSelect")}
+                  accessibilityRole="link"
+                  accessibilityLabel="Next"
+                >
+                  <Text>Next</Text>
+                </GenericFlatButton>
+              )}
+            </FadeSlide>
+          </View>
         </View>
-      </View>
+      </ScrollView>
 
       {(tutorialStore.tutorialsEnabled || !playerState) && (
         <View style={styles.tutorialButtonContainer}>

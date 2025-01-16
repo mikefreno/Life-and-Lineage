@@ -159,16 +159,19 @@ const TutorialModal = observer(
               style={{
                 textAlign: "center",
                 flex: 1,
-                paddingHorizontal: 10,
                 ...text["2xl"],
               }}
             >
               {page.title}
             </Text>
           )}
-          <Text style={{ width: tw_base[6] }}>
-            {tutorialStep}/{pageThree ? 3 : 2}
-          </Text>
+          {!pageTwo ? (
+            <View style={{ width: tw_base[6] }} />
+          ) : (
+            <Text style={{ width: tw_base[6] }}>
+              {tutorialStep}/{pageThree ? 3 : 2}
+            </Text>
+          )}
         </View>
         <Text style={[tw.mt2, { textAlign: "center" }, styles.bodyText]}>
           {page.body}
@@ -181,7 +184,7 @@ const TutorialModal = observer(
               ...tw.my2,
             }}
           >
-            <Text style={[text.xl, { marginVertical: "auto" }]}>
+            <Text style={[text.md, { marginVertical: "auto" }]}>
               Tutorials Enabled:{" "}
             </Text>
             <Switch

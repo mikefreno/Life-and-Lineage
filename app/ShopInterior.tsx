@@ -235,10 +235,6 @@ const ShopInteriorScreen = observer(() => {
           title: "Shopkeepers are people too.",
           body: "They each have different personalities. They will also age eventually die.",
         }}
-        pageThree={{
-          title: "Good Luck.",
-          body: "And remember fleeing (top left) can save you.",
-        }}
       />
       <View
         style={{

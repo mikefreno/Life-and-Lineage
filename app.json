@@ -2,8 +2,7 @@
   "expo": {
     "name": "Lineage",
     "slug": "life-and-lineage",
-    "version": "0.7.2",
-    "newArchEnabled": true,
+    "version": "0.7.5",
     "orientation": "portrait",
     "icon": "assets/images/icon.png",
     "scheme": "lineageapp",
@@ -89,7 +88,7 @@
         "projectId": "f4a10fdc-c377-4a37-8ad7-27685b89b4d9"
       }
     },
-    "runtimeVersion": "0.7.0",
+    "runtimeVersion": "0.7.5",
     "updates": {
       "url": "https://u.expo.dev/f4a10fdc-c377-4a37-8ad7-27685b89b4d9"
     },
