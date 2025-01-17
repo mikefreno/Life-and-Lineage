@@ -31,7 +31,6 @@ import GenericModal from "../components/GenericModal";
 import { CharacterImage } from "../components/CharacterImage";
 import GenericFlatButton from "../components/GenericFlatButton";
 import { useStyles } from "../hooks/styles";
-import { InitialLoading } from "../components/InitialLoading";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -54,24 +53,26 @@ Sentry.init({
  * The responsibility of this is largely around unseen app state, whereas `RootLayout` is largely concerned with UI
  */
 const Root = observer(() => {
-  const [fontsLoaded, error] = useFonts({
+  const [mainFontLoaded, error] = useFonts({
     PixelifySans: require("../assets/fonts/PixelifySans-Regular.ttf"),
+  });
+
+  const [otherFontsLoaded] = useFonts({
     Handwritten: require("../assets/fonts/Caveat-VariableFont_wght.ttf"),
     Cursive: require("../assets/fonts/Tangerine-Regular.ttf"),
     CursiveBold: require("../assets/fonts/Tangerine-Bold.ttf"),
   });
-  const [splashHidden, setSplashHidden] = useState(false);
 
   useEffect(() => {
     if (error) {
       console.error(error);
     }
-    if (fontsLoaded) {
-      SplashScreen.hideAsync().then(() => setSplashHidden(true));
+    if (mainFontLoaded) {
+      SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, error]);
+  }, [mainFontLoaded, error]);
 
-  while (!splashHidden) {
+  while (!mainFontLoaded) {
     return null;
   }
 
@@ -81,7 +82,7 @@ const Root = observer(() => {
         <SafeAreaProvider>
           <ErrorBoundary>
             <LoadingBoundary>
-              <RootLayout fontLoaded={fontsLoaded} />
+              <RootLayout fontLoaded={mainFontLoaded} />
             </LoadingBoundary>
           </ErrorBoundary>
         </SafeAreaProvider>
