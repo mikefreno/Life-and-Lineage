@@ -2,7 +2,7 @@ import React from "react";
 import { router } from "expo-router";
 import GenericModal from "../GenericModal";
 import { Text } from "../Themed";
-import { Pressable, View, Image } from "react-native";
+import { View, Image } from "react-native";
 import { toTitleCase, wait } from "../../utility/functions/misc";
 import { Coins } from "../../assets/icons/SVGIcons";
 import GenericFlatButton from "../GenericFlatButton";
@@ -12,7 +12,7 @@ import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { rarityColors } from "../../constants/Colors";
 import { Rarity } from "../../utility/types";
-import { flex, tw, tw_base, useStyles } from "../../hooks/styles";
+import { flex, tw, useStyles } from "../../hooks/styles";
 
 export default function DroppedItemsModal() {
   const { playerState, dungeonStore, uiStore } = useRootStore();

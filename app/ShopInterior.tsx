@@ -244,7 +244,6 @@ const ShopInteriorScreen = observer(() => {
           opacity: 0.5,
         }}
       />
-
       <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
         <View style={[flex.columnBetween, { flex: 1 }]}>
           <View style={[flex.rowEvenly, { height: "40%" }]}>
@@ -342,7 +341,7 @@ const ShopInteriorScreen = observer(() => {
                 )}
               </View>
             </View>
-            <View style={{ width: "100%" }} collapsable={false}>
+            <View style={{ width: "100%", height: "80%" }} collapsable={false}>
               <InventoryRender
                 screen="shop"
                 displayItem={displayItem}

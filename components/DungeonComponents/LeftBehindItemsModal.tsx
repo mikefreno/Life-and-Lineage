@@ -5,7 +5,8 @@ import { ThemedView, Text } from "../Themed";
 import { useLootState } from "../../providers/DungeonData";
 import type { Item } from "../../entities/item";
 import { useRootStore } from "../../hooks/stores";
-import { useStyles } from "../../hooks/styles";
+import { tw_base, useStyles } from "../../hooks/styles";
+import GenericFlatButton from "../GenericFlatButton";
 
 interface LeftBehindItemsModalProps {
   showLeftBehindItemsScreen: boolean;
@@ -104,12 +105,12 @@ export default function LeftBehindItemsModal({
             </Text>
           </ThemedView>
         )}
-        <Pressable
-          style={[styles.flatButtonContainer, { marginTop: 16 }]}
+        <GenericFlatButton
+          style={{ marginTop: tw_base[4] }}
           onPress={() => setShowLeftBehindItemsScreen(false)}
         >
-          <Text>Close</Text>
-        </Pressable>
+          Close
+        </GenericFlatButton>
       </>
     </GenericModal>
   );

@@ -1,5 +1,5 @@
 [
-   {
+  {
     "name": "flash heal",
     "element": "holy",
     "proficiencyNeeded": "novice",
@@ -18,7 +18,9 @@
     "manaCost": 20,
     "effects": {
       "damage": null,
-      "buffs": ["quickened mind"],
+      "buffs": [
+        "quickened mind"
+      ],
       "debuffs": null
     }
   },
@@ -30,7 +32,12 @@
     "effects": {
       "damage": null,
       "buffs": null,
-      "debuffs": [{"name": "undead cower", "chance": 1.0}] 
+      "debuffs": [
+        {
+          "name": "undead cower",
+          "chance": 1.0
+        }
+      ]
     }
   },
   {
@@ -40,7 +47,9 @@
     "manaCost": 75,
     "effects": {
       "damage": null,
-      "buffs": ["delayed heal"],
+      "buffs": [
+        "delayed heal"
+      ],
       "debuffs": null
     }
   },
@@ -64,7 +73,12 @@
     "effects": {
       "damage": null,
       "buffs": null,
-      "debuffs": [{"name": "revoke undead", "chance": 1.0}] 
+      "debuffs": [
+        {
+          "name": "revoke undead",
+          "chance": 1.0
+        }
+      ]
     }
   },
   {
@@ -74,7 +88,9 @@
     "manaCost": 200,
     "effects": {
       "damage": null,
-      "buffs": ["greater quickened mind"],
+      "buffs": [
+        "greater quickened mind"
+      ],
       "debuffs": null
     }
   },
@@ -85,7 +101,9 @@
     "manaCost": 200,
     "effects": {
       "damage": null,
-      "buffs": ["overwhelming glow"],
+      "buffs": [
+        "overwhelming glow"
+      ],
       "debuffs": null
     }
   },
@@ -96,7 +114,9 @@
     "manaCost": 250,
     "effects": {
       "damage": null,
-      "buffs": ["overwhelming glow"],
+      "buffs": [
+        "overwhelming glow"
+      ],
       "debuffs": null
     }
   },
@@ -113,13 +133,90 @@
     }
   },
   {
+    "name": "holy strike",
+    "element": "vengeance",
+    "usesWeapon": "melee",
+    "proficiencyNeeded": "apprentice",
+    "manaCost": 35,
+    "effects": {
+      "damage": 35,
+      "buffs": null,
+      "debuffs": [
+        {
+          "name": "sunder",
+          "chance": 0.25
+        }
+      ]
+    }
+  },
+  {
+    "name": "consecrated blade",
+    "element": "vengeance",
+    "usesWeapon": "melee",
+    "proficiencyNeeded": "adept",
+    "manaCost": 50,
+    "effects": {
+      "damage": 45,
+      "buffs": [
+        "blessed defense"
+      ],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "smite",
+    "element": "vengeance",
+    "usesWeapon": "melee",
+    "proficiencyNeeded": "expert",
+    "manaCost": 75,
+    "effects": {
+      "damage": 85,
+      "buffs": null,
+      "debuffs": [
+        {
+          "name": "stun",
+          "chance": 0.5
+        }
+      ]
+    }
+  },
+  {
+    "name": "holy nova",
+    "element": "vengeance",
+    "proficiencyNeeded": "master",
+    "manaCost": 150,
+    "effects": {
+      "damage": 125,
+      "buffs": [
+        "protection aura"
+      ],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "divine judgment",
+    "element": "vengeance",
+    "usesWeapon": "melee",
+    "proficiencyNeeded": "legend",
+    "manaCost": 200,
+    "effects": {
+      "damage": 250,
+      "buffs": [
+        "execute"
+      ],
+      "debuffs": null
+    }
+  },
+  {
     "name": "blessed guard",
     "element": "protection",
     "proficiencyNeeded": "novice",
     "manaCost": 25,
     "effects": {
       "damage": null,
-      "buffs": ["guard"],
+      "buffs": [
+        "guard"
+      ],
       "debuffs": null
     }
   },
@@ -130,7 +227,9 @@
     "manaCost": 50,
     "effects": {
       "damage": null,
-      "buffs": ["bulwark"],
+      "buffs": [
+        "bulwark"
+      ],
       "debuffs": null
     }
   },
@@ -141,7 +240,9 @@
     "manaCost": 10,
     "effects": {
       "damage": null,
-      "buffs": ["empowered guarding"],
+      "buffs": [
+        "empowered guarding"
+      ],
       "debuffs": null
     }
   },
@@ -152,8 +253,67 @@
     "manaCost": 25,
     "effects": {
       "damage": null,
-      "buffs": ["protection aura"],
+      "buffs": [
+        "protection aura"
+      ],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "blessed shield",
+    "element": "protection",
+    "proficiencyNeeded": "adept",
+    "manaCost": 65,
+    "effects": {
+      "damage": null,
+      "buffs": [
+        "blessed defense"
+      ],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "divine intervention",
+    "element": "protection",
+    "proficiencyNeeded": "expert",
+    "manaCost": 100,
+    "effects": {
+      "damage": null,
+      "buffs": [
+        "guard",
+        "blessed defense"
+      ],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "holy barrier",
+    "element": "protection",
+    "proficiencyNeeded": "master",
+    "manaCost": 150,
+    "effects": {
+      "damage": null,
+      "buffs": [
+        "protection aura",
+        "bulwark"
+      ],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "aegis of light",
+    "element": "protection",
+    "proficiencyNeeded": "legend",
+    "manaCost": 250,
+    "effects": {
+      "damage": null,
+      "buffs": [
+        "protection aura",
+        "blessed defense",
+        "bulwark"
+      ],
       "debuffs": null
     }
   }
 ]
+

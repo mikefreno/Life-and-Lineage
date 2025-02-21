@@ -340,6 +340,137 @@
         "chance": 0.10
       }
     ]
+  },
+  {
+    "name": "life drain",
+    "energyCost": 25,
+    "targets": "single",
+    "hitChance": 0.90,
+    "damageMult": 1.25,
+    "debuffs": [
+      {
+        "name": "lifesteal",
+        "chance": 0.5
+      },
+      {
+        "name": "dulled mind",
+        "chance": 0.35
+      }
+    ]
+  },
+  {
+    "name": "terrorize",
+    "energyCost": 30,
+    "targets": "aoe",
+    "hitChance": 0.85,
+    "damageMult": 0.0,
+    "flatSanityDamage": 10,
+    "debuffs": [
+      {
+        "name": "fear",
+        "chance": 0.75
+      }
+    ]
+  },
+  {
+    "name": "soul strike",
+    "energyCost": 20,
+    "targets": "single",
+    "hitChance": 0.95,
+    "damageMult": 1.5,
+    "flatSanityDamage": 5
+  },
+  {
+    "name": "death blade",
+    "energyCost": 25,
+    "targets": "single",
+    "hitChance": 0.90,
+    "damageMult": 1.75,
+    "debuffs": [
+      {
+        "name": "hemmorage",
+        "chance": 0.50
+      }
+    ]
+  },
+  {
+    "name": "corrupted cleave",
+    "energyCost": 35,
+    "targets": "dual",
+    "hitChance": 0.85,
+    "damageMult": 1.25,
+    "debuffs": [
+      {
+        "name": "necrotic wound",
+        "chance": 0.45
+      }
+    ]
+  },
+  {
+    "name": "death bolt",
+    "energyCost": 30,
+    "targets": "single",
+    "hitChance": 1.0,
+    "damageMult": 2.0,
+    "debuffs": [
+      {
+        "name": "necrotic wound",
+        "chance": 0.65
+      }
+    ]
+  },
+  {
+    "name": "soul rip",
+    "energyCost": 45,
+    "targets": "single",
+    "hitChance": 0.85,
+    "damageMult": 1.5,
+    "flatSanityDamage": 15,
+    "debuffs": [
+      {
+        "name": "dulled mind",
+        "chance": 0.75
+      }
+    ]
+  },
+  {
+    "name": "curse",
+    "energyCost": 40,
+    "targets": "single",
+    "hitChance": 0.90,
+    "damageMult": 0.0,
+    "debuffs": [
+      {
+        "name": "death mark",
+        "chance": 1.0
+      }
+    ]
+  },
+  {
+    "name": "claw",
+    "energyCost": 10,
+    "targets": "single",
+    "hitChance": 0.90,
+    "damageMult": 1.0,
+    "debuffs": [
+      {
+        "name": "bleed",
+        "chance": 0.25
+      }
+    ]
+  },
+  {
+    "name": "wing buffet",
+    "energyCost": 25,
+    "targets": "aoe",
+    "hitChance": 0.90,
+    "damageMult": 0.75,
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.25
+      }
+    ]
   }
 ]
 

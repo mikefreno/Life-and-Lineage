@@ -184,6 +184,7 @@ const TutorialStateProvider = ({ children }: { children: ReactNode }) => {
             });
           }}
           isFocused={isFocused}
+          backdropCloses={false}
           pageOne={{
             title: "Well Fought!",
             body: "You have defeated the first boss! Every boss will reward you with stats points to distribute as you wish.",

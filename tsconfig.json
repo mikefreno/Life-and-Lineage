@@ -4,7 +4,12 @@
     "strict": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "module": "ESNext"
+    "module": "ESNext",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
   },
   "include": [
     "**/*.ts",

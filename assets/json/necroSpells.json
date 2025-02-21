@@ -6,7 +6,9 @@
     "manaCost": 20,
     "effects": {
       "damage": 5,
-      "buffs": ["blood orb"],
+      "buffs": [
+        "blood orb"
+      ],
       "debuffs": null
     }
   },
@@ -18,7 +20,9 @@
     "effects": {
       "damage": null,
       "selfDamage": null,
-      "buffs": ["consume blood orb"],
+      "buffs": [
+        "consume blood orb"
+      ],
       "debuffs": null
     }
   },
@@ -30,7 +34,9 @@
     "effects": {
       "damage": null,
       "selfDamage": -35,
-      "buffs": ["consume blood orb"],
+      "buffs": [
+        "consume blood orb"
+      ],
       "debuffs": null
     }
   },
@@ -42,7 +48,9 @@
     "effects": {
       "damage": 25,
       "selfDamage": -25,
-      "buffs": ["blood orb"],
+      "buffs": [
+        "blood orb"
+      ],
       "debuffs": null
     }
   },
@@ -54,8 +62,49 @@
     "effects": {
       "damage": 90,
       "selfDamage": null,
-      "buffs": ["consume blood orb"],
+      "buffs": [
+        "consume blood orb"
+      ],
       "debuffs": null
+    }
+  },
+  {
+    "name": "blood lance",
+    "element": "blood",
+    "proficiencyNeeded": "master",
+    "manaCost": 150,
+    "effects": {
+      "damage": 125,
+      "selfDamage": 25,
+      "buffs": [
+        "blood orb"
+      ],
+      "debuffs": [
+        {
+          "name": "hemmorage",
+          "chance": 0.75
+        }
+      ]
+    }
+  },
+  {
+    "name": "blood storm",
+    "element": "blood",
+    "proficiencyNeeded": "legend",
+    "manaCost": 300,
+    "effects": {
+      "damage": 200,
+      "selfDamage": 50,
+      "buffs": [
+        "blood orb",
+        "blood orb"
+      ],
+      "debuffs": [
+        {
+          "name": "hemmorage",
+          "chance": 1.0
+        }
+      ]
     }
   },
   {
@@ -67,7 +116,9 @@
       "damage": null,
       "buffs": null,
       "debuffs": null,
-      "summon": ["flying skull"]
+      "summon": [
+        "flying skull"
+      ]
     }
   },
   {
@@ -79,7 +130,9 @@
       "damage": null,
       "buffs": null,
       "debuffs": null,
-      "summon": ["skeleton"]
+      "summon": [
+        "skeleton"
+      ]
     }
   },
   {
@@ -94,6 +147,63 @@
     }
   },
   {
+    "name": "bone shield",
+    "element": "bone",
+    "proficiencyNeeded": "apprentice",
+    "manaCost": 15,
+    "effects": {
+      "damage": null,
+      "buffs": [
+        "bone shield"
+      ],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "bone spear",
+    "element": "bone",
+    "proficiencyNeeded": "adept",
+    "manaCost": 45,
+    "effects": {
+      "damage": 40,
+      "buffs": null,
+      "debuffs": [{"name": "bleed", "chance": 0.5}]
+    }
+  },
+  {
+    "name": "bone armor",
+    "element": "bone",
+    "proficiencyNeeded": "expert",
+    "manaCost": 75,
+    "effects": {
+      "damage": null,
+      "buffs": ["guard"],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "bone prison",
+    "element": "bone",
+    "proficiencyNeeded": "master",
+    "manaCost": 125,
+    "effects": {
+      "damage": 50,
+      "buffs": null,
+      "debuffs": [{"name": "stun", "chance": 0.75}]
+    }
+  },
+  {
+    "name": "bone storm",
+    "element": "bone",
+    "proficiencyNeeded": "legend",
+    "manaCost": 250,
+    "effects": {
+      "damage": 175,
+      "buffs": null,
+      "debuffs": [{"name": "bleed", "chance": 1.0}]
+    }
+  },
+  {
     "name": "poison dart",
     "element": "pestilence",
     "proficiencyNeeded": "novice",
@@ -101,7 +211,68 @@
     "effects": {
       "damage": 5,
       "buffs": null,
-      "debuffs": [{"name":"poison", "chance": 0.75}]
+      "debuffs": [
+        {
+          "name": "poison",
+          "chance": 0.75
+        }
+      ]
     }
-  }
+  },
+  {
+    "name": "plague cloud",
+    "element": "pestilence",
+    "proficiencyNeeded": "apprentice",
+    "manaCost": 35,
+    "effects": {
+      "damage": 15,
+      "buffs": null,
+      "debuffs": [{"name": "diseased", "chance": 0.5}]
+    }
+  },
+  {
+    "name": "rotting touch",
+    "element": "pestilence",
+    "proficiencyNeeded": "adept",
+    "manaCost": 60,
+    "effects": {
+      "damage": 35,
+      "buffs": null,
+      "debuffs": [{"name": "sunder", "chance": 0.75}]
+    }
+  },
+  {
+    "name": "miasma",
+    "element": "pestilence",
+    "proficiencyNeeded": "expert",
+    "manaCost": 100,
+    "effects": {
+      "damage": 45,
+      "buffs": null,
+      "debuffs": [{"name": "poison", "chance": 1.0}, {"name": "diseased", "chance": 0.75}]
+    }
+  },
+  {
+    "name": "plague bearer",
+    "element": "pestilence",
+    "proficiencyNeeded": "master",
+    "manaCost": 175,
+    "effects": {
+      "damage": 75,
+      "buffs": ["protection aura"],
+      "debuffs": [{"name": "diseased", "chance": 1.0}]
+    }
+  },
+  {
+    "name": "death cloud",
+    "element": "pestilence",
+    "proficiencyNeeded": "legend",
+    "manaCost": 300,
+    "effects": {
+      "damage": 150,
+      "buffs": null,
+      "debuffs": [{"name": "poison", "chance": 1.0}, {"name": "diseased", "chance": 1.0}]
+    }
+  },
 ]
+

@@ -1,65 +1,174 @@
-[ 
-   {
-      "name": "flying skull",
-      "beingType": "undead",
-      "health": 20,
-      "attackPower": 5,
-      "energy": {"maximum": 50, "regen": 5},
-      "attackStrings": ["head slam"],
-      "turns": 5
-   },
-   {
-      "name": "skeleton",
-      "beingType": "undead",
-      "health": 40,
-      "attackPower": 5,
-      "energy": {"maximum": 50, "regen": 5},
-      "attackStrings": ["stab", "cleave"],
-      "turns": 5
-   },
-   {
-      "name": "bandit",
-      "beingType": "human",
-      "sanity": 50,
-      "health":50,
-      "attackPower": 8,
-      "energy": {"maximum": 50, "regen": 10},
-      "attackStrings": ["stab", "pocket sand","serrate"],
-      "turns": 100
-   },
-   {
-      "name": "hobgoblin",
-      "beingType": "demi-human",
-      "sanity": null,
-      "health": 160,
-      "attackPower": 15,
-      "energy": {"maximum": 50, "regen": 10},
-      "attackStrings": ["stab", "frenzy"],
-      "turns":1000
-   },
-   {
-      "name": "raven",
-      "beingType": "beast",
-      "health":50,
-      "attackPower": 2,
-      "energy": {"maximum": 50, "regen": 5},
-      "attackStrings": ["pluck eye", "scratch"],
-      "turns": 1000
-   },
-   {
-      "name": "bear",
-      "beingType": "beast",
-      "health":200,
-      "attackPower": 10,
-      "attackStrings": [],
-      "turns": 1000
-   },
-   {
-      "name": "dragon welp",
-      "beingType": "draconic",
-      "health":200,
-      "attackPower": 10,
-      "attackStrings": [],
-      "turns": 1000
-   }
+[
+  {
+    "name": "flying skull",
+    "beingType": "undead",
+    "health": 20,
+    "attackPower": 5,
+    "energy": {
+      "maximum": 50,
+      "regen": 5
+    },
+    "attackStrings": [
+      "head slam"
+    ],
+    "turns": 5
+  },
+  {
+    "name": "skeleton",
+    "beingType": "undead",
+    "health": 40,
+    "attackPower": 5,
+    "energy": {
+      "maximum": 50,
+      "regen": 5
+    },
+    "attackStrings": [
+      "stab",
+      "cleave"
+    ],
+    "turns": 8
+  },
+  {
+    "name": "zombie",
+    "beingType": "undead",
+    "health": 75,
+    "attackPower": 8,
+    "energy": {
+      "maximum": 50,
+      "regen": 3
+    },
+    "attackStrings": [
+      "bite",
+      "claw"
+    ],
+    "turns": 10
+  },
+  {
+    "name": "wraith",
+    "beingType": "undead",
+    "health": 60,
+    "attackPower": 15,
+    "energy": {
+      "maximum": 75,
+      "regen": 8
+    },
+    "attackStrings": [
+      "life drain",
+      "terrorize"
+    ],
+    "turns": 10
+  },
+  {
+    "name": "death knight",
+    "beingType": "undead",
+    "health": 150,
+    "attackPower": 20,
+    "energy": {
+      "maximum": 100,
+      "regen": 10
+    },
+    "attackStrings": [
+      "soul strike",
+      "death blade",
+      "corrupted cleave"
+    ],
+    "turns": 5
+  },
+  {
+    "name": "lich",
+    "beingType": "undead",
+    "health": 200,
+    "attackPower": 30,
+    "energy": {
+      "maximum": 150,
+      "regen": 15
+    },
+    "attackStrings": [
+      "death bolt",
+      "soul rip",
+      "curse"
+    ],
+    "turns": 10
+  },
+  {
+    "name": "bandit",
+    "beingType": "human",
+    "sanity": 50,
+    "health": 50,
+    "attackPower": 8,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [
+      "stab",
+      "pocket sand",
+      "serrate"
+    ],
+    "turns": 100
+  },
+  {
+    "name": "hobgoblin",
+    "beingType": "demi-human",
+    "sanity": null,
+    "health": 160,
+    "attackPower": 15,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [
+      "stab",
+      "frenzy"
+    ],
+    "turns": 1000
+  },
+  {
+    "name": "raven",
+    "beingType": "beast",
+    "health": 50,
+    "attackPower": 2,
+    "energy": {
+      "maximum": 50,
+      "regen": 5
+    },
+    "attackStrings": [
+      "pluck eye",
+      "scratch"
+    ],
+    "turns": 1000
+  },
+  {
+    "name": "bear",
+    "beingType": "beast",
+    "health": 200,
+    "attackPower": 10,
+    "attackStrings": [],
+    "turns": 1000
+  },
+  {
+    "name": "griffon",
+    "beingType": "beast",
+    "health": 300,
+    "attackPower": 25,
+    "energy": {
+      "maximum": 100,
+      "regen": 10
+    },
+    "attackStrings": [
+      "claw",
+      "bite",
+      "wing buffet"
+    ],
+    "turns": 1000
+  },
+  {
+    "name": "dragon welp",
+    "beingType": "draconic",
+    "health": 200,
+    "attackPower": 10,
+    "attackStrings": [],
+    "turns": 1000
+  }
 ]
+
