@@ -1,5 +1,11 @@
 import React from "react";
-import { StyleSheet, ColorValue, Pressable } from "react-native";
+import {
+  StyleSheet,
+  ColorValue,
+  Pressable,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -30,7 +36,8 @@ interface GenericRaisedButtonProps {
     | "error";
   vibrationEssentiality?: boolean;
   disableTopLevelStyling?: boolean;
-  style?: object;
+  style?: StyleProp<ViewStyle>;
+  buttonStyle?: StyleProp<ViewStyle>;
 }
 
 const styles = StyleSheet.create({
@@ -63,6 +70,7 @@ const GenericRaisedButton = ({
   vibrationEssentiality = false,
   disableTopLevelStyling = false,
   style,
+  buttonStyle,
 }: GenericRaisedButtonProps) => {
   const vibration = useVibration();
 
@@ -109,6 +117,11 @@ const GenericRaisedButton = ({
     onPress?.();
   };
 
+  const containerStyle = React.useMemo(() => {
+    const baseStyles = !disableTopLevelStyling ? styles.defaultContainer : {};
+    return [baseStyles, style];
+  }, [disableTopLevelStyling, style]);
+
   const dynamicButtonStyle = React.useMemo(() => {
     if (!disabled) {
       return {
@@ -141,7 +154,7 @@ const GenericRaisedButton = ({
   return (
     <Pressable
       ref={ref}
-      style={[!disableTopLevelStyling && styles.defaultContainer, style]}
+      style={containerStyle}
       onPress={handlePress}
       onLongPress={() => {
         vibration({
@@ -155,7 +168,12 @@ const GenericRaisedButton = ({
       disabled={disabled}
     >
       <Animated.View
-        style={[styles.buttonContainer, dynamicButtonStyle, animatedStyle]}
+        style={[
+          styles.buttonContainer,
+          buttonStyle,
+          dynamicButtonStyle,
+          animatedStyle,
+        ]}
       >
         {typeof children === "string" ? (
           <Text style={[styles.centerText, textStyle]}>{children}</Text>

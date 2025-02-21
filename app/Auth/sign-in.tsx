@@ -19,7 +19,7 @@ import { ThemedView, Text } from "../../components/Themed";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { wait } from "../../utility/functions/misc";
 import { useRootStore } from "../../hooks/stores";
-import { useStyles } from "../../hooks/styles";
+import { tw, useStyles } from "../../hooks/styles";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const SignInScreen = observer(() => {
@@ -134,7 +134,7 @@ const SignInScreen = observer(() => {
               onPress={handleGoogleSignIn}
               style={styles.providerButton}
             >
-              <Text style={styles.xl}>Sign in with Google</Text>
+              <Text style={[styles.xl, tw.pr1]}>Sign in with Google</Text>
               <GoogleIcon height={20} width={20} />
             </Pressable>
 

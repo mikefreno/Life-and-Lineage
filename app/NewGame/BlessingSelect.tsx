@@ -23,6 +23,7 @@ import { useNewGameStore } from "./_layout";
 import { FadeSlide } from "../../components/AnimatedWrappers";
 import { text, useStyles } from "../../hooks/styles";
 import GenericFlatButton from "../../components/GenericFlatButton";
+import NewGameMetaControls from "@/components/NewGameMetaControls";
 
 export default function SetBlessing() {
   const { classSelection, blessingSelection, setBlessingSelection } =
@@ -115,48 +116,9 @@ export default function SetBlessing() {
             </FadeSlide>
           </View>
         </View>
-
-        {(tutorialStore.tutorialsEnabled || !playerState) && (
-          <View style={{ position: "absolute", marginLeft: 16, marginTop: 16 }}>
-            <Pressable
-              style={{ position: "absolute" }}
-              onPress={() => setForceShowTutorial(true)}
-              accessibilityRole="button"
-              accessibilityLabel="Show Tutorial"
-            >
-              <FontAwesome5
-                name="question-circle"
-                size={32}
-                color={isDark ? "#fafafa" : "#27272a"}
-              />
-            </Pressable>
-          </View>
-        )}
-        <View
-          style={{ position: "absolute", zIndex: 10, marginTop: 16, right: 16 }}
-        >
-          <Pressable
-            onPress={() => {
-              audioStore.setMuteValue(!audioStore.muted);
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Show Tutorial"
-          >
-            {audioStore.muted ? (
-              <MaterialIcons
-                name="music-off"
-                size={32}
-                color={isDark ? "#fafafa" : "#27272a"}
-              />
-            ) : (
-              <MaterialIcons
-                name="music-note"
-                size={32}
-                color={isDark ? "#fafafa" : "#27272a"}
-              />
-            )}
-          </Pressable>
-        </View>
+        <NewGameMetaControls
+          forceShowTutorial={() => setForceShowTutorial(true)}
+        />
       </ScrollView>
     </>
   );

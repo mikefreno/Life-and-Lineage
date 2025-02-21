@@ -147,13 +147,27 @@ export const DungeonMapControls = observer(() => {
       <View
         style={{
           marginTop: -uiStore.dimensions.height / 20,
-          width: "66.666%",
+          width: "100%",
           marginHorizontal: "auto",
         }}
       >
         <ArrowButton direction="up" />
         <View style={styles.arrowButtonRow}>
           <ArrowButton direction="left" />
+          {dungeonStore.currentPosition.specialEncounter &&
+            !dungeonStore.currentPosition.specialEncounter.activated && (
+              <GenericRaisedButton
+                backgroundColor="#2563eb"
+                buttonStyle={{ paddingHorizontal: 8 }}
+                onPress={() =>
+                  dungeonStore.setCurrentSpecialEncounter(
+                    dungeonStore.currentPosition!.specialEncounter!,
+                  )
+                }
+              >
+                Re-Enter
+              </GenericRaisedButton>
+            )}
           <ArrowButton direction="right" />
         </View>
         <ArrowButton direction="down" />

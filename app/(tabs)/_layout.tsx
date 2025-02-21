@@ -37,6 +37,7 @@ import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { shadows } from "../../hooks/styles";
 import { observer } from "mobx-react-lite";
+import { wait } from "@/utility/functions/misc";
 
 const PLAYERSTATUS_SPACER = 64;
 const TABSELECTOR_HEIGHT = 52;
@@ -88,7 +89,7 @@ const TabLayout = observer(() => {
             tabBarIconStyle: {
               marginHorizontal: "auto",
             },
-            animation: "fade",
+            animation: "shift",
             tabBarButton: (props) => {
               const onPressWithVibration = (event: GestureResponderEvent) => {
                 vibration({ style: "light" });
@@ -344,11 +345,16 @@ const TabLayout = observer(() => {
               ),
               headerRight: () => (
                 <Pressable
-                  onPress={async () => {
-                    await uiStore.setIsLoading(true);
+                  onPress={() => {
+                    uiStore.setTotalLoadingSteps(5);
                     vibration({ style: "warning" });
-                    dungeonStore.setUpDungeon("training grounds", "1");
-                    router.replace(`/DungeonLevel`);
+                    dungeonStore
+                      .setUpDungeon("training grounds", "1")
+                      .then(() => uiStore.incrementLoadingStep());
+                    wait(100).then(() => {
+                      router.replace(`/DungeonLevel`);
+                      uiStore.incrementLoadingStep();
+                    });
                   }}
                 >
                   {({ pressed }) => (

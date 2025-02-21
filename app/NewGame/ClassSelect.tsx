@@ -2,7 +2,6 @@ import React from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
 import { useLayoutEffect, useState } from "react";
-import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import TutorialModal from "../../components/TutorialModal";
 import {
   NecromancerSkull,
@@ -23,15 +22,15 @@ import { FadeSlide } from "../../components/AnimatedWrappers";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { useRouter } from "expo-router";
 import { text, useStyles } from "../../hooks/styles";
+import NewGameMetaControls from "@/components/NewGameMetaControls";
 
 const SetClassScreen = observer(() => {
   const vibration = useVibration();
   const { classSelection, setClassSelection, setBlessingSelection } =
     useNewGameStore();
   const router = useRouter();
-  const { uiStore, playerState, tutorialStore, audioStore } = useRootStore();
+  const { uiStore, playerState, tutorialStore } = useRootStore();
   const { height, width } = uiStore.dimensions;
-  const isDark = uiStore.colorScheme === "dark";
 
   const styles = useStyles();
 
@@ -98,21 +97,9 @@ const SetClassScreen = observer(() => {
           </Pressable>
         </ThemedView>
       </GenericModal>
-
       <ScrollView>
         <View style={styles.newGameContainer}>
-          <Text
-            style={{
-              ...styles.bold,
-              ...styles["3xl"],
-              textAlign: "center",
-            }}
-            accessibilityRole="header"
-          >
-            Create a Character
-          </Text>
-          <Text style={styles.newGameHeader}>Select Class</Text>
-
+          <Text style={styles.newGameHeader}>Class Selection</Text>
           <View
             style={{
               flexDirection: "row",
@@ -150,7 +137,7 @@ const SetClassScreen = observer(() => {
                       ? [
                           {
                             borderRadius: 8,
-                            borderColor: isDark ? "#fafafa" : "#27272a",
+                            borderColor: uiStore.isDark ? "#fafafa" : "#27272a",
                           },
                         ]
                       : { borderColor: "transparent" },
@@ -158,7 +145,7 @@ const SetClassScreen = observer(() => {
                 >
                   <WizardHat
                     style={{ marginBottom: 5 }}
-                    color={isDark ? "#2563eb" : "#1e40af"}
+                    color={uiStore.isDark ? "#2563eb" : "#1e40af"}
                     height={height * 0.15}
                     width={height * 0.15}
                   />
@@ -205,7 +192,7 @@ const SetClassScreen = observer(() => {
                       ? [
                           {
                             borderRadius: 8,
-                            borderColor: isDark ? "#fafafa" : "#27272a",
+                            borderColor: uiStore.isDark ? "#fafafa" : "#27272a",
                           },
                         ]
                       : { borderColor: "transparent" },
@@ -269,7 +256,7 @@ const SetClassScreen = observer(() => {
                       ? [
                           {
                             borderRadius: 8,
-                            borderColor: isDark ? "#fafafa" : "#27272a",
+                            borderColor: uiStore.isDark ? "#fafafa" : "#27272a",
                           },
                         ]
                       : { borderColor: "transparent" },
@@ -278,7 +265,7 @@ const SetClassScreen = observer(() => {
                   <View style={{ transform: [{ rotate: "-12deg" }] }}>
                     <NecromancerSkull
                       style={{ marginBottom: 5 }}
-                      color={isDark ? "#9333ea" : "#6b21a8"}
+                      color={uiStore.isDark ? "#9333ea" : "#6b21a8"}
                       height={height * 0.15}
                       width={height * 0.15}
                     />
@@ -326,7 +313,7 @@ const SetClassScreen = observer(() => {
                       ? [
                           {
                             borderRadius: 8,
-                            borderColor: isDark ? "#fafafa" : "#27272a",
+                            borderColor: uiStore.isDark ? "#fafafa" : "#27272a",
                           },
                         ]
                       : { borderColor: "transparent" },
@@ -379,51 +366,10 @@ const SetClassScreen = observer(() => {
             </FadeSlide>
           </View>
         </View>
+        <NewGameMetaControls
+          forceShowTutorial={() => setForceShowTutorial(true)}
+        />
       </ScrollView>
-
-      {(tutorialStore.tutorialsEnabled || !playerState) && (
-        <View style={styles.tutorialButtonContainer}>
-          <Pressable
-            style={{ position: "absolute" }}
-            onPress={() => {
-              setForceShowTutorial(true);
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Show Tutorial"
-          >
-            <FontAwesome5
-              name="question-circle"
-              size={32}
-              color={isDark ? "#fafafa" : "#27272a"}
-            />
-          </Pressable>
-        </View>
-      )}
-      <View
-        style={{ position: "absolute", zIndex: 10, marginTop: 16, right: 16 }}
-      >
-        <Pressable
-          onPress={() => {
-            audioStore.setMuteValue(!audioStore.muted);
-          }}
-          accessibilityRole="button"
-          accessibilityLabel="Show Tutorial"
-        >
-          {audioStore.muted ? (
-            <MaterialIcons
-              name="music-off"
-              size={32}
-              color={isDark ? "#fafafa" : "#27272a"}
-            />
-          ) : (
-            <MaterialIcons
-              name="music-note"
-              size={32}
-              color={isDark ? "#fafafa" : "#27272a"}
-            />
-          )}
-        </Pressable>
-      </View>
     </>
   );
 });

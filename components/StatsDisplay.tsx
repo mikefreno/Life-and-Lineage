@@ -37,7 +37,7 @@ import { Condition } from "../entities/conditions";
 import { useEnemyManagement } from "../hooks/combat";
 import type { Shop } from "../entities/shop";
 import Colors, { rarityColors } from "../constants/Colors";
-import { tw, useStyles } from "../hooks/styles";
+import { shadows, tw, useStyles } from "../hooks/styles";
 import React from "react";
 
 type BaseProps = {
@@ -739,6 +739,7 @@ export function StatsDisplay({
       <Animated.View
         style={[
           styles.statsDisplayContainer,
+          shadows.diffuse,
           firstItem.itemClass == ItemClassType.Book
             ? {}
             : { width: dimensions.width * 0.4 },

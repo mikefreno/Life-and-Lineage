@@ -245,6 +245,10 @@ export default class UIStore {
     return storesLoaded && stepsComplete;
   }
 
+  get isDark() {
+    return this.colorScheme === "dark";
+  }
+
   startTipCycle() {
     const cycleTips = () => {
       if (!this.progressIncrementing) return;

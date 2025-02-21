@@ -352,9 +352,10 @@
     ]
   },
   {
-    "name": "rogue magi fortress",
+    "name": "frost spire fortress",
     "id": 4,
     "difficulty": 5,
+    "bgName": "SnowyMountain",
     "levels": [
       {
         "level": 1,
@@ -393,6 +394,7 @@
     "name": "infested mine",
     "id": 5,
     "difficulty": 6,
+    "bgName": "SpiderLair",
     "levels": [
       {
         "level": 1,
@@ -417,6 +419,7 @@
     "name": "dark forest",
     "id": 6,
     "difficulty": 6,
+    "bgName": "DemonWoods",
     "levels": [
       {
         "level": 1,
@@ -438,9 +441,10 @@
     ]
   },
   {
-    "name": "crystal mine",
+    "name": "crystal labyrinthine - first excavation",
     "id": 7,
     "difficulty": 8,
+    "bgName": "CrystalCave_1",
     "levels": [
       {
         "level": 1,
@@ -458,13 +462,141 @@
       }
     ],
     "unlocks": [
-      "corrupted temple"
+      "crystal labyrinthine - second excavation"
     ]
   },
   {
-    "name": "corrupted temple",
+    "name": "crystal labyrinthine - second excavation",
     "id": 8,
+    "difficulty": 9,
+    "bgName": "CrystalCave_2",
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 20,
+        "boss": [
+          "cave troll"
+        ]
+      },
+      {
+        "level": 2,
+        "tiles": 25,
+        "boss": [
+          "moon bull"
+        ]
+      }
+    ],
+    "unlocks": [
+      "crystal labyrinthine - third excavation"
+    ]
+  },
+  {
+    "name": "crystal labyrinthine - third excavation",
+    "id": 9,
+    "difficulty": 10,
+    "bgName": "CrystalCave_3",
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 20,
+        "boss": [
+          "cave troll"
+        ]
+      },
+      {
+        "level": 2,
+        "tiles": 25,
+        "boss": [
+          "moon bull"
+        ]
+      }
+    ],
+    "unlocks": [
+      "crystal labyrinthine - fourth excavation"
+    ]
+  },
+  {
+    "name": "crystal labyrinthine - fourth excavation",
+    "id": 10,
+    "difficulty": 11,
+    "bgName": "CrystalCave_4",
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 20,
+        "boss": [
+          "cave troll"
+        ]
+      },
+      {
+        "level": 2,
+        "tiles": 25,
+        "boss": [
+          "moon bull"
+        ]
+      }
+    ],
+    "unlocks": [
+      "corrupted temple - outer terrace"
+    ]
+  },
+  {
+    "name": "corrupted temple - outer terrace",
+    "id": 11,
     "difficulty": 12,
+    "bgName": "Castle_Entrance",
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 20,
+        "boss": [
+          "blood paladin"
+        ]
+      },
+      {
+        "level": 2,
+        "tiles": 25,
+        "boss": [
+          "blood priest",
+          "blood paladin"
+        ]
+      }
+    ],
+    "unlocks": [
+      "corrupted temple - ramparts"
+    ]
+  },
+  {
+    "name": "corrupted temple - ramparts",
+    "id": 12,
+    "difficulty": 14,
+    "bgName": "Castle_Ramparts",
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 20,
+        "boss": [
+          "blood paladin"
+        ]
+      },
+      {
+        "level": 2,
+        "tiles": 25,
+        "boss": [
+          "blood priest",
+          "blood paladin"
+        ]
+      }
+    ],
+    "unlocks": [
+      "corrupted temple - hall"
+    ]
+  },
+  {
+    "name": "corrupted temple - hall",
+    "id": 13,
+    "difficulty": 16,
+    "bgName": "Castle_Hall",
     "levels": [
       {
         "level": 1,
@@ -483,6 +615,32 @@
       }
     ],
     "unlocks": []
+  },
+  {
+    "name": "corrupted temple - atrium",
+    "id": 14,
+    "difficulty": 18,
+    "bgName": "Castle_Atrium",
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 20,
+        "boss": [
+          "blood paladin"
+        ]
+      },
+      {
+        "level": 2,
+        "tiles": 25,
+        "boss": [
+          "blood priest",
+          "blood paladin"
+        ]
+      }
+    ],
+    "unlocks": [
+      "corrupted temple - atrium"
+    ]
   }
 ]
 

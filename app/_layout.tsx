@@ -296,12 +296,6 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
           }}
         >
           <Stack.Screen
-            name="(tabs)"
-            options={{
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
             name="NewGame"
             options={{
               headerShown: false,
@@ -309,7 +303,43 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
               animation: !playerState ? "fade" : undefined,
             }}
           />
-
+          <Stack.Screen
+            name="(tabs)"
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="Options"
+            options={{
+              presentation: "modal",
+              headerBackButtonDisplayMode: "minimal",
+              headerBackButtonMenuEnabled: false,
+              headerBackTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 16,
+              },
+              headerTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 22,
+              },
+            }}
+          />
+          <Stack.Screen
+            name="Auth"
+            options={{
+              presentation: uiStore.reduceMotion ? "card" : "modal",
+              headerBackButtonMenuEnabled: false,
+              headerBackTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 16,
+              },
+              headerTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: 22,
+              },
+            }}
+          />
           <Stack.Screen
             name="Relationships"
             options={{
@@ -516,37 +546,6 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
             options={{
               title: "You Died",
               headerBackButtonDisplayMode: "minimal",
-              headerBackButtonMenuEnabled: false,
-              headerBackTitleStyle: {
-                fontFamily: "PixelifySans",
-                fontSize: 16,
-              },
-              headerTitleStyle: {
-                fontFamily: "PixelifySans",
-                fontSize: 22,
-              },
-            }}
-          />
-          <Stack.Screen
-            name="Options"
-            options={{
-              presentation: "card",
-              headerBackButtonDisplayMode: "minimal",
-              headerBackButtonMenuEnabled: false,
-              headerBackTitleStyle: {
-                fontFamily: "PixelifySans",
-                fontSize: 16,
-              },
-              headerTitleStyle: {
-                fontFamily: "PixelifySans",
-                fontSize: 22,
-              },
-            }}
-          />
-          <Stack.Screen
-            name="Auth"
-            options={{
-              presentation: uiStore.reduceMotion ? "card" : "modal",
               headerBackButtonMenuEnabled: false,
               headerBackTitleStyle: {
                 fontFamily: "PixelifySans",

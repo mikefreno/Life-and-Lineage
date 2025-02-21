@@ -13,7 +13,7 @@ import D20DieAnimation from "../../components/DieRollAnim";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
-import { flex, text, useStyles } from "../../hooks/styles";
+import { flex, text, tw, useStyles } from "../../hooks/styles";
 
 const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
@@ -227,8 +227,8 @@ export const AppSettings = observer(() => {
       <ScrollView>
         <View style={styles.settingsContainer}>
           <GenericStrikeAround>
-            <Text style={text.xl}>
-              Remote Backups{!authStore.isAuthenticated && ` (requires login)`}
+            <Text style={[text.xl, { textAlign: "center" }]}>
+              Remote Backups{!authStore.isAuthenticated && `\n(requires login)`}
             </Text>
           </GenericStrikeAround>
           {authStore.isAuthenticated ? (

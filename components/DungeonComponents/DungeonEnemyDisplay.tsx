@@ -498,13 +498,14 @@ const EnemyDisplay = observer(
     }, [enemy?.currentHealth]);
 
     return (
-      <View style={styles.enemyRow}>
+      <View style={[flex.rowEvenly, { flex: 1, alignItems: "center" }]}>
         <View style={styles.enemyInfoContainer}>
           <Text
             style={{
               ...text["3xl"],
               textAlign: "center",
             }}
+            numberOfLines={2}
           >
             {enemy.creatureSpecies.toLowerCase().includes("generic npc")
               ? ""

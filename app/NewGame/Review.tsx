@@ -26,6 +26,8 @@ import {
   StrengthIcon,
 } from "../../assets/icons/SVGIcons";
 import { useState } from "react";
+import NewGameMetaControls from "@/components/NewGameMetaControls";
+import React from "react";
 
 export default function NewGameReview() {
   const { firstName, lastName, blessingSelection, sex, classSelection } =
@@ -71,42 +73,45 @@ export default function NewGameReview() {
 
   if (blessingSelection !== undefined && classSelection !== undefined) {
     return (
-      <View style={styles.newGameContainer}>
-        <Text style={styles.newGameHeader} accessibilityRole="header">
-          Review
-        </Text>
-        <Text style={styles.newGameHeader}>
-          {`${firstName} ${lastName} the `}
-          <Text
-            style={{
-              color:
-                blessingSelection == Element.assassination &&
-                uiStore.colorScheme == "dark"
-                  ? elementalColorMap[blessingSelection].light
-                  : elementalColorMap[blessingSelection].dark,
-            }}
-          >{`${ElementToString[blessingSelection]}`}</Text>
-          -born{" "}
-          <Text
-            style={{ color: playerClassColors[classSelection] }}
-          >{`${toTitleCase(classSelection)}`}</Text>
-        </Text>
-        <StatAllocation
-          baseStats={baseStats}
-          onStatsAllocated={handleStatsAllocated}
-        />
-        <FadeSlide>
-          <GenericFlatButton
-            onPress={startGame}
-            style={{ marginTop: tw_base[4] }}
-            accessibilityRole="button"
-            accessibilityLabel="Confirm"
-            disabled={!allocatedStats || remainingPoints > 0}
-          >
-            Confirm?
-          </GenericFlatButton>
-        </FadeSlide>
-      </View>
+      <>
+        <View style={styles.newGameContainer}>
+          <Text style={styles.newGameHeader} accessibilityRole="header">
+            Review
+          </Text>
+          <Text style={styles.newGameHeader}>
+            {`${firstName} ${lastName} the `}
+            <Text
+              style={{
+                color:
+                  blessingSelection == Element.assassination &&
+                  uiStore.colorScheme == "dark"
+                    ? elementalColorMap[blessingSelection].light
+                    : elementalColorMap[blessingSelection].dark,
+              }}
+            >{`${ElementToString[blessingSelection]}`}</Text>
+            -born{" "}
+            <Text
+              style={{ color: playerClassColors[classSelection] }}
+            >{`${toTitleCase(classSelection)}`}</Text>
+          </Text>
+          <StatAllocation
+            baseStats={baseStats}
+            onStatsAllocated={handleStatsAllocated}
+          />
+          <FadeSlide>
+            <GenericFlatButton
+              onPress={startGame}
+              style={{ marginTop: tw_base[4] }}
+              accessibilityRole="button"
+              accessibilityLabel="Confirm"
+              disabled={!allocatedStats || remainingPoints > 0}
+            >
+              Confirm?
+            </GenericFlatButton>
+          </FadeSlide>
+        </View>
+        <NewGameMetaControls />
+      </>
     );
   }
 }

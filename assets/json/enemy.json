@@ -2,6 +2,7 @@
   {
     "name": "training dummy",
     "beingType": "block o wood",
+    "defaultSprite": "training_dummy",
     "sanity": null,
     "healthRange": {
       "minimum": 9999,

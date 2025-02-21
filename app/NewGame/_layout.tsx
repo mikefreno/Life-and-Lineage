@@ -72,7 +72,7 @@ export default function NewGameLayout() {
         <Stack.Screen
           name="ClassSelect"
           options={{
-            title: "Class Select",
+            title: "Character Creation Start",
             headerBackButtonMenuEnabled: false,
             headerBackTitleStyle: {
               fontFamily: "PixelifySans",
@@ -99,6 +99,7 @@ export default function NewGameLayout() {
           options={{
             title: "Blessing Select",
             headerBackButtonMenuEnabled: false,
+            headerBackTitle: "Select Class",
             headerBackTitleStyle: {
               fontFamily: "PixelifySans",
               fontSize: 16,

@@ -676,7 +676,7 @@ export const useStyles = () => {
       paddingHorizontal: 8,
     } as const,
     attackCardContainer: {
-      marginTop: 8,
+      //marginTop: 8,
       borderRadius: 8,
       paddingHorizontal: 16,
       paddingVertical: 8,
@@ -698,6 +698,7 @@ export const useStyles = () => {
       ...radius.lg,
       ...tw.px2,
       ...tw.py1,
+      backgroundColor: theme.background,
       borderWidth: 1,
       borderColor: theme.border,
       width: "100%",
@@ -747,20 +748,12 @@ export const useStyles = () => {
       marginLeft: 8,
       width: "50%",
     } as const,
-    enemyRow: {
-      flex: 1,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-evenly",
-    } as const,
     enemyInfoContainer: {
-      flexDirection: "column",
-      alignItems: "center",
-      justifyContent: "center",
+      ...flex.columnCenter,
       minWidth: "40%",
       maxWidth: "60%",
-      height: 48,
-      marginTop: -24,
+      top: "40%",
+      transform: [{ translateY: "-50%" }],
     } as const,
     textAnimationContainer: {
       position: "absolute",
@@ -785,7 +778,8 @@ export const useStyles = () => {
     arrowButtonRow: {
       flexDirection: "row",
       justifyContent: "space-between",
-      width: "100%",
+      width: "80%",
+      marginHorizontal: "auto",
     } as const,
     fleeButtonRow: {
       ...flex.rowEvenly,
@@ -957,19 +951,19 @@ export const useStyles = () => {
     } as const,
     providerButton: {
       ...flex.rowBetween,
+      ...flex.columnCenter,
       borderWidth: 1,
       borderColor: theme.border,
       backgroundColor: theme.background,
-      paddingHorizontal: 12,
-      marginTop: -8,
-      marginBottom: 8,
-      paddingVertical: 8,
+      height: 48,
       borderRadius: 5,
       shadowColor: theme.shadow,
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.2,
       shadowRadius: 1.41,
       elevation: 2,
+      paddingHorizontal: 4,
+      marginBottom: 16,
       width: 230,
     } as const,
     authInput: {
@@ -1685,6 +1679,7 @@ export const flex = {
     flexWrap: "wrap",
   } as const,
 } as const;
+
 export const shadows = {
   diffuse: {
     shadowColor: "#000000",

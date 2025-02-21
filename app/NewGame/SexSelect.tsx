@@ -10,20 +10,19 @@ import { Pressable, View } from "react-native";
 import { Text } from "../../components/Themed";
 import { playerClassColors } from "../../constants/Colors";
 import { toTitleCase } from "../../utility/functions/misc";
-import { FontAwesome5, Foundation } from "@expo/vector-icons";
+import { Foundation } from "@expo/vector-icons";
 import { useNewGameStore } from "./_layout";
 import { FadeSlide } from "../../components/AnimatedWrappers";
-import { text, useStyles } from "../../hooks/styles";
+import { text, tw, useStyles } from "../../hooks/styles";
 import GenericFlatButton from "../../components/GenericFlatButton";
+import NewGameMetaControls from "@/components/NewGameMetaControls";
 
 export default function SetSex() {
   const styles = useStyles();
   const { classSelection, sex, setSex } = useNewGameStore();
   const vibration = useVibration();
   const [forceShowTutorial, setForceShowTutorial] = useState(false);
-  const { playerState, tutorialStore, uiStore } = useRootStore();
-
-  const isDark = uiStore.colorScheme === "dark";
+  const { uiStore } = useRootStore();
   const isFocused = useIsFocused();
 
   if (!classSelection) {
@@ -48,7 +47,7 @@ export default function SetSex() {
         }}
       />
       <View style={styles.newGameContainer}>
-        <Text style={[text["2xl"], styles.newGameHeader]}>
+        <Text style={[text["2xl"], tw.px2, styles.newGameHeader]}>
           Set the sex of your{" "}
           <Text style={{ color: playerClassColors[classSelection] }}>
             {toTitleCase(classSelection)}
@@ -71,7 +70,7 @@ export default function SetSex() {
                   pressed || sex == "male"
                     ? {
                         borderRadius: 8,
-                        borderColor: isDark ? "#fafafa" : "#27272a",
+                        borderColor: uiStore.isDark ? "#fafafa" : "#27272a",
                       }
                     : { borderColor: "transparent" },
                 ]}
@@ -106,7 +105,7 @@ export default function SetSex() {
                   pressed || sex == "female"
                     ? {
                         borderRadius: 8,
-                        borderColor: isDark ? "#fafafa" : "#27272a",
+                        borderColor: uiStore.isDark ? "#fafafa" : "#27272a",
                       }
                     : { borderColor: "transparent" },
                 ]}
@@ -138,22 +137,9 @@ export default function SetSex() {
           </FadeSlide>
         </View>
       </View>
-      {(tutorialStore.tutorialsEnabled || !playerState) && (
-        <View style={{ position: "absolute", marginLeft: 16, marginTop: 16 }}>
-          <Pressable
-            style={{ position: "absolute" }}
-            onPress={() => setForceShowTutorial(true)}
-            accessibilityRole="button"
-            accessibilityLabel="Show Tutorial"
-          >
-            <FontAwesome5
-              name="question-circle"
-              size={32}
-              color={isDark ? "#fafafa" : "#27272a"}
-            />
-          </Pressable>
-        </View>
-      )}
+      <NewGameMetaControls
+        forceShowTutorial={() => setForceShowTutorial(true)}
+      />
     </>
   );
 }

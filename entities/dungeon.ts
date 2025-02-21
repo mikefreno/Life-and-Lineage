@@ -598,6 +598,7 @@ export class SpecialEncounter {
       scaler: json.scaler,
       countChances: json.countChances,
       parent: json.parent,
+      activated: json.activated,
     });
   }
 }

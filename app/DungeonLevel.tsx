@@ -82,6 +82,13 @@ const DungeonLevelScreen = observer(() => {
     if (colorScheme != "dark") {
       uiStore.dungeonSetter();
     }
+    if (
+      dungeonStore.currentInstance?.name.toLowerCase() == "training grounds"
+    ) {
+      dungeonStore.setEncounter(false);
+      dungeonStore.setInCombat(true);
+      uiStore.incrementLoadingStep();
+    }
 
     new Promise<void>((resolve) => {
       if (dungeonStore.currentMap && dungeonStore.currentPosition) {

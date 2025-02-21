@@ -2399,6 +2399,21 @@ export const EnemyImageMap = {
     width: 64,
     mirror: true,
   },
+  training_dummy: {
+    sets: {
+      hurt: {
+        anim: require("../assets/images/monsters/Training_Dummy/HIT.png"),
+        frames: 5,
+      },
+      idle: {
+        anim: require("../assets/images/monsters/Training_Dummy/IDLE.png"),
+        frames: 1,
+      },
+      spawn: null,
+    },
+    height: 48,
+    width: 48,
+  },
   viking_assassin: {
     sets: {
       attack_1: {

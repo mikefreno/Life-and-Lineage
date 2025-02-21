@@ -21,7 +21,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { isValidPassword } from "../../utility/functions/password";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
-import { useStyles } from "../../hooks/styles";
+import { tw, useStyles } from "../../hooks/styles";
 
 const SignUpScreen = observer(() => {
   const vibration = useVibration();
@@ -173,7 +173,7 @@ const SignUpScreen = observer(() => {
               onPress={handleGoogleSignUp}
               style={styles.providerButton}
             >
-              <Text style={styles.xl}>Register with Google</Text>
+              <Text style={[styles.xl, tw.pr1]}>Sign up with Google</Text>
               <GoogleIcon height={20} width={20} />
             </Pressable>
             {Platform.OS == "ios" && (
@@ -195,6 +195,7 @@ const SignUpScreen = observer(() => {
               onPress={() => setUsingEmail(true)}
               backgroundColor={"#2563eb"}
               style={{ width: 230 }}
+              buttonStyle={{ borderRadius: 5 }}
             >
               <Text
                 style={{ fontSize: 20, textAlign: "center", color: "white" }}

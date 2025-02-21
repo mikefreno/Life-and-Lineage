@@ -231,9 +231,10 @@ const BattleTab = observer(
                 <FlatList
                   data={combinedData}
                   inverted
+                  persistentScrollbar
                   renderItem={({ item: attackOrSpell, index }) => (
                     <>
-                      <ThemedView
+                      <View
                         style={
                           attackOrSpell instanceof Spell && {
                             backgroundColor:
@@ -340,7 +341,7 @@ const BattleTab = observer(
                             </Text>
                           </Pressable>
                         </View>
-                      </ThemedView>
+                      </View>
                       {index == combinedData.length - 1 && (
                         <ThemedView style={styles.attackCardBase}>
                           <View style={styles.columnCenter}>

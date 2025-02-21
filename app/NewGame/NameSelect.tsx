@@ -15,6 +15,7 @@ import { useRootStore } from "../../hooks/stores";
 import { FadeSlide } from "../../components/AnimatedWrappers";
 import { text, tw_base, useStyles } from "../../hooks/styles";
 import GenericFlatButton from "../../components/GenericFlatButton";
+import NewGameMetaControls from "@/components/NewGameMetaControls";
 
 export default function SetName() {
   const styles = useStyles();
@@ -144,6 +145,7 @@ export default function SetName() {
             </View>
           </View>
         </KeyboardAvoidingView>
+        <NewGameMetaControls />
       </View>
     </TouchableWithoutFeedback>
   );

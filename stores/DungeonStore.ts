@@ -329,7 +329,7 @@ export class DungeonStore {
       wait(350).then(() => {
         if (newPosition.specialEncounter) {
           runInAction(() => {
-            this.setCurrentSpecialEncounter(newPosition.specialEncounter);
+            this.setCurrentSpecialEncounter(newPosition.specialEncounter!);
             this.inSpecialRoom = true;
             this.inCombat = false;
             this.visitRoom(newPosition);

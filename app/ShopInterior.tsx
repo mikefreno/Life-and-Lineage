@@ -25,7 +25,7 @@ import { InventoryItem } from "../components/Draggable";
 import { useDraggableStore, useRootStore } from "../hooks/stores";
 import { useVibration } from "../hooks/generic";
 import type { Item } from "../entities/item";
-import { flex, tw, useStyles } from "../hooks/styles";
+import { flex, shadows, tw, useStyles } from "../hooks/styles";
 
 const GreetingComponent = ({ greeting }: { greeting: string }) => {
   const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -52,6 +52,7 @@ const GreetingComponent = ({ greeting }: { greeting: string }) => {
     <Animated.View
       style={[
         styles.greetingContainer,
+        shadows.soft,
         {
           opacity: fadeAnim,
         },
