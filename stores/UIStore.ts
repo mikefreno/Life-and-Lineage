@@ -438,32 +438,6 @@ export default class UIStore {
     return JSON.parse(stored);
   }
 
-  hydrateShaderSettings() {
-    const curvature = storage.getNumber("curvature");
-    const scanlineIntensity = storage.getNumber("scanlineIntensity");
-    const noiseIntensity = storage.getNumber("noiseIntensity");
-    const flickerIntensity = storage.getNumber("flickerIntensity");
-    const vignetteIntensity = storage.getNumber("vignetteIntensity");
-    const rgbOffset = storage.getNumber("rgbOffset");
-    const brightness = storage.getNumber("brightness");
-    const contrast = storage.getNumber("contrast");
-    const blooming = storage.getNumber("blooming");
-    const ghostIntensity = storage.getNumber("ghost");
-
-    return {
-      curvature: curvature ?? 2.0,
-      scanlineIntensity: scanlineIntensity ?? 0.04,
-      noiseIntensity: noiseIntensity ?? 0.02,
-      flickerIntensity: flickerIntensity ?? 0.01,
-      vignetteIntensity: vignetteIntensity ?? 0.5,
-      rgbOffset: rgbOffset ?? 0.002,
-      brightness: brightness ?? 1.1,
-      contrast: contrast ?? 1.2,
-      blooming: blooming ?? 0.002,
-      ghostIntensity: ghostIntensity ?? 0.15,
-    };
-  }
-
   persistUISettings() {
     storage.set(
       "ui_settings",

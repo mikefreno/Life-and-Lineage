@@ -388,8 +388,6 @@ export const AppSettings = observer(() => {
               <Text style={text["2xl"]}>Off</Text>
             </Pressable>
           </View>
-
-          <GenericStrikeAround>Shader Controls</GenericStrikeAround>
         </View>
       </ScrollView>
     </>
