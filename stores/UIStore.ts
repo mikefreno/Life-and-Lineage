@@ -58,6 +58,7 @@ export default class UIStore {
   displayedProgress: number = 0;
   currentTipIndex: number = 0;
   progressIncrementing: boolean = false;
+  playerStatusHeight: number = 0;
 
   storeLoadingStatus: Record<string, boolean> = {
     player: false,
@@ -151,6 +152,7 @@ export default class UIStore {
       newbornBaby: observable,
       colorHeldForDungeon: observable,
       currentTipIndex: observable,
+      playerStatusHeight: observable,
 
       startTipCycle: action,
       completeLoading: action,
@@ -168,6 +170,7 @@ export default class UIStore {
       dungeonSetter: action,
       clearDungeonColor: action,
       markStoreAsLoaded: action,
+      setPlayerStatusHeight: action,
 
       colorScheme: computed,
       allResourcesLoaded: computed,
@@ -247,6 +250,10 @@ export default class UIStore {
 
   get isDark() {
     return this.colorScheme === "dark";
+  }
+
+  setPlayerStatusHeight(value: number) {
+    this.playerStatusHeight = value;
   }
 
   startTipCycle() {

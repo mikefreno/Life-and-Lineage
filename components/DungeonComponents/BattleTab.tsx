@@ -174,8 +174,21 @@ const BattleTab = observer(
           }}
           size={80}
         >
-          <ThemedView style={styles.encounterResultContainer}>
-            <Text style={styles.encounterResultTitle}>
+          <ThemedView
+            style={{
+              width: "100%",
+              height: "100%",
+              padding: 8,
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 20,
+                textAlign: "center",
+                marginBottom: 16,
+              }}
+            >
               {encounterResult?.message}
             </Text>
             {encounterResult?.health && (
@@ -206,10 +219,21 @@ const BattleTab = observer(
           !dungeonStore.inCombat ? (
             dungeonStore.currentSpecialEncounter ? (
               <ThemedView style={styles.specialEncounterContainer}>
-                <Text style={styles.specialEncounterPrompt}>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    textAlign: "center",
+                    marginBottom: 16,
+                  }}
+                >
                   {dungeonStore.currentSpecialEncounter.prompt}
                 </Text>
-                <View style={styles.specialEncounterButtonContainer}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-around",
+                  }}
+                >
                   <GenericRaisedButton
                     onPress={() => handleSpecialEncounter("activate")}
                   >
@@ -428,7 +452,13 @@ const BattleTab = observer(
         ) : (
           <View style={{ flex: 1, ...tw.px2 }}>
             <View style={styles.logContent}>
-              {Platform.OS == "web" ? (
+              {dungeonStore.logs.length === 0 ? (
+                <View style={{ marginVertical: "auto" }}>
+                  <Text style={[text.lg, { textAlign: "center" }]}>
+                    Combat logs will appear here.
+                  </Text>
+                </View>
+              ) : Platform.OS == "web" ? (
                 <ScrollView>
                   {dungeonStore.reversedLogs.map((text) => (
                     <Text style={{ paddingVertical: 4 }}>

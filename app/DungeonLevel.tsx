@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import { ThemedView, Text } from "../components/Themed";
 import { type LayoutChangeEvent, View } from "react-native";
 import { useRef, useEffect, useState, useCallback } from "react";
@@ -57,6 +57,7 @@ const DungeonLevelScreen = observer(() => {
   const styles = useStyles();
 
   const pouchRef = useRef<View>(null);
+  const mainBodyRef = useRef<View>(null);
 
   const setPouchBoundsOnLayout = useCallback(
     (event: LayoutChangeEvent) => {
@@ -145,6 +146,10 @@ const DungeonLevelScreen = observer(() => {
     setInventoryFullNotifier(false);
   }, [showLeftBehindItemsScreen]);
 
+  useLayoutEffect(() => {
+    mainBodyRef.current?.measure((x, y, width, height) => {});
+  }, [mainBodyRef]);
+
   if (currentLevel) {
     return (
       <>
@@ -230,8 +235,17 @@ const DungeonLevelScreen = observer(() => {
           ) : (
             <DungeonMapRender />
           )}
-          <View style={{ flex: 1 }}>
-            <LinearGradientBlur style={{ position: "absolute" }} />
+          <View ref={mainBodyRef} style={{ flex: 1 }}>
+            <LinearGradientBlur
+              style={{
+                position: "absolute",
+                bottom: 0,
+                marginBottom: -uiStore.playerStatusHeight,
+                paddingTop: uiStore.playerStatusHeight,
+                height:
+                  uiStore.playerStatusHeight + uiStore.dimensions.height / 2,
+              }}
+            />
             <BattleTab battleTab={battleTab} />
             <BattleTabControls
               battleTab={battleTab}

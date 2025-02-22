@@ -536,9 +536,13 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                   )}
                 </Pressable>
               ),
-              title: `${toTitleCase(
-                dungeonStore.currentInstance?.name as string,
-              )} Level ${dungeonStore.currentLevel?.level}`,
+              title:
+                dungeonStore.currentInstance?.name.toLowerCase() ===
+                "training grounds"
+                  ? "Training Grounds"
+                  : `${toTitleCase(
+                      dungeonStore.currentInstance?.name as string,
+                    )} Level ${dungeonStore.currentLevel?.level}`,
             }}
           />
           <Stack.Screen

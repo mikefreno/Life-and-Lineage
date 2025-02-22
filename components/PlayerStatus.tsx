@@ -109,7 +109,7 @@ const PlayerStatus = observer(
     positioning = "absolute",
     style,
   }: PlayerStatusProps) => {
-    const { playerState, uiStore } = useRootStore();
+    const { playerState, uiStore, dungeonStore } = useRootStore();
     const styles = useStyles();
     const [showingHealthWarningPulse, setShowingHealthWarningPulse] =
       useState<boolean>(false);
@@ -138,6 +138,15 @@ const PlayerStatus = observer(
       inputRange: [0, 1],
       outputRange: ["transparent", "rgba(180,30,30,0.4)"],
     });
+    const playerStatusRef = useRef<View>(null);
+
+    useEffect(() => {
+      if (playerStatusRef.current) {
+        playerStatusRef.current.measure((x, y, width, height) => {
+          uiStore.setPlayerStatusHeight(height);
+        });
+      }
+    }, [playerStatusRef]);
 
     useEffect(() => {
       if (playerState?.getTotalAllocatedPoints() == 0) {
@@ -429,6 +438,39 @@ const PlayerStatus = observer(
             </View>
           );
         }
+      } else if (dungeonStore.isInDungeon) {
+        return (
+          <View
+            style={{
+              zIndex: 10,
+              overflow: "hidden",
+              paddingBottom: 24,
+              backgroundColor:
+                Platform.OS !== "ios"
+                  ? uiStore.colorScheme === "dark"
+                    ? "#27272a"
+                    : "#fafafa"
+                  : "transparent",
+              shadowColor:
+                uiStore.colorScheme === "dark" ? "#ffffff" : "#000000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            }}
+          >
+            <Animated.View
+              style={{
+                display: "flex",
+                backgroundColor: showingHealthWarningPulse
+                  ? healthWarningInterpolation
+                  : healthDamageInterpolation,
+              }}
+            >
+              {children}
+            </Animated.View>
+          </View>
+        );
       } else {
         return (
           <BlurView
@@ -700,6 +742,7 @@ const PlayerStatus = observer(
           </View>
         </GenericModal>
         <Pressable
+          ref={playerStatusRef}
           onPress={() => {
             vibration({ style: "light" });
             uiStore.setDetailedStatusViewShowing(true);
