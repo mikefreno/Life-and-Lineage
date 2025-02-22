@@ -1,6 +1,6 @@
 import { useFonts } from "expo-font";
 import { Stack, router, usePathname } from "expo-router";
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import * as SplashScreen from "expo-splash-screen";

@@ -218,7 +218,14 @@ const BattleTab = observer(
         {battleTab == "attacksOrNavigation" ? (
           !dungeonStore.inCombat ? (
             dungeonStore.currentSpecialEncounter ? (
-              <ThemedView style={styles.specialEncounterContainer}>
+              <ThemedView
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  padding: 8,
+                  justifyContent: "center",
+                }}
+              >
                 <Text
                   style={{
                     fontSize: 20,

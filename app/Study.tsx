@@ -231,8 +231,25 @@ export default function LearningKnowledgeScreen() {
               <Text style={[styles.textCenter, styles.xl]}>
                 Available for Study
               </Text>
-              <ScrollView horizontal>
-                <View style={[styles.my2, { maxHeight: 96, flexWrap: "wrap" }]}>
+              <ScrollView
+                horizontal
+                contentContainerStyle={{
+                  flexGrow: 1,
+                  justifyContent: "center",
+                }}
+              >
+                <View
+                  style={[
+                    styles.my2,
+                    {
+                      maxHeight: 96,
+                      flexWrap: "wrap",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    },
+                  ]}
+                >
                   {filteredBooks.map((item) => (
                     <Pressable
                       key={item.id}

@@ -1099,6 +1099,12 @@ export const useStyles = () => {
       alignItems: "center",
       padding: 16,
     } as const,
+    dungeonBlur: {
+      position: "absolute",
+      bottom: 0,
+      marginBottom: -uiStore.playerStatusHeight,
+      height: "70%",
+    } as const,
   });
 };
 

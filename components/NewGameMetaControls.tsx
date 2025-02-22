@@ -15,6 +15,7 @@ const NewGameMetaControls = observer(
         {forceShowTutorial &&
           (tutorialStore.tutorialsEnabled || !playerState) && (
             <Pressable
+              style={{ marginBottom: 4 }}
               onPress={forceShowTutorial}
               accessibilityRole="button"
               accessibilityLabel="Show Tutorial"

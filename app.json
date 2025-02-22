@@ -2,7 +2,7 @@
   "expo": {
     "name": "Lineage",
     "slug": "life-and-lineage",
-    "version": "0.7.5",
+    "version": "0.7.6",
     "orientation": "portrait",
     "icon": "assets/images/icon.png",
     "scheme": "lineageapp",
@@ -35,6 +35,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "expo-sqlite",
       "expo-router",
       "react-native-edge-to-edge",
       "expo-apple-authentication",
@@ -74,8 +75,7 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.976302581992-tbi6afmid4eq5dsn63t30kpfpdhjju8m"
         }
-      ],
-      "expo-sqlite"
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -88,7 +88,7 @@
         "projectId": "f4a10fdc-c377-4a37-8ad7-27685b89b4d9"
       }
     },
-    "runtimeVersion": "0.7.5",
+    "runtimeVersion": "0.7.6",
     "updates": {
       "url": "https://u.expo.dev/f4a10fdc-c377-4a37-8ad7-27685b89b4d9"
     },

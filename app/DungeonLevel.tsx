@@ -58,6 +58,9 @@ const DungeonLevelScreen = observer(() => {
 
   const pouchRef = useRef<View>(null);
   const mainBodyRef = useRef<View>(null);
+  const [mainHeight, setMainHeight] = useState<number>(
+    uiStore.playerStatusHeight,
+  );
 
   const setPouchBoundsOnLayout = useCallback(
     (event: LayoutChangeEvent) => {
@@ -147,7 +150,9 @@ const DungeonLevelScreen = observer(() => {
   }, [showLeftBehindItemsScreen]);
 
   useLayoutEffect(() => {
-    mainBodyRef.current?.measure((x, y, width, height) => {});
+    mainBodyRef.current?.measure((x, y, width, height) => {
+      setMainHeight(height);
+    });
   }, [mainBodyRef]);
 
   if (currentLevel) {
@@ -235,17 +240,8 @@ const DungeonLevelScreen = observer(() => {
           ) : (
             <DungeonMapRender />
           )}
+          <LinearGradientBlur style={styles.dungeonBlur} />
           <View ref={mainBodyRef} style={{ flex: 1 }}>
-            <LinearGradientBlur
-              style={{
-                position: "absolute",
-                bottom: 0,
-                marginBottom: -uiStore.playerStatusHeight,
-                paddingTop: uiStore.playerStatusHeight,
-                height:
-                  uiStore.playerStatusHeight + uiStore.dimensions.height / 2,
-              }}
-            />
             <BattleTab battleTab={battleTab} />
             <BattleTabControls
               battleTab={battleTab}

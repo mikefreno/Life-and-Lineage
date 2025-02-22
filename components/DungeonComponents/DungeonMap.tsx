@@ -165,7 +165,7 @@ export const DungeonMapControls = observer(() => {
                   )
                 }
               >
-                Re-Enter
+                Enter
               </GenericRaisedButton>
             )}
           <ArrowButton direction="right" />
