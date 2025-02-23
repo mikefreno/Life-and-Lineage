@@ -110,6 +110,10 @@ export class DungeonStore {
       leaveSpecialEncounterRoom: action,
     });
 
+    if (__DEV__) {
+      this._openAllInstances();
+    }
+
     reaction(
       () => this.currentInstance?.id,
       (instanceId) => {
@@ -437,6 +441,23 @@ export class DungeonStore {
         this.dungeonInstances.push(inst);
         _dungeonInstanceSave(inst);
       });
+    }
+  }
+
+  private _openAllInstances() {
+    if (!__DEV__) return;
+    const currentNames = this.dungeonInstances.map((inst) => inst.name);
+    const instancesToUnlock = dungeonsJSON.map((json) => {
+      if (!currentNames.includes(json.name)) {
+        return DungeonInstance.fromJSON(json);
+      }
+    });
+    for (const inst of instancesToUnlock) {
+      if (inst) {
+        runInAction(() => {
+          this.dungeonInstances.push(inst);
+        });
+      }
     }
   }
 

@@ -45,6 +45,16 @@ SplashScreen.setOptions({
 
 Sentry.init({
   dsn: "https://2cff54f8aeb50bcb7151c159cc40fe1b@o4506630160187392.ingest.sentry.io/4506630163398656",
+  //@ts-ignore
+  //replaysSessionSampleRate: __DEV__ ? 1.0 : 0.1,
+  //replaysOnErrorSampleRate: 1.0,
+  //integrations: [
+  //Sentry.mobileReplayIntegration({
+  //maskAllText: false,
+  //maskAllImages: false,
+  //maskAllVectors: false,
+  //}),
+  //],
   debug: false, //__DEV__, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
 });
 

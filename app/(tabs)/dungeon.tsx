@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { Text } from "../../components/Themed";
 import {
   Pressable,
@@ -36,6 +36,7 @@ const DungeonScreen = observer(() => {
       .sort((a, b) => a.difficulty - b.difficulty),
   );
   const [scrollViewHeight, setScrollViewHeight] = useState(0);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -43,8 +44,6 @@ const DungeonScreen = observer(() => {
   const isFocused = useIsFocused();
   const headerHeight = useHeaderHeight();
   const styles = useStyles();
-
-  const warningHeight = 64;
 
   useEffect(() => {
     const sorted = dungeonInstances
@@ -62,7 +61,11 @@ const DungeonScreen = observer(() => {
   const onLayout = (event: LayoutChangeEvent) => {
     const { height } = event.nativeEvent.layout;
     setScrollViewHeight(height);
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd();
+    }
   };
+
   const getLevelColor = useMemo(() => {
     const cache = new Map();
 
@@ -103,6 +106,17 @@ const DungeonScreen = observer(() => {
     };
   }, []);
 
+  const blurHeader = useRef<View>(null);
+
+  const [blurHeaderHeight, setBlurHeaderHeight] = useState<number>(100);
+  useLayoutEffect(() => {
+    if (blurHeader.current) {
+      blurHeader.current.measure((x, y, width, height) =>
+        setBlurHeaderHeight(height),
+      );
+    }
+  });
+
   return (
     <>
       <TutorialModal
@@ -121,21 +135,24 @@ const DungeonScreen = observer(() => {
           body: "And greater rewards. Unlock more levels by defeating each levels boss.",
         }}
       />
-      <PlatformDependantBlurView
+      <View
+        ref={blurHeader}
         style={[
           styles.warningContainer,
           { marginTop: headerHeight, paddingBottom: 4 },
         ]}
       >
-        <Text style={{ textAlign: "center", fontSize: 24, lineHeight: 32 }}>
-          The dungeon is a dangerous place. Be careful.
-        </Text>
-      </PlatformDependantBlurView>
+        <PlatformDependantBlurView style={{ flex: 1 }}>
+          <Text style={{ textAlign: "center", fontSize: 24, lineHeight: 32 }}>
+            The dungeon is a dangerous place. Be careful.
+          </Text>
+        </PlatformDependantBlurView>
+      </View>
       <View
         style={[
           {
             flex: 1,
-            paddingTop: headerHeight + warningHeight,
+            paddingTop: headerHeight + blurHeaderHeight,
           },
         ]}
       >
@@ -143,7 +160,7 @@ const DungeonScreen = observer(() => {
           <View
             style={[
               styles.pageIndicator,
-              { marginTop: headerHeight + warningHeight },
+              { marginTop: headerHeight + blurHeaderHeight },
             ]}
           >
             <Text style={{ fontSize: 16 }}>
@@ -153,6 +170,7 @@ const DungeonScreen = observer(() => {
         )}
         <ScrollView
           pagingEnabled
+          ref={scrollViewRef}
           onScroll={onScroll}
           onLayout={onLayout}
           scrollEventThrottle={16}
@@ -177,7 +195,7 @@ const DungeonScreen = observer(() => {
                   style={{ marginHorizontal: "auto", justifyContent: "center" }}
                 >
                   {dungeonInstance.levels
-                    .filter((level) => level.unlocked)
+                    .filter((level) => level.unlocked || __DEV__)
                     .map((level, levelIdx) => (
                       <Pressable
                         key={levelIdx}
