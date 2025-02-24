@@ -50,6 +50,23 @@ const TabLayout = observer(() => {
   const router = useRouter();
   const vibration = useVibration();
 
+  const commonOptions = {
+    lazy: false,
+    headerTransparent: true,
+    headerTitleAlign: "center",
+    headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
+    headerBackground:
+      Platform.OS == "ios"
+        ? () => (
+            <BlurView
+              intensity={100}
+              style={StyleSheet.absoluteFill}
+              tint={uiStore.colorScheme}
+            />
+          )
+        : () => <ThemedView style={[StyleSheet.absoluteFill, shadows.soft]} />,
+  } as const;
+
   return (
     <>
       {playerState && playerState.keyItems.length > 0 && (
@@ -133,24 +150,7 @@ const TabLayout = observer(() => {
           <Tabs.Screen
             name="index"
             options={{
-              lazy: false,
-              headerTransparent: true,
-              headerTitleAlign: "center",
-              headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-              headerBackground:
-                Platform.OS == "ios"
-                  ? () => (
-                      <BlurView
-                        intensity={100}
-                        style={StyleSheet.absoluteFill}
-                        tint={uiStore.colorScheme}
-                      />
-                    )
-                  : () => (
-                      <ThemedView
-                        style={[StyleSheet.absoluteFill, shadows.soft]}
-                      />
-                    ),
+              ...commonOptions,
               title: "Home",
               tabBarIcon: ({ color }) =>
                 playerState?.playerClass == "necromancer" ? (
@@ -207,24 +207,7 @@ const TabLayout = observer(() => {
           <Tabs.Screen
             name="spells"
             options={{
-              lazy: false,
-              headerTransparent: true,
-              headerTitleAlign: "center",
-              headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-              headerBackground:
-                Platform.OS == "ios"
-                  ? () => (
-                      <BlurView
-                        intensity={100}
-                        style={StyleSheet.absoluteFill}
-                        tint={uiStore.colorScheme}
-                      />
-                    )
-                  : () => (
-                      <ThemedView
-                        style={[StyleSheet.absoluteFill, shadows.soft]}
-                      />
-                    ),
+              ...commonOptions,
               title: "Spells",
               tabBarIcon: ({ color }) => (
                 <Wand width={26} height={26} color={color} />
@@ -256,24 +239,7 @@ const TabLayout = observer(() => {
           <Tabs.Screen
             name="labor"
             options={{
-              lazy: false,
-              headerTransparent: true,
-              headerTitleAlign: "center",
-              headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-              headerBackground:
-                Platform.OS == "ios"
-                  ? () => (
-                      <BlurView
-                        intensity={100}
-                        style={StyleSheet.absoluteFill}
-                        tint={uiStore.colorScheme}
-                      />
-                    )
-                  : () => (
-                      <ThemedView
-                        style={[StyleSheet.absoluteFill, shadows.soft]}
-                      />
-                    ),
+              ...commonOptions,
               title: "Labor",
               tabBarIcon: ({ color }) => (
                 <Broom width={30} height={26} color={color} />
@@ -321,24 +287,7 @@ const TabLayout = observer(() => {
           <Tabs.Screen
             name="dungeon"
             options={{
-              lazy: false,
-              headerTransparent: true,
-              headerTitleAlign: "center",
-              headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-              headerBackground:
-                Platform.OS == "ios"
-                  ? () => (
-                      <BlurView
-                        intensity={100}
-                        style={StyleSheet.absoluteFill}
-                        tint={uiStore.colorScheme}
-                      />
-                    )
-                  : () => (
-                      <ThemedView
-                        style={[StyleSheet.absoluteFill, shadows.soft]}
-                      />
-                    ),
+              ...commonOptions,
               title: "Dungeon",
               tabBarIcon: ({ color }) => (
                 <Dungeon width={28} height={28} color={color} />
@@ -372,24 +321,7 @@ const TabLayout = observer(() => {
           <Tabs.Screen
             name="shops"
             options={{
-              lazy: false,
-              headerTransparent: true,
-              headerTitleAlign: "center",
-              headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-              headerBackground:
-                Platform.OS == "ios"
-                  ? () => (
-                      <BlurView
-                        intensity={100}
-                        style={StyleSheet.absoluteFill}
-                        tint={uiStore.colorScheme}
-                      />
-                    )
-                  : () => (
-                      <ThemedView
-                        style={[StyleSheet.absoluteFill, shadows.soft]}
-                      />
-                    ),
+              ...commonOptions,
               title: "Shops",
               tabBarIcon: ({ color }) => (
                 <Potion width={28} height={30} color={color} />
@@ -413,24 +345,7 @@ const TabLayout = observer(() => {
           <Tabs.Screen
             name="medical"
             options={{
-              lazy: false,
-              headerTransparent: true,
-              headerTitleAlign: "center",
-              headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
-              headerBackground:
-                Platform.OS == "ios"
-                  ? () => (
-                      <BlurView
-                        intensity={100}
-                        style={StyleSheet.absoluteFill}
-                        tint={uiStore.colorScheme}
-                      />
-                    )
-                  : () => (
-                      <ThemedView
-                        style={[StyleSheet.absoluteFill, shadows.soft]}
-                      />
-                    ),
+              ...commonOptions,
               title: "Medical",
               tabBarIcon: ({ color }) => (
                 <Medical width={30} height={28} color={color} />

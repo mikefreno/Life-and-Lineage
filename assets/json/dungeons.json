@@ -276,9 +276,6 @@
         "level": 1,
         "tiles": 20,
         "unlocked": true,
-        "boss": [
-          "hobgoblin"
-        ],
         "normalEncounters": [
           [
             {
@@ -305,18 +302,70 @@
         ],
         "bossEncounter": [
           {
-            "name": "zombie",
+            "name": "kobold",
             "scaler": 1.25
           }
-        ]
+        ],
+        "specialEncounters": []
       },
       {
         "level": 2,
         "tiles": 25,
-        "boss": [
-          "goblin shaman",
-          "hobgoblin"
-        ]
+        "normalEncounters": [
+          [
+            {
+              "name": "goblin",
+              "scaler": 1
+            }
+          ],
+          [
+            {
+              "name": "kobold",
+              "scaler": 1
+            }
+          ],
+          [
+            {
+              "name": "kobold",
+              "scaler": 0.75
+            },
+            {
+              "name": "goblin",
+              "scaler": 0.75
+            }
+          ],
+          [
+            {
+              "name": "kobold",
+              "scaler": 0.75
+            },
+            {
+              "name": "bat",
+              "scaler": 0.75
+            }
+          ],
+          [
+            {
+              "name": "goblin",
+              "scaler": 0.75
+            },
+            {
+              "name": "bat",
+              "scaler": 0.75
+            }
+          ]
+        ],
+        "bossEncounter": [
+          {
+            "name": "kobold",
+            "scaler": 1.0
+          },
+          {
+            "name": "goblin mage",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       }
     ],
     "unlocks": [
@@ -333,18 +382,16 @@
         "level": 1,
         "tiles": 20,
         "unlocked": true,
-        "boss": [
-          "bandit",
-          "bandit"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [],
+        "specialEncounters": []
       },
       {
         "level": 2,
         "tiles": 30,
-        "boss": [
-          "bandit boss",
-          "bandit"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [],
+        "specialEncounters": []
       }
     ],
     "unlocks": [
@@ -360,30 +407,30 @@
       {
         "level": 1,
         "tiles": 15,
-        "boss": [
-          "adept water mage"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [],
+        "specialEncounters": []
       },
       {
         "level": 2,
         "tiles": 15,
-        "boss": [
-          "adept air mage"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [],
+        "specialEncounters": []
       },
       {
         "level": 3,
         "tiles": 15,
-        "boss": [
-          "expert fire mage"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [],
+        "specialEncounters": []
       },
       {
         "level": 4,
         "tiles": 20,
-        "boss": [
-          "master earth mage"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [],
+        "specialEncounters": []
       }
     ],
     "unlocks": [
@@ -399,16 +446,16 @@
       {
         "level": 1,
         "tiles": 20,
-        "boss": [
-          "venomous spider"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [],
+        "specialEncounters": []
       },
       {
         "level": 2,
         "tiles": 25,
-        "boss": [
-          "brood mother"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [],
+        "specialEncounters": []
       }
     ],
     "unlocks": [
@@ -424,16 +471,26 @@
       {
         "level": 1,
         "tiles": 25,
-        "boss": [
-          "griffon"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "centaur",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       },
       {
         "level": 2,
         "tiles": 30,
-        "boss": [
-          "chimera"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "gryphon",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       }
     ],
     "unlocks": [
@@ -449,16 +506,26 @@
       {
         "level": 1,
         "tiles": 20,
-        "boss": [
-          "cave troll"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       },
       {
         "level": 2,
         "tiles": 25,
-        "boss": [
-          "moon bull"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       }
     ],
     "unlocks": [
@@ -474,16 +541,26 @@
       {
         "level": 1,
         "tiles": 20,
-        "boss": [
-          "cave troll"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       },
       {
         "level": 2,
         "tiles": 25,
-        "boss": [
-          "moon bull"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       }
     ],
     "unlocks": [
@@ -499,16 +576,26 @@
       {
         "level": 1,
         "tiles": 20,
-        "boss": [
-          "cave troll"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       },
       {
         "level": 2,
         "tiles": 25,
-        "boss": [
-          "moon bull"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       }
     ],
     "unlocks": [
@@ -524,16 +611,26 @@
       {
         "level": 1,
         "tiles": 20,
-        "boss": [
-          "cave troll"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       },
       {
         "level": 2,
         "tiles": 25,
-        "boss": [
-          "moon bull"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       }
     ],
     "unlocks": [
@@ -549,17 +646,26 @@
       {
         "level": 1,
         "tiles": 20,
-        "boss": [
-          "blood paladin"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       },
       {
         "level": 2,
         "tiles": 25,
-        "boss": [
-          "blood priest",
-          "blood paladin"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       }
     ],
     "unlocks": [
@@ -575,17 +681,26 @@
       {
         "level": 1,
         "tiles": 20,
-        "boss": [
-          "blood paladin"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       },
       {
         "level": 2,
         "tiles": 25,
-        "boss": [
-          "blood priest",
-          "blood paladin"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       }
     ],
     "unlocks": [
@@ -601,17 +716,26 @@
       {
         "level": 1,
         "tiles": 20,
-        "boss": [
-          "blood paladin"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       },
       {
         "level": 2,
         "tiles": 25,
-        "boss": [
-          "blood priest",
-          "blood paladin"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       }
     ],
     "unlocks": []
@@ -625,21 +749,100 @@
       {
         "level": 1,
         "tiles": 20,
-        "boss": [
-          "blood paladin"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       },
       {
         "level": 2,
         "tiles": 25,
-        "boss": [
-          "blood priest",
-          "blood paladin"
-        ]
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
       }
     ],
     "unlocks": [
-      "corrupted temple - atrium"
+      "ronin's redoubt"
+    ]
+  },
+  {
+    "name": "ronin's redoubt",
+    "id": 15,
+    "difficulty": 20,
+    "bgName": "AutumnForest",
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 2,
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "samurai old",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
+      }
+    ],
+    "unlocks": [
+      "blade fortress"
+    ]
+  },
+  {
+    "name": "kōtetsu moses",
+    "id": 16,
+    "difficulty": 25,
+    "bgName": "AutumnForest",
+    "levels": [
+      {
+        "level": 1,
+        "tiles": 20,
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "samurai old",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
+      },
+      {
+        "level": 2,
+        "tiles": 30,
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "samurai old",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
+      },
+      {
+        "level": 3,
+        "tiles": 10,
+        "normalEncounters": [],
+        "bossEncounter": [
+          {
+            "name": "samurai old",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": []
+      }
+    ],
+    "unlocks": [
+      "ronin's redoubt"
     ]
   }
 ]

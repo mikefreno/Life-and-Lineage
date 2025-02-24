@@ -142,7 +142,7 @@ const DungeonScreen = observer(() => {
           { marginTop: headerHeight, paddingBottom: 4 },
         ]}
       >
-        <PlatformDependantBlurView style={{ flex: 1 }}>
+        <PlatformDependantBlurView intensity={100} style={{ flex: 1 }}>
           <Text style={{ textAlign: "center", fontSize: 24, lineHeight: 32 }}>
             The dungeon is a dangerous place. Be careful.
           </Text>
