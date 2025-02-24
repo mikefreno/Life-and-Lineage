@@ -143,7 +143,6 @@ const PlayerStatus = observer(
     useEffect(() => {
       if (playerStatusRef.current) {
         playerStatusRef.current.measure((x, y, width, height, px, py) => {
-          console.log(py);
           uiStore.setPlayerStatusHeight(height);
           uiStore.setPlayerStatusTop(py);
         });
