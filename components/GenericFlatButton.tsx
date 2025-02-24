@@ -15,6 +15,7 @@ type GenericFlatButton = {
   disabled?: boolean;
   backgroundColor?: ColorValue;
   style?: ViewStyle;
+  innerStyle?: ViewStyle;
   children: string | ReactNode;
   textColor?: string;
   accessibilityRole?: AccessibilityRole;
@@ -36,6 +37,7 @@ const GenericFlatButton = ({
   textColor,
   children,
   style,
+  innerStyle,
   ...props
 }: GenericFlatButton) => {
   const styles = useStyles();
@@ -55,6 +57,7 @@ const GenericFlatButton = ({
               backgroundColor,
               transform: [{ scale: pressed ? 0.95 : 1 }],
               opacity: pressed ? 0.5 : 1,
+              ...innerStyle,
             },
           ]}
         >

@@ -428,15 +428,11 @@ export const useStyles = () => {
       width: "100%",
       position: "absolute",
       zIndex: 10,
-      paddingHorizontal: 32,
     } as const,
     pageIndicator: {
       position: "absolute",
       right: 16,
       zIndex: 10,
-    } as const,
-    dungeonScrollView: {
-      marginTop: -80,
     } as const,
     dungeonInstanceCard: {
       flex: 1,

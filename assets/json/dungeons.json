@@ -306,7 +306,32 @@
             "scaler": 1.25
           }
         ],
-        "specialEncounters": []
+        "specialEncounters": [
+          {
+            "name": "camp",
+            "countChances": {
+              "1": 1.0
+            },
+            "scaler": 1
+          },
+          {
+            "name": "chest",
+            "countChances": {
+              "0": 0.1,
+              "1": 0.8,
+              "2": 0.1
+            },
+            "scaler": 1
+          },
+          {
+            "name": "ritual altar",
+            "countChances": {
+              "0": 0.5,
+              "1": 0.5
+            },
+            "scaler": 1.5
+          }
+        ]
       },
       {
         "level": 2,
@@ -365,7 +390,32 @@
             "scaler": 1.0
           }
         ],
-        "specialEncounters": []
+        "specialEncounters": [
+          {
+            "name": "camp",
+            "countChances": {
+              "2": 1.0
+            },
+            "scaler": 1
+          },
+          {
+            "name": "chest",
+            "countChances": {
+              "0": 0.1,
+              "1": 0.5,
+              "2": 0.4
+            },
+            "scaler": 1
+          },
+          {
+            "name": "ritual altar",
+            "countChances": {
+              "0": 0.5,
+              "1": 0.5
+            },
+            "scaler": 1.5
+          }
+        ]
       }
     ],
     "unlocks": [
@@ -382,16 +432,92 @@
         "level": 1,
         "tiles": 20,
         "unlocked": true,
-        "normalEncounters": [],
+        "normalEncounters": [
+          [
+            {
+              "name": "bandit light",
+              "scaler": 1
+            }
+          ],
+          [
+            {
+              "name": "bandit light",
+              "scaler": 0.75
+            },
+            {
+              "name": "bandit light",
+              "scaler": 0.75
+            }
+          ],
+          [
+            {
+              "name": "bandit heavy",
+              "scaler": 1
+            }
+          ]
+        ],
         "bossEncounter": [],
-        "specialEncounters": []
+        "specialEncounters": [
+          {
+            "name": "camp",
+            "countChances": {
+              "1": 1.0
+            },
+            "scaler": 1
+          },
+          {
+            "name": "chest",
+            "countChances": {
+              "0": 0,
+              "1": 0,
+              "2": 0.4,
+              "3": 0.6
+            },
+            "scaler": 1
+          },
+          {
+            "name": "water basin",
+            "countChances": {
+              "0": 0.5,
+              "1": 0.5
+            },
+            "scaler": 1
+          }
+        ]
       },
       {
         "level": 2,
         "tiles": 30,
         "normalEncounters": [],
         "bossEncounter": [],
-        "specialEncounters": []
+        "specialEncounters": [
+          {
+            "name": "camp",
+            "countChances": {
+              "1": 1.0
+            },
+            "scaler": 1
+          },
+          {
+            "name": "chest",
+            "countChances": {
+              "0": 0,
+              "1": 0,
+              "2": 0.1,
+              "3": 0.5,
+              "4": 0.4
+            },
+            "scaler": 1
+          },
+          {
+            "name": "water basin",
+            "countChances": {
+              "0": 0,
+              "1": 1
+            },
+            "scaler": 1
+          }
+        ]
       }
     ],
     "unlocks": [
