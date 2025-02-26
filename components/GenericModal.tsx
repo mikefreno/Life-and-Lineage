@@ -19,7 +19,9 @@ interface GenericModalProps {
   backdropCloses?: boolean;
   size?: number;
   style?: StyleProp<ViewStyle>;
+  innerStyle?: StyleProp<ViewStyle>;
   noPad?: boolean;
+  scrollEnabled?: boolean;
   isCheckPointModal?: boolean;
   accessibilityRole?: AccessibilityRole;
   accessibilityLabel?: string;
@@ -51,6 +53,7 @@ export default function GenericModal({
   backFunction,
   children,
   backdropCloses = true,
+  scrollEnabled = false,
   size,
   style,
   noPad,
@@ -101,17 +104,21 @@ export default function GenericModal({
       {...props}
     >
       <ThemedView
-        style={{
-          ...styles.modalContent,
-          width: size ? `${size}%` : "83.3333%",
-          paddingHorizontal: noPad ? 0 : "2%",
-          paddingVertical: noPad ? 0 : 16,
-        }}
+        style={[
+          {
+            maxHeight: "90%",
+            ...styles.modalContent,
+            width: size ? `${size}%` : "83.3333%",
+            paddingHorizontal: noPad ? 0 : "2%",
+            paddingVertical: noPad ? 0 : 16,
+          },
+          props.innerStyle,
+        ]}
       >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           showsVerticalScrollIndicator={false}
-          scrollEnabled={false}
+          scrollEnabled={scrollEnabled}
         >
           {children}
         </ScrollView>

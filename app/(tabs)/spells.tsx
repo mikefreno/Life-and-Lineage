@@ -135,7 +135,9 @@ const SpellsScreen = observer(() => {
             </Text>
           </View>
         )}
-        <GenericStrikeAround>Proficiencies</GenericStrikeAround>
+        <View style={{ paddingHorizontal: 8 }}>
+          <GenericStrikeAround>Proficiencies</GenericStrikeAround>
+        </View>
         <View style={{ flex: 1, alignItems: "center" }}>
           {magicProficiencySection(playerState?.magicProficiencies)}
         </View>

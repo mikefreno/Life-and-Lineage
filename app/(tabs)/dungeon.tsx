@@ -24,6 +24,8 @@ import { useRootStore } from "../../hooks/stores";
 import { flex, tw_base, useStyles } from "../../hooks/styles";
 import GenericFlatButton from "@/components/GenericFlatButton";
 import Colors from "@/constants/Colors";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { AntDesign } from "@expo/vector-icons";
 
 const MIN_RED = 20;
 const MAX_RED = 255;
@@ -43,6 +45,7 @@ const DungeonScreen = observer(() => {
   const isFocused = useIsFocused();
   const headerHeight = useHeaderHeight();
   const styles = useStyles();
+  const tabHeight = useBottomTabBarHeight();
 
   useEffect(() => {
     const sorted = dungeonInstances
@@ -60,12 +63,10 @@ const DungeonScreen = observer(() => {
     const pageIndex = Math.round(offsetY / scrollViewHeight);
     setCurrentPage(pageIndex);
   };
+
   const onLayout = (event: LayoutChangeEvent) => {
     const { height } = event.nativeEvent.layout;
     setScrollViewHeight(height);
-    if (scrollViewRef.current && sort == "ascending") {
-      scrollViewRef.current.scrollToEnd();
-    }
   };
 
   const getLevelColor = useMemo(() => {
@@ -149,7 +150,6 @@ const DungeonScreen = observer(() => {
         ]}
       >
         <PlatformDependantBlurView
-          intensity={100}
           style={{
             flex: 1,
             paddingHorizontal: tw_base[6],
@@ -184,26 +184,52 @@ const DungeonScreen = observer(() => {
                 { width: "100%", paddingHorizontal: tw_base[2] },
               ]}
             >
-              <GenericFlatButton
-                onPress={() => {
-                  setSort(sort == "ascending" ? "descending" : "ascending");
-                  vibration({ style: "light" });
-                  scrollViewRef.current?.scrollTo({
-                    x: 0,
-                    y: 0,
-                    animated: true,
-                  });
-                }}
-                innerStyle={{
-                  paddingHorizontal: tw_base[2],
-                  paddingTop: tw_base[1],
-                  backgroundColor: Colors[uiStore.colorScheme].background,
-                }}
-              >
-                <Text style={{ textAlign: "center" }}>{`Sort by:\n${toTitleCase(
-                  sort,
-                )} Difficulty`}</Text>
-              </GenericFlatButton>
+              <View>
+                <GenericFlatButton
+                  onPress={() => {
+                    setSort(sort == "ascending" ? "descending" : "ascending");
+                    vibration({ style: "light" });
+                  }}
+                  innerStyle={{
+                    paddingHorizontal: tw_base[2],
+                    paddingTop: tw_base[1],
+                    backgroundColor: Colors[uiStore.colorScheme].background,
+                  }}
+                >
+                  <Text
+                    style={{ textAlign: "center" }}
+                  >{`Sort by:\n${toTitleCase(sort)} Difficulty`}</Text>
+                </GenericFlatButton>
+                <Pressable
+                  style={{ marginVertical: tw_base[1] }}
+                  onPress={() => {
+                    vibration({ style: "light" });
+                    scrollViewRef.current?.scrollTo({
+                      x: 0,
+                      y: 0,
+                      animated: true,
+                    });
+                  }}
+                >
+                  <AntDesign
+                    name="upcircleo"
+                    size={28}
+                    color={Colors[uiStore.colorScheme].border}
+                  />
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    vibration({ style: "light" });
+                    scrollViewRef.current?.scrollToEnd();
+                  }}
+                >
+                  <AntDesign
+                    name="downcircleo"
+                    size={28}
+                    color={Colors[uiStore.colorScheme].border}
+                  />
+                </Pressable>
+              </View>
               <Text style={{ fontSize: 16 }}>
                 {currentPage + 1} of {sorted.length}
               </Text>
@@ -211,88 +237,87 @@ const DungeonScreen = observer(() => {
           </View>
         )}
         <ScrollView
+          key={`dungeon-scroll-${isFocused}`}
           pagingEnabled
           ref={scrollViewRef}
           onScroll={onScroll}
           onLayout={onLayout}
           scrollEventThrottle={16}
+          contentInset={{ top: 96 }}
+          style={{
+            marginBottom: uiStore.playerStatusHeight + tabHeight,
+            marginTop: -96,
+          }}
           contentContainerStyle={{
             height: `${100 * sorted.length}%`,
             paddingHorizontal: 12,
-            marginTop: 0,
-          }}
-          style={{
-            marginTop: 0,
-            marginBottom: uiStore.dimensions.height - uiStore.playerStatusTop,
           }}
         >
-          {sorted.map((dungeonInstance, dungeonInstanceIdx) => {
-            return (
-              <ThemedCard
-                key={dungeonInstanceIdx}
-                style={styles.dungeonInstanceCard}
+          {sorted.map((dungeonInstance, dungeonInstanceIdx) => (
+            <ThemedCard
+              key={`dungeon-${dungeonInstance.name}-${dungeonInstanceIdx}`}
+              style={styles.dungeonInstanceCard}
+            >
+              <Text style={styles.dungeonInstanceTitle}>
+                {toTitleCase(dungeonInstance.name)}
+              </Text>
+              <View
+                style={{ marginHorizontal: "auto", justifyContent: "center" }}
               >
-                <Text style={styles.dungeonInstanceTitle}>
-                  {toTitleCase(dungeonInstance.name)}
-                </Text>
-                <View
-                  style={{ marginHorizontal: "auto", justifyContent: "center" }}
-                >
-                  {dungeonInstance.levels
-                    .filter((level) => level.unlocked || __DEV__)
-                    .map((level, levelIdx) => (
-                      <Pressable
-                        key={levelIdx}
-                        onPress={() => {
-                          uiStore.setTotalLoadingSteps(5);
-                          vibration({ style: "warning" });
-                          dungeonStore
-                            .setUpDungeon(dungeonInstance, level)
-                            .then(() => uiStore.incrementLoadingStep());
-                          wait(100).then(() => {
-                            router.replace(`/DungeonLevel`);
-                            uiStore.incrementLoadingStep();
-                          });
-                        }}
-                      >
-                        {({ pressed }) => {
-                          const { bgColor, textColor } = getLevelColor(
-                            dungeonInstance,
-                            levelIdx,
-                            sorted[sort == "ascending" ? sorted.length - 1 : 0]
-                              .difficulty,
-                            sorted[
-                              sort == "ascending"
-                                ? dungeonInstanceIdx + 1
-                                : dungeonInstanceIdx - 1
-                            ],
-                          );
-                          return (
-                            <View
-                              style={[
-                                styles.levelContainer,
-                                {
-                                  backgroundColor: bgColor,
-                                  shadowOpacity: 0.25,
-                                  shadowRadius: 5,
-                                  elevation: 2,
-                                  opacity: pressed ? 0.5 : 1,
-                                  transform: [{ scale: pressed ? 0.95 : 1 }],
-                                },
-                              ]}
-                            >
-                              <Text style={{ color: textColor }}>
-                                {`Delve to Floor ${level.level}`}
-                              </Text>
-                            </View>
-                          );
-                        }}
-                      </Pressable>
-                    ))}
-                </View>
-              </ThemedCard>
-            );
-          })}
+                {dungeonInstance.levels
+                  .filter((level) => level.unlocked || __DEV__)
+                  .map((level, levelIdx) => (
+                    <Pressable
+                      key={levelIdx}
+                      onPress={() => {
+                        uiStore.setTotalLoadingSteps(5);
+                        vibration({ style: "warning" });
+                        dungeonStore
+                          .setUpDungeon(dungeonInstance, level)
+                          .then(() => uiStore.incrementLoadingStep());
+                        wait(100).then(() => {
+                          router.replace(`/DungeonLevel`);
+                          uiStore.incrementLoadingStep();
+                        });
+                      }}
+                    >
+                      {({ pressed }) => {
+                        const { bgColor, textColor } = getLevelColor(
+                          dungeonInstance,
+                          levelIdx,
+                          sorted[sort == "ascending" ? sorted.length - 1 : 0]
+                            .difficulty,
+                          sorted[
+                            sort == "ascending"
+                              ? dungeonInstanceIdx + 1
+                              : dungeonInstanceIdx - 1
+                          ],
+                        );
+                        return (
+                          <View
+                            style={[
+                              styles.levelContainer,
+                              {
+                                backgroundColor: bgColor,
+                                shadowOpacity: 0.25,
+                                shadowRadius: 5,
+                                elevation: 2,
+                                opacity: pressed ? 0.5 : 1,
+                                transform: [{ scale: pressed ? 0.95 : 1 }],
+                              },
+                            ]}
+                          >
+                            <Text style={{ color: textColor }}>
+                              {`Delve to Floor ${level.level}`}
+                            </Text>
+                          </View>
+                        );
+                      }}
+                    </Pressable>
+                  ))}
+              </View>
+            </ThemedCard>
+          ))}
         </ScrollView>
       </View>
     </>

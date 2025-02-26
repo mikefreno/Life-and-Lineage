@@ -414,7 +414,7 @@
   },
   {
     "name": "bandit hideout",
-    "bgName": "Village",
+    "bgName": "Plains",
     "id": 3,
     "difficulty": 3,
     "levels": [
@@ -963,7 +963,36 @@
       {
         "level": 2,
         "tiles": 30,
-        "normalEncounters": [],
+        "normalEncounters": [
+          [
+            {
+              "name": "centaur",
+              "scaler": 1.0
+            }
+          ],
+          [
+            {
+              "name": "satyr",
+              "scaler": 1.0
+            }
+          ],
+          [
+            {
+              "name": "harpy",
+              "scaler": 1.0
+            }
+          ],
+          [
+            {
+              "name": "harpy",
+              "scaler": 0.7
+            },
+            {
+              "name": "harpy",
+              "scaler": 0.7
+            }
+          ]
+        ],
         "bossEncounter": [
           {
             "name": "gryphon",

@@ -147,6 +147,7 @@
   {
     "name": "bandit",
     "beingType": "human",
+    "sprite": "bandit_light",
     "sanity": 50,
     "health": 75,
     "attackPower": 10,
@@ -217,6 +218,7 @@
   },
   {
     "name": "adept air mage",
+    "beingType": "human",
     "sprite": "wizard_gray",
     "sanity": 50,
     "health": 150,
@@ -256,7 +258,48 @@
   {
     "name": "master earthen monk",
     "sprite": "ground_monk",
-    "sanity": 50,
+    "beingType": "human",
+    "sanity": 100,
+    "health": 150,
+    "attackPower": 30,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [],
+    "drops": [],
+    "storyDrops": [],
+    "goldDropRange": {
+      "minimum": 2500,
+      "maximum": 3000
+    },
+    "armorValue": 10
+  },
+  {
+    "name": "master fire mage",
+    "sprite": "pyromancer",
+    "beingType": "human",
+    "sanity": 100,
+    "health": 150,
+    "attackPower": 30,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [],
+    "drops": [],
+    "storyDrops": [],
+    "goldDropRange": {
+      "minimum": 2500,
+      "maximum": 3000
+    },
+    "armorValue": 10
+  },
+  {
+    "name": "gryphon",
+    "sprite": "gryphon",
+    "beingType": "beast",
+    "sanity": null,
     "health": 150,
     "attackPower": 30,
     "energy": {

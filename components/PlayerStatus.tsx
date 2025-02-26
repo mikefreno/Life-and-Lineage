@@ -613,7 +613,13 @@ const PlayerStatus = observer(
             )}
 
             {playerState.getTotalAllocatedPoints() > 0 && (
-              <View style={{ position: "absolute", right: 0, marginTop: -4 }}>
+              <View
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  marginTop: 0,
+                }}
+              >
                 <Pressable
                   disabled={playerState.root.dungeonStore.inCombat}
                   onPress={() => {

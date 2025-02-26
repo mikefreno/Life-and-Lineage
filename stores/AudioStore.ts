@@ -275,25 +275,6 @@ export class AudioStore {
     }
   }
 
-  async getPlayingTracksCount() {
-    let ambientCount = 0;
-    let combatCount = 0;
-
-    // Check ambient players
-    for (const sound of this.ambientPlayers.values()) {
-      const status = await sound.getStatusAsync();
-      if (status.isLoaded && status.isPlaying) ambientCount++;
-    }
-
-    // Check combat players
-    for (const sound of this.combatPlayers.values()) {
-      const status = await sound.getStatusAsync();
-      if (status.isLoaded && status.isPlaying) combatCount++;
-    }
-
-    return { ambientCount, combatCount };
-  }
-
   async playCombat(track: keyof typeof COMBAT_TRACKS) {
     if (!this.isCombatLoaded) return;
 
@@ -304,10 +285,11 @@ export class AudioStore {
       if (!newSound) {
         throw new Error(`Combat track ${track} not found`);
       }
+
       //checks for active transitions
       if (this.activeTransition.trackOut) {
         // nothing special here, we just cancel this to make room for the new fade out
-        this.activeTransition.trackOut.cancel();
+        await this.activeTransition.trackOut.cancel();
       }
       // fade in tracks are the `this.currentTrack`, during transition, we use the transition cancel(which inits the special case) instead of starting a new fade directly
       if (this.activeTransition.trackIn) {
@@ -319,28 +301,32 @@ export class AudioStore {
         this.fadeSound({
           sound: this.currentTrack.sound,
           soundCategory: "combatMusic",
-          startVolume: currentVolume,
           soundName: this.currentTrack.name,
+          startVolume: currentVolume,
           directionality: "out",
           duration: DEFAULT_FADE,
         });
       }
+
+      runInAction(() => {
+        this.currentTrack = {
+          name: track,
+          sound: newSound,
+          category: "combatMusic",
+        };
+      });
+
       //start fade in of new track
       this.fadeSound({
-        sound: newSound,
+        sound: this.currentTrack!.sound,
         soundCategory: "combatMusic",
         soundName: track,
         startVolume: 0,
         directionality: "in",
         duration: DEFAULT_FADE,
       });
-      this.currentTrack = {
-        name: track,
-        sound: newSound,
-        category: "combatMusic",
-      };
     } catch (error) {
-      console.error(`Failed to play combat track ${track}:`, error);
+      console.error(`Failed to play combat track:`, error);
       await this.recoverFromError();
     }
   }
@@ -359,6 +345,25 @@ export class AudioStore {
     } catch (error) {
       console.error(`Failed to play sound effect ${id}:`, error);
     }
+  }
+
+  async getPlayingTracksCount() {
+    let ambientCount = 0;
+    let combatCount = 0;
+
+    // Check ambient players
+    for (const sound of this.ambientPlayers.values()) {
+      const status = await sound.getStatusAsync();
+      if (status.isLoaded && status.isPlaying) ambientCount++;
+    }
+
+    // Check combat players
+    for (const sound of this.combatPlayers.values()) {
+      const status = await sound.getStatusAsync();
+      if (status.isLoaded && status.isPlaying) combatCount++;
+    }
+
+    return { ambientCount, combatCount };
   }
 
   private async getCurrentVolume(sound: Sound): Promise<number> {

@@ -18,6 +18,7 @@ export class TimeStore {
       week: observable,
       year: observable,
       tick: action,
+      devSetter: action,
       currentDate: computed,
       fromCheckpointData: action,
     });
@@ -32,6 +33,16 @@ export class TimeStore {
   tick() {
     this.week = (this.week + 1) % 52;
     if (this.week === 0) this.year++;
+  }
+
+  devSetter(field: "year" | "week", value: number) {
+    if (__DEV__) {
+      if (field == "year") {
+        this.year = value;
+      } else if (field == "week") {
+        this.week = value;
+      }
+    }
   }
 
   get currentDate() {

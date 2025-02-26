@@ -735,7 +735,11 @@
       "maximum": 40,
       "regen": 10
     },
-    "attackStrings": [],
+    "attackStrings": [
+      "poisoned shot",
+      "maddening shot",
+      "shoot"
+    ],
     "drops": [],
     "goldDropRange": {
       "minimum": 40,
@@ -759,7 +763,38 @@
       "maximum": 40,
       "regen": 10
     },
-    "attackStrings": [],
+    "attackStrings": [
+      "gust",
+      "dive",
+      "claw"
+    ],
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 40,
+      "maximum": 50
+    }
+  },
+  {
+    "name": "centaur",
+    "beingType": "demi-human",
+    "sprite": "centaur",
+    "sanity": 50,
+    "healthRange": {
+      "minimum": 120,
+      "maximum": 160
+    },
+    "attackPowerRange": {
+      "minimum": 10,
+      "maximum": 15
+    },
+    "energy": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [
+      "stampede",
+      "chop"
+    ],
     "drops": [],
     "goldDropRange": {
       "minimum": 40,

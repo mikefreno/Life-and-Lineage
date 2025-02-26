@@ -59,6 +59,19 @@
     ]
   },
   {
+    "name": "venomous bite",
+    "energyCost": 10,
+    "targets": "single",
+    "hitChance": 0.90,
+    "damageMult": 0.85,
+    "debuffs": [
+      {
+        "name": "poison",
+        "chance": 0.65
+      }
+    ]
+  },
+  {
     "name": "torch stab",
     "energyCost": 5,
     "targets": "single",
@@ -158,9 +171,30 @@
     "debuffs": [
       {
         "name": "poison",
-        "chance": 0.35
+        "chance": 0.85
       }
     ]
+  },
+  {
+    "name": "poisoned shot",
+    "energyCost": 15,
+    "targets": "single",
+    "hitChance": 0.95,
+    "damageMult": 0.85,
+    "debuffs": [
+      {
+        "name": "poison",
+        "chance": 0.5
+      }
+    ]
+  },
+  {
+    "name": "maddening shot",
+    "energyCost": 20,
+    "targets": "single",
+    "hitChance": 0.95,
+    "damageMult": 1.0,
+    "flatSanityDamage": 5
   },
   {
     "name": "wail",
@@ -197,6 +231,19 @@
     ]
   },
   {
+    "name": "stampede",
+    "energyCost": 15,
+    "targets": "aoe",
+    "hitChance": 0.85,
+    "damageMult": 0.85,
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.50
+      }
+    ]
+  },
+  {
     "name": "heavy swing",
     "energyCost": 20,
     "targets": "single",
@@ -206,6 +253,19 @@
       {
         "name": "stun",
         "chance": 0.20
+      }
+    ]
+  },
+  {
+    "name": "chop",
+    "energyCost": 5,
+    "targets": "single",
+    "hitChance": 1.0,
+    "damageMult": 0.75,
+    "debuffs": [
+      {
+        "name": "bleed",
+        "chance": 0.25
       }
     ]
   },
@@ -471,6 +531,20 @@
         "chance": 0.25
       }
     ]
+  },
+  {
+    "name": "dive",
+    "energyCost": 15,
+    "targets": "single",
+    "hitChance": 0.80,
+    "damageMult": 1.5
+  },
+  {
+    "name": "gust",
+    "energyCost": 15,
+    "targets": "aoe",
+    "hitChance": 0.95,
+    "damageMult": 0.75
   },
   {
     "name": "wing buffet",

@@ -842,27 +842,22 @@ export class PlayerCharacter extends Character {
    * @param amount - the amount of skill points to add, defaults to 1.
    * @param to - the attribute to add skill points to
    * */
-  public addSkillPoint({
-    amount = 1,
-    to = "unallocated",
-  }: {
+  public addSkillPoint(params?: {
     amount?: number;
     to?: Attribute | "unallocated";
   }) {
+    const amount = params?.amount ?? 1;
+    const to = params?.to ?? "unallocated";
+
+    if (to === "unallocated") {
+      this.unAllocatedSkillPoints += amount;
+      return;
+    }
+
     if (this.unAllocatedSkillPoints >= amount) {
-      switch (to) {
-        case Attribute.health:
-        case Attribute.mana:
-        case Attribute.sanity:
-        case Attribute.strength:
-        case Attribute.intelligence:
-        case Attribute.dexterity:
-          this.allocatedSkillPoints[to] += amount;
-          this.unAllocatedSkillPoints -= amount;
-          break;
-        case "unallocated":
-          this.unAllocatedSkillPoints += amount;
-          break;
+      if (Object.values(Attribute).includes(to as Attribute)) {
+        this.allocatedSkillPoints[to as Attribute] += amount;
+        this.unAllocatedSkillPoints -= amount;
       }
     }
   }

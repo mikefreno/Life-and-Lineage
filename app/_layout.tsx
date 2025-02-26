@@ -31,6 +31,7 @@ import GenericModal from "../components/GenericModal";
 import { CharacterImage } from "../components/CharacterImage";
 import GenericFlatButton from "../components/GenericFlatButton";
 import { useStyles } from "../hooks/styles";
+import { DevControls } from "@/components/DevControls";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -300,6 +301,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
         <ProjectedImage />
         <FleeModal />
         <BirthAnnouncementModal />
+        {__DEV__ && <DevControls />}
         <Stack
           screenOptions={{
             animation: uiStore.reduceMotion ? "fade" : undefined,

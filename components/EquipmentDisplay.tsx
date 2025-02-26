@@ -64,7 +64,7 @@ export default function EquipmentDisplay({
               flex: 1,
               alignItems: "center",
               justifyContent: "flex-end",
-              marginTop: "-3%",
+              marginTop: "-5%",
               marginLeft: "-10%",
             }}
           >

@@ -144,7 +144,14 @@ const ShopsScreen = observer(() => {
 
       {isReady ? (
         <ScrollView
-          scrollIndicatorInsets={{ top: 120, right: 0, left: 0, bottom: 48 }}
+          contentInset={{
+            top: headerHeight / 2,
+            bottom: (bottomHeight + uiStore.playerStatusHeight + 80) / 2,
+          }}
+          style={{
+            marginTop: headerHeight / 2,
+          }}
+          scrollIndicatorInsets={{ top: 0, bottom: 0 }}
         >
           <View
             style={{
@@ -152,10 +159,6 @@ const ShopsScreen = observer(() => {
               flexWrap: "wrap",
               alignItems: "flex-start",
               justifyContent: "flex-start",
-              paddingBottom:
-                bottomHeight +
-                (uiStore.playerStatusIsCompact ? 0 : EXPANDED_PAD),
-              paddingTop: headerHeight,
             }}
           >
             {shopsStore &&
