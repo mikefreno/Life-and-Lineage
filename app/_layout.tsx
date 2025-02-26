@@ -302,7 +302,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
         <BirthAnnouncementModal />
         <Stack
           screenOptions={{
-            animation: uiStore.reduceMotion ? "none" : undefined,
+            animation: uiStore.reduceMotion ? "fade" : undefined,
           }}
         >
           <Stack.Screen
@@ -322,7 +322,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
           <Stack.Screen
             name="Options"
             options={{
-              presentation: "modal",
+              presentation: uiStore.reduceMotion ? "card" : "modal",
               headerBackButtonDisplayMode: "minimal",
               headerBackButtonMenuEnabled: false,
               headerBackTitleStyle: {

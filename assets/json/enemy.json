@@ -2,7 +2,7 @@
   {
     "name": "training dummy",
     "beingType": "block o wood",
-    "defaultSprite": "training_dummy",
+    "sprite": "training_dummy",
     "sanity": null,
     "healthRange": {
       "minimum": 9999,
@@ -38,7 +38,7 @@
     "name": "giant rat",
     "beingType": "beast",
     "sanity": null,
-    "defaultSprite": "rat",
+    "sprite": "rat",
     "healthRange": {
       "minimum": 20,
       "maximum": 50
@@ -73,7 +73,7 @@
   },
   {
     "name": "bat",
-    "defaultSprite": "bat_origin",
+    "sprite": "bat_origin",
     "beingType": "beast",
     "sanity": null,
     "healthRange": {
@@ -110,7 +110,7 @@
   },
   {
     "name": "skeleton",
-    "defaultSprite": "skeleton",
+    "sprite": "skeleton",
     "beingType": "undead",
     "sanity": null,
     "healthRange": {
@@ -154,7 +154,7 @@
   },
   {
     "name": "skeleton archer",
-    "defaultSprite": "skeleton",
+    "sprite": "skeleton",
     "beingType": "undead",
     "sanity": null,
     "healthRange": {
@@ -218,7 +218,7 @@
   {
     "name": "zombie",
     "beingType": "undead",
-    "defaultSprite": "zombie",
+    "sprite": "zombie",
     "sanity": null,
     "healthRange": {
       "minimum": 40,
@@ -255,7 +255,7 @@
   },
   {
     "name": "ghost",
-    "defaultSprite": "ghost",
+    "sprite": "ghost",
     "beingType": "undead",
     "sanity": null,
     "healthRange": {
@@ -287,7 +287,7 @@
   },
   {
     "name": "goblin",
-    "defaultSprite": "goblin_2",
+    "sprite": "goblin_2",
     "beingType": "demi-human",
     "sanity": null,
     "healthRange": {
@@ -328,7 +328,7 @@
   },
   {
     "name": "worg",
-    "defaultSprite": "wolf_black",
+    "sprite": "wolf_black",
     "beingType": "beast",
     "sanity": null,
     "healthRange": {
@@ -370,80 +370,56 @@
     }
   },
   {
-    "name": "hobgoblin",
+    "name": "kobold",
+    "sprite": "kobold",
     "beingType": "demi-human",
     "sanity": null,
     "healthRange": {
-      "minimum": 80,
-      "maximum": 80
+      "minimum": 50,
+      "maximum": 70
     },
     "attackPowerRange": {
-      "minimum": 7,
-      "maximum": 14
+      "minimum": 5,
+      "maximum": 10
     },
     "energy": {
       "maximum": 50,
       "regen": 5
     },
     "attackStrings": [
+      "bite",
       "stab"
     ],
     "drops": [
       {
-        "item": "longsword",
-        "itemType": "melee",
-        "chance": 0.10
-      }
-    ],
-    "goldDropRange": {
-      "minimum": 35,
-      "maximum": 65
-    },
-    "armorValue": 10
-  },
-  {
-    "name": "goblin shaman",
-    "beingType": "demi-human",
-    "defaultSprite": "goblin_mage",
-    "sanity": null,
-    "healthRange": {
-      "minimum": 60,
-      "maximum": 80
-    },
-    "attackPowerRange": {
-      "minimum": 15,
-      "maximum": 20
-    },
-    "energy": {
-      "maximum": 50,
-      "regen": 5
-    },
-    "attackStrings": [
-      "stab",
-      "pocket sand",
-      "rock throw",
-      "torch stab"
-    ],
-    "drops": [
+        "item": "patch of hair",
+        "itemType": "junk",
+        "chance": 0.85
+      },
       {
-        "item": "adept robes",
-        "itemType": "bodyArmor",
-        "chance": 1.0
+        "item": "bone",
+        "itemType": "ingredient",
+        "chance": 0.75
+      },
+      {
+        "item": "bone",
+        "itemType": "ingredient",
+        "chance": 0.75
       },
       {
         "item": "dagger",
         "itemType": "melee",
-        "chance": 0.35
+        "chance": 0.25
       }
     ],
     "goldDropRange": {
-      "minimum": 185,
-      "maximum": 250
+      "minimum": 40,
+      "maximum": 55
     }
   },
   {
     "name": "bandit",
-    "defaultSprite": "bandit_light",
+    "sprite": "bandit_light",
     "beingType": "human",
     "sanity": 50,
     "healthRange": {
@@ -492,8 +468,48 @@
     "armorValue": 15
   },
   {
+    "name": "bandit heavy",
+    "sprite": "bandit_heavy",
+    "beingType": "human",
+    "sanity": 25,
+    "healthRange": {
+      "minimum": 85,
+      "maximum": 125
+    },
+    "attackPowerRange": {
+      "minimum": 10,
+      "maximum": 12
+    },
+    "energy": {
+      "maximum": 30,
+      "regen": 2
+    },
+    "attackStrings": [
+      "headbutt",
+      "heavy swing"
+    ],
+    "drops": [
+      {
+        "item": "rat-smasher",
+        "itemType": "melee",
+        "chance": 0.25
+      },
+      {
+        "item": "cheap iron chestpiece",
+        "itemType": "bodyArmor",
+        "chance": 0.25
+      }
+    ],
+    "goldDropRange": {
+      "minimum": 80,
+      "maximum": 100
+    },
+    "armorValue": 15
+  },
+  {
     "name": "novice water mage",
     "beingType": "human",
+    "sprite": "wizard_blue",
     "sanity": 50,
     "healthRange": {
       "minimum": 50,
@@ -520,6 +536,7 @@
   {
     "name": "novice fire mage",
     "beingType": "human",
+    "sprite": "wizard_redblack",
     "sanity": 50,
     "healthRange": {
       "minimum": 50,
@@ -546,6 +563,7 @@
   {
     "name": "novice air mage",
     "beingType": "human",
+    "sprite": "wizard_gray",
     "sanity": 50,
     "healthRange": {
       "minimum": 50,
@@ -572,6 +590,7 @@
   {
     "name": "novice earth mage",
     "beingType": "human",
+    "sprite": "wizard_earthen",
     "sanity": 50,
     "healthRange": {
       "minimum": 75,
@@ -596,72 +615,156 @@
     }
   },
   {
-    "name": "drunkard",
-    "beingType": "human",
-    "sanity": 50,
+    "name": "spider",
+    "beingType": "beast",
+    "sprite": "spider_demon_small",
+    "sanity": null,
     "healthRange": {
-      "minimum": 60,
-      "maximum": 85
+      "minimum": 25,
+      "maximum": 40
     },
     "attackPowerRange": {
-      "minimum": 10,
-      "maximum": 10
+      "minimum": 4,
+      "maximum": 6
     },
     "energy": {
-      "maximum": 30,
-      "regen": 3
+      "maximum": 40,
+      "regen": 10
     },
     "attackStrings": [
-      "headbutt",
-      "pocket sand",
-      "punch",
-      "chug beer"
+      "bite"
     ],
-    "drops": [
-      {
-        "item": "beer stein",
-        "itemType": "melee",
-        "chance": 1.0
-      }
-    ],
+    "drops": [],
     "goldDropRange": {
       "minimum": 40,
-      "maximum": 100
-    },
-    "armorValue": 5
+      "maximum": 50
+    }
   },
   {
-    "name": "generic npc",
-    "beingType": "human",
-    "sanity": 50,
+    "name": "venomous spider",
+    "beingType": "beast",
+    "sprite": "spider_default_small",
+    "sanity": null,
     "healthRange": {
-      "minimum": 60,
-      "maximum": 85
+      "minimum": 25,
+      "maximum": 40
+    },
+    "attackPowerRange": {
+      "minimum": 4,
+      "maximum": 6
+    },
+    "energy": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [
+      "venomous bite"
+    ],
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 40,
+      "maximum": 50
+    }
+  },
+  {
+    "name": "giant spider",
+    "beingType": "beast",
+    "sprite": "spider_demon",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 100,
+      "maximum": 140
     },
     "attackPowerRange": {
       "minimum": 10,
-      "maximum": 10
+      "maximum": 15
     },
     "energy": {
-      "maximum": 30,
-      "regen": 3
+      "maximum": 40,
+      "regen": 10
     },
     "attackStrings": [
-      "stab",
-      "pocket sand"
+      "bite"
     ],
-    "drops": [
-      {
-        "item": "dagger",
-        "itemType": "melee",
-        "chance": 0.75
-      }
-    ],
+    "drops": [],
     "goldDropRange": {
-      "minimum": 250,
-      "maximum": 1000
+      "minimum": 40,
+      "maximum": 50
+    }
+  },
+  {
+    "name": "giant venomous spider",
+    "beingType": "beast",
+    "sprite": "spider_default",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 100,
+      "maximum": 140
     },
-    "armorValue": 5
+    "attackPowerRange": {
+      "minimum": 10,
+      "maximum": 15
+    },
+    "energy": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [
+      "venomous bite"
+    ],
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 40,
+      "maximum": 50
+    }
+  },
+  {
+    "name": "satyr",
+    "beingType": "demi-human",
+    "sprite": "satyr",
+    "sanity": 100,
+    "healthRange": {
+      "minimum": 100,
+      "maximum": 140
+    },
+    "attackPowerRange": {
+      "minimum": 10,
+      "maximum": 15
+    },
+    "energy": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [],
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 40,
+      "maximum": 50
+    }
+  },
+  {
+    "name": "harpy",
+    "beingType": "demi-human",
+    "sprite": "harpy",
+    "sanity": 100,
+    "healthRange": {
+      "minimum": 100,
+      "maximum": 140
+    },
+    "attackPowerRange": {
+      "minimum": 10,
+      "maximum": 15
+    },
+    "energy": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [],
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 40,
+      "maximum": 50
+    }
   }
 ]
 

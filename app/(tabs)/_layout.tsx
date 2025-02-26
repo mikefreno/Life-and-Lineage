@@ -106,7 +106,7 @@ const TabLayout = observer(() => {
             tabBarIconStyle: {
               marginHorizontal: "auto",
             },
-            animation: "shift",
+            animation: uiStore.reduceMotion ? "fade" : "shift",
             tabBarButton: (props) => {
               const onPressWithVibration = (event: GestureResponderEvent) => {
                 vibration({ style: "light" });

@@ -263,7 +263,7 @@ export class DungeonLevel {
             Math.floor(Math.random() * enemySpec.spriteOverride.length)
           ];
       } else {
-        sprite = enemyJSON.defaultSprite;
+        sprite = enemyJSON.sprite;
       }
       if (!sprite || !(sprite in EnemyImageMap)) {
         throw new Error(`Missing sprite on ${enemyJSON.name}`);

@@ -87,7 +87,7 @@
     }
   },
   {
-    "name": "hobgoblin",
+    "name": "kobold",
     "beingType": "demi-human",
     "sanity": null,
     "health": 160,
@@ -113,7 +113,8 @@
     }
   },
   {
-    "name": "goblin shaman",
+    "name": "goblin mage",
+    "sprite": "goblin_mage",
     "beingType": "demi-human",
     "sanity": 50,
     "health": 160,
@@ -187,8 +188,9 @@
     "armorValue": 15
   },
   {
-    "name": "bandit boss",
+    "name": "huge knight",
     "beingType": "human",
+    "sprite": "huge_knight",
     "sanity": 50,
     "health": 200,
     "attackPower": 22.5,
@@ -197,7 +199,7 @@
       "regen": 10
     },
     "attackStrings": [
-      "serrate",
+      "heavy swing",
       "call backup",
       "stab"
     ],
@@ -212,6 +214,63 @@
       "maximum": 3000
     },
     "armorValue": 30
+  },
+  {
+    "name": "adept air mage",
+    "sprite": "wizard_gray",
+    "sanity": 50,
+    "health": 150,
+    "attackPower": 30,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [],
+    "drops": [],
+    "storyDrops": [],
+    "goldDropRange": {
+      "minimum": 2500,
+      "maximum": 3000
+    },
+    "armorValue": 10
+  },
+  {
+    "name": "adept water mage",
+    "sprite": "wizard_classic",
+    "sanity": 50,
+    "health": 150,
+    "attackPower": 30,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [],
+    "drops": [],
+    "storyDrops": [],
+    "goldDropRange": {
+      "minimum": 2500,
+      "maximum": 3000
+    },
+    "armorValue": 10
+  },
+  {
+    "name": "master earthen monk",
+    "sprite": "ground_monk",
+    "sanity": 50,
+    "health": 150,
+    "attackPower": 30,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [],
+    "drops": [],
+    "storyDrops": [],
+    "goldDropRange": {
+      "minimum": 2500,
+      "maximum": 3000
+    },
+    "armorValue": 10
   }
 ]
 

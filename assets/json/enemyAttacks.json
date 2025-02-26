@@ -197,6 +197,19 @@
     ]
   },
   {
+    "name": "heavy swing",
+    "energyCost": 20,
+    "targets": "single",
+    "hitChance": 0.80,
+    "damageMult": 2.0,
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.20
+      }
+    ]
+  },
+  {
     "name": "headbutt",
     "energyCost": 10,
     "targets": "single",

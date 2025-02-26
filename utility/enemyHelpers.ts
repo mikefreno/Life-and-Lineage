@@ -912,6 +912,65 @@ export const EnemyImageMap = {
     displayHeight: 260,
     displayWidth: 260,
   },
+  ground_monk: {
+    sets: {
+      attack_1: {
+        anim: require("../assets/images/monsters/Ground_Monk/ATTACK_1.png"),
+        frames: 7,
+      },
+      attack_2: {
+        anim: require("../assets/images/monsters/Ground_Monk/ATTACK_2.png"),
+        frames: 6,
+      },
+      attack_3: {
+        anim: require("../assets/images/monsters/Ground_Monk/ATTACK_3.png"),
+        frames: 12,
+      },
+      attack_4: {
+        anim: require("../assets/images/monsters/Ground_Monk/ATTACK_4.png"),
+        frames: 23,
+      },
+      attack_5: {
+        anim: require("../assets/images/monsters/Ground_Monk/ATTACK_5.png"),
+        frames: 25,
+      },
+      block: {
+        anim: require("../assets/images/monsters/Ground_Monk/BLOCK.png"),
+        frames: 13,
+      },
+      death: {
+        anim: require("../assets/images/monsters/Ground_Monk/DEATH.png"),
+        frames: 16,
+      },
+      dodge: {
+        anim: require("../assets/images/monsters/Ground_Monk/DODGE.png"),
+        frames: 6,
+      },
+      float: {
+        anim: require("../assets/images/monsters/Ground_Monk/FLOAT.png"),
+        frames: 3,
+      },
+      hurt: {
+        anim: require("../assets/images/monsters/Ground_Monk/HURT.png"),
+        frames: 6,
+      },
+      idle: {
+        anim: require("../assets/images/monsters/Ground_Monk/IDLE.png"),
+        frames: 6,
+      },
+      move: {
+        anim: require("../assets/images/monsters/Ground_Monk/MOVE.png"),
+        frames: 8,
+      },
+      spawn: {
+        anim: require("../assets/images/monsters/Ground_Monk/SPAWN.png"),
+        frames: 8,
+      },
+    },
+    height: 128,
+    width: 288,
+    mirror: true,
+  },
   gryphon: {
     sets: {
       attack_1: {

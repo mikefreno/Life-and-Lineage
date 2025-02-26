@@ -22,8 +22,8 @@ import { useVibration } from "../../hooks/generic";
 import type { DungeonInstance } from "../../entities/dungeon";
 import { useRootStore } from "../../hooks/stores";
 import { flex, tw_base, useStyles } from "../../hooks/styles";
-import GenericRaisedButton from "@/components/GenericRaisedButton";
 import GenericFlatButton from "@/components/GenericFlatButton";
+import Colors from "@/constants/Colors";
 
 const MIN_RED = 20;
 const MAX_RED = 255;
@@ -102,7 +102,7 @@ const DungeonScreen = observer(() => {
       const red = Math.round(currentInstanceRed - redStep * levelIdx);
 
       const bgColor = `rgb(255, ${255 - red}, ${255 - red})`;
-      const textColor = red < 100 ? "black" : "white";
+      const textColor = red < 128 ? "black" : "white";
 
       const result = { bgColor, textColor };
       cache.set(cacheKey, result);
@@ -166,6 +166,7 @@ const DungeonScreen = observer(() => {
           {
             flex: 1,
             paddingTop: headerHeight + blurHeaderHeight,
+            paddingHorizontal: tw_base[2],
           },
         ]}
       >
@@ -186,7 +187,7 @@ const DungeonScreen = observer(() => {
               <GenericFlatButton
                 onPress={() => {
                   setSort(sort == "ascending" ? "descending" : "ascending");
-
+                  vibration({ style: "light" });
                   scrollViewRef.current?.scrollTo({
                     x: 0,
                     y: 0,
@@ -196,6 +197,7 @@ const DungeonScreen = observer(() => {
                 innerStyle={{
                   paddingHorizontal: tw_base[2],
                   paddingTop: tw_base[1],
+                  backgroundColor: Colors[uiStore.colorScheme].background,
                 }}
               >
                 <Text style={{ textAlign: "center" }}>{`Sort by:\n${toTitleCase(
