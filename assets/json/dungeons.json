@@ -268,7 +268,7 @@
   },
   {
     "name": "goblin cave",
-    "bgName": "Cave",
+    "bgName": "Cave_2",
     "id": 2,
     "difficulty": 3,
     "levels": [
@@ -414,7 +414,7 @@
   },
   {
     "name": "bandit hideout",
-    "bgName": "Plains",
+    "bgName": "medieval",
     "id": 3,
     "difficulty": 3,
     "levels": [
@@ -958,7 +958,15 @@
             "scaler": 1.0
           }
         ],
-        "specialEncounters": []
+        "specialEncounters": [
+          {
+            "name": "camp",
+            "countChances": {
+              "2": 1.0
+            },
+            "scaler": 1
+          }
+        ]
       },
       {
         "level": 2,
@@ -999,7 +1007,15 @@
             "scaler": 1.0
           }
         ],
-        "specialEncounters": []
+        "specialEncounters": [
+          {
+            "name": "camp",
+            "countChances": {
+              "3": 1.0
+            },
+            "scaler": 1
+          }
+        ]
       }
     ],
     "unlocks": [
@@ -1010,31 +1026,201 @@
     "name": "ancient arena",
     "id": 7,
     "difficulty": 8,
-    "bgName": "",
+    "bgName": "dungeon",
     "levels": [
       {
         "level": 1,
-        "tiles": 20,
-        "normalEncounters": [],
+        "tiles": 10,
+        "normalEncounters": [
+          [
+            {
+              "name": "legionnaire",
+              "scaler": 1.0
+            }
+          ]
+        ],
         "bossEncounter": [
           {
-            "name": "",
+            "name": "gladiator",
             "scaler": 1.0
           }
         ],
-        "specialEncounters": []
+        "specialEncounters": [
+          {
+            "name": "chest",
+            "countChances": {
+              "0": 0,
+              "1": 0.5,
+              "2": 0.5
+            },
+            "scaler": 1
+          },
+          {
+            "name": "water basin",
+            "countChances": {
+              "0": 0,
+              "1": 1
+            },
+            "scaler": 1
+          }
+        ]
       },
       {
         "level": 2,
-        "tiles": 25,
-        "normalEncounters": [],
+        "tiles": 10,
+        "normalEncounters": [
+          [
+            {
+              "name": "legionnaire",
+              "scaler": 1.0
+            }
+          ],
+          [
+            {
+              "name": "gladiator",
+              "scaler": 1.0
+            }
+          ]
+        ],
         "bossEncounter": [
           {
-            "name": "",
+            "name": "lizardman",
             "scaler": 1.0
           }
         ],
-        "specialEncounters": []
+        "specialEncounters": [
+          {
+            "name": "chest",
+            "countChances": {
+              "0": 0,
+              "1": 0.5,
+              "2": 0.5
+            },
+            "scaler": 1
+          },
+          {
+            "name": "water basin",
+            "countChances": {
+              "0": 0,
+              "1": 1
+            },
+            "scaler": 1
+          }
+        ]
+      },
+      {
+        "level": 3,
+        "tiles": 10,
+        "normalEncounters": [
+          [
+            {
+              "name": "lizardman",
+              "scaler": 0.75
+            },
+            {
+              "name": "lizardman",
+              "scaler": 0.75
+            }
+          ],
+          [
+            {
+              "name": "legionnaire",
+              "scaler": 1.0
+            }
+          ],
+          [
+            {
+              "name": "gladiator",
+              "scaler": 1.0
+            }
+          ]
+        ],
+        "bossEncounter": [
+          {
+            "name": "the hammer",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": [
+          {
+            "name": "chest",
+            "countChances": {
+              "0": 0,
+              "1": 0.5,
+              "2": 0.5
+            },
+            "scaler": 1
+          },
+          {
+            "name": "water basin",
+            "countChances": {
+              "0": 0,
+              "1": 1
+            },
+            "scaler": 1
+          }
+        ]
+      },
+      {
+        "level": 4,
+        "tiles": 10,
+        "normalEncounters": [
+          [
+            {
+              "name": "lizardman",
+              "scaler": 0.75
+            },
+            {
+              "name": "lizardman",
+              "scaler": 0.75
+            }
+          ],
+          [
+            {
+              "name": "legionnaire",
+              "scaler": 1.0
+            }
+          ],
+          [
+            {
+              "name": "gladiator",
+              "scaler": 1.0
+            }
+          ]
+        ],
+        "bossEncounter": [
+          {
+            "name": "her",
+            "scaler": 1.0
+          },
+          {
+            "name": "the deadeye",
+            "scaler": 1.0
+          },
+          {
+            "name": "the spear",
+            "scaler": 1.0
+          }
+        ],
+        "specialEncounters": [
+          {
+            "name": "chest",
+            "countChances": {
+              "0": 0,
+              "1": 0.5,
+              "2": 0.5
+            },
+            "scaler": 1
+          },
+          {
+            "name": "water basin",
+            "countChances": {
+              "0": 0,
+              "1": 1
+            },
+            "scaler": 1
+          }
+        ]
       }
     ],
     "unlocks": []

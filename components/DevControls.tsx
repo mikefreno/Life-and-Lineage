@@ -201,6 +201,30 @@ export const DevControls = observer(() => {
       step: 1,
       initVal: rootStore.time.week,
     },
+    {
+      action: (value: number) => rootStore.playerState?.restoreHealth(value),
+      name: "Adjust HP",
+      min: -1_000,
+      max: 1_000,
+      initVal: 0,
+      step: 10,
+    },
+    {
+      action: (value: number) => rootStore.playerState?.restoreMana(value),
+      name: "Adjust Mana",
+      min: -1_000,
+      max: 1_000,
+      initVal: 0,
+      step: 10,
+    },
+    {
+      action: (value: number) => rootStore.playerState?.restoreSanity(value),
+      name: "Adjust Sanity",
+      min: -1_000,
+      max: 1_000,
+      initVal: 0,
+      step: 10,
+    },
   ];
 
   useEffect(() => {

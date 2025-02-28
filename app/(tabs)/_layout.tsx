@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, Tabs, useRouter } from "expo-router";
 import {
   GestureResponderEvent,
@@ -29,15 +29,17 @@ import {
   Wand,
   WizardHat,
 } from "../../assets/icons/SVGIcons";
-import { ThemedView } from "../../components/Themed";
+import { Text, ThemedView } from "../../components/Themed";
 import TutorialModal from "../../components/TutorialModal";
 import { useIsFocused } from "@react-navigation/native";
 import { Element, TutorialOption } from "../../utility/types";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
-import { shadows } from "../../hooks/styles";
+import { shadows, text } from "../../hooks/styles";
 import { observer } from "mobx-react-lite";
 import { wait } from "@/utility/functions/misc";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import GenericModal from "@/components/GenericModal";
 
 const PLAYERSTATUS_SPACER = 64;
 const TABSELECTOR_HEIGHT = 52;
@@ -46,6 +48,7 @@ const TabLayout = observer(() => {
   const isFocused = useIsFocused();
 
   const { playerState, uiStore, dungeonStore } = useRootStore();
+  const [showPVPInfoModal, setShowPVPInfoModal] = useState(false);
 
   const router = useRouter();
   const vibration = useVibration();
@@ -79,6 +82,20 @@ const TabLayout = observer(() => {
           }}
         />
       )}
+      <GenericModal
+        isVisibleCondition={showPVPInfoModal}
+        backFunction={() => setShowPVPInfoModal(false)}
+      >
+        <View>
+          <Text style={[text.xl, { textAlign: "center" }]}>
+            PVP is currently locked, progress and complete the{" "}
+            <Text style={{ color: Colors[uiStore.colorScheme].health }}>
+              Ancient Arena
+            </Text>{" "}
+            dungeon to unlock!
+          </Text>
+        </View>
+      </GenericModal>
       {playerState && (
         <Tabs
           screenOptions={{
@@ -291,6 +308,31 @@ const TabLayout = observer(() => {
               title: "Dungeon",
               tabBarIcon: ({ color }) => (
                 <Dungeon width={28} height={28} color={color} />
+              ),
+              headerLeft: () => (
+                <Pressable
+                  onPress={() => {
+                    if (dungeonStore.pvpUnlocked) {
+                      uiStore.setTotalLoadingSteps(3);
+                      vibration({ style: "warning" });
+                      wait(100).then(() => {
+                        router.replace(`/DungeonLevel`);
+                        uiStore.incrementLoadingStep();
+                      });
+                    } else {
+                      setShowPVPInfoModal(true);
+                    }
+                  }}
+                >
+                  {({ pressed }) => (
+                    <MaterialCommunityIcons
+                      name="sword-cross"
+                      size={30}
+                      color={Colors[uiStore.colorScheme].health}
+                      style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }}
+                    />
+                  )}
+                </Pressable>
               ),
               headerRight: () => (
                 <Pressable

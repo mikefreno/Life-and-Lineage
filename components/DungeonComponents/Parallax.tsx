@@ -102,6 +102,28 @@ const backgroundImages = {
     size: { width: 384, height: 216 },
     verticalOffset: -0.25,
   },
+  Cave_2: {
+    imageSet: {
+      0: require("../../assets/backgrounds/Cave_2/0.png"),
+      1: require("../../assets/backgrounds/Cave_2/1.png"),
+      2: require("../../assets/backgrounds/Cave_2/2.png"),
+      3: require("../../assets/backgrounds/Cave_2/3.png"),
+      4: require("../../assets/backgrounds/Cave_2/4.png"),
+    },
+    size: { width: 320, height: 64 },
+    verticalOffset: -0.4,
+  },
+  Cemetary: {
+    imageSet: {
+      0: require("../../assets/backgrounds/Cemetary/0.png"),
+      1: require("../../assets/backgrounds/Cemetary/1.png"),
+      2: require("../../assets/backgrounds/Cemetary/2.png"),
+      3: require("../../assets/backgrounds/Cemetary/3.png"),
+      4: require("../../assets/backgrounds/Cemetary/4.png"),
+    },
+    size: { width: 320, height: 64 },
+    verticalOffset: -0.4,
+  },
   CrystalCave_1: {
     imageSet: {
       0: require("../../assets/backgrounds/CrystalCave_1/0.png"),
@@ -188,6 +210,17 @@ const backgroundImages = {
     size: { width: 384, height: 216 },
     verticalOffset: -0.25,
   },
+  Dungeon: {
+    imageSet: {
+      0: require("../../assets/backgrounds/Dungeon/0.png"),
+      1: require("../../assets/backgrounds/Dungeon/1.png"),
+      2: require("../../assets/backgrounds/Dungeon/2.png"),
+      3: require("../../assets/backgrounds/Dungeon/3.png"),
+      4: require("../../assets/backgrounds/Dungeon/4.png"),
+    },
+    size: { width: 320, height: 64 },
+    verticalOffset: -0.4,
+  },
   FallenKingdom: {
     imageSet: {
       0: require("../../assets/backgrounds/FallenKingdom/0.png"),
@@ -214,6 +247,17 @@ const backgroundImages = {
     },
     size: { width: 285, height: 131 },
     verticalOffset: -0.35,
+  },
+  Medieval: {
+    imageSet: {
+      0: require("../../assets/backgrounds/Medieval/0.png"),
+      1: require("../../assets/backgrounds/Medieval/1.png"),
+      2: require("../../assets/backgrounds/Medieval/2.png"),
+      3: require("../../assets/backgrounds/Medieval/3.png"),
+      4: require("../../assets/backgrounds/Medieval/4.png"),
+    },
+    size: { width: 320, height: 64 },
+    verticalOffset: -0.4,
   },
   PineForest: {
     imageSet: {
@@ -251,6 +295,19 @@ const backgroundImages = {
       3: require("../../assets/backgrounds/SnowyMountain/3.png"),
       4: require("../../assets/backgrounds/SnowyMountain/4.png"),
       5: require("../../assets/backgrounds/SnowyMountain/5.png"),
+    },
+    size: { width: 1920, height: 1080 },
+    verticalOffset: 0.1,
+  },
+  SpiderLair: {
+    imageSet: {
+      0: require("../../assets/backgrounds/SpiderLair/0.png"),
+      1: require("../../assets/backgrounds/SpiderLair/1.png"),
+      2: require("../../assets/backgrounds/SpiderLair/2.png"),
+      3: require("../../assets/backgrounds/SpiderLair/3.png"),
+      4: require("../../assets/backgrounds/SpiderLair/4.png"),
+      5: require("../../assets/backgrounds/SpiderLair/5.png"),
+      6: require("../../assets/backgrounds/SpiderLair/6.png"),
     },
     size: { width: 384, height: 216 },
     verticalOffset: -0.25,

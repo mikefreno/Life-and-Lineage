@@ -171,20 +171,23 @@ const DungeonScreen = observer(() => {
         ]}
       >
         {sorted.length > 1 && (
-          <View
-            style={{
-              marginTop: headerHeight + blurHeaderHeight + tw_base[1],
-              position: "absolute",
-              zIndex: 10,
-            }}
-          >
+          <>
             <View
-              style={[
-                flex.rowBetween,
-                { width: "100%", paddingHorizontal: tw_base[2] },
-              ]}
+              style={{
+                marginTop: headerHeight + blurHeaderHeight + tw_base[1],
+                position: "absolute",
+                zIndex: 10,
+              }}
             >
-              <View>
+              <View
+                style={[
+                  flex.rowBetween,
+                  {
+                    width: "100%",
+                    paddingHorizontal: tw_base[2],
+                  },
+                ]}
+              >
                 <GenericFlatButton
                   onPress={() => {
                     setSort(sort == "ascending" ? "descending" : "ascending");
@@ -200,41 +203,51 @@ const DungeonScreen = observer(() => {
                     style={{ textAlign: "center" }}
                   >{`Sort by:\n${toTitleCase(sort)} Difficulty`}</Text>
                 </GenericFlatButton>
-                <Pressable
-                  style={{ marginVertical: tw_base[1] }}
-                  onPress={() => {
-                    vibration({ style: "light" });
-                    scrollViewRef.current?.scrollTo({
-                      x: 0,
-                      y: 0,
-                      animated: true,
-                    });
-                  }}
-                >
-                  <AntDesign
-                    name="upcircleo"
-                    size={28}
-                    color={Colors[uiStore.colorScheme].border}
-                  />
-                </Pressable>
-                <Pressable
-                  onPress={() => {
-                    vibration({ style: "light" });
-                    scrollViewRef.current?.scrollToEnd();
-                  }}
-                >
-                  <AntDesign
-                    name="downcircleo"
-                    size={28}
-                    color={Colors[uiStore.colorScheme].border}
-                  />
-                </Pressable>
+                <Text style={{ fontSize: 16 }}>
+                  {currentPage + 1} of {sorted.length}
+                </Text>
               </View>
-              <Text style={{ fontSize: 16 }}>
-                {currentPage + 1} of {sorted.length}
-              </Text>
             </View>
-          </View>
+            <View
+              style={{
+                position: "absolute",
+                marginTop: uiStore.dimensions.height / 2,
+                zIndex: 10,
+              }}
+            >
+              <Pressable
+                style={{
+                  marginBottom: tw_base[1],
+                }}
+                onPress={() => {
+                  vibration({ style: "light" });
+                  scrollViewRef.current?.scrollTo({
+                    x: 0,
+                    y: 0,
+                    animated: true,
+                  });
+                }}
+              >
+                <AntDesign
+                  name="upcircleo"
+                  size={28}
+                  color={Colors[uiStore.colorScheme].border}
+                />
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  vibration({ style: "light" });
+                  scrollViewRef.current?.scrollToEnd();
+                }}
+              >
+                <AntDesign
+                  name="downcircleo"
+                  size={28}
+                  color={Colors[uiStore.colorScheme].border}
+                />
+              </Pressable>
+            </View>
+          </>
         )}
         <ScrollView
           key={`dungeon-scroll-${isFocused}`}
@@ -243,15 +256,11 @@ const DungeonScreen = observer(() => {
           onScroll={onScroll}
           onLayout={onLayout}
           scrollEventThrottle={16}
-          contentInset={{ top: 96 }}
-          style={{
-            marginBottom: uiStore.playerStatusHeight + tabHeight,
-            marginTop: -96,
-          }}
           contentContainerStyle={{
             height: `${100 * sorted.length}%`,
             paddingHorizontal: 12,
           }}
+          style={{ marginTop: -96 }}
         >
           {sorted.map((dungeonInstance, dungeonInstanceIdx) => (
             <ThemedCard

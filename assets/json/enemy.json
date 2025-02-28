@@ -800,6 +800,62 @@
       "minimum": 40,
       "maximum": 50
     }
+  },
+  {
+    "name": "legionnaire",
+    "beingType": "human",
+    "sprite": "gladiator_ss",
+    "sanity": 50,
+    "healthRange": {
+      "minimum": 120,
+      "maximum": 160
+    },
+    "attackPowerRange": {
+      "minimum": 10,
+      "maximum": 15
+    },
+    "energy": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [
+      "stampede",
+      "chop"
+    ],
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 40,
+      "maximum": 50
+    },
+    "armorValue": 40
+  },
+  {
+    "name": "gladiator",
+    "beingType": "human",
+    "sprite": "gladiator_ls",
+    "sanity": 50,
+    "healthRange": {
+      "minimum": 120,
+      "maximum": 160
+    },
+    "attackPowerRange": {
+      "minimum": 10,
+      "maximum": 15
+    },
+    "energy": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [
+      "stampede",
+      "chop"
+    ],
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 40,
+      "maximum": 50
+    },
+    "armorValue": 20
   }
 ]
 

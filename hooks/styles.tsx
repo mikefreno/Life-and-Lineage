@@ -72,6 +72,10 @@ export const useStyles = () => {
       ...text.xl,
       color: theme.text,
     } as const,
+    debugBorder: {
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
     // ---- New Game ---- //
     newGameContainer: {
       ...centeredContainer,

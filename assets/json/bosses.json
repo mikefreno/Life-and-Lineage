@@ -314,6 +314,126 @@
       "maximum": 3000
     },
     "armorValue": 10
+  },
+  {
+    "name": "gladiator",
+    "sprite": "gladiator_ls",
+    "beingType": "human",
+    "sanity": 50,
+    "health": 150,
+    "attackPower": 30,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [],
+    "drops": [],
+    "storyDrops": [],
+    "goldDropRange": {
+      "minimum": 2500,
+      "maximum": 3000
+    },
+    "armorValue": 50
+  },
+  {
+    "name": "lizardman",
+    "sprite": "lizardman",
+    "beingType": "demi-human",
+    "sanity": null,
+    "health": 150,
+    "attackPower": 30,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [],
+    "drops": [],
+    "storyDrops": [],
+    "goldDropRange": {
+      "minimum": 2500,
+      "maximum": 3000
+    },
+    "armorValue": 50
+  },
+  {
+    "name": "the hammer",
+    "sprite": "gladiator_hammer",
+    "beingType": "human",
+    "sanity": 50,
+    "health": 150,
+    "attackPower": 30,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [],
+    "drops": [],
+    "storyDrops": [],
+    "goldDropRange": {
+      "minimum": 2500,
+      "maximum": 3000
+    },
+    "armorValue": 50
+  },
+  {
+    "name": "the spear",
+    "sprite": "gladiator_spear",
+    "beingType": "human",
+    "sanity": 50,
+    "health": 150,
+    "attackPower": 30,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [],
+    "drops": [],
+    "storyDrops": [],
+    "goldDropRange": {
+      "minimum": 2500,
+      "maximum": 3000
+    },
+    "armorValue": 50
+  },
+  {
+    "name": "the deadeye",
+    "sprite": "gladiator_archer",
+    "beingType": "human",
+    "sanity": 50,
+    "health": 150,
+    "attackPower": 30,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [],
+    "drops": [],
+    "storyDrops": [],
+    "goldDropRange": {
+      "minimum": 2500,
+      "maximum": 3000
+    },
+    "armorValue": 50
+  },
+  {
+    "name": "her",
+    "sprite": "gladiator_female",
+    "beingType": "human",
+    "sanity": 50,
+    "health": 150,
+    "attackPower": 30,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [],
+    "drops": [],
+    "storyDrops": [],
+    "goldDropRange": {
+      "minimum": 2500,
+      "maximum": 3000
+    },
+    "armorValue": 50
   }
 ]
 
