@@ -3,12 +3,12 @@ import { Enemy } from "../entities/creatures";
 import { storage } from "../utility/functions/storage";
 import { RootStore } from "./RootStore";
 import { action, makeObservable, observable, reaction } from "mobx";
-import { AnimationStore } from "./AnimationStore";
 import { throttle } from "lodash";
+import { EnemyAnimationStore } from "./EnemyAnimationStore";
 
 export default class EnemyStore {
   enemies: Enemy[];
-  animationStoreMap: Map<string, AnimationStore>;
+  animationStoreMap: Map<string, EnemyAnimationStore>;
   attackAnimationsOnGoing: boolean = false;
   deathAnimationsOnGoing: boolean = false;
   attackAnimationCount: number = 0;
@@ -103,7 +103,7 @@ export default class EnemyStore {
     this.enemies.push(enemy);
     this.animationStoreMap.set(
       enemy.id,
-      new AnimationStore({ root: this.root }),
+      new EnemyAnimationStore({ root: this.root }),
     );
     this.enemySave(enemy);
   }
@@ -123,7 +123,7 @@ export default class EnemyStore {
 
   public hydrateEnemies() {
     const storedIds = storage.getString("enemyIDs");
-    const map = new Map<string, AnimationStore>();
+    const map = new Map<string, EnemyAnimationStore>();
     if (!storedIds) {
       return { enemies: [], map };
     }
@@ -132,13 +132,13 @@ export default class EnemyStore {
       const retrieved = storage.getString(`enemy_${str}`);
       if (!retrieved) return;
       const enemy = Enemy.fromJSON({ ...parse(retrieved), enemyStore: this });
-      map.set(enemy.id, new AnimationStore({ root: this.root }));
+      map.set(enemy.id, new EnemyAnimationStore({ root: this.root }));
       enemies.push(enemy);
     });
     return { enemies, map };
   }
 
-  public getAnimationStore(enemyId: string): AnimationStore | undefined {
+  public getAnimationStore(enemyId: string): EnemyAnimationStore | undefined {
     return this.animationStoreMap.get(enemyId);
   }
 

@@ -7,6 +7,7 @@ import {
   type NativeScrollEvent,
   type NativeSyntheticEvent,
   type LayoutChangeEvent,
+  Animated,
 } from "react-native";
 import { router } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
@@ -24,7 +25,6 @@ import { useRootStore } from "../../hooks/stores";
 import { flex, tw_base, useStyles } from "../../hooks/styles";
 import GenericFlatButton from "@/components/GenericFlatButton";
 import Colors from "@/constants/Colors";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { AntDesign } from "@expo/vector-icons";
 
 const MIN_RED = 20;
@@ -45,7 +45,6 @@ const DungeonScreen = observer(() => {
   const isFocused = useIsFocused();
   const headerHeight = useHeaderHeight();
   const styles = useStyles();
-  const tabHeight = useBottomTabBarHeight();
 
   useEffect(() => {
     const sorted = dungeonInstances
@@ -121,6 +120,27 @@ const DungeonScreen = observer(() => {
       );
     }
   });
+
+  const scaleAnimUpArrow = useRef(new Animated.Value(1)).current;
+  const scaleAnimDownArrow = useRef(new Animated.Value(1)).current;
+
+  const animatePress = (ref: Animated.Value) => {
+    Animated.spring(ref, {
+      toValue: 0.9,
+      useNativeDriver: true,
+      friction: 5,
+      tension: 40,
+    }).start();
+  };
+
+  const animateRelease = (ref: Animated.Value) => {
+    Animated.spring(ref, {
+      toValue: 1,
+      useNativeDriver: true,
+      friction: 3,
+      tension: 40,
+    }).start();
+  };
 
   return (
     <>
@@ -212,6 +232,7 @@ const DungeonScreen = observer(() => {
               style={{
                 position: "absolute",
                 marginTop: uiStore.dimensions.height / 2,
+                marginLeft: 4,
                 zIndex: 10,
               }}
             >
@@ -219,6 +240,8 @@ const DungeonScreen = observer(() => {
                 style={{
                   marginBottom: tw_base[1],
                 }}
+                onPressIn={() => animatePress(scaleAnimUpArrow)}
+                onPressOut={() => animateRelease(scaleAnimUpArrow)}
                 onPress={() => {
                   vibration({ style: "light" });
                   scrollViewRef.current?.scrollTo({
@@ -228,23 +251,37 @@ const DungeonScreen = observer(() => {
                   });
                 }}
               >
-                <AntDesign
-                  name="upcircleo"
-                  size={28}
-                  color={Colors[uiStore.colorScheme].border}
-                />
+                <Animated.View
+                  style={{
+                    transform: [{ scale: scaleAnimUpArrow }],
+                  }}
+                >
+                  <AntDesign
+                    name="upcircleo"
+                    size={28}
+                    color={Colors[uiStore.colorScheme].border}
+                  />
+                </Animated.View>
               </Pressable>
               <Pressable
+                onPressIn={() => animatePress(scaleAnimDownArrow)}
+                onPressOut={() => animateRelease(scaleAnimDownArrow)}
                 onPress={() => {
                   vibration({ style: "light" });
                   scrollViewRef.current?.scrollToEnd();
                 }}
               >
-                <AntDesign
-                  name="downcircleo"
-                  size={28}
-                  color={Colors[uiStore.colorScheme].border}
-                />
+                <Animated.View
+                  style={{
+                    transform: [{ scale: scaleAnimDownArrow }],
+                  }}
+                >
+                  <AntDesign
+                    name="downcircleo"
+                    size={28}
+                    color={Colors[uiStore.colorScheme].border}
+                  />
+                </Animated.View>
               </Pressable>
             </View>
           </>

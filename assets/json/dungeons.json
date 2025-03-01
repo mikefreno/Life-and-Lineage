@@ -414,7 +414,7 @@
   },
   {
     "name": "bandit hideout",
-    "bgName": "medieval",
+    "bgName": "Medieval",
     "id": 3,
     "difficulty": 3,
     "levels": [
@@ -789,7 +789,7 @@
     ]
   },
   {
-    "name": "infested mine",
+    "name": "infestation",
     "id": 5,
     "difficulty": 6,
     "bgName": "SpiderLair",

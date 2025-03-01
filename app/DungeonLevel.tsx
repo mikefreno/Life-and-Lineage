@@ -34,6 +34,7 @@ import { Parallax } from "../components/DungeonComponents/Parallax";
 import { Image } from "expo-image";
 import { useStyles } from "../hooks/styles";
 import { reaction } from "mobx";
+import { ScreenShaker } from "@/components/ScreenShaker";
 
 const DungeonLevelScreen = observer(() => {
   const { enemyStore, dungeonStore, uiStore, audioStore } = useRootStore();
@@ -157,7 +158,7 @@ const DungeonLevelScreen = observer(() => {
 
   if (currentLevel) {
     return (
-      <>
+      <ScreenShaker>
         <TutorialModal
           tutorial={TutorialOption.dungeonInterior}
           isFocused={isFocused}
@@ -291,7 +292,7 @@ const DungeonLevelScreen = observer(() => {
           )}
         </Parallax>
         <PlayerStatus positioning="absolute" style={{ bottom: 0 }} />
-      </>
+      </ScreenShaker>
     );
   } else {
     return (

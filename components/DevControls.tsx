@@ -172,61 +172,6 @@ export const DevControls = observer(() => {
     }
   };
 
-  const actions = [
-    {
-      action: (value: number) =>
-        rootStore.playerState?.addSkillPoint({ amount: value }),
-      name: "Add skill points",
-      max: 25,
-      step: 1,
-    },
-    {
-      action: (value: number) => rootStore.playerState?.addGold(value),
-      name: "Add gold",
-      max: 10_000,
-      step: 100,
-    },
-    {
-      action: (value: number) => rootStore.time.devSetter("year", value),
-      name: "Set Game Year",
-      min: 1_300,
-      max: 2_000,
-      step: 1,
-      initVal: rootStore.time.year,
-    },
-    {
-      action: (value: number) => rootStore.time.devSetter("week", value),
-      name: "Set Game Week",
-      max: 51,
-      step: 1,
-      initVal: rootStore.time.week,
-    },
-    {
-      action: (value: number) => rootStore.playerState?.restoreHealth(value),
-      name: "Adjust HP",
-      min: -1_000,
-      max: 1_000,
-      initVal: 0,
-      step: 10,
-    },
-    {
-      action: (value: number) => rootStore.playerState?.restoreMana(value),
-      name: "Adjust Mana",
-      min: -1_000,
-      max: 1_000,
-      initVal: 0,
-      step: 10,
-    },
-    {
-      action: (value: number) => rootStore.playerState?.restoreSanity(value),
-      name: "Adjust Sanity",
-      min: -1_000,
-      max: 1_000,
-      initVal: 0,
-      step: 10,
-    },
-  ];
-
   useEffect(() => {
     translateX.setValue(0);
     translateY.setValue(0);
@@ -242,7 +187,7 @@ export const DevControls = observer(() => {
         noPad
         innerStyle={{ paddingHorizontal: "3%" }}
       >
-        <ActionSliders actions={actions} />
+        <ActionSliders actions={rootStore.devActions} />
       </GenericModal>
 
       {/* Main button with gesture handler */}

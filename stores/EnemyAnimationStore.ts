@@ -2,7 +2,7 @@ import { action, makeObservable, observable } from "mobx";
 import { type RootStore } from "./RootStore";
 export const FPS = 12;
 
-export class AnimationStore {
+export class EnemyAnimationStore {
   textString: string | undefined = undefined;
   textDummy: number = 0;
   attackDummy: number = 0;
@@ -13,6 +13,7 @@ export class AnimationStore {
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
+
     makeObservable(this, {
       textString: observable,
       attackDummy: observable,

@@ -111,7 +111,7 @@ const backgroundImages = {
       4: require("../../assets/backgrounds/Cave_2/4.png"),
     },
     size: { width: 320, height: 64 },
-    verticalOffset: -0.4,
+    verticalOffset: 0.45,
   },
   Cemetary: {
     imageSet: {
@@ -122,7 +122,7 @@ const backgroundImages = {
       4: require("../../assets/backgrounds/Cemetary/4.png"),
     },
     size: { width: 320, height: 64 },
-    verticalOffset: -0.4,
+    verticalOffset: 0.45,
   },
   CrystalCave_1: {
     imageSet: {
@@ -219,7 +219,7 @@ const backgroundImages = {
       4: require("../../assets/backgrounds/Dungeon/4.png"),
     },
     size: { width: 320, height: 64 },
-    verticalOffset: -0.4,
+    verticalOffset: 0.45,
   },
   FallenKingdom: {
     imageSet: {
@@ -257,7 +257,7 @@ const backgroundImages = {
       4: require("../../assets/backgrounds/Medieval/4.png"),
     },
     size: { width: 320, height: 64 },
-    verticalOffset: -0.4,
+    verticalOffset: -0.45,
   },
   PineForest: {
     imageSet: {

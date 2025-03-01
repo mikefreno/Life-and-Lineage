@@ -7,7 +7,10 @@ import FadeOutNode from "../FadeOutNode";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import type { Enemy } from "../../entities/creatures";
-import { FPS, type AnimationStore } from "../../stores/AnimationStore";
+import {
+  FPS,
+  type EnemyAnimationStore,
+} from "../../stores/EnemyAnimationStore";
 import { useRootStore } from "../../hooks/stores";
 import { AnimatedSprite } from "../AnimatedSprite";
 import { EnemyImageMap } from "../../utility/enemyHelpers";
@@ -324,7 +327,7 @@ const EnemyDisplay = observer(
     animationStore,
   }: {
     enemy: Enemy;
-    animationStore: AnimationStore;
+    animationStore: EnemyAnimationStore;
   }) => {
     const { uiStore } = useRootStore();
     const styles = useStyles();

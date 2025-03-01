@@ -1,15 +1,25 @@
 [
   {
-    "name": "fire bolt", 
-    "element": "fire", 
-    "proficiencyNeeded": "novice", 
+    "name": "fire bolt",
+    "element": "fire",
+    "proficiencyNeeded": "novice",
     "target": "single",
     "type": "offense",
     "manaCost": 10,
     "effects": {
-      "damage": 15, 
-      "buffs": null, 
-      "debuffs": [{"name":"burn", "chance": 0.25}]
+      "damage": 15,
+      "buffs": null,
+      "debuffs": [
+        {
+          "name": "burn",
+          "chance": 0.25
+        }
+      ]
+    },
+    "animation": {
+      "sprite": "fireMissile",
+      "style": "missile",
+      "position": "enemy"
     }
   },
   {
@@ -22,7 +32,17 @@
     "effects": {
       "damage": 25,
       "buffs": null,
-      "debuffs": [{"name":"burn", "chance": 0.25}]
+      "debuffs": [
+        {
+          "name": "burn",
+          "chance": 0.25
+        }
+      ]
+    },
+    "animation": {
+      "sprite": "fireSlash",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -35,7 +55,17 @@
     "effects": {
       "damage": 25,
       "buffs": null,
-      "debuffs": [{"name":"burn", "chance": 0.75}]
+      "debuffs": [
+        {
+          "name": "burn",
+          "chance": 0.75
+        }
+      ]
+    },
+    "animation": {
+      "sprite": "fireDust",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -48,7 +78,17 @@
     "effects": {
       "damage": 60,
       "buffs": null,
-      "debuffs": [{"name":"burn", "chance": 0.25}]
+      "debuffs": [
+        {
+          "name": "burn",
+          "chance": 0.25
+        }
+      ]
+    },
+    "animation": {
+      "sprite": "fireMissile",
+      "style": "missile",
+      "position": "enemy"
     }
   },
   {
@@ -61,8 +101,20 @@
     "duration": 3,
     "effects": {
       "damage": null,
-      "buffs": ["projectile suppression"],
-      "debuffs": [{"name":"burn", "chance": 0.5}]
+      "buffs": [
+        "projectile suppression"
+      ],
+      "debuffs": [
+        {
+          "name": "burn",
+          "chance": 0.5
+        }
+      ]
+    },
+    "animation": {
+      "sprite": "flameWall",
+      "style": "missile",
+      "position": "enemy"
     }
   },
   {
@@ -76,7 +128,17 @@
     "effects": {
       "damage": 50,
       "buffs": null,
-      "debuffs": [{"name":"burn", "chance": 0.25}]
+      "debuffs": [
+        {
+          "name": "burn",
+          "chance": 0.25
+        }
+      ]
+    },
+    "animation": {
+      "sprite": "fireRain",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -89,7 +151,12 @@
     "effects": {
       "damage": 275,
       "buffs": null,
-      "debuffs": [{"name":"severe burn", "chance": 0.75}]
+      "debuffs": [
+        {
+          "name": "severe burn",
+          "chance": 0.75
+        }
+      ]
     }
   },
   {
@@ -102,7 +169,17 @@
     "effects": {
       "damage": 400,
       "buffs": null,
-      "debuffs": [{"name":"severe burn", "chance": 1.0}]
+      "debuffs": [
+        {
+          "name": "severe burn",
+          "chance": 1.0
+        }
+      ]
+    },
+    "animation": {
+      "sprite": "fireBeam",
+      "style": "span",
+      "position": "self"
     }
   },
   {
@@ -115,7 +192,17 @@
     "effects": {
       "damage": 10,
       "buffs": null,
-      "debuffs": [{"name":"chill", "chance": 0.5}]
+      "debuffs": [
+        {
+          "name": "chill",
+          "chance": 0.5
+        }
+      ]
+    },
+    "animation": {
+      "sprite": "iceBlock",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -129,6 +216,11 @@
       "damage": 30,
       "buffs": null,
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "ambiguousSparks",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -143,6 +235,11 @@
       "selfDamage": -35,
       "buffs": null,
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "splash",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -155,7 +252,21 @@
     "effects": {
       "damage": 40,
       "buffs": null,
-      "debuffs": [{"name":"chill", "chance": 1.0},{"name":"chill", "chance": 1.0}]
+      "debuffs": [
+        {
+          "name": "chill",
+          "chance": 1.0
+        },
+        {
+          "name": "chill",
+          "chance": 1.0
+        }
+      ]
+    },
+    "animation": {
+      "sprite": "coldSmoke",
+      "style": "span",
+      "position": "self"
     }
   },
   {
@@ -168,11 +279,21 @@
     "effects": {
       "damage": 60,
       "buffs": null,
-      "debuffs": [{"name":"burn", "chance": 0.5}]
+      "debuffs": [
+        {
+          "name": "burn",
+          "chance": 0.5
+        }
+      ]
+    },
+    "animation": {
+      "sprite": "coldSmoke",
+      "style": "span",
+      "position": "self"
     }
   },
   {
-    "name": "freezing ray",
+    "name": "ice spike",
     "element": "water",
     "target": "single",
     "type": "offense",
@@ -181,7 +302,20 @@
     "effects": {
       "damage": 100,
       "buffs": null,
-      "debuffs": [{"name":"chill", "chance": 0.75},{"name":"chill", "chance": 0.75},{"name":"chill", "chance": 0.75}]
+      "debuffs": [
+        {
+          "name": "chill",
+          "chance": 0.75
+        },
+        {
+          "name": "chill",
+          "chance": 0.75
+        },
+        {
+          "name": "chill",
+          "chance": 0.75
+        }
+      ]
     }
   },
   {
@@ -193,8 +327,15 @@
     "manaCost": 200,
     "effects": {
       "damage": null,
-      "buffs": ["lasting heal"],
+      "buffs": [
+        "lasting heal"
+      ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "rainCall",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -208,38 +349,76 @@
     "effects": {
       "damage": 50,
       "buffs": null,
-      "debuffs": [{"name":"chill", "chance": 0.75}]
+      "debuffs": [
+        {
+          "name": "chill",
+          "chance": 0.75
+        }
+      ]
+    },
+    "animation": {
+      "sprite": "iceOrb",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
-    "name": "boil blood",
+    "name": "torrent",
     "element": "water",
     "target": "single",
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 600,
     "effects": {
-      "damage": 175,
+      "damage": 400,
       "buffs": null,
-      "debuffs": [{"name":"severe burn", "chance": 1.0}]
+      "debuffs": null
+    },
+    "animation": {
+      "sprite": "torrent",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
-    "name": "blood control",
+    "name": "spike field",
     "element": "water",
-    "target": "single",
+    "target": "aoe",
     "type": "offense",
     "proficiencyNeeded": "legend",
+    "manaCost": 700,
     "duration": 2,
-    "manaCost": 1100,
     "effects": {
-      "damage": 150,
+      "damage": 100,
       "buffs": null,
-      "debuffs": [{"name":"stun", "chance": 1.0}]
+      "debuffs": [
+        {
+          "name": "chill",
+          "chance": 0.75
+        },
+        {
+          "name": "chill",
+          "chance": 0.75
+        },
+        {
+          "name": "bleed",
+          "chance": 0.75
+        },
+        {
+          "name": "bleed",
+          "chance": 0.75
+        }
+      ]
+    },
+    "animation": {
+      "sprite": "massSpikes",
+      "style": "missile",
+      "position": "enemy",
+      "retrigger": false
     }
   },
   {
-    "name": "gust",
+    "name": "air burst",
     "element": "air",
     "target": "single",
     "type": "offense",
@@ -249,6 +428,11 @@
       "damage": 18,
       "buffs": null,
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "puft",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -261,7 +445,17 @@
     "effects": {
       "damage": 25,
       "buffs": null,
-      "debuffs": [{"name":"shocked", "chance": 0.5}]
+      "debuffs": [
+        {
+          "name": "shocked",
+          "chance": 0.5
+        }
+      ]
+    },
+    "animation": {
+      "sprite": "sparks",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -274,7 +468,16 @@
     "effects": {
       "damage": 50,
       "buffs": null,
-      "debuffs": [{"name":"shocked", "chance": 0.5},{"name":"shocked", "chance": 0.5}]
+      "debuffs": [
+        {
+          "name": "shocked",
+          "chance": 0.5
+        },
+        {
+          "name": "shocked",
+          "chance": 0.5
+        }
+      ]
     }
   },
   {
@@ -287,7 +490,16 @@
     "effects": {
       "damage": 50,
       "buffs": null,
-      "debuffs": [{"name":"shocked", "chance": 0.75},{"name":"stun", "chance": 0.5}]
+      "debuffs": [
+        {
+          "name": "shocked",
+          "chance": 0.75
+        },
+        {
+          "name": "stun",
+          "chance": 0.5
+        }
+      ]
     }
   },
   {
@@ -300,7 +512,16 @@
     "effects": {
       "damage": 50,
       "buffs": null,
-      "debuffs": [{"name":"shocked", "chance": 0.75},{"name":"stun", "chance": 0.5}]
+      "debuffs": [
+        {
+          "name": "shocked",
+          "chance": 0.75
+        },
+        {
+          "name": "stun",
+          "chance": 0.5
+        }
+      ]
     }
   },
   {
@@ -313,7 +534,16 @@
     "effects": {
       "damage": 75,
       "buffs": null,
-      "debuffs": [{"name":"bleed", "chance": 0.75},{"name":"bleed", "chance": 0.75}]
+      "debuffs": [
+        {
+          "name": "bleed",
+          "chance": 0.75
+        },
+        {
+          "name": "bleed",
+          "chance": 0.75
+        }
+      ]
     }
   },
   {
@@ -325,7 +555,10 @@
     "manaCost": 125,
     "effects": {
       "damage": null,
-      "buffs": ["hard to see", "damaging to hit"],
+      "buffs": [
+        "hard to see",
+        "damaging to hit"
+      ],
       "debuffs": null
     }
   },
@@ -354,18 +587,28 @@
     "effects": {
       "damage": 125,
       "buffs": null,
-      "debuffs": [{"name":"stun", "chance": 0.75}]
+      "debuffs": [
+        {
+          "name": "stun",
+          "chance": 0.75
+        }
+      ]
     }
   },
   {
     "name": "rock toss",
     "element": "earth",
-    "proficiencyNeeded": "novice", 
+    "proficiencyNeeded": "novice",
     "manaCost": 10,
     "effects": {
-      "damage": 10, 
-      "buffs": null, 
-      "debuffs": [{"name":"stun", "chance": 0.10}]
+      "damage": 10,
+      "buffs": null,
+      "debuffs": [
+        {
+          "name": "stun",
+          "chance": 0.10
+        }
+      ]
     }
   },
   {
@@ -374,8 +617,10 @@
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
     "effects": {
-      "damage": null, 
-      "buffs": ["stone hands"], 
+      "damage": null,
+      "buffs": [
+        "stone hands"
+      ],
       "debuffs": null
     }
   },
@@ -386,9 +631,14 @@
     "duration": 3,
     "manaCost": 40,
     "effects": {
-      "damage": 10, 
-      "buffs": null, 
-      "debuffs": [{"name":"stun", "chance": 0.25}]
+      "damage": 10,
+      "buffs": null,
+      "debuffs": [
+        {
+          "name": "stun",
+          "chance": 0.25
+        }
+      ]
     }
   },
   {
@@ -397,8 +647,10 @@
     "proficiencyNeeded": "adept",
     "manaCost": 60,
     "effects": {
-      "damage": null, 
-      "buffs": ["rock armor"], 
+      "damage": null,
+      "buffs": [
+        "rock armor"
+      ],
       "debuffs": null
     }
   },
@@ -408,9 +660,14 @@
     "proficiencyNeeded": "expert",
     "manaCost": 85,
     "effects": {
-      "damage": 65, 
-      "buffs": null, 
-      "debuffs": [{"name":"stun", "chance": 0.75}]
+      "damage": 65,
+      "buffs": null,
+      "debuffs": [
+        {
+          "name": "stun",
+          "chance": 0.75
+        }
+      ]
     }
   },
   {
@@ -420,31 +677,44 @@
     "duration": 5,
     "manaCost": 120,
     "effects": {
-      "damage": null, 
-      "buffs": ["projectile negation"],
+      "damage": null,
+      "buffs": [
+        "projectile negation"
+      ],
       "debuffs": null
     }
   },
   {
     "name": "earthquake",
     "element": "earth",
-    "proficiencyNeeded": "legend", 
+    "proficiencyNeeded": "legend",
     "manaCost": 650,
     "effects": {
-      "damage": 175, 
+      "damage": 175,
       "buffs": null,
-      "debuffs": [{"name":"heavy stun", "chance": 1.0}]
+      "debuffs": [
+        {
+          "name": "heavy stun",
+          "chance": 1.0
+        }
+      ]
     }
   },
   {
     "name": "sand burial",
     "element": "earth",
-    "proficiencyNeeded": "legend", 
+    "proficiencyNeeded": "legend",
     "manaCost": 1200,
     "effects": {
-      "damage": 400, 
+      "damage": 400,
       "buffs": null,
-      "debuffs": [{"name":"heavy stun", "chance": 1.0}]
+      "debuffs": [
+        {
+          "name": "heavy stun",
+          "chance": 1.0
+        }
+      ]
     }
   }
 ]
+

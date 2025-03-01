@@ -2591,7 +2591,7 @@ export function getStartingBook(player: PlayerCharacter) {
       });
     case Element.air:
       return new Item({
-        name: "book of gust",
+        name: "book of air burst",
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { Image } from "expo-image";
 import { EnemyImageMap, EnemyImageValueOption } from "../utility/enemyHelpers";
-import { FPS } from "../stores/AnimationStore";
+import { FPS } from "../stores/EnemyAnimationStore";
 
 interface AnimatedSpriteProps {
   spriteSet: EnemyImageValueOption;

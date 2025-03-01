@@ -20,9 +20,11 @@ import { ConditionObjectType, EffectOptions } from "../utility/types";
 import { StashStore } from "./StashStore";
 import { SaveStore } from "./SaveStore";
 import { AudioStore } from "./AudioStore";
+import { PlayerAnimationStore } from "./PlayerAnimationStore";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
+  playerAnimationStore: PlayerAnimationStore;
   time: TimeStore;
   enemyStore: EnemyStore;
   shopsStore: ShopStore;
@@ -39,6 +41,15 @@ export class RootStore {
   atDeathScreen: boolean = false;
   startingNewGame: boolean = false;
 
+  devActions: {
+    action: (value: number) => void;
+    name: string;
+    max: number;
+    step: number;
+    min?: number | undefined;
+    initVal?: number | undefined;
+  }[];
+
   constructor() {
     this.uiStore = new UIStore({ root: this });
 
@@ -46,6 +57,7 @@ export class RootStore {
     this.playerState = retrieved_player
       ? PlayerCharacter.fromJSON({ ...parse(retrieved_player), root: this })
       : null;
+    this.playerAnimationStore = new PlayerAnimationStore({ root: this });
 
     this.uiStore.markStoreAsLoaded("player");
 
@@ -81,12 +93,71 @@ export class RootStore {
 
     this.constructed = true;
 
+    this.devActions = __DEV__
+      ? [
+          {
+            action: (value: number) =>
+              this.playerState?.addSkillPoint({ amount: value }),
+            name: "Add skill points",
+            max: 25,
+            step: 1,
+          },
+          {
+            action: (value: number) => this.playerState?.addGold(value),
+            name: "Add gold",
+            max: 10_000,
+            step: 100,
+          },
+          {
+            action: (value: number) => this.time.devSetter("year", value),
+            name: "Set Game Year",
+            min: 1_300,
+            max: 2_000,
+            step: 1,
+            initVal: this.time.year,
+          },
+          {
+            action: (value: number) => this.time.devSetter("week", value),
+            name: "Set Game Week",
+            max: 51,
+            step: 1,
+            initVal: this.time.week,
+          },
+          {
+            action: (value: number) => this.playerState?.restoreHealth(value),
+            name: "Adjust HP",
+            min: -1_000,
+            max: 1_000,
+            initVal: 0,
+            step: 10,
+          },
+          {
+            action: (value: number) => this.playerState?.restoreMana(value),
+            name: "Adjust Mana",
+            min: -1_000,
+            max: 1_000,
+            initVal: 0,
+            step: 10,
+          },
+          {
+            action: (value: number) => this.playerState?.restoreSanity(value),
+            name: "Adjust Sanity",
+            min: -1_000,
+            max: 1_000,
+            initVal: 0,
+            step: 10,
+          },
+        ]
+      : [];
+
     makeObservable(this, {
       constructed: observable,
       atDeathScreen: observable,
       startingNewGame: observable,
+      devActions: observable,
       hitDeathScreen: action,
       clearDeathScreen: action,
+      setDevActions: action,
     });
   }
 
@@ -112,6 +183,19 @@ export class RootStore {
       }
     }
     return points;
+  }
+
+  setDevActions(
+    actions: {
+      action: (value: number) => void;
+      name: string;
+      max: number;
+      step: number;
+      min?: number | undefined;
+      initVal?: number | undefined;
+    }[],
+  ) {
+    this.devActions = actions;
   }
 
   async newGame(newPlayer: PlayerCharacter) {

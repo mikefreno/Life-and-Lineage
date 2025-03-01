@@ -1,9 +1,9 @@
+import { VFXImageOptions } from "@/utility/functions/vfxmapping";
 import { createBuff, createDebuff } from "../utility/functions/conditions";
 import { wait, toTitleCase, rollD20 } from "../utility/functions/misc";
 import {
   Element,
   MasteryLevel,
-  Modifier,
   StringToElement,
   StringToMastery,
 } from "../utility/types";
@@ -32,6 +32,12 @@ interface SpellFields {
     selfDamage?: number | null | undefined;
     sanityDamage?: number | undefined;
   };
+  animation: {
+    sprite: VFXImageOptions;
+    style: "static" | "missile" | "span";
+    position: "enemy" | "field" | "self";
+    retrigger?: boolean;
+  };
 }
 
 /**
@@ -42,7 +48,7 @@ interface SpellFields {
  */
 export class Spell {
   name: string;
-  attackStyle: "single" | "dual" | "aoe"; //at time of writing, only implementing single target
+  attackStyle: "single" | "dual" | "aoe";
   element: Element;
   usesWeapon: string | null;
   proficiencyNeeded: MasteryLevel | null;
@@ -55,6 +61,12 @@ export class Spell {
   debuffs: { name: string; chance: number }[];
   summons: string[];
   rangerPet: string | undefined;
+  animation: {
+    sprite: VFXImageOptions;
+    style: "static" | "missile" | "span";
+    position: "enemy" | "field" | "self";
+    retrigger?: boolean;
+  };
 
   constructor({
     name,
@@ -65,6 +77,7 @@ export class Spell {
     duration,
     effects,
     usesWeapon,
+    animation,
   }: SpellFields) {
     this.name = name;
     this.element = StringToElement[element];
@@ -82,6 +95,7 @@ export class Spell {
     this.debuffs = effects.debuffs ?? [];
     this.summons = effects.summon ?? [];
     this.rangerPet = effects.pet;
+    this.animation = animation;
   }
 
   public baseDamage(user: PlayerCharacter) {

@@ -91,9 +91,9 @@
     "baseValue": 50000
   },
   {
-    "name": "book of freezing ray",
+    "name": "book of ice spike",
     "type": "spell",
-    "teaches": "freezing ray",
+    "teaches": "ice spike",
     "icon": "Book_2",
     "baseValue": 100000
   },
@@ -114,21 +114,21 @@
   {
     "name": "forbidden water techniques vol. 1",
     "type": "spell",
-    "teaches": "boil blood",
+    "teaches": "torrent",
     "icon": "Book_3",
     "baseValue": 500000
   },
   {
     "name": "forbidden water techniques vol. 2",
     "type": "spell",
-    "teaches": "blood control",
+    "teaches": "spike field",
     "icon": "Book_3",
     "baseValue": 1000000
   },
   {
-    "name": "book of gust",
+    "name": "book of air burst",
     "type": "spell",
-    "teaches": "gust",
+    "teaches": "air burst",
     "icon": "Book",
     "baseValue": 2500
   },

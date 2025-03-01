@@ -1,6 +1,7 @@
 import type { PlayerCharacter } from "../entities/character";
 import type { Condition } from "../entities/conditions";
 import type { Enemy, Minion } from "../entities/creatures";
+import { VFXImageOptions } from "./functions/vfxmapping";
 
 type StatEffect = {
   stat: "health" | "mana" | "sanity";
@@ -477,3 +478,9 @@ export type MerchantType =
   | "fletcher"
   | "apothecary"
   | "librarian";
+export type PlayerAnimationSet = {
+  sprite: VFXImageOptions;
+  style: "static" | "missile" | "span";
+  position: "enemy" | "field" | "self";
+  retrigger?: boolean;
+};

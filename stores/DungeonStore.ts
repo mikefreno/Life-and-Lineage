@@ -215,6 +215,35 @@ export class DungeonStore {
     );
 
     reaction(
+      () => this.isInDungeon,
+      (current) => {
+        if (current) {
+          const dungeonDevActions = [
+            ...this.root.devActions,
+            {
+              action: (value: number) => {
+                if (this.root.playerAnimationStore.screenShaker) {
+                  this.root.playerAnimationStore.screenShaker(value);
+                }
+              },
+              name: "Trigger Screen Shake",
+              initVal: 200,
+              max: 500,
+              step: 25,
+            },
+          ];
+          this.root.setDevActions(dungeonDevActions);
+        } else {
+          this.root.setDevActions(
+            this.root.devActions.filter(
+              (action) => action.name !== "Trigger Screen Shake",
+            ),
+          );
+        }
+      },
+    );
+
+    reaction(
       () => this.currentSpecialEncounter,
       (encounter) => {
         if (encounter) {

@@ -8,30 +8,30 @@ export const EnemyImageMap = {
   baby_dragon: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Baby_Dragon/ATTACK.png"),
+        anim: require("@/assets/monsters/Baby_Dragon/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Baby_Dragon/DEATH.png"),
+        anim: require("@/assets/monsters/Baby_Dragon/DEATH.png"),
         frames: 5,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Baby_Dragon/HURT.png"),
+        anim: require("@/assets/monsters/Baby_Dragon/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Baby_Dragon/IDLE.png"),
+        anim: require("@/assets/monsters/Baby_Dragon/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Baby_Dragon/MOVE.png"),
+        anim: require("@/assets/monsters/Baby_Dragon/MOVE.png"),
         frames: 4,
       },
       spawn: null,
     },
     effects: {
       projectile: {
-        anim: require("../assets/images/monsters/Baby_Dragon/Projectile.png"),
+        anim: require("@/assets/monsters/Baby_Dragon/Projectile.png"),
         frames: 6,
       },
     },
@@ -41,23 +41,23 @@ export const EnemyImageMap = {
   bandit_heavy: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Bandit_Heavy/ATTACK.png"),
+        anim: require("@/assets/monsters/Bandit_Heavy/ATTACK.png"),
         frames: 4,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Bandit_Heavy/HURT.png"),
+        anim: require("@/assets/monsters/Bandit_Heavy/HURT.png"),
         frames: 4,
       },
       death: {
-        anim: require("../assets/images/monsters/Bandit_Heavy/DEATH.png"),
+        anim: require("@/assets/monsters/Bandit_Heavy/DEATH.png"),
         frames: 8,
       },
       idle: {
-        anim: require("../assets/images/monsters/Bandit_Heavy/IDLE.png"),
+        anim: require("@/assets/monsters/Bandit_Heavy/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Bandit_Heavy/MOVE.png"),
+        anim: require("@/assets/monsters/Bandit_Heavy/MOVE.png"),
         frames: 8,
       },
       spawn: null,
@@ -68,23 +68,23 @@ export const EnemyImageMap = {
   bandit_light: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Bandit_Light/ATTACK.png"),
+        anim: require("@/assets/monsters/Bandit_Light/ATTACK.png"),
         frames: 4,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Bandit_Light/HURT.png"),
+        anim: require("@/assets/monsters/Bandit_Light/HURT.png"),
         frames: 4,
       },
       death: {
-        anim: require("../assets/images/monsters/Bandit_Light/DEATH.png"),
+        anim: require("@/assets/monsters/Bandit_Light/DEATH.png"),
         frames: 8,
       },
       idle: {
-        anim: require("../assets/images/monsters/Bandit_Light/IDLE.png"),
+        anim: require("@/assets/monsters/Bandit_Light/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Bandit_Light/MOVE.png"),
+        anim: require("@/assets/monsters/Bandit_Light/MOVE.png"),
         frames: 8,
       },
       spawn: null,
@@ -95,19 +95,19 @@ export const EnemyImageMap = {
   bat_blood: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Bat_Blood/ATTACK.png"),
+        anim: require("@/assets/monsters/Bat_Blood/ATTACK.png"),
         frames: 3,
       },
       spawn: {
-        anim: require("../assets/images/monsters/Bat_Blood/SPAWN.png"),
+        anim: require("@/assets/monsters/Bat_Blood/SPAWN.png"),
         frames: 5,
       },
       idle: {
-        anim: require("../assets/images/monsters/Bat_Blood/IDLE.png"),
+        anim: require("@/assets/monsters/Bat_Blood/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Bat_Blood/MOVE.png"),
+        anim: require("@/assets/monsters/Bat_Blood/MOVE.png"),
         frames: 6,
       },
       death: null,
@@ -120,19 +120,19 @@ export const EnemyImageMap = {
   bat_brown: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Bat_Brown/ATTACK.png"),
+        anim: require("@/assets/monsters/Bat_Brown/ATTACK.png"),
         frames: 3,
       },
       spawn: {
-        anim: require("../assets/images/monsters/Bat_Brown/SPAWN.png"),
+        anim: require("@/assets/monsters/Bat_Brown/SPAWN.png"),
         frames: 5,
       },
       idle: {
-        anim: require("../assets/images/monsters/Bat_Brown/IDLE.png"),
+        anim: require("@/assets/monsters/Bat_Brown/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Bat_Brown/MOVE.png"),
+        anim: require("@/assets/monsters/Bat_Brown/MOVE.png"),
         frames: 6,
       },
       death: null,
@@ -145,19 +145,19 @@ export const EnemyImageMap = {
   bat_feral: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Bat_Feral/ATTACK.png"),
+        anim: require("@/assets/monsters/Bat_Feral/ATTACK.png"),
         frames: 3,
       },
       spawn: {
-        anim: require("../assets/images/monsters/Bat_Feral/SPAWN.png"),
+        anim: require("@/assets/monsters/Bat_Feral/SPAWN.png"),
         frames: 5,
       },
       idle: {
-        anim: require("../assets/images/monsters/Bat_Feral/IDLE.png"),
+        anim: require("@/assets/monsters/Bat_Feral/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Bat_Feral/MOVE.png"),
+        anim: require("@/assets/monsters/Bat_Feral/MOVE.png"),
         frames: 6,
       },
       death: null,
@@ -170,19 +170,19 @@ export const EnemyImageMap = {
   bat_gray: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Bat_Gray/ATTACK.png"),
+        anim: require("@/assets/monsters/Bat_Gray/ATTACK.png"),
         frames: 3,
       },
       spawn: {
-        anim: require("../assets/images/monsters/Bat_Gray/SPAWN.png"),
+        anim: require("@/assets/monsters/Bat_Gray/SPAWN.png"),
         frames: 5,
       },
       idle: {
-        anim: require("../assets/images/monsters/Bat_Gray/IDLE.png"),
+        anim: require("@/assets/monsters/Bat_Gray/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Bat_Gray/MOVE.png"),
+        anim: require("@/assets/monsters/Bat_Gray/MOVE.png"),
         frames: 6,
       },
       death: null,
@@ -195,19 +195,19 @@ export const EnemyImageMap = {
   bat_origin: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Bat_Origin/ATTACK.png"),
+        anim: require("@/assets/monsters/Bat_Origin/ATTACK.png"),
         frames: 3,
       },
       spawn: {
-        anim: require("../assets/images/monsters/Bat_Origin/SPAWN.png"),
+        anim: require("@/assets/monsters/Bat_Origin/SPAWN.png"),
         frames: 5,
       },
       idle: {
-        anim: require("../assets/images/monsters/Bat_Origin/IDLE.png"),
+        anim: require("@/assets/monsters/Bat_Origin/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Bat_Origin/MOVE.png"),
+        anim: require("@/assets/monsters/Bat_Origin/MOVE.png"),
         frames: 6,
       },
       death: null,
@@ -220,19 +220,19 @@ export const EnemyImageMap = {
   bat_vampire: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Bat_Vampire/ATTACK.png"),
+        anim: require("@/assets/monsters/Bat_Vampire/ATTACK.png"),
         frames: 3,
       },
       spawn: {
-        anim: require("../assets/images/monsters/Bat_Vampire/SPAWN.png"),
+        anim: require("@/assets/monsters/Bat_Vampire/SPAWN.png"),
         frames: 5,
       },
       idle: {
-        anim: require("../assets/images/monsters/Bat_Vampire/IDLE.png"),
+        anim: require("@/assets/monsters/Bat_Vampire/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Bat_Vampire/MOVE.png"),
+        anim: require("@/assets/monsters/Bat_Vampire/MOVE.png"),
         frames: 6,
       },
       death: null,
@@ -245,23 +245,23 @@ export const EnemyImageMap = {
   centaur: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Centaur/ATTACK.png"),
+        anim: require("@/assets/monsters/Centaur/ATTACK.png"),
         frames: 8,
       },
       death: {
-        anim: require("../assets/images/monsters/Centaur/DEATH.png"),
+        anim: require("@/assets/monsters/Centaur/DEATH.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Centaur/HURT.png"),
+        anim: require("@/assets/monsters/Centaur/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Centaur/IDLE.png"),
+        anim: require("@/assets/monsters/Centaur/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Centaur/MOVE.png"),
+        anim: require("@/assets/monsters/Centaur/MOVE.png"),
         frames: 3,
       },
       spawn: null,
@@ -272,23 +272,23 @@ export const EnemyImageMap = {
   cerebus: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Cerebus/ATTACK.png"),
+        anim: require("@/assets/monsters/Cerebus/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Cerebus/DEATH.png"),
+        anim: require("@/assets/monsters/Cerebus/DEATH.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Cerebus/HURT.png"),
+        anim: require("@/assets/monsters/Cerebus/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Cerebus/IDLE.png"),
+        anim: require("@/assets/monsters/Cerebus/IDLE.png"),
         frames: 3,
       },
       move: {
-        anim: require("../assets/images/monsters/Cerebus/MOVE.png"),
+        anim: require("@/assets/monsters/Cerebus/MOVE.png"),
         frames: 3,
       },
       spawn: null,
@@ -301,27 +301,27 @@ export const EnemyImageMap = {
   cyclops: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Cyclops/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Cyclops/ATTACK_1.png"),
         frames: 7,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Cyclops/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Cyclops/ATTACK_2.png"),
         frames: 11,
       },
       death: {
-        anim: require("../assets/images/monsters/Cyclops/DEATH.png"),
+        anim: require("@/assets/monsters/Cyclops/DEATH.png"),
         frames: 8,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Cyclops/HURT.png"),
+        anim: require("@/assets/monsters/Cyclops/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Cyclops/IDLE.png"),
+        anim: require("@/assets/monsters/Cyclops/IDLE.png"),
         frames: 3,
       },
       move: {
-        anim: require("../assets/images/monsters/Cyclops/MOVE.png"),
+        anim: require("@/assets/monsters/Cyclops/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -334,27 +334,27 @@ export const EnemyImageMap = {
   demon_boss: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Demon_Boss/ATTACK.png"),
+        anim: require("@/assets/monsters/Demon_Boss/ATTACK.png"),
         frames: 6,
       },
       transition: {
-        anim: require("../assets/images/monsters/Demon_Boss/TRANSITION.png"),
+        anim: require("@/assets/monsters/Demon_Boss/TRANSITION.png"),
         frames: 3,
       },
       death: {
-        anim: require("../assets/images/monsters/Demon_Boss/DEATH.png"),
+        anim: require("@/assets/monsters/Demon_Boss/DEATH.png"),
         frames: 10,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Demon_Boss/HURT.png"),
+        anim: require("@/assets/monsters/Demon_Boss/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Demon_Boss/IDLE.png"),
+        anim: require("@/assets/monsters/Demon_Boss/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Demon_Boss/MOVE.png"),
+        anim: require("@/assets/monsters/Demon_Boss/MOVE.png"),
         frames: 4,
       },
       spawn: null,
@@ -367,35 +367,35 @@ export const EnemyImageMap = {
   demon_samurai_p1: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Demon_Samurai/ATTACK_1_P1.png"),
+        anim: require("@/assets/monsters/Demon_Samurai/ATTACK_1_P1.png"),
         frames: 7,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Demon_Samurai/ATTACK_2_P1.png"),
+        anim: require("@/assets/monsters/Demon_Samurai/ATTACK_2_P1.png"),
         frames: 5,
       },
       attack_3: {
-        anim: require("../assets/images/monsters/Demon_Samurai/ATTACK_3_P1.png"),
+        anim: require("@/assets/monsters/Demon_Samurai/ATTACK_3_P1.png"),
         frames: 7,
       },
       attack_4: {
-        anim: require("../assets/images/monsters/Demon_Samurai/ATTACK_4_P1.png"),
+        anim: require("@/assets/monsters/Demon_Samurai/ATTACK_4_P1.png"),
         frames: 12,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Demon_Samurai/HURT_P1.png"),
+        anim: require("@/assets/monsters/Demon_Samurai/HURT_P1.png"),
         frames: 7,
       },
       idle: {
-        anim: require("../assets/images/monsters/Demon_Samurai/IDLE_P1.png"),
+        anim: require("@/assets/monsters/Demon_Samurai/IDLE_P1.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Demon_Samurai/MOVE_P1.png"),
+        anim: require("@/assets/monsters/Demon_Samurai/MOVE_P1.png"),
         frames: 8,
       },
       transition: {
-        anim: require("../assets/images/monsters/Demon_Samurai/SHOUT.png"),
+        anim: require("@/assets/monsters/Demon_Samurai/SHOUT.png"),
         frames: 17,
       },
       spawn: null,
@@ -409,35 +409,35 @@ export const EnemyImageMap = {
   demon_samurai_p2: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Demon_Samurai/ATTACK_1_P2.png"),
+        anim: require("@/assets/monsters/Demon_Samurai/ATTACK_1_P2.png"),
         frames: 7,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Demon_Samurai/ATTACK_2_P2.png"),
+        anim: require("@/assets/monsters/Demon_Samurai/ATTACK_2_P2.png"),
         frames: 6,
       },
       attack_3: {
-        anim: require("../assets/images/monsters/Demon_Samurai/ATTACK_3_P2.png"),
+        anim: require("@/assets/monsters/Demon_Samurai/ATTACK_3_P2.png"),
         frames: 7,
       },
       attack_4: {
-        anim: require("../assets/images/monsters/Demon_Samurai/ATTACK_4_P2.png"),
+        anim: require("@/assets/monsters/Demon_Samurai/ATTACK_4_P2.png"),
         frames: 11,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Demon_Samurai/HURT_P2.png"),
+        anim: require("@/assets/monsters/Demon_Samurai/HURT_P2.png"),
         frames: 11,
       },
       idle: {
-        anim: require("../assets/images/monsters/Demon_Samurai/IDLE_P2.png"),
+        anim: require("@/assets/monsters/Demon_Samurai/IDLE_P2.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Demon_Samurai/MOVE_P2.png"),
+        anim: require("@/assets/monsters/Demon_Samurai/MOVE_P2.png"),
         frames: 8,
       },
       transition: {
-        anim: require("../assets/images/monsters/Demon_Samurai/SHOUT.png"),
+        anim: require("@/assets/monsters/Demon_Samurai/SHOUT.png"),
         frames: 17,
       },
       spawn: null,
@@ -451,23 +451,23 @@ export const EnemyImageMap = {
   dragon: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Dragon/ATTACK.png"),
+        anim: require("@/assets/monsters/Dragon/ATTACK.png"),
         frames: 15,
       },
       death: {
-        anim: require("../assets/images/monsters/Dragon/DEATH.png"),
+        anim: require("@/assets/monsters/Dragon/DEATH.png"),
         frames: 4,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Dragon/HURT.png"),
+        anim: require("@/assets/monsters/Dragon/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Dragon/IDLE.png"),
+        anim: require("@/assets/monsters/Dragon/IDLE.png"),
         frames: 3,
       },
       move: {
-        anim: require("../assets/images/monsters/Dragon/MOVE.png"),
+        anim: require("@/assets/monsters/Dragon/MOVE.png"),
         frames: 3,
       },
       spawn: null,
@@ -482,23 +482,23 @@ export const EnemyImageMap = {
   dwarf_warrior: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Dwarf_Warrior/ATTACK.png"),
+        anim: require("@/assets/monsters/Dwarf_Warrior/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Dwarf_Warrior/DEATH.png"),
+        anim: require("@/assets/monsters/Dwarf_Warrior/DEATH.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Dwarf_Warrior/HURT.png"),
+        anim: require("@/assets/monsters/Dwarf_Warrior/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Dwarf_Warrior/IDLE.png"),
+        anim: require("@/assets/monsters/Dwarf_Warrior/IDLE.png"),
         frames: 3,
       },
       move: {
-        anim: require("../assets/images/monsters/Dwarf_Warrior/MOVE.png"),
+        anim: require("@/assets/monsters/Dwarf_Warrior/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -511,23 +511,23 @@ export const EnemyImageMap = {
   flying_eye: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Flying_Eye/ATTACK.png"),
+        anim: require("@/assets/monsters/Flying_Eye/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Flying_Eye/DEATH.png"),
+        anim: require("@/assets/monsters/Flying_Eye/DEATH.png"),
         frames: 5,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Flying_Eye/HURT.png"),
+        anim: require("@/assets/monsters/Flying_Eye/HURT.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Flying_Eye/MOVE.png"),
+        anim: require("@/assets/monsters/Flying_Eye/MOVE.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Flying_Eye/MOVE.png"),
+        anim: require("@/assets/monsters/Flying_Eye/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -540,23 +540,23 @@ export const EnemyImageMap = {
   gargoyle: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Gargoyle/ATTACK.png"),
+        anim: require("@/assets/monsters/Gargoyle/ATTACK.png"),
         frames: 8,
       },
       death: {
-        anim: require("../assets/images/monsters/Gargoyle/DEATH.png"),
+        anim: require("@/assets/monsters/Gargoyle/DEATH.png"),
         frames: 5,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Gargoyle/HURT.png"),
+        anim: require("@/assets/monsters/Gargoyle/HURT.png"),
         frames: 4,
       },
       idle: {
-        anim: require("../assets/images/monsters/Gargoyle/IDLE.png"),
+        anim: require("@/assets/monsters/Gargoyle/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Gargoyle/MOVE.png"),
+        anim: require("@/assets/monsters/Gargoyle/MOVE.png"),
         frames: 4,
       },
       spawn: null,
@@ -567,27 +567,27 @@ export const EnemyImageMap = {
   ghost: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Ghost/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Ghost/ATTACK_1.png"),
         frames: 20,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Ghost/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Ghost/ATTACK_2.png"),
         frames: 20,
       },
       death: {
-        anim: require("../assets/images/monsters/Ghost/DEATH.png"),
+        anim: require("@/assets/monsters/Ghost/DEATH.png"),
         frames: 20,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Ghost/HURT.png"),
+        anim: require("@/assets/monsters/Ghost/HURT.png"),
         frames: 10,
       },
       idle: {
-        anim: require("../assets/images/monsters/Ghost/IDLE.png"),
+        anim: require("@/assets/monsters/Ghost/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Ghost/MOVE.png"),
+        anim: require("@/assets/monsters/Ghost/MOVE.png"),
         frames: 4,
       },
       spawn: null,
@@ -599,23 +599,23 @@ export const EnemyImageMap = {
   gladiator_archer: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Gladiator_Archer/ATTACK.png"),
+        anim: require("@/assets/monsters/Gladiator_Archer/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Gladiator_Archer/DEATH.png"),
+        anim: require("@/assets/monsters/Gladiator_Archer/DEATH.png"),
         frames: 9,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Gladiator_Archer/HURT.png"),
+        anim: require("@/assets/monsters/Gladiator_Archer/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Gladiator_Archer/IDLE.png"),
+        anim: require("@/assets/monsters/Gladiator_Archer/IDLE.png"),
         frames: 3,
       },
       move: {
-        anim: require("../assets/images/monsters/Gladiator_Archer/MOVE.png"),
+        anim: require("@/assets/monsters/Gladiator_Archer/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -629,27 +629,27 @@ export const EnemyImageMap = {
   gladiator_female: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Gladiator_Female/ATTACK.png"),
+        anim: require("@/assets/monsters/Gladiator_Female/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Gladiator_Female/DEATH.png"),
+        anim: require("@/assets/monsters/Gladiator_Female/DEATH.png"),
         frames: 9,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Gladiator_Female/HURT.png"),
+        anim: require("@/assets/monsters/Gladiator_Female/HURT.png"),
         frames: 7,
       },
       jump: {
-        anim: require("../assets/images/monsters/Gladiator_Female/JUMP.png"),
+        anim: require("@/assets/monsters/Gladiator_Female/JUMP.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Gladiator_Female/IDLE.png"),
+        anim: require("@/assets/monsters/Gladiator_Female/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Gladiator_Female/MOVE.png"),
+        anim: require("@/assets/monsters/Gladiator_Female/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -663,23 +663,23 @@ export const EnemyImageMap = {
   gladiator_hammer: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Gladiator_Hammer/ATTACK.png"),
+        anim: require("@/assets/monsters/Gladiator_Hammer/ATTACK.png"),
         frames: 7,
       },
       death: {
-        anim: require("../assets/images/monsters/Gladiator_Hammer/DEATH.png"),
+        anim: require("@/assets/monsters/Gladiator_Hammer/DEATH.png"),
         frames: 9,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Gladiator_Hammer/HURT.png"),
+        anim: require("@/assets/monsters/Gladiator_Hammer/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Gladiator_Hammer/IDLE.png"),
+        anim: require("@/assets/monsters/Gladiator_Hammer/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Gladiator_Hammer/MOVE.png"),
+        anim: require("@/assets/monsters/Gladiator_Hammer/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -693,23 +693,23 @@ export const EnemyImageMap = {
   gladiator_longsword: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Gladiator_LS/ATTACK.png"),
+        anim: require("@/assets/monsters/Gladiator_LS/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Gladiator_LS/DEATH.png"),
+        anim: require("@/assets/monsters/Gladiator_LS/DEATH.png"),
         frames: 8,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Gladiator_LS/HURT.png"),
+        anim: require("@/assets/monsters/Gladiator_LS/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Gladiator_LS/IDLE.png"),
+        anim: require("@/assets/monsters/Gladiator_LS/IDLE.png"),
         frames: 3,
       },
       move: {
-        anim: require("../assets/images/monsters/Gladiator_LS/MOVE.png"),
+        anim: require("@/assets/monsters/Gladiator_LS/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -723,23 +723,23 @@ export const EnemyImageMap = {
   gladiator_spear: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Gladiator_Spear/ATTACK.png"),
+        anim: require("@/assets/monsters/Gladiator_Spear/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Gladiator_Spear/DEATH.png"),
+        anim: require("@/assets/monsters/Gladiator_Spear/DEATH.png"),
         frames: 9,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Gladiator_Spear/HURT.png"),
+        anim: require("@/assets/monsters/Gladiator_Spear/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Gladiator_Spear/IDLE.png"),
+        anim: require("@/assets/monsters/Gladiator_Spear/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Gladiator_Spear/MOVE.png"),
+        anim: require("@/assets/monsters/Gladiator_Spear/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -754,23 +754,23 @@ export const EnemyImageMap = {
   gladiator_shortsword: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Gladiator_SS/ATTACK.png"),
+        anim: require("@/assets/monsters/Gladiator_SS/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Gladiator_SS/DEATH.png"),
+        anim: require("@/assets/monsters/Gladiator_SS/DEATH.png"),
         frames: 9,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Gladiator_SS/HURT.png"),
+        anim: require("@/assets/monsters/Gladiator_SS/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Gladiator_SS/IDLE.png"),
+        anim: require("@/assets/monsters/Gladiator_SS/IDLE.png"),
         frames: 3,
       },
       move: {
-        anim: require("../assets/images/monsters/Gladiator_SS/MOVE.png"),
+        anim: require("@/assets/monsters/Gladiator_SS/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -784,27 +784,27 @@ export const EnemyImageMap = {
   goblin: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Goblin/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Goblin/ATTACK_1.png"),
         frames: 6,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Goblin/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Goblin/ATTACK_2.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Goblin/DEATH.png"),
+        anim: require("@/assets/monsters/Goblin/DEATH.png"),
         frames: 10,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Goblin/HURT.png"),
+        anim: require("@/assets/monsters/Goblin/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Goblin/IDLE.png"),
+        anim: require("@/assets/monsters/Goblin/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Goblin/MOVE.png"),
+        anim: require("@/assets/monsters/Goblin/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -817,23 +817,23 @@ export const EnemyImageMap = {
   goblin_2: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Goblin_2/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Goblin_2/ATTACK_1.png"),
         frames: 7,
       },
       death: {
-        anim: require("../assets/images/monsters/Goblin_2/DEATH.png"),
+        anim: require("@/assets/monsters/Goblin_2/DEATH.png"),
         frames: 12,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Goblin_2/HURT.png"),
+        anim: require("@/assets/monsters/Goblin_2/HURT.png"),
         frames: 4,
       },
       idle: {
-        anim: require("../assets/images/monsters/Goblin_2/IDLE.png"),
+        anim: require("@/assets/monsters/Goblin_2/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Goblin_2/MOVE.png"),
+        anim: require("@/assets/monsters/Goblin_2/MOVE.png"),
         frames: 8,
       },
       spawn: null,
@@ -846,34 +846,34 @@ export const EnemyImageMap = {
   goblin_mage: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Goblin_Mage/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Goblin_Mage/ATTACK_1.png"),
         frames: 11,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Goblin_Mage/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Goblin_Mage/ATTACK_2.png"),
         frames: 14,
       },
       death: {
-        anim: require("../assets/images/monsters/Goblin_Mage/DEATH.png"),
+        anim: require("@/assets/monsters/Goblin_Mage/DEATH.png"),
         frames: 12,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Goblin_Mage/HURT.png"),
+        anim: require("@/assets/monsters/Goblin_Mage/HURT.png"),
         frames: 4,
       },
       idle: {
-        anim: require("../assets/images/monsters/Goblin_Mage/IDLE.png"),
+        anim: require("@/assets/monsters/Goblin_Mage/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Goblin_Mage/MOVE.png"),
+        anim: require("@/assets/monsters/Goblin_Mage/MOVE.png"),
         frames: 8,
       },
       spawn: null,
     },
     effects: {
       projectile: {
-        anim: require("../assets/images/monsters/Goblin_Mage/PROJECTILE.png"),
+        anim: require("@/assets/monsters/Goblin_Mage/PROJECTILE.png"),
         frames: 9,
       },
     },
@@ -885,23 +885,23 @@ export const EnemyImageMap = {
   golem: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Golem/ATTACK.png"),
+        anim: require("@/assets/monsters/Golem/ATTACK.png"),
         frames: 9,
       },
       death: {
-        anim: require("../assets/images/monsters/Golem/DEATH.png"),
+        anim: require("@/assets/monsters/Golem/DEATH.png"),
         frames: 5,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Golem/HURT.png"),
+        anim: require("@/assets/monsters/Golem/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Golem/IDLE.png"),
+        anim: require("@/assets/monsters/Golem/IDLE.png"),
         frames: 5,
       },
       move: {
-        anim: require("../assets/images/monsters/Golem/MOVE.png"),
+        anim: require("@/assets/monsters/Golem/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -915,55 +915,55 @@ export const EnemyImageMap = {
   ground_monk: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Ground_Monk/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Ground_Monk/ATTACK_1.png"),
         frames: 7,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Ground_Monk/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Ground_Monk/ATTACK_2.png"),
         frames: 6,
       },
       attack_3: {
-        anim: require("../assets/images/monsters/Ground_Monk/ATTACK_3.png"),
+        anim: require("@/assets/monsters/Ground_Monk/ATTACK_3.png"),
         frames: 12,
       },
       attack_4: {
-        anim: require("../assets/images/monsters/Ground_Monk/ATTACK_4.png"),
+        anim: require("@/assets/monsters/Ground_Monk/ATTACK_4.png"),
         frames: 23,
       },
       attack_5: {
-        anim: require("../assets/images/monsters/Ground_Monk/ATTACK_5.png"),
+        anim: require("@/assets/monsters/Ground_Monk/ATTACK_5.png"),
         frames: 25,
       },
       block: {
-        anim: require("../assets/images/monsters/Ground_Monk/BLOCK.png"),
+        anim: require("@/assets/monsters/Ground_Monk/BLOCK.png"),
         frames: 13,
       },
       death: {
-        anim: require("../assets/images/monsters/Ground_Monk/DEATH.png"),
+        anim: require("@/assets/monsters/Ground_Monk/DEATH.png"),
         frames: 16,
       },
       dodge: {
-        anim: require("../assets/images/monsters/Ground_Monk/DODGE.png"),
+        anim: require("@/assets/monsters/Ground_Monk/DODGE.png"),
         frames: 6,
       },
       float: {
-        anim: require("../assets/images/monsters/Ground_Monk/FLOAT.png"),
+        anim: require("@/assets/monsters/Ground_Monk/FLOAT.png"),
         frames: 3,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Ground_Monk/HURT.png"),
+        anim: require("@/assets/monsters/Ground_Monk/HURT.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Ground_Monk/IDLE.png"),
+        anim: require("@/assets/monsters/Ground_Monk/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Ground_Monk/MOVE.png"),
+        anim: require("@/assets/monsters/Ground_Monk/MOVE.png"),
         frames: 8,
       },
       spawn: {
-        anim: require("../assets/images/monsters/Ground_Monk/SPAWN.png"),
+        anim: require("@/assets/monsters/Ground_Monk/SPAWN.png"),
         frames: 8,
       },
     },
@@ -974,27 +974,27 @@ export const EnemyImageMap = {
   gryphon: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Gryphon/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Gryphon/ATTACK_1.png"),
         frames: 7,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Gryphon/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Gryphon/ATTACK_2.png"),
         frames: 5,
       },
       death: {
-        anim: require("../assets/images/monsters/Gryphon/DEATH.png"),
+        anim: require("@/assets/monsters/Gryphon/DEATH.png"),
         frames: 7,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Gryphon/HURT.png"),
+        anim: require("@/assets/monsters/Gryphon/HURT.png"),
         frames: 4,
       },
       idle: {
-        anim: require("../assets/images/monsters/Gryphon/IDLE.png"),
+        anim: require("@/assets/monsters/Gryphon/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Gryphon/MOVE.png"),
+        anim: require("@/assets/monsters/Gryphon/MOVE.png"),
         frames: 4,
       },
       spawn: null,
@@ -1008,23 +1008,23 @@ export const EnemyImageMap = {
   harpy: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Harpy/ATTACK.png"),
+        anim: require("@/assets/monsters/Harpy/ATTACK.png"),
         frames: 8,
       },
       death: {
-        anim: require("../assets/images/monsters/Harpy/DEATH.png"),
+        anim: require("@/assets/monsters/Harpy/DEATH.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Harpy/HURT.png"),
+        anim: require("@/assets/monsters/Harpy/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Harpy/IDLE_MOVE.png"),
+        anim: require("@/assets/monsters/Harpy/IDLE_MOVE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Harpy/IDLE_MOVE.png"),
+        anim: require("@/assets/monsters/Harpy/IDLE_MOVE.png"),
         frames: 4,
       },
       spawn: null,
@@ -1035,23 +1035,23 @@ export const EnemyImageMap = {
   headless_horseman: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Headless_Horseman/ATTACK.png"),
+        anim: require("@/assets/monsters/Headless_Horseman/ATTACK.png"),
         frames: 8,
       },
       death: {
-        anim: require("../assets/images/monsters/Headless_Horseman/DEATH.png"),
+        anim: require("@/assets/monsters/Headless_Horseman/DEATH.png"),
         frames: 10,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Headless_Horseman/HURT.png"),
+        anim: require("@/assets/monsters/Headless_Horseman/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Headless_Horseman/IDLE.png"),
+        anim: require("@/assets/monsters/Headless_Horseman/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Headless_Horseman/MOVE.png"),
+        anim: require("@/assets/monsters/Headless_Horseman/MOVE.png"),
         frames: 4,
       },
       spawn: null,
@@ -1064,23 +1064,23 @@ export const EnemyImageMap = {
   huge_knight: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Huge_Knight/ATTACK.png"),
+        anim: require("@/assets/monsters/Huge_Knight/ATTACK.png"),
         frames: 11,
       },
       death: {
-        anim: require("../assets/images/monsters/Huge_Knight/DEATH.png"),
+        anim: require("@/assets/monsters/Huge_Knight/DEATH.png"),
         frames: 7,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Huge_Knight/HURT.png"),
+        anim: require("@/assets/monsters/Huge_Knight/HURT.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Huge_Knight/IDLE.png"),
+        anim: require("@/assets/monsters/Huge_Knight/IDLE.png"),
         frames: 8,
       },
       move: {
-        anim: require("../assets/images/monsters/Huge_Knight/MOVE.png"),
+        anim: require("@/assets/monsters/Huge_Knight/MOVE.png"),
         frames: 8,
       },
       spawn: null,
@@ -1096,23 +1096,23 @@ export const EnemyImageMap = {
   imp: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Imp/ATTACK.png"),
+        anim: require("@/assets/monsters/Imp/ATTACK.png"),
         frames: 8,
       },
       death: {
-        anim: require("../assets/images/monsters/Imp/DEATH.png"),
+        anim: require("@/assets/monsters/Imp/DEATH.png"),
         frames: 7,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Imp/HURT.png"),
+        anim: require("@/assets/monsters/Imp/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Imp/IDLE_MOVE.png"),
+        anim: require("@/assets/monsters/Imp/IDLE_MOVE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Imp/IDLE_MOVE.png"),
+        anim: require("@/assets/monsters/Imp/IDLE_MOVE.png"),
         frames: 4,
       },
       spawn: null,
@@ -1127,35 +1127,35 @@ export const EnemyImageMap = {
   kobold: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Kobold/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Kobold/ATTACK_1.png"),
         frames: 5,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Kobold/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Kobold/ATTACK_2.png"),
         frames: 5,
       },
       attack_3: {
-        anim: require("../assets/images/monsters/Kobold/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Kobold/ATTACK_1.png"),
         frames: 6,
       },
       attack_4: {
-        anim: require("../assets/images/monsters/Kobold/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Kobold/ATTACK_2.png"),
         frames: 12,
       },
       death: {
-        anim: require("../assets/images/monsters/Kobold/DEATH.png"),
+        anim: require("@/assets/monsters/Kobold/DEATH.png"),
         frames: 7,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Kobold/HURT.png"),
+        anim: require("@/assets/monsters/Kobold/HURT.png"),
         frames: 4,
       },
       idle: {
-        anim: require("../assets/images/monsters/Kobold/IDLE.png"),
+        anim: require("@/assets/monsters/Kobold/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Kobold/MOVE.png"),
+        anim: require("@/assets/monsters/Kobold/MOVE.png"),
         frames: 8,
       },
       spawn: null,
@@ -1169,23 +1169,23 @@ export const EnemyImageMap = {
   lizardman: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Lizardman/ATTACK.png"),
+        anim: require("@/assets/monsters/Lizardman/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Lizardman/DEATH.png"),
+        anim: require("@/assets/monsters/Lizardman/DEATH.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Lizardman/HURT.png"),
+        anim: require("@/assets/monsters/Lizardman/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Lizardman/IDLE.png"),
+        anim: require("@/assets/monsters/Lizardman/IDLE.png"),
         frames: 3,
       },
       move: {
-        anim: require("../assets/images/monsters/Lizardman/MOVE.png"),
+        anim: require("@/assets/monsters/Lizardman/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -1199,27 +1199,27 @@ export const EnemyImageMap = {
   medusa: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Medusa/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Medusa/ATTACK_1.png"),
         frames: 6,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Medusa/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Medusa/ATTACK_2.png"),
         frames: 7,
       },
       death: {
-        anim: require("../assets/images/monsters/Medusa/DEATH.png"),
+        anim: require("@/assets/monsters/Medusa/DEATH.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Medusa/HURT.png"),
+        anim: require("@/assets/monsters/Medusa/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Medusa/IDLE.png"),
+        anim: require("@/assets/monsters/Medusa/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Medusa/MOVE.png"),
+        anim: require("@/assets/monsters/Medusa/MOVE.png"),
         frames: 4,
       },
       spawn: null,
@@ -1232,27 +1232,27 @@ export const EnemyImageMap = {
   mimic: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Mimic/ATTACK.png"),
+        anim: require("@/assets/monsters/Mimic/ATTACK.png"),
         frames: 6,
       },
       spawn: {
-        anim: require("../assets/images/monsters/Mimic/APPEAR.png"),
+        anim: require("@/assets/monsters/Mimic/APPEAR.png"),
         frames: 9,
       },
       death: {
-        anim: require("../assets/images/monsters/Mimic/DEATH.png"),
+        anim: require("@/assets/monsters/Mimic/DEATH.png"),
         frames: 18,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Mimic/HURT.png"),
+        anim: require("@/assets/monsters/Mimic/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Mimic/IDLE.png"),
+        anim: require("@/assets/monsters/Mimic/IDLE.png"),
         frames: 3,
       },
       move: {
-        anim: require("../assets/images/monsters/Mimic/MOVE.png"),
+        anim: require("@/assets/monsters/Mimic/MOVE.png"),
         frames: 6,
       },
     },
@@ -1266,27 +1266,27 @@ export const EnemyImageMap = {
   minotaur: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Minotaur/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Minotaur/ATTACK_1.png"),
         frames: 6,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Minotaur/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Minotaur/ATTACK_2.png"),
         frames: 7,
       },
       death: {
-        anim: require("../assets/images/monsters/Minotaur/DEATH.png"),
+        anim: require("@/assets/monsters/Minotaur/DEATH.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Minotaur/HURT.png"),
+        anim: require("@/assets/monsters/Minotaur/HURT.png"),
         frames: 5,
       },
       idle: {
-        anim: require("../assets/images/monsters/Minotaur/IDLE.png"),
+        anim: require("@/assets/monsters/Minotaur/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Minotaur/MOVE.png"),
+        anim: require("@/assets/monsters/Minotaur/MOVE.png"),
         frames: 8,
       },
       spawn: null,
@@ -1300,31 +1300,31 @@ export const EnemyImageMap = {
   necromancer: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Necromancer/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Necromancer/ATTACK_1.png"),
         frames: 13,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Necromancer/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Necromancer/ATTACK_2.png"),
         frames: 13,
       },
       attack_3: {
-        anim: require("../assets/images/monsters/Necromancer/ATTACK_3.png"),
+        anim: require("@/assets/monsters/Necromancer/ATTACK_3.png"),
         frames: 17,
       },
       death: {
-        anim: require("../assets/images/monsters/Necromancer/DEATH.png"),
+        anim: require("@/assets/monsters/Necromancer/DEATH.png"),
         frames: 9,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Necromancer/HURT.png"),
+        anim: require("@/assets/monsters/Necromancer/HURT.png"),
         frames: 5,
       },
       idle: {
-        anim: require("../assets/images/monsters/Necromancer/IDLE.png"),
+        anim: require("@/assets/monsters/Necromancer/IDLE.png"),
         frames: 8,
       },
       move: {
-        anim: require("../assets/images/monsters/Necromancer/MOVE.png"),
+        anim: require("@/assets/monsters/Necromancer/MOVE.png"),
         frames: 8,
       },
       spawn: null,
@@ -1339,23 +1339,23 @@ export const EnemyImageMap = {
   npc_man: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/NPC_Man/ATTACK.png"),
+        anim: require("@/assets/monsters/NPC_Man/ATTACK.png"),
         frames: 4,
       },
       death: {
-        anim: require("../assets/images/monsters/NPC_Man/DEATH.png"),
+        anim: require("@/assets/monsters/NPC_Man/DEATH.png"),
         frames: 4,
       },
       hurt: {
-        anim: require("../assets/images/monsters/NPC_Man/HURT.png"),
+        anim: require("@/assets/monsters/NPC_Man/HURT.png"),
         frames: 2,
       },
       idle: {
-        anim: require("../assets/images/monsters/NPC_Man/IDLE.png"),
+        anim: require("@/assets/monsters/NPC_Man/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/NPC_Man/MOVE.png"),
+        anim: require("@/assets/monsters/NPC_Man/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -1366,23 +1366,23 @@ export const EnemyImageMap = {
   npc_man_old: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/NPC_Man_Old/ATTACK.png"),
+        anim: require("@/assets/monsters/NPC_Man_Old/ATTACK.png"),
         frames: 4,
       },
       death: {
-        anim: require("../assets/images/monsters/NPC_Man_Old/DEATH.png"),
+        anim: require("@/assets/monsters/NPC_Man_Old/DEATH.png"),
         frames: 4,
       },
       hurt: {
-        anim: require("../assets/images/monsters/NPC_Man_Old/HURT.png"),
+        anim: require("@/assets/monsters/NPC_Man_Old/HURT.png"),
         frames: 2,
       },
       idle: {
-        anim: require("../assets/images/monsters/NPC_Man_Old/IDLE.png"),
+        anim: require("@/assets/monsters/NPC_Man_Old/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/NPC_Man_Old/MOVE.png"),
+        anim: require("@/assets/monsters/NPC_Man_Old/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -1393,23 +1393,23 @@ export const EnemyImageMap = {
   npc_woman: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/NPC_Woman/ATTACK.png"),
+        anim: require("@/assets/monsters/NPC_Woman/ATTACK.png"),
         frames: 4,
       },
       death: {
-        anim: require("../assets/images/monsters/NPC_Woman/DEATH.png"),
+        anim: require("@/assets/monsters/NPC_Woman/DEATH.png"),
         frames: 4,
       },
       hurt: {
-        anim: require("../assets/images/monsters/NPC_Woman/HURT.png"),
+        anim: require("@/assets/monsters/NPC_Woman/HURT.png"),
         frames: 2,
       },
       idle: {
-        anim: require("../assets/images/monsters/NPC_Woman/IDLE.png"),
+        anim: require("@/assets/monsters/NPC_Woman/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/NPC_Woman/MOVE.png"),
+        anim: require("@/assets/monsters/NPC_Woman/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -1420,23 +1420,23 @@ export const EnemyImageMap = {
   npc_woman_old: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/NPC_Woman_Old/ATTACK.png"),
+        anim: require("@/assets/monsters/NPC_Woman_Old/ATTACK.png"),
         frames: 4,
       },
       death: {
-        anim: require("../assets/images/monsters/NPC_Woman_Old/DEATH.png"),
+        anim: require("@/assets/monsters/NPC_Woman_Old/DEATH.png"),
         frames: 4,
       },
       hurt: {
-        anim: require("../assets/images/monsters/NPC_Woman_Old/HURT.png"),
+        anim: require("@/assets/monsters/NPC_Woman_Old/HURT.png"),
         frames: 2,
       },
       idle: {
-        anim: require("../assets/images/monsters/NPC_Woman_Old/IDLE.png"),
+        anim: require("@/assets/monsters/NPC_Woman_Old/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/NPC_Woman_Old/MOVE.png"),
+        anim: require("@/assets/monsters/NPC_Woman_Old/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -1447,23 +1447,23 @@ export const EnemyImageMap = {
   orc_masked: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Orc_Masked/ATTACK.png"),
+        anim: require("@/assets/monsters/Orc_Masked/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Orc_Masked/DEATH.png"),
+        anim: require("@/assets/monsters/Orc_Masked/DEATH.png"),
         frames: 10,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Orc_Masked/HURT.png"),
+        anim: require("@/assets/monsters/Orc_Masked/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Orc_Masked/IDLE.png"),
+        anim: require("@/assets/monsters/Orc_Masked/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Orc_Masked/MOVE.png"),
+        anim: require("@/assets/monsters/Orc_Masked/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -1476,29 +1476,29 @@ export const EnemyImageMap = {
   pyromancer: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Pyromancer/ATTACK.png"),
+        anim: require("@/assets/monsters/Pyromancer/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Pyromancer/DEATH.png"),
+        anim: require("@/assets/monsters/Pyromancer/DEATH.png"),
         frames: 10,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Pyromancer/HURT.png"),
+        anim: require("@/assets/monsters/Pyromancer/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Pyromancer/IDLE.png"),
+        anim: require("@/assets/monsters/Pyromancer/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Pyromancer/MOVE.png"),
+        anim: require("@/assets/monsters/Pyromancer/MOVE.png"),
         frames: 6,
       },
       spawn: null,
     },
     effects: {
-      projectile: require("../assets/images/monsters/Pyromancer/Projectile.png"),
+      projectile: require("@/assets/monsters/Pyromancer/Projectile.png"),
     },
     height: 100,
     width: 100,
@@ -1509,27 +1509,27 @@ export const EnemyImageMap = {
   rat: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Rat/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Rat/ATTACK_1.png"),
         frames: 8,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Rat/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Rat/ATTACK_2.png"),
         frames: 8,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Rat/HURT.png"),
+        anim: require("@/assets/monsters/Rat/HURT.png"),
         frames: 5,
       },
       death: {
-        anim: require("../assets/images/monsters/Rat/DEATH.png"),
+        anim: require("@/assets/monsters/Rat/DEATH.png"),
         frames: 11,
       },
       idle: {
-        anim: require("../assets/images/monsters/Rat/IDLE.png"),
+        anim: require("@/assets/monsters/Rat/IDLE.png"),
         frames: 8,
       },
       move: {
-        anim: require("../assets/images/monsters/Rat/MOVE.png"),
+        anim: require("@/assets/monsters/Rat/MOVE.png"),
         frames: 15,
       },
       spawn: null,
@@ -1541,27 +1541,27 @@ export const EnemyImageMap = {
   rat_corrupt: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Rat_Corrupt/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Rat_Corrupt/ATTACK_1.png"),
         frames: 7,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Rat_Corrupt/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Rat_Corrupt/ATTACK_2.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Rat_Corrupt/HURT.png"),
+        anim: require("@/assets/monsters/Rat_Corrupt/HURT.png"),
         frames: 5,
       },
       death: {
-        anim: require("../assets/images/monsters/Rat_Corrupt/DEATH.png"),
+        anim: require("@/assets/monsters/Rat_Corrupt/DEATH.png"),
         frames: 11,
       },
       idle: {
-        anim: require("../assets/images/monsters/Rat_Corrupt/IDLE.png"),
+        anim: require("@/assets/monsters/Rat_Corrupt/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Rat_Corrupt/MOVE.png"),
+        anim: require("@/assets/monsters/Rat_Corrupt/MOVE.png"),
         frames: 13,
       },
       spawn: null,
@@ -1573,27 +1573,27 @@ export const EnemyImageMap = {
   rat_putrid: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Rat_Putrid/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Rat_Putrid/ATTACK_1.png"),
         frames: 8,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Rat_Putrid/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Rat_Putrid/ATTACK_2.png"),
         frames: 8,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Rat_Putrid/HURT.png"),
+        anim: require("@/assets/monsters/Rat_Putrid/HURT.png"),
         frames: 5,
       },
       death: {
-        anim: require("../assets/images/monsters/Rat_Putrid/DEATH.png"),
+        anim: require("@/assets/monsters/Rat_Putrid/DEATH.png"),
         frames: 12,
       },
       idle: {
-        anim: require("../assets/images/monsters/Rat_Putrid/IDLE.png"),
+        anim: require("@/assets/monsters/Rat_Putrid/IDLE.png"),
         frames: 7,
       },
       move: {
-        anim: require("../assets/images/monsters/Rat_Putrid/MOVE.png"),
+        anim: require("@/assets/monsters/Rat_Putrid/MOVE.png"),
         frames: 15,
       },
       spawn: null,
@@ -1605,31 +1605,31 @@ export const EnemyImageMap = {
   reaper: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Reaper/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Reaper/ATTACK_1.png"),
         frames: 5,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Reaper/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Reaper/ATTACK_2.png"),
         frames: 7,
       },
       attack_3: {
-        anim: require("../assets/images/monsters/Reaper/ATTACK_SUMMON.png"),
+        anim: require("@/assets/monsters/Reaper/ATTACK_SUMMON.png"),
         frames: 4,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Reaper/HURT.png"),
+        anim: require("@/assets/monsters/Reaper/HURT.png"),
         frames: 12,
       },
       death: {
-        anim: require("../assets/images/monsters/Reaper/DEATH.png"),
+        anim: require("@/assets/monsters/Reaper/DEATH.png"),
         frames: 18,
       },
       dodge: {
-        anim: require("../assets/images/monsters/Reaper/DODGE.png"),
+        anim: require("@/assets/monsters/Reaper/DODGE.png"),
         frames: 12,
       },
       idle: {
-        anim: require("../assets/images/monsters/Reaper/IDLE.png"),
+        anim: require("@/assets/monsters/Reaper/IDLE.png"),
         frames: 4,
       },
 
@@ -1642,15 +1642,15 @@ export const EnemyImageMap = {
   reaper_summon: {
     sets: {
       summon_idle: {
-        anim: require("../assets/images/monsters/Reaper/SUMMON_IDLE.png"),
+        anim: require("@/assets/monsters/Reaper/SUMMON_IDLE.png"),
         frames: 4,
       },
       summon_spawn: {
-        anim: require("../assets/images/monsters/Reaper/SUMMON_SPAWN.png"),
+        anim: require("@/assets/monsters/Reaper/SUMMON_SPAWN.png"),
         frames: 6,
       },
       summon_death: {
-        anim: require("../assets/images/monsters/Reaper/SUMMON_DEATH.png"),
+        anim: require("@/assets/monsters/Reaper/SUMMON_DEATH.png"),
         frames: 6,
       },
     },
@@ -1661,54 +1661,54 @@ export const EnemyImageMap = {
   samurai_armor: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Samurai_Armor/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Samurai_Armor/ATTACK_1.png"),
         frames: 5,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Samurai_Armor/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Samurai_Armor/ATTACK_2.png"),
         frames: 5,
       },
       attack_3: {
-        anim: require("../assets/images/monsters/Samurai_Armor/ATTACK_3.png"),
+        anim: require("@/assets/monsters/Samurai_Armor/ATTACK_3.png"),
         frames: 10,
       },
       attack_4: {
-        anim: require("../assets/images/monsters/Samurai_Armor/ATTACK_4.png"),
+        anim: require("@/assets/monsters/Samurai_Armor/ATTACK_4.png"),
         frames: 11,
       },
       throw: {
-        anim: require("../assets/images/monsters/Samurai_Armor/THROW.png"),
+        anim: require("@/assets/monsters/Samurai_Armor/THROW.png"),
         frames: 7,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Samurai_Armor/HURT.png"),
+        anim: require("@/assets/monsters/Samurai_Armor/HURT.png"),
         frames: 3,
       },
       defence: {
-        anim: require("../assets/images/monsters/Samurai_Armor/DEFENCE.png"),
+        anim: require("@/assets/monsters/Samurai_Armor/DEFENCE.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Samurai_Armor/DEATH.png"),
+        anim: require("@/assets/monsters/Samurai_Armor/DEATH.png"),
         frames: 10,
       },
       idle: {
-        anim: require("../assets/images/monsters/Samurai_Armor/IDLE.png"),
+        anim: require("@/assets/monsters/Samurai_Armor/IDLE.png"),
         frames: 5,
       },
       move: {
-        anim: require("../assets/images/monsters/Samurai_Armor/MOVE.png"),
+        anim: require("@/assets/monsters/Samurai_Armor/MOVE.png"),
         frames: 7,
       },
       jump: {
-        anim: require("../assets/images/monsters/Samurai_Armor/JUMP.png"),
+        anim: require("@/assets/monsters/Samurai_Armor/JUMP.png"),
         frames: 3,
       },
       spawn: null,
     },
     effects: {
-      projectile: require("../assets/images/monsters/Samurai_Armor/SHURIKEN.png"),
-      dust: require("../assets/images/monsters/Samurai_Armor/DUST_EFFECT.png"),
+      projectile: require("@/assets/monsters/Samurai_Armor/SHURIKEN.png"),
+      dust: require("@/assets/monsters/Samurai_Armor/DUST_EFFECT.png"),
     },
     height: 64,
     width: 96,
@@ -1719,35 +1719,35 @@ export const EnemyImageMap = {
   samurai_dual: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Samurai_Dual/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Samurai_Dual/ATTACK_1.png"),
         frames: 6,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Samurai_Dual/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Samurai_Dual/ATTACK_2.png"),
         frames: 5,
       },
       attack_3: {
-        anim: require("../assets/images/monsters/Samurai_Dual/ATTACK_3.png"),
+        anim: require("@/assets/monsters/Samurai_Dual/ATTACK_3.png"),
         frames: 7,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Samurai_Dual/HURT.png"),
+        anim: require("@/assets/monsters/Samurai_Dual/HURT.png"),
         frames: 4,
       },
       death: {
-        anim: require("../assets/images/monsters/Samurai_Dual/DEATH.png"),
+        anim: require("@/assets/monsters/Samurai_Dual/DEATH.png"),
         frames: 10,
       },
       idle: {
-        anim: require("../assets/images/monsters/Samurai_Dual/IDLE.png"),
+        anim: require("@/assets/monsters/Samurai_Dual/IDLE.png"),
         frames: 5,
       },
       move: {
-        anim: require("../assets/images/monsters/Samurai_Dual/MOVE.png"),
+        anim: require("@/assets/monsters/Samurai_Dual/MOVE.png"),
         frames: 8,
       },
       jump: {
-        anim: require("../assets/images/monsters/Samurai_Dual/JUMP.png"),
+        anim: require("@/assets/monsters/Samurai_Dual/JUMP.png"),
         frames: 3,
       },
       spawn: null,
@@ -1761,46 +1761,46 @@ export const EnemyImageMap = {
   samurai_female: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Samurai_Female/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Samurai_Female/ATTACK_1.png"),
         frames: 6,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Samurai_Female/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Samurai_Female/ATTACK_2.png"),
         frames: 5,
       },
       attack_3: {
-        anim: require("../assets/images/monsters/Samurai_Female/ATTACK_3.png"),
+        anim: require("@/assets/monsters/Samurai_Female/ATTACK_3.png"),
         frames: 5,
       },
       throw: {
-        anim: require("../assets/images/monsters/Samurai_Female/THROW.png"),
+        anim: require("@/assets/monsters/Samurai_Female/THROW.png"),
         frames: 7,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Samurai_Female/HURT.png"),
+        anim: require("@/assets/monsters/Samurai_Female/HURT.png"),
         frames: 4,
       },
       death: {
-        anim: require("../assets/images/monsters/Samurai_Female/DEATH.png"),
+        anim: require("@/assets/monsters/Samurai_Female/DEATH.png"),
         frames: 10,
       },
       idle: {
-        anim: require("../assets/images/monsters/Samurai_Female/IDLE.png"),
+        anim: require("@/assets/monsters/Samurai_Female/IDLE.png"),
         frames: 5,
       },
       move: {
-        anim: require("../assets/images/monsters/Samurai_Female/MOVE.png"),
+        anim: require("@/assets/monsters/Samurai_Female/MOVE.png"),
         frames: 8,
       },
       jump: {
-        anim: require("../assets/images/monsters/Samurai_Female/JUMP.png"),
+        anim: require("@/assets/monsters/Samurai_Female/JUMP.png"),
         frames: 3,
       },
       spawn: null,
     },
     effects: {
-      projectile: require("../assets/images/monsters/Samurai_Armor/SHURIKEN.png"),
-      dust: require("../assets/images/monsters/Samurai_Armor/DUST_EFFECT.png"),
+      projectile: require("@/assets/monsters/Samurai_Armor/SHURIKEN.png"),
+      dust: require("@/assets/monsters/Samurai_Armor/DUST_EFFECT.png"),
     },
     height: 64,
     width: 96,
@@ -1811,35 +1811,35 @@ export const EnemyImageMap = {
   samurai_huge: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Samurai_Huge/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Samurai_Huge/ATTACK_1.png"),
         frames: 5,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Samurai_Huge/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Samurai_Huge/ATTACK_2.png"),
         frames: 5,
       },
       attack_3: {
-        anim: require("../assets/images/monsters/Samurai_Huge/ATTACK_3.png"),
+        anim: require("@/assets/monsters/Samurai_Huge/ATTACK_3.png"),
         frames: 7,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Samurai_Huge/HURT.png"),
+        anim: require("@/assets/monsters/Samurai_Huge/HURT.png"),
         frames: 4,
       },
       death: {
-        anim: require("../assets/images/monsters/Samurai_Huge/DEATH.png"),
+        anim: require("@/assets/monsters/Samurai_Huge/DEATH.png"),
         frames: 9,
       },
       idle: {
-        anim: require("../assets/images/monsters/Samurai_Huge/IDLE.png"),
+        anim: require("@/assets/monsters/Samurai_Huge/IDLE.png"),
         frames: 5,
       },
       move: {
-        anim: require("../assets/images/monsters/Samurai_Huge/MOVE.png"),
+        anim: require("@/assets/monsters/Samurai_Huge/MOVE.png"),
         frames: 8,
       },
       jump: {
-        anim: require("../assets/images/monsters/Samurai_Huge/JUMP.png"),
+        anim: require("@/assets/monsters/Samurai_Huge/JUMP.png"),
         frames: 3,
       },
       spawn: null,
@@ -1854,55 +1854,55 @@ export const EnemyImageMap = {
   samurai_old: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Samurai_Old/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Samurai_Old/ATTACK_1.png"),
         frames: 7,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Samurai_Old/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Samurai_Old/ATTACK_2.png"),
         frames: 7,
       },
       attack_3: {
-        anim: require("../assets/images/monsters/Samurai_Old/ATTACK_3.png"),
+        anim: require("@/assets/monsters/Samurai_Old/ATTACK_3.png"),
         frames: 7,
       },
       attack_4: {
-        anim: require("../assets/images/monsters/Samurai_Old/ATTACK_4.png"),
+        anim: require("@/assets/monsters/Samurai_Old/ATTACK_4.png"),
         frames: 6,
       },
       block: {
-        anim: require("../assets/images/monsters/Samurai_Old/DEFEND.png"),
+        anim: require("@/assets/monsters/Samurai_Old/DEFEND.png"),
         frames: 6,
       },
       heal: {
-        anim: require("../assets/images/monsters/Samurai_Old/HEALING.png"),
+        anim: require("@/assets/monsters/Samurai_Old/HEALING.png"),
         frames: 15,
       },
       throw: {
-        anim: require("../assets/images/monsters/Samurai_Old/THROW.png"),
+        anim: require("@/assets/monsters/Samurai_Old/THROW.png"),
         frames: 7,
       },
       dodge: {
-        anim: require("../assets/images/monsters/Samurai_Old/DASH.png"),
+        anim: require("@/assets/monsters/Samurai_Old/DASH.png"),
         frames: 8,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Samurai_Old/HURT.png"),
+        anim: require("@/assets/monsters/Samurai_Old/HURT.png"),
         frames: 4,
       },
       death: {
-        anim: require("../assets/images/monsters/Samurai_Old/DEATH.png"),
+        anim: require("@/assets/monsters/Samurai_Old/DEATH.png"),
         frames: 9,
       },
       idle: {
-        anim: require("../assets/images/monsters/Samurai_Old/IDLE.png"),
+        anim: require("@/assets/monsters/Samurai_Old/IDLE.png"),
         frames: 10,
       },
       move: {
-        anim: require("../assets/images/monsters/Samurai_Old/MOVE.png"),
+        anim: require("@/assets/monsters/Samurai_Old/MOVE.png"),
         frames: 16,
       },
       jump: {
-        anim: require("../assets/images/monsters/Samurai_Old/JUMP.png"),
+        anim: require("@/assets/monsters/Samurai_Old/JUMP.png"),
         frames: 3,
       },
       spawn: null,
@@ -1917,31 +1917,31 @@ export const EnemyImageMap = {
   samurai_rice: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Samurai_Rice/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Samurai_Rice/ATTACK_1.png"),
         frames: 5,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Samurai_Rice/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Samurai_Rice/ATTACK_2.png"),
         frames: 9,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Samurai_Rice/HURT.png"),
+        anim: require("@/assets/monsters/Samurai_Rice/HURT.png"),
         frames: 3,
       },
       death: {
-        anim: require("../assets/images/monsters/Samurai_Rice/DEATH.png"),
+        anim: require("@/assets/monsters/Samurai_Rice/DEATH.png"),
         frames: 10,
       },
       idle: {
-        anim: require("../assets/images/monsters/Samurai_Rice/IDLE.png"),
+        anim: require("@/assets/monsters/Samurai_Rice/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Samurai_Rice/MOVE.png"),
+        anim: require("@/assets/monsters/Samurai_Rice/MOVE.png"),
         frames: 8,
       },
       jump: {
-        anim: require("../assets/images/monsters/Samurai_Rice/JUMP.png"),
+        anim: require("@/assets/monsters/Samurai_Rice/JUMP.png"),
         frames: 3,
       },
       spawn: null,
@@ -1956,39 +1956,39 @@ export const EnemyImageMap = {
   samurai_wolf: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Samurai_Wolf/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Samurai_Wolf/ATTACK_1.png"),
         frames: 6,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Samurai_Wolf/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Samurai_Wolf/ATTACK_2.png"),
         frames: 4,
       },
       attack_3: {
-        anim: require("../assets/images/monsters/Samurai_Wolf/ATTACK_3.png"),
+        anim: require("@/assets/monsters/Samurai_Wolf/ATTACK_3.png"),
         frames: 6,
       },
       attack_4: {
-        anim: require("../assets/images/monsters/Samurai_Wolf/ATTACK_4.png"),
+        anim: require("@/assets/monsters/Samurai_Wolf/ATTACK_4.png"),
         frames: 12,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Samurai_Wolf/HURT.png"),
+        anim: require("@/assets/monsters/Samurai_Wolf/HURT.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Samurai_Wolf/DEATH.png"),
+        anim: require("@/assets/monsters/Samurai_Wolf/DEATH.png"),
         frames: 8,
       },
       idle: {
-        anim: require("../assets/images/monsters/Samurai_Wolf/IDLE.png"),
+        anim: require("@/assets/monsters/Samurai_Wolf/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Samurai_Wolf/MOVE.png"),
+        anim: require("@/assets/monsters/Samurai_Wolf/MOVE.png"),
         frames: 6,
       },
       jump: {
-        anim: require("../assets/images/monsters/Samurai_Wolf/JUMP.png"),
+        anim: require("@/assets/monsters/Samurai_Wolf/JUMP.png"),
         frames: 3,
       },
       spawn: null,
@@ -2002,23 +2002,23 @@ export const EnemyImageMap = {
   satyr: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Satyr/ATTACK.png"),
+        anim: require("@/assets/monsters/Satyr/ATTACK.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Satyr/HURT.png"),
+        anim: require("@/assets/monsters/Satyr/HURT.png"),
         frames: 3,
       },
       death: {
-        anim: require("../assets/images/monsters/Satyr/DEATH.png"),
+        anim: require("@/assets/monsters/Satyr/DEATH.png"),
         frames: 7,
       },
       idle: {
-        anim: require("../assets/images/monsters/Satyr/IDLE.png"),
+        anim: require("@/assets/monsters/Satyr/IDLE.png"),
         frames: 3,
       },
       move: {
-        anim: require("../assets/images/monsters/Satyr/MOVE.png"),
+        anim: require("@/assets/monsters/Satyr/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -2031,27 +2031,27 @@ export const EnemyImageMap = {
   skeleton: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Skeleton/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Skeleton/ATTACK_1.png"),
         frames: 5,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Skeleton/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Skeleton/ATTACK_2.png"),
         frames: 5,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Skeleton/HURT.png"),
+        anim: require("@/assets/monsters/Skeleton/HURT.png"),
         frames: 5,
       },
       death: {
-        anim: require("../assets/images/monsters/Skeleton/DEATH.png"),
+        anim: require("@/assets/monsters/Skeleton/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Skeleton/IDLE.png"),
+        anim: require("@/assets/monsters/Skeleton/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Skeleton/MOVE.png"),
+        anim: require("@/assets/monsters/Skeleton/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -2062,31 +2062,31 @@ export const EnemyImageMap = {
   skeleton_warrior: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Skeleton_Warrior/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Skeleton_Warrior/ATTACK_1.png"),
         frames: 7,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Skeleton_Warrior/HURT.png"),
+        anim: require("@/assets/monsters/Skeleton_Warrior/HURT.png"),
         frames: 4,
       },
       death: {
-        anim: require("../assets/images/monsters/Skeleton_Warrior/DEATH.png"),
+        anim: require("@/assets/monsters/Skeleton_Warrior/DEATH.png"),
         frames: 9,
       },
       idle: {
-        anim: require("../assets/images/monsters/Skeleton_Warrior/IDLE.png"),
+        anim: require("@/assets/monsters/Skeleton_Warrior/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Skeleton_Warrior/MOVE.png"),
+        anim: require("@/assets/monsters/Skeleton_Warrior/MOVE.png"),
         frames: 8,
       },
       block: {
-        anim: require("../assets/images/monsters/Skeleton_Warrior/BLOCK.png"),
+        anim: require("@/assets/monsters/Skeleton_Warrior/BLOCK.png"),
         frames: 5,
       },
       spawn: {
-        anim: require("../assets/images/monsters/Skeleton_Warrior/SPAWN.png"),
+        anim: require("@/assets/monsters/Skeleton_Warrior/SPAWN.png"),
         frames: 9,
       },
     },
@@ -2096,30 +2096,30 @@ export const EnemyImageMap = {
   skeleton_archer: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Skeleton_Archer/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Skeleton_Archer/ATTACK_1.png"),
         frames: 9,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Skeleton_Archer/HURT.png"),
+        anim: require("@/assets/monsters/Skeleton_Archer/HURT.png"),
         frames: 4,
       },
       death: {
-        anim: require("../assets/images/monsters/Skeleton_Archer/DEATH.png"),
+        anim: require("@/assets/monsters/Skeleton_Archer/DEATH.png"),
         frames: 9,
       },
       idle: {
-        anim: require("../assets/images/monsters/Skeleton_Archer/IDLE.png"),
+        anim: require("@/assets/monsters/Skeleton_Archer/IDLE.png"),
         frames: 4,
       },
       move: {
-        anim: require("../assets/images/monsters/Skeleton_Archer/MOVE.png"),
+        anim: require("@/assets/monsters/Skeleton_Archer/MOVE.png"),
         frames: 8,
       },
       spawn: null,
     },
     effects: {
       projectile: {
-        anim: require("../assets/images/monsters/Skeleton_Archer/PROJECTILE.png"),
+        anim: require("@/assets/monsters/Skeleton_Archer/PROJECTILE.png"),
         frames: 4,
       },
     },
@@ -2129,29 +2129,29 @@ export const EnemyImageMap = {
   skeleton_mage: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Skeleton_Mage/ATTACK.png"),
+        anim: require("@/assets/monsters/Skeleton_Mage/ATTACK.png"),
         frames: 9,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Skeleton_Mage/HURT.png"),
+        anim: require("@/assets/monsters/Skeleton_Mage/HURT.png"),
         frames: 4,
       },
       death: {
-        anim: require("../assets/images/monsters/Skeleton_Mage/DEATH.png"),
+        anim: require("@/assets/monsters/Skeleton_Mage/DEATH.png"),
         frames: 10,
       },
       idle: {
-        anim: require("../assets/images/monsters/Skeleton_Mage/IDLE.png"),
+        anim: require("@/assets/monsters/Skeleton_Mage/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Skeleton_Mage/MOVE.png"),
+        anim: require("@/assets/monsters/Skeleton_Mage/MOVE.png"),
         frames: 6,
       },
       spawn: null,
     },
     effects: {
-      projectile: require("../assets/images/monsters/Skeleton_Mage/projectile.png"),
+      projectile: require("@/assets/monsters/Skeleton_Mage/projectile.png"),
     },
     height: 128,
     width: 128,
@@ -2161,19 +2161,19 @@ export const EnemyImageMap = {
   spider_dark: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Spider_Dark/ATTACK.png"),
+        anim: require("@/assets/monsters/Spider_Dark/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Spider_Dark/DEATH.png"),
+        anim: require("@/assets/monsters/Spider_Dark/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Spider_Dark/IDLE.png"),
+        anim: require("@/assets/monsters/Spider_Dark/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Spider_Dark/MOVE.png"),
+        anim: require("@/assets/monsters/Spider_Dark/MOVE.png"),
         frames: 6,
       },
       hurt: null,
@@ -2186,19 +2186,19 @@ export const EnemyImageMap = {
   spider_dark_brood: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Spider_Dark_brood/ATTACK.png"),
+        anim: require("@/assets/monsters/Spider_Dark_brood/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Spider_Dark_brood/DEATH.png"),
+        anim: require("@/assets/monsters/Spider_Dark_brood/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Spider_Dark_brood/IDLE.png"),
+        anim: require("@/assets/monsters/Spider_Dark_brood/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Spider_Dark_brood/MOVE.png"),
+        anim: require("@/assets/monsters/Spider_Dark_brood/MOVE.png"),
         frames: 6,
       },
       hurt: null,
@@ -2211,19 +2211,19 @@ export const EnemyImageMap = {
   spider_dark_small: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Spider_Dark_small/ATTACK.png"),
+        anim: require("@/assets/monsters/Spider_Dark_small/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Spider_Dark_small/DEATH.png"),
+        anim: require("@/assets/monsters/Spider_Dark_small/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Spider_Dark_small/IDLE.png"),
+        anim: require("@/assets/monsters/Spider_Dark_small/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Spider_Dark_small/MOVE.png"),
+        anim: require("@/assets/monsters/Spider_Dark_small/MOVE.png"),
         frames: 6,
       },
       hurt: null,
@@ -2236,19 +2236,19 @@ export const EnemyImageMap = {
   spider_default: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Spider_Default/ATTACK.png"),
+        anim: require("@/assets/monsters/Spider_Default/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Spider_Default/DEATH.png"),
+        anim: require("@/assets/monsters/Spider_Default/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Spider_Default/IDLE.png"),
+        anim: require("@/assets/monsters/Spider_Default/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Spider_Default/MOVE.png"),
+        anim: require("@/assets/monsters/Spider_Default/MOVE.png"),
         frames: 6,
       },
       hurt: null,
@@ -2261,19 +2261,19 @@ export const EnemyImageMap = {
   spider_default_brood: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Spider_Default_brood/ATTACK.png"),
+        anim: require("@/assets/monsters/Spider_Default_brood/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Spider_Default_brood/DEATH.png"),
+        anim: require("@/assets/monsters/Spider_Default_brood/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Spider_Default_brood/IDLE.png"),
+        anim: require("@/assets/monsters/Spider_Default_brood/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Spider_Default_brood/MOVE.png"),
+        anim: require("@/assets/monsters/Spider_Default_brood/MOVE.png"),
         frames: 6,
       },
       hurt: null,
@@ -2286,19 +2286,19 @@ export const EnemyImageMap = {
   spider_default_small: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Spider_Default_small/ATTACK.png"),
+        anim: require("@/assets/monsters/Spider_Default_small/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Spider_Default_small/DEATH.png"),
+        anim: require("@/assets/monsters/Spider_Default_small/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Spider_Default_small/IDLE.png"),
+        anim: require("@/assets/monsters/Spider_Default_small/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Spider_Default_small/MOVE.png"),
+        anim: require("@/assets/monsters/Spider_Default_small/MOVE.png"),
         frames: 6,
       },
       hurt: null,
@@ -2311,19 +2311,19 @@ export const EnemyImageMap = {
   spider_demon: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Spider_Demon/ATTACK.png"),
+        anim: require("@/assets/monsters/Spider_Demon/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Spider_Demon/DEATH.png"),
+        anim: require("@/assets/monsters/Spider_Demon/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Spider_Demon/IDLE.png"),
+        anim: require("@/assets/monsters/Spider_Demon/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Spider_Demon/MOVE.png"),
+        anim: require("@/assets/monsters/Spider_Demon/MOVE.png"),
         frames: 6,
       },
       hurt: null,
@@ -2336,19 +2336,19 @@ export const EnemyImageMap = {
   spider_demon_brood: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Spider_Demon_brood/ATTACK.png"),
+        anim: require("@/assets/monsters/Spider_Demon_brood/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Spider_Demon_brood/DEATH.png"),
+        anim: require("@/assets/monsters/Spider_Demon_brood/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Spider_Demon_brood/IDLE.png"),
+        anim: require("@/assets/monsters/Spider_Demon_brood/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Spider_Demon_brood/MOVE.png"),
+        anim: require("@/assets/monsters/Spider_Demon_brood/MOVE.png"),
         frames: 6,
       },
       hurt: null,
@@ -2361,19 +2361,19 @@ export const EnemyImageMap = {
   spider_demon_small: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Spider_Demon_small/ATTACK.png"),
+        anim: require("@/assets/monsters/Spider_Demon_small/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Spider_Demon_small/DEATH.png"),
+        anim: require("@/assets/monsters/Spider_Demon_small/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Spider_Demon_small/IDLE.png"),
+        anim: require("@/assets/monsters/Spider_Demon_small/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Spider_Demon_small/MOVE.png"),
+        anim: require("@/assets/monsters/Spider_Demon_small/MOVE.png"),
         frames: 6,
       },
       hurt: null,
@@ -2386,19 +2386,19 @@ export const EnemyImageMap = {
   spider_wood: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Spider_Wood/ATTACK.png"),
+        anim: require("@/assets/monsters/Spider_Wood/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Spider_Wood/DEATH.png"),
+        anim: require("@/assets/monsters/Spider_Wood/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Spider_Wood/IDLE.png"),
+        anim: require("@/assets/monsters/Spider_Wood/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Spider_Wood/MOVE.png"),
+        anim: require("@/assets/monsters/Spider_Wood/MOVE.png"),
         frames: 6,
       },
       hurt: null,
@@ -2411,19 +2411,19 @@ export const EnemyImageMap = {
   spider_wood_brood: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Spider_Wood_brood/ATTACK.png"),
+        anim: require("@/assets/monsters/Spider_Wood_brood/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Spider_Wood_brood/DEATH.png"),
+        anim: require("@/assets/monsters/Spider_Wood_brood/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Spider_Wood_brood/IDLE.png"),
+        anim: require("@/assets/monsters/Spider_Wood_brood/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Spider_Wood_brood/MOVE.png"),
+        anim: require("@/assets/monsters/Spider_Wood_brood/MOVE.png"),
         frames: 6,
       },
       hurt: null,
@@ -2436,19 +2436,19 @@ export const EnemyImageMap = {
   spider_wood_small: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Spider_Wood_small/ATTACK.png"),
+        anim: require("@/assets/monsters/Spider_Wood_small/ATTACK.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Spider_Wood_small/DEATH.png"),
+        anim: require("@/assets/monsters/Spider_Wood_small/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Spider_Wood_small/IDLE.png"),
+        anim: require("@/assets/monsters/Spider_Wood_small/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Spider_Wood_small/MOVE.png"),
+        anim: require("@/assets/monsters/Spider_Wood_small/MOVE.png"),
         frames: 6,
       },
       hurt: null,
@@ -2461,11 +2461,11 @@ export const EnemyImageMap = {
   training_dummy: {
     sets: {
       hurt: {
-        anim: require("../assets/images/monsters/Training_Dummy/HIT.png"),
+        anim: require("@/assets/monsters/Training_Dummy/HIT.png"),
         frames: 5,
       },
       idle: {
-        anim: require("../assets/images/monsters/Training_Dummy/IDLE.png"),
+        anim: require("@/assets/monsters/Training_Dummy/IDLE.png"),
         frames: 1,
       },
       spawn: null,
@@ -2476,27 +2476,27 @@ export const EnemyImageMap = {
   viking_assassin: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Viking_Assassin/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Viking_Assassin/ATTACK_1.png"),
         frames: 5,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Viking_Assassin/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Viking_Assassin/ATTACK_2.png"),
         frames: 5,
       },
       death: {
-        anim: require("../assets/images/monsters/Viking_Assassin/DEATH.png"),
+        anim: require("@/assets/monsters/Viking_Assassin/DEATH.png"),
         frames: 4,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Viking_Assassin/HURT.png"),
+        anim: require("@/assets/monsters/Viking_Assassin/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Viking_Assassin/IDLE.png"),
+        anim: require("@/assets/monsters/Viking_Assassin/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Viking_Assassin/MOVE.png"),
+        anim: require("@/assets/monsters/Viking_Assassin/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -2510,27 +2510,27 @@ export const EnemyImageMap = {
   viking_axe: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Viking_Axe/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Viking_Axe/ATTACK_1.png"),
         frames: 6,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Viking_Axe/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Viking_Axe/ATTACK_2.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Viking_Axe/DEATH.png"),
+        anim: require("@/assets/monsters/Viking_Axe/DEATH.png"),
         frames: 4,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Viking_Axe/HURT.png"),
+        anim: require("@/assets/monsters/Viking_Axe/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Viking_Axe/IDLE.png"),
+        anim: require("@/assets/monsters/Viking_Axe/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Viking_Axe/MOVE.png"),
+        anim: require("@/assets/monsters/Viking_Axe/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -2544,27 +2544,27 @@ export const EnemyImageMap = {
   viking_giant: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Viking_Giant/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Viking_Giant/ATTACK_1.png"),
         frames: 5,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Viking_Giant/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Viking_Giant/ATTACK_2.png"),
         frames: 5,
       },
       death: {
-        anim: require("../assets/images/monsters/Viking_Giant/DEATH.png"),
+        anim: require("@/assets/monsters/Viking_Giant/DEATH.png"),
         frames: 4,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Viking_Giant/HURT.png"),
+        anim: require("@/assets/monsters/Viking_Giant/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Viking_Giant/IDLE.png"),
+        anim: require("@/assets/monsters/Viking_Giant/IDLE.png"),
         frames: 2,
       },
       move: {
-        anim: require("../assets/images/monsters/Viking_Giant/MOVE.png"),
+        anim: require("@/assets/monsters/Viking_Giant/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -2579,23 +2579,23 @@ export const EnemyImageMap = {
   viking_spearthrower: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Viking_Spearthrower/ATTACK.png"),
+        anim: require("@/assets/monsters/Viking_Spearthrower/ATTACK.png"),
         frames: 5,
       },
       death: {
-        anim: require("../assets/images/monsters/Viking_Spearthrower/DEATH.png"),
+        anim: require("@/assets/monsters/Viking_Spearthrower/DEATH.png"),
         frames: 4,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Viking_Spearthrower/HURT.png"),
+        anim: require("@/assets/monsters/Viking_Spearthrower/HURT.png"),
         frames: 3,
       },
       idle: {
-        anim: require("../assets/images/monsters/Viking_Spearthrower/IDLE.png"),
+        anim: require("@/assets/monsters/Viking_Spearthrower/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Viking_Spearthrower/MOVE.png"),
+        anim: require("@/assets/monsters/Viking_Spearthrower/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -2609,31 +2609,31 @@ export const EnemyImageMap = {
   werewolf: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Werewolf/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Werewolf/ATTACK_1.png"),
         frames: 7,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Werewolf/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Werewolf/ATTACK_2.png"),
         frames: 6,
       },
       spawn: {
-        anim: require("../assets/images/monsters/Werewolf/TRANSFORMATION.png"),
+        anim: require("@/assets/monsters/Werewolf/TRANSFORMATION.png"),
         frames: 8,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Werewolf/HURT.png"),
+        anim: require("@/assets/monsters/Werewolf/HURT.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Werewolf/DEATH.png"),
+        anim: require("@/assets/monsters/Werewolf/DEATH.png"),
         frames: 10,
       },
       idle: {
-        anim: require("../assets/images/monsters/Werewolf/IDLE.png"),
+        anim: require("@/assets/monsters/Werewolf/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Werewolf/MOVE.png"),
+        anim: require("@/assets/monsters/Werewolf/MOVE.png"),
         frames: 6,
       },
     },
@@ -2646,23 +2646,23 @@ export const EnemyImageMap = {
   witch: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Witch/ATTACK.png"),
+        anim: require("@/assets/monsters/Witch/ATTACK.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Witch/HURT.png"),
+        anim: require("@/assets/monsters/Witch/HURT.png"),
         frames: 3,
       },
       death: {
-        anim: require("../assets/images/monsters/Witch/DEATH.png"),
+        anim: require("@/assets/monsters/Witch/DEATH.png"),
         frames: 7,
       },
       idle: {
-        anim: require("../assets/images/monsters/Witch/IDLE.png"),
+        anim: require("@/assets/monsters/Witch/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Witch/MOVE.png"),
+        anim: require("@/assets/monsters/Witch/MOVE.png"),
         frames: 6,
       },
       spawn: null,
@@ -2675,19 +2675,19 @@ export const EnemyImageMap = {
   wizard_black: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Wizard_Black/ATTACK.png"),
+        anim: require("@/assets/monsters/Wizard_Black/ATTACK.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Wizard_Black/HURT.png"),
+        anim: require("@/assets/monsters/Wizard_Black/HURT.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Wizard_Black/DEATH.png"),
+        anim: require("@/assets/monsters/Wizard_Black/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Wizard_Black/IDLE.png"),
+        anim: require("@/assets/monsters/Wizard_Black/IDLE.png"),
         frames: 6,
       },
       move: null,
@@ -2695,11 +2695,11 @@ export const EnemyImageMap = {
     },
     effects: {
       projectile: {
-        anim: require("../assets/images/monsters/Wizard_Black/projectile.png"),
+        anim: require("@/assets/monsters/Wizard_Black/projectile.png"),
         frames: 6,
       },
       splash: {
-        anim: require("../assets/images/monsters/Wizard_Black/effect.png"),
+        anim: require("@/assets/monsters/Wizard_Black/effect.png"),
         frames: 6,
       },
     },
@@ -2712,19 +2712,19 @@ export const EnemyImageMap = {
   wizard_blackblue: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Wizard_BlackBlue/ATTACK.png"),
+        anim: require("@/assets/monsters/Wizard_BlackBlue/ATTACK.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Wizard_BlackBlue/HURT.png"),
+        anim: require("@/assets/monsters/Wizard_BlackBlue/HURT.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Wizard_BlackBlue/DEATH.png"),
+        anim: require("@/assets/monsters/Wizard_BlackBlue/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Wizard_BlackBlue/IDLE.png"),
+        anim: require("@/assets/monsters/Wizard_BlackBlue/IDLE.png"),
         frames: 6,
       },
       move: null,
@@ -2732,11 +2732,11 @@ export const EnemyImageMap = {
     },
     effects: {
       projectile: {
-        anim: require("../assets/images/monsters/Wizard_BlackBlue/projectile.png"),
+        anim: require("@/assets/monsters/Wizard_BlackBlue/projectile.png"),
         frames: 6,
       },
       splash: {
-        anim: require("../assets/images/monsters/Wizard_BlackBlue/effect.png"),
+        anim: require("@/assets/monsters/Wizard_BlackBlue/effect.png"),
         frames: 6,
       },
     },
@@ -2749,19 +2749,19 @@ export const EnemyImageMap = {
   wizard_blue: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Wizard_Blue/ATTACK.png"),
+        anim: require("@/assets/monsters/Wizard_Blue/ATTACK.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Wizard_Blue/HURT.png"),
+        anim: require("@/assets/monsters/Wizard_Blue/HURT.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Wizard_Blue/DEATH.png"),
+        anim: require("@/assets/monsters/Wizard_Blue/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Wizard_Blue/IDLE.png"),
+        anim: require("@/assets/monsters/Wizard_Blue/IDLE.png"),
         frames: 6,
       },
       move: null,
@@ -2769,11 +2769,11 @@ export const EnemyImageMap = {
     },
     effects: {
       projectile: {
-        anim: require("../assets/images/monsters/Wizard_Blue/projectile.png"),
+        anim: require("@/assets/monsters/Wizard_Blue/projectile.png"),
         frames: 6,
       },
       splash: {
-        anim: require("../assets/images/monsters/Wizard_Blue/effect.png"),
+        anim: require("@/assets/monsters/Wizard_Blue/effect.png"),
         frames: 6,
       },
     },
@@ -2786,27 +2786,27 @@ export const EnemyImageMap = {
   wizard_classic: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Wizard_Classic/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Wizard_Classic/ATTACK_1.png"),
         frames: 10,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Wizard_Classic/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Wizard_Classic/ATTACK_2.png"),
         frames: 9,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Wizard_Classic/HURT.png"),
+        anim: require("@/assets/monsters/Wizard_Classic/HURT.png"),
         frames: 4,
       },
       death: {
-        anim: require("../assets/images/monsters/Wizard_Classic/DEATH.png"),
+        anim: require("@/assets/monsters/Wizard_Classic/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Wizard_Classic/IDLE.png"),
+        anim: require("@/assets/monsters/Wizard_Classic/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Wizard_Classic/MOVE.png"),
+        anim: require("@/assets/monsters/Wizard_Classic/MOVE.png"),
         frames: 4,
       },
       spawn: null,
@@ -2820,19 +2820,19 @@ export const EnemyImageMap = {
   wizard_darkpurple: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Wizard_DarkPurple/ATTACK.png"),
+        anim: require("@/assets/monsters/Wizard_DarkPurple/ATTACK.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Wizard_DarkPurple/HURT.png"),
+        anim: require("@/assets/monsters/Wizard_DarkPurple/HURT.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Wizard_DarkPurple/DEATH.png"),
+        anim: require("@/assets/monsters/Wizard_DarkPurple/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Wizard_DarkPurple/IDLE.png"),
+        anim: require("@/assets/monsters/Wizard_DarkPurple/IDLE.png"),
         frames: 6,
       },
       move: null,
@@ -2840,11 +2840,11 @@ export const EnemyImageMap = {
     },
     effects: {
       projectile: {
-        anim: require("../assets/images/monsters/Wizard_DarkPurple/projectile.png"),
+        anim: require("@/assets/monsters/Wizard_DarkPurple/projectile.png"),
         frames: 6,
       },
       splash: {
-        anim: require("../assets/images/monsters/Wizard_DarkPurple/effect.png"),
+        anim: require("@/assets/monsters/Wizard_DarkPurple/effect.png"),
         frames: 6,
       },
     },
@@ -2857,19 +2857,19 @@ export const EnemyImageMap = {
   wizard_earthen: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Wizard_Earthen/ATTACK.png"),
+        anim: require("@/assets/monsters/Wizard_Earthen/ATTACK.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Wizard_Earthen/HURT.png"),
+        anim: require("@/assets/monsters/Wizard_Earthen/HURT.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Wizard_Earthen/DEATH.png"),
+        anim: require("@/assets/monsters/Wizard_Earthen/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Wizard_Earthen/IDLE.png"),
+        anim: require("@/assets/monsters/Wizard_Earthen/IDLE.png"),
         frames: 6,
       },
       move: null,
@@ -2877,11 +2877,11 @@ export const EnemyImageMap = {
     },
     effects: {
       projectile: {
-        anim: require("../assets/images/monsters/Wizard_Earthen/projectile.png"),
+        anim: require("@/assets/monsters/Wizard_Earthen/projectile.png"),
         frames: 6,
       },
       splash: {
-        anim: require("../assets/images/monsters/Wizard_Earthen/effect.png"),
+        anim: require("@/assets/monsters/Wizard_Earthen/effect.png"),
         frames: 6,
       },
     },
@@ -2894,19 +2894,19 @@ export const EnemyImageMap = {
   wizard_gray: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Wizard_Gray/ATTACK.png"),
+        anim: require("@/assets/monsters/Wizard_Gray/ATTACK.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Wizard_Gray/HURT.png"),
+        anim: require("@/assets/monsters/Wizard_Gray/HURT.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Wizard_Gray/DEATH.png"),
+        anim: require("@/assets/monsters/Wizard_Gray/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Wizard_Gray/IDLE.png"),
+        anim: require("@/assets/monsters/Wizard_Gray/IDLE.png"),
         frames: 6,
       },
       move: null,
@@ -2914,11 +2914,11 @@ export const EnemyImageMap = {
     },
     effects: {
       projectile: {
-        anim: require("../assets/images/monsters/Wizard_Gray/projectile.png"),
+        anim: require("@/assets/monsters/Wizard_Gray/projectile.png"),
         frames: 6,
       },
       splash: {
-        anim: require("../assets/images/monsters/Wizard_Gray/effect.png"),
+        anim: require("@/assets/monsters/Wizard_Gray/effect.png"),
         frames: 6,
       },
     },
@@ -2931,19 +2931,19 @@ export const EnemyImageMap = {
   wizard_green: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Wizard_Green/ATTACK.png"),
+        anim: require("@/assets/monsters/Wizard_Green/ATTACK.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Wizard_Green/HURT.png"),
+        anim: require("@/assets/monsters/Wizard_Green/HURT.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Wizard_Green/DEATH.png"),
+        anim: require("@/assets/monsters/Wizard_Green/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Wizard_Green/IDLE.png"),
+        anim: require("@/assets/monsters/Wizard_Green/IDLE.png"),
         frames: 6,
       },
       move: null,
@@ -2951,11 +2951,11 @@ export const EnemyImageMap = {
     },
     effects: {
       projectile: {
-        anim: require("../assets/images/monsters/Wizard_Green/projectile.png"),
+        anim: require("@/assets/monsters/Wizard_Green/projectile.png"),
         frames: 6,
       },
       splash: {
-        anim: require("../assets/images/monsters/Wizard_Green/effect.png"),
+        anim: require("@/assets/monsters/Wizard_Green/effect.png"),
         frames: 6,
       },
     },
@@ -2968,19 +2968,19 @@ export const EnemyImageMap = {
   wizard_purple: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Wizard_Purple/ATTACK.png"),
+        anim: require("@/assets/monsters/Wizard_Purple/ATTACK.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Wizard_Purple/HURT.png"),
+        anim: require("@/assets/monsters/Wizard_Purple/HURT.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Wizard_Purple/DEATH.png"),
+        anim: require("@/assets/monsters/Wizard_Purple/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Wizard_Purple/IDLE.png"),
+        anim: require("@/assets/monsters/Wizard_Purple/IDLE.png"),
         frames: 6,
       },
       move: null,
@@ -2988,11 +2988,11 @@ export const EnemyImageMap = {
     },
     effects: {
       projectile: {
-        anim: require("../assets/images/monsters/Wizard_Purple/projectile.png"),
+        anim: require("@/assets/monsters/Wizard_Purple/projectile.png"),
         frames: 6,
       },
       splash: {
-        anim: require("../assets/images/monsters/Wizard_Purple/effect.png"),
+        anim: require("@/assets/monsters/Wizard_Purple/effect.png"),
         frames: 6,
       },
     },
@@ -3005,19 +3005,19 @@ export const EnemyImageMap = {
   wizard_redblack: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Wizard_RedBlack/ATTACK.png"),
+        anim: require("@/assets/monsters/Wizard_RedBlack/ATTACK.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Wizard_RedBlack/HURT.png"),
+        anim: require("@/assets/monsters/Wizard_RedBlack/HURT.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Wizard_RedBlack/DEATH.png"),
+        anim: require("@/assets/monsters/Wizard_RedBlack/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Wizard_RedBlack/IDLE.png"),
+        anim: require("@/assets/monsters/Wizard_RedBlack/IDLE.png"),
         frames: 6,
       },
       move: null,
@@ -3025,11 +3025,11 @@ export const EnemyImageMap = {
     },
     effects: {
       projectile: {
-        anim: require("../assets/images/monsters/Wizard_RedBlack/projectile.png"),
+        anim: require("@/assets/monsters/Wizard_RedBlack/projectile.png"),
         frames: 6,
       },
       splash: {
-        anim: require("../assets/images/monsters/Wizard_RedBlack/effect.png"),
+        anim: require("@/assets/monsters/Wizard_RedBlack/effect.png"),
         frames: 6,
       },
     },
@@ -3042,19 +3042,19 @@ export const EnemyImageMap = {
   wizard_yellow: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Wizard_Yellow/ATTACK.png"),
+        anim: require("@/assets/monsters/Wizard_Yellow/ATTACK.png"),
         frames: 6,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Wizard_Yellow/HURT.png"),
+        anim: require("@/assets/monsters/Wizard_Yellow/HURT.png"),
         frames: 6,
       },
       death: {
-        anim: require("../assets/images/monsters/Wizard_Yellow/DEATH.png"),
+        anim: require("@/assets/monsters/Wizard_Yellow/DEATH.png"),
         frames: 6,
       },
       idle: {
-        anim: require("../assets/images/monsters/Wizard_Yellow/IDLE.png"),
+        anim: require("@/assets/monsters/Wizard_Yellow/IDLE.png"),
         frames: 6,
       },
       move: null,
@@ -3062,7 +3062,7 @@ export const EnemyImageMap = {
     },
     effects: {
       projectile: {
-        anim: require("../assets/images/monsters/Wizard_Yellow/projectile.png"),
+        anim: require("@/assets/monsters/Wizard_Yellow/projectile.png"),
         frames: 6,
       },
     },
@@ -3075,27 +3075,27 @@ export const EnemyImageMap = {
   wolf_black: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Wolf_Black/ATTACK_1.png"),
+        anim: require("@/assets/monsters/Wolf_Black/ATTACK_1.png"),
         frames: 7,
       },
       attack_2: {
-        anim: require("../assets/images/monsters/Wolf_Black/ATTACK_2.png"),
+        anim: require("@/assets/monsters/Wolf_Black/ATTACK_2.png"),
         frames: 7,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Wolf_Black/HURT.png"),
+        anim: require("@/assets/monsters/Wolf_Black/HURT.png"),
         frames: 4,
       },
       death: {
-        anim: require("../assets/images/monsters/Wolf_Black/DEATH.png"),
+        anim: require("@/assets/monsters/Wolf_Black/DEATH.png"),
         frames: 5,
       },
       idle: {
-        anim: require("../assets/images/monsters/Wolf_Black/IDLE.png"),
+        anim: require("@/assets/monsters/Wolf_Black/IDLE.png"),
         frames: 6,
       },
       move: {
-        anim: require("../assets/images/monsters/Wolf_Black/MOVE.png"),
+        anim: require("@/assets/monsters/Wolf_Black/MOVE.png"),
         frames: 8,
       },
       spawn: null,
@@ -3109,27 +3109,27 @@ export const EnemyImageMap = {
   zombie: {
     sets: {
       attack_1: {
-        anim: require("../assets/images/monsters/Zombie/ATTACK.png"),
+        anim: require("@/assets/monsters/Zombie/ATTACK.png"),
         frames: 15,
       },
       hurt: {
-        anim: require("../assets/images/monsters/Zombie/HURT.png"),
+        anim: require("@/assets/monsters/Zombie/HURT.png"),
         frames: 5,
       },
       death: {
-        anim: require("../assets/images/monsters/Zombie/DEATH.png"),
+        anim: require("@/assets/monsters/Zombie/DEATH.png"),
         frames: 8,
       },
       idle: {
-        anim: require("../assets/images/monsters/Zombie/IDLE.png"),
+        anim: require("@/assets/monsters/Zombie/IDLE.png"),
         frames: 5,
       },
       spawn: {
-        anim: require("../assets/images/monsters/Zombie/SPAWN.png"),
+        anim: require("@/assets/monsters/Zombie/SPAWN.png"),
         frames: 7,
       },
       move: {
-        anim: require("../assets/images/monsters/Zombie/MOVE.png"),
+        anim: require("@/assets/monsters/Zombie/MOVE.png"),
         frames: 10,
       },
     },
