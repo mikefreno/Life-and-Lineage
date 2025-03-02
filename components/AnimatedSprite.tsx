@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { Image } from "expo-image";
-import { EnemyImageValueOption } from "../utility/enemyHelpers";
+import { Animations, EnemyImageValueOption } from "../utility/enemyHelpers";
 import { FPS } from "../stores/EnemyAnimationStore";
 import { useHeaderHeight } from "@react-navigation/elements";
 
@@ -33,19 +33,24 @@ export const AnimatedSprite = ({
   // Original sprite dimensions
   const spriteWidth = spriteSet.width;
   const spriteHeight = spriteSet.height;
-  const topOffset = spriteSet.topOffset ?? 0;
-  const leftOffset = spriteSet.leftOffset ?? 0;
+  const topOffset = "topOffset" in spriteSet ? spriteSet.topOffset : 0;
+  const leftOffset = "leftOffset" in spriteSet ? spriteSet.leftOffset : 0;
 
   const displayWidthActual =
-    spriteSet.displayWidth ?? Math.max(150, spriteWidth);
+    "displayWidth" in spriteSet
+      ? spriteSet.displayWidth
+      : Math.max(150, spriteWidth);
   const displayHeightActual =
-    spriteSet.displayHeight ?? Math.max(150, spriteHeight);
+    "displayWidth" in spriteSet
+      ? spriteSet.displayHeight
+      : Math.max(150, spriteHeight);
 
   // Scale factors
   const scaleX = displayWidthActual / spriteWidth;
   const scaleY = displayHeightActual / spriteHeight;
   const scale = Math.min(scaleX, scaleY);
-  const mirrorTransform = spriteSet.mirror ? [{ scaleX: -1 }] : [];
+  const mirrorTransform =
+    "mirror" in spriteSet && spriteSet.mirror ? [{ scaleX: -1 }] : [];
 
   useEffect(() => {
     const runAnimation = () => {

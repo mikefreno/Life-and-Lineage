@@ -47,7 +47,7 @@ export const VFXImageMap = {
   iceBlock: {
     source: require("@/assets/vfx/ice/floating-block.png"),
     frames: 21,
-    height: 192,
+    height: 96,
     width: 80,
   },
   ambiguousSparks: {
@@ -163,7 +163,7 @@ export const VFXImageMap = {
   rockBullet: {
     source: require("@/assets/vfx/earth/rock-bullet.png"),
     frames: 14,
-    height: 160,
+    height: 80,
     width: 192,
   },
   bloodCone: {

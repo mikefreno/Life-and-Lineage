@@ -1,7 +1,7 @@
 import { useRootStore } from "@/hooks/stores";
 import { VFXImageMap } from "@/utility/functions/vfxmapping";
 import { observer } from "mobx-react-lite";
-import React, { useRef } from "react";
+import React, { useRef, useCallback } from "react";
 import { ReactNode, useEffect, useState } from "react";
 import { View, Animated, Easing } from "react-native";
 import { Image } from "expo-image";
@@ -24,8 +24,11 @@ export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
     y: uiStore.dimensions.height / 2,
   });
 
-  const animationValue = useRef(new Animated.Value(0)).current;
-  const frameAnimValue = useRef(new Animated.Value(0)).current;
+  const [currentFrame, setCurrentFrame] = useState(0);
+  const animationInterval = useRef<NodeJS.Timeout>();
+  const positionAnimValue = useRef(new Animated.Value(0)).current;
+  const animationComplete = useRef(false);
+
   const [activeVFX, setActiveVFX] = useState<{
     source: any;
     style: "static" | "missile" | "span";
@@ -35,6 +38,7 @@ export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
     height: number;
     rotate?: number;
     frames: number;
+    duration: number;
   } | null>(null);
 
   const positionUpdateTrigger = enemyStore.enemies
@@ -60,14 +64,23 @@ export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
   }, [enemyStore.enemies, positionUpdateTrigger]);
 
   // Handle animation completion
-  const completeAnimation = () => {
+  const completeAnimation = useCallback(() => {
+    // Clear any running animation interval
+    if (animationInterval.current) {
+      clearInterval(animationInterval.current);
+      animationInterval.current = undefined;
+    }
+
     setActiveVFX(null);
+    setCurrentFrame(0);
+    animationComplete.current = false;
+
     if (playerAnimationStore.animationPromiseResolver) {
       playerAnimationStore.animationPromiseResolver();
       playerAnimationStore.animationPromiseResolver = null;
     }
     playerAnimationStore.clearAnimation();
-  };
+  }, [playerAnimationStore]);
 
   // Process new animation sets
   useEffect(() => {
@@ -138,8 +151,15 @@ export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
       const vfx = VFXImageMap[animSet.sprite];
 
       // Reset animation values
-      animationValue.setValue(0);
-      frameAnimValue.setValue(0);
+      positionAnimValue.setValue(0);
+      setCurrentFrame(0);
+      animationComplete.current = false;
+
+      // Calculate animation duration using the same formula for all types
+      const animationDuration = Math.min(vfx.frames * 100, 1000);
+
+      // Calculate frame duration based on total animation duration
+      const frameDuration = Math.floor(animationDuration / vfx.frames);
 
       // Set up the VFX
       setActiveVFX({
@@ -151,34 +171,47 @@ export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
         height: vfx.height,
         rotate: "rotate" in vfx ? vfx.rotate : 0,
         frames: vfx.frames,
+        duration: animationDuration,
       });
 
-      // Calculate animation duration based on frames
-      // Assuming each frame should be visible for about 100ms
-      const frameDuration = 100;
-      const animationDuration = vfx.frames * frameDuration;
-
-      // Configure and start position animation
-      Animated.timing(animationValue, {
+      // Start position animation for all types
+      Animated.timing(positionAnimValue, {
         toValue: 1,
         duration: animationDuration,
         easing: Easing.out(Easing.ease),
         useNativeDriver: true,
       }).start();
 
-      // Configure and start frame animation
-      Animated.timing(frameAnimValue, {
-        toValue: vfx.frames - 1,
-        duration: animationDuration,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }).start(({ finished }) => {
-        if (finished) {
-          completeAnimation();
+      // Start frame animation using interval
+      if (animationInterval.current) {
+        clearInterval(animationInterval.current);
+      }
+
+      // Frame animation using setInterval - play exactly once
+      let frameCount = 0;
+      animationInterval.current = setInterval(() => {
+        if (frameCount >= vfx.frames - 1) {
+          // We've reached the last frame, complete the animation
+          clearInterval(animationInterval.current);
+          animationInterval.current = undefined;
+
+          // Add a small delay before completing to ensure the last frame is visible
+          setTimeout(completeAnimation, 50);
+          return;
         }
-      });
+
+        // Advance to next frame
+        frameCount++;
+        setCurrentFrame(frameCount);
+      }, frameDuration);
     }
-  }, [playerAnimationStore.animationSet, enemyAndPosList]);
+
+    return () => {
+      if (animationInterval.current) {
+        clearInterval(animationInterval.current);
+      }
+    };
+  }, [playerAnimationStore.animationSet, enemyAndPosList, completeAnimation]);
 
   // Calculate animation styles based on the animation type
   const getAnimationStyle = () => {
@@ -197,13 +230,13 @@ export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
         return {
           transform: [
             {
-              translateX: animationValue.interpolate({
+              translateX: positionAnimValue.interpolate({
                 inputRange: [0, 1],
                 outputRange: [startPos.x, endPos.x - width / 2],
               }),
             },
             {
-              translateY: animationValue.interpolate({
+              translateY: positionAnimValue.interpolate({
                 inputRange: [0, 1],
                 outputRange: [startPos.y, endPos.y - height / 2],
               }),
@@ -212,7 +245,7 @@ export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
               rotate: rotate ? baseRotation : `${angle}deg`,
             },
           ],
-          opacity: animationValue.interpolate({
+          opacity: positionAnimValue.interpolate({
             inputRange: [0, 0.1, 0.9, 1],
             outputRange: [0, 1, 1, 0],
           }),
@@ -225,15 +258,9 @@ export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
             { translateX: endPos.x - width / 2 },
             { translateY: endPos.y - height / 2 },
             { rotate: baseRotation },
-            {
-              scale: animationValue.interpolate({
-                inputRange: [0, 0.2, 0.8, 1],
-                outputRange: [0.5, 1.2, 1.2, 0.8],
-              }),
-            },
           ],
-          opacity: animationValue.interpolate({
-            inputRange: [0, 0.2, 0.8, 1],
+          opacity: positionAnimValue.interpolate({
+            inputRange: [0, 0.1, 0.9, 1],
             outputRange: [0, 1, 1, 0],
           }),
         };
@@ -254,13 +281,13 @@ export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
             { translateY: startPos.y - height / 2 },
             { rotate: rotate ? `${spanAngle + rotate}deg` : `${spanAngle}deg` },
             {
-              scaleX: animationValue.interpolate({
+              scaleX: positionAnimValue.interpolate({
                 inputRange: [0, 0.5, 1],
                 outputRange: [0, distance / width, 0],
               }),
             },
           ],
-          opacity: animationValue.interpolate({
+          opacity: positionAnimValue.interpolate({
             inputRange: [0, 0.2, 0.8, 1],
             outputRange: [0, 1, 1, 0],
           }),
@@ -320,32 +347,16 @@ export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
             getAnimationStyle(),
           ]}
         >
-          <Animated.View
+          <Image
             style={{
+              position: "absolute",
               width: activeVFX.width * activeVFX.frames,
               height: activeVFX.height,
-              transform: [
-                {
-                  translateX: frameAnimValue.interpolate({
-                    inputRange: [0, activeVFX.frames - 1],
-                    outputRange: [
-                      0,
-                      -(activeVFX.width * (activeVFX.frames - 1)),
-                    ],
-                  }),
-                },
-              ],
+              left: -currentFrame * activeVFX.width,
             }}
-          >
-            <Image
-              style={{
-                width: activeVFX.width * activeVFX.frames,
-                height: activeVFX.height,
-              }}
-              source={activeVFX.source}
-              contentFit="cover"
-            />
-          </Animated.View>
+            source={activeVFX.source}
+            contentFit="cover"
+          />
         </Animated.View>
       )}
 

@@ -118,7 +118,7 @@ const SpellsScreen = observer(() => {
         }}
       >
         {playerState?.spells && playerState.spells.length > 0 ? (
-          <ScrollView contentContainerStyle={{ flex: 1 }}>
+          <ScrollView style={{ flex: 1 }}>
             {playerState.spells.map((spell) => (
               <View key={spell.name} style={styles.spellContainer}>
                 <SpellDetails spell={spell} />

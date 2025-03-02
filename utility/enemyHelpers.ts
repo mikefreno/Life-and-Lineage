@@ -2,7 +2,6 @@ export type EnemyImageMapType = typeof EnemyImageMap;
 export type EnemyImageKeyOption = keyof typeof EnemyImageMap;
 export type EnemyImageValueOption = (typeof EnemyImageMap)[EnemyImageKeyOption];
 export type Animations = EnemyImageValueOption["sets"];
-export type AnimationOptions = keyof Animations;
 
 export const EnemyImageMap = {
   baby_dragon: {
