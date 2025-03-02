@@ -183,6 +183,7 @@ export const DevControls = observer(() => {
         isVisibleCondition={showingDevControls}
         scrollEnabled={true}
         size={100}
+        style={{ maxHeight: "50%", marginVertical: "auto" }}
         backFunction={() => setShowingDevControls(false)}
         noPad
         innerStyle={{ paddingHorizontal: "3%" }}

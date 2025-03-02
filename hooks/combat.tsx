@@ -300,12 +300,10 @@ export const useCombatActions = () => {
     }) => {
       if (!playerState || !isFocused) return;
 
-      // Function to continue attack flow after animation
       const continueAttackFlow = () => {
         const logString = handleAttackResult(attackOrSpell, [target]);
         dungeonStore.addLog(logString);
 
-        // Check if target died and handle it
         const targetEnemy = enemyStore.enemies.find((e) => e.id === target.id);
         if (targetEnemy && targetEnemy.currentHealth <= 0) {
           enemyDeathHandler(targetEnemy);

@@ -2119,16 +2119,23 @@ export const EnemyImageMap = {
     effects: {
       projectile: {
         anim: require("@/assets/monsters/Skeleton_Archer/PROJECTILE.png"),
+        height: 16,
+        width: 32,
         frames: 4,
       },
     },
     height: 80,
     width: 110,
+    displayHeight: 160,
+    displayWidth: 220,
+    mirror: true,
   },
   skeleton_mage: {
     sets: {
       attack_1: {
         anim: require("@/assets/monsters/Skeleton_Mage/ATTACK.png"),
+        disablePreMovement: true,
+        usesProjectile: true,
         frames: 9,
       },
       hurt: {
@@ -3117,6 +3124,7 @@ export const EnemyImageMap = {
       },
       death: {
         anim: require("@/assets/monsters/Zombie/DEATH.png"),
+        sizeOverride: { height: 32, width: 46 },
         frames: 8,
       },
       idle: {

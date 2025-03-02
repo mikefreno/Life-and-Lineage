@@ -1,10 +1,10 @@
-import { View, Animated, Image } from "react-native";
+import { View, Animated, Image, ScrollView, Easing } from "react-native";
 import { toTitleCase } from "../../utility/functions/misc";
 import ProgressBar from "../ProgressBar";
 import GenericStrikeAround from "../GenericStrikeAround";
 import { ThemedView, Text } from "../Themed";
 import FadeOutNode from "../FadeOutNode";
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import type { Enemy } from "../../entities/creatures";
 import {
@@ -243,9 +243,7 @@ const EnemyHealthChangePopUp = memo(
   },
 );
 
-const EnemyConditions = memo(({ conditions }: { conditions: any[] }) => {
-  const styles = useStyles();
-  const { uiStore } = useRootStore();
+const EnemyConditions = observer(({ conditions }: { conditions: any[] }) => {
   const simplifiedConditions = useMemo(() => {
     const condMap = new Map();
     conditions.forEach((condition) => {
@@ -267,31 +265,49 @@ const EnemyConditions = memo(({ conditions }: { conditions: any[] }) => {
   return (
     <View
       style={{
-        flex: 1,
-        flexDirection: "row",
-        paddingTop: 16,
+        width: "100%",
+        height: 44,
       }}
     >
-      {simplifiedConditions.map((cond) => (
-        <ThemedView key={cond.name} style={flex.columnCenter}>
-          <View
-            style={[
-              styles.conditionIcon,
-              {
-                backgroundColor:
-                  uiStore.colorScheme === "dark"
-                    ? "rgba(255,255,255,0.4)"
-                    : "rgba(0,0,0,0.4)",
-              },
-            ]}
-          >
-            <Image source={cond.icon} style={{ width: 22, height: 24 }} />
+      <ScrollView
+        horizontal
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+        }}
+      >
+        {simplifiedConditions.map((cond) => (
+          <View key={cond.name}>
+            <ThemedView
+              style={[
+                flex.columnCenter,
+                {
+                  borderRadius: 9999,
+                  height: 36,
+                  width: 36,
+                  alignContent: "center",
+                  marginVertical: "auto",
+                },
+              ]}
+            >
+              <Image source={cond.icon} style={{ width: 22, height: 24 }} />
+            </ThemedView>
+            <Text
+              style={[
+                text.xl,
+                {
+                  position: "absolute",
+                  right: -4,
+                  bottom: 0,
+                },
+              ]}
+              numberOfLines={1}
+            >
+              x{cond.count}
+            </Text>
           </View>
-          <Text style={{ fontSize: 14 }}>
-            {toTitleCase(cond.name)} x {cond.count}
-          </Text>
-        </ThemedView>
-      ))}
+        ))}
+      </ScrollView>
     </View>
   );
 });
@@ -328,7 +344,7 @@ const EnemyDisplay = observer(
     enemy: Enemy;
     animationStore: EnemyAnimationStore;
   }) => {
-    const { uiStore } = useRootStore();
+    const { uiStore, enemyStore } = useRootStore();
     const styles = useStyles();
     const animations = useEnemyAnimations();
     const [healthState, setHealthState] = useState({
@@ -340,9 +356,24 @@ const EnemyDisplay = observer(
       "idle",
     );
     const healingGlowAnim = useRef(new Animated.Value(0)).current;
-    const attackStateRef = useRef<"start" | "attacking" | "returning">("start");
-
     const dialogueAnim = useRef(new Animated.Value(0)).current;
+    const projectileAnim = useRef(new Animated.Value(0)).current;
+    const [showProjectile, setShowProjectile] = useState(false);
+    const [projectileFrame, setProjectileFrame] = useState(0);
+    const projectileAnimationRef = useRef<NodeJS.Timeout>();
+
+    // Simple animation sequence tracking
+    const animationSequenceRef = useRef({
+      isAttacking: false,
+      attackPhase: 0, // 0: not attacking, 1: moving forward, 2: attacking, 3: returning
+      isAnimationLocked: false,
+    });
+
+    // Get player origin position for projectile targeting
+    const [playerOrigin, setPlayerOrigin] = useState<{ x: number; y: number }>({
+      x: uiStore.dimensions.width / 4,
+      y: uiStore.dimensions.height / 2,
+    });
 
     const runDialogueAnimation = (onComplete: () => void) => {
       Animated.sequence([
@@ -357,7 +388,11 @@ const EnemyDisplay = observer(
           duration: 500,
           useNativeDriver: true,
         }),
-      ]).start(onComplete);
+      ]).start(({ finished }) => {
+        if (finished) {
+          onComplete();
+        }
+      });
     };
 
     useEffect(() => {
@@ -368,7 +403,7 @@ const EnemyDisplay = observer(
       }
     }, [animationStore.dialogueDummy]);
 
-    const runHealAnimation = () => {
+    const runHealAnimation = (onComplete: () => void) => {
       Animated.sequence([
         Animated.timing(healingGlowAnim, {
           toValue: 1,
@@ -381,9 +416,14 @@ const EnemyDisplay = observer(
           duration: 600,
           useNativeDriver: true,
         }),
-      ]).start();
+      ]).start(({ finished }) => {
+        if (finished) {
+          onComplete();
+        }
+      });
     };
 
+    // Handle health changes and damage/death animations
     useEffect(() => {
       if (healthState.diff !== 0) {
         if (healthState.diff < 0) {
@@ -392,52 +432,50 @@ const EnemyDisplay = observer(
             EnemyImageMap[enemy.sprite].sets.death?.frames || 12;
           const isDeathAnimation = enemy.currentHealth <= 0;
 
+          // Lock animations during damage/death
+          animationSequenceRef.current.isAnimationLocked = true;
+
           if (isDeathAnimation) {
+            enemyStore.incrementDeathAnimations();
             setAnimationState("death");
             animations.runDeathAnimation(deathFrames, () => {
-              setTimeout(() => {
+              animationSequenceRef.current.isAnimationLocked = false;
+              enemyStore.decrementDeathAnimations();
+              setHealthState((prev) => ({
+                ...prev,
+                showing: false,
+                diff: 0,
+              }));
+            });
+          } else {
+            setAnimationState("hurt");
+            animations.runDamageAnimation(
+              () => {
+                animationSequenceRef.current.isAnimationLocked = false;
+                setAnimationState("idle");
                 setHealthState((prev) => ({
                   ...prev,
                   showing: false,
                   diff: 0,
                 }));
-              }, 500);
-            });
-          } else {
-            animations.runDamageAnimation(
-              () => {
-                setAnimationState("idle");
-                setTimeout(() => {
-                  setHealthState((prev) => ({
-                    ...prev,
-                    showing: false,
-                    diff: 0,
-                  }));
-                }, 500);
               },
-              isDeathAnimation ? deathFrames : hurtFrames,
+              hurtFrames,
               isDeathAnimation,
             );
           }
-
-          if (isDeathAnimation) {
-            setAnimationState("death");
-          } else {
-            setAnimationState("hurt");
-          }
         } else {
-          runHealAnimation();
-          setTimeout(() => {
+          runHealAnimation(() => {
             setHealthState((prev) => ({
               ...prev,
               showing: false,
               diff: 0,
             }));
-          }, 500);
+          });
         }
       }
-    }, [healthState.diff]);
+    }, [healthState.diff, enemyStore]);
 
+    // Handle text animations
     useEffect(() => {
       if (animationStore.textDummy !== 0) {
         animations.runTextAnimation(() => {
@@ -448,37 +486,210 @@ const EnemyDisplay = observer(
       }
     }, [animationStore.textDummy]);
 
-    useEffect(() => {
-      if (animationStore.attackDummy !== 0) {
-        attackStateRef.current = "start";
-        setAnimationState(uiStore.reduceMotion ? "attack_1" : "move");
-        const sets = EnemyImageMap[enemy.sprite].sets;
+    const runProjectileAnimation = (
+      startPos: { x: number; y: number },
+      targetPos: { x: number; y: number },
+    ) => {
+      const projectileData = EnemyImageMap[enemy.sprite].effects.projectile;
+      const projectileFrames = projectileData.frames || 1;
 
-        animations.runAttackAnimation({
-          attackAnimationFrames: sets.attack_1.frames,
-          moveAnimationFrames: sets.move?.frames,
-          onReachPeak: () => {
-            if (!uiStore.reduceMotion) {
-              setAnimationState("attack_1");
+      // Start frame animation
+      if (projectileFrames > 1) {
+        if (projectileAnimationRef.current) {
+          clearInterval(projectileAnimationRef.current);
+        }
+
+        setProjectileFrame(0);
+
+        projectileAnimationRef.current = setInterval(() => {
+          setProjectileFrame((prev) => (prev + 1) % projectileFrames);
+        }, 100); // Adjust frame rate as needed
+      }
+
+      setShowProjectile(true);
+      projectileAnim.setValue(0);
+
+      Animated.timing(projectileAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }).start(({ finished }) => {
+        if (finished) {
+          setShowProjectile(false);
+
+          if (projectileAnimationRef.current) {
+            clearInterval(projectileAnimationRef.current);
+            projectileAnimationRef.current = undefined;
+          }
+        }
+      });
+    };
+
+    // Cleanup projectile animation on unmount
+    useEffect(() => {
+      return () => {
+        if (projectileAnimationRef.current) {
+          clearInterval(projectileAnimationRef.current);
+        }
+      };
+    }, []);
+
+    // Direct attack animation sequence with support for special attacks
+    const runAttackSequence = () => {
+      if (
+        animationSequenceRef.current.isAnimationLocked ||
+        animationSequenceRef.current.isAttacking
+      ) {
+        return;
+      }
+
+      const sets = EnemyImageMap[enemy.sprite].sets;
+      const attackSet = sets.attack_1;
+      const disablePreMovement =
+        attackSet &&
+        "disablePreMovement" in attackSet &&
+        attackSet.disablePreMovement;
+      const usesProjectile =
+        attackSet && "usesProjectile" in attackSet && attackSet.usesProjectile;
+
+      animationSequenceRef.current.isAttacking = true;
+
+      // Increment the attack animation counter in EnemyStore
+      enemyStore.incrementAttackAnimations();
+
+      if (uiStore.reduceMotion) {
+        // Simplified animation for reduced motion
+        setAnimationState("attack_1");
+
+        const { duration: attackDuration } = calculateAdjustedFrameRate(
+          sets.attack_1.frames,
+        );
+
+        // Fire projectile if needed
+        if (usesProjectile && animationStore.spriteMidPoint) {
+          setTimeout(() => {
+            runProjectileAnimation(animationStore.spriteMidPoint, playerOrigin);
+          }, attackDuration / 3); // Fire projectile 1/3 through the animation
+        }
+
+        setTimeout(() => {
+          setAnimationState("idle");
+          animationSequenceRef.current.isAttacking = false;
+          // Decrement the counter when animation completes
+          enemyStore.decrementAttackAnimations();
+        }, attackDuration);
+      } else if (disablePreMovement) {
+        // Special attack without movement
+        animationSequenceRef.current.attackPhase = 2; // Skip to attack phase
+        setAnimationState("attack_1");
+
+        const { duration: attackDuration } = calculateAdjustedFrameRate(
+          sets.attack_1.frames,
+        );
+
+        // Fire projectile if needed
+        if (usesProjectile && animationStore.spriteMidPoint) {
+          setTimeout(() => {
+            runProjectileAnimation(animationStore.spriteMidPoint, playerOrigin);
+          }, attackDuration / 3); // Fire projectile 1/3 through the animation
+        }
+
+        setTimeout(() => {
+          // Complete sequence
+          setAnimationState("idle");
+          animationSequenceRef.current.isAttacking = false;
+          animationSequenceRef.current.attackPhase = 0;
+          // Decrement the counter when animation completes
+          enemyStore.decrementAttackAnimations();
+        }, attackDuration);
+      } else {
+        // Standard attack with movement
+        // Phase 1: Move forward
+        animationSequenceRef.current.attackPhase = 1;
+        setAnimationState("move");
+
+        Animated.timing(animations.animations.attackAnim, {
+          toValue: -50,
+          duration: 300,
+          useNativeDriver: true,
+        }).start(({ finished }) => {
+          if (finished && animationSequenceRef.current.isAttacking) {
+            // Phase 2: Attack
+            animationSequenceRef.current.attackPhase = 2;
+            setAnimationState("attack_1");
+
+            const { duration: attackDuration } = calculateAdjustedFrameRate(
+              sets.attack_1.frames,
+            );
+
+            // Fire projectile if needed
+            if (usesProjectile && animationStore.spriteMidPoint) {
+              setTimeout(() => {
+                runProjectileAnimation(
+                  animationStore.spriteMidPoint,
+                  playerOrigin,
+                );
+              }, attackDuration / 3); // Fire projectile 1/3 through the animation
             }
-          },
-          onAttackEnd: () => {
-            if (!uiStore.reduceMotion) {
-              setAnimationState("move");
-            }
-          },
-          onComplete: () => setAnimationState("idle"),
+
+            setTimeout(() => {
+              if (animationSequenceRef.current.isAttacking) {
+                // Phase 3: Return
+                animationSequenceRef.current.attackPhase = 3;
+                setAnimationState("move");
+
+                Animated.timing(animations.animations.attackAnim, {
+                  toValue: 0,
+                  duration: 300,
+                  useNativeDriver: true,
+                }).start(({ finished }) => {
+                  if (finished) {
+                    // Complete sequence
+                    setAnimationState("idle");
+                    animationSequenceRef.current.isAttacking = false;
+                    animationSequenceRef.current.attackPhase = 0;
+                    // Decrement the counter when animation completes
+                    enemyStore.decrementAttackAnimations();
+                  }
+                });
+              } else {
+                // If the sequence was interrupted, still decrement the counter
+                enemyStore.decrementAttackAnimations();
+              }
+            }, attackDuration);
+          } else {
+            // If the animation was interrupted, still decrement the counter
+            enemyStore.decrementAttackAnimations();
+          }
         });
       }
-    }, [animationStore.attackDummy]);
+    };
 
+    // Handle attack animations
+    useEffect(() => {
+      if (animationStore.attackDummy !== 0) {
+        runAttackSequence();
+      }
+    }, [animationStore.attackDummy, enemyStore]);
+
+    // Handle dodge animations
     useEffect(() => {
       if (animationStore.dodgeDummy !== 0) {
-        animations.runDodgeAnimation();
+        // Don't start dodge if we're locked in another animation
+        if (
+          animationSequenceRef.current.isAnimationLocked ||
+          animationSequenceRef.current.isAttacking
+        ) {
+          return;
+        }
+
         setAnimationState("jump");
+        animations.runDodgeAnimation();
       }
     }, [animationStore.dodgeDummy]);
 
+    // Track health changes
     useEffect(() => {
       if (
         healthState.record &&
@@ -498,6 +709,91 @@ const EnemyDisplay = observer(
         }));
       }
     }, [enemy?.currentHealth]);
+
+    // Cleanup on unmount - ensure counters are decremented
+    useEffect(() => {
+      return () => {
+        if (animationSequenceRef.current.isAttacking) {
+          enemyStore.decrementAttackAnimations();
+        }
+      };
+    }, [enemyStore]);
+
+    // Calculate projectile animation styles
+    const getProjectileStyles = () => {
+      if (!animationStore.spriteMidPoint || !showProjectile) return {};
+
+      const startPos = animationStore.spriteMidPoint;
+      const targetPos = playerOrigin;
+
+      // Get projectile data
+      const projectileData = EnemyImageMap[enemy.sprite].effects.projectile;
+      const projectileWidth = projectileData.width || 32;
+      const projectileHeight = projectileData.height || 32;
+
+      // Calculate angle for rotation
+      const angle =
+        Math.atan2(targetPos.y - startPos.y, targetPos.x - startPos.x) *
+        (180 / Math.PI);
+
+      return {
+        position: "absolute",
+        width: projectileWidth,
+        height: projectileHeight,
+        transform: [
+          {
+            translateX: projectileAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [
+                startPos.x - projectileWidth / 2,
+                targetPos.x - projectileWidth / 2,
+              ],
+            }),
+          },
+          {
+            translateY: projectileAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [
+                startPos.y - projectileHeight / 2,
+                targetPos.y - projectileHeight / 2,
+              ],
+            }),
+          },
+          { rotate: `${angle}deg` },
+        ],
+        opacity: projectileAnim.interpolate({
+          inputRange: [0, 0.1, 0.9, 1],
+          outputRange: [0, 1, 1, 0],
+        }),
+        zIndex: 9000,
+        overflow: "hidden",
+      };
+    };
+
+    // Get projectile image style for frame animation
+    const getProjectileImageStyle = () => {
+      const projectileData = EnemyImageMap[enemy.sprite].effects.projectile;
+      const projectileWidth = projectileData.width || 32;
+      const projectileHeight = projectileData.height || 32;
+      const projectileFrames = projectileData.frames || 1;
+
+      return {
+        width: projectileWidth * projectileFrames,
+        height: projectileHeight,
+        left: -projectileFrame * projectileWidth,
+      };
+    };
+
+    // Check if enemy has a projectile animation
+    const hasProjectileAnimation = () => {
+      return (
+        enemy.sprite &&
+        EnemyImageMap[enemy.sprite] &&
+        EnemyImageMap[enemy.sprite].effects &&
+        EnemyImageMap[enemy.sprite].effects.projectile &&
+        EnemyImageMap[enemy.sprite].effects.projectile.anim
+      );
+    };
 
     return (
       <View style={[flex.rowEvenly, { flex: 1, alignItems: "center" }]}>
@@ -557,13 +853,45 @@ const EnemyDisplay = observer(
           <AnimatedSprite
             spriteSet={EnemyImageMap[enemy.sprite ?? "samurai_rice"]}
             currentAnimationState={animationState}
-            setCurrentAnimationState={setAnimationState}
+            setCurrentAnimationState={(newState) => {
+              // Only handle animation completion if we're not in an attack sequence
+              if (
+                newState === undefined &&
+                !animationSequenceRef.current.isAttacking
+              ) {
+                setAnimationState("idle");
+              }
+            }}
             positionSetter={(val) => animationStore.setSpriteMidPoint(val)}
           />
           {animationStore.dialogueString && (
-            <DialogueBox text={animationStore.dialogueString} />
+            <Animated.View
+              style={{
+                opacity: dialogueAnim,
+                transform: [
+                  {
+                    translateY: dialogueAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [10, 0],
+                    }),
+                  },
+                ],
+              }}
+            >
+              <DialogueBox text={animationStore.dialogueString} />
+            </Animated.View>
           )}
         </Animated.View>
+
+        {showProjectile && hasProjectileAnimation() && (
+          <Animated.View style={getProjectileStyles()}>
+            <Image
+              source={EnemyImageMap[enemy.sprite].effects.projectile.anim}
+              style={getProjectileImageStyle()}
+            />
+          </Animated.View>
+        )}
+
         <Animated.View
           style={[
             styles.textAnimationContainer,

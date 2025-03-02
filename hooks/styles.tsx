@@ -752,8 +752,6 @@ export const useStyles = () => {
       ...flex.columnCenter,
       minWidth: "40%",
       maxWidth: "60%",
-      top: "40%",
-      transform: [{ translateY: "-50%" }],
     } as const,
     textAnimationContainer: {
       position: "absolute",

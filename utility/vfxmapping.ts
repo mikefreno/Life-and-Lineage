@@ -174,7 +174,7 @@ export const VFXImageMap = {
     mirror: true,
   },
   bloodBurst: {
-    source: require("@/assets/vfx/blood/blood-cone.png"),
+    source: require("@/assets/vfx/blood/blood-burst.png"),
     frames: 6,
     height: 60,
     width: 60,
@@ -191,5 +191,23 @@ export const VFXImageMap = {
     height: 60,
     width: 60,
     rotate: -90,
+  },
+  arrow: {
+    source: require("@/assets/vfx/physical/arrow.png"),
+    frames: 4,
+    height: 30,
+    width: 30,
+  },
+  projectileHit: {
+    source: require("@/assets/vfx/physical/projectile-hit.png"),
+    frames: 4,
+    height: 48,
+    width: 48,
+  },
+  bloodSplash: {
+    source: require("@/assets/vfx/blood/blood-small.png"),
+    frames: 5,
+    height: 20,
+    width: 20,
   },
 };

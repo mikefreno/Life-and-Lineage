@@ -58,7 +58,7 @@
       "debuffs": [
         {
           "name": "burn",
-          "chance": 0.75
+          "chance": 1.0
         }
       ]
     },

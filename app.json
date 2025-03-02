@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Lineage",
+    "name": "Lineage-dev",
     "slug": "life-and-lineage",
     "version": "0.8.0",
     "orientation": "portrait",
@@ -13,7 +13,7 @@
     "ios": {
       "usesAppleSignIn": true,
       "supportsTablet": true,
-      "bundleIdentifier": "com.mikefrenodev.lineage",
+      "bundleIdentifier": "com.mikefrenodev.lineage-dev",
       "buildNumber": "1",
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true,

@@ -31,7 +31,8 @@ const MIN_RED = 20;
 const MAX_RED = 255;
 
 const DungeonScreen = observer(() => {
-  const { dungeonStore, uiStore } = useRootStore();
+  const root = useRootStore();
+  const { dungeonStore, uiStore } = root;
   const { dungeonInstances } = dungeonStore;
 
   const [sorted, setSorted] = useState<DungeonInstance[]>([]);
@@ -311,7 +312,10 @@ const DungeonScreen = observer(() => {
                 style={{ marginHorizontal: "auto", justifyContent: "center" }}
               >
                 {dungeonInstance.levels
-                  .filter((level) => level.unlocked || __DEV__)
+                  .filter(
+                    (level) =>
+                      level.unlocked || (__DEV__ && root.showDevDebugUI),
+                  )
                   .map((level, levelIdx) => (
                     <Pressable
                       key={levelIdx}

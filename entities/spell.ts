@@ -114,6 +114,9 @@ export class Spell {
   }
 
   public canBeUsed(user: PlayerCharacter) {
+    if (__DEV__) {
+      return true;
+    }
     if (user.isStunned) {
       return false;
     }
@@ -145,7 +148,7 @@ export class Spell {
     user: PlayerCharacter;
   }): { logString: string } {
     if (!this.canBeUsed(user)) {
-      return { logString: "failure" };
+      return { logString: "The spell fizzles out" };
     }
 
     user.useMana(this.manaCost);

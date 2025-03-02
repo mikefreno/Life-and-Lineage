@@ -1,5 +1,5 @@
 import { useRootStore } from "@/hooks/stores";
-import { VFXImageMap } from "@/utility/functions/vfxmapping";
+import { VFXImageMap } from "@/utility/vfxmapping";
 import { observer } from "mobx-react-lite";
 import React, { useRef, useCallback } from "react";
 import { ReactNode, useEffect, useState } from "react";
@@ -7,7 +7,8 @@ import { View, Animated, Easing } from "react-native";
 import { Image } from "expo-image";
 
 export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
-  const { uiStore, enemyStore, playerAnimationStore } = useRootStore();
+  const root = useRootStore();
+  const { uiStore, enemyStore, playerAnimationStore } = root;
 
   const [enemyAndPosList, setEnemyAndPosList] = useState<
     {
@@ -301,7 +302,7 @@ export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
   return (
     <View style={{ flex: 1 }}>
       {/* Debug dots */}
-      {__DEV__ && (
+      {__DEV__ && root.showDevDebugUI && (
         <>
           {enemyAndPosList.map((elem) => (
             <View

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { Image } from "expo-image";
-import { Animations, EnemyImageValueOption } from "../utility/enemyHelpers";
+import { EnemyImageValueOption } from "../utility/enemyHelpers";
 import { FPS } from "../stores/EnemyAnimationStore";
 import { useHeaderHeight } from "@react-navigation/elements";
 
@@ -29,6 +29,8 @@ export const AnimatedSprite = ({
   const frameCompletionCounter = useRef(0);
   const hasSpawnAnimationPlayed = useRef(false);
   const measurementAttempts = useRef(0);
+  const pendingAnimationChange = useRef<string | undefined>(undefined);
+  const pendingStateUpdate = useRef<(() => void) | null>(null);
 
   // Original sprite dimensions
   const spriteWidth = spriteSet.width;
@@ -45,6 +47,36 @@ export const AnimatedSprite = ({
       ? spriteSet.displayHeight
       : Math.max(150, spriteHeight);
 
+  // Get current animation's size override if it exists
+  const getCurrentAnimationSizeOverride = () => {
+    if (
+      activeAnimation in spriteSet.sets &&
+      spriteSet.sets[activeAnimation] &&
+      "sizeOverride" in spriteSet.sets[activeAnimation]
+    ) {
+      return spriteSet.sets[activeAnimation].sizeOverride;
+    }
+    return null;
+  };
+
+  // Get current animation's dimensions, accounting for size overrides
+  const getCurrentAnimationDimensions = () => {
+    const sizeOverride = getCurrentAnimationSizeOverride();
+    if (sizeOverride) {
+      return {
+        width: sizeOverride.width,
+        height: sizeOverride.height,
+      };
+    }
+    return {
+      width: spriteWidth,
+      height: spriteHeight,
+    };
+  };
+
+  // Get current animation dimensions
+  const currentDimensions = getCurrentAnimationDimensions();
+
   // Scale factors
   const scaleX = displayWidthActual / spriteWidth;
   const scaleY = displayHeightActual / spriteHeight;
@@ -52,32 +84,68 @@ export const AnimatedSprite = ({
   const mirrorTransform =
     "mirror" in spriteSet && spriteSet.mirror ? [{ scaleX: -1 }] : [];
 
+  // Handle animation state changes from props
+  useEffect(() => {
+    if (
+      currentAnimationState !== undefined &&
+      currentAnimationState !== activeAnimation
+    ) {
+      setActiveAnimation(currentAnimationState);
+      frameCompletionCounter.current = 0;
+      setCurrentFrame(0);
+    }
+  }, [currentAnimationState, activeAnimation]);
+
+  // Process any pending state updates
+  useEffect(() => {
+    if (pendingStateUpdate.current) {
+      pendingStateUpdate.current();
+      pendingStateUpdate.current = null;
+    }
+  });
+
+  // Main animation loop
   useEffect(() => {
     const runAnimation = () => {
       animationRef.current = setInterval(() => {
         setCurrentFrame((prevFrame) => {
-          const nextFrame =
-            (prevFrame + 1) %
-            (activeAnimation in spriteSet.sets &&
-            spriteSet.sets[activeAnimation]
+          const totalFrames =
+            activeAnimation in spriteSet.sets && spriteSet.sets[activeAnimation]
               ? spriteSet.sets[activeAnimation].frames
-              : spriteSet.sets.idle.frames);
+              : spriteSet.sets.idle.frames;
 
+          const nextFrame = (prevFrame + 1) % totalFrames;
+
+          // If we've reached the end of the animation
           if (nextFrame === 0) {
             frameCompletionCounter.current += 1;
 
+            // Schedule state update for next tick instead of during render
             if (
               activeAnimation !== "idle" &&
               currentAnimationState === undefined
             ) {
-              setActiveAnimation("idle");
+              pendingAnimationChange.current = "idle";
             }
           }
+
           return nextFrame;
         });
       }, 1000 / FPS);
     };
 
+    runAnimation();
+
+    return () => {
+      if (animationRef.current) {
+        clearInterval(animationRef.current);
+      }
+    };
+  }, [activeAnimation, currentAnimationState, FPS, spriteSet.sets]);
+
+  // Handle animation completion and state transitions
+  useEffect(() => {
+    // Special handling for spawn animation
     if (
       activeAnimation === "spawn" &&
       frameCompletionCounter.current > 0 &&
@@ -87,39 +155,36 @@ export const AnimatedSprite = ({
       setActiveAnimation("idle");
 
       if (setCurrentAnimationState) {
-        setCurrentAnimationState(undefined);
+        pendingStateUpdate.current = () => {
+          setCurrentAnimationState(undefined);
+        };
       }
       frameCompletionCounter.current = 0;
       return;
     }
 
-    if (currentAnimationState && currentAnimationState !== activeAnimation) {
-      setActiveAnimation(currentAnimationState);
-      frameCompletionCounter.current = 0;
-      setCurrentFrame(0);
-    }
-
+    // Handle animation completion
     if (frameCompletionCounter.current > 0 && activeAnimation !== "idle") {
       if (setCurrentAnimationState) {
-        setCurrentAnimationState(undefined);
+        pendingStateUpdate.current = () => {
+          setCurrentAnimationState(undefined);
+        };
       }
       setActiveAnimation("idle");
+      frameCompletionCounter.current = 0;
     }
 
-    runAnimation();
-
-    return () => {
-      if (animationRef.current) {
-        clearInterval(animationRef.current);
+    // Handle pending animation changes
+    if (pendingAnimationChange.current !== undefined) {
+      setActiveAnimation(pendingAnimationChange.current);
+      if (setCurrentAnimationState) {
+        pendingStateUpdate.current = () => {
+          setCurrentAnimationState(pendingAnimationChange.current);
+        };
       }
-    };
-  }, [
-    activeAnimation,
-    currentAnimationState,
-    FPS,
-    setCurrentAnimationState,
-    spriteSet.sets,
-  ]);
+      pendingAnimationChange.current = undefined;
+    }
+  }, [activeAnimation, currentFrame, setCurrentAnimationState]);
 
   const parentRef = useRef<View>(null);
   const headerHeight = useHeaderHeight();
@@ -162,11 +227,11 @@ export const AnimatedSprite = ({
       ref={parentRef}
       onLayout={handleLayout}
       style={{
-        width: spriteWidth,
-        height: spriteHeight,
+        width: currentDimensions.width,
+        height: currentDimensions.height,
         transform: [{ scale }, ...mirrorTransform],
         overflow: "hidden",
-        top: -spriteHeight / 2 + topOffset,
+        top: -currentDimensions.height / 2 + topOffset,
         left: leftOffset,
       }}
     >
@@ -174,13 +239,13 @@ export const AnimatedSprite = ({
         style={{
           position: "absolute",
           width:
-            spriteWidth *
+            currentDimensions.width *
             (activeAnimation in spriteSet.sets &&
             spriteSet.sets[activeAnimation]
               ? spriteSet.sets[activeAnimation].frames
               : spriteSet.sets.idle.frames),
-          height: spriteHeight,
-          left: -currentFrame * spriteWidth,
+          height: currentDimensions.height,
+          left: -currentFrame * currentDimensions.width,
         }}
         source={
           activeAnimation in spriteSet.sets && spriteSet.sets[activeAnimation]

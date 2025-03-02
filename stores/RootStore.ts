@@ -41,11 +41,14 @@ export class RootStore {
   atDeathScreen: boolean = false;
   startingNewGame: boolean = false;
 
+  //these only are used in dev builds
+  showDevDebugUI: boolean = false;
+  includeDevAttacks: boolean = false;
   devActions: {
     action: (value?: number) => void;
     name: string;
-    max: number;
-    step: number;
+    max?: number;
+    step?: number;
     min?: number | undefined;
     initVal?: number | undefined;
   }[];
@@ -155,6 +158,14 @@ export class RootStore {
             action: () => this.playerState?._unlockAllSpells(),
             name: "Unlock All Spells",
           },
+          {
+            action: () => this.toggleIncludeDevAttacks(),
+            name: "Toggle Developer Attacks",
+          },
+          {
+            action: () => this.toggleDebugUI(),
+            name: "Toggle Debug UI",
+          },
         ]
       : [];
 
@@ -163,6 +174,10 @@ export class RootStore {
       atDeathScreen: observable,
       startingNewGame: observable,
       devActions: observable,
+      includeDevAttacks: observable,
+      showDevDebugUI: observable,
+      toggleIncludeDevAttacks: action,
+      toggleDebugUI: action,
       hitDeathScreen: action,
       clearDeathScreen: action,
       setDevActions: action,
@@ -195,7 +210,7 @@ export class RootStore {
 
   setDevActions(
     actions: {
-      action: (value: number) => void;
+      action: (value?: number) => void;
       name: string;
       max: number;
       step: number;
@@ -204,6 +219,18 @@ export class RootStore {
     }[],
   ) {
     this.devActions = actions;
+  }
+
+  toggleIncludeDevAttacks() {
+    if (__DEV__) {
+      this.includeDevAttacks = !this.includeDevAttacks;
+    }
+  }
+
+  toggleDebugUI() {
+    if (__DEV__) {
+      this.showDevDebugUI = !this.showDevDebugUI;
+    }
   }
 
   async newGame(newPlayer: PlayerCharacter) {

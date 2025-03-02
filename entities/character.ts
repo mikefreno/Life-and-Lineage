@@ -653,7 +653,7 @@ export class PlayerCharacter extends Character {
         stats: { [Modifier.PhysicalDamage]: 1 },
         baseValue: 0,
         itemClass: ItemClassType.Melee,
-        attacks: __DEV__ ? ["punch", "dev punch"] : ["punch"],
+        attacks: ["punch"],
         root,
       }),
       offHand: null,
@@ -1619,7 +1619,7 @@ export class PlayerCharacter extends Character {
       suffix: null,
       itemClass: ItemClassType.Melee,
       root: this.root,
-      attacks: __DEV__ ? ["punch", "dev punch"] : ["punch"],
+      attacks: ["punch"],
     });
   }
 
@@ -2187,19 +2187,31 @@ export class PlayerCharacter extends Character {
   }
   //----------------------------------Physical Combat----------------------------------//
   get weaponAttacks() {
-    if (__DEV__) {
+    if (__DEV__ && this.root.includeDevAttacks) {
       const fullHeal = new Attack({
         name: "DevHeal",
         user: this,
         selfDamage: -9999,
       });
-      let attacks = [fullHeal, ...this.equipment.mainHand.attachedAttacks];
+      const devPunch = new Attack({
+        name: "DevPunch",
+        targets: "single",
+        hitChance: 1.0,
+        damageMult: 10000.0,
+        user: this,
+      });
+      let attacks = [
+        fullHeal,
+        devPunch,
+        ...this.equipment.mainHand.attachedAttacks,
+      ];
       const spells = this.equipment.mainHand.providedSpells;
       if (spells) {
         return [...attacks, ...spells];
       }
       return attacks;
     }
+
     const attacks = this.equipment.mainHand.attachedAttacks;
     const spells = this.equipment.mainHand.providedSpells ?? [];
     return [...attacks, ...spells];

@@ -153,8 +153,8 @@
     }
   },
   {
-    "name": "skeleton archer",
-    "sprite": "skeleton",
+    "name": "skeleton mage",
+    "sprite": "skeleton_mage",
     "beingType": "undead",
     "sanity": null,
     "healthRange": {

@@ -6,12 +6,6 @@
     "damageMult": 1.0
   },
   {
-    "name": "dev punch",
-    "targets": "single",
-    "hitChance": 1.0,
-    "damageMult": 10000.0
-  },
-  {
     "name": "hit",
     "targets": "single",
     "hitChance": 1.0,
@@ -87,7 +81,21 @@
     "name": "shoot",
     "targets": "single",
     "hitChance": 1.0,
-    "damageMult": 1.0
+    "damageMult": 1.0,
+    "animation": {
+      "chain": {
+        "0": {
+          "sprite": "arrow",
+          "style": "missile",
+          "position": "enemy"
+        },
+        "1": {
+          "sprite": "projectileHit",
+          "style": "static",
+          "position": "enemy"
+        }
+      }
+    }
   },
   {
     "name": "rooting shot",
