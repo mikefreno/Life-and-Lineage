@@ -111,10 +111,6 @@ export class DungeonStore {
       leaveSpecialEncounterRoom: action,
     });
 
-    if (__DEV__) {
-      this._openAllInstances();
-    }
-
     reaction(
       () => this.currentInstance?.id,
       (instanceId) => {
@@ -474,7 +470,7 @@ export class DungeonStore {
     }
   }
 
-  private _openAllInstances() {
+  _openAllInstances() {
     if (!__DEV__) return;
     const currentNames = this.dungeonInstances.map((inst) => inst.name);
     const instancesToUnlock = dungeonsJSON.map((json) => {

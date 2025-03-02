@@ -9,6 +9,10 @@ export class EnemyAnimationStore {
   dodgeDummy: number = 0;
   dialogueString: string | undefined = undefined;
   dialogueDummy: number = 0;
+  spriteMidPoint: {
+    x: number;
+    y: number;
+  } | null = null;
   root: RootStore;
 
   constructor({ root }: { root: RootStore }) {
@@ -19,6 +23,8 @@ export class EnemyAnimationStore {
       attackDummy: observable,
       textDummy: observable,
       dodgeDummy: observable,
+      spriteMidPoint: observable,
+      setSpriteMidPoint: action,
       setTextString: action,
       triggerAttack: action,
       triggerText: action,
@@ -28,6 +34,10 @@ export class EnemyAnimationStore {
       setDialogueString: action,
       triggerDialogue: action,
     });
+  }
+
+  setSpriteMidPoint(pos: { x: number; y: number }) {
+    this.spriteMidPoint = pos;
   }
 
   setDialogueString(text: string | undefined) {

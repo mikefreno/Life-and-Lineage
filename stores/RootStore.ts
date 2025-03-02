@@ -42,7 +42,7 @@ export class RootStore {
   startingNewGame: boolean = false;
 
   devActions: {
-    action: (value: number) => void;
+    action: (value?: number) => void;
     name: string;
     max: number;
     step: number;
@@ -146,6 +146,14 @@ export class RootStore {
             max: 1_000,
             initVal: 0,
             step: 10,
+          },
+          {
+            action: () => this.dungeonStore._openAllInstances(),
+            name: "Unlock All Dungeons",
+          },
+          {
+            action: () => this.playerState?._unlockAllSpells(),
+            name: "Unlock All Spells",
           },
         ]
       : [];

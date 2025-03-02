@@ -10,6 +10,11 @@
         "blood orb"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "bloodCone",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -24,6 +29,11 @@
         "consume blood orb"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "bloodBust",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -38,6 +48,11 @@
         "consume blood orb"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "bloodBust",
+      "style": "static",
+      "position": "self"
     }
   },
   {

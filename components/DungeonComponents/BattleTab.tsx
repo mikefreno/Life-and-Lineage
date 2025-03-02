@@ -266,112 +266,107 @@ const BattleTab = observer(
                   renderItem={({ item: attackOrSpell, index }) => (
                     <>
                       <View
-                        style={
+                        style={[
+                          styles.attackCardBase,
                           attackOrSpell instanceof Spell && {
                             backgroundColor:
                               elementalColorMap[attackOrSpell.element].light,
-                            borderColor:
-                              elementalColorMap[attackOrSpell.element].dark,
-                          }
-                        }
+                          },
+                        ]}
                       >
-                        <View style={styles.attackCardBase}>
-                          <View style={styles.columnCenter}>
-                            <Pressable
-                              onPress={() => setAttackDetails(attackOrSpell)}
-                            >
-                              <Text
-                                style={[
-                                  text.xl,
-                                  {
-                                    color:
-                                      attackOrSpell instanceof Spell
-                                        ? elementalColorMap[
-                                            attackOrSpell.element
-                                          ].dark
-                                        : uiStore.colorScheme == "dark"
-                                        ? "#fafafa"
-                                        : "#09090b",
-                                  },
-                                ]}
-                              >
-                                {toTitleCase(attackOrSpell.name)}
-                              </Text>
-                              {attackOrSpell instanceof Attack &&
-                              attackOrSpell.baseHitChance ? (
-                                <Text style={text.lg}>{`${
-                                  attackOrSpell.baseHitChance * 100
-                                }% hit chance`}</Text>
-                              ) : (
-                                attackOrSpell instanceof Spell && (
-                                  <View style={{ flexDirection: "row" }}>
-                                    <Text
-                                      style={{
-                                        color:
-                                          elementalColorMap[
-                                            attackOrSpell.element
-                                          ].dark,
-                                      }}
-                                    >
-                                      {attackOrSpell.manaCost}
-                                    </Text>
-                                    <View
-                                      style={{
-                                        marginVertical: "auto",
-                                        paddingLeft: 4,
-                                      }}
-                                    >
-                                      <Energy
-                                        height={14}
-                                        width={14}
-                                        color={
-                                          uiStore.colorScheme == "dark"
-                                            ? "#2563eb"
-                                            : undefined
-                                        }
-                                      />
-                                    </View>
-                                  </View>
-                                )
-                              )}
-                            </Pressable>
-                          </View>
+                        <View style={styles.columnCenter}>
                           <Pressable
-                            disabled={
-                              !attackOrSpell.canBeUsed ||
-                              enemyStore.attackAnimationsOnGoing
-                            }
-                            onPress={() => attackHandler(attackOrSpell)}
-                            style={[
-                              styles.actionButton,
-                              {
-                                opacity:
-                                  !attackOrSpell.canBeUsed ||
-                                  enemyStore.attackAnimationsOnGoing
-                                    ? 0.5
-                                    : 1,
-                                backgroundColor:
-                                  "element" in attackOrSpell
-                                    ? elementalColorMap[attackOrSpell.element]
-                                        .dark
-                                    : uiStore.colorScheme == "light"
-                                    ? "#d4d4d8"
-                                    : "#27272a",
-                              },
-                            ]}
+                            onPress={() => setAttackDetails(attackOrSpell)}
                           >
-                            <Text style={text.xl}>
-                              {playerState.isStunned
-                                ? "Stunned!"
-                                : attackOrSpell instanceof Spell
-                                ? playerState.currentMana >=
-                                  attackOrSpell.manaCost
-                                  ? "Cast"
-                                  : "Not Enough Mana"
-                                : "Attack"}
+                            <Text
+                              style={[
+                                text.xl,
+                                {
+                                  color:
+                                    attackOrSpell instanceof Spell
+                                      ? elementalColorMap[attackOrSpell.element]
+                                          .dark
+                                      : uiStore.colorScheme == "dark"
+                                      ? "#fafafa"
+                                      : "#09090b",
+                                },
+                              ]}
+                            >
+                              {toTitleCase(attackOrSpell.name)}
                             </Text>
+                            {attackOrSpell instanceof Attack &&
+                            attackOrSpell.baseHitChance ? (
+                              <Text style={text.lg}>{`${
+                                attackOrSpell.baseHitChance * 100
+                              }% hit chance`}</Text>
+                            ) : (
+                              attackOrSpell instanceof Spell && (
+                                <View style={{ flexDirection: "row" }}>
+                                  <Text
+                                    style={{
+                                      color:
+                                        elementalColorMap[attackOrSpell.element]
+                                          .dark,
+                                    }}
+                                  >
+                                    {attackOrSpell.manaCost}
+                                  </Text>
+                                  <View
+                                    style={{
+                                      marginVertical: "auto",
+                                      paddingLeft: 4,
+                                    }}
+                                  >
+                                    <Energy
+                                      height={14}
+                                      width={14}
+                                      color={
+                                        uiStore.colorScheme == "dark"
+                                          ? "#2563eb"
+                                          : undefined
+                                      }
+                                    />
+                                  </View>
+                                </View>
+                              )
+                            )}
                           </Pressable>
                         </View>
+                        <Pressable
+                          disabled={
+                            !attackOrSpell.canBeUsed ||
+                            enemyStore.attackAnimationsOnGoing
+                          }
+                          onPress={() => attackHandler(attackOrSpell)}
+                          style={[
+                            styles.actionButton,
+                            {
+                              opacity:
+                                !attackOrSpell.canBeUsed ||
+                                enemyStore.attackAnimationsOnGoing
+                                  ? 0.5
+                                  : 1,
+                              backgroundColor:
+                                "element" in attackOrSpell
+                                  ? elementalColorMap[attackOrSpell.element]
+                                      .dark
+                                  : uiStore.colorScheme == "light"
+                                  ? "#d4d4d8"
+                                  : "#27272a",
+                            },
+                          ]}
+                        >
+                          <Text style={text.xl}>
+                            {playerState.isStunned
+                              ? "Stunned!"
+                              : attackOrSpell instanceof Spell
+                              ? playerState.currentMana >=
+                                attackOrSpell.manaCost
+                                ? "Cast"
+                                : "Not Enough Mana"
+                              : "Attack"}
+                          </Text>
+                        </Pressable>
                       </View>
                       {index == combinedData.length - 1 && (
                         <ThemedView style={styles.attackCardBase}>

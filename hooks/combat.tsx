@@ -9,6 +9,8 @@ import { Attack } from "../entities/attack";
 import { getMagnitude } from "../utility/functions/conditions";
 import { useIsFocused } from "@react-navigation/native";
 import { Spell } from "../entities/spell";
+import { VFXImageMap } from "@/utility/functions/vfxmapping";
+import { FPS } from "@/stores/EnemyAnimationStore";
 
 export const useEnemyManagement = () => {
   const root = useRootStore();
@@ -210,7 +212,8 @@ export const useEnemyManagement = () => {
 };
 
 export const useCombatActions = () => {
-  const { enemyStore, playerState, dungeonStore } = useRootStore();
+  const { enemyStore, playerState, dungeonStore, playerAnimationStore } =
+    useRootStore();
   const { enemyTurn, enemyDeathHandler } = useEnemyManagement();
   const isFocused = useIsFocused();
 
@@ -297,24 +300,40 @@ export const useCombatActions = () => {
     }) => {
       if (!playerState || !isFocused) return;
 
-      const logString = handleAttackResult(attackOrSpell, [target]);
-      dungeonStore.addLog(logString);
+      // Function to continue attack flow after animation
+      const continueAttackFlow = () => {
+        const logString = handleAttackResult(attackOrSpell, [target]);
+        dungeonStore.addLog(logString);
 
-      // Check if target died and handle it
-      const targetEnemy = enemyStore.enemies.find((e) => e.id === target.id);
-      if (targetEnemy && targetEnemy.currentHealth <= 0) {
-        enemyDeathHandler(targetEnemy);
+        // Check if target died and handle it
+        const targetEnemy = enemyStore.enemies.find((e) => e.id === target.id);
+        if (targetEnemy && targetEnemy.currentHealth <= 0) {
+          enemyDeathHandler(targetEnemy);
+        }
+
+        setTimeout(() => {
+          playerMinionsTurn(() => {
+            setTimeout(() => {
+              if (enemyStore.enemies.length > 0) {
+                enemyTurn();
+              }
+            }, 500);
+          });
+        }, 500);
+      };
+
+      // If there's an animation, set it up and continue after it completes
+      if (attackOrSpell.animation) {
+        playerAnimationStore
+          .setAnimation(attackOrSpell.animation, target.id)
+          .then(() => {
+            // Animation completed, continue with attack flow
+            continueAttackFlow();
+          });
+      } else {
+        // No animation, continue immediately
+        continueAttackFlow();
       }
-
-      setTimeout(() => {
-        playerMinionsTurn(() => {
-          setTimeout(() => {
-            if (enemyStore.enemies.length > 0) {
-              enemyTurn();
-            }
-          }, 500);
-        });
-      }, 500);
     },
     [
       enemyStore.enemies,
@@ -322,6 +341,7 @@ export const useCombatActions = () => {
       handleAttackResult,
       playerMinionsTurn,
       enemyTurn,
+      playerAnimationStore,
     ],
   );
 

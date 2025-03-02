@@ -1,3 +1,4 @@
+import { ColorValue } from "react-native";
 import type { PlayerCharacter } from "../entities/character";
 import type { Condition } from "../entities/conditions";
 import type { Enemy, Minion } from "../entities/creatures";
@@ -478,9 +479,12 @@ export type MerchantType =
   | "fletcher"
   | "apothecary"
   | "librarian";
-export type PlayerAnimationSet = {
-  sprite: VFXImageOptions;
-  style: "static" | "missile" | "span";
-  position: "enemy" | "field" | "self";
-  retrigger?: boolean;
-};
+
+export type PlayerAnimationSet =
+  | {
+      sprite: VFXImageOptions;
+      style: "static" | "missile" | "span";
+      position: "enemy" | "field" | "self";
+      retrigger?: boolean;
+    }
+  | { glow: ColorValue; position: "enemy" | "field" | "self" };

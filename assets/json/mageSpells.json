@@ -63,7 +63,7 @@
       ]
     },
     "animation": {
-      "sprite": "fireDust",
+      "sprite": "flameDust",
       "style": "static",
       "position": "enemy"
     }
@@ -478,6 +478,11 @@
           "chance": 0.5
         }
       ]
+    },
+    "animation": {
+      "sprite": "lightning",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -500,6 +505,11 @@
           "chance": 0.5
         }
       ]
+    },
+    "animation": {
+      "sprite": "thunderClap",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -522,10 +532,15 @@
           "chance": 0.5
         }
       ]
+    },
+    "animation": {
+      "sprite": "lightningRay",
+      "style": "span",
+      "position": "self"
     }
   },
   {
-    "name": "air blades",
+    "name": "wind blades",
     "element": "air",
     "target": "single",
     "type": "offense",
@@ -544,6 +559,11 @@
           "chance": 0.75
         }
       ]
+    },
+    "animation": {
+      "sprite": "windBlades",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -560,6 +580,11 @@
         "damaging to hit"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "groundSlash",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -574,6 +599,11 @@
       "damage": 125,
       "buffs": null,
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "tornado",
+      "style": "missile",
+      "position": "enemy"
     }
   },
   {
@@ -609,6 +639,11 @@
           "chance": 0.10
         }
       ]
+    },
+    "animation": {
+      "sprite": "rockDrop",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -655,7 +690,7 @@
     }
   },
   {
-    "name": "bolder throw",
+    "name": "rock bullet",
     "element": "earth",
     "proficiencyNeeded": "expert",
     "manaCost": 85,
@@ -668,6 +703,11 @@
           "chance": 0.75
         }
       ]
+    },
+    "animation": {
+      "sprite": "rockBullet",
+      "style": "missile",
+      "position": "enemy"
     }
   },
   {

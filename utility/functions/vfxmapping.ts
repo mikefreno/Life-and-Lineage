@@ -15,9 +15,9 @@ export const VFXImageMap = {
   },
   flameDust: {
     source: require("@/assets/vfx/fire/flame-and-dust.png"),
-    frames: 11,
-    height: 96,
-    width: 95,
+    frames: 31,
+    height: 75,
+    width: 47,
   },
   flameWall: {
     source: require("@/assets/vfx/fire/wall-burst.png"),
@@ -42,7 +42,7 @@ export const VFXImageMap = {
     frames: 8,
     height: 192,
     width: 64,
-    rotate: -135,
+    rotate: -90,
   },
   iceBlock: {
     source: require("@/assets/vfx/ice/floating-block.png"),
@@ -130,10 +130,66 @@ export const VFXImageMap = {
     height: 48,
     width: 48,
   },
+  lightningRay: {
+    source: require("@/assets/vfx/lightning/long-bolt.png"),
+    frames: 5,
+    height: 48,
+    width: 144,
+  },
+  windBlades: {
+    source: require("@/assets/vfx/air/blades.png"),
+    frames: 6,
+    height: 64,
+    width: 64,
+  },
+  groundSlash: {
+    source: require("@/assets/vfx/air/ground-slash.png"),
+    frames: 6,
+    height: 64,
+    width: 80,
+  },
   tornado: {
     source: require("@/assets/vfx/air/tornado.png"),
     frames: 17,
     height: 143,
     width: 128,
+  },
+  rockDrop: {
+    source: require("@/assets/vfx/earth/rock-drop.png"),
+    frames: 13,
+    height: 160,
+    width: 96,
+  },
+  rockBullet: {
+    source: require("@/assets/vfx/earth/rock-bullet.png"),
+    frames: 14,
+    height: 160,
+    width: 192,
+  },
+  bloodCone: {
+    source: require("@/assets/vfx/blood/blood-cone.png"),
+    frames: 8,
+    height: 48,
+    width: 48,
+    mirror: true,
+  },
+  bloodBurst: {
+    source: require("@/assets/vfx/blood/blood-cone.png"),
+    frames: 6,
+    height: 60,
+    width: 60,
+  },
+  bloodLongBolts: {
+    source: require("@/assets/vfx/blood/long-bolt.png"),
+    frames: 6,
+    height: 111,
+    width: 144,
+  },
+  bloodSimpleBolts: {
+    source: require("@/assets/vfx/blood/simple-bolts.png"),
+    frames: 6,
+    height: 60,
+    width: 60,
+    rotate: -90,
   },
 };

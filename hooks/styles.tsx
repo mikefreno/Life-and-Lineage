@@ -801,6 +801,7 @@ export const useStyles = () => {
       shadowOffset: { width: 0, height: 2 } as const,
       shadowOpacity: 0.25,
       shadowRadius: 3.84,
+      borderColor: theme.border,
       elevation: 5,
     } as const,
     investmentButton: {

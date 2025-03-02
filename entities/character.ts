@@ -1878,6 +1878,20 @@ export class PlayerCharacter extends Character {
     }
     this.learningSpells = newLearningState;
   }
+  _unlockAllSpells() {
+    if (__DEV__) {
+      let spellList;
+      if (this.playerClass == "paladin") {
+        spellList = paladinSpells;
+      } else if (this.playerClass == "necromancer") {
+        spellList = necroSpells;
+      } else if (this.playerClass == "ranger") {
+        spellList = rangerSpells;
+      } else spellList = mageSpells;
+
+      this.knownSpells = spellList.map((spell) => spell.name);
+    }
+  }
   //----------------------------------Relationships----------------------------------//
   public askForPartner(character: Character) {
     if (character.affection > 75) {

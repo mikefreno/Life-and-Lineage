@@ -161,6 +161,13 @@
     "baseValue": 100000
   },
   {
+    "name": "book of wind blades",
+    "type": "spell",
+    "teaches": "wind blades",
+    "icon": "Book_2",
+    "baseValue": 150000
+  },
+  {
     "name": "book of gale",
     "type": "spell",
     "teaches": "surrounding gale",
@@ -210,9 +217,9 @@
     "baseValue": 50000
   },
   {
-    "name": "book of bolder throw",
+    "name": "book of rock bullet",
     "type": "spell",
-    "teaches": "bolder throw",
+    "teaches": "rock bullet",
     "icon": "Book_2",
     "baseValue": 100000
   },

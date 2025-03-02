@@ -285,11 +285,11 @@ const ActionSliders = ({
   actions,
 }: {
   actions: {
-    action: (value: number) => void | undefined;
+    action: (value?: number) => void | undefined;
     name: string;
     min?: number;
-    max: number;
-    step: number;
+    max?: number;
+    step?: number;
     initVal?: number;
   }[];
 }) => {
@@ -348,47 +348,56 @@ const ActionSliders = ({
                 </View>
                 {expanded && (
                   <>
-                    <Text style={{ textAlign: "center", marginVertical: 8 }}>
-                      Value: {sliderValue.toFixed(1)} / {action.max}
-                    </Text>
+                    {action.min || action.max ? (
+                      <>
+                        <Text
+                          style={{ textAlign: "center", marginVertical: 8 }}
+                        >
+                          Value: {sliderValue.toFixed(1)} / {action.max}
+                        </Text>
 
-                    {/* Slider with step markers */}
-                    <View style={{ marginHorizontal: 10 }}>
-                      <Slider
-                        minimumValue={action.min ?? 0}
-                        maximumValue={action.max}
-                        value={sliderValue}
-                        onValueChange={(val) => {
-                          setSliderValue(val);
-                        }}
-                        step={action.step} // Add step prop if your actions have defined steps
-                      />
+                        {/* Slider with step markers */}
+                        <View style={{ marginHorizontal: 10 }}>
+                          <Slider
+                            minimumValue={action.min ?? 0}
+                            maximumValue={action.max}
+                            value={sliderValue}
+                            onValueChange={(val) => {
+                              setSliderValue(val);
+                            }}
+                            step={action.step} // Add step prop if your actions have defined steps
+                          />
 
-                      {/* Step markers */}
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          marginTop: 5,
-                          paddingHorizontal: 10,
-                        }}
-                      >
-                        {steps.map((step, stepIdx) => (
-                          <View key={stepIdx} style={{ alignItems: "center" }}>
-                            <View
-                              style={{
-                                width: 2,
-                                height: 8,
-                                backgroundColor: "#888",
-                              }}
-                            />
-                            <Text style={{ fontSize: 10 }}>
-                              {step.toFixed(0)}
-                            </Text>
+                          {/* Step markers */}
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              justifyContent: "space-between",
+                              marginTop: 5,
+                              paddingHorizontal: 10,
+                            }}
+                          >
+                            {steps.map((step, stepIdx) => (
+                              <View
+                                key={stepIdx}
+                                style={{ alignItems: "center" }}
+                              >
+                                <View
+                                  style={{
+                                    width: 2,
+                                    height: 8,
+                                    backgroundColor: "#888",
+                                  }}
+                                />
+                                <Text style={{ fontSize: 10 }}>
+                                  {step.toFixed(0)}
+                                </Text>
+                              </View>
+                            ))}
                           </View>
-                        ))}
-                      </View>
-                    </View>
+                        </View>
+                      </>
+                    ) : null}
 
                     <GenericRaisedButton
                       onPress={() => action.action(sliderValue)}

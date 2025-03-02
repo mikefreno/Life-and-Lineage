@@ -7,7 +7,12 @@ import {
 import { toTitleCase, rollD20, wait } from "../utility/functions/misc";
 import { PlayerCharacter } from "./character";
 import { Enemy, Minion } from "./creatures";
-import { AttackUse, ItemClassType, Modifier } from "../utility/types";
+import {
+  AttackUse,
+  ItemClassType,
+  Modifier,
+  PlayerAnimationSet,
+} from "../utility/types";
 import AttackDetails from "../components/AttackDetails";
 import { Condition } from "./conditions";
 import { useStyles } from "../hooks/styles";
@@ -42,6 +47,7 @@ interface AttackFields {
   summons?: string[];
   uses?: number;
   user: PlayerCharacter | Enemy | Minion;
+  animation?: PlayerAnimationSet;
 }
 
 /**
@@ -67,6 +73,7 @@ export class Attack {
   summons: string[];
   uses: number | null; // mainly for enemies, attacks / heals that have limited uses (balance)
   user: PlayerCharacter | Enemy | Minion;
+  animation: PlayerAnimationSet | undefined;
 
   constructor({
     name,
@@ -83,6 +90,7 @@ export class Attack {
     hits = 1,
     uses,
     user,
+    animation,
   }: AttackFields) {
     this.name = name;
     this.energyCost = energyCost;
@@ -98,6 +106,7 @@ export class Attack {
     this.debuffStrings = debuffs;
     this.summons = summons;
     this.user = user;
+    this.animation = animation;
   }
 
   get buffs(): Condition[] {

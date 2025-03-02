@@ -4,6 +4,7 @@ import { wait, toTitleCase, rollD20 } from "../utility/functions/misc";
 import {
   Element,
   MasteryLevel,
+  PlayerAnimationSet,
   StringToElement,
   StringToMastery,
 } from "../utility/types";
@@ -32,12 +33,7 @@ interface SpellFields {
     selfDamage?: number | null | undefined;
     sanityDamage?: number | undefined;
   };
-  animation: {
-    sprite: VFXImageOptions;
-    style: "static" | "missile" | "span";
-    position: "enemy" | "field" | "self";
-    retrigger?: boolean;
-  };
+  animation: PlayerAnimationSet;
 }
 
 /**
@@ -61,12 +57,7 @@ export class Spell {
   debuffs: { name: string; chance: number }[];
   summons: string[];
   rangerPet: string | undefined;
-  animation: {
-    sprite: VFXImageOptions;
-    style: "static" | "missile" | "span";
-    position: "enemy" | "field" | "self";
-    retrigger?: boolean;
-  };
+  animation?: PlayerAnimationSet;
 
   constructor({
     name,

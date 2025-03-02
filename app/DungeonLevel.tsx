@@ -35,6 +35,7 @@ import { Image } from "expo-image";
 import { useStyles } from "../hooks/styles";
 import { reaction } from "mobx";
 import { ScreenShaker } from "@/components/ScreenShaker";
+import { VFXWrapper } from "@/components/VFXWrapper";
 
 const DungeonLevelScreen = observer(() => {
   const { enemyStore, dungeonStore, uiStore, audioStore } = useRootStore();
@@ -237,7 +238,11 @@ const DungeonLevelScreen = observer(() => {
               />
             </View>
           ) : inCombat ? (
-            <DungeonEnemyDisplay />
+            <>
+              <VFXWrapper>
+                <DungeonEnemyDisplay />
+              </VFXWrapper>
+            </>
           ) : (
             <DungeonMapRender />
           )}

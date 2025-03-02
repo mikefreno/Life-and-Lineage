@@ -14,7 +14,7 @@ import {
 import { useRootStore } from "../../hooks/stores";
 import { AnimatedSprite } from "../AnimatedSprite";
 import { EnemyImageMap } from "../../utility/enemyHelpers";
-import { flex, text, tw, tw_base, useStyles } from "../../hooks/styles";
+import { flex, text, tw_base, useStyles } from "../../hooks/styles";
 
 const calculateAdjustedFrameRate = (
   frames: number,
@@ -306,7 +306,6 @@ const DungeonEnemyDisplay = observer(() => {
   return (
     <View
       style={{
-        ...flex.rowEvenly,
         flex: 1,
       }}
     >
@@ -556,9 +555,10 @@ const EnemyDisplay = observer(
           }}
         >
           <AnimatedSprite
-            spriteSet={EnemyImageMap[enemy.sprite]}
+            spriteSet={EnemyImageMap[enemy.sprite ?? "samurai_rice"]}
             currentAnimationState={animationState}
             setCurrentAnimationState={setAnimationState}
+            positionSetter={(val) => animationStore.setSpriteMidPoint(val)}
           />
           {animationStore.dialogueString && (
             <DialogueBox text={animationStore.dialogueString} />
