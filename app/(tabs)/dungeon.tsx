@@ -298,7 +298,7 @@ const DungeonScreen = observer(() => {
             height: `${100 * sorted.length}%`,
             paddingHorizontal: 12,
           }}
-          style={{ marginTop: -96 }}
+          style={{ marginTop: -(headerHeight + blurHeaderHeight) }}
         >
           {sorted.map((dungeonInstance, dungeonInstanceIdx) => (
             <ThemedCard
@@ -312,10 +312,7 @@ const DungeonScreen = observer(() => {
                 style={{ marginHorizontal: "auto", justifyContent: "center" }}
               >
                 {dungeonInstance.levels
-                  .filter(
-                    (level) =>
-                      level.unlocked || (__DEV__ && root.showDevDebugUI),
-                  )
+                  .filter((level) => level.unlocked || __DEV__)
                   .map((level, levelIdx) => (
                     <Pressable
                       key={levelIdx}

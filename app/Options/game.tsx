@@ -93,10 +93,10 @@ export default function GameSettings() {
                 onPress={() => {
                   vibration({ style: "warning" });
                   setLoading(true);
-                  tutorialStore.resetTutorialState(() => {
+                  tutorialStore.resetTutorialState(async () => {
                     setShowTutorialResetConfirm(false);
                     setLoading(false);
-                    router.dismissAll();
+                    await expo.reloadAppAsync("tutorial reset");
                   });
                 }}
                 style={styles.tutorialResetButton}

@@ -60,7 +60,6 @@ export default function GenericModal({
   isCheckPointModal = false,
   ...props
 }: GenericModalProps) {
-  const height = Dimensions.get("screen").height;
   const root = useRootStore();
   const { uiStore } = root;
   let { modalShowing, colorScheme } = uiStore;
@@ -99,7 +98,7 @@ export default function GenericModal({
       onBackButtonPress={backFunction}
       statusBarTranslucent={true}
       coverScreen={true}
-      deviceHeight={height}
+      deviceHeight={uiStore.dimensions.height}
       style={style}
       {...props}
     >

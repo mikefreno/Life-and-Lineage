@@ -98,7 +98,7 @@
           ],
           [
             {
-              "name": "skeleton archer",
+              "name": "skeleton mage",
               "scaler": 1
             }
           ],
@@ -172,7 +172,7 @@
           ],
           [
             {
-              "name": "skeleton archer",
+              "name": "skeleton mage",
               "scaler": 1
             }
           ],
@@ -204,17 +204,17 @@
               "scaler": 0.75
             },
             {
-              "name": "skeleton archer",
+              "name": "skeleton mage",
               "scaler": 0.75
             }
           ],
           [
             {
-              "name": "skeleton archer",
+              "name": "skeleton mage",
               "scaler": 0.75
             },
             {
-              "name": "skeleton archer",
+              "name": "skeleton mage",
               "scaler": 0.75
             }
           ]

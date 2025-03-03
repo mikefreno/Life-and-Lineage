@@ -14,7 +14,6 @@ import { Text } from "../../components/Themed";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { type Shop } from "../../entities/shop";
-import { EXPANDED_PAD } from "../../components/PlayerStatus";
 import { shopColors } from "../../constants/Colors";
 import { useStyles } from "../../hooks/styles";
 
@@ -66,34 +65,24 @@ const ShopsScreen = observer(() => {
             },
           ]}
         >
-          <Text
-            style={{
-              textAlign: "center",
-              fontSize: 24,
-              lineHeight: 32,
-              color: colors.text,
-            }}
-            numberOfLines={2}
-          >
-            The {toTitleCase(shop.archetype)}
-          </Text>
-          <View
-            style={{
-              alignItems: "center",
-            }}
-          >
-            <View
+          <View style={{ justifyContent: "space-between", flex: 1 }}>
+            <Text
               style={{
-                width: "50%",
+                textAlign: "center",
+                fontSize: 24,
+                lineHeight: 32,
+                color: colors.text,
               }}
+              numberOfLines={2}
             >
-              <CharacterImage character={shop.shopKeeper} />
-            </View>
+              The {toTitleCase(shop.archetype)}
+            </Text>
+            <CharacterImage character={shop.shopKeeper} />
             <Text style={{ textAlign: "center", color: colors.text }}>
               {shop.shopKeeper.fullName}
             </Text>
             <Pressable
-              style={{ marginBottom: 8 }}
+              style={{ marginBottom: 8, marginHorizontal: "auto" }}
               onPress={() => {
                 vibration({ style: "light" });
                 shopsStore.setCurrentShop(shop);
@@ -131,7 +120,7 @@ const ShopsScreen = observer(() => {
     <>
       <TutorialModal
         tutorial={TutorialOption.shops}
-        isFocused={useIsFocused()}
+        isFocused={isFocused}
         pageOne={{
           title: "Shop Tab",
           body: "Each of these shops buy and sell various types of items.",

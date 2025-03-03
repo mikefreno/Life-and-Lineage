@@ -1,7 +1,7 @@
-import { Dimensions } from "react-native";
 import { getCharacterImage, toTitleCase } from "../utility/functions/misc";
 import { Character } from "../entities/character";
-import { Image } from "expo-image";
+import { Image } from "react-native";
+import { useRootStore } from "@/hooks/stores";
 
 /**
  * Scale should be 0-1,  defaults to 0.4
@@ -13,7 +13,8 @@ export function CharacterImage({
   character: Character;
   scale?: number;
 }) {
-  const size = Dimensions.get("window").width * scale;
+  const { uiStore } = useRootStore();
+  const size = uiStore.dimensions.lesser * scale;
 
   return (
     <Image
@@ -22,8 +23,11 @@ export function CharacterImage({
         (toTitleCase(character.sex) as "Male") || "Female",
         character.personality!,
       )}
-      contentFit="contain"
-      style={{ width: size, height: size }}
+      style={{
+        width: size,
+        height: size,
+        resizeMode: "contain",
+      }}
     />
   );
 }

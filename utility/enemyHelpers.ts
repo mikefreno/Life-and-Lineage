@@ -2161,6 +2161,8 @@ export const EnemyImageMap = {
     },
     height: 128,
     width: 128,
+    displayHeight: 200,
+    displayWidth: 200,
     topOffset: 20,
     mirror: true,
   },

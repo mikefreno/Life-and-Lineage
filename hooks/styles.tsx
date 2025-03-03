@@ -459,14 +459,12 @@ export const useStyles = () => {
 
     // ---- Main Tabs - Shop ---- //
     shopCard: {
-      height: 384,
+      height: uiStore.dimensions.height / 2.5,
       width: "50%",
     } as const,
     shopCardInner: {
       margin: 8,
       flex: 1,
-      alignItems: "center",
-      justifyContent: "space-between",
       borderRadius: 12,
       borderWidth: 1,
       paddingVertical: 16,

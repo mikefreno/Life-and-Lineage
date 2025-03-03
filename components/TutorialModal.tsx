@@ -63,19 +63,33 @@ const TutorialModal = observer(
     );
     const [shouldShow, setShouldShow] = useState(false);
 
+    const [stillOnPage, setStillOnPage] = useState(false);
+    useEffect(() => {
+      if (isFocused) {
+        setTimeout(() => {
+          if (isFocused) {
+            setStillOnPage(true);
+          }
+        }, 300);
+      } else {
+        setStillOnPage(false);
+      }
+    }, [isFocused]);
+
     useEffect(() => {
       setTutorialState(tutorialStore.tutorialsEnabled);
       setShouldShow(
         override ||
-          ((tutorialStore.tutorialsEnabled ||
-            tutorial === TutorialOption.firstBossKill) &&
+          (stillOnPage &&
+            (tutorialStore.tutorialsEnabled ||
+              tutorial === TutorialOption.firstBossKill) &&
             !tutorialStore.tutorialsShown[tutorial]),
       );
     }, [
       tutorialStore.tutorialsEnabled,
       tutorialStore.tutorialsShown[tutorial],
       override,
-      isFocused,
+      stillOnPage,
     ]);
 
     const handlePress = () => {

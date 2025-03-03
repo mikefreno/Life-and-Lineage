@@ -22,7 +22,7 @@ const NewGameMetaControls = observer(
             >
               <FontAwesome5
                 name="question-circle"
-                size={32}
+                size={uiStore.dimensions.greater / 24}
                 color={uiStore.isDark ? "#fafafa" : "#27272a"}
               />
             </Pressable>
@@ -37,13 +37,13 @@ const NewGameMetaControls = observer(
           {audioStore.muted ? (
             <MaterialIcons
               name="music-off"
-              size={32}
+              size={uiStore.dimensions.greater / 24}
               color={uiStore.isDark ? "#fafafa" : "#27272a"}
             />
           ) : (
             <MaterialIcons
               name="music-note"
-              size={32}
+              size={uiStore.dimensions.greater / 24}
               color={uiStore.isDark ? "#fafafa" : "#27272a"}
             />
           )}
