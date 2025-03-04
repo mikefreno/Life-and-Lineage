@@ -8,7 +8,6 @@ import {
   TouchableWithoutFeedback,
   Animated,
   LayoutChangeEvent,
-  LayoutAnimation,
 } from "react-native";
 import { useEffect, useRef, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
@@ -317,7 +316,7 @@ const ShopInteriorScreen = observer(() => {
                 ...styles.py4,
               }}
             >
-              <Text style={styles.textCenter}>
+              <Text style={[styles.textCenter, styles["text-md"]]}>
                 {playerState.fullName}'s Inventory
               </Text>
               <View style={styles.rowCenter}>

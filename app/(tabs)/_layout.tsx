@@ -172,7 +172,7 @@ const TabLayout = observer(() => {
                   accessibilityRole={props.accessibilityRole}
                   accessibilityState={props.accessibilityState}
                   style={{
-                    top: uiStore.playerStatusHeight + 4,
+                    top: uiStore.playerStatusHeight,
                   }}
                 >
                   {props.children}

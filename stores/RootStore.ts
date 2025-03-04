@@ -41,8 +41,7 @@ export class RootStore {
   atDeathScreen: boolean = false;
   startingNewGame: boolean = false;
 
-  //these only are used in dev builds
-  showDevDebugUI: boolean = __DEV__;
+  showDevDebugUI: boolean = false;
   includeDevAttacks: boolean = false;
   devActions: {
     action: (value?: number) => void;

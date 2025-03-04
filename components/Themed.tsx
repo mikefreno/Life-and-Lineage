@@ -1,18 +1,18 @@
-/**
- * Learn more about Light and Dark modes:
- * https://docs.expo.io/guides/color-schemes/
- */
-
 import {
   Text as DefaultText,
   View as DefaultView,
   SafeAreaView as DefaultSafeAreaView,
   ScrollView as DefaultScrollView,
+  Dimensions,
+  Platform,
+  PixelRatio,
 } from "react-native";
 
 import Colors from "../constants/Colors";
 import { forwardRef } from "react";
 import { useRootStore } from "../hooks/stores";
+import { BASE_WIDTH } from "@/stores/UIStore";
+import { normalize, normalizeLineHeight } from "@/hooks/styles";
 
 type ThemeProps = {
   lightColor?: string;
@@ -44,13 +44,22 @@ export function useThemeColor(
 
 export const Text = forwardRef<DefaultText, TextProps>((props, ref) => {
   const { style, lightColor, darkColor, ...otherProps } = props;
+
   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
 
   return (
     <DefaultText
       ref={ref}
       allowFontScaling={false}
-      style={[{ color }, { fontFamily: "PixelifySans" }, style]}
+      style={[
+        { color },
+        {
+          fontFamily: "PixelifySans",
+          fontSize: normalize(14),
+          lineHeight: normalizeLineHeight(20),
+        },
+        style,
+      ]}
       {...otherProps}
     />
   );

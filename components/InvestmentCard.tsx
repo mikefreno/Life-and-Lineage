@@ -1,5 +1,5 @@
 import React from "react";
-import { ThemedScrollView, Text } from "./Themed";
+import { Text } from "./Themed";
 import { InvestmentType, InvestmentUpgrade } from "../utility/types";
 import { Pressable, View, Animated, ScrollView } from "react-native";
 import { useEffect, useRef, useState } from "react";
@@ -13,7 +13,7 @@ import { ClockIcon, Coins, Vault } from "../assets/icons/SVGIcons";
 import { useRootStore } from "../hooks/stores";
 import { useVibration } from "../hooks/generic";
 import type { Investment } from "../entities/investment";
-import { text, useStyles } from "../hooks/styles";
+import { useStyles } from "../hooks/styles";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const InvestmentCard = observer(
@@ -78,9 +78,11 @@ const InvestmentCard = observer(
             backFunction={() => setShowRequirements(false)}
           >
             <GenericStrikeAround>
-              <Text style={{ textAlign: "center", ...text.xl }}>Alert!</Text>
+              <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
+                Alert!
+              </Text>
             </GenericStrikeAround>
-            <Text style={[styles.mx4, text.lg]}>
+            <Text style={[styles.mx4, styles["text-lg"]]}>
               {investment.requires.message}
             </Text>
             <Text style={[styles.mx8, styles.py4, styles.textCenter]}>
@@ -99,13 +101,13 @@ const InvestmentCard = observer(
           isVisibleCondition={showInvestmentConfirmation}
           backFunction={() => setShowInvestmentConfirmation(false)}
         >
-          <Text style={[styles.textCenter, styles.lg]}>Purchase:</Text>
+          <Text style={[styles.textCenter, styles["text-lg"]]}>Purchase:</Text>
           <GenericStrikeAround>
-            <Text style={[styles.textCenter, styles["2xl"]]}>
+            <Text style={[styles.textCenter, styles["text-2xl"]]}>
               {investment.name}
             </Text>
           </GenericStrikeAround>
-          <Text style={[styles.textCenter, styles.xl, styles.pb6]}>
+          <Text style={[styles.textCenter, styles["text-xl"], styles.pb6]}>
             Are you sure?
           </Text>
           <View style={styles.rowCenter}>
@@ -117,7 +119,7 @@ const InvestmentCard = observer(
               }}
               style={styles.investmentButton}
             >
-              <Text style={styles.lg}>Purchase</Text>
+              <Text style={styles["text-lg"]}>Purchase</Text>
             </Pressable>
             <Pressable
               onPress={() => {
@@ -126,7 +128,7 @@ const InvestmentCard = observer(
               }}
               style={styles.investmentButton}
             >
-              <Text style={styles.lg}>Cancel</Text>
+              <Text style={styles["text-lg"]}>Cancel</Text>
             </Pressable>
           </View>
         </GenericModal>
@@ -134,13 +136,13 @@ const InvestmentCard = observer(
           isVisibleCondition={showInvestmentConfirmation}
           backFunction={() => setShowInvestmentConfirmation(false)}
         >
-          <Text style={[styles.textCenter, text.lg]}>Purchase:</Text>
+          <Text style={[styles.textCenter, styles["text-lg"]]}>Purchase:</Text>
           <GenericStrikeAround>
-            <Text style={[styles.textCenter, text["2xl"]]}>
+            <Text style={[styles.textCenter, styles["text-2xl"]]}>
               {investment.name}
             </Text>
           </GenericStrikeAround>
-          <Text style={[styles.pb6, styles.textCenter, text.xl]}>
+          <Text style={[styles.pb6, styles.textCenter, styles["text-xl"]]}>
             Are you sure?
           </Text>
           <View style={styles.rowCenter}>
@@ -175,7 +177,7 @@ const InvestmentCard = observer(
           innerStyle={{ paddingHorizontal: "3%" }}
         >
           <GenericStrikeAround>
-            <Text style={[styles.textCenter, text.xl]}>
+            <Text style={[styles.textCenter, styles["text-xl"]]}>
               {investment.name} Upgrades
             </Text>
           </GenericStrikeAround>
@@ -223,17 +225,12 @@ const InvestmentCard = observer(
                     ]}
                   >
                     <View
-                      style={[
-                        styles.columnBetween,
-                        styles.roundedBorder,
-                        styles.px4,
-                        styles.py2,
-                      ]}
+                      style={[styles.columnBetween, styles.px4, styles.py2]}
                     >
                       <View style={styles.rowBetween}>
                         <Text
                           style={[
-                            text.xl,
+                            styles["text-xl"],
                             styles.bold,
                             styles.myAuto,
                             { letterSpacing: 0.5 },
@@ -256,7 +253,7 @@ const InvestmentCard = observer(
                       {madeInvestment?.upgrades.includes(upgrade.name) && (
                         <Text
                           style={[
-                            text.lg,
+                            styles["text-lg"],
                             styles.myAuto,
                             {
                               opacity: 0.7,
@@ -373,7 +370,7 @@ const InvestmentCard = observer(
                   style={[
                     styles.bold,
                     styles.myAuto,
-                    text.xl,
+                    styles["text-xl"],
                     { letterSpacing: 0.5 },
                   ]}
                 >
@@ -382,7 +379,7 @@ const InvestmentCard = observer(
                 <Text
                   style={[
                     styles.myAuto,
-                    text.lg,
+                    styles["text-xl"],
                     { letterSpacing: 0.5, opacity: 0.7 },
                   ]}
                 >
@@ -394,7 +391,7 @@ const InvestmentCard = observer(
                 style={[
                   styles.bold,
                   styles.myAuto,
-                  text.xl,
+                  styles["text-xl"],
                   { letterSpacing: 0.5 },
                 ]}
               >
