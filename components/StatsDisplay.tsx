@@ -251,7 +251,9 @@ export function StatsDisplay({
     return (
       <View style={styles.storyContainer}>
         <View style={styles.storyHeaderContainer}>
-          <Text style={{ marginLeft: -16, marginRight: 16, ...styles.xl }}>
+          <Text
+            style={{ marginLeft: -16, marginRight: 16, ...styles["text-xl"] }}
+          >
             {toTitleCase(item.name)}
           </Text>
         </View>
@@ -280,7 +282,7 @@ export function StatsDisplay({
                 style={[
                   { textAlign: "center" },
                   tw.py1,
-                  section.largeMeta && styles.xl,
+                  section.largeMeta && styles["text-xl"],
                 ]}
               >
                 [{section.text}]
@@ -763,12 +765,14 @@ export function StatsDisplay({
               : "right"]: 0,
           }}
         >
-          <Text style={{ marginTop: -8, marginLeft: 0, ...styles["2xl"] }}>
+          <Text style={{ marginTop: -8, marginLeft: 0, ...styles["text-2xl"] }}>
             x
           </Text>
         </Pressable>
         <View>
-          <Text style={{ textAlign: "center" }}>{firstItem.name}</Text>
+          <Text style={{ textAlign: "center" }}>
+            {toTitleCase(firstItem.name)}
+          </Text>
         </View>
         <RequirementsBlock />
         {firstItem.isEquippable &&
@@ -776,8 +780,11 @@ export function StatsDisplay({
             <GenericStrikeAround>
               <Text
                 style={{
-                  color: rarityColors[firstItem.rarity ?? 0].text,
-                  ...styles.lg,
+                  color:
+                    rarityColors[firstItem.rarity ?? 0].background[
+                      uiStore.colorScheme == "light" ? "dark" : "light"
+                    ],
+                  ...styles["text-lg"],
                 }}
               >
                 {RarityAsString[firstItem.rarity]}
@@ -787,11 +794,11 @@ export function StatsDisplay({
         {(firstItem.slot == "one-hand" ||
           firstItem.slot == "two-hand" ||
           firstItem.slot == "off-hand") && (
-          <GenericStrikeAround style={styles.sm}>
+          <GenericStrikeAround style={styles["text-sm"]}>
             {toTitleCase(firstItem.slot)}
           </GenericStrikeAround>
         )}
-        <GenericStrikeAround style={styles.sm}>
+        <GenericStrikeAround style={styles["text-sm"]}>
           {ItemTypeLabel(firstItem)}
         </GenericStrikeAround>
 

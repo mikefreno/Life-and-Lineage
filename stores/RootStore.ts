@@ -42,7 +42,7 @@ export class RootStore {
   startingNewGame: boolean = false;
 
   //these only are used in dev builds
-  showDevDebugUI: boolean = false;
+  showDevDebugUI: boolean = __DEV__;
   includeDevAttacks: boolean = false;
   devActions: {
     action: (value?: number) => void;

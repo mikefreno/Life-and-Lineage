@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import Colors, { elementalColorMap } from "../../constants/Colors";
 import { BlurView } from "expo-blur";
-import { StyleSheet } from "react-native";
-import PlayerStatus, { EXPANDED_PAD } from "../../components/PlayerStatus";
+import { StyleSheet, Text as RNText } from "react-native";
+import PlayerStatus from "../../components/PlayerStatusForHome";
 import { LinearGradientBlur } from "../../components/LinearGradientBlur";
 import {
   BookSparkles,
@@ -35,14 +35,13 @@ import { useIsFocused } from "@react-navigation/native";
 import { Element, TutorialOption } from "../../utility/types";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
-import { shadows, text } from "../../hooks/styles";
+import { normalize, shadows, useStyles } from "../../hooks/styles";
 import { observer } from "mobx-react-lite";
 import { wait } from "@/utility/functions/misc";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import GenericModal from "@/components/GenericModal";
 
-const PLAYERSTATUS_SPACER = 64;
-const TABSELECTOR_HEIGHT = 52;
+const TAB_SELECTION = 80;
 
 const TabLayout = observer(() => {
   const isFocused = useIsFocused();
@@ -50,6 +49,7 @@ const TabLayout = observer(() => {
   const { playerState, uiStore, dungeonStore } = useRootStore();
   const [showPVPInfoModal, setShowPVPInfoModal] = useState(false);
 
+  const styles = useStyles();
   const router = useRouter();
   const vibration = useVibration();
 
@@ -57,7 +57,7 @@ const TabLayout = observer(() => {
     lazy: false,
     headerTransparent: true,
     headerTitleAlign: "center",
-    headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 22 },
+    headerTitleStyle: { fontFamily: "PixelifySans", fontSize: normalize(22) },
     headerBackground:
       Platform.OS == "ios"
         ? () => (
@@ -87,7 +87,7 @@ const TabLayout = observer(() => {
         backFunction={() => setShowPVPInfoModal(false)}
       >
         <View>
-          <Text style={[text.xl, { textAlign: "center" }]}>
+          <Text style={[styles["text-xl"], { textAlign: "center" }]}>
             PVP is currently locked, progress and complete the{" "}
             <Text style={{ color: Colors[uiStore.colorScheme].health }}>
               Ancient Arena
@@ -96,29 +96,65 @@ const TabLayout = observer(() => {
           </Text>
         </View>
       </GenericModal>
+      <Pressable
+        onPress={() => {
+          vibration({ style: "light" });
+          uiStore.setDetailedStatusViewShowing(true);
+        }}
+        style={[
+          uiStore.root.showDevDebugUI && styles.debugBorder,
+          {
+            position: "absolute",
+            zIndex: 9999,
+            top: uiStore.playerStatusTop,
+            height: uiStore.playerStatusHeight,
+            width: uiStore.isLandscape
+              ? uiStore.dimensions.width * 0.75 - 16
+              : uiStore.dimensions.width - 16,
+            alignSelf: "center",
+          },
+        ]}
+      />
       {playerState && (
         <Tabs
           screenOptions={{
             tabBarBackground: () => {
               return (
-                <View style={{ marginHorizontal: -8 }}>
+                <View
+                  onLayout={(event) =>
+                    uiStore.setBottomBarHeight(event.nativeEvent.layout.height)
+                  }
+                >
                   <PlayerStatus home hideGold />
                   <LinearGradientBlur intensity={100} />
                 </View>
               );
             },
             tabBarActiveTintColor: Colors[uiStore.colorScheme].tint,
-            tabBarLabelStyle: {
-              fontFamily: "PixelifySans",
-              marginHorizontal: "auto",
-              marginTop: 4,
+            tabBarLabel: (props) => {
+              return (
+                <RNText
+                  style={{
+                    textAlign: "center",
+                    fontFamily: "PixelifySans",
+                    ...styles["text-sm"],
+                    color: props.color,
+                    marginTop: normalize(3),
+                  }}
+                >
+                  {props.children}
+                </RNText>
+              );
             },
             tabBarStyle: {
-              position: "absolute",
               borderTopWidth: 0,
+              position: "absolute",
               shadowColor: "transparent",
               paddingHorizontal: 4,
-              height: PLAYERSTATUS_SPACER + TABSELECTOR_HEIGHT,
+              paddingTop: 8,
+              height: normalize(TAB_SELECTION) + uiStore.playerStatusHeight,
+              ...styles.columnBetween,
+              display: "flex",
             },
             tabBarIconStyle: {
               marginHorizontal: "auto",
@@ -130,36 +166,17 @@ const TabLayout = observer(() => {
                 if (props.onPress) props.onPress(event);
               };
               return (
-                <View>
-                  <Pressable
-                    onPress={() => {
-                      vibration({ style: "light" });
-                      uiStore.setDetailedStatusViewShowing(true);
-                    }}
-                    style={[
-                      {
-                        height: uiStore.playerStatusIsCompact
-                          ? TABSELECTOR_HEIGHT
-                          : TABSELECTOR_HEIGHT + EXPANDED_PAD,
-                        marginTop: uiStore.playerStatusIsCompact
-                          ? 0
-                          : -EXPANDED_PAD,
-                      },
-                    ]}
-                  />
-                  {/* ^ The above is to trigger the player status ^ */}
-                  <Pressable
-                    onPress={onPressWithVibration}
-                    accessibilityLabel={props.accessibilityLabel}
-                    accessibilityRole={props.accessibilityRole}
-                    accessibilityState={props.accessibilityState}
-                    style={{
-                      height: TABSELECTOR_HEIGHT,
-                    }}
-                  >
-                    {props.children}
-                  </Pressable>
-                </View>
+                <Pressable
+                  onPress={onPressWithVibration}
+                  accessibilityLabel={props.accessibilityLabel}
+                  accessibilityRole={props.accessibilityRole}
+                  accessibilityState={props.accessibilityState}
+                  style={{
+                    top: uiStore.playerStatusHeight + 4,
+                  }}
+                >
+                  {props.children}
+                </Pressable>
               );
             },
           }}
@@ -171,31 +188,39 @@ const TabLayout = observer(() => {
               title: "Home",
               tabBarIcon: ({ color }) =>
                 playerState?.playerClass == "necromancer" ? (
-                  <NecromancerSkull width={28} height={26} color={color} />
+                  <NecromancerSkull
+                    width={normalize(28)}
+                    height={normalize(26)}
+                    color={color}
+                  />
                 ) : playerState?.playerClass == "paladin" ? (
                   <PaladinHammer
-                    width={28}
-                    height={26}
+                    width={normalize(28)}
+                    height={normalize(26)}
                     color={color}
                     useOpacity={true}
                   />
                 ) : playerState?.playerClass == "ranger" ? (
                   <RangerIcon
-                    width={28}
-                    height={26}
+                    width={normalize(28)}
+                    height={normalize(26)}
                     color={color}
                     useOpacity={true}
                   />
                 ) : (
-                  <WizardHat width={28} height={26} color={color} />
+                  <WizardHat
+                    width={normalize(28)}
+                    height={normalize(26)}
+                    color={color}
+                  />
                 ),
               headerLeft: () => (
                 <Link href="/Options" asChild>
                   <Pressable onPress={() => vibration({ style: "light" })}>
                     {({ pressed }) => (
                       <Gear
-                        width={30}
-                        height={26}
+                        width={normalize(30)}
+                        height={normalize(26)}
                         color={
                           Colors[uiStore.colorScheme as "light" | "dark"].text
                         }
@@ -210,8 +235,8 @@ const TabLayout = observer(() => {
                   <Pressable onPress={() => vibration({ style: "light" })}>
                     {({ pressed }) => (
                       <HouseHeart
-                        width={30}
-                        height={26}
+                        width={normalize(30)}
+                        height={normalize(26)}
                         color={"#f87171"}
                         style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                       />
@@ -227,15 +252,19 @@ const TabLayout = observer(() => {
               ...commonOptions,
               title: "Spells",
               tabBarIcon: ({ color }) => (
-                <Wand width={26} height={26} color={color} />
+                <Wand
+                  width={normalize(26)}
+                  height={normalize(26)}
+                  color={color}
+                />
               ),
               headerRight: () => (
                 <Link href="/Study" asChild>
                   <Pressable onPress={() => vibration({ style: "light" })}>
                     {({ pressed }) => (
                       <BookSparkles
-                        width={26}
-                        height={28}
+                        width={normalize(26)}
+                        height={normalize(28)}
                         color={
                           elementalColorMap[
                             playerState?.blessing ?? Element.fire
@@ -259,15 +288,19 @@ const TabLayout = observer(() => {
               ...commonOptions,
               title: "Labor",
               tabBarIcon: ({ color }) => (
-                <Broom width={30} height={26} color={color} />
+                <Broom
+                  width={normalize(30)}
+                  height={normalize(26)}
+                  color={color}
+                />
               ),
               headerLeft: () => (
                 <Link href="/Education" asChild>
                   <Pressable onPress={() => vibration({ style: "light" })}>
                     {({ pressed }) => (
                       <GraduationCapIcon
-                        width={28}
-                        height={28}
+                        width={normalize(28)}
+                        height={normalize(28)}
                         color={
                           uiStore.colorScheme == "light" ? "#3f3f46" : "#e4e4e7"
                         }
@@ -288,8 +321,8 @@ const TabLayout = observer(() => {
                       <Image
                         source={require("../../assets/images/icons/investing.png")}
                         style={{
-                          height: 28,
-                          width: 28,
+                          height: normalize(28),
+                          width: normalize(28),
                           marginRight: 15,
                           marginBottom: 6,
                           opacity: pressed ? 0.5 : 1,
@@ -307,7 +340,11 @@ const TabLayout = observer(() => {
               ...commonOptions,
               title: "Dungeon",
               tabBarIcon: ({ color }) => (
-                <Dungeon width={28} height={28} color={color} />
+                <Dungeon
+                  width={normalize(28)}
+                  height={normalize(28)}
+                  color={color}
+                />
               ),
               headerLeft: () => (
                 <Pressable
@@ -350,8 +387,8 @@ const TabLayout = observer(() => {
                 >
                   {({ pressed }) => (
                     <Sword
-                      width={30}
-                      height={30}
+                      width={normalize(30)}
+                      height={normalize(30)}
                       color={"#BF9069"}
                       style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                     />
@@ -366,15 +403,19 @@ const TabLayout = observer(() => {
               ...commonOptions,
               title: "Shops",
               tabBarIcon: ({ color }) => (
-                <Potion width={28} height={30} color={color} />
+                <Potion
+                  width={normalize(28)}
+                  height={normalize(30)}
+                  color={color}
+                />
               ),
               headerRight: () => (
                 <Link href="/Activities" asChild>
                   <Pressable onPress={() => vibration({ style: "light" })}>
                     {({ pressed }) => (
                       <BowlingBallAndPin
-                        width={30}
-                        height={28}
+                        width={normalize(30)}
+                        height={normalize(28)}
                         color={"#27272a"}
                         style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                       />
@@ -390,7 +431,11 @@ const TabLayout = observer(() => {
               ...commonOptions,
               title: "Medical",
               tabBarIcon: ({ color }) => (
-                <Medical width={30} height={28} color={color} />
+                <Medical
+                  width={normalize(30)}
+                  height={normalize(28)}
+                  color={color}
+                />
               ),
             }}
           />

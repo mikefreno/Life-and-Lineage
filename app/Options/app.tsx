@@ -13,7 +13,7 @@ import D20DieAnimation from "../../components/DieRollAnim";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
-import { flex, text, useStyles } from "../../hooks/styles";
+import { flex, useStyles } from "../../hooks/styles";
 
 const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
@@ -132,7 +132,7 @@ export const AppSettings = observer(() => {
           <D20DieAnimation keepRolling />
         ) : (
           <View style={styles.px2}>
-            <Text style={text.xl}>Remote Saving</Text>
+            <Text style={styles["text-xl"]}>Remote Saving</Text>
             <GenericStrikeAround>Make New Save</GenericStrikeAround>
             <TextInput
               style={styles.modalTextInput}
@@ -164,7 +164,11 @@ export const AppSettings = observer(() => {
                   <Text style={{ textAlign: "center" }}>X</Text>
                 </Pressable>
                 <Text
-                  style={{ paddingTop: 8, textAlign: "center", ...text.xl }}
+                  style={{
+                    paddingTop: 8,
+                    textAlign: "center",
+                    ...styles["text-xl"],
+                  }}
                 >
                   {save.name}
                 </Text>
@@ -191,8 +195,14 @@ export const AppSettings = observer(() => {
         size={95}
       >
         <ScrollView style={styles.px2}>
-          <Text style={text.xl}>Load Saves</Text>
-          <Text style={{ textAlign: "center", color: "#ef4444", ...text.xl }}>
+          <Text style={styles["text-xl"]}>Load Saves</Text>
+          <Text
+            style={{
+              textAlign: "center",
+              color: "#ef4444",
+              ...styles["text-xl"],
+            }}
+          >
             Make sure to backup first!
           </Text>
           {remoteSaves.map((save) => (
@@ -206,7 +216,13 @@ export const AppSettings = observer(() => {
               >
                 <Text style={{ textAlign: "center" }}>X</Text>
               </Pressable>
-              <Text style={{ paddingTop: 8, textAlign: "center", ...text.xl }}>
+              <Text
+                style={{
+                  paddingTop: 8,
+                  textAlign: "center",
+                  ...styles["text-xl"],
+                }}
+              >
                 {save.name}
               </Text>
               <View style={styles.remoteSaveInfo}>
@@ -227,7 +243,7 @@ export const AppSettings = observer(() => {
       <ScrollView>
         <View style={styles.settingsContainer}>
           <GenericStrikeAround>
-            <Text style={[text.xl, { textAlign: "center" }]}>
+            <Text style={[styles["text-xl"], { textAlign: "center" }]}>
               Remote Backups{!authStore.isAuthenticated && `\n(requires login)`}
             </Text>
           </GenericStrikeAround>
@@ -327,7 +343,7 @@ export const AppSettings = observer(() => {
                     },
                   ]}
                 />
-                <Text style={text["2xl"]}>{toTitleCase(item)}</Text>
+                <Text style={styles["text-2xl"]}>{toTitleCase(item)}</Text>
               </Pressable>
             ))}
           </View>
@@ -350,7 +366,7 @@ export const AppSettings = observer(() => {
                     },
                   ]}
                 />
-                <Text style={text["2xl"]}>{toTitleCase(item)}</Text>
+                <Text style={styles["text-2xl"]}>{toTitleCase(item)}</Text>
               </Pressable>
             ))}
           </View>
@@ -370,7 +386,7 @@ export const AppSettings = observer(() => {
                   },
                 ]}
               />
-              <Text style={text["2xl"]}>On</Text>
+              <Text style={styles["text-2xl"]}>On</Text>
             </Pressable>
             <Pressable
               style={styles.optionRow}
@@ -385,7 +401,7 @@ export const AppSettings = observer(() => {
                   },
                 ]}
               />
-              <Text style={text["2xl"]}>Off</Text>
+              <Text style={styles["text-2xl"]}>Off</Text>
             </Pressable>
           </View>
         </View>

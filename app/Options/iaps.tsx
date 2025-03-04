@@ -2,10 +2,11 @@ import { View } from "react-native";
 import { Text } from "../../components/Themed";
 import GenericAnimatedPressable from "../../components/GenericAnimatedButton";
 import { useRootStore } from "../../hooks/stores";
-import { text, tw_base } from "../../hooks/styles";
+import { tw_base, useStyles } from "../../hooks/styles";
 
 export default function InAppPurchasePage() {
   const { uiStore } = useRootStore();
+  const styles = useStyles();
 
   return (
     <View
@@ -17,18 +18,18 @@ export default function InAppPurchasePage() {
       }}
     >
       <GenericAnimatedPressable>
-        <Text style={{ ...text.lg, textAlign: "center" }}>
+        <Text style={{ ...styles["text-lg"], textAlign: "center" }}>
           Unlock both the Ranger and the Necromancer
         </Text>
-        <Text style={text.lg}>($2.99)</Text>
+        <Text style={styles["text-lg"]}>($2.99)</Text>
       </GenericAnimatedPressable>
       <View>
-        <Text style={text.lg}>
+        <Text style={styles["text-lg"]}>
           {"\u2022"}$1.99 for the Ranger Or the Necromancer
         </Text>
       </View>
       <View>
-        <Text style={text.lg}>
+        <Text style={styles["text-lg"]}>
           {"\u2022"}$0.99 for cloud saves - offsets server costs - free with a
           class purchase
         </Text>

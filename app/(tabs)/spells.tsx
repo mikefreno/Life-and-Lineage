@@ -20,7 +20,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { Text } from "../../components/Themed";
 import { useRootStore } from "../../hooks/stores";
 import { EXPANDED_PAD } from "../../components/PlayerStatus";
-import { useStyles } from "../../hooks/styles";
+import { normalize, useStyles } from "../../hooks/styles";
 
 const SpellsScreen = observer(() => {
   const bottomTab = useBottomTabBarHeight();
@@ -46,7 +46,7 @@ const SpellsScreen = observer(() => {
       const nextMasteryBarrier =
         MasteryToBarrier[(currentMastery + 1) as MasteryLevel];
       return (
-        <View style={styles.proficiencyContainer} key={idx}>
+        <View style={[styles.proficiencyContainer]} key={idx}>
           <Text
             style={{
               color:
@@ -113,8 +113,7 @@ const SpellsScreen = observer(() => {
         style={{
           flex: 1,
           marginTop: header,
-          paddingBottom:
-            bottomTab + (uiStore.playerStatusIsCompact ? 0 : EXPANDED_PAD),
+          paddingBottom: uiStore.bottomBarHeight,
         }}
       >
         {playerState?.spells && playerState.spells.length > 0 ? (
@@ -127,10 +126,15 @@ const SpellsScreen = observer(() => {
           </ScrollView>
         ) : (
           <View style={styles.noSpellsContainer}>
-            <Text style={[styles.xl, { letterSpacing: 1 }]}>
+            <Text style={[styles["text-xl"], { letterSpacing: 1 }]}>
               No Known Spells.
             </Text>
-            <Text style={{ textAlign: "center", letterSpacing: 1 }}>
+            <Text
+              style={[
+                styles["text-md"],
+                { textAlign: "center", letterSpacing: 1 },
+              ]}
+            >
               (Books can be studied on the top right)
             </Text>
           </View>
@@ -138,7 +142,16 @@ const SpellsScreen = observer(() => {
         <View style={{ paddingHorizontal: 8 }}>
           <GenericStrikeAround>Proficiencies</GenericStrikeAround>
         </View>
-        <View style={{ flex: 1, alignItems: "center" }}>
+        <View
+          style={[
+            styles.columnEvenly,
+            {
+              flex: 1,
+              paddingBottom: normalize(12),
+              marginTop: -normalize(12),
+            },
+          ]}
+        >
           {magicProficiencySection(playerState?.magicProficiencies)}
         </View>
       </View>

@@ -11,7 +11,8 @@ import D20DieAnimation from "../../components/DieRollAnim";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import CheckpointModal from "../../components/CheckpointModal";
-import { text, useStyles } from "../../hooks/styles";
+import { useStyles } from "../../hooks/styles";
+import GenericFlatButton from "@/components/GenericFlatButton";
 
 const healthWarningOptions: Record<number, string> = {
   0.5: "50%",
@@ -79,17 +80,17 @@ export default function GameSettings() {
             <Text
               style={{
                 textAlign: "center",
-                ...text.lg,
+                ...styles["text-lg"],
               }}
             >
               This will reset all tutorials, some may not make sense based on
               your current game/player/inventory state (And restart the app).
             </Text>
-            <Text style={{ textAlign: "center", ...text["2xl"] }}>
+            <Text style={{ textAlign: "center", ...styles["text-2xl"] }}>
               Are you sure?
             </Text>
-            <View style={{ flexDirection: "row" }}>
-              <Pressable
+            <View style={styles.rowEvenly}>
+              <GenericFlatButton
                 onPress={() => {
                   vibration({ style: "warning" });
                   setLoading(true);
@@ -99,16 +100,14 @@ export default function GameSettings() {
                     await expo.reloadAppAsync("tutorial reset");
                   });
                 }}
-                style={styles.tutorialResetButton}
               >
-                <Text>Reset</Text>
-              </Pressable>
-              <Pressable
+                Reset
+              </GenericFlatButton>
+              <GenericFlatButton
                 onPress={() => setShowTutorialResetConfirm(false)}
-                style={styles.tutorialResetButton}
               >
-                <Text>Cancel</Text>
-              </Pressable>
+                Cancel
+              </GenericFlatButton>
             </View>
           </>
         )}
@@ -148,14 +147,14 @@ export default function GameSettings() {
                   },
                 ]}
               />
-              <Text style={text["2xl"]}>{toTitleCase(item)}</Text>
+              <Text style={styles["text-2xl"]}>{toTitleCase(item)}</Text>
             </Pressable>
           ))}
         </View>
 
         <GenericStrikeAround>Tutorials</GenericStrikeAround>
         <View style={[styles.rowItemsCenter, styles.pt4]}>
-          <Text style={text.lg}>Tutorials Enabled: </Text>
+          <Text style={styles["text-lg"]}>Tutorials Enabled: </Text>
           <Switch
             trackColor={{ false: "#767577", true: "#3b82f6" }}
             ios_backgroundColor="#3e3e3e"

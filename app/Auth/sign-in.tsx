@@ -169,7 +169,7 @@ const SignInScreen = observer(() => {
               <Text
                 style={{
                   ...styles.textCenter,
-                  ...styles["3xl"],
+                  ...styles["text-3xl"],
                   ...styles.pt4,
                 }}
               >

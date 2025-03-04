@@ -8,8 +8,9 @@ import { TutorialOption } from "../utility/types";
 import GenericModal from "./GenericModal";
 import { useVibration } from "../hooks/generic";
 import { useRootStore } from "../hooks/stores";
-import { text, tw, tw_base, useStyles } from "../hooks/styles";
+import { normalize, tw, tw_base, useStyles } from "../hooks/styles";
 import Colors from "../constants/Colors";
+import GenericFlatButton from "./GenericFlatButton";
 
 type TutorialPage = {
   title?: string;
@@ -121,29 +122,13 @@ const TutorialModal = observer(
         (tutorialStepRef.current === 1 && pageTwo) ||
         (tutorialStepRef.current === 2 && pageThree);
       return (
-        <Pressable
+        <GenericFlatButton
           onPress={
             nextPageExists && tutorialState ? handlePress : closeTutorial
           }
         >
-          {({ pressed }) => (
-            <View
-              style={[
-                styles.nextButton,
-                pressed && {
-                  transform: [{ scale: 0.95 }],
-                  opacity: 0.5,
-                },
-              ]}
-            >
-              <Text>
-                {nextPageExists && tutorialState
-                  ? "Next"
-                  : "Acknowledge Knowledge"}
-              </Text>
-            </View>
-          )}
-        </Pressable>
+          {nextPageExists && tutorialState ? "Next" : "Acknowledge Knowledge"}
+        </GenericFlatButton>
       );
     };
 
@@ -160,7 +145,7 @@ const TutorialModal = observer(
               >
                 <Entypo
                   name="chevron-left"
-                  size={24}
+                  size={normalize(24)}
                   color={uiStore.colorScheme === "dark" ? "#f4f4f5" : "black"}
                 />
               </Pressable>
@@ -173,7 +158,7 @@ const TutorialModal = observer(
               style={{
                 textAlign: "center",
                 flex: 1,
-                ...text["2xl"],
+                ...styles["text-2xl"],
               }}
             >
               {page.title}
@@ -182,7 +167,7 @@ const TutorialModal = observer(
           {!pageTwo ? (
             <View style={{ width: tw_base[6] }} />
           ) : (
-            <Text style={{ width: tw_base[6] }}>
+            <Text style={styles["text-md"]}>
               {tutorialStep}/{pageThree ? 3 : 2}
             </Text>
           )}
@@ -198,7 +183,7 @@ const TutorialModal = observer(
               ...tw.my2,
             }}
           >
-            <Text style={[text.md, { marginVertical: "auto" }]}>
+            <Text style={[styles["text-md"], { marginVertical: "auto" }]}>
               Tutorials Enabled:{" "}
             </Text>
             <Switch

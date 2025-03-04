@@ -48,7 +48,6 @@ const LaborScreen = observer(() => {
   }, [playerState?.jobs]);
 
   const headerHeight = useHeaderHeight();
-  const bottomBarHeight = useBottomTabBarHeight();
   const isFocused = useIsFocused();
 
   if (playerState) {
@@ -71,7 +70,7 @@ const LaborScreen = observer(() => {
           backFunction={() => setShowingRejection(false)}
         >
           <View style={{ alignItems: "center" }}>
-            <Text style={styles["3xl"]}>Rejected!</Text>
+            <Text style={styles["text-3xl"]}>Rejected!</Text>
             <Text style={styles.rejectionModalText}>
               You are missing the following qualifications:
             </Text>
@@ -102,9 +101,7 @@ const LaborScreen = observer(() => {
                 {
                   paddingHorizontal: 8,
                   paddingTop: headerHeight,
-                  paddingBottom:
-                    bottomBarHeight +
-                    (uiStore.playerStatusIsCompact ? 0 : EXPANDED_PAD),
+                  paddingBottom: uiStore.bottomBarHeight,
                 },
               ]}
             >

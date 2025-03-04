@@ -14,7 +14,7 @@ import {
   shouldShowModifier,
 } from "../utility/functions/stats";
 import { useVibration } from "../hooks/generic";
-import { flex, text, useStyles } from "../hooks/styles";
+import { flex, useStyles } from "../hooks/styles";
 import React from "react";
 import { useRootStore } from "../hooks/stores";
 
@@ -94,13 +94,13 @@ export default function GearStatsDisplay({ item }: { item: Item }) {
           <View style={[styles.rowBetween, { paddingBottom: 12 }]}>
             {shouldShowTotalDamage ? (
               <View style={{ width: "50%" }}>
-                <Text numberOfLines={2} style={text["3xl"]}>
+                <Text numberOfLines={2} style={styles["text-3xl"]}>
                   {cleanRoundToTenths(item.totalDamage)} Total Damage
                 </Text>
               </View>
             ) : shouldShowTotalArmor ? (
               <View style={{ width: "50%" }}>
-                <Text numberOfLines={2} style={text["3xl"]}>
+                <Text numberOfLines={2} style={styles["text-3xl"]}>
                   {cleanRoundToTenths(item.totalArmor)} Total Armor
                 </Text>
               </View>
@@ -127,7 +127,7 @@ export default function GearStatsDisplay({ item }: { item: Item }) {
             </View>
           ))}
           <GenericStrikeAround>
-            <Text style={{ textAlign: "center", ...text.sm }}>
+            <Text style={{ textAlign: "center", ...styles["text-sm"] }}>
               ( ) Indicates cumulative effect as a standalone item.
             </Text>
           </GenericStrikeAround>
@@ -154,12 +154,12 @@ export default function GearStatsDisplay({ item }: { item: Item }) {
       >
         <View style={[flex.rowCenter, flex.wrap, { alignItems: "center" }]}>
           {shouldShowTotalDamage && (
-            <Text style={{ textAlign: "center", ...text.xl }}>
+            <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
               {cleanRoundToTenths(item.totalDamage)} Total Damage
             </Text>
           )}
           {shouldShowTotalArmor && (
-            <Text style={{ textAlign: "center", ...text.xl }}>
+            <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
               {cleanRoundToTenths(item.totalArmor)} Total Armor
             </Text>
           )}
@@ -174,7 +174,7 @@ export default function GearStatsDisplay({ item }: { item: Item }) {
             marginTop: 8,
             textAlign: "center",
             width: "100%",
-            ...text.sm,
+            ...styles["text-sm"],
           }}
         >
           Hold for more detail

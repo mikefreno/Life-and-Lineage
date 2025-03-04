@@ -4,7 +4,7 @@ import ProgressBar from "../ProgressBar";
 import GenericStrikeAround from "../GenericStrikeAround";
 import { ThemedView, Text } from "../Themed";
 import FadeOutNode from "../FadeOutNode";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import type { Enemy } from "../../entities/creatures";
 import {
@@ -14,7 +14,7 @@ import {
 import { useRootStore } from "../../hooks/stores";
 import { AnimatedSprite } from "../AnimatedSprite";
 import { EnemyImageMap } from "../../utility/enemyHelpers";
-import { flex, text, tw_base, useStyles } from "../../hooks/styles";
+import { flex, tw_base, useStyles } from "../../hooks/styles";
 
 const calculateAdjustedFrameRate = (
   frames: number,
@@ -33,7 +33,7 @@ const DialogueBox = memo(({ text }: { text: string }) => {
   const styles = useStyles();
   return (
     <ThemedView style={styles.dialogueBox}>
-      <Text style={{ ...styles.textCenter, ...styles.lg }}>{text}</Text>
+      <Text style={{ ...styles.textCenter, ...styles["text-lg"] }}>{text}</Text>
     </ThemedView>
   );
 });
@@ -261,6 +261,7 @@ const EnemyConditions = observer(({ conditions }: { conditions: any[] }) => {
     });
     return Array.from(condMap.values());
   }, [conditions]);
+  const styles = useStyles();
 
   return (
     <View
@@ -294,7 +295,7 @@ const EnemyConditions = observer(({ conditions }: { conditions: any[] }) => {
             </ThemedView>
             <Text
               style={[
-                text.xl,
+                styles["text-xl"],
                 {
                   position: "absolute",
                   right: -4,
@@ -800,7 +801,7 @@ const EnemyDisplay = observer(
         <View style={styles.enemyInfoContainer}>
           <Text
             style={{
-              ...text["3xl"],
+              ...styles["text-3xl"],
               textAlign: "center",
             }}
             numberOfLines={2}

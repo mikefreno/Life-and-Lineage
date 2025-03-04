@@ -252,8 +252,8 @@ const InventoryItem = observer(
               <Image
                 source={item[0].getItemIcon()}
                 style={{
-                  width: Math.min(uiStore.itemBlockSize * 0.65, 40),
-                  height: Math.min(uiStore.itemBlockSize * 0.65, 40),
+                  width: uiStore.itemBlockSize * 0.65,
+                  height: uiStore.itemBlockSize * 0.65,
                 }}
               />
               {item[0].stackable && item.length > 1 && (
@@ -310,8 +310,8 @@ const ProjectedImage = observer(() => {
         <Image
           source={itemMap[draggableClassStore.iconString]}
           style={{
-            width: Math.min(uiStore.itemBlockSize * 0.65, 40),
-            height: Math.min(uiStore.itemBlockSize * 0.65, 40),
+            width: uiStore.itemBlockSize * 0.65,
+            height: uiStore.itemBlockSize * 0.65,
           }}
         />
       </View>

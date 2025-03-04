@@ -14,7 +14,7 @@ import { elementalColorMap } from "../constants/Colors";
 import { Element } from "../utility/types";
 import type { Spell } from "../entities/spell";
 import { useRootStore } from "../hooks/stores";
-import { useStyles } from "../hooks/styles";
+import { normalize, useStyles } from "../hooks/styles";
 
 export default function SpellDetails({ spell }: { spell: Spell }) {
   const { playerState, uiStore } = useRootStore();
@@ -45,10 +45,16 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
             ...styles.itemsCenter,
           }}
         >
-          <Text style={styles.textCenter}>{toTitleCase(spell.name)}</Text>
-          <View style={styles.rowCenter}>
-            <Text>{spell.manaCost}</Text>
-            <Energy width={14} height={14} style={{ marginLeft: 6 }} />
+          <Text style={[styles.textCenter, styles["text-md"]]}>
+            {toTitleCase(spell.name)}
+          </Text>
+          <View style={[styles.rowCenter, { alignItems: "center" }]}>
+            <Text style={styles["text-md"]}>{spell.manaCost}</Text>
+            <Energy
+              width={normalize(14)}
+              height={normalize(14)}
+              style={{ marginLeft: 6 }}
+            />
           </View>
         </View>
         <View
@@ -63,8 +69,8 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
               <Text>{spell.duration}</Text>
               <ClockIcon
                 color={uiStore.colorScheme == "dark" ? "#f4f4f5" : "#18181b"}
-                width={14}
-                height={14}
+                width={normalize(14)}
+                height={normalize(14)}
                 style={{ marginLeft: 6 }}
               />
             </View>
@@ -72,7 +78,11 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
           {spell.baseDamage(playerState!) > 0 && (
             <View style={styles.rowCenter}>
               <Text>{spell.baseDamage(playerState!)}</Text>
-              <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
+              <HealthIcon
+                width={normalize(14)}
+                height={normalize(14)}
+                style={{ marginLeft: 6 }}
+              />
             </View>
           )}
           {spell.buffs?.map((buff) => (
@@ -96,8 +106,8 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
                 <>
                   <Text>{spell.selfDamage} Self</Text>
                   <HealthIcon
-                    width={14}
-                    height={14}
+                    width={normalize(14)}
+                    height={normalize(14)}
                     style={{ marginLeft: 6 }}
                   />
                 </>
@@ -105,8 +115,8 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
                 <>
                   <Text>Heal {spell.selfDamage * -1}</Text>
                   <HealthIcon
-                    width={14}
-                    height={14}
+                    width={normalize(14)}
+                    height={normalize(14)}
                     style={{ marginLeft: 6 }}
                   />
                 </>
@@ -117,19 +127,21 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
             <View key={idx} style={styles.rowCenter}>
               <Text>{toTitleCase(summon)}</Text>
               <NecromancerSkull
-                width={14}
-                height={14}
+                width={normalize(14)}
+                height={normalize(14)}
                 style={{ marginLeft: 6 }}
                 color={uiStore.colorScheme == "light" ? "#27272a" : "#f4f4f5"}
               />
             </View>
           ))}
           {spell.rangerPet ? (
-            <View style={styles.rowCenter}>
-              <Text>{toTitleCase(spell.rangerPet)}</Text>
+            <View style={[styles.rowCenter, { alignItems: "center" }]}>
+              <Text style={styles["text-md"]}>
+                {toTitleCase(spell.rangerPet)}
+              </Text>
               <BeastMasteryIcon
-                width={14}
-                height={14}
+                width={normalize(14)}
+                height={normalize(14)}
                 style={{ marginLeft: 6 }}
               />
             </View>

@@ -1,7 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import {
   type AccessibilityRole,
-  Dimensions,
   Platform,
   ScrollView,
   type StyleProp,
@@ -10,7 +9,8 @@ import {
 import Modal from "react-native-modal";
 import { ThemedView } from "./Themed";
 import { useRootStore } from "../hooks/stores";
-import { useStyles } from "../hooks/styles";
+import { shadows, useStyles } from "../hooks/styles";
+import { observer } from "mobx-react-lite";
 
 interface GenericModalProps {
   isVisibleCondition: boolean;
@@ -48,80 +48,86 @@ interface GenericModalProps {
  })
  ```
  */
-export default function GenericModal({
-  isVisibleCondition,
-  backFunction,
-  children,
-  backdropCloses = true,
-  scrollEnabled = false,
-  size,
-  style,
-  noPad,
-  isCheckPointModal = false,
-  ...props
-}: GenericModalProps) {
-  const root = useRootStore();
-  const { uiStore } = root;
-  let { modalShowing, colorScheme } = uiStore;
-  const styles = useStyles();
+const GenericModal = observer(
+  ({
+    isVisibleCondition,
+    backFunction,
+    children,
+    backdropCloses = true,
+    scrollEnabled = false,
+    size,
+    style,
+    noPad,
+    isCheckPointModal = false,
+    ...props
+  }: GenericModalProps) => {
+    const root = useRootStore();
+    const { uiStore } = root;
+    let { modalShowing, colorScheme } = uiStore;
+    const styles = useStyles();
 
-  useEffect(() => {
-    if (
-      isVisibleCondition &&
-      !(root.atDeathScreen && !isCheckPointModal && !root.startingNewGame)
-    ) {
-      modalShowing = true;
-    }
-  }, [isVisibleCondition, root.atDeathScreen, root.startingNewGame]);
-
-  return (
-    <Modal
-      animationIn={uiStore.reduceMotion ? "fadeIn" : "slideInUp"}
-      animationOut={uiStore.reduceMotion ? "fadeOut" : "slideOutDown"}
-      animationInTiming={300}
-      animationOutTiming={300}
-      backdropTransitionOutTiming={300}
-      backdropTransitionInTiming={300}
-      backdropColor={
-        Platform.OS == "ios"
-          ? "#000000"
-          : colorScheme == "light"
-          ? "#ffffffff"
-          : "#000000"
-      }
-      isVisible={
+    useEffect(() => {
+      if (
         isVisibleCondition &&
         !(root.atDeathScreen && !isCheckPointModal && !root.startingNewGame)
+      ) {
+        modalShowing = true;
       }
-      backdropOpacity={0.5}
-      onBackdropPress={backdropCloses ? backFunction : undefined}
-      onBackButtonPress={backFunction}
-      statusBarTranslucent={true}
-      coverScreen={true}
-      deviceHeight={uiStore.dimensions.height}
-      style={style}
-      {...props}
-    >
-      <ThemedView
-        style={[
-          {
-            maxHeight: "90%",
-            ...styles.modalContent,
-            width: size ? `${size}%` : "83.3333%",
-            paddingHorizontal: noPad ? 0 : "2%",
-            paddingVertical: noPad ? 0 : 16,
-          },
-          props.innerStyle,
-        ]}
+    }, [isVisibleCondition, root.atDeathScreen, root.startingNewGame]);
+
+    return (
+      <Modal
+        animationIn={uiStore.reduceMotion ? "fadeIn" : "slideInUp"}
+        animationOut={uiStore.reduceMotion ? "fadeOut" : "slideOutDown"}
+        animationInTiming={300}
+        animationOutTiming={300}
+        backdropTransitionOutTiming={300}
+        backdropTransitionInTiming={300}
+        backdropColor={
+          Platform.OS == "ios"
+            ? "#000000"
+            : colorScheme == "light"
+            ? "#ffffffff"
+            : "#000000"
+        }
+        isVisible={
+          isVisibleCondition &&
+          !(root.atDeathScreen && !isCheckPointModal && !root.startingNewGame)
+        }
+        backdropOpacity={0.5}
+        onBackdropPress={backdropCloses ? backFunction : undefined}
+        onBackButtonPress={backFunction}
+        statusBarTranslucent={true}
+        coverScreen={true}
+        deviceHeight={uiStore.dimensions.height}
+        deviceWidth={uiStore.dimensions.width}
+        style={[style, shadows.soft]}
+        {...props}
       >
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          showsVerticalScrollIndicator={false}
-          scrollEnabled={scrollEnabled}
+        <ThemedView
+          style={[
+            {
+              maxHeight: "90%",
+              ...styles.modalContent,
+              width: size ? `${size}%` : "83.3333%",
+            },
+            props.innerStyle,
+          ]}
         >
-          {children}
-        </ScrollView>
-      </ThemedView>
-    </Modal>
-  );
-}
+          <ScrollView
+            contentContainerStyle={{
+              flexGrow: 1,
+              paddingVertical: noPad ? 0 : 16,
+              paddingHorizontal: noPad ? 0 : "2%",
+            }}
+            showsVerticalScrollIndicator={false}
+            scrollEnabled={scrollEnabled}
+          >
+            {children}
+          </ScrollView>
+        </ThemedView>
+      </Modal>
+    );
+  },
+);
+export default GenericModal;

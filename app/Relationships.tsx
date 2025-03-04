@@ -17,7 +17,7 @@ import { observer } from "mobx-react-lite";
 import GenericStrikeAround from "../components/GenericStrikeAround";
 import { useRootStore } from "../hooks/stores";
 import type { Character } from "../entities/character";
-import { flex, text, useStyles } from "../hooks/styles";
+import { flex, useStyles } from "../hooks/styles";
 
 const RelationshipsScreen = observer(() => {
   const styles = useStyles();
@@ -79,6 +79,7 @@ const RelationshipsScreen = observer(() => {
           {
             width: uiStore.dimensions.lesser * 0.35,
             opacity: character.deathdate ? 0.5 : 1,
+            height: uiStore.dimensions.height / 2,
           },
         ]}
         key={character.id}
@@ -88,21 +89,25 @@ const RelationshipsScreen = observer(() => {
           setSelectedCharacter(character);
         }}
       >
-        <Text style={{ textAlign: "center", ...text["2xl"] }}>
+        <Text style={{ textAlign: "center", ...styles["text-2xl"] }}>
           {character.fullName}
         </Text>
-        <View style={{ marginHorizontal: "auto" }}>
-          <CharacterImage character={character} />
-        </View>
-        <Text style={text.xl}>
+        <CharacterImage character={character} />
+        <Text style={styles["text-xl"]}>
           {character.deathdate && "Died at "}
           {character.age} Years Old
         </Text>
-        <Text style={{ textAlign: "center", ...text.xl }}>
+        <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
           {character.fullName}
         </Text>
         <View style={{ marginHorizontal: "auto" }}>
-          <Text style={{ textAlign: "center", flexWrap: "wrap", ...text.lg }}>
+          <Text
+            style={{
+              textAlign: "center",
+              flexWrap: "wrap",
+              ...styles["text-lg"],
+            }}
+          >
             {character.deathdate && "Was a "}
             {character.job}
           </Text>
@@ -133,7 +138,11 @@ const RelationshipsScreen = observer(() => {
     return (
       <View style={{ width: "100%" }} key={title}>
         <Text
-          style={{ paddingVertical: 32, textAlign: "center", ...text["2xl"] }}
+          style={{
+            paddingVertical: 32,
+            textAlign: "center",
+            ...styles["text-lg"],
+          }}
         >
           {title}
         </Text>
@@ -166,7 +175,7 @@ const RelationshipsScreen = observer(() => {
   if (!playerState) {
     return (
       <View style={[flex.columnCenter, { flex: 1 }]}>
-        <Text style={text.xl}>Unable to load relationship data</Text>
+        <Text style={styles["text-xl"]}>Unable to load relationship data</Text>
       </View>
     );
   }
@@ -178,7 +187,7 @@ const RelationshipsScreen = observer(() => {
   if (!hasAnyCharacters) {
     return (
       <View style={[flex.columnCenter, { flex: 1 }]}>
-        <Text style={text.xl}>You haven't met anyone yet!</Text>
+        <Text style={styles["text-xl"]}>You haven't met anyone yet!</Text>
       </View>
     );
   }
@@ -261,9 +270,7 @@ const RelationshipsScreen = observer(() => {
           backdropCloses
         />
         <ScrollView>
-          <View
-            style={[styles.mainContainer, { paddingTop: useHeaderHeight() }]}
-          >
+          <View style={[styles.mainContainer]}>
             {characterGroups.map((group) =>
               renderGroup(group.title, group.data),
             )}

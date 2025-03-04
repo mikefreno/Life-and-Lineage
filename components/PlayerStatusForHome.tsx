@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import ProgressBar from "./ProgressBar";
 import {
   ScrollView,
@@ -142,6 +142,29 @@ const PlayerStatus = observer(
       outputRange: ["transparent", "rgba(180,30,30,0.4)"],
     });
     const playerStatusRef = useRef<View>(null);
+
+    useLayoutEffect(() => {
+      const timer = setTimeout(() => {
+        if (playerStatusRef.current) {
+          playerStatusRef.current.measure((x, y, width, height, px, py) => {
+            if (
+              uiStore.playerStatusHeight !== height ||
+              uiStore.playerStatusTop !== py
+            ) {
+              uiStore.setPlayerStatusHeight(height);
+              uiStore.setPlayerStatusTop(py);
+            }
+          });
+        }
+      }, 250);
+
+      return () => clearTimeout(timer);
+    }, [
+      uiStore.dimensions,
+      uiStore.playerStatusIsCompact,
+      uiStore.isLandscape,
+      uiStore.root.dungeonStore.isInDungeon,
+    ]);
 
     useEffect(() => {
       if (playerState?.getTotalAllocatedPoints() == 0) {
@@ -758,6 +781,11 @@ const PlayerStatus = observer(
           onPress={() => {
             vibration({ style: "light" });
             uiStore.setDetailedStatusViewShowing(true);
+          }}
+          onLayout={(event) => {
+            const { height, y } = event.nativeEvent.layout;
+            uiStore.setPlayerStatusHeight(height);
+            uiStore.setPlayerStatusTop(y);
           }}
           style={[finalPosition, { alignSelf: "center" }]}
         >

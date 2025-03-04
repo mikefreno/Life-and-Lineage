@@ -13,7 +13,7 @@ import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
 import { FadeSlide } from "../../components/AnimatedWrappers";
-import { tw_base, useStyles } from "../../hooks/styles";
+import { normalize, tw_base, useStyles } from "../../hooks/styles";
 import {
   DexterityIcon,
   Energy,
@@ -75,9 +75,6 @@ export default function NewGameReview() {
     return (
       <>
         <View style={styles.newGameContainer}>
-          <Text style={styles.newGameHeader} accessibilityRole="header">
-            Review
-          </Text>
           <Text style={styles.newGameHeader}>
             {`${firstName} ${lastName} the `}
             <Text
@@ -105,6 +102,7 @@ export default function NewGameReview() {
               accessibilityRole="button"
               accessibilityLabel="Confirm"
               disabled={!allocatedStats || remainingPoints > 0}
+              childrenWhenDisabled={"Spend all points to continue"}
             >
               Confirm?
             </GenericFlatButton>
@@ -185,7 +183,12 @@ export function StatAllocation({
     <View style={styles.statRow}>
       <View style={styles.rowItemsCenter}>
         {icon}
-        <Text style={{ marginLeft: 8 }}>{value}</Text>
+        <Text style={[{ marginLeft: 8 }, styles["text-md"]]}>
+          {value}
+          {stats[stat] !== baseStats[stat]
+            ? `(+${stats[stat] - baseStats[stat]})`
+            : ""}
+        </Text>
       </View>
       <View style={[styles.rowItemsCenter, { gap: 16 }]}>
         <Pressable
@@ -193,9 +196,9 @@ export function StatAllocation({
           disabled={stats[stat] <= baseStats[stat]}
         >
           <SquareMinus
-            height={20}
-            width={20}
-            opacity={stats[stat] <= baseStats[stat] ? 0.5 : 1}
+            height={normalize(20)}
+            width={normalize(20)}
+            opacity={stats[stat] <= baseStats[stat] ? 0.2 : 1}
           />
         </Pressable>
         <Pressable
@@ -203,9 +206,9 @@ export function StatAllocation({
           disabled={remainingPoints <= 0}
         >
           <SquarePlus
-            height={20}
-            width={20}
-            opacity={remainingPoints <= 0 ? 0.5 : 1}
+            height={normalize(20)}
+            width={normalize(20)}
+            opacity={remainingPoints <= 0 ? 0.2 : 1}
           />
         </Pressable>
       </View>
@@ -216,50 +219,52 @@ export function StatAllocation({
     <View style={[styles.gearStatsContainer, { paddingHorizontal: 16 }]}>
       <Text
         style={[
-          styles.lg,
+          styles["text-lg"],
           { color: "#ef4444", textAlign: "center", marginBottom: 16 },
         ]}
       >
-        Warning: Stat allocations are permanent and cannot be changed later!
+        These stat allocations are permanent and cannot be changed later.
       </Text>
 
-      <Text style={[styles.xl, styles.textCenter, { marginBottom: 16 }]}>
+      <Text
+        style={[styles["text-xl"], styles.textCenter, { marginBottom: 16 }]}
+      >
         Remaining Points: {remainingPoints}
       </Text>
 
       <StatRow
         stat="baseHealth"
-        icon={<HealthIcon height={20} width={23} />}
+        icon={<HealthIcon height={normalize(20)} width={normalize(23)} />}
         value={stats.baseHealth}
       />
       <StatRow
         stat="baseMana"
-        icon={<Energy height={20} width={23} />}
+        icon={<Energy height={normalize(20)} width={normalize(23)} />}
         value={stats.baseMana}
       />
       <StatRow
         stat="baseSanity"
-        icon={<Sanity height={20} width={23} />}
+        icon={<Sanity height={normalize(20)} width={normalize(23)} />}
         value={stats.baseSanity}
       />
       <StatRow
         stat="baseStrength"
-        icon={<StrengthIcon height={20} width={23} />}
+        icon={<StrengthIcon height={normalize(20)} width={normalize(23)} />}
         value={stats.baseStrength}
       />
       <StatRow
         stat="baseIntelligence"
-        icon={<IntelligenceIcon height={20} width={23} />}
+        icon={<IntelligenceIcon height={normalize(20)} width={normalize(23)} />}
         value={stats.baseIntelligence}
       />
       <StatRow
         stat="baseDexterity"
-        icon={<DexterityIcon height={20} width={23} />}
+        icon={<DexterityIcon height={normalize(20)} width={normalize(23)} />}
         value={stats.baseDexterity}
       />
       <StatRow
         stat="baseManaRegen"
-        icon={<Regen height={20} width={23} />}
+        icon={<Regen height={normalize(20)} width={normalize(23)} />}
         value={stats.baseManaRegen}
       />
     </View>

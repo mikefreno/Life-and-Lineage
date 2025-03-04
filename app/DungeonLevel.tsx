@@ -73,7 +73,7 @@ const DungeonLevelScreen = observer(() => {
           pouchRef.current.measure((x, y, w, h, pageX, pageY) => {
             draggableClassStore.setAncillaryBounds("pouch", {
               x: pageX,
-              y: pageY - header,
+              y: pageY,
               width,
               height,
             });
@@ -145,6 +145,7 @@ const DungeonLevelScreen = observer(() => {
       .catch((error) => {
         uiStore.completeLoading();
       });
+    return () => draggableClassStore.removeAncillaryBounds("pouch");
   }, []);
 
   useEffect(() => {
@@ -162,7 +163,11 @@ const DungeonLevelScreen = observer(() => {
       <ScreenShaker>
         <TutorialModal
           tutorial={TutorialOption.dungeonInterior}
-          isFocused={isFocused}
+          isFocused={
+            isFocused &&
+            dungeonStore.currentInstance?.name.toLowerCase() !==
+              "training grounds"
+          }
           pageOne={{
             title: "Watch Your Health",
             body: "Your situation can change rapidly.",

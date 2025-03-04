@@ -30,8 +30,9 @@ import { DungeonStore } from "../stores/DungeonStore";
 import GenericModal from "../components/GenericModal";
 import { CharacterImage } from "../components/CharacterImage";
 import GenericFlatButton from "../components/GenericFlatButton";
-import { useStyles } from "../hooks/styles";
+import { normalize, useStyles } from "../hooks/styles";
 import { DevControls } from "@/components/DevControls";
+import BoundsVisualizer from "@/components/BoundsVisualizer";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -261,12 +262,18 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
       accessibilityLabel="Birth Announcement"
     >
       <View style={styles.itemsCenter}>
-        <Text style={{ ...styles["2xl"], ...styles.textCenter }}>
+        <Text style={{ ...styles["text-2xl"], ...styles.textCenter }}>
           A Child is Born!
         </Text>
         {newbornBaby && (
           <>
-            <Text style={{ ...styles.xl, ...styles.textCenter, ...styles.mt4 }}>
+            <Text
+              style={{
+                ...styles["text-xl"],
+                ...styles.textCenter,
+                ...styles.mt4,
+              }}
+            >
               {newbornBaby.fullName}
             </Text>
             <Text style={{ ...styles.textCenter, ...styles.mt2 }}>
@@ -301,7 +308,12 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
         <ProjectedImage />
         <FleeModal />
         <BirthAnnouncementModal />
-        {__DEV__ && <DevControls />}
+        {__DEV__ && (
+          <>
+            <DevControls />
+            {rootStore.showDevDebugUI && <BoundsVisualizer />}
+          </>
+        )}
         <Stack
           screenOptions={{
             animation: uiStore.reduceMotion ? "fade" : undefined,
@@ -324,31 +336,37 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
           <Stack.Screen
             name="Options"
             options={{
-              presentation: uiStore.reduceMotion ? "card" : "modal",
+              presentation:
+                uiStore.reduceMotion || uiStore.isLargeDevice
+                  ? "card"
+                  : "modal",
               headerBackButtonDisplayMode: "minimal",
               headerBackButtonMenuEnabled: false,
               headerBackTitleStyle: {
                 fontFamily: "PixelifySans",
-                fontSize: 16,
+                fontSize: normalize(16),
               },
               headerTitleStyle: {
                 fontFamily: "PixelifySans",
-                fontSize: 22,
+                fontSize: normalize(22),
               },
             }}
           />
           <Stack.Screen
             name="Auth"
             options={{
-              presentation: uiStore.reduceMotion ? "card" : "modal",
+              presentation:
+                uiStore.reduceMotion || uiStore.isLargeDevice
+                  ? "card"
+                  : "fullScreenModal",
               headerBackButtonMenuEnabled: false,
               headerBackTitleStyle: {
                 fontFamily: "PixelifySans",
-                fontSize: 16,
+                fontSize: normalize(16),
               },
               headerTitleStyle: {
                 fontFamily: "PixelifySans",
-                fontSize: 22,
+                fontSize: normalize(22),
               },
             }}
           />
@@ -359,11 +377,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
               headerBackButtonMenuEnabled: false,
               headerBackTitleStyle: {
                 fontFamily: "PixelifySans",
-                fontSize: 16,
+                fontSize: normalize(16),
               },
               headerTitleStyle: {
                 fontFamily: "PixelifySans",
-                fontSize: 22,
+                fontSize: normalize(22),
               },
             }}
           />
@@ -375,11 +393,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
               headerBackButtonMenuEnabled: false,
               headerBackTitleStyle: {
                 fontFamily: "PixelifySans",
-                fontSize: 16,
+                fontSize: normalize(16),
               },
               headerTitleStyle: {
                 fontFamily: "PixelifySans",
-                fontSize: 22,
+                fontSize: normalize(22),
               },
             }}
           />
@@ -389,13 +407,13 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
               headerBackButtonMenuEnabled: false,
               headerBackButtonDisplayMode: "minimal",
               headerTransparent: true,
-              headerTitleStyle: {
-                fontFamily: "PixelifySans",
-                fontSize: 22,
-              },
               headerBackTitleStyle: {
                 fontFamily: "PixelifySans",
-                fontSize: 16,
+                fontSize: normalize(16),
+              },
+              headerTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: normalize(22),
               },
               headerBackground: () => (
                 <BlurView
@@ -420,13 +438,13 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
               headerBackButtonMenuEnabled: false,
               headerBackButtonDisplayMode: "minimal",
               headerTransparent: true,
-              headerTitleStyle: {
-                fontFamily: "PixelifySans",
-                fontSize: 22,
-              },
               headerBackTitleStyle: {
                 fontFamily: "PixelifySans",
-                fontSize: 16,
+                fontSize: normalize(16),
+              },
+              headerTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: normalize(22),
               },
               headerBackground: () => (
                 <BlurView
@@ -451,13 +469,13 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
               headerBackButtonMenuEnabled: false,
               headerBackButtonDisplayMode: "minimal",
               headerTransparent: true,
-              headerTitleStyle: {
-                fontFamily: "PixelifySans",
-                fontSize: 22,
-              },
               headerBackTitleStyle: {
                 fontFamily: "PixelifySans",
-                fontSize: 16,
+                fontSize: normalize(16),
+              },
+              headerTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: normalize(22),
               },
               headerBackground: () => (
                 <BlurView
@@ -483,13 +501,13 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
               headerBackButtonMenuEnabled: false,
               headerBackButtonDisplayMode: "minimal",
               headerTransparent: true,
-              headerTitleStyle: {
-                fontFamily: "PixelifySans",
-                fontSize: 22,
-              },
               headerBackTitleStyle: {
                 fontFamily: "PixelifySans",
-                fontSize: 16,
+                fontSize: normalize(16),
+              },
+              headerTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: normalize(22),
               },
               headerBackground: () => (
                 <BlurView
@@ -511,7 +529,10 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
           <Stack.Screen
             name="DungeonLevel"
             options={{
-              headerTitleStyle: { fontFamily: "PixelifySans", fontSize: 20 },
+              headerTitleStyle: {
+                fontFamily: "PixelifySans",
+                fontSize: normalize(20),
+              },
               headerTransparent: true,
               headerBackground: () => (
                 <BlurView
@@ -565,11 +586,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
               headerBackButtonMenuEnabled: false,
               headerBackTitleStyle: {
                 fontFamily: "PixelifySans",
-                fontSize: 16,
+                fontSize: normalize(16),
               },
               headerTitleStyle: {
                 fontFamily: "PixelifySans",
-                fontSize: 22,
+                fontSize: normalize(22),
               },
             }}
           />

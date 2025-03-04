@@ -21,7 +21,7 @@ import { useNewGameStore } from "./_layout";
 import { FadeSlide } from "../../components/AnimatedWrappers";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { useRouter } from "expo-router";
-import { text, useStyles } from "../../hooks/styles";
+import { useStyles } from "../../hooks/styles";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
 
 const SetClassScreen = observer(() => {
@@ -63,14 +63,19 @@ const SetClassScreen = observer(() => {
         backFunction={() => setShowTutorialReset(false)}
         accessibilityRole="alert"
       >
-        <Text style={{ textAlign: "center", ...text["2xl"] }}>
+        <Text style={{ textAlign: "center", ...styles["text-2xl"] }}>
           Tutorial Reset
         </Text>
-        <Text style={{ textAlign: "center", ...text.xl }}>
+        <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
           Would you like to reset tutorials?
         </Text>
-        <ThemedView style={{ flexDirection: "row" }}>
-          <Pressable
+        <ThemedView
+          style={[
+            styles.rowBetween,
+            { paddingHorizontal: uiStore.dimensions.width * 0.05 },
+          ]}
+        >
+          <GenericFlatButton
             onPress={() => {
               setShowTutorialReset(false);
               if (!!playerState) {
@@ -81,20 +86,18 @@ const SetClassScreen = observer(() => {
                 });
               }
             }}
-            style={styles.tutorialResetButton}
             accessibilityRole="button"
             accessibilityLabel="Reset Tutorial"
           >
-            <Text>Reset</Text>
-          </Pressable>
-          <Pressable
+            Reset
+          </GenericFlatButton>
+          <GenericFlatButton
             onPress={() => setShowTutorialReset(false)}
-            style={styles.tutorialResetButton}
             accessibilityRole="button"
             accessibilityLabel="Cancel"
           >
-            <Text>Cancel</Text>
-          </Pressable>
+            Cancel
+          </GenericFlatButton>
         </ThemedView>
       </GenericModal>
       <ScrollView>
@@ -153,7 +156,7 @@ const SetClassScreen = observer(() => {
                     style={{
                       textAlign: "center",
                       color: "#2563eb",
-                      ...styles.xl,
+                      ...styles["text-xl"],
                     }}
                   >
                     Mage
@@ -209,7 +212,7 @@ const SetClassScreen = observer(() => {
                     style={{
                       textAlign: "center",
                       color: "green",
-                      ...styles.xl,
+                      ...styles["text-xl"],
                     }}
                   >
                     Ranger
@@ -274,7 +277,7 @@ const SetClassScreen = observer(() => {
                     style={{
                       textAlign: "center",
                       color: "#9333ea",
-                      ...styles.xl,
+                      ...styles["text-xl"],
                     }}
                   >
                     Necromancer
@@ -331,7 +334,7 @@ const SetClassScreen = observer(() => {
                     style={{
                       textAlign: "center",
                       color: "#fcd34d",
-                      ...styles.xl,
+                      ...styles["text-xl"],
                     }}
                   >
                     Paladin
@@ -345,26 +348,15 @@ const SetClassScreen = observer(() => {
             {classSelection && ClassDescriptionMap[classSelection]}
           </Text>
 
-          <View
-            style={{
-              marginHorizontal: "auto",
-              paddingTop: 16,
-              paddingBottom: height * 0.1,
-            }}
+          <GenericFlatButton
+            disabled={classSelection === undefined}
+            onPress={() => router.push("/NewGame/BlessingSelect")}
+            accessibilityRole="link"
+            accessibilityLabel="Next"
+            childrenWhenDisabled={"Select class to continue"}
           >
-            <FadeSlide show={!!classSelection}>
-              {({ showing }) => (
-                <GenericFlatButton
-                  disabled={!showing}
-                  onPress={() => router.push("/NewGame/BlessingSelect")}
-                  accessibilityRole="link"
-                  accessibilityLabel="Next"
-                >
-                  <Text>Next</Text>
-                </GenericFlatButton>
-              )}
-            </FadeSlide>
-          </View>
+            Next
+          </GenericFlatButton>
         </View>
         <NewGameMetaControls
           forceShowTutorial={() => setForceShowTutorial(true)}

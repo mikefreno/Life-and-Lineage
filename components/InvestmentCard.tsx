@@ -1,7 +1,7 @@
 import React from "react";
 import { ThemedScrollView, Text } from "./Themed";
 import { InvestmentType, InvestmentUpgrade } from "../utility/types";
-import { Pressable, View, Animated } from "react-native";
+import { Pressable, View, Animated, ScrollView } from "react-native";
 import { useEffect, useRef, useState } from "react";
 import { toTitleCase, asReadableGold } from "../utility/functions/misc";
 import { Entypo } from "@expo/vector-icons";
@@ -165,19 +165,21 @@ const InvestmentCard = observer(
             </Pressable>
           </View>
         </GenericModal>
-
         <GenericModal
           isVisibleCondition={showUpgrades}
-          style={{ maxHeight: "75%", marginTop: "auto", marginBottom: "auto" }}
+          style={{ maxHeight: "75%", marginVertical: "auto" }}
           backFunction={() => setShowUpgrades(false)}
           size={95}
+          noPad
+          scrollEnabled={true}
+          innerStyle={{ paddingHorizontal: "3%" }}
         >
           <GenericStrikeAround>
             <Text style={[styles.textCenter, text.xl]}>
               {investment.name} Upgrades
             </Text>
           </GenericStrikeAround>
-          <ThemedScrollView>
+          <ScrollView>
             {investment.upgrades.map((upgrade) => {
               const [showingBody, setShowingBody] = useState<boolean>(false);
               const rotation = useRef(new Animated.Value(0)).current;
@@ -206,7 +208,6 @@ const InvestmentCard = observer(
                 >
                   <View
                     style={[
-                      styles.themedCard,
                       styles.m2,
                       styles.roundedBorder,
                       {
@@ -345,7 +346,7 @@ const InvestmentCard = observer(
                 </Pressable>
               );
             })}
-          </ThemedScrollView>
+          </ScrollView>
           <Pressable
             onPress={() => {
               vibration({ style: "light" });

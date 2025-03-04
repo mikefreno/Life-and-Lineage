@@ -2,7 +2,7 @@ import { View, Pressable } from "react-native";
 import { Text } from "../Themed";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
-import { text, useStyles } from "../../hooks/styles";
+import { useStyles } from "../../hooks/styles";
 
 interface BattleTabControlsProps {
   battleTab: string;
@@ -42,7 +42,7 @@ export default function BattleTabControls({
           setBattleTab("attacksOrNavigation");
         }}
       >
-        <Text style={{ textAlign: "center", ...text.xl }}>
+        <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
           {dungeonStore.inCombat ? "Attacks" : "Navigation"}
         </Text>
       </Pressable>
@@ -59,7 +59,9 @@ export default function BattleTabControls({
           setBattleTab("equipment");
         }}
       >
-        <Text style={{ textAlign: "center", ...text.xl }}>Inventory</Text>
+        <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
+          Inventory
+        </Text>
       </Pressable>
       <Pressable
         style={[
@@ -74,7 +76,7 @@ export default function BattleTabControls({
           setBattleTab("log");
         }}
       >
-        <Text style={{ textAlign: "center", ...text.xl }}>Log</Text>
+        <Text style={{ textAlign: "center", ...styles["text-xl"] }}>Log</Text>
       </Pressable>
     </View>
   );

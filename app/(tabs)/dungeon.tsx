@@ -111,16 +111,14 @@ const DungeonScreen = observer(() => {
     };
   }, []);
 
-  const blurHeader = useRef<View>(null);
-
   const [blurHeaderHeight, setBlurHeaderHeight] = useState<number>(100);
-  useLayoutEffect(() => {
-    if (blurHeader.current) {
-      blurHeader.current.measure((x, y, width, height) =>
-        setBlurHeaderHeight(height),
-      );
+
+  const handleLayout = (event) => {
+    const { height } = event.nativeEvent.layout;
+    if (typeof height === "number" && !isNaN(height)) {
+      setBlurHeaderHeight(height);
     }
-  });
+  };
 
   const scaleAnimUpArrow = useRef(new Animated.Value(1)).current;
   const scaleAnimDownArrow = useRef(new Animated.Value(1)).current;
@@ -162,13 +160,13 @@ const DungeonScreen = observer(() => {
         }}
       />
       <View
-        ref={blurHeader}
         style={[
           styles.warningContainer,
           {
             marginTop: headerHeight,
           },
         ]}
+        onLayout={handleLayout}
       >
         <PlatformDependantBlurView
           style={{

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Image, type LayoutChangeEvent } from "react-native";
 import { Text } from "./Themed";
 import { InventoryItem } from "./Draggable";
@@ -10,6 +10,7 @@ import UIStore from "../stores/UIStore";
 import { DraggableDataStore } from "../stores/DraggableDataStore";
 import { observer } from "mobx-react-lite";
 import { useStyles } from "../hooks/styles";
+import { useIsFocused } from "@react-navigation/native";
 
 interface EquipmentDisplayProps {
   displayItem: {
@@ -158,6 +159,9 @@ const EquipmentSlot = observer(
     let itemStack: Item[] = [];
     const selfRef = useRef<View | null>(null);
     const styles = useStyles();
+    const slotKey = slot.toLowerCase();
+    const isFocused = useIsFocused();
+
     if (playerState) {
       switch (slot) {
         case "Head":
@@ -187,30 +191,44 @@ const EquipmentSlot = observer(
         return <></>;
       }
 
-      const setBoundsOnLayout = useCallback(
-        (event: LayoutChangeEvent) => {
-          const { width, height } = event.nativeEvent.layout;
+      const measureAndSetBounds = useCallback(() => {
+        if (selfRef.current) {
+          selfRef.current.measure((x, y, w, h, pageX, pageY) => {
+            draggableClassStore.setAncillaryBounds(slotKey, {
+              x: pageX,
+              y: pageY,
+              width: w,
+              height: h,
+            });
+          });
+        }
+      }, [draggableClassStore, slotKey]);
 
+      useEffect(() => {
+        if (isFocused) {
           setTimeout(() => {
-            if (selfRef.current) {
-              selfRef.current.measure((x, y, w, h, pageX, pageY) => {
-                draggableClassStore.setAncillaryBounds(slot.toLowerCase(), {
-                  x: pageX,
-                  y: pageY,
-                  width,
-                  height,
-                });
-              });
-            }
-          }, 100);
-        },
-        [uiStore.dimensions],
-      );
+            measureAndSetBounds();
+          }, 150);
+        } else {
+          draggableClassStore.removeAncillaryBounds(slotKey);
+        }
+
+        return () => {
+          draggableClassStore.removeAncillaryBounds(slotKey);
+        };
+      }, [isFocused, measureAndSetBounds, draggableClassStore, slotKey]);
+
+      const setBoundsOnLayout = useCallback(() => {
+        if (!isFocused) return;
+        setTimeout(() => {
+          measureAndSetBounds();
+        }, 100);
+      }, [isFocused, measureAndSetBounds]);
 
       return (
         <>
           <Text style={{ marginBottom: 4, textAlign: "center" }}>{slot}</Text>
-          <View onLayout={(e) => setBoundsOnLayout(e)} ref={selfRef}>
+          <View onLayout={setBoundsOnLayout} ref={selfRef}>
             {itemStack.length > 0 ? (
               <View
                 style={[

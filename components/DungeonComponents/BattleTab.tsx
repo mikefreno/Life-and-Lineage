@@ -28,7 +28,7 @@ import {
   useRootStore,
 } from "../../hooks/stores";
 import { observer } from "mobx-react-lite";
-import { text, tw, useStyles } from "../../hooks/styles";
+import { tw, useStyles } from "../../hooks/styles";
 import { Enemy } from "../../entities/creatures";
 import GenericRaisedButton from "../GenericRaisedButton";
 
@@ -280,7 +280,7 @@ const BattleTab = observer(
                           >
                             <Text
                               style={[
-                                text.xl,
+                                styles["text-xl"],
                                 {
                                   color:
                                     attackOrSpell instanceof Spell
@@ -296,7 +296,7 @@ const BattleTab = observer(
                             </Text>
                             {attackOrSpell instanceof Attack &&
                             attackOrSpell.baseHitChance ? (
-                              <Text style={text.lg}>{`${
+                              <Text style={styles["text-lg"]}>{`${
                                 attackOrSpell.baseHitChance * 100
                               }% hit chance`}</Text>
                             ) : (
@@ -356,7 +356,7 @@ const BattleTab = observer(
                             },
                           ]}
                         >
-                          <Text style={text.xl}>
+                          <Text style={styles["text-xl"]}>
                             {playerState.isStunned
                               ? "Stunned!"
                               : attackOrSpell instanceof Spell
@@ -371,7 +371,7 @@ const BattleTab = observer(
                       {index == combinedData.length - 1 && (
                         <ThemedView style={styles.attackCardBase}>
                           <View style={styles.columnCenter}>
-                            <Text style={text.xl}>Pass</Text>
+                            <Text style={styles["text-xl"]}>Pass</Text>
                             <View style={styles.rowItemsCenter}>
                               <Text>2x</Text>
                               <Regen width={12} height={12} />
@@ -399,7 +399,7 @@ const BattleTab = observer(
                               },
                             ]}
                           >
-                            <Text style={text.xl}>Use</Text>
+                            <Text style={styles["text-xl"]}>Use</Text>
                           </Pressable>
                         </ThemedView>
                       )}
@@ -411,7 +411,7 @@ const BattleTab = observer(
                   <Text style={styles.stunnedText}>Stunned!</Text>
                   <View style={styles.attackCardBase}>
                     <View style={styles.columnCenter}>
-                      <Text style={text.xl}>Pass</Text>
+                      <Text style={styles["text-xl"]}>Pass</Text>
                     </View>
                     <Pressable
                       disabled={enemyStore.attackAnimationsOnGoing}
@@ -431,7 +431,7 @@ const BattleTab = observer(
                         },
                       ]}
                     >
-                      <Text style={text.xl}>Use</Text>
+                      <Text style={styles["text-xl"]}>Use</Text>
                     </Pressable>
                   </View>
                 </View>
@@ -456,7 +456,7 @@ const BattleTab = observer(
             <View style={styles.logContent}>
               {dungeonStore.logs.length === 0 ? (
                 <View style={{ marginVertical: "auto" }}>
-                  <Text style={[text.lg, { textAlign: "center" }]}>
+                  <Text style={[styles["text-lg"], { textAlign: "center" }]}>
                     Combat logs will appear here.
                   </Text>
                 </View>

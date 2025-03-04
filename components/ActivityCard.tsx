@@ -22,7 +22,7 @@ import {
 } from "../assets/icons/SVGIcons";
 import { useRootStore } from "../hooks/stores";
 import type { Character } from "../entities/character";
-import { useStyles } from "../hooks/styles";
+import { shadows, useStyles } from "../hooks/styles";
 import { DungeonLevel } from "../entities/dungeon";
 import { AnimatedSprite } from "./AnimatedSprite";
 import { EnemyImageMap } from "../utility/enemyHelpers";
@@ -33,7 +33,7 @@ interface ActivityCardProps {
 
 const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   const root = useRootStore();
-  const { playerState, enemyStore } = root;
+  const { playerState } = root;
   const [metCharacter, setMetCharacter] = useState<Character | null>(null);
   const [nothingHappened, setNothingHappened] = useState<boolean>(false);
   const [badOutCome, setBadOutcome] = useState<BadOutcome | null>(null);
@@ -190,7 +190,6 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
       )
       .flat();
 
-    // Create a new level with the encounters
     const activityDungeon = new DungeonLevel({
       level: 0,
       bossEncounter: [],
@@ -219,19 +218,21 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           pressed && { transform: [{ scale: 0.95 }] },
         ]}
       >
-        <Text style={[styles["2xl"], styles.textCenter]}>
+        <Text style={[styles["text-2xl"], styles.textCenter]}>
           {character.fullName}
         </Text>
         <View style={styles.itemsCenter}>
           <CharacterImage character={character} />
         </View>
-        <Text style={styles.xl}>
+        <Text style={styles["text-xl"]}>
           {character.deathdate && "Died at "}
           {character.age} Years Old
         </Text>
-        <Text style={[styles.xl, styles.textCenter]}>{character.fullName}</Text>
+        <Text style={[styles["text-xl"], styles.textCenter]}>
+          {character.fullName}
+        </Text>
         <View style={styles.itemsCenter}>
-          <Text style={[styles.lg, styles.textCenter, styles.wrap]}>
+          <Text style={[styles["text-lg"], styles.textCenter, styles.wrap]}>
             {character.deathdate && "Was a "}
             {character.job}
           </Text>
@@ -283,7 +284,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
         <View style={{ alignItems: "center" }}>
           <Text
             style={[
-              styles["2xl"],
+              styles["text-2xl"],
               styles.textCenter,
               { paddingHorizontal: 16 },
             ]}
@@ -319,7 +320,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
         backFunction={() => setGoodOutcome(null)}
       >
         <View style={{ alignItems: "center" }}>
-          <Text style={[styles.lg, styles.textCenter]}>
+          <Text style={[styles["text-lg"], styles.textCenter]}>
             {goodOutcome?.name}
           </Text>
           {goodOutcome?.effect.gold && (
@@ -353,7 +354,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
         backFunction={() => setBadOutcome(null)}
       >
         <View style={{ alignItems: "center" }}>
-          <Text style={[styles["2xl"], { paddingBottom: 8 }]}>
+          <Text style={[styles["text-2xl"], { paddingBottom: 8 }]}>
             {badOutCome?.name}
           </Text>
           {badOutCome?.fight ? (
@@ -381,7 +382,9 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                         </View>
                       </GenericFlatButton>
                       <GenericStrikeAround>
-                        <Text style={[styles.lg, { marginVertical: 8 }]}>
+                        <Text
+                          style={[styles["text-lg"], { marginVertical: 8 }]}
+                        >
                           Or
                         </Text>
                       </GenericStrikeAround>
@@ -419,7 +422,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
         backFunction={() => setNothingHappened(false)}
       >
         <View style={{ alignItems: "center" }}>
-          <Text style={[styles.xl, { paddingBottom: 8 }]}>
+          <Text style={[styles["text-xl"], { paddingBottom: 8 }]}>
             Nothing of note happened
           </Text>
           <Text>Could have been worse</Text>
@@ -433,11 +436,11 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
       <ThemedView style={styles.activityCard}>
         <View style={styles.activityCardInner}>
           <View style={styles.rowBetween}>
-            <Text style={[styles.xl, styles.bold, { width: "75%" }]}>
+            <Text style={[styles["text-xl"], styles.bold, { width: "75%" }]}>
               {toTitleCase(activity.name)}
             </Text>
             <View style={styles.rowCenter}>
-              <Text style={[styles.xl, styles.bold]}>
+              <Text style={[styles["text-xl"], styles.bold]}>
                 {activity.cost == 0 ? "free" : activity.cost}{" "}
               </Text>
               {activity.cost !== 0 && <Coins height={14} width={14} />}

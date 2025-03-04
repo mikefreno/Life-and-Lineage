@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   ColorValue,
@@ -14,8 +14,10 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { useVibration } from "../hooks/generic";
-import { Text } from "./Themed";
 import { useRootStore } from "../hooks/stores";
+import AnimatedButtonText from "./AnimatedButtonText";
+import { Text } from "./Themed";
+import { useStyles } from "@/hooks/styles";
 
 interface GenericRaisedButtonProps {
   ref?: React.RefObject<any>;
@@ -25,6 +27,8 @@ interface GenericRaisedButtonProps {
   onPressOut?: () => void;
   backgroundColor?: ColorValue;
   children: string | React.ReactNode;
+  childrenWhenDisabled?: string | React.ReactNode;
+  disabledAddendum?: string;
   textColor?: ColorValue;
   disabled?: boolean;
   vibrationStrength?:
@@ -40,22 +44,6 @@ interface GenericRaisedButtonProps {
   buttonStyle?: StyleProp<ViewStyle>;
 }
 
-const styles = StyleSheet.create({
-  defaultContainer: {
-    marginHorizontal: "auto",
-    marginBottom: 8,
-    marginTop: 16,
-  },
-  buttonContainer: {
-    borderRadius: 12,
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-  },
-  centerText: {
-    textAlign: "center",
-  },
-});
-
 const GenericRaisedButton = ({
   ref,
   onPress,
@@ -65,6 +53,8 @@ const GenericRaisedButton = ({
   backgroundColor,
   textColor,
   children,
+  childrenWhenDisabled,
+  disabledAddendum,
   disabled = false,
   vibrationStrength = "light",
   vibrationEssentiality = false,
@@ -77,6 +67,8 @@ const GenericRaisedButton = ({
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
   const { uiStore } = useRootStore();
+  const [textWidth, setTextWidth] = useState<number | null>(null);
+  const styles = useStyles();
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -118,7 +110,13 @@ const GenericRaisedButton = ({
   };
 
   const containerStyle = React.useMemo(() => {
-    const baseStyles = !disableTopLevelStyling ? styles.defaultContainer : {};
+    const baseStyles = !disableTopLevelStyling
+      ? {
+          marginHorizontal: "auto",
+          marginBottom: 8,
+          marginTop: 16,
+        }
+      : {};
     return [baseStyles, style];
   }, [disableTopLevelStyling, style]);
 
@@ -142,14 +140,19 @@ const GenericRaisedButton = ({
     };
   }, [uiStore.colorScheme, disabled, backgroundColor]);
 
-  const textStyle = React.useMemo(
-    () => ({
-      color:
-        textColor || (uiStore.colorScheme === "light" ? "#27272a" : "#fafafa"),
-      opacity: disabled ? 0.5 : 1,
-    }),
-    [uiStore.colorScheme, textColor, disabled],
-  );
+  const currentText =
+    typeof children === "string"
+      ? childrenWhenDisabled && disabled
+        ? (childrenWhenDisabled as string)
+        : children
+      : "";
+
+  const onTextLayout = (e: any) => {
+    const { width } = e.nativeEvent.layout;
+    if (width !== textWidth) {
+      setTextWidth(width);
+    }
+  };
 
   return (
     <Pressable
@@ -169,14 +172,40 @@ const GenericRaisedButton = ({
     >
       <Animated.View
         style={[
-          styles.buttonContainer,
+          {
+            borderRadius: 12,
+            paddingHorizontal: 32,
+            paddingVertical: 16,
+          },
           buttonStyle,
           dynamicButtonStyle,
           animatedStyle,
         ]}
       >
         {typeof children === "string" ? (
-          <Text style={[styles.centerText, textStyle]}>{children}</Text>
+          <>
+            <AnimatedButtonText
+              currentText={currentText}
+              disabled={disabled}
+              textColor={textColor}
+              styles={styles}
+              onLayout={onTextLayout}
+            />
+            {disabled && disabledAddendum && (
+              <Text
+                style={[
+                  styles.flatButtonText,
+                  disabled
+                    ? { color: "#d4d4d8" }
+                    : textColor
+                    ? { color: textColor }
+                    : {},
+                ]}
+              >
+                {disabledAddendum}
+              </Text>
+            )}
+          </>
         ) : (
           children
         )}

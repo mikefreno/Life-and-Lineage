@@ -3,7 +3,6 @@ import { Pressable, ScrollView, View } from "react-native";
 import { Text } from "../../components/Themed";
 import { useState } from "react";
 import { router } from "expo-router";
-import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import TutorialModal from "../../components/TutorialModal";
 import { DescriptionMap } from "../../utility/descriptions";
 import {
@@ -21,7 +20,7 @@ import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
 import { FadeSlide } from "../../components/AnimatedWrappers";
-import { text, useStyles } from "../../hooks/styles";
+import { useStyles } from "../../hooks/styles";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
 
@@ -31,9 +30,8 @@ export default function SetBlessing() {
 
   const isFocused = useIsFocused();
   const vibration = useVibration();
-  const { uiStore, tutorialStore, playerState, audioStore } = useRootStore();
+  const { uiStore } = useRootStore();
   const { dimensions, colorScheme } = uiStore;
-  const isDark = colorScheme === "dark";
   const styles = useStyles();
 
   const [forceShowTutorial, setForceShowTutorial] = useState<boolean>(false);
@@ -89,32 +87,20 @@ export default function SetBlessing() {
               textAlign: "center",
               paddingHorizontal: 16,
               paddingTop: 16,
-              ...text.lg,
+              ...styles["text-lg"],
             }}
           >
             {DescriptionMap[blessingSelection as Element]}
           </Text>
-
-          <View
-            style={{
-              marginHorizontal: "auto",
-              height: 128,
-              paddingVertical: 8,
-            }}
+          <GenericFlatButton
+            onPress={() => router.push("/NewGame/SexSelect")}
+            accessibilityRole="link"
+            accessibilityLabel="Next"
+            disabled={!(blessingSelection == 0 || !!blessingSelection)}
+            childrenWhenDisabled={"Select blessing to continue"}
           >
-            <FadeSlide show={blessingSelection == 0 || !!blessingSelection}>
-              {({ showing }) => (
-                <GenericFlatButton
-                  onPress={() => router.push("/NewGame/SexSelect")}
-                  accessibilityRole="link"
-                  accessibilityLabel="Next"
-                  disabled={!showing}
-                >
-                  <Text>Next</Text>
-                </GenericFlatButton>
-              )}
-            </FadeSlide>
-          </View>
+            Next
+          </GenericFlatButton>
         </View>
         <NewGameMetaControls
           forceShowTutorial={() => setForceShowTutorial(true)}
@@ -171,7 +157,7 @@ const BlessingPressable = ({
           />
           <Text
             style={{
-              ...text.lg,
+              ...styles["text-lg"],
               textAlign: "center",
               paddingHorizontal: 8,
               color:

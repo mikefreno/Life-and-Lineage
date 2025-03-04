@@ -6,7 +6,7 @@ import { router } from "expo-router";
 import ThemedCard from "../../../components/ThemedCard";
 import { CodexEntry, searchCodex } from "../../../utility/functions/codex";
 import { useRootStore } from "../../../hooks/stores";
-import { text, useStyles } from "../../../hooks/styles";
+import { useStyles } from "../../../hooks/styles";
 
 const categories = [
   "Player",
@@ -40,7 +40,7 @@ export default function Codex() {
           marginHorizontal: "auto",
           paddingTop: 48,
           textAlign: "center",
-          ...text["2xl"],
+          ...styles["text-2xl"],
         }}
       >
         {`Welcome to the Codex.\nHere you will find information to every part of the game`}
@@ -78,8 +78,8 @@ export default function Codex() {
                     router.push(result.route);
                   }}
                 >
-                  <Text style={text.xl}>{result.title}</Text>
-                  <Text style={text.lg} numberOfLines={1}>
+                  <Text style={styles["text-xl"]}>{result.title}</Text>
+                  <Text style={styles["text-lg"]} numberOfLines={1}>
                     {result.content}
                   </Text>
                   <Text style={{ fontSize: 14, lineHeight: 20 }}>

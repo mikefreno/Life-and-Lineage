@@ -4,7 +4,6 @@ import { CharacterImage } from "../../components/CharacterImage";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import TutorialModal from "../../components/TutorialModal";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { toTitleCase } from "../../utility/functions/misc";
 import { TutorialOption } from "../../utility/types";
@@ -45,7 +44,6 @@ const ShopsScreen = observer(() => {
   }, [isFocused]);
 
   const headerHeight = useHeaderHeight();
-  const bottomHeight = useBottomTabBarHeight();
 
   const renderItem = (shop: Shop) => {
     const colors = shopColors[shop.archetype];
@@ -65,52 +63,48 @@ const ShopsScreen = observer(() => {
             },
           ]}
         >
-          <View style={{ justifyContent: "space-between", flex: 1 }}>
-            <Text
-              style={{
-                textAlign: "center",
-                fontSize: 24,
-                lineHeight: 32,
-                color: colors.text,
-              }}
-              numberOfLines={2}
-            >
-              The {toTitleCase(shop.archetype)}
-            </Text>
-            <CharacterImage character={shop.shopKeeper} />
-            <Text style={{ textAlign: "center", color: colors.text }}>
-              {shop.shopKeeper.fullName}
-            </Text>
-            <Pressable
-              style={{ marginBottom: 8, marginHorizontal: "auto" }}
-              onPress={() => {
-                vibration({ style: "light" });
-                shopsStore.setCurrentShop(shop);
-                router.push(`/ShopInterior`);
-              }}
-            >
-              {({ pressed }) => (
-                <View
-                  style={[
-                    {
-                      ...styles.enterButtonInner,
-                      shadowColor: colors.border,
-                      elevation: 2,
-                      backgroundColor: colors.border,
-                      shadowOpacity: 0.5,
-                      shadowRadius: 5,
-                      opacity: pressed ? 0.5 : 1,
-                      transform: [{ scale: pressed ? 0.95 : 1 }],
-                    },
-                  ]}
-                >
-                  <Text style={{ fontSize: 18, color: colors.text }}>
-                    Enter
-                  </Text>
-                </View>
-              )}
-            </Pressable>
-          </View>
+          <Text
+            style={{
+              textAlign: "center",
+              fontSize: 24,
+              lineHeight: 32,
+              color: colors.text,
+            }}
+            numberOfLines={2}
+          >
+            The {toTitleCase(shop.archetype)}
+          </Text>
+          <CharacterImage character={shop.shopKeeper} />
+          <Text style={{ textAlign: "center", color: colors.text }}>
+            {shop.shopKeeper.fullName}
+          </Text>
+          <Pressable
+            style={{ marginBottom: 8, marginHorizontal: "auto" }}
+            onPress={() => {
+              vibration({ style: "light" });
+              shopsStore.setCurrentShop(shop);
+              router.push(`/ShopInterior`);
+            }}
+          >
+            {({ pressed }) => (
+              <View
+                style={[
+                  {
+                    ...styles.enterButtonInner,
+                    shadowColor: colors.border,
+                    elevation: 2,
+                    backgroundColor: colors.border,
+                    shadowOpacity: 0.5,
+                    shadowRadius: 5,
+                    opacity: pressed ? 0.5 : 1,
+                    transform: [{ scale: pressed ? 0.95 : 1 }],
+                  },
+                ]}
+              >
+                <Text style={{ fontSize: 18, color: colors.text }}>Enter</Text>
+              </View>
+            )}
+          </Pressable>
         </View>
       </View>
     );
@@ -133,14 +127,10 @@ const ShopsScreen = observer(() => {
 
       {isReady ? (
         <ScrollView
-          contentInset={{
-            top: headerHeight / 2,
-            bottom: (bottomHeight + uiStore.playerStatusHeight + 80) / 2,
+          contentContainerStyle={{
+            paddingTop: headerHeight,
+            paddingBottom: uiStore.bottomBarHeight,
           }}
-          style={{
-            marginTop: headerHeight / 2,
-          }}
-          scrollIndicatorInsets={{ top: 0, bottom: 0 }}
         >
           <View
             style={{

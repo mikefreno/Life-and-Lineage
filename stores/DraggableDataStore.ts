@@ -27,6 +27,8 @@ export class DraggableDataStore {
       clearAncillaryBounds: action,
       setIconString: action,
       setInventoryBounds: action,
+      removeAncillaryBounds: action,
+      removeInventoryBounds: action,
     });
   }
 
@@ -44,6 +46,9 @@ export class DraggableDataStore {
   ) {
     this.inventoryBounds = bounds;
   }
+  removeInventoryBounds() {
+    this.inventoryBounds = null;
+  }
 
   setAncillaryBounds(
     key: string,
@@ -55,6 +60,10 @@ export class DraggableDataStore {
     } | null,
   ) {
     this.ancillaryBoundsMap.set(key, bounds);
+  }
+
+  removeAncillaryBounds(key: string) {
+    this.ancillaryBoundsMap.delete(key);
   }
 
   clearAncillaryBounds() {

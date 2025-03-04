@@ -16,7 +16,7 @@ import { Text } from "./Themed";
 import ThemedCard from "./ThemedCard";
 import GenericRaisedButton from "./GenericRaisedButton";
 import Slider from "@react-native-community/slider";
-import { flex } from "@/hooks/styles";
+import { flex, normalize, useStyles } from "@/hooks/styles";
 import { Entypo } from "@expo/vector-icons";
 
 export const DevControls = observer(() => {
@@ -26,11 +26,9 @@ export const DevControls = observer(() => {
   const [onRight, setOnRight] = useState(true);
   const vibration = useVibration();
 
-  // Animation values
   const translateX = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
 
-  // Position state
   const [verticalPosition, setVerticalPosition] = useState(
     rootStore.uiStore.dimensions.height / 4,
   );
@@ -66,40 +64,29 @@ export const DevControls = observer(() => {
   ) => {
     if (event.nativeEvent.oldState === State.ACTIVE) {
       const { translationX, translationY } = event.nativeEvent;
-
-      // Determine if this is primarily a vertical or horizontal gesture
       const isVerticalGesture =
         Math.abs(translationY) > Math.abs(translationX) * 1.5;
 
       if (isVerticalGesture) {
-        // Handle vertical movement
         setVerticalPosition((prev) => {
           const newPosition = prev + translationY;
-          // Constrain to screen bounds with padding
           return Math.max(
             60,
             Math.min(rootStore.uiStore.dimensions.height - 120, newPosition),
           );
         });
 
-        // Reset X translation
         Animated.spring(translateX, {
           toValue: isVisible ? 0 : onRight ? HIDDEN_OFFSET : -HIDDEN_OFFSET,
           useNativeDriver: true,
         }).start();
 
-        // Reset Y translation
-        //Animated.spring(translateY, {
-        //toValue: 0,
-        //useNativeDriver: true,
-        //}).start();
         translateX.setValue(0);
         translateY.setValue(0);
 
         return;
       }
 
-      // Handle horizontal gestures
       if (isVisible) {
         if (onRight && translationX < -SIDE_SWITCH_THRESHOLD) {
           setOnRight(false);
@@ -110,18 +97,14 @@ export const DevControls = observer(() => {
         }
       }
 
-      // Handle showing/hiding based on current side
       if (onRight) {
         if (translationX > HIDE_THRESHOLD && isVisible) {
-          // Swipe right to hide when on right side
           animateControl(false);
           vibration({ style: "light" });
         } else if (translationX < -SHOW_THRESHOLD && !isVisible) {
-          // Swipe left to show when on right side
           animateControl(true);
           vibration({ style: "light" });
         } else {
-          // Reset position if not swiped enough
           Animated.spring(translateX, {
             toValue: isVisible ? 0 : HIDDEN_OFFSET,
             useNativeDriver: true,
@@ -129,15 +112,12 @@ export const DevControls = observer(() => {
         }
       } else {
         if (translationX < -HIDE_THRESHOLD && isVisible) {
-          // Swipe left to hide when on left side
           animateControl(false);
           vibration({ style: "light" });
         } else if (translationX > SHOW_THRESHOLD && !isVisible) {
-          // Swipe right to show when on left side
           animateControl(true);
           vibration({ style: "light" });
         } else {
-          // Reset position if not swiped enough
           Animated.spring(translateX, {
             toValue: isVisible ? 0 : -HIDDEN_OFFSET,
             useNativeDriver: true,
@@ -145,7 +125,6 @@ export const DevControls = observer(() => {
         }
       }
 
-      // Always reset Y translation after horizontal gestures
       Animated.spring(translateY, {
         toValue: 0,
         useNativeDriver: true,
@@ -185,13 +164,10 @@ export const DevControls = observer(() => {
         size={100}
         style={{ maxHeight: "50%", marginVertical: "auto" }}
         backFunction={() => setShowingDevControls(false)}
-        noPad
-        innerStyle={{ paddingHorizontal: "3%" }}
       >
         <ActionSliders actions={rootStore.devActions} />
       </GenericModal>
 
-      {/* Main button with gesture handler */}
       <PanGestureHandler
         onGestureEvent={onGestureEvent}
         onHandlerStateChange={onHandlerStateChange}
@@ -201,8 +177,8 @@ export const DevControls = observer(() => {
           style={{
             position: "absolute",
             top: verticalPosition,
-            width: 60,
-            height: 60,
+            width: normalize(60),
+            height: normalize(60),
             justifyContent: "center",
             alignItems: "center",
             zIndex: 9999,
@@ -232,7 +208,7 @@ export const DevControls = observer(() => {
             >
               <MaterialIcons
                 name="pest-control"
-                size={32}
+                size={normalize(32)}
                 color={Colors[rootStore.uiStore.colorScheme].border}
               />
             </Pressable>
@@ -240,7 +216,6 @@ export const DevControls = observer(() => {
         </Animated.View>
       </PanGestureHandler>
 
-      {/* Reveal area - always present but only active when button is hidden */}
       {!isVisible && (
         <PanGestureHandler onHandlerStateChange={onRevealHandlerStateChange}>
           <View
@@ -258,8 +233,8 @@ export const DevControls = observer(() => {
               style={{
                 position: "absolute",
                 top: 20,
-                width: 8,
-                height: 20,
+                width: normalize(8),
+                height: normalize(20),
                 backgroundColor: Colors[rootStore.uiStore.colorScheme].border,
                 opacity: 0.3,
                 ...(onRight
@@ -295,12 +270,12 @@ const ActionSliders = ({
   }[];
 }) => {
   const { uiStore } = useRootStore();
+  const styles = useStyles();
   const vibration = useVibration();
   return (
     <>
       {actions.map((action, idx) => {
-        // Calculate step size for the indicator
-        const stepSize = (action.max - (action.min ?? 0)) / 5; // Divide into 5 steps (adjust as needed)
+        const stepSize = (action.max ?? 100 - (action.min ?? 0)) / 5;
         const steps = Array.from(
           { length: 6 },
           (_, i) => i * stepSize + (action.min ?? 0),
@@ -334,7 +309,7 @@ const ActionSliders = ({
             <ThemedCard>
               <>
                 <View style={flex.rowBetween}>
-                  <Text>{action.name}</Text>
+                  <Text style={styles["text-md"]}>{action.name}</Text>
                   <Animated.View
                     style={{
                       transform: [{ rotate: rotationInterpolate }],
@@ -352,12 +327,15 @@ const ActionSliders = ({
                     {action.min || action.max ? (
                       <>
                         <Text
-                          style={{ textAlign: "center", marginVertical: 8 }}
+                          style={{
+                            textAlign: "center",
+                            marginVertical: 8,
+                            ...styles["text-md"],
+                          }}
                         >
                           Value: {sliderValue.toFixed(1)} / {action.max}
                         </Text>
 
-                        {/* Slider with step markers */}
                         <View style={{ marginHorizontal: 10 }}>
                           <Slider
                             minimumValue={action.min ?? 0}
@@ -369,7 +347,6 @@ const ActionSliders = ({
                             step={action.step} // Add step prop if your actions have defined steps
                           />
 
-                          {/* Step markers */}
                           <View
                             style={{
                               flexDirection: "row",

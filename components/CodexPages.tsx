@@ -96,15 +96,15 @@ export function LaborCodex() {
   ];
   return (
     <ScrollView>
-      <Text style={[styles.xl, styles.textCenter, styles.px2]}>
+      <Text style={[styles["text-xl"], styles.textCenter, styles.px2]}>
         Labors are a way to earn gold in a (mostly) safe way.
       </Text>
       <GenericCarousel images={images} />
-      <Text style={[styles.xl, styles.textCenter, styles.px2]}>
+      <Text style={[styles["text-xl"], styles.textCenter, styles.px2]}>
         There are a number of jobs you can take, some require no qualifications,
         but most have some.
       </Text>
-      <Text style={[styles.xl, styles.textCenter, styles.p2]}>
+      <Text style={[styles["text-xl"], styles.textCenter, styles.p2]}>
         To gain new qualifications, go to the qualifications page, just keep an
         eye on your sanity.
       </Text>
@@ -128,14 +128,14 @@ export function PlayerCodex() {
     <ScrollView>
       <View style={styles.p4}>
         <View>
-          <Text style={{ ...styles.xl, ...styles.textCenter }}>
+          <Text style={{ ...styles["text-xl"], ...styles.textCenter }}>
             The player(you) has 4 potential classes:{"\n"}
           </Text>
           <View style={styles.mxAuto}>
             <Link href="/Options/Codex/Player/Mage" suppressHighlighting>
               <Text
                 style={{
-                  ...styles.xl,
+                  ...styles["text-xl"],
                   textDecorationLine: "underline",
                   color: uiStore.colorScheme == "dark" ? "#2563eb" : "#1e40af",
                 }}
@@ -153,7 +153,7 @@ export function PlayerCodex() {
             <Link href="/Options/Codex/Player/Necromancer" suppressHighlighting>
               <Text
                 style={{
-                  ...styles.xl,
+                  ...styles["text-xl"],
                   textDecorationLine: "underline",
                   color: uiStore.colorScheme == "dark" ? "#9333ea" : "#6b21a8",
                 }}
@@ -171,7 +171,7 @@ export function PlayerCodex() {
             <Link href="/Options/Codex/Player/Paladin" suppressHighlighting>
               <Text
                 style={{
-                  ...styles.xl,
+                  ...styles["text-xl"],
                   textDecorationLine: "underline",
                   color: "#fcd34d",
                 }}
@@ -184,7 +184,7 @@ export function PlayerCodex() {
             <Link href="/Options/Codex/Player/Ranger" suppressHighlighting>
               <Text
                 style={{
-                  ...styles.xl,
+                  ...styles["text-xl"],
                   textDecorationLine: "underline",
                   color: "#4ade80",
                 }}
@@ -194,12 +194,15 @@ export function PlayerCodex() {
             </Link>
           </View>
           <View style={styles.py4}>
-            <Text style={{ ...styles.xl, ...styles.textCenter }}>
+            <Text style={{ ...styles["text-xl"], ...styles.textCenter }}>
               Each of these has schools, each housing different styles of magic.
             </Text>
-            <Text style={{ ...styles.sm, ...styles.textCenter }}>
-              <Text style={{ ...styles.lg, color: "black" }}>Note:</Text> Magic
-              of any school can be learned by a player of the parent class.
+            <Text style={{ ...styles["text-sm"], ...styles.textCenter }}>
+              <Text style={{ ...styles["text-lg"], color: "black" }}>
+                Note:
+              </Text>{" "}
+              Magic of any school can be learned by a player of the parent
+              class.
             </Text>
           </View>
 

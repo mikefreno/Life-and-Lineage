@@ -201,12 +201,6 @@ const ShopInteriorScreen = observer(() => {
     playerState?.purchaseStack(itemStack, shopsStore.currentShop?.archetype!);
   };
 
-  useEffect(() => {
-    if (isFocused) {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    }
-  }, [isFocused]);
-
   if (!shopsStore.currentShop) {
     return (
       <View style={[flex.columnCenter, { flex: 1 }]}>

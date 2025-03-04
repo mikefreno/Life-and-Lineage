@@ -8,19 +8,15 @@ import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { ScrollView, View } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import { TutorialOption } from "../../utility/types";
 import { observer } from "mobx-react-lite";
 import { useRootStore } from "../../hooks/stores";
-import { useStyles } from "../../hooks/styles";
 
 const MedicalScreen = observer(() => {
   const isFocused = useIsFocused();
   const { uiStore } = useRootStore();
-  const bottomTab = useBottomTabBarHeight();
   const header = useHeaderHeight();
-  const styles = useStyles();
 
   return (
     <>
@@ -44,8 +40,7 @@ const MedicalScreen = observer(() => {
             style={[
               {
                 paddingHorizontal: 8,
-                paddingBottom:
-                  bottomTab + (uiStore.playerStatusIsCompact ? 0 : 28),
+                paddingBottom: uiStore.bottomBarHeight,
                 paddingTop: header,
               },
             ]}

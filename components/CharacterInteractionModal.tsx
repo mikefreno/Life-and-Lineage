@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { Text } from "./Themed";
 import GenericModal from "./GenericModal";
 import { useEffect, useState } from "react";
@@ -14,7 +14,7 @@ import { AffectionIcon } from "../assets/icons/SVGIcons";
 import { Character } from "../entities/character";
 import { useRootStore } from "../hooks/stores";
 import { useVibration } from "../hooks/generic";
-import { flex, text } from "../hooks/styles";
+import { flex, useStyles } from "../hooks/styles";
 import React from "react";
 
 interface CharacterInteractionModal {
@@ -36,6 +36,7 @@ export const CharacterInteractionModal = observer(
     showAdoptionModal,
   }: CharacterInteractionModal) => {
     const root = useRootStore();
+    const styles = useStyles();
     const { playerState } = root;
     const [showAssaultWarning, setShowAssaultWarning] =
       useState<boolean>(false);
@@ -98,13 +99,14 @@ export const CharacterInteractionModal = observer(
         backdropCloses={backdropCloses}
         backFunction={closeFunction}
         size={100}
+        scrollEnabled={true}
       >
         {character && (
-          <View>
-            <Text style={{ textAlign: "center", ...text.xl }}>
+          <ScrollView>
+            <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
               {character.fullName}
             </Text>
-            <View style={{ marginHorizontal: "auto" }}>
+            <View style={{ height: "50%" }}>
               <CharacterImage character={character} />
             </View>
             {!showAssaultWarning ? (
@@ -286,12 +288,12 @@ export const CharacterInteractionModal = observer(
                   style={{
                     textAlign: "center",
                     color: "#ef4444",
-                    ...text["2xl"],
+                    ...styles["text-2xl"],
                   }}
                 >
                   Warning:{" "}
                 </Text>
-                <Text style={{ textAlign: "center", ...text.lg }}>
+                <Text style={{ textAlign: "center", ...styles["text-lg"] }}>
                   Are you certain you want to do that? You will start a fight{" "}
                   <Text style={{ color: "#ef4444" }}>
                     that could end in {character.fullName}'s death.
@@ -323,7 +325,7 @@ export const CharacterInteractionModal = observer(
                 </View>
               </View>
             )}
-          </View>
+          </ScrollView>
         )}
       </GenericModal>
     );

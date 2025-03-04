@@ -31,9 +31,10 @@ export const LOADING_TIPS: string[] = [
   "Keep an eye on your health during exploration",
 ];
 
+export const BASE_WIDTH = 400;
+
 export default class UIStore {
   root: RootStore;
-  playerStatusIsCompact: boolean;
   dimensions: {
     height: number;
     width: number;
@@ -61,6 +62,8 @@ export default class UIStore {
   playerStatusHeight: number = 0;
   playerStatusTop: number = 0;
 
+  bottomBarHeight: number = 0;
+
   storeLoadingStatus: Record<string, boolean> = {
     player: false,
     time: false,
@@ -80,12 +83,6 @@ export default class UIStore {
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
-    this.playerStatusIsCompact = this.root.playerState
-      ? !(
-          this.root.playerState.unAllocatedSkillPoints > 0 ||
-          this.root.playerState.conditions.length > 0
-        )
-      : true;
 
     const dimensions = {
       height: Dimensions.get("window").height,
@@ -138,7 +135,7 @@ export default class UIStore {
     }
 
     makeObservable(this, {
-      playerStatusIsCompact: observable,
+      playerStatusIsCompact: computed,
       detailedStatusViewShowing: observable,
       dimensions: observable,
       itemBlockSize: observable,
@@ -155,6 +152,7 @@ export default class UIStore {
       currentTipIndex: observable,
       playerStatusHeight: observable,
       playerStatusTop: observable,
+      bottomBarHeight: observable,
 
       startTipCycle: action,
       completeLoading: action,
@@ -174,26 +172,12 @@ export default class UIStore {
       markStoreAsLoaded: action,
       setPlayerStatusHeight: action,
       setPlayerStatusTop: action,
+      setBottomBarHeight: action,
 
       colorScheme: computed,
       allResourcesLoaded: computed,
+      isLandscape: computed,
     });
-
-    reaction(
-      () => [
-        this.root.playerState?.unAllocatedSkillPoints,
-        this.root.playerState?.conditions.length,
-      ],
-      () => {
-        this.setPlayerStatusCompact(
-          !!this.root.playerState &&
-            !(
-              this.root.playerState.unAllocatedSkillPoints > 0 ||
-              this.root.playerState.conditions.length > 0
-            ),
-        );
-      },
-    );
 
     reaction(
       () => [
@@ -224,6 +208,15 @@ export default class UIStore {
     );
   }
 
+  get playerStatusIsCompact() {
+    if (this.root.playerState) {
+      return !(
+        this.root.playerState.unAllocatedSkillPoints > 0 ||
+        this.root.playerState.conditions.length > 0
+      );
+    } else return true;
+  }
+
   debugLoadingStatus() {
     if (__DEV__) {
       console.log("Loading Status:");
@@ -251,6 +244,16 @@ export default class UIStore {
     return storesLoaded && stepsComplete;
   }
 
+  get isLargeDevice() {
+    return this.dimensions.width >= 600;
+  }
+  get isLandscape() {
+    return this.dimensions.width > this.dimensions.height;
+  }
+  get scale() {
+    return this.dimensions.width / BASE_WIDTH;
+  }
+
   get isDark() {
     return this.colorScheme === "dark";
   }
@@ -260,6 +263,9 @@ export default class UIStore {
   }
   setPlayerStatusTop(value: number) {
     this.playerStatusTop = value;
+  }
+  setBottomBarHeight(value: number) {
+    this.bottomBarHeight = value;
   }
 
   startTipCycle() {

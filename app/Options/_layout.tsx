@@ -73,6 +73,7 @@ export default function OptionsLayout() {
       <Tabs.Screen
         name="Codex/index"
         options={{
+          href: null,
           headerShown: false,
           title: "Codex",
           tabBarLabelStyle: { fontFamily: "PixelifySans" },

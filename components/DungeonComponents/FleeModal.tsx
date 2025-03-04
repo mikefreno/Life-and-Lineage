@@ -120,7 +120,9 @@ const FleeModal = observer(() => {
           }}
         >
           <Text style={{ textAlign: "center", ...styles.xl }}>
-            {enemyStore.enemies.length == 0
+            {enemyStore.enemies.length == 0 ||
+            dungeonStore.currentInstance?.name.toLowerCase() ===
+              "training grounds"
               ? "Ready to Leave?"
               : "Attempt to Flee?"}
           </Text>
@@ -135,7 +137,9 @@ const FleeModal = observer(() => {
                 (enemyStore.attackAnimationsOnGoing || playerState.isStunned)
               }
             >
-              {enemyStore.enemies.length > 0
+              {enemyStore.enemies.length > 0 &&
+              dungeonStore.currentInstance?.name.toLowerCase() !==
+                "training grounds"
                 ? `Run! (${Math.round(fleeChance)}%)`
                 : "Leave"}
             </GenericFlatButton>

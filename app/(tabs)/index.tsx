@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  LayoutChangeEvent,
-  Pressable,
-  TouchableWithoutFeedback,
-  View,
-  LayoutAnimation,
-} from "react-native";
+import { Pressable, TouchableWithoutFeedback, View } from "react-native";
 import { Text, ThemedView } from "../../components/Themed";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
@@ -27,11 +21,10 @@ import EquipmentDisplay from "../../components/EquipmentDisplay";
 import { TutorialOption } from "../../utility/types";
 import { useDraggableStore, useRootStore } from "../../hooks/stores";
 import D20DieAnimation from "../../components/DieRollAnim";
-import { EXPANDED_PAD } from "../../components/PlayerStatus";
 import type { Item } from "../../entities/item";
 import { Image } from "expo-image";
 import { StashDisplay } from "../../components/StashDisplay";
-import { text, useStyles } from "../../hooks/styles";
+import { normalize, useStyles } from "../../hooks/styles";
 
 const HomeScreen = observer(() => {
   const { playerState, uiStore, stashStore } = useRootStore();
@@ -85,40 +78,38 @@ const HomeScreen = observer(() => {
     uiStore.colorScheme,
   ]);
 
-  const layoutDimensions = useMemo(
-    () => ({
-      paddingTop: header,
-      paddingBottom:
-        tabBarHeight + (uiStore.playerStatusIsCompact ? 0 : EXPANDED_PAD),
-    }),
-    [header, tabBarHeight, uiStore.playerStatusIsCompact],
-  );
-
   useEffect(() => {
     if (isFocused) {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setTimeout(() => {
+        if (stashButtonRef.current) {
+          measureAndSetStashBounds();
+        }
+      }, 150);
+    } else {
+      draggableClassStore.removeAncillaryBounds("stash");
     }
   }, [isFocused]);
 
-  const setStashBoundsOnLayout = useCallback(
-    (event: LayoutChangeEvent) => {
-      const { width, height } = event.nativeEvent.layout;
+  const measureAndSetStashBounds = useCallback(() => {
+    if (stashButtonRef.current) {
+      stashButtonRef.current.measure((x, y, w, h, pageX, pageY) => {
+        draggableClassStore.setAncillaryBounds("stash", {
+          x: pageX,
+          y: pageY,
+          width: w,
+          height: h,
+        });
+      });
+    }
+  }, [draggableClassStore]);
 
-      setTimeout(() => {
-        if (stashButtonRef.current) {
-          stashButtonRef.current.measure((x, y, w, h, pageX, pageY) => {
-            draggableClassStore.setAncillaryBounds("pouch", {
-              x: pageX,
-              y: pageY - header,
-              width,
-              height,
-            });
-          });
-        }
-      }, 100);
-    },
-    [uiStore.dimensions],
-  );
+  const setStashBoundsOnLayout = useCallback(() => {
+    if (!isFocused) return;
+
+    setTimeout(() => {
+      measureAndSetStashBounds();
+    }, 100);
+  }, [isFocused, measureAndSetStashBounds]);
 
   if (!playerState) {
     return (
@@ -149,7 +140,13 @@ const HomeScreen = observer(() => {
         clear={() => setShowStash(false)}
         showingStash={showStash}
       />
-      <View style={[{ flex: 1 }, layoutDimensions]}>
+      <View
+        style={{
+          flex: 1,
+          paddingTop: header,
+          paddingBottom: uiStore.bottomBarHeight + 4,
+        }}
+      >
         <TouchableWithoutFeedback onPress={clearDisplayItem}>
           <View style={{ padding: 4 }}>
             <View
@@ -168,7 +165,7 @@ const HomeScreen = observer(() => {
                   style={{
                     textAlign: "center",
                     color: isDark ? "white" : "black",
-                    ...text.xl,
+                    ...styles["text-xl"],
                   }}
                 >
                   {playerState.fullName}
@@ -177,7 +174,7 @@ const HomeScreen = observer(() => {
                   style={{
                     textAlign: "center",
                     color: isDark ? "white" : "black",
-                    ...text.xl,
+                    ...styles["text-xl"],
                   }}
                 >
                   {playerState.job}
@@ -186,7 +183,7 @@ const HomeScreen = observer(() => {
                   style={{
                     textAlign: "center",
                     color: isDark ? "white" : "black",
-                    ...text.xl,
+                    ...styles["text-xl"],
                   }}
                 >{`${playerState.age} years old`}</Text>
               </View>
@@ -214,11 +211,11 @@ const HomeScreen = observer(() => {
               ref={stashButtonRef}
               onLayout={setStashBoundsOnLayout}
               onPress={() => setShowStash(true)}
-              style={styles.stashButton}
+              style={[styles.stashButton, { paddingBottom: normalize(4) }]}
             >
               <Image
                 source={require("../../assets/images/icons/Chest.png")}
-                style={{ width: 48, height: 48 }}
+                style={{ width: normalize(48), height: normalize(48) }}
               />
             </Pressable>
             <InventoryRender
@@ -273,4 +270,5 @@ const HomeScreen = observer(() => {
     </>
   );
 });
+
 export default HomeScreen;

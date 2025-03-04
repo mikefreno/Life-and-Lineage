@@ -1,10 +1,39 @@
-import { Platform, StyleSheet } from "react-native";
+import { Dimensions, PixelRatio, Platform, StyleSheet } from "react-native";
 import { useRootStore } from "./stores";
 import Colors from "../constants/Colors";
+import { BASE_WIDTH } from "@/stores/UIStore";
+
+const getTaperedScale = () => {
+  const rawScale = Dimensions.get("window").width / BASE_WIDTH;
+  if (rawScale > 1) {
+    return 1 + (rawScale - 1) * 0.2;
+  } else {
+    return 1 - (1 - rawScale) * 0.8;
+  }
+};
+
+const defaultScale = getTaperedScale();
+
+export const normalize = (size: number, scale: number = defaultScale) => {
+  const newSize = size * scale;
+
+  if (Platform.OS === "ios") {
+    return Math.round(PixelRatio.roundToNearestPixel(newSize));
+  } else {
+    return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 2;
+  }
+};
+
+export const normalizeLineHeight = (
+  size: number,
+  scale: number = defaultScale,
+) => {
+  return Math.round(size * scale);
+};
 
 export const useStyles = () => {
   const { uiStore } = useRootStore();
-  const { height, width, greater, lesser } = uiStore.dimensions;
+  const { height, width, greater } = uiStore.dimensions;
 
   const platform = Platform.OS;
   const theme = Colors[uiStore.colorScheme];
@@ -47,6 +76,45 @@ export const useStyles = () => {
       } as const)),
   } as const;
 
+  const text = {
+    "text-xs": {
+      fontSize: normalize(10),
+      lineHeight: normalizeLineHeight(12),
+    },
+    "text-sm": {
+      fontSize: normalize(12),
+      lineHeight: normalizeLineHeight(16),
+    },
+    "text-md": {
+      fontSize: normalize(14),
+      lineHeight: normalizeLineHeight(20),
+    },
+    "text-lg": {
+      fontSize: normalize(18),
+      lineHeight: normalizeLineHeight(24),
+    },
+    "text-xl": {
+      fontSize: normalize(20),
+      lineHeight: normalizeLineHeight(24),
+    },
+    "text-2xl": {
+      fontSize: normalize(24),
+      lineHeight: normalizeLineHeight(28),
+    },
+    "text-3xl": {
+      fontSize: normalize(28),
+      lineHeight: normalizeLineHeight(32),
+    },
+    "text-4xl": {
+      fontSize: normalize(32),
+      lineHeight: normalizeLineHeight(36),
+    },
+    "text-5xl": {
+      fontSize: normalize(44),
+      lineHeight: normalizeLineHeight(48),
+    },
+  } as const;
+
   return StyleSheet.create({
     // ---- Generics ---- //
     ...flex,
@@ -69,7 +137,7 @@ export const useStyles = () => {
       fontWeight: "700",
       marginVertical: "auto",
       width: "66%",
-      ...text.xl,
+      ...text["text-xl"],
       color: theme.text,
     } as const,
     debugBorder: {
@@ -84,7 +152,7 @@ export const useStyles = () => {
       paddingTop: 0.04 * height,
     } as const,
     newGameHeader: {
-      ...text["2xl"],
+      ...text["text-2xl"],
       textAlign: "center",
       paddingVertical: 0.02 * height,
     } as const,
@@ -104,8 +172,8 @@ export const useStyles = () => {
     } as const,
 
     classDescriptionText: {
+      ...text["text-md"],
       marginTop: height * 0.02,
-      height: 64,
       textAlign: "center",
     } as const,
 
@@ -120,7 +188,7 @@ export const useStyles = () => {
 
     // ---- New Game - Sex Select ---- //
     sexSelectionRow: {
-      marginTop: "12%",
+      marginVertical: "12%",
       flexDirection: "row",
       width: "100%",
       justifyContent: "space-evenly",
@@ -146,7 +214,7 @@ export const useStyles = () => {
       paddingLeft: 8,
       paddingVertical: 8,
       fontFamily: "PixelifySans",
-      fontSize: 20,
+      ...text["text-lg"],
     } as const,
 
     // ---- Options ---- //
@@ -222,15 +290,6 @@ export const useStyles = () => {
       justifyContent: "center",
       paddingHorizontal: 16,
     } as const,
-    tutorialResetButton: {
-      marginHorizontal: "auto",
-      marginTop: 8,
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: theme.border,
-      paddingHorizontal: 24,
-      paddingVertical: 8,
-    } as const,
     healthWarningContainer: {
       marginTop: 12,
       borderRadius: 4,
@@ -287,10 +346,9 @@ export const useStyles = () => {
     stashButton: {
       zIndex: 10,
       borderRadius: 8,
-      marginTop: -64,
+      marginTop: normalize(-50),
+      width: normalize(80),
       paddingHorizontal: 16,
-      width: 80,
-      height: 80,
     } as const,
     equipmentContainer: {
       paddingBottom: 8,
@@ -405,8 +463,7 @@ export const useStyles = () => {
     rejectionModalText: {
       marginVertical: 24,
       textAlign: "center",
-      fontSize: 18,
-      lineHeight: 28,
+      ...text["text-lg"],
     } as const,
     qualificationText: {
       paddingVertical: 4,
@@ -459,16 +516,16 @@ export const useStyles = () => {
 
     // ---- Main Tabs - Shop ---- //
     shopCard: {
-      height: uiStore.dimensions.height / 2.5,
       width: "50%",
     } as const,
     shopCardInner: {
       margin: 8,
-      flex: 1,
       borderRadius: 12,
       borderWidth: 1,
       paddingVertical: 16,
       paddingHorizontal: 8,
+      height: uiStore.dimensions.height / 2,
+      ...flex.columnBetween,
     } as const,
     enterButtonInner: {
       paddingHorizontal: 32,
@@ -484,7 +541,7 @@ export const useStyles = () => {
     } as const,
     // ---- Death Screen ---- //
     deathMessage: {
-      ...text["3xl"],
+      ...text["text-3xl"],
       ...font.bold,
       textAlign: "center",
       letterSpacing: 3,
@@ -568,6 +625,7 @@ export const useStyles = () => {
     } as const,
 
     flatButtonText: {
+      ...text["text-md"],
       textAlign: "center",
       letterSpacing: 2,
     } as const,
@@ -724,7 +782,7 @@ export const useStyles = () => {
       justifyContent: "space-around",
     } as const,
     inventoryFullText: {
-      ...text.lg,
+      ...text["text-lg"],
       textAlign: "center",
       color: "#ef4444",
     } as const,
@@ -918,8 +976,8 @@ export const useStyles = () => {
       paddingHorizontal: 24,
       paddingVertical: 8,
     } as const,
-    titleText: greater > 768 ? text["3xl"] : text["2xl"],
-    bodyText: greater > 768 ? text.xl : text.lg,
+    titleText: greater > 768 ? text["text-3xl"] : text["text-2xl"],
+    bodyText: greater > 768 ? text["text-xl"] : text["text-lg"],
     classContainer: {
       ...flex.columnCenter,
       justifyContent: "space-evenly",
@@ -1597,18 +1655,6 @@ export const radius = {
   bLg: { borderBottomLeftRadius: 8, borderBottomRightRadius: 8 },
   bXl: { borderBottomLeftRadius: 12, borderBottomRightRadius: 12 },
   b2xl: { borderBottomLeftRadius: 16, borderBottomRightRadius: 16 },
-} as const;
-
-export const text = {
-  xs: { fontSize: 10, lineHeight: 12 },
-  sm: { fontSize: 12, lineHeight: 16 },
-  md: { fontSize: 14, lineHeight: 20 },
-  lg: { fontSize: 18, lineHeight: 24 },
-  xl: { fontSize: 20, lineHeight: 24 },
-  "2xl": { fontSize: 24, lineHeight: 28 },
-  "3xl": { fontSize: 28, lineHeight: 32 },
-  "4xl": { fontSize: 32, lineHeight: 36 },
-  "5xl": { fontSize: 44, lineHeight: 48 },
 } as const;
 
 export const font = {

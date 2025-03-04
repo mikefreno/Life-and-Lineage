@@ -13,7 +13,7 @@ import { toTitleCase } from "../../utility/functions/misc";
 import { Foundation } from "@expo/vector-icons";
 import { useNewGameStore } from "./_layout";
 import { FadeSlide } from "../../components/AnimatedWrappers";
-import { text, tw, useStyles } from "../../hooks/styles";
+import { tw, useStyles } from "../../hooks/styles";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
 
@@ -47,7 +47,7 @@ export default function SetSex() {
         }}
       />
       <View style={styles.newGameContainer}>
-        <Text style={[text["2xl"], tw.px2, styles.newGameHeader]}>
+        <Text style={[styles["text-2xl"], tw.px2, styles.newGameHeader]}>
           Set the sex of your{" "}
           <Text style={{ color: playerClassColors[classSelection] }}>
             {toTitleCase(classSelection)}
@@ -82,7 +82,9 @@ export default function SetSex() {
                     color={playerClassColors[classSelection]}
                   />
                 </View>
-                <Text style={{ textAlign: "center", ...text.lg }}>Male</Text>
+                <Text style={{ textAlign: "center", ...styles["text-lg"] }}>
+                  Male
+                </Text>
               </View>
             )}
           </Pressable>
@@ -117,25 +119,22 @@ export default function SetSex() {
                     color={playerClassColors[classSelection]}
                   />
                 </View>
-                <Text style={{ textAlign: "center", ...text.lg }}>Female</Text>
+                <Text style={{ textAlign: "center", ...styles["text-lg"] }}>
+                  Female
+                </Text>
               </View>
             )}
           </Pressable>
         </View>
-        <View style={{ marginHorizontal: "auto", marginTop: 32 }}>
-          <FadeSlide show={!!sex}>
-            {({ showing }) => (
-              <GenericFlatButton
-                disabled={!showing}
-                onPress={() => router.push("/NewGame/NameSelect")}
-                accessibilityRole="link"
-                accessibilityLabel="Next"
-              >
-                <Text>Next</Text>
-              </GenericFlatButton>
-            )}
-          </FadeSlide>
-        </View>
+        <GenericFlatButton
+          onPress={() => router.push("/NewGame/NameSelect")}
+          accessibilityRole="link"
+          accessibilityLabel="Next"
+          disabled={!sex}
+          childrenWhenDisabled={"Select sex to continue"}
+        >
+          Next
+        </GenericFlatButton>
       </View>
       <NewGameMetaControls
         forceShowTutorial={() => setForceShowTutorial(true)}
