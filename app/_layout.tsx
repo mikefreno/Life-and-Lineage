@@ -43,6 +43,7 @@ import BoundsVisualizer from "@/components/BoundsVisualizer";
 import { runOnJS, useSharedValue, withSpring } from "react-native-reanimated";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
+import { useVibration } from "@/hooks/generic";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -313,9 +314,9 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     "/",
     "/spells",
     "/labor",
-    "/dungeon",
     "/shops",
     "/medical",
+    "/dungeon",
   ];
 
   const getCurrentTabIndex = () => {
@@ -328,31 +329,36 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   useEffect(() => {
     currentTabIndex.value = getCurrentTabIndex();
   }, [pathname]);
+  const vibration = useVibration();
 
-  const navigateToPrevTab = () => {
+  const navigateToLeftTab = () => {
     const currentIndex = getCurrentTabIndex();
     if (currentIndex === -1) {
       return;
     }
-    if (currentIndex > 0) {
-      const prevRoute = tabRouteIndexing[
-        currentIndex - 1
-      ] as RelativePathString;
-      router.push(prevRoute);
+    let leftIdx: number;
+    if (currentIndex === 0) {
+      leftIdx = tabRouteIndexing.length - 1;
+    } else {
+      leftIdx = currentIndex - 1;
     }
+    vibration({ style: "light" });
+    router.push(tabRouteIndexing[leftIdx] as RelativePathString);
   };
 
-  const navigateToNextTab = () => {
+  const navigateToRightTab = () => {
     const currentIndex = getCurrentTabIndex();
     if (currentIndex === -1) {
       return;
     }
-    if (currentIndex < tabRouteIndexing.length - 1) {
-      const nextRoute = tabRouteIndexing[
-        currentIndex + 1
-      ] as RelativePathString;
-      router.push(nextRoute);
+    let rightIdx: number;
+    if (currentIndex === tabRouteIndexing.length - 1) {
+      rightIdx = 0;
+    } else {
+      rightIdx = currentIndex + 1;
     }
+    vibration({ style: "light" });
+    router.push(tabRouteIndexing[rightIdx] as RelativePathString);
   };
 
   const startX = useSharedValue(0);
@@ -370,16 +376,13 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
       "worklet";
 
       if (
-        Math.abs(event.velocityX) > 500 &&
-        Math.abs(event.translationX) > 50
+        Math.abs(event.velocityX) > 350 &&
+        Math.abs(event.translationX) > 35
       ) {
-        if (event.velocityX > 0 && currentTabIndex.value > 0) {
-          runOnJS(navigateToPrevTab)();
-        } else if (
-          event.velocityX < 0 &&
-          currentTabIndex.value < tabRouteIndexing.length - 1
-        ) {
-          runOnJS(navigateToNextTab)();
+        if (event.velocityX > 0) {
+          runOnJS(navigateToLeftTab)();
+        } else if (event.velocityX < 0) {
+          runOnJS(navigateToRightTab)();
         }
       }
 

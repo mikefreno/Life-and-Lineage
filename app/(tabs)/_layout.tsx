@@ -335,6 +335,48 @@ const TabLayout = observer(() => {
             }}
           />
           <Tabs.Screen
+            name="shops"
+            options={{
+              ...commonOptions,
+              title: "Shops",
+              tabBarIcon: ({ color }) => (
+                <Potion
+                  width={normalize(28)}
+                  height={normalize(30)}
+                  color={color}
+                />
+              ),
+              headerRight: () => (
+                <Link href="/Activities" asChild>
+                  <Pressable onPress={() => vibration({ style: "light" })}>
+                    {({ pressed }) => (
+                      <BowlingBallAndPin
+                        width={normalize(30)}
+                        height={normalize(28)}
+                        color={"#27272a"}
+                        style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                      />
+                    )}
+                  </Pressable>
+                </Link>
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="medical"
+            options={{
+              ...commonOptions,
+              title: "Medical",
+              tabBarIcon: ({ color }) => (
+                <Medical
+                  width={normalize(30)}
+                  height={normalize(28)}
+                  color={color}
+                />
+              ),
+            }}
+          />
+          <Tabs.Screen
             name="dungeon"
             options={{
               ...commonOptions,
@@ -394,48 +436,6 @@ const TabLayout = observer(() => {
                     />
                   )}
                 </Pressable>
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="shops"
-            options={{
-              ...commonOptions,
-              title: "Shops",
-              tabBarIcon: ({ color }) => (
-                <Potion
-                  width={normalize(28)}
-                  height={normalize(30)}
-                  color={color}
-                />
-              ),
-              headerRight: () => (
-                <Link href="/Activities" asChild>
-                  <Pressable onPress={() => vibration({ style: "light" })}>
-                    {({ pressed }) => (
-                      <BowlingBallAndPin
-                        width={normalize(30)}
-                        height={normalize(28)}
-                        color={"#27272a"}
-                        style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                      />
-                    )}
-                  </Pressable>
-                </Link>
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="medical"
-            options={{
-              ...commonOptions,
-              title: "Medical",
-              tabBarIcon: ({ color }) => (
-                <Medical
-                  width={normalize(30)}
-                  height={normalize(28)}
-                  color={color}
-                />
               ),
             }}
           />
