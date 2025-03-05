@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { router } from "expo-router";
 import { CharacterImage } from "../components/CharacterImage";
 import { wait } from "../utility/functions/misc";
-import GenericStrikeAround from "../components/GenericStrikeAround";
 import GenericModal from "../components/GenericModal";
 import GenericFlatButton from "../components/GenericFlatButton";
 import { Element, ElementToString, PlayerClassOptions } from "../utility/types";
@@ -302,7 +301,9 @@ function MinimalClassSelect({
                 width={dimensions.height * 0.15}
               />
             </View>
-            <Text style={[text.xl, { color, marginHorizontal: "auto" }]}>
+            <Text
+              style={[styles["text-xl"], { color, marginHorizontal: "auto" }]}
+            >
               {classOption.charAt(0).toUpperCase() + classOption.slice(1)}
             </Text>
           </View>

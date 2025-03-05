@@ -14,6 +14,8 @@ export class TimeStore {
     this.year = year;
     this.root = root;
 
+    __DEV__ && this.setupDevActions();
+
     makeObservable(this, {
       week: observable,
       year: observable,
@@ -28,6 +30,26 @@ export class TimeStore {
       () =>
         storage.set("time", stringify({ week: this.week, year: this.year })),
     );
+  }
+
+  private setupDevActions() {
+    this.root.addDevAction([
+      {
+        action: (value: number) => this.devSetter("year", value),
+        name: "Set Game Year",
+        min: 1_300,
+        max: 2_000,
+        step: 1,
+        initVal: this.year,
+      },
+      {
+        action: (value: number) => this.devSetter("week", value),
+        name: "Set Game Week",
+        max: 51,
+        step: 1,
+        initVal: this.week,
+      },
+    ]);
   }
 
   tick() {

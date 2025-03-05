@@ -18,10 +18,9 @@ export const LoadingBoundary = observer(
       new Animated.Value(uiStore.allResourcesLoaded ? 0 : 1),
     ).current;
 
-    // Track if this is the first render after mount
     const isInitialMount = useRef(true);
+    const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Memoize the loading state
     const isLoading = useMemo(
       () => !uiStore.allResourcesLoaded,
       [uiStore.allResourcesLoaded],
@@ -36,7 +35,6 @@ export const LoadingBoundary = observer(
         return;
       }
 
-      // Animate the transition
       Animated.timing(fadeAnim, {
         toValue: isLoading ? 1 : 0,
         duration: 350,
@@ -45,9 +43,7 @@ export const LoadingBoundary = observer(
       }).start();
     }, [isLoading, fadeAnim]);
 
-    // Force an update on fast refresh
     useEffect(() => {
-      // This will run on hot reload/fast refresh
       const timeout = setTimeout(() => {
         if (!isLoading && fadeAnim._value !== 0) {
           fadeAnim.setValue(0);
@@ -56,6 +52,31 @@ export const LoadingBoundary = observer(
 
       return () => clearTimeout(timeout);
     }, []);
+
+    useEffect(() => {
+      if (isLoading) {
+        // Set a timeout to log the loading status if it takes longer than 10 seconds
+        loadingTimeoutRef.current = setTimeout(() => {
+          console.warn(
+            "Loading taking longer than expected. Current loading status:",
+            JSON.stringify(uiStore.storeLoadingStatus, null, 2),
+          );
+        }, 5000);
+      } else {
+        // Clear the timeout if loading completes
+        if (loadingTimeoutRef.current) {
+          clearTimeout(loadingTimeoutRef.current);
+          loadingTimeoutRef.current = null;
+        }
+      }
+
+      return () => {
+        if (loadingTimeoutRef.current) {
+          clearTimeout(loadingTimeoutRef.current);
+          loadingTimeoutRef.current = null;
+        }
+      };
+    }, [isLoading, uiStore.storeLoadingStatus]);
 
     const loadingContent = useMemo(
       () => (

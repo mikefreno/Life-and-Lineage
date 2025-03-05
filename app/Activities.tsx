@@ -1,10 +1,10 @@
 import React from "react";
-import activities from "../assets/json/activities.json";
-import ActivityCard from "../components/ActivityCard";
+import activities from "@/assets/json/activities.json";
+import ActivityCard from "@/components/ActivityCard";
 import { ScrollView, View } from "react-native";
-import PlayerStatus from "../components/PlayerStatus";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { tw } from "../hooks/styles";
+import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 
 export default function Activities() {
   return (
@@ -18,7 +18,7 @@ export default function Activities() {
           </View>
         </ScrollView>
       </View>
-      <PlayerStatus tabScreen />
+      <PlayerStatusForSecondary />
     </>
   );
 }

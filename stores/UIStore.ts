@@ -17,6 +17,10 @@ import {
 } from "react-native";
 import { storage } from "../utility/functions/storage";
 import { Character } from "../entities/character";
+import * as Device from "expo-device";
+import { normalize } from "@/hooks/styles";
+import { TAB_SELECTION } from "@/app/(tabs)/_layout";
+import { debounce } from "lodash";
 
 export const LOADING_TIPS: string[] = [
   "Remember to check your equipment before entering a dungeon",
@@ -59,10 +63,11 @@ export default class UIStore {
   displayedProgress: number = 0;
   currentTipIndex: number = 0;
   progressIncrementing: boolean = false;
-  playerStatusHeight: number = 0;
-  playerStatusTop: number = 0;
 
-  bottomBarHeight: number = 0;
+  tabHeight = normalize(TAB_SELECTION);
+
+  playerStatusExpandedHeight: number | undefined = undefined;
+  playerStatusCompactHeight: number | undefined = undefined;
 
   storeLoadingStatus: Record<string, boolean> = {
     player: false,
@@ -80,6 +85,8 @@ export default class UIStore {
     fonts: false,
     routing: false,
   };
+
+  showDevDebugUI: boolean = false;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
@@ -134,6 +141,8 @@ export default class UIStore {
       this.reduceMotion = reduceMotion;
     }
 
+    __DEV__ && this.setupDevActions();
+
     makeObservable(this, {
       playerStatusIsCompact: computed,
       detailedStatusViewShowing: observable,
@@ -150,14 +159,13 @@ export default class UIStore {
       newbornBaby: observable,
       colorHeldForDungeon: observable,
       currentTipIndex: observable,
-      playerStatusHeight: observable,
-      playerStatusTop: observable,
-      bottomBarHeight: observable,
+      showDevDebugUI: observable,
+      playerStatusCompactHeight: observable,
+      playerStatusExpandedHeight: observable,
 
       startTipCycle: action,
       completeLoading: action,
       setTotalLoadingSteps: action,
-      setPlayerStatusCompact: action,
       setDetailedStatusViewShowing: action,
       setPreferedColorScheme: action,
       modifyVibrationSettings: action,
@@ -171,12 +179,12 @@ export default class UIStore {
       clearDungeonColor: action,
       markStoreAsLoaded: action,
       setPlayerStatusHeight: action,
-      setPlayerStatusTop: action,
-      setBottomBarHeight: action,
 
+      playerStatusHeight: computed,
       colorScheme: computed,
       allResourcesLoaded: computed,
       isLandscape: computed,
+      bottomBarHeight: computed,
     });
 
     reaction(
@@ -208,13 +216,47 @@ export default class UIStore {
     );
   }
 
+  private setupDevActions() {
+    if (__DEV__) {
+      this.root.addDevAction({
+        action: () =>
+          runInAction(() => {
+            if (__DEV__) {
+              this.showDevDebugUI = !this.showDevDebugUI;
+            }
+          }),
+        name: "Toggle Debug UI",
+      });
+    }
+  }
+
   get playerStatusIsCompact() {
-    if (this.root.playerState) {
+    if (this.root.playerState && !this.isLargeDevice) {
       return !(
         this.root.playerState.unAllocatedSkillPoints > 0 ||
-        this.root.playerState.conditions.length > 0
+        this.root.playerState.conditions.length > 0 ||
+        this.onExpandedTab
       );
     } else return true;
+  }
+
+  get playerStatusHeight() {
+    if (this.playerStatusIsCompact) {
+      return this.playerStatusCompactHeight ?? 0;
+    } else {
+      return this.playerStatusExpandedHeight ?? 0;
+    }
+  }
+  get bottomBarHeight() {
+    return (
+      this.playerStatusHeight + (!!this.root.currentTab ? this.tabHeight : 0)
+    );
+  }
+
+  get onExpandedTab() {
+    return (
+      this.root.currentTab == "/medical" || this.root.currentTab == "/labor"
+    );
   }
 
   debugLoadingStatus() {
@@ -244,12 +286,22 @@ export default class UIStore {
     return storesLoaded && stepsComplete;
   }
 
-  get isLargeDevice() {
-    return this.dimensions.width >= 600;
-  }
   get isLandscape() {
     return this.dimensions.width > this.dimensions.height;
   }
+
+  get isTablet() {
+    return Device.deviceType == Device.DeviceType.TABLET;
+  }
+
+  get isDesktop() {
+    return Device.deviceType == Device.DeviceType.DESKTOP;
+  }
+
+  get isLargeDevice() {
+    return this.isTablet || this.isDesktop;
+  }
+
   get scale() {
     return this.dimensions.width / BASE_WIDTH;
   }
@@ -259,13 +311,26 @@ export default class UIStore {
   }
 
   setPlayerStatusHeight(value: number) {
-    this.playerStatusHeight = value;
+    this.debouncedSetPlayerStatusHeight(value);
   }
-  setPlayerStatusTop(value: number) {
-    this.playerStatusTop = value;
+  debouncedSetPlayerStatusHeight = debounce(this._setPlayerStatusHeight, 50);
+
+  private _setPlayerStatusHeight(value: number) {
+    if (!this.playerStatusCompactHeight && this.playerStatusIsCompact) {
+      runInAction(() => this.setPlayerStatusCompactHeight(value));
+    } else if (
+      !this.playerStatusExpandedHeight &&
+      !this.playerStatusIsCompact
+    ) {
+      runInAction(() => this.setPlayerStatusExpandedHeight(value));
+    }
   }
-  setBottomBarHeight(value: number) {
-    this.bottomBarHeight = value;
+
+  private setPlayerStatusCompactHeight(value: number) {
+    this.playerStatusCompactHeight = value;
+  }
+  private setPlayerStatusExpandedHeight(value: number) {
+    this.playerStatusExpandedHeight = value;
   }
 
   startTipCycle() {
@@ -408,9 +473,6 @@ export default class UIStore {
     this.healthWarning = desiredValue;
   }
 
-  public setPlayerStatusCompact(state: boolean) {
-    this.playerStatusIsCompact = state;
-  }
   public setDetailedStatusViewShowing(state: boolean) {
     this.detailedStatusViewShowing = state;
   }

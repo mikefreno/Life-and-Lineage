@@ -44,12 +44,23 @@ import { runOnJS, useSharedValue, withSpring } from "react-native-reanimated";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { useVibration } from "@/hooks/generic";
+import { runInAction } from "mobx";
+import { HeaderBackButton } from "@react-navigation/elements";
 
 export { ErrorBoundary } from "expo-router";
 
 export const unstable_settings = {
   initialRouteName: "(tabs)",
 };
+
+export const tabRouteIndexing = [
+  "/",
+  "/spells",
+  "/labor",
+  "/shops",
+  "/medical",
+  "/dungeon",
+];
 
 SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({
@@ -310,29 +321,20 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     </GenericModal>
   ));
 
-  const tabRouteIndexing = [
-    "/",
-    "/spells",
-    "/labor",
-    "/shops",
-    "/medical",
-    "/dungeon",
-  ];
-
-  const getCurrentTabIndex = () => {
-    const basePath = `/${pathname.split("/")[1]}`;
-    return tabRouteIndexing.indexOf(basePath);
-  };
-
-  const currentTabIndex = useSharedValue(getCurrentTabIndex());
-
   useEffect(() => {
-    currentTabIndex.value = getCurrentTabIndex();
+    runInAction(() => {
+      if (tabRouteIndexing.includes(pathname)) {
+        rootStore.currentTab = pathname;
+      } else {
+        rootStore.currentTab = null;
+      }
+    });
   }, [pathname]);
+
   const vibration = useVibration();
 
   const navigateToLeftTab = () => {
-    const currentIndex = getCurrentTabIndex();
+    const currentIndex = tabRouteIndexing.indexOf(rootStore.currentTab ?? "");
     if (currentIndex === -1) {
       return;
     }
@@ -342,12 +344,14 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     } else {
       leftIdx = currentIndex - 1;
     }
+    const newTabString = tabRouteIndexing[leftIdx];
+    runInAction(() => (rootStore.currentTab = newTabString));
     vibration({ style: "light" });
-    router.push(tabRouteIndexing[leftIdx] as RelativePathString);
+    router.push(newTabString as RelativePathString);
   };
 
   const navigateToRightTab = () => {
-    const currentIndex = getCurrentTabIndex();
+    const currentIndex = tabRouteIndexing.indexOf(rootStore.currentTab ?? "");
     if (currentIndex === -1) {
       return;
     }
@@ -357,8 +361,10 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     } else {
       rightIdx = currentIndex + 1;
     }
+    const newTabString = tabRouteIndexing[rightIdx];
+    runInAction(() => (rootStore.currentTab = newTabString));
     vibration({ style: "light" });
-    router.push(tabRouteIndexing[rightIdx] as RelativePathString);
+    router.push(newTabString as RelativePathString);
   };
 
   const startX = useSharedValue(0);
@@ -405,7 +411,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
             {__DEV__ && (
               <>
                 <DevControls />
-                {rootStore.showDevDebugUI && <BoundsVisualizer />}
+                {uiStore.showDevDebugUI && <BoundsVisualizer />}
               </>
             )}
             <Stack
@@ -482,17 +488,27 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
               <Stack.Screen
                 name="Study"
                 options={{
-                  title: "Magic Study",
-                  headerBackButtonDisplayMode: "minimal",
-                  headerBackButtonMenuEnabled: false,
-                  headerBackTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(16),
-                  },
                   headerTitleStyle: {
                     fontFamily: "PixelifySans",
-                    fontSize: normalize(22),
+                    fontSize: normalize(20),
                   },
+                  headerBackButtonDisplayMode: "minimal",
+                  headerTransparent: true,
+                  headerBackground: () => (
+                    <BlurView
+                      blurReductionFactor={12}
+                      tint={
+                        Platform.OS == "android"
+                          ? uiStore.colorScheme == "light"
+                            ? "light"
+                            : "dark"
+                          : "default"
+                      }
+                      intensity={50}
+                      style={StyleSheet.absoluteFill}
+                    />
+                  ),
+                  title: "Magic Study",
                 }}
               />
               <Stack.Screen

@@ -1,6 +1,5 @@
 import React from "react";
 import qualifications from "../assets/json/qualifications.json";
-import PlayerStatus from "../components/PlayerStatus";
 import TrainingCard from "../components/TrainingCard";
 import TutorialModal from "../components/TutorialModal";
 import { useIsFocused } from "@react-navigation/native";
@@ -9,6 +8,7 @@ import { TutorialOption } from "../utility/types";
 import { ScrollView, View } from "react-native";
 import { useRootStore } from "../hooks/stores";
 import { tw } from "../hooks/styles";
+import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 
 const JobTraining = () => {
   const isFocused = useIsFocused();
@@ -48,7 +48,7 @@ const JobTraining = () => {
           </View>
         </ScrollView>
       </View>
-      <PlayerStatus tabScreen />
+      <PlayerStatusForSecondary />
     </>
   );
 };

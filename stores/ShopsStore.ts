@@ -22,24 +22,20 @@ export class ShopStore {
   shopsMap: Map<MerchantType, Shop>;
   root: RootStore;
   currentShop: Shop | null = null;
-  onShopTab: boolean;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
     this.shopsMap = this.hydrateShopState();
-    this.onShopTab = false;
 
     makeObservable(this, {
       shopsMap: observable,
       fromCheckpointData: action,
-      onShopTab: observable,
-      setOnShopTab: action,
       setShops: action,
     });
   }
 
   get inMarket() {
-    return !!(this.onShopTab || this.currentShop);
+    return !!(this.root.currentTab == "/shops" || this.currentShop);
   }
 
   hydrateShopState() {
@@ -64,10 +60,6 @@ export class ShopStore {
 
   setCurrentShop(shop: Shop | null) {
     this.currentShop = shop;
-  }
-
-  setOnShopTab(value: boolean) {
-    this.onShopTab = value;
   }
 
   getShop(archetype: MerchantType) {

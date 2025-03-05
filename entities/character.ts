@@ -662,6 +662,7 @@ export class PlayerCharacter extends Character {
       quiver: null,
     };
     this.investments = investments ?? [];
+    __DEV__ && this.setupDevActions();
 
     // this is where we set what is to be watched for mutation by mobX.
     // observable are state that is for mutated attributes, computed are for `get`s and
@@ -805,6 +806,53 @@ export class PlayerCharacter extends Character {
         savePlayer(this);
       },
     );
+  }
+
+  private setupDevActions() {
+    if (__DEV__) {
+      this.root.addDevAction([
+        {
+          action: (value: number) => this.addSkillPoint({ amount: value }),
+          name: "Add skill points",
+          max: 25,
+          step: 1,
+        },
+        {
+          action: (value: number) => this.addGold(value),
+          name: "Add gold",
+          max: 10_000,
+          step: 100,
+        },
+        {
+          action: (value: number) => this.restoreHealth(value),
+          name: "Adjust HP",
+          min: -1_000,
+          max: 1_000,
+          initVal: 0,
+          step: 10,
+        },
+        {
+          action: (value: number) => this.restoreMana(value),
+          name: "Adjust Mana",
+          min: -1_000,
+          max: 1_000,
+          initVal: 0,
+          step: 10,
+        },
+        {
+          action: (value: number) => this.restoreSanity(value),
+          name: "Adjust Sanity",
+          min: -1_000,
+          max: 1_000,
+          initVal: 0,
+          step: 10,
+        },
+        {
+          action: () => this._unlockAllSpells(),
+          name: "Unlock All Spells",
+        },
+      ]);
+    }
   }
 
   public gameTurnHandler() {
@@ -1864,19 +1912,23 @@ export class PlayerCharacter extends Character {
   }
 
   public learnSpellCompletion(spell: string, bookName: string) {
-    let newState = this.knownSpells.map((spell) => spell);
-    newState.push(spell);
-    this.knownSpells = newState;
-    let newLearningState = this.learningSpells.filter((spellWithExp) => {
-      if (spellWithExp.spellName !== spell) {
-        return spellWithExp;
-      }
-    });
+    if (!this.knownSpells.includes(spell)) {
+      // prevents spell duplication, only applicable in dev state
+      let newState = this.knownSpells.map((spell) => spell);
+      newState.push(spell);
+      this.knownSpells = newState;
+      let newLearningState = this.learningSpells.filter((spellWithExp) => {
+        if (spellWithExp.spellName !== spell) {
+          return spellWithExp;
+        }
+      });
+
+      this.learningSpells = newLearningState;
+    }
     const book = this.baseInventory.find((item) => item.name == bookName);
     if (book) {
       this.removeFromInventory(book);
     }
-    this.learningSpells = newLearningState;
   }
   _unlockAllSpells() {
     if (__DEV__) {

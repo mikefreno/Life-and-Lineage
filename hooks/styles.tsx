@@ -603,11 +603,9 @@ export const useStyles = () => {
     modalContent: {
       marginHorizontal: "auto",
       borderRadius: 12,
-      shadowColor: "rgba(0, 0, 0, 0.25)",
-      shadowRadius: 5,
-      elevation: 2,
       borderWidth: uiStore.colorScheme === "dark" ? 1 : 0,
       borderColor: uiStore.colorScheme === "dark" ? "#71717a" : undefined,
+      ...shadows.soft,
     } as const,
     errorContainer: {
       flex: 1,
@@ -638,16 +636,6 @@ export const useStyles = () => {
     } as const,
 
     // ---- Player Status ---- //
-    playerStatusContainer: {
-      position: "absolute",
-      zIndex: 10,
-      width: "100%",
-    } as const,
-
-    playerStatusContent: {
-      flex: 1,
-      paddingHorizontal: 8,
-    } as const,
     statsRow: {
       flexDirection: "row",
       justifyContent: "space-evenly",

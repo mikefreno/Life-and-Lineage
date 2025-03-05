@@ -25,6 +25,7 @@ import type { Item } from "../../entities/item";
 import { Image } from "expo-image";
 import { StashDisplay } from "../../components/StashDisplay";
 import { normalize, useStyles } from "../../hooks/styles";
+import { LayoutAnimation } from "react-native";
 
 const HomeScreen = observer(() => {
   const { playerState, uiStore, stashStore } = useRootStore();

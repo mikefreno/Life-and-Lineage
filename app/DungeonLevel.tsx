@@ -5,7 +5,6 @@ import { useRef, useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
 import BattleTab from "../components/DungeonComponents/BattleTab";
 import { toTitleCase, wait } from "../utility/functions/misc";
-import PlayerStatus from "../components/PlayerStatus";
 import ProgressBar from "../components/ProgressBar";
 import { observer } from "mobx-react-lite";
 import TutorialModal from "../components/TutorialModal";
@@ -36,6 +35,7 @@ import { useStyles } from "../hooks/styles";
 import { reaction } from "mobx";
 import { ScreenShaker } from "@/components/ScreenShaker";
 import { VFXWrapper } from "@/components/VFXWrapper";
+import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 
 const DungeonLevelScreen = observer(() => {
   const { enemyStore, dungeonStore, uiStore, audioStore } = useRootStore();
@@ -301,7 +301,7 @@ const DungeonLevelScreen = observer(() => {
             </View>
           )}
         </Parallax>
-        <PlayerStatus positioning="absolute" style={{ bottom: 0 }} />
+        <PlayerStatusForSecondary />
       </ScreenShaker>
     );
   } else {

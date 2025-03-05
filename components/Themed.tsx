@@ -3,15 +3,11 @@ import {
   View as DefaultView,
   SafeAreaView as DefaultSafeAreaView,
   ScrollView as DefaultScrollView,
-  Dimensions,
-  Platform,
-  PixelRatio,
 } from "react-native";
 
 import Colors from "../constants/Colors";
 import { forwardRef } from "react";
 import { useRootStore } from "../hooks/stores";
-import { BASE_WIDTH } from "@/stores/UIStore";
 import { normalize, normalizeLineHeight } from "@/hooks/styles";
 
 type ThemeProps = {

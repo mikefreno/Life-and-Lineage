@@ -35,14 +35,6 @@ const ShopsScreen = observer(() => {
 
   const isFocused = useIsFocused();
 
-  useEffect(() => {
-    shopsStore.setOnShopTab(isFocused);
-
-    return () => {
-      shopsStore.setOnShopTab(false);
-    };
-  }, [isFocused]);
-
   const headerHeight = useHeaderHeight();
 
   const renderItem = (shop: Shop) => {

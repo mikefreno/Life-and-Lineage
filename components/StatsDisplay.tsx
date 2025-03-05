@@ -843,6 +843,7 @@ export function StatsDisplay({
                 onPress={() => {
                   vibration({ style: "light" });
                   clearItem();
+                  router.push("/spells");
                   router.push("/Study");
                 }}
                 style={tw.mt2}

@@ -7,8 +7,7 @@ import { View, Animated, Easing } from "react-native";
 import { Image } from "expo-image";
 
 export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
-  const root = useRootStore();
-  const { uiStore, enemyStore, playerAnimationStore } = root;
+  const { uiStore, enemyStore, playerAnimationStore } = useRootStore();
 
   const [enemyAndPosList, setEnemyAndPosList] = useState<
     {
@@ -302,7 +301,7 @@ export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
   return (
     <View style={{ flex: 1 }}>
       {/* Debug dots */}
-      {__DEV__ && root.showDevDebugUI && (
+      {__DEV__ && uiStore.showDevDebugUI && (
         <>
           {enemyAndPosList.map((elem) => (
             <View

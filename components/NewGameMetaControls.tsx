@@ -27,27 +27,29 @@ const NewGameMetaControls = observer(
               />
             </Pressable>
           )}
-        <Pressable
-          onPress={() => {
-            audioStore.setMuteValue(!audioStore.muted);
-          }}
-          accessibilityRole="button"
-          accessibilityLabel="Show Tutorial"
-        >
-          {audioStore.muted ? (
-            <MaterialIcons
-              name="music-off"
-              size={uiStore.dimensions.greater / 24}
-              color={uiStore.isDark ? "#fafafa" : "#27272a"}
-            />
-          ) : (
-            <MaterialIcons
-              name="music-note"
-              size={uiStore.dimensions.greater / 24}
-              color={uiStore.isDark ? "#fafafa" : "#27272a"}
-            />
-          )}
-        </Pressable>
+        {audioStore.audioOverride && (
+          <Pressable
+            onPress={() => {
+              audioStore.setMuteValue(!audioStore.muted);
+            }}
+            accessibilityRole="button"
+            accessibilityLabel="Show Tutorial"
+          >
+            {audioStore.muted ? (
+              <MaterialIcons
+                name="music-off"
+                size={uiStore.dimensions.greater / 24}
+                color={uiStore.isDark ? "#fafafa" : "#27272a"}
+              />
+            ) : (
+              <MaterialIcons
+                name="music-note"
+                size={uiStore.dimensions.greater / 24}
+                color={uiStore.isDark ? "#fafafa" : "#27272a"}
+              />
+            )}
+          </Pressable>
+        )}
       </View>
     );
   },

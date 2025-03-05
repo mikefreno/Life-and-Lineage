@@ -40,17 +40,18 @@ export class RootStore {
   constructed: boolean = false;
   atDeathScreen: boolean = false;
   startingNewGame: boolean = false;
+  currentTab: string | null = null;
 
-  showDevDebugUI: boolean = false;
   includeDevAttacks: boolean = false;
+
   devActions: {
-    action: (value?: number) => void;
+    action: (value: number) => void;
     name: string;
     max?: number;
     step?: number;
     min?: number | undefined;
     initVal?: number | undefined;
-  }[];
+  }[] = [];
 
   constructor() {
     this.uiStore = new UIStore({ root: this });
@@ -66,17 +67,20 @@ export class RootStore {
     this.time = new TimeStore({ root: this });
     this.uiStore.markStoreAsLoaded("time");
 
+    this.enemyStore = new EnemyStore({ root: this });
+    this.uiStore.markStoreAsLoaded("enemy");
+
+    this.dungeonStore = new DungeonStore({ root: this });
+    this.uiStore.markStoreAsLoaded("dungeon");
+
     this.authStore = new AuthStore({ root: this });
     this.uiStore.markStoreAsLoaded("auth");
 
     this.shopsStore = new ShopStore({ root: this });
     this.uiStore.markStoreAsLoaded("shops");
 
-    this.enemyStore = new EnemyStore({ root: this });
-    this.uiStore.markStoreAsLoaded("enemy");
-
-    this.dungeonStore = new DungeonStore({ root: this });
-    this.uiStore.markStoreAsLoaded("dungeon");
+    this.audioStore = new AudioStore({ root: this });
+    this.uiStore.markStoreAsLoaded("audio");
 
     this.characterStore = new CharacterStore({ root: this });
     this.uiStore.markStoreAsLoaded("character");
@@ -90,83 +94,7 @@ export class RootStore {
     this.saveStore = new SaveStore({ root: this });
     this.uiStore.markStoreAsLoaded("save");
 
-    this.audioStore = new AudioStore({ root: this });
-    this.uiStore.markStoreAsLoaded("audio");
-
     this.constructed = true;
-
-    this.devActions = __DEV__
-      ? [
-          {
-            action: (value: number) =>
-              this.playerState?.addSkillPoint({ amount: value }),
-            name: "Add skill points",
-            max: 25,
-            step: 1,
-          },
-          {
-            action: (value: number) => this.playerState?.addGold(value),
-            name: "Add gold",
-            max: 10_000,
-            step: 100,
-          },
-          {
-            action: (value: number) => this.time.devSetter("year", value),
-            name: "Set Game Year",
-            min: 1_300,
-            max: 2_000,
-            step: 1,
-            initVal: this.time.year,
-          },
-          {
-            action: (value: number) => this.time.devSetter("week", value),
-            name: "Set Game Week",
-            max: 51,
-            step: 1,
-            initVal: this.time.week,
-          },
-          {
-            action: (value: number) => this.playerState?.restoreHealth(value),
-            name: "Adjust HP",
-            min: -1_000,
-            max: 1_000,
-            initVal: 0,
-            step: 10,
-          },
-          {
-            action: (value: number) => this.playerState?.restoreMana(value),
-            name: "Adjust Mana",
-            min: -1_000,
-            max: 1_000,
-            initVal: 0,
-            step: 10,
-          },
-          {
-            action: (value: number) => this.playerState?.restoreSanity(value),
-            name: "Adjust Sanity",
-            min: -1_000,
-            max: 1_000,
-            initVal: 0,
-            step: 10,
-          },
-          {
-            action: () => this.dungeonStore._openAllInstances(),
-            name: "Unlock All Dungeons",
-          },
-          {
-            action: () => this.playerState?._unlockAllSpells(),
-            name: "Unlock All Spells",
-          },
-          {
-            action: () => this.toggleIncludeDevAttacks(),
-            name: "Toggle Developer Attacks",
-          },
-          {
-            action: () => this.toggleDebugUI(),
-            name: "Toggle Debug UI",
-          },
-        ]
-      : [];
 
     makeObservable(this, {
       constructed: observable,
@@ -174,12 +102,12 @@ export class RootStore {
       startingNewGame: observable,
       devActions: observable,
       includeDevAttacks: observable,
-      showDevDebugUI: observable,
-      toggleIncludeDevAttacks: action,
-      toggleDebugUI: action,
+      currentTab: observable,
+
       hitDeathScreen: action,
       clearDeathScreen: action,
-      setDevActions: action,
+      addDevAction: action,
+      removeDevAction: action,
     });
   }
 
@@ -207,29 +135,52 @@ export class RootStore {
     return points;
   }
 
-  setDevActions(
-    actions: {
-      action: (value?: number) => void;
-      name: string;
-      max: number;
-      step: number;
-      min?: number | undefined;
-      initVal?: number | undefined;
-    }[],
+  addDevAction(
+    newAction:
+      | {
+          action: (value: number) => void;
+          name: string;
+          max?: number;
+          step?: number;
+          min?: number | undefined;
+          initVal?: number | undefined;
+        }
+      | {
+          action: (value: number) => void;
+          name: string;
+          max?: number;
+          step?: number;
+          min?: number | undefined;
+          initVal?: number | undefined;
+        }[],
   ) {
-    this.devActions = actions;
-  }
-
-  toggleIncludeDevAttacks() {
-    if (__DEV__) {
-      this.includeDevAttacks = !this.includeDevAttacks;
+    if (Array.isArray(newAction)) {
+      newAction.forEach((action) => {
+        const existingIndex = this.devActions.findIndex(
+          (existing) => existing.name === action.name,
+        );
+        if (existingIndex !== -1) {
+          this.devActions[existingIndex] = action;
+        } else {
+          this.devActions.push(action);
+        }
+      });
+    } else {
+      const existingIndex = this.devActions.findIndex(
+        (existing) => existing.name === newAction.name,
+      );
+      if (existingIndex !== -1) {
+        this.devActions[existingIndex] = newAction;
+      } else {
+        this.devActions.push(newAction);
+      }
     }
   }
 
-  toggleDebugUI() {
-    if (__DEV__) {
-      this.showDevDebugUI = !this.showDevDebugUI;
-    }
+  removeDevAction(actionName: string) {
+    this.devActions = this.devActions.filter(
+      (action) => action.name === actionName,
+    );
   }
 
   async newGame(newPlayer: PlayerCharacter) {

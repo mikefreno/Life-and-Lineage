@@ -11,6 +11,7 @@ import { Audio } from "expo-av";
 import { Sound } from "expo-av/build/Audio/Sound";
 import { debounce } from "lodash";
 import { Platform, InteractionManager } from "react-native";
+import * as Device from "expo-device";
 
 const AMBIENT_TRACKS = {
   shops: require("../assets/music/shops.m4a"),
@@ -93,9 +94,12 @@ export class AudioStore {
 
   private isDestroying: boolean = false;
 
+  audioOverride = Device.isDevice;
+
   constructor({ root }: { root: RootStore }) {
     this.root = root;
     this.loadPersistedSettings();
+    this.initializeAudio();
 
     makeObservable(this, {
       masterVolume: observable,
@@ -107,7 +111,9 @@ export class AudioStore {
       currentTrack: observable,
       isAmbientLoaded: observable,
       isCombatLoaded: observable,
+      audioOverride: observable,
 
+      toggleAudioOverride: action,
       loadAudioResources: action,
       playAmbient: action,
       playCombat: action,
@@ -118,7 +124,10 @@ export class AudioStore {
       prepareForDestroy: action,
     });
 
-    this.initializeAudio();
+    this.root.addDevAction({
+      action: () => this.toggleAudioOverride(),
+      name: "Toggle Audio Override",
+    });
 
     reaction(
       () => ({
@@ -135,36 +144,51 @@ export class AudioStore {
     );
   }
 
-  // Add this method to mark the store as being destroyed
+  toggleAudioOverride() {
+    if (__DEV__) {
+      if (this.audioOverride) {
+        this.audioOverride = false;
+        this.cleanup();
+      } else {
+        this.audioOverride = true;
+        this.initializeAudio();
+      }
+    }
+  }
+
   prepareForDestroy() {
     this.isDestroying = true;
     this.cleanup();
   }
 
   private parseLocationForRelevantTrack(current?: any, previous?: any) {
-    if (this.isDestroying) return;
-
-    if (!previous || !current) {
-      if (this.root.dungeonStore.inCombat) {
-        this.playCombat("basic");
-      } else {
+    if (current === undefined || this.isDestroying || !this.audioOverride)
+      return;
+    try {
+      if (previous === undefined) {
+        if (this.root.dungeonStore.inCombat) {
+          this.playCombat("basic");
+        } else {
+          this.playAmbient();
+        }
+      }
+      if (current.inCombat !== previous?.inCombat) {
+        if (current.inCombat) {
+          this.playCombat("basic");
+        } else {
+          this.playAmbient();
+        }
+      } else if (
+        current.inDungeon !== previous?.inDungeon ||
+        current.inMarket !== previous?.inMarket ||
+        (!current.inDungeon &&
+          !current.inMarket &&
+          current.playerAge !== previous?.playerAge)
+      ) {
         this.playAmbient();
       }
-    }
-    if (current.inCombat !== previous?.inCombat) {
-      if (current.inCombat) {
-        this.playCombat("basic");
-      } else {
-        this.playAmbient();
-      }
-    } else if (
-      current.inDungeon !== previous?.inDungeon ||
-      current.inMarket !== previous?.inMarket ||
-      (!current.inDungeon &&
-        !current.inMarket &&
-        current.playerAge !== previous?.playerAge)
-    ) {
-      this.playAmbient();
+    } catch {
+      this.recoverFromError();
     }
   }
 
@@ -212,7 +236,7 @@ export class AudioStore {
       ]);
 
       if (this.isAmbientLoaded && !this.isDestroying) {
-        this.playAmbient();
+        setTimeout(() => this.parseLocationForRelevantTrack(), 1000);
       }
     } catch (error) {
       console.error("Failed to load audio resources:", error);
@@ -287,7 +311,6 @@ export class AudioStore {
         if (!this.isDestroying) {
           this.combatPlayers.set(id, sound);
         } else {
-          // If we're destroying, unload the sound immediately
           await sound.unloadAsync().catch(() => {});
         }
       },
@@ -314,7 +337,6 @@ export class AudioStore {
         }
       }
 
-      // if the track to play is currently being played, return
       if (this.currentTrack?.name === selectedTrack) return;
 
       const newSound = this.ambientPlayers.get(selectedTrack);
@@ -322,7 +344,6 @@ export class AudioStore {
         throw new Error(`Ambient track ${selectedTrack} not found`);
       }
 
-      // Run on main thread for Android
       await runOnMainThread(async () => {
         if (this.isDestroying) return;
 
@@ -360,7 +381,6 @@ export class AudioStore {
         };
       });
 
-      //start fade in of new track
       await runOnMainThread(() => {
         if (!this.isDestroying && this.currentTrack) {
           return this.fadeSound({
@@ -758,18 +778,14 @@ export class AudioStore {
             await this.currentTrack.sound.setVolumeAsync(
               this.getEffectiveVolume(this.currentTrack.category),
             );
-          } catch (e) {
-            // Ignore errors during volume update
-          }
+          } catch (e) {}
         }
 
         for (const sound of this.soundEffects.values()) {
           if (this.isDestroying) break;
           try {
             await sound.setVolumeAsync(this.getEffectiveVolume("soundEffects"));
-          } catch (e) {
-            // Ignore errors during volume update
-          }
+          } catch (e) {}
         }
       });
     } catch (error) {
@@ -815,7 +831,7 @@ export class AudioStore {
     if (this.isDestroying) return;
 
     this.cleanup();
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 20000));
 
     if (!this.isDestroying) {
       try {
@@ -868,44 +884,34 @@ export class AudioStore {
   cleanup() {
     this.activeTransition = { trackIn: null, trackOut: null };
 
-    // Use a safer approach to stop and unload all sounds
     const cleanupSound = async (sound: Sound) => {
       try {
         await runOnMainThread(async () => {
           try {
             await sound.stopAsync();
             await sound.unloadAsync();
-          } catch (e) {
-            // Ignore errors during cleanup
-          }
+          } catch (e) {}
         });
-      } catch (e) {
-        // Ignore errors during cleanup
-      }
+      } catch (e) {}
     };
 
-    // Clean up current track
     if (this.currentTrack) {
       cleanupSound(this.currentTrack.sound).catch(() => {});
       this.currentTrack = null;
     }
 
-    // Clean up all ambient players
     this.ambientPlayers.forEach((sound) => {
       cleanupSound(sound).catch(() => {});
     });
 
-    // Clean up all combat players
     this.combatPlayers.forEach((sound) => {
       cleanupSound(sound).catch(() => {});
     });
 
-    // Clean up all sound effects
     this.soundEffects.forEach((sound) => {
       cleanupSound(sound).catch(() => {});
     });
 
-    // Clear all maps
     if (this.isDestroying) {
       this.ambientPlayers.clear();
       this.combatPlayers.clear();

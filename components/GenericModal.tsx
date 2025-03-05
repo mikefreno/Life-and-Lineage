@@ -101,7 +101,7 @@ const GenericModal = observer(
         coverScreen={true}
         deviceHeight={uiStore.dimensions.height}
         deviceWidth={uiStore.dimensions.width}
-        style={[style, shadows.soft]}
+        style={[style]}
         {...props}
       >
         <ThemedView

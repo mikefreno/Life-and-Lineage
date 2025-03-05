@@ -47,6 +47,8 @@ export class DungeonStore {
   private isProcessingMovement: boolean = false;
   logs: string[] = [];
 
+  includeDevAttacks: boolean = false;
+
   constructor({ root }: { root: RootStore }) {
     this.root = root;
     this.dungeonInstances = this.hydrateDungeonState();
@@ -79,6 +81,8 @@ export class DungeonStore {
       this.fightingBoss = fightingBoss;
       this.logs = logs;
     }
+
+    __DEV__ && this.setupDevActions();
 
     makeObservable(this, {
       inCombat: observable,
@@ -211,35 +215,6 @@ export class DungeonStore {
     );
 
     reaction(
-      () => this.isInDungeon,
-      (current) => {
-        if (current) {
-          const dungeonDevActions = [
-            ...this.root.devActions,
-            {
-              action: (value: number) => {
-                if (this.root.playerAnimationStore.screenShaker) {
-                  this.root.playerAnimationStore.screenShaker(value);
-                }
-              },
-              name: "Trigger Screen Shake",
-              initVal: 200,
-              max: 500,
-              step: 25,
-            },
-          ];
-          this.root.setDevActions(dungeonDevActions);
-        } else {
-          this.root.setDevActions(
-            this.root.devActions.filter(
-              (action) => action.name !== "Trigger Screen Shake",
-            ),
-          );
-        }
-      },
-    );
-
-    reaction(
       () => this.currentSpecialEncounter,
       (encounter) => {
         if (encounter) {
@@ -257,6 +232,44 @@ export class DungeonStore {
         }
       },
     );
+  }
+
+  private setupDevActions() {
+    if (__DEV__) {
+      this.root.addDevAction({
+        action: () => this._openAllInstances(),
+        name: "Unlock All Dungeons",
+      });
+      reaction(
+        () => this.isInDungeon,
+        (current) => {
+          if (current) {
+            this.root.addDevAction([
+              {
+                action: (value?: number) => {
+                  if (this.root.playerAnimationStore.screenShaker) {
+                    this.root.playerAnimationStore.screenShaker(value);
+                  }
+                },
+                name: "Trigger Screen Shake",
+                initVal: 200,
+                max: 500,
+                step: 25,
+              },
+              {
+                action: () =>
+                  runInAction(
+                    () => (this.includeDevAttacks = !this.includeDevAttacks),
+                  ),
+                name: "Toggle Dev Attacks",
+              },
+            ]);
+          } else {
+            this.root.removeDevAction("Trigger Screen Shake");
+          }
+        },
+      );
+    }
   }
 
   get isInDungeon() {

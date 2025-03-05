@@ -78,17 +78,23 @@ export default function NewGameReview() {
           <Text style={styles.newGameHeader}>
             {`${firstName} ${lastName} the `}
             <Text
-              style={{
-                color:
-                  blessingSelection == Element.assassination &&
-                  uiStore.colorScheme == "dark"
-                    ? elementalColorMap[blessingSelection].light
-                    : elementalColorMap[blessingSelection].dark,
-              }}
+              style={[
+                styles["text-2xl"],
+                {
+                  color:
+                    blessingSelection == Element.assassination &&
+                    uiStore.colorScheme == "dark"
+                      ? elementalColorMap[blessingSelection].light
+                      : elementalColorMap[blessingSelection].dark,
+                },
+              ]}
             >{`${ElementToString[blessingSelection]}`}</Text>
             -born{" "}
             <Text
-              style={{ color: playerClassColors[classSelection] }}
+              style={[
+                styles["text-2xl"],
+                { color: playerClassColors[classSelection] },
+              ]}
             >{`${toTitleCase(classSelection)}`}</Text>
           </Text>
           <StatAllocation

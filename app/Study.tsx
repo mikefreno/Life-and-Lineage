@@ -3,7 +3,6 @@ import { Pressable, Image, View, ScrollView } from "react-native";
 import { AccelerationCurves, toTitleCase } from "../utility/functions/misc";
 import ProgressBar from "../components/ProgressBar";
 import SpellDetails from "../components/SpellDetails";
-import PlayerStatus from "../components/PlayerStatus";
 import GenericRaisedButton from "../components/GenericRaisedButton";
 import {
   Element,
@@ -13,69 +12,73 @@ import {
 } from "../utility/types";
 import GenericModal from "../components/GenericModal";
 import { elementalColorMap } from "../constants/Colors";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { useIsFocused } from "@react-navigation/native";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { useRootStore } from "../hooks/stores";
 import { useAcceleratedAction, useVibration } from "../hooks/generic";
 import type { Item } from "../entities/item";
 import type { Spell } from "../entities/spell";
 import React from "react";
-import { radius, text, useStyles } from "../hooks/styles";
+import { radius, useStyles } from "../hooks/styles";
+import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
+import { observer } from "mobx-react-lite";
+import { useHeaderHeight } from "@react-navigation/elements";
 
-const StudyButton = ({ studyState, onStudy }) => {
-  const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
-    () => null,
-    {
-      minHoldTime: 350,
-      maxSpeed: 10,
-      accelerationCurve: AccelerationCurves.linear,
-      action: () => onStudy(studyState),
-      minActionAmount: 1,
-      maxActionAmount: 50,
-      debounceTime: 50,
-    },
-  );
+interface SpellStudyingState {
+  bookName: string;
+  spellName: string;
+  experience: number;
+  element: Element;
+}
 
-  return (
-    <GenericRaisedButton
-      onPress={() => onStudy(studyState)}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-    >
-      Continue Studying
-    </GenericRaisedButton>
-  );
-};
+const StudyButton = React.memo(
+  ({
+    studyState,
+    onStudy,
+  }: {
+    studyState: SpellStudyingState;
+    onStudy: (state: SpellStudyingState) => void;
+  }) => {
+    const { start: handlePressIn, stop: handlePressOut } = useAcceleratedAction(
+      () => null,
+      {
+        minHoldTime: 350,
+        maxSpeed: 10,
+        accelerationCurve: AccelerationCurves.linear,
+        action: () => onStudy(studyState),
+        minActionAmount: 1,
+        maxActionAmount: 50,
+        debounceTime: 50,
+      },
+    );
 
-export default function LearningKnowledgeScreen() {
+    return (
+      <GenericRaisedButton
+        onPress={() => onStudy(studyState)}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+      >
+        Continue Studying
+      </GenericRaisedButton>
+    );
+  },
+);
+
+const LearningSpellScreen = observer(() => {
   const root = useRootStore();
   const { playerState, uiStore } = root;
   const styles = useStyles();
 
-  const books = playerState?.baseInventory.filter(
-    (item) => item.itemClass == ItemClassType.Book,
-  );
   const isFocused = useIsFocused();
-  const headerHeight = useHeaderHeight();
-
   const vibration = useVibration();
 
   const [selectedBook, setSelectedBook] = useState<Item | null>(null);
   const [selectedBookSpell, setSelectedBookSpell] = useState<Spell | null>(
     null,
   );
-  const [spellState, setSpellState] = useState<
-    | {
-        bookName: string;
-        spellName: string;
-        experience: number;
-        element: Element;
-      }[]
-    | undefined
-  >(playerState?.learningSpells);
   const [showMasteryLevelTooLow, setShowMasteryLevelTooLow] =
     useState<Element | null>(null);
+  const headerHeight = useHeaderHeight();
 
   useEffect(() => {
     if (selectedBook && playerState) {
@@ -85,42 +88,189 @@ export default function LearningKnowledgeScreen() {
         setSelectedBookSpell(spell);
       }
     }
-  }, [selectedBook]);
+  }, [selectedBook, playerState]);
 
-  function studySpell(
-    bookName: string,
-    spellName: string,
-    spellElement: Element,
-  ) {
-    if (playerState && isFocused) {
-      playerState.learnSpellStep(bookName, spellName, spellElement);
-      setSpellState(playerState.learningSpells);
-      root.gameTick();
-    }
-  }
+  const filteredBooks = playerState?.baseInventory
+    .filter((item) => item.itemClass == ItemClassType.Book)
+    ?.filter(
+      (book) =>
+        !playerState?.learningSpells
+          .map((studyState) => studyState.spellName)
+          ?.includes(book.attachedSpell?.name!),
+    );
 
-  const studyingSpells = playerState?.learningSpells.map(
-    (studyState) => studyState.spellName,
+  const studySpell = useCallback(
+    (bookName: string, spellName: string, spellElement: Element) => {
+      if (playerState && isFocused) {
+        playerState.learnSpellStep(bookName, spellName, spellElement);
+        setSpellState(playerState.learningSpells);
+        root.gameTick();
+      }
+    },
+    [playerState, isFocused, root],
   );
 
-  const filteredBooks = books?.filter(
-    (book) => !studyingSpells?.includes(book.attachedSpell?.name!),
-  );
-  function bookLabel() {
+  const [spellState, setSpellState] = useState<
+    SpellStudyingState[] | undefined
+  >(playerState?.learningSpells);
+
+  const bookLabel = useCallback(() => {
     if (playerState && selectedBookSpell) {
       return `${
         MasteryToString[selectedBookSpell.proficiencyNeeded]
       } level book`;
     }
-  }
+    return "";
+  }, [playerState, selectedBookSpell]);
+
+  const NoActionsMessage = useMemo(() => {
+    if (
+      filteredBooks?.length === 0 &&
+      playerState?.learningSpells.length === 0
+    ) {
+      return (
+        <View style={[styles.columnCenter, styles.pt12]}>
+          <Text style={styles["text-xl"]}>No Books to Learn From</Text>
+          <Text>(Books can be bought from the Librarian)</Text>
+        </View>
+      );
+    }
+    return null;
+  }, [filteredBooks?.length, playerState?.learningSpells.length, styles]);
 
   const continueStudying = useCallback(
-    (studyState) => {
+    (studyState: SpellStudyingState) => {
       studySpell(studyState.bookName, studyState.spellName, studyState.element);
       vibration({ style: "light" });
     },
-    [studySpell],
+    [studySpell, vibration],
   );
+
+  const CurrentlyStudyingSection = useMemo(() => {
+    if (spellState && spellState.length > 0)
+      return (
+        <View style={[styles.py4]}>
+          <Text style={[styles.textCenter, styles["text-xl"]]}>
+            Currently Studying
+          </Text>
+          {spellState.map((studyState) => (
+            <View key={`${studyState.bookName}-${studyState.spellName}`}>
+              <Text>{toTitleCase(studyState.spellName)}</Text>
+              <ProgressBar
+                filledColor={elementalColorMap[studyState.element].dark}
+                unfilledColor={elementalColorMap[studyState.element].light}
+                value={studyState.experience}
+                maxValue={20}
+              />
+              <StudyButton studyState={studyState} onStudy={continueStudying} />
+            </View>
+          ))}
+        </View>
+      );
+    return null;
+  }, [spellState, styles, continueStudying]);
+
+  const SelectedBookSection = useMemo(() => {
+    if (selectedBook && selectedBookSpell)
+      return (
+        <View style={[styles.columnCenter, styles.py4]}>
+          <Text style={styles["text-xl"]}>
+            {toTitleCase(selectedBook.name)}
+          </Text>
+          <Text style={[styles.py2, styles["text-lg"], { letterSpacing: 0.1 }]}>
+            Teaches
+          </Text>
+          <Text style={[styles.py2, styles["text-lg"], { letterSpacing: 0.1 }]}>
+            ({bookLabel()})
+          </Text>
+          <SpellDetails spell={selectedBookSpell} />
+          <GenericRaisedButton
+            onPress={() => {
+              if (
+                playerState &&
+                selectedBookSpell.proficiencyNeeded <=
+                  playerState.currentMasteryLevel(selectedBookSpell.element)
+              ) {
+                vibration({ style: "light", essential: true });
+                studySpell(
+                  selectedBook.name,
+                  selectedBookSpell.name,
+                  selectedBookSpell.element,
+                );
+                setSelectedBook(null);
+              } else {
+                setShowMasteryLevelTooLow(selectedBookSpell.element);
+              }
+            }}
+          >
+            Start Studying
+          </GenericRaisedButton>
+        </View>
+      );
+    return null;
+  }, [
+    selectedBook,
+    selectedBookSpell,
+    styles,
+    bookLabel,
+    playerState,
+    vibration,
+    studySpell,
+  ]);
+
+  const NonStartedBooksSection = useMemo(() => {
+    if (filteredBooks && filteredBooks.length > 0) {
+      return (
+        <View style={styles.py4}>
+          <Text style={[styles.textCenter, styles["text-xl"]]}>
+            Available for Study
+          </Text>
+          <ScrollView
+            horizontal
+            contentContainerStyle={{
+              flexGrow: 1,
+              justifyContent: "center",
+            }}
+          >
+            <View
+              style={[
+                styles.my2,
+                {
+                  maxHeight: 96,
+                  flexWrap: "wrap",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                },
+              ]}
+            >
+              {filteredBooks.map((item) => (
+                <Pressable
+                  key={item.id}
+                  style={[
+                    styles.m2,
+                    radius.lg,
+                    styles.columnCenter,
+                    { backgroundColor: "#a1a1aa" },
+                    selectedBook?.id === item.id && {
+                      borderWidth: 2,
+                      borderColor: "red",
+                    },
+                  ]}
+                  onPress={() => setSelectedBook(item)}
+                >
+                  <View style={[styles.p2]}>
+                    <Image source={item.getItemIcon()} />
+                  </View>
+                </Pressable>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+      );
+    }
+    return null;
+  }, [filteredBooks, styles, radius.lg, selectedBook?.id]);
 
   return (
     <>
@@ -149,131 +299,23 @@ export default function LearningKnowledgeScreen() {
           </>
         )}
       </GenericModal>
-      <View
-        style={[
-          { flex: 1, justifyContent: "space-between", paddingBottom: 20 },
-        ]}
-      >
-        <View
-          style={{
+      <View style={{ flex: 1 }}>
+        <ScrollView
+          contentContainerStyle={{
             paddingTop: headerHeight,
+            paddingBottom: uiStore.bottomBarHeight,
             paddingHorizontal: 12,
           }}
         >
-          {filteredBooks?.length == 0 &&
-          playerState?.learningSpells.length == 0 ? (
-            <View style={[styles.columnCenter, styles.pt12]}>
-              <Text style={text.xl}>No Books to Learn From</Text>
-              <Text>(Books can be bought from the Librarian)</Text>
-            </View>
-          ) : null}
-          {spellState && spellState.length > 0 && (
-            <ScrollView style={{ maxHeight: uiStore.dimensions.height * 0.25 }}>
-              <View style={[styles.py4]}>
-                <Text style={[styles.textCenter, styles.xl]}>
-                  Currently Studying
-                </Text>
-                {spellState.map((studyState) => (
-                  <View key={studyState.spellName}>
-                    <Text>{toTitleCase(studyState.spellName)}</Text>
-                    <ProgressBar
-                      filledColor={elementalColorMap[studyState.element].dark}
-                      unfilledColor={
-                        elementalColorMap[studyState.element].light
-                      }
-                      value={studyState.experience}
-                      maxValue={20}
-                    />
-                    <StudyButton
-                      studyState={studyState}
-                      onStudy={continueStudying}
-                    />
-                  </View>
-                ))}
-              </View>
-            </ScrollView>
-          )}
-          {selectedBook && selectedBookSpell && (
-            <View style={[styles.columnCenter, styles.py4]}>
-              <Text style={styles.xl}>{toTitleCase(selectedBook.name)}</Text>
-              <Text style={[styles.py2, styles.lg, { letterSpacing: 0.1 }]}>
-                Teaches
-              </Text>
-              <Text style={[styles.py2, styles.lg, { letterSpacing: 0.1 }]}>
-                ({bookLabel()})
-              </Text>
-              <SpellDetails spell={selectedBookSpell} />
-              <GenericRaisedButton
-                onPress={() => {
-                  if (
-                    playerState &&
-                    selectedBookSpell.proficiencyNeeded <=
-                      playerState.currentMasteryLevel(selectedBookSpell.element)
-                  ) {
-                    vibration({ style: "light", essential: true });
-                    studySpell(
-                      selectedBook.name,
-                      selectedBookSpell.name,
-                      selectedBookSpell.element,
-                    );
-                    setSelectedBook(null);
-                  } else {
-                    setShowMasteryLevelTooLow(selectedBookSpell.element);
-                  }
-                }}
-              >
-                Start Studying
-              </GenericRaisedButton>
-            </View>
-          )}
-          {filteredBooks && filteredBooks.length > 0 && (
-            <View style={styles.py4}>
-              <Text style={[styles.textCenter, styles.xl]}>
-                Available for Study
-              </Text>
-              <ScrollView
-                horizontal
-                contentContainerStyle={{
-                  flexGrow: 1,
-                  justifyContent: "center",
-                }}
-              >
-                <View
-                  style={[
-                    styles.my2,
-                    {
-                      maxHeight: 96,
-                      flexWrap: "wrap",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    },
-                  ]}
-                >
-                  {filteredBooks.map((item) => (
-                    <Pressable
-                      key={item.id}
-                      style={[styles.m2, styles.columnCenter]}
-                      onPress={() => setSelectedBook(item)}
-                    >
-                      <View
-                        style={[
-                          styles.p2,
-                          radius.lg,
-                          { backgroundColor: "#a1a1aa" },
-                        ]}
-                      >
-                        <Image source={item.getItemIcon()} />
-                      </View>
-                    </Pressable>
-                  ))}
-                </View>
-              </ScrollView>
-            </View>
-          )}
-        </View>
+          {NoActionsMessage}
+          {NonStartedBooksSection}
+          {SelectedBookSection}
+          {CurrentlyStudyingSection}
+        </ScrollView>
       </View>
-      <PlayerStatus tabScreen />
+      <PlayerStatusForSecondary />
     </>
   );
-}
+});
+
+export default LearningSpellScreen;

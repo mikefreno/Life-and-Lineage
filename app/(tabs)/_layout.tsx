@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, Tabs, useRouter } from "expo-router";
 import {
   GestureResponderEvent,
@@ -6,12 +6,13 @@ import {
   Pressable,
   Image,
   View,
+  LayoutAnimation,
 } from "react-native";
-import Colors, { elementalColorMap } from "../../constants/Colors";
+import Colors, { elementalColorMap } from "@/constants/Colors";
 import { BlurView } from "expo-blur";
 import { StyleSheet, Text as RNText } from "react-native";
-import PlayerStatus from "../../components/PlayerStatusForHome";
-import { LinearGradientBlur } from "../../components/LinearGradientBlur";
+import PlayerStatusForHome from "@/components/PlayerStatus/ForHome";
+import { LinearGradientBlur } from "@/components/LinearGradientBlur";
 import {
   BookSparkles,
   BowlingBallAndPin,
@@ -28,20 +29,20 @@ import {
   Sword,
   Wand,
   WizardHat,
-} from "../../assets/icons/SVGIcons";
-import { Text, ThemedView } from "../../components/Themed";
-import TutorialModal from "../../components/TutorialModal";
+} from "@/assets/icons/SVGIcons";
+import { Text, ThemedView } from "@/components/Themed";
+import TutorialModal from "@/components/TutorialModal";
 import { useIsFocused } from "@react-navigation/native";
 import { Element, TutorialOption } from "../../utility/types";
-import { useVibration } from "../../hooks/generic";
-import { useRootStore } from "../../hooks/stores";
+import { useVibration } from "@/hooks/generic";
+import { useRootStore } from "@/hooks/stores";
 import { normalize, shadows, useStyles } from "../../hooks/styles";
 import { observer } from "mobx-react-lite";
 import { wait } from "@/utility/functions/misc";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import GenericModal from "@/components/GenericModal";
 
-const TAB_SELECTION = 80;
+export const TAB_SELECTION = 80;
 
 const TabLayout = observer(() => {
   const isFocused = useIsFocused();
@@ -69,6 +70,10 @@ const TabLayout = observer(() => {
           )
         : () => <ThemedView style={[StyleSheet.absoluteFill, shadows.soft]} />,
   } as const;
+
+  useEffect(() => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  }, []);
 
   return (
     <>
@@ -102,11 +107,11 @@ const TabLayout = observer(() => {
           uiStore.setDetailedStatusViewShowing(true);
         }}
         style={[
-          uiStore.root.showDevDebugUI && styles.debugBorder,
+          uiStore.showDevDebugUI && styles.debugBorder,
           {
             position: "absolute",
             zIndex: 9999,
-            top: uiStore.playerStatusTop,
+            top: uiStore.bottomBarHeight,
             height: uiStore.playerStatusHeight,
             width: uiStore.isLandscape
               ? uiStore.dimensions.width * 0.75 - 16
@@ -120,14 +125,10 @@ const TabLayout = observer(() => {
           screenOptions={{
             tabBarBackground: () => {
               return (
-                <View
-                  onLayout={(event) =>
-                    uiStore.setBottomBarHeight(event.nativeEvent.layout.height)
-                  }
-                >
-                  <PlayerStatus home hideGold />
+                <>
+                  <PlayerStatusForHome />
                   <LinearGradientBlur intensity={100} />
-                </View>
+                </>
               );
             },
             tabBarActiveTintColor: Colors[uiStore.colorScheme].tint,
@@ -152,7 +153,7 @@ const TabLayout = observer(() => {
               shadowColor: "transparent",
               paddingHorizontal: 4,
               paddingTop: 8,
-              height: normalize(TAB_SELECTION) + uiStore.playerStatusHeight,
+              height: uiStore.tabHeight + uiStore.playerStatusHeight,
               ...styles.columnBetween,
               display: "flex",
             },

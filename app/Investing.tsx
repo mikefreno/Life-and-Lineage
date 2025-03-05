@@ -2,12 +2,12 @@ import React from "react";
 import investments from "../assets/json/investments.json";
 import { InvestmentType, TutorialOption } from "../utility/types";
 import InvestmentCard from "../components/InvestmentCard";
-import PlayerStatus from "../components/PlayerStatus";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../components/TutorialModal";
 import { ScrollView, View } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { observer } from "mobx-react-lite";
+import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 
 const InvestingScreen = observer(() => {
   const header = useHeaderHeight();
@@ -36,7 +36,7 @@ const InvestingScreen = observer(() => {
           </View>
         </ScrollView>
       </View>
-      <PlayerStatus tabScreen />
+      <PlayerStatusForSecondary />
     </>
   );
 });

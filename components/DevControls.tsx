@@ -162,7 +162,7 @@ export const DevControls = observer(() => {
         isVisibleCondition={showingDevControls}
         scrollEnabled={true}
         size={100}
-        style={{ maxHeight: "50%", marginVertical: "auto" }}
+        style={{ maxHeight: "90%", marginVertical: "auto" }}
         backFunction={() => setShowingDevControls(false)}
       >
         <ActionSliders actions={rootStore.devActions} />
@@ -261,7 +261,7 @@ const ActionSliders = ({
   actions,
 }: {
   actions: {
-    action: (value?: number) => void | undefined;
+    action: (value: number) => void | undefined;
     name: string;
     min?: number;
     max?: number;
