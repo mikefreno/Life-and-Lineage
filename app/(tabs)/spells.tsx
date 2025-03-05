@@ -4,7 +4,6 @@ import { View, ScrollView } from "react-native";
 import { observer } from "mobx-react-lite";
 import ProgressBar from "../../components/ProgressBar";
 import TutorialModal from "../../components/TutorialModal";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import {
@@ -19,11 +18,9 @@ import { elementalColorMap } from "../../constants/Colors";
 import { useIsFocused } from "@react-navigation/native";
 import { Text } from "../../components/Themed";
 import { useRootStore } from "../../hooks/stores";
-import { EXPANDED_PAD } from "../../components/PlayerStatus";
 import { normalize, useStyles } from "../../hooks/styles";
 
 const SpellsScreen = observer(() => {
-  const bottomTab = useBottomTabBarHeight();
   const header = useHeaderHeight();
   const { playerState, uiStore } = useRootStore();
   const styles = useStyles();
@@ -139,20 +136,22 @@ const SpellsScreen = observer(() => {
             </Text>
           </View>
         )}
-        <View style={{ paddingHorizontal: 8 }}>
-          <GenericStrikeAround>Proficiencies</GenericStrikeAround>
-        </View>
-        <View
-          style={[
-            styles.columnEvenly,
-            {
-              flex: 1,
-              paddingBottom: normalize(12),
-              marginTop: -normalize(12),
-            },
-          ]}
-        >
-          {magicProficiencySection(playerState?.magicProficiencies)}
+        <View style={{ height: "40%" }}>
+          <View style={{ paddingHorizontal: 8 }}>
+            <GenericStrikeAround>Proficiencies</GenericStrikeAround>
+          </View>
+          <View
+            style={[
+              styles.columnEvenly,
+              {
+                flex: 1,
+                paddingBottom: normalize(12),
+                marginTop: -normalize(12),
+              },
+            ]}
+          >
+            {magicProficiencySection(playerState?.magicProficiencies)}
+          </View>
         </View>
       </View>
     </>

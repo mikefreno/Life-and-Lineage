@@ -136,7 +136,7 @@ export const useStyles = () => {
     cardTitle: {
       fontWeight: "700",
       marginVertical: "auto",
-      width: "66%",
+      width: "60%",
       ...text["text-xl"],
       color: theme.text,
     } as const,
@@ -446,7 +446,7 @@ export const useStyles = () => {
 
     // ---- Main Tabs - Spells ---- //
     proficiencyContainer: {
-      marginVertical: 8,
+      marginVertical: normalize(4),
       paddingHorizontal: 32,
       width: "100%",
     } as const,
@@ -478,11 +478,11 @@ export const useStyles = () => {
       width: "33%",
     } as const,
     costRow: {
-      ...flex.rowEvenly,
+      flexDirection: "row",
+      justifyContent: "flex-end",
       width: "100%",
       alignItems: "center",
     } as const,
-
     // ---- Main Tabs - Dungeon ---- //
     warningContainer: {
       shadowColor: "#000",
@@ -517,15 +517,15 @@ export const useStyles = () => {
     // ---- Main Tabs - Shop ---- //
     shopCard: {
       width: "50%",
+      height: uiStore.dimensions.height / 2,
     } as const,
     shopCardInner: {
-      margin: 8,
+      margin: normalize(4),
       borderRadius: 12,
       borderWidth: 1,
       paddingVertical: 16,
-      paddingHorizontal: 8,
-      height: uiStore.dimensions.height / 2,
-      ...flex.columnBetween,
+      flex: 1,
+      ...flex.columnEvenly,
     } as const,
     enterButtonInner: {
       paddingHorizontal: 32,
@@ -533,11 +533,10 @@ export const useStyles = () => {
       borderRadius: 8,
     } as const,
     // ---- Main Tabs - Medical ---- //
-
     medicalCostContainer: {
       marginBottom: -16,
       marginTop: 16,
-      width: "40%",
+      width: "20%",
     } as const,
     // ---- Death Screen ---- //
     deathMessage: {

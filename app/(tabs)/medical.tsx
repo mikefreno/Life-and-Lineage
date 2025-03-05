@@ -34,64 +34,55 @@ const MedicalScreen = observer(() => {
       />
       <View style={{ flex: 1 }}>
         <ScrollView
+          contentContainerStyle={{
+            paddingTop: header + 20,
+            paddingBottom: uiStore.bottomBarHeight,
+            width: "80%",
+            marginHorizontal: "auto",
+          }}
           scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
         >
-          <View
-            style={[
-              {
-                paddingHorizontal: 8,
-                paddingBottom: uiStore.bottomBarHeight,
-                paddingTop: header,
-              },
-            ]}
-          >
-            <View style={{ flexDirection: "row" }}>
-              <View style={{ width: "50%" }}>
-                <GenericStrikeAround>Health</GenericStrikeAround>
-                {healthOptions.map((medOption, index) => (
-                  <MedicalOption
-                    key={index}
-                    title={medOption.serviceName}
-                    cost={medOption.cost}
-                    healthRestore={medOption.heathRestore as number | "fill"}
-                    focused={isFocused}
-                  />
-                ))}
-                <GenericStrikeAround>Other</GenericStrikeAround>
-                {otherOptions.map((medOption, index) => (
-                  <MedicalOption
-                    key={index}
-                    title={medOption.serviceName}
-                    cost={medOption.cost}
-                    removeDebuffs={medOption.removeDebuffs as number | "all"}
-                    focused={isFocused}
-                  />
-                ))}
-              </View>
-              <View style={{ width: "50%" }}>
-                <GenericStrikeAround>Mana</GenericStrikeAround>
-                {manaOptions.map((medOption, index) => (
-                  <MedicalOption
-                    key={index}
-                    title={medOption.serviceName}
-                    cost={medOption.cost}
-                    manaRestore={medOption.manaRestore as number | "fill"}
-                    focused={isFocused}
-                  />
-                ))}
-                <GenericStrikeAround>Sanity</GenericStrikeAround>
-                {sanityOptions.map((medOption, index) => (
-                  <MedicalOption
-                    key={index}
-                    title={medOption.serviceName}
-                    cost={medOption.cost}
-                    sanityRestore={medOption.sanityRestore as number | "fill"}
-                    focused={isFocused}
-                  />
-                ))}
-              </View>
-            </View>
-          </View>
+          <GenericStrikeAround>Health</GenericStrikeAround>
+          {healthOptions.map((medOption, index) => (
+            <MedicalOption
+              key={index}
+              title={medOption.serviceName}
+              cost={medOption.cost}
+              healthRestore={medOption.heathRestore as number | "fill"}
+              focused={isFocused}
+            />
+          ))}
+
+          <GenericStrikeAround>Mana</GenericStrikeAround>
+          {manaOptions.map((medOption, index) => (
+            <MedicalOption
+              key={index}
+              title={medOption.serviceName}
+              cost={medOption.cost}
+              manaRestore={medOption.manaRestore as number | "fill"}
+              focused={isFocused}
+            />
+          ))}
+          <GenericStrikeAround>Sanity</GenericStrikeAround>
+          {sanityOptions.map((medOption, index) => (
+            <MedicalOption
+              key={index}
+              title={medOption.serviceName}
+              cost={medOption.cost}
+              sanityRestore={medOption.sanityRestore as number | "fill"}
+              focused={isFocused}
+            />
+          ))}
+          <GenericStrikeAround>Conditions</GenericStrikeAround>
+          {otherOptions.map((medOption, index) => (
+            <MedicalOption
+              key={index}
+              title={medOption.serviceName}
+              cost={medOption.cost}
+              removeDebuffs={medOption.removeDebuffs as number | "all"}
+              focused={isFocused}
+            />
+          ))}
         </ScrollView>
       </View>
     </>

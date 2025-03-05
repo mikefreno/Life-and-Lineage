@@ -230,20 +230,25 @@ const TabLayout = observer(() => {
                   </Pressable>
                 </Link>
               ),
-              headerRight: () => (
-                <Link href="/Relationships" asChild>
-                  <Pressable onPress={() => vibration({ style: "light" })}>
-                    {({ pressed }) => (
-                      <HouseHeart
-                        width={normalize(30)}
-                        height={normalize(26)}
-                        color={"#f87171"}
-                        style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                      />
-                    )}
-                  </Pressable>
-                </Link>
-              ),
+              headerRight: __DEV__
+                ? () => (
+                    <Link href="/Relationships" asChild>
+                      <Pressable onPress={() => vibration({ style: "light" })}>
+                        {({ pressed }) => (
+                          <HouseHeart
+                            width={normalize(30)}
+                            height={normalize(26)}
+                            color={"#f87171"}
+                            style={{
+                              marginRight: 15,
+                              opacity: pressed ? 0.5 : 1,
+                            }}
+                          />
+                        )}
+                      </Pressable>
+                    </Link>
+                  )
+                : undefined,
             }}
           />
           <Tabs.Screen
@@ -346,20 +351,25 @@ const TabLayout = observer(() => {
                   color={color}
                 />
               ),
-              headerRight: () => (
-                <Link href="/Activities" asChild>
-                  <Pressable onPress={() => vibration({ style: "light" })}>
-                    {({ pressed }) => (
-                      <BowlingBallAndPin
-                        width={normalize(30)}
-                        height={normalize(28)}
-                        color={"#27272a"}
-                        style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                      />
-                    )}
-                  </Pressable>
-                </Link>
-              ),
+              headerRight: !__DEV__
+                ? () => (
+                    <Link href="/Activities" asChild>
+                      <Pressable onPress={() => vibration({ style: "light" })}>
+                        {({ pressed }) => (
+                          <BowlingBallAndPin
+                            width={normalize(30)}
+                            height={normalize(28)}
+                            color={"#27272a"}
+                            style={{
+                              marginRight: 15,
+                              opacity: pressed ? 0.5 : 1,
+                            }}
+                          />
+                        )}
+                      </Pressable>
+                    </Link>
+                  )
+                : undefined,
             }}
           />
           <Tabs.Screen
@@ -388,31 +398,33 @@ const TabLayout = observer(() => {
                   color={color}
                 />
               ),
-              headerLeft: () => (
-                <Pressable
-                  onPress={() => {
-                    if (dungeonStore.pvpUnlocked) {
-                      uiStore.setTotalLoadingSteps(3);
-                      vibration({ style: "warning" });
-                      wait(100).then(() => {
-                        router.replace(`/DungeonLevel`);
-                        uiStore.incrementLoadingStep();
-                      });
-                    } else {
-                      setShowPVPInfoModal(true);
-                    }
-                  }}
-                >
-                  {({ pressed }) => (
-                    <MaterialCommunityIcons
-                      name="sword-cross"
-                      size={30}
-                      color={Colors[uiStore.colorScheme].health}
-                      style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }}
-                    />
-                  )}
-                </Pressable>
-              ),
+              headerLeft: __DEV__
+                ? () => (
+                    <Pressable
+                      onPress={() => {
+                        if (dungeonStore.pvpUnlocked) {
+                          uiStore.setTotalLoadingSteps(3);
+                          vibration({ style: "warning" });
+                          wait(100).then(() => {
+                            router.replace(`/DungeonLevel`);
+                            uiStore.incrementLoadingStep();
+                          });
+                        } else {
+                          setShowPVPInfoModal(true);
+                        }
+                      }}
+                    >
+                      {({ pressed }) => (
+                        <MaterialCommunityIcons
+                          name="sword-cross"
+                          size={30}
+                          color={Colors[uiStore.colorScheme].health}
+                          style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }}
+                        />
+                      )}
+                    </Pressable>
+                  )
+                : undefined,
               headerRight: () => (
                 <Pressable
                   onPress={() => {

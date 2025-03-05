@@ -320,8 +320,12 @@ const ShopInteriorScreen = observer(() => {
                 {playerState.fullName}'s Inventory
               </Text>
               <View style={styles.rowCenter}>
-                <Text> ( {playerState.readableGold} )</Text>
-                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+                <Text> ( {playerState.readableGold} </Text>
+                <Coins
+                  width={16}
+                  height={16}
+                  style={{ marginLeft: 6, marginVertical: "auto" }}
+                />
                 <Text> )</Text>
                 {playerState.baseInventory.some(
                   (item) => item.itemClass == "junk",

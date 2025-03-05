@@ -1,9 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Text } from "../components/Themed";
 import { wait } from "../utility/functions/misc";
 import { CharacterImage } from "../components/CharacterImage";
 import { useState } from "react";
-import { useHeaderHeight } from "@react-navigation/elements";
 import ProgressBar from "../components/ProgressBar";
 import { CharacterInteractionModal } from "../components/CharacterInteractionModal";
 import { FlatList, Pressable, ScrollView, View } from "react-native";

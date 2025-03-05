@@ -30,7 +30,7 @@ import { useVibration } from "../hooks/generic";
 import { Item } from "../entities/item";
 import { useHeaderHeight } from "@react-navigation/elements";
 import CheckpointModal from "../components/CheckpointModal";
-import { flex, text, tw, useStyles } from "../hooks/styles";
+import { flex, tw, useStyles } from "../hooks/styles";
 
 export default function DeathScreen() {
   const [nextLife, setNextLife] = useState<Character | null>(null);
@@ -138,7 +138,7 @@ export default function DeathScreen() {
             )}
             {page == 1 && selectedClass && (
               <>
-                <Pressable onPress={() => setPage(0)} style={styles.backButton}>
+                <Pressable onPress={() => setPage(0)}>
                   <Entypo
                     name="chevron-left"
                     size={24}
@@ -180,7 +180,9 @@ export default function DeathScreen() {
 
           {playerState.children.length > 0 && (
             <>
-              <Text style={text.xl}>Continue as one of your children?</Text>
+              <Text style={styles["text-xl"]}>
+                Continue as one of your children?
+              </Text>
               <View style={styles.childrenContainer}>
                 <ScrollView
                   horizontal

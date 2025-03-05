@@ -64,22 +64,41 @@ const ShopsScreen = observer(() => {
           ]}
         >
           <Text
-            style={{
-              textAlign: "center",
-              fontSize: 24,
-              lineHeight: 32,
-              color: colors.text,
-            }}
+            style={[
+              {
+                textAlign: "center",
+                color: colors.text,
+              },
+              styles["text-3xl"],
+            ]}
             numberOfLines={2}
           >
-            The {toTitleCase(shop.archetype)}
+            {`The\n${toTitleCase(shop.archetype)}`}
           </Text>
-          <CharacterImage character={shop.shopKeeper} />
-          <Text style={{ textAlign: "center", color: colors.text }}>
-            {shop.shopKeeper.fullName}
-          </Text>
+          <View
+            style={{
+              width: "100%",
+              flex: 1,
+              justifyContent: "center",
+              paddingHorizontal: 4,
+            }}
+          >
+            <CharacterImage character={shop.shopKeeper} />
+            <Text
+              style={[
+                styles["text-lg"],
+                { textAlign: "center", color: colors.text },
+              ]}
+            >
+              {shop.shopKeeper.fullName}
+            </Text>
+          </View>
           <Pressable
-            style={{ marginBottom: 8, marginHorizontal: "auto" }}
+            style={{
+              marginBottom: 8,
+              marginHorizontal: "auto",
+              justifyContent: "flex-end",
+            }}
             onPress={() => {
               vibration({ style: "light" });
               shopsStore.setCurrentShop(shop);
@@ -101,7 +120,9 @@ const ShopsScreen = observer(() => {
                   },
                 ]}
               >
-                <Text style={{ fontSize: 18, color: colors.text }}>Enter</Text>
+                <Text style={[styles["text-lg"], { color: colors.text }]}>
+                  Enter
+                </Text>
               </View>
             )}
           </Pressable>

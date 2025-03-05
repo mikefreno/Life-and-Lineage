@@ -1,4 +1,3 @@
-import { VFXImageOptions } from "@/utility/functions/vfxmapping";
 import { createBuff, createDebuff } from "../utility/functions/conditions";
 import { wait, toTitleCase, rollD20 } from "../utility/functions/misc";
 import {

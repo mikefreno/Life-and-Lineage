@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View } from "react-native";
 import { Text } from "./Themed";
 import GenericRaisedButton from "./GenericRaisedButton";
@@ -8,7 +8,7 @@ import { observer } from "mobx-react-lite";
 import { useRootStore } from "../hooks/stores";
 import { AccelerationCurves } from "../utility/functions/misc";
 import { useAcceleratedAction } from "../hooks/generic";
-import { useStyles } from "../hooks/styles";
+import { normalize, useStyles } from "../hooks/styles";
 
 interface MedicalOptionProps {
   title: string;
@@ -63,40 +63,55 @@ const MedicalOption = observer(
       }
     }
 
-    function getDisabled() {
+    const getDisabled = useMemo(() => {
       if (playerState) {
         if (cost > playerState.gold) {
-          return true;
+          return { disabled: true, message: "Not enough gold" };
         }
         if (healthRestore) {
           if (playerState.maxHealth - playerState.currentHealth == 0) {
-            return true;
+            return { disabled: true, message: "Health at max" };
           }
         }
         if (manaRestore) {
           if (playerState.maxMana - playerState.currentMana == 0) {
-            return true;
+            return { disabled: true, message: "Mana at max" };
           }
         }
         if (sanityRestore) {
           if (playerState.maxSanity - playerState.currentSanity == 0) {
-            return true;
+            return { disabled: true, message: "Sanity at max" };
           }
         }
         if (removeDebuffs) {
           if (playerState.conditions.length == 0) {
-            return true;
+            return { disabled: true, message: "No conditions" };
           }
         }
       }
-      return false;
-    }
+      return { disabled: false, message: "" };
+    }, [
+      playerState,
+      cost,
+      healthRestore,
+      manaRestore,
+      sanityRestore,
+      removeDebuffs,
+      playerState?.gold,
+      playerState?.maxHealth,
+      playerState?.currentHealth,
+      playerState?.maxMana,
+      playerState?.currentMana,
+      playerState?.maxSanity,
+      playerState?.currentSanity,
+      playerState?.conditions.length,
+    ]);
 
     return (
       <ThemedCard>
         <View style={styles.rowBetween}>
           <Text style={styles.cardTitle}>{title}</Text>
-          <View style={styles.medicalCostContainer}>
+          <View style={{ width: "40%" }}>
             <View style={styles.costRow}>
               {cost > 0 ? (
                 <>
@@ -151,7 +166,8 @@ const MedicalOption = observer(
         <GenericRaisedButton
           onPressIn={start}
           onPressOut={stop}
-          disabled={getDisabled()}
+          disabled={getDisabled.disabled}
+          childrenWhenDisabled={getDisabled.message}
         >
           Visit
         </GenericRaisedButton>

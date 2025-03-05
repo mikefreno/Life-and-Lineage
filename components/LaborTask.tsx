@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View } from "react-native";
 import ProgressBar from "./ProgressBar";
 import { observer } from "mobx-react-lite";
@@ -77,6 +77,30 @@ const LaborTask = observer(
       root.gameTick();
     }
 
+    const getDisabled = useMemo(() => {
+      if (!playerState) {
+        return { disabled: true, message: "No player data" };
+      }
+      if (cost.health && playerState.currentHealth <= cost.health) {
+        return { disabled: true, message: "Low Health" };
+      }
+      if (playerState.currentMana < cost.mana) {
+        return { disabled: true, message: "Low Mana" };
+      }
+      if (cost.sanity && playerState.currentSanity <= cost.sanity) {
+        return { disabled: true, message: "Low Sanity" };
+      }
+      return { disabled: false, message: "" };
+    }, [
+      playerState,
+      cost.health,
+      cost.mana,
+      cost.sanity,
+      playerState?.currentHealth,
+      playerState?.currentMana,
+      playerState?.currentSanity,
+    ]);
+
     return (
       <ThemedCard>
         <View style={styles.rowBetween}>
@@ -120,10 +144,8 @@ const LaborTask = observer(
             <GenericRaisedButton
               onPressIn={handlePressIn}
               onPressOut={handlePressOut}
-              disabled={
-                (cost.health && playerState.currentHealth <= cost.health) ||
-                playerState.currentMana < cost.mana
-              }
+              disabled={getDisabled.disabled}
+              childrenWhenDisabled={getDisabled.message}
             >
               Work
             </GenericRaisedButton>

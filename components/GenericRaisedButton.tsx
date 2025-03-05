@@ -17,7 +17,7 @@ import { useVibration } from "../hooks/generic";
 import { useRootStore } from "../hooks/stores";
 import AnimatedButtonText from "./AnimatedButtonText";
 import { Text } from "./Themed";
-import { useStyles } from "@/hooks/styles";
+import { normalize, useStyles } from "@/hooks/styles";
 
 interface GenericRaisedButtonProps {
   ref?: React.RefObject<any>;
@@ -174,8 +174,8 @@ const GenericRaisedButton = ({
         style={[
           {
             borderRadius: 12,
-            paddingHorizontal: 32,
-            paddingVertical: 16,
+            paddingHorizontal: normalize(20),
+            paddingVertical: normalize(12),
           },
           buttonStyle,
           dynamicButtonStyle,

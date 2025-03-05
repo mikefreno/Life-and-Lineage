@@ -57,7 +57,7 @@ const runOnMainThread = (
   }
 };
 
-const GLOBAL_VOLUME_MULTIPLIER = 0.8;
+const GLOBAL_VOLUME_MULTIPLIER = 0.7;
 
 export class AudioStore {
   root: RootStore;

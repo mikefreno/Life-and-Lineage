@@ -26,6 +26,7 @@ import { flex, tw_base, useStyles } from "../../hooks/styles";
 import GenericFlatButton from "@/components/GenericFlatButton";
 import Colors from "@/constants/Colors";
 import { AntDesign } from "@expo/vector-icons";
+import GenericRaisedButton from "@/components/GenericRaisedButton";
 
 const MIN_RED = 20;
 const MAX_RED = 255;
@@ -311,55 +312,40 @@ const DungeonScreen = observer(() => {
               >
                 {dungeonInstance.levels
                   .filter((level) => level.unlocked || __DEV__)
-                  .map((level, levelIdx) => (
-                    <Pressable
-                      key={levelIdx}
-                      onPress={() => {
-                        uiStore.setTotalLoadingSteps(5);
-                        vibration({ style: "warning" });
-                        dungeonStore
-                          .setUpDungeon(dungeonInstance, level)
-                          .then(() => uiStore.incrementLoadingStep());
-                        wait(100).then(() => {
-                          router.replace(`/DungeonLevel`);
-                          uiStore.incrementLoadingStep();
-                        });
-                      }}
-                    >
-                      {({ pressed }) => {
-                        const { bgColor, textColor } = getLevelColor(
-                          dungeonInstance,
-                          levelIdx,
-                          sorted[sort == "ascending" ? sorted.length - 1 : 0]
-                            .difficulty,
-                          sorted[
-                            sort == "ascending"
-                              ? dungeonInstanceIdx + 1
-                              : dungeonInstanceIdx - 1
-                          ],
-                        );
-                        return (
-                          <View
-                            style={[
-                              styles.levelContainer,
-                              {
-                                backgroundColor: bgColor,
-                                shadowOpacity: 0.25,
-                                shadowRadius: 5,
-                                elevation: 2,
-                                opacity: pressed ? 0.5 : 1,
-                                transform: [{ scale: pressed ? 0.95 : 1 }],
-                              },
-                            ]}
-                          >
-                            <Text style={{ color: textColor }}>
-                              {`Delve to Floor ${level.level}`}
-                            </Text>
-                          </View>
-                        );
-                      }}
-                    </Pressable>
-                  ))}
+                  .map((level, levelIdx) => {
+                    const { bgColor, textColor } = getLevelColor(
+                      dungeonInstance,
+                      levelIdx,
+                      sorted[sort == "ascending" ? sorted.length - 1 : 0]
+                        .difficulty,
+                      sorted[
+                        sort == "ascending"
+                          ? dungeonInstanceIdx + 1
+                          : dungeonInstanceIdx - 1
+                      ],
+                    );
+                    return (
+                      <GenericRaisedButton
+                        key={levelIdx}
+                        onPress={() => {
+                          uiStore.setTotalLoadingSteps(5);
+                          vibration({ style: "warning" });
+                          dungeonStore
+                            .setUpDungeon(dungeonInstance, level)
+                            .then(() => uiStore.incrementLoadingStep());
+                          wait(100).then(() => {
+                            router.replace(`/DungeonLevel`);
+                            uiStore.incrementLoadingStep();
+                          });
+                        }}
+                        backgroundColor={bgColor}
+                      >
+                        <Text style={{ color: textColor }}>
+                          {`Delve to Floor ${level.level}`}
+                        </Text>
+                      </GenericRaisedButton>
+                    );
+                  })}
               </View>
             </ThemedCard>
           ))}

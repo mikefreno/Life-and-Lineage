@@ -76,17 +76,45 @@ export class ShopStore {
 
   getInitShopsState() {
     const map = new Map<MerchantType, Shop>();
+
+    const usedCombinations = new Set<string>();
+
     shopsJSON.forEach((shop) => {
+      const archetype = shop.type as MerchantType;
+
+      let shopKeeper;
+      let sex;
+
+      do {
+        shopKeeper = generateShopKeeper(archetype, this.root);
+        sex = shopKeeper.sex;
+
+        const combinationKey = `${archetype}-${sex}`;
+
+        if (!usedCombinations.has(combinationKey)) {
+          usedCombinations.add(combinationKey);
+          break;
+        }
+        if (usedCombinations.size > 20) {
+          console.warn(
+            `Couldn't generate unique sex-archetype combination after many attempts`,
+          );
+          break;
+        }
+      } while (true);
+
       const newShop = new Shop({
-        shopKeeper: generateShopKeeper(shop.type, this.root),
+        shopKeeper: shopKeeper,
         baseGold: shop.baseGold,
         lastStockRefresh: this.root.time.currentDate,
-        archetype: shop.type as MerchantType,
+        archetype: archetype,
         root: this.root,
       });
+
       _shopSave(newShop);
-      map.set(shop.type as MerchantType, newShop);
+      map.set(archetype, newShop);
     });
+
     return map;
   }
 
