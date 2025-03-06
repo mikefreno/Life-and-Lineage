@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { useState } from "react";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { API_BASE_URL } from "../../config/config";
 import * as AppleAuthentication from "expo-apple-authentication";
@@ -26,6 +26,7 @@ const SignInScreen = observer(() => {
   const { authStore, uiStore } = useRootStore();
   const styles = useStyles();
   const theme = Colors[uiStore.colorScheme];
+  const router = useRouter();
 
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");

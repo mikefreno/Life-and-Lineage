@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Pressable, Animated, View } from "react-native";
 import { Entypo } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { Text } from "./Themed";
 import { useRootStore } from "../hooks/stores";
 import { useStyles } from "../hooks/styles";
@@ -19,6 +19,7 @@ export default function CodexCategory({
   const animatedValue = useState(new Animated.Value(0))[0];
   const { uiStore } = useRootStore();
   const styles = useStyles();
+  const router = useRouter();
 
   useEffect(() => {
     Animated.timing(animatedValue, {

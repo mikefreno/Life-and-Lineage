@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { View } from "react-native";
 import { observer } from "mobx-react-lite";
 
-import "expo-router/entry";
 import { useDraggableStore } from "@/hooks/stores";
 import { Text } from "./Themed";
 import { normalize } from "@/hooks/styles";
@@ -20,11 +19,9 @@ const BoundsVisualizer = observer(() => {
 
   const allBounds = [...ancillaryBoundsEntries, ...inventoryBounds];
 
-  // Generate a random color for each bound
   const boundColors = useMemo(() => {
     return allBounds.reduce(
       (colors, [key]) => {
-        // Generate random RGB values
         const r = Math.floor(Math.random() * 256);
         const g = Math.floor(Math.random() * 256);
         const b = Math.floor(Math.random() * 256);

@@ -1,5 +1,5 @@
 import React from "react";
-import { Href, Stack, router, useLocalSearchParams } from "expo-router";
+import { Href, Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../../../constants/Colors";
@@ -71,9 +71,10 @@ export default function CodexInfo() {
   let { slug } = useLocalSearchParams();
   const { uiStore } = useRootStore();
 
-  const [history, setHistory] = useState<Href<string>[]>([]);
+  const [history, setHistory] = useState<Href[]>([]);
   let category: string;
   let secondary: string | undefined = undefined;
+  const router = useRouter();
 
   if (Array.isArray(slug)) {
     category = slug[0];

@@ -9,7 +9,7 @@ import {
   type LayoutChangeEvent,
   Animated,
 } from "react-native";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
@@ -35,6 +35,7 @@ const DungeonScreen = observer(() => {
   const root = useRootStore();
   const { dungeonStore, uiStore } = root;
   const { dungeonInstances } = dungeonStore;
+  const router = useRouter();
 
   const [sorted, setSorted] = useState<DungeonInstance[]>([]);
   const [sort, setSort] = useState<"ascending" | "descending">("ascending");

@@ -4,7 +4,7 @@ import { Text } from "../../components/Themed";
 import { useEffect, useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 import { observer } from "mobx-react-lite";
 import GenericModal from "../../components/GenericModal";
@@ -32,6 +32,7 @@ export const AppSettings = observer(() => {
 
   const vibration = useVibration();
   const styles = useStyles();
+  const router = useRouter();
 
   const [selectedThemeOption, setSelectedThemeOption] = useState<number>(
     themeOptions.indexOf(uiStore.preferedColorScheme),

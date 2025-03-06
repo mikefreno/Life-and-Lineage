@@ -1,5 +1,5 @@
 import React from "react";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import GenericModal from "../GenericModal";
 import { Text } from "../Themed";
 import { View, Image } from "react-native";
@@ -24,6 +24,7 @@ export default function DroppedItemsModal() {
     setInventoryFullNotifier,
   } = useLootState();
   const styles = useStyles();
+  const router = useRouter();
 
   function closeImmediateItemDrops() {
     if (droppedItems && droppedItems.itemDrops.length > 0) {

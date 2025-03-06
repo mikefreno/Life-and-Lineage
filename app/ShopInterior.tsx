@@ -1,5 +1,5 @@
 import React from "react";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { Text, ThemedScrollView } from "../components/Themed";
 import { CharacterImage } from "../components/CharacterImage";
 import {
@@ -66,6 +66,7 @@ const ShopInteriorScreen = observer(() => {
   const { playerState, shopsStore, uiStore, time } = useRootStore();
   const { draggableClassStore } = useDraggableStore();
   const isFocused = useIsFocused();
+  const router = useRouter();
 
   const shopInventoryTarget = useRef<View | null>(null);
   const vibration = useVibration();

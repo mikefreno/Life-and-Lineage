@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 import { GoogleIcon } from "../../assets/icons/SVGIcons";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { API_BASE_URL } from "../../config/config";
 import D20DieAnimation from "../../components/DieRollAnim";
@@ -27,6 +27,7 @@ const SignUpScreen = observer(() => {
   const vibration = useVibration();
   const { authStore, uiStore } = useRootStore();
   const styles = useStyles();
+  const router = useRouter();
 
   const [emailAddress, setEmailAddress] = useState<string>("");
   const [password, setPassword] = useState<string>("");

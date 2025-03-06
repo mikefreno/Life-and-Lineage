@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import { Text } from "../../components/Themed";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { toTitleCase } from "../../utility/functions/misc";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { playerClassColors } from "../../constants/Colors";
@@ -27,6 +27,7 @@ export default function SetName() {
     useNewGameStore();
   const headerHeight = useHeaderHeight();
   const vibration = useVibration();
+  const router = useRouter();
 
   if (!classSelection) {
     router.back();

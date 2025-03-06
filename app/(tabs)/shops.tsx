@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { CharacterImage } from "../../components/CharacterImage";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import TutorialModal from "../../components/TutorialModal";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -21,6 +21,7 @@ const ShopsScreen = observer(() => {
   const { shopsStore, uiStore } = useRootStore();
   const [isReady, setIsReady] = useState(false);
   const styles = useStyles();
+  const router = useRouter();
 
   const runDeathChecks = () => {
     shopsStore?.shopsMap.forEach((shop) => shop.deathCheck());

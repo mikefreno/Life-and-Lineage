@@ -1,4 +1,4 @@
-import { Stack, router } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { type ReactNode, createContext, useContext, useState } from "react";
 import type { Element, PlayerClassOptions } from "../../utility/types";
 import { useRootStore } from "../../hooks/stores";
@@ -64,6 +64,7 @@ export const useNewGameStore = () => {
 
 export default function NewGameLayout() {
   const { playerState, uiStore } = useRootStore();
+  const router = useRouter();
   return (
     <NewGameProvider>
       <Stack

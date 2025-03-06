@@ -9,7 +9,7 @@ import GenericModal from "./GenericModal";
 import GenericRaisedButton from "./GenericRaisedButton";
 import GenericFlatButton from "./GenericFlatButton";
 import GenericStrikeAround from "./GenericStrikeAround";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
 import { CharacterInteractionModal } from "./CharacterInteractionModal";
 import { CharacterImage } from "./CharacterImage";
@@ -42,6 +42,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
     useState<boolean>(false);
   const [dateDestination, setDateDestination] = useState<string>("");
   const styles = useStyles();
+  const router = useRouter();
 
   function activityRoller(outcomes: { [key: string]: number }) {
     const keys = Object.keys(outcomes);

@@ -1,6 +1,6 @@
 import React from "react";
 import { Text } from "../../components/Themed";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { toTitleCase, wait } from "../../utility/functions/misc";
 import { Pressable, Switch, View } from "react-native";
@@ -35,6 +35,7 @@ const healthWarningKeys = [0.5, 0.25, 0.2, 0.15, 0.1, 0];
 export default function GameSettings() {
   const { uiStore, tutorialStore } = useRootStore();
   const styles = useStyles();
+  const router = useRouter();
   const vibration = useVibration();
   const [tutorialState, setTutorialState] = useState<boolean>(
     tutorialStore.tutorialsEnabled ?? true,

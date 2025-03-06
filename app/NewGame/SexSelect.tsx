@@ -1,5 +1,5 @@
 import React from "react";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { TutorialOption } from "../../utility/types";
 import TutorialModal from "../../components/TutorialModal";
 import { useRootStore } from "../../hooks/stores";
@@ -23,6 +23,7 @@ export default function SetSex() {
   const [forceShowTutorial, setForceShowTutorial] = useState(false);
   const { uiStore } = useRootStore();
   const isFocused = useIsFocused();
+  const router = useRouter();
 
   if (!classSelection) {
     router.back();

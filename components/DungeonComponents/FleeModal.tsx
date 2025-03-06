@@ -2,7 +2,7 @@ import GenericModal from "../GenericModal";
 import GenericFlatButton from "../GenericFlatButton";
 import { ThemedView, Text } from "../Themed";
 import { wait } from "../../utility/functions/misc";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
@@ -19,6 +19,7 @@ const FleeModal = observer(() => {
   const { playerMinionsTurn } = useCombatActions();
   const { enemyTurn } = useEnemyManagement();
   const styles = useStyles();
+  const router = useRouter();
 
   const [fleeRollFailure, setFleeRollFailure] = useState<boolean>(false);
 

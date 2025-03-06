@@ -3,7 +3,7 @@ import LaborTask from "../../components/LaborTask";
 import { View, ScrollView } from "react-native";
 import { useMemo, useState } from "react";
 import { toTitleCase } from "../../utility/functions/misc";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { useIsFocused } from "@react-navigation/native";
 import TutorialModal from "../../components/TutorialModal";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -21,6 +21,7 @@ const LaborScreen = observer(() => {
   const [showingRejection, setShowingRejection] = useState<boolean>(false);
   const [missingPreReqs, setMissingPreReqs] = useState<string[]>([]);
   const styles = useStyles();
+  const router = useRouter();
 
   const vibration = useVibration();
 

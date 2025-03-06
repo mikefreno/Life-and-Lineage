@@ -2,7 +2,7 @@ import React from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { Text } from "../../components/Themed";
 import { useState } from "react";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import TutorialModal from "../../components/TutorialModal";
 import { DescriptionMap } from "../../utility/descriptions";
 import {
@@ -27,6 +27,7 @@ export default function SetBlessing() {
   const { classSelection, blessingSelection, setBlessingSelection } =
     useNewGameStore();
 
+  const router = useRouter();
   const isFocused = useIsFocused();
   const vibration = useVibration();
   const { uiStore } = useRootStore();

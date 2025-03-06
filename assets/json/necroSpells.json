@@ -182,7 +182,12 @@
     "effects": {
       "damage": 40,
       "buffs": null,
-      "debuffs": [{"name": "bleed", "chance": 0.5}]
+      "debuffs": [
+        {
+          "name": "bleed",
+          "chance": 0.5
+        }
+      ]
     }
   },
   {
@@ -192,7 +197,9 @@
     "manaCost": 75,
     "effects": {
       "damage": null,
-      "buffs": ["guard"],
+      "buffs": [
+        "guard"
+      ],
       "debuffs": null
     }
   },
@@ -204,7 +211,12 @@
     "effects": {
       "damage": 50,
       "buffs": null,
-      "debuffs": [{"name": "stun", "chance": 0.75}]
+      "debuffs": [
+        {
+          "name": "stun",
+          "chance": 0.75
+        }
+      ]
     }
   },
   {
@@ -215,7 +227,12 @@
     "effects": {
       "damage": 175,
       "buffs": null,
-      "debuffs": [{"name": "bleed", "chance": 1.0}]
+      "debuffs": [
+        {
+          "name": "bleed",
+          "chance": 1.0
+        }
+      ]
     }
   },
   {
@@ -242,7 +259,12 @@
     "effects": {
       "damage": 15,
       "buffs": null,
-      "debuffs": [{"name": "diseased", "chance": 0.5}]
+      "debuffs": [
+        {
+          "name": "diseased",
+          "chance": 0.5
+        }
+      ]
     }
   },
   {
@@ -253,7 +275,12 @@
     "effects": {
       "damage": 35,
       "buffs": null,
-      "debuffs": [{"name": "sunder", "chance": 0.75}]
+      "debuffs": [
+        {
+          "name": "sunder",
+          "chance": 0.75
+        }
+      ]
     }
   },
   {
@@ -264,7 +291,16 @@
     "effects": {
       "damage": 45,
       "buffs": null,
-      "debuffs": [{"name": "poison", "chance": 1.0}, {"name": "diseased", "chance": 0.75}]
+      "debuffs": [
+        {
+          "name": "poison",
+          "chance": 1.0
+        },
+        {
+          "name": "diseased",
+          "chance": 0.75
+        }
+      ]
     }
   },
   {
@@ -274,8 +310,15 @@
     "manaCost": 175,
     "effects": {
       "damage": 75,
-      "buffs": ["protection aura"],
-      "debuffs": [{"name": "diseased", "chance": 1.0}]
+      "buffs": [
+        "protection aura"
+      ],
+      "debuffs": [
+        {
+          "name": "diseased",
+          "chance": 1.0
+        }
+      ]
     }
   },
   {
@@ -286,8 +329,17 @@
     "effects": {
       "damage": 150,
       "buffs": null,
-      "debuffs": [{"name": "poison", "chance": 1.0}, {"name": "diseased", "chance": 1.0}]
+      "debuffs": [
+        {
+          "name": "poison",
+          "chance": 1.0
+        },
+        {
+          "name": "diseased",
+          "chance": 1.0
+        }
+      ]
     }
-  },
+  }
 ]
 

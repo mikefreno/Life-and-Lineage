@@ -2,8 +2,8 @@ import { useFonts } from "expo-font";
 import {
   type RelativePathString,
   Stack,
-  router,
   usePathname,
+  useRouter,
 } from "expo-router";
 import React, { useEffect, useState, useRef } from "react";
 import { observer } from "mobx-react-lite";
@@ -144,6 +144,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   const { playerState, dungeonStore, uiStore, audioStore, shopsStore } =
     rootStore;
   const styles = useStyles();
+  const router = useRouter();
 
   const [firstLoad, setFirstLoad] = useState(true);
 

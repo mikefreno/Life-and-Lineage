@@ -3,7 +3,7 @@ import { Pressable, ScrollView, View } from "react-native";
 import { Text, ThemedView } from "../components/Themed";
 import deathMessages from "../assets/json/deathMessages.json";
 import { useEffect, useState } from "react";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { CharacterImage } from "../components/CharacterImage";
 import { wait } from "../utility/functions/misc";
 import GenericModal from "../components/GenericModal";
@@ -49,6 +49,7 @@ export default function DeathScreen() {
   const vibration = useVibration();
   const header = useHeaderHeight();
   const styles = useStyles();
+  const router = useRouter();
 
   const getDeathMessage = () => {
     const randomIndex = Math.floor(Math.random() * deathMessages.length);

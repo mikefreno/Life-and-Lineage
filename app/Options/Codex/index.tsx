@@ -2,7 +2,7 @@ import { ScrollView, TextInput, TouchableOpacity, View } from "react-native";
 import { Text } from "../../../components/Themed";
 import { useEffect, useState } from "react";
 import CodexCategory from "../../../components/CodexCategory";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import ThemedCard from "../../../components/ThemedCard";
 import { CodexEntry, searchCodex } from "../../../utility/functions/codex";
 import { useRootStore } from "../../../hooks/stores";
@@ -23,6 +23,7 @@ export default function Codex() {
   const [scrolling, setScrolling] = useState(false);
   const { uiStore } = useRootStore();
   const styles = useStyles();
+  const router = useRouter();
 
   useEffect(() => {
     if (searchTerm) {

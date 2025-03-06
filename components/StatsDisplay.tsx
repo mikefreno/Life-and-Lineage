@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Text, CursiveText, HandwrittenText, CursiveTextBold } from "./Themed";
 import GearStatsDisplay from "./GearStatsDisplay";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { asReadableGold, toTitleCase } from "../utility/functions/misc";
 import SpellDetails from "./SpellDetails";
 import GenericFlatButton from "./GenericFlatButton";
@@ -88,6 +88,7 @@ export function StatsDisplay({
   const [firstItem, setFirstItem] = useState<Item>(displayItem.item[0]);
   const [renderStory, setRenderStory] = useState<string | null>(null);
   const [isFirstRender, setIsFirstRender] = useState(true);
+  const router = useRouter();
 
   const animatedLeft = useRef(
     new Animated.Value(uiStore.dimensions.width / 3),
