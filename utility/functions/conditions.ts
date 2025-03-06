@@ -72,7 +72,7 @@ export function createDebuff({
 
     return debuff;
   } else {
-    throw new Error("Failed to find debuff in createDebuff()");
+    throw new Error(`Failed to find debuff: ${debuffName} in createDebuff()`);
   }
 }
 

@@ -139,17 +139,54 @@
     "turns": 1000
   },
   {
+    "name": "wolf",
+    "beingType": "beast",
+    "health": 100,
+    "attackPower": 8,
+    "energy": {
+      "maximum": 50,
+      "regen": 10
+    },
+    "attackStrings": [
+      "bite"
+    ],
+    "turns": 1000
+  },
+  {
     "name": "bear",
     "beingType": "beast",
     "health": 200,
     "attackPower": 10,
-    "attackStrings": [],
+    "energy": {
+      "maximum": 50,
+      "regen": 3
+    },
+    "attackStrings": [
+      "bite",
+      "scratch"
+    ],
+    "turns": 1000
+  },
+  {
+    "name": "dragon welp",
+    "beingType": "draconic",
+    "health": 350,
+    "attackPower": 15,
+    "energy": {
+      "maximum": 100,
+      "regen": 15
+    },
+    "attackStrings": [
+      "bite",
+      "scratch",
+      "fire breath"
+    ],
     "turns": 1000
   },
   {
     "name": "griffon",
     "beingType": "beast",
-    "health": 300,
+    "health": 500,
     "attackPower": 25,
     "energy": {
       "maximum": 100,
@@ -163,11 +200,19 @@
     "turns": 1000
   },
   {
-    "name": "dragon welp",
+    "name": "dragon",
     "beingType": "draconic",
-    "health": 200,
-    "attackPower": 10,
-    "attackStrings": [],
+    "health": 1000,
+    "attackPower": 30,
+    "energy": {
+      "maximum": 100,
+      "regen": 10
+    },
+    "attackStrings": [
+      "fire breath",
+      "bite",
+      "scratch"
+    ],
     "turns": 1000
   }
 ]

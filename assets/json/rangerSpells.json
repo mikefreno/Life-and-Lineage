@@ -1,15 +1,55 @@
 [
   {
-    "name": "throw dagger", 
-    "element": "assassination", 
-    "proficiencyNeeded": "novice", 
+    "name": "throw dagger",
+    "element": "assassination",
+    "proficiencyNeeded": "novice",
     "target": "single",
     "type": "offense",
     "manaCost": 10,
     "effects": {
-      "damage": 15, 
-      "buffs": null, 
-      "debuffs": [{"name":"bleed", "chance": 0.25}]
+      "damage": 15,
+      "buffs": null,
+      "debuffs": [
+        {
+          "name": "bleed",
+          "chance": 0.25
+        }
+      ]
+    }
+  },
+  {
+    "name": "poison blade",
+    "element": "assassination",
+    "proficiencyNeeded": "novice",
+    "target": "single",
+    "type": "offense",
+    "usesWeapon": "melee",
+    "manaCost": 15,
+    "effects": {
+      "damage": 10,
+      "buffs": null,
+      "debuffs": [
+        {
+          "name": "poison",
+          "chance": 0.5
+        }
+      ]
+    }
+  },
+  {
+    "name": "quick strike",
+    "element": "assassination",
+    "proficiencyNeeded": "novice",
+    "target": "single",
+    "type": "offense",
+    "usesWeapon": "melee",
+    "manaCost": 5,
+    "effects": {
+      "damage": 8,
+      "buffs": [
+        "quickened mind"
+      ],
+      "debuffs": null
     }
   },
   {
@@ -22,19 +62,45 @@
     "effects": {
       "damage": 20,
       "buffs": null,
-      "debuffs": [{"name":"stun", "chance": 0.25}]
+      "debuffs": [
+        {
+          "name": "stun",
+          "chance": 0.25
+        }
+      ]
+    }
+  },
+  {
+    "name": "dual slice",
+    "element": "assassination",
+    "target": "single",
+    "type": "offense",
+    "usesWeapon": "melee",
+    "proficiencyNeeded": "apprentice",
+    "manaCost": 25,
+    "effects": {
+      "damage": 30,
+      "buffs": null,
+      "debuffs": [
+        {
+          "name": "bleed",
+          "chance": 0.5
+        }
+      ]
     }
   },
   {
     "name": "shadow cover",
     "element": "assassination",
-    "target": "single",
+    "target": "self",
     "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 50,
     "effects": {
       "damage": null,
-      "buffs": ["stealth"],
+      "buffs": [
+        "stealth"
+      ],
       "debuffs": null
     }
   },
@@ -48,22 +114,67 @@
     "manaCost": 75,
     "effects": {
       "damage": 95,
-      "buffs": ["remove stealth"],
+      "buffs": [
+        "remove stealth"
+      ],
       "debuffs": null
+    }
+  },
+  {
+    "name": "venomous strike",
+    "element": "assassination",
+    "target": "single",
+    "type": "offense",
+    "usesWeapon": "melee",
+    "proficiencyNeeded": "adept",
+    "manaCost": 60,
+    "effects": {
+      "damage": 45,
+      "buffs": null,
+      "debuffs": [
+        {
+          "name": "severe poison",
+          "chance": 0.75
+        }
+      ]
     }
   },
   {
     "name": "dance of daggers",
     "element": "assassination",
-    "target": "single",
+    "target": "self",
     "type": "defense",
     "usesWeapon": "melee",
     "proficiencyNeeded": "expert",
     "manaCost": 100,
     "effects": {
       "damage": null,
-      "buffs": ["dance of daggers"],
+      "buffs": [
+        "dance of daggers"
+      ],
       "debuffs": null
+    }
+  },
+  {
+    "name": "garrote",
+    "element": "assassination",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "expert",
+    "manaCost": 125,
+    "effects": {
+      "damage": 75,
+      "buffs": null,
+      "debuffs": [
+        {
+          "name": "silence",
+          "chance": 0.75
+        },
+        {
+          "name": "severe bleed",
+          "chance": 0.5
+        }
+      ]
     }
   },
   {
@@ -75,7 +186,9 @@
     "manaCost": 250,
     "effects": {
       "damage": 100,
-      "buffs": ["stealth"],
+      "buffs": [
+        "stealth"
+      ],
       "debuffs": null
     }
   },
@@ -89,7 +202,12 @@
     "effects": {
       "damage": 275,
       "buffs": null,
-      "debuffs": null
+      "debuffs": [
+        {
+          "name": "bleed",
+          "chance": 1.0
+        }
+      ]
     }
   },
   {
@@ -102,41 +220,89 @@
     "manaCost": 500,
     "effects": {
       "damage": 500,
-      "buffs": ["remove stealth"],
+      "buffs": [
+        "remove stealth"
+      ],
       "debuffs": null
     }
   },
   {
     "name": "call raven",
     "element": "beastMastery",
-    "target": "single",
+    "target": "self",
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 10,
     "effects": {
       "damage": null,
       "buffs": null,
-      "debuffs":  null,
+      "debuffs": null,
       "pet": "raven"
+    }
+  },
+  {
+    "name": "call wolf",
+    "element": "beastMastery",
+    "target": "self",
+    "type": "offense",
+    "proficiencyNeeded": "novice",
+    "manaCost": 15,
+    "effects": {
+      "damage": null,
+      "buffs": null,
+      "debuffs": null,
+      "pet": "wolf"
+    }
+  },
+  {
+    "name": "animal instinct",
+    "element": "beastMastery",
+    "target": "self",
+    "type": "defense",
+    "proficiencyNeeded": "novice",
+    "manaCost": 20,
+    "effects": {
+      "damage": null,
+      "buffs": [
+        "minor fortitude"
+      ],
+      "debuffs": null
     }
   },
   {
     "name": "rat trap",
     "element": "beastMastery",
-    "target": "single",
+    "target": "area",
     "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
     "effects": {
       "damage": null,
-      "buffs": ["rat trap"],
+      "buffs": [
+        "rat trap"
+      ],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "beast bond",
+    "element": "beastMastery",
+    "target": "self",
+    "type": "defense",
+    "proficiencyNeeded": "apprentice",
+    "manaCost": 35,
+    "effects": {
+      "damage": null,
+      "buffs": [
+        "beast empowerment"
+      ],
       "debuffs": null
     }
   },
   {
     "name": "call bear",
     "element": "beastMastery",
-    "target": "single",
+    "target": "self",
     "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 50,
@@ -155,15 +321,22 @@
     "proficiencyNeeded": "adept",
     "manaCost": 100,
     "effects": {
-      "damage": null,
-      "buffs": ["bear trap"],
-      "debuffs": null 
+      "damage": 40,
+      "buffs": [
+        "bear trap"
+      ],
+      "debuffs": [
+        {
+          "name": "stun",
+          "chance": 0.5
+        }
+      ]
     }
   },
   {
     "name": "call dragon welp",
     "element": "beastMastery",
-    "target": "single",
+    "target": "self",
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 125,
@@ -175,22 +348,44 @@
     }
   },
   {
+    "name": "beastial fury",
+    "element": "beastMastery",
+    "target": "self",
+    "type": "offense",
+    "proficiencyNeeded": "adept",
+    "manaCost": 75,
+    "effects": {
+      "damage": null,
+      "buffs": [
+        "dual rage"
+      ],
+      "debuffs": null
+    }
+  },
+  {
     "name": "dragon trap",
     "element": "beastMastery",
-    "target": "single",
+    "target": "area",
     "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 200,
     "effects": {
-      "damage": null,
-      "buffs": ["dragon trap"],
-      "debuffs": null 
+      "damage": 75,
+      "buffs": [
+        "dragon trap"
+      ],
+      "debuffs": [
+        {
+          "name": "burn",
+          "chance": 0.75
+        }
+      ]
     }
   },
   {
     "name": "call griffon",
     "element": "beastMastery",
-    "target": "area",
+    "target": "self",
     "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 200,
@@ -212,36 +407,26 @@
     "effects": {
       "damage": 50,
       "buffs": null,
-      "debuffs": [{"name": "stun", "chance": 0.75}]
+      "debuffs": [
+        {
+          "name": "stun",
+          "chance": 0.75
+        }
+      ]
     }
   },
   {
     "name": "call dragon",
     "element": "beastMastery",
-    "target": "single",
+    "target": "self",
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 600,
     "effects": {
       "damage": null,
       "buffs": null,
-      "debuffs": null ,
+      "debuffs": null,
       "pet": "dragon"
-    }
-  },
-  {
-    "name": "beast fury",
-    "element": "beastMastery",
-    "target": "single",
-    "type": "offense",
-    "usesWeapon": "melee",
-    "proficiencyNeeded": "legend",
-    "duration": 2,
-    "manaCost": 1100,
-    "effects": {
-      "damage": 150,
-      "buffs": ["frenzy"],
-      "debuffs": null 
     }
   },
   {
@@ -253,22 +438,69 @@
     "proficiencyNeeded": "novice",
     "manaCost": 20,
     "effects": {
-      "damage": 5,
+      "damage": 25,
       "buffs": null,
+      "debuffs": null
+    }
+  },
+  {
+    "name": "steady aim",
+    "element": "arcane",
+    "target": "self",
+    "type": "defense",
+    "proficiencyNeeded": "novice",
+    "manaCost": 10,
+    "effects": {
+      "damage": null,
+      "buffs": [
+        "steady aim"
+      ],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "quick shot",
+    "element": "arcane",
+    "target": "single",
+    "type": "offense",
+    "usesWeapon": "bow",
+    "proficiencyNeeded": "novice",
+    "manaCost": 5,
+    "effects": {
+      "damage": 10,
+      "buffs": [
+        "quickened mind"
+      ],
       "debuffs": null
     }
   },
   {
     "name": "enchanted quiver",
     "element": "arcane",
-    "target": "single",
+    "target": "self",
     "type": "offense",
     "usesWeapon": "bow",
     "proficiencyNeeded": "apprentice",
     "manaCost": 25,
     "effects": {
       "damage": null,
-      "buffs": ["enchanted quiver"],
+      "buffs": [
+        "enchanted quiver"
+      ],
+      "debuffs": null
+    }
+  },
+  {
+    "name": "arcane arrow",
+    "element": "arcane",
+    "target": "single",
+    "type": "offense",
+    "usesWeapon": "bow",
+    "proficiencyNeeded": "apprentice",
+    "manaCost": 35,
+    "effects": {
+      "damage": 40,
+      "buffs": null,
       "debuffs": null
     }
   },
@@ -287,6 +519,20 @@
     }
   },
   {
+    "name": "multi-shot",
+    "element": "arcane",
+    "target": "area",
+    "type": "offense",
+    "usesWeapon": "bow",
+    "proficiencyNeeded": "adept",
+    "manaCost": 55,
+    "effects": {
+      "damage": 35,
+      "buffs": null,
+      "debuffs": null
+    }
+  },
+  {
     "name": "piercing barrage",
     "element": "arcane",
     "target": "single",
@@ -297,7 +543,12 @@
     "effects": {
       "damage": 60,
       "buffs": null,
-      "debuffs": [{"name": "sunder", "chance": 0.3}]
+      "debuffs": [
+        {
+          "name": "sunder",
+          "chance": 0.3
+        }
+      ]
     }
   },
   {
@@ -311,7 +562,12 @@
     "effects": {
       "damage": 40,
       "buffs": null,
-      "debuffs": [{"name": "weaken", "chance": 0.5}]
+      "debuffs": [
+        {
+          "name": "weaken",
+          "chance": 0.5
+        }
+      ]
     }
   },
   {
@@ -325,19 +581,27 @@
     "effects": {
       "damage": 90,
       "buffs": null,
-      "debuffs": [{"name": "burn", "chance": 0.4}]
+      "debuffs": [
+        {
+          "name": "burn",
+          "chance": 0.4
+        }
+      ]
     }
   },
   {
     "name": "moon call",
     "element": "arcane",
-    "target": "single",
+    "target": "self",
     "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 125,
     "effects": {
       "damage": null,
-      "buffs": ["guard", "quickened mind"],
+      "buffs": [
+        "guard",
+        "quickened mind"
+      ],
       "debuffs": null
     }
   },
@@ -368,7 +632,13 @@
     "effects": {
       "damage": 125,
       "buffs": null,
-      "debuffs": [{"name": "burn", "chance": 0.5}] 
+      "debuffs": [
+        {
+          "name": "burn",
+          "chance": 0.5
+        }
+      ]
     }
   }
 ]
+

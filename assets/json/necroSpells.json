@@ -2,6 +2,8 @@
   {
     "name": "pull blood",
     "element": "blood",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 20,
     "effects": {
@@ -20,6 +22,8 @@
   {
     "name": "orb burst(mana)",
     "element": "blood",
+    "target": "self",
+    "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": -35,
     "effects": {
@@ -39,6 +43,8 @@
   {
     "name": "orb burst(health)",
     "element": "blood",
+    "target": "self",
+    "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 5,
     "effects": {
@@ -58,6 +64,8 @@
   {
     "name": "vampiric touch",
     "element": "blood",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 50,
     "effects": {
@@ -72,6 +80,8 @@
   {
     "name": "blood spear",
     "element": "blood",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 75,
     "effects": {
@@ -86,6 +96,8 @@
   {
     "name": "blood lance",
     "element": "blood",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 150,
     "effects": {
@@ -105,6 +117,8 @@
   {
     "name": "blood storm",
     "element": "blood",
+    "target": "area",
+    "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 300,
     "effects": {
@@ -123,8 +137,33 @@
     }
   },
   {
+    "name": "blood spike",
+    "element": "blood",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "legend",
+    "manaCost": 750,
+    "effects": {
+      "damage": 350,
+      "selfDamage": 75,
+      "buffs": [
+        "blood orb",
+        "blood orb",
+        "blood orb"
+      ],
+      "debuffs": [
+        {
+          "name": "severe hemmorage",
+          "chance": 1.0
+        }
+      ]
+    }
+  },
+  {
     "name": "summon flying skull",
     "element": "summoning",
+    "target": "self",
+    "type": "defense",
     "proficiencyNeeded": "novice",
     "manaCost": 50,
     "effects": {
@@ -139,6 +178,8 @@
   {
     "name": "raise skeleton",
     "element": "summoning",
+    "target": "self",
+    "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 50,
     "effects": {
@@ -151,8 +192,92 @@
     }
   },
   {
+    "name": "raise zombie",
+    "element": "summoning",
+    "target": "self",
+    "type": "defense",
+    "proficiencyNeeded": "adept",
+    "manaCost": 50,
+    "effects": {
+      "damage": null,
+      "buffs": null,
+      "debuffs": null,
+      "summon": [
+        "skeleton"
+      ]
+    }
+  },
+  {
+    "name": "summon lich",
+    "element": "summoning",
+    "target": "self",
+    "type": "defense",
+    "proficiencyNeeded": "expert",
+    "manaCost": 150,
+    "effects": {
+      "damage": null,
+      "buffs": null,
+      "debuffs": null,
+      "summon": [
+        "lich"
+      ]
+    }
+  },
+  {
+    "name": "summon wraith",
+    "element": "summoning",
+    "target": "self",
+    "type": "defense",
+    "proficiencyNeeded": "master",
+    "manaCost": 250,
+    "effects": {
+      "damage": null,
+      "buffs": null,
+      "debuffs": null,
+      "summon": [
+        "wraith"
+      ]
+    }
+  },
+  {
+    "name": "summon death knight",
+    "element": "summoning",
+    "target": "self",
+    "type": "defense",
+    "proficiencyNeeded": "legend",
+    "manaCost": 500,
+    "effects": {
+      "damage": null,
+      "buffs": null,
+      "debuffs": null,
+      "summon": [
+        "death knight"
+      ]
+    }
+  },
+  {
+    "name": "mass raise dead",
+    "element": "summoning",
+    "target": "area",
+    "type": "offense",
+    "proficiencyNeeded": "legend",
+    "manaCost": 750,
+    "effects": {
+      "damage": 100,
+      "buffs": null,
+      "debuffs": null,
+      "summon": [
+        "skeleton",
+        "skeleton",
+        "skeleton"
+      ]
+    }
+  },
+  {
     "name": "teeth",
     "element": "bone",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 15,
     "effects": {
@@ -164,6 +289,8 @@
   {
     "name": "bone shield",
     "element": "bone",
+    "target": "self",
+    "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 15,
     "effects": {
@@ -177,6 +304,8 @@
   {
     "name": "bone spear",
     "element": "bone",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 45,
     "effects": {
@@ -191,8 +320,25 @@
     }
   },
   {
+    "name": "bone wall",
+    "element": "bone",
+    "target": "area",
+    "type": "defense",
+    "proficiencyNeeded": "adept",
+    "manaCost": 60,
+    "effects": {
+      "damage": null,
+      "buffs": [
+        "projectile suppression"
+      ],
+      "debuffs": null
+    }
+  },
+  {
     "name": "bone armor",
     "element": "bone",
+    "target": "self",
+    "type": "defense",
     "proficiencyNeeded": "expert",
     "manaCost": 75,
     "effects": {
@@ -206,6 +352,8 @@
   {
     "name": "bone prison",
     "element": "bone",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "master",
     "manaCost": 125,
     "effects": {
@@ -222,6 +370,8 @@
   {
     "name": "bone storm",
     "element": "bone",
+    "target": "area",
+    "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 250,
     "effects": {
@@ -236,8 +386,28 @@
     }
   },
   {
+    "name": "bone explosion",
+    "element": "bone",
+    "target": "area",
+    "type": "offense",
+    "proficiencyNeeded": "legend",
+    "manaCost": 500,
+    "effects": {
+      "damage": 300,
+      "buffs": null,
+      "debuffs": [
+        {
+          "name": "severe bleed",
+          "chance": 1.0
+        }
+      ]
+    }
+  },
+  {
     "name": "poison dart",
     "element": "pestilence",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 20,
     "effects": {
@@ -254,6 +424,8 @@
   {
     "name": "plague cloud",
     "element": "pestilence",
+    "target": "area",
+    "type": "offense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 35,
     "effects": {
@@ -270,6 +442,8 @@
   {
     "name": "rotting touch",
     "element": "pestilence",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 60,
     "effects": {
@@ -284,8 +458,25 @@
     }
   },
   {
+    "name": "disease ward",
+    "element": "pestilence",
+    "target": "self",
+    "type": "defense",
+    "proficiencyNeeded": "adept",
+    "manaCost": 50,
+    "effects": {
+      "damage": null,
+      "buffs": [
+        "disease immunity"
+      ],
+      "debuffs": null
+    }
+  },
+  {
     "name": "miasma",
     "element": "pestilence",
+    "target": "area",
+    "type": "offense",
     "proficiencyNeeded": "expert",
     "manaCost": 100,
     "effects": {
@@ -306,6 +497,8 @@
   {
     "name": "plague bearer",
     "element": "pestilence",
+    "target": "self",
+    "type": "defense",
     "proficiencyNeeded": "master",
     "manaCost": 175,
     "effects": {
@@ -324,6 +517,8 @@
   {
     "name": "death cloud",
     "element": "pestilence",
+    "target": "area",
+    "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 300,
     "effects": {
@@ -336,6 +531,28 @@
         },
         {
           "name": "diseased",
+          "chance": 1.0
+        }
+      ]
+    }
+  },
+  {
+    "name": "virulent explosion",
+    "element": "pestilence",
+    "target": "area",
+    "type": "offense",
+    "proficiencyNeeded": "legend",
+    "manaCost": 500,
+    "effects": {
+      "damage": 250,
+      "buffs": null,
+      "debuffs": [
+        {
+          "name": "severe poison",
+          "chance": 1.0
+        },
+        {
+          "name": "severe disease",
           "chance": 1.0
         }
       ]

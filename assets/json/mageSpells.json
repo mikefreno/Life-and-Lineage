@@ -628,6 +628,8 @@
   {
     "name": "rock toss",
     "element": "earth",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 10,
     "effects": {
@@ -649,6 +651,8 @@
   {
     "name": "stone hands",
     "element": "earth",
+    "target": "self",
+    "type": "defense",
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
     "effects": {
@@ -662,6 +666,8 @@
   {
     "name": "quick sand",
     "element": "earth",
+    "target": "area",
+    "type": "offense",
     "proficiencyNeeded": "adept",
     "duration": 3,
     "manaCost": 40,
@@ -679,6 +685,8 @@
   {
     "name": "rock armor",
     "element": "earth",
+    "target": "self",
+    "type": "defense",
     "proficiencyNeeded": "adept",
     "manaCost": 60,
     "effects": {
@@ -690,29 +698,10 @@
     }
   },
   {
-    "name": "rock bullet",
-    "element": "earth",
-    "proficiencyNeeded": "expert",
-    "manaCost": 85,
-    "effects": {
-      "damage": 65,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "stun",
-          "chance": 0.75
-        }
-      ]
-    },
-    "animation": {
-      "sprite": "rockBullet",
-      "style": "missile",
-      "position": "enemy"
-    }
-  },
-  {
     "name": "rock wall",
     "element": "earth",
+    "target": "area",
+    "type": "defense",
     "proficiencyNeeded": "master",
     "duration": 5,
     "manaCost": 120,
@@ -727,6 +716,8 @@
   {
     "name": "earthquake",
     "element": "earth",
+    "target": "area",
+    "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 650,
     "effects": {
@@ -743,6 +734,8 @@
   {
     "name": "sand burial",
     "element": "earth",
+    "target": "single",
+    "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 1200,
     "effects": {

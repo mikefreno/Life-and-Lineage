@@ -661,7 +661,7 @@
     "effectAmount": [
       null
     ],
-    "icon": "reveal"
+    "icon": null
   },
   {
     "name": "weaken",
@@ -677,6 +677,390 @@
       0.25
     ],
     "icon": "broken_sword"
+  },
+  {
+    "name": "shocked",
+    "style": "debuff",
+    "turns": 3,
+    "effect": [
+      "stun",
+      "mana drain"
+    ],
+    "effectStyle": [
+      "multiplier",
+      "flat"
+    ],
+    "effectAmount": [
+      0.25,
+      5
+    ],
+    "icon": "lightning"
+  },
+  {
+    "name": "severe burn",
+    "style": "debuff",
+    "turns": 6,
+    "effect": [
+      "health damage"
+    ],
+    "effectStyle": [
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.5
+    ],
+    "icon": "flame"
+  },
+  {
+    "name": "severe bleed",
+    "style": "debuff",
+    "turns": 5,
+    "effect": [
+      "health damage"
+    ],
+    "effectStyle": [
+      "percentage"
+    ],
+    "effectAmount": [
+      0.08
+    ],
+    "icon": "bleed"
+  },
+  {
+    "name": "severe poison",
+    "style": "debuff",
+    "turns": 15,
+    "effect": [
+      "health damage"
+    ],
+    "effectStyle": [
+      "percentage"
+    ],
+    "effectAmount": [
+      0.1
+    ],
+    "icon": "skull_and_crossbones"
+  },
+  {
+    "name": "severe disease",
+    "style": "debuff",
+    "turns": 15,
+    "effect": [
+      "health damage",
+      "accuracy reduction"
+    ],
+    "effectStyle": [
+      "percentage",
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.03,
+      0.5
+    ],
+    "icon": "viruses"
+  },
+  {
+    "name": "severe hemmorage",
+    "style": "debuff",
+    "turns": 4,
+    "effect": [
+      "health damage"
+    ],
+    "effectStyle": [
+      "percentage"
+    ],
+    "effectAmount": [
+      0.1
+    ],
+    "icon": "bleed"
+  },
+  {
+    "name": "severe sunder",
+    "style": "debuff",
+    "turns": 6,
+    "effect": [
+      "armor decrease"
+    ],
+    "effectStyle": [
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.5
+    ],
+    "icon": "shield"
+  },
+  {
+    "name": "silence",
+    "style": "debuff",
+    "turns": 3,
+    "effect": [
+      "silenced"
+    ],
+    "effectStyle": [
+      null
+    ],
+    "effectAmount": [
+      null
+    ],
+    "icon": "blank"
+  },
+  {
+    "name": "blinded",
+    "style": "debuff",
+    "turns": 3,
+    "effect": [
+      "accuracy reduction"
+    ],
+    "effectStyle": [
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.20
+    ],
+    "icon": "blind"
+  },
+  {
+    "name": "weakened",
+    "style": "debuff",
+    "turns": 3,
+    "effect": [
+      "weaken"
+    ],
+    "effectStyle": [
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.25
+    ],
+    "icon": "broken_sword"
+  },
+  {
+    "name": "projectile suppression",
+    "style": "buff",
+    "turns": 5,
+    "effect": [
+      "blur"
+    ],
+    "effectStyle": [
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.5
+    ],
+    "icon": "shield"
+  },
+  {
+    "name": "projectile negation",
+    "style": "buff",
+    "turns": 5,
+    "effect": [
+      "blur"
+    ],
+    "effectStyle": [
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.9
+    ],
+    "icon": "shield"
+  },
+  {
+    "name": "spell resistance",
+    "style": "buff",
+    "turns": 5,
+    "effect": [
+      "armor increase"
+    ],
+    "effectStyle": [
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.25
+    ],
+    "icon": "magic_shield"
+  },
+  {
+    "name": "disease immunity",
+    "style": "buff",
+    "turns": 10,
+    "effect": [
+      "blur"
+    ],
+    "effectStyle": [
+      "multiplier"
+    ],
+    "effectAmount": [
+      1.0
+    ],
+    "icon": "viruses"
+  },
+  {
+    "name": "hard to see",
+    "style": "buff",
+    "turns": 4,
+    "effect": [
+      "blur"
+    ],
+    "effectStyle": [
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.6
+    ],
+    "icon": "hidden"
+  },
+  {
+    "name": "damaging to hit",
+    "style": "buff",
+    "turns": 4,
+    "effect": [
+      "thorns"
+    ],
+    "effectStyle": [
+      "flat"
+    ],
+    "effectAmount": [
+      25
+    ],
+    "icon": "wind"
+  },
+  {
+    "name": "minor fortitude",
+    "style": "buff",
+    "turns": 5,
+    "effect": [
+      "healthMax increase"
+    ],
+    "effectStyle": [
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.1
+    ],
+    "icon": "heart"
+  },
+  {
+    "name": "fortitude",
+    "style": "buff",
+    "turns": 5,
+    "effect": [
+      "healthMax increase"
+    ],
+    "effectStyle": [
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.25
+    ],
+    "icon": "heart"
+  },
+  {
+    "name": "minor fury",
+    "style": "buff",
+    "turns": 3,
+    "effect": [
+      "strengthen"
+    ],
+    "effectStyle": [
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.15
+    ],
+    "icon": "anger"
+  },
+  {
+    "name": "righteous fury",
+    "style": "buff",
+    "turns": 5,
+    "effect": [
+      "strengthen"
+    ],
+    "effectStyle": [
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.4
+    ],
+    "icon": "anger"
+  },
+  {
+    "name": "beast empowerment",
+    "style": "buff",
+    "turns": 10,
+    "effect": [
+      "strengthen"
+    ],
+    "effectStyle": [
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.8
+    ],
+    "icon": "paw"
+  },
+  {
+    "name": "dual rage",
+    "style": "buff",
+    "turns": 5,
+    "effect": [
+      "strengthen"
+    ],
+    "effectStyle": [
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.4
+    ],
+    "icon": "dual_rage"
+  },
+  {
+    "name": "rock armor",
+    "style": "buff",
+    "turns": 8,
+    "effect": [
+      "armor increase"
+    ],
+    "effectStyle": [
+      "flat"
+    ],
+    "effectAmount": [
+      50
+    ],
+    "icon": "rock_shield"
+  },
+  {
+    "name": "steady aim",
+    "style": "buff",
+    "turns": 5,
+    "effect": [
+      "accuracy increase"
+    ],
+    "effectStyle": [
+      "multiplier"
+    ],
+    "effectAmount": [
+      0.25
+    ],
+    "icon": "target"
+  },
+  {
+    "name": "purify",
+    "style": "buff",
+    "turns": 1,
+    "effect": [
+      "heal",
+      "sanity heal"
+    ],
+    "effectStyle": [
+      "flat",
+      "flat"
+    ],
+    "effectAmount": [
+      25,
+      10
+    ],
+    "icon": "holy_water"
   }
 ]
 

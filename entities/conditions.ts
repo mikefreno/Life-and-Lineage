@@ -1,8 +1,8 @@
 import { action, makeObservable, observable, reaction } from "mobx";
 import * as Crypto from "expo-crypto";
-import { ConditionType, EffectOptions, EffectStyle } from "../utility/types";
-import type { PlayerCharacter } from "./character";
-import type { Creature, Enemy, Minion } from "./creatures";
+import { ConditionType, EffectOptions, EffectStyle } from "@/utility/types";
+import type { PlayerCharacter } from "@/entities/character";
+import type { Creature, Enemy, Minion } from "@/entities/creatures";
 
 /**
  * Almost everything in this class is readonly. Everything is either pre-computed or is computed in totality with all Conditions at once.
@@ -278,26 +278,38 @@ export class Condition {
   }
 }
 const conditionIconMap: { [key: string]: any } = {
-  anger: require("../assets/images/conditions/anger.png"),
-  blank: require("../assets/images/conditions/blank.png"),
-  bleed: require("../assets/images/conditions/bleed.png"),
-  blind: require("../assets/images/conditions/blind.png"),
-  distraught: require("../assets/images/conditions/distraught.png"),
-  eagle: require("../assets/images/conditions/eagle.png"),
-  flame: require("../assets/images/conditions/flame.png"),
-  glow_star: require("../assets/images/conditions/glow_star.png"),
-  holding_heart: require("../assets/images/conditions/holding_heart.png"),
-  pray_hands: require("../assets/images/conditions/pray_hands.png"),
-  scarecrow: require("../assets/images/conditions/scarecrow.png"),
-  shield: require("../assets/images/conditions/shield.png"),
-  skull_and_crossbones: require("../assets/images/conditions/skull_crossbones.png"),
-  snowflake: require("../assets/images/conditions/snowflake.png"),
-  split_heart: require("../assets/images/conditions/split_heart.png"),
-  stun: require("../assets/images/conditions/stun.png"),
-  viruses: require("../assets/images/conditions/viruses.png"),
-  blood_orb: require("../assets/images/conditions/blood_orb.png"),
-  hollow_disk: require("../assets/images/conditions/hollow_disk.png"),
-  rock_hands: require("../assets/images/conditions/rock_hands.png"),
-  dagger_ring: require("../assets/images/conditions/dagger_ring.png"),
-  trap: require("../assets/images/conditions/trap.png"),
+  anger: require("@/assets/images/conditions/anger.png"),
+  blank: require("@/assets/images/conditions/blank.png"),
+  bleed: require("@/assets/images/conditions/bleed.png"),
+  blind: require("@/assets/images/conditions/blind.png"),
+  distraught: require("@/assets/images/conditions/distraught.png"),
+  eagle: require("@/assets/images/conditions/eagle.png"),
+  flame: require("@/assets/images/conditions/flame.png"),
+  glow_star: require("@/assets/images/conditions/glow_star.png"),
+  holding_heart: require("@/assets/images/conditions/holding_heart.png"),
+  pray_hands: require("@/assets/images/conditions/pray_hands.png"),
+  scarecrow: require("@/assets/images/conditions/scarecrow.png"),
+  shield: require("@/assets/images/conditions/shield.png"),
+  skull_and_crossbones: require("@/assets/images/conditions/skull_crossbones.png"),
+  snowflake: require("@/assets/images/conditions/snowflake.png"),
+  split_heart: require("@/assets/images/conditions/split_heart.png"),
+  stun: require("@/assets/images/conditions/stun.png"),
+  viruses: require("@/assets/images/conditions/viruses.png"),
+  blood_orb: require("@/assets/images/conditions/blood_orb.png"),
+  hollow_disk: require("@/assets/images/conditions/hollow_disk.png"),
+  rock_hands: require("@/assets/images/conditions/rock_hands.png"),
+  dagger_ring: require("@/assets/images/conditions/dagger_ring.png"),
+  trap: require("@/assets/images/conditions/trap.png"),
+  heart: require("@/assets/images/conditions/heart.png"),
+  dual_rage: require("@/assets/images/conditions/dual_rage.png"),
+  paw: require("@/assets/images/conditions/paw.png"),
+  broken_sword: require("@/assets/images/conditions/broken_sword.png"),
+  wind: require("@/assets/images/conditions/wind.png"),
+  target: require("@/assets/images/conditions/target.png"),
+  holy_water: require("@/assets/images/conditions/holy_water.png"),
+  hidden: require("@/assets/images/conditions/mask.png"),
+  lightning: require("@/assets/images/conditions/lightning.png"),
+  rock_shield: require("@/assets/images/conditions/rock_shield.png"),
+  holy_shield: require("@/assets/images/conditions/holy_shield.png"),
+  magic_shield: require("@/assets/images/conditions/magic_shield.png"),
 };
