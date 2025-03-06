@@ -738,7 +738,7 @@ export function StatsDisplay({
   }
 
   return (
-    <View style={{ pointerEvents: "none", flex: 1 }}>
+    <View style={{ pointerEvents: "box-none", flex: 1 }}>
       <GenericModal
         isVisibleCondition={showingAttacks}
         backFunction={() => setShowingAttacks(false)}

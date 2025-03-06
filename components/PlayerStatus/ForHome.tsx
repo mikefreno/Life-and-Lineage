@@ -6,7 +6,7 @@ import { Coins, SquarePlus } from "@/assets/icons/SVGIcons";
 import { Text } from "@/components/Themed";
 import { useRootStore } from "@/hooks/stores";
 import { useStatChanges, useVibration } from "@/hooks/generic";
-import { normalizeLineHeight, useStyles } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import {
   ChangePopUp,
   ColorAndPlatformDependantBlur,
@@ -34,7 +34,7 @@ const PlayerStatusForHome = observer(() => {
       toValue: uiStore.playerStatusIsCompact ? 0 : uiStore.expansionPadding,
       duration: SCREEN_TRANSITION_TIMING,
       useNativeDriver: false,
-      easing: Easing.in(Easing.ease),
+      easing: Easing.cubic,
     }).start();
   }, [uiStore.playerStatusIsCompact]);
 

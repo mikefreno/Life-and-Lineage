@@ -233,9 +233,6 @@ export default class UIStore {
   }
 
   get playerStatusIsCompact() {
-    if (this.isLargeDevice) {
-      return false;
-    }
     if (this.root.playerState) {
       return !(
         this.root.playerState.unAllocatedSkillPoints > 0 ||
@@ -246,9 +243,6 @@ export default class UIStore {
   }
 
   get playerStatusExpandedOnAllRoutes() {
-    if (this.isLargeDevice) {
-      return false;
-    }
     if (this.root.playerState) {
       return !(
         this.root.playerState.unAllocatedSkillPoints > 0 ||
@@ -258,9 +252,7 @@ export default class UIStore {
   }
 
   get compactRoutePadding() {
-    return this.playerStatusExpandedOnAllRoutes
-      ? this.bottomBarHeight + 4
-      : this.playerStatusCompactHeight ?? 0 + this.tabHeight;
+    return this.bottomBarHeight + 4;
   }
 
   get playerStatusHeight() {
@@ -331,8 +323,9 @@ export default class UIStore {
   }
 
   setPlayerStatusHeight(value: number) {
-    if (!this.playerStatusCompactHeight && this.playerStatusIsCompact) {
-      this.setPlayerStatusCompactHeight(value);
+    const mod = this.playerStatusIsCompact ? 0 : this.expansionPadding;
+    if (!this.playerStatusCompactHeight) {
+      this.setPlayerStatusCompactHeight(value - mod);
     }
   }
 
