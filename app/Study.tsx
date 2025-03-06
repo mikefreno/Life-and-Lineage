@@ -1,4 +1,4 @@
-import { Text } from "../components/Themed";
+import { Text, ThemedView } from "../components/Themed";
 import { Pressable, Image, View, ScrollView } from "react-native";
 import { AccelerationCurves, toTitleCase } from "../utility/functions/misc";
 import ProgressBar from "../components/ProgressBar";
@@ -149,7 +149,7 @@ const LearningSpellScreen = observer(() => {
   const CurrentlyStudyingSection = useMemo(() => {
     if (spellState && spellState.length > 0)
       return (
-        <View style={[styles.py4]}>
+        <View style={styles.py4}>
           <Text style={[styles.textCenter, styles["text-xl"]]}>
             Currently Studying
           </Text>
@@ -173,7 +173,9 @@ const LearningSpellScreen = observer(() => {
   const SelectedBookSection = useMemo(() => {
     if (selectedBook && selectedBookSpell)
       return (
-        <View style={[styles.columnCenter, styles.py4]}>
+        <ThemedView
+          style={[styles.columnCenter, styles.py4, styles.themedCard]}
+        >
           <Text style={styles["text-xl"]}>
             {toTitleCase(selectedBook.name)}
           </Text>
@@ -205,7 +207,7 @@ const LearningSpellScreen = observer(() => {
           >
             Start Studying
           </GenericRaisedButton>
-        </View>
+        </ThemedView>
       );
     return null;
   }, [

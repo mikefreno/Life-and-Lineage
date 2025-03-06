@@ -494,7 +494,7 @@ export const StatDisplay = ({
     >
       <View style={{ ...styles.rowCenter }}>
         <Icon height={14} width={14} />
-        <Text style={{ ...styles.ml2, ...styles.bold }}>
+        <Text style={[styles.ml2, styles.bold]}>
           {getTotalValue(modifier, value)}
         </Text>
       </View>
@@ -503,7 +503,6 @@ export const StatDisplay = ({
           ...styles.textCenter,
           ...styles["text-xs"],
           ...styles.mt1,
-          color: theme.border,
         }}
       >
         {statInfo.description}

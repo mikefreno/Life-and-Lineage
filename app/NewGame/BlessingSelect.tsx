@@ -19,7 +19,6 @@ import { useIsFocused } from "@react-navigation/native";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
-import { FadeSlide } from "../../components/AnimatedWrappers";
 import { useStyles } from "../../hooks/styles";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
@@ -67,7 +66,12 @@ export default function SetBlessing() {
             accessibilityRole="header"
           >
             With What Blessing Was Your
-            <Text style={{ color: playerClassColors[classSelection] }}>
+            <Text
+              style={[
+                styles.newGameHeader,
+                { color: playerClassColors[classSelection] },
+              ]}
+            >
               {` ${toTitleCase(classSelection)} `}
             </Text>
             Born?
@@ -93,7 +97,10 @@ export default function SetBlessing() {
             {DescriptionMap[blessingSelection as Element]}
           </Text>
           <GenericFlatButton
-            onPress={() => router.push("/NewGame/SexSelect")}
+            onPress={() => {
+              vibration({ style: "light" });
+              router.push("/NewGame/SexSelect");
+            }}
             accessibilityRole="link"
             accessibilityLabel="Next"
             disabled={!(blessingSelection == 0 || !!blessingSelection)}

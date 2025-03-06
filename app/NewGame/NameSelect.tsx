@@ -14,10 +14,10 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { playerClassColors } from "../../constants/Colors";
 import { useNewGameStore } from "./_layout";
 import { useRootStore } from "../../hooks/stores";
-import { FadeSlide } from "../../components/AnimatedWrappers";
 import { tw_base, useStyles } from "../../hooks/styles";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
+import { useVibration } from "@/hooks/generic";
 
 export default function SetName() {
   const styles = useStyles();
@@ -26,6 +26,7 @@ export default function SetName() {
   const { classSelection, firstName, lastName, setFirstName, setLastName } =
     useNewGameStore();
   const headerHeight = useHeaderHeight();
+  const vibration = useVibration();
 
   if (!classSelection) {
     router.back();
@@ -144,7 +145,10 @@ export default function SetName() {
               </Text>
               <View>
                 <GenericFlatButton
-                  onPress={() => router.push("/NewGame/Review")}
+                  onPress={() => {
+                    vibration({ style: "light" });
+                    router.push("/NewGame/Review");
+                  }}
                   accessibilityRole="link"
                   accessibilityLabel="Next"
                   disabled={

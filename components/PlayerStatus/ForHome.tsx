@@ -1,21 +1,19 @@
 import React, { useLayoutEffect, useRef, useEffect } from "react";
 import ProgressBar from "@/components/ProgressBar";
-import { Pressable, View, Animated } from "react-native";
+import { Pressable, View, Animated, Easing } from "react-native";
 import { observer } from "mobx-react-lite";
 import { Coins, SquarePlus } from "@/assets/icons/SVGIcons";
 import { Text } from "@/components/Themed";
 import { useRootStore } from "@/hooks/stores";
 import { useStatChanges, useVibration } from "@/hooks/generic";
-import { normalize, useStyles } from "@/hooks/styles";
+import { normalizeLineHeight, useStyles } from "@/hooks/styles";
 import {
   ChangePopUp,
   ColorAndPlatformDependantBlur,
   ConditionRenderer,
 } from "./Components";
 import { PlayerStatusModal } from "./Modal";
-import { TAB_SELECTION } from "@/app/(tabs)/_layout";
-
-const HEIGHT_ANIMATION_DURATION = 200;
+import { SCREEN_TRANSITION_TIMING } from "@/app/(tabs)/_layout";
 
 const PlayerStatusForHome = observer(() => {
   const root = useRootStore();
@@ -26,27 +24,32 @@ const PlayerStatusForHome = observer(() => {
   const playerStatusRef = useRef<View>(null);
 
   const expandedSectionHeight = useRef(
-    new Animated.Value(uiStore.playerStatusIsCompact ? 0 : 20),
+    new Animated.Value(
+      uiStore.playerStatusIsCompact ? 0 : uiStore.expansionPadding,
+    ),
   ).current;
 
   useEffect(() => {
     Animated.timing(expandedSectionHeight, {
-      toValue: uiStore.playerStatusIsCompact ? 0 : 20,
-      duration: HEIGHT_ANIMATION_DURATION,
+      toValue: uiStore.playerStatusIsCompact ? 0 : uiStore.expansionPadding,
+      duration: SCREEN_TRANSITION_TIMING,
       useNativeDriver: false,
+      easing: Easing.in(Easing.ease),
     }).start();
   }, [uiStore.playerStatusIsCompact]);
 
   useLayoutEffect(() => {
     const timer = setTimeout(() => {
       if (playerStatusRef.current) {
-        setTimeout(() => {
-          playerStatusRef.current?.measure((x, y, width, height) => {
-            uiStore.setPlayerStatusHeight(height);
-          });
-        }, HEIGHT_ANIMATION_DURATION);
+        playerStatusRef.current?.measure((x, y, width, height) => {
+          uiStore.setPlayerStatusHeight(height);
+        });
       }
     }, 250);
+
+    if (uiStore.playerStatusCompactHeight) {
+      clearTimeout(timer);
+    }
 
     return () => clearTimeout(timer);
   }, [
@@ -78,6 +81,7 @@ const PlayerStatusForHome = observer(() => {
           position: "absolute",
           bottom: uiStore.tabHeight,
           width: uiStore.isLandscape ? "75%" : "100%",
+          alignSelf: "center",
         }}
       >
         <ColorAndPlatformDependantBlur>

@@ -40,12 +40,18 @@ import GenericFlatButton from "../components/GenericFlatButton";
 import { normalize, useStyles } from "../hooks/styles";
 import { DevControls } from "@/components/DevControls";
 import BoundsVisualizer from "@/components/BoundsVisualizer";
-import { runOnJS, useSharedValue, withSpring } from "react-native-reanimated";
+import {
+  configureReanimatedLogger,
+  ReanimatedLogLevel,
+  runOnJS,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { useVibration } from "@/hooks/generic";
 import { runInAction } from "mobx";
-import { HeaderBackButton } from "@react-navigation/elements";
+import { SCREEN_TRANSITION_TIMING } from "./(tabs)/_layout";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -61,6 +67,11 @@ export const tabRouteIndexing = [
   "/medical",
   "/dungeon",
 ];
+
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false,
+});
 
 SplashScreen.preventAutoHideAsync();
 SplashScreen.setOptions({
@@ -322,19 +333,17 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   ));
 
   useEffect(() => {
-    runInAction(() => {
-      if (tabRouteIndexing.includes(pathname)) {
-        rootStore.currentTab = pathname;
-      } else {
-        rootStore.currentTab = null;
-      }
-    });
+    setTimeout(() => {
+      runInAction(() => {
+        rootStore.pathname = pathname.toLowerCase();
+      });
+    }, SCREEN_TRANSITION_TIMING);
   }, [pathname]);
 
   const vibration = useVibration();
 
   const navigateToLeftTab = () => {
-    const currentIndex = tabRouteIndexing.indexOf(rootStore.currentTab ?? "");
+    const currentIndex = tabRouteIndexing.indexOf(rootStore.pathname ?? "");
     if (currentIndex === -1) {
       return;
     }
@@ -345,13 +354,12 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
       leftIdx = currentIndex - 1;
     }
     const newTabString = tabRouteIndexing[leftIdx];
-    runInAction(() => (rootStore.currentTab = newTabString));
-    vibration({ style: "light" });
     router.push(newTabString as RelativePathString);
+    vibration({ style: "light" });
   };
 
   const navigateToRightTab = () => {
-    const currentIndex = tabRouteIndexing.indexOf(rootStore.currentTab ?? "");
+    const currentIndex = tabRouteIndexing.indexOf(rootStore.pathname ?? "");
     if (currentIndex === -1) {
       return;
     }
@@ -362,9 +370,8 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
       rightIdx = currentIndex + 1;
     }
     const newTabString = tabRouteIndexing[rightIdx];
-    runInAction(() => (rootStore.currentTab = newTabString));
-    vibration({ style: "light" });
     router.push(newTabString as RelativePathString);
+    vibration({ style: "light" });
   };
 
   const startX = useSharedValue(0);
@@ -416,7 +423,10 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
             )}
             <Stack
               screenOptions={{
-                animation: uiStore.reduceMotion ? "fade" : undefined,
+                animation: uiStore.reduceMotion
+                  ? "slide_from_bottom"
+                  : undefined,
+                animationDuration: 500,
               }}
             >
               <Stack.Screen

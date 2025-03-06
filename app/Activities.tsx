@@ -7,11 +7,12 @@ import { tw } from "../hooks/styles";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 
 export default function Activities() {
+  const headerHeight = useHeaderHeight();
   return (
     <>
       <View style={{ flex: 1, justifyContent: "space-between" }}>
         <ScrollView>
-          <View style={{ ...tw.px1, paddingTop: useHeaderHeight() }}>
+          <View style={{ ...tw.px1, paddingTop: headerHeight }}>
             {activities.map((activity) => (
               <ActivityCard activity={activity} key={activity.name} />
             ))}

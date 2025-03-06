@@ -1,3 +1,4 @@
+import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -9,7 +10,6 @@ import {
 import { Text, CursiveText, HandwrittenText, CursiveTextBold } from "./Themed";
 import GearStatsDisplay from "./GearStatsDisplay";
 import { router } from "expo-router";
-import { useEffect, useRef, useState } from "react";
 import { asReadableGold, toTitleCase } from "../utility/functions/misc";
 import SpellDetails from "./SpellDetails";
 import GenericFlatButton from "./GenericFlatButton";
@@ -37,8 +37,7 @@ import { Condition } from "../entities/conditions";
 import { useEnemyManagement } from "../hooks/combat";
 import type { Shop } from "../entities/shop";
 import Colors, { rarityColors } from "../constants/Colors";
-import { shadows, tw, useStyles } from "../hooks/styles";
-import React from "react";
+import { tw, useStyles } from "../hooks/styles";
 
 type BaseProps = {
   displayItem: {
@@ -88,12 +87,18 @@ export function StatsDisplay({
   const [showingAttacks, setShowingAttacks] = useState<boolean>(false);
   const [firstItem, setFirstItem] = useState<Item>(displayItem.item[0]);
   const [renderStory, setRenderStory] = useState<string | null>(null);
+  const [isFirstRender, setIsFirstRender] = useState(true);
+
   const animatedLeft = useRef(
     new Animated.Value(uiStore.dimensions.width / 3),
   ).current;
   const animatedTop = useRef(
     new Animated.Value(uiStore.dimensions.height / 3),
   ).current;
+
+  // Animation values for grow effect
+  const animatedScale = useRef(new Animated.Value(0)).current;
+  const animatedOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const pad = 4;
@@ -112,7 +117,26 @@ export function StatsDisplay({
         ? displayItem.position.top + (topOffset ?? 0)
         : dimensions.height - (viewHeight + tabBarHeight);
 
-    if (uiStore.reduceMotion) {
+    if (isFirstRender) {
+      animatedLeft.setValue(targetLeft);
+      animatedTop.setValue(targetTop);
+
+      Animated.parallel([
+        Animated.spring(animatedScale, {
+          toValue: 1,
+          useNativeDriver: false,
+          tension: 200,
+          friction: 20,
+        }),
+        Animated.timing(animatedOpacity, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: false,
+        }),
+      ]).start(() => {
+        setIsFirstRender(false);
+      });
+    } else if (uiStore.reduceMotion) {
       animatedLeft.setValue(targetLeft);
       animatedTop.setValue(targetTop);
     } else {
@@ -120,17 +144,17 @@ export function StatsDisplay({
         toValue: targetLeft,
         useNativeDriver: false,
         tension: 100,
-        friction: 8,
+        friction: 20,
       }).start();
 
       Animated.spring(animatedTop, {
         toValue: targetTop,
         useNativeDriver: false,
         tension: 100,
-        friction: 8,
+        friction: 20,
       }).start();
     }
-  }, [displayItem.position, viewWidth, viewHeight]);
+  }, [displayItem.position, viewWidth, viewHeight, isFirstRender]);
 
   useEffect(() => {
     setFirstItem(displayItem.item[0]);
@@ -713,7 +737,7 @@ export function StatsDisplay({
   }
 
   return (
-    <>
+    <View style={{ pointerEvents: "none", flex: 1 }}>
       <GenericModal
         isVisibleCondition={showingAttacks}
         backFunction={() => setShowingAttacks(false)}
@@ -741,7 +765,7 @@ export function StatsDisplay({
       <Animated.View
         style={[
           styles.statsDisplayContainer,
-          shadows.diffuse,
+          styles.soft,
           firstItem.itemClass == ItemClassType.Book
             ? {}
             : { width: dimensions.width * 0.4 },
@@ -750,6 +774,11 @@ export function StatsDisplay({
               rarityColors[firstItem.rarity].background[colorScheme],
             left: animatedLeft,
             top: animatedTop,
+            opacity: animatedOpacity,
+            transform: [
+              { scale: animatedScale },
+              { perspective: 1000 }, // Helps with 3D effect
+            ],
           },
         ]}
         onLayout={onLayoutView}
@@ -877,6 +906,6 @@ export function StatsDisplay({
         <ConsumableSection />
         <SaleSection />
       </Animated.View>
-    </>
+    </View>
   );
 }

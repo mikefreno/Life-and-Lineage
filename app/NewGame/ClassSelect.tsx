@@ -18,7 +18,6 @@ import { useIsFocused } from "@react-navigation/native";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
-import { FadeSlide } from "../../components/AnimatedWrappers";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { useRouter } from "expo-router";
 import { useStyles } from "../../hooks/styles";
@@ -350,7 +349,10 @@ const SetClassScreen = observer(() => {
 
           <GenericFlatButton
             disabled={classSelection === undefined}
-            onPress={() => router.push("/NewGame/BlessingSelect")}
+            onPress={() => {
+              vibration({ style: "light" });
+              router.push("/NewGame/BlessingSelect");
+            }}
             accessibilityRole="link"
             accessibilityLabel="Next"
             childrenWhenDisabled={"Select class to continue"}

@@ -18,7 +18,7 @@ import {
 import { storage } from "../utility/functions/storage";
 import { Character } from "../entities/character";
 import * as Device from "expo-device";
-import { normalize } from "@/hooks/styles";
+import { normalize, normalizeLineHeight } from "@/hooks/styles";
 import { TAB_SELECTION } from "@/app/(tabs)/_layout";
 import { debounce } from "lodash";
 
@@ -65,8 +65,8 @@ export default class UIStore {
   progressIncrementing: boolean = false;
 
   tabHeight = normalize(TAB_SELECTION);
+  expansionPadding = normalizeLineHeight(20);
 
-  playerStatusExpandedHeight: number | undefined = undefined;
   playerStatusCompactHeight: number | undefined = undefined;
 
   storeLoadingStatus: Record<string, boolean> = {
@@ -144,7 +144,6 @@ export default class UIStore {
     __DEV__ && this.setupDevActions();
 
     makeObservable(this, {
-      playerStatusIsCompact: computed,
       detailedStatusViewShowing: observable,
       dimensions: observable,
       itemBlockSize: observable,
@@ -161,7 +160,6 @@ export default class UIStore {
       currentTipIndex: observable,
       showDevDebugUI: observable,
       playerStatusCompactHeight: observable,
-      playerStatusExpandedHeight: observable,
 
       startTipCycle: action,
       completeLoading: action,
@@ -180,11 +178,15 @@ export default class UIStore {
       markStoreAsLoaded: action,
       setPlayerStatusHeight: action,
 
+      playerStatusIsCompact: computed,
       playerStatusHeight: computed,
       colorScheme: computed,
       allResourcesLoaded: computed,
       isLandscape: computed,
       bottomBarHeight: computed,
+      onExpandedTab: computed,
+      compactRoutePadding: computed,
+      playerStatusExpandedOnAllRoutes: computed,
     });
 
     reaction(
@@ -231,7 +233,10 @@ export default class UIStore {
   }
 
   get playerStatusIsCompact() {
-    if (this.root.playerState && !this.isLargeDevice) {
+    if (this.isLargeDevice) {
+      return false;
+    }
+    if (this.root.playerState) {
       return !(
         this.root.playerState.unAllocatedSkillPoints > 0 ||
         this.root.playerState.conditions.length > 0 ||
@@ -240,23 +245,38 @@ export default class UIStore {
     } else return true;
   }
 
+  get playerStatusExpandedOnAllRoutes() {
+    if (this.isLargeDevice) {
+      return false;
+    }
+    if (this.root.playerState) {
+      return !(
+        this.root.playerState.unAllocatedSkillPoints > 0 ||
+        this.root.playerState.conditions.length > 0
+      );
+    }
+  }
+
+  get compactRoutePadding() {
+    return this.playerStatusExpandedOnAllRoutes
+      ? this.bottomBarHeight + 4
+      : this.playerStatusCompactHeight ?? 0 + this.tabHeight;
+  }
+
   get playerStatusHeight() {
     if (this.playerStatusIsCompact) {
       return this.playerStatusCompactHeight ?? 0;
     } else {
-      return this.playerStatusExpandedHeight ?? 0;
+      return (this.playerStatusCompactHeight ?? 0) + this.expansionPadding;
     }
   }
+
   get bottomBarHeight() {
-    return (
-      this.playerStatusHeight + (!!this.root.currentTab ? this.tabHeight : 0)
-    );
+    return this.playerStatusHeight + this.tabHeight;
   }
 
   get onExpandedTab() {
-    return (
-      this.root.currentTab == "/medical" || this.root.currentTab == "/labor"
-    );
+    return this.root.pathname === "/medical" || this.root.pathname === "/labor";
   }
 
   debugLoadingStatus() {
@@ -311,26 +331,13 @@ export default class UIStore {
   }
 
   setPlayerStatusHeight(value: number) {
-    this.debouncedSetPlayerStatusHeight(value);
-  }
-  debouncedSetPlayerStatusHeight = debounce(this._setPlayerStatusHeight, 50);
-
-  private _setPlayerStatusHeight(value: number) {
     if (!this.playerStatusCompactHeight && this.playerStatusIsCompact) {
-      runInAction(() => this.setPlayerStatusCompactHeight(value));
-    } else if (
-      !this.playerStatusExpandedHeight &&
-      !this.playerStatusIsCompact
-    ) {
-      runInAction(() => this.setPlayerStatusExpandedHeight(value));
+      this.setPlayerStatusCompactHeight(value);
     }
   }
 
   private setPlayerStatusCompactHeight(value: number) {
     this.playerStatusCompactHeight = value;
-  }
-  private setPlayerStatusExpandedHeight(value: number) {
-    this.playerStatusExpandedHeight = value;
   }
 
   startTipCycle() {
@@ -496,7 +503,7 @@ export default class UIStore {
   }) {
     let blockSize;
     if (dimensions.width === dimensions.lesser) {
-      blockSize = Math.min(dimensions.height / 5, dimensions.width / 7.5);
+      blockSize = Math.min(dimensions.height / 5, dimensions.width / 8);
     } else {
       blockSize = dimensions.width / 14;
     }

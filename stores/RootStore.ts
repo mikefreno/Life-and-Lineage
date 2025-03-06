@@ -40,7 +40,7 @@ export class RootStore {
   constructed: boolean = false;
   atDeathScreen: boolean = false;
   startingNewGame: boolean = false;
-  currentTab: string | null = null;
+  pathname: string = "/";
 
   includeDevAttacks: boolean = false;
 
@@ -102,7 +102,7 @@ export class RootStore {
       startingNewGame: observable,
       devActions: observable,
       includeDevAttacks: observable,
-      currentTab: observable,
+      pathname: observable,
 
       hitDeathScreen: action,
       clearDeathScreen: action,

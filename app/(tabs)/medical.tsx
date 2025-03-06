@@ -35,9 +35,9 @@ const MedicalScreen = observer(() => {
       <View style={{ flex: 1 }}>
         <ScrollView
           contentContainerStyle={{
-            paddingTop: header + 20,
+            paddingTop: header,
             paddingBottom: uiStore.bottomBarHeight,
-            width: "80%",
+            width: "90%",
             marginHorizontal: "auto",
           }}
           scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}

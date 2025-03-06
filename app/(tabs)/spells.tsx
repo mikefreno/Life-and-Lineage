@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import SpellDetails from "../../components/SpellDetails";
 import { View, ScrollView } from "react-native";
 import { observer } from "mobx-react-lite";
@@ -91,12 +91,24 @@ const SpellsScreen = observer(() => {
       );
     });
   }
+  const isFocused = useIsFocused();
+
+  const topViewStyle = useMemo(() => {
+    return {
+      flex: 1,
+      marginTop: header + 20,
+      marginBottom: uiStore.compactRoutePadding,
+    };
+  }, [
+    uiStore.playerStatusExpandedOnAllRoutes,
+    uiStore.playerStatusCompactHeight,
+  ]);
 
   return (
     <>
       <TutorialModal
         tutorial={TutorialOption.spell}
-        isFocused={useIsFocused()}
+        isFocused={isFocused}
         pageOne={{
           title: "Magic Tab",
           body: "Here you can see your known spells, and proficiencies with each school of magic.",
@@ -106,23 +118,31 @@ const SpellsScreen = observer(() => {
           body: "Using spells will increase your proficiency in their school.",
         }}
       />
-      <View
-        style={{
-          flex: 1,
-          marginTop: header,
-          paddingBottom: uiStore.bottomBarHeight,
-        }}
-      >
+      <View style={topViewStyle}>
         {playerState?.spells && playerState.spells.length > 0 ? (
-          <ScrollView style={{ flex: 1 }}>
-            {playerState.spells.map((spell) => (
-              <View key={spell.name} style={styles.spellContainer}>
-                <SpellDetails spell={spell} />
-              </View>
-            ))}
-          </ScrollView>
+          <>
+            <GenericStrikeAround>Known Spells</GenericStrikeAround>
+            <ScrollView
+              contentContainerStyle={{
+                flexGrow: 1,
+                justifyContent: "center",
+              }}
+            >
+              {playerState.spells.map((spell) => (
+                <View key={spell.name} style={styles.spellContainer}>
+                  <SpellDetails spell={spell} />
+                </View>
+              ))}
+            </ScrollView>
+          </>
         ) : (
-          <View style={styles.noSpellsContainer}>
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Text style={[styles["text-xl"], { letterSpacing: 1 }]}>
               No Known Spells.
             </Text>
@@ -136,7 +156,7 @@ const SpellsScreen = observer(() => {
             </Text>
           </View>
         )}
-        <View style={{ height: "40%" }}>
+        <View>
           <View style={{ paddingHorizontal: 8 }}>
             <GenericStrikeAround>Proficiencies</GenericStrikeAround>
           </View>
@@ -144,9 +164,7 @@ const SpellsScreen = observer(() => {
             style={[
               styles.columnEvenly,
               {
-                flex: 1,
                 paddingBottom: normalize(12),
-                marginTop: -normalize(12),
               },
             ]}
           >

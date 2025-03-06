@@ -22,7 +22,7 @@ import {
 } from "../assets/icons/SVGIcons";
 import { useRootStore } from "../hooks/stores";
 import type { Character } from "../entities/character";
-import { shadows, useStyles } from "../hooks/styles";
+import { useStyles } from "../hooks/styles";
 import { DungeonLevel } from "../entities/dungeon";
 import { AnimatedSprite } from "./AnimatedSprite";
 import { EnemyImageMap } from "../utility/enemyHelpers";
@@ -289,7 +289,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
               { paddingHorizontal: 16 },
             ]}
           >
-            Who would you like to {dateDestination} with?
+            Who would you like to {dateDestination} with?l
           </Text>
           {playerState && (
             <ScrollView style={{ width: "100%" }}>

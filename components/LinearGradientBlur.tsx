@@ -58,7 +58,7 @@ export function LinearGradientBlur({
             <View
               style={[
                 StyleSheet.absoluteFill,
-                uiStore.colorScheme === "light"
+                uiStore.colorScheme === "dark"
                   ? {
                       backgroundColor: "#f4f4f5",
                     }

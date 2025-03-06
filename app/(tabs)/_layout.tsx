@@ -7,6 +7,7 @@ import {
   Image,
   View,
   LayoutAnimation,
+  Easing,
 } from "react-native";
 import Colors, { elementalColorMap } from "@/constants/Colors";
 import { BlurView } from "expo-blur";
@@ -43,6 +44,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import GenericModal from "@/components/GenericModal";
 
 export const TAB_SELECTION = 80;
+
+export const SCREEN_TRANSITION_TIMING = 200;
 
 const TabLayout = observer(() => {
   const isFocused = useIsFocused();
@@ -111,7 +114,7 @@ const TabLayout = observer(() => {
           {
             position: "absolute",
             zIndex: 9999,
-            top: uiStore.bottomBarHeight,
+            top: uiStore.dimensions.height - uiStore.bottomBarHeight,
             height: uiStore.playerStatusHeight,
             width: uiStore.isLandscape
               ? uiStore.dimensions.width * 0.75 - 16
@@ -127,7 +130,16 @@ const TabLayout = observer(() => {
               return (
                 <>
                   <PlayerStatusForHome />
-                  <LinearGradientBlur intensity={100} />
+                  <LinearGradientBlur
+                    intensity={100}
+                    style={{
+                      height:
+                        uiStore.tabHeight +
+                        (uiStore.playerStatusCompactHeight ?? 0),
+                      bottom: 0,
+                      position: "absolute",
+                    }}
+                  />
                 </>
               );
             },
@@ -352,7 +364,7 @@ const TabLayout = observer(() => {
                   color={color}
                 />
               ),
-              headerRight: !__DEV__
+              headerRight: __DEV__
                 ? () => (
                     <Link href="/Activities" asChild>
                       <Pressable onPress={() => vibration({ style: "light" })}>

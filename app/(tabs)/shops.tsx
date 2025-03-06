@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { CharacterImage } from "../../components/CharacterImage";
 import { router } from "expo-router";
@@ -123,6 +123,16 @@ const ShopsScreen = observer(() => {
     );
   };
 
+  const topViewStyle = useMemo(() => {
+    return {
+      paddingTop: headerHeight,
+      paddingBottom: uiStore.compactRoutePadding,
+    };
+  }, [
+    uiStore.playerStatusExpandedOnAllRoutes,
+    uiStore.playerStatusCompactHeight,
+  ]);
+
   return (
     <>
       <TutorialModal
@@ -139,12 +149,7 @@ const ShopsScreen = observer(() => {
       />
 
       {isReady ? (
-        <ScrollView
-          contentContainerStyle={{
-            paddingTop: headerHeight,
-            paddingBottom: uiStore.bottomBarHeight,
-          }}
-        >
+        <ScrollView contentContainerStyle={topViewStyle}>
           <View
             style={{
               flexDirection: "row",

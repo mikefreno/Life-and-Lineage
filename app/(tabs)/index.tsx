@@ -25,7 +25,6 @@ import type { Item } from "../../entities/item";
 import { Image } from "expo-image";
 import { StashDisplay } from "../../components/StashDisplay";
 import { normalize, useStyles } from "../../hooks/styles";
-import { LayoutAnimation } from "react-native";
 
 const HomeScreen = observer(() => {
   const { playerState, uiStore, stashStore } = useRootStore();
@@ -112,6 +111,17 @@ const HomeScreen = observer(() => {
     }, 100);
   }, [isFocused, measureAndSetStashBounds]);
 
+  const topViewStyle = useMemo(() => {
+    return {
+      flex: 1,
+      paddingTop: header,
+      paddingBottom: uiStore.compactRoutePadding,
+    };
+  }, [
+    uiStore.playerStatusExpandedOnAllRoutes,
+    uiStore.playerStatusCompactHeight,
+  ]);
+
   if (!playerState) {
     return (
       <ThemedView
@@ -141,13 +151,7 @@ const HomeScreen = observer(() => {
         clear={() => setShowStash(false)}
         showingStash={showStash}
       />
-      <View
-        style={{
-          flex: 1,
-          paddingTop: header,
-          paddingBottom: uiStore.bottomBarHeight + 4,
-        }}
-      >
+      <View style={topViewStyle}>
         <TouchableWithoutFeedback onPress={clearDisplayItem}>
           <View style={{ padding: 4 }}>
             <View

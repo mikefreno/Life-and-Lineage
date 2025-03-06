@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { Text } from "../../components/Themed";
 import {
   Pressable,

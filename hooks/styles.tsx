@@ -148,7 +148,7 @@ export const useStyles = () => {
     newGameContainer: {
       ...centeredContainer,
       justifyContent: "flex-start",
-      paddingHorizontal: 0.06 * width,
+      paddingHorizontal: 0.08 * width,
       paddingTop: 0.04 * height,
     } as const,
     newGameHeader: {
@@ -446,14 +446,9 @@ export const useStyles = () => {
 
     // ---- Main Tabs - Spells ---- //
     proficiencyContainer: {
-      marginVertical: normalize(4),
+      paddingVertical: normalize(4),
       paddingHorizontal: 32,
       width: "100%",
-    } as const,
-    noSpellsContainer: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
     } as const,
     spellContainer: {
       marginVertical: 4,

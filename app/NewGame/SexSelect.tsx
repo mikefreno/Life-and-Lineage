@@ -12,7 +12,6 @@ import { playerClassColors } from "../../constants/Colors";
 import { toTitleCase } from "../../utility/functions/misc";
 import { Foundation } from "@expo/vector-icons";
 import { useNewGameStore } from "./_layout";
-import { FadeSlide } from "../../components/AnimatedWrappers";
 import { tw, useStyles } from "../../hooks/styles";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
@@ -47,9 +46,14 @@ export default function SetSex() {
         }}
       />
       <View style={styles.newGameContainer}>
-        <Text style={[styles["text-2xl"], tw.px2, styles.newGameHeader]}>
+        <Text style={[tw.px2, styles.newGameHeader]}>
           Set the sex of your{" "}
-          <Text style={{ color: playerClassColors[classSelection] }}>
+          <Text
+            style={[
+              styles.newGameHeader,
+              { color: playerClassColors[classSelection] },
+            ]}
+          >
             {toTitleCase(classSelection)}
           </Text>
         </Text>
@@ -127,7 +131,10 @@ export default function SetSex() {
           </Pressable>
         </View>
         <GenericFlatButton
-          onPress={() => router.push("/NewGame/NameSelect")}
+          onPress={() => {
+            vibration({ style: "light" });
+            router.push("/NewGame/NameSelect");
+          }}
           accessibilityRole="link"
           accessibilityLabel="Next"
           disabled={!sex}
