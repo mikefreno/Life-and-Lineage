@@ -14,6 +14,8 @@ import GenericFlatButton from "../../components/GenericFlatButton";
 import { useRootStore } from "../../hooks/stores";
 import { useVibration } from "../../hooks/generic";
 import { flex, useStyles } from "../../hooks/styles";
+import { runInAction } from "mobx";
+import Colors from "@/constants/Colors";
 
 const themeOptions = ["system", "light", "dark"];
 const vibrationOptions = ["full", "minimal", "none"];
@@ -407,6 +409,26 @@ export const AppSettings = observer(() => {
           </View>
         </View>
       </ScrollView>
+      <Pressable
+        onPress={() => {
+          runInAction(() => (uiStore.webviewURL = "contact"));
+          router.push("/FrenoDotMeWebview");
+        }}
+        style={{ paddingBottom: uiStore.dimensions.height * 0.05 }}
+      >
+        <Text
+          style={[
+            styles["text-xl"],
+            {
+              color: Colors[uiStore.colorScheme].tabIconSelected,
+              textDecorationLine: "underline",
+              textAlign: "center",
+            },
+          ]}
+        >
+          Contact
+        </Text>
+      </Pressable>
     </>
   );
 });

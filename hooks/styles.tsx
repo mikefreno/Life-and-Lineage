@@ -288,7 +288,7 @@ export const useStyles = () => {
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
-      paddingHorizontal: 16,
+      padding: 16,
     } as const,
     healthWarningContainer: {
       marginTop: 12,
@@ -965,7 +965,7 @@ export const useStyles = () => {
       borderWidth: 1,
       borderColor: theme.border,
       backgroundColor: theme.background,
-      height: 48,
+      height: normalizeLineHeight(48),
       borderRadius: 5,
       shadowColor: theme.shadow,
       shadowOffset: { width: 0, height: 1 },
@@ -974,7 +974,7 @@ export const useStyles = () => {
       elevation: 2,
       paddingHorizontal: 4,
       marginBottom: 16,
-      width: 230,
+      width: normalize(230),
     } as const,
     authInput: {
       marginVertical: 24,
@@ -1064,7 +1064,8 @@ export const useStyles = () => {
       alignItems: "center",
       justifyContent: "space-between",
       width: "100%",
-      margin: 2,
+      paddingHorizontal: normalize(2),
+      paddingVertical: normalize(6),
       columnGap: 4,
     } as const,
     // ---- Relationships ---- //
@@ -1115,6 +1116,15 @@ export const useStyles = () => {
       marginBottom: -uiStore.playerStatusHeight,
       height: "70%",
     } as const,
+    // webview
+    webViewHeader: {
+      height: 50,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 10,
+      backgroundColor: theme.background,
+    },
   });
 };
 

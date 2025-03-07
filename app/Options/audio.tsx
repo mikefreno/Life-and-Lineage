@@ -3,11 +3,11 @@ import { useRootStore } from "../../hooks/stores";
 import { useStyles } from "../../hooks/styles";
 import { Text } from "../../components/Themed";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
-import { View, Switch } from "react-native";
+import { View, Switch, ScrollView } from "react-native";
 import Slider from "@react-native-community/slider";
 
 const AudioSettings = observer(() => {
-  const { audioStore } = useRootStore();
+  const { audioStore, uiStore } = useRootStore();
   const styles = useStyles();
 
   const renderSlider = (
@@ -29,9 +29,11 @@ const AudioSettings = observer(() => {
   );
 
   return (
-    <View style={[styles.p4, { flex: 1 }]}>
+    <ScrollView
+      contentContainerStyle={[styles.p4, { flex: 1, justifyContent: "center" }]}
+    >
       <GenericStrikeAround>Audio Settings</GenericStrikeAround>
-      <View style={{ flex: 1 }}>
+      <View style={{ paddingBottom: uiStore.dimensions.height * 0.1 }}>
         {renderSlider("Master Volume", "master", audioStore.masterVolume)}
         {renderSlider(
           "Ambient Music",
@@ -52,7 +54,7 @@ const AudioSettings = observer(() => {
           />
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 });
 

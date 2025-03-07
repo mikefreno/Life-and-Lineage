@@ -977,8 +977,8 @@ export const Dodge = ({
 );
 
 export const Winter = ({
-  primaryColor = "#D8DDE6",
-  secondaryColor = "#A5F2F3",
+  primaryColor = "#C5F2F3",
+  secondaryColor = "#D8DDE6",
   primaryOpacity = 1.0,
   secondaryOpacity = 0.8,
   ...props

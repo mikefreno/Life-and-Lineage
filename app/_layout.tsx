@@ -469,7 +469,23 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                   presentation:
                     uiStore.reduceMotion || uiStore.isLargeDevice
                       ? "card"
-                      : "fullScreenModal",
+                      : "modal",
+                  headerBackButtonMenuEnabled: false,
+                  headerBackTitleStyle: {
+                    fontFamily: "PixelifySans",
+                    fontSize: normalize(16),
+                  },
+                  headerTitleStyle: {
+                    fontFamily: "PixelifySans",
+                    fontSize: normalize(22),
+                  },
+                }}
+              />
+              <Stack.Screen
+                name="FrenoDotMeWebview"
+                options={{
+                  presentation: "modal",
+                  headerShown: false,
                   headerBackButtonMenuEnabled: false,
                   headerBackTitleStyle: {
                     fontFamily: "PixelifySans",

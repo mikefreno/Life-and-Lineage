@@ -66,7 +66,7 @@ const TabLayout = observer(() => {
         ? () => (
             <BlurView
               intensity={100}
-              style={StyleSheet.absoluteFill}
+              style={[StyleSheet.absoluteFill, styles.diffuse]}
               tint={uiStore.colorScheme}
             />
           )

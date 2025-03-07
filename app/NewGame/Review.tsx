@@ -150,6 +150,7 @@ export function StatAllocation({
   const [remainingPoints, setRemainingPoints] = useState(3);
   const [stats, setStats] = useState<BaseStats>(baseStats);
   const styles = useStyles();
+  const vibration = useVibration();
 
   const handleIncrement = (stat: StatKey) => {
     if (remainingPoints <= 0) return;
@@ -198,22 +199,28 @@ export function StatAllocation({
       </View>
       <View style={[styles.rowItemsCenter, { gap: 16 }]}>
         <Pressable
-          onPress={() => handleDecrement(stat)}
+          onPress={() => {
+            vibration({ style: "light", essential: true });
+            handleDecrement(stat);
+          }}
           disabled={stats[stat] <= baseStats[stat]}
         >
           <SquareMinus
-            height={normalize(20)}
-            width={normalize(20)}
+            height={normalize(26)}
+            width={normalize(26)}
             opacity={stats[stat] <= baseStats[stat] ? 0.2 : 1}
           />
         </Pressable>
         <Pressable
-          onPress={() => handleIncrement(stat)}
+          onPress={() => {
+            vibration({ style: "light", essential: true });
+            handleIncrement(stat);
+          }}
           disabled={remainingPoints <= 0}
         >
           <SquarePlus
-            height={normalize(20)}
-            width={normalize(20)}
+            height={normalize(26)}
+            width={normalize(26)}
             opacity={remainingPoints <= 0 ? 0.2 : 1}
           />
         </Pressable>
@@ -240,37 +247,37 @@ export function StatAllocation({
 
       <StatRow
         stat="baseHealth"
-        icon={<HealthIcon height={normalize(20)} width={normalize(23)} />}
+        icon={<HealthIcon height={normalize(26)} width={normalize(29)} />}
         value={stats.baseHealth}
       />
       <StatRow
         stat="baseMana"
-        icon={<Energy height={normalize(20)} width={normalize(23)} />}
+        icon={<Energy height={normalize(26)} width={normalize(29)} />}
         value={stats.baseMana}
       />
       <StatRow
         stat="baseSanity"
-        icon={<Sanity height={normalize(20)} width={normalize(23)} />}
+        icon={<Sanity height={normalize(26)} width={normalize(29)} />}
         value={stats.baseSanity}
       />
       <StatRow
         stat="baseStrength"
-        icon={<StrengthIcon height={normalize(20)} width={normalize(23)} />}
+        icon={<StrengthIcon height={normalize(26)} width={normalize(29)} />}
         value={stats.baseStrength}
       />
       <StatRow
         stat="baseIntelligence"
-        icon={<IntelligenceIcon height={normalize(20)} width={normalize(23)} />}
+        icon={<IntelligenceIcon height={normalize(26)} width={normalize(29)} />}
         value={stats.baseIntelligence}
       />
       <StatRow
         stat="baseDexterity"
-        icon={<DexterityIcon height={normalize(20)} width={normalize(23)} />}
+        icon={<DexterityIcon height={normalize(26)} width={normalize(29)} />}
         value={stats.baseDexterity}
       />
       <StatRow
         stat="baseManaRegen"
-        icon={<Regen height={normalize(20)} width={normalize(23)} />}
+        icon={<Regen height={normalize(26)} width={normalize(29)} />}
         value={stats.baseManaRegen}
       />
     </View>

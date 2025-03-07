@@ -19,8 +19,15 @@ import { ThemedView, Text } from "../../components/Themed";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { wait } from "../../utility/functions/misc";
 import { useRootStore } from "../../hooks/stores";
-import { tw, useStyles } from "../../hooks/styles";
-import { Colors } from "react-native/Libraries/NewAppScreen";
+import {
+  normalize,
+  normalizeLineHeight,
+  tw,
+  useStyles,
+} from "../../hooks/styles";
+import React from "react";
+import { runInAction } from "mobx";
+import Colors from "@/constants/Colors";
 
 const SignInScreen = observer(() => {
   const { authStore, uiStore } = useRootStore();
@@ -123,95 +130,130 @@ const SignInScreen = observer(() => {
       <D20DieAnimation keepRolling={true} />
     </ThemedView>
   ) : (
-    <ThemedView style={{ flex: 1 }}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-        keyboardVerticalOffset={header}
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <ThemedView style={{ flex: 1, ...styles.columnCenter }}>
-            <Pressable
-              onPress={handleGoogleSignIn}
-              style={styles.providerButton}
-            >
-              <Text style={[styles.xl, tw.pr1]}>Sign in with Google</Text>
-              <GoogleIcon height={20} width={20} />
-            </Pressable>
+    <>
+      <ThemedView style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={header}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <ThemedView style={{ flex: 1, ...styles.columnCenter }}>
+              <Pressable
+                onPress={handleGoogleSignIn}
+                style={styles.providerButton}
+              >
+                <Text style={[styles["text-xl"], tw.pr1]}>
+                  Sign in with Google
+                </Text>
+                <GoogleIcon height={20} width={20} />
+              </Pressable>
 
-            {Platform.OS == "ios" && (
-              <AppleAuthentication.AppleAuthenticationButton
-                buttonType={
-                  AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN
-                }
-                buttonStyle={
-                  uiStore.colorScheme == "dark"
-                    ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE
-                    : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
-                }
-                cornerRadius={5}
-                style={{ width: 230, height: 48 }}
-                onPress={handleAppleSignIn}
-              />
-            )}
+              {Platform.OS == "ios" && (
+                <AppleAuthentication.AppleAuthenticationButton
+                  buttonType={
+                    AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP
+                  }
+                  buttonStyle={
+                    uiStore.colorScheme == "dark"
+                      ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE
+                      : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+                  }
+                  cornerRadius={5}
+                  style={{
+                    width: normalize(230),
+                    height: normalizeLineHeight(48),
+                  }}
+                  onPress={handleAppleSignIn}
+                />
+              )}
 
-            <View style={{ width: "75%", ...styles.pt6, ...styles.pb16 }}>
-              {error && (
+              <View style={{ width: "75%", ...styles.pt6, ...styles.pb16 }}>
+                {error && (
+                  <Text
+                    style={{
+                      ...styles.textCenter,
+                      ...styles.px6,
+                      color: theme.error,
+                    }}
+                  >
+                    {error}
+                  </Text>
+                )}
                 <Text
                   style={{
                     ...styles.textCenter,
-                    ...styles.px6,
-                    color: theme.error,
+                    ...styles["text-3xl"],
+                    ...styles.pt4,
                   }}
                 >
-                  {error}
+                  Email Login
                 </Text>
-              )}
-              <Text
-                style={{
-                  ...styles.textCenter,
-                  ...styles["text-3xl"],
-                  ...styles.pt4,
-                }}
-              >
-                Email Login
-              </Text>
-              <TextInput
-                style={styles.authInput}
-                placeholderTextColor={theme.secondary}
-                autoComplete={"email"}
-                inputMode={"email"}
-                onChangeText={setEmailAddress}
-                placeholder={"Enter Email Address..."}
-                autoCorrect={false}
-                autoCapitalize={"none"}
-                value={emailAddress}
-              />
-              <TextInput
-                style={styles.authInput}
-                placeholderTextColor={theme.secondary}
-                onChangeText={setPassword}
-                placeholder={"Enter Password..."}
-                autoComplete={"current-password"}
-                autoCorrect={false}
-                autoCapitalize={"none"}
-                secureTextEntry
-                value={password}
-              />
-              <GenericRaisedButton
-                disabled={password.length == 0 || emailAddress.length == 0}
-                onPress={attemptLogin}
-                backgroundColor={theme.interactive}
-                textColor={theme.text}
-                style={{ height: 48 }}
-              >
-                Sign In
-              </GenericRaisedButton>
-            </View>
-          </ThemedView>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </ThemedView>
+                <TextInput
+                  style={styles.authInput}
+                  placeholderTextColor={theme.secondary}
+                  autoComplete={"email"}
+                  inputMode={"email"}
+                  onChangeText={setEmailAddress}
+                  placeholder={"Enter Email Address..."}
+                  autoCorrect={false}
+                  autoCapitalize={"none"}
+                  value={emailAddress}
+                />
+                <TextInput
+                  style={styles.authInput}
+                  placeholderTextColor={theme.secondary}
+                  onChangeText={setPassword}
+                  placeholder={"Enter Password..."}
+                  autoComplete={"current-password"}
+                  autoCorrect={false}
+                  autoCapitalize={"none"}
+                  secureTextEntry
+                  value={password}
+                />
+                <GenericRaisedButton
+                  disabled={password.length == 0 || emailAddress.length == 0}
+                  onPress={attemptLogin}
+                  backgroundColor={theme.interactive}
+                  textColor={theme.text}
+                >
+                  Sign In
+                </GenericRaisedButton>
+              </View>
+            </ThemedView>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </ThemedView>
+      <View
+        style={{
+          position: "absolute",
+          bottom: uiStore.dimensions.height * 0.05,
+          width: "100%",
+        }}
+      >
+        <Pressable
+          onPress={() => {
+            runInAction(
+              () => (uiStore.webviewURL = "privacy-policy/life-and-lineage"),
+            );
+            router.push("/FrenoDotMeWebview");
+          }}
+        >
+          <Text
+            style={[
+              styles["text-xl"],
+              {
+                color: Colors[uiStore.colorScheme].tabIconSelected,
+                textDecorationLine: "underline",
+                textAlign: "center",
+              },
+            ]}
+          >
+            Privacy Policy
+          </Text>
+        </Pressable>
+      </View>
+    </>
   );
 });
 

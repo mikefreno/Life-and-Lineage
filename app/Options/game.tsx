@@ -3,7 +3,7 @@ import { Text } from "../../components/Themed";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { toTitleCase, wait } from "../../utility/functions/misc";
-import { Pressable, Switch, View } from "react-native";
+import { Pressable, ScrollView, Switch, View } from "react-native";
 import GenericRaisedButton from "../../components/GenericRaisedButton";
 import GenericStrikeAround from "../../components/GenericStrikeAround";
 import GenericModal from "../../components/GenericModal";
@@ -120,59 +120,61 @@ export default function GameSettings() {
         onClose={() => setShowCheckpoints(false)}
       />
 
-      <View style={styles.gameSettingsContainer}>
-        <GenericStrikeAround>Game Saves</GenericStrikeAround>
-        <GenericRaisedButton onPress={() => setShowCheckpoints(true)}>
-          Manage Game Saves
-        </GenericRaisedButton>
+      <ScrollView>
+        <View style={styles.gameSettingsContainer}>
+          <GenericStrikeAround>Game Saves</GenericStrikeAround>
+          <GenericRaisedButton onPress={() => setShowCheckpoints(true)}>
+            Manage Game Saves
+          </GenericRaisedButton>
 
-        <GenericStrikeAround>Game Restart</GenericStrikeAround>
-        <GenericRaisedButton onPress={startNewGame}>
-          Start New Game
-        </GenericRaisedButton>
+          <GenericStrikeAround>Game Restart</GenericStrikeAround>
+          <GenericRaisedButton onPress={startNewGame}>
+            Start New Game
+          </GenericRaisedButton>
 
-        <GenericStrikeAround>Health Warning</GenericStrikeAround>
-        <View style={styles.healthWarningContainer}>
-          {healthWarningVals.map((item, idx) => (
-            <Pressable
-              key={idx}
-              style={styles.healthWarningOption}
-              onPress={() => healthWarningSetter(healthWarningKeys[idx])}
-            >
-              <View
-                style={[
-                  styles.optionCircle,
-                  selectedHealthWarning == healthWarningVals[idx] && {
-                    backgroundColor:
-                      uiStore.colorScheme === "dark" ? "#2563eb" : "#3b82f6",
-                  },
-                ]}
-              />
-              <Text style={styles["text-2xl"]}>{toTitleCase(item)}</Text>
-            </Pressable>
-          ))}
+          <GenericStrikeAround>Health Warning</GenericStrikeAround>
+          <View style={styles.healthWarningContainer}>
+            {healthWarningVals.map((item, idx) => (
+              <Pressable
+                key={idx}
+                style={styles.healthWarningOption}
+                onPress={() => healthWarningSetter(healthWarningKeys[idx])}
+              >
+                <View
+                  style={[
+                    styles.optionCircle,
+                    selectedHealthWarning == healthWarningVals[idx] && {
+                      backgroundColor:
+                        uiStore.colorScheme === "dark" ? "#2563eb" : "#3b82f6",
+                    },
+                  ]}
+                />
+                <Text style={styles["text-2xl"]}>{toTitleCase(item)}</Text>
+              </Pressable>
+            ))}
+          </View>
+
+          <GenericStrikeAround>Tutorials</GenericStrikeAround>
+          <View style={[styles.rowItemsCenter, styles.pt4]}>
+            <Text style={styles["text-lg"]}>Tutorials Enabled: </Text>
+            <Switch
+              trackColor={{ false: "#767577", true: "#3b82f6" }}
+              ios_backgroundColor="#3e3e3e"
+              thumbColor={"white"}
+              onValueChange={(bool) => setTutorialState(bool)}
+              value={tutorialState}
+            />
+          </View>
+          <GenericRaisedButton
+            onPress={() => {
+              vibration({ style: "light" });
+              setShowTutorialResetConfirm(true);
+            }}
+          >
+            Reset Tutorials
+          </GenericRaisedButton>
         </View>
-
-        <GenericStrikeAround>Tutorials</GenericStrikeAround>
-        <View style={[styles.rowItemsCenter, styles.pt4]}>
-          <Text style={styles["text-lg"]}>Tutorials Enabled: </Text>
-          <Switch
-            trackColor={{ false: "#767577", true: "#3b82f6" }}
-            ios_backgroundColor="#3e3e3e"
-            thumbColor={"white"}
-            onValueChange={(bool) => setTutorialState(bool)}
-            value={tutorialState}
-          />
-        </View>
-        <GenericRaisedButton
-          onPress={() => {
-            vibration({ style: "light" });
-            setShowTutorialResetConfirm(true);
-          }}
-        >
-          Reset Tutorials
-        </GenericRaisedButton>
-      </View>
+      </ScrollView>
     </>
   );
 }

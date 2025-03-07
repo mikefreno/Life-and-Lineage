@@ -20,7 +20,6 @@ import { Character } from "../entities/character";
 import * as Device from "expo-device";
 import { normalize, normalizeLineHeight } from "@/hooks/styles";
 import { TAB_SELECTION } from "@/app/(tabs)/_layout";
-import { debounce } from "lodash";
 
 export const LOADING_TIPS: string[] = [
   "Remember to check your equipment before entering a dungeon",
@@ -66,6 +65,12 @@ export default class UIStore {
 
   tabHeight = normalize(TAB_SELECTION);
   expansionPadding = normalizeLineHeight(20);
+
+  webviewURL:
+    | "privacy-policy/life-and-lineage"
+    | "contact"
+    | "marketing/life-and-lineage"
+    | null = null;
 
   playerStatusCompactHeight: number | undefined = undefined;
 
@@ -160,6 +165,7 @@ export default class UIStore {
       currentTipIndex: observable,
       showDevDebugUI: observable,
       playerStatusCompactHeight: observable,
+      webviewURL: observable,
 
       startTipCycle: action,
       completeLoading: action,
