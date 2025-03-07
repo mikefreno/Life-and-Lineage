@@ -91,30 +91,28 @@ const LaborScreen = observer(() => {
             Gain Qualifications
           </GenericFlatButton>
         </GenericModal>
-        <View>
-          <ScrollView
-            contentContainerStyle={{
-              paddingTop: headerHeight,
-              paddingBottom: uiStore.bottomBarHeight,
-              width: "90%",
-              marginHorizontal: "auto",
-            }}
-            scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
-          >
-            {sortedJobs.map(([key, jobData]) => (
-              <LaborTask
-                key={key}
-                title={jobData.title}
-                reward={jobData.reward.gold}
-                cost={jobData.cost}
-                experienceToPromote={jobData.experienceToPromote}
-                applyToJob={applyToJob}
-                focused={isFocused}
-                vibration={vibration}
-              />
-            ))}
-          </ScrollView>
-        </View>
+        <ScrollView
+          contentContainerStyle={{
+            paddingTop: headerHeight,
+            paddingBottom: uiStore.bottomBarHeight,
+            width: "90%",
+            marginHorizontal: "auto",
+          }}
+          scrollIndicatorInsets={{ top: 48, right: 0, left: 0, bottom: 48 }}
+        >
+          {sortedJobs.map(([key, jobData]) => (
+            <LaborTask
+              key={key}
+              title={jobData.title}
+              reward={jobData.reward.gold}
+              cost={jobData.cost}
+              experienceToPromote={jobData.experienceToPromote}
+              applyToJob={applyToJob}
+              focused={isFocused}
+              vibration={vibration}
+            />
+          ))}
+        </ScrollView>
       </>
     );
   }

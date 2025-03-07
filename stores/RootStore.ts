@@ -21,6 +21,7 @@ import { StashStore } from "./StashStore";
 import { SaveStore } from "./SaveStore";
 import { AudioStore } from "./AudioStore";
 import { PlayerAnimationStore } from "./PlayerAnimationStore";
+import { Platform } from "react-native";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -79,7 +80,11 @@ export class RootStore {
     this.shopsStore = new ShopStore({ root: this });
     this.uiStore.markStoreAsLoaded("shops");
 
-    this.audioStore = new AudioStore({ root: this });
+    if (Platform.OS == "ios") {
+      this.audioStore = new AudioStore({ root: this });
+    } else {
+      this.uiStore.markStoreAsLoaded("ambient");
+    }
     this.uiStore.markStoreAsLoaded("audio");
 
     this.characterStore = new CharacterStore({ root: this });

@@ -1,13 +1,8 @@
 import { useFonts } from "expo-font";
-import {
-  type RelativePathString,
-  Stack,
-  usePathname,
-  useRouter,
-} from "expo-router";
+import { Stack, usePathname, useRouter } from "expo-router";
 import React, { useEffect, useState, useRef } from "react";
 import { observer } from "mobx-react-lite";
-import { Animated, Platform, Pressable, View, StyleSheet } from "react-native";
+import { Platform, Pressable, View, StyleSheet } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { Text } from "../components/Themed";
 import * as Sentry from "@sentry/react-native";
@@ -16,11 +11,7 @@ import { toTitleCase, wait } from "../utility/functions/misc";
 import { API_BASE_URL } from "../config/config";
 import { SystemBars } from "react-native-edge-to-edge";
 import { DarkTheme, LightTheme } from "../constants/Colors";
-import {
-  Gesture,
-  GestureDetector,
-  GestureHandlerRootView,
-} from "react-native-gesture-handler";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import * as Notifications from "expo-notifications";
 import { registerForPushNotificationsAsync } from "../utility/functions/notifications";
 import { useRootStore } from "../hooks/stores";
@@ -43,15 +34,12 @@ import BoundsVisualizer from "@/components/BoundsVisualizer";
 import {
   configureReanimatedLogger,
   ReanimatedLogLevel,
-  runOnJS,
-  useSharedValue,
-  withSpring,
 } from "react-native-reanimated";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
-import { useVibration } from "@/hooks/generic";
 import { runInAction } from "mobx";
 import { SCREEN_TRANSITION_TIMING } from "./(tabs)/_layout";
+import PlatformDependantGestureWrapper from "@/components/PlatformDependantGestureWrapper";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -238,10 +226,9 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   useEffect(() => {
     const initializeApp = async () => {
       if (
-        fontLoaded &&
-        rootStore.constructed &&
-        firstLoad &&
-        audioStore.isAmbientLoaded
+        fontLoaded && rootStore.constructed && firstLoad && audioStore
+          ? audioStore.isAmbientLoaded
+          : true
       ) {
         uiStore.markStoreAsLoaded("fonts");
         handleRouting(playerState, rootStore, dungeonStore, pathname);
@@ -254,7 +241,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     fontLoaded,
     rootStore.constructed,
     firstLoad,
-    audioStore.isAmbientLoaded,
+    audioStore?.isAmbientLoaded,
   ]);
 
   useEffect(() => {
@@ -341,402 +328,334 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     }, SCREEN_TRANSITION_TIMING);
   }, [pathname]);
 
-  const vibration = useVibration();
-
-  const navigateToLeftTab = () => {
-    const currentIndex = tabRouteIndexing.indexOf(rootStore.pathname ?? "");
-    if (currentIndex === -1) {
-      return;
-    }
-    let leftIdx: number;
-    if (currentIndex === 0) {
-      leftIdx = tabRouteIndexing.length - 1;
-    } else {
-      leftIdx = currentIndex - 1;
-    }
-    const newTabString = tabRouteIndexing[leftIdx];
-    router.push(newTabString as RelativePathString);
-    vibration({ style: "light" });
-  };
-
-  const navigateToRightTab = () => {
-    const currentIndex = tabRouteIndexing.indexOf(rootStore.pathname ?? "");
-    if (currentIndex === -1) {
-      return;
-    }
-    let rightIdx: number;
-    if (currentIndex === tabRouteIndexing.length - 1) {
-      rightIdx = 0;
-    } else {
-      rightIdx = currentIndex + 1;
-    }
-    const newTabString = tabRouteIndexing[rightIdx];
-    router.push(newTabString as RelativePathString);
-    vibration({ style: "light" });
-  };
-
-  const startX = useSharedValue(0);
-  const offsetX = useSharedValue(0);
-
-  const swipeGesture = Gesture.Pan()
-    .onBegin(() => {
-      startX.value = 0;
-      offsetX.value = 0;
-    })
-    .onUpdate((event) => {
-      offsetX.value = event.translationX;
-    })
-    .onEnd((event) => {
-      "worklet";
-
-      if (
-        Math.abs(event.velocityX) > 350 &&
-        Math.abs(event.translationX) > 35
-      ) {
-        if (event.velocityX > 0) {
-          runOnJS(navigateToLeftTab)();
-        } else if (event.velocityX < 0) {
-          runOnJS(navigateToRightTab)();
-        }
-      }
-
-      offsetX.value = withSpring(0);
-    });
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <GestureDetector gesture={swipeGesture}>
-        <Animated.View style={{ flex: 1 }}>
-          <ThemeProvider
-            value={uiStore.colorScheme === "dark" ? DarkTheme : LightTheme}
+      <PlatformDependantGestureWrapper>
+        <ThemeProvider
+          value={uiStore.colorScheme === "dark" ? DarkTheme : LightTheme}
+        >
+          <SystemBars
+            style={uiStore.colorScheme == "dark" ? "light" : "dark"}
+          />
+          <ProjectedImage />
+          <FleeModal />
+          <BirthAnnouncementModal />
+          {__DEV__ && (
+            <>
+              <DevControls />
+              {uiStore.showDevDebugUI && <BoundsVisualizer />}
+            </>
+          )}
+          <Stack
+            screenOptions={{
+              animation: uiStore.reduceMotion ? "slide_from_bottom" : undefined,
+              animationDuration: 500,
+            }}
           >
-            <SystemBars
-              style={uiStore.colorScheme == "dark" ? "light" : "dark"}
-            />
-            <ProjectedImage />
-            <FleeModal />
-            <BirthAnnouncementModal />
-            {__DEV__ && (
-              <>
-                <DevControls />
-                {uiStore.showDevDebugUI && <BoundsVisualizer />}
-              </>
-            )}
-            <Stack
-              screenOptions={{
-                animation: uiStore.reduceMotion
-                  ? "slide_from_bottom"
-                  : undefined,
-                animationDuration: 500,
+            <Stack.Screen
+              name="NewGame"
+              options={{
+                headerShown: false,
+                presentation: "card",
+                animation: !playerState ? "fade" : undefined,
               }}
-            >
-              <Stack.Screen
-                name="NewGame"
-                options={{
-                  headerShown: false,
-                  presentation: "card",
-                  animation: !playerState ? "fade" : undefined,
-                }}
-              />
-              <Stack.Screen
-                name="(tabs)"
-                options={{
-                  headerShown: false,
-                }}
-              />
-              <Stack.Screen
-                name="Options"
-                options={{
-                  presentation:
-                    uiStore.reduceMotion || uiStore.isLargeDevice
-                      ? "card"
-                      : "modal",
-                  headerBackButtonDisplayMode: "minimal",
-                  headerBackButtonMenuEnabled: false,
-                  headerBackTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(16),
-                  },
-                  headerTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(22),
-                  },
-                }}
-              />
-              <Stack.Screen
-                name="Auth"
-                options={{
-                  presentation:
-                    uiStore.reduceMotion || uiStore.isLargeDevice
-                      ? "card"
-                      : "modal",
-                  headerBackButtonMenuEnabled: false,
-                  headerBackTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(16),
-                  },
-                  headerTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(22),
-                  },
-                }}
-              />
-              <Stack.Screen
-                name="FrenoDotMeWebview"
-                options={{
-                  presentation: "modal",
-                  headerShown: false,
-                  headerBackButtonMenuEnabled: false,
-                  headerBackTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(16),
-                  },
-                  headerTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(22),
-                  },
-                }}
-              />
-              <Stack.Screen
-                name="Relationships"
-                options={{
-                  headerBackButtonDisplayMode: "minimal",
-                  headerBackButtonMenuEnabled: false,
-                  headerBackTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(16),
-                  },
-                  headerTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(22),
-                  },
-                }}
-              />
-              <Stack.Screen
-                name="Study"
-                options={{
-                  headerTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(20),
-                  },
-                  headerBackButtonDisplayMode: "minimal",
-                  headerTransparent: true,
-                  headerBackground: () => (
-                    <BlurView
-                      blurReductionFactor={12}
-                      tint={
-                        Platform.OS == "android"
-                          ? uiStore.colorScheme == "light"
-                            ? "light"
-                            : "dark"
-                          : "default"
-                      }
-                      intensity={50}
-                      style={StyleSheet.absoluteFill}
-                    />
-                  ),
-                  title: "Magic Study",
-                }}
-              />
-              <Stack.Screen
-                name="Education"
-                options={{
-                  headerBackButtonMenuEnabled: false,
-                  headerBackButtonDisplayMode: "minimal",
-                  headerTransparent: true,
-                  headerBackTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(16),
-                  },
-                  headerTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(22),
-                  },
-                  headerBackground: () => (
-                    <BlurView
-                      blurReductionFactor={12}
-                      tint={
-                        Platform.OS == "android"
-                          ? uiStore.colorScheme == "light"
-                            ? "light"
-                            : "dark"
-                          : "default"
-                      }
-                      intensity={100}
-                      style={StyleSheet.absoluteFill}
-                      experimentalBlurMethod={"dimezisBlurView"}
-                    />
-                  ),
-                }}
-              />
-              <Stack.Screen
-                name="Activities"
-                options={{
-                  headerBackButtonMenuEnabled: false,
-                  headerBackButtonDisplayMode: "minimal",
-                  headerTransparent: true,
-                  headerBackTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(16),
-                  },
-                  headerTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(22),
-                  },
-                  headerBackground: () => (
-                    <BlurView
-                      blurReductionFactor={12}
-                      tint={
-                        Platform.OS == "android"
-                          ? uiStore.colorScheme == "light"
-                            ? "light"
-                            : "dark"
-                          : "default"
-                      }
-                      intensity={100}
-                      style={StyleSheet.absoluteFill}
-                      experimentalBlurMethod={"dimezisBlurView"}
-                    />
-                  ),
-                }}
-              />
-              <Stack.Screen
-                name="Investing"
-                options={{
-                  headerBackButtonMenuEnabled: false,
-                  headerBackButtonDisplayMode: "minimal",
-                  headerTransparent: true,
-                  headerBackTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(16),
-                  },
-                  headerTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(22),
-                  },
-                  headerBackground: () => (
-                    <BlurView
-                      blurReductionFactor={12}
-                      tint={
-                        Platform.OS == "android"
-                          ? uiStore.colorScheme == "light"
-                            ? "light"
-                            : "dark"
-                          : "default"
-                      }
-                      intensity={100}
-                      style={StyleSheet.absoluteFill}
-                      experimentalBlurMethod={"dimezisBlurView"}
-                    />
-                  ),
-                }}
-              />
-              <Stack.Screen
-                name="ShopInterior"
-                options={{
-                  title: toTitleCase(shopsStore.currentShop?.archetype),
-                  headerBackButtonMenuEnabled: false,
-                  headerBackButtonDisplayMode: "minimal",
-                  headerTransparent: true,
-                  headerBackTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(16),
-                  },
-                  headerTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(22),
-                  },
-                  headerBackground: () => (
-                    <BlurView
-                      blurReductionFactor={12}
-                      tint={
-                        Platform.OS == "android"
-                          ? uiStore.colorScheme == "light"
-                            ? "light"
-                            : "dark"
-                          : "default"
-                      }
-                      intensity={100}
-                      style={StyleSheet.absoluteFill}
-                      experimentalBlurMethod={"dimezisBlurView"}
-                    />
-                  ),
-                }}
-              />
-              <Stack.Screen
-                name="DungeonLevel"
-                options={{
-                  headerTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(20),
-                  },
-                  headerTransparent: true,
-                  headerBackground: () => (
-                    <BlurView
-                      blurReductionFactor={12}
-                      tint={
-                        Platform.OS == "android"
-                          ? uiStore.colorScheme == "light"
-                            ? "light"
-                            : "dark"
-                          : "default"
-                      }
-                      intensity={50}
-                      style={StyleSheet.absoluteFill}
-                    />
-                  ),
-                  headerLeft: () => (
-                    <Pressable
-                      onPress={() => {
-                        dungeonStore.setFleeModalShowing(true);
-                      }}
-                    >
-                      {({ pressed }) => (
-                        <MaterialCommunityIcons
-                          name="run-fast"
-                          size={28}
-                          color={
-                            uiStore.colorScheme == "light"
-                              ? "#18181b"
-                              : "#fafafa"
-                          }
-                          style={{
-                            opacity: pressed ? 0.5 : 1,
-                            marginRight: Platform.OS == "android" ? 8 : 0,
-                          }}
-                        />
-                      )}
-                    </Pressable>
-                  ),
-                  title:
-                    dungeonStore.currentInstance?.name.toLowerCase() ===
-                    "training grounds"
-                      ? "Training Grounds"
-                      : `${toTitleCase(
-                          dungeonStore.currentInstance?.name as string,
-                        )} Level ${dungeonStore.currentLevel?.level}`,
-                }}
-              />
-              <Stack.Screen
-                name="DeathScreen"
-                options={{
-                  title: "You Died",
-                  headerBackButtonDisplayMode: "minimal",
-                  headerBackButtonMenuEnabled: false,
-                  headerBackTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(16),
-                  },
-                  headerTitleStyle: {
-                    fontFamily: "PixelifySans",
-                    fontSize: normalize(22),
-                  },
-                }}
-              />
-            </Stack>
-          </ThemeProvider>
-        </Animated.View>
-      </GestureDetector>
+            />
+            <Stack.Screen
+              name="(tabs)"
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="Options"
+              options={{
+                presentation:
+                  uiStore.reduceMotion || uiStore.isLargeDevice
+                    ? "card"
+                    : "modal",
+                headerBackButtonDisplayMode: "minimal",
+                headerBackButtonMenuEnabled: false,
+                headerBackTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(16),
+                },
+                headerTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(22),
+                },
+              }}
+            />
+            <Stack.Screen
+              name="Auth"
+              options={{
+                presentation:
+                  uiStore.reduceMotion || uiStore.isLargeDevice
+                    ? "card"
+                    : "modal",
+                headerBackButtonMenuEnabled: false,
+                headerBackTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(16),
+                },
+                headerTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(22),
+                },
+              }}
+            />
+            <Stack.Screen
+              name="FrenoDotMeWebview"
+              options={{
+                presentation: "modal",
+                headerShown: false,
+                headerBackButtonMenuEnabled: false,
+                headerBackTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(16),
+                },
+                headerTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(22),
+                },
+              }}
+            />
+            <Stack.Screen
+              name="Relationships"
+              options={{
+                headerBackButtonDisplayMode: "minimal",
+                headerBackButtonMenuEnabled: false,
+                headerBackTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(16),
+                },
+                headerTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(22),
+                },
+              }}
+            />
+            <Stack.Screen
+              name="Study"
+              options={{
+                headerTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(20),
+                },
+                headerBackButtonDisplayMode: "minimal",
+                headerTransparent: true,
+                headerBackground: () => (
+                  <BlurView
+                    blurReductionFactor={12}
+                    tint={
+                      Platform.OS == "android"
+                        ? uiStore.colorScheme == "light"
+                          ? "light"
+                          : "dark"
+                        : "default"
+                    }
+                    intensity={50}
+                    style={StyleSheet.absoluteFill}
+                  />
+                ),
+                title: "Magic Study",
+              }}
+            />
+            <Stack.Screen
+              name="Education"
+              options={{
+                headerBackButtonMenuEnabled: false,
+                headerBackButtonDisplayMode: "minimal",
+                headerTransparent: true,
+                headerBackTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(16),
+                },
+                headerTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(22),
+                },
+                headerBackground: () => (
+                  <BlurView
+                    blurReductionFactor={12}
+                    tint={
+                      Platform.OS == "android"
+                        ? uiStore.colorScheme == "light"
+                          ? "light"
+                          : "dark"
+                        : "default"
+                    }
+                    intensity={100}
+                    style={StyleSheet.absoluteFill}
+                    experimentalBlurMethod={"dimezisBlurView"}
+                  />
+                ),
+              }}
+            />
+            <Stack.Screen
+              name="Activities"
+              options={{
+                headerBackButtonMenuEnabled: false,
+                headerBackButtonDisplayMode: "minimal",
+                headerTransparent: true,
+                headerBackTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(16),
+                },
+                headerTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(22),
+                },
+                headerBackground: () => (
+                  <BlurView
+                    blurReductionFactor={12}
+                    tint={
+                      Platform.OS == "android"
+                        ? uiStore.colorScheme == "light"
+                          ? "light"
+                          : "dark"
+                        : "default"
+                    }
+                    intensity={100}
+                    style={StyleSheet.absoluteFill}
+                    experimentalBlurMethod={"dimezisBlurView"}
+                  />
+                ),
+              }}
+            />
+            <Stack.Screen
+              name="Investing"
+              options={{
+                headerBackButtonMenuEnabled: false,
+                headerBackButtonDisplayMode: "minimal",
+                headerTransparent: true,
+                headerBackTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(16),
+                },
+                headerTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(22),
+                },
+                headerBackground: () => (
+                  <BlurView
+                    blurReductionFactor={12}
+                    tint={
+                      Platform.OS == "android"
+                        ? uiStore.colorScheme == "light"
+                          ? "light"
+                          : "dark"
+                        : "default"
+                    }
+                    intensity={100}
+                    style={StyleSheet.absoluteFill}
+                    experimentalBlurMethod={"dimezisBlurView"}
+                  />
+                ),
+              }}
+            />
+            <Stack.Screen
+              name="ShopInterior"
+              options={{
+                title: toTitleCase(shopsStore.currentShop?.archetype),
+                headerBackButtonMenuEnabled: false,
+                headerBackButtonDisplayMode: "minimal",
+                headerTransparent: true,
+                headerBackTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(16),
+                },
+                headerTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(22),
+                },
+                headerBackground: () => (
+                  <BlurView
+                    blurReductionFactor={12}
+                    tint={
+                      Platform.OS == "android"
+                        ? uiStore.colorScheme == "light"
+                          ? "light"
+                          : "dark"
+                        : "default"
+                    }
+                    intensity={100}
+                    style={StyleSheet.absoluteFill}
+                    experimentalBlurMethod={"dimezisBlurView"}
+                  />
+                ),
+              }}
+            />
+            <Stack.Screen
+              name="DungeonLevel"
+              options={{
+                headerTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(20),
+                },
+                headerTransparent: true,
+                headerBackground: () => (
+                  <BlurView
+                    blurReductionFactor={12}
+                    tint={
+                      Platform.OS == "android"
+                        ? uiStore.colorScheme == "light"
+                          ? "light"
+                          : "dark"
+                        : "default"
+                    }
+                    intensity={50}
+                    style={StyleSheet.absoluteFill}
+                  />
+                ),
+                headerLeft: () => (
+                  <Pressable
+                    onPress={() => {
+                      dungeonStore.setFleeModalShowing(true);
+                    }}
+                  >
+                    {({ pressed }) => (
+                      <MaterialCommunityIcons
+                        name="run-fast"
+                        size={28}
+                        color={
+                          uiStore.colorScheme == "light" ? "#18181b" : "#fafafa"
+                        }
+                        style={{
+                          opacity: pressed ? 0.5 : 1,
+                          marginRight: Platform.OS == "android" ? 8 : 0,
+                        }}
+                      />
+                    )}
+                  </Pressable>
+                ),
+                title:
+                  dungeonStore.currentInstance?.name.toLowerCase() ===
+                  "training grounds"
+                    ? "Training Grounds"
+                    : `${toTitleCase(
+                        dungeonStore.currentInstance?.name as string,
+                      )} Level ${dungeonStore.currentLevel?.level}`,
+              }}
+            />
+            <Stack.Screen
+              name="DeathScreen"
+              options={{
+                title: "You Died",
+                headerBackButtonDisplayMode: "minimal",
+                headerBackButtonMenuEnabled: false,
+                headerBackTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(16),
+                },
+                headerTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(22),
+                },
+              }}
+            />
+          </Stack>
+        </ThemeProvider>
+      </PlatformDependantGestureWrapper>
     </GestureHandlerRootView>
   );
 });

@@ -134,7 +134,6 @@ export const useStyles = () => {
     } as const,
     centeredContainer,
     cardTitle: {
-      fontWeight: "700",
       marginVertical: "auto",
       width: "60%",
       ...text["text-xl"],

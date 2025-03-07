@@ -2,14 +2,11 @@ import { makeAutoObservable, makeObservable } from "mobx";
 import { jwtDecode } from "jwt-decode";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { parseInt } from "lodash";
 import { Platform } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
-import { parse, stringify } from "flatted";
 import { storage } from "../utility/functions/storage";
 import google_config from "../config/google_config";
 import { API_BASE_URL } from "../config/config";
-import { serializeJobs } from "../entities/character";
 import type { RootStore } from "./RootStore";
 
 type EmailLogin = {
@@ -111,8 +108,8 @@ export class AuthStore {
     });
 
     NetInfo.addEventListener((state) => {
-      this.setIsConnected(!!state.isConnected);
-      if (state.isConnected) {
+      this.setIsConnected(!!state.isInternetReachable);
+      if (state.isInternetReachable) {
         this.initializeAuth();
       }
     });

@@ -414,7 +414,7 @@ export const AppSettings = observer(() => {
           runInAction(() => (uiStore.webviewURL = "contact"));
           router.push("/FrenoDotMeWebview");
         }}
-        style={{ paddingBottom: uiStore.dimensions.height * 0.05 }}
+        style={{ paddingVertical: uiStore.dimensions.height * 0.02 }}
       >
         <Text
           style={[
