@@ -3,6 +3,13 @@ import { RootStore } from "./RootStore";
 import { storage } from "../utility/functions/storage";
 import { parse, stringify } from "flatted";
 
+export enum Season {
+  WINTER = "winter",
+  SPRING = "spring",
+  SUMMER = "summer",
+  AUTUMN = "autumn",
+}
+
 export class TimeStore {
   week: number;
   year: number;
@@ -20,6 +27,7 @@ export class TimeStore {
       week: observable,
       year: observable,
       tick: action,
+      currentMonth: computed,
       devSetter: action,
       currentDate: computed,
       fromCheckpointData: action,
@@ -69,6 +77,48 @@ export class TimeStore {
 
   get currentDate() {
     return { year: this.year, week: this.week };
+  }
+
+  get currentMonth(): string {
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    const monthStartWeeks = [0, 4, 9, 13, 17, 22, 26, 30, 35, 39, 43, 48];
+
+    let monthIndex = 0;
+    for (let i = 1; i < monthStartWeeks.length; i++) {
+      if (this.week >= monthStartWeeks[i]) {
+        monthIndex = i;
+      } else {
+        break;
+      }
+    }
+
+    return months[monthIndex];
+  }
+
+  get currentSeason() {
+    if (this.week >= 9 && this.week <= 21) {
+      return Season.SPRING;
+    } else if (this.week >= 22 && this.week <= 34) {
+      return Season.SUMMER;
+    } else if (this.week >= 35 && this.week <= 47) {
+      return Season.AUTUMN;
+    } else {
+      return Season.WINTER;
+    }
   }
 
   generateBirthDateInRange(minAge: number, maxAge: number) {

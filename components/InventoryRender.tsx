@@ -376,16 +376,13 @@ const InventoryRender = observer(
         >
           {/* Regular Inventory Panel */}
           <View style={{ width: uiStore.dimensions.width }}>
-            {playerState.keyItems.length > 0 && (
-              <View
-                style={[
-                  styles.keyItemsText,
-                  { width: uiStore.dimensions.width },
-                ]}
-              >
-                <Text style={styles["text-3xl"]}>Inventory</Text>
-              </View>
-            )}
+            <View
+              style={[styles.keyItemsText, { width: uiStore.dimensions.width }]}
+            >
+              <Text style={[styles["text-3xl"], { opacity: 0.3 }]}>
+                Inventory
+              </Text>
+            </View>
             <Pressable
               onPress={() => setDisplayItem(null)}
               style={styles.inventoryPanel}
@@ -404,7 +401,9 @@ const InventoryRender = observer(
                   { width: uiStore.dimensions.width },
                 ]}
               >
-                <Text style={styles["text-3xl"]}>Key Items</Text>
+                <Text style={[styles["text-3xl"], { opacity: 0.3 }]}>
+                  Key Items
+                </Text>
               </View>
               <Pressable
                 onPress={() => setDisplayItem(null)}

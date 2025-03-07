@@ -350,40 +350,12 @@ export const useStyles = () => {
       width: normalize(80),
       paddingHorizontal: 16,
     } as const,
-    equipmentContainer: {
-      paddingBottom: 8,
-      marginVertical: "auto",
-      zIndex: 10,
-    } as const,
-    equipmentTopRow: {
-      ...flex.rowBetween,
-      alignItems: "center",
-      width: "100%",
-    } as const,
-    equipmentMiddleRow: {
-      ...flex.rowEvenly,
-      marginTop: -12,
-    } as const,
     equipmentSlotContainer: {
       zIndex: 50,
-      marginHorizontal: "auto",
       borderWidth: 1,
       borderColor: "#a1a1aa",
-      borderRadius: 8,
-    } as const,
-    twoHandedSlot: {
-      marginHorizontal: "auto",
-      zIndex: 10,
-      alignItems: "center",
-      borderRadius: 8,
-      borderWidth: 1,
-      borderColor: "#a1a1aa",
-    } as const,
-    emptySlot: {
-      marginHorizontal: "auto",
-      borderRadius: 8,
-      borderWidth: 1,
-      borderColor: "#a1a1aa",
+      borderRadius: normalize(8),
+      alignSelf: "center",
     } as const,
     // ---- Inventory ---- //
     inventoryPanel: {
@@ -402,7 +374,7 @@ export const useStyles = () => {
       top: "40%",
     } as const,
     slotBackground: {
-      borderRadius: 8,
+      borderRadius: normalize(8),
       borderWidth: 1,
       borderColor: theme.secondary,
       zIndex: 0,
@@ -422,8 +394,9 @@ export const useStyles = () => {
 
     inventoryItemContainer: {
       alignItems: "center",
+      borderWidth: 0,
       justifyContent: "center",
-      borderRadius: 8,
+      borderRadius: normalize(8),
       backgroundColor: "#a1a1aa",
       zIndex: 10,
     } as const,

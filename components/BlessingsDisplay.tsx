@@ -29,9 +29,9 @@ export default function BlessingDisplay({
 }: BlessingDisplayProps) {
   switch (blessing) {
     case Element.fire:
-      return <Fire height={size} width={size} />;
+      return <Fire height={size} width={size * 0.75} />;
     case Element.water:
-      return <Water height={size} width={size} />;
+      return <Water height={size} width={size * 1.125} />;
     case Element.air:
       return <Air height={size} width={size} />;
     case Element.earth:
@@ -43,16 +43,16 @@ export default function BlessingDisplay({
     case Element.vengeance:
       return <Vengeance height={size} width={size} />;
     case Element.blood:
-      return <BloodDrop height={size} width={size} />;
+      return <BloodDrop height={size} width={size * 0.75} />;
     case Element.bone:
-      return <Bones height={size} width={size} />;
+      return <Bones height={size} width={size * 0.75} />;
     case Element.summoning:
-      return <SummonerSkull height={size} width={size} />;
+      return <SummonerSkull height={size} width={size * 1.125} />;
     case Element.pestilence:
       return (
         <Pestilence
           height={size}
-          width={size}
+          width={size * 1.125}
           color={colorScheme == "dark" ? "#84cc16" : "#65a30d"}
         />
       );
@@ -69,6 +69,6 @@ export default function BlessingDisplay({
     case Element.arcane:
       return <ArcaneIcon height={size} width={size} />;
     default:
-      return <Fire height={size} width={size} />;
+      return <Fire height={size} width={size * 0.75} />;
   }
 }

@@ -121,7 +121,9 @@ const SpellsScreen = observer(() => {
       <View style={topViewStyle}>
         {playerState?.spells && playerState.spells.length > 0 ? (
           <>
-            <GenericStrikeAround>Known Spells</GenericStrikeAround>
+            <GenericStrikeAround containerStyles={{ paddingHorizontal: 8 }}>
+              Known Spells
+            </GenericStrikeAround>
             <ScrollView
               contentContainerStyle={{
                 flexGrow: 1,
@@ -157,9 +159,9 @@ const SpellsScreen = observer(() => {
           </View>
         )}
         <View>
-          <View style={{ paddingHorizontal: 8 }}>
-            <GenericStrikeAround>Proficiencies</GenericStrikeAround>
-          </View>
+          <GenericStrikeAround containerStyles={{ paddingHorizontal: 8 }}>
+            Proficiencies
+          </GenericStrikeAround>
           <View
             style={[
               styles.columnEvenly,

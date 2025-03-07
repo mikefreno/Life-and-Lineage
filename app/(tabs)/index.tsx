@@ -8,14 +8,7 @@ import TutorialModal from "../../components/TutorialModal";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useHeaderHeight } from "@react-navigation/elements";
 import InventoryRender from "../../components/InventoryRender";
-import {
-  NecromancerSkull,
-  PaladinHammer,
-  RangerIcon,
-  WizardHat,
-} from "../../assets/icons/SVGIcons";
 import "expo-router/entry";
-import BlessingDisplay from "../../components/BlessingsDisplay";
 import { StatsDisplay } from "../../components/StatsDisplay";
 import EquipmentDisplay from "../../components/EquipmentDisplay";
 import { TutorialOption } from "../../utility/types";
@@ -25,9 +18,11 @@ import type { Item } from "../../entities/item";
 import { Image } from "expo-image";
 import { StashDisplay } from "../../components/StashDisplay";
 import { normalize, useStyles } from "../../hooks/styles";
+import { useVibration } from "@/hooks/generic";
+import SeasonDisplay from "@/components/SeasonDisplay";
 
 const HomeScreen = observer(() => {
-  const { playerState, uiStore, stashStore } = useRootStore();
+  const { playerState, uiStore, stashStore, time } = useRootStore();
   const { draggableClassStore } = useDraggableStore();
   const [showStash, setShowStash] = useState(false);
   const stashButtonRef = useRef<View>(null);
@@ -42,41 +37,9 @@ const HomeScreen = observer(() => {
   const tabBarHeight = useBottomTabBarHeight() + 10;
   const header = useHeaderHeight();
   const isFocused = useIsFocused();
+  const vibration = useVibration();
 
   const clearDisplayItem = useCallback(() => setDisplayItem(null), []);
-
-  const playerIcon = useMemo(() => {
-    const iconSize =
-      uiStore.dimensions.height / 9 > 100
-        ? 100
-        : uiStore.dimensions.height / 10;
-    switch (playerState?.playerClass) {
-      case "necromancer":
-        return (
-          <NecromancerSkull
-            width={iconSize}
-            height={iconSize}
-            color={uiStore.colorScheme === "dark" ? "#9333ea" : "#6b21a8"}
-          />
-        );
-      case "paladin":
-        return <PaladinHammer width={iconSize} height={iconSize} />;
-      case "mage":
-        return (
-          <WizardHat
-            width={iconSize}
-            height={iconSize}
-            color={uiStore.colorScheme === "dark" ? "#2563eb" : "#1e40af"}
-          />
-        );
-      default:
-        return <RangerIcon width={iconSize} height={iconSize} />;
-    }
-  }, [
-    playerState?.playerClass,
-    uiStore.dimensions.height,
-    uiStore.colorScheme,
-  ]);
 
   useEffect(() => {
     if (isFocused) {
@@ -153,56 +116,43 @@ const HomeScreen = observer(() => {
       />
       <View style={topViewStyle}>
         <TouchableWithoutFeedback onPress={clearDisplayItem}>
-          <View style={{ padding: 4 }}>
+          <View
+            style={{
+              width: "90%",
+              alignSelf: "center",
+              alignItems: "center",
+              paddingVertical: normalize(4),
+              ...styles.rowBetween,
+            }}
+          >
+            <View style={{ flex: 1 }}>
+              <Text style={[styles["text-lg"], { textAlign: "center" }]}>
+                {`It is ${time.currentMonth}\n of the year ${time.year}`}
+              </Text>
+            </View>
+
             <View
-              style={{
-                flexDirection: "row",
-              }}
+              style={{ flex: 1, alignItems: "center", marginHorizontal: 8 }}
             >
-              <View style={{ marginHorizontal: "auto" }}>{playerIcon}</View>
-              <View
+              <SeasonDisplay
+                season={time.currentSeason}
+                size={uiStore.dimensions.height / 12}
+              />
+              <Text style={{ textAlign: "center" }}>
+                It is currently {time.currentSeason}
+              </Text>
+            </View>
+
+            <View style={{ flex: 1 }}>
+              <Text
                 style={{
-                  flex: 1,
-                  justifyContent: "center",
+                  textAlign: "center",
+                  color: isDark ? "white" : "black",
+                  ...styles["text-xl"],
                 }}
               >
-                <Text
-                  style={{
-                    textAlign: "center",
-                    color: isDark ? "white" : "black",
-                    ...styles["text-xl"],
-                  }}
-                >
-                  {playerState.fullName}
-                </Text>
-                <Text
-                  style={{
-                    textAlign: "center",
-                    color: isDark ? "white" : "black",
-                    ...styles["text-xl"],
-                  }}
-                >
-                  {playerState.job}
-                </Text>
-                <Text
-                  style={{
-                    textAlign: "center",
-                    color: isDark ? "white" : "black",
-                    ...styles["text-xl"],
-                  }}
-                >{`${playerState.age} years old`}</Text>
-              </View>
-              <View style={{ marginHorizontal: "auto" }}>
-                <BlessingDisplay
-                  blessing={playerState.blessing}
-                  colorScheme={uiStore.colorScheme}
-                  size={
-                    uiStore.dimensions.height / 9 > 100
-                      ? 100
-                      : uiStore.dimensions.height / 10
-                  }
-                />
-              </View>
+                {`You are\n${playerState.age} years old`}
+              </Text>
             </View>
           </View>
         </TouchableWithoutFeedback>
@@ -215,7 +165,10 @@ const HomeScreen = observer(() => {
             <Pressable
               ref={stashButtonRef}
               onLayout={setStashBoundsOnLayout}
-              onPress={() => setShowStash(true)}
+              onPress={() => {
+                vibration({ style: "light" });
+                setShowStash(true);
+              }}
               style={[styles.stashButton, { paddingBottom: normalize(4) }]}
             >
               <Image

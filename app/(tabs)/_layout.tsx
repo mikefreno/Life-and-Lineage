@@ -7,7 +7,6 @@ import {
   Image,
   View,
   LayoutAnimation,
-  Easing,
 } from "react-native";
 import Colors, { elementalColorMap } from "@/constants/Colors";
 import { BlurView } from "expo-blur";

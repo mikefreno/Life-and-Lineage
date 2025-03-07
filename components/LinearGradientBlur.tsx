@@ -62,7 +62,7 @@ export const LinearGradientBlur = observer(
               <View
                 style={[
                   StyleSheet.absoluteFill,
-                  uiStore.colorScheme === "dark"
+                  uiStore.colorScheme === "light"
                     ? {
                         backgroundColor: "#f4f4f5",
                       }

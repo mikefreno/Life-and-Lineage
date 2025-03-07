@@ -1,8 +1,8 @@
 import GenericModal from "@/components/GenericModal";
 import { useRootStore } from "@/hooks/stores";
-import { useStyles } from "@/hooks/styles";
+import { normalize, useStyles } from "@/hooks/styles";
 import { Pressable, View } from "react-native";
-import { Text } from "../Themed";
+import { Text } from "@/components/Themed";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -17,12 +17,17 @@ import {
   RenderPrimaryStatsBlock,
   RenderSecondaryStatsBlock,
   StatCategory,
-} from "./Components";
-import GenericStrikeAround from "../GenericStrikeAround";
+} from "@/components/PlayerStatus/Components";
+import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { Attribute, Modifier } from "@/utility/types";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { DEFENSIVE_STATS, OFFENSIVE_STATS } from "@/utility/functions/stats";
 import { observer } from "mobx-react-lite";
+import BlessingDisplay from "@/components/BlessingsDisplay";
+import React from "react";
+import ClassDisplay from "@/components/ClassDisplay";
+import { toTitleCase } from "@/utility/functions/misc";
+import { playerClassColors } from "@/constants/Colors";
 
 export const PlayerStatusModal = observer(() => {
   const { uiStore, playerState } = useRootStore();
@@ -70,6 +75,63 @@ export const PlayerStatusModal = observer(() => {
     };
   });
 
+  const ClassNode = useMemo(() => {
+    const iconSize = uiStore.dimensions.width / 10;
+
+    if (playerState) {
+      return (
+        <View style={{ flex: 1 }}>
+          <View style={{ alignSelf: "center", flexDirection: "row" }}>
+            <ClassDisplay
+              colorScheme={uiStore.colorScheme}
+              playerClass={playerState?.playerClass}
+              size={iconSize}
+            />
+            <View
+              style={{
+                width: normalize(20),
+                height: iconSize,
+                justifyContent: "center",
+                alignItems: "center",
+                marginHorizontal: 0,
+              }}
+            >
+              <View
+                style={{
+                  width: normalize(4),
+                  borderRadius: 5,
+                  height: iconSize * 1.2,
+                  backgroundColor:
+                    uiStore.colorScheme === "dark" ? "#ffffff50" : "#00000050",
+                  transform: [{ rotate: "20deg" }],
+                }}
+              />
+            </View>
+            <BlessingDisplay
+              blessing={playerState.blessing}
+              colorScheme={uiStore.colorScheme}
+              size={iconSize}
+            />
+          </View>
+          <Text
+            style={{
+              textAlign: "center",
+              color: playerClassColors[playerState.playerClass],
+            }}
+          >
+            {toTitleCase(playerState.playerClass)}
+          </Text>
+        </View>
+      );
+    } else {
+      return <></>;
+    }
+  }, [
+    playerState?.playerClass,
+    uiStore.dimensions.height,
+    uiStore.colorScheme,
+  ]);
+
   useEffect(() => {
     if (!playerState?.equipmentStats) return;
 
@@ -113,18 +175,19 @@ export const PlayerStatusModal = observer(() => {
             ...styles.rowBetween,
           }}
         >
+          {ClassNode}
+          <View style={[styles.columnCenter, { flex: 1 }]}>
+            <Text style={[styles["text-xl"], { textAlign: "center" }]}>
+              {playerState.fullName}
+            </Text>
+            <Text style={{ textAlign: "center" }}>{playerState.job}</Text>
+          </View>
           <View style={[styles.columnCenter, { flex: 1 }]}>
             <View style={{ marginLeft: -16, flexDirection: "row" }}>
               <Text>{playerState.readableGold}</Text>
               <Coins width={16} height={16} style={{ marginLeft: 6 }} />
             </View>
           </View>
-          <View style={[styles.columnCenter, { flex: 1 }]}>
-            <Text style={[styles["text-xl"], { textAlign: "center" }]}>
-              {playerState.fullName}
-            </Text>
-          </View>
-          <View style={{ flex: 1 }} />
         </View>
 
         {playerState.unAllocatedSkillPoints > 0 && (
