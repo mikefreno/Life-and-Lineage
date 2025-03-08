@@ -1,4 +1,4 @@
-import { Pressable, View } from "react-native";
+import { Dimensions, Platform, Pressable, View } from "react-native";
 import { Text } from "./Themed";
 import { ItemClassType, Modifier } from "../utility/types";
 import { useState } from "react";
@@ -89,6 +89,9 @@ export default function GearStatsDisplay({ item }: { item: Item }) {
       <GenericModal
         isVisibleCondition={showingDetailedView}
         backFunction={() => setShowingDetailedView(false)}
+        providedHeight={
+          Platform.OS === "android" ? uiStore.dimensions.height : undefined
+        }
       >
         <View style={{ paddingHorizontal: 16 }}>
           <View style={[styles.rowBetween, { paddingBottom: 12 }]}>

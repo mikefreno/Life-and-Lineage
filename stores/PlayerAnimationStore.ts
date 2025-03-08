@@ -1,6 +1,14 @@
 import { RootStore } from "./RootStore";
-import { action, makeObservable, observable } from "mobx";
+import {
+  action,
+  makeObservable,
+  observable,
+  reaction,
+  runInAction,
+} from "mobx";
 import { PlayerAnimationSet } from "@/utility/types";
+
+const PLAYER_TEXT_STRING_DURATION = 3000;
 
 export class PlayerAnimationStore {
   root: RootStore;
@@ -11,14 +19,43 @@ export class PlayerAnimationStore {
   animationEndCallBack: (() => void) | null = null;
   animationPromiseResolver: (() => void) | null = null;
 
+  textString: string | undefined = undefined;
+
+  playerOrigin: { x: number; y: number };
+
   constructor({ root }: { root: RootStore }) {
     this.root = root;
 
+    this.playerOrigin = {
+      x: root.uiStore.dimensions.width / 4,
+      y: root.uiStore.dimensions.height / 2,
+    };
+
     makeObservable(this, {
       animationSet: observable,
+      playerOrigin: observable,
+      textString: observable,
+
       setAnimation: action,
       clearAnimation: action,
+      setTextString: action,
     });
+
+    reaction(
+      () => this.textString,
+      () => {
+        if (this.textString) {
+          setTimeout(
+            () => runInAction(() => (this.textString = undefined)),
+            PLAYER_TEXT_STRING_DURATION,
+          );
+        }
+      },
+    );
+  }
+
+  setTextString(message: string) {
+    this.textString = message;
   }
 
   setAnimation(set: PlayerAnimationSet, enemyID: string): Promise<void> {

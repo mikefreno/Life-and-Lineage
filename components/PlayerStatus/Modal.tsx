@@ -282,24 +282,14 @@ export const PlayerStatusModal = observer(() => {
                 ),
               }}
             >
-              <View style={[styles.equipmentStatsSection]}>
-                <Text
-                  style={[
-                    styles.bold,
-                    { textAlign: "center", marginBottom: 4 },
-                  ]}
-                >
+              <View style={styles.equipmentStatsSection}>
+                <Text style={[{ textAlign: "center", marginBottom: 4 }]}>
                   Offensive
                 </Text>
                 <StatCategory stats={ownedOffensive} category={"offensive"} />
               </View>
-              <View style={[styles.equipmentStatsSection]}>
-                <Text
-                  style={[
-                    styles.bold,
-                    { textAlign: "center", marginBottom: 4 },
-                  ]}
-                >
+              <View style={styles.equipmentStatsSection}>
+                <Text style={{ textAlign: "center", marginBottom: 4 }}>
                   Defensive
                 </Text>
                 <StatCategory stats={ownedDefensive} category={"defensive"} />

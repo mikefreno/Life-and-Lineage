@@ -123,7 +123,6 @@ const BattleTab = observer(
 
     const attackHandler = (attackOrSpell: Attack | Spell) => {
       if (enemyStore.enemies.length > 0) {
-        enemyStore.setAttackAnimationOngoing(true);
         vibration({ style: "light" });
         const enoughForDualToHitAll =
           enemyStore.enemies.length > 1 ||
@@ -335,7 +334,7 @@ const BattleTab = observer(
                         <Pressable
                           disabled={
                             !attackOrSpell.canBeUsed ||
-                            enemyStore.attackAnimationsOnGoing
+                            enemyStore.enemyTurnOngoing
                           }
                           onPress={() => attackHandler(attackOrSpell)}
                           style={[
@@ -343,7 +342,7 @@ const BattleTab = observer(
                             {
                               opacity:
                                 !attackOrSpell.canBeUsed ||
-                                enemyStore.attackAnimationsOnGoing
+                                enemyStore.enemyTurnOngoing
                                   ? 0.5
                                   : 1,
                               backgroundColor:
@@ -378,9 +377,8 @@ const BattleTab = observer(
                             </View>
                           </View>
                           <Pressable
-                            disabled={enemyStore.attackAnimationsOnGoing}
+                            disabled={enemyStore.enemyTurnOngoing}
                             onPress={() => {
-                              enemyStore.setAttackAnimationOngoing(true);
                               vibration({ style: "light" });
                               pass({ voluntary: true });
                             }}
@@ -393,7 +391,7 @@ const BattleTab = observer(
                                     : "#27272a",
                                 opacity:
                                   playerState.isStunned ||
-                                  enemyStore.attackAnimationsOnGoing
+                                  enemyStore.enemyTurnOngoing
                                     ? 0.5
                                     : 1.0,
                               },
@@ -414,9 +412,8 @@ const BattleTab = observer(
                       <Text style={styles["text-xl"]}>Pass</Text>
                     </View>
                     <Pressable
-                      disabled={enemyStore.attackAnimationsOnGoing}
+                      disabled={enemyStore.enemyTurnOngoing}
                       onPress={() => {
-                        enemyStore.setAttackAnimationOngoing(true);
                         vibration({ style: "light" });
                         pass({ voluntary: true });
                       }}
@@ -427,7 +424,7 @@ const BattleTab = observer(
                             uiStore.colorScheme == "light"
                               ? "#d4d4d8"
                               : "#27272a",
-                          opacity: enemyStore.attackAnimationsOnGoing ? 0.5 : 1,
+                          opacity: enemyStore.enemyTurnOngoing ? 0.5 : 1,
                         },
                       ]}
                     >

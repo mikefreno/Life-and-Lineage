@@ -31,8 +31,6 @@ const FleeModal = observer(() => {
     if (!playerState) return;
 
     try {
-      enemyStore.setAttackAnimationOngoing(true);
-
       const canFlee =
         enemyStore.enemies.length === 0 ||
         enemyStore.enemies[0].creatureSpecies === "training dummy" ||
@@ -46,7 +44,6 @@ const FleeModal = observer(() => {
       }
     } catch (error) {
       console.error("Error during flee attempt:", error);
-      enemyStore.setAttackAnimationOngoing(false);
     }
   };
 
@@ -120,7 +117,7 @@ const FleeModal = observer(() => {
             justifyContent: "space-evenly",
           }}
         >
-          <Text style={{ textAlign: "center", ...styles.xl }}>
+          <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
             {enemyStore.enemies.length == 0 ||
             dungeonStore.currentInstance?.name.toLowerCase() ===
               "training grounds"
@@ -135,7 +132,7 @@ const FleeModal = observer(() => {
               onPress={flee}
               disabled={
                 dungeonStore.inCombat &&
-                (enemyStore.attackAnimationsOnGoing || playerState.isStunned)
+                (enemyStore.enemyTurnOngoing || playerState.isStunned)
               }
             >
               {enemyStore.enemies.length > 0 &&

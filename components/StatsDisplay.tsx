@@ -97,7 +97,6 @@ export function StatsDisplay({
     new Animated.Value(uiStore.dimensions.height / 3),
   ).current;
 
-  // Animation values for grow effect
   const animatedScale = useRef(new Animated.Value(0)).current;
   const animatedOpacity = useRef(new Animated.Value(0)).current;
 
@@ -747,7 +746,7 @@ export function StatsDisplay({
           {playerState &&
             firstItem.attachedAttacks.map((attack) => (
               <View key={`${firstItem.id}-${attack.name}`}>
-                {attack.AttackRender(firstItem.totalDamage)}
+                {attack.AttackRender(styles, firstItem.totalDamage)}
               </View>
             ))}
         </View>
@@ -776,10 +775,7 @@ export function StatsDisplay({
             left: animatedLeft,
             top: animatedTop,
             opacity: animatedOpacity,
-            transform: [
-              { scale: animatedScale },
-              { perspective: 1000 }, // Helps with 3D effect
-            ],
+            transform: [{ scale: animatedScale }, { perspective: 1000 }],
           },
         ]}
         onLayout={onLayoutView}

@@ -33,7 +33,7 @@ interface ActivityCardProps {
 
 const ActivityCard = observer(({ activity }: ActivityCardProps) => {
   const root = useRootStore();
-  const { playerState } = root;
+  const { playerState, uiStore } = root;
   const [metCharacter, setMetCharacter] = useState<Character | null>(null);
   const [nothingHappened, setNothingHappened] = useState<boolean>(false);
   const [badOutCome, setBadOutcome] = useState<BadOutcome | null>(null);
@@ -280,6 +280,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
       <GenericModal
         isVisibleCondition={showDatePartnerSelection}
         backFunction={() => setShowDatePartnerSelection(false)}
+        scrollEnabled={true}
         size={100}
       >
         <View style={{ alignItems: "center" }}>
@@ -290,7 +291,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
               { paddingHorizontal: 16 },
             ]}
           >
-            Who would you like to {dateDestination} with?l
+            Who would you like to {dateDestination} with?
           </Text>
           {playerState && (
             <ScrollView style={{ width: "100%" }}>
@@ -311,6 +312,7 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
         </View>
       </GenericModal>
       <CharacterInteractionModal
+        showAdoptionModal={() => null}
         character={metCharacter}
         closeFunction={() => setMetCharacter(null)}
         showGiftModal={() => null}
@@ -360,11 +362,20 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           </Text>
           {badOutCome?.fight ? (
             <>
-              <View style={[styles.columnEvenly, { marginTop: 16 }]}>
-                <AnimatedSprite
-                  spriteSet={EnemyImageMap[badOutCome.fight.enemies[0].image]}
-                  currentAnimationState="idle"
-                />
+              <View style={[styles.columnEvenly, { paddingTop: 16 }]}>
+                <View
+                  style={{
+                    height: uiStore.dimensions.height * 0.45,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    ...styles.debugBorder,
+                  }}
+                >
+                  <AnimatedSprite
+                    spriteSet={EnemyImageMap[badOutCome.fight.enemies[0].image]}
+                    currentAnimationState="idle"
+                  />
+                </View>
                 {badOutCome.buyOff &&
                   playerState &&
                   playerState.gold >= 0.25 * badOutCome.buyOff.price && (

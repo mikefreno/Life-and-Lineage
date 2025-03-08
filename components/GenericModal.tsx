@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from "react";
 import {
   type AccessibilityRole,
+  DimensionValue,
   Platform,
   ScrollView,
   type StyleProp,
@@ -9,7 +10,7 @@ import {
 import Modal from "react-native-modal";
 import { ThemedView } from "./Themed";
 import { useRootStore } from "../hooks/stores";
-import { shadows, useStyles } from "../hooks/styles";
+import { useStyles } from "../hooks/styles";
 import { observer } from "mobx-react-lite";
 
 interface GenericModalProps {
@@ -22,7 +23,7 @@ interface GenericModalProps {
   innerStyle?: StyleProp<ViewStyle>;
   noPad?: boolean;
   scrollEnabled?: boolean;
-  isCheckPointModal?: boolean;
+  providedHeight?: DimensionValue;
   accessibilityRole?: AccessibilityRole;
   accessibilityLabel?: string;
   accessibilityHint?: string;
@@ -54,11 +55,11 @@ const GenericModal = observer(
     backFunction,
     children,
     backdropCloses = true,
+    providedHeight,
     scrollEnabled = false,
     size,
     style,
     noPad,
-    isCheckPointModal = false,
     ...props
   }: GenericModalProps) => {
     const root = useRootStore();
@@ -69,7 +70,7 @@ const GenericModal = observer(
     useEffect(() => {
       if (
         isVisibleCondition &&
-        !(root.atDeathScreen && !isCheckPointModal && !root.startingNewGame)
+        !(root.atDeathScreen && !root.startingNewGame)
       ) {
         modalShowing = true;
       }
@@ -91,15 +92,14 @@ const GenericModal = observer(
             : "#000000"
         }
         isVisible={
-          isVisibleCondition &&
-          !(root.atDeathScreen && !isCheckPointModal && !root.startingNewGame)
+          isVisibleCondition && !(root.atDeathScreen && !root.startingNewGame)
         }
         backdropOpacity={0.5}
         onBackdropPress={backdropCloses ? backFunction : undefined}
         onBackButtonPress={backFunction}
         statusBarTranslucent={true}
         coverScreen={true}
-        deviceHeight={uiStore.dimensions.height}
+        deviceHeight={providedHeight ?? uiStore.dimensions.height}
         deviceWidth={uiStore.dimensions.width}
         style={[style]}
         {...props}

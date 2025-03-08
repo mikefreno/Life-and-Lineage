@@ -120,8 +120,10 @@ export default function GameSettings() {
         onClose={() => setShowCheckpoints(false)}
       />
 
-      <ScrollView>
-        <View style={styles.gameSettingsContainer}>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+      >
+        <View style={styles.settingsContainer}>
           <GenericStrikeAround>Game Saves</GenericStrikeAround>
           <GenericRaisedButton onPress={() => setShowCheckpoints(true)}>
             Manage Game Saves

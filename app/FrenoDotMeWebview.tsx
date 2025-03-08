@@ -5,12 +5,13 @@ import WebView from "react-native-webview";
 import { View, TouchableOpacity, BackHandler, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import { useStyles } from "@/hooks/styles";
+import { normalize, useStyles } from "@/hooks/styles";
 import { Text, ThemedView } from "@/components/Themed";
 import Colors from "@/constants/Colors";
 import D20DieAnimation from "@/components/DieRollAnim";
 import GenericFlatButton from "@/components/GenericFlatButton";
 import { useRouter } from "expo-router";
+import { AnimatedLoadingText } from "@/components/AnimatedLoadingText";
 
 const FrenoDotMeWebview = observer(() => {
   const { uiStore, authStore } = useRootStore();
@@ -52,10 +53,14 @@ const FrenoDotMeWebview = observer(() => {
   const handleClose = () => {
     navigation.goBack();
   };
-  const [webViewFinishedLoading, setWebViewFinishedLoading] = useState(false);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View
+      style={{
+        flex: 1,
+        paddingTop: Platform.OS == "android" ? normalize(30) : 0,
+      }}
+    >
       {authStore.isConnected ? (
         <>
           <View style={styles.webViewHeader}>
@@ -79,7 +84,6 @@ const FrenoDotMeWebview = observer(() => {
           <WebView
             ref={webViewRef}
             style={{ flex: 1 }}
-            onLoad={() => setWebViewFinishedLoading(true)}
             originWhitelist={["https://*.freno.me", "https://freno.me"]}
             source={{
               uri: `https://freno.me/${
@@ -107,6 +111,7 @@ const FrenoDotMeWebview = observer(() => {
                   slowRoll={true}
                   showNumber={false}
                 />
+                <AnimatedLoadingText />
               </ThemedView>
             )}
           />

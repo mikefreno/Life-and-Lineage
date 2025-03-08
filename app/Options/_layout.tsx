@@ -1,15 +1,46 @@
 import { Tabs } from "expo-router";
 import { Foundation, MaterialCommunityIcons } from "@expo/vector-icons";
-import { type GestureResponderEvent, Pressable } from "react-native";
+import {
+  type GestureResponderEvent,
+  Pressable,
+  Text as RNText,
+} from "react-native";
 import { useVibration } from "../../hooks/generic";
+import { normalize, useStyles } from "@/hooks/styles";
+import { useRootStore } from "@/hooks/stores";
 
 export default function OptionsLayout() {
   const vibration = useVibration();
+  const styles = useStyles();
+  const { uiStore } = useRootStore();
+
   return (
     <Tabs
       screenOptions={{
-        tabBarIconStyle: { marginHorizontal: "auto" },
-        tabBarStyle: { height: 80, paddingBottom: 16 },
+        tabBarIconStyle: { alignSelf: "center" },
+        tabBarStyle: {
+          height: 80,
+          paddingBottom: 16,
+          borderTopWidth: 0,
+          alignContent: "center",
+          ...styles.diffuseTop,
+        },
+        animation: uiStore.reduceMotion ? "fade" : "shift",
+        tabBarLabel: (props) => {
+          return (
+            <RNText
+              style={{
+                textAlign: "center",
+                fontFamily: "PixelifySans",
+                ...styles["text-sm"],
+                color: props.color,
+                marginTop: normalize(3),
+              }}
+            >
+              {props.children}
+            </RNText>
+          );
+        },
         tabBarButton: (props) => {
           const onPressWithVibration = (event: GestureResponderEvent) => {
             vibration({ style: "light" });
@@ -19,6 +50,7 @@ export default function OptionsLayout() {
             <Pressable
               onPress={onPressWithVibration}
               style={{
+                alignContent: "center",
                 marginVertical: "auto",
                 height: 44,
               }}

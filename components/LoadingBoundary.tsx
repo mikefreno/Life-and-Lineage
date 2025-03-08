@@ -8,6 +8,7 @@ import ProgressBar from "./ProgressBar";
 import Colors from "../constants/Colors";
 import { Text } from "./Themed";
 import { useStyles } from "@/hooks/styles";
+import { AnimatedLoadingText } from "./AnimatedLoadingText";
 
 export const LoadingBoundary = observer(
   ({ children }: { children: ReactNode }) => {
@@ -55,7 +56,6 @@ export const LoadingBoundary = observer(
 
     useEffect(() => {
       if (isLoading) {
-        // Set a timeout to log the loading status if it takes longer than 10 seconds
         loadingTimeoutRef.current = setTimeout(() => {
           console.warn(
             "Loading taking longer than expected. Current loading status:",
@@ -63,7 +63,6 @@ export const LoadingBoundary = observer(
           );
         }, 5000);
       } else {
-        // Clear the timeout if loading completes
         if (loadingTimeoutRef.current) {
           clearTimeout(loadingTimeoutRef.current);
           loadingTimeoutRef.current = null;
@@ -126,6 +125,9 @@ export const LoadingBoundary = observer(
                 {uiStore.getCurrentTip()}
               </Text>
             </View>
+          </View>
+          <View style={{ marginBottom: uiStore.dimensions.height * 0.1 }}>
+            <AnimatedLoadingText />
           </View>
         </View>
       ),

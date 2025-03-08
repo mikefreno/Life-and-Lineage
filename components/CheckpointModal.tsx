@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { View, TouchableOpacity, FlatList, Animated } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  FlatList,
+  Animated,
+  Platform,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRootStore } from "../hooks/stores";
-import GenericModal from "./GenericModal";
-import { Text } from "./Themed";
+import { Text, ThemedView } from "./Themed";
 import ThemedCard from "./ThemedCard";
 import { parse } from "flatted";
 import { Element, ElementToString } from "../utility/types";
@@ -17,6 +22,8 @@ import {
 import BlessingDisplay from "./BlessingsDisplay";
 import { useNavigation } from "expo-router";
 import { radius, useStyles } from "../hooks/styles";
+import Modal from "react-native-modal";
+import { normalize } from "@sentry/core";
 
 const CheckpointModal = ({
   isVisible,
@@ -27,7 +34,7 @@ const CheckpointModal = ({
   onClose: () => void;
   allowSaving?: boolean;
 }) => {
-  const { saveStore, uiStore } = useRootStore();
+  const { saveStore, uiStore, playerState } = useRootStore();
   const [checkpoints, setCheckpoints] = useState<Record<number, any[]>>({});
   const [expandedGames, setExpandedGames] = useState<Record<number, boolean>>(
     {},
@@ -37,7 +44,6 @@ const CheckpointModal = ({
     id: number;
     action: "overwrite" | "delete" | "load";
   } | null>(null);
-  const navigation = useNavigation();
 
   useEffect(() => {
     if (isVisible) {
@@ -116,13 +122,10 @@ const CheckpointModal = ({
   };
 
   const handleLoad = async (checkpointId: number, gameId: number) => {
-    const success = await saveStore.loadCheckpoint({
+    await saveStore.loadCheckpoint({
       gameId: gameId,
       checkpointId: checkpointId,
     });
-    if (success) {
-      wait(250).then(() => clearHistory(navigation));
-    }
     setConfirmingAction(null);
   };
 
@@ -133,95 +136,97 @@ const CheckpointModal = ({
     item: any;
     gameId: number;
   }) => (
-    <View style={{ ...styles.ml4, ...styles.mt2 }}>
-      <View>
-        <Text>{saveStore.formatDate(new Date(item.timestamp))}</Text>
-        <Text>{item.is_auto_save ? "Auto Save" : "Manual Save"}</Text>
-        <Text>Player Age: {item.player_age}</Text>
-      </View>
-      <View style={{ ...styles.rowCenter, ...styles.mt2 }}>
-        {confirmingAction && confirmingAction.id === item.id ? (
-          <>
-            <TouchableOpacity
-              onPress={() => {
-                if (confirmingAction.action === "overwrite") {
-                  handleOverwrite(item.id);
-                } else if (confirmingAction.action === "delete") {
-                  handleDelete(item.id);
-                } else if (confirmingAction.action === "load") {
-                  handleLoad(item.id, gameId);
-                }
-              }}
-              style={{
-                ...styles.p2,
-                ...radius.md,
-                ...styles.mr2,
-                backgroundColor:
-                  confirmingAction.action === "load"
-                    ? "#22c55e"
-                    : confirmingAction.action === "overwrite"
-                    ? "#3b82f6"
-                    : "#ef4444",
-              }}
-            >
-              <Text style={{ color: "#fff" }}>Confirm</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setConfirmingAction(null)}
-              style={{
-                backgroundColor: "#6b7280",
-                ...styles.p2,
-                ...radius.md,
-              }}
-            >
-              <Text style={{ color: "#fff" }}>Cancel</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <TouchableOpacity
-              onPress={() =>
-                setConfirmingAction({ id: item.id, action: "load" })
-              }
-              style={{
-                backgroundColor: "#22c55e",
-                ...styles.p2,
-                ...radius.md,
-                ...styles.mr2,
-              }}
-            >
-              <Text style={{ color: "#fff" }}>Load</Text>
-            </TouchableOpacity>
-            {allowSaving && (
+    <View style={{ margin: 4 }}>
+      <ThemedView style={[styles.ml4, styles.themedCard]}>
+        <View>
+          <Text>{saveStore.formatDate(new Date(item.timestamp))}</Text>
+          <Text>{item.is_auto_save ? "Auto Save" : "Manual Save"}</Text>
+          <Text>Player Age: {item.player_age}</Text>
+        </View>
+        <View style={{ ...styles.rowCenter, ...styles.mt2 }}>
+          {confirmingAction && confirmingAction.id === item.id ? (
+            <>
+              <TouchableOpacity
+                onPress={() => {
+                  if (confirmingAction.action === "overwrite") {
+                    handleOverwrite(item.id);
+                  } else if (confirmingAction.action === "delete") {
+                    handleDelete(item.id);
+                  } else if (confirmingAction.action === "load") {
+                    handleLoad(item.id, gameId);
+                  }
+                }}
+                style={{
+                  ...styles.p2,
+                  ...radius.md,
+                  ...styles.mr2,
+                  backgroundColor:
+                    confirmingAction.action === "load"
+                      ? "#22c55e"
+                      : confirmingAction.action === "overwrite"
+                      ? "#3b82f6"
+                      : "#ef4444",
+                }}
+              >
+                <Text style={{ color: "#fff" }}>Confirm</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setConfirmingAction(null)}
+                style={{
+                  backgroundColor: "#6b7280",
+                  ...styles.p2,
+                  ...radius.md,
+                }}
+              >
+                <Text style={{ color: "#fff" }}>Cancel</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
               <TouchableOpacity
                 onPress={() =>
-                  setConfirmingAction({ id: item.id, action: "overwrite" })
+                  setConfirmingAction({ id: item.id, action: "load" })
                 }
                 style={{
-                  backgroundColor: "#3b82f6",
+                  backgroundColor: "#22c55e",
                   ...styles.p2,
                   ...radius.md,
                   ...styles.mr2,
                 }}
               >
-                <Text style={{ color: "#fff" }}>Overwrite</Text>
+                <Text style={{ color: "#fff" }}>Load</Text>
               </TouchableOpacity>
-            )}
-            <TouchableOpacity
-              onPress={() =>
-                setConfirmingAction({ id: item.id, action: "delete" })
-              }
-              style={{
-                backgroundColor: "#ef4444",
-                ...styles.p2,
-                ...radius.md,
-              }}
-            >
-              <Text style={{ color: "#fff" }}>Delete</Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
+              {allowSaving && (
+                <TouchableOpacity
+                  onPress={() =>
+                    setConfirmingAction({ id: item.id, action: "overwrite" })
+                  }
+                  style={{
+                    backgroundColor: "#3b82f6",
+                    ...styles.p2,
+                    ...radius.md,
+                    ...styles.mr2,
+                  }}
+                >
+                  <Text style={{ color: "#fff" }}>Overwrite</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                onPress={() =>
+                  setConfirmingAction({ id: item.id, action: "delete" })
+                }
+                style={{
+                  backgroundColor: "#ef4444",
+                  ...styles.p2,
+                  ...radius.md,
+                }}
+              >
+                <Text style={{ color: "#fff" }}>Delete</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </ThemedView>
     </View>
   );
 
@@ -234,10 +239,9 @@ const CheckpointModal = ({
     const rotateAnimation = getRotationAnimation(gameId);
     const heightAnimation = getHeightAnimation(gameId);
 
-    const CHECKPOINT_HEIGHT = 120;
-    const PADDING = 16;
-    const calculatedHeight =
-      gameCheckpoints.length * CHECKPOINT_HEIGHT + PADDING;
+    const CHECKPOINT_HEIGHT = normalize(140);
+    const PADDING = normalize(12);
+    const calculatedHeight = CHECKPOINT_HEIGHT + PADDING;
 
     const spin = rotateAnimation.interpolate({
       inputRange: [0, 1],
@@ -276,9 +280,19 @@ const CheckpointModal = ({
     };
 
     return (
-      <View style={styles.mb4}>
+      <View style={[styles.pb4]}>
         <TouchableOpacity onPress={() => toggleGameExpansion(gameId)}>
           <ThemedCard>
+            {playerState?.id === latestCheckpoint.player_data.id && (
+              <Text
+                style={[
+                  styles["text-sm"],
+                  { textAlign: "center", textDecorationLine: "underline" },
+                ]}
+              >
+                Current Game
+              </Text>
+            )}
             <View style={styles.rowBetween}>
               <View>
                 <Text style={styles.bold}>
@@ -325,8 +339,15 @@ const CheckpointModal = ({
             </Animated.View>
           </ThemedCard>
         </TouchableOpacity>
-        <Animated.View style={{ maxHeight, overflow: "hidden" }}>
+        <Animated.View
+          style={{
+            maxHeight,
+            flexGrow: 1,
+            alignItems: "center",
+          }}
+        >
           <FlatList
+            horizontal
             data={gameCheckpoints}
             renderItem={({ item }) => renderCheckpoint({ item, gameId })}
             keyExtractor={(item) => item.id.toString()}
@@ -337,39 +358,68 @@ const CheckpointModal = ({
   };
 
   return (
-    <GenericModal
-      isVisibleCondition={isVisible}
-      backFunction={onClose}
-      isCheckPointModal={true}
-      size={90}
+    <Modal
+      animationIn={uiStore.reduceMotion ? "fadeIn" : "slideInUp"}
+      animationOut={uiStore.reduceMotion ? "fadeOut" : "slideOutDown"}
+      animationInTiming={300}
+      animationOutTiming={300}
+      backdropTransitionOutTiming={300}
+      backdropTransitionInTiming={300}
+      backdropColor={
+        Platform.OS == "ios"
+          ? "#000000"
+          : uiStore.colorScheme == "light"
+          ? "#ffffffff"
+          : "#000000"
+      }
+      isVisible={isVisible}
+      backdropOpacity={0.5}
+      onBackdropPress={onClose}
+      onBackButtonPress={onClose}
+      statusBarTranslucent={true}
+      coverScreen={true}
+      deviceHeight={uiStore.dimensions.height}
+      deviceWidth={uiStore.dimensions.width}
       style={{
         maxHeight: uiStore.dimensions.height * 0.75,
         marginVertical: "auto",
       }}
     >
-      <Text style={{ ...styles["2xl"], ...styles.bold, ...styles.mb4 }}>
-        Saved Games
-      </Text>
-      {allowSaving && (
-        <View style={{ ...styles.rowBetween, ...styles.mb4 }}>
-          <TouchableOpacity
-            onPress={handleNewSave}
-            style={{
-              ...styles.p2,
-              ...radius.md,
-              backgroundColor: "#3b82f6",
-            }}
-          >
-            <Text style={{ color: "#ffffff" }}>Save</Text>
-          </TouchableOpacity>
+      <ThemedView
+        style={{
+          width: "83.3333%",
+          zIndex: 0,
+          maxHeight: "90%",
+          padding: "4%",
+          ...styles.modalContent,
+        }}
+      >
+        <View style={{ borderBottomWidth: 1, ...styles.rowBetween }}>
+          <Text style={[styles["text-2xl"], styles.bold, styles.mb4]}>
+            Saved Games
+          </Text>
+          {allowSaving && (
+            <View style={[styles.rowBetween, styles.mb4]}>
+              <TouchableOpacity
+                onPress={handleNewSave}
+                style={{
+                  ...styles.p2,
+                  ...radius.md,
+                  backgroundColor: "#3b82f6",
+                }}
+              >
+                <Text style={{ color: "#ffffff" }}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
-      )}
-      <FlatList
-        data={Object.keys(checkpoints).map(Number)}
-        renderItem={renderGame}
-        keyExtractor={(item) => item.toString()}
-      />
-    </GenericModal>
+        <FlatList
+          data={Object.keys(checkpoints).map(Number)}
+          renderItem={renderGame}
+          keyExtractor={(item) => item.toString()}
+        />
+      </ThemedView>
+    </Modal>
   );
 };
 

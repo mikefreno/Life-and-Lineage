@@ -102,7 +102,7 @@ export const CharacterInteractionModal = observer(
         scrollEnabled={true}
       >
         {character && (
-          <ScrollView>
+          <>
             <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
               {character.fullName}
             </Text>
@@ -325,7 +325,7 @@ export const CharacterInteractionModal = observer(
                 </View>
               </View>
             )}
-          </ScrollView>
+          </>
         )}
       </GenericModal>
     );

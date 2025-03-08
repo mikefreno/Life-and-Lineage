@@ -30,28 +30,35 @@ const AudioSettings = observer(() => {
 
   return (
     <ScrollView
-      contentContainerStyle={[styles.p4, { flex: 1, justifyContent: "center" }]}
+      contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
     >
-      <GenericStrikeAround>Audio Settings</GenericStrikeAround>
-      <View style={{ paddingBottom: uiStore.dimensions.height * 0.1 }}>
-        {renderSlider("Master Volume", "master", audioStore.masterVolume)}
-        {renderSlider(
-          "Ambient Music",
-          "ambient",
-          audioStore.ambientMusicVolume,
-        )}
-        {renderSlider("Sound Effects", "sfx", audioStore.soundEffectsVolume)}
-        {renderSlider("Combat Music", "combat", audioStore.combatMusicVolume)}
+      <View
+        style={{
+          paddingHorizontal: 16,
+          paddingTop: 48,
+        }}
+      >
+        <GenericStrikeAround>Audio Settings</GenericStrikeAround>
+        <View style={{ paddingBottom: uiStore.dimensions.height * 0.1 }}>
+          {renderSlider("Master Volume", "master", audioStore.masterVolume)}
+          {renderSlider(
+            "Ambient Music",
+            "ambient",
+            audioStore.ambientMusicVolume,
+          )}
+          {renderSlider("Sound Effects", "sfx", audioStore.soundEffectsVolume)}
+          {renderSlider("Combat Music", "combat", audioStore.combatMusicVolume)}
 
-        <View style={styles.rowEvenly}>
-          <Text style={[styles.myAuto, styles["text-xl"]]}>Mute</Text>
-          <Switch
-            trackColor={{ false: "#767577", true: "#3b82f6" }}
-            ios_backgroundColor="#3e3e3e"
-            thumbColor={"white"}
-            onValueChange={(bool) => audioStore.setMuteValue(bool)}
-            value={audioStore.muted}
-          />
+          <View style={styles.rowEvenly}>
+            <Text style={[styles.myAuto, styles["text-xl"]]}>Mute</Text>
+            <Switch
+              trackColor={{ false: "#767577", true: "#3b82f6" }}
+              ios_backgroundColor="#3e3e3e"
+              thumbColor={"white"}
+              onValueChange={(bool) => audioStore.setMuteValue(bool)}
+              value={audioStore.muted}
+            />
+          </View>
         </View>
       </View>
     </ScrollView>

@@ -2,17 +2,13 @@ import { parse, stringify } from "flatted";
 import { Enemy } from "../entities/creatures";
 import { storage } from "../utility/functions/storage";
 import { RootStore } from "./RootStore";
-import { action, makeObservable, observable, reaction } from "mobx";
+import { action, computed, makeObservable, observable, reaction } from "mobx";
 import { throttle } from "lodash";
 import { EnemyAnimationStore } from "./EnemyAnimationStore";
 
 export default class EnemyStore {
   enemies: Enemy[];
   animationStoreMap: Map<string, EnemyAnimationStore>;
-  attackAnimationsOnGoing: boolean = false;
-  deathAnimationsOnGoing: boolean = false;
-  attackAnimationCount: number = 0;
-  deathAnimationsCount: number = 0;
   root: RootStore;
 
   constructor({ root }: { root: RootStore }) {
@@ -25,17 +21,12 @@ export default class EnemyStore {
 
     makeObservable(this, {
       enemies: observable,
-      attackAnimationsOnGoing: observable,
+      animationStoreMap: observable,
+
       addToEnemyList: action,
-      setAttackAnimationOngoing: action,
       removeEnemy: action,
       clearEnemyList: action,
-      attackAnimationCount: observable,
-      deathAnimationsCount: observable,
-      incrementAttackAnimations: action,
-      decrementAttackAnimations: action,
-      decrementDeathAnimations: action,
-      incrementDeathAnimations: action,
+      enemyTurnOngoing: computed,
     });
 
     reaction(
@@ -46,57 +37,29 @@ export default class EnemyStore {
     );
 
     reaction(
-      () => [
-        this.deathAnimationsCount,
-        this.attackAnimationCount,
-        this.enemies.length,
-      ],
+      () => [this.animationStoreMap, this.enemies],
       () => {
-        if (
-          this.deathAnimationsCount == 0 &&
-          this.attackAnimationCount == 0 &&
-          this.enemies.length == 0
-        ) {
+        console.log("map:", this.animationStoreMap);
+        console.log("enemies:", this.enemies);
+      },
+    );
+
+    reaction(
+      () => this.enemies.length,
+      () => {
+        if (this.enemies.length == 0) {
+          this.clearEnemyList();
           this.root.dungeonStore.setInCombat(false);
         }
       },
     );
   }
 
-  incrementAttackAnimations() {
-    this.attackAnimationCount++;
-    this.setAttackAnimationOngoing(true);
-  }
-
-  decrementAttackAnimations() {
-    this.attackAnimationCount--;
-    if (this.attackAnimationCount <= 0) {
-      this.attackAnimationCount = 0;
-      this.setAttackAnimationOngoing(false);
-    }
-  }
-
-  incrementDeathAnimations() {
-    this.deathAnimationsCount++;
-    this.setDeathAnimationOngoing(true);
-  }
-
-  decrementDeathAnimations() {
-    this.deathAnimationsCount--;
-    if (this.deathAnimationsCount <= 0) {
-      this.deathAnimationsCount = 0;
-      this.setDeathAnimationOngoing(false);
-      if (this.root.enemyStore.enemies.length == 0) {
-        this.root.dungeonStore.setInCombat(false);
-      }
-    }
-  }
-
-  public setAttackAnimationOngoing(state: boolean) {
-    this.attackAnimationsOnGoing = state;
-  }
-  public setDeathAnimationOngoing(ongoing: boolean) {
-    this.deathAnimationsOnGoing = ongoing;
+  get enemyTurnOngoing() {
+    const stores = Array.from(this.animationStoreMap.values());
+    if (stores.length) {
+      return stores.some((store) => store.notIdle);
+    } else return false;
   }
 
   public addToEnemyList(enemy: Enemy) {
@@ -115,7 +78,6 @@ export default class EnemyStore {
   }
 
   public clearEnemyList() {
-    this.setAttackAnimationOngoing(false);
     this.enemies = [];
     this.animationStoreMap.clear();
     this.clearPersistedEnemies();
@@ -135,6 +97,7 @@ export default class EnemyStore {
       map.set(enemy.id, new EnemyAnimationStore({ root: this.root }));
       enemies.push(enemy);
     });
+    console.log(map);
     return { enemies, map };
   }
 

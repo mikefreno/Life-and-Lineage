@@ -6,16 +6,12 @@ import { useRootStore } from "./stores";
 import { Enemy, Minion } from "../entities/creatures";
 import { PlayerCharacter } from "../entities/character";
 import { Attack } from "../entities/attack";
-import { getMagnitude } from "../utility/functions/conditions";
 import { useIsFocused } from "@react-navigation/native";
 import { Spell } from "../entities/spell";
-import { VFXImageMap } from "@/utility/functions/vfxmapping";
-import { FPS } from "@/stores/EnemyAnimationStore";
 
 export const useEnemyManagement = () => {
   const root = useRootStore();
-  const { enemyStore, playerState, dungeonStore, tutorialStore, uiStore } =
-    root;
+  const { enemyStore, playerState, dungeonStore, tutorialStore } = root;
   const { setDroppedItems } = useLootState();
   const { setShouldShowFirstBossKillTutorialAfterItemDrops } =
     useTutorialState();
@@ -36,6 +32,7 @@ export const useEnemyManagement = () => {
           playerState,
           dungeonStore.fightingBoss,
         );
+
         wait(500).then(() => {
           if (itemDrops) {
             playerState.addGold(gold);
@@ -43,6 +40,7 @@ export const useEnemyManagement = () => {
             setDroppedItems({ itemDrops, gold, storyDrops });
           }
 
+          // probably want to move this into the enemystore, triggerd from animation
           enemyStore.removeEnemy(enemy);
           if (enemyStore.enemies.length === 0) {
             if (
@@ -89,124 +87,32 @@ export const useEnemyManagement = () => {
     });
   };
 
-  const handleEnemyAction = useCallback(
-    (
-      enemy: Enemy,
-      enemyAttackRes: {
-        attack?: Attack | undefined;
-        result: {
-          target: string;
-          result: AttackUse;
-        }[];
-        logString: string;
-      },
-      startOfTurnPlayerHP: number,
-    ) => {
-      const animationStore = enemyStore.getAnimationStore(enemy.id);
-      if (!playerState || !animationStore) return;
-      const playerHealthChange =
-        startOfTurnPlayerHP - playerState.currentHealth;
-
-      if (playerHealthChange > 0) {
-        const revengeCondition = playerState.conditions.find((condition) =>
-          condition.effect.includes("revenge"),
-        );
-
-        if (revengeCondition) {
-          const effectMagnitudeValue = getMagnitude(
-            revengeCondition.effectMagnitude,
-          );
-          const revengeDamage = Math.min(
-            playerHealthChange * 5,
-            effectMagnitudeValue * 10,
-          );
-
-          enemy.damageHealth({
-            attackerId: revengeCondition.placedbyID,
-            damage: revengeDamage,
-          });
-          dungeonStore.addLog(`You dealt ${revengeDamage} revenge damage!`);
-        }
-      }
-
-      const actions: Record<AttackUse, (playerHealthChange: number) => void> = {
-        [AttackUse.success]: (playerHealthChange) => {
-          animationStore.triggerAttack();
-
-          wait(500).then(() => {
-            if (
-              playerHealthChange > 0 ||
-              enemyAttackRes.attack!.debuffStrings.length > 0 ||
-              enemyAttackRes.attack!.buffStrings.length > 0
-            ) {
-              animationStore.setTextString(enemyAttackRes.attack!.name);
-              animationStore.triggerText();
-            }
-          });
-        },
-
-        [AttackUse.miss]: () => {
-          animationStore.triggerAttack();
-          wait(500).then(() => {
-            animationStore.setTextString("miss");
-            animationStore.triggerText();
-          });
-        },
-        [AttackUse.block]: () => {
-          animationStore.setTextString("blocked");
-          animationStore.triggerText();
-          enemyStore.decrementAttackAnimations();
-        },
-        [AttackUse.stunned]: () => {
-          animationStore.setTextString("stunned");
-          animationStore.triggerText();
-          enemyStore.decrementAttackAnimations();
-        },
-        [AttackUse.lowEnergy]: () => {
-          animationStore.setTextString("pass");
-          animationStore.triggerText();
-          enemyStore.decrementAttackAnimations();
-        },
-      };
-
-      if (!enemyAttackRes.attack) {
-        actions[enemyAttackRes.result[0].result](playerHealthChange);
-      } else {
-        const playerAsTarget = enemyAttackRes.result.find(
-          ({ target }) => target === playerState.id,
-        );
-        if (playerAsTarget) {
-          actions[playerAsTarget.result](playerHealthChange);
-        } else {
-          actions[enemyAttackRes.result[0].result](playerHealthChange);
-        }
-      }
-      //const playerRes =
-      //actions[enemyAttackRes.find((res)=>res.target == playerState.id)(playerHealthChange);
-    },
-    [playerState],
-  );
-
   const enemyTurn = useCallback(() => {
-    // Process each enemy's turn sequentially
     enemyStore.enemies.forEach((enemy, index) => {
       wait(1000 * index).then(() => {
         if (!enemyDeathHandler(enemy)) {
-          const startOfTurnPlayerHP = { ...playerState }.currentHealth ?? 0;
           const enemyAttackRes = enemy.takeTurn({ player: playerState! });
+          for (const res of enemyAttackRes.result) {
+            switch (res.result) {
+              case AttackUse.success:
+              case AttackUse.miss:
+              case AttackUse.block:
+              case AttackUse.stunned:
+              case AttackUse.lowEnergy:
+            }
+          }
+
           dungeonStore.addLog(enemyAttackRes.logString);
 
-          handleEnemyAction(enemy, enemyAttackRes, startOfTurnPlayerHP);
           enemyMinionsTurn(enemy.minions, enemy, playerState!);
 
-          // Check for death after action
           setTimeout(() => {
             enemyDeathHandler(enemy);
           }, 1000);
         }
       });
     });
-  }, [enemyStore.enemies, playerState, handleEnemyAction, enemyDeathHandler]);
+  }, [enemyStore.enemies, playerState, enemyDeathHandler]);
 
   return { enemyTurn, enemyMinionsTurn, enemyDeathHandler };
 };
@@ -217,34 +123,35 @@ export const useCombatActions = () => {
   const { enemyTurn, enemyDeathHandler } = useEnemyManagement();
   const isFocused = useIsFocused();
 
-  const handleMinionTurns = useCallback(
-    async (minions: Minion[], target: Enemy[], callback: () => void) => {
-      let completedTurns = 0;
-
-      for (let i = 0; i < minions.length; i++) {
-        await wait(1000 * i);
-        const res = minions[i].takeTurn({ target });
-        dungeonStore.addLog(`(minion) ${res.logString}`);
-        completedTurns++;
-        if (completedTurns === minions.length) {
-          callback();
-        }
-      }
-    },
-    [],
-  );
-
   const playerMinionsTurn = useCallback(
     (callback: () => void) => {
       const minions = playerState?.minionsAndPets;
 
-      if (playerState && minions?.length) {
-        handleMinionTurns(minions, enemyStore.enemies, callback);
-      } else {
-        callback();
-      }
+      minions?.forEach((minion) => {
+        const result = minion.takeTurn({ target: enemyStore.enemies });
+        for (const res of result.result) {
+          const animStore = enemyStore.getAnimationStore(res.target);
+          switch (res.result) {
+            case AttackUse.success:
+              animStore?.addToAnimationQueue("hurt");
+              break;
+            case AttackUse.miss:
+              animStore?.addToAnimationQueue("dodge");
+              break;
+            case AttackUse.block:
+              animStore?.addToAnimationQueue("block");
+              break;
+            case AttackUse.stunned:
+              break;
+            case AttackUse.lowEnergy:
+              break;
+          }
+        }
+        dungeonStore.addLog(`(minion) ${result.logString}`);
+      });
+      callback();
     },
-    [playerState, enemyStore.enemies.length, handleMinionTurns],
+    [playerState, enemyStore.enemies.length],
   );
 
   const handleAttackResult = useCallback(
@@ -252,9 +159,28 @@ export const useCombatActions = () => {
       if (attackOrSpell instanceof Attack) {
         const { result, logString } = attackOrSpell.use({ targets });
         for (const res of result) {
-          if (res.result == AttackUse.miss) {
-            const animStore = enemyStore.getAnimationStore(res.target);
-            animStore?.triggerDodge();
+          const animStore = enemyStore.getAnimationStore(res.target);
+          switch (res.result) {
+            case AttackUse.success:
+              animStore?.addToAnimationQueue("hurt");
+              __DEV__ && playerAnimationStore.setTextString("HIT!");
+              break;
+            case AttackUse.miss:
+              animStore?.addToAnimationQueue("dodge");
+              playerAnimationStore.setTextString("MISS!");
+              break;
+            case AttackUse.block:
+              animStore?.addToAnimationQueue("block");
+              playerAnimationStore.setTextString("BLOCKED!");
+              break;
+            case AttackUse.stunned:
+              //should not enter, if the player is stunned, they shouldn't be able to attack
+              console.error("Player attack use returned stunned fail");
+              break;
+            case AttackUse.lowEnergy:
+              //should not enter, blocked if mana is low
+              console.error("Player attack use returned lowEnergy fail");
+              break;
           }
         }
         return logString;
@@ -282,12 +208,7 @@ export const useCombatActions = () => {
         }, 750);
       });
     },
-    [
-      playerState,
-      playerMinionsTurn,
-      enemyTurn,
-      enemyStore.attackAnimationsOnGoing,
-    ],
+    [playerState, playerMinionsTurn, enemyTurn, enemyStore.enemyTurnOngoing],
   );
 
   const useAttack = useCallback(

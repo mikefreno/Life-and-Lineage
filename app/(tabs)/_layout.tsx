@@ -74,7 +74,8 @@ const TabLayout = observer(() => {
   } as const;
 
   useEffect(() => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    Platform.OS === "ios" &&
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
   return (
@@ -171,7 +172,10 @@ const TabLayout = observer(() => {
             tabBarIconStyle: {
               marginHorizontal: "auto",
             },
-            animation: uiStore.reduceMotion ? "fade" : "shift",
+            animation:
+              uiStore.reduceMotion || Platform.OS === "android"
+                ? "fade"
+                : "shift",
             tabBarButton: (props) => {
               const onPressWithVibration = (event: GestureResponderEvent) => {
                 vibration({ style: "light" });

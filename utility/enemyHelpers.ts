@@ -1,7 +1,30 @@
 export type EnemyImageMapType = typeof EnemyImageMap;
 export type EnemyImageKeyOption = keyof typeof EnemyImageMap;
 export type EnemyImageValueOption = (typeof EnemyImageMap)[EnemyImageKeyOption];
-export type Animations = EnemyImageValueOption["sets"];
+
+export type AnimationOptions =
+  | "attack_1"
+  | "attack_2"
+  | "attack_3"
+  | "attack_4"
+  | "attack_5"
+  | "block"
+  | "death"
+  | "defence"
+  | "dodge"
+  | "float"
+  | "heal"
+  | "healing"
+  | "hurt"
+  | "idle"
+  | "jump"
+  | "move"
+  | "spawn"
+  | "summon_death"
+  | "summon_idle"
+  | "summon_spawn"
+  | "throw"
+  | "transition";
 
 export const EnemyImageMap = {
   baby_dragon: {
@@ -63,6 +86,8 @@ export const EnemyImageMap = {
     },
     height: 48,
     width: 48,
+    displayHeight: 300,
+    displayWidth: 300,
   },
   bandit_light: {
     sets: {
@@ -90,6 +115,8 @@ export const EnemyImageMap = {
     },
     height: 48,
     width: 48,
+    displayHeight: 300,
+    displayWidth: 300,
   },
   bat_blood: {
     sets: {
@@ -215,6 +242,7 @@ export const EnemyImageMap = {
     height: 64,
     width: 64,
     mirror: true,
+    renderScale: 0.5,
   },
   bat_vampire: {
     sets: {
@@ -2057,6 +2085,7 @@ export const EnemyImageMap = {
     },
     height: 78,
     width: 89,
+    renderScale: 0.75,
   },
   skeleton_warrior: {
     sets: {

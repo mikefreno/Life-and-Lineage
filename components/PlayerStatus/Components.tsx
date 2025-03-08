@@ -494,14 +494,12 @@ export const StatDisplay = ({
     >
       <View style={{ ...styles.rowCenter }}>
         <Icon height={14} width={14} />
-        <Text style={[styles.ml2, styles.bold]}>
-          {getTotalValue(modifier, value)}
-        </Text>
+        <Text style={styles.ml2}>{getTotalValue(modifier, value)}</Text>
       </View>
       <Text
         style={{
           ...styles.textCenter,
-          ...styles["text-xs"],
+          ...styles["text-sm"],
           ...styles.mt1,
         }}
       >

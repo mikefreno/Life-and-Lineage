@@ -38,7 +38,13 @@ import { VFXWrapper } from "@/components/VFXWrapper";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 
 const DungeonLevelScreen = observer(() => {
-  const { enemyStore, dungeonStore, uiStore, audioStore } = useRootStore();
+  const {
+    enemyStore,
+    dungeonStore,
+    uiStore,
+    audioStore,
+    playerAnimationStore,
+  } = useRootStore();
   const { currentLevel, inCombat } = dungeonStore;
   const playerState = usePlayerStore();
   const { draggableClassStore } = useDraggableStore();
@@ -194,7 +200,6 @@ const DungeonLevelScreen = observer(() => {
               showing: false,
               chosenAttack: null,
             });
-            enemyStore.setAttackAnimationOngoing(false);
           }}
         >
           <ThemedView>
@@ -253,6 +258,9 @@ const DungeonLevelScreen = observer(() => {
           )}
           <LinearGradientBlur style={styles.dungeonBlur} />
           <View ref={mainBodyRef} style={{ flex: 1 }}>
+            <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
+              {playerAnimationStore.textString}
+            </Text>
             <BattleTab battleTab={battleTab} />
             <BattleTabControls
               battleTab={battleTab}

@@ -251,13 +251,6 @@ export const useStyles = () => {
       borderColor: theme.border,
       color: theme.accent,
     } as const,
-    settingsContainer: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      paddingHorizontal: 16,
-      paddingTop: 48,
-    } as const,
     remoteSaveContainer: {
       width: "100%",
       backgroundColor: uiStore.colorScheme === "dark" ? "#3f3f46" : "#d4d4d4",
@@ -283,7 +276,7 @@ export const useStyles = () => {
       alignItems: "flex-end",
       paddingVertical: 8,
     } as const,
-    gameSettingsContainer: {
+    settingsContainer: {
       flex: 1,
       alignItems: "center",
       justifyContent: "center",
@@ -758,11 +751,6 @@ export const useStyles = () => {
       marginLeft: 8,
       width: "50%",
     } as const,
-    enemyInfoContainer: {
-      ...flex.columnCenter,
-      minWidth: "40%",
-      maxWidth: "60%",
-    } as const,
     textAnimationContainer: {
       position: "absolute",
       left: 0,
@@ -1117,7 +1105,7 @@ export const useStyles = () => {
     } as const,
     // webview
     webViewHeader: {
-      height: 50,
+      height: normalize(50),
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
@@ -1674,28 +1662,28 @@ export const shadows = {
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.05,
     shadowRadius: 10,
-    elevation: 2,
+    elevation: 20,
   },
   diffuseTop: {
     shadowColor: "#000000",
     shadowOffset: { width: 0, height: -5 },
     shadowOpacity: 0.05,
     shadowRadius: 10,
-    elevation: 2,
+    elevation: 20,
   },
   soft: {
     shadowColor: "#000000",
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.25,
     shadowRadius: 15,
-    elevation: 4,
+    elevation: 24,
   },
   softTop: {
     shadowColor: "#000000",
     shadowOffset: { width: 0, height: -5 },
     shadowOpacity: 0.25,
     shadowRadius: 15,
-    elevation: 4,
+    elevation: 24,
   },
   diffuseWhite: {
     shadowColor: "#ffffff",

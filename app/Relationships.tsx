@@ -1,5 +1,5 @@
 import React from "react";
-import { Text } from "../components/Themed";
+import { Text, ThemedView } from "../components/Themed";
 import { wait } from "../utility/functions/misc";
 import { CharacterImage } from "../components/CharacterImage";
 import { useState } from "react";
@@ -72,62 +72,68 @@ const RelationshipsScreen = observer(() => {
 
   function renderCharacter(character: Character) {
     return (
-      <Pressable
-        style={[
-          flex.columnCenter,
-          {
-            width: uiStore.dimensions.lesser * 0.35,
-            opacity: character.deathdate ? 0.5 : 1,
-            height: uiStore.dimensions.height / 2,
-          },
-        ]}
-        key={character.id}
-        disabled={!!character.deathdate}
-        onPress={() => {
-          setShowInteractionModal(true);
-          setSelectedCharacter(character);
+      <View
+        style={{
+          width: uiStore.dimensions.width / 2.5,
+          marginHorizontal: uiStore.dimensions.width * 0.05,
+          ...styles.debugBorder,
         }}
       >
-        <Text style={{ textAlign: "center", ...styles["text-2xl"] }}>
-          {character.fullName}
-        </Text>
-        <CharacterImage character={character} />
-        <Text style={styles["text-xl"]}>
-          {character.deathdate && "Died at "}
-          {character.age} Years Old
-        </Text>
-        <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
-          {character.fullName}
-        </Text>
-        <View style={{ marginHorizontal: "auto" }}>
-          <Text
-            style={{
-              textAlign: "center",
-              flexWrap: "wrap",
-              ...styles["text-lg"],
-            }}
-          >
-            {character.deathdate && "Was a "}
-            {character.job}
+        <Pressable
+          style={[
+            flex.columnCenter,
+            {
+              opacity: character.deathdate ? 0.5 : 1,
+            },
+          ]}
+          key={character.id}
+          disabled={!!character.deathdate}
+          onPress={() => {
+            setShowInteractionModal(true);
+            setSelectedCharacter(character);
+          }}
+        >
+          <Text style={{ textAlign: "center", ...styles["text-2xl"] }}>
+            {character.fullName}
           </Text>
-        </View>
-        {!character.deathdate && (
-          <View style={styles.affectionContainer}>
-            <View style={{ width: "75%" }}>
-              <ProgressBar
-                value={Math.floor(character.affection * 4) / 4}
-                minValue={-100}
-                maxValue={100}
-                filledColor="#dc2626"
-                unfilledColor="#fca5a5"
-              />
-            </View>
-            <View style={{ marginVertical: "auto", marginLeft: 4 }}>
-              <AffectionIcon height={14} width={14} />
-            </View>
+          <CharacterImage character={character} />
+          <Text style={styles["text-xl"]}>
+            {character.deathdate && "Died at "}
+            {character.age} Years Old
+          </Text>
+          <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
+            {character.fullName}
+          </Text>
+          <View style={{ marginHorizontal: "auto" }}>
+            <Text
+              style={{
+                textAlign: "center",
+                flexWrap: "wrap",
+                ...styles["text-lg"],
+              }}
+            >
+              {character.deathdate && "Was a "}
+              {character.job}
+            </Text>
           </View>
-        )}
-      </Pressable>
+          {!character.deathdate && (
+            <View style={styles.affectionContainer}>
+              <View style={{ width: "75%" }}>
+                <ProgressBar
+                  value={Math.floor(character.affection * 4) / 4}
+                  minValue={-100}
+                  maxValue={100}
+                  filledColor="#dc2626"
+                  unfilledColor="#fca5a5"
+                />
+              </View>
+              <View style={{ marginVertical: "auto", marginLeft: 4 }}>
+                <AffectionIcon height={14} width={14} />
+              </View>
+            </View>
+          )}
+        </Pressable>
+      </View>
     );
   }
 
@@ -135,10 +141,10 @@ const RelationshipsScreen = observer(() => {
     if (data.length === 0) return null;
 
     return (
-      <View style={{ width: "100%" }} key={title}>
+      <ThemedView key={title}>
         <Text
           style={{
-            paddingVertical: 32,
+            paddingVertical: 12,
             textAlign: "center",
             ...styles["text-lg"],
           }}
@@ -148,11 +154,14 @@ const RelationshipsScreen = observer(() => {
         <FlatList
           horizontal
           data={data}
-          contentContainerStyle={[flex.rowBetween, { minWidth: "100%" }]}
+          contentContainerStyle={{
+            flexGrow: 1,
+            width: (data.length / 2) * uiStore.dimensions.width,
+          }}
           renderItem={({ item }) => renderCharacter(item)}
           keyExtractor={(item) => item.id}
         />
-      </View>
+      </ThemedView>
     );
   };
 
@@ -269,11 +278,7 @@ const RelationshipsScreen = observer(() => {
           backdropCloses
         />
         <ScrollView>
-          <View style={[styles.mainContainer]}>
-            {characterGroups.map((group) =>
-              renderGroup(group.title, group.data),
-            )}
-          </View>
+          {characterGroups.map((group) => renderGroup(group.title, group.data))}
         </ScrollView>
       </>
     );

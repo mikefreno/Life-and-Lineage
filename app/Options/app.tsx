@@ -242,8 +242,9 @@ export const AppSettings = observer(() => {
           ))}
         </ScrollView>
       </GenericModal>
-
-      <ScrollView>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+      >
         <View style={styles.settingsContainer}>
           <GenericStrikeAround>
             <Text style={[styles["text-xl"], { textAlign: "center" }]}>
@@ -408,27 +409,27 @@ export const AppSettings = observer(() => {
             </Pressable>
           </View>
         </View>
-      </ScrollView>
-      <Pressable
-        onPress={() => {
-          runInAction(() => (uiStore.webviewURL = "contact"));
-          router.push("/FrenoDotMeWebview");
-        }}
-        style={{ paddingVertical: uiStore.dimensions.height * 0.02 }}
-      >
-        <Text
-          style={[
-            styles["text-xl"],
-            {
-              color: Colors[uiStore.colorScheme].tabIconSelected,
-              textDecorationLine: "underline",
-              textAlign: "center",
-            },
-          ]}
+        <Pressable
+          onPress={() => {
+            runInAction(() => (uiStore.webviewURL = "contact"));
+            router.push("/FrenoDotMeWebview");
+          }}
+          style={{ paddingVertical: uiStore.dimensions.height * 0.02 }}
         >
-          Contact
-        </Text>
-      </Pressable>
+          <Text
+            style={[
+              styles["text-xl"],
+              {
+                color: Colors[uiStore.colorScheme].tabIconSelected,
+                textDecorationLine: "underline",
+                textAlign: "center",
+              },
+            ]}
+          >
+            Contact
+          </Text>
+        </Pressable>
+      </ScrollView>
     </>
   );
 });
