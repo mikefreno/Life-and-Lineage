@@ -703,7 +703,6 @@ export class PlayerCharacter extends Character {
       totalIntelligence: computed,
       baseDexterity: observable,
       totalDexterity: computed,
-      attackPower: computed,
       magicPower: computed,
 
       addSkillPoint: action,
@@ -1143,10 +1142,6 @@ export class PlayerCharacter extends Character {
       (this.equipmentStats.get(Modifier.Strength) ?? 0)
     );
   }
-
-  get attackPower() {
-    return this.totalStrength * 0.5 + this.totalDamage;
-  }
   //----------------------------------Intelligence-------------------------------//
   get totalIntelligence() {
     // needs conditionals added to it, at time of righting no conditions affect this stat
@@ -1351,10 +1346,13 @@ export class PlayerCharacter extends Character {
   }
 
   get totalPhysicalDamage(): number {
-    return this.calculateTotalDamage(
-      Modifier.PhysicalDamage,
-      Modifier.PhysicalDamageAdded,
-      Modifier.PhysicalDamageMultiplier,
+    return (
+      this.calculateTotalDamage(
+        Modifier.PhysicalDamage,
+        Modifier.PhysicalDamageAdded,
+        Modifier.PhysicalDamageMultiplier,
+      ) +
+      this.totalStrength * 0.5
     );
   }
 

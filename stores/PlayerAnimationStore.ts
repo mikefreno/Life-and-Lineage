@@ -8,7 +8,7 @@ import {
 } from "mobx";
 import { PlayerAnimationSet } from "@/utility/types";
 
-const PLAYER_TEXT_STRING_DURATION = 3000;
+export const PLAYER_TEXT_STRING_DURATION = 3000;
 
 export class PlayerAnimationStore {
   root: RootStore;

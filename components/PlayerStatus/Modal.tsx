@@ -164,6 +164,7 @@ export const PlayerStatusModal = observer(() => {
     <GenericModal
       isVisibleCondition={uiStore.detailedStatusViewShowing}
       backFunction={() => uiStore.setDetailedStatusViewShowing(false)}
+      scrollEnabled={true}
       size={95}
     >
       <View>

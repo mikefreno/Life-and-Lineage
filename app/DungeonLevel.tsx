@@ -1,6 +1,6 @@
 import React, { useLayoutEffect } from "react";
 import { ThemedView, Text } from "../components/Themed";
-import { type LayoutChangeEvent, View } from "react-native";
+import { type LayoutChangeEvent, View, Animated } from "react-native";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
 import BattleTab from "../components/DungeonComponents/BattleTab";
@@ -36,15 +36,12 @@ import { reaction } from "mobx";
 import { ScreenShaker } from "@/components/ScreenShaker";
 import { VFXWrapper } from "@/components/VFXWrapper";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
+import { PLAYER_TEXT_STRING_DURATION } from "@/stores/PlayerAnimationStore";
+import Colors from "@/constants/Colors";
 
 const DungeonLevelScreen = observer(() => {
-  const {
-    enemyStore,
-    dungeonStore,
-    uiStore,
-    audioStore,
-    playerAnimationStore,
-  } = useRootStore();
+  const { dungeonStore, uiStore, audioStore, playerAnimationStore } =
+    useRootStore();
   const { currentLevel, inCombat } = dungeonStore;
   const playerState = usePlayerStore();
   const { draggableClassStore } = useDraggableStore();
@@ -158,6 +155,20 @@ const DungeonLevelScreen = observer(() => {
     setInventoryFullNotifier(false);
   }, [showLeftBehindItemsScreen]);
 
+  const textOpacity = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (playerAnimationStore.textString) {
+      textOpacity.setValue(1);
+
+      Animated.timing(textOpacity, {
+        toValue: 0,
+        duration: PLAYER_TEXT_STRING_DURATION,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [playerAnimationStore.textString]);
+
   useLayoutEffect(() => {
     mainBodyRef.current?.measure((x, y, width, height) => {
       setMainHeight(height);
@@ -240,8 +251,8 @@ const DungeonLevelScreen = observer(() => {
               <Image
                 source={dungeonStore.currentSpecialEncounter.imageSource}
                 style={{
-                  width: 200,
-                  height: 200,
+                  width: uiStore.dimensions.lesser * 0.5,
+                  height: uiStore.dimensions.lesser * 0.5,
                   marginVertical: "auto",
                 }}
                 contentFit="contain"
@@ -258,9 +269,17 @@ const DungeonLevelScreen = observer(() => {
           )}
           <LinearGradientBlur style={styles.dungeonBlur} />
           <View ref={mainBodyRef} style={{ flex: 1 }}>
-            <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
+            <Animated.Text
+              style={{
+                textAlign: "center",
+                ...styles["text-xl"],
+                color: Colors.dark.text,
+                opacity: textOpacity,
+                fontFamily: "PixelifySans",
+              }}
+            >
               {playerAnimationStore.textString}
-            </Text>
+            </Animated.Text>
             <BattleTab battleTab={battleTab} />
             <BattleTabControls
               battleTab={battleTab}

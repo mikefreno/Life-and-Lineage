@@ -3,9 +3,9 @@ import { Text } from "./Themed";
 import { View } from "react-native";
 import D20DieAnimation from "./DieRollAnim";
 import GenericFlatButton from "./GenericFlatButton";
-import * as Updates from "expo-updates";
 import { useRootStore } from "../hooks/stores";
 import { useStyles } from "../hooks/styles";
+import { reloadAppAsync } from "expo";
 
 export class ErrorBoundary extends Component {
   constructor(props) {
@@ -55,7 +55,7 @@ function ErrorRender() {
         </View>
         <GenericFlatButton
           style={{ marginTop: 8 }}
-          onPress={() => Updates.reloadAsync()}
+          onPress={() => reloadAppAsync("Restart")}
         >
           Restart
         </GenericFlatButton>

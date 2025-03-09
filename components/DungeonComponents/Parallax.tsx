@@ -19,6 +19,7 @@ import Animated, {
 import { Image } from "expo-image";
 import { TILE_SIZE } from "../../stores/DungeonStore";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { useRootStore } from "@/hooks/stores";
 
 const backgroundImages = {
   AbandonedValley: {
@@ -378,6 +379,7 @@ export const Parallax = ({
   children: ReactNode;
 }) => {
   const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+  const { uiStore } = useRootStore();
   const scrollX = useSharedValue(0);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
@@ -577,7 +579,13 @@ export const Parallax = ({
         {backgroundContent}
         {!plainReduceMotion && renderEffects()}
       </View>
-      <View style={{ paddingTop: header, flex: 1, paddingBottom: 74 }}>
+      <View
+        style={{
+          paddingTop: header,
+          flex: 1,
+          paddingBottom: uiStore.playerStatusHeight + uiStore.expansionPadding,
+        }}
+      >
         {children}
       </View>
     </View>

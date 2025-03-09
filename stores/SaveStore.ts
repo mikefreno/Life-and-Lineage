@@ -2,7 +2,13 @@ import * as SQLite from "expo-sqlite";
 import { parse, stringify } from "flatted";
 import { PlayerCharacter, serializeJobs } from "../entities/character";
 import { RootStore } from "./RootStore";
-import { action, makeObservable, observable, reaction } from "mobx";
+import {
+  action,
+  makeObservable,
+  observable,
+  reaction,
+  runInAction,
+} from "mobx";
 import { storage } from "../utility/functions/storage";
 
 export class SaveStore {
@@ -240,7 +246,11 @@ export class SaveStore {
 
           this.root.dungeonStore.resetVolatileState();
 
-          this.currentGameId = gameId;
+          runInAction(() => {
+            this.currentGameId = gameId;
+          });
+
+          this.root.clearDeathScreen();
 
           return true;
         }

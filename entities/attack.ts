@@ -114,7 +114,7 @@ export class Attack {
     this.buffStrings.forEach((buffString) => {
       const newBuff = createBuff({
         buffName: buffString,
-        attackPower: this.user.attackPower,
+        attackPower: this.damage().total,
         maxHealth:
           "nonConditionalMaxHealth" in this.user // done due to different attributes on different classes
             ? this.user.nonConditionalMaxHealth
@@ -138,6 +138,7 @@ export class Attack {
   }
 
   /**
+   * TODO: Update to use new damage system (damage types)
    * This is more complicated than buffs, due to this being dependent on both a dice roll and the target's stats.
    * @param target - The target of the attack, which can be a PlayerCharacter, Enemy, or Minion
    */
@@ -146,9 +147,7 @@ export class Attack {
       selfConditions: this.user.conditions,
       enemyConditions: target.conditions,
     });
-    const damagePreDR = this.baseDamage * damageMult + damageFlat;
-    const enemyDR = target.getPhysicalDamageReduction();
-    const perHitDamage = damagePreDR * (1 - enemyDR);
+    const perHitDamage = this.damage(target).total * damageMult + damageFlat;
     const created: {
       debuff?: Condition;
       chance: number;
@@ -169,7 +168,7 @@ export class Attack {
             "nonConditionalMaxHealth" in target
               ? target.nonConditionalMaxSanity
               : target.baseSanity,
-          primaryAttackDamage: this.baseDamage * damageMult + damageFlat,
+          primaryAttackDamage: this.damage().total * damageMult + damageFlat,
           applierNameString: this.userNameReference,
           applierID: this.user.id,
         });
@@ -210,17 +209,6 @@ export class Attack {
     return { debuffNames, amountHealed };
   }
 
-  /**
-   * Calculates the base damage of the attack based on the user's attack power and other modifiers.
-   * @returns The base damage of the attack.
-   */
-  get baseDamage() {
-    if (this.damageMult == 0) {
-      return 0;
-    }
-    return this.user.attackPower * this.damageMult + this.flatHealthDamage;
-  }
-
   public damageBasedOnWeapon(user: PlayerCharacter, weaponDamage: number) {
     if (this.damageMult == 0) {
       return 0;
@@ -253,8 +241,9 @@ export class Attack {
    */
   public use({ targets }: { targets: (Enemy | PlayerCharacter | Minion)[] }): {
     result: {
-      target: string;
+      target: Enemy | PlayerCharacter | Minion;
       result: AttackUse;
+      healed?: number;
       damages?: {
         physical: number;
         fire: number;
@@ -262,6 +251,7 @@ export class Attack {
         lightning: number;
         poison: number;
         total: number;
+        sanity?: number;
       };
     }[];
     logString: string;
@@ -269,16 +259,16 @@ export class Attack {
     if (!this.canBeUsed) {
       if (this.user.isStunned) {
         return {
-          result: targets.map(({ id }) => ({
-            target: id,
+          result: targets.map((target) => ({
+            target,
             result: AttackUse.stunned,
           })),
           logString: `${toTitleCase(this.name)} was stunned!`,
         };
       } else {
         return {
-          result: targets.map(({ id }) => ({
-            target: id,
+          result: targets.map((target) => ({
+            target,
             result: AttackUse.lowEnergy,
           })),
           logString: `${toTitleCase(
@@ -312,7 +302,8 @@ export class Attack {
 
       if (hits.includes(AttackUse.success)) {
         let actualizedHits = hits.filter((h) => h === AttackUse.success).length;
-        const damages = this.calculateTotalDamage(target);
+        const damages = this.damage(target);
+        console.log(damages);
 
         // Apply condition effects to total damage
         const totalDamageWithConditions =
@@ -327,7 +318,6 @@ export class Attack {
           this.user.useArrow();
         }
 
-        // Handle poison effects
         let sanityDmg = this.flatSanityDamage;
         const debuffStrings: string[] = [];
         if (
@@ -339,12 +329,9 @@ export class Attack {
             target.addCondition(effect);
             debuffStrings.push(effect.name);
           } else {
-            // ... handle poison effects
+            // TODO: handle poison effects
           }
         }
-
-        target.damageHealth({ damage: finalDamage, attackerId: this.user.id });
-        target.damageSanity(this.flatSanityDamage);
 
         const thornsIshDamage = getConditionDamageToAttacker(
           target.conditions,
@@ -372,8 +359,8 @@ export class Attack {
             lightning: Math.round(damages.lightning * actualizedHits * 4) / 4,
             poison: Math.round(damages.poison * actualizedHits * 4) / 4,
             total: finalDamage,
+            sanity: sanityDmg,
           },
-          sanityDamage: sanityDmg,
           debuffs: [...debuffStrings, ...debuffNames],
           healed: amountHealed,
         };
@@ -413,7 +400,7 @@ export class Attack {
 
     return {
       result: targetResults.map(({ target, result, damages }) => ({
-        target: target.id,
+        target,
         result,
         damages,
       })),
@@ -452,14 +439,17 @@ export class Attack {
     return AttackUse.miss;
   }
 
-  private calculateDamageType(baseDamage: number, resistance: number): number {
+  private calculateDamageType(
+    baseDamage: number,
+    resistance: number = 0,
+  ): number {
     if (this.damageMult === 0 && this.flatHealthDamage === 0) return 0;
     const damageBeforeResistance =
       baseDamage * this.damageMult + this.flatHealthDamage;
     return damageBeforeResistance * (1 - resistance / 100);
   }
 
-  private calculateTotalDamage(target: Enemy | PlayerCharacter | Minion): {
+  damage(target?: Enemy | PlayerCharacter | Minion): {
     physical: number;
     fire: number;
     cold: number;
@@ -469,27 +459,27 @@ export class Attack {
   } {
     const physical = this.calculateDamageType(
       this.user.totalPhysicalDamage,
-      target.getPhysicalDamageReduction(),
+      target?.getPhysicalDamageReduction(),
     );
 
     const fire = this.calculateDamageType(
       this.user.totalFireDamage,
-      target.fireResistance,
+      target?.fireResistance,
     );
 
     const cold = this.calculateDamageType(
       this.user.totalColdDamage,
-      target.coldResistance,
+      target?.coldResistance,
     );
 
     const lightning = this.calculateDamageType(
       this.user.totalLightningDamage,
-      target.lightningResistance,
+      target?.lightningResistance,
     );
 
     const poison = this.calculateDamageType(
       this.user.totalPoisonDamage,
-      target.poisonResistance,
+      target?.poisonResistance,
     );
 
     return {
@@ -622,7 +612,11 @@ export class Attack {
         ),
       });
     }
-    return AttackDetails({ styles, attack: this, baseDamage: this.baseDamage });
+    return AttackDetails({
+      styles,
+      attack: this,
+      baseDamage: this.damage().total,
+    });
   }
 
   /**

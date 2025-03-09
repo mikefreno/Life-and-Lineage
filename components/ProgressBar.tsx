@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { View, Platform } from "react-native";
+import { View, Platform, ViewStyle, ViewProps, StyleProp } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -22,6 +22,7 @@ interface ProgressBarProps {
   showMax?: boolean;
   animationDuration?: number;
   skipInitialAnimation?: boolean;
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
 const ProgressBar = ({
@@ -37,6 +38,7 @@ const ProgressBar = ({
   showMax = false,
   animationDuration = 300,
   skipInitialAnimation = true,
+  containerStyle = undefined,
 }: ProgressBarProps) => {
   const width = useSharedValue(0);
   const styles = useStyles();
@@ -67,14 +69,17 @@ const ProgressBar = ({
 
   return (
     <View
-      style={{
-        backgroundColor: unfilledColor,
-        borderColor: borderColor,
-        borderWidth: borderColor ? 1 : 0,
-        width: "100%",
-        borderRadius: 50,
-        height,
-      }}
+      style={[
+        {
+          backgroundColor: unfilledColor,
+          borderColor: borderColor,
+          borderWidth: borderColor ? 1 : 0,
+          width: "100%",
+          borderRadius: 50,
+          height,
+        },
+        containerStyle,
+      ]}
     >
       <Animated.View
         style={[

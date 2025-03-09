@@ -11,7 +11,13 @@ import { Spell } from "../entities/spell";
 
 export const useEnemyManagement = () => {
   const root = useRootStore();
-  const { enemyStore, playerState, dungeonStore, tutorialStore } = root;
+  const {
+    enemyStore,
+    playerState,
+    dungeonStore,
+    tutorialStore,
+    playerAnimationStore,
+  } = root;
   const { setDroppedItems } = useLootState();
   const { setShouldShowFirstBossKillTutorialAfterItemDrops } =
     useTutorialState();
@@ -40,7 +46,7 @@ export const useEnemyManagement = () => {
             setDroppedItems({ itemDrops, gold, storyDrops });
           }
 
-          // probably want to move this into the enemystore, triggerd from animation
+          // probably want to move this into the enemystore, triggered from animation
           enemyStore.removeEnemy(enemy);
           if (enemyStore.enemies.length === 0) {
             if (
@@ -93,12 +99,25 @@ export const useEnemyManagement = () => {
         if (!enemyDeathHandler(enemy)) {
           const enemyAttackRes = enemy.takeTurn({ player: playerState! });
           for (const res of enemyAttackRes.result) {
+            const animStore = enemyStore.getAnimationStore(enemy.id);
             switch (res.result) {
               case AttackUse.success:
+                animStore?.addToAnimationQueue(["move", "attack_1", "move"]); // need to map attack used to specific animation
+                break;
               case AttackUse.miss:
+                animStore?.addToAnimationQueue(["move", "attack_1", "move"]); // need to map attack used to specific animation
+                playerAnimationStore.setTextString("DODGE!");
+                break;
               case AttackUse.block:
+                animStore?.addToAnimationQueue(["move", "attack_1", "move"]); // need to map attack used to specific animation
+                playerAnimationStore.setTextString("BLOCKED!");
+                break;
               case AttackUse.stunned:
+                animStore?.setTextString("STUNNED!");
+                break;
               case AttackUse.lowEnergy:
+                animStore?.setTextString("EXHAUSTED!");
+                break;
             }
           }
 
@@ -159,11 +178,22 @@ export const useCombatActions = () => {
       if (attackOrSpell instanceof Attack) {
         const { result, logString } = attackOrSpell.use({ targets });
         for (const res of result) {
-          const animStore = enemyStore.getAnimationStore(res.target);
+          const animStore = enemyStore.getAnimationStore(res.target.id);
           switch (res.result) {
             case AttackUse.success:
-              animStore?.addToAnimationQueue("hurt");
-              __DEV__ && playerAnimationStore.setTextString("HIT!");
+              console.log(
+                `damage done: ${res.damages?.total}, targetHP: ${res.target.currentHealth}`,
+              );
+              if ((res.damages?.total ?? 0) >= res.target.currentHealth) {
+                animStore?.addToAnimationQueue("death");
+              } else {
+                animStore?.addToAnimationQueue("hurt");
+              }
+              res.target.damageHealth({
+                damage: res.damages?.total ?? 0,
+                attackerId: attackOrSpell.user.id,
+              });
+              res.target.damageSanity(res.damages?.sanity);
               break;
             case AttackUse.miss:
               animStore?.addToAnimationQueue("dodge");

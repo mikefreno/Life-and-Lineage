@@ -37,14 +37,6 @@ export default class EnemyStore {
     );
 
     reaction(
-      () => [this.animationStoreMap, this.enemies],
-      () => {
-        console.log("map:", this.animationStoreMap);
-        console.log("enemies:", this.enemies);
-      },
-    );
-
-    reaction(
       () => this.enemies.length,
       () => {
         if (this.enemies.length == 0) {
@@ -58,7 +50,7 @@ export default class EnemyStore {
   get enemyTurnOngoing() {
     const stores = Array.from(this.animationStoreMap.values());
     if (stores.length) {
-      return stores.some((store) => store.notIdle);
+      return stores.some((store) => !store.isIdle);
     } else return false;
   }
 
@@ -97,7 +89,6 @@ export default class EnemyStore {
       map.set(enemy.id, new EnemyAnimationStore({ root: this.root }));
       enemies.push(enemy);
     });
-    console.log(map);
     return { enemies, map };
   }
 

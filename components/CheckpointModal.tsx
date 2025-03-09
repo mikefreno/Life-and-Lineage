@@ -20,10 +20,10 @@ import {
   WizardHat,
 } from "../assets/icons/SVGIcons";
 import BlessingDisplay from "./BlessingsDisplay";
-import { useNavigation } from "expo-router";
 import { radius, useStyles } from "../hooks/styles";
 import Modal from "react-native-modal";
 import { normalize } from "@sentry/core";
+import { useNavigation } from "expo-router";
 
 const CheckpointModal = ({
   isVisible,
@@ -44,6 +44,7 @@ const CheckpointModal = ({
     id: number;
     action: "overwrite" | "delete" | "load";
   } | null>(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (isVisible) {
@@ -122,10 +123,13 @@ const CheckpointModal = ({
   };
 
   const handleLoad = async (checkpointId: number, gameId: number) => {
-    await saveStore.loadCheckpoint({
+    const success = await saveStore.loadCheckpoint({
       gameId: gameId,
       checkpointId: checkpointId,
     });
+    if (success) {
+      wait(250).then(() => clearHistory(navigation));
+    }
     setConfirmingAction(null);
   };
 

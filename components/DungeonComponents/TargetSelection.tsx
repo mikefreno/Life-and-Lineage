@@ -13,7 +13,7 @@ import { useRef } from "react";
 
 export default function TargetSelectionRender() {
   const styles = useStyles();
-  const { enemyStore, uiStore } = useRootStore();
+  const { enemyStore } = useRootStore();
   const { showTargetSelection, setShowTargetSelection } = useCombatState();
   const { useAttack } = useCombatActions();
 
@@ -58,6 +58,7 @@ export default function TargetSelectionRender() {
     >
       {targets.map((target) => {
         const scaleAnim = getAnimationValue(target.id);
+        const store = enemyStore.getAnimationStore(target.id);
 
         return (
           <Animated.View
@@ -86,10 +87,7 @@ export default function TargetSelectionRender() {
             >
               <View style={flex.rowEvenly}>
                 <View style={{ marginVertical: "auto" }}>
-                  <AnimatedSprite
-                    spriteSet={EnemyImageMap[target.sprite ?? "samurai_rice"]}
-                    currentAnimationState={"idle"}
-                  />
+                  <AnimatedSprite enemy={target} />
                 </View>
                 <View style={[styles.myAuto, { width: "33%" }]}>
                   <Text style={{ textAlign: "center" }}>

@@ -589,7 +589,7 @@ export class Creature {
     numberOfPotentialTargets: number,
   ): { attack: Attack; numTargets: number } {
     const scoredAttacks = availableAttacks.map((attack) => {
-      const baseDamage = attack.baseDamage;
+      const damage = attack.damage();
       const numTargets =
         attack.attackStyle === "aoe"
           ? numberOfPotentialTargets
@@ -598,7 +598,7 @@ export class Creature {
             ? 2
             : 1
           : 1;
-      const totalDamage = baseDamage * numTargets;
+      const totalDamage = damage.total * numTargets;
       const heal = attack.buffs.filter((buff) => buff.effect.includes("heal"));
       const nonHealBuffCount = attack.buffs.filter(
         (buff) => !buff.effect.includes("heal"),

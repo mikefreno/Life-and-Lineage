@@ -370,6 +370,7 @@ interface SpecialEncounterOutcome {
   } | null;
 }
 
+// TODO: Need to implement gank fight setup
 export class SpecialEncounter {
   readonly countChances: Record<string, number>;
   readonly name: string;

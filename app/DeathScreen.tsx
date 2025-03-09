@@ -30,8 +30,9 @@ import { Item } from "../entities/item";
 import { useHeaderHeight } from "@react-navigation/elements";
 import CheckpointModal from "../components/CheckpointModal";
 import { flex, tw, useStyles } from "../hooks/styles";
+import { observer } from "mobx-react-lite";
 
-export default function DeathScreen() {
+const DeathScreen = observer(() => {
   const [nextLife, setNextLife] = useState<Character | null>(null);
   const [deathMessage, setDeathMessage] = useState<string>("");
   const [selectedClass, setSelectedClass] = useState<PlayerClassOptions | null>(
@@ -195,7 +196,9 @@ export default function DeathScreen() {
                       style={[tw.myAuto, tw.mx2]}
                     >
                       <View style={styles.childCard}>
-                        <Text style={{ textAlign: "center", ...text.xl }}>
+                        <Text
+                          style={{ textAlign: "center", ...styles["text-xl"] }}
+                        >
                           {child.firstName}
                         </Text>
                         <CharacterImage character={child} />
@@ -208,13 +211,15 @@ export default function DeathScreen() {
           )}
 
           <Pressable style={styles.newLifeButton} onPress={startNewGame}>
-            <Text style={text.lg}>Live a New Life</Text>
+            <Text style={styles["text-lg"]}>Live a New Life</Text>
           </Pressable>
         </View>
       </>
     );
   }
-}
+});
+
+export default DeathScreen;
 
 function MinimalClassSelect({
   dimensions,

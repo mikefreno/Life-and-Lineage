@@ -6,7 +6,7 @@ import { Coins, SquarePlus } from "@/assets/icons/SVGIcons";
 import { Text } from "@/components/Themed";
 import { useRootStore } from "@/hooks/stores";
 import { useStatChanges, useVibration } from "@/hooks/generic";
-import { useStyles } from "@/hooks/styles";
+import { normalize, normalizeLineHeight, useStyles } from "@/hooks/styles";
 import {
   ChangePopUp,
   ColorAndPlatformDependantBlur,
@@ -46,12 +46,11 @@ const PlayerStatusForSecondary = observer(() => {
           >
             <View
               style={{
-                height: 16,
-                paddingVertical: 2,
+                height: normalizeLineHeight(16),
                 ...styles.rowCenter,
               }}
             >
-              <View style={[styles.rowCenter, { marginVertical: "auto" }]}>
+              <View style={[styles.rowCenter, { alignItems: "center" }]}>
                 <Text>{playerState.readableGold}</Text>
                 <ChangePopUp
                   popUp={"gold"}
@@ -59,11 +58,15 @@ const PlayerStatusForSecondary = observer(() => {
                   animationCycler={animationCycler}
                   colorScheme={uiStore.colorScheme}
                 />
-                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+                <Coins
+                  width={normalize(14)}
+                  height={normalize(14)}
+                  style={{ marginLeft: 6 }}
+                />
               </View>
               {playerState.unAllocatedSkillPoints > 0 && (
                 <View style={{ paddingHorizontal: 4, marginVertical: "auto" }}>
-                  <SquarePlus height={16} width={16} />
+                  <SquarePlus height={normalize(14)} width={normalize(14)} />
                 </View>
               )}
               <View>

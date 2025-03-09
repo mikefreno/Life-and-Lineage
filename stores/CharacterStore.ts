@@ -1,7 +1,13 @@
 import { parse, stringify } from "flatted";
 import { storage } from "../utility/functions/storage";
 import { RootStore } from "./RootStore";
-import { action, makeObservable, observable, reaction } from "mobx";
+import {
+  action,
+  makeObservable,
+  observable,
+  reaction,
+  runInAction,
+} from "mobx";
 import { throttle } from "lodash";
 import { Character, PlayerCharacter } from "../entities/character";
 import {
@@ -261,11 +267,17 @@ export class CharacterStore {
   }
 
   fromCheckpointData(data: any) {
-    this.characters = data.characters.map((charData: any) =>
-      Character.fromJSON({ ...charData, root: this.root }),
-    );
-    this.independentChildren = data.independentChildren.map((childData: any) =>
-      Character.fromJSON({ ...childData, root: this.root }),
-    );
+    runInAction(() => {
+      this.characters = data.characters.map((charData: any) =>
+        Character.fromJSON({ ...charData, root: this.root }),
+      );
+    });
+
+    runInAction(() => {
+      this.independentChildren = data.independentChildren.map(
+        (childData: any) =>
+          Character.fromJSON({ ...childData, root: this.root }),
+      );
+    });
   }
 }

@@ -34,6 +34,7 @@ interface SpellFields {
   };
   animation: PlayerAnimationSet;
 }
+//TODO: make damage a return value
 
 /**
  * This class instantiates learned spells by the `PlayerCharacter` only.

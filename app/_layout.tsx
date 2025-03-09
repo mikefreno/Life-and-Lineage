@@ -40,6 +40,10 @@ import { BlurView } from "expo-blur";
 import { runInAction } from "mobx";
 import { SCREEN_TRANSITION_TIMING } from "./(tabs)/_layout";
 import PlatformDependantGestureWrapper from "@/components/PlatformDependantGestureWrapper";
+import {
+  EnemyImageMap,
+  enemyImageOptionsPrinter,
+} from "@/utility/enemyHelpers";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -267,6 +271,8 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     playerState?.currentSanity,
     rootStore.atDeathScreen,
   ]);
+
+  enemyImageOptionsPrinter();
 
   useEffect(() => {
     if (uiStore.newbornBaby) {
@@ -641,6 +647,21 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
               name="DeathScreen"
               options={{
                 title: "You Died",
+                headerBackButtonDisplayMode: "minimal",
+                headerBackButtonMenuEnabled: false,
+                headerBackTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(16),
+                },
+                headerTitleStyle: {
+                  fontFamily: "PixelifySans",
+                  fontSize: normalize(22),
+                },
+              }}
+            />
+            <Stack.Screen
+              name="_sitemap"
+              options={{
                 headerBackButtonDisplayMode: "minimal",
                 headerBackButtonMenuEnabled: false,
                 headerBackTitleStyle: {

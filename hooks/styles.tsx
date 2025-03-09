@@ -12,10 +12,35 @@ const getTaperedScale = () => {
   }
 };
 
+const getReversedTaperedScale = () => {
+  const rawScale = BASE_WIDTH / Dimensions.get("window").width;
+  if (rawScale > 1) {
+    return 1 + (rawScale - 1) * 0.5;
+  } else {
+    return 1 - (1 - rawScale) * 0.5;
+  }
+};
+
 const defaultScale = getTaperedScale();
+
+const reverseScale = getReversedTaperedScale();
 
 export const normalize = (size: number, scale: number = defaultScale) => {
   const newSize = size * scale;
+
+  if (Platform.OS === "ios") {
+    return Math.round(PixelRatio.roundToNearestPixel(newSize));
+  } else {
+    return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 2;
+  }
+};
+
+export const reverseNormalize = (
+  size: number,
+  scale: number = reverseScale,
+) => {
+  const newSize = size * scale;
+  console.log(newSize);
 
   if (Platform.OS === "ios") {
     return Math.round(PixelRatio.roundToNearestPixel(newSize));
