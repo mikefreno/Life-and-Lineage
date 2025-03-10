@@ -272,8 +272,6 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     rootStore.atDeathScreen,
   ]);
 
-  enemyImageOptionsPrinter();
-
   useEffect(() => {
     if (uiStore.newbornBaby) {
       setNewbornBaby(uiStore.newbornBaby);

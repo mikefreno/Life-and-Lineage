@@ -28,6 +28,7 @@ import {
 } from "@react-navigation/native";
 import { Character } from "../../entities/character";
 import { Enemy } from "../../entities/creatures";
+import { FPS, MAX_ANIMATION_DURATION } from "@/stores/EnemyAnimationStore";
 
 export const AccelerationCurves = {
   linear: (t: number) => 1 + t,
@@ -475,4 +476,17 @@ const getNPCAsEnemyStats = () => {
   const regen = getRandomInt(3, 5);
 
   return { health, energy, attackPower, regen };
+};
+
+export const calculateAdjustedFrameRate = (
+  frames: number,
+  maxDuration: number = MAX_ANIMATION_DURATION,
+) => {
+  const normalDuration = (frames / FPS) * 1000;
+  if (normalDuration <= maxDuration) {
+    return { duration: normalDuration, adjustedFPS: FPS };
+  }
+
+  const adjustedFPS = (frames * 1000) / maxDuration;
+  return { duration: maxDuration, adjustedFPS };
 };

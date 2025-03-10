@@ -1,20 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Dimensions, View } from "react-native";
+import { View } from "react-native";
 import { Canvas, useAnimatedImage, Image } from "@shopify/react-native-skia";
-import Animated, {
-  useSharedValue,
-  withTiming,
-  withSequence,
-  withDelay,
-  useAnimatedStyle,
-  runOnJS,
-} from "react-native-reanimated";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import {
   AnimationOptions,
   AnimationSet,
   EnemyImageMap,
 } from "../utility/enemyHelpers";
-import { FPS, MAX_ANIMATION_DURATION } from "../stores/EnemyAnimationStore";
 import { useRootStore } from "@/hooks/stores";
 import { reverseNormalize, useStyles } from "@/hooks/styles";
 import { observer } from "mobx-react-lite";
@@ -22,207 +14,7 @@ import { runInAction } from "mobx";
 import { Enemy, Minion } from "@/entities/creatures";
 import { useHeaderHeight } from "@react-navigation/elements";
 import Colors from "@/constants/Colors";
-
-const calculateAdjustedFrameRate = (
-  frames: number,
-  maxDuration: number = MAX_ANIMATION_DURATION,
-) => {
-  const normalDuration = (frames / FPS) * 1000;
-  if (normalDuration <= maxDuration) {
-    return { duration: normalDuration, adjustedFPS: FPS };
-  }
-
-  const adjustedFPS = (frames * 1000) / maxDuration;
-  return { duration: maxDuration, adjustedFPS };
-};
-
-const useReanimatedAnimations = () => {
-  const flashOpacity = useSharedValue(1);
-  const damageOpacity = useSharedValue(1);
-  const textFade = useSharedValue(1);
-  const textTranslate = useSharedValue(0);
-  const dodgeX = useSharedValue(0);
-  const moveX = useSharedValue(0);
-  const moveY = useSharedValue(0);
-
-  const runDodgeAnimation = (
-    dodgeFrames: number = FPS,
-    onComplete: () => void,
-  ) => {
-    const { duration } = calculateAdjustedFrameRate(dodgeFrames);
-    const dodgeDuration = duration;
-
-    // Reset values
-    dodgeX.value = 0;
-    flashOpacity.value = 1;
-
-    // Create the dodge animation sequence
-    dodgeX.value = withSequence(
-      withTiming(30, { duration: dodgeDuration / 4 }),
-      withTiming(30, { duration: dodgeDuration / 4 }),
-      withTiming(0, { duration: dodgeDuration / 4 }, (finished) => {
-        if (finished) {
-          runOnJS(onComplete)();
-        }
-      }),
-    );
-
-    // Flash animation
-    flashOpacity.value = withSequence(
-      withDelay(
-        dodgeDuration / 4,
-        withTiming(0.3, { duration: dodgeDuration / 8 }),
-      ),
-      withTiming(1, { duration: dodgeDuration / 8 }),
-    );
-  };
-
-  const runDeathAnimation = (
-    deathFrames: number = FPS,
-    onComplete: () => void,
-  ) => {
-    const { duration } = calculateAdjustedFrameRate(deathFrames);
-    const deathDuration = duration;
-
-    // Reset value
-    damageOpacity.value = 1;
-
-    // Create the death animation sequence
-    damageOpacity.value = withSequence(
-      withTiming(0.5, { duration: deathDuration / 2 }),
-      withTiming(0, { duration: deathDuration / 2 }, (finished) => {
-        if (finished) {
-          runOnJS(onComplete)();
-        }
-      }),
-    );
-  };
-
-  const runHurtAnimation = (
-    hurtFrames: number = FPS,
-    isDeathAnimation: boolean = false,
-    onComplete: () => void,
-  ) => {
-    const { duration } = calculateAdjustedFrameRate(hurtFrames);
-    const animationDuration = duration;
-
-    // Reset value
-    damageOpacity.value = 1;
-
-    const iterations = isDeathAnimation
-      ? Math.ceil(animationDuration / 400)
-      : 2;
-
-    const flashDuration = isDeathAnimation
-      ? 200
-      : Math.min(200, animationDuration / 4);
-
-    // Create a single flash cycle
-    const createFlashCycle = () => {
-      return withSequence(
-        withTiming(0.5, { duration: flashDuration }),
-        withTiming(1, { duration: flashDuration }),
-      );
-    };
-
-    // Chain multiple flash cycles together
-    let animation = createFlashCycle();
-    for (let i = 1; i < iterations; i++) {
-      animation = withSequence(animation, createFlashCycle());
-    }
-
-    // Run the animation
-    damageOpacity.value = animation;
-
-    // Set up completion callback
-    setTimeout(
-      () => {
-        onComplete();
-      },
-      flashDuration * 2 * iterations,
-    );
-  };
-
-  const runTextAnimation = (onComplete: () => void) => {
-    // Reset values
-    textFade.value = 1;
-    textTranslate.value = 0;
-
-    // Create the text animation
-    textFade.value = withTiming(0, { duration: 2000 });
-    textTranslate.value = withTiming(
-      -Dimensions.get("screen").height * 0.2,
-      { duration: 2000 },
-      (finished) => {
-        if (finished) {
-          runOnJS(onComplete)();
-        }
-      },
-    );
-  };
-
-  const runMoveAnimation = (
-    targetPosition: { x: number; y: number },
-    currentPosition: { x: number; y: number },
-    moveFrames: number,
-    onComplete: () => void,
-  ) => {
-    const { duration } = calculateAdjustedFrameRate(moveFrames);
-    const moveDuration = duration;
-
-    if (moveX.value === 0 && moveY.value === 0) {
-      const dirX = targetPosition.x - currentPosition.x;
-      const dirY = targetPosition.y - currentPosition.y;
-
-      const distance = Math.sqrt(dirX * dirX + dirY * dirY);
-      const moveDistance = Math.min(distance, 100);
-
-      const normalizedX = distance > 0 ? (dirX / distance) * moveDistance : 0;
-      const normalizedY = distance > 0 ? (dirY / distance) * moveDistance : 0;
-
-      // Move to target
-      moveX.value = withTiming(
-        normalizedX,
-        { duration: moveDuration / 2 },
-        (finished) => {
-          if (finished) {
-            runOnJS(onComplete)();
-          }
-        },
-      );
-      moveY.value = withTiming(normalizedY, { duration: moveDuration / 2 });
-    } else {
-      // Return to original position
-      moveX.value = withTiming(
-        0,
-        { duration: moveDuration / 2 },
-        (finished) => {
-          if (finished) {
-            runOnJS(onComplete)();
-          }
-        },
-      );
-      moveY.value = withTiming(0, { duration: moveDuration / 2 });
-    }
-  };
-
-  return {
-    animations: {
-      flashOpacity,
-      damageOpacity,
-      textFade,
-      textTranslate,
-      dodgeX,
-      moveX,
-      moveY,
-    },
-    runHurtAnimation,
-    runDodgeAnimation,
-    runTextAnimation,
-    runDeathAnimation,
-    runMoveAnimation,
-  };
-};
+import { useReanimatedAnimations } from "@/hooks/animation";
 
 /*
  * Scale is from 0-1.0
@@ -234,96 +26,254 @@ const calculateRenderScaling = (scale: number | undefined) => {
   return 1.0;
 };
 
-interface SkiaAnimatedSpriteProps {
+interface SingleAnimationSpriteProps {
   source: any;
+  width: number;
+  height: number;
+  isActive: boolean;
+  onAnimationComplete?: () => void;
+  isLooping?: boolean;
+  onFrameCountReady?: (count: number) => void;
+  animationOption: AnimationOptions;
+}
+
+const SingleAnimationSprite = React.memo(
+  ({
+    source,
+    width,
+    height,
+    isActive,
+    onAnimationComplete,
+    isLooping,
+    onFrameCountReady,
+    animationOption,
+  }: SingleAnimationSpriteProps) => {
+    const animatedImage = useAnimatedImage(source);
+    const [currentFrame, setCurrentFrame] = useState(0);
+    const frameRef = useRef(0);
+    const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const hasCompletedLoop = useRef(false);
+    const firstFrameHoldTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const isFirstFrameHeld = useRef(false);
+    const isMounted = useRef(true);
+
+    useEffect(() => {
+      isMounted.current = true;
+      return () => {
+        isMounted.current = false;
+      };
+    }, []);
+
+    const safeSetCurrentFrame = (frame: number) => {
+      if (isMounted.current) {
+        setCurrentFrame(frame);
+      }
+    };
+
+    useEffect(() => {
+      if (!animatedImage) return;
+
+      const frameCount = animatedImage.getFrameCount();
+      if (onFrameCountReady && frameCount > 0 && isMounted.current) {
+        onFrameCountReady(frameCount);
+      }
+
+      // Only start animation if this is the active animation
+      if (!isActive) return;
+
+      // Reset animation state
+      frameRef.current = 0;
+      safeSetCurrentFrame(0);
+      hasCompletedLoop.current = false;
+      isFirstFrameHeld.current = false;
+
+      const frameDuration = animatedImage.currentFrameDuration();
+
+      const advanceFrame = () => {
+        if (!animatedImage || !isActive || !isMounted.current) return;
+
+        try {
+          // Special handling for spawn animation - hold first frame for 1 second
+          if (
+            animationOption === "spawn" &&
+            frameRef.current === 0 &&
+            !isFirstFrameHeld.current
+          ) {
+            isFirstFrameHeld.current = true;
+            firstFrameHoldTimerRef.current = setTimeout(() => {
+              if (!isMounted.current) return;
+
+              try {
+                animatedImage.decodeNextFrame();
+                frameRef.current = 1;
+                safeSetCurrentFrame(1);
+                animationTimerRef.current = setTimeout(
+                  continueAnimation,
+                  frameDuration,
+                );
+              } catch (error) {
+                console.log("Error in spawn animation first frame:", error);
+              }
+            }, 1000);
+            return;
+          }
+
+          animatedImage.decodeNextFrame();
+          frameRef.current = (frameRef.current + 1) % frameCount;
+          safeSetCurrentFrame(frameRef.current);
+
+          if (frameRef.current === 0 && !hasCompletedLoop.current) {
+            hasCompletedLoop.current = true;
+            if (onAnimationComplete && !isLooping && isMounted.current) {
+              onAnimationComplete();
+              return;
+            }
+          }
+
+          animationTimerRef.current = setTimeout(advanceFrame, frameDuration);
+        } catch (error) {
+          console.log("Error in animation frame:", error);
+        }
+      };
+
+      const continueAnimation = () => {
+        if (!animatedImage || !isActive || !isMounted.current) return;
+
+        try {
+          animatedImage.decodeNextFrame();
+          frameRef.current = (frameRef.current + 1) % frameCount;
+          safeSetCurrentFrame(frameRef.current);
+
+          if (frameRef.current === 0 && !hasCompletedLoop.current) {
+            hasCompletedLoop.current = true;
+            if (onAnimationComplete && !isLooping && isMounted.current) {
+              onAnimationComplete();
+              return;
+            }
+          }
+
+          animationTimerRef.current = setTimeout(advanceFrame, frameDuration);
+        } catch (error) {
+          console.log("Error in continue animation:", error);
+        }
+      };
+
+      // Start the animation process
+      advanceFrame();
+
+      // Cleanup function
+      return () => {
+        if (animationTimerRef.current) {
+          clearTimeout(animationTimerRef.current);
+          animationTimerRef.current = null;
+        }
+        if (firstFrameHoldTimerRef.current) {
+          clearTimeout(firstFrameHoldTimerRef.current);
+          firstFrameHoldTimerRef.current = null;
+        }
+      };
+    }, [
+      animatedImage,
+      onAnimationComplete,
+      isLooping,
+      onFrameCountReady,
+      isActive,
+      animationOption,
+    ]);
+
+    useEffect(() => {
+      return () => {
+        if (animationTimerRef.current) {
+          clearTimeout(animationTimerRef.current);
+          animationTimerRef.current = null;
+        }
+        if (firstFrameHoldTimerRef.current) {
+          clearTimeout(firstFrameHoldTimerRef.current);
+          firstFrameHoldTimerRef.current = null;
+        }
+      };
+    }, []);
+
+    if (!animatedImage || !isActive) {
+      return null;
+    }
+
+    try {
+      return (
+        <Canvas style={{ width, height, position: "absolute" }}>
+          <Image
+            image={animatedImage.getCurrentFrame()}
+            x={0}
+            y={0}
+            width={width}
+            height={height}
+            fit="contain"
+          />
+        </Canvas>
+      );
+    } catch (error) {
+      console.log("Error rendering animation frame:", error);
+      return null;
+    }
+  },
+);
+
+interface SpriteAnimationManagerProps {
+  spriteSet: {
+    [key in AnimationOptions]?: AnimationSet;
+  };
+  currentAnimation: AnimationOptions;
   width: number;
   height: number;
   onAnimationComplete?: () => void;
   isLooping?: boolean;
+  onFrameCountReady?: (count: number) => void;
 }
 
-const SkiaAnimatedSprite = ({
-  source,
-  width,
-  height,
-  onAnimationComplete,
-  isLooping = true,
-}: SkiaAnimatedSpriteProps) => {
-  const animatedImage = useAnimatedImage(source);
-  const [currentFrame, setCurrentFrame] = useState(0);
-  const frameCount = animatedImage?.getFrameCount() || 0;
-  const frameRef = useRef(0);
-  const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
+const SpriteAnimationManager = React.memo(
+  ({
+    spriteSet,
+    currentAnimation,
+    width,
+    height,
+    onAnimationComplete,
+    isLooping,
+    onFrameCountReady,
+  }: SpriteAnimationManagerProps) => {
+    const validAnimations = useMemo(() => {
+      return Object.entries(spriteSet).map(([key]) => key as AnimationOptions);
+    }, [spriteSet]);
 
-  const hasCompletedLoop = useRef(false);
-
-  useEffect(() => {
-    if (!animatedImage) return;
-
-    // Reset state when source changes
-    frameRef.current = 0;
-    setCurrentFrame(0);
-    hasCompletedLoop.current = false;
-    const frameDuration = animatedImage.currentFrameDuration();
-
-    const advanceFrame = () => {
-      if (!animatedImage) return;
-
-      // Decode next frame
-      animatedImage.decodeNextFrame();
-
-      // Update current frame
-      frameRef.current = (frameRef.current + 1) % frameCount;
-      setCurrentFrame(frameRef.current);
-
-      // Check if we've completed a loop
-      if (frameRef.current === 0 && !hasCompletedLoop.current) {
-        hasCompletedLoop.current = true;
-        if (onAnimationComplete && !isLooping) {
-          onAnimationComplete();
-          return; // Stop animation if not looping
-        }
-      }
-
-      // Schedule next frame
-      animationTimerRef.current = setTimeout(advanceFrame, frameDuration);
-    };
-
-    // Start animation
-    advanceFrame();
-
-    return () => {
-      if (animationTimerRef.current) {
-        clearTimeout(animationTimerRef.current);
-        animationTimerRef.current = null;
-      }
-    };
-  }, [animatedImage, frameCount, onAnimationComplete, isLooping]);
-
-  if (!animatedImage) {
-    return null;
-  }
-
-  return (
-    <Canvas style={{ width, height }}>
-      <Image
-        image={animatedImage.getCurrentFrame()}
-        x={0}
-        y={0}
-        width={width}
-        height={height}
-        fit="contain"
-      />
-    </Canvas>
-  );
-};
+    return (
+      <View style={{ width, height }}>
+        {validAnimations.map((animKey) => (
+          <SingleAnimationSprite
+            key={animKey}
+            animationOption={currentAnimation}
+            source={spriteSet[animKey]?.anim}
+            width={width}
+            height={height}
+            isActive={animKey === currentAnimation}
+            onAnimationComplete={
+              animKey === currentAnimation ? onAnimationComplete : undefined
+            }
+            isLooping={isLooping}
+            onFrameCountReady={
+              animKey === currentAnimation ? onFrameCountReady : undefined
+            }
+          />
+        ))}
+      </View>
+    );
+  },
+);
 
 export const AnimatedSprite = observer(
   ({ enemy }: { enemy: Enemy | Minion | undefined }) => {
-    // measurements for relative positioning
     const spriteContainerRef = useRef<View>(null);
     const headerHeight = useHeaderHeight();
     const measurementAttempts = useRef(0);
+    const [frameCount, setFrameCount] = useState(0);
 
     const measureAndUpdatePosition = () => {
       if (spriteContainerRef.current && animationStore) {
@@ -348,11 +298,14 @@ export const AnimatedSprite = observer(
       setTimeout(measureAndUpdatePosition, 50);
     };
 
-    // actual sprite handling
-    const spriteSet = EnemyImageMap["rat"];
     const { uiStore, playerAnimationStore, enemyStore } = useRootStore();
     const animationStore = enemyStore.getAnimationStore(enemy?.id ?? "");
     const styles = useStyles();
+
+    const enemyData =
+      enemy && enemy.sprite
+        ? EnemyImageMap[enemy.sprite]
+        : EnemyImageMap["bat"];
 
     const {
       animations,
@@ -370,7 +323,7 @@ export const AnimatedSprite = observer(
             animationStore.animationQueue[
               animationStore.animationQueue.length - 1
             ];
-          if (animToQueue in spriteSet.sets) {
+          if (animToQueue in enemyData.sets) {
             return {
               activeAnimationString: animToQueue,
               activeSpriteAnimationString: animToQueue,
@@ -386,32 +339,32 @@ export const AnimatedSprite = observer(
           activeAnimationString: "idle" as AnimationOptions,
           activeSpriteAnimationString: "idle" as AnimationOptions,
         };
-      }, [animationStore?.animationQueue]);
+      }, [animationStore?.animationQueue, enemyData.sets]);
 
-    if (!spriteSet.sets[activeSpriteAnimationString]) {
+    if (!enemyData.sets[activeSpriteAnimationString]) {
       throw new Error(
         `no ${activeSpriteAnimationString} animation for: ${enemy?.sprite}`,
       );
     }
 
     const { currentQueuedAnimation, currentSpriteAnimation } = useMemo(() => {
-      const currentSpriteAnimation = spriteSet.sets[
+      const currentSpriteAnimation = enemyData.sets[
         activeSpriteAnimationString
       ] as AnimationSet;
       return {
-        currentQueuedAnimation: spriteSet.sets[activeAnimationString],
+        currentQueuedAnimation: enemyData.sets[activeAnimationString],
         currentSpriteAnimation,
       };
-    }, [activeAnimationString, activeSpriteAnimationString]);
+    }, [activeAnimationString, activeSpriteAnimationString, enemyData.sets]);
 
-    const spriteWidth = spriteSet.width;
-    const spriteHeight = spriteSet.height;
+    const spriteWidth = enemyData.width;
+    const spriteHeight = enemyData.height;
 
     const containerSize = uiStore.dimensions.lesser * 0.5;
 
     const renderScaleCalc = useMemo(
-      () => calculateRenderScaling(spriteSet.renderScale),
-      [spriteSet.renderScale],
+      () => calculateRenderScaling(enemyData.renderScale),
+      [enemyData.renderScale],
     );
 
     const scaleX = (containerSize / spriteWidth) * renderScaleCalc;
@@ -419,7 +372,7 @@ export const AnimatedSprite = observer(
 
     const scale = Math.min(scaleX, scaleY);
     const mirrorTransform =
-      "mirror" in spriteSet && spriteSet.mirror ? [{ scaleX: -1 }] : [];
+      "mirror" in enemyData && enemyData.mirror ? [{ scaleX: -1 }] : [];
 
     const getCurrentAnimationDimensions = () => {
       if (currentSpriteAnimation.sizeOverride) {
@@ -442,46 +395,58 @@ export const AnimatedSprite = observer(
       }
     };
 
+    const handleFrameCountReady = (count: number) => {
+      setFrameCount(count);
+    };
+
     useEffect(() => {
       if (
         activeAnimationString !== "idle" &&
         animationStore &&
-        !animationStore.runningRNAnimation
+        !animationStore.runningRNAnimation &&
+        frameCount > 0
       ) {
-        const frames = currentSpriteAnimation.frames;
         switch (activeAnimationString) {
           case "move":
             runInAction(() => (animationStore.runningRNAnimation = true));
             runMoveAnimation(
               playerAnimationStore.playerOrigin,
               animationStore.spriteMidPoint!,
-              frames,
+              frameCount,
               () => animationStore.concludeAnimation(),
             );
             return;
+
           case "death":
             runInAction(() => (animationStore.runningRNAnimation = true));
-            runDeathAnimation(frames, () => animationStore.concludeAnimation());
+            runDeathAnimation(frameCount, () =>
+              animationStore.concludeAnimation(),
+            );
             return;
+
           case "dodge":
             runInAction(() => (animationStore.runningRNAnimation = true));
-            runDodgeAnimation(frames, () => animationStore.concludeAnimation());
+            runDodgeAnimation(frameCount, () =>
+              animationStore.concludeAnimation(),
+            );
             return;
 
           case "hurt":
             runInAction(() => (animationStore.runningRNAnimation = true));
-            runHurtAnimation(frames, false, () =>
+            runHurtAnimation(frameCount, false, () =>
               animationStore.concludeAnimation(),
             );
             return;
+
           //TODO
           case "heal":
             return;
+
           default:
             return;
         }
       }
-    }, [currentQueuedAnimation]);
+    }, [currentQueuedAnimation, frameCount]);
 
     useEffect(() => {
       if (animationStore?.textString) {
@@ -494,10 +459,6 @@ export const AnimatedSprite = observer(
         });
       }
     }, [animationStore?.textString]);
-
-    useEffect(() => {
-      console.log(animationStore?.animationQueue);
-    }, [animationStore?.animationQueue]);
 
     const shouldLoop = activeAnimationString === "idle";
 
@@ -540,13 +501,15 @@ export const AnimatedSprite = observer(
             animatedContainerStyle,
           ]}
         >
-          <SkiaAnimatedSprite
-            source={currentSpriteAnimation.anim}
+          <SpriteAnimationManager
+            spriteSet={enemyData.sets}
+            currentAnimation={activeSpriteAnimationString}
             width={currentDimensions.width}
             height={currentDimensions.height}
             onAnimationComplete={handleAnimationComplete}
             isLooping={shouldLoop}
-            key={`${enemy?.id}-${activeAnimationString}`}
+            onFrameCountReady={handleFrameCountReady}
+            key={`${enemy?.id}`}
           />
         </Animated.View>
         {animationStore && animationStore.textString && (

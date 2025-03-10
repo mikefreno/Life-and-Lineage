@@ -40,7 +40,6 @@ export const reverseNormalize = (
   scale: number = reverseScale,
 ) => {
   const newSize = size * scale;
-  console.log(newSize);
 
   if (Platform.OS === "ios") {
     return Math.round(PixelRatio.roundToNearestPixel(newSize));

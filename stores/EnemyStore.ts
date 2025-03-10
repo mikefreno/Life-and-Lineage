@@ -55,10 +55,13 @@ export default class EnemyStore {
   }
 
   public addToEnemyList(enemy: Enemy) {
+    if (!enemy.sprite) {
+      throw new Error(`No sprite on ${enemy}`);
+    }
     this.enemies.push(enemy);
     this.animationStoreMap.set(
       enemy.id,
-      new EnemyAnimationStore({ root: this.root }),
+      new EnemyAnimationStore({ root: this.root, sprite: enemy.sprite }),
     );
     this.enemySave(enemy);
   }
@@ -86,7 +89,13 @@ export default class EnemyStore {
       const retrieved = storage.getString(`enemy_${str}`);
       if (!retrieved) return;
       const enemy = Enemy.fromJSON({ ...parse(retrieved), enemyStore: this });
-      map.set(enemy.id, new EnemyAnimationStore({ root: this.root }));
+      if (!enemy.sprite) {
+        throw new Error(`No sprite on ${enemy}`);
+      }
+      map.set(
+        enemy.id,
+        new EnemyAnimationStore({ root: this.root, sprite: enemy.sprite }),
+      );
       enemies.push(enemy);
     });
     return { enemies, map };

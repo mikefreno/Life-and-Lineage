@@ -51,7 +51,7 @@
     }
   },
   {
-    "name": "short sword",
+    "name": "shortsword",
     "baseValue": 1200,
     "slot": "one-hand",
     "attacks": [

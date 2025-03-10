@@ -54,6 +54,9 @@
     "attackStrings": [
       "bite"
     ],
+    "animationStrings": {
+      "bite": "attack_1"
+    },
     "drops": [
       {
         "item": "patch of hair",
@@ -73,7 +76,7 @@
   },
   {
     "name": "bat",
-    "sprite": "bat_origin",
+    "sprite": "bat",
     "beingType": "beast",
     "sanity": null,
     "healthRange": {
@@ -129,6 +132,10 @@
       "stab",
       "cleave"
     ],
+    "animationStrings": {
+      "stab": "attack_1",
+      "cleave": "attack_2"
+    },
     "drops": [
       {
         "item": "bone",
@@ -172,6 +179,9 @@
     "attackStrings": [
       "shoot"
     ],
+    "animationStrings": {
+      "shoot": "attack_1"
+    },
     "drops": [
       {
         "item": "bone",
@@ -236,6 +246,10 @@
       "grab",
       "zombie bite"
     ],
+    "animationStrings": {
+      "grab": "attack_1",
+      "zombie bite": "attack_1"
+    },
     "drops": [
       {
         "item": "chunk of flesh",
@@ -273,6 +287,9 @@
     "attackStrings": [
       "wail"
     ],
+    "animationStrings": {
+      "wail": "attack_1"
+    },
     "drops": [
       {
         "item": "ghostly residue",
@@ -287,7 +304,7 @@
   },
   {
     "name": "goblin",
-    "sprite": "goblin_2",
+    "sprite": "goblin",
     "beingType": "demi-human",
     "sanity": null,
     "healthRange": {
@@ -303,21 +320,18 @@
       "regen": 5
     },
     "attackStrings": [
-      "stab",
-      "pocket sand",
-      "rock throw",
-      "torch stab"
+      "blunt cleave",
+      "heavy swing"
     ],
+    "animationStrings": {
+      "blunt cleave": "attack_1",
+      "heavy swing": "attack_2"
+    },
     "drops": [
       {
-        "item": "dagger",
+        "item": "mace",
         "itemType": "melee",
-        "chance": 0.10
-      },
-      {
-        "item": "torch",
-        "itemType": "melee",
-        "chance": 0.10
+        "chance": 0.2
       }
     ],
     "goldDropRange": {
@@ -345,8 +359,12 @@
     },
     "attackStrings": [
       "bite",
-      "tackle"
+      "claw"
     ],
+    "animationStrings": {
+      "bite": "attack_1",
+      "claw": "attack_2"
+    },
     "drops": [
       {
         "item": "patch of hair",
@@ -387,9 +405,17 @@
       "regen": 5
     },
     "attackStrings": [
-      "bite",
-      "stab"
+      "stab",
+      "cleave",
+      "chop",
+      "charged pierce"
     ],
+    "animationStrings": {
+      "stab": "attack_1",
+      "cleave": "attack_2",
+      "overhead slice": "attack_3",
+      "charged pierce": "attack_4"
+    },
     "drops": [
       {
         "item": "patch of hair",
@@ -439,14 +465,14 @@
       "pocket sand",
       "serrate"
     ],
+    "animationStrings": {
+      "stab": "attack_1",
+      "pocket sand": "attack_1",
+      "serrate": "attack_1"
+    },
     "drops": [
       {
-        "item": "dagger",
-        "itemType": "melee",
-        "chance": 0.15
-      },
-      {
-        "item": "dagger",
+        "item": "shortsword",
         "itemType": "melee",
         "chance": 0.15
       },
@@ -488,9 +514,13 @@
       "headbutt",
       "heavy swing"
     ],
+    "animationStrings": {
+      "headbutt": "attack_1",
+      "heavy swing": "attack_1"
+    },
     "drops": [
       {
-        "item": "rat-smasher",
+        "item": "longsword",
         "itemType": "melee",
         "chance": 0.25
       },
@@ -527,6 +557,10 @@
       "bonk",
       "frost"
     ],
+    "animationStrings": {
+      "frost": "attack_1",
+      "bonk": "attack_2"
+    },
     "drops": [],
     "goldDropRange": {
       "minimum": 200,
@@ -554,6 +588,10 @@
       "bonk",
       "fire bolt"
     ],
+    "animationStrings": {
+      "fire bolt": "attack_1",
+      "bonk": "attack_2"
+    },
     "drops": [],
     "goldDropRange": {
       "minimum": 200,
@@ -581,6 +619,10 @@
       "bonk",
       "gust"
     ],
+    "animationStrings": {
+      "gust": "attack_1",
+      "bonk": "attack_2"
+    },
     "drops": [],
     "goldDropRange": {
       "minimum": 200,
@@ -608,6 +650,10 @@
       "bonk",
       "rock toss"
     ],
+    "animationStrings": {
+      "rock toss": "attack_1",
+      "bonk": "attack_2"
+    },
     "drops": [],
     "goldDropRange": {
       "minimum": 200,
@@ -634,6 +680,9 @@
     "attackStrings": [
       "bite"
     ],
+    "animationStrings": {
+      "bite": "attack_1"
+    },
     "drops": [],
     "goldDropRange": {
       "minimum": 40,
@@ -660,6 +709,9 @@
     "attackStrings": [
       "venomous bite"
     ],
+    "animationStrings": {
+      "venomous bite": "attack_1"
+    },
     "drops": [],
     "goldDropRange": {
       "minimum": 40,
@@ -686,6 +738,9 @@
     "attackStrings": [
       "bite"
     ],
+    "animationStrings": {
+      "bite": "attack_1"
+    },
     "drops": [],
     "goldDropRange": {
       "minimum": 40,
@@ -712,6 +767,9 @@
     "attackStrings": [
       "venomous bite"
     ],
+    "animationStrings": {
+      "venomous bite": "attack_1"
+    },
     "drops": [],
     "goldDropRange": {
       "minimum": 40,
@@ -740,6 +798,11 @@
       "maddening shot",
       "shoot"
     ],
+    "animationStrings": {
+      "poisoned shot": "attack_1",
+      "maddening shot": "attack_1",
+      "shoot": "attack_1"
+    },
     "drops": [],
     "goldDropRange": {
       "minimum": 40,
@@ -768,6 +831,11 @@
       "dive",
       "claw"
     ],
+    "animationStrings": {
+      "gust": "attack_1",
+      "dive": "attack_1",
+      "claw": "attack_1"
+    },
     "drops": [],
     "goldDropRange": {
       "minimum": 40,
@@ -795,6 +863,10 @@
       "stampede",
       "chop"
     ],
+    "animationStrings": {
+      "chop": "attack_1",
+      "stampede": ""
+    },
     "drops": [],
     "goldDropRange": {
       "minimum": 40,
@@ -819,9 +891,13 @@
       "regen": 10
     },
     "attackStrings": [
-      "stampede",
-      "chop"
+      "serrate",
+      "stab"
     ],
+    "animationStrings": {
+      "serrate": "attack_1",
+      "stab": "attack_1"
+    },
     "drops": [],
     "goldDropRange": {
       "minimum": 40,
@@ -847,9 +923,13 @@
       "regen": 10
     },
     "attackStrings": [
-      "stampede",
-      "chop"
+      "stab",
+      "pierce"
     ],
+    "animationStrings": {
+      "stab": "attack_1",
+      "pierce": "attack_1"
+    },
     "drops": [],
     "goldDropRange": {
       "minimum": 40,

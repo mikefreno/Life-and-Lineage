@@ -98,6 +98,19 @@
     ]
   },
   {
+    "name": "blunt cleave",
+    "energyCost": 10,
+    "targets": "dual",
+    "hitChance": 0.95,
+    "damageMult": 0.75,
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.35
+      }
+    ]
+  },
+  {
     "name": "rock throw",
     "energyCost": 5,
     "targets": "single",
@@ -556,6 +569,26 @@
       {
         "name": "stun",
         "chance": 0.25
+      }
+    ]
+  },
+  {
+    "name": "pierce",
+    "energyCost": 10,
+    "targets": "single",
+    "hitChance": 0.85,
+    "damageMult": 1.25
+  },
+  {
+    "name": "charged pierce",
+    "energyCost": 30,
+    "targets": "single",
+    "hitChance": 0.85,
+    "damageMult": 2.0,
+    "debuffs": [
+      {
+        "name": "shocked",
+        "chance": 0.75
       }
     ]
   }

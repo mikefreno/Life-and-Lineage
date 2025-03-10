@@ -7,13 +7,18 @@ import {
   runInAction,
 } from "mobx";
 import { RootStore } from "./RootStore";
-import { AnimationOptions } from "@/utility/enemyHelpers";
+import {
+  AnimationOptions,
+  EnemyImageMap,
+  type EnemyImageKeyOption,
+} from "@/utility/enemyHelpers";
 
 export const FPS = 8;
 export const MAX_ANIMATION_DURATION = 1000;
 
 export class EnemyAnimationStore {
   textString: string | undefined = undefined;
+  dialogueString: string;
 
   spriteMidPoint: {
     x: number;
@@ -21,15 +26,39 @@ export class EnemyAnimationStore {
   } | null = null;
 
   root: RootStore;
+  enemySprite: EnemyImageKeyOption;
+  projectile: any | null = null;
 
   animationQueue: AnimationOptions[];
+  attacksThatSkipMovement: AnimationOptions[];
+  attacksThatUseProjectiles: AnimationOptions[];
 
   runningRNAnimation = false;
   isIdle: boolean = true;
 
-  constructor({ root }: { root: RootStore }) {
+  constructor({
+    root,
+    sprite,
+  }: {
+    root: RootStore;
+    sprite: EnemyImageKeyOption;
+  }) {
     this.root = root;
+    this.enemySprite = sprite;
     this.animationQueue = ["idle", "spawn"];
+    const attacksThatSkipMovement: AnimationOptions[] = [];
+    const attacksThatUseProjectiles: AnimationOptions[] = [];
+    Object.entries(EnemyImageMap[sprite].sets).forEach(([k, v]) => {
+      if (v.disablePreMovement) {
+        attacksThatSkipMovement.push(k as AnimationOptions);
+      }
+      if (v.projectile) {
+        attacksThatUseProjectiles.push(k as AnimationOptions);
+      }
+    });
+
+    this.attacksThatSkipMovement = attacksThatSkipMovement;
+    this.attacksThatUseProjectiles = attacksThatUseProjectiles;
 
     makeObservable(this, {
       textString: observable,
@@ -37,6 +66,7 @@ export class EnemyAnimationStore {
       animationQueue: observable,
       runningRNAnimation: observable,
       isIdle: observable,
+      projectile: observable,
 
       addToAnimationQueue: action,
       concludeAnimation: action,
@@ -78,8 +108,20 @@ export class EnemyAnimationStore {
     return this.animationQueue.length > 1;
   }
 
+  getAttackQueue(anim: AnimationOptions): AnimationOptions[] {
+    if (this.animationQueue.includes(anim)) {
+      return [anim];
+    } else {
+      return ["move", anim, "move"];
+    }
+  }
+
   setTextString(message: string | undefined) {
     this.textString = message;
+  }
+
+  setDialogueString(message: string) {
+    this.dialogueString = message;
   }
 
   addToAnimationQueue(animation: AnimationOptions | AnimationOptions[]) {

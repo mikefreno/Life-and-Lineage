@@ -40,8 +40,7 @@ import { Attack } from "./attack";
 import { PlayerCharacter } from "./character";
 import { AttackUse } from "../utility/types";
 import { ThreatTable } from "./threatTable";
-import EnemyStore from "../stores/EnemyStore";
-import { EnemyImageKeyOption } from "../utility/enemyHelpers";
+import { AnimationOptions, EnemyImageKeyOption } from "../utility/enemyHelpers";
 import { RootStore } from "../stores/RootStore";
 
 type CreatureType = {
@@ -96,6 +95,7 @@ type EnemyType = CreatureType & {
   gotDrops?: boolean;
   minions?: Minion[];
   sprite: EnemyImageKeyOption;
+  animationStrings: { [key: string]: AnimationOptions };
   drops: {
     item: string;
     itemType: ItemClassType;
@@ -137,7 +137,7 @@ export class Creature {
   attackStrings: string[];
   conditions: Condition[];
   threatTable: ThreatTable = new ThreatTable();
-  sprite: EnemyImageKeyOption | null;
+  sprite: EnemyImageKeyOption;
 
   basePhysicalDamage: number;
   baseFireDamage: number;
@@ -195,7 +195,7 @@ export class Creature {
     this.attackStrings = attackStrings ?? [];
     this.conditions = conditions ?? []; // Initialize conditions to an empty array if not provided
     this.root = root;
-    this.sprite = sprite;
+    this.sprite = sprite ?? ("" as EnemyImageKeyOption); // for simplicity - minion
 
     this.basePhysicalDamage = basePhysicalDamage ?? 0;
     this.baseFireDamage = baseFireDamage ?? 0;
@@ -707,6 +707,7 @@ export class Enemy extends Creature {
   private phases: Phase[];
   currentPhase: number;
   gotDrops: boolean;
+  animationStrings: { [key: string]: AnimationOptions };
   drops: {
     item: string;
     itemType: ItemClassType;
@@ -727,6 +728,7 @@ export class Enemy extends Creature {
     goldDropRange,
     storyDrops,
     phases,
+    animationStrings,
     ...props
   }: EnemyType) {
     super({
@@ -737,6 +739,7 @@ export class Enemy extends Creature {
           Minion.fromJSON({ ...minion, parent: this }),
         )
       : [];
+    this.animationStrings = animationStrings ?? [];
     this.gotDrops = gotDrops ?? false;
     this.drops = drops ?? [];
     this.goldDropRange = goldDropRange ?? { minimum: 0, maximum: 0 };
@@ -821,19 +824,17 @@ export class Enemy extends Creature {
       if (phase.basePoisonResistance)
         this.basePoisonResistance = phase.basePoisonResistance;
 
-      if (phase.dialogue && this.enemyStore) {
-        const animationStore = this.enemyStore.getAnimationStore(this.id);
+      if (phase.dialogue && this.root) {
+        const animationStore = this.root.enemyStore.getAnimationStore(this.id);
         if (animationStore) {
           animationStore.setDialogueString(phase.dialogue);
-          animationStore.triggerDialogue();
         }
       }
 
-      if (phase.dialogue && this.enemyStore) {
-        const animationStore = this.enemyStore.getAnimationStore(this.id);
+      if (phase.dialogue && this.root?.enemyStore) {
+        const animationStore = this.root.enemyStore.getAnimationStore(this.id);
         if (animationStore) {
           animationStore.setDialogueString(phase.dialogue);
-          animationStore.triggerDialogue();
         }
       }
     }
@@ -866,7 +867,7 @@ export class Enemy extends Creature {
             ...storyItemObj,
             itemClass: ItemClassType.StoryItem,
             stackable: false,
-            root: this.enemyStore?.root,
+            root: this.root,
           });
           storyDrops.push(storyItem);
         }
@@ -891,7 +892,7 @@ export class Enemy extends Creature {
               ...itemObj,
               itemClass: drop.itemType,
               stackable: isStackable(drop.itemType),
-              root: this.enemyStore?.root,
+              root: this.root,
             }),
           );
         }
@@ -899,7 +900,7 @@ export class Enemy extends Creature {
     });
 
     // Process instance-specific drops
-    const currentInstance = this.enemyStore?.root.dungeonStore.currentInstance;
+    const currentInstance = this.root?.dungeonStore.currentInstance;
     if (currentInstance?.instanceDrops) {
       currentInstance.instanceDrops.forEach((drop) => {
         const roll = Math.random();
@@ -912,7 +913,7 @@ export class Enemy extends Creature {
                 ...itemObj,
                 itemClass: drop.itemType,
                 stackable: isStackable(drop.itemType),
-                root: this.enemyStore?.root,
+                root: this.root,
               }),
             );
           }
@@ -921,7 +922,7 @@ export class Enemy extends Creature {
     }
 
     // Process level-specific drops
-    const currentLevel = this.enemyStore?.root.dungeonStore.currentLevel;
+    const currentLevel = this.root?.dungeonStore.currentLevel;
     if (currentLevel?.levelDrops) {
       currentLevel.levelDrops.forEach((drop) => {
         const roll = Math.random();
@@ -934,7 +935,7 @@ export class Enemy extends Creature {
                 ...itemObj,
                 itemClass: drop.itemType,
                 stackable: isStackable(drop.itemType),
-                root: this.enemyStore?.root,
+                root: this.root,
               }),
             );
           }
@@ -1021,6 +1022,7 @@ export class Enemy extends Creature {
         ? json.minions.map((minion: any) => Minion.fromJSON(minion))
         : [],
       attackStrings: json.attackStrings,
+      animationStrings: json.animationStrings,
       conditions: json.conditions
         ? json.conditions.map((condition: any) => Condition.fromJSON(condition))
         : [],

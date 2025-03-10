@@ -16,6 +16,7 @@ import {
 import AttackDetails from "../components/AttackDetails";
 import { Condition } from "./conditions";
 import { useStyles } from "../hooks/styles";
+import { runInAction } from "mobx";
 
 /**
  * Interface for the fields of an attack.
@@ -191,7 +192,7 @@ export class Attack {
       if (rollD20() > 20 - debuff.chance * 20) {
         if (debuff.debuff) {
           debuffNames.push(debuff.debuff.name);
-          target.addCondition(debuff.debuff);
+          runInAction(() => target.addCondition(debuff.debuff));
         } else if (debuff.perHitHeal) {
           const healAmount = debuff.perHitHeal * actualizedHits;
           amountHealed += healAmount;
@@ -303,9 +304,7 @@ export class Attack {
       if (hits.includes(AttackUse.success)) {
         let actualizedHits = hits.filter((h) => h === AttackUse.success).length;
         const damages = this.damage(target);
-        console.log(damages);
 
-        // Apply condition effects to total damage
         const totalDamageWithConditions =
           damages.total * damageMult + damageFlat;
         const finalDamage =

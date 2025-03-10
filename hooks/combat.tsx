@@ -8,6 +8,7 @@ import { PlayerCharacter } from "../entities/character";
 import { Attack } from "../entities/attack";
 import { useIsFocused } from "@react-navigation/native";
 import { Spell } from "../entities/spell";
+import { AnimationOptions } from "@/utility/enemyHelpers";
 
 export const useEnemyManagement = () => {
   const root = useRootStore();
@@ -100,16 +101,35 @@ export const useEnemyManagement = () => {
           const enemyAttackRes = enemy.takeTurn({ player: playerState! });
           for (const res of enemyAttackRes.result) {
             const animStore = enemyStore.getAnimationStore(enemy.id);
+            let animationForAttack: AnimationOptions = "attack_1";
+
+            if (enemyAttackRes.attack && enemyAttackRes.attack.name) {
+              animationForAttack =
+                (enemy.animationStrings[
+                  enemyAttackRes.attack.name
+                ] as AnimationOptions) ?? "attack_1";
+            }
+
+            console.log(
+              `${enemy.creatureSpecies} used ${enemyAttackRes.attack?.name}, -> animation: ${animationForAttack}`,
+            );
+
             switch (res.result) {
               case AttackUse.success:
-                animStore?.addToAnimationQueue(["move", "attack_1", "move"]); // need to map attack used to specific animation
+                animStore?.addToAnimationQueue(
+                  animStore.getAttackQueue(animationForAttack),
+                );
                 break;
               case AttackUse.miss:
-                animStore?.addToAnimationQueue(["move", "attack_1", "move"]); // need to map attack used to specific animation
+                animStore?.addToAnimationQueue(
+                  animStore.getAttackQueue(animationForAttack),
+                );
                 playerAnimationStore.setTextString("DODGE!");
                 break;
               case AttackUse.block:
-                animStore?.addToAnimationQueue(["move", "attack_1", "move"]); // need to map attack used to specific animation
+                animStore?.addToAnimationQueue(
+                  animStore.getAttackQueue(animationForAttack),
+                );
                 playerAnimationStore.setTextString("BLOCKED!");
                 break;
               case AttackUse.stunned:
@@ -181,9 +201,6 @@ export const useCombatActions = () => {
           const animStore = enemyStore.getAnimationStore(res.target.id);
           switch (res.result) {
             case AttackUse.success:
-              console.log(
-                `damage done: ${res.damages?.total}, targetHP: ${res.target.currentHealth}`,
-              );
               if ((res.damages?.total ?? 0) >= res.target.currentHealth) {
                 animStore?.addToAnimationQueue("death");
               } else {
