@@ -21,6 +21,8 @@ export class PlayerAnimationStore {
 
   textString: string | undefined = undefined;
 
+  usedPass: boolean = false;
+
   playerOrigin: { x: number; y: number };
 
   constructor({ root }: { root: RootStore }) {
@@ -35,10 +37,12 @@ export class PlayerAnimationStore {
       animationSet: observable,
       playerOrigin: observable,
       textString: observable,
+      usedPass: observable,
 
       setAnimation: action,
       clearAnimation: action,
       setTextString: action,
+      setPassed: action,
     });
 
     reaction(
@@ -52,6 +56,22 @@ export class PlayerAnimationStore {
         }
       },
     );
+    reaction(
+      () => this.usedPass,
+      () => {
+        if (this.usedPass) {
+          setTimeout(() => {
+            if (this.usedPass) {
+              this.setPassed(false);
+            }
+          }, 1000);
+        }
+      },
+    );
+  }
+
+  setPassed(state: boolean) {
+    this.usedPass = state;
   }
 
   setTextString(message: string) {

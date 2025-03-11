@@ -50,8 +50,11 @@ export default class EnemyStore {
   get enemyTurnOngoing() {
     const stores = Array.from(this.animationStoreMap.values());
     if (stores.length) {
-      return stores.some((store) => !store.isIdle);
-    } else return false;
+      return (
+        stores.some((store) => !store.isIdle) ||
+        this.root.playerAnimationStore.usedPass
+      );
+    } else return this.root.playerAnimationStore.usedPass;
   }
 
   public addToEnemyList(enemy: Enemy) {

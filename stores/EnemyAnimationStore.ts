@@ -28,6 +28,7 @@ export class EnemyAnimationStore {
   root: RootStore;
   enemySprite: EnemyImageKeyOption;
   projectile: any | null = null;
+  movementDuration: number = 500;
 
   animationQueue: AnimationOptions[];
   attacksThatSkipMovement: AnimationOptions[];
@@ -45,9 +46,12 @@ export class EnemyAnimationStore {
   }) {
     this.root = root;
     this.enemySprite = sprite;
+    this.dialogueString = "";
     this.animationQueue = ["idle", "spawn"];
+
     const attacksThatSkipMovement: AnimationOptions[] = [];
     const attacksThatUseProjectiles: AnimationOptions[] = [];
+
     Object.entries(EnemyImageMap[sprite].sets).forEach(([k, v]) => {
       if (v.disablePreMovement) {
         attacksThatSkipMovement.push(k as AnimationOptions);
@@ -72,6 +76,7 @@ export class EnemyAnimationStore {
       concludeAnimation: action,
       setSpriteMidPoint: action,
       setTextString: action,
+      getAttackQueue: action,
 
       notIdle: computed,
     });
@@ -109,11 +114,14 @@ export class EnemyAnimationStore {
   }
 
   getAttackQueue(anim: AnimationOptions): AnimationOptions[] {
-    if (this.animationQueue.includes(anim)) {
+    if (this.attacksThatSkipMovement.includes(anim)) {
       return [anim];
     } else {
       return ["move", anim, "move"];
     }
+  }
+  setMovementDuration(duration: number) {
+    this.movementDuration = duration;
   }
 
   setTextString(message: string | undefined) {

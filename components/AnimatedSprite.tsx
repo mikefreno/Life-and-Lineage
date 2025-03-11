@@ -60,6 +60,7 @@ const SingleAnimationSprite = React.memo(
     useEffect(() => {
       isMounted.current = true;
       return () => {
+        animatedImage?.dispose();
         isMounted.current = false;
       };
     }, []);
@@ -340,6 +341,26 @@ export const AnimatedSprite = observer(
           activeSpriteAnimationString: "idle" as AnimationOptions,
         };
       }, [animationStore?.animationQueue, enemyData.sets]);
+
+    const moveAnimationImage = enemyData.sets.move?.anim
+      ? useAnimatedImage(enemyData.sets.move.anim)
+      : null;
+
+    useEffect(() => {
+      if (moveAnimationImage && animationStore) {
+        const duration =
+          moveAnimationImage.getFrameCount() *
+          moveAnimationImage.currentFrameDuration();
+        animationStore.setMovementDuration(duration);
+      }
+
+      // Optional cleanup if needed
+      return () => {
+        if (moveAnimationImage) {
+          moveAnimationImage.dispose();
+        }
+      };
+    }, [moveAnimationImage, animationStore]);
 
     if (!enemyData.sets[activeSpriteAnimationString]) {
       throw new Error(

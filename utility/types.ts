@@ -1,8 +1,8 @@
 import { ColorValue } from "react-native";
-import type { PlayerCharacter } from "../entities/character";
-import type { Condition } from "../entities/conditions";
-import type { Enemy, Minion } from "../entities/creatures";
-import { VFXImageOptions } from "./functions/vfxmapping";
+import type { PlayerCharacter } from "@/entities/character";
+import type { Condition } from "@/entities/conditions";
+import type { Enemy, Minion } from "@/entities/creatures";
+import { VFXImageOptions } from "@/utility/vfxmapping";
 
 type StatEffect = {
   stat: "health" | "mana" | "sanity";

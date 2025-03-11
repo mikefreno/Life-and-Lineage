@@ -8,7 +8,8 @@ import { PlayerCharacter } from "../entities/character";
 import { Attack } from "../entities/attack";
 import { useIsFocused } from "@react-navigation/native";
 import { Spell } from "../entities/spell";
-import { AnimationOptions } from "@/utility/enemyHelpers";
+import { AnimationOptions, EnemyImageMap } from "@/utility/enemyHelpers";
+import { useAnimatedImage } from "@shopify/react-native-skia";
 
 export const useEnemyManagement = () => {
   const root = useRootStore();
@@ -114,6 +115,19 @@ export const useEnemyManagement = () => {
               `${enemy.creatureSpecies} used ${enemyAttackRes.attack?.name}, -> animation: ${animationForAttack}`,
             );
 
+            setTimeout(
+              () => {
+                if (res.damages) {
+                  playerState?.damageHealth({
+                    damage: res.damages.total,
+                    attackerId: enemy.id,
+                  });
+                  playerState?.damageSanity(res.damages.sanity);
+                }
+              },
+              animStore?.movementDuration ?? 500,
+            );
+
             switch (res.result) {
               case AttackUse.success:
                 animStore?.addToAnimationQueue(
@@ -169,7 +183,7 @@ export const useCombatActions = () => {
       minions?.forEach((minion) => {
         const result = minion.takeTurn({ target: enemyStore.enemies });
         for (const res of result.result) {
-          const animStore = enemyStore.getAnimationStore(res.target);
+          const animStore = enemyStore.getAnimationStore(res.target.id);
           switch (res.result) {
             case AttackUse.success:
               animStore?.addToAnimationQueue("hurt");
@@ -245,6 +259,7 @@ export const useCombatActions = () => {
   const pass = useCallback(
     ({ voluntary = false }: { voluntary?: boolean }) => {
       if (!playerState || !isFocused) return;
+      playerAnimationStore.setPassed(true);
 
       playerState.pass({ voluntary });
       dungeonStore.addLog("You passed!");

@@ -141,7 +141,6 @@ export const useReanimatedAnimations = () => {
     onComplete: () => void,
   ) => {
     const { duration } = calculateAdjustedFrameRate(moveFrames);
-    const moveDuration = duration;
 
     if (moveX.value === 0 && moveY.value === 0) {
       const dirX = targetPosition.x - currentPosition.x;
@@ -156,26 +155,22 @@ export const useReanimatedAnimations = () => {
       // Move to target
       moveX.value = withTiming(
         normalizedX,
-        { duration: moveDuration / 2 },
+        { duration: duration / 2 },
         (finished) => {
           if (finished) {
             runOnJS(onComplete)();
           }
         },
       );
-      moveY.value = withTiming(normalizedY, { duration: moveDuration / 2 });
+      moveY.value = withTiming(normalizedY, { duration: duration / 2 });
     } else {
       // Return to original position
-      moveX.value = withTiming(
-        0,
-        { duration: moveDuration / 2 },
-        (finished) => {
-          if (finished) {
-            runOnJS(onComplete)();
-          }
-        },
-      );
-      moveY.value = withTiming(0, { duration: moveDuration / 2 });
+      moveX.value = withTiming(0, { duration: duration / 2 }, (finished) => {
+        if (finished) {
+          runOnJS(onComplete)();
+        }
+      });
+      moveY.value = withTiming(0, { duration: duration / 2 });
     }
   };
 

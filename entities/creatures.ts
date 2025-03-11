@@ -501,8 +501,18 @@ export class Creature {
   protected _takeTurn({ target }: { target: PlayerCharacter | Enemy[] }): {
     attack?: Attack;
     result: {
-      target: string;
+      target: Enemy | PlayerCharacter | Minion;
       result: AttackUse;
+      healed?: number;
+      damages?: {
+        physical: number;
+        fire: number;
+        cold: number;
+        lightning: number;
+        poison: number;
+        total: number;
+        sanity?: number;
+      };
     }[];
     logString: string;
   } {
@@ -513,7 +523,7 @@ export class Creature {
       return {
         result: Array.isArray(target)
           ? target.map((enemy) => ({
-              target: enemy.id,
+              target: enemy,
               result: AttackUse.stunned,
             }))
           : [{ target: target.id, result: AttackUse.stunned }],
@@ -531,7 +541,7 @@ export class Creature {
       return {
         result: Array.isArray(target)
           ? target.map((enemy) => ({
-              target: enemy.id,
+              target: enemy,
               result: AttackUse.stunned,
             }))
           : [{ target: target.id, result: AttackUse.stunned }],
@@ -575,7 +585,7 @@ export class Creature {
       return {
         result: Array.isArray(target)
           ? target.map((enemy) => ({
-              target: enemy.id,
+              target: enemy,
               result: AttackUse.lowEnergy,
             }))
           : [{ target: target.id, result: AttackUse.lowEnergy }],
