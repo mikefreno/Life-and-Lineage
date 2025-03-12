@@ -1,6 +1,3 @@
-import { Attack } from "@/entities/attack";
-import enemyAttackAnimationMapping from "@/assets/json/enemyAttackAnimationMapping.json";
-
 // use after expanding set
 export const enemyImageOptionsPrinter = () => {
   console.log(Object.keys(EnemyImageMap));
@@ -96,16 +93,18 @@ export type AnimationSet = {
   anim: any;
   sizeOverride?: { height: number; width: number };
   disablePreMovement?: boolean;
-  projectile?:
-    | {
-        anim: any;
-        height?: number;
-        width?: number;
-      }
-    | any;
+  projectile?: {
+    anim: any;
+    height: number;
+    width: number;
+    scale?: number;
+  };
   splash?: {
     anim: any;
-    frames: number;
+    height: number;
+    width: number;
+    followsProjectile: boolean;
+    scale?: number;
   };
 };
 
@@ -151,7 +150,12 @@ export const EnemyImageMap: EnemyImageMapType = {
     sets: {
       attack_1: {
         anim: require("@/assets/monsters/Baby_Dragon/ATTACK_1.webp"),
-        projectile: require("@/assets/monsters/Baby_Dragon/PROJECTILE.webp"),
+        projectile: {
+          anim: require("@/assets/monsters/Baby_Dragon/PROJECTILE.webp"),
+          width: 48,
+          height: 32,
+          scale: 3,
+        },
       },
       death: {
         anim: require("@/assets/monsters/Baby_Dragon/DEATH.webp"),
@@ -1052,7 +1056,11 @@ export const EnemyImageMap: EnemyImageMapType = {
     sets: {
       attack_1: {
         anim: require("@/assets/monsters/Pyromancer/ATTACK_1.webp"),
-        projectile: require("@/assets/monsters/Pyromancer/PROJECTILE.webp"),
+        projectile: {
+          anim: require("@/assets/monsters/Pyromancer/PROJECTILE.webp"),
+          width: 48,
+          height: 48,
+        },
       },
       death: {
         anim: require("@/assets/monsters/Pyromancer/DEATH.webp"),
@@ -1440,7 +1448,12 @@ export const EnemyImageMap: EnemyImageMapType = {
       attack_1: {
         anim: require("@/assets/monsters/Skeleton_Mage/ATTACK_1.webp"),
         disablePreMovement: true,
-        projectile: require("@/assets/monsters/Skeleton_Mage/projectile.png"),
+        projectile: {
+          anim: require("@/assets/monsters/Skeleton_Mage/PROJECTILE.webp"),
+          width: 32,
+          height: 16,
+          scale: 4,
+        },
       },
       hurt: {
         anim: require("@/assets/monsters/Skeleton_Mage/HURT.webp"),
@@ -1851,8 +1864,17 @@ export const EnemyImageMap: EnemyImageMapType = {
     sets: {
       attack_1: {
         anim: require("@/assets/monsters/Wizard_Black/ATTACK_1.webp"),
-        projectile: require("@/assets/monsters/Wizard_Black/PROJECTILE.webp"),
-        splash: require("@/assets/monsters/Wizard_Black/EFFECT.webp"),
+        projectile: {
+          anim: require("@/assets/monsters/Wizard_Black/PROJECTILE.webp"),
+          width: 64,
+          height: 64,
+        },
+        splash: {
+          anim: require("@/assets/monsters/Wizard_Black/EFFECT.webp"),
+          width: 64,
+          height: 64,
+          followsProjectile: false,
+        },
         disablePreMovement: true,
       },
       attack_2: {
@@ -1876,8 +1898,17 @@ export const EnemyImageMap: EnemyImageMapType = {
     sets: {
       attack_1: {
         anim: require("@/assets/monsters/Wizard_BlackBlue/ATTACK_1.webp"),
-        projectile: require("@/assets/monsters/Wizard_BlackBlue/PROJECTILE.webp"),
-        splash: require("@/assets/monsters/Wizard_BlackBlue/EFFECT.webp"),
+        projectile: {
+          anim: require("@/assets/monsters/Wizard_BlackBlue/PROJECTILE.webp"),
+          width: 64,
+          height: 64,
+        },
+        splash: {
+          anim: require("@/assets/monsters/Wizard_BlackBlue/EFFECT.webp"),
+          width: 64,
+          height: 64,
+          followsProjectile: false,
+        },
         disablePreMovement: true,
       },
       attack_2: {
@@ -1901,8 +1932,17 @@ export const EnemyImageMap: EnemyImageMapType = {
     sets: {
       attack_1: {
         anim: require("@/assets/monsters/Wizard_Blue/ATTACK_1.webp"),
-        projectile: require("@/assets/monsters/Wizard_Blue/PROJECTILE.webp"),
-        splash: require("@/assets/monsters/Wizard_Blue/EFFECT.webp"),
+        projectile: {
+          anim: require("@/assets/monsters/Wizard_Blue/PROJECTILE.webp"),
+          width: 64,
+          height: 64,
+        },
+        splash: {
+          anim: require("@/assets/monsters/Wizard_Blue/EFFECT.webp"),
+          width: 64,
+          height: 64,
+          followsProjectile: false,
+        },
         disablePreMovement: true,
       },
       attack_2: {
@@ -1926,6 +1966,11 @@ export const EnemyImageMap: EnemyImageMapType = {
     sets: {
       attack_1: {
         anim: require("@/assets/monsters/Wizard_Classic/ATTACK_1.webp"),
+        projectile: {
+          anim: require("@/assets/monsters/Wizard_Classic/PROJECTILE.webp"),
+          width: 32,
+          height: 32,
+        },
       },
       attack_2: {
         anim: require("@/assets/monsters/Wizard_Classic/ATTACK_2.webp"),
@@ -1950,8 +1995,17 @@ export const EnemyImageMap: EnemyImageMapType = {
     sets: {
       attack_1: {
         anim: require("@/assets/monsters/Wizard_DarkPurple/ATTACK_1.webp"),
-        projectile: require("@/assets/monsters/Wizard_DarkPurple/PROJECTILE.webp"),
-        splash: require("@/assets/monsters/Wizard_DarkPurple/EFFECT.webp"),
+        projectile: {
+          anim: require("@/assets/monsters/Wizard_DarkPurple/PROJECTILE.webp"),
+          width: 64,
+          height: 64,
+        },
+        splash: {
+          anim: require("@/assets/monsters/Wizard_DarkPurple/EFFECT.webp"),
+          width: 64,
+          height: 64,
+          followsProjectile: false,
+        },
         disablePreMovement: true,
       },
       attack_2: {
@@ -1974,8 +2028,17 @@ export const EnemyImageMap: EnemyImageMapType = {
     sets: {
       attack_1: {
         anim: require("@/assets/monsters/Wizard_Earthen/ATTACK_1.webp"),
-        projectile: require("@/assets/monsters/Wizard_Earthen/PROJECTILE.webp"),
-        splash: require("@/assets/monsters/Wizard_Earthen/EFFECT.webp"),
+        projectile: {
+          anim: require("@/assets/monsters/Wizard_Earthen/PROJECTILE.webp"),
+          width: 64,
+          height: 64,
+        },
+        splash: {
+          anim: require("@/assets/monsters/Wizard_Earthen/EFFECT.webp"),
+          width: 64,
+          height: 64,
+          followsProjectile: false,
+        },
         disablePreMovement: true,
       },
       attack_2: {
@@ -1999,8 +2062,17 @@ export const EnemyImageMap: EnemyImageMapType = {
     sets: {
       attack_1: {
         anim: require("@/assets/monsters/Wizard_Gray/ATTACK_1.webp"),
-        projectile: require("@/assets/monsters/Wizard_Gray/PROJECTILE.webp"),
-        splash: require("@/assets/monsters/Wizard_Gray/EFFECT.webp"),
+        projectile: {
+          anim: require("@/assets/monsters/Wizard_Gray/PROJECTILE.webp"),
+          width: 64,
+          height: 64,
+        },
+        splash: {
+          anim: require("@/assets/monsters/Wizard_Gray/EFFECT.webp"),
+          width: 64,
+          height: 64,
+          followsProjectile: false,
+        },
         disablePreMovement: true,
       },
       attack_2: {
@@ -2024,8 +2096,17 @@ export const EnemyImageMap: EnemyImageMapType = {
     sets: {
       attack_1: {
         anim: require("@/assets/monsters/Wizard_Green/ATTACK_1.webp"),
-        projectile: require("@/assets/monsters/Wizard_Green/PROJECTILE.webp"),
-        splash: require("@/assets/monsters/Wizard_Green/EFFECT.webp"),
+        projectile: {
+          anim: require("@/assets/monsters/Wizard_Green/PROJECTILE.webp"),
+          width: 64,
+          height: 64,
+        },
+        splash: {
+          anim: require("@/assets/monsters/Wizard_Green/EFFECT.webp"),
+          width: 64,
+          height: 64,
+          followsProjectile: false,
+        },
         disablePreMovement: true,
       },
       attack_2: {
@@ -2049,8 +2130,17 @@ export const EnemyImageMap: EnemyImageMapType = {
     sets: {
       attack_1: {
         anim: require("@/assets/monsters/Wizard_Purple/ATTACK_1.webp"),
-        projectile: require("@/assets/monsters/Wizard_Purple/PROJECTILE.webp"),
-        splash: require("@/assets/monsters/Wizard_Purple/EFFECT.webp"),
+        projectile: {
+          anim: require("@/assets/monsters/Wizard_Purple/PROJECTILE.webp"),
+          width: 64,
+          height: 64,
+        },
+        splash: {
+          anim: require("@/assets/monsters/Wizard_Purple/EFFECT.webp"),
+          width: 64,
+          height: 64,
+          followsProjectile: false,
+        },
         disablePreMovement: true,
       },
       attack_2: {
@@ -2074,8 +2164,17 @@ export const EnemyImageMap: EnemyImageMapType = {
     sets: {
       attack_1: {
         anim: require("@/assets/monsters/Wizard_RedBlack/ATTACK_1.webp"),
-        projectile: require("@/assets/monsters/Wizard_RedBlack/PROJECTILE.webp"),
-        splash: require("@/assets/monsters/Wizard_RedBlack/EFFECT.webp"),
+        projectile: {
+          anim: require("@/assets/monsters/Wizard_RedBlack/PROJECTILE.webp"),
+          width: 64,
+          height: 64,
+        },
+        splash: {
+          anim: require("@/assets/monsters/Wizard_RedBlack/EFFECT.webp"),
+          width: 64,
+          height: 64,
+          followsProjectile: false,
+        },
         disablePreMovement: true,
       },
       attack_2: {
@@ -2099,7 +2198,11 @@ export const EnemyImageMap: EnemyImageMapType = {
     sets: {
       attack_1: {
         anim: require("@/assets/monsters/Wizard_Yellow/ATTACK.webp"),
-        projectile: require("@/assets/monsters/Wizard_Yellow/PROJECTILE.webp"),
+        projectile: {
+          anim: require("@/assets/monsters/Wizard_Yellow/PROJECTILE.webp"),
+          width: 64,
+          height: 64,
+        },
         disablePreMovement: true,
       },
       attack_2: {

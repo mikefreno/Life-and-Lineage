@@ -1,4 +1,5 @@
 import {
+  createBuff,
   getConditionEffectsOnDefenses,
   getConditionEffectsOnMisc,
 } from "../utility/functions/conditions";
@@ -845,6 +846,31 @@ export class PlayerCharacter extends Character {
           max: 1_000,
           initVal: 0,
           step: 10,
+        },
+        {
+          action: (value: number) => {
+            this.restoreSanity(value);
+            this.restoreHealth(value);
+          },
+          name: "Adjust Sanity and Health",
+          min: -100,
+          max: 100,
+          initVal: 0,
+          step: 1,
+        },
+        {
+          action: () => {
+            const cond = createBuff({
+              buffName: "reflective bulwark",
+              attackPower: 100,
+              applierID: this.id,
+              maxHealth: this.maxHealth,
+              maxSanity: this.maxSanity,
+              applierNameString: this.fullName,
+            });
+            this.addCondition(cond);
+          },
+          name: "Add condition",
         },
         {
           action: () => this._unlockAllSpells(),
@@ -2175,6 +2201,7 @@ export class PlayerCharacter extends Character {
       beingType: minionObj.beingType as BeingType,
       parent: this,
     });
+    console.log(minion);
     this.rangerPet = minion;
     return minion.creatureSpecies;
   }

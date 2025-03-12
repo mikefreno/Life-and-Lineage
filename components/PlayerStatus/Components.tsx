@@ -550,7 +550,8 @@ export const ColorAndPlatformDependantBlur = observer(
   ({ children, home = true }: { children: ReactNode; home?: boolean }) => {
     const { uiStore, playerState, dungeonStore } = useRootStore();
     const pathname = usePathname();
-    const { healthDamageFlash } = useStatChanges(playerState!);
+    const { healthDamageFlash, sanityDamageFlash, statChanges } =
+      useStatChanges(playerState!);
 
     const healthWarningAnimatedValue = useState(new Animated.Value(0))[0];
 
@@ -566,6 +567,32 @@ export const ColorAndPlatformDependantBlur = observer(
       inputRange: [0, 1],
       outputRange: ["transparent", "rgba(180,30,30,0.4)"],
     });
+
+    const sanityDamageInterpolation = sanityDamageFlash.interpolate({
+      inputRange: [0, 1],
+      outputRange: ["transparent", "rgba(107,33,168,0.4)"], // #6b21a8 with 0.4 opacity
+    });
+
+    const combinedFlashInterpolation = Animated.multiply(
+      healthDamageFlash,
+      sanityDamageFlash,
+    ).interpolate({
+      inputRange: [0, 1],
+      outputRange: ["transparent", "rgba(160,30,120,0.5)"],
+      extrapolate: "clamp",
+    });
+
+    const healthOrSanityFlash = () => {
+      if (statChanges.health.isShowing && statChanges.sanity.isShowing) {
+        return combinedFlashInterpolation;
+      }
+      if (statChanges.health.isShowing) {
+        return healthDamageInterpolation;
+      }
+      if (statChanges.sanity.isShowing) {
+        return sanityDamageInterpolation;
+      }
+    };
 
     useEffect(() => {
       if (showingHealthWarningPulse) {
@@ -661,7 +688,7 @@ export const ColorAndPlatformDependantBlur = observer(
                 display: "flex",
                 backgroundColor: showingHealthWarningPulse
                   ? healthWarningInterpolation
-                  : healthDamageInterpolation,
+                  : healthOrSanityFlash(),
                 paddingBottom: 4,
               }}
             >
@@ -691,7 +718,7 @@ export const ColorAndPlatformDependantBlur = observer(
                 display: "flex",
                 backgroundColor: showingHealthWarningPulse
                   ? healthWarningInterpolation
-                  : healthDamageInterpolation,
+                  : healthOrSanityFlash(),
                 paddingBottom: 4,
                 borderRadius: 12,
               }}
@@ -727,7 +754,7 @@ export const ColorAndPlatformDependantBlur = observer(
               display: "flex",
               backgroundColor: showingHealthWarningPulse
                 ? healthWarningInterpolation
-                : healthDamageInterpolation,
+                : healthOrSanityFlash(),
             }}
           >
             {children}
@@ -761,7 +788,7 @@ export const ColorAndPlatformDependantBlur = observer(
               display: "flex",
               backgroundColor: showingHealthWarningPulse
                 ? healthWarningInterpolation
-                : healthDamageInterpolation,
+                : healthOrSanityFlash(),
             }}
           >
             {children}

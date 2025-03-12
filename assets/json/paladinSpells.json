@@ -496,7 +496,7 @@
       "damage": null,
       "selfDamage": null,
       "buffs": [
-        "bulwark"
+        "reflective bulwark"
       ],
       "debuffs": null
     }
@@ -616,7 +616,7 @@
       "selfDamage": null,
       "buffs": [
         "protection aura",
-        "bulwark"
+        "reflective bulwark"
       ],
       "debuffs": null
     }
@@ -635,7 +635,7 @@
       "buffs": [
         "protection aura",
         "blessed defense",
-        "bulwark"
+        "reflective bulwark"
       ],
       "debuffs": null
     }

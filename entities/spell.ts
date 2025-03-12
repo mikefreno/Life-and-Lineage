@@ -218,7 +218,6 @@ export class Spell {
       user.removeBloodOrbs(this);
     }
 
-    // Handle summons (only once)
     let minionSpecies: string[] = [];
     this.summons.forEach((summon) => {
       const type = user.createMinion(summon);

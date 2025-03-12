@@ -2,22 +2,22 @@ import { View, Animated, Image, ScrollView } from "react-native";
 import { toTitleCase } from "../../utility/functions/misc";
 import ProgressBar from "../ProgressBar";
 import GenericStrikeAround from "../GenericStrikeAround";
-import { ThemedView, Text } from "../Themed";
+import { Text } from "../Themed";
 import FadeOutNode from "../FadeOutNode";
 import { memo, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import type { Enemy } from "../../entities/creatures";
-import { type EnemyAnimationStore } from "../../stores/EnemyAnimationStore";
 import { useRootStore } from "../../hooks/stores";
 import { AnimatedSprite } from "../AnimatedSprite";
-import { flex, tw_base, useStyles } from "../../hooks/styles";
+import { flex, normalize, tw_base, useStyles } from "../../hooks/styles";
+import Colors from "@/constants/Colors";
 
 const EnemyHealthChangePopUp = memo(
   ({ healthDiff, showing }: { healthDiff: number; showing: boolean }) => {
-    if (!showing) return <View style={{ height: tw_base[6] }} />;
+    if (!showing) return <View style={{ height: tw_base[2] }} />;
 
     return (
-      <View style={{ height: tw_base[6] }}>
+      <View style={{ height: tw_base[2] }}>
         <FadeOutNode>
           <Text style={{ color: "#f87171" }}>
             {healthDiff > 0 ? "+" : ""}
@@ -53,7 +53,6 @@ const EnemyConditions = observer(({ conditions }: { conditions: any[] }) => {
     <View
       style={{
         width: "100%",
-        height: 44,
       }}
     >
       <ScrollView
@@ -65,7 +64,7 @@ const EnemyConditions = observer(({ conditions }: { conditions: any[] }) => {
       >
         {simplifiedConditions.map((cond) => (
           <View key={cond.name}>
-            <ThemedView
+            <View
               style={[
                 flex.columnCenter,
                 {
@@ -74,24 +73,25 @@ const EnemyConditions = observer(({ conditions }: { conditions: any[] }) => {
                   width: 36,
                   alignContent: "center",
                   marginVertical: "auto",
+                  backgroundColor: `${Colors.light.background}50`,
                 },
               ]}
             >
               <Image source={cond.icon} style={{ width: 22, height: 24 }} />
-            </ThemedView>
-            <Text
-              style={[
-                styles["text-xl"],
-                {
-                  position: "absolute",
-                  right: -4,
-                  bottom: 0,
-                },
-              ]}
-              numberOfLines={1}
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                position: "absolute",
+                right: normalize(-4),
+                top: normalize(16),
+              }}
             >
-              x{cond.count}
-            </Text>
+              <Text style={[styles["text-3xl"], { top: 4 }]}>*</Text>
+              <Text style={[styles["text-xl"]]} numberOfLines={1}>
+                {cond.count}
+              </Text>
+            </View>
           </View>
         ))}
       </ScrollView>
@@ -116,9 +116,7 @@ const DungeonEnemyDisplay = observer(() => {
         const store = enemyStore.getAnimationStore(enemy.id);
 
         if (store) {
-          return (
-            <EnemyDisplay key={enemy.id} enemy={enemy} animationStore={store} />
-          );
+          return <EnemyDisplay key={enemy.id} enemy={enemy} />;
         }
       })}
     </View>
@@ -132,14 +130,10 @@ const EnemyDisplay = observer(({ enemy }: { enemy: Enemy }) => {
     diff: 0,
     showing: false,
   });
+
   const healingGlowAnim = useRef(new Animated.Value(0)).current;
-  const projectileAnim = useRef(new Animated.Value(0)).current;
-  const [showProjectile, setShowProjectile] = useState(false);
-  const [projectileFrame, setProjectileFrame] = useState(0);
-  const projectileAnimationRef = useRef<NodeJS.Timeout>();
 
   // TODO: Dialogue popup (modal)
-  // TODO: Projectile animation
   // TODO: Healing animation
 
   return (
@@ -147,37 +141,41 @@ const EnemyDisplay = observer(({ enemy }: { enemy: Enemy }) => {
       <View style={[flex.rowBetween, { flex: 1 }]}>
         <View
           style={{
-            ...flex.columnCenter,
             width: "50%",
           }}
         >
-          <Text
-            style={{
-              ...styles["text-3xl"],
-              textAlign: "center",
-            }}
-            numberOfLines={2}
-          >
-            {enemy.creatureSpecies.toLowerCase().includes("generic npc")
-              ? ""
-              : toTitleCase(enemy.creatureSpecies).replace(" ", "\n")}
-          </Text>
-          <ProgressBar
-            value={enemy.currentHealth >= 0 ? enemy.currentHealth : 0}
-            maxValue={enemy.maxHealth}
-            filledColor="#ef4444"
-            unfilledColor="#fee2e2"
-            displayNumber={
-              enemy.creatureSpecies.toLowerCase() == "training dummy"
-            }
-            removeAtZero={true}
-            containerStyle={{ width: "90%" }}
-          />
-          <EnemyHealthChangePopUp
-            healthDiff={healthState.diff}
-            showing={healthState.showing}
-          />
-          <EnemyConditions conditions={enemy.conditions} />
+          <View style={{ flex: 1 }} />
+          <View style={{ flex: 1, alignItems: "center" }}>
+            <Text
+              style={{
+                ...styles["text-3xl"],
+                textAlign: "center",
+              }}
+              numberOfLines={2}
+            >
+              {enemy.creatureSpecies.toLowerCase().includes("generic npc")
+                ? ""
+                : toTitleCase(enemy.creatureSpecies).replace(" ", "\n")}
+            </Text>
+            <ProgressBar
+              value={enemy.currentHealth >= 0 ? enemy.currentHealth : 0}
+              maxValue={enemy.maxHealth}
+              filledColor="#ef4444"
+              unfilledColor="#fee2e2"
+              displayNumber={
+                enemy.creatureSpecies.toLowerCase() == "training dummy"
+              }
+              removeAtZero={true}
+              containerStyle={{ width: "90%" }}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <EnemyHealthChangePopUp
+              healthDiff={healthState.diff}
+              showing={healthState.showing}
+            />
+            <EnemyConditions conditions={enemy.conditions} />
+          </View>
         </View>
         <AnimatedSprite enemy={enemy} />
       </View>

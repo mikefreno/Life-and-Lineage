@@ -8,29 +8,30 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
 } from "react-native";
-import { toTitleCase } from "../../utility/functions/misc";
+import { toTitleCase } from "@/utility/functions/misc";
 import { useEffect, useState } from "react";
-import GenericModal from "../GenericModal";
-import SpellDetails from "../SpellDetails";
-import InventoryRender from "../InventoryRender";
+import GenericModal from "@/components/GenericModal";
+import SpellDetails from "@/components/SpellDetails";
+import InventoryRender from "@/components/InventoryRender";
 import { DungeonMapControls } from "./DungeonMap";
-import { Energy, Regen } from "../../assets/icons/SVGIcons";
-import { elementalColorMap } from "../../constants/Colors";
-import { useCombatState, useLootState } from "../../providers/DungeonData";
-import { Attack } from "../../entities/attack";
-import { Spell } from "../../entities/spell";
-import { useCombatActions } from "../../hooks/combat";
-import { Item } from "../../entities/item";
-import { usePouch, useVibration } from "../../hooks/generic";
+import { Energy, Regen } from "@/assets/icons/SVGIcons";
+import { elementalColorMap } from "@/constants/Colors";
+import { useCombatState, useLootState } from "@/providers/DungeonData";
+import { Attack } from "@/entities/attack";
+import { Spell } from "@/entities/spell";
+import { useCombatActions } from "@/hooks/combat";
+import { Item } from "@/entities/item";
+import { usePouch, useVibration } from "@/hooks/generic";
 import {
   useDraggableStore,
   usePlayerStore,
   useRootStore,
-} from "../../hooks/stores";
+} from "@/hooks/stores";
 import { observer } from "mobx-react-lite";
-import { tw, useStyles } from "../../hooks/styles";
-import { Enemy } from "../../entities/creatures";
-import GenericRaisedButton from "../GenericRaisedButton";
+import { tw, useStyles } from "@/hooks/styles";
+import { Enemy } from "@/entities/creatures";
+import GenericRaisedButton from "@/components/GenericRaisedButton";
+import { runInAction } from "mobx";
 
 const BattleTab = observer(
   ({
@@ -44,7 +45,8 @@ const BattleTab = observer(
     const [attackDetailsShowing, setAttackDetailsShowing] =
       useState<boolean>(false);
 
-    const { enemyStore, dungeonStore, uiStore } = useRootStore();
+    const { enemyStore, dungeonStore, uiStore, playerAnimationStore } =
+      useRootStore();
     const playerState = usePlayerStore();
 
     const { useAttack } = useCombatActions();
@@ -415,6 +417,13 @@ const BattleTab = observer(
                       disabled={enemyStore.enemyTurnOngoing}
                       onPress={() => {
                         vibration({ style: "light" });
+                        runInAction(() => {
+                          playerAnimationStore.usedPass = true;
+                          setTimeout(
+                            () => (playerAnimationStore.usedPass = false),
+                            1000,
+                          );
+                        });
                         pass({ voluntary: true });
                       }}
                       style={[

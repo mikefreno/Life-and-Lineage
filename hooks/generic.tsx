@@ -381,6 +381,7 @@ export const useStatChanges = (playerState: PlayerCharacter) => {
   });
 
   const [healthDamageFlash] = useState(new Animated.Value(0));
+  const [sanityDamageFlash] = useState(new Animated.Value(0));
   const [animationCycler, setAnimationCycler] = useState(0);
 
   useEffect(() => {
@@ -405,7 +406,6 @@ export const useStatChanges = (playerState: PlayerCharacter) => {
         }));
         setAnimationCycler((prev) => prev + 1);
 
-        // Set timeout to clear the stat change
         setTimeout(() => {
           const timeSinceLastUpdate =
             Date.now() - lastUpdateTimeRef.current[stat];
@@ -420,31 +420,45 @@ export const useStatChanges = (playerState: PlayerCharacter) => {
     };
 
     if (playerState) {
-      // Health special case for damage flash
       if (playerState.currentHealth !== records.health) {
         if (playerState.currentHealth - records.health < 0) {
           Animated.sequence([
             Animated.timing(healthDamageFlash, {
               toValue: 1,
-              duration: 200,
+              duration: 400,
               useNativeDriver: false,
             }),
             Animated.timing(healthDamageFlash, {
               toValue: 0,
-              duration: 200,
+              duration: 600,
               useNativeDriver: false,
             }),
           ]).start();
         }
       }
 
-      // Update all stats
+      if (playerState.currentSanity !== records.sanity) {
+        if (playerState.currentSanity - records.sanity < 0) {
+          Animated.sequence([
+            Animated.timing(sanityDamageFlash, {
+              toValue: 1,
+              duration: 400,
+              useNativeDriver: false,
+            }),
+            Animated.timing(sanityDamageFlash, {
+              toValue: 0,
+              duration: 800,
+              useNativeDriver: false,
+            }),
+          ]).start();
+        }
+      }
+
       updateStat("health", playerState.currentHealth, records.health);
       updateStat("mana", playerState.currentMana, records.mana);
       updateStat("sanity", playerState.currentSanity, records.sanity);
       updateStat("gold", playerState.gold, records.gold);
 
-      // Update records
       setRecords({
         health: playerState.currentHealth,
         mana: playerState.currentMana,
@@ -459,5 +473,5 @@ export const useStatChanges = (playerState: PlayerCharacter) => {
     playerState?.gold,
   ]);
 
-  return { statChanges, animationCycler, healthDamageFlash };
+  return { statChanges, animationCycler, healthDamageFlash, sanityDamageFlash };
 };

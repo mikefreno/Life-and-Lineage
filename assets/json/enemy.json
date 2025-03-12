@@ -936,6 +936,36 @@
       "maximum": 50
     },
     "armorValue": 20
+  },
+  {
+    "name": "mimic",
+    "beingType": "demi-human",
+    "sprite": "mimic",
+    "sanity": null,
+    "healthRange": {
+      "minimum": 120,
+      "maximum": 160
+    },
+    "attackPowerRange": {
+      "minimum": 10,
+      "maximum": 15
+    },
+    "energy": {
+      "maximum": 40,
+      "regen": 10
+    },
+    "attackStrings": [
+      "stomp"
+    ],
+    "animationStrings": {
+      "stomp": "attack_1"
+    },
+    "drops": [],
+    "goldDropRange": {
+      "minimum": 400,
+      "maximum": 500
+    },
+    "armorValue": 20
   }
 ]
 

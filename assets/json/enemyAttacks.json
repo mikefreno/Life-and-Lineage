@@ -145,7 +145,20 @@
     "debuffs": [
       {
         "name": "stun",
-        "chance": 0.4
+        "chance": 0.8
+      }
+    ]
+  },
+  {
+    "name": "stomp",
+    "energyCost": 10,
+    "targets": "single",
+    "hitChance": 0.95,
+    "damageMult": 1.0,
+    "debuffs": [
+      {
+        "name": "stun",
+        "chance": 0.1
       }
     ]
   },

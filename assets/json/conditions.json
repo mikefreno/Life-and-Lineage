@@ -408,7 +408,7 @@
     "icon": "pray_hands"
   },
   {
-    "name": "bulwark",
+    "name": "reflective bulwark",
     "style": "buff",
     "turns": 10,
     "effect": [
@@ -418,7 +418,7 @@
       "flat"
     ],
     "effectAmount": [
-      5
+      20
     ],
     "icon": "pray_hands"
   },

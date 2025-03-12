@@ -162,7 +162,7 @@ export const DevControls = observer(() => {
         isVisibleCondition={showingDevControls}
         scrollEnabled={true}
         size={100}
-        style={{ maxHeight: "90%", marginVertical: "auto" }}
+        style={{ maxHeight: "70%", marginVertical: "auto" }}
         backFunction={() => setShowingDevControls(false)}
       >
         <ActionSliders actions={rootStore.devActions} />

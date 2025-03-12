@@ -354,7 +354,6 @@ export const AnimatedSprite = observer(
         animationStore.setMovementDuration(duration);
       }
 
-      // Optional cleanup if needed
       return () => {
         if (moveAnimationImage) {
           moveAnimationImage.dispose();
@@ -428,6 +427,14 @@ export const AnimatedSprite = observer(
         frameCount > 0
       ) {
         switch (activeAnimationString) {
+          case "attack_1":
+          case "attack_2":
+          case "attack_3":
+          case "attack_4":
+          case "attack_5":
+            animationStore.setProjectile(activeAnimationString);
+            return;
+
           case "move":
             runInAction(() => (animationStore.runningRNAnimation = true));
             runMoveAnimation(

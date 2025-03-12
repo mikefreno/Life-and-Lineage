@@ -91,14 +91,14 @@
     "baseValue": 1000000
   },
   {
-    "name": "book of call raven",
+    "name": "book of the raven",
     "type": "spell",
     "teaches": "call raven",
     "icon": "Book",
     "baseValue": 2500
   },
   {
-    "name": "book of call wolf",
+    "name": "book of the wolf",
     "type": "spell",
     "teaches": "call wolf",
     "icon": "Book",
@@ -119,7 +119,7 @@
     "baseValue": 5000
   },
   {
-    "name": "book of call bear",
+    "name": "book of the bear",
     "type": "spell",
     "teaches": "call bear",
     "icon": "Book",
@@ -140,7 +140,7 @@
     "baseValue": 50000
   },
   {
-    "name": "book of call dragon welp",
+    "name": "book of the dragon welp",
     "type": "spell",
     "teaches": "call dragon welp",
     "icon": "Book_2",
@@ -161,7 +161,7 @@
     "baseValue": 150000
   },
   {
-    "name": "book of call griffon",
+    "name": "book of the griffon",
     "type": "spell",
     "teaches": "call griffon",
     "icon": "Book_3",

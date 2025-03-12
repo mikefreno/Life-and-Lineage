@@ -428,7 +428,8 @@ export type EffectOptions =
   | "revenge"
   | "blood magic consumable"
   | "execute"
-  | "stealth";
+  | "stealth"
+  | "protection";
 
 export type EffectStyle = "multiplier" | "percentage" | "flat";
 

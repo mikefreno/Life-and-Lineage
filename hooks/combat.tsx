@@ -111,10 +111,6 @@ export const useEnemyManagement = () => {
                 ] as AnimationOptions) ?? "attack_1";
             }
 
-            console.log(
-              `${enemy.creatureSpecies} used ${enemyAttackRes.attack?.name}, -> animation: ${animationForAttack}`,
-            );
-
             setTimeout(
               () => {
                 if (res.damages) {
