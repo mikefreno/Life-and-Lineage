@@ -5,14 +5,14 @@ import {
   useState,
   useEffect,
 } from "react";
-import type { Item } from "../entities/item";
-import type { Attack } from "../entities/attack";
-import type { Spell } from "../entities/spell";
-import { wait } from "../utility/functions/misc";
-import TutorialModal from "../components/TutorialModal";
-import { TutorialOption } from "../utility/types";
+import type { Item } from "@/entities/item";
+import type { Attack } from "@/entities/attack";
+import type { Spell } from "@/entities/spell";
+import { wait } from "@/utility/functions/misc";
+import TutorialModal from "@/components/TutorialModal";
+import { TutorialOption } from "@/utility/types";
 import { useIsFocused } from "@react-navigation/native";
-import { useRootStore } from "../hooks/stores";
+import { useRootStore } from "@/hooks/stores";
 
 const CombatStateContext = createContext<
   | {

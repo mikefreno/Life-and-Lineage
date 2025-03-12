@@ -1,5 +1,5 @@
 import { action, makeObservable, observable } from "mobx";
-import { RootStore } from "./RootStore";
+import { RootStore } from "@/stores/RootStore";
 import { Platform } from "react-native";
 
 export class IAPStore {

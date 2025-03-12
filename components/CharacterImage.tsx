@@ -5,7 +5,7 @@ import { Character } from "../entities/character";
 export function CharacterImage({ character }: { character: Character }) {
   return (
     <Image
-      style={{ width: "100%", height: "80%", objectFit: "scale-down" }}
+      style={{ width: "100%", objectFit: "scale-down" }}
       source={getCharacterImage(
         character.age,
         (toTitleCase(character.sex) as "Male") || "Female",

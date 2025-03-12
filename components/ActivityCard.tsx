@@ -1,31 +1,31 @@
 import React from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { ThemedView, Text } from "../components/Themed";
-import { Activity, BadOutcome, GoodOutcome } from "../utility/types";
-import { flipCoin, toTitleCase, wait } from "../utility/functions/misc";
-import { generateNewCharacter } from "../utility/functions/characterAid";
+import { Activity, BadOutcome, GoodOutcome } from "@/utility/types";
+import { flipCoin, toTitleCase, wait } from "@/utility/functions/misc";
+import { generateNewCharacter } from "@/utility/functions/characterAid";
 import { useState } from "react";
-import GenericModal from "./GenericModal";
-import GenericRaisedButton from "./GenericRaisedButton";
-import GenericFlatButton from "./GenericFlatButton";
-import GenericStrikeAround from "./GenericStrikeAround";
+import GenericModal from "@/components/GenericModal";
+import GenericRaisedButton from "@/components/GenericRaisedButton";
+import GenericFlatButton from "@/components/GenericFlatButton";
+import GenericStrikeAround from "@/components/GenericStrikeAround";
 import { useRouter } from "expo-router";
 import { observer } from "mobx-react-lite";
-import { CharacterInteractionModal } from "./CharacterInteractionModal";
-import { CharacterImage } from "./CharacterImage";
-import ProgressBar from "./ProgressBar";
+import { CharacterInteractionModal } from "@/components/CharacterInteractionModal";
+import { CharacterImage } from "@/components/CharacterImage";
+import ProgressBar from "@/components/ProgressBar";
 import {
   AffectionIcon,
   Coins,
   HealthIcon,
   Sanity,
-} from "../assets/icons/SVGIcons";
-import { useRootStore } from "../hooks/stores";
-import type { Character } from "../entities/character";
-import { useStyles } from "../hooks/styles";
-import { DungeonLevel } from "../entities/dungeon";
-import { AnimatedSprite } from "./AnimatedSprite";
-import { EnemyImageMap } from "../utility/enemyHelpers";
+} from "@/assets/icons/SVGIcons";
+import { useRootStore } from "@/hooks/stores";
+import type { Character } from "@/entities/character";
+import { useStyles } from "@/hooks/styles";
+import { DungeonLevel } from "@/entities/dungeon";
+import { AnimatedSprite } from "@/components/AnimatedSprite";
+import { EnemyImageMap } from "@/utility/enemyHelpers";
 
 interface ActivityCardProps {
   activity: Activity;

@@ -1,4 +1,4 @@
-import { makeAutoObservable, makeObservable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { jwtDecode } from "jwt-decode";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";

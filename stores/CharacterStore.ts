@@ -1,6 +1,6 @@
 import { parse, stringify } from "flatted";
-import { storage } from "../utility/functions/storage";
-import { RootStore } from "./RootStore";
+import { storage } from "@/utility/functions/storage";
+import { RootStore } from "@/stores/RootStore";
 import {
   action,
   makeObservable,
@@ -9,12 +9,12 @@ import {
   runInAction,
 } from "mobx";
 import { throttle } from "lodash";
-import { Character, PlayerCharacter } from "../entities/character";
+import { Character, PlayerCharacter } from "@/entities/character";
 import {
   flipCoin,
   getRandomName,
   getRandomPersonality,
-} from "../utility/functions/misc";
+} from "@/utility/functions/misc";
 
 export class CharacterStore {
   characters: Character[] = [];

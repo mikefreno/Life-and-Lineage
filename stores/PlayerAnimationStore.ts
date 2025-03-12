@@ -1,4 +1,4 @@
-import { RootStore } from "./RootStore";
+import { RootStore } from "@/stores/RootStore";
 import {
   action,
   makeObservable,

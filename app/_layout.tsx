@@ -6,7 +6,10 @@ import { Platform, Pressable, View, StyleSheet } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { Text } from "../components/Themed";
 import * as Sentry from "@sentry/react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { toTitleCase, wait } from "../utility/functions/misc";
 import { API_BASE_URL } from "../config/config";
 import { SystemBars } from "react-native-edge-to-edge";
@@ -38,8 +41,8 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { runInAction } from "mobx";
-import { SCREEN_TRANSITION_TIMING } from "./(tabs)/_layout";
 import PlatformDependantGestureWrapper from "@/components/PlatformDependantGestureWrapper";
+import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -133,6 +136,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     rootStore;
   const styles = useStyles();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const [firstLoad, setFirstLoad] = useState(true);
 
@@ -146,6 +150,11 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   const pathname = usePathname();
   const [showBirthModal, setShowBirthModal] = useState(false);
   const [newbornBaby, setNewbornBaby] = useState<Character | null>(null);
+
+  useEffect(
+    () => uiStore.updateTabWithBottomInset(insets.bottom),
+    [insets.bottom],
+  );
 
   useEffect(() => {
     if (fontLoaded) {

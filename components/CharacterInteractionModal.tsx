@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 import { Text } from "./Themed";
 import GenericModal from "./GenericModal";
 import { useEffect, useState } from "react";
@@ -50,6 +50,7 @@ export const CharacterInteractionModal = observer(
     const [pregnancyMessage, setPregnancyMessage] = useState<string | null>(
       null,
     );
+
     const router = useRouter();
 
     const vibration = useVibration();
@@ -106,9 +107,7 @@ export const CharacterInteractionModal = observer(
             <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
               {character.fullName}
             </Text>
-            <View style={{ height: "50%" }}>
-              <CharacterImage character={character} />
-            </View>
+            <CharacterImage character={character} />
             {!showAssaultWarning ? (
               <View>
                 <View style={{ alignItems: "center" }}>
@@ -117,7 +116,13 @@ export const CharacterInteractionModal = observer(
                     Works as a {character.job}
                   </Text>
                   <View style={[flex.rowCenter, { width: "66%" }]}>
-                    <View style={{ width: "75%" }}>
+                    <View
+                      style={{
+                        width: "75%",
+                        justifyContent: "center",
+                        paddingRight: 4,
+                      }}
+                    >
                       <ProgressBar
                         value={Math.floor(character.affection * 4) / 4}
                         minValue={-100}
@@ -126,12 +131,10 @@ export const CharacterInteractionModal = observer(
                         unfilledColor="#fca5a5"
                       />
                     </View>
-                    <View style={{ marginVertical: "auto", marginLeft: 4 }}>
-                      <AffectionIcon
-                        height={uiStore.iconSizeSmall}
-                        width={uiStore.iconSizeSmall}
-                      />
-                    </View>
+                    <AffectionIcon
+                      height={uiStore.iconSizeSmall}
+                      width={uiStore.iconSizeSmall}
+                    />
                   </View>
                 </View>
                 {playerState?.isKnownCharacter(character) ? (

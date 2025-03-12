@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, Tabs, useRouter } from "expo-router";
 import {
   GestureResponderEvent,
@@ -41,20 +41,35 @@ import { observer } from "mobx-react-lite";
 import { wait } from "@/utility/functions/misc";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import GenericModal from "@/components/GenericModal";
-
-export const TAB_SELECTION = 80;
-
-export const SCREEN_TRANSITION_TIMING = 200;
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as Device from "expo-device";
 
 const TabLayout = observer(() => {
   const isFocused = useIsFocused();
-
   const { playerState, uiStore, dungeonStore } = useRootStore();
   const [showPVPInfoModal, setShowPVPInfoModal] = useState(false);
 
   const styles = useStyles();
   const router = useRouter();
   const vibration = useVibration();
+  const insets = useSafeAreaInsets();
+
+  const leftoverSize = useMemo(() => {
+    if (!uiStore.playerStatusTop || !uiStore.playerStatusCompactHeight)
+      return 0;
+
+    return (
+      uiStore.dimensions.height -
+      uiStore.playerStatusTop -
+      uiStore.playerStatusCompactHeight -
+      uiStore.iconSizeXL -
+      Math.max(insets.bottom, 8)
+    );
+  }, [uiStore.playerStatusCompactHeight, uiStore.playerStatusTop]);
+
+  useEffect(() => {
+    console.log(`leftover size: ${leftoverSize} on:${Device.modelId}`);
+  }, [leftoverSize]);
 
   const commonOptions = {
     lazy: false,
@@ -152,7 +167,6 @@ const TabLayout = observer(() => {
                     fontFamily: "PixelifySans",
                     ...styles["text-sm"],
                     color: props.color,
-                    marginTop: normalize(3),
                   }}
                 >
                   {props.children}
@@ -163,14 +177,12 @@ const TabLayout = observer(() => {
               borderTopWidth: 0,
               position: "absolute",
               shadowColor: "transparent",
-              paddingHorizontal: 4,
-              paddingTop: 8,
-              height: uiStore.tabHeight + uiStore.playerStatusHeight,
-              ...styles.columnBetween,
-              display: "flex",
+              height:
+                uiStore.tabHeight + (uiStore.playerStatusCompactHeight ?? 0),
             },
             tabBarIconStyle: {
               marginHorizontal: "auto",
+              height: uiStore.iconSizeXL,
             },
             animation:
               uiStore.reduceMotion || Platform.OS === "android"
@@ -188,7 +200,9 @@ const TabLayout = observer(() => {
                   accessibilityRole={props.accessibilityRole}
                   accessibilityState={props.accessibilityState}
                   style={{
-                    top: uiStore.playerStatusHeight,
+                    top:
+                      (uiStore.playerStatusCompactHeight ?? 0) +
+                      leftoverSize / 2,
                   }}
                 >
                   {props.children}

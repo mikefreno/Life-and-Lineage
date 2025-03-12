@@ -1,4 +1,4 @@
-import React, { Suspense, useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import {
   Pressable,
   View,
@@ -15,7 +15,6 @@ import { useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { useStyles } from "../hooks/styles";
 import { useIsFocused } from "@react-navigation/native";
-import D20DieAnimation from "./DieRollAnim";
 
 const InventoryRender = observer(
   ({
@@ -111,6 +110,7 @@ const InventoryRender = observer(
       draggableClassStore.inventoryBounds?.height,
       draggableClassStore.inventoryBounds?.width,
       uiStore.dimensions.width,
+
       uiStore.dimensions.greater,
       uiStore.itemBlockSize,
     ]);

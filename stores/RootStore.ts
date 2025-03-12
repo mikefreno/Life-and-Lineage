@@ -2,25 +2,25 @@ import {
   PlayerCharacter,
   getStartingBook,
   savePlayer,
-} from "../entities/character";
-import { storage } from "../utility/functions/storage";
+} from "@/entities/character";
+import { storage } from "@/utility/functions/storage";
 import { parse } from "flatted";
-import UIStore from "./UIStore";
-import EnemyStore from "./EnemyStore";
-import { DungeonStore } from "./DungeonStore";
-import { ShopStore } from "./ShopsStore";
+import UIStore from "@/stores/UIStore";
+import EnemyStore from "@/stores/EnemyStore";
+import { DungeonStore } from "@/stores/DungeonStore";
+import { ShopStore } from "@/stores/ShopsStore";
 import { action, makeObservable, observable } from "mobx";
-import { AuthStore } from "./AuthStore";
-import { TimeStore } from "./TimeStore";
-import { CharacterStore } from "./CharacterStore";
-import { TutorialStore } from "./TutorialStore";
-import { Condition } from "../entities/conditions";
-import sanityDebuffs from "../assets/json/sanityDebuffs.json";
-import { ConditionObjectType, EffectOptions } from "../utility/types";
-import { StashStore } from "./StashStore";
-import { SaveStore } from "./SaveStore";
-import { AudioStore } from "./AudioStore";
-import { PlayerAnimationStore } from "./PlayerAnimationStore";
+import { AuthStore } from "@/stores/AuthStore";
+import { TimeStore } from "@/stores/TimeStore";
+import { CharacterStore } from "@/stores/CharacterStore";
+import { TutorialStore } from "@/stores/TutorialStore";
+import { Condition } from "@/entities/conditions";
+import sanityDebuffs from "@/assets/json/sanityDebuffs.json";
+import { ConditionObjectType, EffectOptions } from "@/utility/types";
+import { StashStore } from "@/stores/StashStore";
+import { SaveStore } from "@/stores/SaveStore";
+import { AudioStore } from "@/stores/AudioStore";
+import { PlayerAnimationStore } from "@/stores/PlayerAnimationStore";
 import { Platform } from "react-native";
 
 export class RootStore {

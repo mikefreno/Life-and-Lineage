@@ -2,10 +2,10 @@ import {
   DungeonInstance,
   DungeonLevel,
   SpecialEncounter,
-} from "../entities/dungeon";
-import type { RootStore } from "./RootStore";
-import dungeonsJSON from "../assets/json/dungeons.json";
-import { storage } from "../utility/functions/storage";
+} from "@/entities/dungeon";
+import type { RootStore } from "@/stores/RootStore";
+import dungeonsJSON from "@/assets/json/dungeons.json";
+import { storage } from "@/utility/functions/storage";
 import { parse, stringify } from "flatted";
 import { throttle } from "lodash";
 import {
@@ -22,11 +22,11 @@ import {
   Tile,
   generateTiles,
   getBoundingBox,
-} from "../utility/functions/dungeon";
+} from "@/utility/functions/dungeon";
 import { Dimensions } from "react-native";
-import { generateEnemyFromNPC, wait } from "../utility/functions/misc";
-import { ParallaxOptions } from "../components/DungeonComponents/Parallax";
-import { Character } from "../entities/character";
+import { generateEnemyFromNPC, wait } from "@/utility/functions/misc";
+import { ParallaxOptions } from "@/components/DungeonComponents/Parallax";
+import { Character } from "@/entities/character";
 
 export class DungeonStore {
   root: RootStore;

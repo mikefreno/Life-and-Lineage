@@ -6,7 +6,7 @@ import {
   reaction,
   runInAction,
 } from "mobx";
-import { RootStore } from "./RootStore";
+import { RootStore } from "@/stores/RootStore";
 import {
   AnimationOptions,
   EnemyImageMap,

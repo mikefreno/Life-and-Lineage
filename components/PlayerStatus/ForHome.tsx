@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useEffect } from "react";
+import React, { useLayoutEffect, useRef, useEffect, useState } from "react";
 import ProgressBar from "@/components/ProgressBar";
 import { Pressable, View, Animated, Easing } from "react-native";
 import { observer } from "mobx-react-lite";
@@ -6,14 +6,14 @@ import { Coins, SquarePlus } from "@/assets/icons/SVGIcons";
 import { Text } from "@/components/Themed";
 import { useRootStore } from "@/hooks/stores";
 import { useStatChanges, useVibration } from "@/hooks/generic";
-import { normalize, useStyles } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import {
   ChangePopUp,
   ColorAndPlatformDependantBlur,
   ConditionRenderer,
 } from "./Components";
 import { PlayerStatusModal } from "./Modal";
-import { SCREEN_TRANSITION_TIMING } from "@/app/(tabs)/_layout";
+import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
 
 const PlayerStatusForHome = observer(() => {
   const root = useRootStore();
@@ -22,12 +22,21 @@ const PlayerStatusForHome = observer(() => {
   const vibration = useVibration();
   const { statChanges, animationCycler } = useStatChanges(playerState!);
   const playerStatusRef = useRef<View>(null);
+  const [coinsHidden, setCoinsHidden] = useState(false);
 
   const expandedSectionHeight = useRef(
     new Animated.Value(
       uiStore.playerStatusIsCompact ? 0 : uiStore.expansionPadding,
     ),
   ).current;
+
+  expandedSectionHeight.addListener(({ value }) => {
+    if (value < 4) {
+      setCoinsHidden(true);
+    } else {
+      setCoinsHidden(false);
+    }
+  });
 
   useEffect(() => {
     Animated.timing(expandedSectionHeight, {
@@ -41,8 +50,9 @@ const PlayerStatusForHome = observer(() => {
   useLayoutEffect(() => {
     const timer = setTimeout(() => {
       if (playerStatusRef.current) {
-        playerStatusRef.current?.measure((x, y, width, height) => {
+        playerStatusRef.current?.measure((x, y, width, height, pX, pY) => {
           uiStore.setPlayerStatusHeight(height);
+          uiStore.setPlayerStatusTop(pY);
         });
       }
     }, 250);
@@ -94,7 +104,6 @@ const PlayerStatusForHome = observer(() => {
             <Animated.View
               style={{
                 height: expandedSectionHeight,
-                overflow: "hidden",
                 marginHorizontal: "auto",
                 paddingVertical: 2,
                 ...styles.rowCenter,
@@ -108,18 +117,22 @@ const PlayerStatusForHome = observer(() => {
                   },
                 ]}
               >
-                <Text>{playerState.readableGold}</Text>
-                <ChangePopUp
-                  popUp={"gold"}
-                  change={statChanges.gold}
-                  animationCycler={animationCycler}
-                  colorScheme={uiStore.colorScheme}
-                />
-                <Coins
-                  width={uiStore.iconSizeSmall}
-                  height={uiStore.iconSizeSmall}
-                  style={{ marginLeft: 6 }}
-                />
+                {!coinsHidden && (
+                  <>
+                    <Text>{playerState.readableGold}</Text>
+                    <ChangePopUp
+                      popUp={"gold"}
+                      change={statChanges.gold}
+                      animationCycler={animationCycler}
+                      colorScheme={uiStore.colorScheme}
+                    />
+                    <Coins
+                      width={uiStore.iconSizeSmall}
+                      height={uiStore.iconSizeSmall}
+                      style={{ marginLeft: 6 }}
+                    />
+                  </>
+                )}
               </View>
               {playerState.unAllocatedSkillPoints > 0 && (
                 <View style={{ paddingHorizontal: 4, marginVertical: "auto" }}>

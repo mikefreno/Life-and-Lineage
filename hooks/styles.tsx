@@ -2,11 +2,12 @@ import { Dimensions, PixelRatio, Platform, StyleSheet } from "react-native";
 import { useRootStore } from "./stores";
 import Colors from "../constants/Colors";
 import { BASE_WIDTH } from "@/stores/UIStore";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const getTaperedScale = () => {
   const rawScale = Dimensions.get("window").width / BASE_WIDTH;
   if (rawScale > 1) {
-    return 1 + (rawScale - 1) * 0.3;
+    return 1 + (rawScale - 1) * 0.2;
   } else {
     return 1 - (1 - rawScale) * 0.8;
   }
@@ -31,7 +32,7 @@ const getReversedTaperedScale = () => {
 };
 
 const defaultScale = getTaperedScale();
-const defaultScaleForText = getTaperedScale();
+const defaultScaleForText = getTaperedScaleForText();
 const reverseScale = getReversedTaperedScale();
 
 export const normalize = (size: number, scale: number = defaultScale) => {
@@ -519,18 +520,16 @@ export const useStyles = () => {
       paddingHorizontal: 24,
       paddingVertical: 16,
     } as const,
-
     // ---- Main Tabs - Shop ---- //
     shopCard: {
       width: "50%",
-      height: uiStore.dimensions.height / 2,
+      padding: "1%",
     } as const,
     shopCardInner: {
       margin: normalize(4),
       borderRadius: 12,
       borderWidth: 1,
       paddingVertical: 16,
-      flex: 1,
       ...flex.columnEvenly,
     } as const,
     enterButtonInner: {

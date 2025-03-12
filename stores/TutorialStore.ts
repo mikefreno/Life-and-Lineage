@@ -1,9 +1,9 @@
 import { makeObservable, action, reaction, observable, toJS } from "mobx";
 import { parse, stringify } from "flatted";
-import { storage } from "../utility/functions/storage";
+import { storage } from "@/utility/functions/storage";
 import { throttle } from "lodash";
-import { RootStore } from "./RootStore";
-import { TutorialOption } from "../utility/types";
+import { RootStore } from "@/stores/RootStore";
+import { TutorialOption } from "@/utility/types";
 
 export class TutorialStore {
   tutorialsShown: Record<TutorialOption, boolean>;

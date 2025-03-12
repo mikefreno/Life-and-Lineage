@@ -11,7 +11,7 @@ import { useRootStore } from "../hooks/stores";
 import { normalize, tw, tw_base, useStyles } from "../hooks/styles";
 import Colors from "../constants/Colors";
 import GenericFlatButton from "./GenericFlatButton";
-import { SCREEN_TRANSITION_TIMING } from "@/app/(tabs)/_layout";
+import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
 
 type TutorialPage = {
   title?: string;

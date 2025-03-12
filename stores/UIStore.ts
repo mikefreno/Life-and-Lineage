@@ -6,7 +6,7 @@ import {
   reaction,
   runInAction,
 } from "mobx";
-import { RootStore } from "./RootStore";
+import { RootStore } from "@/stores/RootStore";
 import {
   AccessibilityInfo,
   Appearance,
@@ -15,11 +15,14 @@ import {
   Platform,
   ScaledSize,
 } from "react-native";
-import { storage } from "../utility/functions/storage";
-import { Character } from "../entities/character";
+import { storage } from "@/utility/functions/storage";
+import { Character } from "@/entities/character";
 import * as Device from "expo-device";
-import { normalize, normalizeLineHeight } from "@/hooks/styles";
-import { TAB_SELECTION } from "@/app/(tabs)/_layout";
+import {
+  normalize,
+  normalizeForText,
+  normalizeLineHeight,
+} from "@/hooks/styles";
 
 export const LOADING_TIPS: string[] = [
   "Remember to check your equipment before entering a dungeon",
@@ -35,6 +38,10 @@ export const LOADING_TIPS: string[] = [
 ];
 
 export const BASE_WIDTH = 400;
+
+export const TAB_SELECTION = 64;
+
+export const SCREEN_TRANSITION_TIMING = 200;
 
 export default class UIStore {
   root: RootStore;
@@ -63,9 +70,10 @@ export default class UIStore {
   currentTipIndex: number = 0;
   progressIncrementing: boolean = false;
 
-  tabHeight = normalize(TAB_SELECTION);
   expansionPadding = normalizeLineHeight(28);
   iconSizeXL = normalize(28);
+  tabHeight = normalize(28) + normalizeForText(12) + normalize(3) + 8;
+
   iconSizeLarge = normalize(22);
   iconSizeSmall = normalize(16);
 
@@ -76,8 +84,10 @@ export default class UIStore {
     | null = null;
 
   playerStatusCompactHeight: number | undefined = undefined;
+  playerStatusTop: number | undefined = undefined;
 
   storeLoadingStatus: Record<string, boolean> = {
+    ui: false,
     player: false,
     time: false,
     auth: false,
@@ -169,7 +179,10 @@ export default class UIStore {
       showDevDebugUI: observable,
       playerStatusCompactHeight: observable,
       webviewURL: observable,
+      playerStatusTop: observable,
 
+      setPlayerStatusTop: action,
+      updateTabWithBottomInset: action,
       startTipCycle: action,
       completeLoading: action,
       setTotalLoadingSteps: action,
@@ -331,10 +344,22 @@ export default class UIStore {
     return this.colorScheme === "dark";
   }
 
+  public updateTabWithBottomInset(value: number) {
+    this.tabHeight += value;
+    this.storeLoadingStatus["ui"] = true;
+  }
+
   setPlayerStatusHeight(value: number) {
     const mod = this.playerStatusIsCompact ? 0 : this.expansionPadding;
     if (!this.playerStatusCompactHeight) {
       this.setPlayerStatusCompactHeight(value - mod);
+    }
+  }
+
+  setPlayerStatusTop(pY: number) {
+    const mod = this.playerStatusIsCompact ? 0 : this.expansionPadding;
+    if (!this.playerStatusTop) {
+      this.playerStatusTop = pY - mod;
     }
   }
 

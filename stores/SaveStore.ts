@@ -1,7 +1,7 @@
 import * as SQLite from "expo-sqlite";
 import { parse, stringify } from "flatted";
-import { PlayerCharacter, serializeJobs } from "../entities/character";
-import { RootStore } from "./RootStore";
+import { PlayerCharacter, serializeJobs } from "@/entities/character";
+import { RootStore } from "@/stores/RootStore";
 import {
   action,
   makeObservable,
@@ -9,7 +9,7 @@ import {
   reaction,
   runInAction,
 } from "mobx";
-import { storage } from "../utility/functions/storage";
+import { storage } from "@/utility/functions/storage";
 
 export class SaveStore {
   db: SQLite.SQLiteDatabase | null = null;

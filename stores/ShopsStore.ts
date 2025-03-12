@@ -1,10 +1,10 @@
-import { Shop, generateShopKeeper } from "../entities/shop";
-import type { RootStore } from "./RootStore";
-import { storage } from "../utility/functions/storage";
+import { Shop, generateShopKeeper } from "@/entities/shop";
+import type { RootStore } from "@/stores/RootStore";
+import { storage } from "@/utility/functions/storage";
 import { throttle } from "lodash";
 import { parse, stringify } from "flatted";
-import shopsJSON from "../assets/json/shops.json";
-import { MerchantType } from "../utility/types";
+import shopsJSON from "@/assets/json/shops.json";
+import { MerchantType } from "@/utility/types";
 import { action, makeObservable, observable } from "mobx";
 
 const SHOP_ARCHETYPES: MerchantType[] = [
@@ -35,7 +35,7 @@ export class ShopStore {
   }
 
   get inMarket() {
-    return !!(this.root.currentTab == "/shops" || this.currentShop);
+    return !!(this.root.pathname == "/shops" || this.currentShop);
   }
 
   hydrateShopState() {

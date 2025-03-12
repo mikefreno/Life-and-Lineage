@@ -1,7 +1,7 @@
 import React, { createContext, type ReactNode, useMemo } from "react";
-import { RootStore } from "../stores/RootStore";
+import { RootStore } from "@/stores/RootStore";
 import { type SharedValue, useSharedValue } from "react-native-reanimated";
-import { DraggableDataStore } from "../stores/DraggableDataStore";
+import { DraggableDataStore } from "@/stores/DraggableDataStore";
 
 export const StoreContext = createContext<RootStore | undefined>(undefined);
 

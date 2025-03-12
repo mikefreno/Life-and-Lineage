@@ -1,10 +1,10 @@
 import { parse, stringify } from "flatted";
-import { Enemy } from "../entities/creatures";
-import { storage } from "../utility/functions/storage";
-import { RootStore } from "./RootStore";
+import { Enemy } from "@/entities/creatures";
+import { storage } from "@/utility/functions/storage";
+import { RootStore } from "@/stores/RootStore";
 import { action, computed, makeObservable, observable, reaction } from "mobx";
 import { throttle } from "lodash";
-import { EnemyAnimationStore } from "./EnemyAnimationStore";
+import { EnemyAnimationStore } from "@/stores/EnemyAnimationStore";
 
 export default class EnemyStore {
   enemies: Enemy[];

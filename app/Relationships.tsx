@@ -16,7 +16,7 @@ import { observer } from "mobx-react-lite";
 import GenericStrikeAround from "../components/GenericStrikeAround";
 import { useRootStore } from "../hooks/stores";
 import type { Character } from "../entities/character";
-import { flex, useStyles } from "../hooks/styles";
+import { flex, normalize, tw_base, useStyles } from "../hooks/styles";
 
 const RelationshipsScreen = observer(() => {
   const styles = useStyles();
@@ -72,18 +72,21 @@ const RelationshipsScreen = observer(() => {
 
   function renderCharacter(character: Character) {
     return (
-      <View
-        style={{
-          width: uiStore.dimensions.width / 2.5,
-          marginHorizontal: uiStore.dimensions.width * 0.05,
-          ...styles.debugBorder,
-        }}
+      <ThemedView
+        style={[
+          styles.themedCard,
+          {
+            width: uiStore.dimensions.width / 2.5,
+            marginHorizontal: uiStore.dimensions.width * 0.05,
+          },
+        ]}
       >
         <Pressable
           style={[
             flex.columnCenter,
             {
               opacity: character.deathdate ? 0.5 : 1,
+              paddingVertical: tw_base[2],
             },
           ]}
           key={character.id}
@@ -93,7 +96,15 @@ const RelationshipsScreen = observer(() => {
             setSelectedCharacter(character);
           }}
         >
-          <Text style={{ textAlign: "center", ...styles["text-2xl"] }}>
+          <Text
+            style={{
+              textAlign: "center",
+              ...styles["text-2xl"],
+              textDecorationLine: character.deathdate
+                ? "line-through"
+                : "underline",
+            }}
+          >
             {character.fullName}
           </Text>
           <CharacterImage character={character} />
@@ -101,10 +112,9 @@ const RelationshipsScreen = observer(() => {
             {character.deathdate && "Died at "}
             {character.age} Years Old
           </Text>
-          <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
-            {character.fullName}
-          </Text>
-          <View style={{ marginHorizontal: "auto" }}>
+          <View
+            style={{ marginHorizontal: "auto", paddingVertical: normalize(4) }}
+          >
             <Text
               style={{
                 textAlign: "center",
@@ -118,7 +128,13 @@ const RelationshipsScreen = observer(() => {
           </View>
           {!character.deathdate && (
             <View style={styles.affectionContainer}>
-              <View style={{ width: "75%" }}>
+              <View
+                style={{
+                  width: "75%",
+                  justifyContent: "center",
+                  paddingRight: 4,
+                }}
+              >
                 <ProgressBar
                   value={Math.floor(character.affection * 4) / 4}
                   minValue={-100}
@@ -127,16 +143,14 @@ const RelationshipsScreen = observer(() => {
                   unfilledColor="#fca5a5"
                 />
               </View>
-              <View style={{ marginVertical: "auto", marginLeft: 4 }}>
-                <AffectionIcon
-                  height={uiStore.iconSizeSmall}
-                  width={uiStore.iconSizeSmall}
-                />
-              </View>
+              <AffectionIcon
+                height={uiStore.iconSizeSmall}
+                width={uiStore.iconSizeSmall}
+              />
             </View>
           )}
         </Pressable>
-      </View>
+      </ThemedView>
     );
   }
 
@@ -144,12 +158,12 @@ const RelationshipsScreen = observer(() => {
     if (data.length === 0) return null;
 
     return (
-      <ThemedView key={title}>
+      <View key={title} style={{ paddingVertical: 12 }}>
         <Text
           style={{
             paddingVertical: 12,
             textAlign: "center",
-            ...styles["text-lg"],
+            ...styles["text-xl"],
           }}
         >
           {title}
@@ -160,11 +174,12 @@ const RelationshipsScreen = observer(() => {
           contentContainerStyle={{
             flexGrow: 1,
             width: (data.length / 2) * uiStore.dimensions.width,
+            marginVertical: 4,
           }}
           renderItem={({ item }) => renderCharacter(item)}
           keyExtractor={(item) => item.id}
         />
-      </ThemedView>
+      </View>
     );
   };
 
@@ -236,7 +251,7 @@ const RelationshipsScreen = observer(() => {
           size={100}
         >
           <View style={{ maxHeight: uiStore.dimensions.height * 0.75 }}>
-            <Text style={styles.adoptionTitle}>
+            <Text style={[styles.adoptionTitle, styles["text-xl"]]}>
               {partnerName
                 ? `Adopting with ${partnerName}`
                 : "Independent Adoption"}
@@ -251,8 +266,7 @@ const RelationshipsScreen = observer(() => {
                     <GenericRaisedButton
                       onPress={() =>
                         characterStore.adopt({
-                          adoptee: item,
-                          player: playerState,
+                          child: item,
                           partner: selectedCharacter ?? undefined,
                         })
                       }
@@ -280,7 +294,7 @@ const RelationshipsScreen = observer(() => {
           }}
           backdropCloses
         />
-        <ScrollView>
+        <ScrollView contentContainerStyle={{ flex: 1 }}>
           {characterGroups.map((group) => renderGroup(group.title, group.data))}
         </ScrollView>
       </>

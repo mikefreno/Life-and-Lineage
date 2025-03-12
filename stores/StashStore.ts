@@ -1,9 +1,9 @@
 import { makeObservable, observable, action, reaction, toJS } from "mobx";
-import { RootStore } from "./RootStore";
-import { Item } from "../entities/item";
+import { RootStore } from "@/stores/RootStore";
+import { Item } from "@/entities/item";
 import { stringify, parse } from "flatted";
-import { storage } from "../utility/functions/storage";
-import { ItemClassType, Rarity } from "../utility/types";
+import { storage } from "@/utility/functions/storage";
+import { ItemClassType, Rarity } from "@/utility/types";
 
 export class StashStore {
   root: RootStore;

@@ -1,20 +1,20 @@
 import React, { useMemo } from "react";
 import { Pressable, ScrollView, View } from "react-native";
-import { CharacterImage } from "../../components/CharacterImage";
+import { CharacterImage } from "@/components/CharacterImage";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import TutorialModal from "../../components/TutorialModal";
+import TutorialModal from "@/components/TutorialModal";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { toTitleCase } from "../../utility/functions/misc";
-import { TutorialOption } from "../../utility/types";
+import { toTitleCase } from "@/utility/functions/misc";
+import { TutorialOption } from "@/utility/types";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";
-import { Text } from "../../components/Themed";
-import { useVibration } from "../../hooks/generic";
-import { useRootStore } from "../../hooks/stores";
-import { type Shop } from "../../entities/shop";
-import { shopColors } from "../../constants/Colors";
-import { useStyles } from "../../hooks/styles";
+import { Text } from "@/components/Themed";
+import { useVibration } from "@/hooks/generic";
+import { useRootStore } from "@/hooks/stores";
+import { type Shop } from "@/entities/shop";
+import { shopColors } from "@/constants/Colors";
+import { useStyles } from "@/hooks/styles";
 
 const ShopsScreen = observer(() => {
   const vibration = useVibration();
@@ -73,7 +73,6 @@ const ShopsScreen = observer(() => {
               width: "100%",
               flex: 1,
               justifyContent: "center",
-              paddingHorizontal: 4,
             }}
           >
             <CharacterImage character={shop.shopKeeper} />
@@ -86,9 +85,9 @@ const ShopsScreen = observer(() => {
               {shop.shopKeeper.fullName}
             </Text>
           </View>
+
           <Pressable
             style={{
-              marginBottom: 8,
               marginHorizontal: "auto",
               justifyContent: "flex-end",
             }}

@@ -5,7 +5,7 @@ import {
   reaction,
   runInAction,
 } from "mobx";
-import { storage } from "../utility/functions/storage";
+import { storage } from "@/utility/functions/storage";
 import { RootStore } from "./RootStore";
 import { Audio } from "expo-av";
 import { Sound } from "expo-av/build/Audio/Sound";

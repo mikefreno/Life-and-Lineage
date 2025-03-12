@@ -1,6 +1,6 @@
 import { action, computed, makeObservable, observable, reaction } from "mobx";
-import { RootStore } from "./RootStore";
-import { storage } from "../utility/functions/storage";
+import { RootStore } from "@/stores/RootStore";
+import { storage } from "@/utility/functions/storage";
 import { parse, stringify } from "flatted";
 
 export enum Season {
