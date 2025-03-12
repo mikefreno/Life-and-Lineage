@@ -249,7 +249,10 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
             />
           </View>
           <View style={[styles.itemsCenter, { marginLeft: 4 }]}>
-            <AffectionIcon height={14} width={14} />
+            <AffectionIcon
+              height={uiStore.iconSizeSmall}
+              width={uiStore.iconSizeSmall}
+            />
           </View>
         </View>
       </Pressable>
@@ -329,19 +332,28 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
           {goodOutcome?.effect.gold && (
             <View style={styles.rowCenter}>
               <Text>{goodOutcome?.effect.gold} </Text>
-              <Coins width={14} height={14} />
+              <Coins
+                width={uiStore.iconSizeSmall}
+                height={uiStore.iconSizeSmall}
+              />
             </View>
           )}
           {goodOutcome?.effect.sanityRestore && (
             <View style={styles.rowCenter}>
               <Text>{goodOutcome?.effect.sanityRestore} </Text>
-              <Sanity width={14} height={14} />
+              <Sanity
+                width={uiStore.iconSizeSmall}
+                height={uiStore.iconSizeSmall}
+              />
             </View>
           )}
           {goodOutcome?.effect.healthRestore && (
             <View style={styles.rowCenter}>
               <Text>{goodOutcome?.effect.healthRestore} </Text>
-              <HealthIcon width={14} height={14} />
+              <HealthIcon
+                width={uiStore.iconSizeSmall}
+                height={uiStore.iconSizeSmall}
+              />
             </View>
           )}
           <View style={{ marginTop: 16 }}>
@@ -390,7 +402,10 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                               ? badOutCome.buyOff.price
                               : playerState.gold}{" "}
                           </Text>
-                          <Coins height={14} width={14} />
+                          <Coins
+                            height={uiStore.iconSizeSmall}
+                            width={uiStore.iconSizeSmall}
+                          />
                         </View>
                       </GenericFlatButton>
                       <GenericStrikeAround>
@@ -411,13 +426,19 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
                 {badOutCome?.effect?.healthDamage && (
                   <View style={styles.rowCenter}>
                     <Text>- {badOutCome.effect.healthDamage}</Text>
-                    <HealthIcon height={14} width={14} />
+                    <HealthIcon
+                      height={uiStore.iconSizeSmall}
+                      width={uiStore.iconSizeSmall}
+                    />
                   </View>
                 )}
                 {badOutCome?.effect?.sanityDamage && (
                   <View style={styles.rowCenter}>
                     <Text>- {badOutCome.effect.sanityDamage} </Text>
-                    <Sanity height={14} width={14} />
+                    <Sanity
+                      height={uiStore.iconSizeSmall}
+                      width={uiStore.iconSizeSmall}
+                    />
                   </View>
                 )}
               </View>
@@ -455,7 +476,12 @@ const ActivityCard = observer(({ activity }: ActivityCardProps) => {
               <Text style={[styles["text-xl"], styles.bold]}>
                 {activity.cost == 0 ? "free" : activity.cost}{" "}
               </Text>
-              {activity.cost !== 0 && <Coins height={14} width={14} />}
+              {activity.cost !== 0 && (
+                <Coins
+                  height={uiStore.iconSizeSmall}
+                  width={uiStore.iconSizeSmall}
+                />
+              )}
             </View>
           </View>
           <View style={{ flexDirection: "row" }}>

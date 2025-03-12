@@ -124,7 +124,11 @@ export default function DroppedItemsModal() {
           }}
         >
           <Text>You picked up {droppedItems?.gold}</Text>
-          <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+          <Coins
+            width={uiStore.iconSizeSmall}
+            height={uiStore.iconSizeSmall}
+            style={{ marginLeft: 6 }}
+          />
         </View>
         <Text
           style={[

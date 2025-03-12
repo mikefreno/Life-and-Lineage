@@ -319,8 +319,8 @@ const BattleTab = observer(
                                     }}
                                   >
                                     <Energy
-                                      height={14}
-                                      width={14}
+                                      height={uiStore.iconSizeSmall}
+                                      width={uiStore.iconSizeSmall}
                                       color={
                                         uiStore.colorScheme == "dark"
                                           ? "#2563eb"
@@ -375,7 +375,10 @@ const BattleTab = observer(
                             <Text style={styles["text-xl"]}>Pass</Text>
                             <View style={styles.rowItemsCenter}>
                               <Text>2x</Text>
-                              <Regen width={12} height={12} />
+                              <Regen
+                                width={uiStore.iconSizeSmall}
+                                height={uiStore.iconSizeSmall}
+                              />
                             </View>
                           </View>
                           <Pressable

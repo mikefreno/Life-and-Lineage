@@ -243,17 +243,18 @@ const ShopInteriorScreen = observer(() => {
         <View style={[flex.columnBetween, { flex: 1 }]}>
           <View style={[flex.rowEvenly, { height: "40%" }]}>
             <View style={[flex.columnCenter, styles.shopKeeperSection]}>
-              <CharacterImage
-                character={shopsStore.currentShop.shopKeeper}
-                scale={0.3}
-              />
+              <CharacterImage character={shopsStore.currentShop.shopKeeper} />
               <GreetingComponent greeting={greeting} />
               <Text style={styles.textCenter}>
                 {shopsStore.currentShop.shopKeeper.fullName}'s Inventory
               </Text>
               <View style={[flex.rowCenter, tw.mb1]}>
                 <Text>{shopsStore.currentShop.currentGold}</Text>
-                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+                <Coins
+                  width={uiStore.iconSizeSmall}
+                  height={uiStore.iconSizeSmall}
+                  style={{ marginLeft: 6 }}
+                />
               </View>
               <ProgressBar
                 value={shopsStore.currentShop.shopKeeper.affection}
@@ -323,8 +324,8 @@ const ShopInteriorScreen = observer(() => {
               <View style={styles.rowCenter}>
                 <Text> ( {playerState.readableGold} </Text>
                 <Coins
-                  width={16}
-                  height={16}
+                  width={uiStore.iconSizeSmall}
+                  height={uiStore.iconSizeSmall}
                   style={{ marginLeft: 6, marginVertical: "auto" }}
                 />
                 <Text> )</Text>

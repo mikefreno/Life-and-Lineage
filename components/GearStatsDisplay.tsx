@@ -1,4 +1,4 @@
-import { Dimensions, Platform, Pressable, View } from "react-native";
+import { Platform, Pressable, View } from "react-native";
 import { Text } from "./Themed";
 import { ItemClassType, Modifier } from "../utility/types";
 import { useState } from "react";
@@ -14,7 +14,7 @@ import {
   shouldShowModifier,
 } from "../utility/functions/stats";
 import { useVibration } from "../hooks/generic";
-import { flex, useStyles } from "../hooks/styles";
+import { flex, normalize, useStyles } from "../hooks/styles";
 import React from "react";
 import { useRootStore } from "../hooks/stores";
 
@@ -31,6 +31,7 @@ const StatRow = observer(
     item: Item;
   }) => {
     const styles = useStyles();
+    const { uiStore } = useRootStore();
 
     if (!detailed && !shouldShowModifier(mod, item)) {
       return null;
@@ -42,10 +43,15 @@ const StatRow = observer(
 
     return (
       <View style={styles.statRow}>
-        <Icon height={detailed ? 24 : 18} width={detailed ? 24 : 18} />
+        <Icon
+          height={detailed ? uiStore.iconSizeLarge : uiStore.iconSizeSmall}
+          width={detailed ? uiStore.iconSizeLarge : uiStore.iconSizeSmall}
+        />
         <Text
           style={
-            detailed ? { paddingLeft: 16, textAlign: "center" } : undefined
+            detailed
+              ? { paddingLeft: normalize(16), textAlign: "center" }
+              : undefined
           }
         >
           {`${value} ${detailed ? statInfo.description || "" : ""}`}

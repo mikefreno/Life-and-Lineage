@@ -128,7 +128,10 @@ const RelationshipsScreen = observer(() => {
                 />
               </View>
               <View style={{ marginVertical: "auto", marginLeft: 4 }}>
-                <AffectionIcon height={14} width={14} />
+                <AffectionIcon
+                  height={uiStore.iconSizeSmall}
+                  width={uiStore.iconSizeSmall}
+                />
               </View>
             </View>
           )}

@@ -164,7 +164,7 @@ export const PlayerStatusModal = observer(() => {
     <GenericModal
       isVisibleCondition={uiStore.detailedStatusViewShowing}
       backFunction={() => uiStore.setDetailedStatusViewShowing(false)}
-      scrollEnabled={true}
+      scrollEnabled={false}
       size={95}
     >
       <View>
@@ -186,7 +186,11 @@ export const PlayerStatusModal = observer(() => {
           <View style={[styles.columnCenter, { flex: 1 }]}>
             <View style={{ marginLeft: -16, flexDirection: "row" }}>
               <Text>{playerState.readableGold}</Text>
-              <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+              <Coins
+                width={uiStore.iconSizeSmall}
+                height={uiStore.iconSizeSmall}
+                style={{ marginLeft: 6 }}
+              />
             </View>
           </View>
         </View>
@@ -223,7 +227,11 @@ export const PlayerStatusModal = observer(() => {
             >
               <Animated.View style={[styles.respecButton, respecButtonStyle]}>
                 <View style={{ marginVertical: "auto" }}>
-                  <RotateArrow height={18} width={18} color={"white"} />
+                  <RotateArrow
+                    height={uiStore.iconSizeSmall}
+                    width={uiStore.iconSizeSmall}
+                    color={"white"}
+                  />
                 </View>
               </Animated.View>
             </Pressable>
@@ -278,8 +286,9 @@ export const PlayerStatusModal = observer(() => {
                 flexDirection: "row",
                 marginTop: 8,
                 height: Math.min(
-                  uiStore.dimensions.height * 0.3,
-                  Math.max(ownedOffensive.size, ownedDefensive.size) * 70 + 30,
+                  uiStore.dimensions.height * 0.35,
+                  Math.max(ownedOffensive.size, ownedDefensive.size) * 70 +
+                    normalize(34),
                 ),
               }}
             >

@@ -151,6 +151,7 @@ export function StatAllocation({
   const [stats, setStats] = useState<BaseStats>(baseStats);
   const styles = useStyles();
   const vibration = useVibration();
+  const { uiStore } = useRootStore();
 
   const handleIncrement = (stat: StatKey) => {
     if (remainingPoints <= 0) return;
@@ -206,8 +207,8 @@ export function StatAllocation({
           disabled={stats[stat] <= baseStats[stat]}
         >
           <SquareMinus
-            height={normalize(26)}
-            width={normalize(26)}
+            height={uiStore.iconSizeLarge}
+            width={uiStore.iconSizeLarge}
             opacity={stats[stat] <= baseStats[stat] ? 0.2 : 1}
           />
         </Pressable>
@@ -219,8 +220,8 @@ export function StatAllocation({
           disabled={remainingPoints <= 0}
         >
           <SquarePlus
-            height={normalize(26)}
-            width={normalize(26)}
+            height={uiStore.iconSizeLarge}
+            width={uiStore.iconSizeLarge}
             opacity={remainingPoints <= 0 ? 0.2 : 1}
           />
         </Pressable>
@@ -247,37 +248,69 @@ export function StatAllocation({
 
       <StatRow
         stat="baseHealth"
-        icon={<HealthIcon height={normalize(26)} width={normalize(29)} />}
+        icon={
+          <HealthIcon
+            height={uiStore.iconSizeLarge}
+            width={uiStore.iconSizeLarge}
+          />
+        }
         value={stats.baseHealth}
       />
       <StatRow
         stat="baseMana"
-        icon={<Energy height={normalize(26)} width={normalize(29)} />}
+        icon={
+          <Energy
+            height={uiStore.iconSizeLarge}
+            width={uiStore.iconSizeLarge}
+          />
+        }
         value={stats.baseMana}
       />
       <StatRow
         stat="baseSanity"
-        icon={<Sanity height={normalize(26)} width={normalize(29)} />}
+        icon={
+          <Sanity
+            height={uiStore.iconSizeLarge}
+            width={uiStore.iconSizeLarge}
+          />
+        }
         value={stats.baseSanity}
       />
       <StatRow
         stat="baseStrength"
-        icon={<StrengthIcon height={normalize(26)} width={normalize(29)} />}
+        icon={
+          <StrengthIcon
+            height={uiStore.iconSizeLarge}
+            width={uiStore.iconSizeLarge}
+          />
+        }
         value={stats.baseStrength}
       />
       <StatRow
         stat="baseIntelligence"
-        icon={<IntelligenceIcon height={normalize(26)} width={normalize(29)} />}
+        icon={
+          <IntelligenceIcon
+            height={uiStore.iconSizeLarge}
+            width={uiStore.iconSizeLarge}
+          />
+        }
         value={stats.baseIntelligence}
       />
       <StatRow
         stat="baseDexterity"
-        icon={<DexterityIcon height={normalize(26)} width={normalize(29)} />}
+        icon={
+          <DexterityIcon
+            height={uiStore.iconSizeLarge}
+            width={uiStore.iconSizeLarge}
+          />
+        }
         value={stats.baseDexterity}
       />
       <StatRow
         stat="baseManaRegen"
-        icon={<Regen height={normalize(26)} width={normalize(29)} />}
+        icon={
+          <Regen height={uiStore.iconSizeLarge} width={uiStore.iconSizeLarge} />
+        }
         value={stats.baseManaRegen}
       />
     </View>

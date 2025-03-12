@@ -40,10 +40,6 @@ import { BlurView } from "expo-blur";
 import { runInAction } from "mobx";
 import { SCREEN_TRANSITION_TIMING } from "./(tabs)/_layout";
 import PlatformDependantGestureWrapper from "@/components/PlatformDependantGestureWrapper";
-import {
-  EnemyImageMap,
-  enemyImageOptionsPrinter,
-} from "@/utility/enemyHelpers";
 
 export { ErrorBoundary } from "expo-router";
 

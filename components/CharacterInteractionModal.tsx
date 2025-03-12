@@ -37,7 +37,7 @@ export const CharacterInteractionModal = observer(
   }: CharacterInteractionModal) => {
     const root = useRootStore();
     const styles = useStyles();
-    const { playerState } = root;
+    const { playerState, uiStore } = root;
     const [showAssaultWarning, setShowAssaultWarning] =
       useState<boolean>(false);
     const [dateAvailable, setDateAvailable] = useState<boolean>(
@@ -127,7 +127,10 @@ export const CharacterInteractionModal = observer(
                       />
                     </View>
                     <View style={{ marginVertical: "auto", marginLeft: 4 }}>
-                      <AffectionIcon height={14} width={14} />
+                      <AffectionIcon
+                        height={uiStore.iconSizeSmall}
+                        width={uiStore.iconSizeSmall}
+                      />
                     </View>
                   </View>
                 </View>

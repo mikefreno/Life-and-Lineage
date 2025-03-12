@@ -6,7 +6,7 @@ import { Coins, SquarePlus } from "@/assets/icons/SVGIcons";
 import { Text } from "@/components/Themed";
 import { useRootStore } from "@/hooks/stores";
 import { useStatChanges, useVibration } from "@/hooks/generic";
-import { useStyles } from "@/hooks/styles";
+import { normalize, useStyles } from "@/hooks/styles";
 import {
   ChangePopUp,
   ColorAndPlatformDependantBlur,
@@ -100,7 +100,14 @@ const PlayerStatusForHome = observer(() => {
                 ...styles.rowCenter,
               }}
             >
-              <View style={[styles.rowCenter, { marginVertical: "auto" }]}>
+              <View
+                style={[
+                  styles.rowCenter,
+                  {
+                    alignItems: "center",
+                  },
+                ]}
+              >
                 <Text>{playerState.readableGold}</Text>
                 <ChangePopUp
                   popUp={"gold"}
@@ -108,16 +115,21 @@ const PlayerStatusForHome = observer(() => {
                   animationCycler={animationCycler}
                   colorScheme={uiStore.colorScheme}
                 />
-                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+                <Coins
+                  width={uiStore.iconSizeSmall}
+                  height={uiStore.iconSizeSmall}
+                  style={{ marginLeft: 6 }}
+                />
               </View>
               {playerState.unAllocatedSkillPoints > 0 && (
                 <View style={{ paddingHorizontal: 4, marginVertical: "auto" }}>
-                  <SquarePlus height={16} width={16} />
+                  <SquarePlus
+                    height={uiStore.iconSizeSmall}
+                    width={uiStore.iconSizeSmall}
+                  />
                 </View>
               )}
-              <View>
-                <ConditionRenderer />
-              </View>
+              <ConditionRenderer />
             </Animated.View>
             <View style={styles.statsRow}>
               <View

@@ -868,7 +868,16 @@ export class PlayerCharacter extends Character {
               maxSanity: this.maxSanity,
               applierNameString: this.fullName,
             });
+            const cond2 = createBuff({
+              buffName: "blind",
+              attackPower: 100,
+              applierID: this.id,
+              maxHealth: this.maxHealth,
+              maxSanity: this.maxSanity,
+              applierNameString: this.fullName,
+            });
             this.addCondition(cond);
+            this.addCondition(cond2);
           },
           name: "Add condition",
         },

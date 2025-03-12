@@ -5,10 +5,10 @@ import {
   useAcceleratedAction,
   useStatChanges,
 } from "@/hooks/generic";
-import { radius, tw_base, useStyles } from "@/hooks/styles";
+import { normalize, radius, tw_base, useStyles } from "@/hooks/styles";
 import { AccelerationCurves, toTitleCase } from "@/utility/functions/misc";
 import { Attribute, AttributeToString, Modifier } from "@/utility/types";
-import { ReactNode, useCallback, useEffect, useState } from "react";
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import {
   Animated,
   Image,
@@ -37,7 +37,7 @@ import { Condition } from "@/entities/conditions";
 import { BlurView } from "expo-blur";
 import { usePathname } from "expo-router";
 import { getTotalValue, statMapping } from "@/utility/functions/stats";
-import { Colors } from "react-native/Libraries/NewAppScreen";
+import Colors from "@/constants/Colors";
 
 export const EXPANDED_PAD = 16;
 
@@ -59,6 +59,8 @@ export const RenderPrimaryStatsBlock = observer(
       essential?: boolean | undefined;
     }) => void;
   }) => {
+    const { uiStore } = useRootStore();
+
     const getMaxAmount = useCallback(() => {
       return respeccing
         ? playerState.allocatedSkillPoints[stat]
@@ -163,9 +165,15 @@ export const RenderPrimaryStatsBlock = observer(
               {({ pressed }) => (
                 <View style={{ transform: [{ scale: pressed ? 0.95 : 1 }] }}>
                   {respeccing ? (
-                    <SquareMinus height={28} width={28} />
+                    <SquareMinus
+                      height={uiStore.iconSizeLarge}
+                      width={uiStore.iconSizeLarge}
+                    />
                   ) : (
-                    <SquarePlus height={28} width={28} />
+                    <SquarePlus
+                      height={uiStore.iconSizeLarge}
+                      width={uiStore.iconSizeLarge}
+                    />
                   )}
                 </View>
               )}
@@ -202,6 +210,7 @@ export const RenderSecondaryStatsBlock = observer(
     }, [stat, playerState, respeccing]);
 
     const styles = useStyles();
+    const { uiStore } = useRootStore();
     const action = useCallback(() => {
       if (playerState) {
         if (respeccing) {
@@ -244,9 +253,11 @@ export const RenderSecondaryStatsBlock = observer(
 
     return (
       <View style={styles.columnCenter}>
-        <Text style={{ paddingVertical: 4 }}>{AttributeToString[stat]}</Text>
+        <Text style={{ paddingVertical: 4, ...styles["text-lg"] }}>
+          {AttributeToString[stat]}
+        </Text>
         <View style={[styles.rowCenter, { alignItems: "center" }]}>
-          <Text>
+          <Text style={styles["text-lg"]}>
             {stat === Attribute.strength
               ? playerState.totalStrength
               : stat === Attribute.dexterity
@@ -254,11 +265,20 @@ export const RenderSecondaryStatsBlock = observer(
               : playerState.totalIntelligence}
           </Text>
           {stat === Attribute.strength ? (
-            <StrengthIcon height={20} width={23} />
+            <StrengthIcon
+              height={uiStore.iconSizeLarge}
+              width={uiStore.iconSizeLarge}
+            />
           ) : stat === Attribute.dexterity ? (
-            <DexterityIcon height={20} width={23} />
+            <DexterityIcon
+              height={uiStore.iconSizeLarge}
+              width={uiStore.iconSizeLarge}
+            />
           ) : (
-            <IntelligenceIcon height={20} width={23} />
+            <IntelligenceIcon
+              height={uiStore.iconSizeLarge}
+              width={uiStore.iconSizeLarge}
+            />
           )}
           {shouldShow && (
             <View style={styles.rowCenter}>
@@ -271,9 +291,15 @@ export const RenderSecondaryStatsBlock = observer(
                 {({ pressed }) => (
                   <View style={{ transform: [{ scale: pressed ? 0.95 : 1 }] }}>
                     {respeccing ? (
-                      <SquareMinus height={28} width={28} />
+                      <SquareMinus
+                        height={uiStore.iconSizeLarge}
+                        width={uiStore.iconSizeLarge}
+                      />
                     ) : (
-                      <SquarePlus height={28} width={28} />
+                      <SquarePlus
+                        height={uiStore.iconSizeLarge}
+                        width={uiStore.iconSizeLarge}
+                      />
                     )}
                   </View>
                 )}
@@ -368,25 +394,29 @@ export const ConditionRenderer = observer(() => {
     let simplifiedConditions = Array.from(simplifiedConditionsMap.values());
 
     return (
-      <View style={styles.rowAround}>
+      <View style={[styles.rowAround, { marginLeft: tw_base[2] }]}>
         {simplifiedConditions.map((cond) => (
-          <View key={cond.name} style={styles.conditionIcon}>
+          <View
+            key={cond.name}
+            style={{
+              backgroundColor: `${
+                Colors[uiStore.colorScheme == "light" ? "dark" : "light"]
+                  .background
+              }60`,
+              borderColor: Colors[uiStore.colorScheme].border,
+              borderWidth: 1,
+              borderRadius: 999,
+              padding: 1,
+              marginHorizontal: tw_base[1],
+              marginVertical: "auto",
+            }}
+          >
             <Image
               source={cond.icon}
-              style={[
-                ["blind", "stun"].includes(cond.name) &&
-                uiStore.colorScheme === "dark"
-                  ? {
-                      backgroundColor: "rgba(255, 255, 255, 0.5)",
-                      borderRadius: 20,
-                      width: 24,
-                      height: 24,
-                    }
-                  : {
-                      width: 24,
-                      height: 24,
-                    },
-              ]}
+              style={{
+                width: normalize(22),
+                height: normalize(22),
+              }}
               resizeMode="contain"
             />
           </View>
@@ -397,8 +427,9 @@ export const ConditionRenderer = observer(() => {
 });
 
 export const DetailedViewConditionRender = observer(() => {
-  const { playerState } = useRootStore();
+  const { playerState, uiStore } = useRootStore();
   const styles = useStyles();
+
   if (playerState) {
     return (
       <View style={{ height: tw_base[64] }}>
@@ -419,23 +450,35 @@ export const DetailedViewConditionRender = observer(() => {
                   <View style={[styles.rowCenter, { paddingVertical: 4 }]}>
                     <Image
                       source={condition.getConditionIcon()}
-                      style={{ width: 24, height: 24 }}
+                      style={{
+                        width: uiStore.iconSizeLarge,
+                        height: uiStore.iconSizeLarge,
+                      }}
                       resizeMode="contain"
                     />
                     <Text> {condition.turns} </Text>
-                    <ClockIcon width={16} height={16} />
+                    <ClockIcon
+                      width={uiStore.iconSizeSmall}
+                      height={uiStore.iconSizeSmall}
+                    />
                   </View>
                   {!!condition.getHealthDamage() && (
                     <View style={styles.rowCenter}>
                       <Text>{condition.getHealthDamage()}</Text>
-                      <HealthIcon height={16} width={16} />
+                      <HealthIcon
+                        height={uiStore.iconSizeSmall}
+                        width={uiStore.iconSizeSmall}
+                      />
                     </View>
                   )}
                   {!!condition.getSanityDamage() && (
                     <View style={styles.rowCenter}>
                       <Text>{condition.getSanityDamage()}</Text>
                       <View style={{ marginLeft: 4 }}>
-                        <Sanity height={16} width={16} />
+                        <Sanity
+                          height={uiStore.iconSizeSmall}
+                          width={uiStore.iconSizeSmall}
+                        />
                       </View>
                     </View>
                   )}
@@ -493,7 +536,7 @@ export const StatDisplay = ({
       }}
     >
       <View style={{ ...styles.rowCenter }}>
-        <Icon height={14} width={14} />
+        <Icon height={uiStore.iconSizeSmall} width={uiStore.iconSizeSmall} />
         <Text style={styles.ml2}>{getTotalValue(modifier, value)}</Text>
       </View>
       <Text
@@ -570,7 +613,7 @@ export const ColorAndPlatformDependantBlur = observer(
 
     const sanityDamageInterpolation = sanityDamageFlash.interpolate({
       inputRange: [0, 1],
-      outputRange: ["transparent", "rgba(107,33,168,0.4)"], // #6b21a8 with 0.4 opacity
+      outputRange: ["transparent", "rgba(107,33,168,0.4)"],
     });
 
     const combinedFlashInterpolation = Animated.multiply(
@@ -729,6 +772,7 @@ export const ColorAndPlatformDependantBlur = observer(
         );
       }
     }
+
     if (dungeonStore.isInDungeon) {
       return (
         <View

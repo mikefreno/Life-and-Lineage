@@ -24,11 +24,13 @@ const CostDisplay = ({
   goldCost,
   sanityCost,
   colorScheme,
+  iconSize,
 }: {
   styles: ReturnType<typeof useStyles>;
   goldCost: number;
   sanityCost: number;
   colorScheme: "light" | "dark";
+  iconSize: number;
 }) => (
   <View
     style={{
@@ -58,7 +60,7 @@ const CostDisplay = ({
         <Text style={{ color: colorScheme === "dark" ? "#fafafa" : undefined }}>
           {goldCost}
         </Text>
-        <Coins width={14} height={14} style={{ marginLeft: 6 }} />
+        <Coins width={iconSize} height={iconSize} style={{ marginLeft: 6 }} />
       </View>
     )}
     <View
@@ -71,7 +73,7 @@ const CostDisplay = ({
       <Text style={{ color: colorScheme === "dark" ? "#fafafa" : undefined }}>
         -{sanityCost}
       </Text>
-      <Sanity width={14} height={14} style={{ marginLeft: 6 }} />
+      <Sanity width={iconSize} height={iconSize} style={{ marginLeft: 6 }} />
     </View>
   </View>
 );
@@ -84,7 +86,7 @@ const MissingPreReqs = ({
   missing: string[];
 }) => (
   <View style={styles.itemsCenter}>
-    <Text style={styles.lg}>Missing:</Text>
+    <Text style={styles["text-lg"]}>Missing:</Text>
     {missing.map((item) => (
       <Text key={item} style={styles.py1}>
         {toTitleCase(item)}
@@ -171,7 +173,7 @@ const TrainingCard = observer(
             <View style={styles.rowBetween}>
               <Text
                 style={{
-                  ...styles.xl,
+                  ...styles["text-xl"],
                   ...styles.bold,
                   ...styles.myAuto,
                   width: "66%",
@@ -186,6 +188,7 @@ const TrainingCard = observer(
                   sanityCost={sanityCostPerTick}
                   styles={styles}
                   colorScheme={uiStore.colorScheme}
+                  iconSize={uiStore.iconSizeSmall}
                 />
               )}
             </View>

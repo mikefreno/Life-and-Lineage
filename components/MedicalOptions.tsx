@@ -116,7 +116,11 @@ const MedicalOption = observer(
               {cost > 0 ? (
                 <>
                   <Text>{cost}</Text>
-                  <Coins width={14} height={14} style={{ marginLeft: 6 }} />
+                  <Coins
+                    width={uiStore.iconSizeSmall}
+                    height={uiStore.iconSizeSmall}
+                    style={{ marginLeft: 6 }}
+                  />
                 </>
               ) : (
                 <Text style={{ color: isDark ? "#fafafa" : "#09090b" }}>
@@ -131,7 +135,11 @@ const MedicalOption = observer(
                     ? playerState?.maxHealth
                     : healthRestore}
                 </Text>
-                <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
+                <HealthIcon
+                  width={uiStore.iconSizeSmall}
+                  height={uiStore.iconSizeSmall}
+                  style={{ marginLeft: 6 }}
+                />
               </View>
             ) : null}
             {manaRestore ? (
@@ -139,7 +147,11 @@ const MedicalOption = observer(
                 <Text>
                   {manaRestore == "fill" ? playerState?.maxMana : manaRestore}
                 </Text>
-                <Energy width={14} height={14} style={{ marginLeft: 6 }} />
+                <Energy
+                  width={uiStore.iconSizeSmall}
+                  height={uiStore.iconSizeSmall}
+                  style={{ marginLeft: 6 }}
+                />
               </View>
             ) : null}
             {sanityRestore ? (
@@ -149,7 +161,11 @@ const MedicalOption = observer(
                     ? (playerState?.maxSanity ?? 50) * 2
                     : sanityRestore}
                 </Text>
-                <Sanity width={14} height={14} style={{ marginLeft: 6 }} />
+                <Sanity
+                  width={uiStore.iconSizeSmall}
+                  height={uiStore.iconSizeSmall}
+                  style={{ marginLeft: 6 }}
+                />
               </View>
             ) : null}
             {removeDebuffs ? (

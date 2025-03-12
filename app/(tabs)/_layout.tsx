@@ -60,7 +60,7 @@ const TabLayout = observer(() => {
     lazy: false,
     headerTransparent: true,
     headerTitleAlign: "center",
-    headerTitleStyle: { fontFamily: "PixelifySans", fontSize: normalize(22) },
+    headerTitleStyle: { fontFamily: "PixelifySans", fontSize: normalize(24) },
     headerBackground:
       Platform.OS == "ios"
         ? () => (
@@ -205,28 +205,28 @@ const TabLayout = observer(() => {
               tabBarIcon: ({ color }) =>
                 playerState?.playerClass == "necromancer" ? (
                   <NecromancerSkull
-                    width={normalize(28)}
-                    height={normalize(26)}
+                    width={uiStore.iconSizeXL}
+                    height={uiStore.iconSizeXL}
                     color={color}
                   />
                 ) : playerState?.playerClass == "paladin" ? (
                   <PaladinHammer
-                    width={normalize(28)}
-                    height={normalize(26)}
+                    width={uiStore.iconSizeXL}
+                    height={uiStore.iconSizeXL}
                     color={color}
                     useOpacity={true}
                   />
                 ) : playerState?.playerClass == "ranger" ? (
                   <RangerIcon
-                    width={normalize(28)}
-                    height={normalize(26)}
+                    width={uiStore.iconSizeXL}
+                    height={uiStore.iconSizeXL}
                     color={color}
                     useOpacity={true}
                   />
                 ) : (
                   <WizardHat
-                    width={normalize(28)}
-                    height={normalize(26)}
+                    width={uiStore.iconSizeXL}
+                    height={uiStore.iconSizeXL}
                     color={color}
                   />
                 ),
@@ -235,12 +235,12 @@ const TabLayout = observer(() => {
                   <Pressable onPress={() => vibration({ style: "light" })}>
                     {({ pressed }) => (
                       <Gear
-                        width={normalize(30)}
-                        height={normalize(26)}
+                        width={uiStore.iconSizeXL}
+                        height={uiStore.iconSizeXL}
                         color={
                           Colors[uiStore.colorScheme as "light" | "dark"].text
                         }
-                        style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }}
+                        style={{ marginLeft: 15, ropacity: pressed ? 0.5 : 1 }}
                       />
                     )}
                   </Pressable>
@@ -252,8 +252,8 @@ const TabLayout = observer(() => {
                       <Pressable onPress={() => vibration({ style: "light" })}>
                         {({ pressed }) => (
                           <HouseHeart
-                            width={normalize(30)}
-                            height={normalize(26)}
+                            width={uiStore.iconSizeXL}
+                            height={uiStore.iconSizeXL}
                             color={"#f87171"}
                             style={{
                               marginRight: 15,
@@ -274,8 +274,8 @@ const TabLayout = observer(() => {
               title: "Spells",
               tabBarIcon: ({ color }) => (
                 <Wand
-                  width={normalize(26)}
-                  height={normalize(26)}
+                  width={uiStore.iconSizeXL}
+                  height={uiStore.iconSizeXL}
                   color={color}
                 />
               ),
@@ -284,8 +284,8 @@ const TabLayout = observer(() => {
                   <Pressable onPress={() => vibration({ style: "light" })}>
                     {({ pressed }) => (
                       <BookSparkles
-                        width={normalize(26)}
-                        height={normalize(28)}
+                        width={uiStore.iconSizeXL}
+                        height={uiStore.iconSizeXL}
                         color={
                           elementalColorMap[
                             playerState?.blessing ?? Element.fire
@@ -310,8 +310,8 @@ const TabLayout = observer(() => {
               title: "Labor",
               tabBarIcon: ({ color }) => (
                 <Broom
-                  width={normalize(30)}
-                  height={normalize(26)}
+                  width={uiStore.iconSizeXL * 1.15} // sizing corrective
+                  height={uiStore.iconSizeXL}
                   color={color}
                 />
               ),
@@ -320,8 +320,8 @@ const TabLayout = observer(() => {
                   <Pressable onPress={() => vibration({ style: "light" })}>
                     {({ pressed }) => (
                       <GraduationCapIcon
-                        width={normalize(28)}
-                        height={normalize(28)}
+                        width={uiStore.iconSizeXL}
+                        height={uiStore.iconSizeXL}
                         color={
                           uiStore.colorScheme == "light" ? "#3f3f46" : "#e4e4e7"
                         }
@@ -342,8 +342,8 @@ const TabLayout = observer(() => {
                       <Image
                         source={require("../../assets/images/icons/investing.png")}
                         style={{
-                          height: normalize(28),
-                          width: normalize(28),
+                          height: uiStore.iconSizeXL,
+                          width: uiStore.iconSizeXL,
                           marginRight: 15,
                           marginBottom: 6,
                           opacity: pressed ? 0.5 : 1,
@@ -362,8 +362,8 @@ const TabLayout = observer(() => {
               title: "Shops",
               tabBarIcon: ({ color }) => (
                 <Potion
-                  width={normalize(28)}
-                  height={normalize(30)}
+                  width={uiStore.iconSizeXL}
+                  height={uiStore.iconSizeXL}
                   color={color}
                 />
               ),
@@ -373,8 +373,8 @@ const TabLayout = observer(() => {
                       <Pressable onPress={() => vibration({ style: "light" })}>
                         {({ pressed }) => (
                           <BowlingBallAndPin
-                            width={normalize(30)}
-                            height={normalize(28)}
+                            width={uiStore.iconSizeXL}
+                            height={uiStore.iconSizeXL}
                             color={"#27272a"}
                             style={{
                               marginRight: 15,
@@ -395,8 +395,8 @@ const TabLayout = observer(() => {
               title: "Medical",
               tabBarIcon: ({ color }) => (
                 <Medical
-                  width={normalize(30)}
-                  height={normalize(28)}
+                  width={uiStore.iconSizeXL}
+                  height={uiStore.iconSizeXL}
                   color={color}
                 />
               ),
@@ -409,8 +409,8 @@ const TabLayout = observer(() => {
               title: "Dungeon",
               tabBarIcon: ({ color }) => (
                 <Dungeon
-                  width={normalize(28)}
-                  height={normalize(28)}
+                  width={uiStore.iconSizeXL}
+                  height={uiStore.iconSizeXL}
                   color={color}
                 />
               ),
@@ -433,7 +433,7 @@ const TabLayout = observer(() => {
                       {({ pressed }) => (
                         <MaterialCommunityIcons
                           name="sword-cross"
-                          size={30}
+                          size={uiStore.iconSizeXL}
                           color={Colors[uiStore.colorScheme].health}
                           style={{ marginLeft: 15, opacity: pressed ? 0.5 : 1 }}
                         />
@@ -457,8 +457,8 @@ const TabLayout = observer(() => {
                 >
                   {({ pressed }) => (
                     <Sword
-                      width={normalize(30)}
-                      height={normalize(30)}
+                      width={uiStore.iconSizeXL}
+                      height={uiStore.iconSizeXL}
                       color={"#BF9069"}
                       style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                     />

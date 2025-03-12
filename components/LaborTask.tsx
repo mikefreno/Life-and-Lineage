@@ -113,20 +113,32 @@ const LaborTask = observer(
               <Text style={{ color: isDark ? "#fafafa" : "#09090b" }}>
                 {playerState?.getRewardValue(title, reward)}
               </Text>
-              <Coins width={14} height={14} style={{ marginLeft: 6 }} />
+              <Coins
+                width={uiStore.iconSizeSmall}
+                height={uiStore.iconSizeSmall}
+                style={{ marginLeft: 6 }}
+              />
             </View>
             <View style={styles.costRow}>
               <Text style={{ color: isDark ? "#fafafa" : "#09090b" }}>
                 -{cost.mana}
               </Text>
-              <Energy width={14} height={14} style={{ marginLeft: 6 }} />
+              <Energy
+                width={uiStore.iconSizeSmall}
+                height={uiStore.iconSizeSmall}
+                style={{ marginLeft: 6 }}
+              />
             </View>
             {!!cost.health && (
               <View style={styles.costRow}>
                 <Text style={{ color: isDark ? "#fafafa" : "#09090b" }}>
                   -{cost.health}
                 </Text>
-                <HealthIcon width={14} height={14} style={{ marginLeft: 6 }} />
+                <HealthIcon
+                  width={uiStore.iconSizeSmall}
+                  height={uiStore.iconSizeSmall}
+                  style={{ marginLeft: 6 }}
+                />
               </View>
             )}
             {!!cost.sanity && (
@@ -134,7 +146,11 @@ const LaborTask = observer(
                 <Text style={{ color: isDark ? "#fafafa" : "#09090b" }}>
                   -{cost.sanity}
                 </Text>
-                <Sanity width={14} height={14} style={{ marginLeft: 6 }} />
+                <Sanity
+                  width={uiStore.iconSizeSmall}
+                  height={uiStore.iconSizeSmall}
+                  style={{ marginLeft: 6 }}
+                />
               </View>
             )}
           </View>

@@ -59,14 +59,17 @@ const PlayerStatusForSecondary = observer(() => {
                   colorScheme={uiStore.colorScheme}
                 />
                 <Coins
-                  width={normalize(14)}
-                  height={normalize(14)}
+                  width={uiStore.iconSizeSmall}
+                  height={uiStore.iconSizeSmall}
                   style={{ marginLeft: 6 }}
                 />
               </View>
               {playerState.unAllocatedSkillPoints > 0 && (
                 <View style={{ paddingHorizontal: 4, marginVertical: "auto" }}>
-                  <SquarePlus height={normalize(14)} width={normalize(14)} />
+                  <SquarePlus
+                    height={uiStore.iconSizeSmall}
+                    width={uiStore.iconSizeSmall}
+                  />
                 </View>
               )}
               <View>

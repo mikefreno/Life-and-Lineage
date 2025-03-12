@@ -146,7 +146,7 @@ const SignInScreen = observer(() => {
                 <Text style={[styles["text-xl"], tw.pr1]}>
                   Sign in with Google
                 </Text>
-                <GoogleIcon height={20} width={20} />
+                <GoogleIcon height={normalize(20)} width={normalize(20)} />
               </Pressable>
 
               {Platform.OS == "ios" && (

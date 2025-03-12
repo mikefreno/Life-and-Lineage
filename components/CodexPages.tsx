@@ -142,8 +142,8 @@ export function PlayerCodex() {
               >
                 The Mage{" "}
                 <WizardHat
-                  height={24}
-                  width={24}
+                  height={uiStore.iconSizeLarge}
+                  width={uiStore.iconSizeLarge}
                   color={uiStore.colorScheme == "dark" ? "#2563eb" : "#1e40af"}
                 />
               </Text>
@@ -160,8 +160,8 @@ export function PlayerCodex() {
               >
                 The Necromancer{" "}
                 <NecromancerSkull
-                  height={24}
-                  width={24}
+                  height={uiStore.iconSizeLarge}
+                  width={uiStore.iconSizeLarge}
                   color={uiStore.colorScheme == "dark" ? "#9333ea" : "#6b21a8"}
                 />
               </Text>
@@ -176,7 +176,11 @@ export function PlayerCodex() {
                   color: "#fcd34d",
                 }}
               >
-                The Paladin <PaladinHammer height={24} width={24} />
+                The Paladin{" "}
+                <PaladinHammer
+                  height={uiStore.iconSizeLarge}
+                  width={uiStore.iconSizeLarge}
+                />
               </Text>
             </Link>
           </View>
@@ -189,7 +193,11 @@ export function PlayerCodex() {
                   color: "#4ade80",
                 }}
               >
-                The Ranger <RangerIcon height={24} width={24} />
+                The Ranger{" "}
+                <RangerIcon
+                  height={uiStore.iconSizeLarge}
+                  width={uiStore.iconSizeLarge}
+                />
               </Text>
             </Link>
           </View>

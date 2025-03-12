@@ -416,7 +416,10 @@ export function StatsDisplay({
               >
                 {reqs.strength}
               </Text>
-              <StrengthIcon height={14} width={16} />
+              <StrengthIcon
+                height={uiStore.iconSizeSmall}
+                width={uiStore.iconSizeSmall}
+              />
             </View>
           )}
           {reqs.intelligence && (
@@ -430,7 +433,10 @@ export function StatsDisplay({
               >
                 {reqs.intelligence}
               </Text>
-              <IntelligenceIcon height={14} width={16} />
+              <IntelligenceIcon
+                height={uiStore.iconSizeSmall}
+                width={uiStore.iconSizeSmall}
+              />
             </View>
           )}
           {reqs.dexterity && (
@@ -444,7 +450,10 @@ export function StatsDisplay({
               >
                 {reqs.dexterity}
               </Text>
-              <DexterityIcon height={14} width={16} />
+              <DexterityIcon
+                height={uiStore.iconSizeSmall}
+                width={uiStore.iconSizeSmall}
+              />
             </View>
           )}
         </View>
@@ -478,11 +487,20 @@ export function StatsDisplay({
                 <Text style={{ textAlign: "center" }}>
                   Heals{" "}
                   {effect.stat == "health" ? (
-                    <HealthIcon height={14} width={14} />
+                    <HealthIcon
+                      height={uiStore.iconSizeSmall}
+                      width={uiStore.iconSizeSmall}
+                    />
                   ) : effect.stat == "mana" ? (
-                    <Energy height={14} width={14} />
+                    <Energy
+                      height={uiStore.iconSizeSmall}
+                      width={uiStore.iconSizeSmall}
+                    />
                   ) : (
-                    <Sanity width={14} height={14} />
+                    <Sanity
+                      width={uiStore.iconSizeSmall}
+                      height={uiStore.iconSizeSmall}
+                    />
                   )}{" "}
                   for {effect.amount.min} to {effect.amount.max} points.
                 </Text>
@@ -528,11 +546,20 @@ export function StatsDisplay({
                 <Text style={{ textAlign: "center" }}>
                   Deals {effect.amount.min} to {effect.amount.max} points of{" "}
                   {effect.stat == "health" ? (
-                    <HealthIcon height={14} width={14} />
+                    <HealthIcon
+                      height={uiStore.iconSizeSmall}
+                      width={uiStore.iconSizeSmall}
+                    />
                   ) : effect.stat == "mana" ? (
-                    <Energy height={14} width={14} />
+                    <Energy
+                      height={uiStore.iconSizeSmall}
+                      width={uiStore.iconSizeSmall}
+                    />
                   ) : (
-                    <Sanity width={14} height={14} />
+                    <Sanity
+                      width={uiStore.iconSizeSmall}
+                      height={uiStore.iconSizeSmall}
+                    />
                   )}{" "}
                   damage.
                 </Text>
@@ -595,7 +622,11 @@ export function StatsDisplay({
                       (displayItem.item.length ?? 1),
                   )}
                 </Text>
-                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+                <Coins
+                  width={uiStore.iconSizeSmall}
+                  height={uiStore.iconSizeSmall}
+                  style={{ marginLeft: 6 }}
+                />
               </View>
               {displayItem.item.length && displayItem.item.length > 1 ? (
                 <>
@@ -667,7 +698,11 @@ export function StatsDisplay({
                       displayItem.item.length,
                   )}
                 </Text>
-                <Coins width={16} height={16} style={{ marginLeft: 6 }} />
+                <Coins
+                  width={uiStore.iconSizeSmall}
+                  height={uiStore.iconSizeSmall}
+                  style={{ marginLeft: 6 }}
+                />
               </View>
               <GenericFlatButton
                 onPress={() => purchaseItem(firstItem)}
@@ -840,11 +875,20 @@ export function StatsDisplay({
             ) : (
               <Text style={{ textAlign: "center" }}>
                 {firstItem.activePoison.effect == "health" ? (
-                  <HealthIcon height={14} width={14} />
+                  <HealthIcon
+                    height={uiStore.iconSizeSmall}
+                    width={uiStore.iconSizeSmall}
+                  />
                 ) : firstItem.activePoison.effect == "mana" ? (
-                  <Energy height={14} width={14} />
+                  <Energy
+                    height={uiStore.iconSizeSmall}
+                    width={uiStore.iconSizeSmall}
+                  />
                 ) : (
-                  <Sanity width={14} height={14} />
+                  <Sanity
+                    width={uiStore.iconSizeSmall}
+                    height={uiStore.iconSizeSmall}
+                  />
                 )}{" "}
                 poison active.
               </Text>

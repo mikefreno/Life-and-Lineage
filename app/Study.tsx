@@ -262,7 +262,11 @@ const LearningSpellScreen = observer(() => {
                   onPress={() => setSelectedBook(item)}
                 >
                   <View style={[styles.p2]}>
-                    <Image source={item.getItemIcon()} />
+                    <Image
+                      source={item.getItemIcon()}
+                      width={uiStore.iconSizeSmall}
+                      height={uiStore.iconSizeSmall}
+                    />
                   </View>
                 </Pressable>
               ))}

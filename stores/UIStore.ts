@@ -64,7 +64,10 @@ export default class UIStore {
   progressIncrementing: boolean = false;
 
   tabHeight = normalize(TAB_SELECTION);
-  expansionPadding = normalizeLineHeight(20);
+  expansionPadding = normalizeLineHeight(28);
+  iconSizeXL = normalize(28);
+  iconSizeLarge = normalize(22);
+  iconSizeSmall = normalize(16);
 
   webviewURL:
     | "privacy-policy/life-and-lineage"

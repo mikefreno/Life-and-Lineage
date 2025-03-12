@@ -6,7 +6,16 @@ import { BASE_WIDTH } from "@/stores/UIStore";
 const getTaperedScale = () => {
   const rawScale = Dimensions.get("window").width / BASE_WIDTH;
   if (rawScale > 1) {
-    return 1 + (rawScale - 1) * 0.2;
+    return 1 + (rawScale - 1) * 0.3;
+  } else {
+    return 1 - (1 - rawScale) * 0.8;
+  }
+};
+
+const getTaperedScaleForText = () => {
+  const rawScale = Dimensions.get("window").width / BASE_WIDTH;
+  if (rawScale > 1) {
+    return 1 + (rawScale - 1) * 0.1;
   } else {
     return 1 - (1 - rawScale) * 0.8;
   }
@@ -22,10 +31,23 @@ const getReversedTaperedScale = () => {
 };
 
 const defaultScale = getTaperedScale();
-
+const defaultScaleForText = getTaperedScale();
 const reverseScale = getReversedTaperedScale();
 
 export const normalize = (size: number, scale: number = defaultScale) => {
+  const newSize = size * scale;
+
+  if (Platform.OS === "ios") {
+    return Math.round(PixelRatio.roundToNearestPixel(newSize));
+  } else {
+    return Math.round(PixelRatio.roundToNearestPixel(newSize)) - 2;
+  }
+};
+
+export const normalizeForText = (
+  size: number,
+  scale: number = defaultScaleForText,
+) => {
   const newSize = size * scale;
 
   if (Platform.OS === "ios") {
@@ -50,7 +72,7 @@ export const reverseNormalize = (
 
 export const normalizeLineHeight = (
   size: number,
-  scale: number = defaultScale,
+  scale: number = defaultScaleForText,
 ) => {
   return Math.round(size * scale);
 };
@@ -102,39 +124,39 @@ export const useStyles = () => {
 
   const text = {
     "text-xs": {
-      fontSize: normalize(10),
+      fontSize: normalizeForText(10),
       lineHeight: normalizeLineHeight(12),
     },
     "text-sm": {
-      fontSize: normalize(12),
+      fontSize: normalizeForText(12),
       lineHeight: normalizeLineHeight(16),
     },
     "text-md": {
-      fontSize: normalize(14),
+      fontSize: normalizeForText(14),
       lineHeight: normalizeLineHeight(20),
     },
     "text-lg": {
-      fontSize: normalize(18),
+      fontSize: normalizeForText(18),
       lineHeight: normalizeLineHeight(24),
     },
     "text-xl": {
-      fontSize: normalize(20),
+      fontSize: normalizeForText(20),
       lineHeight: normalizeLineHeight(24),
     },
     "text-2xl": {
-      fontSize: normalize(24),
+      fontSize: normalizeForText(24),
       lineHeight: normalizeLineHeight(28),
     },
     "text-3xl": {
-      fontSize: normalize(28),
+      fontSize: normalizeForText(28),
       lineHeight: normalizeLineHeight(32),
     },
     "text-4xl": {
-      fontSize: normalize(32),
+      fontSize: normalizeForText(32),
       lineHeight: normalizeLineHeight(36),
     },
     "text-5xl": {
-      fontSize: normalize(44),
+      fontSize: normalizeForText(44),
       lineHeight: normalizeLineHeight(48),
     },
   } as const;
@@ -624,11 +646,6 @@ export const useStyles = () => {
       flexDirection: "row",
       justifyContent: "space-evenly",
       paddingVertical: 4,
-    } as const,
-    conditionIcon: {
-      marginHorizontal: 2,
-      flex: 1,
-      alignItems: "center",
     } as const,
     detailedConditionCard: {
       marginVertical: 4,

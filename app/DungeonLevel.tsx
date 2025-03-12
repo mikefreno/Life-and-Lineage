@@ -1,37 +1,37 @@
 import React, { useLayoutEffect } from "react";
-import { ThemedView, Text } from "../components/Themed";
+import { ThemedView, Text } from "@/components/Themed";
 import { type LayoutChangeEvent, View, Animated } from "react-native";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
-import BattleTab from "../components/DungeonComponents/BattleTab";
-import { toTitleCase, wait } from "../utility/functions/misc";
-import ProgressBar from "../components/ProgressBar";
+import BattleTab from "@/components/DungeonComponents/BattleTab";
+import { toTitleCase, wait } from "@/utility/functions/misc";
+import ProgressBar from "@/components/ProgressBar";
 import { observer } from "mobx-react-lite";
-import TutorialModal from "../components/TutorialModal";
-import GenericModal from "../components/GenericModal";
-import BattleTabControls from "../components/DungeonComponents/BattleTabControls";
-import TargetSelection from "../components/DungeonComponents/TargetSelection";
-import DroppedItemsModal from "../components/DungeonComponents/DroppedItemsModal";
-import LeftBehindItemsModal from "../components/DungeonComponents/LeftBehindItemsModal";
-import { SackIcon } from "../assets/icons/SVGIcons";
-import { TutorialOption } from "../utility/types";
+import TutorialModal from "@/components/TutorialModal";
+import GenericModal from "@/components/GenericModal";
+import BattleTabControls from "@/components/DungeonComponents/BattleTabControls";
+import TargetSelection from "@/components/DungeonComponents/TargetSelection";
+import DroppedItemsModal from "@/components/DungeonComponents/DroppedItemsModal";
+import LeftBehindItemsModal from "@/components/DungeonComponents/LeftBehindItemsModal";
+import { SackIcon } from "@/assets/icons/SVGIcons";
+import { TutorialOption } from "@/utility/types";
 import { useIsFocused } from "@react-navigation/native";
-import { useCombatState, useLootState } from "../providers/DungeonData";
-import DungeonEnemyDisplay from "../components/DungeonComponents/DungeonEnemyDisplay";
-import { DungeonMapRender } from "../components/DungeonComponents/DungeonMap";
-import { StatsDisplay } from "../components/StatsDisplay";
+import { useCombatState, useLootState } from "@/providers/DungeonData";
+import DungeonEnemyDisplay from "@/components/DungeonComponents/DungeonEnemyDisplay";
+import { DungeonMapRender } from "@/components/DungeonComponents/DungeonMap";
+import { StatsDisplay } from "@/components/StatsDisplay";
 import {
   useDraggableStore,
   usePlayerStore,
   useRootStore,
-} from "../hooks/stores";
-import { usePouch } from "../hooks/generic";
-import D20DieAnimation from "../components/DieRollAnim";
+} from "@/hooks/stores";
+import { usePouch } from "@/hooks/generic";
+import D20DieAnimation from "@/components/DieRollAnim";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { LinearGradientBlur } from "../components/LinearGradientBlur";
-import { Parallax } from "../components/DungeonComponents/Parallax";
+import { LinearGradientBlur } from "@/components/LinearGradientBlur";
+import { Parallax } from "@/components/DungeonComponents/Parallax";
 import { Image } from "expo-image";
-import { useStyles } from "../hooks/styles";
+import { normalize, useStyles } from "@/hooks/styles";
 import { reaction } from "mobx";
 import { ScreenShaker } from "@/components/ScreenShaker";
 import { VFXWrapper } from "@/components/VFXWrapper";
@@ -231,7 +231,7 @@ const DungeonLevelScreen = observer(() => {
             onLayout={(e) => setPouchBoundsOnLayout(e)}
             onPress={() => setShowLeftBehindItemsScreen(true)}
           >
-            <SackIcon height={32} width={32} />
+            <SackIcon height={normalize(32)} width={normalize(32)} />
           </Pressable>
         </View>
         <Parallax

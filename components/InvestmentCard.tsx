@@ -290,7 +290,10 @@ const InvestmentCard = observer(
                                     ? ` increase: ${upgrade.effect.goldMinimumIncrease} `
                                     : ` decrease: ${upgrade.effect.goldMinimumIncrease} `}
                                 </Text>
-                                <Coins height={14} width={14} />
+                                <Coins
+                                  height={uiStore.iconSizeSmall}
+                                  width={uiStore.iconSizeSmall}
+                                />
                               </View>
                             )}
                             {/* Additional effects follow same pattern */}
@@ -330,7 +333,10 @@ const InvestmentCard = observer(
                                     ]}
                                   >
                                     <Text>{asReadableGold(upgrade.cost)} </Text>
-                                    <Coins width={14} height={14} />
+                                    <Coins
+                                      width={uiStore.iconSizeSmall}
+                                      height={uiStore.iconSizeSmall}
+                                    />
                                   </View>
                                 </View>
                               )}
@@ -422,7 +428,10 @@ const InvestmentCard = observer(
                     {`${investment.goldReturnRange.min} - ${investment.goldReturnRange.max} `}
                   </Text>
                 )}
-                <Coins height={14} width={14} />
+                <Coins
+                  height={uiStore.iconSizeSmall}
+                  width={uiStore.iconSizeSmall}
+                />
               </View>
               <View style={styles.rowCenter}>
                 <Text>
@@ -431,7 +440,11 @@ const InvestmentCard = observer(
                     : investment.turnsPerReturn}{" "}
                 </Text>
                 <View style={styles.myAuto}>
-                  <ClockIcon height={14} width={14} color={theme.text} />
+                  <ClockIcon
+                    height={uiStore.iconSizeSmall}
+                    width={uiStore.iconSizeSmall}
+                    color={theme.text}
+                  />
                 </View>
               </View>
               <View style={[styles.rowCenter, styles.itemsCenter]}>
@@ -440,7 +453,10 @@ const InvestmentCard = observer(
                     ? madeInvestment.maxGoldStockPile
                     : investment.maxGoldStockPile}{" "}
                 </Text>
-                <Vault height={14} width={16} />
+                <Vault
+                  height={uiStore.iconSizeSmall}
+                  width={uiStore.iconSizeSmall * 1.15}
+                />
               </View>
             </View>
             <Pressable
@@ -482,7 +498,10 @@ const InvestmentCard = observer(
                   <Text style={styles.textCenter}>Purchase For</Text>
                   <View style={[styles.rowCenter, styles.itemsCenter]}>
                     <Text>{asReadableGold(investment.cost)} </Text>
-                    <Coins width={14} height={14} />
+                    <Coins
+                      width={uiStore.iconSizeSmall}
+                      height={uiStore.iconSizeSmall}
+                    />
                   </View>
                 </View>
               )}
@@ -510,7 +529,10 @@ const InvestmentCard = observer(
                     <Text>
                       {asReadableGold(madeInvestment.currentGoldStockPile)}{" "}
                     </Text>
-                    <Coins width={14} height={14} />
+                    <Coins
+                      width={uiStore.iconSizeSmall}
+                      height={uiStore.iconSizeSmall}
+                    />
                   </View>
                 </View>
               )}

@@ -51,8 +51,8 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
           <View style={[styles.rowCenter, { alignItems: "center" }]}>
             <Text style={styles["text-md"]}>{spell.manaCost}</Text>
             <Energy
-              width={normalize(14)}
-              height={normalize(14)}
+              width={uiStore.iconSizeSmall}
+              height={uiStore.iconSizeSmall}
               style={{ marginLeft: 6 }}
             />
           </View>
@@ -69,8 +69,8 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
               <Text>{spell.duration}</Text>
               <ClockIcon
                 color={uiStore.colorScheme == "dark" ? "#f4f4f5" : "#18181b"}
-                width={normalize(14)}
-                height={normalize(14)}
+                width={uiStore.iconSizeSmall}
+                height={uiStore.iconSizeSmall}
                 style={{ marginLeft: 6 }}
               />
             </View>
@@ -79,8 +79,8 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
             <View style={styles.rowCenter}>
               <Text>{spell.baseDamage(playerState!)}</Text>
               <HealthIcon
-                width={normalize(14)}
-                height={normalize(14)}
+                width={uiStore.iconSizeSmall}
+                height={uiStore.iconSizeSmall}
                 style={{ marginLeft: 6 }}
               />
             </View>
@@ -101,34 +101,14 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
             </Text>
           )}
           {spell.selfDamage ? (
-            <View style={styles.rowCenter}>
-              {spell.selfDamage > 0 ? (
-                <>
-                  <Text>{spell.selfDamage} Self</Text>
-                  <HealthIcon
-                    width={normalize(14)}
-                    height={normalize(14)}
-                    style={{ marginLeft: 6 }}
-                  />
-                </>
-              ) : spell.selfDamage < 0 ? (
-                <>
-                  <Text>Heal {spell.selfDamage * -1}</Text>
-                  <HealthIcon
-                    width={normalize(14)}
-                    height={normalize(14)}
-                    style={{ marginLeft: 6 }}
-                  />
-                </>
-              ) : null}
-            </View>
+            <View style={styles.rowCenter}>{uiStore.iconSizeSmall}</View>
           ) : null}
           {spell.summons?.map((summon, idx) => (
             <View key={idx} style={styles.rowCenter}>
               <Text>{toTitleCase(summon)}</Text>
               <NecromancerSkull
-                width={normalize(14)}
-                height={normalize(14)}
+                width={uiStore.iconSizeSmall}
+                height={uiStore.iconSizeSmall}
                 style={{ marginLeft: 6 }}
                 color={uiStore.colorScheme == "light" ? "#27272a" : "#f4f4f5"}
               />
@@ -140,8 +120,8 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
                 {toTitleCase(spell.rangerPet)}
               </Text>
               <BeastMasteryIcon
-                width={normalize(14)}
-                height={normalize(14)}
+                width={uiStore.iconSizeSmall}
+                height={uiStore.iconSizeSmall}
                 style={{ marginLeft: 6 }}
               />
             </View>
