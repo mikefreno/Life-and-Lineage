@@ -95,12 +95,7 @@ export class Spell {
         if (
           user.equipment.mainHand.itemClass === this.usesWeapon //title case aligns with ItemClassType
         ) {
-          return (
-            this.initDamage +
-            user.magicPower +
-            (user.totalDamage ?? 0) +
-            user.attackPower
-          );
+          return this.initDamage + user.magicPower + (user.totalDamage ?? 0);
         } else return 0;
       }
       return this.initDamage + user.magicPower;

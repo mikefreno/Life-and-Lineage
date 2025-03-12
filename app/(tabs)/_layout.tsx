@@ -42,7 +42,7 @@ import { wait } from "@/utility/functions/misc";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import GenericModal from "@/components/GenericModal";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import * as Device from "expo-device";
+import { TABS_PADDING } from "@/stores/UIStore";
 
 const TabLayout = observer(() => {
   const isFocused = useIsFocused();
@@ -63,13 +63,10 @@ const TabLayout = observer(() => {
       uiStore.playerStatusTop -
       uiStore.playerStatusCompactHeight -
       uiStore.iconSizeXL -
-      Math.max(insets.bottom, 8)
+      Math.max(insets.bottom, 8) +
+      TABS_PADDING
     );
   }, [uiStore.playerStatusCompactHeight, uiStore.playerStatusTop]);
-
-  useEffect(() => {
-    console.log(`leftover size: ${leftoverSize} on:${Device.modelId}`);
-  }, [leftoverSize]);
 
   const commonOptions = {
     lazy: false,
@@ -85,7 +82,9 @@ const TabLayout = observer(() => {
               tint={uiStore.colorScheme}
             />
           )
-        : () => <ThemedView style={[StyleSheet.absoluteFill, shadows.soft]} />,
+        : () => (
+            <ThemedView style={[StyleSheet.absoluteFill, shadows.diffuse]} />
+          ),
   } as const;
 
   useEffect(() => {

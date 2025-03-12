@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Pressable,
   View,
@@ -15,6 +15,7 @@ import { useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { useStyles } from "../hooks/styles";
 import { useIsFocused } from "@react-navigation/native";
+import { runInAction } from "mobx";
 
 const InventoryRender = observer(
   ({
@@ -23,6 +24,7 @@ const InventoryRender = observer(
     targetBounds,
     runOnSuccess,
     screen,
+    onLayoutComplete,
   }: {
     displayItem: {
       item: Item[];
@@ -63,6 +65,7 @@ const InventoryRender = observer(
     const { draggableClassStore } = useDraggableStore();
     const styles = useStyles();
     const isFocused = useIsFocused();
+    const [layoutCompleted, setLayoutCompleted] = useState(false);
 
     const gridCalculations = useMemo(() => {
       const height = draggableClassStore.inventoryBounds?.height ?? 0;
@@ -110,9 +113,28 @@ const InventoryRender = observer(
       draggableClassStore.inventoryBounds?.height,
       draggableClassStore.inventoryBounds?.width,
       uiStore.dimensions.width,
-
       uiStore.dimensions.greater,
       uiStore.itemBlockSize,
+    ]);
+
+    useEffect(() => {
+      if (
+        gridCalculations.slotPositions.length > 0 &&
+        draggableClassStore.inventoryBounds &&
+        !layoutCompleted
+      ) {
+        setLayoutCompleted(true);
+        setTimeout(
+          () =>
+            runInAction(() => (uiStore.storeLoadingStatus["inventory"] = true)),
+          100,
+        );
+      }
+    }, [
+      gridCalculations,
+      draggableClassStore.inventoryBounds,
+      layoutCompleted,
+      onLayoutComplete,
     ]);
 
     const dropHandler = useCallback(

@@ -4,8 +4,8 @@ import GenericRaisedButton from "../GenericRaisedButton";
 import { TILE_SIZE } from "../../stores/DungeonStore";
 import { observer } from "mobx-react-lite";
 import { useRootStore } from "../../hooks/stores";
-import { useStyles } from "../../hooks/styles";
-import { directionsMapping } from "../../utility/functions/dungeon";
+import { normalize, normalizeForText, useStyles } from "../../hooks/styles";
+import { directionsMapping, Tile } from "../../utility/functions/dungeon";
 
 /**
  * Renders the dungeon map made by `generateTiles`.
@@ -137,6 +137,7 @@ export const DungeonMapControls = observer(() => {
         key={direction}
         onPress={() => dungeonStore.move(direction)}
         disabled={!valid || dungeonStore.movementQueued}
+        style={{ width: normalizeForText(100) }}
       >
         {direction.charAt(0).toUpperCase() + direction.slice(1)}
       </GenericRaisedButton>

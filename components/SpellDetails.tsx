@@ -15,6 +15,7 @@ import { Element } from "../utility/types";
 import type { Spell } from "../entities/spell";
 import { useRootStore } from "../hooks/stores";
 import { normalize, useStyles } from "../hooks/styles";
+import GenericStrikeAround from "./GenericStrikeAround";
 
 export default function SpellDetails({ spell }: { spell: Spell }) {
   const { playerState, uiStore } = useRootStore();
@@ -64,7 +65,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
             ...styles.itemsCenter,
           }}
         >
-          {spell.duration > 1 && (
+          {spell.duration > 1 ? (
             <View style={styles.rowCenter}>
               <Text>{spell.duration}</Text>
               <ClockIcon
@@ -74,9 +75,9 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
                 style={{ marginLeft: 6 }}
               />
             </View>
-          )}
-          {spell.baseDamage(playerState!) > 0 && (
-            <View style={styles.rowCenter}>
+          ) : null}
+          {spell.baseDamage(playerState!) > 0 ? (
+            <View style={[styles.rowCenter, { alignItems: "center" }]}>
               <Text>{spell.baseDamage(playerState!)}</Text>
               <HealthIcon
                 width={uiStore.iconSizeSmall}
@@ -84,24 +85,36 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
                 style={{ marginLeft: 6 }}
               />
             </View>
-          )}
-          {spell.buffs?.map((buff) => (
-            <Text style={styles.textCenter} key={buff}>
-              {toTitleCase(buff)}
-            </Text>
-          ))}
-          {spell.debuffs?.map((debuff, idx) => (
-            <Text style={styles.textCenter} key={idx}>
-              {toTitleCase(debuff.name)} - {debuff.chance * 100}%
-            </Text>
-          ))}
+          ) : null}
           {spell.usesWeapon && !spell.userHasRequiredWeapon(playerState!) && (
             <Text style={styles.textCenter}>
               Requires: {toTitleCase(spell.usesWeapon)}
             </Text>
           )}
           {spell.selfDamage ? (
-            <View style={styles.rowCenter}>{uiStore.iconSizeSmall}</View>
+            <View style={styles.rowCenter}>
+              <View style={styles.rowCenter}>
+                {spell.selfDamage > 0 ? (
+                  <>
+                    <Text>{spell.selfDamage} Self</Text>
+                    <HealthIcon
+                      width={normalize(14)}
+                      height={normalize(14)}
+                      style={{ marginLeft: 6 }}
+                    />
+                  </>
+                ) : spell.selfDamage < 0 ? (
+                  <>
+                    <Text>Heal {spell.selfDamage * -1}</Text>
+                    <HealthIcon
+                      width={normalize(14)}
+                      height={normalize(14)}
+                      style={{ marginLeft: 6 }}
+                    />
+                  </>
+                ) : null}
+              </View>
+            </View>
           ) : null}
           {spell.summons?.map((summon, idx) => (
             <View key={idx} style={styles.rowCenter}>
@@ -125,6 +138,30 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
                 style={{ marginLeft: 6 }}
               />
             </View>
+          ) : null}
+          {spell.buffs.length > 0 ? (
+            <>
+              <GenericStrikeAround style={styles["text-md"]}>
+                Buffs
+              </GenericStrikeAround>
+              {spell.buffs?.map((buff) => (
+                <Text style={styles.textCenter} key={buff}>
+                  {toTitleCase(buff)}
+                </Text>
+              ))}
+            </>
+          ) : null}
+          {spell.debuffs.length > 0 ? (
+            <>
+              <GenericStrikeAround style={styles["text-md"]}>
+                Debuffs
+              </GenericStrikeAround>
+              {spell.debuffs?.map((debuff, idx) => (
+                <Text style={styles.textCenter} key={idx}>
+                  {toTitleCase(debuff.name)} - {debuff.chance * 100}%
+                </Text>
+              ))}
+            </>
           ) : null}
         </View>
         <View style={{ marginVertical: "auto" }}>

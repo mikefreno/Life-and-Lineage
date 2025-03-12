@@ -39,9 +39,9 @@ export const LOADING_TIPS: string[] = [
 
 export const BASE_WIDTH = 400;
 
-export const TAB_SELECTION = 64;
-
 export const SCREEN_TRANSITION_TIMING = 200;
+
+export const TABS_PADDING = 8;
 
 export default class UIStore {
   root: RootStore;
@@ -72,7 +72,8 @@ export default class UIStore {
 
   expansionPadding = normalizeLineHeight(28);
   iconSizeXL = normalize(28);
-  tabHeight = normalize(28) + normalizeForText(12) + normalize(3) + 8;
+  tabHeight =
+    normalize(28) + normalizeForText(12) + normalize(3) + TABS_PADDING;
 
   iconSizeLarge = normalize(22);
   iconSizeSmall = normalize(16);
@@ -87,7 +88,8 @@ export default class UIStore {
   playerStatusTop: number | undefined = undefined;
 
   storeLoadingStatus: Record<string, boolean> = {
-    ui: false,
+    statusBar: false,
+    inventory: false,
     player: false,
     time: false,
     auth: false,
@@ -346,7 +348,7 @@ export default class UIStore {
 
   public updateTabWithBottomInset(value: number) {
     this.tabHeight += value;
-    this.storeLoadingStatus["ui"] = true;
+    this.storeLoadingStatus["statusBar"] = true;
   }
 
   setPlayerStatusHeight(value: number) {
