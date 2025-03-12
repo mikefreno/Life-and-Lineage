@@ -12,7 +12,7 @@ import { playerClassColors } from "../../constants/Colors";
 import { toTitleCase } from "../../utility/functions/misc";
 import { Foundation } from "@expo/vector-icons";
 import { useNewGameStore } from "./_layout";
-import { tw, useStyles } from "../../hooks/styles";
+import { tw, tw_base, useStyles } from "../../hooks/styles";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
 
@@ -140,6 +140,7 @@ export default function SetSex() {
           accessibilityLabel="Next"
           disabled={!sex}
           childrenWhenDisabled={"Select sex to continue"}
+          style={{ marginTop: tw_base[3] }}
         >
           Next
         </GenericFlatButton>

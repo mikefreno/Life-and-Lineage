@@ -19,7 +19,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
-import { useStyles } from "../../hooks/styles";
+import { tw_base, useStyles } from "../../hooks/styles";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
 
@@ -106,6 +106,7 @@ export default function SetBlessing() {
             accessibilityLabel="Next"
             disabled={!(blessingSelection == 0 || !!blessingSelection)}
             childrenWhenDisabled={"Select blessing to continue"}
+            style={{ marginTop: tw_base[3] }}
           >
             Next
           </GenericFlatButton>

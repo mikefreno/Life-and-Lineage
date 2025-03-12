@@ -735,6 +735,7 @@ export class PlayerCharacter extends Character {
       clearMinions: action,
       removeMinion: action,
       minionsAndPets: computed,
+      rangerPet: observable,
 
       weaponAttacks: computed,
       useArrow: action,
@@ -2192,6 +2193,7 @@ export class PlayerCharacter extends Character {
       }
     });
   }
+
   /**
    * Returns the species(name) of the created minion, adds the minion to the minion list
    */
@@ -2210,7 +2212,6 @@ export class PlayerCharacter extends Character {
       beingType: minionObj.beingType as BeingType,
       parent: this,
     });
-    console.log(minion);
     this.rangerPet = minion;
     return minion.creatureSpecies;
   }

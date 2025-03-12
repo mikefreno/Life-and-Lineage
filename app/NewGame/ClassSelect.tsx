@@ -20,7 +20,7 @@ import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
 import GenericFlatButton from "../../components/GenericFlatButton";
 import { useRouter } from "expo-router";
-import { useStyles } from "../../hooks/styles";
+import { tw_base, useStyles } from "../../hooks/styles";
 import NewGameMetaControls from "@/components/NewGameMetaControls";
 
 const SetClassScreen = observer(() => {
@@ -356,6 +356,7 @@ const SetClassScreen = observer(() => {
             accessibilityRole="link"
             accessibilityLabel="Next"
             childrenWhenDisabled={"Select class to continue"}
+            style={{ marginTop: tw_base[3] }}
           >
             Next
           </GenericFlatButton>

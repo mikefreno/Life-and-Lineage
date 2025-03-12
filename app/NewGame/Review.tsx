@@ -12,8 +12,7 @@ import GenericFlatButton from "../../components/GenericFlatButton";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
 import { useNewGameStore } from "./_layout";
-import { FadeSlide } from "../../components/AnimatedWrappers";
-import { normalize, tw_base, useStyles } from "../../hooks/styles";
+import { tw_base, useStyles } from "../../hooks/styles";
 import {
   DexterityIcon,
   Energy,
@@ -101,18 +100,16 @@ export default function NewGameReview() {
             baseStats={baseStats}
             onStatsAllocated={handleStatsAllocated}
           />
-          <FadeSlide>
-            <GenericFlatButton
-              onPress={startGame}
-              style={{ marginTop: tw_base[4] }}
-              accessibilityRole="button"
-              accessibilityLabel="Confirm"
-              disabled={!allocatedStats || remainingPoints > 0}
-              childrenWhenDisabled={"Spend all points to continue"}
-            >
-              Confirm?
-            </GenericFlatButton>
-          </FadeSlide>
+          <GenericFlatButton
+            onPress={startGame}
+            style={{ marginTop: tw_base[4] }}
+            accessibilityRole="button"
+            accessibilityLabel="Confirm"
+            disabled={!allocatedStats || remainingPoints > 0}
+            childrenWhenDisabled={"Spend all points to continue"}
+          >
+            Confirm?
+          </GenericFlatButton>
         </View>
         <NewGameMetaControls />
       </>

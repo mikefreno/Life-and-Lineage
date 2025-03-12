@@ -304,7 +304,7 @@ const DungeonLevelScreen = observer(() => {
                       filledColor="#ef4444"
                       unfilledColor="#fee2e2"
                       value={minion.currentHealth}
-                      maxValue={minion.baseHealth}
+                      maxValue={minion.maxHealth}
                     />
                   </View>
                 ))}
@@ -339,4 +339,5 @@ const DungeonLevelScreen = observer(() => {
     );
   }
 });
+
 export default DungeonLevelScreen;

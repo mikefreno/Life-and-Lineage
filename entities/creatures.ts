@@ -1118,12 +1118,13 @@ export class Minion extends Creature {
    * @returns The created minion.
    */
   static fromJSON(json: any): Minion {
+    console.log(json.baseHealth);
     const minion = new Minion({
       id: json.id,
       beingType: json.beingType,
       creatureSpecies: json.creatureSpecies,
       currentHealth: json.currentHealth,
-      baseHealth: json.maxHealth,
+      baseHealth: json.baseHealth,
       currentSanity: json.currentSanity,
       baseSanity: json.baseSanity,
       attackPower: json.attackPower,

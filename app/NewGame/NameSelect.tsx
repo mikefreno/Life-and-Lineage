@@ -159,6 +159,7 @@ export default function SetName() {
                     )
                   }
                   childrenWhenDisabled={"Set name to continue"}
+                  style={{ marginTop: tw_base[3] }}
                 >
                   Next
                 </GenericFlatButton>
