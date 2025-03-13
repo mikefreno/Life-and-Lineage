@@ -9,7 +9,7 @@ import UIStore from "@/stores/UIStore";
 import EnemyStore from "@/stores/EnemyStore";
 import { DungeonStore } from "@/stores/DungeonStore";
 import { ShopStore } from "@/stores/ShopsStore";
-import { action, makeObservable, observable } from "mobx";
+import { action, makeObservable, observable, runInAction } from "mobx";
 import { AuthStore } from "@/stores/AuthStore";
 import { TimeStore } from "@/stores/TimeStore";
 import { CharacterStore } from "@/stores/CharacterStore";
@@ -61,6 +61,9 @@ export class RootStore {
     this.playerState = retrieved_player
       ? PlayerCharacter.fromJSON({ ...parse(retrieved_player), root: this })
       : null;
+    if (!this.playerState) {
+      runInAction(() => (this.uiStore.storeLoadingStatus.inventory = true));
+    }
     this.playerAnimationStore = new PlayerAnimationStore({ root: this });
 
     this.uiStore.markStoreAsLoaded("player");

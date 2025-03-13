@@ -8,7 +8,7 @@ import {
 import { normalize, radius, tw_base, useStyles } from "@/hooks/styles";
 import { AccelerationCurves, toTitleCase } from "@/utility/functions/misc";
 import { Attribute, AttributeToString, Modifier } from "@/utility/types";
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import {
   Animated,
   Image,
@@ -597,13 +597,16 @@ export const ColorAndPlatformDependantBlur = observer(
       useStatChanges(playerState!);
 
     const healthWarningAnimatedValue = useState(new Animated.Value(0))[0];
+    const sanityWarningAnimatedValue = useState(new Animated.Value(0))[0];
+    const combinedWarningAnimatedValue = useState(new Animated.Value(0))[0];
 
-    const [showingHealthWarningPulse, setShowingHealthWarningPulse] =
-      useState<boolean>(false);
+    const [showingWarningPulse, setShowingWarningPulse] = useState<
+      "health" | "sanity" | "both" | null
+    >(null);
 
     const healthWarningInterpolation = healthWarningAnimatedValue.interpolate({
       inputRange: [0, 1],
-      outputRange: ["rgba(205,20,20,0.6)", "rgba(127,29,29,0.2)"],
+      outputRange: ["rgba(180,30,30,0.1)", "rgba(180,30,30,0.35)"],
     });
 
     const healthDamageInterpolation = healthDamageFlash.interpolate({
@@ -616,14 +619,25 @@ export const ColorAndPlatformDependantBlur = observer(
       outputRange: ["transparent", "rgba(107,33,168,0.4)"],
     });
 
+    const sanityWarningInterpolation = sanityWarningAnimatedValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: ["rgba(107,33,168,0.1)", "rgba(107,33,168,0.35)"],
+    });
+
     const combinedFlashInterpolation = Animated.multiply(
       healthDamageFlash,
       sanityDamageFlash,
     ).interpolate({
       inputRange: [0, 1],
-      outputRange: ["transparent", "rgba(160,30,120,0.5)"],
+      outputRange: ["transparent", "rgba(180,30,120,0.5)"],
       extrapolate: "clamp",
     });
+
+    const combinedWarningInterpolation =
+      combinedWarningAnimatedValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: ["rgba(160,30,120,0.1)", "rgba(180,30,120,0.35)"],
+      });
 
     const healthOrSanityFlash = () => {
       if (statChanges.health.isShowing && statChanges.sanity.isShowing) {
@@ -637,24 +651,56 @@ export const ColorAndPlatformDependantBlur = observer(
       }
     };
 
-    useEffect(() => {
-      if (showingHealthWarningPulse) {
-        startHealthWarningAnimation();
+    const healthOrSanityWarning = () => {
+      switch (showingWarningPulse) {
+        case "sanity":
+          return sanityWarningInterpolation;
+        case "health":
+          return healthWarningInterpolation;
+        case "both":
+          return combinedWarningInterpolation;
       }
-    }, [pathname, showingHealthWarningPulse]);
+    };
+
+    // ----------- Warning ------------- //
+    useEffect(() => {
+      if (showingWarningPulse) {
+        startWarningAnimation();
+      }
+    }, [pathname, showingWarningPulse]);
 
     useEffect(() => {
-      let animationLoop: Animated.CompositeAnimation | null = null;
-
-      if (
-        playerState &&
-        playerState.currentHealth / playerState.maxHealth <=
+      if (playerState) {
+        if (
+          playerState.currentHealth / playerState.maxHealth <=
+            uiStore.healthWarning &&
+          playerState.currentSanity <= 0
+        ) {
+          setShowingWarningPulse("both");
+        } else if (
+          playerState.currentHealth / playerState.maxHealth <=
           uiStore.healthWarning
-      ) {
-        if (!showingHealthWarningPulse) {
-          setShowingHealthWarningPulse(true);
+        ) {
+          setShowingWarningPulse("health");
+        } else if (playerState.currentSanity <= 0) {
+          setShowingWarningPulse("sanity");
+        } else {
+          setShowingWarningPulse(null);
+        }
+      }
+    }, [
+      playerState?.currentHealth,
+      playerState?.currentSanity,
+      playerState?.maxHealth,
+      playerState?.maxSanity,
+      uiStore.healthWarning,
+      showingWarningPulse,
+    ]);
 
-          animationLoop = Animated.loop(
+    const startWarningAnimation = () => {
+      switch (showingWarningPulse) {
+        case "health":
+          Animated.loop(
             Animated.sequence([
               Animated.timing(healthWarningAnimatedValue, {
                 toValue: 1,
@@ -670,45 +716,47 @@ export const ColorAndPlatformDependantBlur = observer(
             {
               iterations: -1,
             },
-          );
-
-          animationLoop.start();
-        }
-      } else if (showingHealthWarningPulse) {
-        setShowingHealthWarningPulse(false);
+          ).start();
+          return;
+        case "sanity":
+          Animated.loop(
+            Animated.sequence([
+              Animated.timing(sanityWarningAnimatedValue, {
+                toValue: 1,
+                duration: 1000,
+                useNativeDriver: true,
+              }),
+              Animated.timing(sanityWarningAnimatedValue, {
+                toValue: 0,
+                duration: 1000,
+                useNativeDriver: true,
+              }),
+            ]),
+            {
+              iterations: -1,
+            },
+          ).start();
+          return;
+        case "both":
+          Animated.loop(
+            Animated.sequence([
+              Animated.timing(combinedWarningAnimatedValue, {
+                toValue: 1,
+                duration: 1000,
+                useNativeDriver: true,
+              }),
+              Animated.timing(combinedWarningAnimatedValue, {
+                toValue: 0,
+                duration: 1000,
+                useNativeDriver: true,
+              }),
+            ]),
+            {
+              iterations: -1,
+            },
+          ).start();
+          return;
       }
-
-      // Cleanup
-      return () => {
-        if (animationLoop) {
-          animationLoop.stop();
-        }
-      };
-    }, [
-      playerState?.currentHealth,
-      playerState?.maxHealth,
-      uiStore.healthWarning,
-      showingHealthWarningPulse,
-    ]);
-
-    const startHealthWarningAnimation = () => {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(healthWarningAnimatedValue, {
-            toValue: 1,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-          Animated.timing(healthWarningAnimatedValue, {
-            toValue: 0,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-        ]),
-        {
-          iterations: -1,
-        },
-      ).start();
     };
 
     if (home) {
@@ -729,8 +777,8 @@ export const ColorAndPlatformDependantBlur = observer(
             <Animated.View
               style={{
                 display: "flex",
-                backgroundColor: showingHealthWarningPulse
-                  ? healthWarningInterpolation
+                backgroundColor: showingWarningPulse
+                  ? healthOrSanityWarning()
                   : healthOrSanityFlash(),
                 paddingBottom: 4,
               }}
@@ -759,8 +807,8 @@ export const ColorAndPlatformDependantBlur = observer(
             <Animated.View
               style={{
                 display: "flex",
-                backgroundColor: showingHealthWarningPulse
-                  ? healthWarningInterpolation
+                backgroundColor: showingWarningPulse
+                  ? healthOrSanityWarning()
                   : healthOrSanityFlash(),
                 paddingBottom: 4,
                 borderRadius: 12,
@@ -796,8 +844,8 @@ export const ColorAndPlatformDependantBlur = observer(
           <Animated.View
             style={{
               display: "flex",
-              backgroundColor: showingHealthWarningPulse
-                ? healthWarningInterpolation
+              backgroundColor: showingWarningPulse
+                ? healthOrSanityWarning()
                 : healthOrSanityFlash(),
             }}
           >
@@ -830,8 +878,8 @@ export const ColorAndPlatformDependantBlur = observer(
           <Animated.View
             style={{
               display: "flex",
-              backgroundColor: showingHealthWarningPulse
-                ? healthWarningInterpolation
+              backgroundColor: showingWarningPulse
+                ? healthOrSanityWarning()
                 : healthOrSanityFlash(),
             }}
           >

@@ -1,6 +1,6 @@
 import { useFonts } from "expo-font";
 import { Stack, usePathname, useRouter } from "expo-router";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Platform, Pressable, View, StyleSheet } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
@@ -15,8 +15,6 @@ import { API_BASE_URL } from "../config/config";
 import { SystemBars } from "react-native-edge-to-edge";
 import { DarkTheme, LightTheme } from "../constants/Colors";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import * as Notifications from "expo-notifications";
-import { registerForPushNotificationsAsync } from "../utility/functions/notifications";
 import { useRootStore } from "../hooks/stores";
 import { ProjectedImage } from "../components/Draggable";
 import { AppProvider } from "../providers/AppData";
@@ -43,6 +41,9 @@ import { BlurView } from "expo-blur";
 import { runInAction } from "mobx";
 import PlatformDependantGestureWrapper from "@/components/PlatformDependantGestureWrapper";
 import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
+
+import { decode } from "base-64";
+global.atob = decode;
 
 export { ErrorBoundary } from "expo-router";
 
@@ -140,13 +141,13 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
 
   const [firstLoad, setFirstLoad] = useState(true);
 
-  const [expoPushToken, setExpoPushToken] = useState("");
-  const [sentToken, setSentToken] = useState(false);
-  const [_, setNotification] = useState<Notifications.Notification | undefined>(
-    undefined,
-  );
-  const notificationListener = useRef<Notifications.EventSubscription>();
-  const responseListener = useRef<Notifications.EventSubscription>();
+  //const [expoPushToken, setExpoPushToken] = useState("");
+  //const [sentToken, setSentToken] = useState(false);
+  //const [_, setNotification] = useState<Notifications.Notification | undefined>(
+  //undefined,
+  //);
+  //const notificationListener = useRef<Notifications.EventSubscription>();
+  //const responseListener = useRef<Notifications.EventSubscription>();
   const pathname = usePathname();
   const [showBirthModal, setShowBirthModal] = useState(false);
   const [newbornBaby, setNewbornBaby] = useState<Character | null>(null);
@@ -156,49 +157,49 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     [insets.bottom],
   );
 
-  useEffect(() => {
-    if (fontLoaded) {
-      wait(500).then(() => {
-        registerForPushNotificationsAsync()
-          .then((token) => setExpoPushToken(token ?? ""))
-          .catch((error: any) => setExpoPushToken(`${error}`));
+  //useEffect(() => {
+  //if (fontLoaded) {
+  //wait(500).then(() => {
+  //registerForPushNotificationsAsync()
+  //.then((token) => setExpoPushToken(token ?? ""))
+  //.catch((error: any) => setExpoPushToken(`${error}`));
 
-        notificationListener.current =
-          Notifications.addNotificationReceivedListener((notification) => {
-            setNotification(notification);
-          });
+  //notificationListener.current =
+  //Notifications.addNotificationReceivedListener((notification) => {
+  //setNotification(notification);
+  //});
 
-        responseListener.current =
-          Notifications.addNotificationResponseReceivedListener(
-            (response) => {},
-          );
+  //responseListener.current =
+  //Notifications.addNotificationResponseReceivedListener(
+  //(response) => {},
+  //);
 
-        return () => {
-          notificationListener.current &&
-            Notifications.removeNotificationSubscription(
-              notificationListener.current,
-            );
-          responseListener.current &&
-            Notifications.removeNotificationSubscription(
-              responseListener.current,
-            );
-        };
-      });
-    }
-  }, [fontLoaded]);
+  //return () => {
+  //notificationListener.current &&
+  //Notifications.removeNotificationSubscription(
+  //notificationListener.current,
+  //);
+  //responseListener.current &&
+  //Notifications.removeNotificationSubscription(
+  //responseListener.current,
+  //);
+  //};
+  //});
+  //}
+  //}, [fontLoaded]);
 
-  useEffect(() => {
-    if (expoPushToken && !sentToken) {
-      fetch(`${API_BASE_URL}/tokens`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token: expoPushToken }),
-      });
-      setSentToken(true);
-    }
-  }, [expoPushToken]);
+  //useEffect(() => {
+  //if (expoPushToken && !sentToken) {
+  //fetch(`${API_BASE_URL}/tokens`, {
+  //method: "POST",
+  //headers: {
+  //"Content-Type": "application/json",
+  //},
+  //body: JSON.stringify({ token: expoPushToken }),
+  //});
+  //setSentToken(true);
+  //}
+  //}, [expoPushToken]);
 
   const handleRouting = (
     playerState: PlayerCharacter | null,

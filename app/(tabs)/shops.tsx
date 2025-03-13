@@ -82,7 +82,7 @@ const ShopsScreen = observer(() => {
                 { textAlign: "center", color: colors.text },
               ]}
             >
-              {shop.shopKeeper.fullName}
+              {shop.shopKeeper.fullName.replaceAll(" ", "\n")}
             </Text>
           </View>
 

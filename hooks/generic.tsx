@@ -425,7 +425,7 @@ export const useStatChanges = (playerState: PlayerCharacter) => {
           Animated.sequence([
             Animated.timing(healthDamageFlash, {
               toValue: 1,
-              duration: 400,
+              duration: 200,
               useNativeDriver: false,
             }),
             Animated.timing(healthDamageFlash, {
@@ -442,12 +442,12 @@ export const useStatChanges = (playerState: PlayerCharacter) => {
           Animated.sequence([
             Animated.timing(sanityDamageFlash, {
               toValue: 1,
-              duration: 400,
+              duration: 200,
               useNativeDriver: false,
             }),
             Animated.timing(sanityDamageFlash, {
               toValue: 0,
-              duration: 800,
+              duration: 600,
               useNativeDriver: false,
             }),
           ]).start();
