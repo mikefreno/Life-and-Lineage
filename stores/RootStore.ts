@@ -21,7 +21,6 @@ import { StashStore } from "@/stores/StashStore";
 import { SaveStore } from "@/stores/SaveStore";
 import { AudioStore } from "@/stores/AudioStore";
 import { PlayerAnimationStore } from "@/stores/PlayerAnimationStore";
-import { Platform } from "react-native";
 
 export class RootStore {
   playerState: PlayerCharacter | null;
@@ -80,18 +79,14 @@ export class RootStore {
     this.authStore = new AuthStore({ root: this });
     this.uiStore.markStoreAsLoaded("auth");
 
+    this.characterStore = new CharacterStore({ root: this });
+    this.uiStore.markStoreAsLoaded("character");
+
     this.shopsStore = new ShopStore({ root: this });
     this.uiStore.markStoreAsLoaded("shops");
 
-    if (Platform.OS == "ios") {
-      this.audioStore = new AudioStore({ root: this });
-    } else {
-      this.uiStore.markStoreAsLoaded("ambient");
-    }
+    this.audioStore = new AudioStore({ root: this });
     this.uiStore.markStoreAsLoaded("audio");
-
-    this.characterStore = new CharacterStore({ root: this });
-    this.uiStore.markStoreAsLoaded("character");
 
     this.tutorialStore = new TutorialStore({ root: this });
     this.uiStore.markStoreAsLoaded("tutorial");
@@ -112,11 +107,19 @@ export class RootStore {
       includeDevAttacks: observable,
       pathname: observable,
 
+      setPathname: action,
       hitDeathScreen: action,
       clearDeathScreen: action,
       addDevAction: action,
       removeDevAction: action,
     });
+  }
+
+  setPathname(pathname: string) {
+    this.pathname = pathname;
+    this.shopsStore.setInShopPath(
+      this.pathname === "/shops" || this.pathname == "/shopinterior",
+    );
   }
 
   gameTick() {

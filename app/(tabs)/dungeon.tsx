@@ -312,7 +312,7 @@ const DungeonScreen = observer(() => {
                 style={{ marginHorizontal: "auto", justifyContent: "center" }}
               >
                 {dungeonInstance.levels
-                  .filter((level) => level.unlocked || __DEV__)
+                  .filter((level) => level.unlocked)
                   .map((level, levelIdx) => {
                     const { bgColor, textColor } = getLevelColor(
                       dungeonInstance,

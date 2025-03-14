@@ -23,6 +23,7 @@ import {
   normalizeForText,
   normalizeLineHeight,
 } from "@/hooks/styles";
+import { EdgeInsets } from "react-native-safe-area-context";
 
 export const LOADING_TIPS: string[] = [
   "Remember to check your equipment before entering a dungeon",
@@ -107,6 +108,12 @@ export default class UIStore {
   };
 
   showDevDebugUI: boolean = false;
+  insets: {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  } | null = null;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
@@ -182,7 +189,9 @@ export default class UIStore {
       playerStatusCompactHeight: observable,
       webviewURL: observable,
       playerStatusTop: observable,
+      insets: observable,
 
+      setInsets: action,
       setPlayerStatusTop: action,
       updateTabWithBottomInset: action,
       startTipCycle: action,
@@ -202,6 +211,7 @@ export default class UIStore {
       markStoreAsLoaded: action,
       setPlayerStatusHeight: action,
 
+      playerStatusHeightSecondary: computed,
       playerStatusIsCompact: computed,
       playerStatusHeight: computed,
       colorScheme: computed,
@@ -240,6 +250,10 @@ export default class UIStore {
         }
       },
     );
+  }
+
+  setInsets(insets: EdgeInsets) {
+    this.insets = insets;
   }
 
   private setupDevActions() {
@@ -285,6 +299,9 @@ export default class UIStore {
     } else {
       return (this.playerStatusCompactHeight ?? 0) + this.expansionPadding;
     }
+  }
+  get playerStatusHeightSecondary() {
+    return this.playerStatusHeight + (this.insets?.bottom ?? 0);
   }
 
   get bottomBarHeight() {

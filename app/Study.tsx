@@ -309,7 +309,7 @@ const LearningSpellScreen = observer(() => {
         <ScrollView
           contentContainerStyle={{
             paddingTop: headerHeight,
-            paddingBottom: uiStore.bottomBarHeight,
+            paddingBottom: uiStore.playerStatusHeightSecondary,
             paddingHorizontal: 12,
           }}
         >

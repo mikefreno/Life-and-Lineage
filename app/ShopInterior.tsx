@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback,
   Animated,
   LayoutChangeEvent,
+  Platform,
 } from "react-native";
 import { useEffect, useRef, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
@@ -93,9 +94,7 @@ const ShopInteriorScreen = observer(() => {
 
   useEffect(() => {
     return () => {
-      if (!isFocused) {
-        shopsStore.setCurrentShop(null);
-      }
+      shopsStore.setCurrentShop(null);
     };
   }, [isFocused]);
 
@@ -139,6 +138,7 @@ const ShopInteriorScreen = observer(() => {
       ) {
         shopsStore.currentShop.refreshInventory();
       }
+      playerState.addKnownCharacter(shopsStore.currentShop.shopKeeper);
       setGreeting(shopsStore.currentShop.createGreeting);
       setInitialized(true);
     }
@@ -218,7 +218,7 @@ const ShopInteriorScreen = observer(() => {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <>
       <TutorialModal
         tutorial={TutorialOption.shopInterior}
         isFocused={isFocused}
@@ -233,143 +233,148 @@ const ShopInteriorScreen = observer(() => {
       />
       <View
         style={{
-          marginTop: header / 2,
-          height: header / 2,
+          marginTop: Platform.OS == "ios" ? header / 2 : 0,
+          height: Platform.OS == "ios" ? header / 2 : header,
           backgroundColor: colors?.background,
           opacity: 0.5,
         }}
       />
-      <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
-        <View style={[flex.columnBetween, { flex: 1 }]}>
-          <View style={[flex.rowEvenly, { height: "40%" }]}>
-            <View style={[flex.columnCenter, styles.shopKeeperSection]}>
-              <CharacterImage character={shopsStore.currentShop.shopKeeper} />
-              <GreetingComponent greeting={greeting} />
-              <Text style={styles.textCenter}>
-                {shopsStore.currentShop.shopKeeper.fullName}'s Inventory
-              </Text>
-              <View style={[flex.rowCenter, tw.mb1]}>
-                <Text>{shopsStore.currentShop.currentGold}</Text>
-                <Coins
-                  width={uiStore.iconSizeSmall}
-                  height={uiStore.iconSizeSmall}
-                  style={{ marginLeft: 6 }}
+      <View style={{ flex: 1 }}>
+        <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
+          <View style={[flex.columnBetween, { flex: 1 }]}>
+            <View style={[flex.rowEvenly, { height: "40%" }]}>
+              <View style={[flex.columnCenter, styles.shopKeeperSection]}>
+                <CharacterImage character={shopsStore.currentShop.shopKeeper} />
+                <GreetingComponent greeting={greeting} />
+                <Text style={styles.textCenter}>
+                  {shopsStore.currentShop.shopKeeper.fullName}'s Inventory
+                </Text>
+                <View style={[flex.rowCenter, tw.mb1]}>
+                  <Text>{shopsStore.currentShop.currentGold}</Text>
+                  <Coins
+                    width={uiStore.iconSizeSmall}
+                    height={uiStore.iconSizeSmall}
+                    style={{ marginLeft: 6 }}
+                  />
+                </View>
+                <ProgressBar
+                  value={shopsStore.currentShop.shopKeeper.affection}
+                  maxValue={100}
+                  filledColor="#ef4444"
+                  unfilledColor="#fca5a5"
                 />
               </View>
-              <ProgressBar
-                value={shopsStore.currentShop.shopKeeper.affection}
-                maxValue={100}
-                filledColor="#ef4444"
-                unfilledColor="#fca5a5"
-              />
-            </View>
-            <View
-              onLayout={(e) => setShopBoundsOnLayout(e)}
-              style={styles.shopsInventoryContainer}
-              ref={shopInventoryTarget}
-            >
-              <ThemedScrollView
-                onScrollBeginDrag={() => setDisplayItem(null)}
-                style={{
-                  height: "100%",
-                  paddingTop: uiStore.itemBlockSize,
-                  ...tw.px2,
-                }}
-                contentContainerStyle={[flex.rowEvenly, flex.wrap]}
+              <View
+                onLayout={(e) => setShopBoundsOnLayout(e)}
+                style={styles.shopsInventoryContainer}
+                ref={shopInventoryTarget}
               >
-                {shopsStore.currentShop.inventory.map((item) => (
-                  <Pressable
-                    key={item.item[0].id}
-                    style={{
-                      height: uiStore.itemBlockSize * 1.4,
-                      width: uiStore.itemBlockSize * 1.5,
-                    }}
-                  >
-                    <View style={styles.columnCenter}>
-                      <InventoryItem
-                        key={item.item[0].id}
-                        item={item.item}
-                        displayItem={displayItem}
-                        targetBounds={[
-                          {
-                            key: "playerInventory",
-                            bounds: draggableClassStore.inventoryBounds,
-                          },
-                        ]}
-                        runOnSuccess={() => purchaseStack(item.item)}
-                        setDisplayItem={(params) => {
-                          if (params) {
-                            setDisplayItem({ ...params, side: "shop" });
-                          } else {
-                            setDisplayItem(null);
-                          }
-                        }}
-                      />
-                    </View>
-                  </Pressable>
-                ))}
-              </ThemedScrollView>
-            </View>
-          </View>
-          <View style={styles.playerInventorySection}>
-            <View
-              style={{
-                ...styles.rowCenter,
-                ...styles.py4,
-              }}
-            >
-              <Text style={[styles.textCenter, styles["text-md"]]}>
-                {playerState.fullName}'s Inventory
-              </Text>
-              <View style={styles.rowCenter}>
-                <Text> ( {playerState.readableGold} </Text>
-                <Coins
-                  width={uiStore.iconSizeSmall}
-                  height={uiStore.iconSizeSmall}
-                  style={{ marginLeft: 6, marginVertical: "auto" }}
-                />
-                <Text> )</Text>
-                {playerState.baseInventory.some(
-                  (item) => item.itemClass == "junk",
-                ) && (
-                  <Pressable
-                    onPress={sellAllJunk}
-                    style={styles.sellJunkButton}
-                  >
-                    <Text>Sell Junk</Text>
-                  </Pressable>
-                )}
+                <ThemedScrollView
+                  onScrollBeginDrag={() => setDisplayItem(null)}
+                  style={{
+                    height: "100%",
+                    paddingTop: uiStore.itemBlockSize,
+                    ...tw.px2,
+                  }}
+                  contentContainerStyle={[flex.rowEvenly, flex.wrap]}
+                >
+                  {shopsStore.currentShop.inventory.map((item) => (
+                    <Pressable
+                      key={item.item[0].id}
+                      style={{
+                        height: uiStore.itemBlockSize * 1.4,
+                        width: uiStore.itemBlockSize * 1.5,
+                      }}
+                    >
+                      <View style={styles.columnCenter}>
+                        <InventoryItem
+                          key={item.item[0].id}
+                          item={item.item}
+                          displayItem={displayItem}
+                          targetBounds={[
+                            {
+                              key: "playerInventory",
+                              bounds: draggableClassStore.inventoryBounds,
+                            },
+                          ]}
+                          runOnSuccess={() => purchaseStack(item.item)}
+                          setDisplayItem={(params) => {
+                            if (params) {
+                              setDisplayItem({ ...params, side: "shop" });
+                            } else {
+                              setDisplayItem(null);
+                            }
+                          }}
+                        />
+                      </View>
+                    </Pressable>
+                  ))}
+                </ThemedScrollView>
               </View>
             </View>
-            <View style={{ width: "100%", height: "80%" }} collapsable={false}>
-              <InventoryRender
-                screen="shop"
-                displayItem={displayItem}
-                setDisplayItem={setDisplayItem}
-                targetBounds={[
-                  { key: "shopInventory", bounds: shopInventoryBounds },
-                ]}
-                runOnSuccess={(item: Item[]) => sellStack(item)}
-              />
+            <View style={styles.playerInventorySection}>
+              <View
+                style={{
+                  ...styles.rowCenter,
+                  ...styles.py4,
+                }}
+              >
+                <Text style={[styles.textCenter, styles["text-md"]]}>
+                  {playerState.fullName}'s Inventory
+                </Text>
+                <View style={styles.rowCenter}>
+                  <Text> ( {playerState.readableGold} </Text>
+                  <Coins
+                    width={uiStore.iconSizeSmall}
+                    height={uiStore.iconSizeSmall}
+                    style={{ marginLeft: 6, marginVertical: "auto" }}
+                  />
+                  <Text> )</Text>
+                  {playerState.baseInventory.some(
+                    (item) => item.itemClass == "junk",
+                  ) && (
+                    <Pressable
+                      onPress={sellAllJunk}
+                      style={styles.sellJunkButton}
+                    >
+                      <Text>Sell Junk</Text>
+                    </Pressable>
+                  )}
+                </View>
+              </View>
+              <View
+                style={{ width: "100%", height: "80%" }}
+                collapsable={false}
+              >
+                <InventoryRender
+                  screen="shop"
+                  displayItem={displayItem}
+                  setDisplayItem={setDisplayItem}
+                  targetBounds={[
+                    { key: "shopInventory", bounds: shopInventoryBounds },
+                  ]}
+                  runOnSuccess={(item: Item[]) => sellStack(item)}
+                />
+              </View>
             </View>
           </View>
-        </View>
-      </TouchableWithoutFeedback>
-      {displayItem && (
-        <View style={styles.raisedAbsolutePosition} pointerEvents="box-none">
-          <StatsDisplay
-            displayItem={displayItem}
-            shop={shopsStore.currentShop}
-            purchaseItem={purchaseItem}
-            purchaseStack={purchaseStack}
-            sellItem={sellItem}
-            sellStack={sellStack}
-            clearItem={() => setDisplayItem(null)}
-            topGuard={header}
-          />
-        </View>
-      )}
-    </View>
+        </TouchableWithoutFeedback>
+        {displayItem && (
+          <View style={styles.raisedAbsolutePosition} pointerEvents="box-none">
+            <StatsDisplay
+              displayItem={displayItem}
+              shop={shopsStore.currentShop}
+              purchaseItem={purchaseItem}
+              purchaseStack={purchaseStack}
+              sellItem={sellItem}
+              sellStack={sellStack}
+              clearItem={() => setDisplayItem(null)}
+              topGuard={header}
+            />
+          </View>
+        )}
+      </View>
+    </>
   );
 });
 

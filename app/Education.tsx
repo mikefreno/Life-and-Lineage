@@ -13,7 +13,7 @@ import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 const JobTraining = () => {
   const isFocused = useIsFocused();
   const header = useHeaderHeight();
-  const { playerState } = useRootStore();
+  const { playerState, uiStore } = useRootStore();
 
   if (!playerState) {
     return null;
@@ -29,25 +29,25 @@ const JobTraining = () => {
           body: "Here you can gain access to better jobs, just keep a careful eye on your sanity.",
         }}
       />
-      <View style={{ flex: 1 }}>
-        <ScrollView
-          style={{ paddingTop: header }}
-          scrollIndicatorInsets={{ top: 0, right: 0, left: 0, bottom: 48 }}
-        >
-          <View style={[tw.px2, tw.pt4]}>
-            {qualifications.map((qual, index) => (
-              <TrainingCard
-                key={index}
-                name={qual.name}
-                ticks={qual.ticks}
-                sanityCostPerTick={qual.sanityCostPerTick}
-                goldCostPerTick={qual.goldCostPerTick}
-                preRequisites={qual.prerequisites}
-              />
-            ))}
-          </View>
-        </ScrollView>
-      </View>
+      <ScrollView
+        style={{
+          paddingTop: header,
+          paddingBottom: uiStore.playerStatusHeightSecondary,
+        }}
+      >
+        <View style={[tw.px2, tw.pt4]}>
+          {qualifications.map((qual, index) => (
+            <TrainingCard
+              key={index}
+              name={qual.name}
+              ticks={qual.ticks}
+              sanityCostPerTick={qual.sanityCostPerTick}
+              goldCostPerTick={qual.goldCostPerTick}
+              preRequisites={qual.prerequisites}
+            />
+          ))}
+        </View>
+      </ScrollView>
       <PlayerStatusForSecondary />
     </>
   );

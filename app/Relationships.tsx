@@ -1,11 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Text, ThemedView } from "../components/Themed";
 import { wait } from "../utility/functions/misc";
 import { CharacterImage } from "../components/CharacterImage";
 import { useState } from "react";
 import ProgressBar from "../components/ProgressBar";
 import { CharacterInteractionModal } from "../components/CharacterInteractionModal";
-import { FlatList, Pressable, ScrollView, View } from "react-native";
+import {
+  FlatList,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import GiftModal from "../components/GiftModal";
 import { AffectionIcon } from "../assets/icons/SVGIcons";
 import GenericModal from "../components/GenericModal";
@@ -17,6 +24,12 @@ import GenericStrikeAround from "../components/GenericStrikeAround";
 import { useRootStore } from "../hooks/stores";
 import type { Character } from "../entities/character";
 import { flex, normalize, tw_base, useStyles } from "../hooks/styles";
+import TutorialModal from "@/components/TutorialModal";
+import { useIsFocused } from "@react-navigation/native";
+import { TutorialOption } from "@/utility/types";
+import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
+import { BlurView } from "expo-blur";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 const RelationshipsScreen = observer(() => {
   const styles = useStyles();
@@ -30,6 +43,9 @@ const RelationshipsScreen = observer(() => {
   const [showingAdoptionModal, setShowingAdoptionModal] =
     useState<boolean>(false);
   const [partnerName, setPartnerName] = useState<string>();
+
+  const headerHeight = useHeaderHeight();
+  const isFocused = useIsFocused();
 
   const characterGroups = [
     { title: "Children", data: playerState?.children || [] },
@@ -82,13 +98,11 @@ const RelationshipsScreen = observer(() => {
         ]}
       >
         <Pressable
-          style={[
-            flex.columnCenter,
-            {
-              opacity: character.deathdate ? 0.5 : 1,
-              paddingVertical: tw_base[2],
-            },
-          ]}
+          style={{
+            ...styles.columnBetween,
+            opacity: character.deathdate ? 0.5 : 1,
+            paddingVertical: tw_base[2],
+          }}
           key={character.id}
           disabled={!!character.deathdate}
           onPress={() => {
@@ -104,6 +118,7 @@ const RelationshipsScreen = observer(() => {
                 ? "line-through"
                 : "underline",
             }}
+            numberOfLines={2}
           >
             {character.fullName}
           </Text>
@@ -113,7 +128,10 @@ const RelationshipsScreen = observer(() => {
             {character.age} Years Old
           </Text>
           <View
-            style={{ marginHorizontal: "auto", paddingVertical: normalize(4) }}
+            style={{
+              marginHorizontal: "auto",
+              paddingVertical: normalize(4),
+            }}
           >
             <Text
               style={{
@@ -188,12 +206,10 @@ const RelationshipsScreen = observer(() => {
       setShowInteractionModal(false);
       wait(500).then(() => {
         setPartnerName(partnerName);
-        characterStore.independantChildrenAgeCheck();
         setShowingAdoptionModal(true);
       });
     } else {
       setPartnerName(partnerName);
-      characterStore.independantChildrenAgeCheck();
       setShowingAdoptionModal(true);
     }
   };
@@ -223,6 +239,26 @@ const RelationshipsScreen = observer(() => {
       <>
         <Stack.Screen
           options={{
+            headerTransparent: true,
+            headerTitleAlign: "center",
+            headerTitleStyle: {
+              fontFamily: "PixelifySans",
+              fontSize: normalize(24),
+            },
+            headerBackground:
+              Platform.OS == "ios"
+                ? () => (
+                    <BlurView
+                      intensity={100}
+                      style={[StyleSheet.absoluteFill, styles.diffuse]}
+                      tint={uiStore.colorScheme}
+                    />
+                  )
+                : () => (
+                    <ThemedView
+                      style={[StyleSheet.absoluteFill, styles.diffuse]}
+                    />
+                  ),
             headerRight: (props) => (
               <Pressable onPress={() => showAdoptionModal()}>
                 <FontAwesome6
@@ -232,6 +268,22 @@ const RelationshipsScreen = observer(() => {
                 />
               </Pressable>
             ),
+          }}
+        />
+        <TutorialModal
+          isFocused={isFocused}
+          tutorial={TutorialOption.relationships}
+          pageOne={{
+            title: "Relationships",
+            body: "Relationships decay over time, chat, give gifts and go on dates with others to improve your relationship",
+          }}
+          pageTwo={{
+            title: "Having Children",
+            body: "Given a good enough relationship, you can try for a child to extend your lineage",
+          }}
+          pageThree={{
+            title: "Adoption",
+            body: "You can also adopt (top left), but it can be extremely expensive",
           }}
         />
         <CharacterInteractionModal
@@ -294,9 +346,16 @@ const RelationshipsScreen = observer(() => {
           }}
           backdropCloses
         />
-        <ScrollView contentContainerStyle={{ flex: 1 }}>
+        <ScrollView
+          contentContainerStyle={{
+            paddingVertical: "2%",
+            paddingBottom: uiStore.playerStatusHeightSecondary,
+            paddingTop: headerHeight,
+          }}
+        >
           {characterGroups.map((group) => renderGroup(group.title, group.data))}
         </ScrollView>
+        <PlayerStatusForSecondary />
       </>
     );
   }

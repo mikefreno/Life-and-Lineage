@@ -26,11 +26,13 @@ export class TimeStore {
     makeObservable(this, {
       week: observable,
       year: observable,
+
       tick: action,
-      currentMonth: computed,
-      devSetter: action,
-      currentDate: computed,
       fromCheckpointData: action,
+      devSetter: action,
+
+      currentMonth: computed,
+      currentDate: computed,
     });
 
     reaction(

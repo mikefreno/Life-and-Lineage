@@ -5,7 +5,7 @@ import { throttle } from "lodash";
 import { parse, stringify } from "flatted";
 import shopsJSON from "@/assets/json/shops.json";
 import { MerchantType } from "@/utility/types";
-import { action, makeObservable, observable } from "mobx";
+import { action, computed, makeObservable, observable } from "mobx";
 
 const SHOP_ARCHETYPES: MerchantType[] = [
   "armorer",
@@ -22,6 +22,7 @@ export class ShopStore {
   shopsMap: Map<MerchantType, Shop>;
   root: RootStore;
   currentShop: Shop | null = null;
+  inShopPath = false;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
@@ -29,13 +30,24 @@ export class ShopStore {
 
     makeObservable(this, {
       shopsMap: observable,
+      currentShop: observable,
+      inShopPath: observable,
+
       fromCheckpointData: action,
       setShops: action,
+      setCurrentShop: action,
+      setInShopPath: action,
+
+      inMarket: computed,
     });
   }
 
-  get inMarket() {
-    return !!(this.root.pathname == "/shops" || this.currentShop);
+  get inMarket(): boolean {
+    return this.currentShop !== null || this.inShopPath;
+  }
+
+  setInShopPath(val: boolean) {
+    this.inShopPath = val;
   }
 
   hydrateShopState() {
@@ -79,6 +91,9 @@ export class ShopStore {
 
       do {
         shopKeeper = generateShopKeeper(archetype, this.root);
+        this.root.characterStore.addCharacter(shopKeeper);
+        this.root.playerState?.addKnownCharacter(shopKeeper);
+
         sex = shopKeeper.sex;
 
         const combinationKey = `${archetype}-${sex}`;

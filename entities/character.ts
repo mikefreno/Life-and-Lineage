@@ -231,32 +231,35 @@ export class Character {
       affection: observable,
       qualifications: observable,
       dateCooldownStart: observable,
-      fullName: computed,
-      setJob: action,
-      deathRoll: action,
-      setDateCooldownStart: action,
       birthdate: observable,
-      updateAffection: action,
       lastName: observable,
-      updateLastName: action,
-      kill: action,
-      setParents: action,
-      pregnancyDueDate: observable,
+      knownCharacterIds: observable,
       isPregnant: observable,
-      initiatePregnancy: action,
-      giveBirth: action,
-      age: computed,
-      parentIds: observable,
+      pregnancyDueDate: observable,
       childrenIds: observable,
       partnerIds: observable,
-      parents: computed,
-      children: computed,
-      partners: computed,
+      parentIds: observable,
+
       makePartner: action,
       removePartner: action,
       addChild: action,
-      knownCharacterIds: observable,
+      setJob: action,
+      deathRoll: action,
+      setDateCooldownStart: action,
+      updateAffection: action,
+      updateLastName: action,
+      kill: action,
+      setParents: action,
+      initiatePregnancy: action,
+      giveBirth: action,
+
+      dateAvailable: computed,
+      age: computed,
+      parents: computed,
+      children: computed,
+      partners: computed,
       knownCharacters: computed,
+      fullName: computed,
     });
 
     reaction(
@@ -391,6 +394,13 @@ export class Character {
    */
   public setDateCooldownStart(): void {
     this.dateCooldownStart = this.root.time.currentDate;
+  }
+
+  get dateAvailable() {
+    return this.dateCooldownStart
+      ? this.dateCooldownStart.year !== this.root.time.year ||
+          this.dateCooldownStart.week !== this.root.time.week
+      : true;
   }
 
   public kill() {

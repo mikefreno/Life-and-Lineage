@@ -113,7 +113,7 @@ const SingleAnimationSprite = React.memo(
                   frameDuration,
                 );
               } catch (error) {
-                console.log("Error in spawn animation first frame:", error);
+                console.error("Error in spawn animation first frame:", error);
               }
             }, 1000);
             return;
@@ -133,7 +133,7 @@ const SingleAnimationSprite = React.memo(
 
           animationTimerRef.current = setTimeout(advanceFrame, frameDuration);
         } catch (error) {
-          console.log("Error in animation frame:", error);
+          console.error("Error in animation frame:", error);
         }
       };
 
@@ -155,7 +155,7 @@ const SingleAnimationSprite = React.memo(
 
           animationTimerRef.current = setTimeout(advanceFrame, frameDuration);
         } catch (error) {
-          console.log("Error in continue animation:", error);
+          console.error("Error in continue animation:", error);
         }
       };
 
@@ -213,7 +213,7 @@ const SingleAnimationSprite = React.memo(
         </Canvas>
       );
     } catch (error) {
-      console.log("Error rendering animation frame:", error);
+      console.error("Error rendering animation frame:", error);
       return null;
     }
   },

@@ -27,6 +27,7 @@ export class CharacterStore {
     const { characters, independentChildren } = this.hydrateCharacters(root);
     this.characters = characters;
     this.independentChildren = independentChildren;
+    this.independantChildrenAgeCheck();
 
     makeObservable(this, {
       characters: observable,
@@ -47,6 +48,13 @@ export class CharacterStore {
         this.saveCharacterIds();
       },
     );
+
+    reaction(
+      () => this.independentChildren.length,
+      () => {
+        this.independantChildrenAgeCheck();
+      },
+    );
   }
 
   adopt({
@@ -64,7 +72,12 @@ export class CharacterStore {
     for (const child of this.independentChildren) {
       if (child.age >= 16) {
         this.removeIndependentChild({ child });
-        this.independentChildren;
+      }
+    }
+    if (this.independentChildren.length <= 2) {
+      const numToAdd = Math.floor(Math.random() * 3 + 1);
+      for (let i = 0; i < numToAdd; i++) {
+        this.createIndependantChild();
       }
     }
   }
@@ -126,7 +139,7 @@ export class CharacterStore {
       root: this.root,
     });
     this.independentChildren.push(child);
-    this.saveCharacter(child);
+    this.characterSave(child);
   }
 
   private removeIndependentChild({
@@ -197,7 +210,7 @@ export class CharacterStore {
     return { characters, independentChildren, player };
   }
 
-  private characterSave = async (character: Character) => {
+  private characterSave = (character: Character) => {
     try {
       const key = `character_${character.id}`;
       const data = stringify({ ...character, root: null });
@@ -215,6 +228,8 @@ export class CharacterStore {
   public saveCharacter = throttle(this.characterSave, 250);
 
   private saveCharacterIds = () => {
+    console.log("saving");
+
     const characterIds = this.characters.map((c) => c.id);
     const independentChildIds = this.independentChildren.map((c) => c.id);
 

@@ -40,19 +40,12 @@ export const CharacterInteractionModal = observer(
     const { playerState, uiStore } = root;
     const [showAssaultWarning, setShowAssaultWarning] =
       useState<boolean>(false);
-    const [dateAvailable, setDateAvailable] = useState<boolean>(
-      character?.dateCooldownStart
-        ? character.dateCooldownStart.week !== root.time.week &&
-            character.dateCooldownStart.year !== root.time.year
-        : true,
-    );
 
     const [pregnancyMessage, setPregnancyMessage] = useState<string | null>(
       null,
     );
 
     const router = useRouter();
-
     const vibration = useVibration();
 
     function setFight() {
@@ -66,15 +59,6 @@ export const CharacterInteractionModal = observer(
         });
       }
     }
-
-    useEffect(() => {
-      if (character?.dateCooldownStart) {
-        setDateAvailable(
-          character.dateCooldownStart.week !== root.time.week &&
-            character.dateCooldownStart.year !== root.time.year,
-        );
-      }
-    }, [root.time.year, root.time.week, character?.dateCooldownStart]);
 
     function attemptPregnancy(character: Character) {
       if (playerState && character) {
@@ -142,18 +126,18 @@ export const CharacterInteractionModal = observer(
                     <GenericStrikeAround>Interactions</GenericStrikeAround>
                     <View style={[flex.rowEvenly, { marginTop: 8 }]}>
                       <GenericFlatButton
-                        disabled={!dateAvailable}
+                        disabled={!character.dateAvailable}
                         onPress={() => {
                           vibration({ style: "light" });
+                          root.gameTick();
                           character.setDateCooldownStart();
                           character.updateAffection(5);
-                          root.gameTick();
                         }}
                       >
                         Chat
                       </GenericFlatButton>
                       <GenericFlatButton
-                        disabled={!dateAvailable}
+                        disabled={!character.dateAvailable}
                         onPress={() => {
                           vibration({ style: "light" });
                           showGiftModal();
@@ -174,7 +158,7 @@ export const CharacterInteractionModal = observer(
                           character.sex !== playerState.sex ? (
                             <>
                               <GenericFlatButton
-                                disabled={!dateAvailable}
+                                disabled={!character.dateAvailable}
                                 onPress={() => {
                                   vibration({ style: "light" });
                                   attemptPregnancy(character);
@@ -183,7 +167,7 @@ export const CharacterInteractionModal = observer(
                                 Try for a Baby
                               </GenericFlatButton>
                               <GenericFlatButton
-                                disabled={!dateAvailable}
+                                disabled={!character.dateAvailable}
                                 onPress={() => {
                                   vibration({ style: "light" });
                                   showAdoptionModal(character.fullName);
@@ -195,7 +179,7 @@ export const CharacterInteractionModal = observer(
                             </>
                           ) : (
                             <GenericFlatButton
-                              disabled={!dateAvailable}
+                              disabled={!character.dateAvailable}
                               onPress={() => {
                                 vibration({ style: "light" });
                                 showAdoptionModal(character.fullName);
@@ -206,7 +190,7 @@ export const CharacterInteractionModal = observer(
                           )
                         ) : (
                           <GenericFlatButton
-                            disabled={!dateAvailable}
+                            disabled={!character.dateAvailable}
                             onPress={() => {
                               vibration({ style: "light" });
                               character.setDateCooldownStart();
@@ -222,7 +206,7 @@ export const CharacterInteractionModal = observer(
                       <>
                         <View style={[flex.rowEvenly, { marginTop: 8 }]}>
                           <GenericFlatButton
-                            disabled={!dateAvailable}
+                            disabled={!character.dateAvailable}
                             onPress={() => {
                               vibration({ style: "light" });
                               character.setDateCooldownStart();
@@ -260,7 +244,7 @@ export const CharacterInteractionModal = observer(
                           vibration({ style: "light" });
                           character.updateAffection(5);
                           if (playerState) {
-                            playerState.addNewKnownCharacter(character);
+                            playerState.addKnownCharacter(character);
                             root.gameTick();
                           }
                         }}
@@ -272,7 +256,7 @@ export const CharacterInteractionModal = observer(
                           vibration({ style: "light" });
                           character.updateAffection(-5);
                           if (playerState) {
-                            playerState.addNewKnownCharacter(character);
+                            playerState.addKnownCharacter(character);
                             root.gameTick();
                           }
                         }}

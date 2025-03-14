@@ -58,13 +58,14 @@ const TabLayout = observer(() => {
     if (!uiStore.playerStatusTop || !uiStore.playerStatusCompactHeight)
       return 0;
 
-    return (
+    return Math.max(
       uiStore.dimensions.height -
-      uiStore.playerStatusTop -
-      uiStore.playerStatusCompactHeight -
-      uiStore.iconSizeXL -
-      Math.max(insets.bottom, 8) +
-      TABS_PADDING
+        uiStore.playerStatusTop -
+        uiStore.playerStatusCompactHeight -
+        uiStore.iconSizeXL -
+        Math.max(insets.bottom, 8) +
+        TABS_PADDING,
+      0,
     );
   }, [uiStore.playerStatusCompactHeight, uiStore.playerStatusTop]);
 
@@ -178,15 +179,13 @@ const TabLayout = observer(() => {
               shadowColor: "transparent",
               height:
                 uiStore.tabHeight + (uiStore.playerStatusCompactHeight ?? 0),
+              paddingHorizontal: "2%",
             },
             tabBarIconStyle: {
               marginHorizontal: "auto",
               height: uiStore.iconSizeXL,
             },
-            animation:
-              uiStore.reduceMotion || Platform.OS === "android"
-                ? "fade"
-                : "shift",
+            animation: uiStore.reduceMotion ? "fade" : "shift",
             tabBarButton: (props) => {
               const onPressWithVibration = (event: GestureResponderEvent) => {
                 vibration({ style: "light" });
@@ -302,7 +301,7 @@ const TabLayout = observer(() => {
                         color={
                           elementalColorMap[
                             playerState?.blessing ?? Element.fire
-                          ].dark
+                          ][uiStore.colorScheme == "dark" ? "light" : "dark"]
                         }
                         style={{
                           marginRight: 15,

@@ -253,6 +253,7 @@ export enum TutorialOption {
   training,
   firstBossKill,
   keyItem,
+  relationships,
 }
 
 export enum MasteryLevel {

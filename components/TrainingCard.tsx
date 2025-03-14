@@ -7,9 +7,10 @@ import GenericRaisedButton from "./GenericRaisedButton";
 import { AccelerationCurves, toTitleCase } from "../utility/functions/misc";
 import { Coins, Sanity } from "../assets/icons/SVGIcons";
 import { useAcceleratedAction } from "../hooks/generic";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { useRootStore } from "../hooks/stores";
-import { useStyles, radius } from "../hooks/styles";
+import { useStyles } from "../hooks/styles";
+import ThemedCard from "./ThemedCard";
 
 interface TrainingCardProps {
   name: string;
@@ -18,82 +19,6 @@ interface TrainingCardProps {
   sanityCostPerTick: number;
   preRequisites: string[] | null;
 }
-
-const CostDisplay = ({
-  styles,
-  goldCost,
-  sanityCost,
-  colorScheme,
-  iconSize,
-}: {
-  styles: ReturnType<typeof useStyles>;
-  goldCost: number;
-  sanityCost: number;
-  colorScheme: "light" | "dark";
-  iconSize: number;
-}) => (
-  <View
-    style={{
-      ...styles.myAuto,
-      marginBottom: -32,
-      marginTop: 32,
-      width: "33%",
-    }}
-  >
-    {goldCost === 0 ? (
-      <Text
-        style={{
-          ...styles.mxAuto,
-          color: colorScheme === "dark" ? "#fafafa" : undefined,
-        }}
-      >
-        Free
-      </Text>
-    ) : (
-      <View
-        style={{
-          ...styles.rowEvenly,
-          width: "100%",
-          alignItems: "center",
-        }}
-      >
-        <Text style={{ color: colorScheme === "dark" ? "#fafafa" : undefined }}>
-          {goldCost}
-        </Text>
-        <Coins width={iconSize} height={iconSize} style={{ marginLeft: 6 }} />
-      </View>
-    )}
-    <View
-      style={{
-        ...styles.rowEvenly,
-        width: "100%",
-        alignItems: "center",
-      }}
-    >
-      <Text style={{ color: colorScheme === "dark" ? "#fafafa" : undefined }}>
-        -{sanityCost}
-      </Text>
-      <Sanity width={iconSize} height={iconSize} style={{ marginLeft: 6 }} />
-    </View>
-  </View>
-);
-
-const MissingPreReqs = ({
-  styles,
-  missing,
-}: {
-  styles: ReturnType<typeof useStyles>;
-  missing: string[];
-}) => (
-  <View style={styles.itemsCenter}>
-    <Text style={styles["text-lg"]}>Missing:</Text>
-    {missing.map((item) => (
-      <Text key={item} style={styles.py1}>
-        {toTitleCase(item)}
-      </Text>
-    ))}
-  </View>
-);
 
 const TrainingCard = observer(
   ({
@@ -105,20 +30,8 @@ const TrainingCard = observer(
   }: TrainingCardProps) => {
     const root = useRootStore();
     const { playerState, uiStore } = root;
+    const isDark = uiStore.colorScheme === "dark";
     const styles = useStyles();
-
-    const cardStyle = useMemo(
-      () => ({
-        shadowColor: "#000",
-        shadowOffset: { width: 3, height: 1 },
-        elevation: 1,
-        backgroundColor:
-          uiStore.colorScheme === "light" ? "#fafafa" : "#27272a",
-        shadowOpacity: 0.2,
-        shadowRadius: 3,
-      }),
-      [uiStore.colorScheme],
-    );
 
     const progressQualification = useCallback(() => {
       playerState?.incrementQualificationProgress(
@@ -152,50 +65,45 @@ const TrainingCard = observer(
 
     if (playerState) {
       return (
-        <View
-          style={{
-            ...styles.m2,
-            ...radius.xl,
-            ...cardStyle,
-          }}
-        >
-          <View
-            style={{
-              ...styles.columnBetween,
-              ...radius.xl,
-              ...styles.px4,
-              ...styles.py2,
-              borderWidth: uiStore.colorScheme === "dark" ? 1 : 0,
-              borderColor:
-                uiStore.colorScheme === "dark" ? "#71717a" : undefined,
-            }}
-          >
-            <View style={styles.rowBetween}>
-              <Text
-                style={{
-                  ...styles["text-xl"],
-                  ...styles.bold,
-                  ...styles.myAuto,
-                  width: "66%",
-                  color: uiStore.colorScheme === "dark" ? "#fafafa" : "#18181b",
-                }}
-              >
-                {toTitleCase(name)}
-              </Text>
+        <ThemedCard>
+          <View style={styles.rowBetween}>
+            <Text style={styles.cardTitle}>{toTitleCase(name)}</Text>
+            <View style={{ width: "40%" }}>
               {!isCompleted && (
-                <CostDisplay
-                  goldCost={goldCostPerTick}
-                  sanityCost={sanityCostPerTick}
-                  styles={styles}
-                  colorScheme={uiStore.colorScheme}
-                  iconSize={uiStore.iconSizeSmall}
-                />
+                <>
+                  <View style={styles.costRow}>
+                    {goldCostPerTick > 0 ? (
+                      <>
+                        <Text>{goldCostPerTick}</Text>
+                        <Coins
+                          width={uiStore.iconSizeSmall}
+                          height={uiStore.iconSizeSmall}
+                          style={{ marginLeft: 6 }}
+                        />
+                      </>
+                    ) : (
+                      <Text style={{ color: isDark ? "#fafafa" : "#09090b" }}>
+                        Free
+                      </Text>
+                    )}
+                  </View>
+                  <View style={styles.costRow}>
+                    <Text>-{sanityCostPerTick}</Text>
+                    <Sanity
+                      width={uiStore.iconSizeSmall}
+                      height={uiStore.iconSizeSmall}
+                      style={{ marginLeft: 6 }}
+                    />
+                  </View>
+                </>
               )}
             </View>
+          </View>
 
-            {!isCompleted ? (
-              <>
-                {hasPreReqs && (
+          {!isCompleted ? (
+            <>
+              {hasPreReqs ? (
+                <>
                   <GenericRaisedButton
                     onPressIn={handlePressIn}
                     onPressOut={handlePressOut}
@@ -205,26 +113,35 @@ const TrainingCard = observer(
                         -playerState.maxSanity
                     }
                   >
-                    {hasPreReqs ? "Study" : "Locked"}
+                    Study
                   </GenericRaisedButton>
-                )}
-
-                {hasPreReqs ? (
                   <ProgressBar value={progress ?? 0} maxValue={ticks} />
-                ) : (
-                  <MissingPreReqs
-                    styles={styles}
-                    missing={playerState?.missingPreReqs(preRequisites) ?? []}
-                  />
-                )}
-              </>
-            ) : (
-              <Text>Completed!</Text>
-            )}
-          </View>
-        </View>
+                </>
+              ) : (
+                <>
+                  <GenericRaisedButton disabled={true}>
+                    Locked
+                  </GenericRaisedButton>
+                  <View style={styles.itemsCenter}>
+                    <Text style={styles["text-lg"]}>Missing:</Text>
+                    {(playerState?.missingPreReqs(preRequisites) ?? []).map(
+                      (item) => (
+                        <Text key={item} style={styles.py1}>
+                          {toTitleCase(item)}
+                        </Text>
+                      ),
+                    )}
+                  </View>
+                </>
+              )}
+            </>
+          ) : (
+            <Text>Completed!</Text>
+          )}
+        </ThemedCard>
       );
     }
+    return null;
   },
 );
 

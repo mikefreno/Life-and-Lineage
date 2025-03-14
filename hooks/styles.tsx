@@ -2,7 +2,6 @@ import { Dimensions, PixelRatio, Platform, StyleSheet } from "react-native";
 import { useRootStore } from "./stores";
 import Colors from "../constants/Colors";
 import { BASE_WIDTH } from "@/stores/UIStore";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const getTaperedScale = () => {
   const rawScale = Dimensions.get("window").width / BASE_WIDTH;

@@ -87,11 +87,9 @@ const HomeScreen = observer(() => {
 
   if (!playerState) {
     return (
-      <ThemedView
-        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-      >
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <D20DieAnimation keepRolling={true} />
-      </ThemedView>
+      </View>
     );
   }
 

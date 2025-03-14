@@ -583,7 +583,7 @@ export const Parallax = ({
         style={{
           paddingTop: header,
           flex: 1,
-          paddingBottom: uiStore.playerStatusHeight + uiStore.expansionPadding,
+          paddingBottom: uiStore.playerStatusHeightSecondary,
         }}
       >
         {children}

@@ -138,16 +138,12 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   const styles = useStyles();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  useEffect(() => {
+    uiStore.setInsets(insets);
+  }, [insets]);
 
   const [firstLoad, setFirstLoad] = useState(true);
 
-  //const [expoPushToken, setExpoPushToken] = useState("");
-  //const [sentToken, setSentToken] = useState(false);
-  //const [_, setNotification] = useState<Notifications.Notification | undefined>(
-  //undefined,
-  //);
-  //const notificationListener = useRef<Notifications.EventSubscription>();
-  //const responseListener = useRef<Notifications.EventSubscription>();
   const pathname = usePathname();
   const [showBirthModal, setShowBirthModal] = useState(false);
   const [newbornBaby, setNewbornBaby] = useState<Character | null>(null);
@@ -157,6 +153,13 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
     [insets.bottom],
   );
 
+  //const [expoPushToken, setExpoPushToken] = useState("");
+  //const [sentToken, setSentToken] = useState(false);
+  //const [_, setNotification] = useState<Notifications.Notification | undefined>(
+  //undefined,
+  //);
+  //const notificationListener = useRef<Notifications.EventSubscription>();
+  //const responseListener = useRef<Notifications.EventSubscription>();
   //useEffect(() => {
   //if (fontLoaded) {
   //wait(500).then(() => {
@@ -332,9 +335,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
 
   useEffect(() => {
     setTimeout(() => {
-      runInAction(() => {
-        rootStore.pathname = pathname.toLowerCase();
-      });
+      rootStore.setPathname(pathname.toLowerCase());
     }, SCREEN_TRANSITION_TIMING);
   }, [pathname]);
 
@@ -496,7 +497,6 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                     }
                     intensity={100}
                     style={StyleSheet.absoluteFill}
-                    experimentalBlurMethod={"dimezisBlurView"}
                   />
                 ),
               }}
@@ -516,19 +516,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                   fontSize: normalize(22),
                 },
                 headerBackground: () => (
-                  <BlurView
-                    blurReductionFactor={12}
-                    tint={
-                      Platform.OS == "android"
-                        ? uiStore.colorScheme == "light"
-                          ? "light"
-                          : "dark"
-                        : "default"
-                    }
-                    intensity={100}
-                    style={StyleSheet.absoluteFill}
-                    experimentalBlurMethod={"dimezisBlurView"}
-                  />
+                  <BlurView intensity={100} style={StyleSheet.absoluteFill} />
                 ),
               }}
             />
@@ -547,19 +535,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                   fontSize: normalize(22),
                 },
                 headerBackground: () => (
-                  <BlurView
-                    blurReductionFactor={12}
-                    tint={
-                      Platform.OS == "android"
-                        ? uiStore.colorScheme == "light"
-                          ? "light"
-                          : "dark"
-                        : "default"
-                    }
-                    intensity={100}
-                    style={StyleSheet.absoluteFill}
-                    experimentalBlurMethod={"dimezisBlurView"}
-                  />
+                  <BlurView intensity={100} style={StyleSheet.absoluteFill} />
                 ),
               }}
             />
@@ -579,19 +555,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                   fontSize: normalize(22),
                 },
                 headerBackground: () => (
-                  <BlurView
-                    blurReductionFactor={12}
-                    tint={
-                      Platform.OS == "android"
-                        ? uiStore.colorScheme == "light"
-                          ? "light"
-                          : "dark"
-                        : "default"
-                    }
-                    intensity={100}
-                    style={StyleSheet.absoluteFill}
-                    experimentalBlurMethod={"dimezisBlurView"}
-                  />
+                  <BlurView intensity={100} style={StyleSheet.absoluteFill} />
                 ),
               }}
             />
@@ -604,18 +568,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                 },
                 headerTransparent: true,
                 headerBackground: () => (
-                  <BlurView
-                    blurReductionFactor={12}
-                    tint={
-                      Platform.OS == "android"
-                        ? uiStore.colorScheme == "light"
-                          ? "light"
-                          : "dark"
-                        : "default"
-                    }
-                    intensity={50}
-                    style={StyleSheet.absoluteFill}
-                  />
+                  <BlurView intensity={50} style={StyleSheet.absoluteFill} />
                 ),
                 headerLeft: () => (
                   <Pressable
