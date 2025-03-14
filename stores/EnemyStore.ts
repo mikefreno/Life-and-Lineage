@@ -10,6 +10,7 @@ export default class EnemyStore {
   enemies: Enemy[];
   animationStoreMap: Map<string, EnemyAnimationStore>;
   root: RootStore;
+  midpointUpdater: number = 0;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
@@ -22,6 +23,7 @@ export default class EnemyStore {
     makeObservable(this, {
       enemies: observable,
       animationStoreMap: observable,
+      midpointUpdater: observable,
 
       addToEnemyList: action,
       removeEnemy: action,
@@ -56,6 +58,13 @@ export default class EnemyStore {
       );
     } else return this.root.playerAnimationStore.usedPass;
   }
+
+  //TODO: return the id of the accociated animation store (or maybe enemy) or null
+  //get enemyGivingDialogue(){
+  //if( this.animationStoreMap.values().find((animStore)=>animStore.dialogue)){
+
+  //}
+  //}
 
   public addToEnemyList(enemy: Enemy) {
     if (!enemy.sprite) {

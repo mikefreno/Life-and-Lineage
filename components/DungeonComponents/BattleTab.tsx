@@ -206,14 +206,6 @@ const BattleTab = observer(
                 {encounterResult.drops.map((item) => item.name).join(", ")}
               </Text>
             )}
-            {encounterResult?.enemies && (
-              <Text>
-                Enemies:{" "}
-                {encounterResult.enemies
-                  .map((enemy) => enemy.creatureSpecies)
-                  .join(", ")}
-              </Text>
-            )}
           </ThemedView>
         </GenericModal>
         {battleTab == "attacksOrNavigation" ? (
@@ -333,13 +325,21 @@ const BattleTab = observer(
                             )}
                           </Pressable>
                         </View>
-                        <Pressable
+                        <GenericRaisedButton
                           disabled={
                             !attackOrSpell.canBeUsed ||
                             enemyStore.enemyTurnOngoing
                           }
                           onPress={() => attackHandler(attackOrSpell)}
-                          style={[
+                          backgroundColor={
+                            "element" in attackOrSpell
+                              ? elementalColorMap[attackOrSpell.element].dark
+                              : uiStore.colorScheme == "light"
+                              ? "#d4d4d8"
+                              : "#27272a"
+                          }
+                          disableTopLevelStyling
+                          buttonStyle={[
                             styles.actionButton,
                             {
                               opacity:
@@ -347,13 +347,6 @@ const BattleTab = observer(
                                 enemyStore.enemyTurnOngoing
                                   ? 0.5
                                   : 1,
-                              backgroundColor:
-                                "element" in attackOrSpell
-                                  ? elementalColorMap[attackOrSpell.element]
-                                      .dark
-                                  : uiStore.colorScheme == "light"
-                                  ? "#d4d4d8"
-                                  : "#27272a",
                             },
                           ]}
                         >
@@ -367,7 +360,7 @@ const BattleTab = observer(
                                 : "Not Enough Mana"
                               : "Attack"}
                           </Text>
-                        </Pressable>
+                        </GenericRaisedButton>
                       </View>
                       {index == combinedData.length - 1 && (
                         <ThemedView style={styles.attackCardBase}>
@@ -381,19 +374,21 @@ const BattleTab = observer(
                               />
                             </View>
                           </View>
-                          <Pressable
+                          <GenericRaisedButton
                             disabled={enemyStore.enemyTurnOngoing}
+                            disableTopLevelStyling
                             onPress={() => {
                               vibration({ style: "light" });
                               pass({ voluntary: true });
                             }}
-                            style={[
+                            backgroundColor={
+                              uiStore.colorScheme == "light"
+                                ? "#d4d4d8"
+                                : "#27272a"
+                            }
+                            buttonStyle={[
                               styles.actionButton,
                               {
-                                backgroundColor:
-                                  uiStore.colorScheme == "light"
-                                    ? "#d4d4d8"
-                                    : "#27272a",
                                 opacity:
                                   playerState.isStunned ||
                                   enemyStore.enemyTurnOngoing
@@ -403,7 +398,7 @@ const BattleTab = observer(
                             ]}
                           >
                             <Text style={styles["text-xl"]}>Use</Text>
-                          </Pressable>
+                          </GenericRaisedButton>
                         </ThemedView>
                       )}
                     </>

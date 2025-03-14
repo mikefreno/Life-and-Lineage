@@ -61,6 +61,11 @@ export const LoadingBoundary = observer(
             "Loading taking longer than expected. Current loading status:",
             JSON.stringify(uiStore.storeLoadingStatus, null, 2),
           );
+          setTimeout(() => {
+            if (isLoading) {
+              uiStore.completeLoading();
+            }
+          }, 2000);
         }, 5000);
       } else {
         if (loadingTimeoutRef.current) {

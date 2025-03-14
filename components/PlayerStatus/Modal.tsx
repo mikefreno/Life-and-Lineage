@@ -276,6 +276,12 @@ export const PlayerStatusModal = observer(() => {
             respeccing={respeccing}
             vibration={vibration}
           />
+          <RenderSecondaryStatsBlock
+            stat={Attribute.manaRegen}
+            playerState={playerState}
+            respeccing={respeccing}
+            vibration={vibration}
+          />
         </View>
 
         {playerState.equipmentStats.size > 0 ? (

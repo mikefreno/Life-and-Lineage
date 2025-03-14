@@ -20,7 +20,7 @@ export const MAX_ANIMATION_DURATION = 1000;
 export class EnemyAnimationStore {
   id = Crypto.randomUUID();
   textString: string | undefined = undefined;
-  dialogueString: string;
+  dialogue: { [key: number]: string } | null;
 
   spriteMidPoint: {
     x: number;
@@ -79,7 +79,7 @@ export class EnemyAnimationStore {
   }) {
     this.root = root;
     this.enemySprite = sprite;
-    this.dialogueString = "";
+    this.dialogue = null;
     this.animationQueue = ["idle", "spawn"];
 
     const attacksThatSkipMovement: AnimationOptions[] = [];
@@ -176,10 +176,6 @@ export class EnemyAnimationStore {
     this.textString = message;
   }
 
-  setDialogueString(message: string) {
-    this.dialogueString = message;
-  }
-
   addToAnimationQueue(animation: AnimationOptions | AnimationOptions[]) {
     if (Array.isArray(animation)) {
       this.animationQueue = [...this.animationQueue, ...animation];
@@ -203,5 +199,6 @@ export class EnemyAnimationStore {
 
   setSpriteMidPoint(pos: { x: number; y: number }) {
     this.spriteMidPoint = pos;
+    runInAction(() => (this.root.enemyStore.midpointUpdater += 1));
   }
 }

@@ -621,8 +621,8 @@ export const useStyles = () => {
       marginHorizontal: "auto",
       borderRadius: 12,
       borderWidth: 1,
-      paddingHorizontal: 24,
-      paddingVertical: 8,
+      paddingHorizontal: normalize(16),
+      paddingVertical: normalize(8),
     } as const,
 
     flatButtonText: {
@@ -877,7 +877,7 @@ export const useStyles = () => {
       borderColor: theme.border,
     } as const,
     shopKeeperSection: {
-      ...tw.my4,
+      ...tw.py4,
       ...tw.px1,
       width: "33%",
     } as const,

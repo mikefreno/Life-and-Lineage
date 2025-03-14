@@ -8,8 +8,51 @@ import { PlayerCharacter } from "../entities/character";
 import { Attack } from "../entities/attack";
 import { useIsFocused } from "@react-navigation/native";
 import { Spell } from "../entities/spell";
-import { AnimationOptions, EnemyImageMap } from "@/utility/enemyHelpers";
-import { useAnimatedImage } from "@shopify/react-native-skia";
+import { AnimationOptions } from "@/utility/enemyHelpers";
+import { type Condition } from "@/entities/conditions";
+import { VFXImageMap } from "@/utility/vfxmapping";
+import { FPS } from "@/stores/EnemyAnimationStore";
+
+const attackHandler = ({
+  attackResults,
+  user,
+}: {
+  attackResults: {
+    attack?: Attack;
+    result: {
+      target: Enemy | PlayerCharacter | Minion;
+      result: AttackUse;
+      debuffs?: Condition[];
+      healed?: number;
+      damages?: {
+        physical: number;
+        fire: number;
+        cold: number;
+        lightning: number;
+        poison: number;
+        total: number;
+        sanity?: number;
+      };
+    }[];
+    buffs?: Condition[];
+    logString: string;
+  };
+  user: PlayerCharacter | Enemy | Minion;
+}) => {
+  if (attackResults.buffs) {
+    attackResults.buffs.forEach((buff) => user.addCondition(buff));
+  }
+  for (const res of attackResults.result) {
+    res.target.damageHealth({
+      damage: res.damages?.total ?? 0,
+      attackerId: user.id,
+    });
+    res.target.damageSanity(res.damages?.sanity);
+    if (res.debuffs) {
+      res.debuffs.forEach((debuff) => res.target.addCondition(debuff));
+    }
+  }
+};
 
 export const useEnemyManagement = () => {
   const root = useRootStore();
@@ -89,8 +132,9 @@ export const useEnemyManagement = () => {
 
     suppliedMinions.forEach((minion, index) => {
       wait(1000 * index).then(() => {
-        const res = minion.takeTurn({ target: playerState });
-        dungeonStore.addLog("(minion) " + res.logString);
+        const results = minion.takeTurn({ target: playerState });
+        attackHandler({ attackResults: results, user: minion });
+        dungeonStore.addLog("(minion) " + results.logString);
       });
     });
   };
@@ -100,30 +144,24 @@ export const useEnemyManagement = () => {
       wait(1000 * index).then(() => {
         if (!enemyDeathHandler(enemy)) {
           const enemyAttackRes = enemy.takeTurn({ player: playerState! });
+          const animStore = enemyStore.getAnimationStore(enemy.id);
+          let animationForAttack: AnimationOptions = "attack_1";
+          if (enemyAttackRes.attack && enemyAttackRes.attack.name) {
+            animationForAttack =
+              (enemy.animationStrings[
+                enemyAttackRes.attack.name
+              ] as AnimationOptions) ?? "attack_1";
+          }
+
+          setTimeout(
+            () => {
+              attackHandler({ attackResults: enemyAttackRes, user: enemy });
+            },
+            animStore?.movementDuration ?? 500,
+          );
+
+          //TODO: better handle multi-target
           for (const res of enemyAttackRes.result) {
-            const animStore = enemyStore.getAnimationStore(enemy.id);
-            let animationForAttack: AnimationOptions = "attack_1";
-
-            if (enemyAttackRes.attack && enemyAttackRes.attack.name) {
-              animationForAttack =
-                (enemy.animationStrings[
-                  enemyAttackRes.attack.name
-                ] as AnimationOptions) ?? "attack_1";
-            }
-
-            setTimeout(
-              () => {
-                if (res.damages) {
-                  playerState?.damageHealth({
-                    damage: res.damages.total,
-                    attackerId: enemy.id,
-                  });
-                  playerState?.damageSanity(res.damages.sanity);
-                }
-              },
-              animStore?.movementDuration ?? 500,
-            );
-
             switch (res.result) {
               case AttackUse.success:
                 animStore?.addToAnimationQueue(
@@ -176,8 +214,10 @@ export const useCombatActions = () => {
     (callback: () => void) => {
       const minions = playerState?.minionsAndPets;
 
-      minions?.forEach((minion) => {
+      minions?.forEach(async (minion, idx) => {
+        await wait(1000 * idx);
         const result = minion.takeTurn({ target: enemyStore.enemies });
+        attackHandler({ attackResults: result, user: minion });
         for (const res of result.result) {
           const animStore = enemyStore.getAnimationStore(res.target.id);
           switch (res.result) {
@@ -206,7 +246,9 @@ export const useCombatActions = () => {
   const handleAttackResult = useCallback(
     (attackOrSpell: Attack | Spell, targets: (Enemy | Minion)[]) => {
       if (attackOrSpell instanceof Attack) {
-        const { result, logString } = attackOrSpell.use({ targets });
+        const { result, logString, buffs } = attackOrSpell.use({ targets });
+
+        buffs?.forEach((buff) => playerState?.addCondition(buff));
         for (const res of result) {
           const animStore = enemyStore.getAnimationStore(res.target.id);
           switch (res.result) {
@@ -243,10 +285,28 @@ export const useCombatActions = () => {
         return logString;
       }
 
-      const { logString } = attackOrSpell.use({
+      const { logString, targetResults, buffs } = attackOrSpell.use({
         targets,
         user: playerState!,
       });
+
+      let timeoutDuration = 500;
+      if (attackOrSpell.animation && "sprite" in attackOrSpell.animation) {
+        const set = VFXImageMap[attackOrSpell.animation.sprite];
+        timeoutDuration = set.frames * (1000 / FPS);
+      }
+
+      buffs?.forEach((buff) => playerState?.addCondition(buff));
+
+      for (const res of targetResults) {
+        res.target.damageHealth({
+          damage: res.damage ?? 0,
+          attackerId: playerState!.id,
+        });
+        res.target.damageSanity(res.damage);
+        res.debuffs.forEach((debuff) => res.target.addCondition(debuff));
+      }
+
       return logString;
     },
     [playerState],
@@ -299,12 +359,11 @@ export const useCombatActions = () => {
         }, 500);
       };
 
-      // If there's an animation, set it up and continue after it completes
       if (attackOrSpell.animation) {
+        console.log("setting animation");
         playerAnimationStore
-          .setAnimation(attackOrSpell.animation, target.id)
+          .setAnimation({ set: attackOrSpell.animation, enemyIDs: [target.id] })
           .then(() => {
-            // Animation completed, continue with attack flow
             continueAttackFlow();
           });
       } else {

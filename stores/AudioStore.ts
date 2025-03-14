@@ -9,6 +9,7 @@ import { storage } from "../utility/functions/storage";
 import { RootStore } from "./RootStore";
 import { Audio } from "expo-av";
 import { Sound } from "expo-av/build/Audio/Sound";
+import * as Sentry from "@sentry/react-native";
 
 const AMBIENT_TRACKS = {
   shops: require("../assets/music/shops.m4a"),
@@ -32,6 +33,10 @@ const DEFAULT_FADE = 1000;
 const FADE_INTERVAL = 50;
 const DEFAULT_FADE_STEPS = 20;
 const GLOBAL_MULT = 0.8;
+
+const AUDIO_FOCUS_ERROR = "expo.modules.av.AudioFocusNotAcquiredException";
+const BACKGROUND_ERROR_MESSAGE =
+  "This experience is currently in the background";
 
 export class AudioStore {
   root: RootStore;
@@ -139,6 +144,7 @@ export class AudioStore {
       await this.loadAudioResources();
     } catch (error) {
       console.error("Failed to initialize audio:", error);
+      this.cleanup();
     }
   }
 
@@ -636,12 +642,114 @@ export class AudioStore {
     }
   }
 
-  cleanup() {
-    this.activeTransition = { trackIn: null, trackOut: null };
+  private isBackgroundError(error: any): boolean {
+    if (!error) return false;
 
-    if (this.currentTrack) {
-      this.currentTrack.sound.stopAsync().catch(console.error);
+    // Check for the specific error message about audio focus
+    const errorMessage = error.message || error.toString();
+    return (
+      (typeof errorMessage === "string" &&
+        (errorMessage.includes(AUDIO_FOCUS_ERROR) ||
+          errorMessage.includes(BACKGROUND_ERROR_MESSAGE))) ||
+      error.name === AUDIO_FOCUS_ERROR
+    );
+  }
+
+  cleanup() {
+    try {
+      this.activeTransition = { trackIn: null, trackOut: null };
+
+      // Clean up all sound objects
+      const cleanupPromises: Promise<any>[] = [];
+
+      if (this.currentTrack) {
+        cleanupPromises.push(
+          this.currentTrack.sound.stopAsync().catch((e) => {
+            if (!this.isBackgroundError(e)) {
+              this.logError(
+                `Failed to stop current track: ${this.currentTrack?.name}`,
+                e,
+              );
+            }
+          }),
+        );
+      }
+
+      // Unload all ambient tracks
+      this.ambientPlayers.forEach((sound, id) => {
+        cleanupPromises.push(
+          sound.unloadAsync().catch((e) => {
+            if (!this.isBackgroundError(e)) {
+              this.logError(`Failed to unload ambient track: ${id}`, e);
+            }
+          }),
+        );
+      });
+
+      // Unload all combat tracks
+      this.combatPlayers.forEach((sound, id) => {
+        cleanupPromises.push(
+          sound.unloadAsync().catch((e) => {
+            if (!this.isBackgroundError(e)) {
+              this.logError(`Failed to unload combat track: ${id}`, e);
+            }
+          }),
+        );
+      });
+
+      // Unload all sound effects
+      this.soundEffects.forEach((sound, id) => {
+        cleanupPromises.push(
+          sound.unloadAsync().catch((e) => {
+            if (!this.isBackgroundError(e)) {
+              this.logError(`Failed to unload sound effect: ${id}`, e);
+            }
+          }),
+        );
+      });
+
+      // Clear maps
+      this.ambientPlayers.clear();
+      this.combatPlayers.clear();
+      this.soundEffects.clear();
+
+      runInAction(() => {
+        this.currentTrack = null;
+        this.isAmbientLoaded = false;
+        this.isCombatLoaded = false;
+        this.isSoundEffectsLoaded = false;
+      });
+
+      Promise.all(cleanupPromises).catch((e) => {
+        if (!this.isBackgroundError(e)) {
+          this.logError("Error during audio cleanup", e);
+        }
+      });
+    } catch (error) {
+      if (!this.isBackgroundError(error)) {
+        this.logError("Error during audio cleanup", error);
+      }
     }
-    this.currentTrack = null;
+  }
+
+  private logError(message: string, error: any) {
+    console.warn(message, error);
+
+    Sentry.withScope((scope) => {
+      scope.setTag("component", "AudioStore");
+
+      scope.setContext("audioState", {
+        isAmbientLoaded: this.isAmbientLoaded,
+        isCombatLoaded: this.isCombatLoaded,
+        isSoundEffectsLoaded: this.isSoundEffectsLoaded,
+        currentTrack: this.currentTrack?.name || "none",
+      });
+
+      if (error instanceof Error) {
+        Sentry.captureException(error);
+      } else {
+        Sentry.captureMessage(`${message}: ${JSON.stringify(error)}`);
+      }
+    });
   }
 }

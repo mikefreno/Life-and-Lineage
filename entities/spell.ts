@@ -8,6 +8,7 @@ import {
   StringToMastery,
 } from "../utility/types";
 import { PlayerCharacter } from "./character";
+import { type Condition } from "./conditions";
 import { Enemy, Minion } from "./creatures";
 
 interface SpellFields {
@@ -141,9 +142,24 @@ export class Spell {
   }: {
     targets: (PlayerCharacter | Enemy | Minion)[];
     user: PlayerCharacter;
-  }): { logString: string } {
+  }): {
+    logString: string;
+    result: "success" | "failure";
+    buffs?: Condition[];
+    targetResults: {
+      target: PlayerCharacter | Enemy | Minion;
+      damage: number;
+      sanityDamage: number;
+      debuffs: Condition[];
+      healed: number;
+    }[];
+  } {
     if (!this.canBeUsed(user)) {
-      return { logString: "The spell fizzles out" };
+      return {
+        logString: "The spell fizzles out",
+        result: "failure",
+        targetResults: [],
+      };
     }
 
     user.useMana(this.manaCost);
@@ -154,7 +170,7 @@ export class Spell {
       target.damageSanity(this.flatSanityDamage);
 
       // Handle debuffs for this target
-      const debuffNames: string[] = [];
+      const debuffs: Condition[] = [];
       let amountHealed = 0;
 
       this.debuffs.forEach((debuff) => {
@@ -175,8 +191,7 @@ export class Spell {
           });
 
           if (newDebuff) {
-            debuffNames.push(newDebuff.name);
-            target.addCondition(newDebuff);
+            debuffs.push(newDebuff);
           }
         }
       });
@@ -185,13 +200,13 @@ export class Spell {
         target,
         damage: finalDamage,
         sanityDamage: this.flatSanityDamage,
-        debuffNames,
+        debuffs,
         healed: amountHealed,
       };
     });
 
     // Handle buffs (only once for the caster)
-    const buffNames: string[] = [];
+    const buffs: Condition[] = [];
     this.buffs.forEach((buff) => {
       if (buff !== "consume blood orb") {
         const newBuff = createBuff({
@@ -203,8 +218,7 @@ export class Spell {
           applierID: user.id,
         });
         if (newBuff) {
-          buffNames.push(newBuff.name);
-          user.addCondition(newBuff);
+          buffs.push(newBuff);
         }
       }
     });
@@ -230,9 +244,11 @@ export class Spell {
     wait(1000).then(() => user.endTurn());
 
     return {
+      result: "success",
+      targetResults,
       logString: this.buildMultiTargetLog({
         targetResults,
-        buffNames,
+        buffs,
         minionSpecies,
         user,
       }),
@@ -241,7 +257,7 @@ export class Spell {
 
   private buildMultiTargetLog({
     targetResults,
-    buffNames,
+    buffs,
     minionSpecies,
     user,
   }: {
@@ -249,10 +265,10 @@ export class Spell {
       target: PlayerCharacter | Enemy | Minion;
       damage: number;
       sanityDamage: number;
-      debuffNames: string[];
+      debuffs: Condition[];
       healed: number;
     }>;
-    buffNames: string[];
+    buffs: Condition[];
     minionSpecies: string[];
     user: PlayerCharacter | Enemy | Minion;
   }): string {
@@ -276,10 +292,12 @@ export class Spell {
         returnString += `  • Caused ${result.sanityDamage} sanity damage to ${targetString}.\n`;
       }
 
-      if (result.debuffNames.length > 0) {
+      if (result.debuffs.map((debuff) => debuff.name).length > 0) {
         returnString += `  • ${toTitleCase(
           targetString,
-        )} was afflicted with: ${result.debuffNames.join(", ")}.\n`;
+        )} was afflicted with: ${result.debuffs
+          .map((debuff) => debuff.name)
+          .join(", ")}.\n`;
       }
 
       if (result.healed > 0) {
@@ -287,8 +305,10 @@ export class Spell {
       }
     });
 
-    if (buffNames.length > 0) {
-      returnString += `  • ${userString} gained: ${buffNames.join(", ")}.\n`;
+    if (buffs.length > 0) {
+      returnString += `  • ${userString} gained: ${buffs
+        .map((buff) => buff.name)
+        .join(", ")}.\n`;
     }
 
     if (minionSpecies.length > 0) {

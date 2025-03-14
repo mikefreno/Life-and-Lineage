@@ -14,7 +14,7 @@ export class PlayerAnimationStore {
   root: RootStore;
 
   animationSet: PlayerAnimationSet | null = null;
-  target: string | null = null;
+  targetIDs: string[] | null = null;
   screenShaker: ((duration?: number) => void) | null = null;
   animationEndCallBack: (() => void) | null = null;
   animationPromiseResolver: (() => void) | null = null;
@@ -78,11 +78,16 @@ export class PlayerAnimationStore {
     this.textString = message;
   }
 
-  setAnimation(set: PlayerAnimationSet, enemyID: string): Promise<void> {
+  setAnimation({
+    set,
+    enemyIDs,
+  }: {
+    set: PlayerAnimationSet;
+    enemyIDs: string[];
+  }): Promise<void> {
     this.animationSet = set;
-    this.target = enemyID;
+    this.targetIDs = enemyIDs;
 
-    // Return a promise that will be resolved when the animation completes
     return new Promise<void>((resolve) => {
       this.animationPromiseResolver = resolve;
     });
@@ -90,7 +95,7 @@ export class PlayerAnimationStore {
 
   clearAnimation() {
     this.animationSet = null;
-    this.target = null;
+    this.targetIDs = null;
 
     // Resolve the promise if it exists
     if (this.animationPromiseResolver) {

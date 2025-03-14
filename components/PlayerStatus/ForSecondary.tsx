@@ -6,7 +6,7 @@ import { Coins, SquarePlus } from "@/assets/icons/SVGIcons";
 import { Text } from "@/components/Themed";
 import { useRootStore } from "@/hooks/stores";
 import { useStatChanges, useVibration } from "@/hooks/generic";
-import { normalize, normalizeLineHeight, useStyles } from "@/hooks/styles";
+import { useStyles } from "@/hooks/styles";
 import {
   ChangePopUp,
   ColorAndPlatformDependantBlur,
@@ -46,7 +46,7 @@ const PlayerStatusForSecondary = observer(() => {
           >
             <View
               style={{
-                height: normalizeLineHeight(16),
+                height: uiStore.expansionPadding,
                 ...styles.rowCenter,
               }}
             >

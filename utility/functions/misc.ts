@@ -31,6 +31,7 @@ import { Enemy } from "../../entities/creatures";
 import { FPS, MAX_ANIMATION_DURATION } from "@/stores/EnemyAnimationStore";
 
 export const AccelerationCurves = {
+  none: (t: number) => t,
   linear: (t: number) => 1 + t,
   quadratic: (t: number) => 1 + Math.pow(t, 2),
   cubic: (t: number) => 1 + Math.pow(t, 3),
@@ -452,6 +453,8 @@ export const generateEnemyFromNPC = (character: Character) => {
     },
     sprite,
     attackPower,
+    attackStrings: ["stab"],
+    animationStrings: { stab: "attack_1" },
   });
 };
 

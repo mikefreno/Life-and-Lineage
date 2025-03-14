@@ -503,6 +503,7 @@ export class Creature {
     result: {
       target: Enemy | PlayerCharacter | Minion;
       result: AttackUse;
+      debuffs?: Condition[];
       healed?: number;
       damages?: {
         physical: number;
@@ -514,6 +515,7 @@ export class Creature {
         sanity?: number;
       };
     }[];
+    buffs?: Condition[];
     logString: string;
   } {
     const execute = this.conditions.find((cond) => cond.name == "execute");
@@ -526,7 +528,7 @@ export class Creature {
               target: enemy,
               result: AttackUse.stunned,
             }))
-          : [{ target: target.id, result: AttackUse.stunned }],
+          : [{ target: target, result: AttackUse.stunned }],
         logString: `${toTitleCase(this.creatureSpecies)} was executed!`,
       };
     }
@@ -544,7 +546,7 @@ export class Creature {
               target: enemy,
               result: AttackUse.stunned,
             }))
-          : [{ target: target.id, result: AttackUse.stunned }],
+          : [{ target: target, result: AttackUse.stunned }],
         logString: `${toTitleCase(this.creatureSpecies)} was stunned!`,
       };
     }
@@ -588,7 +590,7 @@ export class Creature {
               target: enemy,
               result: AttackUse.lowEnergy,
             }))
-          : [{ target: target.id, result: AttackUse.lowEnergy }],
+          : [{ target: target, result: AttackUse.lowEnergy }],
         logString: `${toTitleCase(this.creatureSpecies)} passed (low energy)!`,
       };
     }

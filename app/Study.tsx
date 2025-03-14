@@ -1,9 +1,10 @@
 import { Text, ThemedView } from "../components/Themed";
-import { Pressable, Image, View, ScrollView } from "react-native";
+import { Pressable, View, ScrollView } from "react-native";
 import { AccelerationCurves, toTitleCase } from "../utility/functions/misc";
 import ProgressBar from "../components/ProgressBar";
 import SpellDetails from "../components/SpellDetails";
 import GenericRaisedButton from "../components/GenericRaisedButton";
+import { Image } from "expo-image";
 import {
   Element,
   ElementToString,
@@ -43,12 +44,12 @@ const StudyButton = React.memo(
       () => null,
       {
         minHoldTime: 350,
-        maxSpeed: 10,
-        accelerationCurve: AccelerationCurves.linear,
+        maxSpeed: 2,
+        accelerationCurve: AccelerationCurves.none,
         action: () => onStudy(studyState),
         minActionAmount: 1,
         maxActionAmount: 50,
-        debounceTime: 50,
+        debounceTime: 100,
       },
     );
 
@@ -235,22 +236,17 @@ const LearningSpellScreen = observer(() => {
             }}
           >
             <View
-              style={[
-                styles.my2,
-                {
-                  maxHeight: 96,
-                  flexWrap: "wrap",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                },
-              ]}
+              style={{
+                flexWrap: "wrap",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
               {filteredBooks.map((item) => (
                 <Pressable
                   key={item.id}
                   style={[
-                    styles.m2,
                     radius.lg,
                     styles.columnCenter,
                     { backgroundColor: "#a1a1aa" },
@@ -261,11 +257,21 @@ const LearningSpellScreen = observer(() => {
                   ]}
                   onPress={() => setSelectedBook(item)}
                 >
-                  <View style={[styles.p2]}>
+                  <View
+                    style={[
+                      styles.inventoryItemContainer,
+                      {
+                        height: uiStore.itemBlockSize,
+                        width: uiStore.itemBlockSize,
+                      },
+                    ]}
+                  >
                     <Image
                       source={item.getItemIcon()}
-                      width={uiStore.iconSizeSmall}
-                      height={uiStore.iconSizeSmall}
+                      style={{
+                        width: uiStore.itemBlockSize * 0.65,
+                        height: uiStore.itemBlockSize * 0.65,
+                      }}
                     />
                   </View>
                 </Pressable>

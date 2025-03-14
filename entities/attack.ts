@@ -16,7 +16,6 @@ import {
 import AttackDetails from "../components/AttackDetails";
 import { Condition } from "./conditions";
 import { useStyles } from "../hooks/styles";
-import { runInAction } from "mobx";
 
 /**
  * Interface for the fields of an attack.
@@ -134,13 +133,8 @@ export class Attack {
     return created;
   }
 
-  private addBuffs() {
-    this.buffs.forEach((buff) => this.user.addCondition(buff));
-  }
-
   /**
-   * TODO: Update to use new damage system (damage types)
-   * This is more complicated than buffs, due to this being dependent on both a dice roll and the target's stats.
+   * This methods purpose is for what is possible, the method `rollDebuffs` actually goes about rolling for the debuffs and returning them
    * @param target - The target of the attack, which can be a PlayerCharacter, Enemy, or Minion
    */
   public debuffs({ target }: { target: Enemy | PlayerCharacter | Minion }) {
@@ -179,35 +173,31 @@ export class Attack {
     return created;
   }
 
-  private addDebuffs({
+  private rollDebuffs({
     target,
     actualizedHits,
   }: {
     target: Enemy | PlayerCharacter | Minion;
     actualizedHits: number;
   }) {
-    const debuffNames: string[] = [];
+    const debuffs: Condition[] = [];
     let amountHealed = 0;
     this.debuffs({ target }).forEach((debuff) => {
       if (rollD20() > 20 - debuff.chance * 20) {
         if (debuff.debuff) {
-          debuffNames.push(debuff.debuff.name);
-          runInAction(() => target.addCondition(debuff.debuff));
+          debuffs.push(debuff.debuff);
+          //runInAction(() => target.addCondition(debuff.debuff)); // move to combat hooks to adjust for timing
         } else if (debuff.perHitHeal) {
           const healAmount = debuff.perHitHeal * actualizedHits;
           amountHealed += healAmount;
 
-          if (!(this.user instanceof PlayerCharacter)) {
-            wait(500).then(() => {
-              this.user.restoreHealth(healAmount);
-            });
-          } else {
+          wait(500).then(() => {
             this.user.restoreHealth(healAmount);
-          }
+          });
         }
       }
     });
-    return { debuffNames, amountHealed };
+    return { debuffs, amountHealed };
   }
 
   public damageBasedOnWeapon(user: PlayerCharacter, weaponDamage: number) {
@@ -255,6 +245,7 @@ export class Attack {
         sanity?: number;
       };
     }[];
+    buffs?: Condition[];
     logString: string;
   } {
     if (!this.canBeUsed) {
@@ -284,6 +275,7 @@ export class Attack {
       this.user.expendEnergy(this.energyCost);
     }
 
+    // everything applied to the target
     const targetResults = targets.map((target) => {
       const { hitChanceMultiplier, damageFlat, damageMult } =
         getConditionEffectsOnAttacks({
@@ -318,19 +310,6 @@ export class Attack {
         }
 
         let sanityDmg = this.flatSanityDamage;
-        const debuffStrings: string[] = [];
-        if (
-          this.user instanceof PlayerCharacter &&
-          !!this.user.equipment.mainHand.activePoison
-        ) {
-          const effect = this.user.equipment.mainHand.consumePoison()!;
-          if (effect instanceof Condition) {
-            target.addCondition(effect);
-            debuffStrings.push(effect.name);
-          } else {
-            // TODO: handle poison effects
-          }
-        }
 
         const thornsIshDamage = getConditionDamageToAttacker(
           target.conditions,
@@ -343,10 +322,23 @@ export class Attack {
           });
         }
 
-        const { debuffNames, amountHealed } = this.addDebuffs({
+        const { debuffs, amountHealed } = this.rollDebuffs({
           target,
           actualizedHits,
         });
+
+        if (
+          this.user instanceof PlayerCharacter &&
+          !!this.user.equipment.mainHand.activePoison
+        ) {
+          const effect = this.user.equipment.mainHand.consumePoison()!;
+          if (effect instanceof Condition) {
+            target.addCondition(effect);
+            debuffs.push(effect);
+          } else {
+            // TODO: handle poison effects
+          }
+        }
 
         return {
           target,
@@ -360,7 +352,7 @@ export class Attack {
             total: finalDamage,
             sanity: sanityDmg,
           },
-          debuffs: [...debuffStrings, ...debuffNames],
+          debuffs: debuffs,
           healed: amountHealed,
         };
       }
@@ -370,9 +362,6 @@ export class Attack {
         result: AttackUse.miss,
       };
     });
-
-    // Apply buffs only once for the entire attack
-    this.addBuffs();
 
     // Handle summons
     let minionSpecies: string[] = [];
@@ -385,10 +374,11 @@ export class Attack {
       });
     }
 
+    const buffs = this.buffs;
     // Build combined log string
     const logString = this.buildMultiTargetLog({
       targetResults,
-      buffNames: this.buffStrings,
+      buffs,
       minionSpecies,
     });
 
@@ -398,11 +388,14 @@ export class Attack {
     }
 
     return {
-      result: targetResults.map(({ target, result, damages }) => ({
-        target,
-        result,
-        damages,
-      })),
+      result: targetResults.map(
+        ({ target, result, damages, healed, debuffs }) => ({
+          target,
+          result,
+          damages,
+        }),
+      ),
+      buffs,
       logString,
     };
   }
@@ -493,7 +486,7 @@ export class Attack {
 
   private buildMultiTargetLog({
     targetResults,
-    buffNames,
+    buffs,
     minionSpecies,
   }: {
     targetResults: Array<{
@@ -508,10 +501,10 @@ export class Attack {
         total: number;
       };
       sanityDamage?: number;
-      debuffs?: string[];
+      debuffs?: Condition[];
       healed?: number;
     }>;
-    buffNames: string[];
+    buffs: Condition[];
     minionSpecies: string[];
   }): string {
     let returnString = `${this.userNameReferenceForLog} used ${toTitleCase(
@@ -547,7 +540,9 @@ export class Attack {
         }
 
         if (result.debuffs?.length) {
-          returnString += `    - Applied: ${result.debuffs.join(", ")}\n`;
+          returnString += `    - Applied: ${result.debuffs
+            .map((debuff) => debuff.name)
+            .join(", ")}\n`;
         }
 
         if (result.healed) {
@@ -558,8 +553,10 @@ export class Attack {
       }
     });
 
-    if (buffNames.length > 0) {
-      returnString += `  • Gained: ${buffNames.join(", ")}.\n`;
+    if (buffs.length > 0) {
+      returnString += `  • Gained: ${buffs
+        .map((buff) => buff.name)
+        .join(", ")}.\n`;
     }
 
     if (minionSpecies.length > 0) {

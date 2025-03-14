@@ -948,8 +948,8 @@ export class PlayerCharacter extends Character {
     }
 
     if (this.unAllocatedSkillPoints >= amount) {
-      if (Object.values(Attribute).includes(to as Attribute)) {
-        this.allocatedSkillPoints[to as Attribute] += amount;
+      if (Object.values(Attribute).includes(to)) {
+        this.allocatedSkillPoints[to] += amount;
         this.unAllocatedSkillPoints -= amount;
       }
     }
@@ -1088,7 +1088,8 @@ export class PlayerCharacter extends Character {
       this.conditions,
     );
     return (
-      this.baseManaRegen * manaRegenMult +
+      this.baseManaRegen +
+      this.allocatedSkillPoints[Attribute.manaRegen] * manaRegenMult +
       (this.equipmentStats.get(Modifier.ManaRegen) ?? 0) +
       manaRegenFlat
     );

@@ -40,7 +40,7 @@ export const LOADING_TIPS: string[] = [
 
 export const BASE_WIDTH = 400;
 
-export const SCREEN_TRANSITION_TIMING = 200;
+export const SCREEN_TRANSITION_TIMING = 250;
 
 export const TABS_PADDING = 8;
 
@@ -301,7 +301,11 @@ export default class UIStore {
     }
   }
   get playerStatusHeightSecondary() {
-    return this.playerStatusHeight + (this.insets?.bottom ?? 0);
+    return (
+      this.playerStatusHeight +
+      (this.insets?.bottom ?? 0) +
+      this.expansionPadding
+    );
   }
 
   get bottomBarHeight() {
@@ -378,7 +382,7 @@ export default class UIStore {
   setPlayerStatusTop(pY: number) {
     const mod = this.playerStatusIsCompact ? 0 : this.expansionPadding;
     if (!this.playerStatusTop) {
-      this.playerStatusTop = pY - mod;
+      this.playerStatusTop = pY + mod;
     }
   }
 

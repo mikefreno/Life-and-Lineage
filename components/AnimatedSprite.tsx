@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View } from "react-native";
 import { Canvas, useAnimatedImage, Image } from "@shopify/react-native-skia";
-import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import Animated, {
+  SharedValue,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 import {
   AnimationOptions,
   AnimationSet,
@@ -94,7 +97,7 @@ const SingleAnimationSprite = React.memo(
         if (!animatedImage || !isActive || !isMounted.current) return;
 
         try {
-          // Special handling for spawn animation - hold first frame for 1 second
+          // Special handling for spawn animation (short hold)
           if (
             animationOption === "spawn" &&
             frameRef.current === 0 &&
@@ -115,7 +118,7 @@ const SingleAnimationSprite = React.memo(
               } catch (error) {
                 console.error("Error in spawn animation first frame:", error);
               }
-            }, 1000);
+            }, 350);
             return;
           }
 
@@ -270,7 +273,13 @@ const SpriteAnimationManager = React.memo(
 );
 
 export const AnimatedSprite = observer(
-  ({ enemy }: { enemy: Enemy | Minion | undefined }) => {
+  ({
+    enemy,
+    glow,
+  }: {
+    enemy: Enemy | Minion | undefined;
+    glow?: SharedValue<number>;
+  }) => {
     const spriteContainerRef = useRef<View>(null);
     const headerHeight = useHeaderHeight();
     const measurementAttempts = useRef(0);
@@ -509,6 +518,19 @@ export const AnimatedSprite = observer(
       };
     });
 
+    // Reanimated style for glow effect with padding to prevent edge visibility
+    const glowStyle = useAnimatedStyle(() => {
+      if (!glow) return {};
+
+      return {
+        shadowColor: "#7fff00",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: glow.value,
+        shadowRadius: 10, // Reduced shadow radius
+        elevation: glow.value * 8,
+      };
+    });
+
     return (
       <View
         style={{
@@ -517,29 +539,39 @@ export const AnimatedSprite = observer(
           justifyContent: "center",
         }}
       >
-        <Animated.View
-          ref={spriteContainerRef}
-          onLayout={handleLayout}
-          style={[
-            {
-              width: currentDimensions.width,
-              height: currentDimensions.height,
-              overflow: "hidden",
-            },
-            animatedContainerStyle,
-          ]}
+        <View
+          style={{
+            padding: 20,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
-          <SpriteAnimationManager
-            spriteSet={enemyData.sets}
-            currentAnimation={activeSpriteAnimationString}
-            width={currentDimensions.width}
-            height={currentDimensions.height}
-            onAnimationComplete={handleAnimationComplete}
-            isLooping={shouldLoop}
-            onFrameCountReady={handleFrameCountReady}
-            key={`${enemy?.id}`}
-          />
-        </Animated.View>
+          <Animated.View
+            ref={spriteContainerRef}
+            onLayout={handleLayout}
+            style={[
+              {
+                width: currentDimensions.width,
+                height: currentDimensions.height,
+                overflow: "hidden",
+              },
+              animatedContainerStyle,
+              glowStyle,
+            ]}
+          >
+            <SpriteAnimationManager
+              spriteSet={enemyData.sets}
+              currentAnimation={activeSpriteAnimationString}
+              width={currentDimensions.width}
+              height={currentDimensions.height}
+              onAnimationComplete={handleAnimationComplete}
+              isLooping={shouldLoop}
+              onFrameCountReady={handleFrameCountReady}
+              key={`${enemy?.id}`}
+            />
+          </Animated.View>
+        </View>
+
         {animationStore && animationStore.textString && (
           <Animated.View style={{ position: "absolute" }}>
             <Animated.Text

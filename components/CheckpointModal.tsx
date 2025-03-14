@@ -391,7 +391,6 @@ const CheckpointModal = ({
     >
       <ThemedView
         style={{
-          width: "83.3333%",
           zIndex: 0,
           maxHeight: "90%",
           padding: "4%",

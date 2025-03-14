@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, TouchableWithoutFeedback, View } from "react-native";
-import { Text, ThemedView } from "@/components/Themed";
+import { Text } from "@/components/Themed";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useIsFocused } from "@react-navigation/native";

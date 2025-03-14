@@ -20,6 +20,7 @@ export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
   const { enemyAnimationStores, enemyAndPosList } = useMemo(() => {
     const stores: EnemyAnimationStore[] = [];
     const positionalList = [];
+
     for (const enemy of enemyStore.enemies) {
       const store = enemyStore.getAnimationStore(enemy.id);
       if (store) {
@@ -32,8 +33,14 @@ export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
         }
       }
     }
+
     return { enemyAnimationStores: stores, enemyAndPosList: positionalList };
-  }, [enemyStore.animationStoreMap.entries, enemyStore.animationStoreMap.keys]);
+  }, [
+    enemyStore.enemies,
+    enemyStore.animationStoreMap.entries,
+    enemyStore.animationStoreMap.keys,
+    enemyStore.midpointUpdater,
+  ]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -104,11 +111,23 @@ const PlayerVFX = observer(
       width: 0,
       height: 0,
     });
+
     const [animationPosition, setAnimationPosition] = useState({ x: 0, y: 0 });
     const [isAnimating, setIsAnimating] = useState(false);
     const [opacity, setOpacity] = useState(0);
     const [rotation, setRotation] = useState(0);
     const [scale, setScale] = useState(1);
+
+    // Track multiple animations for multi-target effects
+    const [targetAnimations, setTargetAnimations] = useState<
+      Array<{
+        position: { x: number; y: number };
+        opacity: number;
+        rotation: number;
+        scale: number;
+        id: string;
+      }>
+    >([]);
 
     const animatedImage = useAnimatedImage(sourceImage);
     const frameTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -130,6 +149,7 @@ const PlayerVFX = observer(
       setIsAnimating(false);
       setCurrentFrame(0);
       setOpacity(0);
+      setTargetAnimations([]);
 
       if (playerAnimationStore.animationPromiseResolver) {
         playerAnimationStore.animationPromiseResolver();
@@ -143,67 +163,76 @@ const PlayerVFX = observer(
     }, [playerAnimationStore, animatedImage]);
 
     useEffect(() => {
+      console.log("Animation set changed:", playerAnimationStore.animationSet);
+      console.log("Target IDs:", playerAnimationStore.targetIDs);
+      console.log("Enemy positions:", enemyPositions);
+    }, [
+      playerAnimationStore.animationSet,
+      playerAnimationStore.targetIDs,
+      enemyPositions,
+    ]);
+
+    useEffect(() => {
       if (!playerAnimationStore.animationSet || enemyPositions.length === 0)
         return;
 
-      let targetPos: { x: number; y: number };
+      console.log(playerAnimationStore.animationSet);
+      const targetPositions: { x: number; y: number; id: string }[] = [];
+
+      if (
+        playerAnimationStore.targetIDs &&
+        playerAnimationStore.targetIDs.length > 0
+      ) {
+        // Find positions for all target IDs
+        for (const targetID of playerAnimationStore.targetIDs) {
+          const targetEnemy = enemyPositions.find(
+            (e) => e.enemyID === targetID,
+          );
+
+          if (targetEnemy) {
+            targetPositions.push({
+              ...targetEnemy.positionMidPoint,
+              id: targetEnemy.enemyID,
+            });
+          }
+        }
+      }
+
+      // If no valid targets found, use fallback position
+      if (targetPositions.length === 0) {
+        if (playerAnimationStore.animationSet.position === "self") {
+          targetPositions.push({ ...playerOrigin, id: "self" });
+        } else {
+          targetPositions.push({
+            x: uiStore.dimensions.width / 2,
+            y: uiStore.dimensions.height / 2,
+            id: "center",
+          });
+        }
+      }
+
+      // Calculate midpoint of all targets for area effects
+      const midpoint =
+        targetPositions.length > 1
+          ? {
+              x:
+                targetPositions.reduce((sum, pos) => sum + pos.x, 0) /
+                targetPositions.length,
+              y:
+                targetPositions.reduce((sum, pos) => sum + pos.y, 0) /
+                targetPositions.length,
+            }
+          : targetPositions[0];
 
       if ("glow" in playerAnimationStore.animationSet) {
         // Handle glow animation (simplified for now)
-        const position = playerAnimationStore.animationSet.position;
-
-        if (position === "enemy" && playerAnimationStore.target) {
-          const targetEnemy = enemyPositions.find(
-            (e) => e.enemyID === playerAnimationStore.target,
-          );
-
-          if (!targetEnemy) {
-            console.warn("Target enemy not found for glow animation");
-            completeAnimation();
-            return;
-          }
-
-          targetPos = targetEnemy.positionMidPoint;
-        } else if (position === "self") {
-          targetPos = playerOrigin;
-        } else {
-          targetPos = {
-            x: uiStore.dimensions.width / 2,
-            y: uiStore.dimensions.height / 2,
-          };
-        }
-
         setTimeout(() => {
           completeAnimation();
         }, 1000);
-
         return;
       }
 
       const animSet = playerAnimationStore.animationSet;
-      const position = animSet.position;
-
-      if (position === "enemy" && playerAnimationStore.target) {
-        const targetEnemy = enemyPositions.find(
-          (e) => e.enemyID === playerAnimationStore.target,
-        );
-
-        if (!targetEnemy) {
-          console.warn("Target enemy not found for animation");
-          completeAnimation();
-          return;
-        }
-
-        targetPos = targetEnemy.positionMidPoint;
-      } else if (position === "self") {
-        targetPos = playerOrigin;
-      } else {
-        targetPos = {
-          x: uiStore.dimensions.width / 2,
-          y: uiStore.dimensions.height / 2,
-        };
-      }
-
       const vfx = VFXImageMap[animSet.sprite];
 
       setSourceImage(vfx.source);
@@ -216,25 +245,30 @@ const PlayerVFX = observer(
       const frameDuration = animatedImage?.currentFrameDuration() ?? 100;
       const animationDuration = frames * frameDuration;
 
-      switch (animSet.style) {
-        case "missile":
-          const angle =
-            Math.atan2(
-              targetPos.y - playerOrigin.y,
-              targetPos.x - playerOrigin.x,
-            ) *
-            (180 / Math.PI);
-
-          setRotation(angle);
-          setAnimationPosition({
+      // Initialize animations for each target
+      if (targetPositions.length > 1 && animSet.style !== "span") {
+        // For multi-target effects (except span which is handled differently)
+        const initialAnimations = targetPositions.map((target) => ({
+          position: {
             x: playerOrigin.x - vfx.width / 2,
             y: playerOrigin.y - vfx.height / 2,
-          });
-          setOpacity(1);
-          setIsAnimating(true);
+          },
+          opacity: 0,
+          rotation:
+            Math.atan2(target.y - playerOrigin.y, target.x - playerOrigin.x) *
+            (180 / Math.PI),
+          scale: 1,
+          id: target.id,
+        }));
 
-          const steps = 20;
-          const stepDuration = animationDuration / steps;
+        setTargetAnimations(initialAnimations);
+        setIsAnimating(true);
+
+        // Animate each target separately
+        const steps = 20;
+        const stepDuration = animationDuration / steps;
+
+        const animateMultipleTargets = () => {
           let currentStep = 0;
 
           const moveStep = () => {
@@ -243,22 +277,38 @@ const PlayerVFX = observer(
             currentStep++;
             const progress = currentStep / steps;
 
-            const newX =
-              playerOrigin.x +
-              (targetPos.x - playerOrigin.x) * progress -
-              vfx.width / 2;
-            const newY =
-              playerOrigin.y +
-              (targetPos.y - playerOrigin.y) * progress -
-              vfx.height / 2;
+            const updatedAnimations = targetPositions.map((target, index) => {
+              const newX =
+                playerOrigin.x +
+                (target.x - playerOrigin.x) * progress -
+                vfx.width / 2;
+              const newY =
+                playerOrigin.y +
+                (target.y - playerOrigin.y) * progress -
+                vfx.height / 2;
 
-            setAnimationPosition({ x: newX, y: newY });
+              let currentOpacity = 1;
+              if (progress < 0.1) {
+                currentOpacity = progress * 10;
+              } else if (progress > 0.9) {
+                currentOpacity = (1 - progress) * 10;
+              }
 
-            if (progress < 0.1) {
-              setOpacity(progress * 10);
-            } else if (progress > 0.9) {
-              setOpacity((1 - progress) * 10);
-            }
+              return {
+                position: { x: newX, y: newY },
+                opacity: currentOpacity,
+                rotation:
+                  Math.atan2(
+                    target.y - playerOrigin.y,
+                    target.x - playerOrigin.x,
+                  ) *
+                  (180 / Math.PI),
+                scale: 1,
+                id: target.id,
+              };
+            });
+
+            setTargetAnimations(updatedAnimations);
 
             if (currentStep < steps) {
               positionTimerRef.current = setTimeout(moveStep, stepDuration);
@@ -266,71 +316,164 @@ const PlayerVFX = observer(
           };
 
           positionTimerRef.current = setTimeout(moveStep, stepDuration);
-          break;
+        };
 
-        case "static":
-          setAnimationPosition({
-            x: targetPos.x - vfx.width / 2,
-            y: targetPos.y - vfx.height / 2,
-          });
-          setRotation(0);
-          setOpacity(1);
-          setIsAnimating(true);
-          break;
+        animateMultipleTargets();
+      } else {
+        // For single target or area effects
+        switch (animSet.style) {
+          case "missile":
+            const angle =
+              Math.atan2(
+                midpoint.y - playerOrigin.y,
+                midpoint.x - playerOrigin.x,
+              ) *
+              (180 / Math.PI);
 
-        case "span":
-          const distance = Math.sqrt(
-            Math.pow(targetPos.x - playerOrigin.x, 2) +
-              Math.pow(targetPos.y - playerOrigin.y, 2),
-          );
+            setRotation(angle);
+            setAnimationPosition({
+              x: playerOrigin.x - vfx.width / 2,
+              y: playerOrigin.y - vfx.height / 2,
+            });
+            setOpacity(1);
+            setIsAnimating(true);
 
-          const spanAngle =
-            Math.atan2(
-              targetPos.y - playerOrigin.y,
-              targetPos.x - playerOrigin.x,
-            ) *
-            (180 / Math.PI);
+            const steps = 20;
+            const stepDuration = animationDuration / steps;
+            let currentStep = 0;
 
-          setAnimationPosition({
-            x: playerOrigin.x,
-            y: playerOrigin.y - vfx.height / 2,
-          });
-          setRotation(spanAngle);
-          setOpacity(1);
-          setIsAnimating(true);
+            const moveStep = () => {
+              if (!isMounted.current) return;
 
-          const scaleSteps = 20;
-          const scaleStepDuration = animationDuration / scaleSteps;
-          let currentScaleStep = 0;
+              currentStep++;
+              const progress = currentStep / steps;
 
-          const scaleStep = () => {
-            if (!isMounted.current) return;
+              const newX =
+                playerOrigin.x +
+                (midpoint.x - playerOrigin.x) * progress -
+                vfx.width / 2;
+              const newY =
+                playerOrigin.y +
+                (midpoint.y - playerOrigin.y) * progress -
+                vfx.height / 2;
 
-            currentScaleStep++;
-            const progress = currentScaleStep / scaleSteps;
+              setAnimationPosition({ x: newX, y: newY });
 
-            if (progress <= 0.5) {
-              setScale(progress * 2 * (distance / vfx.width));
+              if (progress < 0.1) {
+                setOpacity(progress * 10);
+              } else if (progress > 0.9) {
+                setOpacity((1 - progress) * 10);
+              }
+
+              if (currentStep < steps) {
+                positionTimerRef.current = setTimeout(moveStep, stepDuration);
+              }
+            };
+
+            positionTimerRef.current = setTimeout(moveStep, stepDuration);
+            break;
+
+          case "static":
+            setAnimationPosition({
+              x: midpoint.x - vfx.width / 2,
+              y: midpoint.y - vfx.height / 2,
+            });
+            setRotation(0);
+            setOpacity(1);
+            setIsAnimating(true);
+            break;
+
+          case "span":
+            // For span, we need to calculate the distance to the furthest target
+            let maxDistance = 0;
+            let spanAngle = 0;
+
+            if (targetPositions.length > 1) {
+              // Find the two targets that are furthest apart
+              let furthestPair = { dist: 0, angle: 0 };
+
+              for (let i = 0; i < targetPositions.length; i++) {
+                for (let j = i + 1; j < targetPositions.length; j++) {
+                  const dist = Math.sqrt(
+                    Math.pow(targetPositions[i].x - targetPositions[j].x, 2) +
+                      Math.pow(targetPositions[i].y - targetPositions[j].y, 2),
+                  );
+
+                  if (dist > furthestPair.dist) {
+                    furthestPair.dist = dist;
+                    furthestPair.angle =
+                      Math.atan2(
+                        targetPositions[j].y - targetPositions[i].y,
+                        targetPositions[j].x - targetPositions[i].x,
+                      ) *
+                      (180 / Math.PI);
+                  }
+                }
+              }
+
+              maxDistance = furthestPair.dist;
+              spanAngle = furthestPair.angle;
             } else {
-              setScale((1 - (progress - 0.5) * 2) * (distance / vfx.width));
-            }
-
-            if (progress < 0.2) {
-              setOpacity(progress * 5);
-            } else if (progress > 0.8) {
-              setOpacity((1 - progress) * 5);
-            }
-
-            if (currentScaleStep < scaleSteps) {
-              positionTimerRef.current = setTimeout(
-                scaleStep,
-                scaleStepDuration,
+              // Single target
+              maxDistance = Math.sqrt(
+                Math.pow(midpoint.x - playerOrigin.x, 2) +
+                  Math.pow(midpoint.y - playerOrigin.y, 2),
               );
-            }
-          };
 
-          positionTimerRef.current = setTimeout(scaleStep, scaleStepDuration);
-          break;
+              spanAngle =
+                Math.atan2(
+                  midpoint.y - playerOrigin.y,
+                  midpoint.x - playerOrigin.x,
+                ) *
+                (180 / Math.PI);
+            }
+
+            // Add some padding to ensure the span covers all targets
+            maxDistance *= 1.2;
+
+            setAnimationPosition({
+              x: playerOrigin.x,
+              y: playerOrigin.y - vfx.height / 2,
+            });
+            setRotation(spanAngle);
+            setOpacity(1);
+            setIsAnimating(true);
+
+            const scaleSteps = 20;
+            const scaleStepDuration = animationDuration / scaleSteps;
+            let currentScaleStep = 0;
+
+            const scaleStep = () => {
+              if (!isMounted.current) return;
+
+              currentScaleStep++;
+              const progress = currentScaleStep / scaleSteps;
+
+              if (progress <= 0.5) {
+                setScale(progress * 2 * (maxDistance / vfx.width));
+              } else {
+                setScale(
+                  (1 - (progress - 0.5) * 2) * (maxDistance / vfx.width),
+                );
+              }
+
+              if (progress < 0.2) {
+                setOpacity(progress * 5);
+              } else if (progress > 0.8) {
+                setOpacity((1 - progress) * 5);
+              }
+
+              if (currentScaleStep < scaleSteps) {
+                positionTimerRef.current = setTimeout(
+                  scaleStep,
+                  scaleStepDuration,
+                );
+              }
+            };
+
+            positionTimerRef.current = setTimeout(scaleStep, scaleStepDuration);
+            break;
+        }
       }
 
       let frameCount = 0;
@@ -360,7 +503,12 @@ const PlayerVFX = observer(
         }
         animatedImage?.dispose();
       };
-    }, [playerAnimationStore.animationSet, enemyPositions, completeAnimation]);
+    }, [
+      playerAnimationStore.animationSet,
+      playerAnimationStore.targetIDs,
+      enemyPositions,
+      completeAnimation,
+    ]);
 
     useEffect(() => {
       isMounted.current = true;
@@ -383,6 +531,48 @@ const PlayerVFX = observer(
       return null;
     }
 
+    // Render multiple animations for multi-target effects
+    if (targetAnimations.length > 0) {
+      return (
+        <>
+          {targetAnimations.map((anim) => (
+            <View
+              key={anim.id}
+              style={{
+                position: "absolute",
+                left: anim.position.x,
+                top: anim.position.y,
+                width: animationDimensions.width,
+                height: animationDimensions.height,
+                opacity: anim.opacity,
+                transform: [
+                  { rotate: `${anim.rotation}deg` },
+                  { scaleX: anim.scale },
+                ],
+              }}
+            >
+              <Canvas
+                style={{
+                  width: animationDimensions.width,
+                  height: animationDimensions.height,
+                }}
+              >
+                <Image
+                  image={animatedImage.getCurrentFrame()}
+                  x={0}
+                  y={0}
+                  width={animationDimensions.width}
+                  height={animationDimensions.height}
+                  fit="contain"
+                />
+              </Canvas>
+            </View>
+          ))}
+        </>
+      );
+    }
+
+    // Render single animation for area effects or single target
     return (
       <View
         style={{

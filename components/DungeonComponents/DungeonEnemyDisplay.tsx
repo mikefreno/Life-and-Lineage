@@ -1,33 +1,48 @@
-import { View, Animated, Image, ScrollView } from "react-native";
+import { View, Image, ScrollView, Animated } from "react-native";
 import { toTitleCase } from "../../utility/functions/misc";
 import ProgressBar from "../ProgressBar";
 import GenericStrikeAround from "../GenericStrikeAround";
 import { Text } from "../Themed";
 import FadeOutNode from "../FadeOutNode";
-import { memo, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { observer } from "mobx-react-lite";
 import type { Enemy } from "../../entities/creatures";
 import { useRootStore } from "../../hooks/stores";
 import { AnimatedSprite } from "../AnimatedSprite";
-import { flex, normalize, tw_base, useStyles } from "../../hooks/styles";
+import {
+  flex,
+  normalize,
+  normalizeLineHeight,
+  useStyles,
+} from "../../hooks/styles";
 import Colors from "@/constants/Colors";
+import {
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 
-const EnemyHealthChangePopUp = memo(
-  ({ healthDiff, showing }: { healthDiff: number; showing: boolean }) => {
-    if (!showing) return <View style={{ height: tw_base[2] }} />;
-
-    return (
-      <View style={{ height: tw_base[2] }}>
-        <FadeOutNode>
-          <Text style={{ color: "#f87171" }}>
-            {healthDiff > 0 ? "+" : ""}
-            {healthDiff.toString()}
-          </Text>
-        </FadeOutNode>
-      </View>
-    );
-  },
-);
+const EnemyHealthChangePopUp = ({
+  healthDiff,
+  showing,
+  reset,
+}: {
+  healthDiff: number;
+  showing: boolean;
+  reset: () => void;
+}) => {
+  if (!showing) return <View style={{ height: normalizeLineHeight(16) }} />;
+  return (
+    <View style={{ height: normalizeLineHeight(16) }}>
+      <FadeOutNode clearingFunction={reset}>
+        <Text style={{ color: "#f87171" }}>
+          {healthDiff > 0 ? "+" : ""}
+          {healthDiff.toString()}
+        </Text>
+      </FadeOutNode>
+    </View>
+  );
+};
 
 const EnemyConditions = observer(({ conditions }: { conditions: any[] }) => {
   const simplifiedConditions = useMemo(() => {
@@ -126,58 +141,84 @@ const DungeonEnemyDisplay = observer(() => {
 const EnemyDisplay = observer(({ enemy }: { enemy: Enemy }) => {
   const styles = useStyles();
   const [healthState, setHealthState] = useState({
+    id: enemy.id,
     record: enemy.currentHealth,
     diff: 0,
     showing: false,
   });
+  const glowValue = useSharedValue(0);
 
-  const healingGlowAnim = useRef(new Animated.Value(0)).current;
-
-  // TODO: Dialogue popup (modal)
-  // TODO: Healing animation
+  useEffect(() => {
+    if (healthState.id !== enemy.id) {
+      setHealthState({
+        id: enemy.id,
+        record: enemy.currentHealth,
+        diff: 0,
+        showing: false,
+      });
+    } else if (enemy.currentHealth !== healthState.record) {
+      if (enemy.currentHealth - healthState.record > 0) {
+        glowValue.value = withSequence(
+          withTiming(0.8, { duration: 300 }),
+          withTiming(0, { duration: 700 }),
+        );
+      }
+      setHealthState((prev) => {
+        return {
+          record: enemy.currentHealth,
+          diff: enemy.currentHealth - prev.record,
+          showing: true,
+          id: prev.id,
+        };
+      });
+    }
+  }, [enemy.currentHealth, enemy.id]);
 
   return (
     <View style={{ flex: 1, paddingHorizontal: "2%" }}>
       <View style={[flex.rowBetween, { flex: 1 }]}>
         <View
           style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
             width: "50%",
           }}
         >
-          <View style={{ flex: 1 }} />
-          <View style={{ flex: 1, alignItems: "center" }}>
-            <Text
-              style={{
-                ...styles["text-3xl"],
-                textAlign: "center",
-              }}
-              numberOfLines={2}
-            >
-              {enemy.creatureSpecies.toLowerCase().includes("generic npc")
-                ? ""
-                : toTitleCase(enemy.creatureSpecies).replace(" ", "\n")}
-            </Text>
-            <ProgressBar
-              value={enemy.currentHealth >= 0 ? enemy.currentHealth : 0}
-              maxValue={enemy.maxHealth}
-              filledColor="#ef4444"
-              unfilledColor="#fee2e2"
-              displayNumber={
-                enemy.creatureSpecies.toLowerCase() == "training dummy"
-              }
-              removeAtZero={true}
-              containerStyle={{ width: "90%" }}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <EnemyHealthChangePopUp
-              healthDiff={healthState.diff}
-              showing={healthState.showing}
-            />
-            <EnemyConditions conditions={enemy.conditions} />
-          </View>
+          <Text
+            style={{
+              ...styles["text-3xl"],
+              textAlign: "center",
+            }}
+            numberOfLines={2}
+          >
+            {enemy.creatureSpecies.toLowerCase().includes("generic npc")
+              ? ""
+              : toTitleCase(enemy.creatureSpecies).replace(" ", "\n")}
+          </Text>
+          <ProgressBar
+            value={enemy.currentHealth >= 0 ? enemy.currentHealth : 0}
+            maxValue={enemy.maxHealth}
+            filledColor="#ef4444"
+            unfilledColor="#fee2e2"
+            displayNumber={
+              enemy.creatureSpecies.toLowerCase() == "training dummy"
+            }
+            removeAtZero={true}
+            containerStyle={{ width: "90%" }}
+          />
+          <EnemyHealthChangePopUp
+            healthDiff={healthState.diff}
+            showing={healthState.showing}
+            reset={() =>
+              setHealthState((prev) => {
+                return { ...prev, showing: false };
+              })
+            }
+          />
+          <EnemyConditions conditions={enemy.conditions} />
         </View>
-        <AnimatedSprite enemy={enemy} />
+        <AnimatedSprite enemy={enemy} glow={glowValue} />
       </View>
       {enemy.minions.length > 0 ? (
         <View style={styles.mx4}>

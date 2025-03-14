@@ -26,6 +26,7 @@ import { useDraggableStore, useRootStore } from "../hooks/stores";
 import { useVibration } from "../hooks/generic";
 import type { Item } from "../entities/item";
 import { flex, shadows, tw, useStyles } from "../hooks/styles";
+import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
 
 const GreetingComponent = ({ greeting }: { greeting: string }) => {
   const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -239,15 +240,26 @@ const ShopInteriorScreen = observer(() => {
           opacity: 0.5,
         }}
       />
-      <View style={{ flex: 1 }}>
+      <View
+        style={{ flex: 1, paddingBottom: uiStore.playerStatusHeightSecondary }}
+      >
         <TouchableWithoutFeedback onPress={() => setDisplayItem(null)}>
           <View style={[flex.columnBetween, { flex: 1 }]}>
-            <View style={[flex.rowEvenly, { height: "40%" }]}>
+            <View
+              style={[
+                flex.rowEvenly,
+                { flex: 1, height: "100%", paddingBottom: 8 },
+              ]}
+            >
               <View style={[flex.columnCenter, styles.shopKeeperSection]}>
-                <CharacterImage character={shopsStore.currentShop.shopKeeper} />
+                <View style={{ maxHeight: "70%", width: "100%" }}>
+                  <CharacterImage
+                    character={shopsStore.currentShop.shopKeeper}
+                  />
+                </View>
                 <GreetingComponent greeting={greeting} />
                 <Text style={styles.textCenter}>
-                  {shopsStore.currentShop.shopKeeper.fullName}'s Inventory
+                  {shopsStore.currentShop.shopKeeper.fullName}
                 </Text>
                 <View style={[flex.rowCenter, tw.mb1]}>
                   <Text>{shopsStore.currentShop.currentGold}</Text>
@@ -312,68 +324,35 @@ const ShopInteriorScreen = observer(() => {
                 </ThemedScrollView>
               </View>
             </View>
-            <View style={styles.playerInventorySection}>
-              <View
-                style={{
-                  ...styles.rowCenter,
-                  ...styles.py4,
-                }}
-              >
-                <Text style={[styles.textCenter, styles["text-md"]]}>
-                  {playerState.fullName}'s Inventory
-                </Text>
-                <View style={styles.rowCenter}>
-                  <Text> ( {playerState.readableGold} </Text>
-                  <Coins
-                    width={uiStore.iconSizeSmall}
-                    height={uiStore.iconSizeSmall}
-                    style={{ marginLeft: 6, marginVertical: "auto" }}
-                  />
-                  <Text> )</Text>
-                  {playerState.baseInventory.some(
-                    (item) => item.itemClass == "junk",
-                  ) && (
-                    <Pressable
-                      onPress={sellAllJunk}
-                      style={styles.sellJunkButton}
-                    >
-                      <Text>Sell Junk</Text>
-                    </Pressable>
-                  )}
-                </View>
-              </View>
-              <View
-                style={{ width: "100%", height: "80%" }}
-                collapsable={false}
-              >
-                <InventoryRender
-                  screen="shop"
-                  displayItem={displayItem}
-                  setDisplayItem={setDisplayItem}
-                  targetBounds={[
-                    { key: "shopInventory", bounds: shopInventoryBounds },
-                  ]}
-                  runOnSuccess={(item: Item[]) => sellStack(item)}
-                />
-              </View>
+            <View style={{ flex: 1 }} collapsable={false}>
+              <InventoryRender
+                screen="shop"
+                displayItem={displayItem}
+                setDisplayItem={setDisplayItem}
+                targetBounds={[
+                  { key: "shopInventory", bounds: shopInventoryBounds },
+                ]}
+                runOnSuccess={(item: Item[]) => sellStack(item)}
+              />
             </View>
           </View>
         </TouchableWithoutFeedback>
-        {displayItem && (
-          <View style={styles.raisedAbsolutePosition} pointerEvents="box-none">
-            <StatsDisplay
-              displayItem={displayItem}
-              shop={shopsStore.currentShop}
-              purchaseItem={purchaseItem}
-              purchaseStack={purchaseStack}
-              sellItem={sellItem}
-              sellStack={sellStack}
-              clearItem={() => setDisplayItem(null)}
-              topGuard={header}
-            />
-          </View>
-        )}
       </View>
+      <PlayerStatusForSecondary />
+      {displayItem && (
+        <View style={styles.raisedAbsolutePosition} pointerEvents="box-none">
+          <StatsDisplay
+            displayItem={displayItem}
+            shop={shopsStore.currentShop}
+            purchaseItem={purchaseItem}
+            purchaseStack={purchaseStack}
+            sellItem={sellItem}
+            sellStack={sellStack}
+            clearItem={() => setDisplayItem(null)}
+            topGuard={header}
+          />
+        </View>
+      )}
     </>
   );
 });

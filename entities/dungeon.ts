@@ -282,10 +282,14 @@ export class DungeonLevel {
         baseEnergy: enemyJSON.energy.maximum,
         energyRegen: enemyJSON.energy.regen,
         goldDropRange: enemyJSON.goldDropRange,
-        drops: enemyJSON.drops,
+        drops: enemyJSON.drops as {
+          item: string;
+          itemType: ItemClassType;
+          chance: number;
+        }[],
         attackStrings: enemyJSON.attackStrings,
+        animationStrings: enemyJSON.animationStrings,
         sprite: sprite as EnemyImageKeyOption,
-        enemyStore: this.dungeonStore.root.enemyStore,
       });
     });
     return enemies;
@@ -323,11 +327,15 @@ export class DungeonLevel {
         baseEnergy: scaledBossJSON.energy.maximum,
         energyRegen: scaledBossJSON.energy.regen,
         attackStrings: scaledBossJSON.attackStrings,
-        storyItems: scaledBossJSON.storyDrops,
+        animationStrings: scaledBossJSON.animationStrings,
+        storyDrops: scaledBossJSON.storyDrops,
         goldDropRange: scaledBossJSON.goldDropRange,
-        drops: scaledBossJSON.drops,
+        drops: scaledBossJSON.drops as {
+          item: string;
+          itemType: ItemClassType;
+          chance: number;
+        }[],
         sprite: scaledBossJSON.sprite as EnemyImageKeyOption,
-        enemyStore: this.dungeonStore.root.enemyStore,
       });
     });
     return bosses;
@@ -370,7 +378,6 @@ interface SpecialEncounterOutcome {
   } | null;
 }
 
-// TODO: Need to implement gank fight setup
 export class SpecialEncounter {
   readonly countChances: Record<string, number>;
   readonly name: string;
@@ -581,6 +588,9 @@ export class SpecialEncounter {
         root.playerState?.restoreSanity(sanityEffect);
         sanity = sanityEffect;
       }
+    }
+    if (enemies.length > 0) {
+      this.parentLevel?.dungeonStore.setInCombat(true);
     }
     return {
       message: outcome.message,

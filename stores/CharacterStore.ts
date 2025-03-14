@@ -32,10 +32,10 @@ export class CharacterStore {
     makeObservable(this, {
       characters: observable,
       independentChildren: observable,
+
       createIndependantChild: action,
       addCharacter: action,
       removeCharacter: action,
-      setPlayer: action,
       clearCharacters: action,
       adopt: action,
       fromCheckpointData: action,
@@ -114,10 +114,6 @@ export class CharacterStore {
     this.clearPersistedCharacter(characterId);
   }
 
-  setPlayer(player: PlayerCharacter) {
-    this.addCharacter(player);
-  }
-
   clearCharacters() {
     this.characters = [];
     this.independentChildren = [];
@@ -166,7 +162,6 @@ export class CharacterStore {
 
     const characters: Character[] = [];
     const independentChildren: Character[] = [];
-    let player: PlayerCharacter | null = null;
 
     // Hydrate characters
     if (storedCharacterIds) {
@@ -196,18 +191,7 @@ export class CharacterStore {
       });
     }
 
-    // Hydrate player
-    if (storedPlayerId) {
-      const retrieved = storage.getString(`character_${storedPlayerId}`);
-      if (retrieved) {
-        player = PlayerCharacter.fromJSON({
-          ...parse(retrieved),
-          root: this.root,
-        });
-      }
-    }
-
-    return { characters, independentChildren, player };
+    return { characters, independentChildren };
   }
 
   private characterSave = (character: Character) => {

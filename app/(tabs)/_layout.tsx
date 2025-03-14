@@ -67,7 +67,11 @@ const TabLayout = observer(() => {
         TABS_PADDING,
       0,
     );
-  }, [uiStore.playerStatusCompactHeight, uiStore.playerStatusTop]);
+  }, [
+    uiStore.playerStatusCompactHeight,
+    uiStore.playerStatusTop,
+    uiStore.playerStatusExpandedOnAllRoutes,
+  ]);
 
   const commonOptions = {
     lazy: false,
@@ -185,7 +189,10 @@ const TabLayout = observer(() => {
               marginHorizontal: "auto",
               height: uiStore.iconSizeXL,
             },
-            animation: uiStore.reduceMotion ? "fade" : "shift",
+            animation:
+              uiStore.reduceMotion || Platform.OS == "android"
+                ? "none"
+                : "shift",
             tabBarButton: (props) => {
               const onPressWithVibration = (event: GestureResponderEvent) => {
                 vibration({ style: "light" });

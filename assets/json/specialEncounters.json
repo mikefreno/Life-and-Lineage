@@ -38,7 +38,7 @@
     "image": "chest",
     "prompt": "You come across a chest. Do you open it?",
     "goodOutcome": {
-      "chance": 0.85,
+      "chance": 0.65,
       "message": "For the explorer, the spoils...",
       "result": {
         "drops": [
@@ -55,7 +55,7 @@
       }
     },
     "neutralOutcome": {
-      "chance": 0.1,
+      "chance": 0.25,
       "message": "The chest appears to already have been looted, also you got a splinter",
       "result": {
         "effect": {
@@ -65,7 +65,7 @@
       }
     },
     "badOutcome": {
-      "chance": 0.05,
+      "chance": 0.10,
       "message": "There is more here than it seems... Prepare for battle!",
       "result": {
         "battle": [

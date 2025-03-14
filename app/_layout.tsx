@@ -11,7 +11,6 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { toTitleCase, wait } from "../utility/functions/misc";
-import { API_BASE_URL } from "../config/config";
 import { SystemBars } from "react-native-edge-to-edge";
 import { DarkTheme, LightTheme } from "../constants/Colors";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -38,7 +37,6 @@ import {
 } from "react-native-reanimated";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
-import { runInAction } from "mobx";
 import PlatformDependantGestureWrapper from "@/components/PlatformDependantGestureWrapper";
 import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
 

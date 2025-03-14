@@ -226,6 +226,7 @@ export enum Attribute {
   strength,
   intelligence,
   dexterity,
+  manaRegen,
 }
 
 export const AttributeToString: Record<Attribute, string> = {
@@ -235,6 +236,7 @@ export const AttributeToString: Record<Attribute, string> = {
   [Attribute.strength]: "Strength",
   [Attribute.intelligence]: "Intelligence",
   [Attribute.dexterity]: "Dexterity",
+  [Attribute.manaRegen]: "Regen",
 };
 
 export enum TutorialOption {

@@ -24,6 +24,7 @@ import {
   DexterityIcon,
   HealthIcon,
   IntelligenceIcon,
+  Regen,
   Sanity,
   SquareMinus,
   SquarePlus,
@@ -192,7 +193,11 @@ export const RenderSecondaryStatsBlock = observer(
     respeccing,
     vibration,
   }: {
-    stat: Attribute.strength | Attribute.dexterity | Attribute.intelligence;
+    stat:
+      | Attribute.strength
+      | Attribute.dexterity
+      | Attribute.intelligence
+      | Attribute.manaRegen;
     playerState: PlayerCharacter;
     respeccing: boolean;
     vibration: ({
@@ -262,7 +267,9 @@ export const RenderSecondaryStatsBlock = observer(
               ? playerState.totalStrength
               : stat === Attribute.dexterity
               ? playerState.totalDexterity
-              : playerState.totalIntelligence}
+              : stat === Attribute.intelligence
+              ? playerState.totalIntelligence
+              : playerState.totalManaRegen}
           </Text>
           {stat === Attribute.strength ? (
             <StrengthIcon
@@ -274,8 +281,13 @@ export const RenderSecondaryStatsBlock = observer(
               height={uiStore.iconSizeLarge}
               width={uiStore.iconSizeLarge}
             />
-          ) : (
+          ) : stat === Attribute.intelligence ? (
             <IntelligenceIcon
+              height={uiStore.iconSizeLarge}
+              width={uiStore.iconSizeLarge}
+            />
+          ) : (
+            <Regen
               height={uiStore.iconSizeLarge}
               width={uiStore.iconSizeLarge}
             />

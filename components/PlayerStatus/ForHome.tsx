@@ -105,7 +105,6 @@ const PlayerStatusForHome = observer(() => {
               style={{
                 height: expandedSectionHeight,
                 marginHorizontal: "auto",
-                paddingVertical: 2,
                 ...styles.rowCenter,
               }}
             >
