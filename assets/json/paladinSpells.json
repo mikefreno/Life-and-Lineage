@@ -11,6 +11,11 @@
       "selfDamage": -35,
       "buffs": null,
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "goldenHeal",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -27,6 +32,11 @@
         "minor fortitude"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "holyShield",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -46,6 +56,10 @@
           "chance": 0.25
         }
       ]
+    },
+    "animation": {
+      "glow": "#FBD44F",
+      "position": "field"
     }
   },
   {
@@ -62,6 +76,10 @@
         "quickened mind"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "glow": "#FBD44F",
+      "position": "field"
     }
   },
   {
@@ -81,6 +99,11 @@
           "chance": 1.0
         }
       ]
+    },
+    "animation": {
+      "sprite": "corruptSword",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -97,6 +120,10 @@
         "purify"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "glow": "#FBD44F",
+      "position": "field"
     }
   },
   {
@@ -113,6 +140,11 @@
         "delayed heal"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "goldenHeal",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -127,6 +159,11 @@
       "selfDamage": -85,
       "buffs": null,
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "goldenHeal",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -146,6 +183,11 @@
           "chance": 0.5
         }
       ]
+    },
+    "animation": {
+      "sprite": "holyOrb",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -165,6 +207,11 @@
           "chance": 1.0
         }
       ]
+    },
+    "animation": {
+      "sprite": "corruptSword",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -181,6 +228,10 @@
         "greater quickened mind"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "glow": "#FBD44F",
+      "position": "field"
     }
   },
   {
@@ -197,6 +248,11 @@
         "overwhelming glow"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "holyBeam",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -213,6 +269,11 @@
         "overwhelming glow"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "goldenHeal",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -224,10 +285,14 @@
     "proficiencyNeeded": "novice",
     "manaCost": 25,
     "effects": {
-      "damage": 25,
-      "selfDamage": null,
+      "damage": 5,
       "buffs": null,
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "holyArc",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -235,16 +300,20 @@
     "element": "vengeance",
     "target": "single",
     "type": "offense",
-    "usesWeapon": "melee",
     "proficiencyNeeded": "novice",
     "manaCost": 15,
     "effects": {
-      "damage": 15,
+      "damage": null,
       "selfDamage": null,
       "buffs": [
         "minor fury"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "crossedSwords",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -259,6 +328,11 @@
       "selfDamage": null,
       "buffs": null,
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "holyDart",
+      "style": "missile",
+      "position": "enemy"
     }
   },
   {
@@ -279,10 +353,15 @@
           "chance": 0.25
         }
       ]
+    },
+    "animation": {
+      "sprite": "glowingBlade",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
-    "name": "righteous hammer",
+    "name": "righteous blow",
     "element": "vengeance",
     "target": "single",
     "type": "offense",
@@ -299,6 +378,11 @@
           "chance": 0.25
         }
       ]
+    },
+    "animation": {
+      "sprite": "holyFist",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -316,6 +400,11 @@
         "blessed defense"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "glowingBlade",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -335,6 +424,11 @@
           "chance": 0.5
         }
       ]
+    },
+    "animation": {
+      "sprite": "holyShred",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -355,6 +449,11 @@
           "chance": 0.5
         }
       ]
+    },
+    "animation": {
+      "sprite": "holySword",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -371,6 +470,11 @@
         "protection aura"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "holyTrails",
+      "style": "static",
+      "position": "field"
     }
   },
   {
@@ -395,6 +499,11 @@
           "chance": 0.75
         }
       ]
+    },
+    "animation": {
+      "sprite": "glowingBlade",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -412,6 +521,11 @@
         "execute"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "corruptSword",
+      "style": "static",
+      "position": "field"
     }
   },
   {
@@ -433,6 +547,11 @@
           "chance": 1.0
         }
       ]
+    },
+    "animation": {
+      "sprite": "holySword",
+      "style": "static",
+      "position": "field"
     }
   },
   {
@@ -450,6 +569,11 @@
         "guard"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "holyShield",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -466,6 +590,10 @@
         "protection aura"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "glow": "#FBD44F",
+      "position": "field"
     }
   },
   {
@@ -482,6 +610,11 @@
         "minor fortitude"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "holyFist",
+      "style": "static",
+      "position": "field"
     }
   },
   {
@@ -499,6 +632,11 @@
         "reflective bulwark"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "holyShield",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -516,6 +654,11 @@
         "empowered guarding"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "holyShield",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -532,6 +675,11 @@
         "spell resistance"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "holyShield",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -549,6 +697,11 @@
         "blessed defense"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "holyShield",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -566,6 +719,11 @@
         "spell resistance"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "holyShield",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -584,6 +742,11 @@
         "blessed defense"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "holyShield",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -601,6 +764,11 @@
         "minor fortitude"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "holyShield",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -619,6 +787,11 @@
         "reflective bulwark"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "holyShield",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -638,6 +811,11 @@
         "reflective bulwark"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "holyShield",
+      "style": "static",
+      "position": "self"
     }
   }
 ]

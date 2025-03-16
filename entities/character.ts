@@ -2805,7 +2805,7 @@ export function getStartingBook(player: PlayerCharacter) {
       });
     case Element.assassination:
       return new Item({
-        name: "book of throw dagger",
+        name: "book of throw shuriken",
         baseValue: 2500,
         itemClass: ItemClassType.Book,
         icon: "Book",

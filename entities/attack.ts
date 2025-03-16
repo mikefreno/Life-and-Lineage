@@ -22,7 +22,7 @@ import { useStyles } from "../hooks/styles";
  * @property {string} name - The name of the attack.
  * @property {number} [energyCost=0] - The energy cost to perform the attack.
  * @property {number} [hitChance=1.0] - The base hit chance of the attack.
- * @property {"single" | "dual" | "aoe"} [targets="single"] - The type of targets the attack can hit.
+ * @property {"single" | "dual" | "area"} [targets="single"] - The type of targets the attack can hit.
  * @property {number} [damageMult=0] - The damage multiplier of the attack.
  * @property {number} [flatHealthDamage=0] - The flat health damage of the attack.
  * @property {number} [selfDamage=0] - The damage dealt to the attacker.
@@ -36,7 +36,7 @@ interface AttackFields {
   name: string;
   energyCost?: number;
   hitChance?: number;
-  targets?: "single" | "dual" | "aoe"; // aoe hits all, dual hits two, single one
+  targets?: "single" | "dual" | "area"; // area hits all, dual hits two, single one
   damageMult?: number;
   flatHealthDamage?: number;
   selfDamage?: number;
@@ -61,7 +61,7 @@ interface AttackFields {
 export class Attack {
   name: string;
   energyCost: number;
-  attackStyle: "single" | "dual" | "aoe";
+  attackStyle: "single" | "dual" | "area";
   baseHitChance: number;
   damageMult: number;
   flatHealthDamage: number;

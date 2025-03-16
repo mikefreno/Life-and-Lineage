@@ -203,9 +203,9 @@
     "baseValue": 5000
   },
   {
-    "name": "book of quick sand",
+    "name": "book of stone salvo",
     "type": "spell",
-    "teaches": "quick sand",
+    "teaches": "stone salve",
     "icon": "Book",
     "baseValue": 20000
   },
@@ -217,9 +217,9 @@
     "baseValue": 50000
   },
   {
-    "name": "book of rock bullet",
+    "name": "book of stalactite storm",
     "type": "spell",
-    "teaches": "rock bullet",
+    "teaches": "stalactite storm",
     "icon": "Book_2",
     "baseValue": 100000
   },
@@ -240,7 +240,7 @@
   {
     "name": "forbidden earth techniques vol. 2",
     "type": "spell",
-    "teaches": "sand burial",
+    "teaches": "collider",
     "icon": "Book_3",
     "baseValue": 1000000
   }

@@ -1,8 +1,8 @@
 [
   {
-    "name": "book of throw dagger",
+    "name": "book of throw shuriken",
     "type": "spell",
-    "teaches": "throw dagger",
+    "teaches": "throw shuriken",
     "icon": "Book",
     "baseValue": 2500
   },
@@ -196,20 +196,6 @@
     "baseValue": 2500
   },
   {
-    "name": "book of steady aim",
-    "type": "spell",
-    "teaches": "steady aim",
-    "icon": "Book",
-    "baseValue": 2500
-  },
-  {
-    "name": "book of quick shot",
-    "type": "spell",
-    "teaches": "quick shot",
-    "icon": "Book",
-    "baseValue": 2500
-  },
-  {
     "name": "book of enchanted quiver",
     "type": "spell",
     "teaches": "enchanted quiver",
@@ -229,27 +215,6 @@
     "teaches": "seeking arrow",
     "icon": "Book_2",
     "baseValue": 50000
-  },
-  {
-    "name": "book of multi-shot",
-    "type": "spell",
-    "teaches": "multi-shot",
-    "icon": "Book_2",
-    "baseValue": 50000
-  },
-  {
-    "name": "book of piercing barrage",
-    "type": "spell",
-    "teaches": "piercing barrage",
-    "icon": "Book_2",
-    "baseValue": 100000
-  },
-  {
-    "name": "book of volley",
-    "type": "spell",
-    "teaches": "volley",
-    "icon": "Book_2",
-    "baseValue": 150000
   },
   {
     "name": "book of arcane missiles",

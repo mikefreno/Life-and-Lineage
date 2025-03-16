@@ -1,4 +1,4 @@
-import { View, Image, ScrollView, Animated } from "react-native";
+import { View, Image, ScrollView } from "react-native";
 import { toTitleCase } from "../../utility/functions/misc";
 import ProgressBar from "../ProgressBar";
 import GenericStrikeAround from "../GenericStrikeAround";
@@ -44,10 +44,12 @@ const EnemyHealthChangePopUp = ({
   );
 };
 
-const EnemyConditions = observer(({ conditions }: { conditions: any[] }) => {
+const EnemyConditions = observer(() => {
+  const { playerState } = useRootStore();
+
   const simplifiedConditions = useMemo(() => {
     const condMap = new Map();
-    conditions.forEach((condition) => {
+    playerState?.conditions.forEach((condition) => {
       if (condMap.has(condition.name)) {
         const existing = condMap.get(condition.name);
         existing.count += 1;
@@ -61,7 +63,7 @@ const EnemyConditions = observer(({ conditions }: { conditions: any[] }) => {
       }
     });
     return Array.from(condMap.values());
-  }, [conditions]);
+  }, [playerState?.conditions, playerState?.conditions.length]);
   const styles = useStyles();
 
   return (
@@ -216,7 +218,7 @@ const EnemyDisplay = observer(({ enemy }: { enemy: Enemy }) => {
               })
             }
           />
-          <EnemyConditions conditions={enemy.conditions} />
+          <EnemyConditions />
         </View>
         <AnimatedSprite enemy={enemy} glow={glowValue} />
       </View>

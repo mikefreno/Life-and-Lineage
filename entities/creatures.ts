@@ -283,7 +283,7 @@ export class Creature {
         name,
         energyCost,
         hitChance,
-        targets: targets as "single" | "aoe" | "dual",
+        targets: targets as "single" | "area" | "dual",
         damageMult,
         flatHealthDamage,
         flatSanityDamage,
@@ -603,7 +603,7 @@ export class Creature {
     const scoredAttacks = availableAttacks.map((attack) => {
       const damage = attack.damage();
       const numTargets =
-        attack.attackStyle === "aoe"
+        attack.attackStyle === "area"
           ? numberOfPotentialTargets
           : attack.attackStyle === "dual"
           ? numberOfPotentialTargets > 1

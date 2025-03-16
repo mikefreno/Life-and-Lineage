@@ -75,6 +75,10 @@
         "blood orb"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "glow": "#7f1d1d",
+      "position": "enemy"
     }
   },
   {
@@ -91,6 +95,11 @@
         "consume blood orb"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "bloodLongBolts",
+      "style": "span",
+      "position": "enemy"
     }
   },
   {
@@ -112,6 +121,11 @@
           "chance": 0.75
         }
       ]
+    },
+    "animation": {
+      "sprite": "bloodSimpleBolts",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -134,6 +148,11 @@
           "chance": 1.0
         }
       ]
+    },
+    "animation": {
+      "sprite": "bloodRain",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -157,6 +176,11 @@
           "chance": 1.0
         }
       ]
+    },
+    "animation": {
+      "sprite": "bloodSpikes",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -276,14 +300,19 @@
   {
     "name": "teeth",
     "element": "bone",
-    "target": "single",
+    "target": "dual",
     "type": "offense",
     "proficiencyNeeded": "novice",
     "manaCost": 15,
     "effects": {
-      "damage": 10,
+      "damage": 7,
       "buffs": null,
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "teeth",
+      "style": "span",
+      "position": "field"
     }
   },
   {
@@ -299,24 +328,11 @@
         "bone shield"
       ],
       "debuffs": null
-    }
-  },
-  {
-    "name": "bone spear",
-    "element": "bone",
-    "target": "single",
-    "type": "offense",
-    "proficiencyNeeded": "adept",
-    "manaCost": 45,
-    "effects": {
-      "damage": 40,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "bleed",
-          "chance": 0.5
-        }
-      ]
+    },
+    "animation": {
+      "sprite": "boneShield",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -332,6 +348,34 @@
         "projectile suppression"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "boneWall",
+      "style": "span",
+      "position": "field"
+    }
+  },
+  {
+    "name": "bone spear",
+    "element": "bone",
+    "target": "single",
+    "type": "offense",
+    "proficiencyNeeded": "expert",
+    "manaCost": 45,
+    "effects": {
+      "damage": 40,
+      "buffs": null,
+      "debuffs": [
+        {
+          "name": "bleed",
+          "chance": 0.5
+        }
+      ]
+    },
+    "animation": {
+      "sprite": "boneLance",
+      "style": "span",
+      "position": "field"
     }
   },
   {
@@ -339,7 +383,7 @@
     "element": "bone",
     "target": "self",
     "type": "defense",
-    "proficiencyNeeded": "expert",
+    "proficiencyNeeded": "master",
     "manaCost": 75,
     "effects": {
       "damage": null,
@@ -347,6 +391,11 @@
         "guard"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "boneShield",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -357,7 +406,7 @@
     "proficiencyNeeded": "master",
     "manaCost": 125,
     "effects": {
-      "damage": 50,
+      "damage": 100,
       "buffs": null,
       "debuffs": [
         {
@@ -365,42 +414,29 @@
           "chance": 0.75
         }
       ]
+    },
+    "animation": {
+      "sprite": "boneOrb",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
-    "name": "bone storm",
+    "name": "bone blade",
     "element": "bone",
     "target": "area",
     "type": "offense",
     "proficiencyNeeded": "legend",
-    "manaCost": 250,
-    "effects": {
-      "damage": 175,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "bleed",
-          "chance": 1.0
-        }
-      ]
-    }
-  },
-  {
-    "name": "bone explosion",
-    "element": "bone",
-    "target": "area",
-    "type": "offense",
-    "proficiencyNeeded": "legend",
-    "manaCost": 500,
+    "manaCost": 200,
     "effects": {
       "damage": 300,
       "buffs": null,
-      "debuffs": [
-        {
-          "name": "severe bleed",
-          "chance": 1.0
-        }
-      ]
+      "debuffs": null
+    },
+    "animation": {
+      "sprite": "boneBlade",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -419,6 +455,11 @@
           "chance": 0.75
         }
       ]
+    },
+    "animation": {
+      "sprite": "poisonDart",
+      "style": "missile",
+      "position": "enemy"
     }
   },
   {
@@ -437,24 +478,38 @@
           "chance": 0.5
         }
       ]
+    },
+    "animation": {
+      "sprite": "poisonPuft",
+      "style": "span",
+      "position": "field"
     }
   },
   {
-    "name": "rotting touch",
+    "name": "poison stream",
     "element": "pestilence",
-    "target": "single",
+    "target": "area",
     "type": "offense",
     "proficiencyNeeded": "adept",
     "manaCost": 60,
     "effects": {
-      "damage": 35,
+      "damage": 5,
       "buffs": null,
       "debuffs": [
         {
-          "name": "sunder",
+          "name": "poison",
+          "chance": 0.75
+        },
+        {
+          "name": "poison",
           "chance": 0.75
         }
       ]
+    },
+    "animation": {
+      "sprite": "poisonStream",
+      "style": "span",
+      "position": "field"
     }
   },
   {
@@ -470,6 +525,11 @@
         "disease immunity"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "poisonShield",
+      "style": "span",
+      "position": "field"
     }
   },
   {
@@ -492,6 +552,11 @@
           "chance": 0.75
         }
       ]
+    },
+    "animation": {
+      "sprite": "poisonOrbBurst",
+      "style": "span",
+      "position": "field"
     }
   },
   {
@@ -504,7 +569,8 @@
     "effects": {
       "damage": 75,
       "buffs": [
-        "protection aura"
+        "protection aura",
+        "heal from poison"
       ],
       "debuffs": [
         {
@@ -512,6 +578,10 @@
           "chance": 1.0
         }
       ]
+    },
+    "animation": {
+      "glow": "#53DF2E",
+      "position": "field"
     }
   },
   {
@@ -534,6 +604,11 @@
           "chance": 1.0
         }
       ]
+    },
+    "animation": {
+      "sprite": "poisonSmallBurst",
+      "style": "span",
+      "position": "field"
     }
   },
   {
@@ -556,6 +631,11 @@
           "chance": 1.0
         }
       ]
+    },
+    "animation": {
+      "sprite": "poisonLargeBurst",
+      "style": "span",
+      "position": "field"
     }
   }
 ]

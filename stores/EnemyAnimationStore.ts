@@ -13,6 +13,7 @@ import {
   type EnemyImageKeyOption,
 } from "@/utility/enemyHelpers";
 import * as Crypto from "expo-crypto";
+import { Vector2 } from "@/utility/Vec2";
 
 export const FPS = 10;
 export const MAX_ANIMATION_DURATION = 1000;
@@ -22,10 +23,7 @@ export class EnemyAnimationStore {
   textString: string | undefined = undefined;
   dialogue: { [key: number]: string } | null;
 
-  spriteMidPoint: {
-    x: number;
-    y: number;
-  } | null = null;
+  spriteMidPoint: Vector2 | null = null;
 
   root: RootStore;
   enemySprite: EnemyImageKeyOption;
@@ -198,7 +196,7 @@ export class EnemyAnimationStore {
   }
 
   setSpriteMidPoint(pos: { x: number; y: number }) {
-    this.spriteMidPoint = pos;
+    this.spriteMidPoint = Vector2.from(pos);
     runInAction(() => (this.root.enemyStore.midpointUpdater += 1));
   }
 }

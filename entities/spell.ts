@@ -13,7 +13,7 @@ import { Enemy, Minion } from "./creatures";
 
 interface SpellFields {
   name: string;
-  attackStyle?: "single" | "dual" | "aoe";
+  attackStyle?: "single" | "dual" | "area";
   element: string;
   proficiencyNeeded: string | null;
   manaCost: number;
@@ -45,7 +45,7 @@ interface SpellFields {
  */
 export class Spell {
   name: string;
-  attackStyle: "single" | "dual" | "aoe";
+  attackStyle: "single" | "dual" | "area";
   element: Element;
   usesWeapon: string | null;
   proficiencyNeeded: MasteryLevel | null;

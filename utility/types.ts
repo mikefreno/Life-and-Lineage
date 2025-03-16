@@ -483,11 +483,36 @@ export type MerchantType =
   | "apothecary"
   | "librarian";
 
-export type PlayerAnimationSet =
+export type PlayerSpriteAnimationSet =
   | {
       sprite: VFXImageOptions;
-      style: "static" | "missile" | "span";
+      style: "static";
       position: "enemy" | "field" | "self";
       retrigger?: boolean;
+      triggersScreenShake?: boolean;
     }
-  | { glow: ColorValue; position: "enemy" | "field" | "self" };
+  | {
+      sprite: VFXImageOptions;
+      style: "missile";
+      position: "enemy";
+      retrigger?: boolean;
+      triggersScreenShake?: boolean;
+      reachTargetAtFrame?: number;
+    }
+  | {
+      sprite: VFXImageOptions;
+      style: "span";
+      position: "field" | "enemy";
+      retrigger?: boolean;
+      triggersScreenShake?: boolean;
+    };
+
+export type PlayerGlowAnimationSet = {
+  glow: ColorValue;
+  position: "enemy" | "field" | "self";
+  triggersScreenShake?: boolean;
+};
+
+export type PlayerAnimationSet =
+  | PlayerSpriteAnimationSet
+  | PlayerGlowAnimationSet;

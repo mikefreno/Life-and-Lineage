@@ -7,6 +7,7 @@ import {
   runInAction,
 } from "mobx";
 import { PlayerAnimationSet } from "@/utility/types";
+import { Vector2 } from "@/utility/Vec2";
 
 export const PLAYER_TEXT_STRING_DURATION = 3000;
 
@@ -14,30 +15,36 @@ export class PlayerAnimationStore {
   root: RootStore;
 
   animationSet: PlayerAnimationSet | null = null;
+  refiringAnimationSets: {
+    set: PlayerAnimationSet;
+    remainingRefires: number;
+  }[] = [];
+
   targetIDs: string[] | null = null;
   screenShaker: ((duration?: number) => void) | null = null;
-  animationEndCallBack: (() => void) | null = null;
   animationPromiseResolver: (() => void) | null = null;
 
   textString: string | undefined = undefined;
 
   usedPass: boolean = false;
 
-  playerOrigin: { x: number; y: number };
+  playerOrigin: Vector2;
 
   constructor({ root }: { root: RootStore }) {
     this.root = root;
 
-    this.playerOrigin = {
-      x: root.uiStore.dimensions.width / 4,
-      y: root.uiStore.dimensions.height / 2,
-    };
+    this.playerOrigin = Vector2.from({
+      x: this.root.uiStore.dimensions.width / 4,
+      y: this.root.uiStore.dimensions.height / 2,
+    });
 
     makeObservable(this, {
       animationSet: observable,
       playerOrigin: observable,
       textString: observable,
       usedPass: observable,
+      animationPromiseResolver: observable,
+      refiringAnimationSets: observable,
 
       setAnimation: action,
       clearAnimation: action,
@@ -68,6 +75,18 @@ export class PlayerAnimationStore {
         }
       },
     );
+
+    reaction(
+      () => this.root.uiStore.dimensions,
+      () =>
+        runInAction(
+          () =>
+            (this.playerOrigin = Vector2.from({
+              x: this.root.uiStore.dimensions.width / 4,
+              y: this.root.uiStore.dimensions.height / 2,
+            })),
+        ),
+    );
   }
 
   setPassed(state: boolean) {
@@ -94,13 +113,13 @@ export class PlayerAnimationStore {
   }
 
   clearAnimation() {
-    this.animationSet = null;
-    this.targetIDs = null;
-
-    // Resolve the promise if it exists
+    console.log("called clear");
     if (this.animationPromiseResolver) {
       this.animationPromiseResolver();
       this.animationPromiseResolver = null;
     }
+
+    this.animationSet = null;
+    this.targetIDs = null;
   }
 }

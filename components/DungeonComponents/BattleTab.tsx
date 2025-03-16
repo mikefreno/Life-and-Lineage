@@ -131,7 +131,7 @@ const BattleTab = observer(
           enemyStore.enemies[0].minions.length > 0;
 
         const attackHitsAllTargets =
-          attackOrSpell.attackStyle == "aoe" ||
+          attackOrSpell.attackStyle == "area" ||
           (attackOrSpell.attackStyle == "dual" && enoughForDualToHitAll) ||
           enemyStore.enemies.length === 1;
 

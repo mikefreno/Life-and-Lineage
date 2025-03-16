@@ -157,6 +157,11 @@
           "chance": 0.75
         }
       ]
+    },
+    "animation": {
+      "sprite": "dragonBreath",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -316,6 +321,11 @@
           "chance": 0.75
         }
       ]
+    },
+    "animation": {
+      "sprite": "iceSpike",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -383,7 +393,7 @@
   {
     "name": "spike field",
     "element": "water",
-    "target": "aoe",
+    "target": "area",
     "type": "offense",
     "proficiencyNeeded": "legend",
     "manaCost": 700,
@@ -623,6 +633,11 @@
           "chance": 0.75
         }
       ]
+    },
+    "animation": {
+      "sprite": "suffocate",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -661,10 +676,14 @@
         "stone hands"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "glow": "#77484C20",
+      "position": "self"
     }
   },
   {
-    "name": "quick sand",
+    "name": "stone salvo",
     "element": "earth",
     "target": "area",
     "type": "offense",
@@ -680,6 +699,11 @@
           "chance": 0.25
         }
       ]
+    },
+    "animation": {
+      "sprite": "rocksDropper",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -695,6 +719,28 @@
         "rock armor"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "glow": "#77484C20",
+      "position": "self"
+    }
+  },
+  {
+    "name": "stalactite storm",
+    "element": "earth",
+    "target": "area",
+    "type": "offense",
+    "proficiencyNeeded": "expert",
+    "manaCost": 120,
+    "effects": {
+      "damage": 120,
+      "buffs": null,
+      "debuffs": null
+    },
+    "animation": {
+      "sprite": "fallingSpikes",
+      "style": "static",
+      "position": "field"
     }
   },
   {
@@ -711,6 +757,11 @@
         "projectile negation"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "rockWall",
+      "style": "static",
+      "position": "field"
     }
   },
   {
@@ -729,10 +780,15 @@
           "chance": 1.0
         }
       ]
+    },
+    "animation": {
+      "glow": "#77484C20",
+      "position": "field",
+      "triggersScreenShake": true
     }
   },
   {
-    "name": "sand burial",
+    "name": "collider",
     "element": "earth",
     "target": "single",
     "type": "offense",
@@ -747,6 +803,11 @@
           "chance": 1.0
         }
       ]
+    },
+    "animation": {
+      "sprite": "rockCollider",
+      "style": "static",
+      "position": "enemy"
     }
   }
 ]

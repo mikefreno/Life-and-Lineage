@@ -90,7 +90,7 @@ describe("Attack", () => {
         name: "Power Strike",
         energyCost: 20,
         hitChance: 0.8,
-        targets: "aoe",
+        targets: "area",
         damageMult: 1.5,
         user: mockUser,
       });
@@ -98,7 +98,7 @@ describe("Attack", () => {
       expect(attack.name).toBe("Power Strike");
       expect(attack.energyCost).toBe(20);
       expect(attack.baseHitChance).toBe(0.8);
-      expect(attack.attackStyle).toBe("aoe");
+      expect(attack.attackStyle).toBe("area");
       expect(attack.damageMult).toBe(1.5);
     });
   });

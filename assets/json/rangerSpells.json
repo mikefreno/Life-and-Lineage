@@ -1,6 +1,6 @@
 [
   {
-    "name": "throw dagger",
+    "name": "throw shuriken",
     "element": "assassination",
     "proficiencyNeeded": "novice",
     "target": "single",
@@ -15,6 +15,11 @@
           "chance": 0.25
         }
       ]
+    },
+    "animation": {
+      "sprite": "shuriken",
+      "style": "missile",
+      "position": "enemy"
     }
   },
   {
@@ -34,6 +39,11 @@
           "chance": 0.5
         }
       ]
+    },
+    "animation": {
+      "sprite": "poisonDart",
+      "style": "missile",
+      "position": "enemy"
     }
   },
   {
@@ -43,13 +53,21 @@
     "target": "single",
     "type": "offense",
     "usesWeapon": "melee",
-    "manaCost": 5,
+    "manaCost": 10,
     "effects": {
-      "damage": 8,
-      "buffs": [
-        "quickened mind"
-      ],
-      "debuffs": null
+      "damage": 0,
+      "buffs": null,
+      "debuffs": [
+        {
+          "name": "stun",
+          "chance": 0.75
+        }
+      ]
+    },
+    "animation": {
+      "sprite": "slashHorizontal",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -60,14 +78,19 @@
     "proficiencyNeeded": "apprentice",
     "manaCost": 20,
     "effects": {
-      "damage": 20,
+      "damage": 15,
       "buffs": null,
       "debuffs": [
         {
           "name": "stun",
-          "chance": 0.25
+          "chance": 0.5
         }
       ]
+    },
+    "animation": {
+      "sprite": "puft",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -87,6 +110,11 @@
           "chance": 0.5
         }
       ]
+    },
+    "animation": {
+      "sprite": "smallCross",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -102,6 +130,11 @@
         "stealth"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "smoke",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -118,6 +151,11 @@
         "remove stealth"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "slashHit",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -137,6 +175,11 @@
           "chance": 0.75
         }
       ]
+    },
+    "animation": {
+      "sprite": "poisonSmallCross",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -153,6 +196,11 @@
         "dance of daggers"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "desaturatedCrossSwords",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -175,6 +223,11 @@
           "chance": 0.5
         }
       ]
+    },
+    "animation": {
+      "sprite": "crossAndBleed",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -208,6 +261,11 @@
           "chance": 1.0
         }
       ]
+    },
+    "animation": {
+      "sprite": "teeth",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -224,6 +282,11 @@
         "remove stealth"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "largeCrossAndBleed",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -438,40 +501,15 @@
     "proficiencyNeeded": "novice",
     "manaCost": 20,
     "effects": {
-      "damage": 25,
+      "damage": 10,
       "buffs": null,
       "debuffs": null
-    }
-  },
-  {
-    "name": "steady aim",
-    "element": "arcane",
-    "target": "self",
-    "type": "defense",
-    "proficiencyNeeded": "novice",
-    "manaCost": 10,
-    "effects": {
-      "damage": null,
-      "buffs": [
-        "steady aim"
-      ],
-      "debuffs": null
-    }
-  },
-  {
-    "name": "quick shot",
-    "element": "arcane",
-    "target": "single",
-    "type": "offense",
-    "usesWeapon": "bow",
-    "proficiencyNeeded": "novice",
-    "manaCost": 5,
-    "effects": {
-      "damage": 10,
-      "buffs": [
-        "quickened mind"
-      ],
-      "debuffs": null
+    },
+    "animation": {
+      "sprite": "arcaneArrow",
+      "style": "missile",
+      "position": "enemy",
+      "reachTargetAtFrame": 7
     }
   },
   {
@@ -488,6 +526,11 @@
         "enchanted quiver"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "risingBlue",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -502,6 +545,12 @@
       "damage": 40,
       "buffs": null,
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "arcaneArrow",
+      "style": "missile",
+      "position": "enemy",
+      "reachTargetAtFrame": 7
     }
   },
   {
@@ -516,58 +565,12 @@
       "damage": 50,
       "buffs": null,
       "debuffs": null
-    }
-  },
-  {
-    "name": "multi-shot",
-    "element": "arcane",
-    "target": "area",
-    "type": "offense",
-    "usesWeapon": "bow",
-    "proficiencyNeeded": "adept",
-    "manaCost": 55,
-    "effects": {
-      "damage": 35,
-      "buffs": null,
-      "debuffs": null
-    }
-  },
-  {
-    "name": "piercing barrage",
-    "element": "arcane",
-    "target": "single",
-    "type": "offense",
-    "usesWeapon": "bow",
-    "proficiencyNeeded": "expert",
-    "manaCost": 75,
-    "effects": {
-      "damage": 60,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "sunder",
-          "chance": 0.3
-        }
-      ]
-    }
-  },
-  {
-    "name": "volley",
-    "element": "arcane",
-    "target": "area",
-    "type": "offense",
-    "usesWeapon": "bow",
-    "proficiencyNeeded": "expert",
-    "manaCost": 105,
-    "effects": {
-      "damage": 40,
-      "buffs": null,
-      "debuffs": [
-        {
-          "name": "weaken",
-          "chance": 0.5
-        }
-      ]
+    },
+    "animation": {
+      "sprite": "arcaneArrow",
+      "style": "missile",
+      "position": "enemy",
+      "reachTargetAtFrame": 7
     }
   },
   {
@@ -587,6 +590,11 @@
           "chance": 0.4
         }
       ]
+    },
+    "animation": {
+      "sprite": "risingBlue",
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -603,6 +611,11 @@
         "quickened mind"
       ],
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "moonCall",
+      "style": "static",
+      "position": "self"
     }
   },
   {
@@ -615,9 +628,15 @@
     "duration": 3,
     "manaCost": 500,
     "effects": {
-      "damage": 150,
+      "damage": 100,
       "buffs": null,
       "debuffs": null
+    },
+    "animation": {
+      "sprite": "torrent",
+      "style": "missile",
+      "position": "enemy",
+      "reachTargetAtFrame": 7
     }
   },
   {
@@ -625,12 +644,11 @@
     "element": "arcane",
     "target": "area",
     "type": "offense",
-    "usesWeapon": "bow",
     "proficiencyNeeded": "legend",
     "duration": 5,
     "manaCost": 1250,
     "effects": {
-      "damage": 125,
+      "damage": 300,
       "buffs": null,
       "debuffs": [
         {
@@ -638,6 +656,11 @@
           "chance": 0.5
         }
       ]
+    },
+    "animation": {
+      "sprite": "blueBeam",
+      "style": "static",
+      "position": "enemy"
     }
   }
 ]

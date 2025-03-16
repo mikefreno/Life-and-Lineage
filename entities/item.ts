@@ -297,7 +297,7 @@ export class Item {
           new Attack({
             ...found,
             user: this.root.playerState,
-            targets: found.targets as "single" | "dual" | "aoe",
+            targets: found.targets as "single" | "dual" | "area",
           }),
         );
       }

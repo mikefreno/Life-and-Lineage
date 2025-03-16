@@ -165,7 +165,7 @@
   {
     "name": "bolder throw",
     "energyCost": 25,
-    "targets": "aoe",
+    "targets": "area",
     "hitChance": 0.85,
     "damageMult": 1.5,
     "debuffs": [
@@ -225,7 +225,7 @@
   {
     "name": "wail",
     "energyCost": 20,
-    "targets": "aoe",
+    "targets": "area",
     "hitChance": 0.85,
     "damageMult": 0.0,
     "flatSanityDamage": 5,
@@ -259,7 +259,7 @@
   {
     "name": "stampede",
     "energyCost": 15,
-    "targets": "aoe",
+    "targets": "area",
     "hitChance": 0.85,
     "damageMult": 0.85,
     "debuffs": [
@@ -460,7 +460,7 @@
   {
     "name": "terrorize",
     "energyCost": 30,
-    "targets": "aoe",
+    "targets": "area",
     "hitChance": 0.85,
     "damageMult": 0.0,
     "flatSanityDamage": 10,
@@ -568,14 +568,14 @@
   {
     "name": "gust",
     "energyCost": 15,
-    "targets": "aoe",
+    "targets": "area",
     "hitChance": 0.95,
     "damageMult": 0.75
   },
   {
     "name": "wing buffet",
     "energyCost": 25,
-    "targets": "aoe",
+    "targets": "area",
     "hitChance": 0.90,
     "damageMult": 0.75,
     "debuffs": [

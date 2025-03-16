@@ -119,18 +119,18 @@
     "baseValue": 5000
   },
   {
-    "name": "book of bone spear",
-    "type": "spell",
-    "teaches": "bone spear",
-    "icon": "Book",
-    "baseValue": 20000
-  },
-  {
     "name": "book of bone wall",
     "type": "spell",
     "teaches": "bone wall",
     "icon": "Book",
     "baseValue": 20000
+  },
+  {
+    "name": "book of bone spear",
+    "type": "spell",
+    "teaches": "bone spear",
+    "icon": "Book",
+    "baseValue": 50000
   },
   {
     "name": "book of bone armor",
@@ -140,23 +140,23 @@
     "baseValue": 50000
   },
   {
-    "name": "book of bone prison",
+    "name": "book of bone armor",
     "type": "spell",
-    "teaches": "bone prison",
+    "teaches": "bone armor",
     "icon": "Book_2",
     "baseValue": 150000
   },
   {
-    "name": "book of bone storm",
+    "name": "book of bone prison",
     "type": "spell",
-    "teaches": "bone storm",
+    "teaches": "bone armor",
     "icon": "Book_2",
     "baseValue": 200000
   },
   {
     "name": "forbidden bone techniques",
     "type": "spell",
-    "teaches": "bone explosion",
+    "teaches": "bone blade",
     "icon": "Book_3",
     "baseValue": 1000000
   },
@@ -175,9 +175,9 @@
     "baseValue": 5000
   },
   {
-    "name": "book of rotting touch",
+    "name": "book of poison stream",
     "type": "spell",
-    "teaches": "rotting touch",
+    "teaches": "poison stream",
     "icon": "Book",
     "baseValue": 20000
   },

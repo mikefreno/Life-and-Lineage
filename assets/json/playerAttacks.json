@@ -3,13 +3,23 @@
     "name": "punch",
     "targets": "single",
     "hitChance": 1.0,
-    "damageMult": 1.0
+    "damageMult": 1.0,
+    "animation": {
+      "sprite": "puft",
+      "style": "static",
+      "position": "enemy"
+    }
   },
   {
     "name": "hit",
     "targets": "single",
     "hitChance": 1.0,
-    "damageMult": 1.0
+    "damageMult": 1.0,
+    "animation": {
+      "sprite": "puft",
+      "style": "static",
+      "position": "enemy"
+    }
   },
   {
     "name": "stab",
@@ -21,7 +31,12 @@
         "name": "bleed",
         "chance": 0.2
       }
-    ]
+    ],
+    "animation": {
+      "sprite": "smallCross",
+      "style": "static",
+      "position": "enemy"
+    }
   },
   {
     "name": "torch stab",
@@ -33,19 +48,34 @@
         "name": "burn",
         "chance": 0.85
       }
-    ]
+    ],
+    "animation": {
+      "sprite": "puft",
+      "style": "static",
+      "position": "enemy"
+    }
   },
   {
     "name": "slash",
     "targets": "single",
     "hitChance": 1.0,
-    "damageMult": 1.0
+    "damageMult": 1.0,
+    "animation": {
+      "sprite": "slash-horizontal",
+      "style": "static",
+      "position": "enemy"
+    }
   },
   {
     "name": "cleave",
     "targets": "dual",
     "hitChance": 0.85,
-    "damageMult": 1.0
+    "damageMult": 1.0,
+    "animation": {
+      "sprite": "slash-horizontal",
+      "style": "static",
+      "position": "enemy"
+    }
   },
   {
     "name": "crushing blow",
@@ -57,10 +87,15 @@
         "name": "stun",
         "chance": 0.25
       }
-    ]
+    ],
+    "animation": {
+      "sprite": "crowning",
+      "style": "static",
+      "position": "enemy"
+    }
   },
   {
-    "name": "crushing blow",
+    "name": "",
     "targets": "single",
     "hitChance": 0.95,
     "damageMult": 1.0,
@@ -83,18 +118,10 @@
     "hitChance": 1.0,
     "damageMult": 1.0,
     "animation": {
-      "chain": {
-        "0": {
-          "sprite": "arrow",
-          "style": "missile",
-          "position": "enemy"
-        },
-        "1": {
-          "sprite": "projectileHit",
-          "style": "static",
-          "position": "enemy"
-        }
-      }
+      "sprite": "chainedArrowHit",
+      "style": "missile",
+      "position": "enemy",
+      "reachTargetAtFrame": 7
     }
   },
   {
@@ -107,7 +134,13 @@
         "name": "stun",
         "chance": 0.5
       }
-    ]
+    ],
+    "animation": {
+      "sprite": "chainedArrowRooting",
+      "style": "missile",
+      "position": "enemy",
+      "reachTargetAtFrame": 7
+    }
   },
   {
     "name": "hack",
@@ -119,20 +152,37 @@
         "name": "execute",
         "chance": 0.1
       }
-    ]
+    ],
+    "animation": {
+      "sprite": "crowning",
+      "style": "static",
+      "position": "enemy"
+    }
   },
   {
     "name": "rapid shot",
     "targets": "single",
     "hitChance": 0.65,
     "damageMult": 0.85,
-    "hits": 3
+    "hits": 3,
+    "animation": {
+      "sprite": "chainedArrowHit",
+      "style": "missile",
+      "position": "enemy",
+      "reachTargetAtFrame": 7
+    }
   },
   {
     "name": "careful shot",
     "targets": "single",
     "hitChance": 1.0,
-    "damageMult": 0.95
+    "damageMult": 0.95,
+    "animation": {
+      "sprite": "chainedArrowHit",
+      "style": "missile",
+      "position": "enemy",
+      "reachTargetAtFrame": 7
+    }
   },
   {
     "name": "poison shot",
@@ -144,13 +194,25 @@
         "name": "poison",
         "chance": 0.65
       }
-    ]
+    ],
+    "animation": {
+      "sprite": "chainedPoisonArrowHit",
+      "style": "missile",
+      "position": "enemy",
+      "reachTargetAtFrame": 7
+    }
   },
   {
     "name": "overdraw",
     "targets": "single",
     "hitChance": 0.80,
-    "damageMult": 1.75
+    "damageMult": 1.75,
+    "animation": {
+      "sprite": "chainedArrowHit",
+      "style": "missile",
+      "position": "enemy",
+      "reachTargetAtFrame": 7
+    }
   }
 ]
 

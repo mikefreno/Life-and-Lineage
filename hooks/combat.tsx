@@ -10,8 +10,6 @@ import { useIsFocused } from "@react-navigation/native";
 import { Spell } from "../entities/spell";
 import { AnimationOptions } from "@/utility/enemyHelpers";
 import { type Condition } from "@/entities/conditions";
-import { VFXImageMap } from "@/utility/vfxmapping";
-import { FPS } from "@/stores/EnemyAnimationStore";
 
 const attackHandler = ({
   attackResults,
@@ -289,12 +287,6 @@ export const useCombatActions = () => {
         targets,
         user: playerState!,
       });
-
-      let timeoutDuration = 500;
-      if (attackOrSpell.animation && "sprite" in attackOrSpell.animation) {
-        const set = VFXImageMap[attackOrSpell.animation.sprite];
-        timeoutDuration = set.frames * (1000 / FPS);
-      }
 
       buffs?.forEach((buff) => playerState?.addCondition(buff));
 

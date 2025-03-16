@@ -119,9 +119,9 @@
     "baseValue": 5000
   },
   {
-    "name": "book of righteous hammer",
+    "name": "book of righteous blow",
     "type": "spell",
-    "teaches": "righteous hammer",
+    "teaches": "righteous blow",
     "icon": "Book",
     "baseValue": 10000
   },
