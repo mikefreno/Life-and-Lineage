@@ -150,9 +150,6 @@ export const useEnemyManagement = () => {
                 enemyAttackRes.attack.name
               ] as AnimationOptions) ?? "attack_1";
           }
-          if (enemy.creatureSpecies == "training dummy") {
-            return;
-          }
 
           setTimeout(
             () => {
@@ -185,7 +182,11 @@ export const useEnemyManagement = () => {
                 animStore?.setTextString("STUNNED!");
                 break;
               case AttackUse.lowEnergy:
-                animStore?.setTextString("EXHAUSTED!");
+                animStore?.setTextString(
+                  enemy.creatureSpecies !== "training dummy"
+                    ? "EXHAUSTED!"
+                    : "*STARE*",
+                );
                 break;
             }
           }

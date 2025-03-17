@@ -1,8 +1,9 @@
-import { View, Pressable } from "react-native";
+import { View, Pressable, DimensionValue } from "react-native";
 import { Text } from "../Themed";
 import { useVibration } from "../../hooks/generic";
 import { useRootStore } from "../../hooks/stores";
-import { useStyles } from "../../hooks/styles";
+import { normalize, useStyles } from "../../hooks/styles";
+import { useMemo } from "react";
 
 interface BattleTabControlsProps {
   battleTab: string;
@@ -27,56 +28,65 @@ export default function BattleTabControls({
         : undefined,
   });
 
+  const attacksOrNavigationStyle = useMemo(
+    () => ({
+      width: "33.333%" as DimensionValue,
+      paddingVertical: normalize(12),
+      ...getBackgroundColor("attacksOrNavigation"),
+    }),
+    [battleTab, getBackgroundColor],
+  );
+
+  const equipmentStyle = useMemo(
+    () => ({
+      width: "33.333%" as DimensionValue,
+      paddingVertical: normalize(12),
+      ...getBackgroundColor("equipment"),
+    }),
+    [battleTab, getBackgroundColor],
+  );
+
+  const logStyle = useMemo(
+    () => ({
+      width: "33.333%" as DimensionValue,
+      paddingVertical: normalize(12),
+      ...getBackgroundColor("attacksOrNavigation"),
+    }),
+    [battleTab, getBackgroundColor],
+  );
+
   return (
     <View style={styles.battleTabControls}>
       <Pressable
-        style={[
-          {
-            width: "33.333%",
-            paddingVertical: 16,
-          },
-          getBackgroundColor("attacksOrNavigation"),
-        ]}
+        style={attacksOrNavigationStyle}
         onPress={() => {
           vibration({ style: "light" });
           setBattleTab("attacksOrNavigation");
         }}
       >
-        <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
+        <Text style={{ textAlign: "center", ...styles["text-lg"] }}>
           {dungeonStore.inCombat ? "Attacks" : "Navigation"}
         </Text>
       </Pressable>
       <Pressable
-        style={[
-          {
-            width: "33.333%",
-            paddingVertical: 16,
-          },
-          getBackgroundColor("equipment"),
-        ]}
+        style={equipmentStyle}
         onPress={() => {
           vibration({ style: "light" });
           setBattleTab("equipment");
         }}
       >
-        <Text style={{ textAlign: "center", ...styles["text-xl"] }}>
+        <Text style={{ textAlign: "center", ...styles["text-lg"] }}>
           Inventory
         </Text>
       </Pressable>
       <Pressable
-        style={[
-          {
-            width: "33.333%",
-            paddingVertical: 16,
-          },
-          getBackgroundColor("log"),
-        ]}
+        style={logStyle}
         onPress={() => {
           vibration({ style: "light" });
           setBattleTab("log");
         }}
       >
-        <Text style={{ textAlign: "center", ...styles["text-xl"] }}>Log</Text>
+        <Text style={{ textAlign: "center", ...styles["text-lg"] }}>Log</Text>
       </Pressable>
     </View>
   );

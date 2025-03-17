@@ -1,6 +1,11 @@
 import React, { useLayoutEffect } from "react";
 import { ThemedView, Text } from "@/components/Themed";
-import { type LayoutChangeEvent, View, Animated } from "react-native";
+import {
+  type LayoutChangeEvent,
+  View,
+  Animated,
+  Dimensions,
+} from "react-native";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
 import BattleTab from "@/components/DungeonComponents/BattleTab";
@@ -31,7 +36,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { LinearGradientBlur } from "@/components/LinearGradientBlur";
 import { Parallax } from "@/components/DungeonComponents/Parallax";
 import { Image } from "expo-image";
-import { normalize, useStyles } from "@/hooks/styles";
+import { normalize, normalizeForText, useStyles } from "@/hooks/styles";
 import { reaction } from "mobx";
 import { ScreenShaker } from "@/components/ScreenShaker";
 import { VFXWrapper } from "@/components/VFXWrapper";
@@ -268,18 +273,26 @@ const DungeonLevelScreen = observer(() => {
             <DungeonMapRender />
           )}
           <LinearGradientBlur style={styles.dungeonBlur} />
-          <View ref={mainBodyRef} style={{ flex: 1 }}>
-            <Animated.Text
+          <View ref={mainBodyRef} style={{ flex: 1, maxHeight: "45%" }}>
+            <View
               style={{
-                textAlign: "center",
-                ...styles["text-xl"],
-                color: Colors.dark.text,
-                opacity: textOpacity,
-                fontFamily: "PixelifySans",
+                position: "absolute",
+                width: uiStore.dimensions.width,
+                marginTop: -normalizeForText(30),
               }}
             >
-              {playerAnimationStore.textString}
-            </Animated.Text>
+              <Animated.Text
+                style={{
+                  textAlign: "center",
+                  ...styles["text-2xl"],
+                  color: Colors.dark.text,
+                  opacity: textOpacity,
+                  fontFamily: "PixelifySans",
+                }}
+              >
+                {playerAnimationStore.textString}
+              </Animated.Text>
+            </View>
             <BattleTab battleTab={battleTab} />
             <BattleTabControls
               battleTab={battleTab}

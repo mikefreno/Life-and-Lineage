@@ -54,9 +54,9 @@ export default class EnemyStore {
     if (stores.length) {
       return (
         stores.some((store) => !store.isIdle) ||
-        this.root.playerAnimationStore.usedPass
+        this.root.playerAnimationStore.playerTurnOngoing
       );
-    } else return this.root.playerAnimationStore.usedPass;
+    } else return this.root.playerAnimationStore.playerTurnOngoing;
   }
 
   //TODO: return the id of the accociated animation store (or maybe enemy) or null

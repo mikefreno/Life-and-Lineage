@@ -5,7 +5,6 @@ export const VFXImageMap = {
     source: require("@/assets/vfx/fire/missile.webp"),
     height: 33,
     width: 57,
-    scale: 0.3,
   },
   fireSlash: {
     source: require("@/assets/vfx/fire/FireSlash.webp"),

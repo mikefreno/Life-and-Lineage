@@ -218,7 +218,6 @@ const PlayerSpriteVFX = ({
     source: any;
     height: number;
     width: number;
-    scale: number;
   };
   enemyPositions: {
     enemyID: string;
@@ -240,8 +239,8 @@ const PlayerSpriteVFX = ({
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
 
   const renderScaleCalc = useMemo(
-    () => calculateRenderScaling(animation.scale),
-    [animation.scale],
+    () => calculateRenderScaling(set.scale),
+    [set.scale],
   );
 
   const containerSize = uiStore.dimensions.lesser * 0.5;

@@ -490,6 +490,7 @@ export type PlayerSpriteAnimationSet =
       position: "enemy" | "field" | "self";
       retrigger?: boolean;
       triggersScreenShake?: boolean;
+      scale?: number;
     }
   | {
       sprite: VFXImageOptions;
@@ -498,6 +499,7 @@ export type PlayerSpriteAnimationSet =
       retrigger?: boolean;
       triggersScreenShake?: boolean;
       reachTargetAtFrame?: number;
+      scale?: number;
     }
   | {
       sprite: VFXImageOptions;
@@ -505,6 +507,7 @@ export type PlayerSpriteAnimationSet =
       position: "field" | "enemy";
       retrigger?: boolean;
       triggersScreenShake?: boolean;
+      scale?: number;
     };
 
 export type PlayerGlowAnimationSet = {

@@ -256,6 +256,7 @@ const BattleTab = observer(
                   data={combinedData}
                   inverted
                   persistentScrollbar
+                  contentContainerStyle={{ paddingHorizontal: "2%" }}
                   renderItem={({ item, index }) => (
                     <AttackOrSpellItem
                       attackOrSpell={item}

@@ -1102,6 +1102,7 @@ export const EnemyImageMap: EnemyImageMapType = {
     },
     height: 44,
     width: 62,
+    topOffset: -15,
     mirror: true,
     renderScale: 0.8,
   },
@@ -1712,6 +1713,7 @@ export const EnemyImageMap: EnemyImageMapType = {
     },
     height: 48,
     width: 48,
+    renderScale: 0.9,
   },
   viking_assassin: {
     sets: {

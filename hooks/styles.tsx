@@ -711,7 +711,7 @@ export const useStyles = () => {
       flexDirection: "row",
       flexWrap: "wrap",
       justifyContent: "space-evenly",
-      paddingHorizontal: 16,
+      paddingHorizontal: normalize(4),
     } as const,
     loadingContainer: {
       flex: 1,

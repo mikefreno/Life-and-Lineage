@@ -177,7 +177,7 @@ const EnemyDisplay = observer(({ enemy }: { enemy: Enemy }) => {
   }, [enemy.currentHealth, enemy.id]);
 
   return (
-    <View style={{ flex: 1, paddingHorizontal: "2%" }}>
+    <View style={{ flex: 1, paddingHorizontal: "2%", marginTop: "-10%" }}>
       <View style={[flex.rowBetween, { flex: 1 }]}>
         <View
           style={{

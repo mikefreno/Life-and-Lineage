@@ -83,7 +83,7 @@ export class PlayerAnimationStore {
           () =>
             (this.playerOrigin = Vector2.from({
               x: this.root.uiStore.dimensions.width / 4,
-              y: this.root.uiStore.dimensions.height / 2,
+              y: this.root.uiStore.dimensions.height / 2.5,
             })),
         ),
     );
@@ -95,6 +95,9 @@ export class PlayerAnimationStore {
 
   setTextString(message: string) {
     this.textString = message;
+  }
+  get playerTurnOngoing() {
+    return !!this.animationSet || this.usedPass;
   }
 
   setAnimation({

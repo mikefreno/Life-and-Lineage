@@ -166,42 +166,6 @@ export const generateTiles = ({
     }
   }
 
-  // Place boss room (if needed)
-  if (!bossDefeated && tiles.length > 1) {
-    // Find a tile that's far from the center of the map
-    const centerX = tiles.reduce((sum, tile) => sum + tile.x, 0) / tiles.length;
-    const centerY = tiles.reduce((sum, tile) => sum + tile.y, 0) / tiles.length;
-
-    let farthestTile = tiles[0];
-    let maxDistance = 0;
-
-    tiles.forEach((tile) => {
-      const distance = Math.sqrt(
-        Math.pow(tile.x - centerX, 2) + Math.pow(tile.y - centerY, 2),
-      );
-
-      if (distance > maxDistance) {
-        maxDistance = distance;
-        farthestTile = tile;
-      }
-    });
-
-    farthestTile.isBossRoom = true;
-  }
-
-  // Place special encounters
-  specials.forEach(({ count, specialEncounter }) => {
-    const availableTiles = tiles.filter(
-      (tile) => !tile.isBossRoom && !tile.specialEncounter,
-    );
-
-    for (let i = 0; i < count && availableTiles.length > 0; i++) {
-      const randomIndex = Math.floor(Math.random() * availableTiles.length);
-      availableTiles[randomIndex].specialEncounter = specialEncounter;
-      availableTiles.splice(randomIndex, 1);
-    }
-  });
-
   // Find tiles that would make good entry points (tiles with only one neighbor)
   const entryPointCandidates = [];
 
@@ -360,8 +324,54 @@ export const generateTiles = ({
   // Add the starting tile to the beginning of the array
   tiles.unshift(startTile);
 
+  // Place boss room (if needed) after the starting room is added
+  if (!bossDefeated && tiles.length > 1) {
+    // Calculate distances from starting tile to all other tiles
+    const distancesFromStart = tiles.map((tile, index) => {
+      if (index === 0) return { tile, distance: 0, index }; // Starting tile
+
+      // Calculate path distance (not just Euclidean)
+      // This is a simplified approach - in a real game you might want to use pathfinding
+      const dx = Math.abs(tile.x - startTile.x) / tileSize;
+      const dy = Math.abs(tile.y - startTile.y) / tileSize;
+      const distance = dx + dy; // Manhattan distance as a simple approximation
+
+      return { tile, distance, index };
+    });
+
+    // Sort by distance (descending)
+    distancesFromStart.sort((a, b) => b.distance - a.distance);
+
+    // Find tiles that are at least 5 units away from start
+    const farTiles = distancesFromStart.filter((item) => item.distance >= 5);
+
+    if (farTiles.length > 0) {
+      // Choose one of the far tiles randomly for the boss room
+      const chosenBossTile =
+        farTiles[Math.floor(Math.random() * farTiles.length)];
+      tiles[chosenBossTile.index].isBossRoom = true;
+    } else {
+      // If no tiles are far enough, choose the farthest one
+      tiles[distancesFromStart[0].index].isBossRoom = true;
+    }
+  }
+
+  // Place special encounters
+  specials.forEach(({ count, specialEncounter }) => {
+    const availableTiles = tiles.filter(
+      (tile) => !tile.isBossRoom && !tile.specialEncounter,
+    );
+
+    for (let i = 0; i < count && availableTiles.length > 0; i++) {
+      const randomIndex = Math.floor(Math.random() * availableTiles.length);
+      availableTiles[randomIndex].specialEncounter = specialEncounter;
+      availableTiles.splice(randomIndex, 1);
+    }
+  });
+
   return tiles;
 };
+
 /**
  * Gets the bounding box of a set of tiles.
  * @param {Tile[]} tiles - The tiles to get the bounding box for.

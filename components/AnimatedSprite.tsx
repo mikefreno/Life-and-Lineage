@@ -11,11 +11,7 @@ import {
   EnemyImageMap,
 } from "../utility/enemyHelpers";
 import { useRootStore } from "@/hooks/stores";
-import {
-  calculateRenderScaling,
-  reverseNormalize,
-  useStyles,
-} from "@/hooks/styles";
+import { calculateRenderScaling, useStyles } from "@/hooks/styles";
 import { observer } from "mobx-react-lite";
 import { runInAction } from "mobx";
 import { Enemy, Minion } from "@/entities/creatures";
@@ -23,249 +19,6 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import Colors from "@/constants/Colors";
 import { useReanimatedAnimations } from "@/hooks/animation";
 import { Vector2 } from "@/utility/Vec2";
-
-interface SingleAnimationSpriteProps {
-  source: any;
-  width: number;
-  height: number;
-  isActive: boolean;
-  onAnimationComplete?: () => void;
-  isLooping?: boolean;
-  onFrameCountReady?: (count: number) => void;
-  animationOption: AnimationOptions;
-}
-
-const SingleAnimationSprite = React.memo(
-  ({
-    source,
-    width,
-    height,
-    isActive,
-    onAnimationComplete,
-    isLooping,
-    onFrameCountReady,
-    animationOption,
-  }: SingleAnimationSpriteProps) => {
-    const animatedImage = useAnimatedImage(source);
-    const [currentFrame, setCurrentFrame] = useState(0);
-    const frameRef = useRef(0);
-    const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
-    const hasCompletedLoop = useRef(false);
-    const firstFrameHoldTimerRef = useRef<NodeJS.Timeout | null>(null);
-    const isFirstFrameHeld = useRef(false);
-    const isMounted = useRef(true);
-
-    useEffect(() => {
-      isMounted.current = true;
-      return () => {
-        animatedImage?.dispose();
-        isMounted.current = false;
-      };
-    }, []);
-
-    const safeSetCurrentFrame = (frame: number) => {
-      if (isMounted.current) {
-        setCurrentFrame(frame);
-      }
-    };
-
-    useEffect(() => {
-      if (!animatedImage) return;
-
-      const frameCount = animatedImage.getFrameCount();
-      if (onFrameCountReady && frameCount > 0 && isMounted.current) {
-        onFrameCountReady(frameCount);
-      }
-
-      // Only start animation if this is the active animation
-      if (!isActive) return;
-
-      // Reset animation state
-      frameRef.current = 0;
-      safeSetCurrentFrame(0);
-      hasCompletedLoop.current = false;
-      isFirstFrameHeld.current = false;
-
-      const frameDuration = animatedImage.currentFrameDuration();
-
-      const advanceFrame = () => {
-        if (!animatedImage || !isActive || !isMounted.current) return;
-
-        try {
-          // Special handling for spawn animation (short hold)
-          if (
-            animationOption === "spawn" &&
-            frameRef.current === 0 &&
-            !isFirstFrameHeld.current
-          ) {
-            isFirstFrameHeld.current = true;
-            firstFrameHoldTimerRef.current = setTimeout(() => {
-              if (!isMounted.current) return;
-
-              try {
-                animatedImage.decodeNextFrame();
-                frameRef.current = 1;
-                safeSetCurrentFrame(1);
-                animationTimerRef.current = setTimeout(
-                  continueAnimation,
-                  frameDuration,
-                );
-              } catch (error) {
-                console.error("Error in spawn animation first frame:", error);
-              }
-            }, 350);
-            return;
-          }
-
-          animatedImage.decodeNextFrame();
-          frameRef.current = (frameRef.current + 1) % frameCount;
-          safeSetCurrentFrame(frameRef.current);
-
-          if (frameRef.current === 0 && !hasCompletedLoop.current) {
-            hasCompletedLoop.current = true;
-            if (onAnimationComplete && !isLooping && isMounted.current) {
-              onAnimationComplete();
-              return;
-            }
-          }
-
-          animationTimerRef.current = setTimeout(advanceFrame, frameDuration);
-        } catch (error) {
-          console.error("Error in animation frame:", error);
-        }
-      };
-
-      const continueAnimation = () => {
-        if (!animatedImage || !isActive || !isMounted.current) return;
-
-        try {
-          animatedImage.decodeNextFrame();
-          frameRef.current = (frameRef.current + 1) % frameCount;
-          safeSetCurrentFrame(frameRef.current);
-
-          if (frameRef.current === 0 && !hasCompletedLoop.current) {
-            hasCompletedLoop.current = true;
-            if (onAnimationComplete && !isLooping && isMounted.current) {
-              onAnimationComplete();
-              return;
-            }
-          }
-
-          animationTimerRef.current = setTimeout(advanceFrame, frameDuration);
-        } catch (error) {
-          console.error("Error in continue animation:", error);
-        }
-      };
-
-      // Start the animation process
-      advanceFrame();
-
-      // Cleanup function
-      return () => {
-        if (animationTimerRef.current) {
-          clearTimeout(animationTimerRef.current);
-          animationTimerRef.current = null;
-        }
-        if (firstFrameHoldTimerRef.current) {
-          clearTimeout(firstFrameHoldTimerRef.current);
-          firstFrameHoldTimerRef.current = null;
-        }
-      };
-    }, [
-      animatedImage,
-      onAnimationComplete,
-      isLooping,
-      onFrameCountReady,
-      isActive,
-      animationOption,
-    ]);
-
-    useEffect(() => {
-      return () => {
-        if (animationTimerRef.current) {
-          clearTimeout(animationTimerRef.current);
-          animationTimerRef.current = null;
-        }
-        if (firstFrameHoldTimerRef.current) {
-          clearTimeout(firstFrameHoldTimerRef.current);
-          firstFrameHoldTimerRef.current = null;
-        }
-      };
-    }, []);
-
-    if (!animatedImage || !isActive) {
-      return null;
-    }
-
-    try {
-      return (
-        <Canvas style={{ width, height, position: "absolute" }}>
-          <Image
-            image={animatedImage.getCurrentFrame()}
-            x={0}
-            y={0}
-            width={width}
-            height={height}
-            fit="contain"
-          />
-        </Canvas>
-      );
-    } catch (error) {
-      console.error("Error rendering animation frame:", error);
-      return null;
-    }
-  },
-);
-
-interface SpriteAnimationManagerProps {
-  spriteSet: {
-    [key in AnimationOptions]?: AnimationSet;
-  };
-  currentAnimation: AnimationOptions;
-  width: number;
-  height: number;
-  onAnimationComplete?: () => void;
-  isLooping?: boolean;
-  onFrameCountReady?: (count: number) => void;
-}
-
-const SpriteAnimationManager = React.memo(
-  ({
-    spriteSet,
-    currentAnimation,
-    width,
-    height,
-    onAnimationComplete,
-    isLooping,
-    onFrameCountReady,
-  }: SpriteAnimationManagerProps) => {
-    const validAnimations = useMemo(() => {
-      return Object.entries(spriteSet).map(([key]) => key as AnimationOptions);
-    }, [spriteSet]);
-
-    return (
-      <View style={{ width, height }}>
-        {validAnimations.map((animKey) => (
-          <SingleAnimationSprite
-            key={animKey}
-            animationOption={currentAnimation}
-            source={spriteSet[animKey]?.anim}
-            width={width}
-            height={height}
-            isActive={animKey === currentAnimation}
-            onAnimationComplete={
-              animKey === currentAnimation ? onAnimationComplete : undefined
-            }
-            isLooping={isLooping}
-            onFrameCountReady={
-              animKey === currentAnimation ? onFrameCountReady : undefined
-            }
-          />
-        ))}
-      </View>
-    );
-  },
-);
 
 export const AnimatedSprite = observer(
   ({
@@ -279,6 +32,7 @@ export const AnimatedSprite = observer(
     const headerHeight = useHeaderHeight();
     const measurementAttempts = useRef(0);
     const [frameCount, setFrameCount] = useState(0);
+    const { uiStore, playerAnimationStore, enemyStore } = useRootStore();
 
     const measureAndUpdatePosition = () => {
       if (spriteContainerRef.current && animationStore) {
@@ -303,7 +57,10 @@ export const AnimatedSprite = observer(
       setTimeout(measureAndUpdatePosition, 50);
     };
 
-    const { uiStore, playerAnimationStore, enemyStore } = useRootStore();
+    useEffect(() => {
+      handleLayout();
+    }, [uiStore.dimensions.height, uiStore.dimensions.width]);
+
     const animationStore = enemyStore.getAnimationStore(enemy?.id ?? "");
     const styles = useStyles();
 
@@ -593,6 +350,7 @@ export const AnimatedSprite = observer(
               isLooping={shouldLoop}
               onFrameCountReady={handleFrameCountReady}
               key={`${enemy?.id}`}
+              topOffset={enemyData.topOffset}
             />
           </Animated.View>
         </View>
@@ -615,6 +373,253 @@ export const AnimatedSprite = observer(
             </Animated.Text>
           </Animated.View>
         )}
+      </View>
+    );
+  },
+);
+
+interface SingleAnimationSpriteProps {
+  source: any;
+  width: number;
+  height: number;
+  isActive: boolean;
+  onAnimationComplete?: () => void;
+  isLooping?: boolean;
+  onFrameCountReady?: (count: number) => void;
+  animationOption: AnimationOptions;
+}
+
+const SingleAnimationSprite = React.memo(
+  ({
+    source,
+    width,
+    height,
+    isActive,
+    onAnimationComplete,
+    isLooping,
+    onFrameCountReady,
+    animationOption,
+  }: SingleAnimationSpriteProps) => {
+    const animatedImage = useAnimatedImage(source);
+    const [currentFrame, setCurrentFrame] = useState(0);
+    const frameRef = useRef(0);
+    const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const hasCompletedLoop = useRef(false);
+    const firstFrameHoldTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const isFirstFrameHeld = useRef(false);
+    const isMounted = useRef(true);
+
+    useEffect(() => {
+      isMounted.current = true;
+      return () => {
+        animatedImage?.dispose();
+        isMounted.current = false;
+      };
+    }, []);
+
+    const safeSetCurrentFrame = (frame: number) => {
+      if (isMounted.current) {
+        setCurrentFrame(frame);
+      }
+    };
+
+    useEffect(() => {
+      if (!animatedImage) return;
+
+      const frameCount = animatedImage.getFrameCount();
+      if (onFrameCountReady && frameCount > 0 && isMounted.current) {
+        onFrameCountReady(frameCount);
+      }
+
+      // Only start animation if this is the active animation
+      if (!isActive) return;
+
+      // Reset animation state
+      frameRef.current = 0;
+      safeSetCurrentFrame(0);
+      hasCompletedLoop.current = false;
+      isFirstFrameHeld.current = false;
+
+      const frameDuration = animatedImage.currentFrameDuration();
+
+      const advanceFrame = () => {
+        if (!animatedImage || !isActive || !isMounted.current) return;
+
+        try {
+          // Special handling for spawn animation (short hold)
+          if (
+            animationOption === "spawn" &&
+            frameRef.current === 0 &&
+            !isFirstFrameHeld.current
+          ) {
+            isFirstFrameHeld.current = true;
+            firstFrameHoldTimerRef.current = setTimeout(() => {
+              if (!isMounted.current) return;
+
+              try {
+                animatedImage.decodeNextFrame();
+                frameRef.current = 1;
+                safeSetCurrentFrame(1);
+                animationTimerRef.current = setTimeout(
+                  continueAnimation,
+                  frameDuration,
+                );
+              } catch (error) {
+                console.error("Error in spawn animation first frame:", error);
+              }
+            }, 350);
+            return;
+          }
+
+          animatedImage.decodeNextFrame();
+          frameRef.current = (frameRef.current + 1) % frameCount;
+          safeSetCurrentFrame(frameRef.current);
+
+          if (frameRef.current === 0 && !hasCompletedLoop.current) {
+            hasCompletedLoop.current = true;
+            if (onAnimationComplete && !isLooping && isMounted.current) {
+              onAnimationComplete();
+              return;
+            }
+          }
+
+          animationTimerRef.current = setTimeout(advanceFrame, frameDuration);
+        } catch (error) {
+          console.error("Error in animation frame:", error);
+        }
+      };
+
+      const continueAnimation = () => {
+        if (!animatedImage || !isActive || !isMounted.current) return;
+
+        try {
+          animatedImage.decodeNextFrame();
+          frameRef.current = (frameRef.current + 1) % frameCount;
+          safeSetCurrentFrame(frameRef.current);
+
+          if (frameRef.current === 0 && !hasCompletedLoop.current) {
+            hasCompletedLoop.current = true;
+            if (onAnimationComplete && !isLooping && isMounted.current) {
+              onAnimationComplete();
+              return;
+            }
+          }
+
+          animationTimerRef.current = setTimeout(advanceFrame, frameDuration);
+        } catch (error) {
+          console.error("Error in continue animation:", error);
+        }
+      };
+
+      // Start the animation process
+      advanceFrame();
+
+      // Cleanup function
+      return () => {
+        if (animationTimerRef.current) {
+          clearTimeout(animationTimerRef.current);
+          animationTimerRef.current = null;
+        }
+        if (firstFrameHoldTimerRef.current) {
+          clearTimeout(firstFrameHoldTimerRef.current);
+          firstFrameHoldTimerRef.current = null;
+        }
+      };
+    }, [
+      animatedImage,
+      onAnimationComplete,
+      isLooping,
+      onFrameCountReady,
+      isActive,
+      animationOption,
+    ]);
+
+    useEffect(() => {
+      return () => {
+        if (animationTimerRef.current) {
+          clearTimeout(animationTimerRef.current);
+          animationTimerRef.current = null;
+        }
+        if (firstFrameHoldTimerRef.current) {
+          clearTimeout(firstFrameHoldTimerRef.current);
+          firstFrameHoldTimerRef.current = null;
+        }
+      };
+    }, []);
+
+    if (!animatedImage || !isActive) {
+      return null;
+    }
+
+    try {
+      return (
+        <Canvas style={{ width, height, position: "absolute" }}>
+          <Image
+            image={animatedImage.getCurrentFrame()}
+            x={0}
+            y={0}
+            width={width}
+            height={height}
+            fit="contain"
+          />
+        </Canvas>
+      );
+    } catch (error) {
+      console.error("Error rendering animation frame:", error);
+      return null;
+    }
+  },
+);
+
+interface SpriteAnimationManagerProps {
+  spriteSet: {
+    [key in AnimationOptions]?: AnimationSet;
+  };
+  currentAnimation: AnimationOptions;
+  width: number;
+  height: number;
+  onAnimationComplete?: () => void;
+  isLooping?: boolean;
+  topOffset?: number;
+  onFrameCountReady?: (count: number) => void;
+}
+
+const SpriteAnimationManager = React.memo(
+  ({
+    spriteSet,
+    currentAnimation,
+    width,
+    height,
+    topOffset,
+    onAnimationComplete,
+    isLooping,
+    onFrameCountReady,
+  }: SpriteAnimationManagerProps) => {
+    const validAnimations = useMemo(() => {
+      return Object.entries(spriteSet).map(([key]) => key as AnimationOptions);
+    }, [spriteSet]);
+
+    return (
+      <View
+        style={{ width, height, marginTop: topOffset ? `${topOffset}%` : 0 }}
+      >
+        {validAnimations.map((animKey) => (
+          <SingleAnimationSprite
+            key={animKey}
+            animationOption={currentAnimation}
+            source={spriteSet[animKey]?.anim}
+            width={width}
+            height={height}
+            isActive={animKey === currentAnimation}
+            onAnimationComplete={
+              animKey === currentAnimation ? onAnimationComplete : undefined
+            }
+            isLooping={isLooping}
+            onFrameCountReady={
+              animKey === currentAnimation ? onFrameCountReady : undefined
+            }
+          />
+        ))}
       </View>
     );
   },

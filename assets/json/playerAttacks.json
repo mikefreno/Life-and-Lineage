@@ -7,7 +7,8 @@
     "animation": {
       "sprite": "puft",
       "style": "static",
-      "position": "enemy"
+      "position": "enemy",
+      "scale": 0.3
     }
   },
   {
