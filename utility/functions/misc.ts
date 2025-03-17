@@ -29,6 +29,7 @@ import {
 import { Character } from "../../entities/character";
 import { Enemy } from "../../entities/creatures";
 import { FPS, MAX_ANIMATION_DURATION } from "@/stores/EnemyAnimationStore";
+import { Vector2 } from "../Vec2";
 
 export const AccelerationCurves = {
   none: (t: number) => t,

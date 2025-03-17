@@ -35,7 +35,7 @@ import {
   configureReanimatedLogger,
   ReanimatedLogLevel,
 } from "react-native-reanimated";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import PlatformDependantGestureWrapper from "@/components/PlatformDependantGestureWrapper";
 import { SCREEN_TRANSITION_TIMING } from "@/stores/UIStore";
@@ -577,7 +577,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                     {({ pressed }) => (
                       <MaterialCommunityIcons
                         name="run-fast"
-                        size={28}
+                        size={uiStore.iconSizeLarge}
                         color={
                           uiStore.colorScheme == "light" ? "#18181b" : "#fafafa"
                         }
@@ -589,6 +589,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                     )}
                   </Pressable>
                 ),
+                headerRight: () => <AudioToggleButton />,
                 title:
                   dungeonStore.currentInstance?.name.toLowerCase() ===
                   "training grounds"
@@ -637,3 +638,31 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
 });
 
 export default Sentry.wrap(Root);
+
+const AudioToggleButton = observer(() => {
+  const { audioStore, uiStore } = useRootStore();
+
+  return (
+    <Pressable
+      onPress={() => {
+        audioStore.setMuteValue(!audioStore.muted);
+      }}
+      accessibilityRole="button"
+      accessibilityLabel={`Toggle audio ${audioStore.muted ? "on" : "off"}`}
+    >
+      {audioStore.muted ? (
+        <MaterialIcons
+          name="music-off"
+          size={uiStore.iconSizeLarge}
+          color={uiStore.isDark ? "#fafafa" : "#27272a"}
+        />
+      ) : (
+        <MaterialIcons
+          name="music-note"
+          size={uiStore.iconSizeLarge}
+          color={uiStore.isDark ? "#fafafa" : "#27272a"}
+        />
+      )}
+    </Pressable>
+  );
+});

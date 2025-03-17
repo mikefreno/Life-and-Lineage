@@ -40,55 +40,104 @@ const SpellsScreen = observer(() => {
         magicProficiency.school,
       );
       const currentMasteryBarrier = MasteryToBarrier[currentMastery];
-      const nextMasteryBarrier =
-        MasteryToBarrier[(currentMastery + 1) as MasteryLevel];
-      return (
-        <View style={[styles.proficiencyContainer]} key={idx}>
-          <Text
-            style={{
-              color:
-                magicProficiency.school == Element.air &&
-                uiStore.colorScheme == "light"
-                  ? "#71717a"
-                  : magicProficiency.school == Element.assassination
-                  ? uiStore.colorScheme == "dark"
-                    ? color.light
-                    : color.dark
-                  : color.dark,
-            }}
-          >
-            {`${ElementToString[magicProficiency.school]} (${
-              MasteryToString[currentMastery]
-            })`}
-          </Text>
-          <ProgressBar
-            value={magicProficiency.proficiency}
-            minValue={currentMasteryBarrier}
-            maxValue={nextMasteryBarrier}
-            unfilledColor={color.light}
-            filledColor={color.dark}
-            borderColor={color.dark}
-          />
-          <Text
-            style={{
-              textAlign: "center",
-              fontSize: 14,
-              color:
-                magicProficiency.school == Element.air &&
-                uiStore.colorScheme == "light"
-                  ? "#71717a"
-                  : magicProficiency.school == Element.assassination
-                  ? uiStore.colorScheme == "dark"
-                    ? color.light
-                    : color.dark
-                  : color.dark,
-            }}
-          >
-            Progression to{" "}
-            {MasteryToString[(currentMastery + 1) as MasteryLevel]}
-          </Text>
-        </View>
-      );
+      if (currentMastery !== MasteryLevel.Legend) {
+        const nextMasteryBarrier =
+          MasteryToBarrier[(currentMastery + 1) as MasteryLevel];
+        return (
+          <View style={[styles.proficiencyContainer]} key={idx}>
+            <Text
+              style={{
+                color:
+                  magicProficiency.school == Element.air &&
+                  uiStore.colorScheme == "light"
+                    ? "#71717a"
+                    : magicProficiency.school == Element.assassination
+                    ? uiStore.colorScheme == "dark"
+                      ? color.light
+                      : color.dark
+                    : color.dark,
+              }}
+            >
+              {`${ElementToString[magicProficiency.school]} (${
+                MasteryToString[currentMastery]
+              })`}
+            </Text>
+            <ProgressBar
+              value={magicProficiency.proficiency}
+              minValue={currentMasteryBarrier}
+              maxValue={nextMasteryBarrier}
+              unfilledColor={color.light}
+              filledColor={color.dark}
+              borderColor={color.dark}
+            />
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: 14,
+                color:
+                  magicProficiency.school == Element.air &&
+                  uiStore.colorScheme == "light"
+                    ? "#71717a"
+                    : magicProficiency.school == Element.assassination
+                    ? uiStore.colorScheme == "dark"
+                      ? color.light
+                      : color.dark
+                    : color.dark,
+              }}
+            >
+              Progression to{" "}
+              {MasteryToString[(currentMastery + 1) as MasteryLevel]}
+            </Text>
+          </View>
+        );
+      } else {
+        return (
+          <View style={[styles.proficiencyContainer]} key={idx}>
+            <Text
+              style={{
+                color:
+                  magicProficiency.school == Element.air &&
+                  uiStore.colorScheme == "light"
+                    ? "#71717a"
+                    : magicProficiency.school == Element.assassination
+                    ? uiStore.colorScheme == "dark"
+                      ? color.light
+                      : color.dark
+                    : color.dark,
+              }}
+            >
+              {`${ElementToString[magicProficiency.school]} (${
+                MasteryToString[currentMastery]
+              })`}
+            </Text>
+            <ProgressBar
+              value={magicProficiency.proficiency}
+              minValue={400}
+              maxValue={500}
+              unfilledColor={color.light}
+              filledColor={color.dark}
+              borderColor={color.dark}
+            />
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: 14,
+                color:
+                  magicProficiency.school == Element.air &&
+                  uiStore.colorScheme == "light"
+                    ? "#71717a"
+                    : magicProficiency.school == Element.assassination
+                    ? uiStore.colorScheme == "dark"
+                      ? color.light
+                      : color.dark
+                    : color.dark,
+              }}
+            >
+              You can progress no further
+            </Text>
+          </View>
+        );
+      }
     });
   }
   const isFocused = useIsFocused();

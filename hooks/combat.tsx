@@ -150,6 +150,9 @@ export const useEnemyManagement = () => {
                 enemyAttackRes.attack.name
               ] as AnimationOptions) ?? "attack_1";
           }
+          if (enemy.creatureSpecies == "training dummy") {
+            return;
+          }
 
           setTimeout(
             () => {
@@ -352,7 +355,6 @@ export const useCombatActions = () => {
       };
 
       if (attackOrSpell.animation) {
-        console.log("setting animation");
         playerAnimationStore
           .setAnimation({ set: attackOrSpell.animation, enemyIDs: [target.id] })
           .then(() => {

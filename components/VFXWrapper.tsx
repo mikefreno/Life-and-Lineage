@@ -1,7 +1,8 @@
 import { useRootStore } from "@/hooks/stores";
-import { normalize } from "@/hooks/styles";
+import { calculateRenderScaling } from "@/hooks/styles";
 import { type EnemyAnimationStore } from "@/stores/EnemyAnimationStore";
 import { PlayerSpriteAnimationSet } from "@/utility/types";
+import { Vector2 } from "@/utility/Vec2";
 import { VFXImageMap } from "@/utility/vfxmapping";
 import { Canvas, useAnimatedImage, Image } from "@shopify/react-native-skia";
 import { toJS } from "mobx";
@@ -78,6 +79,7 @@ export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
           />
         </>
       )}
+      {children}
       <PlayerVFX
         enemyPositions={enemyAndPosList}
         playerOrigin={playerAnimationStore.playerOrigin}
@@ -89,7 +91,6 @@ export const VFXWrapper = observer(({ children }: { children: ReactNode }) => {
           playerOrigin={playerAnimationStore.playerOrigin}
         />
       ))}
-      {children}
     </View>
   );
 });
@@ -101,9 +102,9 @@ const PlayerVFX = observer(
   }: {
     enemyPositions: {
       enemyID: string;
-      positionMidPoint: { x: number; y: number };
+      positionMidPoint: Vector2;
     }[];
-    playerOrigin: { x: number; y: number };
+    playerOrigin: Vector2;
   }) => {
     const { playerAnimationStore } = useRootStore();
 
@@ -115,8 +116,6 @@ const PlayerVFX = observer(
         return VFXImageMap[playerAnimationStore.animationSet.sprite];
       } else return null;
     }, [playerAnimationStore.animationSet]);
-
-    useEffect(() => console.log(animation), [animation]);
 
     if (!playerAnimationStore.animationSet) return null;
     return (
@@ -147,17 +146,20 @@ const PlayerVFX = observer(
   },
 );
 
+// Updated placement handlers using enhanced Vector2 methods
 const missilePlacementHandler = ({
   playerOrigin,
   normalized,
 }: {
-  playerOrigin: { x: number; y: number };
+  playerOrigin: Vector2;
   normalized: { width: number; height: number };
-}) => {
-  return {
-    x: playerOrigin.x - normalized.width / 2,
-    y: playerOrigin.y - normalized.height / 2,
-  };
+}): Vector2 => {
+  // Create an offset vector pointing up (for better visual alignment)
+  const offset = Vector2.fromAngle(-Math.PI / 2, normalized.height * 0.1);
+  // Add the offset to player origin and then adjust for sprite center
+  return playerOrigin
+    .add(offset)
+    .subtract(new Vector2(normalized.width / 2, normalized.height / 2));
 };
 
 const staticPlacementHandler = ({
@@ -166,31 +168,30 @@ const staticPlacementHandler = ({
   targetPosition,
   position,
 }: {
-  playerOrigin: { x: number; y: number };
+  playerOrigin: Vector2;
   normalized: { width: number; height: number };
-  targetPosition: { x: number; y: number };
+  targetPosition: Vector2;
   position: "enemy" | "field" | "self";
-}) => {
+}): Vector2 => {
+  const centerOffset = new Vector2(normalized.width / 2, normalized.height / 2);
+
   switch (position) {
     case "enemy":
       // Place on the enemy position
-      return {
-        x: targetPosition.x - normalized.width / 2,
-        y: targetPosition.y - normalized.height / 2,
-      };
+      return targetPosition.subtract(centerOffset);
+
     case "field":
-      // Place in the center between playerOrigin and the target
-      return {
-        x: (playerOrigin.x + targetPosition.x) / 2 - normalized.width / 2,
-        y: (playerOrigin.y + targetPosition.y) / 2 - normalized.height / 2,
-      };
+      // Place in the center between playerOrigin and the target using midpoint
+      return playerOrigin.midpoint(targetPosition).subtract(centerOffset);
+
     case "self":
     default:
-      // Place at playerOrigin (lowered y for better visibility)
-      return {
-        x: playerOrigin.x - normalized.width / 2,
-        y: playerOrigin.y - normalized.height - 20,
-      };
+      // Place at playerOrigin with a slight upward offset for better visibility
+      const selfOffset = Vector2.fromAngle(
+        -Math.PI / 2,
+        normalized.height * 0.5,
+      );
+      return playerOrigin.add(selfOffset).subtract(centerOffset);
   }
 };
 
@@ -198,14 +199,12 @@ const spanPlacementHandler = ({
   playerOrigin,
   normalized,
 }: {
-  playerOrigin: { x: number; y: number };
+  playerOrigin: Vector2;
   normalized: { width: number; height: number };
-}) => {
-  // For span style, we'll return the position and calculate rotation/scaling separately
-  return {
-    x: playerOrigin.x - normalized.width / 2,
-    y: playerOrigin.y - normalized.height / 2,
-  };
+}): Vector2 => {
+  return playerOrigin.subtract(
+    new Vector2(normalized.width / 2, normalized.height / 2),
+  );
 };
 
 const PlayerSpriteVFX = ({
@@ -217,25 +216,19 @@ const PlayerSpriteVFX = ({
 }: {
   animation: {
     source: any;
-    frames: number;
     height: number;
     width: number;
-    scale?: number;
+    scale: number;
   };
   enemyPositions: {
     enemyID: string;
-    positionMidPoint: {
-      x: number;
-      y: number;
-    };
+    positionMidPoint: Vector2;
   }[];
-  playerOrigin: {
-    x: number;
-    y: number;
-  };
+  playerOrigin: Vector2;
   set: PlayerSpriteAnimationSet;
   onComplete: (() => void) | null;
 }) => {
+  const { uiStore } = useRootStore();
   const animatedImage = useAnimatedImage(animation.source);
   const [currentFrame, setCurrentFrame] = useState(0);
   const frameRef = useRef(0);
@@ -246,20 +239,31 @@ const PlayerSpriteVFX = ({
   const animXY = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
 
+  const renderScaleCalc = useMemo(
+    () => calculateRenderScaling(animation.scale),
+    [animation.scale],
+  );
+
+  const containerSize = uiStore.dimensions.lesser * 0.5;
+
+  const scaleX = (containerSize / animation.width) * renderScaleCalc;
+  const scaleY = (containerSize / animation.height) * renderScaleCalc;
+
+  const scale = Math.min(scaleX, scaleY);
+
   const normalized = useMemo(() => {
     return {
-      height: normalize(animation.height * (animation.scale ?? 1)),
-      width: normalize(animation.width * (animation.scale ?? 1)),
+      height: animation.height * scale,
+      width: animation.width * scale,
     };
-  }, [animation.height, animation.width]);
+  }, [animation.height, animation.width, scale]);
 
   const targetPosition = useMemo(() => {
     return enemyPositions.length > 0
       ? enemyPositions[0].positionMidPoint
-      : { x: playerOrigin.x, y: playerOrigin.y - 100 };
+      : playerOrigin.add(Vector2.fromAngle(-Math.PI / 2, 0));
   }, [enemyPositions, playerOrigin]);
 
-  // Calculate initial position based on style
   const initialPosition = useMemo(() => {
     switch (set.style) {
       case "static":
@@ -276,14 +280,12 @@ const PlayerSpriteVFX = ({
     }
   }, [set.style, set.position, playerOrigin, normalized, targetPosition]);
 
-  // Calculate angle and distance for span style
   const spanCalculations = useMemo(() => {
     if (set.style !== "span") return null;
 
-    const dx = targetPosition.x - playerOrigin.x;
-    const dy = targetPosition.y - playerOrigin.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+    const direction = targetPosition.subtract(playerOrigin);
+    const distance = direction.magnitude();
+    const angle = direction.angleDegrees();
 
     return { distance, angle };
   }, [set.style, playerOrigin, targetPosition]);
@@ -331,7 +333,7 @@ const PlayerSpriteVFX = ({
         frameRef.current = (frameRef.current + 1) % frameCount;
         safeSetCurrentFrame(frameRef.current);
 
-        if (frameRef.current === 0) {
+        if (frameRef.current === frameCount - 1) {
           if (onComplete && isMounted.current) {
             onComplete();
             return;
@@ -347,7 +349,7 @@ const PlayerSpriteVFX = ({
     advanceFrame();
   }, [animatedImage, onComplete, safeSetCurrentFrame]);
 
-  // Handle missile movement animation
+  // Handle missile movement animation using Vector2
   useEffect(() => {
     if (!animatedImage || set.style !== "missile") return;
 
@@ -355,13 +357,12 @@ const PlayerSpriteVFX = ({
     const frameDuration = animatedImage.currentFrameDuration();
     const totalDuration = frameCount * frameDuration;
 
-    const distanceX = targetPosition.x - playerOrigin.x;
-    const distanceY = targetPosition.y - playerOrigin.y;
+    const dist = targetPosition.subtract(playerOrigin);
 
     animXY.setValue({ x: 0, y: 0 });
 
     animationRef.current = Animated.timing(animXY, {
-      toValue: { x: distanceX, y: distanceY },
+      toValue: dist,
       duration: totalDuration,
       useNativeDriver: true,
     });
@@ -414,6 +415,9 @@ const PlayerSpriteVFX = ({
       </View>
     );
   } else if (set.style === "missile") {
+    // Calculate the angle from player to target
+    const angle = playerOrigin.angleBetweenDegrees(targetPosition);
+
     return (
       <Animated.View
         style={{
@@ -422,10 +426,22 @@ const PlayerSpriteVFX = ({
           top: initialPosition.y,
           width: normalized.width,
           height: normalized.height,
-          transform: [{ translateX: animXY.x }, { translateY: animXY.y }],
+          zIndex: 9999,
+          transform: [
+            { translateX: animXY.x },
+            { translateY: animXY.y },
+            // For sprites that face right by default, use the angle directly
+            { rotate: `${angle}deg` },
+          ],
         }}
       >
-        <Canvas style={{ width: normalized.width, height: normalized.height }}>
+        <Canvas
+          style={{
+            width: normalized.width,
+            height: normalized.height,
+            zIndex: 9999,
+          }}
+        >
           <Image
             image={animatedImage.getCurrentFrame()}
             x={0}
@@ -447,9 +463,16 @@ const PlayerSpriteVFX = ({
           top: initialPosition.y,
           width: normalized.width,
           height: normalized.height,
+          zIndex: 9999,
         }}
       >
-        <Canvas style={{ width: normalized.width, height: normalized.height }}>
+        <Canvas
+          style={{
+            width: normalized.width,
+            height: normalized.height,
+            zIndex: 9999,
+          }}
+        >
           <Image
             image={animatedImage.getCurrentFrame()}
             x={0}
@@ -482,7 +505,7 @@ const EnemyVFX = observer(
     playerOrigin,
   }: {
     store: EnemyAnimationStore;
-    playerOrigin: { x: number; y: number };
+    playerOrigin: Vector2;
   }) => {
     if (!store.projectileSet || !store.spriteMidPoint) return null;
 
@@ -516,24 +539,23 @@ const ProjectileEffect = ({
     height: number;
     width: number;
     scale?: number;
+    renderScale?: number;
   };
-  enemyOrigin: { x: number; y: number };
-  playerOrigin: { x: number; y: number };
+  enemyOrigin: Vector2;
+  playerOrigin: Vector2;
   splash?: {
     anim: any;
     height: number;
     width: number;
     scale?: number;
+    renderScale?: number;
     followsProjectile: boolean;
   };
   onComplete: () => void;
 }) => {
+  const { uiStore } = useRootStore();
   const projectileImage = useAnimatedImage(projectile.anim);
   const [projectileFrame, setProjectileFrame] = useState(0);
-  const [projectilePosition, setProjectilePosition] = useState({
-    x: enemyOrigin.x,
-    y: enemyOrigin.y,
-  });
   const [showSplash, setShowSplash] = useState(false);
   const [animationComplete, setAnimationComplete] = useState(false);
   const animationRef = useRef<Animated.CompositeAnimation | null>(null);
@@ -542,12 +564,35 @@ const ProjectileEffect = ({
 
   const animXY = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
 
+  // Apply the same scaling logic as in AnimatedSprite
+  const renderScaleCalc = useMemo(
+    () => calculateRenderScaling(projectile.scale),
+    [projectile.renderScale],
+  );
+
+  // Calculate container size based on screen dimensions
+  const containerSize = uiStore.dimensions.lesser * 0.5;
+
+  // Calculate scale factors
+  const scaleX = (containerSize / projectile.width) * renderScaleCalc;
+  const scaleY = (containerSize / projectile.height) * renderScaleCalc;
+
+  // Use the smaller scale to maintain aspect ratio
+  const scale = Math.min(scaleX, scaleY);
+
+  // Calculate normalized dimensions with proper scaling
   const normalized = useMemo(() => {
     return {
-      height: normalize(projectile.height * (projectile.scale ?? 1)),
-      width: normalize(projectile.width * (projectile.scale ?? 1)),
+      height: projectile.height * scale,
+      width: projectile.width * scale,
     };
-  }, [projectile.height, projectile.width]);
+  }, [projectile.height, projectile.width, scale]);
+
+  // Use Vector2 for projectile position with center offset
+  const centerOffset = new Vector2(normalized.width / 2, normalized.height / 2);
+  const [projectilePosition, setProjectilePosition] = useState<Vector2>(
+    enemyOrigin.subtract(centerOffset),
+  );
 
   useEffect(() => {
     if (!projectileImage) return;
@@ -576,19 +621,48 @@ const ProjectileEffect = ({
 
     animXY.setValue({ x: 0, y: 0 });
 
-    setProjectilePosition({
-      x: enemyOrigin.x - normalized.width / 2,
-      y: enemyOrigin.y - normalized.height / 2,
+    // Update projectile position with proper scaling
+    setProjectilePosition(enemyOrigin.subtract(centerOffset));
+
+    // Calculate movement vector using Vector2
+    const moveVector = playerOrigin.subtract(enemyOrigin);
+
+    // Create a bezier curve path for projectile
+    const distance = moveVector.magnitude();
+    const controlPoint = enemyOrigin
+      .midpoint(playerOrigin)
+      .add(Vector2.fromAngle(-Math.PI / 2, distance * 0.2)); // Arc upward
+
+    // Calculate points along the bezier curve
+    const steps = 10; // Number of points to sample
+    const path = [];
+
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      // Use quadratic bezier curve for smooth arc motion
+      const point = Vector2.quadraticBezier(
+        new Vector2(0, 0), // Start at origin (relative to current position)
+        controlPoint.subtract(enemyOrigin), // Control point (relative)
+        moveVector, // End point (relative)
+        t,
+      );
+      path.push(point);
+    }
+
+    // Create a sequence of animations following the bezier path
+    const segmentDuration = totalDuration / steps;
+
+    // Create the animation sequence
+    const animations = path.map((point, index) => {
+      return Animated.timing(animXY, {
+        toValue: point.toObject(),
+        duration: segmentDuration,
+        useNativeDriver: true,
+      });
     });
 
-    const distanceX = playerOrigin.x - enemyOrigin.x;
-    const distanceY = playerOrigin.y - enemyOrigin.y;
-
-    animationRef.current = Animated.timing(animXY, {
-      toValue: { x: distanceX, y: distanceY },
-      duration: totalDuration,
-      useNativeDriver: true,
-    });
+    // Run the sequence
+    animationRef.current = Animated.sequence(animations);
 
     animationRef.current.start(({ finished }) => {
       if (finished && isMounted.current) {
@@ -627,6 +701,9 @@ const ProjectileEffect = ({
 
   if (!projectileImage) return null;
 
+  // Calculate rotation angle to face the direction of movement
+  const angle = enemyOrigin.angleBetweenDegrees(playerOrigin);
+
   return (
     <>
       <Animated.View
@@ -636,7 +713,12 @@ const ProjectileEffect = ({
           top: projectilePosition.y,
           width: normalized.width,
           height: normalized.height,
-          transform: [{ translateX: animXY.x }, { translateY: animXY.y }],
+          transform: [
+            { translateX: animXY.x },
+            { translateY: animXY.y },
+            // For sprites that face right by default, use the angle directly
+            { rotate: `${angle}deg` },
+          ],
         }}
       >
         <Canvas style={{ width: normalized.width, height: normalized.height }}>
@@ -659,10 +741,7 @@ const ProjectileEffect = ({
         >
           <SplashEffect
             splash={splash}
-            projectilePosition={{
-              x: projectilePosition.x,
-              y: projectilePosition.y,
-            }}
+            projectilePosition={projectilePosition}
             playerOrigin={playerOrigin}
             onComplete={() => {
               setAnimationComplete(true);
@@ -687,27 +766,45 @@ const SplashEffect = ({
     scale?: number;
     followsProjectile: boolean;
   };
-  projectilePosition: { x: number; y: number };
-  playerOrigin: { x: number; y: number };
+  projectilePosition: Vector2;
+  playerOrigin: Vector2;
   onComplete: () => void;
 }) => {
+  const { uiStore } = useRootStore();
   const splashImage = useAnimatedImage(splash.anim);
   const [splashFrame, setSplashFrame] = useState(0);
   const frameTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isMounted = useRef(true);
+
+  // Apply the same scaling logic as in AnimatedSprite
+  const renderScaleCalc = useMemo(
+    () => calculateRenderScaling(splash.scale),
+    [splash.scale],
+  );
+
+  // Calculate container size based on screen dimensions
+  const containerSize = uiStore.dimensions.lesser * 0.5;
+
+  // Calculate scale factors
+  const scaleX = (containerSize / splash.width) * renderScaleCalc;
+  const scaleY = (containerSize / splash.height) * renderScaleCalc;
+
+  // Use the smaller scale to maintain aspect ratio
+  const scale = Math.min(scaleX, scaleY);
+
+  // Calculate normalized dimensions with proper scaling
   const normalized = useMemo(() => {
     return {
-      height: normalize(splash.height * (splash.scale ?? 1)),
-      width: normalize(splash.width * (splash.scale ?? 1)),
+      height: splash.height * scale,
+      width: splash.width * scale,
     };
-  }, [splash.height, splash.width]);
+  }, [splash.height, splash.width, scale]);
 
+  // Use Vector2 for splash position with center offset
+  const centerOffset = new Vector2(normalized.width / 2, normalized.height / 2);
   const splashPosition = splash.followsProjectile
     ? projectilePosition
-    : {
-        x: playerOrigin.x - splash.width / 2,
-        y: playerOrigin.y - splash.height / 2,
-      };
+    : playerOrigin.subtract(centerOffset);
 
   useEffect(() => {
     if (!splashImage) return;

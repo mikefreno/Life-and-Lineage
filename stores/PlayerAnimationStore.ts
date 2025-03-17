@@ -35,7 +35,7 @@ export class PlayerAnimationStore {
 
     this.playerOrigin = Vector2.from({
       x: this.root.uiStore.dimensions.width / 4,
-      y: this.root.uiStore.dimensions.height / 2,
+      y: this.root.uiStore.dimensions.height / 2.5,
     });
 
     makeObservable(this, {
@@ -113,7 +113,6 @@ export class PlayerAnimationStore {
   }
 
   clearAnimation() {
-    console.log("called clear");
     if (this.animationPromiseResolver) {
       this.animationPromiseResolver();
       this.animationPromiseResolver = null;

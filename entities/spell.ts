@@ -109,31 +109,33 @@ export class Spell {
     );
   }
 
-  public canBeUsed(user: PlayerCharacter) {
-    if (__DEV__) {
-      return true;
-    }
+  public canBeUsed(
+    user: PlayerCharacter,
+  ): { val: true } | { val: false; reason: string } {
     if (user.isStunned) {
-      return false;
+      return { val: false, reason: "Stunned!" };
     }
     if (this.usesWeapon && !this.userHasRequiredWeapon(user)) {
-      return false;
+      return {
+        val: false,
+        reason: `Requires: ${toTitleCase(this.usesWeapon)}`,
+      };
     }
     if (user.currentMana < this.manaCost) {
-      return false;
+      return { val: false, reason: "Not Enough Mana" };
     }
     if (
       this.proficiencyNeeded &&
       (user.currentMasteryLevel(this.element) as MasteryLevel) <
         this.proficiencyNeeded
     ) {
-      return false;
+      return { val: false, reason: "Low Proficiency" };
     }
     if (!user.hasEnoughBloodOrbs(this)) {
-      return false;
+      return { val: false, reason: "Lack Blood Orbs" };
     }
 
-    return true;
+    return { val: true };
   }
 
   public use({
@@ -154,7 +156,7 @@ export class Spell {
       healed: number;
     }[];
   } {
-    if (!this.canBeUsed(user)) {
+    if (!this.canBeUsed(user).val) {
       return {
         logString: "The spell fizzles out",
         result: "failure",

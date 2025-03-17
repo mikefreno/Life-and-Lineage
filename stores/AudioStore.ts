@@ -394,127 +394,148 @@ export class AudioStore {
     startVolume: number;
     directionality: "in" | "out";
   }) {
+    // Check if sound is loaded before attempting to fade
+    try {
+      const status = await sound.getStatusAsync();
+      if (!status.isLoaded) {
+        console.warn(
+          `Cannot fade ${soundCategory} ${soundName}: Sound not loaded`,
+        );
+        return;
+      }
+    } catch (error) {
+      console.warn(
+        `Error checking sound status for ${soundCategory} ${soundName}:`,
+        error,
+      );
+      return;
+    }
+
     let usingDefaults = duration === DEFAULT_FADE;
     const targetVolume =
       directionality === "in" ? this.getEffectiveVolume(soundCategory) : 0;
 
     return this.withTimeout<void>(
       new Promise(async (resolve, reject) => {
-        if (directionality == "in") {
-          await sound.setVolumeAsync(0);
-          await sound.playAsync();
-        }
-
-        const steps = usingDefaults
-          ? DEFAULT_FADE_STEPS
-          : Math.max(Math.floor(duration / FADE_INTERVAL), 1);
-        const volumeStep = (targetVolume - startVolume) / steps;
-        let interrupt = false;
-        let isCleanedUp = false;
-        let currentStep = 0;
-
-        // Create cancel promise resolver
-        let cancelResolve: () => void;
-        const cancelPromise = new Promise<void>((resolve) => {
-          cancelResolve = resolve;
-        });
-
-        const interval = setInterval(async () => {
-          if (interrupt) {
-            clearInterval(interval);
-            if (directionality === "in") {
-              // If interrupted while fading in, start fading out from current volume
-              const currentVolume = await this.getCurrentVolume(sound);
-              await this.fadeSound({
-                sound,
-                soundCategory,
-                duration,
-                soundName,
-                startVolume: currentVolume,
-                directionality: "out",
-              });
-            } else {
-              // If interrupted while fading out, just stop immediately
-              await sound.setVolumeAsync(0);
-              await sound.pauseAsync();
-            }
-            isCleanedUp = true;
-            cancelResolve();
-            resolve();
-            return;
+        try {
+          if (directionality == "in") {
+            await sound.setVolumeAsync(0);
+            await sound.playAsync();
           }
 
-          try {
-            // Set up cancel function if this is the first interval
-            if (currentStep === 0) {
-              if (directionality === "in") {
-                this.activeTransition.trackIn = {
-                  cancel: async () => {
-                    interrupt = true;
-                    await new Promise<void>((resolve) => {
-                      const checkInterval = setInterval(() => {
-                        if (isCleanedUp) {
-                          clearInterval(checkInterval);
-                          resolve();
-                        }
-                      }, 10);
-                    });
-                    await cancelPromise;
-                  },
-                  sound,
-                  name: soundName,
-                };
-              } else {
-                this.activeTransition.trackOut = {
-                  cancel: async () => {
-                    interrupt = true;
-                    await new Promise<void>((resolve) => {
-                      const checkInterval = setInterval(() => {
-                        if (isCleanedUp) {
-                          clearInterval(checkInterval);
-                          resolve();
-                        }
-                      }, 10);
-                    });
-                    await cancelPromise;
-                  },
-                  sound,
-                  name: soundName,
-                };
-              }
-            }
+          const steps = usingDefaults
+            ? DEFAULT_FADE_STEPS
+            : Math.max(Math.floor(duration / FADE_INTERVAL), 1);
+          const volumeStep = (targetVolume - startVolume) / steps;
+          let interrupt = false;
+          let isCleanedUp = false;
+          let currentStep = 0;
 
-            // Calculate and set new volume
-            currentStep++;
-            const volume = startVolume + volumeStep * currentStep;
-            const clampedVolume = Math.max(0, Math.min(1, volume));
-            await sound.setVolumeAsync(clampedVolume);
+          // Create cancel promise resolver
+          let cancelResolve: () => void;
+          const cancelPromise = new Promise<void>((resolve) => {
+            cancelResolve = resolve;
+          });
 
-            // Check if fade is complete
-            if (currentStep >= steps) {
+          const interval = setInterval(async () => {
+            if (interrupt) {
               clearInterval(interval);
               if (directionality === "in") {
-                this.activeTransition.trackIn = null;
+                // If interrupted while fading in, start fading out from current volume
+                const currentVolume = await this.getCurrentVolume(sound);
+                await this.fadeSound({
+                  sound,
+                  soundCategory,
+                  duration,
+                  soundName,
+                  startVolume: currentVolume,
+                  directionality: "out",
+                });
               } else {
-                this.activeTransition.trackOut = null;
+                // If interrupted while fading out, just stop immediately
+                await sound.setVolumeAsync(0);
                 await sound.pauseAsync();
               }
               isCleanedUp = true;
               cancelResolve();
               resolve();
+              return;
             }
-          } catch (error) {
-            clearInterval(interval);
-            if (directionality === "in") {
-              this.activeTransition.trackIn = null;
-            } else {
-              this.activeTransition.trackOut = null;
+
+            try {
+              // Set up cancel function if this is the first interval
+              if (currentStep === 0) {
+                if (directionality === "in") {
+                  this.activeTransition.trackIn = {
+                    cancel: async () => {
+                      interrupt = true;
+                      await new Promise<void>((resolve) => {
+                        const checkInterval = setInterval(() => {
+                          if (isCleanedUp) {
+                            clearInterval(checkInterval);
+                            resolve();
+                          }
+                        }, 10);
+                      });
+                      await cancelPromise;
+                    },
+                    sound,
+                    name: soundName,
+                  };
+                } else {
+                  this.activeTransition.trackOut = {
+                    cancel: async () => {
+                      interrupt = true;
+                      await new Promise<void>((resolve) => {
+                        const checkInterval = setInterval(() => {
+                          if (isCleanedUp) {
+                            clearInterval(checkInterval);
+                            resolve();
+                          }
+                        }, 10);
+                      });
+                      await cancelPromise;
+                    },
+                    sound,
+                    name: soundName,
+                  };
+                }
+              }
+
+              // Calculate and set new volume
+              currentStep++;
+              const volume = startVolume + volumeStep * currentStep;
+              const clampedVolume = Math.max(0, Math.min(1, volume));
+              await sound.setVolumeAsync(clampedVolume);
+
+              // Check if fade is complete
+              if (currentStep >= steps) {
+                clearInterval(interval);
+                if (directionality === "in") {
+                  this.activeTransition.trackIn = null;
+                } else {
+                  this.activeTransition.trackOut = null;
+                  await sound.pauseAsync();
+                }
+                isCleanedUp = true;
+                cancelResolve();
+                resolve();
+              }
+            } catch (error) {
+              clearInterval(interval);
+              if (directionality === "in") {
+                this.activeTransition.trackIn = null;
+              } else {
+                this.activeTransition.trackOut = null;
+              }
+              isCleanedUp = true;
+              cancelResolve();
+              reject(error);
             }
-            isCleanedUp = true;
-            cancelResolve();
-            reject(error);
-          }
-        }, FADE_INTERVAL);
+          }, FADE_INTERVAL);
+        } catch (error) {
+          reject(error);
+        }
       }),
       duration * 3,
       `fade_${directionality}_${soundCategory}_${soundName}`,

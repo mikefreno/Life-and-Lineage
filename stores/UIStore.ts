@@ -302,9 +302,9 @@ export default class UIStore {
   }
   get playerStatusHeightSecondary() {
     return (
-      this.playerStatusHeight +
-      (this.insets?.bottom ?? 0) +
-      this.expansionPadding
+      (this.playerStatusCompactHeight ?? 0) +
+      this.expansionPadding +
+      (this.insets?.bottom ?? 0)
     );
   }
 
@@ -375,7 +375,7 @@ export default class UIStore {
   setPlayerStatusHeight(value: number) {
     const mod = this.playerStatusIsCompact ? 0 : this.expansionPadding;
     if (!this.playerStatusCompactHeight) {
-      this.setPlayerStatusCompactHeight(value - mod);
+      this.setPlayerStatusCompactHeight(value + mod);
     }
   }
 

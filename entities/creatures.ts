@@ -787,7 +787,7 @@ export class Enemy extends Creature {
     );
 
     reaction(
-      () => [this.currentHealth],
+      () => this.currentHealth,
       () => {
         if (
           this.phases[this.currentPhase + 1] &&

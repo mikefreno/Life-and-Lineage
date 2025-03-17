@@ -12,7 +12,14 @@ import necroSpells from "../assets/json/necroSpells.json";
 import rangerSpells from "../assets/json/rangerSpells.json";
 import { Minion } from "./creatures";
 import summons from "../assets/json/summons.json";
-import { action, makeObservable, observable, computed, reaction } from "mobx";
+import {
+  action,
+  makeObservable,
+  observable,
+  computed,
+  reaction,
+  runInAction,
+} from "mobx";
 import * as Crypto from "expo-crypto";
 import { Investment } from "./investment";
 import {
@@ -895,6 +902,18 @@ export class PlayerCharacter extends Character {
         {
           action: () => this._unlockAllSpells(),
           name: "Unlock All Spells",
+        },
+        {
+          action: () =>
+            runInAction(
+              () =>
+                (this.magicProficiencies = this.magicProficiencies.map(
+                  (prof) => {
+                    return { school: prof.school, proficiency: 500 };
+                  },
+                )),
+            ),
+          name: "Max All Proficiencies",
         },
       ]);
     }

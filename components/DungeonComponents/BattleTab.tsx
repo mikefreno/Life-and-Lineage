@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { ThemedView, Text } from "../Themed";
 import {
   Pressable,
@@ -256,152 +256,15 @@ const BattleTab = observer(
                   data={combinedData}
                   inverted
                   persistentScrollbar
-                  renderItem={({ item: attackOrSpell, index }) => (
-                    <>
-                      <View
-                        style={[
-                          styles.attackCardBase,
-                          attackOrSpell instanceof Spell && {
-                            backgroundColor:
-                              elementalColorMap[attackOrSpell.element].light,
-                          },
-                        ]}
-                      >
-                        <View style={styles.columnCenter}>
-                          <Pressable
-                            onPress={() => setAttackDetails(attackOrSpell)}
-                          >
-                            <Text
-                              style={[
-                                styles["text-xl"],
-                                {
-                                  color:
-                                    attackOrSpell instanceof Spell
-                                      ? elementalColorMap[attackOrSpell.element]
-                                          .dark
-                                      : uiStore.colorScheme == "dark"
-                                      ? "#fafafa"
-                                      : "#09090b",
-                                },
-                              ]}
-                            >
-                              {toTitleCase(attackOrSpell.name)}
-                            </Text>
-                            {attackOrSpell instanceof Attack &&
-                            attackOrSpell.baseHitChance ? (
-                              <Text style={styles["text-lg"]}>{`${
-                                attackOrSpell.baseHitChance * 100
-                              }% hit chance`}</Text>
-                            ) : (
-                              attackOrSpell instanceof Spell && (
-                                <View style={{ flexDirection: "row" }}>
-                                  <Text
-                                    style={{
-                                      color:
-                                        elementalColorMap[attackOrSpell.element]
-                                          .dark,
-                                    }}
-                                  >
-                                    {attackOrSpell.manaCost}
-                                  </Text>
-                                  <View
-                                    style={{
-                                      marginVertical: "auto",
-                                      paddingLeft: 4,
-                                    }}
-                                  >
-                                    <Energy
-                                      height={uiStore.iconSizeSmall}
-                                      width={uiStore.iconSizeSmall}
-                                      color={
-                                        uiStore.colorScheme == "dark"
-                                          ? "#2563eb"
-                                          : undefined
-                                      }
-                                    />
-                                  </View>
-                                </View>
-                              )
-                            )}
-                          </Pressable>
-                        </View>
-                        <GenericRaisedButton
-                          disabled={
-                            !attackOrSpell.canBeUsed ||
-                            enemyStore.enemyTurnOngoing
-                          }
-                          onPress={() => attackHandler(attackOrSpell)}
-                          backgroundColor={
-                            "element" in attackOrSpell
-                              ? elementalColorMap[attackOrSpell.element].dark
-                              : uiStore.colorScheme == "light"
-                              ? "#d4d4d8"
-                              : "#27272a"
-                          }
-                          disableTopLevelStyling
-                          buttonStyle={[
-                            styles.actionButton,
-                            {
-                              opacity:
-                                !attackOrSpell.canBeUsed ||
-                                enemyStore.enemyTurnOngoing
-                                  ? 0.5
-                                  : 1,
-                            },
-                          ]}
-                        >
-                          <Text style={styles["text-xl"]}>
-                            {playerState.isStunned
-                              ? "Stunned!"
-                              : attackOrSpell instanceof Spell
-                              ? playerState.currentMana >=
-                                attackOrSpell.manaCost
-                                ? "Cast"
-                                : "Not Enough Mana"
-                              : "Attack"}
-                          </Text>
-                        </GenericRaisedButton>
-                      </View>
-                      {index == combinedData.length - 1 && (
-                        <ThemedView style={styles.attackCardBase}>
-                          <View style={styles.columnCenter}>
-                            <Text style={styles["text-xl"]}>Pass</Text>
-                            <View style={styles.rowItemsCenter}>
-                              <Text>2x</Text>
-                              <Regen
-                                width={uiStore.iconSizeSmall}
-                                height={uiStore.iconSizeSmall}
-                              />
-                            </View>
-                          </View>
-                          <GenericRaisedButton
-                            disabled={enemyStore.enemyTurnOngoing}
-                            disableTopLevelStyling
-                            onPress={() => {
-                              vibration({ style: "light" });
-                              pass({ voluntary: true });
-                            }}
-                            backgroundColor={
-                              uiStore.colorScheme == "light"
-                                ? "#d4d4d8"
-                                : "#27272a"
-                            }
-                            buttonStyle={[
-                              styles.actionButton,
-                              {
-                                opacity:
-                                  playerState.isStunned ||
-                                  enemyStore.enemyTurnOngoing
-                                    ? 0.5
-                                    : 1.0,
-                              },
-                            ]}
-                          >
-                            <Text style={styles["text-xl"]}>Use</Text>
-                          </GenericRaisedButton>
-                        </ThemedView>
-                      )}
-                    </>
+                  renderItem={({ item, index }) => (
+                    <AttackOrSpellItem
+                      attackOrSpell={item}
+                      isLast={index == combinedData.length - 1}
+                      setAttackDetails={setAttackDetails}
+                      attackHandler={attackHandler}
+                      pass={pass}
+                      vibration={vibration}
+                    />
                   )}
                 />
               ) : (
@@ -498,3 +361,168 @@ const BattleTab = observer(
 );
 
 export default BattleTab;
+
+const AttackOrSpellItem = observer(
+  ({
+    attackOrSpell,
+    isLast,
+    attackHandler,
+    pass,
+    vibration,
+    setAttackDetails,
+  }: {
+    attackOrSpell: Attack | Spell;
+    isLast: boolean;
+    setAttackDetails: (val: Attack | Spell) => void;
+    attackHandler: (val: Attack | Spell) => void;
+    pass: ({ voluntary }: { voluntary?: boolean }) => void;
+    vibration: ({
+      style,
+      essential,
+    }: {
+      style: "light" | "medium" | "heavy" | "success" | "warning" | "error";
+      essential?: boolean;
+    }) => void;
+  }) => {
+    const { playerState, enemyStore, uiStore } = useRootStore();
+    const styles = useStyles();
+
+    if (!playerState) {
+      throw new Error(
+        "playerState should be checked before AttackOrSpellItem render",
+      );
+    }
+
+    const canUse = useMemo(
+      () => attackOrSpell.canBeUsed(playerState),
+      [attackOrSpell, playerState.currentMana, playerState.isStunned],
+    );
+
+    const isDisabled = useMemo(
+      () => !canUse.val || enemyStore.enemyTurnOngoing,
+      [canUse, enemyStore.enemyTurnOngoing],
+    );
+
+    const handlePress = useCallback(() => {
+      attackHandler(attackOrSpell);
+    }, [attackHandler, attackOrSpell]);
+
+    const handlePassPress = useCallback(() => {
+      vibration({ style: "light" });
+      pass({ voluntary: true });
+    }, [pass, vibration]);
+
+    const handleDetailsPress = useCallback(() => {
+      setAttackDetails(attackOrSpell);
+    }, [setAttackDetails, attackOrSpell]);
+
+    const isSpell = attackOrSpell instanceof Spell;
+
+    const buttonText = useMemo(() => {
+      if (playerState.isStunned) return "Stunned!";
+      if (isSpell) return canUse.val ? "Cast" : canUse.reason;
+      return "Attack";
+    }, [isSpell, canUse, playerState.isStunned]);
+
+    const backgroundColor = useMemo(() => {
+      if (isSpell) return elementalColorMap[attackOrSpell.element].dark;
+      return uiStore.colorScheme === "light" ? "#d4d4d8" : "#27272a";
+    }, [isSpell, attackOrSpell, uiStore.colorScheme]);
+
+    const textColor = useMemo(() => {
+      if (isSpell) return elementalColorMap[attackOrSpell.element].dark;
+      return uiStore.colorScheme === "dark" ? "#fafafa" : "#09090b";
+    }, [isSpell, attackOrSpell, uiStore.colorScheme]);
+
+    return (
+      <>
+        <View
+          style={[
+            styles.attackCardBase,
+            isSpell && {
+              backgroundColor: elementalColorMap[attackOrSpell.element].light,
+            },
+          ]}
+        >
+          <View style={styles.columnCenter}>
+            <Pressable onPress={handleDetailsPress}>
+              <Text style={[styles["text-xl"], { color: textColor }]}>
+                {toTitleCase(attackOrSpell.name)}
+              </Text>
+              {!isSpell && attackOrSpell.baseHitChance ? (
+                <Text style={styles["text-lg"]}>{`${
+                  attackOrSpell.baseHitChance * 100
+                }% hit chance`}</Text>
+              ) : (
+                isSpell && (
+                  <View style={{ flexDirection: "row" }}>
+                    <Text
+                      style={{
+                        color: elementalColorMap[attackOrSpell.element].dark,
+                      }}
+                    >
+                      {attackOrSpell.manaCost}
+                    </Text>
+                    <View style={{ marginVertical: "auto", paddingLeft: 4 }}>
+                      <Energy
+                        height={uiStore.iconSizeSmall}
+                        width={uiStore.iconSizeSmall}
+                        color={
+                          uiStore.colorScheme === "dark" ? "#2563eb" : undefined
+                        }
+                      />
+                    </View>
+                  </View>
+                )
+              )}
+            </Pressable>
+          </View>
+          <GenericRaisedButton
+            disabled={isDisabled}
+            onPress={handlePress}
+            backgroundColor={backgroundColor}
+            disableTopLevelStyling
+            style={{ opacity: isDisabled ? 0.5 : 1 }}
+            buttonStyle={styles.actionButton}
+          >
+            <Text style={styles["text-xl"]}>{buttonText}</Text>
+          </GenericRaisedButton>
+        </View>
+
+        {isLast && <PassButton onPress={handlePassPress} />}
+      </>
+    );
+  },
+);
+
+const PassButton = ({ onPress }: { onPress: () => void }) => {
+  const { uiStore, enemyStore, playerState } = useRootStore();
+  const styles = useStyles();
+
+  return (
+    <ThemedView style={styles.attackCardBase}>
+      <View style={styles.columnCenter}>
+        <Text style={styles["text-xl"]}>Pass</Text>
+        <View style={styles.rowItemsCenter}>
+          <Text>2x</Text>
+          <Regen width={uiStore.iconSizeSmall} height={uiStore.iconSizeSmall} />
+        </View>
+      </View>
+      <GenericRaisedButton
+        disabled={enemyStore.enemyTurnOngoing}
+        disableTopLevelStyling
+        onPress={onPress}
+        backgroundColor={uiStore.colorScheme == "light" ? "#d4d4d8" : "#27272a"}
+        buttonStyle={[
+          styles.actionButton,
+          {
+            opacity:
+              playerState?.isStunned || enemyStore.enemyTurnOngoing ? 0.5 : 1.0,
+          },
+        ]}
+      >
+        <Text style={styles["text-xl"]}>Use</Text>
+      </GenericRaisedButton>
+    </ThemedView>
+  );
+};

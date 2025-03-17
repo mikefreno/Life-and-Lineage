@@ -77,6 +77,13 @@ export const normalizeLineHeight = (
   return Math.round(size * scale);
 };
 
+export const calculateRenderScaling = (scale: number | undefined) => {
+  if (scale) {
+    return reverseNormalize(scale * 10) / 10;
+  }
+  return 1.0;
+};
+
 export const useStyles = () => {
   const { uiStore } = useRootStore();
   const { height, width, greater } = uiStore.dimensions;

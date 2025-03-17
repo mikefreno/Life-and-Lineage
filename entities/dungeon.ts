@@ -290,6 +290,7 @@ export class DungeonLevel {
         attackStrings: enemyJSON.attackStrings,
         animationStrings: enemyJSON.animationStrings,
         sprite: sprite as EnemyImageKeyOption,
+        root: this.parent.dungeonStore.root,
       });
     });
     return enemies;
@@ -336,6 +337,7 @@ export class DungeonLevel {
           chance: number;
         }[],
         sprite: scaledBossJSON.sprite as EnemyImageKeyOption,
+        root: this.parent.dungeonStore.root,
       });
     });
     return bosses;

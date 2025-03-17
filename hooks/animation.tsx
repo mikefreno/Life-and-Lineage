@@ -1,5 +1,6 @@
 import { FPS } from "@/stores/EnemyAnimationStore";
 import { calculateAdjustedFrameRate } from "@/utility/functions/misc";
+import { Vector2 } from "@/utility/Vec2";
 import { Dimensions } from "react-native";
 import {
   runOnJS,
@@ -60,7 +61,6 @@ export const useReanimatedAnimations = () => {
     // Reset value
     damageOpacity.value = 1;
 
-    // Create the death animation sequence
     damageOpacity.value = withSequence(
       withTiming(0.5, { duration: deathDuration / 2 }),
       withTiming(0, { duration: deathDuration / 2 }, (finished) => {
@@ -90,7 +90,6 @@ export const useReanimatedAnimations = () => {
       ? 200
       : Math.min(200, animationDuration / 4);
 
-    // Create a single flash cycle
     const createFlashCycle = () => {
       return withSequence(
         withTiming(0.5, { duration: flashDuration }),
@@ -135,26 +134,25 @@ export const useReanimatedAnimations = () => {
   };
 
   const runMoveAnimation = (
-    targetPosition: { x: number; y: number },
-    currentPosition: { x: number; y: number },
+    targetPosition: Vector2,
+    currentPosition: Vector2,
     moveFrames: number,
     onComplete: () => void,
   ) => {
     const { duration } = calculateAdjustedFrameRate(moveFrames);
 
     if (moveX.value === 0 && moveY.value === 0) {
-      const dirX = targetPosition.x - currentPosition.x;
-      const dirY = targetPosition.y - currentPosition.y;
-
-      const distance = Math.sqrt(dirX * dirX + dirY * dirY);
+      const direction = targetPosition.subtract(currentPosition);
+      const distance = direction.magnitude();
       const moveDistance = Math.min(distance, 100);
 
-      const normalizedX = distance > 0 ? (dirX / distance) * moveDistance : 0;
-      const normalizedY = distance > 0 ? (dirY / distance) * moveDistance : 0;
+      const moveVector =
+        distance > 0
+          ? direction.normalize().multiply(moveDistance)
+          : new Vector2(0, 0);
 
-      // Move to target
       moveX.value = withTiming(
-        normalizedX,
+        moveVector.x,
         { duration: duration / 2 },
         (finished) => {
           if (finished) {
@@ -162,7 +160,7 @@ export const useReanimatedAnimations = () => {
           }
         },
       );
-      moveY.value = withTiming(normalizedY, { duration: duration / 2 });
+      moveY.value = withTiming(moveVector.y, { duration: duration / 2 });
     } else {
       // Return to original position
       moveX.value = withTiming(0, { duration: duration / 2 }, (finished) => {

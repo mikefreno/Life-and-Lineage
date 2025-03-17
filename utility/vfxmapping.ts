@@ -1,11 +1,11 @@
 export type VFXImageOptions = keyof typeof VFXImageMap;
 
 export const VFXImageMap = {
-  // fire spells
   fireMissile: {
     source: require("@/assets/vfx/fire/missile.webp"),
     height: 33,
     width: 57,
+    scale: 0.3,
   },
   fireSlash: {
     source: require("@/assets/vfx/fire/FireSlash.webp"),
@@ -34,9 +34,8 @@ export const VFXImageMap = {
   },
   fireBeam: {
     source: require("@/assets/vfx/fire/beam.webp"),
-    height: 192,
-    width: 64,
-    rotate: -90,
+    height: 64,
+    width: 192,
   },
   // ice/water spells
   iceBlock: {

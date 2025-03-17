@@ -32,7 +32,7 @@ const NewGameMetaControls = observer(
             audioStore.setMuteValue(!audioStore.muted);
           }}
           accessibilityRole="button"
-          accessibilityLabel="Show Tutorial"
+          accessibilityLabel={`Toggle audio ${audioStore.muted ? "on" : "off"}`}
         >
           {audioStore.muted ? (
             <MaterialIcons

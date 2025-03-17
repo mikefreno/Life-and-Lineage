@@ -75,7 +75,7 @@ export default class EnemyStore {
       enemy.id,
       new EnemyAnimationStore({ root: this.root, sprite: enemy.sprite }),
     );
-    this.enemySave(enemy);
+    this.saveEnemy(enemy);
   }
 
   public removeEnemy(enemy: Enemy) {
@@ -100,7 +100,7 @@ export default class EnemyStore {
     (parse(storedIds) as string[]).forEach((str) => {
       const retrieved = storage.getString(`enemy_${str}`);
       if (!retrieved) return;
-      const enemy = Enemy.fromJSON({ ...parse(retrieved), enemyStore: this });
+      const enemy = Enemy.fromJSON({ ...parse(retrieved), root: this.root });
       if (!enemy.sprite) {
         throw new Error(`No sprite on ${enemy}`);
       }
@@ -117,7 +117,7 @@ export default class EnemyStore {
     return this.animationStoreMap.get(enemyId);
   }
 
-  private enemySave = async (enemy: Enemy) => {
+  public saveEnemy = (enemy: Enemy) => {
     const str = this.enemies.map((enemy) => enemy.id);
 
     storage.set("enemyIDs", stringify(str));
@@ -126,10 +126,10 @@ export default class EnemyStore {
         `enemy_${enemy?.id}`,
         stringify({ ...enemy, enemyStore: null }),
       );
-    } catch (e) {}
+    } catch (e) {
+      __DEV__ && console.error(e);
+    }
   };
-
-  public saveEnemy = throttle(this.enemySave, 250);
 
   private clearPersistedEnemies() {
     storage.delete("enemyIDs");

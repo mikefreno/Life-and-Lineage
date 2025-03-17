@@ -59,36 +59,6 @@ export class Vector2 {
     return this.subtract(v).magnitudeSquared();
   }
 
-  // Calculate the dot product with another vector
-  dot(v: Vector2): number {
-    return this.x * v.x + this.y * v.y;
-  }
-
-  // Calculate the angle between this vector and another (in radians)
-  angle(v: Vector2): number {
-    return Math.atan2(v.y - this.y, v.x - this.x);
-  }
-
-  // Calculate the angle between this vector and another (in degrees)
-  angleDegrees(v: Vector2): number {
-    return this.angle(v) * (180 / Math.PI);
-  }
-
-  // Rotate this vector by an angle (in radians)
-  rotate(angle: number): Vector2 {
-    const cos = Math.cos(angle);
-    const sin = Math.sin(angle);
-    return new Vector2(
-      this.x * cos - this.y * sin,
-      this.x * sin + this.y * cos,
-    );
-  }
-
-  // Rotate this vector by an angle (in degrees)
-  rotateDegrees(angle: number): Vector2 {
-    return this.rotate(angle * (Math.PI / 180));
-  }
-
   // Linear interpolation between this vector and another
   lerp(v: Vector2, t: number): Vector2 {
     return new Vector2(
@@ -102,51 +72,129 @@ export class Vector2 {
     return this.lerp(v, 0.5);
   }
 
-  // Convert to an object with x and y properties
-  toObject(): { x: number; y: number } {
-    return { x: this.x, y: this.y };
+  angle(): number {
+    return Math.atan2(this.y, this.x);
   }
 
-  // Calculate the center point of a rectangle with this vector as dimensions
-  center(): Vector2 {
-    return new Vector2(this.x / 2, this.y / 2);
+  // Calculate angle in degrees
+  angleDegrees(): number {
+    return Math.atan2(this.y, this.x) * (180 / Math.PI);
   }
 
-  // Check if this vector is equal to another
-  equals(v: Vector2): boolean {
-    return this.x === v.x && this.y === v.y;
+  // Calculate angle between this vector and another
+  angleBetween(v: Vector2): number {
+    return Math.atan2(v.y - this.y, v.x - this.x);
   }
 
-  // Convert to a string representation
-  toString(): string {
-    return `Vector2(${this.x}, ${this.y})`;
+  // Calculate angle between this vector and another in degrees
+  angleBetweenDegrees(v: Vector2): number {
+    return Math.atan2(v.y - this.y, v.x - this.x) * (180 / Math.PI);
   }
 
-  // Calculate a point that is offset from this vector by width and height
-  offset(width: number, height: number): Vector2 {
-    return new Vector2(this.x + width, this.y + height);
+  // Create a vector from angle and magnitude
+  static fromAngle(angle: number, magnitude: number = 1): Vector2 {
+    return new Vector2(
+      Math.cos(angle) * magnitude,
+      Math.sin(angle) * magnitude,
+    );
   }
 
-  // Calculate a point that is offset from this vector by half width and height
-  offsetByHalf(width: number, height: number): Vector2 {
-    return new Vector2(this.x - width / 2, this.y - height / 2);
+  // Rotate a vector by an angle (in radians)
+  rotate(angle: number): Vector2 {
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    return new Vector2(
+      this.x * cos - this.y * sin,
+      this.x * sin + this.y * cos,
+    );
   }
 
-  // Project this vector onto another vector
-  project(v: Vector2): Vector2 {
-    const normalized = v.normalize();
-    const scalar = this.dot(normalized);
-    return normalized.multiply(scalar);
-  }
-
-  // Get a vector perpendicular to this one
+  // Get perpendicular vector (90 degrees rotation)
   perpendicular(): Vector2 {
     return new Vector2(-this.y, this.x);
   }
 
-  // Calculate the reflection of this vector off a surface with normal n
-  reflect(n: Vector2): Vector2 {
-    const normalized = n.normalize();
-    return this.subtract(normalized.multiply(2 * this.dot(normalized)));
+  // Dot product
+  dot(v: Vector2): number {
+    return this.x * v.x + this.y * v.y;
+  }
+
+  // Cross product (returns scalar for 2D vectors)
+  cross(v: Vector2): number {
+    return this.x * v.y - this.y * v.x;
+  }
+
+  // Project this vector onto another vector
+  project(v: Vector2): Vector2 {
+    const magnitude = v.magnitude();
+    if (magnitude === 0) return new Vector2();
+    const scalar = this.dot(v) / magnitude;
+    return v.normalize().multiply(scalar);
+  }
+
+  // Reflect this vector off a surface with normal vector n
+  reflect(normal: Vector2): Vector2 {
+    const n = normal.normalize();
+    return this.subtract(n.multiply(2 * this.dot(n)));
+  }
+
+  // Limit the magnitude of this vector
+  limit(max: number): Vector2 {
+    const mSq = this.magnitudeSquared();
+    if (mSq > max * max) {
+      return this.normalize().multiply(max);
+    }
+    return this.clone();
+  }
+
+  // Convert to object with x,y properties (useful for React Native Animated)
+  toObject(): { x: number; y: number } {
+    return { x: this.x, y: this.y };
+  }
+
+  // Create a vector with random direction and specified magnitude
+  static random(magnitude: number = 1): Vector2 {
+    const angle = Math.random() * Math.PI * 2;
+    return Vector2.fromAngle(angle, magnitude);
+  }
+
+  // Interpolate between vectors with easing
+  static lerpWithEasing(
+    start: Vector2,
+    end: Vector2,
+    t: number,
+    easingFn: (t: number) => number,
+  ): Vector2 {
+    return start.lerp(end, easingFn(t));
+  }
+
+  // Calculate a point on a quadratic bezier curve
+  static quadraticBezier(
+    p0: Vector2,
+    p1: Vector2,
+    p2: Vector2,
+    t: number,
+  ): Vector2 {
+    const q0 = p0.lerp(p1, t);
+    const q1 = p1.lerp(p2, t);
+    return q0.lerp(q1, t);
+  }
+
+  // Calculate a point on a cubic bezier curve
+  static cubicBezier(
+    p0: Vector2,
+    p1: Vector2,
+    p2: Vector2,
+    p3: Vector2,
+    t: number,
+  ): Vector2 {
+    const q0 = p0.lerp(p1, t);
+    const q1 = p1.lerp(p2, t);
+    const q2 = p2.lerp(p3, t);
+
+    const r0 = q0.lerp(q1, t);
+    const r1 = q1.lerp(q2, t);
+
+    return r0.lerp(r1, t);
   }
 }

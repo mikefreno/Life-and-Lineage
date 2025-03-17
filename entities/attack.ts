@@ -215,14 +215,16 @@ export class Attack {
    * Checks if the attack can be used based on the user's current state.
    * @returns True if the attack can be used, false otherwise.
    */
-  get canBeUsed() {
-    if (this.user.isStunned) {
-      return false;
+  canBeUsed(
+    specifiedUser: PlayerCharacter | Enemy | Minion,
+  ): { val: true } | { val: false; reason: "Stunned!" | "Not enough Energy" } {
+    if (specifiedUser.isStunned) {
+      return { val: false, reason: "Stunned!" };
     }
     if ("baseEnergy" in this.user && this.user.baseEnergy < this.energyCost) {
-      return false;
+      return { val: false, reason: "Not enough Energy" };
     }
-    return true;
+    return { val: true };
   }
 
   /**
@@ -248,7 +250,7 @@ export class Attack {
     buffs?: Condition[];
     logString: string;
   } {
-    if (!this.canBeUsed) {
+    if (!this.canBeUsed(this.user).val) {
       if (this.user.isStunned) {
         return {
           result: targets.map((target) => ({

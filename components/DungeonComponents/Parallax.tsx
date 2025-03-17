@@ -1,11 +1,12 @@
 import { toJS } from "mobx";
-import React, { type ReactNode, useEffect } from "react";
+import React, { type ReactNode, useCallback, useEffect, useMemo } from "react";
 import {
   View,
   Dimensions,
   StyleSheet,
   type StyleProp,
   type ViewStyle,
+  Platform,
 } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -15,11 +16,13 @@ import Animated, {
   withRepeat,
   cancelAnimation,
   Easing,
+  type SharedValue,
 } from "react-native-reanimated";
-import { Image } from "expo-image";
+import { Image, ImageStyle } from "expo-image";
 import { TILE_SIZE } from "../../stores/DungeonStore";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useRootStore } from "@/hooks/stores";
+import { observer } from "mobx-react-lite";
 
 const backgroundImages = {
   AbandonedValley: {
@@ -339,255 +342,387 @@ export type ParallaxOptions = keyof typeof backgroundImages;
 
 const NORMATIVE_WIDTH = 2160;
 
-const ParallaxEffect = ({ effect, size, style }) => {
-  return (
-    <Image
-      source={effect}
-      style={[
-        {
-          position: "absolute",
-          width: size.width,
-          height: size.height,
-        },
-        style,
-      ]}
-      contentFit="cover"
-    />
-  );
-};
-
-export const Parallax = ({
-  backgroundName,
-  inCombat = false,
-  reduceMotion = false,
-  playerPosition,
-  boundingBox,
-  style,
-  children,
-}: {
-  backgroundName: ParallaxOptions;
-  inCombat: boolean;
-  reduceMotion: boolean;
-  playerPosition: { x: number; y: number };
-  boundingBox: {
+interface ParallaxEffectProps {
+  effect: any;
+  size: {
     width: number;
     height: number;
-    offsetX: number;
-    offsetY: number;
   };
-  style?: StyleProp<ViewStyle>;
-  children: ReactNode;
-}) => {
-  const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
-  const { uiStore } = useRootStore();
-  const scrollX = useSharedValue(0);
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
-  const lastMoveDirection = useSharedValue(1);
-
-  const plainPlayerPosition = toJS(playerPosition);
-  const plainBoundingBox = toJS(boundingBox);
-  const plainInCombat = toJS(inCombat);
-  const plainReduceMotion = toJS(reduceMotion);
-
-  const { imageSet, size, verticalOffset } = backgroundImages[backgroundName];
-  const layerCount = Object.keys(imageSet).length - 1;
-  const header = useHeaderHeight();
-
-  const targetHeight = screenHeight;
-  const scale = targetHeight / size.height;
-
-  const scaledWidth = size.width * scale;
-  const scaledHeight = targetHeight;
-
-  const imagesNeeded = Math.max(3, Math.ceil(NORMATIVE_WIDTH / size.width));
-
-  useEffect(() => {
-    if (plainInCombat) {
-      const totalWidth = size.width * imagesNeeded;
-
-      scrollX.value = withRepeat(
-        withTiming(
-          lastMoveDirection.value *
-            -totalWidth *
-            (NORMATIVE_WIDTH / size.width / 4),
+  style?: StyleProp<ImageStyle>;
+}
+const ParallaxEffect = React.memo(
+  ({ effect, size, style }: ParallaxEffectProps) => {
+    return (
+      <Image
+        source={effect}
+        style={[
           {
-            duration: 10000 * imagesNeeded,
-            easing: Easing.linear,
+            position: "absolute",
+            width: size.width,
+            height: size.height,
           },
-        ),
-        -1,
-        true,
-      );
+          style,
+        ]}
+        contentFit="cover"
+      />
+    );
+  },
+);
 
-      return () => {
-        cancelAnimation(scrollX);
-        scrollX.value = 0;
-      };
-    }
-  }, [plainInCombat]);
+interface ParallaxLayerProps {
+  imageSource: any;
+  size: {
+    width: number;
+    height: number;
+  };
+  imagesNeeded: number;
+  moveRate: number;
+  scrollX: SharedValue<number>;
+  translateX: SharedValue<number>;
+  translateY: SharedValue<number>;
+  inCombat: boolean;
+  scale: number;
+  screenWidth: number;
+  screenHeight: number;
+  scaledWidth: number;
+}
 
-  useEffect(() => {
-    if (!plainInCombat) {
-      const relativeX =
-        plainPlayerPosition.x -
-        plainBoundingBox.offsetX -
-        plainBoundingBox.width / 2;
-
-      if (translateX.value !== -relativeX) {
-        if (-relativeX > translateX.value) {
-          lastMoveDirection.value = -1;
-        } else if (-relativeX < translateX.value) {
-          lastMoveDirection.value = 1;
-        }
-      }
-
-      const relativeY = plainPlayerPosition.y - plainBoundingBox.offsetY;
-      const boundingBoxVerticalCenter = plainBoundingBox.height - TILE_SIZE / 2;
-      const verticalOffset = boundingBoxVerticalCenter - relativeY;
-
-      translateX.value = withSpring(-relativeX, {
-        damping: 15,
-        stiffness: 50,
-      });
-      translateY.value = withSpring(verticalOffset, {
-        damping: 15,
-        stiffness: 50,
-      });
-    }
-  }, [plainPlayerPosition, plainBoundingBox, plainInCombat]);
-
-  const renderLayers = () => {
-    const layers = [];
-    for (let i = layerCount; i >= 1; i--) {
-      const moveRate = 1 - (i - 1) / layerCount;
-
-      const animatedStyle = useAnimatedStyle(() => ({
+const ParallaxLayer = React.memo(
+  ({
+    imageSource,
+    size,
+    imagesNeeded,
+    moveRate,
+    scrollX,
+    translateX,
+    translateY,
+    inCombat,
+    scale,
+    screenWidth,
+    screenHeight,
+    scaledWidth,
+  }: ParallaxLayerProps) => {
+    const animatedStyle = useAnimatedStyle(
+      () => ({
         transform: [
           {
-            translateX: plainInCombat
+            translateX: inCombat
               ? scrollX.value * moveRate
               : translateX.value * moveRate,
           },
           {
-            translateY: plainInCombat
+            translateY: inCombat
               ? 0
               : (translateY.value / 2) * moveRate +
-                (scaledHeight - screenHeight),
+                (size.height * scale - screenHeight),
           },
           { scale },
         ],
-      }));
+      }),
+      [moveRate, inCombat],
+    );
 
-      const tileGroups = [
+    const tileGroups = useMemo(
+      () => [
         { offset: -size.width * imagesNeeded },
         { offset: 0 },
         { offset: size.width * imagesNeeded },
-      ];
+      ],
+      [size.width, imagesNeeded],
+    );
 
-      layers.push(
-        <Animated.View
-          key={i}
-          style={[
-            {
-              width: size.width * imagesNeeded * 3,
+    return (
+      <Animated.View
+        style={[
+          {
+            width: size.width * imagesNeeded * 3,
+            height: size.height,
+            left: (screenWidth - scaledWidth) / 2,
+            position: "absolute",
+            backfaceVisibility: "hidden",
+            ...Platform.select({
+              android: { renderToHardwareTextureAndroid: true },
+              ios: { shouldRasterizeIOS: true },
+              web: { willChange: "transform" },
+            }),
+          },
+          animatedStyle,
+        ]}
+      >
+        {tileGroups.map((group, groupIndex) => (
+          <View
+            key={groupIndex}
+            style={{
+              position: "absolute",
+              left: group.offset,
+              width: size.width * imagesNeeded,
               height: size.height,
+            }}
+          >
+            {Array.from({ length: imagesNeeded }).map((_, index) => (
+              <Image
+                key={index}
+                source={imageSource}
+                style={{
+                  width: size.width,
+                  height: size.height,
+                  left: index * size.width,
+                  position: "absolute",
+                }}
+                contentFit="cover"
+                cachePolicy="memory-disk"
+                recyclingKey={`layer-${index}`}
+              />
+            ))}
+          </View>
+        ))}
+      </Animated.View>
+    );
+  },
+);
+
+export const Parallax = observer(
+  ({
+    backgroundName,
+    inCombat = false,
+    reduceMotion = false,
+    playerPosition,
+    boundingBox,
+    style,
+    children,
+  }: {
+    backgroundName: ParallaxOptions;
+    inCombat: boolean;
+    reduceMotion: boolean;
+    playerPosition: { x: number; y: number };
+    boundingBox: {
+      width: number;
+      height: number;
+      offsetX: number;
+      offsetY: number;
+    };
+    style?: StyleProp<ViewStyle>;
+    children: ReactNode;
+  }) => {
+    const dimensions = useMemo(() => Dimensions.get("window"), []);
+    const { width: screenWidth, height: screenHeight } = dimensions;
+
+    const { uiStore } = useRootStore();
+    const scrollX = useSharedValue(0);
+    const translateX = useSharedValue(0);
+    const translateY = useSharedValue(0);
+    const lastMoveDirection = useSharedValue(1);
+
+    const plainPlayerPosition = useMemo(
+      () => toJS(playerPosition),
+      [playerPosition],
+    );
+    const plainBoundingBox = useMemo(() => toJS(boundingBox), [boundingBox]);
+    const plainInCombat = useMemo(() => toJS(inCombat), [inCombat]);
+    const plainReduceMotion = useMemo(() => toJS(reduceMotion), [reduceMotion]);
+
+    const backgroundData = backgroundImages[backgroundName];
+    const { imageSet, size, verticalOffset } = backgroundData;
+    const layerCount = Object.keys(imageSet).length - 1;
+    const header = useHeaderHeight();
+
+    const { scale, scaledWidth, scaledHeight, imagesNeeded } = useMemo(() => {
+      const targetHeight = screenHeight;
+      const scale = targetHeight / size.height;
+      const scaledWidth = size.width * scale;
+      const scaledHeight = targetHeight;
+      const imagesNeeded = Math.max(3, Math.ceil(NORMATIVE_WIDTH / size.width));
+
+      return { scale, scaledWidth, scaledHeight, imagesNeeded };
+    }, [screenHeight, size.height, size.width]);
+
+    useEffect(() => {
+      if (plainInCombat) {
+        const totalWidth = size.width * imagesNeeded;
+
+        scrollX.value = 0;
+
+        scrollX.value = withRepeat(
+          withTiming(
+            lastMoveDirection.value *
+              -totalWidth *
+              (NORMATIVE_WIDTH / size.width / 4),
+            {
+              duration: 10000 * imagesNeeded,
+              easing: Easing.linear,
+            },
+          ),
+          -1,
+          true,
+        );
+
+        return () => {
+          cancelAnimation(scrollX);
+          scrollX.value = 0;
+        };
+      }
+    }, [plainInCombat, imagesNeeded, size.width, lastMoveDirection]);
+
+    useEffect(() => {
+      if (!plainInCombat) {
+        const relativeX =
+          plainPlayerPosition.x -
+          plainBoundingBox.offsetX -
+          plainBoundingBox.width / 2;
+
+        if (translateX.value !== -relativeX) {
+          if (-relativeX > translateX.value) {
+            lastMoveDirection.value = -1;
+          } else if (-relativeX < translateX.value) {
+            lastMoveDirection.value = 1;
+          }
+        }
+
+        const relativeY = plainPlayerPosition.y - plainBoundingBox.offsetY;
+        const boundingBoxVerticalCenter =
+          plainBoundingBox.height - TILE_SIZE / 2;
+        const verticalOffset = boundingBoxVerticalCenter - relativeY;
+
+        translateX.value = withSpring(-relativeX, {
+          damping: 20,
+          stiffness: 90,
+          mass: 1,
+          overshootClamping: false,
+          restDisplacementThreshold: 0.01,
+          restSpeedThreshold: 0.01,
+        });
+
+        translateY.value = withSpring(verticalOffset, {
+          damping: 20,
+          stiffness: 90,
+          mass: 1,
+          overshootClamping: false,
+          restDisplacementThreshold: 0.01,
+          restSpeedThreshold: 0.01,
+        });
+      }
+    }, [plainPlayerPosition, plainBoundingBox, plainInCombat]);
+
+    const renderLayers = useCallback(() => {
+      const layers = [];
+      for (let i = layerCount; i >= 1; i--) {
+        const moveRate = 1 - (i - 1) / layerCount;
+
+        layers.push(
+          <ParallaxLayer
+            key={i}
+            imageSource={imageSet[i]}
+            size={size}
+            imagesNeeded={imagesNeeded}
+            moveRate={moveRate}
+            scrollX={scrollX}
+            translateX={translateX}
+            translateY={translateY}
+            inCombat={plainInCombat}
+            scale={scale}
+            screenWidth={screenWidth}
+            screenHeight={screenHeight}
+            scaledWidth={scaledWidth}
+          />,
+        );
+      }
+      return layers;
+    }, [
+      layerCount,
+      imageSet,
+      size,
+      imagesNeeded,
+      scrollX,
+      translateX,
+      translateY,
+      plainInCombat,
+      scale,
+      screenWidth,
+      screenHeight,
+      scaledWidth,
+    ]);
+
+    const renderEffects = useCallback(() => {
+      const bgSet = backgroundImages[backgroundName];
+      if ("effects" in bgSet) {
+        const { effects } = bgSet;
+
+        return Object.entries(effects).map(([effectName, effectSource]) => (
+          <ParallaxEffect
+            key={effectName}
+            effect={effectSource}
+            size={size}
+            style={{
+              transform: [{ scale }],
+              left: (screenWidth - scaledWidth) / 2,
+            }}
+          />
+        ));
+      }
+      return null;
+    }, [backgroundName, size, scale, screenWidth, scaledWidth]);
+
+    const backgroundContent = useMemo(() => {
+      if (plainReduceMotion) {
+        return (
+          <Image
+            source={imageSet[0]}
+            style={{
+              width: scaledWidth,
+              height: scaledHeight,
+              top: -(scaledHeight - screenHeight) / 2,
               left: (screenWidth - scaledWidth) / 2,
               position: "absolute",
-            },
-            animatedStyle,
-          ]}
-        >
-          {tileGroups.map((group, groupIndex) => (
-            <View
-              key={groupIndex}
-              style={{
-                position: "absolute",
-                left: group.offset,
-                width: size.width * imagesNeeded,
-                height: size.height,
-              }}
-            >
-              {[...Array(imagesNeeded)].map((_, index) => (
-                <Image
-                  key={index}
-                  source={imageSet[i]}
-                  style={{
-                    width: size.width,
-                    height: size.height,
-                    left: index * size.width,
-                    position: "absolute",
-                  }}
-                  contentFit="cover"
-                />
-              ))}
-            </View>
-          ))}
-        </Animated.View>,
-      );
-    }
-    return layers;
-  };
+            }}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+          />
+        );
+      } else {
+        return renderLayers();
+      }
+    }, [
+      plainReduceMotion,
+      imageSet,
+      scaledWidth,
+      scaledHeight,
+      screenHeight,
+      screenWidth,
+      renderLayers,
+    ]);
 
-  const renderEffects = () => {
-    const bgSet = backgroundImages[backgroundName];
-    if ("effects" in bgSet) {
-      const { effects } = bgSet;
+    const effectsContent = useMemo(() => {
+      if (!plainReduceMotion) {
+        return renderEffects();
+      }
+      return null;
+    }, [plainReduceMotion, renderEffects]);
 
-      return Object.entries(effects).map(([effectName, effectSource]) => (
-        <ParallaxEffect
-          key={effectName}
-          effect={effectSource}
-          size={size}
+    return (
+      <View style={[{ flex: 1 }, style]}>
+        <View
           style={{
-            transform: [{ scale }],
-            left: (screenWidth - scaledWidth) / 2,
+            ...StyleSheet.absoluteFillObject,
+            height: screenHeight,
+            marginTop: !plainReduceMotion
+              ? -verticalOffset * screenHeight
+              : undefined,
+            bottom: 0,
           }}
-        />
-      ));
-    }
-  };
-
-  const backgroundContent = plainReduceMotion ? (
-    <Image
-      source={imageSet[0]}
-      style={{
-        width: scaledWidth,
-        height: scaledHeight,
-        top: -(scaledHeight - screenHeight) / 2,
-        left: (screenWidth - scaledWidth) / 2,
-        position: "absolute",
-      }}
-      contentFit="cover"
-    />
-  ) : (
-    renderLayers()
-  );
-
-  return (
-    <View style={[{ flex: 1 }, style]}>
-      <View
-        style={{
-          ...StyleSheet.absoluteFillObject,
-          height: screenHeight,
-          marginTop: !plainReduceMotion
-            ? -verticalOffset * screenHeight
-            : undefined,
-          bottom: 0,
-        }}
-      >
-        {backgroundContent}
-        {!plainReduceMotion && renderEffects()}
+        >
+          {backgroundContent}
+          {effectsContent}
+        </View>
+        <View
+          style={{
+            paddingTop: header,
+            flex: 1,
+            paddingBottom: uiStore.playerStatusHeightSecondary,
+          }}
+        >
+          {children}
+        </View>
       </View>
-      <View
-        style={{
-          paddingTop: header,
-          flex: 1,
-          paddingBottom: uiStore.playerStatusHeightSecondary,
-        }}
-      >
-        {children}
-      </View>
-    </View>
-  );
-};
+    );
+  },
+);

@@ -212,8 +212,6 @@ export class CharacterStore {
   public saveCharacter = throttle(this.characterSave, 250);
 
   private saveCharacterIds = () => {
-    console.log("saving");
-
     const characterIds = this.characters.map((c) => c.id);
     const independentChildIds = this.independentChildren.map((c) => c.id);
 

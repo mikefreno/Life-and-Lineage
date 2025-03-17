@@ -11,23 +11,18 @@ import {
   EnemyImageMap,
 } from "../utility/enemyHelpers";
 import { useRootStore } from "@/hooks/stores";
-import { reverseNormalize, useStyles } from "@/hooks/styles";
+import {
+  calculateRenderScaling,
+  reverseNormalize,
+  useStyles,
+} from "@/hooks/styles";
 import { observer } from "mobx-react-lite";
 import { runInAction } from "mobx";
 import { Enemy, Minion } from "@/entities/creatures";
 import { useHeaderHeight } from "@react-navigation/elements";
 import Colors from "@/constants/Colors";
 import { useReanimatedAnimations } from "@/hooks/animation";
-
-/*
- * Scale is from 0-1.0
- */
-const calculateRenderScaling = (scale: number | undefined) => {
-  if (scale) {
-    return reverseNormalize(scale * 10) / 10;
-  }
-  return 1.0;
-};
+import { Vector2 } from "@/utility/Vec2";
 
 interface SingleAnimationSpriteProps {
   source: any;
@@ -428,6 +423,27 @@ export const AnimatedSprite = observer(
       setFrameCount(count);
     };
 
+    // Calculate movement direction and distance using Vector2
+    const calculateMovementVector = (
+      playerPos: Vector2,
+      enemyPos: Vector2,
+      maxDistance: number = 100,
+    ): Vector2 => {
+      // Get direction vector from enemy to player
+      const direction = playerPos.subtract(enemyPos);
+
+      // Get distance
+      const distance = direction.magnitude();
+
+      // Limit the movement distance
+      const moveDistance = Math.min(distance, maxDistance);
+
+      // Normalize and scale the direction vector
+      return distance > 0
+        ? direction.normalize().multiply(moveDistance)
+        : new Vector2(0, 0);
+    };
+
     useEffect(() => {
       if (
         activeAnimationString !== "idle" &&
@@ -446,12 +462,22 @@ export const AnimatedSprite = observer(
 
           case "move":
             runInAction(() => (animationStore.runningRNAnimation = true));
-            runMoveAnimation(
-              playerAnimationStore.playerOrigin,
-              animationStore.spriteMidPoint!,
-              frameCount,
-              () => animationStore.concludeAnimation(),
-            );
+
+            if (
+              playerAnimationStore.playerOrigin &&
+              animationStore.spriteMidPoint
+            ) {
+              runMoveAnimation(
+                playerAnimationStore.playerOrigin,
+                animationStore.spriteMidPoint,
+                frameCount,
+                () => animationStore.concludeAnimation(),
+              );
+            } else {
+              __DEV__ &&
+                console.warn("Missing position data for move animation");
+              animationStore.concludeAnimation();
+            }
             return;
 
           case "death":
@@ -518,7 +544,6 @@ export const AnimatedSprite = observer(
       };
     });
 
-    // Reanimated style for glow effect with padding to prevent edge visibility
     const glowStyle = useAnimatedStyle(() => {
       if (!glow) return {};
 
@@ -526,7 +551,7 @@ export const AnimatedSprite = observer(
         shadowColor: "#7fff00",
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: glow.value,
-        shadowRadius: 10, // Reduced shadow radius
+        shadowRadius: 10,
         elevation: glow.value * 8,
       };
     });
