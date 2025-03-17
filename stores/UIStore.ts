@@ -80,7 +80,7 @@ export default class UIStore {
   progressIncrementing: boolean = false;
 
   iconSizeXL = normalize(28);
-  tabHeight =
+  tabHeightBase =
     normalize(28) + normalizeForText(12) + normalize(3) + TABS_PADDING;
 
   expansionPadding = normalizeLineHeight(22);
@@ -199,7 +199,6 @@ export default class UIStore {
 
       setInsets: action,
       setPlayerStatusTop: action,
-      updateTabWithBottomInset: action,
       startTipCycle: action,
       completeLoading: action,
       setTotalLoadingSteps: action,
@@ -217,6 +216,7 @@ export default class UIStore {
       markStoreAsLoaded: action,
       setPlayerStatusHeight: action,
 
+      tabHeight: computed,
       itemBlockSize: computed,
       playerStatusHeightSecondary: computed,
       playerStatusIsCompact: computed,
@@ -261,6 +261,7 @@ export default class UIStore {
 
   setInsets(insets: EdgeInsets) {
     this.insets = insets;
+    this.storeLoadingStatus["statusBar"] = true;
   }
 
   private setupDevActions() {
@@ -300,7 +301,12 @@ export default class UIStore {
   }
 
   get compactRoutePadding() {
-    return this.bottomBarHeight + 4;
+    return (
+      (this.playerStatusCompactHeight ?? 0) +
+      this.tabHeight +
+      4 +
+      (this.playerStatusExpandedOnAllRoutes ? this.expansionPadding : 0)
+    );
   }
 
   get playerStatusHeight() {
@@ -310,6 +316,7 @@ export default class UIStore {
       return (this.playerStatusCompactHeight ?? 0) + this.expansionPadding;
     }
   }
+
   get playerStatusHeightSecondary() {
     return this.playerStatusHeight + (this.insets?.bottom ?? 0);
   }
@@ -373,22 +380,21 @@ export default class UIStore {
     return this.colorScheme === "dark";
   }
 
-  public updateTabWithBottomInset(value: number) {
-    this.tabHeight += value;
-    this.storeLoadingStatus["statusBar"] = true;
+  get tabHeight() {
+    return this.tabHeightBase + (this.insets?.bottom ?? 0);
   }
 
   setPlayerStatusHeight(value: number) {
     const mod = this.playerStatusIsCompact ? 0 : this.expansionPadding;
-    if (!this.playerStatusCompactHeight) {
-      this.setPlayerStatusCompactHeight(value + mod);
+    if (this.playerStatusCompactHeight === undefined) {
+      this.setPlayerStatusCompactHeight(value - mod);
     }
   }
 
   setPlayerStatusTop(pY: number) {
     const mod = this.playerStatusIsCompact ? 0 : this.expansionPadding;
-    if (!this.playerStatusTop) {
-      this.playerStatusTop = pY + mod;
+    if (this.playerStatusTop === undefined) {
+      this.playerStatusTop = pY - mod;
     }
   }
 

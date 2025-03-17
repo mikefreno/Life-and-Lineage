@@ -142,17 +142,6 @@ const SpellsScreen = observer(() => {
   }
   const isFocused = useIsFocused();
 
-  const topViewStyle = useMemo(() => {
-    return {
-      flex: 1,
-      marginTop: header + 20,
-      marginBottom: uiStore.compactRoutePadding,
-    };
-  }, [
-    uiStore.playerStatusExpandedOnAllRoutes,
-    uiStore.playerStatusCompactHeight,
-  ]);
-
   return (
     <>
       <TutorialModal
@@ -167,61 +156,53 @@ const SpellsScreen = observer(() => {
           body: "Using spells will increase your proficiency in their school.",
         }}
       />
-      <View style={topViewStyle}>
-        {playerState?.spells && playerState.spells.length > 0 ? (
-          <>
-            <GenericStrikeAround containerStyles={{ paddingHorizontal: 8 }}>
-              Known Spells
-            </GenericStrikeAround>
-            <ScrollView
-              contentContainerStyle={{
-                flexGrow: 1,
-                justifyContent: "center",
-              }}
-            >
-              {playerState.spells.map((spell) => (
-                <View key={spell.name} style={styles.spellContainer}>
-                  <SpellDetails spell={spell} />
-                </View>
-              ))}
-            </ScrollView>
-          </>
-        ) : (
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text style={[styles["text-xl"], { letterSpacing: 1 }]}>
-              No Known Spells.
-            </Text>
-            <Text
-              style={[
-                styles["text-md"],
-                { textAlign: "center", letterSpacing: 1 },
-              ]}
-            >
-              (Books can be studied on the top right)
-            </Text>
-          </View>
-        )}
-        <View>
+      {playerState?.spells && playerState.spells.length > 0 ? (
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingTop: header + 20,
+            justifyContent: "center",
+          }}
+        >
           <GenericStrikeAround containerStyles={{ paddingHorizontal: 8 }}>
-            Proficiencies
+            Known Spells
           </GenericStrikeAround>
-          <View
+          {playerState.spells.map((spell) => (
+            <View key={spell.name} style={styles.spellContainer}>
+              <SpellDetails spell={spell} />
+            </View>
+          ))}
+        </ScrollView>
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text style={[styles["text-xl"], { letterSpacing: 1 }]}>
+            No Known Spells.
+          </Text>
+          <Text
             style={[
-              styles.columnEvenly,
-              {
-                paddingBottom: normalize(12),
-              },
+              styles["text-md"],
+              { textAlign: "center", letterSpacing: 1 },
             ]}
           >
-            {magicProficiencySection(playerState?.magicProficiencies)}
-          </View>
+            (Books can be studied on the top right)
+          </Text>
         </View>
+      )}
+      <View
+        style={{ paddingBottom: uiStore.compactRoutePadding, maxHeight: "50%" }}
+      >
+        <GenericStrikeAround containerStyles={{ paddingHorizontal: 8 }}>
+          Proficiencies
+        </GenericStrikeAround>
+        <ScrollView contentContainerStyle={[styles.columnEvenly, {}]}>
+          {magicProficiencySection(playerState?.magicProficiencies)}
+        </ScrollView>
       </View>
     </>
   );

@@ -82,7 +82,7 @@ const TabLayout = observer(() => {
       Platform.OS == "ios"
         ? () => (
             <BlurView
-              intensity={80}
+              intensity={50}
               style={[StyleSheet.absoluteFill, styles.diffuse]}
               tint={uiStore.colorScheme}
             />
@@ -91,11 +91,6 @@ const TabLayout = observer(() => {
             <ThemedView style={[StyleSheet.absoluteFill, shadows.diffuse]} />
           ),
   } as const;
-
-  useEffect(() => {
-    Platform.OS === "ios" &&
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  }, []);
 
   return (
     <>

@@ -146,11 +146,6 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
   const [showBirthModal, setShowBirthModal] = useState(false);
   const [newbornBaby, setNewbornBaby] = useState<Character | null>(null);
 
-  useEffect(
-    () => uiStore.updateTabWithBottomInset(insets.bottom),
-    [insets.bottom],
-  );
-
   //const [expoPushToken, setExpoPushToken] = useState("");
   //const [sentToken, setSentToken] = useState(false);
   //const [_, setNotification] = useState<Notifications.Notification | undefined>(

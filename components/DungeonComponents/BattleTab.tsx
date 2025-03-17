@@ -254,6 +254,7 @@ const BattleTab = observer(
                 <FlatList
                   data={combinedData}
                   inverted
+                  indicatorStyle={"white"}
                   persistentScrollbar
                   contentContainerStyle={{ paddingHorizontal: "2%" }}
                   renderItem={({ item, index }) => (

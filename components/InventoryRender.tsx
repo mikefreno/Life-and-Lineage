@@ -5,6 +5,8 @@ import {
   LayoutChangeEvent,
   ScrollView,
   type DimensionValue,
+  Platform,
+  LayoutAnimation,
 } from "react-native";
 import { Text } from "./Themed";
 import { InventoryItem } from "./Draggable";
@@ -13,7 +15,7 @@ import { useVibration } from "../hooks/generic";
 import { useDraggableStore, useRootStore } from "../hooks/stores";
 import { useRef } from "react";
 import { observer } from "mobx-react-lite";
-import { useStyles } from "../hooks/styles";
+import { normalizeForText, useStyles } from "../hooks/styles";
 import { useIsFocused } from "@react-navigation/native";
 import { runInAction } from "mobx";
 
@@ -24,7 +26,6 @@ const InventoryRender = observer(
     targetBounds,
     runOnSuccess,
     screen,
-    onLayoutComplete,
   }: {
     displayItem: {
       item: Item[];
@@ -70,9 +71,7 @@ const InventoryRender = observer(
     const gridCalculations = useMemo(() => {
       const height = draggableClassStore.inventoryBounds?.height ?? 0;
       const width = draggableClassStore.inventoryBounds?.width ?? 0;
-      const isLandscape =
-        uiStore.dimensions.width === uiStore.dimensions.greater;
-      const rows = isLandscape ? 2 : 4;
+      const rows = uiStore.isLandscape ? 2 : 4;
       const columns = 24 / rows;
       const itemSize = uiStore.itemBlockSize;
 
@@ -102,20 +101,19 @@ const InventoryRender = observer(
         };
       });
 
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       return {
         rows,
         columns,
         itemSize,
         slotPositions,
-        isLandscape,
       };
-    }, [
-      draggableClassStore.inventoryBounds?.height,
-      draggableClassStore.inventoryBounds?.width,
-      uiStore.dimensions.width,
-      uiStore.dimensions.greater,
-      uiStore.itemBlockSize,
-    ]);
+    }, [draggableClassStore.inventoryBounds]);
+
+    useEffect(() => {
+      Platform.OS === "ios" &&
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    }, [uiStore.dimensions]);
 
     useEffect(() => {
       if (
@@ -134,7 +132,6 @@ const InventoryRender = observer(
       gridCalculations,
       draggableClassStore.inventoryBounds,
       layoutCompleted,
-      onLayoutComplete,
     ]);
 
     const dropHandler = useCallback(
@@ -162,24 +159,6 @@ const InventoryRender = observer(
       [playerState, runOnSuccess, setDisplayItem, vibration],
     );
 
-    const onLayoutView = useCallback(
-      (event: LayoutChangeEvent) => {
-        const { width, height } = event.nativeEvent.layout;
-
-        if (selfRef.current) {
-          selfRef.current.measure((x, y, w, h, pageX, pageY) => {
-            draggableClassStore.setInventoryBounds({
-              x: pageX,
-              y: pageY,
-              width,
-              height,
-            });
-          });
-        }
-      },
-      [draggableClassStore],
-    );
-
     useEffect(() => {
       if (isFocused && selfRef.current) {
         setTimeout(() => {
@@ -193,9 +172,9 @@ const InventoryRender = observer(
               });
             }
           });
-        }, 150);
+        }, 0);
       }
-    }, [isFocused, draggableClassStore]);
+    }, [isFocused, draggableClassStore, uiStore.dimensions]);
 
     const renderInventorySlot = useCallback(
       (index: number) => {
@@ -387,7 +366,6 @@ const InventoryRender = observer(
         <ScrollView
           horizontal
           pagingEnabled
-          onLayout={onLayoutView}
           scrollEnabled={playerState.keyItems.length > 0}
           onScrollBeginDrag={() => setDisplayItem(null)}
           disableScrollViewPanResponder={true}
@@ -398,11 +376,23 @@ const InventoryRender = observer(
           scrollIndicatorInsets={{ top: 0, left: 10, bottom: 0, right: 10 }}
         >
           {/* Regular Inventory Panel */}
-          <View style={{ width: uiStore.dimensions.width }}>
+          <View style={{ width: draggableClassStore.inventoryBounds?.width }}>
             <View
-              style={[styles.keyItemsText, { width: uiStore.dimensions.width }]}
+              style={[
+                styles.keyItemsText,
+                { width: draggableClassStore.inventoryBounds?.width },
+              ]}
             >
-              <Text style={[styles["text-3xl"], { opacity: 0.3 }]}>
+              <Text
+                style={[
+                  styles["text-3xl"],
+                  {
+                    opacity: 0.3,
+                    position: "absolute",
+                    top: normalizeForText(28),
+                  },
+                ]}
+              >
                 Inventory
               </Text>
             </View>

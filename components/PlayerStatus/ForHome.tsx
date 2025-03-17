@@ -63,7 +63,7 @@ const PlayerStatusForHome = observer(() => {
 
     return () => clearTimeout(timer);
   }, [
-    uiStore.dimensions,
+    uiStore.dimensions.height,
     uiStore.playerStatusIsCompact,
     uiStore.isLandscape,
     uiStore.root.dungeonStore.isInDungeon,
@@ -81,10 +81,6 @@ const PlayerStatusForHome = observer(() => {
         onPress={() => {
           vibration({ style: "light" });
           uiStore.setDetailedStatusViewShowing(true);
-        }}
-        onLayout={(event) => {
-          const { height } = event.nativeEvent.layout;
-          uiStore.setPlayerStatusHeight(height);
         }}
         style={{
           zIndex: 10,

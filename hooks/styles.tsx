@@ -465,7 +465,7 @@ export const useStyles = () => {
     // ---- Main Tabs - Spells ---- //
     proficiencyContainer: {
       paddingVertical: normalize(4),
-      paddingHorizontal: 32,
+      paddingHorizontal: normalize(24),
       width: "100%",
     } as const,
     spellContainer: {
