@@ -1147,7 +1147,7 @@ export const useStyles = () => {
       position: "absolute",
       bottom: 0,
       marginBottom: -uiStore.playerStatusHeight,
-      height: "70%",
+      height: "85%",
     } as const,
     // webview
     webViewHeader: {

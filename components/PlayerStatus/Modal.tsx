@@ -165,7 +165,7 @@ export const PlayerStatusModal = observer(() => {
       isVisibleCondition={uiStore.detailedStatusViewShowing}
       backFunction={() => uiStore.setDetailedStatusViewShowing(false)}
       scrollEnabled={false}
-      size={95}
+      size={100}
     >
       <View>
         <View
@@ -270,6 +270,8 @@ export const PlayerStatusModal = observer(() => {
             respeccing={respeccing}
             vibration={vibration}
           />
+        </View>
+        <View style={styles.rowEvenly}>
           <RenderSecondaryStatsBlock
             stat={Attribute.intelligence}
             playerState={playerState}

@@ -44,6 +44,15 @@ export const SCREEN_TRANSITION_TIMING = 250;
 
 export const TABS_PADDING = 8;
 
+export const tabRouteIndexing = [
+  "/",
+  "/spells",
+  "/labor",
+  "/shops",
+  "/medical",
+  "/dungeon",
+];
+
 export default class UIStore {
   root: RootStore;
   dimensions: {
@@ -271,6 +280,9 @@ export default class UIStore {
   }
 
   get playerStatusIsCompact() {
+    if (!tabRouteIndexing.includes(this.root.pathname)) {
+      return false;
+    }
     if (this.root.playerState) {
       return !(
         this.root.playerState.unAllocatedSkillPoints > 0 ||
@@ -301,11 +313,7 @@ export default class UIStore {
     }
   }
   get playerStatusHeightSecondary() {
-    return (
-      (this.playerStatusCompactHeight ?? 0) +
-      this.expansionPadding +
-      (this.insets?.bottom ?? 0)
-    );
+    return this.playerStatusHeight + (this.insets?.bottom ?? 0);
   }
 
   get bottomBarHeight() {
@@ -375,7 +383,7 @@ export default class UIStore {
   setPlayerStatusHeight(value: number) {
     const mod = this.playerStatusIsCompact ? 0 : this.expansionPadding;
     if (!this.playerStatusCompactHeight) {
-      this.setPlayerStatusCompactHeight(value + mod);
+      this.setPlayerStatusCompactHeight(value - mod);
     }
   }
 

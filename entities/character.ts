@@ -1106,9 +1106,10 @@ export class PlayerCharacter extends Character {
     const { manaRegenFlat, manaRegenMult } = getConditionEffectsOnMisc(
       this.conditions,
     );
+
     return (
       this.baseManaRegen +
-      this.allocatedSkillPoints[Attribute.manaRegen] * manaRegenMult +
+      (this.allocatedSkillPoints[Attribute.manaRegen] ?? 0) * manaRegenMult +
       (this.equipmentStats.get(Modifier.ManaRegen) ?? 0) +
       manaRegenFlat
     );

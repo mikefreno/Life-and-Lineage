@@ -10,7 +10,7 @@ import React, {
 import { Animated } from "react-native";
 
 export const ScreenShaker = ({ children }: { children: ReactNode }) => {
-  const { playerAnimationStore } = useRootStore();
+  const { dungeonStore } = useRootStore();
   const shakeAnimation = useRef(new Animated.Value(0)).current;
   const [isShaking, setIsShaking] = useState(false);
 
@@ -59,10 +59,9 @@ export const ScreenShaker = ({ children }: { children: ReactNode }) => {
         );
       }
 
-      // Final animation back to 0
       shakeSequence.push(
         Animated.timing(shakeAnimation, {
-          toValue: 0, // Return to 0 instead of numShakes+1
+          toValue: 0,
           duration: 50,
           useNativeDriver: true,
         }),
@@ -91,12 +90,12 @@ export const ScreenShaker = ({ children }: { children: ReactNode }) => {
   });
 
   useEffect(() => {
-    playerAnimationStore.screenShaker = shakeScreen;
+    dungeonStore.screenShaker = shakeScreen;
 
     return () => {
-      playerAnimationStore.screenShaker = null;
+      dungeonStore.screenShaker = null;
     };
-  }, [shakeScreen, playerAnimationStore]);
+  }, [shakeScreen, dungeonStore]);
 
   return (
     <Animated.View

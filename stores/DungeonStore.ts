@@ -47,6 +47,8 @@ export class DungeonStore {
   private isProcessingMovement: boolean = false;
   logs: string[] = [];
 
+  screenShaker: ((duration?: number) => void) | null = null;
+
   includeDevAttacks: boolean = false;
 
   constructor({ root }: { root: RootStore }) {

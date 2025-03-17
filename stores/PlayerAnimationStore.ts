@@ -21,7 +21,6 @@ export class PlayerAnimationStore {
   }[] = [];
 
   targetIDs: string[] | null = null;
-  screenShaker: ((duration?: number) => void) | null = null;
   animationPromiseResolver: (() => void) | null = null;
 
   textString: string | undefined = undefined;
@@ -116,6 +115,9 @@ export class PlayerAnimationStore {
   }
 
   clearAnimation() {
+    if (this.animationSet?.triggersScreenShake) {
+      this.root.dungeonStore.screenShaker;
+    }
     if (this.animationPromiseResolver) {
       this.animationPromiseResolver();
       this.animationPromiseResolver = null;

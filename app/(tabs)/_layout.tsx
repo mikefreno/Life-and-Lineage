@@ -63,7 +63,7 @@ const TabLayout = observer(() => {
         uiStore.playerStatusTop -
         uiStore.playerStatusCompactHeight -
         uiStore.iconSizeXL -
-        Math.max(insets.bottom, 8) +
+        Math.max(insets.bottom, 16) +
         TABS_PADDING,
       0,
     );

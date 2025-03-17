@@ -257,12 +257,12 @@ export const RenderSecondaryStatsBlock = observer(
       (!respeccing && playerState.unAllocatedSkillPoints > 0);
 
     return (
-      <View style={styles.columnCenter}>
+      <View style={[styles.columnCenter, { flex: 1 }]}>
         <Text style={{ paddingVertical: 4, ...styles["text-lg"] }}>
           {AttributeToString[stat]}
         </Text>
         <View style={[styles.rowCenter, { alignItems: "center" }]}>
-          <Text style={styles["text-lg"]}>
+          <Text style={[styles["text-lg"], { paddingRight: 4 }]}>
             {stat === Attribute.strength
               ? playerState.totalStrength
               : stat === Attribute.dexterity
@@ -839,7 +839,7 @@ export const ColorAndPlatformDependantBlur = observer(
           style={{
             zIndex: 10,
             overflow: "hidden",
-            paddingBottom: 24,
+            paddingBottom: uiStore.insets?.bottom,
             backgroundColor:
               Platform.OS !== "ios"
                 ? uiStore.colorScheme === "dark"

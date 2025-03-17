@@ -17,15 +17,10 @@ export default function BattleTabControls({
 }: BattleTabControlsProps) {
   const styles = useStyles();
   const vibration = useVibration();
-  const { dungeonStore, uiStore } = useRootStore();
+  const { dungeonStore } = useRootStore();
 
   const getBackgroundColor = (tab: string) => ({
-    backgroundColor:
-      battleTab === tab
-        ? uiStore.colorScheme === "dark"
-          ? "rgba(39, 39, 42, 0.3)"
-          : "rgba(244, 244, 245, 0.3)"
-        : undefined,
+    backgroundColor: battleTab === tab ? "rgba(39, 39, 42, 0.8)" : undefined,
   });
 
   const attacksOrNavigationStyle = useMemo(
@@ -50,7 +45,7 @@ export default function BattleTabControls({
     () => ({
       width: "33.333%" as DimensionValue,
       paddingVertical: normalize(12),
-      ...getBackgroundColor("attacksOrNavigation"),
+      ...getBackgroundColor("log"),
     }),
     [battleTab, getBackgroundColor],
   );
