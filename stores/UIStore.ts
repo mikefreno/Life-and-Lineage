@@ -61,7 +61,6 @@ export default class UIStore {
     greater: number;
     lesser: number;
   };
-  itemBlockSize: number;
   detailedStatusViewShowing: boolean;
   modalShowing: boolean;
   readonly dimensionsSubscription: EmitterSubscription;
@@ -80,11 +79,11 @@ export default class UIStore {
   currentTipIndex: number = 0;
   progressIncrementing: boolean = false;
 
-  expansionPadding = normalizeLineHeight(28);
   iconSizeXL = normalize(28);
   tabHeight =
     normalize(28) + normalizeForText(12) + normalize(3) + TABS_PADDING;
 
+  expansionPadding = normalizeLineHeight(22);
   iconSizeLarge = normalize(22);
   iconSizeSmall = normalize(16);
 
@@ -140,7 +139,6 @@ export default class UIStore {
       ),
     };
     this.dimensions = dimensions;
-    this.itemBlockSize = UIStore.calcBlockSize(dimensions);
     this.dimensionsSubscription = Dimensions.addEventListener(
       "change",
       ({ window }: { window: ScaledSize }) => {
@@ -182,7 +180,6 @@ export default class UIStore {
     makeObservable(this, {
       detailedStatusViewShowing: observable,
       dimensions: observable,
-      itemBlockSize: observable,
       modalShowing: observable,
       preferedColorScheme: observable,
       vibrationEnabled: observable,
@@ -220,6 +217,7 @@ export default class UIStore {
       markStoreAsLoaded: action,
       setPlayerStatusHeight: action,
 
+      itemBlockSize: computed,
       playerStatusHeightSecondary: computed,
       playerStatusIsCompact: computed,
       playerStatusHeight: computed,
@@ -294,7 +292,7 @@ export default class UIStore {
 
   get playerStatusExpandedOnAllRoutes() {
     if (this.root.playerState) {
-      return !(
+      return (
         this.root.playerState.unAllocatedSkillPoints > 0 ||
         this.root.playerState.conditions.length > 0
       );
@@ -383,7 +381,7 @@ export default class UIStore {
   setPlayerStatusHeight(value: number) {
     const mod = this.playerStatusIsCompact ? 0 : this.expansionPadding;
     if (!this.playerStatusCompactHeight) {
-      this.setPlayerStatusCompactHeight(value - mod);
+      this.setPlayerStatusCompactHeight(value + mod);
     }
   }
 
@@ -550,22 +548,23 @@ export default class UIStore {
       lesser: Math.min(window.height, window.width),
     };
     this.dimensions = dimensions;
-    this.itemBlockSize = UIStore.calcBlockSize(dimensions);
   }
 
-  static calcBlockSize(dimensions: {
-    height: number;
-    width: number;
-    greater: number;
-    lesser: number;
-  }) {
-    let blockSize;
-    if (dimensions.width === dimensions.lesser) {
-      blockSize = Math.min(dimensions.height / 5, dimensions.width / 8);
+  get itemBlockSize() {
+    let blockSize: number;
+
+    if (this.dimensions.width === this.dimensions.lesser) {
+      blockSize = Math.min(
+        this.dimensions.height / 5,
+        this.dimensions.width / 8,
+      );
     } else {
-      blockSize = dimensions.width / 14;
+      blockSize = this.dimensions.width / 14;
     }
-    return blockSize;
+    return (
+      blockSize *
+      (this.root.dungeonStore && this.root.dungeonStore.isInDungeon ? 0.9 : 1.0)
+    );
   }
 
   hydrateUISettings(): {

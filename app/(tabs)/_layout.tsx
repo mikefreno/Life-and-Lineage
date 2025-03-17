@@ -82,7 +82,7 @@ const TabLayout = observer(() => {
       Platform.OS == "ios"
         ? () => (
             <BlurView
-              intensity={100}
+              intensity={80}
               style={[StyleSheet.absoluteFill, styles.diffuse]}
               tint={uiStore.colorScheme}
             />
@@ -150,7 +150,7 @@ const TabLayout = observer(() => {
                 <>
                   <PlayerStatusForHome />
                   <LinearGradientBlur
-                    intensity={100}
+                    intensity={80}
                     style={{
                       height:
                         uiStore.tabHeight +

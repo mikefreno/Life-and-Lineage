@@ -577,7 +577,7 @@ const RootLayout = observer(({ fontLoaded }: { fontLoaded: boolean }) => {
                     {({ pressed }) => (
                       <MaterialCommunityIcons
                         name="run-fast"
-                        size={uiStore.iconSizeLarge}
+                        size={uiStore.iconSizeXL}
                         color={
                           uiStore.colorScheme == "light" ? "#18181b" : "#fafafa"
                         }
@@ -653,13 +653,13 @@ const AudioToggleButton = observer(() => {
       {audioStore.muted ? (
         <MaterialIcons
           name="music-off"
-          size={uiStore.iconSizeLarge}
+          size={uiStore.iconSizeXL}
           color={uiStore.isDark ? "#fafafa" : "#27272a"}
         />
       ) : (
         <MaterialIcons
           name="music-note"
-          size={uiStore.iconSizeLarge}
+          size={uiStore.iconSizeXL}
           color={uiStore.isDark ? "#fafafa" : "#27272a"}
         />
       )}

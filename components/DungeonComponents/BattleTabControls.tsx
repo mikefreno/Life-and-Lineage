@@ -20,7 +20,7 @@ export default function BattleTabControls({
   const { dungeonStore } = useRootStore();
 
   const getBackgroundColor = (tab: string) => ({
-    backgroundColor: battleTab === tab ? "rgba(39, 39, 42, 0.8)" : undefined,
+    backgroundColor: battleTab === tab ? "rgba(39, 39, 42, 0.5)" : undefined,
   });
 
   const attacksOrNavigationStyle = useMemo(

@@ -22,7 +22,8 @@ import { useVibration } from "@/hooks/generic";
 import SeasonDisplay from "@/components/SeasonDisplay";
 
 const HomeScreen = observer(() => {
-  const { playerState, uiStore, stashStore, time } = useRootStore();
+  const root = useRootStore();
+  const { playerState, uiStore, stashStore, time } = root;
   const { draggableClassStore } = useDraggableStore();
   const [showStash, setShowStash] = useState(false);
   const stashButtonRef = useRef<View>(null);
@@ -81,6 +82,7 @@ const HomeScreen = observer(() => {
       paddingBottom: uiStore.compactRoutePadding,
     };
   }, [
+    root.pathname,
     uiStore.playerStatusExpandedOnAllRoutes,
     uiStore.playerStatusCompactHeight,
   ]);

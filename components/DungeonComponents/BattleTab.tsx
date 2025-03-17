@@ -166,7 +166,6 @@ const BattleTab = observer(
             </View>
           )}
         </GenericModal>
-
         <GenericModal
           isVisibleCondition={showEncounterResultModal}
           backFunction={() => {
