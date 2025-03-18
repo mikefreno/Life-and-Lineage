@@ -14,7 +14,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.mikefrenodev.lineage",
-      "buildNumber": "11",
+      "buildNumber": "12",
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true,
         "aps-environment": "development"
@@ -95,4 +95,3 @@
     "owner": "mikefrenodev"
   }
 }
-

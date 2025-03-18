@@ -2276,34 +2276,38 @@ export class PlayerCharacter extends Character {
   /**
    * This is only ever needed if the player is a necromancer
    * `Throws` if the user does not have enough blood orbs; only ever call if `hasEnoughBloodOrbs` returns true
-   * Removes soonest to expire blood orbs first
+   * Removes soonest to expire blood orbs first, removes as many orbs as possible
    */
   public removeBloodOrbs(spell: Spell) {
     const bloodOrbsNeeded = spell.buffs.filter(
       (buff) => buff == "consume blood orb",
     ).length;
+
+    if (bloodOrbsNeeded <= 0) {
+      return 1;
+    }
+
     if (bloodOrbsNeeded > this.bloodOrbCount) {
       throw new Error("User does not have enough blood orbs");
-    } else {
-      let orbsToRemove = this.getBloodOrbs()
-        .sort((a, b) => a.turns - b.turns)
-        .splice(0, bloodOrbsNeeded);
-      for (let i = 0; orbsToRemove.length > 0; i++) {
-        //still make sure that we can not run past length of conditions, should not ever be hit
-        if (i > this.conditions.length) {
-          break;
-        }
-        const filtered = orbsToRemove.filter(
-          (orb) => !(orb.id == this.conditions[i].id),
-        );
-        if (filtered.length < orbsToRemove.length) {
-          // we found a match with i, remove it from this.conditions, and update removal list
-          this.conditions.splice(i, 1);
-          orbsToRemove = filtered;
-        }
-      }
     }
+
+    const mult = Math.floor(this.bloodOrbCount / bloodOrbsNeeded);
+
+    const totalOrbsToRemove = bloodOrbsNeeded * mult;
+
+    const allBloodOrbs = this.getBloodOrbs().sort((a, b) => a.turns - b.turns);
+
+    const orbIdsToRemove = allBloodOrbs
+      .slice(0, totalOrbsToRemove)
+      .map((orb) => orb.id);
+
+    this.conditions = this.conditions.filter(
+      (condition) => !orbIdsToRemove.includes(condition.id),
+    );
+
+    return mult;
   }
+
   //----------------------------------Physical Combat----------------------------------//
   get weaponAttacks() {
     if (__DEV__ && this.root.includeDevAttacks) {

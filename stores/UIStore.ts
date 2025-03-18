@@ -80,10 +80,9 @@ export default class UIStore {
   progressIncrementing: boolean = false;
 
   iconSizeXL = normalize(28);
-  tabHeightBase =
-    normalize(28) + normalizeForText(12) + normalize(3) + TABS_PADDING;
+  tabHeightBase = normalize(28) + normalizeForText(12) + normalize(3);
 
-  expansionPadding = normalizeLineHeight(22);
+  expansionPadding = normalize(24);
   iconSizeLarge = normalize(22);
   iconSizeSmall = normalize(16);
 

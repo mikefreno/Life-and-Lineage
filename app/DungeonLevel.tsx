@@ -67,9 +67,6 @@ const DungeonLevelScreen = observer(() => {
   const header = useHeaderHeight();
   const styles = useStyles();
 
-  const [currentMinionPage, setCurrentMinionPage] = useState(0);
-  const minionScrollViewRef = useRef<ScrollView>(null);
-
   const pouchRef = useRef<View>(null);
   const mainBodyRef = useRef<View>(null);
   const [mainHeight, setMainHeight] = useState<number>(
@@ -302,134 +299,7 @@ const DungeonLevelScreen = observer(() => {
               battleTab={battleTab}
               setBattleTab={setBattleTab}
             />
-            {playerState.minionsAndPets.length > 0 ? (
-              <View>
-                <ScrollView
-                  ref={minionScrollViewRef}
-                  horizontal
-                  pagingEnabled
-                  showsHorizontalScrollIndicator={false}
-                  style={{
-                    width: "100%",
-                    marginBottom: normalize(5),
-                  }}
-                  contentContainerStyle={{
-                    alignItems: "center",
-                  }}
-                  onScroll={(event) => {
-                    const contentOffsetX = event.nativeEvent.contentOffset.x;
-                    const pageIndex = Math.round(
-                      contentOffsetX / uiStore.dimensions.width,
-                    );
-                    setCurrentMinionPage(pageIndex);
-                  }}
-                  scrollEventThrottle={16}
-                >
-                  {Array.from({
-                    length: Math.ceil(playerState.minionsAndPets.length / 2),
-                  }).map((_, pageIndex) => (
-                    <View
-                      key={`page-${pageIndex}`}
-                      style={{
-                        width: uiStore.dimensions.width,
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        paddingHorizontal: normalize(10),
-                      }}
-                    >
-                      {playerState.minionsAndPets[pageIndex * 2] && (
-                        <View
-                          style={{
-                            width: "48%",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Text style={{ fontSize: normalizeForText(14) }}>
-                            {toTitleCase(
-                              playerState.minionsAndPets[pageIndex * 2]
-                                .creatureSpecies,
-                            )}
-                          </Text>
-                          <ProgressBar
-                            filledColor="#ef4444"
-                            unfilledColor="#fee2e2"
-                            value={
-                              playerState.minionsAndPets[pageIndex * 2]
-                                .currentHealth
-                            }
-                            maxValue={
-                              playerState.minionsAndPets[pageIndex * 2]
-                                .maxHealth
-                            }
-                          />
-                        </View>
-                      )}
-                      {playerState.minionsAndPets[pageIndex * 2 + 1] && (
-                        <View
-                          style={{
-                            width: "48%",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Text style={{ fontSize: normalizeForText(14) }}>
-                            {toTitleCase(
-                              playerState.minionsAndPets[pageIndex * 2 + 1]
-                                .creatureSpecies,
-                            )}
-                          </Text>
-                          <ProgressBar
-                            filledColor="#ef4444"
-                            unfilledColor="#fee2e2"
-                            value={
-                              playerState.minionsAndPets[pageIndex * 2 + 1]
-                                .currentHealth
-                            }
-                            maxValue={
-                              playerState.minionsAndPets[pageIndex * 2 + 1]
-                                .maxHealth
-                            }
-                          />
-                        </View>
-                      )}
-                    </View>
-                  ))}
-                </ScrollView>
-                {playerState.minionsAndPets.length > 2 && (
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "center",
-                      paddingBottom: normalize(8),
-                    }}
-                  >
-                    {Array.from({
-                      length: Math.ceil(playerState.minionsAndPets.length / 2),
-                    }).map((_, index) => (
-                      <Pressable
-                        onPress={() => {
-                          vibration({ style: "light" });
-                          minionScrollViewRef.current?.scrollTo({
-                            x: index * uiStore.dimensions.width,
-                            animated: true,
-                          });
-                        }}
-                        key={`indicator-${index}`}
-                        style={{
-                          width: normalize(14),
-                          height: normalize(14),
-                          borderRadius: 9999,
-                          backgroundColor:
-                            currentMinionPage === index
-                              ? "#ffffff"
-                              : "rgba(255,255,255,0.3)",
-                          marginHorizontal: normalize(12),
-                        }}
-                      />
-                    ))}
-                  </View>
-                )}
-              </View>
-            ) : null}
+            <PlayerMinionSection />
           </View>
         </Parallax>
         <PlayerStatusForSecondary />
@@ -461,3 +331,136 @@ const DungeonLevelScreen = observer(() => {
 });
 
 export default DungeonLevelScreen;
+
+const PlayerMinionSection = observer(() => {
+  const { playerState, uiStore } = useRootStore();
+  const vibration = useVibration();
+
+  const [currentMinionPage, setCurrentMinionPage] = useState(0);
+  const minionScrollViewRef = useRef<ScrollView>(null);
+  if (!playerState || playerState.minionsAndPets.length == 0) {
+    return null;
+  }
+
+  return (
+    <View>
+      <ScrollView
+        ref={minionScrollViewRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        style={{
+          width: "100%",
+          marginBottom: normalize(5),
+        }}
+        contentContainerStyle={{
+          alignItems: "center",
+        }}
+        onScroll={(event) => {
+          const contentOffsetX = event.nativeEvent.contentOffset.x;
+          const pageIndex = Math.round(
+            contentOffsetX / uiStore.dimensions.width,
+          );
+          setCurrentMinionPage(pageIndex);
+        }}
+        scrollEventThrottle={16}
+      >
+        {Array.from({
+          length: Math.ceil(playerState.minionsAndPets.length / 2),
+        }).map((_, pageIndex) => (
+          <View
+            key={`page-${pageIndex}`}
+            style={{
+              width: uiStore.dimensions.width,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              paddingHorizontal: normalize(10),
+            }}
+          >
+            {playerState.minionsAndPets[pageIndex * 2] && (
+              <View
+                style={{
+                  width: "48%",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ fontSize: normalizeForText(14) }}>
+                  {toTitleCase(
+                    playerState.minionsAndPets[pageIndex * 2].creatureSpecies,
+                  )}
+                </Text>
+                <ProgressBar
+                  filledColor="#ef4444"
+                  unfilledColor="#fee2e2"
+                  value={
+                    playerState.minionsAndPets[pageIndex * 2].currentHealth
+                  }
+                  maxValue={playerState.minionsAndPets[pageIndex * 2].maxHealth}
+                />
+              </View>
+            )}
+            {playerState.minionsAndPets[pageIndex * 2 + 1] && (
+              <View
+                style={{
+                  width: "48%",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ fontSize: normalizeForText(14) }}>
+                  {toTitleCase(
+                    playerState.minionsAndPets[pageIndex * 2 + 1]
+                      .creatureSpecies,
+                  )}
+                </Text>
+                <ProgressBar
+                  filledColor="#ef4444"
+                  unfilledColor="#fee2e2"
+                  value={
+                    playerState.minionsAndPets[pageIndex * 2 + 1].currentHealth
+                  }
+                  maxValue={
+                    playerState.minionsAndPets[pageIndex * 2 + 1].maxHealth
+                  }
+                />
+              </View>
+            )}
+          </View>
+        ))}
+      </ScrollView>
+      {playerState.minionsAndPets.length > 2 && (
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            paddingBottom: normalize(8),
+          }}
+        >
+          {Array.from({
+            length: Math.ceil(playerState.minionsAndPets.length / 2),
+          }).map((_, index) => (
+            <Pressable
+              onPress={() => {
+                vibration({ style: "light" });
+                minionScrollViewRef.current?.scrollTo({
+                  x: index * uiStore.dimensions.width,
+                  animated: true,
+                });
+              }}
+              key={`indicator-${index}`}
+              style={{
+                width: normalize(14),
+                height: normalize(14),
+                borderRadius: 9999,
+                backgroundColor:
+                  currentMinionPage === index
+                    ? "#ffffff"
+                    : "rgba(255,255,255,0.3)",
+                marginHorizontal: normalize(12),
+              }}
+            />
+          ))}
+        </View>
+      )}
+    </View>
+  );
+});

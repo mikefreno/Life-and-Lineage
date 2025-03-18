@@ -102,33 +102,30 @@ const PlayerStatusForHome = observer(() => {
                 height: expandedSectionHeight,
                 marginHorizontal: "auto",
                 ...styles.rowCenter,
+                paddingTop: 2,
               }}
             >
-              <View
-                style={[
-                  styles.rowCenter,
-                  {
+              {!coinsHidden && (
+                <View
+                  style={{
                     alignItems: "center",
-                  },
-                ]}
-              >
-                {!coinsHidden && (
-                  <>
-                    <Text>{playerState.readableGold}</Text>
-                    <ChangePopUp
-                      popUp={"gold"}
-                      change={statChanges.gold}
-                      animationCycler={animationCycler}
-                      colorScheme={uiStore.colorScheme}
-                    />
-                    <Coins
-                      width={uiStore.iconSizeSmall}
-                      height={uiStore.iconSizeSmall}
-                      style={{ marginLeft: 6 }}
-                    />
-                  </>
-                )}
-              </View>
+                    ...styles.rowCenter,
+                  }}
+                >
+                  <Text>{playerState.readableGold}</Text>
+                  <ChangePopUp
+                    popUp={"gold"}
+                    change={statChanges.gold}
+                    animationCycler={animationCycler}
+                    colorScheme={uiStore.colorScheme}
+                  />
+                  <Coins
+                    width={uiStore.iconSizeSmall}
+                    height={uiStore.iconSizeSmall}
+                    style={{ marginLeft: 6 }}
+                  />
+                </View>
+              )}
               {playerState.unAllocatedSkillPoints > 0 && (
                 <View style={{ paddingHorizontal: 4, marginVertical: "auto" }}>
                   <SquarePlus

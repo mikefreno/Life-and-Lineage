@@ -4,11 +4,12 @@ import {
   StatType,
   useAcceleratedAction,
   useStatChanges,
+  useVibration,
 } from "@/hooks/generic";
 import { normalize, radius, tw_base, useStyles } from "@/hooks/styles";
 import { AccelerationCurves, toTitleCase } from "@/utility/functions/misc";
 import { Attribute, AttributeToString, Modifier } from "@/utility/types";
-import { ReactNode, useCallback, useEffect, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   Image,
@@ -140,9 +141,7 @@ export const RenderPrimaryStatsBlock = observer(
 
     return (
       <View style={styles.columnCenter}>
-        <Text style={{ paddingVertical: 4, color: filledColor }}>
-          {AttributeToString[stat]}
-        </Text>
+        <Text style={{ color: filledColor }}>{AttributeToString[stat]}</Text>
         <View
           style={{ width: "100%", alignItems: "center", ...styles.rowCenter }}
         >
@@ -258,7 +257,7 @@ export const RenderSecondaryStatsBlock = observer(
 
     return (
       <View style={[styles.columnCenter, { flex: 1 }]}>
-        <Text style={{ paddingVertical: 4, ...styles["text-lg"] }}>
+        <Text style={{ padding: 4, ...styles["text-lg"] }}>
           {AttributeToString[stat]}
         </Text>
         <View style={[styles.rowCenter, { alignItems: "center" }]}>
@@ -347,6 +346,9 @@ export const ChangePopUp = ({
       : "black";
 
   const styles = useStyles();
+  if (!change.isShowing) {
+    return null;
+  }
   return (
     <View style={{ opacity: change.isShowing ? 1 : 0 }}>
       <FadeOutNode
@@ -360,7 +362,7 @@ export const ChangePopUp = ({
               color,
               ...styles["text-sm"],
             },
-            popUp === "gold" ? { paddingLeft: 4 } : { paddingRight: 8 },
+            popUp === "gold" ? {} : { paddingRight: 8 },
           ]}
         >
           {change.current > 0 ? "+" : ""}
@@ -410,29 +412,30 @@ export const ConditionRenderer = observer(() => {
     return (
       <View style={[styles.rowAround, { marginLeft: tw_base[2] }]}>
         {simplifiedConditions.map((cond) => (
-          <View
-            key={cond.id}
-            style={{
-              backgroundColor: `${
-                Colors[uiStore.colorScheme == "light" ? "dark" : "light"]
-                  .background
-              }60`,
-              borderColor: Colors[uiStore.colorScheme].border,
-              borderWidth: 1,
-              borderRadius: 999,
-              padding: 1,
-              marginHorizontal: tw_base[1],
-              marginVertical: "auto",
-            }}
-          >
-            <Image
-              source={cond.icon}
+          <View key={cond.id}>
+            <View
               style={{
-                width: normalize(22),
-                height: normalize(22),
+                backgroundColor: `${
+                  Colors[uiStore.colorScheme == "light" ? "dark" : "light"]
+                    .background
+                }60`,
+                borderColor: Colors[uiStore.colorScheme].border,
+                borderWidth: 1,
+                borderRadius: 999,
+                padding: 1,
+                marginHorizontal: tw_base[1],
+                marginVertical: "auto",
               }}
-              resizeMode="contain"
-            />
+            >
+              <Image
+                source={cond.icon}
+                style={{
+                  width: uiStore.iconSizeSmall,
+                  height: uiStore.iconSizeSmall,
+                }}
+                resizeMode="contain"
+              />
+            </View>
           </View>
         ))}
       </View>
@@ -443,88 +446,194 @@ export const ConditionRenderer = observer(() => {
 export const DetailedViewConditionRender = observer(() => {
   const { playerState, uiStore } = useRootStore();
   const styles = useStyles();
+  const conditionScrollViewRef = useRef<ScrollView>(null);
+  const [currentConditionPage, setCurrentConditionPage] = useState(0);
+  const vibration = useVibration();
 
-  if (playerState) {
+  if (!playerState || playerState.conditions.length === 0) {
     return (
-      /*TODO: Fix sizing, cannot scroll to bottom*/
-      <ScrollView>
-        {playerState.conditions.map((condition) => (
-          <View key={condition.id} style={styles.detailedConditionCard}>
-            <View style={styles.rowEvenly}>
-              <Text
-                style={{
-                  letterSpacing: 1,
-                  opacity: 0.8,
-                  ...styles["text-xl"],
-                }}
-              >
-                {toTitleCase(condition.name)}
-              </Text>
-              <View style={styles.columnCenter}>
-                <View style={[styles.rowCenter, { paddingVertical: 4 }]}>
-                  <Image
-                    source={condition.getConditionIcon()}
-                    style={{
-                      width: uiStore.iconSizeLarge,
-                      height: uiStore.iconSizeLarge,
-                    }}
-                    resizeMode="contain"
-                  />
-                  <Text> {condition.turns} </Text>
-                  <ClockIcon
-                    width={uiStore.iconSizeSmall}
-                    height={uiStore.iconSizeSmall}
-                  />
-                </View>
-                {!!condition.getHealthDamage() && (
-                  <View style={styles.rowCenter}>
-                    <Text>{condition.getHealthDamage()}</Text>
-                    <HealthIcon
-                      height={uiStore.iconSizeSmall}
-                      width={uiStore.iconSizeSmall}
-                    />
-                  </View>
-                )}
-                {!!condition.getSanityDamage() && (
-                  <View style={styles.rowCenter}>
-                    <Text>{condition.getSanityDamage()}</Text>
-                    <View style={{ marginLeft: 4 }}>
-                      <Sanity
-                        height={uiStore.iconSizeSmall}
-                        width={uiStore.iconSizeSmall}
-                      />
-                    </View>
-                  </View>
-                )}
-              </View>
-              <Text
-                style={{
-                  letterSpacing: 1,
-                  opacity: 0.8,
-                  ...styles["text-xl"],
-                }}
-              >
-                {toTitleCase(condition.style)}
-              </Text>
-            </View>
-            <View style={{ marginHorizontal: "auto" }}>
-              {condition.effect.map((effect, idx) => (
-                <Text key={idx}>
-                  {Condition.effectExplanationString({
-                    effect,
-                    effectMagnitude: condition.effectMagnitude[idx],
-                    effectStyle: condition.effectStyle[idx],
-                    trapSetupTime: condition.trapSetupTime,
-                  })}
-                </Text>
-              ))}
-            </View>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text style={styles["text-lg"]}>No active conditions</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        paddingHorizontal: 0,
+        marginHorizontal: "-2%",
+      }}
+    >
+      <ScrollView
+        ref={conditionScrollViewRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          alignItems: "center",
+        }}
+        onScroll={(event) => {
+          const contentOffsetX = event.nativeEvent.contentOffset.x;
+          const pageIndex = Math.round(
+            contentOffsetX / uiStore.dimensions.width,
+          );
+          setCurrentConditionPage(pageIndex);
+        }}
+        scrollEventThrottle={16}
+      >
+        {Array.from({
+          length: Math.ceil(playerState.conditions.length / 2),
+        }).map((_, pageIndex) => (
+          <View
+            key={`page-${pageIndex}`}
+            style={{
+              width: uiStore.dimensions.width * 0.9,
+              paddingHorizontal: uiStore.dimensions.width * 0.025,
+              flexDirection: uiStore.isLandscape ? "row" : "column",
+              justifyContent: "flex-start",
+              alignItems: "center",
+            }}
+          >
+            {playerState.conditions[pageIndex * 2] && (
+              <ConditionCard
+                condition={playerState.conditions[pageIndex * 2]}
+              />
+            )}
+            {playerState.conditions[pageIndex * 2 + 1] && (
+              <ConditionCard
+                condition={playerState.conditions[pageIndex * 2 + 1]}
+              />
+            )}
           </View>
         ))}
       </ScrollView>
-    );
-  }
+
+      {playerState.conditions.length > 2 && (
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          {Array.from({
+            length: Math.ceil(playerState.conditions.length / 2),
+          }).map((_, index) => (
+            <Pressable
+              onPress={() => {
+                vibration({ style: "light" });
+                conditionScrollViewRef.current?.scrollTo({
+                  x: index * uiStore.dimensions.width * 0.9,
+                  animated: true,
+                });
+              }}
+              key={`indicator-${index}`}
+              style={{
+                width: normalize(14),
+                height: normalize(14),
+                borderRadius: 9999,
+                backgroundColor:
+                  currentConditionPage === index
+                    ? uiStore.colorScheme === "dark"
+                      ? "#ffffff"
+                      : "#27272a"
+                    : uiStore.colorScheme === "dark"
+                    ? "rgba(255,255,255,0.3)"
+                    : "rgba(0,0,0,0.3)",
+                marginHorizontal: normalize(12),
+              }}
+            />
+          ))}
+        </View>
+      )}
+    </View>
+  );
 });
+
+const ConditionCard = ({ condition }: { condition: Condition }) => {
+  const { uiStore } = useRootStore();
+  const styles = useStyles();
+
+  return (
+    <View style={styles.detailedConditionCard}>
+      <View style={styles.rowBetween}>
+        <Text
+          style={{
+            letterSpacing: 1,
+            opacity: 0.8,
+            ...styles["text-xl"],
+          }}
+        >
+          {toTitleCase(condition.name)}
+        </Text>
+        <View style={styles.columnCenter}>
+          <View
+            style={[
+              styles.rowCenter,
+              { paddingVertical: 4, alignItems: "center" },
+            ]}
+          >
+            <Image
+              source={condition.getConditionIcon()}
+              style={{
+                width: uiStore.iconSizeLarge,
+                height: uiStore.iconSizeLarge,
+              }}
+              resizeMode="contain"
+            />
+            <Text> {condition.turns} </Text>
+            <ClockIcon
+              width={uiStore.iconSizeSmall}
+              height={uiStore.iconSizeSmall}
+            />
+          </View>
+          {!!condition.getHealthDamage() && (
+            <View style={styles.rowCenter}>
+              <Text>{condition.getHealthDamage()}</Text>
+              <HealthIcon
+                height={uiStore.iconSizeSmall}
+                width={uiStore.iconSizeSmall}
+              />
+            </View>
+          )}
+          {!!condition.getSanityDamage() && (
+            <View style={styles.rowCenter}>
+              <Text>{condition.getSanityDamage()}</Text>
+              <View style={{ marginLeft: 4 }}>
+                <Sanity
+                  height={uiStore.iconSizeSmall}
+                  width={uiStore.iconSizeSmall}
+                />
+              </View>
+            </View>
+          )}
+        </View>
+        <Text
+          style={{
+            letterSpacing: 1,
+            opacity: 0.8,
+            ...styles["text-xl"],
+          }}
+        >
+          {toTitleCase(condition.style)}
+        </Text>
+      </View>
+      <View style={{ marginHorizontal: "auto" }}>
+        {condition.effect.map((effect, idx) => (
+          <Text key={idx}>
+            {Condition.effectExplanationString({
+              effect,
+              effectMagnitude: condition.effectMagnitude[idx],
+              effectStyle: condition.effectStyle[idx],
+              trapSetupTime: condition.trapSetupTime,
+            })}
+          </Text>
+        ))}
+      </View>
+    </View>
+  );
+};
 
 export const StatDisplay = ({
   modifier,

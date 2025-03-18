@@ -12,6 +12,7 @@ import { ThemedView } from "./Themed";
 import { useRootStore } from "../hooks/stores";
 import { useStyles } from "../hooks/styles";
 import { observer } from "mobx-react-lite";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface GenericModalProps {
   isVisibleCondition: boolean;
@@ -66,6 +67,7 @@ const GenericModal = observer(
     const { uiStore } = root;
     let { modalShowing, colorScheme } = uiStore;
     const styles = useStyles();
+    const insets = useSafeAreaInsets();
 
     useEffect(() => {
       if (
@@ -107,7 +109,7 @@ const GenericModal = observer(
         <ThemedView
           style={[
             {
-              maxHeight: "90%",
+              maxHeight: uiStore.dimensions.height - insets.top - insets.bottom,
               ...styles.modalContent,
               width: size ? `${size}%` : "83.3333%",
             },
@@ -115,6 +117,9 @@ const GenericModal = observer(
           ]}
         >
           <ScrollView
+            style={{
+              maxHeight: uiStore.dimensions.height - insets.top - insets.bottom,
+            }}
             contentContainerStyle={{
               flexGrow: 1,
               paddingVertical: noPad ? 0 : 16,

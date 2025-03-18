@@ -35,7 +35,6 @@ interface SpellFields {
   };
   animation: PlayerAnimationSet;
 }
-//TODO: blood orb consuming spells should consume all orbs, multiplying out the values
 
 /**
  * This class instantiates learned spells by the `PlayerCharacter` only.
@@ -164,7 +163,12 @@ export class Spell {
       };
     }
 
-    user.useMana(this.manaCost);
+    let bloodMult = 1;
+    if (this.buffs.includes("consume blood orb")) {
+      bloodMult = user.removeBloodOrbs(this);
+    }
+
+    user.useMana(this.manaCost * bloodMult);
 
     const targetResults = targets.map((target) => {
       const finalDamage = Math.round(this.baseDamage(user) * 4) / 4;
@@ -200,7 +204,7 @@ export class Spell {
 
       return {
         target,
-        damage: finalDamage,
+        damage: finalDamage * bloodMult,
         sanityDamage: this.flatSanityDamage,
         debuffs,
         healed: amountHealed,
@@ -225,10 +229,6 @@ export class Spell {
       }
     });
 
-    if (this.buffs.includes("consume blood orb")) {
-      user.removeBloodOrbs(this);
-    }
-
     let minionSpecies: string[] = [];
     this.summons.forEach((summon) => {
       const type = user.createMinion(summon);
@@ -241,7 +241,10 @@ export class Spell {
     }
 
     user.gainProficiency(this);
-    user.damageHealth({ damage: this.selfDamage, attackerId: user.id });
+    user.damageHealth({
+      damage: this.selfDamage * bloodMult,
+      attackerId: user.id,
+    });
 
     wait(1000).then(() => user.endTurn());
 

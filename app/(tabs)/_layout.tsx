@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Link, Tabs, useRouter } from "expo-router";
 import {
   GestureResponderEvent,
@@ -40,36 +40,36 @@ import { observer } from "mobx-react-lite";
 import { wait } from "@/utility/functions/misc";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import GenericModal from "@/components/GenericModal";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { TABS_PADDING } from "@/stores/UIStore";
 
 const TabLayout = observer(() => {
   const isFocused = useIsFocused();
-  const { playerState, uiStore, dungeonStore } = useRootStore();
+  const root = useRootStore();
+  const { playerState, uiStore, dungeonStore } = root;
   const [showPVPInfoModal, setShowPVPInfoModal] = useState(false);
 
   const styles = useStyles();
   const router = useRouter();
   const vibration = useVibration();
-  const insets = useSafeAreaInsets();
 
-  const leftoverSize = useMemo(() => {
-    if (!uiStore.playerStatusTop || !uiStore.playerStatusCompactHeight)
-      return 0;
+  const tabBarLayout = useMemo(() => {
+    const playerStatusHeight = uiStore.playerStatusCompactHeight ?? 0;
+    const expandedPadding = uiStore.playerStatusExpandedOnAllRoutes
+      ? uiStore.expansionPadding
+      : 0;
+    const totalTabHeight =
+      uiStore.tabHeight + playerStatusHeight + expandedPadding;
+    const tabContentHeight = uiStore.tabHeight;
 
-    return Math.max(
-      uiStore.dimensions.height -
-        uiStore.playerStatusTop -
-        uiStore.playerStatusCompactHeight -
-        uiStore.iconSizeXL -
-        Math.max(insets.bottom, 16) +
-        TABS_PADDING,
-      0,
-    );
+    return {
+      height: totalTabHeight,
+      contentHeight: tabContentHeight,
+      paddingTop: playerStatusHeight + expandedPadding,
+    };
   }, [
     uiStore.playerStatusCompactHeight,
-    uiStore.playerStatusTop,
+    uiStore.tabHeight,
     uiStore.playerStatusExpandedOnAllRoutes,
+    uiStore.expansionPadding,
   ]);
 
   const commonOptions = {
@@ -141,19 +141,20 @@ const TabLayout = observer(() => {
           screenOptions={{
             tabBarBackground: () => {
               return (
-                <>
+                <View
+                  style={{ position: "absolute", bottom: 0, width: "100%" }}
+                >
                   <PlayerStatusForHome />
                   <LinearGradientBlur
                     intensity={80}
                     style={{
-                      height:
-                        uiStore.tabHeight +
-                        (uiStore.playerStatusCompactHeight ?? 0),
-                      bottom: 0,
+                      height: tabBarLayout.height,
+                      width: "100%",
                       position: "absolute",
+                      bottom: 0,
                     }}
                   />
-                </>
+                </View>
               );
             },
             tabBarActiveTintColor: Colors[uiStore.colorScheme].tint,
@@ -165,6 +166,7 @@ const TabLayout = observer(() => {
                     fontFamily: "PixelifySans",
                     ...styles["text-sm"],
                     color: props.color,
+                    marginTop: normalize(2), // Add a small margin to separate from icon
                   }}
                 >
                   {props.children}
@@ -175,17 +177,19 @@ const TabLayout = observer(() => {
               borderTopWidth: 0,
               position: "absolute",
               shadowColor: "transparent",
-              height:
-                uiStore.tabHeight +
-                (uiStore.playerStatusCompactHeight ?? 0) +
-                (uiStore.playerStatusExpandedOnAllRoutes
-                  ? uiStore.expansionPadding
-                  : 0),
+              height: tabBarLayout.height,
               paddingHorizontal: "2%",
+              paddingTop: tabBarLayout.paddingTop,
             },
             tabBarIconStyle: {
               marginHorizontal: "auto",
               height: uiStore.iconSizeXL,
+            },
+            tabBarItemStyle: {
+              // This centers the content in the available space
+              height: tabBarLayout.contentHeight,
+              justifyContent: "center",
+              paddingTop: 0,
             },
             animation:
               uiStore.reduceMotion || Platform.OS == "android"
@@ -202,11 +206,13 @@ const TabLayout = observer(() => {
                   accessibilityLabel={props.accessibilityLabel}
                   accessibilityRole={props.accessibilityRole}
                   accessibilityState={props.accessibilityState}
-                  style={{
-                    top:
-                      (uiStore.playerStatusCompactHeight ?? 0) +
-                      leftoverSize / 2,
-                  }}
+                  style={[
+                    props.style,
+                    {
+                      height: tabBarLayout.contentHeight,
+                      justifyContent: "center",
+                    },
+                  ]}
                 >
                   {props.children}
                 </Pressable>
@@ -263,25 +269,23 @@ const TabLayout = observer(() => {
                   </Pressable>
                 </Link>
               ),
-              headerRight: __DEV__
-                ? () => (
-                    <Link href="/Relationships" asChild>
-                      <Pressable onPress={() => vibration({ style: "light" })}>
-                        {({ pressed }) => (
-                          <HouseHeart
-                            width={uiStore.iconSizeXL}
-                            height={uiStore.iconSizeXL}
-                            color={"#f87171"}
-                            style={{
-                              marginRight: 15,
-                              opacity: pressed ? 0.5 : 1,
-                            }}
-                          />
-                        )}
-                      </Pressable>
-                    </Link>
-                  )
-                : undefined,
+              headerRight: () => (
+                <Link href="/Relationships" asChild>
+                  <Pressable onPress={() => vibration({ style: "light" })}>
+                    {({ pressed }) => (
+                      <HouseHeart
+                        width={uiStore.iconSizeXL}
+                        height={uiStore.iconSizeXL}
+                        color={"#f87171"}
+                        style={{
+                          marginRight: 15,
+                          opacity: pressed ? 0.5 : 1,
+                        }}
+                      />
+                    )}
+                  </Pressable>
+                </Link>
+              ),
             }}
           />
           <Tabs.Screen

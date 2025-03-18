@@ -51,7 +51,7 @@ const LaborTask = observer(
       {
         minHoldTime: 350,
         maxSpeed: 10,
-        accelerationCurve: AccelerationCurves.linear,
+        accelerationCurve: AccelerationCurves.cubic,
         action: work,
         minActionAmount: 1,
         maxActionAmount: 50,

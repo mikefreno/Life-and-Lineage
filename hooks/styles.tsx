@@ -650,12 +650,14 @@ export const useStyles = () => {
     statsRow: {
       flexDirection: "row",
       justifyContent: "space-evenly",
-      paddingVertical: 4,
+      paddingBottom: 4,
     } as const,
     detailedConditionCard: {
       marginVertical: 4,
       borderRadius: 8,
-      paddingVertical: 8,
+      marginHorizontal: uiStore.isLandscape ? "1%" : 0,
+      padding: "1%",
+      width: uiStore.isLandscape ? "48%" : "100%",
       backgroundColor: uiStore.colorScheme === "dark" ? "#52525b" : "#e4e4e7",
     } as const,
     respecButton: {

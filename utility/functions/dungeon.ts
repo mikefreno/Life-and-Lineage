@@ -111,9 +111,7 @@ export const generateTiles = ({
 
   // Generate map without a starting position
   const tiles: Tile[] = [];
-  const directions = Object.values(directionsMapping);
 
-  // Use integer coordinates during generation
   let currentX = Math.floor(Math.random() * numTiles);
   let currentY = Math.floor(Math.random() * numTiles);
   const initialTile: Tile = {
@@ -166,163 +164,87 @@ export const generateTiles = ({
     }
   }
 
-  // Find tiles that would make good entry points (tiles with only one neighbor)
-  const entryPointCandidates = [];
+  // Find the leftmost and rightmost x-coordinates in the map
+  let minX = Infinity;
+  let maxX = -Infinity;
 
   for (const tile of tiles) {
-    // For each tile, check how many neighbors it has
-    let neighborCount = 0;
-    let neighborDirection = null;
-
-    for (const dir of directions) {
-      const neighborX = tile.x + dir.x * tileSize;
-      const neighborY = tile.y + dir.y * tileSize;
-
-      if (tiles.some((t) => t.x === neighborX && t.y === neighborY)) {
-        neighborCount++;
-        neighborDirection = dir;
-      }
-    }
-
-    // If this tile has exactly one neighbor, it's a good entry point
-    if (neighborCount === 1 && neighborDirection) {
-      entryPointCandidates.push({
-        tile,
-        neighborDirection,
-      });
-    }
+    const tileX = tile.x / tileSize;
+    if (tileX < minX) minX = tileX;
+    if (tileX > maxX) maxX = tileX;
   }
 
-  // If no good entry points found, find tiles with two neighbors
-  if (entryPointCandidates.length === 0) {
-    for (const tile of tiles) {
-      let neighborCount = 0;
-      let openDirections = [];
+  // Find tiles on the left and right edges of the map
+  const leftEdgeTiles = tiles.filter((tile) => tile.x / tileSize === minX);
+  const rightEdgeTiles = tiles.filter((tile) => tile.x / tileSize === maxX);
 
-      for (const dir of directions) {
-        const neighborX = tile.x + dir.x * tileSize;
-        const neighborY = tile.y + dir.y * tileSize;
-
-        if (tiles.some((t) => t.x === neighborX && t.y === neighborY)) {
-          neighborCount++;
-        } else {
-          openDirections.push(dir);
-        }
-      }
-
-      if (neighborCount === 2 && openDirections.length > 0) {
-        entryPointCandidates.push({
-          tile,
-          neighborDirection:
-            openDirections[Math.floor(Math.random() * openDirections.length)],
-        });
-      }
+  // Combine them and filter to only include tiles with an open space to their left/right
+  const edgeTiles = [...leftEdgeTiles, ...rightEdgeTiles].filter((tile) => {
+    // For left edge tiles, check if there's an open space to the left
+    if (tile.x / tileSize === minX) {
+      return !tiles.some((t) => t.x === tile.x - tileSize && t.y === tile.y);
     }
-  }
-
-  // If still no candidates, use any tile with an open direction
-  if (entryPointCandidates.length === 0) {
-    for (const tile of tiles) {
-      const openDirections = directions.filter((dir) => {
-        const neighborX = tile.x + dir.x * tileSize;
-        const neighborY = tile.y + dir.y * tileSize;
-
-        return !tiles.some((t) => t.x === neighborX && t.y === neighborY);
-      });
-
-      if (openDirections.length > 0) {
-        entryPointCandidates.push({
-          tile,
-          neighborDirection:
-            openDirections[Math.floor(Math.random() * openDirections.length)],
-        });
-      }
+    // For right edge tiles, check if there's an open space to the right
+    else if (tile.x / tileSize === maxX) {
+      return !tiles.some((t) => t.x === tile.x + tileSize && t.y === tile.y);
     }
-  }
+    return false;
+  });
 
-  // Choose a random entry point
-  const chosenEntry =
-    entryPointCandidates[
-      Math.floor(Math.random() * entryPointCandidates.length)
-    ];
-
-  // Create the starting tile in the opposite direction of the neighbor
-  const oppositeDirection = {
-    x: -chosenEntry.neighborDirection.x,
-    y: -chosenEntry.neighborDirection.y,
-  };
-
-  const startTile: Tile = {
-    x: chosenEntry.tile.x + oppositeDirection.x * tileSize,
-    y: chosenEntry.tile.y + oppositeDirection.y * tileSize,
-    clearedRoom: true,
-    isBossRoom: false,
-  };
-
-  // Verify that the starting tile only touches one other tile
-  let touchCount = 0;
-  for (const dir of directions) {
-    const neighborX = startTile.x + dir.x * tileSize;
-    const neighborY = startTile.y + dir.y * tileSize;
-
-    if (tiles.some((t) => t.x === neighborX && t.y === neighborY)) {
-      touchCount++;
-    }
-  }
-
-  // If the starting tile would touch more than one tile, try another approach
-  if (touchCount > 1) {
-    // Find any tile with at least one open direction
-    const edgeTiles = tiles.filter((tile) => {
-      return directions.some((dir) => {
-        const neighborX = tile.x + dir.x * tileSize;
-        const neighborY = tile.y + dir.y * tileSize;
-        return !tiles.some((t) => t.x === neighborX && t.y === neighborY);
-      });
-    });
-
-    if (edgeTiles.length > 0) {
+  // If no suitable edge tiles found, try to find any tile on the left or right edge
+  if (edgeTiles.length === 0) {
+    // Just use any left or right edge tile
+    const anyEdgeTiles = [...leftEdgeTiles, ...rightEdgeTiles];
+    if (anyEdgeTiles.length > 0) {
       const randomEdgeTile =
-        edgeTiles[Math.floor(Math.random() * edgeTiles.length)];
+        anyEdgeTiles[Math.floor(Math.random() * anyEdgeTiles.length)];
 
-      // Find all open directions from this tile
-      const openDirections = directions.filter((dir) => {
-        const neighborX = randomEdgeTile.x + dir.x * tileSize;
-        const neighborY = randomEdgeTile.y + dir.y * tileSize;
+      const isLeftEdge = randomEdgeTile.x / tileSize === minX;
 
-        // Check that this direction doesn't lead to another tile
-        if (tiles.some((t) => t.x === neighborX && t.y === neighborY)) {
-          return false;
-        }
+      // Create starting tile to the left or right of the edge tile
+      const startTile: Tile = {
+        x: isLeftEdge
+          ? randomEdgeTile.x - tileSize
+          : randomEdgeTile.x + tileSize,
+        y: randomEdgeTile.y,
+        clearedRoom: true,
+        isBossRoom: false,
+      };
 
-        // Also check that placing a tile here wouldn't touch other tiles
-        let wouldTouchOthers = false;
-        for (const checkDir of directions) {
-          if (checkDir.x === -dir.x && checkDir.y === -dir.y) continue; // Skip the direction back to our edge tile
+      // Add the starting tile to the beginning of the array
+      tiles.unshift(startTile);
+    } else {
+      // Fallback: create a starting tile on the left side of the map
+      const randomY = Math.floor(Math.random() * numTiles) * tileSize;
+      const startTile: Tile = {
+        x: (minX - 1) * tileSize,
+        y: randomY,
+        clearedRoom: true,
+        isBossRoom: false,
+      };
 
-          const checkX = neighborX + checkDir.x * tileSize;
-          const checkY = neighborY + checkDir.y * tileSize;
-
-          if (tiles.some((t) => t.x === checkX && t.y === checkY)) {
-            wouldTouchOthers = true;
-            break;
-          }
-        }
-
-        return !wouldTouchOthers;
-      });
-
-      if (openDirections.length > 0) {
-        const chosenDir =
-          openDirections[Math.floor(Math.random() * openDirections.length)];
-        startTile.x = randomEdgeTile.x + chosenDir.x * tileSize;
-        startTile.y = randomEdgeTile.y + chosenDir.y * tileSize;
-      }
+      // Add the starting tile to the beginning of the array
+      tiles.unshift(startTile);
     }
-  }
+  } else {
+    // Choose a random edge tile from our filtered list
+    const randomEdgeTile =
+      edgeTiles[Math.floor(Math.random() * edgeTiles.length)];
 
-  // Add the starting tile to the beginning of the array
-  tiles.unshift(startTile);
+    // Determine if this is a left or right edge tile
+    const isLeftEdge = randomEdgeTile.x / tileSize === minX;
+
+    // Create starting tile to the left or right of the edge tile
+    const startTile: Tile = {
+      x: isLeftEdge ? randomEdgeTile.x - tileSize : randomEdgeTile.x + tileSize,
+      y: randomEdgeTile.y,
+      clearedRoom: true,
+      isBossRoom: false,
+    };
+
+    // Add the starting tile to the beginning of the array
+    tiles.unshift(startTile);
+  }
 
   // Place boss room (if needed) after the starting room is added
   if (!bossDefeated && tiles.length > 1) {
@@ -332,8 +254,8 @@ export const generateTiles = ({
 
       // Calculate path distance (not just Euclidean)
       // This is a simplified approach - in a real game you might want to use pathfinding
-      const dx = Math.abs(tile.x - startTile.x) / tileSize;
-      const dy = Math.abs(tile.y - startTile.y) / tileSize;
+      const dx = Math.abs(tile.x - tiles[0].x) / tileSize;
+      const dy = Math.abs(tile.y - tiles[0].y) / tileSize;
       const distance = dx + dy; // Manhattan distance as a simple approximation
 
       return { tile, distance, index };

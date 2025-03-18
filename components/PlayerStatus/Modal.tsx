@@ -1,7 +1,7 @@
 import GenericModal from "@/components/GenericModal";
 import { useRootStore } from "@/hooks/stores";
 import { normalize, useStyles } from "@/hooks/styles";
-import { Pressable, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { Text } from "@/components/Themed";
 import Animated, {
   useAnimatedStyle,
@@ -76,7 +76,7 @@ export const PlayerStatusModal = observer(() => {
   });
 
   const ClassNode = useMemo(() => {
-    const iconSize = uiStore.dimensions.width / 10;
+    const iconSize = uiStore.dimensions.lesser / 10;
 
     if (playerState) {
       return (
@@ -164,10 +164,13 @@ export const PlayerStatusModal = observer(() => {
     <GenericModal
       isVisibleCondition={uiStore.detailedStatusViewShowing}
       backFunction={() => uiStore.setDetailedStatusViewShowing(false)}
-      scrollEnabled={false}
       size={100}
     >
-      <View>
+      <View
+        style={{
+          flex: 1,
+        }}
+      >
         <View
           style={{
             alignItems: "center",
@@ -194,7 +197,6 @@ export const PlayerStatusModal = observer(() => {
             </View>
           </View>
         </View>
-
         {playerState.unAllocatedSkillPoints > 0 && (
           <Text
             style={{
@@ -205,11 +207,9 @@ export const PlayerStatusModal = observer(() => {
             numberOfLines={2}
             adjustsFontSizeToFit={true}
           >
-            You have {playerState.unAllocatedSkillPoints} unallocated
-            {"\n"}Skill Points!
+            {playerState.unAllocatedSkillPoints} unallocated skill points
           </Text>
         )}
-
         {playerState.getTotalAllocatedPoints() > 0 && (
           <View
             style={{
@@ -237,7 +237,6 @@ export const PlayerStatusModal = observer(() => {
             </Pressable>
           </View>
         )}
-
         <RenderPrimaryStatsBlock
           stat={Attribute.health}
           playerState={playerState}
@@ -256,8 +255,7 @@ export const PlayerStatusModal = observer(() => {
           respeccing={respeccing}
           vibration={vibration}
         />
-
-        <View style={styles.rowEvenly}>
+        <ScrollView horizontal contentContainerStyle={{ flexGrow: 1 }}>
           <RenderSecondaryStatsBlock
             stat={Attribute.strength}
             playerState={playerState}
@@ -270,8 +268,6 @@ export const PlayerStatusModal = observer(() => {
             respeccing={respeccing}
             vibration={vibration}
           />
-        </View>
-        <View style={styles.rowEvenly}>
           <RenderSecondaryStatsBlock
             stat={Attribute.intelligence}
             playerState={playerState}
@@ -284,8 +280,7 @@ export const PlayerStatusModal = observer(() => {
             respeccing={respeccing}
             vibration={vibration}
           />
-        </View>
-
+        </ScrollView>
         {playerState.equipmentStats.size > 0 ? (
           <View style={{ paddingVertical: 4 }}>
             <GenericStrikeAround>Equipment Stats</GenericStrikeAround>
@@ -293,10 +288,13 @@ export const PlayerStatusModal = observer(() => {
               style={{
                 flexDirection: "row",
                 marginTop: 8,
-                height: Math.min(
-                  uiStore.dimensions.height * 0.35,
-                  Math.max(ownedOffensive.size, ownedDefensive.size) * 70 +
-                    normalize(34),
+                height: Math.max(
+                  Math.min(
+                    uiStore.dimensions.height * 0.35,
+                    Math.max(ownedOffensive.size, ownedDefensive.size) * 70 +
+                      normalize(34),
+                    uiStore.dimensions.height * 0.2,
+                  ),
                 ),
               }}
             >
@@ -315,7 +313,6 @@ export const PlayerStatusModal = observer(() => {
             </View>
           </View>
         ) : null}
-
         {playerState.conditions.length > 0 ? (
           <View>
             <GenericStrikeAround>Conditions</GenericStrikeAround>
