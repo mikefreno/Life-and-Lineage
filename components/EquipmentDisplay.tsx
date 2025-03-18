@@ -285,6 +285,9 @@ const EquipmentSlot = observer(
                     }}
                     displayItem={null}
                     isDraggable={true}
+                    bgColor={
+                      itemStack[0].playerHasRequirements ? "#a1a1aa" : "#991b1b"
+                    }
                   />
                 </View>
               </View>

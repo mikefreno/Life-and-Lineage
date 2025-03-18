@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, View, Image } from "react-native";
+import { Pressable, View, Image, ColorValue } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -137,6 +137,7 @@ const InventoryItem = observer(
     setDisplayItem,
     isDraggable,
     runOnSuccess,
+    bgColor = "#a1a1aa",
   }: {
     item: Item[];
     targetBounds: {
@@ -170,6 +171,7 @@ const InventoryItem = observer(
     ) => void;
     isDraggable?: boolean;
     runOnSuccess: (droppedOnKey: string) => void;
+    bgColor?: ColorValue;
   }) => {
     const ref = useRef<View>(null);
     const opacity = useSharedValue(1);
@@ -246,6 +248,7 @@ const InventoryItem = observer(
                 {
                   height: uiStore.itemBlockSize,
                   width: uiStore.itemBlockSize,
+                  backgroundColor: bgColor,
                 },
               ]}
             >

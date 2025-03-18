@@ -401,7 +401,11 @@ export function StatsDisplay({
         <View
           style={[
             styles.consumableEffectContainer,
-            { borderColor: theme.error, borderWidth: 1 },
+            {
+              borderColor: theme.error,
+              borderWidth: 1,
+              backgroundColor: `${theme.error}30`,
+            },
           ]}
         >
           <Text>Requires:</Text>
