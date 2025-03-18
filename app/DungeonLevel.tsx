@@ -4,7 +4,7 @@ import {
   type LayoutChangeEvent,
   View,
   Animated,
-  Dimensions,
+  ScrollView,
 } from "react-native";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Pressable } from "react-native";
@@ -30,7 +30,7 @@ import {
   usePlayerStore,
   useRootStore,
 } from "@/hooks/stores";
-import { usePouch } from "@/hooks/generic";
+import { usePouch, useVibration } from "@/hooks/generic";
 import D20DieAnimation from "@/components/DieRollAnim";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { LinearGradientBlur } from "@/components/LinearGradientBlur";
@@ -56,6 +56,7 @@ const DungeonLevelScreen = observer(() => {
   const { showTargetSelection, setShowTargetSelection } = useCombatState();
   const { addItemToPouch } = usePouch();
   const colorScheme = uiStore.colorScheme;
+  const vibration = useVibration();
 
   const [battleTab, setBattleTab] = useState<
     "attacksOrNavigation" | "equipment" | "log"
@@ -65,6 +66,9 @@ const DungeonLevelScreen = observer(() => {
   const isFocused = useIsFocused();
   const header = useHeaderHeight();
   const styles = useStyles();
+
+  const [currentMinionPage, setCurrentMinionPage] = useState(0);
+  const minionScrollViewRef = useRef<ScrollView>(null);
 
   const pouchRef = useRef<View>(null);
   const mainBodyRef = useRef<View>(null);
@@ -299,49 +303,152 @@ const DungeonLevelScreen = observer(() => {
               setBattleTab={setBattleTab}
             />
             {playerState.minionsAndPets.length > 0 ? (
-              <View style={styles.minionContainer}>
-                {playerState.minionsAndPets.map((minion, index) => (
+              <View>
+                <ScrollView
+                  ref={minionScrollViewRef}
+                  horizontal
+                  pagingEnabled
+                  showsHorizontalScrollIndicator={false}
+                  style={{
+                    width: "100%",
+                    marginBottom: normalize(5),
+                  }}
+                  contentContainerStyle={{
+                    alignItems: "center",
+                  }}
+                  onScroll={(event) => {
+                    const contentOffsetX = event.nativeEvent.contentOffset.x;
+                    const pageIndex = Math.round(
+                      contentOffsetX / uiStore.dimensions.width,
+                    );
+                    setCurrentMinionPage(pageIndex);
+                  }}
+                  scrollEventThrottle={16}
+                >
+                  {Array.from({
+                    length: Math.ceil(playerState.minionsAndPets.length / 2),
+                  }).map((_, pageIndex) => (
+                    <View
+                      key={`page-${pageIndex}`}
+                      style={{
+                        width: uiStore.dimensions.width,
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        paddingHorizontal: normalize(10),
+                      }}
+                    >
+                      {playerState.minionsAndPets[pageIndex * 2] && (
+                        <View
+                          style={{
+                            width: "48%",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text style={{ fontSize: normalizeForText(14) }}>
+                            {toTitleCase(
+                              playerState.minionsAndPets[pageIndex * 2]
+                                .creatureSpecies,
+                            )}
+                          </Text>
+                          <ProgressBar
+                            filledColor="#ef4444"
+                            unfilledColor="#fee2e2"
+                            value={
+                              playerState.minionsAndPets[pageIndex * 2]
+                                .currentHealth
+                            }
+                            maxValue={
+                              playerState.minionsAndPets[pageIndex * 2]
+                                .maxHealth
+                            }
+                          />
+                        </View>
+                      )}
+                      {playerState.minionsAndPets[pageIndex * 2 + 1] && (
+                        <View
+                          style={{
+                            width: "48%",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text style={{ fontSize: normalizeForText(14) }}>
+                            {toTitleCase(
+                              playerState.minionsAndPets[pageIndex * 2 + 1]
+                                .creatureSpecies,
+                            )}
+                          </Text>
+                          <ProgressBar
+                            filledColor="#ef4444"
+                            unfilledColor="#fee2e2"
+                            value={
+                              playerState.minionsAndPets[pageIndex * 2 + 1]
+                                .currentHealth
+                            }
+                            maxValue={
+                              playerState.minionsAndPets[pageIndex * 2 + 1]
+                                .maxHealth
+                            }
+                          />
+                        </View>
+                      )}
+                    </View>
+                  ))}
+                </ScrollView>
+                {playerState.minionsAndPets.length > 2 && (
                   <View
-                    key={minion.id}
                     style={{
-                      ...styles.py1,
-                      width:
-                        index === playerState.minionsAndPets.length - 1 &&
-                        playerState.minionsAndPets.length % 2 !== 0
-                          ? "100%"
-                          : "40%",
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      paddingBottom: normalize(8),
                     }}
                   >
-                    <Text>{toTitleCase(minion.creatureSpecies)}</Text>
-                    <ProgressBar
-                      filledColor="#ef4444"
-                      unfilledColor="#fee2e2"
-                      value={minion.currentHealth}
-                      maxValue={minion.maxHealth}
-                    />
+                    {Array.from({
+                      length: Math.ceil(playerState.minionsAndPets.length / 2),
+                    }).map((_, index) => (
+                      <Pressable
+                        onPress={() => {
+                          vibration({ style: "light" });
+                          minionScrollViewRef.current?.scrollTo({
+                            x: index * uiStore.dimensions.width,
+                            animated: true,
+                          });
+                        }}
+                        key={`indicator-${index}`}
+                        style={{
+                          width: normalize(14),
+                          height: normalize(14),
+                          borderRadius: 9999,
+                          backgroundColor:
+                            currentMinionPage === index
+                              ? "#ffffff"
+                              : "rgba(255,255,255,0.3)",
+                          marginHorizontal: normalize(12),
+                        }}
+                      />
+                    ))}
                   </View>
-                ))}
+                )}
               </View>
             ) : null}
           </View>
-          {displayItem && (
-            <View
-              style={{
-                position: "absolute",
-                zIndex: 10,
-              }}
-              pointerEvents="box-none"
-            >
-              <StatsDisplay
-                displayItem={displayItem}
-                clearItem={() => setDisplayItem(null)}
-                addItemToPouch={(items) => addItemToPouch({ items })}
-                topOffset={-96}
-              />
-            </View>
-          )}
         </Parallax>
         <PlayerStatusForSecondary />
+        {displayItem && (
+          <View
+            style={{
+              position: "absolute",
+              zIndex: 10,
+            }}
+            pointerEvents="box-none"
+          >
+            <StatsDisplay
+              displayItem={displayItem}
+              clearItem={() => setDisplayItem(null)}
+              addItemToPouch={(items) => addItemToPouch({ items })}
+              topOffset={-96}
+            />
+          </View>
+        )}
       </ScreenShaker>
     );
   } else {

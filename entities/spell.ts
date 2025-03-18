@@ -35,7 +35,7 @@ interface SpellFields {
   };
   animation: PlayerAnimationSet;
 }
-//TODO: make damage a return value
+//TODO: blood orb consuming spells should consume all orbs, multiplying out the values
 
 /**
  * This class instantiates learned spells by the `PlayerCharacter` only.
@@ -122,7 +122,7 @@ export class Spell {
       };
     }
     if (user.currentMana < this.manaCost) {
-      return { val: false, reason: "Not Enough Mana" };
+      return { val: false, reason: "Low Mana" };
     }
     if (
       this.proficiencyNeeded &&
@@ -132,7 +132,7 @@ export class Spell {
       return { val: false, reason: "Low Proficiency" };
     }
     if (!user.hasEnoughBloodOrbs(this)) {
-      return { val: false, reason: "Lack Blood Orbs" };
+      return { val: false, reason: "Low Orbs" };
     }
 
     return { val: true };
@@ -224,7 +224,6 @@ export class Spell {
         }
       }
     });
-    console.log(buffs);
 
     if (this.buffs.includes("consume blood orb")) {
       user.removeBloodOrbs(this);

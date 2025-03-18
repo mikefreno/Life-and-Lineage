@@ -16,6 +16,7 @@ export class Condition {
   readonly style: "debuff" | "buff";
   turns: number;
   trapSetupTime: number | undefined;
+  // No idea if auras work at current
   readonly aura: boolean;
   readonly placedby: string;
   readonly placedbyID: string;
@@ -239,7 +240,7 @@ export class Condition {
       case "revenge":
         return "Will strike next attacker";
       case "blood magic consumable":
-        return "Empowers ";
+        return "Empowers the use of blood magics";
       case "execute":
         return "Will die at end of next turn";
       case "stealth":
@@ -281,6 +282,7 @@ const conditionIconMap: { [key: string]: any } = {
   anger: require("@/assets/images/conditions/anger.png"),
   blank: require("@/assets/images/conditions/blank.png"),
   bleed: require("@/assets/images/conditions/bleed.png"),
+  broken_shield: require("@/assets/images/conditions/broken_shield.png"),
   blind: require("@/assets/images/conditions/blind.png"),
   distraught: require("@/assets/images/conditions/distraught.png"),
   eagle: require("@/assets/images/conditions/eagle.png"),

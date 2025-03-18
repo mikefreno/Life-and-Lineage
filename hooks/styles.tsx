@@ -1158,6 +1158,12 @@ export const useStyles = () => {
       paddingHorizontal: 10,
       backgroundColor: theme.background,
     },
+    minionPage: {
+      width: uiStore.dimensions.width,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingHorizontal: 10,
+    },
   });
 };
 

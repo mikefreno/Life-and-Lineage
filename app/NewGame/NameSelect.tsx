@@ -44,7 +44,6 @@ export default function SetName() {
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ flex: 1 }}
-      keyboardVerticalOffset={headerHeight + 10}
     >
       <TouchableWithoutFeedback
         onPress={Keyboard.dismiss}

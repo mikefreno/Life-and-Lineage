@@ -117,7 +117,7 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
             </View>
           ) : null}
           {spell.summons?.map((summon, idx) => (
-            <View key={idx} style={styles.rowCenter}>
+            <View key={summon + idx} style={styles.rowCenter}>
               <Text>{toTitleCase(summon)}</Text>
               <NecromancerSkull
                 width={uiStore.iconSizeSmall}
@@ -144,20 +144,20 @@ export default function SpellDetails({ spell }: { spell: Spell }) {
               <GenericStrikeAround style={styles["text-md"]}>
                 Buffs
               </GenericStrikeAround>
-              {spell.buffs?.map((buff) => (
-                <Text style={styles.textCenter} key={buff}>
+              {spell.buffs?.map((buff, idx) => (
+                <Text style={styles.textCenter} key={buff + idx}>
                   {toTitleCase(buff)}
                 </Text>
               ))}
             </>
           ) : null}
-          {spell.debuffs.length > 0 ? (
+          {spell.buffs.length > 0 ? (
             <>
               <GenericStrikeAround style={styles["text-md"]}>
                 Debuffs
               </GenericStrikeAround>
               {spell.debuffs?.map((debuff, idx) => (
-                <Text style={styles.textCenter} key={idx}>
+                <Text style={styles.textCenter} key={debuff.name + idx}>
                   {toTitleCase(debuff.name)} - {debuff.chance * 100}%
                 </Text>
               ))}

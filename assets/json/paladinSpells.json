@@ -187,7 +187,7 @@
     "animation": {
       "sprite": "holyOrb",
       "style": "static",
-      "position": "self"
+      "position": "enemy"
     }
   },
   {
@@ -292,7 +292,8 @@
     "animation": {
       "sprite": "holyArc",
       "style": "static",
-      "position": "enemy"
+      "position": "enemy",
+      "scale": 0.3
     }
   },
   {
@@ -332,7 +333,9 @@
     "animation": {
       "sprite": "holyDart",
       "style": "missile",
-      "position": "enemy"
+      "position": "enemy",
+      "scale": 0.3,
+      "reachTargetAtFrame": 10
     }
   },
   {

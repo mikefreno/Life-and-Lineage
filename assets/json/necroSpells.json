@@ -37,7 +37,7 @@
       "debuffs": null
     },
     "animation": {
-      "sprite": "bloodBust",
+      "sprite": "bloodBurst",
       "style": "static",
       "position": "self"
     }
@@ -58,7 +58,7 @@
       "debuffs": null
     },
     "animation": {
-      "sprite": "bloodBust",
+      "sprite": "bloodBurst",
       "style": "static",
       "position": "self"
     }
@@ -79,7 +79,7 @@
       "debuffs": null
     },
     "animation": {
-      "glow": "#7f1d1d",
+      "glow": "#7f1d1d80",
       "position": "enemy"
     }
   },
@@ -461,7 +461,9 @@
     "animation": {
       "sprite": "poisonDart",
       "style": "missile",
-      "position": "enemy"
+      "position": "enemy",
+      "reachTargetAtFrame": 10,
+      "scale": 0.3
     }
   },
   {
@@ -483,8 +485,8 @@
     },
     "animation": {
       "sprite": "poisonPuft",
-      "style": "span",
-      "position": "field"
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -557,8 +559,8 @@
     },
     "animation": {
       "sprite": "poisonOrbBurst",
-      "style": "span",
-      "position": "field"
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -609,8 +611,8 @@
     },
     "animation": {
       "sprite": "poisonSmallBurst",
-      "style": "span",
-      "position": "field"
+      "style": "static",
+      "position": "enemy"
     }
   },
   {
@@ -636,8 +638,8 @@
     },
     "animation": {
       "sprite": "poisonLargeBurst",
-      "style": "span",
-      "position": "field"
+      "style": "static",
+      "position": "enemy"
     }
   }
 ]

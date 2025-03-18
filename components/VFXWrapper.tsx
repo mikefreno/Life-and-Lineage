@@ -506,19 +506,44 @@ const PlayerGlowVFX = ({
   onComplete: (() => void) | null;
 }) => {
   const { uiStore } = useRootStore();
+  const opacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    onComplete && setTimeout(() => onComplete(), duration);
+    Animated.timing(opacity, {
+      toValue: 1.0,
+      duration: duration / 3,
+      useNativeDriver: true,
+    }).start(({ finished }) => {
+      if (finished) {
+        setTimeout(() => {
+          Animated.timing(opacity, {
+            toValue: 0,
+            duration: duration / 2,
+            useNativeDriver: true,
+          }).start(({ finished }) => {
+            if (finished && onComplete) {
+              onComplete();
+            }
+          });
+        }, duration / 6);
+      }
+    });
+
+    return () => {
+      opacity.stopAnimation();
+      if (onComplete) onComplete();
+    };
   }, []);
 
   return (
-    <View
+    <Animated.View
       style={{
         zIndex: 9999,
         width: uiStore.dimensions.width,
         height: uiStore.dimensions.height,
         position: "absolute",
         backgroundColor: glow,
+        opacity: opacity,
       }}
     />
   );

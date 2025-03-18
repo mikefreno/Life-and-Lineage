@@ -291,7 +291,6 @@ export const useCombatActions = () => {
         targets,
         user: playerState!,
       });
-      console.log(buffs);
 
       buffs?.forEach((buff) => playerState?.addCondition(buff));
 

@@ -386,6 +386,7 @@ export const ConditionRenderer = observer(() => {
       {
         name: string;
         icon: any;
+        id: string;
         count: number;
       }
     > = new Map();
@@ -398,6 +399,7 @@ export const ConditionRenderer = observer(() => {
       } else {
         simplifiedConditionsMap.set(condition.name, {
           name: condition.name,
+          id: condition.id,
           icon: condition.getConditionIcon(),
           count: 1,
         });
@@ -409,7 +411,7 @@ export const ConditionRenderer = observer(() => {
       <View style={[styles.rowAround, { marginLeft: tw_base[2] }]}>
         {simplifiedConditions.map((cond) => (
           <View
-            key={cond.name}
+            key={cond.id}
             style={{
               backgroundColor: `${
                 Colors[uiStore.colorScheme == "light" ? "dark" : "light"]
@@ -444,83 +446,82 @@ export const DetailedViewConditionRender = observer(() => {
 
   if (playerState) {
     return (
-      <View style={{ height: tw_base[64] }}>
-        <ScrollView>
-          {playerState.conditions.map((condition) => (
-            <View key={condition.id} style={styles.detailedConditionCard}>
-              <View style={styles.rowEvenly}>
-                <Text
-                  style={{
-                    letterSpacing: 1,
-                    opacity: 0.8,
-                    ...styles["text-xl"],
-                  }}
-                >
-                  {toTitleCase(condition.name)}
-                </Text>
-                <View style={styles.columnCenter}>
-                  <View style={[styles.rowCenter, { paddingVertical: 4 }]}>
-                    <Image
-                      source={condition.getConditionIcon()}
-                      style={{
-                        width: uiStore.iconSizeLarge,
-                        height: uiStore.iconSizeLarge,
-                      }}
-                      resizeMode="contain"
-                    />
-                    <Text> {condition.turns} </Text>
-                    <ClockIcon
-                      width={uiStore.iconSizeSmall}
+      /*TODO: Fix sizing, cannot scroll to bottom*/
+      <ScrollView>
+        {playerState.conditions.map((condition) => (
+          <View key={condition.id} style={styles.detailedConditionCard}>
+            <View style={styles.rowEvenly}>
+              <Text
+                style={{
+                  letterSpacing: 1,
+                  opacity: 0.8,
+                  ...styles["text-xl"],
+                }}
+              >
+                {toTitleCase(condition.name)}
+              </Text>
+              <View style={styles.columnCenter}>
+                <View style={[styles.rowCenter, { paddingVertical: 4 }]}>
+                  <Image
+                    source={condition.getConditionIcon()}
+                    style={{
+                      width: uiStore.iconSizeLarge,
+                      height: uiStore.iconSizeLarge,
+                    }}
+                    resizeMode="contain"
+                  />
+                  <Text> {condition.turns} </Text>
+                  <ClockIcon
+                    width={uiStore.iconSizeSmall}
+                    height={uiStore.iconSizeSmall}
+                  />
+                </View>
+                {!!condition.getHealthDamage() && (
+                  <View style={styles.rowCenter}>
+                    <Text>{condition.getHealthDamage()}</Text>
+                    <HealthIcon
                       height={uiStore.iconSizeSmall}
+                      width={uiStore.iconSizeSmall}
                     />
                   </View>
-                  {!!condition.getHealthDamage() && (
-                    <View style={styles.rowCenter}>
-                      <Text>{condition.getHealthDamage()}</Text>
-                      <HealthIcon
+                )}
+                {!!condition.getSanityDamage() && (
+                  <View style={styles.rowCenter}>
+                    <Text>{condition.getSanityDamage()}</Text>
+                    <View style={{ marginLeft: 4 }}>
+                      <Sanity
                         height={uiStore.iconSizeSmall}
                         width={uiStore.iconSizeSmall}
                       />
                     </View>
-                  )}
-                  {!!condition.getSanityDamage() && (
-                    <View style={styles.rowCenter}>
-                      <Text>{condition.getSanityDamage()}</Text>
-                      <View style={{ marginLeft: 4 }}>
-                        <Sanity
-                          height={uiStore.iconSizeSmall}
-                          width={uiStore.iconSizeSmall}
-                        />
-                      </View>
-                    </View>
-                  )}
-                </View>
-                <Text
-                  style={{
-                    letterSpacing: 1,
-                    opacity: 0.8,
-                    ...styles["text-xl"],
-                  }}
-                >
-                  {toTitleCase(condition.style)}
-                </Text>
+                  </View>
+                )}
               </View>
-              <View style={{ marginHorizontal: "auto" }}>
-                {condition.effect.map((effect, idx) => (
-                  <Text key={idx}>
-                    {Condition.effectExplanationString({
-                      effect,
-                      effectMagnitude: condition.effectMagnitude[idx],
-                      effectStyle: condition.effectStyle[idx],
-                      trapSetupTime: condition.trapSetupTime,
-                    })}
-                  </Text>
-                ))}
-              </View>
+              <Text
+                style={{
+                  letterSpacing: 1,
+                  opacity: 0.8,
+                  ...styles["text-xl"],
+                }}
+              >
+                {toTitleCase(condition.style)}
+              </Text>
             </View>
-          ))}
-        </ScrollView>
-      </View>
+            <View style={{ marginHorizontal: "auto" }}>
+              {condition.effect.map((effect, idx) => (
+                <Text key={idx}>
+                  {Condition.effectExplanationString({
+                    effect,
+                    effectMagnitude: condition.effectMagnitude[idx],
+                    effectStyle: condition.effectStyle[idx],
+                    trapSetupTime: condition.trapSetupTime,
+                  })}
+                </Text>
+              ))}
+            </View>
+          </View>
+        ))}
+      </ScrollView>
     );
   }
 });

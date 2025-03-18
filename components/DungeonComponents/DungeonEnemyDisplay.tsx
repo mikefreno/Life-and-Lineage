@@ -45,6 +45,7 @@ const EnemyHealthChangePopUp = ({
 };
 
 const EnemyConditions = ({ enemy }: { enemy: Enemy }) => {
+  const { uiStore } = useRootStore();
   const simplifiedConditions = useMemo(() => {
     const condMap = new Map();
     enemy?.conditions.forEach((condition) => {
@@ -55,6 +56,7 @@ const EnemyConditions = ({ enemy }: { enemy: Enemy }) => {
       } else {
         condMap.set(condition.name, {
           name: condition.name,
+          id: condition.id,
           icon: condition.getConditionIcon(),
           count: 1,
         });
@@ -68,6 +70,7 @@ const EnemyConditions = ({ enemy }: { enemy: Enemy }) => {
     <View
       style={{
         width: "100%",
+        height: uiStore.iconSizeLarge + 8,
       }}
     >
       <ScrollView
@@ -78,21 +81,26 @@ const EnemyConditions = ({ enemy }: { enemy: Enemy }) => {
         }}
       >
         {simplifiedConditions.map((cond) => (
-          <View key={cond.name}>
+          <View key={cond.id} style={{ marginHorizontal: 2 }}>
             <View
               style={[
                 flex.columnCenter,
                 {
                   borderRadius: 9999,
-                  height: 36,
-                  width: 36,
+                  padding: 4,
                   alignContent: "center",
                   marginVertical: "auto",
                   backgroundColor: `${Colors.light.background}50`,
                 },
               ]}
             >
-              <Image source={cond.icon} style={{ width: 22, height: 24 }} />
+              <Image
+                source={cond.icon}
+                style={{
+                  width: uiStore.iconSizeLarge,
+                  height: uiStore.iconSizeLarge,
+                }}
+              />
             </View>
             <View
               style={{

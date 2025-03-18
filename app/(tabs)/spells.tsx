@@ -1,11 +1,11 @@
-import React, { useMemo } from "react";
-import SpellDetails from "../../components/SpellDetails";
+import React from "react";
+import SpellDetails from "@/components/SpellDetails";
 import { View, ScrollView } from "react-native";
 import { observer } from "mobx-react-lite";
-import ProgressBar from "../../components/ProgressBar";
-import TutorialModal from "../../components/TutorialModal";
+import ProgressBar from "@/components/ProgressBar";
+import TutorialModal from "@/components/TutorialModal";
 import { useHeaderHeight } from "@react-navigation/elements";
-import GenericStrikeAround from "../../components/GenericStrikeAround";
+import GenericStrikeAround from "@/components/GenericStrikeAround";
 import {
   Element,
   ElementToString,
@@ -13,12 +13,12 @@ import {
   MasteryToBarrier,
   MasteryToString,
   TutorialOption,
-} from "../../utility/types";
-import { elementalColorMap } from "../../constants/Colors";
+} from "@/utility/types";
+import { elementalColorMap } from "@/constants/Colors";
 import { useIsFocused } from "@react-navigation/native";
-import { Text } from "../../components/Themed";
-import { useRootStore } from "../../hooks/stores";
-import { normalize, useStyles } from "../../hooks/styles";
+import { Text } from "@/components/Themed";
+import { useRootStore } from "@/hooks/stores";
+import { useStyles } from "@/hooks/styles";
 
 const SpellsScreen = observer(() => {
   const header = useHeaderHeight();
@@ -167,8 +167,8 @@ const SpellsScreen = observer(() => {
               justifyContent: "center",
             }}
           >
-            {playerState.spells.map((spell) => (
-              <View key={spell.name} style={styles.spellContainer}>
+            {playerState.spells.map((spell, idx) => (
+              <View key={spell.name + idx} style={styles.spellContainer}>
                 <SpellDetails spell={spell} />
               </View>
             ))}
