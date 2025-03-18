@@ -109,18 +109,35 @@ export class PlayerAnimationStore {
     this.animationSet = set;
     this.targetIDs = enemyIDs;
 
+    if (
+      this.animationSet?.triggersScreenShake &&
+      this.animationSet.triggersScreenShake.when == "start"
+    ) {
+      this.root.dungeonStore.screenShaker &&
+        this.root.dungeonStore.screenShaker(
+          this.animationSet.triggersScreenShake.duration,
+        );
+    }
+
     return new Promise<void>((resolve) => {
       this.animationPromiseResolver = resolve;
     });
   }
 
   clearAnimation() {
-    if (this.animationSet?.triggersScreenShake) {
-      this.root.dungeonStore.screenShaker;
-    }
     if (this.animationPromiseResolver) {
       this.animationPromiseResolver();
       this.animationPromiseResolver = null;
+    }
+
+    if (
+      this.animationSet?.triggersScreenShake &&
+      this.animationSet.triggersScreenShake.when == "end"
+    ) {
+      this.root.dungeonStore.screenShaker &&
+        this.root.dungeonStore.screenShaker(
+          this.animationSet.triggersScreenShake.duration,
+        );
     }
 
     this.animationSet = null;

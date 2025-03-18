@@ -7,6 +7,7 @@ import {
   Platform,
   TouchableWithoutFeedback,
   ScrollView,
+  LayoutAnimation,
 } from "react-native";
 import { toTitleCase } from "@/utility/functions/misc";
 import { useEffect, useState } from "react";

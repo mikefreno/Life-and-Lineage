@@ -224,6 +224,7 @@ export class Spell {
         }
       }
     });
+    console.log(buffs);
 
     if (this.buffs.includes("consume blood orb")) {
       user.removeBloodOrbs(this);
@@ -248,6 +249,7 @@ export class Spell {
     return {
       result: "success",
       targetResults,
+      buffs,
       logString: this.buildMultiTargetLog({
         targetResults,
         buffs,

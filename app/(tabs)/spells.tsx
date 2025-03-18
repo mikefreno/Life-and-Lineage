@@ -157,22 +157,23 @@ const SpellsScreen = observer(() => {
         }}
       />
       {playerState?.spells && playerState.spells.length > 0 ? (
-        <ScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
-            paddingTop: header + 20,
-            justifyContent: "center",
-          }}
-        >
+        <View style={{ paddingTop: header + 20, flex: 1 }}>
           <GenericStrikeAround containerStyles={{ paddingHorizontal: 8 }}>
             Known Spells
           </GenericStrikeAround>
-          {playerState.spells.map((spell) => (
-            <View key={spell.name} style={styles.spellContainer}>
-              <SpellDetails spell={spell} />
-            </View>
-          ))}
-        </ScrollView>
+          <ScrollView
+            contentContainerStyle={{
+              flexGrow: 1,
+              justifyContent: "center",
+            }}
+          >
+            {playerState.spells.map((spell) => (
+              <View key={spell.name} style={styles.spellContainer}>
+                <SpellDetails spell={spell} />
+              </View>
+            ))}
+          </ScrollView>
+        </View>
       ) : (
         <View
           style={{

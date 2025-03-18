@@ -6,7 +6,6 @@ import {
   Pressable,
   Image,
   View,
-  LayoutAnimation,
 } from "react-native";
 import Colors, { elementalColorMap } from "@/constants/Colors";
 import { BlurView } from "expo-blur";
@@ -177,7 +176,11 @@ const TabLayout = observer(() => {
               position: "absolute",
               shadowColor: "transparent",
               height:
-                uiStore.tabHeight + (uiStore.playerStatusCompactHeight ?? 0),
+                uiStore.tabHeight +
+                (uiStore.playerStatusCompactHeight ?? 0) +
+                (uiStore.playerStatusExpandedOnAllRoutes
+                  ? uiStore.expansionPadding
+                  : 0),
               paddingHorizontal: "2%",
             },
             tabBarIconStyle: {

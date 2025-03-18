@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Pressable,
   View,
-  LayoutChangeEvent,
   ScrollView,
   type DimensionValue,
   Platform,

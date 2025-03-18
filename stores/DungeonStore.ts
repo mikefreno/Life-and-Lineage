@@ -84,8 +84,6 @@ export class DungeonStore {
       this.logs = logs;
     }
 
-    __DEV__ && this.setupDevActions();
-
     makeObservable(this, {
       inCombat: observable,
       inSpecialRoom: observable,
@@ -234,44 +232,6 @@ export class DungeonStore {
         }
       },
     );
-  }
-
-  private setupDevActions() {
-    if (__DEV__) {
-      this.root.addDevAction({
-        action: () => this._openAllInstances(),
-        name: "Unlock All Dungeons",
-      });
-      reaction(
-        () => this.isInDungeon,
-        (current) => {
-          if (current) {
-            this.root.addDevAction([
-              {
-                action: (value?: number) => {
-                  if (this.root.playerAnimationStore.screenShaker) {
-                    this.root.playerAnimationStore.screenShaker(value);
-                  }
-                },
-                name: "Trigger Screen Shake",
-                initVal: 200,
-                max: 500,
-                step: 25,
-              },
-              {
-                action: () =>
-                  runInAction(
-                    () => (this.includeDevAttacks = !this.includeDevAttacks),
-                  ),
-                name: "Toggle Dev Attacks",
-              },
-            ]);
-          } else {
-            this.root.removeDevAction("Trigger Screen Shake");
-          }
-        },
-      );
-    }
   }
 
   get isInDungeon() {

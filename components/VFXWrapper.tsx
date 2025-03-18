@@ -136,8 +136,8 @@ const PlayerVFX = observer(
           "glow" in playerAnimationStore.animationSet && (
             <PlayerGlowVFX
               glow={playerAnimationStore.animationSet.glow}
-              placement={playerAnimationStore.animationSet.position}
-              onComplete={playerAnimationStore.animationPromiseResolver}
+              duration={playerAnimationStore.animationSet.duration}
+              onComplete={() => playerAnimationStore.clearAnimation()}
             />
           )
         )}
@@ -321,7 +321,7 @@ const PlayerSpriteVFX = ({
     frameRef.current = 0;
     safeSetCurrentFrame(0);
 
-    const frameCount = animatedImage.getFrameCount();
+    const frameCount = animatedImage.getFrameCount() * (set.repeat ?? 1);
     const frameDuration = animatedImage.currentFrameDuration();
 
     const advanceFrame = () => {
@@ -333,6 +333,7 @@ const PlayerSpriteVFX = ({
         safeSetCurrentFrame(frameRef.current);
 
         if (frameRef.current === frameCount - 1) {
+          animatedImage.dispose();
           if (onComplete && isMounted.current) {
             onComplete();
             return;
@@ -354,7 +355,9 @@ const PlayerSpriteVFX = ({
 
     const frameCount = animatedImage.getFrameCount();
     const frameDuration = animatedImage.currentFrameDuration();
-    const totalDuration = frameCount * frameDuration;
+    const totalDuration =
+      (set.reachTargetAtFrame ? set.reachTargetAtFrame : frameCount) *
+      frameDuration;
 
     const dist = targetPosition.subtract(playerOrigin);
 
@@ -397,11 +400,17 @@ const PlayerSpriteVFX = ({
             { rotate: `${angle}deg` },
             { scaleX: scaleX },
             { translateX: normalized.width / 2 },
-            { translateY: normalized.height / 2 },
           ],
         }}
       >
-        <Canvas style={{ width: normalized.width, height: normalized.height }}>
+        <Canvas
+          style={{
+            width: normalized.width,
+            height: normalized.height,
+            top: set.topOffset ? `${set.topOffset}%` : 0,
+            left: set.leftOffset ? `${set.leftOffset}%` : 0,
+          }}
+        >
           <Image
             image={animatedImage.getCurrentFrame()}
             x={0}
@@ -414,7 +423,6 @@ const PlayerSpriteVFX = ({
       </View>
     );
   } else if (set.style === "missile") {
-    // Calculate the angle from player to target
     const angle = playerOrigin.angleBetweenDegrees(targetPosition);
 
     return (
@@ -429,7 +437,6 @@ const PlayerSpriteVFX = ({
           transform: [
             { translateX: animXY.x },
             { translateY: animXY.y },
-            // For sprites that face right by default, use the angle directly
             { rotate: `${angle}deg` },
           ],
         }}
@@ -439,6 +446,8 @@ const PlayerSpriteVFX = ({
             width: normalized.width,
             height: normalized.height,
             zIndex: 9999,
+            top: set.topOffset ? `${set.topOffset}%` : 0,
+            left: set.leftOffset ? `${set.leftOffset}%` : 0,
           }}
         >
           <Image
@@ -453,7 +462,6 @@ const PlayerSpriteVFX = ({
       </Animated.View>
     );
   } else {
-    // Static style
     return (
       <View
         style={{
@@ -469,6 +477,8 @@ const PlayerSpriteVFX = ({
           style={{
             width: normalized.width,
             height: normalized.height,
+            top: set.topOffset ? `${set.topOffset}%` : 0,
+            left: set.leftOffset ? `${set.leftOffset}%` : 0,
             zIndex: 9999,
           }}
         >
@@ -488,14 +498,30 @@ const PlayerSpriteVFX = ({
 
 const PlayerGlowVFX = ({
   glow,
-  placement,
+  duration = 1000,
   onComplete,
 }: {
   glow: ColorValue;
-  placement: "enemy" | "field" | "self";
+  duration?: number;
   onComplete: (() => void) | null;
 }) => {
-  return <View></View>;
+  const { uiStore } = useRootStore();
+
+  useEffect(() => {
+    onComplete && setTimeout(() => onComplete(), duration);
+  }, []);
+
+  return (
+    <View
+      style={{
+        zIndex: 9999,
+        width: uiStore.dimensions.width,
+        height: uiStore.dimensions.height,
+        position: "absolute",
+        backgroundColor: glow,
+      }}
+    />
+  );
 };
 
 const EnemyVFX = observer(

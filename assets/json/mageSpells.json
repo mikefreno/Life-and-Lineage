@@ -20,7 +20,8 @@
       "sprite": "fireMissile",
       "style": "missile",
       "position": "enemy",
-      "scale": 0.3
+      "scale": 0.3,
+      "reachTargetAtFrame": 5
     }
   },
   {
@@ -44,7 +45,7 @@
       "sprite": "fireSlash",
       "style": "static",
       "position": "enemy",
-      "scale": 0.6
+      "scale": 0.5
     }
   },
   {
@@ -67,7 +68,8 @@
     "animation": {
       "sprite": "flameDust",
       "style": "static",
-      "position": "enemy"
+      "position": "enemy",
+      "scale": 0.6
     }
   },
   {
@@ -90,7 +92,9 @@
     "animation": {
       "sprite": "fireMissile",
       "style": "missile",
-      "position": "enemy"
+      "position": "enemy",
+      "scale": 0.7,
+      "reachTargetAtFrame": 5
     }
   },
   {
@@ -115,8 +119,9 @@
     },
     "animation": {
       "sprite": "flameWall",
-      "style": "missile",
-      "position": "enemy"
+      "style": "static",
+      "position": "field",
+      "scale": 0.8
     }
   },
   {
@@ -163,7 +168,8 @@
     "animation": {
       "sprite": "dragonBreath",
       "style": "static",
-      "position": "enemy"
+      "position": "enemy",
+      "topOffset": 30
     }
   },
   {
@@ -186,7 +192,8 @@
     "animation": {
       "sprite": "fireBeam",
       "style": "span",
-      "position": "self"
+      "position": "self",
+      "scale": 1.2
     }
   },
   {
@@ -209,7 +216,8 @@
     "animation": {
       "sprite": "iceBlock",
       "style": "static",
-      "position": "enemy"
+      "position": "enemy",
+      "scale": 0.3
     }
   },
   {
@@ -227,7 +235,8 @@
     "animation": {
       "sprite": "ambiguousSparks",
       "style": "static",
-      "position": "enemy"
+      "position": "enemy",
+      "scale": 0.4
     }
   },
   {
@@ -294,9 +303,11 @@
       ]
     },
     "animation": {
-      "sprite": "coldSmoke",
+      "sprite": "steam",
       "style": "span",
-      "position": "self"
+      "position": "enemy",
+      "scale": 0.5,
+      "leftOffset": 10
     }
   },
   {
@@ -371,7 +382,9 @@
     "animation": {
       "sprite": "iceOrb",
       "style": "static",
-      "position": "enemy"
+      "position": "enemy",
+      "scale": 0.8,
+      "repeat": 3
     }
   },
   {
@@ -424,9 +437,10 @@
     },
     "animation": {
       "sprite": "massSpikes",
-      "style": "missile",
+      "style": "static",
       "position": "enemy",
-      "retrigger": false
+      "retrigger": false,
+      "scale": 1.4
     }
   },
   {
@@ -444,7 +458,8 @@
     "animation": {
       "sprite": "puft",
       "style": "static",
-      "position": "enemy"
+      "position": "enemy",
+      "scale": 0.4
     }
   },
   {
@@ -467,7 +482,8 @@
     "animation": {
       "sprite": "sparks",
       "style": "static",
-      "position": "enemy"
+      "position": "enemy",
+      "scale": 0.4
     }
   },
   {
@@ -521,7 +537,8 @@
     "animation": {
       "sprite": "thunderClap",
       "style": "static",
-      "position": "enemy"
+      "position": "enemy",
+      "scale": 0.8
     }
   },
   {
@@ -548,7 +565,8 @@
     "animation": {
       "sprite": "lightningRay",
       "style": "span",
-      "position": "self"
+      "position": "self",
+      "repeat": 3
     }
   },
   {
@@ -575,7 +593,8 @@
     "animation": {
       "sprite": "windBlades",
       "style": "static",
-      "position": "enemy"
+      "position": "enemy",
+      "scale": 0.8
     }
   },
   {
@@ -596,7 +615,8 @@
     "animation": {
       "sprite": "groundSlash",
       "style": "static",
-      "position": "self"
+      "position": "self",
+      "repeat": 2
     }
   },
   {
@@ -614,8 +634,9 @@
     },
     "animation": {
       "sprite": "tornado",
-      "style": "missile",
-      "position": "enemy"
+      "style": "static",
+      "position": "enemy",
+      "scale": 1.4
     }
   },
   {
@@ -639,7 +660,8 @@
     "animation": {
       "sprite": "suffocate",
       "style": "static",
-      "position": "enemy"
+      "position": "enemy",
+      "scale": 0.8
     }
   },
   {
@@ -742,7 +764,8 @@
     "animation": {
       "sprite": "fallingSpikes",
       "style": "static",
-      "position": "field"
+      "position": "enemy",
+      "scale": 4
     }
   },
   {
@@ -784,9 +807,13 @@
       ]
     },
     "animation": {
-      "glow": "#77484C20",
+      "glow": "#77484895",
       "position": "field",
-      "triggersScreenShake": true
+      "triggersScreenShake": {
+        "when": "start",
+        "duration": 1000
+      },
+      "duration": 1000
     }
   },
   {
@@ -809,7 +836,8 @@
     "animation": {
       "sprite": "rockCollider",
       "style": "static",
-      "position": "enemy"
+      "position": "enemy",
+      "scale": 2
     }
   }
 ]

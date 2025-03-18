@@ -51,12 +51,16 @@ export const VFXImageMap = {
     source: require("@/assets/vfx/ice/cold-smoke.webp"),
     height: 64,
     width: 70,
-    rotate: 45,
+  },
+  longSteam: {
+    source: require("@/assets/vfx/water/long-steam.webp"),
+    height: 178,
+    width: 314,
   },
   steam: {
     source: require("@/assets/vfx/water/steam.webp"),
-    height: 64,
-    width: 70,
+    height: 70,
+    width: 64,
     rotate: 45,
   },
   rainCall: {

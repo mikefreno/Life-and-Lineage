@@ -19,7 +19,8 @@
     "animation": {
       "sprite": "shuriken",
       "style": "missile",
-      "position": "enemy"
+      "position": "enemy",
+      "scale": 0.3
     }
   },
   {
@@ -43,7 +44,9 @@
     "animation": {
       "sprite": "poisonDart",
       "style": "missile",
-      "position": "enemy"
+      "position": "enemy",
+      "reachTargetAtFrame": 10,
+      "scale": 0.3
     }
   },
   {
@@ -208,6 +211,7 @@
     "element": "assassination",
     "target": "single",
     "type": "offense",
+    "usesWeapon": "melee",
     "proficiencyNeeded": "expert",
     "manaCost": 125,
     "effects": {
@@ -509,7 +513,8 @@
       "sprite": "arcaneArrow",
       "style": "missile",
       "position": "enemy",
-      "reachTargetAtFrame": 7
+      "reachTargetAtFrame": 7,
+      "scale": 0.3
     }
   },
   {
@@ -550,7 +555,8 @@
       "sprite": "arcaneArrow",
       "style": "missile",
       "position": "enemy",
-      "reachTargetAtFrame": 7
+      "reachTargetAtFrame": 7,
+      "scale": 0.3
     }
   },
   {
@@ -570,7 +576,8 @@
       "sprite": "arcaneArrow",
       "style": "missile",
       "position": "enemy",
-      "reachTargetAtFrame": 7
+      "reachTargetAtFrame": 7,
+      "scale": 0.3
     }
   },
   {
@@ -633,10 +640,11 @@
       "debuffs": null
     },
     "animation": {
-      "sprite": "torrent",
+      "sprite": "arrowTorrent",
       "style": "missile",
       "position": "enemy",
-      "reachTargetAtFrame": 7
+      "reachTargetAtFrame": 7,
+      "topOffset": 30
     }
   },
   {

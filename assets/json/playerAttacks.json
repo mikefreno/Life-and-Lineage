@@ -122,7 +122,8 @@
       "sprite": "chainedArrowHit",
       "style": "missile",
       "position": "enemy",
-      "reachTargetAtFrame": 7
+      "reachTargetAtFrame": 7,
+      "scale": 0.3
     }
   },
   {
@@ -140,7 +141,8 @@
       "sprite": "chainedArrowRooting",
       "style": "missile",
       "position": "enemy",
-      "reachTargetAtFrame": 7
+      "reachTargetAtFrame": 7,
+      "scale": 0.3
     }
   },
   {

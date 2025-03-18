@@ -489,31 +489,44 @@ export type PlayerSpriteAnimationSet =
       style: "static";
       position: "enemy" | "field" | "self";
       retrigger?: boolean;
-      triggersScreenShake?: boolean;
+      triggersScreenShake?: { when: "start" | "end"; duration: number };
       scale?: number;
+      topOffset?: number;
+      leftOffset?: number;
+      rotate?: number;
+      repeat?: number;
     }
   | {
       sprite: VFXImageOptions;
       style: "missile";
       position: "enemy";
       retrigger?: boolean;
-      triggersScreenShake?: boolean;
+      triggersScreenShake?: { when: "start" | "end"; duration: number };
       reachTargetAtFrame?: number;
       scale?: number;
+      topOffset?: number;
+      leftOffset?: number;
+      rotate?: number;
+      repeat?: number;
     }
   | {
       sprite: VFXImageOptions;
       style: "span";
       position: "field" | "enemy";
       retrigger?: boolean;
-      triggersScreenShake?: boolean;
+      triggersScreenShake?: { when: "start" | "end"; duration: number };
       scale?: number;
+      topOffset?: number;
+      leftOffset?: number;
+      rotate?: number;
+      repeat?: number;
     };
 
 export type PlayerGlowAnimationSet = {
   glow: ColorValue;
   position: "enemy" | "field" | "self";
-  triggersScreenShake?: boolean;
+  triggersScreenShake?: { when: "start" | "end"; duration: number };
+  duration?: number;
 };
 
 export type PlayerAnimationSet =

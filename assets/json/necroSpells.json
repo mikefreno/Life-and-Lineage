@@ -16,7 +16,9 @@
     "animation": {
       "sprite": "bloodCone",
       "style": "static",
-      "position": "enemy"
+      "position": "enemy",
+      "leftOffset": 5,
+      "scale": 0.3
     }
   },
   {

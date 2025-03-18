@@ -44,12 +44,10 @@ const EnemyHealthChangePopUp = ({
   );
 };
 
-const EnemyConditions = observer(() => {
-  const { playerState } = useRootStore();
-
+const EnemyConditions = ({ enemy }: { enemy: Enemy }) => {
   const simplifiedConditions = useMemo(() => {
     const condMap = new Map();
-    playerState?.conditions.forEach((condition) => {
+    enemy?.conditions.forEach((condition) => {
       if (condMap.has(condition.name)) {
         const existing = condMap.get(condition.name);
         existing.count += 1;
@@ -63,7 +61,7 @@ const EnemyConditions = observer(() => {
       }
     });
     return Array.from(condMap.values());
-  }, [playerState?.conditions, playerState?.conditions.length]);
+  }, [enemy?.conditions, enemy?.conditions.length]);
   const styles = useStyles();
 
   return (
@@ -114,7 +112,7 @@ const EnemyConditions = observer(() => {
       </ScrollView>
     </View>
   );
-});
+};
 
 const DungeonEnemyDisplay = observer(() => {
   const { enemyStore } = useRootStore();
@@ -218,7 +216,7 @@ const EnemyDisplay = observer(({ enemy }: { enemy: Enemy }) => {
               })
             }
           />
-          <EnemyConditions />
+          <EnemyConditions enemy={enemy} />
         </View>
         <AnimatedSprite enemy={enemy} glow={glowValue} />
       </View>

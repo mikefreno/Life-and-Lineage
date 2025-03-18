@@ -641,6 +641,7 @@ export class PlayerCharacter extends Character {
       [Attribute.strength]: 0,
       [Attribute.dexterity]: 0,
       [Attribute.intelligence]: 0,
+      [Attribute.manaRegen]: 0,
     };
 
     //this.gold = gold !== undefined ? gold : __DEV__ ? 1000000 : 500;
