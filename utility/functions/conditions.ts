@@ -1,7 +1,7 @@
 import conditions from "../../assets/json/conditions.json";
 import { Condition } from "../../entities/conditions";
 import sanityDebuffs from "../../assets/json/sanityDebuffs.json";
-import { ConditionObjectType } from "../types";
+import { ConditionObjectType, DamageType } from "../types";
 import { PlayerCharacter } from "../../entities/character";
 
 interface createDebuffDeps {
@@ -318,14 +318,14 @@ export function getConditionEffectsOnDefenses(suppliedConditions: Condition[]) {
             armorMult *= 1 - effectMagnitude;
           }
           break;
-        case "maxHealth increase":
+        case "healthMax increase":
           if (effectStyle === "flat") {
             healthFlat += effectMagnitude;
           } else if (effectStyle) {
             healthMult *= 1 + effectMagnitude;
           }
           break;
-        case "maxHealth decrease":
+        case "healthMax decrease":
           if (effectStyle === "flat") {
             healthFlat -= effectMagnitude;
           } else if (effectStyle) {
@@ -358,6 +358,19 @@ export function getConditionEffectsOnDefenses(suppliedConditions: Condition[]) {
     sanityMult,
     sanityFlat,
   };
+}
+
+export function getConditionEffectsOnResistances(
+  suppliedConditions: Condition[],
+) {
+  const map = new Map<DamageType, { flat: number; mult: number }>();
+
+  for (const condition of suppliedConditions) {
+    condition.effect;
+  }
+
+  //TODO
+  throw new Error("function not yet implemented");
 }
 
 export function getConditionEffectsOnMisc(suppliedConditions: Condition[]) {

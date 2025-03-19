@@ -3,6 +3,7 @@ import type { PlayerCharacter } from "@/entities/character";
 import type { Condition } from "@/entities/conditions";
 import type { Enemy, Minion } from "@/entities/creatures";
 import { VFXImageOptions } from "@/utility/vfxmapping";
+import { Being } from "@/entities/being";
 
 type StatEffect = {
   stat: "health" | "mana" | "sanity";
@@ -26,37 +27,91 @@ export enum Modifier {
   Strength,
   Dexterity,
   Intelligence,
+  PhysicalDamage,
+  PhysicalDamageAdded,
+  PhysicalDamageMultiplier,
   Armor,
   ArmorAdded,
   BlockChance,
   DodgeChance,
-  FireResistance,
-  ColdResistance,
-  LightningResistance,
-  PoisonResistance,
-  PhysicalDamage,
-  PhysicalDamageAdded,
-  PhysicalDamageMultiplier,
   FireDamage,
   FireDamageAdded,
   FireDamageMultiplier,
+  FireResistance,
   ColdDamage,
   ColdDamageAdded,
   ColdDamageMultiplier,
+  ColdResistance,
   LightningDamage,
   LightningDamageAdded,
   LightningDamageMultiplier,
+  LightningResistance,
   PoisonDamage,
   PoisonDamageAdded,
   PoisonDamageMultiplier,
+  PoisonResistance,
+  HolyDamage,
+  HolyDamageAdded,
+  HolyDamageMultiplier,
+  HolyResistance,
+  MagicDamage,
+  MagicDamageAdded,
+  MagicDamageMultiplier,
+  MagicResistance,
 }
 
-export enum DamageTypes {
+export enum DamageType {
   PHYSICAL,
   FIRE,
   COLD,
   LIGHTNING,
   POISON,
+  HOLY,
+  MAGIC,
+}
+
+export const DamageTypeToString: Record<DamageType, string> = {
+  [DamageType.PHYSICAL]: "physical",
+  [DamageType.FIRE]: "fire",
+  [DamageType.COLD]: "cold",
+  [DamageType.LIGHTNING]: "lightning",
+  [DamageType.POISON]: "poison",
+  [DamageType.HOLY]: "holy",
+  [DamageType.MAGIC]: "magic",
+};
+
+export const StringToDamageType: Record<string, DamageType> = {
+  physical: DamageType.PHYSICAL,
+  fire: DamageType.FIRE,
+  cold: DamageType.COLD,
+  lightning: DamageType.LIGHTNING,
+  poison: DamageType.POISON,
+  holy: DamageType.HOLY,
+  magic: DamageType.MAGIC,
+};
+
+export function parseDamageTypeObject(
+  data: { [key: string]: number } | undefined,
+): {
+  [key in DamageType]?: number;
+} {
+  if (!data) return {};
+  const returnObject: { [key in DamageType]?: number } = {};
+  Object.entries(data).forEach(([key, value]) => {
+    let damageType: DamageType | undefined;
+
+    if (!isNaN(Number(key))) {
+      damageType = Number(key) as DamageType;
+    } else {
+      damageType = StringToDamageType[key.toLowerCase()];
+    }
+    if (damageType !== undefined && value !== undefined) {
+      returnObject[damageType] = value;
+    } else {
+      throw new Error(`invalid damage type: ${key})`);
+    }
+  });
+  return returnObject;
 }
 
 export function stringToModifier(key: string): Modifier | undefined {
@@ -450,7 +505,7 @@ export type ConditionType = {
   placedbyID: string;
   aura?: boolean;
   icon: string;
-  on: PlayerCharacter | Enemy | Minion | null;
+  on: Being;
 };
 
 export type ConditionObjectType = {

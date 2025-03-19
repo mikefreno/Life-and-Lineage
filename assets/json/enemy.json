@@ -876,7 +876,7 @@
   {
     "name": "legionnaire",
     "beingType": "human",
-    "sprite": "gladiator_ss",
+    "sprite": "gladiator_shortsword",
     "sanity": 50,
     "healthRange": {
       "minimum": 120,
@@ -908,7 +908,7 @@
   {
     "name": "gladiator",
     "beingType": "human",
-    "sprite": "gladiator_ls",
+    "sprite": "gladiator_longsword",
     "sanity": 50,
     "healthRange": {
       "minimum": 120,

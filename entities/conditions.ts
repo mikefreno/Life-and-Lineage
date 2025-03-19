@@ -3,6 +3,7 @@ import * as Crypto from "expo-crypto";
 import { ConditionType, EffectOptions, EffectStyle } from "@/utility/types";
 import type { PlayerCharacter } from "@/entities/character";
 import type { Creature, Enemy, Minion } from "@/entities/creatures";
+import { Being } from "./being";
 
 /**
  * Almost everything in this class is readonly. Everything is either pre-computed or is computed in totality with all Conditions at once.
@@ -26,7 +27,7 @@ export class Condition {
   readonly effectStyle: EffectStyle[];
   readonly effectMagnitude: number[];
   readonly icon: string;
-  on: PlayerCharacter | Enemy | Minion | null;
+  on: Being;
 
   constructor({
     name,
@@ -60,6 +61,7 @@ export class Condition {
     this.aura = aura ?? false;
     this.icon = icon;
     this.on = on;
+
     makeObservable(this, {
       turns: observable,
       tick: action,
@@ -85,11 +87,6 @@ export class Condition {
     } else {
       return ["Egg"];
     }
-  }
-
-  public reinstateParent(parent: PlayerCharacter | Enemy | Minion) {
-    this.on = parent;
-    return this;
   }
 
   public getHealthDamage() {
@@ -121,7 +118,7 @@ export class Condition {
    * This will always return the turn count, which need be checked for removal, an effect is returned if it exists
    * If the condition only does sanity and/or health damage, no effect is returned
    */
-  public tick(holder: PlayerCharacter | Creature) {
+  public tick(holder: Being) {
     if (!this.aura) {
       this.turns--;
       if (this.trapSetupTime && this.trapSetupTime > 0) {

@@ -243,6 +243,8 @@ export class Attack {
         cold: number;
         lightning: number;
         poison: number;
+        holy: number;
+        magic: number;
         total: number;
         sanity?: number;
       };
@@ -301,6 +303,7 @@ export class Attack {
 
         const totalDamageWithConditions =
           damages.total * damageMult + damageFlat;
+
         const finalDamage =
           Math.round(totalDamageWithConditions * actualizedHits * 4) / 4;
 

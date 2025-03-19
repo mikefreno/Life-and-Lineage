@@ -56,6 +56,9 @@ export class RootStore {
   constructor() {
     this.uiStore = new UIStore({ root: this });
 
+    this.enemyStore = new EnemyStore({ root: this });
+    this.uiStore.markStoreAsLoaded("enemy");
+
     const retrieved_player = storage.getString("player");
     this.playerState = retrieved_player
       ? PlayerCharacter.fromJSON({ ...parse(retrieved_player), root: this })
@@ -69,9 +72,6 @@ export class RootStore {
 
     this.time = new TimeStore({ root: this });
     this.uiStore.markStoreAsLoaded("time");
-
-    this.enemyStore = new EnemyStore({ root: this });
-    this.uiStore.markStoreAsLoaded("enemy");
 
     this.dungeonStore = new DungeonStore({ root: this });
     this.uiStore.markStoreAsLoaded("dungeon");
@@ -126,7 +126,7 @@ export class RootStore {
     this.time.tick();
     if (!this.playerState) throw new Error("Missing player in root!");
 
-    if (this.playerState.currentSanity < 0) {
+    if (this.playerState.currentSanity! < 0) {
       this.generateLowSanityDebuff();
     }
 
@@ -149,20 +149,24 @@ export class RootStore {
   addDevAction(
     newAction:
       | {
-          action: (value: number) => void;
+          action: (value: number | string) => void;
           name: string;
           max?: number;
           step?: number;
           min?: number | undefined;
           initVal?: number | undefined;
+          stringInput?: boolean;
+          autocompleteType?: string;
         }
       | {
-          action: (value: number) => void;
+          action: (value: number | string) => void;
           name: string;
           max?: number;
           step?: number;
           min?: number | undefined;
           initVal?: number | undefined;
+          stringInput?: boolean;
+          autocompleteType?: string;
         }[],
   ) {
     if (Array.isArray(newAction)) {
@@ -234,6 +238,7 @@ export class RootStore {
     });
   }
 
+  // TODO: Add old age corralate
   private generateLowSanityDebuff() {
     if (Math.random() < 0.75) return;
 

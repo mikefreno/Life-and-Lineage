@@ -27,6 +27,7 @@ import { useVibration } from "../hooks/generic";
 import type { Item } from "../entities/item";
 import { flex, shadows, tw, useStyles } from "../hooks/styles";
 import PlayerStatusForSecondary from "@/components/PlayerStatus/ForSecondary";
+import GenericFlatButton from "@/components/GenericFlatButton";
 
 const GreetingComponent = ({ greeting }: { greeting: string }) => {
   const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -324,6 +325,9 @@ const ShopInteriorScreen = observer(() => {
                 </ThemedScrollView>
               </View>
             </View>
+            <GenericFlatButton onPress={sellAllJunk}>
+              Sell all junk
+            </GenericFlatButton>
             <View style={{ flex: 1 }} collapsable={false}>
               <InventoryRender
                 screen="shop"

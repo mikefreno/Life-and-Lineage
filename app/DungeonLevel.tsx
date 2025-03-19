@@ -25,11 +25,7 @@ import { useCombatState, useLootState } from "@/providers/DungeonData";
 import DungeonEnemyDisplay from "@/components/DungeonComponents/DungeonEnemyDisplay";
 import { DungeonMapRender } from "@/components/DungeonComponents/DungeonMap";
 import { StatsDisplay } from "@/components/StatsDisplay";
-import {
-  useDraggableStore,
-  usePlayerStore,
-  useRootStore,
-} from "@/hooks/stores";
+import { useDraggableStore, useRootStore } from "@/hooks/stores";
 import { usePouch, useVibration } from "@/hooks/generic";
 import D20DieAnimation from "@/components/DieRollAnim";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -48,7 +44,6 @@ const DungeonLevelScreen = observer(() => {
   const { dungeonStore, uiStore, audioStore, playerAnimationStore } =
     useRootStore();
   const { currentLevel, inCombat } = dungeonStore;
-  const playerState = usePlayerStore();
   const { draggableClassStore } = useDraggableStore();
 
   const { setInventoryFullNotifier, displayItem, setDisplayItem } =
@@ -56,7 +51,6 @@ const DungeonLevelScreen = observer(() => {
   const { showTargetSelection, setShowTargetSelection } = useCombatState();
   const { addItemToPouch } = usePouch();
   const colorScheme = uiStore.colorScheme;
-  const vibration = useVibration();
 
   const [battleTab, setBattleTab] = useState<
     "attacksOrNavigation" | "equipment" | "log"

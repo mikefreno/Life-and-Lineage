@@ -1,7 +1,6 @@
 import {
   createBuff,
   getConditionEffectsOnDefenses,
-  getConditionEffectsOnMisc,
 } from "../utility/functions/conditions";
 import { Condition } from "./conditions";
 import { Item } from "./item";
@@ -20,7 +19,6 @@ import {
   reaction,
   runInAction,
 } from "mobx";
-import * as Crypto from "expo-crypto";
 import { Investment } from "./investment";
 import {
   InvestmentType,
@@ -45,11 +43,12 @@ import {
 } from "../utility/functions/misc";
 import { Spell } from "./spell";
 import storyItems from "../assets/json/items/storyItems.json";
-import { Attack } from "./attack";
 import { storage } from "../utility/functions/storage";
 import { stringify } from "flatted";
 import { throttle } from "lodash";
 import type { RootStore } from "../stores/RootStore";
+import { Being } from "./being";
+import { CharacterOptions } from "./entityTypes";
 
 export interface JobData {
   title: string;
@@ -62,118 +61,16 @@ export interface JobData {
   rankMultiplier: number;
 }
 
-interface BaseCharacterOptions {
-  id?: string;
-  firstName: string;
-  lastName: string;
-  sex: "male" | "female";
-  birthdate: { year: number; week: number };
-  alive?: boolean;
-  deathdate?: { year: number; week: number };
-  job?: string;
-  affection?: number;
-  qualifications?: string[];
-  dateCooldownStart?: { year: number; week: number };
-  pregnancyDueDate?: { year: number; week: number };
-  isPregnant?: boolean;
-  parentIds?: string[];
-  childrenIds?: string[];
-  partnerIds?: string[];
-  knownCharacterIds?: string[];
-  root: RootStore;
-}
-
-interface CharacterOptions extends BaseCharacterOptions {
-  personality: Personality | null;
-}
-
-interface PlayerCharacterBase extends BaseCharacterOptions {
-  baseHealth: number;
-  baseMana: number;
-  baseSanity: number;
-  baseStrength: number;
-  baseIntelligence: number;
-  baseDexterity: number;
-  baseManaRegen: number;
-
-  currentHealth?: number;
-  currentMana?: number;
-  currentSanity?: number;
-  magicProficiencies?: { school: Element; proficiency: number }[];
-  jobs?: Map<string, JobData>;
-  learningSpells?: {
-    bookName: string;
-    spellName: string;
-    experience: number;
-    element: Element;
-  }[];
-  qualificationProgress?: {
-    name: string;
-    progress: number;
-    completed: boolean;
-  }[];
-  knownSpells?: string[];
-  gold?: number;
-  conditions?: Condition[];
-  baseInventory?: Item[];
-  keyItems?: Item[];
-  minions?: Minion[];
-  rangerPet?: Minion;
-  equipment?: {
-    mainHand: Item;
-    offHand: Item | null;
-    head: Item | null;
-    body: Item | null;
-    quiver: Item[] | null;
-  };
-  investments?: Investment[];
-  unAllocatedSkillPoints?: number;
-  allocatedSkillPoints?: Record<Attribute, number>;
-}
-
-type MageCharacter = PlayerCharacterBase & {
-  playerClass: "mage" | PlayerClassOptions.mage;
-  blessing: Element.fire | Element.water | Element.air | Element.earth;
-};
-type NecromancerCharacter = PlayerCharacterBase & {
-  playerClass: "necromancer" | PlayerClassOptions.necromancer;
-  blessing:
-    | Element.blood
-    | Element.summoning
-    | Element.bone
-    | Element.pestilence;
-};
-
-type PaladinCharacter = PlayerCharacterBase & {
-  playerClass: "paladin" | PlayerClassOptions.paladin;
-  blessing: Element.holy | Element.vengeance | Element.protection;
-};
-
-type RangerCharacter = PlayerCharacterBase & {
-  playerClass: "ranger" | PlayerClassOptions.ranger;
-  blessing: Element.assassination | Element.beastMastery | Element.arcane;
-};
-
-type PlayerCharacterOptions =
-  | MageCharacter
-  | NecromancerCharacter
-  | PaladinCharacter
-  | RangerCharacter;
-
 /**
  * This class fully contains characters like parents, children, met characters and shopkeepers (which are a property of the `Shop` class).
  * This class serves as a base for the player's character - `PlayerCharacter`
  */
-export class Character {
-  readonly id: string;
-  readonly beingType = "human";
+export class Character extends Being {
   readonly firstName: string;
   lastName: string;
   readonly personality: Personality | null; // null only for the playerCharacter
   readonly sex: "male" | "female";
-  alive: boolean;
   readonly birthdate: { year: number; week: number };
-  deathdate: { year: number; week: number } | null;
   job: string;
   affection: number;
   qualifications: string[];
@@ -186,16 +83,11 @@ export class Character {
   parentIds: string[];
   knownCharacterIds: string[];
 
-  root: RootStore;
-
   constructor({
-    id,
     firstName,
     lastName,
     sex,
-    alive,
     birthdate,
-    deathdate,
     job,
     affection,
     qualifications,
@@ -207,9 +99,10 @@ export class Character {
     parentIds,
     partnerIds,
     knownCharacterIds,
-    root,
+    ...props
   }: CharacterOptions) {
-    this.id = id ?? Crypto.randomUUID();
+    super({ ...props });
+
     this.firstName = firstName;
     this.lastName = lastName;
     this.sex = sex;
@@ -220,20 +113,15 @@ export class Character {
     this.knownCharacterIds = knownCharacterIds ?? [];
 
     this.personality = personality;
-    this.alive = alive ?? true;
     this.birthdate = birthdate;
-    this.deathdate = deathdate ?? null;
     this.job = job ?? "Unemployed";
     this.affection = affection ?? 0;
     this.qualifications = qualifications ?? [];
     this.dateCooldownStart = dateCooldownStart;
     this.pregnancyDueDate = pregnancyDueDate;
     this.isPregnant = isPregnant;
-    this.root = root;
 
     makeObservable(this, {
-      alive: observable,
-      deathdate: observable,
       job: observable,
       affection: observable,
       qualifications: observable,
@@ -526,24 +414,11 @@ export class PlayerCharacter extends Character {
   readonly playerClass: PlayerClassOptions;
   readonly blessing: Element;
 
-  baseHealth: number;
-  baseSanity: number;
-  baseMana: number;
-  baseManaRegen: number;
-  baseStrength: number;
-  baseIntelligence: number;
-  baseDexterity: number;
-
-  currentSanity: number;
-  currentMana: number;
-  currentHealth: number;
-
   gold: number;
 
   magicProficiencies: { school: Element; proficiency: number }[];
 
   unAllocatedSkillPoints: number;
-  allocatedSkillPoints: Record<Attribute, number>;
 
   knownSpells: string[];
 
@@ -565,86 +440,38 @@ export class PlayerCharacter extends Character {
   }[];
   jobs: Map<string, JobData>;
 
-  conditions: Condition[];
   baseInventory: Item[];
   keyItems: Item[];
-  equipment: {
-    mainHand: Item;
-    offHand: Item | null;
-    head: Item | null;
-    body: Item | null;
-    quiver: Item[] | null;
-  };
+
   investments: Investment[];
 
   constructor({
     playerClass,
     blessing,
-    currentHealth,
-    baseHealth,
-    currentSanity,
-    baseSanity,
-    currentMana,
-    baseMana,
     rangerPet,
-    baseManaRegen,
-    baseStrength,
-    baseIntelligence,
-    baseDexterity,
     minions,
     learningSpells,
     qualificationProgress,
     magicProficiencies,
-    conditions,
     knownSpells,
     gold,
     baseInventory,
-    equipment,
     investments,
     unAllocatedSkillPoints,
-    allocatedSkillPoints,
     keyItems,
-    root,
     jobs,
     ...props
   }: PlayerCharacterOptions) {
-    super({
-      ...props,
-      root,
-      personality: null,
-    });
+    super({ ...props, isPlayerCharacter: true });
     this.playerClass = PlayerClassOptions[playerClass];
     this.blessing = blessing;
-
-    this.baseHealth = baseHealth;
-    this.baseSanity = baseSanity;
-    this.baseMana = baseMana;
-    this.baseStrength = baseStrength;
-    this.baseIntelligence = baseIntelligence;
-    this.baseDexterity = baseDexterity;
-    this.baseManaRegen = baseManaRegen;
 
     this.magicProficiencies =
       magicProficiencies ??
       getStartingProficiencies(PlayerClassOptions[playerClass], blessing);
 
-    this.currentHealth = currentHealth ?? baseHealth;
-    this.currentSanity = currentSanity ?? baseSanity;
-    this.currentMana = currentMana ?? baseMana;
-
-    //this.unAllocatedSkillPoints = unAllocatedSkillPoints ?? __DEV__ ? 100 : 0;
     this.unAllocatedSkillPoints = unAllocatedSkillPoints ?? 0;
-    this.allocatedSkillPoints = allocatedSkillPoints ?? {
-      [Attribute.health]: 0,
-      [Attribute.mana]: 0,
-      [Attribute.sanity]: 0,
-      [Attribute.strength]: 0,
-      [Attribute.dexterity]: 0,
-      [Attribute.intelligence]: 0,
-      [Attribute.manaRegen]: 0,
-    };
 
-    //this.gold = gold !== undefined ? gold : __DEV__ ? 1000000 : 500;
     this.gold = gold !== undefined ? gold : 500;
 
     this.minions = minions
@@ -658,28 +485,10 @@ export class PlayerCharacter extends Character {
     this.learningSpells = learningSpells ?? [];
     this.qualificationProgress = qualificationProgress ?? [];
     this.knownSpells = knownSpells ?? [];
-    this.conditions = conditions ?? [];
 
     this.baseInventory = baseInventory ?? [];
-    this.keyItems = keyItems ?? []; //__DEV__ ? testKeyItems(root) : [];
-    this.equipment = equipment ?? {
-      mainHand: new Item({
-        rarity: Rarity.NORMAL,
-        prefix: null,
-        suffix: null,
-        name: "unarmored",
-        slot: "one-hand",
-        stats: { [Modifier.PhysicalDamage]: 1 },
-        baseValue: 0,
-        itemClass: ItemClassType.Melee,
-        attacks: ["punch"],
-        root,
-      }),
-      offHand: null,
-      head: null,
-      body: null,
-      quiver: null,
-    };
+    this.keyItems = keyItems ?? [];
+
     this.investments = investments ?? [];
     __DEV__ && this.setupDevActions();
 
@@ -687,15 +496,6 @@ export class PlayerCharacter extends Character {
     // observable are state that is for mutated attributes, computed are for `get`s and
     // actions are methods to be tracked that manipulate any attributes, needed in strict mode
     makeObservable(this, {
-      baseHealth: observable,
-      currentHealth: observable,
-      maxHealth: computed, // this is all effects, base, stat points, gear + conditions
-      nonConditionalMaxHealth: computed, // refers to base, stat points, + gear only
-      restoreHealth: action,
-      damageHealth: action,
-      totalHealthRegen: computed,
-      regenHealth: action,
-
       baseSanity: observable,
       currentSanity: observable,
       maxSanity: computed,
@@ -716,12 +516,6 @@ export class PlayerCharacter extends Character {
       nonConditionalManaRegen: computed,
       regenMana: action,
 
-      baseStrength: observable,
-      totalStrength: computed,
-      baseIntelligence: observable,
-      totalIntelligence: computed,
-      baseDexterity: observable,
-      totalDexterity: computed,
       magicPower: computed,
 
       addSkillPoint: action,
@@ -794,21 +588,6 @@ export class PlayerCharacter extends Character {
       bossDefeated: action,
 
       gameTurnHandler: action,
-
-      totalPhysicalDamage: computed,
-      totalFireDamage: computed,
-      totalColdDamage: computed,
-      totalLightningDamage: computed,
-      totalPoisonDamage: computed,
-      totalDamage: computed,
-
-      fireResistance: computed,
-      coldResistance: computed,
-      lightningResistance: computed,
-      poisonResistance: computed,
-      totalArmor: computed,
-      dodgeChance: computed,
-      blockChance: computed,
     });
 
     reaction(
@@ -969,7 +748,7 @@ export class PlayerCharacter extends Character {
 
     if (this.unAllocatedSkillPoints >= amount) {
       if (Object.values(Attribute).includes(to)) {
-        this.allocatedSkillPoints[to] += amount;
+        this.allocatedSkillPoints![to] += amount;
         this.unAllocatedSkillPoints -= amount;
       }
     }
@@ -982,275 +761,25 @@ export class PlayerCharacter extends Character {
     amount?: number;
     from: Attribute;
   }) {
-    if (this.allocatedSkillPoints[from] >= amount) {
-      this.allocatedSkillPoints[from] -= amount;
+    if (this.allocatedSkillPoints![from] >= amount) {
+      this.allocatedSkillPoints![from] -= amount;
       if (this.currentHealth > this.maxHealth) {
         this.currentHealth = this.maxHealth;
       }
-      if (this.currentMana > this.maxMana) {
+      if (this.currentMana! > this.maxMana) {
         this.currentMana = this.maxMana;
       }
-      if (this.currentSanity > this.maxSanity) {
+      if (this.currentSanity! > this.maxSanity) {
         this.currentSanity = this.maxSanity;
       }
       this.addSkillPoint({ amount });
     }
   }
 
-  public getTotalAllocatedPoints() {
-    return (
-      this.allocatedSkillPoints[Attribute.health] +
-      this.allocatedSkillPoints[Attribute.mana] +
-      this.allocatedSkillPoints[Attribute.sanity] +
-      this.allocatedSkillPoints[Attribute.strength] +
-      this.allocatedSkillPoints[Attribute.intelligence] +
-      this.allocatedSkillPoints[Attribute.dexterity]
-    );
-  }
-
   public setUnAllocatedSkillPoints(points: number) {
     if (__DEV__) {
       this.unAllocatedSkillPoints = points;
     }
-  }
-  //----------------------------------Health----------------------------------//
-  get maxHealth() {
-    const { healthFlat, healthMult } = getConditionEffectsOnDefenses(
-      this.conditions,
-    );
-    return (
-      (this.baseHealth + this.allocatedSkillPoints[Attribute.health] * 10) *
-        healthMult +
-      (this.equipmentStats.get(Modifier.Health) ?? 0) +
-      healthFlat
-    );
-  }
-
-  get nonConditionalMaxHealth() {
-    return (
-      this.baseHealth +
-      this.allocatedSkillPoints[Attribute.health] * 10 +
-      (this.equipmentStats.get(Modifier.Health) ?? 0)
-    );
-  }
-
-  get totalHealthRegen() {
-    const { healthRegenFlat, healthRegenMult } = getConditionEffectsOnMisc(
-      this.conditions,
-    );
-    return (
-      healthRegenFlat * healthRegenMult +
-      (this.equipmentStats.get(Modifier.HealthRegen) ?? 0)
-    );
-  }
-
-  public regenHealth() {
-    if (this.currentHealth + this.totalHealthRegen < this.maxHealth) {
-      this.currentHealth += this.totalHealthRegen;
-    } else {
-      this.currentHealth = this.maxHealth;
-    }
-  }
-
-  /**
-   * attackerId is here to conform with the Creature implementation, it is unused
-   */
-  public damageHealth({
-    damage,
-  }: {
-    attackerId: string;
-    damage: number | null;
-  }) {
-    if (damage) {
-      if (this.currentHealth - damage > this.maxHealth) {
-        this.currentHealth = this.maxHealth;
-        return this.currentHealth;
-      }
-      this.currentHealth -= damage;
-    }
-    return this.currentHealth;
-  }
-
-  public restoreHealth(amount: number) {
-    if (this.currentHealth + amount < this.maxHealth) {
-      this.currentHealth += amount;
-      return amount;
-    } else {
-      const amt = this.maxHealth - this.currentHealth;
-      this.currentHealth = this.maxHealth;
-      return amt;
-    }
-  }
-
-  //----------------------------------Mana----------------------------------//
-  get maxMana() {
-    const { manaMaxFlat, manaMaxMult } = getConditionEffectsOnMisc(
-      this.conditions,
-    );
-    return (
-      (this.baseMana + this.allocatedSkillPoints[Attribute.mana] * 10) *
-        manaMaxMult +
-      (this.equipmentStats.get(Modifier.Mana) ?? 0) +
-      manaMaxFlat
-    );
-  }
-
-  get nonConditionalMaxMana() {
-    return (
-      this.baseMana +
-      this.allocatedSkillPoints[Attribute.mana] * 10 +
-      (this.equipmentStats.get(Modifier.Mana) ?? 0)
-    );
-  }
-
-  get totalManaRegen() {
-    const { manaRegenFlat, manaRegenMult } = getConditionEffectsOnMisc(
-      this.conditions,
-    );
-
-    return (
-      this.baseManaRegen +
-      (this.allocatedSkillPoints[Attribute.manaRegen] ?? 0) * manaRegenMult +
-      (this.equipmentStats.get(Modifier.ManaRegen) ?? 0) +
-      manaRegenFlat
-    );
-  }
-
-  get nonConditionalManaRegen() {
-    return (
-      this.baseManaRegen + (this.equipmentStats.get(Modifier.ManaRegen) ?? 0)
-    );
-  }
-
-  public useMana(mana: number) {
-    this.currentMana -= mana;
-  }
-
-  public damageMana(damage: number) {
-    if (this.currentMana < damage) {
-      this.currentMana = 0;
-    } else {
-      this.currentMana -= damage;
-    }
-  }
-
-  public restoreMana(amount: number) {
-    if (this.currentMana + amount < this.maxMana) {
-      this.currentMana += amount;
-    } else {
-      this.currentMana = this.maxMana;
-    }
-  }
-
-  public regenMana() {
-    if (this.currentMana + this.totalManaRegen < this.maxMana) {
-      this.currentMana += this.totalManaRegen;
-    } else {
-      this.currentMana = this.maxMana;
-    }
-  }
-  //----------------------------------Sanity----------------------------------//
-  get maxSanity() {
-    const { sanityFlat, sanityMult } = getConditionEffectsOnDefenses(
-      this.conditions,
-    );
-    return (
-      (this.baseSanity + this.allocatedSkillPoints[Attribute.sanity] * 5) *
-        sanityMult +
-      (this.equipmentStats.get(Modifier.Sanity) ?? 0) +
-      sanityFlat
-    );
-  }
-
-  get nonConditionalMaxSanity() {
-    return (
-      this.baseSanity +
-      this.allocatedSkillPoints[Attribute.sanity] * 5 +
-      (this.equipmentStats.get(Modifier.Sanity) ?? 0)
-    );
-  }
-
-  public damageSanity(damage?: number | null) {
-    if (damage) {
-      this.currentSanity -= damage;
-    }
-    return this.currentSanity;
-  }
-
-  public restoreSanity(amount: number) {
-    if (this.currentSanity + amount < this.maxSanity) {
-      this.currentSanity += amount;
-    } else {
-      this.currentSanity = this.maxSanity;
-    }
-  }
-
-  public changeBaseSanity(change: number) {
-    this.baseSanity += change;
-    if (this.currentSanity > this.baseSanity) {
-      this.currentSanity = this.baseSanity;
-    }
-  }
-
-  //----------------------------------Strength-----------------------------------//
-  get totalStrength() {
-    // needs conditionals added to it, at time of righting no conditions affect this stat
-
-    return (
-      this.baseStrength +
-      this.allocatedSkillPoints[Attribute.strength] +
-      (this.equipmentStats.get(Modifier.Strength) ?? 0)
-    );
-  }
-
-  get nonConditionalStrength() {
-    return (
-      this.baseStrength +
-      this.allocatedSkillPoints[Attribute.strength] +
-      (this.equipmentStats.get(Modifier.Strength) ?? 0)
-    );
-  }
-  //----------------------------------Intelligence-------------------------------//
-  get totalIntelligence() {
-    // needs conditionals added to it, at time of righting no conditions affect this stat
-
-    return (
-      this.baseIntelligence +
-      this.allocatedSkillPoints[Attribute.intelligence] +
-      (this.equipmentStats.get(Modifier.Intelligence) ?? 0)
-    );
-  }
-
-  get nonConditionalIntelligence() {
-    return (
-      this.baseIntelligence +
-      this.allocatedSkillPoints[Attribute.intelligence] +
-      (this.equipmentStats.get(Modifier.Intelligence) ?? 0)
-    );
-  }
-  get magicPower() {
-    return this.totalIntelligence * 0.5;
-  }
-  //----------------------------------Dexterity-------------------------------//
-  get totalDexterity() {
-    // needs conditionals added to it, at time of righting no conditions affect this stat
-
-    return (
-      this.baseDexterity +
-      this.allocatedSkillPoints[Attribute.dexterity] +
-      (this.equipmentStats.get(Modifier.Dexterity) ?? 0)
-    );
-  }
-
-  get nonConditionalDexterity() {
-    return (
-      this.baseDexterity +
-      this.allocatedSkillPoints[Attribute.dexterity] +
-      (this.equipmentStats.get(Modifier.Dexterity) ?? 0)
-    );
-  }
-  get criticalChance() {
-    return this.totalDexterity * 0.1;
   }
   //----------------------------------Inventory----------------------------------//
   public addToInventory(item: Item | Item[] | null) {
@@ -1365,182 +894,6 @@ export class PlayerCharacter extends Character {
     return purchaseCount;
   }
 
-  get equipmentStats() {
-    const stats = new Map<Modifier, number>();
-
-    for (const [_, item] of Object.entries(this.equipment)) {
-      if (item && "length" in item) {
-        if (this.equipment.mainHand.itemClass === ItemClassType.Bow) {
-          const itemStats = item[0]?.stats;
-          if (!itemStats || !item[0].playerHasRequirements) continue;
-
-          itemStats.forEach((value, key) => {
-            stats.set(key, (stats.get(key) ?? 0) + value);
-          });
-        }
-      } else {
-        const itemStats = item?.stats;
-        if (!itemStats || !item.playerHasRequirements) continue;
-
-        itemStats.forEach((value, key) => {
-          stats.set(key, (stats.get(key) ?? 0) + value);
-        });
-      }
-    }
-
-    return stats;
-  }
-
-  private calculateTotalDamage(
-    baseDamageModifier: Modifier,
-    addedDamageModifier: Modifier,
-    multiplierModifier: Modifier,
-  ): number {
-    let baseDamage = 0;
-    let addedDamage = 0;
-    let multiplier = 1;
-
-    for (const [_, item] of Object.entries(this.equipment)) {
-      if (Array.isArray(item)) {
-        baseDamage += item[0].stats?.get(baseDamageModifier) || 0;
-      } else if (item && item.stats) {
-        baseDamage += item.stats.get(baseDamageModifier) || 0;
-        addedDamage += item.stats.get(addedDamageModifier) || 0;
-        multiplier += item.stats.get(multiplierModifier) || 0;
-      }
-    }
-
-    return (baseDamage + addedDamage) * multiplier;
-  }
-
-  get totalPhysicalDamage(): number {
-    return (
-      this.calculateTotalDamage(
-        Modifier.PhysicalDamage,
-        Modifier.PhysicalDamageAdded,
-        Modifier.PhysicalDamageMultiplier,
-      ) +
-      this.totalStrength * 0.5
-    );
-  }
-
-  get totalFireDamage(): number {
-    return this.calculateTotalDamage(
-      Modifier.FireDamage,
-      Modifier.FireDamageAdded,
-      Modifier.FireDamageMultiplier,
-    );
-  }
-
-  get totalColdDamage(): number {
-    return this.calculateTotalDamage(
-      Modifier.ColdDamage,
-      Modifier.ColdDamageAdded,
-      Modifier.ColdDamageMultiplier,
-    );
-  }
-
-  get totalLightningDamage(): number {
-    return this.calculateTotalDamage(
-      Modifier.LightningDamage,
-      Modifier.LightningDamageAdded,
-      Modifier.LightningDamageMultiplier,
-    );
-  }
-
-  get totalPoisonDamage(): number {
-    return this.calculateTotalDamage(
-      Modifier.PoisonDamage,
-      Modifier.PoisonDamageAdded,
-      Modifier.PoisonDamageMultiplier,
-    );
-  }
-
-  get totalDamage(): number {
-    return (
-      this.totalPhysicalDamage +
-      this.totalFireDamage +
-      this.totalColdDamage +
-      this.totalLightningDamage +
-      this.totalPoisonDamage
-    );
-  }
-
-  private calculateTotalResistance(resistanceModifier: Modifier): number {
-    let resistance = 0;
-    for (const [_, item] of Object.entries(this.equipment)) {
-      if (Array.isArray(item)) {
-        // arrows - no mods
-        continue;
-      } else if (item && item.stats) {
-        resistance += item.stats.get(resistanceModifier) || 0;
-      }
-    }
-    // Cap resistance at 75%
-    return Math.min(resistance, 75);
-  }
-
-  get fireResistance(): number {
-    return this.calculateTotalResistance(Modifier.FireResistance);
-  }
-
-  get coldResistance(): number {
-    return this.calculateTotalResistance(Modifier.ColdResistance);
-  }
-
-  get lightningResistance(): number {
-    return this.calculateTotalResistance(Modifier.LightningResistance);
-  }
-
-  get poisonResistance(): number {
-    return this.calculateTotalResistance(Modifier.PoisonResistance);
-  }
-
-  get totalArmor(): number {
-    let baseArmor = 0;
-    let addedArmor = 0;
-    for (const [_, item] of Object.entries(this.equipment)) {
-      if (Array.isArray(item)) {
-        // arrows - no mods
-        continue;
-      } else if (item && item.stats) {
-        baseArmor += item.stats.get(Modifier.Armor) || 0;
-        addedArmor += item.stats.get(Modifier.ArmorAdded) || 0;
-      }
-    }
-    return baseArmor + addedArmor;
-  }
-
-  get dodgeChance(): number {
-    let dodgeChance = 0;
-    for (const [_, item] of Object.entries(this.equipment)) {
-      if (Array.isArray(item)) {
-        // arrows - no mods
-        continue;
-      } else if (item && item.stats) {
-        dodgeChance += item.stats.get(Modifier.DodgeChance) || 0;
-      }
-    }
-    // Base dodge chance from dexterity (assuming 1 dexterity = 0.1% dodge chance)
-    const baseDodgeChance = this.totalDexterity * 0.1;
-    // Cap dodge chance at 75%
-    return Math.min(dodgeChance + baseDodgeChance, 75);
-  }
-
-  get blockChance(): number {
-    let blockChance = 0;
-    for (const [_, item] of Object.entries(this.equipment)) {
-      if (Array.isArray(item)) {
-        // arrows - no mods
-        continue;
-      } else if (item && item.stats) {
-        blockChance += item.stats.get(Modifier.BlockChance) || 0;
-      }
-    }
-    // Cap block chance at 75%
-    return Math.min(blockChance, 75);
-  }
-
   public equipItem(
     item: Item[],
     slot: "head" | "main-hand" | "off-hand" | "body" | "quiver",
@@ -1552,18 +905,18 @@ export class PlayerCharacter extends Character {
     switch (slot) {
       case "head":
         this.removeEquipment("head");
-        this.equipment.head = item[0];
+        this.equipment!.head = item[0];
         this.removeFromInventory(item[0]);
         break;
       case "body":
         this.removeEquipment("body");
-        this.equipment.body = item[0];
+        this.equipment!.body = item[0];
         this.removeFromInventory(item[0]);
         break;
       case "off-hand":
         if (
-          (this.equipment.mainHand.name == "unarmored" ||
-            this.equipment.mainHand.slot == "two-hand") &&
+          (this.equipment!.mainHand.name == "unarmored" ||
+            this.equipment!.mainHand.slot == "two-hand") &&
           (item[0].slot == "two-hand" ||
             item[0].itemClass == ItemClassType.Melee ||
             item[0].itemClass == ItemClassType.Wand ||
@@ -1573,32 +926,32 @@ export class PlayerCharacter extends Character {
           break;
         }
         this.removeEquipment("off-hand");
-        if (this.equipment.mainHand.slot == "two-hand") {
+        if (this.equipment!.mainHand.slot == "two-hand") {
           this.removeEquipment("main-hand");
           this.setUnarmored();
         }
-        this.equipment.offHand = item[0];
+        this.equipment!.offHand = item[0];
         this.removeFromInventory(item[0]);
         break;
       case "main-hand":
         if (
           item[0].itemClass == ItemClassType.Shield &&
-          !this.equipment.offHand
+          !this.equipment!.offHand
         ) {
-          this.equipment.offHand = item[0];
+          this.equipment!.offHand = item[0];
           this.removeFromInventory(item[0]);
         } else {
           this.removeEquipment("main-hand");
           if (item[0].slot == "two-hand") {
             this.removeEquipment("off-hand");
           }
-          this.equipment.mainHand = item[0];
+          this.equipment!.mainHand = item[0];
           this.removeFromInventory(item[0]);
         }
         break;
       case "quiver":
         this.removeEquipment("quiver");
-        this.equipment.quiver = item;
+        this.equipment!.quiver = item;
         this.removeFromInventory(item);
         break;
     }
@@ -1608,8 +961,8 @@ export class PlayerCharacter extends Character {
   private gatherPercents() {
     return {
       health: this.currentHealth / this.maxHealth,
-      mana: this.currentMana / this.maxMana,
-      sanity: this.currentSanity / this.maxSanity,
+      mana: this.currentMana! / this.maxMana,
+      sanity: this.currentSanity! / this.maxSanity,
     };
   }
 
@@ -1628,13 +981,13 @@ export class PlayerCharacter extends Character {
   }
 
   public equippedCheck(item: Item) {
-    if (this.equipment.body?.equals(item)) {
+    if (this.equipment!.body?.equals(item)) {
       return true;
-    } else if (this.equipment.head?.equals(item)) {
+    } else if (this.equipment!.head?.equals(item)) {
       return true;
-    } else if (this.equipment.mainHand.equals(item)) {
+    } else if (this.equipment!.mainHand.equals(item)) {
       return true;
-    } else if (this.equipment.offHand?.equals(item)) {
+    } else if (this.equipment!.offHand?.equals(item)) {
       return true;
     }
     return false;
@@ -1645,44 +998,44 @@ export class PlayerCharacter extends Character {
     addToInventory: boolean = true,
   ) {
     if (slot === "main-hand") {
-      const item = this.equipment.mainHand;
+      const item = this.equipment!.mainHand;
       if (addToInventory) this.addToInventory(item);
       this.setUnarmored();
       return item;
     } else if (slot === "off-hand") {
-      const item = this.equipment.offHand;
+      const item = this.equipment!.offHand;
       if (addToInventory) this.addToInventory(item);
-      this.equipment.offHand = null;
+      this.equipment!.offHand = null;
       return item;
     } else if (slot == "body") {
-      const item = this.equipment.body;
+      const item = this.equipment!.body;
       if (addToInventory) this.addToInventory(item);
-      this.equipment.body = null;
+      this.equipment!.body = null;
       return item;
     } else if (slot == "head") {
-      const item = this.equipment.head;
+      const item = this.equipment!.head;
       if (addToInventory) this.addToInventory(item);
-      this.equipment.head = null;
+      this.equipment!.head = null;
       return item;
     } else if (slot == "quiver") {
-      const item = this.equipment.quiver;
+      const item = this.equipment!.quiver;
       if (addToInventory) this.addToInventory(item);
-      this.equipment.quiver = null;
+      this.equipment!.quiver = null;
       return item;
     }
   }
 
   public unEquipItem(item: Item[], addToInventory: boolean = true) {
     const percentages = this.gatherPercents();
-    if (this.equipment.body?.equals(item[0])) {
+    if (this.equipment!.body?.equals(item[0])) {
       this.removeEquipment("body", addToInventory);
-    } else if (this.equipment.head?.equals(item[0])) {
+    } else if (this.equipment!.head?.equals(item[0])) {
       this.removeEquipment("head", addToInventory);
-    } else if (this.equipment.mainHand.equals(item[0])) {
+    } else if (this.equipment!.mainHand.equals(item[0])) {
       this.removeEquipment("main-hand", addToInventory);
-    } else if (this.equipment.offHand?.equals(item[0])) {
+    } else if (this.equipment!.offHand?.equals(item[0])) {
       this.removeEquipment("off-hand", addToInventory);
-    } else if (this.equipment.quiver?.find((arrow) => arrow.equals(item[0]))) {
+    } else if (this.equipment!.quiver?.find((arrow) => arrow.equals(item[0]))) {
       this.removeEquipment("quiver", addToInventory);
     }
     this.resolvePercentages(percentages);
@@ -1723,7 +1076,7 @@ export class PlayerCharacter extends Character {
   }
 
   private setUnarmored() {
-    this.equipment.mainHand = new Item({
+    this.equipment!.mainHand = new Item({
       name: "unarmored",
       slot: "one-hand",
       stats: { [Modifier.PhysicalDamage]: 1 },
@@ -1781,7 +1134,7 @@ export class PlayerCharacter extends Character {
 
   public performLabor({ title, cost, goldReward }: performLaborProps): boolean {
     if (
-      this.currentMana < cost.mana ||
+      this.currentMana! < cost.mana ||
       (cost.health && this.currentHealth <= cost.health) ||
       this.job !== title
     ) {
@@ -1860,7 +1213,7 @@ export class PlayerCharacter extends Character {
     sanityCost: number,
     goldCost: number,
   ) {
-    if (this.currentSanity - sanityCost > -this.maxSanity) {
+    if (this.currentSanity! - sanityCost > -this.maxSanity) {
       let foundQual = false;
       this.qualificationProgress.forEach((qual) => {
         if (qual.name == name) {
@@ -2191,17 +1544,7 @@ export class PlayerCharacter extends Character {
     );
   }
 
-  private conditionTicker() {
-    for (let i = this.conditions.length - 1; i >= 0; i--) {
-      const { turns } = this.conditions[i].tick(this);
-
-      if (turns <= 0) {
-        this.conditions.splice(i, 1);
-      }
-    }
-  }
-
-  private removeDebuffs(amount: number) {
+  public removeDebuffs(amount: number) {
     const debuffArray = this.conditions.filter(
       (condition) =>
         condition.style == "debuff" && condition.placedby !== "age",
@@ -2238,10 +1581,18 @@ export class PlayerCharacter extends Character {
       creatureSpecies: minionObj.name,
       currentHealth: minionObj.health,
       baseHealth: minionObj.health,
-      attackPower: minionObj.attackPower,
+      currentMana: minionObj.energy?.maximum,
+      baseMana: minionObj.energy?.maximum,
+      baseManaRegen: minionObj.energy?.regen,
       attackStrings: minionObj.attackStrings,
       turnsLeftAlive: minionObj.turns,
+      baseStrength: minionObj.baseStrength,
+      baseIntelligence: minionObj.baseIntelligence,
+      baseDexterity: minionObj.baseDexterity,
+      baseDamageTable: minionObj.baseDamageTable,
+      baseResistanceTable: minionObj.baseResistanceTable,
       beingType: minionObj.beingType as BeingType,
+      root: this.root,
       parent: this,
     });
     this.rangerPet = minion;
@@ -2310,31 +1661,6 @@ export class PlayerCharacter extends Character {
 
   //----------------------------------Physical Combat----------------------------------//
   get weaponAttacks() {
-    if (__DEV__ && this.root.includeDevAttacks) {
-      const fullHeal = new Attack({
-        name: "DevHeal",
-        user: this,
-        selfDamage: -9999,
-      });
-      const devPunch = new Attack({
-        name: "DevPunch",
-        targets: "single",
-        hitChance: 1.0,
-        damageMult: 10000.0,
-        user: this,
-      });
-      let attacks = [
-        fullHeal,
-        devPunch,
-        ...this.equipment.mainHand.attachedAttacks,
-      ];
-      const spells = this.equipment.mainHand.providedSpells;
-      if (spells) {
-        return [...attacks, ...spells];
-      }
-      return attacks;
-    }
-
     const attacks = this.equipment.mainHand.attachedAttacks;
     const spells = this.equipment.mainHand.providedSpells ?? [];
     return [...attacks, ...spells];
@@ -2429,13 +1755,18 @@ export class PlayerCharacter extends Character {
       creatureSpecies: minionObj.name,
       currentHealth: minionObj.health,
       baseHealth: minionObj.health,
-      attackPower: minionObj.attackPower,
+      currentMana: minionObj.energy?.maximum,
+      baseMana: minionObj.energy?.maximum,
+      baseManaRegen: minionObj.energy?.regen,
       attackStrings: minionObj.attackStrings,
       turnsLeftAlive: minionObj.turns,
+      baseStrength: minionObj.baseStrength,
+      baseIntelligence: minionObj.baseIntelligence,
+      baseDexterity: minionObj.baseDexterity,
+      baseDamageTable: minionObj.baseDamageTable,
+      baseResistanceTable: minionObj.baseResistanceTable,
       beingType: minionObj.beingType as BeingType,
-      currentEnergy: minionObj.energy?.maximum,
-      baseEnergy: minionObj.energy?.maximum,
-      energyRegen: minionObj.energy?.regen,
+      root: this.root,
       parent: this,
     });
     this.addMinion(minion);
@@ -2862,10 +2193,10 @@ const _playerSave = async (
         jobs: serializeJobs(player.jobs),
         baseInventory: player.baseInventory.map((item) => item.toJSON()),
         equipment: {
-          head: player.equipment.head?.toJSON(),
-          body: player.equipment.body?.toJSON(),
-          mainHand: player.equipment.mainHand.toJSON(),
-          offHand: player.equipment.offHand?.toJSON(),
+          head: player.equipment?.head?.toJSON(),
+          body: player.equipment?.body?.toJSON(),
+          mainHand: player.equipment?.mainHand.toJSON(),
+          offHand: player.equipment?.offHand?.toJSON(),
         },
         root: undefined,
       };

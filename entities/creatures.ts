@@ -1,9 +1,4 @@
 import attacks from "../assets/json/enemyAttacks.json";
-import {
-  getConditionEffectsOnDefenses,
-  getConditionEffectsOnMisc,
-  getMagnitude,
-} from "../utility/functions/conditions";
 import { Condition } from "./conditions";
 import arrows from "../assets/json/items/arrows.json";
 import artifacts from "../assets/json/items/artifacts.json";
@@ -26,230 +21,51 @@ import paladinBooks from "../assets/json/items/paladinBooks.json";
 import mageBooks from "../assets/json/items/mageBooks.json";
 import rangerBooks from "../assets/json/items/rangerBooks.json";
 import storyItems from "../assets/json/items/storyItems.json";
-import * as Crypto from "expo-crypto";
 import { Item, isStackable } from "./item";
-import { action, computed, makeObservable, observable, reaction } from "mobx";
-import summons from "../assets/json/summons.json";
-import { ItemClassType, BeingType, PlayerClassOptions } from "../utility/types";
 import {
-  damageReduction,
-  getRandomInt,
-  toTitleCase,
-} from "../utility/functions/misc";
+  action,
+  computed,
+  makeObservable,
+  observable,
+  reaction,
+  runInAction,
+} from "mobx";
+import summons from "../assets/json/summons.json";
+import {
+  ItemClassType,
+  BeingType,
+  PlayerClassOptions,
+  parseDamageTypeObject,
+} from "../utility/types";
+import { getRandomInt, toTitleCase } from "../utility/functions/misc";
 import { Attack } from "./attack";
 import { PlayerCharacter } from "./character";
 import { AttackUse } from "../utility/types";
-import { ThreatTable } from "./threatTable";
-import { AnimationOptions, EnemyImageKeyOption } from "../utility/enemyHelpers";
-import { RootStore } from "../stores/RootStore";
-
-type CreatureType = {
-  id?: string;
-  beingType: BeingType;
-  creatureSpecies: string;
-  currentHealth: number;
-  baseHealth: number;
-  currentSanity?: number | null;
-  baseSanity?: number | null;
-  attackPower: number;
-  baseArmor?: number;
-  currentEnergy?: number;
-  baseEnergy?: number;
-  energyRegen?: number;
-  attackStrings?: string[];
-  conditions?: Condition[];
-  root?: RootStore;
-  sprite?: EnemyImageKeyOption | null; // null for minions;
-  basePhysicalDamage?: number;
-  baseFireDamage?: number;
-  baseColdDamage?: number;
-  baseLightningDamage?: number;
-  basePoisonDamage?: number;
-  baseFireResistance?: number;
-  baseColdResistance?: number;
-  baseLightningResistance?: number;
-  basePoisonResistance?: number;
-};
-
-interface Phase {
-  triggerHealth: number;
-  sprite?: EnemyImageKeyOption;
-  dialogue?: string;
-  attackPower?: number;
-  baseArmor?: number;
-  energyRegen?: number;
-  attackStrings?: string[];
-  basePhysicalDamage?: number;
-  baseFireDamage?: number;
-  baseColdDamage?: number;
-  baseLightningDamage?: number;
-  basePoisonDamage?: number;
-  baseFireResistance?: number;
-  baseColdResistance?: number;
-  baseLightningResistance?: number;
-  basePoisonResistance?: number;
-}
-
-type EnemyType = CreatureType & {
-  phases?: Phase[];
-  gotDrops?: boolean;
-  minions?: Minion[];
-  sprite: EnemyImageKeyOption;
-  animationStrings: { [key: string]: AnimationOptions };
-  drops: {
-    item: string;
-    itemType: ItemClassType;
-    chance: number;
-  }[];
-  goldDropRange: {
-    minimum: number;
-    maximum: number;
-  };
-  storyDrops?: {
-    item: string;
-  }[];
-};
-
-type MinionType = CreatureType & {
-  turnsLeftAlive: number;
-  parent: Enemy | PlayerCharacter | null;
-  sprite?: null;
-};
+import { AnimationOptions } from "../utility/enemyHelpers";
+import {
+  CreatureOptions,
+  EnemyOptions,
+  MinionOptions,
+  Phase,
+} from "./entityTypes";
+import { Being } from "./being";
 
 /**
  * This class is used as a base class for `Enemy` and `Minion` and is not meant to be instantiated directly.
  * It contains properties and methods that are shared between enemies and minions.
  * Most of the attributes here are readonly.
  */
-export class Creature {
-  readonly id: string;
-  readonly beingType: BeingType;
+export class Creature extends Being {
   readonly creatureSpecies: string;
-  currentHealth: number;
-  readonly baseHealth: number;
-  currentSanity: number | null;
-  readonly baseSanity: number | null;
-  attackPower: number;
-  baseArmor: number;
-  currentEnergy: number;
-  readonly baseEnergy: number;
-  readonly energyRegen: number;
-  attackStrings: string[];
-  conditions: Condition[];
-  threatTable: ThreatTable = new ThreatTable();
-  sprite: EnemyImageKeyOption;
 
-  basePhysicalDamage: number;
-  baseFireDamage: number;
-  baseColdDamage: number;
-  baseLightningDamage: number;
-  basePoisonDamage: number;
-
-  baseFireResistance: number;
-  baseColdResistance: number;
-  baseLightningResistance: number;
-  basePoisonResistance: number;
-
-  root: RootStore | undefined;
-
-  constructor({
-    id,
-    beingType,
-    creatureSpecies,
-    currentHealth,
-    baseHealth,
-    currentSanity,
-    baseSanity,
-    attackPower,
-    baseArmor,
-    currentEnergy,
-    baseEnergy,
-    energyRegen,
-    attackStrings,
-    conditions,
-    root,
-    sprite,
-    basePhysicalDamage,
-    baseFireDamage,
-    baseColdDamage,
-    baseLightningDamage,
-    basePoisonDamage,
-
-    baseFireResistance,
-    baseColdResistance,
-    baseLightningResistance,
-    basePoisonResistance,
-  }: CreatureType) {
-    this.id = id ?? Crypto.randomUUID(); // Assign a random UUID if id is not provided
-    this.beingType = beingType;
+  constructor({ creatureSpecies, ...props }: CreatureOptions) {
+    super(props);
     this.creatureSpecies = creatureSpecies;
-    this.currentHealth = currentHealth;
-    this.currentSanity = currentSanity ?? null; // Initialize sanity to null if not provided
-    this.baseSanity = baseSanity ?? null; // Initialize baseSanity to null if not provided
-    this.baseHealth = baseHealth;
-    this.attackPower = attackPower;
-    this.baseArmor = baseArmor ?? 0; // Default base armor to 0 if not provided
-    this.currentEnergy = currentEnergy ?? 0; // Initialize Mana to 0 if not provided
-    this.baseEnergy = baseEnergy ?? 0; // Initialize baseMana to 0 if not provided
-    this.energyRegen = energyRegen ?? 0; // Initialize ManaRegen to 0 if not provided
-    this.attackStrings = attackStrings ?? [];
-    this.conditions = conditions ?? []; // Initialize conditions to an empty array if not provided
-    this.root = root;
-    this.sprite = sprite ?? ("" as EnemyImageKeyOption); // for simplicity - minion
-
-    this.basePhysicalDamage = basePhysicalDamage ?? 0;
-    this.baseFireDamage = baseFireDamage ?? 0;
-    this.baseColdDamage = baseColdDamage ?? 0;
-    this.baseLightningDamage = baseLightningDamage ?? 0;
-    this.basePoisonDamage = basePoisonDamage ?? 0;
-
-    this.baseFireResistance = baseFireResistance ?? 0;
-    this.baseColdResistance = baseColdResistance ?? 0;
-    this.baseLightningResistance = baseLightningResistance ?? 0;
-    this.basePoisonResistance = basePoisonResistance ?? 0;
 
     makeObservable(this, {
       id: observable,
-      currentHealth: observable,
       creatureSpecies: observable,
-      currentSanity: observable,
-      currentEnergy: observable,
-      conditions: observable,
-      damageHealth: action,
-      restoreHealth: action,
-      damageSanity: action,
-      addCondition: action,
-      conditionTicker: action,
-      equals: action,
-      regenerate: action,
-      expendEnergy: action,
       attacks: computed,
-      removeCondition: action,
-      maxEnergy: computed,
-      maxHealth: computed,
-      maxSanity: computed,
-      attackStrings: observable,
-      attackPower: observable,
-      sprite: observable,
-      baseArmor: observable,
-      baseFireResistance: observable,
-      baseColdResistance: observable,
-      baseLightningResistance: observable,
-      basePoisonResistance: observable,
-      basePhysicalDamage: observable,
-      baseColdDamage: observable,
-      baseFireDamage: observable,
-      basePoisonDamage: observable,
-      baseLightningDamage: observable,
-      fireResistance: computed,
-      coldResistance: computed,
-      lightningResistance: computed,
-      poisonResistance: computed,
-      totalPhysicalDamage: computed,
-      totalColdDamage: computed,
-      totalFireDamage: computed,
-      totalPoisonDamage: computed,
-      totalLightningDamage: computed,
     });
   }
 
@@ -301,195 +117,19 @@ export class Creature {
   public equals(otherMonsterID: string) {
     return this.id === otherMonsterID;
   }
-  //---------------------------Health---------------------------//
-  /**
-   * Calculates the maximum health of the creature considering any condition effects.
-   * @returns The maximum health value.
-   */
-  get maxHealth() {
-    const { healthMult, healthFlat } = getConditionEffectsOnDefenses(
-      this.conditions,
-    );
-    return this.baseHealth * healthMult + healthFlat;
-  }
 
-  /**
-   * Damages the creature's health by the specified amount.
-   * @param damage - The amount of damage to apply. If null, defaults to 0.
-   * @param attackerId - The id of the attacker
-   * @returns The new health value after applying the damage.
-   */
-  public damageHealth({
-    damage,
-    attackerId,
-  }: {
-    damage: number | null;
-    attackerId: string;
-  }): number {
-    this.currentHealth -= damage ?? 0;
-    this.threatTable.addThreat(attackerId, damage ?? 0);
-
-    return this.currentHealth;
-  }
-
-  /**
-   * Restores the creature's health by the specified amount, up to the maximum health.
-   * @param amount - The amount of health to restore.
-   * @returns The actual amount of health restored.
-   */
-  public restoreHealth(amount: number) {
-    if (this.currentHealth + amount < this.baseHealth) {
-      this.currentHealth += amount;
-      return amount;
-    } else {
-      const amt = this.baseHealth - this.currentHealth;
-      this.currentHealth = this.baseHealth;
-      return amt;
-    }
-  }
-  //---------------------------Sanity---------------------------//
-  /**
-   * Calculates the maximum sanity of the creature considering any condition effects.
-   * @returns The maximum sanity value, or null if baseSanity is not set.
-   */
-  get maxSanity() {
-    const { sanityMult, sanityFlat } = getConditionEffectsOnDefenses(
-      this.conditions,
-    );
-    return this.baseSanity ? this.baseSanity * sanityMult + sanityFlat : null;
-  }
-
-  /**
-   * Damages the creature's sanity by the specified amount.
-   * @param damage - The amount of sanity damage to apply. If not provided, defaults to 0.
-   * @returns The new sanity value after applying the damage, or null if sanity is not set.
-   */
-  public damageSanity(damage?: number | null) {
-    if (this.currentSanity) {
-      this.currentSanity -= damage ?? 0;
-      return this.currentSanity;
-    }
-  }
-  //---------------------------energy---------------------------//
-  /**
-   * Calculates the maximum sanity of the creature considering any condition effects.
-   * @returns The maximum sanity value, or null if baseSanity is not set.
-   */
-  get maxEnergy() {
-    const { manaMaxFlat, manaMaxMult } = getConditionEffectsOnMisc(
-      this.conditions,
-    );
-    return this.baseEnergy ? this.baseEnergy * manaMaxMult + manaMaxFlat : null;
-  }
-  /**
-   * Regenerates the creature's energy based on its regeneration rate.
-   */
-  public regenerate() {
-    if (this.currentEnergy + this.energyRegen >= this.baseEnergy) {
-      this.currentEnergy = this.baseEnergy;
-    } else {
-      this.currentEnergy += this.energyRegen;
-    }
-  }
-
-  /**
-   * Expends the creature's energy by the specified amount.
-   * @param energyCost - The amount of Mana to expend.
-   */
-  public expendEnergy(energyCost: number) {
-    if (this.currentEnergy && this.currentEnergy < energyCost) {
-      this.currentEnergy = 0;
-    } else if (this.currentEnergy) {
-      this.currentEnergy -= energyCost;
-    }
-  }
-  /**
-   * Convenience, to align with the PlayerCharacter
-   */
-  public useMana(energyCost: number) {
-    if (this.currentEnergy && this.currentEnergy < energyCost) {
-      this.currentEnergy = 0;
-    } else if (this.currentEnergy) {
-      this.currentEnergy -= energyCost;
-    }
-  }
-
-  /**
-   * Decreases the creature's energy by the specified amount, and adds threat.
-   * @param energyCost - The amount of Mana to expend.
-   */
-  public damageEnergy({
-    damage,
-    attackerId,
-  }: {
-    damage: number;
-    attackerId: string;
-  }) {
-    if (this.currentEnergy && this.currentEnergy < damage) {
-      this.currentEnergy = 0;
-      this.threatTable.addThreat(attackerId, damage / 2);
-    } else if (this.currentEnergy) {
-      this.currentEnergy -= damage;
-    }
-  }
-  //---------------------------Armor---------------------------//
-  /**
-   * Calculates the damage reduction of the creature based on its armor and condition effects.
-   * @returns The damage reduction percentage.
-   */
-  public getPhysicalDamageReduction() {
-    const { armorMult, armorFlat } = getConditionEffectsOnDefenses(
-      this.conditions,
-    );
-    return damageReduction(this.baseArmor * armorMult + armorFlat);
-  }
   //---------------------------Battle---------------------------//
   /**
    * Checks if the creature is currently stunned.
    * @returns True if the creature is stunned, otherwise false.
    */
-  get isStunned() {
-    const isStunned = getConditionEffectsOnMisc(this.conditions).isStunned;
-    return isStunned;
-  }
 
   protected endTurn() {
     setTimeout(() => {
       this.conditionTicker();
-      this.regenerate();
+      this.regenMana();
+      this.regenHealth();
     }, 250);
-  }
-
-  /**
-   * Adds a condition to the creature's list of conditions. Sets the `on` property.
-   * @param condition - The condition to add. If null, does nothing.
-   */
-  public addCondition(condition?: Condition | null) {
-    if (condition) {
-      condition.on = this as unknown as Enemy | Minion;
-      this.conditions.push(condition);
-    }
-  }
-
-  public removeCondition(condition: Condition) {
-    this.conditions = this.conditions.filter((cond) => cond !== condition);
-  }
-
-  /**
-   * Updates the list of conditions, removing those that have expired.
-   */
-  public conditionTicker() {
-    let undeadDeathCheck = -1;
-    for (let i = this.conditions.length - 1; i >= 0; i--) {
-      const { effect } = this.conditions[i].tick(this);
-
-      if (effect.includes("destroy undead")) {
-        undeadDeathCheck = getMagnitude(this.conditions[i].effectMagnitude);
-      }
-    }
-    if (this.currentHealth <= undeadDeathCheck) {
-      this.currentHealth = 0;
-    }
   }
 
   /**
@@ -565,8 +205,7 @@ export class Creature {
     );
 
     const availableAttacks = this.attacks.filter(
-      (attack) =>
-        !this.currentEnergy || this.currentEnergy >= attack.energyCost,
+      (attack) => !this.currentMana || this.currentMana >= attack.energyCost,
     );
     if (availableAttacks.length > 0) {
       const { attack, numTargets } = this.chooseAttack(
@@ -671,43 +310,6 @@ export class Creature {
       numTargets: scoredAttacks[0].numTargets,
     };
   }
-
-  //---------------------------Resistances---------------------------//
-  get fireResistance() {
-    return this.baseFireResistance; // add conditional modifiers if they exist
-  }
-
-  get coldResistance() {
-    return this.baseColdResistance;
-  }
-
-  get lightningResistance() {
-    return this.baseLightningResistance;
-  }
-
-  get poisonResistance() {
-    return this.basePoisonResistance;
-  }
-  //---------------------------Damage Types---------------------------//
-  get totalPhysicalDamage() {
-    return this.attackPower; // or some other implementation
-  }
-
-  get totalFireDamage() {
-    return this.baseFireDamage;
-  }
-
-  get totalColdDamage() {
-    return this.baseColdDamage;
-  }
-
-  get totalLightningDamage() {
-    return this.baseLightningDamage;
-  }
-
-  get totalPoisonDamage() {
-    return this.basePoisonDamage;
-  }
 }
 
 /**
@@ -742,7 +344,7 @@ export class Enemy extends Creature {
     phases,
     animationStrings,
     ...props
-  }: EnemyType) {
+  }: EnemyOptions) {
     super({
       ...props,
     });
@@ -777,7 +379,7 @@ export class Enemy extends Creature {
         this.currentHealth,
         this.minions,
         this.currentSanity,
-        this.currentEnergy,
+        this.currentMana,
       ],
       () => {
         if (this.root) {
@@ -810,43 +412,31 @@ export class Enemy extends Creature {
       this.currentPhase++;
       const phase = this.phases[this.currentPhase];
 
-      if (phase.attackPower) {
-        this.attackPower = phase.attackPower;
+      if (phase.sprite) {
+        runInAction(() => (this.sprite = phase.sprite!));
       }
-
-      if (phase.sprite) this.sprite = phase.sprite;
-      if (phase.attackPower) this.attackPower = phase.attackPower;
-      if (phase.baseArmor) this.baseArmor = phase.baseArmor;
-      if (phase.energyRegen) this.energyRegen = phase.energyRegen;
-      if (phase.attackStrings) this.attackStrings = phase.attackStrings;
-      if (phase.basePhysicalDamage)
-        this.basePhysicalDamage = phase.basePhysicalDamage;
-      if (phase.baseFireDamage) this.baseFireDamage = phase.baseFireDamage;
-      if (phase.baseColdDamage) this.baseColdDamage = phase.baseColdDamage;
-      if (phase.baseLightningDamage)
-        this.baseLightningDamage = phase.baseLightningDamage;
-      if (phase.basePoisonDamage)
-        this.basePoisonDamage = phase.basePoisonDamage;
-      if (phase.baseFireResistance)
-        this.baseFireResistance = phase.baseFireResistance;
-      if (phase.baseColdResistance)
-        this.baseColdResistance = phase.baseColdResistance;
-      if (phase.baseLightningResistance)
-        this.baseLightningResistance = phase.baseLightningResistance;
-      if (phase.basePoisonResistance)
-        this.basePoisonResistance = phase.basePoisonResistance;
+      if (phase.baseArmor) {
+        runInAction(() => (this.baseArmor = phase.baseArmor!));
+      }
+      if (phase.attackStrings) {
+        runInAction(() => (this.attackStrings = phase.attackStrings!));
+      }
+      if (phase.manaRegen) {
+        runInAction(() => (this.baseManaRegen = phase.manaRegen!));
+      }
+      if (phase.baseDamageTable) {
+        runInAction(
+          () =>
+            (this.baseDamageTable = parseDamageTypeObject(
+              phase.baseDamageTable,
+            )),
+        );
+      }
 
       if (phase.dialogue && this.root) {
         const animationStore = this.root.enemyStore.getAnimationStore(this.id);
         if (animationStore) {
-          animationStore.setDialogueString(phase.dialogue);
-        }
-      }
-
-      if (phase.dialogue && this.root?.enemyStore) {
-        const animationStore = this.root.enemyStore.getAnimationStore(this.id);
-        if (animationStore) {
-          animationStore.setDialogueString(phase.dialogue);
+          runInAction(() => (animationStore.dialogue = phase.dialogue));
         }
       }
     }
@@ -976,12 +566,16 @@ export class Enemy extends Creature {
       creatureSpecies: minionObj.name,
       currentHealth: minionObj.health,
       baseHealth: minionObj.health,
-      currentEnergy: minionObj.energy?.maximum,
-      baseEnergy: minionObj.energy?.maximum,
-      energyRegen: minionObj.energy?.regen,
-      attackPower: minionObj.attackPower,
+      currentMana: minionObj.energy?.maximum,
+      baseMana: minionObj.energy?.maximum,
+      baseManaRegen: minionObj.energy?.regen,
       attackStrings: minionObj.attackStrings,
       turnsLeftAlive: minionObj.turns,
+      baseStrength: minionObj.baseStrength,
+      baseIntelligence: minionObj.baseIntelligence,
+      baseDexterity: minionObj.baseDexterity,
+      baseDamageTable: minionObj.baseDamageTable,
+      baseResistanceTable: minionObj.baseResistanceTable,
       beingType: minionObj.beingType as BeingType,
       root: this.root,
       parent: this,
@@ -1068,10 +662,9 @@ export class Minion extends Creature {
   turnsLeftAlive: number;
   private parent: Enemy | PlayerCharacter | null;
 
-  constructor({ sprite = null, turnsLeftAlive, parent, ...props }: MinionType) {
+  constructor({ turnsLeftAlive, parent, ...props }: MinionOptions) {
     super({
       ...props,
-      sprite,
     });
     this.turnsLeftAlive = turnsLeftAlive;
     this.parent = parent;

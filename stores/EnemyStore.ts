@@ -3,8 +3,10 @@ import { Enemy } from "@/entities/creatures";
 import { storage } from "@/utility/functions/storage";
 import { RootStore } from "@/stores/RootStore";
 import { action, computed, makeObservable, observable, reaction } from "mobx";
-import { throttle } from "lodash";
 import { EnemyAnimationStore } from "@/stores/EnemyAnimationStore";
+import enemiesJSON from "@/assets/json/enemy.json";
+import { BeingType, ItemClassType } from "@/utility/types";
+import { EnemyImageKeyOption } from "@/utility/enemyHelpers";
 
 export default class EnemyStore {
   enemies: Enemy[];
@@ -20,6 +22,8 @@ export default class EnemyStore {
     this.enemies = enemies;
     this.animationStoreMap = map;
 
+    __DEV__ && this.setupDevActions();
+
     makeObservable(this, {
       enemies: observable,
       animationStoreMap: observable,
@@ -28,6 +32,7 @@ export default class EnemyStore {
       addToEnemyList: action,
       removeEnemy: action,
       clearEnemyList: action,
+      _enemyTester: action,
       enemyTurnOngoing: computed,
     });
 
@@ -47,6 +52,66 @@ export default class EnemyStore {
         }
       },
     );
+  }
+
+  setupDevActions() {
+    this.root.addDevAction({
+      action: (value: string) => this._enemyTester(value.replaceAll("_", " ")),
+      name: "Enemy tester",
+      stringInput: true,
+      autocompleteType: "enemyOptions",
+    });
+  }
+  _enemyTester(val: string) {
+    let enemyJSON = enemiesJSON.find((json) => json.name == val);
+    if (!enemyJSON) {
+      console.error(`invalid enemy name: ${val}`);
+      return;
+    }
+    const hp =
+      Math.floor(
+        Math.random() *
+          (enemyJSON.healthRange.maximum - enemyJSON.healthRange.minimum + 1),
+      ) + enemyJSON.healthRange.minimum;
+    const ap =
+      Math.floor(
+        Math.random() *
+          (enemyJSON.attackPowerRange.maximum -
+            enemyJSON.attackPowerRange.minimum +
+            1),
+      ) + enemyJSON.attackPowerRange.minimum;
+
+    this.clearEnemyList();
+    const enemy = new Enemy({
+      beingType: enemyJSON.beingType as BeingType,
+      creatureSpecies: enemyJSON.name,
+      currentHealth: hp,
+      baseHealth: hp,
+      currentSanity: enemyJSON.sanity,
+      baseSanity: enemyJSON.sanity,
+      attackPower: ap,
+      baseArmor: enemyJSON.armorValue,
+      currentEnergy: enemyJSON.energy.maximum,
+      baseEnergy: enemyJSON.energy.maximum,
+      energyRegen: enemyJSON.energy.regen,
+      goldDropRange: enemyJSON.goldDropRange,
+      drops: enemyJSON.drops as {
+        item: string;
+        itemType: ItemClassType;
+        chance: number;
+      }[],
+      attackStrings: enemyJSON.attackStrings,
+      animationStrings: enemyJSON.animationStrings,
+      sprite: enemyJSON.sprite as EnemyImageKeyOption,
+      root: this.root,
+    });
+
+    this.enemies.push(enemy);
+    this.animationStoreMap.set(
+      enemy.id,
+      new EnemyAnimationStore({ root: this.root, sprite: enemy.sprite }),
+    );
+    this.saveEnemy(enemy);
   }
 
   get enemyTurnOngoing() {

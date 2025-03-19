@@ -8,7 +8,7 @@ import { observer } from "mobx-react-lite";
 import { useRootStore } from "../hooks/stores";
 import { AccelerationCurves } from "../utility/functions/misc";
 import { useAcceleratedAction } from "../hooks/generic";
-import { normalize, useStyles } from "../hooks/styles";
+import { useStyles } from "../hooks/styles";
 
 interface MedicalOptionProps {
   title: string;
@@ -53,7 +53,7 @@ const MedicalOption = observer(
         playerState?.getMedicalService(
           cost,
           healthRestore == "fill" ? playerState.maxHealth : healthRestore,
-          sanityRestore == "fill" ? playerState.maxSanity : sanityRestore,
+          sanityRestore == "fill" ? playerState.maxSanity! : sanityRestore,
           manaRestore == "fill" ? playerState.maxMana : manaRestore,
           removeDebuffs == "all"
             ? playerState.conditions.length
@@ -79,7 +79,7 @@ const MedicalOption = observer(
           }
         }
         if (sanityRestore) {
-          if (playerState.maxSanity - playerState.currentSanity == 0) {
+          if (playerState.maxSanity! - playerState.currentSanity! == 0) {
             return { disabled: true, message: "Sanity at max" };
           }
         }

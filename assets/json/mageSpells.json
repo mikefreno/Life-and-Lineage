@@ -7,7 +7,9 @@
     "type": "offense",
     "manaCost": 10,
     "effects": {
-      "damage": 15,
+      "damage": {
+        "fire": 15
+      },
       "buffs": null,
       "debuffs": [
         {

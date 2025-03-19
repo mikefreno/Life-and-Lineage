@@ -1,3 +1,5 @@
+import enemiesJSON from "@/assets/json/enemy.json";
+
 // use after expanding set
 export const enemyImageOptionsPrinter = () => {
   console.log(Object.keys(EnemyImageMap));
@@ -88,6 +90,8 @@ export type EnemyImageKeyOption =
   | "wizard_yellow"
   | "wolf_black"
   | "zombie";
+
+export const enemyOptions = enemiesJSON.map((json) => json.name);
 
 export type AnimationSet = {
   anim: any;
@@ -193,6 +197,7 @@ export const EnemyImageMap: EnemyImageMapType = {
     },
     height: 48,
     width: 48,
+    renderScale: 0.85,
   },
   bandit_light: {
     sets: {
@@ -214,6 +219,7 @@ export const EnemyImageMap: EnemyImageMapType = {
     },
     height: 48,
     width: 48,
+    renderScale: 0.85,
   },
   bat: {
     sets: {
@@ -1453,7 +1459,7 @@ export const EnemyImageMap: EnemyImageMapType = {
           anim: require("@/assets/monsters/Skeleton_Mage/PROJECTILE.webp"),
           width: 32,
           height: 16,
-          scale: 4,
+          scale: 0.8,
         },
       },
       hurt: {
@@ -1471,7 +1477,6 @@ export const EnemyImageMap: EnemyImageMapType = {
     },
     height: 128,
     width: 128,
-    topOffset: 20,
     mirror: true,
   },
   spider_dark: {

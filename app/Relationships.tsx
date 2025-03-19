@@ -283,7 +283,7 @@ const RelationshipsScreen = observer(() => {
           }}
           pageThree={{
             title: "Adoption",
-            body: "You can also adopt (top left), but it can be extremely expensive",
+            body: "You can also adopt (top right), but it can be extremely expensive",
           }}
         />
         <CharacterInteractionModal

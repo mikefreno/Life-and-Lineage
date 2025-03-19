@@ -1,0 +1,178 @@
+import { AnimationOptions, EnemyImageKeyOption } from "@/utility/enemyHelpers";
+import {
+  Attribute,
+  BeingType,
+  Personality,
+  Element,
+  PlayerClassOptions,
+  ItemClassType,
+} from "@/utility/types";
+import { type Item } from "./item";
+import { type RootStore } from "@/stores/RootStore";
+import { JobData, type PlayerCharacter } from "./character";
+import { type Enemy, type Minion } from "./creatures";
+import { type Investment } from "./investment";
+import { Condition } from "./conditions";
+
+export interface BeingOptions {
+  baseDexterity?: number;
+  baseIntelligence?: number;
+  baseStrength?: number;
+  allocatedSkillPoints?: Record<Attribute, number>;
+
+  id?: string;
+  beingType: BeingType;
+  sprite?: EnemyImageKeyOption;
+
+  isPlayerCharacter?: boolean;
+  equipment?: {
+    mainHand: Item;
+    offHand: Item | null;
+    head: Item | null;
+    body: Item | null;
+    quiver: Item[] | null;
+  };
+
+  attackStrings?: string[];
+  conditions?: Condition[];
+
+  baseArmor?: number;
+
+  baseMana: number;
+  currentMana?: number;
+
+  baseManaRegen: number;
+
+  baseSanity?: number | null;
+  currentSanity?: number | null;
+
+  baseHealth: number;
+  currentHealth?: number;
+
+  baseDamageTable: { [key in string]?: number };
+  baseResistanceTable: { [key in string]?: number };
+
+  deathdate?: { year: number; week: number };
+  alive?: boolean;
+
+  root: RootStore;
+}
+
+export interface BaseCharacterOptions extends BeingOptions {
+  firstName: string;
+  lastName: string;
+  sex: "male" | "female";
+  birthdate: { year: number; week: number };
+  alive?: boolean;
+  deathdate?: { year: number; week: number };
+  job?: string;
+  affection?: number;
+  qualifications?: string[];
+  dateCooldownStart?: { year: number; week: number };
+  pregnancyDueDate?: { year: number; week: number };
+  isPregnant?: boolean;
+  parentIds?: string[];
+  childrenIds?: string[];
+  partnerIds?: string[];
+  knownCharacterIds?: string[];
+  root: RootStore;
+}
+
+export interface CharacterOptions extends BaseCharacterOptions {
+  personality: Personality | null;
+}
+
+export interface PlayerCharacterBase extends BaseCharacterOptions {
+  magicProficiencies?: { school: Element; proficiency: number }[];
+  jobs?: Map<string, JobData>;
+  learningSpells?: {
+    bookName: string;
+    spellName: string;
+    experience: number;
+    element: Element;
+  }[];
+  qualificationProgress?: {
+    name: string;
+    progress: number;
+    completed: boolean;
+  }[];
+  knownSpells?: string[];
+  gold?: number;
+  baseInventory?: Item[];
+  keyItems?: Item[];
+  minions?: Minion[];
+  rangerPet?: Minion;
+  investments?: Investment[];
+  unAllocatedSkillPoints?: number;
+}
+
+export type MageCharacter = PlayerCharacterBase & {
+  playerClass: "mage" | PlayerClassOptions.mage;
+  blessing: Element.fire | Element.water | Element.air | Element.earth;
+};
+
+export type NecromancerCharacter = PlayerCharacterBase & {
+  playerClass: "necromancer" | PlayerClassOptions.necromancer;
+  blessing:
+    | Element.blood
+    | Element.summoning
+    | Element.bone
+    | Element.pestilence;
+};
+
+export type PaladinCharacter = PlayerCharacterBase & {
+  playerClass: "paladin" | PlayerClassOptions.paladin;
+  blessing: Element.holy | Element.vengeance | Element.protection;
+};
+
+export type RangerCharacter = PlayerCharacterBase & {
+  playerClass: "ranger" | PlayerClassOptions.ranger;
+  blessing: Element.assassination | Element.beastMastery | Element.arcane;
+};
+
+export type PlayerCharacterOptions =
+  | MageCharacter
+  | NecromancerCharacter
+  | PaladinCharacter
+  | RangerCharacter;
+
+export interface CreatureOptions extends BeingOptions {
+  creatureSpecies: string;
+}
+
+export interface Phase {
+  triggerHealth: number;
+  sprite?: EnemyImageKeyOption;
+  dialogue?: string;
+  attackPower?: number;
+  baseArmor?: number;
+  manaRegen?: number;
+  attackStrings?: string[];
+  baseDamageTable?: { [key: string]: number };
+  baseResistanceTable?: { [key: string]: number };
+}
+
+export interface EnemyOptions extends CreatureOptions {
+  phases?: Phase[];
+  gotDrops?: boolean;
+  minions?: Minion[];
+  sprite: EnemyImageKeyOption;
+  animationStrings: { [key: string]: AnimationOptions };
+  drops: {
+    item: string;
+    itemType: ItemClassType;
+    chance: number;
+  }[];
+  goldDropRange: {
+    minimum: number;
+    maximum: number;
+  };
+  storyDrops?: {
+    item: string;
+  }[];
+}
+
+export interface MinionOptions extends CreatureOptions {
+  turnsLeftAlive: number;
+  parent: Enemy | PlayerCharacter | null;
+}

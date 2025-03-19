@@ -12,7 +12,7 @@
         "normalEncounters": [
           [
             {
-              "name": "training dummy",
+              "name": "training_dummy",
               "scaler": 1
             }
           ]
@@ -32,7 +32,7 @@
       {
         "item": "stick",
         "itemType": "melee",
-        "chance": 1.0
+        "chance": 0.2
       }
     ],
     "levels": [

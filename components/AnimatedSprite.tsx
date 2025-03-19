@@ -18,7 +18,6 @@ import { Enemy, Minion } from "@/entities/creatures";
 import { useHeaderHeight } from "@react-navigation/elements";
 import Colors from "@/constants/Colors";
 import { useReanimatedAnimations } from "@/hooks/animation";
-import { Vector2 } from "@/utility/Vec2";
 
 export const AnimatedSprite = observer(
   ({
@@ -178,27 +177,6 @@ export const AnimatedSprite = observer(
 
     const handleFrameCountReady = (count: number) => {
       setFrameCount(count);
-    };
-
-    // Calculate movement direction and distance using Vector2
-    const calculateMovementVector = (
-      playerPos: Vector2,
-      enemyPos: Vector2,
-      maxDistance: number = 100,
-    ): Vector2 => {
-      // Get direction vector from enemy to player
-      const direction = playerPos.subtract(enemyPos);
-
-      // Get distance
-      const distance = direction.magnitude();
-
-      // Limit the movement distance
-      const moveDistance = Math.min(distance, maxDistance);
-
-      // Normalize and scale the direction vector
-      return distance > 0
-        ? direction.normalize().multiply(moveDistance)
-        : new Vector2(0, 0);
     };
 
     useEffect(() => {
@@ -497,7 +475,10 @@ const SingleAnimationSprite = React.memo(
           frameRef.current = (frameRef.current + 1) % frameCount;
           safeSetCurrentFrame(frameRef.current);
 
-          if (frameRef.current === 0 && !hasCompletedLoop.current) {
+          if (
+            frameRef.current === frameCount - 1 &&
+            !hasCompletedLoop.current
+          ) {
             hasCompletedLoop.current = true;
             if (onAnimationComplete && !isLooping && isMounted.current) {
               onAnimationComplete();
@@ -511,10 +492,8 @@ const SingleAnimationSprite = React.memo(
         }
       };
 
-      // Start the animation process
       advanceFrame();
 
-      // Cleanup function
       return () => {
         if (animationTimerRef.current) {
           clearTimeout(animationTimerRef.current);

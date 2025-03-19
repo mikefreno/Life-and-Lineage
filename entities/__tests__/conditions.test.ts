@@ -101,27 +101,6 @@ describe("Condition", () => {
     });
   });
 
-  describe("reinstateParent", () => {
-    it("should set the parent and return the condition", () => {
-      const condition = new Condition({
-        name: "Test Condition",
-        style: "buff",
-        turns: 3,
-        effect: ["strengthen"],
-        effectStyle: ["flat"],
-        effectMagnitude: [1],
-        healthDamage: [],
-        sanityDamage: [],
-        placedby: "Test Player",
-        placedbyID: "player1",
-      });
-
-      const result = condition.reinstateParent(mockPlayer);
-      expect(result).toBe(condition);
-      expect(condition.on).toBe(mockPlayer);
-    });
-  });
-
   describe("damage calculations", () => {
     it("should calculate health damage correctly", () => {
       const condition = new Condition({

@@ -1,7 +1,7 @@
 import Colors from "@/constants/Colors";
 import { useRootStore } from "@/hooks/stores";
 import { observer } from "mobx-react-lite";
-import { Animated, Pressable, View } from "react-native";
+import { Animated, Pressable, ScrollView, TextInput, View } from "react-native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React, { useRef, useState, useEffect } from "react";
 import GenericModal from "./GenericModal";
@@ -18,6 +18,7 @@ import GenericRaisedButton from "./GenericRaisedButton";
 import Slider from "@react-native-community/slider";
 import { flex, normalize, useStyles } from "@/hooks/styles";
 import { Entypo } from "@expo/vector-icons";
+import { enemyOptions } from "@/utility/enemyHelpers";
 
 export const DevControls = observer(() => {
   const rootStore = useRootStore();
@@ -156,16 +157,21 @@ export const DevControls = observer(() => {
     translateY.setValue(0);
   }, [isVisible, onRight]);
 
+  const [scrollEnabled, setScrollEnabled] = useState<boolean>(true);
+
   return (
     <>
       <GenericModal
         isVisibleCondition={showingDevControls}
-        scrollEnabled={true}
+        scrollEnabled={scrollEnabled}
         size={100}
         style={{ maxHeight: "70%", marginVertical: "auto" }}
         backFunction={() => setShowingDevControls(false)}
       >
-        <ActionSliders actions={rootStore.devActions} />
+        <ActionSliders
+          actions={rootStore.devActions}
+          setScrollEnabled={setScrollEnabled}
+        />
       </GenericModal>
 
       <PanGestureHandler
@@ -259,19 +265,24 @@ export const DevControls = observer(() => {
 
 const ActionSliders = ({
   actions,
+  setScrollEnabled,
 }: {
   actions: {
-    action: (value: number) => void | undefined;
+    action: (value: number | string) => void | undefined;
     name: string;
     min?: number;
     max?: number;
     step?: number;
     initVal?: number;
+    stringInput?: boolean;
+    autocompleteType?: "enemyOptions";
   }[];
+  setScrollEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const { uiStore } = useRootStore();
   const styles = useStyles();
   const vibration = useVibration();
+
   return (
     <>
       {actions.map((action, idx) => {
@@ -281,7 +292,10 @@ const ActionSliders = ({
           (_, i) => i * stepSize + (action.min ?? 0),
         );
         const [sliderValue, setSliderValue] = useState(action.initVal ?? 0);
+        const [textValue, setTextValue] = useState("");
         const [expanded, setExpanded] = useState(false);
+        const [filteredOptions, setFilteredOptions] = useState<string[]>([]);
+        const [showDropdown, setShowDropdown] = useState(false);
 
         const rotation = useRef(new Animated.Value(0)).current;
 
@@ -297,6 +311,17 @@ const ActionSliders = ({
           inputRange: [0, 1],
           outputRange: ["0deg", "180deg"],
         });
+
+        const filterOptions = (text: string) => {
+          setTextValue(text);
+          if (action.autocompleteType === "enemyOptions") {
+            const filtered = enemyOptions.filter((option) =>
+              option.toLowerCase().includes(text.toLowerCase()),
+            );
+            setFilteredOptions(filtered);
+            setShowDropdown(text.length > 0 && filtered.length > 0);
+          }
+        };
 
         return (
           <Pressable
@@ -324,7 +349,77 @@ const ActionSliders = ({
                 </View>
                 {expanded && (
                   <>
-                    {action.min || action.max ? (
+                    {action.stringInput ? (
+                      <View style={{ position: "relative" }}>
+                        <TextInput
+                          style={[
+                            styles.nameInput,
+                            {
+                              borderColor: Colors[uiStore.colorScheme].border,
+                              color: Colors[uiStore.colorScheme].text,
+                            },
+                          ]}
+                          placeholder="Enter value..."
+                          placeholderTextColor={`${
+                            Colors[uiStore.colorScheme].text
+                          }`}
+                          value={textValue}
+                          onChangeText={(text) => {
+                            setTextValue(text);
+                            if (text && action.autocompleteType) {
+                              filterOptions(text);
+                            }
+                          }}
+                          onFocus={() => {
+                            setScrollEnabled(false);
+                            if (textValue && action.autocompleteType) {
+                              filterOptions(textValue);
+                            }
+                          }}
+                          onBlur={() => setScrollEnabled(true)}
+                        />
+
+                        {showDropdown && (
+                          <ScrollView
+                            style={{
+                              maxHeight: 200,
+                              backgroundColor: Colors[uiStore.colorScheme].card,
+                              borderWidth: 1,
+                              borderColor: Colors[uiStore.colorScheme].border,
+                              borderRadius: 5,
+                              zIndex: 1000,
+                            }}
+                          >
+                            {filteredOptions.map((option, optionIdx) => (
+                              <Pressable
+                                key={optionIdx}
+                                style={{
+                                  padding: 10,
+                                  borderBottomWidth:
+                                    optionIdx < filteredOptions.length - 1
+                                      ? 1
+                                      : 0,
+                                  borderBottomColor:
+                                    Colors[uiStore.colorScheme].border,
+                                }}
+                                onPress={() => {
+                                  setTextValue(option);
+                                  setShowDropdown(false);
+                                }}
+                              >
+                                <Text
+                                  style={{
+                                    color: Colors[uiStore.colorScheme].text,
+                                  }}
+                                >
+                                  {option}
+                                </Text>
+                              </Pressable>
+                            ))}
+                          </ScrollView>
+                        )}
+                      </View>
+                    ) : action.min || action.max ? (
                       <>
                         <Text
                           style={{
@@ -344,7 +439,7 @@ const ActionSliders = ({
                             onValueChange={(val) => {
                               setSliderValue(val);
                             }}
-                            step={action.step} // Add step prop if your actions have defined steps
+                            step={action.step}
                           />
 
                           <View
@@ -378,7 +473,11 @@ const ActionSliders = ({
                     ) : null}
 
                     <GenericRaisedButton
-                      onPress={() => action.action(sliderValue)}
+                      onPress={() =>
+                        action.action(
+                          action.stringInput ? textValue : sliderValue,
+                        )
+                      }
                       style={{ marginTop: 10 }}
                     >
                       Activate
